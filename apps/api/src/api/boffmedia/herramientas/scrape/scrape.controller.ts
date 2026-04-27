@@ -1,5 +1,5 @@
-import { Body, Controller, Get, HttpStatus, Post, Query, Res, UseInterceptors } from '@nestjs/common';
-import { ApiBody, ApiTags, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { BadRequestException, Body, Controller, Get, HttpStatus, Patch, Post, Query, Res, UseInterceptors } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiQuery, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { Response } from 'express';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { ScrapeFacadeService } from './scrape.facade.service';
@@ -9,6 +9,7 @@ import { DownloadResult } from './entities/download-result.entity';
 import { BulkDownloadResult } from './entities/bulk-download-result.entity';
 import { DownloadAllGamesDto } from './dto/download-all-games.dto';
 import { DownloadSelectedGamesDto } from './dto/download-selected-games.dto';
+import { DownloadMangaNovelDto } from './dto/download-manga-novel.dto';
 import { MyrientConsole } from './enums/myrient-console.enum';
 
 @ApiTags('BoffMedia | Scrape')
@@ -167,6 +168,77 @@ export class ScrapeController {
     res.flushHeaders();
 
     for await (const chunk of this.scrapeFacadeService.streamDownloadSelected(dto)) {
+      res.write(chunk);
+    }
+    res.end();
+  }
+
+  // ==================== MANGA ====================
+
+  @Get('manga/library')
+  @ApiOperation({ summary: 'Get all locally downloaded manga series and their chapters' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Local manga library.' })
+  async getLocalMangaLibrary() {
+    return this.scrapeFacadeService.getLocalMangaLibrary();
+  }
+
+  @Get('manga/browser')
+  @ApiOperation({ summary: 'Get current browser config (tunnel on/off)' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Browser config.' })
+  getBrowserConfig() {
+    return this.scrapeFacadeService.getBrowserConfig();
+  }
+
+  @Patch('manga/browser')
+  @ApiOperation({ summary: 'Enable or disable the remote browser tunnel' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Updated browser config.' })
+  async setBrowserTunnel(@Body() body: { tunnelEnabled: boolean }) {
+    return this.scrapeFacadeService.setBrowserTunnel(body.tunnelEnabled);
+  }
+
+  @Get('manga/search')
+  @ApiOperation({ summary: 'Search novelcool.com for a manga title' })
+  @ApiQuery({ name: 'q', type: String, description: 'Search query', example: 'Raeliana' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'List of matching manga.' })
+  async searchManga(@Query('q') query: string) {
+    if (!query?.trim()) throw new BadRequestException('q is required');
+    return this.scrapeFacadeService.searchManga(query);
+  }
+
+  @Get('manga/info')
+  @ApiOperation({ summary: 'Get title for a novel URL (used for direct URL input)' })
+  @ApiQuery({ name: 'url', type: String, description: 'Novel page URL' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Novel title and URL.' })
+  async getNovelInfo(@Query('url') url: string) {
+    if (!url?.trim()) throw new BadRequestException('url is required');
+    return this.scrapeFacadeService.getNovelInfo(url);
+  }
+
+  @Get('manga/chapters')
+  @ApiOperation({ summary: 'Get the full ordered chapter list for a novelcool.com novel' })
+  @ApiQuery({ name: 'url', type: String, description: 'Novel page URL', example: 'https://es.novelcool.com/novel/La-Raz-n-Por-La-Que-Raeliana-Termin-En-La-Mansi-n-Del-Duque.html' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Ordered list of chapters (title + url).' })
+  async getMangaChapters(@Query('url') url: string) {
+    if (!url?.trim()) throw new BadRequestException('url is required');
+    return this.scrapeFacadeService.getMangaChapters(url);
+  }
+
+  @Post('manga/download/novel/stream')
+  @ApiOperation({
+    summary: 'Stream manga download progress via SSE',
+    description: 'Scrapes every selected chapter with Playwright and streams per-chapter progress events. Events: start, chapter, done.',
+  })
+  @ApiResponse({ status: HttpStatus.OK, description: 'SSE stream of download progress events.' })
+  async streamDownloadMangaNovel(
+    @Body() dto: DownloadMangaNovelDto,
+    @Res() res: Response,
+  ): Promise<void> {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders();
+
+    for await (const chunk of this.scrapeFacadeService.streamDownloadMangaNovel(dto.url, dto.from, dto.to, dto.skipDownloaded ?? true)) {
       res.write(chunk);
     }
     res.end();

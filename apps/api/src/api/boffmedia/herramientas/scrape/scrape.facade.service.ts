@@ -1,5 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { MyrientScrapeService } from './services/myrient.service';
+import { MangaScraperService } from './services/manga.service';
+import { MangaBrowserService } from './services/manga/manga-browser.service';
+import type {
+  MangaSearchResult,
+  MangaChapter,
+  MangaChapterDownloadResult,
+  LocalMangaLibrary,
+} from './services/manga/manga.types';
 import { EuropeAggregateResult } from './entities/europe-aggregate.entity';
 import { DownloadResult } from './entities/download-result.entity';
 import { BulkDownloadResult } from './entities/bulk-download-result.entity';
@@ -12,6 +20,8 @@ import { MyrientConsole } from './enums/myrient-console.enum';
 export class ScrapeFacadeService {
   constructor(
     private readonly myrientScrapeService: MyrientScrapeService,
+    private readonly mangaScraperService: MangaScraperService,
+    private readonly mangaBrowserService: MangaBrowserService,
   ) {}
 
   // ==================== MYRIENT SCRAPING ====================
@@ -35,9 +45,9 @@ export class ScrapeFacadeService {
   async getMyrientCatalog(consoleKey: MyrientConsole, regions: string[]): Promise<EuropeAggregateResult> {
     try {
       return await this.myrientScrapeService.scrapeCatalog(consoleKey, regions);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error scraping Myrient catalog:', error);
-      throw new Error(`Failed to scrape catalog: ${error.message}`);
+      throw new Error(`Failed to scrape catalog: ${(error as Error).message}`);
     }
   }
 
@@ -46,31 +56,87 @@ export class ScrapeFacadeService {
   async downloadGame(url: string): Promise<DownloadResult> {
     try {
       return await this.myrientScrapeService.downloadGame(url);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error downloading game from Myrient:', error);
-      throw new Error(`Failed to download game: ${error.message}`);
+      throw new Error(`Failed to download game: ${(error as Error).message}`);
     }
   }
 
   async downloadAllGames(dto: DownloadAllGamesDto): Promise<BulkDownloadResult> {
     try {
       return await this.myrientScrapeService.downloadAllGames(dto);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error in bulk download from Myrient:', error);
-      throw new Error(`Bulk download failed: ${error.message}`);
+      throw new Error(`Bulk download failed: ${(error as Error).message}`);
     }
   }
 
   async downloadSelectedGames(dto: DownloadSelectedGamesDto): Promise<BulkDownloadResult> {
     try {
       return await this.myrientScrapeService.downloadSelectedGames(dto);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error in selected download from Myrient:', error);
-      throw new Error(`Selected download failed: ${error.message}`);
+      throw new Error(`Selected download failed: ${(error as Error).message}`);
     }
   }
 
   streamDownloadSelected(dto: DownloadSelectedGamesDto): AsyncGenerator<string> {
     return this.myrientScrapeService.streamDownloadSelected(dto);
+  }
+
+  // ==================== MANGA SCRAPER ====================
+
+  async searchManga(query: string): Promise<MangaSearchResult[]> {
+    try {
+      return await this.mangaScraperService.searchNovels(query);
+    } catch (error) {
+      throw new Error(`Failed to search manga: ${(error as Error).message}`);
+    }
+  }
+
+  async getNovelInfo(novelUrl: string): Promise<{ title: string; url: string }> {
+    try {
+      return await this.mangaScraperService.getNovelInfo(novelUrl);
+    } catch (error) {
+      throw new Error(`Failed to fetch novel info: ${(error as Error).message}`);
+    }
+  }
+
+  async getMangaChapters(novelUrl: string): Promise<MangaChapter[]> {
+    try {
+      return await this.mangaScraperService.getChapterList(novelUrl);
+    } catch (error) {
+      throw new Error(`Failed to fetch chapter list: ${(error as Error).message}`);
+    }
+  }
+
+  async downloadMangaChapter(chapterUrl: string, saveDir: string): Promise<MangaChapterDownloadResult> {
+    try {
+      return await this.mangaScraperService.downloadChapter(chapterUrl, saveDir);
+    } catch (error) {
+      throw new Error(`Failed to download chapter: ${(error as Error).message}`);
+    }
+  }
+
+  streamDownloadMangaNovel(novelUrl: string, from?: number, to?: number, skipDownloaded = true): AsyncGenerator<string> {
+    return this.mangaScraperService.streamDownloadNovel(novelUrl, from, to, skipDownloaded);
+  }
+
+  async getLocalMangaLibrary(): Promise<LocalMangaLibrary> {
+    return this.mangaScraperService.getLocalLibrary();
+  }
+
+  // ==================== BROWSER CONFIG ====================
+
+  getBrowserConfig(): { tunnelEnabled: boolean; tunnelAvailable: boolean } {
+    return {
+      tunnelEnabled: this.mangaBrowserService.getTunnelEnabled(),
+      tunnelAvailable: this.mangaBrowserService.tunnelAvailable(),
+    };
+  }
+
+  async setBrowserTunnel(enabled: boolean): Promise<{ tunnelEnabled: boolean; tunnelAvailable: boolean }> {
+    await this.mangaBrowserService.setTunnelEnabled(enabled);
+    return this.getBrowserConfig();
   }
 }
