@@ -1,4 +1,5 @@
 import { apiGET, apiDELETE, boffPOST } from '@/services/boffAPI';
+import type { BatchFetchResultDto, ChampionsPasteDetailDto } from '@boffmedia/shared';
 
 // ─── VGC Meta Analysis ────────────────────────────────────────────────────────
 
@@ -33,6 +34,12 @@ export interface PokemonUsageDetail extends PokemonUsageEntry {
   spreads:    Array<{ nature: string; spread: string; percent: number }>;
 }
 
+/** Paste-derived breakdown for a Champions species (Phase 3) */
+export type ChampionsPasteDetail = ChampionsPasteDetailDto;
+
+/** Result of a batch paste-fetch operation */
+export type BatchFetchResult = BatchFetchResultDto;
+
 export class VgcMetaService {
   static getAvailableSnapshots() {
     return apiGET<SmogonSnapshot[]>('/tools/vgc/meta/smogon/available');
@@ -60,6 +67,34 @@ export class VgcMetaService {
   static deleteSmogonSnapshot(format: string, month: string, cutoff: number) {
     const params = new URLSearchParams({ format, month, cutoff: String(cutoff) });
     return apiDELETE<void>(`/tools/vgc/meta/smogon/snapshot?${params}`);
+  }
+
+  static getAvailableChampionsRegulations() {
+    return apiGET<ChampionsRegulation[]>('/tools/vgc/meta/champions/available');
+  }
+
+  static getChampionsUsage(regulationId: string) {
+    return apiGET<PokemonUsageDetail[]>(`/tools/vgc/meta/champions?regulationId=${regulationId}`);
+  }
+
+  static refreshChampions(regulationId: string) {
+    return boffPOST<{ count: number }>(
+      `/tools/vgc/meta/champions/refresh?regulationId=${regulationId}`,
+      {},
+    );
+  }
+
+  static getChampionsPasteDetail(regulationId: string, speciesId: string) {
+    return apiGET<ChampionsPasteDetail>(
+      `/tools/vgc/meta/champions/${speciesId}/detail?regulationId=${regulationId}`,
+    );
+  }
+
+  static fetchChampionsPastes(regulationId: string) {
+    return boffPOST<BatchFetchResult>(
+      `/tools/vgc/meta/champions/fetch-pastes?regulationId=${regulationId}`,
+      {},
+    );
   }
 }
 

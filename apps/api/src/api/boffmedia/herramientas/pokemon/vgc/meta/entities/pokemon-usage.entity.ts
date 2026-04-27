@@ -22,6 +22,29 @@ export interface PokemonUsageDetail extends PokemonUsageEntry {
   spreads:    Array<{ nature: string; spread: string; percent: number }>;
 }
 
+/**
+ * Paste-derived breakdown for a Champions species.
+ * Returned by GET /champions/:speciesId/detail — separate from the usage list entry.
+ */
+export interface ChampionsPasteDetail {
+  speciesId:  string;
+  speciesName: string;
+  pasteCount: number;
+  abilities:  Array<{ name: string; percent: number }>;
+  items:      Array<{ name: string; percent: number }>;
+  moves:      Array<{ name: string; percent: number }>;
+  teraTypes:  Array<{ name: string; percent: number }>;
+  spreads:    Array<{ nature: string; spread: string; percent: number }>;
+}
+
+/** Result of a batch paste-fetch operation */
+export interface BatchFetchResult {
+  total:   number;
+  fetched: number;
+  cached:  number;
+  failed:  number;
+}
+
 /** Divergence entry comparing ladder vs Champions usage */
 export interface DivergenceEntry {
   speciesId:        string;

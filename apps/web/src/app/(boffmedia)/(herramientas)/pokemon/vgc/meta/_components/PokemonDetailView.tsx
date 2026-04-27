@@ -172,38 +172,51 @@ export function PokemonDetailView({ detail, loading, speciesId, onBack, onSelect
           <BaseStatsPanel baseStats={detail.baseStats} speciesName={detail.speciesName} />
         )}
 
-        <StatPanel title={t("detail.moves")} items={detail.moves.slice(0, 10)} />
-        <StatPanel title={t("detail.items")} items={detail.items.slice(0, 8)} />
+        {detail.moves.length > 0 && (
+          <StatPanel title={t("detail.moves")} items={detail.moves.slice(0, 10)} />
+        )}
+        {detail.items.length > 0 && (
+          <StatPanel title={t("detail.items")} items={detail.items.slice(0, 8)} />
+        )}
 
         {/* Abilities + Tera Types share one column — both are small sections */}
-        <div className="flex flex-col gap-4">
-          <StatPanel title={t("detail.abilities")} items={detail.abilities} />
-          <TeraTypesPanel title={t("detail.teraTypes")} items={detail.teraTypes} />
-        </div>
+        {(detail.abilities.length > 0 || detail.teraTypes.length > 0) && (
+          <div className="flex flex-col gap-4">
+            {detail.abilities.length > 0 && (
+              <StatPanel title={t("detail.abilities")} items={detail.abilities} />
+            )}
+            {detail.teraTypes.length > 0 && (
+              <TeraTypesPanel title={t("detail.teraTypes")} items={detail.teraTypes} />
+            )}
+          </div>
+        )}
 
-        <TeammatesPanel
-          title={t("detail.teammates")}
-          items={detail.teammates}
-          onSelect={onSelect}
-        />
+        {detail.teammates.length > 0 && (
+          <TeammatesPanel
+            title={t("detail.teammates")}
+            items={detail.teammates}
+            onSelect={onSelect}
+          />
+        )}
 
         {/* EV Spreads */}
-        <div className="rounded-xl border border-surface-800 bg-surface-950 p-4">
-          <h3 className="text-[11px] font-semibold uppercase tracking-wider text-surface-300 mb-3">
-            {t("detail.spreads")}
-          </h3>
-          <div className="space-y-2">
-            {detail.spreads.slice(0, 5).map((s, i) => (
-              <div key={i} className="flex items-start gap-2 py-0.5">
-                <SpreadRow nature={s.nature} spread={s.spread} />
-                <span className="text-xs text-surface-200 tabular-nums font-mono shrink-0 w-12 text-right pt-0.5">
-                  {s.percent.toFixed(1)}%
-                </span>
-              </div>
-            ))}
+        {detail.spreads.length > 0 && (
+          <div className="rounded-xl border border-surface-800 bg-surface-950 p-4">
+            <h3 className="text-[11px] font-semibold uppercase tracking-wider text-surface-300 mb-3">
+              {t("detail.spreads")}
+            </h3>
+            <div className="space-y-2">
+              {detail.spreads.slice(0, 5).map((s, i) => (
+                <div key={i} className="flex items-start gap-2 py-0.5">
+                  <SpreadRow nature={s.nature} spread={s.spread} />
+                  <span className="text-xs text-surface-200 tabular-nums font-mono shrink-0 w-12 text-right pt-0.5">
+                    {s.percent.toFixed(1)}%
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
-
-        </div>
+        )}
       </div>
     </div>
   );

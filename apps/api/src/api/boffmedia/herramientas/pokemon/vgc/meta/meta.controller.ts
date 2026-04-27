@@ -20,6 +20,7 @@ import { FetchSmogonDto } from './dto/fetch-smogon.dto';
 import { QueryChampionsDto } from './dto/query-champions.dto';
 import { AddLimitlessTournamentDto } from './dto/add-limitless-tournament.dto';
 import { QueryLimitlessDto } from './dto/query-limitless.dto';
+import { BatchFetchResultDto, ChampionsPasteDetailDto } from './dto/champions-paste-detail.dto';
 
 @ApiTags('BoffMedia 🛠 | VGC Meta')
 @Controller('tools/vgc/meta')
@@ -67,6 +68,13 @@ export class VgcMetaController {
 
   // --- Champions (VGCPastes) -------------------------------------------------
 
+  @Get('champions/available')
+  @ApiOperation({ summary: 'List Champions regulations that have imported data' })
+  @ApiResponse({ status: 200, description: 'Available regulation list returned.' })
+  getAvailableChampionsRegulations() {
+    return this.facade.getAvailableChampionsRegulations();
+  }
+
   @Get('champions')
   @ApiOperation({ summary: 'Get Champions usage data from VGCPastes' })
   @ApiResponse({ status: 200, description: 'Usage list returned.' })
@@ -74,10 +82,26 @@ export class VgcMetaController {
     return this.facade.getChampionsUsage(dto);
   }
 
+  @Get('champions/:speciesId/detail')
+  @ApiOperation({ summary: 'Get Champions paste detail for a single Pokémon' })
+  @ApiParam({ name: 'speciesId', example: 'glimmoramega' })
+  @ApiResponse({ status: 200, description: 'Paste-derived breakdown returned.', type: ChampionsPasteDetailDto })
+  getChampionsPasteDetail(
+    @Param('speciesId') speciesId: string,
+    @Query() dto: QueryChampionsDto,
+  ) {
+    return this.facade.getChampionsPasteDetail(dto.regulationId, speciesId);
+  }
+
+  @Post('champions/fetch-pastes')
+  @ApiOperation({ summary: '[Admin] Batch-fetch pastes for all teams in a regulation' })
+  @ApiResponse({ status: 201, description: 'Batch fetch result returned.', type: BatchFetchResultDto })
+  batchFetchChampionsPastes(@Query('regulationId') regulationId: string) {
+    return this.facade.batchFetchChampionsPastes(regulationId);
+  }
+
   @Post('champions/refresh')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
-  @ApiOperation({ summary: '[Admin] Re-fetch VGCPastes CSV and refresh Champions data' })
+  @ApiOperation({ summary: 'Re-fetch VGCPastes CSV and refresh Champions data' })
   @ApiResponse({ status: 201, description: 'Data refreshed.' })
   refreshChampions(@Query('regulationId') regulationId: string) {
     return this.facade.refreshChampionsData(regulationId);
