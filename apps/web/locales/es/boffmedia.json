@@ -144,6 +144,9 @@
         "privacy": "Privacidad",
         "terms": "Términos"
       }
+    },
+    "manga": {
+      "chapter": "Capítulo {number}"
     }
   }
 }
