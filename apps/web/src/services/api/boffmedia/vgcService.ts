@@ -1,4 +1,67 @@
-import { apiGET } from '@/services/boffAPI';
+import { apiGET, apiDELETE, boffPOST } from '@/services/boffAPI';
+
+// ─── VGC Meta Analysis ────────────────────────────────────────────────────────
+
+export interface SmogonSnapshot {
+  id:           number;
+  formatId:     string;
+  month:        string;
+  cutoff:       number;
+  pokemonCount: number;
+  fetchedAt:    string;
+}
+
+export interface PokemonUsageEntry {
+  speciesId:    string;
+  speciesName:  string;
+  rank:         number;
+  types:        string[];
+  usagePercent: number;
+  rawCount:     number;
+  topItem?:     string;
+  topMove?:     string;
+  topTeraType?: string;
+}
+
+export interface PokemonUsageDetail extends PokemonUsageEntry {
+  baseStats:  { hp: number; atk: number; def: number; spa: number; spd: number; spe: number };
+  abilities:  Array<{ name: string; percent: number }>;
+  items:      Array<{ name: string; percent: number }>;
+  moves:      Array<{ name: string; percent: number }>;
+  teraTypes:  Array<{ name: string; percent: number }>;
+  teammates:  Array<{ name: string; percent: number }>;
+  spreads:    Array<{ nature: string; spread: string; percent: number }>;
+}
+
+export class VgcMetaService {
+  static getAvailableSnapshots() {
+    return apiGET<SmogonSnapshot[]>('/tools/vgc/meta/smogon/available');
+  }
+
+  /** Returns full PokemonUsageDetail[] — all Pokémon in one request, frontend builds a Map */
+  static getSmogonUsage(format: string, month?: string, cutoff?: number) {
+    const params = new URLSearchParams({ format });
+    if (month)                params.set('month', month);
+    if (cutoff !== undefined) params.set('cutoff', String(cutoff));
+    return apiGET<PokemonUsageDetail[]>(`/tools/vgc/meta/smogon?${params}`);
+  }
+
+  static getSmogonDetail(format: string, speciesId: string, month?: string, cutoff?: number) {
+    const params = new URLSearchParams({ format });
+    if (month)                params.set('month', month);
+    if (cutoff !== undefined) params.set('cutoff', String(cutoff));
+    return apiGET<PokemonUsageDetail>(`/tools/vgc/meta/smogon/${speciesId}?${params}`);
+  }
+
+  static fetchSmogonSnapshot(format: string, month: string, cutoff: number) {
+    return boffPOST<{ count: number }>('/tools/vgc/meta/smogon/fetch', { format, month, cutoff });
+  }
+
+  static deleteSmogonSnapshot(format: string, month: string, cutoff: number) {
+    const params = new URLSearchParams({ format, month, cutoff: String(cutoff) });
+    return apiDELETE<void>(`/tools/vgc/meta/smogon/snapshot?${params}`);
+  }
+}
 
 export interface ChampionsRegulation {
   id: string;

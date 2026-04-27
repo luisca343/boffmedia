@@ -1,4 +1,5 @@
 ﻿import { IsIn, IsNotEmpty, IsOptional, IsString, Matches } from 'class-validator';
+import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { SMOGON_VALID_CUTOFFS } from '../config/smogon.config';
 
@@ -16,6 +17,7 @@ export class QuerySmogonDto {
 
   @ApiPropertyOptional({ enum: SMOGON_VALID_CUTOFFS, default: 1760 })
   @IsOptional()
+  @Type(() => Number)
   @IsIn(SMOGON_VALID_CUTOFFS)
   cutoff?: number;
 }

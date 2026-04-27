@@ -1,5 +1,4 @@
-import { datetime, int, longtext, mysqlTable, text, varchar } from 'drizzle-orm/mysql-core';
-import { uniqueIndex } from 'drizzle-orm/mysql-core';
+import { datetime, double, foreignKey, int, mysqlTable, text, uniqueIndex, varchar } from 'drizzle-orm/mysql-core';
 
 // ─── Shared payload types ─────────────────────────────────────────────────────
 
@@ -13,7 +12,7 @@ export interface StatSpread {
   spe: number;
 }
 
-/** One Pokémon slot parsed from a Champions or ladder paste, enriched with spread data */
+/** One Pokemon slot parsed from a Champions or ladder paste, enriched with spread data */
 export interface VgcMetaSlot {
   slotIndex: 0 | 1 | 2 | 3 | 4 | 5;
   speciesId: string;
@@ -29,61 +28,95 @@ export interface VgcMetaSlot {
 
 // ─── Tables ──────────────────────────────────────────────────────────────────
 
-/**
- * One row per format + month + cutoff. Stores the full Smogon chaos JSON blob.
- * Files are ~6.5 MB uncompressed — longtext required.
- */
+/** One row per format + month + cutoff — metadata only, data lives in vgcSmogonPokemon */
 export const vgcSmogonSnapshots = mysqlTable(
   'vgc_smogon_snapshots',
   {
-    id:       int('id').primaryKey().autoincrement(),
-    formatId: varchar('format_id', { length: 64 }).notNull(),  // e.g. 'gen9vgc2026regi'
-    month:    varchar('month',     { length: 7  }).notNull(),  // e.g. '2026-03'
-    cutoff:   int('cutoff').notNull(),                         // 0 | 1500 | 1630 | 1760
-    data:     longtext('data').notNull(),                      // serialized chaos JSON
-    fetchedAt: datetime('fetched_at').notNull(),
+    id:           int('id').primaryKey().autoincrement(),
+    formatId:     varchar('format_id',    { length: 64 }).notNull(),
+    month:        varchar('month',        { length: 7  }).notNull(),
+    cutoff:       int('cutoff').notNull(),
+    pokemonCount: int('pokemon_count').notNull().default(0),
+    fetchedAt:    datetime('fetched_at').notNull(),
   },
-  (t) => ({
-    formatMonthCutoffIdx: uniqueIndex('vgc_smogon_format_month_cutoff_idx').on(
-      t.formatId,
-      t.month,
-      t.cutoff,
-    ),
-  }),
+  (t) => [
+    uniqueIndex('vgc_smogon_format_month_cutoff_idx').on(t.formatId, t.month, t.cutoff),
+  ],
 );
 
 export type VgcSmogonSnapshot = typeof vgcSmogonSnapshots.$inferSelect;
 
+/** One row per Pokémon per snapshot — normalized from Smogon stats.txt + moveset.txt */
+export const vgcSmogonPokemon = mysqlTable(
+  'vgc_smogon_pokemon',
+  {
+    id:           int('id').primaryKey().autoincrement(),
+    formatId:     varchar('format_id',    { length: 64 }).notNull(),
+    month:        varchar('month',        { length: 7  }).notNull(),
+    cutoff:       int('cutoff').notNull(),
+    speciesId:    varchar('species_id',   { length: 64 }).notNull(),
+    speciesName:  varchar('species_name', { length: 64 }).notNull(),
+    rank:         int('rank').notNull(),
+    usagePercent: double('usage_percent').notNull(),
+    rawCount:     int('raw_count').notNull(),
+    topItem:      varchar('top_item',     { length: 64 }),
+    topMove:      varchar('top_move',     { length: 64 }),
+    topTeraType:  varchar('top_tera_type',{ length: 32 }),
+    abilities:    text('abilities').notNull(),
+    items:        text('items').notNull(),
+    moves:        text('moves').notNull(),
+    teraTypes:    text('tera_types').notNull(),
+    teammates:    text('teammates').notNull(),
+    spreads:      text('spreads').notNull(),
+    fetchedAt:    datetime('fetched_at').notNull(),
+  },
+  (t) => [
+    uniqueIndex('vgc_smogon_pokemon_idx').on(t.formatId, t.month, t.cutoff, t.speciesId),
+  ],
+);
+
+export type VgcSmogonPokemonRow = typeof vgcSmogonPokemon.$inferSelect;
+
 /**
- * Parsed paste cache — one row per pokepast.es paste ID, immutable once fetched.
- * Defined before vgcPasteTeams so the FK reference resolves correctly.
+ * Single source of truth for all Showdown-format pastes, regardless of origin.
+ *
+ * - Pastes from pokepast.es: pokepasteId is set; rawText + parsedSlots come from
+ *   the pokepast.es JSON API.
+ * - Pastes scraped inline from Limitless HTML: pokepasteId is null; rawText is
+ *   extracted from the `const teamlist` JS variable on the teamlist page.
+ * - If the same pokepast.es paste appears in both VGCPastes CSV and a Limitless
+ *   tournament, a single vgcPastes row is shared — both FK references point to it.
  */
-export const vgcPasteDetails = mysqlTable('vgc_paste_details', {
-  pasteId:     varchar('paste_id',  { length: 32 }).primaryKey(),
+export const vgcPastes = mysqlTable('vgc_pastes', {
+  id:          int('id').primaryKey().autoincrement(),
+  pokepasteId: varchar('pokepaste_id', { length: 32 }).unique(),  // null if not from pokepast.es
+  rawText:     text('raw_text').notNull(),                         // source of truth for re-parsing
+  parsedSlots: text('parsed_slots').notNull(),                     // JSON: VgcMetaSlot[]
   author:      varchar('author',    { length: 128 }),
   title:       varchar('title',     { length: 255 }),
   formatId:    varchar('format_id', { length: 64 }),
-  parsedSlots: text('parsed_slots').notNull(),                 // JSON: VgcMetaSlot[]
   fetchedAt:   datetime('fetched_at').notNull(),
 });
 
-export type VgcPasteDetail = typeof vgcPasteDetails.$inferSelect;
+export type VgcPaste = typeof vgcPastes.$inferSelect;
 
 /**
  * One row per team entry from the VGCPastes Google Sheet CSV.
- * pasteId is a nullable FK to vgcPasteDetails — populated in Phase 3 once the
- * paste has been fetched and parsed.
+ *
+ * species: quick 6-species list from the CSV column — available in Phase 2
+ *          without fetching any paste.
+ * pasteId: populated in Phase 3 once the paste is stored in vgcPastes.
  */
 export const vgcPasteTeams = mysqlTable('vgc_paste_teams', {
-  id:           varchar('id',           { length: 16  }).primaryKey(),   // e.g. 'PC476'
-  pasteId:      varchar('paste_id',     { length: 32  }).references(() => vgcPasteDetails.pasteId),
-  pasteUrl:     varchar('paste_url',    { length: 255 }),
-  playerName:   varchar('player_name',  { length: 128 }),
-  tournament:   varchar('tournament',   { length: 255 }),
-  dateShared:   varchar('date_shared',  { length: 16  }),               // 'DD Mon YYYY'
-  rank:         varchar('rank',         { length: 64  }),
-  regulationId: varchar('regulation_id',{ length: 64  }),
-  species:      text('species').notNull(),                               // JSON: string[]
+  id:           varchar('id',            { length: 16  }).primaryKey(),  // e.g. 'PC476'
+  pasteId:      int('paste_id').references(() => vgcPastes.id),          // null until Phase 3
+  pasteUrl:     varchar('paste_url',     { length: 255 }),
+  playerName:   varchar('player_name',   { length: 128 }),
+  tournament:   varchar('tournament',    { length: 255 }),
+  dateShared:   varchar('date_shared',   { length: 16  }),               // 'DD Mon YYYY'
+  rank:         varchar('rank',          { length: 64  }),
+  regulationId: varchar('regulation_id', { length: 64  }),
+  species:      text('species').notNull(),                                // JSON: string[]
   fetchedAt:    datetime('fetched_at').notNull(),
 });
 
@@ -103,19 +136,23 @@ export const vgcLimitlessTournaments = mysqlTable('vgc_limitless_tournaments', {
 export type VgcLimitlessTournament = typeof vgcLimitlessTournaments.$inferSelect;
 
 /**
- * One row per player × tournament.
- * pasteText is the raw paste scraped from Limitless HTML — kept as source of truth
- * so parsedSlots can be regenerated if parse logic changes.
+ * One row per player x tournament.
+ * pasteId: populated once the teamlist page is scraped and stored in vgcPastes.
  */
 export const vgcLimitlessTeams = mysqlTable('vgc_limitless_teams', {
   id:           int('id').primaryKey().autoincrement(),
-  tournamentId: int('tournament_id').references(() => vgcLimitlessTournaments.id, { onDelete: 'cascade' }),
-  playerSlug:   varchar('player_slug',  { length: 128 }).notNull(),
-  playerName:   varchar('player_name',  { length: 128 }),
-  record:       varchar('record',       { length: 16  }),               // e.g. '7-2-0'
-  pasteText:    text('paste_text'),                                     // raw scraped paste
-  parsedSlots:  text('parsed_slots'),                                   // JSON: VgcMetaSlot[]
+  tournamentId: int('tournament_id'),
+  playerSlug:   varchar('player_slug', { length: 128 }).notNull(),
+  playerName:   varchar('player_name', { length: 128 }),
+  record:       varchar('record',      { length: 16  }),                // e.g. '7-2-0'
+  pasteId:      int('paste_id').references(() => vgcPastes.id),         // null until paste scraped
   fetchedAt:    datetime('fetched_at').notNull(),
-});
+}, (t) => [
+  foreignKey({
+    name:           'vgc_lt_tournament_id_fk',
+    columns:        [t.tournamentId],
+    foreignColumns: [vgcLimitlessTournaments.id],
+  }).onDelete('cascade'),
+]);
 
 export type VgcLimitlessTeam = typeof vgcLimitlessTeams.$inferSelect;

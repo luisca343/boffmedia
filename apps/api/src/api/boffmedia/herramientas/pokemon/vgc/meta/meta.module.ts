@@ -1,11 +1,11 @@
-﻿import { Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ResponseModule } from '@api/_utils/response/response.module';
 import { LoggerModule } from '@api/_utils/logger/logger.module';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 
 import { SmogonRepository } from './repositories/smogon.repository';
 import { VgcPastesRepository } from './repositories/vgcpastes.repository';
-import { PokepasteRepository } from './repositories/pokepaste.repository';
+import { PastesRepository } from './repositories/pastes.repository';
 import { LimitlessRepository } from './repositories/limitless.repository';
 
 import { SmogonService } from './services/smogon.service';
@@ -22,7 +22,7 @@ import { VgcMetaController } from './meta.controller';
   providers: [
     SmogonRepository,
     VgcPastesRepository,
-    PokepasteRepository,
+    PastesRepository,
     LimitlessRepository,
     SmogonService,
     VgcPastesService,

@@ -21,6 +21,27 @@ export const pokemon: GameEntry = {
 
   categories: [
     {
+      key: "vgc",
+      nameKey: "games.pokemon.categories.vgc",
+      href: "/pokemon/vgc/meta",
+      landing: {
+        icon: "",
+        fallbackIcon: "Podium",
+        fallbackIconColor: "text-primary-400",
+        color: "from-primary-500 to-violet-600",
+        features: ["meta", "speedTiers", "tracker"],
+        featured: true,
+        isNew: false,
+        popularity: "high",
+      },
+      tools: [
+        { key: "meta",            nameKey: "games.pokemon.tools.meta",            href: "/pokemon/vgc/meta",            sidebarIcon: "Podium" },
+        { key: "speedTiers",      nameKey: "games.pokemon.tools.speedTiers",      href: "/pokemon/vgc/speed-tiers",     sidebarIcon: "Speedometer" },
+        { key: "speedComparison", nameKey: "games.pokemon.tools.speedComparison", href: "/pokemon/vgc/speed-comparison", sidebarIcon: "Scales" },
+        { key: "tracker",         nameKey: "games.pokemon.tools.tracker",         href: "/pokemon/vgc/tracker",         sidebarIcon: "Notebook" },
+      ],
+    },
+    {
       key: "tcgpocket",
       nameKey: "games.pokemon.categories.tcgpocket",
       href: "/pokemon/tcgpocket",
