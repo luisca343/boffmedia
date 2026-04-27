@@ -1,56 +1,16 @@
 import { apiGET, apiPOST } from '@/services/boffAPI';
+import type {
+  ChapterEntry,
+  DownloadChaptersDto,
+  LocalChaptersResult,
+  MangaChapter,
+  MangaDetail,
+  MangaResult,
+  MangaSearchResult,
+} from '@boffmedia/shared';
 
-// ── Types ──────────────────────────────────────────────────────────────────
-
-export interface MangaResult {
-  title: string;
-  url: string;
-  source: string;
-  coverUrl?: string;
-  tags: string[];
-  chapterCount?: number;
-}
-
-export interface MangaSearchResult {
-  query: string;
-  results: MangaResult[];
-}
-
-export interface MangaChapter {
-  title: string;
-  url: string;
-  number: string;
-}
-
-export interface MangaDetail {
-  title: string;
-  url: string;
-  source: string;
-  coverUrl?: string;
-  tags: string[];
-  chapters: MangaChapter[];
-  chapterCount: number;
-}
-
-export interface LocalChaptersResult {
-  seriesName: string;
-  count: number;
-  files: string[];
-}
-
-export interface ChapterEntry {
-  title: string;
-  url: string;
-  number: string;
-}
-
-export interface DownloadChaptersDto {
-  seriesName: string;
-  chapters: ChapterEntry[];
-  concurrency?: number;
-  /** Manga detail page URL — sent as Referer when fetching chapter pages to avoid 403s */
-  mangaUrl?: string;
-}
+// Re-export shared types so existing consumers keep working without import changes
+export type { ChapterEntry, DownloadChaptersDto, LocalChaptersResult, MangaChapter, MangaDetail, MangaResult, MangaSearchResult };
 
 // ── SSE event types ────────────────────────────────────────────────────────
 

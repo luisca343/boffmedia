@@ -3,5 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 export type GoogleAuthDto = {
+    email: string;
+    name: string;
+    googleId: string;
+    profilePicture?: string;
 };
 

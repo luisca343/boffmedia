@@ -18,7 +18,9 @@ import {
   ApiResponse,
   ApiParam,
   ApiQuery,
-  ApiBody
+  ApiBody,
+  ApiProperty,
+  ApiPropertyOptional,
 } from '@nestjs/swagger';
 import { BoffMediaUsersFacadeService } from './users.facade.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -37,37 +39,64 @@ import { IntegratedUserCreationResultEntity } from './entities/user-creation-res
 import { AuthenticationResultEntity } from './entities/integrations.entity';
 
 // Additional DTOs for specialized endpoints
-export class MinecraftRegistrationDto {
+export class MinecraftDetails {
+  @ApiProperty({ example: 'Steve' })
   username: string;
+
+  @ApiProperty({ example: '069a79f4-44e9-4726-a5be-fca90e38aaf5' })
+  uuid: string;
+
+  @ApiProperty({ example: 'world' })
+  world: string;
+}
+
+export class MinecraftRegistrationDto {
+  @ApiProperty({ example: 'steve123' })
+  username: string;
+
+  @ApiProperty({ example: 'steve@example.com' })
   email: string;
+
+  @ApiProperty({ example: 'password123' })
   password: string;
-  minecraft: {
-    username: string;
-    uuid: string;
-    world: string;
-  };
+
+  @ApiProperty({ type: MinecraftDetails })
+  minecraft: MinecraftDetails;
 }
 
 export class MinecraftLinkDto {
+  @ApiProperty({ example: 'steve123' })
   username: string;
+
+  @ApiProperty({ example: 'steve@example.com' })
   email: string;
+
+  @ApiProperty({ example: 'password123' })
   password: string;
-  minecraft: {
-    username: string;
-    uuid: string;
-    world: string;
-  };
+
+  @ApiProperty({ type: MinecraftDetails })
+  minecraft: MinecraftDetails;
 }
 
 export class GoogleAuthDto {
+  @ApiProperty({ example: 'steve@gmail.com' })
   email: string;
+
+  @ApiProperty({ example: 'Steve Player' })
   name: string;
+
+  @ApiProperty({ example: '1234567890' })
   googleId: string;
+
+  @ApiPropertyOptional({ example: 'https://lh3.googleusercontent.com/...' })
   profilePicture?: string;
 }
 
 export class LoginDto {
+  @ApiProperty({ example: 'steve123' })
   username: string;
+
+  @ApiProperty({ example: 'password123' })
   password: string;
 }
 

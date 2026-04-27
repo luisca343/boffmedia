@@ -2,8 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type LoginDto = {
+export type MinecraftDetails = {
     username: string;
-    password: string;
+    uuid: string;
+    world: string;
 };
 

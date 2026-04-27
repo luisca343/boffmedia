@@ -1,18 +1,21 @@
 import { apiGET, apiPATCH } from '@/services/boffAPI';
+import type {
+  BulkDownloadResult,
+  CatalogSearchConsoleResult,
+  CatalogSearchResult,
+  GameFileEntry,
+  LocalGameEntry,
+  LocalGamesResult,
+  SearchConsoleResult,
+  SearchLocalGamesResult,
+} from '@boffmedia/shared';
 
-export interface GameFileEntry {
-  name: string;
-  link: string;
-  size: string;
-}
+// Re-export shared types so existing consumers keep working without import changes
+export type { BulkDownloadResult, CatalogSearchConsoleResult, CatalogSearchResult, GameFileEntry, LocalGameEntry, LocalGamesResult, SearchConsoleResult, SearchLocalGamesResult };
 
-export interface CatalogResult {
-  count: number;
-  totalSize: string;
-  totalSizeBytes: number;
-  files: GameFileEntry[];
-}
-
+// FileDownloadEntry from shared uses a 3-value enum (downloaded|skipped|failed).
+// The SSE progress stream also emits 'pending' and 'downloading' states, so we keep a
+// local superset type for SSE consumers only.
 export type FileDownloadStatus = 'pending' | 'downloading' | 'downloaded' | 'skipped' | 'failed';
 
 export interface FileDownloadEntry {
@@ -23,17 +26,11 @@ export interface FileDownloadEntry {
   error?: string;
 }
 
-export interface BulkDownloadResult {
-  console: string;
-  consoleLabel: string;
-  regions: string[];
-  totalMatched: number;
-  downloaded: number;
-  skipped: number;
-  failed: number;
-  totalDownloadedSize: string;
-  totalDownloadedSizeBytes: number;
-  files: FileDownloadEntry[];
+export interface CatalogResult {
+  count: number;
+  totalSize: string;
+  totalSizeBytes: number;
+  files: GameFileEntry[];
 }
 
 // SSE event types emitted by the stream endpoint
@@ -41,47 +38,6 @@ export type SseStartEvent    = { type: 'start';    total: number };
 export type SseProgressEvent = { type: 'progress'; index: number; total: number } & FileDownloadEntry;
 export type SseDoneEvent     = { type: 'done' } & Omit<BulkDownloadResult, 'files' | 'regions' | 'totalMatched'>;
 export type SseEvent         = SseStartEvent | SseProgressEvent | SseDoneEvent;
-
-export interface LocalGameEntry {
-  filename: string;
-  size: string;
-  sizeBytes: number;
-}
-
-export interface LocalGamesResult {
-  console: string;
-  consoleLabel: string;
-  count: number;
-  totalSize: string;
-  totalSizeBytes: number;
-  files: LocalGameEntry[];
-}
-
-export interface CatalogSearchConsoleResult {
-  consoleKey: string;
-  consoleLabel: string;
-  count: number;
-  files: GameFileEntry[];
-}
-
-export interface CatalogSearchResult {
-  query: string;
-  totalCount: number;
-  consoles: CatalogSearchConsoleResult[];
-}
-
-export interface SearchConsoleResult {
-  consoleKey: string;
-  consoleLabel: string;
-  count: number;
-  files: LocalGameEntry[];
-}
-
-export interface SearchLocalGamesResult {
-  query: string;
-  totalCount: number;
-  consoles: SearchConsoleResult[];
-}
 
 // ── Manga types ───────────────────────────────────────────────────────────────
 

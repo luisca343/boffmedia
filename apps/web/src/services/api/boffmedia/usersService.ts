@@ -1,40 +1,12 @@
-import { AuthenticationResultEntity, BoffMediaUserEntity, CreateUserDto, FullUserEntity, IntegratedUserCreationResultEntity, SessionUserEntity, SuccessResponse, UpdateUserDto, UserStatistics, UserWithIntegrationsEntity } from '@boffmedia/shared';
+import {
+  AuthenticationResultEntity, BoffMediaUserEntity, CreateUserDto, FullUserEntity,
+  GoogleAuthDto, IntegratedUserCreationResultEntity, LoginDto,
+  MinecraftLinkDto, MinecraftRegistrationDto,
+  SessionUserEntity, SuccessResponse, UpdateUserDto, UserStatistics, UserWithIntegrationsEntity,
+} from '@boffmedia/shared';
 import { apiGET, apiPOST, apiPUT, apiDELETE, apiPATCH } from '@/services/boffAPI';
 
-// Additional DTOs for specialized endpoints
-export interface MinecraftRegistrationDto {
-  username: string;
-  email: string;
-  password: string;
-  minecraft: {
-    username: string;
-    uuid: string;
-    world: string;
-  };
-}
-
-export interface MinecraftLinkDto {
-  username: string;
-  email: string;
-  password: string;
-  minecraft: {
-    username: string;
-    uuid: string;
-    world: string;
-  };
-}
-
-export interface GoogleAuthDto {
-  email: string;
-  name: string;
-  googleId: string;
-  profilePicture?: string;
-}
-
-export interface LoginDto {
-  username: string;
-  password: string;
-}
+export type { GoogleAuthDto, LoginDto, MinecraftLinkDto, MinecraftRegistrationDto };
 
 export interface BatchUsersRequest {
   userIds: number[];
