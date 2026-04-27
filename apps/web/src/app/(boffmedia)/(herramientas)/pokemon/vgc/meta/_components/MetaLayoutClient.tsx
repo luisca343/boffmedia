@@ -1,10 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useMemo } from "react";
-import { useRouter, useSearchParams, useParams } from "next/navigation";
+import { useMemo } from "react";
+import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSmogonSnapshots } from "../_hooks/useSmogonSnapshots";
 import { useSmogonUsage } from "../_hooks/useSmogonUsage";
+import { useChampionsRegulations } from "../_hooks/useChampionsRegulations";
+import { useChampionsUsage } from "../_hooks/useChampionsUsage";
+import { useChampionsPasteDetail } from "../_hooks/useChampionsPasteDetail";
+import { useMetaNavigation, DEFAULT_CUTOFF } from "../_hooks/useMetaNavigation";
 import { FormatBar } from "./FormatBar";
 import { PokemonSidebar } from "./PokemonSidebar";
 import { PokemonDetailView } from "./PokemonDetailView";
@@ -16,88 +22,76 @@ const FORMAT_LABELS: Record<string, string> = {
   gen9vgc2025regf: "VGC 2025 Reg F",
 };
 
-const BASE_PATH = "/pokemon/vgc/meta";
-const DEFAULT_CUTOFF = 1760;
-
-function buildUrl(
-  speciesId: string | undefined,
-  format:    string,
-  month:     string,
-  cutoff:    number
-) {
-  const params = new URLSearchParams({ format });
-  if (month) params.set("month", month);
-  if (cutoff !== DEFAULT_CUTOFF) params.set("cutoff", String(cutoff));
-  const base = speciesId ? `${BASE_PATH}/${speciesId}` : BASE_PATH;
-  return `${base}?${params}`;
-}
-
 export function MetaLayoutClient() {
-  const router       = useRouter();
+  const t            = useTranslations("vgc.meta");
   const searchParams = useSearchParams();
-  const rawParams    = useParams();
-  const speciesId    = rawParams?.speciesId as string | undefined;
 
-  const format = searchParams.get("format") ?? "";
-  const month  = searchParams.get("month")  ?? "";
-  const cutoff = Number(searchParams.get("cutoff") ?? DEFAULT_CUTOFF);
+  // ── URL state — read inline to gate data hooks before they are called ──────
+  const tab        = searchParams.get("tab")        ?? "ladder";
+  const format     = searchParams.get("format")     ?? "";
+  const month      = searchParams.get("month")      ?? "";
+  const cutoff     = Number(searchParams.get("cutoff") ?? DEFAULT_CUTOFF);
+  const regulation = searchParams.get("regulation") ?? "";
 
-  const snapshots = useSmogonSnapshots();
-  const { entries, entriesMap, loading, error } = useSmogonUsage(format, month, cutoff);
+  // ── Data hooks — inactive tab receives empty string and skips fetching ─────
+  const snapshots   = useSmogonSnapshots();
+  const regulations = useChampionsRegulations();
+  const { entries: ladderEntries,    entriesMap: ladderMap,    loading: ladderLoading,    error: ladderError    } =
+    useSmogonUsage(tab === "ladder" ? format : "", month, cutoff);
+  const { entries: championsEntries, entriesMap: championsMap, loading: championsLoading, error: championsError } =
+    useChampionsUsage(tab === "champions" ? regulation : "");
 
-  // Auto-navigate to first snapshot when no format is set
-  useEffect(() => {
-    if (snapshots.length > 0 && !searchParams.get("format")) {
-      const first = snapshots[0];
-      router.replace(buildUrl(speciesId, first.formatId, first.month, first.cutoff));
-    }
-  }, [snapshots]); // eslint-disable-line react-hooks/exhaustive-deps
+  const entries    = tab === "champions" ? championsEntries : ladderEntries;
+  const entriesMap = tab === "champions" ? championsMap     : ladderMap;
+  const loading    = tab === "champions" ? championsLoading : ladderLoading;
+  const error      = tab === "champions" ? championsError   : ladderError;
 
-  // Auto-navigate to first Pokémon when list loads and no selection
-  useEffect(() => {
-    if (!speciesId && entries.length > 0) {
-      router.replace(buildUrl(entries[0].speciesId, format, month, cutoff));
-    }
-  }, [entries]); // eslint-disable-line react-hooks/exhaustive-deps
+  // ── Navigation hook — buildUrl, auto-navigation effects, all handlers ──────
+  const { speciesId, detail: baseDetail, handleSelect, handleTabChange, handleFormatChange, handleOptionsApply, handleRegulationChange, handleBack } =
+    useMetaNavigation({ snapshots, regulations, entries, entriesMap });
 
-  const detail = useMemo(
-    () => (speciesId ? (entriesMap.get(speciesId) ?? null) : null),
-    [speciesId, entriesMap]
+  // ── Phase 3: paste-derived data for Champions tab ─────────────────────────
+  const { detail: pasteDetail } = useChampionsPasteDetail(
+    tab === "champions" ? speciesId : undefined,
+    tab === "champions" ? regulation : undefined,
   );
 
-  const handleSelect = useCallback(
-    (id: string) => router.push(buildUrl(id, format, month, cutoff)),
-    [router, format, month, cutoff]
-  );
-
-  const handleFormatChange = useCallback(
-    (newFormat: string, newMonth: string, newCutoff: number) =>
-      router.push(buildUrl(speciesId, newFormat, newMonth, newCutoff)),
-    [router, speciesId]
-  );
-
-  const handleOptionsApply = useCallback(
-    (newMonth: string, newCutoff: number) =>
-      router.push(buildUrl(speciesId, format, newMonth, newCutoff)),
-    [router, speciesId, format]
-  );
-
-  const handleBack = useCallback(
-    () => router.push(buildUrl(undefined, format, month, cutoff)),
-    [router, format, month, cutoff]
-  );
+  const detail = useMemo(() => {
+    if (!baseDetail || tab !== "champions" || !pasteDetail) return baseDetail;
+    return {
+      ...baseDetail,
+      abilities: pasteDetail.abilities.length > 0 ? pasteDetail.abilities : baseDetail.abilities,
+      items:     pasteDetail.items.length     > 0 ? pasteDetail.items     : baseDetail.items,
+      moves:     pasteDetail.moves.length     > 0 ? pasteDetail.moves     : baseDetail.moves,
+      teraTypes: pasteDetail.teraTypes.length > 0 ? pasteDetail.teraTypes : baseDetail.teraTypes,
+      spreads:   pasteDetail.spreads.length   > 0 ? pasteDetail.spreads   : baseDetail.spreads,
+    };
+  }, [baseDetail, pasteDetail, tab]);
 
   return (
     <div className="h-screen flex flex-col bg-surface-950">
       <FormatBar
+        tab={tab}
         format={format}
         month={month}
         cutoff={cutoff}
+        regulation={regulation}
         snapshots={snapshots}
+        regulations={regulations}
         formatLabels={FORMAT_LABELS}
+        onTabChange={handleTabChange}
         onFormatChange={handleFormatChange}
         onOptionsApply={handleOptionsApply}
+        onRegulationChange={handleRegulationChange}
       />
+
+      {/* Preview notice for Champions tab — sourced from VGCPastes CSV until Smogon adds the format */}
+      {tab === "champions" && (
+        <div className="shrink-0 flex items-center gap-2 px-3 py-2 bg-amber-500/5 border-b border-amber-500/20 text-xs text-amber-400/80">
+          <Info className="w-3.5 h-3.5 shrink-0" />
+          {t("tabs.championsPreviewNotice")}
+        </div>
+      )}
 
       {/* Single scroll container — sidebar sticks, detail panel drives height */}
       <div className="flex flex-1 min-h-0 overflow-y-auto">
@@ -137,3 +131,4 @@ export function MetaLayoutClient() {
     </div>
   );
 }
+

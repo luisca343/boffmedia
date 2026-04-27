@@ -116,12 +116,14 @@ export interface Match {
 
 export type SpeciesEntry = { id: string; name: string; num: number };
 
-const SPRITE_BASE    = 'https://play.pokemonshowdown.com/sprites/home-centered/';
-const SUBSTITUTE_URL = 'https://play.pokemonshowdown.com/sprites/dex/substitute.png';
+const SPRITE_BASE      = 'https://play.pokemonshowdown.com/sprites/home-centered/';
+const SPRITE_BASE_GEN5 = 'https://play.pokemonshowdown.com/sprites/gen5/';
+const SUBSTITUTE_URL   = 'https://play.pokemonshowdown.com/sprites/dex/substitute.png';
 
 /** Explicit Showdown slug overrides for forms that don't follow any generic rule. */
 const SPRITE_SLUG_OVERRIDES: Record<string, string> = {
-  'urshifu-single-strike': 'urshifu', // single-strike is the base form — no suffix
+  'urshifu-single-strike': 'urshifu',      // single-strike is the base form — no suffix
+  'floette-eternal-mega':  'floette-mega', // Eternal form drops its infix in the sprite slug
 };
 
 /**
@@ -138,14 +140,21 @@ function normalizeFormSlug(slug: string): string {
   return slug.slice(0, firstHyphen) + '-' + formPart.replace(/-/g, '');
 }
 
-/** Primary sprite URL: spaces → hyphens, then form slug normalised for Showdown. */
+/** Returns true for Mega / Mega-X / Mega-Y forms. */
+function isMegaSlug(slug: string): boolean {
+  return /-mega(-[xy])?$/.test(slug);
+}
+
+/** Primary sprite URL: spaces → hyphens, then form slug normalised for Showdown.
+ *  Mega forms use gen5 sprites (home-centered has no mega assets). */
 export function spriteUrl(speciesName: string): string {
   const slug = speciesName
     .toLowerCase()
     .replace(/[^a-z0-9\- ]/g, '')
     .replace(/\s+/g, '-');
-  if (SPRITE_SLUG_OVERRIDES[slug]) return `${SPRITE_BASE}${SPRITE_SLUG_OVERRIDES[slug]}.png`;
-  return `${SPRITE_BASE}${normalizeFormSlug(slug)}.png`;
+  const base = isMegaSlug(slug) ? SPRITE_BASE_GEN5 : SPRITE_BASE;
+  if (SPRITE_SLUG_OVERRIDES[slug]) return `${base}${SPRITE_SLUG_OVERRIDES[slug]}.png`;
+  return `${base}${normalizeFormSlug(slug)}.png`;
 }
 
 /**
@@ -159,9 +168,12 @@ export function handleSpriteError(e: React.SyntheticEvent<HTMLImageElement>): vo
 
   if (!img.dataset.triedAlt) {
     img.dataset.triedAlt = '1';
-    const match = img.src.match(/\/sprites\/home-centered\/([^.]+)\.png/);
+    const matchHome = img.src.match(/\/sprites\/home-centered\/([^.]+)\.png/);
+    const matchGen5 = img.src.match(/\/sprites\/gen5\/([^.]+)\.png/);
+    const match = matchHome ?? matchGen5;
+    const base  = matchGen5 ? SPRITE_BASE_GEN5 : SPRITE_BASE;
     if (match) {
-      const toIdUrl = `${SPRITE_BASE}${match[1].replace(/[^a-z0-9]/g, '')}.png`;
+      const toIdUrl = `${base}${match[1].replace(/[^a-z0-9]/g, '')}.png`;
       if (toIdUrl !== img.src) {
         img.src = toIdUrl;
         return;

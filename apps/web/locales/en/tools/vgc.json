@@ -374,7 +374,9 @@
         "ladder": "Ladder",
         "champions": "Champions",
         "compare": "Compare",
-        "comingSoon": "Coming soon"
+        "comingSoon": "Coming soon",
+        "previewBadge": "Preview",
+        "championsPreviewNotice": "Data sourced from VGCPastes (CSV export). This tab is a temporary preview — it will switch to official Smogon ladder stats once the Champions format is added to Pokémon Showdown."
       },
       "formats": {
         "gen9vgc2026regi": "VGC 2026 Reg I",
@@ -419,6 +421,7 @@
         "battles": "{count} battles",
         "other": "Other"
       },
+      "refresh": "Refresh",
       "footer": "Data from Smogon Stats · Updated monthly · Default cutoff: 1760"
     }
   }

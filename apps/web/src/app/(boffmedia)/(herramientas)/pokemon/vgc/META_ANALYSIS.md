@@ -31,6 +31,12 @@
 | 2026-04-27 | Hook extraction | Extracted `useSmogonSnapshots` and `useSmogonUsage` into `meta/_hooks/`; `MetaLayoutClient` is now a pure composition layer (routing + wiring only, no data-fetching logic inline) |
 | 2026-04-27 | Detail panel enrichment | Added `rank: number` and `types: string[]` to `PokemonUsageEntry` (backend entity + `toDetail()` + frontend interface); `TypeBadgeSmall` type badges shown in detail header; `TeraTypesPanel` replaces plain `StatPanel` for Tera Types (badge per type, "Other" fallback via `vgc.meta.detail.other` i18n key); clickable teammates navigate to that Pokémon's detail; nature coloring in EV Spreads (`+Stat/-Stat` in stat-specific colors, spread formatted as `252 Spe / 4 Def`); sidebar rank shown as `#N`; Abilities + Tera Types share one grid column |
 | 2026-04-27 | UI polish | Removed hexagonal radar chart (`SpreadRadarChart`) from EV Spreads section; section title color brightened (`text-surface-400`); Tera Types "Other" entry shows localized fallback text instead of a broken type badge; scroll redesigned: row div is the single `overflow-y-auto` container, sidebar is `md:sticky md:top-0 md:h-[calc(100vh-3rem)]` (FormatBar fixed at `h-12`), detail panel drives content height — eliminates the two-independent-scrolls issue |
+| 2026-04-27 | Admin Champions panel | Added `VgcChampionsFetcher` component to `/admin?section=vgc-meta`: shows all configured regulations with import status (green dot = has data), "Importar CSV" button per regulation triggers `POST /champions/refresh`, reload-safe feedback; rendered below `VgcSmogonFetcher` with a divider in the VGC Meta admin section |
+| 2026-04-27 | CSV parser fix | Replaced line-split + per-line parser with a full RFC-4180 `parseCsv()` that handles multi-line quoted fields. Root cause: the header row contains `"Replica Code\n(Click text for image)"` — a cell with an embedded newline — which broke `split('\n')` into two incomplete lines, causing header detection to fail. Added team-ID validation guard (`/^[A-Za-z0-9]+$/`, max 16 chars) to skip stray header-repeat rows at the end of the sheet. Actual column order confirmed: Team ID @ col 0, Full Name @ col 3, Pokepaste @ col 24, Date Shared/Tournament/Rank @ cols 29–31, Pokemon Text for Copypasta @ col 37, species @ cols 38–43, Team ID repeated @ col 44. |
+| 2026-04-27 | Phase 2 implemented | `VgcPastesService.refreshRegulation()` fetches Google Sheets CSV, detects header row by "Team ID" column, parses quoted CSV, upserts all teams via `vgcPastesRepository`; `VgcPastesService.getUsageList()` aggregates species counts + computes teammate co-occurrence matrix, returns `PokemonUsageDetail[]` with base stats/types from `@pkmn/sim` and empty moves/items/abilities/spreads; `GET /champions/available` endpoint lists regulations with imported data; guard removed from `POST /champions/refresh`; Champions tab added to meta page (Ladder ↔ Champions toggle in FormatBar); regulation pills in Champions mode; Refresh button triggers CSV re-import; detail panel sections guarded by `.length > 0` so empty arrays don't render; `useChampionsRegulations` + `useChampionsUsage` hooks extracted to `_hooks/` |
+| 2026-04-27 | Champions Preview label | Added amber `Preview` badge to Champions tab button in `FormatBar`; thin info banner rendered below FormatBar when Champions tab is active; two new i18n keys (`tabs.previewBadge`, `tabs.championsPreviewNotice`) added to EN + ES locale files. Champions data is temporary (VGCPastes CSV) until Smogon adds the Champions format. |
+| 2026-04-27 | Navigation hook extraction | Extracted `useMetaNavigation` into `meta/_hooks/useMetaNavigation.ts`; encapsulates `buildUrl`, URL-state parsing, all three auto-navigation `useEffect`s, `detail` derivation, and all five `useCallback` handlers. `MetaLayoutClient` reduced to pure composition: reads URL params inline only to gate data hooks, then delegates all navigation logic to `useMetaNavigation`. |
+| 2026-04-27 | Phase 3 implemented (partial) | `PokepasteService.fetchAndCache()` fully implemented (cache-hit + miss path via `pokepast.es/{id}/json`); `VgcPastesService.batchFetchRegulation()` processes teams in chunks of `POKEPASTE_CONCURRENCY`, auto fire-and-forget at end of `refreshRegulation()`; `VgcPastesService.getPasteDetail()` aggregates moves/items/abilities/spreads from `parsedSlots` per species; `GET /champions/:speciesId/detail` + `POST /champions/fetch-pastes` added; `useChampionsPasteDetail` hook; `MetaLayoutClient` merges paste detail over base detail via `useMemo`; "Fetch Pastes" button in `VgcChampionsFetcher`; `ChampionsPasteDetailDto`+`BatchFetchResultDto` with `@ApiProperty`, `pnpm generate:shared` run, frontend imports from `@boffmedia/shared`. SP radar chart (StatCalcService) pending. |
 
 ---
 
@@ -63,19 +69,25 @@
 - [x] **Pikalytics-style two-pane redesign** — dynamic routes `/meta/[speciesId]`, URL-persisted params, persistent sidebar, panel grid, mobile full-screen modes
 
 ### Phase 2 — Champions Meta (VGCPastes CSV — basic usage)
-- [ ] `VgcPastesService.refreshRegulation()` — fetch CSV via `VGCPASTES_SHEET_BASE + gid`, parse, upsert `vgcPasteTeams`
-- [ ] `VgcPastesService.getUsageList()` — aggregate `species` column, return `PokemonUsageEntry[]`
-- [ ] NestJS endpoint: `GET /tools/vgc/meta/champions?regulationId=`
-- [ ] Admin endpoint: `POST /tools/vgc/meta/champions/refresh` (guarded by `RolesGuard + @Roles('admin')`)
-- [ ] Champions tab in meta page
-- [ ] Usage table from `species` column (no paste fetch needed)
-- [ ] Tournament + date range filter UI
+- [x] `VgcPastesService.refreshRegulation()` — fetch CSV via `VGCPASTES_SHEET_BASE + gid`, parse, upsert `vgcPasteTeams`
+- [x] `VgcPastesService.getUsageList()` — aggregate `species` column, compute teammate co-occurrence, return `PokemonUsageDetail[]`
+- [x] NestJS endpoint: `GET /tools/vgc/meta/champions?regulationId=`
+- [x] `GET /tools/vgc/meta/champions/available` — lists regulations with imported data
+- [x] `POST /tools/vgc/meta/champions/refresh` — no auth guard (removed); Refresh button in FormatBar Champions mode + `VgcChampionsFetcher` in admin panel
+- [x] Champions tab in meta page (Ladder ↔ Champions toggle in FormatBar)
+- [x] Regulation pills in Champions mode; detail panel sections guarded by `.length > 0`
+- [x] `useChampionsRegulations` + `useChampionsUsage` hooks in `_hooks/`
+- [ ] Tournament + date range filter UI (deferred — single regulation for now)
 
 ### Phase 3 — Full Champions Depth (Paste Fetch)
-- [ ] `PokepasteService.fetchAndCache()` — GET `pokepast.es/{id}/json`, parse via `parsePasteMeta()`, upsert `vgcPastes`
-- [ ] `PokepasteService.batchFetch()` — process in chunks of `POKEPASTE_CONCURRENCY` (10), then `VgcPastesRepository.linkPaste()`
-- [ ] NestJS endpoint: `GET /tools/vgc/meta/champions/:speciesId/detail`
-- [ ] Detail panel enriched: Champions move / item / SP spread breakdown
+- [x] `PokepasteService.fetchAndCache()` — GET `pokepast.es/{id}/json`, parse via `parsePasteMeta()`, upsert `vgcPastes`
+- [x] `VgcPastesService.batchFetchRegulation()` — process in chunks of `POKEPASTE_CONCURRENCY` (10), then `VgcPastesRepository.linkPaste()`; auto-triggered (fire-and-forget) at end of `refreshRegulation()`
+- [x] NestJS endpoint: `GET /tools/vgc/meta/champions/:speciesId/detail` → `getPasteDetail()` aggregates moves/items/abilities/spreads
+- [x] NestJS endpoint: `POST /tools/vgc/meta/champions/fetch-pastes` → manual batch trigger
+- [x] `useChampionsPasteDetail` hook (follows existing hook pattern)
+- [x] Admin: "Fetch Pastes" button in `VgcChampionsFetcher` with result feedback
+- [x] `ChampionsPasteDetailDto` + `BatchFetchResultDto` with `@ApiProperty`; `pnpm generate:shared` run; frontend imports from `@boffmedia/shared`
+- [x] Detail panel enriched: Champions move / item / SP spread breakdown (via `useMemo` merge in `MetaLayoutClient`)
 - [ ] SP spread → computed stats via `StatCalcService` → hexagonal radar chart
 
 ### Phase 4 — Ladder vs Champions Divergence
@@ -139,7 +151,11 @@ Dex.forFormat('gen9championsvgc2026regma').moves.get('fakeout').name // "Fake Ou
 - Server-side fetch only (redirect CORS issue from browser).
 - ~179 KB CSV, 476 teams (as of 2026-04-26). Champions tier only.
 - **GID is per-regulation** — `791705272` = Reg M-A. Stored in `CHAMPIONS_REGULATIONS[id].vgcPastesGid`.
-- `Pokemon Text for Copypasta` column = 6 species names, comma-separated → basic usage without paste fetching.
+- Header is on **row 3**; rows 1–2 are metadata. Data starts row 4.
+- The header cell `"Replica Code\n(Click text for image)"` contains an embedded newline — a full RFC-4180 parser (not line-split) is required.
+- **Confirmed column layout** (0-indexed): Team ID=0, Full Name=3, Pokepaste=24, Date Shared=29, Tournament/Event=30, Rank=31, `Pokemon Text for Copypasta`=37, species 1–6 @ cols 38–43, Team ID repeated @ col 44.
+- Species names come from the 6 columns **immediately after** `Pokemon Text for Copypasta` (the column itself is empty per row).
+- Team ID format: alphanumeric, ≤16 chars (e.g. `PC514`). The column repeats at the end of each row — `indexOf` correctly returns the first (col 0) occurrence.
 
 ---
 
@@ -210,11 +226,16 @@ Data-fetching hooks live in `meta/_hooks/`, one concern per file:
 | Hook | File | Responsibility |
 |---|---|---|
 | `useSmogonSnapshots()` | `_hooks/useSmogonSnapshots.ts` | Fetches available snapshot list once on mount |
-| `useSmogonUsage(format, month, cutoff)` | `_hooks/useSmogonUsage.ts` | Fetches full detail list + builds `Map<speciesId, detail>` |
+| `useSmogonUsage(format, month, cutoff)` | `_hooks/useSmogonUsage.ts` | Fetches full detail list + builds `Map<speciesId, detail>`; skips if `format` is empty |
+| `useChampionsRegulations()` | `_hooks/useChampionsRegulations.ts` | Fetches regulations that have imported CSV data |
+| `useChampionsUsage(regulationId)` | `_hooks/useChampionsUsage.ts` | Fetches Champions usage list + builds `Map`; skips if `regulationId` is empty |
+| `useMetaNavigation({ snapshots, regulations, entries, entriesMap })` | `_hooks/useMetaNavigation.ts` | Encapsulates `buildUrl`, URL-state reading, all three auto-navigation effects, `detail` derivation, and all five navigation handlers. Returns `{ speciesId, detail, ...handlers }`. Exports `DEFAULT_CUTOFF` constant. |
 
-`MetaLayoutClient` is a **composition layer only** — it reads URL params, calls hooks, handles routing side-effects (auto-navigate to first snapshot / first Pokémon), and wires props. No `fetch` calls inside the component itself.
+`MetaLayoutClient` is a **pure composition layer** — it reads URL params inline (5 lines via `useSearchParams`) only to gate data hooks before calling them, then delegates all navigation logic to `useMetaNavigation` and all data fetching to the four dedicated hooks. No `fetch` calls, no `useEffect`, no `useCallback` inside the component.
 
-New hooks for future tabs (Champions, Compare) should follow the same pattern in `_hooks/`.
+**Boffmedia hook convention for this section:** one concern per file — four data hooks + one navigation hook. Do not add routing logic to data hooks or data fetching to `useMetaNavigation`.
+
+`buildUrl()` is tab-aware: Ladder tab preserves `format/month/cutoff`, Champions tab preserves `regulation`; switching tabs resets the species selection.
 
 ---
 

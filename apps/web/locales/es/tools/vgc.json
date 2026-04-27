@@ -374,7 +374,9 @@
         "ladder": "Escalera",
         "champions": "Champions",
         "compare": "Comparar",
-        "comingSoon": "Próximamente"
+        "comingSoon": "Próximamente",
+        "previewBadge": "Preview",
+        "championsPreviewNotice": "Datos obtenidos de VGCPastes (exportación CSV). Esta pestaña es una previsualización temporal: cuando el formato Champions llegue a Pokémon Showdown, los datos pasarán a ser los estadísticos oficiales de Smogon."
       },
       "formats": {
         "gen9vgc2026regi": "VGC 2026 Reg I",
@@ -419,6 +421,7 @@
         "battles": "{count} combates",
         "other": "Otros"
       },
+      "refresh": "Actualizar",
       "footer": "Datos de Smogon Stats · Actualización mensual · Corte por defecto: 1760"
     }
   }
