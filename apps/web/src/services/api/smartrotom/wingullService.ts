@@ -9,13 +9,13 @@ import {
 
 
 
-export type Region = {
+export type ServerRegion = {
     name: string;
     players: number;
     status: string;
 };
 
-export type PlayerStats = {
+export type PixelmonPlayerStats = {
     uuid: string;
     username: string;
     level: number;
@@ -56,7 +56,7 @@ export class WingullService {
     * Get player stats
     */
     static getStats(uuid: string) {
-        return wingullPOST<PlayerStats>('/stats', { uuid });
+        return wingullPOST<PixelmonPlayerStats>('/stats', { uuid });
     }
     
     /**
@@ -114,7 +114,7 @@ export class WingullService {
     * Get regions data
     */
     static getRegions() {
-        return wingullGET<Region[]>('/regions');
+        return wingullGET<ServerRegion[]>('/regions');
     }
     
     /**

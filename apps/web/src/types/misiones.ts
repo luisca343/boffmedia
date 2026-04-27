@@ -1,3 +1,23 @@
+import type {
+  Dialogue,
+  FactionRequirements,
+  QuestCategory,
+  QuestObjective,
+  QuestRequirements,
+  QuestReward,
+  ScoreboardRequirements,
+} from '@boffmedia/shared';
+
+export type { FactionRequirements, ScoreboardRequirements };
+
+// Backward-compatible I-prefix aliases for shared types
+export type IDialogue          = Dialogue;
+export type IQuestCategory     = QuestCategory;
+export type IQuestObjective    = QuestObjective;
+export type IQuestReward       = QuestReward;
+export type IQuestRequirements = QuestRequirements;
+
+// Kept local: string enum values match Quest.status but consumers depend on this enum shape
 export enum QuestStatus {
   ACTIVE = 'ACTIVE',
   COMPLETED = 'COMPLETED',
@@ -7,51 +27,7 @@ export enum QuestStatus {
   NOT_STARTED = 'NOT_STARTED',
 }
 
-export interface IDialogue {
-  id: number;
-  name: string;
-  text: string;
-  questId: number;
-  requirements: IQuestRequirements;
-}
-
-export interface IQuestCategory {
-  quests: number[];
-}
-
-export interface IQuestObjective {
-  name: string;
-  progress: number;
-  total: number;
-}
-
-export interface IQuestReward {
-  item: string;
-  count: number;
-}
-
-export interface ScoreboardRequirements {
-  scoreboardObjective: string;
-  scoreboardType: string;
-  scoreboardValue: number;
-}
-
-export interface FactionRequirements {
-  factionId: number;
-  factionAvailable: string;
-  factionStance: string;
-}
-
-export interface IQuestRequirements {
-  available: boolean;
-  requiredQuests: number[];
-  requiredDialogs: number[];
-  requiredLevel: number;
-  requiredTime: number;
-  factionRequirements: FactionRequirements[];
-  scoreboardRequirements: ScoreboardRequirements[];
-}
-
+// Kept local: status field uses QuestStatus enum (not Quest.status namespace enum)
 export interface QuestData {
   id: number;
   name: string;
@@ -68,27 +44,24 @@ export interface QuestData {
   rewards: IQuestReward[];
 }
 
+// Kept local: extends shared NPC with Minecraft-specific skin + dialogId fields
 export interface NPC {
-  id: number
-  name: string
-  text: string
-  questId: number
-  requirements: IQuestRequirements
-
-  skin: string
-  dialogId: number
+  id: number;
+  name: string;
+  text: string;
+  questId: number;
+  requirements: IQuestRequirements;
+  skin: string;
+  dialogId: number;
 }
 
+// Kept local: references local QuestData[] and extended NPC[]
 export interface QuestSystemData {
-  quests: QuestData[]
-  categories: IQuestCategory[]
-  dialogs: IDialogue[]
-  npcs: NPC[]
+  quests: QuestData[];
+  categories: IQuestCategory[];
+  dialogs: IDialogue[];
+  npcs: NPC[];
 }
-
-
-
-
 
 
 
