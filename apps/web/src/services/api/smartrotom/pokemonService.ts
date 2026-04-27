@@ -2,6 +2,8 @@
 import { rotomGET, rotomPOST } from "@/services/boffAPI"
 import { EvolutionTree, PokedexData, PokemonMove, Registry } from "@/types/pokedex";
 import { NextPrev, Pokemon, SpeciesMoveEntry, SpriteManifest } from "@/types/Pokemon";
+import type { AbilityCount, MoveCount } from "@boffmedia/shared";
+export type { AbilityCount, MoveCount };
 
 type ImageResult = {
   url: string;
@@ -62,16 +64,6 @@ export type MoveEffect = {
   damage?: number,
 }
 
-
-export interface MoveCount {
-    name: string;
-    count: number;
-}
-
-export type AbilityCount = {
-  name: string;
-  count: number;
-};
 
 export type Ability = {
   name: string;
