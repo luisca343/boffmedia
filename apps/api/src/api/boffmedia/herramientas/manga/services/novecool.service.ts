@@ -1,7 +1,7 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import axios, { AxiosRequestConfig } from 'axios';
 import * as cheerio from 'cheerio';
-import { existsSync } from 'fs';
+import { chromium, Browser } from 'playwright';
 import { MangaResult } from '../entities/manga-result.entity';
 import { MangaChapter, MangaDetail } from '../entities/manga-chapter.entity';
 
@@ -41,32 +41,6 @@ const SEL_CHAPTER_TITLE  = 'span.chapter-item-headtitle';
 // Novelcool typically uses lazy-loaded images; check data-src first then src.
 const SEL_CHAPTER_IMAGES = '.chapter-img, .reading-content img, .manga-images img, #chapter-images img, .page-img';
 
-
-// ---------------------------------------------------------------------------
-// Chrome executable paths (Windows + Linux fallbacks)
-// ---------------------------------------------------------------------------
-
-const CHROME_PATHS = [
-  // Windows – LOCALAPPDATA may be undefined in some environments
-  ...(process.env.LOCALAPPDATA ? [`${process.env.LOCALAPPDATA}\\Google\\Chrome\\Application\\chrome.exe`] : []),
-  'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-  'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
-  // Linux
-  '/usr/bin/google-chrome',
-  '/usr/bin/google-chrome-stable',
-  '/usr/bin/chromium-browser',
-  '/usr/bin/chromium',
-];
-
-function findChrome(): string {
-  const override = process.env.CHROME_PATH;
-  if (override && existsSync(override)) return override;
-  const found = CHROME_PATHS.find(p => existsSync(p));
-  if (found) return found;
-  throw new Error(
-    'Chrome/Chromium not found. Install Google Chrome or set the CHROME_PATH environment variable.',
-  );
-}
 
 // ---------------------------------------------------------------------------
 // Headers sent for every HTML page request.
@@ -111,11 +85,11 @@ function extractImageSrc($el: { attr(name: string): string | undefined }): strin
 export class NovecoolService implements OnModuleDestroy {
   private readonly logger = new Logger(NovecoolService.name);
 
-  /** Lazily-initialised headless Chrome instance (reused across chapter downloads). */
-  private browser: import('puppeteer-core').Browser | null = null;
+  /** Lazily-initialised Playwright Chromium instance (reused across chapter downloads). */
+  private browser: Browser | null = null;
 
   constructor() {
-    this.logger.log('[Novecool] Service initialised — chapter pages use headless Chrome (puppeteer-core)');
+    this.logger.log('[Novecool] Service initialised — chapter pages use Playwright Chromium');
   }
 
   async onModuleDestroy() {
@@ -125,30 +99,20 @@ export class NovecoolService implements OnModuleDestroy {
     }
   }
 
-  private async getBrowser(): Promise<import('puppeteer-core').Browser> {
+  private async getBrowser(): Promise<Browser> {
     if (this.browser) return this.browser;
-
-    let chromePath: string;
+    this.logger.log('[Novecool] Launching Playwright Chromium…');
     try {
-      chromePath = findChrome();
-    } catch (e) {
-      this.logger.error(`[Novecool] Chrome not found: ${e?.message ?? e}`);
-      throw e;
-    }
-
-    this.logger.log(`[Novecool] Launching Chrome at: ${chromePath}`);
-    const puppeteer = await import('puppeteer-core');
-    try {
-      this.browser = await puppeteer.launch({
-        executablePath: chromePath,
+      this.browser = await chromium.launch({
         headless: true,
         args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+        ...(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {}),
       });
     } catch (e) {
-      this.logger.error(`[Novecool] Chrome launch failed: ${e?.message ?? e}`);
+      this.logger.error(`[Novecool] Browser launch failed: ${(e as Error)?.message ?? e}`);
       throw e;
     }
-    this.logger.log('[Novecool] Headless Chrome launched');
+    this.logger.log('[Novecool] Playwright Chromium launched');
     return this.browser;
   }
 
@@ -287,17 +251,17 @@ export class NovecoolService implements OnModuleDestroy {
     const allImages: string[] = [];
 
     const browser = await this.getBrowser();
-    const tab = await browser.newPage();
+    const context = await browser.newContext({
+      userAgent: HTML_HEADERS['User-Agent'],
+      extraHTTPHeaders: { Referer: mangaUrl ?? BASE_URL },
+    });
+    const tab = await context.newPage();
 
     try {
-      // Spoof a real Chrome fingerprint
-      await tab.setExtraHTTPHeaders({ Referer: mangaUrl ?? BASE_URL });
-      await tab.setUserAgent(HTML_HEADERS['User-Agent']);
-
       let page = 1;
       while (true) {
         const url = `${base}-${IMGS_PER_PAGE}-${page}.html`;
-        this.logger.log(`[Novecool] Fetching chapter page ${page} via Chrome: ${url}`);
+        this.logger.log(`[Novecool] Fetching chapter page ${page} via Playwright: ${url}`);
 
         await tab.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
 
@@ -316,6 +280,7 @@ export class NovecoolService implements OnModuleDestroy {
       }
     } finally {
       await tab.close();
+      await context.close();
     }
 
     this.logger.log(`[Novecool] Total: ${allImages.length} image(s) in chapter`);
