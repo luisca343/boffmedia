@@ -1,4 +1,4 @@
-﻿import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { eq } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
@@ -7,14 +7,13 @@ import {
   vgcLimitlessTeams,
   VgcLimitlessTournament,
   VgcLimitlessTeam,
-  VgcMetaSlot,
 } from '@/_db/schema/Vgc';
 
 @Injectable()
 export class LimitlessRepository {
   constructor(@Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>) {}
 
-  // â”€â”€â”€ Tournaments â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // --- Tournaments -----------------------------------------------------------
 
   async findAllTournaments(): Promise<VgcLimitlessTournament[]> {
     return this.db.select().from(vgcLimitlessTournaments);
@@ -44,7 +43,7 @@ export class LimitlessRepository {
     return (await this.findTournamentByLimitlessId(data.limitlessId))!.id;
   }
 
-  // â”€â”€â”€ Teams â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // --- Teams ----------------------------------------------------------------
 
   async findTeamsByTournament(tournamentId: number): Promise<VgcLimitlessTeam[]> {
     return this.db
@@ -58,17 +57,22 @@ export class LimitlessRepository {
     playerSlug: string;
     playerName?: string | null;
     record?: string | null;
-    pasteText?: string | null;
-    parsedSlots?: VgcMetaSlot[] | null;
+    pasteId?: number | null;
   }): Promise<void> {
     await this.db.insert(vgcLimitlessTeams).values({
       tournamentId: data.tournamentId,
       playerSlug:   data.playerSlug,
       playerName:   data.playerName ?? null,
       record:       data.record ?? null,
-      pasteText:    data.pasteText ?? null,
-      parsedSlots:  data.parsedSlots ? JSON.stringify(data.parsedSlots) : null,
+      pasteId:      data.pasteId ?? null,
       fetchedAt:    new Date(),
     });
+  }
+
+  async linkPaste(teamId: number, pasteId: number): Promise<void> {
+    await this.db
+      .update(vgcLimitlessTeams)
+      .set({ pasteId })
+      .where(eq(vgcLimitlessTeams.id, teamId));
   }
 }

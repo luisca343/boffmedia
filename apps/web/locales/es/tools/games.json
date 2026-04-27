@@ -3,10 +3,15 @@
         "pokemon": {
             "name": "Pokémon",
             "categories": {
+                "vgc": "VGC",
                 "tcgpocket": "TCG Pocket",
                 "others": "Otros"
             },
             "tools": {
+                "meta": "Análisis de Meta",
+                "speedTiers": "Niveles de Velocidad",
+                "speedComparison": "Comparación de Velocidad",
+                "tracker": "Tracker",
                 "gallery": "Galería",
                 "cardList": "Lista de Cartas",
                 "battles": "Combates",

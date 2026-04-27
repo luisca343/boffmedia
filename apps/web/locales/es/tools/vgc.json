@@ -272,7 +272,9 @@
       },
       "speedWidget": {
         "label": "Velocidades",
-        "tailwind": "VA ×2",        "scarf": "Pañuelo ×1.5",        "trickroom": "ER ↕"
+        "tailwind": "VA ×2",
+        "scarf": "Pañuelo ×1.5",
+        "trickroom": "ER ↕"
       },
       "zones": {
         "leads": "Inicios",
@@ -364,6 +366,60 @@
           "archetype": "Arquetipo"
         }
       }
+    },
+    "meta": {
+      "title": "Análisis de Meta",
+      "subtitle": "Uso en la escalera y composición de equipos desde Smogon Stats",
+      "tabs": {
+        "ladder": "Escalera",
+        "champions": "Champions",
+        "compare": "Comparar",
+        "comingSoon": "Próximamente"
+      },
+      "formats": {
+        "gen9vgc2026regi": "VGC 2026 Reg I",
+        "gen9vgc2026regh": "VGC 2026 Reg H",
+        "gen9vgc2025regg": "VGC 2025 Reg G",
+        "gen9vgc2025regf": "VGC 2025 Reg F"
+      },
+      "pickers": {
+        "format": "Formato",
+        "month": "Mes",
+        "monthPlaceholder": "Último",
+        "cutoff": "ELO mín.",
+        "load": "Aplicar"
+      },
+      "options": "Opciones",
+      "sidebar": {
+        "search": "Buscar Pokémon...",
+        "noResults": "Sin resultados"
+      },
+      "table": {
+        "rank": "#",
+        "pokemon": "Pokémon",
+        "usage": "Uso",
+        "item": "Objeto",
+        "move": "Movimiento",
+        "tera": "Tera",
+        "loading": "Cargando datos de meta...",
+        "empty": "Sin datos para este formato y mes.",
+        "error": "Error al cargar la meta. Comprueba que la API esté activa."
+      },
+      "detail": {
+        "abilities": "Habilidades",
+        "items": "Objetos",
+        "moves": "Movimientos",
+        "teraTypes": "Teratipos",
+        "teammates": "Compañeros",
+        "spreads": "Distribuciones de EVs",
+        "close": "Cerrar",
+        "loading": "Cargando detalles...",
+        "backToList": "Volver",
+        "notFound": "Sin datos disponibles para este Pokémon.",
+        "battles": "{count} combates",
+        "other": "Otros"
+      },
+      "footer": "Datos de Smogon Stats · Actualización mensual · Corte por defecto: 1760"
     }
   }
 }

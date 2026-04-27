@@ -1,86 +1,141 @@
 "use client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/primitives/card";
+
+import { Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Gamepad2, Calendar, Users, Award, CreditCard, BarChart2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useBoffSession } from "../../../services/useBoffSession";
-import { Button } from "@/components/ui/primitives/button";
-import { Badge } from "@/components/ui/primitives/badge";
-import { useEffect, useState } from "react";
-import { boffPOST } from "@/services/boffAPI";
 import UnauthorizedPage from "../_components/Unauthorized";
+import { GamesTab } from "./events/_components/games/GamesTab";
+import { EventsTab } from "./events/_components/events/EventsTab";
+import { TeamsTab } from "./events/_components/teams/TeamsTab";
+import { AchievementsTab } from "./events/_components/achievements/AchievementsTab";
+import { TcgpScraper } from "./_components/tools/TcgpScraper";
+import { VgcSmogonFetcher } from "./_components/tools/VgcSmogonFetcher";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-interface FetchStatusData {
-  status: "fetching" | "success" | "error";
-  message: string;
-  timestamp: string;
-}
+const NAV = [
+  {
+    label: "Portal",
+    items: [
+      { id: "games",        label: "Juegos",   icon: Gamepad2  },
+      { id: "events",       label: "Eventos",  icon: Calendar  },
+      { id: "teams",        label: "Equipos",  icon: Users     },
+      { id: "achievements", label: "Logros",   icon: Award     },
+    ],
+  },
+  {
+    label: "Herramientas",
+    items: [
+      { id: "tcgp",    label: "TCG Pocket", icon: CreditCard },
+      { id: "vgc-meta", label: "VGC Meta",  icon: BarChart2  },
+    ],
+  },
+] as const;
 
-export default function AdminPage() {
-  const { session } = useBoffSession();
+type SectionId = typeof NAV[number]["items"][number]["id"];
 
-  const [status, setStatus] = useState<FetchStatusData | null>(null);
+const VALID_SECTIONS = NAV.flatMap((g) => g.items.map((i) => i.id)) as SectionId[];
 
-  useEffect(() => {
-    const eventSource = new EventSource(
-      `${process.env.NEXT_PUBLIC_API}/tools/ptcgp/scrape/status`
+function AdminContent() {
+  const router            = useRouter();
+  const searchParams      = useSearchParams();
+  const { session, status } = useBoffSession();
+
+  const rawSection = searchParams.get("section");
+  const section: SectionId = (VALID_SECTIONS as string[]).includes(rawSection ?? "")
+    ? (rawSection as SectionId)
+    : "games";
+
+  if (status === "loading") {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-surface-950">
+        <div className="w-8 h-8 rounded-full border-2 border-primary-500 border-t-transparent animate-spin" />
+      </div>
     );
-    console.log("eventSource:", eventSource);
-
-    eventSource.onmessage = (event) => {
-      const data = JSON.parse(event.data) as FetchStatusData;
-      setStatus(data);
-    };
-
-    return () => {
-      eventSource.close();
-    };
-  }, []);
-
-  const triggerFetch = async () => {
-    try {
-      await boffPOST("/tools/ptcgp/scrape/refresh", { method: "POST" });
-    } catch (error) {
-      console.error("Failed to trigger fetch:", error);
-    }
-  };
+  }
 
   if (!session?.user.roles.includes("BOFF_ADMIN")) {
     return <UnauthorizedPage />;
   }
 
+  const navigate = (id: SectionId) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("section", id);
+    router.replace(`?${params.toString()}`, { scroll: false });
+  };
+
   return (
-    <div>
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Cargar datos de TCGP</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {status && (
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Estado:</span>
-                <Badge
-                  variant={
-                    status.status === "success"
-                      ? "default"
-                      : status.status === "error"
-                      ? "destructive"
-                      : "default"
-                  }
-                >
-                  {status.status}
-                </Badge>
-              </div>
-              <p className="text-sm">{status.message}</p>
-              <p className="text-xs text-surface-500">
-                Última actualización:{" "}
-                {new Date(status.timestamp).toLocaleString()}
-              </p>
-            </div>
+    <div className="flex min-h-screen bg-surface-950">
+      {/* Sidebar */}
+      <aside className="hidden md:flex md:w-56 lg:w-60 shrink-0 flex-col border-r border-surface-800 py-6 px-3 gap-1">
+        <p className="px-3 mb-4 text-lg font-bold text-surface-50">Admin</p>
+
+        {NAV.map((group) => (
+          <div key={group.label} className="mb-4">
+            <p className="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-surface-600">
+              {group.label}
+            </p>
+            {group.items.map(({ id, label, icon: Icon }) => (
+              <button
+                key={id}
+                onClick={() => navigate(id)}
+                className={cn(
+                  "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                  section === id
+                    ? "bg-primary-500/15 text-primary-300"
+                    : "text-surface-400 hover:bg-surface-800 hover:text-surface-200"
+                )}
+              >
+                <Icon className="w-4 h-4 shrink-0" />
+                {label}
+              </button>
+            ))}
+          </div>
+        ))}
+      </aside>
+
+      {/* Main */}
+      <main className="flex-1 min-w-0 p-6 overflow-y-auto">
+        {/* Mobile nav — pill strip */}
+        <div className="md:hidden mb-4 flex gap-2 overflow-x-auto pb-2">
+          {NAV.map((group) =>
+            group.items.map(({ id, label, icon: Icon }) => (
+              <button
+                key={id}
+                onClick={() => navigate(id)}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border whitespace-nowrap transition-colors",
+                  section === id
+                    ? "bg-primary-500/15 border-primary-500/40 text-primary-300"
+                    : "border-surface-700 text-surface-400 hover:border-surface-600 hover:text-surface-200"
+                )}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                {label}
+              </button>
+            ))
           )}
-          <Button onClick={triggerFetch} className="mt-4 w-full">
-            Cargar datos de TCG
-          </Button>
-        </CardContent>
-      </Card>
+        </div>
+
+        {section === "games"        && <GamesTab />}
+        {section === "events"       && <EventsTab />}
+        {section === "teams"        && <TeamsTab />}
+        {section === "achievements" && <AchievementsTab />}
+        {section === "tcgp"         && <TcgpScraper />}
+        {section === "vgc-meta"     && <VgcSmogonFetcher />}
+      </main>
+
+      <ToastContainer position="bottom-right" theme="dark" />
     </div>
+  );
+}
+
+export default function AdminPage() {
+  return (
+    <Suspense>
+      <AdminContent />
+    </Suspense>
   );
 }
