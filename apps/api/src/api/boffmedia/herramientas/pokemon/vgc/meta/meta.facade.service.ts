@@ -1,4 +1,5 @@
 ﻿import { Injectable, NotFoundException } from '@nestjs/common';
+import { FetchSmogonDto } from './dto/fetch-smogon.dto';
 import { SmogonService } from './services/smogon.service';
 import { VgcPastesService } from './services/vgcpastes.service';
 import { PokepasteService } from './services/pokepaste.service';
@@ -22,16 +23,39 @@ export class VgcMetaFacadeService {
 
   // â”€â”€â”€ Ladder (Smogon) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
+  async getAvailableSmogonSnapshots() {
+    return this.smogonService.getAvailableSnapshots();
+  }
+
+  async fetchSmogonSnapshot(dto: FetchSmogonDto) {
+    const cutoff = dto.cutoff ?? SMOGON_DEFAULT_CUTOFF;
+    return this.smogonService.fetchAndStore(dto.format, dto.month, cutoff);
+  }
+
+  async deleteSmogonSnapshot(dto: QuerySmogonDto) {
+    const cutoff = dto.cutoff ?? SMOGON_DEFAULT_CUTOFF;
+    const month  = dto.month  ?? await this.resolveMostRecentMonth(dto.format, cutoff);
+    return this.smogonService.deleteSnapshot(dto.format, month, cutoff);
+  }
+
   async getSmogonUsage(dto: QuerySmogonDto) {
     const cutoff = dto.cutoff ?? SMOGON_DEFAULT_CUTOFF;
-    const month = dto.month ?? await this.smogonService.resolveLatestMonth(dto.format);
+    // Month must be provided, or fall back to the most recent available snapshot
+    const month = dto.month ?? await this.resolveMostRecentMonth(dto.format, cutoff);
     return this.smogonService.getUsageList(dto.format, month, cutoff);
   }
 
   async getSmogonDetail(dto: QuerySmogonDto & { speciesId: string }) {
     const cutoff = dto.cutoff ?? SMOGON_DEFAULT_CUTOFF;
-    const month = dto.month ?? await this.smogonService.resolveLatestMonth(dto.format);
+    const month = dto.month ?? await this.resolveMostRecentMonth(dto.format, cutoff);
     return this.smogonService.getPokemonDetail(dto.format, month, cutoff, dto.speciesId);
+  }
+
+  private async resolveMostRecentMonth(formatId: string, cutoff: number): Promise<string> {
+    const snapshots = await this.smogonService.getAvailableSnapshots();
+    const match = snapshots.find((s) => s.formatId === formatId && s.cutoff === cutoff);
+    if (match) return match.month;
+    throw new NotFoundException(`No snapshot available for ${formatId}-${cutoff}. Fetch it from the admin panel.`);
   }
 
   // â”€â”€â”€ Champions (VGCPastes) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€

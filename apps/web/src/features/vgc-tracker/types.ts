@@ -116,22 +116,42 @@ export interface Match {
 
 export type SpeciesEntry = { id: string; name: string; num: number };
 
-const SPRITE_BASE = 'https://play.pokemonshowdown.com/sprites/dex/';
-const SUBSTITUTE_URL = `${SPRITE_BASE}substitute.png`;
+const SPRITE_BASE    = 'https://play.pokemonshowdown.com/sprites/home-centered/';
+const SUBSTITUTE_URL = 'https://play.pokemonshowdown.com/sprites/dex/substitute.png';
 
-/** Primary sprite URL: spaces → hyphens, other hyphens preserved.
- *  Correct for forme Pokémon (Rotom-Wash → rotom-wash.png). */
+/** Explicit Showdown slug overrides for forms that don't follow any generic rule. */
+const SPRITE_SLUG_OVERRIDES: Record<string, string> = {
+  'urshifu-single-strike': 'urshifu', // single-strike is the base form — no suffix
+};
+
+/**
+ * Collapses double-hyphenated form names to the Showdown sprite convention:
+ * "necrozma-dusk-mane" → "necrozma-duskmane"
+ * "calyrex-ice-rider"  → "calyrex-icerider"
+ * Single-hyphen names (rotom-wash, kyurem-black) are returned unchanged.
+ */
+function normalizeFormSlug(slug: string): string {
+  const firstHyphen = slug.indexOf('-');
+  if (firstHyphen === -1) return slug;
+  const formPart = slug.slice(firstHyphen + 1);
+  if (!formPart.includes('-')) return slug;
+  return slug.slice(0, firstHyphen) + '-' + formPart.replace(/-/g, '');
+}
+
+/** Primary sprite URL: spaces → hyphens, then form slug normalised for Showdown. */
 export function spriteUrl(speciesName: string): string {
-  return `${SPRITE_BASE}${speciesName
+  const slug = speciesName
     .toLowerCase()
     .replace(/[^a-z0-9\- ]/g, '')
-    .replace(/\s+/g, '-')}.png`;
+    .replace(/\s+/g, '-');
+  if (SPRITE_SLUG_OVERRIDES[slug]) return `${SPRITE_BASE}${SPRITE_SLUG_OVERRIDES[slug]}.png`;
+  return `${SPRITE_BASE}${normalizeFormSlug(slug)}.png`;
 }
 
 /**
  * onError handler for Pokémon sprite <img> tags.
  * Attempt 1 – try toID (strips ALL non-alphanumeric, fixes Kommo-o → kommoo.png).
- * Attempt 2 – show substitute sprite.
+ * Attempt 2 – show substitute sprite (dex fallback, always exists).
  */
 export function handleSpriteError(e: React.SyntheticEvent<HTMLImageElement>): void {
   const img = e.currentTarget;
@@ -139,8 +159,7 @@ export function handleSpriteError(e: React.SyntheticEvent<HTMLImageElement>): vo
 
   if (!img.dataset.triedAlt) {
     img.dataset.triedAlt = '1';
-    // Extract the filename from the current URL and strip hyphens/special chars.
-    const match = img.src.match(/\/sprites\/dex\/([^.]+)\.png/);
+    const match = img.src.match(/\/sprites\/home-centered\/([^.]+)\.png/);
     if (match) {
       const toIdUrl = `${SPRITE_BASE}${match[1].replace(/[^a-z0-9]/g, '')}.png`;
       if (toIdUrl !== img.src) {

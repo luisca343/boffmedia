@@ -272,7 +272,9 @@
       },
       "speedWidget": {
         "label": "Speed Tiers",
-        "tailwind": "TW ×2",        "scarf": "Scarf ×1.5",        "trickroom": "TR ↕"
+        "tailwind": "TW ×2",
+        "scarf": "Scarf ×1.5",
+        "trickroom": "TR ↕"
       },
       "zones": {
         "leads": "Leads",
@@ -364,6 +366,60 @@
           "archetype": "Archetype"
         }
       }
+    },
+    "meta": {
+      "title": "Meta Analysis",
+      "subtitle": "Ladder usage & team composition data from Smogon Stats",
+      "tabs": {
+        "ladder": "Ladder",
+        "champions": "Champions",
+        "compare": "Compare",
+        "comingSoon": "Coming soon"
+      },
+      "formats": {
+        "gen9vgc2026regi": "VGC 2026 Reg I",
+        "gen9vgc2026regh": "VGC 2026 Reg H",
+        "gen9vgc2025regg": "VGC 2025 Reg G",
+        "gen9vgc2025regf": "VGC 2025 Reg F"
+      },
+      "pickers": {
+        "format": "Format",
+        "month": "Month",
+        "monthPlaceholder": "Latest",
+        "cutoff": "Min ELO",
+        "load": "Apply"
+      },
+      "options": "Options",
+      "sidebar": {
+        "search": "Search Pokémon...",
+        "noResults": "No results"
+      },
+      "table": {
+        "rank": "#",
+        "pokemon": "Pokémon",
+        "usage": "Usage",
+        "item": "Item",
+        "move": "Move",
+        "tera": "Tera",
+        "loading": "Loading meta data...",
+        "empty": "No data found for this format and month.",
+        "error": "Failed to load meta data. Make sure the API is running."
+      },
+      "detail": {
+        "abilities": "Abilities",
+        "items": "Items",
+        "moves": "Moves",
+        "teraTypes": "Tera Types",
+        "teammates": "Teammates",
+        "spreads": "EV Spreads",
+        "close": "Close",
+        "loading": "Loading details...",
+        "backToList": "Back",
+        "notFound": "No data available for this Pokémon.",
+        "battles": "{count} battles",
+        "other": "Other"
+      },
+      "footer": "Data from Smogon Stats · Updated monthly · Default cutoff: 1760"
     }
   }
 }
