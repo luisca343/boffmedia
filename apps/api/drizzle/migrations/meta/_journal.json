@@ -43,6 +43,13 @@
       "when": 1777312095396,
       "tag": "0005_giant_slipstream",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1777321343340,
+      "tag": "0006_married_rattler",
+      "breakpoints": true
     }
   ]
 }

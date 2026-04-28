@@ -96,6 +96,55 @@ export class VgcMetaService {
       {},
     );
   }
+
+  // ─── Limitless ─────────────────────────────────────────────────────────────
+
+  static importLimitlessTournament(url: string, regulationId: string, maxPlayers?: number) {
+    return boffPOST<{ tournamentId: number }>('/tools/vgc/meta/limitless/tournament', {
+      url,
+      regulationId,
+      ...(maxPlayers !== undefined ? { maxPlayers } : {}),
+    });
+  }
+
+  static getLimitlessTournamentStatus(tournamentId: number) {
+    return apiGET<LimitlessImportJobStatus>(
+      `/tools/vgc/meta/limitless/tournament/${tournamentId}/status`,
+    );
+  }
+
+  static getLimitlessTournaments(regulationId?: string) {
+    if (regulationId) {
+      return apiGET<LimitlessTournament[]>(
+        `/tools/vgc/meta/limitless/tournaments?regulationId=${regulationId}`,
+      );
+    }
+    return apiGET<LimitlessTournament[]>('/tools/vgc/meta/limitless');
+  }
+
+  static getLimitlessUsage(tournamentId: number) {
+    return apiGET<PokemonUsageDetail[]>(
+      `/tools/vgc/meta/limitless/usage?tournamentId=${tournamentId}`,
+    );
+  }
+
+  static getLimitlessCombinedUsage(regulationId: string) {
+    return apiGET<PokemonUsageDetail[]>(
+      `/tools/vgc/meta/limitless/usage/combined?regulationId=${regulationId}`,
+    );
+  }
+
+  static getLimitlessPlayers(tournamentId: number) {
+    return apiGET<LimitlessPlayerEntry[]>(
+      `/tools/vgc/meta/limitless/${tournamentId}/players`,
+    );
+  }
+
+  static getLimitlessPlayerTeam(tournamentId: number, slug: string) {
+    return apiGET<LimitlessPlayerTeam>(
+      `/tools/vgc/meta/limitless/${tournamentId}/player/${encodeURIComponent(slug)}`,
+    );
+  }
 }
 
 export interface ChampionsRegulation {
@@ -104,6 +153,59 @@ export interface ChampionsRegulation {
   name: string;
   gameType: 'singles' | 'doubles';
   notes?: string;
+}
+
+// ─── Limitless types ─────────────────────────────────────────────────────────
+
+export interface LimitlessTournament {
+  id:           number;
+  limitlessId:  string;
+  name:         string | null;
+  date:         string | null;
+  format:       string | null;
+  regulationId: string;
+  playerCount:  number | null;
+  status:       'pending' | 'running' | 'done' | 'error';
+  progress:     number;
+  total:        number;
+  errorMessage: string | null;
+  fetchedAt:    string;
+}
+
+export interface LimitlessPlayerEntry {
+  playerSlug: string;
+  playerName: string;
+  placing:    number;
+  record:     string;
+  drop:       number | null;
+  hasTeam:    boolean;
+}
+
+export interface LimitlessMetaSlot {
+  slotIndex:   number;
+  speciesId:   string;
+  speciesName: string;
+  item?:       string;
+  ability?:    string;
+  moves:       string[];
+  tera?:       string;
+}
+
+export interface LimitlessPlayerTeam {
+  playerSlug: string;
+  playerName: string;
+  placing:    number;
+  record:     string;
+  rawText:    string;
+  slots:      LimitlessMetaSlot[];
+}
+
+export interface LimitlessImportJobStatus {
+  tournamentId: number;
+  status:       string;
+  progress:     number;
+  total:        number;
+  errorMessage?: string;
 }
 
 export interface SpeedTierEntry {

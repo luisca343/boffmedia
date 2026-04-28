@@ -93,11 +93,31 @@ export class VgcMetaFacadeService {
   // â”€â”€â”€ Limitless â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   async importLimitlessTournament(dto: AddLimitlessTournamentDto) {
-    return this.limitlessService.importTournament(dto.url);
+    return this.limitlessService.importTournament(dto.url, dto.regulationId, dto.maxPlayers);
   }
 
   async getLimitlessUsage(tournamentId: number) {
     return this.limitlessService.getUsageList(tournamentId);
+  }
+
+  async getLimitlessCombinedUsage(regulationId: string) {
+    return this.limitlessService.getCombinedUsage(regulationId);
+  }
+
+  async getLimitlessTournamentStatus(id: number) {
+    return this.limitlessService.getJobStatus(id);
+  }
+
+  async getLimitlessTournamentsByRegulation(regulationId: string) {
+    return this.limitlessService.listTournamentsByRegulation(regulationId);
+  }
+
+  async getLimitlessPlayers(tournamentId: number) {
+    return this.limitlessService.getPlayerList(tournamentId);
+  }
+
+  async getLimitlessPlayerTeam(tournamentId: number, slug: string) {
+    return this.limitlessService.getPlayerTeam(tournamentId, slug);
   }
 
   async listLimitlessTournaments() {

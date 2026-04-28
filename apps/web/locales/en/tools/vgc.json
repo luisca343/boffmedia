@@ -373,6 +373,10 @@
       "tabs": {
         "ladder": "Ladder",
         "champions": "Champions",
+        "tournament": "Tournament",
+        "combined": "Combined",
+        "aggregate": "Usage",
+        "players": "Players",
         "compare": "Compare",
         "comingSoon": "Coming soon",
         "previewBadge": "Preview",
@@ -420,6 +424,20 @@
         "notFound": "No data available for this Pokémon.",
         "battles": "{count} battles",
         "other": "Other"
+      },
+      "standings": {
+        "loading": "Loading standings\u2026",
+        "empty": "No players found.",
+        "col": {
+          "rank": "#",
+          "player": "Player",
+          "record": "Record",
+          "team": "Team"
+        },
+        "teamLoading": "Loading\u2026",
+        "copyPaste": "Copy Pok\u00e9paste",
+        "copied": "Copied!",
+        "tera": "Tera: {type}"
       },
       "refresh": "Refresh",
       "footer": "Data from Smogon Stats · Updated monthly · Default cutoff: 1760"

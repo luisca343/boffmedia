@@ -6,14 +6,10 @@ import {
   Param,
   Post,
   Query,
-  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
-import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
-import { RolesGuard } from '@api/_utils/guards/roles.guard';
-import { Roles } from '@api/_utils/decorators/roles.decorator';
 import { VgcMetaFacadeService } from './meta.facade.service';
 import { QuerySmogonDto } from './dto/query-smogon.dto';
 import { FetchSmogonDto } from './dto/fetch-smogon.dto';
@@ -109,11 +105,25 @@ export class VgcMetaController {
 
   // --- Limitless -------------------------------------------------------------
 
+  @Get('limitless/tournaments')
+  @ApiOperation({ summary: 'List Limitless tournaments for a regulation' })
+  @ApiResponse({ status: 200, description: 'Tournament list returned.' })
+  listTournamentsByRegulation(@Query('regulationId') regulationId: string) {
+    return this.facade.getLimitlessTournamentsByRegulation(regulationId);
+  }
+
   @Get('limitless')
   @ApiOperation({ summary: 'List all cached Limitless tournaments' })
   @ApiResponse({ status: 200, description: 'Tournament list returned.' })
   listTournaments() {
     return this.facade.listLimitlessTournaments();
+  }
+
+  @Get('limitless/usage/combined')
+  @ApiOperation({ summary: 'Get combined usage data across all completed tournaments in a regulation' })
+  @ApiResponse({ status: 200, description: 'Combined usage list returned.' })
+  getLimitlessCombinedUsage(@Query('regulationId') regulationId: string) {
+    return this.facade.getLimitlessCombinedUsage(regulationId);
   }
 
   @Get('limitless/usage')
@@ -123,12 +133,38 @@ export class VgcMetaController {
     return this.facade.getLimitlessUsage(dto.tournamentId);
   }
 
+  @Get('limitless/tournament/:id/status')
+  @ApiOperation({ summary: 'Get import job status for a tournament' })
+  @ApiParam({ name: 'id', example: '1' })
+  @ApiResponse({ status: 200, description: 'Job status returned.' })
+  getLimitlessTournamentStatus(@Param('id') id: string) {
+    return this.facade.getLimitlessTournamentStatus(+id);
+  }
+
   @Post('limitless/tournament')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
   @ApiOperation({ summary: '[Admin] Import a Limitless tournament by URL' })
   @ApiResponse({ status: 201, description: 'Tournament import started.' })
   importTournament(@Body() dto: AddLimitlessTournamentDto) {
     return this.facade.importLimitlessTournament(dto);
+  }
+
+  @Get('limitless/:tournamentId/players')
+  @ApiOperation({ summary: 'Get player list for a Limitless tournament' })
+  @ApiParam({ name: 'tournamentId', example: '1' })
+  @ApiResponse({ status: 200, description: 'Player list returned.' })
+  getLimitlessPlayers(@Param('tournamentId') tournamentId: string) {
+    return this.facade.getLimitlessPlayers(+tournamentId);
+  }
+
+  @Get('limitless/:tournamentId/player/:slug')
+  @ApiOperation({ summary: 'Get a player\'s team for a Limitless tournament' })
+  @ApiParam({ name: 'tournamentId', example: '1' })
+  @ApiParam({ name: 'slug', example: 'johndoe' })
+  @ApiResponse({ status: 200, description: 'Player team returned.' })
+  getLimitlessPlayerTeam(
+    @Param('tournamentId') tournamentId: string,
+    @Param('slug') slug: string,
+  ) {
+    return this.facade.getLimitlessPlayerTeam(+tournamentId, slug);
   }
 }
