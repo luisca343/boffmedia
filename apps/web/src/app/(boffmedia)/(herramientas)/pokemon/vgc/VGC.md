@@ -1,4 +1,4 @@
-# VGC Meta Analysis — Living Design Document
+# VGC — Living Design Document
 
 > **This is a living document.** Any agent working on this feature must:
 > - Check off completed items as they are implemented (`- [x]`)
@@ -12,6 +12,7 @@
 
 | Date | Author | Change |
 |---|---|---|
+| 2026-04-28 | Speed & Tracker analysis | Renamed META_ANALYSIS.md → VGC.md; full audit of speed-tiers, speed-comparison, tracker sections; proposed unified Speed page + tracker integration points; OQ-S1–S6 + OQ-T1–T6 added |
 | 2026-04-26 | Initial analysis | Document created from live data fetches |
 | 2026-04-26 | User answers | Q1–Q19 answered; RK9 added; DB/pkmn/sim decisions recorded |
 | 2026-04-26 | Architecture deep-dive | OQ1–OQ6 answered; module structure, roles, Champions SP formula documented |
@@ -45,6 +46,7 @@
 | 2026-04-28 | FormatBar selects redesign | Replaced all format/regulation/tournament pills with `<select>` elements for a more compact and consistent UI. Stats tab: single `<select>` with `<optgroup label="Smogon">` and `<optgroup label="VGCPastes · Preview">` groups; month and cutoff also inline `<select>`s (no Apply button — change fires immediately via `onOptionsApply`). Tournament tab: regulation `<select>` + tournament `<select>` (Combined + individual entries sorted by date desc). Options popover (`Settings2` icon, `useRef`, `useState`) fully removed. `SELECT_CLS` constant for consistent styling across all selects. All tabs use the same sticky sidebar layout (`md:sticky md:top-0 md:h-screen`). |
 | 2026-04-28 | Dex mod consistency fix | Fixed missing base stats for new Champions mega evolutions by making all VGC meta aggregators format-aware. `SmogonService`, `VgcPastesService`, and `LimitlessService` now resolve species through `Dex.forFormat(...)` (with Champions mod initialized via `initChampionsMod()`), instead of relying on global `Dex.species`. For `regulationId=vgc2026regma`, species/stat/type lookups now correctly use `gen9championsvgc2026regma` across Stats preview + Tournament aggregate/player flows. **Guardrail:** any future meta usage/detail aggregation must resolve species with format-specific Dex, never plain global Dex for Champions-enabled formats. |
 | 2026-04-28 | SOLID refactor | Centralized all format-aware Dex logic into `meta/utils/dex-resolver.ts` (`getDexForFormat`, `resolveSpeciesId`). Removed duplicate implementations from the three services. Extracted `FORMAT_LABELS` from `MetaLayoutClient` into `meta/constants.ts` (non-component files must not live inside `_components/`). Fixed `catch (e)` unknown-type error in `VgcPastesService`. Fixed non-null assertion on `parsedSlots` in `LimitlessService` with a proper type-predicate filter. |
+| 2026-04-28 | Speed tools redesign | Unified `/speed-tiers` + `/speed-comparison` into `/pokemon/vgc/speed` (OQ-S1–S6 resolved). Old routes deleted (404). `SpeedTiersTab` fully redesigned: reference-based layout — left `ReferencePanel` sidebar (Pokémon search, EV preset chips 0N/0+/252N/252+, `ModifierPanel`, large effective-speed readout), zone-colored table rows (red=faster, yellow=tie, green=slower vs reference), separator row at the user's speed, expandable rows with per-stat breakdown chips (▲/=/▼) and "Compare in Matchup" cross-tab prefill button. `SpeedMatchupTab` created. Nav, i18n (EN+ES), and `data/games/pokemon.ts` updated. HOME-centered sprites. IVs remain hardcoded at 31. |
 
 ---
 
@@ -573,3 +575,150 @@ Adamant Nature
 **OQ-L5** Tournament selector → One at a time; "Combined [Reg]" appears as a special pill pinned above individual tournament pills.  
 **OQ-L6** Re-import → Always full re-scrape (idempotent). Same `player_slug` = overwrite `paste_id`.  
 **OQ-L7** Record weighting → Store all players + records; aggregation uses raw usage count (no weighting). Record available for future filtering.  
+
+---
+
+## Speed Tools — Current State & Analysis
+
+### Speed Tiers (`/pokemon/vgc/speed-tiers`)
+
+A full-reference table of all regulation-legal Pokémon with 6 pre-computed speed checkpoints (0/N, 0/+, 252/N, 252/+, Scarf N, Scarf +), global modifier controls, a team overlay with comparison dots, and a live "outspeed filter".
+
+**Data source:** `VgcService.getChampionsSpeedTiers(regulationId)` → `SpeedTierEntry[]`  
+**Regulation:** Selectable via pill tabs (falls back to `vgc2026regma` hardcoded default).  
+**Key features:**
+- `computedMap` (`useMemo`) pre-applies `ModifierPanel` to every row on every change
+- Team overlay (up to 6 members) with manual speed override per slot; comparison dots per row (red/yellow/green)
+- "Outspeed filter" hides rows that don't threaten any team member
+- Scarf columns auto-hide when the Scarf modifier is active
+
+**Issues found:**
+- `pokemonSpriteUrl()` helper defined inline — duplicated verbatim in speed-comparison
+- Default regulation is a hardcoded string `"vgc2026regma"` — not driven by the DB-backed regulations list
+- On regulation change, team is wiped to `[]` without warning
+- Sprite URLs use the Showdown CDN directly (`play.pokemonshowdown.com/sprites/gen5`) — not the project's own `sprites/` folder; HOME-centered sprites used everywhere else in the VGC section
+
+---
+
+### Current State: Unified `/pokemon/vgc/speed` _(Implemented 2026-04-28)_
+
+Both old pages replaced by a single route with two tabs.
+
+**Route:** `/pokemon/vgc/speed?tab=tiers|matchup`  
+**Data source:** `VgcService.getChampionsSpeedTiers(regulationId)` — regulation driven by DB (`getChampionsRegulations()`)  
+**Sprites:** HOME-centered (`spriteUrl` from `features/vgc-tracker/types.ts`)
+
+#### Tiers tab (`SpeedTiersTab`)
+- **Left sidebar** (`ReferencePanel`): Pokémon search/autocomplete, 4 EV preset chips (0N / 0+ / 252N / 252+), `ModifierPanel`, large effective-speed readout
+- **Table**: 11 columns — #, Pokémon (sprite+name+types), Base, 0N, 0+, 252N, 252+, Scarf, Scarf+, expand chevron
+- **Zone coloring**: rows color-coded red / yellow / green (faster / tie / slower vs reference). Separator row at the user's speed position when sorted by 252+ desc
+- **Expandable rows**: click to expand — per-stat breakdown chips (▲/=/▼ vs reference) + "Compare in Matchup" button (cross-tab prefill)
+- **i18n namespaces**: `vgc.speedTiers.*` (table), `vgc.speed.modifiers.*` (ModifierPanel), `vgc.speedTiers.reference.*`, `vgc.speedTiers.zones.*`, `vgc.speedTiers.expanded.*`
+
+#### Matchup tab (`SpeedMatchupTab`)
+- Head-to-head comparison: up to 6 team members vs a selected opponent
+- Cross-tab prefill: "Compare in Matchup" in the Tiers expanded row sets the opponent in the Matchup tab via `onSelectForMatchup` prop
+- Team member IDs use `crypto.randomUUID()`
+- `ModifierPanel` uses `vgc.speed.modifiers` namespace (not borrowed from tiers)
+
+---
+
+## Tracker — Current State & Analysis
+
+### Overview
+
+Full client-side VGC battle logger. Sessions store match-by-match results, opponent team compositions, ELO history, and rich statistics (usage tables, heatmaps, matchup matrices, lead pairs, ELO curves). All data lives in IndexedDB (Dexie) — no server persistence.
+
+**API calls (metadata only):**
+- `VgcService.getChampionsRegulations()` — regulation list for session creation and preset management
+- `VgcService.getChampionsLegalPokemon(regulationId)` — species list for paste normalization in `PresetManager`
+
+**Storage:** `vgcDb` (Dexie/IndexedDB) — sessions, matches, series, presets, preset versions  
+**Export/import:** Full JSON dump or per-session export; no cloud path
+
+---
+
+### Issues Found
+
+| Issue | Location | Severity |
+|---|---|---|
+| Data loss on browser wipe | All tracker data | High |
+| No multi-device sync | Architecture | High |
+| `getChampionsRegulations()` uses legacy endpoint; won't list DB-only regulations | `NewSessionDialog`, `PresetManager` | Medium |
+| `useRegulationMeta` re-fetches meta on every stats tab open — no cache layer visible | `tracker/[sessionId]/` | Medium |
+| Speed tiers not accessible from match context | Match flow | Low |
+| Opponent Pokémon in a match log are not clickable to meta page | Match flow | Low |
+
+---
+
+### Integration Opportunities
+
+#### 1 — Meta Integration (current: `RegulationMetaSection`)
+
+The stats view already has `RegulationMetaSection` which overlays Smogon/Champions meta usage against personal session data — this is the right integration point. It can be extended:
+
+- Add Limitless tournament data as a third overlay (alongside Smogon ladder and VGCPastes): "tournament meta" usage %
+- Show "ladder trap" / "tournament staple" badges (Phase 4 divergence) directly in the usage table
+- Add a "You vs the meta" summary: for each team member, how does your win rate with that Pokémon compare to its meta usage % rank?
+
+#### 2 — Speed Context During Matches
+
+When a match is open, players often need to quickly check speed matchups. A lightweight floating or collapsible panel showing speed tiers for the registered preset team (vs a typed opponent speed) would remove the need to navigate away. This can reuse `speedCalc.ts` and `applyMods` directly — no API call needed if the team's base speeds come from the preset.
+
+#### 3 — Tournament Session Link
+
+For `tournament`-type sessions, optionally link the session to an imported Limitless tournament. This enables:
+- Comparing personal record against the top-N finishers
+- Seeing which opponent Pokémon you faced that were common in the tournament field
+- Future Phase 4 divergence overlays scoped to that specific tournament
+
+#### 4 — Cloud Backup (Optional, Opt-In)
+
+The current export/import JSON mechanism is the only backup path. An opt-in cloud sync (server-side storage of sessions, keyed by user ID) would make the tracker viable for serious players who use multiple devices or fear browser wipe. This requires:
+- Auth (already in place via NextAuth)
+- A new NestJS module (`tracker/`) with session/match/preset CRUD endpoints
+- Client migration: keep IndexedDB as the primary store; sync to server on write; pull on first load from a new device
+
+This is a significant scope addition — needs explicit user decision before proceeding.
+
+#### 5 — Cross-Tool Navigation
+
+- In match details, clicking an opponent Pokémon's name should navigate to `/pokemon/vgc/meta?species={slug}` for that Pokémon's meta stats
+- In session stats usage table, clicking a species should link to the meta page
+- From the meta detail panel, a "Check speed tiers" link could open `/pokemon/vgc/speed?tab=tiers&highlight={baseSpeed}`
+
+---
+
+## Open Questions — Speed & Tracker
+
+### Speed Tools _(All resolved)_
+
+**OQ-S1** → **Unified.** `/pokemon/vgc/speed` with Tiers + Matchup tabs. Old routes deleted (404).
+
+**OQ-S2** → **404.** Old directories removed; no redirects needed.
+
+**OQ-S3** → **Implemented.** "Compare in Matchup" button in expanded Tiers rows prefills the opponent slot in the Matchup tab via `onSelectForMatchup` prop from `page.tsx`.
+
+**OQ-S4** → **Deferred.** Scarf toggle not re-enabled; left for a future pass when the UX rationale is clarified.
+
+**OQ-S5** → **Keep hardcoded at 31.** 0-IV Trick Room use case is a future enhancement.
+
+**OQ-S6** → **HOME-centered sprites** (`spriteUrl` from `features/vgc-tracker/types.ts`), consistent with meta + tracker.
+
+### Tracker
+
+**OQ-T1** Should tracker data ever be stored server-side? If yes: opt-in cloud backup only, or mandatory server persistence (breaking the offline-first model)?
+
+**OQ-T2** Should the tracker's regulation selector be migrated to the DB-backed `GET /vgc/regulations` endpoint so it lists the same regulations as the meta and speed tools?
+
+**OQ-T3** How deep should meta integration go in `RegulationMetaSection`?
+  a. Keep current (Smogon + Champions usage overlay)
+  b. Add Limitless tournament usage as a third overlay
+  c. Add Phase 4 divergence badges ("ladder trap" / "tournament staple")
+  d. Add a "You vs the meta" summary panel
+
+**OQ-T4** Should a `tournament`-type tracker session be linkable to a specific imported Limitless tournament? What would the UI look like?
+
+**OQ-T5** Should there be a speed-tier quick-reference panel accessible within a match (without navigating away)? If yes, should it show the preset team's speed checkpoints automatically?
+
+**OQ-T6** Should opponent Pokémon in match logs be clickable links to the meta page, or keep them as plain text/sprites with no navigation?

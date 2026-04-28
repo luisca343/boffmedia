@@ -6,8 +6,7 @@
         "name": "VGC",
         "tools": {
           "meta": "Meta Analysis",
-          "speedTiers": "Speed Tiers",
-          "speedComparison": "Speed Comparison",
+          "speed": "Speed",
           "tracker": "Tracker"
         }
       },
@@ -42,7 +41,7 @@
         "description": "Meta analysis, speed tiers and match tracker for competitive VGC",
         "features": {
           "meta": "Meta Analysis",
-          "speedTiers": "Speed Tiers",
+          "speed": "Speed",
           "tracker": "Tracker"
         }
       },

@@ -9,8 +9,7 @@
       },
       "tools": {
         "meta": "Meta Analysis",
-        "speedTiers": "Speed Tiers",
-        "speedComparison": "Speed Comparison",
+        "speed": "Speed",
         "tracker": "Tracker",
         "gallery": "Gallery",
         "cardList": "Card List",
