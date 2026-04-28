@@ -11,6 +11,7 @@ import { emptySlots, seriesScore, slotsForGame, slotsFromPreset, spriteUrl, hand
 import { parseMatchCsv } from '@/features/vgc-tracker/utils/importCsv';
 import { vgcDb } from '@/lib/db/vgc-db';
 import type { Match, Series, SeriesGame } from '@/features/vgc-tracker/types';
+import { useTrackerSync } from '@/features/vgc-tracker/context/TrackerSyncContext';
 import { SessionStatsView } from './_components/SessionStatsView';
 import { ExportImportDialog } from '../_components/ExportImportDialog';
 
@@ -31,6 +32,7 @@ export default function SessionPage({ params }: Props) {
   const session = sessions.find((s) => s.id === sessionId);
   const { matches, loading, create: createMatch, refresh: refreshMatches } = useMatches(sessionId);
   const { seriesList, loading: seriesLoading, create: createSeries } = useSeries(sessionId);
+  const { pushChange } = useTrackerSync();
   const { presets } = usePresets();
   const preset = usePreset(session?.activePresetId ?? null);
   const isTournament = session?.type === 'tournament';
@@ -74,6 +76,9 @@ export default function SessionPage({ params }: Props) {
       );
       if (newMatches.length > 0) {
         await vgcDb.matches.bulkPut(newMatches);
+        for (const match of newMatches) {
+          pushChange('matches', match.id, match);
+        }
         await refreshMatches();
       }
     } finally {

@@ -1,5 +1,6 @@
 import { vgcDb } from '@/lib/db/vgc-db';
 import type { Match, Series, Session, TeamPreset } from '../types';
+import type { SyncTable } from '../context/TrackerSyncContext';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -31,6 +32,9 @@ export interface ImportResult {
   series: number;
   presets: number;
 }
+
+type ImportEntity = Session | Match | Series | TeamPreset;
+type ImportSyncCallback = (table: SyncTable, id: string, data: ImportEntity) => void;
 
 // ─── Export ───────────────────────────────────────────────────────────────────
 
@@ -79,34 +83,41 @@ export function parseExportFile(text: string): VgcExport {
   return data as VgcExport;
 }
 
-export async function importData(data: VgcExport): Promise<ImportResult> {
+export async function importData(data: VgcExport, onSynced?: ImportSyncCallback): Promise<ImportResult> {
   const result: ImportResult = { sessions: 0, matches: 0, series: 0, presets: 0 };
 
-  const mergeInto = async <T extends { id: string }>(
+  const mergeInto = async <T extends ImportEntity>(
     existing: (T | undefined)[],
     incoming: T[],
     putAll: (items: T[]) => Promise<unknown>,
     counter: keyof ImportResult,
+    table: SyncTable,
   ) => {
     const existingIds = new Set(existing.filter(Boolean).map((i) => i!.id));
     const toAdd = incoming.filter((i) => !existingIds.has(i.id));
-    if (toAdd.length) { await putAll(toAdd); result[counter] += toAdd.length; }
+    if (toAdd.length) {
+      await putAll(toAdd);
+      result[counter] += toAdd.length;
+      if (onSynced) {
+        for (const item of toAdd) onSynced(table, item.id, item);
+      }
+    }
   };
 
   if (data.type === 'session') {
     const sessions = [data.session];
-    await mergeInto(await vgcDb.sessions.bulkGet(sessions.map((s) => s.id)), sessions, (items) => vgcDb.sessions.bulkPut(items), 'sessions');
-    await mergeInto(await vgcDb.matches.bulkGet(data.matches.map((m) => m.id)), data.matches, (items) => vgcDb.matches.bulkPut(items), 'matches');
-    await mergeInto(await vgcDb.series.bulkGet(data.series.map((s) => s.id)), data.series, (items) => vgcDb.series.bulkPut(items), 'series');
+    await mergeInto(await vgcDb.sessions.bulkGet(sessions.map((s) => s.id)), sessions, (items) => vgcDb.sessions.bulkPut(items), 'sessions', 'sessions');
+    await mergeInto(await vgcDb.matches.bulkGet(data.matches.map((m) => m.id)), data.matches, (items) => vgcDb.matches.bulkPut(items), 'matches', 'matches');
+    await mergeInto(await vgcDb.series.bulkGet(data.series.map((s) => s.id)), data.series, (items) => vgcDb.series.bulkPut(items), 'series', 'series');
     if (data.preset) {
       const presets = [data.preset];
-      await mergeInto(await vgcDb.presets.bulkGet(presets.map((p) => p.id)), presets, (items) => vgcDb.presets.bulkPut(items), 'presets');
+      await mergeInto(await vgcDb.presets.bulkGet(presets.map((p) => p.id)), presets, (items) => vgcDb.presets.bulkPut(items), 'presets', 'presets');
     }
   } else {
-    await mergeInto(await vgcDb.sessions.bulkGet(data.sessions.map((s) => s.id)), data.sessions, (items) => vgcDb.sessions.bulkPut(items), 'sessions');
-    await mergeInto(await vgcDb.matches.bulkGet(data.matches.map((m) => m.id)), data.matches, (items) => vgcDb.matches.bulkPut(items), 'matches');
-    await mergeInto(await vgcDb.series.bulkGet(data.series.map((s) => s.id)), data.series, (items) => vgcDb.series.bulkPut(items), 'series');
-    await mergeInto(await vgcDb.presets.bulkGet(data.presets.map((p) => p.id)), data.presets, (items) => vgcDb.presets.bulkPut(items), 'presets');
+    await mergeInto(await vgcDb.sessions.bulkGet(data.sessions.map((s) => s.id)), data.sessions, (items) => vgcDb.sessions.bulkPut(items), 'sessions', 'sessions');
+    await mergeInto(await vgcDb.matches.bulkGet(data.matches.map((m) => m.id)), data.matches, (items) => vgcDb.matches.bulkPut(items), 'matches', 'matches');
+    await mergeInto(await vgcDb.series.bulkGet(data.series.map((s) => s.id)), data.series, (items) => vgcDb.series.bulkPut(items), 'series', 'series');
+    await mergeInto(await vgcDb.presets.bulkGet(data.presets.map((p) => p.id)), data.presets, (items) => vgcDb.presets.bulkPut(items), 'presets', 'presets');
   }
 
   return result;
