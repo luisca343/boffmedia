@@ -25,6 +25,7 @@ export class CreateSessionDto {
   @ApiPropertyOptional() @IsOptional() @IsNumber() startedAt?: number;
   @ApiPropertyOptional() @IsOptional() @IsNumber() archivedAt?: number;
   @ApiPropertyOptional() @IsOptional() @IsString() tournamentName?: string;
+  @ApiPropertyOptional() @IsOptional() @IsNumber() limitlessTournamentId?: number;
   @ApiPropertyOptional() @IsOptional() @IsString() sessionNotes?: string;
   @ApiPropertyOptional() @IsOptional() @IsNumber() userId?: number;
 }

@@ -63,6 +63,7 @@ export const vgcSessions = mysqlTable('vgc_sessions', {
   startedAt: datetime('started_at').notNull().default(sql`CURRENT_TIMESTAMP()`),
   archivedAt: bigint('archived_at', { mode: 'number' }),
   tournamentName: varchar('tournament_name', { length: 255 }),
+  limitlessTournamentId: int('limitless_tournament_id'),
   sessionNotes: text('session_notes'),
   createdAt: datetime('created_at').notNull().default(sql`CURRENT_TIMESTAMP()`),
   updatedAt: datetime('updated_at').notNull().default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),

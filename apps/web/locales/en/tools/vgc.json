@@ -174,7 +174,11 @@
         "startDate": "Start date & time",
         "minsPerGame": "Minutes per game",
         "showdownPaste": "Showdown paste",
-        "tournamentName": "Tournament name"
+        "tournamentName": "Tournament name",
+        "limitlessTournament": "Link to Limitless tournament",
+        "optional": "optional",
+        "noTournamentLink": "None",
+        "noImportedTournaments": "No imported tournaments for this regulation yet"
       },
       "placeholders": {
         "rivalName": "Rival name…",
@@ -313,6 +317,9 @@
       },
       "speedWidget": {
         "label": "Speed Tiers",
+        "expand": "Show",
+        "collapse": "Hide",
+        "summary": "{count} mons · {min}-{max}",
         "tailwind": "TW ×2",
         "scarf": "Scarf ×1.5",
         "trickroom": "TR ↕"

@@ -45,38 +45,39 @@ export function SpeedTierWidget({ slots }: Props) {
         <span className="text-[10px] font-semibold text-surface-500 uppercase tracking-wide">
           {t('speedWidget.label')}
         </span>
-        <div className="flex gap-1">
-          <button
-            onClick={() => setTailwind((v) => !v)}
-            className={`text-[10px] px-1.5 py-0.5 rounded font-mono transition-colors ${
-              tailwind
-                ? 'bg-blue-600/40 text-blue-300 border border-blue-600/50'
-                : 'bg-surface-800 text-surface-500 hover:text-surface-300 border border-transparent'
-            }`}
-          >
-            {t('speedWidget.tailwind')}
-          </button>
-          <button
-            onClick={() => setScarf((v) => !v)}
-            className={`text-[10px] px-1.5 py-0.5 rounded font-mono transition-colors ${
-              scarf
-                ? 'bg-orange-600/40 text-orange-300 border border-orange-600/50'
-                : 'bg-surface-800 text-surface-500 hover:text-surface-300 border border-transparent'
-            }`}
-          >
-            {t('speedWidget.scarf')}
-          </button>
-          <button
-            onClick={() => setTrickRoom((v) => !v)}
-            className={`text-[10px] px-1.5 py-0.5 rounded font-mono transition-colors ${
-              trickRoom
-                ? 'bg-violet-600/40 text-violet-300 border border-violet-600/50'
-                : 'bg-surface-800 text-surface-500 hover:text-surface-300 border border-transparent'
-            }`}
-          >
-            {t('speedWidget.trickroom')}
-          </button>
-        </div>
+      </div>
+
+      <div className="flex gap-1 px-3 py-1.5 border-b border-surface-800">
+        <button
+          onClick={() => setTailwind((v) => !v)}
+          className={`text-[10px] px-1.5 py-0.5 rounded font-mono transition-colors ${
+            tailwind
+              ? 'bg-blue-600/40 text-blue-300 border border-blue-600/50'
+              : 'bg-surface-800 text-surface-500 hover:text-surface-300 border border-transparent'
+          }`}
+        >
+          {t('speedWidget.tailwind')}
+        </button>
+        <button
+          onClick={() => setScarf((v) => !v)}
+          className={`text-[10px] px-1.5 py-0.5 rounded font-mono transition-colors ${
+            scarf
+              ? 'bg-orange-600/40 text-orange-300 border border-orange-600/50'
+              : 'bg-surface-800 text-surface-500 hover:text-surface-300 border border-transparent'
+          }`}
+        >
+          {t('speedWidget.scarf')}
+        </button>
+        <button
+          onClick={() => setTrickRoom((v) => !v)}
+          className={`text-[10px] px-1.5 py-0.5 rounded font-mono transition-colors ${
+            trickRoom
+              ? 'bg-violet-600/40 text-violet-300 border border-violet-600/50'
+              : 'bg-surface-800 text-surface-500 hover:text-surface-300 border border-transparent'
+          }`}
+        >
+          {t('speedWidget.trickroom')}
+        </button>
       </div>
 
       {/* Rows */}

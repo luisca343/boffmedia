@@ -1,0 +1,1 @@
+ALTER TABLE `vgc_sessions` ADD `limitless_tournament_id` int;
