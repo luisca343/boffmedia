@@ -39,8 +39,10 @@
 | 2026-04-27 | Phase 3 implemented (partial) | `PokepasteService.fetchAndCache()` fully implemented (cache-hit + miss path via `pokepast.es/{id}/json`); `VgcPastesService.batchFetchRegulation()` processes teams in chunks of `POKEPASTE_CONCURRENCY`, auto fire-and-forget at end of `refreshRegulation()`; `VgcPastesService.getPasteDetail()` aggregates moves/items/abilities/spreads from `parsedSlots` per species; `GET /champions/:speciesId/detail` + `POST /champions/fetch-pastes` added; `useChampionsPasteDetail` hook; `MetaLayoutClient` merges paste detail over base detail via `useMemo`; "Fetch Pastes" button in `VgcChampionsFetcher`; `ChampionsPasteDetailDto`+`BatchFetchResultDto` with `@ApiProperty`, `pnpm generate:shared` run, frontend imports from `@boffmedia/shared`. SP radar chart (StatCalcService) pending. |
 | 2026-04-27 | SP radar chart cancelled | SP spread → `StatCalcService` → hexagonal radar chart deferred indefinitely. Phase 3 marked complete without it. |
 | 2026-04-28 | Phase 5 implemented | Full Limitless Tournament Aggregation end-to-end. Backend: `LimitlessService` with fire-and-forget `importTournament()` + `runImport()` background job; `decklistToText()` generates proper Showdown paste from structured Limitless API data; `resolveSpeciesName()` uses `entry.id` (Showdown slug) for canonical names; `getUsageList()`, `getCombinedUsage()`, `getPlayerList()`, `getPlayerTeam()` implemented; all 7 Limitless controller endpoints registered (no guards — matches pattern of all other meta admin endpoints); `LIMITLESS_RATE_LIMIT` config constant added. DB: migration `0006_married_rattler.sql` adds `placing` to `vgc_limitless_teams` and `regulation_id`, `status`, `progress`, `total`, `error_message` to `vgc_limitless_tournaments` (migration applied manually on server). Frontend: `useMetaNavigation` extended with `view` URL param + `handleViewChange`; `MetaLayoutClient` has Aggregate/Players sub-tab strip (shown only when `tab=tournament`); three new hooks (`useLimitlessTournaments`, `useLimitlessUsage`, `useLimitlessPlayers`); `StandingsView` component (standings table with lazy per-player team fetch, `<Fragment key>` fix, plain `<img>` sprites); `FormatBar` extended with `tournament` tab + regulation pills → "Combined" pill + individual tournament pills; locale keys `tournament`, `combined`, `aggregate`, `players` added (EN + ES). Admin panel `VgcLimitlessFetcher` **not yet implemented**. |
+| 2026-04-28 | Tab consolidation | Removed the separate Champions tab. `tab=ladder` renamed to `tab=stats` (default, omitted from URL). VGCPastes-backed regulations now appear as amber "Preview" pills inside the Stats format bar, alongside Smogon format pills. The format bar derives source from the active `format` param: if it matches a known Smogon snapshot → Smogon hook; if it matches an available regulation → Champions/VGCPastes hook. Both lists must load before either hook fires (prevents spurious Smogon requests for Champions format IDs). Tournament tab gains regulation pills at the start of its bar and auto-selects the first regulation when none is set. Refresh button removed from the public meta page (admin-only). `tabs.ladder`/`tabs.champions` locale keys replaced with `tabs.stats`. |
 | 2026-04-28 | VgcLimitlessFetcher admin panel | `VgcLimitlessFetcher` component implemented: URL input, regulation picker (5 options), optional max-players field; submit → `POST /limitless/tournament` → returns `tournamentId`; per-tournament `setInterval` polling every 3 s via `useRef<Map<number, interval>>`; progress bar inline in the table row while `status === "running"`; status icons (`Loader2` / `CheckCircle2` / `AlertCircle`); tournament list sorted by date; wired into `/admin?section=vgc-meta` below `VgcChampionsFetcher`. Phase 5 fully complete. |
 | 2026-04-28 | StandingsView UX improvements | **Eager team prefetch**: all player teams now fetched concurrently on mount via a `useEffect` + `fetchedRef` Set; sprites appear without requiring a click. **Scroll-into-view**: expanding a row scrolls the detail panel into view with `scrollIntoView({ behavior: "smooth", block: "nearest" })` using a `detailRowRef`. **Copy Poképaste button**: expanded row exposes a "Copy Poképaste" button that writes `rawText` to the clipboard with a 2-second "Copied!" confirmation; backend `getPlayerTeam()` and `findTeamWithPaste()` now return `rawText`; `LimitlessPlayerTeam` type updated. **i18n**: all `StandingsView` strings moved to `vgc.meta.standings.*` keys in both EN and ES locale files. **Top-N sort fix**: `runImport()` now sorts standings by `placing` ascending before `slice(0, maxPlayers)` so `maxPlayers=16` reliably gives the actual top 16 finishers. **Sprite fix**: `floette-eternal` only exists at `sprites/dex/` — added `SPRITE_DEX_SLUGS` Set in `types.ts` to route specific slugs to the dex base URL instead of home-centered/gen5; removed wrong `floette-eternal-mega` override. |
+| 2026-04-28 | FormatBar selects redesign | Replaced all format/regulation/tournament pills with `<select>` elements for a more compact and consistent UI. Stats tab: single `<select>` with `<optgroup label="Smogon">` and `<optgroup label="VGCPastes · Preview">` groups; month and cutoff also inline `<select>`s (no Apply button — change fires immediately via `onOptionsApply`). Tournament tab: regulation `<select>` + tournament `<select>` (Combined + individual entries sorted by date desc). Options popover (`Settings2` icon, `useRef`, `useState`) fully removed. `SELECT_CLS` constant for consistent styling across all selects. All tabs use the same sticky sidebar layout (`md:sticky md:top-0 md:h-screen`). |
 
 ---
 
@@ -446,29 +448,26 @@ Adamant Nature
 
 ```
 /pokemon/vgc/meta
-  ├── Tabs: [Ladder | Champions | Compare]
+  ├── Tabs: [Stats | Tournament]  (URL: tab= — "stats" is default and omitted)
   │
-  ├── Ladder tab (Smogon chaos) — two-pane persistent layout
-  │     ├── FormatBar: regulation pills + Options popover (month / cutoff)
-  │     ├── Left pane: sticky sidebar — ranked list (sprite | rank | name | bar | %) + search
+  ├── Stats tab — two-pane persistent layout
+  │     ├── FormatBar: single <select> with optgroups "Smogon" + "VGCPastes · Preview"
+  │     │             + month <select> + cutoff <select> (Smogon formats only)
+  │     ├── Preview notice banner (amber) when a VGCPastes regulation is active
+  │     ├── Left pane: sticky sidebar (md:sticky md:top-0 md:h-screen)
+  │     │             ranked list (sprite | rank | name | %) + search
   │     └── Right pane: panel grid per selected Pokémon
   │           Row 1: Moves · Items · Abilities
-  │           Row 2: Tera Types · Teammates · EV Spreads + RadarChart
+  │           Row 2: Tera Types · Teammates · EV Spreads
   │     Mobile: sidebar only (no speciesId) ↔ detail only (speciesId set) — back button navigates
-  │     URL: /meta/[speciesId]?format=gen9vgc2026regi[&month=YYYY-MM][&cutoff=1630]
+  │     URL: /meta?format=gen9vgc2026regi[&month=YYYY-MM][&cutoff=1630][&species=...]
   │
-  ├── Champions tab (VGCPastes + Limitless)
-  │     ├── Source: [VGCPastes | Limitless]
-  │     ├── [VGCPastes] Regulation picker · date range · tournament filter
-  │     ├── [Limitless] Tournament picker (admin URL input when no cached data)
-  │     ├── Usage table (same structure as Ladder)
-  │     └── Pokemon detail panel (Champions moves / items / SP spreads)
-  │
-  └── Compare tab
-        ├── Side-by-side: Ladder % vs Champions %
-        ├── Divergence table (sorted by |ladder - champions|)
-        ├── "Ladder trap" badge  ·  "Tournament staple" badge
-        └── Month-over-month trend sparklines (future)
+  └── Tournament tab
+        ├── FormatBar: regulation <select> + tournament <select> (Combined + individual, date-sorted)
+        ├── Sub-tabs: [Aggregate | Players]  (URL: view=)
+        ├── Aggregate view: same two-pane layout as Stats (usage list + detail panel)
+        └── Players view: StandingsView — standings table with eager team prefetch,
+                          expand row → sprite grid + item/tera/moves per slot + Copy Paste button
 ```
 
 ---

@@ -124,6 +124,7 @@ const SUBSTITUTE_URL   = 'https://play.pokemonshowdown.com/sprites/dex/substitut
 /** Explicit Showdown slug overrides for forms that don't follow any generic rule. */
 const SPRITE_SLUG_OVERRIDES: Record<string, string> = {
   'urshifu-single-strike': 'urshifu',      // single-strike is the base form — no suffix
+  'floette-eternal-mega':  'floette-mega', // mega variant uses gen5/floette-mega.png slug
 };
 
 /**

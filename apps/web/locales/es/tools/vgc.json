@@ -371,8 +371,7 @@
       "title": "Análisis de Meta",
       "subtitle": "Uso en la escalera y composición de equipos desde Smogon Stats",
       "tabs": {
-        "ladder": "Escalera",
-        "champions": "Champions",
+        "stats": "Estadísticas",
         "tournament": "Torneo",
         "combined": "Combinado",
         "aggregate": "Uso",

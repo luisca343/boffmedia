@@ -32,20 +32,24 @@ export function MetaLayoutClient() {
   const searchParams = useSearchParams();
 
   // ── URL state — read inline to gate data hooks before they are called ──────
-  const tab          = searchParams.get("tab")          ?? "ladder";
+  const tab          = searchParams.get("tab")          ?? "stats";
   const format       = searchParams.get("format")       ?? "";
   const month        = searchParams.get("month")        ?? "";
   const cutoff       = Number(searchParams.get("cutoff") ?? DEFAULT_CUTOFF);
   const regulation   = searchParams.get("regulation")   ?? "";
   const tournamentId = searchParams.get("tournamentId") ?? "";
 
-  // ── Data hooks — inactive tab receives empty string and skips fetching ─────
+  // ── Determine format source — wait until both lists load before activating ─
   const snapshots   = useSmogonSnapshots();
   const regulations = useChampionsRegulations();
+  const isSmogonFormat  = useMemo(() => snapshots.some(s => s.formatId === format),   [snapshots,   format]);
+  const isPreviewFormat = useMemo(() => regulations.some(r => r.id    === format),    [regulations, format]);
+
+  // ── Data hooks — inactive tab/source receives empty string and skips fetch ─
   const { entries: ladderEntries,    entriesMap: ladderMap,    loading: ladderLoading,    error: ladderError    } =
-    useSmogonUsage(tab === "ladder" ? format : "", month, cutoff);
+    useSmogonUsage(tab === "stats" && isSmogonFormat ? format : "", month, cutoff);
   const { entries: championsEntries, entriesMap: championsMap, loading: championsLoading, error: championsError } =
-    useChampionsUsage(tab === "champions" ? regulation : "");
+    useChampionsUsage(tab === "stats" && isPreviewFormat ? format : "");
 
   // ── Limitless hooks ────────────────────────────────────────────────────────
   const { tournaments } = useLimitlessTournaments(
@@ -60,23 +64,23 @@ export function MetaLayoutClient() {
   const { players: standingsPlayers, loading: standingsLoading, error: standingsError } =
     useLimitlessPlayers(tab === "tournament" ? tournamentIdNum : undefined);
 
-  const entries    = tab === "champions" ? championsEntries : tab === "tournament" ? tournamentEntries : ladderEntries;
-  const entriesMap = tab === "champions" ? championsMap     : tab === "tournament" ? tournamentMap     : ladderMap;
-  const loading    = tab === "champions" ? championsLoading : tab === "tournament" ? tournamentLoading : ladderLoading;
-  const error      = tab === "champions" ? championsError   : tab === "tournament" ? tournamentError   : ladderError;
+  const entries    = tab === "tournament" ? tournamentEntries : isPreviewFormat ? championsEntries : ladderEntries;
+  const entriesMap = tab === "tournament" ? tournamentMap     : isPreviewFormat ? championsMap     : ladderMap;
+  const loading    = tab === "tournament" ? tournamentLoading : isPreviewFormat ? championsLoading : ladderLoading;
+  const error      = tab === "tournament" ? tournamentError   : isPreviewFormat ? championsError   : ladderError;
 
   // ── Navigation hook — buildUrl, auto-navigation effects, all handlers ──────
   const { speciesId, detail: baseDetail, view, handleSelect, handleTabChange, handleFormatChange, handleOptionsApply, handleRegulationChange, handleTournamentChange, handleViewChange, handleBack } =
     useMetaNavigation({ snapshots, regulations, entries, entriesMap });
 
-  // ── Phase 3: paste-derived data for Champions tab ─────────────────────────
+  // ── Phase 3: paste-derived data for preview formats ───────────────────────
   const { detail: pasteDetail } = useChampionsPasteDetail(
-    tab === "champions" ? speciesId : undefined,
-    tab === "champions" ? regulation : undefined,
+    isPreviewFormat ? speciesId : undefined,
+    isPreviewFormat ? format    : undefined,
   );
 
   const detail = useMemo(() => {
-    if (!baseDetail || tab !== "champions" || !pasteDetail) return baseDetail;
+    if (!baseDetail || !isPreviewFormat || !pasteDetail) return baseDetail;
     return {
       ...baseDetail,
       abilities: pasteDetail.abilities.length > 0 ? pasteDetail.abilities : baseDetail.abilities,
@@ -85,7 +89,7 @@ export function MetaLayoutClient() {
       teraTypes: pasteDetail.teraTypes.length > 0 ? pasteDetail.teraTypes : baseDetail.teraTypes,
       spreads:   pasteDetail.spreads.length   > 0 ? pasteDetail.spreads   : baseDetail.spreads,
     };
-  }, [baseDetail, pasteDetail, tab]);
+  }, [baseDetail, pasteDetail, isPreviewFormat]);
 
   return (
     <div className="flex flex-col bg-surface-950 min-h-screen">
@@ -107,8 +111,8 @@ export function MetaLayoutClient() {
         onTournamentChange={handleTournamentChange}
       />
 
-      {/* Preview notice for Champions tab */}
-      {tab === "champions" && (
+      {/* Preview notice for VGCPastes-backed formats */}
+      {tab === "stats" && isPreviewFormat && (
         <div className="shrink-0 flex items-center gap-2 px-3 py-2 bg-amber-500/5 border-b border-amber-500/20 text-xs text-amber-400/80">
           <Info className="w-3.5 h-3.5 shrink-0" />
           {t("tabs.championsPreviewNotice")}
