@@ -43,6 +43,13 @@
       "when": 1777397680236,
       "tag": "0005_smooth_bloodstorm",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1777404408239,
+      "tag": "0006_lumpy_harpoon",
+      "breakpoints": true
     }
   ]
 }

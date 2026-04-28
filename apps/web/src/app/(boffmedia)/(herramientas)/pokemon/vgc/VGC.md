@@ -12,6 +12,11 @@
 
 | Date | Author | Change |
 |---|---|---|
+| 2026-04-28 | OQ-T5 UX tweak: always-visible speed panel | Updated tracker match `SpeedTierWidget` to be always visible (removed collapse/expand toggle and collapsed summary) by UX preference. Kept live Tailwind/Scarf/Trick Room toggles and speed ordering behavior intact. |
+| 2026-04-28 | OQ-T5: In-match speed panel implemented | Added collapsible in-match speed panel in tracker match workspace (`SpeedTierWidget`) for both team columns. Uses local species base speeds with `calcSpeedStat` + `applyMods`; includes Tailwind/Scarf/Trick Room toggles and collapsed summary (`count` + effective speed range). No API calls required. |
+| 2026-04-28 | OQ-T6 rollback: non-clickable Pokémon in tracker lists | Reverted clickable Pokémon behavior in tracker session views by user request. Opponent sprites in MatchRow and species rows in SessionStats `PokemonUsageTable` are display-only again (no links to meta pages). |
+| 2026-04-28 | OQ-T4: Tournament session → Limitless link | Added `limitlessTournamentId` (nullable int) to `vgc_sessions` DB schema. Drizzle migration `0006_lumpy_harpoon.sql` generated. `CreateSessionDto` updated with `@IsOptional() @IsNumber()` field. `Session` frontend type extended. `NewSessionDialog` fetches completed Limitless tournaments for the selected regulation and shows a tournament link picker when `sessionType === 'tournament'`. i18n keys added (EN + ES). |
+| 2026-04-28 | OQ-T6: Clickable opponent Pokémon | `PokemonUsageTable` sprite+name cell now renders as a `<Link>` to `/pokemon/vgc/meta/{speciesId}` (opens in new tab). `MatchRow` in session page converted from outer `<Link>` to `div+onClick` so opponent team sprites can be individual `<a>` links to the meta page (with `stopPropagation`). |
 | 2026-04-28 | Tracker preset DTO fix | Fixed `property id should not exist` ValidationPipe rejection on preset upsert. Added `@IsOptional() @IsString() id?: string;` to `CreatePresetDto` so the `id` field sent from the frontend (spread from local Dexie preset) passes `whitelist: true` + `forbidNonWhitelisted: true`. |
 | 2026-04-28 | Tracker backlog push (bidirectional catch-up) | Extended `TrackerSyncContext` pull flow to perform local→cloud backfill after cloud→local merge. On login, any local-only entities not present remotely are now upserted automatically (sessions first, then matches/series/presets), enabling full historical upload including previously offline BO3 series data. |
 | 2026-04-28 | Tracker FK ordering fix | Fixed cloud sync foreign-key failures when pushing matches/series before their parent session existed on server (`ER_NO_REFERENCED_ROW_2` on `vgc_matches.session_id -> vgc_sessions.id`). `TrackerSyncContext.pushChange` now self-heals by upserting the local parent session from Dexie before pushing a match or series. This also repairs legacy local data created while earlier push bugs were active. |
@@ -650,7 +655,7 @@ Full client-side VGC battle logger. Sessions store match-by-match results, oppon
 |---|---|---|
 | Data loss on browser wipe | All tracker data | High |
 | No multi-device sync | Architecture | High |
-| `getChampionsRegulations()` uses legacy endpoint; won't list DB-only regulations | `NewSessionDialog`, `PresetManager` | Medium |
+| `getChampionsRegulations()` uses legacy endpoint; won't list DB-only regulations | `NewSessionDialog`, `PresetManager` | Medium | **Resolved** — already calls `regulationsRepository.findActive()` (DB-backed) |
 | `useRegulationMeta` re-fetches meta on every stats tab open — no cache layer visible | `tracker/[sessionId]/` | Medium |
 | Speed tiers not accessible from match context | Match flow | Low |
 | Opponent Pokémon in a match log are not clickable to meta page | Match flow | Low |
@@ -713,18 +718,16 @@ This is a significant scope addition — needs explicit user decision before pro
 
 ### Tracker
 
-**OQ-T1** Should tracker data ever be stored server-side? If yes: opt-in cloud backup only, or mandatory server persistence (breaking the offline-first model)?
+**OQ-T1** → **Implemented.** Opt-in cloud sync via `TrackerSyncContext`: auto-pull on login (cloud→local merge), push on every write (`pushChange`), bidirectional backlog catch-up. Sessions/matches/series/presets all upserted. DB migration applied.
 
-**OQ-T2** Should the tracker's regulation selector be migrated to the DB-backed `GET /vgc/regulations` endpoint so it lists the same regulations as the meta and speed tools?
+**OQ-T2** → **Yes.** Regulation selector in `NewSessionDialog` + `PresetManager` to migrate from static list / legacy endpoint to `GET /vgc/regulations` (same source as meta and speed tools).
 
-**OQ-T3** How deep should meta integration go in `RegulationMetaSection`?
-  a. Keep current (Smogon + Champions usage overlay)
-  b. Add Limitless tournament usage as a third overlay
-  c. Add Phase 4 divergence badges ("ladder trap" / "tournament staple")
-  d. Add a "You vs the meta" summary panel
+**OQ-T3** → **Phase (c) first, then (b), defer (d).** Add Phase 4 divergence badges ("Ladder trap" / "Tournament staple") to `RegulationMetaSection`'s usage table — highest signal-to-noise, uses data already in DB. Once badges land, add Limitless tournament usage % as a tooltip/sub-column (option b). "You vs the meta" panel (option d) deferred until users have meaningful match history (20+ matches).
 
-**OQ-T4** Should a `tournament`-type tracker session be linkable to a specific imported Limitless tournament? What would the UI look like?
+**OQ-T4** → **Yes.** Tournament-type sessions can optionally link to an imported Limitless tournament. Enables: compare personal record vs top-N finishers, see which opponent species you faced that were common in the tournament field, future Phase 4 divergence scoped to that specific tournament.
 
-**OQ-T5** Should there be a speed-tier quick-reference panel accessible within a match (without navigating away)? If yes, should it show the preset team's speed checkpoints automatically?
+**OQ-T5** → **Implemented.** Lightweight in-match speed-tier panel is available inside the match workspace (no navigation away), with live Tailwind/Scarf/Trick Room toggles. It reuses `speedCalc.ts` + `applyMods` client-side and needs no API call.
 
-**OQ-T6** Should opponent Pokémon in match logs be clickable links to the meta page, or keep them as plain text/sprites with no navigation?
+Future backlog for OQ-T5 (feature-rich pass): per-slot EV/nature presets (0N/0+/252N/252+), quick opponent speed input with outspeed highlights, and turn-state chips (e.g. Icy Wind / Electroweb / Booster/Protosynthesis speed state).
+
+**OQ-T6** → **No (rolled back).** By UX preference, opponent Pokémon in match logs and session stats usage remain non-clickable display elements. Keep focus on fast logging/review and avoid accidental navigation inside tracker workflows.

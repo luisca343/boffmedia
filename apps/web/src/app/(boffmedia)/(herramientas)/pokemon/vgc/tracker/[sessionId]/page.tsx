@@ -475,6 +475,7 @@ function StatCard({ value, label, color }: { value: string | number; label: stri
 
 function MatchRow({ match, number, sessionId, eloDelta }: { match: Match; number: number; sessionId: string; eloDelta?: number }) {
   const t = useTranslations('vgc.tracker');
+  const router = useRouter();
 
   // ELO delta: colored by result
   const deltaColor = eloDelta === undefined
@@ -486,7 +487,7 @@ function MatchRow({ match, number, sessionId, eloDelta }: { match: Match; number
     : 'text-surface-400';
   const deltaSign = eloDelta !== undefined && eloDelta >= 0 ? '+' : '';
 
-  // Build sprite rows: picked slots (lead/back) bright; discards dim
+  // Build sprite rows for my team (no links)
   const spritesFor = (slots: typeof match.myTeam.slots) => {
     const filled = slots.filter((s) => s.speciesId !== null);
     if (filled.length === 0) return null;
@@ -506,14 +507,35 @@ function MatchRow({ match, number, sessionId, eloDelta }: { match: Match; number
     ));
   };
 
+  // Build opponent sprite row (no links)
+  const oppSpritesFor = (slots: typeof match.opponentTeam.slots) => {
+    const filled = slots.filter((s) => s.speciesId !== null);
+    if (filled.length === 0) return null;
+    const order: Record<string, number> = { lead1: 0, lead2: 1, back1: 2, back2: 3, unknown: 4 };
+    const sorted = [...filled].sort((a, b) => order[a.role] - order[b.role]);
+    return sorted.map((s) => (
+      <img
+        key={s.slotIndex}
+        src={spriteUrl(s.speciesName!)}
+        alt={s.speciesName ?? ''}
+        title={s.speciesName ?? ''}
+        className={`w-6 h-6 object-contain transition-opacity ${s.role === 'unknown' ? 'opacity-25 grayscale' : 'opacity-100'}`}
+        onError={handleSpriteError}
+      />
+    ));
+  };
+
   const mySprites = spritesFor(match.myTeam.slots);
-  const oppSprites = spritesFor(match.opponentTeam.slots);
+  const oppSprites = oppSpritesFor(match.opponentTeam.slots);
   const hasSprites = mySprites || oppSprites;
 
   return (
-    <Link
-      href={`/pokemon/vgc/tracker/${sessionId}/${match.id}`}
-      className="flex items-center gap-3 rounded-xl border border-surface-800 bg-surface-950 hover:border-primary-500/40 px-3 py-2.5 transition-all"
+    <div
+      role="link"
+      tabIndex={0}
+      onClick={() => router.push(`/pokemon/vgc/tracker/${sessionId}/${match.id}`)}
+      onKeyDown={(e) => e.key === 'Enter' && router.push(`/pokemon/vgc/tracker/${sessionId}/${match.id}`)}
+      className="flex items-center gap-3 rounded-xl border border-surface-800 bg-surface-950 hover:border-primary-500/40 px-3 py-2.5 transition-all cursor-pointer"
     >
       {/* Result badge */}
       <div
@@ -576,7 +598,7 @@ function MatchRow({ match, number, sessionId, eloDelta }: { match: Match; number
           </div>
         )}
       </div>
-    </Link>
+    </div>
   );
 }
 
