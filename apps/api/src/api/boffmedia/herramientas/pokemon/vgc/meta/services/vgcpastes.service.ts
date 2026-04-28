@@ -1,8 +1,8 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Dex } from '@pkmn/sim';
 import { VgcPastesRepository } from '../repositories/vgcpastes.repository';
+import { VgcRegulationsRepository } from '../repositories/regulations.repository';
 import { BatchFetchResult, ChampionsPasteDetail, PokemonUsageDetail } from '../entities/pokemon-usage.entity';
-import { CHAMPIONS_REGULATIONS, ChampionsRegulation } from '../../champions-data';
 import { POKEPASTE_CONCURRENCY, VGCPASTES_SHEET_BASE } from '../config/smogon.config';
 import { VgcMetaSlot, StatSpread } from '@/_db/schema/Vgc';
 import { PokepasteService } from './pokepaste.service';
@@ -54,12 +54,12 @@ export class VgcPastesService {
 
   constructor(
     private readonly vgcPastesRepository: VgcPastesRepository,
+    private readonly regulationsRepository: VgcRegulationsRepository,
     private readonly pokepasteService: PokepasteService,
   ) {}
 
-  async getAvailableRegulations(): Promise<ChampionsRegulation[]> {
-    const ids = await this.vgcPastesRepository.findAvailableRegulations();
-    return ids.map((id) => CHAMPIONS_REGULATIONS[id]).filter(Boolean);
+  async getAvailableRegulations() {
+    return this.regulationsRepository.findActive();
   }
 
   async refreshRegulation(regulationId: string, gid: string): Promise<{ count: number }> {
@@ -152,9 +152,10 @@ export class VgcPastesService {
     this.logger.log(`Refreshed ${count} teams for regulation ${regulationId}`);
 
     // Phase 3: auto-trigger paste fetch for newly inserted teams (fire-and-forget)
-    this.batchFetchRegulation(regulationId).catch((e) =>
-      this.logger.warn(`Auto paste-fetch failed for ${regulationId}: ${e.message}`),
-    );
+    this.batchFetchRegulation(regulationId).catch((e) => {
+      const msg = e instanceof Error ? e.message : String(e);
+      this.logger.warn(`Auto paste-fetch failed for ${regulationId}: ${msg}`);
+    });
 
     return { count };
   }
@@ -166,6 +167,7 @@ export class VgcPastesService {
    * Processes in chunks of POKEPASTE_CONCURRENCY to respect the rate limit.
    */
   async batchFetchRegulation(regulationId: string): Promise<BatchFetchResult> {
+    const regulation = await this.regulationsRepository.findById(regulationId);
     const teams = await this.vgcPastesRepository.findTeamsNeedingFetch(regulationId);
     let fetched = 0, cached = 0, failed = 0;
 
@@ -174,7 +176,10 @@ export class VgcPastesService {
       await Promise.all(
         chunk.map(async (team) => {
           try {
-            const { pasteId, wasCached } = await this.pokepasteService.fetchAndCache(team.pasteUrl);
+            const { pasteId, wasCached } = await this.pokepasteService.fetchAndCache(
+              team.pasteUrl,
+              regulation?.formatId ?? undefined,
+            );
             await this.vgcPastesRepository.linkPaste(team.id, pasteId);
             if (wasCached) cached++; else fetched++;
           } catch (e) {
@@ -261,8 +266,8 @@ export class VgcPastesService {
   }
 
   async getUsageList(regulationId: string): Promise<PokemonUsageDetail[]> {
-    const regulation = CHAMPIONS_REGULATIONS[regulationId];
-    const dexForFormat = getDexForFormat(regulation?.formatId);
+    const regulation = await this.regulationsRepository.findById(regulationId);
+    const dexForFormat = getDexForFormat(regulation?.formatId ?? undefined);
 
     const teams = await this.vgcPastesRepository.findByRegulation(regulationId);
     if (teams.length === 0) {

@@ -70,7 +70,7 @@ export class VgcMetaService {
   }
 
   static getAvailableChampionsRegulations() {
-    return apiGET<ChampionsRegulation[]>('/tools/vgc/meta/champions/available');
+    return apiGET<ChampionsRegulation[]>('/tools/vgc/meta/regulations');
   }
 
   static getChampionsUsage(regulationId: string) {
@@ -145,14 +145,23 @@ export class VgcMetaService {
       `/tools/vgc/meta/limitless/${tournamentId}/player/${encodeURIComponent(slug)}`,
     );
   }
+
+  // ─── Species Teams ─────────────────────────────────────────────────────────
+
+  static getSpeciesTeams(speciesId: string, regulationId: string) {
+    const params = new URLSearchParams({ speciesId, regulationId });
+    return apiGET<SpeciesTeamEntry[]>(`/tools/vgc/meta/teams?${params}`);
+  }
 }
 
 export interface ChampionsRegulation {
-  id: string;
-  formatId: string;
-  name: string;
-  gameType: 'singles' | 'doubles';
-  notes?: string;
+  id:           string;
+  formatId:     string;
+  name:         string;
+  gameType:     string;
+  vgcPastesGid: string | null;
+  active:       number;
+  createdAt:    string;
 }
 
 // ─── Limitless types ─────────────────────────────────────────────────────────
@@ -251,4 +260,26 @@ export class VgcService {
   static getChampionsLegalPokemon(regulationId: string) {
     return apiGET<VgcPokemon[]>(`/tools/vgc/champions/${regulationId}/pokemon`);
   }
+}
+
+// ─── Species Teams ────────────────────────────────────────────────────────────
+
+export interface SpeciesTeamSlot {
+  slotIndex:   number;
+  speciesId:   string;
+  speciesName: string;
+  item?:       string;
+  ability?:    string;
+  moves:       string[];
+  tera?:       string;
+}
+
+export interface SpeciesTeamEntry {
+  source:     'vgcpastes' | 'limitless';
+  playerId:   string;
+  playerName: string | null;
+  record:     string | null;
+  rank:       string | null;
+  slots:      SpeciesTeamSlot[];
+  rawText:    string;
 }

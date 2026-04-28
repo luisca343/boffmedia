@@ -3,6 +3,7 @@ CREATE TABLE `vgc_limitless_teams` (
 	`tournament_id` int,
 	`player_slug` varchar(128) NOT NULL,
 	`player_name` varchar(128),
+	`placing` int,
 	`record` varchar(16),
 	`paste_id` int,
 	`fetched_at` datetime NOT NULL,
@@ -16,6 +17,11 @@ CREATE TABLE `vgc_limitless_tournaments` (
 	`date` varchar(32),
 	`format` varchar(64),
 	`player_count` int,
+	`regulation_id` varchar(64),
+	`status` varchar(16) NOT NULL DEFAULT 'pending',
+	`progress` int NOT NULL DEFAULT 0,
+	`total` int NOT NULL DEFAULT 0,
+	`error_message` text,
 	`fetched_at` datetime NOT NULL,
 	CONSTRAINT `vgc_limitless_tournaments_id` PRIMARY KEY(`id`),
 	CONSTRAINT `vgc_limitless_tournaments_limitless_id_unique` UNIQUE(`limitless_id`)
@@ -26,11 +32,18 @@ CREATE TABLE `vgc_paste_teams` (
 	`paste_id` int,
 	`paste_url` varchar(255),
 	`player_name` varchar(128),
+	`team_description` varchar(512),
 	`tournament` varchar(255),
 	`date_shared` varchar(16),
 	`rank` varchar(64),
 	`regulation_id` varchar(64),
 	`species` text NOT NULL,
+	`items` text NOT NULL DEFAULT ('[]'),
+	`replica_status` varchar(8),
+	`replica_code` varchar(20),
+	`has_evs` varchar(4),
+	`source_url` varchar(512),
+	`owner` varchar(128),
 	`fetched_at` datetime NOT NULL,
 	CONSTRAINT `vgc_paste_teams_id` PRIMARY KEY(`id`)
 );
@@ -47,6 +60,30 @@ CREATE TABLE `vgc_pastes` (
 	CONSTRAINT `vgc_pastes_id` PRIMARY KEY(`id`),
 	CONSTRAINT `vgc_pastes_pokepaste_id_unique` UNIQUE(`pokepaste_id`)
 );
+--> statement-breakpoint
+CREATE TABLE `vgc_regulations` (
+	`id` varchar(64) NOT NULL,
+	`format_id` varchar(128) NOT NULL,
+	`name` varchar(255) NOT NULL,
+	`game_type` varchar(16) NOT NULL DEFAULT 'doubles',
+	`vgcpastes_gid` varchar(32),
+	`active` int NOT NULL DEFAULT 1,
+	`created_at` datetime NOT NULL,
+	CONSTRAINT `vgc_regulations_id` PRIMARY KEY(`id`)
+);
+
+INSERT INTO `vgc_regulations` (`id`, `format_id`, `name`, `game_type`, `vgcpastes_gid`, `active`, `created_at`)
+VALUES (
+  'vgc2026regma',
+  'gen9championsvgc2026regma',
+  '[Gen 9 Champions] VGC 2026 Reg M-A',
+  'doubles',
+  '791705272',
+  1,
+  NOW()
+);
+
+
 --> statement-breakpoint
 CREATE TABLE `vgc_smogon_pokemon` (
 	`id` int AUTO_INCREMENT NOT NULL,

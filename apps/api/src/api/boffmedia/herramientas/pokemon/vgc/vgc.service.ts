@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Dex } from '@pkmn/sim';
-import { CHAMPIONS_REGULATIONS, ChampionsRegulation } from './champions-data';
+import { VgcRegulationsRepository } from './meta/repositories/regulations.repository';
 import { initChampionsMod } from './champions.mod';
 
 export interface VgcPokemon {
@@ -47,7 +47,7 @@ export interface SpeedTierEntry {
 
 @Injectable()
 export class VgcService {
-  constructor() {
+  constructor(private readonly regulationsRepository: VgcRegulationsRepository) {
     // Register the Champions mod into @pkmn/sim so that Champions format IDs
     // (e.g. 'gen9championsvgc2026regma') are queryable via Dex.forFormat().
     initChampionsMod();
@@ -142,8 +142,12 @@ export class VgcService {
   /**
    * Returns the list of Champions regulations with their format IDs.
    */
-  getChampionsRegulations(): ChampionsRegulation[] {
-    return Object.values(CHAMPIONS_REGULATIONS);
+  async getChampionsRegulations() {
+    return this.regulationsRepository.findActive();
+  }
+
+  async getRegulationById(id: string) {
+    return this.regulationsRepository.findById(id);
   }
 
   // ==================== SHARED ====================

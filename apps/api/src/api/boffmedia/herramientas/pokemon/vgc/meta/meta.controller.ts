@@ -17,6 +17,7 @@ import { QueryChampionsDto } from './dto/query-champions.dto';
 import { AddLimitlessTournamentDto } from './dto/add-limitless-tournament.dto';
 import { QueryLimitlessDto } from './dto/query-limitless.dto';
 import { BatchFetchResultDto, ChampionsPasteDetailDto } from './dto/champions-paste-detail.dto';
+import { UpsertRegulationDto } from './dto/upsert-regulation.dto';
 
 @ApiTags('BoffMedia 🛠 | VGC Meta')
 @Controller('tools/vgc/meta')
@@ -166,5 +167,33 @@ export class VgcMetaController {
     @Param('slug') slug: string,
   ) {
     return this.facade.getLimitlessPlayerTeam(+tournamentId, slug);
+  }
+
+  // --- Regulations -----------------------------------------------------------
+
+  @Get('regulations')
+  @ApiOperation({ summary: 'List all active Champions regulations' })
+  @ApiResponse({ status: 200, description: 'Regulation list returned.' })
+  getRegulations() {
+    return this.facade.getRegulations();
+  }
+
+  @Post('regulations')
+  @ApiOperation({ summary: '[Admin] Create or update a Champions regulation' })
+  @ApiResponse({ status: 201, description: 'Regulation upserted.' })
+  upsertRegulation(@Body() dto: UpsertRegulationDto) {
+    return this.facade.upsertRegulation(dto);
+  }
+
+  // --- Species Teams ---------------------------------------------------------
+
+  @Get('teams')
+  @ApiOperation({ summary: 'Get teams featuring a Pokémon in a regulation (max 30, rank ascending)' })
+  @ApiResponse({ status: 200, description: 'Team list returned.' })
+  getSpeciesTeams(
+    @Query('speciesId')    speciesId:    string,
+    @Query('regulationId') regulationId: string,
+  ) {
+    return this.facade.getSpeciesTeams(speciesId, regulationId);
   }
 }
