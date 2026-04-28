@@ -162,7 +162,7 @@ export function PokemonDetailView({ detail, loading, speciesId, regulationId, on
             </div>
           )}
           <p className="text-sm text-surface-400">
-            {detail.usagePercent.toFixed(1)}% usage
+            {t("detail.usagePercent", { percent: detail.usagePercent.toFixed(1) })}
             <span className="mx-1.5 text-surface-700">·</span>
             {t("detail.battles", { count: detail.rawCount })}
           </p>
@@ -229,7 +229,7 @@ export function PokemonDetailView({ detail, loading, speciesId, regulationId, on
           <TeamsPanel
             teams={teams}
             loading={teamsLoading}
-            title="Featuring Teams"
+            title={t("detail.featuringTeams")}
           />
         </div>
       )}

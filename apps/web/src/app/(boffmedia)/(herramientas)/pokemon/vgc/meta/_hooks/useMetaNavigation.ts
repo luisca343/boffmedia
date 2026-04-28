@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo } from "react";
 import { useRouter, useSearchParams, useParams } from "next/navigation";
 import {
   ChampionsRegulation,
+  LimitlessTournament,
   PokemonUsageDetail,
   SmogonSnapshot,
 } from "@/services/api/boffmedia/vgcService";
@@ -62,6 +63,7 @@ function buildUrl(opts: MetaUrlState) {
 interface UseMetaNavigationOpts {
   snapshots:   SmogonSnapshot[];
   regulations: ChampionsRegulation[];
+  tournaments: LimitlessTournament[];
   entries:     PokemonUsageDetail[];
   entriesMap:  Map<string, PokemonUsageDetail>;
 }
@@ -73,6 +75,7 @@ interface UseMetaNavigationOpts {
 export function useMetaNavigation({
   snapshots,
   regulations,
+  tournaments,
   entries,
   entriesMap,
 }: UseMetaNavigationOpts): UseMetaNavigationResult {
@@ -89,15 +92,15 @@ export function useMetaNavigation({
   const tournamentId = searchParams.get("tournamentId") ?? "";
   const view         = searchParams.get("view")         ?? "aggregate";
 
-  // Auto-navigate when Stats tab has no format: try first Smogon snapshot, fall back to first preview regulation
+  // Auto-navigate when Stats tab has no format: default to latest regulation (Champions), fall back to first Smogon snapshot
   useEffect(() => {
     if (tab !== "stats") return;
     if (searchParams.get("format")) return;
-    if (snapshots.length > 0) {
+    if (regulations.length > 0) {
+      router.replace(buildUrl({ speciesId, tab, format: regulations[0].id, month: "", cutoff: DEFAULT_CUTOFF, regulation, tournamentId, view }));
+    } else if (snapshots.length > 0) {
       const first = snapshots[0];
       router.replace(buildUrl({ speciesId, tab, format: first.formatId, month: first.month, cutoff: first.cutoff, regulation, tournamentId, view }));
-    } else if (regulations.length > 0) {
-      router.replace(buildUrl({ speciesId, tab, format: regulations[0].id, month: "", cutoff: DEFAULT_CUTOFF, regulation, tournamentId, view }));
     }
   }, [snapshots, regulations]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -108,6 +111,14 @@ export function useMetaNavigation({
       router.replace(buildUrl({ speciesId, tab, format, month, cutoff, regulation: regulations[0].id, tournamentId, view }));
     }
   }, [regulations]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Auto-navigate to first tournament when Tournament tab has a regulation but no tournamentId
+  useEffect(() => {
+    if (tab !== "tournament") return;
+    if (tournaments.length > 0 && !searchParams.get("tournamentId")) {
+      router.replace(buildUrl({ speciesId, tab, format, month, cutoff, regulation, tournamentId: String(tournaments[0].id), view }));
+    }
+  }, [tournaments]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-navigate to first Pokémon when list loads and no selection
   useEffect(() => {
@@ -127,8 +138,25 @@ export function useMetaNavigation({
   );
 
   const handleTabChange = useCallback(
-    (newTab: string) => router.push(buildUrl({ speciesId: undefined, tab: newTab, format, month, cutoff, regulation, tournamentId: "", view: "aggregate" })),
-    [router, format, month, cutoff, regulation],
+    (newTab: string) => {
+      if (newTab === "stats") {
+        // Default to first regulation (Champions preview) or first Smogon snapshot
+        const defaultFormat = regulations.length > 0
+          ? regulations[0].id
+          : snapshots.length > 0 ? snapshots[0].formatId : "";
+        const defaultMonth  = regulations.length > 0 ? "" : (snapshots[0]?.month ?? "");
+        const defaultCutoff = regulations.length > 0 ? DEFAULT_CUTOFF : (snapshots[0]?.cutoff ?? DEFAULT_CUTOFF);
+        router.push(buildUrl({ speciesId: undefined, tab: newTab, format: defaultFormat, month: defaultMonth, cutoff: defaultCutoff, regulation, tournamentId: "", view: "aggregate" }));
+      } else if (newTab === "tournament") {
+        // Default to first regulation + first tournament
+        const defaultReg        = regulations[0]?.id ?? "";
+        const defaultTournament = tournaments[0] ? String(tournaments[0].id) : "";
+        router.push(buildUrl({ speciesId: undefined, tab: newTab, format, month, cutoff, regulation: defaultReg, tournamentId: defaultTournament, view: "aggregate" }));
+      } else {
+        router.push(buildUrl({ speciesId: undefined, tab: newTab, format, month, cutoff, regulation, tournamentId: "", view: "aggregate" }));
+      }
+    },
+    [router, format, month, cutoff, regulation, regulations, snapshots, tournaments],
   );
 
   const handleFormatChange = useCallback(

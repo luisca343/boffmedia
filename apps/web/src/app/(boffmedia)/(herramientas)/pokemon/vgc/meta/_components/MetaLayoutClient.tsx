@@ -65,7 +65,7 @@ export function MetaLayoutClient() {
 
   // ── Navigation hook — buildUrl, auto-navigation effects, all handlers ──────
   const { speciesId, detail: baseDetail, view, handleSelect, handleTabChange, handleFormatChange, handleOptionsApply, handleRegulationChange, handleTournamentChange, handleViewChange, handleBack } =
-    useMetaNavigation({ snapshots, regulations, entries, entriesMap });
+    useMetaNavigation({ snapshots, regulations, tournaments, entries, entriesMap });
 
   // ── Phase 3: paste-derived data for preview formats ───────────────────────
   const { detail: pasteDetail } = useChampionsPasteDetail(
@@ -86,7 +86,7 @@ export function MetaLayoutClient() {
   }, [baseDetail, pasteDetail, isPreviewFormat]);
 
   return (
-    <div className="flex flex-col bg-surface-950 min-h-screen">
+    <div className="flex flex-col bg-surface-950 h-[calc(100vh-4rem)] overflow-hidden">
       <FormatBar
         tab={tab}
         format={format}
@@ -134,6 +134,7 @@ export function MetaLayoutClient() {
       )}
 
       {/* Players / Standings view for tournament tab */}
+      <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
       {tab === "tournament" && view === "players" ? (
         <StandingsView
           players={standingsPlayers}
@@ -165,6 +166,7 @@ export function MetaLayoutClient() {
           }
         />
       )}
+      </div>
     </div>
   );
 }
