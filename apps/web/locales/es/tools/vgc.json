@@ -322,7 +322,9 @@
         "summary": "{count} mons · {min}-{max}",
         "tailwind": "VA ×2",
         "scarf": "Pañuelo ×1.5",
-        "trickroom": "ER ↕"
+        "trickroom": "ER ↕",
+        "opponentSpeed": "Velocidad Base Rival",
+        "opponentSpeedPlaceholder": "Ingresa la velocidad base del rival..."
       },
       "zones": {
         "leads": "Inicios",
@@ -357,6 +359,7 @@
           "discards": "Descartes",
           "record": "V/D/E",
           "winRate": "WR",
+          "tournamentUsage": "Torneo %",
           "noData": "Sin datos de partidas completadas.",
           "tabs": {
             "myTeam": "Mi equipo",

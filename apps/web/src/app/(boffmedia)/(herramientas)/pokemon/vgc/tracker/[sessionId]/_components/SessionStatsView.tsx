@@ -26,13 +26,14 @@ interface Props {
   sessionId: string;
   regulationId?: string;
   startElo?: number;
+  limitlessTournamentId?: number;
   ladderSessions?: Session[];
 }
 
-export function SessionStatsView({ sessionId, regulationId, startElo, ladderSessions = [] }: Props) {
+export function SessionStatsView({ sessionId, regulationId, startElo, limitlessTournamentId, ladderSessions = [] }: Props) {
   const t = useTranslations('vgc.tracker.sessionStats');
   const { stats, loading } = useSessionStats(sessionId, startElo);
-  const { meta: regulationMeta, loading: metaLoading } = useRegulationMeta(regulationId);
+  const { meta: regulationMeta, loading: metaLoading } = useRegulationMeta(regulationId, limitlessTournamentId);
   const [tableTab, setTableTab] = useState<TableTab>('myTeam');
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const { series: comparisonSeries, loading: compLoading } = useComparisonElo(

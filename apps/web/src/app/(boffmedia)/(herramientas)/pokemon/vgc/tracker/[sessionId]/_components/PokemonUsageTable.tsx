@@ -12,9 +12,11 @@ interface Props {
   items: PokemonUsage[];
   /** When true, shows a Discards column and labels the uses column "Brought". */
   showDiscards?: boolean;
+  /** Optional map of speciesId to tournament usage % (e.g., from Limitless combined usage) */
+  tournamentUsageMap?: Map<string, number>;
 }
 
-export function PokemonUsageTable({ items, showDiscards }: Props) {
+export function PokemonUsageTable({ items, showDiscards, tournamentUsageMap }: Props) {
   const t = useTranslations('vgc.tracker.sessionStats');
   const [sortKey, setSortKey] = useState<SortKey>('uses');
   const [sortDir, setSortDir] = useState<'desc' | 'asc'>('desc');
@@ -107,6 +109,13 @@ export function PokemonUsageTable({ items, showDiscards }: Props) {
                 )}
               </span>
             </th>
+
+            {/* Tournament usage % (if available) */}
+            {tournamentUsageMap && (
+              <th className="py-2.5 px-3 text-right text-surface-500 font-medium whitespace-nowrap">
+                {t('table.tournamentUsage')}
+              </th>
+            )}
           </tr>
         </thead>
         <tbody>
@@ -170,6 +179,15 @@ export function PokemonUsageTable({ items, showDiscards }: Props) {
                 >
                   {wrDisplay}
                 </td>
+
+                {/* Tournament usage % (if available) */}
+                {tournamentUsageMap && (
+                  <td className="py-2 px-3 text-right font-mono tabular-nums text-surface-400 text-[11px]">
+                    {tournamentUsageMap.has(p.speciesId)
+                      ? `${Math.round(tournamentUsageMap.get(p.speciesId)! * 100)}%`
+                      : '—'}
+                  </td>
+                )}
               </tr>
             );
           })}
