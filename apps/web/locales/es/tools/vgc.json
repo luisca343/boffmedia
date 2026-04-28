@@ -1,5 +1,24 @@
 {
   "vgc": {
+    "speed": {
+      "title": "Velocidad",
+      "subtitle": "Referencia de niveles de velocidad y calculadora de matchups",
+      "tabs": {
+        "tiers": "Niveles",
+        "matchup": "Matchup"
+      },
+      "modifiers": {
+        "title": "Modificadores",
+        "clear": "Limpiar modificadores",
+        "boostTitle": "Etapa de Velocidad {n}",
+        "tailwind": "Viento Afín (×2 Velocidad)",
+        "tailwindShort": "V. Afín",
+        "scarf": "Pañuelo Elegido (×1.5 Velocidad)",
+        "scarfShort": "Pañuelo",
+        "paralysis": "Parálisis (×0.5 Velocidad)",
+        "paralysisShort": "Parál."
+      }
+    },
     "speedTiers": {
       "title": "Niveles de Velocidad",
       "subtitle": "Estadísticas de velocidad a nivel 50 para Pokémon legales — ordenados por velocidad base",
@@ -65,6 +84,28 @@
         "slower": "Más lento",
         "tie": "Empate",
         "column": "vs Equipo"
+      },
+      "reference": {
+        "title": "Tu Referencia",
+        "searchPlaceholder": "Elige un Pokémon...",
+        "customMode": "Personalizado",
+        "pokemonMode": "Pokémon",
+        "clearRef": "Limpiar",
+        "effectiveSpeed": "Velocidad Efectiva",
+        "evLabel": "PE / Naturaleza",
+        "noRef": "Elige un Pokémon para ver tu posición en la tabla de velocidad"
+      },
+      "zones": {
+        "separator": "TU VELOCIDAD",
+        "fasterCount": "{count} más rápidos",
+        "slowerCount": "{count} más lentos",
+        "tieCount": "{count} empate"
+      },
+      "expanded": {
+        "breakdown": "Desglose de Velocidad",
+        "vsRef": "vs tú ({speed})",
+        "sendToMatchup": "Comparar en Matchup",
+        "noRef": "Establece una referencia para comparar velocidades"
       }
     },
     "speedComparison": {

@@ -12,7 +12,7 @@ interface Props {
 const BOOST_STEPS = [-2, -1, 1, 2, 3] as const;
 
 export function ModifierPanel({ modifiers, onChange }: Props) {
-  const t = useTranslations("vgc.speedTiers.modifiers");
+  const t = useTranslations("vgc.speed.modifiers");
 
   const toggleBoost = (n: number) =>
     onChange({ ...modifiers, boost: modifiers.boost === n ? 0 : n });
@@ -59,8 +59,8 @@ export function ModifierPanel({ modifiers, onChange }: Props) {
       {/* Flag toggles */}
       {(
         [
-          { key: "tailwind"  as const, label: t("tailwindShort"),  title: t("tailwind"),  activeClass: "bg-blue-500/20 text-blue-300 border-blue-500/50"   },
-          /*{ key: "scarf"     as const, label: t("scarfShort"),     title: t("scarf"),     activeClass: "bg-orange-500/20 text-orange-300 border-orange-500/50" },*/
+          { key: "tailwind"  as const, label: t("tailwindShort"),  title: t("tailwind"),  activeClass: "bg-blue-500/20 text-blue-300 border-blue-500/50"       },
+          { key: "scarf"     as const, label: t("scarfShort"),     title: t("scarf"),     activeClass: "bg-orange-500/20 text-orange-300 border-orange-500/50" },
           { key: "paralysis" as const, label: t("paralysisShort"), title: t("paralysis"), activeClass: "bg-yellow-500/20 text-yellow-300 border-yellow-500/50" },
         ]
       ).map(({ key, label, title, activeClass }) => (

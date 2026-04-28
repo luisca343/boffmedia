@@ -6,8 +6,7 @@
         "name": "VGC",
         "tools": {
           "meta": "Análisis de Meta",
-          "speedTiers": "Niveles de Velocidad",
-          "speedComparison": "Comparación de Velocidad",
+          "speed": "Velocidad",
           "tracker": "Tracker"
         }
       },
@@ -42,7 +41,7 @@
         "description": "Análisis de meta, niveles de velocidad y tracker de partidas para VGC competitivo",
         "features": {
           "meta": "Análisis de Meta",
-          "speedTiers": "Niveles de Velocidad",
+          "speed": "Velocidad",
           "tracker": "Tracker"
         }
       },

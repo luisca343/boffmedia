@@ -9,8 +9,7 @@
             },
             "tools": {
                 "meta": "Análisis de Meta",
-                "speedTiers": "Niveles de Velocidad",
-                "speedComparison": "Comparación de Velocidad",
+                "speed": "Velocidad",
                 "tracker": "Tracker",
                 "gallery": "Galería",
                 "cardList": "Lista de Cartas",
