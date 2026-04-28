@@ -371,8 +371,7 @@
       "title": "Meta Analysis",
       "subtitle": "Ladder usage & team composition data from Smogon Stats",
       "tabs": {
-        "ladder": "Ladder",
-        "champions": "Champions",
+        "stats": "Stats",
         "tournament": "Tournament",
         "combined": "Combined",
         "aggregate": "Usage",
