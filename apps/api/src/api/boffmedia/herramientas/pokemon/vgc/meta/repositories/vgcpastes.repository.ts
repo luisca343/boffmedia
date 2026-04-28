@@ -115,4 +115,41 @@ export class VgcPastesRepository {
       .innerJoin(vgcPastes, eq(vgcPasteTeams.pasteId, vgcPastes.id))
       .where(eq(vgcPasteTeams.regulationId, regulationId));
   }
+
+  /**
+   * Returns all VGCPastes teams with their parsed paste for a regulation.
+   * Used to build the "teams featuring this Pokémon" panel — filtered in-app.
+   */
+  async findTeamsByRegulationWithPastes(regulationId: string): Promise<Array<{
+    teamId:      string;
+    playerName:  string | null;
+    rank:        string | null;
+    tournament:  string | null;
+    dateShared:  string | null;
+    parsedSlots: string;
+    rawText:     string;
+  }>> {
+    const rows = await this.db
+      .select({
+        teamId:      vgcPasteTeams.id,
+        playerName:  vgcPasteTeams.playerName,
+        rank:        vgcPasteTeams.rank,
+        tournament:  vgcPasteTeams.tournament,
+        dateShared:  vgcPasteTeams.dateShared,
+        parsedSlots: vgcPastes.parsedSlots,
+        rawText:     vgcPastes.rawText,
+      })
+      .from(vgcPasteTeams)
+      .innerJoin(vgcPastes, eq(vgcPasteTeams.pasteId, vgcPastes.id))
+      .where(eq(vgcPasteTeams.regulationId, regulationId));
+    return rows as Array<{
+      teamId:      string;
+      playerName:  string | null;
+      rank:        string | null;
+      tournament:  string | null;
+      dateShared:  string | null;
+      parsedSlots: string;
+      rawText:     string;
+    }>;
+  }
 }

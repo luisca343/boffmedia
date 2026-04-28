@@ -4,12 +4,14 @@ import { SmogonService } from './services/smogon.service';
 import { VgcPastesService } from './services/vgcpastes.service';
 import { PokepasteService } from './services/pokepaste.service';
 import { LimitlessService } from './services/limitless.service';
+import { TeamsService } from './services/teams.service';
 import { StatCalcService } from './services/stat-calc.service';
 import { QuerySmogonDto } from './dto/query-smogon.dto';
 import { QueryChampionsDto } from './dto/query-champions.dto';
 import { AddLimitlessTournamentDto } from './dto/add-limitless-tournament.dto';
+import { UpsertRegulationDto } from './dto/upsert-regulation.dto';
 import { SMOGON_DEFAULT_CUTOFF } from './config/smogon.config';
-import { CHAMPIONS_REGULATIONS } from '../champions-data';
+import { VgcRegulationsRepository } from './repositories/regulations.repository';
 
 @Injectable()
 export class VgcMetaFacadeService {
@@ -18,7 +20,9 @@ export class VgcMetaFacadeService {
     private readonly vgcPastesService: VgcPastesService,
     private readonly pokepasteService: PokepasteService,
     private readonly limitlessService: LimitlessService,
+    private readonly teamsService: TeamsService,
     readonly statCalcService: StatCalcService,
+    private readonly regulationsRepository: VgcRegulationsRepository,
   ) {}
 
   // â”€â”€â”€ Ladder (Smogon) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -65,27 +69,27 @@ export class VgcMetaFacadeService {
   }
 
   async getChampionsUsage(dto: QueryChampionsDto) {
-    const regulation = CHAMPIONS_REGULATIONS[dto.regulationId];
+    const regulation = await this.regulationsRepository.findById(dto.regulationId);
     if (!regulation) throw new NotFoundException(`Regulation "${dto.regulationId}" not found`);
     if (!regulation.vgcPastesGid) throw new NotFoundException(`No VGCPastes GID configured for "${dto.regulationId}"`);
     return this.vgcPastesService.getUsageList(dto.regulationId);
   }
 
   async refreshChampionsData(regulationId: string) {
-    const regulation = CHAMPIONS_REGULATIONS[regulationId];
+    const regulation = await this.regulationsRepository.findById(regulationId);
     if (!regulation) throw new NotFoundException(`Regulation "${regulationId}" not found`);
     if (!regulation.vgcPastesGid) throw new NotFoundException(`No VGCPastes GID configured for "${regulationId}"`);
     return this.vgcPastesService.refreshRegulation(regulationId, regulation.vgcPastesGid);
   }
 
   async getChampionsPasteDetail(regulationId: string, speciesId: string) {
-    const regulation = CHAMPIONS_REGULATIONS[regulationId];
+    const regulation = await this.regulationsRepository.findById(regulationId);
     if (!regulation) throw new NotFoundException(`Regulation "${regulationId}" not found`);
     return this.vgcPastesService.getPasteDetail(regulationId, speciesId);
   }
 
   async batchFetchChampionsPastes(regulationId: string) {
-    const regulation = CHAMPIONS_REGULATIONS[regulationId];
+    const regulation = await this.regulationsRepository.findById(regulationId);
     if (!regulation) throw new NotFoundException(`Regulation "${regulationId}" not found`);
     return this.vgcPastesService.batchFetchRegulation(regulationId);
   }
@@ -122,5 +126,28 @@ export class VgcMetaFacadeService {
 
   async listLimitlessTournaments() {
     return this.limitlessService.listTournaments();
+  }
+
+  // ─── Regulations ────────────────────────────────────────────────────────────
+
+  async getRegulations() {
+    return this.regulationsRepository.findActive();
+  }
+
+  async upsertRegulation(dto: UpsertRegulationDto) {
+    await this.regulationsRepository.upsert({
+      id:           dto.id,
+      formatId:     dto.formatId,
+      name:         dto.name,
+      gameType:     dto.gameType,
+      vgcPastesGid: dto.vgcPastesGid,
+    });
+    return this.regulationsRepository.findById(dto.id);
+  }
+
+  // ─── Species Teams ──────────────────────────────────────────────────────────
+
+  async getSpeciesTeams(speciesId: string, regulationId: string) {
+    return this.teamsService.getTeamsForSpecies(speciesId, regulationId);
   }
 }

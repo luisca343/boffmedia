@@ -9,6 +9,8 @@ import { BaseStatsPanel } from "./BaseStatsPanel";
 import { StatPanel } from "./StatPanel";
 import { TeammatesPanel } from "./TeammatesPanel";
 import { TeraTypesPanel } from "./TeraTypesPanel";
+import { TeamsPanel } from "./TeamsPanel";
+import { useSpeciesTeams } from "../_hooks/useSpeciesTeams";
 
 // ─── Spread / nature helpers ──────────────────────────────────────────────────
 
@@ -88,15 +90,17 @@ function SpreadRow({ nature, spread }: { nature: string; spread: string }) {
 // ─── Main component ───────────────────────────────────────────────────────────
 
 interface Props {
-  detail:    PokemonUsageDetail | null;
-  loading:   boolean;
-  speciesId: string | undefined;
-  onBack:    () => void;
-  onSelect?: (speciesId: string) => void;
+  detail:       PokemonUsageDetail | null;
+  loading:      boolean;
+  speciesId:    string | undefined;
+  regulationId?: string | undefined;
+  onBack:       () => void;
+  onSelect?:    (speciesId: string) => void;
 }
 
-export function PokemonDetailView({ detail, loading, speciesId, onBack, onSelect }: Props) {
+export function PokemonDetailView({ detail, loading, speciesId, regulationId, onBack, onSelect }: Props) {
   const t = useTranslations("vgc.meta");
+  const { teams, loading: teamsLoading } = useSpeciesTeams(speciesId, regulationId);
 
   if (!speciesId) {
     return (
@@ -218,6 +222,17 @@ export function PokemonDetailView({ detail, loading, speciesId, onBack, onSelect
           </div>
         )}
       </div>
+
+      {/* Teams featuring this Pokémon — full width, below the grid */}
+      {(teamsLoading || teams.length > 0) && (
+        <div className="px-4 pb-4">
+          <TeamsPanel
+            teams={teams}
+            loading={teamsLoading}
+            title="Featuring Teams"
+          />
+        </div>
+      )}
     </div>
   );
 }

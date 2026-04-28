@@ -281,9 +281,6 @@ export default function SpeedTiersPage() {
             {reg.name.replace(/\[Gen 9 Champions\]\s*/i, "")}
           </button>
         ))}
-        {selectedRegData?.notes && (
-          <span className="self-center text-xs text-surface-500 italic">{selectedRegData.notes}</span>
-        )}
       </motion.div>
 
       {/* Filters */}

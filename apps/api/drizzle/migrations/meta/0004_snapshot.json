@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "0f9322ec-fc7d-41f3-a1ca-582969cf032d",
+  "id": "e3676a21-2c7c-490b-be27-abf82e7bcf42",
   "prevId": "4a810547-6324-42a2-9ac9-81fc9841cfe1",
   "tables": {
     "boffmedia_roles": {
@@ -3534,6 +3534,13 @@
           "notNull": false,
           "autoincrement": false
         },
+        "placing": {
+          "name": "placing",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "record": {
           "name": "record",
           "type": "varchar(16)",
@@ -3641,6 +3648,44 @@
           "notNull": false,
           "autoincrement": false
         },
+        "regulation_id": {
+          "name": "regulation_id",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "varchar(16)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'pending'"
+        },
+        "progress": {
+          "name": "progress",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "total": {
+          "name": "total",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "error_message": {
+          "name": "error_message",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "fetched_at": {
           "name": "fetched_at",
           "type": "datetime",
@@ -3700,6 +3745,13 @@
           "notNull": false,
           "autoincrement": false
         },
+        "team_description": {
+          "name": "team_description",
+          "type": "varchar(512)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "tournament": {
           "name": "tournament",
           "type": "varchar(255)",
@@ -3733,6 +3785,49 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
+          "autoincrement": false
+        },
+        "items": {
+          "name": "items",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "('[]')"
+        },
+        "replica_status": {
+          "name": "replica_status",
+          "type": "varchar(8)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "replica_code": {
+          "name": "replica_code",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "has_evs": {
+          "name": "has_evs",
+          "type": "varchar(4)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "source_url": {
+          "name": "source_url",
+          "type": "varchar(512)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "owner": {
+          "name": "owner",
+          "type": "varchar(128)",
+          "primaryKey": false,
+          "notNull": false,
           "autoincrement": false
         },
         "fetched_at": {
@@ -3848,6 +3943,74 @@
           ]
         }
       },
+      "checkConstraint": {}
+    },
+    "vgc_regulations": {
+      "name": "vgc_regulations",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "format_id": {
+          "name": "format_id",
+          "type": "varchar(128)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "game_type": {
+          "name": "game_type",
+          "type": "varchar(16)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'doubles'"
+        },
+        "vgcpastes_gid": {
+          "name": "vgcpastes_gid",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "active": {
+          "name": "active",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 1
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "vgc_regulations_id": {
+          "name": "vgc_regulations_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
       "checkConstraint": {}
     },
     "vgc_smogon_pokemon": {

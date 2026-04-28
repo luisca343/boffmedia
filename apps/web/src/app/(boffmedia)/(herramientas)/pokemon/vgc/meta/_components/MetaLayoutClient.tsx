@@ -158,6 +158,7 @@ export function MetaLayoutClient() {
               detail={detail}
               loading={false}
               speciesId={speciesId}
+              regulationId={isPreviewFormat ? format : regulation || undefined}
               onBack={handleBack}
               onSelect={handleSelect}
             />

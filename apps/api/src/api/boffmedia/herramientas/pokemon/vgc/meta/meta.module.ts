@@ -7,11 +7,13 @@ import { SmogonRepository } from './repositories/smogon.repository';
 import { VgcPastesRepository } from './repositories/vgcpastes.repository';
 import { PastesRepository } from './repositories/pastes.repository';
 import { LimitlessRepository } from './repositories/limitless.repository';
+import { VgcRegulationsRepository } from './repositories/regulations.repository';
 
 import { SmogonService } from './services/smogon.service';
 import { VgcPastesService } from './services/vgcpastes.service';
 import { PokepasteService } from './services/pokepaste.service';
 import { LimitlessService } from './services/limitless.service';
+import { TeamsService } from './services/teams.service';
 import { StatCalcService } from './services/stat-calc.service';
 
 import { VgcMetaFacadeService } from './meta.facade.service';
@@ -24,14 +26,16 @@ import { VgcMetaController } from './meta.controller';
     VgcPastesRepository,
     PastesRepository,
     LimitlessRepository,
+    VgcRegulationsRepository,
     SmogonService,
     VgcPastesService,
     PokepasteService,
     LimitlessService,
+    TeamsService,
     StatCalcService,
     VgcMetaFacadeService,
   ],
   controllers: [VgcMetaController],
-  exports: [VgcMetaFacadeService, StatCalcService],
+  exports: [VgcMetaFacadeService, StatCalcService, VgcRegulationsRepository],
 })
 export class VgcMetaModule {}
