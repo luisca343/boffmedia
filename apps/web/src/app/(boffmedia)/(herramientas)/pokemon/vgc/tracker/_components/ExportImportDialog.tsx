@@ -12,6 +12,7 @@ import {
   parseExportFile,
   type ImportResult,
 } from '@/features/vgc-tracker/utils/exportImport';
+import { useTrackerSync } from '@/features/vgc-tracker/context/TrackerSyncContext';
 
 interface Props {
   sessionId?: string;
@@ -22,6 +23,7 @@ interface Props {
 
 export function ExportImportDialog({ sessionId, sessionLabel, onImportDone, onClose }: Props) {
   const t = useTranslations('vgc.tracker');
+  const { pushChange } = useTrackerSync();
   const fileRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<ImportResult | null>(null);
@@ -59,7 +61,9 @@ export function ExportImportDialog({ sessionId, sessionLabel, onImportDone, onCl
     try {
       const text = await file.text();
       const data = parseExportFile(text);
-      const res = await importData(data);
+      const res = await importData(data, (table, id, entity) => {
+        pushChange(table, id, entity);
+      });
       setResult(res);
       onImportDone();
     } catch {

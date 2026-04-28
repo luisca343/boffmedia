@@ -1,7 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { TrackerRepository } from './tracker.repository';
-import { CreatePresetDto, CreateSessionDto, CreateMatchDto, UpdateMatchDto } from './dto';
-import { VgcSession, VgcTeamPreset, VgcMatch } from '@/_db/schema/VgcTracker';
+import { CreatePresetDto, CreateSessionDto, CreateMatchDto, UpdateMatchDto, UpsertSeriesDto } from './dto';
+import { VgcSession, VgcTeamPreset, VgcMatch, VgcSeries } from '@/_db/schema/VgcTracker';
+
+// Convert a Date | null/undefined to unix ms, or pass through a number as-is
+function toMs(value: Date | number | null | undefined): number | undefined {
+  if (value == null) return undefined;
+  if (typeof value === 'number') return value;
+  return value instanceof Date ? value.getTime() : undefined;
+}
 
 @Injectable()
 export class TrackerService {
@@ -14,7 +21,18 @@ export class TrackerService {
   }
 
   async upsertPreset(id: string, dto: CreatePresetDto): Promise<void> {
-    await this.repo.upsertPreset({ id, ...dto });
+    await this.repo.upsertPreset({
+      id,
+      userId: dto.userId,
+      name: dto.name,
+      regulationId: dto.regulationId,
+      exportString: dto.exportString,
+      slots: dto.slots,
+      currentVersion: dto.currentVersion,
+      versions: dto.versions,
+      createdAt: dto.createdAt ? new Date(dto.createdAt) : undefined,
+      updatedAt: dto.updatedAt ? new Date(dto.updatedAt) : undefined,
+    });
   }
 
   async deletePreset(id: string): Promise<void> {
@@ -27,8 +45,10 @@ export class TrackerService {
     return this.repo.findSessions(userId);
   }
 
-  async upsertSession(dto: CreateSessionDto): Promise<void> {
-    await this.repo.upsertSession(dto as any);
+  async upsertSession(dto: CreateSessionDto & { id: string }): Promise<void> {
+    const data: any = { ...dto };
+    if (dto.startedAt) data.startedAt = new Date(dto.startedAt);
+    await this.repo.upsertSession(data);
   }
 
   async deleteSession(id: string): Promise<void> {
@@ -44,7 +64,9 @@ export class TrackerService {
   async upsertMatch(dto: CreateMatchDto): Promise<void> {
     await this.repo.upsertMatch({
       ...dto,
-      notes: [],
+      notes: dto.notes ?? [],
+      createdAt: dto.createdAt ? new Date(dto.createdAt) : undefined,
+      completedAt: dto.completedAt ? new Date(dto.completedAt) : undefined,
     });
   }
 
@@ -58,7 +80,10 @@ export class TrackerService {
       myTeam: dto.myTeam ?? JSON.parse(existing.myTeam as unknown as string),
       opponentTeam: dto.opponentTeam ?? JSON.parse(existing.opponentTeam as unknown as string),
       opponentName: dto.opponentName ?? existing.opponentName,
+      opponentArchetype: dto.opponentArchetype ?? existing.opponentArchetype,
       result: dto.result ?? existing.result,
+      outcomeTag: dto.outcomeTag ?? existing.outcomeTag,
+      turnCount: dto.turnCount ?? existing.turnCount,
       eloAfter: dto.eloAfter ?? existing.eloAfter,
       opponentElo: dto.opponentElo ?? existing.opponentElo,
       notes: dto.notes ?? JSON.parse(existing.notes as unknown as string),
@@ -69,5 +94,68 @@ export class TrackerService {
 
   async deleteMatch(id: string): Promise<void> {
     await this.repo.deleteMatch(id);
+  }
+
+  // ─── Series ──────────────────────────────────────────────────────────────────
+
+  async getSeriesForSession(sessionId: string): Promise<VgcSeries[]> {
+    return this.repo.findSeriesForSession(sessionId);
+  }
+
+  async upsertSeries(dto: UpsertSeriesDto & { id: string }): Promise<void> {
+    await this.repo.upsertSeries({
+      ...dto,
+      myTeam: typeof dto.myTeam === 'string' ? dto.myTeam : dto.myTeam,
+      opponentTeam: typeof dto.opponentTeam === 'string' ? dto.opponentTeam : dto.opponentTeam,
+      games: dto.games ?? [],
+      notes: dto.notes ?? [],
+    });
+  }
+
+  async deleteSeries(id: string): Promise<void> {
+    await this.repo.deleteSeries(id);
+  }
+
+  // ─── Sync ─────────────────────────────────────────────────────────────────────
+
+  async syncAll(userId: number) {
+    const raw = await this.repo.findAllByUser(userId);
+
+    // Map datetime columns → unix ms for the client
+    const sessions = raw.sessions.map((s) => ({
+      ...s,
+      startedAt: toMs(s.startedAt as any),
+      createdAt: toMs(s.createdAt as any),
+      updatedAt: toMs(s.updatedAt as any),
+    }));
+
+    const matches = raw.matches.map((m) => ({
+      ...m,
+      createdAt: toMs(m.createdAt as any),
+      completedAt: toMs(m.completedAt as any),
+      updatedAt: toMs(m.updatedAt as any),
+      myTeam: typeof m.myTeam === 'string' ? JSON.parse(m.myTeam) : m.myTeam,
+      opponentTeam: typeof m.opponentTeam === 'string' ? JSON.parse(m.opponentTeam) : m.opponentTeam,
+      notes: typeof m.notes === 'string' ? JSON.parse(m.notes) : m.notes,
+    }));
+
+    const series = raw.series.map((s) => ({
+      ...s,
+      updatedAt: toMs(s.updatedAt as any),
+      myTeam: typeof s.myTeam === 'string' ? JSON.parse(s.myTeam) : s.myTeam,
+      opponentTeam: typeof s.opponentTeam === 'string' ? JSON.parse(s.opponentTeam) : s.opponentTeam,
+      games: typeof s.games === 'string' ? JSON.parse(s.games) : s.games,
+      notes: typeof s.notes === 'string' ? JSON.parse(s.notes) : s.notes,
+    }));
+
+    const presets = raw.presets.map((p) => ({
+      ...p,
+      createdAt: toMs(p.createdAt as any),
+      updatedAt: toMs(p.updatedAt as any),
+      slots: typeof p.slots === 'string' ? JSON.parse(p.slots) : p.slots,
+      versions: typeof p.versions === 'string' ? JSON.parse(p.versions) : p.versions,
+    }));
+
+    return { sessions, matches, series, presets };
   }
 }
