@@ -322,7 +322,9 @@
         "summary": "{count} mons · {min}-{max}",
         "tailwind": "TW ×2",
         "scarf": "Scarf ×1.5",
-        "trickroom": "TR ↕"
+        "trickroom": "TR ↕",
+        "opponentSpeed": "Opponent Base Speed",
+        "opponentSpeedPlaceholder": "Enter opponent base speed..."
       },
       "zones": {
         "leads": "Leads",
@@ -357,6 +359,7 @@
           "discards": "Discards",
           "record": "W/L/D",
           "winRate": "WR",
+          "tournamentUsage": "Tournament %",
           "noData": "No completed match data yet.",
           "tabs": {
             "myTeam": "My team",

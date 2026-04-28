@@ -58,16 +58,6 @@ export interface SpeciesTeamEntry {
   rawText:    string;
 }
 
-/** Divergence entry comparing ladder vs Champions usage */
-export interface DivergenceEntry {
-  speciesId:        string;
-  speciesName:      string;
-  ladderPercent:    number;
-  championsPercent: number;
-  divergence:       number;
-  badge?: 'ladder-trap' | 'tournament-staple';
-}
-
 /** One player entry from a Limitless tournament (for the players list) */
 export interface LimitlessPlayer {
   playerSlug:  string;

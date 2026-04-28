@@ -63,6 +63,7 @@ export function RegulationMetaSection({ regulationId, meta, loading }: Props) {
         <PokemonUsageTable
           items={tab === 'preview' ? meta.preview : tab === 'leads' ? meta.leads : meta.backs}
           showDiscards={tab === 'preview'}
+          tournamentUsageMap={meta.tournamentUsageMap}
         />
       )}
     </div>
