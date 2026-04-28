@@ -1,5 +1,24 @@
 {
   "vgc": {
+    "speed": {
+      "title": "Speed",
+      "subtitle": "Speed tier reference and head-to-head matchup calculator",
+      "tabs": {
+        "tiers": "Tiers",
+        "matchup": "Matchup"
+      },
+      "modifiers": {
+        "title": "Modifiers",
+        "clear": "Clear all modifiers",
+        "boostTitle": "Speed stage {n}",
+        "tailwind": "Tailwind (×2 Speed)",
+        "tailwindShort": "Tailwind",
+        "scarf": "Choice Scarf (×1.5 Speed)",
+        "scarfShort": "Scarf",
+        "paralysis": "Paralysis (×0.5 Speed)",
+        "paralysisShort": "Para"
+      }
+    },
     "speedTiers": {
       "title": "Speed Tiers",
       "subtitle": "Level 50 speed stats for legal Pokémon — sorted by base Speed",
@@ -65,6 +84,28 @@
         "slower": "Slower",
         "tie": "Tie",
         "column": "vs Team"
+      },
+      "reference": {
+        "title": "Your Reference",
+        "searchPlaceholder": "Pick a Pokémon...",
+        "customMode": "Custom",
+        "pokemonMode": "Pokémon",
+        "clearRef": "Clear",
+        "effectiveSpeed": "Effective Speed",
+        "evLabel": "EV / Nature",
+        "noRef": "Pick a Pokémon to see your speed position in the tier list"
+      },
+      "zones": {
+        "separator": "YOUR SPEED",
+        "fasterCount": "{count} faster",
+        "slowerCount": "{count} slower",
+        "tieCount": "{count} tie"
+      },
+      "expanded": {
+        "breakdown": "Speed Breakdown",
+        "vsRef": "vs you ({speed})",
+        "sendToMatchup": "Compare in Matchup",
+        "noRef": "Set a reference to compare speeds"
       }
     },
     "speedComparison": {
