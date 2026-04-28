@@ -44,6 +44,7 @@
 | 2026-04-28 | StandingsView UX improvements | **Eager team prefetch**: all player teams now fetched concurrently on mount via a `useEffect` + `fetchedRef` Set; sprites appear without requiring a click. **Scroll-into-view**: expanding a row scrolls the detail panel into view with `scrollIntoView({ behavior: "smooth", block: "nearest" })` using a `detailRowRef`. **Copy Poképaste button**: expanded row exposes a "Copy Poképaste" button that writes `rawText` to the clipboard with a 2-second "Copied!" confirmation; backend `getPlayerTeam()` and `findTeamWithPaste()` now return `rawText`; `LimitlessPlayerTeam` type updated. **i18n**: all `StandingsView` strings moved to `vgc.meta.standings.*` keys in both EN and ES locale files. **Top-N sort fix**: `runImport()` now sorts standings by `placing` ascending before `slice(0, maxPlayers)` so `maxPlayers=16` reliably gives the actual top 16 finishers. **Sprite fix**: `floette-eternal` only exists at `sprites/dex/` — added `SPRITE_DEX_SLUGS` Set in `types.ts` to route specific slugs to the dex base URL instead of home-centered/gen5; removed wrong `floette-eternal-mega` override. |
 | 2026-04-28 | FormatBar selects redesign | Replaced all format/regulation/tournament pills with `<select>` elements for a more compact and consistent UI. Stats tab: single `<select>` with `<optgroup label="Smogon">` and `<optgroup label="VGCPastes · Preview">` groups; month and cutoff also inline `<select>`s (no Apply button — change fires immediately via `onOptionsApply`). Tournament tab: regulation `<select>` + tournament `<select>` (Combined + individual entries sorted by date desc). Options popover (`Settings2` icon, `useRef`, `useState`) fully removed. `SELECT_CLS` constant for consistent styling across all selects. All tabs use the same sticky sidebar layout (`md:sticky md:top-0 md:h-screen`). |
 | 2026-04-28 | Dex mod consistency fix | Fixed missing base stats for new Champions mega evolutions by making all VGC meta aggregators format-aware. `SmogonService`, `VgcPastesService`, and `LimitlessService` now resolve species through `Dex.forFormat(...)` (with Champions mod initialized via `initChampionsMod()`), instead of relying on global `Dex.species`. For `regulationId=vgc2026regma`, species/stat/type lookups now correctly use `gen9championsvgc2026regma` across Stats preview + Tournament aggregate/player flows. **Guardrail:** any future meta usage/detail aggregation must resolve species with format-specific Dex, never plain global Dex for Champions-enabled formats. |
+| 2026-04-28 | SOLID refactor | Centralized all format-aware Dex logic into `meta/utils/dex-resolver.ts` (`getDexForFormat`, `resolveSpeciesId`). Removed duplicate implementations from the three services. Extracted `FORMAT_LABELS` from `MetaLayoutClient` into `meta/constants.ts` (non-component files must not live inside `_components/`). Fixed `catch (e)` unknown-type error in `VgcPastesService`. Fixed non-null assertion on `parsedSlots` in `LimitlessService` with a proper type-predicate filter. |
 
 ---
 
@@ -241,6 +242,50 @@ Each standing object:
 ### RK9 (Future — Low Priority)
 `https://rk9.gg/event/pokemon-euic-2026` / `https://rk9.gg/pairings/{id}`  
 Pairings companion feature only. Not meta aggregation.
+
+---
+
+## SOLID Conventions
+
+These rules apply to all code inside `apps/api/.../vgc/meta/` and `apps/web/.../vgc/meta/`.
+
+### Single Responsibility
+
+- Each NestJS service owns one concern: `SmogonService` = Smogon fetch/parse, `VgcPastesService` = Champions CSV import + aggregation, `LimitlessService` = Limitless import + aggregation, `PokepasteService` = pokepast.es fetch/cache.
+- Frontend hooks follow the same principle — one concern per file (data fetching or navigation, never both). See the hook table in the Architecture section.
+- `MetaLayoutClient` is a **pure composition layer** only — no `fetch`, no `useEffect`, no business logic.
+
+### Open/Closed
+
+- **Format ID labels**: add new entries to `apps/web/.../meta/constants.ts` (`FORMAT_LABELS`). Components fall back to the raw ID automatically — no component change required for new formats.
+- **Champions regulations**: add new entries to `champions-data.ts`. Zero other files need to change.
+- **Cutoffs**: the static list `[1760, 1630, 1500, 0]` lives in `FormatBar.tsx` (`VALID_CUTOFFS`). Update there only.
+
+### DRY — Shared Utilities
+
+| File | Exports | Consumers |
+|------|---------|-----------|
+| `meta/utils/dex-resolver.ts` | `getDexForFormat(formatId?)`, `resolveSpeciesId(name, dex)` | SmogonService, VgcPastesService, LimitlessService |
+| `meta/utils/parse-usage-txt.ts` | `parseUsageTxt(txt)` | SmogonService |
+| `meta/utils/parse-moveset-txt.ts` | `parseMovesetTxt(txt)` | SmogonService |
+| `meta/services/parse-paste-meta.ts` | `parsePasteMeta(paste)` | PokepasteService, LimitlessService |
+| `meta/constants.ts` (frontend) | `FORMAT_LABELS` | MetaLayoutClient |
+
+**Rules:**
+- Never call `Dex.species.get()` directly in a service — always go through `resolveSpeciesId(name, dex)`.
+- Never call `Dex.forFormat()` directly in a service — always go through `getDexForFormat(formatId)`.
+- Never call `initChampionsMod()` directly in a service — it is owned by `dex-resolver.ts`.
+
+### Type Safety
+
+- Narrow `catch (e)` blocks: `const msg = e instanceof Error ? e.message : String(e)`.
+- Use type-predicate filters instead of non-null assertions after a `.filter()`:
+  ```ts
+  // ✅ correct
+  .filter((t): t is typeof t & { parsedSlots: string } => t.parsedSlots !== null)
+  // ❌ avoid
+  .filter((t) => t.parsedSlots).map((t) => t.parsedSlots!)
+  ```
 
 ---
 
