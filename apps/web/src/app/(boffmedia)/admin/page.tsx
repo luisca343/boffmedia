@@ -13,6 +13,7 @@ import { AchievementsTab } from "./events/_components/achievements/AchievementsT
 import { TcgpScraper } from "./_components/tools/TcgpScraper";
 import { VgcSmogonFetcher } from "./_components/tools/VgcSmogonFetcher";
 import { VgcChampionsFetcher } from "./_components/tools/VgcChampionsFetcher";
+import { VgcLimitlessFetcher } from "./_components/tools/VgcLimitlessFetcher";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -130,6 +131,8 @@ function AdminContent() {
             <VgcSmogonFetcher />
             <div className="border-t border-surface-800" />
             <VgcChampionsFetcher />
+            <div className="border-t border-surface-800" />
+            <VgcLimitlessFetcher />
           </div>
         )}
       </main>

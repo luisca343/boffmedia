@@ -54,3 +54,13 @@ export interface DivergenceEntry {
   divergence:       number;
   badge?: 'ladder-trap' | 'tournament-staple';
 }
+
+/** One player entry from a Limitless tournament (for the players list) */
+export interface LimitlessPlayer {
+  playerSlug:  string;
+  playerName:  string;
+  placing:     number;
+  record:      string;
+  drop:        number | null;
+  hasTeam:     boolean;
+}

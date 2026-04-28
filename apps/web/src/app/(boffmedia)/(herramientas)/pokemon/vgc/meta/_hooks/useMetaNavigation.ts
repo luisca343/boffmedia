@@ -12,37 +12,47 @@ const BASE_PATH      = "/pokemon/vgc/meta";
 export const DEFAULT_CUTOFF = 1760;
 
 export interface MetaUrlState {
-  tab:        string;
-  format:     string;
-  month:      string;
-  cutoff:     number;
-  regulation: string;
-  speciesId:  string | undefined;
+  tab:          string;
+  format:       string;
+  month:        string;
+  cutoff:       number;
+  regulation:   string;
+  speciesId:    string | undefined;
+  tournamentId: string;
+  view:         string;
 }
 
 export interface MetaNavigationHandlers {
-  handleSelect:           (id: string) => void;
-  handleTabChange:        (newTab: string) => void;
-  handleFormatChange:     (newFormat: string, newMonth: string, newCutoff: number) => void;
-  handleOptionsApply:     (newMonth: string, newCutoff: number) => void;
-  handleRegulationChange: (newRegulation: string) => void;
-  handleBack:             () => void;
+  handleSelect:            (id: string) => void;
+  handleTabChange:         (newTab: string) => void;
+  handleFormatChange:      (newFormat: string, newMonth: string, newCutoff: number) => void;
+  handleOptionsApply:      (newMonth: string, newCutoff: number) => void;
+  handleRegulationChange:  (newRegulation: string) => void;
+  handleTournamentChange:  (newTournamentId: string) => void;
+  handleViewChange:        (newView: string) => void;
+  handleBack:              () => void;
 }
 
 export interface UseMetaNavigationResult extends MetaNavigationHandlers {
   /** Route param — identifies the selected Pokémon */
-  speciesId: string | undefined;
-  detail:    PokemonUsageDetail | null;
+  speciesId:    string | undefined;
+  tournamentId: string;
+  view:         string;
+  detail:       PokemonUsageDetail | null;
 }
 
 function buildUrl(opts: MetaUrlState) {
-  const { speciesId, tab, format, month, cutoff, regulation } = opts;
+  const { speciesId, tab, format, month, cutoff, regulation, tournamentId, view } = opts;
   const params = new URLSearchParams();
   if (tab !== "ladder") params.set("tab", tab);
   if (tab === "ladder") {
     if (format) params.set("format", format);
     if (month)  params.set("month",  month);
     if (cutoff !== DEFAULT_CUTOFF) params.set("cutoff", String(cutoff));
+  } else if (tab === "tournament") {
+    if (regulation)             params.set("regulation",   regulation);
+    if (tournamentId)           params.set("tournamentId", tournamentId);
+    if (view && view !== "aggregate") params.set("view", view);
   } else {
     if (regulation) params.set("regulation", regulation);
   }
@@ -72,19 +82,21 @@ export function useMetaNavigation({
   const searchParams = useSearchParams();
   const rawParams    = useParams();
 
-  const speciesId  = rawParams?.speciesId as string | undefined;
-  const tab        = searchParams.get("tab")        ?? "ladder";
-  const format     = searchParams.get("format")     ?? "";
-  const month      = searchParams.get("month")      ?? "";
-  const cutoff     = Number(searchParams.get("cutoff") ?? DEFAULT_CUTOFF);
-  const regulation = searchParams.get("regulation") ?? "";
+  const speciesId    = rawParams?.speciesId as string | undefined;
+  const tab          = searchParams.get("tab")          ?? "ladder";
+  const format       = searchParams.get("format")       ?? "";
+  const month        = searchParams.get("month")        ?? "";
+  const cutoff       = Number(searchParams.get("cutoff") ?? DEFAULT_CUTOFF);
+  const regulation   = searchParams.get("regulation")   ?? "";
+  const tournamentId = searchParams.get("tournamentId") ?? "";
+  const view         = searchParams.get("view")         ?? "aggregate";
 
   // Auto-navigate to first Smogon snapshot when Ladder tab has no format set
   useEffect(() => {
     if (tab !== "ladder") return;
     if (snapshots.length > 0 && !searchParams.get("format")) {
       const first = snapshots[0];
-      router.replace(buildUrl({ speciesId, tab, format: first.formatId, month: first.month, cutoff: first.cutoff, regulation }));
+      router.replace(buildUrl({ speciesId, tab, format: first.formatId, month: first.month, cutoff: first.cutoff, regulation, tournamentId, view }));
     }
   }, [snapshots]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -92,14 +104,14 @@ export function useMetaNavigation({
   useEffect(() => {
     if (tab !== "champions") return;
     if (regulations.length > 0 && !searchParams.get("regulation")) {
-      router.replace(buildUrl({ speciesId, tab, format, month, cutoff, regulation: regulations[0].id }));
+      router.replace(buildUrl({ speciesId, tab, format, month, cutoff, regulation: regulations[0].id, tournamentId, view }));
     }
   }, [regulations]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-navigate to first Pokémon when list loads and no selection
   useEffect(() => {
-    if (!speciesId && entries.length > 0) {
-      router.replace(buildUrl({ speciesId: entries[0].speciesId, tab, format, month, cutoff, regulation }));
+    if (!speciesId && entries.length > 0 && view === "aggregate") {
+      router.replace(buildUrl({ speciesId: entries[0].speciesId, tab, format, month, cutoff, regulation, tournamentId, view }));
     }
   }, [entries]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -109,41 +121,54 @@ export function useMetaNavigation({
   );
 
   const handleSelect = useCallback(
-    (id: string) => router.push(buildUrl({ speciesId: id, tab, format, month, cutoff, regulation })),
-    [router, tab, format, month, cutoff, regulation],
+    (id: string) => router.push(buildUrl({ speciesId: id, tab, format, month, cutoff, regulation, tournamentId, view })),
+    [router, tab, format, month, cutoff, regulation, tournamentId, view],
   );
 
   const handleTabChange = useCallback(
-    (newTab: string) => router.push(buildUrl({ speciesId: undefined, tab: newTab, format, month, cutoff, regulation })),
+    (newTab: string) => router.push(buildUrl({ speciesId: undefined, tab: newTab, format, month, cutoff, regulation, tournamentId: "", view: "aggregate" })),
     [router, format, month, cutoff, regulation],
   );
 
   const handleFormatChange = useCallback(
     (newFormat: string, newMonth: string, newCutoff: number) =>
-      router.push(buildUrl({ speciesId, tab, format: newFormat, month: newMonth, cutoff: newCutoff, regulation })),
-    [router, speciesId, tab, regulation],
+      router.push(buildUrl({ speciesId, tab, format: newFormat, month: newMonth, cutoff: newCutoff, regulation, tournamentId, view })),
+    [router, speciesId, tab, regulation, tournamentId, view],
   );
 
   const handleOptionsApply = useCallback(
     (newMonth: string, newCutoff: number) =>
-      router.push(buildUrl({ speciesId, tab, format, month: newMonth, cutoff: newCutoff, regulation })),
-    [router, speciesId, tab, format, regulation],
+      router.push(buildUrl({ speciesId, tab, format, month: newMonth, cutoff: newCutoff, regulation, tournamentId, view })),
+    [router, speciesId, tab, format, regulation, tournamentId, view],
   );
 
   const handleRegulationChange = useCallback(
     (newRegulation: string) =>
-      router.push(buildUrl({ speciesId: undefined, tab, format, month, cutoff, regulation: newRegulation })),
+      router.push(buildUrl({ speciesId: undefined, tab, format, month, cutoff, regulation: newRegulation, tournamentId: "", view: "aggregate" })),
     [router, tab, format, month, cutoff],
   );
 
+  const handleTournamentChange = useCallback(
+    (newTournamentId: string) =>
+      router.push(buildUrl({ speciesId: undefined, tab, format, month, cutoff, regulation, tournamentId: newTournamentId, view })),
+    [router, tab, format, month, cutoff, regulation, view],
+  );
+
+  const handleViewChange = useCallback(
+    (newView: string) =>
+      router.push(buildUrl({ speciesId: undefined, tab, format, month, cutoff, regulation, tournamentId, view: newView })),
+    [router, tab, format, month, cutoff, regulation, tournamentId],
+  );
+
   const handleBack = useCallback(
-    () => router.push(buildUrl({ speciesId: undefined, tab, format, month, cutoff, regulation })),
-    [router, tab, format, month, cutoff, regulation],
+    () => router.push(buildUrl({ speciesId: undefined, tab, format, month, cutoff, regulation, tournamentId, view })),
+    [router, tab, format, month, cutoff, regulation, tournamentId, view],
   );
 
   return {
-    speciesId, detail,
+    speciesId, tournamentId, view, detail,
     handleSelect, handleTabChange, handleFormatChange,
-    handleOptionsApply, handleRegulationChange, handleBack,
+    handleOptionsApply, handleRegulationChange, handleTournamentChange,
+    handleViewChange, handleBack,
   };
 }
