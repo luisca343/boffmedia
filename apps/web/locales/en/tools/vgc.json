@@ -422,7 +422,12 @@
         "backToList": "Back",
         "notFound": "No data available for this Pokémon.",
         "battles": "{count} battles",
-        "other": "Other"
+        "other": "Other",
+        "usagePercent": "{percent}% usage",
+        "featuringTeams": "Featuring Teams",
+        "teamsLoading": "Loading teams\u2026",
+        "copyPaste": "Copy Paste",
+        "copied": "Copied!"
       },
       "standings": {
         "loading": "Loading standings\u2026",

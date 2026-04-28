@@ -1,15 +1,17 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { ChevronDown, ChevronUp, Copy, Check, Loader2 } from "lucide-react";
 import { spriteUrl, handleSpriteError } from "@/features/vgc-tracker/types";
 import { SpeciesTeamEntry, SpeciesTeamSlot } from "@/services/api/boffmedia/vgcService";
 import { cn } from "@/lib/utils";
 
-// ─── Copy button ──────────────────────────────────────────────────────────────
+// ─── Copy button ───────────────────────────────────────────────────────────────────────────────
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
+  const t = useTranslations("vgc.meta");
 
   const handleCopy = useCallback(async () => {
     try {
@@ -31,7 +33,7 @@ function CopyButton({ text }: { text: string }) {
       ) : (
         <Copy className="w-3 h-3" />
       )}
-      {copied ? "Copied!" : "Copy Paste"}
+      {copied ? t("detail.copied") : t("detail.copyPaste")}
     </button>
   );
 }
@@ -97,11 +99,8 @@ function SlotDetail({ slot }: { slot: SpeciesTeamSlot }) {
 function TeamRow({ entry }: { entry: SpeciesTeamEntry }) {
   const [expanded, setExpanded] = useState(false);
 
-  const label = entry.record
-    ? entry.record
-    : entry.rank
-    ? `#${entry.rank}`
-    : null;
+  const placing = entry.rank  ? `#${entry.rank}`  : null;
+  const record   = entry.record ?? null;
 
   return (
     <div className="border border-surface-800 rounded-lg overflow-hidden">
@@ -115,8 +114,10 @@ function TeamRow({ entry }: { entry: SpeciesTeamEntry }) {
           <p className="text-xs font-medium text-surface-100 truncate leading-tight">
             {entry.playerName ?? entry.playerId}
           </p>
-          {label && (
-            <p className="text-[11px] text-surface-400 leading-tight">{label}</p>
+          {(placing || record) && (
+            <p className="text-[11px] text-surface-400 leading-tight">
+              {placing}{placing && record && " · "}{record}
+            </p>
           )}
           <p className="text-[10px] text-surface-600 leading-tight capitalize">
             {entry.source}
@@ -171,6 +172,8 @@ interface Props {
 }
 
 export function TeamsPanel({ teams, loading, title = "Teams" }: Props) {
+  const t = useTranslations("vgc.meta");
+
   if (loading) {
     return (
       <div className="rounded-xl border border-surface-800 bg-surface-950 p-4">
@@ -179,7 +182,7 @@ export function TeamsPanel({ teams, loading, title = "Teams" }: Props) {
         </h3>
         <div className="flex items-center justify-center gap-2 py-4 text-surface-500 text-sm">
           <Loader2 className="w-4 h-4 animate-spin" />
-          Loading teams…
+          {t("detail.teamsLoading")}
         </div>
       </div>
     );

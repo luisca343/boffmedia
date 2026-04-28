@@ -422,7 +422,12 @@
         "backToList": "Volver",
         "notFound": "Sin datos disponibles para este Pokémon.",
         "battles": "{count} combates",
-        "other": "Otros"
+        "other": "Otros",
+        "usagePercent": "{percent}% de uso",
+        "featuringTeams": "Equipos con este Pok\u00e9mon",
+        "teamsLoading": "Cargando equipos\u2026",
+        "copyPaste": "Copiar paste",
+        "copied": "\u00a1Copiado!"
       },
       "standings": {
         "loading": "Cargando resultados\u2026",
