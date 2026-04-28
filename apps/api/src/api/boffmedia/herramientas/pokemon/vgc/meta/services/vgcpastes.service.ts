@@ -6,9 +6,17 @@ import { CHAMPIONS_REGULATIONS, ChampionsRegulation } from '../../champions-data
 import { POKEPASTE_CONCURRENCY, VGCPASTES_SHEET_BASE } from '../config/smogon.config';
 import { VgcMetaSlot, StatSpread } from '@/_db/schema/Vgc';
 import { PokepasteService } from './pokepaste.service';
+import { initChampionsMod } from '../../champions.mod';
 
-function toSpeciesId(name: string): string {
-  const s = Dex.species.get(name);
+function getDexForFormat(formatId?: string) {
+  initChampionsMod();
+  if (!formatId) return Dex;
+  const format = Dex.formats.get(formatId);
+  return format.exists ? Dex.forFormat(format) : Dex;
+}
+
+function toSpeciesId(name: string, dex: typeof Dex): string {
+  const s = dex.species.get(name);
   return s.exists ? s.id : name.toLowerCase().replace(/[^a-z0-9]/g, '');
 }
 
@@ -264,6 +272,9 @@ export class VgcPastesService {
   }
 
   async getUsageList(regulationId: string): Promise<PokemonUsageDetail[]> {
+    const regulation = CHAMPIONS_REGULATIONS[regulationId];
+    const dexForFormat = getDexForFormat(regulation?.formatId);
+
     const teams = await this.vgcPastesRepository.findByRegulation(regulationId);
     if (teams.length === 0) {
       throw new NotFoundException(
@@ -283,10 +294,10 @@ export class VgcPastesService {
 
     for (const { species } of parsedTeams) {
       for (const name of species) {
-        const id = toSpeciesId(name);
+        const id = toSpeciesId(name, dexForFormat);
         speciesCounts.set(id, (speciesCounts.get(id) ?? 0) + 1);
         if (!speciesDisplay.has(id)) {
-          const s = Dex.species.get(name);
+          const s = dexForFormat.species.get(name);
           speciesDisplay.set(id, s.exists ? s.name : name);
         }
       }
@@ -300,7 +311,7 @@ export class VgcPastesService {
       for (let i = 0; i < species.length; i++) {
         const itemName = items[i];
         if (!itemName) continue;
-        const id  = toSpeciesId(species[i]);
+        const id  = toSpeciesId(species[i], dexForFormat);
         const row = itemMatrix.get(id) ?? new Map<string, number>();
         row.set(itemName, (row.get(itemName) ?? 0) + 1);
         itemMatrix.set(id, row);
@@ -310,7 +321,7 @@ export class VgcPastesService {
     // ── Teammate co-occurrence ────────────────────────────────────────────────
     const teammateMatrix = new Map<string, Map<string, number>>();
     for (const { species } of parsedTeams) {
-      const ids = species.map(toSpeciesId);
+      const ids = species.map((name) => toSpeciesId(name, dexForFormat));
       for (const id of ids) {
         const row = teammateMatrix.get(id) ?? new Map<string, number>();
         for (const other of ids) {
@@ -324,12 +335,12 @@ export class VgcPastesService {
 
     return sorted.map(([speciesId, count], idx) => {
       const speciesName = speciesDisplay.get(speciesId) ?? speciesId;
-      const dex         = Dex.species.get(speciesName);
-      const baseStats   = dex.exists
-        ? dex.baseStats
+      const species     = dexForFormat.species.get(speciesName);
+      const baseStats   = species.exists
+        ? species.baseStats
         : { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
-      const types = dex.exists
-        ? ([...dex.types] as string[]).filter(Boolean)
+      const types = species.exists
+        ? ([...species.types] as string[]).filter(Boolean)
         : [];
 
       const items = [...(itemMatrix.get(speciesId)?.entries() ?? [])]

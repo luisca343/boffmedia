@@ -5,6 +5,8 @@ import { PastesRepository } from '../repositories/pastes.repository';
 import { PokemonUsageDetail, LimitlessPlayer } from '../entities/pokemon-usage.entity';
 import { VgcMetaSlot } from '@/_db/schema/Vgc';
 import { LIMITLESS_API_BASE } from '../config/smogon.config';
+import { CHAMPIONS_REGULATIONS } from '../../champions-data';
+import { initChampionsMod } from '../../champions.mod';
 
 // ─── Limitless API types ─────────────────────────────────────────────────────
 
@@ -38,8 +40,15 @@ interface LimitlessApiDetails {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function toSpeciesId(name: string): string {
-  const s = Dex.species.get(name);
+function getDexForFormat(formatId?: string) {
+  initChampionsMod();
+  if (!formatId) return Dex;
+  const format = Dex.formats.get(formatId);
+  return format.exists ? Dex.forFormat(format) : Dex;
+}
+
+function toSpeciesId(name: string, dex: typeof Dex): string {
+  const s = dex.species.get(name);
   return s.exists ? s.id : name.toLowerCase().replace(/[^a-z0-9]/g, '');
 }
 
@@ -48,11 +57,11 @@ function toSpeciesId(name: string): string {
  * The `id` field in the Limitless API response already uses the Showdown slug
  * (e.g. "rotom-wash", "ninetales-alola") so we prefer it over the display name.
  */
-function resolveSpeciesName(entry: LimitlessApiDecklist): string {
-  const byId = Dex.species.get(entry.id);
+function resolveSpeciesName(entry: LimitlessApiDecklist, dex: typeof Dex): string {
+  const byId = dex.species.get(entry.id);
   if (byId.exists) return byId.name;
   // Fallback: try the display name directly
-  const byName = Dex.species.get(entry.name);
+  const byName = dex.species.get(entry.name);
   if (byName.exists) return byName.name;
   return entry.name;
 }
@@ -61,10 +70,10 @@ function resolveSpeciesName(entry: LimitlessApiDecklist): string {
  * Converts a Limitless decklist to minimal Pokémon Showdown paste text.
  * Limitless does not expose EVs, natures or levels, so those fields are omitted.
  */
-function decklistToText(decklist: LimitlessApiDecklist[]): string {
+function decklistToText(decklist: LimitlessApiDecklist[], dex: typeof Dex): string {
   return decklist
     .map((entry) => {
-      const name  = resolveSpeciesName(entry);
+      const name  = resolveSpeciesName(entry, dex);
       const lines: string[] = [
         entry.item ? `${name} @ ${entry.item}` : name,
       ];
@@ -84,7 +93,7 @@ function formatRecord(r: { wins: number; losses: number; ties: number }): string
 }
 
 /** Aggregate VgcMetaSlot[] arrays from all teams into PokemonUsageDetail[] */
-function aggregateSlots(teamSlots: VgcMetaSlot[][]): PokemonUsageDetail[] {
+function aggregateSlots(teamSlots: VgcMetaSlot[][], dexForFormat: typeof Dex): PokemonUsageDetail[] {
   if (teamSlots.length === 0) return [];
 
   const totalTeams    = teamSlots.length;
@@ -138,9 +147,9 @@ function aggregateSlots(teamSlots: VgcMetaSlot[][]): PokemonUsageDetail[] {
 
   return sorted.map(([speciesId, count], idx) => {
     const speciesName = speciesNames.get(speciesId) ?? speciesId;
-    const dex         = Dex.species.get(speciesName);
-    const baseStats   = dex.exists ? dex.baseStats : { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
-    const types       = dex.exists ? ([...dex.types] as string[]).filter(Boolean) : [];
+    const species     = dexForFormat.species.get(speciesName);
+    const baseStats   = species.exists ? species.baseStats : { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
+    const types       = species.exists ? ([...species.types] as string[]).filter(Boolean) : [];
 
     const toList = (map: Map<string, number> | undefined, total: number, limit = 8) =>
       [...(map?.entries() ?? [])].sort((a, b) => b[1] - a[1]).slice(0, limit)
@@ -187,13 +196,13 @@ export class LimitlessService {
     return match[1];
   }
 
-  private convertDecklist(decklist: LimitlessApiDecklist[] | null): VgcMetaSlot[] {
+  private convertDecklist(decklist: LimitlessApiDecklist[] | null, dexForFormat: typeof Dex): VgcMetaSlot[] {
     if (!decklist?.length) return [];
     return decklist.slice(0, 6).map((entry, i) => {
-      const speciesName = resolveSpeciesName(entry);
+      const speciesName = resolveSpeciesName(entry, dexForFormat);
       return {
         slotIndex:   i as 0 | 1 | 2 | 3 | 4 | 5,
-        speciesId:   toSpeciesId(speciesName),
+        speciesId:   toSpeciesId(speciesName, dexForFormat),
         speciesName,
         item:        entry.item    || undefined,
         ability:     entry.ability || undefined,
@@ -221,7 +230,7 @@ export class LimitlessService {
     await this.limitlessRepository.deleteTeamsByTournament(tournamentId);
 
     // Fire-and-forget background job
-    this.runImport(tournamentId, limitlessId, maxPlayers).catch(async (err) => {
+    this.runImport(tournamentId, limitlessId, regulationId, maxPlayers).catch(async (err) => {
       this.logger.error(`Tournament import failed for ${limitlessId}: ${err.message}`);
       await this.limitlessRepository.updateTournamentStatus(tournamentId, {
         status:       'error',
@@ -235,8 +244,12 @@ export class LimitlessService {
   private async runImport(
     tournamentId: number,
     limitlessId:  string,
+    regulationId: string,
     maxPlayers?:  number,
   ): Promise<void> {
+    const regulation = CHAMPIONS_REGULATIONS[regulationId];
+    const dexForFormat = getDexForFormat(regulation?.formatId);
+
     const detailsRes = await fetch(`${LIMITLESS_API_BASE}/tournaments/${limitlessId}/details`);
     if (!detailsRes.ok) throw new Error(`Details fetch failed: HTTP ${detailsRes.status}`);
     const details = await detailsRes.json() as LimitlessApiDetails;
@@ -273,10 +286,10 @@ export class LimitlessService {
 
     for (let i = 0; i < toProcess.length; i++) {
       const standing = toProcess[i];
-      const slots    = this.convertDecklist(standing.decklist);
+      const slots    = this.convertDecklist(standing.decklist, dexForFormat);
 
       const pasteId = await this.pastesRepository.upsertPaste({
-        rawText:     decklistToText(standing.decklist ?? []),
+        rawText:     decklistToText(standing.decklist ?? [], dexForFormat),
         parsedSlots: slots,
       });
 
@@ -317,6 +330,13 @@ export class LimitlessService {
   }
 
   async getUsageList(tournamentId: number): Promise<PokemonUsageDetail[]> {
+    const tournament = await this.limitlessRepository.findTournamentById(tournamentId);
+    if (!tournament) {
+      throw new NotFoundException(`Tournament ${tournamentId} not found`);
+    }
+    const regulation = CHAMPIONS_REGULATIONS[tournament.regulationId];
+    const dexForFormat = getDexForFormat(regulation?.formatId ?? tournament.format ?? undefined);
+
     const teams = await this.limitlessRepository.findTeamsWithPastes(tournamentId);
     if (teams.length === 0) {
       throw new NotFoundException(
@@ -326,10 +346,13 @@ export class LimitlessService {
     const teamSlots = teams
       .filter((t) => t.parsedSlots)
       .map((t) => JSON.parse(t.parsedSlots!) as VgcMetaSlot[]);
-    return aggregateSlots(teamSlots);
+    return aggregateSlots(teamSlots, dexForFormat);
   }
 
   async getCombinedUsage(regulationId: string): Promise<PokemonUsageDetail[]> {
+    const regulation = CHAMPIONS_REGULATIONS[regulationId];
+    const dexForFormat = getDexForFormat(regulation?.formatId);
+
     const tournaments = await this.limitlessRepository.findTournamentsByRegulation(regulationId);
     if (tournaments.length === 0) {
       throw new NotFoundException(`No tournaments found for regulation "${regulationId}".`);
@@ -347,7 +370,7 @@ export class LimitlessService {
         if (team.parsedSlots) allSlots.push(JSON.parse(team.parsedSlots) as VgcMetaSlot[]);
       }
     }
-    return aggregateSlots(allSlots);
+    return aggregateSlots(allSlots, dexForFormat);
   }
 
   async getPlayerList(tournamentId: number): Promise<LimitlessPlayer[]> {
