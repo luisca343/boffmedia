@@ -23,10 +23,11 @@ export const VGCPASTES_SHEET_BASE =
 
 export const POKEPASTE_BASE = 'https://pokepast.es';
 
-export const LIMITLESS_BASE = 'https://play.limitlesstcg.com/tournament';
+export const LIMITLESS_BASE     = 'https://play.limitlesstcg.com/tournament';
+export const LIMITLESS_API_BASE = 'https://play.limitlesstcg.com/api';
+
+/** Rate limit for Limitless JSON API: 50 requests per 5 minutes */
+export const LIMITLESS_RATE_LIMIT = { requests: 50, windowMs: 5 * 60 * 1000 } as const;
 
 /** Max parallel requests when batch-fetching pastes */
 export const POKEPASTE_CONCURRENCY = 10;
-
-/** Limitless rate limit: 50 requests per 5 minutes */
-export const LIMITLESS_RATE_LIMIT = { requests: 50, windowMs: 5 * 60 * 1000 };

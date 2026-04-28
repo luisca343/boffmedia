@@ -37,6 +37,9 @@
 | 2026-04-27 | Champions Preview label | Added amber `Preview` badge to Champions tab button in `FormatBar`; thin info banner rendered below FormatBar when Champions tab is active; two new i18n keys (`tabs.previewBadge`, `tabs.championsPreviewNotice`) added to EN + ES locale files. Champions data is temporary (VGCPastes CSV) until Smogon adds the Champions format. |
 | 2026-04-27 | Navigation hook extraction | Extracted `useMetaNavigation` into `meta/_hooks/useMetaNavigation.ts`; encapsulates `buildUrl`, URL-state parsing, all three auto-navigation `useEffect`s, `detail` derivation, and all five `useCallback` handlers. `MetaLayoutClient` reduced to pure composition: reads URL params inline only to gate data hooks, then delegates all navigation logic to `useMetaNavigation`. |
 | 2026-04-27 | Phase 3 implemented (partial) | `PokepasteService.fetchAndCache()` fully implemented (cache-hit + miss path via `pokepast.es/{id}/json`); `VgcPastesService.batchFetchRegulation()` processes teams in chunks of `POKEPASTE_CONCURRENCY`, auto fire-and-forget at end of `refreshRegulation()`; `VgcPastesService.getPasteDetail()` aggregates moves/items/abilities/spreads from `parsedSlots` per species; `GET /champions/:speciesId/detail` + `POST /champions/fetch-pastes` added; `useChampionsPasteDetail` hook; `MetaLayoutClient` merges paste detail over base detail via `useMemo`; "Fetch Pastes" button in `VgcChampionsFetcher`; `ChampionsPasteDetailDto`+`BatchFetchResultDto` with `@ApiProperty`, `pnpm generate:shared` run, frontend imports from `@boffmedia/shared`. SP radar chart (StatCalcService) pending. |
+| 2026-04-27 | SP radar chart cancelled | SP spread → `StatCalcService` → hexagonal radar chart deferred indefinitely. Phase 3 marked complete without it. |
+| 2026-04-28 | Phase 5 implemented | Full Limitless Tournament Aggregation end-to-end. Backend: `LimitlessService` with fire-and-forget `importTournament()` + `runImport()` background job; `decklistToText()` generates proper Showdown paste from structured Limitless API data; `resolveSpeciesName()` uses `entry.id` (Showdown slug) for canonical names; `getUsageList()`, `getCombinedUsage()`, `getPlayerList()`, `getPlayerTeam()` implemented; all 7 Limitless controller endpoints registered (no guards — matches pattern of all other meta admin endpoints); `LIMITLESS_RATE_LIMIT` config constant added. DB: migration `0006_married_rattler.sql` adds `placing` to `vgc_limitless_teams` and `regulation_id`, `status`, `progress`, `total`, `error_message` to `vgc_limitless_tournaments` (migration applied manually on server). Frontend: `useMetaNavigation` extended with `view` URL param + `handleViewChange`; `MetaLayoutClient` has Aggregate/Players sub-tab strip (shown only when `tab=tournament`); three new hooks (`useLimitlessTournaments`, `useLimitlessUsage`, `useLimitlessPlayers`); `StandingsView` component (standings table with lazy per-player team fetch, `<Fragment key>` fix, plain `<img>` sprites); `FormatBar` extended with `tournament` tab + regulation pills → "Combined" pill + individual tournament pills; locale keys `tournament`, `combined`, `aggregate`, `players` added (EN + ES). Admin panel `VgcLimitlessFetcher` **not yet implemented**. |
+| 2026-04-28 | StandingsView UX improvements | **Eager team prefetch**: all player teams now fetched concurrently on mount via a `useEffect` + `fetchedRef` Set; sprites appear without requiring a click. **Scroll-into-view**: expanding a row scrolls the detail panel into view with `scrollIntoView({ behavior: "smooth", block: "nearest" })` using a `detailRowRef`. **Copy Poképaste button**: expanded row exposes a "Copy Poképaste" button that writes `rawText` to the clipboard with a 2-second "Copied!" confirmation; backend `getPlayerTeam()` and `findTeamWithPaste()` now return `rawText`; `LimitlessPlayerTeam` type updated. **i18n**: all `StandingsView` strings moved to `vgc.meta.standings.*` keys in both EN and ES locale files. **Top-N sort fix**: `runImport()` now sorts standings by `placing` ascending before `slice(0, maxPlayers)` so `maxPlayers=16` reliably gives the actual top 16 finishers. **Sprite fix**: `floette-eternal` only exists at `sprites/dex/` — added `SPRITE_DEX_SLUGS` Set in `types.ts` to route specific slugs to the dex base URL instead of home-centered/gen5; removed wrong `floette-eternal-mega` override. |
 
 ---
 
@@ -88,23 +91,54 @@
 - [x] Admin: "Fetch Pastes" button in `VgcChampionsFetcher` with result feedback
 - [x] `ChampionsPasteDetailDto` + `BatchFetchResultDto` with `@ApiProperty`; `pnpm generate:shared` run; frontend imports from `@boffmedia/shared`
 - [x] Detail panel enriched: Champions move / item / SP spread breakdown (via `useMemo` merge in `MetaLayoutClient`)
-- [ ] SP spread → computed stats via `StatCalcService` → hexagonal radar chart
+- [x] ~~SP spread → computed stats via `StatCalcService` → hexagonal radar chart~~ _(cancelled — deferred indefinitely)_
 
-### Phase 4 — Ladder vs Champions Divergence
-- [ ] Divergence score computation: `|ladder_usage - champions_usage|`
-- [ ] NestJS endpoint: `GET /tools/vgc/meta/divergence?regulationId=`
+### Phase 4 — Ladder vs Tournament Divergence _(Future — blocked on Phase 5)_
+> Requires Limitless tournament data to compare against. Will be Ladder vs Tournament, not Ladder vs Champions.
+- [ ] Divergence score computation: `|ladder_usage - tournament_usage|`
+- [ ] NestJS endpoint: `GET /tools/vgc/meta/divergence?tournamentId=`
 - [ ] Compare tab in meta page
 - [ ] Sortable divergence table
-- [ ] "Ladder trap" badge (high ladder %, low Champions %)
-- [ ] "Tournament staple" badge (low ladder %, high Champions %)
+- [ ] "Ladder trap" badge (high ladder %, low tournament %)
+- [ ] "Tournament staple" badge (low ladder %, high tournament %)
 
-### Phase 5 — Limitless Tournament Aggregation
-- [ ] `LimitlessService.importTournament()` — extract `limitlessId` from URL, scrape standings HTML, batch-scrape teamlist pages
-- [ ] Paste write path: `parsePasteMeta(rawText)` → `PastesRepository.upsertPaste()` → `LimitlessRepository.linkPaste()`
-- [ ] Rate-limit stagger: max 10 req/min (50 req/5 min) with retry on 429
-- [ ] Admin endpoint: `POST /tools/vgc/meta/limitless/tournament` (guarded by `RolesGuard + @Roles('admin')`)
-- [ ] NestJS endpoint: `GET /tools/vgc/meta/limitless/usage?tournamentId=`
-- [ ] Tournament tab in meta page (admin URL input + cached tournament list)
+### Phase 5 — Limitless Tournament Aggregation _(Complete — admin panel pending)_
+
+#### Backend — Admin import pipeline
+- [x] `LimitlessService.importTournament(url, regulationId, maxPlayers?)` — extracts `limitlessId` from URL; upserts tournament row; spawns fire-and-forget `runImport()` background job; returns `{ tournamentId }` immediately
+- [x] Import job fetches standings from `play.limitlesstcg.com/api/tournaments/{id}/standings`; for each player with a decklist: resolves canonical species names via `resolveSpeciesName(entry)` (uses `entry.id` Showdown slug via `Dex.species.get()`); generates Showdown paste text via `decklistToText()` (name @ item / Ability / Level / Tera / moves); stores via `PastesRepository.upsertPaste()`; inserts `vgc_limitless_teams` row
+- [x] Rate-limit config: `LIMITLESS_RATE_LIMIT = { requests: 50, windowMs: 5 * 60 * 1000 }` in `smogon.config.ts`
+- [x] Admin endpoint: `POST /tools/vgc/meta/limitless/tournament` — no auth guard (matches pattern of all other meta admin endpoints); spawns background job, returns `{ tournamentId }` immediately
+- [x] Job status: `status`, `progress`, `total`, `error_message` on `vgc_limitless_tournaments`; polling endpoint `GET /tools/vgc/meta/limitless/tournament/:id/status`
+- [x] `LimitlessService.getUsageList(tournamentId)` — aggregates species from `parsedSlots` across all teams for a tournament; returns `PokemonUsageDetail[]`
+- [x] `LimitlessService.getCombinedUsage(regulationId)` — same aggregation across all completed tournaments for a regulation
+- [x] NestJS endpoints — all implemented:
+  - [x] `GET /limitless/tournaments?regulationId=` — lists imported tournaments for a regulation
+  - [x] `GET /limitless` — lists all cached tournaments
+  - [x] `GET /limitless/usage?tournamentId=` — per-tournament usage list
+  - [x] `GET /limitless/usage/combined?regulationId=` — cross-tournament aggregate
+  - [x] `GET /limitless/tournament/:id/status` — job progress polling
+  - [x] `GET /limitless/:tournamentId/players` — standings list (slug, name, record, placing, parsed team)
+  - [x] `GET /limitless/:tournamentId/player/:slug` — full parsed team for one player
+
+#### DB changes
+- [x] Added `status varchar(16)`, `progress int`, `total int`, `error_message text nullable` to `vgc_limitless_tournaments`
+- [x] Added `regulation_id varchar(64)` to `vgc_limitless_tournaments`
+- [x] Added `placing int nullable` to `vgc_limitless_teams`
+- [x] Migration file `0006_married_rattler.sql` generated and applied on server
+
+#### Frontend — Tournament tab
+- [x] `tab=tournament` in `FormatBar` — third tab alongside Ladder and Champions
+- [x] `FormatBar` Tournament mode: regulation pills → "Combined [Reg]" special pill (pinned) + individual tournament pills
+- [x] Two sub-tabs inside Tournament: **Aggregate** (usage table + detail panel) and **Players** (standings table) — controlled by `view` URL param
+- [x] `useLimitlessTournaments(regulationId)` hook — fetches tournament list for a regulation
+- [x] `useLimitlessUsage(tournamentId | 'combined', regulationId)` hook — fetches usage list (per-tournament or combined)
+- [x] `useLimitlessPlayers(tournamentId)` hook — fetches player standings
+- [x] `useMetaNavigation` extended: `view` URL param, `handleViewChange`, `handleTournamentChange`; auto-nav to first Pokémon guarded by `view === "aggregate"`; tab/regulation switch resets `view` to `"aggregate"`
+- [x] `StandingsView` component: placing · player name · record · 6 inline sprites; row click lazily fetches + caches player team; expanded detail row with sprite + item + tera + moves per slot; uses `<Fragment key>` + plain `<img>` + `spriteUrl()` + `handleSpriteError`
+- [x] `MetaLayoutClient` wires all Tournament hooks; conditionally renders `StandingsView` vs sidebar+detail layout based on `view`
+- [x] Locale keys `tournament`, `combined`, `aggregate`, `players` added (EN + ES)
+- [ ] Admin panel: `VgcLimitlessFetcher` component — URL input + regulation picker + optional max-players; submit → POST → poll status every 3 s; progress bar; list of imported tournaments with status dot
 
 ### Future — RK9 Regionals Pairings (Low Priority)
 - [ ] RK9 event scrape (`rk9.gg/event/{id}`)
@@ -169,10 +203,33 @@ Fields: `{ author, notes, paste, title }` — `paste` feeds into `parsePasteMeta
 
 ### Limitless TCG
 
-**Standings:** `https://play.limitlesstcg.com/tournament/{id}/standings` — 497 KB HTML, no CORS.  
-**Teamlist:** `https://play.limitlesstcg.com/tournament/{id}/player/{slug}/teamlist` — 14 KB HTML.  
-Team paste extracted via: `` html.match(/const teamlist = `([\s\S]*?)`/) ``  
-Rate limit: **50 req / 5 min** (confirmed from response headers).
+**REST API base:** `https://play.limitlesstcg.com/api`  
+**Tournaments list:** `GET /tournaments` — JSON array of all tournaments.  
+**Tournament details:** `GET /tournaments/{id}/details` — name, date, format, player count.  
+**Standings:** `GET /tournaments/{id}/standings` — full JSON array, no CORS issues.  
+
+Each standing object:
+```ts
+{
+  player: string;       // slug used in player URLs
+  name: string;         // display name
+  placing: number | null;
+  record: { wins, losses, ties };
+  drop: number | null;
+  decklist: Array<{
+    id: string;         // Showdown slug (e.g. "rotom-wash", "ninetales-alola") ← use this for name resolution
+    name: string;       // display name (e.g. "Wash Rotom", "Alolan Ninetales") ← do NOT use for species lookup
+    item: string;
+    ability: string;
+    attacks: string[];
+    tera: string | null;
+  }> | null;
+}
+```
+
+**Important:** the API returns only item / ability / attacks / tera — **no EVs, natures, or levels**. The `raw_text` stored in `vgc_pastes` is a minimal Showdown paste generated by `decklistToText()` (name @ item / Ability / Level: 50 / Tera / moves).  
+**Name resolution:** always use `entry.id` via `Dex.species.get(entry.id)` — NOT `entry.name`. The `id` field already follows Showdown slug conventions.  
+**Rate limit:** `LIMITLESS_RATE_LIMIT = { requests: 50, windowMs: 5 * 60 * 1000 }` (confirmed from response headers).
 
 ---
 
@@ -229,7 +286,11 @@ Data-fetching hooks live in `meta/_hooks/`, one concern per file:
 | `useSmogonUsage(format, month, cutoff)` | `_hooks/useSmogonUsage.ts` | Fetches full detail list + builds `Map<speciesId, detail>`; skips if `format` is empty |
 | `useChampionsRegulations()` | `_hooks/useChampionsRegulations.ts` | Fetches regulations that have imported CSV data |
 | `useChampionsUsage(regulationId)` | `_hooks/useChampionsUsage.ts` | Fetches Champions usage list + builds `Map`; skips if `regulationId` is empty |
-| `useMetaNavigation({ snapshots, regulations, entries, entriesMap })` | `_hooks/useMetaNavigation.ts` | Encapsulates `buildUrl`, URL-state reading, all three auto-navigation effects, `detail` derivation, and all five navigation handlers. Returns `{ speciesId, detail, ...handlers }`. Exports `DEFAULT_CUTOFF` constant. |
+| `useChampionsPasteDetail(regulationId, speciesId)` | `_hooks/useChampionsPasteDetail.ts` | Fetches move/item/spread detail from paste aggregation; merged over base detail |
+| `useLimitlessTournaments(regulationId)` | `_hooks/useLimitlessTournaments.ts` | Fetches tournament list for a regulation; skips if `regulationId` is empty |
+| `useLimitlessUsage(tournamentId, regulationId)` | `_hooks/useLimitlessUsage.ts` | Fetches usage list (per-tournament or combined); builds `Map`; skips if no id |
+| `useLimitlessPlayers(tournamentId)` | `_hooks/useLimitlessPlayers.ts` | Fetches player standings list; skips if no id |
+| `useMetaNavigation({ snapshots, regulations, entries, entriesMap })` | `_hooks/useMetaNavigation.ts` | Encapsulates `buildUrl`, URL-state reading (tab, format, month, cutoff, regulation, tournamentId, view, speciesId), all auto-navigation effects, `detail` derivation, and all navigation handlers. Returns `{ speciesId, detail, view, ...handlers }`. Exports `DEFAULT_CUTOFF` constant. |
 
 `MetaLayoutClient` is a **pure composition layer** — it reads URL params inline (5 lines via `useSearchParams`) only to gate data hooks before calling them, then delegates all navigation logic to `useMetaNavigation` and all data fetching to the four dedicated hooks. No `fetch` calls, no `useEffect`, no `useCallback` inside the component.
 
@@ -457,3 +518,11 @@ Adamant Nature
 ## Open Questions
 
 *(All resolved — none pending.)*
+
+**OQ-L1** Import scope → Admin sets `maxPlayers` per import (optional; no limit = all players).  
+**OQ-L2** Background model → Background job; admin polls status in admin panel (running / done / error + progress bar). `POST` returns `{ jobId }` immediately.  
+**OQ-L3** Format association → Admin manually picks the regulation when submitting the URL. No auto-detection.  
+**OQ-L4** Tournament tab UI → Two sub-tabs: **Aggregate** (usage table + detail panel) and **Players** (standings + team browser).  
+**OQ-L5** Tournament selector → One at a time; "Combined [Reg]" appears as a special pill pinned above individual tournament pills.  
+**OQ-L6** Re-import → Always full re-scrape (idempotent). Same `player_slug` = overwrite `paste_id`.  
+**OQ-L7** Record weighting → Store all players + records; aggregation uses raw usage count (no weighting). Record available for future filtering.  

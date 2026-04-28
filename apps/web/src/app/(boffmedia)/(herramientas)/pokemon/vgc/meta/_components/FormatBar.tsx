@@ -4,7 +4,7 @@ import { useMemo, useRef, useState } from "react";
 import { Settings2, RefreshCw } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import { SmogonSnapshot, ChampionsRegulation, VgcMetaService } from "@/services/api/boffmedia/vgcService";
+import { SmogonSnapshot, ChampionsRegulation, LimitlessTournament, VgcMetaService } from "@/services/api/boffmedia/vgcService";
 
 const VALID_CUTOFFS = [1760, 1630, 1500, 0] as const;
 
@@ -37,18 +37,21 @@ function RefreshButton({ regulation }: { regulation: string }) {
 }
 
 interface FormatBarProps {
-  tab:                string;
-  format:             string;
-  month:              string;
-  cutoff:             number;
-  regulation:         string;
-  snapshots:          SmogonSnapshot[];
-  regulations:        ChampionsRegulation[];
-  formatLabels:       Record<string, string>;
-  onTabChange:        (tab: string) => void;
-  onFormatChange:     (format: string, month: string, cutoff: number) => void;
-  onOptionsApply:     (month: string, cutoff: number) => void;
-  onRegulationChange: (regulationId: string) => void;
+  tab:                 string;
+  format:              string;
+  month:               string;
+  cutoff:              number;
+  regulation:          string;
+  tournamentId:        string;
+  snapshots:           SmogonSnapshot[];
+  regulations:         ChampionsRegulation[];
+  tournaments:         LimitlessTournament[];
+  formatLabels:        Record<string, string>;
+  onTabChange:         (tab: string) => void;
+  onFormatChange:      (format: string, month: string, cutoff: number) => void;
+  onOptionsApply:      (month: string, cutoff: number) => void;
+  onRegulationChange:  (regulationId: string) => void;
+  onTournamentChange:  (tournamentId: string) => void;
 }
 
 export function FormatBar({
@@ -57,13 +60,16 @@ export function FormatBar({
   month,
   cutoff,
   regulation,
+  tournamentId,
   snapshots,
   regulations,
+  tournaments,
   formatLabels,
   onTabChange,
   onFormatChange,
   onOptionsApply,
   onRegulationChange,
+  onTournamentChange,
 }: FormatBarProps) {
   const t = useTranslations("vgc.meta");
 
@@ -114,7 +120,7 @@ export function FormatBar({
     <div className="shrink-0 h-12 flex items-center gap-2 px-3 bg-surface-950 border-b border-surface-800 overflow-x-auto">
       {/* Tab toggle */}
       <div className="flex gap-1 shrink-0 border border-surface-700 rounded-lg p-0.5">
-        {(["ladder", "champions"] as const).map((t2) => (
+        {(["ladder", "champions", "tournament"] as const).map((t2) => (
           <button
             key={t2}
             onClick={() => onTabChange(t2)}
@@ -230,6 +236,45 @@ export function FormatBar({
             </>
           )}
         </>
+      ) : tab === "tournament" ? (
+        /* Tournament regulation → tournament pills */
+        <div className="flex items-center gap-1 min-w-0">
+          {/* "Combined" pill */}
+          <button
+            onClick={() => onTournamentChange("combined")}
+            className={cn(
+              "px-3 py-1.5 rounded-full text-xs font-medium border transition-all whitespace-nowrap shrink-0",
+              tournamentId === "combined" || !tournamentId
+                ? "bg-amber-500/20 border-amber-500/60 text-amber-300"
+                : "border-surface-700 text-surface-400 hover:border-surface-500 hover:text-surface-200"
+            )}
+          >
+            {t("tabs.combined")}
+          </button>
+
+          {tournaments.length > 0 && <div className="w-px h-5 bg-surface-800 shrink-0 mx-1" />}
+
+          {/* Individual tournament pills sorted by date desc */}
+          <div className="flex gap-1 overflow-x-auto shrink">
+            {[...tournaments]
+              .sort((a, b) => (b.date ?? "").localeCompare(a.date ?? ""))
+              .map((t2) => (
+                <button
+                  key={t2.id}
+                  onClick={() => onTournamentChange(String(t2.id))}
+                  className={cn(
+                    "px-3 py-1.5 rounded-full text-xs font-medium border transition-all whitespace-nowrap flex items-center gap-1.5",
+                    tournamentId === String(t2.id)
+                      ? "bg-primary-500/20 border-primary-500/60 text-primary-300"
+                      : "border-surface-700 text-surface-400 hover:border-surface-500 hover:text-surface-200"
+                  )}
+                >
+                  <span>{t2.name ?? t2.limitlessId}</span>
+                  <span className="text-surface-600 text-[10px]">{t2.date ?? ""}</span>
+                </button>
+              ))}
+          </div>
+        </div>
       ) : (
         /* Champions regulation pills + refresh */
         <>

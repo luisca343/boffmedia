@@ -373,6 +373,10 @@
       "tabs": {
         "ladder": "Escalera",
         "champions": "Champions",
+        "tournament": "Torneo",
+        "combined": "Combinado",
+        "aggregate": "Uso",
+        "players": "Jugadores",
         "compare": "Comparar",
         "comingSoon": "Próximamente",
         "previewBadge": "Preview",
@@ -420,6 +424,20 @@
         "notFound": "Sin datos disponibles para este Pokémon.",
         "battles": "{count} combates",
         "other": "Otros"
+      },
+      "standings": {
+        "loading": "Cargando resultados\u2026",
+        "empty": "No se encontraron jugadores.",
+        "col": {
+          "rank": "#",
+          "player": "Jugador",
+          "record": "Registro",
+          "team": "Equipo"
+        },
+        "teamLoading": "Cargando\u2026",
+        "copyPaste": "Copiar Pok\u00e9paste",
+        "copied": "\u00a1Copiado!",
+        "tera": "Tera: {type}"
       },
       "refresh": "Actualizar",
       "footer": "Datos de Smogon Stats · Actualización mensual · Corte por defecto: 1760"

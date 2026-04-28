@@ -24,6 +24,8 @@ export interface VgcMetaSlot {
   nature?: string;
   /** SP (Champions) or EV (standard) spread parsed from the EVs: line */
   spread?: StatSpread;
+  /** Tera type from Limitless API or Showdown paste Tera Type: line */
+  tera?: string;
 }
 
 // ─── Tables ──────────────────────────────────────────────────────────────────
@@ -136,13 +138,18 @@ export type VgcPasteTeam = typeof vgcPasteTeams.$inferSelect;
 
 /** One row per scraped Limitless tournament */
 export const vgcLimitlessTournaments = mysqlTable('vgc_limitless_tournaments', {
-  id:          int('id').primaryKey().autoincrement(),
-  limitlessId: varchar('limitless_id', { length: 64 }).notNull().unique(),
-  name:        varchar('name',         { length: 255 }),
-  date:        varchar('date',         { length: 32  }),
-  format:      varchar('format',       { length: 64  }),
-  playerCount: int('player_count'),
-  fetchedAt:   datetime('fetched_at').notNull(),
+  id:           int('id').primaryKey().autoincrement(),
+  limitlessId:  varchar('limitless_id',  { length: 64  }).notNull().unique(),
+  name:         varchar('name',          { length: 255 }),
+  date:         varchar('date',          { length: 32  }),
+  format:       varchar('format',        { length: 64  }),
+  playerCount:  int('player_count'),
+  regulationId: varchar('regulation_id', { length: 64  }),
+  status:       varchar('status',        { length: 16  }).notNull().default('pending'),
+  progress:     int('progress').notNull().default(0),
+  total:        int('total').notNull().default(0),
+  errorMessage: text('error_message'),
+  fetchedAt:    datetime('fetched_at').notNull(),
 });
 
 export type VgcLimitlessTournament = typeof vgcLimitlessTournaments.$inferSelect;
@@ -156,6 +163,7 @@ export const vgcLimitlessTeams = mysqlTable('vgc_limitless_teams', {
   tournamentId: int('tournament_id'),
   playerSlug:   varchar('player_slug', { length: 128 }).notNull(),
   playerName:   varchar('player_name', { length: 128 }),
+  placing:      int('placing'),
   record:       varchar('record',      { length: 16  }),                // e.g. '7-2-0'
   pasteId:      int('paste_id').references(() => vgcPastes.id),         // null until paste scraped
   fetchedAt:    datetime('fetched_at').notNull(),

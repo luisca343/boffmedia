@@ -118,13 +118,21 @@ export type SpeciesEntry = { id: string; name: string; num: number };
 
 const SPRITE_BASE      = 'https://play.pokemonshowdown.com/sprites/home-centered/';
 const SPRITE_BASE_GEN5 = 'https://play.pokemonshowdown.com/sprites/gen5/';
+const SPRITE_BASE_DEX  = 'https://play.pokemonshowdown.com/sprites/dex/';
 const SUBSTITUTE_URL   = 'https://play.pokemonshowdown.com/sprites/dex/substitute.png';
 
 /** Explicit Showdown slug overrides for forms that don't follow any generic rule. */
 const SPRITE_SLUG_OVERRIDES: Record<string, string> = {
   'urshifu-single-strike': 'urshifu',      // single-strike is the base form — no suffix
-  'floette-eternal-mega':  'floette-mega', // Eternal form drops its infix in the sprite slug
 };
+
+/**
+ * Slugs that only exist in the dex sprite sheet — no home-centered or gen5 asset.
+ * These bypass base URL selection entirely.
+ */
+const SPRITE_DEX_SLUGS = new Set([
+  'floette-eternal', // AZ's Floette — only available in dex sprites
+]);
 
 /**
  * Collapses double-hyphenated form names to the Showdown sprite convention:
@@ -152,6 +160,7 @@ export function spriteUrl(speciesName: string): string {
     .toLowerCase()
     .replace(/[^a-z0-9\- ]/g, '')
     .replace(/\s+/g, '-');
+  if (SPRITE_DEX_SLUGS.has(slug)) return `${SPRITE_BASE_DEX}${slug}.png`;
   const base = isMegaSlug(slug) ? SPRITE_BASE_GEN5 : SPRITE_BASE;
   if (SPRITE_SLUG_OVERRIDES[slug]) return `${base}${SPRITE_SLUG_OVERRIDES[slug]}.png`;
   return `${base}${normalizeFormSlug(slug)}.png`;
