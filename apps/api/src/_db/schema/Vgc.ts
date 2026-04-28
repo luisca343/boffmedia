@@ -176,3 +176,23 @@ export const vgcLimitlessTeams = mysqlTable('vgc_limitless_teams', {
 ]);
 
 export type VgcLimitlessTeam = typeof vgcLimitlessTeams.$inferSelect;
+
+/**
+ * Champions regulation definitions — persisted in DB so new regulations can be
+ * added via the admin panel without a code deploy.
+ *
+ * formatId must correspond to a format registered in the Champions mod
+ * (champions.mod.ts). The mod itself stays in code; only the data-sourcing
+ * config (GID, name, etc.) lives here.
+ */
+export const vgcRegulations = mysqlTable('vgc_regulations', {
+  id:            varchar('id',             { length: 64  }).primaryKey(),  // e.g. 'vgc2026regma'
+  formatId:      varchar('format_id',      { length: 128 }).notNull(),     // e.g. 'gen9championsvgc2026regma'
+  name:          varchar('name',           { length: 255 }).notNull(),
+  gameType:      varchar('game_type',      { length: 16  }).notNull().default('doubles'),
+  vgcPastesGid:  varchar('vgcpastes_gid',  { length: 32  }),               // null = no VGCPastes sheet
+  active:        int('active').notNull().default(1),                        // 0 = soft-disabled
+  createdAt:     datetime('created_at').notNull(),
+});
+
+export type VgcRegulation = typeof vgcRegulations.$inferSelect;

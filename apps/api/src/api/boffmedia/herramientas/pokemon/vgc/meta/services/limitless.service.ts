@@ -2,10 +2,10 @@
 import { Dex } from '@pkmn/sim';
 import { LimitlessRepository } from '../repositories/limitless.repository';
 import { PastesRepository } from '../repositories/pastes.repository';
+import { VgcRegulationsRepository } from '../repositories/regulations.repository';
 import { PokemonUsageDetail, LimitlessPlayer } from '../entities/pokemon-usage.entity';
 import { VgcMetaSlot } from '@/_db/schema/Vgc';
 import { LIMITLESS_API_BASE } from '../config/smogon.config';
-import { CHAMPIONS_REGULATIONS } from '../../champions-data';
 import { getDexForFormat, resolveSpeciesId } from '../utils/dex-resolver';
 
 // ─── Limitless API types ─────────────────────────────────────────────────────
@@ -176,6 +176,7 @@ export class LimitlessService {
   constructor(
     private readonly limitlessRepository: LimitlessRepository,
     private readonly pastesRepository:    PastesRepository,
+    private readonly regulationsRepository: VgcRegulationsRepository,
   ) {}
 
   private extractLimitlessId(url: string): string {
@@ -235,8 +236,8 @@ export class LimitlessService {
     regulationId: string,
     maxPlayers?:  number,
   ): Promise<void> {
-    const regulation = CHAMPIONS_REGULATIONS[regulationId];
-    const dexForFormat = getDexForFormat(regulation?.formatId);
+    const regulation   = await this.regulationsRepository.findById(regulationId);
+    const dexForFormat = getDexForFormat(regulation?.formatId ?? undefined);
 
     const detailsRes = await fetch(`${LIMITLESS_API_BASE}/tournaments/${limitlessId}/details`);
     if (!detailsRes.ok) throw new Error(`Details fetch failed: HTTP ${detailsRes.status}`);
@@ -279,6 +280,7 @@ export class LimitlessService {
       const pasteId = await this.pastesRepository.upsertPaste({
         rawText:     decklistToText(standing.decklist ?? [], dexForFormat),
         parsedSlots: slots,
+        formatId:    regulation?.formatId ?? null,
       });
 
       await this.limitlessRepository.insertTeam({
@@ -322,7 +324,7 @@ export class LimitlessService {
     if (!tournament) {
       throw new NotFoundException(`Tournament ${tournamentId} not found`);
     }
-    const regulation = CHAMPIONS_REGULATIONS[tournament.regulationId];
+    const regulation   = await this.regulationsRepository.findById(tournament.regulationId ?? '');
     const dexForFormat = getDexForFormat(regulation?.formatId ?? tournament.format ?? undefined);
 
     const teams = await this.limitlessRepository.findTeamsWithPastes(tournamentId);
@@ -338,8 +340,8 @@ export class LimitlessService {
   }
 
   async getCombinedUsage(regulationId: string): Promise<PokemonUsageDetail[]> {
-    const regulation = CHAMPIONS_REGULATIONS[regulationId];
-    const dexForFormat = getDexForFormat(regulation?.formatId);
+    const regulation   = await this.regulationsRepository.findById(regulationId);
+    const dexForFormat = getDexForFormat(regulation?.formatId ?? undefined);
 
     const tournaments = await this.limitlessRepository.findTournamentsByRegulation(regulationId);
     if (tournaments.length === 0) {

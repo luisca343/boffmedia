@@ -205,4 +205,44 @@ export class LimitlessRepository {
       .set({ pasteId })
       .where(eq(vgcLimitlessTeams.id, teamId));
   }
+
+  /**
+   * Returns all Limitless teams with their parsed paste for a regulation.
+   * Used to build the "teams featuring this Pokémon" panel — filtered in-app.
+   */
+  async findTeamsByRegulationWithPastes(regulationId: string): Promise<Array<{
+    playerSlug:  string;
+    playerName:  string | null;
+    placing:     number | null;
+    record:      string | null;
+    parsedSlots: string;
+    rawText:     string;
+  }>> {
+    const rows = await this.db
+      .select({
+        playerSlug:  vgcLimitlessTeams.playerSlug,
+        playerName:  vgcLimitlessTeams.playerName,
+        placing:     vgcLimitlessTeams.placing,
+        record:      vgcLimitlessTeams.record,
+        parsedSlots: vgcPastes.parsedSlots,
+        rawText:     vgcPastes.rawText,
+      })
+      .from(vgcLimitlessTeams)
+      .innerJoin(vgcPastes, eq(vgcLimitlessTeams.pasteId, vgcPastes.id))
+      .innerJoin(vgcLimitlessTournaments, eq(vgcLimitlessTeams.tournamentId, vgcLimitlessTournaments.id))
+      .where(
+        and(
+          eq(vgcLimitlessTournaments.regulationId, regulationId),
+          eq(vgcLimitlessTournaments.status, 'done'),
+        ),
+      );
+    return rows as Array<{
+      playerSlug:  string;
+      playerName:  string | null;
+      placing:     number | null;
+      record:      string | null;
+      parsedSlots: string;
+      rawText:     string;
+    }>;
+  }
 }
