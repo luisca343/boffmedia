@@ -6,7 +6,7 @@ import { PokemonUsageDetail, LimitlessPlayer } from '../entities/pokemon-usage.e
 import { VgcMetaSlot } from '@/_db/schema/Vgc';
 import { LIMITLESS_API_BASE } from '../config/smogon.config';
 import { CHAMPIONS_REGULATIONS } from '../../champions-data';
-import { initChampionsMod } from '../../champions.mod';
+import { getDexForFormat, resolveSpeciesId } from '../utils/dex-resolver';
 
 // ─── Limitless API types ─────────────────────────────────────────────────────
 
@@ -39,18 +39,6 @@ interface LimitlessApiDetails {
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
-
-function getDexForFormat(formatId?: string) {
-  initChampionsMod();
-  if (!formatId) return Dex;
-  const format = Dex.formats.get(formatId);
-  return format.exists ? Dex.forFormat(format) : Dex;
-}
-
-function toSpeciesId(name: string, dex: typeof Dex): string {
-  const s = dex.species.get(name);
-  return s.exists ? s.id : name.toLowerCase().replace(/[^a-z0-9]/g, '');
-}
 
 /**
  * Resolve a canonical species name from a Limitless decklist entry.
@@ -202,7 +190,7 @@ export class LimitlessService {
       const speciesName = resolveSpeciesName(entry, dexForFormat);
       return {
         slotIndex:   i as 0 | 1 | 2 | 3 | 4 | 5,
-        speciesId:   toSpeciesId(speciesName, dexForFormat),
+        speciesId:   resolveSpeciesId(speciesName, dexForFormat),
         speciesName,
         item:        entry.item    || undefined,
         ability:     entry.ability || undefined,
@@ -344,8 +332,8 @@ export class LimitlessService {
       );
     }
     const teamSlots = teams
-      .filter((t) => t.parsedSlots)
-      .map((t) => JSON.parse(t.parsedSlots!) as VgcMetaSlot[]);
+      .filter((t): t is typeof t & { parsedSlots: string } => t.parsedSlots !== null)
+      .map((t) => JSON.parse(t.parsedSlots) as VgcMetaSlot[]);
     return aggregateSlots(teamSlots, dexForFormat);
   }
 
