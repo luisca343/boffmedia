@@ -44,8 +44,8 @@ export interface UseMetaNavigationResult extends MetaNavigationHandlers {
 function buildUrl(opts: MetaUrlState) {
   const { speciesId, tab, format, month, cutoff, regulation, tournamentId, view } = opts;
   const params = new URLSearchParams();
-  if (tab !== "ladder") params.set("tab", tab);
-  if (tab === "ladder") {
+  if (tab !== "stats") params.set("tab", tab);
+  if (tab === "stats") {
     if (format) params.set("format", format);
     if (month)  params.set("month",  month);
     if (cutoff !== DEFAULT_CUTOFF) params.set("cutoff", String(cutoff));
@@ -53,8 +53,6 @@ function buildUrl(opts: MetaUrlState) {
     if (regulation)             params.set("regulation",   regulation);
     if (tournamentId)           params.set("tournamentId", tournamentId);
     if (view && view !== "aggregate") params.set("view", view);
-  } else {
-    if (regulation) params.set("regulation", regulation);
   }
   const base = speciesId ? `${BASE_PATH}/${speciesId}` : BASE_PATH;
   const qs   = params.toString();
@@ -83,7 +81,7 @@ export function useMetaNavigation({
   const rawParams    = useParams();
 
   const speciesId    = rawParams?.speciesId as string | undefined;
-  const tab          = searchParams.get("tab")          ?? "ladder";
+  const tab          = searchParams.get("tab")          ?? "stats";
   const format       = searchParams.get("format")       ?? "";
   const month        = searchParams.get("month")        ?? "";
   const cutoff       = Number(searchParams.get("cutoff") ?? DEFAULT_CUTOFF);
@@ -91,18 +89,21 @@ export function useMetaNavigation({
   const tournamentId = searchParams.get("tournamentId") ?? "";
   const view         = searchParams.get("view")         ?? "aggregate";
 
-  // Auto-navigate to first Smogon snapshot when Ladder tab has no format set
+  // Auto-navigate when Stats tab has no format: try first Smogon snapshot, fall back to first preview regulation
   useEffect(() => {
-    if (tab !== "ladder") return;
-    if (snapshots.length > 0 && !searchParams.get("format")) {
+    if (tab !== "stats") return;
+    if (searchParams.get("format")) return;
+    if (snapshots.length > 0) {
       const first = snapshots[0];
       router.replace(buildUrl({ speciesId, tab, format: first.formatId, month: first.month, cutoff: first.cutoff, regulation, tournamentId, view }));
+    } else if (regulations.length > 0) {
+      router.replace(buildUrl({ speciesId, tab, format: regulations[0].id, month: "", cutoff: DEFAULT_CUTOFF, regulation, tournamentId, view }));
     }
-  }, [snapshots]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [snapshots, regulations]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Auto-navigate to first regulation when Champions tab has no selection
+  // Auto-navigate to first regulation when Tournament tab has no regulation set
   useEffect(() => {
-    if (tab !== "champions") return;
+    if (tab !== "tournament") return;
     if (regulations.length > 0 && !searchParams.get("regulation")) {
       router.replace(buildUrl({ speciesId, tab, format, month, cutoff, regulation: regulations[0].id, tournamentId, view }));
     }
