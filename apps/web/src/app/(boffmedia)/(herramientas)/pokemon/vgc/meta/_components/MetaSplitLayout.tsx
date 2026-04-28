@@ -18,11 +18,10 @@ interface Props {
  */
 export function MetaSplitLayout({ sidebar, detail, hasSelection }: Props) {
   return (
-    <div className="flex">
+    <div className="flex h-full">
       <aside
         className={cn(
-          "shrink-0 border-r border-surface-800 flex flex-col overflow-hidden",
-          "md:sticky md:top-0 md:self-start md:h-screen",
+          "shrink-0 border-r border-surface-800 flex flex-col overflow-y-auto",
           hasSelection
             ? "hidden md:flex md:w-72 xl:w-80"
             : "flex w-full md:w-72 xl:w-80",
@@ -30,7 +29,7 @@ export function MetaSplitLayout({ sidebar, detail, hasSelection }: Props) {
       >
         {sidebar}
       </aside>
-      <main className={cn("flex-1 min-w-0", hasSelection ? "block" : "hidden md:block")}>
+      <main className={cn("flex-1 min-w-0 overflow-y-auto", hasSelection ? "block" : "hidden md:block")}>
         {detail}
       </main>
     </div>
