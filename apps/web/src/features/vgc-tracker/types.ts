@@ -46,6 +46,7 @@ export interface Session {
   startElo?: number;
   startedAt: number;
   tournamentName?: string;
+  limitlessTournamentId?: number;
   archivedAt?: number;
   sessionNotes?: string;
 }

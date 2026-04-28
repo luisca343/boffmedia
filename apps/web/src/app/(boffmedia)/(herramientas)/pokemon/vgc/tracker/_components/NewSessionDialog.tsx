@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Trophy, TrendingUp, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { VgcService, ChampionsRegulation } from '@/services/api/boffmedia/vgcService';
+import { VgcService, ChampionsRegulation, LimitlessTournament } from '@/services/api/boffmedia/vgcService';
 import type { MatchFormat, Session, SessionType, TeamPreset } from '@/features/vgc-tracker/types';
 
 interface Props {
@@ -23,6 +23,8 @@ export function NewSessionDialog({ presets, onConfirm, onClose }: Props) {
   const [activePresetId, setActivePresetId] = useState(presets[0]?.id ?? '');
   const [startElo, setStartElo] = useState('');
   const [regulations, setRegulations] = useState<ChampionsRegulation[]>([]);
+  const [limitlessTournaments, setLimitlessTournaments] = useState<LimitlessTournament[]>([]);
+  const [limitlessTournamentId, setLimitlessTournamentId] = useState<number | undefined>(undefined);
 
   // Tournament mode defaults to BO3
   useEffect(() => {
@@ -39,6 +41,19 @@ export function NewSessionDialog({ presets, onConfirm, onClose }: Props) {
     });
   }, []);
 
+  // Fetch completed Limitless tournaments for the selected regulation (tournament mode only)
+  useEffect(() => {
+    if (sessionType !== 'tournament' || !regulationId) return;
+    setLimitlessTournaments([]);
+    setLimitlessTournamentId(undefined);
+    VgcService.getLimitlessTournaments(regulationId).then((res) => {
+      if (res.success && res.data) {
+        const done = res.data.filter((t) => t.status === 'done');
+        setLimitlessTournaments(done);
+      }
+    });
+  }, [sessionType, regulationId]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!label.trim() || !regulationId) return;
@@ -51,6 +66,7 @@ export function NewSessionDialog({ presets, onConfirm, onClose }: Props) {
       activePresetId,
       startElo: sessionType === 'ladder' && !isNaN(parsed) ? parsed : undefined,
       tournamentName: sessionType === 'tournament' ? (tournamentName.trim() || undefined) : undefined,
+      limitlessTournamentId: sessionType === 'tournament' ? limitlessTournamentId : undefined,
     });
   };
 
@@ -103,6 +119,31 @@ export function NewSessionDialog({ presets, onConfirm, onClose }: Props) {
                 placeholder={t('placeholders.tournamentName')}
                 className="bg-surface-800 border border-surface-600 rounded-lg px-3 py-2 text-surface-50 placeholder:text-surface-500 focus:outline-none focus:border-amber-500 text-sm"
               />
+            </div>
+          )}
+
+          {/* Limitless tournament link (tournament only, optional) */}
+          {sessionType === 'tournament' && (
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-medium text-surface-400 uppercase tracking-wide">
+                {t('labels.limitlessTournament')}
+                <span className="ml-1 text-surface-600 normal-case font-normal">({t('labels.optional')})</span>
+              </label>
+              <select
+                value={limitlessTournamentId ?? ''}
+                onChange={(e) => setLimitlessTournamentId(e.target.value ? Number(e.target.value) : undefined)}
+                className="bg-surface-800 border border-surface-600 rounded-lg px-3 py-2 text-surface-50 focus:outline-none focus:border-amber-500 text-sm"
+              >
+                <option value="">{t('labels.noTournamentLink')}</option>
+                {limitlessTournaments.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.name ?? t.limitlessId}{t.date ? ` · ${t.date}` : ''}
+                  </option>
+                ))}
+              </select>
+              {limitlessTournaments.length === 0 && regulationId && (
+                <p className="text-[11px] text-surface-600">{t('labels.noImportedTournaments')}</p>
+              )}
             </div>
           )}
 

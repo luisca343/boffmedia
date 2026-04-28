@@ -174,7 +174,11 @@
         "startDate": "Fecha y hora de inicio",
         "minsPerGame": "Minutos por partida",
         "showdownPaste": "Paste de Showdown",
-        "tournamentName": "Nombre del torneo"
+        "tournamentName": "Nombre del torneo",
+        "limitlessTournament": "Vincular torneo de Limitless",
+        "optional": "opcional",
+        "noTournamentLink": "Ninguno",
+        "noImportedTournaments": "No hay torneos importados para esta regulación"
       },
       "placeholders": {
         "rivalName": "Nombre del rival…",
@@ -313,6 +317,9 @@
       },
       "speedWidget": {
         "label": "Velocidades",
+        "expand": "Mostrar",
+        "collapse": "Ocultar",
+        "summary": "{count} mons · {min}-{max}",
         "tailwind": "VA ×2",
         "scarf": "Pañuelo ×1.5",
         "trickroom": "ER ↕"
