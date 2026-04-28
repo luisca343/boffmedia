@@ -290,6 +290,7 @@ export default function SessionPage({ params }: Props) {
           sessionId={sessionId}
           regulationId={session?.regulationId}
           startElo={session?.startElo}
+          limitlessTournamentId={session?.limitlessTournamentId}
           ladderSessions={sessions.filter((s) => s.type === 'ladder')}
         />
       ) : loading ? (

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { vgcDb } from '@/lib/db/vgc-db';
 import { buildOppUsage, type PokemonUsage, type FinishedMatch } from '../utils/sessionStats';
+import { VgcService } from '@/services/api/boffmedia/vgcService';
 import type { Match } from '../types';
 
 export interface RegulationMeta {
@@ -10,13 +11,17 @@ export interface RegulationMeta {
   leads: PokemonUsage[];
   backs: PokemonUsage[];
   totalMatches: number;
+  /** Optional tournament usage % per speciesId (from Limitless combined usage) */
+  tournamentUsageMap?: Map<string, number>;
 }
 
 export function useRegulationMeta(
   regulationId: string | undefined,
+  limitlessTournamentId?: number,
 ): { meta: RegulationMeta | null; loading: boolean } {
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
+  const [tournamentUsageMap, setTournamentUsageMap] = useState<Map<string, number>>();
 
   useEffect(() => {
     if (!regulationId) {
@@ -40,6 +45,30 @@ export function useRegulationMeta(
     });
   }, [regulationId]);
 
+  // Fetch tournament usage data if a tournament ID is provided
+  useEffect(() => {
+    if (!regulationId || !limitlessTournamentId) {
+      setTournamentUsageMap(undefined);
+      return;
+    }
+
+    VgcService.getLimitlessCombinedUsage(regulationId)
+      .then((response) => {
+        if (response.success && response.data) {
+          // Create a map of speciesId -> usagePercent
+          const map = new Map<string, number>();
+          response.data.forEach((entry) => {
+            map.set(entry.speciesId, entry.usagePercent);
+          });
+          setTournamentUsageMap(map);
+        }
+      })
+      .catch(() => {
+        // If fetch fails, just skip tournament data
+        setTournamentUsageMap(undefined);
+      });
+  }, [regulationId, limitlessTournamentId]);
+
   const meta = useMemo((): RegulationMeta | null => {
     const finished = matches.filter(
       (m): m is FinishedMatch => m.result !== undefined,
@@ -51,8 +80,9 @@ export function useRegulationMeta(
       leads: buildOppUsage(finished, (r) => r === 'lead1' || r === 'lead2', false),
       backs: buildOppUsage(finished, (r) => r === 'back1' || r === 'back2', false),
       totalMatches: finished.length,
+      tournamentUsageMap,
     };
-  }, [matches]);
+  }, [matches, tournamentUsageMap]);
 
   return { meta, loading };
 }
