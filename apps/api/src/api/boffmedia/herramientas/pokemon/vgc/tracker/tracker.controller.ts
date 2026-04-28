@@ -4,13 +4,22 @@ import {
 import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { TrackerService } from './tracker.service';
-import { CreateMatchDto, CreatePresetDto, CreateSessionDto, UpdateMatchDto } from './dto';
+import { CreateMatchDto, CreatePresetDto, CreateSessionDto, UpsertSeriesDto } from './dto';
 
 @ApiTags('BoffMedia 🛠 | Pokémon VGC Tracker')
 @Controller('tools/vgc/tracker')
 @UseInterceptors(ResponseInterceptor)
 export class TrackerController {
   constructor(private readonly service: TrackerService) {}
+
+  // ─── Sync ─────────────────────────────────────────────────────────────────────
+
+  @Get('sync')
+  @ApiQuery({ name: 'userId', required: true, type: Number })
+  @ApiOperation({ summary: 'Pull all tracker data for a user (sessions, matches, series, presets)' })
+  syncAll(@Query('userId') userId: number) {
+    return this.service.syncAll(+userId);
+  }
 
   // ─── Presets ────────────────────────────────────────────────────────────────
 
@@ -70,14 +79,35 @@ export class TrackerController {
   }
 
   @Put('matches/:id')
-  @ApiOperation({ summary: 'Update match result, teams, or notes' })
-  updateMatch(@Param('id') id: string, @Body() dto: UpdateMatchDto) {
-    return this.service.updateMatch(id, dto);
+  @ApiOperation({ summary: 'Upsert (create or update) a match' })
+  upsertMatch(@Param('id') id: string, @Body() dto: CreateMatchDto) {
+    return this.service.upsertMatch({ ...dto, id });
   }
 
   @Delete('matches/:id')
   @ApiOperation({ summary: 'Delete a match' })
   deleteMatch(@Param('id') id: string) {
     return this.service.deleteMatch(id);
+  }
+
+  // ─── Series ──────────────────────────────────────────────────────────────────
+
+  @Get('sessions/:sessionId/series')
+  @ApiOperation({ summary: 'List series for a session' })
+  getSeries(@Param('sessionId') sessionId: string) {
+    return this.service.getSeriesForSession(sessionId);
+  }
+
+  @Put('series/:id')
+  @ApiParam({ name: 'id', description: 'Series UUID' })
+  @ApiOperation({ summary: 'Create or update a series' })
+  upsertSeries(@Param('id') id: string, @Body() dto: UpsertSeriesDto) {
+    return this.service.upsertSeries({ ...dto, id });
+  }
+
+  @Delete('series/:id')
+  @ApiOperation({ summary: 'Delete a series' })
+  deleteSeries(@Param('id') id: string) {
+    return this.service.deleteSeries(id);
   }
 }

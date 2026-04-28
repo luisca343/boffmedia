@@ -6,9 +6,11 @@ import {
   vgcSessions,
   vgcTeamPresets,
   vgcMatches,
+  vgcSeries,
   VgcSession,
   VgcTeamPreset,
   VgcMatch,
+  VgcSeries,
   TeamSnapshotData,
   MatchNoteData,
   PresetSlotData,
@@ -40,15 +42,33 @@ export class TrackerRepository {
     regulationId: string;
     exportString: string;
     slots: PresetSlotData[];
+    currentVersion?: number;
+    versions?: any[];
+    createdAt?: Date;
+    updatedAt?: Date;
   }): Promise<void> {
-    await this.db.insert(vgcTeamPresets).values({
-      ...data,
+    const row = {
+      id: data.id,
+      userId: data.userId,
+      name: data.name,
+      regulationId: data.regulationId,
+      exportString: data.exportString,
       slots: JSON.stringify(data.slots),
-    }).onDuplicateKeyUpdate({
+      currentVersion: data.currentVersion ?? 1,
+      versions: JSON.stringify(data.versions ?? []),
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
+    };
+
+    await this.db.insert(vgcTeamPresets).values(row).onDuplicateKeyUpdate({
       set: {
         name: data.name,
+        regulationId: data.regulationId,
         exportString: data.exportString,
         slots: JSON.stringify(data.slots),
+        currentVersion: data.currentVersion ?? 1,
+        versions: JSON.stringify(data.versions ?? []),
+        updatedAt: data.updatedAt,
       },
     });
   }
@@ -98,10 +118,14 @@ export class TrackerRepository {
     sessionId: string;
     userId?: number;
     format: 'BO1' | 'BO3';
+    createdAt?: Date;
     myTeam: TeamSnapshotData;
     opponentTeam: TeamSnapshotData;
     opponentName?: string;
+    opponentArchetype?: string;
     result?: 'win' | 'loss' | 'draw';
+    outcomeTag?: string;
+    turnCount?: number;
     eloAfter?: number;
     opponentElo?: number;
     notes: MatchNoteData[];
@@ -118,5 +142,66 @@ export class TrackerRepository {
 
   async deleteMatch(id: string): Promise<void> {
     await this.db.delete(vgcMatches).where(eq(vgcMatches.id, id));
+  }
+
+  // ─── Series ──────────────────────────────────────────────────────────────────
+
+  async findSeriesForSession(sessionId: string): Promise<VgcSeries[]> {
+    return this.db
+      .select()
+      .from(vgcSeries)
+      .where(eq(vgcSeries.sessionId, sessionId))
+      .orderBy(desc(vgcSeries.createdAt));
+  }
+
+  async findSeries(id: string): Promise<VgcSeries | undefined> {
+    const [row] = await this.db.select().from(vgcSeries).where(eq(vgcSeries.id, id));
+    return row;
+  }
+
+  async upsertSeries(data: {
+    id: string;
+    sessionId: string;
+    userId?: number;
+    createdAt: number;
+    completedAt?: number;
+    roundNumber?: number;
+    opponentName?: string;
+    opponentArchetype?: string;
+    myTeam: any;
+    opponentTeam: any;
+    games: any[];
+    seriesResult?: string;
+    notes: any[];
+  }): Promise<void> {
+    const row = {
+      ...data,
+      myTeam: JSON.stringify(data.myTeam),
+      opponentTeam: JSON.stringify(data.opponentTeam),
+      games: JSON.stringify(data.games),
+      notes: JSON.stringify(data.notes),
+    };
+    await this.db.insert(vgcSeries).values(row as any).onDuplicateKeyUpdate({ set: row as any });
+  }
+
+  async deleteSeries(id: string): Promise<void> {
+    await this.db.delete(vgcSeries).where(eq(vgcSeries.id, id));
+  }
+
+  // ─── Sync ─────────────────────────────────────────────────────────────────────
+
+  async findAllByUser(userId: number): Promise<{
+    sessions: VgcSession[];
+    matches: VgcMatch[];
+    series: VgcSeries[];
+    presets: VgcTeamPreset[];
+  }> {
+    const [sessions, matches, seriesList, presets] = await Promise.all([
+      this.db.select().from(vgcSessions).where(eq(vgcSessions.userId, userId)).orderBy(desc(vgcSessions.startedAt)),
+      this.db.select().from(vgcMatches).where(eq(vgcMatches.userId, userId)).orderBy(desc(vgcMatches.createdAt)),
+      this.db.select().from(vgcSeries).where(eq(vgcSeries.userId, userId)).orderBy(desc(vgcSeries.createdAt)),
+      this.db.select().from(vgcTeamPresets).where(eq(vgcTeamPresets.userId, userId)).orderBy(desc(vgcTeamPresets.createdAt)),
+    ]);
+    return { sessions, matches, series: seriesList, presets };
   }
 }
