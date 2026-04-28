@@ -6,19 +6,7 @@ import { CHAMPIONS_REGULATIONS, ChampionsRegulation } from '../../champions-data
 import { POKEPASTE_CONCURRENCY, VGCPASTES_SHEET_BASE } from '../config/smogon.config';
 import { VgcMetaSlot, StatSpread } from '@/_db/schema/Vgc';
 import { PokepasteService } from './pokepaste.service';
-import { initChampionsMod } from '../../champions.mod';
-
-function getDexForFormat(formatId?: string) {
-  initChampionsMod();
-  if (!formatId) return Dex;
-  const format = Dex.formats.get(formatId);
-  return format.exists ? Dex.forFormat(format) : Dex;
-}
-
-function toSpeciesId(name: string, dex: typeof Dex): string {
-  const s = dex.species.get(name);
-  return s.exists ? s.id : name.toLowerCase().replace(/[^a-z0-9]/g, '');
-}
+import { getDexForFormat, resolveSpeciesId } from '../utils/dex-resolver';
 
 /**
  * Full RFC-4180 CSV parser. Handles quoted fields that contain commas,
@@ -190,7 +178,8 @@ export class VgcPastesService {
             await this.vgcPastesRepository.linkPaste(team.id, pasteId);
             if (wasCached) cached++; else fetched++;
           } catch (e) {
-            this.logger.warn(`Paste fetch failed for team ${team.id}: ${e.message}`);
+            const msg = e instanceof Error ? e.message : String(e);
+            this.logger.warn(`Paste fetch failed for team ${team.id}: ${msg}`);
             failed++;
           }
         }),
@@ -294,7 +283,7 @@ export class VgcPastesService {
 
     for (const { species } of parsedTeams) {
       for (const name of species) {
-        const id = toSpeciesId(name, dexForFormat);
+        const id = resolveSpeciesId(name, dexForFormat);
         speciesCounts.set(id, (speciesCounts.get(id) ?? 0) + 1);
         if (!speciesDisplay.has(id)) {
           const s = dexForFormat.species.get(name);
@@ -311,7 +300,7 @@ export class VgcPastesService {
       for (let i = 0; i < species.length; i++) {
         const itemName = items[i];
         if (!itemName) continue;
-        const id  = toSpeciesId(species[i], dexForFormat);
+        const id  = resolveSpeciesId(species[i], dexForFormat);
         const row = itemMatrix.get(id) ?? new Map<string, number>();
         row.set(itemName, (row.get(itemName) ?? 0) + 1);
         itemMatrix.set(id, row);
@@ -321,7 +310,7 @@ export class VgcPastesService {
     // ── Teammate co-occurrence ────────────────────────────────────────────────
     const teammateMatrix = new Map<string, Map<string, number>>();
     for (const { species } of parsedTeams) {
-      const ids = species.map((name) => toSpeciesId(name, dexForFormat));
+      const ids = species.map((name) => resolveSpeciesId(name, dexForFormat));
       for (const id of ids) {
         const row = teammateMatrix.get(id) ?? new Map<string, number>();
         for (const other of ids) {

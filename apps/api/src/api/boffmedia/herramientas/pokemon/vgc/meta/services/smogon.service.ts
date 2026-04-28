@@ -6,18 +6,7 @@ import { VgcSmogonSnapshot, VgcSmogonPokemonRow } from '@/_db/schema/Vgc';
 import { smogonUsageUrl, smogonMovesetUrl } from '../config/smogon.config';
 import { parseUsageTxt } from '../utils/parse-usage-txt';
 import { parseMovesetTxt } from '../utils/parse-moveset-txt';
-import { initChampionsMod } from '../../champions.mod';
-
-function getDexForFormat(formatId: string) {
-  initChampionsMod();
-  const format = Dex.formats.get(formatId);
-  return format.exists ? Dex.forFormat(format) : Dex;
-}
-
-function toSpeciesId(displayName: string): string {
-  const s = Dex.species.get(displayName);
-  return s.exists ? s.id : displayName.toLowerCase().replace(/[^a-z0-9]/g, '');
-}
+import { getDexForFormat, resolveSpeciesId } from '../utils/dex-resolver';
 
 @Injectable()
 export class SmogonService {
@@ -73,7 +62,7 @@ export class SmogonService {
         formatId,
         month,
         cutoff,
-        speciesId:    toSpeciesId(entry.name),
+        speciesId:    resolveSpeciesId(entry.name, Dex),
         speciesName:  entry.name,
         rank:         entry.rank,
         usagePercent: entry.usagePercent,

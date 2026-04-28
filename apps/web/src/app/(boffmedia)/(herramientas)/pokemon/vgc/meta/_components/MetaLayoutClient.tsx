@@ -19,13 +19,7 @@ import { PokemonSidebar } from "./PokemonSidebar";
 import { PokemonDetailView } from "./PokemonDetailView";
 import { StandingsView } from "./StandingsView";
 import { MetaSplitLayout } from "./MetaSplitLayout";
-
-const FORMAT_LABELS: Record<string, string> = {
-  gen9vgc2026regi: "VGC 2026 Reg I",
-  gen9vgc2026regh: "VGC 2026 Reg H",
-  gen9vgc2025regg: "VGC 2025 Reg G",
-  gen9vgc2025regf: "VGC 2025 Reg F",
-};
+import { FORMAT_LABELS } from "../constants";
 
 export function MetaLayoutClient() {
   const t            = useTranslations("vgc.meta");
