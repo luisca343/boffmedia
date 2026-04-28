@@ -6,6 +6,13 @@ import { VgcSmogonSnapshot, VgcSmogonPokemonRow } from '@/_db/schema/Vgc';
 import { smogonUsageUrl, smogonMovesetUrl } from '../config/smogon.config';
 import { parseUsageTxt } from '../utils/parse-usage-txt';
 import { parseMovesetTxt } from '../utils/parse-moveset-txt';
+import { initChampionsMod } from '../../champions.mod';
+
+function getDexForFormat(formatId: string) {
+  initChampionsMod();
+  const format = Dex.formats.get(formatId);
+  return format.exists ? Dex.forFormat(format) : Dex;
+}
 
 function toSpeciesId(displayName: string): string {
   const s = Dex.species.get(displayName);
@@ -115,7 +122,8 @@ export class SmogonService {
         `No data for ${formatId} ${month}-${cutoff}. Fetch from the admin panel first.`,
       );
     }
-    return rows.map((row) => this.toDetail(row));
+    const dex = getDexForFormat(formatId);
+    return rows.map((row) => this.toDetail(row, dex));
   }
 
   async getPokemonDetail(
@@ -130,7 +138,7 @@ export class SmogonService {
         `Species "${speciesId}" not found in ${formatId} ${month}-${cutoff}`,
       );
     }
-    return this.toDetail(row);
+    return this.toDetail(row, getDexForFormat(formatId));
   }
 
   /** Probe Smogon index for the latest available month — used as a helper in the admin panel */
@@ -151,8 +159,8 @@ export class SmogonService {
 
   // ─── Private ────────────────────────────────────────────────────────────────
 
-  private toDetail(row: VgcSmogonPokemonRow): PokemonUsageDetail {
-    const species  = Dex.species.get(row.speciesName);
+  private toDetail(row: VgcSmogonPokemonRow, dex: typeof Dex): PokemonUsageDetail {
+    const species  = dex.species.get(row.speciesName);
     const baseStats = species.exists
       ? species.baseStats
       : { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
