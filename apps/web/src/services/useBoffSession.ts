@@ -1,11 +1,13 @@
 import { useSession } from "next-auth/react"
 import { Session } from "next-auth"
 import { forceSessionRefresh } from "@/utils/refreshSession"
+import { USER_ROLES } from "@boffmedia/shared"
+import type { UserRole } from "@boffmedia/shared"
 
 export const useBoffSession = () => {
   const { data: session, status, update } = useSession()
 
-  function hasRole(role: string | string[]) {
+  function hasRole(role: UserRole | UserRole[]) {
     if (!session?.user?.roles) return false
     
     if (Array.isArray(role)) {
@@ -16,11 +18,11 @@ export const useBoffSession = () => {
   }
 
   function isBoffAdmin() {
-    return hasRole('BOFF_ADMIN')
+    return hasRole(USER_ROLES.BOFF_ADMIN)
   }
 
   function isRotomAdmin() {
-    return hasRole('TERAS_ADMIN')
+    return hasRole(USER_ROLES.ROTOM_ADMIN)
   }
 
   function getMinecraftUUID() {

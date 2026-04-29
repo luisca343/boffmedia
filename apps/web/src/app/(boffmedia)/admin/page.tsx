@@ -15,6 +15,7 @@ import { VgcSmogonFetcher } from "./_components/tools/VgcSmogonFetcher";
 import { VgcChampionsFetcher } from "./_components/tools/VgcChampionsFetcher";
 import { VgcLimitlessFetcher } from "./_components/tools/VgcLimitlessFetcher";
 import { ToastContainer } from "react-toastify";
+import { USER_ROLES } from "@boffmedia/shared";
 import "react-toastify/dist/ReactToastify.css";
 
 const NAV = [
@@ -58,7 +59,7 @@ function AdminContent() {
     );
   }
 
-  if (!session?.user.roles.includes("BOFF_ADMIN")) {
+  if (!session?.user.roles.includes(USER_ROLES.BOFF_ADMIN)) {
     return <UnauthorizedPage />;
   }
 
