@@ -278,6 +278,7 @@ export class LimitlessService {
       const slots    = this.convertDecklist(standing.decklist, dexForFormat);
 
       const pasteId = await this.pastesRepository.upsertPaste({
+        sourceKey:   `limitless:${limitlessId}:${standing.player}`,
         rawText:     decklistToText(standing.decklist ?? [], dexForFormat),
         parsedSlots: slots,
         formatId:    regulation?.formatId ?? null,

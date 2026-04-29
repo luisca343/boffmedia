@@ -77,15 +77,17 @@ export class VgcRegulationsRepository {
     importStatus?: string;
     importError?: string | null;
     importTeamCount?: number;
+    importFetchedCount?: number;
     importStartedAt?: Date | null;
     importCompletedAt?: Date | null;
   }): Promise<void> {
     const set: Partial<typeof vgcRegulations.$inferInsert> = {};
-    if (patch.importStatus !== undefined) set.importStatus = patch.importStatus;
-    if (patch.importError !== undefined) set.importError = patch.importError;
-    if (patch.importTeamCount !== undefined) set.importTeamCount = patch.importTeamCount;
-    if (patch.importStartedAt !== undefined) set.importStartedAt = patch.importStartedAt;
-    if (patch.importCompletedAt !== undefined) set.importCompletedAt = patch.importCompletedAt;
+    if (patch.importStatus !== undefined)       set.importStatus = patch.importStatus;
+    if (patch.importError !== undefined)        set.importError = patch.importError;
+    if (patch.importTeamCount !== undefined)    set.importTeamCount = patch.importTeamCount;
+    if (patch.importFetchedCount !== undefined) set.importFetchedCount = patch.importFetchedCount;
+    if (patch.importStartedAt !== undefined)    set.importStartedAt = patch.importStartedAt;
+    if (patch.importCompletedAt !== undefined)  set.importCompletedAt = patch.importCompletedAt;
     if (Object.keys(set).length === 0) return;
 
     await this.db
