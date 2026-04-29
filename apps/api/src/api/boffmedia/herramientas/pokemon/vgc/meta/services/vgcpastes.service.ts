@@ -326,7 +326,7 @@ export class VgcPastesService {
     };
   }
 
-  async getUsageList(regulationId: string): Promise<PokemonUsageDetail[]> {
+  async getUsageList(regulationId: string, limit?: number, offset?: number): Promise<PokemonUsageDetail[]> {
     const regulation = await this.regulationsRepository.findById(regulationId);
     const dexForFormat = getDexForFormat(regulation?.formatId ?? undefined);
 
@@ -388,7 +388,7 @@ export class VgcPastesService {
 
     const sorted = [...speciesCounts.entries()].sort((a, b) => b[1] - a[1]);
 
-    return sorted.map(([speciesId, count], idx) => {
+    const rows = sorted.map(([speciesId, count], idx) => {
       const speciesName = speciesDisplay.get(speciesId) ?? speciesId;
       const species     = dexForFormat.species.get(speciesName);
       const baseStats   = species.exists
@@ -428,10 +428,13 @@ export class VgcPastesService {
         spreads:      [],
       };
     });
+
+    if (offset === undefined && limit === undefined) return rows;
+    return rows.slice(offset ?? 0, (offset ?? 0) + (limit ?? rows.length));
   }
 
-  async getUsageEntries(regulationId: string): Promise<PokemonUsageEntry[]> {
-    const rows = await this.getUsageList(regulationId);
+  async getUsageEntries(regulationId: string, limit?: number, offset?: number): Promise<PokemonUsageEntry[]> {
+    const rows = await this.getUsageList(regulationId, limit, offset);
     return rows.map((row) => ({
       speciesId: row.speciesId,
       speciesName: row.speciesName,

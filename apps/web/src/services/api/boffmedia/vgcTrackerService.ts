@@ -25,6 +25,7 @@ export interface TrackerSyncData {
 type WireSession = Session & { createdAt?: number; updatedAt?: number };
 type WireMatch = Match & { updatedAt?: number };
 type WireSeries = Series & { updatedAt?: number };
+type WirePreset = TeamPreset & { updatedAt?: number };
 
 function toSessionPayload(session: Session): Session {
   return {
@@ -40,7 +41,9 @@ function toSessionPayload(session: Session): Session {
     limitlessTournamentId: session.limitlessTournamentId,
     archivedAt: session.archivedAt,
     sessionNotes: session.sessionNotes,
-  };
+    updatedAt: session.updatedAt,
+    clientUpdatedAt: session.updatedAt,
+  } as Session;
 }
 
 function toMatchPayload(match: Match): Match {
@@ -60,7 +63,9 @@ function toMatchPayload(match: Match): Match {
     outcomeTag: match.outcomeTag,
     turnCount: match.turnCount,
     opponentArchetype: match.opponentArchetype,
-  };
+    updatedAt: match.updatedAt,
+    clientUpdatedAt: match.updatedAt,
+  } as Match;
 }
 
 function toSeriesPayload(series: Series): Series {
@@ -77,7 +82,9 @@ function toSeriesPayload(series: Series): Series {
     games: series.games,
     seriesResult: series.seriesResult,
     notes: series.notes,
-  };
+    updatedAt: series.updatedAt,
+    clientUpdatedAt: series.updatedAt,
+  } as Series;
 }
 
 function toPresetPayload(preset: TeamPreset): TeamPreset {
@@ -89,9 +96,10 @@ function toPresetPayload(preset: TeamPreset): TeamPreset {
     slots: preset.slots,
     createdAt: preset.createdAt,
     updatedAt: preset.updatedAt,
+    clientUpdatedAt: preset.updatedAt,
     currentVersion: preset.currentVersion,
     versions: preset.versions,
-  };
+  } as TeamPreset;
 }
 
 function normalizeSyncData(data: TrackerSyncData): TrackerSyncData {
@@ -99,7 +107,7 @@ function normalizeSyncData(data: TrackerSyncData): TrackerSyncData {
     sessions: data.sessions.map((session) => toSessionPayload(session as WireSession)),
     matches: data.matches.map((match) => toMatchPayload(match as WireMatch)),
     series: data.series.map((series) => toSeriesPayload(series as WireSeries)),
-    presets: data.presets.map((preset) => toPresetPayload(preset)),
+    presets: data.presets.map((preset) => toPresetPayload(preset as WirePreset)),
   };
 }
 

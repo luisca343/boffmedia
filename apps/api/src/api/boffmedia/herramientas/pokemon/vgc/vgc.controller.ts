@@ -9,19 +9,6 @@ import { VgcService, VgcPokemon, SpeedTierEntry } from './vgc.service';
 export class VgcController {
   constructor(private readonly vgcService: VgcService) {}
 
-  @Get('champions/regulations')
-  @ApiOperation({
-    summary: '[Compatibility alias] List Champions regulations',
-    description:
-      'Compatibility alias for `GET /tools/vgc/meta/regulations`. ' +
-      'Returns all supported Champions regulations. ' +
-      'Use the meta endpoint as the canonical regulation source for admin and ingestion flows.',
-  })
-  @ApiResponse({ status: 200, description: 'Regulations retrieved successfully.' })
-  async getChampionsRegulations() {
-    return this.vgcService.getChampionsRegulations();
-  }
-
   @Get('champions/:regulationId/pokemon')
   @ApiOperation({
     summary: 'Get legal Pokémon for a Champions regulation',

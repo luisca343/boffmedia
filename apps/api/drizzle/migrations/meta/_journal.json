@@ -36,6 +36,20 @@
       "when": 1777462353297,
       "tag": "0004_youthful_spectrum",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1777489200000,
+      "tag": "0005_paste_source_key_and_fetch_progress",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1777489260000,
+      "tag": "0006_vgc_p1_indexes",
+      "breakpoints": true
     }
   ]
 }

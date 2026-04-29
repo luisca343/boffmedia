@@ -118,8 +118,17 @@ export function TrackerSyncProvider({ children }: { children: React.ReactNode })
           await performRemoteOp(entry, authToken);
           await vgcDb.trackerOutbox.delete(entry.opId);
         } catch (err) {
-          const attempts = entry.attempts + 1;
           const message = err instanceof Error ? err.message : String(err);
+          const isConflict = /newer server version|\b409\b|conflict/i.test(message);
+
+          if (isConflict) {
+            // Stale local mutation: drop it from outbox so we don't retry forever.
+            await vgcDb.trackerOutbox.delete(entry.opId);
+            setSyncStatus('error');
+            continue;
+          }
+
+          const attempts = entry.attempts + 1;
           await vgcDb.trackerOutbox.put({
             ...entry,
             attempts,
