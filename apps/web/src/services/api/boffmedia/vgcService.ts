@@ -260,6 +260,21 @@ export class VgcService {
   static getChampionsLegalPokemon(regulationId: string) {
     return apiGET<VgcPokemon[]>(`/tools/vgc/champions/${regulationId}/pokemon`);
   }
+
+  static getLimitlessTournaments(regulationId?: string) {
+    if (regulationId) {
+      return apiGET<LimitlessTournament[]>(
+        `/tools/vgc/meta/limitless/tournaments?regulationId=${regulationId}`,
+      );
+    }
+    return apiGET<LimitlessTournament[]>('/tools/vgc/meta/limitless');
+  }
+
+  static getLimitlessCombinedUsage(regulationId: string) {
+    return apiGET<PokemonUsageDetail[]>(
+      `/tools/vgc/meta/limitless/usage/combined?regulationId=${regulationId}`,
+    );
+  }
 }
 
 // ─── Species Teams ────────────────────────────────────────────────────────────

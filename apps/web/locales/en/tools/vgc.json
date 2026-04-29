@@ -320,11 +320,10 @@
         "expand": "Show",
         "collapse": "Hide",
         "summary": "{count} mons · {min}-{max}",
-        "tailwind": "TW ×2",
-        "scarf": "Scarf ×1.5",
         "trickroom": "TR ↕",
         "opponentSpeed": "Opponent Base Speed",
-        "opponentSpeedPlaceholder": "Enter opponent base speed..."
+        "opponentSpeedPlaceholder": "Enter opponent base speed...",
+        "presetHint": "Click a row to change EV preset"
       },
       "zones": {
         "leads": "Leads",
