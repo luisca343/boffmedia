@@ -98,6 +98,10 @@ export function VgcLimitlessFetcher() {
 
   const handleSubmit = async () => {
     if (!url.trim()) { setError("Introduce la URL del torneo."); return; }
+    if (!token) {
+      setError("Sesion invalida: vuelve a iniciar sesion con una cuenta BOFF_ADMIN.");
+      return;
+    }
     const max = maxPlayers.trim() ? parseInt(maxPlayers, 10) : undefined;
     if (max !== undefined && (isNaN(max) || max < 1)) {
       setError("Max jugadores debe ser un número positivo.");

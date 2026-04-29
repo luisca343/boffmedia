@@ -3,9 +3,11 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   Param,
   Post,
   Query,
+  Req,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -27,7 +29,15 @@ import { UpsertRegulationDto } from './dto/upsert-regulation.dto';
 @Controller('tools/vgc/meta')
 @UseInterceptors(ResponseInterceptor)
 export class VgcMetaController {
+  private readonly logger = new Logger(VgcMetaController.name);
+
   constructor(private readonly facade: VgcMetaFacadeService) {}
+
+  private logAdminAction(action: string, req: any, details: Record<string, unknown> = {}) {
+    this.logger.log(
+      `[${action}] userId=${req?.user?.userId ?? 'unknown'} roles=${JSON.stringify(req?.user?.roles ?? [])} details=${JSON.stringify(details)}`,
+    );
+  }
 
   // --- Ladder (Smogon) -------------------------------------------------------
 
@@ -43,7 +53,12 @@ export class VgcMetaController {
   @Roles('BOFF_ADMIN')
   @ApiOperation({ summary: '[Admin] Fetch stats.txt + moveset.txt from Smogon and store normalised rows' })
   @ApiResponse({ status: 201, description: 'Snapshot fetched and stored.' })
-  fetchSmogonSnapshot(@Body() dto: FetchSmogonDto) {
+  fetchSmogonSnapshot(@Body() dto: FetchSmogonDto, @Req() req: any) {
+    this.logAdminAction('smogon/fetch', req, {
+      format: dto.format,
+      month: dto.month,
+      cutoff: dto.cutoff,
+    });
     return this.facade.fetchSmogonSnapshot(dto);
   }
 
@@ -52,7 +67,12 @@ export class VgcMetaController {
   @Roles('BOFF_ADMIN')
   @ApiOperation({ summary: '[Admin] Delete a Smogon snapshot and its Pokémon rows' })
   @ApiResponse({ status: 200, description: 'Snapshot deleted.' })
-  deleteSmogonSnapshot(@Query() dto: QuerySmogonDto) {
+  deleteSmogonSnapshot(@Query() dto: QuerySmogonDto, @Req() req: any) {
+    this.logAdminAction('smogon/snapshot-delete', req, {
+      format: dto.format,
+      month: dto.month,
+      cutoff: dto.cutoff,
+    });
     return this.facade.deleteSmogonSnapshot(dto);
   }
 
@@ -103,7 +123,8 @@ export class VgcMetaController {
   @Roles('BOFF_ADMIN')
   @ApiOperation({ summary: '[Admin] Batch-fetch pastes for all teams in a regulation' })
   @ApiResponse({ status: 201, description: 'Batch fetch result returned.', type: BatchFetchResultDto })
-  batchFetchChampionsPastes(@Query('regulationId') regulationId: string) {
+  batchFetchChampionsPastes(@Query('regulationId') regulationId: string, @Req() req: any) {
+    this.logAdminAction('champions/fetch-pastes', req, { regulationId });
     return this.facade.batchFetchChampionsPastes(regulationId);
   }
 
@@ -112,7 +133,8 @@ export class VgcMetaController {
   @Roles('BOFF_ADMIN')
   @ApiOperation({ summary: 'Re-fetch VGCPastes CSV and refresh Champions data' })
   @ApiResponse({ status: 201, description: 'Data refreshed.' })
-  refreshChampions(@Query('regulationId') regulationId: string) {
+  refreshChampions(@Query('regulationId') regulationId: string, @Req() req: any) {
+    this.logAdminAction('champions/refresh', req, { regulationId });
     return this.facade.refreshChampionsData(regulationId);
   }
 
@@ -159,7 +181,12 @@ export class VgcMetaController {
   @Roles('BOFF_ADMIN')
   @ApiOperation({ summary: '[Admin] Import a Limitless tournament by URL' })
   @ApiResponse({ status: 201, description: 'Tournament import started.' })
-  importTournament(@Body() dto: AddLimitlessTournamentDto) {
+  importTournament(@Body() dto: AddLimitlessTournamentDto, @Req() req: any) {
+    this.logAdminAction('limitless/tournament-import', req, {
+      regulationId: dto.regulationId,
+      maxPlayers: dto.maxPlayers ?? null,
+      url: dto.url,
+    });
     return this.facade.importLimitlessTournament(dto);
   }
 
@@ -193,9 +220,18 @@ export class VgcMetaController {
   }
 
   @Post('regulations')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('BOFF_ADMIN')
   @ApiOperation({ summary: '[Admin] Create or update a Champions regulation' })
   @ApiResponse({ status: 201, description: 'Regulation upserted.' })
-  upsertRegulation(@Body() dto: UpsertRegulationDto) {
+  upsertRegulation(@Body() dto: UpsertRegulationDto, @Req() req: any) {
+    this.logAdminAction('regulations/upsert', req, {
+      id: dto.id,
+      formatId: dto.formatId,
+      name: dto.name,
+      gameType: dto.gameType ?? null,
+      hasVgcPastesGid: Boolean(dto.vgcPastesGid),
+    });
     return this.facade.upsertRegulation(dto);
   }
 
