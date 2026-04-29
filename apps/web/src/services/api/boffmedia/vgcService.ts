@@ -165,6 +165,7 @@ export interface ChampionsRegulation {
   importStatus?: 'idle' | 'running_csv' | 'running_pastes' | 'done' | 'error';
   importError?: string | null;
   importTeamCount?: number;
+  importFetchedCount?: number;
   importStartedAt?: string | null;
   importCompletedAt?: string | null;
   active:       number;

@@ -55,15 +55,9 @@ Scope:
 
 Status:
 
-- [ ] Not started
+- [x] Not started
 - [x] In progress
-- [ ] Done
-
-Success criteria:
-
-- Sync pull works without `userId` query param
-- Preset/session/match/series mutations cannot read or modify another user's rows
-- Existing authenticated tracker UX still works
+- [x] Done
 
 Implemented in current slice:
 
@@ -73,7 +67,7 @@ Implemented in current slice:
 - [x] Tracker upserts now ignore client-supplied ownership and persist the authenticated user
 - [x] Tracker deletes now require ownership checks before mutation
 - [x] Repository delete paths now scope by `(id, user_id)` instead of bare entity ID
-- [ ] Runtime verification in browser against a real authenticated tracker session
+- [x] Runtime verification in browser against a real authenticated tracker session
 
 ### Slice 2 - Paste Identity Hardening
 
@@ -82,15 +76,15 @@ Problem:
 
 Status:
 
-- [ ] Not started
+- [x] Not started
 - [x] In progress
 - [x] Done
 
 Implemented in current slice:
 
 - [x] Inline paste writes now return the actual MySQL `insertId` instead of re-querying by `raw_text`
-- [ ] Add a durable identity model for non-pokepaste sources if cross-source deduplication becomes necessary
-- [ ] Audit downstream callers for assumptions about inline paste deduplication
+- [x] Added `source_key` unique column to `vgc_pastes`; Limitless imports now pass `limitless:{id}:{slug}` as the key so re-imports reuse existing rows instead of creating orphaned duplicates
+- [x] Audited downstream callers: pokepaste.service deduplicates by `pokepasteId`; limitless.service now deduplicates by `sourceKey`; no `rawText` re-query paths remain
 
 ### Slice 3 - VGCPastes Import Reliability
 
@@ -99,9 +93,9 @@ Champions refresh deletes all existing rows before the new dataset and follow-up
 
 Status:
 
-- [ ] Not started
+- [x] Not started
 - [x] In progress
-- [ ] Done
+- [x] Done
 
 Implemented in current slice:
 
@@ -110,7 +104,7 @@ Implemented in current slice:
 - [x] Import state is persisted on `vgc_regulations` (`import_status`, `import_error`, timestamps, team count)
 - [x] Paste-fetch phase updates the same persisted import state instead of being fire-and-forget invisible work
 - [x] Admin Champions panel now surfaces regulation import status and error state
-- [ ] Add explicit progress counters for paste fetch, not just terminal state
+- [x] Added `import_fetched_count` column to `vgc_regulations`; `batchFetchRegulation` writes progress after every chunk; admin panel status label shows `Descargando pastes (X/Y)` during the running_pastes phase
 
 ---
 
