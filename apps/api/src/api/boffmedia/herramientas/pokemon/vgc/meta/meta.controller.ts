@@ -24,7 +24,7 @@ import { AddLimitlessTournamentDto } from './dto/add-limitless-tournament.dto';
 import { QueryLimitlessDto } from './dto/query-limitless.dto';
 import { BatchFetchResultDto, ChampionsPasteDetailDto } from './dto/champions-paste-detail.dto';
 import { UpsertRegulationDto } from './dto/upsert-regulation.dto';
-import { USER_ROLES } from '@boffmedia/shared';
+import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 
 @ApiTags('BoffMedia 🛠 | VGC Meta')
 @Controller('tools/vgc/meta')
