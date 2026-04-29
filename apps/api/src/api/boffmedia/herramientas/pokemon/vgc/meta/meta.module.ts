@@ -9,6 +9,7 @@ import { VgcPastesRepository } from './repositories/vgcpastes.repository';
 import { PastesRepository } from './repositories/pastes.repository';
 import { LimitlessRepository } from './repositories/limitless.repository';
 import { VgcRegulationsRepository } from './repositories/regulations.repository';
+import { TrackerRepository } from '../tracker/tracker.repository';
 
 import { SmogonService } from './services/smogon.service';
 import { VgcPastesService } from './services/vgcpastes.service';
@@ -16,6 +17,8 @@ import { PokepasteService } from './services/pokepaste.service';
 import { LimitlessService } from './services/limitless.service';
 import { TeamsService } from './services/teams.service';
 import { StatCalcService } from './services/stat-calc.service';
+import { IngestionJobsService } from './services/ingestion-jobs.service';
+import { PersonalMetaAnalyticsService } from './services/personal-meta-analytics.service';
 
 import { VgcMetaFacadeService } from './meta.facade.service';
 import { VgcMetaController } from './meta.controller';
@@ -29,12 +32,15 @@ import { VgcMetaController } from './meta.controller';
     PastesRepository,
     LimitlessRepository,
     VgcRegulationsRepository,
+    TrackerRepository,
     SmogonService,
     VgcPastesService,
     PokepasteService,
     LimitlessService,
     TeamsService,
     StatCalcService,
+    IngestionJobsService,
+    PersonalMetaAnalyticsService,
     VgcMetaFacadeService,
   ],
   controllers: [VgcMetaController],
