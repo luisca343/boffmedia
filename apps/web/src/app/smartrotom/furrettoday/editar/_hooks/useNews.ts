@@ -5,7 +5,7 @@ import { useUpdateNewsStatus } from '@/hooks/documents/useUpdateNewsStatus'
 import { NewsStatusDto } from '@boffmedia/shared'
 
 export function useNews() {
-  const { news, featured, published, setNews, error: fetchError, isLoading } = useGetAllNews()
+  const { news, featured, published, fetchNews, setNews, error: fetchError, isLoading } = useGetAllNews()
   const { updateNewsStatus, error: updateError } = useUpdateNewsStatus()
   
   const [publishedNewsIds, setPublishedNewsIds] = useState<number[]>([])
@@ -77,6 +77,7 @@ export function useNews() {
   return {
     news: allNews,
     setNews,
+    fetchNews,
     publishedNewsIds,
     featuredNewsId,
     hasUnsavedChanges,

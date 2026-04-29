@@ -3,6 +3,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { vgcDb } from '@/lib/db/vgc-db';
+import { sendToast } from '@/lib/toast';
 import type { TrackerOutboxEntry } from '@/lib/db/vgc-db';
 import {
   syncPull,
@@ -20,7 +21,7 @@ import type { Session, Match, Series, TeamPreset } from '../types';
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export type SyncTable = 'sessions' | 'matches' | 'series' | 'presets';
-export type SyncStatus = 'idle' | 'syncing' | 'error' | 'offline';
+export type SyncStatus = 'idle' | 'syncing' | 'error' | 'offline' | 'conflict';
 
 const OUTBOX_BASE_RETRY_MS = 1500;
 const OUTBOX_MAX_RETRY_MS = 60_000;
@@ -34,15 +35,19 @@ interface TrackerSyncContextValue {
   /** Call after every write. Pass null for data to trigger a DELETE on the server. */
   pushChange: (table: SyncTable, id: string, data: Session | Match | Series | TeamPreset | null) => void;
   syncStatus: SyncStatus;
+  conflictMessage: string | null;
+  refreshNow: () => Promise<boolean>;
   /** Increments after each successful pull so hooks know to re-query Dexie. */
   lastSyncAt: number;
 }
 
 // ─── Context ──────────────────────────────────────────────────────────────────
 
-const TrackerSyncContext = createContext<TrackerSyncContextValue>({
+export const TrackerSyncContext = createContext<TrackerSyncContextValue>({
   pushChange: () => {},
   syncStatus: 'offline',
+  conflictMessage: null,
+  refreshNow: async () => false,
   lastSyncAt: 0,
 });
 
@@ -61,6 +66,7 @@ export function TrackerSyncProvider({ children }: { children: React.ReactNode })
   useEffect(() => { tokenRef.current = token; }, [token]);
 
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('offline');
+  const [conflictMessage, setConflictMessage] = useState<string | null>(null);
   const [lastSyncAt, setLastSyncAt] = useState(0);
   const isFlushingRef = useRef(false);
 
@@ -99,6 +105,53 @@ export function TrackerSyncProvider({ children }: { children: React.ReactNode })
     [ensureParentSessionSynced],
   );
 
+  const pullAndMergeRemote = useCallback(async (authToken: string) => {
+    const remote = await syncPull(authToken);
+    if (!remote) return;
+
+    const [localSessions, localMatches, localSeries, localPresets] = await Promise.all([
+      vgcDb.sessions.toArray(),
+      vgcDb.matches.toArray(),
+      vgcDb.series.toArray(),
+      vgcDb.presets.toArray(),
+    ]);
+
+    const localSessionIds = new Set(localSessions.map((s) => s.id));
+    const localMatchIds = new Set(localMatches.map((m) => m.id));
+    const localSeriesIds = new Set(localSeries.map((s) => s.id));
+    const localPresetIds = new Set(localPresets.map((p) => p.id));
+
+    const remoteSessionIds = new Set(remote.sessions.map((s) => s.id));
+    const remoteMatchIds = new Set(remote.matches.map((m) => m.id));
+    const remoteSeriesIds = new Set(remote.series.map((s) => s.id));
+    const remotePresetIds = new Set(remote.presets.map((p) => p.id));
+
+    const newSessions = remote.sessions.filter((s) => !localSessionIds.has(s.id));
+    const newMatches = remote.matches.filter((m) => !localMatchIds.has(m.id));
+    const newSeries = remote.series.filter((s) => !localSeriesIds.has(s.id));
+    const newPresets = remote.presets.filter((p) => !localPresetIds.has(p.id));
+
+    // Push local-only entities so existing offline history (including full BO3 series)
+    // is backfilled to cloud storage after login.
+    const localOnlySessions = localSessions.filter((s) => !remoteSessionIds.has(s.id));
+    const localOnlyMatches = localMatches.filter((m) => !remoteMatchIds.has(m.id));
+    const localOnlySeries = localSeries.filter((s) => !remoteSeriesIds.has(s.id));
+    const localOnlyPresets = localPresets.filter((p) => !remotePresetIds.has(p.id));
+
+    await Promise.all([
+      newSessions.length > 0 ? vgcDb.sessions.bulkAdd(newSessions) : Promise.resolve(),
+      newMatches.length > 0 ? vgcDb.matches.bulkAdd(newMatches) : Promise.resolve(),
+      newSeries.length > 0 ? vgcDb.series.bulkAdd(newSeries) : Promise.resolve(),
+      newPresets.length > 0 ? vgcDb.presets.bulkAdd(newPresets) : Promise.resolve(),
+    ]);
+
+    // Parent-first upserts to satisfy FK constraints.
+    for (const s of localOnlySessions) await pushSession(s, authToken);
+    for (const m of localOnlyMatches) await pushMatch(m, authToken);
+    for (const s of localOnlySeries) await pushSeries(s, authToken);
+    for (const p of localOnlyPresets) await pushPreset(p, authToken);
+  }, []);
+
   const flushOutbox = useCallback(async () => {
     const authToken = tokenRef.current;
     if (!authToken || isFlushingRef.current) return;
@@ -124,7 +177,9 @@ export function TrackerSyncProvider({ children }: { children: React.ReactNode })
           if (isConflict) {
             // Stale local mutation: drop it from outbox so we don't retry forever.
             await vgcDb.trackerOutbox.delete(entry.opId);
-            setSyncStatus('error');
+            setConflictMessage('Another tab/device has newer data. Refresh from cloud to continue.');
+            setSyncStatus('conflict');
+            console.warn('[TrackerSync][conflict]', { opId: entry.opId, table: entry.table, entityId: entry.entityId });
             continue;
           }
 
@@ -142,12 +197,32 @@ export function TrackerSyncProvider({ children }: { children: React.ReactNode })
 
       const remaining = await vgcDb.trackerOutbox.count();
       if (remaining === 0) {
-        setSyncStatus('idle');
+        setSyncStatus((current) => (current === 'conflict' ? current : 'idle'));
       }
     } finally {
       isFlushingRef.current = false;
     }
   }, [performRemoteOp]);
+
+  const refreshNow = useCallback(async () => {
+    const authToken = tokenRef.current;
+    if (!authToken) return false;
+
+    setConflictMessage(null);
+    setSyncStatus('syncing');
+    try {
+      await pullAndMergeRemote(authToken);
+      await flushOutbox();
+      setLastSyncAt(Date.now());
+      setSyncStatus('idle');
+      sendToast('Tracker refreshed from cloud');
+      return true;
+    } catch (err) {
+      console.error('[TrackerSync] Manual refresh failed:', err);
+      setSyncStatus('error');
+      return false;
+    }
+  }, [flushOutbox, pullAndMergeRemote]);
 
   const enqueueOutboxChange = useCallback(
     async (table: SyncTable, id: string, data: Session | Match | Series | TeamPreset | null) => {
@@ -176,57 +251,17 @@ export function TrackerSyncProvider({ children }: { children: React.ReactNode })
   useEffect(() => {
     if (!token) {
       setSyncStatus('offline');
+      setConflictMessage(null);
       return;
     }
 
     let cancelled = false;
     setSyncStatus('syncing');
+    setConflictMessage(null);
 
-    syncPull(token)
-      .then(async (remote) => {
-        if (cancelled || !remote) return;
-
-        const [localSessions, localMatches, localSeries, localPresets] = await Promise.all([
-          vgcDb.sessions.toArray(),
-          vgcDb.matches.toArray(),
-          vgcDb.series.toArray(),
-          vgcDb.presets.toArray(),
-        ]);
-
-        const localSessionIds = new Set(localSessions.map((s) => s.id));
-        const localMatchIds = new Set(localMatches.map((m) => m.id));
-        const localSeriesIds = new Set(localSeries.map((s) => s.id));
-        const localPresetIds = new Set(localPresets.map((p) => p.id));
-
-        const remoteSessionIds = new Set(remote.sessions.map((s) => s.id));
-        const remoteMatchIds = new Set(remote.matches.map((m) => m.id));
-        const remoteSeriesIds = new Set(remote.series.map((s) => s.id));
-        const remotePresetIds = new Set(remote.presets.map((p) => p.id));
-
-        const newSessions = remote.sessions.filter((s) => !localSessionIds.has(s.id));
-        const newMatches = remote.matches.filter((m) => !localMatchIds.has(m.id));
-        const newSeries = remote.series.filter((s) => !localSeriesIds.has(s.id));
-        const newPresets = remote.presets.filter((p) => !localPresetIds.has(p.id));
-
-        // Push local-only entities so existing offline history (including full BO3 series)
-        // is backfilled to cloud storage after login.
-        const localOnlySessions = localSessions.filter((s) => !remoteSessionIds.has(s.id));
-        const localOnlyMatches = localMatches.filter((m) => !remoteMatchIds.has(m.id));
-        const localOnlySeries = localSeries.filter((s) => !remoteSeriesIds.has(s.id));
-        const localOnlyPresets = localPresets.filter((p) => !remotePresetIds.has(p.id));
-
-        await Promise.all([
-          newSessions.length > 0 ? vgcDb.sessions.bulkAdd(newSessions) : Promise.resolve(),
-          newMatches.length > 0 ? vgcDb.matches.bulkAdd(newMatches) : Promise.resolve(),
-          newSeries.length > 0 ? vgcDb.series.bulkAdd(newSeries) : Promise.resolve(),
-          newPresets.length > 0 ? vgcDb.presets.bulkAdd(newPresets) : Promise.resolve(),
-        ]);
-
-        // Parent-first upserts to satisfy FK constraints.
-        for (const s of localOnlySessions) await pushSession(s, token);
-        for (const m of localOnlyMatches) await pushMatch(m, token);
-        for (const s of localOnlySeries) await pushSeries(s, token);
-        for (const p of localOnlyPresets) await pushPreset(p, token);
+    pullAndMergeRemote(token)
+      .then(async () => {
+        if (cancelled) return;
 
         if (!cancelled) {
           setSyncStatus('idle');
@@ -242,7 +277,7 @@ export function TrackerSyncProvider({ children }: { children: React.ReactNode })
       });
 
     return () => { cancelled = true; };
-  }, [token, flushOutbox]);
+  }, [token, flushOutbox, pullAndMergeRemote]);
 
   useEffect(() => {
     if (!token) return;
@@ -270,6 +305,10 @@ export function TrackerSyncProvider({ children }: { children: React.ReactNode })
     (table: SyncTable, id: string, data: Session | Match | Series | TeamPreset | null) => {
       if (!tokenRef.current) return;
 
+      if (syncStatus === 'conflict') {
+        return;
+      }
+
       const fire = async () => {
         await enqueueOutboxChange(table, id, data);
         void flushOutbox();
@@ -277,11 +316,11 @@ export function TrackerSyncProvider({ children }: { children: React.ReactNode })
 
       void fire();
     },
-    [enqueueOutboxChange, flushOutbox],
+    [enqueueOutboxChange, flushOutbox, syncStatus],
   );
 
   return (
-    <TrackerSyncContext.Provider value={{ pushChange, syncStatus, lastSyncAt }}>
+    <TrackerSyncContext.Provider value={{ pushChange, syncStatus, conflictMessage, refreshNow, lastSyncAt }}>
       {children}
     </TrackerSyncContext.Provider>
   );
