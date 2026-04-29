@@ -4,15 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import { Loader2, RefreshCw, Upload, AlertCircle, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/primitives/button";
 import {
+  ChampionsRegulation,
   LimitlessTournament,
   LimitlessImportJobStatus,
   VgcMetaService,
 } from "@/services/api/boffmedia/vgcService";
 import { useBoffSession } from "@/services/useBoffSession";
-
-const REGULATION_OPTIONS: Array<{ id: string; name: string }> = [
-  { id: "vgc2026regma", name: "VGC 2026 Reg M-A" },
-];
 
 function StatusDot({ status }: { status: LimitlessTournament["status"] }) {
   if (status === "running")
@@ -43,8 +40,10 @@ export function VgcLimitlessFetcher() {
   const { session } = useBoffSession();
   const token = session?.user?.accessToken ?? '';
 
+  const [regulations, setRegulations] = useState<ChampionsRegulation[]>([]);
+
   const [url,          setUrl]          = useState("");
-  const [regulationId, setRegulationId] = useState(REGULATION_OPTIONS[0].id);
+  const [regulationId, setRegulationId] = useState("");
   const [maxPlayers,   setMaxPlayers]   = useState<string>("");
   const [submitting,   setSubmitting]   = useState(false);
   const [error,        setError]        = useState<string | null>(null);
@@ -57,6 +56,10 @@ export function VgcLimitlessFetcher() {
   const pollingRef = useRef<Map<number, ReturnType<typeof setInterval>>>(new Map());
 
   const loadTournaments = (regId = regulationId) => {
+    if (!regId) {
+      setTournaments([]);
+      return;
+    }
     setLoadingList(true);
     VgcMetaService.getLimitlessTournaments(regId)
       .then((res) => setTournaments(res.data ?? []))
@@ -64,11 +67,39 @@ export function VgcLimitlessFetcher() {
       .finally(() => setLoadingList(false));
   };
 
+  const loadRegulations = () => {
+    VgcMetaService.getAvailableChampionsRegulations()
+      .then((res) => {
+        const regs = res.data ?? [];
+        setRegulations(regs);
+        if (!regulationId && regs.length > 0) {
+          setRegulationId(regs[0].id);
+        }
+      })
+      .catch(() => {
+        setError("No se pudieron cargar las regulaciones.");
+      });
+  };
+
   useEffect(() => {
-    loadTournaments();
+    loadRegulations();
     return () => {
       pollingRef.current.forEach((id) => clearInterval(id));
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const onRegulationsUpdated = () => loadRegulations();
+    window.addEventListener("vgc-regulations-updated", onRegulationsUpdated);
+    return () => {
+      window.removeEventListener("vgc-regulations-updated", onRegulationsUpdated);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!regulationId) return;
+    loadTournaments(regulationId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [regulationId]);
 
@@ -98,6 +129,10 @@ export function VgcLimitlessFetcher() {
 
   const handleSubmit = async () => {
     if (!url.trim()) { setError("Introduce la URL del torneo."); return; }
+    if (!regulationId) {
+      setError("No hay regulación disponible. Regístrala primero en Champions.");
+      return;
+    }
     if (!token) {
       setError("Sesion invalida: vuelve a iniciar sesion con una cuenta BOFF_ADMIN.");
       return;
@@ -173,7 +208,7 @@ export function VgcLimitlessFetcher() {
                 onChange={(e) => setRegulationId(e.target.value)}
                 className="w-full bg-surface-900 border border-surface-700 rounded-lg px-3 py-2 text-sm text-surface-100 focus:outline-none focus:border-amber-500/50"
               >
-                {REGULATION_OPTIONS.map((r) => (
+                {regulations.map((r) => (
                   <option key={r.id} value={r.id}>{r.name}</option>
                 ))}
               </select>
@@ -198,7 +233,7 @@ export function VgcLimitlessFetcher() {
         <Button
           size="sm"
           onClick={handleSubmit}
-          disabled={submitting || !url.trim()}
+          disabled={submitting || !url.trim() || !regulationId}
           className="w-full"
         >
           {submitting ? (

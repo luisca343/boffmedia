@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { and, eq, isNotNull, isNull } from 'drizzle-orm';
+import { and, eq, inArray, isNotNull, isNull } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { vgcPasteTeams, vgcPastes, VgcPasteTeam } from '@/_db/schema/Vgc';
 
@@ -82,6 +82,21 @@ export class VgcPastesRepository {
 
   async deleteByRegulation(regulationId: string): Promise<void> {
     await this.db.delete(vgcPasteTeams).where(eq(vgcPasteTeams.regulationId, regulationId));
+  }
+
+  async findTeamIdsByRegulation(regulationId: string): Promise<string[]> {
+    const rows = await this.db
+      .select({ id: vgcPasteTeams.id })
+      .from(vgcPasteTeams)
+      .where(eq(vgcPasteTeams.regulationId, regulationId));
+    return rows.map((row) => row.id);
+  }
+
+  async deleteTeamsByIds(teamIds: string[]): Promise<void> {
+    if (teamIds.length === 0) return;
+    await this.db
+      .delete(vgcPasteTeams)
+      .where(inArray(vgcPasteTeams.id, teamIds));
   }
 
   async findAvailableRegulations(): Promise<string[]> {

@@ -28,6 +28,15 @@ export class VgcRegulationsRepository {
     return row ?? null;
   }
 
+  async findByFormatId(formatId: string): Promise<VgcRegulation | null> {
+    const [row] = await this.db
+      .select()
+      .from(vgcRegulations)
+      .where(eq(vgcRegulations.formatId, formatId))
+      .limit(1);
+    return row ?? null;
+  }
+
   async upsert(data: {
     id:           string;
     formatId:     string;
@@ -45,6 +54,11 @@ export class VgcRegulationsRepository {
         name:         data.name,
         gameType:     data.gameType    ?? 'doubles',
         vgcPastesGid: data.vgcPastesGid ?? null,
+        importStatus: 'idle',
+        importError:  null,
+        importTeamCount: 0,
+        importStartedAt: null,
+        importCompletedAt: null,
         active:       data.active      ?? 1,
         createdAt:    now,
       })
@@ -57,5 +71,26 @@ export class VgcRegulationsRepository {
           active:       data.active      ?? 1,
         },
       });
+  }
+
+  async updateImportState(id: string, patch: {
+    importStatus?: string;
+    importError?: string | null;
+    importTeamCount?: number;
+    importStartedAt?: Date | null;
+    importCompletedAt?: Date | null;
+  }): Promise<void> {
+    const set: Partial<typeof vgcRegulations.$inferInsert> = {};
+    if (patch.importStatus !== undefined) set.importStatus = patch.importStatus;
+    if (patch.importError !== undefined) set.importError = patch.importError;
+    if (patch.importTeamCount !== undefined) set.importTeamCount = patch.importTeamCount;
+    if (patch.importStartedAt !== undefined) set.importStartedAt = patch.importStartedAt;
+    if (patch.importCompletedAt !== undefined) set.importCompletedAt = patch.importCompletedAt;
+    if (Object.keys(set).length === 0) return;
+
+    await this.db
+      .update(vgcRegulations)
+      .set(set)
+      .where(eq(vgcRegulations.id, id));
   }
 }

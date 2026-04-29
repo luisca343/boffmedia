@@ -32,6 +32,12 @@ export class VgcMetaFacadeService {
   }
 
   async fetchSmogonSnapshot(dto: FetchSmogonDto) {
+    const regulation = await this.regulationsRepository.findByFormatId(dto.format);
+    if (!regulation) {
+      throw new NotFoundException(
+        `Format \"${dto.format}\" is not registered in vgc_regulations. Create it from admin first.`,
+      );
+    }
     const cutoff = dto.cutoff ?? SMOGON_DEFAULT_CUTOFF;
     return this.smogonService.fetchAndStore(dto.format, dto.month, cutoff);
   }

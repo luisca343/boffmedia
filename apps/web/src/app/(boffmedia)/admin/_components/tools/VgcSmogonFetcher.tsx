@@ -3,15 +3,8 @@
 import { useEffect, useState } from "react";
 import { Loader2, RefreshCw, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/primitives/button";
-import { VgcMetaService, SmogonSnapshot } from "@/services/api/boffmedia/vgcService";
+import { ChampionsRegulation, SmogonSnapshot, VgcMetaService } from "@/services/api/boffmedia/vgcService";
 import { useBoffSession } from "@/services/useBoffSession";
-
-const FORMAT_OPTIONS = [
-  { id: "gen9vgc2026regi", label: "VGC 2026 Reg I" },
-  { id: "gen9vgc2026regh", label: "VGC 2026 Reg H" },
-  { id: "gen9vgc2026regg", label: "VGC 2026 Reg G" },
-  { id: "gen9vgc2026regf", label: "VGC 2026 Reg F" },
-];
 
 const CUTOFF_OPTIONS = [1760, 1630, 1500, 0];
 
@@ -24,8 +17,9 @@ export function VgcSmogonFetcher() {
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [error,     setError]     = useState<string | null>(null);
   const [success,   setSuccess]   = useState<string | null>(null);
+  const [regulations, setRegulations] = useState<ChampionsRegulation[]>([]);
 
-  const [format, setFormat] = useState(FORMAT_OPTIONS[0].id);
+  const [format, setFormat] = useState("");
   const [month,  setMonth]  = useState(() => {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
@@ -40,7 +34,30 @@ export function VgcSmogonFetcher() {
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { loadSnapshots(); }, []);
+  const loadRegulations = () => {
+    VgcMetaService.getAvailableChampionsRegulations()
+      .then((res) => {
+        const regs = res.data ?? [];
+        setRegulations(regs);
+        if (!format && regs.length > 0) {
+          setFormat(regs[0].formatId);
+        }
+      })
+      .catch(() => setError("No se pudieron cargar las regulaciones."));
+  };
+
+  useEffect(() => {
+    loadSnapshots();
+    loadRegulations();
+  }, []);
+
+  useEffect(() => {
+    const onRegulationsUpdated = () => loadRegulations();
+    window.addEventListener("vgc-regulations-updated", onRegulationsUpdated);
+    return () => {
+      window.removeEventListener("vgc-regulations-updated", onRegulationsUpdated);
+    };
+  }, []);
 
   const handleFetch = async () => {
     setFetching(true);
@@ -48,6 +65,11 @@ export function VgcSmogonFetcher() {
     setSuccess(null);
     if (!token) {
       setError("Sesion invalida: vuelve a iniciar sesion con una cuenta BOFF_ADMIN.");
+      setFetching(false);
+      return;
+    }
+    if (!format) {
+      setError("No hay formato disponible. Registra primero una regulación en Champions.");
       setFetching(false);
       return;
     }
@@ -168,8 +190,8 @@ export function VgcSmogonFetcher() {
               onChange={(e) => setFormat(e.target.value)}
               className="w-full h-9 rounded-md border border-surface-700 bg-surface-800 px-2.5 text-sm text-surface-100 focus:outline-none focus:ring-1 focus:ring-primary-500"
             >
-              {FORMAT_OPTIONS.map((f) => (
-                <option key={f.id} value={f.id}>{f.label}</option>
+              {regulations.map((r) => (
+                <option key={r.id} value={r.formatId}>{r.name} · {r.formatId}</option>
               ))}
             </select>
           </div>
@@ -206,7 +228,7 @@ export function VgcSmogonFetcher() {
         {error   && <p className="text-xs text-red-400">{error}</p>}
         {success && <p className="text-xs text-green-400">{success}</p>}
 
-        <Button onClick={handleFetch} disabled={fetching} className="w-full sm:w-auto">
+        <Button onClick={handleFetch} disabled={fetching || !format} className="w-full sm:w-auto">
           {fetching ? (
             <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Importando...</>
           ) : (
