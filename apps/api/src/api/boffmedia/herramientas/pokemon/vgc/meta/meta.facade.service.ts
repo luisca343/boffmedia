@@ -12,6 +12,9 @@ import { AddLimitlessTournamentDto } from './dto/add-limitless-tournament.dto';
 import { UpsertRegulationDto } from './dto/upsert-regulation.dto';
 import { SMOGON_DEFAULT_CUTOFF } from './config/smogon.config';
 import { VgcRegulationsRepository } from './repositories/regulations.repository';
+import { IngestionJobsService } from './services/ingestion-jobs.service';
+import { PersonalMetaAnalyticsService } from './services/personal-meta-analytics.service';
+import { QueryPersonalMetaDto } from './dto/query-personal-meta.dto';
 
 @Injectable()
 export class VgcMetaFacadeService {
@@ -23,6 +26,8 @@ export class VgcMetaFacadeService {
     private readonly teamsService: TeamsService,
     readonly statCalcService: StatCalcService,
     private readonly regulationsRepository: VgcRegulationsRepository,
+    private readonly ingestionJobsService: IngestionJobsService,
+    private readonly personalMetaAnalyticsService: PersonalMetaAnalyticsService,
   ) {}
 
   // â”€â”€â”€ Ladder (Smogon) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -176,5 +181,20 @@ export class VgcMetaFacadeService {
 
   async getSpeciesTeams(speciesId: string, regulationId: string) {
     return this.teamsService.getTeamsForSpecies(speciesId, regulationId);
+  }
+
+  // ─── Unified jobs + analytics ─────────────────────────────────────────────
+
+  async getIngestionJobs(regulationId?: string) {
+    return this.ingestionJobsService.listJobs(regulationId);
+  }
+
+  async comparePersonalVsMeta(userId: number, dto: QueryPersonalMetaDto) {
+    return this.personalMetaAnalyticsService.comparePersonalVsMeta(userId, {
+      regulationId: dto.regulationId,
+      source: dto.source ?? 'auto',
+      month: dto.month,
+      cutoff: dto.cutoff ?? SMOGON_DEFAULT_CUTOFF,
+    });
   }
 }
