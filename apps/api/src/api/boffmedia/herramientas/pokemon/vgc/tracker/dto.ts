@@ -11,6 +11,7 @@ export class CreatePresetDto {
   @ApiPropertyOptional({ type: 'array' }) @IsOptional() @IsArray() versions?: any[];
   @ApiPropertyOptional() @IsOptional() @IsNumber() createdAt?: number;
   @ApiPropertyOptional() @IsOptional() @IsNumber() updatedAt?: number;
+  @ApiPropertyOptional() @IsOptional() @IsNumber() clientUpdatedAt?: number;
   @ApiPropertyOptional() @IsOptional() @IsNumber() userId?: number;
 }
 
@@ -27,6 +28,7 @@ export class CreateSessionDto {
   @ApiPropertyOptional() @IsOptional() @IsString() tournamentName?: string;
   @ApiPropertyOptional() @IsOptional() @IsNumber() limitlessTournamentId?: number;
   @ApiPropertyOptional() @IsOptional() @IsString() sessionNotes?: string;
+  @ApiPropertyOptional() @IsOptional() @IsNumber() clientUpdatedAt?: number;
   @ApiPropertyOptional() @IsOptional() @IsNumber() userId?: number;
 }
 
@@ -46,6 +48,7 @@ export class CreateMatchDto {
   @ApiPropertyOptional({ type: 'array' }) @IsOptional() @IsArray() notes?: any[];
   @ApiPropertyOptional() @IsOptional() @IsNumber() createdAt?: number;
   @ApiPropertyOptional() @IsOptional() completedAt?: any;
+  @ApiPropertyOptional() @IsOptional() @IsNumber() clientUpdatedAt?: number;
   @ApiPropertyOptional() @IsOptional() @IsNumber() userId?: number;
 }
 
@@ -77,5 +80,6 @@ export class UpsertSeriesDto {
   @ApiProperty({ type: 'array' }) @IsArray() games: any[];
   @ApiPropertyOptional() @IsOptional() @IsString() seriesResult?: string;
   @ApiProperty({ type: 'array' }) @IsArray() notes: any[];
+  @ApiPropertyOptional() @IsOptional() @IsNumber() clientUpdatedAt?: number;
   @ApiPropertyOptional() @IsOptional() @IsNumber() userId?: number;
 }

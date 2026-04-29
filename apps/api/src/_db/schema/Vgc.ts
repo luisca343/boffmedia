@@ -74,6 +74,7 @@ export const vgcSmogonPokemon = mysqlTable(
   },
   (t) => [
     uniqueIndex('vgc_smogon_pokemon_idx').on(t.formatId, t.month, t.cutoff, t.speciesId),
+    index('vgc_smogon_snapshot_lookup_idx').on(t.formatId, t.month, t.cutoff),
   ],
 );
 
@@ -89,17 +90,23 @@ export type VgcSmogonPokemonRow = typeof vgcSmogonPokemon.$inferSelect;
  * - If the same pokepast.es paste appears in both VGCPastes CSV and a Limitless
  *   tournament, a single vgcPastes row is shared — both FK references point to it.
  */
-export const vgcPastes = mysqlTable('vgc_pastes', {
-  id:          int('id').primaryKey().autoincrement(),
-  pokepasteId: varchar('pokepaste_id', { length: 32 }).unique(),  // null if not from pokepast.es
-  sourceKey:   varchar('source_key',   { length: 255 }).unique(), // stable dedup key for non-pokepaste sources (e.g. 'limitless:{id}:{slug}')
-  rawText:     text('raw_text').notNull(),                         // source of truth for re-parsing
-  parsedSlots: text('parsed_slots').notNull(),                     // JSON: VgcMetaSlot[]
-  author:      varchar('author',    { length: 128 }),
-  title:       varchar('title',     { length: 255 }),
-  formatId:    varchar('format_id', { length: 64 }),
-  fetchedAt:   datetime('fetched_at').notNull(),
-});
+export const vgcPastes = mysqlTable(
+  'vgc_pastes',
+  {
+    id:          int('id').primaryKey().autoincrement(),
+    pokepasteId: varchar('pokepaste_id', { length: 32 }).unique(),  // null if not from pokepast.es
+    sourceKey:   varchar('source_key',   { length: 255 }).unique(), // stable dedup key for non-pokepaste sources (e.g. 'limitless:{id}:{slug}')
+    rawText:     text('raw_text').notNull(),                         // source of truth for re-parsing
+    parsedSlots: text('parsed_slots').notNull(),                     // JSON: VgcMetaSlot[]
+    author:      varchar('author',    { length: 128 }),
+    title:       varchar('title',     { length: 255 }),
+    formatId:    varchar('format_id', { length: 64 }),
+    fetchedAt:   datetime('fetched_at').notNull(),
+  },
+  (t) => [
+    index('vgc_pastes_format_idx').on(t.formatId),
+  ],
+);
 
 export type VgcPaste = typeof vgcPastes.$inferSelect;
 

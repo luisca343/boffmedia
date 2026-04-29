@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { TrackerRepository } from './tracker.repository';
 import { CreatePresetDto, CreateSessionDto, CreateMatchDto, UpdateMatchDto, UpsertSeriesDto } from './dto';
 import { VgcSession, VgcTeamPreset, VgcMatch, VgcSeries } from '@/_db/schema/VgcTracker';
@@ -14,6 +14,21 @@ function toMs(value: Date | number | null | undefined): number | undefined {
 export class TrackerService {
   constructor(private readonly repo: TrackerRepository) {}
 
+  private ensureNoConflict(
+    label: string,
+    clientUpdatedAt: number | undefined,
+    serverUpdatedAt: Date | number | null | undefined,
+  ): void {
+    if (clientUpdatedAt === undefined) return;
+    const serverMs = toMs(serverUpdatedAt);
+    if (serverMs === undefined) return;
+    if (clientUpdatedAt < serverMs) {
+      throw new ConflictException(
+        `${label} has a newer server version. Pull latest data and retry the write.`,
+      );
+    }
+  }
+
   private ensureOwnership(entityUserId: number | null | undefined, userId: number, label: string): void {
     if (entityUserId == null || entityUserId !== userId) {
       throw new NotFoundException(`${label} not found.`);
@@ -28,7 +43,10 @@ export class TrackerService {
 
   async upsertPreset(userId: number, id: string, dto: CreatePresetDto): Promise<void> {
     const existing = await this.repo.findPreset(id);
-    if (existing) this.ensureOwnership(existing.userId, userId, `Preset "${id}"`);
+    if (existing) {
+      this.ensureOwnership(existing.userId, userId, `Preset "${id}"`);
+      this.ensureNoConflict(`Preset "${id}"`, dto.clientUpdatedAt, existing.updatedAt);
+    }
 
     await this.repo.upsertPreset({
       id,
@@ -59,12 +77,26 @@ export class TrackerService {
 
   async upsertSession(userId: number, dto: CreateSessionDto & { id: string }): Promise<void> {
     const existing = await this.repo.findSession(dto.id);
-    if (existing) this.ensureOwnership(existing.userId, userId, `Session "${dto.id}"`);
+    if (existing) {
+      this.ensureOwnership(existing.userId, userId, `Session "${dto.id}"`);
+      this.ensureNoConflict(`Session "${dto.id}"`, dto.clientUpdatedAt, existing.updatedAt);
+    }
 
-    const data: any = { ...dto };
-    data.userId = userId;
-    if (dto.startedAt) data.startedAt = new Date(dto.startedAt);
-    await this.repo.upsertSession(data);
+    await this.repo.upsertSession({
+      id: dto.id,
+      userId,
+      label: dto.label,
+      format: dto.format,
+      regulationId: dto.regulationId,
+      type: dto.type,
+      activePresetId: dto.activePresetId,
+      startElo: dto.startElo,
+      startedAt: dto.startedAt ? new Date(dto.startedAt) : undefined,
+      archivedAt: dto.archivedAt,
+      tournamentName: dto.tournamentName,
+      limitlessTournamentId: dto.limitlessTournamentId,
+      sessionNotes: dto.sessionNotes,
+    });
   }
 
   async deleteSession(userId: number, id: string): Promise<void> {
@@ -89,11 +121,25 @@ export class TrackerService {
     this.ensureOwnership(session.userId, userId, `Session "${dto.sessionId}"`);
 
     const existing = await this.repo.findMatch(dto.id);
-    if (existing) this.ensureOwnership(existing.userId, userId, `Match "${dto.id}"`);
+    if (existing) {
+      this.ensureOwnership(existing.userId, userId, `Match "${dto.id}"`);
+      this.ensureNoConflict(`Match "${dto.id}"`, dto.clientUpdatedAt, existing.updatedAt);
+    }
 
     await this.repo.upsertMatch({
-      ...dto,
+      id: dto.id,
+      sessionId: dto.sessionId,
+      format: dto.format,
       userId,
+      myTeam: dto.myTeam,
+      opponentTeam: dto.opponentTeam,
+      opponentName: dto.opponentName,
+      opponentArchetype: dto.opponentArchetype,
+      result: dto.result,
+      outcomeTag: dto.outcomeTag,
+      turnCount: dto.turnCount,
+      eloAfter: dto.eloAfter,
+      opponentElo: dto.opponentElo,
       notes: dto.notes ?? [],
       createdAt: dto.createdAt ? new Date(dto.createdAt) : undefined,
       completedAt: dto.completedAt ? new Date(dto.completedAt) : undefined,
@@ -146,14 +192,24 @@ export class TrackerService {
     this.ensureOwnership(session.userId, userId, `Session "${dto.sessionId}"`);
 
     const existing = await this.repo.findSeries(dto.id);
-    if (existing) this.ensureOwnership(existing.userId, userId, `Series "${dto.id}"`);
+    if (existing) {
+      this.ensureOwnership(existing.userId, userId, `Series "${dto.id}"`);
+      this.ensureNoConflict(`Series "${dto.id}"`, dto.clientUpdatedAt, existing.updatedAt);
+    }
 
     await this.repo.upsertSeries({
-      ...dto,
+      id: dto.id,
+      sessionId: dto.sessionId,
+      createdAt: dto.createdAt,
+      completedAt: dto.completedAt,
+      roundNumber: dto.roundNumber,
+      opponentName: dto.opponentName,
+      opponentArchetype: dto.opponentArchetype,
       userId,
       myTeam: typeof dto.myTeam === 'string' ? dto.myTeam : dto.myTeam,
       opponentTeam: typeof dto.opponentTeam === 'string' ? dto.opponentTeam : dto.opponentTeam,
       games: dto.games ?? [],
+      seriesResult: dto.seriesResult,
       notes: dto.notes ?? [],
     });
   }

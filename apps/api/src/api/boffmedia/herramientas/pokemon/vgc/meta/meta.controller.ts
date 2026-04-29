@@ -188,14 +188,14 @@ export class VgcMetaController {
   @ApiOperation({ summary: 'Get usage data for a Limitless tournament' })
   @ApiResponse({ status: 200, description: 'Usage list returned.' })
   getLimitlessUsage(@Query() dto: QueryLimitlessDto) {
-    return this.facade.getLimitlessUsage(dto.tournamentId);
+    return this.facade.getLimitlessUsage(dto.tournamentId, dto.limit, dto.offset);
   }
 
   @Get('limitless/usage/list')
   @ApiOperation({ summary: 'Get lean Limitless usage list for a tournament' })
   @ApiResponse({ status: 200, description: 'Lean usage list returned.' })
   getLimitlessUsageList(@Query() dto: QueryLimitlessDto) {
-    return this.facade.getLimitlessUsageList(dto.tournamentId);
+    return this.facade.getLimitlessUsageList(dto.tournamentId, dto.limit, dto.offset);
   }
 
   @Get('limitless/tournament/:id/status')
