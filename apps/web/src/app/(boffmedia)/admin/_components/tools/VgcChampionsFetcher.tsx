@@ -35,6 +35,11 @@ export function VgcChampionsFetcher() {
     setRefreshing(regulationId);
     setError(null);
     setSuccess(null);
+    if (!token) {
+      setError("Sesion invalida: vuelve a iniciar sesion con una cuenta BOFF_ADMIN.");
+      setRefreshing(null);
+      return;
+    }
     try {
       const res = await VgcMetaService.refreshChampions(regulationId, token);
       setSuccess(`Importados ${res.data?.count ?? 0} equipos para ${regulationId}.`);
@@ -50,6 +55,11 @@ export function VgcChampionsFetcher() {
     setFetchingPastes(regulationId);
     setError(null);
     setSuccess(null);
+    if (!token) {
+      setError("Sesion invalida: vuelve a iniciar sesion con una cuenta BOFF_ADMIN.");
+      setFetchingPastes(null);
+      return;
+    }
     try {
       const res = await VgcMetaService.fetchChampionsPastes(regulationId, token);
       const r = res.data as BatchFetchResult | undefined;
