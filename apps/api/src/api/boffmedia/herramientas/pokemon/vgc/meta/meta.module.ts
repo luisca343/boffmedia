@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
 import { ResponseModule } from '@api/_utils/response/response.module';
 import { LoggerModule } from '@api/_utils/logger/logger.module';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
@@ -22,6 +23,7 @@ import { VgcMetaController } from './meta.controller';
 @Module({
   imports: [ResponseModule, LoggerModule, DrizzleModule],
   providers: [
+    RolesGuard,
     SmogonRepository,
     VgcPastesRepository,
     PastesRepository,

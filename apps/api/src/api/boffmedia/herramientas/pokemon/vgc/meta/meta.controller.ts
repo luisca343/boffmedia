@@ -6,10 +6,14 @@ import {
   Param,
   Post,
   Query,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { Roles } from '@api/_utils/decorators/roles.decorator';
 import { VgcMetaFacadeService } from './meta.facade.service';
 import { QuerySmogonDto } from './dto/query-smogon.dto';
 import { FetchSmogonDto } from './dto/fetch-smogon.dto';
@@ -35,6 +39,8 @@ export class VgcMetaController {
   }
 
   @Post('smogon/fetch')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('BOFF_ADMIN')
   @ApiOperation({ summary: '[Admin] Fetch stats.txt + moveset.txt from Smogon and store normalised rows' })
   @ApiResponse({ status: 201, description: 'Snapshot fetched and stored.' })
   fetchSmogonSnapshot(@Body() dto: FetchSmogonDto) {
@@ -42,6 +48,8 @@ export class VgcMetaController {
   }
 
   @Delete('smogon/snapshot')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('BOFF_ADMIN')
   @ApiOperation({ summary: '[Admin] Delete a Smogon snapshot and its Pokémon rows' })
   @ApiResponse({ status: 200, description: 'Snapshot deleted.' })
   deleteSmogonSnapshot(@Query() dto: QuerySmogonDto) {
@@ -91,6 +99,8 @@ export class VgcMetaController {
   }
 
   @Post('champions/fetch-pastes')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('BOFF_ADMIN')
   @ApiOperation({ summary: '[Admin] Batch-fetch pastes for all teams in a regulation' })
   @ApiResponse({ status: 201, description: 'Batch fetch result returned.', type: BatchFetchResultDto })
   batchFetchChampionsPastes(@Query('regulationId') regulationId: string) {
@@ -98,6 +108,8 @@ export class VgcMetaController {
   }
 
   @Post('champions/refresh')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('BOFF_ADMIN')
   @ApiOperation({ summary: 'Re-fetch VGCPastes CSV and refresh Champions data' })
   @ApiResponse({ status: 201, description: 'Data refreshed.' })
   refreshChampions(@Query('regulationId') regulationId: string) {
@@ -143,6 +155,8 @@ export class VgcMetaController {
   }
 
   @Post('limitless/tournament')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('BOFF_ADMIN')
   @ApiOperation({ summary: '[Admin] Import a Limitless tournament by URL' })
   @ApiResponse({ status: 201, description: 'Tournament import started.' })
   importTournament(@Body() dto: AddLimitlessTournamentDto) {

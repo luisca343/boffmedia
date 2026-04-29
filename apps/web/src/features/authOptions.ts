@@ -34,7 +34,7 @@ export const authOptions: NextAuthOptions = {
           
           if (response && !response.error) {
             console.log("Authentication successful");
-            return response.user as any; // TODO - CREATE FULL USER TYPE
+            return { ...response.user, accessToken: response.access_token } as any;
           }
           
           console.log("Authentication failed - invalid response:", response);
@@ -127,6 +127,7 @@ export const authOptions: NextAuthOptions = {
         token.roles = user.roles;
         token.smartRotomUser = user.smartRotomUser;
         token.image = (user as any).profilePicture ?? user.image ?? null;
+        token.accessToken = (user as any).accessToken;
         token.lastUpdated = Date.now();
       }
 
@@ -156,6 +157,7 @@ export const authOptions: NextAuthOptions = {
             token.email = userData.user.email;
             token.smartRotomUser = userData.user.smartRotomUser;
             token.image = userData.user.image ?? token.image ?? null;
+            token.accessToken = userData.access_token ?? token.accessToken;
             token.lastUpdated = Date.now();
           }
         } catch (error) {
@@ -183,7 +185,8 @@ export const authOptions: NextAuthOptions = {
           uuid: string;
           world: string;
         } | undefined,
-        image: token.image as string | null | undefined
+        image: token.image as string | null | undefined,
+        accessToken: token.accessToken as string | undefined,
       } as BoffUser;
       console.log('Session:', session);
       return session;
