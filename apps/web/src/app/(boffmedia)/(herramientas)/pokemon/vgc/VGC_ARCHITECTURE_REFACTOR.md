@@ -83,6 +83,14 @@ Problem:
 Status:
 
 - [ ] Not started
+- [x] In progress
+- [ ] Done
+
+Implemented in current slice:
+
+- [x] Inline paste writes now return the actual MySQL `insertId` instead of re-querying by `raw_text`
+- [ ] Add a durable identity model for non-pokepaste sources if cross-source deduplication becomes necessary
+- [ ] Audit downstream callers for assumptions about inline paste deduplication
 
 ### Slice 3 - VGCPastes Import Reliability
 
@@ -110,3 +118,4 @@ Status:
 | 2026-04-29 | Created refactor tracker from architecture review. Priorities grouped into P0/P1/P2 and implementation slices defined. |
 | 2026-04-29 | Started Slice 1: tracker auth + ownership enforcement. |
 | 2026-04-29 | Implemented Slice 1 backend/frontend auth wiring: tracker sync now uses bearer auth, tracker endpoints are JWT-guarded, and tracker mutations/reads are scoped to the authenticated user. |
+| 2026-04-29 | Started Slice 2: inline paste identity hardening by removing the `raw_text` re-query path and returning the inserted row ID directly from MySQL metadata. |
