@@ -19,16 +19,19 @@ export function useNews() {
   }, [fetchError])
 
   useEffect(() => {
-    if (news && featured) {
-      const publishedIds = published.map(item => item.id)
-      setPublishedNewsIds(publishedIds)
-      setFeaturedNewsId(featured.id)
-    }
+    const publishedIds = (news ?? []).filter(item => item.published === 1).map(item => item.id)
+    setPublishedNewsIds(publishedIds)
+    setFeaturedNewsId(featured?.id ?? null)
   }, [news, featured, published])
 
   const allNews = useMemo(() => {
-    return featured ? [featured, ...published] : published
-  }, [featured, published])
+    if (!news?.length) return []
+    return [...news].sort((a, b) => {
+      if (a.id === featured?.id) return -1
+      if (b.id === featured?.id) return 1
+      return b.id - a.id
+    })
+  }, [news, featured])
 
   function handlePublishToggle(id: number) {
     setPublishedNewsIds((prev) =>

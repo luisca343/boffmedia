@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
 import { LoggerModule } from '@api/_utils/logger/logger.module';
 import { ResponseModule } from '@api/_utils/response/response.module';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
@@ -23,6 +24,7 @@ import { DocumentsController } from './documents.controller';
   imports: [LoggerModule, ResponseModule, DrizzleModule],
   controllers: [DocumentsController],
   providers: [
+    RolesGuard,
     // Provide repositories via tokens
     { provide: DOCUMENTS_REPOSITORY_TOKEN, useClass: DocumentsRepository },
     { provide: NEWS_REPOSITORY_TOKEN, useClass: NewsRepository },
