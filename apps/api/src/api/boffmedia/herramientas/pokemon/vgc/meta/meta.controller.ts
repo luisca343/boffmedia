@@ -84,6 +84,13 @@ export class VgcMetaController {
     return this.facade.getSmogonUsage(dto);
   }
 
+  @Get('smogon/list')
+  @ApiOperation({ summary: 'Get lean Smogon usage list (without expanded detail arrays)' })
+  @ApiResponse({ status: 200, description: 'Lean usage list returned.' })
+  getSmogonUsageList(@Query() dto: QuerySmogonDto) {
+    return this.facade.getSmogonUsageList(dto);
+  }
+
   @Get('smogon/:speciesId')
   @ApiOperation({ summary: 'Get Smogon detail for a single Pokémon' })
   @ApiParam({ name: 'speciesId', example: 'incineroar' })
@@ -106,6 +113,13 @@ export class VgcMetaController {
   @ApiResponse({ status: 200, description: 'Usage list returned.' })
   getChampionsUsage(@Query() dto: QueryChampionsDto) {
     return this.facade.getChampionsUsage(dto);
+  }
+
+  @Get('champions/list')
+  @ApiOperation({ summary: 'Get lean Champions usage list (without expanded detail arrays)' })
+  @ApiResponse({ status: 200, description: 'Lean usage list returned.' })
+  getChampionsUsageList(@Query() dto: QueryChampionsDto) {
+    return this.facade.getChampionsUsageList(dto);
   }
 
   @Get('champions/:speciesId/detail')
@@ -162,11 +176,25 @@ export class VgcMetaController {
     return this.facade.getLimitlessCombinedUsage(regulationId);
   }
 
+  @Get('limitless/usage/combined/list')
+  @ApiOperation({ summary: 'Get lean combined Limitless usage list for a regulation' })
+  @ApiResponse({ status: 200, description: 'Lean combined usage list returned.' })
+  getLimitlessCombinedUsageList(@Query('regulationId') regulationId: string) {
+    return this.facade.getLimitlessCombinedUsageList(regulationId);
+  }
+
   @Get('limitless/usage')
   @ApiOperation({ summary: 'Get usage data for a Limitless tournament' })
   @ApiResponse({ status: 200, description: 'Usage list returned.' })
   getLimitlessUsage(@Query() dto: QueryLimitlessDto) {
     return this.facade.getLimitlessUsage(dto.tournamentId);
+  }
+
+  @Get('limitless/usage/list')
+  @ApiOperation({ summary: 'Get lean Limitless usage list for a tournament' })
+  @ApiResponse({ status: 200, description: 'Lean usage list returned.' })
+  getLimitlessUsageList(@Query() dto: QueryLimitlessDto) {
+    return this.facade.getLimitlessUsageList(dto.tournamentId);
   }
 
   @Get('limitless/tournament/:id/status')

@@ -53,6 +53,13 @@ export class VgcMetaService {
     return apiGET<PokemonUsageDetail[]>(`/tools/vgc/meta/smogon?${params}`);
   }
 
+  static getSmogonUsageList(format: string, month?: string, cutoff?: number) {
+    const params = new URLSearchParams({ format });
+    if (month)                params.set('month', month);
+    if (cutoff !== undefined) params.set('cutoff', String(cutoff));
+    return apiGET<PokemonUsageEntry[]>(`/tools/vgc/meta/smogon/list?${params}`);
+  }
+
   static getSmogonDetail(format: string, speciesId: string, month?: string, cutoff?: number) {
     const params = new URLSearchParams({ format });
     if (month)                params.set('month', month);
@@ -75,6 +82,10 @@ export class VgcMetaService {
 
   static getChampionsUsage(regulationId: string) {
     return apiGET<PokemonUsageDetail[]>(`/tools/vgc/meta/champions?regulationId=${regulationId}`);
+  }
+
+  static getChampionsUsageList(regulationId: string) {
+    return apiGET<PokemonUsageEntry[]>(`/tools/vgc/meta/champions/list?regulationId=${regulationId}`);
   }
 
   static refreshChampions(regulationId: string, token: string) {
@@ -130,9 +141,21 @@ export class VgcMetaService {
     );
   }
 
+  static getLimitlessUsageList(tournamentId: number) {
+    return apiGET<PokemonUsageEntry[]>(
+      `/tools/vgc/meta/limitless/usage/list?tournamentId=${tournamentId}`,
+    );
+  }
+
   static getLimitlessCombinedUsage(regulationId: string) {
     return apiGET<PokemonUsageDetail[]>(
       `/tools/vgc/meta/limitless/usage/combined?regulationId=${regulationId}`,
+    );
+  }
+
+  static getLimitlessCombinedUsageList(regulationId: string) {
+    return apiGET<PokemonUsageEntry[]>(
+      `/tools/vgc/meta/limitless/usage/combined/list?regulationId=${regulationId}`,
     );
   }
 
@@ -272,7 +295,7 @@ export interface VgcPokemon {
 
 export class VgcService {
   static getChampionsRegulations() {
-    return apiGET<ChampionsRegulation[]>('/tools/vgc/champions/regulations');
+    return apiGET<ChampionsRegulation[]>('/tools/vgc/meta/regulations');
   }
 
   static getChampionsSpeedTiers(regulationId: string) {

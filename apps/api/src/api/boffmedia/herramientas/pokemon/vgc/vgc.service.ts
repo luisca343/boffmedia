@@ -64,7 +64,7 @@ export class VgcService {
       throw new NotFoundException(
         `Format "${formatId}" not found. ` +
         `Use GET /tools/vgc/formats for standard VGC formats or ` +
-        `GET /tools/vgc/champions/regulations for Champions format IDs.`,
+        `GET /tools/vgc/meta/regulations for Champions format IDs.`,
       );
     }
 
