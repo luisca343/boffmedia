@@ -162,8 +162,27 @@ export interface ChampionsRegulation {
   name:         string;
   gameType:     string;
   vgcPastesGid: string | null;
+  importStatus?: 'idle' | 'running_csv' | 'running_pastes' | 'done' | 'error';
+  importError?: string | null;
+  importTeamCount?: number;
+  importStartedAt?: string | null;
+  importCompletedAt?: string | null;
   active:       number;
   createdAt:    string;
+}
+
+export interface UpsertRegulationPayload {
+  id: string;
+  formatId: string;
+  name: string;
+  gameType?: 'singles' | 'doubles';
+  vgcPastesGid?: string | null;
+}
+
+export class VgcRegulationsAdminService {
+  static upsertRegulation(payload: UpsertRegulationPayload, token: string) {
+    return apiAuthedPOST<ChampionsRegulation>('/tools/vgc/meta/regulations', payload, token);
+  }
 }
 
 // ─── Limitless types ─────────────────────────────────────────────────────────

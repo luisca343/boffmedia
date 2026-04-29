@@ -191,6 +191,11 @@ export const vgcRegulations = mysqlTable('vgc_regulations', {
   name:          varchar('name',           { length: 255 }).notNull(),
   gameType:      varchar('game_type',      { length: 16  }).notNull().default('doubles'),
   vgcPastesGid:  varchar('vgcpastes_gid',  { length: 32  }),               // null = no VGCPastes sheet
+  importStatus:  varchar('import_status',  { length: 16  }).notNull().default('idle'),
+  importError:   text('import_error'),
+  importTeamCount:int('import_team_count').notNull().default(0),
+  importStartedAt: datetime('import_started_at'),
+  importCompletedAt: datetime('import_completed_at'),
   active:        int('active').notNull().default(1),                        // 0 = soft-disabled
   createdAt:     datetime('created_at').notNull(),
 });
