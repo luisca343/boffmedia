@@ -57,13 +57,13 @@ export class VgcMetaFacadeService {
     const cutoff = dto.cutoff ?? SMOGON_DEFAULT_CUTOFF;
     // Month must be provided, or fall back to the most recent available snapshot
     const month = dto.month ?? await this.resolveMostRecentMonth(dto.format, cutoff);
-    return this.smogonService.getUsageList(dto.format, month, cutoff, dto.limit, dto.offset);
+    return this.smogonService.getUsageList(dto.format, month, cutoff);
   }
 
   async getSmogonUsageList(dto: QuerySmogonDto) {
     const cutoff = dto.cutoff ?? SMOGON_DEFAULT_CUTOFF;
     const month = dto.month ?? await this.resolveMostRecentMonth(dto.format, cutoff);
-    return this.smogonService.getUsageEntries(dto.format, month, cutoff, dto.limit, dto.offset);
+    return this.smogonService.getUsageEntries(dto.format, month, cutoff);
   }
 
   async getSmogonDetail(dto: QuerySmogonDto & { speciesId: string }) {
@@ -89,14 +89,14 @@ export class VgcMetaFacadeService {
     const regulation = await this.regulationsRepository.findById(dto.regulationId);
     if (!regulation) throw new NotFoundException(`Regulation "${dto.regulationId}" not found`);
     if (!regulation.vgcPastesGid) throw new NotFoundException(`No VGCPastes GID configured for "${dto.regulationId}"`);
-    return this.vgcPastesService.getUsageList(dto.regulationId, dto.limit, dto.offset);
+    return this.vgcPastesService.getUsageList(dto.regulationId);
   }
 
   async getChampionsUsageList(dto: QueryChampionsDto) {
     const regulation = await this.regulationsRepository.findById(dto.regulationId);
     if (!regulation) throw new NotFoundException(`Regulation "${dto.regulationId}" not found`);
     if (!regulation.vgcPastesGid) throw new NotFoundException(`No VGCPastes GID configured for "${dto.regulationId}"`);
-    return this.vgcPastesService.getUsageEntries(dto.regulationId, dto.limit, dto.offset);
+    return this.vgcPastesService.getUsageEntries(dto.regulationId);
   }
 
   async refreshChampionsData(regulationId: string) {
@@ -124,12 +124,12 @@ export class VgcMetaFacadeService {
     return this.limitlessService.importTournament(dto.url, dto.regulationId, dto.maxPlayers);
   }
 
-  async getLimitlessUsage(tournamentId: number, limit?: number, offset?: number) {
-    return this.limitlessService.getUsageList(tournamentId, limit, offset);
+  async getLimitlessUsage(tournamentId: number) {
+    return this.limitlessService.getUsageList(tournamentId);
   }
 
-  async getLimitlessUsageList(tournamentId: number, limit?: number, offset?: number) {
-    return this.limitlessService.getUsageEntries(tournamentId, limit, offset);
+  async getLimitlessUsageList(tournamentId: number) {
+    return this.limitlessService.getUsageEntries(tournamentId);
   }
 
   async getLimitlessCombinedUsage(regulationId: string) {

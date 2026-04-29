@@ -104,10 +104,8 @@ export class SmogonService {
     formatId: string,
     month: string,
     cutoff: number,
-    limit?: number,
-    offset?: number,
   ): Promise<PokemonUsageDetail[]> {
-    const rows = await this.smogonRepository.findAllPokemon(formatId, month, cutoff, limit, offset);
+    const rows = await this.smogonRepository.findAllPokemon(formatId, month, cutoff);
     if (rows.length === 0) {
       throw new NotFoundException(
         `No data for ${formatId} ${month}-${cutoff}. Fetch from the admin panel first.`,
@@ -121,10 +119,8 @@ export class SmogonService {
     formatId: string,
     month: string,
     cutoff: number,
-    limit?: number,
-    offset?: number,
   ): Promise<PokemonUsageEntry[]> {
-    const rows = await this.smogonRepository.findAllPokemon(formatId, month, cutoff, limit, offset);
+    const rows = await this.smogonRepository.findAllPokemon(formatId, month, cutoff);
     if (rows.length === 0) {
       throw new NotFoundException(
         `No data for ${formatId} ${month}-${cutoff}. Fetch from the admin panel first.`,

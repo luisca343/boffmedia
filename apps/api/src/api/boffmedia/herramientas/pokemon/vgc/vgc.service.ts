@@ -139,13 +139,6 @@ export class VgcService {
 
   // ==================== CHAMPIONS MOD ====================
 
-  /**
-   * Returns the list of Champions regulations with their format IDs.
-   */
-  async getChampionsRegulations() {
-    return this.regulationsRepository.findActive();
-  }
-
   async getRegulationById(id: string) {
     return this.regulationsRepository.findById(id);
   }

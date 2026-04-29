@@ -82,10 +82,8 @@ export class SmogonRepository {
     formatId: string,
     month: string,
     cutoff: number,
-    limit?: number,
-    offset?: number,
   ): Promise<VgcSmogonPokemonRow[]> {
-    const baseQuery = this.db
+    return this.db
       .select()
       .from(vgcSmogonPokemon)
       .where(and(
@@ -94,18 +92,6 @@ export class SmogonRepository {
         eq(vgcSmogonPokemon.cutoff, cutoff),
       ))
       .orderBy(vgcSmogonPokemon.rank);
-
-    if (offset !== undefined && limit !== undefined) {
-      return baseQuery.offset(offset).limit(limit);
-    }
-    if (offset !== undefined) {
-      return baseQuery.offset(offset);
-    }
-    if (limit !== undefined) {
-      return baseQuery.limit(limit);
-    }
-
-    return baseQuery;
   }
 
   async findPokemon(
