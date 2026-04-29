@@ -4,6 +4,8 @@ import dynamic from 'next/dynamic';
 import { useGetNewsById } from '@/hooks/documents/useGetNewsById';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/primitives/alert"
 import { AlertCircle, Loader2 } from 'lucide-react'
+import { useBoffSession } from '@/services/useBoffSession';
+import { USER_ROLES } from '@boffmedia/shared';
 import FurretHeader from '../../_components/Header';
 import FurretFooter from '../../_components/Footer';
 import PopArtWallpaper from '../../_components/PopArtWallpaper';
@@ -13,8 +15,61 @@ import { InternalLink } from "@/components/ui/navigation/Link";
 const CustomEditor = dynamic(() => import('@/components/shared/ckeditor/TestEditor'), { ssr: false });
 
 export default function EditNote({ params }: { params: { id: string } }) {
+  const { hasRole, status } = useBoffSession();
+  const canManageNews = hasRole([USER_ROLES.ROTOM_ADMIN, USER_ROLES.ROTOM_FURRET]);
   const { id } = params;
   const { article, error, isLoading } = useGetNewsById(id);
+
+  if (status === 'loading') {
+    return (
+      <div className="min-h-full relative overflow-auto">
+        <div className="absolute inset-0">
+          <PopArtWallpaper />
+        </div>
+        <div className="relative z-10 min-h-full flex items-center justify-center p-8">
+          <div className="bg-yellow-300 card-pop p-8 text-center">
+            <h2 className="text-pop-4xl font-bold mb-6 text-pink-500 pop-shadow">
+              ¡CARGANDO!
+            </h2>
+            <p className="text-pop-xl font-comic text-secondary-600">
+              Verificando permisos... 🔐
+            </p>
+          </div>
+        </div>
+        <PopStyles />
+      </div>
+    );
+  }
+
+  if (!canManageNews) {
+    return (
+      <div className="min-h-full relative overflow-auto">
+        <div className="absolute inset-0">
+          <PopArtWallpaper />
+        </div>
+        <div className="relative z-10 min-h-full flex items-center justify-center p-8">
+          <Alert className="card-pop bg-red-100 border-red-500 max-w-2xl">
+            <AlertCircle className="h-8 w-8" />
+            <AlertTitle className="text-pop-2xl font-bold pop-shadow text-red-600">
+              ACCESO DENEGADO
+            </AlertTitle>
+            <AlertDescription className="text-pop-lg font-comic mt-4">
+              Necesitas el rol ROTOM_ADMIN o ROTOM_FURRET para editar noticias.
+            </AlertDescription>
+            <div className="mt-6">
+              <InternalLink 
+                href="/smartrotom/furrettoday" 
+                className="btn-pop-primary pop-focus animate-button-press"
+              >
+                🏠 Volver a Furret Today
+              </InternalLink>
+            </div>
+          </Alert>
+        </div>
+        <PopStyles />
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
