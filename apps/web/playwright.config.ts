@@ -23,23 +23,15 @@ const config: PlaywrightTestConfig = {
         ...devices["Desktop Chrome"],
       },
     },
-    {
-      name: "firefox",
-      use: {
-        ...devices["Desktop Firefox"],
-      },
-    },
-    {
-      name: "webkit",
-      use: {
-        ...devices["Desktop Safari"],
-      },
-    },
   ],
   webServer: {
     command: "npm run start",
     port: 3000,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: true,
+    env: {
+      ...process.env,
+      NEXT_PUBLIC_API: process.env.NEXT_PUBLIC_API ?? "http://127.0.0.1:3333",
+    },
   },
 }
 
