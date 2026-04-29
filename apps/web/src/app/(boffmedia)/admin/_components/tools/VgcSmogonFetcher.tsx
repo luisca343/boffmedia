@@ -9,8 +9,8 @@ import { useBoffSession } from "@/services/useBoffSession";
 const FORMAT_OPTIONS = [
   { id: "gen9vgc2026regi", label: "VGC 2026 Reg I" },
   { id: "gen9vgc2026regh", label: "VGC 2026 Reg H" },
-  { id: "gen9vgc2025regg", label: "VGC 2025 Reg G" },
-  { id: "gen9vgc2025regf", label: "VGC 2025 Reg F" },
+  { id: "gen9vgc2026regg", label: "VGC 2026 Reg G" },
+  { id: "gen9vgc2026regf", label: "VGC 2026 Reg F" },
 ];
 
 const CUTOFF_OPTIONS = [1760, 1630, 1500, 0];
@@ -46,6 +46,11 @@ export function VgcSmogonFetcher() {
     setFetching(true);
     setError(null);
     setSuccess(null);
+    if (!token) {
+      setError("Sesion invalida: vuelve a iniciar sesion con una cuenta BOFF_ADMIN.");
+      setFetching(false);
+      return;
+    }
     try {
       const res = await VgcMetaService.fetchSmogonSnapshot(format, month, cutoff, token);
       setSuccess(`Importados ${res.data?.count ?? 0} Pokémon.`);
@@ -61,6 +66,11 @@ export function VgcSmogonFetcher() {
     setDeletingId(s.id);
     setError(null);
     setSuccess(null);
+    if (!token) {
+      setError("Sesion invalida: vuelve a iniciar sesion con una cuenta BOFF_ADMIN.");
+      setDeletingId(null);
+      return;
+    }
     try {
       await VgcMetaService.deleteSmogonSnapshot(s.formatId, s.month, s.cutoff, token);
       setSuccess(`Snapshot ${s.formatId} ${s.month}-${s.cutoff} eliminado.`);

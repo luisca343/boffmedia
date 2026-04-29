@@ -10,6 +10,6 @@
 export const FORMAT_LABELS: Readonly<Record<string, string>> = {
   gen9vgc2026regi: "VGC 2026 Reg I",
   gen9vgc2026regh: "VGC 2026 Reg H",
-  gen9vgc2025regg: "VGC 2025 Reg G",
-  gen9vgc2025regf: "VGC 2025 Reg F",
+  gen9vgc2025regg: "VGC 2026 Reg G",
+  gen9vgc2025regf: "VGC 2026 Reg F",
 };
