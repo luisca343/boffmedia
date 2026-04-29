@@ -1,4 +1,4 @@
-import { apiGET, apiDELETE, boffPOST } from '@/services/boffAPI';
+import { apiGET, apiDELETE, apiAuthedPOST, apiAuthedDELETE } from '@/services/boffAPI';
 import type { BatchFetchResultDto, ChampionsPasteDetailDto } from '@boffmedia/shared';
 
 // ─── VGC Meta Analysis ────────────────────────────────────────────────────────
@@ -60,13 +60,13 @@ export class VgcMetaService {
     return apiGET<PokemonUsageDetail>(`/tools/vgc/meta/smogon/${speciesId}?${params}`);
   }
 
-  static fetchSmogonSnapshot(format: string, month: string, cutoff: number) {
-    return boffPOST<{ count: number }>('/tools/vgc/meta/smogon/fetch', { format, month, cutoff });
+  static fetchSmogonSnapshot(format: string, month: string, cutoff: number, token: string) {
+    return apiAuthedPOST<{ count: number }>('/tools/vgc/meta/smogon/fetch', { format, month, cutoff }, token);
   }
 
-  static deleteSmogonSnapshot(format: string, month: string, cutoff: number) {
+  static deleteSmogonSnapshot(format: string, month: string, cutoff: number, token: string) {
     const params = new URLSearchParams({ format, month, cutoff: String(cutoff) });
-    return apiDELETE<void>(`/tools/vgc/meta/smogon/snapshot?${params}`);
+    return apiAuthedDELETE<void>(`/tools/vgc/meta/smogon/snapshot?${params}`, token);
   }
 
   static getAvailableChampionsRegulations() {
@@ -77,10 +77,11 @@ export class VgcMetaService {
     return apiGET<PokemonUsageDetail[]>(`/tools/vgc/meta/champions?regulationId=${regulationId}`);
   }
 
-  static refreshChampions(regulationId: string) {
-    return boffPOST<{ count: number }>(
+  static refreshChampions(regulationId: string, token: string) {
+    return apiAuthedPOST<{ count: number }>(
       `/tools/vgc/meta/champions/refresh?regulationId=${regulationId}`,
       {},
+      token,
     );
   }
 
@@ -90,21 +91,22 @@ export class VgcMetaService {
     );
   }
 
-  static fetchChampionsPastes(regulationId: string) {
-    return boffPOST<BatchFetchResult>(
+  static fetchChampionsPastes(regulationId: string, token: string) {
+    return apiAuthedPOST<BatchFetchResult>(
       `/tools/vgc/meta/champions/fetch-pastes?regulationId=${regulationId}`,
       {},
+      token,
     );
   }
 
   // ─── Limitless ─────────────────────────────────────────────────────────────
 
-  static importLimitlessTournament(url: string, regulationId: string, maxPlayers?: number) {
-    return boffPOST<{ tournamentId: number }>('/tools/vgc/meta/limitless/tournament', {
+  static importLimitlessTournament(url: string, regulationId: string, token: string, maxPlayers?: number) {
+    return apiAuthedPOST<{ tournamentId: number }>('/tools/vgc/meta/limitless/tournament', {
       url,
       regulationId,
       ...(maxPlayers !== undefined ? { maxPlayers } : {}),
-    });
+    }, token);
   }
 
   static getLimitlessTournamentStatus(tournamentId: number) {

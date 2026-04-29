@@ -20,6 +20,8 @@ export interface BoffUser { //extends DefaultUser {
   smartRotomUser?: SmartRotomUser
   discordId?: string
   image?: string | null
+  /** NestJS-signed JWT — use for Authorization: Bearer headers when calling guarded API endpoints */
+  accessToken?: string
 }
 
 declare module "next-auth" {
