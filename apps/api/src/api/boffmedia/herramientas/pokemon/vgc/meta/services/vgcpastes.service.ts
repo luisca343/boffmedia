@@ -2,7 +2,7 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Dex } from '@pkmn/sim';
 import { VgcPastesRepository } from '../repositories/vgcpastes.repository';
 import { VgcRegulationsRepository } from '../repositories/regulations.repository';
-import { BatchFetchResult, ChampionsPasteDetail, PokemonUsageDetail } from '../entities/pokemon-usage.entity';
+import { BatchFetchResult, ChampionsPasteDetail, PokemonUsageDetail, PokemonUsageEntry } from '../entities/pokemon-usage.entity';
 import { POKEPASTE_CONCURRENCY, VGCPASTES_SHEET_BASE } from '../config/smogon.config';
 import { VgcMetaSlot, StatSpread } from '@/_db/schema/Vgc';
 import { PokepasteService } from './pokepaste.service';
@@ -428,5 +428,20 @@ export class VgcPastesService {
         spreads:      [],
       };
     });
+  }
+
+  async getUsageEntries(regulationId: string): Promise<PokemonUsageEntry[]> {
+    const rows = await this.getUsageList(regulationId);
+    return rows.map((row) => ({
+      speciesId: row.speciesId,
+      speciesName: row.speciesName,
+      rank: row.rank,
+      types: row.types,
+      usagePercent: row.usagePercent,
+      rawCount: row.rawCount,
+      topItem: row.topItem,
+      topMove: row.topMove,
+      topTeraType: row.topTeraType,
+    }));
   }
 }

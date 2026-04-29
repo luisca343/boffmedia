@@ -3,7 +3,7 @@ import { Dex } from '@pkmn/sim';
 import { LimitlessRepository } from '../repositories/limitless.repository';
 import { PastesRepository } from '../repositories/pastes.repository';
 import { VgcRegulationsRepository } from '../repositories/regulations.repository';
-import { PokemonUsageDetail, LimitlessPlayer } from '../entities/pokemon-usage.entity';
+import { PokemonUsageDetail, PokemonUsageEntry, LimitlessPlayer } from '../entities/pokemon-usage.entity';
 import { VgcMetaSlot } from '@/_db/schema/Vgc';
 import { LIMITLESS_API_BASE } from '../config/smogon.config';
 import { getDexForFormat, resolveSpeciesId } from '../utils/dex-resolver';
@@ -340,6 +340,21 @@ export class LimitlessService {
     return aggregateSlots(teamSlots, dexForFormat);
   }
 
+  async getUsageEntries(tournamentId: number): Promise<PokemonUsageEntry[]> {
+    const rows = await this.getUsageList(tournamentId);
+    return rows.map((row) => ({
+      speciesId: row.speciesId,
+      speciesName: row.speciesName,
+      rank: row.rank,
+      types: row.types,
+      usagePercent: row.usagePercent,
+      rawCount: row.rawCount,
+      topItem: row.topItem,
+      topMove: row.topMove,
+      topTeraType: row.topTeraType,
+    }));
+  }
+
   async getCombinedUsage(regulationId: string): Promise<PokemonUsageDetail[]> {
     const regulation   = await this.regulationsRepository.findById(regulationId);
     const dexForFormat = getDexForFormat(regulation?.formatId ?? undefined);
@@ -362,6 +377,21 @@ export class LimitlessService {
       }
     }
     return aggregateSlots(allSlots, dexForFormat);
+  }
+
+  async getCombinedUsageEntries(regulationId: string): Promise<PokemonUsageEntry[]> {
+    const rows = await this.getCombinedUsage(regulationId);
+    return rows.map((row) => ({
+      speciesId: row.speciesId,
+      speciesName: row.speciesName,
+      rank: row.rank,
+      types: row.types,
+      usagePercent: row.usagePercent,
+      rawCount: row.rawCount,
+      topItem: row.topItem,
+      topMove: row.topMove,
+      topTeraType: row.topTeraType,
+    }));
   }
 
   async getPlayerList(tournamentId: number): Promise<LimitlessPlayer[]> {
