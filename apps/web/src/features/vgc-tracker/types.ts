@@ -49,6 +49,7 @@ export interface Session {
   limitlessTournamentId?: number;
   archivedAt?: number;
   sessionNotes?: string;
+  updatedAt?: number;
 }
 
 export interface SeriesGame {
@@ -76,6 +77,7 @@ export interface Series {
   games: SeriesGame[];
   seriesResult?: MatchResult;
   notes: MatchNote[];
+  updatedAt?: number;
 }
 
 export interface MatchSlot {
@@ -113,6 +115,7 @@ export interface Match {
   outcomeTag?: OutcomeTag;
   turnCount?: number;
   opponentArchetype?: string;
+  updatedAt?: number;
 }
 
 export type SpeciesEntry = { id: string; name: string; num: number };
