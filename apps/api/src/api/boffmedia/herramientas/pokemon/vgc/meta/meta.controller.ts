@@ -24,6 +24,7 @@ import { AddLimitlessTournamentDto } from './dto/add-limitless-tournament.dto';
 import { QueryLimitlessDto } from './dto/query-limitless.dto';
 import { BatchFetchResultDto, ChampionsPasteDetailDto } from './dto/champions-paste-detail.dto';
 import { UpsertRegulationDto } from './dto/upsert-regulation.dto';
+import { QueryPersonalMetaDto } from './dto/query-personal-meta.dto';
 import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 
 @ApiTags('BoffMedia 🛠 | VGC Meta')
@@ -274,5 +275,25 @@ export class VgcMetaController {
     @Query('regulationId') regulationId: string,
   ) {
     return this.facade.getSpeciesTeams(speciesId, regulationId);
+  }
+
+  // --- Unified Jobs + Personal Analytics -----------------------------------
+
+  @Get('jobs')
+  @ApiOperation({ summary: 'List unified ingestion jobs across Smogon, Champions, and Limitless' })
+  @ApiResponse({ status: 200, description: 'Unified ingestion jobs returned.' })
+  getIngestionJobs(@Query('regulationId') regulationId?: string) {
+    return this.facade.getIngestionJobs(regulationId);
+  }
+
+  @Get('compare/personal')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Compare personal tracker opponent usage vs selected meta source' })
+  @ApiResponse({ status: 200, description: 'Personal-vs-meta comparison returned.' })
+  getPersonalVsMeta(
+    @Req() req: any,
+    @Query() dto: QueryPersonalMetaDto,
+  ) {
+    return this.facade.comparePersonalVsMeta(req.user.userId, dto);
   }
 }

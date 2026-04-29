@@ -33,9 +33,9 @@
 ### P2
 
 - [ ] Introduce tracker sync conflict detection (`updatedAt` or version-based)
-- [ ] Add durable client outbox/retry model for tracker sync
-- [ ] Unify ingestion jobs under a shared status/retry/revision model
-- [ ] Move personal-vs-meta comparative analytics to backend contracts
+- [x] Add durable client outbox/retry model for tracker sync
+- [x] Unify ingestion jobs under a shared status/retry/revision model
+- [x] Move personal-vs-meta comparative analytics to backend contracts
 
 ---
 

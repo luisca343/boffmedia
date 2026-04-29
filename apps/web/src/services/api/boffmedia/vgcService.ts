@@ -1,4 +1,4 @@
-import { apiGET, apiDELETE, apiAuthedPOST, apiAuthedDELETE } from '@/services/boffAPI';
+import { apiGET, apiDELETE, apiAuthedGET, apiAuthedPOST, apiAuthedDELETE } from '@/services/boffAPI';
 import type { BatchFetchResultDto, ChampionsPasteDetailDto } from '@boffmedia/shared';
 
 // ─── VGC Meta Analysis ────────────────────────────────────────────────────────
@@ -177,6 +177,61 @@ export class VgcMetaService {
     const params = new URLSearchParams({ speciesId, regulationId });
     return apiGET<SpeciesTeamEntry[]>(`/tools/vgc/meta/teams?${params}`);
   }
+
+  static getIngestionJobs(regulationId?: string) {
+    const params = new URLSearchParams();
+    if (regulationId) params.set('regulationId', regulationId);
+    const query = params.toString();
+    return apiGET<VgcIngestionJob[]>(`/tools/vgc/meta/jobs${query ? `?${query}` : ''}`);
+  }
+
+  static getPersonalMetaComparison(
+    token: string,
+    params: {
+      regulationId: string;
+      source?: 'auto' | 'smogon' | 'champions' | 'limitless';
+      month?: string;
+      cutoff?: number;
+    },
+  ) {
+    const search = new URLSearchParams({ regulationId: params.regulationId });
+    if (params.source) search.set('source', params.source);
+    if (params.month) search.set('month', params.month);
+    if (params.cutoff !== undefined) search.set('cutoff', String(params.cutoff));
+    return apiAuthedGET<PersonalMetaComparison>(`/tools/vgc/meta/compare/personal?${search}`, token);
+  }
+}
+
+export interface VgcIngestionJob {
+  id: string;
+  type: 'smogon_snapshot' | 'champions_regulation' | 'limitless_tournament';
+  status: 'idle' | 'queued' | 'running' | 'done' | 'error';
+  revisionKey: string;
+  progress?: number;
+  total?: number;
+  startedAt?: string;
+  completedAt?: string;
+  lastError?: string;
+  metadata: Record<string, unknown>;
+}
+
+export interface PersonalMetaComparisonRow {
+  speciesId: string;
+  speciesName: string;
+  personalUsagePercent: number;
+  metaUsagePercent: number;
+  deltaPercent: number;
+  absDeltaPercent: number;
+  personalRawCount: number;
+  metaRawCount: number;
+}
+
+export interface PersonalMetaComparison {
+  regulationId: string;
+  source: 'smogon' | 'champions' | 'limitless';
+  personalSampleSize: number;
+  rowCount: number;
+  rows: PersonalMetaComparisonRow[];
 }
 
 export interface ChampionsRegulation {
