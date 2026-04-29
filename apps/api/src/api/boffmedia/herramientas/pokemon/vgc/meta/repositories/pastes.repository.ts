@@ -49,7 +49,7 @@ export class PastesRepository {
       fetchedAt:    new Date(),
     };
 
-    await this.db
+    const result = await this.db
       .insert(vgcPastes)
       .values(row)
       .onDuplicateKeyUpdate({ set: { rawText: row.rawText, parsedSlots: row.parsedSlots, fetchedAt: row.fetchedAt } });
@@ -57,12 +57,8 @@ export class PastesRepository {
     if (data.pokepasteId) {
       return (await this.findByPokepasteId(data.pokepasteId))!.id;
     }
-    // For inline pastes (no pokepasteId), fetch the last inserted id
-    const [last] = await this.db
-      .select()
-      .from(vgcPastes)
-      .where(eq(vgcPastes.rawText, data.rawText))
-      .limit(1);
-    return last.id;
+    // Inline pastes have no natural unique key, so rely on the actual insert metadata
+    // instead of re-querying by rawText, which can collide across unrelated rows.
+    return result[0].insertId;
   }
 }
