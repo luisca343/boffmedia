@@ -11,10 +11,10 @@ export const useBoffSession = () => {
     if (!session?.user?.roles) return false
     
     if (Array.isArray(role)) {
-      return role.some(r => session.user.roles.includes(r.toUpperCase()))
+      return role.some(r => session.user.roles.includes(r))
     }
 
-    return session.user.roles.includes(role.toUpperCase())
+    return session.user.roles.includes(role)
   }
 
   function isBoffAdmin() {

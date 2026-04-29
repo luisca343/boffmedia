@@ -16,6 +16,8 @@
 
 ## Current Priorities
 
+Status: P0-P2 refactor priorities are complete in the current implementation slice. The next phase is post-refactor hardening: broader regression coverage, CI enforcement for targeted checks, and production-facing operational runbooks for tracker sync and ingestion jobs.
+
 ### P0
 
 - [x] Tracker endpoints must derive identity from JWT, not client-supplied `userId`
@@ -129,3 +131,6 @@ Implemented in current slice:
 | 2026-04-29 | Completed P1.2/P1.3 verification: documented query fields match implementation and lean `/list` vs heavy detail payload split remains the canonical pattern (no pagination params added by product decision). |
 | 2026-04-29 | Completed P1.4 by codifying new indexes in schema (`vgc_smogon_snapshot_lookup_idx`, `vgc_pastes_format_idx`) and preparing migration `0006_vgc_p1_indexes.sql` (not executed in this session). |
 | 2026-04-29 | Completed remaining P2 item by adding tracker conflict detection: upserts now accept `clientUpdatedAt` and return `409 Conflict` on stale writes; outbox drops stale mutations to avoid infinite retries. |
+| 2026-04-29 | Added tracker conflict UX: new `conflict` sync state, explicit conflict badge copy, and one-click “Refresh from cloud” action; non-conflict network/server failures still use retry/backoff. |
+| 2026-04-29 | Fixed tracker pull-loop regression by stabilizing `flushOutbox` callback identity (removed state dependency churn), preventing repeated `/tracker/sync` calls when entering tracker. |
+| 2026-04-29 | Cleaned up remaining web TypeScript errors (news editor refresh contract and typed role checks) and added Playwright tracker regression coverage for single-pull sync mount and conflict refresh UX via localtest harness pages. |
