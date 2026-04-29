@@ -13,6 +13,7 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/primitives/button";
 import { motion } from "framer-motion";
 import { useBoffSession } from "@/services/useBoffSession";
+import type { UserRole } from "@boffmedia/shared";
 
 // ─── Shared nav-menu context ──────────────────────────────────────────────────
 //
@@ -94,7 +95,7 @@ interface MenuItemProps {
   label: string;
   icon?: React.ReactNode;
   description?: string;
-  roles?: string[];
+  roles?: UserRole[];
   isExternal?: boolean;
 }
 

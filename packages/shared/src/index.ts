@@ -3,6 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
+export { USER_ROLES } from './roles';
+export type { UserRole } from './roles';
+
 export type { AbilityCount } from './models/AbilityCount';
 export type { AbilityInfo } from './models/AbilityInfo';
 export { Achievement } from './models/Achievement';

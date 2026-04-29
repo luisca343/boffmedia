@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { boffPOST } from '@/services/boffAPI';
 import { BoffUser } from "@/types";
+import type { UserRole } from "@boffmedia/shared";
 import { AuthError, AUTH_ERROR_CODES, handleAuthError } from '@/utils/auth-errors';
 import { CookiesOptions } from "next-auth";
 
@@ -179,7 +180,7 @@ export const authOptions: NextAuthOptions = {
         id: token.id as string,
         email: token.email as string,
         name: token.name as string,
-        roles: token.roles as string[],
+        roles: token.roles as UserRole[],
         smartRotomUser: token.smartRotomUser as {
           username: string;
           uuid: string;

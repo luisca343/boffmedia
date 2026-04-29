@@ -8,6 +8,7 @@ import {
   BarChart2,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { USER_ROLES } from '@boffmedia/shared'
 
 export function ToolsMenu() {
   const t = useTranslations('nav.menus.tools')
@@ -82,7 +83,7 @@ export function ToolsMenu() {
             label: t("sections.gaming.items.steamKeys.label"), 
             description: t("sections.gaming.items.steamKeys.description"),
             icon: <FaSteam className="h-5 w-5" />,
-            roles: ["BOFF_ADMIN"]
+            roles: [USER_ROLES.BOFF_ADMIN]
           },
           { 
             href: "/otros/sorteos", 
