@@ -10,7 +10,7 @@ import WebSocket from 'ws';
 import axios from 'axios';
 import { Actions } from '@pkmn/login';
 
-@WebSocketGateway(34305, { cors: true })
+@WebSocketGateway({ namespace: '/showdown', cors: true })
 export class ShowdownGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
 
