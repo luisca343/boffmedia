@@ -3,6 +3,7 @@
 import { X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Modifiers, hasModifiers } from "../speedCalc";
+import { SpeedFlagChips } from "./SpeedFlagChips";
 
 interface Props {
   modifiers: Modifiers;
@@ -57,26 +58,32 @@ export function ModifierPanel({ modifiers, onChange }: Props) {
       <div className="h-4 w-px bg-surface-700/60 hidden sm:block" />
 
       {/* Flag toggles */}
-      {(
-        [
-          { key: "tailwind"  as const, label: t("tailwindShort"),  title: t("tailwind"),  activeClass: "bg-blue-500/20 text-blue-300 border-blue-500/50"       },
-          { key: "scarf"     as const, label: t("scarfShort"),     title: t("scarf"),     activeClass: "bg-orange-500/20 text-orange-300 border-orange-500/50" },
-          { key: "paralysis" as const, label: t("paralysisShort"), title: t("paralysis"), activeClass: "bg-yellow-500/20 text-yellow-300 border-yellow-500/50" },
-        ]
-      ).map(({ key, label, title, activeClass }) => (
-        <button
-          key={key}
-          onClick={() => toggleFlag(key)}
-          title={title}
-          className={`px-2.5 py-0.5 rounded text-xs font-semibold transition-all border ${
-            modifiers[key]
-              ? activeClass
-              : "bg-surface-800/80 text-surface-400 border-transparent hover:text-surface-200 hover:bg-surface-700/60"
-          }`}
-        >
-          {label}
-        </button>
-      ))}
+      <SpeedFlagChips
+        chips={[
+          {
+            key: "tailwind",
+            label: t("tailwindShort"),
+            title: t("tailwind"),
+            active: modifiers.tailwind,
+            activeClass: "bg-blue-500/20 text-blue-300 border-blue-500/50",
+          },
+          {
+            key: "scarf",
+            label: t("scarfShort"),
+            title: t("scarf"),
+            active: modifiers.scarf,
+            activeClass: "bg-orange-500/20 text-orange-300 border-orange-500/50",
+          },
+          {
+            key: "paralysis",
+            label: t("paralysisShort"),
+            title: t("paralysis"),
+            active: modifiers.paralysis,
+            activeClass: "bg-yellow-500/20 text-yellow-300 border-yellow-500/50",
+          },
+        ]}
+        onToggle={(key) => toggleFlag(key as "tailwind" | "scarf" | "paralysis")}
+      />
 
       {active && (
         <>

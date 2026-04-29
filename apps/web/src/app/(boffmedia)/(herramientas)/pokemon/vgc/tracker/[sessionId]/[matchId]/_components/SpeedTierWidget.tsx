@@ -7,6 +7,7 @@ import { Dex } from '@pkmn/dex';
 import type { MatchSlot } from '@/features/vgc-tracker/types';
 import { spriteUrl, handleSpriteError } from '@/features/vgc-tracker/types';
 import { calcSpeedStat, applyMods, compareSpeed } from '@/app/(boffmedia)/(herramientas)/pokemon/vgc/speedCalc';
+import { SpeedFlagChips } from '@/app/(boffmedia)/(herramientas)/pokemon/vgc/_components/SpeedFlagChips';
 
 interface Props {
   slots: MatchSlot[];
@@ -27,6 +28,7 @@ const EV_PRESETS = [
 
 export function SpeedTierWidget({ slots }: Props) {
   const t = useTranslations('vgc.tracker');
+  const tMods = useTranslations('vgc.speed.modifiers');
   const [tailwind, setTailwind] = useState(false);
   const [trickRoom, setTrickRoom] = useState(false);
   const [scarf, setScarf] = useState(false);
@@ -74,36 +76,39 @@ export function SpeedTierWidget({ slots }: Props) {
 
       {/* Modifiers row */}
       <div className="flex gap-1 px-3 py-1.5 border-b border-surface-800">
-        <button
-          onClick={() => setTailwind((v) => !v)}
-          className={`text-[10px] px-1.5 py-0.5 rounded font-mono transition-colors ${
-            tailwind
-              ? 'bg-blue-600/40 text-blue-300 border border-blue-600/50'
-              : 'bg-surface-800 text-surface-500 hover:text-surface-300 border border-transparent'
-          }`}
-        >
-          {t('speedWidget.tailwind')}
-        </button>
-        <button
-          onClick={() => setScarf((v) => !v)}
-          className={`text-[10px] px-1.5 py-0.5 rounded font-mono transition-colors ${
-            scarf
-              ? 'bg-orange-600/40 text-orange-300 border border-orange-600/50'
-              : 'bg-surface-800 text-surface-500 hover:text-surface-300 border border-transparent'
-          }`}
-        >
-          {t('speedWidget.scarf')}
-        </button>
-        <button
-          onClick={() => setTrickRoom((v) => !v)}
-          className={`text-[10px] px-1.5 py-0.5 rounded font-mono transition-colors ${
-            trickRoom
-              ? 'bg-violet-600/40 text-violet-300 border border-violet-600/50'
-              : 'bg-surface-800 text-surface-500 hover:text-surface-300 border border-transparent'
-          }`}
-        >
-          {t('speedWidget.trickroom')}
-        </button>
+        <SpeedFlagChips
+          className="flex gap-1"
+          buttonClassName="text-[10px] px-1.5 py-0.5 rounded font-mono transition-colors border"
+          inactiveClassName="bg-surface-800 text-surface-500 hover:text-surface-300 border-transparent"
+          chips={[
+            {
+              key: 'tailwind',
+              label: tMods('tailwindShort'),
+              title: tMods('tailwind'),
+              active: tailwind,
+              activeClass: 'bg-blue-600/40 text-blue-300 border-blue-600/50',
+            },
+            {
+              key: 'scarf',
+              label: tMods('scarfShort'),
+              title: tMods('scarf'),
+              active: scarf,
+              activeClass: 'bg-orange-600/40 text-orange-300 border-orange-600/50',
+            },
+            {
+              key: 'trickroom',
+              label: t('speedWidget.trickroom'),
+              title: t('speedWidget.trickroom'),
+              active: trickRoom,
+              activeClass: 'bg-violet-600/40 text-violet-300 border-violet-600/50',
+            },
+          ]}
+          onToggle={(key) => {
+            if (key === 'tailwind') setTailwind((v) => !v);
+            if (key === 'scarf') setScarf((v) => !v);
+            if (key === 'trickroom') setTrickRoom((v) => !v);
+          }}
+        />
       </div>
 
       {/* Opponent speed input */}
@@ -120,6 +125,10 @@ export function SpeedTierWidget({ slots }: Props) {
           placeholder={t('speedWidget.opponentSpeedPlaceholder')}
           className="w-full text-xs bg-surface-800 border border-surface-700 rounded px-2 py-1 text-surface-200 placeholder-surface-600 focus:outline-none focus:border-primary-500"
         />
+      </div>
+
+      <div className="px-3 py-1 text-[10px] text-surface-500 border-b border-surface-800 bg-surface-900/20">
+        {t('speedWidget.presetHint')}
       </div>
 
       {/* Your team rows */}
@@ -152,8 +161,12 @@ export function SpeedTierWidget({ slots }: Props) {
                 onError={handleSpriteError}
               />
               <div className="relative flex-1 min-w-0">
-                <span className={`text-xs truncate ${nameColor}`}>{row.name}</span>
-                <span className="text-[9px] text-surface-600">{row.evs}/{row.nature === 1.1 ? '+' : 'N'}</span>
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <span className={`text-xs truncate ${nameColor}`}>{row.name}</span>
+                  <span className="shrink-0 text-[9px] text-surface-500 bg-surface-800/70 border border-surface-700 rounded px-1 py-px font-mono">
+                    {row.evs}/{row.nature === 1.1 ? '+' : 'N'}
+                  </span>
+                </div>
               </div>
               <span className="relative text-xs font-mono shrink-0 tabular-nums text-surface-400">
                 {row.effective}
