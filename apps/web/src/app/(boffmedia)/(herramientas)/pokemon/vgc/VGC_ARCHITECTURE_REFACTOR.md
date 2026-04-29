@@ -18,10 +18,10 @@
 
 ### P0
 
-- [ ] Tracker endpoints must derive identity from JWT, not client-supplied `userId`
-- [ ] Tracker mutations must enforce row ownership server-side
-- [ ] Unified paste upsert must stop resolving non-pokepaste rows by `raw_text`
-- [ ] VGCPastes refresh must stop doing destructive delete-and-rebuild without a recoverable job/state model
+- [x] Tracker endpoints must derive identity from JWT, not client-supplied `userId`
+- [x] Tracker mutations must enforce row ownership server-side
+- [x] Unified paste upsert must stop resolving non-pokepaste rows by `raw_text`
+- [x] VGCPastes refresh must stop doing destructive delete-and-rebuild without a recoverable job/state model
 
 ### P1
 
@@ -125,3 +125,4 @@ Implemented in current slice:
 | 2026-04-29 | Implemented Slice 1 backend/frontend auth wiring: tracker sync now uses bearer auth, tracker endpoints are JWT-guarded, and tracker mutations/reads are scoped to the authenticated user. |
 | 2026-04-29 | Started Slice 2: inline paste identity hardening by removing the `raw_text` re-query path and returning the inserted row ID directly from MySQL metadata. |
 | 2026-04-29 | Completed Slice 2 first hardening step and started Slice 3: VGCPastes refresh is now non-destructive during CSV ingest, persists import state on regulations, and exposes status/errors in the admin Champions fetcher. |
+| 2026-04-29 | **Verified all P0 items complete**: JWT identity derivation ✓, ownership enforcement on deletes ✓, paste deduplication by pokepasteId ✓, non-destructive refresh flow ✓. |
