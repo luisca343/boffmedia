@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import type { RegulationMeta } from '@/features/vgc-tracker/hooks/useRegulationMeta';
 import { PokemonUsageTable } from './PokemonUsageTable';
+import { UsageTableTabs } from './UsageTableTabs';
 
 type MetaTab = 'preview' | 'leads' | 'backs';
 const META_TABS: MetaTab[] = ['preview', 'leads', 'backs'];
@@ -17,6 +18,11 @@ interface Props {
 export function RegulationMetaSection({ regulationId, meta, loading }: Props) {
   const t = useTranslations('vgc.tracker.sessionStats');
   const [tab, setTab] = useState<MetaTab>('preview');
+  const tabConfig: Record<MetaTab, { label: string; showDiscards: boolean }> = {
+    preview: { label: t('table.tabs.preview'), showDiscards: true },
+    leads: { label: t('table.tabs.leads'), showDiscards: false },
+    backs: { label: t('table.tabs.backs'), showDiscards: false },
+  };
 
   return (
     <div className="rounded-xl border border-surface-800 bg-surface-950 overflow-hidden">
@@ -36,21 +42,11 @@ export function RegulationMetaSection({ regulationId, meta, loading }: Props) {
       </div>
 
       {/* Sub-tabs */}
-      <div className="flex border-b border-surface-800">
-        {META_TABS.map((tabKey) => (
-          <button
-            key={tabKey}
-            onClick={() => setTab(tabKey)}
-            className={`flex-1 py-2.5 text-xs font-medium transition-colors ${
-              tab === tabKey
-                ? 'text-primary-400 border-b-2 border-primary-400 -mb-px bg-primary-500/5'
-                : 'text-surface-500 hover:text-surface-300'
-            }`}
-          >
-            {t(`table.tabs.${tabKey}`)}
-          </button>
-        ))}
-      </div>
+      <UsageTableTabs
+        tabs={META_TABS.map((tabKey) => ({ key: tabKey, label: tabConfig[tabKey].label }))}
+        active={tab}
+        onChange={setTab}
+      />
 
       {/* Content */}
       {loading ? (
@@ -62,7 +58,7 @@ export function RegulationMetaSection({ regulationId, meta, loading }: Props) {
       ) : (
         <PokemonUsageTable
           items={tab === 'preview' ? meta.preview : tab === 'leads' ? meta.leads : meta.backs}
-          showDiscards={tab === 'preview'}
+          showDiscards={tabConfig[tab].showDiscards}
           tournamentUsageMap={meta.tournamentUsageMap}
         />
       )}

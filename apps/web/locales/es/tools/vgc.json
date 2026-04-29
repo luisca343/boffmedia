@@ -320,11 +320,10 @@
         "expand": "Mostrar",
         "collapse": "Ocultar",
         "summary": "{count} mons · {min}-{max}",
-        "tailwind": "VA ×2",
-        "scarf": "Pañuelo ×1.5",
         "trickroom": "ER ↕",
         "opponentSpeed": "Velocidad Base Rival",
-        "opponentSpeedPlaceholder": "Ingresa la velocidad base del rival..."
+        "opponentSpeedPlaceholder": "Ingresa la velocidad base del rival...",
+        "presetHint": "Haz click en una fila para cambiar el preset de EV"
       },
       "zones": {
         "leads": "Inicios",

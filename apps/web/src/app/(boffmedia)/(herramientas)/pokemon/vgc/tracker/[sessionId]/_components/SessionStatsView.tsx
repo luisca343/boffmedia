@@ -16,6 +16,7 @@ import { SessionComparisonChart } from './SessionComparisonChart';
 import { HeatmapSection } from './HeatmapSection';
 import { MatchupMatrixSection } from './MatchupMatrixSection';
 import { ArchetypeSection } from './ArchetypeSection';
+import { UsageTableTabs } from './UsageTableTabs';
 
 const TABLE_TABS = ['myTeam', 'preview', 'leads', 'backs'] as const;
 type TableTab = (typeof TABLE_TABS)[number];
@@ -113,18 +114,11 @@ export function SessionStatsView({ sessionId, regulationId, startElo, limitlessT
 
   // ── Table data ─────────────────────────────────────────────────────────────
 
-  const tabData = {
-    myTeam: stats.myPokemon,
-    preview: stats.opponentPreview,
-    leads: stats.opponentLeads,
-    backs: stats.opponentBacks,
-  };
-
-  const tabLabels: Record<TableTab, string> = {
-    myTeam: t('table.tabs.myTeam'),
-    preview: t('table.tabs.preview'),
-    leads: t('table.tabs.leads'),
-    backs: t('table.tabs.backs'),
+  const tabConfig: Record<TableTab, { items: typeof stats.myPokemon; showDiscards: boolean; label: string }> = {
+    myTeam: { items: stats.myPokemon, showDiscards: false, label: t('table.tabs.myTeam') },
+    preview: { items: stats.opponentPreview, showDiscards: true, label: t('table.tabs.preview') },
+    leads: { items: stats.opponentLeads, showDiscards: false, label: t('table.tabs.leads') },
+    backs: { items: stats.opponentBacks, showDiscards: false, label: t('table.tabs.backs') },
   };
 
   return (
@@ -210,22 +204,15 @@ export function SessionStatsView({ sessionId, regulationId, startElo, limitlessT
 
       {/* ── Pokémon tables ────────────────────────────────────────────────── */}
       <div className="rounded-xl border border-surface-800 bg-surface-950 overflow-hidden">
-        <div className="flex border-b border-surface-800">
-          {TABLE_TABS.map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setTableTab(tab)}
-              className={`flex-1 py-2.5 text-xs font-medium transition-colors ${
-                tableTab === tab
-                  ? 'text-primary-400 border-b-2 border-primary-400 -mb-px bg-primary-500/5'
-                  : 'text-surface-500 hover:text-surface-300'
-              }`}
-            >
-              {tabLabels[tab]}
-            </button>
-          ))}
-        </div>
-        <PokemonUsageTable items={tabData[tableTab]} showDiscards={tableTab === 'preview'} />
+        <UsageTableTabs
+          tabs={TABLE_TABS.map((tab) => ({ key: tab, label: tabConfig[tab].label }))}
+          active={tableTab}
+          onChange={setTableTab}
+        />
+        <PokemonUsageTable
+          items={tabConfig[tableTab].items}
+          showDiscards={tabConfig[tableTab].showDiscards}
+        />
       </div>
 
       {/* ── Lead pairs ────────────────────────────────────────────────────── */}
