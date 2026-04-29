@@ -7,7 +7,8 @@ import { Args, Protocol } from '@pkmn/protocol'
 import { UpdateUserResult, QueryType } from './util/types'
 import { handleChallstr, handleFormats, handleUpdateSearch, handleUpdateUser } from './util/queryHandler'
 
-const SERVER = 'http://localhost:34305'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API ?? 'http://localhost:34301'
+const SERVER = `${API_BASE_URL}/showdown`
 const RECONNECT_INTERVAL = 5000 // 5 seconds
 
 type Message = {
