@@ -126,6 +126,6 @@ Implemented in current slice:
 | 2026-04-29 | Started Slice 2: inline paste identity hardening by removing the `raw_text` re-query path and returning the inserted row ID directly from MySQL metadata. |
 | 2026-04-29 | Completed Slice 2 first hardening step and started Slice 3: VGCPastes refresh is now non-destructive during CSV ingest, persists import state on regulations, and exposes status/errors in the admin Champions fetcher. |
 | 2026-04-29 | **Verified all P0 items complete**: JWT identity derivation ✓, ownership enforcement on deletes ✓, paste deduplication by pokepasteId ✓, non-destructive refresh flow ✓. |
-| 2026-04-29 | Completed P1.2/P1.3 by adding optional `limit`/`offset` query support on Smogon/Champions/Limitless usage routes while preserving previous unbounded defaults when omitted. |
+| 2026-04-29 | Completed P1.2/P1.3 verification: documented query fields match implementation and lean `/list` vs heavy detail payload split remains the canonical pattern (no pagination params added by product decision). |
 | 2026-04-29 | Completed P1.4 by codifying new indexes in schema (`vgc_smogon_snapshot_lookup_idx`, `vgc_pastes_format_idx`) and preparing migration `0006_vgc_p1_indexes.sql` (not executed in this session). |
 | 2026-04-29 | Completed remaining P2 item by adding tracker conflict detection: upserts now accept `clientUpdatedAt` and return `409 Conflict` on stale writes; outbox drops stale mutations to avoid infinite retries. |

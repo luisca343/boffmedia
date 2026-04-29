@@ -320,7 +320,7 @@ export class LimitlessService {
     return this.limitlessRepository.findTournamentsByRegulation(regulationId);
   }
 
-  async getUsageList(tournamentId: number, limit?: number, offset?: number): Promise<PokemonUsageDetail[]> {
+  async getUsageList(tournamentId: number): Promise<PokemonUsageDetail[]> {
     const tournament = await this.limitlessRepository.findTournamentById(tournamentId);
     if (!tournament) {
       throw new NotFoundException(`Tournament ${tournamentId} not found`);
@@ -337,13 +337,11 @@ export class LimitlessService {
     const teamSlots = teams
       .filter((t): t is typeof t & { parsedSlots: string } => t.parsedSlots !== null)
       .map((t) => JSON.parse(t.parsedSlots) as VgcMetaSlot[]);
-    const rows = aggregateSlots(teamSlots, dexForFormat);
-    if (offset === undefined && limit === undefined) return rows;
-    return rows.slice(offset ?? 0, (offset ?? 0) + (limit ?? rows.length));
+    return aggregateSlots(teamSlots, dexForFormat);
   }
 
-  async getUsageEntries(tournamentId: number, limit?: number, offset?: number): Promise<PokemonUsageEntry[]> {
-    const rows = await this.getUsageList(tournamentId, limit, offset);
+  async getUsageEntries(tournamentId: number): Promise<PokemonUsageEntry[]> {
+    const rows = await this.getUsageList(tournamentId);
     return rows.map((row) => ({
       speciesId: row.speciesId,
       speciesName: row.speciesName,
