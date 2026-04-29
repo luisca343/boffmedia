@@ -4,12 +4,16 @@ import { useEffect, useState } from "react";
 import { Download, Loader2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/primitives/button";
 import { BatchFetchResult, VgcMetaService, ChampionsRegulation } from "@/services/api/boffmedia/vgcService";
+import { useBoffSession } from "@/services/useBoffSession";
 
 const REGULATION_OPTIONS: Array<{ id: string; name: string }> = [
   { id: "vgc2026regma", name: "[Gen 9 Champions] VGC 2026 Reg M-A" },
 ];
 
 export function VgcChampionsFetcher() {
+  const { session } = useBoffSession();
+  const token = session?.user?.accessToken ?? '';
+
   const [available,      setAvailable]      = useState<ChampionsRegulation[]>([]);
   const [loading,        setLoading]        = useState(false);
   const [refreshing,     setRefreshing]     = useState<string | null>(null);
@@ -32,7 +36,7 @@ export function VgcChampionsFetcher() {
     setError(null);
     setSuccess(null);
     try {
-      const res = await VgcMetaService.refreshChampions(regulationId);
+      const res = await VgcMetaService.refreshChampions(regulationId, token);
       setSuccess(`Importados ${res.data?.count ?? 0} equipos para ${regulationId}.`);
       loadAvailable();
     } catch {
@@ -47,7 +51,7 @@ export function VgcChampionsFetcher() {
     setError(null);
     setSuccess(null);
     try {
-      const res = await VgcMetaService.fetchChampionsPastes(regulationId);
+      const res = await VgcMetaService.fetchChampionsPastes(regulationId, token);
       const r = res.data as BatchFetchResult | undefined;
       setSuccess(
         r

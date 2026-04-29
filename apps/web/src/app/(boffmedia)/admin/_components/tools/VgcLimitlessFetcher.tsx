@@ -8,6 +8,7 @@ import {
   LimitlessImportJobStatus,
   VgcMetaService,
 } from "@/services/api/boffmedia/vgcService";
+import { useBoffSession } from "@/services/useBoffSession";
 
 const REGULATION_OPTIONS: Array<{ id: string; name: string }> = [
   { id: "vgc2026regma", name: "VGC 2026 Reg M-A" },
@@ -39,6 +40,9 @@ function ProgressBar({ progress, total }: { progress: number; total: number }) {
 }
 
 export function VgcLimitlessFetcher() {
+  const { session } = useBoffSession();
+  const token = session?.user?.accessToken ?? '';
+
   const [url,          setUrl]          = useState("");
   const [regulationId, setRegulationId] = useState(REGULATION_OPTIONS[0].id);
   const [maxPlayers,   setMaxPlayers]   = useState<string>("");
@@ -103,7 +107,7 @@ export function VgcLimitlessFetcher() {
     setError(null);
     setSuccess(null);
     try {
-      const res = await VgcMetaService.importLimitlessTournament(url.trim(), regulationId, max);
+      const res = await VgcMetaService.importLimitlessTournament(url.trim(), regulationId, token, max);
       const tournamentId = res.data?.tournamentId;
       if (tournamentId) {
         setSuccess(`Importación iniciada (ID #${tournamentId}). Procesando en segundo plano...`);

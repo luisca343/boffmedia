@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Loader2, RefreshCw, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/primitives/button";
 import { VgcMetaService, SmogonSnapshot } from "@/services/api/boffmedia/vgcService";
+import { useBoffSession } from "@/services/useBoffSession";
 
 const FORMAT_OPTIONS = [
   { id: "gen9vgc2026regi", label: "VGC 2026 Reg I" },
@@ -15,6 +16,8 @@ const FORMAT_OPTIONS = [
 const CUTOFF_OPTIONS = [1760, 1630, 1500, 0];
 
 export function VgcSmogonFetcher() {
+    const { session } = useBoffSession();
+    const token = session?.user?.accessToken ?? '';
   const [snapshots, setSnapshots] = useState<SmogonSnapshot[]>([]);
   const [loading,   setLoading]   = useState(false);
   const [fetching,  setFetching]  = useState(false);
@@ -44,7 +47,7 @@ export function VgcSmogonFetcher() {
     setError(null);
     setSuccess(null);
     try {
-      const res = await VgcMetaService.fetchSmogonSnapshot(format, month, cutoff);
+      const res = await VgcMetaService.fetchSmogonSnapshot(format, month, cutoff, token);
       setSuccess(`Importados ${res.data?.count ?? 0} Pokémon.`);
       loadSnapshots();
     } catch {
@@ -59,7 +62,7 @@ export function VgcSmogonFetcher() {
     setError(null);
     setSuccess(null);
     try {
-      await VgcMetaService.deleteSmogonSnapshot(s.formatId, s.month, s.cutoff);
+      await VgcMetaService.deleteSmogonSnapshot(s.formatId, s.month, s.cutoff, token);
       setSuccess(`Snapshot ${s.formatId} ${s.month}-${s.cutoff} eliminado.`);
       loadSnapshots();
     } catch {
