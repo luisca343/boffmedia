@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq, desc } from 'drizzle-orm';
+import { and, eq, desc } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   vgcSessions,
@@ -26,7 +26,7 @@ export class TrackerRepository {
 
   async findPresets(userId?: number): Promise<VgcTeamPreset[]> {
     const query = this.db.select().from(vgcTeamPresets);
-    if (userId) return query.where(eq(vgcTeamPresets.userId, userId));
+    if (userId !== undefined) return query.where(eq(vgcTeamPresets.userId, userId));
     return query;
   }
 
@@ -73,15 +73,18 @@ export class TrackerRepository {
     });
   }
 
-  async deletePreset(id: string): Promise<void> {
-    await this.db.delete(vgcTeamPresets).where(eq(vgcTeamPresets.id, id));
+  async deletePreset(id: string, userId: number): Promise<void> {
+    await this.db.delete(vgcTeamPresets).where(and(
+      eq(vgcTeamPresets.id, id),
+      eq(vgcTeamPresets.userId, userId),
+    ));
   }
 
   // ─── Sessions ────────────────────────────────────────────────────────────────
 
   async findSessions(userId?: number): Promise<VgcSession[]> {
     const query = this.db.select().from(vgcSessions).orderBy(desc(vgcSessions.startedAt));
-    if (userId) return query.where(eq(vgcSessions.userId, userId));
+    if (userId !== undefined) return query.where(eq(vgcSessions.userId, userId));
     return query;
   }
 
@@ -94,8 +97,11 @@ export class TrackerRepository {
     await this.db.insert(vgcSessions).values(data as any).onDuplicateKeyUpdate({ set: data as any });
   }
 
-  async deleteSession(id: string): Promise<void> {
-    await this.db.delete(vgcSessions).where(eq(vgcSessions.id, id));
+  async deleteSession(id: string, userId: number): Promise<void> {
+    await this.db.delete(vgcSessions).where(and(
+      eq(vgcSessions.id, id),
+      eq(vgcSessions.userId, userId),
+    ));
   }
 
   // ─── Matches ─────────────────────────────────────────────────────────────────
@@ -140,8 +146,11 @@ export class TrackerRepository {
     await this.db.insert(vgcMatches).values(row as any).onDuplicateKeyUpdate({ set: row as any });
   }
 
-  async deleteMatch(id: string): Promise<void> {
-    await this.db.delete(vgcMatches).where(eq(vgcMatches.id, id));
+  async deleteMatch(id: string, userId: number): Promise<void> {
+    await this.db.delete(vgcMatches).where(and(
+      eq(vgcMatches.id, id),
+      eq(vgcMatches.userId, userId),
+    ));
   }
 
   // ─── Series ──────────────────────────────────────────────────────────────────
@@ -184,8 +193,11 @@ export class TrackerRepository {
     await this.db.insert(vgcSeries).values(row as any).onDuplicateKeyUpdate({ set: row as any });
   }
 
-  async deleteSeries(id: string): Promise<void> {
-    await this.db.delete(vgcSeries).where(eq(vgcSeries.id, id));
+  async deleteSeries(id: string, userId: number): Promise<void> {
+    await this.db.delete(vgcSeries).where(and(
+      eq(vgcSeries.id, id),
+      eq(vgcSeries.userId, userId),
+    ));
   }
 
   // ─── Sync ─────────────────────────────────────────────────────────────────────

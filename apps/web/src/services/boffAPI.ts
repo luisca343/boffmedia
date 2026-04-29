@@ -165,6 +165,14 @@ export async function apiAuthedPOST<T>(url: string, data: any, token: string): P
   return authedRequest<T>("POST", `${getApiUrl()}${url}`, token, data);
 }
 
+export async function apiAuthedGET<T>(url: string, token: string): Promise<ApiResponse<T>> {
+  return authedRequest<T>("GET", `${getApiUrl()}${url}`, token);
+}
+
+export async function apiAuthedPUT<T>(url: string, data: any, token: string): Promise<ApiResponse<T>> {
+  return authedRequest<T>("PUT", `${getApiUrl()}${url}`, token, data);
+}
+
 export async function apiAuthedDELETE<T>(url: string, token: string): Promise<ApiResponse<T>> {
   return authedRequest<T>("DELETE", `${getApiUrl()}${url}`, token);
 }

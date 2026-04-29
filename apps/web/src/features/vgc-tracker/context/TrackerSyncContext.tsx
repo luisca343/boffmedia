@@ -45,25 +45,25 @@ export function useTrackerSync() {
 
 export function TrackerSyncProvider({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession();
-  const userId = session?.user?.id ? parseInt(String(session.user.id), 10) : null;
+  const token = session?.user?.accessToken ?? null;
 
-  // Keep a ref so pushChange always reads the latest userId without recreating
-  const userIdRef = useRef<number | null>(userId);
-  useEffect(() => { userIdRef.current = userId; }, [userId]);
+  // Keep a ref so pushChange always reads the latest token without recreating
+  const tokenRef = useRef<string | null>(token);
+  useEffect(() => { tokenRef.current = token; }, [token]);
 
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('offline');
   const [lastSyncAt, setLastSyncAt] = useState(0);
 
-  const ensureParentSessionSynced = useCallback(async (uid: number, sessionId: string) => {
+  const ensureParentSessionSynced = useCallback(async (authToken: string, sessionId: string) => {
     const localSession = await vgcDb.sessions.get(sessionId);
     if (!localSession) return;
-    await pushSession(uid, localSession);
+    await pushSession(localSession, authToken);
   }, []);
 
   // ─── Initial pull on login ──────────────────────────────────────────────────
 
   useEffect(() => {
-    if (!userId) {
+    if (!token) {
       setSyncStatus('offline');
       return;
     }
@@ -71,7 +71,7 @@ export function TrackerSyncProvider({ children }: { children: React.ReactNode })
     let cancelled = false;
     setSyncStatus('syncing');
 
-    syncPull(userId)
+    syncPull(token)
       .then(async (remote) => {
         if (cancelled || !remote) return;
 
@@ -112,10 +112,10 @@ export function TrackerSyncProvider({ children }: { children: React.ReactNode })
         ]);
 
         // Parent-first upserts to satisfy FK constraints.
-        for (const s of localOnlySessions) await pushSession(userId, s);
-        for (const m of localOnlyMatches) await pushMatch(userId, m);
-        for (const s of localOnlySeries) await pushSeries(userId, s);
-        for (const p of localOnlyPresets) await pushPreset(userId, p);
+        for (const s of localOnlySessions) await pushSession(s, token);
+        for (const m of localOnlyMatches) await pushMatch(m, token);
+        for (const s of localOnlySeries) await pushSeries(s, token);
+        for (const p of localOnlyPresets) await pushPreset(p, token);
 
         if (!cancelled) {
           setSyncStatus('idle');
@@ -130,7 +130,7 @@ export function TrackerSyncProvider({ children }: { children: React.ReactNode })
       });
 
     return () => { cancelled = true; };
-  }, [userId]);
+  }, [token]);
 
   // ─── Push individual changes ───────────────────────────────────────────────
 
@@ -138,29 +138,29 @@ export function TrackerSyncProvider({ children }: { children: React.ReactNode })
   // Each push is independent; no mutex needed.
   const pushChange = useCallback(
     (table: SyncTable, id: string, data: Session | Match | Series | TeamPreset | null) => {
-      const uid = userIdRef.current;
-      if (!uid) return; // anonymous — no sync
+      const authToken = tokenRef.current;
+      if (!authToken) return; // anonymous — no sync
 
       const fire = async () => {
         setSyncStatus('syncing');
         try {
           if (data === null) {
-            if (table === 'sessions') await apiDeleteSession(id);
-            else if (table === 'matches') await apiDeleteMatch(id);
-            else if (table === 'series') await apiDeleteSeries(id);
-            else if (table === 'presets') await apiDeletePreset(id);
+            if (table === 'sessions') await apiDeleteSession(id, authToken);
+            else if (table === 'matches') await apiDeleteMatch(id, authToken);
+            else if (table === 'series') await apiDeleteSeries(id, authToken);
+            else if (table === 'presets') await apiDeletePreset(id, authToken);
           } else {
-            if (table === 'sessions') await pushSession(uid, data as Session);
+            if (table === 'sessions') await pushSession(data as Session, authToken);
             else if (table === 'matches') {
               const match = data as Match;
-              await ensureParentSessionSynced(uid, match.sessionId);
-              await pushMatch(uid, match);
+              await ensureParentSessionSynced(authToken, match.sessionId);
+              await pushMatch(match, authToken);
             } else if (table === 'series') {
               const oneSeries = data as Series;
-              await ensureParentSessionSynced(uid, oneSeries.sessionId);
-              await pushSeries(uid, oneSeries);
+              await ensureParentSessionSynced(authToken, oneSeries.sessionId);
+              await pushSeries(oneSeries, authToken);
             }
-            else if (table === 'presets') await pushPreset(uid, data as TeamPreset);
+            else if (table === 'presets') await pushPreset(data as TeamPreset, authToken);
           }
           setSyncStatus('idle');
         } catch (err) {

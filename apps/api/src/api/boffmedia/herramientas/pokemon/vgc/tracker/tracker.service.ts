@@ -14,16 +14,25 @@ function toMs(value: Date | number | null | undefined): number | undefined {
 export class TrackerService {
   constructor(private readonly repo: TrackerRepository) {}
 
+  private ensureOwnership(entityUserId: number | null | undefined, userId: number, label: string): void {
+    if (entityUserId == null || entityUserId !== userId) {
+      throw new NotFoundException(`${label} not found.`);
+    }
+  }
+
   // ─── Presets ────────────────────────────────────────────────────────────────
 
-  async getPresets(userId?: number): Promise<VgcTeamPreset[]> {
+  async getPresets(userId: number): Promise<VgcTeamPreset[]> {
     return this.repo.findPresets(userId);
   }
 
-  async upsertPreset(id: string, dto: CreatePresetDto): Promise<void> {
+  async upsertPreset(userId: number, id: string, dto: CreatePresetDto): Promise<void> {
+    const existing = await this.repo.findPreset(id);
+    if (existing) this.ensureOwnership(existing.userId, userId, `Preset "${id}"`);
+
     await this.repo.upsertPreset({
       id,
-      userId: dto.userId,
+      userId,
       name: dto.name,
       regulationId: dto.regulationId,
       exportString: dto.exportString,
@@ -35,47 +44,70 @@ export class TrackerService {
     });
   }
 
-  async deletePreset(id: string): Promise<void> {
-    await this.repo.deletePreset(id);
+  async deletePreset(userId: number, id: string): Promise<void> {
+    const existing = await this.repo.findPreset(id);
+    if (!existing) throw new NotFoundException(`Preset "${id}" not found.`);
+    this.ensureOwnership(existing.userId, userId, `Preset "${id}"`);
+    await this.repo.deletePreset(id, userId);
   }
 
   // ─── Sessions ────────────────────────────────────────────────────────────────
 
-  async getSessions(userId?: number): Promise<VgcSession[]> {
+  async getSessions(userId: number): Promise<VgcSession[]> {
     return this.repo.findSessions(userId);
   }
 
-  async upsertSession(dto: CreateSessionDto & { id: string }): Promise<void> {
+  async upsertSession(userId: number, dto: CreateSessionDto & { id: string }): Promise<void> {
+    const existing = await this.repo.findSession(dto.id);
+    if (existing) this.ensureOwnership(existing.userId, userId, `Session "${dto.id}"`);
+
     const data: any = { ...dto };
+    data.userId = userId;
     if (dto.startedAt) data.startedAt = new Date(dto.startedAt);
     await this.repo.upsertSession(data);
   }
 
-  async deleteSession(id: string): Promise<void> {
-    await this.repo.deleteSession(id);
+  async deleteSession(userId: number, id: string): Promise<void> {
+    const existing = await this.repo.findSession(id);
+    if (!existing) throw new NotFoundException(`Session "${id}" not found.`);
+    this.ensureOwnership(existing.userId, userId, `Session "${id}"`);
+    await this.repo.deleteSession(id, userId);
   }
 
   // ─── Matches ─────────────────────────────────────────────────────────────────
 
-  async getMatchesForSession(sessionId: string): Promise<VgcMatch[]> {
+  async getMatchesForSession(userId: number, sessionId: string): Promise<VgcMatch[]> {
+    const session = await this.repo.findSession(sessionId);
+    if (!session) throw new NotFoundException(`Session "${sessionId}" not found.`);
+    this.ensureOwnership(session.userId, userId, `Session "${sessionId}"`);
     return this.repo.findMatchesForSession(sessionId);
   }
 
-  async upsertMatch(dto: CreateMatchDto): Promise<void> {
+  async upsertMatch(userId: number, dto: CreateMatchDto): Promise<void> {
+    const session = await this.repo.findSession(dto.sessionId);
+    if (!session) throw new NotFoundException(`Session "${dto.sessionId}" not found.`);
+    this.ensureOwnership(session.userId, userId, `Session "${dto.sessionId}"`);
+
+    const existing = await this.repo.findMatch(dto.id);
+    if (existing) this.ensureOwnership(existing.userId, userId, `Match "${dto.id}"`);
+
     await this.repo.upsertMatch({
       ...dto,
+      userId,
       notes: dto.notes ?? [],
       createdAt: dto.createdAt ? new Date(dto.createdAt) : undefined,
       completedAt: dto.completedAt ? new Date(dto.completedAt) : undefined,
     });
   }
 
-  async updateMatch(id: string, dto: UpdateMatchDto): Promise<VgcMatch> {
+  async updateMatch(userId: number, id: string, dto: UpdateMatchDto): Promise<VgcMatch> {
     const existing = await this.repo.findMatch(id);
     if (!existing) throw new NotFoundException(`Match "${id}" not found.`);
+    this.ensureOwnership(existing.userId, userId, `Match "${id}"`);
     await this.repo.upsertMatch({
       id,
       sessionId: existing.sessionId,
+      userId,
       format: existing.format,
       myTeam: dto.myTeam ?? JSON.parse(existing.myTeam as unknown as string),
       opponentTeam: dto.opponentTeam ?? JSON.parse(existing.opponentTeam as unknown as string),
@@ -92,19 +124,33 @@ export class TrackerService {
     return this.repo.findMatch(id);
   }
 
-  async deleteMatch(id: string): Promise<void> {
-    await this.repo.deleteMatch(id);
+  async deleteMatch(userId: number, id: string): Promise<void> {
+    const existing = await this.repo.findMatch(id);
+    if (!existing) throw new NotFoundException(`Match "${id}" not found.`);
+    this.ensureOwnership(existing.userId, userId, `Match "${id}"`);
+    await this.repo.deleteMatch(id, userId);
   }
 
   // ─── Series ──────────────────────────────────────────────────────────────────
 
-  async getSeriesForSession(sessionId: string): Promise<VgcSeries[]> {
+  async getSeriesForSession(userId: number, sessionId: string): Promise<VgcSeries[]> {
+    const session = await this.repo.findSession(sessionId);
+    if (!session) throw new NotFoundException(`Session "${sessionId}" not found.`);
+    this.ensureOwnership(session.userId, userId, `Session "${sessionId}"`);
     return this.repo.findSeriesForSession(sessionId);
   }
 
-  async upsertSeries(dto: UpsertSeriesDto & { id: string }): Promise<void> {
+  async upsertSeries(userId: number, dto: UpsertSeriesDto & { id: string }): Promise<void> {
+    const session = await this.repo.findSession(dto.sessionId);
+    if (!session) throw new NotFoundException(`Session "${dto.sessionId}" not found.`);
+    this.ensureOwnership(session.userId, userId, `Session "${dto.sessionId}"`);
+
+    const existing = await this.repo.findSeries(dto.id);
+    if (existing) this.ensureOwnership(existing.userId, userId, `Series "${dto.id}"`);
+
     await this.repo.upsertSeries({
       ...dto,
+      userId,
       myTeam: typeof dto.myTeam === 'string' ? dto.myTeam : dto.myTeam,
       opponentTeam: typeof dto.opponentTeam === 'string' ? dto.opponentTeam : dto.opponentTeam,
       games: dto.games ?? [],
@@ -112,8 +158,11 @@ export class TrackerService {
     });
   }
 
-  async deleteSeries(id: string): Promise<void> {
-    await this.repo.deleteSeries(id);
+  async deleteSeries(userId: number, id: string): Promise<void> {
+    const existing = await this.repo.findSeries(id);
+    if (!existing) throw new NotFoundException(`Series "${id}" not found.`);
+    this.ensureOwnership(existing.userId, userId, `Series "${id}"`);
+    await this.repo.deleteSeries(id, userId);
   }
 
   // ─── Sync ─────────────────────────────────────────────────────────────────────
