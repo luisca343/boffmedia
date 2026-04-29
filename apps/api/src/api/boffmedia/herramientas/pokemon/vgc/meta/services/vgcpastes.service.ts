@@ -63,101 +63,132 @@ export class VgcPastesService {
   }
 
   async refreshRegulation(regulationId: string, gid: string): Promise<{ count: number }> {
-    const url = `${VGCPASTES_SHEET_BASE}${gid}`;
-    const res = await fetch(url);
-    if (!res.ok) {
-      throw new NotFoundException(`Failed to fetch VGCPastes CSV: HTTP ${res.status}`);
-    }
-
-    const rows = parseCsv(await res.text());
-
-    // Find the real column-header row by parsed cell values, not raw line text.
-    // "Team ID" appears twice (first and last column); "Pokemon Text for Copypasta"
-    // uniquely identifies the header row alongside it.
-    const headerRowIdx = rows.findIndex(
-      (cols) => cols.includes('Team ID') && cols.some((h) => h.includes('Pokemon Text for Copypasta')),
-    );
-    if (headerRowIdx === -1) {
-      throw new NotFoundException(
-        'Could not find column-header row (needs "Team ID" + "Pokemon Text for Copypasta") in VGCPastes CSV',
-      );
-    }
-
-    const headers          = rows[headerRowIdx];
-    const idxTeamId        = headers.indexOf('Team ID');          // first occurrence = col 0
-    const idxTeamDesc      = headers.indexOf('Team Description');
-    const idxFullName      = headers.indexOf('Full Name');
-    const idxPokepaste     = headers.indexOf('Pokepaste');
-    const idxHasEvs        = headers.indexOf('EVs');
-    const idxReplicaStatus = headers.findIndex((h) => h === 'Replica Status');
-    const idxReplicaCode   = headers.findIndex((h) => h.includes('Replica Code'));
-    const idxDate          = headers.indexOf('Date Shared');
-    const idxTournament    = headers.indexOf('Tournament / Event');
-    const idxRank          = headers.indexOf('Rank');
-    const idxSourceUrl     = headers.indexOf('Link to Source');
-    const idxOwner         = headers.indexOf('Owner');
-    const idxPokeText      = headers.findIndex((h) => h.includes('Pokemon Text for Copypasta'));
-    // Species are in the 6 columns starting AT idxPokeText (the header reads "Pokemon Text for
-    // Copypasta" but each data row stores the first Pokémon name there, not paste text).
-    const speciesStart     = idxPokeText;
-
-    // The per-Pokémon item columns sit in the upper "sprite slot" groups.
-    // Each group has 3 sub-cols; the 3rd sub-col (index 2 within the group) is the held item.
-    // Groups start at col 5 and repeat every 3 cols → item cols: 7, 10, 13, 16, 19, 22.
-    // Relative to idxPokepaste (col 24): offsets are -17, -14, -11, -8, -5, -2.
-    const itemCols = [-17, -14, -11, -8, -5, -2].map((offset) => idxPokepaste + offset);
-
-    this.logger.debug(
-      `Header at row ${headerRowIdx}: Team ID @ col ${idxTeamId}, ` +
-      `PokeText @ col ${idxPokeText}, species @ cols ${speciesStart}–${speciesStart + 5}`,
-    );
-
-    await this.vgcPastesRepository.deleteByRegulation(regulationId);
-
-    let count = 0;
-    for (const cols of rows.slice(headerRowIdx + 1)) {
-      const teamId = cols[idxTeamId]?.trim();
-      // Skip blank rows, repeated headers, and anything that can't be a valid team ID
-      if (!teamId || teamId.length > 16 || !/^[A-Za-z0-9]+$/.test(teamId)) continue;
-
-      const species = cols
-        .slice(speciesStart, speciesStart + 6)
-        .map((s) => s.trim())
-        .filter((s) => s.length > 0);
-
-      const items = itemCols
-        .map((ci) => cols[ci]?.trim() ?? '')
-        .filter((s) => s.length > 0);
-
-      await this.vgcPastesRepository.upsertTeam({
-        id:              teamId,
-        playerName:      cols[idxFullName]?.trim()        || null,
-        teamDescription: cols[idxTeamDesc]?.trim()        || null,
-        pasteUrl:        cols[idxPokepaste]?.trim()       || null,
-        hasEvs:          cols[idxHasEvs]?.trim()          || null,
-        replicaStatus:   cols[idxReplicaStatus]?.trim()   || null,
-        replicaCode:     cols[idxReplicaCode]?.trim()     || null,
-        dateShared:      cols[idxDate]?.trim()             || null,
-        tournament:      cols[idxTournament]?.trim()       || null,
-        rank:            cols[idxRank]?.trim()             || null,
-        sourceUrl:       cols[idxSourceUrl]?.trim()        || null,
-        owner:           cols[idxOwner]?.trim()            || null,
-        regulationId,
-        species,
-        items,
-      });
-      count++;
-    }
-
-    this.logger.log(`Refreshed ${count} teams for regulation ${regulationId}`);
-
-    // Phase 3: auto-trigger paste fetch for newly inserted teams (fire-and-forget)
-    this.batchFetchRegulation(regulationId).catch((e) => {
-      const msg = e instanceof Error ? e.message : String(e);
-      this.logger.warn(`Auto paste-fetch failed for ${regulationId}: ${msg}`);
+    await this.regulationsRepository.updateImportState(regulationId, {
+      importStatus: 'running_csv',
+      importError: null,
+      importStartedAt: new Date(),
+      importCompletedAt: null,
     });
 
-    return { count };
+    try {
+      const url = `${VGCPASTES_SHEET_BASE}${gid}`;
+      const res = await fetch(url);
+      if (!res.ok) {
+        throw new NotFoundException(`Failed to fetch VGCPastes CSV: HTTP ${res.status}`);
+      }
+
+      const rows = parseCsv(await res.text());
+
+      // Find the real column-header row by parsed cell values, not raw line text.
+      // "Team ID" appears twice (first and last column); "Pokemon Text for Copypasta"
+      // uniquely identifies the header row alongside it.
+      const headerRowIdx = rows.findIndex(
+        (cols) => cols.includes('Team ID') && cols.some((h) => h.includes('Pokemon Text for Copypasta')),
+      );
+      if (headerRowIdx === -1) {
+        throw new NotFoundException(
+          'Could not find column-header row (needs "Team ID" + "Pokemon Text for Copypasta") in VGCPastes CSV',
+        );
+      }
+
+      const headers          = rows[headerRowIdx];
+      const idxTeamId        = headers.indexOf('Team ID');          // first occurrence = col 0
+      const idxTeamDesc      = headers.indexOf('Team Description');
+      const idxFullName      = headers.indexOf('Full Name');
+      const idxPokepaste     = headers.indexOf('Pokepaste');
+      const idxHasEvs        = headers.indexOf('EVs');
+      const idxReplicaStatus = headers.findIndex((h) => h === 'Replica Status');
+      const idxReplicaCode   = headers.findIndex((h) => h.includes('Replica Code'));
+      const idxDate          = headers.indexOf('Date Shared');
+      const idxTournament    = headers.indexOf('Tournament / Event');
+      const idxRank          = headers.indexOf('Rank');
+      const idxSourceUrl     = headers.indexOf('Link to Source');
+      const idxOwner         = headers.indexOf('Owner');
+      const idxPokeText      = headers.findIndex((h) => h.includes('Pokemon Text for Copypasta'));
+      // Species are in the 6 columns starting AT idxPokeText (the header reads "Pokemon Text for
+      // Copypasta" but each data row stores the first Pokémon name there, not paste text).
+      const speciesStart     = idxPokeText;
+
+      // The per-Pokémon item columns sit in the upper "sprite slot" groups.
+      // Each group has 3 sub-cols; the 3rd sub-col (index 2 within the group) is the held item.
+      // Groups start at col 5 and repeat every 3 cols → item cols: 7, 10, 13, 16, 19, 22.
+      // Relative to idxPokepaste (col 24): offsets are -17, -14, -11, -8, -5, -2.
+      const itemCols = [-17, -14, -11, -8, -5, -2].map((offset) => idxPokepaste + offset);
+
+      this.logger.debug(
+        `Header at row ${headerRowIdx}: Team ID @ col ${idxTeamId}, ` +
+        `PokeText @ col ${idxPokeText}, species @ cols ${speciesStart}–${speciesStart + 5}`,
+      );
+
+      const seenTeamIds = new Set<string>();
+
+      let count = 0;
+      for (const cols of rows.slice(headerRowIdx + 1)) {
+        const teamId = cols[idxTeamId]?.trim();
+        // Skip blank rows, repeated headers, and anything that can't be a valid team ID
+        if (!teamId || teamId.length > 16 || !/^[A-Za-z0-9]+$/.test(teamId)) continue;
+
+        const species = cols
+          .slice(speciesStart, speciesStart + 6)
+          .map((s) => s.trim())
+          .filter((s) => s.length > 0);
+
+        const items = itemCols
+          .map((ci) => cols[ci]?.trim() ?? '')
+          .filter((s) => s.length > 0);
+
+        await this.vgcPastesRepository.upsertTeam({
+          id:              teamId,
+          playerName:      cols[idxFullName]?.trim()        || null,
+          teamDescription: cols[idxTeamDesc]?.trim()        || null,
+          pasteUrl:        cols[idxPokepaste]?.trim()       || null,
+          hasEvs:          cols[idxHasEvs]?.trim()          || null,
+          replicaStatus:   cols[idxReplicaStatus]?.trim()   || null,
+          replicaCode:     cols[idxReplicaCode]?.trim()     || null,
+          dateShared:      cols[idxDate]?.trim()             || null,
+          tournament:      cols[idxTournament]?.trim()       || null,
+          rank:            cols[idxRank]?.trim()             || null,
+          sourceUrl:       cols[idxSourceUrl]?.trim()        || null,
+          owner:           cols[idxOwner]?.trim()            || null,
+          regulationId,
+          species,
+          items,
+        });
+        seenTeamIds.add(teamId);
+        count++;
+      }
+
+      const existingIds = await this.vgcPastesRepository.findTeamIdsByRegulation(regulationId);
+      const staleIds = existingIds.filter((id) => !seenTeamIds.has(id));
+      await this.vgcPastesRepository.deleteTeamsByIds(staleIds);
+
+      this.logger.log(`Refreshed ${count} teams for regulation ${regulationId} (removed stale=${staleIds.length})`);
+
+      await this.regulationsRepository.updateImportState(regulationId, {
+        importStatus: 'running_pastes',
+        importError: null,
+        importTeamCount: count,
+      });
+
+      await this.batchFetchRegulation(regulationId);
+
+      await this.regulationsRepository.updateImportState(regulationId, {
+        importStatus: 'done',
+        importError: null,
+        importTeamCount: count,
+        importCompletedAt: new Date(),
+      });
+
+      return { count };
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      await this.regulationsRepository.updateImportState(regulationId, {
+        importStatus: 'error',
+        importError: msg,
+        importCompletedAt: new Date(),
+      });
+      throw error;
+    }
   }
 
   // ── Phase 3 — Paste fetch ────────────────────────────────────────────────────
@@ -171,24 +202,46 @@ export class VgcPastesService {
     const teams = await this.vgcPastesRepository.findTeamsNeedingFetch(regulationId);
     let fetched = 0, cached = 0, failed = 0;
 
-    for (let i = 0; i < teams.length; i += POKEPASTE_CONCURRENCY) {
-      const chunk = teams.slice(i, i + POKEPASTE_CONCURRENCY);
-      await Promise.all(
-        chunk.map(async (team) => {
-          try {
-            const { pasteId, wasCached } = await this.pokepasteService.fetchAndCache(
-              team.pasteUrl,
-              regulation?.formatId ?? undefined,
-            );
-            await this.vgcPastesRepository.linkPaste(team.id, pasteId);
-            if (wasCached) cached++; else fetched++;
-          } catch (e) {
-            const msg = e instanceof Error ? e.message : String(e);
-            this.logger.warn(`Paste fetch failed for team ${team.id}: ${msg}`);
-            failed++;
-          }
-        }),
-      );
+    await this.regulationsRepository.updateImportState(regulationId, {
+      importStatus: 'running_pastes',
+      importError: null,
+    });
+
+    try {
+      for (let i = 0; i < teams.length; i += POKEPASTE_CONCURRENCY) {
+        const chunk = teams.slice(i, i + POKEPASTE_CONCURRENCY);
+        await Promise.all(
+          chunk.map(async (team) => {
+            try {
+              const { pasteId, wasCached } = await this.pokepasteService.fetchAndCache(
+                team.pasteUrl,
+                regulation?.formatId ?? undefined,
+              );
+              await this.vgcPastesRepository.linkPaste(team.id, pasteId);
+              if (wasCached) cached++; else fetched++;
+            } catch (e) {
+              const msg = e instanceof Error ? e.message : String(e);
+              this.logger.warn(`Paste fetch failed for team ${team.id}: ${msg}`);
+              failed++;
+            }
+          }),
+        );
+      }
+
+      const status = failed > 0 ? 'error' : 'done';
+      await this.regulationsRepository.updateImportState(regulationId, {
+        importStatus: status,
+        importError: failed > 0 ? `${failed} paste fetches failed` : null,
+        importCompletedAt: new Date(),
+      });
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      await this.regulationsRepository.updateImportState(regulationId, {
+        importStatus: 'error',
+        importError: msg,
+        importCompletedAt: new Date(),
+      });
+      throw error;
     }
 
     this.logger.log(

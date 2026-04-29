@@ -3,12 +3,13 @@
 import { useEffect, useState } from "react";
 import { Download, Loader2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/primitives/button";
-import { BatchFetchResult, VgcMetaService, ChampionsRegulation } from "@/services/api/boffmedia/vgcService";
+import {
+  BatchFetchResult,
+  ChampionsRegulation,
+  VgcMetaService,
+  VgcRegulationsAdminService,
+} from "@/services/api/boffmedia/vgcService";
 import { useBoffSession } from "@/services/useBoffSession";
-
-const REGULATION_OPTIONS: Array<{ id: string; name: string }> = [
-  { id: "vgc2026regma", name: "[Gen 9 Champions] VGC 2026 Reg M-A" },
-];
 
 export function VgcChampionsFetcher() {
   const { session } = useBoffSession();
@@ -20,16 +21,47 @@ export function VgcChampionsFetcher() {
   const [fetchingPastes, setFetchingPastes] = useState<string | null>(null);
   const [error,          setError]          = useState<string | null>(null);
   const [success,        setSuccess]        = useState<string | null>(null);
+  const [addingRegulation, setAddingRegulation] = useState(false);
 
-  const loadAvailable = () => {
-    setLoading(true);
+  const [newRegulationId, setNewRegulationId] = useState("");
+  const [newFormatId, setNewFormatId] = useState("");
+  const [newName, setNewName] = useState("");
+  const [newGid, setNewGid] = useState("");
+
+  const loadAvailable = (silent = false) => {
+    if (!silent) setLoading(true);
     VgcMetaService.getAvailableChampionsRegulations()
       .then((res) => setAvailable(res.data ?? []))
       .catch(() => setError("No se pudo cargar el estado de Champions."))
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (!silent) setLoading(false);
+      });
   };
 
   useEffect(() => { loadAvailable(); }, []);
+
+  useEffect(() => {
+    if (!refreshing && !fetchingPastes) return;
+    const id = setInterval(() => {
+      loadAvailable(true);
+    }, 2000);
+    return () => clearInterval(id);
+  }, [refreshing, fetchingPastes]);
+
+  const getStatusLabel = (regulation: ChampionsRegulation | undefined) => {
+    switch (regulation?.importStatus) {
+      case 'running_csv':
+        return { text: 'Importando CSV', className: 'text-amber-400', dot: 'bg-amber-400' };
+      case 'running_pastes':
+        return { text: 'Descargando pastes', className: 'text-sky-400', dot: 'bg-sky-400' };
+      case 'done':
+        return { text: 'Importado', className: 'text-green-400', dot: 'bg-green-400' };
+      case 'error':
+        return { text: 'Error', className: 'text-red-400', dot: 'bg-red-400' };
+      default:
+        return { text: 'Sin datos', className: 'text-surface-600', dot: 'bg-surface-600' };
+    }
+  };
 
   const handleRefresh = async (regulationId: string) => {
     setRefreshing(regulationId);
@@ -71,7 +103,46 @@ export function VgcChampionsFetcher() {
     } catch {
       setError("Error al descargar los pastes.");
     } finally {
+      loadAvailable(true);
       setFetchingPastes(null);
+    }
+  };
+
+  const handleUpsertRegulation = async () => {
+    setError(null);
+    setSuccess(null);
+    if (!token) {
+      setError("Sesion invalida: vuelve a iniciar sesion con una cuenta BOFF_ADMIN.");
+      return;
+    }
+    if (!newRegulationId.trim() || !newFormatId.trim() || !newName.trim()) {
+      setError("Completa id, formatId y nombre para registrar la regulación.");
+      return;
+    }
+
+    setAddingRegulation(true);
+    try {
+      await VgcRegulationsAdminService.upsertRegulation(
+        {
+          id: newRegulationId.trim(),
+          formatId: newFormatId.trim(),
+          name: newName.trim(),
+          gameType: "doubles",
+          vgcPastesGid: newGid.trim() ? newGid.trim() : null,
+        },
+        token,
+      );
+      setSuccess(`Regulación ${newRegulationId.trim()} guardada.`);
+      setNewRegulationId("");
+      setNewFormatId("");
+      setNewName("");
+      setNewGid("");
+      loadAvailable(true);
+      window.dispatchEvent(new CustomEvent("vgc-regulations-updated"));
+    } catch {
+      setError("Error al guardar la regulación.");
+    } finally {
+      setAddingRegulation(false);
     }
   };
 
@@ -84,6 +155,53 @@ export function VgcChampionsFetcher() {
         </p>
       </div>
 
+      <div className="rounded-xl border border-surface-800 p-4 space-y-4">
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-surface-500">
+          Registrar regulación
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <input
+            value={newRegulationId}
+            onChange={(e) => setNewRegulationId(e.target.value)}
+            placeholder="id (ej. vgc2026regf)"
+            className="w-full h-9 rounded-md border border-surface-700 bg-surface-800 px-2.5 text-sm text-surface-100 placeholder:text-surface-600 focus:outline-none focus:ring-1 focus:ring-primary-500"
+          />
+          <input
+            value={newFormatId}
+            onChange={(e) => setNewFormatId(e.target.value)}
+            placeholder="formatId (ej. gen9vgc2026regf)"
+            className="w-full h-9 rounded-md border border-surface-700 bg-surface-800 px-2.5 text-sm text-surface-100 placeholder:text-surface-600 focus:outline-none focus:ring-1 focus:ring-primary-500"
+          />
+          <input
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            placeholder="Nombre visible"
+            className="w-full h-9 rounded-md border border-surface-700 bg-surface-800 px-2.5 text-sm text-surface-100 placeholder:text-surface-600 focus:outline-none focus:ring-1 focus:ring-primary-500"
+          />
+          <input
+            value={newGid}
+            onChange={(e) => setNewGid(e.target.value)}
+            placeholder="VGCPastes GID (opcional)"
+            className="w-full h-9 rounded-md border border-surface-700 bg-surface-800 px-2.5 text-sm text-surface-100 placeholder:text-surface-600 focus:outline-none focus:ring-1 focus:ring-primary-500"
+          />
+        </div>
+
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={handleUpsertRegulation}
+          disabled={addingRegulation}
+          className="w-full sm:w-auto"
+        >
+          {addingRegulation ? (
+            <><Loader2 className="w-3 h-3 mr-1.5 animate-spin" />Guardando...</>
+          ) : (
+            "Guardar regulación"
+          )}
+        </Button>
+      </div>
+
       {/* Regulation table */}
       <div className="rounded-xl border border-surface-800 overflow-hidden">
         <div className="px-4 py-3 border-b border-surface-800 flex items-center justify-between">
@@ -91,7 +209,7 @@ export function VgcChampionsFetcher() {
             Regulaciones configuradas
           </span>
           <button
-            onClick={loadAvailable}
+            onClick={() => loadAvailable()}
             className="text-surface-500 hover:text-surface-300 transition-colors"
           >
             <RefreshCw className="w-3.5 h-3.5" />
@@ -112,33 +230,43 @@ export function VgcChampionsFetcher() {
               </tr>
             </thead>
             <tbody>
-              {REGULATION_OPTIONS.map((reg) => {
-                const hasData       = available.some((a) => a.id === reg.id);
-                const isRefreshing  = refreshing === reg.id;
-                const isFetching    = fetchingPastes === reg.id;
+              {available.map((regulation) => {
+                const hasData       = (regulation?.importTeamCount ?? 0) > 0;
+                const isRefreshing  = refreshing === regulation.id;
+                const isFetching    = fetchingPastes === regulation.id;
+                const status        = getStatusLabel(regulation);
                 return (
-                  <tr key={reg.id} className="border-b border-surface-800/50 hover:bg-surface-900/40">
+                  <tr key={regulation.id} className="border-b border-surface-800/50 hover:bg-surface-900/40">
                     <td className="px-4 py-3">
-                      <p className="text-surface-200 text-xs font-medium">{reg.name}</p>
-                      <p className="text-surface-600 text-[11px] font-mono">{reg.id}</p>
+                      <p className="text-surface-200 text-xs font-medium">{regulation.name}</p>
+                      <p className="text-surface-600 text-[11px] font-mono">{regulation.id}</p>
+                      <p className="text-surface-600 text-[11px] font-mono">{regulation.formatId}</p>
+                      {regulation?.importTeamCount ? (
+                        <p className="text-surface-500 text-[11px]">
+                          {regulation.importTeamCount} equipos importados
+                        </p>
+                      ) : null}
                     </td>
                     <td className="px-4 py-3">
-                      {hasData ? (
-                        <span className="inline-flex items-center gap-1 text-xs text-green-400">
-                          <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
-                          Importado
+                      <div className="space-y-1">
+                        <span className={`inline-flex items-center gap-1 text-xs ${status.className}`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${status.dot}`} />
+                          {status.text}
                         </span>
-                      ) : (
-                        <span className="text-xs text-surface-600">Sin datos</span>
-                      )}
+                        {regulation?.importError ? (
+                          <p className="text-[11px] text-red-400 max-w-56 truncate" title={regulation.importError}>
+                            {regulation.importError}
+                          </p>
+                        ) : null}
+                      </div>
                     </td>
                     <td className="px-3 py-3 text-right">
                       <div className="flex items-center justify-end gap-2">
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => handleRefresh(reg.id)}
-                          disabled={isRefreshing || isFetching}
+                          onClick={() => handleRefresh(regulation.id)}
+                          disabled={isRefreshing || isFetching || !regulation.vgcPastesGid}
                         >
                           {isRefreshing ? (
                             <><Loader2 className="w-3 h-3 mr-1.5 animate-spin" />Importando...</>
@@ -149,8 +277,8 @@ export function VgcChampionsFetcher() {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => handleFetchPastes(reg.id)}
-                          disabled={!hasData || isRefreshing || isFetching}
+                          onClick={() => handleFetchPastes(regulation.id)}
+                          disabled={!hasData || isRefreshing || isFetching || !regulation.vgcPastesGid}
                         >
                           {isFetching ? (
                             <><Loader2 className="w-3 h-3 mr-1.5 animate-spin" />Descargando...</>

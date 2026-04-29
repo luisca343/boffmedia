@@ -84,7 +84,7 @@ Status:
 
 - [ ] Not started
 - [x] In progress
-- [ ] Done
+- [x] Done
 
 Implemented in current slice:
 
@@ -100,6 +100,17 @@ Champions refresh deletes all existing rows before the new dataset and follow-up
 Status:
 
 - [ ] Not started
+- [x] In progress
+- [ ] Done
+
+Implemented in current slice:
+
+- [x] Refresh no longer deletes all rows before importing the next CSV snapshot
+- [x] CSV import now upserts seen teams first and only prunes stale rows after a successful pass
+- [x] Import state is persisted on `vgc_regulations` (`import_status`, `import_error`, timestamps, team count)
+- [x] Paste-fetch phase updates the same persisted import state instead of being fire-and-forget invisible work
+- [x] Admin Champions panel now surfaces regulation import status and error state
+- [ ] Add explicit progress counters for paste fetch, not just terminal state
 
 ---
 
@@ -119,3 +130,4 @@ Status:
 | 2026-04-29 | Started Slice 1: tracker auth + ownership enforcement. |
 | 2026-04-29 | Implemented Slice 1 backend/frontend auth wiring: tracker sync now uses bearer auth, tracker endpoints are JWT-guarded, and tracker mutations/reads are scoped to the authenticated user. |
 | 2026-04-29 | Started Slice 2: inline paste identity hardening by removing the `raw_text` re-query path and returning the inserted row ID directly from MySQL metadata. |
+| 2026-04-29 | Completed Slice 2 first hardening step and started Slice 3: VGCPastes refresh is now non-destructive during CSV ingest, persists import state on regulations, and exposes status/errors in the admin Champions fetcher. |
