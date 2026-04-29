@@ -67,11 +67,17 @@ CREATE TABLE `vgc_regulations` (
 	`name` varchar(255) NOT NULL,
 	`game_type` varchar(16) NOT NULL DEFAULT 'doubles',
 	`vgcpastes_gid` varchar(32),
+	`import_status` varchar(16) NOT NULL DEFAULT 'idle',
+	`import_error` text,
+	`import_team_count` int NOT NULL DEFAULT 0,
+	`import_started_at` datetime,
+	`import_completed_at` datetime,
 	`active` int NOT NULL DEFAULT 1,
 	`created_at` datetime NOT NULL,
 	CONSTRAINT `vgc_regulations_id` PRIMARY KEY(`id`)
 );
 
+--> statement-breakpoint
 INSERT INTO `vgc_regulations` (`id`, `format_id`, `name`, `game_type`, `vgcpastes_gid`, `active`, `created_at`)
 VALUES (
   'vgc2026regma',
@@ -128,7 +134,10 @@ CREATE TABLE `vgc_matches` (
 	`my_team` text NOT NULL,
 	`opponent_team` text NOT NULL,
 	`opponent_name` varchar(128),
+	`opponent_archetype` varchar(128),
 	`result` enum('win','loss','draw'),
+	`outcome_tag` varchar(32),
+	`turn_count` int,
 	`elo_after` double,
 	`opponent_elo` double,
 	`notes` text NOT NULL DEFAULT ('[]'),
@@ -138,15 +147,38 @@ CREATE TABLE `vgc_matches` (
 	CONSTRAINT `vgc_matches_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
+CREATE TABLE `vgc_series` (
+	`id` varchar(36) NOT NULL,
+	`session_id` varchar(36),
+	`user_id` int,
+	`created_at` bigint NOT NULL,
+	`completed_at` bigint,
+	`round_number` int,
+	`opponent_name` varchar(128),
+	`opponent_archetype` varchar(128),
+	`my_team` text NOT NULL,
+	`opponent_team` text NOT NULL,
+	`games` text NOT NULL DEFAULT ('[]'),
+	`series_result` varchar(8),
+	`notes` text NOT NULL DEFAULT ('[]'),
+	`updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
+	CONSTRAINT `vgc_series_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
 CREATE TABLE `vgc_sessions` (
 	`id` varchar(36) NOT NULL,
 	`user_id` int,
 	`label` varchar(128) NOT NULL,
 	`format` enum('BO1','BO3') NOT NULL DEFAULT 'BO1',
 	`regulation_id` varchar(64) NOT NULL,
+	`type` varchar(16) NOT NULL DEFAULT 'ladder',
 	`active_preset_id` varchar(36),
 	`start_elo` double,
 	`started_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+	`archived_at` bigint,
+	`tournament_name` varchar(255),
+	`limitless_tournament_id` int,
+	`session_notes` text,
 	`created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP(),
 	`updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
 	CONSTRAINT `vgc_sessions_id` PRIMARY KEY(`id`)
@@ -159,6 +191,8 @@ CREATE TABLE `vgc_team_presets` (
 	`regulation_id` varchar(64) NOT NULL,
 	`export_string` text NOT NULL,
 	`slots` text NOT NULL,
+	`current_version` int NOT NULL DEFAULT 1,
+	`versions` text NOT NULL DEFAULT ('[]'),
 	`created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP(),
 	`updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
 	CONSTRAINT `vgc_team_presets_id` PRIMARY KEY(`id`)
@@ -169,5 +203,7 @@ ALTER TABLE `vgc_limitless_teams` ADD CONSTRAINT `vgc_lt_tournament_id_fk` FOREI
 ALTER TABLE `vgc_paste_teams` ADD CONSTRAINT `vgc_paste_teams_paste_id_vgc_pastes_id_fk` FOREIGN KEY (`paste_id`) REFERENCES `vgc_pastes`(`id`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `vgc_matches` ADD CONSTRAINT `vgc_matches_session_id_vgc_sessions_id_fk` FOREIGN KEY (`session_id`) REFERENCES `vgc_sessions`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `vgc_matches` ADD CONSTRAINT `vgc_matches_user_id_boffmedia_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `boffmedia_users`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE `vgc_series` ADD CONSTRAINT `vgc_series_session_id_vgc_sessions_id_fk` FOREIGN KEY (`session_id`) REFERENCES `vgc_sessions`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE `vgc_series` ADD CONSTRAINT `vgc_series_user_id_boffmedia_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `boffmedia_users`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `vgc_sessions` ADD CONSTRAINT `vgc_sessions_user_id_boffmedia_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `boffmedia_users`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `vgc_team_presets` ADD CONSTRAINT `vgc_team_presets_user_id_boffmedia_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `boffmedia_users`(`id`) ON DELETE cascade ON UPDATE no action;
