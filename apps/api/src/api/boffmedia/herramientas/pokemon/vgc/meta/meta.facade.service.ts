@@ -55,6 +55,12 @@ export class VgcMetaFacadeService {
     return this.smogonService.getUsageList(dto.format, month, cutoff);
   }
 
+  async getSmogonUsageList(dto: QuerySmogonDto) {
+    const cutoff = dto.cutoff ?? SMOGON_DEFAULT_CUTOFF;
+    const month = dto.month ?? await this.resolveMostRecentMonth(dto.format, cutoff);
+    return this.smogonService.getUsageEntries(dto.format, month, cutoff);
+  }
+
   async getSmogonDetail(dto: QuerySmogonDto & { speciesId: string }) {
     const cutoff = dto.cutoff ?? SMOGON_DEFAULT_CUTOFF;
     const month = dto.month ?? await this.resolveMostRecentMonth(dto.format, cutoff);
@@ -79,6 +85,13 @@ export class VgcMetaFacadeService {
     if (!regulation) throw new NotFoundException(`Regulation "${dto.regulationId}" not found`);
     if (!regulation.vgcPastesGid) throw new NotFoundException(`No VGCPastes GID configured for "${dto.regulationId}"`);
     return this.vgcPastesService.getUsageList(dto.regulationId);
+  }
+
+  async getChampionsUsageList(dto: QueryChampionsDto) {
+    const regulation = await this.regulationsRepository.findById(dto.regulationId);
+    if (!regulation) throw new NotFoundException(`Regulation "${dto.regulationId}" not found`);
+    if (!regulation.vgcPastesGid) throw new NotFoundException(`No VGCPastes GID configured for "${dto.regulationId}"`);
+    return this.vgcPastesService.getUsageEntries(dto.regulationId);
   }
 
   async refreshChampionsData(regulationId: string) {
@@ -110,8 +123,16 @@ export class VgcMetaFacadeService {
     return this.limitlessService.getUsageList(tournamentId);
   }
 
+  async getLimitlessUsageList(tournamentId: number) {
+    return this.limitlessService.getUsageEntries(tournamentId);
+  }
+
   async getLimitlessCombinedUsage(regulationId: string) {
     return this.limitlessService.getCombinedUsage(regulationId);
+  }
+
+  async getLimitlessCombinedUsageList(regulationId: string) {
+    return this.limitlessService.getCombinedUsageEntries(regulationId);
   }
 
   async getLimitlessTournamentStatus(id: number) {

@@ -96,8 +96,9 @@ export function useMetaNavigation({
   useEffect(() => {
     if (tab !== "stats") return;
     if (searchParams.get("format")) return;
-    if (regulations.length > 0) {
-      router.replace(buildUrl({ speciesId, tab, format: regulations[0].id, month: "", cutoff: DEFAULT_CUTOFF, regulation, tournamentId, view }));
+    const previewRegulation = regulations.find((r) => Boolean(r.vgcPastesGid));
+    if (previewRegulation) {
+      router.replace(buildUrl({ speciesId, tab, format: previewRegulation.id, month: "", cutoff: DEFAULT_CUTOFF, regulation, tournamentId, view }));
     } else if (snapshots.length > 0) {
       const first = snapshots[0];
       router.replace(buildUrl({ speciesId, tab, format: first.formatId, month: first.month, cutoff: first.cutoff, regulation, tournamentId, view }));
@@ -140,12 +141,14 @@ export function useMetaNavigation({
   const handleTabChange = useCallback(
     (newTab: string) => {
       if (newTab === "stats") {
-        // Default to first regulation (Champions preview) or first Smogon snapshot
-        const defaultFormat = regulations.length > 0
-          ? regulations[0].id
+        // Default to first Champions preview regulation (must have VGCPastes GID),
+        // otherwise fall back to first Smogon snapshot.
+        const previewRegulation = regulations.find((r) => Boolean(r.vgcPastesGid));
+        const defaultFormat = previewRegulation
+          ? previewRegulation.id
           : snapshots.length > 0 ? snapshots[0].formatId : "";
-        const defaultMonth  = regulations.length > 0 ? "" : (snapshots[0]?.month ?? "");
-        const defaultCutoff = regulations.length > 0 ? DEFAULT_CUTOFF : (snapshots[0]?.cutoff ?? DEFAULT_CUTOFF);
+        const defaultMonth  = previewRegulation ? "" : (snapshots[0]?.month ?? "");
+        const defaultCutoff = previewRegulation ? DEFAULT_CUTOFF : (snapshots[0]?.cutoff ?? DEFAULT_CUTOFF);
         router.push(buildUrl({ speciesId: undefined, tab: newTab, format: defaultFormat, month: defaultMonth, cutoff: defaultCutoff, regulation, tournamentId: "", view: "aggregate" }));
       } else if (newTab === "tournament") {
         // Default to first regulation + first tournament

@@ -36,12 +36,28 @@ export function MetaLayoutClient() {
   // ── Determine format source — wait until both lists load before activating ─
   const snapshots   = useSmogonSnapshots();
   const regulations = useChampionsRegulations();
-  const isSmogonFormat  = useMemo(() => snapshots.some(s => s.formatId === format),   [snapshots,   format]);
-  const isPreviewFormat = useMemo(() => regulations.some(r => r.id    === format),    [regulations, format]);
+  const selectedRegulation = useMemo(
+    () => regulations.find((r) => r.id === format),
+    [regulations, format],
+  );
+  const isPreviewFormat = useMemo(
+    () => Boolean(selectedRegulation?.vgcPastesGid),
+    [selectedRegulation],
+  );
+  const resolvedSmogonFormat = useMemo(
+    // If `format` points to a regulation that has no VGCPastes GID, treat it as
+    // a Smogon-backed regulation and resolve to its formatId.
+    () => (selectedRegulation && !selectedRegulation.vgcPastesGid ? selectedRegulation.formatId : format),
+    [selectedRegulation, format],
+  );
+  const isSmogonFormat = useMemo(
+    () => snapshots.some((s) => s.formatId === resolvedSmogonFormat),
+    [snapshots, resolvedSmogonFormat],
+  );
 
   // ── Data hooks — inactive tab/source receives empty string and skips fetch ─
   const { entries: ladderEntries,    entriesMap: ladderMap,    loading: ladderLoading,    error: ladderError    } =
-    useSmogonUsage(tab === "stats" && isSmogonFormat ? format : "", month, cutoff);
+    useSmogonUsage(tab === "stats" && isSmogonFormat && !isPreviewFormat ? resolvedSmogonFormat : "", month, cutoff);
   const { entries: championsEntries, entriesMap: championsMap, loading: championsLoading, error: championsError } =
     useChampionsUsage(tab === "stats" && isPreviewFormat ? format : "");
 

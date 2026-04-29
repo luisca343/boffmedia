@@ -11,12 +11,11 @@ export class VgcController {
 
   @Get('champions/regulations')
   @ApiOperation({
-    summary: 'List Champions mod regulations',
+    summary: '[Compatibility alias] List Champions regulations',
     description:
+      'Compatibility alias for `GET /tools/vgc/meta/regulations`. ' +
       'Returns all supported Champions regulations. ' +
-      'Each entry includes the `formatId` which can be passed directly to ' +
-      '`/formats/:formatId/pokemon` or `/formats/:formatId/speed-tiers`, ' +
-      'or use the shorthand `:regulationId` in the Champions-specific endpoints below.',
+      'Use the meta endpoint as the canonical regulation source for admin and ingestion flows.',
   })
   @ApiResponse({ status: 200, description: 'Regulations retrieved successfully.' })
   async getChampionsRegulations() {

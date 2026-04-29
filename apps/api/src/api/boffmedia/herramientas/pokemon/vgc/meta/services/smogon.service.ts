@@ -1,7 +1,7 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Dex } from '@pkmn/sim';
 import { SmogonRepository } from '../repositories/smogon.repository';
-import { PokemonUsageDetail } from '../entities/pokemon-usage.entity';
+import { PokemonUsageDetail, PokemonUsageEntry } from '../entities/pokemon-usage.entity';
 import { VgcSmogonSnapshot, VgcSmogonPokemonRow } from '@/_db/schema/Vgc';
 import { smogonUsageUrl, smogonMovesetUrl } from '../config/smogon.config';
 import { parseUsageTxt } from '../utils/parse-usage-txt';
@@ -115,6 +115,21 @@ export class SmogonService {
     return rows.map((row) => this.toDetail(row, dex));
   }
 
+  async getUsageEntries(
+    formatId: string,
+    month: string,
+    cutoff: number,
+  ): Promise<PokemonUsageEntry[]> {
+    const rows = await this.smogonRepository.findAllPokemon(formatId, month, cutoff);
+    if (rows.length === 0) {
+      throw new NotFoundException(
+        `No data for ${formatId} ${month}-${cutoff}. Fetch from the admin panel first.`,
+      );
+    }
+    const dex = getDexForFormat(formatId);
+    return rows.map((row) => this.toEntry(row, dex));
+  }
+
   async getPokemonDetail(
     formatId: string,
     month: string,
@@ -171,6 +186,21 @@ export class SmogonService {
       teraTypes:    JSON.parse(row.teraTypes),
       teammates:    JSON.parse(row.teammates),
       spreads:      JSON.parse(row.spreads),
+    };
+  }
+
+  private toEntry(row: VgcSmogonPokemonRow, dex: typeof Dex): PokemonUsageEntry {
+    const species = dex.species.get(row.speciesName);
+    return {
+      speciesId:    row.speciesId,
+      speciesName:  row.speciesName,
+      rank:         row.rank,
+      types:        species.exists ? ([...species.types] as string[]).filter(Boolean) : [],
+      usagePercent: row.usagePercent,
+      rawCount:     row.rawCount,
+      topItem:      row.topItem ?? undefined,
+      topMove:      row.topMove ?? undefined,
+      topTeraType:  row.topTeraType ?? undefined,
     };
   }
 }

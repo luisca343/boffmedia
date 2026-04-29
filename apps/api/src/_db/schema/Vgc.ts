@@ -1,4 +1,4 @@
-import { datetime, double, foreignKey, int, mysqlTable, text, uniqueIndex, varchar } from 'drizzle-orm/mysql-core';
+import { datetime, double, foreignKey, index, int, mysqlTable, text, uniqueIndex, varchar } from 'drizzle-orm/mysql-core';
 
 // ─── Shared payload types ─────────────────────────────────────────────────────
 
@@ -115,43 +115,57 @@ export type VgcPaste = typeof vgcPastes.$inferSelect;
  * replicaCode:   in-game rental team code (e.g. '4RMQUHVYCY').
  * hasEvs:        whether the paste includes EV/SP spread data ('Yes'/'No' in sheet).
  */
-export const vgcPasteTeams = mysqlTable('vgc_paste_teams', {
-  id:              varchar('id',              { length: 16  }).primaryKey(),  // e.g. 'PC476'
-  pasteId:         int('paste_id').references(() => vgcPastes.id),            // null until Phase 3
-  pasteUrl:        varchar('paste_url',       { length: 255 }),
-  playerName:      varchar('player_name',     { length: 128 }),
-  teamDescription: varchar('team_description',{ length: 512 }),
-  tournament:      varchar('tournament',      { length: 255 }),
-  dateShared:      varchar('date_shared',     { length: 16  }),               // 'DD Mon YYYY'
-  rank:            varchar('rank',            { length: 64  }),
-  regulationId:    varchar('regulation_id',   { length: 64  }),
-  species:         text('species').notNull(),                                  // JSON: string[]
-  items:           text('items').notNull().default('[]'),                      // JSON: string[]
-  replicaStatus:   varchar('replica_status',  { length: 8   }),               // '✔' or blank
-  replicaCode:     varchar('replica_code',    { length: 20  }),               // in-game team code
-  hasEvs:          varchar('has_evs',         { length: 4   }),               // 'Yes' / 'No'
-  sourceUrl:       varchar('source_url',      { length: 512 }),
-  owner:           varchar('owner',           { length: 128 }),
-  fetchedAt:       datetime('fetched_at').notNull(),
-});
+export const vgcPasteTeams = mysqlTable(
+  'vgc_paste_teams',
+  {
+    id:              varchar('id',              { length: 16  }).primaryKey(),  // e.g. 'PC476'
+    pasteId:         int('paste_id').references(() => vgcPastes.id),            // null until Phase 3
+    pasteUrl:        varchar('paste_url',       { length: 255 }),
+    playerName:      varchar('player_name',     { length: 128 }),
+    teamDescription: varchar('team_description',{ length: 512 }),
+    tournament:      varchar('tournament',      { length: 255 }),
+    dateShared:      varchar('date_shared',     { length: 16  }),               // 'DD Mon YYYY'
+    rank:            varchar('rank',            { length: 64  }),
+    regulationId:    varchar('regulation_id',   { length: 64  }),
+    species:         text('species').notNull(),                                  // JSON: string[]
+    items:           text('items').notNull().default('[]'),                      // JSON: string[]
+    replicaStatus:   varchar('replica_status',  { length: 8   }),               // '✔' or blank
+    replicaCode:     varchar('replica_code',    { length: 20  }),               // in-game team code
+    hasEvs:          varchar('has_evs',         { length: 4   }),               // 'Yes' / 'No'
+    sourceUrl:       varchar('source_url',      { length: 512 }),
+    owner:           varchar('owner',           { length: 128 }),
+    fetchedAt:       datetime('fetched_at').notNull(),
+  },
+  (t) => [
+    index('vgc_paste_teams_regulation_idx').on(t.regulationId),
+    index('vgc_paste_teams_regulation_paste_idx').on(t.regulationId, t.pasteId),
+  ],
+);
 
 export type VgcPasteTeam = typeof vgcPasteTeams.$inferSelect;
 
 /** One row per scraped Limitless tournament */
-export const vgcLimitlessTournaments = mysqlTable('vgc_limitless_tournaments', {
-  id:           int('id').primaryKey().autoincrement(),
-  limitlessId:  varchar('limitless_id',  { length: 64  }).notNull().unique(),
-  name:         varchar('name',          { length: 255 }),
-  date:         varchar('date',          { length: 32  }),
-  format:       varchar('format',        { length: 64  }),
-  playerCount:  int('player_count'),
-  regulationId: varchar('regulation_id', { length: 64  }),
-  status:       varchar('status',        { length: 16  }).notNull().default('pending'),
-  progress:     int('progress').notNull().default(0),
-  total:        int('total').notNull().default(0),
-  errorMessage: text('error_message'),
-  fetchedAt:    datetime('fetched_at').notNull(),
-});
+export const vgcLimitlessTournaments = mysqlTable(
+  'vgc_limitless_tournaments',
+  {
+    id:           int('id').primaryKey().autoincrement(),
+    limitlessId:  varchar('limitless_id',  { length: 64  }).notNull().unique(),
+    name:         varchar('name',          { length: 255 }),
+    date:         varchar('date',          { length: 32  }),
+    format:       varchar('format',        { length: 64  }),
+    playerCount:  int('player_count'),
+    regulationId: varchar('regulation_id', { length: 64  }),
+    status:       varchar('status',        { length: 16  }).notNull().default('pending'),
+    progress:     int('progress').notNull().default(0),
+    total:        int('total').notNull().default(0),
+    errorMessage: text('error_message'),
+    fetchedAt:    datetime('fetched_at').notNull(),
+  },
+  (t) => [
+    index('vgc_limitless_tournaments_regulation_idx').on(t.regulationId),
+    index('vgc_limitless_tournaments_regulation_status_idx').on(t.regulationId, t.status),
+  ],
+);
 
 export type VgcLimitlessTournament = typeof vgcLimitlessTournaments.$inferSelect;
 
@@ -169,6 +183,9 @@ export const vgcLimitlessTeams = mysqlTable('vgc_limitless_teams', {
   pasteId:      int('paste_id').references(() => vgcPastes.id),         // null until paste scraped
   fetchedAt:    datetime('fetched_at').notNull(),
 }, (t) => [
+  index('vgc_limitless_teams_tournament_idx').on(t.tournamentId),
+  index('vgc_limitless_teams_tournament_player_idx').on(t.tournamentId, t.playerSlug),
+  index('vgc_limitless_teams_paste_idx').on(t.pasteId),
   foreignKey({
     name:           'vgc_lt_tournament_id_fk',
     columns:        [t.tournamentId],
@@ -186,20 +203,27 @@ export type VgcLimitlessTeam = typeof vgcLimitlessTeams.$inferSelect;
  * (champions.mod.ts). The mod itself stays in code; only the data-sourcing
  * config (GID, name, etc.) lives here.
  */
-export const vgcRegulations = mysqlTable('vgc_regulations', {
-  id:            varchar('id',             { length: 64  }).primaryKey(),  // e.g. 'vgc2026regma'
-  formatId:      varchar('format_id',      { length: 128 }).notNull(),     // e.g. 'gen9championsvgc2026regma'
-  name:          varchar('name',           { length: 255 }).notNull(),
-  gameType:      varchar('game_type',      { length: 16  }).notNull().default('doubles'),
-  vgcPastesGid:  varchar('vgcpastes_gid',  { length: 32  }),               // null = no VGCPastes sheet
-  importStatus:  varchar('import_status',  { length: 16  }).notNull().default('idle'),
-  importError:   text('import_error'),
-  importTeamCount:   int('import_team_count').notNull().default(0),
-  importFetchedCount:int('import_fetched_count').notNull().default(0),
-  importStartedAt:   datetime('import_started_at'),
-  importCompletedAt: datetime('import_completed_at'),
-  active:        int('active').notNull().default(1),                        // 0 = soft-disabled
-  createdAt:     datetime('created_at').notNull(),
-});
+export const vgcRegulations = mysqlTable(
+  'vgc_regulations',
+  {
+    id:            varchar('id',             { length: 64  }).primaryKey(),  // e.g. 'vgc2026regma'
+    formatId:      varchar('format_id',      { length: 128 }).notNull(),     // e.g. 'gen9championsvgc2026regma'
+    name:          varchar('name',           { length: 255 }).notNull(),
+    gameType:      varchar('game_type',      { length: 16  }).notNull().default('doubles'),
+    vgcPastesGid:  varchar('vgcpastes_gid',  { length: 32  }),               // null = no VGCPastes sheet
+    importStatus:  varchar('import_status',  { length: 16  }).notNull().default('idle'),
+    importError:   text('import_error'),
+    importTeamCount:   int('import_team_count').notNull().default(0),
+    importFetchedCount:int('import_fetched_count').notNull().default(0),
+    importStartedAt:   datetime('import_started_at'),
+    importCompletedAt: datetime('import_completed_at'),
+    active:        int('active').notNull().default(1),                        // 0 = soft-disabled
+    createdAt:     datetime('created_at').notNull(),
+  },
+  (t) => [
+    index('vgc_regulations_active_idx').on(t.active),
+    index('vgc_regulations_format_idx').on(t.formatId),
+  ],
+);
 
 export type VgcRegulation = typeof vgcRegulations.$inferSelect;

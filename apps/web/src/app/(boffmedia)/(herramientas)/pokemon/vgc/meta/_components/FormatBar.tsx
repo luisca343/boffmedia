@@ -54,7 +54,17 @@ export function FormatBar({
     [regulations],
   );
 
-  const isPreviewFormat = sortedRegulations.some(r => r.id === format);
+  const previewRegulations = useMemo(
+    () => sortedRegulations.filter((r) => Boolean(r.vgcPastesGid)),
+    [sortedRegulations],
+  );
+
+  const regulationNameByFormatId = useMemo(
+    () => new Map(sortedRegulations.map((r) => [r.formatId, r.name])),
+    [sortedRegulations],
+  );
+
+  const isPreviewFormat = previewRegulations.some((r) => r.id === format);
 
   const uniqueFormats = useMemo(() => {
     const latestMonthByFormat = new Map<string, string>();
@@ -109,15 +119,15 @@ export function FormatBar({
       {tab === "stats" ? (
         <>
           {/* Unified format select — Smogon + Preview in optgroups */}
-          {(uniqueFormats.length > 0 || regulations.length > 0) && (
+          {(uniqueFormats.length > 0 || previewRegulations.length > 0) && (
             <select
               value={format}
               onChange={e => handleFormatSelect(e.target.value)}
               className={SELECT_CLS}
             >
-              {sortedRegulations.length > 0 && (
+              {previewRegulations.length > 0 && (
                 <optgroup label="Champions · Preview">
-                  {sortedRegulations.map(reg => (
+                  {previewRegulations.map(reg => (
                     <option key={reg.id} value={reg.id}>{reg.name}</option>
                   ))}
                 </optgroup>
@@ -126,7 +136,7 @@ export function FormatBar({
                 <optgroup label="Smogon">
                   {uniqueFormats.map(fmtId => (
                     <option key={fmtId} value={fmtId}>
-                      {formatLabels[fmtId] ?? fmtId}
+                      {regulationNameByFormatId.get(fmtId) ?? formatLabels[fmtId] ?? fmtId}
                     </option>
                   ))}
                 </optgroup>
