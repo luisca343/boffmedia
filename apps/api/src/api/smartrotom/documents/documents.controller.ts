@@ -4,7 +4,7 @@ import { ResponseInterceptor } from '@api/_utils/interceptors/response.intercept
 import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { Roles } from '@api/_utils/decorators/roles.decorator';
 import { RolesGuard } from '@api/_utils/guards/roles.guard';
-import { USER_ROLES } from '@boffmedia/shared';
+import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { DocumentsFacadeService, CreateNoteWithUserRequest } from './documents.facade.service';
 import { CreateNewsRequest, UpdateNewsRequest } from './services/news.service';
 import { CreateDocumentRequest, UpdateDocumentRequest } from './services/document.service';
