@@ -52,8 +52,12 @@ export function VgcChampionsFetcher() {
     switch (regulation?.importStatus) {
       case 'running_csv':
         return { text: 'Importando CSV', className: 'text-amber-400', dot: 'bg-amber-400' };
-      case 'running_pastes':
-        return { text: 'Descargando pastes', className: 'text-sky-400', dot: 'bg-sky-400' };
+      case 'running_pastes': {
+        const total   = regulation.importTeamCount ?? 0;
+        const fetched = regulation.importFetchedCount ?? 0;
+        const progress = total > 0 ? ` (${fetched}/${total})` : '';
+        return { text: `Descargando pastes${progress}`, className: 'text-sky-400', dot: 'bg-sky-400' };
+      }
       case 'done':
         return { text: 'Importado', className: 'text-green-400', dot: 'bg-green-400' };
       case 'error':

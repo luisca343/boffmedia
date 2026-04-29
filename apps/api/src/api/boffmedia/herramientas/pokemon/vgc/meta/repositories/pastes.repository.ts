@@ -26,13 +26,25 @@ export class PastesRepository {
     return row ?? null;
   }
 
+  async findBySourceKey(sourceKey: string): Promise<VgcPaste | null> {
+    const [row] = await this.db
+      .select()
+      .from(vgcPastes)
+      .where(eq(vgcPastes.sourceKey, sourceKey))
+      .limit(1);
+    return row ?? null;
+  }
+
   /**
    * Insert or update a paste. Returns the internal ID of the upserted row.
    * For pokepast.es pastes, pass pokepasteId so duplicates are merged.
-   * For inline Limitless pastes, omit pokepasteId.
+   * For Limitless and other non-pokepaste sources, pass sourceKey (e.g. 'limitless:{id}:{slug}')
+   * so re-imports reuse the existing row instead of creating orphaned duplicates.
+   * For truly anonymous inline pastes, omit both keys and rely on the MySQL insertId.
    */
   async upsertPaste(data: {
     pokepasteId?: string | null;
+    sourceKey?: string | null;
     rawText: string;
     parsedSlots: VgcMetaSlot[];
     author?: string | null;
@@ -41,6 +53,7 @@ export class PastesRepository {
   }): Promise<number> {
     const row = {
       pokepasteId:  data.pokepasteId ?? null,
+      sourceKey:    data.sourceKey   ?? null,
       rawText:      data.rawText,
       parsedSlots:  JSON.stringify(data.parsedSlots),
       author:       data.author ?? null,
@@ -57,8 +70,10 @@ export class PastesRepository {
     if (data.pokepasteId) {
       return (await this.findByPokepasteId(data.pokepasteId))!.id;
     }
-    // Inline pastes have no natural unique key, so rely on the actual insert metadata
-    // instead of re-querying by rawText, which can collide across unrelated rows.
+    if (data.sourceKey) {
+      return (await this.findBySourceKey(data.sourceKey))!.id;
+    }
+    // No dedup key — rely on MySQL insert metadata
     return result[0].insertId;
   }
 }

@@ -66,6 +66,7 @@ export class VgcPastesService {
     await this.regulationsRepository.updateImportState(regulationId, {
       importStatus: 'running_csv',
       importError: null,
+      importFetchedCount: 0,
       importStartedAt: new Date(),
       importCompletedAt: null,
     });
@@ -205,6 +206,7 @@ export class VgcPastesService {
     await this.regulationsRepository.updateImportState(regulationId, {
       importStatus: 'running_pastes',
       importError: null,
+      importFetchedCount: 0,
     });
 
     try {
@@ -226,12 +228,18 @@ export class VgcPastesService {
             }
           }),
         );
+
+        // Write progress after every chunk so the admin panel can poll it
+        await this.regulationsRepository.updateImportState(regulationId, {
+          importFetchedCount: fetched + cached + failed,
+        });
       }
 
       const status = failed > 0 ? 'error' : 'done';
       await this.regulationsRepository.updateImportState(regulationId, {
         importStatus: status,
         importError: failed > 0 ? `${failed} paste fetches failed` : null,
+        importFetchedCount: fetched + cached + failed,
         importCompletedAt: new Date(),
       });
     } catch (error) {
