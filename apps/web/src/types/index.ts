@@ -1,5 +1,6 @@
 import { DefaultSession, DefaultUser } from "next-auth"
 import { SmartRotomApp, TaxiStop } from "@boffmedia/shared"
+import type { UserRole } from "@boffmedia/shared"
 
 export type SmartRotomAppExtended = SmartRotomApp & { order?: number }
 
@@ -16,7 +17,7 @@ export interface BoffUser { //extends DefaultUser {
   email: string
   username: string
   mcUuid?: string
-  roles: string[]
+  roles: UserRole[]
   smartRotomUser?: SmartRotomUser
   discordId?: string
   image?: string | null
