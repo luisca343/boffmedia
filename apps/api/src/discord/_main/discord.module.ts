@@ -14,6 +14,10 @@ import { JoinCommand } from '../commands/global/voz/join';
 import { SetVozCommand } from '../commands/global/voz/setVoz';
 import { SetVozAutocompleteInterceptor } from '../commands/global/voz/setVoz.interceptor';
 import { MessageListener } from './message.listener';
+import { VgcMetaModule } from '@/api/boffmedia/herramientas/pokemon/vgc/meta/meta.module';
+import { MetaRegulationAutocompleteInterceptor } from '../commands/global/meta/meta-regulation.interceptor';
+import { MetaPokemonCommand } from '../commands/global/meta/meta-pokemon.command';
+import { MetaTopCommand } from '../commands/global/meta/meta-top.command';
 
 console.log('[DEBUG] Initializing NecordModule with token:', process.env.DISCORD_KEY);
 
@@ -21,6 +25,7 @@ console.log('[DEBUG] Initializing NecordModule with token:', process.env.DISCORD
 @Module({
   imports: [
     ConfigModule,
+    VgcMetaModule,
     NecordModule.forRoot({
       token: process.env.DISCORD_KEY,
       intents: [
@@ -47,6 +52,9 @@ console.log('[DEBUG] Initializing NecordModule with token:', process.env.DISCORD
     SetVozCommand,
     SetVozAutocompleteInterceptor,
     MessageListener,
+    MetaRegulationAutocompleteInterceptor,
+    MetaPokemonCommand,
+    MetaTopCommand,
   ],
 })
 export class DiscordModule {}

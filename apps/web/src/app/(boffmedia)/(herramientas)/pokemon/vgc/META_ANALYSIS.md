@@ -48,6 +48,7 @@
 | 2026-04-29 | Divergence planning (deferred) | Phase 4 implementation deferred, but approach decided: (1) Divergence lives under Tournament tab as a third sub-view (`aggregate` / `players` / `divergence`), (2) reuse existing regulation + tournament selectors from FormatBar/useMetaNavigation, (3) default baseline = Smogon vs selected tournament (or Smogon vs Combined when tournament=Combined), (4) honor URL `month`/`cutoff` for Smogon baseline, (5) Global divergence is public while Personal mode remains auth-gated, (6) initial badge thresholds: Ladder trap = ladder >= 10% and tournament <= 5% and delta >= +5; Tournament staple = tournament >= 10% and ladder <= 5% and delta <= -5. |
 | 2026-04-29 | UX direction (deferred) | Decided lightweight onboarding over guided tour: one-time dismissible "What am I seeing?" panel + contextual `?` tooltips for key labels (`Preview`, `Combined`, future `Divergence`). Decided mobile optimization priority = fast scan first (denser ranked list) then deep detail (full-screen detail with sticky mini-header + section jump chips). Implementation deferred to next UX slice. |
 | 2026-04-29 | UX prioritization resolved (deferred) | Decided to remember last Tournament sub-view per user (`aggregate`/`players`/`divergence`), enable personal sample-size confidence indicators, ship quick actions in v1 for high-delta rows, show public data freshness metadata in meta UI, and show full section jump chips by default in mobile detail. Added a concrete deferred UX implementation checklist. |
+| 2026-04-30 | Phase 4 implemented | `DivergenceService.compareLadderVsTournament()` joins Smogon ladder entries vs Limitless tournament/combined entries; badge thresholds from OQ-D4 applied (ladder-trap / tournament-staple); `GET /tools/vgc/meta/divergence` public endpoint; `useDivergence` hook; `DivergenceView` sortable table (click header to sort by Ladder %, Tourn. %, or |Δ|); amber / blue badge chips with tooltips; "Divergence" added as third sub-tab in Tournament tab alongside Aggregate and Players; EN + ES i18n keys added. |
 
 ---
 
@@ -102,14 +103,13 @@
 - [x] Detail panel enriched: Champions move / item / SP spread breakdown (via `useMemo` merge in `MetaLayoutClient`)
 - [x] ~~SP spread → computed stats via `StatCalcService` → hexagonal radar chart~~ _(cancelled — deferred indefinitely)_
 
-### Phase 4 — Ladder vs Tournament Divergence _(Future — blocked on Phase 5)_
-> Requires Limitless tournament data to compare against. Will be Ladder vs Tournament, not Ladder vs Champions.
-- [ ] Divergence score computation: `|ladder_usage - tournament_usage|`
-- [ ] NestJS endpoint: `GET /tools/vgc/meta/divergence?tournamentId=`
-- [ ] Compare tab in meta page
-- [ ] Sortable divergence table
-- [ ] "Ladder trap" badge (high ladder %, low tournament %)
-- [ ] "Tournament staple" badge (low ladder %, high tournament %)
+### Phase 4 — Ladder vs Tournament Divergence _(Complete)_
+- [x] Divergence score computation: `|ladder_usage - tournament_usage|`
+- [x] NestJS endpoint: `GET /tools/vgc/meta/divergence?regulationId=&tournamentId=&month=&cutoff=` (public)
+- [x] "Divergence" sub-tab inside Tournament tab (alongside Aggregate and Players)
+- [x] Sortable divergence table (click column headers: Ladder %, Tourn. %, |Δ|)
+- [x] "Ladder trap" badge (ladder ≥ 10% AND tournament ≤ 5% AND delta ≥ +5)
+- [x] "Tournament staple" badge (tournament ≥ 10% AND ladder ≤ 5% AND delta ≤ -5)
 
 ### Phase 5 — Limitless Tournament Aggregation _(Complete)_
 
