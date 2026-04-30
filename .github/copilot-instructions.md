@@ -2,6 +2,12 @@
 
 Full reference: `AGENTS.md`. Path-specific context: `.github/instructions/`.
 
+Additional scoped instruction domains:
+- API standards: `api-standards.instructions.md`
+- Web network policy: `web-network.instructions.md`
+- i18n rules: `i18n.instructions.md`
+- Repository hygiene: `hygiene.instructions.md`
+
 ## Stack
 NestJS 11 (port 34301) + Next.js 16 App Router (port 3000). pnpm workspaces. MySQL + TypeORM + Drizzle.
 

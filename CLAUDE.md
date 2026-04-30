@@ -42,6 +42,10 @@ pending `pnpm generate:shared` runs, active design system (Boffmedia or SmartRot
 | Tech stack / deps | `.claude/context/stack.md` |
 | Folder structure | `.claude/context/architecture.md` |
 | Conventions / commands | `.claude/context/conventions.md` |
+| API standards (NestJS) | `.claude/context/api-standards.md` |
+| Web network policy | `.claude/context/web-network.md` |
+| i18n rules | `.claude/context/i18n.md` |
+| Repository hygiene | `.claude/context/hygiene.md` |
 | MCEF / Minecraft | `.claude/context/mcef.md` |
 | SmartRotom UI | `.claude/context/smartrotom.md` |
 | Full reference | `AGENTS.md` |
