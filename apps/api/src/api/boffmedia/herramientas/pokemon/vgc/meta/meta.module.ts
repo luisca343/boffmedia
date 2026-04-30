@@ -19,6 +19,7 @@ import { TeamsService } from './services/teams.service';
 import { StatCalcService } from './services/stat-calc.service';
 import { IngestionJobsService } from './services/ingestion-jobs.service';
 import { PersonalMetaAnalyticsService } from './services/personal-meta-analytics.service';
+import { DivergenceService } from './services/divergence.service';
 
 import { VgcMetaFacadeService } from './meta.facade.service';
 import { VgcMetaController } from './meta.controller';
@@ -41,6 +42,7 @@ import { VgcMetaController } from './meta.controller';
     StatCalcService,
     IngestionJobsService,
     PersonalMetaAnalyticsService,
+    DivergenceService,
     VgcMetaFacadeService,
   ],
   controllers: [VgcMetaController],

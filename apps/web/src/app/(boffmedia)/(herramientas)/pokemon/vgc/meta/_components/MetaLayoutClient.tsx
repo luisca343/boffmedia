@@ -13,11 +13,13 @@ import { useChampionsPasteDetail } from "../_hooks/useChampionsPasteDetail";
 import { useLimitlessTournaments } from "../_hooks/useLimitlessTournaments";
 import { useLimitlessUsage } from "../_hooks/useLimitlessUsage";
 import { useLimitlessPlayers } from "../_hooks/useLimitlessPlayers";
+import { useDivergence } from "../_hooks/useDivergence";
 import { useMetaNavigation, DEFAULT_CUTOFF } from "../_hooks/useMetaNavigation";
 import { FormatBar } from "./FormatBar";
 import { PokemonSidebar } from "./PokemonSidebar";
 import { PokemonDetailView } from "./PokemonDetailView";
 import { StandingsView } from "./StandingsView";
+import { DivergenceView } from "./DivergenceView";
 import { MetaSplitLayout } from "./MetaSplitLayout";
 import { FORMAT_LABELS } from "../constants";
 
@@ -74,6 +76,15 @@ export function MetaLayoutClient() {
   const { players: standingsPlayers, loading: standingsLoading, error: standingsError } =
     useLimitlessPlayers(tab === "tournament" ? tournamentIdNum : undefined);
 
+  // ── Divergence hook — only active when view=divergence in tournament tab ──
+  const view_preread = searchParams.get("view") ?? "aggregate";
+  const divergenceRegulation = tab === "tournament" && view_preread === "divergence" ? regulation || undefined : undefined;
+  const divergenceTournamentId = tab === "tournament" && view_preread === "divergence"
+    ? (tournamentId === "combined" || !tournamentId ? "combined" : tournamentIdNum)
+    : undefined;
+  const { result: divergenceResult, loading: divergenceLoading, error: divergenceError } =
+    useDivergence(divergenceRegulation, divergenceTournamentId, "", DEFAULT_CUTOFF);
+
   const entries    = tab === "tournament" ? tournamentEntries : isPreviewFormat ? championsEntries : ladderEntries;
   const entriesMap = tab === "tournament" ? tournamentMap     : isPreviewFormat ? championsMap     : ladderMap;
   const loading    = tab === "tournament" ? tournamentLoading : isPreviewFormat ? championsLoading : ladderLoading;
@@ -129,10 +140,10 @@ export function MetaLayoutClient() {
         </div>
       )}
 
-      {/* Aggregate / Players sub-tab strip — tournament tab only */}
+      {/* Aggregate / Players / Divergence sub-tab strip — tournament tab only */}
       {tab === "tournament" && (
         <div className="shrink-0 flex items-center gap-1 px-3 py-1.5 border-b border-surface-800 bg-surface-950">
-          {(["aggregate", "players"] as const).map((v) => (
+          {(["aggregate", "players", "divergence"] as const).map((v) => (
             <button
               key={v}
               onClick={() => handleViewChange(v)}
@@ -149,7 +160,7 @@ export function MetaLayoutClient() {
         </div>
       )}
 
-      {/* Players / Standings view for tournament tab */}
+      {/* Main content area */}
       <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
       {tab === "tournament" && view === "players" ? (
         <StandingsView
@@ -157,6 +168,12 @@ export function MetaLayoutClient() {
           loading={standingsLoading}
           error={standingsError}
           tournamentId={tournamentIdNum}
+        />
+      ) : tab === "tournament" && view === "divergence" ? (
+        <DivergenceView
+          result={divergenceResult}
+          loading={divergenceLoading}
+          error={divergenceError}
         />
       ) : (
         <MetaSplitLayout
