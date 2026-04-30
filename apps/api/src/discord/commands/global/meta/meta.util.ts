@@ -29,3 +29,15 @@ export function spriteUrl(speciesName: string): string {
   const slug = speciesName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '');
   return `https://play.pokemonshowdown.com/sprites/gen5/${slug}.png`;
 }
+
+const TYPE_EMOJI: Record<string, string> = {
+  normal:   '⬜', fire:     '🔥', water:    '💧', electric: '⚡',
+  grass:    '🌿', ice:      '❄️', fighting: '🥊', poison:   '☠️',
+  ground:   '🌍', flying:   '🌬️', psychic:  '🔮', bug:      '🐛',
+  rock:     '🪨', ghost:    '👻', dragon:   '🐉', dark:     '🌑',
+  steel:    '⚙️', fairy:    '🌸', stellar:  '✨',
+};
+
+export function typeEmoji(types: string[]): string {
+  return types.map((t) => TYPE_EMOJI[t.toLowerCase()] ?? t).join('');
+}

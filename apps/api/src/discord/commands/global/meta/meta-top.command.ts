@@ -1,25 +1,12 @@
 import { Injectable, UseInterceptors } from '@nestjs/common';
 import { Context, Options, Subcommand } from 'necord';
 import { ChatInputCommandInteraction } from 'discord.js';
-import { EmbedBuilder } from 'discord.js';
 import { MetaCommand } from './meta.group';
 import { MetaTopDto } from './meta.dto';
 import { MetaRegulationAutocompleteInterceptor } from './meta-regulation.interceptor';
 import { VgcMetaFacadeService } from '@/api/boffmedia/herramientas/pokemon/vgc/meta/meta.facade.service';
-import { typeColor } from './meta.util';
+import { buildTopPages, buildNavRow, COLLECTOR_TTL_MS } from './meta-paginator';
 import { PokemonUsageEntry } from '@/api/boffmedia/herramientas/pokemon/vgc/meta/entities/pokemon-usage.entity';
-
-const TYPE_EMOJI: Record<string, string> = {
-  normal:   '⬜', fire:     '🔥', water:    '💧', electric: '⚡',
-  grass:    '🌿', ice:      '❄️', fighting: '🥊', poison:   '☠️',
-  ground:   '🌍', flying:   '🌬️', psychic:  '🔮', bug:      '🐛',
-  rock:     '🪨', ghost:    '👻', dragon:   '🐉', dark:     '🌑',
-  steel:    '⚙️', fairy:    '🌸', stellar:  '✨',
-};
-
-function typeEmoji(types: string[]): string {
-  return types.map((t) => TYPE_EMOJI[t.toLowerCase()] ?? t).join('');
-}
 
 @Injectable()
 @MetaCommand()
@@ -40,38 +27,53 @@ export class MetaTopCommand {
       return;
     }
 
-    const n = count ?? 10;
-
     let entries: PokemonUsageEntry[];
     try {
-      if (reg.vgcPastesGid) {
-        entries = await this.metaFacade.getChampionsUsageList({ regulationId: regulation });
-      } else {
-        entries = await this.metaFacade.getSmogonUsageList({ format: reg.formatId });
-      }
+      entries = reg.vgcPastesGid
+        ? await this.metaFacade.getChampionsUsageList({ regulationId: regulation })
+        : await this.metaFacade.getSmogonUsageList({ format: reg.formatId });
     } catch {
       await interaction.editReply(`No usage data available for **${reg.name}** yet.`);
       return;
     }
 
-    const top = entries.slice(0, n);
-    if (!top.length) {
+    if (!entries.length) {
       await interaction.editReply(`No usage data available for **${reg.name}** yet.`);
       return;
     }
 
-    const lines = top.map(
-      (e) =>
-        `\`#${String(e.rank).padStart(2, ' ')}\` ${typeEmoji(e.types)} **${e.speciesName}** — ${e.usagePercent.toFixed(2)}%`,
-    );
-
+    // Honour the optional `count` cap before building pages
+    const slice  = count ? entries.slice(0, count) : entries;
     const source = reg.vgcPastesGid ? 'VGCPastes (Champions)' : 'Smogon Ladder';
-    const embed  = new EmbedBuilder()
-      .setColor(typeColor(top[0]?.types ?? []))
-      .setTitle(`Top ${n} — ${reg.name}`)
-      .setDescription(lines.join('\n'))
-      .setFooter({ text: `Source: ${source}` });
+    const pages  = buildTopPages(slice, reg.name, source);
+    const iid    = interaction.id;
+    let   page   = 0;
 
-    await interaction.editReply({ embeds: [embed] });
+    const msg = await interaction.editReply({
+      embeds:     [pages[page]],
+      components: pages.length > 1 ? [buildNavRow(iid, page, pages.length)] : [],
+    });
+
+    if (pages.length === 1) return;
+
+    const collector = msg.createMessageComponentCollector({
+      filter: (i) =>
+        i.user.id === interaction.user.id &&
+        (i.customId === `meta_${iid}_prev` || i.customId === `meta_${iid}_next`),
+      time: COLLECTOR_TTL_MS,
+    });
+
+    collector.on('collect', async (btn) => {
+      page = btn.customId === `meta_${iid}_prev` ? page - 1 : page + 1;
+      page = Math.max(0, Math.min(pages.length - 1, page));
+      await btn.update({
+        embeds:     [pages[page]],
+        components: [buildNavRow(iid, page, pages.length)],
+      });
+    });
+
+    collector.on('end', () => {
+      interaction.editReply({ components: [] }).catch(() => {});
+    });
   }
 }
