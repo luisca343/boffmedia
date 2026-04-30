@@ -14,7 +14,9 @@ import { SMOGON_DEFAULT_CUTOFF } from './config/smogon.config';
 import { VgcRegulationsRepository } from './repositories/regulations.repository';
 import { IngestionJobsService } from './services/ingestion-jobs.service';
 import { PersonalMetaAnalyticsService } from './services/personal-meta-analytics.service';
+import { DivergenceService } from './services/divergence.service';
 import { QueryPersonalMetaDto } from './dto/query-personal-meta.dto';
+import { QueryDivergenceDto } from './dto/query-divergence.dto';
 
 @Injectable()
 export class VgcMetaFacadeService {
@@ -28,6 +30,7 @@ export class VgcMetaFacadeService {
     private readonly regulationsRepository: VgcRegulationsRepository,
     private readonly ingestionJobsService: IngestionJobsService,
     private readonly personalMetaAnalyticsService: PersonalMetaAnalyticsService,
+    private readonly divergenceService: DivergenceService,
   ) {}
 
   // â”€â”€â”€ Ladder (Smogon) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -195,6 +198,17 @@ export class VgcMetaFacadeService {
       source: dto.source ?? 'auto',
       month: dto.month,
       cutoff: dto.cutoff ?? SMOGON_DEFAULT_CUTOFF,
+    });
+  }
+
+  // ─── Divergence (ladder vs tournament) ───────────────────────────────────────
+
+  async getDivergence(dto: QueryDivergenceDto) {
+    return this.divergenceService.compareLadderVsTournament({
+      regulationId: dto.regulationId,
+      tournamentId: dto.tournamentId,
+      month:        dto.month,
+      cutoff:       dto.cutoff ?? SMOGON_DEFAULT_CUTOFF,
     });
   }
 }

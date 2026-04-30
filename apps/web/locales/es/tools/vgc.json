@@ -426,6 +426,7 @@
         "combined": "Combinado",
         "aggregate": "Uso",
         "players": "Jugadores",
+        "divergence": "Divergencia",
         "compare": "Comparar",
         "comingSoon": "Próximamente",
         "previewBadge": "Preview",
@@ -492,6 +493,26 @@
         "copyPaste": "Copiar Pok\u00e9paste",
         "copied": "\u00a1Copiado!",
         "tera": "Tera: {type}"
+      },
+      "divergence": {
+        "loading": "Cargando datos de divergencia…",
+        "empty": "Sin datos de divergencia. Importa un torneo primero.",
+        "selectTournament": "Selecciona una regulación y torneo para ver la divergencia.",
+        "rowCount": "{count} Pokémon",
+        "allElo": "Todos los ELO",
+        "col": {
+          "pokemon": "Pokémon",
+          "ladder": "Escalera %",
+          "tournament": "Torneo %",
+          "delta": "|Δ|",
+          "badge": "Insignia"
+        },
+        "badges": {
+          "ladderTrap": "Trampa de Escalera",
+          "ladderTrapTitle": "Alto uso en escalera, bajo en torneos — puede estar sobrevalorado en top-cut",
+          "tournamentStaple": "Pilar de Torneo",
+          "tournamentStapleTitle": "Bajo uso en escalera, alto en torneos — infravalorado en la escalera"
+        }
       },
       "refresh": "Actualizar",
       "footer": "Datos de Smogon Stats · Actualización mensual · Corte por defecto: 1760"

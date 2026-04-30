@@ -200,6 +200,19 @@ export class VgcMetaService {
     if (params.cutoff !== undefined) search.set('cutoff', String(params.cutoff));
     return apiAuthedGET<PersonalMetaComparison>(`/tools/vgc/meta/compare/personal?${search}`, token);
   }
+
+  static getDivergence(params: {
+    regulationId: string;
+    tournamentId?: number;
+    month?: string;
+    cutoff?: number;
+  }) {
+    const search = new URLSearchParams({ regulationId: params.regulationId });
+    if (params.tournamentId !== undefined) search.set('tournamentId', String(params.tournamentId));
+    if (params.month) search.set('month', params.month);
+    if (params.cutoff !== undefined) search.set('cutoff', String(params.cutoff));
+    return apiGET<DivergenceResult>(`/tools/vgc/meta/divergence?${search}`);
+  }
 }
 
 export interface VgcIngestionJob {
@@ -397,4 +410,29 @@ export interface SpeciesTeamEntry {
   rank:       string | null;
   slots:      SpeciesTeamSlot[];
   rawText:    string;
+}
+
+// ─── Divergence types ────────────────────────────────────────────────────────
+
+export type DivergenceBadge = 'ladder-trap' | 'tournament-staple' | null;
+
+export interface DivergenceRow {
+  speciesId:         string;
+  speciesName:       string;
+  ladderPercent:     number;
+  tournamentPercent: number;
+  deltaPercent:      number;
+  absDeltaPercent:   number;
+  badge:             DivergenceBadge;
+}
+
+export interface DivergenceResult {
+  regulationId:  string;
+  /** null = combined across all completed tournaments in the regulation */
+  tournamentId:  number | null;
+  ladderFormat:  string;
+  ladderMonth:   string;
+  ladderCutoff:  number;
+  rowCount:      number;
+  rows:          DivergenceRow[];
 }
