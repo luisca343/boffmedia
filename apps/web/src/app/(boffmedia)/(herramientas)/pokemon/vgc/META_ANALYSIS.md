@@ -45,6 +45,9 @@
 | 2026-04-28 | FormatBar selects redesign | Replaced all format/regulation/tournament pills with `<select>` elements for a more compact and consistent UI. Stats tab: single `<select>` with `<optgroup label="Smogon">` and `<optgroup label="VGCPastes · Preview">` groups; month and cutoff also inline `<select>`s (no Apply button — change fires immediately via `onOptionsApply`). Tournament tab: regulation `<select>` + tournament `<select>` (Combined + individual entries sorted by date desc). Options popover (`Settings2` icon, `useRef`, `useState`) fully removed. `SELECT_CLS` constant for consistent styling across all selects. All tabs use the same sticky sidebar layout (`md:sticky md:top-0 md:h-screen`). |
 | 2026-04-28 | Dex mod consistency fix | Fixed missing base stats for new Champions mega evolutions by making all VGC meta aggregators format-aware. `SmogonService`, `VgcPastesService`, and `LimitlessService` now resolve species through `Dex.forFormat(...)` (with Champions mod initialized via `initChampionsMod()`), instead of relying on global `Dex.species`. For `regulationId=vgc2026regma`, species/stat/type lookups now correctly use `gen9championsvgc2026regma` across Stats preview + Tournament aggregate/player flows. **Guardrail:** any future meta usage/detail aggregation must resolve species with format-specific Dex, never plain global Dex for Champions-enabled formats. |
 | 2026-04-28 | SOLID refactor | Centralized all format-aware Dex logic into `meta/utils/dex-resolver.ts` (`getDexForFormat`, `resolveSpeciesId`). Removed duplicate implementations from the three services. Extracted `FORMAT_LABELS` from `MetaLayoutClient` into `meta/constants.ts` (non-component files must not live inside `_components/`). Fixed `catch (e)` unknown-type error in `VgcPastesService`. Fixed non-null assertion on `parsedSlots` in `LimitlessService` with a proper type-predicate filter. |
+| 2026-04-29 | Divergence planning (deferred) | Phase 4 implementation deferred, but approach decided: (1) Divergence lives under Tournament tab as a third sub-view (`aggregate` / `players` / `divergence`), (2) reuse existing regulation + tournament selectors from FormatBar/useMetaNavigation, (3) default baseline = Smogon vs selected tournament (or Smogon vs Combined when tournament=Combined), (4) honor URL `month`/`cutoff` for Smogon baseline, (5) Global divergence is public while Personal mode remains auth-gated, (6) initial badge thresholds: Ladder trap = ladder >= 10% and tournament <= 5% and delta >= +5; Tournament staple = tournament >= 10% and ladder <= 5% and delta <= -5. |
+| 2026-04-29 | UX direction (deferred) | Decided lightweight onboarding over guided tour: one-time dismissible "What am I seeing?" panel + contextual `?` tooltips for key labels (`Preview`, `Combined`, future `Divergence`). Decided mobile optimization priority = fast scan first (denser ranked list) then deep detail (full-screen detail with sticky mini-header + section jump chips). Implementation deferred to next UX slice. |
+| 2026-04-29 | UX prioritization resolved (deferred) | Decided to remember last Tournament sub-view per user (`aggregate`/`players`/`divergence`), enable personal sample-size confidence indicators, ship quick actions in v1 for high-delta rows, show public data freshness metadata in meta UI, and show full section jump chips by default in mobile detail. Added a concrete deferred UX implementation checklist. |
 
 ---
 
@@ -154,6 +157,13 @@
 ### Future — Personal Integration
 - [ ] Join meta usage data with user's own tracker `opponentTeam` records
 - [ ] "You vs the meta" overlays in `SessionStatsView`
+
+### Future — UX Hardening Slice (Deferred)
+- [ ] Remember last Tournament sub-view per user (`aggregate`/`players`/`divergence`) and restore on next visit
+- [ ] Add personal sample-size confidence indicators (`low`/`medium`/`high`) next to personal deltas
+- [ ] Add quick actions for high-delta rows in v1 (copy note / export row / open speed tools)
+- [ ] Add public freshness strip in meta UI (latest Smogon month + latest tournament import timestamp)
+- [ ] Show full section jump chips by default in mobile detail view
 
 ---
 
@@ -560,11 +570,41 @@ Adamant Nature
 
 **OQ10** Unified `vgcPastes` table for all Showdown pastes. `vgcPasteDetails` eliminated. Both `vgcPasteTeams.pasteId` and `vgcLimitlessTeams.pasteId` FK into `vgcPastes.id`. `pastes.repository.ts` (`PastesRepository`) owns all paste upserts and returns the internal ID for back-linking.
 
+**OQ-D1** Divergence comparison baseline → Smogon vs selected tournament when a tournament is selected; Smogon vs Combined when Tournament selector is `Combined`.
+
+**OQ-D2** Divergence UI placement → keep inside Tournament tab as a third sub-view (`aggregate` / `players` / `divergence`), not a top-level app tab.
+
+**OQ-D3** Personal-vs-meta placement → merge into Divergence view with a mode toggle (`global` / `personal`) so selectors, sorting, and table UX are shared.
+
+**OQ-D4** Initial badge thresholds → `Ladder trap`: ladder >= 10% and tournament <= 5% and delta >= +5 points. `Tournament staple`: tournament >= 10% and ladder <= 5% and delta <= -5 points.
+
+**OQ-D5** Smogon baseline options precedence → honor URL `month`/`cutoff` when present; otherwise default to latest month + `SMOGON_DEFAULT_CUTOFF`.
+
+**OQ-D6** Access model → Global divergence is public; Personal divergence mode requires authenticated user context.
+
+**OQ-UX1** Onboarding model → Lightweight onboarding (one-time dismissible context panel + contextual tooltips) instead of a full guided tour.
+
+**OQ-UX2** Mobile priority → Optimize for fast scan first (compact ranked list), then deep detail (full-screen detail flow with sticky mini-header and sectolion jumps).
+
+**OQ-UX3** Divergence discoverability default → remember the last Tournament sub-view per user instead of forcing `aggregate` on every entry.
+
+**OQ-UX4** Personal confidence indicators → yes; show sample-size confidence bands in Personal mode.
+
+**OQ-UX5** Actionability scope → yes; include quick actions for high-delta rows in v1.
+
+**OQ-UX6** Data freshness surface → yes; expose freshness metadata in the public meta UI.
+
+**OQ-UX7** Mobile detail shortcuts → include full section jump chips by default.
+
 ---
 
 ## Open Questions
 
+### UX / Product Prioritization
+
 *(All resolved — none pending.)*
+
+### Historical (Resolved)
 
 **OQ-L1** Import scope → Admin sets `maxPlayers` per import (optional; no limit = all players).  
 **OQ-L2** Background model → Background job; admin polls status in admin panel (running / done / error + progress bar). `POST` returns `{ jobId }` immediately.  
