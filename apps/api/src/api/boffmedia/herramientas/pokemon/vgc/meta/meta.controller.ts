@@ -25,6 +25,7 @@ import { QueryLimitlessDto } from './dto/query-limitless.dto';
 import { BatchFetchResultDto, ChampionsPasteDetailDto } from './dto/champions-paste-detail.dto';
 import { UpsertRegulationDto } from './dto/upsert-regulation.dto';
 import { QueryPersonalMetaDto } from './dto/query-personal-meta.dto';
+import { QueryDivergenceDto } from './dto/query-divergence.dto';
 import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 
 @ApiTags('BoffMedia 🛠 | VGC Meta')
@@ -295,5 +296,14 @@ export class VgcMetaController {
     @Query() dto: QueryPersonalMetaDto,
   ) {
     return this.facade.comparePersonalVsMeta(req.user.userId, dto);
+  }
+
+  // --- Divergence (Ladder vs Tournament) -----------------------------------
+
+  @Get('divergence')
+  @ApiOperation({ summary: 'Compare Smogon ladder usage vs Limitless tournament usage for a regulation' })
+  @ApiResponse({ status: 200, description: 'Divergence rows returned, sorted by |delta| descending.' })
+  getDivergence(@Query() dto: QueryDivergenceDto) {
+    return this.facade.getDivergence(dto);
   }
 }

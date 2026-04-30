@@ -426,6 +426,7 @@
         "combined": "Combined",
         "aggregate": "Usage",
         "players": "Players",
+        "divergence": "Divergence",
         "compare": "Compare",
         "comingSoon": "Coming soon",
         "previewBadge": "Preview",
@@ -492,6 +493,26 @@
         "copyPaste": "Copy Pok\u00e9paste",
         "copied": "Copied!",
         "tera": "Tera: {type}"
+      },
+      "divergence": {
+        "loading": "Loading divergence data…",
+        "empty": "No divergence data. Import a tournament first.",
+        "selectTournament": "Select a regulation and tournament to view divergence.",
+        "rowCount": "{count} Pokémon",
+        "allElo": "All ELO",
+        "col": {
+          "pokemon": "Pokémon",
+          "ladder": "Ladder %",
+          "tournament": "Tourn. %",
+          "delta": "|Δ|",
+          "badge": "Badge"
+        },
+        "badges": {
+          "ladderTrap": "Ladder Trap",
+          "ladderTrapTitle": "High ladder usage, low tournament usage — may be overrated in top-cut",
+          "tournamentStaple": "Tournament Staple",
+          "tournamentStapleTitle": "Low ladder usage, high tournament usage — underrated on the ladder"
+        }
       },
       "refresh": "Refresh",
       "footer": "Data from Smogon Stats · Updated monthly · Default cutoff: 1760"
