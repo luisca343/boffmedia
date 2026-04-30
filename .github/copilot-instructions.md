@@ -1,20 +1,33 @@
-# GitHub Copilot Instructions
+# Copilot Instructions — Boffmedia Monorepo
 
-Full project reference: [AGENTS.md](../AGENTS.md). This file adds Copilot-specific scoping.
+Full reference: `AGENTS.md`. Path-specific context: `.github/instructions/`.
 
-## Critical rules (read before suggesting code)
+## Stack
+NestJS 11 (port 34301) + Next.js 16 App Router (port 3000). pnpm workspaces. MySQL + TypeORM + Drizzle.
 
-1. **Never duplicate shared types.** All server-generated types live in `@boffmedia/shared`. Import from there; never redefine them on the client.
-2. **All API calls go through `apps/web/src/services/api/`**. Never inline `fetch` in components.
-3. **MCEF**: Use only the existing functions in `apps/web/src/services/mcef/mcefApi.ts`. Do not invent new `window.mcefQuery` call shapes.
-4. **Two products, two design systems**: Boffmedia uses `components/ui/primitives/`; SmartRotom uses `components/smartrotom/ui/`. Do not mix them.
-5. **New components default to `app/**/_components/`**. Promote to `features/` or `components/` only when shared across routes.
-6. **NestJS DTOs must include `@ApiProperty` decorators** so the OpenAPI spec stays accurate for `generate:shared`.
-7. **`next.config.mjs` suppresses TS build errors** — suggest running `pnpm type-check` to surface them.
+## Critical rules
 
-## Stack at a glance
+- Never edit `packages/shared/src/` — auto-generated from OpenAPI. Run `pnpm generate:shared` after adding server DTOs.
+- All HTTP calls go through `apps/web/src/services/api/`. Never inline `fetch` in components.
+- Default new components to `app/**/_components/`. Promote with justification only.
+- Run `pnpm type-check` to verify TypeScript — `next.config.mjs` ignores TS build errors.
+- Two incompatible design systems — do NOT cross-apply:
+	- Boffmedia: `components/ui/primitives/` (shadcn/Radix)
+	- SmartRotom: `components/smartrotom/ui/` (neobrutalism)
+- Never invent new `window.mcefQuery` call shapes. Extend `mcefApi.ts` only.
+- New DTOs must include `@ApiProperty`/`@ApiResponse` Swagger decorators.
+- Use `class-validator` for all server request bodies. `ValidationPipe` has `whitelist: true` and `forbidNonWhitelisted: true`.
+- Use `next-intl` translation keys — never hardcode user-facing strings.
+- Use `@/` absolute aliases, not deep relative paths (more than 2 levels).
+- Do not mix TypeORM and Drizzle within a single module.
+- `@pkmn/*` packages are version-overridden in `pnpm-workspace.yaml` — do not upgrade independently.
 
-- **Client**: Next.js 16 + React 19, Tailwind 3, Zustand, Zod, `next-intl`
-- **Server**: NestJS 11, MySQL, TypeORM + Drizzle ORM, Socket.io, Swagger
-- **Shared**: `packages/shared/` — auto-generated OpenAPI models (do not edit)
-- **Minecraft**: MCEF bridge in `apps/web/src/services/mcef/`
+## Forbidden paths — never read
+- `packages/shared/src/` — 255+ auto-generated files
+- `node_modules/`, `.next/`, `dist/`, `pnpm-lock.yaml`
+
+## Key commands
+- `pnpm dev` — run web + api
+- `pnpm generate:shared` — regenerate shared types (api must be on port 34301)
+- `pnpm type-check` — TypeScript check all packages
+- `pnpm --filter api migrate` — run Drizzle migrations
