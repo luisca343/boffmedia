@@ -18,6 +18,8 @@ import { VgcMetaModule } from '@/api/boffmedia/herramientas/pokemon/vgc/meta/met
 import { MetaRegulationAutocompleteInterceptor } from '../commands/global/meta/meta-regulation.interceptor';
 import { MetaPokemonCommand } from '../commands/global/meta/meta-pokemon.command';
 import { MetaTopCommand } from '../commands/global/meta/meta-top.command';
+import { MetaTeammatesCommand } from '../commands/global/meta/meta-teammates.command';
+import { MetaRegulationsCommand } from '../commands/global/meta/meta-regulations.command';
 
 console.log('[DEBUG] Initializing NecordModule with token:', process.env.DISCORD_KEY);
 
@@ -55,6 +57,8 @@ console.log('[DEBUG] Initializing NecordModule with token:', process.env.DISCORD
     MetaRegulationAutocompleteInterceptor,
     MetaPokemonCommand,
     MetaTopCommand,
+    MetaTeammatesCommand,
+    MetaRegulationsCommand,
   ],
 })
 export class DiscordModule {}
