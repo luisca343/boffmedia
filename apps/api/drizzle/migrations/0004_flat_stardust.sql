@@ -51,6 +51,7 @@ CREATE TABLE `vgc_paste_teams` (
 CREATE TABLE `vgc_pastes` (
 	`id` int AUTO_INCREMENT NOT NULL,
 	`pokepaste_id` varchar(32),
+	`source_key` varchar(255),
 	`raw_text` text NOT NULL,
 	`parsed_slots` text NOT NULL,
 	`author` varchar(128),
@@ -58,7 +59,8 @@ CREATE TABLE `vgc_pastes` (
 	`format_id` varchar(64),
 	`fetched_at` datetime NOT NULL,
 	CONSTRAINT `vgc_pastes_id` PRIMARY KEY(`id`),
-	CONSTRAINT `vgc_pastes_pokepaste_id_unique` UNIQUE(`pokepaste_id`)
+	CONSTRAINT `vgc_pastes_pokepaste_id_unique` UNIQUE(`pokepaste_id`),
+	CONSTRAINT `vgc_pastes_source_key_unique` UNIQUE(`source_key`)
 );
 --> statement-breakpoint
 CREATE TABLE `vgc_regulations` (
@@ -70,26 +72,13 @@ CREATE TABLE `vgc_regulations` (
 	`import_status` varchar(16) NOT NULL DEFAULT 'idle',
 	`import_error` text,
 	`import_team_count` int NOT NULL DEFAULT 0,
+	`import_fetched_count` int NOT NULL DEFAULT 0,
 	`import_started_at` datetime,
 	`import_completed_at` datetime,
 	`active` int NOT NULL DEFAULT 1,
 	`created_at` datetime NOT NULL,
 	CONSTRAINT `vgc_regulations_id` PRIMARY KEY(`id`)
 );
-
---> statement-breakpoint
-INSERT INTO `vgc_regulations` (`id`, `format_id`, `name`, `game_type`, `vgcpastes_gid`, `active`, `created_at`)
-VALUES (
-  'vgc2026regma',
-  'gen9championsvgc2026regma',
-  '[Gen 9 Champions] VGC 2026 Reg M-A',
-  'doubles',
-  '791705272',
-  1,
-  NOW()
-);
-
-
 --> statement-breakpoint
 CREATE TABLE `vgc_smogon_pokemon` (
 	`id` int AUTO_INCREMENT NOT NULL,
@@ -206,4 +195,15 @@ ALTER TABLE `vgc_matches` ADD CONSTRAINT `vgc_matches_user_id_boffmedia_users_id
 ALTER TABLE `vgc_series` ADD CONSTRAINT `vgc_series_session_id_vgc_sessions_id_fk` FOREIGN KEY (`session_id`) REFERENCES `vgc_sessions`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `vgc_series` ADD CONSTRAINT `vgc_series_user_id_boffmedia_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `boffmedia_users`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `vgc_sessions` ADD CONSTRAINT `vgc_sessions_user_id_boffmedia_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `boffmedia_users`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `vgc_team_presets` ADD CONSTRAINT `vgc_team_presets_user_id_boffmedia_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `boffmedia_users`(`id`) ON DELETE cascade ON UPDATE no action;
+ALTER TABLE `vgc_team_presets` ADD CONSTRAINT `vgc_team_presets_user_id_boffmedia_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `boffmedia_users`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+CREATE INDEX `vgc_limitless_teams_tournament_idx` ON `vgc_limitless_teams` (`tournament_id`);--> statement-breakpoint
+CREATE INDEX `vgc_limitless_teams_tournament_player_idx` ON `vgc_limitless_teams` (`tournament_id`,`player_slug`);--> statement-breakpoint
+CREATE INDEX `vgc_limitless_teams_paste_idx` ON `vgc_limitless_teams` (`paste_id`);--> statement-breakpoint
+CREATE INDEX `vgc_limitless_tournaments_regulation_idx` ON `vgc_limitless_tournaments` (`regulation_id`);--> statement-breakpoint
+CREATE INDEX `vgc_limitless_tournaments_regulation_status_idx` ON `vgc_limitless_tournaments` (`regulation_id`,`status`);--> statement-breakpoint
+CREATE INDEX `vgc_paste_teams_regulation_idx` ON `vgc_paste_teams` (`regulation_id`);--> statement-breakpoint
+CREATE INDEX `vgc_paste_teams_regulation_paste_idx` ON `vgc_paste_teams` (`regulation_id`,`paste_id`);--> statement-breakpoint
+CREATE INDEX `vgc_pastes_format_idx` ON `vgc_pastes` (`format_id`);--> statement-breakpoint
+CREATE INDEX `vgc_regulations_active_idx` ON `vgc_regulations` (`active`);--> statement-breakpoint
+CREATE INDEX `vgc_regulations_format_idx` ON `vgc_regulations` (`format_id`);--> statement-breakpoint
+CREATE INDEX `vgc_smogon_snapshot_lookup_idx` ON `vgc_smogon_pokemon` (`format_id`,`month`,`cutoff`);
