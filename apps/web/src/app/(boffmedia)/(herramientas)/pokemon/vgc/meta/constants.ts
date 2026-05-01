@@ -13,3 +13,5 @@ export const FORMAT_LABELS: Readonly<Record<string, string>> = {
   gen9vgc2025regg: "VGC 2026 Reg G",
   gen9vgc2025regf: "VGC 2026 Reg F",
 };
+
+export const ENABLE_PREVIEW_FORMATS = false;
