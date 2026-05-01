@@ -4,6 +4,7 @@ import { LimitlessService } from './limitless.service';
 import { VgcRegulationsRepository } from '../repositories/regulations.repository';
 import { SMOGON_DEFAULT_CUTOFF } from '../config/smogon.config';
 import type { PokemonUsageEntry } from '../entities/pokemon-usage.entity';
+import { getDexForFormat, toBaseFormId } from '../utils/dex-resolver';
 
 export type DivergenceBadge = 'ladder-trap' | 'tournament-staple' | null;
 
@@ -26,6 +27,44 @@ export interface DivergenceResult {
   ladderCutoff: number;
   rowCount: number;
   rows: DivergenceRow[];
+}
+
+/**
+ * Normalizes mega-evolution and primal-reversion entries to their base species
+ * and merges usage from entries that collapse to the same base ID.
+ *
+ * This is needed for cross-format comparisons where the ladder uses base forms
+ * (megas do not exist in standard Gen 9 VGC) but tournament data from the
+ * Champions format stores the mega form explicitly (e.g. "charizardmegay").
+ */
+function mergeToBaseForms(entries: PokemonUsageEntry[], dex: ReturnType<typeof getDexForFormat>): PokemonUsageEntry[] {
+  const merged = new Map<string, PokemonUsageEntry>();
+
+  for (const entry of entries) {
+    const baseId = toBaseFormId(entry.speciesId, dex);
+
+    if (baseId === entry.speciesId) {
+      // Not a mega/primal — insert as-is if not already present, otherwise keep
+      if (!merged.has(baseId)) merged.set(baseId, entry);
+      continue;
+    }
+
+    // Mega/primal/eternal → collapse to base form
+    const baseName = dex.species.get(baseId).name ?? entry.speciesName;
+    const existing = merged.get(baseId);
+    if (existing) {
+      merged.set(baseId, {
+        ...existing,
+        usagePercent: existing.usagePercent + entry.usagePercent,
+        rawCount:     existing.rawCount + entry.rawCount,
+        rank:         Math.min(existing.rank, entry.rank),
+      });
+    } else {
+      merged.set(baseId, { ...entry, speciesId: baseId, speciesName: baseName });
+    }
+  }
+
+  return [...merged.values()];
 }
 
 /**
@@ -82,8 +121,11 @@ export class DivergenceService {
           : this.limitlessService.getCombinedUsageEntries(params.regulationId),
       ]);
 
-    const ladderMap = new Map(ladderEntries.map((e) => [e.speciesId, e]));
-    const tournamentMap = new Map(tournamentEntries.map((e) => [e.speciesId, e]));
+    const dex = getDexForFormat(regulation.formatId);
+    const normalizedLadder     = mergeToBaseForms(ladderEntries, dex);
+    const normalizedTournament = mergeToBaseForms(tournamentEntries, dex);
+    const ladderMap     = new Map(normalizedLadder.map((e) => [e.speciesId, e]));
+    const tournamentMap = new Map(normalizedTournament.map((e) => [e.speciesId, e]));
     const allIds = new Set([...ladderMap.keys(), ...tournamentMap.keys()]);
 
     const rows: DivergenceRow[] = [...allIds]
