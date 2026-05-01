@@ -51,7 +51,7 @@ COPY --from=builder /app/apps/api/drizzle ./drizzle
 COPY --from=builder /app/apps/api/package.json ./
 
 # NOTE: mount your Google service-account JSON at runtime, e.g.:
-#   docker run -v /etc/boffmedia/boffmedia-a39cdd7a63c7.json:/app/boffmedia-a39cdd7a63c7.json ...
+#   docker run -v /etc/boffmedia/boffmedia-b6e4f721c326.json:/app/boffmedia-b6e4f721c326.json ...
 
 EXPOSE 3000
 ENV NODE_OPTIONS="--max-old-space-size=4096"
