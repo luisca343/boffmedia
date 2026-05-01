@@ -25,7 +25,7 @@ export class PokemonLogService {
 
     try {
       const auth = new google.auth.GoogleAuth({
-        keyFile: 'boffmedia-a39cdd7a63c7.json',
+        keyFile: 'boffmedia-b6e4f721c326.json',
         scopes: ['https://www.googleapis.com/auth/spreadsheets'],
       });
 
