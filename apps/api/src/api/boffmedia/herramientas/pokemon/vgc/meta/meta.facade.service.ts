@@ -4,6 +4,7 @@ import { SmogonService } from './services/smogon.service';
 import { VgcPastesService } from './services/vgcpastes.service';
 import { PokepasteService } from './services/pokepaste.service';
 import { LimitlessService } from './services/limitless.service';
+import { PokemonUsageDetail, PokemonUsageEntry } from './entities/pokemon-usage.entity';
 import { TeamsService } from './services/teams.service';
 import { StatCalcService } from './services/stat-calc.service';
 import { QuerySmogonDto } from './dto/query-smogon.dto';
@@ -161,6 +162,64 @@ export class VgcMetaFacadeService {
 
   async listLimitlessTournaments() {
     return this.limitlessService.listTournaments();
+  }
+
+  // ─── Unified detail (source-agnostic) ───────────────────────────────────────
+
+  async getUnifiedUsageDetailList(regulationId: string): Promise<PokemonUsageDetail[]> {
+    const regulation = await this.regulationsRepository.findById(regulationId);
+    if (!regulation) throw new NotFoundException(`Regulation "${regulationId}" not found`);
+    if (regulation.vgcPastesGid) return this.vgcPastesService.getUsageList(regulationId);
+    if (regulation.formatId) {
+      const month = await this.resolveMostRecentMonth(regulation.formatId, SMOGON_DEFAULT_CUTOFF);
+      return this.smogonService.getUsageList(regulation.formatId, month, SMOGON_DEFAULT_CUTOFF);
+    }
+    return this.limitlessService.getCombinedUsage(regulationId);
+  }
+
+  async getChampionsDetail(regulationId: string, speciesId: string): Promise<PokemonUsageDetail> {
+    const list  = await this.vgcPastesService.getUsageList(regulationId);
+    const entry = list.find((e) => e.speciesId === speciesId);
+    if (!entry) throw new NotFoundException(`${speciesId} not found in Champions data for ${regulationId}`);
+
+    // Usage list has teammates but empty moves/items/abilities/spreads.
+    // Paste detail has the opposite. Merge both when paste data is available.
+    try {
+      const paste = await this.vgcPastesService.getPasteDetail(regulationId, speciesId);
+      return {
+        ...entry,
+        abilities: paste.abilities.length ? paste.abilities : entry.abilities,
+        items:     paste.items.length     ? paste.items     : entry.items,
+        moves:     paste.moves.length     ? paste.moves     : entry.moves,
+        teraTypes: paste.teraTypes.length ? paste.teraTypes : entry.teraTypes,
+        spreads:   paste.spreads.length   ? paste.spreads   : entry.spreads,
+      };
+    } catch {
+      return entry;
+    }
+  }
+
+  async getLimitlessDetail(regulationId: string, speciesId: string): Promise<PokemonUsageDetail> {
+    const list = await this.limitlessService.getCombinedUsage(regulationId);
+    const entry = list.find((e) => e.speciesId === speciesId);
+    if (!entry) throw new NotFoundException(`${speciesId} not found in Limitless data for ${regulationId}`);
+    return entry;
+  }
+
+  async getUnifiedUsageList(regulationId: string): Promise<PokemonUsageEntry[]> {
+    const regulation = await this.regulationsRepository.findById(regulationId);
+    if (!regulation) throw new NotFoundException(`Regulation "${regulationId}" not found`);
+    if (regulation.vgcPastesGid) return this.vgcPastesService.getUsageEntries(regulationId);
+    if (regulation.formatId)     return this.getSmogonUsageList({ format: regulation.formatId });
+    return this.limitlessService.getCombinedUsageEntries(regulationId);
+  }
+
+  async getUnifiedDetail(regulationId: string, speciesId: string): Promise<PokemonUsageDetail> {
+    const regulation = await this.regulationsRepository.findById(regulationId);
+    if (!regulation) throw new NotFoundException(`Regulation "${regulationId}" not found`);
+    if (regulation.vgcPastesGid) return this.getChampionsDetail(regulationId, speciesId);
+    if (regulation.formatId)     return this.getSmogonDetail({ format: regulation.formatId, speciesId });
+    return this.getLimitlessDetail(regulationId, speciesId);
   }
 
   // ─── Regulations ────────────────────────────────────────────────────────────
