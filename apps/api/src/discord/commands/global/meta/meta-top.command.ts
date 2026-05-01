@@ -4,6 +4,7 @@ import { ChatInputCommandInteraction } from 'discord.js';
 import { MetaCommand } from './meta.group';
 import { MetaTopDto } from './meta.dto';
 import { MetaRegulationAutocompleteInterceptor } from './meta-regulation.interceptor';
+import { MetaCacheService } from './meta-cache.service';
 import { VgcMetaFacadeService } from '@/api/boffmedia/herramientas/pokemon/vgc/meta/meta.facade.service';
 import { buildTopPages, buildNavRow, COLLECTOR_TTL_MS } from './meta-paginator';
 import { PokemonUsageEntry } from '@/api/boffmedia/herramientas/pokemon/vgc/meta/entities/pokemon-usage.entity';
@@ -11,7 +12,10 @@ import { PokemonUsageEntry } from '@/api/boffmedia/herramientas/pokemon/vgc/meta
 @Injectable()
 @MetaCommand()
 export class MetaTopCommand {
-  constructor(private readonly metaFacade: VgcMetaFacadeService) {}
+  constructor(
+    private readonly metaFacade: VgcMetaFacadeService,
+    private readonly cache: MetaCacheService,
+  ) {}
 
   @UseInterceptors(MetaRegulationAutocompleteInterceptor)
   @Subcommand({ name: 'top', description: 'Top Pokémon by usage in the current meta' })
@@ -29,9 +33,10 @@ export class MetaTopCommand {
 
     let entries: PokemonUsageEntry[];
     try {
-      entries = reg.vgcPastesGid
-        ? await this.metaFacade.getChampionsUsageList({ regulationId: regulation })
-        : await this.metaFacade.getSmogonUsageList({ format: reg.formatId });
+      entries = await this.cache.getOrFetch(
+        `vgc:usage-entries:${regulation}`,
+        () => this.metaFacade.getUnifiedUsageList(regulation),
+      );
     } catch {
       await interaction.editReply(`No usage data available for **${reg.name}** yet.`);
       return;
@@ -42,9 +47,8 @@ export class MetaTopCommand {
       return;
     }
 
-    // Honour the optional `count` cap before building pages
+    const source = reg.vgcPastesGid ? 'VGCPastes (Champions)' : reg.formatId ? 'Smogon Ladder' : 'Limitless (Combined)';
     const slice  = count ? entries.slice(0, count) : entries;
-    const source = reg.vgcPastesGid ? 'VGCPastes (Champions)' : 'Smogon Ladder';
     const pages  = buildTopPages(slice, reg.name, source);
     const iid    = interaction.id;
     let   page   = 0;

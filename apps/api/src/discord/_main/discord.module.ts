@@ -16,10 +16,15 @@ import { SetVozAutocompleteInterceptor } from '../commands/global/voz/setVoz.int
 import { MessageListener } from './message.listener';
 import { VgcMetaModule } from '@/api/boffmedia/herramientas/pokemon/vgc/meta/meta.module';
 import { MetaRegulationAutocompleteInterceptor } from '../commands/global/meta/meta-regulation.interceptor';
+import { MetaVgcAutocompleteInterceptor } from '../commands/global/meta/meta-vgc-autocomplete.interceptor';
+import { MetaCacheService } from '../commands/global/meta/meta-cache.service';
 import { MetaPokemonCommand } from '../commands/global/meta/meta-pokemon.command';
 import { MetaTopCommand } from '../commands/global/meta/meta-top.command';
 import { MetaTeammatesCommand } from '../commands/global/meta/meta-teammates.command';
 import { MetaRegulationsCommand } from '../commands/global/meta/meta-regulations.command';
+import { MetaCoreCommand } from '../commands/global/meta/meta-core.command';
+import { MetaCompareCommand } from '../commands/global/meta/meta-compare.command';
+import { MetaExplainCommand } from '../commands/global/meta/meta-explain.command';
 
 console.log('[DEBUG] Initializing NecordModule with token:', process.env.DISCORD_KEY);
 
@@ -38,7 +43,7 @@ console.log('[DEBUG] Initializing NecordModule with token:', process.env.DISCORD
         IntentsBitField.Flags.GuildPresences,
         IntentsBitField.Flags.GuildVoiceStates,
       ],
-      development: ['516237304101339156'], // Ensure the guild ID is included
+      development: ['516237304101339156'],
     }),
     CommandsModule,
   ],
@@ -54,11 +59,18 @@ console.log('[DEBUG] Initializing NecordModule with token:', process.env.DISCORD
     SetVozCommand,
     SetVozAutocompleteInterceptor,
     MessageListener,
+    // VGC meta — shared utilities
+    MetaCacheService,
     MetaRegulationAutocompleteInterceptor,
+    MetaVgcAutocompleteInterceptor,
+    // VGC meta — commands
     MetaPokemonCommand,
     MetaTopCommand,
     MetaTeammatesCommand,
     MetaRegulationsCommand,
+    MetaCoreCommand,
+    MetaCompareCommand,
+    MetaExplainCommand,
   ],
 })
 export class DiscordModule {}

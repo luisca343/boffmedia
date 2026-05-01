@@ -3,7 +3,8 @@ import { Context, Options, Subcommand } from 'necord';
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import { MetaCommand } from './meta.group';
 import { MetaPokemonDto } from './meta.dto';
-import { MetaRegulationAutocompleteInterceptor } from './meta-regulation.interceptor';
+import { MetaVgcAutocompleteInterceptor } from './meta-vgc-autocomplete.interceptor';
+import { MetaCacheService } from './meta-cache.service';
 import { VgcMetaFacadeService } from '@/api/boffmedia/herramientas/pokemon/vgc/meta/meta.facade.service';
 import { typeColor, spriteUrl } from './meta.util';
 import { DetailData, buildDetailPages, buildNavRow, COLLECTOR_TTL_MS } from './meta-paginator';
@@ -12,9 +13,12 @@ import { PokemonUsageEntry } from '@/api/boffmedia/herramientas/pokemon/vgc/meta
 @Injectable()
 @MetaCommand()
 export class MetaPokemonCommand {
-  constructor(private readonly metaFacade: VgcMetaFacadeService) {}
+  constructor(
+    private readonly metaFacade: VgcMetaFacadeService,
+    private readonly cache: MetaCacheService,
+  ) {}
 
-  @UseInterceptors(MetaRegulationAutocompleteInterceptor)
+  @UseInterceptors(MetaVgcAutocompleteInterceptor)
   @Subcommand({ name: 'pokemon', description: 'Usage stats for a single Pokémon in the current meta' })
   public async onMetaPokemon(
     @Context() [interaction]: [ChatInputCommandInteraction],
@@ -28,12 +32,15 @@ export class MetaPokemonCommand {
       return;
     }
 
+    const source = reg.vgcPastesGid ? 'VGCPastes (Champions)' : reg.formatId ? 'Smogon Ladder' : 'Limitless (Combined)';
+
     // ── Resolve usage list entry ─────────────────────────────────────────────
     let entries: PokemonUsageEntry[];
     try {
-      entries = reg.vgcPastesGid
-        ? await this.metaFacade.getChampionsUsageList({ regulationId: regulation })
-        : await this.metaFacade.getSmogonUsageList({ format: reg.formatId });
+      entries = await this.cache.getOrFetch(
+        `vgc:usage-entries:${regulation}`,
+        () => this.metaFacade.getUnifiedUsageList(regulation),
+      );
     } catch {
       await interaction.editReply(`No usage data available for **${reg.name}** yet.`);
       return;
@@ -51,46 +58,28 @@ export class MetaPokemonCommand {
 
     // ── Resolve full detail ──────────────────────────────────────────────────
     let detailData: DetailData;
-    const source = reg.vgcPastesGid ? 'VGCPastes (Champions)' : 'Smogon Ladder';
-
     try {
-      if (reg.vgcPastesGid) {
-        const pd = await this.metaFacade.getChampionsPasteDetail(regulation, entry.speciesId);
-        detailData = {
-          speciesName:  entry.speciesName,
-          types:        entry.types,
-          rank:         entry.rank,
-          usagePercent: entry.usagePercent,
-          rawCount:     entry.rawCount,
-          topItem:      entry.topItem,
-          topMove:      entry.topMove,
-          topTeraType:  entry.topTeraType,
-          abilities:    pd.abilities,
-          items:        pd.items,
-          moves:        pd.moves,
-          teraTypes:    pd.teraTypes,
-          spreads:      pd.spreads,
-        };
-      } else {
-        const sd = await this.metaFacade.getSmogonDetail({ format: reg.formatId, speciesId: entry.speciesId });
-        detailData = {
-          speciesName:  sd.speciesName,
-          types:        sd.types,
-          rank:         sd.rank,
-          usagePercent: sd.usagePercent,
-          rawCount:     sd.rawCount,
-          topItem:      sd.topItem,
-          topMove:      sd.topMove,
-          topTeraType:  sd.topTeraType,
-          abilities:    sd.abilities,
-          items:        sd.items,
-          moves:        sd.moves,
-          teraTypes:    sd.teraTypes,
-          spreads:      sd.spreads,
-        };
-      }
+      const d = await this.cache.getOrFetch(
+        `vgc:detail:${regulation}:${entry.speciesId}`,
+        () => this.metaFacade.getUnifiedDetail(regulation, entry.speciesId),
+      );
+      detailData = {
+        speciesName:  d.speciesName,
+        types:        d.types,
+        rank:         d.rank,
+        usagePercent: d.usagePercent,
+        rawCount:     d.rawCount,
+        topItem:      d.topItem,
+        topMove:      d.topMove,
+        topTeraType:  d.topTeraType,
+        abilities:    d.abilities,
+        items:        d.items,
+        moves:        d.moves,
+        teraTypes:    d.teraTypes,
+        teammates:    d.teammates ?? [],
+        spreads:      d.spreads,
+      };
     } catch {
-      // Fallback: show a simple overview-only embed when detail fetch fails
       const embed = buildFallbackEmbed(entry, reg.name, source);
       await interaction.editReply({ embeds: [embed] });
       return;
@@ -136,10 +125,10 @@ function buildFallbackEmbed(entry: PokemonUsageEntry, regName: string, source: s
     .setTitle(entry.speciesName)
     .setThumbnail(spriteUrl(entry.speciesName))
     .addFields(
-      { name: 'Regulation', value: regName,                            inline: true },
-      { name: 'Rank',       value: `#${entry.rank}`,                   inline: true },
+      { name: 'Regulation', value: regName,                             inline: true },
+      { name: 'Rank',       value: `#${entry.rank}`,                    inline: true },
       { name: 'Usage',      value: `${entry.usagePercent.toFixed(2)}%`, inline: true },
-      { name: 'Types',      value: entry.types.join(' / ') || '—',     inline: true },
+      { name: 'Types',      value: entry.types.join(' / ') || '—',      inline: true },
       ...(entry.topItem     ? [{ name: 'Top Item',      value: entry.topItem,     inline: true }] : []),
       ...(entry.topMove     ? [{ name: 'Top Move',      value: entry.topMove,     inline: true }] : []),
       ...(entry.topTeraType ? [{ name: 'Top Tera Type', value: entry.topTeraType, inline: true }] : []),
