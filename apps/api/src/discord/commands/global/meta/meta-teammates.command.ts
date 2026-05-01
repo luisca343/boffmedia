@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UseInterceptors } from '@nestjs/common';
 import { Context, Options, Subcommand } from 'necord';
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import { MetaCommand } from './meta.group';
 import { MetaTeammatesDto } from './meta-teammates.dto';
+import { MetaVgcAutocompleteInterceptor } from './meta-vgc-autocomplete.interceptor';
 import { MetaCacheService } from './meta-cache.service';
 import { VgcMetaFacadeService } from '@/api/boffmedia/herramientas/pokemon/vgc/meta/meta.facade.service';
 import { typeColor, spriteUrl } from './meta.util';
@@ -55,6 +56,7 @@ export class MetaTeammatesCommand {
     private readonly cache: MetaCacheService,
   ) {}
 
+  @UseInterceptors(MetaVgcAutocompleteInterceptor)
   @Subcommand({ name: 'teammates', description: 'Find most common teammates for one or more Pokémon' })
   public async onTeammates(
     @Context() [interaction]: [ChatInputCommandInteraction],
