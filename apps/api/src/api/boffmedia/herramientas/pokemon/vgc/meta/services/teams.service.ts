@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { VgcPastesRepository } from '../repositories/vgcpastes.repository';
 import { LimitlessRepository } from '../repositories/limitless.repository';
+import { PastesRepository } from '../repositories/pastes.repository';
 import { SpeciesTeamEntry } from '../entities/pokemon-usage.entity';
 import { VgcMetaSlot } from '@/_db/schema/Vgc';
 
@@ -11,20 +12,23 @@ export class TeamsService {
   constructor(
     private readonly vgcPastesRepository: VgcPastesRepository,
     private readonly limitlessRepository:  LimitlessRepository,
+    private readonly pastesRepository:     PastesRepository,
   ) {}
 
   /**
    * Returns up to 30 teams featuring `speciesId` for a regulation.
-   * Sources: VGCPastes + all completed Limitless tournaments for that regulation.
+   * Sources: VGCPastes CSV, Limitless tournaments, and raw vgc_pastes by formatId.
    * Teams are sorted by numeric rank (ascending) — unranked teams come last.
    */
   async getTeamsForSpecies(
     speciesId:    string,
     regulationId: string,
+    formatId?:    string,
   ): Promise<SpeciesTeamEntry[]> {
-    const [vgcPastesTeams, limitlessTeams] = await Promise.all([
+    const [vgcPastesTeams, limitlessTeams, rawPastes] = await Promise.all([
       this.vgcPastesRepository.findTeamsByRegulationWithPastes(regulationId),
       this.limitlessRepository.findTeamsByRegulationWithPastes(regulationId),
+      formatId ? this.pastesRepository.findByFormatId(formatId) : Promise.resolve([]),
     ]);
 
     const results: SpeciesTeamEntry[] = [];
@@ -54,6 +58,32 @@ export class TeamsService {
         rank:       team.placing != null ? String(team.placing) : null,
         slots,
         rawText:    team.rawText,
+      });
+    }
+
+    // Collect paste IDs already added from the two structured sources to avoid duplicates.
+    // vgc_paste_teams and vgc_limitless_teams reference vgc_pastes rows by paste_id, so a
+    // raw paste that was already linked via those tables would otherwise appear twice.
+    const linkedPasteIds = new Set<number>();
+    for (const team of vgcPastesTeams) {
+      if ((team as any).pasteId != null) linkedPasteIds.add((team as any).pasteId);
+    }
+    for (const team of limitlessTeams) {
+      if ((team as any).pasteId != null) linkedPasteIds.add((team as any).pasteId);
+    }
+
+    for (const paste of rawPastes) {
+      if (linkedPasteIds.has(paste.id)) continue;
+      const slots = JSON.parse(paste.parsedSlots) as VgcMetaSlot[];
+      if (!slots.some((s) => s.speciesId === speciesId)) continue;
+      results.push({
+        source:     'paste',
+        playerId:   String(paste.id),
+        playerName: paste.author ?? null,
+        record:     null,
+        rank:       null,
+        slots,
+        rawText:    paste.rawText,
       });
     }
 

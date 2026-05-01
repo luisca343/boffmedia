@@ -52,6 +52,13 @@ export function MetaLayoutClient() {
     () => (selectedRegulation && !selectedRegulation.vgcPastesGid ? selectedRegulation.formatId : format),
     [selectedRegulation, format],
   );
+  // Regulation ID to use for the teams panel: prefer the tournament-tab URL param,
+  // then the regulation whose ID matches `format`, then the regulation whose formatId
+  // matches `resolvedSmogonFormat` (for raw Smogon format IDs like "gen9vgc2026regf").
+  const teamsRegulationId = useMemo(
+    () => regulation || selectedRegulation?.id || regulations.find((r) => r.formatId === resolvedSmogonFormat)?.id || undefined,
+    [regulation, selectedRegulation, regulations, resolvedSmogonFormat],
+  );
   const isSmogonFormat = useMemo(
     () => snapshots.some((s) => s.formatId === resolvedSmogonFormat),
     [snapshots, resolvedSmogonFormat],
@@ -192,7 +199,7 @@ export function MetaLayoutClient() {
               detail={detail}
               loading={false}
               speciesId={speciesId}
-              regulationId={isPreviewFormat ? format : regulation || undefined}
+              regulationId={isPreviewFormat ? format : teamsRegulationId}
               onBack={handleBack}
               onSelect={handleSelect}
             />
