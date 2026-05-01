@@ -87,6 +87,24 @@ function SpreadRow({ nature, spread }: { nature: string; spread: string }) {
   );
 }
 
+const NON_TERA_TYPE_NAMES = new Set([
+  "",
+  "none",
+  "nothing",
+  "type_nothing",
+  "pokedex.type_nothing",
+]);
+
+function isRealTeraTypeName(name: string): boolean {
+  const normalized = name.toLowerCase().trim();
+  return !NON_TERA_TYPE_NAMES.has(normalized);
+}
+
+function isTypeNothingName(name: string): boolean {
+  const normalized = name.toLowerCase().trim();
+  return normalized === "nothing";
+}
+
 // ─── Main component ───────────────────────────────────────────────────────────
 
 interface Props {
@@ -126,6 +144,9 @@ export function PokemonDetailView({ detail, loading, speciesId, regulationId, on
       </div>
     );
   }
+
+  const hasTypeNothing = detail.teraTypes.some((entry) => isTypeNothingName(entry.name));
+  const teraTypes = detail.teraTypes.filter((entry) => isRealTeraTypeName(entry.name));
 
 
   return (
@@ -184,13 +205,11 @@ export function PokemonDetailView({ detail, loading, speciesId, regulationId, on
         )}
 
         {/* Abilities + Tera Types share one column — both are small sections */}
-        {(detail.abilities.length > 0 || detail.teraTypes.length > 0) && (
+        {detail.abilities.length > 0 && (
           <div className="flex flex-col gap-4">
-            {detail.abilities.length > 0 && (
-              <StatPanel title={t("detail.abilities")} items={detail.abilities} />
-            )}
-            {detail.teraTypes.length > 0 && (
-              <TeraTypesPanel title={t("detail.teraTypes")} items={detail.teraTypes} />
+            <StatPanel title={t("detail.abilities")} items={detail.abilities} />
+            {!hasTypeNothing && teraTypes.length > 0 && (
+              <TeraTypesPanel title={t("detail.teraTypes")} items={teraTypes} />
             )}
           </div>
         )}

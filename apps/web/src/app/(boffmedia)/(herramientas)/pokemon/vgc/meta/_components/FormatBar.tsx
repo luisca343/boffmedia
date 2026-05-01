@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { SmogonSnapshot, ChampionsRegulation, LimitlessTournament } from "@/services/api/boffmedia/vgcService";
 import { DEFAULT_CUTOFF } from "../_hooks/useMetaNavigation";
+import { ENABLE_PREVIEW_FORMATS } from "../constants";
 
 const VALID_CUTOFFS = [1760, 1630, 1500, 0] as const;
 
@@ -55,7 +56,7 @@ export function FormatBar({
   );
 
   const previewRegulations = useMemo(
-    () => sortedRegulations.filter((r) => Boolean(r.vgcPastesGid)),
+    () => (ENABLE_PREVIEW_FORMATS ? sortedRegulations.filter((r) => Boolean(r.vgcPastesGid)) : []),
     [sortedRegulations],
   );
 
@@ -125,19 +126,19 @@ export function FormatBar({
               onChange={e => handleFormatSelect(e.target.value)}
               className={SELECT_CLS}
             >
-              {previewRegulations.length > 0 && (
-                <optgroup label="Champions · Preview">
-                  {previewRegulations.map(reg => (
-                    <option key={reg.id} value={reg.id}>{reg.name}</option>
-                  ))}
-                </optgroup>
-              )}
               {uniqueFormats.length > 0 && (
                 <optgroup label="Smogon">
                   {uniqueFormats.map(fmtId => (
                     <option key={fmtId} value={fmtId}>
                       {regulationNameByFormatId.get(fmtId) ?? formatLabels[fmtId] ?? fmtId}
                     </option>
+                  ))}
+                </optgroup>
+              )}
+              {previewRegulations.length > 0 && (
+                <optgroup label="Champions · Preview">
+                  {previewRegulations.map(reg => (
+                    <option key={reg.id} value={reg.id}>{reg.name}</option>
                   ))}
                 </optgroup>
               )}

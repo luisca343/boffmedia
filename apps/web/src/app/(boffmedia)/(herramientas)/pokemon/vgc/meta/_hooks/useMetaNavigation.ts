@@ -8,6 +8,7 @@ import {
   PokemonUsageDetail,
   SmogonSnapshot,
 } from "@/services/api/boffmedia/vgcService";
+import { ENABLE_PREVIEW_FORMATS } from "../constants";
 
 const BASE_PATH      = "/pokemon/vgc/meta";
 export const DEFAULT_CUTOFF = 1760;
@@ -92,11 +93,47 @@ export function useMetaNavigation({
   const tournamentId = searchParams.get("tournamentId") ?? "";
   const view         = searchParams.get("view")         ?? "aggregate";
 
+  const selectedRegulation = useMemo(
+    () => regulations.find((r) => r.id === format),
+    [regulations, format],
+  );
+
+  const isDisabledPreviewFormat = !ENABLE_PREVIEW_FORMATS && Boolean(selectedRegulation?.vgcPastesGid);
+
+  // If preview formats are disabled but URL still points to one, force fallback.
+  useEffect(() => {
+    if (tab !== "stats") return;
+    if (!isDisabledPreviewFormat) return;
+
+    const first = snapshots[0];
+    if (!first) return;
+
+    router.replace(buildUrl({
+      speciesId,
+      tab,
+      format: first.formatId,
+      month: first.month,
+      cutoff: first.cutoff,
+      regulation,
+      tournamentId,
+      view,
+    }));
+  }, [
+    tab,
+    isDisabledPreviewFormat,
+    snapshots,
+    router,
+    speciesId,
+    regulation,
+    tournamentId,
+    view,
+  ]);
+
   // Auto-navigate when Stats tab has no format: default to latest regulation (Champions), fall back to first Smogon snapshot
   useEffect(() => {
     if (tab !== "stats") return;
     if (searchParams.get("format")) return;
-    const previewRegulation = regulations.find((r) => Boolean(r.vgcPastesGid));
+    const previewRegulation = ENABLE_PREVIEW_FORMATS ? regulations.find((r) => Boolean(r.vgcPastesGid)) : undefined;
     if (previewRegulation) {
       router.replace(buildUrl({ speciesId, tab, format: previewRegulation.id, month: "", cutoff: DEFAULT_CUTOFF, regulation, tournamentId, view }));
     } else if (snapshots.length > 0) {
@@ -143,7 +180,7 @@ export function useMetaNavigation({
       if (newTab === "stats") {
         // Default to first Champions preview regulation (must have VGCPastes GID),
         // otherwise fall back to first Smogon snapshot.
-        const previewRegulation = regulations.find((r) => Boolean(r.vgcPastesGid));
+        const previewRegulation = ENABLE_PREVIEW_FORMATS ? regulations.find((r) => Boolean(r.vgcPastesGid)) : undefined;
         const defaultFormat = previewRegulation
           ? previewRegulation.id
           : snapshots.length > 0 ? snapshots[0].formatId : "";

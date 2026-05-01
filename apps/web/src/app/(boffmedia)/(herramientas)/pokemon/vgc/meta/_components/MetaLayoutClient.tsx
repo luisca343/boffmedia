@@ -21,7 +21,7 @@ import { PokemonDetailView } from "./PokemonDetailView";
 import { StandingsView } from "./StandingsView";
 import { DivergenceView } from "./DivergenceView";
 import { MetaSplitLayout } from "./MetaSplitLayout";
-import { FORMAT_LABELS } from "../constants";
+import { ENABLE_PREVIEW_FORMATS, FORMAT_LABELS } from "../constants";
 
 export function MetaLayoutClient() {
   const t            = useTranslations("vgc.meta");
@@ -43,7 +43,7 @@ export function MetaLayoutClient() {
     [regulations, format],
   );
   const isPreviewFormat = useMemo(
-    () => Boolean(selectedRegulation?.vgcPastesGid),
+    () => ENABLE_PREVIEW_FORMATS && Boolean(selectedRegulation?.vgcPastesGid),
     [selectedRegulation],
   );
   const resolvedSmogonFormat = useMemo(
