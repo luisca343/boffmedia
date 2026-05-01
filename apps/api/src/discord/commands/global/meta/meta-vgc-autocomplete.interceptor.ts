@@ -5,7 +5,7 @@ import { VgcMetaFacadeService } from '@/api/boffmedia/herramientas/pokemon/vgc/m
 import { MetaCacheService } from './meta-cache.service';
 import { PokemonUsageEntry } from '@/api/boffmedia/herramientas/pokemon/vgc/meta/entities/pokemon-usage.entity';
 
-const POKEMON_FIELDS = new Set(['pokemon', 'pokemon2', 'pokemon3']);
+const POKEMON_FIELDS = new Set(['pokemon', 'pokemon2', 'pokemon3', 'your', 'vs']);
 
 @Injectable()
 export class MetaVgcAutocompleteInterceptor extends AutocompleteInterceptor {

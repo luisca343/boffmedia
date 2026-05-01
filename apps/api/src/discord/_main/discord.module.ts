@@ -23,8 +23,9 @@ import { MetaTopCommand } from '../commands/global/meta/meta-top.command';
 import { MetaTeammatesCommand } from '../commands/global/meta/meta-teammates.command';
 import { MetaRegulationsCommand } from '../commands/global/meta/meta-regulations.command';
 import { MetaCoreCommand } from '../commands/global/meta/meta-core.command';
-import { MetaCompareCommand } from '../commands/global/meta/meta-compare.command';
 import { MetaExplainCommand } from '../commands/global/meta/meta-explain.command';
+import { MetaAnalyzeCommand } from '../commands/global/meta/meta-analyze.command';
+import { MetaMatchupCommand } from '../commands/global/meta/meta-matchup.command';
 
 console.log('[DEBUG] Initializing NecordModule with token:', process.env.DISCORD_KEY);
 
@@ -69,8 +70,9 @@ console.log('[DEBUG] Initializing NecordModule with token:', process.env.DISCORD
     MetaTeammatesCommand,
     MetaRegulationsCommand,
     MetaCoreCommand,
-    MetaCompareCommand,
     MetaExplainCommand,
+    MetaAnalyzeCommand,
+    MetaMatchupCommand,
   ],
 })
 export class DiscordModule {}
