@@ -28,6 +28,16 @@ export function VgcChampionsFetcher() {
   const [newName, setNewName] = useState("");
   const [newGid, setNewGid] = useState("");
 
+  // When the user types an ID that matches an existing regulation, pre-fill the
+  // other fields so a re-save doesn't accidentally overwrite them with blanks.
+  useEffect(() => {
+    const existing = available.find((r) => r.id === newRegulationId.trim());
+    if (!existing) return;
+    if (!newFormatId) setNewFormatId(existing.formatId ?? "");
+    if (!newName)     setNewName(existing.name ?? "");
+    if (!newGid)      setNewGid(existing.vgcPastesGid ?? "");
+  }, [newRegulationId, available]);
+
   const loadAvailable = (silent = false) => {
     if (!silent) setLoading(true);
     VgcMetaService.getAvailableChampionsRegulations()

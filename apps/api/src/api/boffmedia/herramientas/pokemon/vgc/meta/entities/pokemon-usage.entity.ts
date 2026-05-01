@@ -47,7 +47,7 @@ export interface BatchFetchResult {
 
 /** A single team entry returned by the "teams featuring this Pokémon" endpoint */
 export interface SpeciesTeamEntry {
-  source:     'vgcpastes' | 'limitless';
+  source:     'vgcpastes' | 'limitless' | 'paste';
   /** VGCPastes teamId (e.g. "PC476") or Limitless playerSlug */
   playerId:   string;
   playerName: string | null;
