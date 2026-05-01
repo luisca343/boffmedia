@@ -35,6 +35,20 @@ export class PastesRepository {
     return row ?? null;
   }
 
+  async findByFormatId(formatId: string, limit = 500): Promise<Pick<VgcPaste, 'id' | 'parsedSlots' | 'rawText' | 'author' | 'title'>[]> {
+    return this.db
+      .select({
+        id:          vgcPastes.id,
+        parsedSlots: vgcPastes.parsedSlots,
+        rawText:     vgcPastes.rawText,
+        author:      vgcPastes.author,
+        title:       vgcPastes.title,
+      })
+      .from(vgcPastes)
+      .where(eq(vgcPastes.formatId, formatId))
+      .limit(limit);
+  }
+
   /**
    * Insert or update a paste. Returns the internal ID of the upserted row.
    * For pokepast.es pastes, pass pokepasteId so duplicates are merged.

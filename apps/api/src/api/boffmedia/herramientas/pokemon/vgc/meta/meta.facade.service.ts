@@ -242,7 +242,8 @@ export class VgcMetaFacadeService {
   // ─── Species Teams ──────────────────────────────────────────────────────────
 
   async getSpeciesTeams(speciesId: string, regulationId: string) {
-    return this.teamsService.getTeamsForSpecies(speciesId, regulationId);
+    const regulation = await this.regulationsRepository.findById(regulationId);
+    return this.teamsService.getTeamsForSpecies(speciesId, regulationId, regulation?.formatId ?? undefined);
   }
 
   // ─── Unified jobs + analytics ─────────────────────────────────────────────

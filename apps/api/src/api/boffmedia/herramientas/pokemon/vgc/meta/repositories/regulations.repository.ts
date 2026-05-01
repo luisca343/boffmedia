@@ -64,11 +64,15 @@ export class VgcRegulationsRepository {
       })
       .onDuplicateKeyUpdate({
         set: {
-          formatId:     data.formatId,
-          name:         data.name,
-          gameType:     data.gameType    ?? 'doubles',
-          vgcPastesGid: data.vgcPastesGid ?? null,
-          active:       data.active      ?? 1,
+          formatId: data.formatId,
+          name:     data.name,
+          gameType: data.gameType ?? 'doubles',
+          active:   data.active   ?? 1,
+          // Only overwrite vgcPastesGid when a string is explicitly supplied.
+          // null/undefined means "leave the stored GID as-is" so that re-saving
+          // the regulation form without filling in the GID field doesn't wipe
+          // a previously-set value and silently break the VGCPastes routing.
+          ...(typeof data.vgcPastesGid === 'string' && { vgcPastesGid: data.vgcPastesGid }),
         },
       });
   }
