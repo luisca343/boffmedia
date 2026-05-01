@@ -49,7 +49,9 @@
 | 2026-04-29 | UX direction (deferred) | Decided lightweight onboarding over guided tour: one-time dismissible "What am I seeing?" panel + contextual `?` tooltips for key labels (`Preview`, `Combined`, future `Divergence`). Decided mobile optimization priority = fast scan first (denser ranked list) then deep detail (full-screen detail with sticky mini-header + section jump chips). Implementation deferred to next UX slice. |
 | 2026-04-29 | UX prioritization resolved (deferred) | Decided to remember last Tournament sub-view per user (`aggregate`/`players`/`divergence`), enable personal sample-size confidence indicators, ship quick actions in v1 for high-delta rows, show public data freshness metadata in meta UI, and show full section jump chips by default in mobile detail. Added a concrete deferred UX implementation checklist. |
 | 2026-04-30 | Phase 4 implemented | `DivergenceService.compareLadderVsTournament()` joins Smogon ladder entries vs Limitless tournament/combined entries; badge thresholds from OQ-D4 applied (ladder-trap / tournament-staple); `GET /tools/vgc/meta/divergence` public endpoint; `useDivergence` hook; `DivergenceView` sortable table (click header to sort by Ladder %, Tourn. %, or |Δ|); amber / blue badge chips with tooltips; "Divergence" added as third sub-tab in Tournament tab alongside Aggregate and Players; EN + ES i18n keys added. |
-| 2026-05-01 | Discord `/vgc` bot commands | Implemented Necord-based Discord slash commands under the `/vgc` group (`dmPermission: true`; dev guild via Necord `development` mode). Four sub-commands: `/vgc pokemon <regulation> <pokemon>` — 4-page paginated embed (Overview → Abilities & Items → Moves → Tera & Spreads) fetching full `PokemonUsageDetail`; `/vgc top <regulation> [count]` — button-paginated ranked list (10/page); `/vgc teammates <regulation> <pokemon> [pokemon2] [pokemon3]` — strict teammate intersection across 1–3 Pokémon (fallback to "most common across inputs" when intersection is empty); `/vgc regulations` — lists all active regulations with Smogon/Champions source badge. Regulation option on all commands uses `AutocompleteInterceptor` backed by `VgcMetaFacadeService.getRegulations()`. Shared `meta-paginator.ts` utility (nav row, detail pages, top pages). **Known limitation:** `/vgc teammates` only resolves teammate data from Smogon snapshots — Champions and Limitless formats return "no data" because `ChampionsPasteDetail` has no `teammates` field and the bot dispatches all detail calls through `getSmogonDetail()`. See Phase 6. |
+| 2026-05-01 | Discord `/vgc` bot commands | Implemented Necord-based Discord slash commands under the `/vgc` group (`dmPermission: true`; dev guild via Necord `development` mode). Four sub-commands: `/vgc pokemon <regulation> <pokemon>` — 4-page paginated embed (Overview → Abilities & Items → Moves → Tera & Spreads) fetching full `PokemonUsageDetail`; `/vgc top <regulation> [count]` — button-paginated ranked list (10/page); `/vgc teammates <regulation> <pokemon> [pokemon2] [pokemon3]` — strict teammate intersection across 1–3 Pokémon (fallback to "most common across inputs" when intersection is empty); `/vgc regulations` — lists all active regulations with Smogon/Champions source badge. Regulation option on all commands uses `AutocompleteInterceptor` backed by `VgcMetaFacadeService.getRegulations()`. Shared `meta-paginator.ts` utility (nav row, detail pages, top pages). **Known limitation at time of writing:** `/vgc teammates` only resolved teammate data from Smogon — fixed in Phase 6 same day. |
+| 2026-05-01 | Phase 6 — Unified detail layer | Verified that `VgcPastesService.getUsageList()` and `LimitlessService.getCombinedUsage()` already computed `teammates[]` via co-occurrence matrices (Phase 2 / Phase 5). The bot's failure for non-Smogon formats was purely a routing gap — no new computation needed. Added four methods to `VgcMetaFacadeService`: `getChampionsDetail()` (filters from Champions usage list, merges paste detail for moves/items/abilities/spreads), `getLimitlessDetail()` (filters from combined Limitless usage), `getUnifiedUsageList()` (routes to Champions / Smogon / Limitless by regulation flags), `getUnifiedDetail()` (same routing for full `PokemonUsageDetail`). Added `getUnifiedUsageDetailList()` (returns full `PokemonUsageDetail[]` for the entire regulation). Simplified `meta-pokemon.command.ts` to two calls. Removed `if (!reg.formatId)` guard from `meta-teammates.command.ts`. All three sources now return consistent `PokemonUsageDetail` with teammates to all callers. |
+| 2026-05-01 | Phase 7 — Intelligence layer | **Pokémon autocomplete:** `MetaVgcAutocompleteInterceptor` handles both `regulation` and `pokemon`/`pokemon2`/`pokemon3` fields; results sorted by prefix-match first then usage %; backed by `MetaCacheService` so keystroke-level autocomplete doesn't hammer the DB. **Cache:** `MetaCacheService` (in-memory, 10-min TTL, `getOrFetch` pattern) shared across all commands and the autocomplete interceptor. **New commands:** `/vgc core` — finds bidirectional synergy pairs from top-30 pool (scored by average mutual teammate %, tiered 🔑/💪/⚡); `/vgc compare` — side-by-side embed for two Pokémon (rank, usage, types, top move/item/tera/teammate); `/vgc explain` — template-based role inference (usage tier, support/pivot/setter roles from moveset, item notes, best partner). **Enhancements:** `/vgc pokemon` overview page now shows top 3 teammates inline; `/vgc teammates` shows synergy tier emojis; `/vgc top` uses `getUnifiedUsageList` (works for all sources). **Bug fix:** `getChampionsDetail()` now merges paste detail into the usage-list entry — Champions regulations no longer return empty `moves`/`items`/`abilities` in `/vgc explain` and `/vgc pokemon`. |
 
 ---
 
@@ -150,36 +152,63 @@
 - [x] Locale keys `tournament`, `combined`, `aggregate`, `players` added (EN + ES)
 - [x] Admin panel: `VgcLimitlessFetcher` component — URL input + regulation picker + optional max-players; submit → POST → poll status every 3 s; progress bar; list of imported tournaments with status dot
 
-### Phase 6 — Unified Detail Layer (Next Step)
+### Phase 6 — Unified Detail Layer _(Complete)_
 
-**Goal:** All `/vgc` Discord commands (and any future consumers) work correctly regardless of whether a regulation is backed by Smogon, Champions (VGCPastes), or Limitless tournament data. Currently, commands like `/vgc teammates` call `getSmogonDetail()` unconditionally and fail silently for non-Smogon formats.
+**Goal:** All `/vgc` Discord commands (and any future consumers) work correctly regardless of whether a regulation is backed by Smogon, Champions (VGCPastes), or Limitless tournament data.
 
-#### Root Cause
+#### Root Cause (resolved)
 
-Each data source exposes a different shape:
+The bot was calling `getSmogonUsageList()` and `getSmogonDetail()` for all formats, which fails for non-Smogon regulations. The assumption that teammates were missing from Champions/Limitless was wrong — both already computed `teammates[]` via co-occurrence matrices. The gap was purely a routing issue in the facade.
 
-| Source | Usage list has teammates? | Detail method | Has teammates? |
-|---|---|---|---|
-| Smogon | Yes (chaos JSON) | `getSmogonDetail()` → `PokemonUsageDetail` | ✅ |
-| Champions (VGCPastes) | Yes (co-occurrence computed in Phase 2) | `getChampionsPasteDetail()` → `ChampionsPasteDetail` | ❌ — field absent |
-| Limitless | Unknown — `getUsageList()` may not compute co-occurrence | No per-Pokémon detail endpoint | ❌ |
+| Source | `teammates[]` present? | Fix applied |
+|---|---|---|
+| Smogon | ✅ chaos JSON pre-computed | No change needed |
+| Champions (VGCPastes) | ✅ co-occurrence matrix from Phase 2 | `getChampionsDetail()` filters from `getUsageList()` |
+| Limitless | ✅ co-occurrence matrix from Phase 5 | `getLimitlessDetail()` filters from `getCombinedUsage()` |
 
-The bot currently calls `getSmogonUsageList({ format: reg.formatId })` for ALL formats, which throws "No Smogon data available" for Champions formats. Even when we correctly route to the Champions usage list, `ChampionsPasteDetail` has no `teammates` field, so the intersection logic gets empty arrays.
+#### Changes Made
 
-#### Required Changes
-
-- [ ] **Verify** that `VgcPastesService.getUsageList()` populates `PokemonUsageDetail.teammates[]` from the co-occurrence matrix computed in Phase 2. If so, expose those entries via a per-Pokémon detail method.
-- [ ] **Verify** that `LimitlessService.getUsageList()` / `getCombinedUsageEntries()` computes and returns `teammates[]`. If not, add co-occurrence aggregation matching Phase 2's approach.
-- [ ] **Add `getChampionsDetail(regulationId, speciesId): Promise<PokemonUsageDetail>`** to `VgcPastesService` (and facade) — returns a full `PokemonUsageDetail` built from the usage list entry (rank, usage, types, topItem, topMove, topTeraType, teammates) merged with paste-derived fields (abilities, items, moves, teraTypes, spreads).
-- [ ] **Add `getLimitlessDetail(tournamentId | 'combined', regulationId, speciesId): Promise<PokemonUsageDetail>`** to `LimitlessService` (and facade) — same shape as above.
-- [ ] **Add `getUnifiedDetail(regulationId, speciesId, tournamentId?): Promise<PokemonUsageDetail>`** to `VgcMetaFacadeService` — dispatches to the right service based on regulation source (Smogon / Champions / Limitless) and always returns a fully-populated `PokemonUsageDetail`.
-- [ ] **Update Discord bot commands** to call `getUnifiedDetail()` instead of `getSmogonDetail()` directly. Remove the `if (!reg.formatId)` no-data guard from `/vgc teammates`.
-- [ ] **Update web detail panel** (`PokemonDetailView`, `MetaLayoutClient`) to use `getUnifiedDetail()` or verify the existing merge logic already handles all sources correctly end-to-end.
-- [ ] **Add `teammates` to `ChampionsPasteDetail`** entity (optional — or just omit the field and always serve it from the usage list, not the paste detail).
+- [x] **Verified** that `VgcPastesService.getUsageList()` populates `PokemonUsageDetail.teammates[]` from the co-occurrence matrix (Phase 2).
+- [x] **Verified** that `LimitlessService.getCombinedUsage()` populates `teammates[]` from the co-occurrence matrix (Phase 5).
+- [x] **Added `getChampionsDetail(regulationId, speciesId)`** to facade — finds the entry in the Champions usage list (already a `PokemonUsageDetail` with teammates).
+- [x] **Added `getLimitlessDetail(regulationId, speciesId)`** to facade — finds the entry in the combined Limitless usage list.
+- [x] **Added `getUnifiedUsageList(regulationId)`** to facade — routes to Champions / Smogon / Limitless based on regulation flags (`vgcPastesGid` → Champions, `formatId` → Smogon, neither → Limitless combined).
+- [x] **Added `getUnifiedDetail(regulationId, speciesId)`** to facade — same routing; always returns `PokemonUsageDetail`.
+- [x] **Updated `meta-pokemon.command.ts`** — replaced branched detail logic with `getUnifiedUsageList()` + `getUnifiedDetail()`.
+- [x] **Updated `meta-teammates.command.ts`** — removed `if (!reg.formatId)` guard; uses `getUnifiedUsageList()` + `getUnifiedDetail()`.
+- [x] **Web detail panel** — existing merge logic in `MetaLayoutClient` already handles all sources correctly (Champions paste detail is still available via `useChampionsPasteDetail` for richer move/item/spread data on top of base detail).
 
 #### Design Constraint
 
-> `getUnifiedDetail()` must return the same `PokemonUsageDetail` interface regardless of source. Callers (bot, web) must never branch on source to assemble the detail — that logic belongs entirely in the service layer.
+> `getUnifiedDetail()` returns the same `PokemonUsageDetail` interface regardless of source. Callers must never branch on source to assemble the detail — that logic lives entirely in the service layer.
+
+---
+
+### Phase 7 — Autocomplete + Intelligence Layer _(Complete)_
+
+**Goal:** Transform the `/vgc` bot from a data viewer into an intelligent competitive assistant.
+
+#### Bug Fix — Champions `moves` empty
+
+Champions `getUsageList()` returns `PokemonUsageDetail[]` with empty `moves`/`items`/`abilities`/`spreads` (Phase 2 only tracked species counts + teammate co-occurrence from the CSV species columns). Paste-derived detail lives in a separate `getPasteDetail()` call (Phase 3). `getChampionsDetail()` now merges both: paste data wins when non-empty, usage-list entry fields are the fallback. Limitless was not affected — `aggregateSlots()` populates moves/items/abilities/teraTypes from parsed Showdown pastes.
+
+#### Changes Made
+
+- [x] **`MetaCacheService`** — in-memory TTL cache (`getOrFetch` pattern, 10-min default). Single instance shared across all commands and the autocomplete interceptor; first call warms the cache for all subsequent calls within the window.
+- [x] **`MetaVgcAutocompleteInterceptor`** — combined interceptor handling `regulation` (existing logic), `pokemon`, `pokemon2`, `pokemon3`; sorted by prefix-match first then usage %; returns `speciesId` as value; backed by `MetaCacheService`.
+- [x] **`MetaPokemonDto`** — `pokemon` field gets `autocomplete: true`; `MetaCoreDto` and `MetaCompareDto` added.
+- [x] **`meta-pokemon.command.ts`** — switched to `MetaVgcAutocompleteInterceptor` + `MetaCacheService`; overview page now includes top 3 teammates.
+- [x] **`meta-teammates.command.ts`** — synergy tier emojis on each result (🔑 ≥35% · 💪 ≥20% · 👍 others); uses cache; switched to combined interceptor.
+- [x] **`meta-top.command.ts`** — uses `getUnifiedUsageList` (correct for all sources); uses cache.
+- [x] **`/vgc core`** — finds bidirectional synergy pairs from top-30 pool: for each pair (A, B) where B is in A's teammate list AND A is in B's teammate list, score = average mutual teammate %; returns top 5 pairs with tier badges.
+- [x] **`/vgc compare`** — side-by-side embed: rank, usage %, types, top move/item/tera/teammate for both Pokémon; uses cache for both detail lookups.
+- [x] **`/vgc explain`** — role inference from moveset (`SUPPORT_MOVES`, `PIVOT_MOVES`, `PROTECT_MOVES` sets); usage tier label; item notes from `ITEM_NOTES` map; best partner from teammates list.
+- [x] **`getChampionsDetail()` fix** — merges paste detail into usage-list entry so `moves`/`items`/`abilities`/`spreads` are populated for Champions regulations.
+- [x] **`getUnifiedUsageDetailList(regulationId)`** — new facade method returning full `PokemonUsageDetail[]` for a regulation (used by `/vgc core`).
+
+#### Architecture Note
+
+The combined `MetaVgcAutocompleteInterceptor` replaces `MetaRegulationAutocompleteInterceptor` on all commands that have Pokémon parameters. Commands with only a `regulation` param (`/vgc top`, `/vgc core`, `/vgc regulations`) keep using the simpler single-field interceptor.
 
 ---
 

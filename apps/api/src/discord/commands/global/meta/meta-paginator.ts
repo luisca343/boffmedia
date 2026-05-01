@@ -15,6 +15,7 @@ export interface DetailData {
   items:        Array<{ name: string; percent: number }>;
   moves:        Array<{ name: string; percent: number }>;
   teraTypes:    Array<{ name: string; percent: number }>;
+  teammates:    Array<{ name: string; percent: number }>;
   spreads:      Array<{ nature: string; spread: string; percent: number }>;
 }
 
@@ -57,6 +58,11 @@ function fmtSpreads(arr: Array<{ nature: string; spread: string; percent: number
   return arr.slice(0, limit).map((e) => `**${e.nature}** \`${e.spread}\` ${pct(e.percent)}`).join('\n');
 }
 
+function fmtTeammates(arr: Array<{ name: string; percent: number }>, limit = 3): string {
+  if (!arr?.length) return '—';
+  return arr.slice(0, limit).map((e) => `**${e.name}** ${pct(e.percent)}`).join(' · ');
+}
+
 /** Builds 4 embed pages for a single Pokémon detail view. */
 export function buildDetailPages(
   d:       DetailData,
@@ -74,15 +80,18 @@ export function buildDetailPages(
   const p1 = base()
     .setTitle(`${d.speciesName}`)
     .addFields(
-      { name: 'Regulation', value: regName,                inline: true },
-      { name: 'Rank',       value: `#${d.rank}`,           inline: true },
-      { name: 'Usage',      value: pct(d.usagePercent),    inline: true },
+      { name: 'Regulation', value: regName,                    inline: true },
+      { name: 'Rank',       value: `#${d.rank}`,               inline: true },
+      { name: 'Usage',      value: pct(d.usagePercent),        inline: true },
       { name: 'Types',      value: d.types.join(' / ') || '—', inline: true },
-      { name: 'Raw Count',  value: String(d.rawCount),     inline: true },
-      { name: '​',     value: '​',               inline: true },
+      { name: 'Raw Count',  value: String(d.rawCount),         inline: true },
+      { name: '​',     value: '​',                   inline: true },
       ...(d.topItem     ? [{ name: 'Top Item',      value: d.topItem,     inline: true }] : []),
       ...(d.topMove     ? [{ name: 'Top Move',      value: d.topMove,     inline: true }] : []),
       ...(d.topTeraType ? [{ name: 'Top Tera Type', value: d.topTeraType, inline: true }] : []),
+      ...(d.teammates?.length
+        ? [{ name: 'Top Teammates', value: fmtTeammates(d.teammates, 3), inline: false }]
+        : []),
     );
 
   // Page 2 — Abilities & Items

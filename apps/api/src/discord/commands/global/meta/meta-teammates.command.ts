@@ -3,14 +3,21 @@ import { Context, Options, Subcommand } from 'necord';
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import { MetaCommand } from './meta.group';
 import { MetaTeammatesDto } from './meta-teammates.dto';
-import { MetaRegulationAutocompleteInterceptor } from './meta-regulation.interceptor';
+import { MetaVgcAutocompleteInterceptor } from './meta-vgc-autocomplete.interceptor';
+import { MetaCacheService } from './meta-cache.service';
 import { VgcMetaFacadeService } from '@/api/boffmedia/herramientas/pokemon/vgc/meta/meta.facade.service';
 import { typeColor, spriteUrl } from './meta.util';
 
 interface TeammateScore {
   name:       string;
   avgPercent: number;
-  listCount:  number; // how many input Pokémon had this teammate
+  listCount:  number;
+}
+
+function synergyTier(pct: number): string {
+  if (pct >= 35) return '🔑';
+  if (pct >= 20) return '💪';
+  return '👍';
 }
 
 /** Intersect N teammate arrays, sorted by average percent across all inputs. */
@@ -34,11 +41,9 @@ function intersectTeammates(
     listCount:  v.count,
   }));
 
-  // Strict intersection: appear in ALL input lists
   const strict = scored.filter((s) => s.listCount === n).sort((a, b) => b.avgPercent - a.avgPercent);
   if (strict.length > 0) return { scores: strict, strict: true };
 
-  // Fallback: most common across inputs, then by average
   const fallback = scored.sort((a, b) => b.listCount - a.listCount || b.avgPercent - a.avgPercent);
   return { scores: fallback, strict: false };
 }
@@ -46,9 +51,12 @@ function intersectTeammates(
 @Injectable()
 @MetaCommand()
 export class MetaTeammatesCommand {
-  constructor(private readonly metaFacade: VgcMetaFacadeService) {}
+  constructor(
+    private readonly metaFacade: VgcMetaFacadeService,
+    private readonly cache: MetaCacheService,
+  ) {}
 
-  @UseInterceptors(MetaRegulationAutocompleteInterceptor)
+  @UseInterceptors(MetaVgcAutocompleteInterceptor)
   @Subcommand({ name: 'teammates', description: 'Find most common teammates for one or more Pokémon' })
   public async onTeammates(
     @Context() [interaction]: [ChatInputCommandInteraction],
@@ -62,20 +70,18 @@ export class MetaTeammatesCommand {
       return;
     }
 
-    // Teammate data only available from Smogon snapshots
-    if (!reg.formatId) {
-      await interaction.editReply(`Teammate data is not available for **${reg.name}**.`);
-      return;
-    }
+    const source = reg.vgcPastesGid ? 'VGCPastes (Champions)' : reg.formatId ? 'Smogon Ladder' : 'Limitless (Combined)';
+    const names  = [pokemon, pokemon2, pokemon3].filter(Boolean) as string[];
 
     // ── Resolve speciesIds for all input Pokémon ────────────────────────────
-    const names = [pokemon, pokemon2, pokemon3].filter(Boolean) as string[];
-
-    let usageEntries: Awaited<ReturnType<typeof this.metaFacade.getSmogonUsageList>>;
+    let usageEntries: Awaited<ReturnType<typeof this.metaFacade.getUnifiedUsageList>>;
     try {
-      usageEntries = await this.metaFacade.getSmogonUsageList({ format: reg.formatId });
+      usageEntries = await this.cache.getOrFetch(
+        `vgc:usage-entries:${regulation}`,
+        () => this.metaFacade.getUnifiedUsageList(regulation),
+      );
     } catch {
-      await interaction.editReply(`No Smogon data available for **${reg.name}** yet.`);
+      await interaction.editReply(`No usage data available for **${reg.name}** yet.`);
       return;
     }
 
@@ -97,7 +103,10 @@ export class MetaTeammatesCommand {
     // ── Fetch full detail (includes teammates) for each Pokémon ─────────────
     const detailResults = await Promise.allSettled(
       resolved.map((entry) =>
-        this.metaFacade.getSmogonDetail({ format: reg.formatId, speciesId: entry!.speciesId }),
+        this.cache.getOrFetch(
+          `vgc:detail:${regulation}:${entry!.speciesId}`,
+          () => this.metaFacade.getUnifiedDetail(regulation, entry!.speciesId),
+        ),
       ),
     );
 
@@ -135,11 +144,10 @@ export class MetaTeammatesCommand {
       : `Common Teammates — ${inputNames.join(' + ')}`;
 
     const lines = top.map((tm, idx) => {
-      const pctStr = `${tm.avgPercent.toFixed(1)}%`;
-      const listNote = !strict && names.length > 1
-        ? ` *(${tm.listCount}/${names.length})*`
-        : '';
-      return `\`#${String(idx + 1).padStart(2)}\` **${tm.name}** — ${pctStr}${listNote}`;
+      const tier     = synergyTier(tm.avgPercent);
+      const pctStr   = `${tm.avgPercent.toFixed(1)}%`;
+      const listNote = !strict && names.length > 1 ? ` *(${tm.listCount}/${names.length})*` : '';
+      return `\`#${String(idx + 1).padStart(2)}\` ${tier} **${tm.name}** — ${pctStr}${listNote}`;
     });
 
     let description = lines.join('\n');
@@ -153,7 +161,7 @@ export class MetaTeammatesCommand {
       .setTitle(title)
       .setDescription(description)
       .addFields({ name: 'Regulation', value: reg.name, inline: true })
-      .setFooter({ text: 'Source: Smogon Ladder' });
+      .setFooter({ text: `Source: ${source}  ·  🔑 ≥35%  💪 ≥20%  👍 others` });
 
     await interaction.editReply({ embeds: [embed] });
   }
