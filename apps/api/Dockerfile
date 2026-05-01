@@ -1,8 +1,8 @@
 # Build from the monorepo root:
 #   docker build -f apps/api/Dockerfile -t boffmedia-api .
 
-FROM node:20-alpine AS base
-RUN apk add --no-cache ffmpeg
+FROM node:20-slim AS base
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg && rm -rf /var/lib/apt/lists/*
 RUN corepack enable
 
 # ---- Install stage ----
