@@ -31,3 +31,22 @@ export function resolveSpeciesId(name: string, dex: typeof Dex): string {
   const s = dex.species.get(name);
   return s.exists ? s.id : name.toLowerCase().replace(/[^a-z0-9]/g, '');
 }
+
+/**
+ * Maps mega-evolution and primal-reversion species IDs back to their base
+ * species ID so that cross-format comparisons (e.g. standard VGC ladder vs
+ * Champions tournament) can join on a consistent key.
+ *
+ * Regional/alternate formes (Rotom-Wash, Landorus-Therian, …) are intentionally
+ * left unchanged because they are distinct competitive identities.
+ */
+export function toBaseFormId(speciesId: string, dex: typeof Dex): string {
+  const s = dex.species.get(speciesId);
+  if (!s.exists) return speciesId;
+  const f = s.forme;
+  if (f === 'Mega' || f === 'Mega-X' || f === 'Mega-Y' || f === 'Primal' || f === 'Eternal') {
+    const base = dex.species.get(s.baseSpecies);
+    return base.exists ? base.id : speciesId;
+  }
+  return speciesId;
+}
