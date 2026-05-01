@@ -3,9 +3,9 @@ import { AutocompleteInteraction } from 'discord.js';
 import { AutocompleteInterceptor } from 'necord';
 import { VgcMetaFacadeService } from '@/api/boffmedia/herramientas/pokemon/vgc/meta/meta.facade.service';
 import { MetaCacheService } from './meta-cache.service';
-import { PokemonUsageEntry } from '@/api/boffmedia/herramientas/pokemon/vgc/meta/entities/pokemon-usage.entity';
+import { PokemonUsageDetail, PokemonUsageEntry } from '@/api/boffmedia/herramientas/pokemon/vgc/meta/entities/pokemon-usage.entity';
 
-const POKEMON_FIELDS = new Set(['pokemon', 'pokemon2', 'pokemon3', 'your', 'vs']);
+const POKEMON_FIELDS = new Set(['pokemon', 'pokemon2', 'pokemon3', 'your', 'vs', 'compare']);
 
 @Injectable()
 export class MetaVgcAutocompleteInterceptor extends AutocompleteInterceptor {
@@ -30,6 +30,47 @@ export class MetaVgcAutocompleteInterceptor extends AutocompleteInterceptor {
         filtered.map((r) => ({
           name:  r.vgcPastesGid ? `${r.name} (Preview)` : r.name,
           value: r.id,
+        })),
+      );
+    }
+
+    // ── Move autocomplete (requires regulation + pokemon to be filled) ────────
+    if (focused.name === 'move') {
+      const regulationId = interaction.options.getString('regulation');
+      const pokemonVal   = interaction.options.getString('pokemon');
+      if (!regulationId || !pokemonVal) return interaction.respond([]);
+
+      let entries: PokemonUsageEntry[];
+      try {
+        entries = await this.cache.getOrFetch(
+          `vgc:usage-entries:${regulationId}`,
+          () => this.metaFacade.getUnifiedUsageList(regulationId),
+        );
+      } catch {
+        return interaction.respond([]);
+      }
+
+      const q     = pokemonVal.toLowerCase();
+      const entry = entries.find((e) => e.speciesId === pokemonVal || e.speciesName.toLowerCase() === q);
+      if (!entry) return interaction.respond([]);
+
+      let detail: PokemonUsageDetail;
+      try {
+        detail = await this.cache.getOrFetch(
+          `vgc:detail:${regulationId}:${entry.speciesId}`,
+          () => this.metaFacade.getUnifiedDetail(regulationId, entry.speciesId),
+        );
+      } catch {
+        return interaction.respond([]);
+      }
+
+      const moveQuery = focused.value.toString().toLowerCase();
+      const moves     = (detail.moves ?? []).filter((m) => m.name.toLowerCase().includes(moveQuery));
+
+      return interaction.respond(
+        moves.slice(0, 25).map((m) => ({
+          name:  `${m.name} (${m.percent.toFixed(1)}%)`,
+          value: m.name,
         })),
       );
     }

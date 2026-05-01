@@ -26,6 +26,9 @@ import { MetaCoreCommand } from '../commands/global/meta/meta-core.command';
 import { MetaExplainCommand } from '../commands/global/meta/meta-explain.command';
 import { MetaAnalyzeCommand } from '../commands/global/meta/meta-analyze.command';
 import { MetaMatchupCommand } from '../commands/global/meta/meta-matchup.command';
+import { MetaSpeedCommand } from '../commands/global/meta/meta-speed.command';
+import { MetaThreatsCommand } from '../commands/global/meta/meta-threats.command';
+import { MetaDamageCommand } from '../commands/global/meta/meta-damage.command';
 
 console.log('[DEBUG] Initializing NecordModule with token:', process.env.DISCORD_KEY);
 
@@ -73,6 +76,9 @@ console.log('[DEBUG] Initializing NecordModule with token:', process.env.DISCORD
     MetaExplainCommand,
     MetaAnalyzeCommand,
     MetaMatchupCommand,
+    MetaSpeedCommand,
+    MetaThreatsCommand,
+    MetaDamageCommand,
   ],
 })
 export class DiscordModule {}
