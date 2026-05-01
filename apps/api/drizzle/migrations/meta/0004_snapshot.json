@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "528d5315-e7fb-4bbf-9116-f6840ec157e0",
+  "id": "17c4ebc2-4279-436a-be45-ea5ab25dadd2",
   "prevId": "4a810547-6324-42a2-9ac9-81fc9841cfe1",
   "tables": {
     "boffmedia_roles": {
@@ -3563,7 +3563,30 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "vgc_limitless_teams_tournament_idx": {
+          "name": "vgc_limitless_teams_tournament_idx",
+          "columns": [
+            "tournament_id"
+          ],
+          "isUnique": false
+        },
+        "vgc_limitless_teams_tournament_player_idx": {
+          "name": "vgc_limitless_teams_tournament_player_idx",
+          "columns": [
+            "tournament_id",
+            "player_slug"
+          ],
+          "isUnique": false
+        },
+        "vgc_limitless_teams_paste_idx": {
+          "name": "vgc_limitless_teams_paste_idx",
+          "columns": [
+            "paste_id"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {
         "vgc_limitless_teams_paste_id_vgc_pastes_id_fk": {
           "name": "vgc_limitless_teams_paste_id_vgc_pastes_id_fk",
@@ -3694,7 +3717,23 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "vgc_limitless_tournaments_regulation_idx": {
+          "name": "vgc_limitless_tournaments_regulation_idx",
+          "columns": [
+            "regulation_id"
+          ],
+          "isUnique": false
+        },
+        "vgc_limitless_tournaments_regulation_status_idx": {
+          "name": "vgc_limitless_tournaments_regulation_status_idx",
+          "columns": [
+            "regulation_id",
+            "status"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {
         "vgc_limitless_tournaments_id": {
@@ -3838,7 +3877,23 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "vgc_paste_teams_regulation_idx": {
+          "name": "vgc_paste_teams_regulation_idx",
+          "columns": [
+            "regulation_id"
+          ],
+          "isUnique": false
+        },
+        "vgc_paste_teams_regulation_paste_idx": {
+          "name": "vgc_paste_teams_regulation_paste_idx",
+          "columns": [
+            "regulation_id",
+            "paste_id"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {
         "vgc_paste_teams_paste_id_vgc_pastes_id_fk": {
           "name": "vgc_paste_teams_paste_id_vgc_pastes_id_fk",
@@ -3878,6 +3933,13 @@
         "pokepaste_id": {
           "name": "pokepaste_id",
           "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "source_key": {
+          "name": "source_key",
+          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -3925,7 +3987,15 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "vgc_pastes_format_idx": {
+          "name": "vgc_pastes_format_idx",
+          "columns": [
+            "format_id"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {
         "vgc_pastes_id": {
@@ -3940,6 +4010,12 @@
           "name": "vgc_pastes_pokepaste_id_unique",
           "columns": [
             "pokepaste_id"
+          ]
+        },
+        "vgc_pastes_source_key_unique": {
+          "name": "vgc_pastes_source_key_unique",
+          "columns": [
+            "source_key"
           ]
         }
       },
@@ -4007,6 +4083,14 @@
           "autoincrement": false,
           "default": 0
         },
+        "import_fetched_count": {
+          "name": "import_fetched_count",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
         "import_started_at": {
           "name": "import_started_at",
           "type": "datetime",
@@ -4037,7 +4121,22 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "vgc_regulations_active_idx": {
+          "name": "vgc_regulations_active_idx",
+          "columns": [
+            "active"
+          ],
+          "isUnique": false
+        },
+        "vgc_regulations_format_idx": {
+          "name": "vgc_regulations_format_idx",
+          "columns": [
+            "format_id"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {
         "vgc_regulations_id": {
@@ -4197,6 +4296,15 @@
             "species_id"
           ],
           "isUnique": true
+        },
+        "vgc_smogon_snapshot_lookup_idx": {
+          "name": "vgc_smogon_snapshot_lookup_idx",
+          "columns": [
+            "format_id",
+            "month",
+            "cutoff"
+          ],
+          "isUnique": false
         }
       },
       "foreignKeys": {},
