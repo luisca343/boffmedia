@@ -51,7 +51,8 @@
 | 2026-04-30 | Phase 4 implemented | `DivergenceService.compareLadderVsTournament()` joins Smogon ladder entries vs Limitless tournament/combined entries; badge thresholds from OQ-D4 applied (ladder-trap / tournament-staple); `GET /tools/vgc/meta/divergence` public endpoint; `useDivergence` hook; `DivergenceView` sortable table (click header to sort by Ladder %, Tourn. %, or |Δ|); amber / blue badge chips with tooltips; "Divergence" added as third sub-tab in Tournament tab alongside Aggregate and Players; EN + ES i18n keys added. |
 | 2026-05-01 | Discord `/vgc` bot commands | Implemented Necord-based Discord slash commands under the `/vgc` group (`dmPermission: true`; dev guild via Necord `development` mode). Four sub-commands: `/vgc pokemon <regulation> <pokemon>` — 4-page paginated embed (Overview → Abilities & Items → Moves → Tera & Spreads) fetching full `PokemonUsageDetail`; `/vgc top <regulation> [count]` — button-paginated ranked list (10/page); `/vgc teammates <regulation> <pokemon> [pokemon2] [pokemon3]` — strict teammate intersection across 1–3 Pokémon (fallback to "most common across inputs" when intersection is empty); `/vgc regulations` — lists all active regulations with Smogon/Champions source badge. Regulation option on all commands uses `AutocompleteInterceptor` backed by `VgcMetaFacadeService.getRegulations()`. Shared `meta-paginator.ts` utility (nav row, detail pages, top pages). **Known limitation at time of writing:** `/vgc teammates` only resolved teammate data from Smogon — fixed in Phase 6 same day. |
 | 2026-05-01 | Phase 6 — Unified detail layer | Verified that `VgcPastesService.getUsageList()` and `LimitlessService.getCombinedUsage()` already computed `teammates[]` via co-occurrence matrices (Phase 2 / Phase 5). The bot's failure for non-Smogon formats was purely a routing gap — no new computation needed. Added four methods to `VgcMetaFacadeService`: `getChampionsDetail()` (filters from Champions usage list, merges paste detail for moves/items/abilities/spreads), `getLimitlessDetail()` (filters from combined Limitless usage), `getUnifiedUsageList()` (routes to Champions / Smogon / Limitless by regulation flags), `getUnifiedDetail()` (same routing for full `PokemonUsageDetail`). Added `getUnifiedUsageDetailList()` (returns full `PokemonUsageDetail[]` for the entire regulation). Simplified `meta-pokemon.command.ts` to two calls. Removed `if (!reg.formatId)` guard from `meta-teammates.command.ts`. All three sources now return consistent `PokemonUsageDetail` with teammates to all callers. |
-| 2026-05-01 | Phase 7 — Intelligence layer | **Pokémon autocomplete:** `MetaVgcAutocompleteInterceptor` handles both `regulation` and `pokemon`/`pokemon2`/`pokemon3` fields; results sorted by prefix-match first then usage %; backed by `MetaCacheService` so keystroke-level autocomplete doesn't hammer the DB. **Cache:** `MetaCacheService` (in-memory, 10-min TTL, `getOrFetch` pattern) shared across all commands and the autocomplete interceptor. **New commands:** `/vgc core` — finds bidirectional synergy pairs from top-30 pool (scored by average mutual teammate %, tiered 🔑/💪/⚡); `/vgc compare` — side-by-side embed for two Pokémon (rank, usage, types, top move/item/tera/teammate); `/vgc explain` — template-based role inference (usage tier, support/pivot/setter roles from moveset, item notes, best partner). **Enhancements:** `/vgc pokemon` overview page now shows top 3 teammates inline; `/vgc teammates` shows synergy tier emojis; `/vgc top` uses `getUnifiedUsageList` (works for all sources). **Bug fix:** `getChampionsDetail()` now merges paste detail into the usage-list entry — Champions regulations no longer return empty `moves`/`items`/`abilities` in `/vgc explain` and `/vgc pokemon`. |
+| 2026-05-01 | Phase 8 — Coaching & Insight layer | **New commands:** `/vgc analyze <regulation> <paste>` (3-page: team overview + archetype detection, type weakness bar chart, role gap analysis). `/vgc matchup <regulation> <your> <vs>` (2-page: type matchup with STAB effectiveness labels; damage calcs using `@smogon/calc` with meta-typical sets from usage data, fallback to estimated 252/252/4 EVs; weather/terrain auto-detected from top abilities; top 4 damaging moves each direction; kochance labels). **Shared utility:** `meta-team-utils.ts` (type chart, `analyzeWeaknesses`, `detectArchetype`, `analyzeRoles`). **Removed:** `/vgc compare` (= page 1 of `/vgc pokemon` × 2), `/vgc prep` (= `/vgc top` + `/vgc core`). **Cleaned:** `/vgc teammates` dead interceptor decorator removed. **Added dep:** `@smogon/calc ^0.10.0` as direct dependency (was transitive). |
+| 2026-05-01 | Phase 7 — Intelligence layer | **Pokémon autocomplete:** `MetaVgcAutocompleteInterceptor` handles both `regulation` and `pokemon`/`pokemon2`/`pokemon3` fields; results sorted by prefix-match first then usage %; backed by `MetaCacheService` so keystroke-level autocomplete doesn't hammer the DB. **Cache:** `MetaCacheService` (in-memory, 10-min TTL, `getOrFetch` pattern) shared across all commands and the autocomplete interceptor. **New commands:** `/vgc core` — finds bidirectional synergy pairs from top-30 pool (scored by average mutual teammate %, tiered 🔑/💪/⚡); `/vgc compare` — side-by-side embed for two Pokémon (rank, usage, types, top move/item/tera/teammate) *(removed in Phase 8 — overlap with `/vgc pokemon`)*; `/vgc explain` — template-based role inference (usage tier, support/pivot/setter roles from moveset, item notes, best partner). **Enhancements:** `/vgc pokemon` overview page now shows top 3 teammates inline; `/vgc teammates` shows synergy tier emojis; `/vgc top` uses `getUnifiedUsageList` (works for all sources). **Bug fix:** `getChampionsDetail()` now merges paste detail into the usage-list entry — Champions regulations no longer return empty `moves`/`items`/`abilities` in `/vgc explain` and `/vgc pokemon`. |
 
 ---
 
@@ -209,6 +210,42 @@ Champions `getUsageList()` returns `PokemonUsageDetail[]` with empty `moves`/`it
 #### Architecture Note
 
 The combined `MetaVgcAutocompleteInterceptor` replaces `MetaRegulationAutocompleteInterceptor` on all commands that have Pokémon parameters. Commands with only a `regulation` param (`/vgc top`, `/vgc core`, `/vgc regulations`) keep using the simpler single-field interceptor.
+
+---
+
+### Phase 8 — Coaching & Insight Layer _(Complete)_
+
+**Goal:** Transform the `/vgc` bot into a hands-on team-building advisor — analyze user-provided teams, identify weaknesses, evaluate individual matchups, and surface prep guides.
+
+#### Changes Made
+
+- [x] **`meta-team-utils.ts`** — shared utility module:
+  - Hardcoded defensive type chart (`DEFENSE_CHART`) for all 18 types (only non-1× values stored).
+  - `getEffectiveness(atkType, defTypes)` — multiplies across dual types; returns 0 for immunities.
+  - `analyzeWeaknesses(team)` — for each attacking type, counts double/quad hits across 6 Pokémon; returns sorted `WeaknessResult[]`.
+  - `detectArchetype(slots)` — detects Trick Room, Tailwind, Rain, Sun, Sand, Snow (ability + move), Psyspam (≥2 Pokémon with Expanding Force / Future Sight), Hyper Offense (≥4 HO items), Balance (fallback).
+  - `analyzeRoles(slots)` — returns `{ present, missing }` for Speed Control, Fake Out, Redirection, Wide Guard, Encore, Intimidate.
+- [x] **`MetaVgcAutocompleteInterceptor`** — `POKEMON_FIELDS` extended with `'your'` and `'vs'` for matchup autocomplete.
+- [x] **`MetaAnalyzeDto`** — `regulation` + `paste` (raw string, no autocomplete).
+- [x] **`MetaMatchupDto`** — `regulation` + `your` + `vs` (all autocomplete).
+- [x] **`/vgc analyze`** — `MetaAnalyzeCommand`:
+  - `resolvePaste()` helper: detects `pokepast.es/{id}` URL → fetches `pokepast.es/{id}/json`, falls back to raw text.
+  - `parsePasteMeta()` parses slots; each species is looked up in the regulation's usage entries for rank + types.
+  - 3-page paginated embed: Team Overview (6 Pokémon with emoji types, rank, usage%, archetype), Weaknesses (bar chart style with quad-hit callouts), Roles & Gaps (present/missing role checklist).
+  - Uses `MetaRegulationAutocompleteInterceptor` (paste param is free-text, not autocompleted).
+- [x] **`/vgc matchup`** — `MetaMatchupCommand`:
+  - `bestOffensive(atkTypes, defTypes)` — best STAB effectiveness from the attacker's types.
+  - Single embed with direction labels, icon badges (🚫/🔥/✅/🛡️/➖), both Pokémon's meta rank.
+  - Uses `MetaVgcAutocompleteInterceptor`.
+- [x] **`discord.module.ts`** — `MetaAnalyzeCommand`, `MetaMatchupCommand` registered as providers.
+- ~~`/vgc prep`~~ — removed (was a combination of `/vgc top` + `/vgc core`).
+
+#### Design Notes
+
+- Type weakness analysis uses hardcoded chart rather than `@pkmn/sim` `damageTaken` — avoids format-specific Dex coupling for Discord-layer analysis.
+- Tera type changes are explicitly excluded from weakness analysis (noted in embed footer).
+- The archetype detector is additive: a Rain + Trick Room team shows both archetypes.
+- `/vgc prep` reuses the same `findTopCores()` bidirectional pair logic from `/vgc core` (copy, not extracted — keeps commands self-contained).
 
 ---
 

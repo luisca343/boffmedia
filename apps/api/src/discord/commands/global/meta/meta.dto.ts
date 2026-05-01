@@ -47,7 +47,8 @@ export class MetaCoreDto {
   regulation: string;
 }
 
-export class MetaCompareDto {
+
+export class MetaAnalyzeDto {
   @StringOption({
     name:         'regulation',
     description:  'VGC regulation (e.g. Reg H, Reg I)',
@@ -57,18 +58,36 @@ export class MetaCompareDto {
   regulation: string;
 
   @StringOption({
-    name:         'pokemon',
-    description:  'First Pokémon',
+    name:        'paste',
+    description: 'Pokepast.es URL or raw Showdown paste (up to 6 Pokémon)',
+    required:    true,
+  })
+  paste: string;
+}
+
+export class MetaMatchupDto {
+  @StringOption({
+    name:         'regulation',
+    description:  'VGC regulation (e.g. Reg H, Reg I)',
     required:     true,
     autocomplete: true,
   })
-  pokemon: string;
+  regulation: string;
 
   @StringOption({
-    name:         'pokemon2',
-    description:  'Second Pokémon',
+    name:         'your',
+    description:  'Your Pokémon',
     required:     true,
     autocomplete: true,
   })
-  pokemon2: string;
+  your: string;
+
+  @StringOption({
+    name:         'vs',
+    description:  'Opposing Pokémon',
+    required:     true,
+    autocomplete: true,
+  })
+  vs: string;
 }
+
