@@ -91,3 +91,72 @@ export class MetaMatchupDto {
   vs: string;
 }
 
+export class MetaSpeedDto {
+  @StringOption({
+    name:         'regulation',
+    description:  'VGC regulation (e.g. Reg H, Reg I)',
+    required:     true,
+    autocomplete: true,
+  })
+  regulation: string;
+
+  @StringOption({
+    name:         'compare',
+    description:  'Jump to this Pokémon and highlight it in the speed tiers',
+    required:     false,
+    autocomplete: true,
+  })
+  compare?: string;
+}
+
+export class MetaThreatsDto {
+  @StringOption({
+    name:         'regulation',
+    description:  'VGC regulation (e.g. Reg H, Reg I)',
+    required:     true,
+    autocomplete: true,
+  })
+  regulation: string;
+
+  @StringOption({
+    name:        'paste',
+    description: 'Pokepast.es URL or raw Showdown paste (up to 6 Pokémon)',
+    required:    true,
+  })
+  paste: string;
+}
+
+export class MetaDamageDto {
+  @StringOption({
+    name:         'regulation',
+    description:  'VGC regulation (e.g. Reg H, Reg I)',
+    required:     true,
+    autocomplete: true,
+  })
+  regulation: string;
+
+  @StringOption({
+    name:         'pokemon',
+    description:  'Attacking Pokémon',
+    required:     true,
+    autocomplete: true,
+  })
+  pokemon: string;
+
+  @StringOption({
+    name:         'vs',
+    description:  'Defending Pokémon',
+    required:     true,
+    autocomplete: true,
+  })
+  vs: string;
+
+  @StringOption({
+    name:         'move',
+    description:  'Specific move to calculate (leave blank for top 4)',
+    required:     false,
+    autocomplete: true,
+  })
+  move?: string;
+}
+
