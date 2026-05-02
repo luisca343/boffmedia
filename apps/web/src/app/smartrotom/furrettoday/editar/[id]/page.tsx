@@ -5,7 +5,7 @@ import { useGetNewsById } from '@/hooks/documents/useGetNewsById';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/primitives/alert"
 import { AlertCircle, Loader2 } from 'lucide-react'
 import { useBoffSession } from '@/services/useBoffSession';
-import { USER_ROLES } from '@boffmedia/shared';
+import { USER_ROLES } from '@boffmedia/shared/roles';
 import FurretHeader from '../../_components/Header';
 import FurretFooter from '../../_components/Footer';
 import PopArtWallpaper from '../../_components/PopArtWallpaper';

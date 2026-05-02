@@ -47,7 +47,7 @@ export class CreateMatchDto {
   @ApiPropertyOptional() @IsOptional() @IsNumber() opponentElo?: number;
   @ApiPropertyOptional({ type: 'array' }) @IsOptional() @IsArray() notes?: any[];
   @ApiPropertyOptional() @IsOptional() @IsNumber() createdAt?: number;
-  @ApiPropertyOptional() @IsOptional() completedAt?: any;
+  @ApiPropertyOptional() @IsOptional() @IsNumber() completedAt?: number;
   @ApiPropertyOptional() @IsOptional() @IsNumber() clientUpdatedAt?: number;
   @ApiPropertyOptional() @IsOptional() @IsNumber() userId?: number;
 }

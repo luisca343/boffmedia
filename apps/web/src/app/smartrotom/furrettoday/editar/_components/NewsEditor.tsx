@@ -10,7 +10,7 @@ import PopArtWallpaper from '../../_components/PopArtWallpaper'
 import { InternalLink } from "@/components/ui/navigation/Link"
 import { sendToast } from '@/lib/toast'
 import { useBoffSession } from '@/services/useBoffSession'
-import { USER_ROLES } from '@boffmedia/shared'
+import { USER_ROLES } from '@boffmedia/shared/roles'
 
 const NewsList = React.lazy(() => import('./NewsList'))
 const NewsContent = React.lazy(() => import('./NewsContent'))

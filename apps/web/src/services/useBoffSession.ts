@@ -1,8 +1,8 @@
 import { useSession } from "next-auth/react"
 import { Session } from "next-auth"
 import { forceSessionRefresh } from "@/utils/refreshSession"
-import { USER_ROLES } from "@boffmedia/shared"
-import type { UserRole } from "@boffmedia/shared"
+import { USER_ROLES } from "@boffmedia/shared/roles"
+import type { UserRole } from "@boffmedia/shared/roles"
 
 export const useBoffSession = () => {
   const { data: session, status, update } = useSession()

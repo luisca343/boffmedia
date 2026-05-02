@@ -3,7 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { boffPOST } from '@/services/boffAPI';
 import { BoffUser } from "@/types";
-import type { UserRole } from "@boffmedia/shared";
+import type { UserRole } from "@boffmedia/shared/roles";
 import { AuthError, AUTH_ERROR_CODES, handleAuthError } from '@/utils/auth-errors';
 import { CookiesOptions } from "next-auth";
 

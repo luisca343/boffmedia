@@ -1,6 +1,6 @@
 import { withAuth } from "next-auth/middleware"
 import { NextResponse } from "next/server"
-import { USER_ROLES } from "@boffmedia/shared"
+import { USER_ROLES } from "@boffmedia/shared/roles"
 
 export default withAuth(
   function middleware(req) {
