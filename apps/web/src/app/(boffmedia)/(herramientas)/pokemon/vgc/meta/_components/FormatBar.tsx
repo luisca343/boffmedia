@@ -18,7 +18,7 @@ import {
 
 const VALID_CUTOFFS = [1760, 1630, 1500, 0] as const;
 
-const TRIGGER_CLS = "h-8 w-auto text-xs px-2.5 shrink-0 ring-offset-surface-900";
+const TRIGGER_CLS = "h-8 w-auto min-w-[8.75rem] sm:min-w-[10.5rem] text-xs px-2.5 shrink-0 ring-offset-surface-900 bg-surface-800/75 border-surface-700/80 text-surface-100 hover:bg-surface-800 focus:border-primary-400 focus:ring-primary-400/30";
 
 interface FormatBarProps {
   tab:                 string;
@@ -103,29 +103,31 @@ export function FormatBar({
   };
 
   return (
-    <div className="shrink-0 h-12 flex items-center gap-2 px-3 bg-surface-900 border-b border-surface-700">
-      {/* Tab toggle — Stats | Tournament */}
-      <div className="flex gap-1 shrink-0 border border-surface-700 rounded-lg p-0.5">
-        {(["stats", "tournament"] as const).map((t2) => (
-          <button
-            key={t2}
-            onClick={() => onTabChange(t2)}
-            className={cn(
-              "px-3 py-1 rounded-md text-xs font-medium transition-all whitespace-nowrap",
-              tab === t2
-                ? "bg-primary-500/20 text-primary-300"
-                : "text-surface-400 hover:text-surface-200"
-            )}
-          >
-            {t(`tabs.${t2}`)}
-          </button>
-        ))}
-      </div>
+    <div className="shrink-0 px-3 py-2 bg-gradient-to-r from-surface-900 via-surface-900 to-surface-800/85 border-b border-surface-700 shadow-sm">
+      <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-surface-700/70 scrollbar-track-transparent">
+        <div className="min-w-max flex items-center gap-2 pr-1">
+          {/* Tab toggle — Stats | Tournament */}
+          <div className="flex gap-1 shrink-0 rounded-xl border border-surface-700/80 bg-surface-800/70 p-1">
+            {(["stats", "tournament"] as const).map((t2) => (
+              <button
+                key={t2}
+                onClick={() => onTabChange(t2)}
+                className={cn(
+                  "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap",
+                  tab === t2
+                    ? "bg-primary-500/20 text-primary-300 shadow-[inset_0_0_0_1px_rgba(56,189,248,0.2)]"
+                    : "text-surface-400 hover:text-surface-100 hover:bg-surface-700/40"
+                )}
+              >
+                {t(`tabs.${t2}`)}
+              </button>
+            ))}
+          </div>
 
-        <div className="w-px h-5 bg-surface-700 shrink-0" />
+          <div className="w-px h-6 bg-surface-700/90 shrink-0" />
 
-      {tab === "stats" ? (
-        <>
+          {tab === "stats" ? (
+            <>
           {/* Unified format select — Smogon + Preview in groups */}
           {(uniqueFormats.length > 0 || previewRegulations.length > 0) && (
             <Select value={format} onValueChange={handleFormatSelect}>
@@ -167,7 +169,7 @@ export function FormatBar({
                 value={month || "__all__"}
                 onValueChange={(val) => onOptionsApply(val === "__all__" ? "" : val, cutoff)}
               >
-                <SelectTrigger className={TRIGGER_CLS}>
+                <SelectTrigger className={`${TRIGGER_CLS} min-w-[7.25rem] sm:min-w-[8.5rem]`}>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -184,7 +186,7 @@ export function FormatBar({
                 value={String(cutoff)}
                 onValueChange={(val) => onOptionsApply(month, Number(val))}
               >
-                <SelectTrigger className={TRIGGER_CLS}>
+                <SelectTrigger className={`${TRIGGER_CLS} min-w-[6.5rem] sm:min-w-[7.5rem]`}>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -197,9 +199,9 @@ export function FormatBar({
               </Select>
             </>
           )}
-        </>
-      ) : (
-        <>
+            </>
+          ) : (
+            <>
           {/* Regulation select */}
           {sortedRegulations.length > 0 && (
             <Select value={regulation} onValueChange={onRegulationChange}>
@@ -216,14 +218,14 @@ export function FormatBar({
             </Select>
           )}
 
-          {sortedRegulations.length > 0 && <div className="w-px h-5 bg-surface-700 shrink-0" />}
+          {sortedRegulations.length > 0 && <div className="w-px h-5 bg-surface-700/90 shrink-0" />}
 
           {/* Tournament select — Combined + individual */}
           <Select
             value={tournamentId || "combined"}
             onValueChange={onTournamentChange}
           >
-            <SelectTrigger className={TRIGGER_CLS}>
+            <SelectTrigger className={`${TRIGGER_CLS} min-w-[13rem] sm:min-w-[16rem]`}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -239,8 +241,10 @@ export function FormatBar({
                 ))}
             </SelectContent>
           </Select>
-        </>
-      )}
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

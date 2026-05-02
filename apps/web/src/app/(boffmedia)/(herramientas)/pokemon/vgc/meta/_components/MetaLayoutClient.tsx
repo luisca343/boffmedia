@@ -149,21 +149,25 @@ export function MetaLayoutClient() {
 
       {/* Aggregate / Players / Divergence sub-tab strip — tournament tab only */}
       {tab === "tournament" && (
-        <div className="shrink-0 flex items-center gap-1 px-3 py-1.5 border-b border-surface-700 bg-surface-900">
-          {(["aggregate", "players", "divergence"] as const).map((v) => (
-            <button
-              key={v}
-              onClick={() => handleViewChange(v)}
-              className={cn(
-                "px-3 py-1 rounded-md text-xs font-medium transition-all whitespace-nowrap",
-                view === v
-                  ? "bg-primary-500/20 text-primary-300"
-                  : "text-surface-400 hover:text-surface-200",
-              )}
-            >
-              {t(`tabs.${v}`)}
-            </button>
-          ))}
+        <div className="shrink-0 px-3 py-2 border-b border-surface-700 bg-gradient-to-r from-surface-900 via-surface-900 to-surface-800/85">
+          <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-surface-700/70 scrollbar-track-transparent">
+            <div className="inline-flex min-w-max items-center gap-1 rounded-xl border border-surface-700/80 bg-surface-800/70 p-1">
+              {(["aggregate", "players", "divergence"] as const).map((v) => (
+                <button
+                  key={v}
+                  onClick={() => handleViewChange(v)}
+                  className={cn(
+                    "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap",
+                    view === v
+                      ? "bg-primary-500/20 text-primary-300 shadow-[inset_0_0_0_1px_rgba(56,189,248,0.2)]"
+                      : "text-surface-400 hover:text-surface-100 hover:bg-surface-700/40",
+                  )}
+                >
+                  {t(`tabs.${v}`)}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       )}
 
