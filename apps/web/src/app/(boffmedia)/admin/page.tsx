@@ -15,7 +15,7 @@ import { VgcSmogonFetcher } from "./_components/tools/VgcSmogonFetcher";
 import { VgcChampionsFetcher } from "./_components/tools/VgcChampionsFetcher";
 import { VgcLimitlessFetcher } from "./_components/tools/VgcLimitlessFetcher";
 import { ToastContainer } from "react-toastify";
-import { USER_ROLES } from "@boffmedia/shared";
+import { USER_ROLES } from "@boffmedia/shared/roles";
 import "react-toastify/dist/ReactToastify.css";
 
 const NAV = [

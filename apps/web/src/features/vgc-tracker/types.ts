@@ -42,7 +42,7 @@ export interface Session {
   label: string;
   format: MatchFormat;
   regulationId: string;
-  activePresetId: string;
+  activePresetId?: string;
   startElo?: number;
   startedAt: number;
   tournamentName?: string;

@@ -24,9 +24,23 @@ import { AddLimitlessTournamentDto } from './dto/add-limitless-tournament.dto';
 import { QueryLimitlessDto } from './dto/query-limitless.dto';
 import { BatchFetchResultDto, ChampionsPasteDetailDto } from './dto/champions-paste-detail.dto';
 import { UpsertRegulationDto } from './dto/upsert-regulation.dto';
+import {
+  ChampionsRegulationDto,
+  CountResultDto,
+  DivergenceResultDto,
+  LimitlessPlayerTeamDto,
+  PersonalMetaComparisonDto,
+  PokemonUsageDetailDto,
+  PokemonUsageEntryDto,
+  SmogonSnapshotDto,
+  SpeciesTeamEntryDto,
+  TournamentImportStartDto,
+  VgcIngestionJobDto,
+} from './dto/meta-response.dto';
 import { QueryPersonalMetaDto } from './dto/query-personal-meta.dto';
 import { QueryDivergenceDto } from './dto/query-divergence.dto';
 import { USER_ROLES } from '@api/_utils/auth/roles.constants';
+import { ImportJobStatusDto, LimitlessPlayerDto, LimitlessTournamentDto } from './dto/limitless-tournament.dto';
 
 @ApiTags('BoffMedia 🛠 | VGC Meta')
 @Controller('tools/vgc/meta')
@@ -46,7 +60,7 @@ export class VgcMetaController {
 
   @Get('smogon/available')
   @ApiOperation({ summary: 'List all cached Smogon snapshots' })
-  @ApiResponse({ status: 200, description: 'Snapshot list returned.' })
+  @ApiResponse({ status: 200, description: 'Snapshot list returned.', type: SmogonSnapshotDto, isArray: true })
   getAvailableSmogonSnapshots() {
     return this.facade.getAvailableSmogonSnapshots();
   }
@@ -55,7 +69,7 @@ export class VgcMetaController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.BOFF_ADMIN)
   @ApiOperation({ summary: '[Admin] Fetch stats.txt + moveset.txt from Smogon and store normalised rows' })
-  @ApiResponse({ status: 201, description: 'Snapshot fetched and stored.' })
+  @ApiResponse({ status: 201, description: 'Snapshot fetched and stored.', type: CountResultDto })
   fetchSmogonSnapshot(@Body() dto: FetchSmogonDto, @Req() req: any) {
     this.logAdminAction('smogon/fetch', req, {
       format: dto.format,
@@ -81,14 +95,14 @@ export class VgcMetaController {
 
   @Get('smogon')
   @ApiOperation({ summary: 'Get full Smogon usage + detail for all Pokémon in a snapshot' })
-  @ApiResponse({ status: 200, description: 'Usage list with full detail returned.' })
+  @ApiResponse({ status: 200, description: 'Usage list with full detail returned.', type: PokemonUsageDetailDto, isArray: true })
   getSmogonUsage(@Query() dto: QuerySmogonDto) {
     return this.facade.getSmogonUsage(dto);
   }
 
   @Get('smogon/list')
   @ApiOperation({ summary: 'Get lean Smogon usage list (without expanded detail arrays)' })
-  @ApiResponse({ status: 200, description: 'Lean usage list returned.' })
+  @ApiResponse({ status: 200, description: 'Lean usage list returned.', type: PokemonUsageEntryDto, isArray: true })
   getSmogonUsageList(@Query() dto: QuerySmogonDto) {
     return this.facade.getSmogonUsageList(dto);
   }
@@ -96,7 +110,7 @@ export class VgcMetaController {
   @Get('smogon/:speciesId')
   @ApiOperation({ summary: 'Get Smogon detail for a single Pokémon' })
   @ApiParam({ name: 'speciesId', example: 'incineroar' })
-  @ApiResponse({ status: 200, description: 'Detail returned.' })
+  @ApiResponse({ status: 200, description: 'Detail returned.', type: PokemonUsageDetailDto })
   getSmogonDetail(@Param('speciesId') speciesId: string, @Query() dto: QuerySmogonDto) {
     return this.facade.getSmogonDetail({ ...dto, speciesId });
   }
@@ -105,21 +119,21 @@ export class VgcMetaController {
 
   @Get('champions/available')
   @ApiOperation({ summary: 'List Champions regulations that have imported data' })
-  @ApiResponse({ status: 200, description: 'Available regulation list returned.' })
+  @ApiResponse({ status: 200, description: 'Available regulation list returned.', type: ChampionsRegulationDto, isArray: true })
   getAvailableChampionsRegulations() {
     return this.facade.getAvailableChampionsRegulations();
   }
 
   @Get('champions')
   @ApiOperation({ summary: 'Get Champions usage data from VGCPastes' })
-  @ApiResponse({ status: 200, description: 'Usage list returned.' })
+  @ApiResponse({ status: 200, description: 'Usage list returned.', type: PokemonUsageDetailDto, isArray: true })
   getChampionsUsage(@Query() dto: QueryChampionsDto) {
     return this.facade.getChampionsUsage(dto);
   }
 
   @Get('champions/list')
   @ApiOperation({ summary: 'Get lean Champions usage list (without expanded detail arrays)' })
-  @ApiResponse({ status: 200, description: 'Lean usage list returned.' })
+  @ApiResponse({ status: 200, description: 'Lean usage list returned.', type: PokemonUsageEntryDto, isArray: true })
   getChampionsUsageList(@Query() dto: QueryChampionsDto) {
     return this.facade.getChampionsUsageList(dto);
   }
@@ -149,7 +163,7 @@ export class VgcMetaController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.BOFF_ADMIN)
   @ApiOperation({ summary: 'Re-fetch VGCPastes CSV and refresh Champions data' })
-  @ApiResponse({ status: 201, description: 'Data refreshed.' })
+  @ApiResponse({ status: 201, description: 'Data refreshed.', type: CountResultDto })
   refreshChampions(@Query('regulationId') regulationId: string, @Req() req: any) {
     this.logAdminAction('champions/refresh', req, { regulationId });
     return this.facade.refreshChampionsData(regulationId);
@@ -159,42 +173,42 @@ export class VgcMetaController {
 
   @Get('limitless/tournaments')
   @ApiOperation({ summary: 'List Limitless tournaments for a regulation' })
-  @ApiResponse({ status: 200, description: 'Tournament list returned.' })
+  @ApiResponse({ status: 200, description: 'Tournament list returned.', type: LimitlessTournamentDto, isArray: true })
   listTournamentsByRegulation(@Query('regulationId') regulationId: string) {
     return this.facade.getLimitlessTournamentsByRegulation(regulationId);
   }
 
   @Get('limitless')
   @ApiOperation({ summary: 'List all cached Limitless tournaments' })
-  @ApiResponse({ status: 200, description: 'Tournament list returned.' })
+  @ApiResponse({ status: 200, description: 'Tournament list returned.', type: LimitlessTournamentDto, isArray: true })
   listTournaments() {
     return this.facade.listLimitlessTournaments();
   }
 
   @Get('limitless/usage/combined')
   @ApiOperation({ summary: 'Get combined usage data across all completed tournaments in a regulation' })
-  @ApiResponse({ status: 200, description: 'Combined usage list returned.' })
+  @ApiResponse({ status: 200, description: 'Combined usage list returned.', type: PokemonUsageDetailDto, isArray: true })
   getLimitlessCombinedUsage(@Query('regulationId') regulationId: string) {
     return this.facade.getLimitlessCombinedUsage(regulationId);
   }
 
   @Get('limitless/usage/combined/list')
   @ApiOperation({ summary: 'Get lean combined Limitless usage list for a regulation' })
-  @ApiResponse({ status: 200, description: 'Lean combined usage list returned.' })
+  @ApiResponse({ status: 200, description: 'Lean combined usage list returned.', type: PokemonUsageEntryDto, isArray: true })
   getLimitlessCombinedUsageList(@Query('regulationId') regulationId: string) {
     return this.facade.getLimitlessCombinedUsageList(regulationId);
   }
 
   @Get('limitless/usage')
   @ApiOperation({ summary: 'Get usage data for a Limitless tournament' })
-  @ApiResponse({ status: 200, description: 'Usage list returned.' })
+  @ApiResponse({ status: 200, description: 'Usage list returned.', type: PokemonUsageDetailDto, isArray: true })
   getLimitlessUsage(@Query() dto: QueryLimitlessDto) {
     return this.facade.getLimitlessUsage(dto.tournamentId);
   }
 
   @Get('limitless/usage/list')
   @ApiOperation({ summary: 'Get lean Limitless usage list for a tournament' })
-  @ApiResponse({ status: 200, description: 'Lean usage list returned.' })
+  @ApiResponse({ status: 200, description: 'Lean usage list returned.', type: PokemonUsageEntryDto, isArray: true })
   getLimitlessUsageList(@Query() dto: QueryLimitlessDto) {
     return this.facade.getLimitlessUsageList(dto.tournamentId);
   }
@@ -202,7 +216,7 @@ export class VgcMetaController {
   @Get('limitless/tournament/:id/status')
   @ApiOperation({ summary: 'Get import job status for a tournament' })
   @ApiParam({ name: 'id', example: '1' })
-  @ApiResponse({ status: 200, description: 'Job status returned.' })
+  @ApiResponse({ status: 200, description: 'Job status returned.', type: ImportJobStatusDto })
   getLimitlessTournamentStatus(@Param('id') id: string) {
     return this.facade.getLimitlessTournamentStatus(+id);
   }
@@ -211,7 +225,7 @@ export class VgcMetaController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.BOFF_ADMIN)
   @ApiOperation({ summary: '[Admin] Import a Limitless tournament by URL' })
-  @ApiResponse({ status: 201, description: 'Tournament import started.' })
+  @ApiResponse({ status: 201, description: 'Tournament import started.', type: TournamentImportStartDto })
   importTournament(@Body() dto: AddLimitlessTournamentDto, @Req() req: any) {
     this.logAdminAction('limitless/tournament-import', req, {
       regulationId: dto.regulationId,
@@ -224,7 +238,7 @@ export class VgcMetaController {
   @Get('limitless/:tournamentId/players')
   @ApiOperation({ summary: 'Get player list for a Limitless tournament' })
   @ApiParam({ name: 'tournamentId', example: '1' })
-  @ApiResponse({ status: 200, description: 'Player list returned.' })
+  @ApiResponse({ status: 200, description: 'Player list returned.', type: LimitlessPlayerDto, isArray: true })
   getLimitlessPlayers(@Param('tournamentId') tournamentId: string) {
     return this.facade.getLimitlessPlayers(+tournamentId);
   }
@@ -233,7 +247,7 @@ export class VgcMetaController {
   @ApiOperation({ summary: 'Get a player\'s team for a Limitless tournament' })
   @ApiParam({ name: 'tournamentId', example: '1' })
   @ApiParam({ name: 'slug', example: 'johndoe' })
-  @ApiResponse({ status: 200, description: 'Player team returned.' })
+  @ApiResponse({ status: 200, description: 'Player team returned.', type: LimitlessPlayerTeamDto })
   getLimitlessPlayerTeam(
     @Param('tournamentId') tournamentId: string,
     @Param('slug') slug: string,
@@ -245,7 +259,7 @@ export class VgcMetaController {
 
   @Get('regulations')
   @ApiOperation({ summary: 'List all active Champions regulations' })
-  @ApiResponse({ status: 200, description: 'Regulation list returned.' })
+  @ApiResponse({ status: 200, description: 'Regulation list returned.', type: ChampionsRegulationDto, isArray: true })
   getRegulations() {
     return this.facade.getRegulations();
   }
@@ -254,7 +268,7 @@ export class VgcMetaController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.BOFF_ADMIN)
   @ApiOperation({ summary: '[Admin] Create or update a Champions regulation' })
-  @ApiResponse({ status: 201, description: 'Regulation upserted.' })
+  @ApiResponse({ status: 201, description: 'Regulation upserted.', type: ChampionsRegulationDto })
   upsertRegulation(@Body() dto: UpsertRegulationDto, @Req() req: any) {
     this.logAdminAction('regulations/upsert', req, {
       id: dto.id,
@@ -270,7 +284,7 @@ export class VgcMetaController {
 
   @Get('teams')
   @ApiOperation({ summary: 'Get teams featuring a Pokémon in a regulation (max 30, rank ascending)' })
-  @ApiResponse({ status: 200, description: 'Team list returned.' })
+  @ApiResponse({ status: 200, description: 'Team list returned.', type: SpeciesTeamEntryDto, isArray: true })
   getSpeciesTeams(
     @Query('speciesId')    speciesId:    string,
     @Query('regulationId') regulationId: string,
@@ -282,7 +296,7 @@ export class VgcMetaController {
 
   @Get('jobs')
   @ApiOperation({ summary: 'List unified ingestion jobs across Smogon, Champions, and Limitless' })
-  @ApiResponse({ status: 200, description: 'Unified ingestion jobs returned.' })
+  @ApiResponse({ status: 200, description: 'Unified ingestion jobs returned.', type: VgcIngestionJobDto, isArray: true })
   getIngestionJobs(@Query('regulationId') regulationId?: string) {
     return this.facade.getIngestionJobs(regulationId);
   }
@@ -290,7 +304,7 @@ export class VgcMetaController {
   @Get('compare/personal')
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Compare personal tracker opponent usage vs selected meta source' })
-  @ApiResponse({ status: 200, description: 'Personal-vs-meta comparison returned.' })
+  @ApiResponse({ status: 200, description: 'Personal-vs-meta comparison returned.', type: PersonalMetaComparisonDto })
   getPersonalVsMeta(
     @Req() req: any,
     @Query() dto: QueryPersonalMetaDto,
@@ -302,7 +316,7 @@ export class VgcMetaController {
 
   @Get('divergence')
   @ApiOperation({ summary: 'Compare Smogon ladder usage vs Limitless tournament usage for a regulation' })
-  @ApiResponse({ status: 200, description: 'Divergence rows returned, sorted by |delta| descending.' })
+  @ApiResponse({ status: 200, description: 'Divergence rows returned, sorted by |delta| descending.', type: DivergenceResultDto })
   getDivergence(@Query() dto: QueryDivergenceDto) {
     return this.facade.getDivergence(dto);
   }

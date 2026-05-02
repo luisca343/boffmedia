@@ -1,11 +1,12 @@
 import {
   Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards, UseInterceptors,
 } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { TrackerService } from './tracker.service';
 import { CreateMatchDto, CreatePresetDto, CreateSessionDto, UpsertSeriesDto } from './dto';
+import { MatchDto, SeriesDto, SessionDto, TeamPresetDto, TrackerSyncDataDto } from './response.dto';
 
 @ApiTags('BoffMedia 🛠 | Pokémon VGC Tracker')
 @Controller('tools/vgc/tracker')
@@ -18,6 +19,7 @@ export class TrackerController {
 
   @Get('sync')
   @ApiOperation({ summary: 'Pull all tracker data for a user (sessions, matches, series, presets)' })
+  @ApiResponse({ status: 200, description: 'Full tracker payload returned.', type: TrackerSyncDataDto })
   syncAll(@Req() req: any) {
     return this.service.syncAll(req.user.userId);
   }
@@ -26,6 +28,7 @@ export class TrackerController {
 
   @Get('presets')
   @ApiOperation({ summary: 'List team presets' })
+  @ApiResponse({ status: 200, description: 'Presets returned.', type: TeamPresetDto, isArray: true })
   getPresets(@Req() req: any) {
     return this.service.getPresets(req.user.userId);
   }
@@ -47,6 +50,7 @@ export class TrackerController {
 
   @Get('sessions')
   @ApiOperation({ summary: 'List tracking sessions' })
+  @ApiResponse({ status: 200, description: 'Sessions returned.', type: SessionDto, isArray: true })
   getSessions(@Req() req: any) {
     return this.service.getSessions(req.user.userId);
   }
@@ -67,6 +71,7 @@ export class TrackerController {
 
   @Get('sessions/:sessionId/matches')
   @ApiOperation({ summary: 'List matches for a session' })
+  @ApiResponse({ status: 200, description: 'Matches returned.', type: MatchDto, isArray: true })
   getMatches(@Param('sessionId') sessionId: string, @Req() req: any) {
     return this.service.getMatchesForSession(req.user.userId, sessionId);
   }
@@ -93,6 +98,7 @@ export class TrackerController {
 
   @Get('sessions/:sessionId/series')
   @ApiOperation({ summary: 'List series for a session' })
+  @ApiResponse({ status: 200, description: 'Series returned.', type: SeriesDto, isArray: true })
   getSeries(@Param('sessionId') sessionId: string, @Req() req: any) {
     return this.service.getSeriesForSession(req.user.userId, sessionId);
   }
