@@ -138,9 +138,18 @@ export function useMetaNavigation({
       router.replace(buildUrl({ speciesId, tab, format: previewRegulation.id, month: "", cutoff: DEFAULT_CUTOFF, regulation, tournamentId, view }));
     } else if (snapshots.length > 0) {
       const first = snapshots[0];
-      router.replace(buildUrl({ speciesId, tab, format: first.formatId, month: first.month, cutoff: first.cutoff, regulation, tournamentId, view }));
+      router.replace(buildUrl({
+        speciesId,
+        tab,
+        format: first.formatId,
+        month: searchParams.get("month") ?? first.month,
+        cutoff: searchParams.get("cutoff") ? cutoff : first.cutoff,
+        regulation,
+        tournamentId,
+        view,
+      }));
     }
-  }, [snapshots, regulations]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [snapshots, regulations, tab, searchParams, speciesId, cutoff, regulation, tournamentId, view, router]);
 
   // Auto-navigate to first regulation when Tournament tab has no regulation set
   useEffect(() => {
@@ -163,7 +172,7 @@ export function useMetaNavigation({
     if (!speciesId && entries.length > 0 && view === "aggregate") {
       router.replace(buildUrl({ speciesId: entries[0].speciesId, tab, format, month, cutoff, regulation, tournamentId, view }));
     }
-  }, [entries]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [entries, speciesId, view, router, tab, format, month, cutoff, regulation, tournamentId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const detail = useMemo(
     () => (speciesId ? (entriesMap.get(speciesId) ?? null) : null),

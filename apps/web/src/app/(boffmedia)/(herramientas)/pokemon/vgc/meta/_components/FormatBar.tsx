@@ -57,6 +57,21 @@ export function FormatBar({
 }: FormatBarProps) {
   const t = useTranslations("vgc.meta");
 
+  const pickLatestSnapshot = (targetFormat: string, preferredCutoff?: number) => {
+    const formatSnapshots = snapshots.filter((snapshot) => snapshot.formatId === targetFormat);
+    if (formatSnapshots.length === 0) return null;
+
+    const preferredSnapshots = preferredCutoff === undefined
+      ? []
+      : formatSnapshots.filter((snapshot) => snapshot.cutoff === preferredCutoff);
+
+    const pool = preferredSnapshots.length > 0 ? preferredSnapshots : formatSnapshots;
+
+    return [...pool].sort((left, right) => {
+      return right.month.localeCompare(left.month) || right.cutoff - left.cutoff;
+    })[0];
+  };
+
   const sortedRegulations = useMemo(
     () => [...regulations].sort((a, b) => b.id.localeCompare(a.id)),
     [regulations],
@@ -96,10 +111,39 @@ export function FormatBar({
     [snapshots, format],
   );
 
+  // Only show cutoffs that actually exist for the selected format (regulation-wide)
+  const availableCutoffs = useMemo(() => {
+    const existing = new Set(
+      snapshots
+        .filter(s => s.formatId === format)
+        .map(s => s.cutoff),
+    );
+    return VALID_CUTOFFS.filter(c => existing.has(c));
+  }, [snapshots, format]);
+
+  const cutoffValue = useMemo(() => {
+    if (availableCutoffs.includes(cutoff as (typeof VALID_CUTOFFS)[number])) {
+      return String(cutoff);
+    }
+    return String(availableCutoffs[0] ?? DEFAULT_CUTOFF);
+  }, [availableCutoffs, cutoff]);
+
   const handleFormatSelect = (value: string) => {
-    const snap = snapshots.find(s => s.formatId === value);
-    if (snap) onFormatChange(snap.formatId, snap.month, snap.cutoff);
-    else      onFormatChange(value, "", DEFAULT_CUTOFF);
+    if (value === format) return;
+
+    const previewRegulation = previewRegulations.find((regulationOption) => regulationOption.id === value);
+    if (previewRegulation) {
+      onFormatChange(value, "", DEFAULT_CUTOFF);
+      return;
+    }
+
+    const snapshot = pickLatestSnapshot(value, cutoff);
+    if (snapshot) {
+      onFormatChange(snapshot.formatId, snapshot.month, snapshot.cutoff);
+      return;
+    }
+
+    onFormatChange(value, "", DEFAULT_CUTOFF);
   };
 
   return (
@@ -183,14 +227,14 @@ export function FormatBar({
               </Select>
 
               <Select
-                value={String(cutoff)}
+                value={cutoffValue}
                 onValueChange={(val) => onOptionsApply(month, Number(val))}
               >
                 <SelectTrigger className={`${TRIGGER_CLS} min-w-[6.5rem] sm:min-w-[7.5rem]`}>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {VALID_CUTOFFS.map(c => (
+                  {availableCutoffs.map(c => (
                     <SelectItem key={c} value={String(c)} className="text-xs">
                       {c === 0 ? "All ELO" : `${c}+ ELO`}
                     </SelectItem>
