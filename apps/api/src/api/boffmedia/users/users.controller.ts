@@ -37,6 +37,10 @@ import { SessionUserEntity } from './entities/session-user.entity';
 import { UserStatisticsEntity } from './entities/user-statistics.entity';
 import { IntegratedUserCreationResultEntity } from './entities/user-creation-result';
 import { AuthenticationResultEntity } from './entities/integrations.entity';
+import { UsersPaginatedResponseEntity } from './entities/users-paginated-response.entity';
+import { UserRolesResponseEntity } from './entities/user-roles-response.entity';
+import { UserValidationResponseEntity } from './entities/user-validation-response.entity';
+import { BatchUsersDto } from './dto/batch-users.dto';
 
 // Additional DTOs for specialized endpoints
 export class MinecraftDetails {
@@ -210,6 +214,7 @@ export class BoffMediaUsersController {
   @ApiResponse({ 
     status: 200, 
     description: 'Users retrieved successfully',
+    type: UsersPaginatedResponseEntity
   })
   @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Limit number of results' })
   @ApiQuery({ name: 'offset', required: false, type: Number, description: 'Offset for pagination' })
@@ -381,15 +386,7 @@ export class BoffMediaUsersController {
   @ApiResponse({ 
     status: 200, 
     description: 'User roles retrieved',
-    schema: {
-      type: 'object',
-      properties: {
-        roles: {
-          type: 'array',
-          items: { type: 'string' }
-        }
-      }
-    }
+    type: UserRolesResponseEntity
   })
   @ApiResponse({ status: 404, description: 'User not found' })
   async getUserRoles(@Param('id', ParseIntPipe) id: number) {
@@ -485,20 +482,11 @@ export class BoffMediaUsersController {
   @ApiResponse({ 
     status: 200, 
     description: 'Batch users retrieved successfully',
-    type: [UserWithIntegrationsEntity]
+    type: UserWithIntegrationsEntity,
+    isArray: true
   })
-  @ApiBody({ 
-    schema: { 
-      type: 'object', 
-      properties: { 
-        userIds: { 
-          type: 'array', 
-          items: { type: 'number' } 
-        } 
-      } 
-    } 
-  })
-  async getBatchUsersWithIntegrations(@Body() body: { userIds: number[] }) {
+  @ApiBody({ type: BatchUsersDto })
+  async getBatchUsersWithIntegrations(@Body() body: BatchUsersDto) {
     try {
       const { userIds } = body;
       
@@ -523,7 +511,7 @@ export class BoffMediaUsersController {
   @ApiResponse({ 
     status: 200, 
     description: 'Validation result',
-    type: SuccessResponse
+    type: UserValidationResponseEntity
   })
   async validateUserExists(
     @Param('type') type: 'id' | 'username' | 'email' | 'uuid',
