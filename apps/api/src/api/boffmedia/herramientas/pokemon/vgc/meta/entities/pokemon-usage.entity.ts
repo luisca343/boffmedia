@@ -47,15 +47,16 @@ export interface BatchFetchResult {
 
 /** A single team entry returned by the "teams featuring this Pokémon" endpoint */
 export interface SpeciesTeamEntry {
-  source:     'vgcpastes' | 'limitless' | 'paste';
+  source:      'vgcpastes' | 'limitless' | 'paste';
   /** VGCPastes teamId (e.g. "PC476") or Limitless playerSlug */
-  playerId:   string;
-  playerName: string | null;
+  playerId:    string;
+  playerName:  string | null;
   /** Display string for placement/rank: Limitless "7-2-0" or VGCPastes rank */
-  record:     string | null;
-  rank:       string | null;
-  slots:      import('@/_db/schema/Vgc').VgcMetaSlot[];
-  rawText:    string;
+  record:      string | null;
+  rank:        string | null;
+  slots:       import('@/_db/schema/Vgc').VgcMetaSlot[];
+  rawText:     string;
+  replicaCode: string | null;
 }
 
 /** One player entry from a Limitless tournament (for the players list) */

@@ -403,13 +403,14 @@ export interface SpeciesTeamSlot {
 }
 
 export interface SpeciesTeamEntry {
-  source:     'vgcpastes' | 'limitless';
-  playerId:   string;
-  playerName: string | null;
-  record:     string | null;
-  rank:       string | null;
-  slots:      SpeciesTeamSlot[];
-  rawText:    string;
+  source:      'vgcpastes' | 'limitless' | 'paste';
+  playerId:    string;
+  playerName:  string | null;
+  record:      string | null;
+  rank:        string | null;
+  slots:       SpeciesTeamSlot[];
+  rawText:     string;
+  replicaCode: string | null;
 }
 
 // ─── Divergence types ────────────────────────────────────────────────────────
