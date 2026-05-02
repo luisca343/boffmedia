@@ -40,9 +40,9 @@ export const NotesPanel = forwardRef<NotesPanelHandle, Props>(function NotesPane
   };
 
   return (
-    <div className="flex-1 min-h-0 bg-surface-950 flex flex-col">
+    <div className="flex-1 min-h-0 bg-surface-900 flex flex-col">
       {/* Input row */}
-      <div className="flex items-center gap-2 px-4 py-2 border-b border-surface-800 shrink-0">
+      <div className="flex items-center gap-2 px-4 py-2 border-b border-surface-700 shrink-0">
         <span className="text-xs text-surface-500 font-mono shrink-0 select-none">
           {phase === 'live' ? (
             <span className="flex items-center gap-1">

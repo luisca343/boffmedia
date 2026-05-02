@@ -117,14 +117,14 @@ function SpeedPageContent() {
       </motion.div>
 
       {/* Tab bar */}
-      <div className="flex items-center gap-1 bg-surface-900/50 rounded-lg p-1 w-fit border border-surface-800">
+      <div className="flex items-center gap-1 bg-surface-800/50 rounded-lg p-1 w-fit border border-surface-700">
         {(["tiers", "matchup"] as Tab[]).map((tabKey) => (
           <button
             key={tabKey}
             onClick={() => setTab(tabKey)}
             className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
               tab === tabKey
-                ? "bg-surface-700 text-surface-100"
+                ? "bg-primary-500/20 text-primary-300"
                 : "text-surface-400 hover:text-surface-200"
             }`}
           >

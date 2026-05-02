@@ -22,9 +22,9 @@ const PALETTE = [
 ];
 
 const C = {
-  grid: '#1e293b',
+  grid: '#334155',
   axis: '#64748b',
-  dotStroke: '#03050f',
+  dotStroke: '#1e293b',
 } as const;
 
 interface Props {

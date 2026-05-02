@@ -79,7 +79,7 @@ export function PersonalMetaComparisonTest() {
 
   if (!session?.user) {
     return (
-      <div className="p-4 bg-red-100 text-red-800 rounded">
+      <div className="p-4 bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg text-sm">
         Please log in to test personal vs meta comparison.
       </div>
     );
@@ -88,22 +88,22 @@ export function PersonalMetaComparisonTest() {
   return (
     <div className="space-y-4">
       {/* Controls */}
-      <div className="flex gap-4 items-end">
+      <div className="flex gap-4 items-end flex-wrap">
         <div>
-          <label className="block text-sm font-medium mb-1">Regulation</label>
+          <label className="block text-xs font-medium text-surface-400 uppercase tracking-wide mb-1">Regulation</label>
           <input
             type="text"
             value={regulationId}
             onChange={(e) => setRegulationId(e.target.value)}
-            className="border rounded px-2 py-1"
+            className="bg-surface-800 border border-surface-600 rounded-lg px-3 py-1.5 text-sm text-surface-100 focus:outline-none focus:border-primary-500"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">Source</label>
+          <label className="block text-xs font-medium text-surface-400 uppercase tracking-wide mb-1">Source</label>
           <select
             value={source}
-            onChange={(e) => setSource(e.target.value as any)}
-            className="border rounded px-2 py-1"
+            onChange={(e) => setSource(e.target.value as 'auto' | 'smogon' | 'champions' | 'limitless')}
+            className="bg-surface-800 border border-surface-600 rounded-lg px-3 py-1.5 text-sm text-surface-100 focus:outline-none focus:border-primary-500"
           >
             <option value="auto">Auto (Champions or Smogon)</option>
             <option value="smogon">Smogon</option>
@@ -114,7 +114,7 @@ export function PersonalMetaComparisonTest() {
         <button
           onClick={handleFetch}
           disabled={loading}
-          className="bg-blue-500 text-white px-4 py-1 rounded disabled:opacity-50"
+          className="bg-primary-600 hover:bg-primary-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
         >
           {loading ? 'Loading...' : 'Fetch'}
         </button>
@@ -122,52 +122,52 @@ export function PersonalMetaComparisonTest() {
 
       {/* Error */}
       {error && (
-        <div className="p-3 bg-red-100 text-red-800 rounded">
-          <p className="font-semibold">Error:</p>
-          <p className="text-sm">{error}</p>
+        <div className="p-3 bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg">
+          <p className="font-semibold text-sm">Error:</p>
+          <p className="text-xs mt-0.5">{error}</p>
         </div>
       )}
 
       {/* Results */}
       {data && (
         <div className="space-y-3">
-          <div className="p-3 bg-blue-50 rounded">
-            <p className="text-sm">
-              <strong>Regulation:</strong> {data.regulationId} | <strong>Source:</strong> {data.source} |{' '}
-              <strong>Your Sample:</strong> {data.personalSampleSize} | <strong>Rows:</strong> {data.rowCount}
+          <div className="p-3 bg-primary-500/10 border border-primary-500/30 rounded-lg">
+            <p className="text-sm text-surface-300">
+              <strong className="text-surface-100">Regulation:</strong> {data.regulationId} | <strong className="text-surface-100">Source:</strong> {data.source} |{' '}
+              <strong className="text-surface-100">Your Sample:</strong> {data.personalSampleSize} | <strong className="text-surface-100">Rows:</strong> {data.rowCount}
             </p>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm border-collapse">
+          <div className="overflow-x-auto rounded-lg border border-surface-700">
+            <table className="w-full text-xs border-collapse">
               <thead>
-                <tr className="bg-gray-200">
-                  <th className="border px-2 py-1 text-left">Pokémon</th>
-                  <th className="border px-2 py-1 text-right">Your %</th>
-                  <th className="border px-2 py-1 text-right">Meta %</th>
-                  <th className="border px-2 py-1 text-right">Delta %</th>
-                  <th className="border px-2 py-1 text-right">|Delta|</th>
-                  <th className="border px-2 py-1 text-right">Your Count</th>
-                  <th className="border px-2 py-1 text-right">Meta Count</th>
+                <tr className="border-b border-surface-700 bg-surface-800/60">
+                  <th className="px-3 py-2 text-left text-surface-400 font-medium">Pokémon</th>
+                  <th className="px-3 py-2 text-right text-surface-400 font-medium">Your %</th>
+                  <th className="px-3 py-2 text-right text-surface-400 font-medium">Meta %</th>
+                  <th className="px-3 py-2 text-right text-surface-400 font-medium">Delta %</th>
+                  <th className="px-3 py-2 text-right text-surface-400 font-medium">|Delta|</th>
+                  <th className="px-3 py-2 text-right text-surface-400 font-medium">Your Count</th>
+                  <th className="px-3 py-2 text-right text-surface-400 font-medium">Meta Count</th>
                 </tr>
               </thead>
               <tbody>
                 {(data.rows || []).slice(0, 20).map((row) => (
-                  <tr key={row.speciesId} className="hover:bg-gray-50">
-                    <td className="border px-2 py-1">{row.speciesName}</td>
-                    <td className="border px-2 py-1 text-right">{row.personalUsagePercent.toFixed(2)}%</td>
-                    <td className="border px-2 py-1 text-right">{row.metaUsagePercent.toFixed(2)}%</td>
-                    <td className="border px-2 py-1 text-right">{row.deltaPercent.toFixed(2)}%</td>
-                    <td className="border px-2 py-1 text-right">{row.absDeltaPercent.toFixed(2)}%</td>
-                    <td className="border px-2 py-1 text-right">{row.personalRawCount}</td>
-                    <td className="border px-2 py-1 text-right">{row.metaRawCount}</td>
+                  <tr key={row.speciesId} className="border-b border-surface-700/50 hover:bg-surface-700/30 transition-colors">
+                    <td className="px-3 py-1.5 text-surface-200">{row.speciesName}</td>
+                    <td className="px-3 py-1.5 text-right text-surface-300 font-mono">{row.personalUsagePercent.toFixed(2)}%</td>
+                    <td className="px-3 py-1.5 text-right text-surface-300 font-mono">{row.metaUsagePercent.toFixed(2)}%</td>
+                    <td className="px-3 py-1.5 text-right font-mono">{row.deltaPercent.toFixed(2)}%</td>
+                    <td className="px-3 py-1.5 text-right text-surface-300 font-mono">{row.absDeltaPercent.toFixed(2)}%</td>
+                    <td className="px-3 py-1.5 text-right text-surface-300 font-mono">{row.personalRawCount}</td>
+                    <td className="px-3 py-1.5 text-right text-surface-300 font-mono">{row.metaRawCount}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
 
-          {(data.rows?.length || 0) > 20 && <p className="text-xs text-gray-500">Showing first 20 of {data.rowCount} rows</p>}
+          {(data.rows?.length || 0) > 20 && <p className="text-xs text-surface-500">Showing first 20 of {data.rowCount} rows</p>}
         </div>
       )}
     </div>

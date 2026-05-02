@@ -5,6 +5,8 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import { spriteUrl, handleSpriteError } from "@/features/vgc-tracker/types";
 import { PokemonUsageDetail } from "@/services/api/boffmedia/vgcService";
 import { TypeBadgeSmall } from "@/components/shared/pokemon/TypeBadge";
+import { Card, CardContent } from "@/components/ui/primitives/card";
+import { ToolSectionHeader } from "@/components/boffmedia/tools/ToolSectionHeader";
 import { BaseStatsPanel } from "./BaseStatsPanel";
 import { StatPanel } from "./StatPanel";
 import { TeammatesPanel } from "./TeammatesPanel";
@@ -152,7 +154,7 @@ export function PokemonDetailView({ detail, loading, speciesId, regulationId, on
   return (
     <div className="flex flex-col">
       {/* Header */}
-      <div className="sticky top-0 z-10 flex items-center gap-3 px-4 py-3 border-b border-surface-800 bg-surface-950/95 backdrop-blur-sm shrink-0">
+      <div className="sticky top-0 z-10 flex items-center gap-3 px-4 py-3 border-b border-surface-700 bg-surface-900/95 backdrop-blur-sm shrink-0">
         <button
           onClick={onBack}
           className="md:hidden flex items-center gap-1 text-surface-400 hover:text-surface-200 text-sm transition-colors mr-1"
@@ -183,7 +185,7 @@ export function PokemonDetailView({ detail, loading, speciesId, regulationId, on
             </div>
           )}
           <p className="text-sm text-surface-400">
-            {t("detail.usagePercent", { percent: detail.usagePercent.toFixed(1) })}
+            {t("detail.usagePercent", { percent: detail.usagePercent.toFixed(2) })}
             <span className="mx-1.5 text-surface-700">·</span>
             {t("detail.battles", { count: detail.rawCount })}
           </p>
@@ -224,21 +226,21 @@ export function PokemonDetailView({ detail, loading, speciesId, regulationId, on
 
         {/* EV Spreads */}
         {detail.spreads.length > 0 && (
-          <div className="rounded-xl border border-surface-800 bg-surface-950 p-4">
-            <h3 className="text-[11px] font-semibold uppercase tracking-wider text-surface-300 mb-3">
-              {t("detail.spreads")}
-            </h3>
-            <div className="space-y-2">
-              {detail.spreads.slice(0, 5).map((s, i) => (
-                <div key={i} className="flex items-start gap-2 py-0.5">
-                  <SpreadRow nature={s.nature} spread={s.spread} />
-                  <span className="text-xs text-surface-200 tabular-nums font-mono shrink-0 w-12 text-right pt-0.5">
-                    {s.percent.toFixed(1)}%
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
+          <Card className="hover:shadow-sm">
+            <CardContent className="p-4">
+              <ToolSectionHeader label={t("detail.spreads")} color="neutral" compact />
+              <div className="space-y-2">
+                {detail.spreads.slice(0, 5).map((s, i) => (
+                  <div key={i} className="flex items-start gap-2 py-0.5">
+                    <SpreadRow nature={s.nature} spread={s.spread} />
+                    <span className="text-xs text-surface-200 tabular-nums font-mono shrink-0 w-14 text-right pt-0.5">
+                      {s.percent.toFixed(2)}%
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         )}
       </div>
 

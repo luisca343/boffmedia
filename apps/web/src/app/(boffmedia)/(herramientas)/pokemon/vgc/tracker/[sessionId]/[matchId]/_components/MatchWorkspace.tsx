@@ -158,7 +158,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)] text-surface-50 overflow-hidden">
       {/* ── Top bar ──────────────────────────────────────────────────────── */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-surface-800 shrink-0 bg-surface-900">
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-surface-700 shrink-0 bg-surface-900">
         <button
           onClick={handleBack}
           className="text-surface-400 hover:text-surface-50 transition-colors"
@@ -288,7 +288,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
       {/* ── Main: My Team | Notes | Opponent ─────────────────────────── */}
       <div className="flex flex-1 min-h-0">
         {/* My Team column */}
-        <div className="w-[400px] shrink-0 overflow-y-auto border-r border-surface-800 px-5 py-4">
+        <div className="w-[400px] shrink-0 overflow-y-auto border-r border-surface-700 px-5 py-4">
           <TeamPanel
             label={t('labels.myTeam')}
             slots={match.myTeam.slots}
@@ -307,7 +307,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
         />
 
         {/* Opponent column */}
-        <div className="w-[400px] shrink-0 overflow-y-auto border-l border-surface-800 px-5 py-4 flex flex-col gap-4">
+        <div className="w-[400px] shrink-0 overflow-y-auto border-l border-surface-700 px-5 py-4 flex flex-col gap-4">
           <TeamPanel
             label={t('labels.opponent')}
             slots={match.opponentTeam.slots}
@@ -334,7 +334,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
                         : tag === 'misplay' ? 'bg-red-500/20 border-red-500/40 text-red-300'
                         : tag === 'luck' ? 'bg-yellow-500/20 border-yellow-500/40 text-yellow-300'
                         : 'bg-surface-500/20 border-surface-500/40 text-surface-300'
-                      : 'border-surface-800 text-surface-500 hover:text-surface-300 hover:border-surface-700',
+                      : 'border-surface-700 text-surface-500 hover:text-surface-300 hover:border-surface-600',
                   ].join(' ')}
                 >
                   {t(`outcomeTag.${tag}`)}

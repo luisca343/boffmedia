@@ -82,13 +82,13 @@ export function NewSessionDialog({ presets, onConfirm, onClose }: Props) {
 
         <form onSubmit={handleSubmit} className="p-4 flex flex-col gap-4">
           {/* Type toggle */}
-          <div className="flex rounded-lg border border-surface-700 bg-surface-950 p-0.5 gap-0.5">
+          <div className="flex rounded-lg border border-surface-700 bg-surface-900 p-0.5 gap-0.5">
             <button
               type="button"
               onClick={() => setSessionType('ladder')}
               className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 text-sm font-medium rounded-md transition-colors ${
                 sessionType === 'ladder'
-                  ? 'bg-surface-800 text-surface-50'
+                  ? 'bg-primary-500/20 text-primary-300'
                   : 'text-surface-500 hover:text-surface-300'
               }`}
             >

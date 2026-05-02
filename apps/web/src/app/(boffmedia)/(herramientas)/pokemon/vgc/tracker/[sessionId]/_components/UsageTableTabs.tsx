@@ -13,7 +13,7 @@ interface Props<T extends string> {
 
 export function UsageTableTabs<T extends string>({ tabs, active, onChange }: Props<T>) {
   return (
-    <div className="flex border-b border-surface-800">
+    <div className="flex border-b border-surface-700">
       {tabs.map((tab) => (
         <button
           key={tab.key}

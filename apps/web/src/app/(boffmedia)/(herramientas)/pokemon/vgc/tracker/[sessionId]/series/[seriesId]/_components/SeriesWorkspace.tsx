@@ -211,7 +211,7 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
   return (
     <div className="flex flex-col h-screen text-surface-50 overflow-hidden">
       {/* ── Top bar ──────────────────────────────────────────────────────── */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-surface-800 shrink-0 bg-surface-900">
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-surface-700 shrink-0 bg-surface-900">
         <button onClick={handleBack} className="text-surface-400 hover:text-surface-50 transition-colors">
           <ArrowLeft size={18} />
         </button>
@@ -275,7 +275,7 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
       </div>
 
       {/* ── Game tabs ────────────────────────────────────────────────────── */}
-      <div className="flex items-center gap-1 px-4 py-2 border-b border-surface-800 bg-surface-950 shrink-0">
+      <div className="flex items-center gap-1 px-4 py-2 border-b border-surface-700 bg-surface-900 shrink-0">
         {([1, 2, 3] as const).map((n) => {
           const game = series.games.find((g) => g.gameNumber === n);
           const unlocked = !!game;
@@ -323,7 +323,7 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
       {currentGame ? (
         <div className="flex-1 flex gap-0 min-h-0 overflow-hidden">
           {/* Left: My team */}
-          <div className="flex flex-col w-[360px] shrink-0 border-r border-surface-800 overflow-y-auto p-4 gap-4">
+          <div className="flex flex-col w-[360px] shrink-0 border-r border-surface-700 overflow-y-auto p-4 gap-4">
             <TeamPanel
               label={t('labels.myTeam')}
               slots={currentGame.mySlots}
@@ -349,7 +349,7 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
           </div>
 
           {/* Right: Opponent */}
-          <div className="flex flex-col w-[360px] shrink-0 border-l border-surface-800 overflow-visible p-4 gap-4">
+          <div className="flex flex-col w-[360px] shrink-0 border-l border-surface-700 overflow-visible p-4 gap-4">
             <TeamPanel
               label={t('labels.opponent')}
               slots={currentGame.opponentSlots}
@@ -404,7 +404,7 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
                           : tag === 'misplay' ? 'bg-red-500/20 border-red-500/40 text-red-300'
                           : tag === 'luck' ? 'bg-yellow-500/20 border-yellow-500/40 text-yellow-300'
                           : 'bg-surface-500/20 border-surface-500/40 text-surface-300'
-                        : 'border-surface-800 text-surface-600 hover:text-surface-400 hover:border-surface-700',
+                        : 'border-surface-700 text-surface-600 hover:text-surface-400 hover:border-surface-600',
                     ].join(' ')}
                   >
                     {t(`outcomeTag.${tag}`)}
@@ -459,7 +459,7 @@ function PreviousGameRecap({
   if (!prior.length) return null;
 
   return (
-    <div className="flex flex-col gap-2 pt-2 border-t border-surface-800">
+    <div className="flex flex-col gap-2 pt-2 border-t border-surface-700">
       <span className="text-[10px] text-surface-600 uppercase tracking-wide font-medium">{t('workspace.previousGames')}</span>
       {prior.map((g) => {
         const slots = side === 'my' ? g.mySlots : g.opponentSlots;

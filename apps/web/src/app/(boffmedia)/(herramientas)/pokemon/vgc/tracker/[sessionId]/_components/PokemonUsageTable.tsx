@@ -54,7 +54,7 @@ export function PokemonUsageTable({ items, showDiscards, tournamentUsageMap }: P
     <div className="overflow-x-auto">
       <table className="w-full text-xs">
         <thead>
-          <tr className="border-b border-surface-800">
+          <tr className="border-b border-surface-700">
             {/* Pokémon name */}
             <th className="text-left py-2.5 px-3 text-surface-500 font-medium">
               {t('table.pokemon')}
@@ -135,7 +135,7 @@ export function PokemonUsageTable({ items, showDiscards, tournamentUsageMap }: P
             return (
               <tr
                 key={p.speciesId}
-                className="border-b border-surface-800/40 hover:bg-surface-900/40 transition-colors"
+                className="border-b border-surface-700/40 hover:bg-surface-700/30 transition-colors"
               >
                 {/* Pokémon sprite + name */}
                 <td className="py-2 px-3">
