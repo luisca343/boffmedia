@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { Archive, Copy, Database, Layers, Plus, Swords, TrendingUp, Trophy } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useSessions, usePresets } from '@/features/vgc-tracker/hooks/useVgcDb';
+import { Card } from '@/components/ui/primitives/card';
 import { NewSessionDialog } from './_components/NewSessionDialog';
 import { PresetManager } from './_components/PresetManager';
 import { DuplicateSessionDialog } from './_components/DuplicateSessionDialog';
@@ -98,11 +99,11 @@ export default function TrackerPage() {
           <div className="w-5 h-5 border-2 border-primary-400 border-t-transparent rounded-full animate-spin" />
         </div>
       ) : activeSessions.length === 0 && !showingArchived ? (
-        <div className="rounded-xl border border-surface-800 bg-surface-950 p-12 text-center">
-          <Swords size={36} className="mx-auto text-surface-700 mb-3" />
+        <Card className="p-12 text-center">
+          <Swords size={36} className="mx-auto text-surface-600 mb-3" />
           <p className="text-surface-400 text-sm font-medium mb-1">{t('empty.noSessions')}</p>
           <p className="text-surface-600 text-xs">{t('empty.noSessionsHint')}</p>
-        </div>
+        </Card>
       ) : (
         <div className="flex flex-col gap-2">
           {activeSessions.map((s) => (
@@ -188,12 +189,12 @@ function SessionCard({
   return (
     <Link
       href={`/pokemon/vgc/tracker/${session.id}`}
-      className={`group flex items-start justify-between gap-3 rounded-xl border bg-surface-950 px-4 py-3 transition-all ${
+      className={`group flex items-start justify-between gap-3 rounded-xl border bg-surface-800 px-4 py-3 transition-all ${
         archived
-          ? 'border-surface-800 opacity-60 hover:opacity-80'
+          ? 'border-surface-700 opacity-60 hover:opacity-80'
           : isTournament
           ? 'border-amber-500/30 hover:border-amber-400/50'
-          : 'border-surface-800 hover:border-primary-500/40'
+          : 'border-surface-700 hover:border-primary-500/40'
       }`}
     >
       <div className="flex items-start gap-3 flex-1 min-w-0">

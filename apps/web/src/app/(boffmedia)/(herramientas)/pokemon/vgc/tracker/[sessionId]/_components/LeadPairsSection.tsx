@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { Card } from '@/components/ui/primitives/card';
 import { spriteUrl, handleSpriteError } from '@/features/vgc-tracker/types';
 import type { LeadPairStats } from '@/features/vgc-tracker/utils/sessionStats';
 
@@ -23,9 +24,9 @@ export function LeadPairsSection({ myPairs, opponentPairs }: Props) {
   if (myPairs.length === 0 && opponentPairs.length === 0) return null;
 
   return (
-    <div className="rounded-xl border border-surface-800 bg-surface-950 overflow-hidden">
+    <Card className="overflow-hidden">
       {/* Header row */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-surface-800">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-surface-700">
         <span className="text-sm font-semibold text-surface-300">{t('leadPairs.title')}</span>
         <div className="flex items-center gap-2">
           <button
@@ -42,7 +43,7 @@ export function LeadPairsSection({ myPairs, opponentPairs }: Props) {
       </div>
 
       {/* Side tabs */}
-      <div className="flex border-b border-surface-800">
+      <div className="flex border-b border-surface-700">
         <button
           onClick={() => setSide('my')}
           className={`flex-1 py-2 text-xs font-medium transition-colors ${
@@ -74,7 +75,7 @@ export function LeadPairsSection({ myPairs, opponentPairs }: Props) {
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
             <thead>
-              <tr className="border-b border-surface-800">
+              <tr className="border-b border-surface-700">
                 <th className="text-left py-2.5 px-3 text-surface-500 font-medium">{t('leadPairs.pair')}</th>
                 <th className="py-2.5 px-2 text-right text-surface-500 font-medium">{t('table.record')}</th>
                 <th className="py-2.5 px-3 text-right text-surface-500 font-medium">{t('table.winRate')}</th>
@@ -86,7 +87,7 @@ export function LeadPairsSection({ myPairs, opponentPairs }: Props) {
                 const wrColor =
                   wr === null ? 'text-surface-500' : wr >= 0.6 ? 'text-green-400' : wr >= 0.4 ? 'text-yellow-400' : 'text-red-400';
                 return (
-                  <tr key={p.key} className="border-b border-surface-800/40 hover:bg-surface-900/40 transition-colors">
+                  <tr key={p.key} className="border-b border-surface-700/40 hover:bg-surface-700/30 transition-colors">
                     <td className="py-2 px-3">
                       <div className="flex items-center gap-2">
                         <div className="flex -space-x-2 shrink-0">
@@ -114,6 +115,6 @@ export function LeadPairsSection({ myPairs, opponentPairs }: Props) {
           </table>
         </div>
       )}
-    </div>
+    </Card>
   );
 }

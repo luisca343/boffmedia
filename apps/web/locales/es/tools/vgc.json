@@ -462,6 +462,7 @@
         "error": "Error al cargar la meta. Comprueba que la API esté activa."
       },
       "detail": {
+        "baseStats": "Estadísticas Base",
         "abilities": "Habilidades",
         "items": "Objetos",
         "moves": "Movimientos",

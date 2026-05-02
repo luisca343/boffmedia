@@ -120,7 +120,7 @@ export function MetaLayoutClient() {
   }, [baseDetail, pasteDetail, isPreviewFormat]);
 
   return (
-    <div className="flex flex-col bg-surface-950 h-[calc(100vh-4rem)] overflow-hidden">
+    <div className="flex flex-col bg-surface-900 h-[calc(100vh-4rem)] overflow-hidden">
       <FormatBar
         tab={tab}
         format={format}
@@ -149,16 +149,16 @@ export function MetaLayoutClient() {
 
       {/* Aggregate / Players / Divergence sub-tab strip — tournament tab only */}
       {tab === "tournament" && (
-        <div className="shrink-0 flex items-center gap-1 px-3 py-1.5 border-b border-surface-800 bg-surface-950">
+        <div className="shrink-0 flex items-center gap-1 px-3 py-1.5 border-b border-surface-700 bg-surface-900">
           {(["aggregate", "players", "divergence"] as const).map((v) => (
             <button
               key={v}
               onClick={() => handleViewChange(v)}
               className={cn(
-                "px-3 py-1 rounded text-xs font-medium transition-colors",
+                "px-3 py-1 rounded-md text-xs font-medium transition-all whitespace-nowrap",
                 view === v
-                  ? "bg-surface-700 text-surface-100"
-                  : "text-surface-400 hover:text-surface-200 hover:bg-surface-800/60",
+                  ? "bg-primary-500/20 text-primary-300"
+                  : "text-surface-400 hover:text-surface-200",
               )}
             >
               {t(`tabs.${v}`)}

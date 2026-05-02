@@ -195,9 +195,9 @@ export function SpeedMatchupTab({
         initial={{ opacity: 0, x: -12 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.1, duration: 0.3 }}
-        className="rounded-xl border border-surface-800 bg-surface-950 overflow-hidden"
+        className="rounded-xl border border-surface-700 bg-surface-800 shadow-lg overflow-hidden"
       >
-        <div className="px-4 py-3 border-b border-surface-800 bg-surface-900/50">
+        <div className="px-4 py-3 border-b border-surface-700 bg-surface-900/50">
           <h2 className="text-xs font-semibold text-surface-400 uppercase tracking-wider">
             {t("opponentTitle")}
           </h2>
@@ -323,7 +323,7 @@ export function SpeedMatchupTab({
           </div>
 
           {/* Effective speed display */}
-          <div className="rounded-lg bg-surface-900 border border-surface-800 px-4 py-4 text-center">
+          <div className="rounded-lg bg-surface-900/80 border border-surface-700 px-4 py-4 text-center">
             <div className="text-[10px] text-surface-500 uppercase tracking-wider mb-1">
               {t("effectiveSpeed")}
             </div>
@@ -344,9 +344,9 @@ export function SpeedMatchupTab({
         initial={{ opacity: 0, x: 12 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.15, duration: 0.3 }}
-        className="rounded-xl border border-surface-800 bg-surface-950 overflow-hidden"
+        className="rounded-xl border border-surface-700 bg-surface-800 shadow-lg overflow-hidden"
       >
-        <div className="flex items-center justify-between px-4 py-3 border-b border-surface-800 bg-surface-900/50">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-surface-700 bg-surface-900/50">
           <h2 className="text-xs font-semibold text-surface-400 uppercase tracking-wider">
             {t("myTeamTitle")} ({team.length}/6)
           </h2>
@@ -367,7 +367,7 @@ export function SpeedMatchupTab({
           </button>
         </div>
 
-        <div className="divide-y divide-surface-800/60">
+        <div className="divide-y divide-surface-700/60">
           {team.map((member, idx) => {
             const effective = calcEffective(member.speed, member.mods);
             return (
@@ -438,7 +438,7 @@ export function SpeedMatchupTab({
         </div>
 
         {team.length < 6 && (
-          <div className="px-4 py-3 border-t border-surface-800/60">
+          <div className="px-4 py-3 border-t border-surface-700/60">
             <button
               onClick={addMember}
               className="flex items-center gap-1.5 text-xs text-surface-500 hover:text-surface-300 transition-colors"

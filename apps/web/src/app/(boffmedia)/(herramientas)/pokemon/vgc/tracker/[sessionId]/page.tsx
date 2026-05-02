@@ -14,6 +14,7 @@ import type { Match, Series, SeriesGame } from '@/features/vgc-tracker/types';
 import { useTrackerSync } from '@/features/vgc-tracker/context/TrackerSyncContext';
 import { SessionStatsView } from './_components/SessionStatsView';
 import { ExportImportDialog } from '../_components/ExportImportDialog';
+import { Card } from '@/components/ui/primitives/card';
 
 interface Props {
   params: Promise<{ sessionId: string }>;
@@ -243,12 +244,12 @@ export default function SessionPage({ params }: Props) {
       <SessionNotesEditor session={session} onSave={(notes) => session && updateSession(session.id, { sessionNotes: notes })} />
 
       {/* ── Tabs (ladder only) ───────────────────────────────────────────── */}
-      {!isTournament && <div className="flex rounded-lg border border-surface-800 bg-surface-950 p-0.5 gap-0.5">
+      {!isTournament && <div className="flex rounded-lg border border-surface-700 bg-surface-900 p-0.5 gap-0.5">
         <button
           onClick={() => setActiveTab('matches')}
           className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-colors ${
             activeTab === 'matches'
-              ? 'bg-surface-800 text-surface-50'
+              ? 'bg-primary-500/20 text-primary-300'
               : 'text-surface-500 hover:text-surface-300'
           }`}
         >
@@ -258,7 +259,7 @@ export default function SessionPage({ params }: Props) {
           onClick={() => setActiveTab('stats')}
           className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-colors ${
             activeTab === 'stats'
-              ? 'bg-surface-800 text-surface-50'
+              ? 'bg-primary-500/20 text-primary-300'
               : 'text-surface-500 hover:text-surface-300'
           }`}
         >
@@ -273,10 +274,10 @@ export default function SessionPage({ params }: Props) {
             <div className="w-5 h-5 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
           </div>
         ) : seriesList.length === 0 ? (
-          <div className="rounded-xl border border-surface-800 bg-surface-950 p-12 text-center">
-            <Trophy size={36} className="mx-auto text-surface-700 mb-3" />
+          <Card className="p-12 text-center">
+            <Trophy size={36} className="mx-auto text-surface-600 mb-3" />
             <p className="text-surface-400 text-sm">{t('tournament.noSeries')}</p>
-          </div>
+          </Card>
         ) : (
           <TournamentSeriesList
             seriesList={seriesList}
@@ -298,10 +299,10 @@ export default function SessionPage({ params }: Props) {
           <div className="w-5 h-5 border-2 border-primary-400 border-t-transparent rounded-full animate-spin" />
         </div>
       ) : matches.length === 0 ? (
-        <div className="rounded-xl border border-surface-800 bg-surface-950 p-12 text-center">
-          <Swords size={36} className="mx-auto text-surface-700 mb-3" />
+        <Card className="p-12 text-center">
+          <Swords size={36} className="mx-auto text-surface-600 mb-3" />
           <p className="text-surface-400 text-sm">{t('empty.noMatches')}</p>
-        </div>
+        </Card>
       ) : (
         <div className="flex flex-col gap-2">
           {(() => {
@@ -448,8 +449,8 @@ function SessionNotesEditor({
   if (!session) return null;
 
   return (
-    <div className="rounded-xl border border-surface-800 bg-surface-950 overflow-hidden">
-      <div className="px-4 py-2.5 border-b border-surface-800">
+    <Card className="overflow-hidden">
+      <div className="px-4 py-2.5 border-b border-surface-700">
         <span className="text-xs font-semibold text-surface-500 uppercase tracking-wide">
           {t('sessionNotes.label')}
         </span>
@@ -461,13 +462,13 @@ function SessionNotesEditor({
         rows={3}
         className="w-full bg-transparent px-4 py-3 text-sm text-surface-200 placeholder:text-surface-700 focus:outline-none resize-none"
       />
-    </div>
+    </Card>
   );
 }
 
 function StatCard({ value, label, color }: { value: string | number; label: string; color: string }) {
   return (
-    <div className="rounded-xl border border-surface-800 bg-surface-950 p-4 text-center">
+    <div className="rounded-xl border border-surface-700 bg-surface-800 p-4 text-center">
       <div className={`text-2xl font-bold tabular-nums ${color}`}>{value}</div>
       <div className="text-xs text-surface-500 mt-0.5">{label}</div>
     </div>
@@ -536,7 +537,7 @@ function MatchRow({ match, number, sessionId, eloDelta }: { match: Match; number
       tabIndex={0}
       onClick={() => router.push(`/pokemon/vgc/tracker/${sessionId}/${match.id}`)}
       onKeyDown={(e) => e.key === 'Enter' && router.push(`/pokemon/vgc/tracker/${sessionId}/${match.id}`)}
-      className="flex items-center gap-3 rounded-xl border border-surface-800 bg-surface-950 hover:border-primary-500/40 px-3 py-2.5 transition-all cursor-pointer"
+      className="flex items-center gap-3 rounded-xl border border-surface-700 bg-surface-800 hover:border-primary-500/40 px-3 py-2.5 transition-all cursor-pointer"
     >
       {/* Result badge */}
       <div
@@ -625,7 +626,7 @@ function TournamentSeriesList({
           <button
             onClick={() => onRoundFilter(null)}
             className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
-              roundFilter === null ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40' : 'text-surface-500 hover:text-surface-300 border border-surface-800'
+              roundFilter === null ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40' : 'text-surface-500 hover:text-surface-300 border border-surface-700'
             }`}
           >
             {t('tournament.allRounds')}
@@ -635,7 +636,7 @@ function TournamentSeriesList({
               key={r}
               onClick={() => onRoundFilter(r)}
               className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
-                roundFilter === r ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40' : 'text-surface-500 hover:text-surface-300 border border-surface-800'
+                roundFilter === r ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40' : 'text-surface-500 hover:text-surface-300 border border-surface-700'
               }`}
             >
               {t('tournament.round', { n: r })}
@@ -665,7 +666,7 @@ function SeriesRow({ series, number, sessionId }: { series: Series; number: numb
   return (
     <Link
       href={`/pokemon/vgc/tracker/${sessionId}/series/${series.id}`}
-      className="flex items-center gap-3 rounded-xl border border-surface-800 bg-surface-950 hover:border-amber-500/30 px-3 py-2.5 transition-all"
+      className="flex items-center gap-3 rounded-xl border border-surface-700 bg-surface-800 hover:border-amber-500/30 px-3 py-2.5 transition-all"
     >
       {/* Result badge */}
       <div className={`shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold font-mono border ${

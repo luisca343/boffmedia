@@ -6,6 +6,7 @@ import { ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DivergenceBadge, DivergenceResult, DivergenceRow } from "@/services/api/boffmedia/vgcService";
 import { spriteUrl, handleSpriteError } from "@/features/vgc-tracker/types";
+import { Badge } from "@/components/ui/primitives/badge";
 
 type SortKey = "ladder" | "tournament" | "delta";
 type SortDir = "asc" | "desc";
@@ -27,17 +28,17 @@ function BadgeChip({ badge, t }: { badge: DivergenceBadge; t: (k: string) => str
   if (!badge) return null;
   const isLadder = badge === "ladder-trap";
   return (
-    <span
+    <Badge
+      variant="outline"
       className={cn(
-        "inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium border",
         isLadder
-          ? "bg-amber-500/15 text-amber-300 border-amber-500/30"
-          : "bg-blue-500/15 text-blue-300 border-blue-500/30",
+          ? "border-amber-500/30 text-amber-300 bg-amber-500/15"
+          : "border-blue-500/30 text-blue-300 bg-blue-500/15",
       )}
       title={t(isLadder ? "badges.ladderTrapTitle" : "badges.tournamentStapleTitle")}
     >
       {t(isLadder ? "badges.ladderTrap" : "badges.tournamentStaple")}
-    </span>
+    </Badge>
   );
 }
 
@@ -100,7 +101,7 @@ export function DivergenceView({ result, loading, error }: Props) {
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Info strip */}
-      <div className="shrink-0 px-4 py-1.5 border-b border-surface-800 flex items-center gap-2 text-xs text-surface-400">
+      <div className="shrink-0 px-4 py-1.5 border-b border-surface-700 flex items-center gap-2 text-xs text-surface-400">
         <span className="text-surface-500">Smogon</span>
         <span>{result.ladderFormat}</span>
         <span className="text-surface-700">·</span>
@@ -113,8 +114,8 @@ export function DivergenceView({ result, loading, error }: Props) {
       {/* Table */}
       <div className="flex-1 overflow-y-auto">
         <table className="w-full text-sm border-collapse">
-          <thead className="sticky top-0 bg-surface-950 z-10">
-            <tr className="border-b border-surface-800 text-left text-surface-400 text-xs uppercase tracking-wide">
+          <thead className="sticky top-0 bg-surface-900 z-10">
+            <tr className="border-b border-surface-700 text-left text-surface-400 text-xs uppercase tracking-wide">
               <th className="py-2 px-3 w-8 font-medium">#</th>
               <th className="py-2 px-3 font-medium">{t("col.pokemon")}</th>
               <th
@@ -170,7 +171,7 @@ function DivergenceTableRow({
   const positive = row.deltaPercent > 0;
 
   return (
-    <tr className="border-b border-surface-800/50 hover:bg-surface-800/30 transition-colors">
+    <tr className="border-b border-surface-700/50 hover:bg-surface-700/30 transition-colors">
       <td className="py-2 px-3 text-surface-500 font-mono text-xs">{rank}</td>
 
       <td className="py-2 px-3">
@@ -188,18 +189,18 @@ function DivergenceTableRow({
       </td>
 
       <td className="py-2 px-3 text-surface-300 text-xs tabular-nums">
-        {row.ladderPercent.toFixed(1)}%
+        {row.ladderPercent.toFixed(2)}%
       </td>
 
       <td className="py-2 px-3 text-surface-300 text-xs tabular-nums">
-        {row.tournamentPercent.toFixed(1)}%
+        {row.tournamentPercent.toFixed(2)}%
       </td>
 
       <td className={cn(
         "py-2 px-3 text-xs font-semibold tabular-nums",
         positive ? "text-amber-400" : "text-blue-400",
       )}>
-        {positive ? "+" : ""}{row.deltaPercent.toFixed(1)}%
+        {positive ? "+" : ""}{row.deltaPercent.toFixed(2)}%
       </td>
 
       <td className="py-2 px-3">

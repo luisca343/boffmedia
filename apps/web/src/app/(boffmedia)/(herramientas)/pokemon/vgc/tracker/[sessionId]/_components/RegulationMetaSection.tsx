@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { Card } from '@/components/ui/primitives/card';
 import type { RegulationMeta } from '@/features/vgc-tracker/hooks/useRegulationMeta';
 import { PokemonUsageTable } from './PokemonUsageTable';
 import { UsageTableTabs } from './UsageTableTabs';
@@ -25,9 +26,9 @@ export function RegulationMetaSection({ regulationId, meta, loading }: Props) {
   };
 
   return (
-    <div className="rounded-xl border border-surface-800 bg-surface-950 overflow-hidden">
+    <Card className="overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-surface-800">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-surface-700">
         <div>
           <span className="text-sm font-semibold text-surface-300">{t('regulationMeta.title')}</span>
           <span className="ml-2 text-[11px] font-mono bg-surface-800 border border-surface-700 rounded px-1.5 py-px text-surface-400">
@@ -62,6 +63,6 @@ export function RegulationMetaSection({ regulationId, meta, loading }: Props) {
           tournamentUsageMap={meta.tournamentUsageMap}
         />
       )}
-    </div>
+    </Card>
   );
 }

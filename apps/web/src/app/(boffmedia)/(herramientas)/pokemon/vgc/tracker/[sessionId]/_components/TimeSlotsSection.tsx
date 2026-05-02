@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { Moon, Sun, Sunrise, Sunset } from 'lucide-react';
+import { Card } from '@/components/ui/primitives/card';
 import { useTranslations } from 'next-intl';
 import type { TimeSlotStats, TimeSlot } from '@/features/vgc-tracker/utils/sessionStats';
 
@@ -22,11 +23,11 @@ export function TimeSlotsSection({ slots }: Props) {
   if (slots.length === 0) return null;
 
   return (
-    <div className="rounded-xl border border-surface-800 bg-surface-950 overflow-hidden">
-      <div className="px-4 py-3 border-b border-surface-800">
+    <Card className="overflow-hidden">
+      <div className="px-4 py-3 border-b border-surface-700">
         <span className="text-sm font-semibold text-surface-300">{t('timeSlots.title')}</span>
       </div>
-      <div className="divide-y divide-surface-800/50">
+      <div className="divide-y divide-surface-700/50">
         {slots.map((s) => {
           const wr = s.winRate;
           const wrColor =
@@ -52,7 +53,7 @@ export function TimeSlotsSection({ slots }: Props) {
                   </div>
                 </div>
                 {wr !== null && (
-                  <div className="h-1 rounded-full bg-surface-800 overflow-hidden">
+                  <div className="h-1 rounded-full bg-surface-700 overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all ${wr >= 0.6 ? 'bg-green-500' : wr >= 0.4 ? 'bg-yellow-500' : 'bg-red-500'}`}
                       style={{ width: `${barWidth}%` }}
@@ -65,6 +66,6 @@ export function TimeSlotsSection({ slots }: Props) {
           );
         })}
       </div>
-    </div>
+    </Card>
   );
 }

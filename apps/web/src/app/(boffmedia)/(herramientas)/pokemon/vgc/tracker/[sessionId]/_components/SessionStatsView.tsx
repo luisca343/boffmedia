@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { X } from 'lucide-react';
+import { Card } from '@/components/ui/primitives/card';
 import { useTranslations } from 'next-intl';
 import { useSessionStats } from '@/features/vgc-tracker/hooks/useSessionStats';
 import { useRegulationMeta } from '@/features/vgc-tracker/hooks/useRegulationMeta';
@@ -141,16 +142,16 @@ export function SessionStatsView({ sessionId, regulationId, startElo, limitlessT
 
       {/* ── ELO Chart ─────────────────────────────────────────────────────── */}
       {eloTimeline.length > 0 && (
-        <div className="rounded-xl border border-surface-800 bg-surface-950 px-4 pt-4 pb-2">
+        <Card className="px-4 pt-4 pb-2">
           <h3 className="text-sm font-semibold text-surface-300 mb-3">{t('chart.title')}</h3>
           <EloChart timeline={eloTimeline} startElo={startElo} />
-        </div>
+        </Card>
       )}
 
       {/* ── Session comparison ────────────────────────────────────────────── */}
       {comparableSessions.length > 0 && (
-        <div className="rounded-xl border border-surface-800 bg-surface-950 overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-surface-800">
+        <Card className="overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-surface-700">
             <span className="text-sm font-semibold text-surface-300">{t('comparison.title')}</span>
             {compareIds.length > 0 && (
               <button
@@ -178,7 +179,7 @@ export function SessionStatsView({ sessionId, regulationId, startElo, limitlessT
                     active
                       ? 'bg-primary-500/15 border-primary-500/40 text-primary-400'
                       : maxReached
-                      ? 'border-surface-800 text-surface-700 cursor-not-allowed'
+                      ? 'border-surface-700 text-surface-600 cursor-not-allowed'
                       : 'border-surface-700 text-surface-400 hover:text-surface-200 hover:border-surface-600'
                   }`}
                 >
@@ -199,11 +200,11 @@ export function SessionStatsView({ sessionId, regulationId, startElo, limitlessT
           ) : (
             <p className="px-4 pb-4 text-xs text-surface-600">{t('comparison.hint')}</p>
           )}
-        </div>
+        </Card>
       )}
 
       {/* ── Pokémon tables ────────────────────────────────────────────────── */}
-      <div className="rounded-xl border border-surface-800 bg-surface-950 overflow-hidden">
+      <Card className="overflow-hidden">
         <UsageTableTabs
           tabs={TABLE_TABS.map((tab) => ({ key: tab, label: tabConfig[tab].label }))}
           active={tableTab}
@@ -213,7 +214,7 @@ export function SessionStatsView({ sessionId, regulationId, startElo, limitlessT
           items={tabConfig[tableTab].items}
           showDiscards={tabConfig[tableTab].showDiscards}
         />
-      </div>
+      </Card>
 
       {/* ── Lead pairs ────────────────────────────────────────────────────── */}
       <LeadPairsSection myPairs={stats.myLeadPairs} opponentPairs={stats.opponentLeadPairs} />
@@ -256,7 +257,7 @@ function KpiCard({
   small?: boolean;
 }) {
   return (
-    <div className="rounded-xl border border-surface-800 bg-surface-950 p-3 text-center">
+    <div className="rounded-xl border border-surface-700 bg-surface-800 p-3 text-center">
       <div className={`font-bold tabular-nums leading-tight ${small ? 'text-lg' : 'text-2xl'} ${color}`}>
         {value}
       </div>
