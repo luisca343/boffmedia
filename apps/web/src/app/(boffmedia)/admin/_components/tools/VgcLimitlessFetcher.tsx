@@ -165,26 +165,23 @@ export function VgcLimitlessFetcher() {
   };
 
   return (
-    <div className="space-y-6 max-w-2xl">
-      <div>
-        <h2 className="text-lg font-semibold text-surface-50 mb-1">VGC Meta — Limitless</h2>
-        <p className="text-sm text-surface-400">
-          Importa torneos de{" "}
-          <a
-            href="https://play.limitlesstcg.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-amber-400 hover:underline"
-          >
-            Limitless TCG
-          </a>{" "}
-          para agregar estadísticas de uso de los decklists VGC. Solo se necesitan 2 peticiones a la API por torneo.
-        </p>
-      </div>
+    <div className="space-y-4 max-w-2xl">
+      <p className="text-sm text-surface-400">
+        Importa torneos de{" "}
+        <a
+          href="https://play.limitlesstcg.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-amber-400 hover:underline"
+        >
+          Limitless TCG
+        </a>{" "}
+        para agregar estadísticas de uso de los decklists VGC. Solo se necesitan 2 peticiones a la API por torneo.
+      </p>
 
       {/* Import form */}
-      <div className="rounded-xl border border-surface-800 p-4 space-y-4">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-surface-500">
+      <div className="rounded-xl border border-surface-700/80 bg-surface-800/50 shadow-sm p-4 space-y-4">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-surface-500">
           Importar torneo
         </p>
 
@@ -196,7 +193,7 @@ export function VgcLimitlessFetcher() {
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="https://play.limitlesstcg.com/tournament/..."
-              className="w-full bg-surface-900 border border-surface-700 rounded-lg px-3 py-2 text-sm text-surface-100 placeholder:text-surface-600 focus:outline-none focus:border-amber-500/50"
+              className="w-full h-9 bg-surface-800/75 border border-surface-700/80 rounded-lg px-3 py-2 text-sm text-surface-100 placeholder:text-surface-600 focus:outline-none focus:border-primary-400 focus:ring-1 focus:ring-primary-400/30"
             />
           </div>
 
@@ -206,7 +203,7 @@ export function VgcLimitlessFetcher() {
               <select
                 value={regulationId}
                 onChange={(e) => setRegulationId(e.target.value)}
-                className="w-full bg-surface-900 border border-surface-700 rounded-lg px-3 py-2 text-sm text-surface-100 focus:outline-none focus:border-amber-500/50"
+                className="w-full h-9 bg-surface-800/75 border border-surface-700/80 rounded-lg px-3 py-2 text-sm text-surface-100 focus:outline-none focus:border-primary-400 focus:ring-1 focus:ring-primary-400/30"
               >
                 {regulations.map((r) => (
                   <option key={r.id} value={r.id}>{r.name}</option>
@@ -224,7 +221,7 @@ export function VgcLimitlessFetcher() {
                 value={maxPlayers}
                 onChange={(e) => setMaxPlayers(e.target.value)}
                 placeholder="Todos"
-                className="w-full bg-surface-900 border border-surface-700 rounded-lg px-3 py-2 text-sm text-surface-100 placeholder:text-surface-600 focus:outline-none focus:border-amber-500/50"
+                className="w-full h-9 bg-surface-800/75 border border-surface-700/80 rounded-lg px-3 py-2 text-sm text-surface-100 placeholder:text-surface-600 focus:outline-none focus:border-primary-400 focus:ring-1 focus:ring-primary-400/30"
               />
             </div>
           </div>
@@ -248,9 +245,9 @@ export function VgcLimitlessFetcher() {
       </div>
 
       {/* Tournament list */}
-      <div className="rounded-xl border border-surface-800 overflow-hidden">
-        <div className="px-4 py-3 border-b border-surface-800 flex items-center justify-between">
-          <span className="text-[11px] font-semibold uppercase tracking-wider text-surface-500">
+      <div className="rounded-xl border border-surface-700/80 bg-surface-800/50 shadow-sm overflow-hidden">
+        <div className="px-4 py-3 bg-surface-900/50 border-b border-surface-700/60 flex items-center justify-between">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-surface-500">
             Torneos importados
           </span>
           <button
@@ -272,15 +269,15 @@ export function VgcLimitlessFetcher() {
         ) : (
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-surface-800">
-                <th className="px-4 py-2 text-left text-[11px] uppercase tracking-wider text-surface-500 font-medium">Torneo</th>
-                <th className="px-4 py-2 text-left text-[11px] uppercase tracking-wider text-surface-500 font-medium">Estado</th>
-                <th className="px-4 py-2 text-left text-[11px] uppercase tracking-wider text-surface-500 font-medium">Jugadores</th>
+              <tr className="border-b border-surface-700/60 bg-surface-900/95">
+                <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-[0.08em] text-surface-500 font-semibold">Torneo</th>
+                <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-[0.08em] text-surface-500 font-semibold">Estado</th>
+                <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-[0.08em] text-surface-500 font-semibold">Jugadores</th>
               </tr>
             </thead>
             <tbody>
               {[...tournaments].sort((a, b) => (b.date ?? "").localeCompare(a.date ?? "")).map((t) => (
-                <tr key={t.id} className="border-b border-surface-800/50 hover:bg-surface-900/40">
+                <tr key={t.id} className="border-b border-surface-700/35 hover:bg-surface-700/20 transition-colors">
                   <td className="px-4 py-3">
                     <p className="text-surface-200 text-xs font-medium">{t.name ?? t.limitlessId}</p>
                     <p className="text-surface-600 text-[11px] font-mono">{t.date ?? "—"} · {t.format ?? "—"}</p>
