@@ -15,3 +15,8 @@ export const FORMAT_LABELS: Readonly<Record<string, string>> = {
 };
 
 export const ENABLE_PREVIEW_FORMATS = false;
+
+export function formatCountWithDots(value: number): string {
+  const safeValue = Number.isFinite(value) ? Math.max(0, Math.trunc(value)) : 0;
+  return safeValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}

@@ -13,6 +13,7 @@ import { TeammatesPanel } from "./TeammatesPanel";
 import { TeraTypesPanel } from "./TeraTypesPanel";
 import { TeamsPanel } from "./TeamsPanel";
 import { useSpeciesTeams } from "../_hooks/useSpeciesTeams";
+import { formatCountWithDots } from "../constants";
 
 // ─── Spread / nature helpers ──────────────────────────────────────────────────
 
@@ -149,12 +150,13 @@ export function PokemonDetailView({ detail, loading, speciesId, regulationId, on
 
   const hasTypeNothing = detail.teraTypes.some((entry) => isTypeNothingName(entry.name));
   const teraTypes = detail.teraTypes.filter((entry) => isRealTeraTypeName(entry.name));
+  const formattedBattles = formatCountWithDots(detail.rawCount);
 
 
   return (
     <div className="flex flex-col">
       {/* Header */}
-      <div className="sticky top-0 z-10 flex items-center gap-3 px-4 py-3 border-b border-surface-700 bg-surface-900/95 backdrop-blur-sm shrink-0">
+      <div className="sticky top-0 z-10 flex items-center gap-3 px-4 py-3 border-b border-surface-700 bg-gradient-to-r from-surface-900/95 via-surface-900/95 to-surface-800/90 backdrop-blur-sm shrink-0">
         <button
           onClick={onBack}
           className="md:hidden flex items-center gap-1 text-surface-400 hover:text-surface-200 text-sm transition-colors mr-1"
@@ -184,11 +186,14 @@ export function PokemonDetailView({ detail, loading, speciesId, regulationId, on
               ))}
             </div>
           )}
-          <p className="text-sm text-surface-400">
-            {t("detail.usagePercent", { percent: detail.usagePercent.toFixed(2) })}
-            <span className="mx-1.5 text-surface-700">·</span>
-            {t("detail.battles", { count: detail.rawCount })}
-          </p>
+          <div className="mt-1 flex flex-wrap items-center gap-1.5">
+            <span className="inline-flex items-center rounded-md border border-surface-700 bg-surface-800/80 px-2 py-0.5 text-[11px] text-surface-300">
+              {t("detail.usagePercent", { percent: detail.usagePercent.toFixed(2) })}
+            </span>
+            <span className="inline-flex items-center rounded-md border border-surface-700 bg-surface-800/80 px-2 py-0.5 text-[11px] text-surface-300 tabular-nums font-mono">
+              {t("detail.battles", { count: formattedBattles })}
+            </span>
+          </div>
         </div>
       </div>
 
