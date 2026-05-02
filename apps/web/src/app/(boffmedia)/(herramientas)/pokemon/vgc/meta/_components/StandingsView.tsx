@@ -103,10 +103,10 @@ export function StandingsView({ players, loading, error, tournamentId }: Props) 
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-y-auto overflow-x-auto">
-        <table className="w-full text-sm border-collapse">
-          <thead className="sticky top-0 bg-surface-900 z-10">
-            <tr className="border-b border-surface-700 text-left text-surface-400 text-xs uppercase tracking-wide">
+      <div className="flex-1 min-h-0 overflow-auto border border-surface-700/80 bg-surface-800/50 shadow-sm">
+        <table className="w-full min-w-[46rem] text-sm border-collapse">
+          <thead className="sticky top-0 z-10 bg-surface-900/95 backdrop-blur-sm">
+            <tr className="border-b border-surface-700/70 text-left text-surface-400 text-[11px] uppercase tracking-[0.08em]">
               <th className="py-2 px-3 w-12 font-medium">{t("col.rank")}</th>
               <th className="py-2 px-3 font-medium">{t("col.player")}</th>
               <th className="py-2 px-3 w-24 font-medium">{t("col.record")}</th>
@@ -124,17 +124,17 @@ export function StandingsView({ players, loading, error, tournamentId }: Props) 
                   <tr
                     onClick={() => handleRowClick(player)}
                     className={cn(
-                      "border-b border-surface-700/50 transition-colors",
+                      "border-b border-surface-700/35 transition-colors",
                       player.hasTeam
-                        ? "cursor-pointer hover:bg-surface-800/40"
+                        ? "cursor-pointer hover:bg-surface-700/20"
                         : "opacity-50 cursor-default",
                     )}
                   >
-                    <td className="py-2.5 px-3 text-surface-400 font-mono text-xs">
+                    <td className="py-3 px-3 text-surface-400 font-mono text-xs tabular-nums">
                       {player.placing || "—"}
                     </td>
 
-                    <td className="py-2.5 px-3">
+                    <td className="py-3 px-3">
                       <span className="flex items-center gap-1.5">
                         {player.hasTeam ? (
                           isExpanded
@@ -147,15 +147,17 @@ export function StandingsView({ players, loading, error, tournamentId }: Props) 
                       </span>
                     </td>
 
-                    <td className="py-2.5 px-3 text-surface-300 font-mono text-xs">
-                      {player.record || "—"}
+                    <td className="py-3 px-3 text-xs">
+                      <span className="inline-flex items-center rounded-md border border-surface-700/80 bg-surface-800/80 px-2 py-0.5 text-surface-300 font-mono tabular-nums">
+                        {player.record || "—"}
+                      </span>
                     </td>
 
-                    <td className="py-2.5 px-3">
+                    <td className="py-3 px-3">
                       {isLoadingTeam ? (
                         <span className="text-surface-500 text-xs">{t("teamLoading")}</span>
                       ) : team ? (
-                        <div className="flex items-center gap-0.5">
+                        <div className="flex items-center gap-1">
                           {team.slots.slice(0, 6).map((slot) => (
                             /* eslint-disable-next-line @next/next/no-img-element */
                             <img
@@ -181,7 +183,7 @@ export function StandingsView({ players, loading, error, tournamentId }: Props) 
                     <tr
                       ref={detailRowRef}
                       key={`${player.playerSlug}-detail`}
-                      className="border-b border-surface-700/50 bg-surface-800/40"
+                      className="border-b border-surface-700/35 bg-surface-900/45"
                     >
                       <td colSpan={4} className="px-4 py-3">
                         <div className="flex justify-end mb-2">
@@ -194,11 +196,11 @@ export function StandingsView({ players, loading, error, tournamentId }: Props) 
                               : <><Copy className="w-3 h-3" /> {t("copyPaste")}</>}
                           </button>
                         </div>
-                        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
                           {team.slots.map((slot) => (
                             <div
                               key={slot.slotIndex}
-                              className="flex flex-col items-center gap-1 bg-surface-800/60 rounded-md p-2"
+                              className="flex flex-col items-center gap-1 bg-surface-800/75 border border-surface-700/70 rounded-lg p-2"
                             >
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
