@@ -45,7 +45,7 @@ export function ToolSectionHeader({ icon, label, color = "secondary", compact = 
           className={`text-xs font-mono ${cfg.text} tracking-[0.35em] uppercase`}
           style={{ fontFamily: "Orbitron, sans-serif" }}
         >
-          // {label}
+          {label}
         </span>
       </div>
       <div className={`h-px flex-1 bg-gradient-to-r ${cfg.line} to-transparent`} />

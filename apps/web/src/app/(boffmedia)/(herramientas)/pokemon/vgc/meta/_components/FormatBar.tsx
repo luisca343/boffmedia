@@ -18,7 +18,7 @@ import {
 
 const VALID_CUTOFFS = [1760, 1630, 1500, 0] as const;
 
-const TRIGGER_CLS = "h-8 w-auto text-xs px-2.5 shrink-0 ring-offset-surface-950";
+const TRIGGER_CLS = "h-8 w-auto text-xs px-2.5 shrink-0 ring-offset-surface-900";
 
 interface FormatBarProps {
   tab:                 string;
@@ -122,7 +122,7 @@ export function FormatBar({
         ))}
       </div>
 
-      <div className="w-px h-5 bg-surface-800 shrink-0" />
+        <div className="w-px h-5 bg-surface-700 shrink-0" />
 
       {tab === "stats" ? (
         <>
@@ -160,7 +160,7 @@ export function FormatBar({
           {/* Month + cutoff selects — only for Smogon formats */}
           {!isPreviewFormat && uniqueFormats.length > 0 && (
             <>
-              <div className="w-px h-5 bg-surface-800 shrink-0" />
+              <div className="w-px h-5 bg-surface-700 shrink-0" />
 
               {/* Month select — "__all__" sentinel maps to empty string */}
               <Select
@@ -216,7 +216,7 @@ export function FormatBar({
             </Select>
           )}
 
-          {sortedRegulations.length > 0 && <div className="w-px h-5 bg-surface-800 shrink-0" />}
+          {sortedRegulations.length > 0 && <div className="w-px h-5 bg-surface-700 shrink-0" />}
 
           {/* Tournament select — Combined + individual */}
           <Select
@@ -234,7 +234,7 @@ export function FormatBar({
                 .sort((a, b) => (b.date ?? "").localeCompare(a.date ?? ""))
                 .map(t2 => (
                   <SelectItem key={t2.id} value={String(t2.id)} className="text-xs">
-                    {t2.name ?? t2.limitlessId}{t2.date ? ` — ${t2.date}` : ""}
+                    {t2.name ?? t2.limitlessId}{t2.date ? ` — ${t2.date.slice(0, 10)}` : ""}
                   </SelectItem>
                 ))}
             </SelectContent>
