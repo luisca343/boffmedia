@@ -160,16 +160,13 @@ export function VgcChampionsFetcher() {
   };
 
   return (
-    <div className="space-y-6 max-w-2xl">
-      <div>
-        <h2 className="text-lg font-semibold text-surface-50 mb-1">VGC Meta — Champions</h2>
-        <p className="text-sm text-surface-400">
-          Importa datos del CSV de VGCPastes (Google Sheets). Agrega uso por especie y co-aparición de compañeros de equipo. Los equipos individuales se guardan en <code className="text-surface-500">vgc_paste_teams</code>.
-        </p>
-      </div>
+    <div className="space-y-4 max-w-2xl">
+      <p className="text-sm text-surface-400">
+        Importa datos del CSV de VGCPastes (Google Sheets). Agrega uso por especie y co-aparición de compañeros de equipo. Los equipos individuales se guardan en <code className="text-surface-500">vgc_paste_teams</code>.
+      </p>
 
-      <div className="rounded-xl border border-surface-800 p-4 space-y-4">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-surface-500">
+      <div className="rounded-xl border border-surface-700/80 bg-surface-800/50 shadow-sm p-4 space-y-4">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-surface-500">
           Registrar regulación
         </p>
 
@@ -178,25 +175,25 @@ export function VgcChampionsFetcher() {
             value={newRegulationId}
             onChange={(e) => setNewRegulationId(e.target.value)}
             placeholder="id (ej. vgc2026regf)"
-            className="w-full h-9 rounded-md border border-surface-700 bg-surface-800 px-2.5 text-sm text-surface-100 placeholder:text-surface-600 focus:outline-none focus:ring-1 focus:ring-primary-500"
+            className="w-full h-9 rounded-lg border border-surface-700/80 bg-surface-800/75 px-2.5 text-sm text-surface-100 placeholder:text-surface-600 focus:outline-none focus:border-primary-400 focus:ring-1 focus:ring-primary-400/30"
           />
           <input
             value={newFormatId}
             onChange={(e) => setNewFormatId(e.target.value)}
             placeholder="formatId (ej. gen9vgc2026regf)"
-            className="w-full h-9 rounded-md border border-surface-700 bg-surface-800 px-2.5 text-sm text-surface-100 placeholder:text-surface-600 focus:outline-none focus:ring-1 focus:ring-primary-500"
+            className="w-full h-9 rounded-lg border border-surface-700/80 bg-surface-800/75 px-2.5 text-sm text-surface-100 placeholder:text-surface-600 focus:outline-none focus:border-primary-400 focus:ring-1 focus:ring-primary-400/30"
           />
           <input
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             placeholder="Nombre visible"
-            className="w-full h-9 rounded-md border border-surface-700 bg-surface-800 px-2.5 text-sm text-surface-100 placeholder:text-surface-600 focus:outline-none focus:ring-1 focus:ring-primary-500"
+            className="w-full h-9 rounded-lg border border-surface-700/80 bg-surface-800/75 px-2.5 text-sm text-surface-100 placeholder:text-surface-600 focus:outline-none focus:border-primary-400 focus:ring-1 focus:ring-primary-400/30"
           />
           <input
             value={newGid}
             onChange={(e) => setNewGid(e.target.value)}
             placeholder="VGCPastes GID (opcional)"
-            className="w-full h-9 rounded-md border border-surface-700 bg-surface-800 px-2.5 text-sm text-surface-100 placeholder:text-surface-600 focus:outline-none focus:ring-1 focus:ring-primary-500"
+            className="w-full h-9 rounded-lg border border-surface-700/80 bg-surface-800/75 px-2.5 text-sm text-surface-100 placeholder:text-surface-600 focus:outline-none focus:border-primary-400 focus:ring-1 focus:ring-primary-400/30"
           />
         </div>
 
@@ -216,9 +213,9 @@ export function VgcChampionsFetcher() {
       </div>
 
       {/* Regulation table */}
-      <div className="rounded-xl border border-surface-800 overflow-hidden">
-        <div className="px-4 py-3 border-b border-surface-800 flex items-center justify-between">
-          <span className="text-[11px] font-semibold uppercase tracking-wider text-surface-500">
+      <div className="rounded-xl border border-surface-700/80 bg-surface-800/50 shadow-sm overflow-hidden">
+        <div className="px-4 py-3 bg-surface-900/50 border-b border-surface-700/60 flex items-center justify-between">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-surface-500">
             Regulaciones configuradas
           </span>
           <button
@@ -236,10 +233,10 @@ export function VgcChampionsFetcher() {
         ) : (
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-surface-800">
-                <th className="px-4 py-2 text-left text-[11px] uppercase tracking-wider text-surface-500 font-medium">Regulación</th>
-                <th className="px-4 py-2 text-left text-[11px] uppercase tracking-wider text-surface-500 font-medium">Estado</th>
-                <th className="px-4 py-2" />
+              <tr className="border-b border-surface-700/60 bg-surface-900/95">
+                <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-[0.08em] text-surface-500 font-semibold">Regulación</th>
+                <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-[0.08em] text-surface-500 font-semibold">Estado</th>
+                <th className="px-4 py-2.5" />
               </tr>
             </thead>
             <tbody>
@@ -249,7 +246,7 @@ export function VgcChampionsFetcher() {
                 const isFetching    = fetchingPastes === regulation.id;
                 const status        = getStatusLabel(regulation);
                 return (
-                  <tr key={regulation.id} className="border-b border-surface-800/50 hover:bg-surface-900/40">
+                  <tr key={regulation.id} className="border-b border-surface-700/35 hover:bg-surface-700/20 transition-colors">
                     <td className="px-4 py-3">
                       <p className="text-surface-200 text-xs font-medium">{regulation.name}</p>
                       <p className="text-surface-600 text-[11px] font-mono">{regulation.id}</p>

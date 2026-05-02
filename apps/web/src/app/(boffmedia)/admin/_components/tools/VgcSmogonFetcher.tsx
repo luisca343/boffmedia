@@ -105,18 +105,15 @@ export function VgcSmogonFetcher() {
   };
 
   return (
-    <div className="space-y-6 max-w-2xl">
-      <div>
-        <h2 className="text-lg font-semibold text-surface-50 mb-1">VGC Meta — Smogon</h2>
-        <p className="text-sm text-surface-400">
-          Importa stats.txt + moveset.txt de Smogon y normaliza los datos en la base de datos.
-        </p>
-      </div>
+    <div className="space-y-4 max-w-2xl">
+      <p className="text-sm text-surface-400">
+        Importa stats.txt + moveset.txt de Smogon y normaliza los datos en la base de datos.
+      </p>
 
       {/* Existing snapshots */}
-      <div className="rounded-xl border border-surface-800 overflow-hidden">
-        <div className="px-4 py-3 border-b border-surface-800 flex items-center justify-between">
-          <span className="text-[11px] font-semibold uppercase tracking-wider text-surface-500">
+      <div className="rounded-xl border border-surface-700/80 bg-surface-800/50 shadow-sm overflow-hidden">
+        <div className="px-4 py-3 bg-surface-900/50 border-b border-surface-700/60 flex items-center justify-between">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-surface-500">
             Snapshots almacenados
           </span>
           <button
@@ -135,18 +132,18 @@ export function VgcSmogonFetcher() {
         ) : (
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-surface-800">
-                <th className="px-4 py-2 text-left text-[11px] uppercase tracking-wider text-surface-500 font-medium">Formato</th>
-                <th className="px-4 py-2 text-left text-[11px] uppercase tracking-wider text-surface-500 font-medium">Mes</th>
-                <th className="px-4 py-2 text-left text-[11px] uppercase tracking-wider text-surface-500 font-medium">Cutoff</th>
-                <th className="px-4 py-2 text-left text-[11px] uppercase tracking-wider text-surface-500 font-medium">Pkm</th>
-                <th className="px-4 py-2 text-left text-[11px] uppercase tracking-wider text-surface-500 font-medium">Importado</th>
-                <th className="px-4 py-2" />
+              <tr className="border-b border-surface-700/60 bg-surface-900/95">
+                <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-[0.08em] text-surface-500 font-semibold">Formato</th>
+                <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-[0.08em] text-surface-500 font-semibold">Mes</th>
+                <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-[0.08em] text-surface-500 font-semibold">Cutoff</th>
+                <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-[0.08em] text-surface-500 font-semibold">Pkm</th>
+                <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-[0.08em] text-surface-500 font-semibold">Importado</th>
+                <th className="px-4 py-2.5" />
               </tr>
             </thead>
             <tbody>
               {snapshots.map((s) => (
-                <tr key={s.id} className="border-b border-surface-800/50 hover:bg-surface-900/40">
+                <tr key={s.id} className="border-b border-surface-700/35 hover:bg-surface-700/20 transition-colors">
                   <td className="px-4 py-2 text-surface-200 font-mono text-xs">{s.formatId}</td>
                   <td className="px-4 py-2 text-surface-300">{s.month}</td>
                   <td className="px-4 py-2 text-surface-300">{s.cutoff === 0 ? "0 (all)" : `${s.cutoff}+`}</td>
@@ -175,8 +172,8 @@ export function VgcSmogonFetcher() {
       </div>
 
       {/* Fetch form */}
-      <div className="rounded-xl border border-surface-800 p-4 space-y-4">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-surface-500">
+      <div className="rounded-xl border border-surface-700/80 bg-surface-800/50 shadow-sm p-4 space-y-4">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-surface-500">
           Importar nuevo snapshot
         </p>
 
@@ -188,7 +185,7 @@ export function VgcSmogonFetcher() {
             <select
               value={format}
               onChange={(e) => setFormat(e.target.value)}
-              className="w-full h-9 rounded-md border border-surface-700 bg-surface-800 px-2.5 text-sm text-surface-100 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="w-full h-9 rounded-lg border border-surface-700/80 bg-surface-800/75 px-2.5 text-sm text-surface-100 focus:outline-none focus:border-primary-400 focus:ring-1 focus:ring-primary-400/30"
             >
               {regulations.map((r) => (
                 <option key={r.id} value={r.formatId}>{r.name} · {r.formatId}</option>
@@ -205,7 +202,7 @@ export function VgcSmogonFetcher() {
               onChange={(e) => setMonth(e.target.value)}
               placeholder="2026-03"
               pattern="\d{4}-\d{2}"
-              className="w-full h-9 rounded-md border border-surface-700 bg-surface-800 px-2.5 text-sm text-surface-100 placeholder:text-surface-600 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="w-full h-9 rounded-lg border border-surface-700/80 bg-surface-800/75 px-2.5 text-sm text-surface-100 placeholder:text-surface-600 focus:outline-none focus:border-primary-400 focus:ring-1 focus:ring-primary-400/30"
             />
           </div>
 
@@ -216,7 +213,7 @@ export function VgcSmogonFetcher() {
             <select
               value={cutoff}
               onChange={(e) => setCutoff(Number(e.target.value))}
-              className="w-full h-9 rounded-md border border-surface-700 bg-surface-800 px-2.5 text-sm text-surface-100 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="w-full h-9 rounded-lg border border-surface-700/80 bg-surface-800/75 px-2.5 text-sm text-surface-100 focus:outline-none focus:border-primary-400 focus:ring-1 focus:ring-primary-400/30"
             >
               {CUTOFF_OPTIONS.map((c) => (
                 <option key={c} value={c}>{c === 0 ? "0 (all)" : `${c}+`}</option>
