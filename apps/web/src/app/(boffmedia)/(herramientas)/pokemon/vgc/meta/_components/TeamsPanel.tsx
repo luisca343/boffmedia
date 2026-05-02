@@ -94,6 +94,20 @@ function SlotDetail({ slot }: { slot: SpeciesTeamSlot }) {
   );
 }
 
+// ─── Replica code badge ───────────────────────────────────────────────────────
+
+function ReplicaCodeBadge({ code }: { code: string }) {
+  const t = useTranslations("vgc.meta");
+  return (
+    <div className="flex items-center gap-1.5">
+      <span className="text-[11px] text-surface-500">{t("detail.rentalCode")}</span>
+      <code className="text-[11px] font-mono tracking-widest text-surface-100 bg-surface-800 border border-surface-700 px-1.5 py-0.5 rounded">
+        {code}
+      </code>
+    </div>
+  );
+}
+
 // ─── Team row ─────────────────────────────────────────────────────────────────
 
 function TeamRow({ entry }: { entry: SpeciesTeamEntry }) {
@@ -154,7 +168,12 @@ function TeamRow({ entry }: { entry: SpeciesTeamEntry }) {
               <SlotDetail key={i} slot={slot} />
             ))}
           </div>
-          <div className="flex justify-end">
+          <div className="flex items-center justify-between gap-2">
+            {entry.replicaCode ? (
+              <ReplicaCodeBadge code={entry.replicaCode} />
+            ) : (
+              <span />
+            )}
             <CopyButton text={entry.rawText} />
           </div>
         </div>

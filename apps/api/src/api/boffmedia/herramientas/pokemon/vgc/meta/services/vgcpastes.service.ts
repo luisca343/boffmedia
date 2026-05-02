@@ -99,7 +99,6 @@ export class VgcPastesService {
       const idxPokepaste     = headers.indexOf('Pokepaste');
       const idxHasEvs        = headers.indexOf('EVs');
       const idxReplicaStatus = headers.findIndex((h) => h === 'Replica Status');
-      const idxReplicaCode   = headers.findIndex((h) => h.includes('Replica Code'));
       const idxDate          = headers.indexOf('Date Shared');
       const idxTournament    = headers.indexOf('Tournament / Event');
       const idxRank          = headers.indexOf('Rank');
@@ -145,7 +144,6 @@ export class VgcPastesService {
           pasteUrl:        cols[idxPokepaste]?.trim()       || null,
           hasEvs:          cols[idxHasEvs]?.trim()          || null,
           replicaStatus:   cols[idxReplicaStatus]?.trim()   || null,
-          replicaCode:     cols[idxReplicaCode]?.trim()     || null,
           dateShared:      cols[idxDate]?.trim()             || null,
           tournament:      cols[idxTournament]?.trim()       || null,
           rank:            cols[idxRank]?.trim()             || null,
@@ -218,6 +216,11 @@ export class VgcPastesService {
               const { pasteId, wasCached } = await this.pokepasteService.fetchAndCache(
                 team.pasteUrl,
                 regulation?.formatId ?? undefined,
+                {
+                  author:    team.owner           || null,
+                  title:     team.teamDescription || null,
+                  sourceKey: `vgcpastes:${team.id}`,
+                },
               );
               await this.vgcPastesRepository.linkPaste(team.id, pasteId);
               if (wasCached) cached++; else fetched++;

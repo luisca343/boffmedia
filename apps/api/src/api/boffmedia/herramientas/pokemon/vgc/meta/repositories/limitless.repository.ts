@@ -5,7 +5,7 @@ import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   vgcLimitlessTournaments,
   vgcLimitlessTeams,
-  vgcPastes,
+  vgcPokepastes,
   VgcLimitlessTournament,
   VgcLimitlessTeam,
 } from '@/_db/schema/Vgc';
@@ -137,10 +137,10 @@ export class LimitlessRepository {
         record:       vgcLimitlessTeams.record,
         pasteId:      vgcLimitlessTeams.pasteId,
         fetchedAt:    vgcLimitlessTeams.fetchedAt,
-        parsedSlots:  vgcPastes.parsedSlots,
+        parsedSlots:  vgcPokepastes.parsedSlots,
       })
       .from(vgcLimitlessTeams)
-      .leftJoin(vgcPastes, eq(vgcLimitlessTeams.pasteId, vgcPastes.id))
+      .leftJoin(vgcPokepastes, eq(vgcLimitlessTeams.pasteId, vgcPokepastes.id))
       .where(eq(vgcLimitlessTeams.tournamentId, tournamentId));
     return rows as Array<VgcLimitlessTeam & { parsedSlots: string | null }>;
   }
@@ -159,11 +159,11 @@ export class LimitlessRepository {
         record:       vgcLimitlessTeams.record,
         pasteId:      vgcLimitlessTeams.pasteId,
         fetchedAt:    vgcLimitlessTeams.fetchedAt,
-        parsedSlots:  vgcPastes.parsedSlots,
-        rawText:      vgcPastes.rawText,
+        parsedSlots:  vgcPokepastes.parsedSlots,
+        rawText:      vgcPokepastes.rawText,
       })
       .from(vgcLimitlessTeams)
-      .leftJoin(vgcPastes, eq(vgcLimitlessTeams.pasteId, vgcPastes.id))
+      .leftJoin(vgcPokepastes, eq(vgcLimitlessTeams.pasteId, vgcPokepastes.id))
       .where(
         and(
           eq(vgcLimitlessTeams.tournamentId, tournamentId),
@@ -224,11 +224,11 @@ export class LimitlessRepository {
         playerName:  vgcLimitlessTeams.playerName,
         placing:     vgcLimitlessTeams.placing,
         record:      vgcLimitlessTeams.record,
-        parsedSlots: vgcPastes.parsedSlots,
-        rawText:     vgcPastes.rawText,
+        parsedSlots: vgcPokepastes.parsedSlots,
+        rawText:     vgcPokepastes.rawText,
       })
       .from(vgcLimitlessTeams)
-      .innerJoin(vgcPastes, eq(vgcLimitlessTeams.pasteId, vgcPastes.id))
+      .innerJoin(vgcPokepastes, eq(vgcLimitlessTeams.pasteId, vgcPokepastes.id))
       .innerJoin(vgcLimitlessTournaments, eq(vgcLimitlessTeams.tournamentId, vgcLimitlessTournaments.id))
       .where(
         and(

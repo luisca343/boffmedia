@@ -10,6 +10,14 @@ interface FetchResult {
   wasCached: boolean;
 }
 
+/** Metadata sourced from the importing CSV, preferred over pokepast.es scrape values. */
+interface PasteMeta {
+  author?:      string | null;
+  title?:       string | null;
+  sourceKey?:   string | null;
+  replicaCode?: string | null;
+}
+
 @Injectable()
 export class PokepasteService {
   private readonly logger = new Logger(PokepasteService.name);
@@ -24,15 +32,19 @@ export class PokepasteService {
 
   /**
    * Fetch a paste from pokepast.es and cache it.
-   * If already cached by pokepasteId, returns the stored slots without a network call.
+   * If already cached by pokepasteId, skips the network call but still applies `meta`
+   * overrides so that re-imports can correct stale author/title/replicaCode values.
+   *
+   * `meta` values (from the importing CSV) take precedence over pokepast.es JSON fields.
    */
-  async fetchAndCache(pasteUrl: string, formatId?: string): Promise<FetchResult> {
+  async fetchAndCache(pasteUrl: string, formatId?: string, meta?: PasteMeta): Promise<FetchResult> {
     const pokepasteId = this.extractPokepasteId(pasteUrl);
     if (!pokepasteId) throw new Error(`Invalid pokepaste URL: ${pasteUrl}`);
 
-    // Cache hit — return stored parsed slots immediately
+    // Cache hit — update metadata if provided, then return
     const existing = await this.pastesRepository.findByPokepasteId(pokepasteId);
     if (existing) {
+      if (meta) await this.pastesRepository.updateMeta(existing.id, meta);
       return {
         pasteId:   existing.id,
         slots:     JSON.parse(existing.parsedSlots) as VgcMetaSlot[],
@@ -51,9 +63,12 @@ export class PokepasteService {
       pokepasteId,
       rawText:     json.paste ?? '',
       parsedSlots: slots,
-      author:      json.author  ?? null,
-      title:       json.title   ?? null,
-      formatId:    formatId     ?? null,
+      // CSV metadata takes precedence over pokepast.es fields
+      author:      meta?.author      ?? json.author ?? null,
+      title:       meta?.title       ?? json.title  ?? null,
+      sourceKey:   meta?.sourceKey   ?? null,
+      replicaCode: meta?.replicaCode ?? null,
+      formatId:    formatId          ?? null,
     });
 
     this.logger.debug(`Fetched paste ${pokepasteId} (${slots.length} slots)`);
