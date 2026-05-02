@@ -61,6 +61,39 @@ function buildUrl(opts: MetaUrlState) {
   return qs ? `${base}?${qs}` : base;
 }
 
+function pickBestSnapshot(
+  snapshots: SmogonSnapshot[],
+  targetFormat: string,
+  preferredMonth: string,
+  preferredCutoff: number,
+): SmogonSnapshot | null {
+  const formatSnapshots = snapshots.filter((snapshot) => snapshot.formatId === targetFormat);
+  if (formatSnapshots.length === 0) return null;
+
+  const exact = formatSnapshots.find(
+    (snapshot) => snapshot.month === preferredMonth && snapshot.cutoff === preferredCutoff,
+  );
+  if (exact) return exact;
+
+  const monthSnapshots = preferredMonth
+    ? formatSnapshots.filter((snapshot) => snapshot.month === preferredMonth)
+    : [];
+  if (monthSnapshots.length > 0) {
+    const withPreferredCutoff = monthSnapshots.find((snapshot) => snapshot.cutoff === preferredCutoff);
+    if (withPreferredCutoff) return withPreferredCutoff;
+    return [...monthSnapshots].sort((left, right) => right.cutoff - left.cutoff)[0];
+  }
+
+  const cutoffSnapshots = formatSnapshots.filter((snapshot) => snapshot.cutoff === preferredCutoff);
+  if (cutoffSnapshots.length > 0) {
+    return [...cutoffSnapshots].sort((left, right) => right.month.localeCompare(left.month))[0];
+  }
+
+  return [...formatSnapshots].sort((left, right) => {
+    return right.month.localeCompare(left.month) || right.cutoff - left.cutoff;
+  })[0];
+}
+
 interface UseMetaNavigationOpts {
   snapshots:   SmogonSnapshot[];
   regulations: ChampionsRegulation[];
@@ -105,23 +138,45 @@ export function useMetaNavigation({
     if (tab !== "stats") return;
     if (!isDisabledPreviewFormat) return;
 
-    const first = snapshots[0];
-    if (!first) return;
+    const fallbackFormat = selectedRegulation?.formatId;
+    if (!fallbackFormat) return;
 
-    router.replace(buildUrl({
+    const fallback = pickBestSnapshot(snapshots, fallbackFormat, month, cutoff);
+    if (!fallback) return;
+
+    const nextUrl = buildUrl({
       speciesId,
       tab,
-      format: first.formatId,
-      month: first.month,
-      cutoff: first.cutoff,
+      format: fallback.formatId,
+      month: fallback.month,
+      cutoff: fallback.cutoff,
       regulation,
       tournamentId,
       view,
-    }));
+    });
+
+    const currentUrl = buildUrl({
+      speciesId,
+      tab,
+      format,
+      month,
+      cutoff,
+      regulation,
+      tournamentId,
+      view,
+    });
+
+    if (nextUrl !== currentUrl) {
+      router.replace(nextUrl);
+    }
   }, [
     tab,
     isDisabledPreviewFormat,
+    selectedRegulation,
     snapshots,
+    format,
+    month,
+    cutoff,
     router,
     speciesId,
     regulation,
