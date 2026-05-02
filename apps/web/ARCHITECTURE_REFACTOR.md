@@ -565,6 +565,59 @@ A second-pass audit of all 64 `_components` directories in `src/app/` was perfor
 
 Seven backup/copy files committed by accident were deleted. These had no importers and were never referenced from any route.
 
+---
+
+## API Services — Shared Types Migration
+
+**Date:** May 2026  
+**Scope:** `apps/web/src/services/api/**` and `apps/api/src/api/**`
+
+All handwritten local interface/type definitions in client-side API service wrappers were replaced with type aliases pointing to the auto-generated `@boffmedia/shared` types. Each migration follows the same pattern:
+
+1. Add `@ApiResponse({ type: EntityClass })` to the NestJS controller endpoint
+2. Create any missing response entity class in `apps/api/src/api/**/entities/`
+3. Run `pnpm run --filter api generate:shared` (API must be running on port 34301)
+4. In the web service file: import the generated type, remove the local interface, and export a backward-compatible type alias
+
+### Migrated services
+
+| Service file | Local types removed | Shared types used |
+|---|---|---|
+| `services/api/boffmedia/vgcService.ts` | `VgcPokemonUsage`, `VgcMetaResponse`, `VgcSpeedTier`, etc. | `PokemonUsageEntry`, `PokemonUsageDetail`, `SpeedTierEntry`, etc. |
+| `services/api/boffmedia/vgcTrackerService.ts` | `TrackerSession`, `TrackerMatch`, `TrackerSeries`, etc. | `Session`, `Match`, `Series`, `TrackerPreset`, etc. |
+| `services/api/boffmedia/usersService.ts` | `BatchUsersRequest`, `UsersPaginatedResponse`, `UserRolesResponse`, `UserValidationResponse` | `BatchUsersDto`, `UsersPaginatedResponseEntity`, `UserRolesResponseEntity`, `UserValidationResponseEntity` |
+| `services/api/smartrotom/wingullService.ts` | `ServerRegion`, `PixelmonPlayerStats` | `Region`, `PlayerStats` |
+| `services/api/smartrotom/smartrotomService.ts` | `ArceuSpeak` | `ArceuSpeakEntity` |
+| `services/api/smartrotom/ficusAiService.ts` | `UserStats`, `HealthStatus` | `FicusAiUserStatsEntity`, `FicusAiHealthEntity` |
+| `services/api/smartrotom/playerService.ts` | `Pokemon` | `PokemonW` |
+
+### New server entities created
+
+| Entity file | Used by |
+|---|---|
+| `api/boffmedia/users/entities/users-paginated-response.entity.ts` | `GET /users` |
+| `api/boffmedia/users/entities/user-roles-response.entity.ts` | `GET /users/:id/roles` |
+| `api/boffmedia/users/entities/user-validation-response.entity.ts` | `GET /users/validate/:type/:identifier` |
+| `api/boffmedia/users/dto/batch-users.dto.ts` | `POST /users/batch` |
+| `api/smartrotom/_main/entities/arceuspeak.entity.ts` | `GET /smartrotom/arceuspeak` |
+| `api/smartrotom/ficusai/entities/ficusai-user-stats.entity.ts` | `GET /smartrotom/ficusai/stats` |
+| `api/smartrotom/ficusai/entities/ficusai-health.entity.ts` | `GET /smartrotom/ficusai/health` |
+
+### Stable roles subpath export
+
+To prevent `generate:shared` from overwriting the `UserRole` enum re-export that many files depend on, a stable subpath was added to `packages/shared/package.json`:
+- `exports["./roles"] = "./src/roles.ts"`
+- All `UserRole` imports across the codebase now use `@boffmedia/shared/roles` instead of `@boffmedia/shared`
+
+### Known exceptions (intentionally local)
+
+| Service | Local type | Reason |
+|---|---|---|
+| `ficusAiService.ts` | `MessagePart`, `FicusMessageContent` | Frontend-only union refinements of `FicusMessageContentDto` — not an API contract |
+| `playerService.ts` | `MinecraftStats` | Raw Wingull external API response shape (outer `{ stats: {...} }` wrapper); the player module returns raw axios `res.data` unlike the wingull repository which extracts `response.data.data` |
+| `ligaService.ts` | `ReplayResponse = any` | No server-side liga module exists yet |
+| `scrapeService.ts`, `mangaService.ts` | SSE event types | Frontend-composed SSE event shapes, not REST response contracts |
+
 **Files deleted:**
 - `(herramientas)/pokemon/tcgpocket/_components/CardItem copy.tsx`
 - `battlesim/_components/BattleCanvas copy.tsx`
