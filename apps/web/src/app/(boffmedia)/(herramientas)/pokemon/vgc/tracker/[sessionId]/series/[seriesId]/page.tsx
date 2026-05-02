@@ -16,7 +16,7 @@ export default function SeriesPage({ params }: Props) {
 
   if (loading) {
     return (
-      <div className="h-screen bg-surface-950 flex items-center justify-center">
+      <div className="h-screen bg-surface-900 flex items-center justify-center">
         <div className="w-6 h-6 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -24,7 +24,7 @@ export default function SeriesPage({ params }: Props) {
 
   if (!series) {
     return (
-      <div className="h-screen bg-surface-950 flex items-center justify-center text-surface-400">
+      <div className="h-screen bg-surface-900 flex items-center justify-center text-surface-400">
         Series not found.
       </div>
     );

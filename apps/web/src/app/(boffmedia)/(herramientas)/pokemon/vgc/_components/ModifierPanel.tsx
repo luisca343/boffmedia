@@ -26,7 +26,7 @@ export function ModifierPanel({ modifiers, onChange }: Props) {
   const active = hasModifiers(modifiers);
 
   return (
-    <div className="flex flex-wrap items-center gap-2 sm:gap-3 px-3 py-2.5 rounded-lg border border-surface-800 bg-surface-950/60">
+    <div className="flex flex-wrap items-center gap-2 sm:gap-3 px-3 py-2.5 rounded-lg border border-surface-700 bg-surface-800/60">
       <span className="text-[11px] text-surface-500 font-semibold uppercase tracking-wider shrink-0">
         {t("title")}
       </span>

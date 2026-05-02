@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { Card } from '@/components/ui/primitives/card';
 import type { HeatmapCell, TimeSlot } from '@/features/vgc-tracker/utils/sessionStats';
 
 interface Props {
@@ -30,8 +31,8 @@ export function HeatmapSection({ heatmap }: Props) {
   heatmap.forEach((c) => cellMap.set(`${c.dayOfWeek}:${c.slot}`, c));
 
   return (
-    <div className="rounded-xl border border-surface-800 bg-surface-950 overflow-hidden">
-      <div className="px-4 py-3 border-b border-surface-800">
+    <Card className="overflow-hidden">
+      <div className="px-4 py-3 border-b border-surface-700">
         <h3 className="text-sm font-semibold text-surface-300">{t('heatmap.title')}</h3>
       </div>
       <div className="p-3 overflow-x-auto">
@@ -78,6 +79,6 @@ export function HeatmapSection({ heatmap }: Props) {
           </tbody>
         </table>
       </div>
-    </div>
+    </Card>
   );
 }

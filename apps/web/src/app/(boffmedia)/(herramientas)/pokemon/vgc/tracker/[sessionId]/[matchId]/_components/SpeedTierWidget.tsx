@@ -66,16 +66,16 @@ export function SpeedTierWidget({ slots }: Props) {
   }
 
   return (
-    <div className="mt-3 rounded-lg border border-surface-800 bg-surface-900/60 overflow-hidden">
+    <div className="mt-3 rounded-lg border border-surface-700 bg-surface-800/60 overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-3 py-1.5 border-b border-surface-800">
+      <div className="flex items-center justify-between px-3 py-1.5 border-b border-surface-700">
         <span className="text-[10px] font-semibold text-surface-500 uppercase tracking-wide">
           {t('speedWidget.label')}
         </span>
       </div>
 
       {/* Modifiers row */}
-      <div className="flex gap-1 px-3 py-1.5 border-b border-surface-800">
+      <div className="flex gap-1 px-3 py-1.5 border-b border-surface-700">
         <SpeedFlagChips
           className="flex gap-1"
           buttonClassName="text-[10px] px-1.5 py-0.5 rounded font-mono transition-colors border"
@@ -112,7 +112,7 @@ export function SpeedTierWidget({ slots }: Props) {
       </div>
 
       {/* Opponent speed input */}
-      <div className="px-3 py-1.5 border-b border-surface-800 bg-surface-900/30">
+      <div className="px-3 py-1.5 border-b border-surface-700 bg-surface-800/40">
         <label className="text-[10px] font-semibold text-surface-500 uppercase tracking-wide block mb-1">
           {t('speedWidget.opponentSpeed')}
         </label>
@@ -127,7 +127,7 @@ export function SpeedTierWidget({ slots }: Props) {
         />
       </div>
 
-      <div className="px-3 py-1 text-[10px] text-surface-500 border-b border-surface-800 bg-surface-900/20">
+      <div className="px-3 py-1 text-[10px] text-surface-500 border-b border-surface-700 bg-surface-800/20">
         {t('speedWidget.presetHint')}
       </div>
 
@@ -184,7 +184,7 @@ export function SpeedTierWidget({ slots }: Props) {
 
             {/* EV preset picker (shown when row is clicked) */}
             {selectedSlot === row.slotIndex && (
-              <div className="px-3 py-2 bg-surface-800/20 border-t border-surface-800 flex flex-wrap gap-1">
+              <div className="px-3 py-2 bg-surface-700/30 border-t border-surface-700 flex flex-wrap gap-1">
                 {EV_PRESETS.map((preset) => (
                   <button
                     key={preset.label}

@@ -107,7 +107,7 @@ export function ExportImportDialog({ sessionId, sessionLabel, onImportDone, onCl
             </button>
           </div>
 
-          <div className="border-t border-surface-800" />
+          <div className="border-t border-surface-700" />
 
           {/* Import */}
           <input ref={fileRef} type="file" accept=".json" className="hidden" onChange={handleFileChange} />

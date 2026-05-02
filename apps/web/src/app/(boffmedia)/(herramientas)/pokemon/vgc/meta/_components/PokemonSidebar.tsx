@@ -6,6 +6,7 @@ import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { spriteUrl, handleSpriteError } from "@/features/vgc-tracker/types";
 import { PokemonUsageDetail } from "@/services/api/boffmedia/vgcService";
+import { Input } from "@/components/ui/primitives/input";
 
 interface Props {
   entries:    PokemonUsageDetail[];
@@ -28,12 +29,13 @@ export function PokemonSidebar({ entries, loading, error, selectedId, onSelect }
   return (
     <div className="flex flex-col h-full">
       {/* Search */}
-      <div className="shrink-0 px-2 py-2 border-b border-surface-800">
-        <input
+      <div className="shrink-0 px-2 py-2 border-b border-surface-700">
+        <Input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder={t("sidebar.search")}
-          className="w-full h-8 rounded-md border border-surface-700 bg-surface-900 px-3 text-sm text-surface-100 placeholder:text-surface-600 focus:outline-none focus:ring-1 focus:ring-primary-500"
+          variant="default"
+          className="h-8 text-sm"
         />
       </div>
 
@@ -66,10 +68,10 @@ export function PokemonSidebar({ entries, loading, error, selectedId, onSelect }
                 key={entry.speciesId}
                 onClick={() => onSelect(entry.speciesId)}
                 className={cn(
-                  "w-full flex items-center gap-2 px-2 py-1.5 border-b border-surface-800/40 transition-colors text-left",
+                  "w-full flex items-center gap-2 px-2 py-1.5 border-b border-surface-700/40 transition-colors text-left",
                   isSelected
                     ? "bg-primary-500/10 border-l-2 border-l-primary-400"
-                    : "hover:bg-surface-900/70"
+                    : "hover:bg-surface-700/30"
                 )}
               >
                 <span className="text-[11px] text-surface-500 tabular-nums font-mono w-8 shrink-0 text-right">
@@ -90,7 +92,7 @@ export function PokemonSidebar({ entries, loading, error, selectedId, onSelect }
                   </p>
                 </div>
                 <span className="text-[11px] text-surface-400 tabular-nums font-mono shrink-0">
-                  {entry.usagePercent.toFixed(1)}%
+                  {entry.usagePercent.toFixed(2)}%
                 </span>
               </button>
             );

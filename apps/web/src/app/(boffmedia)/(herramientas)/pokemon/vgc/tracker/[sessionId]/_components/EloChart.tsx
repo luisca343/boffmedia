@@ -22,13 +22,13 @@ interface Props {
 const C = {
   primary: '#fb923c', // primary-400  (251 146 60)
   gap: '#475569',     // surface-600  (71 85 105)
-  grid: '#1e293b',    // surface-800  (30 41 59)
+  grid: '#334155',    // surface-700  (51 65 85)
   axis: '#64748b',    // surface-500  (100 116 139)
   win: '#4ade80',     // green-400
   loss: '#f87171',    // red-400
   draw: '#facc15',    // yellow-400
   neutral: '#94a3b8', // surface-400  (148 163 184) — startElo dot
-  dotStroke: '#03050f', // surface-950
+  dotStroke: '#1e293b', // surface-800
 } as const;
 
 export function EloChart({ timeline, startElo }: Props) {

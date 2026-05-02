@@ -6,8 +6,10 @@ import { ChevronDown, ChevronUp, Copy, Check, Loader2 } from "lucide-react";
 import { spriteUrl, handleSpriteError } from "@/features/vgc-tracker/types";
 import { SpeciesTeamEntry, SpeciesTeamSlot } from "@/services/api/boffmedia/vgcService";
 import { cn } from "@/lib/utils";
+import { Card, CardContent } from "@/components/ui/primitives/card";
+import { ToolSectionHeader } from "@/components/boffmedia/tools/ToolSectionHeader";
 
-// ─── Copy button ───────────────────────────────────────────────────────────────────────────────
+// ─── Copy button ──────────────────────────────────────────────────────────────
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
@@ -26,7 +28,7 @@ function CopyButton({ text }: { text: string }) {
   return (
     <button
       onClick={handleCopy}
-      className="flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium text-surface-300 hover:text-surface-100 border border-surface-700 hover:border-surface-500 bg-surface-900 hover:bg-surface-800 transition-all"
+      className="flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium text-surface-300 hover:text-surface-100 border border-surface-600 hover:border-surface-500 bg-surface-800 hover:bg-surface-700 transition-all"
     >
       {copied ? (
         <Check className="w-3 h-3 text-green-400" />
@@ -38,7 +40,7 @@ function CopyButton({ text }: { text: string }) {
   );
 }
 
-// ─── Tera type colour map (matches Radix-based palette) ──────────────────────
+// ─── Tera type colour map ─────────────────────────────────────────────────────
 
 const TERA_COLOURS: Record<string, string> = {
   Normal:   "#A8A878", Fire:     "#F08030", Water:    "#6890F0",
@@ -54,7 +56,6 @@ const TERA_COLOURS: Record<string, string> = {
 function SlotDetail({ slot }: { slot: SpeciesTeamSlot }) {
   return (
     <div className="flex gap-2 items-start min-w-0">
-      {/* Sprite */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={spriteUrl(slot.speciesName)}
@@ -64,14 +65,13 @@ function SlotDetail({ slot }: { slot: SpeciesTeamSlot }) {
         className="object-contain shrink-0"
         onError={handleSpriteError}
       />
-      {/* Info */}
       <div className="flex-1 min-w-0 pt-0.5">
         <p className="text-xs font-semibold text-surface-100 leading-tight">
           {slot.speciesName}
           {slot.tera && (
             <span
-              className="ml-1.5 text-[10px] font-normal px-1 rounded"
-              style={{ color: TERA_COLOURS[slot.tera] ?? "#fff", backgroundColor: "#1a1a2e" }}
+              className="ml-1.5 text-[10px] font-normal px-1 rounded bg-surface-900"
+              style={{ color: TERA_COLOURS[slot.tera] ?? "#fff" }}
             >
               Tera {slot.tera}
             </span>
@@ -101,7 +101,7 @@ function ReplicaCodeBadge({ code }: { code: string }) {
   return (
     <div className="flex items-center gap-1.5">
       <span className="text-[11px] text-surface-500">{t("detail.rentalCode")}</span>
-      <code className="text-[11px] font-mono tracking-widest text-surface-100 bg-surface-800 border border-surface-700 px-1.5 py-0.5 rounded">
+      <code className="text-[11px] font-mono tracking-widest text-surface-100 bg-surface-700 border border-surface-600 px-1.5 py-0.5 rounded">
         {code}
       </code>
     </div>
@@ -113,15 +113,15 @@ function ReplicaCodeBadge({ code }: { code: string }) {
 function TeamRow({ entry }: { entry: SpeciesTeamEntry }) {
   const [expanded, setExpanded] = useState(false);
 
-  const placing = entry.rank  ? `#${entry.rank}`  : null;
-  const record   = entry.record ?? null;
+  const placing = entry.rank   ? `#${entry.rank}`  : null;
+  const record  = entry.record ?? null;
 
   return (
-    <div className="border border-surface-800 rounded-lg overflow-hidden">
+    <div className="border border-surface-700 rounded-lg overflow-hidden">
       {/* Collapsed row */}
       <button
         onClick={() => setExpanded((prev) => !prev)}
-        className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-surface-800/40 transition-colors text-left"
+        className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-surface-700/40 transition-colors text-left"
       >
         {/* Player info */}
         <div className="min-w-0 w-28 shrink-0">
@@ -162,7 +162,7 @@ function TeamRow({ entry }: { entry: SpeciesTeamEntry }) {
 
       {/* Expanded detail */}
       {expanded && (
-        <div className="border-t border-surface-800 bg-surface-950/60 px-3 py-3">
+        <div className="border-t border-surface-700 bg-surface-900/80 px-3 py-3">
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-3">
             {entry.slots.map((slot, i) => (
               <SlotDetail key={i} slot={slot} />
@@ -195,33 +195,34 @@ export function TeamsPanel({ teams, loading, title = "Teams" }: Props) {
 
   if (loading) {
     return (
-      <div className="rounded-xl border border-surface-800 bg-surface-950 p-4">
-        <h3 className="text-[11px] font-semibold uppercase tracking-wider text-surface-300 mb-3">
-          {title}
-        </h3>
-        <div className="flex items-center justify-center gap-2 py-4 text-surface-500 text-sm">
-          <Loader2 className="w-4 h-4 animate-spin" />
-          {t("detail.teamsLoading")}
-        </div>
-      </div>
+      <Card className="hover:shadow-sm">
+        <CardContent className="p-4">
+          <ToolSectionHeader label={title} color="neutral" compact />
+          <div className="flex items-center justify-center gap-2 py-4 text-surface-500 text-sm">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            {t("detail.teamsLoading")}
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
   if (teams.length === 0) return null;
 
   return (
-    <div className="rounded-xl border border-surface-800 bg-surface-950 p-4">
-      <h3 className="text-[11px] font-semibold uppercase tracking-wider text-surface-300 mb-3">
-        {title}
-        <span className={cn("ml-1.5 font-normal normal-case text-surface-500")}>
-          ({teams.length})
-        </span>
-      </h3>
-      <div className="space-y-1.5">
-        {teams.map((entry, i) => (
-          <TeamRow key={`${entry.source}-${entry.playerId}-${i}`} entry={entry} />
-        ))}
-      </div>
-    </div>
+    <Card className="hover:shadow-sm">
+      <CardContent className="p-4">
+        <ToolSectionHeader
+          label={`${title} (${teams.length})`}
+          color="neutral"
+          compact
+        />
+        <div className="space-y-1.5">
+          {teams.map((entry, i) => (
+            <TeamRow key={`${entry.source}-${entry.playerId}-${i}`} entry={entry} />
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 }

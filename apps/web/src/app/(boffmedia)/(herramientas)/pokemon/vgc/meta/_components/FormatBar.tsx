@@ -6,12 +6,19 @@ import { cn } from "@/lib/utils";
 import { SmogonSnapshot, ChampionsRegulation, LimitlessTournament } from "@/services/api/boffmedia/vgcService";
 import { DEFAULT_CUTOFF } from "../_hooks/useMetaNavigation";
 import { ENABLE_PREVIEW_FORMATS } from "../constants";
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectGroup,
+  SelectLabel,
+  SelectValue,
+} from "@/components/ui/primitives/select";
 
 const VALID_CUTOFFS = [1760, 1630, 1500, 0] as const;
 
-const SELECT_CLS =
-  "h-8 rounded-md border border-surface-700 bg-surface-900 px-2.5 text-xs text-surface-100 " +
-  "focus:outline-none focus:ring-1 focus:ring-primary-500 cursor-pointer shrink-0";
+const TRIGGER_CLS = "h-8 w-auto text-xs px-2.5 shrink-0 ring-offset-surface-950";
 
 interface FormatBarProps {
   tab:                 string;
@@ -96,7 +103,7 @@ export function FormatBar({
   };
 
   return (
-    <div className="shrink-0 h-12 flex items-center gap-2 px-3 bg-surface-950 border-b border-surface-800">
+    <div className="shrink-0 h-12 flex items-center gap-2 px-3 bg-surface-900 border-b border-surface-700">
       {/* Tab toggle — Stats | Tournament */}
       <div className="flex gap-1 shrink-0 border border-surface-700 rounded-lg p-0.5">
         {(["stats", "tournament"] as const).map((t2) => (
@@ -119,30 +126,35 @@ export function FormatBar({
 
       {tab === "stats" ? (
         <>
-          {/* Unified format select — Smogon + Preview in optgroups */}
+          {/* Unified format select — Smogon + Preview in groups */}
           {(uniqueFormats.length > 0 || previewRegulations.length > 0) && (
-            <select
-              value={format}
-              onChange={e => handleFormatSelect(e.target.value)}
-              className={SELECT_CLS}
-            >
-              {uniqueFormats.length > 0 && (
-                <optgroup label="Smogon">
-                  {uniqueFormats.map(fmtId => (
-                    <option key={fmtId} value={fmtId}>
-                      {regulationNameByFormatId.get(fmtId) ?? formatLabels[fmtId] ?? fmtId}
-                    </option>
-                  ))}
-                </optgroup>
-              )}
-              {previewRegulations.length > 0 && (
-                <optgroup label="Champions · Preview">
-                  {previewRegulations.map(reg => (
-                    <option key={reg.id} value={reg.id}>{reg.name}</option>
-                  ))}
-                </optgroup>
-              )}
-            </select>
+            <Select value={format} onValueChange={handleFormatSelect}>
+              <SelectTrigger className={TRIGGER_CLS}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {uniqueFormats.length > 0 && (
+                  <SelectGroup>
+                    <SelectLabel>Smogon</SelectLabel>
+                    {uniqueFormats.map(fmtId => (
+                      <SelectItem key={fmtId} value={fmtId} className="text-xs">
+                        {regulationNameByFormatId.get(fmtId) ?? formatLabels[fmtId] ?? fmtId}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                )}
+                {previewRegulations.length > 0 && (
+                  <SelectGroup>
+                    <SelectLabel>Champions · Preview</SelectLabel>
+                    {previewRegulations.map(reg => (
+                      <SelectItem key={reg.id} value={reg.id} className="text-xs">
+                        {reg.name}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                )}
+              </SelectContent>
+            </Select>
           )}
 
           {/* Month + cutoff selects — only for Smogon formats */}
@@ -150,28 +162,39 @@ export function FormatBar({
             <>
               <div className="w-px h-5 bg-surface-800 shrink-0" />
 
-              <select
-                value={month}
-                onChange={e => onOptionsApply(e.target.value, cutoff)}
-                className={SELECT_CLS}
+              {/* Month select — "__all__" sentinel maps to empty string */}
+              <Select
+                value={month || "__all__"}
+                onValueChange={(val) => onOptionsApply(val === "__all__" ? "" : val, cutoff)}
               >
-                <option value="">{t("pickers.monthPlaceholder")}</option>
-                {availableMonths.map(m => (
-                  <option key={m} value={m}>{m}</option>
-                ))}
-              </select>
+                <SelectTrigger className={TRIGGER_CLS}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__all__" className="text-xs">
+                    {t("pickers.monthPlaceholder")}
+                  </SelectItem>
+                  {availableMonths.map(m => (
+                    <SelectItem key={m} value={m} className="text-xs">{m}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-              <select
-                value={cutoff}
-                onChange={e => onOptionsApply(month, Number(e.target.value))}
-                className={SELECT_CLS}
+              <Select
+                value={String(cutoff)}
+                onValueChange={(val) => onOptionsApply(month, Number(val))}
               >
-                {VALID_CUTOFFS.map(c => (
-                  <option key={c} value={c}>
-                    {c === 0 ? "All ELO" : `${c}+ ELO`}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger className={TRIGGER_CLS}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {VALID_CUTOFFS.map(c => (
+                    <SelectItem key={c} value={String(c)} className="text-xs">
+                      {c === 0 ? "All ELO" : `${c}+ ELO`}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </>
           )}
         </>
@@ -179,34 +202,43 @@ export function FormatBar({
         <>
           {/* Regulation select */}
           {sortedRegulations.length > 0 && (
-            <select
-              value={regulation}
-              onChange={e => onRegulationChange(e.target.value)}
-              className={SELECT_CLS}
-            >
-              {sortedRegulations.map(reg => (
-                <option key={reg.id} value={reg.id}>{reg.name}</option>
-              ))}
-            </select>
+            <Select value={regulation} onValueChange={onRegulationChange}>
+              <SelectTrigger className={TRIGGER_CLS}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {sortedRegulations.map(reg => (
+                  <SelectItem key={reg.id} value={reg.id} className="text-xs">
+                    {reg.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           )}
 
           {sortedRegulations.length > 0 && <div className="w-px h-5 bg-surface-800 shrink-0" />}
 
           {/* Tournament select — Combined + individual */}
-          <select
+          <Select
             value={tournamentId || "combined"}
-            onChange={e => onTournamentChange(e.target.value)}
-            className={SELECT_CLS}
+            onValueChange={onTournamentChange}
           >
-            <option value="combined">{t("tabs.combined")}</option>
-            {[...tournaments]
-              .sort((a, b) => (b.date ?? "").localeCompare(a.date ?? ""))
-              .map(t2 => (
-                <option key={t2.id} value={String(t2.id)}>
-                  {t2.name ?? t2.limitlessId}{t2.date ? ` — ${t2.date}` : ""}
-                </option>
-              ))}
-          </select>
+            <SelectTrigger className={TRIGGER_CLS}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="combined" className="text-xs">
+                {t("tabs.combined")}
+              </SelectItem>
+              {[...tournaments]
+                .sort((a, b) => (b.date ?? "").localeCompare(a.date ?? ""))
+                .map(t2 => (
+                  <SelectItem key={t2.id} value={String(t2.id)} className="text-xs">
+                    {t2.name ?? t2.limitlessId}{t2.date ? ` — ${t2.date}` : ""}
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
         </>
       )}
     </div>

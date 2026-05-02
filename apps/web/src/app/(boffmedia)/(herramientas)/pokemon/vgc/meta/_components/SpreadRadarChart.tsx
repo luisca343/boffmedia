@@ -25,7 +25,7 @@ export function SpreadRadarChart({ spread, nature, maxValue = 252 }: Props) {
       <p className="text-xs text-surface-400 text-center mb-1 font-medium">{nature}</p>
       <ResponsiveContainer width="100%" height={180}>
         <RadarChart data={data} margin={{ top: 4, right: 16, bottom: 4, left: 16 }}>
-          <PolarGrid stroke="#334155" />
+          <PolarGrid stroke="#475569" />
           <PolarAngleAxis
             dataKey="stat"
             tick={{ fill: "#94a3b8", fontSize: 11 }}
@@ -38,7 +38,7 @@ export function SpreadRadarChart({ spread, nature, maxValue = 252 }: Props) {
             strokeWidth={1.5}
           />
           <Tooltip
-            contentStyle={{ background: "#0f172a", border: "1px solid #1e293b", fontSize: 12 }}
+            contentStyle={{ background: "#1e293b", border: "1px solid #334155", fontSize: 12 }}
             itemStyle={{ color: "#e2e8f0" }}
             formatter={(v: number) => [v, "EVs"]}
           />

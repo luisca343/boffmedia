@@ -16,6 +16,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { Input } from "@/components/ui/primitives/input";
+import { Card } from "@/components/ui/primitives/card";
 import { TypeBadgeSmall } from "@/components/shared/pokemon/TypeBadge";
 import { ModifierPanel } from "../../_components/ModifierPanel";
 import {
@@ -134,9 +135,9 @@ function ReferencePanel({
   };
 
   return (
-    <div className="rounded-xl border border-surface-800 bg-surface-950 overflow-hidden">
+    <Card className="overflow-visible">
       {/* Header */}
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-surface-800 bg-surface-900/50">
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-surface-700 bg-surface-900/50">
         <Target className="w-4 h-4 text-primary-400 shrink-0" />
         <span className="text-xs font-semibold text-surface-300 uppercase tracking-wider">
           {t("reference.title")}
@@ -159,7 +160,7 @@ function ReferencePanel({
             onClick={() => onChange({ ...refState, useCustom: false })}
             className={`flex-1 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
               !refState.useCustom
-                ? "bg-surface-700 text-surface-100 shadow"
+                ? "bg-primary-500/20 text-primary-300 shadow"
                 : "text-surface-500 hover:text-surface-300"
             }`}
           >
@@ -169,7 +170,7 @@ function ReferencePanel({
             onClick={() => onChange({ ...refState, useCustom: true })}
             className={`flex-1 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
               refState.useCustom
-                ? "bg-surface-700 text-surface-100 shadow"
+                ? "bg-primary-500/20 text-primary-300 shadow"
                 : "text-surface-500 hover:text-surface-300"
             }`}
           >
@@ -289,7 +290,7 @@ function ReferencePanel({
 
         {/* Effective speed display */}
         {refEffective !== null ? (
-          <div className="rounded-lg bg-surface-900 border border-primary-500/30 px-4 pt-3 pb-4 text-center">
+          <div className="rounded-lg bg-surface-900/80 border border-primary-500/30 px-4 pt-3 pb-4 text-center">
             <div className="text-[10px] text-surface-500 uppercase tracking-wider mb-1">
               {t("reference.effectiveSpeed")}
             </div>
@@ -324,13 +325,13 @@ function ReferencePanel({
           </div>
         ) : (
           !hasRef && (
-            <div className="rounded-lg bg-surface-900/50 border border-surface-800 px-4 py-5 text-center text-xs text-surface-600 leading-relaxed">
+            <div className="rounded-lg bg-surface-900/50 border border-surface-700 px-4 py-5 text-center text-xs text-surface-600 leading-relaxed">
               {t("reference.noRef")}
             </div>
           )
         )}
       </div>
-    </div>
+    </Card>
   );
 }
 
@@ -446,7 +447,7 @@ function ExpandedRowContent({
   ];
 
   return (
-    <tr className="bg-surface-900/40 border-b border-surface-800">
+    <tr className="bg-surface-900/60 border-b border-surface-700">
       <td colSpan={colSpan} className="px-4 py-3">
         <div className="flex flex-wrap items-center gap-4">
           {/* Speed breakdown chips */}
@@ -703,7 +704,7 @@ export function SpeedTiersTab({
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.3 }}
-          className="rounded-xl border border-surface-800 overflow-hidden bg-surface-950"
+          className="rounded-xl border border-surface-700 overflow-hidden bg-surface-800 shadow-lg"
         >
           {loading ? (
             <div className="py-24 text-center text-surface-400 animate-pulse">
@@ -717,7 +718,7 @@ export function SpeedTiersTab({
             <div className="overflow-x-auto">
               <table className="w-full text-sm border-collapse">
                 <thead>
-                  <tr className="bg-surface-900 border-b border-surface-800">
+                  <tr className="bg-surface-800 border-b border-surface-700">
                     <th className="px-3 py-3 text-left w-10">
                       <span className="text-[10px] text-surface-600 font-semibold uppercase tracking-wider">
                         {t("columns.number")}
@@ -758,7 +759,7 @@ export function SpeedTiersTab({
                     const rowBg =
                       zone === "faster" ? "hover:bg-red-950/20"
                       : zone === "tie"  ? "bg-yellow-950/10 hover:bg-yellow-950/20"
-                      : "hover:bg-surface-900/60";
+                      : "hover:bg-surface-700/40";
 
                     return [
                       /* ── Separator row ── */
@@ -790,7 +791,7 @@ export function SpeedTiersTab({
                         onClick={() =>
                           setExpandedRow((prev) => (prev === pokemon.name ? null : pokemon.name))
                         }
-                        className={`group border-b border-surface-800/40 cursor-pointer transition-colors ${rowBorder} ${rowBg}`}
+                        className={`group border-b border-surface-700/50 cursor-pointer transition-colors ${rowBorder} ${rowBg}`}
                       >
                         {/* # */}
                         <td className="px-3 py-2.5 text-surface-600 text-xs tabular-nums">

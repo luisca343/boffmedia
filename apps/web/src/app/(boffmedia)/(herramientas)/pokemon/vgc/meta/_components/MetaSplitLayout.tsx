@@ -21,7 +21,7 @@ export function MetaSplitLayout({ sidebar, detail, hasSelection }: Props) {
     <div className="flex h-full">
       <aside
         className={cn(
-          "shrink-0 border-r border-surface-800 flex flex-col overflow-y-auto",
+          "shrink-0 border-r border-surface-700 flex flex-col overflow-y-auto",
           hasSelection
             ? "hidden md:flex md:w-72 xl:w-80"
             : "flex w-full md:w-72 xl:w-80",
