@@ -8,7 +8,7 @@ import {
   BarChart2,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { USER_ROLES } from '@boffmedia/shared'
+import { USER_ROLES } from '@boffmedia/shared/roles'
 
 export function ToolsMenu() {
   const t = useTranslations('nav.menus.tools')

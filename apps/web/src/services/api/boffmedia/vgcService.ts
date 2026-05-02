@@ -1,38 +1,34 @@
 import { apiGET, apiDELETE, apiAuthedGET, apiAuthedPOST, apiAuthedDELETE } from '@/services/boffAPI';
-import type { BatchFetchResultDto, ChampionsPasteDetailDto } from '@boffmedia/shared';
+import type {
+  BatchFetchResultDto,
+  ChampionsPasteDetailDto,
+  ChampionsRegulationDto,
+  CountResultDto,
+  DivergenceResultDto,
+  DivergenceRowDto,
+  ImportJobStatusDto,
+  LimitlessPlayerDto,
+  LimitlessPlayerTeamDto,
+  LimitlessTournamentDto,
+  PersonalMetaComparisonDto,
+  PersonalMetaComparisonRowDto,
+  PokemonUsageDetailDto,
+  PokemonUsageEntryDto,
+  SmogonSnapshotDto,
+  SpeciesTeamEntryDto,
+  SpeedTierEntryDto,
+  TournamentImportStartDto,
+  UpsertRegulationDto,
+  VgcIngestionJobDto,
+  VgcMetaSlotDto,
+  VgcPokemonDto,
+} from '@boffmedia/shared';
 
 // ─── VGC Meta Analysis ────────────────────────────────────────────────────────
 
-export interface SmogonSnapshot {
-  id:           number;
-  formatId:     string;
-  month:        string;
-  cutoff:       number;
-  pokemonCount: number;
-  fetchedAt:    string;
-}
-
-export interface PokemonUsageEntry {
-  speciesId:    string;
-  speciesName:  string;
-  rank:         number;
-  types:        string[];
-  usagePercent: number;
-  rawCount:     number;
-  topItem?:     string;
-  topMove?:     string;
-  topTeraType?: string;
-}
-
-export interface PokemonUsageDetail extends PokemonUsageEntry {
-  baseStats:  { hp: number; atk: number; def: number; spa: number; spd: number; spe: number };
-  abilities:  Array<{ name: string; percent: number }>;
-  items:      Array<{ name: string; percent: number }>;
-  moves:      Array<{ name: string; percent: number }>;
-  teraTypes:  Array<{ name: string; percent: number }>;
-  teammates:  Array<{ name: string; percent: number }>;
-  spreads:    Array<{ nature: string; spread: string; percent: number }>;
-}
+export type SmogonSnapshot = SmogonSnapshotDto;
+export type PokemonUsageEntry = PokemonUsageEntryDto;
+export type PokemonUsageDetail = PokemonUsageDetailDto;
 
 /** Paste-derived breakdown for a Champions species (Phase 3) */
 export type ChampionsPasteDetail = ChampionsPasteDetailDto;
@@ -68,7 +64,7 @@ export class VgcMetaService {
   }
 
   static fetchSmogonSnapshot(format: string, month: string, cutoff: number, token: string) {
-    return apiAuthedPOST<{ count: number }>('/tools/vgc/meta/smogon/fetch', { format, month, cutoff }, token);
+    return apiAuthedPOST<CountResultDto>('/tools/vgc/meta/smogon/fetch', { format, month, cutoff }, token);
   }
 
   static deleteSmogonSnapshot(format: string, month: string, cutoff: number, token: string) {
@@ -89,7 +85,7 @@ export class VgcMetaService {
   }
 
   static refreshChampions(regulationId: string, token: string) {
-    return apiAuthedPOST<{ count: number }>(
+    return apiAuthedPOST<CountResultDto>(
       `/tools/vgc/meta/champions/refresh?regulationId=${regulationId}`,
       {},
       token,
@@ -113,7 +109,7 @@ export class VgcMetaService {
   // ─── Limitless ─────────────────────────────────────────────────────────────
 
   static importLimitlessTournament(url: string, regulationId: string, token: string, maxPlayers?: number) {
-    return apiAuthedPOST<{ tournamentId: number }>('/tools/vgc/meta/limitless/tournament', {
+    return apiAuthedPOST<TournamentImportStartDto>('/tools/vgc/meta/limitless/tournament', {
       url,
       regulationId,
       ...(maxPlayers !== undefined ? { maxPlayers } : {}),
@@ -182,7 +178,7 @@ export class VgcMetaService {
     const params = new URLSearchParams();
     if (regulationId) params.set('regulationId', regulationId);
     const query = params.toString();
-    return apiGET<VgcIngestionJob[]>(`/tools/vgc/meta/jobs${query ? `?${query}` : ''}`);
+    return apiGET<VgcIngestionJobDto[]>(`/tools/vgc/meta/jobs${query ? `?${query}` : ''}`);
   }
 
   static getPersonalMetaComparison(
@@ -198,7 +194,7 @@ export class VgcMetaService {
     if (params.source) search.set('source', params.source);
     if (params.month) search.set('month', params.month);
     if (params.cutoff !== undefined) search.set('cutoff', String(params.cutoff));
-    return apiAuthedGET<PersonalMetaComparison>(`/tools/vgc/meta/compare/personal?${search}`, token);
+    return apiAuthedGET<PersonalMetaComparisonDto>(`/tools/vgc/meta/compare/personal?${search}`, token);
   }
 
   static getDivergence(params: {
@@ -211,65 +207,15 @@ export class VgcMetaService {
     if (params.tournamentId !== undefined) search.set('tournamentId', String(params.tournamentId));
     if (params.month) search.set('month', params.month);
     if (params.cutoff !== undefined) search.set('cutoff', String(params.cutoff));
-    return apiGET<DivergenceResult>(`/tools/vgc/meta/divergence?${search}`);
+    return apiGET<DivergenceResultDto>(`/tools/vgc/meta/divergence?${search}`);
   }
 }
 
-export interface VgcIngestionJob {
-  id: string;
-  type: 'smogon_snapshot' | 'champions_regulation' | 'limitless_tournament';
-  status: 'idle' | 'queued' | 'running' | 'done' | 'error';
-  revisionKey: string;
-  progress?: number;
-  total?: number;
-  startedAt?: string;
-  completedAt?: string;
-  lastError?: string;
-  metadata: Record<string, unknown>;
-}
-
-export interface PersonalMetaComparisonRow {
-  speciesId: string;
-  speciesName: string;
-  personalUsagePercent: number;
-  metaUsagePercent: number;
-  deltaPercent: number;
-  absDeltaPercent: number;
-  personalRawCount: number;
-  metaRawCount: number;
-}
-
-export interface PersonalMetaComparison {
-  regulationId: string;
-  source: 'smogon' | 'champions' | 'limitless';
-  personalSampleSize: number;
-  rowCount: number;
-  rows: PersonalMetaComparisonRow[];
-}
-
-export interface ChampionsRegulation {
-  id:           string;
-  formatId:     string;
-  name:         string;
-  gameType:     string;
-  vgcPastesGid: string | null;
-  importStatus?: 'idle' | 'running_csv' | 'running_pastes' | 'done' | 'error';
-  importError?: string | null;
-  importTeamCount?: number;
-  importFetchedCount?: number;
-  importStartedAt?: string | null;
-  importCompletedAt?: string | null;
-  active:       number;
-  createdAt:    string;
-}
-
-export interface UpsertRegulationPayload {
-  id: string;
-  formatId: string;
-  name: string;
-  gameType?: 'singles' | 'doubles';
-  vgcPastesGid?: string | null;
-}
+export type VgcIngestionJob = VgcIngestionJobDto;
+export type PersonalMetaComparisonRow = PersonalMetaComparisonRowDto;
+export type PersonalMetaComparison = PersonalMetaComparisonDto;
+export type ChampionsRegulation = ChampionsRegulationDto;
+export type UpsertRegulationPayload = UpsertRegulationDto;
 
 export class VgcRegulationsAdminService {
   static upsertRegulation(payload: UpsertRegulationPayload, token: string) {
@@ -279,87 +225,13 @@ export class VgcRegulationsAdminService {
 
 // ─── Limitless types ─────────────────────────────────────────────────────────
 
-export interface LimitlessTournament {
-  id:           number;
-  limitlessId:  string;
-  name:         string | null;
-  date:         string | null;
-  format:       string | null;
-  regulationId: string;
-  playerCount:  number | null;
-  status:       'pending' | 'running' | 'done' | 'error';
-  progress:     number;
-  total:        number;
-  errorMessage: string | null;
-  fetchedAt:    string;
-}
-
-export interface LimitlessPlayerEntry {
-  playerSlug: string;
-  playerName: string;
-  placing:    number;
-  record:     string;
-  drop:       number | null;
-  hasTeam:    boolean;
-}
-
-export interface LimitlessMetaSlot {
-  slotIndex:   number;
-  speciesId:   string;
-  speciesName: string;
-  item?:       string;
-  ability?:    string;
-  moves:       string[];
-  tera?:       string;
-}
-
-export interface LimitlessPlayerTeam {
-  playerSlug: string;
-  playerName: string;
-  placing:    number;
-  record:     string;
-  rawText:    string;
-  slots:      LimitlessMetaSlot[];
-}
-
-export interface LimitlessImportJobStatus {
-  tournamentId: number;
-  status:       string;
-  progress:     number;
-  total:        number;
-  errorMessage?: string;
-}
-
-export interface SpeedTierEntry {
-  name: string;
-  num: number;
-  types: string[];
-  baseSpeed: number;
-  abilities: { [slot: string]: string };
-  isRestricted: boolean;
-  isMythical: boolean;
-  requiredItem: string | null;
-  speedTiers: {
-    min: number;
-    minPlus: number;
-    max: number;
-    maxPlus: number;
-    scarf: number | null;
-    scarfPlus: number | null;
-  };
-}
-
-export interface VgcPokemon {
-  name: string;
-  num: number;
-  types: string[];
-  baseStats: { hp: number; atk: number; def: number; spa: number; spd: number; spe: number };
-  abilities: { [slot: string]: string };
-  weightkg: number;
-  isRestricted: boolean;
-  isMythical: boolean;
-  requiredItem: string | null;
-}
+export type LimitlessTournament = LimitlessTournamentDto;
+export type LimitlessPlayerEntry = LimitlessPlayerDto;
+export type LimitlessMetaSlot = VgcMetaSlotDto;
+export type LimitlessPlayerTeam = LimitlessPlayerTeamDto;
+export type LimitlessImportJobStatus = ImportJobStatusDto;
+export type SpeedTierEntry = SpeedTierEntryDto;
+export type VgcPokemon = VgcPokemonDto;
 
 export class VgcService {
   static getChampionsRegulations() {
@@ -392,48 +264,11 @@ export class VgcService {
 
 // ─── Species Teams ────────────────────────────────────────────────────────────
 
-export interface SpeciesTeamSlot {
-  slotIndex:   number;
-  speciesId:   string;
-  speciesName: string;
-  item?:       string;
-  ability?:    string;
-  moves:       string[];
-  tera?:       string;
-}
-
-export interface SpeciesTeamEntry {
-  source:      'vgcpastes' | 'limitless' | 'paste';
-  playerId:    string;
-  playerName:  string | null;
-  record:      string | null;
-  rank:        string | null;
-  slots:       SpeciesTeamSlot[];
-  rawText:     string;
-  replicaCode: string | null;
-}
+export type SpeciesTeamSlot = VgcMetaSlotDto;
+export type SpeciesTeamEntry = SpeciesTeamEntryDto;
 
 // ─── Divergence types ────────────────────────────────────────────────────────
 
-export type DivergenceBadge = 'ladder-trap' | 'tournament-staple' | null;
-
-export interface DivergenceRow {
-  speciesId:         string;
-  speciesName:       string;
-  ladderPercent:     number;
-  tournamentPercent: number;
-  deltaPercent:      number;
-  absDeltaPercent:   number;
-  badge:             DivergenceBadge;
-}
-
-export interface DivergenceResult {
-  regulationId:  string;
-  /** null = combined across all completed tournaments in the regulation */
-  tournamentId:  number | null;
-  ladderFormat:  string;
-  ladderMonth:   string;
-  ladderCutoff:  number;
-  rowCount:      number;
-  rows:          DivergenceRow[];
-}
+export type DivergenceBadge = DivergenceRowDto['badge'];
+export type DivergenceRow = DivergenceRowDto;
+export type DivergenceResult = DivergenceResultDto;

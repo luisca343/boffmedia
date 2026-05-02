@@ -2,6 +2,7 @@ import { Controller, Get, NotFoundException, Param, UseInterceptors } from '@nes
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { VgcService, VgcPokemon, SpeedTierEntry } from './vgc.service';
+import { SpeedTierEntryDto, VgcPokemonDto } from './dto/vgc-response.dto';
 
 @ApiTags('BoffMedia 🛠 | Pokémon VGC')
 @Controller('tools/vgc')
@@ -22,7 +23,7 @@ export class VgcController {
     description: 'Champions regulation shorthand ID',
     example: 'vgc2026regma',
   })
-  @ApiResponse({ status: 200, description: 'Legal Pokémon retrieved successfully.' })
+  @ApiResponse({ status: 200, description: 'Legal Pokémon retrieved successfully.', type: VgcPokemonDto, isArray: true })
   async getChampionsLegalPokemon(@Param('regulationId') regulationId: string): Promise<VgcPokemon[]> {
     const regulation = await this.vgcService.getRegulationById(regulationId);
     if (!regulation) {
@@ -43,7 +44,7 @@ export class VgcController {
     description: 'Champions regulation shorthand ID',
     example: 'vgc2026regma',
   })
-  @ApiResponse({ status: 200, description: 'Speed tiers retrieved successfully.' })
+  @ApiResponse({ status: 200, description: 'Speed tiers retrieved successfully.', type: SpeedTierEntryDto, isArray: true })
   async getChampionsSpeedTiers(@Param('regulationId') regulationId: string): Promise<SpeedTierEntry[]> {
     const regulation = await this.vgcService.getRegulationById(regulationId);
     if (!regulation) {

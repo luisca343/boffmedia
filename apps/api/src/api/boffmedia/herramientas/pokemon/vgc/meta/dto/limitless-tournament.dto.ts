@@ -3,15 +3,15 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 export class LimitlessTournamentDto {
   @ApiProperty() id:           number;
   @ApiProperty() limitlessId:  string;
-  @ApiProperty() name:         string;
-  @ApiProperty() date:         string;
-  @ApiProperty() format:       string;
+  @ApiProperty({ nullable: true }) name:         string | null;
+  @ApiProperty({ nullable: true }) date:         string | null;
+  @ApiProperty({ nullable: true }) format:       string | null;
   @ApiProperty() regulationId: string;
-  @ApiProperty() playerCount:  number;
+  @ApiProperty({ nullable: true }) playerCount:  number | null;
   @ApiProperty() status:       string;
   @ApiProperty() progress:     number;
   @ApiProperty() total:        number;
-  @ApiPropertyOptional() errorMessage?: string;
+  @ApiPropertyOptional({ nullable: true }) errorMessage?: string | null;
   @ApiProperty() fetchedAt:    string;
 }
 

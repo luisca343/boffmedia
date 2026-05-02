@@ -141,8 +141,7 @@ export function VgcChampionsFetcher() {
           id: newRegulationId.trim(),
           formatId: newFormatId.trim(),
           name: newName.trim(),
-          gameType: "doubles",
-          vgcPastesGid: newGid.trim() ? newGid.trim() : null,
+          ...(newGid.trim() ? { vgcPastesGid: newGid.trim() } : {}),
         },
         token,
       );
