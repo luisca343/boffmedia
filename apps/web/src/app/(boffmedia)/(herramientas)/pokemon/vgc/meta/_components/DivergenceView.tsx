@@ -6,7 +6,6 @@ import { ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DivergenceBadge, DivergenceResult, DivergenceRow } from "@/services/api/boffmedia/vgcService";
 import { spriteUrl, handleSpriteError } from "@/features/vgc-tracker/types";
-import { Badge } from "@/components/ui/primitives/badge";
 
 type SortKey = "ladder" | "tournament" | "delta";
 type SortDir = "asc" | "desc";
@@ -28,9 +27,9 @@ function BadgeChip({ badge, t }: { badge: DivergenceBadge; t: (k: string) => str
   if (!badge) return null;
   const isLadder = badge === "ladder-trap";
   return (
-    <Badge
-      variant="outline"
+    <span
       className={cn(
+        "inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-medium border",
         isLadder
           ? "border-amber-500/30 text-amber-300 bg-amber-500/15"
           : "border-blue-500/30 text-blue-300 bg-blue-500/15",
@@ -38,7 +37,7 @@ function BadgeChip({ badge, t }: { badge: DivergenceBadge; t: (k: string) => str
       title={t(isLadder ? "badges.ladderTrapTitle" : "badges.tournamentStapleTitle")}
     >
       {t(isLadder ? "badges.ladderTrap" : "badges.tournamentStaple")}
-    </Badge>
+    </span>
   );
 }
 
