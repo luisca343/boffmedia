@@ -100,21 +100,21 @@ export function DivergenceView({ result, loading, error }: Props) {
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Info strip */}
-      <div className="shrink-0 px-4 py-1.5 border-b border-surface-700 flex items-center gap-2 text-xs text-surface-400">
-        <span className="text-surface-500">Smogon</span>
-        <span>{result.ladderFormat}</span>
+      <div className="shrink-0 border border-surface-700/80 bg-surface-800/50 px-3 py-2 flex items-center gap-2 text-xs text-surface-400">
+        <span className="inline-flex items-center rounded-md border border-surface-700/80 bg-surface-900/45 px-2 py-0.5 text-surface-500">Smogon</span>
+        <span className="text-surface-200">{result.ladderFormat}</span>
         <span className="text-surface-700">·</span>
         <span>{result.ladderMonth}</span>
         <span className="text-surface-700">·</span>
         <span>{cutoffLabel}</span>
-        <span className="ml-auto text-surface-500">{t("rowCount", { count: result.rowCount })}</span>
+        <span className="ml-auto text-surface-500 tabular-nums">{t("rowCount", { count: result.rowCount })}</span>
       </div>
 
       {/* Table */}
-      <div className="flex-1 overflow-y-auto">
-        <table className="w-full text-sm border-collapse">
-          <thead className="sticky top-0 bg-surface-900 z-10">
-            <tr className="border-b border-surface-700 text-left text-surface-400 text-xs uppercase tracking-wide">
+      <div className="flex-1 min-h-0 overflow-auto border border-surface-700/80 bg-surface-800/50 shadow-sm">
+        <table className="w-full min-w-[44rem] text-sm border-collapse">
+          <thead className="sticky top-0 bg-surface-900/95 backdrop-blur-sm z-10">
+            <tr className="border-b border-surface-700/70 text-left text-surface-400 text-[11px] uppercase tracking-[0.08em]">
               <th className="py-2 px-3 w-8 font-medium">#</th>
               <th className="py-2 px-3 font-medium">{t("col.pokemon")}</th>
               <th
@@ -170,10 +170,10 @@ function DivergenceTableRow({
   const positive = row.deltaPercent > 0;
 
   return (
-    <tr className="border-b border-surface-700/50 hover:bg-surface-700/30 transition-colors">
-      <td className="py-2 px-3 text-surface-500 font-mono text-xs">{rank}</td>
+    <tr className="border-b border-surface-700/35 hover:bg-surface-700/20 transition-colors">
+      <td className="py-2.5 px-3 text-surface-500 font-mono text-xs tabular-nums">{rank}</td>
 
-      <td className="py-2 px-3">
+      <td className="py-2.5 px-3">
         <span className="flex items-center gap-2">
           <img
             src={spriteUrl(row.speciesName)}
@@ -187,22 +187,22 @@ function DivergenceTableRow({
         </span>
       </td>
 
-      <td className="py-2 px-3 text-surface-300 text-xs tabular-nums">
+      <td className="py-2.5 px-3 text-surface-300 text-xs tabular-nums">
         {row.ladderPercent.toFixed(2)}%
       </td>
 
-      <td className="py-2 px-3 text-surface-300 text-xs tabular-nums">
+      <td className="py-2.5 px-3 text-surface-300 text-xs tabular-nums">
         {row.tournamentPercent.toFixed(2)}%
       </td>
 
       <td className={cn(
-        "py-2 px-3 text-xs font-semibold tabular-nums",
+        "py-2.5 px-3 text-xs font-semibold tabular-nums",
         positive ? "text-amber-400" : "text-blue-400",
       )}>
         {positive ? "+" : ""}{row.deltaPercent.toFixed(2)}%
       </td>
 
-      <td className="py-2 px-3">
+      <td className="py-2.5 px-3">
         <BadgeChip badge={row.badge} t={t} />
       </td>
     </tr>
