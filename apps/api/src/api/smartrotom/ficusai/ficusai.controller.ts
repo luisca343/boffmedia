@@ -6,6 +6,8 @@ import { GetMessagesDto } from './dto/get-messages.dto';
 import { FicusMessageContentDto } from './dto/ficus-message-content.dto';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
+import { FicusAiUserStatsEntity } from './entities/ficusai-user-stats.entity';
+import { FicusAiHealthEntity } from './entities/ficusai-health.entity';
 
 @ApiTags('FicusAI - Chat Assistant')
 @Controller('smartrotom/ficusai')
@@ -114,7 +116,8 @@ export class FicusAIController {
   })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Statistics retrieved successfully'
+    description: 'Statistics retrieved successfully',
+    type: FicusAiUserStatsEntity
   })
   @ApiQuery({
     name: 'uuid',
@@ -138,7 +141,8 @@ export class FicusAIController {
   })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Service is healthy'
+    description: 'Service is healthy',
+    type: FicusAiHealthEntity
   })
   async healthCheck() {
     return {

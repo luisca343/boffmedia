@@ -1,4 +1,5 @@
 import { rotomPOST, ApiResponse } from "@/services/boffAPI"
+import { PokemonW } from "@boffmedia/shared"
 
 export type MinecraftStats = {
   stats: {
@@ -53,21 +54,8 @@ export type MinecraftStats = {
 };
 
 
-  export type Pokemon = {
-    dex: number;
-    nature: string;
-    species: string;
-    form: string;
-    palette: string;
-    name: string;
-    level: number;
-    item: string;
-    ability: string;
-    moves: (string | null)[];
-    ivs: number[];
-    evs: number[];
-    stats: number[];
-  };
+/** @deprecated use PokemonW from @boffmedia/shared */
+export type Pokemon = PokemonW;
 
 export class PlayerService {
   /**
@@ -81,7 +69,7 @@ export class PlayerService {
    * Get player's Pokemon team
    */
   static getTeam(uuid: string) {
-    return rotomPOST<Pokemon[]>("/player/team", { uuid });
+    return rotomPOST<PokemonW[]>("/player/team", { uuid });
   }
 }
 
