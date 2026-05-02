@@ -478,7 +478,8 @@
         "featuringTeams": "Featuring Teams",
         "teamsLoading": "Loading teams\u2026",
         "copyPaste": "Copy Paste",
-        "copied": "Copied!"
+        "copied": "Copied!",
+        "rentalCode": "Rental Code"
       },
       "standings": {
         "loading": "Loading standings\u2026",

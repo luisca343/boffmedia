@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "17c4ebc2-4279-436a-be45-ea5ab25dadd2",
+  "id": "b8718bad-917d-420b-b69c-d62d77bebbd0",
   "prevId": "4a810547-6324-42a2-9ac9-81fc9841cfe1",
   "tables": {
     "boffmedia_roles": {
@@ -3588,10 +3588,10 @@
         }
       },
       "foreignKeys": {
-        "vgc_limitless_teams_paste_id_vgc_pastes_id_fk": {
-          "name": "vgc_limitless_teams_paste_id_vgc_pastes_id_fk",
+        "vgc_limitless_teams_paste_id_vgc_pokepastes_id_fk": {
+          "name": "vgc_limitless_teams_paste_id_vgc_pokepastes_id_fk",
           "tableFrom": "vgc_limitless_teams",
-          "tableTo": "vgc_pastes",
+          "tableTo": "vgc_pokepastes",
           "columnsFrom": [
             "paste_id"
           ],
@@ -3753,8 +3753,8 @@
       },
       "checkConstraint": {}
     },
-    "vgc_paste_teams": {
-      "name": "vgc_paste_teams",
+    "vgc_pastes_repository": {
+      "name": "vgc_pastes_repository",
       "columns": {
         "id": {
           "name": "id",
@@ -3841,13 +3841,6 @@
           "notNull": false,
           "autoincrement": false
         },
-        "replica_code": {
-          "name": "replica_code",
-          "type": "varchar(20)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
         "has_evs": {
           "name": "has_evs",
           "type": "varchar(4)",
@@ -3878,15 +3871,15 @@
         }
       },
       "indexes": {
-        "vgc_paste_teams_regulation_idx": {
-          "name": "vgc_paste_teams_regulation_idx",
+        "vgc_pastes_repository_regulation_idx": {
+          "name": "vgc_pastes_repository_regulation_idx",
           "columns": [
             "regulation_id"
           ],
           "isUnique": false
         },
-        "vgc_paste_teams_regulation_paste_idx": {
-          "name": "vgc_paste_teams_regulation_paste_idx",
+        "vgc_pastes_repository_regulation_paste_idx": {
+          "name": "vgc_pastes_repository_regulation_paste_idx",
           "columns": [
             "regulation_id",
             "paste_id"
@@ -3895,10 +3888,10 @@
         }
       },
       "foreignKeys": {
-        "vgc_paste_teams_paste_id_vgc_pastes_id_fk": {
-          "name": "vgc_paste_teams_paste_id_vgc_pastes_id_fk",
-          "tableFrom": "vgc_paste_teams",
-          "tableTo": "vgc_pastes",
+        "vgc_pastes_repository_paste_id_vgc_pokepastes_id_fk": {
+          "name": "vgc_pastes_repository_paste_id_vgc_pokepastes_id_fk",
+          "tableFrom": "vgc_pastes_repository",
+          "tableTo": "vgc_pokepastes",
           "columnsFrom": [
             "paste_id"
           ],
@@ -3910,8 +3903,8 @@
         }
       },
       "compositePrimaryKeys": {
-        "vgc_paste_teams_id": {
-          "name": "vgc_paste_teams_id",
+        "vgc_pastes_repository_id": {
+          "name": "vgc_pastes_repository_id",
           "columns": [
             "id"
           ]
@@ -3920,8 +3913,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "vgc_pastes": {
-      "name": "vgc_pastes",
+    "vgc_pokepastes": {
+      "name": "vgc_pokepastes",
       "columns": {
         "id": {
           "name": "id",
@@ -3979,6 +3972,13 @@
           "notNull": false,
           "autoincrement": false
         },
+        "replica_code": {
+          "name": "replica_code",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "fetched_at": {
           "name": "fetched_at",
           "type": "datetime",
@@ -3988,8 +3988,8 @@
         }
       },
       "indexes": {
-        "vgc_pastes_format_idx": {
-          "name": "vgc_pastes_format_idx",
+        "vgc_pokepastes_format_idx": {
+          "name": "vgc_pokepastes_format_idx",
           "columns": [
             "format_id"
           ],
@@ -3998,22 +3998,22 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "vgc_pastes_id": {
-          "name": "vgc_pastes_id",
+        "vgc_pokepastes_id": {
+          "name": "vgc_pokepastes_id",
           "columns": [
             "id"
           ]
         }
       },
       "uniqueConstraints": {
-        "vgc_pastes_pokepaste_id_unique": {
-          "name": "vgc_pastes_pokepaste_id_unique",
+        "vgc_pokepastes_pokepaste_id_unique": {
+          "name": "vgc_pokepastes_pokepaste_id_unique",
           "columns": [
             "pokepaste_id"
           ]
         },
-        "vgc_pastes_source_key_unique": {
-          "name": "vgc_pastes_source_key_unique",
+        "vgc_pokepastes_source_key_unique": {
+          "name": "vgc_pokepastes_source_key_unique",
           "columns": [
             "source_key"
           ]

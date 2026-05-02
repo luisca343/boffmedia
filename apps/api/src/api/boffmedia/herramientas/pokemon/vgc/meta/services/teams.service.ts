@@ -37,13 +37,14 @@ export class TeamsService {
       const slots = JSON.parse(team.parsedSlots) as VgcMetaSlot[];
       if (!slots.some((s) => s.speciesId === speciesId)) continue;
       results.push({
-        source:     'vgcpastes',
-        playerId:   team.teamId,
-        playerName: team.playerName,
-        record:     null,
-        rank:       team.rank,
+        source:      'vgcpastes',
+        playerId:    team.teamId,
+        playerName:  team.playerName,
+        record:      null,
+        rank:        team.rank,
         slots,
-        rawText:    team.rawText,
+        rawText:     team.rawText,
+        replicaCode: team.replicaCode ?? null,
       });
     }
 
@@ -51,13 +52,14 @@ export class TeamsService {
       const slots = JSON.parse(team.parsedSlots) as VgcMetaSlot[];
       if (!slots.some((s) => s.speciesId === speciesId)) continue;
       results.push({
-        source:     'limitless',
-        playerId:   team.playerSlug,
-        playerName: team.playerName,
-        record:     team.record,
-        rank:       team.placing != null ? String(team.placing) : null,
+        source:      'limitless',
+        playerId:    team.playerSlug,
+        playerName:  team.playerName,
+        record:      team.record,
+        rank:        team.placing != null ? String(team.placing) : null,
         slots,
-        rawText:    team.rawText,
+        rawText:     team.rawText,
+        replicaCode: null,
       });
     }
 
@@ -77,13 +79,14 @@ export class TeamsService {
       const slots = JSON.parse(paste.parsedSlots) as VgcMetaSlot[];
       if (!slots.some((s) => s.speciesId === speciesId)) continue;
       results.push({
-        source:     'paste',
-        playerId:   String(paste.id),
-        playerName: paste.author ?? null,
-        record:     null,
-        rank:       null,
+        source:      'paste',
+        playerId:    String(paste.id),
+        playerName:  paste.author ?? null,
+        record:      null,
+        rank:        null,
         slots,
-        rawText:    paste.rawText,
+        rawText:     paste.rawText,
+        replicaCode: paste.replicaCode ?? null,
       });
     }
 

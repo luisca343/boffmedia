@@ -2,14 +2,14 @@ import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { and, eq, inArray, isNotNull, isNull } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import { vgcPasteTeams, vgcPastes, VgcPasteTeam } from '@/_db/schema/Vgc';
+import { vgcPastesRepository, vgcPokepastes, VgcPastesRepositoryEntry } from '@/_db/schema/Vgc';
 
 @Injectable()
 export class VgcPastesRepository {
   constructor(@Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>) {}
 
-  async findByRegulation(regulationId: string): Promise<VgcPasteTeam[]> {
-    return this.db.select().from(vgcPasteTeams).where(eq(vgcPasteTeams.regulationId, regulationId));
+  async findByRegulation(regulationId: string): Promise<VgcPastesRepositoryEntry[]> {
+    return this.db.select().from(vgcPastesRepository).where(eq(vgcPastesRepository.regulationId, regulationId));
   }
 
   async upsertTeam(data: {
@@ -25,7 +25,6 @@ export class VgcPastesRepository {
     species:         string[];
     items?:          string[];
     replicaStatus?:  string | null;
-    replicaCode?:    string | null;
     hasEvs?:         string | null;
     sourceUrl?:      string | null;
     owner?:          string | null;
@@ -43,14 +42,13 @@ export class VgcPastesRepository {
       species:         JSON.stringify(data.species),
       items:           JSON.stringify(data.items ?? []),
       replicaStatus:   data.replicaStatus   ?? null,
-      replicaCode:     data.replicaCode     ?? null,
       hasEvs:          data.hasEvs          ?? null,
       sourceUrl:       data.sourceUrl       ?? null,
       owner:           data.owner           ?? null,
       fetchedAt:       new Date(),
     };
     await this.db
-      .insert(vgcPasteTeams)
+      .insert(vgcPastesRepository)
       .values(row)
       .onDuplicateKeyUpdate({
         set: {
@@ -64,7 +62,6 @@ export class VgcPastesRepository {
           species:         row.species,
           items:           row.items,
           replicaStatus:   row.replicaStatus,
-          replicaCode:     row.replicaCode,
           hasEvs:          row.hasEvs,
           sourceUrl:       row.sourceUrl,
           owner:           row.owner,
@@ -75,60 +72,70 @@ export class VgcPastesRepository {
 
   async linkPaste(teamId: string, pasteId: number): Promise<void> {
     await this.db
-      .update(vgcPasteTeams)
+      .update(vgcPastesRepository)
       .set({ pasteId })
-      .where(eq(vgcPasteTeams.id, teamId));
+      .where(eq(vgcPastesRepository.id, teamId));
   }
 
   async deleteByRegulation(regulationId: string): Promise<void> {
-    await this.db.delete(vgcPasteTeams).where(eq(vgcPasteTeams.regulationId, regulationId));
+    await this.db.delete(vgcPastesRepository).where(eq(vgcPastesRepository.regulationId, regulationId));
   }
 
   async findTeamIdsByRegulation(regulationId: string): Promise<string[]> {
     const rows = await this.db
-      .select({ id: vgcPasteTeams.id })
-      .from(vgcPasteTeams)
-      .where(eq(vgcPasteTeams.regulationId, regulationId));
+      .select({ id: vgcPastesRepository.id })
+      .from(vgcPastesRepository)
+      .where(eq(vgcPastesRepository.regulationId, regulationId));
     return rows.map((row) => row.id);
   }
 
   async deleteTeamsByIds(teamIds: string[]): Promise<void> {
     if (teamIds.length === 0) return;
     await this.db
-      .delete(vgcPasteTeams)
-      .where(inArray(vgcPasteTeams.id, teamIds));
+      .delete(vgcPastesRepository)
+      .where(inArray(vgcPastesRepository.id, teamIds));
   }
 
   async findAvailableRegulations(): Promise<string[]> {
     const rows = await this.db
-      .selectDistinct({ regulationId: vgcPasteTeams.regulationId })
-      .from(vgcPasteTeams)
-      .where(isNotNull(vgcPasteTeams.regulationId));
+      .selectDistinct({ regulationId: vgcPastesRepository.regulationId })
+      .from(vgcPastesRepository)
+      .where(isNotNull(vgcPastesRepository.regulationId));
     return rows.map((r) => r.regulationId).filter(Boolean) as string[];
   }
 
   /** Teams that have a paste URL but have not yet had their paste fetched and linked. */
-  async findTeamsNeedingFetch(regulationId: string): Promise<Array<{ id: string; pasteUrl: string }>> {
+  async findTeamsNeedingFetch(regulationId: string): Promise<Array<{
+    id:              string;
+    pasteUrl:        string;
+    owner:           string | null;
+    teamDescription: string | null;
+  }>> {
     const rows = await this.db
-      .select({ id: vgcPasteTeams.id, pasteUrl: vgcPasteTeams.pasteUrl })
-      .from(vgcPasteTeams)
+      .select({
+        id:              vgcPastesRepository.id,
+        pasteUrl:        vgcPastesRepository.pasteUrl,
+        owner:           vgcPastesRepository.owner,
+        teamDescription: vgcPastesRepository.teamDescription,
+      })
+      .from(vgcPastesRepository)
       .where(
         and(
-          eq(vgcPasteTeams.regulationId, regulationId),
-          isNotNull(vgcPasteTeams.pasteUrl),
-          isNull(vgcPasteTeams.pasteId),
+          eq(vgcPastesRepository.regulationId, regulationId),
+          isNotNull(vgcPastesRepository.pasteUrl),
+          isNull(vgcPastesRepository.pasteId),
         ),
       );
-    return rows.filter((r): r is { id: string; pasteUrl: string } => r.pasteUrl !== null);
+    return rows.filter((r): r is typeof rows[number] & { pasteUrl: string } => r.pasteUrl !== null);
   }
 
   /** All parsed paste slots for teams in a regulation that have a linked paste. */
   async findParsedSlotsByRegulation(regulationId: string): Promise<Array<{ parsedSlots: string }>> {
     return this.db
-      .select({ parsedSlots: vgcPastes.parsedSlots })
-      .from(vgcPasteTeams)
-      .innerJoin(vgcPastes, eq(vgcPasteTeams.pasteId, vgcPastes.id))
-      .where(eq(vgcPasteTeams.regulationId, regulationId));
+      .select({ parsedSlots: vgcPokepastes.parsedSlots })
+      .from(vgcPastesRepository)
+      .innerJoin(vgcPokepastes, eq(vgcPastesRepository.pasteId, vgcPokepastes.id))
+      .where(eq(vgcPastesRepository.regulationId, regulationId));
   }
 
   /**
@@ -143,28 +150,21 @@ export class VgcPastesRepository {
     dateShared:  string | null;
     parsedSlots: string;
     rawText:     string;
+    replicaCode: string | null;
   }>> {
-    const rows = await this.db
+    return this.db
       .select({
-        teamId:      vgcPasteTeams.id,
-        playerName:  vgcPasteTeams.playerName,
-        rank:        vgcPasteTeams.rank,
-        tournament:  vgcPasteTeams.tournament,
-        dateShared:  vgcPasteTeams.dateShared,
-        parsedSlots: vgcPastes.parsedSlots,
-        rawText:     vgcPastes.rawText,
+        teamId:      vgcPastesRepository.id,
+        playerName:  vgcPastesRepository.playerName,
+        rank:        vgcPastesRepository.rank,
+        tournament:  vgcPastesRepository.tournament,
+        dateShared:  vgcPastesRepository.dateShared,
+        parsedSlots: vgcPokepastes.parsedSlots,
+        rawText:     vgcPokepastes.rawText,
+        replicaCode: vgcPokepastes.replicaCode,
       })
-      .from(vgcPasteTeams)
-      .innerJoin(vgcPastes, eq(vgcPasteTeams.pasteId, vgcPastes.id))
-      .where(eq(vgcPasteTeams.regulationId, regulationId));
-    return rows as Array<{
-      teamId:      string;
-      playerName:  string | null;
-      rank:        string | null;
-      tournament:  string | null;
-      dateShared:  string | null;
-      parsedSlots: string;
-      rawText:     string;
-    }>;
+      .from(vgcPastesRepository)
+      .innerJoin(vgcPokepastes, eq(vgcPastesRepository.pasteId, vgcPokepastes.id))
+      .where(eq(vgcPastesRepository.regulationId, regulationId));
   }
 }

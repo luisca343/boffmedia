@@ -478,7 +478,8 @@
         "featuringTeams": "Equipos con este Pok\u00e9mon",
         "teamsLoading": "Cargando equipos\u2026",
         "copyPaste": "Copiar paste",
-        "copied": "\u00a1Copiado!"
+        "copied": "\u00a1Copiado!",
+        "rentalCode": "C\u00f3digo de alquiler"
       },
       "standings": {
         "loading": "Cargando resultados\u2026",
