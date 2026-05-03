@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams, useParams } from "next/navigation";
 import {
   ChampionsRegulation,
@@ -12,6 +12,7 @@ import { ENABLE_PREVIEW_FORMATS } from "../constants";
 
 const BASE_PATH      = "/pokemon/vgc/meta";
 export const DEFAULT_CUTOFF = 1760;
+const DESKTOP_MEDIA_QUERY = "(min-width: 768px)";
 
 export interface MetaUrlState {
   tab:          string;
@@ -116,6 +117,7 @@ export function useMetaNavigation({
   const router       = useRouter();
   const searchParams = useSearchParams();
   const rawParams    = useParams();
+  const [isDesktop, setIsDesktop] = useState(false);
 
   const speciesId    = rawParams?.speciesId as string | undefined;
   const tab          = searchParams.get("tab")          ?? "stats";
@@ -132,6 +134,18 @@ export function useMetaNavigation({
   );
 
   const isDisabledPreviewFormat = !ENABLE_PREVIEW_FORMATS && Boolean(selectedRegulation?.vgcPastesGid);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(DESKTOP_MEDIA_QUERY);
+    const updateViewport = () => setIsDesktop(mediaQuery.matches);
+
+    updateViewport();
+    mediaQuery.addEventListener("change", updateViewport);
+
+    return () => {
+      mediaQuery.removeEventListener("change", updateViewport);
+    };
+  }, []);
 
   // If preview formats are disabled but URL still points to one, force fallback.
   useEffect(() => {
@@ -224,10 +238,11 @@ export function useMetaNavigation({
 
   // Auto-navigate to first Pokémon when list loads and no selection
   useEffect(() => {
+    if (!isDesktop) return;
     if (!speciesId && entries.length > 0 && view === "aggregate") {
       router.replace(buildUrl({ speciesId: entries[0].speciesId, tab, format, month, cutoff, regulation, tournamentId, view }));
     }
-  }, [entries, speciesId, view, router, tab, format, month, cutoff, regulation, tournamentId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isDesktop, entries, speciesId, view, router, tab, format, month, cutoff, regulation, tournamentId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const detail = useMemo(
     () => (speciesId ? (entriesMap.get(speciesId) ?? null) : null),
