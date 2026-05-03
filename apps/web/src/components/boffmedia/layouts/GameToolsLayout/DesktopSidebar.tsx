@@ -44,7 +44,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         willChange: "width",
         background: "linear-gradient(180deg, rgba(12,18,32,0.98) 0%, rgba(9,14,26,0.99) 100%)",
         borderRight: "1px solid rgba(71,85,105,0.4)",
-        boxShadow: "4px 0 24px rgba(0,0,0,0.4), inset -1px 0 0 rgba(255,255,255,0.02)",
+        //boxShadow: "4px 0 24px rgba(0,0,0,0.4), inset -1px 0 0 rgba(255,255,255,0.02)",
       }}
     >
       {/* Top neon accent bar */}
