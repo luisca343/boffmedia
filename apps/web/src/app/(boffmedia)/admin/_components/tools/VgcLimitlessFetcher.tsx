@@ -273,6 +273,7 @@ export function VgcLimitlessFetcher() {
                 <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-[0.08em] text-surface-500 font-semibold">Torneo</th>
                 <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-[0.08em] text-surface-500 font-semibold">Estado</th>
                 <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-[0.08em] text-surface-500 font-semibold">Jugadores</th>
+                <th className="px-4 py-2.5 text-left text-[11px] uppercase tracking-[0.08em] text-surface-500 font-semibold">Cargados</th>
               </tr>
             </thead>
             <tbody>
@@ -302,6 +303,9 @@ export function VgcLimitlessFetcher() {
                   </td>
                   <td className="px-4 py-3 text-xs text-surface-400">
                     {t.playerCount ?? "—"}
+                  </td>
+                  <td className="px-4 py-3 text-xs text-surface-400">
+                    {t.progress ? `${t.progress}/${t.total}` : "—"}
                   </td>
                 </tr>
               ))}
