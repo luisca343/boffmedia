@@ -1,5 +1,46 @@
 {
   "vgc": {
+    "calc": {
+      "title": "Damage Calculator",
+      "subtitle": "Calculate damage with full VGC field conditions",
+      "tabs": {
+        "calc": "Calculator",
+        "matrix": "Matrix",
+        "speed": "Speed",
+        "typecalc": "Types"
+      },
+      "panel": {
+        "attacker": "Pokémon 1 — Attacker",
+        "defender": "Pokémon 2 — Defender",
+        "searchPlaceholder": "Search Pokémon...",
+        "level": "Level",
+        "nature": "Nature",
+        "ability": "Ability",
+        "item": "Item",
+        "tera": "Tera",
+        "status": "Status",
+        "boost": "Boost",
+        "moves": "Moves"
+      },
+      "field": {
+        "title": "Field",
+        "weather": "Weather",
+        "terrain": "Terrain",
+        "conditions": "Conditions",
+        "attackerSide": "Attacker Side",
+        "defenderSide": "Defender Side"
+      },
+      "result": {
+        "selectMove": "← select a move",
+        "selectMoveRight": "select a move →",
+        "noKO": "no KO",
+        "possibleOHKO": "possible OHKO",
+        "guaranteedOHKO": "guaranteed OHKO",
+        "guaranteed2HKO": "guaranteed 2HKO",
+        "possible2HKO": "possible 2HKO",
+        "noImmune": "No damage / immune"
+      }
+    },
     "speed": {
       "title": "Speed",
       "subtitle": "Speed tier reference and head-to-head matchup calculator",
@@ -477,13 +518,13 @@
         "other": "Other",
         "usagePercent": "{percent}% usage",
         "featuringTeams": "Featuring Teams",
-        "teamsLoading": "Loading teams\u2026",
+        "teamsLoading": "Loading teams…",
         "copyPaste": "Copy Paste",
         "copied": "Copied!",
         "rentalCode": "Rental Code"
       },
       "standings": {
-        "loading": "Loading standings\u2026",
+        "loading": "Loading standings…",
         "empty": "No players found.",
         "col": {
           "rank": "#",
@@ -491,8 +532,8 @@
           "record": "Record",
           "team": "Team"
         },
-        "teamLoading": "Loading\u2026",
-        "copyPaste": "Copy Pok\u00e9paste",
+        "teamLoading": "Loading…",
+        "copyPaste": "Copy Poképaste",
         "copied": "Copied!",
         "tera": "Tera: {type}"
       },

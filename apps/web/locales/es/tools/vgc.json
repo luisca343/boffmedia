@@ -1,5 +1,46 @@
 {
   "vgc": {
+    "calc": {
+      "title": "Calculadora de Daño",
+      "subtitle": "Calcula el daño con condiciones de campo VGC completas",
+      "tabs": {
+        "calc": "Calculadora",
+        "matrix": "Matriz",
+        "speed": "Velocidad",
+        "typecalc": "Tipos"
+      },
+      "panel": {
+        "attacker": "Pokémon 1 — Atacante",
+        "defender": "Pokémon 2 — Defensor",
+        "searchPlaceholder": "Buscar Pokémon...",
+        "level": "Nivel",
+        "nature": "Naturaleza",
+        "ability": "Habilidad",
+        "item": "Objeto",
+        "tera": "Tera",
+        "status": "Estado",
+        "boost": "Incremento",
+        "moves": "Movimientos"
+      },
+      "field": {
+        "title": "Campo",
+        "weather": "Clima",
+        "terrain": "Terreno",
+        "conditions": "Condiciones",
+        "attackerSide": "Lado Atacante",
+        "defenderSide": "Lado Defensor"
+      },
+      "result": {
+        "selectMove": "← selecciona un movimiento",
+        "selectMoveRight": "selecciona un movimiento →",
+        "noKO": "sin KO",
+        "possibleOHKO": "posible OHKO",
+        "guaranteedOHKO": "OHKO garantizado",
+        "guaranteed2HKO": "2HKO garantizado",
+        "possible2HKO": "posible 2HKO",
+        "noImmune": "Sin daño / inmune"
+      }
+    },
     "speed": {
       "title": "Velocidad",
       "subtitle": "Referencia de niveles de velocidad y calculadora de matchups",
@@ -476,14 +517,14 @@
         "battles": "{count} combates",
         "other": "Otros",
         "usagePercent": "{percent}% de uso",
-        "featuringTeams": "Equipos con este Pok\u00e9mon",
-        "teamsLoading": "Cargando equipos\u2026",
+        "featuringTeams": "Equipos con este Pokémon",
+        "teamsLoading": "Cargando equipos…",
         "copyPaste": "Copiar paste",
-        "copied": "\u00a1Copiado!",
-        "rentalCode": "C\u00f3digo de alquiler"
+        "copied": "¡Copiado!",
+        "rentalCode": "Código de alquiler"
       },
       "standings": {
-        "loading": "Cargando resultados\u2026",
+        "loading": "Cargando resultados…",
         "empty": "No se encontraron jugadores.",
         "col": {
           "rank": "#",
@@ -491,9 +532,9 @@
           "record": "Registro",
           "team": "Equipo"
         },
-        "teamLoading": "Cargando\u2026",
-        "copyPaste": "Copiar Pok\u00e9paste",
-        "copied": "\u00a1Copiado!",
+        "teamLoading": "Cargando…",
+        "copyPaste": "Copiar Poképaste",
+        "copied": "¡Copiado!",
         "tera": "Tera: {type}"
       },
       "divergence": {
