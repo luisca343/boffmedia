@@ -47,7 +47,6 @@ console.log('[DEBUG] Initializing NecordModule with token:', process.env.DISCORD
         IntentsBitField.Flags.GuildPresences,
         IntentsBitField.Flags.GuildVoiceStates,
       ],
-      development: ['516237304101339156'],
     }),
     CommandsModule,
   ],
