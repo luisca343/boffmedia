@@ -1,5 +1,46 @@
 {
   "vgc": {
+    "calc": {
+      "title": "Calculadora de Daño",
+      "subtitle": "Calcula el daño con condiciones de campo VGC completas",
+      "tabs": {
+        "calc": "Calculadora",
+        "matrix": "Matriz",
+        "speed": "Velocidad",
+        "typecalc": "Tipos"
+      },
+      "panel": {
+        "attacker": "Pokémon 1 — Atacante",
+        "defender": "Pokémon 2 — Defensor",
+        "searchPlaceholder": "Buscar Pokémon...",
+        "level": "Nivel",
+        "nature": "Naturaleza",
+        "ability": "Habilidad",
+        "item": "Objeto",
+        "tera": "Tera",
+        "status": "Estado",
+        "boost": "Incremento",
+        "moves": "Movimientos"
+      },
+      "field": {
+        "title": "Campo",
+        "weather": "Clima",
+        "terrain": "Terreno",
+        "conditions": "Condiciones",
+        "attackerSide": "Lado Atacante",
+        "defenderSide": "Lado Defensor"
+      },
+      "result": {
+        "selectMove": "← selecciona un movimiento",
+        "selectMoveRight": "selecciona un movimiento →",
+        "noKO": "sin KO",
+        "possibleOHKO": "posible OHKO",
+        "guaranteedOHKO": "OHKO garantizado",
+        "guaranteed2HKO": "2HKO garantizado",
+        "possible2HKO": "posible 2HKO",
+        "noImmune": "Sin daño / inmune"
+      }
+    },
     "speed": {
       "title": "Velocidad",
       "subtitle": "Referencia de niveles de velocidad y calculadora de matchups",

@@ -115,6 +115,9 @@ importers:
       '@scalar/nestjs-api-reference':
         specifier: ^0.5.12
         version: 0.5.14
+      '@smogon/calc':
+        specifier: ^0.10.0
+        version: 0.10.0
       abort-controller:
         specifier: ^3.0.0
         version: 3.0.0
@@ -423,8 +426,8 @@ importers:
         specifier: ^8.16.1
         version: 8.18.0(@types/react@19.2.7)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(three@0.163.0)
       '@smogon/calc':
-        specifier: ^0.10.0
-        version: 0.10.0
+        specifier: ^0.11.0
+        version: 0.11.0
       '@tanstack/react-table':
         specifier: ^8.20.5
         version: 8.21.3(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -3634,6 +3637,9 @@ packages:
 
   '@smogon/calc@0.10.0':
     resolution: {integrity: sha512-VmtTDVjF4z1Yzx1QN7NbsEcRLBAZGv/NVlb1ZK1//uppNmIg3Iqp7hDERGSM0FlmdogPEqw7iqY/3RuMSYPkmw==}
+
+  '@smogon/calc@0.11.0':
+    resolution: {integrity: sha512-ixP+IgQhI12R68FXxyt8+f4EZM/jdqBXZ2oCKu5zuUWXls4kYbIVdgE7t6+pkn/y6VxU+cXJhRgMkiU7wG8JHQ==}
 
   '@snazzah/davey-android-arm-eabi@0.1.11':
     resolution: {integrity: sha512-T1RYbNYKN6tLOcGIDKJd8OI6FBSEemwL7DOYdTMmhqfhhMr3YVN8WOhfoxGg63OcnpTN2e2c5tdY2bAx25RmQQ==}
@@ -10778,6 +10784,8 @@ snapshots:
     dependencies:
       '@ckeditor/ckeditor5-utils': 47.6.1
       es-toolkit: 1.39.5
+    transitivePeerDependencies:
+      - supports-color
 
   '@ckeditor/ckeditor5-enter@47.6.1':
     dependencies:
@@ -11184,6 +11192,8 @@ snapshots:
     dependencies:
       '@ckeditor/ckeditor5-ui': 47.6.1
       es-toolkit: 1.39.5
+    transitivePeerDependencies:
+      - supports-color
 
   '@ckeditor/ckeditor5-watchdog@47.6.1':
     dependencies:
@@ -11192,6 +11202,8 @@ snapshots:
       '@ckeditor/ckeditor5-engine': 47.6.1
       '@ckeditor/ckeditor5-utils': 47.6.1
       es-toolkit: 1.39.5
+    transitivePeerDependencies:
+      - supports-color
 
   '@ckeditor/ckeditor5-widget@47.6.1':
     dependencies:
@@ -13663,6 +13675,10 @@ snapshots:
       '@sinonjs/commons': 3.0.1
 
   '@smogon/calc@0.10.0':
+    dependencies:
+      '@types/node': 18.19.130
+
+  '@smogon/calc@0.11.0':
     dependencies:
       '@types/node': 18.19.130
 

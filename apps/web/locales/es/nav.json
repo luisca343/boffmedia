@@ -84,6 +84,10 @@
                     "label": "VGC",
                     "description": "Análisis de meta, niveles de velocidad y tracker para VGC"
                   },
+                  "damageCalc": {
+                    "label": "Calculadora de Daño",
+                    "description": "Calcula el daño VGC con condiciones de campo completas"
+                  },
                   "pmdsky": {
                     "label": "Exploradores del Cielo",
                     "description": "Generador de correos para Pokémon Mystery Dungeon"
