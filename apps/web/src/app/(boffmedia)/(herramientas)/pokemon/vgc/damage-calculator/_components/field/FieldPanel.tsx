@@ -66,7 +66,7 @@ export function FieldPanel({ field, onFieldChange, onAttackerSide, onDefenderSid
   }
 
   return (
-    <div className="h-full overflow-y-auto bg-surface-950/98 border-x border-surface-700/30 flex flex-col gap-3 p-3">
+    <div className="bg-surface-950/98 border-x border-surface-700/30 flex flex-col gap-3 p-3">
       {/* Title */}
       <div className="text-[10px] font-black uppercase tracking-[0.15em] text-primary-500 text-center py-1 border-b border-primary-500/20">
         ⚡ Field
