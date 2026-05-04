@@ -6,6 +6,7 @@ import {
   Cpu,
   Gift,
   BarChart2,
+  Calculator,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { USER_ROLES } from '@boffmedia/shared/roles'
@@ -43,6 +44,12 @@ export function ToolsMenu() {
             label: t("sections.pokemon.items.vgc.label"),
             description: t("sections.pokemon.items.vgc.description"),
             icon: <BarChart2 className="h-5 w-5" />
+          },
+          {
+            href: "/pokemon/vgc/damage-calculator",
+            label: t("sections.pokemon.items.damageCalc.label"),
+            description: t("sections.pokemon.items.damageCalc.description"),
+            icon: <Calculator className="h-5 w-5" />
           },
           {
             href: "/pokemon/pmdsky",

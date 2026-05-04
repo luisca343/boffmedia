@@ -13,7 +13,8 @@ export default function Layout({
 
   const isVgcTracker = pathname.includes('/vgc/tracker') && pathname.split("/").length >= 6;
   const isVgcMeta    = pathname.includes('/vgc/meta');
-  const fullscreen   = isVgcTracker || isVgcMeta;
+  const isDamageCalc  = pathname.includes('/vgc/damage-calculator');
+  const fullscreen   = isVgcTracker || isVgcMeta || isDamageCalc;
 
   return (
     <GameToolsLayout gameSlug={gameSlug} noContainer={fullscreen} noMargin={fullscreen}>
