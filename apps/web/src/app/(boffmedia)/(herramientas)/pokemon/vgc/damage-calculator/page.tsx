@@ -19,12 +19,9 @@ function DamageCalculatorContent() {
   } = useCalculatorStore()
 
   return (
-    <div
-      className="flex flex-col bg-surface-950"
-      style={{ height: 'calc(100vh - 56px)' }}
-    >
+    <div className="flex flex-col bg-surface-950">
       {/* Header */}
-      <header className="flex-shrink-0 flex items-center gap-3 px-4 py-2.5 bg-surface-900/97 border-b border-surface-700/50 z-10">
+      <header className="sticky top-0 z-20 flex items-center gap-3 px-4 py-2.5 bg-surface-900/97 border-b border-surface-700/50">
         <div className="p-1.5 rounded-lg bg-primary-500/20 border border-primary-500/30">
           <Swords className="w-4 h-4 text-primary-400" />
         </div>
@@ -39,7 +36,8 @@ function DamageCalculatorContent() {
         )}
       </header>
 
-      {/* Move strip (always visible) */}
+      {/* Move strip — sticky below header */}
+      <div className="sticky top-[49px] z-10">
       <MoveStrip
         poke1={poke1}
         poke2={poke2}
@@ -50,9 +48,10 @@ function DamageCalculatorContent() {
         onSelectMove1={setActiveMove1}
         onSelectMove2={setActiveMove2}
       />
+      </div>
 
       {/* Main 3-column layout */}
-      <div className="flex-1 min-h-0 grid grid-cols-[35vw_1fr_35vw]">
+      <div className="grid grid-cols-[35vw_1fr_35vw] items-start">
         <PokemonPanel
           poke={poke1}
           onChange={setPoke1}
