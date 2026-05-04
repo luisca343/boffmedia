@@ -45,7 +45,7 @@ export function PokemonPanel({ poke, onChange, side, useChampions = false }: Pro
     : []
 
   return (
-    <div className={`h-full overflow-y-auto bg-surface-900/95 ${isAtk ? 'border-r' : 'border-l'} border-surface-700/50 flex flex-col gap-3 p-3`}>
+    <div className={`bg-surface-900/95 ${isAtk ? 'border-r' : 'border-l'} border-surface-700/50 flex flex-col gap-3 p-3`}>
 
       {/* Header */}
       <div className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-widest px-2 py-1.5 rounded-md ${accentBg} border ${accentBorder} ${accentText}`}>

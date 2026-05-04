@@ -142,9 +142,9 @@ export function StatTable({ poke, onChange, useChampions = false }: Props) {
           )
         })}
         <tr className="border-t border-surface-700">
+          <td colSpan={3} />
           <td
-            colSpan={4}
-            className="pt-1 text-surface-500 text-xs"
+            className="pt-1 text-center text-surface-500 text-xs"
           >
             Total {useChampions ? 'SP' : 'EVs'}
           </td>
