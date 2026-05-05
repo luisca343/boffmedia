@@ -1,8 +1,3 @@
-// ---------------------------------------------------------------------------
-// MangaLibraryService — scans MANGA_ROOT on disk and returns the local
-// library structure. Reads .cbz files; series folders use the original title.
-// ---------------------------------------------------------------------------
-
 import { Injectable } from '@nestjs/common';
 import { readdir, stat } from 'fs/promises';
 import * as path from 'path';
@@ -28,24 +23,41 @@ export class MangaLibraryService {
       if (!seriesStat?.isDirectory()) continue;
 
       const entries = await readdir(seriesPath).catch(() => [] as string[]);
-      const cbzFiles = entries.filter(f => /\.cbz$/i.test(f));
+
+      // Collect unique chapter slugs from both .cbz and .epub files.
+      const slugMap = new Map<string, { hasCbz: boolean; hasEpub: boolean }>();
+      for (const entry of entries) {
+        if (/\.cbz$/i.test(entry)) {
+          const slug = entry.replace(/\.cbz$/i, '');
+          const existing = slugMap.get(slug) ?? { hasCbz: false, hasEpub: false };
+          slugMap.set(slug, { ...existing, hasCbz: true });
+        } else if (/\.epub$/i.test(entry)) {
+          const slug = entry.replace(/\.epub$/i, '');
+          const existing = slugMap.get(slug) ?? { hasCbz: false, hasEpub: false };
+          slugMap.set(slug, { ...existing, hasEpub: true });
+        }
+      }
+
       const chapters: LocalMangaChapter[] = [];
 
-      for (const cbzFile of cbzFiles) {
-        const cbzPath = path.join(seriesPath, cbzFile);
-        const chapterSlug = cbzFile.replace(/\.cbz$/i, '');
+      for (const [slug, { hasCbz, hasEpub }] of slugMap) {
         let imageCount = 0;
 
+        // Count images from CBZ when available; fall back to EPUB.
+        const archivePath = hasCbz
+          ? path.join(seriesPath, `${slug}.cbz`)
+          : path.join(seriesPath, `${slug}.epub`);
+
         try {
-          const zip = new AdmZip(cbzPath);
+          const zip = new AdmZip(archivePath);
           imageCount = zip.getEntries().filter(e =>
             /\.(webp|jpg|jpeg|png|gif)$/i.test(e.name),
           ).length;
         } catch {
-          // Corrupt or unreadable CBZ — still list it with 0 images.
+          // Corrupt or unreadable archive — list with 0 images.
         }
 
-        chapters.push({ slug: chapterSlug, imageCount });
+        chapters.push({ slug, imageCount, hasCbz, hasEpub });
       }
 
       // Sort chapters numerically (handles "8.5" between "8" and "9").

@@ -36,6 +36,7 @@ WORKDIR /app
 # Install runtime system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
+    calibre \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy compiled output

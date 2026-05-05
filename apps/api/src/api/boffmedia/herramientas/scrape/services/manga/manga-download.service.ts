@@ -1,6 +1,9 @@
 // ---------------------------------------------------------------------------
 // MangaDownloadService — owns the Playwright browser lifecycle and handles
-// chapter image downloading (saved as .cbz) and SSE streaming.
+// chapter image downloading (saved as .cbz or .epub) and SSE streaming.
+//
+// ── Format switch ──────────────────────────────────────────────────────────
+// Change OUTPUT_FORMAT below to toggle the archive format for all downloads.
 // ---------------------------------------------------------------------------
 
 import { Injectable, Logger } from '@nestjs/common';
@@ -18,6 +21,12 @@ import { chapterFilename, sanitizeForFilesystem } from './chapter-normalizer';
 import { UA, randomDelay, getProxy, toPlaywrightProxy } from './manga-http';
 import { MangaChapterDownloadResult } from './manga.types';
 import { MANGA_ROOT } from './manga-constants';
+import { buildEpub } from './manga-epub.builder';
+
+export type MangaOutputFormat = 'cbz' | 'epub';
+
+/** Change this constant to switch the output format for all downloads. */
+const OUTPUT_FORMAT: MangaOutputFormat = 'epub';
 
 function sse(data: object): string {
   return `data: ${JSON.stringify(data)}\n\n`;
@@ -50,12 +59,13 @@ export class MangaDownloadService {
   // ── Public API ─────────────────────────────────────────────────────────────
 
   /**
-   * Downloads a single chapter to a .cbz file.
-   * `cbzPath` should be the full path including the .cbz extension.
+   * Downloads a single chapter.
+   * `outputPath` should include the file extension (the format is determined
+   * by OUTPUT_FORMAT regardless of the extension provided).
    */
   async downloadChapter(
     chapterUrl: string,
-    cbzPath: string,
+    outputPath: string,
   ): Promise<MangaChapterDownloadResult> {
     const scraper = this.registry.resolve(chapterUrl);
     const browser = await this.getBrowser();
@@ -72,7 +82,7 @@ export class MangaDownloadService {
       await context.close();
     }
 
-    return this.saveCbz(imageUrls, cbzPath);
+    return this.saveChapter(imageUrls, outputPath);
   }
 
   /**
@@ -124,9 +134,9 @@ export class MangaDownloadService {
         const ch = slice[i];
         const name = chapterFilename(ch.number, ch.title);
         const seriesDir = path.join(MANGA_ROOT, novelTitle);
-        const cbzPath = path.join(seriesDir, `${name}.cbz`);
+        const outputPath = path.join(seriesDir, `${name}.${OUTPUT_FORMAT}`);
 
-        this.logger.log(`[${i + 1}/${slice.length}] ${ch.title} → ${name}.cbz`);
+        this.logger.log(`[${i + 1}/${slice.length}] ${ch.title} → ${name}.${OUTPUT_FORMAT}`);
 
         let imageUrls: string[] = [];
         try {
@@ -137,7 +147,7 @@ export class MangaDownloadService {
           );
         }
 
-        const result = await this.saveCbz(imageUrls, cbzPath, ch.title, ch.number, novelTitle, skipDownloaded);
+        const result = await this.saveChapter(imageUrls, outputPath, ch.title, ch.number, novelTitle, skipDownloaded);
         totalDownloaded += result.downloaded;
         totalFailed += result.failed;
 
@@ -158,6 +168,26 @@ export class MangaDownloadService {
     }
 
     yield sse({ type: 'done', novelTitle, totalDownloaded, totalFailed });
+  }
+
+  // ── Private: format dispatcher ─────────────────────────────────────────────
+
+  /**
+   * Routes to saveCbz or saveEpub based on OUTPUT_FORMAT.
+   * `outputPath` must include the correct extension (.cbz or .epub).
+   */
+  private saveChapter(
+    imageUrls: string[],
+    outputPath: string,
+    chapterTitle?: string,
+    chapterNumber?: number | null,
+    seriesTitle?: string,
+    skipIfExists = true,
+  ): Promise<MangaChapterDownloadResult> {
+    if (OUTPUT_FORMAT === 'epub') {
+      return this.saveEpub(imageUrls, outputPath, chapterTitle, chapterNumber, seriesTitle, skipIfExists);
+    }
+    return this.saveCbz(imageUrls, outputPath, chapterTitle, chapterNumber, seriesTitle, skipIfExists);
   }
 
   // ── Private: CBZ persistence ───────────────────────────────────────────────
@@ -239,6 +269,88 @@ export class MangaDownloadService {
       failed,
       saveDir: seriesDir,
     };
+  }
+
+  // ── Private: EPUB persistence ──────────────────────────────────────────────
+
+  /**
+   * Downloads all images for a chapter and packages them as an EPUB 3 file.
+   *
+   * If the .epub already exists, the chapter is skipped entirely.
+   * Images are downloaded to a temp directory, then built into an EPUB via
+   * buildEpub(), then the temp directory is deleted.
+   */
+  private async saveEpub(
+    imageUrls: string[],
+    epubPath: string,
+    chapterTitle?: string,
+    chapterNumber?: number | null,
+    seriesTitle?: string,
+    skipIfExists = true,
+  ): Promise<MangaChapterDownloadResult> {
+    const chapterName = path.basename(epubPath, '.epub');
+
+    if (skipIfExists && await fileExists(epubPath)) {
+      this.logger.log(`  ${chapterTitle ?? chapterName} — skip (already downloaded)`);
+      return { chapter: chapterName, imageUrls, downloaded: 0, skipped: 1, failed: 0, saveDir: path.dirname(epubPath) };
+    }
+
+    const seriesDir = path.dirname(epubPath);
+    await mkdir(seriesDir, { recursive: true });
+
+    const tempDir = `${epubPath}.tmp`;
+    await mkdir(tempDir, { recursive: true });
+
+    const { downloaded, failed, files } = await this.downloadImagesToDir(imageUrls, tempDir);
+
+    if (downloaded > 0) {
+      await buildEpub({ imageFiles: files, outputPath: epubPath, seriesTitle, chapterTitle, chapterNumber });
+    }
+
+    await rm(tempDir, { recursive: true, force: true });
+
+    this.logger.log(
+      `  ${chapterTitle ?? chapterName} — ${downloaded} DL, 0 skip, ${failed} fail`,
+    );
+
+    return {
+      chapter: chapterName,
+      imageUrls,
+      downloaded,
+      skipped: 0,
+      failed,
+      saveDir: seriesDir,
+    };
+  }
+
+  // ── Private: shared helpers ────────────────────────────────────────────────
+
+  /** Downloads all image URLs into tempDir; returns counts and sorted file paths. */
+  private async downloadImagesToDir(
+    imageUrls: string[],
+    tempDir: string,
+  ): Promise<{ downloaded: number; failed: number; files: string[] }> {
+    let downloaded = 0;
+    let failed = 0;
+    const files: string[] = [];
+
+    for (let i = 0; i < imageUrls.length; i++) {
+      const url = imageUrls[i];
+      const ext = this.guessExtension(url);
+      const filename = `${String(i + 1).padStart(3, '0')}${ext}`;
+      const filePath = path.join(tempDir, filename);
+
+      try {
+        await this.downloadImage(url, filePath);
+        files.push(filePath);
+        downloaded++;
+      } catch (err) {
+        this.logger.error(`  ✗ [${i + 1}/${imageUrls.length}] ${(err as Error).message}`);
+        failed++;
+      }
+    }
+
+    return { downloaded, failed, files };
   }
 
   private buildComicInfo(

@@ -150,6 +150,28 @@
     },
     "manga": {
       "chapter": "Chapter {number}"
+    },
+    "mangaLibrary": {
+      "title": "Manga Library",
+      "allSeries": "All series",
+      "chapters": "chapters",
+      "pages": "pages",
+      "noSeries": "No manga downloaded yet",
+      "noChapters": "No chapters",
+      "backToLibrary": "Library",
+      "backToSeries": "Series",
+      "discardHint": "Click pages to mark them for removal",
+      "discardedCount": "{count} pages discarded",
+      "convertToEpub": "Convert to EPUB",
+      "converting": "Converting…",
+      "converted": "Converted!",
+      "keepNote": "The original CBZ will not be modified",
+      "loadingPages": "Loading pages…",
+      "errorLoadingPages": "Error loading pages",
+      "errorConverting": "Error converting",
+      "cbz": "CBZ",
+      "epub": "EPUB",
+      "clearDiscarded": "Clear selection"
     }
   }
 }
