@@ -161,6 +161,51 @@ interface CompEntry {
   side: 'mine' | 'foe'
 }
 
+function speedResult(a: number, b: number, tr: boolean): 'faster' | 'tie' | 'slower' {
+  const delta = tr ? b - a : a - b
+  if (delta > 0) return 'faster'
+  if (delta === 0) return 'tie'
+  return 'slower'
+}
+
+const RESULT_STYLE = {
+  faster: { outline: '2px solid #22c55e', title: '▲ Faster than' },
+  tie:    { outline: '2px solid #eab308', title: '= Ties with'   },
+  slower: { outline: '2px solid #ef4444', title: '▼ Slower than' },
+} as const
+
+function SpeedRelIcons({
+  entry,
+  opponents,
+  trickRoom,
+}: {
+  entry: CompEntry
+  opponents: CompEntry[]
+  trickRoom: boolean
+}) {
+  if (!opponents.length) return null
+  return (
+    <div className="flex gap-1 flex-wrap mt-1">
+      {opponents.map((opp, i) => {
+        const res = speedResult(entry.actual, opp.actual, trickRoom)
+        const { outline, title } = RESULT_STYLE[res]
+        return (
+          <img
+            key={i}
+            src={getSpriteUrl(opp.name)}
+            onError={handleSpriteError}
+            width={20} height={20}
+            className="object-contain rounded-sm"
+            style={{ imageRendering: 'pixelated', outline, outlineOffset: 1 }}
+            title={`${title} ${opp.name} (${opp.actual})`}
+            alt={opp.name}
+          />
+        )
+      })}
+    </div>
+  )
+}
+
 function RivalsComparisonList({
   myEntries,
   foeEntries,
@@ -191,6 +236,7 @@ function RivalsComparisonList({
         const hasItem = entry.item && entry.item !== 'None' && entry.item !== ''
         const isScarf = entry.item === 'Choice Scarf'
         const isSlowItem = entry.item === 'Iron Ball' || entry.item === 'Lagging Tail' || entry.item === 'Macho Brace'
+        const opponents = isMine ? foeEntries : myEntries
 
         return (
           <div
@@ -213,7 +259,7 @@ function RivalsComparisonList({
               alt={entry.name}
             />
 
-            {/* Name + meta */}
+            {/* Name + meta + speed rel icons */}
             <div className="flex-1 min-w-0">
               <div className="font-semibold text-sm leading-tight" style={{ color }}>{entry.name}</div>
               <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
@@ -239,6 +285,7 @@ function RivalsComparisonList({
                   {isMine ? 'My Team' : 'Rival'}
                 </span>
               </div>
+              <SpeedRelIcons entry={entry} opponents={opponents} trickRoom={trickRoom} />
             </div>
 
             {/* Speed value */}

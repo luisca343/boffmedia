@@ -479,7 +479,16 @@ Checklist:
     - `_hooks/useCalcUrlSync.ts` — SRP hook: mounts once to hydrate + clean URL; `copyShareLink()` reads live state via `getState()`; `prompt()` fallback for non-HTTPS contexts; URL auto-cleaned after hydration via `replaceState`
     - **Store split** — `_store/slices/calcSlice.ts` (1v1), `matrixSlice.ts` (team/many), `savedSlice.ts` (localStorage); `_store/types.ts` as combined type; `calculatorStore.ts` is now a thin compositor (~15 lines)
     - **MatrixView split** — 740-line monolith → 6 focused files: `CompactFieldBar`, `SlotPanel` (+ `SlotCard`), `PasteImportModal`, `PokeDrawer`, `MatrixTable` (+ `EmptyMatrix`), `MatrixView` (orchestrator, ~115 lines)
-15. [ ] **Polish / remaining** ← **NEXT**
+15. ✅ **Polish / UX pass — DONE**
+    - **B — Matrix cell tooltips**: hover any result cell → fixed-position tooltip shows full Smogon calc description (e.g. `252 SpA Timid Miraidon …`). `CalcTooltip` component with edge-flip for right-side overflow. Native `onMouseEnter/Leave` on result divs; `onMouseLeave` on table clears tooltip.
+    - **C — TypeCalcView rivals tab**: `view: 'team' | 'rivals'` state. `ViewToggle` component (only visible when `many.length > 0`). All `useMemo` computations switch to `activePokes` (team or rivals). Labels/titles adapt per view. Two empty states: global (both sides empty) and per-tab.
+    - **D — Saved panel QoL**:
+      - `reorderSaved(fromIdx, toIdx)` added to `savedSlice.ts`
+      - HTML5 drag-and-drop reorder: `GripVertical` handle, `draggingId`/`overIdx` state, display index → stored index mapping (reversed display)
+      - Nicer empty state with icon + call-to-action copy
+      - `navigator.clipboard` fallback → `window.prompt()` for non-HTTPS
+    - **E — SpeedView speed rel indicators**: `SpeedRelIcons` component renders 20px sprites with green/yellow/red `outline` borders (faster / tie / slower vs each opponent). `speedResult()` pure function respects Trick Room. Tooltips on each icon.
+16. [ ] **Matrix URL sharing** — Extend `urlSerializer.ts` to encode/decode `team`/`many` arrays; add size guard (drop matrix data if compressed > ~2000 chars) ← **NEXT**
 
 ---
 
