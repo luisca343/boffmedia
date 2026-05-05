@@ -2,22 +2,25 @@
 
 import { calcStat, Generations } from '@smogon/calc'
 import type { CalcPokemon } from '../../_types/calculator'
-import { SPECIES_MAP, NATURES } from '../../_hooks/usePokemonData'
 
 const GEN9 = Generations.get(9)
+
+type BaseStats = { hp: number; atk: number; def: number; spa: number; spd: number; spe: number }
 
 interface Props {
   poke: CalcPokemon
   onChange: (patch: Partial<CalcPokemon>) => void
   useChampions?: boolean
+  /** Optional baseStats from the API VgcPokemon entry — used when SPECIES_MAP lookup misses. */
+  baseStats?: BaseStats
 }
 
-export function HPBar({ poke, onChange, useChampions = false }: Props) {
-  const species = SPECIES_MAP.get(poke.name)
-  if (!species) return null
+export function HPBar({ poke, onChange, useChampions = false, baseStats: apiBaseStats }: Props) {
+  const bs: BaseStats | undefined = apiBaseStats
+  if (!bs) return null
 
   const hpEv = useChampions ? Math.floor((poke.evs.hp * 252) / 32) : poke.evs.hp
-  const maxHP = calcStat(GEN9, 'hp', species.baseStats.hp, poke.ivs.hp, hpEv, poke.level, poke.nature)
+  const maxHP = calcStat(GEN9, 'hp', bs.hp, poke.ivs.hp, hpEv, poke.level, poke.nature)
   const cur = poke.currentHP < 0 ? maxHP : Math.min(poke.currentHP, maxHP)
   const pct = (cur / maxHP) * 100
 
