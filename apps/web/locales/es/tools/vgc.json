@@ -3,6 +3,8 @@
     "calc": {
       "title": "Calculadora de Daño",
       "subtitle": "Calcula el daño con condiciones de campo VGC completas",
+      "share": "Compartir",
+      "shareCopied": "¡Copiado!",
       "tabs": {
         "1v1": "1 vs 1",
         "teamvsmany": "Equipo → Amenazas",
