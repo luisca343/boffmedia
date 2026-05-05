@@ -4,10 +4,11 @@
       "title": "Damage Calculator",
       "subtitle": "Calculate damage with full VGC field conditions",
       "tabs": {
-        "calc": "Calculator",
-        "matrix": "Matrix",
-        "speed": "Speed",
-        "typecalc": "Types"
+        "1v1": "1 vs 1",
+        "teamvsmany": "Team → Threats",
+        "manyvsteam": "Threats → Team",
+        "speed": "⚡ Speed",
+        "typecalc": "🔮 Types"
       },
       "panel": {
         "attacker": "Pokémon 1 — Attacker",
@@ -39,6 +40,28 @@
         "guaranteed2HKO": "guaranteed 2HKO",
         "possible2HKO": "possible 2HKO",
         "noImmune": "No damage / immune"
+      },
+      "matrix": {
+        "teamLabel": "Your Team",
+        "manyLabel": "Threats",
+        "addPokemon": "+ Add Pokémon",
+        "emptyTeam": "No Pokémon in your team yet",
+        "emptyMany": "No threats added yet",
+        "searchPlaceholder": "Search Pokémon...",
+        "atkDefCorner": "ATK ↓ / DEF →"
+      },
+      "speedCalc": {
+        "title": "Speed Tiers",
+        "filterPlaceholder": "Filter by name...",
+        "level50": "Lv 50",
+        "level100": "Lv 100",
+        "showMin": "Min (0 EVs)",
+        "showMax": "Max (252 EVs)",
+        "tailwind": "Tailwind ×2",
+        "scarf": "Scarf ×1.5",
+        "paralyzed": "Para ×0.5",
+        "trickRoom": "Trick Room",
+        "noPokemon": "No Pokémon match your filter"
       }
     },
     "speed": {

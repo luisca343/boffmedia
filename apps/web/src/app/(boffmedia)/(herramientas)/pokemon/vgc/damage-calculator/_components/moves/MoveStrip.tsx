@@ -4,6 +4,8 @@ import { useMemo } from 'react'
 import type { CalcPokemon, CalcField, DamageResult } from '../../_types/calculator'
 import { calcAllMoves, getKOVerdict, getDamageColorClass } from '../../_lib/smogonAdapter'
 import { MoveStripPokemonCard } from './MoveStripPokemonCard'
+import { useLegalPokemon } from '../../_hooks/useLegalPokemon'
+import { useCalculatorStore } from '../../_store/calculatorStore'
 
 interface Props {
   poke1: CalcPokemon
@@ -100,6 +102,10 @@ export function MoveStrip({
   poke1, poke2, field, useChampions,
   activeMove1, activeMove2, onSelectMove1, onSelectMove2,
 }: Props) {
+  const { regulation } = useCalculatorStore()
+  const legalPokemon = useLegalPokemon(regulation)
+  const api1 = legalPokemon.find((p) => p.name === poke1.name)
+  const api2 = legalPokemon.find((p) => p.name === poke2.name)
   const results1 = useMemo(
     () => calcAllMoves(poke1, poke2, field, useChampions),
     [poke1, poke2, field, useChampions],
@@ -116,7 +122,7 @@ export function MoveStrip({
 
         {/* Left — poke1 attacks poke2 */}
         <div className="grid grid-cols-[170px_minmax(0,1fr)] gap-2 px-2.5 py-2 items-start">
-          <MoveStripPokemonCard poke={poke1} />
+          <MoveStripPokemonCard poke={poke1} apiEntry={api1} />
           {/* Move list */}
           <div className="flex flex-col rounded overflow-hidden border border-surface-700/40 w-full max-w-[280px] justify-self-end">
             {poke1.moves.map((mv, i) => (
@@ -148,7 +154,7 @@ export function MoveStrip({
               />
             ))}
           </div>
-          <MoveStripPokemonCard poke={poke2} align="right" />
+          <MoveStripPokemonCard poke={poke2} apiEntry={api2} align="right" />
         </div>
       </div>
 

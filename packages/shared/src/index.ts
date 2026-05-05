@@ -118,6 +118,8 @@ export type { GameEndResponse } from './models/GameEndResponse';
 export type { GameFileEntry } from './models/GameFileEntry';
 export type { GameRewardDto } from './models/GameRewardDto';
 export type { GameStartResponse } from './models/GameStartResponse';
+export type { Gen9DataDto } from './models/Gen9DataDto';
+export type { Gen9MoveDto } from './models/Gen9MoveDto';
 export type { GetAchievementByIdDto } from './models/GetAchievementByIdDto';
 export type { GetAchievementsDto } from './models/GetAchievementsDto';
 export type { GetNewsDto } from './models/GetNewsDto';

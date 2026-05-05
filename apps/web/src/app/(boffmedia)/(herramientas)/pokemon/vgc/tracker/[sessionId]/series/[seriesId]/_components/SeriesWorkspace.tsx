@@ -330,7 +330,7 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
               editable={false}
               onSlotChange={(slots) => handleMySlots(activeGame, slots)}
             />
-            <SpeedTierWidget slots={currentGame.mySlots} />
+            <SpeedTierWidget slots={currentGame.mySlots} regulationId={regulationId} />
             {activeGame > 1 && (
               <PreviousGameRecap games={series.games} upToGame={activeGame} side="my" />
             )}
@@ -370,7 +370,7 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
                 });
               }}
             />
-            <SpeedTierWidget slots={currentGame.opponentSlots} />
+            <SpeedTierWidget slots={currentGame.opponentSlots} regulationId={regulationId} />
             {/* Result buttons for this game */}
             <div className="flex items-center gap-2">
               <span className="text-xs text-surface-500 uppercase tracking-wide font-medium">{t('workspace.game', { n: activeGame })}</span>

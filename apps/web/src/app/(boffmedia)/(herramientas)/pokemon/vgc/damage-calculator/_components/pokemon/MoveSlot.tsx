@@ -2,7 +2,8 @@
 
 import { useMemo, useState, useRef, useEffect } from 'react'
 import type { CalcMove } from '../../_types/calculator'
-import { MOVE_MAP, MOVE_NAMES } from '../../_hooks/usePokemonData'
+import { useGameData } from '../../_hooks/usePokemonData'
+import { useCalculatorStore } from '../../_store/calculatorStore'
 
 interface Props {
   move: CalcMove
@@ -20,6 +21,8 @@ const TYPE_COLORS: Record<string, string> = {
 }
 
 export function MoveSlot({ move, index, onChange, accentColor = 'primary' }: Props) {
+  const { regulation } = useCalculatorStore()
+  const { moveMap, moveNames, isLoaded } = useGameData(regulation)
   const [query, setQuery] = useState(move.name)
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -38,13 +41,13 @@ export function MoveSlot({ move, index, onChange, accentColor = 'primary' }: Pro
   }, [move.name])
 
   const filtered = useMemo(() => {
-    if (!query) return MOVE_NAMES.slice(0, 20)
+    if (!query) return moveNames.slice(0, 20)
     const q = query.toLowerCase()
-    return MOVE_NAMES.filter((n) => n.toLowerCase().includes(q)).slice(0, 20)
-  }, [query])
+    return moveNames.filter((n) => n.toLowerCase().includes(q)).slice(0, 20)
+  }, [query, moveNames])
 
   function selectMove(name: string) {
-    const data = MOVE_MAP.get(name)
+    const data = moveMap.get(name)
     if (data) {
       onChange({
         name: data.name,
@@ -94,10 +97,16 @@ export function MoveSlot({ move, index, onChange, accentColor = 'primary' }: Pro
           )}
         </div>
 
-        {open && filtered.length > 0 && (
+        {open && !isLoaded && (
+          <div className="absolute top-full left-0 right-0 z-50 mt-0.5 bg-surface-900 border border-surface-700 rounded-lg shadow-2xl px-3 py-2">
+            <span className="text-[11px] text-surface-500 italic">Loading moves…</span>
+          </div>
+        )}
+
+        {open && isLoaded && filtered.length > 0 && (
           <div className="absolute top-full left-0 right-0 z-50 mt-0.5 bg-surface-900 border border-surface-700 rounded-lg shadow-2xl max-h-44 overflow-y-auto">
             {filtered.map((name) => {
-              const data = MOVE_MAP.get(name)
+              const data = moveMap.get(name)
               if (!data) return null
               const col = TYPE_COLORS[data.type] ?? '#9ca3af'
               return (

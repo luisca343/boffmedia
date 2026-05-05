@@ -4,10 +4,11 @@
       "title": "Calculadora de Daño",
       "subtitle": "Calcula el daño con condiciones de campo VGC completas",
       "tabs": {
-        "calc": "Calculadora",
-        "matrix": "Matriz",
-        "speed": "Velocidad",
-        "typecalc": "Tipos"
+        "1v1": "1 vs 1",
+        "teamvsmany": "Equipo → Amenazas",
+        "manyvsteam": "Amenazas → Equipo",
+        "speed": "⚡ Velocidad",
+        "typecalc": "🔮 Tipos"
       },
       "panel": {
         "attacker": "Pokémon 1 — Atacante",
@@ -39,6 +40,28 @@
         "guaranteed2HKO": "2HKO garantizado",
         "possible2HKO": "posible 2HKO",
         "noImmune": "Sin daño / inmune"
+      },
+      "matrix": {
+        "teamLabel": "Tu Equipo",
+        "manyLabel": "Amenazas",
+        "addPokemon": "+ Añadir Pokémon",
+        "emptyTeam": "No hay Pokémon en tu equipo aún",
+        "emptyMany": "No hay amenazas añadidas aún",
+        "searchPlaceholder": "Buscar Pokémon...",
+        "atkDefCorner": "ATK ↓ / DEF →"
+      },
+      "speedCalc": {
+        "title": "Velocidades",
+        "filterPlaceholder": "Filtrar por nombre...",
+        "level50": "Lv 50",
+        "level100": "Lv 100",
+        "showMin": "Mín (0 PEs)",
+        "showMax": "Máx (252 PEs)",
+        "tailwind": "Viento Afín ×2",
+        "scarf": "Pañuelo ×1.5",
+        "paralyzed": "Parál. ×0.5",
+        "trickRoom": "Sala Trampa",
+        "noPokemon": "No hay Pokémon con ese filtro"
       }
     },
     "speed": {

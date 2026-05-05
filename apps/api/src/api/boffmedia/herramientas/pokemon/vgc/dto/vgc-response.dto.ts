@@ -2,6 +2,34 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { BaseStatsDto } from '../meta/dto/meta-response.dto';
 
+export class Gen9MoveDto {
+  @ApiProperty()
+  name!: string;
+
+  @ApiProperty()
+  id!: string;
+
+  @ApiProperty()
+  basePower!: number;
+
+  @ApiProperty()
+  type!: string;
+
+  @ApiProperty()
+  category!: string;
+}
+
+export class Gen9DataDto {
+  @ApiProperty({ type: Gen9MoveDto, isArray: true })
+  moves!: Gen9MoveDto[];
+
+  @ApiProperty({ type: String, isArray: true })
+  items!: string[];
+
+  @ApiProperty({ type: String, isArray: true })
+  abilities!: string[];
+}
+
 export class VgcPokemonDto {
   @ApiProperty()
   name!: string;
