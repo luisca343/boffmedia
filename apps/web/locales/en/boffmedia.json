@@ -179,7 +179,9 @@
       "removeLast": "Remove last",
       "convertSelected": "Convert selected",
       "bulkConverting": "Converting {done}/{total}…",
-      "bulkDone": "{count} converted"
+      "bulkDone": "{count} converted",
+      "selectChapter": "Select a chapter to view its pages",
+      "coverPage": "Cover page"
     }
   }
 }

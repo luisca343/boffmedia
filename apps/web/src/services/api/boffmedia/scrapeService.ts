@@ -304,10 +304,10 @@ export class ScrapeService {
     return `${apiUrl}/boffmedia/herramientas/scrape/manga/chapter-image?${params}`;
   }
 
-  static convertMangaChapter(series: string, chapter: string, excludePages: number[]) {
+  static convertMangaChapter(series: string, chapter: string, excludePages: number[], includeCover?: boolean) {
     return apiPOST<{ outputPath: string }>(
       '/boffmedia/herramientas/scrape/manga/convert-chapter',
-      { series, chapter, excludePages },
+      { series, chapter, excludePages, includeCover },
     );
   }
 }

@@ -82,6 +82,7 @@ export class MangaEditorService {
     series: string,
     chapter: string,
     excludePages: number[],
+    includeCover?: boolean,
   ): Promise<{ outputPath: string }> {
     const cbzPath = this.resolveCbz(series, chapter);
     const zip = this.openArchive(cbzPath);
@@ -118,6 +119,7 @@ export class MangaEditorService {
         seriesTitle: series,
         chapterTitle: chapter,
         chapterNumber: parseFloat(chapter) || null,
+        includeCover,
       });
     } finally {
       await rm(tempDir, { recursive: true, force: true });
