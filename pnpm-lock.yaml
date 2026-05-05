@@ -511,6 +511,9 @@ importers:
       lucide-react:
         specifier: ^0.452.0
         version: 0.452.0(react@19.2.3)
+      lz-string:
+        specifier: ^1.5.0
+        version: 1.5.0
       mdast-util-from-markdown:
         specifier: ^2.0.0
         version: 2.0.3
@@ -11098,8 +11101,6 @@ snapshots:
       '@ckeditor/ckeditor5-utils': 47.6.1
       ckeditor5: 47.6.1
       es-toolkit: 1.39.5
-    transitivePeerDependencies:
-      - supports-color
 
   '@ckeditor/ckeditor5-editor-multi-root@47.6.1':
     dependencies:
@@ -11128,8 +11129,6 @@ snapshots:
     dependencies:
       '@ckeditor/ckeditor5-utils': 47.6.1
       es-toolkit: 1.39.5
-    transitivePeerDependencies:
-      - supports-color
 
   '@ckeditor/ckeditor5-enter@47.6.1':
     dependencies:
