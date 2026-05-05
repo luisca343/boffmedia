@@ -17,6 +17,13 @@ function spToEv(sp: number): number {
   return Math.floor((sp * 252) / 32)
 }
 
+// Per-Pokémon item speed multipliers
+function applyItemMod(spd: number, item: string): number {
+  if (item === 'Choice Scarf')  return Math.floor(spd * 1.5)
+  if (item === 'Iron Ball' || item === 'Lagging Tail' || item === 'Macho Brace') return Math.floor(spd * 0.5)
+  return spd
+}
+
 interface Mods {
   tailwind: boolean
   choiceScarf: boolean
@@ -144,7 +151,108 @@ function SpdCard({
   )
 }
 
-interface SpeedEntry { name: string; baseSpe: number; actual: number }
+// ─── Rivals Comparison List ───────────────────────────────────────────────────
+
+interface CompEntry {
+  name: string
+  baseSpe: number
+  actual: number
+  item: string
+  side: 'mine' | 'foe'
+}
+
+function RivalsComparisonList({
+  myEntries,
+  foeEntries,
+  trickRoom,
+}: {
+  myEntries: CompEntry[]
+  foeEntries: CompEntry[]
+  trickRoom: boolean
+}) {
+  const merged = useMemo(() => {
+    return [...myEntries, ...foeEntries]
+      .sort((a, b) => trickRoom ? a.actual - b.actual : b.actual - a.actual)
+  }, [myEntries, foeEntries, trickRoom])
+
+  if (merged.length === 0) {
+    return (
+      <div className="flex-1 flex items-center justify-center text-surface-600 text-sm py-12">
+        Add Pokémon to both teams to compare speeds
+      </div>
+    )
+  }
+
+  return (
+    <div className="rounded-lg overflow-hidden border border-surface-700/40">
+      {merged.map((entry, i) => {
+        const isMine = entry.side === 'mine'
+        const color = isMine ? 'rgb(249,115,22)' : 'rgb(168,85,247)'
+        const hasItem = entry.item && entry.item !== 'None' && entry.item !== ''
+        const isScarf = entry.item === 'Choice Scarf'
+        const isSlowItem = entry.item === 'Iron Ball' || entry.item === 'Lagging Tail' || entry.item === 'Macho Brace'
+
+        return (
+          <div
+            key={`${entry.side}-${entry.name}-${i}`}
+            className="flex items-center gap-3 px-4 py-2.5 border-b border-surface-800/30 last:border-b-0"
+            style={{ background: isMine ? 'rgba(249,115,22,0.04)' : 'rgba(168,85,247,0.04)' }}
+          >
+            {/* Rank */}
+            <span className="text-xs font-bold w-5 shrink-0 text-right" style={{ color: 'rgb(71,85,105)' }}>
+              {i + 1}
+            </span>
+
+            {/* Sprite */}
+            <img
+              src={getSpriteUrl(entry.name)}
+              onError={handleSpriteError}
+              width={36} height={36}
+              className="object-contain shrink-0"
+              style={{ imageRendering: 'pixelated' }}
+              alt={entry.name}
+            />
+
+            {/* Name + meta */}
+            <div className="flex-1 min-w-0">
+              <div className="font-semibold text-sm leading-tight" style={{ color }}>{entry.name}</div>
+              <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                <span className="text-[10px] text-surface-600">base {entry.baseSpe}</span>
+                {hasItem && (
+                  <span
+                    className="text-[10px] font-bold px-1.5 py-0.5 rounded"
+                    style={
+                      isScarf
+                        ? { background: 'rgba(249,115,22,0.15)', color: 'rgb(251,146,60)', border: '1px solid rgba(249,115,22,0.3)' }
+                        : isSlowItem
+                        ? { background: 'rgba(239,68,68,0.12)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)' }
+                        : { background: 'rgba(100,116,139,0.12)', color: 'rgb(148,163,184)', border: '1px solid rgba(100,116,139,0.2)' }
+                    }
+                  >
+                    {entry.item}
+                  </span>
+                )}
+                <span
+                  className="text-[9px] font-bold px-1 rounded"
+                  style={{ background: isMine ? 'rgba(249,115,22,0.12)' : 'rgba(168,85,247,0.12)', color }}
+                >
+                  {isMine ? 'My Team' : 'Rival'}
+                </span>
+              </div>
+            </div>
+
+            {/* Speed value */}
+            <span className="font-mono font-black text-2xl shrink-0" style={{ color }}>
+              {entry.actual}
+            </span>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+interface SpeedEntry { name: string; baseSpe: number; actual: number; item: string }
 interface RefEntry   { name: string; baseSpe: number; neutral: number; plus: number; isMine: boolean; isFoe: boolean }
 
 interface Props { useChampions: boolean }
@@ -156,9 +264,17 @@ export function SpeedView({ useChampions }: Props) {
   const [myMods,   setMyMods]   = useState<Mods>({ ...EMPTY_MODS })
   const [foesMods, setFoesMods] = useState<Mods>({ ...EMPTY_MODS })
   const [filter, setFilter] = useState('')
+  const [vsRivalsOnly, setVsRivalsOnly] = useState(false)
   const [speedTiers, setSpeedTiers] = useState<SpeedTierEntry[] | null>(() =>
     useChampions && regulation ? (speedTierCache.get(regulation) ?? null) : null,
   )
+
+  const hasRivals = many.length > 0
+
+  // Auto-switch to rivals mode when rivals are added for the first time
+  useEffect(() => {
+    if (hasRivals) setVsRivalsOnly(true)
+  }, [hasRivals])
 
   // Fetch speed tiers whenever regulation changes (or on first mount with Champions mode)
   useEffect(() => {
@@ -188,8 +304,9 @@ export function SpeedView({ useChampions }: Props) {
       if (!apiEntry) return null
       const baseSpe = apiEntry.baseStats.spe
       const speEv   = useChampions ? spToEv(p.evs.spe) : p.evs.spe
-      const actual  = applyMods(calcStat(GEN9, 'spe', baseSpe, p.ivs.spe, speEv, level, p.nature), myMods)
-      return { name: p.name, baseSpe, actual }
+      const base    = calcStat(GEN9, 'spe', baseSpe, p.ivs.spe, speEv, level, p.nature)
+      const actual  = applyItemMod(applyMods(base, myMods), p.item)
+      return { name: p.name, baseSpe, actual, item: p.item }
     })
       .filter((e): e is SpeedEntry => e !== null)
       .sort((a, b) => myMods.trickRoom ? a.actual - b.actual : b.actual - a.actual)
@@ -201,8 +318,9 @@ export function SpeedView({ useChampions }: Props) {
       if (!apiEntry) return null
       const baseSpe = apiEntry.baseStats.spe
       const speEv   = useChampions ? spToEv(p.evs.spe) : p.evs.spe
-      const actual  = applyMods(calcStat(GEN9, 'spe', baseSpe, p.ivs.spe, speEv, level, p.nature), foesMods)
-      return { name: p.name, baseSpe, actual }
+      const base    = calcStat(GEN9, 'spe', baseSpe, p.ivs.spe, speEv, level, p.nature)
+      const actual  = applyItemMod(applyMods(base, foesMods), p.item)
+      return { name: p.name, baseSpe, actual, item: p.item }
     })
       .filter((e): e is SpeedEntry => e !== null)
       .sort((a, b) => foesMods.trickRoom ? a.actual - b.actual : b.actual - a.actual)
@@ -211,8 +329,14 @@ export function SpeedView({ useChampions }: Props) {
   const teamNames = useMemo(() => new Set(team.map((p) => p.name)), [team])
   const manyNames = useMemo(() => new Set(many.map((p) => p.name)), [many])
 
+  const compEntries = useMemo<CompEntry[]>(() => {
+    return [
+      ...teamEntries.map((e) => ({ ...e, side: 'mine' as const })),
+      ...foesEntries.map((e) => ({ ...e, side: 'foe'  as const })),
+    ]
+  }, [teamEntries, foesEntries])
+
   const refEntries = useMemo<RefEntry[]>(() => {
-    // Use format-legal speed tiers when available, otherwise fall back to the API legal list.
     const source: { name: string; baseSpe: number }[] = speedTiers
       ? speedTiers.map((t) => ({ name: t.name, baseSpe: t.baseSpeed }))
       : legalPokemon.map((p) => ({ name: p.name, baseSpe: p.baseStats.spe }))
@@ -227,6 +351,8 @@ export function SpeedView({ useChampions }: Props) {
       .sort((a, b) => myMods.trickRoom ? a.neutral - b.neutral : b.neutral - a.neutral)
       .slice(0, filter ? 200 : 120)
   }, [level, myMods, filter, teamNames, manyNames, speedTiers, legalPokemon])
+
+  const showRivals = hasRivals && vsRivalsOnly
 
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
@@ -248,13 +374,44 @@ export function SpeedView({ useChampions }: Props) {
               Lv {lv}
             </button>
           ))}
-          <input
-            type="text"
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            placeholder="Filter reference..."
-            className="ml-auto w-40 bg-surface-900 border border-surface-700 rounded px-2 py-1 text-xs text-surface-200 placeholder:text-surface-600 focus:outline-none focus:border-primary-500"
-          />
+
+          {/* Rivals toggle */}
+          {hasRivals && (
+            <div className="flex items-center gap-1 ml-2 rounded-md border border-surface-700/50 overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setVsRivalsOnly(true)}
+                className={`px-2.5 py-1 text-xs font-semibold transition-all ${
+                  vsRivalsOnly
+                    ? 'bg-accent-500/20 text-accent-300 border-r border-accent-500/30'
+                    : 'text-surface-500 hover:text-surface-300 border-r border-surface-700/50'
+                }`}
+              >
+                vs Rivals
+              </button>
+              <button
+                type="button"
+                onClick={() => setVsRivalsOnly(false)}
+                className={`px-2.5 py-1 text-xs font-semibold transition-all ${
+                  !vsRivalsOnly
+                    ? 'bg-primary-500/15 text-primary-400'
+                    : 'text-surface-500 hover:text-surface-300'
+                }`}
+              >
+                All Pokémon
+              </button>
+            </div>
+          )}
+
+          {!showRivals && (
+            <input
+              type="text"
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              placeholder="Filter reference..."
+              className="ml-auto w-40 bg-surface-900 border border-surface-700 rounded px-2 py-1 text-xs text-surface-200 placeholder:text-surface-600 focus:outline-none focus:border-primary-500"
+            />
+          )}
         </div>
 
         {/* Two-column mod pills */}
@@ -268,69 +425,85 @@ export function SpeedView({ useChampions }: Props) {
         </div>
       </div>
 
-      {/* Scrollable card sections */}
+      {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-5">
 
-        {/* My Team */}
-        {teamEntries.length > 0 && (
-          <div>
-            <SectionDivider label="My Team" color="rgb(249,115,22)" />
-            <div className="flex flex-wrap gap-1 items-end">
-              {teamEntries.map((p) => (
-                <SpdCard key={p.name} name={p.name} baseSpe={p.baseSpe} color="rgb(249,115,22)">
-                  <div className="font-mono font-black text-[14px]" style={{ color: 'rgb(249,115,22)' }}>
-                    {p.actual}
-                  </div>
-                </SpdCard>
-              ))}
+        {/* ── Rivals comparison mode ── */}
+        {showRivals ? (
+          <>
+            <div>
+              <SectionDivider label="Speed comparison — My Team vs Rivals (items applied per Pokémon)" color="rgb(148,163,184)" />
+              <RivalsComparisonList
+                myEntries={compEntries.filter((e) => e.side === 'mine')}
+                foeEntries={compEntries.filter((e) => e.side === 'foe')}
+                trickRoom={myMods.trickRoom}
+              />
             </div>
-          </div>
-        )}
-
-        {/* Rivals */}
-        {foesEntries.length > 0 && (
-          <div>
-            <SectionDivider label="Rivals" color="rgb(168,85,247)" />
-            <div className="flex flex-wrap gap-1 items-end">
-              {foesEntries.map((p) => (
-                <SpdCard key={p.name} name={p.name} baseSpe={p.baseSpe} color="rgb(168,85,247)">
-                  <div className="font-mono font-black text-[14px]" style={{ color: 'rgb(168,85,247)' }}>
-                    {p.actual}
-                  </div>
-                </SpdCard>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Reference */}
-        <div>
-          <SectionDivider
-            label={`Reference — top: +Spd 252 EVs / bottom: neutral · ${refEntries.length} Pokémon${speedTiers ? ' (format)' : ''}${filter ? ' filtered' : ''}`}
-          />
-          <div className="flex flex-wrap gap-1 items-end">
-            {refEntries.map((p) => {
-              const col = p.isMine ? 'rgb(249,115,22)' : p.isFoe ? 'rgb(168,85,247)' : undefined
-              return (
-                <SpdCard key={p.name} name={p.name} baseSpe={p.baseSpe} color={col}>
-                  <div className="flex flex-col items-center">
-                    <div className="font-mono font-black text-[11px]" style={{ color: col ?? 'rgb(203,213,225)' }}>
-                      {p.plus}
-                    </div>
-                    <div className="font-mono text-[9px]" style={{ color: 'rgb(71,85,105)' }}>
-                      {p.neutral}
-                    </div>
-                  </div>
-                </SpdCard>
-              )
-            })}
-            {refEntries.length === 0 && (
-              <p className="text-surface-600 text-sm py-10 w-full text-center">
-                No Pokémon match your filter
-              </p>
+          </>
+        ) : (
+          <>
+            {/* My Team */}
+            {teamEntries.length > 0 && (
+              <div>
+                <SectionDivider label="My Team" color="rgb(249,115,22)" />
+                <div className="flex flex-wrap gap-1 items-end">
+                  {teamEntries.map((p) => (
+                    <SpdCard key={p.name} name={p.name} baseSpe={p.baseSpe} color="rgb(249,115,22)">
+                      <div className="font-mono font-black text-[14px]" style={{ color: 'rgb(249,115,22)' }}>
+                        {p.actual}
+                      </div>
+                    </SpdCard>
+                  ))}
+                </div>
+              </div>
             )}
-          </div>
-        </div>
+
+            {/* Rivals */}
+            {foesEntries.length > 0 && (
+              <div>
+                <SectionDivider label="Rivals" color="rgb(168,85,247)" />
+                <div className="flex flex-wrap gap-1 items-end">
+                  {foesEntries.map((p) => (
+                    <SpdCard key={p.name} name={p.name} baseSpe={p.baseSpe} color="rgb(168,85,247)">
+                      <div className="font-mono font-black text-[14px]" style={{ color: 'rgb(168,85,247)' }}>
+                        {p.actual}
+                      </div>
+                    </SpdCard>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Reference */}
+            <div>
+              <SectionDivider
+                label={`Reference — top: +Spd 252 EVs / bottom: neutral · ${refEntries.length} Pokémon${speedTiers ? ' (format)' : ''}${filter ? ' filtered' : ''}`}
+              />
+              <div className="flex flex-wrap gap-1 items-end">
+                {refEntries.map((p) => {
+                  const col = p.isMine ? 'rgb(249,115,22)' : p.isFoe ? 'rgb(168,85,247)' : undefined
+                  return (
+                    <SpdCard key={p.name} name={p.name} baseSpe={p.baseSpe} color={col}>
+                      <div className="flex flex-col items-center">
+                        <div className="font-mono font-black text-[11px]" style={{ color: col ?? 'rgb(203,213,225)' }}>
+                          {p.plus}
+                        </div>
+                        <div className="font-mono text-[9px]" style={{ color: 'rgb(71,85,105)' }}>
+                          {p.neutral}
+                        </div>
+                      </div>
+                    </SpdCard>
+                  )
+                })}
+                {refEntries.length === 0 && (
+                  <p className="text-surface-600 text-sm py-10 w-full text-center">
+                    No Pokémon match your filter
+                  </p>
+                )}
+              </div>
+            </div>
+          </>
+        )}
 
       </div>
     </div>
