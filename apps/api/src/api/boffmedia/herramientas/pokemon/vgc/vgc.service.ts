@@ -3,6 +3,14 @@ import { Dex } from '@pkmn/sim';
 import { VgcRegulationsRepository } from './meta/repositories/regulations.repository';
 import { initChampionsMod } from './champions.mod';
 
+export interface Gen9MoveEntry {
+  name: string;
+  id: string;
+  basePower: number;
+  type: string;
+  category: string;
+}
+
 export interface VgcPokemon {
   name: string;
   num: number;
@@ -174,5 +182,47 @@ export class VgcService {
       (Math.floor(((2 * base + iv + Math.floor(evs / 4)) * level) / 100) + 5) *
         nature,
     );
+  }
+
+  /**
+   * Returns game data (moves, items, abilities) for the given format.
+   * Uses Dex.forFormat() so the regulation's ban list is respected.
+   * Cached per formatId — one entry per regulation, lives for the process lifetime.
+   */
+  private _gameDataCache = new Map<string, { moves: Gen9MoveEntry[]; items: string[]; abilities: string[] }>();
+
+  getChampionsGameData(formatId: string): { moves: Gen9MoveEntry[]; items: string[]; abilities: string[] } {
+    if (this._gameDataCache.has(formatId)) return this._gameDataCache.get(formatId)!;
+
+    const format = Dex.formats.get(formatId);
+    if (!format.exists) {
+      throw new NotFoundException(`Format "${formatId}" not found.`);
+    }
+    const dex = Dex.forFormat(format);
+
+    const moves: Gen9MoveEntry[] = [];
+    for (const m of dex.moves.all()) {
+      if (m.isNonstandard || m.num <= 0) continue;
+      moves.push({ name: m.name, id: m.id, basePower: m.basePower, type: m.type, category: m.category });
+    }
+    moves.sort((a, b) => a.name.localeCompare(b.name));
+
+    const items: string[] = ['None'];
+    for (const i of dex.items.all()) {
+      if (i.isNonstandard || i.num <= 0) continue;
+      items.push(i.name);
+    }
+    items.sort();
+
+    const abilities: string[] = ['None'];
+    for (const a of dex.abilities.all()) {
+      if (a.isNonstandard || a.num <= 0) continue;
+      abilities.push(a.name);
+    }
+    abilities.sort();
+
+    const result = { moves, items, abilities };
+    this._gameDataCache.set(formatId, result);
+    return result;
   }
 }
