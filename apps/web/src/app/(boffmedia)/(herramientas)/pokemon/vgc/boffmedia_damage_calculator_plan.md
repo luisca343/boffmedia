@@ -474,7 +474,12 @@ Checklist:
 11. [x] Optimization pass — lazy-load chunks, delete dead code
 12. [x] **Mobile polish** ✅
 13. [x] **UX polish pass** ✅ — TypeCalcView table 2× larger; SpeedView rivals comparison mode (item-aware per-Pokémon, auto-activates when rivals set, toggle for full reference); MatrixView SlotCard 36px sprites + bigger text, table cells h-[56px]/h-[28px], sprites 40px, SlotPanel width 240px
-14. [ ] **URL serialization** ← **NEXT**
+14. [x] **URL serialization + SOLID refactor** ✅
+    - `_lib/urlSerializer.ts` — lz-string compression (`compressToEncodedURIComponent`) replaces raw base64; versioned envelope `v:1`; graceful fallback for old/invalid links
+    - `_hooks/useCalcUrlSync.ts` — SRP hook: mounts once to hydrate + clean URL; `copyShareLink()` reads live state via `getState()`; `prompt()` fallback for non-HTTPS contexts; URL auto-cleaned after hydration via `replaceState`
+    - **Store split** — `_store/slices/calcSlice.ts` (1v1), `matrixSlice.ts` (team/many), `savedSlice.ts` (localStorage); `_store/types.ts` as combined type; `calculatorStore.ts` is now a thin compositor (~15 lines)
+    - **MatrixView split** — 740-line monolith → 6 focused files: `CompactFieldBar`, `SlotPanel` (+ `SlotCard`), `PasteImportModal`, `PokeDrawer`, `MatrixTable` (+ `EmptyMatrix`), `MatrixView` (orchestrator, ~115 lines)
+15. [ ] **Polish / remaining** ← **NEXT**
 
 ---
 

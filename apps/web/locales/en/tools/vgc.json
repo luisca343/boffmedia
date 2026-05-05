@@ -3,6 +3,8 @@
     "calc": {
       "title": "Damage Calculator",
       "subtitle": "Calculate damage with full VGC field conditions",
+      "share": "Share",
+      "shareCopied": "Copied!",
       "tabs": {
         "1v1": "1 vs 1",
         "teamvsmany": "Team → Threats",
