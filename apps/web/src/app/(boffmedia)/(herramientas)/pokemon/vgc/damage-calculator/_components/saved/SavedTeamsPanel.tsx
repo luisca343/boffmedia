@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { X, ClipboardPaste, Check, Pencil, Eye, EyeOff, ChevronDown, ChevronRight } from 'lucide-react'
+import { X, ClipboardPaste, Check, Pencil, Eye, EyeOff, ChevronDown, ChevronRight, GripVertical } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useCalculatorStore, defaultPokemon } from '../../_store/calculatorStore'
 import type { SavedEntry, CalcPokemon } from '../../_types/calculator'
@@ -16,6 +16,12 @@ import { useGameData } from '../../_hooks/usePokemonData'
 function EntryCard({
   entry,
   useChampions,
+  isDragging,
+  isDropTarget,
+  onDragStart,
+  onDragEnd,
+  onDragOver,
+  onDrop,
   onLoadTeam,
   onLoadMany,
   onCopy,
@@ -25,6 +31,12 @@ function EntryCard({
 }: {
   entry: SavedEntry
   useChampions: boolean
+  isDragging: boolean
+  isDropTarget: boolean
+  onDragStart: () => void
+  onDragEnd: () => void
+  onDragOver: (e: React.DragEvent) => void
+  onDrop: (e: React.DragEvent) => void
   onLoadTeam: () => void
   onLoadMany: () => void
   onCopy: () => void
@@ -58,9 +70,21 @@ function EntryCard({
   })
 
   return (
-    <div className="border border-surface-700/40 rounded-lg overflow-hidden bg-surface-900/60">
+    <div
+      draggable
+      onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
+      onDragOver={onDragOver}
+      onDrop={onDrop}
+      className={`border rounded-lg overflow-hidden bg-surface-900/60 transition-all ${
+        isDragging ? 'opacity-40' : ''
+      } ${
+        isDropTarget ? 'border-primary-500/60 ring-1 ring-primary-500/30' : 'border-surface-700/40'
+      }`}
+    >
       {/* Header row */}
       <div className="flex items-start gap-1.5 px-2.5 pt-2 pb-1.5">
+        <GripVertical className="w-3 h-3 shrink-0 mt-0.5 text-surface-700 cursor-grab" />
         {renaming ? (
           <input
             ref={inputRef}
@@ -356,24 +380,46 @@ export function SavedTeamsPanel({ onClose }: { onClose: () => void }) {
   const t = useTranslations('vgc.calc.saved')
   const {
     saved, team, many, regulation, useChampions,
-    hydrateFromStorage, saveGroup, deleteSaved, renameSaved,
+    hydrateFromStorage, saveGroup, deleteSaved, renameSaved, reorderSaved,
     loadSavedAsTeam, loadSavedAsManyList,
   } = useCalculatorStore()
 
   const [importOpen, setImportOpen] = useState(false)
   const [copyingId, setCopyingId] = useState<number | null>(null)
+  const [draggingId, setDraggingId] = useState<number | null>(null)
+  const [overIdx, setOverIdx] = useState<number | null>(null)
 
   useEffect(() => {
     hydrateFromStorage()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Newest first for display; indices map back as: displayIdx → savedIdx = saved.length - 1 - displayIdx
+  const displayedSaved = useMemo(() => [...saved].reverse(), [saved])
+
   function handleCopy(entry: SavedEntry) {
     const text = pokesToPaste(entry.pokeList, useChampions)
-    navigator.clipboard.writeText(text).then(() => {
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        setCopyingId(entry.id)
+        setTimeout(() => setCopyingId(null), 1500)
+      })
+    } else {
+      window.prompt('Copy this paste:', text)
       setCopyingId(entry.id)
       setTimeout(() => setCopyingId(null), 1500)
-    })
+    }
+  }
+
+  function handleDrop(e: React.DragEvent, toDisplayIdx: number) {
+    e.preventDefault()
+    if (draggingId === null) return
+    const fromDisplayIdx = displayedSaved.findIndex((entry) => entry.id === draggingId)
+    if (fromDisplayIdx === -1 || fromDisplayIdx === toDisplayIdx) return
+    const len = saved.length
+    reorderSaved(len - 1 - fromDisplayIdx, len - 1 - toDisplayIdx)
+    setDraggingId(null)
+    setOverIdx(null)
   }
 
   return (
@@ -436,13 +482,25 @@ export function SavedTeamsPanel({ onClose }: { onClose: () => void }) {
       {/* Saved entries */}
       <div className="flex-1 overflow-y-auto p-2 flex flex-col gap-2">
         {saved.length === 0 ? (
-          <p className="text-center text-[11px] text-surface-700 py-8 px-4">{t('empty')}</p>
+          <div className="flex flex-col items-center justify-center gap-2 py-12 px-4 text-center">
+            <div className="text-3xl opacity-20">💾</div>
+            <p className="text-[11px] font-semibold text-surface-500">{t('empty')}</p>
+            <p className="text-[10px] text-surface-700 leading-relaxed">
+              Save your team or paste a set using the buttons above.
+            </p>
+          </div>
         ) : (
-          [...saved].reverse().map((entry) => (
+          displayedSaved.map((entry, displayIdx) => (
             <EntryCard
               key={entry.id}
               entry={entry}
               useChampions={useChampions}
+              isDragging={draggingId === entry.id}
+              isDropTarget={overIdx === displayIdx && draggingId !== entry.id}
+              onDragStart={() => setDraggingId(entry.id)}
+              onDragEnd={() => { setDraggingId(null); setOverIdx(null) }}
+              onDragOver={(e) => { e.preventDefault(); setOverIdx(displayIdx) }}
+              onDrop={(e) => handleDrop(e, displayIdx)}
               onLoadTeam={() => loadSavedAsTeam(entry.id)}
               onLoadMany={() => loadSavedAsManyList(entry.id)}
               onCopy={() => handleCopy(entry)}

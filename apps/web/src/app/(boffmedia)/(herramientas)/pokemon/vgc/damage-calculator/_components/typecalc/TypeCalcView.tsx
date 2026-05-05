@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useCalculatorStore } from '../../_store/calculatorStore'
 import { useLegalPokemon } from '../../_hooks/useLegalPokemon'
 import { getSpriteUrl, handleSpriteError } from '../../_lib/spriteUtils'
@@ -216,8 +216,9 @@ function InsightRow({ poke, children }: { poke: TeamPoke; children: React.ReactN
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export function TypeCalcView() {
-  const { team, regulation } = useCalculatorStore()
+  const { team, many, regulation } = useCalculatorStore()
   const legalPokemon = useLegalPokemon(regulation)
+  const [view, setView] = useState<'team' | 'rivals'>('team')
 
   const teamPokes = useMemo<TeamPoke[]>(() => {
     return team.map((p) => {
@@ -226,8 +227,19 @@ export function TypeCalcView() {
     }).filter((e): e is TeamPoke => e !== null)
   }, [team, legalPokemon])
 
+  const manyPokes = useMemo<TeamPoke[]>(() => {
+    return many.map((p) => {
+      const apiEntry = legalPokemon.find((lp) => lp.name === p.name)
+      return apiEntry ? { name: p.name, types: apiEntry.types } : null
+    }).filter((e): e is TeamPoke => e !== null)
+  }, [many, legalPokemon])
+
+  const hasRivals = manyPokes.length > 0
+  const activePokes = view === 'team' ? teamPokes : manyPokes
+  const isRivals = view === 'rivals'
+
   const offInsights = useMemo(() => {
-    return teamPokes.map((p) => {
+    return activePokes.map((p) => {
       let se = 0, nve = 0, imm = 0
       for (const defT of ALL_TYPES) {
         const e = getBestOffenseEff(p.types, defT)
@@ -237,10 +249,10 @@ export function TypeCalcView() {
       }
       return { ...p, se, nve, imm }
     })
-  }, [teamPokes])
+  }, [activePokes])
 
   const defInsights = useMemo(() => {
-    return teamPokes.map((p) => {
+    return activePokes.map((p) => {
       let weak = 0, resist = 0, imm = 0, quad = 0
       for (const t of ALL_TYPES) {
         const e = getTypeEff(t, p.types)
@@ -251,29 +263,30 @@ export function TypeCalcView() {
       }
       return { ...p, weak, resist, imm, quad }
     })
-  }, [teamPokes])
+  }, [activePokes])
 
   const bestOffType = useMemo(() => {
-    if (!teamPokes.length) return null
+    if (!activePokes.length) return null
     let best = '', bestN = 0
     for (const defT of ALL_TYPES) {
-      const n = teamPokes.filter((p) => getBestOffenseEff(p.types, defT) >= 2).length
+      const n = activePokes.filter((p) => getBestOffenseEff(p.types, defT) >= 2).length
       if (n > bestN) { bestN = n; best = defT }
     }
     return bestN > 0 ? { type: best, count: bestN } : null
-  }, [teamPokes])
+  }, [activePokes])
 
   const bestDefType = useMemo(() => {
-    if (!teamPokes.length) return null
+    if (!activePokes.length) return null
     let best = '', bestN = 0
     for (const t of ALL_TYPES) {
-      const n = teamPokes.filter((p) => { const e = getTypeEff(t, p.types); return e > 0 && e < 1 }).length
+      const n = activePokes.filter((p) => { const e = getTypeEff(t, p.types); return e > 0 && e < 1 }).length
       if (n > bestN) { bestN = n; best = t }
     }
     return bestN > 0 ? { type: best, count: bestN } : null
-  }, [teamPokes])
+  }, [activePokes])
 
-  if (teamPokes.length === 0) {
+  // Both sides empty → primary empty state
+  if (teamPokes.length === 0 && manyPokes.length === 0) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center px-8">
         <div className="text-4xl opacity-15">🔮</div>
@@ -283,9 +296,39 @@ export function TypeCalcView() {
     )
   }
 
+  // Active tab is empty → contextual empty
+  if (activePokes.length === 0) {
+    return (
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {hasRivals && <ViewToggle view={view} onChange={setView} />}
+        <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center px-8">
+          <div className="text-4xl opacity-15">⚔</div>
+          <p className="text-surface-500 text-sm font-semibold">
+            {isRivals ? 'No threats to analyze' : 'No team to analyze'}
+          </p>
+          <p className="text-surface-700 text-xs">
+            {isRivals ? 'Add threats in the matrix tab.' : 'Switch to the 1v1 or matrix tabs to configure your team.'}
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  const offLabel  = isRivals ? '⚔ Rivals can threaten'     : '⚔ Offensive coverage'
+  const defLabel  = isRivals ? '🛡 Rivals\' vulnerabilities' : '🛡 Defensive profile'
+  const offTitle  = isRivals ? '⚔ Rivals\' Threats'         : '⚔ Offensive Coverage'
+  const defTitle  = isRivals ? '🛡 Rivals\' Weaknesses'      : '🛡 Defensive Coverage'
+  const offDesc   = isRivals ? 'Rivals\' STAB threats by defender type'    : 'Your team\'s STAB coverage vs each defender type'
+  const defDesc   = isRivals ? 'Types that hit rivals super-effectively'   : 'Your team\'s resistances and weaknesses'
+  const bestOffLbl = isRivals ? 'Rivals best threaten:' : 'Best covered:'
+  const bestDefLbl = isRivals ? 'Rivals resist most:'   : 'Most resisted by:'
+
   return (
     <div className="flex-1 overflow-y-auto">
       <div className="p-4 flex flex-col gap-4 max-w-full">
+
+        {/* ── View toggle ── */}
+        {hasRivals && <ViewToggle view={view} onChange={setView} />}
 
         {/* ── Insights ── */}
         <div
@@ -298,7 +341,7 @@ export function TypeCalcView() {
           <div className="grid grid-cols-2 divide-x divide-surface-700/30">
             {/* Offensive */}
             <div className="px-3 py-2">
-              <div className="text-[9px] font-bold uppercase tracking-wider text-orange-400 mb-2">⚔ Offensive coverage</div>
+              <div className="text-[9px] font-bold uppercase tracking-wider text-orange-400 mb-2">{offLabel}</div>
               {offInsights.map((p) => (
                 <InsightRow key={p.name} poke={p}>
                   Can hit <strong>{p.se}</strong> types SE
@@ -308,7 +351,7 @@ export function TypeCalcView() {
               ))}
               {bestOffType && (
                 <div className="mt-2 rounded px-2 py-1.5 text-[10px]" style={{ background: 'rgba(30,41,59,0.6)' }}>
-                  <span className="text-surface-500">Best covered:</span>{' '}
+                  <span className="text-surface-500">{bestOffLbl}</span>{' '}
                   <TypeBadge type={bestOffType.type} />
                   <span className="text-surface-500 ml-1">({bestOffType.count} members hit SE)</span>
                 </div>
@@ -316,7 +359,7 @@ export function TypeCalcView() {
             </div>
             {/* Defensive */}
             <div className="px-3 py-2">
-              <div className="text-[9px] font-bold uppercase tracking-wider text-cyan-400 mb-2">🛡 Defensive profile</div>
+              <div className="text-[9px] font-bold uppercase tracking-wider text-cyan-400 mb-2">{defLabel}</div>
               {defInsights.map((p) => (
                 <InsightRow key={p.name} poke={p}>
                   {p.imm > 0 && <><strong>{p.imm}</strong> immune, </>}
@@ -328,7 +371,7 @@ export function TypeCalcView() {
               ))}
               {bestDefType && (
                 <div className="mt-2 rounded px-2 py-1.5 text-[10px]" style={{ background: 'rgba(30,41,59,0.6)' }}>
-                  <span className="text-surface-500">Most resisted by:</span>{' '}
+                  <span className="text-surface-500">{bestDefLbl}</span>{' '}
                   <TypeBadge type={bestDefType.type} />
                   <span className="text-surface-500 ml-1">({bestDefType.count} members)</span>
                 </div>
@@ -344,11 +387,11 @@ export function TypeCalcView() {
             style={{ background: 'rgba(8,12,24,0.97)', border: '1px solid rgba(51,65,85,0.4)' }}
           >
             <div className="px-3 py-2 border-b border-surface-700/30">
-              <span className="text-[10px] font-black tracking-widest uppercase text-orange-400">⚔ Offensive Coverage</span>
-              <p className="text-[9px] text-surface-600 mt-0.5">Your team's STAB coverage vs each defender type</p>
+              <span className="text-[10px] font-black tracking-widest uppercase text-orange-400">{offTitle}</span>
+              <p className="text-[9px] text-surface-600 mt-0.5">{offDesc}</p>
             </div>
             <div className="p-2">
-              <CovTable teamPokes={teamPokes} mode="offense" />
+              <CovTable teamPokes={activePokes} mode="offense" />
             </div>
           </div>
 
@@ -357,16 +400,47 @@ export function TypeCalcView() {
             style={{ background: 'rgba(8,12,24,0.97)', border: '1px solid rgba(51,65,85,0.4)' }}
           >
             <div className="px-3 py-2 border-b border-surface-700/30">
-              <span className="text-[10px] font-black tracking-widest uppercase text-cyan-400">🛡 Defensive Coverage</span>
-              <p className="text-[9px] text-surface-600 mt-0.5">Your team's resistances and weaknesses</p>
+              <span className="text-[10px] font-black tracking-widest uppercase text-cyan-400">{defTitle}</span>
+              <p className="text-[9px] text-surface-600 mt-0.5">{defDesc}</p>
             </div>
             <div className="p-2">
-              <CovTable teamPokes={teamPokes} mode="defense" />
+              <CovTable teamPokes={activePokes} mode="defense" />
             </div>
           </div>
         </div>
 
       </div>
+    </div>
+  )
+}
+
+// ─── View toggle ──────────────────────────────────────────────────────────────
+
+function ViewToggle({ view, onChange }: { view: 'team' | 'rivals'; onChange: (v: 'team' | 'rivals') => void }) {
+  return (
+    <div className="flex items-center gap-1 self-start rounded-lg border border-surface-700/50 overflow-hidden">
+      <button
+        type="button"
+        onClick={() => onChange('team')}
+        className={`px-3 py-1.5 text-xs font-semibold transition-all ${
+          view === 'team'
+            ? 'bg-primary-500/15 text-primary-400 border-r border-primary-500/30'
+            : 'text-surface-500 hover:text-surface-300 border-r border-surface-700/50'
+        }`}
+      >
+        ⚔ My Team
+      </button>
+      <button
+        type="button"
+        onClick={() => onChange('rivals')}
+        className={`px-3 py-1.5 text-xs font-semibold transition-all ${
+          view === 'rivals'
+            ? 'bg-accent-500/15 text-accent-300'
+            : 'text-surface-500 hover:text-surface-300'
+        }`}
+      >
+        🛡 Rivals
+      </button>
     </div>
   )
 }
