@@ -297,15 +297,18 @@ Layout:
 - Insights panel: SE/NVE coverage counts + weak/resist/immune profile per Pokémon
 - Empty state if no team Pokémon loaded
 
-### 📥 Import/Export System ✅ DONE (parse) / ⏳ TODO (export)
+### 📥 Import/Export System ✅ DONE
 
 **Paste import** is handled by `PasteImportModal` inside `MatrixView.tsx`:
 - Uses `parseShowdownPaste(text)` from `@/features/vgc-tracker/showdown-parse` — the same canonical parser used by the tracker's `PresetManager`. Returns `PresetSlot[]` with `{ speciesId, speciesName, item?, ability?, moves: string[], nature? }`.
 - Move BP/type/category are resolved via `moveMap` from `useGameData()`. The Import button is disabled until `isLoaded === true` (prevents importing with empty move data on slow connections).
 - Species names are matched against `legalPokemon` via `toId()` for canonical lookup.
-- `_lib/pokePasteParser.ts` (old custom parser) is no longer used and can be deleted. It relied on `@smogon/calc`'s `GEN9.moves.get()` which was fragile and format-specific.
+- `_lib/pokePasteParser.ts` (old custom parser) is no longer used — ⚠️ **can be deleted** (relied on `@smogon/calc`'s `GEN9.moves.get()` which was fragile and format-specific).
 
-Export (`pokesToPaste`): ⏳ not yet implemented
+**Export** (`pokesToPaste`): ✅ implemented in `_lib/pokesToPaste.ts`
+- Converts `CalcPokemon[]` to Showdown/PokéPaste format.
+- Accepts `useChampions` flag: converts SP→EV via `floor(sp * 252 / 32)` before outputting.
+- Used by the Saved Teams panel copy-to-clipboard action.
 
 ---
 
@@ -380,6 +383,7 @@ type MoveSlot = {
 - [x] Centralized Zustand store (`calculatorStore.ts`)
 - [x] Slices: poke1/poke2, field (with attackerSide/defenderSide), UI (activeTab, activeMoves)
 - [x] `subscribeWithSelector` middleware for fine-grained subscriptions
+- [x] `saved` slice: `SavedEntry[]` + `hydrateFromStorage` / `saveGroup` / `deleteSaved` / `renameSaved` / `loadSavedAsTeam` / `loadSavedAsManyList`
 - [ ] Memoized selectors — partially done (useMemo in MoveStrip)
 - [ ] Avoid unnecessary re-renders — needs profiling pass
 
@@ -396,34 +400,34 @@ type MoveSlot = {
 
 ---
 
-## 💾 Phase 7 — Persistence & Sharing ⏳ TODO
+## 💾 Phase 7 — Persistence & Sharing 🔄 IN PROGRESS
 
-### Saved Teams Panel
-Slides in from the right (320px), no overlay — panel itself slides in.
+### Saved Teams Panel ✅ DONE
 
-- Header: Title + 📋 Importar button + ✕ close
-- Body: "+ Guardar Equipo" / "+ Guardar Rivales" → reveals name input + Guardar button
-- Saved entry: name + Pokémon count + row of 28×28 sprites + actions (→ Equipo | → Rivales | 📋 Copiar | 👁 Ver | ✎ rename | ✕ delete)
-- Copy button turns green with "✓ Copiado" for 1.5s
+`_components/saved/SavedTeamsPanel.tsx` — slides in from right (320px width transition, no overlay, pushes content).
 
-```js
-// Persistence shape
-{
-  id: Date.now(),
-  name: string,
-  pokeList: PokémonState[],
-  savedAt: ISO string
+- Header: "EQUIPOS GUARDADOS" + 📋 Importar toggle + ✕ close
+- Importar section (collapsible): paste textarea + name input → saves directly to library (uses `parseShowdownPaste` + `moveMap` + `legalPokemon` for full resolution)
+- "+ Guardar Equipo" / "+ Guardar Rivales" → reveals name input + Guardar; disabled when list is empty
+- Entry cards: 28×28 sprite strip + count + date · actions: → Equipo | → Rivales | 📋 Copiar (1.5s green ✓) | 👁 Ver (inline paste preview) | ✎ Rename (inline input) | ✕ Delete
+- Entries displayed newest-first; hydrates from `localStorage` on mount (SSR-safe: `typeof window !== 'undefined'` guard)
+- `BookmarkPlus` button in calculator header toggles panel; button reflects active state
+
+```ts
+// SavedEntry shape (in _types/calculator.ts)
+interface SavedEntry {
+  id: number        // Date.now()
+  name: string
+  pokeList: CalcPokemon[]
+  savedAt: string   // ISO date
 }
-// Save
-localStorage.setItem("boffmedia_saved_teams", JSON.stringify(entries))
-// Load
-JSON.parse(localStorage.getItem("boffmedia_saved_teams") || "[]")
+// localStorage key: "boffmedia_saved_teams"
 ```
 
 Checklist:
-- [ ] LocalStorage sync (hydration-safe)
-- [ ] URL serialization (shareable states)
-- [ ] Hydration-safe logic (Next.js SSR)
+- [x] LocalStorage sync (hydration-safe)
+- [x] Hydration-safe logic (Next.js SSR) — `hydrateFromStorage` called in `useEffect`, never during SSR
+- [ ] URL serialization (shareable states) — **deferred**
 
 ---
 
@@ -457,13 +461,14 @@ Checklist:
 3. [x] Pokémon panels
 4. [x] Damage calculation logic
 5. [x] Move strip
-6. [ ] **Matrix view** ← **NEXT**
-7. [ ] Speed view
-8. [ ] Type calculator
-9. [ ] Import/export (PokéPaste)
-10. [ ] Persistence + URL sync + Saved Teams panel
-11. [ ] Optimization pass
+6. [x] Matrix view
+7. [x] Speed view
+8. [x] Type calculator
+9. [x] Import/export (PokéPaste) — parse + export (`pokesToPaste`)
+10. [x] Saved Teams panel + localStorage persistence
+11. [ ] **Optimization pass** ← **NEXT**
 12. [ ] Mobile polish
+13. [ ] URL serialization (deferred)
 
 ---
 
@@ -483,6 +488,8 @@ Checklist:
 | SP→EV: `floor(sp * 252 / 32)` | Exact at max (32→252); ±1 at intermediate values — documented |
 | Matrix capped at 120 speed entries | Prevents slow renders with full Pokédex in Speed view |
 | JS-positioned tooltips for matrix | CSS hover tooltips clip near table edges with large datasets |
+| `hydrateFromStorage` action (not persist middleware) | Zustand `persist` writes to localStorage synchronously on SSR which causes hydration mismatches. Instead, store starts empty and `SavedTeamsPanel` calls `hydrateFromStorage()` in `useEffect` — only runs on the client. |
+| Saved Teams panel width via inline `style` + `transition-[width]` | Tailwind arbitrary `w-[320px]`/`w-0` with `transition-all` doesn't animate correctly on conditional renders. Inline style on width + `overflow-hidden` on the wrapper gives a smooth slide with no layout jank. |
 
 ---
 
