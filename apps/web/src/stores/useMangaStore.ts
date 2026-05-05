@@ -1,12 +1,18 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import type { ChapterPageInfo, LocalMangaLibrary } from "@/services/api/boffmedia/scrapeService";
 
 export type MangaStore = {
+  library: LocalMangaLibrary | null;
+  setLibrary: (lib: LocalMangaLibrary) => void;
+
+  chapterPages: Record<string, ChapterPageInfo[]>;
+  setChapterPages: (chapterId: string, pages: ChapterPageInfo[]) => void;
+
   currentMangaId: string | null;
   currentChapterId: string | null;
-  pageSelections: {
-    [chapterId: string]: number[];
-  };
+  pageSelections: Record<string, number[]>;
+
   setCurrentManga: (id: string) => void;
   setCurrentChapter: (id: string) => void;
   togglePage: (chapterId: string, page: number) => void;
@@ -17,13 +23,21 @@ export type MangaStore = {
 export const useMangaStore = create<MangaStore>()(
   persist(
     (set, get) => ({
+      library: null,
+      setLibrary: (lib) => set({ library: lib }),
+
+      chapterPages: {},
+      setChapterPages: (chapterId, pages) =>
+        set({ chapterPages: { ...get().chapterPages, [chapterId]: pages } }),
+
       currentMangaId: null,
       currentChapterId: null,
       pageSelections: {},
+
       setCurrentManga: (id) => set({ currentMangaId: id }),
       setCurrentChapter: (id) => set({ currentChapterId: id }),
       togglePage: (chapterId, page) => {
-        const prev = get().pageSelections[chapterId] || [];
+        const prev = get().pageSelections[chapterId] ?? [];
         set({
           pageSelections: {
             ...get().pageSelections,
@@ -33,12 +47,8 @@ export const useMangaStore = create<MangaStore>()(
           },
         });
       },
-      setPages: (chapterId, pages) => set({
-        pageSelections: {
-          ...get().pageSelections,
-          [chapterId]: pages,
-        },
-      }),
+      setPages: (chapterId, pages) =>
+        set({ pageSelections: { ...get().pageSelections, [chapterId]: pages } }),
       resetSelections: () => set({ pageSelections: {} }),
     }),
     {
@@ -47,6 +57,8 @@ export const useMangaStore = create<MangaStore>()(
         currentMangaId: state.currentMangaId,
         currentChapterId: state.currentChapterId,
         pageSelections: state.pageSelections,
+        library: state.library,
+        chapterPages: state.chapterPages,
       }),
     }
   )
