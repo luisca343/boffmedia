@@ -1,12 +1,15 @@
 import { Injectable } from '@nestjs/common';
+import { Response } from 'express';
 import { MyrientScrapeService } from './services/myrient.service';
 import { MangaScraperService } from './services/manga.service';
 import { MangaBrowserService } from './services/manga/manga-browser.service';
+import { MangaEditorService } from './services/manga/manga-editor.service';
 import type {
   MangaSearchResult,
   MangaChapter,
   MangaChapterDownloadResult,
   LocalMangaLibrary,
+  ChapterPageInfo,
 } from './services/manga/manga.types';
 import { EuropeAggregateResult } from './entities/europe-aggregate.entity';
 import { DownloadResult } from './entities/download-result.entity';
@@ -22,6 +25,7 @@ export class ScrapeFacadeService {
     private readonly myrientScrapeService: MyrientScrapeService,
     private readonly mangaScraperService: MangaScraperService,
     private readonly mangaBrowserService: MangaBrowserService,
+    private readonly mangaEditorService: MangaEditorService,
   ) {}
 
   // ==================== MYRIENT SCRAPING ====================
@@ -138,5 +142,19 @@ export class ScrapeFacadeService {
   async setBrowserTunnel(enabled: boolean): Promise<{ tunnelEnabled: boolean; tunnelAvailable: boolean }> {
     await this.mangaBrowserService.setTunnelEnabled(enabled);
     return this.getBrowserConfig();
+  }
+
+  // ==================== MANGA EDITOR ====================
+
+  getMangaChapterPageList(series: string, chapter: string): Promise<ChapterPageInfo[]> {
+    return this.mangaEditorService.getChapterPageList(series, chapter);
+  }
+
+  serveChapterImage(series: string, chapter: string, page: number, res: Response): Promise<void> {
+    return this.mangaEditorService.serveChapterImage(series, chapter, page, res);
+  }
+
+  convertMangaChapter(series: string, chapter: string, excludePages: number[]): Promise<{ outputPath: string }> {
+    return this.mangaEditorService.convertChapter(series, chapter, excludePages);
   }
 }

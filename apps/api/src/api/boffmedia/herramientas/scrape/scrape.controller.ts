@@ -261,4 +261,53 @@ export class ScrapeController {
   async downloadSelectedGames(@Body() dto: DownloadSelectedGamesDto): Promise<BulkDownloadResult> {
     return this.scrapeFacadeService.downloadSelectedGames(dto);
   }
+
+  // ==================== MANGA LIBRARY EDITOR ====================
+
+  @Get('manga/chapter-pages')
+  @ApiOperation({ summary: 'List all pages in a local chapter (CBZ or EPUB)' })
+  @ApiQuery({ name: 'series', type: String })
+  @ApiQuery({ name: 'chapter', type: String })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Ordered list of page metadata.' })
+  async getChapterPages(
+    @Query('series') series: string,
+    @Query('chapter') chapter: string,
+  ) {
+    if (!series?.trim()) throw new BadRequestException('series is required');
+    if (!chapter?.trim()) throw new BadRequestException('chapter is required');
+    return this.scrapeFacadeService.getMangaChapterPageList(series, chapter);
+  }
+
+  @Get('manga/chapter-image')
+  @ApiOperation({ summary: 'Serve a single raw page image from a local chapter' })
+  @ApiQuery({ name: 'series', type: String })
+  @ApiQuery({ name: 'chapter', type: String })
+  @ApiQuery({ name: 'page', type: Number })
+  async serveChapterImage(
+    @Query('series') series: string,
+    @Query('chapter') chapter: string,
+    @Query('page') page: string,
+    @Res() res: Response,
+  ): Promise<void> {
+    if (!series?.trim()) throw new BadRequestException('series is required');
+    if (!chapter?.trim()) throw new BadRequestException('chapter is required');
+    const pageIndex = parseInt(page, 10);
+    if (isNaN(pageIndex)) throw new BadRequestException('page must be a number');
+    await this.scrapeFacadeService.serveChapterImage(series, chapter, pageIndex, res);
+  }
+
+  @Post('manga/convert-chapter')
+  @ApiOperation({ summary: 'Convert a CBZ chapter to EPUB, optionally excluding pages' })
+  @ApiResponse({ status: HttpStatus.CREATED, description: 'EPUB created. Returns output path.' })
+  async convertChapter(
+    @Body() body: { series: string; chapter: string; excludePages?: number[] },
+  ): Promise<{ outputPath: string }> {
+    if (!body.series?.trim()) throw new BadRequestException('series is required');
+    if (!body.chapter?.trim()) throw new BadRequestException('chapter is required');
+    return this.scrapeFacadeService.convertMangaChapter(
+      body.series,
+      body.chapter,
+      body.excludePages ?? [],
+    );
+  }
 }

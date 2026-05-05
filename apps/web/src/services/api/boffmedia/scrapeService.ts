@@ -1,4 +1,4 @@
-import { apiGET, apiPATCH } from '@/services/boffAPI';
+import { apiGET, apiPATCH, apiPOST } from '@/services/boffAPI';
 
 export interface GameFileEntry {
   name: string;
@@ -116,6 +116,14 @@ export interface MangaNovelDownloadResult {
 export interface LocalMangaChapter {
   slug: string;
   imageCount: number;
+  hasCbz: boolean;
+  hasEpub: boolean;
+}
+
+export interface ChapterPageInfo {
+  index: number;
+  filename: string;
+  mimeType: string;
 }
 
 export interface LocalMangaSeries {
@@ -280,5 +288,26 @@ export class ScrapeService {
         }
       }
     }
+  }
+
+  // ── Manga Library Editor ─────────────────────────────────────────────────
+
+  static getChapterPageList(series: string, chapter: string) {
+    const params = new URLSearchParams({ series, chapter });
+    return apiGET<ChapterPageInfo[]>(`/boffmedia/herramientas/scrape/manga/chapter-pages?${params}`);
+  }
+
+  /** Returns a URL suitable for use as an <img src>. No auth needed. */
+  static getChapterImageUrl(series: string, chapter: string, page: number): string {
+    const apiUrl = process.env.NEXT_PUBLIC_API ?? '';
+    const params = new URLSearchParams({ series, chapter, page: String(page) });
+    return `${apiUrl}/boffmedia/herramientas/scrape/manga/chapter-image?${params}`;
+  }
+
+  static convertMangaChapter(series: string, chapter: string, excludePages: number[]) {
+    return apiPOST<{ outputPath: string }>(
+      '/boffmedia/herramientas/scrape/manga/convert-chapter',
+      { series, chapter, excludePages },
+    );
   }
 }

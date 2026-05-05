@@ -32,6 +32,14 @@ export interface MangaChapterDownloadResult {
 export interface LocalMangaChapter {
   slug: string;
   imageCount: number;
+  hasCbz: boolean;
+  hasEpub: boolean;
+}
+
+export interface ChapterPageInfo {
+  index: number;
+  filename: string;
+  mimeType: string;
 }
 
 export interface LocalMangaSeries {
