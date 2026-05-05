@@ -171,7 +171,15 @@
       "errorConverting": "Error converting",
       "cbz": "CBZ",
       "epub": "EPUB",
-      "clearDiscarded": "Clear selection"
+      "clearDiscarded": "Clear selection",
+      "selectAll": "Select all",
+      "deselectAll": "Deselect all",
+      "selectedChapters": "{count} chapters selected",
+      "removeFirst": "Remove first",
+      "removeLast": "Remove last",
+      "convertSelected": "Convert selected",
+      "bulkConverting": "Converting {done}/{total}…",
+      "bulkDone": "{count} converted"
     }
   }
 }
