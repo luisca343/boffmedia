@@ -23,13 +23,41 @@ When conflicts arise:
 - State: **Zustand** with `subscribeWithSelector`
 - Language: **Strict TypeScript**
 - Damage calc: `@smogon/calc` v0.11.0 (upgraded from 0.10.0)
-- Pokémon data: `@pkmn/dex` (static singletons, built at module load)
+- Pokémon game data: server API `GET /tools/vgc/champions/:reg/game-data` for moves/items/abilities (backed by `@pkmn/sim` on the server, scoped to the active regulation); natures are hardcoded static constants (game mechanics, never change)
 - i18n: `next-intl`, namespace `vgc.calc`
 
 ### Champions Format Notes
 - Uses SP (Spirit Points): 66 total, 32 max per stat (vs standard 510/252 EVs)
 - SP → EV approximation: `floor(sp * 252 / 32)` — exact at extremes, ±1 at mid values
 - Toggle via `useChampions` store flag; default regulation is `gen9championsvgc2026regma`
+
+### ⚠️ Critical: The API owns ALL Pokémon Dex logic — the web has none
+
+`@pkmn/dex` and `@pkmn/sim` are **server-side only**. The web client has zero Dex logic.
+All game data — species, moves, items, abilities — flows from NestJS through typed HTTP endpoints.
+
+> **Rule:** If you need Pokémon data on the web, add or call an API endpoint.
+> Never import `@pkmn/dex`, `@pkmn/sim`, or `@pkmn/data` in any web file.
+
+**Reason:** The server runs `@pkmn/sim` with the Champions mod registered. Only the server knows which moves, abilities, and items are legal in a given regulation. Any client-side Dex call would be format-agnostic and incorrect.
+
+**Data sources by type:**
+
+| Data | API Endpoint | Client hook / service |
+|---|---|---|
+| Legal Pokémon + base stats | `GET /tools/vgc/champions/:reg/pokemon` | `useLegalPokemon(regulationId)` |
+| Moves / Items / Abilities | `GET /tools/vgc/champions/:reg/game-data` | `useGameData(regulationId)` in `usePokemonData.ts` |
+| Speed tiers | `GET /tools/vgc/champions/:reg/speed-tiers` | `VgcService.getChampionsSpeedTiers()` |
+| Natures | *(static constant — 25 values, never changes)* | `NATURES` named export from `usePokemonData.ts` |
+
+All three regulation-scoped endpoints use `Dex.forFormat(format)` on the server so ban lists and mod overrides are applied automatically. Results are cached per `formatId` server-side (process lifetime) and per `regulationId` client-side (module-level Map, page session).
+
+**Calling `useGameData(regulationId)`:**
+- Takes the regulation ID from the Zustand store (`useCalculatorStore().regulation`).
+- Returns `{ moveMap, moveNames, items, abilities, isLoaded }`. Never call without a regulation.
+- `isLoaded` is `false` until the first fetch resolves — guard destructive actions (paste import, etc.) behind it.
+
+`Dex.formats.get(formatId)` **cannot** be used as a substitute on the web: it returns format rule definitions (banlists, rulesets) but does not produce a filtered data list. That logic belongs on the server.
 
 ---
 
@@ -74,7 +102,7 @@ The AI agent must:
 
 ```
 /damage-calculator/
-  page.tsx                         ✅ Main page, 3-col layout [300px | 1fr | 300px]
+  page.tsx                         ✅ Main page, 3-col layout [320px | 1fr | 320px]
 
   _types/
     calculator.ts                  ✅ StatKey, CalcPokemon, CalcMove, CalcField, DamageResult…
@@ -87,7 +115,8 @@ The AI agent must:
     spriteUtils.ts                 ✅ Re-exports spriteUrl/handleSpriteError from vgc-tracker
 
   _hooks/
-    usePokemonData.ts              ✅ Static singletons: SPECIES_MAP, MOVE_MAP, NATURES, ITEMS, ABILITIES
+    usePokemonData.ts              ✅ useGameData() — async hook fetching moves/items/abilities from server;
+                                      NATURES — named static export (hardcoded game constants)
 
   _components/
     pokemon/
@@ -102,9 +131,67 @@ The AI agent must:
       MoveStrip.tsx                ✅ Persistent top bar: both sides, 16 rolls, KO verdict
 ```
 
+> ⚠️ **Correction:** The main page column layout is `320px | 1fr | 320px` (not `300px | 1fr | 300px` as previously documented). This matches the prototype spec.
+
 ---
 
 ## 🎨 Phase 3 — UI Implementation 🔄 IN PROGRESS
+
+### Design Tokens (from prototype reference)
+
+#### Colors
+```
+Background:         rgb(3, 5, 15)          — near-black blue
+Surface:            rgb(8, 12, 24)         — panel background
+Surface-mid:        rgb(12, 18, 32)        — nav / strip background
+Border:             rgba(51, 65, 85, 0.5)  — default border
+Text-primary:       rgb(226, 232, 240)
+Text-secondary:     rgb(148, 163, 184)
+Text-muted:         rgb(100, 116, 139)
+Text-dim:           rgb(71, 85, 105)
+
+Accent-orange:      rgb(249, 115, 22)      — attacker side
+Accent-orange-soft: rgb(251, 146, 60)
+Accent-violet:      rgb(168, 85, 247)      — defender side
+Accent-violet-soft: rgb(192, 132, 252)
+
+Damage-OHKO:        #ef4444
+Damage-2HKO:        #f97316
+Damage-possible:    #eab308
+Damage-low:         rgb(148, 163, 184)
+
+HP-high:            rgb(74, 222, 128)      — >50% HP
+HP-mid:             rgb(234, 179, 8)       — 25–50% HP
+HP-low:             rgb(239, 68, 68)       — <25% HP
+```
+
+#### Typography
+```
+Primary font:   'Inter', sans-serif
+Mono font:      'Roboto Mono', monospace
+Display font:   'Orbitron', sans-serif  (nav logo, panel titles, section headers)
+
+Body:           13px / Inter / weight 400
+Labels:         11px / Inter / weight 600 / color: text-muted
+Section title:  10px / Orbitron / weight 800 / uppercase / letter-spacing 0.15em
+Mono values:    11–12px / Roboto Mono / weight 400–700
+Nav logo:       17px / Orbitron / weight 900
+```
+
+#### Spacing & Radius
+```
+Nav height:     56px
+Panel padding:  12px
+Card padding:   8px 10px
+Gap (standard): 6–8px
+Gap (tight):    3–4px
+
+Border radius:
+  Cards/panels:  7–8px
+  Buttons/pills: 5–6px
+  Badges:        9999px (pill)
+  Tooltips:      9px
+```
 
 ### Checklist
 - [x] Navigation integrates with existing VGC/tools nav (ToolsMenu + i18n)
@@ -118,6 +205,23 @@ The AI agent must:
 ## ⚙️ Phase 4 — Core Features 🔄 IN PROGRESS
 
 ### 🧬 Pokémon Panels ✅ DONE
+
+Panels are 320px wide and scrollable. Each panel contains (top to bottom):
+1. Panel title — "Pokémon 1 — Atacante" (orange) / "Pokémon 2 — Defensor" (violet)
+2. PokéSearch combobox — autocomplete with sprite + type badges
+3. Sprite + types row — 64×64 sprite + type badges + base stats summary
+4. Tera Type select (color-coded by type)
+5. Level number input
+6. Stat table — HP/Atk/Def/SpA/SpD/Spe with Base/IVs/EVs/Total columns; nature colors: green (+), red (−)
+7. Nature select — shows `+STAT -STAT` label
+8. Ability select
+9. Item select
+10. Status select
+11. HP bar — editable current HP + animated colored bar + Reset button
+12. Boost row — buttons from −6 to +6, active=orange
+13. Movimientos header + 4 Move Slots: name | BP | Type (colored) | Category | Crit toggle
+
+Implementation status:
 - [x] Stats (EVs/SP, IVs, Nature) with live computed totals
 - [x] Moves (with BP/Type/Category/Crit overrides)
 - [x] Tera type selector
@@ -131,26 +235,146 @@ The AI agent must:
 - [x] Spread move tuple `[number[], number[]]` handled correctly
 - [x] KO verdict (guaranteed OHKO/2HKO, possible OHKO/2HKO, no KO)
 
-### 📊 Matrix View ⏳ NEXT
-- [ ] Attacker vs Defender grid (all moves of poke1 vs all of poke2)
-- [ ] Tooltip breakdowns
-- [ ] Performance optimized rendering
+> ⚠️ **Note on Trick Room:** Trick Room is present in FieldState (the prototype includes it as a field condition toggling sort order in Speed view). It does NOT affect damage calculation and should not be wired into `@smogon/calc`. It only reverses the sort order in the Speed view.
 
-### ⚡ Speed View ⏳ TODO
-- [ ] Speed tiers with TR support
-- [ ] Highlight player Pokémon
+### 🗺️ Navigation Tabs ✅ DONE
 
-### 🧪 Type Calculator ⏳ TODO
-- [ ] Offensive + defensive coverage
-- [ ] Summary insights
+The app has **5 tabs**:
 
-### 📥 Import System ⏳ TODO
-- [ ] PokéPaste parsing
-- [ ] Error handling
+| Tab ID | Label | Description |
+|---|---|---|
+| `1v1` | 1 vs 1 | Single Pokémon vs single Pokémon, bidirectional |
+| `teamvsmany` | Equipo → Muchos | Team attacks threat list — damage matrix |
+| `manyvsteam` | Muchos → Equipo | Threat list attacks team — defensive matrix |
+| `speed` | ⚡ Velocidad | Speed tier reference list |
+| `typecalc` | 🔮 Tipos | Type coverage + defensive profile |
+
+**Tab active style:** `bg-primary-500/15 border-primary-500/35 text-primary-400`
+
+### 🏷️ Format / Regulation Picker ✅ DONE
+
+A `Select` dropdown lives in the calculator header (right side). It fetches available Champions regulations from the API via the reused `useChampionsRegulations()` hook (from `../meta/_hooks/`). Selecting a regulation calls `setRegulation(reg.formatId)` + `setUseChampions(true)`.
+
+- Default: `gen9championsvgc2026regma`
+- While regulations load the picker is hidden; it appears once data arrives
+- A small "SP" badge next to the picker indicates Champions SP mode is active
+- Standard VGC formats are not yet offered (deferred — would require `setUseChampions(false)`)
+
+Regulation is **wired to all tabs**:
+- `PokemonPanel` reads `regulation` from the store → `useLegalPokemonNames` → `legalNames` prop on `PokemonSearch`. Covers 1v1 panels and Matrix View drawers (both use `PokemonPanel`).
+- `SpeedView` reads `regulation` from the store → `VgcService.getChampionsSpeedTiers(regulation)` → Reference section shows only format-legal Pokémon.
+- `TypeCalcView` operates on the user's own team (already-selected Pokémon), so no additional filtering needed.
+
+### 📊 Matrix View ✅ DONE
+
+Layout:
+```
+[ Compact Field Bar — full width ]
+[ Side Panel 200px ] [ Matrix Table — flex 1 ] [ Side Panel 200px ]
+```
+
+- Side panels: scrollable slot cards (sprite + name + types + ×button). Import button (ClipboardPaste) at top + Add button at bottom.
+- **Add button**: adds `defaultPokemon()` then immediately opens `PokeDrawer` for full editing (avoids dropdown-in-overflow clipping)
+- **PokeDrawer**: fixed right-side panel (360px), overlay backdrop, full `PokemonPanel` inside, Escape closes
+- **PasteImportModal**: fixed overlay, textarea for Showdown/PokéPaste text, live parse preview count, Import/Cancel buttons
+- Matrix table: sticky header (defender columns) + sticky left (attacker rows with move sub-rows), KO badge per cell
+- Uses `team` (up to 6) and `many` (up to 12) Pokémon arrays from the store
+
+### ⚡ Speed View ✅ DONE
+
+- Three sections: My Team (orange), Rivals (purple), Reference (format-legal Pokémon as flex-wrap sprite cards)
+- Two independent modifier pill groups (My Team mods / Reference mods): Tailwind, Scarf, Para, TR, ±1, ±2
+- `applyMods(spd, mods)`: tailwind×2 → paralyzed×0.5 → scarf×1.5 → boost stages (all `Math.floor`)
+- Trick Room reverses sort order only; does not affect values
+- Reference capped at 120 entries (200 with text filter active)
+- Champions SP toggle respected via `useChampions` prop
+- **Reference section reads `regulation` from store** → fetches `VgcService.getChampionsSpeedTiers(regulation)`. Module-level cache per regulation ID. Falls back to full `SPECIES_MAP` when `useChampions=false`. Label shows `(format)` indicator when filtered.
+
+### 🧪 Type Calculator ✅ DONE
+- Full Gen 9 type chart hardcoded as `TYPE_EFF: Record<string, Record<string, number>>`
+- Offense mode: team types vs 18 defender types (highlights SE/NVE)
+- Defense mode: 18 attacker types vs each team member (highlights weak/resist/immune)
+- Insights panel: SE/NVE coverage counts + weak/resist/immune profile per Pokémon
+- Empty state if no team Pokémon loaded
+
+### 📥 Import/Export System ✅ DONE (parse) / ⏳ TODO (export)
+
+**Paste import** is handled by `PasteImportModal` inside `MatrixView.tsx`:
+- Uses `parseShowdownPaste(text)` from `@/features/vgc-tracker/showdown-parse` — the same canonical parser used by the tracker's `PresetManager`. Returns `PresetSlot[]` with `{ speciesId, speciesName, item?, ability?, moves: string[], nature? }`.
+- Move BP/type/category are resolved via `moveMap` from `useGameData()`. The Import button is disabled until `isLoaded === true` (prevents importing with empty move data on slow connections).
+- Species names are matched against `legalPokemon` via `toId()` for canonical lookup.
+- `_lib/pokePasteParser.ts` (old custom parser) is no longer used and can be deleted. It relied on `@smogon/calc`'s `GEN9.moves.get()` which was fragile and format-specific.
+
+Export (`pokesToPaste`): ⏳ not yet implemented
 
 ---
 
 ## 🧠 Phase 5 — State Management ✅ DONE
+
+### State Shapes
+
+#### PokémonState
+```ts
+{
+  name: string;           // Pokémon name key matching POKEMON_DATA
+  level: number;          // 1–100
+  nature: string;         // key of NATURES
+  ability: string;
+  item: string;
+  status: "Healthy" | "Burned" | "Paralyzed" | "Poisoned" | "Badly Poisoned" | "Frozen" | "Asleep";
+  teraType: string;       // "None" or type name
+  evs: { hp, atk, def, spa, spd, spe: number };  // 0–252
+  ivs: { hp, atk, def, spa, spd, spe: number };  // 0–31
+  boost: number;          // −6 to +6
+  currentHP: number;      // −1 = max
+  moves: MoveSlot[];      // always 4 elements
+}
+
+type MoveSlot = {
+  key: string;    // move name key or ""
+  bp: number;     // base power (overridable)
+  type: string;   // type name
+  cat: "physical" | "special" | "status";
+  crit: boolean;
+}
+```
+
+#### FieldState
+```ts
+{
+  format: "Singles" | "Doubles";
+  level: number;
+  weather: string;       // "None" | "Sun" | "Rain" | "Sand" | "Snow" | ...
+  terrain: string;       // "None" | "Electric" | "Grassy" | "Psychic" | "Misty"
+  // Per-slot hazards (p1 = attacker/team side, p2 = defender/many side)
+  p1StealthRock, p2StealthRock: boolean;
+  p1Spikes, p2Spikes: 0|1|2|3;
+  p1Reflect, p2Reflect: boolean;
+  p1LightScreen, p2LightScreen: boolean;
+  p1AuroraVeil, p2AuroraVeil: boolean;
+  p1Protect, p2Protect: boolean;
+  p1LeechSeed, p2LeechSeed: boolean;
+  gravity, magicRoom, wonderRoom, trickRoom: boolean;  // trickRoom: speed sort only
+}
+```
+
+#### Top-level app state also includes:
+- `team` — array of up to 6 Pokémon (attacker side in matrix views)
+- `many` — array of up to 12 Pokémon (threat/rival list in matrix views)
+- `saved` — localStorage-persisted named groups
+
+#### calcDamageRolls result shape
+```ts
+{
+  min: number;
+  max: number;
+  minPct: number;
+  maxPct: number;
+  rolls: number[];   // all 16 damage rolls
+  defHP: number;
+  isPhys: boolean;
+}
+```
 
 ### Checklist
 - [x] Centralized Zustand store (`calculatorStore.ts`)
@@ -166,13 +390,37 @@ The AI agent must:
 - [x] `useMemo` on `calcAllMoves` in MoveStrip
 - [ ] `useCallback` pass on panel handlers
 - [ ] Avoid deep re-renders (profiling needed)
-- [ ] Virtualize heavy tables if needed (Matrix view)
+- [ ] Virtualize heavy tables if needed (Matrix view — especially with 12 many vs 6 team)
 - [ ] Lazy load heavy views (Matrix, Speed, TypeCalc tabs)
+- [ ] JS-positioned tooltips for matrix cells near edges (consider Floating UI / Popper.js)
 
 ---
 
 ## 💾 Phase 7 — Persistence & Sharing ⏳ TODO
 
+### Saved Teams Panel
+Slides in from the right (320px), no overlay — panel itself slides in.
+
+- Header: Title + 📋 Importar button + ✕ close
+- Body: "+ Guardar Equipo" / "+ Guardar Rivales" → reveals name input + Guardar button
+- Saved entry: name + Pokémon count + row of 28×28 sprites + actions (→ Equipo | → Rivales | 📋 Copiar | 👁 Ver | ✎ rename | ✕ delete)
+- Copy button turns green with "✓ Copiado" for 1.5s
+
+```js
+// Persistence shape
+{
+  id: Date.now(),
+  name: string,
+  pokeList: PokémonState[],
+  savedAt: ISO string
+}
+// Save
+localStorage.setItem("boffmedia_saved_teams", JSON.stringify(entries))
+// Load
+JSON.parse(localStorage.getItem("boffmedia_saved_teams") || "[]")
+```
+
+Checklist:
 - [ ] LocalStorage sync (hydration-safe)
 - [ ] URL serialization (shareable states)
 - [ ] Hydration-safe logic (Next.js SSR)
@@ -192,7 +440,8 @@ The AI agent must:
 
 - [x] Strict TypeScript throughout
 - [x] `@smogon/calc` State interfaces used for type-safe construction
-- [x] `@pkmn/dex` types used for species/move/nature data
+- [x] `Gen9DataDto` / `Gen9MoveDto` from `@boffmedia/shared` (auto-generated from server OpenAPI spec)
+- [x] `MoveData` / `NatureData` interfaces defined in `usePokemonData.ts`
 - [x] `Result.damage: number | number[] | number[][]` handled correctly
 - [x] Zero errors in all damage-calculator files (`pnpm exec tsc --noEmit --skipLibCheck`)
 - [x] No `any` in new files
@@ -212,7 +461,7 @@ The AI agent must:
 7. [ ] Speed view
 8. [ ] Type calculator
 9. [ ] Import/export (PokéPaste)
-10. [ ] Persistence + URL sync
+10. [ ] Persistence + URL sync + Saved Teams panel
 11. [ ] Optimization pass
 12. [ ] Mobile polish
 
@@ -223,12 +472,35 @@ The AI agent must:
 | Decision | Reason |
 |---|---|
 | `@smogon/calc` over `@pkmn/ps` | Full damage formula support, Champions SP approximation |
-| `@pkmn/dex` for static data | Synchronous, tree-shakeable, no fetch needed |
-| Singleton maps at module load | `Dex` is static; avoids repeated iteration on every render |
+| **API owns ALL Dex logic — web has none** | `@pkmn/dex`/`@pkmn/sim` live on the server only. The web never calls Dex functions directly. If game data is needed on the web, call an API endpoint. |
+| Game data scoped to regulation | `GET /tools/vgc/champions/:reg/game-data` uses `Dex.forFormat()` so only moves/items/abilities valid for that regulation are returned. A single format-agnostic `/data/gen9` endpoint would return incorrect data (e.g. banned moves would appear). |
+| Natures as static client constants | 25 natures are Gen 3+ game constants that never change. No fetch needed. Exported as `NATURES` from `usePokemonData.ts`. |
+| Module-level `_cache` + `_fetchPromise` keyed by regulationId | One fetch per regulation per page session, shared across all components. Same `Record<string, ...>` pattern as `useLegalPokemon`. Prevents duplicate requests from 8+ `MoveSlot` components mounting simultaneously. |
+| `parseShowdownPaste` from tracker | Canonical, tested paste parser already used by `PresetManager`. Removes dependency on `@smogon/calc` for paste move lookups. Move data resolved post-parse via `moveMap` from `useGameData(regulationId)`. |
 | `useChampions` toggle in store | Single source of truth for SP↔EV conversion everywhere |
-| Trick Room NOT in Field | Only affects turn order, not damage — omitted intentionally |
+| Trick Room in FieldState but NOT in damage calc | Only affects Speed view sort order — never passed to `@smogon/calc` |
 | `Result.damage` typed `number[][]` | v0.11.0 changed tuple `[number[], number[]]` to `number[][]` in the TS type |
 | SP→EV: `floor(sp * 252 / 32)` | Exact at max (32→252); ±1 at intermediate values — documented |
+| Matrix capped at 120 speed entries | Prevents slow renders with full Pokédex in Speed view |
+| JS-positioned tooltips for matrix | CSS hover tooltips clip near table edges with large datasets |
+
+---
+
+## 📦 Data Sources
+
+All game data comes from the NestJS API or is a hardcoded constant. The web never computes or infers Pokémon data itself.
+
+| Data | API Endpoint | Client hook |
+|---|---|---|
+| Move list (name, BP, type, category) | `GET /tools/vgc/champions/:reg/game-data` | `useGameData(regulationId)` → `moveMap`, `moveNames` |
+| Item list | `GET /tools/vgc/champions/:reg/game-data` | `useGameData(regulationId)` → `items` |
+| Ability list | `GET /tools/vgc/champions/:reg/game-data` | `useGameData(regulationId)` → `abilities` |
+| Natures (25) | *(static constant — never changes)* | `NATURES` named export from `usePokemonData.ts` |
+| Legal Pokémon + base stats | `GET /tools/vgc/champions/:reg/pokemon` | `useLegalPokemon(regulationId)` |
+| Speed tiers | `GET /tools/vgc/champions/:reg/speed-tiers` | `VgcService.getChampionsSpeedTiers()` |
+| Type chart | *(hardcoded — immutable game mechanic)* | `TYPE_EFF` in `TypeCalcView.tsx` |
+| Type colors | *(hardcoded — visual constant)* | `TYPE_COLORS` in `MoveSlot.tsx` |
+| Statuses | *(hardcoded — fixed enum)* | Inline in `PokemonPanel.tsx` |
 
 ---
 
@@ -237,7 +509,9 @@ The AI agent must:
 - ❌ Authentication
 - ❌ Backend saving
 - ❌ SEO optimization
-- ❌ Regulation-filtered Pokémon lists (deferred — too heavy for MVP)
+- ✅ Regulation-filtered Pokémon search — `PokemonSearch` uses `legalNames` from `useLegalPokemonNames` hook
+- ✅ Regulation-filtered Speed Reference — `SpeedView` uses `VgcService.getChampionsSpeedTiers(regulation)`
+- ⏳ Standard VGC format support in picker (only Champions regulations currently)
 
 ---
 

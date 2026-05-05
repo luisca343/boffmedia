@@ -6,6 +6,7 @@ import type {
   CountResultDto,
   DivergenceResultDto,
   DivergenceRowDto,
+  Gen9DataDto,
   ImportJobStatusDto,
   LimitlessPlayerDto,
   LimitlessPlayerTeamDto,
@@ -244,6 +245,10 @@ export class VgcService {
 
   static getChampionsLegalPokemon(regulationId: string) {
     return apiGET<VgcPokemon[]>(`/tools/vgc/champions/${regulationId}/pokemon`);
+  }
+
+  static getChampionsGameData(regulationId: string) {
+    return apiGET<Gen9DataDto>(`/tools/vgc/champions/${regulationId}/game-data`);
   }
 
   static getLimitlessTournaments(regulationId?: string) {
