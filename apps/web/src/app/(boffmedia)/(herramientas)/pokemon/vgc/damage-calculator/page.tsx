@@ -1,7 +1,7 @@
 'use client'
 
-import { Suspense } from 'react'
-import { Swords, ArrowRight, ArrowLeft, Zap, Shield } from 'lucide-react'
+import { Suspense, useState } from 'react'
+import { Swords, ArrowRight, ArrowLeft, Zap, Shield, BookmarkPlus } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useCalculatorStore } from './_store/calculatorStore'
 import type { CalcTab } from './_types/calculator'
@@ -11,6 +11,7 @@ import { MoveStrip } from './_components/moves/MoveStrip'
 import { MatrixView } from './_components/matrix/MatrixView'
 import { SpeedView } from './_components/speed/SpeedView'
 import { TypeCalcView } from './_components/typecalc/TypeCalcView'
+import { SavedTeamsPanel } from './_components/saved/SavedTeamsPanel'
 import { useChampionsRegulations } from '../meta/_hooks/useChampionsRegulations'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/primitives/select'
 
@@ -38,6 +39,7 @@ function DamageCalculatorContent() {
   } = useCalculatorStore()
 
   const regulations = useChampionsRegulations()
+  const [savedOpen, setSavedOpen] = useState(false)
 
   return (
     <div className="flex flex-col bg-surface-950" style={{ height: 'calc(100vh - 56px)' }}>
@@ -100,72 +102,97 @@ function DamageCalculatorContent() {
               SP
             </span>
           )}
+          <button
+            type="button"
+            onClick={() => setSavedOpen((v) => !v)}
+            title={t('saved.title')}
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold border transition-all ${
+              savedOpen
+                ? 'bg-primary-500/15 border-primary-500/35 text-primary-400'
+                : 'bg-transparent border-transparent text-surface-400 hover:text-surface-200 hover:bg-surface-800/50'
+            }`}
+          >
+            <BookmarkPlus className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">{t('saved.title')}</span>
+          </button>
         </div>
       </header>
 
-      {/* Tab content fills remaining height */}
-      <div className="flex-1 overflow-hidden flex flex-col">
-        {activeTab === '1v1' && (
-          <>
-            <div className="shrink-0">
-              <MoveStrip
-                poke1={poke1}
-                poke2={poke2}
-                field={field}
-                useChampions={useChampions}
-                activeMove1={activeMove1}
-                activeMove2={activeMove2}
-                onSelectMove1={setActiveMove1}
-                onSelectMove2={setActiveMove2}
-              />
-            </div>
-            <div className="flex-1 overflow-y-auto grid grid-cols-[35vw_1fr_35vw]">
-              <div className="border-r border-surface-700/30">
-                <PokemonPanel
-                  poke={poke1}
-                  onChange={setPoke1}
-                  side="atk"
-                  useChampions={useChampions}
-                />
-              </div>
-              <div>
-                <FieldPanel
+      {/* Tab content + sliding saved panel */}
+      <div className="flex flex-1 overflow-hidden">
+        <div className="flex-1 min-w-0 overflow-hidden flex flex-col">
+          {activeTab === '1v1' && (
+            <>
+              <div className="shrink-0">
+                <MoveStrip
+                  poke1={poke1}
+                  poke2={poke2}
                   field={field}
-                  onFieldChange={setField}
-                  onAttackerSide={setAttackerSide}
-                  onDefenderSide={setDefenderSide}
-                />
-              </div>
-              <div className="border-l border-surface-700/30">
-                <PokemonPanel
-                  poke={poke2}
-                  onChange={setPoke2}
-                  side="def"
                   useChampions={useChampions}
+                  activeMove1={activeMove1}
+                  activeMove2={activeMove2}
+                  onSelectMove1={setActiveMove1}
+                  onSelectMove2={setActiveMove2}
                 />
               </div>
-            </div>
-          </>
-        )}
+              <div className="flex-1 overflow-y-auto grid grid-cols-[35vw_1fr_35vw]">
+                <div className="border-r border-surface-700/30">
+                  <PokemonPanel
+                    poke={poke1}
+                    onChange={setPoke1}
+                    side="atk"
+                    useChampions={useChampions}
+                  />
+                </div>
+                <div>
+                  <FieldPanel
+                    field={field}
+                    onFieldChange={setField}
+                    onAttackerSide={setAttackerSide}
+                    onDefenderSide={setDefenderSide}
+                  />
+                </div>
+                <div className="border-l border-surface-700/30">
+                  <PokemonPanel
+                    poke={poke2}
+                    onChange={setPoke2}
+                    side="def"
+                    useChampions={useChampions}
+                  />
+                </div>
+              </div>
+            </>
+          )}
 
-        {(activeTab === 'teamvsmany' || activeTab === 'manyvsteam') && (
-          <MatrixView
-            tab={activeTab}
-            field={field}
-            onFieldChange={setField}
-            onAttackerSide={setAttackerSide}
-            onDefenderSide={setDefenderSide}
-            useChampions={useChampions}
-          />
-        )}
+          {(activeTab === 'teamvsmany' || activeTab === 'manyvsteam') && (
+            <MatrixView
+              tab={activeTab}
+              field={field}
+              onFieldChange={setField}
+              onAttackerSide={setAttackerSide}
+              onDefenderSide={setDefenderSide}
+              useChampions={useChampions}
+            />
+          )}
 
-        {activeTab === 'speed' && (
-          <SpeedView useChampions={useChampions} />
-        )}
+          {activeTab === 'speed' && (
+            <SpeedView useChampions={useChampions} />
+          )}
 
-        {activeTab === 'typecalc' && (
-          <TypeCalcView />
-        )}
+          {activeTab === 'typecalc' && (
+            <TypeCalcView />
+          )}
+        </div>
+
+        {/* Saved teams panel — slides in from right, no overlay */}
+        <div
+          className="shrink-0 border-l border-surface-700/50 overflow-hidden transition-[width] duration-200"
+          style={{ width: savedOpen ? '320px' : '0px' }}
+        >
+          <div className="w-[320px] h-full">
+            <SavedTeamsPanel onClose={() => setSavedOpen(false)} />
+          </div>
+        </div>
       </div>
     </div>
   )

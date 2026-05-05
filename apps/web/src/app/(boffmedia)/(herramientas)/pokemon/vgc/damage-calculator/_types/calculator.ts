@@ -81,3 +81,10 @@ export interface DamageResult {
 }
 
 export type CalcTab = '1v1' | 'teamvsmany' | 'manyvsteam' | 'speed' | 'typecalc'
+
+export interface SavedEntry {
+  id: number
+  name: string
+  pokeList: CalcPokemon[]
+  savedAt: string
+}
