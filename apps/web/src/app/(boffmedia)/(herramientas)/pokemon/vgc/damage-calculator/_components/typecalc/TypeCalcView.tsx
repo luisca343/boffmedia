@@ -79,7 +79,7 @@ function TypeBadge({ type }: { type: string }) {
   const col = TYPE_COLORS[type] ?? '#9ca3af'
   return (
     <span
-      className="px-1 py-0.5 rounded text-[8px] font-bold leading-none whitespace-nowrap"
+      className="px-1.5 py-0.5 rounded text-[11px] font-bold leading-none whitespace-nowrap"
       style={{ background: `${col}33`, border: `1px solid ${col}66`, color: col }}
     >
       {type}
@@ -100,16 +100,16 @@ function CovTable({
 }) {
   return (
     <div className="overflow-x-auto">
-      <table className="border-collapse text-[10px]">
+      <table className="border-collapse text-[13px]">
         <thead>
           <tr>
-            <th className="w-20 min-w-[80px] border-b border-surface-700/40 bg-surface-900 sticky left-0 z-10" />
+            <th className="w-28 min-w-[112px] border-b border-surface-700/40 bg-surface-900 sticky left-0 z-10" />
             {teamPokes.map((p) => (
-              <th key={p.name} className="min-w-[40px] border-b border-surface-700/40 bg-surface-900 px-1 py-1 text-center">
+              <th key={p.name} className="min-w-[70px] border-b border-surface-700/40 bg-surface-900 px-2 py-1.5 text-center">
                 <img
                   src={getSpriteUrl(p.name)}
                   onError={handleSpriteError}
-                  width={24} height={24}
+                  width={40} height={40}
                   className="object-contain mx-auto"
                   style={{ imageRendering: 'pixelated' }}
                   alt={p.name}
@@ -118,18 +118,18 @@ function CovTable({
             ))}
             {/* Summary column header */}
             <th
-              className="min-w-[32px] border-b border-surface-700/40 px-1 py-1 text-center"
+              className="min-w-[52px] border-b border-surface-700/40 px-2 py-1.5 text-center"
               style={{ background: mode === 'offense' ? 'rgba(239,68,68,0.08)' : 'rgba(252,165,165,0.08)' }}
             >
-              <span className="text-[8px] font-bold" style={{ color: mode === 'offense' ? 'rgb(252,165,165)' : 'rgb(252,165,165)' }}>
+              <span className="text-[11px] font-bold" style={{ color: 'rgb(252,165,165)' }}>
                 {mode === 'offense' ? 'NVE' : 'Weak'}
               </span>
             </th>
             <th
-              className="min-w-[32px] border-b border-surface-700/40 px-1 py-1 text-center"
+              className="min-w-[52px] border-b border-surface-700/40 px-2 py-1.5 text-center"
               style={{ background: 'rgba(74,222,128,0.08)' }}
             >
-              <span className="text-[8px] font-bold text-green-400">
+              <span className="text-[11px] font-bold text-green-400">
                 {mode === 'offense' ? 'SE' : 'Res'}
               </span>
             </th>
@@ -149,9 +149,9 @@ function CovTable({
             const col = TYPE_COLORS[rowType] ?? '#9ca3af'
             return (
               <tr key={rowType} className="border-b border-surface-800/30 hover:bg-surface-900/30">
-                <td className="sticky left-0 z-10 bg-surface-950 px-1.5 py-0.5">
+                <td className="sticky left-0 z-10 bg-surface-950 px-2 py-1.5">
                   <span
-                    className="px-1 py-0.5 rounded text-[8px] font-bold leading-none whitespace-nowrap"
+                    className="px-2 py-1 rounded text-[11px] font-bold leading-none whitespace-nowrap"
                     style={{ background: `${col}33`, border: `1px solid ${col}66`, color: col }}
                   >
                     {rowType}
@@ -160,20 +160,20 @@ function CovTable({
                 {effs.map((eff, j) => (
                   <td
                     key={j}
-                    className="text-center font-bold py-0.5 px-1 text-[9px]"
+                    className="text-center font-bold py-1.5 px-2 text-[12px]"
                     style={effCellStyle(eff)}
                   >
                     {effLabel(eff)}
                   </td>
                 ))}
                 <td
-                  className="text-center font-bold text-[9px] py-0.5 px-1"
-                  style={badCount > 0 ? { background: mode === 'offense' ? 'rgba(239,68,68,0.06)' : 'rgba(239,68,68,0.06)', color: '#ef4444' } : { color: 'rgb(51,65,85)' }}
+                  className="text-center font-bold text-[12px] py-1.5 px-2"
+                  style={badCount > 0 ? { background: 'rgba(239,68,68,0.06)', color: '#ef4444' } : { color: 'rgb(51,65,85)' }}
                 >
                   {badCount || ''}
                 </td>
                 <td
-                  className="text-center font-bold text-[9px] py-0.5 px-1"
+                  className="text-center font-bold text-[12px] py-1.5 px-2"
                   style={goodCount > 0 ? { background: 'rgba(74,222,128,0.06)', color: 'rgb(74,222,128)' } : { color: 'rgb(51,65,85)' }}
                 >
                   {goodCount || ''}
