@@ -434,12 +434,14 @@ Checklist:
 
 ---
 
-## 📱 Phase 8 — Responsiveness & Offline ⏳ TODO
+## 📱 Phase 8 — Responsiveness & Offline ✅ DONE
 
-- [ ] Mobile layout (currently desktop-only 3-col grid)
-- [ ] Touch-friendly UI
-- [ ] No reliance on external CDNs ✅ (all static)
-- [ ] Works offline ✅ (static assets + logic only)
+- [x] **MoveStrip**: `flex flex-col md:grid md:grid-cols-[1fr_1px_1fr]` — stacks vertically on mobile; sprite cards shrink from 170px → 140px on xs
+- [x] **page.tsx 1v1**: mobile panel switcher (⚔ Attacker / ⚡ Field / 🛡 Defender) toggled by `mobilePanel` state — panels hidden/shown via `hidden md:block`; header tab nav `overflow-x-auto scrollbar-none`; regulation picker `hidden sm:block`
+- [x] **page.tsx saved panel**: dual implementations — mobile: `fixed md:hidden translate-x-full/0` full-screen drawer; desktop: `hidden md:block transition-[width] 320px/0` inline slide
+- [x] **MatrixView**: `flex flex-col md:flex-row` — SlotPanels stack on mobile with `w-full max-h-36`, switch to `w-[200px] max-h-none` on md+; borders responsive (`border-b md:border-r` / `border-t md:border-l`)
+- [x] No reliance on external CDNs ✅ (all static)
+- [x] Works offline ✅ (static assets + logic only)
 
 ---
 
@@ -470,8 +472,9 @@ Checklist:
 9. [x] Import/export (PokéPaste) — parse + export (`pokesToPaste`)
 10. [x] Saved Teams panel + localStorage persistence
 11. [x] Optimization pass — lazy-load chunks, delete dead code
-12. [ ] **Mobile polish** ← **NEXT**
-13. [ ] URL serialization (deferred)
+12. [x] **Mobile polish** ✅
+13. [x] **UX polish pass** ✅ — TypeCalcView table 2× larger; SpeedView rivals comparison mode (item-aware per-Pokémon, auto-activates when rivals set, toggle for full reference); MatrixView SlotCard 36px sprites + bigger text, table cells h-[56px]/h-[28px], sprites 40px, SlotPanel width 240px
+14. [ ] **URL serialization** ← **NEXT**
 
 ---
 
