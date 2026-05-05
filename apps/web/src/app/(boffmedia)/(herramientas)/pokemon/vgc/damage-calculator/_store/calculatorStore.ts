@@ -64,6 +64,8 @@ export function defaultPokemon(name = 'Miraidon'): CalcPokemon {
 interface CalculatorState {
   poke1: CalcPokemon
   poke2: CalcPokemon
+  team: CalcPokemon[]   // up to 6, used as attackers in teamvsmany / defenders in manyvsteam
+  many: CalcPokemon[]   // up to 12, used as defenders in teamvsmany / attackers in manyvsteam
   field: CalcField
   activeTab: CalcTab
   activeMove1: number | null
@@ -83,14 +85,24 @@ interface CalculatorState {
   setUseChampions: (val: boolean) => void
   updateMove1: (idx: number, patch: Partial<CalcMove>) => void
   updateMove2: (idx: number, patch: Partial<CalcMove>) => void
+  addToTeam: (p: CalcPokemon) => void
+  removeFromTeam: (idx: number) => void
+  updateTeamPokemon: (idx: number, patch: Partial<CalcPokemon>) => void
+  setTeamFull: (team: CalcPokemon[]) => void
+  addToMany: (p: CalcPokemon) => void
+  removeFromMany: (idx: number) => void
+  updateManyPokemon: (idx: number, patch: Partial<CalcPokemon>) => void
+  setManyFull: (many: CalcPokemon[]) => void
 }
 
 export const useCalculatorStore = create<CalculatorState>()(
   subscribeWithSelector((set) => ({
     poke1: defaultPokemon('Miraidon'),
     poke2: defaultPokemon('Rillaboom'),
+    team: [],
+    many: [],
     field: DEFAULT_FIELD,
-    activeTab: 'calc',
+    activeTab: '1v1',
     activeMove1: null,
     activeMove2: null,
     regulation: 'gen9championsvgc2026regma',
@@ -130,5 +142,23 @@ export const useCalculatorStore = create<CalculatorState>()(
           ) as MoveSlots,
         },
       })),
+    addToTeam: (p) =>
+      set((s) => ({ team: s.team.length < 6 ? [...s.team, p] : s.team })),
+    removeFromTeam: (idx) =>
+      set((s) => ({ team: s.team.filter((_, i) => i !== idx) })),
+    updateTeamPokemon: (idx, patch) =>
+      set((s) => ({
+        team: s.team.map((p, i) => (i === idx ? { ...p, ...patch } : p)),
+      })),
+    setTeamFull: (team) => set({ team }),
+    addToMany: (p) =>
+      set((s) => ({ many: s.many.length < 12 ? [...s.many, p] : s.many })),
+    removeFromMany: (idx) =>
+      set((s) => ({ many: s.many.filter((_, i) => i !== idx) })),
+    updateManyPokemon: (idx, patch) =>
+      set((s) => ({
+        many: s.many.map((p, i) => (i === idx ? { ...p, ...patch } : p)),
+      })),
+    setManyFull: (many) => set({ many }),
   })),
 )

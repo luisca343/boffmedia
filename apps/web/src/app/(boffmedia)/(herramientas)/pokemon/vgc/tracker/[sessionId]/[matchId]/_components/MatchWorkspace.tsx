@@ -295,7 +295,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
             editable={false}
             onSlotChange={handleMyTeamChange}
           />
-          <SpeedTierWidget slots={match.myTeam.slots} />
+          <SpeedTierWidget slots={match.myTeam.slots} regulationId={regulationId} />
         </div>
 
         {/* Notes — centre column fills remaining space */}
@@ -315,7 +315,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
             search={search}
             onSlotChange={handleOpponentTeamChange}
           />
-          <SpeedTierWidget slots={match.opponentTeam.slots} />
+          <SpeedTierWidget slots={match.opponentTeam.slots} regulationId={regulationId} />
 
           {/* Outcome tag */}
           <div className="flex flex-col gap-1.5">

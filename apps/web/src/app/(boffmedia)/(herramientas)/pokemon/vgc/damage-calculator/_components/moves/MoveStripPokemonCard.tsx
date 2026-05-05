@@ -2,24 +2,25 @@
 
 import { calcStat, Generations } from '@smogon/calc'
 import type { CalcPokemon } from '../../_types/calculator'
-import { SPECIES_MAP } from '../../_hooks/usePokemonData'
+import type { VgcPokemon } from '../../_hooks/useLegalPokemon'
 import { getSpriteUrl, handleSpriteError } from '../../_lib/spriteUtils'
 
 const GEN9 = Generations.get(9)
 
 interface MoveStripPokemonCardProps {
   poke: CalcPokemon
+  apiEntry?: VgcPokemon
   align?: 'left' | 'right'
 }
 
-function getMaxHP(poke: CalcPokemon): number {
-  const species = SPECIES_MAP.get(poke.name)
-  if (!species) return 1
-  return calcStat(GEN9, 'hp', species.baseStats.hp, poke.ivs.hp, poke.evs.hp, poke.level, poke.nature)
+function getMaxHP(poke: CalcPokemon, apiEntry?: VgcPokemon): number {
+  if (!apiEntry) return -1
+  return calcStat(GEN9, 'hp', apiEntry.baseStats.hp, poke.ivs.hp, poke.evs.hp, poke.level, poke.nature)
 }
 
-function HPMini({ poke, align = 'left' }: { poke: CalcPokemon; align?: 'left' | 'right' }) {
-  const maxHP = getMaxHP(poke)
+function HPMini({ poke, apiEntry, align = 'left' }: { poke: CalcPokemon; apiEntry?: VgcPokemon; align?: 'left' | 'right' }) {
+  const maxHP = getMaxHP(poke, apiEntry)
+  if (maxHP < 0) return null
   const cur = poke.currentHP < 0 ? maxHP : Math.min(poke.currentHP, maxHP)
   const pct = (cur / maxHP) * 100
   const barColor = pct > 50 ? 'bg-success-500' : pct > 25 ? 'bg-warning-500' : 'bg-error-500'
@@ -44,7 +45,7 @@ function HPMini({ poke, align = 'left' }: { poke: CalcPokemon; align?: 'left' | 
   )
 }
 
-export function MoveStripPokemonCard({ poke, align = 'left' }: MoveStripPokemonCardProps) {
+export function MoveStripPokemonCard({ poke, apiEntry, align = 'left' }: MoveStripPokemonCardProps) {
   const reverse = align === 'right'
 
   return (
@@ -65,7 +66,7 @@ export function MoveStripPokemonCard({ poke, align = 'left' }: MoveStripPokemonC
         </div>
       </div>
       <div className="mt-1">
-        <HPMini poke={poke} align={align} />
+        <HPMini poke={poke} apiEntry={apiEntry} align={align} />
       </div>
     </div>
   )

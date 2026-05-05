@@ -2,7 +2,7 @@
 
 import { calcStat, Generations } from '@smogon/calc'
 import type { CalcPokemon, StatKey, BoostKey } from '../../_types/calculator'
-import { SPECIES_MAP, NATURES } from '../../_hooks/usePokemonData'
+import { NATURES } from '../../_hooks/usePokemonData'
 
 const GEN9 = Generations.get(9)
 
@@ -17,17 +17,22 @@ const STAT_LABELS: Record<StatKey, string> = {
 
 const STAT_KEYS: StatKey[] = ['hp', 'atk', 'def', 'spa', 'spd', 'spe']
 
+type BaseStats = { hp: number; atk: number; def: number; spa: number; spd: number; spe: number }
+
 interface Props {
   poke: CalcPokemon
   onChange: (patch: Partial<CalcPokemon>) => void
   useChampions?: boolean
+  /** Optional baseStats from the API VgcPokemon entry — used when SPECIES_MAP lookup misses (e.g. forme name differences). */
+  baseStats?: BaseStats
 }
 
 const BOOST_VALUES = [-6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6]
 
-export function StatTable({ poke, onChange, useChampions = false }: Props) {
-  const species = SPECIES_MAP.get(poke.name)
-  if (!species) return null
+export function StatTable({ poke, onChange, useChampions = false, baseStats: apiBaseStats }: Props) {
+  // Use API-provided baseStats — no @pkmn/dex fallback.
+  const bs: BaseStats | undefined = apiBaseStats
+  if (!bs) return null
 
   const nature = NATURES.find((n) => n.name === poke.nature)
   const plusStat = nature?.plus ?? null
@@ -42,7 +47,7 @@ export function StatTable({ poke, onChange, useChampions = false }: Props) {
     const ev = useChampions
       ? Math.floor((poke.evs[key] * 252) / 32)
       : poke.evs[key]
-    return calcStat(GEN9, key, species!.baseStats[key], poke.ivs[key], ev, poke.level, poke.nature)
+    return calcStat(GEN9, key, bs![key], poke.ivs[key], ev, poke.level, poke.nature)
   }
 
   function updateEv(key: StatKey, raw: string) {
@@ -95,7 +100,7 @@ export function StatTable({ poke, onChange, useChampions = false }: Props) {
                 {isUp ? ' ↑' : isDown ? ' ↓' : ''}
               </td>
               <td className="text-center font-mono text-surface-400 px-1">
-                {species.baseStats[key]}
+                {bs[key]}
               </td>
               <td className="text-center px-1">
                 {key !== 'hp' ? (

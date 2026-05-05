@@ -1,16 +1,46 @@
 'use client'
 
-import { useMemo } from 'react'
-import { Dex } from '@pkmn/dex'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { VgcService } from '@/services/api/boffmedia/vgcService'
 
-export interface SpeciesData {
-  id: string
+// ─── Natures — static Gen 3+ game mechanics constants ──────────────────────────
+// These 25 natures have never changed since Gen 3 and are fully format-agnostic.
+
+export interface NatureData {
   name: string
-  types: string[]
-  baseStats: { hp: number; atk: number; def: number; spa: number; spd: number; spe: number }
-  abilities: Record<string, string>
-  spriteId: string
+  plus: string | null
+  minus: string | null
 }
+
+export const NATURES: NatureData[] = [
+  { name: 'Adamant', plus: 'atk',  minus: 'spa' },
+  { name: 'Bashful', plus: null,   minus: null  },
+  { name: 'Bold',    plus: 'def',  minus: 'atk' },
+  { name: 'Brave',   plus: 'atk',  minus: 'spe' },
+  { name: 'Calm',    plus: 'spd',  minus: 'atk' },
+  { name: 'Careful', plus: 'spd',  minus: 'spa' },
+  { name: 'Docile',  plus: null,   minus: null  },
+  { name: 'Gentle',  plus: 'spd',  minus: 'def' },
+  { name: 'Hardy',   plus: null,   minus: null  },
+  { name: 'Hasty',   plus: 'spe',  minus: 'def' },
+  { name: 'Impish',  plus: 'def',  minus: 'spa' },
+  { name: 'Jolly',   plus: 'spe',  minus: 'spa' },
+  { name: 'Lax',     plus: 'def',  minus: 'spd' },
+  { name: 'Lonely',  plus: 'atk',  minus: 'def' },
+  { name: 'Mild',    plus: 'spa',  minus: 'def' },
+  { name: 'Modest',  plus: 'spa',  minus: 'atk' },
+  { name: 'Naive',   plus: 'spe',  minus: 'spd' },
+  { name: 'Naughty', plus: 'atk',  minus: 'spd' },
+  { name: 'Quiet',   plus: 'spa',  minus: 'spe' },
+  { name: 'Quirky',  plus: null,   minus: null  },
+  { name: 'Rash',    plus: 'spa',  minus: 'spd' },
+  { name: 'Relaxed', plus: 'def',  minus: 'spe' },
+  { name: 'Sassy',   plus: 'spd',  minus: 'spe' },
+  { name: 'Serious', plus: null,   minus: null  },
+  { name: 'Timid',   plus: 'spe',  minus: 'atk' },
+]
+
+// ─── Move / item / ability data from server ────────────────────────────────────
 
 export interface MoveData {
   id: string
@@ -20,96 +50,64 @@ export interface MoveData {
   category: 'Physical' | 'Special' | 'Status'
 }
 
-export interface NatureData {
-  name: string
-  plus: string | null
-  minus: string | null
+interface GameData {
+  moves: MoveData[]
+  items: string[]
+  abilities: string[]
 }
 
-function buildSpeciesMap(): Map<string, SpeciesData> {
-  const map = new Map<string, SpeciesData>()
-  for (const s of Dex.species.all()) {
-    if (s.num <= 0 || s.isNonstandard || s.forme === 'Totem') continue
-    map.set(s.name, {
-      id: s.id,
-      name: s.name,
-      types: s.types,
-      baseStats: s.baseStats,
-      abilities: s.abilities as unknown as Record<string, string>,
-      spriteId: s.id,
+// Module-level cache keyed by regulationId — same pattern as useLegalPokemon.
+// One fetch per regulation per page session, shared across all components.
+const _cache: Record<string, GameData> = {}
+const _fetchPromise: Record<string, Promise<GameData>> = {}
+
+const EMPTY: GameData = { moves: [], items: ['None'], abilities: ['None'] }
+
+async function loadGameData(regulationId: string): Promise<GameData> {
+  if (!regulationId) return EMPTY
+  if (_cache[regulationId]) return _cache[regulationId]
+  if (!_fetchPromise[regulationId]) {
+    _fetchPromise[regulationId] = VgcService.getChampionsGameData(regulationId)
+      .then((res) => {
+        const data = (res.data ?? EMPTY) as GameData
+        _cache[regulationId] = data
+        return data
+      })
+      .catch(() => {
+        delete _fetchPromise[regulationId]
+        return EMPTY
+      })
+  }
+  return _fetchPromise[regulationId]
+}
+
+export function useGameData(regulationId: string) {
+  const [data, setData] = useState<GameData>(_cache[regulationId] ?? EMPTY)
+  const mounted = useRef(true)
+
+  useEffect(() => {
+    mounted.current = true
+    if (!regulationId) return () => { mounted.current = false }
+    loadGameData(regulationId).then((d) => {
+      if (mounted.current) setData(d)
     })
+    return () => { mounted.current = false }
+  }, [regulationId])
+
+  const moveMap = useMemo(() => {
+    const map = new Map<string, MoveData>()
+    for (const m of data.moves) map.set(m.name, m)
+    return map
+  }, [data.moves])
+
+  const moveNames = useMemo(() => data.moves.map((m) => m.name), [data.moves])
+
+  return {
+    moveMap,
+    moveNames,
+    items: data.items,
+    abilities: data.abilities,
+    natures: NATURES,
+    isLoaded: data.moves.length > 0,
   }
-  return map
 }
-
-function buildMoveMap(): Map<string, MoveData> {
-  const map = new Map<string, MoveData>()
-  for (const m of Dex.moves.all()) {
-    if (m.isNonstandard || m.num <= 0) continue
-    map.set(m.name, {
-      id: m.id,
-      name: m.name,
-      basePower: m.basePower,
-      type: m.type,
-      category: m.category as MoveData['category'],
-    })
-  }
-  return map
-}
-
-function buildNatures(): NatureData[] {
-  const natures: NatureData[] = []
-  for (const n of Dex.natures.all()) {
-    natures.push({
-      name: n.name,
-      plus: n.plus ?? null,
-      minus: n.minus ?? null,
-    })
-  }
-  return natures.sort((a, b) => a.name.localeCompare(b.name))
-}
-
-function buildItems(): string[] {
-  const items: string[] = ['None']
-  for (const i of Dex.items.all()) {
-    if (i.isNonstandard || i.num <= 0) continue
-    items.push(i.name)
-  }
-  return items.sort()
-}
-
-function buildAbilities(): string[] {
-  const abs: string[] = ['None']
-  for (const a of Dex.abilities.all()) {
-    if (a.isNonstandard || a.num <= 0) continue
-    abs.push(a.name)
-  }
-  return abs.sort()
-}
-
-// Singletons — Dex is static so these are computed once at module load
-const SPECIES_MAP = buildSpeciesMap()
-const MOVE_MAP = buildMoveMap()
-const NATURES = buildNatures()
-const ITEMS = buildItems()
-const ABILITIES = buildAbilities()
-
-const SPECIES_NAMES = Array.from(SPECIES_MAP.keys()).sort()
-const MOVE_NAMES = Array.from(MOVE_MAP.keys()).sort()
-
-export function usePokemonData() {
-  return useMemo(
-    () => ({
-      speciesMap: SPECIES_MAP,
-      moveMap: MOVE_MAP,
-      natures: NATURES,
-      items: ITEMS,
-      abilities: ABILITIES,
-      speciesNames: SPECIES_NAMES,
-      moveNames: MOVE_NAMES,
-    }),
-    [],
-  )
-}
-
-export { SPECIES_MAP, MOVE_MAP, NATURES, ITEMS, ABILITIES, SPECIES_NAMES, MOVE_NAMES }
