@@ -50,6 +50,11 @@ function getTypeEff(atkType: string, defTypes: string[]): number {
   return mult
 }
 
+// Best effectiveness a Pokémon with pokemonTypes can achieve against a single defenderType using STAB.
+function getBestOffenseEff(pokemonTypes: string[], defenderType: string): number {
+  return Math.max(...pokemonTypes.map((pt) => getTypeEff(pt, [defenderType])))
+}
+
 function effLabel(eff: number): string {
   if (eff === 0)    return 'Immune'
   if (eff === 0.25) return '¼×'
@@ -131,23 +136,25 @@ function CovTable({
           </tr>
         </thead>
         <tbody>
-          {ALL_TYPES.map((atkType) => {
-            const effs = teamPokes.map((p) => getTypeEff(atkType, p.types))
+          {ALL_TYPES.map((rowType) => {
+            const effs = mode === 'offense'
+              ? teamPokes.map((p) => getBestOffenseEff(p.types, rowType))
+              : teamPokes.map((p) => getTypeEff(rowType, p.types))
             const badCount = mode === 'offense'
               ? effs.filter((e) => e > 0 && e < 1).length
               : effs.filter((e) => e >= 2).length
             const goodCount = mode === 'offense'
               ? effs.filter((e) => e >= 2).length
               : effs.filter((e) => e > 0 && e < 1).length
-            const col = TYPE_COLORS[atkType] ?? '#9ca3af'
+            const col = TYPE_COLORS[rowType] ?? '#9ca3af'
             return (
-              <tr key={atkType} className="border-b border-surface-800/30 hover:bg-surface-900/30">
+              <tr key={rowType} className="border-b border-surface-800/30 hover:bg-surface-900/30">
                 <td className="sticky left-0 z-10 bg-surface-950 px-1.5 py-0.5">
                   <span
                     className="px-1 py-0.5 rounded text-[8px] font-bold leading-none whitespace-nowrap"
                     style={{ background: `${col}33`, border: `1px solid ${col}66`, color: col }}
                   >
-                    {atkType}
+                    {rowType}
                   </span>
                 </td>
                 {effs.map((eff, j) => (
@@ -222,8 +229,8 @@ export function TypeCalcView() {
   const offInsights = useMemo(() => {
     return teamPokes.map((p) => {
       let se = 0, nve = 0, imm = 0
-      for (const t of ALL_TYPES) {
-        const e = getTypeEff(t, p.types)
+      for (const defT of ALL_TYPES) {
+        const e = getBestOffenseEff(p.types, defT)
         if (e >= 2) se++
         else if (e === 0) imm++
         else if (e < 1) nve++
@@ -249,9 +256,9 @@ export function TypeCalcView() {
   const bestOffType = useMemo(() => {
     if (!teamPokes.length) return null
     let best = '', bestN = 0
-    for (const t of ALL_TYPES) {
-      const n = teamPokes.filter((p) => getTypeEff(t, p.types) >= 2).length
-      if (n > bestN) { bestN = n; best = t }
+    for (const defT of ALL_TYPES) {
+      const n = teamPokes.filter((p) => getBestOffenseEff(p.types, defT) >= 2).length
+      if (n > bestN) { bestN = n; best = defT }
     }
     return bestN > 0 ? { type: best, count: bestN } : null
   }, [teamPokes])
@@ -291,19 +298,19 @@ export function TypeCalcView() {
           <div className="grid grid-cols-2 divide-x divide-surface-700/30">
             {/* Offensive */}
             <div className="px-3 py-2">
-              <div className="text-[9px] font-bold uppercase tracking-wider text-orange-400 mb-2">⚔ Offensive exposure</div>
+              <div className="text-[9px] font-bold uppercase tracking-wider text-orange-400 mb-2">⚔ Offensive coverage</div>
               {offInsights.map((p) => (
                 <InsightRow key={p.name} poke={p}>
-                  <strong>{p.se}</strong> types hit SE
+                  Can hit <strong>{p.se}</strong> types SE
                   {p.nve > 0 && <>, <span className="text-surface-600">{p.nve} not very effective</span></>}
                   {p.imm > 0 && <>, <span className="text-surface-700">{p.imm} immune</span></>}
                 </InsightRow>
               ))}
               {bestOffType && (
                 <div className="mt-2 rounded px-2 py-1.5 text-[10px]" style={{ background: 'rgba(30,41,59,0.6)' }}>
-                  <span className="text-surface-500">Most SE hits:</span>{' '}
+                  <span className="text-surface-500">Best covered:</span>{' '}
                   <TypeBadge type={bestOffType.type} />
-                  <span className="text-surface-500 ml-1">({bestOffType.count} members)</span>
+                  <span className="text-surface-500 ml-1">({bestOffType.count} members hit SE)</span>
                 </div>
               )}
             </div>
@@ -338,7 +345,7 @@ export function TypeCalcView() {
           >
             <div className="px-3 py-2 border-b border-surface-700/30">
               <span className="text-[10px] font-black tracking-widest uppercase text-orange-400">⚔ Offensive Coverage</span>
-              <p className="text-[9px] text-surface-600 mt-0.5">How each type hits your team members</p>
+              <p className="text-[9px] text-surface-600 mt-0.5">Your team's STAB coverage vs each defender type</p>
             </div>
             <div className="p-2">
               <CovTable teamPokes={teamPokes} mode="offense" />
