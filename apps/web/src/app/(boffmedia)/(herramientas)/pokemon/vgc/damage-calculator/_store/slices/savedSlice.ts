@@ -31,6 +31,7 @@ export type SavedSlice = {
   saveGroup: (name: string, pokeList: CalcPokemon[]) => void
   deleteSaved: (id: number) => void
   renameSaved: (id: number, newName: string) => void
+  reorderSaved: (fromIdx: number, toIdx: number) => void
   loadSavedAsTeam: (id: number) => void
   loadSavedAsManyList: (id: number) => void
 }
@@ -60,6 +61,16 @@ export const createSavedSlice: Creator<SavedSlice> = (set) => ({
   renameSaved: (id, newName) =>
     set((s) => {
       const saved = s.saved.map((e) => e.id === id ? { ...e, name: newName } : e)
+      persistSaved(saved)
+      return { saved }
+    }),
+
+  reorderSaved: (fromIdx, toIdx) =>
+    set((s) => {
+      if (fromIdx === toIdx) return {}
+      const saved = [...s.saved]
+      const [item] = saved.splice(fromIdx, 1)
+      saved.splice(toIdx, 0, item)
       persistSaved(saved)
       return { saved }
     }),
