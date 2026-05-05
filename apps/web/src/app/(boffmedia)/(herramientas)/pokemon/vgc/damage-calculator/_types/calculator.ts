@@ -80,4 +80,4 @@ export interface DamageResult {
   desc: string
 }
 
-export type CalcTab = 'calc' | 'matrix' | 'speed' | 'typecalc'
+export type CalcTab = '1v1' | 'teamvsmany' | 'manyvsteam' | 'speed' | 'typecalc'

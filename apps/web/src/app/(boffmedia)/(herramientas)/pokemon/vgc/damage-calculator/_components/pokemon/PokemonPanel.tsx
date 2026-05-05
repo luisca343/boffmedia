@@ -1,7 +1,9 @@
 'use client'
 
 import type { CalcPokemon } from '../../_types/calculator'
-import { SPECIES_MAP, NATURES, ITEMS, ABILITIES } from '../../_hooks/usePokemonData'
+import { NATURES, useGameData } from '../../_hooks/usePokemonData'
+import { useLegalPokemon } from '../../_hooks/useLegalPokemon'
+import { useCalculatorStore } from '../../_store/calculatorStore'
 import { PokemonSearch } from './PokemonSearch'
 import { StatTable } from './StatTable'
 import { MoveSlot } from './MoveSlot'
@@ -24,8 +26,14 @@ interface Props {
 }
 
 export function PokemonPanel({ poke, onChange, side, useChampions = false }: Props) {
+  const { regulation } = useCalculatorStore()
+  const legalPokemon = useLegalPokemon(regulation)
+  const { items, abilities } = useGameData(regulation)
   const isAtk = side === 'atk'
-  const species = SPECIES_MAP.get(poke.name)
+
+  // Look up species data entirely from the API list — no @pkmn/dex fallback.
+  const apiEntry = legalPokemon.find((p) => p.name === poke.name)
+  const species = apiEntry
 
   const accentText = isAtk ? 'text-primary-400' : 'text-accent-400'
   const accentBg = isAtk ? 'bg-primary-500/8' : 'bg-accent-500/8'
@@ -56,10 +64,10 @@ export function PokemonPanel({ poke, onChange, side, useChampions = false }: Pro
       {/* Name search */}
       <PokemonSearch
         value={poke.name}
+        legalPokemon={legalPokemon}
         onChange={(name) => {
-          const sp = SPECIES_MAP.get(name)
-          if (!sp) return
-          const firstAbility = Object.values(sp.abilities).filter(Boolean)[0] ?? ''
+          const apiPoke = legalPokemon.find((p) => p.name === name)
+          const firstAbility = apiPoke ? Object.values(apiPoke.abilities).filter(Boolean)[0] ?? '' : ''
           onChange({ name, ability: firstAbility })
         }}
       />
@@ -123,7 +131,7 @@ export function PokemonPanel({ poke, onChange, side, useChampions = false }: Pro
               <option key={a} value={a}>{a}</option>
             ))}
             {speciesAbilities.length === 0 &&
-              ABILITIES.slice(0, 50).map((a) => (
+              abilities.slice(0, 50).map((a) => (
                 <option key={a} value={a}>{a}</option>
               ))}
           </select>
@@ -134,7 +142,7 @@ export function PokemonPanel({ poke, onChange, side, useChampions = false }: Pro
             onChange={(e) => onChange({ item: e.target.value })}
             className="w-full bg-surface-900 border border-surface-700 rounded px-2 py-1 text-xs text-surface-200 focus:outline-none focus:border-primary-500"
           >
-            {ITEMS.map((i) => <option key={i} value={i}>{i}</option>)}
+            {items.map((i) => <option key={i} value={i}>{i}</option>)}
           </select>
         </FormRow>
       </div>
@@ -174,11 +182,11 @@ export function PokemonPanel({ poke, onChange, side, useChampions = false }: Pro
       </FormRow>
 
       {/* HP bar */}
-      <HPBar poke={poke} onChange={onChange} useChampions={useChampions} />
+      <HPBar poke={poke} onChange={onChange} useChampions={useChampions} baseStats={apiEntry?.baseStats} />
 
       {/* Stat table */}
       <div className="bg-surface-950/50 rounded-lg p-2 border border-surface-800/50">
-        <StatTable poke={poke} onChange={onChange} useChampions={useChampions} />
+        <StatTable poke={poke} onChange={onChange} useChampions={useChampions} baseStats={apiEntry?.baseStats} />
       </div>
     </div>
   )

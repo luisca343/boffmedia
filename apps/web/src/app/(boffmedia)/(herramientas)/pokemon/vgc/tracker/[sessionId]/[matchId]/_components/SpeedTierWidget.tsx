@@ -3,19 +3,15 @@
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { Dex } from '@pkmn/dex';
 import type { MatchSlot } from '@/features/vgc-tracker/types';
 import { spriteUrl, handleSpriteError } from '@/features/vgc-tracker/types';
+import { useLegalPokemon } from '@/app/(boffmedia)/(herramientas)/pokemon/vgc/damage-calculator/_hooks/useLegalPokemon';
 import { calcSpeedStat, applyMods, compareSpeed } from '@/app/(boffmedia)/(herramientas)/pokemon/vgc/speedCalc';
 import { SpeedFlagChips } from '@/app/(boffmedia)/(herramientas)/pokemon/vgc/_components/SpeedFlagChips';
 
 interface Props {
   slots: MatchSlot[];
-}
-
-function getBaseSpe(name: string): number {
-  const sp = Dex.species.get(name);
-  return sp?.baseStats?.spe ?? 0;
+  regulationId: string;
 }
 
 // EV preset presets for quick selection
@@ -26,9 +22,10 @@ const EV_PRESETS = [
   { label: '252+', evs: 252, nature: 1.1 },
 ] as const;
 
-export function SpeedTierWidget({ slots }: Props) {
+export function SpeedTierWidget({ slots, regulationId }: Props) {
   const t = useTranslations('vgc.tracker');
   const tMods = useTranslations('vgc.speed.modifiers');
+  const legalPokemon = useLegalPokemon(regulationId);
   const [tailwind, setTailwind] = useState(false);
   const [trickRoom, setTrickRoom] = useState(false);
   const [scarf, setScarf] = useState(false);
@@ -44,7 +41,7 @@ export function SpeedTierWidget({ slots }: Props) {
   const rows = slots
     .filter((s) => !!s.speciesName)
     .map((s) => {
-      const baseSpe = getBaseSpe(s.speciesName!);
+      const baseSpe = legalPokemon.find((p) => p.name === s.speciesName)?.baseStats.spe ?? 0;
       const evs = slotEvs[s.slotIndex] ?? 0;
       const nature = slotNatures[s.slotIndex] ?? 1.0;
       const stat = calcSpeedStat(baseSpe, evs, nature);
