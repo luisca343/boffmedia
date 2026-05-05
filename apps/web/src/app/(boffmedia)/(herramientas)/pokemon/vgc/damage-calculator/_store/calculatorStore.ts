@@ -10,7 +10,27 @@ import type {
   MoveSlots,
   SideConditions,
   StatValues,
+  SavedEntry,
 } from '../_types/calculator'
+
+// ─── localStorage helpers (client-only) ───────────────────────────────────────
+
+const LS_KEY = 'boffmedia_saved_teams'
+
+function persistSaved(entries: SavedEntry[]): void {
+  if (typeof window !== 'undefined') {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(entries)) } catch {}
+  }
+}
+
+function loadPersistedSaved(): SavedEntry[] {
+  if (typeof window === 'undefined') return []
+  try {
+    return JSON.parse(localStorage.getItem(LS_KEY) ?? '[]') as SavedEntry[]
+  } catch {
+    return []
+  }
+}
 
 const DEFAULT_IVS: StatValues = { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 }
 const DEFAULT_EVS: StatValues = { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 }
@@ -93,6 +113,14 @@ interface CalculatorState {
   removeFromMany: (idx: number) => void
   updateManyPokemon: (idx: number, patch: Partial<CalcPokemon>) => void
   setManyFull: (many: CalcPokemon[]) => void
+
+  saved: SavedEntry[]
+  hydrateFromStorage: () => void
+  saveGroup: (name: string, pokeList: CalcPokemon[]) => void
+  deleteSaved: (id: number) => void
+  renameSaved: (id: number, newName: string) => void
+  loadSavedAsTeam: (id: number) => void
+  loadSavedAsManyList: (id: number) => void
 }
 
 export const useCalculatorStore = create<CalculatorState>()(
@@ -160,5 +188,37 @@ export const useCalculatorStore = create<CalculatorState>()(
         many: s.many.map((p, i) => (i === idx ? { ...p, ...patch } : p)),
       })),
     setManyFull: (many) => set({ many }),
+
+    saved: [],
+    hydrateFromStorage: () => set({ saved: loadPersistedSaved() }),
+    saveGroup: (name, pokeList) =>
+      set((s) => {
+        const entry: SavedEntry = { id: Date.now(), name, pokeList, savedAt: new Date().toISOString() }
+        const saved = [...s.saved, entry]
+        persistSaved(saved)
+        return { saved }
+      }),
+    deleteSaved: (id) =>
+      set((s) => {
+        const saved = s.saved.filter((e) => e.id !== id)
+        persistSaved(saved)
+        return { saved }
+      }),
+    renameSaved: (id, newName) =>
+      set((s) => {
+        const saved = s.saved.map((e) => e.id === id ? { ...e, name: newName } : e)
+        persistSaved(saved)
+        return { saved }
+      }),
+    loadSavedAsTeam: (id) =>
+      set((s) => {
+        const entry = s.saved.find((e) => e.id === id)
+        return entry ? { team: entry.pokeList.slice(0, 6) } : {}
+      }),
+    loadSavedAsManyList: (id) =>
+      set((s) => {
+        const entry = s.saved.find((e) => e.id === id)
+        return entry ? { many: entry.pokeList.slice(0, 12) } : {}
+      }),
   })),
 )
