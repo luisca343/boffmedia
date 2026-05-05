@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { Swords, ArrowRight, ArrowLeft, Zap, Shield, BookmarkPlus } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useCalculatorStore } from './_store/calculatorStore'
@@ -8,12 +8,22 @@ import type { CalcTab } from './_types/calculator'
 import { PokemonPanel } from './_components/pokemon/PokemonPanel'
 import { FieldPanel } from './_components/field/FieldPanel'
 import { MoveStrip } from './_components/moves/MoveStrip'
-import { MatrixView } from './_components/matrix/MatrixView'
-import { SpeedView } from './_components/speed/SpeedView'
-import { TypeCalcView } from './_components/typecalc/TypeCalcView'
-import { SavedTeamsPanel } from './_components/saved/SavedTeamsPanel'
 import { useChampionsRegulations } from '../meta/_hooks/useChampionsRegulations'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/primitives/select'
+
+// Heavy tab views — code-split so they don't bloat the initial bundle
+const MatrixView     = lazy(() => import('./_components/matrix/MatrixView').then((m) => ({ default: m.MatrixView })))
+const SpeedView      = lazy(() => import('./_components/speed/SpeedView').then((m) => ({ default: m.SpeedView })))
+const TypeCalcView   = lazy(() => import('./_components/typecalc/TypeCalcView').then((m) => ({ default: m.TypeCalcView })))
+const SavedTeamsPanel = lazy(() => import('./_components/saved/SavedTeamsPanel').then((m) => ({ default: m.SavedTeamsPanel })))
+
+function TabFallback() {
+  return (
+    <div className="flex-1 flex items-center justify-center">
+      <div className="w-5 h-5 rounded-full border-2 border-primary-500/30 border-t-primary-400 animate-spin" />
+    </div>
+  )
+}
 
 type TabIcon = React.ComponentType<{ className?: string }>
 
@@ -165,22 +175,28 @@ function DamageCalculatorContent() {
           )}
 
           {(activeTab === 'teamvsmany' || activeTab === 'manyvsteam') && (
-            <MatrixView
-              tab={activeTab}
-              field={field}
-              onFieldChange={setField}
-              onAttackerSide={setAttackerSide}
-              onDefenderSide={setDefenderSide}
-              useChampions={useChampions}
-            />
+            <Suspense fallback={<TabFallback />}>
+              <MatrixView
+                tab={activeTab}
+                field={field}
+                onFieldChange={setField}
+                onAttackerSide={setAttackerSide}
+                onDefenderSide={setDefenderSide}
+                useChampions={useChampions}
+              />
+            </Suspense>
           )}
 
           {activeTab === 'speed' && (
-            <SpeedView useChampions={useChampions} />
+            <Suspense fallback={<TabFallback />}>
+              <SpeedView useChampions={useChampions} />
+            </Suspense>
           )}
 
           {activeTab === 'typecalc' && (
-            <TypeCalcView />
+            <Suspense fallback={<TabFallback />}>
+              <TypeCalcView />
+            </Suspense>
           )}
         </div>
 
@@ -190,7 +206,9 @@ function DamageCalculatorContent() {
           style={{ width: savedOpen ? '320px' : '0px' }}
         >
           <div className="w-[320px] h-full">
-            <SavedTeamsPanel onClose={() => setSavedOpen(false)} />
+            <Suspense fallback={null}>
+              <SavedTeamsPanel onClose={() => setSavedOpen(false)} />
+            </Suspense>
           </div>
         </div>
       </div>
