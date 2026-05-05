@@ -292,9 +292,11 @@ Layout:
 
 ### 🧪 Type Calculator ✅ DONE
 - Full Gen 9 type chart hardcoded as `TYPE_EFF: Record<string, Record<string, number>>`
-- Offense mode: team types vs 18 defender types (highlights SE/NVE)
-- Defense mode: 18 attacker types vs each team member (highlights weak/resist/immune)
-- Insights panel: SE/NVE coverage counts + weak/resist/immune profile per Pokémon
+- **Offensive Coverage**: rows = 18 defender types; cells = best effectiveness each team member can achieve using its own STAB types (`getBestOffenseEff(p.types, defenderType)`)
+- **Defensive Coverage**: rows = 18 attacker types; cells = effectiveness against each team member's types (`getTypeEff(atkType, p.types)`)
+- Insights panel: SE coverage counts per Pokémon (offensive) + weak/resist/immune profile (defensive)
+- `bestOffType`: defender type most of the team has SE coverage against
+- `bestDefType`: attacker type most of the team resists
 - Empty state if no team Pokémon loaded
 
 ### 📥 Import/Export System ✅ DONE
@@ -389,14 +391,15 @@ type MoveSlot = {
 
 ---
 
-## 🚀 Phase 6 — Performance Optimization ⏳ TODO
+## 🚀 Phase 6 — Performance Optimization ✅ DONE
 
 - [x] `useMemo` on `calcAllMoves` in MoveStrip
-- [ ] `useCallback` pass on panel handlers
-- [ ] Avoid deep re-renders (profiling needed)
-- [ ] Virtualize heavy tables if needed (Matrix view — especially with 12 many vs 6 team)
-- [ ] Lazy load heavy views (Matrix, Speed, TypeCalc tabs)
-- [ ] JS-positioned tooltips for matrix cells near edges (consider Floating UI / Popper.js)
+- [x] Lazy-load `MatrixView`, `SpeedView`, `TypeCalcView`, `SavedTeamsPanel` via `React.lazy()` + `Suspense` — each is a separate JS chunk; only `PokemonPanel`/`FieldPanel`/`MoveStrip` are in the initial bundle
+- [x] `TabFallback` spinner shown while lazy chunk loads (first visit only; subsequent switches are instant)
+- [x] Deleted `_lib/pokePasteParser.ts` (dead code, was relying on `@smogon/calc` `GEN9.moves.get()`)
+- [ ] `useCallback` pass on panel handlers — deferred (Zustand actions are already stable; no measurable re-render issue observed without profiling)
+- [ ] Virtualize heavy tables if needed — deferred (Matrix is 6×12 max = 72 cells, renders fast)
+- [ ] JS-positioned tooltips for matrix cells near edges — deferred to Phase 8 polish
 
 ---
 
@@ -463,11 +466,11 @@ Checklist:
 5. [x] Move strip
 6. [x] Matrix view
 7. [x] Speed view
-8. [x] Type calculator
+8. [x] Type calculator — bug fix: offensive coverage now uses `getBestOffenseEff` (STAB vs defender types)
 9. [x] Import/export (PokéPaste) — parse + export (`pokesToPaste`)
 10. [x] Saved Teams panel + localStorage persistence
-11. [ ] **Optimization pass** ← **NEXT**
-12. [ ] Mobile polish
+11. [x] Optimization pass — lazy-load chunks, delete dead code
+12. [ ] **Mobile polish** ← **NEXT**
 13. [ ] URL serialization (deferred)
 
 ---
@@ -490,6 +493,8 @@ Checklist:
 | JS-positioned tooltips for matrix | CSS hover tooltips clip near table edges with large datasets |
 | `hydrateFromStorage` action (not persist middleware) | Zustand `persist` writes to localStorage synchronously on SSR which causes hydration mismatches. Instead, store starts empty and `SavedTeamsPanel` calls `hydrateFromStorage()` in `useEffect` — only runs on the client. |
 | Saved Teams panel width via inline `style` + `transition-[width]` | Tailwind arbitrary `w-[320px]`/`w-0` with `transition-all` doesn't animate correctly on conditional renders. Inline style on width + `overflow-hidden` on the wrapper gives a smooth slide with no layout jank. |
+| Offensive coverage uses `getBestOffenseEff(p.types, defenderType)` | Takes `Math.max` over the Pokémon's own type(s) effectiveness against the defender type — "best STAB I can bring against this type". Defensive coverage stays `getTypeEff(atkType, p.types)` — "how hard does this attack type hit me". The two formulas are asymmetric by design. |
+| `React.lazy()` for MatrixView / SpeedView / TypeCalcView / SavedTeamsPanel | These four are never needed on initial render. Splitting them into separate chunks keeps the initial JS payload to just the 1v1 view (PokemonPanel + FieldPanel + MoveStrip). Zustand actions are stable so no `useCallback` wrapping is needed. |
 
 ---
 
