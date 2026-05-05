@@ -117,14 +117,13 @@ export function MoveStrip({
 
   return (
     <div className="bg-surface-900/97 border-b border-surface-700/50 flex-shrink-0">
-      {/* Top: sprite/info + moves */}
-      <div className="grid grid-cols-[1fr_1px_1fr]">
+      {/* Pokémon + moves — stacked on mobile, side-by-side on md+ */}
+      <div className="flex flex-col md:grid md:grid-cols-[1fr_1px_1fr]">
 
-        {/* Left — poke1 attacks poke2 */}
-        <div className="grid grid-cols-[170px_minmax(0,1fr)] gap-2 px-2.5 py-2 items-start">
+        {/* poke1 attacks poke2 */}
+        <div className="grid grid-cols-[140px_minmax(0,1fr)] sm:grid-cols-[170px_minmax(0,1fr)] gap-2 px-2.5 py-2 items-start">
           <MoveStripPokemonCard poke={poke1} apiEntry={api1} />
-          {/* Move list */}
-          <div className="flex flex-col rounded overflow-hidden border border-surface-700/40 w-full max-w-[280px] justify-self-end">
+          <div className="flex flex-col rounded overflow-hidden border border-surface-700/40 w-full md:max-w-[280px] md:justify-self-end">
             {poke1.moves.map((mv, i) => (
               <MoveRow
                 key={i}
@@ -137,13 +136,12 @@ export function MoveStrip({
           </div>
         </div>
 
-        {/* Divider */}
-        <div className="bg-surface-700/50 self-stretch" />
+        {/* Divider — horizontal on mobile, vertical on md+ */}
+        <div className="h-px w-full bg-surface-700/40 md:h-auto md:w-px md:bg-surface-700/50 md:self-stretch" />
 
-        {/* Right — poke2 attacks poke1 (mirrored) */}
-        <div className="grid grid-cols-[minmax(0,1fr)_170px] gap-2 px-2.5 py-2 items-start">
-          {/* Move list */}
-          <div className="flex flex-col rounded overflow-hidden border border-surface-700/40 w-full max-w-[280px] justify-self-start">
+        {/* poke2 attacks poke1 */}
+        <div className="grid grid-cols-[minmax(0,1fr)_140px] sm:grid-cols-[minmax(0,1fr)_170px] gap-2 px-2.5 py-2 items-start">
+          <div className="flex flex-col rounded overflow-hidden border border-surface-700/40 w-full md:max-w-[280px] md:justify-self-start">
             {poke2.moves.map((mv, i) => (
               <MoveRow
                 key={i}
@@ -158,14 +156,14 @@ export function MoveStrip({
         </div>
       </div>
 
-      {/* Result bars */}
-      <div className="grid grid-cols-[1fr_1px_1fr] border-t border-surface-700/40">
+      {/* Result bars — stacked on mobile, side-by-side on md+ */}
+      <div className="flex flex-col md:grid md:grid-cols-[1fr_1px_1fr] border-t border-surface-700/40">
         <ResultBar
           result={activeMove1 !== null ? (results1[activeMove1] ?? null) : null}
           move={activeMove1 !== null ? poke1.moves[activeMove1] : null}
           isActive={activeMove1 !== null}
         />
-        <div className="bg-surface-700/50 self-stretch" />
+        <div className="hidden md:block md:bg-surface-700/50 md:self-stretch" />
         <ResultBar
           result={activeMove2 !== null ? (results2[activeMove2] ?? null) : null}
           move={activeMove2 !== null ? poke2.moves[activeMove2] : null}

@@ -120,24 +120,24 @@ function SlotCard({
   const apiEntry = legalPokemon.find((p) => p.name === poke.name)
   return (
     <div
-      className="flex items-center gap-2 px-2 py-1.5 border-b border-surface-800/40 cursor-pointer hover:bg-surface-800/40 transition-colors group"
+      className="flex items-center gap-2.5 px-3 py-2 border-b border-surface-800/40 cursor-pointer hover:bg-surface-800/40 transition-colors group"
       onClick={() => onEdit(idx)}
     >
-      <span className="text-[9px] font-bold text-surface-600 w-5 shrink-0">#{idx + 1}</span>
+      <span className="text-[10px] font-bold text-surface-600 w-5 shrink-0">#{idx + 1}</span>
       <img
         src={getSpriteUrl(poke.name)}
         onError={handleSpriteError}
-        width={28} height={28}
+        width={36} height={36}
         className="object-contain shrink-0"
         style={{ imageRendering: 'pixelated' }}
         alt={poke.name}
       />
       <div className="flex-1 min-w-0">
-        <div className="text-[11px] font-semibold text-surface-200 truncate leading-tight">{poke.name}</div>
+        <div className="text-xs font-semibold text-surface-200 truncate leading-tight">{poke.name}</div>
         {apiEntry && (
           <div className="flex gap-0.5 mt-0.5">
             {apiEntry.types.map((type) => (
-              <PokemonTypeIcon key={type} type={type} size={12} />
+              <PokemonTypeIcon key={type} type={type} size={14} />
             ))}
           </div>
         )}
@@ -145,7 +145,7 @@ function SlotCard({
       <button
         type="button"
         onClick={(e) => { e.stopPropagation(); onRemove(idx) }}
-        className="opacity-0 group-hover:opacity-100 text-surface-600 hover:text-red-400 transition-all shrink-0 text-sm leading-none"
+        className="opacity-0 group-hover:opacity-100 text-surface-600 hover:text-red-400 transition-all shrink-0 text-base leading-none"
         aria-label="Remove"
       >
         ×
@@ -347,6 +347,7 @@ function SlotPanel({
   onRemove,
   onAdd,
   onImport,
+  className,
 }: {
   label: string
   accent: string
@@ -358,11 +359,14 @@ function SlotPanel({
   onRemove: (idx: number) => void
   onAdd: () => void
   onImport: () => void
+  className?: string
 }) {
-  const borderClass = border === 'left' ? 'border-r border-surface-700/40' : 'border-l border-surface-700/40'
+  const borderClass = border === 'left'
+    ? 'border-b md:border-b-0 md:border-r border-surface-700/40'
+    : 'border-t md:border-t-0 md:border-l border-surface-700/40'
 
   return (
-    <div className={`w-[200px] shrink-0 flex flex-col bg-surface-950 ${borderClass}`}>
+    <div className={`shrink-0 flex flex-col bg-surface-950 ${borderClass} ${className ?? 'w-[200px]'}`}>
       {/* Header */}
       <div className="px-2.5 py-2 border-b border-surface-700/40 flex items-center justify-between shrink-0">
         <span
@@ -440,32 +444,32 @@ interface MatrixTableProps {
 
 function MatrixTable({ attackers, defenders, matrix, cornerLabel, legalPokemon }: MatrixTableProps) {
   return (
-    <table className="border-collapse text-xs">
+    <table className="border-collapse text-sm">
       <thead>
         <tr>
-          <th className="sticky left-0 top-0 z-30 bg-surface-900 border-b border-r border-surface-700/40 w-40 min-w-[160px] p-1.5">
-            <span className="text-[9px] text-surface-600 uppercase tracking-wider">{cornerLabel}</span>
+          <th className="sticky left-0 top-0 z-30 bg-surface-900 border-b border-r border-surface-700/40 w-52 min-w-[208px] p-2">
+            <span className="text-[10px] text-surface-600 uppercase tracking-wider">{cornerLabel}</span>
           </th>
           {defenders.map((def) => {
             const defEntry = legalPokemon.find((p) => p.name === def.name)
             return (
               <th
                 key={def.name}
-                className="sticky top-0 z-20 min-w-[90px] bg-surface-900 border-b border-r border-surface-700/40 px-1.5 py-1 text-center"
+                className="sticky top-0 z-20 min-w-[110px] bg-surface-900 border-b border-r border-surface-700/40 px-2 py-1.5 text-center"
               >
                 <div className="flex flex-col items-center gap-0.5">
                   <img
                     src={getSpriteUrl(def.name)}
                     onError={handleSpriteError}
-                    className="w-7 h-7 object-contain"
+                    className="w-10 h-10 object-contain"
                     style={{ imageRendering: 'pixelated' }}
                     alt={def.name}
                   />
-                  <span className="font-bold text-[10px] text-surface-200 leading-tight max-w-[80px] truncate">{def.name}</span>
+                  <span className="font-bold text-xs text-surface-200 leading-tight max-w-[96px] truncate">{def.name}</span>
                   {defEntry && (
                     <div className="flex gap-0.5">
                       {defEntry.types.map((type) => (
-                        <PokemonTypeIcon key={type} type={type} size={14} />
+                        <PokemonTypeIcon key={type} type={type} size={16} />
                       ))}
                     </div>
                   )}
@@ -480,21 +484,21 @@ function MatrixTable({ attackers, defenders, matrix, cornerLabel, legalPokemon }
           const atkEntry = legalPokemon.find((p) => p.name === atk.name)
           return (
             <tr key={`${atk.name}-${atkIdx}`} className="border-b border-surface-800/40">
-              <td className="sticky left-0 z-10 bg-surface-950 border-r border-surface-700/40 w-40 min-w-[160px] align-top p-0">
-                <div className="flex items-center gap-1.5 h-[44px] px-1.5 border-b border-surface-800/20 overflow-hidden">
+              <td className="sticky left-0 z-10 bg-surface-950 border-r border-surface-700/40 w-52 min-w-[208px] align-top p-0">
+                <div className="flex items-center gap-2 h-[56px] px-2 border-b border-surface-800/20 overflow-hidden">
                   <img
                     src={getSpriteUrl(atk.name)}
                     onError={handleSpriteError}
-                    className="w-6 h-6 object-contain shrink-0"
+                    className="w-8 h-8 object-contain shrink-0"
                     style={{ imageRendering: 'pixelated' }}
                     alt={atk.name}
                   />
                   <div className="min-w-0">
-                    <div className="font-bold text-[10px] text-surface-200 truncate leading-tight">{atk.name}</div>
+                    <div className="font-bold text-xs text-surface-200 truncate leading-tight">{atk.name}</div>
                     {atkEntry && (
                       <div className="flex gap-0.5 mt-0.5">
                         {(atkEntry.types).map((type) => (
-                          <PokemonTypeIcon key={type} type={type} size={14} />
+                          <PokemonTypeIcon key={type} type={type} size={16} />
                         ))}
                       </div>
                     )}
@@ -503,7 +507,7 @@ function MatrixTable({ attackers, defenders, matrix, cornerLabel, legalPokemon }
                 {atk.moves.map((move, mi) => (
                   <div
                     key={mi}
-                    className="h-[22px] flex items-center text-[9px] text-surface-500 truncate px-1.5 leading-tight border-b border-surface-800/10 last:border-b-0"
+                    className="h-[28px] flex items-center text-[11px] text-surface-400 truncate px-2 leading-tight border-b border-surface-800/10 last:border-b-0"
                   >
                     {move.name || <span className="text-surface-700">—</span>}
                   </div>
@@ -513,29 +517,29 @@ function MatrixTable({ attackers, defenders, matrix, cornerLabel, legalPokemon }
                 const results = matrix[atkIdx]?.[defIdx] ?? []
                 return (
                   <td key={`${def.name}-${defIdx}`} className="border-r border-surface-800/30 align-top p-0">
-                    <div className="h-[44px] border-b border-surface-800/20" />
+                    <div className="h-[56px] border-b border-surface-800/20" />
                     {results.map((res, mi) => {
                       const { bg, color } = getMoveRowStyle(res)
                       const koLabel = res ? getKOLabel(res) : null
                       return (
                         <div
                           key={mi}
-                          className="h-[22px] flex flex-col items-center justify-center px-1 border-b border-surface-800/10 last:border-b-0"
+                          className="h-[28px] flex flex-col items-center justify-center px-1.5 border-b border-surface-800/10 last:border-b-0"
                           style={{ background: bg }}
                         >
                           {res ? (
                             <>
-                              <span className="font-mono font-bold text-[10px] whitespace-nowrap" style={{ color }}>
+                              <span className="font-mono font-bold text-xs whitespace-nowrap" style={{ color }}>
                                 {res.minPct.toFixed(0)}–{res.maxPct.toFixed(0)}%
                               </span>
                               {koLabel && (
-                                <span className="text-[7px] font-black leading-none" style={{ color }}>
+                                <span className="text-[9px] font-black leading-none" style={{ color }}>
                                   {koLabel}
                                 </span>
                               )}
                             </>
                           ) : (
-                            <span style={{ color: 'rgb(51,65,85)', fontSize: 9 }}>—</span>
+                            <span style={{ color: 'rgb(51,65,85)', fontSize: 10 }}>—</span>
                           )}
                         </div>
                       )
@@ -664,7 +668,7 @@ export function MatrixView({
       />
 
       {/* Three-column layout: attackers | matrix | defenders */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
         {/* Left: Attacker panel */}
         <SlotPanel
           label={attackerLabel}
@@ -677,10 +681,11 @@ export function MatrixView({
           onRemove={(idx) => handleRemove(attackerList, idx)}
           onAdd={() => handleAdd(attackerList)}
           onImport={() => setPasteTarget(attackerList)}
+          className="w-full max-h-40 md:w-[240px] md:max-h-none"
         />
 
         {/* Center: Matrix table */}
-        <div className="flex-1 overflow-auto bg-surface-950">
+        <div className="flex-1 overflow-auto bg-surface-950 min-h-0">
           {hasData ? (
             <MatrixTable
               attackers={attackers}
@@ -706,6 +711,7 @@ export function MatrixView({
           onRemove={(idx) => handleRemove(defenderList, idx)}
           onAdd={() => handleAdd(defenderList)}
           onImport={() => setPasteTarget(defenderList)}
+          className="w-full max-h-40 md:w-[240px] md:max-h-none"
         />
       </div>
 
