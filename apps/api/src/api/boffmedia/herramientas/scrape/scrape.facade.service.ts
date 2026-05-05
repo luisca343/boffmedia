@@ -154,7 +154,7 @@ export class ScrapeFacadeService {
     return this.mangaEditorService.serveChapterImage(series, chapter, page, res);
   }
 
-  convertMangaChapter(series: string, chapter: string, excludePages: number[]): Promise<{ outputPath: string }> {
-    return this.mangaEditorService.convertChapter(series, chapter, excludePages);
+  convertMangaChapter(series: string, chapter: string, excludePages: number[], includeCover?: boolean): Promise<{ outputPath: string }> {
+    return this.mangaEditorService.convertChapter(series, chapter, excludePages, includeCover);
   }
 }

@@ -176,7 +176,9 @@
       "removeLast": "Quitar últimas",
       "convertSelected": "Convertir seleccionados",
       "bulkConverting": "Convirtiendo {done}/{total}…",
-      "bulkDone": "{count} convertidos"
+      "bulkDone": "{count} convertidos",
+      "selectChapter": "Selecciona un capítulo para ver sus páginas",
+      "coverPage": "Portada"
     }
   }
 }

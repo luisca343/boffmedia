@@ -29,6 +29,11 @@ export interface EpubChapterOptions {
   seriesTitle?: string;
   chapterTitle?: string;
   chapterNumber?: number | null;
+  /**
+   * When true, uses the first image as the EPUB cover page.
+   * When false (default), suppresses Calibre's auto-generated title page entirely.
+   */
+  includeCover?: boolean;
 }
 
 /** Returns true when the buffer contains a WebP image (magic bytes). */
@@ -57,7 +62,7 @@ async function webpToJpeg(data: Buffer): Promise<Buffer> {
 }
 
 export async function buildEpub(opts: EpubChapterOptions): Promise<void> {
-  const { imageFiles, outputPath, seriesTitle, chapterTitle, chapterNumber } = opts;
+  const { imageFiles, outputPath, seriesTitle, chapterTitle, chapterNumber, includeCover } = opts;
 
   const title = chapterTitle ?? path.basename(outputPath, '.epub');
   const tempCbz = `${outputPath}.tmp.cbz`;
@@ -96,6 +101,14 @@ export async function buildEpub(opts: EpubChapterOptions): Promise<void> {
     args.push('--output-profile', 'tablet');
     // Calibre's comic pipeline converts images to grayscale by default; disable it.
     args.push('--dont-grayscale');
+
+    if (includeCover && processedFiles.length > 0) {
+      // Use the first manga page as the EPUB cover image.
+      args.push('--cover', processedFiles[0]);
+    } else {
+      // Prevent Calibre from generating a text-based title page from metadata.
+      args.push('--no-default-epub-cover');
+    }
 
     await execFileAsync('ebook-convert', args, { timeout: 180_000 });
   } catch (err: any) {
