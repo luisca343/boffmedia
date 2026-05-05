@@ -1,7 +1,7 @@
 'use client'
 
 import { lazy, Suspense, useState } from 'react'
-import { Swords, ArrowRight, ArrowLeft, Zap, Shield, BookmarkPlus } from 'lucide-react'
+import { Swords, ArrowRight, ArrowLeft, Zap, Shield, BookmarkPlus, Link2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useCalculatorStore } from './_store/calculatorStore'
 import type { CalcTab } from './_types/calculator'
@@ -10,6 +10,7 @@ import { FieldPanel } from './_components/field/FieldPanel'
 import { MoveStrip } from './_components/moves/MoveStrip'
 import { useChampionsRegulations } from '../meta/_hooks/useChampionsRegulations'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/primitives/select'
+import { useCalcUrlSync } from './_hooks/useCalcUrlSync'
 
 // Heavy tab views — code-split so they don't bloat the initial bundle
 const MatrixView      = lazy(() => import('./_components/matrix/MatrixView').then((m) => ({ default: m.MatrixView })))
@@ -53,6 +54,7 @@ function DamageCalculatorContent() {
   const regulations = useChampionsRegulations()
   const [savedOpen, setSavedOpen] = useState(false)
   const [mobilePanel, setMobilePanel] = useState<MobilePanel>('atk')
+  const { copyShareLink, linkCopied } = useCalcUrlSync()
 
   return (
     <div className="flex flex-col bg-surface-950" style={{ height: 'calc(100vh - 56px)' }}>
@@ -118,6 +120,19 @@ function DamageCalculatorContent() {
               SP
             </span>
           )}
+          <button
+            type="button"
+            onClick={copyShareLink}
+            title={t('share')}
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold border transition-all ${
+              linkCopied
+                ? 'bg-green-500/15 border-green-500/35 text-green-400'
+                : 'bg-transparent border-transparent text-surface-400 hover:text-surface-200 hover:bg-surface-800/50'
+            }`}
+          >
+            <Link2 className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">{linkCopied ? t('shareCopied') : t('share')}</span>
+          </button>
           <button
             type="button"
             onClick={() => setSavedOpen((v) => !v)}
