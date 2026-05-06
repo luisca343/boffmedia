@@ -18,7 +18,9 @@ import {
   ApiResponse,
   ApiParam,
   ApiQuery,
-  ApiBody
+  ApiBody,
+  ApiProperty,
+  ApiPropertyOptional,
 } from '@nestjs/swagger';
 import { BoffMediaUsersFacadeService } from './users.facade.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -35,39 +37,70 @@ import { SessionUserEntity } from './entities/session-user.entity';
 import { UserStatisticsEntity } from './entities/user-statistics.entity';
 import { IntegratedUserCreationResultEntity } from './entities/user-creation-result';
 import { AuthenticationResultEntity } from './entities/integrations.entity';
+import { UsersPaginatedResponseEntity } from './entities/users-paginated-response.entity';
+import { UserRolesResponseEntity } from './entities/user-roles-response.entity';
+import { UserValidationResponseEntity } from './entities/user-validation-response.entity';
+import { BatchUsersDto } from './dto/batch-users.dto';
 
 // Additional DTOs for specialized endpoints
-export class MinecraftRegistrationDto {
+export class MinecraftDetails {
+  @ApiProperty({ example: 'Steve' })
   username: string;
+
+  @ApiProperty({ example: '069a79f4-44e9-4726-a5be-fca90e38aaf5' })
+  uuid: string;
+
+  @ApiProperty({ example: 'world' })
+  world: string;
+}
+
+export class MinecraftRegistrationDto {
+  @ApiProperty({ example: 'steve123' })
+  username: string;
+
+  @ApiProperty({ example: 'steve@example.com' })
   email: string;
+
+  @ApiProperty({ example: 'password123' })
   password: string;
-  minecraft: {
-    username: string;
-    uuid: string;
-    world: string;
-  };
+
+  @ApiProperty({ type: MinecraftDetails })
+  minecraft: MinecraftDetails;
 }
 
 export class MinecraftLinkDto {
+  @ApiProperty({ example: 'steve123' })
   username: string;
+
+  @ApiProperty({ example: 'steve@example.com' })
   email: string;
+
+  @ApiProperty({ example: 'password123' })
   password: string;
-  minecraft: {
-    username: string;
-    uuid: string;
-    world: string;
-  };
+
+  @ApiProperty({ type: MinecraftDetails })
+  minecraft: MinecraftDetails;
 }
 
 export class GoogleAuthDto {
+  @ApiProperty({ example: 'steve@gmail.com' })
   email: string;
+
+  @ApiProperty({ example: 'Steve Player' })
   name: string;
+
+  @ApiProperty({ example: '1234567890' })
   googleId: string;
+
+  @ApiPropertyOptional({ example: 'https://lh3.googleusercontent.com/...' })
   profilePicture?: string;
 }
 
 export class LoginDto {
+  @ApiProperty({ example: 'steve123' })
   username: string;
+
+  @ApiProperty({ example: 'password123' })
   password: string;
 }
 
@@ -102,7 +135,7 @@ export class BoffMediaUsersController {
       });
 
       return user;
-    } catch (error) {
+    } catch (error: any) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -127,7 +160,7 @@ export class BoffMediaUsersController {
         isNewBoffMediaUser: result.isNewBoffMediaUser,
         isNewSmartRotomUser: result.isNewSmartRotomUser
       };
-    } catch (error) {
+    } catch (error: any) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -151,7 +184,7 @@ export class BoffMediaUsersController {
         smartRotomUser: result.smartRotomUser,
         starbankAccounts: result.starbankAccounts
       };
-    } catch (error) {
+    } catch (error: any) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -169,7 +202,7 @@ export class BoffMediaUsersController {
     try {
       const sessionUser = await this.usersFacadeService.createFromGoogle(googleData);
       return sessionUser;
-    } catch (error) {
+    } catch (error: any) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -181,6 +214,7 @@ export class BoffMediaUsersController {
   @ApiResponse({ 
     status: 200, 
     description: 'Users retrieved successfully',
+    type: UsersPaginatedResponseEntity
   })
   @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Limit number of results' })
   @ApiQuery({ name: 'offset', required: false, type: Number, description: 'Offset for pagination' })
@@ -205,7 +239,7 @@ export class BoffMediaUsersController {
         limit,
         offset
       };
-    } catch (error) {
+    } catch (error: any) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -221,7 +255,7 @@ export class BoffMediaUsersController {
     try {
       const stats = await this.usersFacadeService.getUserStatistics();
       return stats;
-    } catch (error) {
+    } catch (error: any) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -244,7 +278,7 @@ export class BoffMediaUsersController {
       }
 
       return user;
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof HttpException) throw error;
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -268,7 +302,7 @@ export class BoffMediaUsersController {
       }
 
       return userWithIntegrations;
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof HttpException) throw error;
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -292,7 +326,7 @@ export class BoffMediaUsersController {
       }
 
       return user;
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof HttpException) throw error;
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -316,7 +350,7 @@ export class BoffMediaUsersController {
       }
 
       return fullUser;
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof HttpException) throw error;
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -340,7 +374,7 @@ export class BoffMediaUsersController {
       }
 
       return sessionUser;
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof HttpException) throw error;
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -352,22 +386,14 @@ export class BoffMediaUsersController {
   @ApiResponse({ 
     status: 200, 
     description: 'User roles retrieved',
-    schema: {
-      type: 'object',
-      properties: {
-        roles: {
-          type: 'array',
-          items: { type: 'string' }
-        }
-      }
-    }
+    type: UserRolesResponseEntity
   })
   @ApiResponse({ status: 404, description: 'User not found' })
   async getUserRoles(@Param('id', ParseIntPipe) id: number) {
     try {
       const roles = await this.usersFacadeService.getUserRoles(id);
       return { roles };
-    } catch (error) {
+    } catch (error: any) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -392,7 +418,7 @@ export class BoffMediaUsersController {
     try {
       const updatedUser = await this.usersFacadeService.updateUser(id, updateUserDto);
       return updatedUser;
-    } catch (error) {
+    } catch (error: any) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -417,7 +443,7 @@ export class BoffMediaUsersController {
       }
 
       return { deleted: true, message: result.message };
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof HttpException) throw error;
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -443,7 +469,7 @@ export class BoffMediaUsersController {
       }
 
       return authResult;
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof HttpException) throw error;
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -456,20 +482,11 @@ export class BoffMediaUsersController {
   @ApiResponse({ 
     status: 200, 
     description: 'Batch users retrieved successfully',
-    type: [UserWithIntegrationsEntity]
+    type: UserWithIntegrationsEntity,
+    isArray: true
   })
-  @ApiBody({ 
-    schema: { 
-      type: 'object', 
-      properties: { 
-        userIds: { 
-          type: 'array', 
-          items: { type: 'number' } 
-        } 
-      } 
-    } 
-  })
-  async getBatchUsersWithIntegrations(@Body() body: { userIds: number[] }) {
+  @ApiBody({ type: BatchUsersDto })
+  async getBatchUsersWithIntegrations(@Body() body: BatchUsersDto) {
     try {
       const { userIds } = body;
       
@@ -479,7 +496,7 @@ export class BoffMediaUsersController {
 
       const users = await this.usersFacadeService.getMultipleUsersWithIntegrations(userIds);
       return users;
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof HttpException) throw error;
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -494,7 +511,7 @@ export class BoffMediaUsersController {
   @ApiResponse({ 
     status: 200, 
     description: 'Validation result',
-    type: SuccessResponse
+    type: UserValidationResponseEntity
   })
   async validateUserExists(
     @Param('type') type: 'id' | 'username' | 'email' | 'uuid',
@@ -503,7 +520,7 @@ export class BoffMediaUsersController {
     try {
       const exists = await this.usersFacadeService.validateUserExists(identifier, type);
       return { exists, type, identifier };
-    } catch (error) {
+    } catch (error: any) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }

@@ -23,7 +23,7 @@ export class InvitesFacadeService {
       };
 
       return await this.inviteManagementService.createInvite(createData);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating invite:', error);
       return {
         success: false,
@@ -35,7 +35,7 @@ export class InvitesFacadeService {
   async getAllInvites(): Promise<InviteResult[]> {
     try {
       return await this.inviteManagementService.getAllInvites();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error getting all invites:', error);
       throw new Error(`Failed to retrieve invites: ${error.message}`);
     }
@@ -44,7 +44,7 @@ export class InvitesFacadeService {
   async getInviteById(id: string): Promise<InviteResult | null> {
     try {
       return await this.inviteManagementService.getInviteById(id);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting invite ${id}:`, error);
       throw new Error(`Failed to retrieve invite: ${error.message}`);
     }
@@ -53,7 +53,7 @@ export class InvitesFacadeService {
   async getActiveInviteById(id: string): Promise<InviteResult | null> {
     try {
       return await this.inviteManagementService.getActiveInviteById(id);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting active invite ${id}:`, error);
       throw new Error(`Failed to retrieve active invite: ${error.message}`);
     }
@@ -62,7 +62,7 @@ export class InvitesFacadeService {
   async deleteInvite(id: string): Promise<{ success: boolean; message: string }> {
     try {
       return await this.inviteManagementService.deleteInvite(id);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error deleting invite ${id}:`, error);
       return {
         success: false,
@@ -74,7 +74,7 @@ export class InvitesFacadeService {
   async permanentlyDeleteInvite(id: string): Promise<{ success: boolean; message: string }> {
     try {
       return await this.inviteManagementService.permanentlyDeleteInvite(id);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error permanently deleting invite ${id}:`, error);
       return {
         success: false,
@@ -98,7 +98,7 @@ export class InvitesFacadeService {
       }
 
       return await this.registrationService.registerUser(inviteId, registrationData);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error in registration process:', error);
       return {
         success: false,
@@ -111,7 +111,7 @@ export class InvitesFacadeService {
   async canRegisterWithInvite(inviteId: string): Promise<{ canRegister: boolean; message: string }> {
     try {
       return await this.registrationService.canRegisterWithInvite(inviteId);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error checking registration eligibility for invite ${inviteId}:`, error);
       return {
         canRegister: false,
@@ -125,7 +125,7 @@ export class InvitesFacadeService {
   async validateInvite(id: string): Promise<{ valid: boolean; message: string; invite?: InviteResult }> {
     try {
       return await this.inviteManagementService.validateInvite(id);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error validating invite ${id}:`, error);
       return {
         valid: false,
@@ -139,7 +139,7 @@ export class InvitesFacadeService {
   async getInviteStatistics(): Promise<InviteStatistics> {
     try {
       return await this.inviteManagementService.getInviteStatistics();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error getting invite statistics:', error);
       throw new Error(`Failed to retrieve invite statistics: ${error.message}`);
     }
@@ -150,7 +150,7 @@ export class InvitesFacadeService {
   async getUserInvites(uuid: string): Promise<InviteResult[]> {
     try {
       return await this.inviteManagementService.getInvitesByUser(uuid);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting invites for user ${uuid}:`, error);
       throw new Error(`Failed to retrieve user invites: ${error.message}`);
     }
@@ -159,7 +159,7 @@ export class InvitesFacadeService {
   async getUserInvitesByUsername(username: string): Promise<InviteResult[]> {
     try {
       return await this.inviteManagementService.getInvitesByUsername(username);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting invites for username ${username}:`, error);
       throw new Error(`Failed to retrieve username invites: ${error.message}`);
     }

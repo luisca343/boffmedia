@@ -68,7 +68,7 @@ export class MisionesFacadeService {
         success: true,
         timestamp: new Date()
       };
-    } catch (error) {
+    } catch (error: any) {
       throw new BadRequestException(`Failed to refresh cache: ${error.message}`);
     }
   }
@@ -177,7 +177,7 @@ export class MisionesFacadeService {
         fileSystem: fileSystemHealthy
       };
 
-    } catch (error) {
+    } catch (error: any) {
       return {
         overall: 'unhealthy',
         cache: false,

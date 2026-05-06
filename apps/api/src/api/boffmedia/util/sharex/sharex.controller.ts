@@ -49,7 +49,7 @@ export class SharexController {
                     type: file.mimetype
                 }
             };
-        } catch (error) {
+        } catch (error: any) {
             throw new InternalServerErrorException('Failed to save file');
         }
     }

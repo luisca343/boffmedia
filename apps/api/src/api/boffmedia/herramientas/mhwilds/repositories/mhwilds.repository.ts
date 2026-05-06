@@ -61,7 +61,7 @@ export class MhwildsRepository implements IMhwildsRepository {
           exists: false
         };
       }
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to get cache metadata for ${resourceType}: ${error.message}`);
     }
   }
@@ -88,7 +88,7 @@ export class MhwildsRepository implements IMhwildsRepository {
     try {
       const fileContent = await fs.readFile(filePath, 'utf8');
       return JSON.parse(fileContent);
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to read cached data from ${filePath}: ${error.message}`);
     }
   }
@@ -98,7 +98,7 @@ export class MhwildsRepository implements IMhwildsRepository {
       const dirPath = path.dirname(filePath);
       await this.ensureDirectoryExists(dirPath);
       await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf8');
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to save data to ${filePath}: ${error.message}`);
     }
   }
@@ -116,7 +116,7 @@ export class MhwildsRepository implements IMhwildsRepository {
       });
       
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       if (error.response) {
         throw new Error(`API request failed: ${error.response.status} - ${error.response.statusText}`);
       } else if (error.request) {
@@ -152,7 +152,7 @@ export class MhwildsRepository implements IMhwildsRepository {
         fromCache: false,
         fetchTime: new Date()
       };
-    } catch (error) {
+    } catch (error: any) {
       // Try to fallback to cached data if remote fetch fails
       try {
         const cacheMetadata = await this.getCacheMetadata(resourceType, locale);
@@ -200,7 +200,7 @@ export class MhwildsRepository implements IMhwildsRepository {
     try {
       const filePath = path.join(process.cwd(), `public/data/mhwilds/${locale}/${filename}`);
       await this.saveCachedData(filePath, data);
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to save processed data to ${filename}: ${error.message}`);
     }
   }
@@ -215,7 +215,7 @@ export class MhwildsRepository implements IMhwildsRepository {
       }
       
       return null;
-    } catch (error) {
+    } catch (error: any) {
       return null;
     }
   }
@@ -271,7 +271,7 @@ export class MhwildsRepository implements IMhwildsRepository {
           };
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       return {
         success: false,
         message: `Cache clearing failed: ${error.message}`
@@ -324,7 +324,7 @@ export class MhwildsRepository implements IMhwildsRepository {
         locales: Array.from(locales),
         resources: Array.from(resources)
       };
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to get cache stats: ${error.message}`);
     }
   }

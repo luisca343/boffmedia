@@ -86,7 +86,7 @@ export class MessageService {
         } else {
           console.warn('Image payload missing screenshot.image');
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('Failed to parse/process image message', err);
       }
     }

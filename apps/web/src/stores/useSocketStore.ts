@@ -29,7 +29,6 @@ const useSocketStore = create<SocketStore>((set, get) => ({
     // Connect to NestJS Socket.io server
     //console.log("Creating new socket connection")
     const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL as string, {
-      port: 34304,
       transports: ["websocket"],
       reconnectionAttempts: RECONNECTION_ATTEMPTS,
       reconnectionDelay: RECONNECTION_DELAY,

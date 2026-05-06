@@ -16,7 +16,7 @@ export class PokemonIntegrationService {
   async getTerasPokemonShowdownData(): Promise<any> {
     try {
       return await this.pokemonShowdownService.getTerasPokemonShowdownData();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to get Teras Pokemon Showdown data:', error);
       throw new Error(`Showdown data retrieval failed: ${error.message}`);
     }
@@ -27,7 +27,7 @@ export class PokemonIntegrationService {
   async updateWingullDex(uuid: string): Promise<any> {
     try {
       return await this.wingullFacadeService.updateDex(uuid);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to update Wingull dex for ${uuid}:`, error);
       throw new Error(`Wingull dex update failed: ${error.message}`);
     }
@@ -51,7 +51,7 @@ export class PokemonIntegrationService {
       }
 
       return updateResult;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to update dex with sync for ${uuid}:`, error);
       throw new Error(`Dex update with sync failed: ${error.message}`);
     }

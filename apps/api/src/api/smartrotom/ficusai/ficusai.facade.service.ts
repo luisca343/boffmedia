@@ -85,7 +85,7 @@ export class FicusAIFacadeService {
           }],
         };
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error generating AI response:', error);
       return {
         sender: MessageSender.BOT,
@@ -121,7 +121,7 @@ export class FicusAIFacadeService {
 
         // Track requested types and Pokemon names for intro text
         this.trackRequestedData(call, requestedTypes, pokemonNames, functionParts);
-      } catch (error) {
+      } catch (error: any) {
         if (error instanceof PokemonNotFoundError) {
           console.log(`Handling Pokémon not found: ${error.pokemonName}`);
           

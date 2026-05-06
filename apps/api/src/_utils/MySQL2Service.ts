@@ -56,7 +56,7 @@ export class MySQL2Service {
     try {
       if(!values) return await this.pool.execute(sql) as [T, mysql.FieldPacket[]];
       return await this.pool.execute(sql, values) as [T, mysql.FieldPacket[]];
-    } catch (error) {
+    } catch (error: any) {
       return new Error('Failed to execute query: ' + error.message) as any; 
     }
   }
@@ -73,7 +73,7 @@ export class MySQL2Service {
       const [rows, fields] = await this.query<mysql.RowDataPacket[]>(`SELECT * FROM ?? WHERE id IN (?)`, [table, ids]);
   
       return rows as T[];
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error al insertar y retornar ", error.message);
       throw error; // re-throw the error to be handled by the calling code
     }

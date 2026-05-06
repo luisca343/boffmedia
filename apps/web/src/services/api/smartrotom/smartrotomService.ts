@@ -1,11 +1,8 @@
 import { ApiResponse, rotomGET, rotomPOST } from "@/services/boffAPI"
-import { TaxiStop, TeleportPlayerDto } from "@boffmedia/shared"
+import { ArceuSpeakEntity, TaxiStop, TeleportPlayerDto } from "@boffmedia/shared"
 
-export interface ArceuSpeak {
-  name: string
-  value: string
-  format: string
-}
+/** @deprecated use ArceuSpeakEntity from @boffmedia/shared */
+export type ArceuSpeak = ArceuSpeakEntity;
 
 export class SmartrotomService {
   
@@ -13,13 +10,13 @@ export class SmartrotomService {
    * Get ArceuSpeak messages
    */
   static getArceuSpeak() {
-    return rotomGET<ArceuSpeak[]>("/arceuspeak");
+    return rotomGET<ArceuSpeakEntity[]>("/arceuspeak");
   }
 
   /**
    * Post new ArceuSpeak message
    */
-  static postArceuSpeak({name, value, format}: ArceuSpeak) {
+  static postArceuSpeak({name, value, format}: ArceuSpeakEntity) {
     return rotomPOST<ApiResponse>('/arceuspeak', {name, value, format});
   }
 }

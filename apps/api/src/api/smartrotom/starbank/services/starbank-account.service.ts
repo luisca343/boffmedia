@@ -75,7 +75,7 @@ export class StarbankAccountService {
     try {
       const balance = await this.accountRepository.getUserBalance(uuid);
       return { balance };
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to get balance for user ${uuid}:`, error);
       return { balance: 0 };
     }
@@ -92,7 +92,7 @@ export class StarbankAccountService {
   async checkAccountExists(accountId: number): Promise<boolean> {
     try {
       return await this.accountRepository.checkAccountExists(accountId);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to check if account ${accountId} exists:`, error);
       return false;
     }

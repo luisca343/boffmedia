@@ -1,4 +1,4 @@
-import { apiGET, apiPATCH, apiPOST } from '@/services/boffAPI';
+import { apiGET, apiPATCH } from '@/services/boffAPI';
 
 export interface GameFileEntry {
   name: string;
@@ -23,17 +23,11 @@ export interface FileDownloadEntry {
   error?: string;
 }
 
-export interface BulkDownloadResult {
-  console: string;
-  consoleLabel: string;
-  regions: string[];
-  totalMatched: number;
-  downloaded: number;
-  skipped: number;
-  failed: number;
-  totalDownloadedSize: string;
-  totalDownloadedSizeBytes: number;
-  files: FileDownloadEntry[];
+export interface CatalogResult {
+  count: number;
+  totalSize: string;
+  totalSizeBytes: number;
+  files: GameFileEntry[];
 }
 
 // SSE event types emitted by the stream endpoint
@@ -41,47 +35,6 @@ export type SseStartEvent    = { type: 'start';    total: number };
 export type SseProgressEvent = { type: 'progress'; index: number; total: number } & FileDownloadEntry;
 export type SseDoneEvent     = { type: 'done' } & Omit<BulkDownloadResult, 'files' | 'regions' | 'totalMatched'>;
 export type SseEvent         = SseStartEvent | SseProgressEvent | SseDoneEvent;
-
-export interface LocalGameEntry {
-  filename: string;
-  size: string;
-  sizeBytes: number;
-}
-
-export interface LocalGamesResult {
-  console: string;
-  consoleLabel: string;
-  count: number;
-  totalSize: string;
-  totalSizeBytes: number;
-  files: LocalGameEntry[];
-}
-
-export interface CatalogSearchConsoleResult {
-  consoleKey: string;
-  consoleLabel: string;
-  count: number;
-  files: GameFileEntry[];
-}
-
-export interface CatalogSearchResult {
-  query: string;
-  totalCount: number;
-  consoles: CatalogSearchConsoleResult[];
-}
-
-export interface SearchConsoleResult {
-  consoleKey: string;
-  consoleLabel: string;
-  count: number;
-  files: LocalGameEntry[];
-}
-
-export interface SearchLocalGamesResult {
-  query: string;
-  totalCount: number;
-  consoles: SearchConsoleResult[];
-}
 
 // ── Manga types ───────────────────────────────────────────────────────────────
 

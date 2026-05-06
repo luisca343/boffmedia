@@ -52,7 +52,7 @@ export class PokemonDataService extends BaseDataService {
           this.customSpeciesFiles.add(file.split('_')[1]);
         }
       });
-    } catch (error) {
+    } catch (error: any) {
       console.warn('No custom species directory found or error reading it:', error.message);
     }
 

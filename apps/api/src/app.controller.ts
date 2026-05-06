@@ -37,7 +37,7 @@ export class AppController {
       });
 
       return result;
-    } catch (err) {
+    } catch (err: any) {
       return { error: 'Failed to read file' };
     }
   }

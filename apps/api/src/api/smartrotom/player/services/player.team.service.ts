@@ -14,7 +14,7 @@ export class PlayerTeamService {
 
     try {
       return await this.playerRepository.fetchPlayerTeamFromAPI(uuid);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to get player team for ${uuid}:`, error);
       throw new Error(`Player team retrieval failed: ${error.message}`);
     }

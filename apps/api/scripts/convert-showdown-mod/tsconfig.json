@@ -1,0 +1,22 @@
+{
+  "extends": "../../tsconfig.json",
+  "ts-node": {
+    "esm": false,
+    "transpileOnly": true
+  },
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "ES2021",
+    "strict": false,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "outDir": "../../dist/scripts",
+    "rootDir": "."
+  },
+  "include": [
+    "./**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

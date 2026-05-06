@@ -12,7 +12,7 @@ export class PlayerFacadeService {
   async getStats(uuid: string): Promise<any> {
     try {
       return await this.playerStatsService.getPlayerStats(uuid);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting player stats for ${uuid}:`, error);
       throw new Error(`Failed to retrieve player stats: ${error.message}`);
     }
@@ -21,7 +21,7 @@ export class PlayerFacadeService {
   async getTeam(uuid: string): Promise<any> {
     try {
       return await this.playerTeamService.getPlayerTeam(uuid);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting player team for ${uuid}:`, error);
       throw new Error(`Failed to retrieve player team: ${error.message}`);
     }

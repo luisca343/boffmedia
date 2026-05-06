@@ -70,7 +70,7 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
       }).execute();
 
       return { success: true };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to create transaction:', error);
       return { success: false, message: `Transaction failed: ${error.message}` };
     }
@@ -113,7 +113,7 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
         .execute();
 
       return result.map(this.mapToEntity);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to find transactions for account ${accountId}:`, error);
       throw new Error(`Failed to find account transactions: ${error.message}`);
     }
@@ -152,7 +152,7 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
         .execute();
 
       return result.map(this.mapToEntity);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to find transactions for user ${uuid}:`, error);
       throw new Error(`Failed to find user transactions: ${error.message}`);
     }
@@ -191,7 +191,7 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
         .execute();
 
       return result.map(this.mapToEntity);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to find transfers for account ${accountId}:`, error);
       throw new Error(`Failed to find account transfers: ${error.message}`);
     }
@@ -231,7 +231,7 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
         .execute();
 
       return result.map(this.mapToEntity);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to find transfers for user ${uuid}:`, error);
       throw new Error(`Failed to find user transfers: ${error.message}`);
     }
@@ -265,7 +265,7 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
         .orderBy(desc(starBankTransactions.date));
 
       return result.map(this.mapToEntity);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to find transactions by type ${type}:`, error);
       throw new Error(`Failed to find transactions by type: ${error.message}`);
     }

@@ -59,7 +59,7 @@ export class ImageService {
         path: filepath
       };
 
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Failed to upload image for NPC ${request.npcName}`, error.stack);
       
       return {
@@ -108,7 +108,7 @@ export class ImageService {
       await fs.mkdir(this.renderPath, { recursive: true });
       await fs.mkdir(this.imagePath, { recursive: true });
       this.logger.log('Image directories ensured');
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Failed to create image directories', error.stack);
     }
   }

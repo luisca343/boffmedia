@@ -123,7 +123,7 @@ export class AIService {
           content: responseText
         }]
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error generating fallback response with Gemma:', error);
       
       // Fallback to basic response if Gemma fails

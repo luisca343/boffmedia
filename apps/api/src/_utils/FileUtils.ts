@@ -30,7 +30,7 @@ export class FileUtils {
     const content = this.readFile(fileName);
     try {
       return JSON.parse(content) as T;
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to parse JSON file ${fileName}: ${error.message}`);
     }
   }

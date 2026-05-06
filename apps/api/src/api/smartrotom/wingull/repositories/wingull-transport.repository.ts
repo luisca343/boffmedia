@@ -24,7 +24,7 @@ export class WingullTransportRepository implements IWingullTransportRepository {
         },
       );
       return response.data.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to get taxi stops:', error);
       throw new Error(`Taxi stops retrieval failed: ${error.message}`);
     }
@@ -52,7 +52,7 @@ export class WingullTransportRepository implements IWingullTransportRepository {
         },
       );
       return response.data.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error(
         `Failed to teleport player ${request.uuid} to stop ${request.id}:`,
         error,

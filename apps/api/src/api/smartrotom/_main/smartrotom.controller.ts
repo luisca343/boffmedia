@@ -4,6 +4,7 @@ import { Body, Controller, Get, Post, HttpStatus, UseInterceptors } from '@nestj
 import { TeleportPlayerDto } from '../_dto/teleport-player.dto';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { WingullFacadeService } from '../wingull/wingull.facade.service';
+import { ArceuSpeakEntity } from './entities/arceuspeak.entity';
 
 export class ParticipanteCarreraDto {
   uuid: string;
@@ -46,7 +47,7 @@ export class SmartrotomController {
 
   @Get('arceuspeak')
   @ApiOperation({ summary: 'Get Arceuspeak available characters' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Characters retrieved successfully.' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Characters retrieved successfully.', type: ArceuSpeakEntity, isArray: true })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve characters.' })
   async getArceuspeak() {
     return await this.smartrotomService.getArceuspeak();

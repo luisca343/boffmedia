@@ -46,7 +46,7 @@ export class ConfigService {
       this.validateConfig(config);
 
       return config;
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof SyntaxError) {
         throw new Error(`Invalid JSON in config file for NPC: ${npcConfigName}`);
       }
@@ -73,7 +73,7 @@ export class ConfigService {
       }
 
       return configNames.sort();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error reading config directories:', error);
       return [];
     }
@@ -104,7 +104,7 @@ export class ConfigService {
 
       // Write config file
       await fsPromises.writeFile(configPath, JSON.stringify(config, null, 2), 'utf8');
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to create config for NPC: ${npcConfigName}. ${error.message}`);
     }
   }
@@ -130,7 +130,7 @@ export class ConfigService {
       if (fs.existsSync(configDir)) {
         await fsPromises.rm(configDir, { recursive: true, force: true });
       }
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to delete config for NPC: ${npcConfigName}. ${error.message}`);
     }
   }
