@@ -247,7 +247,6 @@ function MangaLibraryInner() {
   // Store
   const library = useMangaStore((s) => s.library);
    const setLibrary = useMangaStore((s) => s.setLibrary);
-   const clearLibraryCache = useMangaStore((s) => s.clearLibraryCache);
    const clearSelectionsForSeries = useMangaStore((s) => s.clearSelectionsForSeries);
    const clearChapterPagesForSeries = useMangaStore((s) => s.clearChapterPagesForSeries);
   const chapterPagesMap = useMangaStore((s) => s.chapterPages);
@@ -451,6 +450,12 @@ function MangaLibraryInner() {
   }, [selectedChapters, selectedSeries, chapterPagesMap, pageSelections]);
 
   // ── Export bar (portalled to body) ───────────────────────────────────────────
+  const allEpubOnly = selectedSeries !== null && selectedChapters.size > 0 &&
+    [...selectedChapters].every((slug) => {
+      const ch = selectedSeries.chapters.find((c) => c.slug === slug);
+      return ch && ch.hasEpub && !ch.hasCbz && !converted.get(selectedSeries.slug)?.has(slug);
+    });
+
   const exportBar = exportSummary && portalTarget
     ? createPortal(
         <div className="fixed bottom-0 left-0 right-0 z-[9999] flex justify-center pointer-events-none">
@@ -525,8 +530,8 @@ function MangaLibraryInner() {
                 className="shrink-0"
               >
                 {bulk && !bulk.finished
-                  ? <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />Exportando…</>
-                  : <><FileText className="w-3.5 h-3.5 mr-1.5" />Exportar EPUB</>}
+                  ? <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />Procesando…</>
+                  : <><FileText className="w-3.5 h-3.5 mr-1.5" />{allEpubOnly ? "Actualizar EPUB" : "Exportar EPUB"}</>}
               </Button>
             </div>
 

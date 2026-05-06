@@ -99,8 +99,8 @@ export class MangaEditorService {
     includeCover?: boolean,
     metadata?: EpubMetadata,
   ): Promise<{ outputPath: string }> {
-    const cbzPath = this.resolveCbz(series, chapter);
-    const zip = this.openArchive(cbzPath);
+    const archivePath = this.resolveArchive(series, chapter);
+    const zip = this.openArchive(archivePath);
     const entries = sortedImageEntries(zip);
 
     const excluded = new Set(excludePages);
