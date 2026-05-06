@@ -24,6 +24,8 @@ export type MangaStore = {
   togglePage: (chapterId: string, page: number) => void;
   setPages: (chapterId: string, pages: number[]) => void;
   resetSelections: () => void;
+  clearSelectionsForSeries: (seriesSlug: string) => void;
+  clearChapterPagesForSeries: (seriesSlug: string) => void;
 };
 
 export const useMangaStore = create<MangaStore>()(
@@ -60,7 +62,29 @@ export const useMangaStore = create<MangaStore>()(
       },
       setPages: (chapterId, pages) =>
         set({ pageSelections: { ...get().pageSelections, [chapterId]: pages } }),
-      resetSelections: () => set({ pageSelections: {} }),
+       resetSelections: () => set({ pageSelections: {} }),
+       clearSelectionsForSeries: (seriesSlug) => {
+         const lib = get().library;
+         if (!lib) return;
+         const targetSeries = lib.series.find((s) => s.slug === seriesSlug);
+         if (!targetSeries) return;
+         const curSelections = { ...get().pageSelections };
+         for (const chapter of targetSeries.chapters) {
+           delete curSelections[chapter.slug];
+         }
+         set({ pageSelections: curSelections });
+       },
+       clearChapterPagesForSeries: (seriesSlug) => {
+         const lib = get().library;
+         if (!lib) return;
+         const targetSeries = lib.series.find((s) => s.slug === seriesSlug);
+         if (!targetSeries) return;
+         const curPages = { ...get().chapterPages };
+         for (const chapter of targetSeries.chapters) {
+           delete curPages[chapter.slug];
+         }
+         set({ chapterPages: curPages });
+       },
     }),
     {
       name: "manga-store",
