@@ -1,5 +1,5 @@
-import MangaLibrary from "./_components/MangaLibrary";
+import { redirect } from 'next/navigation';
 
 export default function MangaLibraryPage() {
-  return <MangaLibrary />;
+  redirect('/admin?section=manga-library');
 }

@@ -9,6 +9,8 @@ import { MangaLibraryService } from './services/manga/manga-library.service';
 import { MangaDownloadService } from './services/manga/manga-download.service';
 import { MangaScraperService } from './services/manga.service';
 import { MangaEditorService } from './services/manga/manga-editor.service';
+import { MangaConfigService } from './services/manga/manga-config.service';
+import { MangaCronService } from './services/manga/manga-cron.service';
 import { ScrapeFacadeService } from './scrape.facade.service';
 import { ScrapeController } from './scrape.controller';
 
@@ -20,6 +22,8 @@ import { ScrapeController } from './scrape.controller';
   controllers: [ScrapeController],
   providers: [
     MyrientScrapeService,
+    // Manga config (no dependencies — must come first)
+    MangaConfigService,
     // Manga sub-services (ordered by dependency)
     MangaBrowserService,
     MangaScraperRegistry,
@@ -27,6 +31,7 @@ import { ScrapeController } from './scrape.controller';
     MangaDownloadService,
     MangaScraperService,
     MangaEditorService,
+    MangaCronService,
     ScrapeFacadeService,
   ],
   exports: [ScrapeFacadeService],

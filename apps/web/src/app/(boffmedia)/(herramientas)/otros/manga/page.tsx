@@ -1,5 +1,5 @@
-import MangaDownloader from './_components/MangaDownloader';
+import { redirect } from 'next/navigation';
 
 export default function MangaPage() {
-  return <MangaDownloader />;
+  redirect('/admin?section=manga-downloader');
 }
