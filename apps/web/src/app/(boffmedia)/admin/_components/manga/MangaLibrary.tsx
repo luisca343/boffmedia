@@ -188,7 +188,10 @@ function MangaLibraryInner() {
 
     for (const ch of chapters) {
       setBulk((prev) => prev ? { ...prev, currentSlug: ch.slug } : prev);
-      const excludePages = buildExcludePages(ch.imageCount, removeFirst, removeLast);
+      // Merge "remove first/last" and individually discarded pages for this chapter
+      const userExcluded = new Set([...(pageSelections[ch.slug] ?? [])]);
+      for (const idx of buildExcludePages(ch.imageCount, removeFirst, removeLast)) userExcluded.add(idx);
+      const excludePages = Array.from(userExcluded);
       const res = await ScrapeService.convertMangaChapter(
         selectedSeries.slug, ch.slug, excludePages, includeCoverBulk,
         seriesMetadata[selectedSeries.slug],
