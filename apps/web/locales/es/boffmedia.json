@@ -150,6 +150,7 @@
     },
     "mangaLibrary": {
       "title": "Biblioteca de Manga",
+      "subtitle": "Gestiona y convierte tus descargas de manga",
       "allSeries": "Todas las series",
       "chapters": "capítulos",
       "pages": "páginas",
