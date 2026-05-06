@@ -85,6 +85,18 @@ export interface SearchLocalGamesResult {
 
 // ── Manga types ───────────────────────────────────────────────────────────────
 
+export interface EpubMetadata {
+  title?: string;
+  language?: string;
+  author?: string;
+  authorSort?: string;
+  illustrator?: string;
+  illustratorSort?: string;
+  publisher?: string;
+  date?: string;
+  subjects?: string[];
+}
+
 export interface MangaSearchResult {
   title: string;
   url: string;
@@ -304,10 +316,10 @@ export class ScrapeService {
     return `${apiUrl}/boffmedia/herramientas/scrape/manga/chapter-image?${params}`;
   }
 
-  static convertMangaChapter(series: string, chapter: string, excludePages: number[], includeCover?: boolean) {
+  static convertMangaChapter(series: string, chapter: string, excludePages: number[], includeCover?: boolean, metadata?: EpubMetadata) {
     return apiPOST<{ outputPath: string }>(
       '/boffmedia/herramientas/scrape/manga/convert-chapter',
-      { series, chapter, excludePages, includeCover },
+      { series, chapter, excludePages, includeCover, metadata },
     );
   }
 }

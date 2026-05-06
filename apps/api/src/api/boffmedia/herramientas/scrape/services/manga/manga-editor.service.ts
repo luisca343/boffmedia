@@ -5,7 +5,7 @@ import * as path from 'path';
 import AdmZip from 'adm-zip';
 import { ChapterPageInfo } from './manga.types';
 import { MANGA_ROOT } from './manga-constants';
-import { buildEpub } from './manga-epub.builder';
+import { buildEpub, type EpubMetadata } from './manga-epub.builder';
 
 const IMAGE_RE = /\.(webp|jpg|jpeg|png|gif)$/i;
 
@@ -83,6 +83,7 @@ export class MangaEditorService {
     chapter: string,
     excludePages: number[],
     includeCover?: boolean,
+    metadata?: EpubMetadata,
   ): Promise<{ outputPath: string }> {
     const cbzPath = this.resolveCbz(series, chapter);
     const zip = this.openArchive(cbzPath);
@@ -120,6 +121,7 @@ export class MangaEditorService {
         chapterTitle: chapter,
         chapterNumber: parseFloat(chapter) || null,
         includeCover,
+        metadata,
       });
     } finally {
       await rm(tempDir, { recursive: true, force: true });

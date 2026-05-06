@@ -300,7 +300,7 @@ export class ScrapeController {
   @ApiOperation({ summary: 'Convert a CBZ chapter to EPUB, optionally excluding pages' })
   @ApiResponse({ status: HttpStatus.CREATED, description: 'EPUB created. Returns output path.' })
   async convertChapter(
-    @Body() body: { series: string; chapter: string; excludePages?: number[]; includeCover?: boolean },
+    @Body() body: { series: string; chapter: string; excludePages?: number[]; includeCover?: boolean; metadata?: import('./services/manga/manga-epub.builder').EpubMetadata },
   ): Promise<{ outputPath: string }> {
     if (!body.series?.trim()) throw new BadRequestException('series is required');
     if (!body.chapter?.trim()) throw new BadRequestException('chapter is required');
@@ -309,6 +309,7 @@ export class ScrapeController {
       body.chapter,
       body.excludePages ?? [],
       body.includeCover,
+      body.metadata,
     );
   }
 }
