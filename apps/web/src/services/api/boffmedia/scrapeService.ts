@@ -1,4 +1,4 @@
-import { apiGET, apiPATCH } from '@/services/boffAPI';
+import { apiGET, apiPATCH, apiPOST } from '@/services/boffAPI';
 
 export interface GameFileEntry {
   name: string;
