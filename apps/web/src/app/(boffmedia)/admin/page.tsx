@@ -2,7 +2,7 @@
 
 import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Gamepad2, Calendar, Users, Award, CreditCard, BarChart2 } from "lucide-react";
+import { Gamepad2, Calendar, Users, Award, CreditCard, BarChart2, Download, Library, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useBoffSession } from "../../../services/useBoffSession";
 import UnauthorizedPage from "../_components/Unauthorized";
@@ -12,9 +12,11 @@ import { TeamsTab } from "./events/_components/teams/TeamsTab";
 import { AchievementsTab } from "./events/_components/achievements/AchievementsTab";
 import { TcgpScraper } from "./_components/tools/TcgpScraper";
 import { VgcMetaPanel } from "./_components/tools/VgcMetaPanel";
+import MangaDownloader from "./_components/manga/MangaDownloader";
+import MangaLibrary from "./_components/manga/MangaLibrary";
+import MangaConfig from "./_components/manga/MangaConfig";
 import { ToastContainer } from "react-toastify";
 import { USER_ROLES } from "@boffmedia/shared/roles";
-import "react-toastify/dist/ReactToastify.css";
 
 const NAV = [
   {
@@ -31,6 +33,14 @@ const NAV = [
     items: [
       { id: "tcgp",    label: "TCG Pocket", icon: CreditCard },
       { id: "vgc-meta", label: "VGC Meta",  icon: BarChart2  },
+    ],
+  },
+  {
+    label: "Manga",
+    items: [
+      { id: "manga-downloader", label: "Descargador", icon: Download  },
+      { id: "manga-library",    label: "Biblioteca",  icon: Library   },
+      { id: "manga-config",     label: "Config",      icon: Settings  },
     ],
   },
 ] as const;
@@ -133,7 +143,7 @@ function AdminContent() {
           {/* Desktop page title */}
           <div className="hidden md:block">
             {(() => {
-              const active = NAV.flatMap((g) => g.items).find((i) => i.id === section);
+              const active = NAV.flatMap((g) => g.items as readonly { id: SectionId; label: string; icon: typeof Gamepad2 }[]).find((i) => i.id === section);
               const ActiveIcon = active?.icon;
               return (
                 <div className="flex items-center gap-2">
@@ -147,12 +157,15 @@ function AdminContent() {
 
         {/* Content */}
         <div className="p-6">
-          {section === "games"        && <GamesTab />}
-          {section === "events"       && <EventsTab />}
-          {section === "teams"        && <TeamsTab />}
-          {section === "achievements" && <AchievementsTab />}
-          {section === "tcgp"         && <TcgpScraper />}
-          {section === "vgc-meta"     && <VgcMetaPanel />}
+          {section === "games"             && <GamesTab />}
+          {section === "events"            && <EventsTab />}
+          {section === "teams"             && <TeamsTab />}
+          {section === "achievements"      && <AchievementsTab />}
+          {section === "tcgp"              && <TcgpScraper />}
+          {section === "vgc-meta"          && <VgcMetaPanel />}
+          {section === "manga-downloader"  && <MangaDownloader />}
+          {section === "manga-library"     && <MangaLibrary />}
+          {section === "manga-config"      && <MangaConfig />}
         </div>
       </main>
 

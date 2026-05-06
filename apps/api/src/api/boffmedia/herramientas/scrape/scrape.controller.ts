@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, HttpStatus, Patch, Post, Query, Res, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, HttpStatus, Param, Patch, Post, Query, Res, UseInterceptors } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiQuery, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { Response } from 'express';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
@@ -311,5 +311,42 @@ export class ScrapeController {
       body.includeCover,
       body.metadata,
     );
+  }
+
+  // ==================== MANGA CONFIG ====================
+
+  @Get('manga/config')
+  @ApiOperation({ summary: 'Get manga admin config (cron settings + series status)' })
+  @ApiResponse({ status: HttpStatus.OK })
+  getMangaConfig() {
+    return this.scrapeFacadeService.getMangaConfig();
+  }
+
+  @Patch('manga/config')
+  @ApiOperation({ summary: 'Update manga admin config (cron enable/disable + schedule)' })
+  @ApiResponse({ status: HttpStatus.OK })
+  async updateMangaConfig(
+    @Body() body: { cron?: { enabled?: boolean; schedule?: string } },
+  ) {
+    return this.scrapeFacadeService.updateMangaConfig(body);
+  }
+
+  @Patch('manga/series/:slug/status')
+  @ApiOperation({ summary: 'Update the status of a tracked manga series' })
+  @ApiResponse({ status: HttpStatus.OK })
+  async updateSeriesStatus(
+    @Param('slug') slug: string,
+    @Body() body: { status: 'ongoing' | 'completed' | 'hiatus' },
+  ) {
+    if (!slug?.trim()) throw new BadRequestException('slug is required');
+    if (!body.status) throw new BadRequestException('status is required');
+    return this.scrapeFacadeService.updateSeriesStatus(slug, body.status);
+  }
+
+  @Post('manga/cron/run')
+  @ApiOperation({ summary: 'Manually trigger the manga auto-update cron task' })
+  @ApiResponse({ status: HttpStatus.CREATED })
+  async runMangaCron() {
+    return this.scrapeFacadeService.runMangaCron();
   }
 }
