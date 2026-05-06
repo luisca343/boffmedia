@@ -67,7 +67,7 @@ export class UploadController {
 
             await mkdir(uploadPath, { recursive: true });
             callback(null, uploadPath);
-          } catch (error) {
+          } catch (error: any) {
             callback(error, "");
           }
         },
@@ -81,7 +81,7 @@ export class UploadController {
               const generatedFilename = `${Date.now()}-${Math.round(Math.random() * 1e9)}${extname(file.originalname)}`;
               callback(null, generatedFilename);
             }
-          } catch (error) {
+          } catch (error: any) {
             callback(error, "");
           }
         },
@@ -145,7 +145,7 @@ export class UploadController {
 
             await mkdir(uploadPath, { recursive: true });
             callback(null, uploadPath);
-          } catch (error) {
+          } catch (error: any) {
             callback(error, "");
           }
         },
@@ -159,7 +159,7 @@ export class UploadController {
               const generatedFilename = `${Date.now()}-${Math.round(Math.random() * 1e9)}${extname(file.originalname)}`;
               callback(null, generatedFilename);
             }
-          } catch (error) {
+          } catch (error: any) {
             callback(error, "");
           }
         },

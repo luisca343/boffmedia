@@ -1,5 +1,6 @@
 import { withAuth } from "next-auth/middleware"
 import { NextResponse } from "next/server"
+import { USER_ROLES } from "@boffmedia/shared/roles"
 
 export default withAuth(
   function middleware(req) {
@@ -7,7 +8,7 @@ export default withAuth(
     const path = req.nextUrl.pathname
 
     // Example: Protect admin routes
-    if (path.startsWith("/admin") && !token?.roles?.includes("ADMIN")) {
+    if (path.startsWith("/admin") && !token?.roles?.includes(USER_ROLES.BOFF_ADMIN)) {
       return NextResponse.redirect(new URL("/auth/unauthorized", req.url))
     }
 

@@ -19,13 +19,14 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "generate": "drizzle-kit generate",
-    "migrate": "drizzle-kit migrate",
-    "push": "drizzle-kit push",
+    "generate": "node ../../node_modules/drizzle-kit/bin.cjs generate",
+    "migrate": "node ../../node_modules/drizzle-kit/bin.cjs migrate",
+    "push": "node ../../node_modules/drizzle-kit/bin.cjs push",
     "generate-api": "openapi --input http://localhost:34301/api-json --output ./src/generated/api --client axios",
     "generate:models": "openapi --input http://localhost:34301/api-json --output ./src/generated --exportModels true --exportServices false --exportCore false",
     "generate:shared": "openapi --input http://localhost:34301/api-json --output ../../packages/shared/src --exportModels true --exportServices false --exportCore false",
-    "fix-pnpm": "powershell -ExecutionPolicy Bypass -File ./fix-pnpm.ps1"
+    "fix-pnpm": "powershell -ExecutionPolicy Bypass -File ./fix-pnpm.ps1",
+    "convert-mod": "node ../../node_modules/ts-node/dist/bin.js -P scripts/convert-showdown-mod/tsconfig.json scripts/convert-showdown-mod/index.ts"
   },
   "dependencies": {
     "@boffmedia/shared": "workspace:*",
@@ -48,6 +49,7 @@
     "@nestjs/typeorm": "^11.0.0",
     "@nestjs/websockets": "^11.1.6",
     "@noble/ciphers": "^2.2.0",
+    "@smogon/calc": "^0.10.0",
     "@pkmn/client": "^0.7.0",
     "@pkmn/data": "^0.10.7",
     "@pkmn/img": "^0.2.40",

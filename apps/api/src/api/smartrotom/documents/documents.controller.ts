@@ -1,6 +1,10 @@
-import { Body, Controller, Get, Param, Post, Put, Delete, HttpStatus, UseInterceptors, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Delete, HttpStatus, Query, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery, ApiBody } from '@nestjs/swagger';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
+import { Roles } from '@api/_utils/decorators/roles.decorator';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { DocumentsFacadeService, CreateNoteWithUserRequest } from './documents.facade.service';
 import { CreateNewsRequest, UpdateNewsRequest } from './services/news.service';
 import { CreateDocumentRequest, UpdateDocumentRequest } from './services/document.service';
@@ -247,6 +251,8 @@ export class DocumentsController {
   }
 
   @Post('news')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.ROTOM_ADMIN, USER_ROLES.ROTOM_FURRET)
   @ApiOperation({ summary: 'Create new news' })
   @ApiResponse({ status: HttpStatus.CREATED, description: 'News created successfully.', type: News })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid news data.' })
@@ -267,6 +273,8 @@ export class DocumentsController {
   }
 
   @Put('news/:newsId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.ROTOM_ADMIN, USER_ROLES.ROTOM_FURRET)
   @ApiOperation({ summary: 'Update news' })
   @ApiResponse({ status: HttpStatus.OK, description: 'News updated successfully.', type: News })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'News not found.' })
@@ -295,6 +303,8 @@ export class DocumentsController {
   }
 
   @Delete('news/:newsId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.ROTOM_ADMIN, USER_ROLES.ROTOM_FURRET)
   @ApiOperation({ summary: 'Delete news' })
   @ApiResponse({ status: HttpStatus.OK, description: 'News deleted successfully.', type: SuccessResponse })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'News not found.' })
@@ -308,6 +318,8 @@ export class DocumentsController {
   }
 
   @Post('newsstatus')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.ROTOM_ADMIN, USER_ROLES.ROTOM_FURRET)
   @ApiOperation({ summary: 'Update news status (published and featured)' })
   @ApiResponse({ status: HttpStatus.OK, description: 'News status updated successfully.', type: SuccessResponse })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid status data.' })

@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq, and, isNull } from 'drizzle-orm';
+import { eq, and, isNull, or } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/mysql-core';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { boffMediaEvents, boffMediaGames, Event } from '@/_db/schema/Events';
@@ -46,8 +46,8 @@ export class EventsRepository {
       .leftJoin(boffMediaGames, eq(boffMediaGames.id, boffMediaEvents.gameId))
       .leftJoin(parentEvent, eq(parentEvent.id, boffMediaEvents.parentId))
       .where(and(
-        isNull(boffMediaEvents.deletedAt), 
-        isNull(boffMediaGames.deletedAt)
+        isNull(boffMediaEvents.deletedAt),
+        or(isNull(boffMediaEvents.gameId), isNull(boffMediaGames.deletedAt))
       ));
   }
 
@@ -65,7 +65,7 @@ export class EventsRepository {
       .where(and(
         eq(boffMediaEvents.id, id), 
         isNull(boffMediaEvents.deletedAt),
-        isNull(boffMediaGames.deletedAt)
+        or(isNull(boffMediaEvents.gameId), isNull(boffMediaGames.deletedAt))
       ));
 
     return result.length ? result[0] : null;
@@ -85,7 +85,7 @@ export class EventsRepository {
       .where(and(
         eq(boffMediaEvents.parentId, parentId), 
         isNull(boffMediaEvents.deletedAt),
-        isNull(boffMediaGames.deletedAt)
+        or(isNull(boffMediaEvents.gameId), isNull(boffMediaGames.deletedAt))
       ));
   }
 

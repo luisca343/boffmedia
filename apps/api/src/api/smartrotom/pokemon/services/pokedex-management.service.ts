@@ -98,7 +98,7 @@ export class PokedexManagementService {
           message: 'Pokemon already registered with this status'
         };
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to register pokemon:', error);
       return {
         success: false,
@@ -200,7 +200,7 @@ export class PokedexManagementService {
         message: 'Pokedex updated successfully',
         results
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to bulk update pokedex:', error);
       return {
         success: false,
@@ -218,7 +218,7 @@ export class PokedexManagementService {
     try {
       const totalPokemonCount = this.pokemonDataService.countPokemon();
       return await this.pokemonRepository.getPokedexStatistics(uuid, totalPokemonCount);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to get pokedex statistics for ${uuid}:`, error);
       throw new Error(`Pokedex statistics retrieval failed: ${error.message}`);
     }
@@ -268,7 +268,7 @@ export class PokedexManagementService {
         missingSeenForms: totalForms - seenPokemon.size,
         missingCaughtForms: totalForms - caughtPokemon.size,
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to get detailed pokedex status for ${uuid}:`, error);
       throw new Error(`Detailed pokedex status retrieval failed: ${error.message}`);
     }
@@ -288,7 +288,7 @@ export class PokedexManagementService {
           pokemonName
         };
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to get pokedex registries for ${uuid}:`, error);
       throw new Error(`Pokedex registries retrieval failed: ${error.message}`);
     }

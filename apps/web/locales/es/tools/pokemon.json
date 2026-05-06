@@ -2,6 +2,14 @@
   "pokemon": {
     "title": "Pokémon",
     "categories": {
+      "vgc": {
+        "name": "VGC",
+        "tools": {
+          "meta": "Análisis de Meta",
+          "speed": "Velocidad",
+          "tracker": "Tracker"
+        }
+      },
       "tcgpocket": {
         "name": "TCG Pocket",
         "tools": {
@@ -28,6 +36,15 @@
     "accessButton": "Acceder a {tool}",
     "explore": "Explorar",
     "tools": {
+      "vgc": {
+        "title": "VGC",
+        "description": "Análisis de meta, niveles de velocidad y tracker de partidas para VGC competitivo",
+        "features": {
+          "meta": "Análisis de Meta",
+          "speed": "Velocidad",
+          "tracker": "Tracker"
+        }
+      },
       "tcgpocket": {
         "title": "TCG Pocket",
         "description": "Colección, galerías y guía para TCG Pocket",

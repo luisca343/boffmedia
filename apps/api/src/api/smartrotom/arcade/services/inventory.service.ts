@@ -177,7 +177,7 @@ export class InventoryService {
         remainingAmount: updatedItem.remainingAmount || updatedItem.amount,
         totalRemaining
       };
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof NotFoundException) {
         throw error;
       }

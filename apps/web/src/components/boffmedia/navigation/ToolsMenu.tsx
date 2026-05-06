@@ -1,12 +1,14 @@
 import { FaSteam } from 'react-icons/fa'
 import { CustomDropdownMenu, MenuSectionProps } from './DropdownMenu'
-import { 
-  Gamepad2, 
-  Swords, 
-  Cpu, 
-  Gift, 
+import {
+  Gamepad2,
+  Swords,
+  Cpu,
+  Gift,
+  BarChart2,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { USER_ROLES } from '@boffmedia/shared/roles'
 
 export function ToolsMenu() {
   const t = useTranslations('nav.menus.tools')
@@ -36,15 +38,21 @@ export function ToolsMenu() {
         href: "/pokemon", // Added href to make the section title clickable
         icon: <Gamepad2 className="h-4 w-4" />, // Added icon for section
         items: [
-          { 
-            href: "/pokemon/pmdsky", 
-            label: t("sections.pokemon.items.pmdsky.label"), 
+          {
+            href: "/pokemon/vgc/meta",
+            label: t("sections.pokemon.items.vgc.label"),
+            description: t("sections.pokemon.items.vgc.description"),
+            icon: <BarChart2 className="h-5 w-5" />
+          },
+          {
+            href: "/pokemon/pmdsky",
+            label: t("sections.pokemon.items.pmdsky.label"),
             description: t("sections.pokemon.items.pmdsky.description"),
             icon: <Gamepad2 className="h-5 w-5" />
           },
-          { 
-            href: "/pokemon/tcgpocket", 
-            label: t("sections.pokemon.items.tcgpocket.label"), 
+          {
+            href: "/pokemon/tcgpocket",
+            label: t("sections.pokemon.items.tcgpocket.label"),
             description: t("sections.pokemon.items.tcgpocket.description"),
             icon: <Swords className="h-5 w-5" />
           },
@@ -75,7 +83,7 @@ export function ToolsMenu() {
             label: t("sections.gaming.items.steamKeys.label"), 
             description: t("sections.gaming.items.steamKeys.description"),
             icon: <FaSteam className="h-5 w-5" />,
-            roles: ["BOFF_ADMIN"]
+            roles: [USER_ROLES.BOFF_ADMIN]
           },
           { 
             href: "/otros/sorteos", 

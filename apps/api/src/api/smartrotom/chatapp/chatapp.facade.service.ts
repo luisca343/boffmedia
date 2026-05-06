@@ -31,7 +31,7 @@ export class ChatappFacadeService {
   async createChat(createChatRequest: CreateChatRequest): Promise<number> {
     try {
       return await this.chatService.createChat(createChatRequest);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating chat:', error);
       throw new Error(`Failed to create chat: ${error.message}`);
     }
@@ -40,7 +40,7 @@ export class ChatappFacadeService {
   async getChats(uuid: string): Promise<Group[]> {
     try {
       return await this.groupService.getUserGroups(uuid);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting chats for user ${uuid}:`, error);
       throw new Error(`Failed to retrieve chats: ${error.message}`);
     }
@@ -49,7 +49,7 @@ export class ChatappFacadeService {
   async getChatById(chatId: number, requestingUserUuid: string): Promise<Group> {
     try {
       return await this.groupService.getGroupById(chatId, requestingUserUuid);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting chat ${chatId}:`, error);
       throw new Error(`Failed to retrieve chat: ${error.message}`);
     }
@@ -60,7 +60,7 @@ export class ChatappFacadeService {
   async getMessages(chatId: number): Promise<RotomMessage[]> {
     try {
       return await this.messageService.getMessages(chatId);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting messages for chat ${chatId}:`, error);
       throw new Error(`Failed to retrieve messages: ${error.message}`);
     }
@@ -94,7 +94,7 @@ export class ChatappFacadeService {
       }
 
       return message;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error creating message in chat ${chatId}:`, error);
       throw new Error(`Failed to create message: ${error.message}`);
     }
@@ -115,7 +115,7 @@ export class ChatappFacadeService {
       await this.emitGlobalMessage(messageId, message, createMessageRequest);
 
       return message;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating global message:', error);
       throw new Error(`Failed to create global message: ${error.message}`);
     }
@@ -128,7 +128,7 @@ export class ChatappFacadeService {
   ): Promise<RotomMessage> {
     try {
       return await this.messageService.updateMessage(messageId, content, senderUuid);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error updating message ${messageId}:`, error);
       throw new Error(`Failed to update message: ${error.message}`);
     }
@@ -141,7 +141,7 @@ export class ChatappFacadeService {
         success: true,
         message: 'Message deleted successfully'
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error deleting message ${messageId}:`, error);
       throw new Error(`Failed to delete message: ${error.message}`);
     }
@@ -154,7 +154,7 @@ export class ChatappFacadeService {
         success: true,
         message: 'Message marked as read'
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error marking message ${messageId} as read:`, error);
       throw new Error(`Failed to mark message as read: ${error.message}`);
     }
@@ -173,7 +173,7 @@ export class ChatappFacadeService {
         success: true,
         message: 'Member added to group successfully'
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error adding member to group ${groupId}:`, error);
       throw new Error(`Failed to add member to group: ${error.message}`);
     }
@@ -190,7 +190,7 @@ export class ChatappFacadeService {
         success: true,
         message: 'Member removed from group successfully'
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error removing member from group ${groupId}:`, error);
       throw new Error(`Failed to remove member from group: ${error.message}`);
     }
@@ -206,7 +206,7 @@ export class ChatappFacadeService {
       await this.emitCallToChat(callSession);
 
       return callSession;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error initiating call in chat ${chatId}:`, error);
       throw new Error(`Failed to initiate call: ${error.message}`);
     }
@@ -222,7 +222,7 @@ export class ChatappFacadeService {
         date: new Date(),
         uuid: 'system'
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error ending call in chat ${chatId}:`, error);
       throw new Error(`Failed to end call: ${error.message}`);
     }
@@ -262,7 +262,7 @@ export class ChatappFacadeService {
           }
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error emitting message to chat:', error);
       // Don't throw error here as message was already saved
     }
@@ -291,7 +291,7 @@ export class ChatappFacadeService {
           });
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error emitting global message:', error);
     }
   }
@@ -316,7 +316,7 @@ export class ChatappFacadeService {
           }
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error emitting call to chat:', error);
       // Don't throw error here as call was already initialized
     }
@@ -325,7 +325,7 @@ export class ChatappFacadeService {
   private async getChatMembersForSocket(chatId: number, requestUuid: string): Promise<{ uuid: string }[]> {
     try {
       return await this.groupService.getGroupById(chatId, requestUuid).then(group => group.members);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error getting chat members for socket:', error);
       return [];
     }

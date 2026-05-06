@@ -106,7 +106,7 @@ export class RegistrationService {
         }
       };
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Registration failed:', error);
       return {
         success: false,
@@ -142,7 +142,7 @@ export class RegistrationService {
         name: data.name
       };
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error validating Minecraft username:', error);
       return null;
     }
@@ -205,7 +205,7 @@ export class RegistrationService {
         canRegister: true,
         message: 'Invite is valid for registration'
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to check registration eligibility for invite ${inviteId}:`, error);
       return {
         canRegister: false,

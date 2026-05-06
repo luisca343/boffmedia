@@ -11,7 +11,7 @@ export class WingullRepository {
       const query = 'SELECT * FROM worldguard_world';
       const [rows] = await this.wingullSQL2Service.query(query);
       return rows as { id: number; name: string }[];
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching WorldGuard worlds:', error);
       throw new Error('Failed to fetch WorldGuard worlds');
     }
@@ -47,7 +47,7 @@ export class WingullRepository {
             uuid: row.uuid,
         };
         });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error fetching players owned regions:', error);
         throw new Error('Failed to fetch players owned regions');
     }
@@ -82,7 +82,7 @@ async getAllPlots(): Promise<{ town: string; type: string; number: number; owner
           return null; // Explicitly return null for invalid entries
         })
         .filter(Boolean); // Remove null values
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching all plots:', error);
       throw new Error('Failed to fetch all plots');
     }

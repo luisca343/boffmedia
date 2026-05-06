@@ -65,7 +65,7 @@ export class InvitesRepository {
         success: false, 
         message: 'Failed to create invite' 
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to create invite:', error);
       return { 
         success: false, 
@@ -82,7 +82,7 @@ export class InvitesRepository {
         .select(this.inviteSelect)
         .from(wingullInvites);
       return await query.execute();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to get all invites:', error);
       throw new Error(`Invites retrieval failed: ${error.message}`);
     }
@@ -97,7 +97,7 @@ export class InvitesRepository {
         .execute();
 
       return result.length > 0 ? result[0] : null;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to find invite ${id}:`, error);
       throw new Error(`Invite lookup failed: ${error.message}`);
     }
@@ -116,7 +116,7 @@ export class InvitesRepository {
         .execute();
 
       return result.length > 0 ? result[0] : null;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to find active invite ${id}:`, error);
       throw new Error(`Active invite lookup failed: ${error.message}`);
     }
@@ -129,7 +129,7 @@ export class InvitesRepository {
         .from(wingullInvites)
         .where(eq(wingullInvites.uuid, uuid))
         .execute();
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to find invites for UUID ${uuid}:`, error);
       throw new Error(`UUID invites lookup failed: ${error.message}`);
     }
@@ -142,7 +142,7 @@ export class InvitesRepository {
         .from(wingullInvites)
         .where(eq(wingullInvites.username, username))
         .execute();
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to find invites for username ${username}:`, error);
       throw new Error(`Username invites lookup failed: ${error.message}`);
     }
@@ -166,7 +166,7 @@ export class InvitesRepository {
         success: false, 
         message: 'No invite found to update' 
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to update invite ${id}:`, error);
       return { 
         success: false, 
@@ -178,7 +178,7 @@ export class InvitesRepository {
   async markInviteAsUsed(id: string): Promise<{ success: boolean; message?: string }> {
     try {
       return await this.updateInvite(id, { usedAt: new Date() });
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to mark invite ${id} as used:`, error);
       return { 
         success: false, 
@@ -190,7 +190,7 @@ export class InvitesRepository {
   async markInviteAsDeleted(id: string): Promise<{ success: boolean; message?: string }> {
     try {
       return await this.updateInvite(id, { deletedAt: new Date() });
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to mark invite ${id} as deleted:`, error);
       return { 
         success: false, 
@@ -216,7 +216,7 @@ export class InvitesRepository {
         success: false, 
         message: 'No invite found to delete' 
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to delete invite ${id}:`, error);
       return { 
         success: false, 
@@ -231,7 +231,7 @@ export class InvitesRepository {
     try {
       const invite = await this.findInviteById(id);
       return !!invite;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to check invite existence ${id}:`, error);
       return false;
     }
@@ -241,7 +241,7 @@ export class InvitesRepository {
     try {
       const invite = await this.findActiveInviteById(id);
       return !!invite;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to check invite active status ${id}:`, error);
       return false;
     }
@@ -255,7 +255,7 @@ export class InvitesRepository {
         .execute();
 
       return result[0].count;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to get invite count:', error);
       return 0;
     }
@@ -273,7 +273,7 @@ export class InvitesRepository {
         .execute();
 
       return result[0].count;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to get active invite count:', error);
       return 0;
     }
@@ -291,7 +291,7 @@ export class InvitesRepository {
         .execute();
 
       return result[0].count;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to get used invite count:', error);
       return 0;
     }

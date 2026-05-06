@@ -29,7 +29,7 @@ export class MessageService {
           : message.content;
         
         parsedMessages.push(content);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error parsing message content:', error);
         // Skip malformed messages
       }
@@ -59,7 +59,7 @@ export class MessageService {
         return typeof message.content === 'string' 
           ? JSON.parse(message.content) 
           : message.content;
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error parsing message content for context:', error);
         return null;
       }

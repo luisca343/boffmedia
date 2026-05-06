@@ -156,7 +156,7 @@ export class PokemonImageService {
       }
       
       return '/smartrotom/packs/default_resourcepack/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png';
-    } catch (error) {
+    } catch (error: any) {
       return '/smartrotom/packs/default_resourcepack/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png';
     }
   }

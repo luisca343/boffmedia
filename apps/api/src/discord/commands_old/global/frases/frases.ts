@@ -25,7 +25,7 @@ async function execute(interaction, service: CommandsService) {
   
     try {
       await interaction.reply({ embeds: [embed], components: [row] });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error replying to interaction:', error);
     }
   }

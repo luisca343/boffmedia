@@ -143,7 +143,7 @@ import { ChatappFacadeService } from "@api/smartrotom/chatapp/chatapp.facade.ser
             }
           }
         })
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error broadcasting typing start:', error)
       }
     }
@@ -171,7 +171,7 @@ import { ChatappFacadeService } from "@api/smartrotom/chatapp/chatapp.facade.ser
             }
           }
         })
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error broadcasting typing stop:', error)
       }
     }

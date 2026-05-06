@@ -1,0 +1,523 @@
+{
+  "vgc": {
+    "speed": {
+      "title": "Speed",
+      "subtitle": "Speed tier reference and head-to-head matchup calculator",
+      "tabs": {
+        "tiers": "Tiers",
+        "matchup": "Matchup"
+      },
+      "modifiers": {
+        "title": "Modifiers",
+        "clear": "Clear all modifiers",
+        "boostTitle": "Speed stage {n}",
+        "tailwind": "Tailwind (×2 Speed)",
+        "tailwindShort": "Tailwind",
+        "scarf": "Choice Scarf (×1.5 Speed)",
+        "scarfShort": "Scarf",
+        "paralysis": "Paralysis (×0.5 Speed)",
+        "paralysisShort": "Para"
+      }
+    },
+    "speedTiers": {
+      "title": "Speed Tiers",
+      "subtitle": "Level 50 speed stats for legal Pokémon — sorted by base Speed",
+      "search": "Filter Pokémon...",
+      "highlightPlaceholder": "Highlight speed...",
+      "showingTier": "Showing {speed} speed tier",
+      "pokemonCount": "{count} Pokémon",
+      "loading": "Loading speed tiers...",
+      "error": "Failed to load speed tiers. Make sure the API is running.",
+      "empty": "No Pokémon found.",
+      "footer": "N = Neutral nature · + = +Speed nature · all calculations at level 50 · 31 IVs",
+      "legend": {
+        "restricted": "Restricted",
+        "mythical": "Mythical",
+        "highlighted": "Highlighted speed tier"
+      },
+      "badge": {
+        "restricted": "Restricted",
+        "restrictedTitle": "Restricted Legendary",
+        "mythical": "Mythical",
+        "mythicalTitle": "Mythical Pokémon"
+      },
+      "columns": {
+        "number": "#",
+        "pokemon": "Pokémon",
+        "base": "Base",
+        "baseTitle": "Base Speed stat",
+        "minNeutral": "0/N",
+        "minNeutralTitle": "0 EVs, Neutral nature",
+        "minPlus": "0/+",
+        "minPlusTitle": "0 EVs, +Speed nature",
+        "maxNeutral": "252/N",
+        "maxNeutralTitle": "252 EVs, Neutral nature",
+        "maxPlus": "252/+",
+        "maxPlusTitle": "252 EVs, +Speed nature",
+        "scarf": "Scarf",
+        "scarfTitle": "252 EVs, Choice Scarf",
+        "scarfPlus": "Scarf+",
+        "scarfPlusTitle": "252 EVs, +Speed, Choice Scarf",
+        "noScarf": "Cannot hold Choice Scarf"
+      },
+      "modifiers": {
+        "title": "Modifiers",
+        "clear": "Clear all modifiers",
+        "boostTitle": "Speed stage {n}",
+        "tailwind": "Tailwind (×2 Speed)",
+        "tailwindShort": "Tailwind",
+        "scarf": "Choice Scarf (×1.5 Speed)",
+        "scarfShort": "Scarf",
+        "paralysis": "Paralysis (×0.5 Speed)",
+        "paralysisShort": "Para"
+      },
+      "team": {
+        "title": "My Team",
+        "add": "Add to team",
+        "remove": "Remove from team",
+        "full": "Team is full (6 Pokémon)",
+        "clearTeam": "Clear team",
+        "filterToggle": "Outspeeds team"
+      },
+      "comparison": {
+        "faster": "Faster",
+        "slower": "Slower",
+        "tie": "Tie",
+        "column": "vs Team"
+      },
+      "reference": {
+        "title": "Your Reference",
+        "searchPlaceholder": "Pick a Pokémon...",
+        "customMode": "Custom",
+        "pokemonMode": "Pokémon",
+        "clearRef": "Clear",
+        "effectiveSpeed": "Effective Speed",
+        "evLabel": "EV / Nature",
+        "noRef": "Pick a Pokémon to see your speed position in the tier list"
+      },
+      "zones": {
+        "separator": "YOUR SPEED",
+        "fasterCount": "{count} faster",
+        "slowerCount": "{count} slower",
+        "tieCount": "{count} tie"
+      },
+      "expanded": {
+        "breakdown": "Speed Breakdown",
+        "vsRef": "vs you ({speed})",
+        "sendToMatchup": "Compare in Matchup",
+        "noRef": "Set a reference to compare speeds"
+      }
+    },
+    "speedComparison": {
+      "title": "Speed Comparison",
+      "subtitle": "Compare your team's speed against any opponent",
+      "opponentTitle": "Opponent",
+      "opponentSearch": "Search Pokémon...",
+      "opponentManual": "Or enter speed directly",
+      "opponentSpeedPlaceholder": "Speed stat...",
+      "opponentModifiers": "Opponent modifiers",
+      "effectiveSpeed": "Effective speed",
+      "myTeamTitle": "My Team",
+      "myTeamModifiers": "Team conditions",
+      "teamMemberName": "Name (optional)",
+      "teamMemberSpeed": "Speed stat",
+      "addMember": "Add slot",
+      "removeMember": "Remove",
+      "clearTeam": "Clear all",
+      "faster": "Faster",
+      "slower": "Slower",
+      "tie": "Tie",
+      "noOpponent": "Enter an opponent speed to compare",
+      "invalidSpeed": "Enter a valid speed stat",
+      "referenceSpeed": "Reference speeds",
+      "loading": "Loading Pokémon data...",
+      "empty": "No Pokémon found"
+    },
+    "tracker": {
+      "title": "VGC Tracker",
+      "subtitle": "Log your ranked matches",
+      "buttons": {
+        "presets": "Presets ({count})",
+        "newSession": "New session",
+        "newMatch": "New match",
+        "newSeries": "New series",
+        "importCsv": "Import CSV",
+        "importing": "Importing…",
+        "finish": "Finish",
+        "delete": "Delete",
+        "cancel": "Cancel",
+        "import": "Import",
+        "importFile": "Import {name}",
+        "importNewPreset": "Import new preset",
+        "startSession": "Start session",
+        "archive": "Archive",
+        "unarchive": "Unarchive",
+        "duplicate": "Duplicate",
+        "editPreset": "Edit",
+        "save": "Save",
+        "changePreset": "Change preset",
+        "exportSession": "Export session",
+        "exportAll": "Export all",
+        "importData": "Import data",
+        "restoreVersion": "Restore"
+      },
+      "labels": {
+        "sessionLabel": "Session label",
+        "presetName": "Preset name",
+        "regulation": "Regulation",
+        "format": "Format",
+        "startingElo": "Starting ELO",
+        "teamPreset": "Team preset",
+        "noPreset": "No preset",
+        "myTeam": "My team",
+        "opponent": "Opponent",
+        "startDate": "Start date & time",
+        "minsPerGame": "Minutes per game",
+        "showdownPaste": "Showdown paste",
+        "tournamentName": "Tournament name",
+        "limitlessTournament": "Link to Limitless tournament",
+        "optional": "optional",
+        "noTournamentLink": "None",
+        "noImportedTournaments": "No imported tournaments for this regulation yet"
+      },
+      "placeholders": {
+        "rivalName": "Rival name…",
+        "sessionLabel": "e.g. Ranked grind Apr 24",
+        "presetName": "e.g. Reg H — April 2025",
+        "typeName": "Type name…",
+        "addNote": "Add note... (Enter to save)",
+        "startingElo": "optional",
+        "tournamentName": "e.g. EUIC 2025"
+      },
+      "stats": {
+        "wins": "Wins",
+        "losses": "Losses",
+        "draws": "Draws",
+        "elo": "ELO"
+      },
+      "matchRow": {
+        "match": "Match #{number}",
+        "vs": "vs",
+        "noPicks": "No picks entered",
+        "noteSingular": "1 note",
+        "notesPlural": "{count} notes"
+      },
+      "tooltips": {
+        "deleteMatch": "Delete match",
+        "removeFromTeam": "Remove from team",
+        "removeFromSlot": "Remove from slot",
+        "assignSlot": "Click to assign to next open slot",
+        "slotsFull": "All 4 slots are full",
+        "assignedSlot": "{role} — click × in zone below to remove",
+        "pressKey": "Press {hint}",
+        "importCsv": "Import matches from CSV"
+      },
+      "modals": {
+        "newSession": "New Session",
+        "teamPresets": "Team Presets",
+        "importCsv": "Import CSV"
+      },
+      "indicators": {
+        "saved": "Saved",
+        "myElo": "My ELO",
+        "rival": "Rival",
+        "live": "LIVE",
+        "post": "POST"
+      },
+      "result": {
+        "winShort": "W",
+        "drawShort": "D",
+        "lossShort": "L"
+      },
+      "empty": {
+        "noSessions": "No sessions yet",
+        "noSessionsHint": "Import a team preset, then start a session.",
+        "noMatches": "No matches yet — start one!",
+        "noPresets": "No presets yet. Import a Showdown paste to get started.",
+        "noArchivedSessions": "No archived sessions"
+      },
+      "archive": {
+        "showArchived": "Show archived ({count})",
+        "hideArchived": "Hide archived",
+        "badge": "Archived"
+      },
+      "duplicate": {
+        "title": "Duplicate session",
+        "newLabel": "New label"
+      },
+      "exportImport": {
+        "title": "Data",
+        "exportSession": "Export session",
+        "exportAll": "Export all",
+        "importFile": "Import file",
+        "importHint": "Merges data, skips duplicates",
+        "importSuccess": "{sessions} sessions · {matches} matches imported",
+        "importError": "Invalid or corrupt file"
+      },
+      "preset": {
+        "editTitle": "Edit preset",
+        "versionHistory": "Version history",
+        "versionN": "v{n}",
+        "currentTag": "current",
+        "changeTitle": "Change active preset",
+        "activeLabel": "Active preset"
+      },
+      "sessionType": {
+        "ladder": "Ladder",
+        "tournament": "Tournament"
+      },
+      "tournament": {
+        "seriesWins": "Series W",
+        "seriesLosses": "Series L",
+        "gameRecord": "Game record",
+        "noSeries": "No series yet — start one!",
+        "round": "R{n}",
+        "allRounds": "All rounds",
+        "seriesNumber": "Series #{n}"
+      },
+      "errors": {
+        "presetNameRequired": "Give this preset a name.",
+        "invalidPaste": "Could not parse the paste. Check the format."
+      },
+      "outcomeTag": {
+        "label": "Outcome",
+        "skill": "Skill",
+        "misplay": "Misplay",
+        "luck": "Luck",
+        "disconnect": "Disconnect"
+      },
+      "turnCount": {
+        "label": "Turns"
+      },
+      "archetype": {
+        "label": "Archetype",
+        "placeholder": "e.g. Rain, HO, TR..."
+      },
+      "sessionNotes": {
+        "label": "Session notes",
+        "placeholder": "Notes about this session..."
+      },
+      "workspace": {
+        "roundPrefix": "R",
+        "game": "Game {n}",
+        "gameAbbr": "G{n}",
+        "endGame": "End game {n}",
+        "noGameData": "No game data.",
+        "previousGames": "Previous games"
+      },
+      "notes": {
+        "gameTab": "Game notes",
+        "seriesTab": "Series notes",
+        "noGameNotes": "No game notes yet",
+        "noSeriesNotes": "No series notes yet",
+        "phaseLive": "live",
+        "phasePost": "post",
+        "phaseSeries": "series",
+        "addSeriesPlaceholder": "Add series note… (Enter)"
+      },
+      "speedWidget": {
+        "label": "Speed Tiers",
+        "expand": "Show",
+        "collapse": "Hide",
+        "summary": "{count} mons · {min}-{max}",
+        "trickroom": "TR ↕",
+        "opponentSpeed": "Opponent Base Speed",
+        "opponentSpeedPlaceholder": "Enter opponent base speed...",
+        "presetHint": "Click a row to change EV preset"
+      },
+      "zones": {
+        "leads": "Leads",
+        "backs": "Backs"
+      },
+      "sessionStats": {
+        "tabs": {
+          "matches": "Matches",
+          "stats": "Stats"
+        },
+        "kpi": {
+          "played": "Played",
+          "winRate": "Win Rate",
+          "streak": "Streak",
+          "streakWin": "{count}W streak",
+          "streakLoss": "{count}L streak",
+          "eloNow": "Current ELO",
+          "eloBest": "Best",
+          "eloWorst": "Worst",
+          "avgDelta": "±ELO/game",
+          "bestStreak": "Best streak"
+        },
+        "chart": {
+          "title": "ELO Timeline",
+          "start": "Start",
+          "noData": "No completed matches yet"
+        },
+        "table": {
+          "pokemon": "Pokémon",
+          "uses": "Uses",
+          "brought": "Brought",
+          "discards": "Discards",
+          "record": "W/L/D",
+          "winRate": "WR",
+          "tournamentUsage": "Tournament %",
+          "noData": "No completed match data yet.",
+          "tabs": {
+            "myTeam": "My team",
+            "preview": "Opponent preview",
+            "leads": "Opp. leads",
+            "backs": "Opp. backs"
+          }
+        },
+        "leadPairs": {
+          "title": "Lead pairs",
+          "my": "My leads",
+          "opp": "Opponent leads",
+          "pair": "Pair",
+          "minGames": "≥{n} games",
+          "noData": "No lead data recorded yet.",
+          "noDataThreshold": "No pairs with {n}+ games. Try removing the filter."
+        },
+        "timeSlots": {
+          "title": "Time of day",
+          "morning": "Morning (6–11h)",
+          "afternoon": "Afternoon (12–20h)",
+          "evening": "Evening (21–23h)",
+          "night": "Night (0–6h)"
+        },
+        "regulationMeta": {
+          "title": "Regulation meta",
+          "matchCount": "{n} matches",
+          "noData": "No opponent data across this regulation yet."
+        },
+        "comparison": {
+          "title": "Compare sessions",
+          "clearAll": "Clear all",
+          "hint": "Select sessions above to overlay their ELO charts."
+        },
+        "heatmap": {
+          "title": "Activity heatmap",
+          "days": {
+            "sun": "Sun",
+            "mon": "Mon",
+            "tue": "Tue",
+            "wed": "Wed",
+            "thu": "Thu",
+            "fri": "Fri",
+            "sat": "Sat"
+          }
+        },
+        "matchupMatrix": {
+          "title": "Pair win rates",
+          "pair": "Pair",
+          "minGames": "≥{n} games",
+          "noData": "No pairs with enough games yet."
+        },
+        "archetypeBreakdown": {
+          "title": "vs Archetype",
+          "archetype": "Archetype"
+        }
+      }
+    },
+    "meta": {
+      "title": "Meta Analysis",
+      "subtitle": "Ladder usage & team composition data from Smogon Stats",
+      "tabs": {
+        "stats": "Stats",
+        "tournament": "Tournament",
+        "combined": "Combined",
+        "aggregate": "Usage",
+        "players": "Players",
+        "divergence": "Divergence",
+        "compare": "Compare",
+        "comingSoon": "Coming soon",
+        "previewBadge": "Preview",
+        "championsPreviewNotice": "Data sourced from VGCPastes (CSV export). This tab is a temporary preview — it will switch to official Smogon ladder stats once the Champions format is added to Pokémon Showdown."
+      },
+      "formats": {
+        "gen9vgc2026regi": "VGC 2026 Reg I",
+        "gen9vgc2026regh": "VGC 2026 Reg H",
+        "gen9vgc2025regg": "VGC 2026 Reg G",
+        "gen9vgc2025regf": "VGC 2026 Reg F"
+      },
+      "pickers": {
+        "format": "Format",
+        "month": "Month",
+        "monthPlaceholder": "Latest",
+        "cutoff": "Min ELO",
+        "load": "Apply"
+      },
+      "options": "Options",
+      "sidebar": {
+        "search": "Search Pokémon...",
+        "noResults": "No results"
+      },
+      "table": {
+        "rank": "#",
+        "pokemon": "Pokémon",
+        "usage": "Usage",
+        "item": "Item",
+        "move": "Move",
+        "tera": "Tera",
+        "loading": "Loading meta data...",
+        "empty": "No data found for this format and month.",
+        "error": "Failed to load meta data. Make sure the API is running."
+      },
+      "detail": {
+        "baseStats": "Base Stats",
+        "abilities": "Abilities",
+        "items": "Items",
+        "moves": "Moves",
+        "teraTypes": "Tera Types",
+        "teammates": "Teammates",
+        "spreads": "EV Spreads",
+        "close": "Close",
+        "loading": "Loading details...",
+        "backToList": "Back",
+        "notFound": "No data available for this Pokémon.",
+        "battles": "{count} battles",
+        "other": "Other",
+        "usagePercent": "{percent}% usage",
+        "featuringTeams": "Featuring Teams",
+        "teamsLoading": "Loading teams\u2026",
+        "copyPaste": "Copy Paste",
+        "copied": "Copied!",
+        "rentalCode": "Rental Code"
+      },
+      "standings": {
+        "loading": "Loading standings\u2026",
+        "empty": "No players found.",
+        "col": {
+          "rank": "#",
+          "player": "Player",
+          "record": "Record",
+          "team": "Team"
+        },
+        "teamLoading": "Loading\u2026",
+        "copyPaste": "Copy Pok\u00e9paste",
+        "copied": "Copied!",
+        "tera": "Tera: {type}"
+      },
+      "divergence": {
+        "loading": "Loading divergence data…",
+        "empty": "No divergence data. Import a tournament first.",
+        "selectTournament": "Select a regulation and tournament to view divergence.",
+        "rowCount": "{count} Pokémon",
+        "allElo": "All ELO",
+        "col": {
+          "pokemon": "Pokémon",
+          "ladder": "Ladder %",
+          "tournament": "Tourn. %",
+          "delta": "|Δ|",
+          "badge": "Badge"
+        },
+        "badges": {
+          "ladderTrap": "Ladder Trap",
+          "ladderTrapTitle": "High ladder usage, low tournament usage — may be overrated in top-cut",
+          "tournamentStaple": "Tournament Staple",
+          "tournamentStapleTitle": "Low ladder usage, high tournament usage — underrated on the ladder"
+        }
+      },
+      "refresh": "Refresh",
+      "footer": "Data from Smogon Stats · Updated monthly · Default cutoff: 1760"
+    }
+  }
+}

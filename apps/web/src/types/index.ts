@@ -1,5 +1,6 @@
 import { DefaultSession, DefaultUser } from "next-auth"
 import { SmartRotomApp, TaxiStop } from "@boffmedia/shared"
+import type { UserRole } from "@boffmedia/shared/roles"
 
 export type SmartRotomAppExtended = SmartRotomApp & { order?: number }
 
@@ -16,10 +17,12 @@ export interface BoffUser { //extends DefaultUser {
   email: string
   username: string
   mcUuid?: string
-  roles: string[]
+  roles: UserRole[]
   smartRotomUser?: SmartRotomUser
   discordId?: string
   image?: string | null
+  /** NestJS-signed JWT — use for Authorization: Bearer headers when calling guarded API endpoints */
+  accessToken?: string
 }
 
 declare module "next-auth" {

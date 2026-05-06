@@ -135,6 +135,48 @@ export async function DELETE<T>(url: string): Promise<ApiResponse<T>> {
   return request<T>("DELETE", url);
 }
 
+// ─── Authenticated requests (sends Authorization: Bearer <token>) ──────────────
+
+async function authedRequest<T>(method: string, url: string, token: string, data?: any): Promise<ApiResponse<T>> {
+  const options: Options = {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+    next: { revalidate: 0 },
+  };
+
+  if (method !== "GET" && data) {
+    options.body = JSON.stringify(data);
+  }
+
+  try {
+    const res = await fetch(url, options);
+    const result: ApiResponse<T> = await res.json();
+    return result;
+  } catch (error) {
+    console.error(`Error in authedRequest: ${(error as Error).message}`);
+    throw error;
+  }
+}
+
+export async function apiAuthedPOST<T>(url: string, data: any, token: string): Promise<ApiResponse<T>> {
+  return authedRequest<T>("POST", `${getApiUrl()}${url}`, token, data);
+}
+
+export async function apiAuthedGET<T>(url: string, token: string): Promise<ApiResponse<T>> {
+  return authedRequest<T>("GET", `${getApiUrl()}${url}`, token);
+}
+
+export async function apiAuthedPUT<T>(url: string, data: any, token: string): Promise<ApiResponse<T>> {
+  return authedRequest<T>("PUT", `${getApiUrl()}${url}`, token, data);
+}
+
+export async function apiAuthedDELETE<T>(url: string, token: string): Promise<ApiResponse<T>> {
+  return authedRequest<T>("DELETE", `${getApiUrl()}${url}`, token);
+}
+
 const getApiUrl = (): string => {
   const apiUrl = process.env.NEXT_PUBLIC_API;
   if (!apiUrl) {

@@ -24,7 +24,7 @@ export class DocumentsFacadeService {
   async getDocumentById(id: number): Promise<DocumentDetails> {
     try {
       return await this.documentService.getDocumentById(id);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting document ${id}:`, error);
       throw new Error(`Failed to retrieve document: ${error.message}`);
     }
@@ -33,7 +33,7 @@ export class DocumentsFacadeService {
   async createDocument(createDocumentRequest: CreateDocumentRequest): Promise<DocumentDetails> {
     try {
       return await this.documentService.createDocument(createDocumentRequest);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating document:', error);
       throw new Error(`Failed to create document: ${error.message}`);
     }
@@ -42,7 +42,7 @@ export class DocumentsFacadeService {
   async updateDocument(id: number, updateDocumentRequest: UpdateDocumentRequest): Promise<DocumentDetails> {
     try {
       return await this.documentService.updateDocument(id, updateDocumentRequest);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error updating document ${id}:`, error);
       throw new Error(`Failed to update document: ${error.message}`);
     }
@@ -55,7 +55,7 @@ export class DocumentsFacadeService {
         success: true,
         message: 'Document deleted successfully'
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error deleting document ${id}:`, error);
       throw new Error(`Failed to delete document: ${error.message}`);
     }
@@ -64,7 +64,7 @@ export class DocumentsFacadeService {
   async saveDocument(id: number, title: string, content: string, type: number): Promise<{ success: boolean; id: number }> {
     try {
       return await this.documentService.saveDocument(id, title, content, type);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error saving document:`, error);
       throw new Error(`Failed to save document: ${error.message}`);
     }
@@ -75,7 +75,7 @@ export class DocumentsFacadeService {
   async getUserNotes(uuid: string): Promise<NotePreview[]> {
     try {
       return await this.documentService.getUserDocuments(uuid);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting notes for user ${uuid}:`, error);
       throw new Error(`Failed to retrieve notes: ${error.message}`);
     }
@@ -92,7 +92,7 @@ export class DocumentsFacadeService {
       await this.noteService.addNoteToUser(document.id, createNoteRequest.uuid);
 
       return { id: document.id, success: true };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating note with user:', error);
       throw new Error(`Failed to create note: ${error.message}`);
     }
@@ -101,7 +101,7 @@ export class DocumentsFacadeService {
   async addNoteToUser(documentId: number, uuid: string): Promise<{ success: boolean }> {
     try {
       return await this.noteService.addNoteToUser(documentId, uuid);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error adding note ${documentId} to user ${uuid}:`, error);
       throw new Error(`Failed to add note to user: ${error.message}`);
     }
@@ -110,7 +110,7 @@ export class DocumentsFacadeService {
   async removeNoteFromUser(documentId: number, uuid: string): Promise<{ success: boolean }> {
     try {
       return await this.noteService.removeNoteFromUser(documentId, uuid);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error removing note ${documentId} from user ${uuid}:`, error);
       throw new Error(`Failed to remove note from user: ${error.message}`);
     }
@@ -121,7 +121,7 @@ export class DocumentsFacadeService {
   async getAllNews(): Promise<NewsResponse> {
     try {
       return await this.newsService.getAllNews();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error getting all news:', error);
       throw new Error(`Failed to retrieve news: ${error.message}`);
     }
@@ -130,7 +130,7 @@ export class DocumentsFacadeService {
   async getPublishedNews(): Promise<NewsResponse> {
     try {
       return await this.newsService.getPublishedNews();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error getting published news:', error);
       throw new Error(`Failed to retrieve published news: ${error.message}`);
     }
@@ -139,7 +139,7 @@ export class DocumentsFacadeService {
   async getNewsById(newsId: number): Promise<NewsDetails> {
     try {
       return await this.newsService.getNewsById(newsId);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting news ${newsId}:`, error);
       throw new Error(`Failed to retrieve news: ${error.message}`);
     }
@@ -148,7 +148,7 @@ export class DocumentsFacadeService {
   async getFeaturedNews(): Promise<NewsDetails | null> {
     try {
       return await this.newsService.getFeaturedNews();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error getting featured news:', error);
       throw new Error(`Failed to retrieve featured news: ${error.message}`);
     }
@@ -157,7 +157,7 @@ export class DocumentsFacadeService {
   async createNews(createNewsRequest: CreateNewsRequest): Promise<NewsDetails> {
     try {
       return await this.newsService.createNews(createNewsRequest);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating news:', error);
       throw new Error(`Failed to create news: ${error.message}`);
     }
@@ -166,7 +166,7 @@ export class DocumentsFacadeService {
   async updateNews(newsId: number, updateNewsRequest: UpdateNewsRequest): Promise<NewsDetails> {
     try {
       return await this.newsService.updateNews(newsId, updateNewsRequest);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error updating news ${newsId}:`, error);
       throw new Error(`Failed to update news: ${error.message}`);
     }
@@ -179,7 +179,7 @@ export class DocumentsFacadeService {
         success: true,
         message: 'News deleted successfully'
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error deleting news ${newsId}:`, error);
       throw new Error(`Failed to delete news: ${error.message}`);
     }
@@ -188,7 +188,7 @@ export class DocumentsFacadeService {
   async updateNewsStatus(publishedIds: number[], featuredId: number): Promise<{ success: boolean }> {
     try {
       return await this.newsService.updateNewsStatus(publishedIds, featuredId);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating news status:', error);
       throw new Error(`Failed to update news status: ${error.message}`);
     }
@@ -197,7 +197,7 @@ export class DocumentsFacadeService {
   async saveNews(news: CreateNewsRequest, newsId: number): Promise<{ success: boolean; id: number }> {
     try {
       return await this.newsService.saveNews(news, newsId);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving news:', error);
       throw new Error(`Failed to save news: ${error.message}`);
     }
@@ -208,7 +208,7 @@ export class DocumentsFacadeService {
   async validateDocumentAccess(documentId: number, uuid: string): Promise<boolean> {
     try {
       return await this.noteService.validateUserHasAccess(documentId, uuid);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error validating document access:`, error);
       return false;
     }
@@ -217,7 +217,7 @@ export class DocumentsFacadeService {
   async validateDocumentExists(documentId: number): Promise<boolean> {
     try {
       return await this.documentService.validateDocumentExists(documentId);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error validating document exists:`, error);
       return false;
     }

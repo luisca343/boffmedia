@@ -5,6 +5,10 @@ import {
   GiSwordWound,
   GiGamepad,
   GiFamilyTree,
+  GiPodiumWinner,
+  GiSpeedometer,
+  GiScales,
+  GiNotebook,
 } from "react-icons/gi";
 import { FaStar } from "react-icons/fa";
 import { getGameEntry } from "@/data/games";
@@ -39,12 +43,16 @@ export interface GameToolsConfigType {
 // ─── Sidebar icon mapping (react-icons, sidebar-only concern) ─────────────────
 
 const sidebarIconMap: Record<string, IconType> = {
-  Diamond: GiDiamondHard,
-  Zap: GiLightningSpanner,
-  SwordIcon: GiSwordWound,
-  Gamepad: GiGamepad,
-  Star: FaStar,
-  FamilyTree: GiFamilyTree,
+  Diamond:     GiDiamondHard,
+  Zap:         GiLightningSpanner,
+  SwordIcon:   GiSwordWound,
+  Gamepad:     GiGamepad,
+  Star:        FaStar,
+  FamilyTree:  GiFamilyTree,
+  Podium:      GiPodiumWinner,
+  Speedometer: GiSpeedometer,
+  Scales:      GiScales,
+  Notebook:    GiNotebook,
 };
 
 // ─── Adapter: builds GameConfig from the unified game registry ────────────────

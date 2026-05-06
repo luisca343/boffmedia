@@ -117,7 +117,7 @@ export class TranscriptionService {
         duration: info.basic_info.duration,
         transcript
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to get transcription:', error);
       return {
         success: false,
@@ -147,7 +147,7 @@ export class TranscriptionService {
         uploadDate: info.basic_info.start_timestamp?.toString(),
         thumbnails: info.basic_info.thumbnail
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to get video info:', error);
       return {
         success: false,

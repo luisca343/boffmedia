@@ -21,7 +21,7 @@ export class PokemonFacadeService {
   async initializeService(): Promise<void> {
     try {
       await this.pokemonDataService.initializeData();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error initializing Pokemon service:', error);
       throw new Error(`Pokemon service initialization failed: ${error.message}`);
     }
@@ -32,7 +32,7 @@ export class PokemonFacadeService {
   getAllPokemon(): Pokemon[] {
     try {
       return this.pokemonDataService.getAllPokemon();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error getting all Pokemon:', error);
       throw new Error(`Failed to retrieve all Pokemon: ${error.message}`);
     }
@@ -41,7 +41,7 @@ export class PokemonFacadeService {
   getPokemonByDex(dex: number): Pokemon | undefined {
     try {
       return this.pokemonDataService.getPokemonByDex(dex);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting Pokemon by dex ${dex}:`, error);
       throw new Error(`Failed to retrieve Pokemon by dex: ${error.message}`);
     }
@@ -50,7 +50,7 @@ export class PokemonFacadeService {
   getPokemonByName(name: string): Pokemon | undefined {
     try {
       return this.pokemonDataService.getPokemonByName(name);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting Pokemon by name ${name}:`, error);
       throw new Error(`Failed to retrieve Pokemon by name: ${error.message}`);
     }
@@ -60,7 +60,7 @@ export class PokemonFacadeService {
     try {
       
       return this.pokemonDataService.searchPokemonByName(name, amount);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error searching Pokemon by name ${name}:`, error);
       throw new Error(`Failed to search Pokemon: ${error.message}`);
     }
@@ -69,7 +69,7 @@ export class PokemonFacadeService {
   getPokemonNames(): string[] {
     try {
       return this.pokemonDataService.getPokemonNames();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error getting Pokemon names:', error);
       throw new Error(`Failed to retrieve Pokemon names: ${error.message}`);
     }
@@ -78,7 +78,7 @@ export class PokemonFacadeService {
   countPokemon(): number {
     try {
       return this.pokemonDataService.countPokemon();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error counting Pokemon:', error);
       return 0;
     }
@@ -89,7 +89,7 @@ export class PokemonFacadeService {
   getEvoTree(id: number): { depth: number; tree: { [key: string]: EvoTreeNode } } {
     try {
       return this.pokemonDataService.getEvoTree(id);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting evolution tree for ${id}:`, error);
       throw new Error(`Failed to retrieve evolution tree: ${error.message}`);
     }
@@ -98,7 +98,7 @@ export class PokemonFacadeService {
   getNextPrev(id: number): { prev: Pokemon | undefined; next: Pokemon | undefined } {
     try {
       return this.pokemonDataService.getNextPrev(id);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting next/prev for ${id}:`, error);
       throw new Error(`Failed to retrieve next/prev Pokemon: ${error.message}`);
     }
@@ -109,7 +109,7 @@ export class PokemonFacadeService {
   getAllMoves(): { name: string; count: number }[] {
     try {
       return this.pokemonDataService.getAllMoves();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error getting all moves:', error);
       throw new Error(`Failed to retrieve all moves: ${error.message}`);
     }
@@ -118,7 +118,7 @@ export class PokemonFacadeService {
   getMove(name: string): FullMove | undefined {
     try {
       return this.pokemonDataService.getMove(name);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting move ${name}:`, error);
       throw new Error(`Failed to retrieve move: ${error.message}`);
     }
@@ -127,7 +127,7 @@ export class PokemonFacadeService {
   getPokemonMoves(id: number, formIndex: number): any {
     try {
       return this.pokemonDataService.getPokemonMoves(id, formIndex);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting moves for Pokemon ${id}, form ${formIndex}:`, error);
       throw new Error(`Failed to retrieve Pokemon moves: ${error.message}`);
     }
@@ -136,7 +136,7 @@ export class PokemonFacadeService {
   getPokemonByMove(name: string): { speciesID: number; form: string }[] | undefined {
     try {
       return this.pokemonDataService.getPokemonByMove(name);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting Pokemon by move ${name}:`, error);
       throw new Error(`Failed to retrieve Pokemon by move: ${error.message}`);
     }
@@ -147,7 +147,7 @@ export class PokemonFacadeService {
   getAllAbilities(): { name: string; count: number }[] {
     try {
       return this.pokemonDataService.getAllAbilities();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error getting all abilities:', error);
       throw new Error(`Failed to retrieve all abilities: ${error.message}`);
     }
@@ -156,7 +156,7 @@ export class PokemonFacadeService {
   getAbility(name: string): any {
     try {
       return this.pokemonDataService.getAbility(name);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting ability ${name}:`, error);
       throw new Error(`Failed to retrieve ability: ${error.message}`);
     }
@@ -165,7 +165,7 @@ export class PokemonFacadeService {
   getPokemonByAbility(name: string): { speciesID: number; form: string; speciesName: string }[] {
     try {
       return this.pokemonDataService.getPokemonByAbility(name);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting Pokemon by ability ${name}:`, error);
       throw new Error(`Failed to retrieve Pokemon by ability: ${error.message}`);
     }
@@ -176,7 +176,7 @@ export class PokemonFacadeService {
   getSpawnByPokemon(name: string): SpawnInfo[] {
     try {
       return this.pokemonDataService.getSpawnByPokemon(name);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting spawns for Pokemon ${name}:`, error);
       throw new Error(`Failed to retrieve Pokemon spawns: ${error.message}`);
     }
@@ -189,7 +189,7 @@ export class PokemonFacadeService {
               name,
               count
           }));
-      } catch (error) {
+      } catch (error: any) {
           console.error('Error getting biomes:', error);
           throw new Error(`Failed to retrieve biomes: ${error.message}`);
       }
@@ -198,7 +198,7 @@ export class PokemonFacadeService {
   getPokemonByBiome(name: string): { [key: string]: Array<{ dex: number; species: string; form: string; palette: string; rarity: number; percentage: number }> } {
     try {
       return this.pokemonDataService.getPokemonByBiome(name);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting Pokemon by biome ${name}:`, error);
       throw new Error(`Failed to retrieve Pokemon by biome: ${error.message}`);
     }
@@ -207,7 +207,7 @@ export class PokemonFacadeService {
   getBiomesByPokemon(name: string): string[] {
     try {
       return this.pokemonDataService.getBiomesByPokemon(name);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting biomes for Pokemon ${name}:`, error);
       throw new Error(`Failed to retrieve biomes for Pokemon: ${error.message}`);
     }
@@ -225,7 +225,7 @@ export class PokemonFacadeService {
   }): Promise<any> {
     try {
       return await this.pokemonDataService.getImage(params);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error getting Pokemon image:', error);
       throw new Error(`Failed to retrieve Pokemon image: ${error.message}`);
     }
@@ -234,7 +234,7 @@ export class PokemonFacadeService {
   getItemSprite(name: string): any {
     try {
       return this.pokemonDataService.getItemSprite(name);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting item sprite ${name}:`, error);
       throw new Error(`Failed to retrieve item sprite: ${error.message}`);
     }
@@ -251,7 +251,7 @@ export class PokemonFacadeService {
   ): Promise<RegistrationResult> {
     try {
       return await this.pokedexService.registerPokemon(uuid, pokemonId, form, palette, status);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error registering Pokemon:', error);
       throw new Error(`Failed to register Pokemon: ${error.message}`);
     }
@@ -260,7 +260,7 @@ export class PokemonFacadeService {
   async updateDex(uuid: string, data: { SEEN: number[], CAUGHT: number[] }): Promise<any> {
     try {
       return await this.integrationService.updateDexWithSync(uuid, data);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating dex:', error);
       throw new Error(`Failed to update dex: ${error.message}`);
     }
@@ -269,7 +269,7 @@ export class PokemonFacadeService {
   async getPokedexStatistics(uuid: string): Promise<any> {
     try {
       return await this.pokedexService.getPokedexStatistics(uuid);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting pokedex statistics for ${uuid}:`, error);
       throw new Error(`Failed to retrieve pokedex statistics: ${error.message}`);
     }
@@ -278,7 +278,7 @@ export class PokemonFacadeService {
   async getDetailedPokedexStatus(uuid: string): Promise<any> {
     try {
       return await this.pokedexService.getDetailedPokedexStatus(uuid);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting detailed pokedex status for ${uuid}:`, error);
       throw new Error(`Failed to retrieve detailed pokedex status: ${error.message}`);
     }
@@ -287,7 +287,7 @@ export class PokemonFacadeService {
   async getPokedexRegistries(uuid: string): Promise<any[]> {
     try {
       return await this.pokedexService.getPokedexRegistries(uuid);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting pokedex registries for ${uuid}:`, error);
       throw new Error(`Failed to retrieve pokedex registries: ${error.message}`);
     }
@@ -298,7 +298,7 @@ export class PokemonFacadeService {
   async getTerasPokemonShowdownData(): Promise<any> {
     try {
       return await this.integrationService.getTerasPokemonShowdownData();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error getting Teras Pokemon Showdown data:', error);
       throw new Error(`Failed to retrieve Showdown data: ${error.message}`);
     }
@@ -309,7 +309,7 @@ export class PokemonFacadeService {
   getWordleData(): any[] {
     try {
       return this.pokemonDataService.getWordleData();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error getting Wordle data:', error);
       throw new Error(`Failed to retrieve Wordle data: ${error.message}`);
     }
@@ -320,7 +320,7 @@ export class PokemonFacadeService {
   getSpriteManifest(): any {
     try {
       return this.pokemonDataService.getSpriteManifest();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error getting sprite manifest:', error);
       throw new Error(`Failed to retrieve sprite manifest: ${error.message}`);
     }
@@ -329,7 +329,7 @@ export class PokemonFacadeService {
   async refreshSpriteManifest(): Promise<void> {
     try {
       await this.pokemonDataService.refreshSpriteManifest();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error refreshing sprite manifest:', error);
       throw new Error(`Failed to refresh sprite manifest: ${error.message}`);
     }
@@ -340,7 +340,7 @@ export class PokemonFacadeService {
   async getPmdPortrait(name: string): Promise<{ url: string }> {
     try {
       return await this.pokemonDataService.getPmdPortrait(name);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting PMD portrait for ${name}:`, error);
       throw new Error(`Failed to retrieve PMD portrait: ${error.message}`);
     }

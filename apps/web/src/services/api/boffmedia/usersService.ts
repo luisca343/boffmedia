@@ -1,61 +1,18 @@
-import { AuthenticationResultEntity, BoffMediaUserEntity, CreateUserDto, FullUserEntity, IntegratedUserCreationResultEntity, SessionUserEntity, SuccessResponse, UpdateUserDto, UserStatistics, UserWithIntegrationsEntity } from '@boffmedia/shared';
+import {
+  AuthenticationResultEntity, BatchUsersDto, BoffMediaUserEntity, CreateUserDto, FullUserEntity,
+  GoogleAuthDto, IntegratedUserCreationResultEntity, LoginDto,
+  MinecraftLinkDto, MinecraftRegistrationDto,
+  SessionUserEntity, SuccessResponse, UpdateUserDto, UserStatistics, UserValidationResponseEntity,
+  UserRolesResponseEntity, UsersPaginatedResponseEntity, UserWithIntegrationsEntity,
+} from '@boffmedia/shared';
 import { apiGET, apiPOST, apiPUT, apiDELETE, apiPATCH } from '@/services/boffAPI';
 
-// Additional DTOs for specialized endpoints
-export interface MinecraftRegistrationDto {
-  username: string;
-  email: string;
-  password: string;
-  minecraft: {
-    username: string;
-    uuid: string;
-    world: string;
-  };
-}
+export type { GoogleAuthDto, LoginDto, MinecraftLinkDto, MinecraftRegistrationDto };
 
-export interface MinecraftLinkDto {
-  username: string;
-  email: string;
-  password: string;
-  minecraft: {
-    username: string;
-    uuid: string;
-    world: string;
-  };
-}
-
-export interface GoogleAuthDto {
-  email: string;
-  name: string;
-  googleId: string;
-  profilePicture?: string;
-}
-
-export interface LoginDto {
-  username: string;
-  password: string;
-}
-
-export interface BatchUsersRequest {
-  userIds: number[];
-}
-
-export interface UsersPaginatedResponse {
-  users: BoffMediaUserEntity[];
-  total: number;
-  limit?: number;
-  offset?: number;
-}
-
-export interface UserRolesResponse {
-  roles: string[];
-}
-
-export interface UserValidationResponse {
-  exists: boolean;
-  type: string;
-  identifier: string;
-}
+export type BatchUsersRequest = BatchUsersDto;
+export type UsersPaginatedResponse = UsersPaginatedResponseEntity;
+export type UserRolesResponse = UserRolesResponseEntity;
+export type UserValidationResponse = UserValidationResponseEntity;
 
 export class UsersService {
   // ==================== USER CREATION ====================
@@ -101,7 +58,7 @@ export class UsersService {
     const queryString = params.toString();
     const url = queryString ? `/users?${queryString}` : '/users';
     
-    return apiGET<UsersPaginatedResponse>(url);
+    return apiGET<UsersPaginatedResponseEntity>(url);
   }
 
   /**
@@ -150,7 +107,7 @@ export class UsersService {
    * Get user roles
    */
   static getUserRoles(id: number) {
-    return apiGET<UserRolesResponse>(`/users/${id}/roles`);
+    return apiGET<UserRolesResponseEntity>(`/users/${id}/roles`);
   }
 
   // ==================== USER UPDATE ====================
@@ -185,7 +142,7 @@ export class UsersService {
   /**
    * Get multiple users with integrations by IDs
    */
-  static getBatchUsersWithIntegrations(data: BatchUsersRequest) {
+  static getBatchUsersWithIntegrations(data: BatchUsersDto) {
     return apiPOST<UserWithIntegrationsEntity[]>('/users/batch', data);
   }
 
@@ -195,7 +152,7 @@ export class UsersService {
    * Validate if user exists by different identifiers
    */
   static validateUserExists(type: 'id' | 'username' | 'email' | 'uuid', identifier: string) {
-    return apiGET<UserValidationResponse>(`/users/validate/${type}/${identifier}`);
+    return apiGET<UserValidationResponseEntity>(`/users/validate/${type}/${identifier}`);
   }
 
   // ==================== CONVENIENCE METHODS ====================
@@ -210,7 +167,7 @@ export class UsersService {
     ]);
     return { 
       user: user.data, 
-      roles: rolesResponse.data?.roles || [] 
+      roles: rolesResponse.data?.roles || []
     };
   }
 

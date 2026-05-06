@@ -12,7 +12,7 @@ export class YoutubeFacadeService {
   async getTranscription(videoId: string): Promise<TranscriptionResult> {
     try {
       return await this.transcriptionService.getTranscription(videoId);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error getting transcription:', error);
       throw new Error(`Failed to retrieve transcription: ${error.message}`);
     }
@@ -21,7 +21,7 @@ export class YoutubeFacadeService {
   async getVideoInfo(videoId: string): Promise<VideoInfoResult> {
     try {
       return await this.transcriptionService.getVideoInfo(videoId);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error getting video info:', error);
       throw new Error(`Failed to retrieve video info: ${error.message}`);
     }

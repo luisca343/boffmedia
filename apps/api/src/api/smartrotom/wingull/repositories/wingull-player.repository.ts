@@ -31,7 +31,7 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
         }
       );
       return response.data.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to get stats for UUID ${uuid}:`, error);
       throw new Error(`Stats retrieval failed: ${error.message}`);
     }
@@ -56,7 +56,7 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
         }
       );
       return response.data.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to get team for UUID ${uuid}:`, error);
       throw new Error(`Team retrieval failed: ${error.message}`);
     }
@@ -81,7 +81,7 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
         }
       );
       return response.data.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to get PC for UUID ${uuid}:`, error);
       throw new Error(`PC retrieval failed: ${error.message}`);
     }
@@ -106,7 +106,7 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
         }
       );
       return response.data.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to move Pokémon:`, error);
       throw new Error(`Pokémon move failed: ${error.message}`);
     }
@@ -131,7 +131,7 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
         }
       );
       return response.data.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to update dex for UUID ${uuid}:`, error);
       throw new Error(`Dex update failed: ${error.message}`);
     }
@@ -156,7 +156,7 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
         }
       );
       return response.data.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to get quests for UUID ${uuid}:`, error);
       throw new Error(`Quests retrieval failed: ${error.message}`);
     }
@@ -184,7 +184,7 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
         }
       );
       return response.data.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to send message to UUID ${request.uuid}:`, error);
       throw new Error(`Message sending failed: ${error.message}`);
     }
@@ -212,7 +212,7 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
         }
       );
       return response.data.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to send global chat message for UUID ${request.uuid}:`, error);
       throw new Error(`Global chat message sending failed: ${error.message}`);
     }
@@ -240,7 +240,7 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
         }
       );
       return response.data.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to give Pokémon to UUID ${request.uuid}:`, error);
       throw new Error(`Pokémon giving failed: ${error.message}`);
     }
@@ -282,7 +282,7 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
         }
       );
       return response.data.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to give items to UUID ${uuid}:`, error);
       throw new Error(`Items giving failed: ${error.message}`);
     }
@@ -307,7 +307,7 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
         }
       );
       return response.data.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to get battle teams for UUID ${uuid}:`, error);
       throw new Error(`Battle teams retrieval failed: ${error.message}`);
     }
@@ -336,7 +336,7 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
       );
       
       return response.data.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to update battle team for UUID ${updateBattleTeamDto.uuid}:`, error);
       throw new Error(`Battle team update failed: ${error.message}`);
     }

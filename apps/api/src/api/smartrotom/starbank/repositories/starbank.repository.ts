@@ -78,7 +78,7 @@ export class StarbankRepository {
       }).execute();
 
       return { success: true, accountId };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to create account:', error);
       return { success: false, message: `Account creation failed: ${error.message}` };
     }
@@ -101,7 +101,7 @@ export class StarbankRepository {
         .execute();
 
       return result.length > 0 ? result[0] : null;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to find account ${accountId}:`, error);
       throw new Error(`Failed to find account: ${error.message}`);
     }
@@ -120,7 +120,7 @@ export class StarbankRepository {
         .execute();
 
       return result.length > 0 ? result[0] : null;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to find main account for ${uuid}:`, error);
       throw new Error(`Failed to find main account: ${error.message}`);
     }
@@ -142,7 +142,7 @@ export class StarbankRepository {
         .execute();
 
       return result;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to find accounts for ${uuid}:`, error);
       throw new Error(`Failed to find user accounts: ${error.message}`);
     }
@@ -160,7 +160,7 @@ export class StarbankRepository {
         })
         .from(starBankAccounts)
         .execute();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to find all accounts:', error);
       throw new Error(`Failed to find all accounts: ${error.message}`);
     }
@@ -177,7 +177,7 @@ export class StarbankRepository {
         .execute();
 
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to update balance for account ${accountId}:`, error);
       throw new Error(`Failed to update account balance: ${error.message}`);
     }
@@ -229,7 +229,7 @@ export class StarbankRepository {
       }).execute();
 
       return { success: true };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to create transaction:', error);
       return { success: false, message: `Transaction failed: ${error.message}` };
     }
@@ -271,7 +271,7 @@ export class StarbankRepository {
         .execute();
 
       return result;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to find transactions for account ${accountId}:`, error);
       throw new Error(`Failed to find account transactions: ${error.message}`);
     }
@@ -310,7 +310,7 @@ export class StarbankRepository {
         .execute();
 
       return result;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to find transactions for user ${uuid}:`, error);
       throw new Error(`Failed to find user transactions: ${error.message}`);
     }
@@ -349,7 +349,7 @@ export class StarbankRepository {
         .execute();
 
       return result;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to find transfers for account ${accountId}:`, error);
       throw new Error(`Failed to find account transfers: ${error.message}`);
     }
@@ -389,7 +389,7 @@ export class StarbankRepository {
         .execute();
 
       return result;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to find transfers for user ${uuid}:`, error);
       throw new Error(`Failed to find user transfers: ${error.message}`);
     }
@@ -401,7 +401,7 @@ export class StarbankRepository {
     try {
       const account = await this.findAccountById(accountId);
       return !!account;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to check if account ${accountId} exists:`, error);
       return false;
     }
@@ -415,7 +415,7 @@ export class StarbankRepository {
       // Return main account balance or first account balance
       const mainAccount = accounts.find(acc => acc.type === 'MAIN');
       return mainAccount ? mainAccount.balance : accounts[0].balance;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to get balance for user ${uuid}:`, error);
       return 0;
     }

@@ -51,7 +51,7 @@ export class QuestCacheService {
       };
 
       this.logger.log('Quest cache refreshed successfully');
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Failed to refresh quest cache', error.stack);
       throw error;
     }

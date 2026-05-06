@@ -52,7 +52,7 @@ export class TwitchApiService {
 
       this.logger.log('Successfully obtained Twitch access token');
       return this.accessToken;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Failed to obtain Twitch access token', error.stack);
       throw error;
     }
@@ -82,7 +82,7 @@ export class TwitchApiService {
       );
 
       return response.data.data.length > 0 ? response.data.data[0] : null;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Failed to fetch stream for user "${username}"`, error.stack);
       throw error;
     }
@@ -122,7 +122,7 @@ export class TwitchApiService {
 
       this.logger.log(`Found ${allStreams.length} live streams from ${usernames.length} usernames`);
       return allStreams;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Failed to fetch streams for usernames`, error.stack);
       throw error;
     }

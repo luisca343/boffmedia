@@ -43,7 +43,7 @@ export class MhwildsDataService {
     try {
       const result = await this.mhwildsRepository.getWeapons(locale);
       return this.formatResultWithCacheInfo(result);
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to get weapons: ${error.message}`);
     }
   }
@@ -52,7 +52,7 @@ export class MhwildsDataService {
     try {
       const result = await this.mhwildsRepository.getArmor(locale);
       return this.formatResultWithCacheInfo(result);
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to get armor: ${error.message}`);
     }
   }
@@ -61,7 +61,7 @@ export class MhwildsDataService {
     try {
       const result = await this.mhwildsRepository.getCharms(locale);
       return this.formatResultWithCacheInfo(result);
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to get charms: ${error.message}`);
     }
   }
@@ -70,7 +70,7 @@ export class MhwildsDataService {
     try {
       const result = await this.mhwildsRepository.getDecorations(locale);
       return this.formatResultWithCacheInfo(result);
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to get decorations: ${error.message}`);
     }
   }
@@ -79,7 +79,7 @@ export class MhwildsDataService {
     try {
       const result = await this.mhwildsRepository.getSkills(locale);
       return this.formatResultWithCacheInfo(result);
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to get skills: ${error.message}`);
     }
   }
@@ -105,7 +105,7 @@ export class MhwildsDataService {
         data: allRanks,
         cacheInfo: this.extractCacheInfo(result)
       };
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to get charm ranks: ${error.message}`);
     }
   }
@@ -166,7 +166,7 @@ export class MhwildsDataService {
         totalWeapons: this.countWeaponsInTree(weaponTree),
         weaponKinds: Object.keys(weaponTreeByKind)
       };
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to create weapon tree: ${error.message}`);
     }
   }
@@ -186,7 +186,7 @@ export class MhwildsDataService {
         data: filteredWeapons,
         cacheInfo: this.extractCacheInfo(result)
       };
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to search weapons: ${error.message}`);
     }
   }
@@ -204,7 +204,7 @@ export class MhwildsDataService {
         data: filteredWeapons,
         cacheInfo: this.extractCacheInfo(result)
       };
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to get weapons by kind: ${error.message}`);
     }
   }
@@ -220,7 +220,7 @@ export class MhwildsDataService {
         data: filteredArmor,
         cacheInfo: this.extractCacheInfo(result)
       };
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to get armor by rarity: ${error.message}`);
     }
   }
@@ -287,7 +287,7 @@ export class MhwildsDataService {
           total: skillsResult.data.length
         }
       };
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to get data statistics: ${error.message}`);
     }
   }

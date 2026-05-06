@@ -67,7 +67,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       }
 
       return newUser;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to create user:', error);
       throw new Error(`User creation failed: ${error.message}`);
     }
@@ -89,7 +89,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
           updatedAt: new Date()
         }).execute();
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating participant:', error);
       throw new Error(`Participant creation failed: ${error.message}`);
     }
@@ -103,7 +103,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
         .select(this.userSelectWithoutPassword)
         .from(boffMediaUsers)
         .execute();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to retrieve all users:', error);
       throw new Error(`Failed to retrieve users: ${error.message}`);
     }
@@ -122,7 +122,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
         .execute();
 
       return rows.length > 0 ? rows[0] : null;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to find user by ID ${id}:`, error);
       throw new Error(`Failed to find user: ${error.message}`);
     }
@@ -141,7 +141,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
         .execute();
 
       return rows.length > 0 ? rows[0] : null;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to find user by username ${username}:`, error);
       throw new Error(`Failed to find user: ${error.message}`);
     }
@@ -160,7 +160,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
         .execute();
 
       return rows.length > 0 ? rows[0] : null;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to find user by email ${email}:`, error);
       throw new Error(`Failed to find user: ${error.message}`);
     }
@@ -179,7 +179,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
         .execute();
 
       return rows.length > 0 ? rows[0] : null;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to find user by UUID ${uuid}:`, error);
       throw new Error(`Failed to find user: ${error.message}`);
     }
@@ -198,7 +198,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
         .execute();
 
       return rows.length > 0 ? rows[0] : null;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to find user by Google ID ${googleId}:`, error);
       throw new Error(`Failed to find user: ${error.message}`);
     }
@@ -225,7 +225,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
         boffmedia_users: rows[0].boffmedia_users,
         rotom_users: rows[0].rotom_users
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to find full user by username ${username}:`, error);
       throw new Error(`Failed to find full user: ${error.message}`);
     }
@@ -250,7 +250,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
         boffmedia_users: rows[0].boffmedia_users,
         rotom_users: rows[0].rotom_users
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to find full user by username ${username}:`, error);
       throw new Error(`Failed to find full user: ${error.message}`);
     }
@@ -278,7 +278,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
         boffmedia_users: rows[0].boffmedia_users,
         rotom_users: rows[0].rotom_users
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to find full user by UUID ${uuid}:`, error);
       throw new Error(`Failed to find full user: ${error.message}`);
     }
@@ -303,7 +303,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
         boffmedia_users: rows[0].boffmedia_users,
         rotom_users: rows[0].rotom_users
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to find full user by email ${email}:`, error);
       throw new Error(`Failed to find full user: ${error.message}`);
     }
@@ -323,7 +323,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
         .execute();
 
       return data.map((d: { role: string }) => d.role).filter(Boolean);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to get user roles for user ${userId}:`, error);
       throw new Error(`Failed to get user roles: ${error.message}`);
     }
@@ -357,7 +357,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       }
 
       return updatedUser;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to update user ${id}:`, error);
       throw new Error(`User update failed: ${error.message}`);
     }
@@ -384,7 +384,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
         .execute();
 
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to delete user ${id}:`, error);
       throw new Error(`User deletion failed: ${error.message}`);
     }
@@ -412,7 +412,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       }
       
       return !!user;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to check if user exists ${identifier}:`, error);
       return false;
     }
@@ -441,7 +441,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
         .from(boffMediaUsers)
         .where(or(...conditions))
         .execute();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to check multiple fields exist:', error);
       throw new Error(`Failed to check user existence: ${error.message}`);
     }
@@ -453,7 +453,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
     try {
       const users = await this.findAllUsers();
       return users.length;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to get user count:', error);
       return 0;
     }

@@ -2,13 +2,15 @@
 
 import React, { useState, Suspense } from 'react'
 import { Button } from '@/components/ui/primitives/button'
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/primitives/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/primitives/dialog'
 import { useNews } from '../_hooks/useNews'
 import FurretHeader from '../../_components/Header'
 import FurretFooter from '../../_components/Footer'
 import PopArtWallpaper from '../../_components/PopArtWallpaper'
 import { InternalLink } from "@/components/ui/navigation/Link"
 import { sendToast } from '@/lib/toast'
+import { useBoffSession } from '@/services/useBoffSession'
+import { USER_ROLES } from '@boffmedia/shared/roles'
 
 const NewsList = React.lazy(() => import('./NewsList'))
 const NewsContent = React.lazy(() => import('./NewsContent'))
@@ -16,9 +18,13 @@ const NewsManager = React.lazy(() => import('../../_components/NewsManager'))
 const PopStyles = React.lazy(() => import('../../_components/PopStyles'))
 
 export default function NewsEditor() {
+  const { hasRole, status } = useBoffSession()
+  const canManageNews = hasRole([USER_ROLES.ROTOM_ADMIN, USER_ROLES.ROTOM_FURRET])
+
   const { 
     news, 
     setNews, 
+    fetchNews,
     publishedNewsIds, 
     featuredNewsId, 
     handleSave, 
@@ -29,6 +35,43 @@ export default function NewsEditor() {
   } = useNews()
   const [selectedNewsId, setSelectedNewsId] = useState<number | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+
+  if (status === 'loading') {
+    return (
+      <div className="min-h-full relative overflow-auto">
+        <div className="absolute inset-0">
+          <PopArtWallpaper />
+        </div>
+        <div className="relative z-10 min-h-full flex items-center justify-center p-8">
+          <div className="bg-yellow-300 card-pop p-8 text-center">
+            <h2 className="text-pop-4xl font-bold mb-6 text-pink-500 pop-shadow">¡CARGANDO!</h2>
+            <p className="text-pop-xl font-comic text-secondary-600">Verificando permisos... 🔐</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (!canManageNews) {
+    return (
+      <div className="min-h-full relative overflow-auto">
+        <div className="absolute inset-0">
+          <PopArtWallpaper />
+        </div>
+        <div className="relative z-10 min-h-full flex items-center justify-center p-8">
+          <div className="bg-red-100 card-pop p-8 text-center border-4 border-black max-w-2xl">
+            <h2 className="text-pop-3xl font-bold mb-4 text-red-600 pop-shadow">ACCESO DENEGADO</h2>
+            <p className="text-pop-lg font-comic text-secondary-700 mb-6">
+              Necesitas el rol ROTOM_ADMIN o ROTOM_FURRET para editar noticias.
+            </p>
+            <InternalLink href="/smartrotom/furrettoday" className="btn-pop-primary pop-focus animate-button-press">
+              🏠 Volver a Furret Today
+            </InternalLink>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   function updateNews(id: number, content: string) {
     const newNews = news.map(item => ({...item}));
@@ -49,6 +92,11 @@ export default function NewsEditor() {
     } else {
       console.error(`News item with ID ${id} not found`);
     }
+  }
+
+  function handleNewsSaved() {
+    fetchNews()
+    setIsDialogOpen(false)
   }
 
   return (
@@ -96,13 +144,16 @@ export default function NewsEditor() {
                       ✨ Nueva Noticia
                     </button>
                   </DialogTrigger>
-                  <DialogContent className="bg-yellow-300 border-8 border-black p-6 max-w-3xl w-11/12 card-pop">
+                  <DialogContent className="w-[min(92vw,48rem)] max-w-3xl border-4 border-black bg-[#fff7d6] p-0 overflow-hidden">
+                    <DialogHeader className="sr-only">
+                      <DialogTitle>Crear nueva noticia</DialogTitle>
+                    </DialogHeader>
                     <Suspense fallback={
                       <div className="text-pop-3xl font-comic text-center p-8">
                         Cargando editor... 📝
                       </div>
                     }>
-                      <NewsManager onClose={() => setIsDialogOpen(false)} />
+                      <NewsManager onClose={() => setIsDialogOpen(false)} onSaved={handleNewsSaved} />
                     </Suspense>
                   </DialogContent>
                 </Dialog>

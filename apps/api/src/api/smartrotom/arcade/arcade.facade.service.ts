@@ -402,7 +402,7 @@ export class ArcadeFacadeService implements OnModuleInit {
         message
       };
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Critical error in claimItems:', error);
       throw new BadRequestException(`Failed to claim items: ${error.message}`);
     }

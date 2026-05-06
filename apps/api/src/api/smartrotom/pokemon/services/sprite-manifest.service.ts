@@ -42,7 +42,7 @@ export class SpriteManifestService extends BaseDataService {
         this.logger.log('No sprite manifest found, generating a new one...');
         await this.generateManifest();
       }
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Failed to load sprite manifest: ${error.message}`);
       await this.generateManifest();
     }
@@ -208,7 +208,7 @@ async generateManifest(): Promise<void> {
       };
       this.manifest.count.total++;
       
-    } catch (error) {
+    } catch (error: any) {
       this.logger.warn(`Failed to process sprite for ${key}: ${error.message}`);
       // Add a fallback entry
       this.manifest.sprites[key] = {
@@ -231,7 +231,7 @@ async generateManifest(): Promise<void> {
       }
       await fsPromises.writeFile(this.MANIFEST_PATH, JSON.stringify(this.manifest, null, 2));
       this.logger.log(`Saved sprite manifest to ${this.MANIFEST_PATH}`);
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Failed to save sprite manifest: ${error.message}`);
     }
   }

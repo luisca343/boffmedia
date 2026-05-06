@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { a } from './a';
+import type { MessagePartDto } from './MessagePartDto';
 import type { MessageSender } from './MessageSender';
 export type FicusMessageContentDto = {
     /**
@@ -12,6 +12,6 @@ export type FicusMessageContentDto = {
     /**
      * Parts of the message
      */
-    parts: Array<Array<a>>;
+    parts: Array<MessagePartDto>;
 };
 
