@@ -313,6 +313,18 @@ export class ScrapeController {
     );
   }
 
+  @Post('manga/patch-metadata')
+  @ApiOperation({ summary: 'Patch metadata in existing EPUB files without re-converting' })
+  @ApiResponse({ status: HttpStatus.CREATED, description: 'Results per chapter.' })
+  async patchEpubMetadata(
+    @Body() body: { series: string; chapters: string[]; metadata?: import('./services/manga/manga-epub.builder').EpubMetadata },
+  ) {
+    if (!body.series?.trim()) throw new BadRequestException('series is required');
+    if (!Array.isArray(body.chapters) || body.chapters.length === 0)
+      throw new BadRequestException('chapters is required');
+    return this.scrapeFacadeService.patchMangaEpubMetadata(body.series, body.chapters, body.metadata ?? {});
+  }
+
   // ==================== MANGA CONFIG ====================
 
   @Get('manga/config')

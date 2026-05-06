@@ -5,7 +5,7 @@ import * as path from 'path';
 import AdmZip from 'adm-zip';
 import { ChapterPageInfo } from './manga.types';
 import { MANGA_ROOT } from './manga-constants';
-import { buildEpub, type EpubMetadata } from './manga-epub.builder';
+import { buildEpub, injectEpubMetadata, type EpubMetadata } from './manga-epub.builder';
 
 const IMAGE_RE = /\.(webp|jpg|jpeg|png|gif)$/i;
 const COMIC_INFO_RE = /^ComicInfo\.xml$/i;
@@ -145,6 +145,14 @@ export class MangaEditorService {
     }
 
     return { outputPath: epubPath };
+  }
+
+  async patchEpubMetadata(series: string, chapter: string, metadata: EpubMetadata): Promise<{ updated: boolean }> {
+    const epubPath = path.resolve(MANGA_ROOT, series, `${chapter}.epub`);
+    assertSafe(epubPath);
+    try { new AdmZip(epubPath); } catch { return { updated: false }; }
+    await injectEpubMetadata(epubPath, metadata);
+    return { updated: true };
   }
 
   // ── Private helpers ────────────────────────────────────────────────────────
