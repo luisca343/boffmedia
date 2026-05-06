@@ -11,6 +11,7 @@ import type {
   LocalMangaLibrary,
   ChapterPageInfo,
 } from './services/manga/manga.types';
+import type { EpubMetadata } from './services/manga/manga-epub.builder';
 import { EuropeAggregateResult } from './entities/europe-aggregate.entity';
 import { DownloadResult } from './entities/download-result.entity';
 import { BulkDownloadResult } from './entities/bulk-download-result.entity';
@@ -154,7 +155,7 @@ export class ScrapeFacadeService {
     return this.mangaEditorService.serveChapterImage(series, chapter, page, res);
   }
 
-  convertMangaChapter(series: string, chapter: string, excludePages: number[], includeCover?: boolean): Promise<{ outputPath: string }> {
-    return this.mangaEditorService.convertChapter(series, chapter, excludePages, includeCover);
+  convertMangaChapter(series: string, chapter: string, excludePages: number[], includeCover?: boolean, metadata?: EpubMetadata): Promise<{ outputPath: string }> {
+    return this.mangaEditorService.convertChapter(series, chapter, excludePages, includeCover, metadata);
   }
 }

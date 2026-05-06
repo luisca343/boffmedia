@@ -21,7 +21,9 @@ import {
   type MangaDownloadSseEvent,
   type LocalMangaLibrary,
 } from '@/services/api/boffmedia/scrapeService';
+import { useMangaStore } from '@/stores/useMangaStore';
 import { FloatingSection } from '@/app/(boffmedia)/_components/layout/FloatingSection';
+import MangaMetadataForm from '../../_components/MangaMetadataForm';
 
 // ─── Scraper sources panel ─────────────────────────────────────────────────────
 
@@ -278,6 +280,9 @@ function DownloadProgressPanel({ progress }: { progress: ProgressState }) {
 // ─── Main component ────────────────────────────────────────────────────────────
 
 export default function MangaDownloader() {
+  const setSeriesMetadata = useMangaStore((s) => s.setSeriesMetadata);
+  const seriesMetadata = useMangaStore((s) => s.seriesMetadata);
+
   const [library, setLibrary] = useState<LocalMangaLibrary | null>(null);
 
   const [query, setQuery] = useState('');
@@ -361,6 +366,10 @@ export default function MangaDownloader() {
 
   const handleSelectNovel = async (novel: MangaSearchResult) => {
     setSelectedNovel(novel);
+    // Pre-populate title in the metadata store if not already set for this series.
+    if (novel.title && !seriesMetadata[novel.title]?.title) {
+      setSeriesMetadata(novel.title, { ...seriesMetadata[novel.title], title: novel.title });
+    }
     setSearchResults(null);
     setChapters(null);
     setSelectedChapters(new Set());
@@ -607,6 +616,19 @@ export default function MangaDownloader() {
                     {chaptersError && (
                       <p className="text-sm text-red-400 bg-red-900/20 border border-red-800/40 rounded-md px-3 py-2">{chaptersError}</p>
                     )}
+                    {/* Metadata form — collapsible */}
+                    {selectedNovel && (
+                      <details className="group">
+                        <summary className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-surface-200 cursor-pointer select-none list-none py-1">
+                          <ChevronDown className="h-3.5 w-3.5 transition-transform group-open:rotate-180" />
+                          Metadatos EPUB
+                        </summary>
+                        <div className="mt-3 pt-3 border-t border-surface-700/40">
+                          <MangaMetadataForm seriesSlug={selectedNovel.title} />
+                        </div>
+                      </details>
+                    )}
+
                     {chapters && (
                       <>
                         <div className="flex items-center gap-2 text-xs text-surface-400 flex-wrap">

@@ -21,6 +21,18 @@ import sharp from 'sharp';
 
 const execFileAsync = promisify(execFile);
 
+export interface EpubMetadata {
+  title?: string;
+  language?: string;
+  author?: string;
+  authorSort?: string;
+  illustrator?: string;
+  illustratorSort?: string;
+  publisher?: string;
+  date?: string;
+  subjects?: string[];
+}
+
 export interface EpubChapterOptions {
   /** Absolute paths to image files, in display order. */
   imageFiles: string[];
@@ -34,6 +46,8 @@ export interface EpubChapterOptions {
    * When false (default), suppresses Calibre's auto-generated title page entirely.
    */
   includeCover?: boolean;
+  /** Optional metadata injected into the EPUB OPF after Calibre conversion. */
+  metadata?: EpubMetadata;
 }
 
 /** Returns true when the buffer contains a WebP image (magic bytes). */
@@ -59,6 +73,69 @@ async function webpToJpeg(data: Buffer): Promise<Buffer> {
       .jpeg({ quality: 92 })
       .toBuffer(),
   );
+}
+
+function escapeXml(str: string): string {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+/**
+ * Opens the EPUB (a ZIP file), finds the OPF via container.xml, replaces the
+ * dc: metadata with the provided values, and preserves Calibre's <meta> elements
+ * (cover reference, series info, etc.).  Best-effort — errors are silently swallowed
+ * so a malformed EPUB is never caused by this step.
+ */
+async function injectEpubMetadata(epubPath: string, meta: EpubMetadata): Promise<void> {
+  const hasContent = Object.values(meta).some(v => (Array.isArray(v) ? v.length > 0 : !!v));
+  if (!hasContent) return;
+
+  try {
+    const zip = new AdmZip(epubPath);
+
+    const container = zip.readAsText('META-INF/container.xml');
+    const opfPathMatch = container.match(/full-path="([^"]+)"/);
+    if (!opfPathMatch) return;
+    const opfPath = opfPathMatch[1];
+
+    let opf = zip.readAsText(opfPath);
+
+    // Preserve the unique book identifier and all <meta .../> elements.
+    const identifierMatch = opf.match(/<dc:identifier[\s\S]*?<\/dc:identifier>/i);
+    const metaElements = [...opf.matchAll(/<meta\b[^>]*\/?>/gi)].map(m => m[0]);
+
+    const lines: string[] = [];
+    if (identifierMatch) lines.push(identifierMatch[0]);
+    if (meta.title)       lines.push(`<dc:title>${escapeXml(meta.title)}</dc:title>`);
+    if (meta.language)    lines.push(`<dc:language>${escapeXml(meta.language)}</dc:language>`);
+    if (meta.author) {
+      const fileAs = meta.authorSort || meta.author;
+      lines.push(`<dc:creator opf:role="aut" opf:file-as="${escapeXml(fileAs)}">${escapeXml(meta.author)}</dc:creator>`);
+    }
+    if (meta.illustrator) {
+      const fileAs = meta.illustratorSort || meta.illustrator;
+      lines.push(`<dc:creator opf:role="ill" opf:file-as="${escapeXml(fileAs)}">${escapeXml(meta.illustrator)}</dc:creator>`);
+    }
+    if (meta.publisher)   lines.push(`<dc:publisher>${escapeXml(meta.publisher)}</dc:publisher>`);
+    if (meta.date)        lines.push(`<dc:date>${escapeXml(meta.date)}</dc:date>`);
+    for (const s of meta.subjects ?? []) {
+      if (s.trim()) lines.push(`<dc:subject>${escapeXml(s.trim())}</dc:subject>`);
+    }
+    lines.push(...metaElements);
+
+    const newMetadata = [
+      '<metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">',
+      ...lines.map(l => `    ${l}`),
+      '  </metadata>',
+    ].join('\n');
+
+    const updated = opf.replace(/<metadata\b[\s\S]*?<\/metadata>/i, newMetadata);
+    if (updated === opf) return;
+
+    zip.updateFile(opfPath, Buffer.from(updated, 'utf-8'));
+    zip.writeZip(epubPath);
+  } catch {
+    // Best-effort: do not fail the conversion if metadata injection errors.
+  }
 }
 
 export async function buildEpub(opts: EpubChapterOptions): Promise<void> {
@@ -111,6 +188,7 @@ export async function buildEpub(opts: EpubChapterOptions): Promise<void> {
     }
 
     await execFileAsync('ebook-convert', args, { timeout: 180_000 });
+    if (opts.metadata) await injectEpubMetadata(outputPath, opts.metadata);
   } catch (err: any) {
     if (err.code === 'ENOENT') {
       throw new Error(
