@@ -153,6 +153,7 @@
     },
     "mangaLibrary": {
       "title": "Manga Library",
+      "subtitle": "Manage and convert your manga downloads",
       "allSeries": "All series",
       "chapters": "chapters",
       "pages": "pages",
