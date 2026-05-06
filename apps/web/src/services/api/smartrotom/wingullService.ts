@@ -1,4 +1,4 @@
-import { PokemonW, SuccessResponse, TaxiStop, TeleportPlayerDto, Weather, Performance } from '@boffmedia/shared';
+import { PlayerStats, PokemonW, Region, SuccessResponse, TaxiStop, TeleportPlayerDto, Weather, Performance } from '@boffmedia/shared';
 import { wingullGET, wingullPOST, ApiResponse, rotomPOST } from '@/services/boffAPI';
 import { 
     BattleTeamData, 
@@ -9,22 +9,8 @@ import {
 
 
 
-export type Region = {
-    name: string;
-    players: number;
-    status: string;
-};
-
-export type PlayerStats = {
-    uuid: string;
-    username: string;
-    level: number;
-    experience: number;
-    playtime: number;
-    badges: number;
-    pokemonCaught: number;
-    pokemonSeen: number;
-};
+export type ServerRegion = Region;
+export type PixelmonPlayerStats = PlayerStats;
 
 export class WingullService {
     // ==================== ECONOMY ENDPOINTS ====================

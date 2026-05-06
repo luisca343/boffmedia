@@ -33,7 +33,7 @@ export class ConfigService extends NestConfigService {
     try {
       await fs.mkdir(path.dirname(filePath), { recursive: true });
       await fs.writeFile(filePath, JSON.stringify(data, null, 2));
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to write file ${filename} in ${subdir}: ${error.message}`);
     }
   }
@@ -43,7 +43,7 @@ export class ConfigService extends NestConfigService {
     try {
       const fileContent = await fs.readFile(filePath, 'utf-8');
       return JSON.parse(fileContent);
-    } catch (error) {
+    } catch (error: any) {
       if (error.code === 'ENOENT') {
         return null;
       }
@@ -84,7 +84,7 @@ export class ConfigService extends NestConfigService {
 
       this.logger.log(`Image saved: ${subPath}`);
       return `/img/${subPath}`;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Failed to save image from URL ${imageUrl}: ${error.message}`);
       //throw new Error(`Failed to save image from URL ${imageUrl}: ${error.message}`);
     }

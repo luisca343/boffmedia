@@ -37,7 +37,7 @@ export class TwitchMonitorService {
       this.cleanupStreamCache();
 
       this.logger.log('Stream monitoring cycle completed');
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Error during stream monitoring cycle', error.stack);
     }
   }
@@ -57,7 +57,7 @@ export class TwitchMonitorService {
       notifications = userResults.notifications;
 
       return { foundStreams, notifications };
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Error during manual stream check', error.stack);
       throw error;
     }
@@ -90,7 +90,7 @@ export class TwitchMonitorService {
           this.logger.debug(`Stream ${stream.user_name} does not contain "wingull" - skipping notification`);
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Failed to check streams for monitored users', error.stack);
     }
 

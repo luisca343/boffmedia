@@ -1,8 +1,8 @@
 # Build from the monorepo root:
 #   docker build -f apps/api/Dockerfile -t boffmedia-api .
 
-FROM node:20-alpine AS base
-RUN apk add --no-cache ffmpeg
+FROM node:20-slim AS base
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg && rm -rf /var/lib/apt/lists/*
 RUN corepack enable
 
 # ---- Install stage ----
@@ -52,7 +52,7 @@ COPY --from=builder /app/apps/api/drizzle ./drizzle
 COPY --from=builder /app/apps/api/package.json ./
 
 # NOTE: mount your Google service-account JSON at runtime, e.g.:
-#   docker run -v /etc/boffmedia/boffmedia-a39cdd7a63c7.json:/app/boffmedia-a39cdd7a63c7.json ...
+#   docker run -v /etc/boffmedia/boffmedia-b6e4f721c326.json:/app/boffmedia-b6e4f721c326.json ...
 
 EXPOSE 3000
 ENV NODE_OPTIONS="--max-old-space-size=4096"

@@ -24,7 +24,7 @@ export class WingullEconomyRepository implements IWingullEconomyRepository {
         }
       );
       return response.data.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to update balance in WINGULL API:', error);
       throw new Error(`Balance update failed: ${error.message}`);
     }
@@ -49,7 +49,7 @@ export class WingullEconomyRepository implements IWingullEconomyRepository {
         }
       );
       return response.data.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to get current balance for UUID ${uuid}:`, error);
       throw new Error(`Current balance retrieval failed: ${error.message}`);
     }
@@ -74,7 +74,7 @@ export class WingullEconomyRepository implements IWingullEconomyRepository {
         }
       );
       return response.data.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to get money for UUID ${uuid}:`, error);
       throw new Error(`Money retrieval failed: ${error.message}`);
     }

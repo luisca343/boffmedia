@@ -1,5 +1,7 @@
 import { rotomGET, rotomPOST, rotomDELETE, ApiResponse } from '@/services/boffAPI';
 import { 
+  FicusAiHealthEntity,
+  FicusAiUserStatsEntity,
   FicusMessageContentDto, 
   SendMessageDto, 
   SuccessResponse,
@@ -18,17 +20,10 @@ export interface FicusMessageContent {
   parts: MessagePart[];
 }
 
-export interface UserStats {
-  uuid: string;
-  messageCount: number;
-  hasHistory: boolean;
-}
+export interface UserStats extends FicusAiUserStatsEntity {}
 
-export interface HealthStatus {
-  service: string;
-  status: string;
-  timestamp: string;
-}
+/** @deprecated use FicusAiHealthEntity from @boffmedia/shared */
+export type HealthStatus = FicusAiHealthEntity;
 
 export class FicusAIService {
   /**
@@ -68,16 +63,16 @@ export class FicusAIService {
   /**
    * Get user chat statistics
    */
-  static getUserStats(uuid: string): Promise<ApiResponse<UserStats>> {
+  static getUserStats(uuid: string): Promise<ApiResponse<FicusAiUserStatsEntity>> {
     const queryParams = new URLSearchParams({ uuid });
-    return rotomGET<UserStats>(`/ficusai/stats?${queryParams}`);
+    return rotomGET<FicusAiUserStatsEntity>(`/ficusai/stats?${queryParams}`);
   }
 
   /**
    * Health check for FicusAI service
    */
-  static healthCheck(): Promise<ApiResponse<HealthStatus>> {
-    return rotomGET<HealthStatus>('/ficusai/health');
+  static healthCheck(): Promise<ApiResponse<FicusAiHealthEntity>> {
+    return rotomGET<FicusAiHealthEntity>('/ficusai/health');
   }
 
   // ==================== CONVENIENCE METHODS ====================

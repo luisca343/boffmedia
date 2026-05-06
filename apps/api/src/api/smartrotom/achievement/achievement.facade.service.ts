@@ -66,7 +66,7 @@ export class AchievementFacadeService {
     try {
       await this.achievementsService.createUserAchievement(achievementData);
       return { success: true, message: 'Achievement unlocked successfully' };
-    } catch (error) {
+    } catch (error: any) {
       return { success: false, message: error.message || 'Failed to unlock achievement' };
     }
   }

@@ -383,7 +383,7 @@ export class MyrientScrapeService {
         const { size: sizeBytes } = await stat(filePath);
         this.logger.log(`${prefix} OK ${filename} → ${formatBytes(sizeBytes)}`);
         return { filename, status: 'downloaded', size: formatBytes(sizeBytes), sizeBytes };
-      } catch (err) {
+      } catch (err: any) {
         this.logger.error(`${prefix} FAILED ${filename}: ${err?.message ?? err} — URL: ${entry.link}`);
         return { filename, status: 'failed', error: String(err?.message ?? err) };
       }
@@ -470,7 +470,7 @@ export class MyrientScrapeService {
         const { size: sizeBytes } = await stat(filePath);
         this.logger.log(`${prefix} OK ${filename} → ${formatBytes(sizeBytes)}`);
         return { filename, status: 'downloaded', size: formatBytes(sizeBytes), sizeBytes };
-      } catch (err) {
+      } catch (err: any) {
         this.logger.error(`${prefix} FAILED ${filename}: ${err?.message ?? err}`);
         return { filename, status: 'failed', error: String(err?.message ?? err) };
       }
@@ -559,7 +559,7 @@ export class MyrientScrapeService {
         const { size: sizeBytes } = await stat(filePath);
         this.logger.log(`${prefix} OK ${filename} → ${formatBytes(sizeBytes)}`);
         return { filename, status: 'downloaded', size: formatBytes(sizeBytes), sizeBytes };
-      } catch (err) {
+      } catch (err: any) {
         this.logger.error(`${prefix} FAILED ${filename}: ${err?.message ?? err} — URL: ${entry.link}`);
         return { filename, status: 'failed', error: String(err?.message ?? err) };
       }

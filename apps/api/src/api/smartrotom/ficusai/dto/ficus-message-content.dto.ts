@@ -18,7 +18,7 @@ export class FicusMessageContentDto {
 
   @ApiProperty({ 
     description: 'Parts of the message',
-    type: [MessagePartDto],
+    type: MessagePartDto,
     isArray: true
   })
   @IsArray()

@@ -17,7 +17,7 @@ export class WingullPlayerService {
   async getStats(uuid: string): Promise<PlayerStats> {
     try {
       return await this.wingullPlayerRepository.getStatsFromAPI(uuid);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to get stats for ${uuid}:`, error);
       throw new Error(`Stats retrieval failed: ${error.message}`);
     }
@@ -26,7 +26,7 @@ export class WingullPlayerService {
   async getTeam(uuid: string): Promise<PokemonW[]> {
     try {
       return await this.wingullPlayerRepository.getTeamFromAPI(uuid);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to get team for ${uuid}:`, error);
       throw new Error(`Team retrieval failed: ${error.message}`);
     }
@@ -35,7 +35,7 @@ export class WingullPlayerService {
   async getPC(uuid: string): Promise<any> {
     try {
       return await this.wingullPlayerRepository.getPCFromAPI(uuid);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to get PC for ${uuid}:`, error);
       throw new Error(`PC retrieval failed: ${error.message}`);
     }
@@ -44,7 +44,7 @@ export class WingullPlayerService {
   async movePokemon(movePokemonDto: any): Promise<any> {
     try {
       return await this.wingullPlayerRepository.movePokemonInAPI(movePokemonDto);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to move Pokémon:`, error);
       throw new Error(`Pokémon move failed: ${error.message}`);
     }
@@ -53,7 +53,7 @@ export class WingullPlayerService {
   async updateDex(uuid: string): Promise<any> {
     try {
       return await this.wingullPlayerRepository.updateDexInAPI(uuid);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to update dex for ${uuid}:`, error);
       throw new Error(`Dex update failed: ${error.message}`);
     }
@@ -62,7 +62,7 @@ export class WingullPlayerService {
   async getQuests(uuid: string): Promise<any> {
     try {
       return await this.wingullPlayerRepository.getQuestsFromAPI(uuid);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to get quests for ${uuid}:`, error);
       throw new Error(`Quests retrieval failed: ${error.message}`);
     }
@@ -72,7 +72,7 @@ export class WingullPlayerService {
     try {
       const request: MessageRequestDto = { uuid, message };
       return await this.wingullPlayerRepository.sendMessageInAPI(request);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to send message to ${uuid}:`, error);
       throw new Error(`Message sending failed: ${error.message}`);
     }
@@ -82,7 +82,7 @@ export class WingullPlayerService {
     try {
       const request: MessageRequestDto = { uuid, message };
       return await this.wingullPlayerRepository.globalchatInAPI(request);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to send global chat message for ${uuid}:`, error);
       throw new Error(`Global chat message sending failed: ${error.message}`);
     }
@@ -92,7 +92,7 @@ export class WingullPlayerService {
     try {
       const request: PokemonGiveRequestDto = { uuid, pokespec, sendMessage };
       return await this.wingullPlayerRepository.givePokemonInAPI(request);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to give Pokémon to ${uuid}:`, error);
       throw new Error(`Pokémon giving failed: ${error.message}`);
     }
@@ -106,7 +106,7 @@ export class WingullPlayerService {
   }>): Promise<any> {
     try {
       return await this.wingullPlayerRepository.giveItemsInAPI(uuid, items);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to give items to ${uuid}:`, error);
       throw new Error(`Items giving failed: ${error.message}`);
     }
@@ -115,7 +115,7 @@ export class WingullPlayerService {
   async getBattleTeams(uuid: string): Promise<any> {
     try {
       return await this.wingullPlayerRepository.getBattleTeamsFromAPI(uuid);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to get battle teams for ${uuid}:`, error);
       throw new Error(`Battle teams retrieval failed: ${error.message}`);
     }
@@ -124,7 +124,7 @@ export class WingullPlayerService {
   async updateBattleTeam(updateBattleTeamDto: UpdateBattleTeamDto): Promise<any> {
     try {
       return await this.wingullPlayerRepository.updateBattleTeamInAPI(updateBattleTeamDto);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to update battle team:', error);
       throw new Error(`Battle team update failed: ${error.message}`);
     }

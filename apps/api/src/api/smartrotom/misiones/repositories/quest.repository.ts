@@ -41,7 +41,7 @@ export class QuestRepository implements IQuestRepository {
       this.logger.log(`Successfully fetched ${Object.keys(questResponse.quests).length} quests`);
       return questResponse;
 
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Failed to fetch quests from external API', error.stack);
       throw new BadRequestException(`Failed to fetch quest data: ${error.message}`);
     }
@@ -74,7 +74,7 @@ export class QuestRepository implements IQuestRepository {
       this.logger.log(`Successfully fetched user quests for ${uuid}`);
       return userQuestResponse;
 
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Failed to fetch user quests for ${uuid}`, error.stack);
       throw new BadRequestException(`Failed to fetch user quest data: ${error.message}`);
     }

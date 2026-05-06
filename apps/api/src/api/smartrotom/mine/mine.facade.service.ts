@@ -33,7 +33,7 @@ export class MineFacadeService {
   async getPlayerEnergy(uuid: string): Promise<EnergyStatus> {
     try {
       return await this.energyService.getPlayerEnergy(uuid);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting energy for player ${uuid}:`, error);
       throw new Error(`Failed to retrieve energy: ${error.message}`);
     }
@@ -56,7 +56,7 @@ export class MineFacadeService {
 
       // Start game
       return await this.gameService.startGame(uuid);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error starting game for player ${request.uuid}:`, error);
       throw new Error(`Failed to start game: ${error.message}`);
     }
@@ -74,7 +74,7 @@ export class MineFacadeService {
       }
 
       return await this.gameService.endGame(uuid, rewards);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error ending game for player ${request.uuid}:`, error);
       throw new Error(`Failed to end game: ${error.message}`);
     }
@@ -85,7 +85,7 @@ export class MineFacadeService {
   async getAllRewards(): Promise<MineRewardItem[]> {
     try {
       return await this.rewardService.getAllRewards();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error getting all rewards:', error);
       throw new Error(`Failed to retrieve rewards: ${error.message}`);
     }
@@ -94,7 +94,7 @@ export class MineFacadeService {
   async getRewardsByType(): Promise<RewardsByType> {
     try {
       return await this.rewardService.getRewardsByType();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error getting rewards by type:', error);
       throw new Error(`Failed to retrieve rewards by type: ${error.message}`);
     }
@@ -103,7 +103,7 @@ export class MineFacadeService {
   async getRewardDropRates(): Promise<{ [rewardId: number]: { name: string; dropRate: number } }> {
     try {
       return await this.rewardService.getRewardDropRates();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error getting reward drop rates:', error);
       throw new Error(`Failed to retrieve drop rates: ${error.message}`);
     }
@@ -114,7 +114,7 @@ export class MineFacadeService {
   async getPlayerHistory(uuid: string): Promise<PlayerHistory> {
     try {
       return await this.playerService.getPlayerHistory(uuid);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting history for player ${uuid}:`, error);
       throw new Error(`Failed to retrieve player history: ${error.message}`);
     }
@@ -123,7 +123,7 @@ export class MineFacadeService {
   async getPlayerRanking(): Promise<RankingEntry[]> {
     try {
       return await this.playerService.getPlayerRanking();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error getting player ranking:', error);
       throw new Error(`Failed to retrieve ranking: ${error.message}`);
     }
@@ -132,7 +132,7 @@ export class MineFacadeService {
   async getPlayerRank(uuid: string): Promise<{ rank: number; totalValue: number } | null> {
     try {
       return await this.playerService.getPlayerRank(uuid);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting rank for player ${uuid}:`, error);
       throw new Error(`Failed to retrieve player rank: ${error.message}`);
     }
@@ -141,7 +141,7 @@ export class MineFacadeService {
   async getUnclaimedRewards(uuid: string): Promise<UnclaimedItem[]> {
     try {
       return await this.playerService.getUnclaimedRewards(uuid);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting unclaimed rewards for player ${uuid}:`, error);
       throw new Error(`Failed to retrieve unclaimed rewards: ${error.message}`);
     }
@@ -150,7 +150,7 @@ export class MineFacadeService {
   async claimRewards(request: ClaimRequest): Promise<ClaimResponse> {
     try {
       return await this.playerService.claimRewards(request.uuid);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error claiming rewards for player ${request.uuid}:`, error);
       throw new Error(`Failed to claim rewards: ${error.message}`);
     }
@@ -159,7 +159,7 @@ export class MineFacadeService {
   async getPlayerStatistics(uuid: string): Promise<PlayerStatistics> {
     try {
       return await this.playerService.getPlayerStatistics(uuid);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting statistics for player ${uuid}:`, error);
       throw new Error(`Failed to retrieve player statistics: ${error.message}`);
     }
@@ -170,7 +170,7 @@ export class MineFacadeService {
   async validatePlayerExists(uuid: string): Promise<boolean> {
     try {
       return await this.playerService.validatePlayerExists(uuid);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error validating player ${uuid}:`, error);
       return false;
     }
@@ -179,7 +179,7 @@ export class MineFacadeService {
   async validateRewardsExist(rewardIds: number[]): Promise<boolean> {
     try {
       return await this.rewardService.validateRewardsExist(rewardIds);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error validating rewards:', error);
       return false;
     }

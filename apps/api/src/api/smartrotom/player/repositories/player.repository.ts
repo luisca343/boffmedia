@@ -29,7 +29,7 @@ export class PlayerRepository {
       );
 
       return response.data.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to fetch player stats for UUID ${uuid}:`, error);
       
       if (error.code === 'ECONNABORTED') {
@@ -66,7 +66,7 @@ export class PlayerRepository {
       );
 
       return response.data.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to fetch player team for UUID ${uuid}:`, error);
       
       if (error.code === 'ECONNABORTED') {

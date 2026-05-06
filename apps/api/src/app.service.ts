@@ -76,7 +76,7 @@ export class AppService {
         status: 'ok',
         responseTime: `${Date.now() - startTime}ms`,
       };
-    } catch (error) {
+    } catch (error: any) {
       return {
         status: 'error',
         error: error.message,
@@ -102,7 +102,7 @@ export class AppService {
         status: 'ok',
         responseTime: `${Date.now() - startTime}ms`,
       };
-    } catch (error) {
+    } catch (error: any) {
       if (error.code === 'ECONNABORTED') {
         return {
           status: 'timeout',
@@ -125,7 +125,7 @@ export class AppService {
         return acc;
       }, {});
       return filesObj;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error reading the icons folder:', error);
       return []; // Return an empty array in case of an error
     }
@@ -142,7 +142,7 @@ export class AppService {
         JSON.stringify(this.imageCache, null, 2),
       );
       console.log('Cache saved to file.');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving cache to file:', error);
     }
   }
@@ -152,7 +152,7 @@ export class AppService {
       const data = await fs.readFile(this.CACHE_FILE_PATH, 'utf-8');
       this.imageCache = JSON.parse(data);
       console.log('Cache loaded from file.');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error loading cache from file:', error);
     }
   }

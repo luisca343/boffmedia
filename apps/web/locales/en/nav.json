@@ -80,6 +80,10 @@
             "title": "Pokémon",
             "description": "Tools related to Pokémon games",
             "items": {
+              "vgc": {
+                "label": "VGC",
+                "description": "Meta analysis, speed tiers and tracker for VGC"
+              },
               "pmdsky": {
                 "label": "Explorers of Sky",
                 "description": "Mail generator for Pokémon Mystery Dungeon"

@@ -25,7 +25,7 @@ export class PokemonLogService {
 
     try {
       const auth = new google.auth.GoogleAuth({
-        keyFile: 'boffmedia-a39cdd7a63c7.json',
+        keyFile: 'boffmedia-b6e4f721c326.json',
         scopes: ['https://www.googleapis.com/auth/spreadsheets'],
       });
 
@@ -81,7 +81,7 @@ export class PokemonLogService {
             this.logger.warn(`Could not parse log for row ${actualRowNumber}`);
             errors++;
           }
-        } catch (error) {
+        } catch (error: any) {
           this.logger.error(`Error processing link in row ${actualRowNumber}:`, error);
           errors++;
         }
@@ -96,7 +96,7 @@ export class PokemonLogService {
       }
 
       return { processed, errors };
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Error in processShowdownLogs:', error);
       throw error;
     }
@@ -115,7 +115,7 @@ export class PokemonLogService {
       });
       
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Error fetching log data from ${url}:`, error.message);
       throw error;
     }
@@ -316,7 +316,7 @@ export class PokemonLogService {
       }
 
       this.logger.log(`Google Sheet updated with ${parsedLogs.length} logs`);
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Error updating Google Sheet:', error);
       throw error;
     }

@@ -14,7 +14,7 @@ export class UploadFacadeService {
   async uploadImage(imageRequest: ImageUploadRequest): Promise<FileUploadResponse> {
     try {
       return await this.imageUploadService.uploadImage(imageRequest);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading image:', error);
       throw new Error(`Failed to upload image: ${error.message}`);
     }
@@ -27,7 +27,7 @@ export class UploadFacadeService {
         success: result.success, 
         message: result.success ? 'Image deleted successfully' : 'Failed to delete image' 
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error deleting image ${filename}:`, error);
       throw new Error(`Failed to delete image: ${error.message}`);
     }
@@ -36,7 +36,7 @@ export class UploadFacadeService {
   async getImageInfo(path: string, filename: string): Promise<{ exists: boolean; size?: number; createdAt?: Date }> {
     try {
       return await this.imageUploadService.getImageInfo(path, filename);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting image info for ${filename}:`, error);
       throw new Error(`Failed to get image info: ${error.message}`);
     }
@@ -47,7 +47,7 @@ export class UploadFacadeService {
   async uploadFile(fileRequest: FileUploadRequest): Promise<FileUploadResponse> {
     try {
       return await this.fileUploadService.uploadFile(fileRequest);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading file:', error);
       throw new Error(`Failed to upload file: ${error.message}`);
     }
@@ -60,7 +60,7 @@ export class UploadFacadeService {
         success: result.success, 
         message: result.success ? 'File deleted successfully' : 'Failed to delete file' 
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error deleting file ${filename}:`, error);
       throw new Error(`Failed to delete file: ${error.message}`);
     }
@@ -69,7 +69,7 @@ export class UploadFacadeService {
   async getFileInfo(path: string, filename: string): Promise<{ exists: boolean; size?: number; createdAt?: Date }> {
     try {
       return await this.fileUploadService.getFileInfo(path, filename);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting file info for ${filename}:`, error);
       throw new Error(`Failed to get file info: ${error.message}`);
     }
@@ -107,7 +107,7 @@ export class UploadFacadeService {
       }
 
       return { valid: true };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error validating image file:', error);
       return { valid: false, error: 'Failed to validate file' };
     }

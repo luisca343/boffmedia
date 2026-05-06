@@ -9,6 +9,8 @@ interface ToolSectionHeaderProps {
    * Defaults to `"secondary"`.
    */
   color?: "primary" | "secondary" | "accent" | "neutral";
+  /** Reduces bottom margin from mb-6 to mb-3 — use inside compact card panels. */
+  compact?: boolean;
 }
 
 const COLOR_MAP = {
@@ -30,11 +32,11 @@ const COLOR_MAP = {
   },
 };
 
-export function ToolSectionHeader({ icon, label, color = "secondary" }: ToolSectionHeaderProps) {
+export function ToolSectionHeader({ icon, label, color = "secondary", compact = false }: ToolSectionHeaderProps) {
   const cfg = COLOR_MAP[color];
 
   return (
-    <div className="flex items-center gap-3 mb-6">
+    <div className={`flex items-center gap-3 ${compact ? "mb-3" : "mb-6"}`}>
       <div className="flex items-center gap-2">
         {icon && (
           <span className={`${cfg.text} [&_svg]:w-4 [&_svg]:h-4`}>{icon}</span>
@@ -43,7 +45,7 @@ export function ToolSectionHeader({ icon, label, color = "secondary" }: ToolSect
           className={`text-xs font-mono ${cfg.text} tracking-[0.35em] uppercase`}
           style={{ fontFamily: "Orbitron, sans-serif" }}
         >
-          // {label}
+          {label}
         </span>
       </div>
       <div className={`h-px flex-1 bg-gradient-to-r ${cfg.line} to-transparent`} />

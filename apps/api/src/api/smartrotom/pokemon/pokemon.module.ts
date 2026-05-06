@@ -84,7 +84,7 @@ export class PokemonModule implements OnModuleInit {
     try {
       await this.pokemonFacadeService.initializeService();
       console.log('Pokemon service initialized successfully');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to initialize Pokemon service:', error);
       throw error;
     }
