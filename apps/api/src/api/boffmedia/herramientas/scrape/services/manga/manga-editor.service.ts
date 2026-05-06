@@ -8,6 +8,7 @@ import { MANGA_ROOT } from './manga-constants';
 import { buildEpub, type EpubMetadata } from './manga-epub.builder';
 
 const IMAGE_RE = /\.(webp|jpg|jpeg|png|gif)$/i;
+const COMIC_INFO_RE = /^ComicInfo\.xml$/i;
 
 const MIME_MAP: Record<string, string> = {
   '.jpg': 'image/jpeg',
@@ -26,6 +27,19 @@ function assertSafe(resolved: string): void {
   const root = path.resolve(MANGA_ROOT);
   if (!resolved.startsWith(root + path.sep) && resolved !== root) {
     throw new NotFoundException('Chapter not found');
+  }
+}
+
+/** Extract the chapter title from ComicInfo.xml inside a zip, or return undefined. */
+function readComicInfoTitle(zip: AdmZip): string | undefined {
+  const entry = zip.getEntries().find(e => COMIC_INFO_RE.test(e.name));
+  if (!entry) return undefined;
+  try {
+    const xml = zip.readAsText(entry);
+    const match = xml.match(/<Title>([^<]+)<\/Title>/i);
+    return match ? match[1].trim() || undefined : undefined;
+  } catch {
+    return undefined;
   }
 }
 
@@ -114,11 +128,14 @@ export class MangaEditorService {
         imageFiles.push(dest);
       }
 
+      // Prefer title from ComicInfo.xml over the slug; user metadata overrides both
+      const comicInfoTitle = readComicInfoTitle(zip);
+
       await buildEpub({
         imageFiles,
         outputPath: epubPath,
         seriesTitle: series,
-        chapterTitle: chapter,
+        chapterTitle: comicInfoTitle ?? chapter,
         chapterNumber: parseFloat(chapter) || null,
         includeCover,
         metadata,

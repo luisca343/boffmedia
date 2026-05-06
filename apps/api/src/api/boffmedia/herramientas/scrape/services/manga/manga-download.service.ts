@@ -17,6 +17,7 @@ import { pipeline } from 'stream/promises';
 
 import { MangaBrowserService } from './manga-browser.service';
 import { MangaScraperRegistry } from './manga-registry.service';
+import { MangaConfigService } from './manga-config.service';
 import { chapterFilename, sanitizeForFilesystem } from './chapter-normalizer';
 import { UA, randomDelay, getProxy, toPlaywrightProxy } from './manga-http';
 import { MangaChapterDownloadResult } from './manga.types';
@@ -48,6 +49,7 @@ export class MangaDownloadService {
   constructor(
     private readonly registry: MangaScraperRegistry,
     private readonly browserService: MangaBrowserService,
+    private readonly configService: MangaConfigService,
   ) {}
 
   // ── Browser ────────────────────────────────────────────────────────────────
@@ -113,6 +115,9 @@ export class MangaDownloadService {
       `Streaming download "${novelTitle}" via ${scraper.name}: ` +
       `chapters ${from}–${to ?? allChapters.length} (${slice.length} total)`,
     );
+
+    // Record source URL the first time this series is downloaded
+    await this.configService.setSourceUrlIfMissing(novelTitle, novelUrl);
 
     yield sse({ type: 'start', total: slice.length, novelTitle });
 

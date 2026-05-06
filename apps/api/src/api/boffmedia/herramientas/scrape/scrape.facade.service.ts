@@ -4,6 +4,8 @@ import { MyrientScrapeService } from './services/myrient.service';
 import { MangaScraperService } from './services/manga.service';
 import { MangaBrowserService } from './services/manga/manga-browser.service';
 import { MangaEditorService } from './services/manga/manga-editor.service';
+import { MangaConfigService, type MangaConfig, type SeriesConfig, type SeriesStatus } from './services/manga/manga-config.service';
+import { MangaCronService } from './services/manga/manga-cron.service';
 import type {
   MangaSearchResult,
   MangaChapter,
@@ -27,6 +29,8 @@ export class ScrapeFacadeService {
     private readonly mangaScraperService: MangaScraperService,
     private readonly mangaBrowserService: MangaBrowserService,
     private readonly mangaEditorService: MangaEditorService,
+    private readonly mangaConfigService: MangaConfigService,
+    private readonly mangaCronService: MangaCronService,
   ) {}
 
   // ==================== MYRIENT SCRAPING ====================
@@ -157,5 +161,29 @@ export class ScrapeFacadeService {
 
   convertMangaChapter(series: string, chapter: string, excludePages: number[], includeCover?: boolean, metadata?: EpubMetadata): Promise<{ outputPath: string }> {
     return this.mangaEditorService.convertChapter(series, chapter, excludePages, includeCover, metadata);
+  }
+
+  // ==================== MANGA CONFIG ====================
+
+  getMangaConfig(): MangaConfig {
+    return this.mangaConfigService.getConfig();
+  }
+
+  async updateMangaConfig(patch: { cron?: Partial<MangaConfig['cron']> }): Promise<MangaConfig> {
+    if (patch.cron) {
+      await this.mangaConfigService.updateCron(patch.cron);
+      await this.mangaCronService.syncCronJob();
+    }
+    return this.mangaConfigService.getConfig();
+  }
+
+  async updateSeriesStatus(slug: string, status: SeriesStatus): Promise<SeriesConfig> {
+    return this.mangaConfigService.updateSeriesConfig(slug, { status });
+  }
+
+  async runMangaCron(): Promise<{ message: string }> {
+    // Fire and forget — don't await; return immediately
+    this.mangaCronService.runAutoUpdate().catch(() => undefined);
+    return { message: 'Manga auto-update started in background.' };
   }
 }
