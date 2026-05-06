@@ -1,4 +1,5 @@
 import { apiGET, apiPATCH, apiPOST } from '@/services/boffAPI';
+import type { LocalGamesResult, CatalogSearchResult, SearchLocalGamesResult } from '@boffmedia/shared';
 
 export interface GameFileEntry {
   name: string;
