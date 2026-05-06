@@ -85,7 +85,7 @@ function escapeXml(str: string): string {
  * (cover reference, series info, etc.).  Best-effort — errors are silently swallowed
  * so a malformed EPUB is never caused by this step.
  */
-async function injectEpubMetadata(epubPath: string, meta: EpubMetadata): Promise<void> {
+export async function injectEpubMetadata(epubPath: string, meta: EpubMetadata): Promise<void> {
   const hasContent = Object.values(meta).some(v => (Array.isArray(v) ? v.length > 0 : !!v));
   if (!hasContent) return;
 

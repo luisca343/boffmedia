@@ -276,4 +276,11 @@ export class ScrapeService {
       { series, chapter, excludePages, includeCover, metadata },
     );
   }
+
+  static patchEpubMetadata(series: string, chapters: string[], metadata: EpubMetadata) {
+    return apiPOST<{ results: { chapter: string; updated: boolean }[]; updated: number }>(
+      '/boffmedia/herramientas/scrape/manga/patch-metadata',
+      { series, chapters, metadata },
+    );
+  }
 }

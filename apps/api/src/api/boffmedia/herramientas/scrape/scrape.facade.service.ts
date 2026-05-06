@@ -163,6 +163,15 @@ export class ScrapeFacadeService {
     return this.mangaEditorService.convertChapter(series, chapter, excludePages, includeCover, metadata);
   }
 
+  async patchMangaEpubMetadata(series: string, chapters: string[], metadata: EpubMetadata): Promise<{ results: { chapter: string; updated: boolean }[]; updated: number }> {
+    const results: { chapter: string; updated: boolean }[] = [];
+    for (const chapter of chapters) {
+      const result = await this.mangaEditorService.patchEpubMetadata(series, chapter, metadata);
+      results.push({ chapter, updated: result.updated });
+    }
+    return { results, updated: results.filter(r => r.updated).length };
+  }
+
   // ==================== MANGA CONFIG ====================
 
   getMangaConfig(): MangaConfig {

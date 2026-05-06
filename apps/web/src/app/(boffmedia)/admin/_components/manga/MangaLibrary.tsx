@@ -272,6 +272,8 @@ function MangaLibraryInner() {
   const [removeFirst, setRemoveFirst] = useState(0);
   const [removeLast, setRemoveLast] = useState(0);
   const [portalTarget, setPortalTarget] = useState<Element | null>(null);
+  const [patching, setPatching] = useState(false);
+  const [patchResult, setPatchResult] = useState<{ updated: number; total: number } | null>(null);
 
   const prevSeriesRef = useRef<string | null>(null);
 
@@ -412,6 +414,23 @@ function MangaLibraryInner() {
     refreshLibrary();
   }
 
+  async function handlePatchMetadata(slugs?: string[]) {
+    if (!selectedSeries) return;
+    const meta = seriesMetadata[selectedSeries.slug] ?? {};
+    const convertedSet = converted.get(selectedSeries.slug) ?? new Set<string>();
+    const targetSlugs = slugs ?? selectedSeries.chapters
+      .filter((c) => c.hasEpub || convertedSet.has(c.slug))
+      .map((c) => c.slug);
+    if (targetSlugs.length === 0) return;
+    setPatching(true);
+    setPatchResult(null);
+    const res = await ScrapeService.patchEpubMetadata(selectedSeries.slug, targetSlugs, meta).catch(() => null);
+    if (res?.success && res.data) {
+      setPatchResult({ updated: res.data.updated, total: res.data.results.length });
+    }
+    setPatching(false);
+  }
+
   // ── Export summary (live) ────────────────────────────────────────────────────
   const exportSummary = useMemo(() => {
     if (!selectedSeries || selectedChapters.size === 0) return null;
@@ -478,6 +497,26 @@ function MangaLibraryInner() {
               >
                 {showAdvanced ? "Básico" : "Avanzado"}
               </button>
+
+              {(() => {
+                const convertedSet = converted.get(selectedSeries?.slug ?? "") ?? new Set<string>();
+                const epubSlugs = (selectedSeries?.chapters ?? [])
+                  .filter((c) => selectedChapters.has(c.slug) && (c.hasEpub || convertedSet.has(c.slug)))
+                  .map((c) => c.slug);
+                return epubSlugs.length > 0 ? (
+                  <Button
+                    onClick={() => handlePatchMetadata(epubSlugs)}
+                    disabled={patching || (!!bulk && !bulk.finished)}
+                    size="sm"
+                    variant="outline"
+                    className="shrink-0 border-surface-600 hover:bg-surface-700 text-surface-300"
+                  >
+                    {patching
+                      ? <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />Actualizando…</>
+                      : "Actualizar metadatos"}
+                  </Button>
+                ) : null;
+              })()}
 
               <Button
                 onClick={handleBulkExport}
@@ -669,8 +708,26 @@ function MangaLibraryInner() {
                   </button>
                   {showMetadata && (
                     <Card className="mb-2">
-                      <CardContent className="p-4">
+                      <CardContent className="p-4 space-y-3">
                         <MangaMetadataForm seriesSlug={seriesSlug} />
+                        <div className="flex items-center gap-3 pt-2 border-t border-surface-700/40">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handlePatchMetadata()}
+                            disabled={patching}
+                            className="border-surface-600 hover:bg-surface-700 text-surface-300"
+                          >
+                            {patching
+                              ? <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />Aplicando…</>
+                              : "Aplicar a todos los EPUB"}
+                          </Button>
+                          {patchResult && (
+                            <p className="text-xs text-surface-400">
+                              {patchResult.updated}/{patchResult.total} EPUB actualizados
+                            </p>
+                          )}
+                        </div>
                       </CardContent>
                     </Card>
                   )}
