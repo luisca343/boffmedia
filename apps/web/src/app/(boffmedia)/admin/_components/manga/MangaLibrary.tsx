@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
-import { BookOpen, ChevronRight, Loader2, RefreshCw, X } from "lucide-react";
+import { BookOpen, ChevronRight, Loader2, RefreshCw, X, Library, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/primitives/badge";
 import { Button } from "@/components/ui/primitives/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/primitives/card";
@@ -14,6 +14,7 @@ import { ScrapeService } from "@/services/api/boffmedia/scrapeService";
 import { useMangaStore } from "@/stores/useMangaStore";
 import ChapterGrid from "./ChapterGrid";
 import MangaMetadataForm from "./MangaMetadataForm";
+import { FloatingSection } from "@/app/(boffmedia)/_components/layout/FloatingSection";
 
 // Session-only scroll memory for the library grid
 let _libraryScrollY = 0;
@@ -323,215 +324,291 @@ function MangaLibraryInner() {
 
   // ── Render ──────────────────────────────────────────────────────────────────
   return (
-    <div className="pb-24">
-      <div className="mb-6 flex items-center gap-3">
-        <BookOpen className="w-6 h-6 text-primary-400 shrink-0" />
-        <h2 className="text-xl font-bold tracking-tight flex-1">
-          <span className="bg-gradient-to-r from-primary-400 to-primary-200 bg-clip-text text-transparent">
-            {t("title")}
-          </span>
-        </h2>
-        <button
-          onClick={clearLibraryCache}
-          className="text-surface-500 hover:text-surface-200 transition-colors p-1.5 rounded hover:bg-surface-700/40"
-          aria-label={t("refreshLibrary")}
-          title={t("refreshLibrary")}
+    <FloatingSection className="min-h-screen pb-32">
+      <div className="container mx-auto px-4 py-10 max-w-6xl">
+
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
         >
-          <RefreshCw className="w-4 h-4" />
-        </button>
-      </div>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2.5 rounded-xl bg-primary-900/30 border border-primary-800/40">
+              <Library className="w-6 h-6 text-primary-400" />
+            </div>
+            <div className="flex-1">
+              <h1 className="text-2xl font-bold text-surface-50">
+                {t("title")}
+              </h1>
+              <p className="text-sm text-surface-400 mt-0.5">{t("subtitle")}</p>
+            </div>
+            <button
+              onClick={clearLibraryCache}
+              className="flex items-center gap-2 px-3 py-2 text-sm text-surface-400 hover:text-surface-200 hover:bg-surface-700/40 rounded-lg transition-colors"
+              aria-label={t("refreshLibrary")}
+              title={t("refreshLibrary")}
+            >
+              <RefreshCw className="w-4 h-4" />
+              <span className="hidden sm:inline">{t("refreshLibrary")}</span>
+            </button>
+          </div>
+        </motion.div>
 
-      {/* Breadcrumb */}
-      {seriesSlug && (
-        <div className="flex items-center gap-1.5 text-sm text-surface-400 mb-6 flex-wrap">
-          <button onClick={goToLibrary} className="hover:text-surface-100 transition-colors">
-            {t("backToLibrary")}
-          </button>
-          <ChevronRight className="w-3.5 h-3.5 shrink-0" />
-          <button
-            onClick={chapterSlug ? goToSeries : undefined}
-            className={`hover:text-surface-100 transition-colors ${!chapterSlug ? "text-surface-100 font-medium pointer-events-none" : ""}`}
-          >
-            {seriesSlug}
-          </button>
-          {chapterSlug && (
-            <>
-              <ChevronRight className="w-3.5 h-3.5 shrink-0" />
-              <span className="text-surface-100 font-medium">{chapterSlug}</span>
-            </>
-          )}
-        </div>
-      )}
-
-      <AnimatePresence mode="wait">
-        {/* ── LIBRARY VIEW ── */}
-        {!seriesSlug && (
-          <motion.div
-            key="library"
-            initial={{ opacity: 0, x: -16 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 16 }}
-            transition={{ duration: 0.2 }}
-          >
-            {loadingLibrary ? (
-              <div className="flex items-center gap-2 text-surface-400">
-                <Loader2 className="w-4 h-4 animate-spin" />
-              </div>
-            ) : !library?.series.length ? (
-              <Card>
-                <CardContent className="py-12 text-center text-surface-400">{t("noSeries")}</CardContent>
-              </Card>
-            ) : (
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {library.series.map((series) => (
-                  <button key={series.slug} onClick={() => openSeries(series.slug)} className="text-left">
-                    <Card className="hover:border-primary-500/50 transition-colors cursor-pointer h-full">
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-base leading-snug line-clamp-2">{series.slug}</CardTitle>
-                      </CardHeader>
-                      <CardContent className="pt-0">
-                        <span className="text-sm text-surface-400">{series.chapters.length} {t("chapters")}</span>
-                      </CardContent>
-                    </Card>
-                  </button>
-                ))}
-              </div>
-            )}
-          </motion.div>
-        )}
-
-        {/* ── SERIES + CHAPTER TWO-PANEL VIEW ── */}
+        {/* Breadcrumb */}
         {seriesSlug && (
           <motion.div
-            key="series"
-            initial={{ opacity: 0, x: 16 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -16 }}
-            transition={{ duration: 0.2 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex items-center gap-1.5 text-sm mb-6 flex-wrap bg-surface-800/40 border border-surface-700/50 rounded-lg px-4 py-2"
           >
-            {loadingLibrary || !selectedSeries ? (
-              <div className="flex items-center gap-2 text-surface-400">
-                <Loader2 className="w-4 h-4 animate-spin" />
-              </div>
-            ) : (
-              <div className="flex flex-col lg:flex-row gap-4">
-
-                {/* LEFT PANEL: Chapter list */}
-                <div className="lg:w-72 xl:w-80 shrink-0 lg:self-start lg:sticky lg:top-4">
-                  <Card className="flex flex-col lg:max-h-[calc(100vh-5rem)]">
-                    <CardContent className="p-0 flex flex-col min-h-0">
-
-                      {selectedSeries.chapters.length > 0 && (
-                        <div className="flex items-center gap-3 px-4 py-2.5 border-b border-surface-700/50 shrink-0">
-                          <Checkbox
-                            id="select-all"
-                            checked={
-                              selectedChapters.size === selectedSeries.chapters.length &&
-                              selectedSeries.chapters.length > 0
-                            }
-                            onCheckedChange={toggleSelectAll}
-                          />
-                          <label htmlFor="select-all" className="text-xs text-surface-400 cursor-pointer select-none">
-                            {selectedChapters.size === selectedSeries.chapters.length &&
-                            selectedSeries.chapters.length > 0
-                              ? t("deselectAll")
-                              : t("selectAll")}
-                          </label>
-                          {selectedChapters.size > 0 && (
-                            <Badge variant="outline" className="ml-auto text-[10px] border-primary-600/60 text-primary-400">
-                              {t("selectedChapters", { count: selectedChapters.size })}
-                            </Badge>
-                          )}
-                        </div>
-                      )}
-
-                      <div className="overflow-y-auto">
-                        {selectedSeries.chapters.length === 0 ? (
-                          <p className="p-6 text-surface-400 text-sm">{t("noChapters")}</p>
-                        ) : (
-                          <ul className="divide-y divide-surface-700/50">
-                            {selectedSeries.chapters.map((ch) => {
-                              const hasEpub = ch.hasEpub || converted.get(selectedSeries.slug)?.has(ch.slug);
-                              const isSelected = selectedChapters.has(ch.slug);
-                              const isActive = ch.slug === chapterSlug;
-                              return (
-                                <li
-                                  key={ch.slug}
-                                  className={`flex items-center transition-colors ${isSelected ? "bg-primary-900/20" : ""} ${isActive ? "border-l-2 border-primary-500 bg-primary-900/30" : ""}`}
-                                >
-                                  <div className="pl-4 pr-2 py-3 flex items-center shrink-0">
-                                    <Checkbox
-                                      checked={isSelected}
-                                      onCheckedChange={() => toggleChapterSelect(ch.slug)}
-                                      aria-label={`Select chapter ${ch.slug}`}
-                                    />
-                                  </div>
-                                  <button
-                                    onClick={() => openChapter(ch.slug)}
-                                    className="flex-1 flex items-center gap-2 px-3 py-3 hover:bg-surface-700/30 transition-colors text-left min-w-0"
-                                  >
-                                    <span className={`flex-1 font-medium text-sm truncate ${isActive ? "text-primary-300" : ""}`}>
-                                      {ch.slug}
-                                    </span>
-                                    <div className="flex gap-1 shrink-0">
-                                      {ch.hasCbz && (
-                                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-surface-600 text-surface-400">{t("cbz")}</Badge>
-                                      )}
-                                      {hasEpub && (
-                                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-primary-600/60 text-primary-400">{t("epub")}</Badge>
-                                      )}
-                                    </div>
-                                    <ChevronRight className={`w-3.5 h-3.5 shrink-0 ${isActive ? "text-primary-400" : "text-surface-500"}`} />
-                                  </button>
-                                </li>
-                              );
-                            })}
-                          </ul>
-                        )}
-                      </div>
-
-                    </CardContent>
-                  </Card>
-                </div>
-
-                {/* RIGHT PANEL: Page grid or metadata form */}
-                <div className="flex-1 min-w-0">
-                  {!chapterSlug ? (
-                    <Card>
-                      <CardContent className="p-5">
-                        <MangaMetadataForm seriesSlug={seriesSlug} />
-                        <p className="mt-4 text-xs text-surface-500 text-center">{t("selectChapter")}</p>
-                      </CardContent>
-                    </Card>
-                  ) : loadingPages ? (
-                    <div className="flex items-center gap-2 text-surface-400 py-8">
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span className="text-sm">{t("loadingPages")}</span>
-                    </div>
-                  ) : pagesError ? (
-                    <Card>
-                      <CardContent className="py-8 text-center text-red-400 text-sm">{pagesError}</CardContent>
-                    </Card>
-                  ) : (
-                    <ChapterGrid
-                      series={seriesSlug}
-                      chapter={chapterSlug}
-                      pages={currentPages}
-                      discarded={discarded}
-                      onToggle={(i) => togglePage(chapterSlug, i)}
-                    />
-                  )}
-                </div>
-
-              </div>
+            <button onClick={goToLibrary} className="text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-1">
+              <Library className="w-3.5 h-3.5" />
+              {t("backToLibrary")}
+            </button>
+            <ChevronRight className="w-3.5 h-3.5 text-surface-500" />
+            <button
+              onClick={chapterSlug ? goToSeries : undefined}
+              className={`hover:text-surface-100 transition-colors ${!chapterSlug ? "text-surface-100 font-medium" : "text-surface-300"}`}
+            >
+              {seriesSlug}
+            </button>
+            {chapterSlug && (
+              <>
+                <ChevronRight className="w-3.5 h-3.5 text-surface-500" />
+                <span className="text-surface-100 font-medium flex items-center gap-1.5">
+                  <FileText className="w-3.5 h-3.5" />
+                  {chapterSlug}
+                </span>
+              </>
             )}
           </motion.div>
         )}
-      </AnimatePresence>
+
+        <AnimatePresence mode="wait">
+          {/* ── LIBRARY VIEW ── */}
+          {!seriesSlug && (
+            <motion.div
+              key="library"
+              initial={{ opacity: 0, x: -16 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 16 }}
+              transition={{ duration: 0.2 }}
+            >
+              {loadingLibrary ? (
+                <Card className="bg-surface-800/40 border-surface-700/50">
+                  <CardContent className="py-12 flex items-center justify-center gap-3 text-surface-400">
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span>Cargando biblioteca...</span>
+                  </CardContent>
+                </Card>
+              ) : !library?.series.length ? (
+                <Card className="bg-surface-800/40 border-surface-700/50">
+                  <CardContent className="py-16 flex flex-col items-center justify-center gap-4 text-surface-400">
+                    <div className="p-4 rounded-full bg-surface-700/30">
+                      <BookOpen className="w-10 h-10 text-surface-500" />
+                    </div>
+                    <div className="text-center">
+                      <p className="text-surface-300 font-medium mb-1">{t("noSeries")}</p>
+                      <p className="text-sm">Descarga manga desde elDescargador para verlo aquí</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {library.series.map((series) => (
+                    <button
+                      key={series.slug}
+                      onClick={() => openSeries(series.slug)}
+                      className="text-left group"
+                    >
+                      <Card className="bg-surface-800/40 border-surface-700/50 hover:border-primary-500/50 hover:bg-surface-800/60 transition-all h-full">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-base leading-snug line-clamp-2 text-surface-100 group-hover:text-primary-300 transition-colors">
+                            {series.slug}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="pt-0">
+                          <div className="flex items-center gap-2">
+                            <Badge className="bg-primary-900/30 text-primary-300 border-primary-800/40 text-xs">
+                              {series.chapters.length} {t("chapters")}
+                            </Badge>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </motion.div>
+          )}
+
+          {/* ── SERIES + CHAPTER TWO-PANEL VIEW ── */}
+          {seriesSlug && (
+            <motion.div
+              key="series"
+              initial={{ opacity: 0, x: 16 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -16 }}
+              transition={{ duration: 0.2 }}
+            >
+              {loadingLibrary || !selectedSeries ? (
+                <Card className="bg-surface-800/40 border-surface-700/50">
+                  <CardContent className="py-12 flex items-center justify-center gap-3 text-surface-400">
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span>Cargando serie...</span>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="flex flex-col lg:flex-row gap-6">
+
+                  {/* LEFT PANEL: Chapter list */}
+                  <div className="lg:w-80 xl:w-96 shrink-0 lg:self-start lg:sticky lg:top-4">
+                    <Card className="bg-surface-800/40 border-surface-700/50 flex flex-col lg:max-h-[calc(100vh-8rem)]">
+                      <CardHeader className="pb-3 px-5 pt-5 border-b border-surface-700/50 shrink-0">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-lg font-semibold text-surface-100">
+                            {selectedSeries.slug}
+                          </CardTitle>
+                          <Badge className="bg-surface-700/50 text-surface-300 border-surface-600/50 text-xs">
+                            {selectedSeries.chapters.length} {t("chapters")}
+                          </Badge>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="p-0 flex flex-col min-h-0">
+
+                        {selectedSeries.chapters.length > 0 && (
+                          <div className="flex items-center gap-3 px-5 py-3 border-b border-surface-700/40 shrink-0 bg-surface-800/20">
+                            <Checkbox
+                              id="select-all"
+                              checked={
+                                selectedChapters.size === selectedSeries.chapters.length &&
+                                selectedSeries.chapters.length > 0
+                              }
+                              onCheckedChange={toggleSelectAll}
+                              className="border-surface-500"
+                            />
+                            <label htmlFor="select-all" className="text-sm text-surface-400 cursor-pointer select-none">
+                              {selectedChapters.size === selectedSeries.chapters.length &&
+                              selectedSeries.chapters.length > 0
+                                ? t("deselectAll")
+                                : t("selectAll")}
+                            </label>
+                            {selectedChapters.size > 0 && (
+                              <Badge className="ml-auto bg-primary-600/20 text-primary-300 border-primary-500/40 text-xs">
+                                {t("selectedChapters", { count: selectedChapters.size })}
+                              </Badge>
+                            )}
+                          </div>
+                        )}
+
+                        <div className="overflow-y-auto flex-1">
+                          {selectedSeries.chapters.length === 0 ? (
+                            <div className="p-8 text-center text-surface-400">
+                              <p className="text-sm">{t("noChapters")}</p>
+                            </div>
+                          ) : (
+                            <ul className="divide-y divide-surface-700/30">
+                              {selectedSeries.chapters.map((ch) => {
+                                const hasEpub = ch.hasEpub || converted.get(selectedSeries.slug)?.has(ch.slug);
+                                const isSelected = selectedChapters.has(ch.slug);
+                                const isActive = ch.slug === chapterSlug;
+                                return (
+                                  <li
+                                    key={ch.slug}
+                                    className={`flex items-center transition-colors ${
+                                      isSelected ? "bg-primary-900/20" : ""
+                                    } ${
+                                      isActive ? "border-l-2 border-primary-500 bg-primary-900/30" : ""
+                                    } hover:bg-surface-700/20`}
+                                  >
+                                    <div className="pl-4 pr-2 py-2.5 flex items-center shrink-0">
+                                      <Checkbox
+                                        checked={isSelected}
+                                        onCheckedChange={() => toggleChapterSelect(ch.slug)}
+                                        aria-label={`Select chapter ${ch.slug}`}
+                                        className="border-surface-500"
+                                      />
+                                    </div>
+                                    <button
+                                      onClick={() => openChapter(ch.slug)}
+                                      className="flex-1 flex items-center gap-2 px-3 py-2.5 hover:bg-surface-700/20 transition-colors text-left min-w-0"
+                                    >
+                                      <span className={`flex-1 font-medium text-sm truncate ${isActive ? "text-primary-300" : "text-surface-200"}`}>
+                                        {ch.slug}
+                                      </span>
+                                      <div className="flex gap-1.5 shrink-0">
+                                        {ch.hasCbz && (
+                                          <Badge variant="outline" className="text-[10px] px-2 py-0 border-surface-600 text-surface-400 bg-surface-700/30">
+                                            {t("cbz")}
+                                          </Badge>
+                                        )}
+                                        {hasEpub && (
+                                          <Badge className="text-[10px] px-2 py-0 bg-primary-900/30 text-primary-300 border-primary-700/40">
+                                            {t("epub")}
+                                          </Badge>
+                                        )}
+                                      </div>
+                                      <ChevronRight className={`w-4 h-4 shrink-0 ${isActive ? "text-primary-400" : "text-surface-500"}`} />
+                                    </button>
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          )}
+                        </div>
+
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* RIGHT PANEL: Page grid or metadata form */}
+                  <div className="flex-1 min-w-0">
+                    {!chapterSlug ? (
+                      <Card className="bg-surface-800/40 border-surface-700/50">
+                        <CardContent className="p-6">
+                          <MangaMetadataForm seriesSlug={seriesSlug} />
+                          <div className="mt-6 pt-4 border-t border-surface-700/40 flex items-center justify-center gap-2 text-surface-500">
+                            <FileText className="w-4 h-4" />
+                            <p className="text-sm">{t("selectChapter")}</p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ) : loadingPages ? (
+                      <Card className="bg-surface-800/40 border-surface-700/50">
+                        <CardContent className="py-16 flex items-center justify-center gap-3 text-surface-400">
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                          <span className="text-sm">{t("loadingPages")}</span>
+                        </CardContent>
+                      </Card>
+                    ) : pagesError ? (
+                      <Card className="bg-surface-800/40 border-surface-700/50">
+                        <CardContent className="py-16 text-center">
+                          <p className="text-red-400 text-sm">{pagesError}</p>
+                        </CardContent>
+                      </Card>
+                    ) : (
+                      <ChapterGrid
+                        series={seriesSlug}
+                        chapter={chapterSlug}
+                        pages={currentPages}
+                        discarded={discarded}
+                        onToggle={(i) => togglePage(chapterSlug, i)}
+                      />
+                    )}
+                  </div>
+
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+      </div>
 
       {singleBar}
       {bulkBar}
-    </div>
+    </FloatingSection>
   );
 }
 
