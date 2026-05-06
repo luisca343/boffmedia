@@ -181,7 +181,21 @@
       "bulkConverting": "Converting {done}/{total}…",
       "bulkDone": "{count} converted",
       "selectChapter": "Select a chapter to view its pages",
-      "coverPage": "Cover page"
+      "coverPage": "Cover page",
+      "refreshLibrary": "Refresh library",
+      "metadata": "EPUB Metadata",
+      "metaTitle": "Title",
+      "metaLanguage": "Language",
+      "metaAuthor": "Author",
+      "metaIllustrator": "Illustrator",
+      "metaPublisher": "Publisher",
+      "metaYear": "Year",
+      "metaSubjects": "Subjects",
+      "metaSubjectsHint": "manga, action, adventure…",
+      "metaSortPlaceholder": "Last, First",
+      "saveMetadata": "Save metadata",
+      "metaSaved": "Saved",
+      "autoSort": "Auto"
     }
   }
 }

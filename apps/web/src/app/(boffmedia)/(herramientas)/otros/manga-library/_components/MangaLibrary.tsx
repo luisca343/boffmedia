@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
-import { BookOpen, ChevronRight, Loader2, X } from "lucide-react";
+import { BookOpen, ChevronRight, Loader2, RefreshCw, X } from "lucide-react";
 import { Badge } from "@/components/ui/primitives/badge";
 import { Button } from "@/components/ui/primitives/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/primitives/card";
@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/primitives/checkbox";
 import { ScrapeService } from "@/services/api/boffmedia/scrapeService";
 import { useMangaStore } from "@/stores/useMangaStore";
 import ChapterGrid from "./ChapterGrid";
+import MangaMetadataForm from "../../_components/MangaMetadataForm";
 
 // Session-only scroll memory for the library grid
 let _libraryScrollY = 0;
@@ -34,10 +35,12 @@ function MangaLibraryInner() {
   // Store
   const library = useMangaStore((s) => s.library);
   const setLibrary = useMangaStore((s) => s.setLibrary);
+  const clearLibraryCache = useMangaStore((s) => s.clearLibraryCache);
   const chapterPagesMap = useMangaStore((s) => s.chapterPages);
   const pageSelections = useMangaStore((s) => s.pageSelections);
   const togglePage = useMangaStore((s) => s.togglePage);
   const setPages = useMangaStore((s) => s.setPages);
+  const seriesMetadata = useMangaStore((s) => s.seriesMetadata);
 
   // URL-driven state (source of truth for current view)
   const seriesSlug = searchParams.get("series");
@@ -79,9 +82,10 @@ function MangaLibraryInner() {
     prevSeriesSlug.current = seriesSlug;
   }, [seriesSlug]);
 
-  // Load library (use persisted cache if available)
+  // Load library (use persisted cache if available; re-fetches when cache is cleared)
   useEffect(() => {
     if (library) { setLoadingLibrary(false); return; }
+    setLoadingLibrary(true);
     ScrapeService.getLocalMangaLibrary().then((res) => {
       if (res.success && res.data) setLibrary(res.data);
       setLoadingLibrary(false);
@@ -142,6 +146,7 @@ function MangaLibraryInner() {
     setConvertError(null);
     const res = await ScrapeService.convertMangaChapter(
       seriesSlug, chapterSlug, Array.from(discarded), includeCoverSingle,
+      seriesSlug ? seriesMetadata[seriesSlug] : undefined,
     ).catch(() => null);
     setConverting(false);
     if (!res?.success) { setConvertError(t("errorConverting")); return; }
@@ -177,6 +182,7 @@ function MangaLibraryInner() {
       const excludePages = buildExcludePages(ch.imageCount, removeFirst, removeLast);
       const res = await ScrapeService.convertMangaChapter(
         selectedSeries.slug, ch.slug, excludePages, includeCoverBulk,
+        seriesMetadata[selectedSeries.slug],
       ).catch(() => null);
       if (res?.success) markConverted(selectedSeries.slug, ch.slug);
       setBulk((prev) => prev
@@ -315,14 +321,22 @@ function MangaLibraryInner() {
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35 }}
-        className="mb-8"
+        className="mb-8 flex items-center gap-3"
       >
-        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
-          <BookOpen className="w-7 h-7 text-primary-400" />
+        <BookOpen className="w-7 h-7 text-primary-400 shrink-0" />
+        <h1 className="text-3xl font-bold tracking-tight flex-1">
           <span className="bg-gradient-to-r from-primary-400 to-primary-200 bg-clip-text text-transparent">
             {t("title")}
           </span>
         </h1>
+        <button
+          onClick={clearLibraryCache}
+          className="text-surface-500 hover:text-surface-200 transition-colors p-1.5 rounded hover:bg-surface-700/40"
+          aria-label={t("refreshLibrary")}
+          title={t("refreshLibrary")}
+        >
+          <RefreshCw className="w-4 h-4" />
+        </button>
       </motion.div>
 
       {/* Breadcrumb */}
@@ -478,13 +492,15 @@ function MangaLibraryInner() {
                   </Card>
                 </div>
 
-                {/* RIGHT PANEL: Page grid */}
+                {/* RIGHT PANEL: Page grid or metadata form */}
                 <div className="flex-1 min-w-0">
                   {!chapterSlug ? (
-                    <div className="flex flex-col items-center justify-center h-48 text-surface-500 text-sm gap-2">
-                      <BookOpen className="w-8 h-8 opacity-30" />
-                      <span>{t("selectChapter")}</span>
-                    </div>
+                    <Card>
+                      <CardContent className="p-5">
+                        <MangaMetadataForm seriesSlug={seriesSlug} />
+                        <p className="mt-4 text-xs text-surface-500 text-center">{t("selectChapter")}</p>
+                      </CardContent>
+                    </Card>
                   ) : loadingPages ? (
                     <div className="flex items-center gap-2 text-surface-400 py-8">
                       <Loader2 className="w-4 h-4 animate-spin" />

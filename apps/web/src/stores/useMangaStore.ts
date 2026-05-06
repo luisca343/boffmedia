@@ -1,10 +1,13 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { ChapterPageInfo, LocalMangaLibrary } from "@/services/api/boffmedia/scrapeService";
+import type { ChapterPageInfo, EpubMetadata, LocalMangaLibrary } from "@/services/api/boffmedia/scrapeService";
+
+export type { EpubMetadata };
 
 export type MangaStore = {
   library: LocalMangaLibrary | null;
   setLibrary: (lib: LocalMangaLibrary) => void;
+  clearLibraryCache: () => void;
 
   chapterPages: Record<string, ChapterPageInfo[]>;
   setChapterPages: (chapterId: string, pages: ChapterPageInfo[]) => void;
@@ -12,6 +15,9 @@ export type MangaStore = {
   currentMangaId: string | null;
   currentChapterId: string | null;
   pageSelections: Record<string, number[]>;
+
+  seriesMetadata: Record<string, EpubMetadata>;
+  setSeriesMetadata: (slug: string, meta: EpubMetadata) => void;
 
   setCurrentManga: (id: string) => void;
   setCurrentChapter: (id: string) => void;
@@ -25,6 +31,7 @@ export const useMangaStore = create<MangaStore>()(
     (set, get) => ({
       library: null,
       setLibrary: (lib) => set({ library: lib }),
+      clearLibraryCache: () => set({ library: null, chapterPages: {} }),
 
       chapterPages: {},
       setChapterPages: (chapterId, pages) =>
@@ -33,6 +40,10 @@ export const useMangaStore = create<MangaStore>()(
       currentMangaId: null,
       currentChapterId: null,
       pageSelections: {},
+
+      seriesMetadata: {},
+      setSeriesMetadata: (slug, meta) =>
+        set({ seriesMetadata: { ...get().seriesMetadata, [slug]: meta } }),
 
       setCurrentManga: (id) => set({ currentMangaId: id }),
       setCurrentChapter: (id) => set({ currentChapterId: id }),
@@ -59,6 +70,7 @@ export const useMangaStore = create<MangaStore>()(
         pageSelections: state.pageSelections,
         library: state.library,
         chapterPages: state.chapterPages,
+        seriesMetadata: state.seriesMetadata,
       }),
     }
   )
