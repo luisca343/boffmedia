@@ -90,7 +90,7 @@ function ResultBar({
   return (
     <div className={`flex items-center gap-2 px-3 min-h-[30px] overflow-hidden ${reversed ? 'flex-row-reverse' : ''}`}>
       <span className={`text-[10px] font-black whitespace-nowrap ${verdict.colorClass}`}>
-        {verdict.label}
+        {t(verdict.labelKey as any)}
       </span>
       <span className="font-mono text-[10px] text-surface-400 truncate flex-1">{result.desc}</span>
       <span className="font-mono text-[9px] text-surface-600 truncate flex-1 text-right">
@@ -124,7 +124,7 @@ export function MoveStrip({
 
         {/* poke1 attacks poke2 */}
         <div className="grid grid-cols-[140px_minmax(0,1fr)] sm:grid-cols-[170px_minmax(0,1fr)] gap-2 px-2.5 py-2 items-start">
-          <MoveStripPokemonCard poke={poke1} apiEntry={api1} />
+          <MoveStripPokemonCard poke={poke1} apiEntry={api1} useChampions={useChampions} />
           <div className="flex flex-col rounded overflow-hidden border border-surface-700/40 w-full md:max-w-[280px] md:justify-self-end">
             {poke1.moves.map((mv, i) => (
               <MoveRow
@@ -154,7 +154,7 @@ export function MoveStrip({
               />
             ))}
           </div>
-          <MoveStripPokemonCard poke={poke2} apiEntry={api2} align="right" />
+          <MoveStripPokemonCard poke={poke2} apiEntry={api2} align="right" useChampions={useChampions} />
         </div>
       </div>
 

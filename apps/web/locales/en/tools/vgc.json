@@ -16,13 +16,11 @@
         "attacker": "Pokémon 1 — Attacker",
         "defender": "Pokémon 2 — Defender",
         "searchPlaceholder": "Search Pokémon...",
-        "level": "Level",
         "nature": "Nature",
         "ability": "Ability",
         "item": "Item",
         "tera": "Tera",
         "status": "Status",
-        "boost": "Boost",
         "moves": "Moves",
         "lv": "Lv.",
         "teraNone": "None",
@@ -64,8 +62,7 @@
         "basePower": "Base Power",
         "categoryPhysical": "Phys",
         "categorySpecial": "Spec",
-        "categoryStatus": "Stat",
-        "crit": "Crit"
+        "categoryStatus": "Stat"
       },
       "field": {
         "title": "Field",
@@ -105,16 +102,6 @@
           "Spikes": "Spikes"
         }
       },
-      "result": {
-        "selectMove": "← select a move",
-        "selectMoveRight": "select a move →",
-        "noKO": "no KO",
-        "possibleOHKO": "possible OHKO",
-        "guaranteedOHKO": "guaranteed OHKO",
-        "guaranteed2HKO": "guaranteed 2HKO",
-        "possible2HKO": "possible 2HKO",
-        "noImmune": "No damage / immune"
-      },
       "matrix": {
         "teamLabel": "Your Team",
         "manyLabel": "Threats",
@@ -151,19 +138,6 @@
         "delete": "Delete",
         "pokemon": "{count} Pokémon"
       },
-      "speedCalc": {
-        "title": "Speed Tiers",
-        "filterPlaceholder": "Filter by name...",
-        "level50": "Lv 50",
-        "level100": "Lv 100",
-        "showMin": "Min (0 EVs)",
-        "showMax": "Max (252 EVs)",
-        "tailwind": "Tailwind ×2",
-        "scarf": "Scarf ×1.5",
-        "paralyzed": "Para ×0.5",
-        "trickRoom": "Trick Room",
-        "noPokemon": "No Pokémon match your filter"
-      },
       "mobile": {
         "attacker": "⚔ Attacker",
         "field": "⚡ Field",
@@ -173,7 +147,12 @@
       "moveStrip": {
         "selectMoveLeft": "← select a move",
         "selectMoveRight": "select a move →",
-        "noDamage": "No damage / immune"
+        "noDamage": "No damage / immune",
+        "noKO": "no KO",
+        "possibleOHKO": "possible OHKO",
+        "guaranteedOHKO": "guaranteed OHKO",
+        "guaranteed2HKO": "guaranteed 2HKO",
+        "possible2HKO": "possible 2HKO"
       },
       "speedView": {
         "tailwind": "Tailwind",

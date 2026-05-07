@@ -16,13 +16,11 @@
         "attacker": "Pokémon 1 — Atacante",
         "defender": "Pokémon 2 — Defensor",
         "searchPlaceholder": "Buscar Pokémon...",
-        "level": "Nivel",
         "nature": "Naturaleza",
         "ability": "Habilidad",
         "item": "Objeto",
         "tera": "Tera",
         "status": "Estado",
-        "boost": "Incremento",
         "moves": "Movimientos",
         "lv": "Nv.",
         "teraNone": "Ninguno",
@@ -64,8 +62,7 @@
         "basePower": "Poder Base",
         "categoryPhysical": "Fís",
         "categorySpecial": "Esp",
-        "categoryStatus": "Est",
-        "crit": "Crít"
+        "categoryStatus": "Est"
       },
       "field": {
         "title": "Campo",
@@ -92,7 +89,7 @@
           "Misty": "Niebla"
         },
         "pill": {
-          "Trick Room": "Sala Trampa",
+          "Trick Room": "Espacio Raro",
           "Gravity": "Gravedad",
           "Magic Room": "Sala Mágica",
           "Wonder Room": "Sala Extraña",
@@ -104,16 +101,6 @@
           "Helping Hand": "Ayuda",
           "Spikes": "Púas"
         }
-      },
-      "result": {
-        "selectMove": "← selecciona un movimiento",
-        "selectMoveRight": "selecciona un movimiento →",
-        "noKO": "sin KO",
-        "possibleOHKO": "posible OHKO",
-        "guaranteedOHKO": "OHKO garantizado",
-        "guaranteed2HKO": "2HKO garantizado",
-        "possible2HKO": "posible 2HKO",
-        "noImmune": "Sin daño / inmune"
       },
       "matrix": {
         "teamLabel": "Tu Equipo",
@@ -151,19 +138,6 @@
         "delete": "Eliminar",
         "pokemon": "{count} Pokémon"
       },
-      "speedCalc": {
-        "title": "Velocidades",
-        "filterPlaceholder": "Filtrar por nombre...",
-        "level50": "Lv 50",
-        "level100": "Lv 100",
-        "showMin": "Mín (0 PEs)",
-        "showMax": "Máx (252 PEs)",
-        "tailwind": "Viento Afín ×2",
-        "scarf": "Pañuelo ×1.5",
-        "paralyzed": "Parál. ×0.5",
-        "trickRoom": "Sala Trampa",
-        "noPokemon": "No hay Pokémon con ese filtro"
-      },
       "mobile": {
         "attacker": "⚔ Atacante",
         "field": "⚡ Campo",
@@ -173,13 +147,18 @@
       "moveStrip": {
         "selectMoveLeft": "← selecciona un movimiento",
         "selectMoveRight": "selecciona un movimiento →",
-        "noDamage": "Sin daño / inmune"
+        "noDamage": "Sin daño / inmune",
+        "noKO": "sin KO",
+        "possibleOHKO": "posible OHKO",
+        "guaranteedOHKO": "OHKO garantizado",
+        "guaranteed2HKO": "2HKO garantizado",
+        "possible2HKO": "posible 2HKO"
       },
       "speedView": {
         "tailwind": "Viento Afín",
         "scarf": "Pañuelo",
         "para": "Parál",
-        "trickRoom": "Sala Trampa",
+        "trickRoom": "Espacio Raro",
         "boostPlus1": "+1",
         "boostPlus2": "+2",
         "boostMinus1": "-1",
@@ -257,7 +236,7 @@
       "compactField": {
         "singles": "Individual",
         "doubles": "Dobles",
-        "trickRoom": "Sala Trampa",
+        "trickRoom": "Espacio Raro",
         "gravity": "Gravedad",
         "atkTailwind": "Atq VA",
         "atkHelpingHand": "Atq Ayuda",
