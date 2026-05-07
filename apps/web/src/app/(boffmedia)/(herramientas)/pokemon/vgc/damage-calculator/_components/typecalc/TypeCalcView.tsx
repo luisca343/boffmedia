@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { useCalculatorStore } from '../../_store/calculatorStore'
 import { useLegalPokemon } from '../../_hooks/useLegalPokemon'
 import { getSpriteUrl, handleSpriteError } from '../../_lib/spriteUtils'
@@ -55,13 +56,13 @@ function getBestOffenseEff(pokemonTypes: string[], defenderType: string): number
   return Math.max(...pokemonTypes.map((pt) => getTypeEff(pt, [defenderType])))
 }
 
-function effLabel(eff: number): string {
-  if (eff === 0)    return 'Immune'
-  if (eff === 0.25) return '¼×'
-  if (eff === 0.5)  return '½×'
+function effLabel(eff: number, t: (key: string) => string): string {
+  if (eff === 0)    return t('immune')
+  if (eff === 0.25) return t('quarterX')
+  if (eff === 0.5)  return t('halfX')
   if (eff === 1)    return ''
-  if (eff === 4)    return '4×'
-  return '2×'
+  if (eff === 4)    return t('quadX')
+  return t('doubleX')
 }
 
 function effCellStyle(eff: number): React.CSSProperties {
@@ -98,6 +99,7 @@ function CovTable({
   teamPokes: TeamPoke[]
   mode: 'offense' | 'defense'
 }) {
+  const t = useTranslations('vgc.calc.typeCalc')
   return (
     <div className="overflow-x-auto">
       <table className="border-collapse text-[13px]">
@@ -122,7 +124,7 @@ function CovTable({
               style={{ background: mode === 'offense' ? 'rgba(239,68,68,0.08)' : 'rgba(252,165,165,0.08)' }}
             >
               <span className="text-[11px] font-bold" style={{ color: 'rgb(252,165,165)' }}>
-                {mode === 'offense' ? 'NVE' : 'Weak'}
+                {mode === 'offense' ? t('nve') : t('weak')}
               </span>
             </th>
             <th
@@ -130,7 +132,7 @@ function CovTable({
               style={{ background: 'rgba(74,222,128,0.08)' }}
             >
               <span className="text-[11px] font-bold text-green-400">
-                {mode === 'offense' ? 'SE' : 'Res'}
+                {mode === 'offense' ? t('se') : t('res')}
               </span>
             </th>
           </tr>
@@ -163,7 +165,7 @@ function CovTable({
                     className="text-center font-bold py-1.5 px-2 text-[12px]"
                     style={effCellStyle(eff)}
                   >
-                    {effLabel(eff)}
+                    {effLabel(eff, t)}
                   </td>
                 ))}
                 <td
@@ -219,6 +221,7 @@ export function TypeCalcView() {
   const { team, many, regulation } = useCalculatorStore()
   const legalPokemon = useLegalPokemon(regulation)
   const [view, setView] = useState<'team' | 'rivals'>('team')
+  const t = useTranslations('vgc.calc.typeCalc')
 
   const teamPokes = useMemo<TeamPoke[]>(() => {
     return team.map((p) => {
@@ -290,8 +293,8 @@ export function TypeCalcView() {
     return (
       <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center px-8">
         <div className="text-4xl opacity-15">🔮</div>
-        <p className="text-surface-500 text-sm font-semibold">Add Pokémon to your team</p>
-        <p className="text-surface-700 text-xs">Switch to the 1v1 or matrix tabs to configure your team, then come back here.</p>
+        <p className="text-surface-500 text-sm font-semibold">{t('addPokemon')}</p>
+        <p className="text-surface-700 text-xs">{t('addPokemonHint')}</p>
       </div>
     )
   }
@@ -304,24 +307,24 @@ export function TypeCalcView() {
         <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center px-8">
           <div className="text-4xl opacity-15">⚔</div>
           <p className="text-surface-500 text-sm font-semibold">
-            {isRivals ? 'No threats to analyze' : 'No team to analyze'}
+            {isRivals ? t('noThreats') : t('noTeam')}
           </p>
           <p className="text-surface-700 text-xs">
-            {isRivals ? 'Add threats in the matrix tab.' : 'Switch to the 1v1 or matrix tabs to configure your team.'}
+            {isRivals ? t('noThreatsHint') : t('noTeamHint')}
           </p>
         </div>
       </div>
     )
   }
 
-  const offLabel  = isRivals ? '⚔ Rivals can threaten'     : '⚔ Offensive coverage'
-  const defLabel  = isRivals ? '🛡 Rivals\' vulnerabilities' : '🛡 Defensive profile'
-  const offTitle  = isRivals ? '⚔ Rivals\' Threats'         : '⚔ Offensive Coverage'
-  const defTitle  = isRivals ? '🛡 Rivals\' Weaknesses'      : '🛡 Defensive Coverage'
-  const offDesc   = isRivals ? 'Rivals\' STAB threats by defender type'    : 'Your team\'s STAB coverage vs each defender type'
+  const offLabel  = isRivals ? t('rivalsCanThreaten')     : t('offensiveCoverage')
+  const defLabel  = isRivals ? t('rivalsVulnerabilities') : t('defensiveProfile')
+  const offTitle  = isRivals ? t('rivalsThreatsTitle')     : t('offensiveCoverageTitle')
+  const defTitle  = isRivals ? t('rivalsWeaknessesTitle')  : t('defensiveCoverageTitle')
+  const offDesc   = isRivals ? t('stabByDefenderType')     : t('stabVsDefenderType')
   const defDesc   = isRivals ? 'Types that hit rivals super-effectively'   : 'Your team\'s resistances and weaknesses'
-  const bestOffLbl = isRivals ? 'Rivals best threaten:' : 'Best covered:'
-  const bestDefLbl = isRivals ? 'Rivals resist most:'   : 'Most resisted by:'
+  const bestOffLbl = isRivals ? t('rivalsBestThreaten') : t('bestCovered')
+  const bestDefLbl = isRivals ? t('rivalsResistMost')   : t('mostResistedBy')
 
   return (
     <div className="flex-1 overflow-y-auto">
@@ -336,7 +339,7 @@ export function TypeCalcView() {
           style={{ background: 'rgba(8,12,24,0.97)', border: '1px solid rgba(51,65,85,0.4)' }}
         >
           <div className="px-3 py-2 border-b border-surface-700/30">
-            <span className="text-[10px] font-black tracking-widest uppercase text-primary-400">Insights</span>
+            <span className="text-[10px] font-black tracking-widest uppercase text-primary-400">{t('insights')}</span>
           </div>
           <div className="grid grid-cols-2 divide-x divide-surface-700/30">
             {/* Offensive */}
@@ -344,16 +347,16 @@ export function TypeCalcView() {
               <div className="text-[9px] font-bold uppercase tracking-wider text-orange-400 mb-2">{offLabel}</div>
               {offInsights.map((p) => (
                 <InsightRow key={p.name} poke={p}>
-                  Can hit <strong>{p.se}</strong> types SE
-                  {p.nve > 0 && <>, <span className="text-surface-600">{p.nve} not very effective</span></>}
-                  {p.imm > 0 && <>, <span className="text-surface-700">{p.imm} immune</span></>}
+                  {t('canHit')} <strong>{p.se}</strong> {t('typesSe')}
+                  {p.nve > 0 && <>, <span className="text-surface-600">{p.nve} {t('notVeryEffective')}</span></>}
+                  {p.imm > 0 && <>, <span className="text-surface-700">{p.imm} {t('insightImmune')}</span></>}
                 </InsightRow>
               ))}
               {bestOffType && (
                 <div className="mt-2 rounded px-2 py-1.5 text-[10px]" style={{ background: 'rgba(30,41,59,0.6)' }}>
                   <span className="text-surface-500">{bestOffLbl}</span>{' '}
                   <TypeBadge type={bestOffType.type} />
-                  <span className="text-surface-500 ml-1">({bestOffType.count} members hit SE)</span>
+                  <span className="text-surface-500 ml-1">{t('membersHitSe', { count: bestOffType.count })}</span>
                 </div>
               )}
             </div>
@@ -362,10 +365,10 @@ export function TypeCalcView() {
               <div className="text-[9px] font-bold uppercase tracking-wider text-cyan-400 mb-2">{defLabel}</div>
               {defInsights.map((p) => (
                 <InsightRow key={p.name} poke={p}>
-                  {p.imm > 0 && <><strong>{p.imm}</strong> immune, </>}
-                  <strong>{p.resist}</strong> resists
+                  {p.imm > 0 && <><strong>{p.imm}</strong> {t('insightImmune')}, </>}
+                  <strong>{p.resist}</strong> {t('resists')}
                   {p.weak > 0 && (
-                    <>, <span className="text-red-400">{p.weak} weak{p.quad > 0 ? ` (${p.quad}×4)` : ''}</span></>
+                    <>, <span className="text-red-400">{p.weak} {t('insightWeak')}{p.quad > 0 ? ` (${p.quad}×4)` : ''}</span></>
                   )}
                 </InsightRow>
               ))}
@@ -373,7 +376,7 @@ export function TypeCalcView() {
                 <div className="mt-2 rounded px-2 py-1.5 text-[10px]" style={{ background: 'rgba(30,41,59,0.6)' }}>
                   <span className="text-surface-500">{bestDefLbl}</span>{' '}
                   <TypeBadge type={bestDefType.type} />
-                  <span className="text-surface-500 ml-1">({bestDefType.count} members)</span>
+                  <span className="text-surface-500 ml-1">{t('membersCount', { count: bestDefType.count })}</span>
                 </div>
               )}
             </div>
@@ -417,6 +420,7 @@ export function TypeCalcView() {
 // ─── View toggle ──────────────────────────────────────────────────────────────
 
 function ViewToggle({ view, onChange }: { view: 'team' | 'rivals'; onChange: (v: 'team' | 'rivals') => void }) {
+  const t = useTranslations('vgc.calc.typeCalc')
   return (
     <div className="flex items-center gap-1 self-start rounded-lg border border-surface-700/50 overflow-hidden">
       <button
@@ -428,7 +432,7 @@ function ViewToggle({ view, onChange }: { view: 'team' | 'rivals'; onChange: (v:
             : 'text-surface-500 hover:text-surface-300 border-r border-surface-700/50'
         }`}
       >
-        ⚔ My Team
+        {t('myTeamToggle')}
       </button>
       <button
         type="button"
@@ -439,7 +443,7 @@ function ViewToggle({ view, onChange }: { view: 'team' | 'rivals'; onChange: (v:
             : 'text-surface-500 hover:text-surface-300'
         }`}
       >
-        🛡 Rivals
+        {t('rivalsToggle')}
       </button>
     </div>
   )

@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import type { CalcField, SideConditions } from '../../_types/calculator'
 
 type PillColor = 'orange' | 'cyan' | 'violet' | 'lime'
@@ -36,10 +37,11 @@ interface Props {
 }
 
 export function CompactFieldBar({ field, onFieldChange, onAttackerSide, onDefenderSide }: Props) {
+  const t = useTranslations('vgc.calc.compactField')
   return (
     <div className="shrink-0 border-b border-surface-700/40 bg-surface-900/90 px-3 py-1.5 flex flex-wrap items-center gap-1.5">
       {(['Singles', 'Doubles'] as const).map((f) => (
-        <FieldPill key={f} label={f} active={field.format === f} onClick={() => onFieldChange({ format: f })} />
+        <FieldPill key={f} label={t(f === 'Singles' ? 'singles' : 'doubles')} active={field.format === f} onClick={() => onFieldChange({ format: f })} />
       ))}
       <span className="w-px h-3 bg-surface-700/60 mx-0.5" />
       {(['Sun', 'Rain', 'Sand', 'Snow', 'Harsh Sunshine', 'Heavy Rain'] as const).map((w) => (
@@ -49,27 +51,27 @@ export function CompactFieldBar({ field, onFieldChange, onAttackerSide, onDefend
         />
       ))}
       <span className="w-px h-3 bg-surface-700/60 mx-0.5" />
-      {(['Electric', 'Grassy', 'Psychic', 'Misty'] as const).map((t) => (
-        <FieldPill key={t} label={t} active={field.terrain === t}
-          color={t === 'Grassy' ? 'lime' : t === 'Psychic' || t === 'Misty' ? 'violet' : 'orange'}
-          onClick={() => onFieldChange({ terrain: field.terrain === t ? 'None' : t })}
+      {(['Electric', 'Grassy', 'Psychic', 'Misty'] as const).map((te) => (
+        <FieldPill key={te} label={te} active={field.terrain === te}
+          color={te === 'Grassy' ? 'lime' : te === 'Psychic' || te === 'Misty' ? 'violet' : 'orange'}
+          onClick={() => onFieldChange({ terrain: field.terrain === te ? 'None' : te })}
         />
       ))}
       <span className="w-px h-3 bg-surface-700/60 mx-0.5" />
-      <FieldPill label="TR" active={field.trickRoom} color="violet"
+      <FieldPill label={t('trickRoom')} active={field.trickRoom} color="violet"
         onClick={() => onFieldChange({ trickRoom: !field.trickRoom })} />
-      <FieldPill label="Gravity" active={field.gravity} color="violet"
+      <FieldPill label={t('gravity')} active={field.gravity} color="violet"
         onClick={() => onFieldChange({ gravity: !field.gravity })} />
       <span className="w-px h-3 bg-surface-700/60 mx-0.5" />
-      <FieldPill label="Atk TW" active={field.attackerSide.tailwind} color="cyan"
+      <FieldPill label={t('atkTailwind')} active={field.attackerSide.tailwind} color="cyan"
         onClick={() => onAttackerSide({ tailwind: !field.attackerSide.tailwind })} />
-      <FieldPill label="Atk HH" active={field.attackerSide.helpingHand} color="lime"
+      <FieldPill label={t('atkHelpingHand')} active={field.attackerSide.helpingHand} color="lime"
         onClick={() => onAttackerSide({ helpingHand: !field.attackerSide.helpingHand })} />
-      <FieldPill label="Def TW" active={field.defenderSide.tailwind} color="cyan"
+      <FieldPill label={t('defTailwind')} active={field.defenderSide.tailwind} color="cyan"
         onClick={() => onDefenderSide({ tailwind: !field.defenderSide.tailwind })} />
-      <FieldPill label="Def Reflect" active={field.defenderSide.reflect}
+      <FieldPill label={t('defReflect')} active={field.defenderSide.reflect}
         onClick={() => onDefenderSide({ reflect: !field.defenderSide.reflect })} />
-      <FieldPill label="Def Light Screen" active={field.defenderSide.lightScreen} color="cyan"
+      <FieldPill label={t('defLightScreen')} active={field.defenderSide.lightScreen} color="cyan"
         onClick={() => onDefenderSide({ lightScreen: !field.defenderSide.lightScreen })} />
     </div>
   )

@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import type { CalcPokemon } from '../../_types/calculator'
 import { NATURES, useGameData } from '../../_hooks/usePokemonData'
 import { useLegalPokemon } from '../../_hooks/useLegalPokemon'
@@ -10,13 +11,13 @@ import { MoveSlot } from './MoveSlot'
 import { HPBar } from './HPBar'
 import { getSpriteUrl, handleSpriteError } from '../../_lib/spriteUtils'
 
-const TERA_TYPES = [
+const TERA_TYPE_KEYS = [
   'None','Normal','Fire','Water','Electric','Grass','Ice','Fighting',
   'Poison','Ground','Flying','Psychic','Bug','Rock','Ghost','Dragon',
   'Dark','Steel','Fairy','Stellar',
 ]
 
-const STATUSES = ['Healthy', 'Burned', 'Paralyzed', 'Poisoned', 'Badly Poisoned', 'Frozen', 'Asleep']
+const STATUS_KEYS = ['Healthy', 'Burned', 'Paralyzed', 'Poisoned', 'Badly Poisoned', 'Frozen', 'Asleep']
 
 interface Props {
   poke: CalcPokemon
@@ -26,6 +27,7 @@ interface Props {
 }
 
 export function PokemonPanel({ poke, onChange, side, useChampions = false }: Props) {
+  const t = useTranslations('vgc.calc.panel')
   const { regulation } = useCalculatorStore()
   const legalPokemon = useLegalPokemon(regulation)
   const { items, abilities } = useGameData(regulation)
@@ -58,7 +60,7 @@ export function PokemonPanel({ poke, onChange, side, useChampions = false }: Pro
       {/* Header */}
       <div className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-widest px-2 py-1.5 rounded-md ${accentBg} border ${accentBorder} ${accentText}`}>
         <span className={`w-1.5 h-1.5 rounded-full ${dotColor}`} />
-        {isAtk ? 'Pokémon 1 — Attacker' : 'Pokémon 2 — Defender'}
+        {isAtk ? t('attacker') : t('defender')}
       </div>
 
       {/* Name search */}
@@ -72,114 +74,123 @@ export function PokemonPanel({ poke, onChange, side, useChampions = false }: Pro
         }}
       />
 
-      {/* Sprite (left) + Moves (right) */}
-      <div className="grid grid-cols-[auto_1fr] gap-3">
-        {/* Left: sprite + types + status */}
-        <div className="flex flex-col gap-2 items-center">
-          <div className={`w-20 h-20 rounded-xl bg-surface-950 border ${accentBorder} flex items-center justify-center flex-shrink-0`}>
+      {/* Identity Card */}
+      <div className="rounded-xl bg-surface-950/50 border border-surface-800/50 p-3 flex flex-col gap-2.5">
+        {/* Sprite + Name + Types */}
+        <div className="flex items-center gap-3">
+          <div className={`w-16 h-16 rounded-lg bg-surface-950 border ${accentBorder} flex items-center justify-center flex-shrink-0`}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={getSpriteUrl(poke.name)}
               alt={poke.name}
-              width={72}
-              height={72}
+              width={56}
+              height={56}
               className="pixelated drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]"
               onError={handleSpriteError}
             />
           </div>
-          {species && (
-            <div className="flex flex-wrap gap-1 justify-center">
-              {species.types.map((t) => (
-                <TypeBadgeInline key={t} type={t} />
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-bold text-surface-100 truncate">{poke.name || '—'}</p>
+            {species && (
+              <div className="flex flex-wrap gap-1 mt-1">
+                {species.types.map((t) => (
+                  <TypeBadgeInline key={t} type={t} />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Ability + Item */}
+        <div className="grid grid-cols-2 gap-2">
+          <FormRow label={t('ability')}>
+            <select
+              value={poke.ability}
+              onChange={(e) => onChange({ ability: e.target.value })}
+              className="w-full bg-surface-900 border border-surface-700 rounded px-2 py-1 text-xs text-surface-200 focus:outline-none focus:border-primary-500"
+            >
+              {speciesAbilities.map((a) => (
+                <option key={a} value={a}>{a}</option>
               ))}
-            </div>
-          )}
-          {/* Status */}
+              {speciesAbilities.length === 0 &&
+                abilities.slice(0, 50).map((a) => (
+                  <option key={a} value={a}>{a}</option>
+                ))}
+            </select>
+          </FormRow>
+          <FormRow label={t('item')}>
+            <select
+              value={poke.item}
+              onChange={(e) => onChange({ item: e.target.value })}
+              className="w-full bg-surface-900 border border-surface-700 rounded px-2 py-1 text-xs text-surface-200 focus:outline-none focus:border-primary-500"
+            >
+              {items.map((i) => <option key={i} value={i}>{i}</option>)}
+            </select>
+          </FormRow>
+        </div>
+
+        {/* Tera + Level */}
+        <div className="grid grid-cols-2 gap-2">
+          <FormRow label={t('tera')}>
+            <select
+              value={poke.teraType}
+              onChange={(e) => onChange({ teraType: e.target.value })}
+              className="w-full bg-surface-900 border border-surface-700 rounded px-2 py-1 text-xs text-surface-200 focus:outline-none focus:border-primary-500"
+            >
+              {TERA_TYPE_KEYS.map((tk) => {
+                const label = tk === 'None' ? t('teraNone') : t(`teraTypes.${tk}` as any)
+                return <option key={tk} value={tk}>{label}</option>
+              })}
+            </select>
+          </FormRow>
+          <FormRow label={t('lv')}>
+            <input
+              type="number" min={1} max={100} value={poke.level}
+              onChange={(e) => onChange({ level: Math.min(100, Math.max(1, parseInt(e.target.value) || 1)) })}
+              className="w-full bg-surface-900 border border-surface-700 rounded px-2 py-1 text-xs text-surface-200 focus:outline-none focus:border-primary-500"
+            />
+          </FormRow>
+        </div>
+
+        {/* Nature */}
+        <FormRow label={t('nature')}>
+          <select
+            value={poke.nature}
+            onChange={(e) => onChange({ nature: e.target.value })}
+            className="w-full bg-surface-900 border border-surface-700 rounded px-2 py-1 text-xs text-surface-200 focus:outline-none focus:border-primary-500"
+          >
+            {NATURES.map((n) => {
+              const suffix = n.plus ? ` (+${n.plus.toUpperCase()}, -${n.minus?.toUpperCase()})` : ''
+              return <option key={n.name} value={n.name}>{n.name}{suffix}</option>
+            })}
+          </select>
+        </FormRow>
+
+        {/* Status */}
+        <FormRow label={t('status')}>
           <select
             value={poke.status}
             onChange={(e) => onChange({ status: e.target.value })}
-            className="w-full bg-surface-900 border border-surface-700 rounded px-1.5 py-1 text-[10px] text-surface-200 focus:outline-none focus:border-primary-500"
-          >
-            {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
-          </select>
-        </div>
-
-        {/* Right: move slots */}
-        <div className="flex flex-col gap-1.5">
-          <span className={`text-[10px] font-black uppercase tracking-widest ${accentText}`}>Moves</span>
-          {poke.moves.map((mv, i) => (
-            <MoveSlot
-              key={i}
-              move={mv}
-              index={i}
-              onChange={(patch) => updateMove(i, patch)}
-              accentColor={accentMoveColor as 'primary' | 'accent'}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Ability + Item row */}
-      <div className="grid grid-cols-2 gap-2">
-        <FormRow label="Ability">
-          <select
-            value={poke.ability}
-            onChange={(e) => onChange({ ability: e.target.value })}
             className="w-full bg-surface-900 border border-surface-700 rounded px-2 py-1 text-xs text-surface-200 focus:outline-none focus:border-primary-500"
           >
-            {speciesAbilities.map((a) => (
-              <option key={a} value={a}>{a}</option>
-            ))}
-            {speciesAbilities.length === 0 &&
-              abilities.slice(0, 50).map((a) => (
-                <option key={a} value={a}>{a}</option>
-              ))}
-          </select>
-        </FormRow>
-        <FormRow label="Item">
-          <select
-            value={poke.item}
-            onChange={(e) => onChange({ item: e.target.value })}
-            className="w-full bg-surface-900 border border-surface-700 rounded px-2 py-1 text-xs text-surface-200 focus:outline-none focus:border-primary-500"
-          >
-            {items.map((i) => <option key={i} value={i}>{i}</option>)}
+            {STATUS_KEYS.map((sk) => <option key={sk} value={sk}>{t(`statuses.${sk}` as any)}</option>)}
           </select>
         </FormRow>
       </div>
 
-      {/* Tera + Level row */}
-      <div className="grid grid-cols-2 gap-2">
-        <FormRow label="Tera">
-          <select
-            value={poke.teraType}
-            onChange={(e) => onChange({ teraType: e.target.value })}
-            className="w-full bg-surface-900 border border-surface-700 rounded px-2 py-1 text-xs text-surface-200 focus:outline-none focus:border-primary-500"
-          >
-            {TERA_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
-          </select>
-        </FormRow>
-        <FormRow label="Lv.">
-          <input
-            type="number" min={1} max={100} value={poke.level}
-            onChange={(e) => onChange({ level: Math.min(100, Math.max(1, parseInt(e.target.value) || 1)) })}
-            className="w-full bg-surface-900 border border-surface-700 rounded px-2 py-1 text-xs text-surface-200 focus:outline-none focus:border-primary-500"
+      {/* Moves */}
+      <div className="flex flex-col gap-1.5">
+        <span className={`text-[10px] font-black uppercase tracking-widest ${accentText}`}>{t('moves')}</span>
+        {poke.moves.map((mv, i) => (
+          <MoveSlot
+            key={i}
+            move={mv}
+            index={i}
+            onChange={(patch) => updateMove(i, patch)}
+            accentColor={accentMoveColor as 'primary' | 'accent'}
           />
-        </FormRow>
+        ))}
       </div>
-
-      {/* Nature */}
-      <FormRow label="Nature">
-        <select
-          value={poke.nature}
-          onChange={(e) => onChange({ nature: e.target.value })}
-          className="w-full bg-surface-900 border border-surface-700 rounded px-2 py-1 text-xs text-surface-200 focus:outline-none focus:border-primary-500"
-        >
-          {NATURES.map((n) => {
-            const suffix = n.plus ? ` (+${n.plus.toUpperCase()}, -${n.minus?.toUpperCase()})` : ''
-            return <option key={n.name} value={n.name}>{n.name}{suffix}</option>
-          })}
-        </select>
-      </FormRow>
 
       {/* HP bar */}
       <HPBar poke={poke} onChange={onChange} useChampions={useChampions} baseStats={apiEntry?.baseStats} />
