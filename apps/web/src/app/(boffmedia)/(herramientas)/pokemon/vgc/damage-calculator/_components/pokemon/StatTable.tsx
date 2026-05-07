@@ -1,19 +1,11 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { calcStat, Generations } from '@smogon/calc'
 import type { CalcPokemon, StatKey, BoostKey } from '../../_types/calculator'
 import { NATURES } from '../../_hooks/usePokemonData'
 
 const GEN9 = Generations.get(9)
-
-const STAT_LABELS: Record<StatKey, string> = {
-  hp: 'HP',
-  atk: 'Atk',
-  def: 'Def',
-  spa: 'SpA',
-  spd: 'SpD',
-  spe: 'Spe',
-}
 
 const STAT_KEYS: StatKey[] = ['hp', 'atk', 'def', 'spa', 'spd', 'spe']
 
@@ -30,6 +22,7 @@ interface Props {
 const BOOST_VALUES = [-6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6]
 
 export function StatTable({ poke, onChange, useChampions = false, baseStats: apiBaseStats }: Props) {
+  const t = useTranslations('vgc.calc.panel')
   // Use API-provided baseStats — no @pkmn/dex fallback.
   const bs: BaseStats | undefined = apiBaseStats
   if (!bs) return null
@@ -66,18 +59,27 @@ export function StatTable({ poke, onChange, useChampions = false, baseStats: api
     onChange({ boosts: { ...poke.boosts, [key]: val } })
   }
 
+  const STAT_LABELS: Record<StatKey, string> = {
+    hp: t('statHp'),
+    atk: t('statAtk'),
+    def: t('statDef'),
+    spa: t('statSpa'),
+    spd: t('statSpd'),
+    spe: t('statSpe'),
+  }
+
   return (
     <table className="w-full text-xs border-collapse">
       <thead>
         <tr className="border-b border-surface-700">
-          <th className="text-left text-surface-500 font-semibold pb-1 pr-2">Stat</th>
-          <th className="text-center text-surface-500 font-semibold pb-1 px-1">Base</th>
-          <th className="text-center text-surface-500 font-semibold pb-1 px-1">Stage</th>
-          <th className="text-center text-surface-500 font-semibold pb-1 px-1">IVs</th>
+          <th className="text-left text-surface-500 font-semibold pb-1 pr-2">{t('colStat')}</th>
+          <th className="text-center text-surface-500 font-semibold pb-1 px-1">{t('colBase')}</th>
+          <th className="text-center text-surface-500 font-semibold pb-1 px-1">{t('colStage')}</th>
+          <th className="text-center text-surface-500 font-semibold pb-1 px-1">{t('colIvs')}</th>
           <th className="text-center text-surface-500 font-semibold pb-1 px-1">
-            {useChampions ? 'SP' : 'EVs'}
+            {useChampions ? t('colSp') : t('colEvs')}
           </th>
-          <th className="text-center text-surface-500 font-semibold pb-1 px-1">Total</th>
+          <th className="text-center text-surface-500 font-semibold pb-1 px-1">{t('colTotal')}</th>
         </tr>
       </thead>
       <tbody>
@@ -151,7 +153,7 @@ export function StatTable({ poke, onChange, useChampions = false, baseStats: api
           <td
             className="pt-1 text-center text-surface-500 text-xs"
           >
-            Total {useChampions ? 'SP' : 'EVs'}
+            {useChampions ? t('totalSp') : t('totalEvs')}
           </td>
           <td
             className={`text-center font-mono font-bold pt-1 text-xs ${

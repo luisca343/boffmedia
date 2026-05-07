@@ -41,7 +41,7 @@ export function MatrixView({ tab, field, onFieldChange, onAttackerSide, onDefend
   const defenderMax   = isTeamVsMany ? 12 : 6
   const attackerLabel = isTeamVsMany ? `⚔ ${t('matrix.teamLabel')}` : `⚔ ${t('matrix.manyLabel')}`
   const defenderLabel = isTeamVsMany ? `🛡 ${t('matrix.manyLabel')}` : `🛡 ${t('matrix.teamLabel')}`
-  const cornerLabel   = isTeamVsMany ? 'ATK ↓ / DEF →' : 'THREAT ↓ / TEAM →'
+  const cornerLabel   = isTeamVsMany ? t('matrix.atkDefCorner') : 'THREAT ↓ / TEAM →'
   const emptyIcon     = isTeamVsMany ? '⚔' : '🛡'
 
   const [drawer, setDrawer]           = useState<{ list: 'team' | 'many'; idx: number } | null>(null)
