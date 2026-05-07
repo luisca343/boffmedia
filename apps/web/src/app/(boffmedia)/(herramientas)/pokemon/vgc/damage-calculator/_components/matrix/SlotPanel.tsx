@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { ClipboardPaste, Plus } from 'lucide-react'
 import type { CalcPokemon } from '../../_types/calculator'
 import type { VgcPokemon } from '../../_hooks/useLegalPokemon'
@@ -74,6 +75,7 @@ export function SlotPanel({
   label, accent, pokemons, maxSlots, border,
   legalPokemon, onEdit, onRemove, onAdd, onImport, className,
 }: Props) {
+  const t = useTranslations('vgc.calc.matrixExtras')
   const borderClass = border === 'left'
     ? 'border-b md:border-b-0 md:border-r border-surface-700/40'
     : 'border-t md:border-t-0 md:border-l border-surface-700/40'
@@ -90,13 +92,13 @@ export function SlotPanel({
           className="flex items-center gap-1 text-[9px] font-semibold text-surface-500 hover:text-surface-200 transition-colors border border-surface-700/50 rounded px-1.5 py-0.5 hover:border-surface-600"
         >
           <ClipboardPaste className="w-2.5 h-2.5" />
-          Import
+          {t('importLabel')}
         </button>
       </div>
 
       <div className="flex-1 overflow-y-auto min-h-0">
         {pokemons.length === 0 && (
-          <p className="text-center text-[10px] text-surface-700 py-6 px-2">No Pokémon added</p>
+          <p className="text-center text-[10px] text-surface-700 py-6 px-2">{t('noPokemon')}</p>
         )}
         {pokemons.map((p, idx) => (
           <SlotCard
@@ -115,7 +117,7 @@ export function SlotPanel({
             className="w-full flex items-center justify-center gap-1.5 py-1.5 rounded border border-dashed border-surface-700/70 text-[10px] font-semibold text-surface-600 hover:border-primary-500/50 hover:text-primary-400 transition-all"
           >
             <Plus className="w-3 h-3" />
-            Add Pokémon
+            {t('addPokemon')}
           </button>
         </div>
       )}

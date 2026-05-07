@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { calcStat, Generations } from '@smogon/calc'
 import type { CalcPokemon } from '../../_types/calculator'
 
@@ -16,6 +17,7 @@ interface Props {
 }
 
 export function HPBar({ poke, onChange, useChampions = false, baseStats: apiBaseStats }: Props) {
+  const t = useTranslations('vgc.calc.panel')
   const bs: BaseStats | undefined = apiBaseStats
   if (!bs) return null
 
@@ -32,7 +34,7 @@ export function HPBar({ poke, onChange, useChampions = false, baseStats: apiBase
   return (
     <div className="space-y-1">
       <div className="flex items-center gap-2">
-        <span className="text-xs font-semibold text-surface-500 min-w-[24px]">HP</span>
+        <span className="text-xs font-semibold text-surface-500 min-w-[24px]">{t('hpLabel')}</span>
         <input
           type="number"
           min={1}
@@ -51,7 +53,7 @@ export function HPBar({ poke, onChange, useChampions = false, baseStats: apiBase
           onClick={() => onChange({ currentHP: -1 })}
           className="ml-auto text-[10px] text-surface-600 hover:text-surface-400 transition-colors"
         >
-          Reset
+          {t('hpReset')}
         </button>
       </div>
       <div className="h-2 bg-surface-900 rounded-full overflow-hidden border border-surface-700/50">

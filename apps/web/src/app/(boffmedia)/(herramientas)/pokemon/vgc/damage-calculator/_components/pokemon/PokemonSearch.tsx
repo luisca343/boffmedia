@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { PokemonTypeIcon } from '@/components/shared/pokemon/PokemonTypeIcon'
 import { getSpriteUrl } from '../../_lib/spriteUtils'
@@ -22,10 +23,12 @@ interface Props {
   legalPokemon: VgcPokemon[]
 }
 
-export function PokemonSearch({ value, onChange, placeholder = 'Search Pokémon...', legalPokemon }: Props) {
+export function PokemonSearch({ value, onChange, placeholder, legalPokemon }: Props) {
+  const t = useTranslations('vgc.calc.panel')
   const [query, setQuery] = useState(value)
   const [open, setOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
+  const resolvedPlaceholder = placeholder ?? t('searchPlaceholder')
 
   useEffect(() => { setQuery(value) }, [value])
 
@@ -64,7 +67,7 @@ export function PokemonSearch({ value, onChange, placeholder = 'Search Pokémon.
       <input
         className="w-full bg-surface-900 border border-surface-700 rounded-md px-3 py-2 text-sm font-semibold text-surface-100 placeholder:text-surface-500 focus:outline-none focus:border-primary-500 transition-colors"
         value={query}
-        placeholder={placeholder}
+        placeholder={resolvedPlaceholder}
         onFocus={() => setOpen(true)}
         onChange={(e) => {
           setQuery(e.target.value)
