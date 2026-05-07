@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useMemo, useState, useRef, useEffect } from 'react'
 import type { CalcMove } from '../../_types/calculator'
 import { useGameData } from '../../_hooks/usePokemonData'
@@ -21,6 +22,7 @@ const TYPE_COLORS: Record<string, string> = {
 }
 
 export function MoveSlot({ move, index, onChange, accentColor = 'primary' }: Props) {
+  const t = useTranslations('vgc.calc.panel')
   const { regulation } = useCalculatorStore()
   const { moveMap, moveNames, isLoaded } = useGameData(regulation)
   const [query, setQuery] = useState(move.name)
@@ -78,7 +80,7 @@ export function MoveSlot({ move, index, onChange, accentColor = 'primary' }: Pro
           <input
             className={`flex-1 bg-surface-950/80 border border-surface-700 rounded px-2 py-1 text-xs font-semibold text-surface-200 placeholder:text-surface-600 focus:outline-none ${borderFocus} transition-colors`}
             value={query}
-            placeholder={`Move ${index + 1}...`}
+            placeholder={t('movePlaceholder', { n: index + 1 })}
             onFocus={() => setOpen(true)}
             onChange={(e) => { setQuery(e.target.value); setOpen(true) }}
             onKeyDown={(e) => {
@@ -99,7 +101,7 @@ export function MoveSlot({ move, index, onChange, accentColor = 'primary' }: Pro
 
         {open && !isLoaded && (
           <div className="absolute top-full left-0 right-0 z-50 mt-0.5 bg-surface-900 border border-surface-700 rounded-lg shadow-2xl px-3 py-2">
-            <span className="text-[11px] text-surface-500 italic">Loading moves…</span>
+            <span className="text-[11px] text-surface-500 italic">{t('loadingMoves')}</span>
           </div>
         )}
 
@@ -144,7 +146,7 @@ export function MoveSlot({ move, index, onChange, accentColor = 'primary' }: Pro
             value={move.bp}
             onChange={(e) => onChange({ bp: Math.max(0, parseInt(e.target.value) || 0) })}
             className="w-12 bg-surface-950/80 border border-surface-700 rounded px-1 py-0.5 text-xs font-mono text-center text-surface-200 focus:outline-none focus:border-surface-600"
-            title="Base Power"
+            title={t('basePower')}
           />
           {/* Type */}
           <select
@@ -163,9 +165,9 @@ export function MoveSlot({ move, index, onChange, accentColor = 'primary' }: Pro
             onChange={(e) => onChange({ category: e.target.value as CalcMove['category'] })}
             className="bg-surface-950/80 border border-surface-700 rounded px-1 py-0.5 text-[10px] text-surface-300 focus:outline-none focus:border-surface-600"
           >
-            <option value="Physical">Phys</option>
-            <option value="Special">Spec</option>
-            <option value="Status">Stat</option>
+            <option value="Physical">{t('categoryPhysical')}</option>
+            <option value="Special">{t('categorySpecial')}</option>
+            <option value="Status">{t('categoryStatus')}</option>
           </select>
           {/* Crit */}
           <button
@@ -177,7 +179,7 @@ export function MoveSlot({ move, index, onChange, accentColor = 'primary' }: Pro
                 : 'bg-surface-800 border-surface-700 text-surface-500 hover:text-surface-400'
             }`}
           >
-            Crit
+            {t('crit')}
           </button>
         </div>
       )}
