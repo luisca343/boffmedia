@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { calcStat, Generations } from '@smogon/calc'
 import type { CalcPokemon } from '../../_types/calculator'
 import type { VgcPokemon } from '../../_hooks/useLegalPokemon'
@@ -46,6 +47,7 @@ function HPMini({ poke, apiEntry, align = 'left' }: { poke: CalcPokemon; apiEntr
 }
 
 export function MoveStripPokemonCard({ poke, apiEntry, align = 'left' }: MoveStripPokemonCardProps) {
+  const t = useTranslations('vgc.calc.moveStripCard')
   const reverse = align === 'right'
 
   return (
@@ -62,7 +64,7 @@ export function MoveStripPokemonCard({ poke, apiEntry, align = 'left' }: MoveStr
         />
         <div className="min-w-0 flex-1">
           <div className="text-[13px] font-black text-surface-100 truncate">{poke.name}</div>
-          <div className="text-[10px] text-surface-500">Lv. {poke.level}</div>
+          <div className="text-[10px] text-surface-500">{t('level', { level: poke.level })}</div>
         </div>
       </div>
       <div className="mt-1">
