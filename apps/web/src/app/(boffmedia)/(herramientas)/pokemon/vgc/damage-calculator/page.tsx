@@ -117,7 +117,7 @@ function DamageCalculatorContent() {
           )}
           {useChampions && (
             <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-accent-500/15 border border-accent-500/30 text-accent-300 whitespace-nowrap">
-              SP
+              {t('mobile.spBadge')}
             </span>
           )}
           <button
@@ -172,7 +172,7 @@ function DamageCalculatorContent() {
               {/* Mobile panel switcher — hidden on md+ */}
               <div className="flex md:hidden shrink-0 border-b border-surface-700/40 bg-surface-900/90">
                 {(['atk', 'field', 'def'] as const).map((p) => {
-                  const label = p === 'atk' ? '⚔ Attacker' : p === 'field' ? '⚡ Field' : '🛡 Defender'
+                  const label = p === 'atk' ? t('mobile.attacker') : p === 'field' ? t('mobile.field') : t('mobile.defender')
                   const active = mobilePanel === p
                   return (
                     <button

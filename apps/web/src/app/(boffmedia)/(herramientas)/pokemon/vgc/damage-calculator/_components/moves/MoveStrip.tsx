@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useMemo } from 'react'
 import type { CalcPokemon, CalcField, DamageResult } from '../../_types/calculator'
 import { calcAllMoves, getKOVerdict, getDamageColorClass } from '../../_lib/smogonAdapter'
@@ -73,11 +74,12 @@ function ResultBar({
   isActive: boolean
   reversed?: boolean
 }) {
+  const t = useTranslations('vgc.calc.moveStrip')
   if (!isActive || !result || !move) {
     return (
       <div className={`flex items-center px-3 min-h-[30px] ${reversed ? 'justify-end' : ''}`}>
         <span className="text-[10px] text-surface-600">
-          {!isActive ? (reversed ? 'select a move →' : '← select a move') : 'No damage / immune'}
+          {!isActive ? (reversed ? t('selectMoveRight') : t('selectMoveLeft')) : t('noDamage')}
         </span>
       </div>
     )

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import type { CalcPokemon, DamageResult } from '../../_types/calculator'
 import type { VgcPokemon } from '../../_hooks/useLegalPokemon'
 import { getSpriteUrl, handleSpriteError } from '../../_lib/spriteUtils'
@@ -29,10 +30,11 @@ function getKOLabel(res: DamageResult): string | null {
 // ─── Empty state ──────────────────────────────────────────────────────────────
 
 export function EmptyMatrix({ icon }: { icon: string }) {
+  const t = useTranslations('vgc.calc.matrixExtras')
   return (
     <div className="flex-1 flex flex-col items-center justify-center gap-2 text-center px-8">
       <div className="text-4xl opacity-10">{icon}</div>
-      <p className="text-surface-600 text-xs">Add Pokémon on both sides to see the damage matrix</p>
+      <p className="text-surface-600 text-xs">{t('emptyMatrix')}</p>
     </div>
   )
 }

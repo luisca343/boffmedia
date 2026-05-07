@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { calcStat, Generations } from '@smogon/calc'
 import { useCalculatorStore } from '../../_store/calculatorStore'
 import { useLegalPokemon } from '../../_hooks/useLegalPokemon'
@@ -55,14 +56,14 @@ function applyMods(spd: number, mods: Mods): number {
 }
 
 const MOD_DEFS: { k: ModKey; label: string; bg: string; bc: string; col: string }[] = [
-  { k: 'tailwind',    label: 'Tailwind', bg: 'rgba(6,182,212,0.15)',  bc: 'rgba(6,182,212,0.5)',  col: 'rgb(103,232,249)' },
-  { k: 'choiceScarf', label: 'Scarf',   bg: 'rgba(249,115,22,0.15)', bc: 'rgba(249,115,22,0.5)', col: 'rgb(251,146,60)'  },
-  { k: 'paralyzed',   label: 'Para',    bg: 'rgba(239,68,68,0.15)',  bc: 'rgba(239,68,68,0.5)',  col: '#ef4444'          },
-  { k: 'trickRoom',   label: 'TR',      bg: 'rgba(168,85,247,0.15)', bc: 'rgba(168,85,247,0.5)', col: 'rgb(192,132,252)' },
-  { k: 'boostPlus1',  label: '+1',      bg: 'rgba(132,204,22,0.15)', bc: 'rgba(132,204,22,0.5)', col: 'rgb(163,230,53)'  },
-  { k: 'boostPlus2',  label: '+2',      bg: 'rgba(132,204,22,0.25)', bc: 'rgba(132,204,22,0.7)', col: 'rgb(163,230,53)'  },
-  { k: 'boostMinus1', label: '-1',      bg: 'rgba(239,68,68,0.12)',  bc: 'rgba(239,68,68,0.4)',  col: '#ef4444'          },
-  { k: 'boostMinus2', label: '-2',      bg: 'rgba(239,68,68,0.22)',  bc: 'rgba(239,68,68,0.7)',  col: '#ef4444'          },
+  { k: 'tailwind',    label: 'tailwind',    bg: 'rgba(6,182,212,0.15)',  bc: 'rgba(6,182,212,0.5)',  col: 'rgb(103,232,249)' },
+  { k: 'choiceScarf', label: 'scarf',       bg: 'rgba(249,115,22,0.15)', bc: 'rgba(249,115,22,0.5)', col: 'rgb(251,146,60)'  },
+  { k: 'paralyzed',   label: 'para',        bg: 'rgba(239,68,68,0.15)',  bc: 'rgba(239,68,68,0.5)',  col: '#ef4444'          },
+  { k: 'trickRoom',   label: 'trickRoom',   bg: 'rgba(168,85,247,0.15)', bc: 'rgba(168,85,247,0.5)', col: 'rgb(192,132,252)' },
+  { k: 'boostPlus1',  label: 'boostPlus1',  bg: 'rgba(132,204,22,0.15)', bc: 'rgba(132,204,22,0.5)', col: 'rgb(163,230,53)'  },
+  { k: 'boostPlus2',  label: 'boostPlus2',  bg: 'rgba(132,204,22,0.25)', bc: 'rgba(132,204,22,0.7)', col: 'rgb(163,230,53)'  },
+  { k: 'boostMinus1', label: 'boostMinus1', bg: 'rgba(239,68,68,0.12)',  bc: 'rgba(239,68,68,0.4)',  col: '#ef4444'          },
+  { k: 'boostMinus2', label: 'boostMinus2', bg: 'rgba(239,68,68,0.22)',  bc: 'rgba(239,68,68,0.7)',  col: '#ef4444'          },
 ]
 
 const IDLE_MOD_STYLE = {
@@ -79,10 +80,11 @@ function ModPills({
   label: string
   accentColor: string
 }) {
+  const t = useTranslations('vgc.calc.speedView')
   return (
     <div className="flex items-center gap-1 flex-wrap">
       <span className="text-[9px] font-bold uppercase tracking-wider whitespace-nowrap mr-1" style={{ color: accentColor }}>
-        {label}
+        {t(label as any)}
       </span>
       {MOD_DEFS.map(({ k, label: pl, bg, bc, col }) => (
         <button
@@ -92,7 +94,7 @@ function ModPills({
           className="px-1.5 py-0.5 rounded text-[10px] font-bold border transition-all"
           style={mods[k] ? { background: bg, borderColor: bc, color: col } : IDLE_MOD_STYLE}
         >
-          {pl}
+          {t(pl as any)}
         </button>
       ))}
     </div>
@@ -118,6 +120,7 @@ function SpdCard({
   color?: string
   children: React.ReactNode
 }) {
+  const t = useTranslations('vgc.calc.speedView')
   return (
     <div
       className="flex flex-col items-center gap-0.5 p-1 shrink-0"
@@ -145,7 +148,7 @@ function SpdCard({
       </div>
       {children}
       <div className="text-[8px]" style={{ color: 'rgb(71,85,105)' }}>
-        base {baseSpe}
+        {t('baseSpeed', { speed: baseSpe })}
       </div>
     </div>
   )
@@ -169,9 +172,9 @@ function speedResult(a: number, b: number, tr: boolean): 'faster' | 'tie' | 'slo
 }
 
 const RESULT_STYLE = {
-  faster: { outline: '2px solid #22c55e', title: '▲ Faster than' },
-  tie:    { outline: '2px solid #eab308', title: '= Ties with'   },
-  slower: { outline: '2px solid #ef4444', title: '▼ Slower than' },
+  faster: { outline: '2px solid #22c55e', title: 'fasterThan' },
+  tie:    { outline: '2px solid #eab308', title: 'tiesWith'   },
+  slower: { outline: '2px solid #ef4444', title: 'slowerThan' },
 } as const
 
 function SpeedRelIcons({
@@ -183,6 +186,7 @@ function SpeedRelIcons({
   opponents: CompEntry[]
   trickRoom: boolean
 }) {
+  const t = useTranslations('vgc.calc.speedView')
   if (!opponents.length) return null
   return (
     <div className="flex gap-1 flex-wrap mt-1">
@@ -197,7 +201,7 @@ function SpeedRelIcons({
             width={20} height={20}
             className="object-contain rounded-sm"
             style={{ imageRendering: 'pixelated', outline, outlineOffset: 1 }}
-            title={`${title} ${opp.name} (${opp.actual})`}
+            title={`${t(title as any)} ${opp.name} (${opp.actual})`}
             alt={opp.name}
           />
         )
@@ -215,6 +219,7 @@ function RivalsComparisonList({
   foeEntries: CompEntry[]
   trickRoom: boolean
 }) {
+  const t = useTranslations('vgc.calc.speedView')
   const merged = useMemo(() => {
     return [...myEntries, ...foeEntries]
       .sort((a, b) => trickRoom ? a.actual - b.actual : b.actual - a.actual)
@@ -223,7 +228,7 @@ function RivalsComparisonList({
   if (merged.length === 0) {
     return (
       <div className="flex-1 flex items-center justify-center text-surface-600 text-sm py-12">
-        Add Pokémon to both teams to compare speeds
+        {t('emptyState')}
       </div>
     )
   }
@@ -263,7 +268,7 @@ function RivalsComparisonList({
             <div className="flex-1 min-w-0">
               <div className="font-semibold text-sm leading-tight" style={{ color }}>{entry.name}</div>
               <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                <span className="text-[10px] text-surface-600">base {entry.baseSpe}</span>
+                <span className="text-[10px] text-surface-600">{t('baseSpeed', { speed: entry.baseSpe })}</span>
                 {hasItem && (
                   <span
                     className="text-[10px] font-bold px-1.5 py-0.5 rounded"
@@ -282,7 +287,7 @@ function RivalsComparisonList({
                   className="text-[9px] font-bold px-1 rounded"
                   style={{ background: isMine ? 'rgba(249,115,22,0.12)' : 'rgba(168,85,247,0.12)', color }}
                 >
-                  {isMine ? 'My Team' : 'Rival'}
+                  {isMine ? t('myTeam') : t('rival')}
                 </span>
               </div>
               <SpeedRelIcons entry={entry} opponents={opponents} trickRoom={trickRoom} />
@@ -305,6 +310,7 @@ interface RefEntry   { name: string; baseSpe: number; neutral: number; plus: num
 interface Props { useChampions: boolean }
 
 export function SpeedView({ useChampions }: Props) {
+  const t = useTranslations('vgc.calc.speedView')
   const { team, many, regulation } = useCalculatorStore()
   const legalPokemon = useLegalPokemon(regulation)
   const [level, setLevel] = useState<50 | 100>(50)
@@ -406,7 +412,7 @@ export function SpeedView({ useChampions }: Props) {
       {/* Controls */}
       <div className="shrink-0 border-b border-surface-700/40 bg-surface-900/90 px-4 py-2.5 flex flex-col gap-2">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-[9px] font-bold uppercase tracking-wider text-surface-500">Level</span>
+          <span className="text-[9px] font-bold uppercase tracking-wider text-surface-500">{t('level')}</span>
           {([50, 100] as const).map((lv) => (
             <button
               key={lv}
@@ -434,7 +440,7 @@ export function SpeedView({ useChampions }: Props) {
                     : 'text-surface-500 hover:text-surface-300 border-r border-surface-700/50'
                 }`}
               >
-                vs Rivals
+                {t('vsRivals')}
               </button>
               <button
                 type="button"
@@ -445,7 +451,7 @@ export function SpeedView({ useChampions }: Props) {
                     : 'text-surface-500 hover:text-surface-300'
                 }`}
               >
-                All Pokémon
+                {t('allPokemon')}
               </button>
             </div>
           )}
@@ -455,7 +461,7 @@ export function SpeedView({ useChampions }: Props) {
               type="text"
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              placeholder="Filter reference..."
+              placeholder={t('filterPlaceholder')}
               className="ml-auto w-40 bg-surface-900 border border-surface-700 rounded px-2 py-1 text-xs text-surface-200 placeholder:text-surface-600 focus:outline-none focus:border-primary-500"
             />
           )}
@@ -464,10 +470,10 @@ export function SpeedView({ useChampions }: Props) {
         {/* Two-column mod pills */}
         <div className="grid grid-cols-2 gap-2">
           <div className="rounded px-2.5 py-1.5" style={{ background: 'rgba(249,115,22,0.05)', border: '1px solid rgba(249,115,22,0.15)' }}>
-            <ModPills mods={myMods} toggle={toggleMy} label="My Team" accentColor="rgb(251,146,60)" />
+            <ModPills mods={myMods} toggle={toggleMy} label="modMyTeam" accentColor="rgb(251,146,60)" />
           </div>
           <div className="rounded px-2.5 py-1.5" style={{ background: 'rgba(168,85,247,0.05)', border: '1px solid rgba(168,85,247,0.15)' }}>
-            <ModPills mods={foesMods} toggle={toggleFoes} label="Rivals" accentColor="rgb(192,132,252)" />
+            <ModPills mods={foesMods} toggle={toggleFoes} label="modRivals" accentColor="rgb(192,132,252)" />
           </div>
         </div>
       </div>
@@ -479,7 +485,7 @@ export function SpeedView({ useChampions }: Props) {
         {showRivals ? (
           <>
             <div>
-              <SectionDivider label="Speed comparison — My Team vs Rivals (items applied per Pokémon)" color="rgb(148,163,184)" />
+              <SectionDivider label={t('comparisonTitle')} color="rgb(148,163,184)" />
               <RivalsComparisonList
                 myEntries={compEntries.filter((e) => e.side === 'mine')}
                 foeEntries={compEntries.filter((e) => e.side === 'foe')}
@@ -492,7 +498,7 @@ export function SpeedView({ useChampions }: Props) {
             {/* My Team */}
             {teamEntries.length > 0 && (
               <div>
-                <SectionDivider label="My Team" color="rgb(249,115,22)" />
+                <SectionDivider label={t('sectionMyTeam')} color="rgb(249,115,22)" />
                 <div className="flex flex-wrap gap-1 items-end">
                   {teamEntries.map((p) => (
                     <SpdCard key={p.name} name={p.name} baseSpe={p.baseSpe} color="rgb(249,115,22)">
@@ -508,7 +514,7 @@ export function SpeedView({ useChampions }: Props) {
             {/* Rivals */}
             {foesEntries.length > 0 && (
               <div>
-                <SectionDivider label="Rivals" color="rgb(168,85,247)" />
+                <SectionDivider label={t('sectionRivals')} color="rgb(168,85,247)" />
                 <div className="flex flex-wrap gap-1 items-end">
                   {foesEntries.map((p) => (
                     <SpdCard key={p.name} name={p.name} baseSpe={p.baseSpe} color="rgb(168,85,247)">
@@ -524,7 +530,11 @@ export function SpeedView({ useChampions }: Props) {
             {/* Reference */}
             <div>
               <SectionDivider
-                label={`Reference — top: +Spd 252 EVs / bottom: neutral · ${refEntries.length} Pokémon${speedTiers ? ' (format)' : ''}${filter ? ' filtered' : ''}`}
+                label={t('referenceTitle', {
+                  count: refEntries.length,
+                  format: speedTiers ? t('formatSuffix') : '',
+                  filter: filter ? t('filterSuffix') : '',
+                })}
               />
               <div className="flex flex-wrap gap-1 items-end">
                 {refEntries.map((p) => {
@@ -544,7 +554,7 @@ export function SpeedView({ useChampions }: Props) {
                 })}
                 {refEntries.length === 0 && (
                   <p className="text-surface-600 text-sm py-10 w-full text-center">
-                    No Pokémon match your filter
+                    {t('noFilterMatch')}
                   </p>
                 )}
               </div>
