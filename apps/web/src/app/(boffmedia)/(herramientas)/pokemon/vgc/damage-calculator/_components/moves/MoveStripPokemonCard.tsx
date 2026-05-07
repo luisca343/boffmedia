@@ -12,15 +12,17 @@ interface MoveStripPokemonCardProps {
   poke: CalcPokemon
   apiEntry?: VgcPokemon
   align?: 'left' | 'right'
+  useChampions?: boolean
 }
 
-function getMaxHP(poke: CalcPokemon, apiEntry?: VgcPokemon): number {
+function getMaxHP(poke: CalcPokemon, apiEntry?: VgcPokemon, useChampions = false): number {
   if (!apiEntry) return -1
-  return calcStat(GEN9, 'hp', apiEntry.baseStats.hp, poke.ivs.hp, poke.evs.hp, poke.level, poke.nature)
+  const hpEv = useChampions ? Math.floor((poke.evs.hp * 252) / 32) : poke.evs.hp
+  return calcStat(GEN9, 'hp', apiEntry.baseStats.hp, poke.ivs.hp, hpEv, poke.level, poke.nature)
 }
 
-function HPMini({ poke, apiEntry, align = 'left' }: { poke: CalcPokemon; apiEntry?: VgcPokemon; align?: 'left' | 'right' }) {
-  const maxHP = getMaxHP(poke, apiEntry)
+function HPMini({ poke, apiEntry, align = 'left', useChampions = false }: { poke: CalcPokemon; apiEntry?: VgcPokemon; align?: 'left' | 'right'; useChampions?: boolean }) {
+  const maxHP = getMaxHP(poke, apiEntry, useChampions)
   if (maxHP < 0) return null
   const cur = poke.currentHP < 0 ? maxHP : Math.min(poke.currentHP, maxHP)
   const pct = (cur / maxHP) * 100
@@ -46,7 +48,7 @@ function HPMini({ poke, apiEntry, align = 'left' }: { poke: CalcPokemon; apiEntr
   )
 }
 
-export function MoveStripPokemonCard({ poke, apiEntry, align = 'left' }: MoveStripPokemonCardProps) {
+export function MoveStripPokemonCard({ poke, apiEntry, align = 'left', useChampions = false }: MoveStripPokemonCardProps) {
   const t = useTranslations('vgc.calc.moveStripCard')
   const reverse = align === 'right'
 
@@ -68,7 +70,7 @@ export function MoveStripPokemonCard({ poke, apiEntry, align = 'left' }: MoveStr
         </div>
       </div>
       <div className="mt-1">
-        <HPMini poke={poke} apiEntry={apiEntry} align={align} />
+        <HPMini poke={poke} apiEntry={apiEntry} align={align} useChampions={useChampions} />
       </div>
     </div>
   )

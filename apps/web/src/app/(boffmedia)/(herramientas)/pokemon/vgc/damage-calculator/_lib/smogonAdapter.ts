@@ -112,6 +112,8 @@ export function calcDamage(
     const moveOpts: Partial<State.Move> = {
       isCrit: move.crit,
       hits: 1,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      overrides: { basePower: move.bp, type: move.type as any, category: move.category },
     }
 
     const smogonMove = new Move(GEN9, move.name as State.Move['name'], moveOpts)
@@ -156,13 +158,13 @@ export function calcAllMoves(
   return attacker.moves.map((move) => calcDamage(attacker, defender, move, field, useChampions))
 }
 
-export function getKOVerdict(res: DamageResult): { label: string; colorClass: string } {
+export function getKOVerdict(res: DamageResult): { labelKey: string; colorClass: string } {
   const { minPct, maxPct } = res
-  if (minPct >= 100) return { label: 'guaranteed OHKO', colorClass: 'text-red-400' }
-  if (minPct * 2 >= 100) return { label: 'guaranteed 2HKO', colorClass: 'text-primary-400' }
-  if (maxPct * 2 >= 100) return { label: 'possible 2HKO', colorClass: 'text-warning-400' }
-  if (maxPct >= 100) return { label: 'possible OHKO', colorClass: 'text-red-400' }
-  return { label: 'no KO', colorClass: 'text-surface-500' }
+  if (minPct >= 100) return { labelKey: 'guaranteedOHKO', colorClass: 'text-red-400' }
+  if (minPct * 2 >= 100) return { labelKey: 'guaranteed2HKO', colorClass: 'text-primary-400' }
+  if (maxPct * 2 >= 100) return { labelKey: 'possible2HKO', colorClass: 'text-warning-400' }
+  if (maxPct >= 100) return { labelKey: 'possibleOHKO', colorClass: 'text-red-400' }
+  return { labelKey: 'noKO', colorClass: 'text-surface-500' }
 }
 
 export function getDamageColorClass(res: DamageResult): string {
