@@ -51,12 +51,7 @@ export function MoveSlot({ move, index, onChange, accentColor = 'primary' }: Pro
   function selectMove(name: string) {
     const data = moveMap.get(name)
     if (data) {
-      onChange({
-        name: data.name,
-        bp: data.basePower,
-        type: data.type,
-        category: data.category,
-      })
+      onChange({ name: data.name, bp: data.basePower, type: data.type, category: data.category })
     } else {
       onChange({ name, bp: 0, type: 'Normal', category: 'Physical' })
     }
@@ -71,33 +66,23 @@ export function MoveSlot({ move, index, onChange, accentColor = 'primary' }: Pro
 
   const typeColor = TYPE_COLORS[move.type] ?? '#9ca3af'
   const borderFocus = accentColor === 'primary' ? 'focus:border-primary-500' : 'focus:border-accent-500'
+  const ctrlCls = 'bg-surface-950/80 border border-surface-700/60 rounded px-1 py-1 text-xs focus:outline-none focus:border-surface-500'
 
   return (
-    <div className="bg-surface-900/60 border border-surface-700/60 rounded-lg p-2 flex flex-col gap-2">
+    <div className="flex items-center gap-1">
       {/* Move name search */}
-      <div ref={ref} className="relative">
-        <div className="flex items-center gap-1">
-          <input
-            className={`flex-1 bg-surface-950/80 border border-surface-700 rounded px-2 py-1 text-xs font-semibold text-surface-200 placeholder:text-surface-600 focus:outline-none ${borderFocus} transition-colors`}
-            value={query}
-            placeholder={t('movePlaceholder', { n: index + 1 })}
-            onFocus={() => setOpen(true)}
-            onChange={(e) => { setQuery(e.target.value); setOpen(true) }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && filtered[0]) selectMove(filtered[0])
-              if (e.key === 'Escape') { setOpen(false); setQuery(move.name) }
-            }}
-          />
-          {move.name && (
-            <button
-              type="button"
-              onClick={clearMove}
-              className="text-surface-600 hover:text-surface-400 text-xs px-1"
-            >
-              ×
-            </button>
-          )}
-        </div>
+      <div ref={ref} className="relative flex-1 min-w-0">
+        <input
+          className={`w-full bg-surface-950/80 border border-surface-700/60 rounded px-2 py-1 text-xs font-semibold text-surface-200 placeholder:text-surface-600 focus:outline-none ${borderFocus} transition-colors`}
+          value={query}
+          placeholder={t('movePlaceholder', { n: index + 1 })}
+          onFocus={() => setOpen(true)}
+          onChange={(e) => { setQuery(e.target.value); setOpen(true) }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && filtered[0]) selectMove(filtered[0])
+            if (e.key === 'Escape') { setOpen(false); setQuery(move.name) }
+          }}
+        />
 
         {open && !isLoaded && (
           <div className="absolute top-full left-0 right-0 z-50 mt-0.5 bg-surface-900 border border-surface-700 rounded-lg shadow-2xl px-3 py-2">
@@ -135,53 +120,65 @@ export function MoveSlot({ move, index, onChange, accentColor = 'primary' }: Pro
         )}
       </div>
 
-      {/* BP / Type / Category / Crit row */}
-      {move.name && (
-        <div className="flex items-center gap-1 flex-wrap">
-          {/* BP override */}
-          <input
-            type="number"
-            min={0}
-            max={999}
-            value={move.bp}
-            onChange={(e) => onChange({ bp: Math.max(0, parseInt(e.target.value) || 0) })}
-            className="w-12 bg-surface-950/80 border border-surface-700 rounded px-1 py-0.5 text-xs font-mono text-center text-surface-200 focus:outline-none focus:border-surface-600"
-            title={t('basePower')}
-          />
-          {/* Type */}
-          <select
-            value={move.type}
-            onChange={(e) => onChange({ type: e.target.value })}
-            className="bg-surface-950/80 border border-surface-700 rounded px-1 py-0.5 text-[10px] font-bold focus:outline-none focus:border-surface-600 flex-1 min-w-0"
-            style={{ color: typeColor }}
-          >
-            {Object.keys(TYPE_COLORS).map((t) => (
-              <option key={t} value={t}>{t}</option>
-            ))}
-          </select>
-          {/* Category */}
-          <select
-            value={move.category}
-            onChange={(e) => onChange({ category: e.target.value as CalcMove['category'] })}
-            className="bg-surface-950/80 border border-surface-700 rounded px-1 py-0.5 text-[10px] text-surface-300 focus:outline-none focus:border-surface-600"
-          >
-            <option value="Physical">{t('categoryPhysical')}</option>
-            <option value="Special">{t('categorySpecial')}</option>
-            <option value="Status">{t('categoryStatus')}</option>
-          </select>
-          {/* Crit */}
-          <button
-            type="button"
-            onClick={() => onChange({ crit: !move.crit })}
-            className={`text-[10px] font-bold px-2 py-0.5 rounded border transition-all ${
-              move.crit
-                ? 'bg-error-500/15 border-error-500/40 text-error-400'
-                : 'bg-surface-800 border-surface-700 text-surface-500 hover:text-surface-400'
-            }`}
-          >
-            {t('crit')}
-          </button>
-        </div>
+      {/* BP */}
+      <input
+        type="number"
+        min={0}
+        max={999}
+        value={move.bp}
+        onChange={(e) => onChange({ bp: Math.max(0, parseInt(e.target.value) || 0) })}
+        className={`w-12 font-mono text-center text-surface-200 ${ctrlCls}`}
+        title={t('basePower')}
+      />
+
+      {/* Type */}
+      <select
+        value={move.type}
+        onChange={(e) => onChange({ type: e.target.value })}
+        className={`w-[84px] font-bold text-[10px] ${ctrlCls}`}
+        style={{ color: typeColor }}
+      >
+        {Object.keys(TYPE_COLORS).map((tp) => (
+          <option key={tp} value={tp}>{tp}</option>
+        ))}
+      </select>
+
+      {/* Category */}
+      <select
+        value={move.category}
+        onChange={(e) => onChange({ category: e.target.value as CalcMove['category'] })}
+        className={`w-24 text-[10px] text-surface-300 ${ctrlCls}`}
+      >
+        <option value="Physical">{t('categoryPhysical')}</option>
+        <option value="Special">{t('categorySpecial')}</option>
+        <option value="Status">{t('categoryStatus')}</option>
+      </select>
+
+      {/* Crit */}
+      <button
+        type="button"
+        onClick={() => onChange({ crit: !move.crit })}
+        title="Critical hit"
+        className={`w-5 h-[26px] flex items-center justify-center rounded border text-[9px] font-bold transition-all ${
+          move.crit
+            ? 'bg-error-500/15 border-error-500/40 text-error-400'
+            : 'bg-surface-800 border-surface-700 text-surface-500 hover:text-surface-400'
+        }`}
+      >
+        C
+      </button>
+
+      {/* Clear / spacer */}
+      {move.name ? (
+        <button
+          type="button"
+          onClick={clearMove}
+          className="w-3 text-surface-600 hover:text-surface-400 text-xs text-center leading-none"
+        >
+          ×
+        </button>
+      ) : (
+        <span className="w-3" />
       )}
     </div>
   )
