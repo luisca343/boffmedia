@@ -150,24 +150,25 @@ export function RotomNav({
         </SheetTrigger>
         <SheetContent
           side="top"
-          className="bg-surface-800 text-surface-50 border-none"
+          className="bg-surface-800 text-surface-50 border-none max-h-[80vh] overflow-y-auto"
         >
-          <SheetHeader>
-            <SheetTitle className="text-surface-50">Ajustes</SheetTitle>
-            <SheetDescription>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-                <div>
-                  <SettingsPage setTema={setTema} />
-                </div>
-                <div className="space-y-4">
-                  <h3 className="text-surface-50 text-lg font-medium mb-2">Idioma</h3>
-                  <div className="bg-surface-700 p-4 rounded-lg">
-                    <LanguageSwitcher variant="mobile" />
-                  </div>
-                </div>
-              </div>
-            </SheetDescription>
+          <SheetHeader className="mb-4">
+            <SheetTitle className="text-surface-50 text-lg">Ajustes</SheetTitle>
           </SheetHeader>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <SettingsPage setTema={setTema} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-primary-400">🌐</span>
+                <h3 className="text-sm font-semibold text-surface-100 uppercase tracking-wider">Idioma</h3>
+              </div>
+              <div className="bg-surface-700/50 border-2 border-surface-600 p-4 rounded-lg">
+                <LanguageSwitcher variant="mobile" />
+              </div>
+            </div>
+          </div>
         </SheetContent>
       </Sheet>
       <Sheet>
