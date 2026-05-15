@@ -31,6 +31,23 @@
       "@pkmn/randoms": "^0.9.38",
       "@pkmn/sim": "^0.9.38",
       "@pkmn/view": "^0.7.0"
-    }
+    },
+    "onlyBuiltDependencies": [
+      "@nestjs/core",
+      "@parcel/watcher",
+      "@scarf/scarf",
+      "@swc/core",
+      "bcrypt",
+      "bufferutil",
+      "core-js",
+      "es5-ext",
+      "esbuild",
+      "necord",
+      "next-translate-plugin",
+      "protobufjs",
+      "sharp",
+      "unrs-resolver",
+      "utf-8-validate"
+    ]
   }
 }
