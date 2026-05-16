@@ -24,6 +24,12 @@
       "type": "local",
       "command": ["gk", "mcp"],
       "enabled": true
+    },
+    "boff-agent": {
+      "type": "local",
+      "command": ["pnpm", "--filter", "@repo/agent", "mcp"],
+      "enabled": true,
+      "timeout": 60000
     }
   }
 }

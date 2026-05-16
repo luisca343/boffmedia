@@ -13,13 +13,14 @@ export function registerTools(server: McpServer) {
 
   server.tool(
     'begin_task',
-    'CALL THIS FIRST before any code changes. Registers the task, loads relevant codebase context, and retrieves prior run history. Returns the step-by-step workflow to follow for this session. Every task must start here and end with save_run.',
+    'CALL THIS FIRST before any code changes. Registers the task, loads relevant codebase context, and retrieves prior run history. Returns the step-by-step workflow to follow for this session, including the runId you must pass to all subsequent tools. Every task must start here and end with save_run.',
     {
-      runId: z.string().describe('Unique kebab-case ID for this run, e.g. "add-user-endpoint-1716900000"'),
       title: z.string().describe('Short human-readable task title'),
-      taskDescription: z.string().describe('Full description of what needs to be done')
+      taskDescription: z.string().describe('Full description of what needs to be done'),
+      taskType: z.enum(['feature', 'ui-ux', 'refactor', 'bugfix']).default('feature').describe('Type of task — drives whether Playwright is included in the workflow')
     },
-    async ({ runId, title, taskDescription }) => {
+    async ({ title, taskDescription, taskType }) => {
+      const runId = `${title.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40)}-${Date.now()}`
       await saveRun({ runId, status: 'running', title })
 
       const [context, history] = await Promise.all([
@@ -27,18 +28,24 @@ export function registerTools(server: McpServer) {
         getRunHistory({ limit: 5, similarTo: title, status: 'all' })
       ])
 
+      const playwrightStep = taskType === 'ui-ux'
+        ? `4b. Call run_playwright (runId: "${runId}") — trace + screenshots. Present reviewInstructions to the user before proceeding to step 5.`
+        : `4b. Skip run_playwright unless you made UI changes.`
+
       const workflow = `
 # Boff Agent — Task Started
 
 runId: ${runId}
 title: ${title}
+taskType: ${taskType}
 
 ## Workflow (follow in order)
 
 1. ✅ begin_task — done
 2. Call check_guardrails with every file path you intend to write or modify. Stop if violations are returned.
 3. Make your code changes using your own file editing tools.
-4. Call run_verification (runId: "${runId}") to run lint + tests. Fix failures before proceeding.
+4a. Call run_verification (runId: "${runId}") to run lint + tests. Fix failures before proceeding.
+${playwrightStep}
 5. Call save_run (runId: "${runId}", status: "passed" | "failed") to close the task.
 
 Do not skip steps. Do not call save_run before run_verification passes.
@@ -71,9 +78,9 @@ ${context.conventions ? '\n' + context.conventions : ''}
 
   server.tool(
     'run_verification',
-    'CALL THIS AFTER ALL CODE CHANGES — step 4 of the workflow. Runs lint → Jest unit → Jest e2e and returns structured results. Fix any failures before calling save_run.',
+    'CALL THIS AFTER ALL CODE CHANGES — step 4a of the workflow. Runs lint → Jest unit → Jest e2e and returns structured results. Fix any failures before calling save_run. Use the runId returned by begin_task.',
     {
-      runId: z.string().describe('The runId from begin_task'),
+      runId: z.string().describe('The runId returned by begin_task'),
       apps: z.array(z.enum(['api', 'web'])).optional(),
       skipStages: z.array(z.enum(['lint', 'jest_unit', 'jest_e2e'])).optional()
     },
@@ -85,9 +92,9 @@ ${context.conventions ? '\n' + context.conventions : ''}
 
   server.tool(
     'save_run',
-    'CALL THIS LAST — step 5 of the workflow. Persists the final run status after run_verification completes. Every task started with begin_task must be closed with save_run.',
+    'CALL THIS LAST — step 5 of the workflow. Persists the final run status after run_verification completes. Every task started with begin_task must be closed with save_run. Use the runId returned by begin_task.',
     {
-      runId: z.string().describe('The runId from begin_task'),
+      runId: z.string().describe('The runId returned by begin_task'),
       status: z.enum(['running', 'passed', 'failed']),
       title: z.string(),
       branch: z.string().optional(),
@@ -102,9 +109,9 @@ ${context.conventions ? '\n' + context.conventions : ''}
 
   server.tool(
     'run_playwright',
-    'Run Playwright e2e tests and capture a full trace + screenshots. Returns test results and paths to trace.zip and screenshot files for visual review. Use instead of or after run_verification for UI tasks.',
+    'Step 4b of the workflow for ui-ux tasks. Run Playwright e2e tests and capture a full trace + screenshots. Returns test results, paths to trace.zip, screenshot files, and reviewInstructions to present to the user. Use the runId returned by begin_task.',
     {
-      runId: z.string(),
+      runId: z.string().describe('The runId returned by begin_task'),
       specPath: z.string().optional().describe('Path to a specific spec file. Omit to run all e2e specs.'),
       captureTrace: z.boolean().default(true),
       captureScreenshots: z.boolean().default(true)
