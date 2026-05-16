@@ -8,7 +8,8 @@ export class QueryDivergenceDto {
   regulationId: string;
 
   @ApiPropertyOptional({
-    description: 'Limitless tournament ID; omit for combined across all completed tournaments in the regulation',
+    description:
+      'Limitless tournament ID; omit for combined across all completed tournaments in the regulation',
     example: 1,
   })
   @IsOptional()
@@ -18,7 +19,8 @@ export class QueryDivergenceDto {
   tournamentId?: number;
 
   @ApiPropertyOptional({
-    description: 'Smogon month (YYYY-MM); defaults to the most recent cached snapshot',
+    description:
+      'Smogon month (YYYY-MM); defaults to the most recent cached snapshot',
     example: '2026-03',
   })
   @IsOptional()

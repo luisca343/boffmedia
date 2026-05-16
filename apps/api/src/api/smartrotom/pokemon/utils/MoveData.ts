@@ -1,52 +1,63 @@
 import * as fs from 'fs';
-import *  as  path from 'path';
+import * as path from 'path';
 import { promises as fsPromises } from 'fs';
 import { wolfeyTypeRanking } from './types';
 import { Attack } from '@/types/move';
 
 export class MoveData {
-    constructor() {}
-    
-    moveList = [];
-    movesByName = {}
-    movesByType = {}
-    movesByCategory = {}
+  constructor() {}
 
-    async loadMoveData() {
-        const startingTime = Date.now();
-        const defaultDirDef = path.join(__dirname, '../../../../', 'public/smartrotom/packs/default_datapack/data/pixelmon/moves');
-        const publicDir = path.join(__dirname, '../../../../', 'public/smartrotom/packs/datapack/data/pixelmon/moves');
+  moveList = [];
+  movesByName = {};
+  movesByType = {};
+  movesByCategory = {};
 
-        const defaultDir = await fsPromises.readdir(defaultDirDef);
-        const dir = await fsPromises.readdir(publicDir);
+  async loadMoveData() {
+    const startingTime = Date.now();
+    const defaultDirDef = path.join(
+      __dirname,
+      '../../../../',
+      'public/smartrotom/packs/default_datapack/data/pixelmon/moves',
+    );
+    const publicDir = path.join(
+      __dirname,
+      '../../../../',
+      'public/smartrotom/packs/datapack/data/pixelmon/moves',
+    );
 
-        const fullDir = [...new Set([...defaultDir, ...dir])];
+    const defaultDir = await fsPromises.readdir(defaultDirDef);
+    const dir = await fsPromises.readdir(publicDir);
 
-        let defaultCounter = 0;
-        let terasCounter = 0;
+    const fullDir = [...new Set([...defaultDir, ...dir])];
 
-        for (const file of fullDir) {
-            if (!file || !file.includes(".json")) continue;
-            let fileName = path.join(publicDir, file);
-            let data: Attack
-            if(fs.existsSync(fileName)) {
-                data = JSON.parse(await fsPromises.readFile(fileName, 'utf8')) as Attack;
-                terasCounter++;
-            } else {
-                fileName = path.join(defaultDirDef, file);
-                data = JSON.parse(await fsPromises.readFile(fileName, 'utf8')) as Attack;
-                defaultCounter++;
-            }
+    let defaultCounter = 0;
+    let terasCounter = 0;
 
-            this.moveList.push(data);
-            this.movesByName[data.attackName] = data;
-            this.movesByType[data.attackType] = data;
-            this.movesByCategory[data.attackCategory] = data;
-            
-        }
+    for (const file of fullDir) {
+      if (!file || !file.includes('.json')) continue;
+      let fileName = path.join(publicDir, file);
+      let data: Attack;
+      if (fs.existsSync(fileName)) {
+        data = JSON.parse(
+          await fsPromises.readFile(fileName, 'utf8'),
+        ) as Attack;
+        terasCounter++;
+      } else {
+        fileName = path.join(defaultDirDef, file);
+        data = JSON.parse(
+          await fsPromises.readFile(fileName, 'utf8'),
+        ) as Attack;
+        defaultCounter++;
+      }
 
-        console.log(`Cargados ${terasCounter} movimientos de Teras y ${defaultCounter} movimientos por defecto en ${Date.now() - startingTime}ms`);
-
+      this.moveList.push(data);
+      this.movesByName[data.attackName] = data;
+      this.movesByType[data.attackType] = data;
+      this.movesByCategory[data.attackCategory] = data;
     }
 
+    console.log(
+      `Cargados ${terasCounter} movimientos de Teras y ${defaultCounter} movimientos por defecto en ${Date.now() - startingTime}ms`,
+    );
+  }
 }

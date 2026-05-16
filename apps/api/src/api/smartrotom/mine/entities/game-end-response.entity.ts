@@ -1,23 +1,23 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class GameEndResponse {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Game session ID',
-    example: 123
+    example: 123,
   })
   idPartida: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Success status',
     example: true,
-    required: false
+    required: false,
   })
   success?: boolean;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Number of rewards processed',
     example: 3,
-    required: false
+    required: false,
   })
   rewardsProcessed?: number;
 }

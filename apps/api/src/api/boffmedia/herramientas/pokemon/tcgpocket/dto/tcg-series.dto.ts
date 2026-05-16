@@ -14,7 +14,11 @@ export class TcgSeriesDto {
   @IsString()
   name_es: string;
 
-  @ApiProperty({ description: 'Logo URL', example: 'https://assets.tcgdex.net/en/base/base1/logo', required: false })
+  @ApiProperty({
+    description: 'Logo URL',
+    example: 'https://assets.tcgdex.net/en/base/base1/logo',
+    required: false,
+  })
   @IsOptional()
   @IsUrl()
   logo?: string;

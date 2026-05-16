@@ -1,4 +1,9 @@
-import { Injectable, Inject, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { ARCADE_STREAK_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 import { IArcadeStreakRepository } from '../repositories/interfaces/arcade-streak.repository.interface';
 import { CreateArcadeStreakDto } from '../dto/create-arcade-streak.dto';
@@ -25,44 +30,48 @@ export class StreakService {
 
   async getUserStreak(uuid: string): Promise<ArcadeStreak> {
     this.validateUuid(uuid);
-    
+
     // Get current time and reset time boundaries
     const now = new Date();
     const resetTime = this.getDailyResetTime(now);
     const nextResetTime = this.getNextResetTime(now, resetTime);
-    
+
     // Get user streak record from database or create default
     let streakRecord = await this.arcadeStreakRepository.findByUuid(uuid);
-    
+
     if (!streakRecord) {
       // Create new streak record for user
       const newStreakData: CreateArcadeStreakDto = {
         uuid,
         streak: 0,
-        totalClaims: 0
+        totalClaims: 0,
       };
-      
-      const result = await this.arcadeStreakRepository.createUserStreak(newStreakData);
-      streakRecord = await this.arcadeStreakRepository.findById(result.insertId);
-      
+
+      const result =
+        await this.arcadeStreakRepository.createUserStreak(newStreakData);
+      streakRecord = await this.arcadeStreakRepository.findById(
+        result.insertId,
+      );
+
       if (!streakRecord) {
         throw new NotFoundException('Failed to create streak record');
       }
     }
-    
+
     // Get current rewards config
     const rewardsConfig = loadRewardsConfig();
-    
+
     // Check if banner has changed
-    const bannerChanged = streakRecord.lastBanner && streakRecord.lastBanner !== rewardsConfig.name;
-    let effectiveStreak = bannerChanged ? 0 : streakRecord.streak;
-    
+    const bannerChanged =
+      streakRecord.lastBanner && streakRecord.lastBanner !== rewardsConfig.name;
+    const effectiveStreak = bannerChanged ? 0 : streakRecord.streak;
+
     // Determine if user has claimed today
     let claimedToday = false;
     if (streakRecord.lastClaimed) {
       const lastClaimDate = new Date(streakRecord.lastClaimed);
       const currentResetTime = this.getDailyResetTime(now);
-      
+
       if (now < currentResetTime) {
         // If we're before today's reset, check if claimed since yesterday's reset
         const yesterdayDate = new Date(now);
@@ -76,15 +85,18 @@ export class StreakService {
         }
       }
     }
-    
+
     // Calculate current day in streak cycle
     let currentDay = effectiveStreak % rewardsConfig.totalDays;
-    if (!claimedToday) currentDay = (currentDay + 1);
+    if (!claimedToday) currentDay = currentDay + 1;
     if (currentDay === 0) currentDay = rewardsConfig.totalDays;
-    
+
     // Get next reward information
-    const nextReward = this.getRewardForDay(claimedToday ? currentDay + 1 : currentDay, rewardsConfig);
-    
+    const nextReward = this.getRewardForDay(
+      claimedToday ? currentDay + 1 : currentDay,
+      rewardsConfig,
+    );
+
     // Return complete streak information
     return {
       lastClaimed: streakRecord.lastClaimed,
@@ -101,7 +113,9 @@ export class StreakService {
     };
   }
 
-  async canClaimReward(uuid: string): Promise<{ canClaim: boolean; streak: ArcadeStreak }> {
+  async canClaimReward(
+    uuid: string,
+  ): Promise<{ canClaim: boolean; streak: ArcadeStreak }> {
     this.validateUuid(uuid);
 
     const streak = await this.getUserStreak(uuid);
@@ -110,9 +124,9 @@ export class StreakService {
     return { canClaim, streak };
   }
 
-  async claimDailyReward(uuid: string): Promise<{ 
-    success: boolean; 
-    streak: ArcadeStreak; 
+  async claimDailyReward(uuid: string): Promise<{
+    success: boolean;
+    streak: ArcadeStreak;
     reward: any;
     message: string;
   }> {
@@ -126,9 +140,9 @@ export class StreakService {
 
     // Check if streak should continue or reset
     const shouldResetStreak = this.shouldResetStreak(streak);
-    
+
     let updatedStreak: ArcadeStreak;
-    
+
     if (shouldResetStreak) {
       // Reset streak and start over
       await this.arcadeStreakRepository.resetStreak(uuid);
@@ -141,27 +155,28 @@ export class StreakService {
     // Calculate reward based on streak
     const reward = this.calculateReward(updatedStreak.streak);
 
-
     return {
       success: true,
       streak: updatedStreak,
       reward,
-      message: `Day ${updatedStreak.streak} reward claimed!`
+      message: `Day ${updatedStreak.streak} reward claimed!`,
     };
   }
 
-  async resetUserStreak(uuid: string): Promise<{ success: boolean; message: string }> {
+  async resetUserStreak(
+    uuid: string,
+  ): Promise<{ success: boolean; message: string }> {
     this.validateUuid(uuid);
 
     const success = await this.arcadeStreakRepository.resetStreak(uuid);
-    
+
     if (!success) {
       throw new NotFoundException('Streak not found or already reset');
     }
 
     return {
       success: true,
-      message: 'Streak reset successfully'
+      message: 'Streak reset successfully',
     };
   }
 
@@ -169,7 +184,7 @@ export class StreakService {
     this.validateUuid(uuid);
 
     const stats = await this.arcadeStreakRepository.getStreakStats(uuid);
-    
+
     if (!stats) {
       throw new NotFoundException('Streak stats not found');
     }
@@ -185,7 +200,7 @@ export class StreakService {
     }
 
     const updateData: UpdateArcadeStreakDto = {
-      lastBanner: banner
+      lastBanner: banner,
     };
 
     const streak = await this.arcadeStreakRepository.findByUuid(uuid);
@@ -219,7 +234,7 @@ export class StreakService {
     return reward;
   }
 
-    private getDailyResetTime(date: Date): Date {
+  private getDailyResetTime(date: Date): Date {
     const resetTime = new Date(date);
     resetTime.setHours(6, 0, 0, 0);
     return resetTime;
@@ -234,20 +249,26 @@ export class StreakService {
   }
 
   private isSameDay(date1: Date, date2: Date): boolean {
-    return date1.getDate() === date2.getDate() &&
-           date1.getMonth() === date2.getMonth() &&
-           date1.getFullYear() === date2.getFullYear();
+    return (
+      date1.getDate() === date2.getDate() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getFullYear() === date2.getFullYear()
+    );
   }
 
   private getRewardForDay(day: number, rewardsConfig: any): any {
     const dayInCycle = ((day - 1) % rewardsConfig.totalDays) + 1;
-    const rewardConfig = rewardsConfig.rewards.find(r => r.day === dayInCycle);
-    
-    return rewardConfig || { 
-      day: dayInCycle, 
-      type: "CURRENCY", 
-      amount: 100,
-      description: `Day ${dayInCycle} reward`
-    };
+    const rewardConfig = rewardsConfig.rewards.find(
+      (r) => r.day === dayInCycle,
+    );
+
+    return (
+      rewardConfig || {
+        day: dayInCycle,
+        type: 'CURRENCY',
+        amount: 100,
+        description: `Day ${dayInCycle} reward`,
+      }
+    );
   }
 }

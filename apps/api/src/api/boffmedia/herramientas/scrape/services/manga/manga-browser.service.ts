@@ -35,7 +35,9 @@ export class MangaBrowserService implements OnModuleDestroy {
     // Close the existing browser so the next getBrowser() call reconnects
     // with the new mode (local ↔ remote).
     if (this.browser) {
-      this.logger.log(`Tunnel ${enabled ? 'enabled' : 'disabled'} — closing current browser instance`);
+      this.logger.log(
+        `Tunnel ${enabled ? 'enabled' : 'disabled'} — closing current browser instance`,
+      );
       await this.browser.close().catch(() => {});
       this.browser = null;
     }
@@ -51,7 +53,9 @@ export class MangaBrowserService implements OnModuleDestroy {
         this.browser = await chromium.connect(wsEndpoint);
       } else {
         if (this.useTunnel && !wsEndpoint) {
-          this.logger.warn('Tunnel enabled but MANGA_BROWSER_WS_ENDPOINT is not set — falling back to local browser');
+          this.logger.warn(
+            'Tunnel enabled but MANGA_BROWSER_WS_ENDPOINT is not set — falling back to local browser',
+          );
         }
         this.logger.log('Launching local Chromium browser…');
         this.browser = await chromium.launch({

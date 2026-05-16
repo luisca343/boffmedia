@@ -11,33 +11,38 @@ import {
   SmartRotomReplay,
   SmartRotomUserReplay,
   smartRotomReplays,
-  smartRotomUserReplays
+  smartRotomUserReplays,
 } from '@/_db/schema/SmartRotom';
 import { BaseInsertResponse } from '@api/_utils/dto/base-responses.dto';
 
 @Injectable()
-export class ReplaysRepository 
-  extends BaseRepositoryImpl<Replay, CreateReplayFullDto, UpdateReplayDto> 
-  implements IReplaysRepository {
-
-  constructor(
-    @Inject(DRIZZLE) db: MySql2Database<Record<string, never>>,
-  ) {
+export class ReplaysRepository
+  extends BaseRepositoryImpl<Replay, CreateReplayFullDto, UpdateReplayDto>
+  implements IReplaysRepository
+{
+  constructor(@Inject(DRIZZLE) db: MySql2Database<Record<string, never>>) {
     super(db, smartRotomReplays);
   }
 
   async create(data: CreateReplayFullDto): Promise<Replay> {
-    const result = await this.db.insert(smartRotomReplays).values(data as SmartRotomReplay);
+    const result = await this.db
+      .insert(smartRotomReplays)
+      .values(data as SmartRotomReplay);
     return this.findById(result[0].insertId) as Promise<Replay>;
   }
 
   async update(id: number, data: UpdateReplayDto): Promise<Replay> {
-    await this.db.update(smartRotomReplays).set(data).where(eq(smartRotomReplays.id, id));
+    await this.db
+      .update(smartRotomReplays)
+      .set(data)
+      .where(eq(smartRotomReplays.id, id));
     return this.findById(id) as Promise<Replay>;
   }
 
   async delete(id: number): Promise<boolean> {
-    const result = await this.db.delete(smartRotomReplays).where(eq(smartRotomReplays.id, id));
+    const result = await this.db
+      .delete(smartRotomReplays)
+      .where(eq(smartRotomReplays.id, id));
     return result[0].affectedRows > 0;
   }
 
@@ -67,7 +72,8 @@ export class ReplaysRepository
         and(
           eq(smartRotomUserReplays.replayId, smartRotomReplays.id),
           eq(smartRotomUserReplays.uuid, uuid),
-        ))
+        ),
+      )
       .where(eq(smartRotomReplays.id, replayId))
       .limit(1);
 

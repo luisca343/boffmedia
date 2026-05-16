@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { LigaRepository, Tournament, LeagueMatch } from '@api/smartrotom/liga/repositories/liga.repository';
+import {
+  LigaRepository,
+  Tournament,
+  LeagueMatch,
+} from '@api/smartrotom/liga/repositories/liga.repository';
 
 export interface TournamentCreationRequest {
   name: string;
@@ -15,9 +19,7 @@ export interface TournamentRegistration {
 
 @Injectable()
 export class TournamentService {
-  constructor(
-    private readonly ligaRepository: LigaRepository,
-  ) {}
+  constructor(private readonly ligaRepository: LigaRepository) {}
 
   async getActiveTournaments(): Promise<Tournament[]> {
     return this.ligaRepository.findActiveTournaments();
@@ -28,7 +30,8 @@ export class TournamentService {
       throw new Error('Valid tournament ID is required');
     }
 
-    const tournament = await this.ligaRepository.findTournamentById(tournamentId);
+    const tournament =
+      await this.ligaRepository.findTournamentById(tournamentId);
     if (!tournament) {
       throw new Error('Tournament not found');
     }
@@ -39,14 +42,16 @@ export class TournamentService {
   async getTournamentMatches(tournamentId: number): Promise<LeagueMatch[]> {
     // Validate tournament exists
     await this.getTournamentById(tournamentId);
-    
+
     return this.ligaRepository.findTournamentMatches(tournamentId);
   }
 
-  async createTournament(request: TournamentCreationRequest): Promise<{ success: boolean; message: string }> {
+  async createTournament(
+    request: TournamentCreationRequest,
+  ): Promise<{ success: boolean; message: string }> {
     // Placeholder for future implementation
     // This would require creating tournaments table and implementing the logic
-    
+
     if (!request.name || request.name.trim().length === 0) {
       throw new Error('Tournament name is required');
     }
@@ -63,7 +68,9 @@ export class TournamentService {
     throw new Error('Tournament creation is not yet implemented');
   }
 
-  async registerForTournament(registration: TournamentRegistration): Promise<{ success: boolean; message: string }> {
+  async registerForTournament(
+    registration: TournamentRegistration,
+  ): Promise<{ success: boolean; message: string }> {
     // Placeholder for future implementation
     throw new Error('Tournament registration is not yet implemented');
   }

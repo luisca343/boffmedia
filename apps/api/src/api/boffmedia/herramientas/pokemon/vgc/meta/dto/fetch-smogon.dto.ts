@@ -1,10 +1,19 @@
-import { IsIn, IsNotEmpty, IsOptional, IsString, Matches } from 'class-validator';
+import {
+  IsIn,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Matches,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { SMOGON_VALID_CUTOFFS } from '../config/smogon.config';
 
 export class FetchSmogonDto {
-  @ApiProperty({ example: 'gen9vgc2026regi', description: 'Showdown format ID' })
+  @ApiProperty({
+    example: 'gen9vgc2026regi',
+    description: 'Showdown format ID',
+  })
   @IsString()
   @IsNotEmpty()
   format: string;

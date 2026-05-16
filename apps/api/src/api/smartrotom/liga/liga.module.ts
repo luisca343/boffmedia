@@ -22,16 +22,16 @@ import { LigaController } from './liga.controller';
   controllers: [LigaController],
   providers: [
     LigaRepository,
-    
+
     ReplayService,
     StatisticsService,
     TournamentService,
-    
+
     LigaFacadeService,
   ],
   exports: [
     LigaFacadeService,
-    
+
     ReplayService,
     StatisticsService,
     TournamentService,

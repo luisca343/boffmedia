@@ -1,84 +1,84 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class BiomeSpawnEntry {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Pokédex number',
-    example: 618
+    example: 618,
   })
   dex: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Species name',
-    example: 'stunfisk'
+    example: 'stunfisk',
   })
   species: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Form name',
-    example: 'base'
+    example: 'base',
   })
   form: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Spawn rarity',
-    example: 10
+    example: 10,
   })
   rarity: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Spawn percentage',
-    example: 50
+    example: 50,
   })
   percentage: number;
 }
 
 export class BiomeSpawnCollection {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Standard spawns',
     type: [BiomeSpawnEntry],
-    required: false
+    required: false,
   })
   standard?: BiomeSpawnEntry[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Fishing spawns',
     type: [BiomeSpawnEntry],
-    required: false
+    required: false,
   })
   fishing?: BiomeSpawnEntry[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Headbutt spawns',
     type: [BiomeSpawnEntry],
-    required: false
+    required: false,
   })
   headbutt?: BiomeSpawnEntry[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Sweet Scent spawns',
     type: [BiomeSpawnEntry],
-    required: false
+    required: false,
   })
   sweetscent?: BiomeSpawnEntry[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Cave Rock spawns',
     type: [BiomeSpawnEntry],
-    required: false
+    required: false,
   })
   caverock?: BiomeSpawnEntry[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Rock Smash spawns',
     type: [BiomeSpawnEntry],
-    required: false
+    required: false,
   })
   rocksmash?: BiomeSpawnEntry[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Forage spawns',
     type: [BiomeSpawnEntry],
-    required: false
+    required: false,
   })
   forage?: BiomeSpawnEntry[];
 }

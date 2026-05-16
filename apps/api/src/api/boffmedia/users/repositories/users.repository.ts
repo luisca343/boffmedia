@@ -2,24 +2,28 @@ import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { eq, or } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import { 
-  BoffMediaUser, 
-  boffMediaUsers, 
-  boffMediaRoles, 
-  boffMediaUserRoles 
+import {
+  BoffMediaUser,
+  boffMediaUsers,
+  boffMediaRoles,
+  boffMediaUserRoles,
 } from '@/_db/schema/BoffMedia';
 import { smartrotomUsers, SmartRotomUser } from '@/_db/schema/SmartRotom';
 import { boffMediaParticipants } from '@/_db/schema/Events';
-import { BoffMediaUserSafe, FullUserData, FullUserDataSafe, IBoffMediaUsersRepository } from './interfaces/users.repository.interface';
+import {
+  BoffMediaUserSafe,
+  FullUserData,
+  FullUserDataSafe,
+  IBoffMediaUsersRepository,
+} from './interfaces/users.repository.interface';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 
 @Injectable()
 export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
   constructor(
-    @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>
+    @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
   ) {}
-
 
   // ==================== SELECT CLAUSES ====================
 
@@ -33,35 +37,36 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
     discordId: boffMediaUsers.discordId,
     twitchId: boffMediaUsers.twitchId,
     createdAt: boffMediaUsers.createdAt,
-    updatedAt: boffMediaUsers.updatedAt
+    updatedAt: boffMediaUsers.updatedAt,
   };
 
   private readonly userSelectWithPassword = {
     ...this.userSelectWithoutPassword,
-    password: boffMediaUsers.password
+    password: boffMediaUsers.password,
   };
 
   private readonly fullUserSelectWithoutPassword = {
     boffmedia_users: this.userSelectWithoutPassword,
-    rotom_users: smartrotomUsers
+    rotom_users: smartrotomUsers,
   };
 
   private readonly fullUserSelectWithPassword = {
     boffmedia_users: this.userSelectWithPassword,
-    rotom_users: smartrotomUsers
+    rotom_users: smartrotomUsers,
   };
 
   // ==================== CREATE OPERATIONS ====================
 
   async createUser(userData: CreateUserDto): Promise<BoffMediaUserSafe> {
     try {
-      const result = await this.db.insert(boffMediaUsers)
+      const result = await this.db
+        .insert(boffMediaUsers)
         .values(userData as BoffMediaUser)
         .execute();
-      
+
       const userId = result[0].insertId;
       const newUser = await this.findUserById(userId);
-      
+
       if (!newUser) {
         throw new Error('Failed to retrieve created user');
       }
@@ -75,19 +80,23 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
 
   async createParticipant(userId: number, username: string): Promise<void> {
     try {
-      const existingParticipant = await this.db.select()
+      const existingParticipant = await this.db
+        .select()
         .from(boffMediaParticipants)
         .where(eq(boffMediaParticipants.nickname, username))
         .execute();
 
       if (existingParticipant.length === 0) {
-        await this.db.insert(boffMediaParticipants).values({
-          userId,
-          nickname: username,
-          avatar: null,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        }).execute();
+        await this.db
+          .insert(boffMediaParticipants)
+          .values({
+            userId,
+            nickname: username,
+            avatar: null,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          })
+          .execute();
       }
     } catch (error: any) {
       console.error('Error creating participant:', error);
@@ -128,7 +137,9 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
     }
   }
 
-  async findUserByUsername(username: string): Promise<BoffMediaUserSafe | null> {
+  async findUserByUsername(
+    username: string,
+  ): Promise<BoffMediaUserSafe | null> {
     if (!username || username.trim() === '') {
       throw new Error('Username is required');
     }
@@ -185,7 +196,9 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
     }
   }
 
-  async findUserByGoogleId(googleId: string): Promise<BoffMediaUserSafe | null> {
+  async findUserByGoogleId(
+    googleId: string,
+  ): Promise<BoffMediaUserSafe | null> {
     if (!googleId || googleId.trim() === '') {
       throw new Error('Google ID is required');
     }
@@ -206,7 +219,9 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
 
   // ==================== COMPLEX QUERIES ====================
 
-  async findFullUserByUsernameWithPassword(username: string): Promise<FullUserData | null> {
+  async findFullUserByUsernameWithPassword(
+    username: string,
+  ): Promise<FullUserData | null> {
     if (!username || username.trim() === '') {
       throw new Error('Username is required');
     }
@@ -215,7 +230,10 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       const rows = await this.db
         .select(this.fullUserSelectWithPassword)
         .from(boffMediaUsers)
-        .leftJoin(smartrotomUsers, eq(boffMediaUsers.uuid, smartrotomUsers.uuid))
+        .leftJoin(
+          smartrotomUsers,
+          eq(boffMediaUsers.uuid, smartrotomUsers.uuid),
+        )
         .where(eq(boffMediaUsers.username, username))
         .execute();
 
@@ -223,7 +241,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
 
       return {
         boffmedia_users: rows[0].boffmedia_users,
-        rotom_users: rows[0].rotom_users
+        rotom_users: rows[0].rotom_users,
       };
     } catch (error: any) {
       console.error(`Failed to find full user by username ${username}:`, error);
@@ -231,7 +249,9 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
     }
   }
 
-  async findFullUserByUsername(username: string): Promise<FullUserDataSafe | null> {
+  async findFullUserByUsername(
+    username: string,
+  ): Promise<FullUserDataSafe | null> {
     if (!username || username.trim() === '') {
       throw new Error('Username is required');
     }
@@ -240,7 +260,10 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       const rows = await this.db
         .select(this.fullUserSelectWithoutPassword)
         .from(boffMediaUsers)
-        .leftJoin(smartrotomUsers, eq(boffMediaUsers.uuid, smartrotomUsers.uuid))
+        .leftJoin(
+          smartrotomUsers,
+          eq(boffMediaUsers.uuid, smartrotomUsers.uuid),
+        )
         .where(eq(boffMediaUsers.username, username))
         .execute();
 
@@ -248,7 +271,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
 
       return {
         boffmedia_users: rows[0].boffmedia_users,
-        rotom_users: rows[0].rotom_users
+        rotom_users: rows[0].rotom_users,
       };
     } catch (error: any) {
       console.error(`Failed to find full user by username ${username}:`, error);
@@ -265,7 +288,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       const rows = await this.db
         .select({
           boffmedia_users: this.userSelectWithoutPassword,
-          rotom_users: smartrotomUsers
+          rotom_users: smartrotomUsers,
         })
         .from(smartrotomUsers)
         .leftJoin(boffMediaUsers, eq(boffMediaUsers.uuid, smartrotomUsers.uuid))
@@ -276,7 +299,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
 
       return {
         boffmedia_users: rows[0].boffmedia_users,
-        rotom_users: rows[0].rotom_users
+        rotom_users: rows[0].rotom_users,
       };
     } catch (error: any) {
       console.error(`Failed to find full user by UUID ${uuid}:`, error);
@@ -293,7 +316,10 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       const rows = await this.db
         .select(this.fullUserSelectWithoutPassword)
         .from(boffMediaUsers)
-        .leftJoin(smartrotomUsers, eq(boffMediaUsers.uuid, smartrotomUsers.uuid))
+        .leftJoin(
+          smartrotomUsers,
+          eq(boffMediaUsers.uuid, smartrotomUsers.uuid),
+        )
         .where(eq(boffMediaUsers.email, email))
         .execute();
 
@@ -301,7 +327,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
 
       return {
         boffmedia_users: rows[0].boffmedia_users,
-        rotom_users: rows[0].rotom_users
+        rotom_users: rows[0].rotom_users,
       };
     } catch (error: any) {
       console.error(`Failed to find full user by email ${email}:`, error);
@@ -318,7 +344,10 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       const data = await this.db
         .select({ role: boffMediaRoles.name })
         .from(boffMediaUserRoles)
-        .leftJoin(boffMediaRoles, eq(boffMediaRoles.id, boffMediaUserRoles.roleId))
+        .leftJoin(
+          boffMediaRoles,
+          eq(boffMediaRoles.id, boffMediaUserRoles.roleId),
+        )
         .where(eq(boffMediaUserRoles.userId, userId))
         .execute();
 
@@ -331,7 +360,10 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
 
   // ==================== UPDATE OPERATIONS ====================
 
-  async updateUser(id: number, updateData: UpdateUserDto): Promise<BoffMediaUserSafe> {
+  async updateUser(
+    id: number,
+    updateData: UpdateUserDto,
+  ): Promise<BoffMediaUserSafe> {
     if (!id || id <= 0) {
       throw new Error('Valid ID is required');
     }
@@ -392,10 +424,13 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
 
   // ==================== VALIDATION OPERATIONS ====================
 
-  async checkUserExists(identifier: string, type: 'id' | 'username' | 'email' | 'uuid'): Promise<boolean> {
+  async checkUserExists(
+    identifier: string,
+    type: 'id' | 'username' | 'email' | 'uuid',
+  ): Promise<boolean> {
     try {
       let user: BoffMediaUserSafe | null = null;
-      
+
       switch (type) {
         case 'id':
           user = await this.findUserById(parseInt(identifier));
@@ -410,7 +445,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
           user = await this.findUserByUuid(identifier);
           break;
       }
-      
+
       return !!user;
     } catch (error: any) {
       console.error(`Failed to check if user exists ${identifier}:`, error);
@@ -418,10 +453,14 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
     }
   }
 
-  async checkMultipleFieldsExist(fields: { username?: string; email?: string; uuid?: string }): Promise<BoffMediaUserSafe[]> {
+  async checkMultipleFieldsExist(fields: {
+    username?: string;
+    email?: string;
+    uuid?: string;
+  }): Promise<BoffMediaUserSafe[]> {
     try {
       const conditions = [];
-      
+
       if (fields.username) {
         conditions.push(eq(boffMediaUsers.username, fields.username));
       }

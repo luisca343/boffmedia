@@ -6,49 +6,49 @@ export enum UserIdentifierType {
   ID = 'id',
   USERNAME = 'username',
   EMAIL = 'email',
-  UUID = 'uuid'
+  UUID = 'uuid',
 }
 
 export class CheckUserExistsDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Identifier value',
-    example: 'johndoe'
+    example: 'johndoe',
   })
   @IsString()
   identifier: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Type of identifier',
     example: UserIdentifierType.USERNAME,
-    enum: UserIdentifierType
+    enum: UserIdentifierType,
   })
   @IsEnum(UserIdentifierType)
   type: UserIdentifierType;
 }
 
 export class CheckMultipleFieldsDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Username to check',
     required: false,
-    example: 'johndoe'
+    example: 'johndoe',
   })
   @IsOptional()
   @IsString()
   username?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Email to check',
     required: false,
-    example: 'user@example.com'
+    example: 'user@example.com',
   })
   @IsOptional()
   @IsString()
   email?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'UUID to check',
     required: false,
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
   })
   @IsOptional()
   @IsString()

@@ -15,5 +15,6 @@ export class MangaDownloadResult {
   @ApiProperty() downloaded: number;
   @ApiProperty() skipped: number;
   @ApiProperty() failed: number;
-  @ApiProperty({ type: [ChapterDownloadEntry] }) chapters: ChapterDownloadEntry[];
+  @ApiProperty({ type: [ChapterDownloadEntry] })
+  chapters: ChapterDownloadEntry[];
 }

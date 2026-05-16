@@ -4,22 +4,22 @@ import { ArcadeInventoryItem } from './arcade-inventory.entity';
 import { DailyRewardItem } from './daily-rewards.entity';
 
 export class ArcadeStreakClaim {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Updated streak information after claim',
-    type: ArcadeStreak
+    type: ArcadeStreak,
   })
   streak: ArcadeStreak;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'The reward that was claimed',
-    type: DailyRewardItem
+    type: DailyRewardItem,
   })
   reward: DailyRewardItem;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Items added to inventory as part of the claim',
     type: [ArcadeInventoryItem],
-    required: false
+    required: false,
   })
   inventoryItems?: ArcadeInventoryItem[];
 }

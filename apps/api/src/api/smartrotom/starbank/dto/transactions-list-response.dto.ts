@@ -3,21 +3,21 @@ import { ApiProperty } from '@nestjs/swagger';
 import { StarBankTransaction } from '../entities/starbank-transaction.entity';
 
 export class TransactionsListResponseDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'List of transactions',
-    type: [StarBankTransaction]
+    type: [StarBankTransaction],
   })
   transactions: StarBankTransaction[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Total number of transactions',
-    example: 25
+    example: 25,
   })
   total: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Number of transactions returned',
-    example: 10
+    example: 10,
   })
   limit: number;
 }

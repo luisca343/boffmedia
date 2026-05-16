@@ -12,14 +12,12 @@ import { PlayerController } from './player.controller';
   controllers: [PlayerController],
   providers: [
     PlayerRepository,
-    
+
     PlayerStatsService,
     PlayerTeamService,
-    
+
     PlayerFacadeService,
   ],
-  exports: [
-    PlayerFacadeService,
-  ],
+  exports: [PlayerFacadeService],
 })
 export class PlayerModule {}

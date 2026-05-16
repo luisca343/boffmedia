@@ -5,6 +5,6 @@ import { ChatappModule } from '@api/smartrotom/chatapp/chatapp.module';
 @Module({
   providers: [SocketsGateway],
   exports: [SocketsGateway],
-  imports: [forwardRef(() => ChatappModule)]
+  imports: [forwardRef(() => ChatappModule)],
 })
 export class SocketsModule {}

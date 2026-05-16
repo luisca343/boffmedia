@@ -3,9 +3,9 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
 export class GetAchievementsDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Player UUID',
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
   })
   @IsNotEmpty()
   @IsString()
@@ -14,18 +14,18 @@ export class GetAchievementsDto extends BaseDto {
 }
 
 export class GetAchievementByIdDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Player UUID',
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
   })
   @IsNotEmpty()
   @IsString()
   @IsUUID()
   uuid: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Achievement ID',
-    example: 'medalla_denki'
+    example: 'medalla_denki',
   })
   @IsNotEmpty()
   @IsString()
@@ -33,18 +33,18 @@ export class GetAchievementByIdDto {
 }
 
 export class CheckAchievementDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Player UUID',
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
   })
   @IsNotEmpty()
   @IsString()
   @IsUUID()
   uuid: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Achievement ID to check',
-    example: 'medalla_denki'
+    example: 'medalla_denki',
   })
   @IsNotEmpty()
   @IsString()
@@ -52,15 +52,15 @@ export class CheckAchievementDto {
 }
 
 export class AchievementStatusResponse {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Completion status (0 = not completed, 1 = completed)',
-    example: 1
+    example: 1,
   })
   completed: number | null;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Error message if any',
-    required: false
+    required: false,
   })
   error?: string;
 }

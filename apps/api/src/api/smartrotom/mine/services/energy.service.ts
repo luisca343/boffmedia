@@ -35,7 +35,7 @@ export class EnergyService {
       throw new BadRequestException('Player energy data not found');
     }
 
-    let currentEnergy = playerEnergy.energy;
+    const currentEnergy = playerEnergy.energy;
 
     // If already at max energy, return current state
     if (currentEnergy >= this.MAX_ENERGY) {
@@ -43,7 +43,7 @@ export class EnergyService {
         energy: this.MAX_ENERGY,
         maxEnergy: this.MAX_ENERGY,
         lastCharge,
-        timeToNextCharge: 0
+        timeToNextCharge: 0,
       };
     }
 
@@ -60,26 +60,35 @@ export class EnergyService {
 
     // Update energy if it has increased
     if (newEnergy > currentEnergy) {
-      const newLastCharge = new Date(lastCharge.getTime() + (extraEnergy * this.HOURS_TO_CHARGE * 60 * 60 * 1000));
-      await this.mineRepository.updatePlayerEnergy(uuid, newEnergy, newLastCharge);
+      const newLastCharge = new Date(
+        lastCharge.getTime() +
+          extraEnergy * this.HOURS_TO_CHARGE * 60 * 60 * 1000,
+      );
+      await this.mineRepository.updatePlayerEnergy(
+        uuid,
+        newEnergy,
+        newLastCharge,
+      );
     }
 
     // Calculate time to next charge
-    const timeToNextCharge = newEnergy < this.MAX_ENERGY 
-      ? this.HOURS_TO_CHARGE * 60 * 60 * 1000 - (timeDiff % (this.HOURS_TO_CHARGE * 60 * 60 * 1000))
-      : 0;
+    const timeToNextCharge =
+      newEnergy < this.MAX_ENERGY
+        ? this.HOURS_TO_CHARGE * 60 * 60 * 1000 -
+          (timeDiff % (this.HOURS_TO_CHARGE * 60 * 60 * 1000))
+        : 0;
 
     return {
       energy: newEnergy,
       maxEnergy: this.MAX_ENERGY,
       lastCharge,
-      timeToNextCharge: Math.max(0, timeToNextCharge)
+      timeToNextCharge: Math.max(0, timeToNextCharge),
     };
   }
 
   async consumeEnergy(uuid: string, amount: number = 1): Promise<EnergyStatus> {
     const currentStatus = await this.getPlayerEnergy(uuid);
-    
+
     if (currentStatus.energy < amount) {
       throw new BadRequestException('Not enough energy');
     }
@@ -89,7 +98,7 @@ export class EnergyService {
 
     return {
       ...currentStatus,
-      energy: newEnergy
+      energy: newEnergy,
     };
   }
 

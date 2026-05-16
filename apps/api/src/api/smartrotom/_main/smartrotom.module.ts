@@ -8,9 +8,15 @@ import { StarbankModule } from '../starbank/starbank.module';
 import { WingullModule } from '../wingull/wingull.module';
 
 @Module({
-  imports: [LoggerModule, ResponseModule, DrizzleModule, StarbankModule, WingullModule],
+  imports: [
+    LoggerModule,
+    ResponseModule,
+    DrizzleModule,
+    StarbankModule,
+    WingullModule,
+  ],
   controllers: [SmartrotomController],
   providers: [SmartrotomService],
-  exports: [SmartrotomService]
+  exports: [SmartrotomService],
 })
 export class SmartrotomModule {}

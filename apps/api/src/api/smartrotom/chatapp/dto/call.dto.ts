@@ -6,21 +6,21 @@ export enum CallStatus {
   RINGING = 'RINGING',
   IN_CALL = 'IN_CALL',
   DECLINED = 'DECLINED',
-  BUSY = 'BUSY'
+  BUSY = 'BUSY',
 }
 
 export class InitiateCallDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Chat ID',
-    example: 1
+    example: 1,
   })
   @IsNotEmpty()
   @IsInt()
   chatId: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Caller UUID',
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
   })
   @IsNotEmpty()
   @IsString()
@@ -28,17 +28,17 @@ export class InitiateCallDto extends BaseDto {
 }
 
 export class EndCallDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Chat ID',
-    example: 1
+    example: 1,
   })
   @IsNotEmpty()
   @IsInt()
   chatId: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Call start time (timestamp)',
-    example: 1640995200000
+    example: 1640995200000,
   })
   @IsNotEmpty()
   @IsNumber()
@@ -46,42 +46,42 @@ export class EndCallDto extends BaseDto {
 }
 
 export class CallUserResponseDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'User UUID',
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
   })
   uuid: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'User call status',
     enum: CallStatus,
-    example: CallStatus.RINGING
+    example: CallStatus.RINGING,
   })
   status: CallStatus;
 }
 
 export class CallSessionResponseDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Unique call identifier',
-    example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890'
+    example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
   })
   callId: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Chat ID',
-    example: 1
+    example: 1,
   })
   chatId: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Caller UUID',
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
   })
   caller: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Users in the call',
-    type: [CallUserResponseDto]
+    type: [CallUserResponseDto],
   })
   users: CallUserResponseDto[];
 }

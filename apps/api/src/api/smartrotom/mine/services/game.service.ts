@@ -1,5 +1,10 @@
 import { MINE_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
-import { Injectable, Inject, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { IMineRepository } from '../repositories/interfaces/mine.repository.interface';
 
 export interface GameStartResponse {
@@ -19,11 +24,11 @@ export interface GameEndResponse {
 }
 
 export enum ItemRarity {
-  COMMON = "common",
-  UNCOMMON = "uncommon",
-  RARE = "rare",
-  EPIC = "epic",
-  LEGENDARY = "legendary"
+  COMMON = 'common',
+  UNCOMMON = 'uncommon',
+  RARE = 'rare',
+  EPIC = 'epic',
+  LEGENDARY = 'legendary',
 }
 
 @Injectable()
@@ -42,11 +47,14 @@ export class GameService {
     const result = await this.mineRepository.createGameSession(uuid);
 
     return {
-      idPartida: result.insertId
+      idPartida: result.insertId,
     };
   }
 
-  async endGame(uuid: string, rewards: { value: number; id: number }[]): Promise<GameEndResponse> {
+  async endGame(
+    uuid: string,
+    rewards: { value: number; id: number }[],
+  ): Promise<GameEndResponse> {
     if (!uuid) {
       throw new BadRequestException('UUID is required');
     }
@@ -62,9 +70,9 @@ export class GameService {
     }
 
     // Validate rewards exist
-    const rewardIds = rewards.map(r => r.id);
+    const rewardIds = rewards.map((r) => r.id);
     const validRewards = await this.mineRepository.findRewardsByIds(rewardIds);
-    
+
     if (validRewards.length !== rewardIds.length) {
       throw new BadRequestException('Some rewards do not exist');
     }
@@ -72,15 +80,15 @@ export class GameService {
     // Create game rewards
     await this.mineRepository.createGameRewards(
       gameSession.id,
-      rewards.map(reward => ({
+      rewards.map((reward) => ({
         rewardId: reward.id,
-        value: reward.value
-      }))
+        value: reward.value,
+      })),
     );
 
     // Create inventory entries
-    const inventoryEntries = rewards.map(reward => {
-      const rewardData = validRewards.find(r => r.id === reward.id);
+    const inventoryEntries = rewards.map((reward) => {
+      const rewardData = validRewards.find((r) => r.id === reward.id);
       return {
         uuid,
         itemId: rewardData!.itemId,
@@ -90,7 +98,7 @@ export class GameService {
         sourceType: 'mine',
         sourceId: gameSession.id,
         used: 0,
-        rarity: this.calculateRarityFromWeight(reward.value)
+        rarity: this.calculateRarityFromWeight(reward.value),
       };
     });
 
@@ -99,7 +107,7 @@ export class GameService {
     return {
       idPartida: gameSession.id,
       success: true,
-      rewardsProcessed: rewards.length
+      rewardsProcessed: rewards.length,
     };
   }
 

@@ -18,12 +18,20 @@ export class TcgCardDto {
   @IsString()
   name_es: string;
 
-  @ApiProperty({ description: 'Card image URL (EN)', example: 'https://...', required: false })
+  @ApiProperty({
+    description: 'Card image URL (EN)',
+    example: 'https://...',
+    required: false,
+  })
   @IsOptional()
   @IsUrl()
   image_local_en?: string;
 
-  @ApiProperty({ description: 'Card image URL (ES)', example: 'https://...', required: false })
+  @ApiProperty({
+    description: 'Card image URL (ES)',
+    example: 'https://...',
+    required: false,
+  })
   @IsOptional()
   @IsUrl()
   image_local_es?: string;
@@ -32,7 +40,11 @@ export class TcgCardDto {
   @IsString()
   category: string;
 
-  @ApiProperty({ description: 'Card illustrator', example: 'Atsuko Nishida', required: false })
+  @ApiProperty({
+    description: 'Card illustrator',
+    example: 'Atsuko Nishida',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   illustrator?: string;
@@ -46,7 +58,11 @@ export class TcgCardDto {
   @IsNumber()
   hp?: number;
 
-  @ApiProperty({ description: 'Pokemon stage', example: 'Basic', required: false })
+  @ApiProperty({
+    description: 'Pokemon stage',
+    example: 'Basic',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   stage?: string;

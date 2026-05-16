@@ -9,24 +9,24 @@ export enum MessagePartType {
   POKEMON_MOVES = 'pokemonMoves',
   POKEMON_HABITAT = 'pokemonHabitat',
   RANDOM_POKEMON = 'randomPokemon',
-  POKEMON_COUNT = 'pokemonCount'
+  POKEMON_COUNT = 'pokemonCount',
 }
 
 export class MessagePartDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Type of the message part',
     example: MessagePartType.TEXT,
     enum: MessagePartType,
-    enumName: 'MessagePartType'
+    enumName: 'MessagePartType',
   })
   @IsString()
   @IsNotEmpty()
   @IsEnum(MessagePartType)
   type: MessagePartType;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Content of the message part',
-    example: 'Hello, how can I help you?'
+    example: 'Hello, how can I help you?',
   })
   @IsNotEmpty()
   content: any;

@@ -37,7 +37,10 @@ export interface DivergenceResult {
  * (megas do not exist in standard Gen 9 VGC) but tournament data from the
  * Champions format stores the mega form explicitly (e.g. "charizardmegay").
  */
-function mergeToBaseForms(entries: PokemonUsageEntry[], dex: ReturnType<typeof getDexForFormat>): PokemonUsageEntry[] {
+function mergeToBaseForms(
+  entries: PokemonUsageEntry[],
+  dex: ReturnType<typeof getDexForFormat>,
+): PokemonUsageEntry[] {
   const merged = new Map<string, PokemonUsageEntry>();
 
   for (const entry of entries) {
@@ -56,11 +59,15 @@ function mergeToBaseForms(entries: PokemonUsageEntry[], dex: ReturnType<typeof g
       merged.set(baseId, {
         ...existing,
         usagePercent: existing.usagePercent + entry.usagePercent,
-        rawCount:     existing.rawCount + entry.rawCount,
-        rank:         Math.min(existing.rank, entry.rank),
+        rawCount: existing.rawCount + entry.rawCount,
+        rank: Math.min(existing.rank, entry.rank),
       });
     } else {
-      merged.set(baseId, { ...entry, speciesId: baseId, speciesName: baseName });
+      merged.set(baseId, {
+        ...entry,
+        speciesId: baseId,
+        speciesName: baseName,
+      });
     }
   }
 
@@ -72,9 +79,14 @@ function mergeToBaseForms(entries: PokemonUsageEntry[], dex: ReturnType<typeof g
  *   Ladder trap      = ladder >= 10% AND tournament <= 5% AND delta >= +5
  *   Tournament staple = tournament >= 10% AND ladder <= 5% AND delta <= -5
  */
-function computeBadge(ladder: number, tournament: number, delta: number): DivergenceBadge {
+function computeBadge(
+  ladder: number,
+  tournament: number,
+  delta: number,
+): DivergenceBadge {
   if (ladder >= 10 && tournament <= 5 && delta >= 5) return 'ladder-trap';
-  if (tournament >= 10 && ladder <= 5 && delta <= -5) return 'tournament-staple';
+  if (tournament >= 10 && ladder <= 5 && delta <= -5)
+    return 'tournament-staple';
   return null;
 }
 
@@ -92,9 +104,13 @@ export class DivergenceService {
     month?: string;
     cutoff?: number;
   }): Promise<DivergenceResult> {
-    const regulation = await this.regulationsRepository.findById(params.regulationId);
+    const regulation = await this.regulationsRepository.findById(
+      params.regulationId,
+    );
     if (!regulation) {
-      throw new NotFoundException(`Regulation "${params.regulationId}" not found`);
+      throw new NotFoundException(
+        `Regulation "${params.regulationId}" not found`,
+      );
     }
 
     const cutoff = params.cutoff ?? SMOGON_DEFAULT_CUTOFF;
@@ -103,7 +119,9 @@ export class DivergenceService {
     if (!month) {
       const snapshots = await this.smogonService.getAvailableSnapshots();
       const match = snapshots
-        .filter((s) => s.formatId === regulation.formatId && s.cutoff === cutoff)
+        .filter(
+          (s) => s.formatId === regulation.formatId && s.cutoff === cutoff,
+        )
         .sort((a, b) => b.month.localeCompare(a.month))[0];
       if (!match) {
         throw new NotFoundException(
@@ -113,19 +131,23 @@ export class DivergenceService {
       month = match.month;
     }
 
-    const [ladderEntries, tournamentEntries]: [PokemonUsageEntry[], PokemonUsageEntry[]] =
-      await Promise.all([
-        this.smogonService.getUsageEntries(regulation.formatId, month, cutoff),
-        params.tournamentId
-          ? this.limitlessService.getUsageEntries(params.tournamentId)
-          : this.limitlessService.getCombinedUsageEntries(params.regulationId),
-      ]);
+    const [ladderEntries, tournamentEntries]: [
+      PokemonUsageEntry[],
+      PokemonUsageEntry[],
+    ] = await Promise.all([
+      this.smogonService.getUsageEntries(regulation.formatId, month, cutoff),
+      params.tournamentId
+        ? this.limitlessService.getUsageEntries(params.tournamentId)
+        : this.limitlessService.getCombinedUsageEntries(params.regulationId),
+    ]);
 
     const dex = getDexForFormat(regulation.formatId);
-    const normalizedLadder     = mergeToBaseForms(ladderEntries, dex);
+    const normalizedLadder = mergeToBaseForms(ladderEntries, dex);
     const normalizedTournament = mergeToBaseForms(tournamentEntries, dex);
-    const ladderMap     = new Map(normalizedLadder.map((e) => [e.speciesId, e]));
-    const tournamentMap = new Map(normalizedTournament.map((e) => [e.speciesId, e]));
+    const ladderMap = new Map(normalizedLadder.map((e) => [e.speciesId, e]));
+    const tournamentMap = new Map(
+      normalizedTournament.map((e) => [e.speciesId, e]),
+    );
     const allIds = new Set([...ladderMap.keys(), ...tournamentMap.keys()]);
 
     const rows: DivergenceRow[] = [...allIds]

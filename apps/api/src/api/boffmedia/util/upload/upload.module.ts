@@ -10,17 +10,12 @@ import { UploadController } from './upload.controller';
   controllers: [UploadController],
   providers: [
     UploadRepository,
-    
+
     FileUploadService,
     ImageUploadService,
-    
+
     UploadFacadeService,
   ],
-  exports: [
-    UploadFacadeService,
-    
-    FileUploadService,
-    ImageUploadService,
-  ],
+  exports: [UploadFacadeService, FileUploadService, ImageUploadService],
 })
 export class UploadModule {}

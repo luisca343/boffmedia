@@ -1,7 +1,10 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { DOCUMENTS_REPOSITORY_TOKEN } from '../repositories/interfaces/documents.repository.token';
 import { IDocumentsRepository } from '../repositories/interfaces/documents.repository.interface';
-import { DocumentDetails, NotePreview } from '../repositories/documents.repository';
+import {
+  DocumentDetails,
+  NotePreview,
+} from '../repositories/documents.repository';
 
 export interface CreateDocumentRequest {
   title: string;
@@ -45,7 +48,9 @@ export class DocumentService {
     return this.documentsRepository.findUserDocuments(uuid);
   }
 
-  async createDocument(createDocumentRequest: CreateDocumentRequest): Promise<DocumentDetails> {
+  async createDocument(
+    createDocumentRequest: CreateDocumentRequest,
+  ): Promise<DocumentDetails> {
     const { title, content, type, public: isPublic } = createDocumentRequest;
 
     if (!title || !content) {
@@ -60,32 +65,36 @@ export class DocumentService {
       title: title.trim(),
       content: content.trim(),
       type,
-      public: isPublic || 0
+      public: isPublic || 0,
     });
 
     return this.getDocumentById(result.insertId);
   }
 
-  async updateDocument(id: number, updateDocumentRequest: UpdateDocumentRequest): Promise<DocumentDetails> {
-    const existingDocument = await this.documentsRepository.findDocumentById(id);
+  async updateDocument(
+    id: number,
+    updateDocumentRequest: UpdateDocumentRequest,
+  ): Promise<DocumentDetails> {
+    const existingDocument =
+      await this.documentsRepository.findDocumentById(id);
     if (!existingDocument) {
       throw new Error('Document not found');
     }
 
     const updateData: any = {};
-    
+
     if (updateDocumentRequest.title !== undefined) {
       updateData.title = updateDocumentRequest.title.trim();
     }
-    
+
     if (updateDocumentRequest.content !== undefined) {
       updateData.content = updateDocumentRequest.content.trim();
     }
-    
+
     if (updateDocumentRequest.type !== undefined) {
       updateData.type = updateDocumentRequest.type;
     }
-    
+
     if (updateDocumentRequest.public !== undefined) {
       updateData.public = updateDocumentRequest.public;
     }
@@ -95,7 +104,8 @@ export class DocumentService {
   }
 
   async deleteDocument(id: number): Promise<void> {
-    const existingDocument = await this.documentsRepository.findDocumentById(id);
+    const existingDocument =
+      await this.documentsRepository.findDocumentById(id);
     if (!existingDocument) {
       throw new Error('Document not found');
     }
@@ -103,13 +113,22 @@ export class DocumentService {
     await this.documentsRepository.deleteDocument(id);
   }
 
-  async saveDocument(id: number, title: string, content: string, type: number): Promise<{ success: boolean; id: number }> {
+  async saveDocument(
+    id: number,
+    title: string,
+    content: string,
+    type: number,
+  ): Promise<{ success: boolean; id: number }> {
     // Legacy method for backward compatibility
     if (id === 0) {
       const newDocument = await this.createDocument({ title, content, type });
       return { success: true, id: newDocument.id };
     } else {
-      const updatedDocument = await this.updateDocument(id, { title, content, type });
+      const updatedDocument = await this.updateDocument(id, {
+        title,
+        content,
+        type,
+      });
       return { success: true, id: updatedDocument.id };
     }
   }

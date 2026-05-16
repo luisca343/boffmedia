@@ -9,9 +9,9 @@ import { StarbankAccountService } from './services/starbank-account.service';
 import { StarbankTransactionService } from './services/starbank-transaction.service';
 import { StarbankFacadeService } from './starbank.facade.service';
 import { StarbankController } from './starbank.controller';
-import { 
-  STARBANK_ACCOUNT_REPOSITORY_TOKEN, 
-  STARBANK_TRANSACTION_REPOSITORY_TOKEN 
+import {
+  STARBANK_ACCOUNT_REPOSITORY_TOKEN,
+  STARBANK_TRANSACTION_REPOSITORY_TOKEN,
 } from '@api/_utils/repositories/interfaces/repository.token';
 
 @Module({
@@ -27,16 +27,14 @@ import {
       provide: STARBANK_TRANSACTION_REPOSITORY_TOKEN,
       useClass: StarbankTransactionRepository,
     },
-    
+
     // Service providers
     StarbankAccountService,
     StarbankTransactionService,
-    
+
     // Facade provider
     StarbankFacadeService,
   ],
-  exports: [
-    StarbankFacadeService,
-  ],
+  exports: [StarbankFacadeService],
 })
 export class StarbankModule {}

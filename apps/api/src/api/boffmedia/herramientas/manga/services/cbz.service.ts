@@ -62,17 +62,17 @@ function buildZip(files: ZipFile[]): Buffer {
 
     // Local file header (30 bytes + filename)
     const localHeader = Buffer.alloc(30 + nameBuf.length);
-    localHeader.writeUInt32LE(0x04034b50, 0);  // signature PK\x03\x04
-    localHeader.writeUInt16LE(20, 4);           // version needed: 2.0
-    localHeader.writeUInt16LE(0, 6);            // general purpose bit flag
-    localHeader.writeUInt16LE(0, 8);            // compression: stored
+    localHeader.writeUInt32LE(0x04034b50, 0); // signature PK\x03\x04
+    localHeader.writeUInt16LE(20, 4); // version needed: 2.0
+    localHeader.writeUInt16LE(0, 6); // general purpose bit flag
+    localHeader.writeUInt16LE(0, 8); // compression: stored
     localHeader.writeUInt16LE(dosTime.time, 10);
     localHeader.writeUInt16LE(dosTime.date, 12);
     localHeader.writeUInt32LE(checksum, 14);
-    localHeader.writeUInt32LE(size, 18);        // compressed size = stored size
-    localHeader.writeUInt32LE(size, 22);        // uncompressed size
+    localHeader.writeUInt32LE(size, 18); // compressed size = stored size
+    localHeader.writeUInt32LE(size, 22); // uncompressed size
     localHeader.writeUInt16LE(nameBuf.length, 26);
-    localHeader.writeUInt16LE(0, 28);           // extra field length
+    localHeader.writeUInt16LE(0, 28); // extra field length
     nameBuf.copy(localHeader, 30);
 
     offsets.push(currentOffset);
@@ -81,22 +81,22 @@ function buildZip(files: ZipFile[]): Buffer {
 
     // Central directory entry (46 bytes + filename)
     const cdEntry = Buffer.alloc(46 + nameBuf.length);
-    cdEntry.writeUInt32LE(0x02014b50, 0);  // signature PK\x01\x02
-    cdEntry.writeUInt16LE(20, 4);          // version made by: 2.0
-    cdEntry.writeUInt16LE(20, 6);          // version needed: 2.0
-    cdEntry.writeUInt16LE(0, 8);           // general purpose bit flag
-    cdEntry.writeUInt16LE(0, 10);          // compression: stored
+    cdEntry.writeUInt32LE(0x02014b50, 0); // signature PK\x01\x02
+    cdEntry.writeUInt16LE(20, 4); // version made by: 2.0
+    cdEntry.writeUInt16LE(20, 6); // version needed: 2.0
+    cdEntry.writeUInt16LE(0, 8); // general purpose bit flag
+    cdEntry.writeUInt16LE(0, 10); // compression: stored
     cdEntry.writeUInt16LE(dosTime.time, 12);
     cdEntry.writeUInt16LE(dosTime.date, 14);
     cdEntry.writeUInt32LE(checksum, 16);
-    cdEntry.writeUInt32LE(size, 20);       // compressed size
-    cdEntry.writeUInt32LE(size, 24);       // uncompressed size
+    cdEntry.writeUInt32LE(size, 20); // compressed size
+    cdEntry.writeUInt32LE(size, 24); // uncompressed size
     cdEntry.writeUInt16LE(nameBuf.length, 28);
-    cdEntry.writeUInt16LE(0, 30);          // extra field length
-    cdEntry.writeUInt16LE(0, 32);          // file comment length
-    cdEntry.writeUInt16LE(0, 34);          // disk number start
-    cdEntry.writeUInt16LE(0, 36);          // internal file attributes
-    cdEntry.writeUInt32LE(0, 38);          // external file attributes
+    cdEntry.writeUInt16LE(0, 30); // extra field length
+    cdEntry.writeUInt16LE(0, 32); // file comment length
+    cdEntry.writeUInt16LE(0, 34); // disk number start
+    cdEntry.writeUInt16LE(0, 36); // internal file attributes
+    cdEntry.writeUInt32LE(0, 38); // external file attributes
     cdEntry.writeUInt32LE(offsets[offsets.length - 1], 42); // local header offset
     nameBuf.copy(cdEntry, 46);
 
@@ -108,22 +108,28 @@ function buildZip(files: ZipFile[]): Buffer {
 
   // End of central directory record (22 bytes)
   const eocd = Buffer.alloc(22);
-  eocd.writeUInt32LE(0x06054b50, 0);        // signature PK\x05\x06
-  eocd.writeUInt16LE(0, 4);                 // disk number
-  eocd.writeUInt16LE(0, 6);                 // disk with central dir
-  eocd.writeUInt16LE(files.length, 8);      // entries on this disk
-  eocd.writeUInt16LE(files.length, 10);     // total entries
+  eocd.writeUInt32LE(0x06054b50, 0); // signature PK\x05\x06
+  eocd.writeUInt16LE(0, 4); // disk number
+  eocd.writeUInt16LE(0, 6); // disk with central dir
+  eocd.writeUInt16LE(files.length, 8); // entries on this disk
+  eocd.writeUInt16LE(files.length, 10); // total entries
   eocd.writeUInt32LE(centralDir.length, 12);
   eocd.writeUInt32LE(centralDirOffset, 16);
-  eocd.writeUInt16LE(0, 20);               // comment length
+  eocd.writeUInt16LE(0, 20); // comment length
 
   return Buffer.concat([...localHeaders, centralDir, eocd]);
 }
 
 function getDosDateTime(): { time: number; date: number } {
   const now = new Date();
-  const time = ((now.getHours() & 0x1f) << 11) | ((now.getMinutes() & 0x3f) << 5) | ((now.getSeconds() >> 1) & 0x1f);
-  const date = (((now.getFullYear() - 1980) & 0x7f) << 9) | (((now.getMonth() + 1) & 0x0f) << 5) | (now.getDate() & 0x1f);
+  const time =
+    ((now.getHours() & 0x1f) << 11) |
+    ((now.getMinutes() & 0x3f) << 5) |
+    ((now.getSeconds() >> 1) & 0x1f);
+  const date =
+    (((now.getFullYear() - 1980) & 0x7f) << 9) |
+    (((now.getMonth() + 1) & 0x0f) << 5) |
+    (now.getDate() & 0x1f);
   return { time, date };
 }
 
@@ -134,20 +140,29 @@ function imageExtension(imageUrl: string): string {
   try {
     const urlPath = new URL(imageUrl).pathname;
     const ext = path.extname(urlPath).toLowerCase().replace('.', '');
-    if (['jpg', 'jpeg', 'png', 'webp', 'gif', 'avif'].includes(ext)) return ext === 'jpeg' ? 'jpg' : ext;
-  } catch { /* ignore */ }
+    if (['jpg', 'jpeg', 'png', 'webp', 'gif', 'avif'].includes(ext))
+      return ext === 'jpeg' ? 'jpg' : ext;
+  } catch {
+    /* ignore */
+  }
   return 'jpg';
 }
 
 // ── Path helpers ─────────────────────────────────────────────────────────────
 
-const MANGA_BASE = path.join(process.cwd(), 'laboon', 'manga', 'downloads', 'mangas');
+const MANGA_BASE = path.join(
+  process.cwd(),
+  'laboon',
+  'manga',
+  'downloads',
+  'mangas',
+);
 
 /** Sanitizes a series or chapter name so it is safe to use as a filesystem path segment. */
 function sanitizeName(name: string): string {
   return name
-    .replace(/[<>:"/\\|?*\x00-\x1f]/g, '_')  // forbidden chars
-    .replace(/\.+$/, '')                        // trailing dots
+    .replace(/[<>:"/\\|?*\x00-\x1f]/g, '_') // forbidden chars
+    .replace(/\.+$/, '') // trailing dots
     .trim()
     .substring(0, 200);
 }
@@ -176,17 +191,24 @@ export class CbzService {
    */
   chapterFilename(chapterNumber: string, chapterTitle: string): string {
     const paddedNum = padChapterNumber(chapterNumber);
-    const safeName  = sanitizeName(chapterTitle);
+    const safeName = sanitizeName(chapterTitle);
     return `Chapter ${paddedNum} - ${safeName}.cbz`;
   }
 
   /**
    * Checks whether a CBZ for the given chapter already exists on disk.
    */
-  async chapterExists(seriesName: string, chapterNumber: string, chapterTitle: string): Promise<boolean> {
-    const filePath = path.join(this.seriesDir(seriesName), this.chapterFilename(chapterNumber, chapterTitle));
+  async chapterExists(
+    seriesName: string,
+    chapterNumber: string,
+    chapterTitle: string,
+  ): Promise<boolean> {
+    const filePath = path.join(
+      this.seriesDir(seriesName),
+      this.chapterFilename(chapterNumber, chapterTitle),
+    );
     try {
-      await import('fs/promises').then(fs => fs.access(filePath));
+      await import('fs/promises').then((fs) => fs.access(filePath));
       return true;
     } catch {
       return false;
@@ -222,7 +244,9 @@ export class CbzService {
     const cbzBuffer = buildZip(zipFiles);
     await writeFile(filePath, cbzBuffer);
 
-    this.logger.log(`[CBZ] Saved ${filename} (${images.length} pages, ${(cbzBuffer.length / 1024).toFixed(1)} KB)`);
+    this.logger.log(
+      `[CBZ] Saved ${filename} (${images.length} pages, ${(cbzBuffer.length / 1024).toFixed(1)} KB)`,
+    );
     return filePath;
   }
 
@@ -233,7 +257,7 @@ export class CbzService {
     const dir = this.seriesDir(seriesName);
     try {
       const files = await readdir(dir);
-      return files.filter(f => f.toLowerCase().endsWith('.cbz')).sort();
+      return files.filter((f) => f.toLowerCase().endsWith('.cbz')).sort();
     } catch {
       return [];
     }

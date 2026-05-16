@@ -41,14 +41,14 @@ export class NewsService {
 
   async getAllNews(): Promise<NewsResponse> {
     const allNews = await this.newsRepository.findAllNews();
-    const featured = allNews.find(item => item.featured === 1) || null;
+    const featured = allNews.find((item) => item.featured === 1) || null;
 
     return { featured, news: allNews };
   }
 
   async getPublishedNews(): Promise<NewsResponse> {
     const publishedNews = await this.newsRepository.findPublishedNews();
-    const featured = publishedNews.find(item => item.featured === 1) || null;
+    const featured = publishedNews.find((item) => item.featured === 1) || null;
 
     return { featured, news: publishedNews };
   }
@@ -78,35 +78,46 @@ export class NewsService {
     }
 
     // Validate URL if provided
-    if (createNewsRequest.imageUrl && !this.isValidUrl(createNewsRequest.imageUrl)) {
+    if (
+      createNewsRequest.imageUrl &&
+      !this.isValidUrl(createNewsRequest.imageUrl)
+    ) {
       throw new Error('Invalid image URL format');
     }
 
     const result = await this.newsRepository.createNews({
       ...createNewsRequest,
       title: title.trim(),
-      content: content.trim()
+      content: content.trim(),
     });
 
     return this.getNewsById(result.insertId);
   }
 
-  async updateNews(newsId: number, updateNewsRequest: UpdateNewsRequest): Promise<NewsDetails> {
+  async updateNews(
+    newsId: number,
+    updateNewsRequest: UpdateNewsRequest,
+  ): Promise<NewsDetails> {
     const existingNews = await this.newsRepository.findNewsById(newsId);
     if (!existingNews) {
-      const news = await this.createNews(updateNewsRequest as CreateNewsRequest);
+      const news = await this.createNews(
+        updateNewsRequest as CreateNewsRequest,
+      );
       const id = news.id;
       return this.getNewsById(id);
     }
 
     // Validate URL if provided
-    if (updateNewsRequest.imageUrl && !this.isValidUrl(updateNewsRequest.imageUrl)) {
+    if (
+      updateNewsRequest.imageUrl &&
+      !this.isValidUrl(updateNewsRequest.imageUrl)
+    ) {
       throw new Error('Invalid image URL format');
     }
 
     const updateData: any = {};
-    
-    Object.keys(updateNewsRequest).forEach(key => {
+
+    Object.keys(updateNewsRequest).forEach((key) => {
       const value = updateNewsRequest[key as keyof UpdateNewsRequest];
       if (value !== undefined) {
         if (typeof value === 'string') {
@@ -130,7 +141,10 @@ export class NewsService {
     await this.newsRepository.deleteNews(newsId);
   }
 
-  async updateNewsStatus(publishedIds: number[], featuredId: number): Promise<{ success: boolean }> {
+  async updateNewsStatus(
+    publishedIds: number[],
+    featuredId: number,
+  ): Promise<{ success: boolean }> {
     // Validate published IDs
     if (!Array.isArray(publishedIds)) {
       throw new Error('Published IDs must be an array');
@@ -169,7 +183,10 @@ export class NewsService {
     return { success: true };
   }
 
-  async saveNews(news: CreateNewsRequest, newsId: number): Promise<{ success: boolean; id: number }> {
+  async saveNews(
+    news: CreateNewsRequest,
+    newsId: number,
+  ): Promise<{ success: boolean; id: number }> {
     // Legacy method for backward compatibility
     if (newsId === 0) {
       const newNews = await this.createNews(news);

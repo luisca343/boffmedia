@@ -5,17 +5,20 @@ import { TwitchApiService } from './services/twitch-api.service';
 @ApiTags('Automation - Twitch Debug')
 @Controller('automation/twitch/debug')
 export class TwitchDebugController {
-  constructor(
-    private readonly twitchApiService: TwitchApiService,
-  ) {}
+  constructor(private readonly twitchApiService: TwitchApiService) {}
 
   @Get('check-user/:username')
-  @ApiOperation({ summary: 'Check if a specific user contains wingull content' })
-  @ApiResponse({ status: 200, description: 'Debug information about user stream' })
+  @ApiOperation({
+    summary: 'Check if a specific user contains wingull content',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Debug information about user stream',
+  })
   async checkUser(@Param('username') username: string) {
     try {
       const stream = await this.twitchApiService.getStreamByUsername(username);
-      
+
       if (!stream) {
         return {
           username,
@@ -25,7 +28,7 @@ export class TwitchDebugController {
       }
 
       const containsWingull = this.streamContainsWingull(stream);
-      
+
       return {
         username,
         isLive: true,
@@ -38,11 +41,14 @@ export class TwitchDebugController {
         },
         wingullAnalysis: {
           inTitle: stream.title?.toLowerCase().includes('wingull'),
-          inTags: stream.tags?.some(tag => tag.toLowerCase().includes('wingull')),
-          isPixelmonWingull2: stream.game_name?.toLowerCase() === 'pixelmon wingull 2',
+          inTags: stream.tags?.some((tag) =>
+            tag.toLowerCase().includes('wingull'),
+          ),
+          isPixelmonWingull2:
+            stream.game_name?.toLowerCase() === 'pixelmon wingull 2',
         },
-        message: containsWingull 
-          ? `Stream contains "wingull" content and would trigger notifications` 
+        message: containsWingull
+          ? `Stream contains "wingull" content and would trigger notifications`
           : `Stream does not contain "wingull" content`,
       };
     } catch (error: any) {
@@ -56,8 +62,11 @@ export class TwitchDebugController {
 
   private streamContainsWingull(stream: any): boolean {
     const titleContains = stream.title?.toLowerCase().includes('wingull');
-    const tagsContain = stream.tags?.some((tag: string) => tag.toLowerCase().includes('wingull'));
-    const gameIsPixelmonWingull = stream.game_name?.toLowerCase() === 'pixelmon wingull 2';
+    const tagsContain = stream.tags?.some((tag: string) =>
+      tag.toLowerCase().includes('wingull'),
+    );
+    const gameIsPixelmonWingull =
+      stream.game_name?.toLowerCase() === 'pixelmon wingull 2';
     return titleContains || tagsContain || gameIsPixelmonWingull;
   }
 }

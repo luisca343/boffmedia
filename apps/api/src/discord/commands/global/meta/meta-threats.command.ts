@@ -15,7 +15,7 @@ async function resolvePaste(input: string): Promise<string | null> {
   const match = input.match(/https?:\/\/pokepast\.es\/([a-zA-Z0-9]+)\/?/);
   if (match) {
     try {
-      const res  = await fetch(`https://pokepast.es/${match[1]}/json`);
+      const res = await fetch(`https://pokepast.es/${match[1]}/json`);
       if (!res.ok) return null;
       const json = (await res.json()) as { paste?: string };
       return json.paste ?? null;
@@ -31,16 +31,16 @@ function capitalize(s: string): string {
 }
 
 interface ThreatResult {
-  entry:   PokemonUsageEntry;
-  score:   number;
-  count:   number;
+  entry: PokemonUsageEntry;
+  score: number;
+  count: number;
   targets: string[];
 }
 
 function buildThreatList(
-  metaEntries:  PokemonUsageEntry[],
+  metaEntries: PokemonUsageEntry[],
   pasteMembers: Array<{ speciesName: string; types: string[] }>,
-  limit:        number,
+  limit: number,
 ): ThreatResult[] {
   const validMembers = pasteMembers.filter((m) => m.types.length > 0);
   if (validMembers.length === 0) return [];
@@ -50,11 +50,18 @@ function buildThreatList(
     if (meta.types.length === 0) continue;
     const targets: string[] = [];
     for (const pm of validMembers) {
-      const bestEff = Math.max(...meta.types.map((t) => getEffectiveness(t, pm.types)));
+      const bestEff = Math.max(
+        ...meta.types.map((t) => getEffectiveness(t, pm.types)),
+      );
       if (bestEff >= 2) targets.push(pm.speciesName);
     }
     if (targets.length === 0) continue;
-    results.push({ entry: meta, score: targets.length * meta.usagePercent, count: targets.length, targets });
+    results.push({
+      entry: meta,
+      score: targets.length * meta.usagePercent,
+      count: targets.length,
+      targets,
+    });
   }
 
   return results.sort((a, b) => b.score - a.score).slice(0, limit);
@@ -69,31 +76,44 @@ export class MetaThreatsCommand {
   ) {}
 
   @UseInterceptors(MetaRegulationAutocompleteInterceptor)
-  @Subcommand({ name: 'threats', description: 'Find top meta threats to a team paste' })
+  @Subcommand({
+    name: 'threats',
+    description: 'Find top meta threats to a team paste',
+  })
   public async onThreats(
     @Context() [interaction]: [ChatInputCommandInteraction],
     @Options() { regulation, paste }: MetaThreatsDto,
   ) {
     await interaction.deferReply();
 
-    const reg = (await this.metaFacade.getRegulations()).find((r) => r.id === regulation);
+    const reg = (await this.metaFacade.getRegulations()).find(
+      (r) => r.id === regulation,
+    );
     if (!reg) {
       await interaction.editReply(`Unknown regulation \`${regulation}\`.`);
       return;
     }
 
-    const source = reg.vgcPastesGid ? 'VGCPastes (Champions)' : reg.formatId ? 'Smogon Ladder' : 'Limitless (Combined)';
+    const source = reg.vgcPastesGid
+      ? 'VGCPastes (Champions)'
+      : reg.formatId
+        ? 'Smogon Ladder'
+        : 'Limitless (Combined)';
 
     // ── Resolve paste ─────────────────────────────────────────────────────────
     const rawPaste = await resolvePaste(paste.trim());
     if (!rawPaste) {
-      await interaction.editReply('Could not fetch paste. Provide a valid pokepast.es URL or raw Showdown paste.');
+      await interaction.editReply(
+        'Could not fetch paste. Provide a valid pokepast.es URL or raw Showdown paste.',
+      );
       return;
     }
 
     const slots = parsePasteMeta(rawPaste);
     if (slots.length === 0) {
-      await interaction.editReply('No Pokémon found in paste. Check the Showdown format.');
+      await interaction.editReply(
+        'No Pokémon found in paste. Check the Showdown format.',
+      );
       return;
     }
 
@@ -105,7 +125,9 @@ export class MetaThreatsCommand {
         () => this.metaFacade.getUnifiedUsageList(regulation),
       );
     } catch {
-      await interaction.editReply(`No usage data available for **${reg.name}** yet.`);
+      await interaction.editReply(
+        `No usage data available for **${reg.name}** yet.`,
+      );
       return;
     }
 
@@ -114,19 +136,25 @@ export class MetaThreatsCommand {
     // ── Build paste member type profiles ─────────────────────────────────────
     const pasteMembers = slots.map((s) => ({
       speciesName: s.speciesName,
-      types:       entryMap.get(s.speciesId)?.types ?? [],
+      types: entryMap.get(s.speciesId)?.types ?? [],
     }));
 
-    const unknownCount = pasteMembers.filter((m) => m.types.length === 0).length;
+    const unknownCount = pasteMembers.filter(
+      (m) => m.types.length === 0,
+    ).length;
 
     // ── Find top 8 threats (from top 30 meta Pokémon) ────────────────────────
     const threats = buildThreatList(entries.slice(0, 30), pasteMembers, 8);
 
     // ── Analyze team weaknesses ──────────────────────────────────────────────
-    const weaknesses = analyzeWeaknesses(pasteMembers.filter((m) => m.types.length > 0));
+    const weaknesses = analyzeWeaknesses(
+      pasteMembers.filter((m) => m.types.length > 0),
+    );
 
     // ── Build embed ──────────────────────────────────────────────────────────
-    const firstTypes  = pasteMembers.find((m) => m.types.length)?.types ?? ['normal'];
+    const firstTypes = pasteMembers.find((m) => m.types.length)?.types ?? [
+      'normal',
+    ];
 
     const threatLines = threats.map((t, i) => {
       const targetStr = t.targets.join(', ');
@@ -135,13 +163,14 @@ export class MetaThreatsCommand {
 
     const weakLines = weaknesses.slice(0, 5).map((w) => {
       const total = w.doubleHits + w.quadHits;
-      const tag   = w.quadHits ? ` (${w.quadHits}×4×)` : '';
+      const tag = w.quadHits ? ` (${w.quadHits}×4×)` : '';
       return `**${capitalize(w.atkType)}** — ${total} member${total !== 1 ? 's' : ''}${tag}`;
     });
 
-    const description = threats.length > 0
-      ? threatLines.join('\n')
-      : '*No notable threats found — strong coverage!*';
+    const description =
+      threats.length > 0
+        ? threatLines.join('\n')
+        : '*No notable threats found — strong coverage!*';
 
     const embed = new EmbedBuilder()
       .setColor(typeColor(firstTypes))
@@ -150,12 +179,16 @@ export class MetaThreatsCommand {
       .setFooter({ text: `Source: ${source}  ·  Based on STAB type matchups` });
 
     if (weakLines.length > 0) {
-      embed.addFields({ name: 'Your top type weaknesses', value: weakLines.join('\n'), inline: false });
+      embed.addFields({
+        name: 'Your top type weaknesses',
+        value: weakLines.join('\n'),
+        inline: false,
+      });
     }
     if (unknownCount > 0) {
       embed.addFields({
-        name:   'Note',
-        value:  `${unknownCount} Pokémon not in meta data — excluded from analysis.`,
+        name: 'Note',
+        value: `${unknownCount} Pokémon not in meta data — excluded from analysis.`,
         inline: false,
       });
     }

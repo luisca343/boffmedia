@@ -6,7 +6,10 @@ export class JoinEventDto {
   @IsInt()
   userId: number;
 
-  @ApiProperty({ description: 'Optional nickname for the participant', required: false })
+  @ApiProperty({
+    description: 'Optional nickname for the participant',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   @MaxLength(100)
@@ -18,9 +21,9 @@ export class JoinEventDto {
   @MaxLength(255)
   avatar?: string;
 
-  @ApiProperty({ 
-    description: 'Optional comment or reason for joining', 
-    required: false 
+  @ApiProperty({
+    description: 'Optional comment or reason for joining',
+    required: false,
   })
   @IsOptional()
   @IsString()

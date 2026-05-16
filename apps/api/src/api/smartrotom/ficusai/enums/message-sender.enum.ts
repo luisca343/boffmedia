@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export enum MessageSender {
   USER = 'user',
-  BOT = 'bot'
+  BOT = 'bot',
 }
 
 export class MessageSenderEnum {

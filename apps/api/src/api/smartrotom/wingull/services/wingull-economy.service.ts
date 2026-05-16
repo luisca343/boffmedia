@@ -12,7 +12,9 @@ export class WingullEconomyService {
 
   async updateBalance(balanceData: WingullBalanceDto): Promise<any> {
     try {
-      return await this.wingullEconomyRepository.updateBalanceInAPI(balanceData);
+      return await this.wingullEconomyRepository.updateBalanceInAPI(
+        balanceData,
+      );
     } catch (error: any) {
       console.error('Failed to update balance:', error);
       throw new Error(`Balance update failed: ${error.message}`);
@@ -21,7 +23,11 @@ export class WingullEconomyService {
 
   async getCurrentBalance(uuid: string, amount?: number): Promise<number> {
     try {
-      const result = await this.wingullEconomyRepository.getCurrentBalanceFromAPI(uuid, amount);
+      const result =
+        await this.wingullEconomyRepository.getCurrentBalanceFromAPI(
+          uuid,
+          amount,
+        );
       return result || 0;
     } catch (error: any) {
       console.error(`Failed to get current balance for ${uuid}:`, error);

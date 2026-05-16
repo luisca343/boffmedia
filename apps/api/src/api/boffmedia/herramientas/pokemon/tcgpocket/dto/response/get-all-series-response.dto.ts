@@ -2,21 +2,21 @@ import { ApiProperty } from '@nestjs/swagger';
 import { TcgSeries } from '../../entities/tcg-series.entity';
 
 export class GetAllSeriesResponseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Success status',
-    example: true
+    example: true,
   })
   success: boolean;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'List of TCG series',
-    type: [TcgSeries]
+    type: [TcgSeries],
   })
   data: TcgSeries[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Total number of series',
-    example: 5
+    example: 5,
   })
   count: number;
 }

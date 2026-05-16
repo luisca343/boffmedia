@@ -7,7 +7,12 @@ function toSpeciesId(name: string): string {
 function parseSpread(line: string): StatSpread | undefined {
   // Accepts "10 HP / 32 Atk / 0 Def / 0 SpA / 16 SpD / 8 Spe"
   const statMap: Record<string, keyof StatSpread> = {
-    HP: 'hp', Atk: 'atk', Def: 'def', SpA: 'spa', SpD: 'spd', Spe: 'spe',
+    HP: 'hp',
+    Atk: 'atk',
+    Def: 'def',
+    SpA: 'spa',
+    SpD: 'spd',
+    Spe: 'spe',
   };
   const result: Partial<StatSpread> = {};
   for (const pair of line.split('/').map((s) => s.trim())) {
@@ -19,7 +24,7 @@ function parseSpread(line: string): StatSpread | undefined {
   }
   if (Object.keys(result).length === 0) return undefined;
   return {
-    hp:  result.hp  ?? 0,
+    hp: result.hp ?? 0,
     atk: result.atk ?? 0,
     def: result.def ?? 0,
     spa: result.spa ?? 0,
@@ -33,11 +38,17 @@ function parseSpread(line: string): StatSpread | undefined {
  * also captures the EVs/SPs line into `slot.spread`. Tracker types are not touched.
  */
 export function parsePasteMeta(paste: string): VgcMetaSlot[] {
-  const blocks = paste.trim().split(/\n\s*\n/).filter(Boolean);
+  const blocks = paste
+    .trim()
+    .split(/\n\s*\n/)
+    .filter(Boolean);
   const slots: VgcMetaSlot[] = [];
 
   blocks.slice(0, 6).forEach((block, idx) => {
-    const lines = block.split('\n').map((l) => l.trim()).filter(Boolean);
+    const lines = block
+      .split('\n')
+      .map((l) => l.trim())
+      .filter(Boolean);
     if (!lines.length) return;
 
     const firstLine = lines[0];

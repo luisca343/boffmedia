@@ -15,10 +15,7 @@ import { ScrapeFacadeService } from './scrape.facade.service';
 import { ScrapeController } from './scrape.controller';
 
 @Module({
-  imports: [
-    LoggerModule,
-    ResponseModule,
-  ],
+  imports: [LoggerModule, ResponseModule],
   controllers: [ScrapeController],
   providers: [
     MyrientScrapeService,

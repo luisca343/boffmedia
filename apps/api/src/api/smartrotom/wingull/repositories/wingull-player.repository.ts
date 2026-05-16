@@ -27,8 +27,8 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
           timeout: this.DEFAULT_TIMEOUT,
           headers: {
             'Content-Type': 'application/json',
-          }
-        }
+          },
+        },
       );
       return response.data.data;
     } catch (error: any) {
@@ -52,8 +52,8 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
           timeout: this.DEFAULT_TIMEOUT,
           headers: {
             'Content-Type': 'application/json',
-          }
-        }
+          },
+        },
       );
       return response.data.data;
     } catch (error: any) {
@@ -77,8 +77,8 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
           timeout: this.DEFAULT_TIMEOUT,
           headers: {
             'Content-Type': 'application/json',
-          }
-        }
+          },
+        },
       );
       return response.data.data;
     } catch (error: any) {
@@ -102,8 +102,8 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
           timeout: this.DEFAULT_TIMEOUT,
           headers: {
             'Content-Type': 'application/json',
-          }
-        }
+          },
+        },
       );
       return response.data.data;
     } catch (error: any) {
@@ -127,8 +127,8 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
           timeout: this.DEFAULT_TIMEOUT,
           headers: {
             'Content-Type': 'application/json',
-          }
-        }
+          },
+        },
       );
       return response.data.data;
     } catch (error: any) {
@@ -152,8 +152,8 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
           timeout: this.DEFAULT_TIMEOUT,
           headers: {
             'Content-Type': 'application/json',
-          }
-        }
+          },
+        },
       );
       return response.data.data;
     } catch (error: any) {
@@ -180,8 +180,8 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
           timeout: this.DEFAULT_TIMEOUT,
           headers: {
             'Content-Type': 'application/json',
-          }
-        }
+          },
+        },
       );
       return response.data.data;
     } catch (error: any) {
@@ -208,12 +208,15 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
           timeout: this.DEFAULT_TIMEOUT,
           headers: {
             'Content-Type': 'application/json',
-          }
-        }
+          },
+        },
       );
       return response.data.data;
     } catch (error: any) {
-      console.error(`Failed to send global chat message for UUID ${request.uuid}:`, error);
+      console.error(
+        `Failed to send global chat message for UUID ${request.uuid}:`,
+        error,
+      );
       throw new Error(`Global chat message sending failed: ${error.message}`);
     }
   }
@@ -236,8 +239,8 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
           timeout: this.DEFAULT_TIMEOUT,
           headers: {
             'Content-Type': 'application/json',
-          }
-        }
+          },
+        },
       );
       return response.data.data;
     } catch (error: any) {
@@ -246,21 +249,42 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
     }
   }
 
- splitItemsForApi(items: Array<{ id: string, amount: number, display_name?: string, lore?: string[] }>, maxAmount = 64) {
-  const result: Array<{ id: string, amount: number, display_name?: string, lore?: string[] }> = [];
-  for (const item of items) {
-    let remaining = item.amount;
-    while (remaining > 0) {
-      const batchAmount = Math.min(remaining, maxAmount);
-      result.push({ ...item, amount: batchAmount });
-      remaining -= batchAmount;
+  splitItemsForApi(
+    items: Array<{
+      id: string;
+      amount: number;
+      display_name?: string;
+      lore?: string[];
+    }>,
+    maxAmount = 64,
+  ) {
+    const result: Array<{
+      id: string;
+      amount: number;
+      display_name?: string;
+      lore?: string[];
+    }> = [];
+    for (const item of items) {
+      let remaining = item.amount;
+      while (remaining > 0) {
+        const batchAmount = Math.min(remaining, maxAmount);
+        result.push({ ...item, amount: batchAmount });
+        remaining -= batchAmount;
+      }
     }
+    return result;
   }
-  return result;
-}
 
-  async giveItemsInAPI(uuid: string, items: Array<{ id: string, amount: number, display_name?: string, lore?: string[] }>): Promise<any> {
-  const splitItems = this.splitItemsForApi(items, 64);
+  async giveItemsInAPI(
+    uuid: string,
+    items: Array<{
+      id: string;
+      amount: number;
+      display_name?: string;
+      lore?: string[];
+    }>,
+  ): Promise<any> {
+    const splitItems = this.splitItemsForApi(items, 64);
     if (!uuid || uuid.trim() === '') {
       throw new Error('UUID is required for giving items');
     }
@@ -278,8 +302,8 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
           timeout: this.DEFAULT_TIMEOUT,
           headers: {
             'Content-Type': 'application/json',
-          }
-        }
+          },
+        },
       );
       return response.data.data;
     } catch (error: any) {
@@ -303,8 +327,8 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
           timeout: this.DEFAULT_TIMEOUT,
           headers: {
             'Content-Type': 'application/json',
-          }
-        }
+          },
+        },
       );
       return response.data.data;
     } catch (error: any) {
@@ -313,9 +337,13 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
     }
   }
 
-  async updateBattleTeamInAPI(updateBattleTeamDto: UpdateBattleTeamDto): Promise<any> {
+  async updateBattleTeamInAPI(
+    updateBattleTeamDto: UpdateBattleTeamDto,
+  ): Promise<any> {
     if (!updateBattleTeamDto || typeof updateBattleTeamDto !== 'object') {
-      throw new Error('UpdateBattleTeamDto is required for updating battle team');
+      throw new Error(
+        'UpdateBattleTeamDto is required for updating battle team',
+      );
     }
     if (!updateBattleTeamDto.uuid || updateBattleTeamDto.uuid.trim() === '') {
       throw new Error('UUID is required for updating battle team');
@@ -331,13 +359,16 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
           timeout: this.DEFAULT_TIMEOUT,
           headers: {
             'Content-Type': 'application/json',
-          }
-        }
+          },
+        },
       );
-      
+
       return response.data.data;
     } catch (error: any) {
-      console.error(`Failed to update battle team for UUID ${updateBattleTeamDto.uuid}:`, error);
+      console.error(
+        `Failed to update battle team for UUID ${updateBattleTeamDto.uuid}:`,
+        error,
+      );
       throw new Error(`Battle team update failed: ${error.message}`);
     }
   }

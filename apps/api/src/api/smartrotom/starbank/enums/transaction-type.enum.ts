@@ -5,5 +5,5 @@ export enum TransactionType {
   PREMIO = 'PREMIO',
   DERROTA_ENTRENADOR = 'DERROTA_ENTRENADOR',
   DEPOSITO = 'DEPOSITO',
-  RETIRO = 'RETIRO'
+  RETIRO = 'RETIRO',
 }

@@ -9,7 +9,10 @@ export class NoteService {
     private readonly documentsRepository: IDocumentsRepository,
   ) {}
 
-  async addNoteToUser(documentId: number, uuid: string): Promise<{ success: boolean }> {
+  async addNoteToUser(
+    documentId: number,
+    uuid: string,
+  ): Promise<{ success: boolean }> {
     if (!documentId || documentId <= 0) {
       throw new Error('Valid document ID is required');
     }
@@ -19,22 +22,30 @@ export class NoteService {
     }
 
     // Check if document exists
-    const document = await this.documentsRepository.findDocumentById(documentId);
+    const document =
+      await this.documentsRepository.findDocumentById(documentId);
     if (!document) {
       throw new Error('Document not found');
     }
 
     // Check if association already exists
-    const existingAssociation = await this.documentsRepository.findDocumentUserAssociation(documentId, uuid);
+    const existingAssociation =
+      await this.documentsRepository.findDocumentUserAssociation(
+        documentId,
+        uuid,
+      );
     if (existingAssociation) {
-      return { success: true }; 
+      return { success: true };
     }
 
     await this.documentsRepository.addDocumentToUser(documentId, uuid);
     return { success: true };
   }
 
-  async removeNoteFromUser(documentId: number, uuid: string): Promise<{ success: boolean }> {
+  async removeNoteFromUser(
+    documentId: number,
+    uuid: string,
+  ): Promise<{ success: boolean }> {
     if (!documentId || documentId <= 0) {
       throw new Error('Valid document ID is required');
     }
@@ -43,7 +54,11 @@ export class NoteService {
       throw new Error('UUID is required');
     }
 
-    const existingAssociation = await this.documentsRepository.findDocumentUserAssociation(documentId, uuid);
+    const existingAssociation =
+      await this.documentsRepository.findDocumentUserAssociation(
+        documentId,
+        uuid,
+      );
     if (!existingAssociation) {
       throw new Error('User is not associated with this document');
     }
@@ -52,8 +67,15 @@ export class NoteService {
     return { success: true };
   }
 
-  async validateUserHasAccess(documentId: number, uuid: string): Promise<boolean> {
-    const association = await this.documentsRepository.findDocumentUserAssociation(documentId, uuid);
+  async validateUserHasAccess(
+    documentId: number,
+    uuid: string,
+  ): Promise<boolean> {
+    const association =
+      await this.documentsRepository.findDocumentUserAssociation(
+        documentId,
+        uuid,
+      );
     return !!association;
   }
 }

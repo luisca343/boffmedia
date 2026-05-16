@@ -37,27 +37,33 @@ export class RegistrationService {
 
   // ==================== REGISTRATION OPERATIONS ====================
 
-  async registerUser(inviteId: string, registrationData: RegistrationData): Promise<RegistrationResult> {
+  async registerUser(
+    inviteId: string,
+    registrationData: RegistrationData,
+  ): Promise<RegistrationResult> {
     try {
       console.log(`Starting registration process for invite ${inviteId}`);
 
       // 1. Validate the invite
-      const inviteValidation = await this.inviteManagementService.validateInvite(inviteId);
+      const inviteValidation =
+        await this.inviteManagementService.validateInvite(inviteId);
       if (!inviteValidation.valid) {
         return {
           success: false,
           message: inviteValidation.message,
-          error: 'INVALID_INVITE'
+          error: 'INVALID_INVITE',
         };
       }
 
       // 2. Validate Minecraft username
-      const minecraftUser = await this.validateMinecraftUsername(registrationData.mc_username);
+      const minecraftUser = await this.validateMinecraftUsername(
+        registrationData.mc_username,
+      );
       if (!minecraftUser) {
         return {
           success: false,
           message: 'Invalid Minecraft username',
-          error: 'INVALID_MINECRAFT_USERNAME'
+          error: 'INVALID_MINECRAFT_USERNAME',
         };
       }
 
@@ -73,64 +79,71 @@ export class RegistrationService {
         minecraft: {
           username: registrationData.mc_username,
           uuid: uuid,
-          world: 'world' // Default world, you can adjust this
-        }
+          world: 'world', // Default world, you can adjust this
+        },
       };
 
-      const creationResult = await this.boffMediaUsersService.createMinecraftUser(registrationDataForFacade);
+      const creationResult =
+        await this.boffMediaUsersService.createMinecraftUser(
+          registrationDataForFacade,
+        );
 
       console.log('User creation completed:', {
         boffMediaUserId: creationResult.boffMediaUser.id,
         smartRotomUserId: creationResult.smartRotomUser?.id,
         hasStarbank: creationResult.starbankAccounts.length > 0,
         isNewBoffMediaUser: creationResult.isNewBoffMediaUser,
-        isNewSmartRotomUser: creationResult.isNewSmartRotomUser
+        isNewSmartRotomUser: creationResult.isNewSmartRotomUser,
       });
 
       // 5. Mark invite as used
-      const markUsedResult = await this.inviteManagementService.markInviteAsUsed(inviteId);
+      const markUsedResult =
+        await this.inviteManagementService.markInviteAsUsed(inviteId);
       if (!markUsedResult.success) {
         console.error('Error marking invite as used:', markUsedResult.message);
         // This is not a critical error, so we'll continue
       }
 
       console.log('User registration completed successfully');
-      
+
       return {
         success: true,
         message: 'User registered successfully',
         user: {
           uuid,
           username: registrationData.username,
-          email: registrationData.email
-        }
+          email: registrationData.email,
+        },
       };
-
     } catch (error: any) {
       console.error('Registration failed:', error);
       return {
         success: false,
         message: `Registration failed: ${error.message}`,
-        error: 'REGISTRATION_ERROR'
+        error: 'REGISTRATION_ERROR',
       };
     }
   }
 
   // ==================== MINECRAFT VALIDATION ====================
 
-  private async validateMinecraftUsername(username: string): Promise<MinecraftUser | null> {
+  private async validateMinecraftUsername(
+    username: string,
+  ): Promise<MinecraftUser | null> {
     try {
       console.log(`Validating Minecraft username: ${username}`);
-      
-      const response = await fetch(`https://api.mojang.com/users/profiles/minecraft/${username}`);
-      
+
+      const response = await fetch(
+        `https://api.mojang.com/users/profiles/minecraft/${username}`,
+      );
+
       if (!response.ok) {
         console.error(`Minecraft API error: ${response.status}`);
         return null;
       }
 
       const data = await response.json();
-      
+
       if (!data.id || !data.name) {
         console.error('Invalid response from Minecraft API:', data);
         return null;
@@ -139,9 +152,8 @@ export class RegistrationService {
       console.log(`Minecraft user found: ${data.name} (${data.id})`);
       return {
         id: data.id,
-        name: data.name
+        name: data.name,
       };
-
     } catch (error: any) {
       console.error('Error validating Minecraft username:', error);
       return null;
@@ -150,7 +162,9 @@ export class RegistrationService {
 
   // ==================== REGISTRATION VALIDATION ====================
 
-  async validateRegistrationData(data: RegistrationData): Promise<{ valid: boolean; errors: string[] }> {
+  async validateRegistrationData(
+    data: RegistrationData,
+  ): Promise<{ valid: boolean; errors: string[] }> {
     const errors: string[] = [];
 
     // Validate username
@@ -184,32 +198,38 @@ export class RegistrationService {
 
     return {
       valid: errors.length === 0,
-      errors
+      errors,
     };
   }
 
   // ==================== UTILITY METHODS ====================
 
-  async canRegisterWithInvite(inviteId: string): Promise<{ canRegister: boolean; message: string }> {
+  async canRegisterWithInvite(
+    inviteId: string,
+  ): Promise<{ canRegister: boolean; message: string }> {
     try {
-      const validation = await this.inviteManagementService.validateInvite(inviteId);
-      
+      const validation =
+        await this.inviteManagementService.validateInvite(inviteId);
+
       if (!validation.valid) {
         return {
           canRegister: false,
-          message: validation.message
+          message: validation.message,
         };
       }
 
       return {
         canRegister: true,
-        message: 'Invite is valid for registration'
+        message: 'Invite is valid for registration',
       };
     } catch (error: any) {
-      console.error(`Failed to check registration eligibility for invite ${inviteId}:`, error);
+      console.error(
+        `Failed to check registration eligibility for invite ${inviteId}:`,
+        error,
+      );
       return {
         canRegister: false,
-        message: `Validation failed: ${error.message}`
+        message: `Validation failed: ${error.message}`,
       };
     }
   }

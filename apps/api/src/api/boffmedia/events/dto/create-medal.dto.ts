@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateMedalDto {
-  
   @ApiProperty({ description: 'The name of the medal' })
   name: string;
 
@@ -17,7 +16,10 @@ export class CreateMedalDto {
   @ApiProperty({ description: 'Category of the medal' })
   category: 'placement' | 'challenge' | 'participation' | 'team_achievement';
 
-  @ApiProperty({ description: 'Placement position (for placement medals)', required: false })
+  @ApiProperty({
+    description: 'Placement position (for placement medals)',
+    required: false,
+  })
   placement?: number;
 
   @ApiProperty({ description: 'Maximum progress needed' })

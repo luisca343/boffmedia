@@ -53,7 +53,7 @@ export class TranscriptionService {
   private extractVideoId(input: string): string {
     const patterns = [
       /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/,
-      /^([a-zA-Z0-9_-]{11})$/
+      /^([a-zA-Z0-9_-]{11})$/,
     ];
 
     for (const pattern of patterns) {
@@ -90,24 +90,25 @@ export class TranscriptionService {
 
       // Get transcript
       const transcriptData = await info.getTranscript();
-      
 
       if (!transcriptData || !transcriptData.transcript) {
         return {
           success: false,
-          message: 'Transcription not available for this video'
+          message: 'Transcription not available for this video',
         };
       }
-      
 
       // Format transcript
-      const transcript: TranscriptSegment[] = transcriptData.transcript.content?.body?.initial_segments?.map((segment: any) => ({
-        text: segment.snippet.text,
-        startMs: segment.start_ms,
-        endMs: segment.end_ms,
-        startTime: this.formatTime(segment.start_ms),
-        endTime: this.formatTime(segment.end_ms)
-      })) || [];
+      const transcript: TranscriptSegment[] =
+        transcriptData.transcript.content?.body?.initial_segments?.map(
+          (segment: any) => ({
+            text: segment.snippet.text,
+            startMs: segment.start_ms,
+            endMs: segment.end_ms,
+            startTime: this.formatTime(segment.start_ms),
+            endTime: this.formatTime(segment.end_ms),
+          }),
+        ) || [];
 
       return {
         success: true,
@@ -115,13 +116,13 @@ export class TranscriptionService {
         title: info.basic_info.title,
         author: info.basic_info.author,
         duration: info.basic_info.duration,
-        transcript
+        transcript,
       };
     } catch (error: any) {
       console.error('Failed to get transcription:', error);
       return {
         success: false,
-        message: `Failed to get transcription: ${error.message}`
+        message: `Failed to get transcription: ${error.message}`,
       };
     }
   }
@@ -145,13 +146,13 @@ export class TranscriptionService {
         description: info.basic_info.short_description,
         viewCount: info.basic_info.view_count?.toString(),
         uploadDate: info.basic_info.start_timestamp?.toString(),
-        thumbnails: info.basic_info.thumbnail
+        thumbnails: info.basic_info.thumbnail,
       };
     } catch (error: any) {
       console.error('Failed to get video info:', error);
       return {
         success: false,
-        message: `Failed to get video info: ${error.message}`
+        message: `Failed to get video info: ${error.message}`,
       };
     }
   }

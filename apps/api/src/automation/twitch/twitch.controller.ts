@@ -21,7 +21,7 @@ export class TwitchController {
     return {
       status: 'active',
       monitoring: this.twitchMonitorService.getMonitoringStatus(),
-      targets: this.notificationService.getTargets().map(target => ({
+      targets: this.notificationService.getTargets().map((target) => ({
         type: target.type,
         configured: true,
       })),
@@ -55,8 +55,11 @@ export class TwitchController {
 
   private streamContainsWingull(stream: any): boolean {
     const titleContains = stream.title?.toLowerCase().includes('wingull');
-    const tagsContain = stream.tags?.some((tag: string) => tag.toLowerCase().includes('wingull'));
-    const gameIsPixelmonWingull = stream.game_name?.toLowerCase() === 'pixelmon wingull 2';
+    const tagsContain = stream.tags?.some((tag: string) =>
+      tag.toLowerCase().includes('wingull'),
+    );
+    const gameIsPixelmonWingull =
+      stream.game_name?.toLowerCase() === 'pixelmon wingull 2';
     return titleContains || tagsContain || gameIsPixelmonWingull;
   }
 

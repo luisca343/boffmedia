@@ -24,22 +24,20 @@ import { BoffMediaUsersModule } from '@api/boffmedia/users/users.module';
     ResponseModule,
     DrizzleModule,
     BoffMediaUsersModule,
-    SmartRotomUsersModule
+    SmartRotomUsersModule,
   ],
   controllers: [InvitesController],
   providers: [
     // Repository
     InvitesRepository,
-    
+
     // Domain services
     InviteManagementService,
     RegistrationService,
-    
+
     // Facade service
     InvitesFacadeService,
   ],
-  exports: [
-    InvitesFacadeService,
-  ],
+  exports: [InvitesFacadeService],
 })
 export class InvitesModule {}

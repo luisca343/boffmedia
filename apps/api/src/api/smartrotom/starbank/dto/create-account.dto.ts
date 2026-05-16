@@ -12,28 +12,28 @@ export class CreateAccountDto extends BaseDto {
   @IsString()
   name: string;
 
-  @ApiProperty({ 
-    description: 'Type of the account', 
+  @ApiProperty({
+    description: 'Type of the account',
     enum: AccountType,
     default: AccountType.SECONDARY,
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsEnum(AccountType)
   type?: AccountType = AccountType.SECONDARY;
 
-  @ApiProperty({ 
-    description: 'Initial balance of the account in PokéDollars', 
+  @ApiProperty({
+    description: 'Initial balance of the account in PokéDollars',
     default: 0,
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsNumber()
   initialBalance?: number = 0;
 
-  @ApiProperty({ 
-    description: 'Image route/path for the account', 
-    required: false
+  @ApiProperty({
+    description: 'Image route/path for the account',
+    required: false,
   })
   @IsOptional()
   @IsString()

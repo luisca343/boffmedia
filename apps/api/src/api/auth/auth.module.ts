@@ -22,7 +22,7 @@ import { BoffMediaUsersModule } from '@api/boffmedia/users/users.module';
     }),
   ],
   controllers: [AuthController],
-  providers: [GoogleStrategy, JwtStrategy, AuthService ],
+  providers: [GoogleStrategy, JwtStrategy, AuthService],
   exports: [AuthService, JwtModule],
 })
 export class AuthModule {}

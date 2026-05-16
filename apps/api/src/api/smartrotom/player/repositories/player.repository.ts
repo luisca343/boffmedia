@@ -24,22 +24,22 @@ export class PlayerRepository {
           timeout: this.DEFAULT_TIMEOUT,
           headers: {
             'Content-Type': 'application/json',
-          }
-        }
+          },
+        },
       );
 
       return response.data.data;
     } catch (error: any) {
       console.error(`Failed to fetch player stats for UUID ${uuid}:`, error);
-      
+
       if (error.code === 'ECONNABORTED') {
         throw new Error('Wingull API request timed out');
       }
-      
+
       if (error.response?.status === 404) {
         throw new Error('Player not found in Wingull API');
       }
-      
+
       throw new Error(`Wingull API stats request failed: ${error.message}`);
     }
   }
@@ -61,22 +61,22 @@ export class PlayerRepository {
           timeout: this.DEFAULT_TIMEOUT,
           headers: {
             'Content-Type': 'application/json',
-          }
-        }
+          },
+        },
       );
 
       return response.data.data;
     } catch (error: any) {
       console.error(`Failed to fetch player team for UUID ${uuid}:`, error);
-      
+
       if (error.code === 'ECONNABORTED') {
         throw new Error('Wingull API request timed out');
       }
-      
+
       if (error.response?.status === 404) {
         throw new Error('Player team not found in Wingull API');
       }
-      
+
       throw new Error(`Wingull API team request failed: ${error.message}`);
     }
   }

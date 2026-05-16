@@ -13,21 +13,26 @@ export class ReplaysService {
     private readonly replaysRepository: IReplaysRepository,
   ) {}
 
-  async createReplay(replayData: CreateReplayFullDto): Promise<BaseInsertResponse> {
+  async createReplay(
+    replayData: CreateReplayFullDto,
+  ): Promise<BaseInsertResponse> {
     this.validateReplayData(replayData);
 
     const replay = await this.replaysRepository.create(replayData);
     return { insertId: replay.id };
   }
 
-  async createUserReplay(uuid: string, replayId: number): Promise<BaseInsertResponse> {
+  async createUserReplay(
+    uuid: string,
+    replayId: number,
+  ): Promise<BaseInsertResponse> {
     this.validateUuid(uuid);
     this.validateReplayId(replayId);
 
     const userReplayData: UserReplayEntity = {
       uuid,
       replayId,
-      side: 1 // Default to side 1, could be parameterized later
+      side: 1, // Default to side 1, could be parameterized later
     };
 
     return this.replaysRepository.createUserReplay(userReplayData);

@@ -8,5 +8,5 @@ export enum Rarity {
   RARITY_7 = 7,
   RARITY_8 = 8,
   RARITY_9 = 9,
-  RARITY_10 = 10
+  RARITY_10 = 10,
 }

@@ -24,7 +24,7 @@ import { PasswordModule } from '@api/auth/password.module';
     DrizzleModule,
     StarbankModule,
     SmartRotomUsersModule,
-    PasswordModule
+    PasswordModule,
   ],
   controllers: [BoffMediaUsersController],
   providers: [

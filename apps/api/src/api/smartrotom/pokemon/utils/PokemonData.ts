@@ -83,7 +83,7 @@ export class PokemonData {
       data.forms?.forEach((form, index) => {
         formIndex++;
         if (!form) return;
-        let formName = form.name || 'base';
+        const formName = form.name || 'base';
         if (!this.speciesByForm[formName]) {
           this.speciesByForm[formName] = [];
         }
@@ -247,9 +247,8 @@ export class PokemonData {
             gen: data.generation,
             weight: form.weight,
             height: dimensions.height,
-          })
+          });
         }
-
       });
     }
 

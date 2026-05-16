@@ -13,7 +13,9 @@ type PokemonInsert = typeof vgcSmogonPokemon.$inferInsert;
 
 @Injectable()
 export class SmogonRepository {
-  constructor(@Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>) {}
+  constructor(
+    @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
+  ) {}
 
   // ─── Snapshots ──────────────────────────────────────────────────────────────
 
@@ -24,15 +26,21 @@ export class SmogonRepository {
       .orderBy(desc(vgcSmogonSnapshots.fetchedAt));
   }
 
-  async findSnapshot(formatId: string, month: string, cutoff: number): Promise<VgcSmogonSnapshot | null> {
+  async findSnapshot(
+    formatId: string,
+    month: string,
+    cutoff: number,
+  ): Promise<VgcSmogonSnapshot | null> {
     const [row] = await this.db
       .select()
       .from(vgcSmogonSnapshots)
-      .where(and(
-        eq(vgcSmogonSnapshots.formatId, formatId),
-        eq(vgcSmogonSnapshots.month, month),
-        eq(vgcSmogonSnapshots.cutoff, cutoff),
-      ))
+      .where(
+        and(
+          eq(vgcSmogonSnapshots.formatId, formatId),
+          eq(vgcSmogonSnapshots.month, month),
+          eq(vgcSmogonSnapshots.cutoff, cutoff),
+        ),
+      )
       .limit(1);
     return row ?? null;
   }
@@ -47,29 +55,43 @@ export class SmogonRepository {
     await this.db
       .insert(vgcSmogonSnapshots)
       .values({ ...data, fetchedAt: now })
-      .onDuplicateKeyUpdate({ set: { pokemonCount: data.pokemonCount, fetchedAt: now } });
+      .onDuplicateKeyUpdate({
+        set: { pokemonCount: data.pokemonCount, fetchedAt: now },
+      });
   }
 
   // ─── Pokémon rows ─────────────────────────────────────────────────────────
 
-  async deleteSnapshot(formatId: string, month: string, cutoff: number): Promise<void> {
+  async deleteSnapshot(
+    formatId: string,
+    month: string,
+    cutoff: number,
+  ): Promise<void> {
     await this.db
       .delete(vgcSmogonSnapshots)
-      .where(and(
-        eq(vgcSmogonSnapshots.formatId, formatId),
-        eq(vgcSmogonSnapshots.month, month),
-        eq(vgcSmogonSnapshots.cutoff, cutoff),
-      ));
+      .where(
+        and(
+          eq(vgcSmogonSnapshots.formatId, formatId),
+          eq(vgcSmogonSnapshots.month, month),
+          eq(vgcSmogonSnapshots.cutoff, cutoff),
+        ),
+      );
   }
 
-  async deletePokemon(formatId: string, month: string, cutoff: number): Promise<void> {
+  async deletePokemon(
+    formatId: string,
+    month: string,
+    cutoff: number,
+  ): Promise<void> {
     await this.db
       .delete(vgcSmogonPokemon)
-      .where(and(
-        eq(vgcSmogonPokemon.formatId, formatId),
-        eq(vgcSmogonPokemon.month, month),
-        eq(vgcSmogonPokemon.cutoff, cutoff),
-      ));
+      .where(
+        and(
+          eq(vgcSmogonPokemon.formatId, formatId),
+          eq(vgcSmogonPokemon.month, month),
+          eq(vgcSmogonPokemon.cutoff, cutoff),
+        ),
+      );
   }
 
   async insertPokemonBatch(rows: PokemonInsert[]): Promise<void> {
@@ -86,11 +108,13 @@ export class SmogonRepository {
     return this.db
       .select()
       .from(vgcSmogonPokemon)
-      .where(and(
-        eq(vgcSmogonPokemon.formatId, formatId),
-        eq(vgcSmogonPokemon.month, month),
-        eq(vgcSmogonPokemon.cutoff, cutoff),
-      ))
+      .where(
+        and(
+          eq(vgcSmogonPokemon.formatId, formatId),
+          eq(vgcSmogonPokemon.month, month),
+          eq(vgcSmogonPokemon.cutoff, cutoff),
+        ),
+      )
       .orderBy(vgcSmogonPokemon.rank);
   }
 
@@ -103,12 +127,14 @@ export class SmogonRepository {
     const [row] = await this.db
       .select()
       .from(vgcSmogonPokemon)
-      .where(and(
-        eq(vgcSmogonPokemon.formatId, formatId),
-        eq(vgcSmogonPokemon.month, month),
-        eq(vgcSmogonPokemon.cutoff, cutoff),
-        eq(vgcSmogonPokemon.speciesId, speciesId),
-      ))
+      .where(
+        and(
+          eq(vgcSmogonPokemon.formatId, formatId),
+          eq(vgcSmogonPokemon.month, month),
+          eq(vgcSmogonPokemon.cutoff, cutoff),
+          eq(vgcSmogonPokemon.speciesId, speciesId),
+        ),
+      )
       .limit(1);
     return row ?? null;
   }

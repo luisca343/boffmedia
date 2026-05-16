@@ -10,7 +10,7 @@ export class InventoryItemGroupDto {
   @ApiProperty({
     description: 'Items of a specific type',
     type: [ArcadeInventoryItem],
-    additionalProperties: { type: 'array', items: { $ref: 'ArcadeInventory' } }
+    additionalProperties: { type: 'array', items: { $ref: 'ArcadeInventory' } },
   })
   items: Record<string, ArcadeInventoryItem[]>;
 }
@@ -18,19 +18,19 @@ export class InventoryItemGroupDto {
 export class ArcadeInventoryResponse {
   @ApiProperty({
     description: 'Aggregated inventory items list',
-    type: [ArcadeInventoryItem]
+    type: [ArcadeInventoryItem],
   })
   items: ArcadeInventoryItem[];
 
   @ApiProperty({
     description: 'Items grouped by their type',
-    type: InventoryItemGroup
+    type: InventoryItemGroup,
   })
   groupedItems: Record<string, ArcadeInventoryItem[]>;
 
   @ApiProperty({
     description: 'Raw inventory items from database without aggregation',
-    type: [ArcadeInventoryItem]
+    type: [ArcadeInventoryItem],
   })
   rawItems: ArcadeInventoryItem[];
 }

@@ -1,5 +1,5 @@
-import { GameSession } from "../../entities/game-session.entity";
-import { MineReward } from "../../entities/mine-reward.entity";
+import { GameSession } from '../../entities/game-session.entity';
+import { MineReward } from '../../entities/mine-reward.entity';
 
 export interface HistoryEntry {
   id: number;
@@ -48,7 +48,11 @@ export interface IMineRepository {
   // Energy operations
   findPlayerEnergy(uuid: string): Promise<{ energy: number } | null>;
   findPlayerLastCharge(uuid: string): Promise<Date | null>;
-  updatePlayerEnergy(uuid: string, energy: number, lastCharge?: Date): Promise<void>;
+  updatePlayerEnergy(
+    uuid: string,
+    energy: number,
+    lastCharge?: Date,
+  ): Promise<void>;
 
   // Game session operations
   createGameSession(uuid: string): Promise<{ insertId: number }>;
@@ -59,14 +63,19 @@ export interface IMineRepository {
   findAllRewards(): Promise<MineReward[]>;
   findRewardsByIds(ids: number[]): Promise<MineReward[]>;
   findMaxRewardValue(): Promise<number>;
-  createGameRewards(gameId: number, rewards: { rewardId: number; value: number }[]): Promise<void>;
+  createGameRewards(
+    gameId: number,
+    rewards: { rewardId: number; value: number }[],
+  ): Promise<void>;
 
   // History operations
   findPlayerHistory(uuid: string): Promise<HistoryEntry[]>;
 
   // Ranking operations
   findTopPlayers(limit?: number): Promise<RankingEntry[]>;
-  findPlayerRanking(uuid: string): Promise<{ rank: number; totalValue: number } | null>;
+  findPlayerRanking(
+    uuid: string,
+  ): Promise<{ rank: number; totalValue: number } | null>;
 
   // Inventory operations
   createInventoryEntries(entries: InventoryEntry[]): Promise<void>;

@@ -12,12 +12,10 @@ export class DuplicateEntryExceptionFilter implements ExceptionFilter {
       // Extract the column name from the error message
       const columnName = exception.message.split('for key')[1];
 
-      response
-        .status(409)
-        .json({
-          statusCode: 409,
-          message: `Duplicate entry for column ${columnName}`,
-        });
+      response.status(409).json({
+        statusCode: 409,
+        message: `Duplicate entry for column ${columnName}`,
+      });
     } else {
       // handle other database errors, or throw the original error
       throw exception;

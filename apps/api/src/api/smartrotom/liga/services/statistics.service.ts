@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { LigaRepository, LeagueStanding } from '@api/smartrotom/liga/repositories/liga.repository';
+import {
+  LigaRepository,
+  LeagueStanding,
+} from '@api/smartrotom/liga/repositories/liga.repository';
 
 export interface PlayerStatistics {
   uuid: string;
@@ -20,9 +23,7 @@ export interface LeaderboardResponse {
 
 @Injectable()
 export class StatisticsService {
-  constructor(
-    private readonly ligaRepository: LigaRepository,
-  ) {}
+  constructor(private readonly ligaRepository: LigaRepository) {}
 
   async getPlayerStatistics(playerUuid: string): Promise<PlayerStatistics> {
     if (!playerUuid) {
@@ -30,12 +31,16 @@ export class StatisticsService {
     }
 
     const stats = await this.ligaRepository.getPlayerStats(playerUuid);
-    const recentReplays = await this.ligaRepository.findReplaysByPlayer(playerUuid);
-    
+    const recentReplays =
+      await this.ligaRepository.findReplaysByPlayer(playerUuid);
+
     // Get recent form (last 10 matches)
     const recentForm = recentReplays
       .slice(0, 10)
-      .map(replay => replay.winner === playerUuid ? 'W' : 'L') as ('W' | 'L')[];
+      .map((replay) => (replay.winner === playerUuid ? 'W' : 'L')) as (
+      | 'W'
+      | 'L'
+    )[];
 
     return {
       uuid: playerUuid,
@@ -44,7 +49,7 @@ export class StatisticsService {
       losses: stats.losses,
       winRate: stats.winRate,
       points: stats.wins * 3 + stats.losses * 1,
-      recentForm
+      recentForm,
     };
   }
 
@@ -58,17 +63,21 @@ export class StatisticsService {
     return {
       rankings,
       totalPlayers: rankings.length,
-      lastUpdated: new Date()
+      lastUpdated: new Date(),
     };
   }
 
-  async getPlayerRanking(playerUuid: string): Promise<{ rank: number; totalPlayers: number } | null> {
+  async getPlayerRanking(
+    playerUuid: string,
+  ): Promise<{ rank: number; totalPlayers: number } | null> {
     if (!playerUuid) {
       throw new Error('Player UUID is required');
     }
 
     const fullLeaderboard = await this.ligaRepository.getLeaderboard(1000);
-    const playerRanking = fullLeaderboard.find(standing => standing.player === playerUuid);
+    const playerRanking = fullLeaderboard.find(
+      (standing) => standing.player === playerUuid,
+    );
 
     if (!playerRanking) {
       return null;
@@ -76,11 +85,14 @@ export class StatisticsService {
 
     return {
       rank: playerRanking.rank,
-      totalPlayers: fullLeaderboard.length
+      totalPlayers: fullLeaderboard.length,
     };
   }
 
-  async comparePlayers(player1: string, player2: string): Promise<{
+  async comparePlayers(
+    player1: string,
+    player2: string,
+  ): Promise<{
     player1Stats: PlayerStatistics;
     player2Stats: PlayerStatistics;
     headToHead: {
@@ -99,13 +111,20 @@ export class StatisticsService {
 
     const [player1Stats, player2Stats] = await Promise.all([
       this.getPlayerStatistics(player1),
-      this.getPlayerStatistics(player2)
+      this.getPlayerStatistics(player2),
     ]);
 
-    const headToHeadReplays = await this.ligaRepository.findReplaysByPlayers(player1, player2);
-    
-    const player1Wins = headToHeadReplays.filter(replay => replay.winner === player1).length;
-    const player2Wins = headToHeadReplays.filter(replay => replay.winner === player2).length;
+    const headToHeadReplays = await this.ligaRepository.findReplaysByPlayers(
+      player1,
+      player2,
+    );
+
+    const player1Wins = headToHeadReplays.filter(
+      (replay) => replay.winner === player1,
+    ).length;
+    const player2Wins = headToHeadReplays.filter(
+      (replay) => replay.winner === player2,
+    ).length;
 
     return {
       player1Stats,
@@ -113,8 +132,8 @@ export class StatisticsService {
       headToHead: {
         player1Wins,
         player2Wins,
-        totalMatches: headToHeadReplays.length
-      }
+        totalMatches: headToHeadReplays.length,
+      },
     };
   }
 }

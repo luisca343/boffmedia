@@ -3,26 +3,26 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsOptional, IsUUID, Length } from 'class-validator';
 
 export class UserInitializationDataDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'UUID of the user',
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
   })
   @IsString()
   @IsUUID()
   uuid: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Username of the user',
-    example: 'PlayerName123'
+    example: 'PlayerName123',
   })
   @IsString()
   @Length(3, 16)
   username: string;
 
-  @ApiProperty({ 
-    description: 'World of the user', 
+  @ApiProperty({
+    description: 'World of the user',
     required: false,
-    example: 'survival'
+    example: 'survival',
   })
   @IsOptional()
   @IsString()

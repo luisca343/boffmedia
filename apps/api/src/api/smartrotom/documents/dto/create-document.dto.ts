@@ -18,7 +18,9 @@ export class CreateDocumentDto extends BaseDto {
   @IsNotEmpty()
   type: number;
 
-  @ApiProperty({ description: 'Public status of the document (0=private, 1=public)' })
+  @ApiProperty({
+    description: 'Public status of the document (0=private, 1=public)',
+  })
   @IsInt()
   @IsNotEmpty()
   public: number;

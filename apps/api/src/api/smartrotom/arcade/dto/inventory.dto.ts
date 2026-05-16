@@ -1,21 +1,28 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsOptional, IsInt, IsArray, ValidateNested } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsOptional,
+  IsInt,
+  IsArray,
+  ValidateNested,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { ItemRarity } from '../entities/arcade-inventory.entity';
 
 export class GetInventoryDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Player UUID',
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
   })
   @IsNotEmpty()
   @IsString()
   uuid: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Filter by source type',
     required: false,
-    example: 'arcade'
+    example: 'arcade',
   })
   @IsOptional()
   @IsString()
@@ -23,9 +30,9 @@ export class GetInventoryDto {
 }
 
 export class AddInventoryItemDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Player UUID',
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
   })
   @IsNotEmpty()
   @IsString()
@@ -51,7 +58,11 @@ export class AddInventoryItemDto {
   @IsInt()
   amount?: number;
 
-  @ApiProperty({ description: 'Source type', required: false, example: 'admin' })
+  @ApiProperty({
+    description: 'Source type',
+    required: false,
+    example: 'admin',
+  })
   @IsOptional()
   @IsString()
   sourceType?: string;
@@ -61,16 +72,20 @@ export class AddInventoryItemDto {
   @IsInt()
   sourceId?: number;
 
-  @ApiProperty({ description: 'Item rarity', required: false, example: 'legendary' })
+  @ApiProperty({
+    description: 'Item rarity',
+    required: false,
+    example: 'legendary',
+  })
   @IsOptional()
   @IsString()
   rarity?: ItemRarity;
 }
 
 export class ConsumeInventoryItemDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Player UUID',
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
   })
   @IsNotEmpty()
   @IsString()
@@ -81,7 +96,11 @@ export class ConsumeInventoryItemDto {
   @IsString()
   itemId: string;
 
-  @ApiProperty({ description: 'Amount to consume', required: false, example: 1 })
+  @ApiProperty({
+    description: 'Amount to consume',
+    required: false,
+    example: 1,
+  })
   @IsOptional()
   @IsInt()
   amount?: number = 1;
@@ -100,17 +119,17 @@ export class ClaimItemDto {
 }
 
 export class ClaimInventoryItemsDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Player UUID',
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
   })
   @IsNotEmpty()
   @IsString()
   uuid: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Items to claim',
-    type: [ClaimItemDto]
+    type: [ClaimItemDto],
   })
   @IsArray()
   @ValidateNested({ each: true })

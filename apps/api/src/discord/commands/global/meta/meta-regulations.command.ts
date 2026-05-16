@@ -9,7 +9,10 @@ import { VgcMetaFacadeService } from '@/api/boffmedia/herramientas/pokemon/vgc/m
 export class MetaRegulationsCommand {
   constructor(private readonly metaFacade: VgcMetaFacadeService) {}
 
-  @Subcommand({ name: 'regulations', description: 'List all available VGC regulations' })
+  @Subcommand({
+    name: 'regulations',
+    description: 'List all available VGC regulations',
+  })
   public async onRegulations(
     @Context() [interaction]: [ChatInputCommandInteraction],
   ) {

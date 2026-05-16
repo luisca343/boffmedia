@@ -1,77 +1,84 @@
 import { BaseDto } from '@api/_utils/dto/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsUUID, IsInt, IsOptional, Min, MaxLength } from 'class-validator';
+import {
+  IsString,
+  IsUUID,
+  IsInt,
+  IsOptional,
+  Min,
+  MaxLength,
+} from 'class-validator';
 import { ItemRarity } from '../entities/arcade-inventory.entity';
 
 export class CreateInventoryItemDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Player UUID',
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
   })
   @IsString()
   @IsUUID()
   uuid: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Item ID',
-    example: 'potion_heal'
+    example: 'potion_heal',
   })
   @IsString()
   @MaxLength(32)
   itemId: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Item data (Pokemon specifications for Pokemon items)',
     example: 'charizard:shiny:adamant',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
   @MaxLength(255)
   itemData?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Item type',
-    example: 'consumable'
+    example: 'consumable',
   })
   @IsString()
   @MaxLength(32)
   itemType: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Item amount',
     example: 5,
-    default: 1
+    default: 1,
   })
   @IsOptional()
   @IsInt()
   @Min(1)
   amount?: number = 1;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Item rarity',
     example: 'common',
-    default: 'common'
+    default: 'common',
   })
   @IsOptional()
   @IsString()
   @MaxLength(20)
   rarity?: ItemRarity = 'common';
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Source type (how item was obtained)',
     example: 'lootbox',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
   @MaxLength(32)
   sourceType?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Whether item has been used',
     example: 0,
-    default: 0
+    default: 0,
   })
   @IsOptional()
   @IsInt()

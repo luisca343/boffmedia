@@ -47,7 +47,9 @@ export class TcgConfigService {
 
   private validateLocale(locale: string): void {
     if (!this.supportedLocales.includes(locale)) {
-      throw new Error(`Unsupported locale: ${locale}. Supported: ${this.supportedLocales.join(', ')}`);
+      throw new Error(
+        `Unsupported locale: ${locale}. Supported: ${this.supportedLocales.join(', ')}`,
+      );
     }
   }
 

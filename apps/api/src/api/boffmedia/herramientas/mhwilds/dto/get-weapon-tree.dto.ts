@@ -5,25 +5,25 @@ import { Type, Transform } from 'class-transformer';
 import { Locale } from '../enums/locale.enum';
 
 export class GetWeaponTreeDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Language/locale for the data',
     example: Locale.SPANISH,
     default: Locale.SPANISH,
     required: false,
     enum: Locale,
-    enumName: 'Locale'
+    enumName: 'Locale',
   })
   @IsOptional()
   @IsString()
   @IsEnum(Locale)
   locale?: Locale = Locale.SPANISH;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Include grouped by weapon kind',
     example: true,
     default: true,
     required: false,
-    type: Boolean
+    type: Boolean,
   })
   @IsOptional()
   @Transform(({ value }) => {

@@ -9,21 +9,9 @@ import { TwitchMonitorService } from './services/twitch-monitor.service';
 import { NotificationService } from './services/notification.service';
 
 @Module({
-  imports: [
-    HttpModule,
-    ScheduleModule.forRoot(),
-    ConfigModule,
-  ],
+  imports: [HttpModule, ScheduleModule.forRoot(), ConfigModule],
   controllers: [TwitchController, TwitchDebugController],
-  providers: [
-    TwitchApiService,
-    TwitchMonitorService,
-    NotificationService,
-  ],
-  exports: [
-    TwitchApiService,
-    TwitchMonitorService,
-    NotificationService,
-  ],
+  providers: [TwitchApiService, TwitchMonitorService, NotificationService],
+  exports: [TwitchApiService, TwitchMonitorService, NotificationService],
 })
 export class TwitchModule {}

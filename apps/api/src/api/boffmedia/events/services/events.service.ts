@@ -6,9 +6,7 @@ import { UpdateEventDto } from '../dto/update-event.dto';
 
 @Injectable()
 export class EventsService {
-  constructor(
-    private readonly eventsRepository: EventsRepository,
-  ) {}
+  constructor(private readonly eventsRepository: EventsRepository) {}
 
   async getAllEvents(): Promise<Event[]> {
     return this.eventsRepository.findAll();
@@ -19,10 +17,10 @@ export class EventsService {
     if (!event) return null;
 
     const childEvents = await this.eventsRepository.findChildEvents(id);
-    
+
     return {
       ...event,
-      childEvents: childEvents.length > 0 ? childEvents : []
+      childEvents: childEvents.length > 0 ? childEvents : [],
     };
   }
 
@@ -44,7 +42,10 @@ export class EventsService {
     return this.getEventById(result.insertId);
   }
 
-  async updateEvent(id: number, updateEventDto: UpdateEventDto): Promise<Event> {
+  async updateEvent(
+    id: number,
+    updateEventDto: UpdateEventDto,
+  ): Promise<Event> {
     const eventData = {
       parentId: updateEventDto.parentId || null,
       title: updateEventDto.title,
@@ -65,7 +66,7 @@ export class EventsService {
   async deleteEvent(id: number): Promise<void> {
     // First, soft delete all child events
     await this.eventsRepository.softDeleteChildren(id);
-    
+
     // Then soft delete the main event
     await this.eventsRepository.softDelete(id);
   }

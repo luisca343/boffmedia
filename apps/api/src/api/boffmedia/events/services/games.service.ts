@@ -6,9 +6,7 @@ import { UpdateEventDto } from '../dto/update-event.dto';
 
 @Injectable()
 export class GamesService {
-  constructor(
-    private readonly gamesRepository: GamesRepository,
-  ) {}
+  constructor(private readonly gamesRepository: GamesRepository) {}
 
   async getAllGames(): Promise<Game[]> {
     return this.gamesRepository.findAll();

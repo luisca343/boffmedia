@@ -46,7 +46,10 @@ export class BattleFacadeService {
 
       // If UUID is provided, validate access
       if (uuid) {
-        const hasAccess = await this.replayService.validateReplayAccess(uuid, replayId);
+        const hasAccess = await this.replayService.validateReplayAccess(
+          uuid,
+          replayId,
+        );
         if (!hasAccess) {
           throw new Error('User does not have access to this replay');
         }
@@ -72,7 +75,10 @@ export class BattleFacadeService {
       });
 
       // Associate with user
-      await this.replayService.associateReplayWithUser(createReplayDto.userUuid, replay.id);
+      await this.replayService.associateReplayWithUser(
+        createReplayDto.userUuid,
+        replay.id,
+      );
 
       return replay;
     } catch (error: any) {
@@ -81,11 +87,18 @@ export class BattleFacadeService {
     }
   }
 
-  async updateReplay(replayId: number, updateReplayDto: UpdateReplayDto, uuid?: string): Promise<BattleReplay> {
+  async updateReplay(
+    replayId: number,
+    updateReplayDto: UpdateReplayDto,
+    uuid?: string,
+  ): Promise<BattleReplay> {
     try {
       // If UUID is provided, validate access
       if (uuid) {
-        const hasAccess = await this.replayService.validateReplayAccess(uuid, replayId);
+        const hasAccess = await this.replayService.validateReplayAccess(
+          uuid,
+          replayId,
+        );
         if (!hasAccess) {
           throw new Error('User does not have access to this replay');
         }
@@ -98,11 +111,17 @@ export class BattleFacadeService {
     }
   }
 
-  async deleteReplay(replayId: number, uuid?: string): Promise<{ success: boolean; message: string }> {
+  async deleteReplay(
+    replayId: number,
+    uuid?: string,
+  ): Promise<{ success: boolean; message: string }> {
     try {
       // If UUID is provided, validate access
       if (uuid) {
-        const hasAccess = await this.replayService.validateReplayAccess(uuid, replayId);
+        const hasAccess = await this.replayService.validateReplayAccess(
+          uuid,
+          replayId,
+        );
         if (!hasAccess) {
           throw new Error('User does not have access to this replay');
         }
@@ -112,7 +131,7 @@ export class BattleFacadeService {
 
       return {
         success: true,
-        message: 'Replay deleted successfully'
+        message: 'Replay deleted successfully',
       };
     } catch (error: any) {
       console.error(`Error deleting replay ${replayId}:`, error);
@@ -120,11 +139,18 @@ export class BattleFacadeService {
     }
   }
 
-  async shareReplayWithUser(replayId: number, targetUuid: string, sourceUuid?: string): Promise<{ success: boolean; message: string }> {
+  async shareReplayWithUser(
+    replayId: number,
+    targetUuid: string,
+    sourceUuid?: string,
+  ): Promise<{ success: boolean; message: string }> {
     try {
       // If source UUID is provided, validate they have access to share
       if (sourceUuid) {
-        const hasAccess = await this.replayService.validateReplayAccess(sourceUuid, replayId);
+        const hasAccess = await this.replayService.validateReplayAccess(
+          sourceUuid,
+          replayId,
+        );
         if (!hasAccess) {
           throw new Error('Source user does not have access to this replay');
         }
@@ -134,10 +160,13 @@ export class BattleFacadeService {
 
       return {
         success: true,
-        message: 'Replay shared successfully'
+        message: 'Replay shared successfully',
       };
     } catch (error: any) {
-      console.error(`Error sharing replay ${replayId} with user ${targetUuid}:`, error);
+      console.error(
+        `Error sharing replay ${replayId} with user ${targetUuid}:`,
+        error,
+      );
       throw new Error(`Failed to share replay: ${error.message}`);
     }
   }
@@ -162,39 +191,56 @@ export class BattleFacadeService {
     }
   }
 
-  async createBattleConfig(npcConfigName: string, config: BattleConfig): Promise<{ success: boolean; message: string }> {
+  async createBattleConfig(
+    npcConfigName: string,
+    config: BattleConfig,
+  ): Promise<{ success: boolean; message: string }> {
     try {
       await this.configService.createConfig(npcConfigName, config);
 
       return {
         success: true,
-        message: 'Battle config created successfully'
+        message: 'Battle config created successfully',
       };
     } catch (error: any) {
-      console.error(`Error creating battle config for ${npcConfigName}:`, error);
+      console.error(
+        `Error creating battle config for ${npcConfigName}:`,
+        error,
+      );
       throw new Error(`Failed to create battle config: ${error.message}`);
     }
   }
 
-  async updateBattleConfig(npcConfigName: string, config: Partial<BattleConfig>): Promise<BattleConfig> {
+  async updateBattleConfig(
+    npcConfigName: string,
+    config: Partial<BattleConfig>,
+  ): Promise<BattleConfig> {
     try {
       return await this.configService.updateConfig(npcConfigName, config);
     } catch (error: any) {
-      console.error(`Error updating battle config for ${npcConfigName}:`, error);
+      console.error(
+        `Error updating battle config for ${npcConfigName}:`,
+        error,
+      );
       throw new Error(`Failed to update battle config: ${error.message}`);
     }
   }
 
-  async deleteBattleConfig(npcConfigName: string): Promise<{ success: boolean; message: string }> {
+  async deleteBattleConfig(
+    npcConfigName: string,
+  ): Promise<{ success: boolean; message: string }> {
     try {
       await this.configService.deleteConfig(npcConfigName);
 
       return {
         success: true,
-        message: 'Battle config deleted successfully'
+        message: 'Battle config deleted successfully',
       };
     } catch (error: any) {
-      console.error(`Error deleting battle config for ${npcConfigName}:`, error);
+      console.error(
+        `Error deleting battle config for ${npcConfigName}:`,
+        error,
+      );
       throw new Error(`Failed to delete battle config: ${error.message}`);
     }
   }
@@ -203,7 +249,10 @@ export class BattleFacadeService {
     try {
       return await this.configService.validateConfigExists(npcConfigName);
     } catch (error: any) {
-      console.error(`Error validating battle config for ${npcConfigName}:`, error);
+      console.error(
+        `Error validating battle config for ${npcConfigName}:`,
+        error,
+      );
       return false;
     }
   }

@@ -12,7 +12,9 @@ import {
 
 @Injectable()
 export class LimitlessRepository {
-  constructor(@Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>) {}
+  constructor(
+    @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
+  ) {}
 
   // --- Tournaments -----------------------------------------------------------
 
@@ -20,7 +22,9 @@ export class LimitlessRepository {
     return this.db.select().from(vgcLimitlessTournaments);
   }
 
-  async findTournamentsByRegulation(regulationId: string): Promise<VgcLimitlessTournament[]> {
+  async findTournamentsByRegulation(
+    regulationId: string,
+  ): Promise<VgcLimitlessTournament[]> {
     return this.db
       .select()
       .from(vgcLimitlessTournaments)
@@ -36,7 +40,9 @@ export class LimitlessRepository {
     return row ?? null;
   }
 
-  async findTournamentByLimitlessId(limitlessId: string): Promise<VgcLimitlessTournament | null> {
+  async findTournamentByLimitlessId(
+    limitlessId: string,
+  ): Promise<VgcLimitlessTournament | null> {
     const [row] = await this.db
       .select()
       .from(vgcLimitlessTournaments)
@@ -46,38 +52,38 @@ export class LimitlessRepository {
   }
 
   async upsertTournament(data: {
-    limitlessId:  string;
+    limitlessId: string;
     regulationId: string;
-    name?:        string | null;
-    date?:        string | null;
-    format?:      string | null;
+    name?: string | null;
+    date?: string | null;
+    format?: string | null;
     playerCount?: number | null;
-    status?:      string;
-    progress?:    number;
-    total?:       number;
+    status?: string;
+    progress?: number;
+    total?: number;
   }): Promise<number> {
     const now = new Date();
     await this.db
       .insert(vgcLimitlessTournaments)
       .values({
-        limitlessId:  data.limitlessId,
+        limitlessId: data.limitlessId,
         regulationId: data.regulationId,
-        name:         data.name         ?? null,
-        date:         data.date         ?? null,
-        format:       data.format       ?? null,
-        playerCount:  data.playerCount  ?? null,
-        status:       data.status       ?? 'pending',
-        progress:     data.progress     ?? 0,
-        total:        data.total        ?? 0,
-        fetchedAt:    now,
+        name: data.name ?? null,
+        date: data.date ?? null,
+        format: data.format ?? null,
+        playerCount: data.playerCount ?? null,
+        status: data.status ?? 'pending',
+        progress: data.progress ?? 0,
+        total: data.total ?? 0,
+        fetchedAt: now,
       })
       .onDuplicateKeyUpdate({
         set: {
           regulationId: data.regulationId,
-          status:       data.status   ?? 'pending',
-          progress:     data.progress ?? 0,
-          total:        data.total    ?? 0,
-          fetchedAt:    now,
+          status: data.status ?? 'pending',
+          progress: data.progress ?? 0,
+          total: data.total ?? 0,
+          fetchedAt: now,
         },
       });
     return (await this.findTournamentByLimitlessId(data.limitlessId))!.id;
@@ -86,28 +92,28 @@ export class LimitlessRepository {
   async updateTournamentStatus(
     id: number,
     patch: {
-      name?:        string | null;
-      date?:        string | null;
-      format?:      string | null;
+      name?: string | null;
+      date?: string | null;
+      format?: string | null;
       playerCount?: number | null;
       regulationId?: string;
-      status?:      string;
-      progress?:    number;
-      total?:       number;
+      status?: string;
+      progress?: number;
+      total?: number;
       errorMessage?: string | null;
     },
   ): Promise<void> {
     const set: Partial<typeof vgcLimitlessTournaments.$inferInsert> = {};
-    if (patch.name         !== undefined) set.name         = patch.name;
-    if (patch.date         !== undefined) set.date         = patch.date;
-    if (patch.format       !== undefined) set.format       = patch.format;
-    if (patch.playerCount  !== undefined) set.playerCount  = patch.playerCount;
+    if (patch.name !== undefined) set.name = patch.name;
+    if (patch.date !== undefined) set.date = patch.date;
+    if (patch.format !== undefined) set.format = patch.format;
+    if (patch.playerCount !== undefined) set.playerCount = patch.playerCount;
     if (patch.regulationId !== undefined) set.regulationId = patch.regulationId;
-    if (patch.status       !== undefined) set.status       = patch.status;
-    if (patch.progress     !== undefined) set.progress     = patch.progress;
-    if (patch.total        !== undefined) set.total        = patch.total;
+    if (patch.status !== undefined) set.status = patch.status;
+    if (patch.progress !== undefined) set.progress = patch.progress;
+    if (patch.total !== undefined) set.total = patch.total;
     if (patch.errorMessage !== undefined) set.errorMessage = patch.errorMessage;
-    if (Object.keys(set).length === 0)   return;
+    if (Object.keys(set).length === 0) return;
 
     await this.db
       .update(vgcLimitlessTournaments)
@@ -117,7 +123,9 @@ export class LimitlessRepository {
 
   // --- Teams ----------------------------------------------------------------
 
-  async findTeamsByTournament(tournamentId: number): Promise<VgcLimitlessTeam[]> {
+  async findTeamsByTournament(
+    tournamentId: number,
+  ): Promise<VgcLimitlessTeam[]> {
     return this.db
       .select()
       .from(vgcLimitlessTeams)
@@ -129,15 +137,15 @@ export class LimitlessRepository {
   ): Promise<Array<VgcLimitlessTeam & { parsedSlots: string | null }>> {
     const rows = await this.db
       .select({
-        id:           vgcLimitlessTeams.id,
+        id: vgcLimitlessTeams.id,
         tournamentId: vgcLimitlessTeams.tournamentId,
-        playerSlug:   vgcLimitlessTeams.playerSlug,
-        playerName:   vgcLimitlessTeams.playerName,
-        placing:      vgcLimitlessTeams.placing,
-        record:       vgcLimitlessTeams.record,
-        pasteId:      vgcLimitlessTeams.pasteId,
-        fetchedAt:    vgcLimitlessTeams.fetchedAt,
-        parsedSlots:  vgcPokepastes.parsedSlots,
+        playerSlug: vgcLimitlessTeams.playerSlug,
+        playerName: vgcLimitlessTeams.playerName,
+        placing: vgcLimitlessTeams.placing,
+        record: vgcLimitlessTeams.record,
+        pasteId: vgcLimitlessTeams.pasteId,
+        fetchedAt: vgcLimitlessTeams.fetchedAt,
+        parsedSlots: vgcPokepastes.parsedSlots,
       })
       .from(vgcLimitlessTeams)
       .leftJoin(vgcPokepastes, eq(vgcLimitlessTeams.pasteId, vgcPokepastes.id))
@@ -147,20 +155,26 @@ export class LimitlessRepository {
 
   async findTeamWithPaste(
     tournamentId: number,
-    playerSlug:   string,
-  ): Promise<(VgcLimitlessTeam & { parsedSlots: string | null; rawText: string | null }) | null> {
+    playerSlug: string,
+  ): Promise<
+    | (VgcLimitlessTeam & {
+        parsedSlots: string | null;
+        rawText: string | null;
+      })
+    | null
+  > {
     const [row] = await this.db
       .select({
-        id:           vgcLimitlessTeams.id,
+        id: vgcLimitlessTeams.id,
         tournamentId: vgcLimitlessTeams.tournamentId,
-        playerSlug:   vgcLimitlessTeams.playerSlug,
-        playerName:   vgcLimitlessTeams.playerName,
-        placing:      vgcLimitlessTeams.placing,
-        record:       vgcLimitlessTeams.record,
-        pasteId:      vgcLimitlessTeams.pasteId,
-        fetchedAt:    vgcLimitlessTeams.fetchedAt,
-        parsedSlots:  vgcPokepastes.parsedSlots,
-        rawText:      vgcPokepastes.rawText,
+        playerSlug: vgcLimitlessTeams.playerSlug,
+        playerName: vgcLimitlessTeams.playerName,
+        placing: vgcLimitlessTeams.placing,
+        record: vgcLimitlessTeams.record,
+        pasteId: vgcLimitlessTeams.pasteId,
+        fetchedAt: vgcLimitlessTeams.fetchedAt,
+        parsedSlots: vgcPokepastes.parsedSlots,
+        rawText: vgcPokepastes.rawText,
       })
       .from(vgcLimitlessTeams)
       .leftJoin(vgcPokepastes, eq(vgcLimitlessTeams.pasteId, vgcPokepastes.id))
@@ -171,25 +185,32 @@ export class LimitlessRepository {
         ),
       )
       .limit(1);
-    return (row as (VgcLimitlessTeam & { parsedSlots: string | null; rawText: string | null }) | undefined) ?? null;
+    return (
+      (row as
+        | (VgcLimitlessTeam & {
+            parsedSlots: string | null;
+            rawText: string | null;
+          })
+        | undefined) ?? null
+    );
   }
 
   async insertTeam(data: {
     tournamentId: number;
-    playerSlug:   string;
-    playerName?:  string | null;
-    placing?:     number | null;
-    record?:      string | null;
-    pasteId?:     number | null;
+    playerSlug: string;
+    playerName?: string | null;
+    placing?: number | null;
+    record?: string | null;
+    pasteId?: number | null;
   }): Promise<void> {
     await this.db.insert(vgcLimitlessTeams).values({
       tournamentId: data.tournamentId,
-      playerSlug:   data.playerSlug,
-      playerName:   data.playerName ?? null,
-      placing:      data.placing    ?? null,
-      record:       data.record     ?? null,
-      pasteId:      data.pasteId    ?? null,
-      fetchedAt:    new Date(),
+      playerSlug: data.playerSlug,
+      playerName: data.playerName ?? null,
+      placing: data.placing ?? null,
+      record: data.record ?? null,
+      pasteId: data.pasteId ?? null,
+      fetchedAt: new Date(),
     });
   }
 
@@ -210,26 +231,31 @@ export class LimitlessRepository {
    * Returns all Limitless teams with their parsed paste for a regulation.
    * Used to build the "teams featuring this Pokémon" panel — filtered in-app.
    */
-  async findTeamsByRegulationWithPastes(regulationId: string): Promise<Array<{
-    playerSlug:  string;
-    playerName:  string | null;
-    placing:     number | null;
-    record:      string | null;
-    parsedSlots: string;
-    rawText:     string;
-  }>> {
+  async findTeamsByRegulationWithPastes(regulationId: string): Promise<
+    Array<{
+      playerSlug: string;
+      playerName: string | null;
+      placing: number | null;
+      record: string | null;
+      parsedSlots: string;
+      rawText: string;
+    }>
+  > {
     const rows = await this.db
       .select({
-        playerSlug:  vgcLimitlessTeams.playerSlug,
-        playerName:  vgcLimitlessTeams.playerName,
-        placing:     vgcLimitlessTeams.placing,
-        record:      vgcLimitlessTeams.record,
+        playerSlug: vgcLimitlessTeams.playerSlug,
+        playerName: vgcLimitlessTeams.playerName,
+        placing: vgcLimitlessTeams.placing,
+        record: vgcLimitlessTeams.record,
         parsedSlots: vgcPokepastes.parsedSlots,
-        rawText:     vgcPokepastes.rawText,
+        rawText: vgcPokepastes.rawText,
       })
       .from(vgcLimitlessTeams)
       .innerJoin(vgcPokepastes, eq(vgcLimitlessTeams.pasteId, vgcPokepastes.id))
-      .innerJoin(vgcLimitlessTournaments, eq(vgcLimitlessTeams.tournamentId, vgcLimitlessTournaments.id))
+      .innerJoin(
+        vgcLimitlessTournaments,
+        eq(vgcLimitlessTeams.tournamentId, vgcLimitlessTournaments.id),
+      )
       .where(
         and(
           eq(vgcLimitlessTournaments.regulationId, regulationId),
@@ -237,12 +263,12 @@ export class LimitlessRepository {
         ),
       );
     return rows as Array<{
-      playerSlug:  string;
-      playerName:  string | null;
-      placing:     number | null;
-      record:      string | null;
+      playerSlug: string;
+      playerName: string | null;
+      placing: number | null;
+      record: string | null;
       parsedSlots: string;
-      rawText:     string;
+      rawText: string;
     }>;
   }
 }

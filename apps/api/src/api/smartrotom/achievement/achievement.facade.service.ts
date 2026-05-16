@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { AchievementsService } from './services/achievements.service';
 import { ReplaysService } from './services/replays.service';
-import { BattleAchievementService, BattleAchievementRequest } from './services/battle-achievement.service';
+import {
+  BattleAchievementService,
+  BattleAchievementRequest,
+} from './services/battle-achievement.service';
 import { BaseInsertResponse } from '@api/_utils/dto/base-responses.dto';
 import { UserAchievement } from './entities/achievement.entity';
 import { Replay } from './entities/replay.entity';
@@ -22,21 +25,35 @@ export class AchievementFacadeService {
     return this.achievementsService.getUserAchievements(uuid);
   }
 
-  async getUserAchievementById(uuid: string, achievementId: string): Promise<UserAchievement> {
+  async getUserAchievementById(
+    uuid: string,
+    achievementId: string,
+  ): Promise<UserAchievement> {
     return this.achievementsService.getUserAchievementById(uuid, achievementId);
   }
 
-  async checkUserHasAchievement(uuid: string, achievementId: string): Promise<{ completed: number | null; error?: string }> {
-    return this.achievementsService.checkUserHasAchievement(uuid, achievementId);
+  async checkUserHasAchievement(
+    uuid: string,
+    achievementId: string,
+  ): Promise<{ completed: number | null; error?: string }> {
+    return this.achievementsService.checkUserHasAchievement(
+      uuid,
+      achievementId,
+    );
   }
 
   // ==================== REPLAY MANAGEMENT ====================
 
-  async createReplay(replayData: CreateReplayFullDto): Promise<BaseInsertResponse> {
+  async createReplay(
+    replayData: CreateReplayFullDto,
+  ): Promise<BaseInsertResponse> {
     return this.replaysService.createReplay(replayData);
   }
 
-  async createUserReplay(uuid: string, replayId: number): Promise<BaseInsertResponse> {
+  async createUserReplay(
+    uuid: string,
+    replayId: number,
+  ): Promise<BaseInsertResponse> {
     return this.replaysService.createUserReplay(uuid, replayId);
   }
 
@@ -46,13 +63,18 @@ export class AchievementFacadeService {
 
   // ==================== BATTLE ACHIEVEMENT PROCESSING ====================
 
-  async processBattleAchievement(battleData: BattleAchievementRequest): Promise<{ success: boolean; message: string }> {
+  async processBattleAchievement(
+    battleData: BattleAchievementRequest,
+  ): Promise<{ success: boolean; message: string }> {
     return this.battleAchievementService.processBattleAchievement(battleData);
   }
 
   // ==================== LEGACY METHODS (for backwards compatibility) ====================
 
-  async unlockAchievement(uuid: string, logro: string): Promise<{ success: boolean; message: string }> {
+  async unlockAchievement(
+    uuid: string,
+    logro: string,
+  ): Promise<{ success: boolean; message: string }> {
     // Simple achievement unlock without battle data
     const achievementData: UserAchievementEntity = {
       uuid,
@@ -60,14 +82,17 @@ export class AchievementFacadeService {
       progress: 1,
       completed: 1,
       completedAt: new Date(),
-      dataId: null
+      dataId: null,
     };
 
     try {
       await this.achievementsService.createUserAchievement(achievementData);
       return { success: true, message: 'Achievement unlocked successfully' };
     } catch (error: any) {
-      return { success: false, message: error.message || 'Failed to unlock achievement' };
+      return {
+        success: false,
+        message: error.message || 'Failed to unlock achievement',
+      };
     }
   }
 }

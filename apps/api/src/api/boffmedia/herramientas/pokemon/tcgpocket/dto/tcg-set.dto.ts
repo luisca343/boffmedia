@@ -10,12 +10,20 @@ export class TcgSetDto {
   @IsString()
   name: string;
 
-  @ApiProperty({ description: 'Logo URL', example: 'https://assets.tcgdex.net/en/tcgp/A1/logo', required: false })
+  @ApiProperty({
+    description: 'Logo URL',
+    example: 'https://assets.tcgdex.net/en/tcgp/A1/logo',
+    required: false,
+  })
   @IsOptional()
   @IsUrl()
   logo?: string;
 
-  @ApiProperty({ description: 'Symbol URL', example: 'https://assets.tcgdex.net/univ/tcgp/A1/symbol', required: false })
+  @ApiProperty({
+    description: 'Symbol URL',
+    example: 'https://assets.tcgdex.net/univ/tcgp/A1/symbol',
+    required: false,
+  })
   @IsOptional()
   @IsUrl()
   symbol?: string;

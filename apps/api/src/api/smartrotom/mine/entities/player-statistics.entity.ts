@@ -1,49 +1,49 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class PlayerRankInfo {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Player rank position',
-    example: 5
+    example: 5,
   })
   rank: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Total value earned',
-    example: 5000
+    example: 5000,
   })
   totalValue: number;
 }
 
 export class PlayerStatistics {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Total number of games played',
-    example: 25
+    example: 25,
   })
   totalGames: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Total value earned across all games',
-    example: 5000
+    example: 5000,
   })
   totalValue: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Average value per game',
-    example: 200
+    example: 200,
   })
   averageValue: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Date of last game played',
     example: '2025-06-28T10:00:00Z',
-    nullable: true
+    nullable: true,
   })
   lastPlayed: Date | null;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Player ranking information',
     type: PlayerRankInfo,
-    nullable: true
+    nullable: true,
   })
   ranking: PlayerRankInfo | null;
 }

@@ -28,13 +28,19 @@ export class ConfigService extends NestConfigService {
     return path.join(this.publicPath, 'data', subdir, filename);
   }
 
-  async writeDataFile(subdir: string, filename: string, data: any): Promise<void> {
+  async writeDataFile(
+    subdir: string,
+    filename: string,
+    data: any,
+  ): Promise<void> {
     const filePath = this.getDataFilePath(subdir, filename);
     try {
       await fs.mkdir(path.dirname(filePath), { recursive: true });
       await fs.writeFile(filePath, JSON.stringify(data, null, 2));
     } catch (error: any) {
-      throw new Error(`Failed to write file ${filename} in ${subdir}: ${error.message}`);
+      throw new Error(
+        `Failed to write file ${filename} in ${subdir}: ${error.message}`,
+      );
     }
   }
 
@@ -47,19 +53,24 @@ export class ConfigService extends NestConfigService {
       if (error.code === 'ENOENT') {
         return null;
       }
-      throw new Error(`Failed to read file ${filename} in ${subdir}: ${error.message}`);
+      throw new Error(
+        `Failed to read file ${filename} in ${subdir}: ${error.message}`,
+      );
     }
   }
 
   private async waitForToken(): Promise<void> {
     const now = Date.now();
     const timeSinceLastRefill = now - this.lastRefill;
-    this.tokens = Math.min(this.maxTokens, this.tokens + timeSinceLastRefill * (this.maxTokens / this.refillRate));
+    this.tokens = Math.min(
+      this.maxTokens,
+      this.tokens + timeSinceLastRefill * (this.maxTokens / this.refillRate),
+    );
     this.lastRefill = now;
 
     if (this.tokens < 1) {
       const waitTime = (1 - this.tokens) * (this.refillRate / this.maxTokens);
-      await new Promise(resolve => setTimeout(resolve, waitTime));
+      await new Promise((resolve) => setTimeout(resolve, waitTime));
       return this.waitForToken();
     }
 
@@ -70,7 +81,9 @@ export class ConfigService extends NestConfigService {
     await this.waitForToken();
 
     try {
-      const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+      const response = await axios.get(imageUrl, {
+        responseType: 'arraybuffer',
+      });
       const buffer = Buffer.from(response.data, 'binary');
 
       const fullPath = path.join(this.publicPath, 'img', subPath);
@@ -85,7 +98,9 @@ export class ConfigService extends NestConfigService {
       this.logger.log(`Image saved: ${subPath}`);
       return `/img/${subPath}`;
     } catch (error: any) {
-      this.logger.error(`Failed to save image from URL ${imageUrl}: ${error.message}`);
+      this.logger.error(
+        `Failed to save image from URL ${imageUrl}: ${error.message}`,
+      );
       //throw new Error(`Failed to save image from URL ${imageUrl}: ${error.message}`);
     }
   }

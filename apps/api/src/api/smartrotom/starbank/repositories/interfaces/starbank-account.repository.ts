@@ -10,9 +10,15 @@ export interface CreateAccountData {
   image?: string;
 }
 
-export interface IStarbankAccountRepository extends BaseRepository<StarBankAccount, CreateAccountData, Partial<CreateAccountData>> {
+export interface IStarbankAccountRepository extends BaseRepository<
+  StarBankAccount,
+  CreateAccountData,
+  Partial<CreateAccountData>
+> {
   findByUuid(uuid: string): Promise<StarBankAccount[]>;
-  findUserMainAccount(uuid: string): Promise<{ id: number; balance: number } | null>;
+  findUserMainAccount(
+    uuid: string,
+  ): Promise<{ id: number; balance: number } | null>;
   findByType(type: AccountType): Promise<StarBankAccount[]>;
   updateBalance(accountId: number, newBalance: number): Promise<boolean>;
   getUserBalance(uuid: string): Promise<number>;

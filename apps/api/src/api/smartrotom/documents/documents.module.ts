@@ -7,7 +7,10 @@ import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 // Import repositories and tokens
 import { DocumentsRepository } from '@api/smartrotom/documents/repositories/documents.repository';
 import { NewsRepository } from '@api/smartrotom/documents/repositories/news.repository';
-import { DOCUMENTS_REPOSITORY_TOKEN, NEWS_REPOSITORY_TOKEN } from '@api/smartrotom/documents/repositories/interfaces/documents.repository.token';
+import {
+  DOCUMENTS_REPOSITORY_TOKEN,
+  NEWS_REPOSITORY_TOKEN,
+} from '@api/smartrotom/documents/repositories/interfaces/documents.repository.token';
 
 // Import domain services
 import { DocumentService } from './services/document.service';
@@ -33,11 +36,6 @@ import { DocumentsController } from './documents.controller';
     NewsService,
     DocumentsFacadeService,
   ],
-  exports: [
-    DocumentsFacadeService,
-    DocumentService,
-    NoteService,
-    NewsService,
-  ],
+  exports: [DocumentsFacadeService, DocumentService, NoteService, NewsService],
 })
 export class DocumentsModule {}

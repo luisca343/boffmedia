@@ -2,15 +2,15 @@ import { ApiProperty } from '@nestjs/swagger';
 import { CacheInfoEntity } from './cache-info.entity';
 
 export class ResourceResponseEntity<T> {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'The requested data',
-    type: [Object]
+    type: [Object],
   })
   data: T[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Cache information for this request',
-    type: CacheInfoEntity
+    type: CacheInfoEntity,
   })
   cacheInfo: CacheInfoEntity;
 }

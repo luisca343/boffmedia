@@ -1,43 +1,43 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CacheRefreshResponse {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Refresh success status',
-    example: true
+    example: true,
   })
   success: boolean;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Refresh timestamp',
-    example: '2025-06-29T10:00:00Z'
+    example: '2025-06-29T10:00:00Z',
   })
   timestamp: Date;
 }
 
 export class CacheStatusResponse {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Whether cache is active',
-    example: true
+    example: true,
   })
   cached: boolean;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Cache age in milliseconds',
     example: 3600000,
-    required: false
+    required: false,
   })
   age?: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Milliseconds until next refresh',
     example: 10800000,
-    required: false
+    required: false,
   })
   nextRefresh?: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Cache health status',
-    example: true
+    example: true,
   })
   healthy: boolean;
 }

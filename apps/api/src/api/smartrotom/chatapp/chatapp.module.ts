@@ -9,7 +9,12 @@ import { ChatMemberRepository } from './repositories/chat-member.repository';
 import { ChatMessageRepository } from './repositories/chat-message.repository';
 import { ChatUserRepository } from './repositories/chat-user.repository';
 // Import tokens
-import { CHAT_REPOSITORY_TOKEN, CHAT_MEMBER_REPOSITORY_TOKEN, CHAT_MESSAGE_REPOSITORY_TOKEN, CHAT_USER_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/chatapp.repository.token';
+import {
+  CHAT_REPOSITORY_TOKEN,
+  CHAT_MEMBER_REPOSITORY_TOKEN,
+  CHAT_MESSAGE_REPOSITORY_TOKEN,
+  CHAT_USER_REPOSITORY_TOKEN,
+} from '@api/_utils/repositories/interfaces/chatapp.repository.token';
 
 // Import domain services
 import { ChatService } from './services/chat.service';
@@ -31,7 +36,7 @@ import { WingullModule } from '../wingull/wingull.module';
     ResponseModule,
     LoggerModule,
     DrizzleModule,
-    WingullModule
+    WingullModule,
   ],
   controllers: [ChatappController],
   providers: [

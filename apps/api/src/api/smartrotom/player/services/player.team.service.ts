@@ -3,9 +3,7 @@ import { PlayerRepository } from '@api/smartrotom/player/repositories/player.rep
 
 @Injectable()
 export class PlayerTeamService {
-  constructor(
-    private readonly playerRepository: PlayerRepository,
-  ) {}
+  constructor(private readonly playerRepository: PlayerRepository) {}
 
   async getPlayerTeam(uuid: string): Promise<any> {
     if (!uuid || uuid.trim() === '') {

@@ -1,37 +1,37 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class PokemonImage {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Image URL',
-    example: '/smartrotom/img/sprites/Front/PIKACHU.png'
+    example: '/smartrotom/img/sprites/Front/PIKACHU.png',
   })
   url: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Image type',
     example: 'image',
-    enum: ['image', 'sprite']
+    enum: ['image', 'sprite'],
   })
   type: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Pokémon status (0=unseen, 1=seen, 2=caught)',
     example: 2,
-    enum: [0, 1, 2]
+    enum: [0, 1, 2],
   })
   status: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Whether to show the image',
-    example: true
+    example: true,
   })
   showImg: boolean;
 }
 
 export class ItemSprite {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Item sprite URL',
-    example: '\\smartrotom\\img\\sprites\\items\\POKEBALL.png'
+    example: '\\smartrotom\\img\\sprites\\items\\POKEBALL.png',
   })
   url: string;
 }

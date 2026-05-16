@@ -1,26 +1,26 @@
-import { 
-  Body, 
-  Controller, 
-  Get, 
-  Post, 
-  Query, 
-  Param, 
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  Param,
   Delete,
-  HttpStatus, 
+  HttpStatus,
   UseInterceptors,
   ValidationPipe,
-  UsePipes
+  UsePipes,
 } from '@nestjs/common';
-import { 
-  ApiTags, 
-  ApiOperation, 
-  ApiResponse, 
-  ApiParam, 
-  ApiQuery, 
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiQuery,
   ApiBody,
   ApiBadRequestResponse,
   ApiNotFoundResponse,
-  ApiInternalServerErrorResponse
+  ApiInternalServerErrorResponse,
 } from '@nestjs/swagger';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { MisionesFacadeService } from './misiones.facade.service';
@@ -36,8 +36,14 @@ import { CheckImageDto } from './dto/check-image.dto';
 import { QuestSystemData } from './entities/quest-system-data.entity';
 import { UserQuestData } from './entities/user-quest-data.entity';
 import { NPCUpdateResponse } from './entities/npc-update-response.entity';
-import { ImageUploadResponse, ImageExistsResponse } from './entities/image-response.entity';
-import { CacheRefreshResponse, CacheStatusResponse } from './entities/cache-response.entity';
+import {
+  ImageUploadResponse,
+  ImageExistsResponse,
+} from './entities/image-response.entity';
+import {
+  CacheRefreshResponse,
+  CacheStatusResponse,
+} from './entities/cache-response.entity';
 import { SystemHealthResponse } from './entities/system-health-response.entity';
 import { NPC } from './entities/npc.entity';
 
@@ -46,26 +52,24 @@ import { NPC } from './entities/npc.entity';
 @UseInterceptors(ResponseInterceptor)
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
 export class MisionesController {
-  constructor(
-    private readonly misionesFacadeService: MisionesFacadeService,
-  ) {}
+  constructor(private readonly misionesFacadeService: MisionesFacadeService) {}
 
   // ==================== QUEST ENDPOINTS ====================
 
   @Get()
   @ApiOperation({ summary: 'Get all quests from the system' })
-  @ApiResponse({ 
-    status: HttpStatus.OK, 
+  @ApiResponse({
+    status: HttpStatus.OK,
     description: 'Quests retrieved successfully.',
-    type: QuestSystemData
+    type: QuestSystemData,
   })
   @ApiInternalServerErrorResponse({ description: 'Failed to retrieve quests.' })
-  @ApiQuery({ 
-    name: 'force', 
-    description: 'Force refresh cache (1 = force, 0 = use cache)', 
+  @ApiQuery({
+    name: 'force',
+    description: 'Force refresh cache (1 = force, 0 = use cache)',
     required: false,
     type: Number,
-    enum: [0, 1]
+    enum: [0, 1],
   })
   async getAllQuests(@Query() query: GetQuestsDto) {
     return await this.misionesFacadeService.getAllQuests(query.force);
@@ -73,24 +77,28 @@ export class MisionesController {
 
   @Post('user')
   @ApiOperation({ summary: 'Get quests for specific user with progress' })
-  @ApiResponse({ 
-    status: HttpStatus.OK, 
+  @ApiResponse({
+    status: HttpStatus.OK,
     description: 'User quests retrieved successfully.',
-    type: UserQuestData
+    type: UserQuestData,
   })
   @ApiBadRequestResponse({ description: 'Invalid user UUID.' })
-  @ApiInternalServerErrorResponse({ description: 'Failed to retrieve user quests.' })
+  @ApiInternalServerErrorResponse({
+    description: 'Failed to retrieve user quests.',
+  })
   @ApiBody({ type: GetUserQuestsDto })
   async getQuestsForUser(@Body() getUserQuestsDto: GetUserQuestsDto) {
-    return await this.misionesFacadeService.getQuestsForUser(getUserQuestsDto.uuid);
+    return await this.misionesFacadeService.getQuestsForUser(
+      getUserQuestsDto.uuid,
+    );
   }
 
   @Post('cache/refresh')
   @ApiOperation({ summary: 'Force refresh quest cache from external API' })
-  @ApiResponse({ 
-    status: HttpStatus.OK, 
+  @ApiResponse({
+    status: HttpStatus.OK,
     description: 'Cache refreshed successfully.',
-    type: CacheRefreshResponse
+    type: CacheRefreshResponse,
   })
   @ApiInternalServerErrorResponse({ description: 'Failed to refresh cache.' })
   async refreshCache() {
@@ -99,10 +107,10 @@ export class MisionesController {
 
   @Get('cache/status')
   @ApiOperation({ summary: 'Get quest cache status and health' })
-  @ApiResponse({ 
-    status: HttpStatus.OK, 
+  @ApiResponse({
+    status: HttpStatus.OK,
     description: 'Cache status retrieved successfully.',
-    type: CacheStatusResponse
+    type: CacheStatusResponse,
   })
   async getCacheStatus() {
     return await this.misionesFacadeService.getCacheStatus();
@@ -112,10 +120,10 @@ export class MisionesController {
 
   @Post('npcs')
   @ApiOperation({ summary: 'Update NPCs data in the system' })
-  @ApiResponse({ 
-    status: HttpStatus.OK, 
+  @ApiResponse({
+    status: HttpStatus.OK,
     description: 'NPCs updated successfully.',
-    type: NPCUpdateResponse
+    type: NPCUpdateResponse,
   })
   @ApiBadRequestResponse({ description: 'Invalid NPC data.' })
   @ApiInternalServerErrorResponse({ description: 'Failed to update NPCs.' })
@@ -126,10 +134,10 @@ export class MisionesController {
 
   @Get('npcs')
   @ApiOperation({ summary: 'Get all NPCs from the system' })
-  @ApiResponse({ 
-    status: HttpStatus.OK, 
+  @ApiResponse({
+    status: HttpStatus.OK,
     description: 'NPCs retrieved successfully.',
-    type: [NPC]
+    type: [NPC],
   })
   async getAllNPCs() {
     return await this.misionesFacadeService.getAllNPCs();
@@ -137,10 +145,10 @@ export class MisionesController {
 
   @Get('npcs/:id')
   @ApiOperation({ summary: 'Get specific NPC by ID' })
-  @ApiResponse({ 
-    status: HttpStatus.OK, 
+  @ApiResponse({
+    status: HttpStatus.OK,
     description: 'NPC retrieved successfully.',
-    type: NPC
+    type: NPC,
   })
   @ApiNotFoundResponse({ description: 'NPC not found.' })
   @ApiBadRequestResponse({ description: 'Invalid NPC ID.' })
@@ -148,20 +156,20 @@ export class MisionesController {
   async getNPCById(@Param('id') id: string) {
     const npcId = parseInt(id, 10);
     const npc = await this.misionesFacadeService.getNPCById(npcId);
-    
+
     if (!npc) {
       throw new Error('NPC not found');
     }
-    
+
     return npc;
   }
 
   @Get('npcs/quest/:questId')
   @ApiOperation({ summary: 'Get all NPCs associated with a quest' })
-  @ApiResponse({ 
-    status: HttpStatus.OK, 
+  @ApiResponse({
+    status: HttpStatus.OK,
     description: 'Quest NPCs retrieved successfully.',
-    type: [NPC]
+    type: [NPC],
   })
   @ApiBadRequestResponse({ description: 'Invalid Quest ID.' })
   @ApiParam({ name: 'questId', description: 'Quest ID', type: Number })
@@ -174,10 +182,10 @@ export class MisionesController {
 
   @Post('images/upload')
   @ApiOperation({ summary: 'Upload custom NPC image' })
-  @ApiResponse({ 
-    status: HttpStatus.OK, 
+  @ApiResponse({
+    status: HttpStatus.OK,
     description: 'Image uploaded successfully.',
-    type: ImageUploadResponse
+    type: ImageUploadResponse,
   })
   @ApiBadRequestResponse({ description: 'Invalid image data or format.' })
   @ApiInternalServerErrorResponse({ description: 'Failed to upload image.' })
@@ -188,10 +196,10 @@ export class MisionesController {
 
   @Get('images/render/:npcName')
   @ApiOperation({ summary: 'Check if custom NPC render exists' })
-  @ApiResponse({ 
-    status: HttpStatus.OK, 
+  @ApiResponse({
+    status: HttpStatus.OK,
     description: 'Render status retrieved successfully.',
-    type: ImageExistsResponse
+    type: ImageExistsResponse,
   })
   @ApiNotFoundResponse({ description: 'Render image not found.' })
   @ApiBadRequestResponse({ description: 'Invalid NPC name.' })
@@ -202,10 +210,10 @@ export class MisionesController {
 
   @Get('images/:npcName')
   @ApiOperation({ summary: 'Check if custom NPC image exists' })
-  @ApiResponse({ 
-    status: HttpStatus.OK, 
+  @ApiResponse({
+    status: HttpStatus.OK,
     description: 'Image status retrieved successfully.',
-    type: ImageExistsResponse
+    type: ImageExistsResponse,
   })
   @ApiNotFoundResponse({ description: 'Image not found.' })
   @ApiBadRequestResponse({ description: 'Invalid NPC name.' })
@@ -218,15 +226,15 @@ export class MisionesController {
 
   @Get('validate/user/:uuid')
   @ApiOperation({ summary: 'Validate if user exists in quest system' })
-  @ApiResponse({ 
-    status: HttpStatus.OK, 
+  @ApiResponse({
+    status: HttpStatus.OK,
     description: 'User validation result.',
     schema: {
       type: 'object',
       properties: {
-        exists: { type: 'boolean', example: true }
-      }
-    }
+        exists: { type: 'boolean', example: true },
+      },
+    },
   })
   @ApiParam({ name: 'uuid', description: 'User UUID' })
   async validateUser(@Param('uuid') uuid: string) {
@@ -238,10 +246,10 @@ export class MisionesController {
 
   @Get('health')
   @ApiOperation({ summary: 'Get comprehensive system health status' })
-  @ApiResponse({ 
-    status: HttpStatus.OK, 
+  @ApiResponse({
+    status: HttpStatus.OK,
     description: 'Health status retrieved successfully.',
-    type: SystemHealthResponse
+    type: SystemHealthResponse,
   })
   async getHealth() {
     return await this.misionesFacadeService.getSystemHealth();

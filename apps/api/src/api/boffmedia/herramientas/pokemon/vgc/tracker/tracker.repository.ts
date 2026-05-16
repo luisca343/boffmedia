@@ -26,12 +26,16 @@ export class TrackerRepository {
 
   async findPresets(userId?: number): Promise<VgcTeamPreset[]> {
     const query = this.db.select().from(vgcTeamPresets);
-    if (userId !== undefined) return query.where(eq(vgcTeamPresets.userId, userId));
+    if (userId !== undefined)
+      return query.where(eq(vgcTeamPresets.userId, userId));
     return query;
   }
 
   async findPreset(id: string): Promise<VgcTeamPreset | undefined> {
-    const [row] = await this.db.select().from(vgcTeamPresets).where(eq(vgcTeamPresets.id, id));
+    const [row] = await this.db
+      .select()
+      .from(vgcTeamPresets)
+      .where(eq(vgcTeamPresets.id, id));
     return row;
   }
 
@@ -60,48 +64,61 @@ export class TrackerRepository {
       updatedAt: data.updatedAt,
     };
 
-    await this.db.insert(vgcTeamPresets).values(row).onDuplicateKeyUpdate({
-      set: {
-        name: data.name,
-        regulationId: data.regulationId,
-        exportString: data.exportString,
-        slots: JSON.stringify(data.slots),
-        currentVersion: data.currentVersion ?? 1,
-        versions: JSON.stringify(data.versions ?? []),
-        updatedAt: data.updatedAt,
-      },
-    });
+    await this.db
+      .insert(vgcTeamPresets)
+      .values(row)
+      .onDuplicateKeyUpdate({
+        set: {
+          name: data.name,
+          regulationId: data.regulationId,
+          exportString: data.exportString,
+          slots: JSON.stringify(data.slots),
+          currentVersion: data.currentVersion ?? 1,
+          versions: JSON.stringify(data.versions ?? []),
+          updatedAt: data.updatedAt,
+        },
+      });
   }
 
   async deletePreset(id: string, userId: number): Promise<void> {
-    await this.db.delete(vgcTeamPresets).where(and(
-      eq(vgcTeamPresets.id, id),
-      eq(vgcTeamPresets.userId, userId),
-    ));
+    await this.db
+      .delete(vgcTeamPresets)
+      .where(and(eq(vgcTeamPresets.id, id), eq(vgcTeamPresets.userId, userId)));
   }
 
   // ─── Sessions ────────────────────────────────────────────────────────────────
 
   async findSessions(userId?: number): Promise<VgcSession[]> {
-    const query = this.db.select().from(vgcSessions).orderBy(desc(vgcSessions.startedAt));
-    if (userId !== undefined) return query.where(eq(vgcSessions.userId, userId));
+    const query = this.db
+      .select()
+      .from(vgcSessions)
+      .orderBy(desc(vgcSessions.startedAt));
+    if (userId !== undefined)
+      return query.where(eq(vgcSessions.userId, userId));
     return query;
   }
 
   async findSession(id: string): Promise<VgcSession | undefined> {
-    const [row] = await this.db.select().from(vgcSessions).where(eq(vgcSessions.id, id));
+    const [row] = await this.db
+      .select()
+      .from(vgcSessions)
+      .where(eq(vgcSessions.id, id));
     return row;
   }
 
-  async upsertSession(data: Partial<VgcSession> & { id: string }): Promise<void> {
-    await this.db.insert(vgcSessions).values(data as any).onDuplicateKeyUpdate({ set: data as any });
+  async upsertSession(
+    data: Partial<VgcSession> & { id: string },
+  ): Promise<void> {
+    await this.db
+      .insert(vgcSessions)
+      .values(data as any)
+      .onDuplicateKeyUpdate({ set: data as any });
   }
 
   async deleteSession(id: string, userId: number): Promise<void> {
-    await this.db.delete(vgcSessions).where(and(
-      eq(vgcSessions.id, id),
-      eq(vgcSessions.userId, userId),
-    ));
+    await this.db
+      .delete(vgcSessions)
+      .where(and(eq(vgcSessions.id, id), eq(vgcSessions.userId, userId)));
   }
 
   // ─── Matches ─────────────────────────────────────────────────────────────────
@@ -115,7 +132,10 @@ export class TrackerRepository {
   }
 
   async findMatch(id: string): Promise<VgcMatch | undefined> {
-    const [row] = await this.db.select().from(vgcMatches).where(eq(vgcMatches.id, id));
+    const [row] = await this.db
+      .select()
+      .from(vgcMatches)
+      .where(eq(vgcMatches.id, id));
     return row;
   }
 
@@ -143,14 +163,16 @@ export class TrackerRepository {
       opponentTeam: JSON.stringify(data.opponentTeam),
       notes: JSON.stringify(data.notes),
     };
-    await this.db.insert(vgcMatches).values(row as any).onDuplicateKeyUpdate({ set: row as any });
+    await this.db
+      .insert(vgcMatches)
+      .values(row as any)
+      .onDuplicateKeyUpdate({ set: row as any });
   }
 
   async deleteMatch(id: string, userId: number): Promise<void> {
-    await this.db.delete(vgcMatches).where(and(
-      eq(vgcMatches.id, id),
-      eq(vgcMatches.userId, userId),
-    ));
+    await this.db
+      .delete(vgcMatches)
+      .where(and(eq(vgcMatches.id, id), eq(vgcMatches.userId, userId)));
   }
 
   // ─── Series ──────────────────────────────────────────────────────────────────
@@ -164,7 +186,10 @@ export class TrackerRepository {
   }
 
   async findSeries(id: string): Promise<VgcSeries | undefined> {
-    const [row] = await this.db.select().from(vgcSeries).where(eq(vgcSeries.id, id));
+    const [row] = await this.db
+      .select()
+      .from(vgcSeries)
+      .where(eq(vgcSeries.id, id));
     return row;
   }
 
@@ -190,14 +215,16 @@ export class TrackerRepository {
       games: JSON.stringify(data.games),
       notes: JSON.stringify(data.notes),
     };
-    await this.db.insert(vgcSeries).values(row as any).onDuplicateKeyUpdate({ set: row as any });
+    await this.db
+      .insert(vgcSeries)
+      .values(row as any)
+      .onDuplicateKeyUpdate({ set: row as any });
   }
 
   async deleteSeries(id: string, userId: number): Promise<void> {
-    await this.db.delete(vgcSeries).where(and(
-      eq(vgcSeries.id, id),
-      eq(vgcSeries.userId, userId),
-    ));
+    await this.db
+      .delete(vgcSeries)
+      .where(and(eq(vgcSeries.id, id), eq(vgcSeries.userId, userId)));
   }
 
   // ─── Sync ─────────────────────────────────────────────────────────────────────
@@ -209,10 +236,26 @@ export class TrackerRepository {
     presets: VgcTeamPreset[];
   }> {
     const [sessions, matches, seriesList, presets] = await Promise.all([
-      this.db.select().from(vgcSessions).where(eq(vgcSessions.userId, userId)).orderBy(desc(vgcSessions.startedAt)),
-      this.db.select().from(vgcMatches).where(eq(vgcMatches.userId, userId)).orderBy(desc(vgcMatches.createdAt)),
-      this.db.select().from(vgcSeries).where(eq(vgcSeries.userId, userId)).orderBy(desc(vgcSeries.createdAt)),
-      this.db.select().from(vgcTeamPresets).where(eq(vgcTeamPresets.userId, userId)).orderBy(desc(vgcTeamPresets.createdAt)),
+      this.db
+        .select()
+        .from(vgcSessions)
+        .where(eq(vgcSessions.userId, userId))
+        .orderBy(desc(vgcSessions.startedAt)),
+      this.db
+        .select()
+        .from(vgcMatches)
+        .where(eq(vgcMatches.userId, userId))
+        .orderBy(desc(vgcMatches.createdAt)),
+      this.db
+        .select()
+        .from(vgcSeries)
+        .where(eq(vgcSeries.userId, userId))
+        .orderBy(desc(vgcSeries.createdAt)),
+      this.db
+        .select()
+        .from(vgcTeamPresets)
+        .where(eq(vgcTeamPresets.userId, userId))
+        .orderBy(desc(vgcTeamPresets.createdAt)),
     ]);
     return { sessions, matches, series: seriesList, presets };
   }

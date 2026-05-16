@@ -21,22 +21,29 @@ export class StarbankFacadeService {
 
   // ==================== ACCOUNT OPERATIONS ====================
 
-  async createAccount(uuid: string, name: string, image?: string): Promise<StarBankAccount> {
+  async createAccount(
+    uuid: string,
+    name: string,
+    image?: string,
+  ): Promise<StarBankAccount> {
     if (!name || name.length === 0) {
       return await this.createMainAccount(uuid, name);
     }
-    
+
     const createAccountDto: CreateAccountDto = {
       uuid,
       name,
       type: AccountType.SECONDARY,
-      image
+      image,
     };
-    
+
     return await this.accountService.createAccount(createAccountDto);
   }
 
-  async createMainAccount(uuid: string, username: string): Promise<StarBankAccount> {
+  async createMainAccount(
+    uuid: string,
+    username: string,
+  ): Promise<StarBankAccount> {
     return await this.accountService.createMainAccount(uuid, username);
   }
 
@@ -48,7 +55,9 @@ export class StarbankFacadeService {
     return await this.accountService.getUserAccounts(uuid);
   }
 
-  async getMainAccount(uuid: string): Promise<{ id: number; balance: number } | null> {
+  async getMainAccount(
+    uuid: string,
+  ): Promise<{ id: number; balance: number } | null> {
     return await this.accountService.getUserMainAccount(uuid);
   }
 
@@ -62,12 +71,17 @@ export class StarbankFacadeService {
 
   // ==================== TRANSACTION OPERATIONS ====================
 
-  async transfer(from: number, to: number, amount: number, concept: string): Promise<void> {
+  async transfer(
+    from: number,
+    to: number,
+    amount: number,
+    concept: string,
+  ): Promise<void> {
     const transferDto: CreateTransferDto = {
       from,
       to,
       amount,
-      concept
+      concept,
     };
 
     await this.transactionService.transfer(transferDto);
@@ -77,28 +91,38 @@ export class StarbankFacadeService {
       const fromAccount = await this.getAccountInfo(from);
       const toAccount = await this.getAccountInfo(to);
 
-      const accounts = [fromAccount, toAccount].filter(acc => acc && acc.type === AccountType.MAIN);
+      const accounts = [fromAccount, toAccount].filter(
+        (acc) => acc && acc.type === AccountType.MAIN,
+      );
 
       for (const account of accounts) {
         if (account && account.uuid) {
           await this.updateBalance({
             balance: account.balance,
             type: account.type,
-            uuid: account.uuid
+            uuid: account.uuid,
           });
         }
       }
     } catch (error: any) {
-      console.warn('Failed to update balance in game after transfer, continuing anyway:', error.message);
+      console.warn(
+        'Failed to update balance in game after transfer, continuing anyway:',
+        error.message,
+      );
     }
   }
 
-  async transferFromMain(uuid: string, to: number, amount: number, concept: string): Promise<void> {
+  async transferFromMain(
+    uuid: string,
+    to: number,
+    amount: number,
+    concept: string,
+  ): Promise<void> {
     const transferDto: TransferFromMainDto = {
       uuid,
       to,
       amount,
-      concept
+      concept,
     };
 
     await this.transactionService.transferFromMain(transferDto);
@@ -110,16 +134,27 @@ export class StarbankFacadeService {
         await this.updateBalance({
           balance: mainAccount.balance,
           type: AccountType.MAIN,
-          uuid
+          uuid,
         });
       }
     } catch (error: any) {
-      console.warn(`Failed to update balance in game for user ${uuid}, continuing anyway:`, error.message);
+      console.warn(
+        `Failed to update balance in game for user ${uuid}, continuing anyway:`,
+        error.message,
+      );
     }
   }
 
-  async transferFromSystem(accountId: number, amount: number, concept: string): Promise<void> {
-    await this.transactionService.transferFromSystem(accountId, amount, concept);
+  async transferFromSystem(
+    accountId: number,
+    amount: number,
+    concept: string,
+  ): Promise<void> {
+    await this.transactionService.transferFromSystem(
+      accountId,
+      amount,
+      concept,
+    );
 
     // Update balance in game after successful transfer (non-blocking)
     try {
@@ -128,11 +163,14 @@ export class StarbankFacadeService {
         await this.updateBalance({
           balance: account.balance,
           type: account.type,
-          uuid: account.uuid
+          uuid: account.uuid,
         });
       }
     } catch (error: any) {
-      console.warn(`Failed to update balance in game for account ${accountId}, continuing anyway:`, error.message);
+      console.warn(
+        `Failed to update balance in game for account ${accountId}, continuing anyway:`,
+        error.message,
+      );
     }
   }
 
@@ -146,32 +184,45 @@ export class StarbankFacadeService {
         await this.updateBalance({
           balance: mainAccount.balance,
           type: AccountType.MAIN,
-          uuid: shopData.uuid
+          uuid: shopData.uuid,
         });
       }
     } catch (error: any) {
-      console.warn(`Failed to update balance in game after shop transaction for user ${shopData.uuid}, continuing anyway:`, error.message);
+      console.warn(
+        `Failed to update balance in game after shop transaction for user ${shopData.uuid}, continuing anyway:`,
+        error.message,
+      );
     }
   }
 
   async trainerDefeat(amount: number, uuid: string): Promise<void> {
     const trainerDto: TrainerDefeatMoneyDto = {
       uuid,
-      money: amount
+      money: amount,
     };
 
-    const currentGameBalance = await this.wingullFacadeService.getCurrentBalance(uuid, amount);
-    
-    await this.transactionService.processTrainerDefeat(trainerDto, currentGameBalance);
+    const currentGameBalance =
+      await this.wingullFacadeService.getCurrentBalance(uuid, amount);
+
+    await this.transactionService.processTrainerDefeat(
+      trainerDto,
+      currentGameBalance,
+    );
   }
 
   // ==================== TRANSACTION HISTORY ====================
 
-  async getTransactions(account: number, limit: number = 50): Promise<StarBankTransaction[]> {
+  async getTransactions(
+    account: number,
+    limit: number = 50,
+  ): Promise<StarBankTransaction[]> {
     return await this.transactionService.getAccountTransactions(account, limit);
   }
 
-  async getTransactionsByUUID(uuid: string, limit: number = 50): Promise<StarBankTransaction[]> {
+  async getTransactionsByUUID(
+    uuid: string,
+    limit: number = 50,
+  ): Promise<StarBankTransaction[]> {
     return await this.transactionService.getUserTransactions(uuid, limit);
   }
 
@@ -185,7 +236,11 @@ export class StarbankFacadeService {
 
   // ==================== BALANCE MANAGEMENT ====================
 
-  private async updateBalance(account: { balance: number; type: AccountType | string; uuid: string }): Promise<void> {
+  private async updateBalance(account: {
+    balance: number;
+    type: AccountType | string;
+    uuid: string;
+  }): Promise<void> {
     try {
       await this.wingullFacadeService.updateBalance(account);
     } catch (error: any) {

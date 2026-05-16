@@ -2,20 +2,23 @@ import { MySql2Database } from 'drizzle-orm/mysql2';
 import { eq } from 'drizzle-orm';
 import { BaseRepository } from './base-repository.interface';
 
-export abstract class BaseRepositoryImpl<T, CreateDto, UpdateDto> 
-  implements BaseRepository<T, CreateDto, UpdateDto> {
-  
+export abstract class BaseRepositoryImpl<
+  T,
+  CreateDto,
+  UpdateDto,
+> implements BaseRepository<T, CreateDto, UpdateDto> {
   constructor(
     protected readonly db: MySql2Database<Record<string, never>>,
     protected readonly table: any,
   ) {}
 
   async findAll(): Promise<T[]> {
-    return await this.db.select().from(this.table) as T[];
+    return (await this.db.select().from(this.table)) as T[];
   }
 
   async findById(id: number): Promise<T | null> {
-    const result = await this.db.select()
+    const result = await this.db
+      .select()
       .from(this.table)
       .where(eq(this.table.id, id));
     return (result[0] as T) || null;

@@ -12,7 +12,9 @@ export class StarbankAccountService {
     private readonly accountRepository: IStarbankAccountRepository,
   ) {}
 
-  async createAccount(createAccountDto: CreateAccountDto): Promise<StarBankAccount> {
+  async createAccount(
+    createAccountDto: CreateAccountDto,
+  ): Promise<StarBankAccount> {
     // Validate inputs
     if (!createAccountDto.uuid || createAccountDto.uuid.trim() === '') {
       throw new Error('UUID is required');
@@ -23,7 +25,9 @@ export class StarbankAccountService {
 
     // For main accounts, check if user already has one
     if (createAccountDto.type === AccountType.MAIN) {
-      const existingMain = await this.accountRepository.findUserMainAccount(createAccountDto.uuid);
+      const existingMain = await this.accountRepository.findUserMainAccount(
+        createAccountDto.uuid,
+      );
       if (existingMain) {
         throw new Error('User already has a main account');
       }
@@ -34,7 +38,7 @@ export class StarbankAccountService {
       name: createAccountDto.name,
       type: createAccountDto.type || AccountType.SECONDARY,
       initialBalance: createAccountDto.initialBalance || 0,
-      image: createAccountDto.image
+      image: createAccountDto.image,
     };
 
     console.log('Creating account with data:', accountData);
@@ -42,7 +46,10 @@ export class StarbankAccountService {
     return await this.accountRepository.create(accountData);
   }
 
-  async createMainAccount(uuid: string, username: string): Promise<StarBankAccount> {
+  async createMainAccount(
+    uuid: string,
+    username: string,
+  ): Promise<StarBankAccount> {
     // Check if main account already exists
     const existingMain = await this.accountRepository.findUserMainAccount(uuid);
     if (existingMain) {
@@ -53,7 +60,7 @@ export class StarbankAccountService {
       uuid,
       name: username,
       type: AccountType.MAIN,
-      initialBalance: 0
+      initialBalance: 0,
     };
 
     return await this.createAccount(createAccountDto);
@@ -67,7 +74,9 @@ export class StarbankAccountService {
     return await this.accountRepository.findByUuid(uuid);
   }
 
-  async getUserMainAccount(uuid: string): Promise<{ id: number; balance: number } | null> {
+  async getUserMainAccount(
+    uuid: string,
+  ): Promise<{ id: number; balance: number } | null> {
     return await this.accountRepository.findUserMainAccount(uuid);
   }
 
@@ -98,7 +107,10 @@ export class StarbankAccountService {
     }
   }
 
-  async updateAccountBalance(accountId: number, newBalance: number): Promise<boolean> {
+  async updateAccountBalance(
+    accountId: number,
+    newBalance: number,
+  ): Promise<boolean> {
     return await this.accountRepository.updateBalance(accountId, newBalance);
   }
 }

@@ -34,35 +34,42 @@ export interface WeaponTreeNode {
 
 @Injectable()
 export class MhwildsRepository implements IMhwildsRepository {
-  
   private readonly API_BASE_URL = 'https://wilds.mhdb.io';
   private readonly CACHE_DURATION_MS = 86400000; // 1 day in milliseconds
-  
+
   constructor(
-    @Inject(DRIZZLE) private readonly db: MySql2Database<Record<string, never>>
+    @Inject(DRIZZLE) private readonly db: MySql2Database<Record<string, never>>,
   ) {}
   // ==================== CACHE MANAGEMENT ====================
 
-  async getCacheMetadata(resourceType: string, locale: string): Promise<CacheMetadata> {
+  async getCacheMetadata(
+    resourceType: string,
+    locale: string,
+  ): Promise<CacheMetadata> {
     try {
-      const filePath = path.join(process.cwd(), `public/data/mhwilds/${locale}/${resourceType}.json`);
-      
+      const filePath = path.join(
+        process.cwd(),
+        `public/data/mhwilds/${locale}/${resourceType}.json`,
+      );
+
       try {
         const stats = await fs.stat(filePath);
         return {
           filePath,
           lastModified: stats.mtime,
-          exists: true
+          exists: true,
         };
       } catch {
         return {
           filePath,
           lastModified: new Date(0),
-          exists: false
+          exists: false,
         };
       }
     } catch (error: any) {
-      throw new Error(`Failed to get cache metadata for ${resourceType}: ${error.message}`);
+      throw new Error(
+        `Failed to get cache metadata for ${resourceType}: ${error.message}`,
+      );
     }
   }
 
@@ -89,7 +96,9 @@ export class MhwildsRepository implements IMhwildsRepository {
       const fileContent = await fs.readFile(filePath, 'utf8');
       return JSON.parse(fileContent);
     } catch (error: any) {
-      throw new Error(`Failed to read cached data from ${filePath}: ${error.message}`);
+      throw new Error(
+        `Failed to read cached data from ${filePath}: ${error.message}`,
+      );
     }
   }
 
@@ -111,14 +120,16 @@ export class MhwildsRepository implements IMhwildsRepository {
       const response = await axios.get(apiUrl, {
         timeout: 30000,
         headers: {
-          'User-Agent': 'BoffMedia-MHWilds-Tool/1.0'
-        }
+          'User-Agent': 'BoffMedia-MHWilds-Tool/1.0',
+        },
       });
-      
+
       return response.data;
     } catch (error: any) {
       if (error.response) {
-        throw new Error(`API request failed: ${error.response.status} - ${error.response.statusText}`);
+        throw new Error(
+          `API request failed: ${error.response.status} - ${error.response.statusText}`,
+        );
       } else if (error.request) {
         throw new Error(`Network error: Unable to reach the API`);
       } else {
@@ -129,7 +140,10 @@ export class MhwildsRepository implements IMhwildsRepository {
 
   // ==================== GENERIC RESOURCE OPERATIONS ====================
 
-  async getResourceData(resourceType: string, locale: string): Promise<ResourceFetchResult> {
+  async getResourceData(
+    resourceType: string,
+    locale: string,
+  ): Promise<ResourceFetchResult> {
     try {
       const cacheMetadata = await this.getCacheMetadata(resourceType, locale);
       const isCacheValid = await this.isCacheValid(cacheMetadata);
@@ -139,18 +153,18 @@ export class MhwildsRepository implements IMhwildsRepository {
         return {
           data: cachedData,
           fromCache: true,
-          fetchTime: cacheMetadata.lastModified
+          fetchTime: cacheMetadata.lastModified,
         };
       }
 
       // Cache is invalid or doesn't exist, fetch from remote
       const remoteData = await this.fetchRemoteData(resourceType, locale);
       await this.saveCachedData(cacheMetadata.filePath, remoteData);
-      
+
       return {
         data: remoteData,
         fromCache: false,
-        fetchTime: new Date()
+        fetchTime: new Date(),
       };
     } catch (error: any) {
       // Try to fallback to cached data if remote fetch fails
@@ -161,7 +175,7 @@ export class MhwildsRepository implements IMhwildsRepository {
           return {
             data: cachedData,
             fromCache: true,
-            fetchTime: cacheMetadata.lastModified
+            fetchTime: cacheMetadata.lastModified,
           };
         }
       } catch (fallbackError) {
@@ -196,24 +210,42 @@ export class MhwildsRepository implements IMhwildsRepository {
 
   // ==================== PROCESSED DATA OPERATIONS ====================
 
-  async saveProcessedData(filename: string, locale: string, data: any): Promise<void> {
+  async saveProcessedData(
+    filename: string,
+    locale: string,
+    data: any,
+  ): Promise<void> {
     try {
-      const filePath = path.join(process.cwd(), `public/data/mhwilds/${locale}/${filename}`);
+      const filePath = path.join(
+        process.cwd(),
+        `public/data/mhwilds/${locale}/${filename}`,
+      );
       await this.saveCachedData(filePath, data);
     } catch (error: any) {
-      throw new Error(`Failed to save processed data to ${filename}: ${error.message}`);
+      throw new Error(
+        `Failed to save processed data to ${filename}: ${error.message}`,
+      );
     }
   }
 
-  async getProcessedData(filename: string, locale: string): Promise<any | null> {
+  async getProcessedData(
+    filename: string,
+    locale: string,
+  ): Promise<any | null> {
     try {
-      const filePath = path.join(process.cwd(), `public/data/mhwilds/${locale}/${filename}`);
-      const cacheMetadata = await this.getCacheMetadata(filename.replace('.json', ''), locale);
-      
+      const filePath = path.join(
+        process.cwd(),
+        `public/data/mhwilds/${locale}/${filename}`,
+      );
+      const cacheMetadata = await this.getCacheMetadata(
+        filename.replace('.json', ''),
+        locale,
+      );
+
       if (cacheMetadata.exists) {
         return await this.readCachedData(filePath);
       }
-      
+
       return null;
     } catch (error: any) {
       return null;
@@ -222,10 +254,13 @@ export class MhwildsRepository implements IMhwildsRepository {
 
   // ==================== CACHE MANAGEMENT OPERATIONS ====================
 
-  async clearCache(resourceType?: string, locale?: string): Promise<{ success: boolean; message: string }> {
+  async clearCache(
+    resourceType?: string,
+    locale?: string,
+  ): Promise<{ success: boolean; message: string }> {
     try {
       const basePath = path.join(process.cwd(), 'public/data/mhwilds');
-      
+
       if (resourceType && locale) {
         // Clear specific resource for specific locale
         const filePath = path.join(basePath, locale, `${resourceType}.json`);
@@ -233,12 +268,12 @@ export class MhwildsRepository implements IMhwildsRepository {
           await fs.unlink(filePath);
           return {
             success: true,
-            message: `Cleared cache for ${resourceType} in ${locale}`
+            message: `Cleared cache for ${resourceType} in ${locale}`,
           };
         } catch {
           return {
             success: false,
-            message: `Cache file not found for ${resourceType} in ${locale}`
+            message: `Cache file not found for ${resourceType} in ${locale}`,
           };
         }
       } else if (locale) {
@@ -248,12 +283,12 @@ export class MhwildsRepository implements IMhwildsRepository {
           await fs.rm(localePath, { recursive: true, force: true });
           return {
             success: true,
-            message: `Cleared all cache for locale ${locale}`
+            message: `Cleared all cache for locale ${locale}`,
           };
         } catch {
           return {
             success: false,
-            message: `Failed to clear cache for locale ${locale}`
+            message: `Failed to clear cache for locale ${locale}`,
           };
         }
       } else {
@@ -262,19 +297,19 @@ export class MhwildsRepository implements IMhwildsRepository {
           await fs.rm(basePath, { recursive: true, force: true });
           return {
             success: true,
-            message: 'Cleared all MHWilds cache'
+            message: 'Cleared all MHWilds cache',
           };
         } catch {
           return {
             success: false,
-            message: 'Failed to clear all cache'
+            message: 'Failed to clear all cache',
           };
         }
       }
     } catch (error: any) {
       return {
         success: false,
-        message: `Cache clearing failed: ${error.message}`
+        message: `Cache clearing failed: ${error.message}`,
       };
     }
   }
@@ -294,14 +329,14 @@ export class MhwildsRepository implements IMhwildsRepository {
 
       try {
         const localesDirs = await fs.readdir(basePath);
-        
+
         for (const localeDir of localesDirs) {
           const localePath = path.join(basePath, localeDir);
           const stat = await fs.stat(localePath);
-          
+
           if (stat.isDirectory()) {
             locales.add(localeDir);
-            
+
             const files = await fs.readdir(localePath);
             for (const file of files) {
               if (file.endsWith('.json')) {
@@ -322,7 +357,7 @@ export class MhwildsRepository implements IMhwildsRepository {
         totalFiles,
         totalSize,
         locales: Array.from(locales),
-        resources: Array.from(resources)
+        resources: Array.from(resources),
       };
     } catch (error: any) {
       throw new Error(`Failed to get cache stats: ${error.message}`);

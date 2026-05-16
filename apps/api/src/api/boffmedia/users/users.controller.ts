@@ -10,7 +10,7 @@ import {
   ParseIntPipe,
   HttpStatus,
   HttpException,
-  UseInterceptors
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -116,10 +116,10 @@ export class BoffMediaUsersController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new BoffMedia user' })
-  @ApiResponse({ 
-    status: 201, 
+  @ApiResponse({
+    status: 201,
     description: 'User created successfully',
-    type: BoffMediaUserEntity
+    type: BoffMediaUserEntity,
   })
   @ApiResponse({ status: 400, description: 'Invalid input data' })
   @ApiResponse({ status: 409, description: 'User already exists' })
@@ -131,7 +131,7 @@ export class BoffMediaUsersController {
         email: createUserDto.email,
         username: createUserDto.username,
         password: createUserDto.password,
-        uuid: createUserDto.uuid
+        uuid: createUserDto.uuid,
       });
 
       return user;
@@ -142,23 +142,24 @@ export class BoffMediaUsersController {
 
   @Post('minecraft/register')
   @ApiOperation({ summary: 'Register a new user with Minecraft integration' })
-  @ApiResponse({ 
-    status: 201, 
+  @ApiResponse({
+    status: 201,
     description: 'User registered with full integration',
-    type: IntegratedUserCreationResultEntity
+    type: IntegratedUserCreationResultEntity,
   })
   @ApiResponse({ status: 400, description: 'Invalid registration data' })
   @ApiBody({ type: MinecraftRegistrationDto })
   async registerMinecraftUser(@Body() registerData: MinecraftRegistrationDto) {
     try {
-      const result = await this.usersFacadeService.createMinecraftUser(registerData);
+      const result =
+        await this.usersFacadeService.createMinecraftUser(registerData);
 
       return {
         user: result.boffMediaUser,
         smartRotomUser: result.smartRotomUser,
         starbankAccounts: result.starbankAccounts,
         isNewBoffMediaUser: result.isNewBoffMediaUser,
-        isNewSmartRotomUser: result.isNewSmartRotomUser
+        isNewSmartRotomUser: result.isNewSmartRotomUser,
       };
     } catch (error: any) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -167,22 +168,23 @@ export class BoffMediaUsersController {
 
   @Post('minecraft/link')
   @ApiOperation({ summary: 'Link existing user to Minecraft account' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Minecraft account linked successfully',
-    type: UserWithIntegrationsEntity
+    type: UserWithIntegrationsEntity,
   })
   @ApiResponse({ status: 400, description: 'Invalid linking data' })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   @ApiBody({ type: MinecraftLinkDto })
   async linkMinecraftAccount(@Body() linkData: MinecraftLinkDto) {
     try {
-      const result = await this.usersFacadeService.linkMinecraftAccount(linkData);
+      const result =
+        await this.usersFacadeService.linkMinecraftAccount(linkData);
 
       return {
         boffMediaUser: result.boffMediaUser,
         smartRotomUser: result.smartRotomUser,
-        starbankAccounts: result.starbankAccounts
+        starbankAccounts: result.starbankAccounts,
       };
     } catch (error: any) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -191,16 +193,17 @@ export class BoffMediaUsersController {
 
   @Post('google/auth')
   @ApiOperation({ summary: 'Authenticate or create user via Google OAuth' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Google authentication successful',
-    type: SessionUserEntity
+    type: SessionUserEntity,
   })
   @ApiResponse({ status: 400, description: 'Invalid Google data' })
   @ApiBody({ type: GoogleAuthDto })
   async googleAuth(@Body() googleData: GoogleAuthDto) {
     try {
-      const sessionUser = await this.usersFacadeService.createFromGoogle(googleData);
+      const sessionUser =
+        await this.usersFacadeService.createFromGoogle(googleData);
       return sessionUser;
     } catch (error: any) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -211,20 +214,30 @@ export class BoffMediaUsersController {
 
   @Get()
   @ApiOperation({ summary: 'Get all BoffMedia users' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Users retrieved successfully',
-    type: UsersPaginatedResponseEntity
+    type: UsersPaginatedResponseEntity,
   })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Limit number of results' })
-  @ApiQuery({ name: 'offset', required: false, type: Number, description: 'Offset for pagination' })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Limit number of results',
+  })
+  @ApiQuery({
+    name: 'offset',
+    required: false,
+    type: Number,
+    description: 'Offset for pagination',
+  })
   async findAll(
     @Query('limit') limit?: number,
-    @Query('offset') offset?: number
+    @Query('offset') offset?: number,
   ) {
     try {
       const users = await this.usersFacadeService.getAllUsers();
-      
+
       // Apply pagination if provided
       let paginatedUsers = users;
       if (limit && offset !== undefined) {
@@ -237,7 +250,7 @@ export class BoffMediaUsersController {
         users: paginatedUsers,
         total: users.length,
         limit,
-        offset
+        offset,
       };
     } catch (error: any) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -246,10 +259,10 @@ export class BoffMediaUsersController {
 
   @Get('statistics')
   @ApiOperation({ summary: 'Get user statistics with integrations' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Statistics retrieved successfully',
-    type: UserStatisticsEntity
+    type: UserStatisticsEntity,
   })
   async getStatistics() {
     try {
@@ -263,16 +276,16 @@ export class BoffMediaUsersController {
   @Get(':id')
   @ApiOperation({ summary: 'Get user by ID' })
   @ApiParam({ name: 'id', type: 'number', description: 'User ID' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'User found',
-    type: BoffMediaUserEntity
+    type: BoffMediaUserEntity,
   })
   @ApiResponse({ status: 404, description: 'User not found' })
   async findOne(@Param('id', ParseIntPipe) id: number) {
     try {
       const user = await this.usersFacadeService.getUserById(id);
-      
+
       if (!user) {
         throw new HttpException('User not found', HttpStatus.NOT_FOUND);
       }
@@ -285,18 +298,24 @@ export class BoffMediaUsersController {
   }
 
   @Get(':id/integrations')
-  @ApiOperation({ summary: 'Get user with all integrations (SmartRotom, Starbank, Roles)' })
+  @ApiOperation({
+    summary: 'Get user with all integrations (SmartRotom, Starbank, Roles)',
+  })
   @ApiParam({ name: 'id', type: 'number', description: 'User ID' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'User with integrations found',
-    type: UserWithIntegrationsEntity
+    type: UserWithIntegrationsEntity,
   })
   @ApiResponse({ status: 404, description: 'User not found' })
   async findUserWithIntegrations(@Param('id', ParseIntPipe) id: number) {
     try {
-      const userWithIntegrations = await this.usersFacadeService.getUserWithIntegrations(id.toString(), 'id');
-      
+      const userWithIntegrations =
+        await this.usersFacadeService.getUserWithIntegrations(
+          id.toString(),
+          'id',
+        );
+
       if (!userWithIntegrations) {
         throw new HttpException('User not found', HttpStatus.NOT_FOUND);
       }
@@ -311,16 +330,16 @@ export class BoffMediaUsersController {
   @Get('username/:username')
   @ApiOperation({ summary: 'Get user by username' })
   @ApiParam({ name: 'username', type: 'string', description: 'Username' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'User found',
-    type: BoffMediaUserEntity
+    type: BoffMediaUserEntity,
   })
   @ApiResponse({ status: 404, description: 'User not found' })
   async findByUsername(@Param('username') username: string) {
     try {
       const user = await this.usersFacadeService.getUserByUsername(username);
-      
+
       if (!user) {
         throw new HttpException('User not found', HttpStatus.NOT_FOUND);
       }
@@ -333,18 +352,21 @@ export class BoffMediaUsersController {
   }
 
   @Get('username/:username/full')
-  @ApiOperation({ summary: 'Get full user data by username (with SmartRotom data)' })
+  @ApiOperation({
+    summary: 'Get full user data by username (with SmartRotom data)',
+  })
   @ApiParam({ name: 'username', type: 'string', description: 'Username' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Full user data found',
-    type: FullUserEntity
+    type: FullUserEntity,
   })
   @ApiResponse({ status: 404, description: 'User not found' })
   async findFullUserByUsername(@Param('username') username: string) {
     try {
-      const fullUser = await this.usersFacadeService.getFullUserByUsername(username);
-      
+      const fullUser =
+        await this.usersFacadeService.getFullUserByUsername(username);
+
       if (!fullUser) {
         throw new HttpException('User not found', HttpStatus.NOT_FOUND);
       }
@@ -359,16 +381,16 @@ export class BoffMediaUsersController {
   @Get('email/:email')
   @ApiOperation({ summary: 'Get user by email' })
   @ApiParam({ name: 'email', type: 'string', description: 'Email address' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'User found',
-    type: SessionUserEntity
+    type: SessionUserEntity,
   })
   @ApiResponse({ status: 404, description: 'User not found' })
   async findByEmail(@Param('email') email: string) {
     try {
       const sessionUser = await this.usersFacadeService.findByEmail(email);
-      
+
       if (!sessionUser) {
         throw new HttpException('User not found', HttpStatus.NOT_FOUND);
       }
@@ -383,10 +405,10 @@ export class BoffMediaUsersController {
   @Get(':id/roles')
   @ApiOperation({ summary: 'Get user roles' })
   @ApiParam({ name: 'id', type: 'number', description: 'User ID' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'User roles retrieved',
-    type: UserRolesResponseEntity
+    type: UserRolesResponseEntity,
   })
   @ApiResponse({ status: 404, description: 'User not found' })
   async getUserRoles(@Param('id', ParseIntPipe) id: number) {
@@ -403,20 +425,23 @@ export class BoffMediaUsersController {
   @Patch(':id')
   @ApiOperation({ summary: 'Update user by ID' })
   @ApiParam({ name: 'id', type: 'number', description: 'User ID' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'User updated successfully',
-    type: BoffMediaUserEntity
+    type: BoffMediaUserEntity,
   })
   @ApiResponse({ status: 404, description: 'User not found' })
   @ApiResponse({ status: 400, description: 'Invalid update data' })
   @ApiBody({ type: UpdateUserDto })
   async update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateUserDto: UpdateUserDto
+    @Body() updateUserDto: UpdateUserDto,
   ) {
     try {
-      const updatedUser = await this.usersFacadeService.updateUser(id, updateUserDto);
+      const updatedUser = await this.usersFacadeService.updateUser(
+        id,
+        updateUserDto,
+      );
       return updatedUser;
     } catch (error: any) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -428,10 +453,10 @@ export class BoffMediaUsersController {
   @Delete(':id')
   @ApiOperation({ summary: 'Delete user by ID' })
   @ApiParam({ name: 'id', type: 'number', description: 'User ID' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'User deleted successfully',
-    type: SuccessResponse
+    type: SuccessResponse,
   })
   @ApiResponse({ status: 404, description: 'User not found' })
   async remove(@Param('id', ParseIntPipe) id: number) {
@@ -453,17 +478,20 @@ export class BoffMediaUsersController {
 
   @Post('auth/login')
   @ApiOperation({ summary: 'Authenticate user with username and password' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Authentication successful',
-    type: AuthenticationResultEntity
+    type: AuthenticationResultEntity,
   })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   @ApiBody({ type: LoginDto })
   async login(@Body() loginDto: LoginDto) {
     try {
-      const authResult = await this.usersFacadeService.validateUser(loginDto.username, loginDto.password);
-      
+      const authResult = await this.usersFacadeService.validateUser(
+        loginDto.username,
+        loginDto.password,
+      );
+
       if (!authResult) {
         throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
       }
@@ -479,22 +507,26 @@ export class BoffMediaUsersController {
 
   @Post('batch')
   @ApiOperation({ summary: 'Get multiple users with integrations by IDs' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Batch users retrieved successfully',
     type: UserWithIntegrationsEntity,
-    isArray: true
+    isArray: true,
   })
   @ApiBody({ type: BatchUsersDto })
   async getBatchUsersWithIntegrations(@Body() body: BatchUsersDto) {
     try {
       const { userIds } = body;
-      
+
       if (!Array.isArray(userIds) || userIds.length === 0) {
-        throw new HttpException('Valid array of user IDs is required', HttpStatus.BAD_REQUEST);
+        throw new HttpException(
+          'Valid array of user IDs is required',
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
-      const users = await this.usersFacadeService.getMultipleUsersWithIntegrations(userIds);
+      const users =
+        await this.usersFacadeService.getMultipleUsersWithIntegrations(userIds);
       return users;
     } catch (error: any) {
       if (error instanceof HttpException) throw error;
@@ -506,19 +538,30 @@ export class BoffMediaUsersController {
 
   @Get('validate/:type/:identifier')
   @ApiOperation({ summary: 'Validate if user exists by different identifiers' })
-  @ApiParam({ name: 'type', enum: ['id', 'username', 'email', 'uuid'], description: 'Type of identifier' })
-  @ApiParam({ name: 'identifier', type: 'string', description: 'Identifier value' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiParam({
+    name: 'type',
+    enum: ['id', 'username', 'email', 'uuid'],
+    description: 'Type of identifier',
+  })
+  @ApiParam({
+    name: 'identifier',
+    type: 'string',
+    description: 'Identifier value',
+  })
+  @ApiResponse({
+    status: 200,
     description: 'Validation result',
-    type: UserValidationResponseEntity
+    type: UserValidationResponseEntity,
   })
   async validateUserExists(
     @Param('type') type: 'id' | 'username' | 'email' | 'uuid',
-    @Param('identifier') identifier: string
+    @Param('identifier') identifier: string,
   ) {
     try {
-      const exists = await this.usersFacadeService.validateUserExists(identifier, type);
+      const exists = await this.usersFacadeService.validateUserExists(
+        identifier,
+        type,
+      );
       return { exists, type, identifier };
     } catch (error: any) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);

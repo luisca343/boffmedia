@@ -71,7 +71,9 @@ export class MangaDownloadService {
   ): Promise<MangaChapterDownloadResult> {
     const scraper = this.registry.resolve(chapterUrl);
     const browser = await this.getBrowser();
-    const proxy = this.browserService.getTunnelEnabled() ? await getProxy() : undefined;
+    const proxy = this.browserService.getTunnelEnabled()
+      ? await getProxy()
+      : undefined;
     const context = await browser.newContext({
       userAgent: UA,
       ...(proxy ? { proxy: toPlaywrightProxy(proxy) } : {}),
@@ -113,7 +115,7 @@ export class MangaDownloadService {
 
     this.logger.log(
       `Streaming download "${novelTitle}" via ${scraper.name}: ` +
-      `chapters ${from}–${to ?? allChapters.length} (${slice.length} total)`,
+        `chapters ${from}–${to ?? allChapters.length} (${slice.length} total)`,
     );
 
     // Record source URL the first time this series is downloaded
@@ -122,9 +124,13 @@ export class MangaDownloadService {
     yield sse({ type: 'start', total: slice.length, novelTitle });
 
     const browser = await this.getBrowser();
-    const proxy = this.browserService.getTunnelEnabled() ? await getProxy() : undefined;
+    const proxy = this.browserService.getTunnelEnabled()
+      ? await getProxy()
+      : undefined;
     if (!proxy && this.browserService.getTunnelEnabled()) {
-      this.logger.warn('Tunnel enabled but no proxy available — browser contexts will use direct connection');
+      this.logger.warn(
+        'Tunnel enabled but no proxy available — browser contexts will use direct connection',
+      );
     }
     const context = await browser.newContext({
       userAgent: UA,
@@ -141,7 +147,9 @@ export class MangaDownloadService {
         const seriesDir = path.join(MANGA_ROOT, novelTitle);
         const outputPath = path.join(seriesDir, `${name}.${OUTPUT_FORMAT}`);
 
-        this.logger.log(`[${i + 1}/${slice.length}] ${ch.title} → ${name}.${OUTPUT_FORMAT}`);
+        this.logger.log(
+          `[${i + 1}/${slice.length}] ${ch.title} → ${name}.${OUTPUT_FORMAT}`,
+        );
 
         let imageUrls: string[] = [];
         try {
@@ -152,7 +160,14 @@ export class MangaDownloadService {
           );
         }
 
-        const result = await this.saveChapter(imageUrls, outputPath, ch.title, ch.number, novelTitle, skipDownloaded);
+        const result = await this.saveChapter(
+          imageUrls,
+          outputPath,
+          ch.title,
+          ch.number,
+          novelTitle,
+          skipDownloaded,
+        );
         totalDownloaded += result.downloaded;
         totalFailed += result.failed;
 
@@ -190,9 +205,23 @@ export class MangaDownloadService {
     skipIfExists = true,
   ): Promise<MangaChapterDownloadResult> {
     if (OUTPUT_FORMAT === 'epub') {
-      return this.saveEpub(imageUrls, outputPath, chapterTitle, chapterNumber, seriesTitle, skipIfExists);
+      return this.saveEpub(
+        imageUrls,
+        outputPath,
+        chapterTitle,
+        chapterNumber,
+        seriesTitle,
+        skipIfExists,
+      );
     }
-    return this.saveCbz(imageUrls, outputPath, chapterTitle, chapterNumber, seriesTitle, skipIfExists);
+    return this.saveCbz(
+      imageUrls,
+      outputPath,
+      chapterTitle,
+      chapterNumber,
+      seriesTitle,
+      skipIfExists,
+    );
   }
 
   // ── Private: CBZ persistence ───────────────────────────────────────────────
@@ -215,9 +244,18 @@ export class MangaDownloadService {
     const chapterName = path.basename(cbzPath, '.cbz');
 
     // Skip if CBZ already exists (when skipIfExists is true).
-    if (skipIfExists && await fileExists(cbzPath)) {
-      this.logger.log(`  ${chapterTitle ?? chapterName} — skip (already downloaded)`);
-      return { chapter: chapterName, imageUrls, downloaded: 0, skipped: 1, failed: 0, saveDir: path.dirname(cbzPath) };
+    if (skipIfExists && (await fileExists(cbzPath))) {
+      this.logger.log(
+        `  ${chapterTitle ?? chapterName} — skip (already downloaded)`,
+      );
+      return {
+        chapter: chapterName,
+        imageUrls,
+        downloaded: 0,
+        skipped: 1,
+        failed: 0,
+        saveDir: path.dirname(cbzPath),
+      };
     }
 
     const seriesDir = path.dirname(cbzPath);
@@ -239,7 +277,9 @@ export class MangaDownloadService {
         await this.downloadImage(url, filePath);
         downloaded++;
       } catch (err) {
-        this.logger.error(`  ✗ [${i + 1}/${imageUrls.length}] ${(err as Error).message}`);
+        this.logger.error(
+          `  ✗ [${i + 1}/${imageUrls.length}] ${(err as Error).message}`,
+        );
         failed++;
       }
     }
@@ -252,10 +292,18 @@ export class MangaDownloadService {
         zip.addLocalFile(path.join(tempDir, file));
       }
       // Embed ComicInfo.xml so Komga/Kavita recognise the chapter number correctly.
-      zip.addFile('ComicInfo.xml', Buffer.from(
-        this.buildComicInfo(seriesTitle, chapterTitle, chapterNumber, downloaded),
-        'utf-8',
-      ));
+      zip.addFile(
+        'ComicInfo.xml',
+        Buffer.from(
+          this.buildComicInfo(
+            seriesTitle,
+            chapterTitle,
+            chapterNumber,
+            downloaded,
+          ),
+          'utf-8',
+        ),
+      );
       zip.writeZip(cbzPath);
     }
 
@@ -295,9 +343,18 @@ export class MangaDownloadService {
   ): Promise<MangaChapterDownloadResult> {
     const chapterName = path.basename(epubPath, '.epub');
 
-    if (skipIfExists && await fileExists(epubPath)) {
-      this.logger.log(`  ${chapterTitle ?? chapterName} — skip (already downloaded)`);
-      return { chapter: chapterName, imageUrls, downloaded: 0, skipped: 1, failed: 0, saveDir: path.dirname(epubPath) };
+    if (skipIfExists && (await fileExists(epubPath))) {
+      this.logger.log(
+        `  ${chapterTitle ?? chapterName} — skip (already downloaded)`,
+      );
+      return {
+        chapter: chapterName,
+        imageUrls,
+        downloaded: 0,
+        skipped: 1,
+        failed: 0,
+        saveDir: path.dirname(epubPath),
+      };
     }
 
     const seriesDir = path.dirname(epubPath);
@@ -306,10 +363,19 @@ export class MangaDownloadService {
     const tempDir = `${epubPath}.tmp`;
     await mkdir(tempDir, { recursive: true });
 
-    const { downloaded, failed, files } = await this.downloadImagesToDir(imageUrls, tempDir);
+    const { downloaded, failed, files } = await this.downloadImagesToDir(
+      imageUrls,
+      tempDir,
+    );
 
     if (downloaded > 0) {
-      await buildEpub({ imageFiles: files, outputPath: epubPath, seriesTitle, chapterTitle, chapterNumber });
+      await buildEpub({
+        imageFiles: files,
+        outputPath: epubPath,
+        seriesTitle,
+        chapterTitle,
+        chapterNumber,
+      });
     }
 
     await rm(tempDir, { recursive: true, force: true });
@@ -350,7 +416,9 @@ export class MangaDownloadService {
         files.push(filePath);
         downloaded++;
       } catch (err) {
-        this.logger.error(`  ✗ [${i + 1}/${imageUrls.length}] ${(err as Error).message}`);
+        this.logger.error(
+          `  ✗ [${i + 1}/${imageUrls.length}] ${(err as Error).message}`,
+        );
         failed++;
       }
     }
@@ -364,14 +432,20 @@ export class MangaDownloadService {
     number?: number | null,
     pageCount?: number,
   ): string {
-    const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    const lines = ['<?xml version="1.0" encoding="UTF-8"?>',
+    const esc = (s: string) =>
+      s
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    const lines = [
+      '<?xml version="1.0" encoding="UTF-8"?>',
       '<ComicInfo xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">',
     ];
-    if (series)          lines.push(`  <Series>${esc(series)}</Series>`);
-    if (title)           lines.push(`  <Title>${esc(title)}</Title>`);
-    if (number != null)  lines.push(`  <Number>${number}</Number>`);
-    if (pageCount)       lines.push(`  <PageCount>${pageCount}</PageCount>`);
+    if (series) lines.push(`  <Series>${esc(series)}</Series>`);
+    if (title) lines.push(`  <Title>${esc(title)}</Title>`);
+    if (number != null) lines.push(`  <Number>${number}</Number>`);
+    if (pageCount) lines.push(`  <PageCount>${pageCount}</PageCount>`);
     lines.push('</ComicInfo>');
     return lines.join('\n');
   }

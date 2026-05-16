@@ -33,7 +33,10 @@ export class AppsFacadeService {
     return this.appsService.createApp(createAppDto);
   }
 
-  async updateApp(id: number, updateAppDto: UpdateAppDto): Promise<SmartRotomApp> {
+  async updateApp(
+    id: number,
+    updateAppDto: UpdateAppDto,
+  ): Promise<SmartRotomApp> {
     return this.appsService.updateApp(id, updateAppDto);
   }
 
@@ -42,7 +45,7 @@ export class AppsFacadeService {
   }
 
   // ==================== APP STATUS MANAGEMENT ====================
-  
+
   async activateApp(id: number): Promise<SmartRotomApp> {
     return this.appsService.activateApp(id);
   }
@@ -56,17 +59,23 @@ export class AppsFacadeService {
     return this.userAppsService.getAppsForPlayer(uuid);
   }
 
-  async addAppToPlayer(uuid: string, appId: number): Promise<{ success: boolean }> {
+  async addAppToPlayer(
+    uuid: string,
+    appId: number,
+  ): Promise<{ success: boolean }> {
     return this.userAppsService.addAppToPlayer(uuid, appId);
   }
 
-  async removeAppFromPlayer(uuid: string, appId: number): Promise<{ success: boolean }> {
+  async removeAppFromPlayer(
+    uuid: string,
+    appId: number,
+  ): Promise<{ success: boolean }> {
     return this.userAppsService.removeAppFromPlayer(uuid, appId);
   }
 
   async orderApps(
-    order: { id: number | string; order: number }[], 
-    uuid: string
+    order: { id: number | string; order: number }[],
+    uuid: string,
   ): Promise<{ success: boolean }> {
     return this.userAppsService.orderAppsForPlayer(order, uuid);
   }

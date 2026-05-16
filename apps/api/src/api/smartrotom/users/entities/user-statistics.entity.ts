@@ -1,21 +1,21 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UserStatistics {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Total number of users',
-    example: 150
+    example: 150,
   })
   totalUsers: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Number of users with accounts',
-    example: 142
+    example: 142,
   })
   usersWithAccounts: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Number of users without accounts',
-    example: 8
+    example: 8,
   })
   usersWithoutAccounts: number;
 }
