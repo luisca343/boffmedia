@@ -5,7 +5,8 @@
       "mcp__boff-agent__reset_environment",
       "mcp__boff-agent__check_guardrails",
       "mcp__boff-agent__run_verification",
-      "mcp__boff-agent__get_run_history"
+      "mcp__boff-agent__get_run_history",
+      "mcp__boff-agent__save_run"
     ]
   }
 }
