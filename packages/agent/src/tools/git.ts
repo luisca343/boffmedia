@@ -19,9 +19,10 @@ export async function gitOperation(input: GitInput): Promise<GitResult> {
     case 'branch': {
       if (!branchName) throw new Error('branchName required for action=branch')
       const slug = branchName.toLowerCase().replace(/[^a-z0-9-]/g, '-')
-      const fullName = `agent/${slug}-${Date.now()}`
-      const r = await shell('git.sh', ['branch', fullName])
-      return { success: r.exitCode === 0, output: r.stdout + r.stderr, branch: fullName }
+      // git.sh already prepends "agent/" — pass only the slug+timestamp
+      const suffix = `${slug}-${Date.now()}`
+      const r = await shell('git.sh', ['branch', suffix])
+      return { success: r.exitCode === 0, output: r.stdout + r.stderr, branch: `agent/${suffix}` }
     }
     case 'commit': {
       if (!commitMessage) throw new Error('commitMessage required for action=commit')

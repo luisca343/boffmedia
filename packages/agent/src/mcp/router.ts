@@ -94,9 +94,11 @@ taskType: ${taskType}
 ${playwrightStep}
 4c. Call detect_structural_changes. If adrRecommended=true, call write_adr with a generated context, decision, and consequences based on the changes you made. Always call sync_conventions after.
 4d. If you touched the NestJS API, call sync_openapi_docs (runId: "${runId}") with the affected module names to keep the BookStack API reference current.
-5. Call save_run (runId: "${runId}", status: "passed" | "failed") to close the task.
+5. Create a branch (git_operation branch), commit (git_operation commit), and push to both remotes (git_operation push_mirrors).
+6. Call save_run (runId: "${runId}", status: "passed" | "failed") to close the task.
 
 Do not skip steps. Do not call save_run before run_verification passes.
+Do NOT call create_gitlab_mr — MR creation is the user's decision after reviewing the pushed branch.
 
 ## Prior runs on similar tasks
 ${history.length > 0 ? JSON.stringify(history, null, 2) : 'No prior runs found.'}
@@ -353,7 +355,7 @@ ${bookstackSection}
 
   server.tool(
     'create_gitlab_mr',
-    'Create a GitLab merge request after a successful run. The description is built from the task spec, verification results, and optional Playwright trace path.',
+    'Create a GitLab merge request. Call this only when explicitly asked by the user — MR creation is never automatic. The description is built from the task spec, verification results, and optional Playwright trace path.',
     {
       sourceBranch: z.string().describe('Branch to merge from'),
       title: z.string().describe('MR title'),
