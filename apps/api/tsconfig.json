@@ -25,11 +25,12 @@
       "@/*": ["src/*"],
       "@boffmedia/shared": ["../../packages/shared/src"],
       "@boffmedia/shared/*": ["../../packages/shared/src/*"]
-    }
+    },
+    "types": ["jest", "node"]
   },
   "watchOptions": {
     "watchFile": "fixedPollingInterval"
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist", "public", "**/*.spec.ts", "src/generated"]
+  "include": ["src", "test"],
+  "exclude": ["node_modules", "dist", "public", "src/generated"]
 }
