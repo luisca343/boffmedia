@@ -148,6 +148,7 @@ export const Scripts: ModdedBattleScriptsData = {
         if (!source) source = this.battle.event.source;
         if (!sourceEffect) sourceEffect = this.battle.effect;
       }
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
       if (!source) source = this;
 
       if (this.status === status.id) {

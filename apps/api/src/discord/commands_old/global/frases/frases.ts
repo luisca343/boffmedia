@@ -119,7 +119,7 @@ async function handleButton(
     page,
   );
 
-  // @ts-ignore
+  // @ts-expect-error discord.js interaction type mismatch
   await interaction.update({ embeds: [embed], components: [row] });
 
   return true;

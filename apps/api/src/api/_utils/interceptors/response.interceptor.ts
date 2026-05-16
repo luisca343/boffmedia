@@ -42,6 +42,7 @@ export class ResponseInterceptor implements NestInterceptor {
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   private extractSwaggerMetadata(handler: Function) {
     // Get ApiOperation metadata
     const apiOperation = this.reflector.get('swagger/apiOperation', handler);
