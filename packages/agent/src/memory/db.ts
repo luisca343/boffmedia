@@ -16,7 +16,7 @@ export async function getDb(): Promise<AgentDb> {
 
   await pool.execute(`
     CREATE TABLE IF NOT EXISTS task_runs (
-      id VARCHAR(36) PRIMARY KEY,
+      id VARCHAR(80) PRIMARY KEY,
       status VARCHAR(20) NOT NULL,
       title VARCHAR(255) NOT NULL,
       branch VARCHAR(255),
@@ -29,8 +29,8 @@ export async function getDb(): Promise<AgentDb> {
 
   await pool.execute(`
     CREATE TABLE IF NOT EXISTS verification_results (
-      id VARCHAR(36) PRIMARY KEY,
-      run_id VARCHAR(36) NOT NULL,
+      id VARCHAR(80) PRIMARY KEY,
+      run_id VARCHAR(80) NOT NULL,
       stage VARCHAR(50) NOT NULL,
       status VARCHAR(10) NOT NULL,
       failures JSON,

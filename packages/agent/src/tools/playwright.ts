@@ -12,19 +12,16 @@ interface PlaywrightInput {
 export async function runPlaywright(input: PlaywrightInput) {
   const { runId, specPath, captureTrace = true, captureScreenshots = true } = input
   const runDir = path.resolve(REPO_ROOT, `.agent-runs/${runId}`)
-  const screenshotDir = path.join(runDir, 'screenshots')
 
   fs.mkdirSync(runDir, { recursive: true })
-  fs.mkdirSync(screenshotDir, { recursive: true })
 
   const args = [
     '--filter', 'web', 'exec', 'playwright', 'test',
     '--reporter=json',
-    `--output-dir=${runDir}`
+    `--output=${runDir}`
   ]
 
   if (captureTrace) args.push('--trace=on')
-  if (captureScreenshots) args.push('--screenshot=on')
   if (specPath) args.push(specPath)
 
   const start = Date.now()
@@ -32,7 +29,7 @@ export async function runPlaywright(input: PlaywrightInput) {
   const durationMs = Date.now() - start
 
   const tracePath = captureTrace ? findTrace(runDir) : undefined
-  const screenshotPaths = captureScreenshots ? findScreenshots(screenshotDir) : []
+  const screenshotPaths = captureScreenshots ? findScreenshots(runDir) : []
 
   return {
     status: result.exitCode === 0 ? 'pass' : 'fail',
@@ -41,7 +38,7 @@ export async function runPlaywright(input: PlaywrightInput) {
     tracePath,
     screenshotPaths,
     reviewInstructions: tracePath
-      ? `View trace: npx playwright show-trace ${tracePath}\nScreenshots: ${screenshotDir}`
+      ? `View trace: pnpm --filter web exec playwright show-trace "${tracePath}"\nScreenshots: ${runDir}`
       : undefined
   }
 }

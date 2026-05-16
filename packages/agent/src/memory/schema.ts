@@ -1,7 +1,7 @@
 import { mysqlTable, varchar, text, int, datetime, json } from 'drizzle-orm/mysql-core'
 
 export const taskRuns = mysqlTable('task_runs', {
-  id: varchar('id', { length: 36 }).primaryKey(),
+  id: varchar('id', { length: 80 }).primaryKey(),
   status: varchar('status', { length: 20 }).notNull(),
   title: varchar('title', { length: 255 }).notNull(),
   branch: varchar('branch', { length: 255 }),
@@ -12,8 +12,8 @@ export const taskRuns = mysqlTable('task_runs', {
 })
 
 export const verificationResults = mysqlTable('verification_results', {
-  id: varchar('id', { length: 36 }).primaryKey(),
-  runId: varchar('run_id', { length: 36 }).notNull(),
+  id: varchar('id', { length: 80 }).primaryKey(),
+  runId: varchar('run_id', { length: 80 }).notNull(),
   stage: varchar('stage', { length: 50 }).notNull(),
   status: varchar('status', { length: 10 }).notNull(),
   failures: json('failures'),

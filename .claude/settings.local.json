@@ -7,7 +7,10 @@
       "mcp__boff-agent__run_verification",
       "mcp__boff-agent__get_run_history",
       "mcp__boff-agent__save_run",
-      "mcp__boff-agent__resolve_context"
+      "mcp__boff-agent__resolve_context",
+      "mcp__boff-agent__begin_task",
+      "Bash(docker compose *)",
+      "mcp__boff-agent__run_playwright"
     ]
   }
 }
