@@ -3,7 +3,7 @@
     "boff-agent": {
       "command": "pnpm",
       "args": ["--filter", "@repo/agent", "mcp"],
-      "cwd": "e:/Programación/Ficus Labs/Boffmedia"
+      "cwd": "/home/luis/Ficus Labs/boffmedia"
     }
   }
 }
