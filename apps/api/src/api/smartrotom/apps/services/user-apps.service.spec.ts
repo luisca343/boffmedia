@@ -31,7 +31,10 @@ describe('UserAppsService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UserAppsService,
-        { provide: USER_APPS_REPOSITORY_TOKEN, useValue: mockUserAppsRepository },
+        {
+          provide: USER_APPS_REPOSITORY_TOKEN,
+          useValue: mockUserAppsRepository,
+        },
         { provide: APPS_REPOSITORY_TOKEN, useValue: mockAppsRepository },
       ],
     }).compile();
@@ -56,16 +59,22 @@ describe('UserAppsService', () => {
       const result = await service.getAppsForPlayer(uuid);
 
       expect(result).toEqual(mockApps);
-      expect(mockUserAppsRepository.getAppsForPlayer).toHaveBeenCalledWith(uuid);
+      expect(mockUserAppsRepository.getAppsForPlayer).toHaveBeenCalledWith(
+        uuid,
+      );
     });
 
     it('should throw BadRequestException for empty uuid', async () => {
-      await expect(service.getAppsForPlayer('')).rejects.toThrow(BadRequestException);
+      await expect(service.getAppsForPlayer('')).rejects.toThrow(
+        BadRequestException,
+      );
       expect(mockUserAppsRepository.getAppsForPlayer).not.toHaveBeenCalled();
     });
 
     it('should throw BadRequestException for null uuid', async () => {
-      await expect(service.getAppsForPlayer(null)).rejects.toThrow(BadRequestException);
+      await expect(service.getAppsForPlayer(null)).rejects.toThrow(
+        BadRequestException,
+      );
       expect(mockUserAppsRepository.getAppsForPlayer).not.toHaveBeenCalled();
     });
   });
@@ -85,43 +94,64 @@ describe('UserAppsService', () => {
 
       expect(result).toEqual({ success: true });
       expect(mockAppsRepository.findById).toHaveBeenCalledWith(appId);
-      expect(mockUserAppsRepository.findUserApp).toHaveBeenCalledWith(uuid, appId);
+      expect(mockUserAppsRepository.findUserApp).toHaveBeenCalledWith(
+        uuid,
+        appId,
+      );
       expect(mockUserAppsRepository.addUserApp).toHaveBeenCalled();
     });
 
     it('should throw BadRequestException for empty uuid', async () => {
-      await expect(service.addAppToPlayer('', appId)).rejects.toThrow(BadRequestException);
+      await expect(service.addAppToPlayer('', appId)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should throw BadRequestException for null uuid', async () => {
-      await expect(service.addAppToPlayer(null, appId)).rejects.toThrow(BadRequestException);
+      await expect(service.addAppToPlayer(null, appId)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should throw BadRequestException for invalid appId (0)', async () => {
-      await expect(service.addAppToPlayer(uuid, 0)).rejects.toThrow(BadRequestException);
+      await expect(service.addAppToPlayer(uuid, 0)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should throw BadRequestException for null appId', async () => {
-      await expect(service.addAppToPlayer(uuid, null)).rejects.toThrow(BadRequestException);
+      await expect(service.addAppToPlayer(uuid, null)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should throw NotFoundException when app not found', async () => {
       mockAppsRepository.findById.mockResolvedValue(null);
 
-      await expect(service.addAppToPlayer(uuid, appId)).rejects.toThrow(NotFoundException);
+      await expect(service.addAppToPlayer(uuid, appId)).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should throw BadRequestException when app is inactive', async () => {
       mockAppsRepository.findById.mockResolvedValue({ ...mockApp, active: 0 });
 
-      await expect(service.addAppToPlayer(uuid, appId)).rejects.toThrow(BadRequestException);
+      await expect(service.addAppToPlayer(uuid, appId)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should throw ConflictException when app already added', async () => {
       mockAppsRepository.findById.mockResolvedValue(mockApp);
-      mockUserAppsRepository.findUserApp.mockResolvedValue({ uuid, appId, order: 1 });
+      mockUserAppsRepository.findUserApp.mockResolvedValue({
+        uuid,
+        appId,
+        order: 1,
+      });
 
-      await expect(service.addAppToPlayer(uuid, appId)).rejects.toThrow(ConflictException);
+      await expect(service.addAppToPlayer(uuid, appId)).rejects.toThrow(
+        ConflictException,
+      );
     });
   });
 
@@ -135,21 +165,30 @@ describe('UserAppsService', () => {
       const result = await service.removeAppFromPlayer(uuid, appId);
 
       expect(result).toEqual({ success: true });
-      expect(mockUserAppsRepository.removeUserApp).toHaveBeenCalledWith(uuid, appId);
+      expect(mockUserAppsRepository.removeUserApp).toHaveBeenCalledWith(
+        uuid,
+        appId,
+      );
     });
 
     it('should throw BadRequestException for empty uuid', async () => {
-      await expect(service.removeAppFromPlayer('', appId)).rejects.toThrow(BadRequestException);
+      await expect(service.removeAppFromPlayer('', appId)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should throw BadRequestException for invalid appId', async () => {
-      await expect(service.removeAppFromPlayer(uuid, 0)).rejects.toThrow(BadRequestException);
+      await expect(service.removeAppFromPlayer(uuid, 0)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should throw NotFoundException when app not found in player list', async () => {
       mockUserAppsRepository.removeUserApp.mockResolvedValue(false);
 
-      await expect(service.removeAppFromPlayer(uuid, appId)).rejects.toThrow(NotFoundException);
+      await expect(service.removeAppFromPlayer(uuid, appId)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -168,21 +207,29 @@ describe('UserAppsService', () => {
       const result = await service.orderAppsForPlayer(order, uuid);
 
       expect(result).toEqual({ success: true });
-      expect(mockUserAppsRepository.findByPlayerUuid).toHaveBeenCalledWith(uuid);
+      expect(mockUserAppsRepository.findByPlayerUuid).toHaveBeenCalledWith(
+        uuid,
+      );
       expect(mockUserAppsRepository.updateOrder).toHaveBeenCalledTimes(2);
       expect(mockUserAppsRepository.resetOrderExcept).not.toHaveBeenCalled();
     });
 
     it('should throw BadRequestException for empty uuid', async () => {
-      await expect(service.orderAppsForPlayer(order, '')).rejects.toThrow(BadRequestException);
+      await expect(service.orderAppsForPlayer(order, '')).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should throw BadRequestException for empty order array', async () => {
-      await expect(service.orderAppsForPlayer([], uuid)).rejects.toThrow(BadRequestException);
+      await expect(service.orderAppsForPlayer([], uuid)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should throw BadRequestException for null order', async () => {
-      await expect(service.orderAppsForPlayer(null, uuid)).rejects.toThrow(BadRequestException);
+      await expect(service.orderAppsForPlayer(null, uuid)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should filter out non-existing apps and reset remainder', async () => {
@@ -195,9 +242,16 @@ describe('UserAppsService', () => {
 
       // order has ids [1, 2]; existingApps has [1, 3] — only id 1 is valid
       expect(mockUserAppsRepository.updateOrder).toHaveBeenCalledTimes(1);
-      expect(mockUserAppsRepository.updateOrder).toHaveBeenCalledWith(uuid, 1, 1);
+      expect(mockUserAppsRepository.updateOrder).toHaveBeenCalledWith(
+        uuid,
+        1,
+        1,
+      );
       // app 3 is in existingApps but not in validOrder, so it is passed to resetOrderExcept
-      expect(mockUserAppsRepository.resetOrderExcept).toHaveBeenCalledWith(uuid, [3]);
+      expect(mockUserAppsRepository.resetOrderExcept).toHaveBeenCalledWith(
+        uuid,
+        [3],
+      );
     });
   });
 });

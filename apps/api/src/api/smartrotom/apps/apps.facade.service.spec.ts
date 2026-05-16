@@ -162,7 +162,10 @@ describe('AppsFacadeService', () => {
 
       const result = await service.orderApps(order, uuid);
 
-      expect(userAppsService.orderAppsForPlayer).toHaveBeenCalledWith(order, uuid);
+      expect(userAppsService.orderAppsForPlayer).toHaveBeenCalledWith(
+        order,
+        uuid,
+      );
       expect(result).toEqual(mockResult);
     });
   });

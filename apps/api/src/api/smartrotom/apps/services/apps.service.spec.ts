@@ -96,7 +96,9 @@ describe('AppsService', () => {
       const createDto: CreateAppDto = { name: 'New App', url: 'test-app' };
       mockAppsRepository.findByUrl.mockResolvedValue(mockApp);
 
-      await expect(service.createApp(createDto)).rejects.toThrow(ConflictException);
+      await expect(service.createApp(createDto)).rejects.toThrow(
+        ConflictException,
+      );
       expect(mockAppsRepository.create).not.toHaveBeenCalled();
     });
   });
@@ -118,7 +120,9 @@ describe('AppsService', () => {
     it('should throw NotFoundException when app not found', async () => {
       mockAppsRepository.findById.mockResolvedValue(null);
 
-      await expect(service.updateApp(999, {})).rejects.toThrow(NotFoundException);
+      await expect(service.updateApp(999, {})).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
