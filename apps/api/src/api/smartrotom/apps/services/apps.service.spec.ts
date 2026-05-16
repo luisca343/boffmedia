@@ -81,7 +81,10 @@ describe('AppsService', () => {
     it('should create and return new app', async () => {
       const createDto: CreateAppDto = { name: 'New App', url: 'new-app' };
       mockAppsRepository.create.mockResolvedValue({ insertId: 1 });
-      mockAppsRepository.findById.mockResolvedValue({ ...mockApp, ...createDto });
+      mockAppsRepository.findById.mockResolvedValue({
+        ...mockApp,
+        ...createDto,
+      });
 
       const result = await service.createApp(createDto);
 
@@ -108,7 +111,9 @@ describe('AppsService', () => {
     it('should throw NotFoundException when app not found', async () => {
       mockAppsRepository.findById.mockResolvedValue(null);
 
-      await expect(service.updateApp(999, {})).rejects.toThrow(NotFoundException);
+      await expect(service.updateApp(999, {})).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 

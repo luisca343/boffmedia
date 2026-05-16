@@ -154,7 +154,10 @@ describe('AppsFacadeService', () => {
       const result = await service.removeAppFromPlayer(uuid, appId);
 
       expect(result).toEqual(mockResult);
-      expect(userAppsService.removeAppFromPlayer).toHaveBeenCalledWith(uuid, appId);
+      expect(userAppsService.removeAppFromPlayer).toHaveBeenCalledWith(
+        uuid,
+        appId,
+      );
     });
   });
 

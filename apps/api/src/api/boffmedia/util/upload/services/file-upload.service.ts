@@ -1,4 +1,5 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
+import * as nodePath from 'path';
 import {
   UploadRepository,
   UploadedFileDetails,
@@ -80,7 +81,7 @@ export class FileUploadService {
       : undefined;
     const uploadDir =
       await this.uploadRepository.getUploadDirectory(sanitizedPath);
-    const filePath = require('path').join(uploadDir, filename);
+    const filePath = nodePath.join(uploadDir, filename);
 
     const exists = await this.uploadRepository.fileExists(filePath);
     if (!exists) {
@@ -104,7 +105,7 @@ export class FileUploadService {
       : undefined;
     const uploadDir =
       await this.uploadRepository.getUploadDirectory(sanitizedPath);
-    const filePath = require('path').join(uploadDir, filename);
+    const filePath = nodePath.join(uploadDir, filename);
 
     const exists = await this.uploadRepository.fileExists(filePath);
     if (!exists) {
