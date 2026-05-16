@@ -1,14 +1,16 @@
 import { RankingEntry } from "@boffmedia/shared";
 import MenuWrapper from "../_components/MenuWrapper";
 import { MinaService } from "@/services/api/smartrotom/minaService";
+import Podium from "./_components/Podium";
 
 export default async function Ranking() {
   const ranking = (await MinaService.getPlayerRanking()).data;
 
   if(!ranking) return <></>
   return (
-    <MenuWrapper className="w-full h-screen overflow-hidden bg-surface-900 text-white pt-4  flex flex-col items-center">
-      <div className="bg-black bg-opacity-70 p-6 rounded-lg w-3/4 max-w-3xl ">
+    <MenuWrapper className="w-full h-screen overflow-y-auto bg-surface-900 text-white pt-4 flex flex-col items-center">
+      <Podium top3={ranking.slice(0, 3)} />
+      <div className="bg-black bg-opacity-70 p-6 rounded-lg w-3/4 max-w-3xl mb-4">
         <h2 className="text-2xl font-bold mb-4">RANKING</h2>
         <table className="w-full">
           <thead>
