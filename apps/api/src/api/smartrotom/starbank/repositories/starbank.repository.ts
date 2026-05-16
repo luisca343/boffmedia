@@ -4,11 +4,11 @@ import { MySql2Database } from 'drizzle-orm/mysql2';
 import { eq, or, desc } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/mysql-core';
 import { RowDataPacket } from 'mysql2';
-import { 
-  StarBankAccount, 
-  starBankAccounts, 
-  starBankTransactions, 
-  starBankUsersAccounts 
+import {
+  StarBankAccount,
+  starBankAccounts,
+  starBankTransactions,
+  starBankUsersAccounts,
 } from '@/_db/schema/SmartRotomStarBank';
 import { smartrotomUsers } from '@/_db/schema/SmartRotom';
 
@@ -55,32 +55,43 @@ export interface TransactionDetails {
 @Injectable()
 export class StarbankRepository {
   constructor(
-    @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>
+    @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
   ) {}
 
   // ==================== ACCOUNT OPERATIONS ====================
 
-  async createAccount(accountData: CreateAccountData): Promise<{ success: boolean; accountId?: number; message?: string }> {
+  async createAccount(
+    accountData: CreateAccountData,
+  ): Promise<{ success: boolean; accountId?: number; message?: string }> {
     try {
-      const result = await this.db.insert(starBankAccounts).values({
-        name: accountData.name,
-        balance: accountData.initialBalance || 0,
-        type: accountData.type || 'SECONDARY',
-        image: accountData.image
-      } as StarBankAccount).execute() as RowDataPacket[];
+      const result = (await this.db
+        .insert(starBankAccounts)
+        .values({
+          name: accountData.name,
+          balance: accountData.initialBalance || 0,
+          type: accountData.type || 'SECONDARY',
+          image: accountData.image,
+        } as StarBankAccount)
+        .execute()) as RowDataPacket[];
 
       const accountId = result[0].insertId;
 
       // Link account to user
-      await this.db.insert(starBankUsersAccounts).values({
-        uuid: accountData.uuid,
-        accountId: accountId
-      }).execute();
+      await this.db
+        .insert(starBankUsersAccounts)
+        .values({
+          uuid: accountData.uuid,
+          accountId: accountId,
+        })
+        .execute();
 
       return { success: true, accountId };
     } catch (error: any) {
       console.error('Failed to create account:', error);
-      return { success: false, message: `Account creation failed: ${error.message}` };
+      return {
+        success: false,
+        message: `Account creation failed: ${error.message}`,
+      };
     }
   }
 
@@ -93,10 +104,13 @@ export class StarbankRepository {
           name: starBankAccounts.name,
           type: starBankAccounts.type,
           uuid: starBankUsersAccounts.uuid,
-          image: starBankAccounts.image
+          image: starBankAccounts.image,
         })
         .from(starBankAccounts)
-        .leftJoin(starBankUsersAccounts, eq(starBankAccounts.id, starBankUsersAccounts.accountId))
+        .leftJoin(
+          starBankUsersAccounts,
+          eq(starBankAccounts.id, starBankUsersAccounts.accountId),
+        )
         .where(eq(starBankAccounts.id, accountId))
         .execute();
 
@@ -107,15 +121,20 @@ export class StarbankRepository {
     }
   }
 
-  async findUserMainAccount(uuid: string): Promise<{ id: number; balance: number } | null> {
+  async findUserMainAccount(
+    uuid: string,
+  ): Promise<{ id: number; balance: number } | null> {
     try {
       const result = await this.db
         .select({
           id: starBankAccounts.id,
-          balance: starBankAccounts.balance
+          balance: starBankAccounts.balance,
         })
         .from(starBankAccounts)
-        .innerJoin(starBankUsersAccounts, eq(starBankAccounts.id, starBankUsersAccounts.accountId))
+        .innerJoin(
+          starBankUsersAccounts,
+          eq(starBankAccounts.id, starBankUsersAccounts.accountId),
+        )
         .where(eq(starBankUsersAccounts.uuid, uuid))
         .execute();
 
@@ -134,10 +153,13 @@ export class StarbankRepository {
           balance: starBankAccounts.balance,
           name: starBankAccounts.name,
           type: starBankAccounts.type,
-          image: starBankAccounts.image
+          image: starBankAccounts.image,
         })
         .from(starBankAccounts)
-        .innerJoin(starBankUsersAccounts, eq(starBankAccounts.id, starBankUsersAccounts.accountId))
+        .innerJoin(
+          starBankUsersAccounts,
+          eq(starBankAccounts.id, starBankUsersAccounts.accountId),
+        )
         .where(eq(starBankUsersAccounts.uuid, uuid))
         .execute();
 
@@ -156,7 +178,7 @@ export class StarbankRepository {
           balance: starBankAccounts.balance,
           name: starBankAccounts.name,
           type: starBankAccounts.type,
-          image: starBankAccounts.image
+          image: starBankAccounts.image,
         })
         .from(starBankAccounts)
         .execute();
@@ -166,7 +188,10 @@ export class StarbankRepository {
     }
   }
 
-  async updateAccountBalance(accountId: number, newBalance: number): Promise<boolean> {
+  async updateAccountBalance(
+    accountId: number,
+    newBalance: number,
+  ): Promise<boolean> {
     try {
       if (accountId === 0) return true; // System account
 
@@ -178,18 +203,29 @@ export class StarbankRepository {
 
       return true;
     } catch (error: any) {
-      console.error(`Failed to update balance for account ${accountId}:`, error);
+      console.error(
+        `Failed to update balance for account ${accountId}:`,
+        error,
+      );
       throw new Error(`Failed to update account balance: ${error.message}`);
     }
   }
 
   // ==================== TRANSACTION OPERATIONS ====================
 
-  async createTransaction(transactionData: CreateTransactionData): Promise<{ success: boolean; message?: string }> {
+  async createTransaction(
+    transactionData: CreateTransactionData,
+  ): Promise<{ success: boolean; message?: string }> {
     try {
       // Get current balances
-      const fromAccount = transactionData.from === 0 ? null : await this.findAccountById(transactionData.from);
-      const toAccount = transactionData.to === 0 ? null : await this.findAccountById(transactionData.to);
+      const fromAccount =
+        transactionData.from === 0
+          ? null
+          : await this.findAccountById(transactionData.from);
+      const toAccount =
+        transactionData.to === 0
+          ? null
+          : await this.findAccountById(transactionData.to);
 
       // Validate accounts exist (except system account 0)
       if (transactionData.from !== 0 && !fromAccount) {
@@ -205,8 +241,12 @@ export class StarbankRepository {
       }
 
       // Calculate new balances
-      const fromBalance = fromAccount ? fromAccount.balance - transactionData.amount : 0;
-      const toBalance = toAccount ? toAccount.balance + transactionData.amount : 0;
+      const fromBalance = fromAccount
+        ? fromAccount.balance - transactionData.amount
+        : 0;
+      const toBalance = toAccount
+        ? toAccount.balance + transactionData.amount
+        : 0;
 
       // Update balances
       if (fromAccount) {
@@ -217,28 +257,37 @@ export class StarbankRepository {
       }
 
       // Record transaction
-      await this.db.insert(starBankTransactions).values({
-        from: transactionData.from,
-        to: transactionData.to,
-        amount: transactionData.amount,
-        fromBalance,
-        toBalance,
-        reason: transactionData.reason,
-        type: transactionData.type,
-        date: new Date().toISOString(),
-      }).execute();
+      await this.db
+        .insert(starBankTransactions)
+        .values({
+          from: transactionData.from,
+          to: transactionData.to,
+          amount: transactionData.amount,
+          fromBalance,
+          toBalance,
+          reason: transactionData.reason,
+          type: transactionData.type,
+          date: new Date().toISOString(),
+        })
+        .execute();
 
       return { success: true };
     } catch (error: any) {
       console.error('Failed to create transaction:', error);
-      return { success: false, message: `Transaction failed: ${error.message}` };
+      return {
+        success: false,
+        message: `Transaction failed: ${error.message}`,
+      };
     }
   }
 
-  async findAccountTransactions(accountId: number, limit: number = 50): Promise<TransactionDetails[]> {
+  async findAccountTransactions(
+    accountId: number,
+    limit: number = 50,
+  ): Promise<TransactionDetails[]> {
     try {
-      const toJoin = alias(starBankAccounts, "to");
-      const fromJoin = alias(starBankAccounts, "from");
+      const toJoin = alias(starBankAccounts, 'to');
+      const fromJoin = alias(starBankAccounts, 'from');
 
       const result = await this.db
         .selectDistinct({
@@ -253,34 +302,45 @@ export class StarbankRepository {
           fromName: fromJoin.name,
           toType: toJoin.type,
           fromType: fromJoin.type,
-          date: starBankTransactions.date
+          date: starBankTransactions.date,
         })
         .from(starBankTransactions)
         .innerJoin(toJoin, eq(starBankTransactions.to, toJoin.id))
         .innerJoin(fromJoin, eq(starBankTransactions.from, fromJoin.id))
-        .leftJoin(starBankUsersAccounts, or(
-          eq(toJoin.id, starBankUsersAccounts.accountId),
-          eq(fromJoin.id, starBankUsersAccounts.accountId)
-        ))
-        .where(or(
-          eq(starBankTransactions.from, accountId),
-          eq(starBankTransactions.to, accountId)
-        ))
+        .leftJoin(
+          starBankUsersAccounts,
+          or(
+            eq(toJoin.id, starBankUsersAccounts.accountId),
+            eq(fromJoin.id, starBankUsersAccounts.accountId),
+          ),
+        )
+        .where(
+          or(
+            eq(starBankTransactions.from, accountId),
+            eq(starBankTransactions.to, accountId),
+          ),
+        )
         .limit(limit)
         .orderBy(desc(starBankTransactions.date))
         .execute();
 
       return result;
     } catch (error: any) {
-      console.error(`Failed to find transactions for account ${accountId}:`, error);
+      console.error(
+        `Failed to find transactions for account ${accountId}:`,
+        error,
+      );
       throw new Error(`Failed to find account transactions: ${error.message}`);
     }
   }
 
-  async findUserTransactions(uuid: string, limit: number = 50): Promise<TransactionDetails[]> {
+  async findUserTransactions(
+    uuid: string,
+    limit: number = 50,
+  ): Promise<TransactionDetails[]> {
     try {
-      const toJoin = alias(starBankAccounts, "to");
-      const fromJoin = alias(starBankAccounts, "from");
+      const toJoin = alias(starBankAccounts, 'to');
+      const fromJoin = alias(starBankAccounts, 'from');
 
       const result = await this.db
         .selectDistinct({
@@ -295,15 +355,18 @@ export class StarbankRepository {
           fromName: fromJoin.name,
           toType: toJoin.type,
           fromType: fromJoin.type,
-          date: starBankTransactions.date
+          date: starBankTransactions.date,
         })
         .from(starBankTransactions)
         .innerJoin(toJoin, eq(starBankTransactions.to, toJoin.id))
         .innerJoin(fromJoin, eq(starBankTransactions.from, fromJoin.id))
-        .leftJoin(starBankUsersAccounts, or(
-          eq(toJoin.id, starBankUsersAccounts.accountId),
-          eq(fromJoin.id, starBankUsersAccounts.accountId)
-        ))
+        .leftJoin(
+          starBankUsersAccounts,
+          or(
+            eq(toJoin.id, starBankUsersAccounts.accountId),
+            eq(fromJoin.id, starBankUsersAccounts.accountId),
+          ),
+        )
         .leftJoin(smartrotomUsers, eq(starBankUsersAccounts.uuid, uuid))
         .limit(limit)
         .orderBy(desc(starBankTransactions.date))
@@ -316,10 +379,13 @@ export class StarbankRepository {
     }
   }
 
-  async findTransfersByAccount(accountId: number, limit: number = 10): Promise<TransactionDetails[]> {
+  async findTransfersByAccount(
+    accountId: number,
+    limit: number = 10,
+  ): Promise<TransactionDetails[]> {
     try {
-      const toJoin = alias(starBankAccounts, "to");
-      const fromJoin = alias(starBankAccounts, "from");
+      const toJoin = alias(starBankAccounts, 'to');
+      const fromJoin = alias(starBankAccounts, 'from');
 
       const result = await this.db
         .selectDistinct({
@@ -334,31 +400,40 @@ export class StarbankRepository {
           fromName: fromJoin.name,
           toType: toJoin.type,
           fromType: fromJoin.type,
-          date: starBankTransactions.date
+          date: starBankTransactions.date,
         })
         .from(starBankTransactions)
         .innerJoin(toJoin, eq(starBankTransactions.to, toJoin.id))
         .innerJoin(fromJoin, eq(starBankTransactions.from, fromJoin.id))
-        .innerJoin(starBankUsersAccounts, or(
-          eq(toJoin.id, starBankUsersAccounts.accountId),
-          eq(fromJoin.id, starBankUsersAccounts.accountId)
-        ))
-        .where(eq(starBankTransactions.type, "TRANSFERENCIA"))
+        .innerJoin(
+          starBankUsersAccounts,
+          or(
+            eq(toJoin.id, starBankUsersAccounts.accountId),
+            eq(fromJoin.id, starBankUsersAccounts.accountId),
+          ),
+        )
+        .where(eq(starBankTransactions.type, 'TRANSFERENCIA'))
         .limit(limit)
         .orderBy(desc(starBankTransactions.date))
         .execute();
 
       return result;
     } catch (error: any) {
-      console.error(`Failed to find transfers for account ${accountId}:`, error);
+      console.error(
+        `Failed to find transfers for account ${accountId}:`,
+        error,
+      );
       throw new Error(`Failed to find account transfers: ${error.message}`);
     }
   }
 
-  async findTransfersByUser(uuid: string, limit: number = 10): Promise<TransactionDetails[]> {
+  async findTransfersByUser(
+    uuid: string,
+    limit: number = 10,
+  ): Promise<TransactionDetails[]> {
     try {
-      const toJoin = alias(starBankAccounts, "to");
-      const fromJoin = alias(starBankAccounts, "from");
+      const toJoin = alias(starBankAccounts, 'to');
+      const fromJoin = alias(starBankAccounts, 'from');
 
       const result = await this.db
         .select({
@@ -373,17 +448,20 @@ export class StarbankRepository {
           fromName: fromJoin.name,
           toType: toJoin.type,
           fromType: fromJoin.type,
-          date: starBankTransactions.date
+          date: starBankTransactions.date,
         })
         .from(starBankTransactions)
         .innerJoin(toJoin, eq(starBankTransactions.to, toJoin.id))
         .innerJoin(fromJoin, eq(starBankTransactions.from, fromJoin.id))
-        .innerJoin(starBankUsersAccounts, or(
-          eq(toJoin.id, starBankUsersAccounts.accountId),
-          eq(fromJoin.id, starBankUsersAccounts.accountId)
-        ))
+        .innerJoin(
+          starBankUsersAccounts,
+          or(
+            eq(toJoin.id, starBankUsersAccounts.accountId),
+            eq(fromJoin.id, starBankUsersAccounts.accountId),
+          ),
+        )
         .innerJoin(smartrotomUsers, eq(starBankUsersAccounts.uuid, uuid))
-        .where(eq(starBankTransactions.type, "TRANSFERENCIA"))
+        .where(eq(starBankTransactions.type, 'TRANSFERENCIA'))
         .limit(limit)
         .orderBy(desc(starBankTransactions.date))
         .execute();
@@ -411,9 +489,9 @@ export class StarbankRepository {
     try {
       const accounts = await this.findUserAccounts(uuid);
       if (accounts.length === 0) return 0;
-      
+
       // Return main account balance or first account balance
-      const mainAccount = accounts.find(acc => acc.type === 'MAIN');
+      const mainAccount = accounts.find((acc) => acc.type === 'MAIN');
       return mainAccount ? mainAccount.balance : accounts[0].balance;
     } catch (error: any) {
       console.error(`Failed to get balance for user ${uuid}:`, error);

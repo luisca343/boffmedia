@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { AchievementsService } from './achievements.service';
 import { ReplaysService } from './replays.service';
 import { UserAchievementEntity } from '../entities/user-achievement.entity';
@@ -22,33 +26,39 @@ export class BattleAchievementService {
     private readonly replaysService: ReplaysService,
   ) {}
 
-  async processBattleAchievement(battleData: BattleAchievementRequest): Promise<{ success: boolean; message: string }> {
+  async processBattleAchievement(
+    battleData: BattleAchievementRequest,
+  ): Promise<{ success: boolean; message: string }> {
     this.validateBattleData(battleData);
 
     // Check if achievement exists
-    const achievementExists = await this.achievementsService.validateAchievementExists(battleData.logro);
+    const achievementExists =
+      await this.achievementsService.validateAchievementExists(
+        battleData.logro,
+      );
     if (!achievementExists) {
       throw new NotFoundException('Achievement not found');
     }
 
     // Check if user already has this achievement
-    const userAchievementStatus = await this.achievementsService.checkUserHasAchievement(
-      battleData.uuid, 
-      battleData.logro
-    );
+    const userAchievementStatus =
+      await this.achievementsService.checkUserHasAchievement(
+        battleData.uuid,
+        battleData.logro,
+      );
 
     if (userAchievementStatus.completed === 1) {
-      return { 
-        success: false, 
-        message: 'Achievement already completed' 
+      return {
+        success: false,
+        message: 'Achievement already completed',
       };
     }
 
     // Only process if user won the battle (for most achievements)
     if (!battleData.victoria) {
-      return { 
-        success: false, 
-        message: 'Achievement requires victory' 
+      return {
+        success: false,
+        message: 'Achievement requires victory',
       };
     }
 
@@ -59,13 +69,16 @@ export class BattleAchievementService {
       team1: JSON.stringify(battleData.team1),
       team2: JSON.stringify(battleData.team2),
       replay: battleData.replay,
-      winner: battleData.name1 // Assuming name1 is the winner based on victoria = true
+      winner: battleData.name1, // Assuming name1 is the winner based on victoria = true
     };
 
     const replayResult = await this.replaysService.createReplay(replayData);
 
     // Create user replay association
-    await this.replaysService.createUserReplay(battleData.uuid, replayResult.insertId);
+    await this.replaysService.createUserReplay(
+      battleData.uuid,
+      replayResult.insertId,
+    );
 
     // Create user achievement
     const achievementData: UserAchievementEntity = {
@@ -74,14 +87,14 @@ export class BattleAchievementService {
       progress: 1,
       completed: 1,
       dataId: replayResult.insertId,
-      completedAt: new Date()
+      completedAt: new Date(),
     };
 
     await this.achievementsService.createUserAchievement(achievementData);
 
-    return { 
-      success: true, 
-      message: 'Achievement unlocked successfully' 
+    return {
+      success: true,
+      message: 'Achievement unlocked successfully',
     };
   }
 
@@ -101,10 +114,14 @@ export class BattleAchievementService {
       throw new BadRequestException('Player 2 name is required');
     }
     if (!battleData.team1 || !Array.isArray(battleData.team1)) {
-      throw new BadRequestException('Player 1 team data is required and must be an array');
+      throw new BadRequestException(
+        'Player 1 team data is required and must be an array',
+      );
     }
     if (!battleData.team2 || !Array.isArray(battleData.team2)) {
-      throw new BadRequestException('Player 2 team data is required and must be an array');
+      throw new BadRequestException(
+        'Player 2 team data is required and must be an array',
+      );
     }
     if (!battleData.replay) {
       throw new BadRequestException('Replay data is required');

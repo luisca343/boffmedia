@@ -1,8 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { DocumentService, CreateDocumentRequest, UpdateDocumentRequest } from './services/document.service';
+import {
+  DocumentService,
+  CreateDocumentRequest,
+  UpdateDocumentRequest,
+} from './services/document.service';
 import { NoteService } from './services/note.service';
-import { NewsService, CreateNewsRequest, UpdateNewsRequest, NewsResponse } from './services/news.service';
-import { DocumentDetails, NotePreview, NewsDetails } from '@api/smartrotom/documents/repositories/documents.repository';
+import {
+  NewsService,
+  CreateNewsRequest,
+  UpdateNewsRequest,
+  NewsResponse,
+} from './services/news.service';
+import {
+  DocumentDetails,
+  NotePreview,
+  NewsDetails,
+} from '@api/smartrotom/documents/repositories/documents.repository';
 
 export interface CreateNoteWithUserRequest {
   title: string;
@@ -30,7 +43,9 @@ export class DocumentsFacadeService {
     }
   }
 
-  async createDocument(createDocumentRequest: CreateDocumentRequest): Promise<DocumentDetails> {
+  async createDocument(
+    createDocumentRequest: CreateDocumentRequest,
+  ): Promise<DocumentDetails> {
     try {
       return await this.documentService.createDocument(createDocumentRequest);
     } catch (error: any) {
@@ -39,21 +54,29 @@ export class DocumentsFacadeService {
     }
   }
 
-  async updateDocument(id: number, updateDocumentRequest: UpdateDocumentRequest): Promise<DocumentDetails> {
+  async updateDocument(
+    id: number,
+    updateDocumentRequest: UpdateDocumentRequest,
+  ): Promise<DocumentDetails> {
     try {
-      return await this.documentService.updateDocument(id, updateDocumentRequest);
+      return await this.documentService.updateDocument(
+        id,
+        updateDocumentRequest,
+      );
     } catch (error: any) {
       console.error(`Error updating document ${id}:`, error);
       throw new Error(`Failed to update document: ${error.message}`);
     }
   }
 
-  async deleteDocument(id: number): Promise<{ success: boolean; message: string }> {
+  async deleteDocument(
+    id: number,
+  ): Promise<{ success: boolean; message: string }> {
     try {
       await this.documentService.deleteDocument(id);
       return {
         success: true,
-        message: 'Document deleted successfully'
+        message: 'Document deleted successfully',
       };
     } catch (error: any) {
       console.error(`Error deleting document ${id}:`, error);
@@ -61,7 +84,12 @@ export class DocumentsFacadeService {
     }
   }
 
-  async saveDocument(id: number, title: string, content: string, type: number): Promise<{ success: boolean; id: number }> {
+  async saveDocument(
+    id: number,
+    title: string,
+    content: string,
+    type: number,
+  ): Promise<{ success: boolean; id: number }> {
     try {
       return await this.documentService.saveDocument(id, title, content, type);
     } catch (error: any) {
@@ -81,12 +109,14 @@ export class DocumentsFacadeService {
     }
   }
 
-  async createNoteWithUser(createNoteRequest: CreateNoteWithUserRequest): Promise<{ id: number; success: boolean }> {
+  async createNoteWithUser(
+    createNoteRequest: CreateNoteWithUserRequest,
+  ): Promise<{ id: number; success: boolean }> {
     try {
       const document = await this.documentService.createDocument({
         title: createNoteRequest.title,
         content: createNoteRequest.content,
-        type: createNoteRequest.type
+        type: createNoteRequest.type,
       });
 
       await this.noteService.addNoteToUser(document.id, createNoteRequest.uuid);
@@ -98,7 +128,10 @@ export class DocumentsFacadeService {
     }
   }
 
-  async addNoteToUser(documentId: number, uuid: string): Promise<{ success: boolean }> {
+  async addNoteToUser(
+    documentId: number,
+    uuid: string,
+  ): Promise<{ success: boolean }> {
     try {
       return await this.noteService.addNoteToUser(documentId, uuid);
     } catch (error: any) {
@@ -107,11 +140,17 @@ export class DocumentsFacadeService {
     }
   }
 
-  async removeNoteFromUser(documentId: number, uuid: string): Promise<{ success: boolean }> {
+  async removeNoteFromUser(
+    documentId: number,
+    uuid: string,
+  ): Promise<{ success: boolean }> {
     try {
       return await this.noteService.removeNoteFromUser(documentId, uuid);
     } catch (error: any) {
-      console.error(`Error removing note ${documentId} from user ${uuid}:`, error);
+      console.error(
+        `Error removing note ${documentId} from user ${uuid}:`,
+        error,
+      );
       throw new Error(`Failed to remove note from user: ${error.message}`);
     }
   }
@@ -163,7 +202,10 @@ export class DocumentsFacadeService {
     }
   }
 
-  async updateNews(newsId: number, updateNewsRequest: UpdateNewsRequest): Promise<NewsDetails> {
+  async updateNews(
+    newsId: number,
+    updateNewsRequest: UpdateNewsRequest,
+  ): Promise<NewsDetails> {
     try {
       return await this.newsService.updateNews(newsId, updateNewsRequest);
     } catch (error: any) {
@@ -172,12 +214,14 @@ export class DocumentsFacadeService {
     }
   }
 
-  async deleteNews(newsId: number): Promise<{ success: boolean; message: string }> {
+  async deleteNews(
+    newsId: number,
+  ): Promise<{ success: boolean; message: string }> {
     try {
       await this.newsService.deleteNews(newsId);
       return {
         success: true,
-        message: 'News deleted successfully'
+        message: 'News deleted successfully',
       };
     } catch (error: any) {
       console.error(`Error deleting news ${newsId}:`, error);
@@ -185,7 +229,10 @@ export class DocumentsFacadeService {
     }
   }
 
-  async updateNewsStatus(publishedIds: number[], featuredId: number): Promise<{ success: boolean }> {
+  async updateNewsStatus(
+    publishedIds: number[],
+    featuredId: number,
+  ): Promise<{ success: boolean }> {
     try {
       return await this.newsService.updateNewsStatus(publishedIds, featuredId);
     } catch (error: any) {
@@ -194,7 +241,10 @@ export class DocumentsFacadeService {
     }
   }
 
-  async saveNews(news: CreateNewsRequest, newsId: number): Promise<{ success: boolean; id: number }> {
+  async saveNews(
+    news: CreateNewsRequest,
+    newsId: number,
+  ): Promise<{ success: boolean; id: number }> {
     try {
       return await this.newsService.saveNews(news, newsId);
     } catch (error: any) {
@@ -205,7 +255,10 @@ export class DocumentsFacadeService {
 
   // ==================== VALIDATION METHODS ====================
 
-  async validateDocumentAccess(documentId: number, uuid: string): Promise<boolean> {
+  async validateDocumentAccess(
+    documentId: number,
+    uuid: string,
+  ): Promise<boolean> {
     try {
       return await this.noteService.validateUserHasAccess(documentId, uuid);
     } catch (error: any) {

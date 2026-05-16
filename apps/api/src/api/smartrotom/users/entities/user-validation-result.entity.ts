@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UserValidationResult {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Whether the user exists',
-    example: true
+    example: true,
   })
   exists: boolean;
 }

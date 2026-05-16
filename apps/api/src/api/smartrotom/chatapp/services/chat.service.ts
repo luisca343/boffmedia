@@ -1,5 +1,8 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { CHAT_REPOSITORY_TOKEN, CHAT_MEMBER_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/chatapp.repository.token';
+import {
+  CHAT_REPOSITORY_TOKEN,
+  CHAT_MEMBER_REPOSITORY_TOKEN,
+} from '@api/_utils/repositories/interfaces/chatapp.repository.token';
 import { IChatRepository } from '../repositories/interfaces/chat.repository.interface';
 import { IMemberRepository } from '../repositories/interfaces/chat-member.repository.interface';
 import { ChatDetails } from '../repositories/chatapp.repository';
@@ -31,9 +34,13 @@ export class ChatService {
     if (uuids.length === 1) {
       // For single-user chats (like "Mensajes Guardados"), check if THIS user already has one
       const existingChats = await this.chatRepository.findUserChats(uuids[0]);
-      const existingChat = existingChats.find(chat => chat.name === chatName && chat.type === 1);
+      const existingChat = existingChats.find(
+        (chat) => chat.name === chatName && chat.type === 1,
+      );
       if (existingChat) {
-        console.log(`User ${uuids[0]} already has a "${chatName}" chat (ID: ${existingChat.id})`);
+        console.log(
+          `User ${uuids[0]} already has a "${chatName}" chat (ID: ${existingChat.id})`,
+        );
         return existingChat.id;
       }
       chatType = 1;
@@ -50,14 +57,16 @@ export class ChatService {
     const newChat = await this.chatRepository.createChat({
       type: chatType,
       name: chatName,
-      description: 'Chat'
+      description: 'Chat',
     });
 
     for (const uuid of uuids) {
       await this.chatMemberRepository.addChatMember(newChat.insertId, uuid);
     }
 
-    console.log(`Created new chat "${chatName}" (ID: ${newChat.insertId}) for user(s): ${uuids.join(', ')}`);
+    console.log(
+      `Created new chat "${chatName}" (ID: ${newChat.insertId}) for user(s): ${uuids.join(', ')}`,
+    );
     return newChat.insertId;
   }
 
@@ -67,7 +76,10 @@ export class ChatService {
     return chat;
   }
 
-  async updateChat(chatId: number, chatData: { name?: string; description?: string; image?: string }): Promise<ChatDetails> {
+  async updateChat(
+    chatId: number,
+    chatData: { name?: string; description?: string; image?: string },
+  ): Promise<ChatDetails> {
     const existingChat = await this.chatRepository.findChatById(chatId);
     if (!existingChat) throw new Error('Chat not found');
     await this.chatRepository.updateChat(chatId, chatData);
@@ -86,7 +98,10 @@ export class ChatService {
   }
 
   async validateUserInChat(chatId: number, uuid: string): Promise<boolean> {
-    const membership = await this.chatMemberRepository.findUserInChat(chatId, uuid);
+    const membership = await this.chatMemberRepository.findUserInChat(
+      chatId,
+      uuid,
+    );
     return !!membership;
   }
 }

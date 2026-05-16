@@ -1,8 +1,17 @@
-import { Injectable, NotFoundException, ConflictException, BadRequestException, Inject } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+  BadRequestException,
+  Inject,
+} from '@nestjs/common';
 import { SmartRotomApp } from '@/_db/schema/SmartRotom';
 import { IUserAppsRepository } from '../repositories/interfaces/user-apps-repository.interface';
 import { IAppsRepository } from '../repositories/interfaces/apps-repository.interface';
-import { APPS_REPOSITORY_TOKEN, USER_APPS_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
+import {
+  APPS_REPOSITORY_TOKEN,
+  USER_APPS_REPOSITORY_TOKEN,
+} from '@api/_utils/repositories/interfaces/repository.token';
 import { AppStatus } from '../enums/app-status.enum';
 
 @Injectable()
@@ -21,7 +30,10 @@ export class UserAppsService {
     return this.userAppsRepository.getAppsForPlayer(uuid);
   }
 
-  async addAppToPlayer(uuid: string, appId: number): Promise<{ success: boolean }> {
+  async addAppToPlayer(
+    uuid: string,
+    appId: number,
+  ): Promise<{ success: boolean }> {
     this.validateUuid(uuid);
     this.validateAppId(appId);
 
@@ -34,14 +46,17 @@ export class UserAppsService {
       throw new BadRequestException('App is inactive');
     }
 
-    const existingUserApp = await this.userAppsRepository.findUserApp(uuid, appId);
+    const existingUserApp = await this.userAppsRepository.findUserApp(
+      uuid,
+      appId,
+    );
     if (existingUserApp) {
       throw new ConflictException('App already added to player');
     }
 
     const appOrder = await this.userAppsRepository.findByPlayerUuid(uuid);
     let order = 1;
-    const usedOrders = new Set(appOrder.map(a => a.order));
+    const usedOrders = new Set(appOrder.map((a) => a.order));
     while (usedOrders.has(order) && order <= 36) {
       order++;
     }
@@ -51,7 +66,10 @@ export class UserAppsService {
     return { success: true };
   }
 
-  async removeAppFromPlayer(uuid: string, appId: number): Promise<{ success: boolean }> {
+  async removeAppFromPlayer(
+    uuid: string,
+    appId: number,
+  ): Promise<{ success: boolean }> {
     this.validateUuid(uuid);
     this.validateAppId(appId);
 
@@ -66,31 +84,39 @@ export class UserAppsService {
   // ==================== APP ORDERING ====================
 
   async orderAppsForPlayer(
-    order: { id: number | string; order: number }[], 
-    uuid: string
+    order: { id: number | string; order: number }[],
+    uuid: string,
   ): Promise<{ success: boolean }> {
     this.validateUuid(uuid);
-    
+
     if (!order?.length) {
       throw new BadRequestException('Order data is required');
     }
 
     // Get existing apps for the player
     const existingApps = await this.userAppsRepository.findByPlayerUuid(uuid);
-    const existingAppIds = new Set(existingApps.map(app => app.appId));
+    const existingAppIds = new Set(existingApps.map((app) => app.appId));
 
     // Filter out any apps that are not in the existing set
-    const validOrder = order.filter(app => existingAppIds.has(Number(app.id)));
+    const validOrder = order.filter((app) =>
+      existingAppIds.has(Number(app.id)),
+    );
 
     // Update the order of existing apps
     for (const app of validOrder) {
-      await this.userAppsRepository.updateOrder(uuid, Number(app.id), app.order);
+      await this.userAppsRepository.updateOrder(
+        uuid,
+        Number(app.id),
+        app.order,
+      );
     }
 
     // Reset order for apps not in the valid order list
-    const validAppIds = validOrder.map(app => Number(app.id));
-    const appsToReset = Array.from(existingAppIds).filter(id => !validAppIds.includes(id));
-    
+    const validAppIds = validOrder.map((app) => Number(app.id));
+    const appsToReset = Array.from(existingAppIds).filter(
+      (id) => !validAppIds.includes(id),
+    );
+
     if (appsToReset.length > 0) {
       await this.userAppsRepository.resetOrderExcept(uuid, appsToReset);
     }

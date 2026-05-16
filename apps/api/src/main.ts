@@ -7,7 +7,7 @@ import { AppModule } from './app.module';
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
-import { apiReference } from '@scalar/nestjs-api-reference'
+import { apiReference } from '@scalar/nestjs-api-reference';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { DuplicateEntryExceptionFilter } from './_filters/DuplicateEntryExceptionFilter';
 
@@ -17,13 +17,15 @@ async function bootstrap() {
   });
 
   // Add global validation pipe for better type generation
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: true,
-    transform: true,
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
 
-  let origin = [
+  const origin = [
     'http://localhost:3000',
     'http://148.251.3.244:34333',
     'https://lizardon.es',
@@ -46,17 +48,22 @@ async function bootstrap() {
   if (process.env.NODE_ENV !== 'production') {
     const config = new DocumentBuilder()
       .setTitle('Ficus Labs API')
-      .setDescription('Comprehensive API for Ficus Labs services including SmartRotom and BoffMedia tools')
+      .setDescription(
+        'Comprehensive API for Ficus Labs services including SmartRotom and BoffMedia tools',
+      )
       .setVersion('1.0.0')
       .setContact('Ficus Labs', 'https://ficuslab.es', 'contact@ficuslab.es')
       .addServer('https://api.ficuslab.es', 'Development server')
       .addServer('https://api.boffmedia.es', 'Production server')
-      .addBearerAuth({
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        description: 'Enter JWT token for authentication',
-      }, 'JWT')
+      .addBearerAuth(
+        {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          description: 'Enter JWT token for authentication',
+        },
+        'JWT',
+      )
       .build();
 
     const document = SwaggerModule.createDocument(app, config, {
@@ -69,11 +76,14 @@ async function bootstrap() {
     // YOUR ORIGINAL TAG SORTING LOGIC - KEPT EXACTLY AS IT WAS
     if (document.tags && document.tags.length > 0) {
       document.tags.sort((a, b) => a.name.localeCompare(b.name));
-      console.log('Tags sorted alphabetically:', document.tags.map(tag => tag.name));
+      console.log(
+        'Tags sorted alphabetically:',
+        document.tags.map((tag) => tag.name),
+      );
     } else {
       // Extract tags from paths if they're not in the document.tags array
       const tagsSet = new Set<string>();
-      
+
       Object.values(document.paths).forEach((pathItem: any) => {
         Object.values(pathItem).forEach((operation: any) => {
           if (operation.tags && Array.isArray(operation.tags)) {
@@ -81,19 +91,22 @@ async function bootstrap() {
           }
         });
       });
-      
+
       // Convert to sorted array and add to document
       document.tags = Array.from(tagsSet)
         .sort((a, b) => a.localeCompare(b))
-        .map(tag => ({ name: tag }));
-      
-      console.log('Tags extracted and sorted:', document.tags.map(tag => tag.name));
+        .map((tag) => ({ name: tag }));
+
+      console.log(
+        'Tags extracted and sorted:',
+        document.tags.map((tag) => tag.name),
+      );
     }
 
     console.log('Final document structure check:');
     console.log('Tags count:', document.tags?.length || 0);
     console.log('Paths count:', Object.keys(document.paths).length);
-    
+
     // Set up the standard Swagger endpoints
     SwaggerModule.setup('api', app, document, {
       swaggerOptions: {
@@ -104,7 +117,7 @@ async function bootstrap() {
       },
       customSiteTitle: 'Ficus Labs API Documentation',
     });
-    
+
     // Set up the Scalar API reference
     app.use(
       '/reference',

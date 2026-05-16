@@ -14,9 +14,14 @@ export class NuevaFraseCommand {
   })
   public async onNuevaFrase(
     @Context() [interaction]: SlashCommandContext,
-    @Options() { usuario, frase, comentario }: NuevaFraseDto
+    @Options() { usuario, frase, comentario }: NuevaFraseDto,
   ) {
-    const response = await this.service.addQuote(interaction.guildId, usuario, frase, comentario);
+    const response = await this.service.addQuote(
+      interaction.guildId,
+      usuario,
+      frase,
+      comentario,
+    );
     await interaction.reply(response);
   }
 }

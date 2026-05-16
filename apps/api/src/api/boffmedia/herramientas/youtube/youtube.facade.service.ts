@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { TranscriptionService, TranscriptionResult, VideoInfoResult } from './services/transcription.service';
+import {
+  TranscriptionService,
+  TranscriptionResult,
+  VideoInfoResult,
+} from './services/transcription.service';
 
 @Injectable()
 export class YoutubeFacadeService {
-  constructor(
-    private readonly transcriptionService: TranscriptionService,
-  ) {}
+  constructor(private readonly transcriptionService: TranscriptionService) {}
 
   // ==================== TRANSCRIPTION OPERATIONS ====================
 

@@ -17,11 +17,11 @@ export class WingullFacadeService {
     private readonly wingullPlayerService: WingullPlayerService,
     private readonly wingullWorldService: WingullWorldService,
     private readonly wingullTransportService: WingullTransportService,
-    private readonly wingullRepository: WingullRepository
+    private readonly wingullRepository: WingullRepository,
   ) {}
-  
+
   // ==================== ECONOMY OPERATIONS ====================
-  
+
   async updateBalance(balanceData: WingullBalanceDto): Promise<any> {
     try {
       return await this.wingullEconomyService.updateBalance(balanceData);
@@ -30,7 +30,7 @@ export class WingullFacadeService {
       throw new Error(`Failed to update balance: ${error.message}`);
     }
   }
-  
+
   async getCurrentBalance(uuid: string, amount?: number): Promise<number> {
     try {
       return await this.wingullEconomyService.getCurrentBalance(uuid, amount);
@@ -39,7 +39,7 @@ export class WingullFacadeService {
       throw new Error(`Failed to get current balance: ${error.message}`);
     }
   }
-  
+
   async getMoney(uuid: string): Promise<number> {
     try {
       return await this.wingullEconomyService.getMoney(uuid);
@@ -48,9 +48,9 @@ export class WingullFacadeService {
       throw new Error(`Failed to get money: ${error.message}`);
     }
   }
-  
+
   // ==================== PLAYER OPERATIONS ====================
-  
+
   async getStats(uuid: string): Promise<PlayerStats> {
     try {
       return await this.wingullPlayerService.getStats(uuid);
@@ -59,7 +59,7 @@ export class WingullFacadeService {
       throw new Error(`Failed to get stats: ${error.message}`);
     }
   }
-  
+
   async getTeam(uuid: string): Promise<PokemonW[]> {
     try {
       return await this.wingullPlayerService.getTeam(uuid);
@@ -95,7 +95,7 @@ export class WingullFacadeService {
       throw new Error(`Failed to update dex: ${error.message}`);
     }
   }
-  
+
   async getQuests(uuid: string): Promise<any> {
     try {
       return await this.wingullPlayerService.getQuests(uuid);
@@ -104,7 +104,7 @@ export class WingullFacadeService {
       throw new Error(`Failed to get quests: ${error.message}`);
     }
   }
-  
+
   async sendMessage(uuid: string, message: string): Promise<any> {
     try {
       return await this.wingullPlayerService.sendMessage(uuid, message);
@@ -122,22 +122,33 @@ export class WingullFacadeService {
       throw new Error(`Failed to send global chat message: ${error.message}`);
     }
   }
-  
-  async givePokemon(uuid: string, pokespec: string, sendMessage: boolean = true): Promise<any> {
+
+  async givePokemon(
+    uuid: string,
+    pokespec: string,
+    sendMessage: boolean = true,
+  ): Promise<any> {
     try {
-      return await this.wingullPlayerService.givePokemon(uuid, pokespec, sendMessage);
+      return await this.wingullPlayerService.givePokemon(
+        uuid,
+        pokespec,
+        sendMessage,
+      );
     } catch (error: any) {
       console.error(`Error giving Pokémon to ${uuid}:`, error);
       throw new Error(`Failed to give Pokémon: ${error.message}`);
     }
   }
-  
-  async giveItems(uuid: string, items: Array<{
-    id: string,
-    amount: number,
-    display_name?: string,
-    lore?: string[]
-  }>): Promise<any> {
+
+  async giveItems(
+    uuid: string,
+    items: Array<{
+      id: string;
+      amount: number;
+      display_name?: string;
+      lore?: string[];
+    }>,
+  ): Promise<any> {
     try {
       return await this.wingullPlayerService.giveItems(uuid, items);
     } catch (error: any) {
@@ -149,24 +160,26 @@ export class WingullFacadeService {
   async getBattleTeams(uuid: string): Promise<any> {
     try {
       const data = await this.wingullPlayerService.getBattleTeams(uuid);
-      
+
       // The battleteam is already an array of pokemon, wrap it as a single team
       if (data && data.battleteam) {
-        const pokemon = Array.isArray(data.battleteam) ? data.battleteam : [data.battleteam];
-        
+        const pokemon = Array.isArray(data.battleteam)
+          ? data.battleteam
+          : [data.battleteam];
+
         return {
           teams: [
             {
               id: 1,
-              name: "battleteam",
-              pokemon: pokemon
-            }
+              name: 'battleteam',
+              pokemon: pokemon,
+            },
           ],
           maxTeams: 5,
-          activeTeamId: -1
+          activeTeamId: -1,
         };
       }
-      
+
       return data;
     } catch (error: any) {
       console.error(`Error getting battle teams for ${uuid}:`, error);
@@ -174,17 +187,21 @@ export class WingullFacadeService {
     }
   }
 
-  async updateBattleTeam(updateBattleTeamDto: UpdateBattleTeamDto): Promise<any> {
+  async updateBattleTeam(
+    updateBattleTeamDto: UpdateBattleTeamDto,
+  ): Promise<any> {
     try {
-      return await this.wingullPlayerService.updateBattleTeam(updateBattleTeamDto);
+      return await this.wingullPlayerService.updateBattleTeam(
+        updateBattleTeamDto,
+      );
     } catch (error: any) {
       console.error('Error updating battle team:', error);
       throw new Error(`Failed to update battle team: ${error.message}`);
     }
   }
-  
+
   // ==================== WORLD OPERATIONS ====================
-  
+
   async getPerformance(): Promise<any> {
     try {
       return await this.wingullWorldService.getPerformance();
@@ -193,7 +210,7 @@ export class WingullFacadeService {
       throw new Error(`Failed to get performance data: ${error.message}`);
     }
   }
-  
+
   async getRegions(): Promise<any> {
     try {
       return await this.wingullWorldService.getRegions();
@@ -202,7 +219,7 @@ export class WingullFacadeService {
       throw new Error(`Failed to get regions data: ${error.message}`);
     }
   }
-  
+
   async getWeather(): Promise<any> {
     try {
       return await this.wingullWorldService.getWeather();
@@ -211,7 +228,7 @@ export class WingullFacadeService {
       throw new Error(`Failed to get weather data: ${error.message}`);
     }
   }
-  
+
   async updateNPCs(data: any): Promise<any> {
     try {
       return await this.wingullWorldService.updateNPCs(data);
@@ -220,13 +237,13 @@ export class WingullFacadeService {
       throw new Error(`Failed to update NPCs: ${error.message}`);
     }
   }
-  
+
   async getWorldGuardWorlds(): Promise<{ id: number; name: string }[]> {
     return await this.wingullRepository.getWorldGuardWorlds();
   }
-  
+
   // ==================== TRANSPORTATION OPERATIONS ====================
-  
+
   async getTaxiStops(): Promise<TaxiStop[]> {
     try {
       return await this.wingullTransportService.getTaxiStops();
@@ -235,7 +252,7 @@ export class WingullFacadeService {
       throw new Error(`Failed to get taxi stops: ${error.message}`);
     }
   }
-  
+
   async teleportPlayer(id: string, uuid: string): Promise<boolean> {
     try {
       return await this.wingullTransportService.teleportPlayer(id, uuid);
@@ -245,7 +262,15 @@ export class WingullFacadeService {
     }
   }
 
-  async getPlayersOwnedRegions(uuid: string): Promise<{ region_id: string; world_id: number; owner: boolean; name: string; uuid: string }[]> {
+  async getPlayersOwnedRegions(uuid: string): Promise<
+    {
+      region_id: string;
+      world_id: number;
+      owner: boolean;
+      name: string;
+      uuid: string;
+    }[]
+  > {
     return await this.wingullRepository.getPlayersOwnedRegions(uuid);
   }
 

@@ -11,9 +11,9 @@ export class SetVozAutocompleteInterceptor extends AutocompleteInterceptor {
     if (focused.name === 'voz') {
       const choices = await getVoices();
       const focusedValue = focused.value.toString().toLowerCase();
-      
-      let filtered = choices.filter(choice => 
-        choice.name.toLowerCase().includes(focusedValue)
+
+      let filtered = choices.filter((choice) =>
+        choice.name.toLowerCase().includes(focusedValue),
       );
 
       if (filtered.length > 25) {
@@ -21,7 +21,7 @@ export class SetVozAutocompleteInterceptor extends AutocompleteInterceptor {
       }
 
       return interaction.respond(
-        filtered.map(choice => ({ name: choice.name, value: choice.value }))
+        filtered.map((choice) => ({ name: choice.name, value: choice.value })),
       );
     }
   }

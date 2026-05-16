@@ -1,6 +1,12 @@
 import { BaseDto } from '@api/_utils/dto/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsInt, IsOptional, IsEnum } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsInt,
+  IsOptional,
+  IsEnum,
+} from 'class-validator';
 
 export enum MessageType {
   TEXT = 'text',
@@ -17,27 +23,27 @@ export enum MessageType {
 }
 
 export class CreateMessageDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Sender UUID',
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
   })
   @IsNotEmpty()
   @IsString()
   uuid: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Message content',
-    example: 'Hello everyone!'
+    example: 'Hello everyone!',
   })
   @IsNotEmpty()
   @IsString()
   message: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Type of message',
     enum: MessageType,
     example: MessageType.TEXT,
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsEnum(MessageType)
@@ -45,18 +51,18 @@ export class CreateMessageDto extends BaseDto {
 }
 
 export class GetMessagesDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Chat ID',
-    example: 1
+    example: 1,
   })
   @IsNotEmpty()
   @IsInt()
   chatId: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Maximum number of messages to retrieve',
     example: 50,
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsInt()
@@ -64,25 +70,25 @@ export class GetMessagesDto {
 }
 
 export class UpdateMessageDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Message ID',
-    example: 123
+    example: 123,
   })
   @IsNotEmpty()
   @IsInt()
   messageId: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'New message content',
-    example: 'Updated message content'
+    example: 'Updated message content',
   })
   @IsNotEmpty()
   @IsString()
   content: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'UUID of user updating the message',
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
   })
   @IsNotEmpty()
   @IsString()
@@ -90,17 +96,17 @@ export class UpdateMessageDto extends BaseDto {
 }
 
 export class DeleteMessageDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Message ID',
-    example: 123
+    example: 123,
   })
   @IsNotEmpty()
   @IsInt()
   messageId: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'UUID of user deleting the message',
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
   })
   @IsNotEmpty()
   @IsString()
@@ -108,17 +114,17 @@ export class DeleteMessageDto extends BaseDto {
 }
 
 export class MarkMessageReadDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Message ID',
-    example: 123
+    example: 123,
   })
   @IsNotEmpty()
   @IsInt()
   messageId: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'User UUID',
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
   })
   @IsNotEmpty()
   @IsString()

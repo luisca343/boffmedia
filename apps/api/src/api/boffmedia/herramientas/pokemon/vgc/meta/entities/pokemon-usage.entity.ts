@@ -1,25 +1,32 @@
 /** Usage entry for a single Pokemon -- returned by the Ladder and Champions tabs */
 export interface PokemonUsageEntry {
-  speciesId:    string;
-  speciesName:  string;
-  rank:         number;
-  types:        string[];
+  speciesId: string;
+  speciesName: string;
+  rank: number;
+  types: string[];
   usagePercent: number;
-  rawCount:     number;
-  topItem?:     string;
-  topMove?:     string;
+  rawCount: number;
+  topItem?: string;
+  topMove?: string;
   topTeraType?: string;
 }
 
 /** Full detail for a single Pokemon (expanded panel) */
 export interface PokemonUsageDetail extends PokemonUsageEntry {
-  baseStats:  { hp: number; atk: number; def: number; spa: number; spd: number; spe: number };
-  abilities:  Array<{ name: string; percent: number }>;
-  items:      Array<{ name: string; percent: number }>;
-  moves:      Array<{ name: string; percent: number }>;
-  teraTypes:  Array<{ name: string; percent: number }>;
-  teammates:  Array<{ name: string; percent: number }>;
-  spreads:    Array<{ nature: string; spread: string; percent: number }>;
+  baseStats: {
+    hp: number;
+    atk: number;
+    def: number;
+    spa: number;
+    spd: number;
+    spe: number;
+  };
+  abilities: Array<{ name: string; percent: number }>;
+  items: Array<{ name: string; percent: number }>;
+  moves: Array<{ name: string; percent: number }>;
+  teraTypes: Array<{ name: string; percent: number }>;
+  teammates: Array<{ name: string; percent: number }>;
+  spreads: Array<{ nature: string; spread: string; percent: number }>;
 }
 
 /**
@@ -27,44 +34,44 @@ export interface PokemonUsageDetail extends PokemonUsageEntry {
  * Returned by GET /champions/:speciesId/detail — separate from the usage list entry.
  */
 export interface ChampionsPasteDetail {
-  speciesId:  string;
+  speciesId: string;
   speciesName: string;
   pasteCount: number;
-  abilities:  Array<{ name: string; percent: number }>;
-  items:      Array<{ name: string; percent: number }>;
-  moves:      Array<{ name: string; percent: number }>;
-  teraTypes:  Array<{ name: string; percent: number }>;
-  spreads:    Array<{ nature: string; spread: string; percent: number }>;
+  abilities: Array<{ name: string; percent: number }>;
+  items: Array<{ name: string; percent: number }>;
+  moves: Array<{ name: string; percent: number }>;
+  teraTypes: Array<{ name: string; percent: number }>;
+  spreads: Array<{ nature: string; spread: string; percent: number }>;
 }
 
 /** Result of a batch paste-fetch operation */
 export interface BatchFetchResult {
-  total:   number;
+  total: number;
   fetched: number;
-  cached:  number;
-  failed:  number;
+  cached: number;
+  failed: number;
 }
 
 /** A single team entry returned by the "teams featuring this Pokémon" endpoint */
 export interface SpeciesTeamEntry {
-  source:      'vgcpastes' | 'limitless' | 'paste';
+  source: 'vgcpastes' | 'limitless' | 'paste';
   /** VGCPastes teamId (e.g. "PC476") or Limitless playerSlug */
-  playerId:    string;
-  playerName:  string | null;
+  playerId: string;
+  playerName: string | null;
   /** Display string for placement/rank: Limitless "7-2-0" or VGCPastes rank */
-  record:      string | null;
-  rank:        string | null;
-  slots:       import('@/_db/schema/Vgc').VgcMetaSlot[];
-  rawText:     string;
+  record: string | null;
+  rank: string | null;
+  slots: import('@/_db/schema/Vgc').VgcMetaSlot[];
+  rawText: string;
   replicaCode: string | null;
 }
 
 /** One player entry from a Limitless tournament (for the players list) */
 export interface LimitlessPlayer {
-  playerSlug:  string;
-  playerName:  string;
-  placing:     number;
-  record:      string;
-  drop:        number | null;
-  hasTeam:     boolean;
+  playerSlug: string;
+  playerName: string;
+  placing: number;
+  record: string;
+  drop: number | null;
+  hasTeam: boolean;
 }

@@ -3,7 +3,10 @@ import { SmogonRepository } from '../repositories/smogon.repository';
 import { VgcRegulationsRepository } from '../repositories/regulations.repository';
 import { LimitlessRepository } from '../repositories/limitless.repository';
 
-export type VgcIngestionJobType = 'smogon_snapshot' | 'champions_regulation' | 'limitless_tournament';
+export type VgcIngestionJobType =
+  | 'smogon_snapshot'
+  | 'champions_regulation'
+  | 'limitless_tournament';
 
 export interface VgcIngestionJob {
   id: string;

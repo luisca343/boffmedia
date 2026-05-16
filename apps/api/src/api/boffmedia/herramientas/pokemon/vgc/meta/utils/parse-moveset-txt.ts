@@ -1,18 +1,30 @@
-export interface MovesetEntry { name: string; percent: number; }
-export interface SpreadEntry  { nature: string; spread: string; percent: number; }
+export interface MovesetEntry {
+  name: string;
+  percent: number;
+}
+export interface SpreadEntry {
+  nature: string;
+  spread: string;
+  percent: number;
+}
 
 export interface MovesetPokemon {
   speciesName: string;
-  abilities:   MovesetEntry[];
-  items:       MovesetEntry[];
-  moves:       MovesetEntry[];
-  teraTypes:   MovesetEntry[];
-  teammates:   MovesetEntry[];
-  spreads:     SpreadEntry[];
+  abilities: MovesetEntry[];
+  items: MovesetEntry[];
+  moves: MovesetEntry[];
+  teraTypes: MovesetEntry[];
+  teammates: MovesetEntry[];
+  spreads: SpreadEntry[];
 }
 
 const KNOWN_SECTIONS = new Set([
-  'Abilities', 'Items', 'Spreads', 'Moves', 'Tera Types', 'Teammates',
+  'Abilities',
+  'Items',
+  'Spreads',
+  'Moves',
+  'Tera Types',
+  'Teammates',
 ]);
 
 /**
@@ -46,11 +58,20 @@ export function parseMovesetTxt(text: string): Record<string, MovesetPokemon> {
       for (let i = 1; i < chunk.length; i++) {
         parseEntry(chunk[i], first, current);
       }
-    } else if (chunk.length === 1 && !first.includes(':') && !first.includes('%')) {
+    } else if (
+      chunk.length === 1 &&
+      !first.includes(':') &&
+      !first.includes('%')
+    ) {
       // Single non-metadata line → Pokémon display name
       current = {
         speciesName: first,
-        abilities: [], items: [], moves: [], teraTypes: [], teammates: [], spreads: [],
+        abilities: [],
+        items: [],
+        moves: [],
+        teraTypes: [],
+        teammates: [],
+        spreads: [],
       };
       result[first] = current;
     }
@@ -60,25 +81,39 @@ export function parseMovesetTxt(text: string): Record<string, MovesetPokemon> {
   return result;
 }
 
-function parseEntry(line: string, section: string, pokemon: MovesetPokemon): void {
+function parseEntry(
+  line: string,
+  section: string,
+  pokemon: MovesetPokemon,
+): void {
   const match = line.match(/^(.+?)\s+([\d.]+)%\s*$/);
   if (!match) return;
 
-  const name    = match[1].trim();
+  const name = match[1].trim();
   const percent = parseFloat(match[2]);
 
   switch (section) {
-    case 'Abilities':  pokemon.abilities.push({ name, percent });  break;
-    case 'Items':      pokemon.items.push({ name, percent });      break;
-    case 'Moves':      pokemon.moves.push({ name, percent });      break;
-    case 'Tera Types': pokemon.teraTypes.push({ name, percent });  break;
-    case 'Teammates':  pokemon.teammates.push({ name, percent });  break;
+    case 'Abilities':
+      pokemon.abilities.push({ name, percent });
+      break;
+    case 'Items':
+      pokemon.items.push({ name, percent });
+      break;
+    case 'Moves':
+      pokemon.moves.push({ name, percent });
+      break;
+    case 'Tera Types':
+      pokemon.teraTypes.push({ name, percent });
+      break;
+    case 'Teammates':
+      pokemon.teammates.push({ name, percent });
+      break;
     case 'Spreads': {
       const colonIdx = name.indexOf(':');
       if (colonIdx === -1) return;
       pokemon.spreads.push({
-        nature:  name.slice(0, colonIdx),
-        spread:  name.slice(colonIdx + 1),
+        nature: name.slice(0, colonIdx),
+        spread: name.slice(colonIdx + 1),
         percent,
       });
       break;

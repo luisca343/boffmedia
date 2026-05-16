@@ -5,26 +5,26 @@ import { Type } from 'class-transformer';
 import { FicusMessageContentDto } from './ficus-message-content.dto';
 
 export class SendMessageDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'UUID of the player/user',
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
   })
   @IsString()
   @IsUUID()
   @IsNotEmpty()
   uuid: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Server identifier',
-    example: '1ee7e5f6-8e50-4b49-9ee6-b26cc1b5f365'
+    example: '1ee7e5f6-8e50-4b49-9ee6-b26cc1b5f365',
   })
   @IsString()
   @IsNotEmpty()
   server: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Message content to send',
-    type: FicusMessageContentDto
+    type: FicusMessageContentDto,
   })
   @ValidateNested()
   @Type(() => FicusMessageContentDto)

@@ -29,7 +29,7 @@ export class PasswordService {
     uppercase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
     numbers: '0123456789',
     symbols: '!@#$%^&*()_+-=[]{}|;:,.<>?',
-    similar: 'il1Lo0O' // Characters that look similar
+    similar: 'il1Lo0O', // Characters that look similar
   };
 
   /**
@@ -78,7 +78,9 @@ export class PasswordService {
     }
 
     if (password.length < this.minLength) {
-      errors.push(`Password must be at least ${this.minLength} characters long`);
+      errors.push(
+        `Password must be at least ${this.minLength} characters long`,
+      );
     } else {
       strengthScore += 1;
     }
@@ -141,7 +143,7 @@ export class PasswordService {
     return {
       isValid: errors.length === 0,
       errors,
-      strength
+      strength,
     };
   }
 
@@ -155,7 +157,7 @@ export class PasswordService {
       includeLowercase = true,
       includeNumbers = true,
       includeSymbols = true,
-      excludeSimilar = true
+      excludeSimilar = true,
     } = options;
 
     if (length < 4 || length > 256) {
@@ -167,26 +169,37 @@ export class PasswordService {
 
     if (includeLowercase) {
       charset += this.charsets.lowercase;
-      requiredChars.push(this.getRandomChar(this.charsets.lowercase, excludeSimilar));
+      requiredChars.push(
+        this.getRandomChar(this.charsets.lowercase, excludeSimilar),
+      );
     }
 
     if (includeUppercase) {
       charset += this.charsets.uppercase;
-      requiredChars.push(this.getRandomChar(this.charsets.uppercase, excludeSimilar));
+      requiredChars.push(
+        this.getRandomChar(this.charsets.uppercase, excludeSimilar),
+      );
     }
 
     if (includeNumbers) {
       charset += this.charsets.numbers;
-      requiredChars.push(this.getRandomChar(this.charsets.numbers, excludeSimilar));
+      requiredChars.push(
+        this.getRandomChar(this.charsets.numbers, excludeSimilar),
+      );
     }
 
     if (includeSymbols) {
       charset += this.charsets.symbols;
-      requiredChars.push(this.getRandomChar(this.charsets.symbols, excludeSimilar));
+      requiredChars.push(
+        this.getRandomChar(this.charsets.symbols, excludeSimilar),
+      );
     }
 
     if (excludeSimilar) {
-      charset = charset.split('').filter(char => !this.charsets.similar.includes(char)).join('');
+      charset = charset
+        .split('')
+        .filter((char) => !this.charsets.similar.includes(char))
+        .join('');
     }
 
     if (charset.length === 0) {
@@ -215,7 +228,7 @@ export class PasswordService {
       includeLowercase: true,
       includeNumbers: true,
       includeSymbols: false, // Avoid symbols for OAuth passwords
-      excludeSimilar: true
+      excludeSimilar: true,
     });
   }
 
@@ -226,8 +239,16 @@ export class PasswordService {
   async isPasswordCompromised(password: string): Promise<boolean> {
     // Basic check for very common passwords
     const commonPasswords = [
-      'password', '123456', '123456789', 'qwerty', 'abc123',
-      'password123', 'admin', 'letmein', 'welcome', 'monkey'
+      'password',
+      '123456',
+      '123456789',
+      'qwerty',
+      'abc123',
+      'password123',
+      'admin',
+      'letmein',
+      'welcome',
+      'monkey',
     ];
 
     return commonPasswords.includes(password.toLowerCase());
@@ -269,7 +290,10 @@ export class PasswordService {
   private getRandomChar(charset: string, excludeSimilar: boolean): string {
     let validChars = charset;
     if (excludeSimilar) {
-      validChars = charset.split('').filter(char => !this.charsets.similar.includes(char)).join('');
+      validChars = charset
+        .split('')
+        .filter((char) => !this.charsets.similar.includes(char))
+        .join('');
     }
     return validChars.charAt(crypto.randomInt(0, validChars.length));
   }

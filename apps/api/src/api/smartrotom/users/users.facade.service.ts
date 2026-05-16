@@ -29,7 +29,7 @@ export class UsersFacadeService {
   constructor(
     private readonly usersService: UsersService,
     private readonly starbankService: StarbankFacadeService,
-    private readonly chatAppService: ChatappFacadeService
+    private readonly chatAppService: ChatappFacadeService,
   ) {}
 
   // ==================== USER MANAGEMENT ====================
@@ -46,15 +46,22 @@ export class UsersFacadeService {
     return this.usersService.getUserByUuid(uuid);
   }
 
-  async createUser(createUserDto: CreateSmartrotomUserDto): Promise<SmartRotomUser> {
+  async createUser(
+    createUserDto: CreateSmartrotomUserDto,
+  ): Promise<SmartRotomUser> {
     return this.usersService.createUser(createUserDto);
   }
 
-  async findOrCreateUser(createUserDto: CreateSmartrotomUserDto): Promise<UserCreationResult> {
+  async findOrCreateUser(
+    createUserDto: CreateSmartrotomUserDto,
+  ): Promise<UserCreationResult> {
     return this.usersService.findOrCreateUser(createUserDto);
   }
 
-  async updateUser(id: number, updateUserDto: UpdateSmartrotomUserDto): Promise<SmartRotomUser> {
+  async updateUser(
+    id: number,
+    updateUserDto: UpdateSmartrotomUserDto,
+  ): Promise<SmartRotomUser> {
     return this.usersService.updateUser(id, updateUserDto);
   }
 
@@ -64,16 +71,18 @@ export class UsersFacadeService {
 
   // ==================== INTEGRATED OPERATIONS ====================
 
-  async initializeUserAndAccounts(data: UserInitializationData): Promise<InitializationResult> {
+  async initializeUserAndAccounts(
+    data: UserInitializationData,
+  ): Promise<InitializationResult> {
     // Find or create user
     const userResult = await this.usersService.findOrCreateUser({
       uuid: data.uuid,
       username: data.username,
-      world: data.world
+      world: data.world,
     });
 
     // Check existing accounts
-    let accounts = await this.starbankService.getAccounts(data.uuid);
+    const accounts = await this.starbankService.getAccounts(data.uuid);
     let isNewAccount = false;
 
     // Create main StarBank account if none exist
@@ -82,23 +91,34 @@ export class UsersFacadeService {
       isNewAccount = true;
 
       const mainAccount = await this.starbankService.getMainAccount(data.uuid);
-      await this.starbankService.transferFromSystem(mainAccount.id, 1000, 'Ingreso de Bienvenida');
+      await this.starbankService.transferFromSystem(
+        mainAccount.id,
+        1000,
+        'Ingreso de Bienvenida',
+      );
       console.log(`Welcome bonus credited to user ${data.uuid}`);
     }
 
     // Create saved messages chat (non-blocking)
     try {
-      await this.chatAppService.createChat({player: data.uuid, users: [], name: 'Mensajes Guardados'});
+      await this.chatAppService.createChat({
+        player: data.uuid,
+        users: [],
+        name: 'Mensajes Guardados',
+      });
       console.log(`Saved Messages chat created for user ${data.uuid}`);
     } catch (error: any) {
-      console.warn(`Failed to create Saved Messages chat for user ${data.uuid}, continuing anyway:`, error.message);
+      console.warn(
+        `Failed to create Saved Messages chat for user ${data.uuid}, continuing anyway:`,
+        error.message,
+      );
     }
 
     return {
       user: userResult.user,
       accounts: accounts || [],
       isNewUser: userResult.isNew,
-      isNewAccount
+      isNewAccount,
     };
   }
 
@@ -112,17 +132,21 @@ export class UsersFacadeService {
 
     return {
       user,
-      accounts: accounts || []
+      accounts: accounts || [],
     };
   }
 
   // ==================== BATCH OPERATIONS ====================
 
-  async getMultipleUsers(uuids: string[]): Promise<{ [uuid: string]: SmartRotomUser | null }> {
+  async getMultipleUsers(
+    uuids: string[],
+  ): Promise<{ [uuid: string]: SmartRotomUser | null }> {
     return this.usersService.getMultipleUsers(uuids);
   }
 
-  async getMultipleUsersWithAccounts(uuids: string[]): Promise<{ [uuid: string]: UserWithAccounts | null }> {
+  async getMultipleUsersWithAccounts(
+    uuids: string[],
+  ): Promise<{ [uuid: string]: UserWithAccounts | null }> {
     const results: { [uuid: string]: UserWithAccounts | null } = {};
 
     // Process in batches to avoid overwhelming the system
@@ -158,13 +182,13 @@ export class UsersFacadeService {
     usersWithoutAccounts: number;
   }> {
     const totalUsers = await this.usersService.getUserCount();
-    
+
     // This would need more sophisticated querying for accurate counts
     // For now, return basic stats
     return {
       totalUsers,
       usersWithAccounts: 0, // Would need to implement
-      usersWithoutAccounts: 0 // Would need to implement
+      usersWithoutAccounts: 0, // Would need to implement
     };
   }
 

@@ -24,7 +24,8 @@ export class WingullTransportService {
   async teleportPlayer(id: string, uuid: string): Promise<boolean> {
     try {
       const request: TeleportRequestDto = { id, uuid };
-      const result = await this.wingullTransportRepository.teleportPlayerInAPI(request);
+      const result =
+        await this.wingullTransportRepository.teleportPlayerInAPI(request);
       return !!result; // Convert to boolean
     } catch (error: any) {
       console.error(`Failed to teleport player ${uuid} to ${id}:`, error);

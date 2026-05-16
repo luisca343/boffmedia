@@ -1,6 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { FileUploadService, FileUploadRequest, FileUploadResponse } from './services/file-upload.service';
-import { ImageUploadService, ImageUploadRequest } from './services/image-upload.service';
+import {
+  FileUploadService,
+  FileUploadRequest,
+  FileUploadResponse,
+} from './services/file-upload.service';
+import {
+  ImageUploadService,
+  ImageUploadRequest,
+} from './services/image-upload.service';
 
 @Injectable()
 export class UploadFacadeService {
@@ -11,7 +18,9 @@ export class UploadFacadeService {
 
   // ==================== IMAGE UPLOAD MANAGEMENT ====================
 
-  async uploadImage(imageRequest: ImageUploadRequest): Promise<FileUploadResponse> {
+  async uploadImage(
+    imageRequest: ImageUploadRequest,
+  ): Promise<FileUploadResponse> {
     try {
       return await this.imageUploadService.uploadImage(imageRequest);
     } catch (error: any) {
@@ -20,12 +29,17 @@ export class UploadFacadeService {
     }
   }
 
-  async deleteImage(path: string, filename: string): Promise<{ success: boolean; message: string }> {
+  async deleteImage(
+    path: string,
+    filename: string,
+  ): Promise<{ success: boolean; message: string }> {
     try {
       const result = await this.imageUploadService.deleteImage(path, filename);
-      return { 
-        success: result.success, 
-        message: result.success ? 'Image deleted successfully' : 'Failed to delete image' 
+      return {
+        success: result.success,
+        message: result.success
+          ? 'Image deleted successfully'
+          : 'Failed to delete image',
       };
     } catch (error: any) {
       console.error(`Error deleting image ${filename}:`, error);
@@ -33,7 +47,10 @@ export class UploadFacadeService {
     }
   }
 
-  async getImageInfo(path: string, filename: string): Promise<{ exists: boolean; size?: number; createdAt?: Date }> {
+  async getImageInfo(
+    path: string,
+    filename: string,
+  ): Promise<{ exists: boolean; size?: number; createdAt?: Date }> {
     try {
       return await this.imageUploadService.getImageInfo(path, filename);
     } catch (error: any) {
@@ -44,7 +61,9 @@ export class UploadFacadeService {
 
   // ==================== GENERAL FILE UPLOAD MANAGEMENT ====================
 
-  async uploadFile(fileRequest: FileUploadRequest): Promise<FileUploadResponse> {
+  async uploadFile(
+    fileRequest: FileUploadRequest,
+  ): Promise<FileUploadResponse> {
     try {
       return await this.fileUploadService.uploadFile(fileRequest);
     } catch (error: any) {
@@ -53,12 +72,17 @@ export class UploadFacadeService {
     }
   }
 
-  async deleteFile(path: string, filename: string): Promise<{ success: boolean; message: string }> {
+  async deleteFile(
+    path: string,
+    filename: string,
+  ): Promise<{ success: boolean; message: string }> {
     try {
       const result = await this.fileUploadService.deleteFile(path, filename);
-      return { 
-        success: result.success, 
-        message: result.success ? 'File deleted successfully' : 'Failed to delete file' 
+      return {
+        success: result.success,
+        message: result.success
+          ? 'File deleted successfully'
+          : 'Failed to delete file',
       };
     } catch (error: any) {
       console.error(`Error deleting file ${filename}:`, error);
@@ -66,7 +90,10 @@ export class UploadFacadeService {
     }
   }
 
-  async getFileInfo(path: string, filename: string): Promise<{ exists: boolean; size?: number; createdAt?: Date }> {
+  async getFileInfo(
+    path: string,
+    filename: string,
+  ): Promise<{ exists: boolean; size?: number; createdAt?: Date }> {
     try {
       return await this.fileUploadService.getFileInfo(path, filename);
     } catch (error: any) {
@@ -85,25 +112,39 @@ export class UploadFacadeService {
     return this.imageUploadService.getMaxImageSize();
   }
 
-  async validateImageFile(file: Express.Multer.File): Promise<{ valid: boolean; error?: string }> {
+  async validateImageFile(
+    file: Express.Multer.File,
+  ): Promise<{ valid: boolean; error?: string }> {
     try {
       if (!file) {
         return { valid: false, error: 'No file provided' };
       }
 
       const supportedTypes = this.getSupportedImageTypes();
-      const isValidType = await this.fileUploadService.validateFileType(file, supportedTypes);
-      
+      const isValidType = await this.fileUploadService.validateFileType(
+        file,
+        supportedTypes,
+      );
+
       if (!isValidType) {
-        return { valid: false, error: 'Invalid file type. Only images are allowed.' };
+        return {
+          valid: false,
+          error: 'Invalid file type. Only images are allowed.',
+        };
       }
 
       const maxSize = this.getMaxImageSize();
-      const isValidSize = await this.fileUploadService.validateFileSize(file, maxSize);
-      
+      const isValidSize = await this.fileUploadService.validateFileSize(
+        file,
+        maxSize,
+      );
+
       if (!isValidSize) {
         const maxSizeMB = Math.round(maxSize / (1024 * 1024));
-        return { valid: false, error: `File size exceeds ${maxSizeMB}MB limit` };
+        return {
+          valid: false,
+          error: `File size exceeds ${maxSizeMB}MB limit`,
+        };
       }
 
       return { valid: true };

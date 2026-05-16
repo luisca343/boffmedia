@@ -2,7 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { readdir, stat } from 'fs/promises';
 import * as path from 'path';
 import AdmZip from 'adm-zip';
-import { LocalMangaChapter, LocalMangaLibrary, LocalMangaSeries } from './manga.types';
+import {
+  LocalMangaChapter,
+  LocalMangaLibrary,
+  LocalMangaSeries,
+} from './manga.types';
 import { MANGA_ROOT } from './manga-constants';
 
 @Injectable()
@@ -29,11 +33,17 @@ export class MangaLibraryService {
       for (const entry of entries) {
         if (/\.cbz$/i.test(entry)) {
           const slug = entry.replace(/\.cbz$/i, '');
-          const existing = slugMap.get(slug) ?? { hasCbz: false, hasEpub: false };
+          const existing = slugMap.get(slug) ?? {
+            hasCbz: false,
+            hasEpub: false,
+          };
           slugMap.set(slug, { ...existing, hasCbz: true });
         } else if (/\.epub$/i.test(entry)) {
           const slug = entry.replace(/\.epub$/i, '');
-          const existing = slugMap.get(slug) ?? { hasCbz: false, hasEpub: false };
+          const existing = slugMap.get(slug) ?? {
+            hasCbz: false,
+            hasEpub: false,
+          };
           slugMap.set(slug, { ...existing, hasEpub: true });
         }
       }
@@ -50,9 +60,9 @@ export class MangaLibraryService {
 
         try {
           const zip = new AdmZip(archivePath);
-          imageCount = zip.getEntries().filter(e =>
-            /\.(webp|jpg|jpeg|png|gif)$/i.test(e.name),
-          ).length;
+          imageCount = zip
+            .getEntries()
+            .filter((e) => /\.(webp|jpg|jpeg|png|gif)$/i.test(e.name)).length;
         } catch {
           // Corrupt or unreadable archive — list with 0 images.
         }

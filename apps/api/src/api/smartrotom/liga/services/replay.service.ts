@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { LigaRepository, LeagueReplay } from '@api/smartrotom/liga/repositories/liga.repository';
+import {
+  LigaRepository,
+  LeagueReplay,
+} from '@api/smartrotom/liga/repositories/liga.repository';
 
 @Injectable()
 export class ReplayService {
-  constructor(
-    private readonly ligaRepository: LigaRepository,
-  ) {}
+  constructor(private readonly ligaRepository: LigaRepository) {}
 
   async getReplayById(id: number): Promise<LeagueReplay> {
     if (!id || id <= 0) {
@@ -36,7 +37,10 @@ export class ReplayService {
     return this.ligaRepository.findReplaysByPlayer(playerUuid);
   }
 
-  async getMatchHistory(player1: string, player2: string): Promise<LeagueReplay[]> {
+  async getMatchHistory(
+    player1: string,
+    player2: string,
+  ): Promise<LeagueReplay[]> {
     if (!player1 || !player2) {
       throw new Error('Both player UUIDs are required');
     }

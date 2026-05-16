@@ -1,21 +1,21 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class NPCUpdateResponse {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Operation status',
-    example: 'ok'
+    example: 'ok',
   })
   status: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Number of NPCs updated',
-    example: 5
+    example: 5,
   })
   updated: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Update timestamp',
-    example: '2025-06-29T10:00:00Z'
+    example: '2025-06-29T10:00:00Z',
   })
   timestamp: Date;
 }

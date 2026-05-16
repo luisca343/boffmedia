@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { BattleRepository, BattleReplay } from '@api/deprecated/battle/repositories/battle.repository';
+import {
+  BattleRepository,
+  BattleReplay,
+} from '@api/deprecated/battle/repositories/battle.repository';
 
 @Injectable()
 export class ReplayService {
-  constructor(
-    private readonly battleRepository: BattleRepository,
-  ) {}
+  constructor(private readonly battleRepository: BattleRepository) {}
 
   async getUserReplays(uuid: string): Promise<BattleReplay[]> {
     if (!uuid) {
@@ -21,7 +22,7 @@ export class ReplayService {
     }
 
     const replay = await this.battleRepository.findReplayById(replayId);
-    
+
     if (!replay) {
       throw new Error('Replay not found');
     }
@@ -49,25 +50,31 @@ export class ReplayService {
     }
 
     // Check if association already exists
-    const existingAssociation = await this.battleRepository.findUserReplayByIds(uuid, replayId);
+    const existingAssociation = await this.battleRepository.findUserReplayByIds(
+      uuid,
+      replayId,
+    );
     if (existingAssociation) {
       throw new Error('User is already associated with this replay');
     }
 
     await this.battleRepository.createUserReplay({
       uuid,
-      replayId
+      replayId,
     });
   }
 
-  async updateReplay(replayId: number, replayData: Partial<{
-    team1: string;
-    team2: string;
-    replay: string;
-    winner: string;
-    side1: string;
-    side2: string;
-  }>): Promise<BattleReplay> {
+  async updateReplay(
+    replayId: number,
+    replayData: Partial<{
+      team1: string;
+      team2: string;
+      replay: string;
+      winner: string;
+      side1: string;
+      side2: string;
+    }>,
+  ): Promise<BattleReplay> {
     const existingReplay = await this.battleRepository.findReplayById(replayId);
     if (!existingReplay) {
       throw new Error('Replay not found');
@@ -87,7 +94,10 @@ export class ReplayService {
   }
 
   async removeUserFromReplay(uuid: string, replayId: number): Promise<void> {
-    const existingAssociation = await this.battleRepository.findUserReplayByIds(uuid, replayId);
+    const existingAssociation = await this.battleRepository.findUserReplayByIds(
+      uuid,
+      replayId,
+    );
     if (!existingAssociation) {
       throw new Error('User is not associated with this replay');
     }
@@ -96,7 +106,10 @@ export class ReplayService {
   }
 
   async validateReplayAccess(uuid: string, replayId: number): Promise<boolean> {
-    const association = await this.battleRepository.findUserReplayByIds(uuid, replayId);
+    const association = await this.battleRepository.findUserReplayByIds(
+      uuid,
+      replayId,
+    );
     return !!association;
   }
 }

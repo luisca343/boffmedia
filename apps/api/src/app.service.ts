@@ -67,7 +67,11 @@ export class AppService {
     return health;
   }
 
-  private async checkDatabaseConnection(): Promise<{ status: string; responseTime?: string; error?: string }> {
+  private async checkDatabaseConnection(): Promise<{
+    status: string;
+    responseTime?: string;
+    error?: string;
+  }> {
     const startTime = Date.now();
     try {
       // Execute a simple query to check database connectivity
@@ -84,9 +88,13 @@ export class AppService {
     }
   }
 
-  private async checkWingullApi(): Promise<{ status: string; responseTime?: string; error?: string }> {
+  private async checkWingullApi(): Promise<{
+    status: string;
+    responseTime?: string;
+    error?: string;
+  }> {
     const wingullApiUrl = process.env.WINGULL_API;
-    
+
     if (!wingullApiUrl) {
       return {
         status: 'not_configured',
@@ -203,12 +211,12 @@ export class AppService {
   }
 
   async getSteamData(steamID: string): Promise<GameData> {
-    console.log("GETSTEAMDATA= " + steamID)
+    console.log('GETSTEAMDATA= ' + steamID);
     const url = `https://store.steampowered.com/api/appdetails?appids=${steamID}&l=spanish`;
     const response = await axios.get(url);
     const gameData = response.data[steamID].data;
 
-    console.log(gameData)
+    console.log(gameData);
 
     const initialPrice = gameData.price_overview?.initial;
     const finalPrice = gameData.price_overview?.final;
@@ -216,8 +224,8 @@ export class AppService {
     const initialFormatted = initialPrice ? `${initialPrice / 100} €` : 'N/A';
     const finalFormatted = finalPrice ? `${finalPrice / 100} €` : 'N/A';
 
-    const trailers = gameData.movies || [] as Video[];
-    const screenshots = gameData.screenshots || [] as Image[];
+    const trailers = gameData.movies || ([] as Video[]);
+    const screenshots = gameData.screenshots || ([] as Image[]);
 
     const media = [...trailers, ...screenshots] as (Video | Image)[];
 
@@ -256,8 +264,8 @@ export class AppService {
       media: media,
     };
 
-    console.log("== RESULTADO ==")
-    console.log(data)
+    console.log('== RESULTADO ==');
+    console.log(data);
 
     return data;
   }

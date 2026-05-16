@@ -3,48 +3,48 @@ import { BoffMediaUserEntity } from './user.entity';
 import { SmartRotomUserEntity } from './full-user.entity';
 
 export class StarbankAccountEntity {
-  @ApiProperty({ 
-    example: 1, 
-    description: 'Account ID' 
+  @ApiProperty({
+    example: 1,
+    description: 'Account ID',
   })
   id: number;
 
-  @ApiProperty({ 
-    example: 'main_account', 
-    description: 'Account type' 
+  @ApiProperty({
+    example: 'main_account',
+    description: 'Account type',
   })
   type: string;
 
-  @ApiProperty({ 
-    example: 1000.50, 
-    description: 'Account balance' 
+  @ApiProperty({
+    example: 1000.5,
+    description: 'Account balance',
   })
   balance: number;
 }
 
 export class UserWithIntegrationsEntity {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'BoffMedia user data',
-    type: BoffMediaUserEntity
+    type: BoffMediaUserEntity,
   })
   boffMediaUser: BoffMediaUserEntity;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'SmartRotom user data',
     type: SmartRotomUserEntity,
-    nullable: true
+    nullable: true,
   })
   smartRotomUser: SmartRotomUserEntity | null;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Starbank accounts',
-    type: [StarbankAccountEntity]
+    type: [StarbankAccountEntity],
   })
   starbankAccounts: StarbankAccountEntity[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'User roles',
-    type: [String]
+    type: [String],
   })
   roles: string[];
 }

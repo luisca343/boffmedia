@@ -21,28 +21,34 @@ export class RewardService {
 
   async getRewardsByType(): Promise<RewardsByType> {
     const rewards = await this.mineRepository.findAllRewards();
-    
-    const groupedByType = rewards.reduce((acc, reward) => {
-      if (!acc[reward.type]) {
-        acc[reward.type] = { items: [], totalValue: 0 };
-      }
-      acc[reward.type].items.push(reward);
-      acc[reward.type].totalValue += reward.value;
-      return acc;
-    }, {} as { [key: string]: { items: MineReward[]; totalValue: number } });
+
+    const groupedByType = rewards.reduce(
+      (acc, reward) => {
+        if (!acc[reward.type]) {
+          acc[reward.type] = { items: [], totalValue: 0 };
+        }
+        acc[reward.type].items.push(reward);
+        acc[reward.type].totalValue += reward.value;
+        return acc;
+      },
+      {} as { [key: string]: { items: MineReward[]; totalValue: number } },
+    );
 
     // Sort by total value (descending)
-    const sortedEntries = Object.entries(groupedByType)
-      .sort(([, a], [, b]) => b.totalValue - a.totalValue);
+    const sortedEntries = Object.entries(groupedByType).sort(
+      ([, a], [, b]) => b.totalValue - a.totalValue,
+    );
 
     const sortedGrouped = Object.fromEntries(sortedEntries);
 
-    const totalValue = Object.values(sortedGrouped)
-      .reduce((sum, type) => sum + type.totalValue, 0);
+    const totalValue = Object.values(sortedGrouped).reduce(
+      (sum, type) => sum + type.totalValue,
+      0,
+    );
 
     return {
       drops: sortedGrouped,
-      totalValue
+      totalValue,
     };
   }
 
@@ -53,21 +59,25 @@ export class RewardService {
 
   async validateRewardsExist(rewardIds: number[]): Promise<boolean> {
     if (rewardIds.length === 0) return true;
-    
+
     const rewards = await this.mineRepository.findRewardsByIds(rewardIds);
     return rewards.length === rewardIds.length;
   }
 
-  async getRewardDropRates(): Promise<{ [rewardId: number]: { name: string; dropRate: number } }> {
+  async getRewardDropRates(): Promise<{
+    [rewardId: number]: { name: string; dropRate: number };
+  }> {
     const rewards = await this.mineRepository.findAllRewards();
     const totalWeight = rewards.reduce((sum, reward) => sum + reward.value, 0);
-    
-    const dropRates: { [rewardId: number]: { name: string; dropRate: number } } = {};
-    
-    rewards.forEach(reward => {
+
+    const dropRates: {
+      [rewardId: number]: { name: string; dropRate: number };
+    } = {};
+
+    rewards.forEach((reward) => {
       dropRates[reward.id] = {
         name: reward.name,
-        dropRate: (reward.value / totalWeight) * 100
+        dropRate: (reward.value / totalWeight) * 100,
       };
     });
 

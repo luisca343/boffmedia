@@ -3,5 +3,5 @@ export enum ArmorType {
   CHEST = 'chest',
   ARMS = 'arms',
   WAIST = 'waist',
-  LEGS = 'legs'
+  LEGS = 'legs',
 }

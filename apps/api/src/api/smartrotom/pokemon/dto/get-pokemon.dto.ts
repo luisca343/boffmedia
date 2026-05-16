@@ -4,9 +4,9 @@ import { IsOptional, IsNumberString, IsString, Min } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class GetPokemonByDexDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Pokédex number',
-    example: 1
+    example: 1,
   })
   @IsNumberString()
   @Transform(({ value }) => parseInt(value, 10))
@@ -15,17 +15,17 @@ export class GetPokemonByDexDto extends BaseDto {
 }
 
 export class SearchPokemonDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Search term',
-    example: 'pikachu'
+    example: 'pikachu',
   })
   @IsString()
   name: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Number of results to return',
     example: 16,
-    required: false
+    required: false,
   })
   @IsOptional()
   @Transform(({ value }) => parseInt(value, 10))
@@ -34,18 +34,18 @@ export class SearchPokemonDto extends BaseDto {
 }
 
 export class GetPokemonMovesDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Pokémon ID',
-    example: 1
+    example: 1,
   })
   @IsNumberString()
   @Transform(({ value }) => parseInt(value, 10))
   @Min(1)
   id: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Form index',
-    example: 0
+    example: 0,
   })
   @IsNumberString()
   @Transform(({ value }) => parseInt(value, 10))

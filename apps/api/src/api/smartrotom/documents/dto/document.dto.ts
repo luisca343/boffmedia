@@ -3,25 +3,25 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsInt, IsOptional, Min } from 'class-validator';
 
 export class CreateDocumentDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Document title',
-    example: 'My Important Notes'
+    example: 'My Important Notes',
   })
   @IsNotEmpty()
   @IsString()
   title: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Document content',
-    example: 'This is the content of my document...'
+    example: 'This is the content of my document...',
   })
   @IsNotEmpty()
   @IsString()
   content: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Document type',
-    example: 1
+    example: 1,
   })
   @IsNotEmpty()
   @IsInt()
@@ -30,9 +30,9 @@ export class CreateDocumentDto extends BaseDto {
 }
 
 export class CreateDocumentDtoWithUuid extends CreateDocumentDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'User UUID',
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
   })
   @IsNotEmpty()
   @IsString()
@@ -40,38 +40,38 @@ export class CreateDocumentDtoWithUuid extends CreateDocumentDto {
 }
 
 export class UpdateDocumentDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Document title',
     example: 'Updated Document Title',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
   title?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Document content',
     example: 'Updated content...',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
   content?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Document type',
     example: 2,
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsInt()
   @Min(0)
   type?: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Whether the document is public',
     example: 1,
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsInt()
@@ -79,9 +79,9 @@ export class UpdateDocumentDto {
 }
 
 export class GetUserDocumentsDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'User UUID',
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
   })
   @IsNotEmpty()
   @IsString()
@@ -89,18 +89,18 @@ export class GetUserDocumentsDto {
 }
 
 export class AddNoteToUserDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Document ID',
-    example: 123
+    example: 123,
   })
   @IsNotEmpty()
   @IsInt()
   @Min(1)
   documentId: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'User UUID',
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
   })
   @IsNotEmpty()
   @IsString()

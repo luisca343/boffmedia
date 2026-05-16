@@ -1,4 +1,9 @@
-import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
@@ -121,25 +126,52 @@ import { VgcModule } from '@api/boffmedia/herramientas/pokemon/vgc/vgc.module';
     MangaModule,
     VgcModule,
   ],
-  controllers: [AppController, PokemonController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, EventsController, UploadController, MhwildsController],
-  providers: [AppService, ResponseService, NetfluisService, BattleService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, CommandsService, 
-     ShowdownGateway, BattleService, PlayerService, SmartrotomService, PokemonShowdownService, SpriteManifestService, MySQL2Service, WingullSQL2Service,
+  controllers: [
+    AppController,
+    PokemonController,
+    StarbankController,
+    ChatappController,
+    SmartrotomController,
+    BattleController,
+    ArcadeController,
+    EventsController,
+    UploadController,
+    MhwildsController,
+  ],
+  providers: [
+    AppService,
+    ResponseService,
+    NetfluisService,
+    BattleService,
+    PokemonDataService,
+    MoveDataService,
+    SpawnDataService,
+    PokemonImageService,
+    CommandsService,
+    ShowdownGateway,
+    BattleService,
+    PlayerService,
+    SmartrotomService,
+    PokemonShowdownService,
+    SpriteManifestService,
+    MySQL2Service,
+    WingullSQL2Service,
     {
-    provide: ConfigService,
-    useClass: ConfigService,
-  },
+      provide: ConfigService,
+      useClass: ConfigService,
+    },
     EventsFacadeService,
-
-],
-  exports: [ConfigService]
+  ],
+  exports: [ConfigService],
 })
-export class AppModule implements NestModule{
+export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(MinecraftMiddleware)
-      .exclude(
-        { path: 'smartrotom/starbank/accounts', method: RequestMethod.POST }
-      )
+      .exclude({
+        path: 'smartrotom/starbank/accounts',
+        method: RequestMethod.POST,
+      })
       .forRoutes('/smartrotom/');
   }
 }

@@ -1,8 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { NovecoolService } from './novecool.service';
 import { CbzService } from './cbz.service';
-import { DownloadChaptersDto, ChapterEntry } from '../dto/download-chapters.dto';
-import { ChapterDownloadEntry, ChapterDownloadStatus } from '../entities/download-result.entity';
+import {
+  DownloadChaptersDto,
+  ChapterEntry,
+} from '../dto/download-chapters.dto';
+import {
+  ChapterDownloadEntry,
+  ChapterDownloadStatus,
+} from '../entities/download-result.entity';
 
 // ---------------------------------------------------------------------------
 // MangaDownloadService
@@ -52,18 +58,28 @@ export class MangaDownloadService {
    *                        filename?: string, pages?: number, error?: string }
    *   { type: 'done',     downloaded: N, skipped: N, failed: N }
    */
-  async *streamDownloadChapters(dto: DownloadChaptersDto): AsyncGenerator<string> {
+  async *streamDownloadChapters(
+    dto: DownloadChaptersDto,
+  ): AsyncGenerator<string> {
     const { seriesName, chapters } = dto;
     const chapterConcurrency = Math.min(Math.max(dto.concurrency ?? 1, 1), 3);
 
-    this.logger.log(`[Manga] Starting download of ${chapters.length} chapter(s) for "${seriesName}" (concurrency=${chapterConcurrency})`);
+    this.logger.log(
+      `[Manga] Starting download of ${chapters.length} chapter(s) for "${seriesName}" (concurrency=${chapterConcurrency})`,
+    );
 
     yield sse({ type: 'start', total: chapters.length });
 
-    let downloaded = 0, skipped = 0, failed = 0;
+    let downloaded = 0,
+      skipped = 0,
+      failed = 0;
 
     // Process chapters in batches of `chapterConcurrency`
-    for (let batchStart = 0; batchStart < chapters.length; batchStart += chapterConcurrency) {
+    for (
+      let batchStart = 0;
+      batchStart < chapters.length;
+      batchStart += chapterConcurrency
+    ) {
       const batch = chapters.slice(batchStart, batchStart + chapterConcurrency);
 
       // Signal all chapters in batch as "downloading" before we start
@@ -79,7 +95,15 @@ export class MangaDownloadService {
       }
 
       const batchResults = await Promise.all(
-        batch.map((chapter, j) => this.processChapter(seriesName, chapter, batchStart + j + 1, chapters.length, dto.mangaUrl)),
+        batch.map((chapter, j) =>
+          this.processChapter(
+            seriesName,
+            chapter,
+            batchStart + j + 1,
+            chapters.length,
+            dto.mangaUrl,
+          ),
+        ),
       );
 
       for (const result of batchResults) {
@@ -101,7 +125,9 @@ export class MangaDownloadService {
     }
 
     yield sse({ type: 'done', downloaded, skipped, failed });
-    this.logger.log(`[Manga] Done — ${downloaded} downloaded, ${skipped} skipped, ${failed} failed`);
+    this.logger.log(
+      `[Manga] Done — ${downloaded} downloaded, ${skipped} skipped, ${failed} failed`,
+    );
   }
 
   // ── Internal ─────────────────────────────────────────────────────────────
@@ -127,13 +153,15 @@ export class MangaDownloadService {
       // Fetch image URLs (pass manga URL as Referer to avoid 403)
       const imageUrls = await this.novecool.getChapterImageUrls(url, mangaUrl);
       if (imageUrls.length === 0) {
-        throw new Error('No images found on chapter page — selectors may need updating');
+        throw new Error(
+          'No images found on chapter page — selectors may need updating',
+        );
       }
 
       this.logger.log(`${prefix} Downloading ${imageUrls.length} images…`);
 
       // Download images in parallel (bounded concurrency)
-      const imageTasks = imageUrls.map(imageUrl => async () => {
+      const imageTasks = imageUrls.map((imageUrl) => async () => {
         const data = await this.novecool.downloadImage(imageUrl, url);
         return { data, url: imageUrl };
       });
@@ -141,16 +169,32 @@ export class MangaDownloadService {
       const images = await runWithConcurrency(imageTasks, IMAGE_CONCURRENCY);
 
       // Build and save CBZ
-      const filePath = await this.cbz.saveChapter(seriesName, number, title, images);
-      const filename  = filePath.split(/[\\/]/).pop() ?? '';
+      const filePath = await this.cbz.saveChapter(
+        seriesName,
+        number,
+        title,
+        images,
+      );
+      const filename = filePath.split(/[\\/]/).pop() ?? '';
 
       this.logger.log(`${prefix} OK → ${filename}`);
-      return { index, chapterTitle: title, filename, status: 'downloaded', pages: images.length };
-
+      return {
+        index,
+        chapterTitle: title,
+        filename,
+        status: 'downloaded',
+        pages: images.length,
+      };
     } catch (err: any) {
       const error = String(err?.message ?? err);
       this.logger.error(`${prefix} FAILED: ${error}`);
-      return { index, chapterTitle: title, filename: '', status: 'failed', error };
+      return {
+        index,
+        chapterTitle: title,
+        filename: '',
+        status: 'failed',
+        error,
+      };
     }
   }
 }

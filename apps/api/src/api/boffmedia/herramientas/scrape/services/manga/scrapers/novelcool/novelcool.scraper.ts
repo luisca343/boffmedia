@@ -12,7 +12,15 @@ import * as cheerio from 'cheerio';
 import { IMangaScraper } from '../manga-scraper.interface';
 import { MangaChapter, MangaSearchResult } from '../../manga.types';
 import { normalizeChapterNumber } from '../../chapter-normalizer';
-import { fetchHtmlSafe, getProxies, toPlaywrightProxy, MAX_RETRIES, randomDelay, sleep, UA } from '../../manga-http';
+import {
+  fetchHtmlSafe,
+  getProxies,
+  toPlaywrightProxy,
+  MAX_RETRIES,
+  randomDelay,
+  sleep,
+  UA,
+} from '../../manga-http';
 import { MangaBrowserService } from '../../manga-browser.service';
 
 export class NovelCoolScraper implements IMangaScraper {
@@ -73,7 +81,8 @@ export class NovelCoolScraper implements IMangaScraper {
       const url = $(el).attr('href') ?? '';
       const rawText = $(el).text().trim().split('\n')[0].trim();
 
-      if (!url || !rawText || seen.has(url) || rawText === 'Empieza a leer') return;
+      if (!url || !rawText || seen.has(url) || rawText === 'Empieza a leer')
+        return;
       seen.add(url);
 
       chapters.push({
@@ -88,9 +97,14 @@ export class NovelCoolScraper implements IMangaScraper {
     return chapters;
   }
 
-  async getChapterImages(chapterUrl: string, context: BrowserContext): Promise<string[]> {
+  async getChapterImages(
+    chapterUrl: string,
+    context: BrowserContext,
+  ): Promise<string[]> {
     const firstPageUrl = this.normalizeChapterUrl(chapterUrl);
-    console.log(`[NovelCoolScraper] Detecting total pages for chapter: ${firstPageUrl}`);
+    console.log(
+      `[NovelCoolScraper] Detecting total pages for chapter: ${firstPageUrl}`,
+    );
     const totalPages = await this.detectTotalPages(context, firstPageUrl);
     console.log(`[NovelCoolScraper] Chapter has ${totalPages} page(s)`);
 
@@ -103,15 +117,21 @@ export class NovelCoolScraper implements IMangaScraper {
 
     for (let page = 1; page <= totalPages; page++) {
       const pageUrl = this.buildPageUrl(canonicalBase, page);
-      console.log(`[NovelCoolScraper] Scraping page ${page}/${totalPages}: ${pageUrl}`);
+      console.log(
+        `[NovelCoolScraper] Scraping page ${page}/${totalPages}: ${pageUrl}`,
+      );
       const images = await this.scrapePageWithRetry(context, pageUrl, page);
-      console.log(`[NovelCoolScraper] Page ${page}/${totalPages}: found ${images.length} image(s)`);
+      console.log(
+        `[NovelCoolScraper] Page ${page}/${totalPages}: found ${images.length} image(s)`,
+      );
       allImages.push(...images);
       if (page < totalPages) await randomDelay();
     }
 
     const deduplicated = [...new Set(allImages)];
-    console.log(`[NovelCoolScraper] Chapter done — ${deduplicated.length} unique image(s) total`);
+    console.log(
+      `[NovelCoolScraper] Chapter done — ${deduplicated.length} unique image(s) total`,
+    );
     return deduplicated;
   }
 
@@ -132,18 +152,26 @@ export class NovelCoolScraper implements IMangaScraper {
       console.log(`[NovelCoolScraper] Direct fetch succeeded for ${url}`);
       return direct;
     }
-    console.warn(`[NovelCoolScraper] Direct fetch blocked — trying proxies for ${url}`);
+    console.warn(
+      `[NovelCoolScraper] Direct fetch blocked — trying proxies for ${url}`,
+    );
 
     // 2. Proxy pool — only when tunnel is enabled.
     const tunnelEnabled = this.browserService.getTunnelEnabled();
     const proxies = tunnelEnabled ? await getProxies(3) : [];
     if (!tunnelEnabled) {
-      console.log(`[NovelCoolScraper] Tunnel disabled — skipping proxy tier for ${url}`);
+      console.log(
+        `[NovelCoolScraper] Tunnel disabled — skipping proxy tier for ${url}`,
+      );
     } else if (proxies.length === 0) {
-      console.warn(`[NovelCoolScraper] Tunnel enabled but no proxies configured — skipping proxy tier`);
+      console.warn(
+        `[NovelCoolScraper] Tunnel enabled but no proxies configured — skipping proxy tier`,
+      );
     }
     for (let i = 0; i < proxies.length; i++) {
-      console.log(`[NovelCoolScraper] Proxy attempt ${i + 1}/${proxies.length} for ${url}`);
+      console.log(
+        `[NovelCoolScraper] Proxy attempt ${i + 1}/${proxies.length} for ${url}`,
+      );
       const proxied = await fetchHtmlSafe(url, proxies[i]);
       if (proxied !== null) {
         console.log(`[NovelCoolScraper] Proxy ${i + 1} succeeded for ${url}`);
@@ -154,12 +182,19 @@ export class NovelCoolScraper implements IMangaScraper {
 
     // 3. Playwright fallback — use proxy only when tunnel is enabled.
     const fallbackProxy = tunnelEnabled ? proxies[0] : undefined;
-    console.warn(`[NovelCoolScraper] All HTTP attempts failed — falling back to Playwright${fallbackProxy ? ' (with proxy)' : ' (direct)'} for ${url}`);
+    console.warn(
+      `[NovelCoolScraper] All HTTP attempts failed — falling back to Playwright${fallbackProxy ? ' (with proxy)' : ' (direct)'} for ${url}`,
+    );
     return this.fetchHtmlWithPlaywright(url, fallbackProxy);
   }
 
-  private async fetchHtmlWithPlaywright(url: string, proxyUrl?: string): Promise<string> {
-    console.log(`[NovelCoolScraper] Launching Playwright for ${url}${proxyUrl ? ' (with proxy)' : ' (no proxy)'}`);
+  private async fetchHtmlWithPlaywright(
+    url: string,
+    proxyUrl?: string,
+  ): Promise<string> {
+    console.log(
+      `[NovelCoolScraper] Launching Playwright for ${url}${proxyUrl ? ' (with proxy)' : ' (no proxy)'}`,
+    );
     const browser = await this.browserService.getBrowser();
     const context = await browser.newContext({
       userAgent: UA,
@@ -177,11 +212,18 @@ export class NovelCoolScraper implements IMangaScraper {
       await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
 
       // Dismiss age/content warning if present (e.g. violence/adult content gate).
-      const warned = await page.locator('.bookwarn-continue').click().then(() => true).catch(() => false);
-      if (warned) console.log(`[NovelCoolScraper] Dismissed content warning on ${url}`);
+      const warned = await page
+        .locator('.bookwarn-continue')
+        .click()
+        .then(() => true)
+        .catch(() => false);
+      if (warned)
+        console.log(`[NovelCoolScraper] Dismissed content warning on ${url}`);
 
       await page
-        .waitForSelector('[class*="book-item"], a[href*="/chapter/"], h1', { timeout: 15_000 })
+        .waitForSelector('[class*="book-item"], a[href*="/chapter/"], h1', {
+          timeout: 15_000,
+        })
         .catch(() => {});
       console.log(`[NovelCoolScraper] Playwright page loaded for ${url}`);
       return await page.content();
@@ -217,7 +259,7 @@ export class NovelCoolScraper implements IMangaScraper {
     try {
       await page.goto(firstPageUrl, { waitUntil: 'domcontentloaded' });
       const count = await page
-        .$eval('select.sl-page', el => el.querySelectorAll('option').length)
+        .$eval('select.sl-page', (el) => el.querySelectorAll('option').length)
         .catch(() => 0);
       return count > 0 ? count : 1;
     } finally {
@@ -260,10 +302,10 @@ export class NovelCoolScraper implements IMangaScraper {
     try {
       await page.goto(pageUrl, { waitUntil: 'domcontentloaded' });
       await page.waitForSelector('.mangaread-manga-pic', { timeout: 15_000 });
-      return await page.$$eval('.mangaread-manga-pic', imgs =>
+      return await page.$$eval('.mangaread-manga-pic', (imgs) =>
         imgs
-          .map(img => (img as HTMLImageElement).src)
-          .filter(src => !!src && src.startsWith('http')),
+          .map((img) => (img as HTMLImageElement).src)
+          .filter((src) => !!src && src.startsWith('http')),
       );
     } finally {
       await page.close();

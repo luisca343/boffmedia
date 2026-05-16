@@ -1,10 +1,19 @@
-import { Injectable, OnModuleInit, BadRequestException, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  OnModuleInit,
+  BadRequestException,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { StreakService } from './services/streak.service';
 import { InventoryService, ClaimItemData } from './services/inventory.service';
 import { LootboxService } from './services/lootbox.service';
 import { WingullFacadeService } from '../wingull/wingull.facade.service';
 import { ArcadeStreak } from './entities/arcade-streak.entity';
-import { ArcadeInventoryItem, ItemRarity } from './entities/arcade-inventory.entity';
+import {
+  ArcadeInventoryItem,
+  ItemRarity,
+} from './entities/arcade-inventory.entity';
 import { OpenLootBoxDto, OpenLootBoxResponseDto } from './dto/lottbox.dto';
 import { loadRewardsConfig } from '../_main/_config/daily-rewards.config';
 import { ArcadeInventoryResponse } from './entities/inventory-response.entity';
@@ -30,7 +39,7 @@ export class ArcadeFacadeService implements OnModuleInit {
   async getRewardsBanner(): Promise<DailyRewardsConfig> {
     return loadRewardsConfig();
   }
-  
+
   async getUserStreak(uuid: string): Promise<ArcadeStreak> {
     if (!uuid) {
       throw new BadRequestException('UUID is required');
@@ -39,7 +48,9 @@ export class ArcadeFacadeService implements OnModuleInit {
     return this.streakService.getUserStreak(uuid);
   }
 
-  async canClaimDailyReward(uuid: string): Promise<{ canClaim: boolean; streak: ArcadeStreak }> {
+  async canClaimDailyReward(
+    uuid: string,
+  ): Promise<{ canClaim: boolean; streak: ArcadeStreak }> {
     if (!uuid) {
       throw new BadRequestException('UUID is required');
     }
@@ -68,17 +79,18 @@ export class ArcadeFacadeService implements OnModuleInit {
     }
 
     // If the reward is a box or item, add it to the inventory
-    let inventoryItems: ArcadeInventoryItem[] = [];
+    const inventoryItems: ArcadeInventoryItem[] = [];
     if (reward.type === 'box' || reward.type === 'item') {
       const claimData: ClaimItemData = {
         uuid,
         itemId: reward.description,
         itemType: reward.type,
         amount: reward.amount,
-        sourceType: 'daily_reward'
+        sourceType: 'daily_reward',
       };
-      
-      const inventoryResult = await this.inventoryService.addItemToInventory(claimData);
+
+      const inventoryResult =
+        await this.inventoryService.addItemToInventory(claimData);
       inventoryItems.push(inventoryResult.item);
     }
 
@@ -95,7 +107,7 @@ export class ArcadeFacadeService implements OnModuleInit {
     }
 
     const result = await this.streakService.resetUserStreak(uuid);
-    
+
     if (!result.success) {
       throw new NotFoundException('Streak not found or could not be reset');
     }
@@ -127,7 +139,10 @@ export class ArcadeFacadeService implements OnModuleInit {
     return this.inventoryService.getUserInventory(uuid);
   }
 
-  async getUserItem(uuid: string, itemId: string): Promise<ArcadeInventoryItem | null> {
+  async getUserItem(
+    uuid: string,
+    itemId: string,
+  ): Promise<ArcadeInventoryItem | null> {
     if (!uuid || !itemId) {
       throw new BadRequestException('UUID and item ID are required');
     }
@@ -144,7 +159,9 @@ export class ArcadeFacadeService implements OnModuleInit {
     sourceType?: string;
   }): Promise<ArcadeInventoryItem> {
     if (!itemData.uuid || !itemData.itemId || !itemData.itemType) {
-      throw new BadRequestException('UUID, item ID, and item type are required');
+      throw new BadRequestException(
+        'UUID, item ID, and item type are required',
+      );
     }
 
     const claimData: ClaimItemData = {
@@ -153,14 +170,18 @@ export class ArcadeFacadeService implements OnModuleInit {
       itemType: itemData.itemType,
       amount: itemData.amount || 1,
       rarity: itemData.rarity || 'common',
-      sourceType: itemData.sourceType || 'manual'
+      sourceType: itemData.sourceType || 'manual',
     };
 
     const result = await this.inventoryService.addItemToInventory(claimData);
     return result.item;
   }
 
-  async consumeInventoryItem(uuid: string, itemId: string, amount: number = 1): Promise<{
+  async consumeInventoryItem(
+    uuid: string,
+    itemId: string,
+    amount: number = 1,
+  ): Promise<{
     item: ArcadeInventoryItem | null;
     consumed: number;
   }> {
@@ -172,15 +193,19 @@ export class ArcadeFacadeService implements OnModuleInit {
       throw new BadRequestException('Amount must be greater than 0');
     }
 
-    const result = await this.inventoryService.consumeItem(uuid, itemId, amount);
-    
+    const result = await this.inventoryService.consumeItem(
+      uuid,
+      itemId,
+      amount,
+    );
+
     if (!result.success) {
       throw new BadRequestException('Failed to consume item');
     }
 
     return {
       item: result.item,
-      consumed: result.consumed
+      consumed: result.consumed,
     };
   }
 
@@ -190,7 +215,7 @@ export class ArcadeFacadeService implements OnModuleInit {
     }
 
     const result = await this.inventoryService.removeItem(uuid, itemId);
-    
+
     if (!result.success) {
       throw new BadRequestException('Failed to remove item');
     }
@@ -208,7 +233,10 @@ export class ArcadeFacadeService implements OnModuleInit {
     return this.inventoryService.getInventoryStats(uuid);
   }
 
-  async getInventoryItemsByType(uuid: string, itemType: string): Promise<ArcadeInventoryItem[]> {
+  async getInventoryItemsByType(
+    uuid: string,
+    itemType: string,
+  ): Promise<ArcadeInventoryItem[]> {
     if (!uuid || !itemType) {
       throw new BadRequestException('UUID and item type are required');
     }
@@ -216,7 +244,10 @@ export class ArcadeFacadeService implements OnModuleInit {
     return this.inventoryService.getItemsByType(uuid, itemType);
   }
 
-  async getInventoryItemsByRarity(uuid: string, rarity: string): Promise<ArcadeInventoryItem[]> {
+  async getInventoryItemsByRarity(
+    uuid: string,
+    rarity: string,
+  ): Promise<ArcadeInventoryItem[]> {
     if (!uuid || !rarity) {
       throw new BadRequestException('UUID and rarity are required');
     }
@@ -224,7 +255,10 @@ export class ArcadeFacadeService implements OnModuleInit {
     return this.inventoryService.getItemsByRarity(uuid, rarity);
   }
 
-  async markItemAsUsed(uuid: string, itemId: string): Promise<ArcadeInventoryItem> {
+  async markItemAsUsed(
+    uuid: string,
+    itemId: string,
+  ): Promise<ArcadeInventoryItem> {
     if (!uuid || !itemId) {
       throw new BadRequestException('UUID and item ID are required');
     }
@@ -232,14 +266,16 @@ export class ArcadeFacadeService implements OnModuleInit {
     return this.inventoryService.markItemAsUsed(uuid, itemId);
   }
 
-// ==================== LOOTBOX MANAGEMENT ====================
+  // ==================== LOOTBOX MANAGEMENT ====================
 
   async getLootboxConfig(): Promise<LootboxConfigEntity> {
     return this.lootboxService.getLootboxConfig();
   }
 
-
-  async openLootbox(uuid: string, lootboxType: string): Promise<OpenLootBoxResponseDto> {
+  async openLootbox(
+    uuid: string,
+    lootboxType: string,
+  ): Promise<OpenLootBoxResponseDto> {
     if (!uuid || !lootboxType) {
       throw new BadRequestException('UUID and lootbox type are required');
     }
@@ -250,15 +286,19 @@ export class ArcadeFacadeService implements OnModuleInit {
     };
 
     const lootboxResult = await this.lootboxService.openLootBox(openLootBoxDto);
-    
+
     return {
       item: lootboxResult.item,
       spinnerItems: lootboxResult.spinnerItems || [],
-      winningPosition: lootboxResult.winningPosition || 0
+      winningPosition: lootboxResult.winningPosition || 0,
     };
   }
 
-  async giveLootbox(uuid: string, lootboxType: string, amount: number = 1): Promise<void> {
+  async giveLootbox(
+    uuid: string,
+    lootboxType: string,
+    amount: number = 1,
+  ): Promise<void> {
     if (!uuid || !lootboxType) {
       throw new BadRequestException('UUID and lootbox type are required');
     }
@@ -267,8 +307,12 @@ export class ArcadeFacadeService implements OnModuleInit {
       throw new BadRequestException('Amount must be greater than 0');
     }
 
-    const result = await this.lootboxService.giveLootbox(uuid, lootboxType, amount);
-    
+    const result = await this.lootboxService.giveLootbox(
+      uuid,
+      lootboxType,
+      amount,
+    );
+
     if (!result.success) {
       throw new BadRequestException(result.message || 'Failed to give lootbox');
     }
@@ -278,20 +322,22 @@ export class ArcadeFacadeService implements OnModuleInit {
 
   async claimItems(claimData: ClaimItemsDto): Promise<ClaimItemsResponseDto> {
     console.log('Claiming items:', claimData);
-    
+
     const { uuid, items } = claimData;
-    
+
     // Input validation
     if (!uuid) {
       throw new BadRequestException('UUID is required');
     }
-    
+
     if (!items || !Array.isArray(items) || items.length === 0) {
-      throw new BadRequestException('Items array is required and must not be empty');
+      throw new BadRequestException(
+        'Items array is required and must not be empty',
+      );
     }
 
     // Validate items structure
-    const validItems = items.filter(item => {
+    const validItems = items.filter((item) => {
       if (!item || !item.id || !item.itemId || !item.itemType) {
         console.warn(`Invalid item detected:`, item);
         return false;
@@ -311,14 +357,13 @@ export class ArcadeFacadeService implements OnModuleInit {
     const errors: string[] = [];
 
     try {
-
       // Process each requested item
       for (const item of validItems) {
         try {
           // Calculate available amount for this item
           const usedAmount = item.used || 0;
           const availableAmount = Math.max(0, item.amount - usedAmount);
-          
+
           // Check if there's anything to claim
           if (availableAmount === 0) {
             failedItems.push(item.itemId);
@@ -328,11 +373,20 @@ export class ArcadeFacadeService implements OnModuleInit {
 
           // Mark this item as fully used (claim all available amount)
           try {
-            await this.inventoryService.consumeItem(uuid, item.itemId, availableAmount);
+            await this.inventoryService.consumeItem(
+              uuid,
+              item.itemId,
+              availableAmount,
+            );
           } catch (consumeError) {
-            console.error(`Error consuming item ${item.itemId} (ID: ${item.id}):`, consumeError);
+            console.error(
+              `Error consuming item ${item.itemId} (ID: ${item.id}):`,
+              consumeError,
+            );
             failedItems.push(item.itemId);
-            errors.push(`Failed to claim item ${item.itemId}: ${consumeError.message}`);
+            errors.push(
+              `Failed to claim item ${item.itemId}: ${consumeError.message}`,
+            );
             continue;
           }
 
@@ -343,37 +397,55 @@ export class ArcadeFacadeService implements OnModuleInit {
             try {
               const pokemonSpec = item.itemData || item.itemId;
               for (let i = 0; i < item.amount; i++) {
-                await this.wingullFacadeService.givePokemon(uuid, pokemonSpec, true);
+                await this.wingullFacadeService.givePokemon(
+                  uuid,
+                  pokemonSpec,
+                  true,
+                );
               }
               pokemonItems.push(item.itemId);
               claimedItems.push(item.itemId);
             } catch (pokemonError) {
-              console.error(`Failed to give Pokemon ${item.itemId} to ${uuid}:`, pokemonError);
-              errors.push(`Failed to distribute Pokemon ${item.itemId}: ${pokemonError.message}`);
+              console.error(
+                `Failed to give Pokemon ${item.itemId} to ${uuid}:`,
+                pokemonError,
+              );
+              errors.push(
+                `Failed to distribute Pokemon ${item.itemId}: ${pokemonError.message}`,
+              );
               failedItems.push(item.itemId);
             }
           } else {
             try {
               // Give regular items to player
-              const itemsToGive = [{
-                id: item.itemId,
-                amount: availableAmount,
-                display_name: this.getItemDisplayName(item.itemId),
-                lore: this.getItemLore(item.itemId)
-              }];
-              
+              const itemsToGive = [
+                {
+                  id: item.itemId,
+                  amount: availableAmount,
+                  display_name: this.getItemDisplayName(item.itemId),
+                  lore: this.getItemLore(item.itemId),
+                },
+              ];
+
               await this.wingullFacadeService.giveItems(uuid, itemsToGive);
               regularItems.push(item.itemId);
               claimedItems.push(item.itemId);
             } catch (itemError) {
-              console.error(`Failed to give item ${item.itemId} to ${uuid}:`, itemError);
-              errors.push(`Failed to distribute item ${item.itemId}: ${itemError.message}`);
+              console.error(
+                `Failed to give item ${item.itemId} to ${uuid}:`,
+                itemError,
+              );
+              errors.push(
+                `Failed to distribute item ${item.itemId}: ${itemError.message}`,
+              );
               failedItems.push(item.itemId);
             }
           }
-
         } catch (itemError) {
-          console.error(`Error processing item ${item.itemId} for user ${uuid}:`, itemError);
+          console.error(
+            `Error processing item ${item.itemId} for user ${uuid}:`,
+            itemError,
+          );
           failedItems.push(item.itemId);
           errors.push(`Error processing ${item.itemId}: ${itemError.message}`);
         }
@@ -399,9 +471,8 @@ export class ArcadeFacadeService implements OnModuleInit {
         pokemonItems,
         regularItems,
         success: totalClaimed > 0,
-        message
+        message,
       };
-
     } catch (error: any) {
       console.error('Critical error in claimItems:', error);
       throw new BadRequestException(`Failed to claim items: ${error.message}`);
@@ -417,20 +488,20 @@ export class ArcadeFacadeService implements OnModuleInit {
     // Format item ID to a readable display name
     return itemId
       .replace(/[_-]/g, ' ')
-      .replace(/\b\w/g, l => l.toUpperCase());
+      .replace(/\b\w/g, (l) => l.toUpperCase());
   }
 
   /**
    * Gets lore for an item (can be enhanced with item registry)
    */
   private getItemLore(itemId: string): string[] {
-    return [
-      '§7Claimed from Arcade System',
-      '§8Item ID: ' + itemId
-    ];
+    return ['§7Claimed from Arcade System', '§8Item ID: ' + itemId];
   }
 
-  async claimMultipleItems(uuid: string, items: ClaimItemData[]): Promise<ArcadeInventoryItem[]> {
+  async claimMultipleItems(
+    uuid: string,
+    items: ClaimItemData[],
+  ): Promise<ArcadeInventoryItem[]> {
     if (!uuid || !items || items.length === 0) {
       throw new BadRequestException('UUID and items array are required');
     }
@@ -440,7 +511,7 @@ export class ArcadeFacadeService implements OnModuleInit {
     for (const itemData of items) {
       const claimData: ClaimItemData = {
         ...itemData,
-        uuid // Ensure UUID is set
+        uuid, // Ensure UUID is set
       };
 
       const result = await this.inventoryService.addItemToInventory(claimData);
@@ -466,13 +537,13 @@ export class ArcadeFacadeService implements OnModuleInit {
     const [streak, inventory, inventoryStats] = await Promise.all([
       this.streakService.getUserStreak(uuid),
       this.inventoryService.getUserInventory(uuid),
-      this.inventoryService.getInventoryStats(uuid)
+      this.inventoryService.getInventoryStats(uuid),
     ]);
 
     return {
       streak,
       inventory,
-      inventoryStats
+      inventoryStats,
     };
   }
 }

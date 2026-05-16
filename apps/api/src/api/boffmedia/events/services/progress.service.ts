@@ -2,11 +2,11 @@ import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { eq, and } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import { 
+import {
   boffMediaParticipantProgress,
   boffMediaAchievements,
   ParticipantProgress,
-  validateParticipantCanReceiveAchievement
+  validateParticipantCanReceiveAchievement,
 } from '@/_db/schema/Events';
 import { AchievementsService } from './achievements.service';
 import { TeamsService } from './teams.service';
@@ -20,19 +20,26 @@ export class ProgressService {
   ) {}
 
   async updateProgress(
-    participantId: number, 
+    participantId: number,
     achievementId: number,
     progress: number,
-    teamId?: number
+    teamId?: number,
   ): Promise<ParticipantProgress> {
     // 1. Validate participant can receive this achievement
-    const canReceive = await validateParticipantCanReceiveAchievement(participantId, achievementId, this.db);
+    const canReceive = await validateParticipantCanReceiveAchievement(
+      participantId,
+      achievementId,
+      this.db,
+    );
     if (!canReceive) {
-      throw new Error('Participant is not eligible to receive this achievement');
+      throw new Error(
+        'Participant is not eligible to receive this achievement',
+      );
     }
 
     // 2. Get achievement details
-    const achievement = await this.achievementsService.getAchievementById(achievementId);
+    const achievement =
+      await this.achievementsService.getAchievementById(achievementId);
     if (!achievement) {
       throw new Error('Achievement not found');
     }
@@ -41,21 +48,23 @@ export class ProgressService {
     const isCompleted = progress >= achievement.maxProgress ? 1 : 0;
     const completedAt = isCompleted ? new Date() : null;
 
-    await this.db.insert(boffMediaParticipantProgress).values({
-      participantId,
-      achievementId,
-      currentProgress: progress,
-      isCompleted,
-      completedAt,
-      lastUpdated: new Date(),
-      createdAt: new Date()
-    } as ParticipantProgress)
-    .onDuplicateKeyUpdate({
-      currentProgress: progress,
-      isCompleted,
-      completedAt,
-      lastUpdated: new Date()
-    } as any);
+    await this.db
+      .insert(boffMediaParticipantProgress)
+      .values({
+        participantId,
+        achievementId,
+        currentProgress: progress,
+        isCompleted,
+        completedAt,
+        lastUpdated: new Date(),
+        createdAt: new Date(),
+      } as ParticipantProgress)
+      .onDuplicateKeyUpdate({
+        currentProgress: progress,
+        isCompleted,
+        completedAt,
+        lastUpdated: new Date(),
+      } as any);
 
     // 4. If completed and team exists, update team score
     if (isCompleted && teamId) {
@@ -63,29 +72,41 @@ export class ProgressService {
     }
 
     // 5. Return updated progress
-    const result = await this.db.select()
+    const result = await this.db
+      .select()
       .from(boffMediaParticipantProgress)
-      .where(and(
-        eq(boffMediaParticipantProgress.participantId, participantId),
-        eq(boffMediaParticipantProgress.achievementId, achievementId)
-      ));
+      .where(
+        and(
+          eq(boffMediaParticipantProgress.participantId, participantId),
+          eq(boffMediaParticipantProgress.achievementId, achievementId),
+        ),
+      );
 
     return result[0];
   }
 
-  async getParticipantProgress(participantId: number, achievementId: number): Promise<ParticipantProgress> {
-    const result = await this.db.select()
+  async getParticipantProgress(
+    participantId: number,
+    achievementId: number,
+  ): Promise<ParticipantProgress> {
+    const result = await this.db
+      .select()
       .from(boffMediaParticipantProgress)
-      .where(and(
-        eq(boffMediaParticipantProgress.participantId, participantId),
-        eq(boffMediaParticipantProgress.achievementId, achievementId)
-      ));
+      .where(
+        and(
+          eq(boffMediaParticipantProgress.participantId, participantId),
+          eq(boffMediaParticipantProgress.achievementId, achievementId),
+        ),
+      );
 
     return result[0];
   }
 
-  async getAllParticipantProgress(participantId: number): Promise<ParticipantProgress[]> {
-    return this.db.select()
+  async getAllParticipantProgress(
+    participantId: number,
+  ): Promise<ParticipantProgress[]> {
+    return this.db
+      .select()
       .from(boffMediaParticipantProgress)
       .where(eq(boffMediaParticipantProgress.participantId, participantId));
   }

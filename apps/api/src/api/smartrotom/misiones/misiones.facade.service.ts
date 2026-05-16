@@ -1,6 +1,15 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { NPCService, NPCUpdateRequest, NPCUpdateResponse } from './services/npc.service';
-import { ImageService, ImageUploadRequest, ImageUploadResponse, ImageExistsResponse } from './services/image.service';
+import {
+  NPCService,
+  NPCUpdateRequest,
+  NPCUpdateResponse,
+} from './services/npc.service';
+import {
+  ImageService,
+  ImageUploadRequest,
+  ImageUploadResponse,
+  ImageExistsResponse,
+} from './services/image.service';
 import { QuestSystemData, NPC } from './types';
 import { QuestCacheService } from './services/quest.cache.service';
 import { UserQuestData, UserQuestService } from './services/user.quest.service';
@@ -66,20 +75,23 @@ export class MisionesFacadeService {
       await this.questCacheService.refreshCache();
       return {
         success: true,
-        timestamp: new Date()
+        timestamp: new Date(),
       };
     } catch (error: any) {
-      throw new BadRequestException(`Failed to refresh cache: ${error.message}`);
+      throw new BadRequestException(
+        `Failed to refresh cache: ${error.message}`,
+      );
     }
   }
 
   async getCacheStatus(): Promise<CacheStatusResponse> {
     const status = this.questCacheService.getCacheStatus();
-    const healthy = status.cached && (!status.age || status.age < 6 * 60 * 60 * 1000); // 6 hours
+    const healthy =
+      status.cached && (!status.age || status.age < 6 * 60 * 60 * 1000); // 6 hours
 
     return {
       ...status,
-      healthy
+      healthy,
     };
   }
 
@@ -111,7 +123,9 @@ export class MisionesFacadeService {
 
   // ==================== IMAGE MANAGEMENT ====================
 
-  async uploadNPCImage(request: ImageUploadRequest): Promise<ImageUploadResponse> {
+  async uploadNPCImage(
+    request: ImageUploadRequest,
+  ): Promise<ImageUploadResponse> {
     if (!request.npcName || !request.image) {
       throw new BadRequestException('NPC name and image are required');
     }
@@ -161,11 +175,11 @@ export class MisionesFacadeService {
 
       // Determine overall health
       let overall: 'healthy' | 'degraded' | 'unhealthy' = 'healthy';
-      
+
       if (!cacheHealthy || !externalAPIHealthy) {
         overall = 'degraded';
       }
-      
+
       if (!cacheHealthy && !externalAPIHealthy) {
         overall = 'unhealthy';
       }
@@ -174,15 +188,14 @@ export class MisionesFacadeService {
         overall,
         cache: cacheHealthy,
         externalAPI: externalAPIHealthy,
-        fileSystem: fileSystemHealthy
+        fileSystem: fileSystemHealthy,
       };
-
     } catch (error: any) {
       return {
         overall: 'unhealthy',
         cache: false,
         externalAPI: false,
-        fileSystem: false
+        fileSystem: false,
       };
     }
   }

@@ -7,9 +7,7 @@ import Fuse from 'fuse.js';
 
 @Injectable()
 export class PokemonDataService {
-  constructor(
-    private readonly pokemonService: PokemonFacadeService,
-  ) {}
+  constructor(private readonly pokemonService: PokemonFacadeService) {}
 
   getPokemonCount(): { type: string; content: any }[] {
     const count = this.pokemonService.getAllPokemon().length;
@@ -18,39 +16,49 @@ export class PokemonDataService {
         type: 'pokemonCount',
         content: {
           count,
-          pokemonName: null
-        }
+          pokemonName: null,
+        },
       },
       {
         type: 'text',
         content: `Hay ${count} Pokémon en la región de Teras.`,
-      }
+      },
     ];
   }
 
-  getRandomPokemon(dataTypes: string[] = ['basic']): { pokemon: any; parts: MessagePartDto[] } {
+  getRandomPokemon(dataTypes: string[] = ['basic']): {
+    pokemon: any;
+    parts: MessagePartDto[];
+  } {
     const allPokemon = this.pokemonService.getAllPokemon();
-    
+
     if (!allPokemon || allPokemon.length === 0) {
       return {
         pokemon: null,
-        parts: [{
-          type: MessagePartType.TEXT,
-          content: 'Lo siento, no pude encontrar ningún Pokémon en la región de Teras en este momento.',
-        }]
+        parts: [
+          {
+            type: MessagePartType.TEXT,
+            content:
+              'Lo siento, no pude encontrar ningún Pokémon en la región de Teras en este momento.',
+          },
+        ],
       };
     }
 
     const randomIndex = Math.floor(Math.random() * allPokemon.length);
     const randomPokemon = allPokemon[randomIndex];
-    
+
     const parts = this.getRandomPokemonParts(randomPokemon, dataTypes);
-    
+
     return { pokemon: randomPokemon, parts };
   }
 
   // Modified to return consolidated PokemonData instead of separate parts
-  getPokemonDataParts(pokemonName: string, dataTypes: string[], moveTypes: string[] = []): MessagePartDto[] | null {
+  getPokemonDataParts(
+    pokemonName: string,
+    dataTypes: string[],
+    moveTypes: string[] = [],
+  ): MessagePartDto[] | null {
     const pokemon = this.pokemonService.searchPokemonByName(pokemonName);
 
     if (!pokemon || pokemon.length === 0 || !pokemon[0].item) {
@@ -63,7 +71,7 @@ export class PokemonDataService {
 
     // Build consolidated pokemon data object
     const consolidatedData: PokemonData = {
-      pokemonName: pokemonData.name
+      pokemonName: pokemonData.name,
     };
 
     // Add requested data types to the consolidated object
@@ -76,7 +84,9 @@ export class PokemonDataService {
           break;
         case 'stats':
           if (pokemonForm.battleStats) {
-            consolidatedData.stats = this.mapPokemonStats(pokemonForm.battleStats);
+            consolidatedData.stats = this.mapPokemonStats(
+              pokemonForm.battleStats,
+            );
           }
           break;
         case 'moves':
@@ -86,25 +96,32 @@ export class PokemonDataService {
           }
           break;
         case 'habitat':
-          const biomes = this.pokemonService.getBiomesByPokemon(`${pokemonData.name.toLowerCase()}_base`);
+          const biomes = this.pokemonService.getBiomesByPokemon(
+            `${pokemonData.name.toLowerCase()}_base`,
+          );
           if (biomes && biomes.length > 0) {
             consolidatedData.habitat = biomes;
           }
           break;
       }
     }
-    
+
     consolidatedData.id = pokemonData.dex;
-    consolidatedData.form = pokemonForm.name || 'base'
+    consolidatedData.form = pokemonForm.name || 'base';
 
     // Return single consolidated part
-    return [{
-      type: MessagePartType.POKEMON_DATA,
-      content: consolidatedData
-    }];
+    return [
+      {
+        type: MessagePartType.POKEMON_DATA,
+        content: consolidatedData,
+      },
+    ];
   }
 
-  private getRandomPokemonParts(pokemon: any, dataTypes: string[]): MessagePartDto[] {
+  private getRandomPokemonParts(
+    pokemon: any,
+    dataTypes: string[],
+  ): MessagePartDto[] {
     const responseParts: MessagePartDto[] = [];
 
     if (dataTypes.includes('basic')) {
@@ -114,17 +131,18 @@ export class PokemonDataService {
           `¡Qué interesante elección! Este Pokémon tiene características únicas.`,
           `¡Perfecto! Este Pokémon podría ser justo lo que estás buscando.`,
           `¡Genial! Este Pokémon tiene un gran potencial.`,
-          `¡Excelente! Este Pokémon es muy versátil en batalla.`
+          `¡Excelente! Este Pokémon es muy versátil en batalla.`,
         ];
-        const randomFlavorText = flavorTexts[Math.floor(Math.random() * flavorTexts.length)];
-        
+        const randomFlavorText =
+          flavorTexts[Math.floor(Math.random() * flavorTexts.length)];
+
         responseParts.push({
           type: MessagePartType.TEXT,
-          content: `¡Te presento a ${firstLetterToUpperCase(pokemon.name)}! 🎲`
+          content: `¡Te presento a ${firstLetterToUpperCase(pokemon.name)}! 🎲`,
         });
         responseParts.push({
           type: MessagePartType.TEXT,
-          content: randomFlavorText
+          content: randomFlavorText,
         });
 
         // Create consolidated pokemon data for random pokemon
@@ -136,15 +154,18 @@ export class PokemonDataService {
 
         responseParts.push({
           type: MessagePartType.POKEMON_DATA,
-          content: consolidatedData
+          content: consolidatedData,
         });
       }
     }
 
     // Add specific data types if requested (excluding 'basic')
-    const specificDataTypes = dataTypes.filter(type => type !== 'basic');
+    const specificDataTypes = dataTypes.filter((type) => type !== 'basic');
     if (specificDataTypes.length > 0) {
-      const dataParts = this.getPokemonDataParts(pokemon.name, specificDataTypes);
+      const dataParts = this.getPokemonDataParts(
+        pokemon.name,
+        specificDataTypes,
+      );
       if (dataParts) {
         responseParts.push(...dataParts);
       }
@@ -153,7 +174,8 @@ export class PokemonDataService {
     if (dataTypes.includes('basic')) {
       responseParts.push({
         type: MessagePartType.TEXT,
-        content: '\n¿Te gustaría saber más sobre este Pokémon o prefieres que elija otro?'
+        content:
+          '\n¿Te gustaría saber más sobre este Pokémon o prefieres que elija otro?',
       });
     }
 
@@ -162,18 +184,21 @@ export class PokemonDataService {
 
   private mapPokemonStats(battleStats: any): PokemonStats | undefined {
     if (!battleStats) return undefined;
-    
+
     return {
       hp: battleStats.hp || 0,
       attack: battleStats.attack || 0,
       defense: battleStats.defense || 0,
       specialAttack: battleStats.specialAttack || 0,
       specialDefense: battleStats.specialDefense || 0,
-      speed: battleStats.speed || 0
+      speed: battleStats.speed || 0,
     };
   }
 
-  private getFilteredMoves(moves: any, moveTypes: string[]): Record<string, any> | null {
+  private getFilteredMoves(
+    moves: any,
+    moveTypes: string[],
+  ): Record<string, any> | null {
     if (!moves) return null;
 
     const keyMapping = {

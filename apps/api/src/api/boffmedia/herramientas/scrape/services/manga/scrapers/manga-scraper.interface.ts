@@ -41,5 +41,8 @@ export interface IMangaScraper {
    * requires JavaScript execution (requiresBrowser = true), ignore it
    * otherwise.
    */
-  getChapterImages(chapterUrl: string, context: BrowserContext): Promise<string[]>;
+  getChapterImages(
+    chapterUrl: string,
+    context: BrowserContext,
+  ): Promise<string[]>;
 }

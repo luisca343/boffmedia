@@ -1,12 +1,12 @@
-import { ItemRarity } from "../entities/arcade-inventory.entity";
-import { FileUtils } from "@/_utils/FileUtils";
+import { ItemRarity } from '../entities/arcade-inventory.entity';
+import { FileUtils } from '@/_utils/FileUtils';
 
 export const rarityRanges = {
   common: { min: 50, max: 100 },
   uncommon: { min: 20, max: 49 },
   rare: { min: 10, max: 19 },
   epic: { min: 3, max: 9 },
-  legendary: { min: 1, max: 2 }
+  legendary: { min: 1, max: 2 },
 };
 
 // Helper function to determine rarity from weight
@@ -39,4 +39,6 @@ export interface LootBoxConfig {
   boxes: LootBox[];
 }
 
-export const lootboxConfig: LootBoxConfig = FileUtils.readJsonFile("/public/smartrotom/data/lootboxConfig.json");
+export const lootboxConfig: LootBoxConfig = FileUtils.readJsonFile(
+  '/public/smartrotom/data/lootboxConfig.json',
+);

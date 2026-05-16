@@ -16,10 +16,15 @@ export class FraseCommand {
   })
   public async onFrase(
     @Context() [interaction]: SlashCommandContext,
-    @Options() { usuario, num, global }: FraseDto
+    @Options() { usuario, num, global }: FraseDto,
   ) {
     const userId = usuario?.id || null;
-    const frase = await this.service.getQuote(interaction.guildId, userId, num || 0, global || false);
+    const frase = await this.service.getQuote(
+      interaction.guildId,
+      userId,
+      num || 0,
+      global || false,
+    );
 
     if (!frase) {
       await interaction.reply('No se ha encontrado la frase');
@@ -30,7 +35,10 @@ export class FraseCommand {
       .setColor(`#${frase.color || '0099ff'}`)
       .setAuthor({
         name: `${frase.discordName}`,
-        iconURL: frase.avatar && frase.avatar.startsWith('http') ? frase.avatar : undefined,
+        iconURL:
+          frase.avatar && frase.avatar.startsWith('http')
+            ? frase.avatar
+            : undefined,
       })
       .setTimestamp()
       .setDescription(`**"${frase.quote}" **`)

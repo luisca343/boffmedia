@@ -1,5 +1,10 @@
 import { Injectable, Inject, BadRequestException } from '@nestjs/common';
-import { IMineRepository, PlayerStatistics, RankingEntry, UnclaimedItem } from '../repositories/interfaces/mine.repository.interface';
+import {
+  IMineRepository,
+  PlayerStatistics,
+  RankingEntry,
+  UnclaimedItem,
+} from '../repositories/interfaces/mine.repository.interface';
 import { MINE_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 
 export interface PlayerHistory {
@@ -29,7 +34,7 @@ export class PlayerService {
     }
 
     const historyEntries = await this.mineRepository.findPlayerHistory(uuid);
-    
+
     // Group by game ID
     const groupedHistory = historyEntries.reduce((acc, entry) => {
       if (!acc[entry.id]) {
@@ -46,7 +51,9 @@ export class PlayerService {
     return this.mineRepository.findTopPlayers(50);
   }
 
-  async getPlayerRank(uuid: string): Promise<{ rank: number; totalValue: number } | null> {
+  async getPlayerRank(
+    uuid: string,
+  ): Promise<{ rank: number; totalValue: number } | null> {
     if (!uuid) {
       throw new BadRequestException('UUID is required');
     }
@@ -60,26 +67,26 @@ export class PlayerService {
     }
 
     const unclaimedItems = await this.mineRepository.findUnclaimedItems(uuid);
-    
+
     // Aggregate items by itemId
     const aggregatedItems = new Map<string, UnclaimedItem>();
-    
+
     for (const item of unclaimedItems) {
       const existingItem = aggregatedItems.get(item.itemId);
-      
+
       if (existingItem) {
         existingItem.amount = (existingItem.amount || 1) + (item.amount || 1);
       } else {
         // Create new aggregated item
         aggregatedItems.set(item.itemId, {
-          id: item.id, 
+          id: item.id,
           itemId: item.itemId,
           type: item.type,
-          amount: item.amount || 1
+          amount: item.amount || 1,
         });
       }
     }
-    
+
     return Array.from(aggregatedItems.values());
   }
 
@@ -89,22 +96,22 @@ export class PlayerService {
     }
 
     const unclaimedItems = await this.mineRepository.findUnclaimedItems(uuid);
-    
+
     if (unclaimedItems.length === 0) {
       return {
         claimedIds: [],
         totalClaimed: 0,
-        success: true
+        success: true,
       };
     }
 
-    const itemIds = unclaimedItems.map(item => item.id);
+    const itemIds = unclaimedItems.map((item) => item.id);
     await this.mineRepository.claimInventoryItems(itemIds);
 
     return {
       claimedIds: itemIds,
       totalClaimed: unclaimedItems.length,
-      success: true
+      success: true,
     };
   }
 
@@ -115,12 +122,12 @@ export class PlayerService {
 
     const [stats, ranking] = await Promise.all([
       this.mineRepository.getPlayerStats(uuid),
-      this.mineRepository.findPlayerRanking(uuid)
+      this.mineRepository.findPlayerRanking(uuid),
     ]);
 
     return {
       ...stats,
-      ranking
+      ranking,
     };
   }
 

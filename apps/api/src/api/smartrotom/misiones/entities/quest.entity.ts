@@ -2,202 +2,202 @@ import { ApiProperty } from '@nestjs/swagger';
 import { QuestStatus } from '../types';
 
 export class QuestObjective {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Objective name',
-    example: 'Collect 10 berries'
+    example: 'Collect 10 berries',
   })
   name: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Current progress',
-    example: 5
+    example: 5,
   })
   progress: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Total required',
-    example: 10
+    example: 10,
   })
   total: number;
 }
 
 export class QuestReward {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Item identifier',
-    example: 'berry:oran'
+    example: 'berry:oran',
   })
   item: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Item count',
-    example: 5
+    example: 5,
   })
   count: number;
 }
 
 export class ScoreboardRequirements {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Scoreboard objective name',
-    example: 'pokemon_caught'
+    example: 'pokemon_caught',
   })
   scoreboardObjective: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Scoreboard type',
-    example: 'dummy'
+    example: 'dummy',
   })
   scoreboardType: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Required value',
-    example: 50
+    example: 50,
   })
   scoreboardValue: number;
 }
 
 export class FactionRequirements {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Faction ID',
-    example: 1
+    example: 1,
   })
   factionId: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Faction availability',
-    example: 'AVAILABLE'
+    example: 'AVAILABLE',
   })
   factionAvailable: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Faction stance',
-    example: 'ALLIED'
+    example: 'ALLIED',
   })
   factionStance: string;
 }
 
 export class QuestRequirements {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Whether quest is available',
-    example: true
+    example: true,
   })
   available: boolean;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Required quest IDs',
     type: [Number],
-    example: [1, 2, 3]
+    example: [1, 2, 3],
   })
   requiredQuests: number[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Required dialog IDs',
     type: [Number],
-    example: [5, 6]
+    example: [5, 6],
   })
   requiredDialogs: number[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Required player level',
-    example: 10
+    example: 10,
   })
   requiredLevel: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Required time (timestamp)',
-    example: 1640995200000
+    example: 1640995200000,
   })
   requiredTime: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Faction requirements',
-    type: [FactionRequirements]
+    type: [FactionRequirements],
   })
   factionRequirements: FactionRequirements[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Scoreboard requirements',
-    type: [ScoreboardRequirements]
+    type: [ScoreboardRequirements],
   })
   scoreboardRequirements: ScoreboardRequirements[];
 }
 
 export class Quest {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Quest ID',
-    example: 1
+    example: 1,
   })
   id: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Quest name',
-    example: 'Berry Collector'
+    example: 'Berry Collector',
   })
   name: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Quest log text',
-    example: 'Collect berries for the local Pokemon center'
+    example: 'Collect berries for the local Pokemon center',
   })
   logText: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Quest completion text',
-    example: 'Great job! You collected all the berries.'
+    example: 'Great job! You collected all the berries.',
   })
   completeText: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Whether quest is repeatable',
-    example: false
+    example: false,
   })
   repeatable: boolean;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Quest type ID',
-    example: 1
+    example: 1,
   })
   type: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Next quest ID',
-    example: 2
+    example: 2,
   })
   nextQuest: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Quest category',
-    example: 'main'
+    example: 'main',
   })
   category: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Quest status',
     enum: QuestStatus,
-    example: QuestStatus.AVAILABLE
+    example: QuestStatus.AVAILABLE,
   })
   status: QuestStatus;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Quest objectives',
-    type: [QuestObjective]
+    type: [QuestObjective],
   })
   objectives: QuestObjective[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Quest requirements',
-    type: QuestRequirements
+    type: QuestRequirements,
   })
   requirements: QuestRequirements;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Dialog ID',
-    example: 10
+    example: 10,
   })
   dialogId: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Quest rewards',
-    type: [QuestReward]
+    type: [QuestReward],
   })
   rewards: QuestReward[];
 }

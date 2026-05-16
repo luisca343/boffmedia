@@ -1,69 +1,69 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class Team {
-  @ApiProperty({ 
-    example: 1, 
-    description: 'Unique identifier for the team' 
+  @ApiProperty({
+    example: 1,
+    description: 'Unique identifier for the team',
   })
   id: number;
 
-  @ApiProperty({ 
-    example: 1, 
-    description: 'Event ID this team belongs to' 
+  @ApiProperty({
+    example: 1,
+    description: 'Event ID this team belongs to',
   })
   eventId: number;
 
-  @ApiProperty({ 
-    example: 'Team Alpha', 
-    description: 'Name of the team' 
+  @ApiProperty({
+    example: 'Team Alpha',
+    description: 'Name of the team',
   })
   name: string;
 
-  @ApiProperty({ 
-    example: 'ALPH', 
+  @ApiProperty({
+    example: 'ALPH',
     description: 'Team tag/code',
-    required: false 
+    required: false,
   })
   tag?: string;
 
-  @ApiProperty({ 
-    example: '/icons/team-alpha.png', 
+  @ApiProperty({
+    example: '/icons/team-alpha.png',
     description: 'Team icon URL',
-    required: false 
+    required: false,
   })
   icon?: string;
 
-  @ApiProperty({ 
-    example: 'active', 
+  @ApiProperty({
+    example: 'active',
     description: 'Team status',
     enum: ['active', 'disqualified', 'withdrew'],
-    required: false 
+    required: false,
   })
   status?: 'active' | 'disqualified' | 'withdrew';
 
-  @ApiProperty({ 
-    example: 750, 
+  @ApiProperty({
+    example: 750,
     description: 'Total team score',
-    required: false 
+    required: false,
   })
   totalScore?: number;
 
-  @ApiProperty({ 
-    example: '2024-01-01T00:00:00.000Z', 
-    description: 'When the team was created' 
+  @ApiProperty({
+    example: '2024-01-01T00:00:00.000Z',
+    description: 'When the team was created',
   })
   createdAt: Date;
 
-  @ApiProperty({ 
-    example: '2024-01-01T00:00:00.000Z', 
-    description: 'When the team was last updated' 
+  @ApiProperty({
+    example: '2024-01-01T00:00:00.000Z',
+    description: 'When the team was last updated',
   })
   updatedAt: Date;
 
-  @ApiProperty({ 
-    example: null, 
+  @ApiProperty({
+    example: null,
     description: 'When the team was deleted',
-    required: false 
+    required: false,
   })
   deletedAt?: Date;
 }

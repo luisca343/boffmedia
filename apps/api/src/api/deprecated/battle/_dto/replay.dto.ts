@@ -2,57 +2,57 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, IsUUID, IsOptional } from 'class-validator';
 
 export class CreateReplayDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Player 1 name',
-    example: 'PlayerOne'
+    example: 'PlayerOne',
   })
   @IsString()
   @IsNotEmpty()
   side1: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Player 2 name',
-    example: 'PlayerTwo'
+    example: 'PlayerTwo',
   })
   @IsString()
   @IsNotEmpty()
   side2: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Player 1 team data (JSON string)',
-    example: '{"pokemon": ["pikachu", "charizard"]}'
+    example: '{"pokemon": ["pikachu", "charizard"]}',
   })
   @IsString()
   @IsNotEmpty()
   team1: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Player 2 team data (JSON string)',
-    example: '{"pokemon": ["blastoise", "venusaur"]}'
+    example: '{"pokemon": ["blastoise", "venusaur"]}',
   })
   @IsString()
   @IsNotEmpty()
   team2: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Battle replay data',
-    example: 'replay-data-string'
+    example: 'replay-data-string',
   })
   @IsString()
   @IsNotEmpty()
   replay: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Winner of the battle',
-    example: 'PlayerOne'
+    example: 'PlayerOne',
   })
   @IsString()
   @IsNotEmpty()
   winner: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'User UUID to associate with this replay',
-    example: '007d1a64-661c-4396-8844-e27856f2ddfa'
+    example: '007d1a64-661c-4396-8844-e27856f2ddfa',
   })
   @IsString()
   @IsNotEmpty()
@@ -61,55 +61,55 @@ export class CreateReplayDto {
 }
 
 export class UpdateReplayDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Player 1 name',
     example: 'PlayerOne',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
   side1?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Player 2 name',
     example: 'PlayerTwo',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
   side2?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Player 1 team data (JSON string)',
     example: '{"pokemon": ["pikachu", "charizard"]}',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
   team1?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Player 2 team data (JSON string)',
     example: '{"pokemon": ["blastoise", "venusaur"]}',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
   team2?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Battle replay data',
     example: 'replay-data-string',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
   replay?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Winner of the battle',
     example: 'PlayerOne',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
@@ -117,9 +117,9 @@ export class UpdateReplayDto {
 }
 
 export class GetUserReplaysDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Player UUID',
-    example: '007d1a64-661c-4396-8844-e27856f2ddfa'
+    example: '007d1a64-661c-4396-8844-e27856f2ddfa',
   })
   @IsString()
   @IsNotEmpty()
@@ -128,17 +128,17 @@ export class GetUserReplaysDto {
 }
 
 export class GetReplayByIdDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Replay ID',
-    example: 123
+    example: 123,
   })
   @IsNotEmpty()
   replayId: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Player UUID for access validation',
     example: '007d1a64-661c-4396-8844-e27856f2ddfa',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
@@ -147,19 +147,19 @@ export class GetReplayByIdDto {
 }
 
 export class ShareReplayDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Target player UUID to share with',
-    example: '007d1a64-661c-4396-8844-e27856f2ddfa'
+    example: '007d1a64-661c-4396-8844-e27856f2ddfa',
   })
   @IsString()
   @IsNotEmpty()
   @IsUUID()
   targetUuid: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Source player UUID (optional for validation)',
     example: '007d1a64-661c-4396-8844-e27856f2ddfa',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()

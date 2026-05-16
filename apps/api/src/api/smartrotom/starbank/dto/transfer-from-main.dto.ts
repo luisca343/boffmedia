@@ -1,11 +1,18 @@
 import { BaseDto } from '@api/_utils/dto/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString, Min, Length, IsUUID } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  Min,
+  Length,
+  IsUUID,
+} from 'class-validator';
 
 export class TransferFromMainDto extends BaseDto {
   @ApiProperty({
     description: 'UUID of the user whose main account will be used as source',
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
   })
   @IsNotEmpty({ message: 'UUID is required' })
   @IsString()
@@ -15,7 +22,7 @@ export class TransferFromMainDto extends BaseDto {
   @ApiProperty({
     description: 'Account ID to transfer funds to',
     example: 123,
-    minimum: 1
+    minimum: 1,
   })
   @IsNotEmpty({ message: 'Destination account ID is required' })
   @IsNumber({}, { message: 'Destination account ID must be a number' })
@@ -25,7 +32,7 @@ export class TransferFromMainDto extends BaseDto {
   @ApiProperty({
     description: 'Amount to transfer in PokéDollars',
     example: 1000,
-    minimum: 1
+    minimum: 1,
   })
   @IsNotEmpty({ message: 'Amount is required' })
   @IsNumber({}, { message: 'Amount must be a number' })
@@ -36,7 +43,7 @@ export class TransferFromMainDto extends BaseDto {
     description: 'Reason or description for the transfer',
     example: 'Payment for premium services',
     minLength: 1,
-    maxLength: 255
+    maxLength: 255,
   })
   @IsNotEmpty({ message: 'Concept is required' })
   @IsString()

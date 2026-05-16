@@ -27,7 +27,7 @@ export interface InviteResult {
 @Injectable()
 export class InvitesRepository {
   constructor(
-    @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>
+    @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
   ) {}
 
   private readonly inviteSelect = {
@@ -36,12 +36,14 @@ export class InvitesRepository {
     username: wingullInvites.username,
     createdAt: wingullInvites.createdAt,
     usedAt: wingullInvites.usedAt,
-    deletedAt: wingullInvites.deletedAt
+    deletedAt: wingullInvites.deletedAt,
   };
 
   // ==================== CREATE OPERATIONS ====================
 
-  async createInvite(data: CreateInviteData): Promise<{ success: boolean; invite?: InviteResult; message?: string }> {
+  async createInvite(
+    data: CreateInviteData,
+  ): Promise<{ success: boolean; invite?: InviteResult; message?: string }> {
     try {
       const result = await this.db
         .insert(wingullInvites)
@@ -49,38 +51,39 @@ export class InvitesRepository {
           id: data.id,
           uuid: data.uuid,
           username: data.username,
-          createdAt: new Date()
+          createdAt: new Date(),
         } as Invite)
         .execute();
 
       if (result[0].affectedRows === 1) {
         const newInvite = await this.findInviteById(data.id);
-        return { 
-          success: true, 
-          invite: newInvite || undefined 
+        return {
+          success: true,
+          invite: newInvite || undefined,
         };
       }
-      
-      return { 
-        success: false, 
-        message: 'Failed to create invite' 
+
+      return {
+        success: false,
+        message: 'Failed to create invite',
       };
     } catch (error: any) {
       console.error('Failed to create invite:', error);
-      return { 
-        success: false, 
-        message: `Invite creation failed: ${error.message}` 
+      return {
+        success: false,
+        message: `Invite creation failed: ${error.message}`,
       };
     }
   }
 
   // ==================== READ OPERATIONS ====================
 
-  async findAllInvites(limit?: number, offset?: number): Promise<InviteResult[]> {
+  async findAllInvites(
+    limit?: number,
+    offset?: number,
+  ): Promise<InviteResult[]> {
     try {
-      let query = this.db
-        .select(this.inviteSelect)
-        .from(wingullInvites);
+      const query = this.db.select(this.inviteSelect).from(wingullInvites);
       return await query.execute();
     } catch (error: any) {
       console.error('Failed to get all invites:', error);
@@ -108,11 +111,13 @@ export class InvitesRepository {
       const result = await this.db
         .select(this.inviteSelect)
         .from(wingullInvites)
-        .where(and(
-          eq(wingullInvites.id, id),
-          isNull(wingullInvites.usedAt),
-          isNull(wingullInvites.deletedAt)
-        ))
+        .where(
+          and(
+            eq(wingullInvites.id, id),
+            isNull(wingullInvites.usedAt),
+            isNull(wingullInvites.deletedAt),
+          ),
+        )
         .execute();
 
       return result.length > 0 ? result[0] : null;
@@ -150,7 +155,10 @@ export class InvitesRepository {
 
   // ==================== UPDATE OPERATIONS ====================
 
-  async updateInvite(id: string, updateData: UpdateInviteData): Promise<{ success: boolean; message?: string }> {
+  async updateInvite(
+    id: string,
+    updateData: UpdateInviteData,
+  ): Promise<{ success: boolean; message?: string }> {
     try {
       const result = await this.db
         .update(wingullInvites)
@@ -161,47 +169,53 @@ export class InvitesRepository {
       if (result[0].affectedRows === 1) {
         return { success: true };
       }
-      
-      return { 
-        success: false, 
-        message: 'No invite found to update' 
+
+      return {
+        success: false,
+        message: 'No invite found to update',
       };
     } catch (error: any) {
       console.error(`Failed to update invite ${id}:`, error);
-      return { 
-        success: false, 
-        message: `Invite update failed: ${error.message}` 
+      return {
+        success: false,
+        message: `Invite update failed: ${error.message}`,
       };
     }
   }
 
-  async markInviteAsUsed(id: string): Promise<{ success: boolean; message?: string }> {
+  async markInviteAsUsed(
+    id: string,
+  ): Promise<{ success: boolean; message?: string }> {
     try {
       return await this.updateInvite(id, { usedAt: new Date() });
     } catch (error: any) {
       console.error(`Failed to mark invite ${id} as used:`, error);
-      return { 
-        success: false, 
-        message: `Mark as used failed: ${error.message}` 
+      return {
+        success: false,
+        message: `Mark as used failed: ${error.message}`,
       };
     }
   }
 
-  async markInviteAsDeleted(id: string): Promise<{ success: boolean; message?: string }> {
+  async markInviteAsDeleted(
+    id: string,
+  ): Promise<{ success: boolean; message?: string }> {
     try {
       return await this.updateInvite(id, { deletedAt: new Date() });
     } catch (error: any) {
       console.error(`Failed to mark invite ${id} as deleted:`, error);
-      return { 
-        success: false, 
-        message: `Mark as deleted failed: ${error.message}` 
+      return {
+        success: false,
+        message: `Mark as deleted failed: ${error.message}`,
       };
     }
   }
 
   // ==================== DELETE OPERATIONS ====================
 
-  async deleteInvite(id: string): Promise<{ success: boolean; message?: string }> {
+  async deleteInvite(
+    id: string,
+  ): Promise<{ success: boolean; message?: string }> {
     try {
       const result = await this.db
         .delete(wingullInvites)
@@ -211,16 +225,16 @@ export class InvitesRepository {
       if (result[0].affectedRows === 1) {
         return { success: true };
       }
-      
-      return { 
-        success: false, 
-        message: 'No invite found to delete' 
+
+      return {
+        success: false,
+        message: 'No invite found to delete',
       };
     } catch (error: any) {
       console.error(`Failed to delete invite ${id}:`, error);
-      return { 
-        success: false, 
-        message: `Invite deletion failed: ${error.message}` 
+      return {
+        success: false,
+        message: `Invite deletion failed: ${error.message}`,
       };
     }
   }
@@ -266,10 +280,9 @@ export class InvitesRepository {
       const result = await this.db
         .select({ count: count() })
         .from(wingullInvites)
-        .where(and(
-          isNull(wingullInvites.usedAt),
-          isNull(wingullInvites.deletedAt)
-        ))
+        .where(
+          and(isNull(wingullInvites.usedAt), isNull(wingullInvites.deletedAt)),
+        )
         .execute();
 
       return result[0].count;
@@ -284,10 +297,12 @@ export class InvitesRepository {
       const result = await this.db
         .select({ count: count() })
         .from(wingullInvites)
-        .where(and(
-          isNotNull(wingullInvites.usedAt),
-          isNull(wingullInvites.deletedAt)
-        ))
+        .where(
+          and(
+            isNotNull(wingullInvites.usedAt),
+            isNull(wingullInvites.deletedAt),
+          ),
+        )
         .execute();
 
       return result[0].count;

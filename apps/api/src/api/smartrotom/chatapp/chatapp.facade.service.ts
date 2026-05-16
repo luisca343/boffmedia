@@ -11,7 +11,7 @@ import { WingullFacadeService } from '../wingull/wingull.facade.service';
 export interface CreateChatMessageRequest {
   uuid: string;
   message: string;
-type: string;
+  type: string;
 }
 
 @Injectable()
@@ -46,7 +46,10 @@ export class ChatappFacadeService {
     }
   }
 
-  async getChatById(chatId: number, requestingUserUuid: string): Promise<Group> {
+  async getChatById(
+    chatId: number,
+    requestingUserUuid: string,
+  ): Promise<Group> {
     try {
       return await this.groupService.getGroupById(chatId, requestingUserUuid);
     } catch (error: any) {
@@ -67,26 +70,33 @@ export class ChatappFacadeService {
   }
 
   async createMessage(
-    chatId: number, 
-    createMessageRequest: CreateChatMessageRequest
+    chatId: number,
+    createMessageRequest: CreateChatMessageRequest,
   ): Promise<RotomMessage> {
     try {
       const { messageId, message } = await this.messageService.createMessage(
         chatId,
-        createMessageRequest
+        createMessageRequest,
       );
 
       // Emit message to all chat members via WebSocket
-      await this.emitMessageToChat(chatId, messageId, message, createMessageRequest);
+      await this.emitMessageToChat(
+        chatId,
+        messageId,
+        message,
+        createMessageRequest,
+      );
 
       // If this is a text message sent to global chat (chatId -1), broadcast to Minecraft
       if (chatId === -1 && createMessageRequest.type === 'text') {
         try {
           await this.wingullFacadeService.globalchat(
             createMessageRequest.uuid,
-            createMessageRequest.message
+            createMessageRequest.message,
           );
-          console.log(`Broadcasted global chat message to Minecraft from ${createMessageRequest.uuid}`);
+          console.log(
+            `Broadcasted global chat message to Minecraft from ${createMessageRequest.uuid}`,
+          );
         } catch (minecraftError) {
           console.error('Error broadcasting to Minecraft:', minecraftError);
           // Don't throw - message was already saved and sent to web clients
@@ -101,13 +111,12 @@ export class ChatappFacadeService {
   }
 
   async createGlobalMessage(
-    createMessageRequest: CreateChatMessageRequest
+    createMessageRequest: CreateChatMessageRequest,
   ): Promise<RotomMessage> {
     try {
       console.log('Creating global message:', createMessageRequest);
-      const { messageId, message } = await this.messageService.createGlobalMessage(
-        createMessageRequest
-      );
+      const { messageId, message } =
+        await this.messageService.createGlobalMessage(createMessageRequest);
 
       console.log('Created global message with ID:', messageId);
 
@@ -122,24 +131,31 @@ export class ChatappFacadeService {
   }
 
   async updateMessage(
-    messageId: number, 
-    content: string, 
-    senderUuid: string
+    messageId: number,
+    content: string,
+    senderUuid: string,
   ): Promise<RotomMessage> {
     try {
-      return await this.messageService.updateMessage(messageId, content, senderUuid);
+      return await this.messageService.updateMessage(
+        messageId,
+        content,
+        senderUuid,
+      );
     } catch (error: any) {
       console.error(`Error updating message ${messageId}:`, error);
       throw new Error(`Failed to update message: ${error.message}`);
     }
   }
 
-  async deleteMessage(messageId: number, senderUuid: string): Promise<{ success: boolean; message: string }> {
+  async deleteMessage(
+    messageId: number,
+    senderUuid: string,
+  ): Promise<{ success: boolean; message: string }> {
     try {
       await this.messageService.deleteMessage(messageId, senderUuid);
       return {
         success: true,
-        message: 'Message deleted successfully'
+        message: 'Message deleted successfully',
       };
     } catch (error: any) {
       console.error(`Error deleting message ${messageId}:`, error);
@@ -147,12 +163,15 @@ export class ChatappFacadeService {
     }
   }
 
-  async markMessageAsRead(messageId: number, uuid: string): Promise<{ success: boolean; message: string }> {
+  async markMessageAsRead(
+    messageId: number,
+    uuid: string,
+  ): Promise<{ success: boolean; message: string }> {
     try {
       await this.messageService.markMessageAsRead(messageId, uuid);
       return {
         success: true,
-        message: 'Message marked as read'
+        message: 'Message marked as read',
       };
     } catch (error: any) {
       console.error(`Error marking message ${messageId} as read:`, error);
@@ -163,15 +182,19 @@ export class ChatappFacadeService {
   // ==================== GROUP MANAGEMENT ====================
 
   async addMemberToGroup(
-    groupId: number, 
-    uuid: string, 
-    requestingUserUuid: string
+    groupId: number,
+    uuid: string,
+    requestingUserUuid: string,
   ): Promise<{ success: boolean; message: string }> {
     try {
-      await this.groupService.addMemberToGroup(groupId, uuid, requestingUserUuid);
+      await this.groupService.addMemberToGroup(
+        groupId,
+        uuid,
+        requestingUserUuid,
+      );
       return {
         success: true,
-        message: 'Member added to group successfully'
+        message: 'Member added to group successfully',
       };
     } catch (error: any) {
       console.error(`Error adding member to group ${groupId}:`, error);
@@ -180,15 +203,19 @@ export class ChatappFacadeService {
   }
 
   async removeMemberFromGroup(
-    groupId: number, 
-    uuid: string, 
-    requestingUserUuid: string
+    groupId: number,
+    uuid: string,
+    requestingUserUuid: string,
   ): Promise<{ success: boolean; message: string }> {
     try {
-      await this.groupService.removeMemberFromGroup(groupId, uuid, requestingUserUuid);
+      await this.groupService.removeMemberFromGroup(
+        groupId,
+        uuid,
+        requestingUserUuid,
+      );
       return {
         success: true,
-        message: 'Member removed from group successfully'
+        message: 'Member removed from group successfully',
       };
     } catch (error: any) {
       console.error(`Error removing member from group ${groupId}:`, error);
@@ -200,8 +227,11 @@ export class ChatappFacadeService {
 
   async initiateCall(chatId: number, callerUuid: string): Promise<CallSession> {
     try {
-      const callSession = await this.callService.initializeCall(chatId, callerUuid);
-      
+      const callSession = await this.callService.initializeCall(
+        chatId,
+        callerUuid,
+      );
+
       // Emit call signal to all chat members
       await this.emitCallToChat(callSession);
 
@@ -214,13 +244,16 @@ export class ChatappFacadeService {
 
   async endCall(chatId: number, startTime: number): Promise<RotomMessage> {
     try {
-      const { messageId, duration } = await this.callService.endCall(chatId, startTime);
-      
+      const { messageId, duration } = await this.callService.endCall(
+        chatId,
+        startTime,
+      );
+
       return {
         id: messageId,
         text: duration.toString(),
         date: new Date(),
-        uuid: 'system'
+        uuid: 'system',
       };
     } catch (error: any) {
       console.error(`Error ending call in chat ${chatId}:`, error);
@@ -231,30 +264,37 @@ export class ChatappFacadeService {
   // ==================== PRIVATE HELPER METHODS ====================
 
   private async emitMessageToChat(
-    chatId: number, 
-    messageId: number, 
+    chatId: number,
+    messageId: number,
     message: RotomMessage,
-    createMessageRequest: CreateChatMessageRequest
+    createMessageRequest: CreateChatMessageRequest,
   ): Promise<void> {
     try {
       // Get chat members for targeted message sending
-      const chatMembers = chatId === 1 
-        ? Array.from(this.socketGateway.users.values()) 
-        : await this.getChatMembersForSocket(chatId, createMessageRequest.uuid);
+      const chatMembers =
+        chatId === 1
+          ? Array.from(this.socketGateway.users.values())
+          : await this.getChatMembersForSocket(
+              chatId,
+              createMessageRequest.uuid,
+            );
 
       let sentToSelf = true;
 
       for (const member of chatMembers) {
         const socket = this.socketGateway.users.get(member.uuid);
-        
-        if (socket && (member.uuid !== createMessageRequest.uuid || !sentToSelf)) {
+
+        if (
+          socket &&
+          (member.uuid !== createMessageRequest.uuid || !sentToSelf)
+        ) {
           this.socketGateway.server.to(socket.socketId).emit('chat:message', {
             chatId,
             id: messageId,
             type: createMessageRequest.type,
             content: message.text,
             createdAt: new Date(),
-            uuid: createMessageRequest.uuid
+            uuid: createMessageRequest.uuid,
           });
 
           if (member.uuid === createMessageRequest.uuid) {
@@ -269,13 +309,16 @@ export class ChatappFacadeService {
   }
 
   private async emitGlobalMessage(
-    messageId: number, 
+    messageId: number,
     message: RotomMessage,
-    createMessageRequest: CreateChatMessageRequest
+    createMessageRequest: CreateChatMessageRequest,
   ): Promise<void> {
     try {
       console.log('Emitting global message via WebSocket');
-      console.log('Current connected users:', Array.from(this.socketGateway.users.keys()));
+      console.log(
+        'Current connected users:',
+        Array.from(this.socketGateway.users.keys()),
+      );
       for (const socketData of this.socketGateway.users.values()) {
         console.log('Emitting global message to:', socketData.uuid);
         const socket = this.socketGateway.users.get(socketData.uuid);
@@ -287,7 +330,7 @@ export class ChatappFacadeService {
             type: createMessageRequest.type,
             content: message.text,
             createdAt: new Date(),
-            uuid: createMessageRequest.uuid
+            uuid: createMessageRequest.uuid,
           });
         }
       }
@@ -299,12 +342,14 @@ export class ChatappFacadeService {
   private async emitCallToChat(callSession: CallSession): Promise<void> {
     try {
       const { chatId, caller, users } = callSession;
-      
+
       // Get caller socket
       const callerSocket = this.socketGateway.users.get(caller);
       if (callerSocket) {
         console.log('Emitting call to caller:', caller);
-        this.socketGateway.server.to(callerSocket.socketId).emit('chat:call', callSession);
+        this.socketGateway.server
+          .to(callerSocket.socketId)
+          .emit('chat:call', callSession);
       }
 
       // Emit to all other call participants
@@ -312,7 +357,9 @@ export class ChatappFacadeService {
         if (user.uuid !== caller) {
           const userSocket = this.socketGateway.users.get(user.uuid);
           if (userSocket) {
-            this.socketGateway.server.to(userSocket.socketId).emit('chat:call', callSession);
+            this.socketGateway.server
+              .to(userSocket.socketId)
+              .emit('chat:call', callSession);
           }
         }
       }
@@ -322,9 +369,14 @@ export class ChatappFacadeService {
     }
   }
 
-  private async getChatMembersForSocket(chatId: number, requestUuid: string): Promise<{ uuid: string }[]> {
+  private async getChatMembersForSocket(
+    chatId: number,
+    requestUuid: string,
+  ): Promise<{ uuid: string }[]> {
     try {
-      return await this.groupService.getGroupById(chatId, requestUuid).then(group => group.members);
+      return await this.groupService
+        .getGroupById(chatId, requestUuid)
+        .then((group) => group.members);
     } catch (error: any) {
       console.error('Error getting chat members for socket:', error);
       return [];

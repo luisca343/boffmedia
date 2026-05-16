@@ -1,5 +1,8 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { UploadRepository, UploadedFileDetails } from '@repositories/boffmedia/upload.repository';
+import {
+  UploadRepository,
+  UploadedFileDetails,
+} from '@repositories/boffmedia/upload.repository';
 
 export interface FileUploadRequest {
   file: Express.Multer.File;
@@ -17,11 +20,11 @@ export interface FileUploadResponse {
 
 @Injectable()
 export class FileUploadService {
-  constructor(
-    private readonly uploadRepository: UploadRepository,
-  ) {}
+  constructor(private readonly uploadRepository: UploadRepository) {}
 
-  async uploadFile(uploadRequest: FileUploadRequest): Promise<FileUploadResponse> {
+  async uploadFile(
+    uploadRequest: FileUploadRequest,
+  ): Promise<FileUploadResponse> {
     const { file, path, filename } = uploadRequest;
 
     if (!file) {
@@ -29,7 +32,9 @@ export class FileUploadService {
     }
 
     // Validate and sanitize inputs
-    const sanitizedPath = path ? this.uploadRepository.sanitizePath(path) : undefined;
+    const sanitizedPath = path
+      ? this.uploadRepository.sanitizePath(path)
+      : undefined;
     const finalFilename = this.determineFinalFilename(file, filename);
 
     if (!this.uploadRepository.validateFilename(finalFilename)) {
@@ -37,34 +42,44 @@ export class FileUploadService {
     }
 
     // Get upload directory
-    const uploadDir = await this.uploadRepository.getUploadDirectory(sanitizedPath);
+    const uploadDir =
+      await this.uploadRepository.getUploadDirectory(sanitizedPath);
 
     // Save the file
     const uploadedFile = await this.uploadRepository.saveFile(
       file.path,
       uploadDir,
-      finalFilename
+      finalFilename,
     );
 
     // Construct URL
-    const url = this.uploadRepository.constructUrlPath(sanitizedPath, finalFilename);
+    const url = this.uploadRepository.constructUrlPath(
+      sanitizedPath,
+      finalFilename,
+    );
 
     return {
       filename: finalFilename,
       path: uploadedFile.path,
       url,
       size: uploadedFile.size,
-      mimetype: file.mimetype
+      mimetype: file.mimetype,
     };
   }
 
-  async deleteFile(path: string, filename: string): Promise<{ success: boolean }> {
+  async deleteFile(
+    path: string,
+    filename: string,
+  ): Promise<{ success: boolean }> {
     if (!filename) {
       throw new BadRequestException('Filename is required');
     }
 
-    const sanitizedPath = path ? this.uploadRepository.sanitizePath(path) : undefined;
-    const uploadDir = await this.uploadRepository.getUploadDirectory(sanitizedPath);
+    const sanitizedPath = path
+      ? this.uploadRepository.sanitizePath(path)
+      : undefined;
+    const uploadDir =
+      await this.uploadRepository.getUploadDirectory(sanitizedPath);
     const filePath = require('path').join(uploadDir, filename);
 
     const exists = await this.uploadRepository.fileExists(filePath);
@@ -76,13 +91,19 @@ export class FileUploadService {
     return { success: true };
   }
 
-  async getFileInfo(path: string, filename: string): Promise<{ exists: boolean; size?: number; createdAt?: Date }> {
+  async getFileInfo(
+    path: string,
+    filename: string,
+  ): Promise<{ exists: boolean; size?: number; createdAt?: Date }> {
     if (!filename) {
       throw new BadRequestException('Filename is required');
     }
 
-    const sanitizedPath = path ? this.uploadRepository.sanitizePath(path) : undefined;
-    const uploadDir = await this.uploadRepository.getUploadDirectory(sanitizedPath);
+    const sanitizedPath = path
+      ? this.uploadRepository.sanitizePath(path)
+      : undefined;
+    const uploadDir =
+      await this.uploadRepository.getUploadDirectory(sanitizedPath);
     const filePath = require('path').join(uploadDir, filename);
 
     const exists = await this.uploadRepository.fileExists(filePath);
@@ -94,11 +115,14 @@ export class FileUploadService {
     return {
       exists: true,
       size: fileInfo?.size,
-      createdAt: fileInfo?.createdAt
+      createdAt: fileInfo?.createdAt,
     };
   }
 
-  private determineFinalFilename(file: Express.Multer.File, customFilename?: string): string {
+  private determineFinalFilename(
+    file: Express.Multer.File,
+    customFilename?: string,
+  ): string {
     if (customFilename) {
       return customFilename;
     }
@@ -110,16 +134,24 @@ export class FileUploadService {
     return this.uploadRepository.generateUniqueFilename(file.originalname);
   }
 
-  async validateFileType(file: Express.Multer.File, allowedTypes: string[]): Promise<boolean> {
+  async validateFileType(
+    file: Express.Multer.File,
+    allowedTypes: string[],
+  ): Promise<boolean> {
     if (!file || !file.originalname) {
       return false;
     }
 
-    const extension = file.originalname.toLowerCase().substring(file.originalname.lastIndexOf('.'));
+    const extension = file.originalname
+      .toLowerCase()
+      .substring(file.originalname.lastIndexOf('.'));
     return allowedTypes.includes(extension);
   }
 
-  async validateFileSize(file: Express.Multer.File, maxSizeInBytes: number): Promise<boolean> {
+  async validateFileSize(
+    file: Express.Multer.File,
+    maxSizeInBytes: number,
+  ): Promise<boolean> {
     return file && file.size <= maxSizeInBytes;
   }
 }

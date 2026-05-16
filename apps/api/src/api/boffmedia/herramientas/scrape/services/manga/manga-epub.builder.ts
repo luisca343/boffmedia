@@ -54,8 +54,14 @@ export interface EpubChapterOptions {
 function isWebP(data: Buffer): boolean {
   return (
     data.length >= 12 &&
-    data[0] === 0x52 && data[1] === 0x49 && data[2] === 0x46 && data[3] === 0x46 &&
-    data[8] === 0x57 && data[9] === 0x45 && data[10] === 0x42 && data[11] === 0x50
+    data[0] === 0x52 &&
+    data[1] === 0x49 &&
+    data[2] === 0x46 &&
+    data[3] === 0x46 &&
+    data[8] === 0x57 &&
+    data[9] === 0x45 &&
+    data[10] === 0x42 &&
+    data[11] === 0x50
   );
 }
 
@@ -76,7 +82,11 @@ async function webpToJpeg(data: Buffer): Promise<Buffer> {
 }
 
 function escapeXml(str: string): string {
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
 /**
@@ -85,8 +95,13 @@ function escapeXml(str: string): string {
  * (cover reference, series info, etc.).  Best-effort — errors are silently swallowed
  * so a malformed EPUB is never caused by this step.
  */
-export async function injectEpubMetadata(epubPath: string, meta: EpubMetadata): Promise<void> {
-  const hasContent = Object.values(meta).some(v => (Array.isArray(v) ? v.length > 0 : !!v));
+export async function injectEpubMetadata(
+  epubPath: string,
+  meta: EpubMetadata,
+): Promise<void> {
+  const hasContent = Object.values(meta).some((v) =>
+    Array.isArray(v) ? v.length > 0 : !!v,
+  );
   if (!hasContent) return;
 
   try {
@@ -97,38 +112,52 @@ export async function injectEpubMetadata(epubPath: string, meta: EpubMetadata): 
     if (!opfPathMatch) return;
     const opfPath = opfPathMatch[1];
 
-    let opf = zip.readAsText(opfPath);
+    const opf = zip.readAsText(opfPath);
 
     // Preserve the unique book identifier and all <meta .../> elements.
-    const identifierMatch = opf.match(/<dc:identifier[\s\S]*?<\/dc:identifier>/i);
-    const metaElements = [...opf.matchAll(/<meta\b[^>]*\/?>/gi)].map(m => m[0]);
+    const identifierMatch = opf.match(
+      /<dc:identifier[\s\S]*?<\/dc:identifier>/i,
+    );
+    const metaElements = [...opf.matchAll(/<meta\b[^>]*\/?>/gi)].map(
+      (m) => m[0],
+    );
 
     const lines: string[] = [];
     if (identifierMatch) lines.push(identifierMatch[0]);
-    if (meta.title)       lines.push(`<dc:title>${escapeXml(meta.title)}</dc:title>`);
-    if (meta.language)    lines.push(`<dc:language>${escapeXml(meta.language)}</dc:language>`);
+    if (meta.title) lines.push(`<dc:title>${escapeXml(meta.title)}</dc:title>`);
+    if (meta.language)
+      lines.push(`<dc:language>${escapeXml(meta.language)}</dc:language>`);
     if (meta.author) {
       const fileAs = meta.authorSort || meta.author;
-      lines.push(`<dc:creator opf:role="aut" opf:file-as="${escapeXml(fileAs)}">${escapeXml(meta.author)}</dc:creator>`);
+      lines.push(
+        `<dc:creator opf:role="aut" opf:file-as="${escapeXml(fileAs)}">${escapeXml(meta.author)}</dc:creator>`,
+      );
     }
     if (meta.illustrator) {
       const fileAs = meta.illustratorSort || meta.illustrator;
-      lines.push(`<dc:creator opf:role="ill" opf:file-as="${escapeXml(fileAs)}">${escapeXml(meta.illustrator)}</dc:creator>`);
+      lines.push(
+        `<dc:creator opf:role="ill" opf:file-as="${escapeXml(fileAs)}">${escapeXml(meta.illustrator)}</dc:creator>`,
+      );
     }
-    if (meta.publisher)   lines.push(`<dc:publisher>${escapeXml(meta.publisher)}</dc:publisher>`);
-    if (meta.date)        lines.push(`<dc:date>${escapeXml(meta.date)}</dc:date>`);
+    if (meta.publisher)
+      lines.push(`<dc:publisher>${escapeXml(meta.publisher)}</dc:publisher>`);
+    if (meta.date) lines.push(`<dc:date>${escapeXml(meta.date)}</dc:date>`);
     for (const s of meta.subjects ?? []) {
-      if (s.trim()) lines.push(`<dc:subject>${escapeXml(s.trim())}</dc:subject>`);
+      if (s.trim())
+        lines.push(`<dc:subject>${escapeXml(s.trim())}</dc:subject>`);
     }
     lines.push(...metaElements);
 
     const newMetadata = [
       '<metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">',
-      ...lines.map(l => `    ${l}`),
+      ...lines.map((l) => `    ${l}`),
       '  </metadata>',
     ].join('\n');
 
-    const updated = opf.replace(/<metadata\b[\s\S]*?<\/metadata>/i, newMetadata);
+    const updated = opf.replace(
+      /<metadata\b[\s\S]*?<\/metadata>/i,
+      newMetadata,
+    );
     if (updated === opf) return;
 
     zip.updateFile(opfPath, Buffer.from(updated, 'utf-8'));
@@ -139,7 +168,14 @@ export async function injectEpubMetadata(epubPath: string, meta: EpubMetadata): 
 }
 
 export async function buildEpub(opts: EpubChapterOptions): Promise<void> {
-  const { imageFiles, outputPath, seriesTitle, chapterTitle, chapterNumber, includeCover } = opts;
+  const {
+    imageFiles,
+    outputPath,
+    seriesTitle,
+    chapterTitle,
+    chapterNumber,
+    includeCover,
+  } = opts;
 
   const title = chapterTitle ?? path.basename(outputPath, '.epub');
   const tempCbz = `${outputPath}.tmp.cbz`;
@@ -172,7 +208,8 @@ export async function buildEpub(opts: EpubChapterOptions): Promise<void> {
 
     args.push('--title', title);
     if (seriesTitle) args.push('--series', seriesTitle);
-    if (chapterNumber != null) args.push('--series-index', String(chapterNumber));
+    if (chapterNumber != null)
+      args.push('--series-index', String(chapterNumber));
 
     // 'tablet' profile = 2560×1600 — large enough to avoid Calibre downscaling manga images.
     args.push('--output-profile', 'tablet');
@@ -198,6 +235,6 @@ export async function buildEpub(opts: EpubChapterOptions): Promise<void> {
     throw err;
   } finally {
     await rm(tempCbz, { force: true });
-    await Promise.all(tempJpegs.map(f => rm(f, { force: true })));
+    await Promise.all(tempJpegs.map((f) => rm(f, { force: true })));
   }
 }

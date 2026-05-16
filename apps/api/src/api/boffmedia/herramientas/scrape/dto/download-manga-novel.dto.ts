@@ -1,10 +1,18 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsUrl, IsNotEmpty, IsOptional, IsInt, IsBoolean, Min } from 'class-validator';
+import {
+  IsUrl,
+  IsNotEmpty,
+  IsOptional,
+  IsInt,
+  IsBoolean,
+  Min,
+} from 'class-validator';
 
 export class DownloadMangaNovelDto {
   @ApiProperty({
     description: 'Novel page URL',
-    example: 'https://es.novelcool.com/novel/La-Raz-n-Por-La-Que-Raeliana-Termin-En-La-Mansi-n-Del-Duque.html',
+    example:
+      'https://es.novelcool.com/novel/La-Raz-n-Por-La-Que-Raeliana-Termin-En-La-Mansi-n-Del-Duque.html',
   })
   @IsUrl({}, { message: 'url must be a valid URL' })
   @IsNotEmpty()
@@ -31,7 +39,8 @@ export class DownloadMangaNovelDto {
   to?: number;
 
   @ApiProperty({
-    description: 'Skip chapters that already exist on disk as .cbz files (default: true)',
+    description:
+      'Skip chapters that already exist on disk as .cbz files (default: true)',
     example: true,
     required: false,
   })

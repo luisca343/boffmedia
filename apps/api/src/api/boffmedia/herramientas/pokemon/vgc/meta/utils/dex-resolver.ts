@@ -44,7 +44,13 @@ export function toBaseFormId(speciesId: string, dex: typeof Dex): string {
   const s = dex.species.get(speciesId);
   if (!s.exists) return speciesId;
   const f = s.forme;
-  if (f === 'Mega' || f === 'Mega-X' || f === 'Mega-Y' || f === 'Primal' || f === 'Eternal') {
+  if (
+    f === 'Mega' ||
+    f === 'Mega-X' ||
+    f === 'Mega-Y' ||
+    f === 'Primal' ||
+    f === 'Eternal'
+  ) {
     const base = dex.species.get(s.baseSpecies);
     return base.exists ? base.id : speciesId;
   }

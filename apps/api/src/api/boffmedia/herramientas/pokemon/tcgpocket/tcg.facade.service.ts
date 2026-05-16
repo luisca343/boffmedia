@@ -48,7 +48,11 @@ export class TcgFacadeService {
     return this.tcgService.addUserCard(addUserCardDto);
   }
 
-  async updateUserCardQuantity(userId: number, cardId: string, updateDto: UpdateUserCardQuantityDto) {
+  async updateUserCardQuantity(
+    userId: number,
+    cardId: string,
+    updateDto: UpdateUserCardQuantityDto,
+  ) {
     return this.tcgService.updateUserCardQuantity(userId, cardId, updateDto);
   }
 

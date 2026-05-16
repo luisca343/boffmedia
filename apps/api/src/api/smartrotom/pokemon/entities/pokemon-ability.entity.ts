@@ -1,55 +1,55 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class AbilityCount {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Ability name',
-    example: 'Static'
+    example: 'Static',
   })
   name: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Number of Pokémon with this ability',
-    example: 15
+    example: 15,
   })
   count: number;
 }
 
 export class AbilityInfo {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Ability name',
-    example: 'Static'
+    example: 'Static',
   })
   name: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Number of forms with this ability',
-    example: 25
+    example: 25,
   })
   count: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Number of unique species with this ability',
-    example: 15
+    example: 15,
   })
   uniqueSpecies: number;
 }
 
 export class PokemonAbilityEntry {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Pokémon species ID',
-    example: 25
+    example: 25,
   })
   speciesID: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Form name',
-    example: 'base'
+    example: 'base',
   })
   form: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Species name',
-    example: 'Pikachu'
+    example: 'Pikachu',
   })
   speciesName: string;
 }

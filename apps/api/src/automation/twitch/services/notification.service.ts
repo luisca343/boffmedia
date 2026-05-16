@@ -2,7 +2,10 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
-import { StreamNotification, NotificationTarget } from '../interfaces/notification.interface';
+import {
+  StreamNotification,
+  NotificationTarget,
+} from '../interfaces/notification.interface';
 
 @Injectable()
 export class NotificationService {
@@ -21,7 +24,9 @@ export class NotificationService {
    */
   private initializeDefaultTargets(): void {
     // Example: Discord webhook (you can configure this in your .env)
-    const discordWebhook = this.configService.get<string>('DISCORD_WEBHOOK_URL');
+    const discordWebhook = this.configService.get<string>(
+      'DISCORD_WEBHOOK_URL',
+    );
     if (discordWebhook) {
       this.targets.push({
         type: 'webhook',
@@ -47,13 +52,17 @@ export class NotificationService {
   /**
    * Send stream notification to all configured targets
    */
-  async sendStreamNotification(notification: StreamNotification): Promise<void> {
+  async sendStreamNotification(
+    notification: StreamNotification,
+  ): Promise<void> {
     this.logger.log(
       `Sending notification for ${notification.stream.user_name} - Live: ${notification.isLive}, New: ${notification.isNewStream}`,
     );
 
-    const promises = this.targets.map(target => this.sendToTarget(notification, target));
-    
+    const promises = this.targets.map((target) =>
+      this.sendToTarget(notification, target),
+    );
+
     try {
       await Promise.allSettled(promises);
     } catch (error: any) {
@@ -64,7 +73,10 @@ export class NotificationService {
   /**
    * Send notification to a specific target
    */
-  private async sendToTarget(notification: StreamNotification, target: NotificationTarget): Promise<void> {
+  private async sendToTarget(
+    notification: StreamNotification,
+    target: NotificationTarget,
+  ): Promise<void> {
     try {
       switch (target.type) {
         case 'discord':
@@ -80,23 +92,34 @@ export class NotificationService {
           this.logger.warn(`Unknown notification target type: ${target.type}`);
       }
     } catch (error: any) {
-      this.logger.error(`Failed to send notification to ${target.type}`, error.stack);
+      this.logger.error(
+        `Failed to send notification to ${target.type}`,
+        error.stack,
+      );
     }
   }
 
   /**
    * Send Discord notification (if you have a bot)
    */
-  private async sendDiscordNotification(notification: StreamNotification, target: NotificationTarget): Promise<void> {
+  private async sendDiscordNotification(
+    notification: StreamNotification,
+    target: NotificationTarget,
+  ): Promise<void> {
     // This would require discord.js integration
     // For now, we'll log it
-    this.logger.log(`[Discord] Would send: ${this.formatMessage(notification)}`);
+    this.logger.log(
+      `[Discord] Would send: ${this.formatMessage(notification)}`,
+    );
   }
 
   /**
    * Send webhook notification
    */
-  private async sendWebhookNotification(notification: StreamNotification, target: NotificationTarget): Promise<void> {
+  private async sendWebhookNotification(
+    notification: StreamNotification,
+    target: NotificationTarget,
+  ): Promise<void> {
     if (!target.config.url) {
       throw new Error('Webhook URL not configured');
     }
@@ -129,10 +152,13 @@ export class NotificationService {
   /**
    * Log to console (database placeholder)
    */
-  private async logToConsole(notification: StreamNotification, target: NotificationTarget): Promise<void> {
+  private async logToConsole(
+    notification: StreamNotification,
+    target: NotificationTarget,
+  ): Promise<void> {
     const message = this.formatMessage(notification);
     console.log(`[STREAM NOTIFICATION] ${message}`);
-    
+
     // Here you could save to your database instead
     // await this.saveToDatabase(notification);
   }
@@ -142,11 +168,13 @@ export class NotificationService {
    */
   private formatMessage(notification: StreamNotification): string {
     if (notification.isLive && notification.isNewStream) {
-      return `🔴 ${notification.stream.user_name} just went live!\n` +
-             `🎮 Playing: ${notification.stream.game_name}\n` +
-             `📺 "${notification.stream.title}"\n` +
-             `👥 ${notification.stream.viewer_count} viewers\n` +
-             `🏷️ Tags: ${notification.stream.tags.join(', ')}`;
+      return (
+        `🔴 ${notification.stream.user_name} just went live!\n` +
+        `🎮 Playing: ${notification.stream.game_name}\n` +
+        `📺 "${notification.stream.title}"\n` +
+        `👥 ${notification.stream.viewer_count} viewers\n` +
+        `🏷️ Tags: ${notification.stream.tags.join(', ')}`
+      );
     } else if (!notification.isLive) {
       return `⚫ ${notification.stream.user_name} went offline`;
     } else {
@@ -182,9 +210,10 @@ export class NotificationService {
               },
               {
                 name: '🏷️ Tags',
-                value: notification.stream.tags.length > 0 
-                  ? notification.stream.tags.slice(0, 5).join(', ') 
-                  : 'No tags',
+                value:
+                  notification.stream.tags.length > 0
+                    ? notification.stream.tags.slice(0, 5).join(', ')
+                    : 'No tags',
                 inline: false,
               },
             ],
@@ -230,11 +259,14 @@ export class NotificationService {
    * Remove a notification target
    */
   removeTarget(type: string, identifier?: string): void {
-    const index = this.targets.findIndex(target => 
-      target.type === type && 
-      (!identifier || target.config.url === identifier || target.config.channelId === identifier)
+    const index = this.targets.findIndex(
+      (target) =>
+        target.type === type &&
+        (!identifier ||
+          target.config.url === identifier ||
+          target.config.channelId === identifier),
     );
-    
+
     if (index > -1) {
       this.targets.splice(index, 1);
       this.logger.log(`Removed notification target: ${type}`);

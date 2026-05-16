@@ -3,15 +3,15 @@ import { ApiProperty } from '@nestjs/swagger';
 import { StarBankAccount } from '../entities/starbank-account.entity';
 
 export class AccountsListResponseDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'List of accounts',
-    type: [StarBankAccount]
+    type: [StarBankAccount],
   })
   accounts: StarBankAccount[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Total number of accounts',
-    example: 5
+    example: 5,
   })
   total: number;
 }

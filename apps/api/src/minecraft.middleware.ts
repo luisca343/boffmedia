@@ -20,7 +20,9 @@ export class MinecraftMiddleware implements NestMiddleware {
         console.log(`Failed to access ${req.method} ${req.url}`);
         if (req.body) console.log(req.body);
       }
-      res.status(403).send({ message: 'You are not authorized to access this route.' });
+      res
+        .status(403)
+        .send({ message: 'You are not authorized to access this route.' });
     }
   }
 }

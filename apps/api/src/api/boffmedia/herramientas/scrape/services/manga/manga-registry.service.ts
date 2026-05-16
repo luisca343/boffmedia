@@ -31,11 +31,11 @@ export class MangaScraperRegistry {
    * Throws if no scraper is registered for that host.
    */
   resolve(url: string): IMangaScraper {
-    const scraper = this.scrapers.find(s => s.canHandle(url));
+    const scraper = this.scrapers.find((s) => s.canHandle(url));
     if (!scraper) {
       throw new Error(
         `No manga scraper registered for URL: ${url}. ` +
-        `Registered scrapers: ${this.scrapers.map(s => s.name).join(', ')}`,
+          `Registered scrapers: ${this.scrapers.map((s) => s.name).join(', ')}`,
       );
     }
     return scraper;

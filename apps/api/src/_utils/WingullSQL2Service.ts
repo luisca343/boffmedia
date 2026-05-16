@@ -29,9 +29,8 @@ export class WingullSQL2Service {
     this.db = drizzle(this.pool);
   }
 
-  
-  smartRotom(){
-    return drizzle(this.pool, {schema: SmartRotomSchema, mode: 'default'});
+  smartRotom() {
+    return drizzle(this.pool, { schema: SmartRotomSchema, mode: 'default' });
   }
 
   getConnection(): mysql.Connection {
@@ -44,37 +43,55 @@ export class WingullSQL2Service {
 
   async migrar() {
     await this.connect();
-    migrate(this.db, { migrationsFolder: './drizzle/migrations' }).then(() => {
-      console.log("Base de datos migrada");
-    }).catch((error) => {
-      console.error("Error al migrar base de datos: ", error.message);
-      throw error;
-    });
+    migrate(this.db, { migrationsFolder: './drizzle/migrations' })
+      .then(() => {
+        console.log('Base de datos migrada');
+      })
+      .catch((error) => {
+        console.error('Error al migrar base de datos: ', error.message);
+        throw error;
+      });
   }
 
-  async query<T = unknown>(sql: string, values?: any): Promise<[T, mysql.FieldPacket[]]> {
+  async query<T = unknown>(
+    sql: string,
+    values?: any,
+  ): Promise<[T, mysql.FieldPacket[]]> {
     try {
-      if(!values) return await this.pool.execute(sql) as [T, mysql.FieldPacket[]];
-      return await this.pool.execute(sql, values) as [T, mysql.FieldPacket[]];
+      if (!values)
+        return (await this.pool.execute(sql)) as [T, mysql.FieldPacket[]];
+      return (await this.pool.execute(sql, values)) as [T, mysql.FieldPacket[]];
     } catch (error: any) {
-      return new Error('Failed to execute query: ' + error.message) as any; 
+      return new Error('Failed to execute query: ' + error.message) as any;
     }
   }
 
-  async insertAndReturn<T = unknown>(table: string, sql: string, values?: any): Promise<T[]> {
+  async insertAndReturn<T = unknown>(
+    table: string,
+    sql: string,
+    values?: any,
+  ): Promise<T[]> {
     try {
-      const result = await this.pool.query(sql, values) as mysql.ResultSetHeader[];
-      const ids = result.map(row => row?.insertId).filter(id => id !== undefined);
-  
+      const result = (await this.pool.query(
+        sql,
+        values,
+      )) as mysql.ResultSetHeader[];
+      const ids = result
+        .map((row) => row?.insertId)
+        .filter((id) => id !== undefined);
+
       if (ids.length === 0) {
         throw new Error('No rows were inserted.');
       }
-  
-      const [rows, fields] = await this.query<mysql.RowDataPacket[]>(`SELECT * FROM ?? WHERE id IN (?)`, [table, ids]);
-  
+
+      const [rows, fields] = await this.query<mysql.RowDataPacket[]>(
+        `SELECT * FROM ?? WHERE id IN (?)`,
+        [table, ids],
+      );
+
       return rows as T[];
     } catch (error: any) {
-      console.error("Error al insertar y retornar ", error.message);
+      console.error('Error al insertar y retornar ', error.message);
       throw error; // re-throw the error to be handled by the calling code
     }
   }

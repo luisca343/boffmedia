@@ -16,20 +16,26 @@ export interface INewsRepository {
     buttonText?: string;
     imageUrl?: string;
   }): Promise<{ insertId: number }>;
-  updateNews(newsId: number, newsData: {
-    title?: string;
-    subtitle?: string;
-    category?: string;
-    subcategory?: string;
-    published?: number;
-    featured?: number;
-    content?: string;
-    buttonText?: string;
-    imageUrl?: string;
-  }): Promise<void>;
+  updateNews(
+    newsId: number,
+    newsData: {
+      title?: string;
+      subtitle?: string;
+      category?: string;
+      subcategory?: string;
+      published?: number;
+      featured?: number;
+      content?: string;
+      buttonText?: string;
+      imageUrl?: string;
+    },
+  ): Promise<void>;
   deleteNews(newsId: number): Promise<void>;
   updateAllNewsPublishedStatus(published: number): Promise<void>;
-  updateNewsPublishedStatus(newsIds: number[], published: number): Promise<void>;
+  updateNewsPublishedStatus(
+    newsIds: number[],
+    published: number,
+  ): Promise<void>;
   updateAllNewsFeaturedStatus(featured: number): Promise<void>;
   updateNewsFeaturedStatus(newsId: number, featured: number): Promise<void>;
 }

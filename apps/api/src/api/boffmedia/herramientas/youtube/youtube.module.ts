@@ -12,20 +12,15 @@ import { YoutubeFacadeService } from './youtube.facade.service';
 import { YoutubeController } from './youtube.controller';
 
 @Module({
-  imports: [
-    LoggerModule,
-    ResponseModule,
-  ],
+  imports: [LoggerModule, ResponseModule],
   controllers: [YoutubeController],
   providers: [
     // Domain services
     TranscriptionService,
-    
+
     // Facade service
     YoutubeFacadeService,
   ],
-  exports: [
-    YoutubeFacadeService,
-  ],
+  exports: [YoutubeFacadeService],
 })
 export class YoutubeModule {}

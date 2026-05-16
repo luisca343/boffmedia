@@ -13,21 +13,31 @@ export class MoveDataService extends BaseDataService {
 
   async loadMoveData() {
     const startingTime = Date.now();
-    const defaultDir = path.join(process.cwd(), 'public/smartrotom/packs/default_datapack/data/pixelmon/moves');
-    const publicDir = path.join(process.cwd(), 'public/smartrotom/packs/datapack/data/pixelmon/moves');
+    const defaultDir = path.join(
+      process.cwd(),
+      'public/smartrotom/packs/default_datapack/data/pixelmon/moves',
+    );
+    const publicDir = path.join(
+      process.cwd(),
+      'public/smartrotom/packs/datapack/data/pixelmon/moves',
+    );
 
     const moves = await this.readJsonFiles(defaultDir, publicDir);
 
     moves.forEach((move: FullMove) => {
       this.moveList.push(move);
       this.movesByName[move.attackName] = move;
-      if (!this.movesByType[move.attackType]) this.movesByType[move.attackType] = [];
+      if (!this.movesByType[move.attackType])
+        this.movesByType[move.attackType] = [];
       this.movesByType[move.attackType].push(move);
-      if (!this.movesByCategory[move.attackCategory]) this.movesByCategory[move.attackCategory] = [];
+      if (!this.movesByCategory[move.attackCategory])
+        this.movesByCategory[move.attackCategory] = [];
       this.movesByCategory[move.attackCategory].push(move);
     });
 
-    console.log(`Loaded ${moves.length} moves in ${Date.now() - startingTime}ms`);
+    console.log(
+      `Loaded ${moves.length} moves in ${Date.now() - startingTime}ms`,
+    );
   }
 
   getMovesByName() {
@@ -58,4 +68,3 @@ export class MoveDataService extends BaseDataService {
     return this.movesByCategory[category] || [];
   }
 }
-

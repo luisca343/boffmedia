@@ -1,28 +1,28 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UnclaimedItem {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Item ID',
-    example: 1
+    example: 1,
   })
   id: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Item identifier',
-    example: 'gema_roja'
+    example: 'gema_roja',
   })
   itemId: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Item type',
-    example: 'gema'
+    example: 'gema',
   })
   type: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Item amount',
     example: 1,
-    required: false
+    required: false,
   })
   amount?: number;
 }

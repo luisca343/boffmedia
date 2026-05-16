@@ -12,8 +12,8 @@ import { typeColor } from './meta.util';
 const POOL_SIZE = 30;
 
 interface Core {
-  a:     PokemonUsageDetail;
-  b:     PokemonUsageDetail;
+  a: PokemonUsageDetail;
+  b: PokemonUsageDetail;
   score: number;
 }
 
@@ -25,7 +25,7 @@ function coreTier(score: number): string {
 
 function findTopCores(pool: PokemonUsageDetail[]): Core[] {
   const index = new Map(pool.map((d) => [d.speciesName.toLowerCase(), d]));
-  const seen  = new Set<string>();
+  const seen = new Set<string>();
   const cores: Core[] = [];
 
   for (const a of pool) {
@@ -58,20 +58,29 @@ export class MetaCoreCommand {
   ) {}
 
   @UseInterceptors(MetaRegulationAutocompleteInterceptor)
-  @Subcommand({ name: 'core', description: 'Discover top Pokémon synergy pairs in the current meta' })
+  @Subcommand({
+    name: 'core',
+    description: 'Discover top Pokémon synergy pairs in the current meta',
+  })
   public async onCore(
     @Context() [interaction]: [ChatInputCommandInteraction],
     @Options() { regulation }: MetaCoreDto,
   ) {
     await interaction.deferReply();
 
-    const reg = (await this.metaFacade.getRegulations()).find((r) => r.id === regulation);
+    const reg = (await this.metaFacade.getRegulations()).find(
+      (r) => r.id === regulation,
+    );
     if (!reg) {
       await interaction.editReply(`Unknown regulation \`${regulation}\`.`);
       return;
     }
 
-    const source = reg.vgcPastesGid ? 'VGCPastes (Champions)' : reg.formatId ? 'Smogon Ladder' : 'Limitless (Combined)';
+    const source = reg.vgcPastesGid
+      ? 'VGCPastes (Champions)'
+      : reg.formatId
+        ? 'Smogon Ladder'
+        : 'Limitless (Combined)';
 
     let details: PokemonUsageDetail[];
     try {
@@ -80,15 +89,19 @@ export class MetaCoreCommand {
         () => this.metaFacade.getUnifiedUsageDetailList(regulation),
       );
     } catch {
-      await interaction.editReply(`No usage data available for **${reg.name}** yet.`);
+      await interaction.editReply(
+        `No usage data available for **${reg.name}** yet.`,
+      );
       return;
     }
 
-    const pool    = details.slice(0, POOL_SIZE);
+    const pool = details.slice(0, POOL_SIZE);
     const topCores = findTopCores(pool).slice(0, 5);
 
     if (!topCores.length) {
-      await interaction.editReply(`Not enough teammate data to compute cores for **${reg.name}**.`);
+      await interaction.editReply(
+        `Not enough teammate data to compute cores for **${reg.name}**.`,
+      );
       return;
     }
 
@@ -103,9 +116,11 @@ export class MetaCoreCommand {
       .setDescription(lines.join('\n'))
       .addFields(
         { name: 'Regulation', value: reg.name, inline: true },
-        { name: 'Source',     value: source,   inline: true },
+        { name: 'Source', value: source, inline: true },
       )
-      .setFooter({ text: 'Score = average mutual teammate %  ·  🔑 ≥35%  💪 ≥20%  ⚡ others' });
+      .setFooter({
+        text: 'Score = average mutual teammate %  ·  🔑 ≥35%  💪 ≥20%  ⚡ others',
+      });
 
     await interaction.editReply({ embeds: [embed] });
   }

@@ -1,56 +1,64 @@
 import { BaseDto } from '@api/_utils/dto/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsInt, IsOptional, Min, Max, IsUrl } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsInt,
+  IsOptional,
+  Min,
+  Max,
+  IsUrl,
+} from 'class-validator';
 import { Base } from 'discord.js';
 
 export class CreateNewsDto extends BaseDto {
   @ApiProperty({
     description: 'Unique identifier for the news article',
-    example: 1
+    example: 1,
   })
   @IsNotEmpty()
   @IsInt()
   id: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'News title',
-    example: 'Exciting New Features Released!'
+    example: 'Exciting New Features Released!',
   })
   @IsNotEmpty()
   @IsString()
   title: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'News subtitle',
-    example: 'Discover what\'s new in this update',
-    required: false
+    example: "Discover what's new in this update",
+    required: false,
   })
   @IsOptional()
   @IsString()
   subtitle?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'News category',
     example: 'Updates',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
   category?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'News subcategory',
     example: 'Game Features',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
   subcategory?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Published status (0=draft, 1=published)',
     example: 1,
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsInt()
@@ -58,10 +66,10 @@ export class CreateNewsDto extends BaseDto {
   @Max(1)
   published?: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Featured status (0=normal, 1=featured)',
     example: 0,
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsInt()
@@ -69,26 +77,26 @@ export class CreateNewsDto extends BaseDto {
   @Max(1)
   featured?: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'News content',
-    example: 'We are excited to announce the release of new features...'
+    example: 'We are excited to announce the release of new features...',
   })
   @IsString()
   content: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Button text for call-to-action',
     example: 'Learn More',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
   buttonText?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Image URL for the news',
     example: 'https://example.com/news-image.jpg',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
@@ -98,19 +106,19 @@ export class CreateNewsDto extends BaseDto {
 export class UpdateNewsDto extends CreateNewsDto {}
 
 export class NewsStatusDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Array of news IDs to publish',
     example: [1, 2, 3],
-    type: [Number]
+    type: [Number],
   })
   @IsNotEmpty()
   @IsInt({ each: true })
   @Min(1, { each: true })
   published: number[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'News ID to feature',
-    example: 1
+    example: 1,
   })
   @IsNotEmpty()
   @IsInt()
@@ -119,10 +127,10 @@ export class NewsStatusDto extends BaseDto {
 }
 
 export class GetNewsDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Filter by published status',
     example: 'true',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()

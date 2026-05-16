@@ -1,8 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { ReplayService } from './services/replay.service';
-import { StatisticsService, PlayerStatistics, LeaderboardResponse } from './services/statistics.service';
-import { TournamentService, TournamentCreationRequest, TournamentRegistration } from './services/tournament.service';
-import { LeagueReplay, LeagueStanding, Tournament, LeagueMatch } from '@api/smartrotom/liga/repositories/liga.repository';
+import {
+  StatisticsService,
+  PlayerStatistics,
+  LeaderboardResponse,
+} from './services/statistics.service';
+import {
+  TournamentService,
+  TournamentCreationRequest,
+  TournamentRegistration,
+} from './services/tournament.service';
+import {
+  LeagueReplay,
+  LeagueStanding,
+  Tournament,
+  LeagueMatch,
+} from '@api/smartrotom/liga/repositories/liga.repository';
 
 @Injectable()
 export class LigaFacadeService {
@@ -41,11 +54,17 @@ export class LigaFacadeService {
     }
   }
 
-  async getMatchHistory(player1: string, player2: string): Promise<LeagueReplay[]> {
+  async getMatchHistory(
+    player1: string,
+    player2: string,
+  ): Promise<LeagueReplay[]> {
     try {
       return await this.replayService.getMatchHistory(player1, player2);
     } catch (error: any) {
-      console.error(`Error getting match history between ${player1} and ${player2}:`, error);
+      console.error(
+        `Error getting match history between ${player1} and ${player2}:`,
+        error,
+      );
       throw new Error(`Failed to retrieve match history: ${error.message}`);
     }
   }
@@ -56,7 +75,10 @@ export class LigaFacadeService {
     try {
       return await this.statisticsService.getPlayerStatistics(playerUuid);
     } catch (error: any) {
-      console.error(`Error getting statistics for player ${playerUuid}:`, error);
+      console.error(
+        `Error getting statistics for player ${playerUuid}:`,
+        error,
+      );
       throw new Error(`Failed to retrieve player statistics: ${error.message}`);
     }
   }
@@ -70,7 +92,9 @@ export class LigaFacadeService {
     }
   }
 
-  async getPlayerRanking(playerUuid: string): Promise<{ rank: number; totalPlayers: number } | null> {
+  async getPlayerRanking(
+    playerUuid: string,
+  ): Promise<{ rank: number; totalPlayers: number } | null> {
     try {
       return await this.statisticsService.getPlayerRanking(playerUuid);
     } catch (error: any) {
@@ -79,7 +103,10 @@ export class LigaFacadeService {
     }
   }
 
-  async comparePlayerStatistics(player1: string, player2: string): Promise<{
+  async comparePlayerStatistics(
+    player1: string,
+    player2: string,
+  ): Promise<{
     player1Stats: PlayerStatistics;
     player2Stats: PlayerStatistics;
     headToHead: {
@@ -91,7 +118,10 @@ export class LigaFacadeService {
     try {
       return await this.statisticsService.comparePlayers(player1, player2);
     } catch (error: any) {
-      console.error(`Error comparing players ${player1} and ${player2}:`, error);
+      console.error(
+        `Error comparing players ${player1} and ${player2}:`,
+        error,
+      );
       throw new Error(`Failed to compare players: ${error.message}`);
     }
   }
@@ -103,7 +133,9 @@ export class LigaFacadeService {
       return await this.tournamentService.getActiveTournaments();
     } catch (error: any) {
       console.error('Error getting active tournaments:', error);
-      throw new Error(`Failed to retrieve active tournaments: ${error.message}`);
+      throw new Error(
+        `Failed to retrieve active tournaments: ${error.message}`,
+      );
     }
   }
 
@@ -120,12 +152,19 @@ export class LigaFacadeService {
     try {
       return await this.tournamentService.getTournamentMatches(tournamentId);
     } catch (error: any) {
-      console.error(`Error getting matches for tournament ${tournamentId}:`, error);
-      throw new Error(`Failed to retrieve tournament matches: ${error.message}`);
+      console.error(
+        `Error getting matches for tournament ${tournamentId}:`,
+        error,
+      );
+      throw new Error(
+        `Failed to retrieve tournament matches: ${error.message}`,
+      );
     }
   }
 
-  async createTournament(request: TournamentCreationRequest): Promise<{ success: boolean; message: string }> {
+  async createTournament(
+    request: TournamentCreationRequest,
+  ): Promise<{ success: boolean; message: string }> {
     try {
       return await this.tournamentService.createTournament(request);
     } catch (error: any) {
@@ -134,7 +173,9 @@ export class LigaFacadeService {
     }
   }
 
-  async registerForTournament(registration: TournamentRegistration): Promise<{ success: boolean; message: string }> {
+  async registerForTournament(
+    registration: TournamentRegistration,
+  ): Promise<{ success: boolean; message: string }> {
     try {
       return await this.tournamentService.registerForTournament(registration);
     } catch (error: any) {
@@ -156,7 +197,9 @@ export class LigaFacadeService {
 
   async validateTournamentExists(tournamentId: number): Promise<boolean> {
     try {
-      return await this.tournamentService.validateTournamentExists(tournamentId);
+      return await this.tournamentService.validateTournamentExists(
+        tournamentId,
+      );
     } catch (error: any) {
       console.error(`Error validating tournament ${tournamentId}:`, error);
       return false;

@@ -1,7 +1,10 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { PokedexRegistry, pokedexRegistry } from '@/_db/schema/SmartRotomPokedex';
+import {
+  PokedexRegistry,
+  pokedexRegistry,
+} from '@/_db/schema/SmartRotomPokedex';
 import { eq, and, desc } from 'drizzle-orm';
 import { IPokemonRepository } from './interfaces/pokemon.repository.interface';
 
@@ -60,12 +63,14 @@ export interface BulkUpdateResult {
 @Injectable()
 export class PokemonRepository implements IPokemonRepository {
   constructor(
-    @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>
+    @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
   ) {}
 
   // ==================== POKEDEX REGISTRY OPERATIONS ====================
 
-  async createPokedexRegistry(data: PokedexRegistryData): Promise<{ success: boolean; message?: string }> {
+  async createPokedexRegistry(
+    data: PokedexRegistryData,
+  ): Promise<{ success: boolean; message?: string }> {
     try {
       const result = await this.db
         .insert(pokedexRegistry)
@@ -75,18 +80,21 @@ export class PokemonRepository implements IPokemonRepository {
           formId: data.formId,
           paletteId: data.paletteId,
           seenAt: data.seenAt || new Date(),
-          caughtAt: data.caughtAt || null
+          caughtAt: data.caughtAt || null,
         } as PokedexRegistry)
         .execute();
 
       if (result[0].affectedRows === 1) {
         return { success: true };
       }
-      
+
       return { success: false, message: 'Failed to create registry entry' };
     } catch (error: any) {
       console.error('Failed to create pokedex registry:', error);
-      return { success: false, message: `Registry creation failed: ${error.message}` };
+      return {
+        success: false,
+        message: `Registry creation failed: ${error.message}`,
+      };
     }
   }
 
@@ -94,7 +102,7 @@ export class PokemonRepository implements IPokemonRepository {
     uuid: string,
     pokemonId: number,
     formId: string,
-    paletteId: string
+    paletteId: string,
   ): Promise<PokedexRegistryResult | null> {
     try {
       const result = await this.db
@@ -103,15 +111,17 @@ export class PokemonRepository implements IPokemonRepository {
           formId: pokedexRegistry.formId,
           paletteId: pokedexRegistry.paletteId,
           seenAt: pokedexRegistry.seenAt,
-          caughtAt: pokedexRegistry.caughtAt
+          caughtAt: pokedexRegistry.caughtAt,
         })
         .from(pokedexRegistry)
-        .where(and(
-          eq(pokedexRegistry.uuid, uuid),
-          eq(pokedexRegistry.pokemonId, pokemonId),
-          eq(pokedexRegistry.formId, formId),
-          eq(pokedexRegistry.paletteId, paletteId)
-        ))
+        .where(
+          and(
+            eq(pokedexRegistry.uuid, uuid),
+            eq(pokedexRegistry.pokemonId, pokemonId),
+            eq(pokedexRegistry.formId, formId),
+            eq(pokedexRegistry.paletteId, paletteId),
+          ),
+        )
         .execute();
 
       return result.length > 0 ? result[0] : null;
@@ -126,32 +136,40 @@ export class PokemonRepository implements IPokemonRepository {
     pokemonId: number,
     formId: string,
     paletteId: string,
-    updateData: Partial<PokedexRegistryData>
+    updateData: Partial<PokedexRegistryData>,
   ): Promise<{ success: boolean; message?: string }> {
     try {
       const result = await this.db
         .update(pokedexRegistry)
         .set(updateData as PokedexRegistry)
-        .where(and(
-          eq(pokedexRegistry.uuid, uuid),
-          eq(pokedexRegistry.pokemonId, pokemonId),
-          eq(pokedexRegistry.formId, formId),
-          eq(pokedexRegistry.paletteId, paletteId)
-        ))
+        .where(
+          and(
+            eq(pokedexRegistry.uuid, uuid),
+            eq(pokedexRegistry.pokemonId, pokemonId),
+            eq(pokedexRegistry.formId, formId),
+            eq(pokedexRegistry.paletteId, paletteId),
+          ),
+        )
         .execute();
 
       if (result[0].affectedRows === 1) {
         return { success: true };
       }
-      
+
       return { success: false, message: 'No registry found to update' };
     } catch (error: any) {
       console.error('Failed to update pokedex registry:', error);
-      return { success: false, message: `Registry update failed: ${error.message}` };
+      return {
+        success: false,
+        message: `Registry update failed: ${error.message}`,
+      };
     }
   }
 
-  async getUserPokedexRegistries(uuid: string, limit: number = 20): Promise<PokedexRegistryResult[]> {
+  async getUserPokedexRegistries(
+    uuid: string,
+    limit: number = 20,
+  ): Promise<PokedexRegistryResult[]> {
     try {
       return await this.db
         .select({
@@ -159,7 +177,7 @@ export class PokemonRepository implements IPokemonRepository {
           formId: pokedexRegistry.formId,
           paletteId: pokedexRegistry.paletteId,
           seenAt: pokedexRegistry.seenAt,
-          caughtAt: pokedexRegistry.caughtAt
+          caughtAt: pokedexRegistry.caughtAt,
         })
         .from(pokedexRegistry)
         .where(eq(pokedexRegistry.uuid, uuid))
@@ -172,7 +190,9 @@ export class PokemonRepository implements IPokemonRepository {
     }
   }
 
-  async getAllUserPokedexRegistries(uuid: string): Promise<PokedexRegistryResult[]> {
+  async getAllUserPokedexRegistries(
+    uuid: string,
+  ): Promise<PokedexRegistryResult[]> {
     try {
       return await this.db
         .selectDistinct({
@@ -180,7 +200,7 @@ export class PokemonRepository implements IPokemonRepository {
           formId: pokedexRegistry.formId,
           paletteId: pokedexRegistry.paletteId,
           seenAt: pokedexRegistry.seenAt,
-          caughtAt: pokedexRegistry.caughtAt
+          caughtAt: pokedexRegistry.caughtAt,
         })
         .from(pokedexRegistry)
         .where(eq(pokedexRegistry.uuid, uuid))
@@ -193,7 +213,9 @@ export class PokemonRepository implements IPokemonRepository {
 
   // ==================== BULK OPERATIONS ====================
 
-  async bulkInsertPokedexRegistries(registries: PokedexRegistryData[]): Promise<{ success: boolean; insertedCount: number }> {
+  async bulkInsertPokedexRegistries(
+    registries: PokedexRegistryData[],
+  ): Promise<{ success: boolean; insertedCount: number }> {
     if (registries.length === 0) {
       return { success: true, insertedCount: 0 };
     }
@@ -201,19 +223,24 @@ export class PokemonRepository implements IPokemonRepository {
     try {
       const result = await this.db
         .insert(pokedexRegistry)
-        .values(registries.map(registry => ({
-          uuid: registry.uuid,
-          pokemonId: registry.pokemonId,
-          formId: registry.formId,
-          paletteId: registry.paletteId,
-          seenAt: registry.seenAt || new Date(),
-          caughtAt: registry.caughtAt || null
-        } as PokedexRegistry)))
+        .values(
+          registries.map(
+            (registry) =>
+              ({
+                uuid: registry.uuid,
+                pokemonId: registry.pokemonId,
+                formId: registry.formId,
+                paletteId: registry.paletteId,
+                seenAt: registry.seenAt || new Date(),
+                caughtAt: registry.caughtAt || null,
+              }) as PokedexRegistry,
+          ),
+        )
         .execute();
 
-      return { 
-        success: true, 
-        insertedCount: result[0].affectedRows || 0 
+      return {
+        success: true,
+        insertedCount: result[0].affectedRows || 0,
       };
     } catch (error: any) {
       console.error('Failed to bulk insert pokedex registries:', error);
@@ -224,7 +251,7 @@ export class PokemonRepository implements IPokemonRepository {
   async bulkUpdatePokedexRegistriesStatus(
     uuid: string,
     pokemonIds: number[],
-    status: 'seen' | 'caught'
+    status: 'seen' | 'caught',
   ): Promise<{ success: boolean; updatedCount: number }> {
     if (pokemonIds.length === 0) {
       return { success: true, updatedCount: 0 };
@@ -237,19 +264,22 @@ export class PokemonRepository implements IPokemonRepository {
       const batchSize = 50;
       for (let i = 0; i < pokemonIds.length; i += batchSize) {
         const batch = pokemonIds.slice(i, i + batchSize);
-        
+
         for (const pokemonId of batch) {
-          const updateData = status === 'caught' ? { caughtAt: new Date() } : {};
-          
+          const updateData =
+            status === 'caught' ? { caughtAt: new Date() } : {};
+
           const result = await this.db
             .update(pokedexRegistry)
             .set(updateData as PokedexRegistry)
-            .where(and(
-              eq(pokedexRegistry.uuid, uuid),
-              eq(pokedexRegistry.pokemonId, pokemonId),
-              eq(pokedexRegistry.formId, 'base'),
-              eq(pokedexRegistry.paletteId, 'none')
-            ))
+            .where(
+              and(
+                eq(pokedexRegistry.uuid, uuid),
+                eq(pokedexRegistry.pokemonId, pokemonId),
+                eq(pokedexRegistry.formId, 'base'),
+                eq(pokedexRegistry.paletteId, 'none'),
+              ),
+            )
             .execute();
 
           updatedCount += result[0].affectedRows || 0;
@@ -265,20 +295,25 @@ export class PokemonRepository implements IPokemonRepository {
 
   // ==================== STATISTICS ====================
 
-  async getPokedexStatistics(uuid: string, totalPokemonCount: number): Promise<PokedexStatistics> {
+  async getPokedexStatistics(
+    uuid: string,
+    totalPokemonCount: number,
+  ): Promise<PokedexStatistics> {
     try {
       const registries = await this.getAllUserPokedexRegistries(uuid);
 
       const seenUniquePokemonIds = new Set(
-        registries.filter(p => p.seenAt !== null).map(p => p.pokemonId)
+        registries.filter((p) => p.seenAt !== null).map((p) => p.pokemonId),
       );
       const caughtUniquePokemonIds = new Set(
-        registries.filter(p => p.caughtAt !== null).map(p => p.pokemonId)
+        registries.filter((p) => p.caughtAt !== null).map((p) => p.pokemonId),
       );
 
       const seenPokemon = seenUniquePokemonIds.size;
       const caughtPokemon = caughtUniquePokemonIds.size;
-      const shinyPokemon = registries.filter(p => p.paletteId === 'shiny' && p.caughtAt !== null).length;
+      const shinyPokemon = registries.filter(
+        (p) => p.paletteId === 'shiny' && p.caughtAt !== null,
+      ).length;
 
       return {
         seenPokemon,
@@ -286,7 +321,7 @@ export class PokemonRepository implements IPokemonRepository {
         totalPokemon: totalPokemonCount,
         missingPokemon: totalPokemonCount - seenPokemon,
         missingCaughtPokemon: totalPokemonCount - caughtPokemon,
-        shinyPokemon
+        shinyPokemon,
       };
     } catch (error: any) {
       console.error(`Failed to get pokedex statistics for ${uuid}:`, error);
@@ -296,7 +331,9 @@ export class PokemonRepository implements IPokemonRepository {
 
   // ==================== CACHE SUPPORT ====================
 
-  async getUserRegistriesForCache(uuid: string): Promise<PokedexRegistryResult[]> {
+  async getUserRegistriesForCache(
+    uuid: string,
+  ): Promise<PokedexRegistryResult[]> {
     try {
       return await this.db
         .select({
@@ -304,7 +341,7 @@ export class PokemonRepository implements IPokemonRepository {
           formId: pokedexRegistry.formId,
           paletteId: pokedexRegistry.paletteId,
           seenAt: pokedexRegistry.seenAt,
-          caughtAt: pokedexRegistry.caughtAt
+          caughtAt: pokedexRegistry.caughtAt,
         })
         .from(pokedexRegistry)
         .where(eq(pokedexRegistry.uuid, uuid))
@@ -321,10 +358,15 @@ export class PokemonRepository implements IPokemonRepository {
     uuid: string,
     pokemonId: number,
     formId: string,
-    paletteId: string
+    paletteId: string,
   ): Promise<boolean> {
     try {
-      const registry = await this.findPokedexRegistry(uuid, pokemonId, formId, paletteId);
+      const registry = await this.findPokedexRegistry(
+        uuid,
+        pokemonId,
+        formId,
+        paletteId,
+      );
       return !!registry;
     } catch (error: any) {
       console.error('Failed to check registry existence:', error);

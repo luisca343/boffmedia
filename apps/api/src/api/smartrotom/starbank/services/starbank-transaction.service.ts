@@ -1,5 +1,8 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { STARBANK_ACCOUNT_REPOSITORY_TOKEN, STARBANK_TRANSACTION_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
+import {
+  STARBANK_ACCOUNT_REPOSITORY_TOKEN,
+  STARBANK_TRANSACTION_REPOSITORY_TOKEN,
+} from '@api/_utils/repositories/interfaces/repository.token';
 import { TransactionType } from '../enums/transaction-type.enum';
 import { CreateTransferDto } from '../dto/create-transfer.dto';
 import { CreateShopTransactionDto } from '../dto/create-shop-transaction.dto';
@@ -48,18 +51,20 @@ export class StarbankTransactionService {
       to: transferDto.to,
       amount: transferDto.amount,
       reason: transferDto.concept,
-      type: TransactionType.TRANSFERENCIA
+      type: TransactionType.TRANSFERENCIA,
     };
 
     const result = await this.transactionRepository.create(transactionData);
-    
+
     if (!result.success) {
       throw new Error(result.message || 'Transfer failed');
     }
   }
 
   async transferFromMain(transferDto: TransferFromMainDto): Promise<void> {
-    const mainAccount = await this.accountRepository.findUserMainAccount(transferDto.uuid);
+    const mainAccount = await this.accountRepository.findUserMainAccount(
+      transferDto.uuid,
+    );
     if (!mainAccount) {
       throw new Error('Main account not found');
     }
@@ -68,13 +73,17 @@ export class StarbankTransactionService {
       from: mainAccount.id,
       to: transferDto.to,
       amount: transferDto.amount,
-      concept: transferDto.concept
+      concept: transferDto.concept,
     };
 
     return await this.transfer(createTransferDto);
   }
 
-  async transferFromSystem(accountId: number, amount: number, concept: string): Promise<void> {
+  async transferFromSystem(
+    accountId: number,
+    amount: number,
+    concept: string,
+  ): Promise<void> {
     // Validate transfer data
     if (amount <= 0) {
       throw new Error('Transfer amount must be positive');
@@ -91,38 +100,44 @@ export class StarbankTransactionService {
       to: accountId,
       amount: amount,
       reason: concept,
-      type: TransactionType.TRANSFERENCIA
+      type: TransactionType.TRANSFERENCIA,
     };
 
     const result = await this.transactionRepository.create(transactionData);
-    
+
     if (!result.success) {
       throw new Error(result.message || 'System transfer failed');
     }
   }
 
-  async processShopTransaction(shopDto: CreateShopTransactionDto): Promise<void> {
-    const mainAccount = await this.accountRepository.findUserMainAccount(shopDto.uuid);
+  async processShopTransaction(
+    shopDto: CreateShopTransactionDto,
+  ): Promise<void> {
+    const mainAccount = await this.accountRepository.findUserMainAccount(
+      shopDto.uuid,
+    );
     if (!mainAccount) {
       throw new Error('Main account not found');
     }
 
     const total = shopDto.unitPrice * shopDto.count;
-    
+
     if (shopDto.operation === TransactionType.COMPRA) {
       // Check sufficient balance for purchase
       if (mainAccount.balance < total) {
         throw new Error('Insufficient balance for purchase');
       }
 
-      console.log(`Compra de ${shopDto.count} ${shopDto.itemName} a ${shopDto.npcName} por ${total}`);
-      
+      console.log(
+        `Compra de ${shopDto.count} ${shopDto.itemName} a ${shopDto.npcName} por ${total}`,
+      );
+
       const transactionData = {
         from: mainAccount.id,
         to: 0, // System account
         amount: total,
         reason: `Compra de ${shopDto.count} ${shopDto.itemName} a ${shopDto.npcName}`,
-        type: TransactionType.COMPRA
+        type: TransactionType.COMPRA,
       };
 
       const result = await this.transactionRepository.create(transactionData);
@@ -131,14 +146,16 @@ export class StarbankTransactionService {
       }
     } else {
       // VENTA
-      console.log(`Venta de ${shopDto.count} ${shopDto.itemName} a ${shopDto.npcName} por ${total}`);
-      
+      console.log(
+        `Venta de ${shopDto.count} ${shopDto.itemName} a ${shopDto.npcName} por ${total}`,
+      );
+
       const transactionData = {
         from: 0, // System account
         to: mainAccount.id,
         amount: total,
         reason: `Venta de ${shopDto.count} ${shopDto.itemName} a ${shopDto.npcName}`,
-        type: TransactionType.VENTA
+        type: TransactionType.VENTA,
       };
 
       const result = await this.transactionRepository.create(transactionData);
@@ -148,8 +165,13 @@ export class StarbankTransactionService {
     }
   }
 
-  async processTrainerDefeat(trainerDto: TrainerDefeatMoneyDto, currentGameBalance: number): Promise<void> {
-    const mainAccount = await this.accountRepository.findUserMainAccount(trainerDto.uuid);
+  async processTrainerDefeat(
+    trainerDto: TrainerDefeatMoneyDto,
+    currentGameBalance: number,
+  ): Promise<void> {
+    const mainAccount = await this.accountRepository.findUserMainAccount(
+      trainerDto.uuid,
+    );
     if (!mainAccount) {
       throw new Error('Main account not found');
     }
@@ -166,7 +188,7 @@ export class StarbankTransactionService {
       to: mainAccount.id,
       amount: diff,
       reason: 'Derrota de entrenador',
-      type: TransactionType.DERROTA_ENTRENADOR
+      type: TransactionType.DERROTA_ENTRENADOR,
     };
 
     const result = await this.transactionRepository.create(transactionData);
@@ -175,23 +197,41 @@ export class StarbankTransactionService {
     }
   }
 
-  async getAccountTransactions(accountId: number, limit: number = 50): Promise<StarBankTransaction[]> {
+  async getAccountTransactions(
+    accountId: number,
+    limit: number = 50,
+  ): Promise<StarBankTransaction[]> {
     return await this.transactionRepository.findByAccountId(accountId, limit);
   }
 
-  async getUserTransactions(uuid: string, limit: number = 50): Promise<StarBankTransaction[]> {
+  async getUserTransactions(
+    uuid: string,
+    limit: number = 50,
+  ): Promise<StarBankTransaction[]> {
     return await this.transactionRepository.findByUserUuid(uuid, limit);
   }
 
-  async getAccountTransfers(accountId: number, limit: number = 10): Promise<StarBankTransaction[]> {
-    return await this.transactionRepository.findTransfersByAccount(accountId, limit);
+  async getAccountTransfers(
+    accountId: number,
+    limit: number = 10,
+  ): Promise<StarBankTransaction[]> {
+    return await this.transactionRepository.findTransfersByAccount(
+      accountId,
+      limit,
+    );
   }
 
-  async getUserTransfers(uuid: string, limit: number = 10): Promise<StarBankTransaction[]> {
+  async getUserTransfers(
+    uuid: string,
+    limit: number = 10,
+  ): Promise<StarBankTransaction[]> {
     return await this.transactionRepository.findTransfersByUser(uuid, limit);
   }
 
-  async getTransactionsByType(type: TransactionType, limit: number = 50): Promise<StarBankTransaction[]> {
+  async getTransactionsByType(
+    type: TransactionType,
+    limit: number = 50,
+  ): Promise<StarBankTransaction[]> {
     return await this.transactionRepository.findByType(type, limit);
   }
 }

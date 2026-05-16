@@ -1,6 +1,10 @@
 import { BaseRepository } from '@api/_utils/repositories/base-repository.interface';
 
-export interface IArcadeLootboxRepository extends BaseRepository<any, any, any> {
+export interface IArcadeLootboxRepository extends BaseRepository<
+  any,
+  any,
+  any
+> {
   findUserLootboxes(uuid: string): Promise<any[]>;
   findUserLootboxByType(uuid: string, type: string): Promise<any | null>;
   addLootbox(lootboxData: any): Promise<{ insertId: number }>;

@@ -6,6 +6,6 @@ import { CommandsService } from './commands.service';
 @Module({
   controllers: [CommandsController],
   providers: [MySQL2Service, CommandsService],
-  exports: [CommandsService]
+  exports: [CommandsService],
 })
 export class CommandsModule {}

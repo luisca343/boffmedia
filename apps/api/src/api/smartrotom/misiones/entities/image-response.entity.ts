@@ -1,37 +1,37 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ImageUploadResponse {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Upload status',
-    example: 'OK'
+    example: 'OK',
   })
   status: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'File path (if successful)',
     example: './public/smartrotom/img/customNPC/renders/professor_oak.png',
-    required: false
+    required: false,
   })
   path?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Error message (if failed)',
-    required: false
+    required: false,
   })
   error?: string;
 }
 
 export class ImageExistsResponse {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Whether image exists',
-    example: true
+    example: true,
   })
   exists: boolean;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'File path (if exists)',
     example: './public/smartrotom/img/customNPC/professor_oak.png',
-    required: false
+    required: false,
   })
   path?: string;
 }

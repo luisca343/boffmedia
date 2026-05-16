@@ -7,7 +7,7 @@ export class MessageSenderSchema {
     enum: MessageSender,
     enumName: 'MessageSender',
     description: 'Available message senders',
-    example: MessageSender.USER
+    example: MessageSender.USER,
   })
   sender: MessageSender;
 }
@@ -17,7 +17,7 @@ export class MessagePartTypeSchema {
     enum: MessagePartType,
     enumName: 'MessagePartType',
     description: 'Available message part types',
-    example: MessagePartType.TEXT
+    example: MessagePartType.TEXT,
   })
   type: MessagePartType;
 }
@@ -26,14 +26,14 @@ export class EnumsResponseDto {
   @ApiProperty({
     enum: MessageSender,
     enumName: 'MessageSender',
-    description: 'MessageSender enum values'
+    description: 'MessageSender enum values',
   })
   MessageSender: typeof MessageSender;
 
   @ApiProperty({
     enum: MessagePartType,
     enumName: 'MessagePartType',
-    description: 'MessagePartType enum values'
+    description: 'MessagePartType enum values',
   })
   MessagePartType: typeof MessagePartType;
 }

@@ -40,7 +40,10 @@ export class PokemonDataManagementService {
       keys: ['name', 'dex', 'nickname'],
       threshold,
     };
-    this.fusePokemon = new Fuse(this.pokemonDataService.getAllSpecies(), options);
+    this.fusePokemon = new Fuse(
+      this.pokemonDataService.getAllSpecies(),
+      options,
+    );
   }
 
   // ==================== POKEMON OPERATIONS ====================
@@ -57,7 +60,10 @@ export class PokemonDataManagementService {
     return this.pokemonDataService.getSpeciesByName(name);
   }
 
-  searchPokemonByName(name: string, amount: number = 16): FuseResult<Pokemon>[] {
+  searchPokemonByName(
+    name: string,
+    amount: number = 16,
+  ): FuseResult<Pokemon>[] {
     if (!this.fusePokemon) {
       this.initializeFuse(0.5);
     }
@@ -65,7 +71,9 @@ export class PokemonDataManagementService {
   }
 
   getPokemonNames(): string[] {
-    return this.pokemonDataService.getAllSpecies().map(species => species.name);
+    return this.pokemonDataService
+      .getAllSpecies()
+      .map((species) => species.name);
   }
 
   countPokemon(): number {
@@ -78,11 +86,17 @@ export class PokemonDataManagementService {
 
   // ==================== EVOLUTION OPERATIONS ====================
 
-  getEvoTree(id: number): { depth: number; tree: { [key: string]: EvoTreeNode } } {
+  getEvoTree(id: number): {
+    depth: number;
+    tree: { [key: string]: EvoTreeNode };
+  } {
     return this.pokemonDataService.getEvoTree(id);
   }
 
-  getNextPrev(id: number): { prev: Pokemon | undefined; next: Pokemon | undefined } {
+  getNextPrev(id: number): {
+    prev: Pokemon | undefined;
+    next: Pokemon | undefined;
+  } {
     const allSpecies = this.pokemonDataService.getAllSpecies();
     const currIndex = allSpecies.findIndex((species) => species.dex === id);
 
@@ -90,8 +104,14 @@ export class PokemonDataManagementService {
       return { prev: undefined, next: undefined };
     }
 
-    const prev = currIndex > 0 ? allSpecies[currIndex - 1] : allSpecies[allSpecies.length - 1];
-    const next = currIndex < allSpecies.length - 1 ? allSpecies[currIndex + 1] : allSpecies[0];
+    const prev =
+      currIndex > 0
+        ? allSpecies[currIndex - 1]
+        : allSpecies[allSpecies.length - 1];
+    const next =
+      currIndex < allSpecies.length - 1
+        ? allSpecies[currIndex + 1]
+        : allSpecies[0];
 
     return { prev, next };
   }
@@ -107,27 +127,27 @@ export class PokemonDataManagementService {
   }
 
   getPokemonMoves(id: number, formIndex: number): any {
-      const pokemon = this.pokemonDataService.getSpeciesByDex(id);
-      if (!pokemon) return null;
+    const pokemon = this.pokemonDataService.getSpeciesByDex(id);
+    if (!pokemon) return null;
 
-      const form = pokemon.forms[formIndex] || pokemon.forms[0];
-      const moves = form.moves || {};
+    const form = pokemon.forms[formIndex] || pokemon.forms[0];
+    const moves = form.moves || {};
 
-      const moveDataSet = {};
+    const moveDataSet = {};
 
-      Object.entries(moves).forEach(([key, moveList]) => {
-          moveList.forEach((move: any) => {
-              if (typeof move === 'object' && move.attacks) {
-                  move.attacks.forEach((attack: string) => {
-                      this.addMoveToDataSet(attack, moveDataSet);
-                  });
-              } else if (typeof move === 'string') {
-                  this.addMoveToDataSet(move, moveDataSet);
-              }
+    Object.entries(moves).forEach(([key, moveList]) => {
+      moveList.forEach((move: any) => {
+        if (typeof move === 'object' && move.attacks) {
+          move.attacks.forEach((attack: string) => {
+            this.addMoveToDataSet(attack, moveDataSet);
           });
+        } else if (typeof move === 'string') {
+          this.addMoveToDataSet(move, moveDataSet);
+        }
       });
+    });
 
-      return moveDataSet;
+    return moveDataSet;
   }
 
   private addMoveToDataSet(moveName: string, moveDataSet: any): void {
@@ -139,7 +159,7 @@ export class PokemonDataManagementService {
         category: 'Unknown',
         power: 0,
         pp: '0 - 0',
-        accuracy: 0
+        accuracy: 0,
       };
       return;
     }
@@ -151,13 +171,18 @@ export class PokemonDataManagementService {
         category: moveData.attackCategory,
         power: moveData.basePower,
         pp: `${moveData.ppBase} - ${moveData.ppMax}`,
-        accuracy: moveData.accuracy
+        accuracy: moveData.accuracy,
       };
     }
   }
 
-  getPokemonByMove(name: string): { speciesID: number; form: string }[] | undefined {
-    return this.pokemonDataService.sortByDex(this.pokemonDataService.getSpeciesByMove(name), 'speciesID');
+  getPokemonByMove(
+    name: string,
+  ): { speciesID: number; form: string }[] | undefined {
+    return this.pokemonDataService.sortByDex(
+      this.pokemonDataService.getSpeciesByMove(name),
+      'speciesID',
+    );
   }
 
   // ==================== ABILITY OPERATIONS ====================
@@ -166,8 +191,11 @@ export class PokemonDataManagementService {
     const abilityCounts: { [key: string]: number } = {};
 
     for (const ability in this.pokemonDataService.getAllSpeciesByAbility()) {
-      if (this.pokemonDataService.getAllSpeciesByAbility().hasOwnProperty(ability)) {
-        abilityCounts[ability] = this.pokemonDataService.getSpeciesByAbility(ability)?.length || 0;
+      if (
+        this.pokemonDataService.getAllSpeciesByAbility().hasOwnProperty(ability)
+      ) {
+        abilityCounts[ability] =
+          this.pokemonDataService.getSpeciesByAbility(ability)?.length || 0;
       }
     }
 
@@ -181,10 +209,10 @@ export class PokemonDataManagementService {
 
     // Count unique Pokemon species with this ability
     const uniqueSpeciesWithAbility = new Set();
-    forms.forEach(form => {
-      const pokemon = this.pokemonDataService.getAllSpecies().find(
-        species => species.forms.includes(form)
-      );
+    forms.forEach((form) => {
+      const pokemon = this.pokemonDataService
+        .getAllSpecies()
+        .find((species) => species.forms.includes(form));
       if (pokemon) {
         uniqueSpeciesWithAbility.add(pokemon.dex);
       }
@@ -197,15 +225,17 @@ export class PokemonDataManagementService {
     };
   }
 
-  getPokemonByAbility(name: string): { speciesID: number; form: string; speciesName: string }[] {
+  getPokemonByAbility(
+    name: string,
+  ): { speciesID: number; form: string; speciesName: string }[] {
     const forms = this.pokemonDataService.getSpeciesByAbility(name) || [];
     const result = [];
 
-    forms.forEach(form => {
-      const pokemon = this.pokemonDataService.getAllSpecies().find(
-        species => species.forms.includes(form)
-      );
-      
+    forms.forEach((form) => {
+      const pokemon = this.pokemonDataService
+        .getAllSpecies()
+        .find((species) => species.forms.includes(form));
+
       if (pokemon) {
         result.push({
           speciesID: pokemon.dex,
@@ -228,7 +258,16 @@ export class PokemonDataManagementService {
     return this.spawnDataService.getAllBiomes();
   }
 
-  getPokemonByBiome(name: string): { [key: string]: Array<{ dex: number; species: string; form: string; palette: string; rarity: number; percentage: number }> } {
+  getPokemonByBiome(name: string): {
+    [key: string]: Array<{
+      dex: number;
+      species: string;
+      form: string;
+      palette: string;
+      rarity: number;
+      percentage: number;
+    }>;
+  } {
     return this.spawnDataService.getPokemonByBiome(name);
   }
 
@@ -253,8 +292,16 @@ export class PokemonDataManagementService {
     return this.pokemonImageService.getItemSprite(name);
   }
 
-  getSimpleSprite(pokemonId: number, formName: string = 'base', paletteName: string = 'none'): string {
-    return this.pokemonImageService.getSimpleSprite(pokemonId, formName, paletteName);
+  getSimpleSprite(
+    pokemonId: number,
+    formName: string = 'base',
+    paletteName: string = 'none',
+  ): string {
+    return this.pokemonImageService.getSimpleSprite(
+      pokemonId,
+      formName,
+      paletteName,
+    );
   }
 
   // ==================== WORDLE DATA ====================
@@ -281,24 +328,23 @@ export class PokemonDataManagementService {
       const searchResults = this.searchPokemonByName(name, 1);
       console.log('Searching for PMD portrait for:', name);
       console.log('Search results:', searchResults);
-      
+
       if (searchResults.length === 0) {
         console.log('Pokemon not found:', name);
         return { url: '/smartrotom/img/pmd/portrait/0000/Normal.png' };
       }
-      
+
       const pokemon = searchResults[0].item;
       console.log('Found Pokemon:', pokemon.name, 'Dex:', pokemon.dex);
-      
+
       // Format dex number with leading zeros (4 digits)
       const dex = pokemon.dex.toString().padStart(4, '0');
-      
+
       // Construct the PMD sprite URL
       const spriteUrl = `/smartrotom/img/pmd/portrait/${dex}/Normal.png`;
-      
+
       console.log('PMD sprite URL:', spriteUrl);
       return { url: spriteUrl };
-      
     } catch (error: any) {
       console.error('Error in getPmdPortrait:', error);
       return { url: '/smartrotom/img/pmd/portrait/0000/Normal.png' };

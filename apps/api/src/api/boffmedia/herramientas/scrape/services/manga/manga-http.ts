@@ -19,7 +19,8 @@ let proxyPoolLoadedAt = 0;
  * Returns an empty array if the env var is not set or the fetch fails.
  */
 async function loadProxyPool(): Promise<string[]> {
-  if (proxyPool !== null && Date.now() - proxyPoolLoadedAt < PROXY_POOL_TTL_MS) return proxyPool;
+  if (proxyPool !== null && Date.now() - proxyPoolLoadedAt < PROXY_POOL_TTL_MS)
+    return proxyPool;
 
   const listUrl = process.env.MANGA_SCRAPER_PROXY_LIST_URL;
   if (!listUrl) {
@@ -31,16 +32,18 @@ async function loadProxyPool(): Promise<string[]> {
     const { data } = await axios.get<string>(listUrl, { timeout: 10_000 });
     proxyPool = data
       .split('\n')
-      .map(l => l.trim())
-      .filter(l => l.includes(':'))
-      .map(l => {
+      .map((l) => l.trim())
+      .filter((l) => l.includes(':'))
+      .map((l) => {
         const [host, port, user, pass] = l.split(':');
         return `http://${user}:${pass}@${host}:${port}`;
       });
     proxyPoolLoadedAt = Date.now();
     console.log(`[manga-http] Loaded ${proxyPool.length} proxies from pool`);
   } catch (err) {
-    console.warn(`[manga-http] Failed to load proxy list: ${(err as Error).message}`);
+    console.warn(
+      `[manga-http] Failed to load proxy list: ${(err as Error).message}`,
+    );
     proxyPool = [];
   }
 
@@ -77,14 +80,20 @@ export async function getProxies(n = 3): Promise<string[]> {
  * Parses a proxy URL (http://user:pass@host:port) into Playwright's proxy
  * config shape, which requires credentials as separate fields.
  */
-export function toPlaywrightProxy(
-  proxyUrl: string,
-): { server: string; username?: string; password?: string } {
+export function toPlaywrightProxy(proxyUrl: string): {
+  server: string;
+  username?: string;
+  password?: string;
+} {
   const parsed = new URL(proxyUrl);
   return {
     server: `${parsed.protocol}//${parsed.hostname}:${parsed.port}`,
-    ...(parsed.username ? { username: decodeURIComponent(parsed.username) } : {}),
-    ...(parsed.password ? { password: decodeURIComponent(parsed.password) } : {}),
+    ...(parsed.username
+      ? { username: decodeURIComponent(parsed.username) }
+      : {}),
+    ...(parsed.password
+      ? { password: decodeURIComponent(parsed.password) }
+      : {}),
   };
 }
 
@@ -101,7 +110,7 @@ const MIN_HTML_BYTES = 3_000;
 const BLOCK_MARKERS = ['novelcool_bad_user_4', 'bad_user'];
 
 export function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export function randomDelay(): Promise<void> {
@@ -177,8 +186,9 @@ export async function fetchHtmlSafe(
   if (html.length < MIN_HTML_BYTES) return null;
 
   const lower = html.toLowerCase();
-  if (BLOCK_MARKERS.some(m => lower.includes(m))) return null;
-  if (lower.includes('cf-browser-verification') || lower.includes('_cf_chl_')) return null;
+  if (BLOCK_MARKERS.some((m) => lower.includes(m))) return null;
+  if (lower.includes('cf-browser-verification') || lower.includes('_cf_chl_'))
+    return null;
   if (lower.includes('captcha')) return null;
 
   return html;

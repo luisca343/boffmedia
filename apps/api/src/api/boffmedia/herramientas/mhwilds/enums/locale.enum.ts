@@ -7,5 +7,5 @@ export enum Locale {
   ITALIAN = 'it',
   KOREAN = 'ko',
   CHINESE_SIMPLIFIED = 'zh-CN',
-  CHINESE_TRADITIONAL = 'zh-TW'
+  CHINESE_TRADITIONAL = 'zh-TW',
 }

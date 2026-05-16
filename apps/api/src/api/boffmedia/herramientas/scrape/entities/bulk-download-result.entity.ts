@@ -35,7 +35,10 @@ export class BulkDownloadResult {
   @ApiProperty({ example: 300 })
   downloaded: number;
 
-  @ApiProperty({ example: 10, description: 'Files that already existed locally and were skipped' })
+  @ApiProperty({
+    example: 10,
+    description: 'Files that already existed locally and were skipped',
+  })
   skipped: number;
 
   @ApiProperty({ example: 2 })

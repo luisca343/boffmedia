@@ -29,7 +29,9 @@ export class ImageService {
     this.ensureDirectoriesExist();
   }
 
-  async uploadCustomNPCImage(request: ImageUploadRequest): Promise<ImageUploadResponse> {
+  async uploadCustomNPCImage(
+    request: ImageUploadRequest,
+  ): Promise<ImageUploadResponse> {
     try {
       if (!request.npcName || !request.image) {
         throw new BadRequestException('NPC name and image are required');
@@ -52,53 +54,61 @@ export class ImageService {
       // Write file
       await fs.writeFile(filepath, imageBuffer);
 
-      this.logger.log(`Successfully uploaded image for NPC: ${request.npcName}`);
+      this.logger.log(
+        `Successfully uploaded image for NPC: ${request.npcName}`,
+      );
 
       return {
         status: 'OK',
-        path: filepath
+        path: filepath,
       };
-
     } catch (error: any) {
-      this.logger.error(`Failed to upload image for NPC ${request.npcName}`, error.stack);
-      
+      this.logger.error(
+        `Failed to upload image for NPC ${request.npcName}`,
+        error.stack,
+      );
+
       return {
         status: 'ERROR',
-        error: error.message || 'Upload failed'
+        error: error.message || 'Upload failed',
       };
     }
   }
 
-  async checkCustomNPCRenderExists(npcName: string): Promise<ImageExistsResponse> {
+  async checkCustomNPCRenderExists(
+    npcName: string,
+  ): Promise<ImageExistsResponse> {
     const sanitizedName = this.sanitizeFilename(npcName);
     const filepath = path.join(this.renderPath, `${sanitizedName}.png`);
-    
+
     try {
       await fs.access(filepath);
       return {
         exists: true,
-        path: filepath
+        path: filepath,
       };
     } catch {
       return {
-        exists: false
+        exists: false,
       };
     }
   }
 
-  async checkCustomNPCImageExists(npcName: string): Promise<ImageExistsResponse> {
+  async checkCustomNPCImageExists(
+    npcName: string,
+  ): Promise<ImageExistsResponse> {
     const sanitizedName = this.sanitizeFilename(npcName);
     const filepath = path.join(this.imagePath, `${sanitizedName}.png`);
-    
+
     try {
       await fs.access(filepath);
       return {
         exists: true,
-        path: filepath
+        path: filepath,
       };
     } catch {
       return {
-        exists: false
+        exists: false,
       };
     }
   }

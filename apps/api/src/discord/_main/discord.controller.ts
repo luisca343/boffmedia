@@ -3,7 +3,7 @@ import { DiscordService } from './discord.service';
 
 @Controller('discord')
 export class DiscordController {
-    /*
+  /*
     constructor(private readonly discordService: DiscordService) {}
     @Post('resetCommands')
     async resetCommands() {

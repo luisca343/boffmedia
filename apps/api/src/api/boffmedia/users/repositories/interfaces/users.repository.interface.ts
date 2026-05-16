@@ -31,7 +31,9 @@ export interface IBoffMediaUsersRepository {
   findUserByGoogleId(googleId: string): Promise<BoffMediaUserSafe | null>;
 
   // ==================== COMPLEX QUERIES ====================
-  findFullUserByUsernameWithPassword(username: string): Promise<FullUserData | null>;
+  findFullUserByUsernameWithPassword(
+    username: string,
+  ): Promise<FullUserData | null>;
   findFullUserByUsername(username: string): Promise<FullUserDataSafe | null>;
   findFullUserByUuid(uuid: string): Promise<FullUserDataSafe | null>;
   findFullUserByEmail(email: string): Promise<FullUserDataSafe | null>;
@@ -44,8 +46,15 @@ export interface IBoffMediaUsersRepository {
   deleteUser(id: number): Promise<boolean>;
 
   // ==================== VALIDATION OPERATIONS ====================
-  checkUserExists(identifier: string, type: 'id' | 'username' | 'email' | 'uuid'): Promise<boolean>;
-  checkMultipleFieldsExist(fields: { username?: string; email?: string; uuid?: string }): Promise<BoffMediaUserSafe[]>;
+  checkUserExists(
+    identifier: string,
+    type: 'id' | 'username' | 'email' | 'uuid',
+  ): Promise<boolean>;
+  checkMultipleFieldsExist(fields: {
+    username?: string;
+    email?: string;
+    uuid?: string;
+  }): Promise<BoffMediaUserSafe[]>;
 
   // ==================== STATISTICS ====================
   getUserCount(): Promise<number>;

@@ -20,14 +20,14 @@ export interface NotificationTarget {
     // Discord specific
     channelId?: string;
     botToken?: string;
-    
+
     // Webhook specific
     url?: string;
     headers?: Record<string, string>;
-    
+
     // Database specific
     table?: string;
-    
+
     // Common
     message?: string;
     template?: string;

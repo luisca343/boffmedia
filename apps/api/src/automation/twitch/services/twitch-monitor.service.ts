@@ -45,7 +45,10 @@ export class TwitchMonitorService {
   /**
    * Manual trigger for immediate check
    */
-  async checkStreamsNow(): Promise<{ foundStreams: number; notifications: number }> {
+  async checkStreamsNow(): Promise<{
+    foundStreams: number;
+    notifications: number;
+  }> {
     this.logger.log('Manual stream check triggered');
 
     let foundStreams = 0;
@@ -66,9 +69,14 @@ export class TwitchMonitorService {
   /**
    * Check streams by monitored users
    */
-  private async checkStreamsByUsers(): Promise<{ foundStreams: number; notifications: number }> {
+  private async checkStreamsByUsers(): Promise<{
+    foundStreams: number;
+    notifications: number;
+  }> {
     if (this.monitoredUsers.length === 0) {
-      this.logger.log('No users to monitor. Add users with addMonitoredUser() method.');
+      this.logger.log(
+        'No users to monitor. Add users with addMonitoredUser() method.',
+      );
       return { foundStreams: 0, notifications: 0 };
     }
 
@@ -76,22 +84,29 @@ export class TwitchMonitorService {
     let notifications = 0;
 
     try {
-      const streams = await this.twitchApiService.getStreamsByUsernames(this.monitoredUsers);
+      const streams = await this.twitchApiService.getStreamsByUsernames(
+        this.monitoredUsers,
+      );
       foundStreams = streams.length;
 
       for (const stream of streams) {
         // Check if stream contains "wingull" in title, tags, or game
         const containsWingull = this.streamContainsWingull(stream);
-        
+
         if (containsWingull) {
           const notificationSent = await this.processStream(stream, 'user');
           if (notificationSent) notifications++;
         } else {
-          this.logger.debug(`Stream ${stream.user_name} does not contain "wingull" - skipping notification`);
+          this.logger.debug(
+            `Stream ${stream.user_name} does not contain "wingull" - skipping notification`,
+          );
         }
       }
     } catch (error: any) {
-      this.logger.error('Failed to check streams for monitored users', error.stack);
+      this.logger.error(
+        'Failed to check streams for monitored users',
+        error.stack,
+      );
     }
 
     return { foundStreams, notifications };
@@ -103,26 +118,27 @@ export class TwitchMonitorService {
   private streamContainsWingull(stream: TwitchStream): boolean {
     // Check title for "wingull"
     const titleContains = stream.title?.toLowerCase().includes('wingull');
-    
+
     // Check tags for "wingull"
-    const tagsContain = stream.tags?.some(tag => 
-      tag.toLowerCase().includes('wingull')
+    const tagsContain = stream.tags?.some((tag) =>
+      tag.toLowerCase().includes('wingull'),
     );
-    
+
     // Check if game is exactly "Pixelmon Wingull 2"
-    const gameIsPixelmonWingull = stream.game_name?.toLowerCase() === 'pixelmon wingull 2';
-    
+    const gameIsPixelmonWingull =
+      stream.game_name?.toLowerCase() === 'pixelmon wingull 2';
+
     const result = titleContains || tagsContain || gameIsPixelmonWingull;
-    
+
     if (result) {
       this.logger.log(
         `Stream "${stream.user_name}" contains wingull content - ` +
-        `Title: ${titleContains ? '✓' : '✗'}, ` +
-        `Tags: ${tagsContain ? '✓' : '✗'}, ` +
-        `Game is "Pixelmon Wingull 2": ${gameIsPixelmonWingull ? '✓' : '✗'}`
+          `Title: ${titleContains ? '✓' : '✗'}, ` +
+          `Tags: ${tagsContain ? '✓' : '✗'}, ` +
+          `Game is "Pixelmon Wingull 2": ${gameIsPixelmonWingull ? '✓' : '✗'}`,
       );
     }
-    
+
     return result;
   }
 
@@ -180,7 +196,9 @@ export class TwitchMonitorService {
   /**
    * Mark streams as offline if they're no longer in the current check
    */
-  private async markStreamsOffline(currentStreamIds: Set<string>): Promise<void> {
+  private async markStreamsOffline(
+    currentStreamIds: Set<string>,
+  ): Promise<void> {
     for (const [userId, cached] of this.streamCache) {
       if (cached.isCurrentlyLive && !currentStreamIds.has(cached.streamId)) {
         // Stream went offline
@@ -235,7 +253,9 @@ export class TwitchMonitorService {
     cachedStreams: number;
     liveStreams: number;
   } {
-    const liveStreams = Array.from(this.streamCache.values()).filter(s => s.isCurrentlyLive).length;
+    const liveStreams = Array.from(this.streamCache.values()).filter(
+      (s) => s.isCurrentlyLive,
+    ).length;
 
     return {
       monitoredUsers: this.monitoredUsers,

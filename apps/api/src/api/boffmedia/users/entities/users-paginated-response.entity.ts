@@ -2,7 +2,11 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { BoffMediaUserEntity } from './user.entity';
 
 export class UsersPaginatedResponseEntity {
-  @ApiProperty({ type: BoffMediaUserEntity, isArray: true, description: 'List of users' })
+  @ApiProperty({
+    type: BoffMediaUserEntity,
+    isArray: true,
+    description: 'List of users',
+  })
   users: BoffMediaUserEntity[];
 
   @ApiProperty({ example: 150, description: 'Total number of matching users' })

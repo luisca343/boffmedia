@@ -30,16 +30,22 @@ export class UploadRepository {
   }
 
   async getUploadDirectory(subPath?: string): Promise<string> {
-    const uploadDir = subPath ? join(this.baseUploadDir, subPath) : this.baseUploadDir;
+    const uploadDir = subPath
+      ? join(this.baseUploadDir, subPath)
+      : this.baseUploadDir;
     await this.ensureDirectoryExists(uploadDir);
     return uploadDir;
   }
 
   // ==================== FILE OPERATIONS ====================
 
-  async saveFile(sourceFilePath: string, destinationPath: string, filename: string): Promise<UploadedFileDetails> {
+  async saveFile(
+    sourceFilePath: string,
+    destinationPath: string,
+    filename: string,
+  ): Promise<UploadedFileDetails> {
     const finalFilePath = join(destinationPath, filename);
-    
+
     // Move file from temp location to final destination
     await fs.rename(sourceFilePath, finalFilePath);
 
@@ -54,7 +60,7 @@ export class UploadRepository {
       size: stats.size,
       uploadDir: destinationPath,
       url: '', // Will be constructed by service
-      createdAt: new Date()
+      createdAt: new Date(),
     };
   }
 
@@ -78,12 +84,14 @@ export class UploadRepository {
     }
   }
 
-  async getFileInfo(filePath: string): Promise<{ size: number; createdAt: Date } | null> {
+  async getFileInfo(
+    filePath: string,
+  ): Promise<{ size: number; createdAt: Date } | null> {
     try {
       const stats = await fs.stat(filePath);
       return {
         size: stats.size,
-        createdAt: stats.birthtime
+        createdAt: stats.birthtime,
       };
     } catch {
       return null;
@@ -101,8 +109,10 @@ export class UploadRepository {
 
   constructUrlPath(subPath?: string, filename?: string): string {
     if (!filename) return '';
-    
-    const urlPath = subPath ? `uploads/${subPath}/${filename}` : `uploads/${filename}`;
+
+    const urlPath = subPath
+      ? `uploads/${subPath}/${filename}`
+      : `uploads/${filename}`;
     return `/${urlPath}`;
   }
 
@@ -114,6 +124,10 @@ export class UploadRepository {
   validateFilename(filename: string): boolean {
     // Check for valid filename characters
     const invalidChars = /[<>:"|?*\\\/]/;
-    return !invalidChars.test(filename) && filename.length > 0 && filename.length <= 255;
+    return (
+      !invalidChars.test(filename) &&
+      filename.length > 0 &&
+      filename.length <= 255
+    );
   }
 }

@@ -14,56 +14,72 @@ export class MessageService {
     private readonly ficusaiRepository: IFicusAiRepository,
   ) {}
 
-  async getMessages(uuid: string, limit: number = 20): Promise<FicusMessageContentDto[]> {
+  async getMessages(
+    uuid: string,
+    limit: number = 20,
+  ): Promise<FicusMessageContentDto[]> {
     this.validateUuid(uuid);
-    
+
     const messages = await this.ficusaiRepository.findByUuid(uuid, limit);
-    
+
     // Transform and parse the messages
     const parsedMessages: FicusMessageContentDto[] = [];
-    
-    for (const message of messages.reverse()) { // Reverse to get chronological order
+
+    for (const message of messages.reverse()) {
+      // Reverse to get chronological order
       try {
-        const content = typeof message.content === 'string' 
-          ? JSON.parse(message.content) 
-          : message.content;
-        
+        const content =
+          typeof message.content === 'string'
+            ? JSON.parse(message.content)
+            : message.content;
+
         parsedMessages.push(content);
       } catch (error: any) {
         console.error('Error parsing message content:', error);
         // Skip malformed messages
       }
     }
-    
+
     return parsedMessages;
   }
 
-  async storeMessage(uuid: string, messageContent: FicusMessageContentDto): Promise<FicusMessage> {
+  async storeMessage(
+    uuid: string,
+    messageContent: FicusMessageContentDto,
+  ): Promise<FicusMessage> {
     this.validateUuid(uuid);
-    
+
     const createMessageDto: CreateMessageDto = {
       uuid,
-      content: messageContent
+      content: messageContent,
     };
-    
+
     return this.ficusaiRepository.create(createMessageDto);
   }
 
-  async getMessagesForContext(uuid: string, contextLimit: number = 5): Promise<FicusMessageContentDto[]> {
+  async getMessagesForContext(
+    uuid: string,
+    contextLimit: number = 5,
+  ): Promise<FicusMessageContentDto[]> {
     this.validateUuid(uuid);
-    
-    const messages = await this.ficusaiRepository.findRecentByUuid(uuid, contextLimit);
-    
-    return messages.map(message => {
-      try {
-        return typeof message.content === 'string' 
-          ? JSON.parse(message.content) 
-          : message.content;
-      } catch (error: any) {
-        console.error('Error parsing message content for context:', error);
-        return null;
-      }
-    }).filter(Boolean);
+
+    const messages = await this.ficusaiRepository.findRecentByUuid(
+      uuid,
+      contextLimit,
+    );
+
+    return messages
+      .map((message) => {
+        try {
+          return typeof message.content === 'string'
+            ? JSON.parse(message.content)
+            : message.content;
+        } catch (error: any) {
+          console.error('Error parsing message content for context:', error);
+          return null;
+        }
+      })
+      .filter(Boolean);
   }
 
   async deleteUserMessages(uuid: string): Promise<boolean> {
@@ -82,7 +98,8 @@ export class MessageService {
       parts: [
         {
           type: MessagePartType.TEXT,
-          content: 'Hola, soy Profesor Ficus, tu asistente virtual. ¿En qué puedo ayudarte?',
+          content:
+            'Hola, soy Profesor Ficus, tu asistente virtual. ¿En qué puedo ayudarte?',
         },
       ],
     };

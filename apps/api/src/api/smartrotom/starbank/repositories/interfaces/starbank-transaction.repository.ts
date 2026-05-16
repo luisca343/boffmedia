@@ -10,10 +10,24 @@ export interface CreateTransactionData {
 }
 
 export interface IStarbankTransactionRepository {
-  create(transactionData: CreateTransactionData): Promise<{ success: boolean; message?: string }>;
-  findByAccountId(accountId: number, limit?: number): Promise<StarBankTransaction[]>;
+  create(
+    transactionData: CreateTransactionData,
+  ): Promise<{ success: boolean; message?: string }>;
+  findByAccountId(
+    accountId: number,
+    limit?: number,
+  ): Promise<StarBankTransaction[]>;
   findByUserUuid(uuid: string, limit?: number): Promise<StarBankTransaction[]>;
-  findTransfersByAccount(accountId: number, limit?: number): Promise<StarBankTransaction[]>;
-  findTransfersByUser(uuid: string, limit?: number): Promise<StarBankTransaction[]>;
-  findByType(type: TransactionType, limit?: number): Promise<StarBankTransaction[]>;
+  findTransfersByAccount(
+    accountId: number,
+    limit?: number,
+  ): Promise<StarBankTransaction[]>;
+  findTransfersByUser(
+    uuid: string,
+    limit?: number,
+  ): Promise<StarBankTransaction[]>;
+  findByType(
+    type: TransactionType,
+    limit?: number,
+  ): Promise<StarBankTransaction[]>;
 }

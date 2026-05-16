@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsOptional, IsInt, IsNotEmpty, IsUrl } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsInt,
+  IsNotEmpty,
+  IsUrl,
+} from 'class-validator';
 
 export class CreateNewsDto {
   @ApiProperty({ description: 'Title of the news', maxLength: 255 })
@@ -7,17 +13,29 @@ export class CreateNewsDto {
   @IsNotEmpty()
   title: string;
 
-  @ApiProperty({ description: 'Subtitle of the news', maxLength: 255, required: false })
+  @ApiProperty({
+    description: 'Subtitle of the news',
+    maxLength: 255,
+    required: false,
+  })
   @IsString()
   @IsOptional()
   subtitle?: string;
 
-  @ApiProperty({ description: 'Category of the news', maxLength: 255, required: false })
+  @ApiProperty({
+    description: 'Category of the news',
+    maxLength: 255,
+    required: false,
+  })
   @IsString()
   @IsOptional()
   category?: string;
 
-  @ApiProperty({ description: 'Subcategory of the news', maxLength: 255, required: false })
+  @ApiProperty({
+    description: 'Subcategory of the news',
+    maxLength: 255,
+    required: false,
+  })
   @IsString()
   @IsOptional()
   subcategory?: string;
@@ -37,12 +55,20 @@ export class CreateNewsDto {
   @IsNotEmpty()
   content: string;
 
-  @ApiProperty({ description: 'Button text for the news', maxLength: 255, required: false })
+  @ApiProperty({
+    description: 'Button text for the news',
+    maxLength: 255,
+    required: false,
+  })
   @IsString()
   @IsOptional()
   buttonText?: string;
 
-  @ApiProperty({ description: 'Image URL for the news', maxLength: 255, required: false })
+  @ApiProperty({
+    description: 'Image URL for the news',
+    maxLength: 255,
+    required: false,
+  })
   @IsString()
   @IsOptional()
   @IsUrl()

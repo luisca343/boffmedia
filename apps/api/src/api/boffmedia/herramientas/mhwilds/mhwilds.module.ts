@@ -10,11 +10,7 @@ import { MhwildsRepository } from './repositories/mhwilds.repository';
 import { MHWILDS_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 
 @Module({
-  imports: [
-    LoggerModule,
-    DrizzleModule,
-    ResponseModule
-  ],
+  imports: [LoggerModule, DrizzleModule, ResponseModule],
   controllers: [MhwildsController],
   providers: [
     MhwildsDataService,
@@ -25,10 +21,6 @@ import { MHWILDS_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/re
       useClass: MhwildsRepository,
     },
   ],
-  exports: [
-    MhwildsFacadeService,
-    MhwildsDataService,
-    MhwildsCacheService,
-  ],
+  exports: [MhwildsFacadeService, MhwildsDataService, MhwildsCacheService],
 })
 export class MhwildsModule {}

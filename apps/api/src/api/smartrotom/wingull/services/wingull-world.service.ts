@@ -53,15 +53,19 @@ export class WingullWorldService {
 
   async getAllTowns(): Promise<string[]> {
     try {
-      const pueblosPath = path.join(process.cwd(), 'public/smartrotom/data/pueblos');
-      
+      const pueblosPath = path.join(
+        process.cwd(),
+        'public/smartrotom/data/pueblos',
+      );
+
       if (!fs.existsSync(pueblosPath)) {
         throw new Error('Towns directory does not exist.');
       }
 
-      const towns = fs.readdirSync(pueblosPath, { withFileTypes: true })
-        .filter(dirent => dirent.isDirectory())
-        .map(dirent => dirent.name);
+      const towns = fs
+        .readdirSync(pueblosPath, { withFileTypes: true })
+        .filter((dirent) => dirent.isDirectory())
+        .map((dirent) => dirent.name);
 
       return towns;
     } catch (error: any) {
@@ -74,12 +78,18 @@ export class WingullWorldService {
     try {
       // Get all towns to validate if the requested town exists
       const allTowns = await this.getAllTowns();
-      
+
       if (!allTowns.includes(townName)) {
-        throw new Error(`Town '${townName}' not found. Available towns: ${allTowns.join(', ')}`);
+        throw new Error(
+          `Town '${townName}' not found. Available towns: ${allTowns.join(', ')}`,
+        );
       }
 
-      const townPath = path.join(process.cwd(), 'public/smartrotom/data/pueblos', townName);
+      const townPath = path.join(
+        process.cwd(),
+        'public/smartrotom/data/pueblos',
+        townName,
+      );
       const textosPath = path.join(townPath, 'config.json');
 
       if (!fs.existsSync(townPath)) {
@@ -87,16 +97,22 @@ export class WingullWorldService {
       }
 
       const textos = JSON.parse(fs.readFileSync(textosPath, 'utf-8'));
-      const images = fs.readdirSync(townPath).filter(file => file !== 'config.json' && file !== 'fondo.webp');
+      const images = fs
+        .readdirSync(townPath)
+        .filter((file) => file !== 'config.json' && file !== 'fondo.webp');
 
       return {
         textos,
         fondo: `/smartrotom/data/pueblos/${townName}/fondo.webp`,
-        images: images.map(image => `/smartrotom/data/pueblos/${townName}/${image}`),
+        images: images.map(
+          (image) => `/smartrotom/data/pueblos/${townName}/${image}`,
+        ),
       };
     } catch (error: any) {
       console.error(`Failed to fetch town info for ${townName}:`, error);
-      throw new Error(`Could not fetch town info for ${townName}: ${error.message}`);
+      throw new Error(
+        `Could not fetch town info for ${townName}: ${error.message}`,
+      );
     }
   }
 }

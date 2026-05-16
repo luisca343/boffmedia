@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { BaseDataService } from './base-data.service';
 import { PokemonDataService } from './pokemon-data.service';
-import {  SpawnInfos } from '../../interfaces/pokemon.interface';
+import { SpawnInfos } from '../../interfaces/pokemon.interface';
 import * as path from 'path';
 import * as fs from 'fs';
 import { Console } from 'console';
@@ -22,15 +22,37 @@ export class SpawnDataService extends BaseDataService {
 
   async loadSpawnData() {
     const startingTime = Date.now();
-    const folders = ['caverock', 'fishing', 'forage', 'grass', 'headbutt', 'legendaries', 'megas', 'npcs', 'rocksmash', 'standard', 'sweetscent'];
+    const folders = [
+      'caverock',
+      'fishing',
+      'forage',
+      'grass',
+      'headbutt',
+      'legendaries',
+      'megas',
+      'npcs',
+      'rocksmash',
+      'standard',
+      'sweetscent',
+    ];
 
     for (const folder of folders) {
-      const defaultDir = path.join(process.cwd(), 'public/smartrotom/packs/default_datapack/data/pixelmon/spawning', folder);
-      const publicDir = path.join(process.cwd(), 'public/smartrotom/packs/datapack/data/pixelmon/spawning', folder);
+      const defaultDir = path.join(
+        process.cwd(),
+        'public/smartrotom/packs/default_datapack/data/pixelmon/spawning',
+        folder,
+      );
+      const publicDir = path.join(
+        process.cwd(),
+        'public/smartrotom/packs/datapack/data/pixelmon/spawning',
+        folder,
+      );
 
       const spawnData = await this.readJsonFiles(defaultDir, publicDir);
 
-      spawnData.forEach((data: SpawnInfos) => this.processSpawnInfos(data, folder));
+      spawnData.forEach((data: SpawnInfos) =>
+        this.processSpawnInfos(data, folder),
+      );
     }
 
     console.log(`Loaded spawn data in ${Date.now() - startingTime}ms`);
@@ -46,10 +68,11 @@ export class SpawnDataService extends BaseDataService {
       const species = spawnInfo.spec.split('species:')[1].toLowerCase();
       const biomes = spawnInfo.condition?.stringBiomes;
 
-      const regex = /(?<species>[\w-]+)(?: form:(?<form>\w+))?(?: palette:(?<palette>\w+))?/;
+      const regex =
+        /(?<species>[\w-]+)(?: form:(?<form>\w+))?(?: palette:(?<palette>\w+))?/;
       const match = species.match(regex);
       const speciesName = match?.groups?.species;
-      let form = match?.groups?.form || 'base';
+      const form = match?.groups?.form || 'base';
       const palette = match?.groups?.palette;
 
       const pokemonID = `${speciesName.toLowerCase()}_${form.toLowerCase()}`;
@@ -57,41 +80,56 @@ export class SpawnDataService extends BaseDataService {
       spawnInfo.pokemonName = speciesName;
       spawnInfo.pokemonForm = form;
       spawnInfo.pokemonPalette = palette;
-      spawnInfo.gender = this.pokemonDataService.getSpeciesByNameWithForm(pokemonID)?.gender;
-      spawnInfo.pokemonDex = this.pokemonDataService.getSpeciesByName(speciesName)?.dex || 0;
+      spawnInfo.gender =
+        this.pokemonDataService.getSpeciesByNameWithForm(pokemonID)?.gender;
+      spawnInfo.pokemonDex =
+        this.pokemonDataService.getSpeciesByName(speciesName)?.dex || 0;
 
       this.addSpawnInfoToBiomes(biomes, spawnInfo);
       this.addSpawnInfoToCollections(speciesName, form, pokemonID, spawnInfo);
     });
   }
 
-  private addSpawnInfoToBiomes(biomes: string[] | undefined, spawnInfo: SpawnInfo) {
-    biomes?.forEach(biome => {
+  private addSpawnInfoToBiomes(
+    biomes: string[] | undefined,
+    spawnInfo: SpawnInfo,
+  ) {
+    biomes?.forEach((biome) => {
       if (!this.spawnByBiome[biome]) this.spawnByBiome[biome] = [];
       this.spawnByBiome[biome].push(spawnInfo);
     });
   }
 
-  private addSpawnInfoToCollections(speciesName: string | undefined, form: string, pokemonID: string, spawnInfo: SpawnInfo) {
+  private addSpawnInfoToCollections(
+    speciesName: string | undefined,
+    form: string,
+    pokemonID: string,
+    spawnInfo: SpawnInfo,
+  ) {
     if (!speciesName) return;
 
-    if (!this.spawnByPokemon[speciesName]) this.spawnByPokemon[speciesName] = [];
+    if (!this.spawnByPokemon[speciesName])
+      this.spawnByPokemon[speciesName] = [];
     this.spawnByPokemon[speciesName].push(spawnInfo);
 
-    if (!this.spawnByDex[`${spawnInfo.pokemonDex}`]) this.spawnByDex[`${spawnInfo.pokemonDex}`] = [];
+    if (!this.spawnByDex[`${spawnInfo.pokemonDex}`])
+      this.spawnByDex[`${spawnInfo.pokemonDex}`] = [];
     this.spawnByDex[`${spawnInfo.pokemonDex}`].push(spawnInfo);
 
     if (spawnInfo.pokemonForm) {
-      if (!this.spawnByForm[spawnInfo.pokemonForm]) this.spawnByForm[spawnInfo.pokemonForm] = [];
+      if (!this.spawnByForm[spawnInfo.pokemonForm])
+        this.spawnByForm[spawnInfo.pokemonForm] = [];
       this.spawnByForm[spawnInfo.pokemonForm].push(spawnInfo);
     }
 
     if (spawnInfo.pokemonPalette) {
-      if (!this.spawnByPalette[spawnInfo.pokemonPalette]) this.spawnByPalette[spawnInfo.pokemonPalette] = [];
+      if (!this.spawnByPalette[spawnInfo.pokemonPalette])
+        this.spawnByPalette[spawnInfo.pokemonPalette] = [];
       this.spawnByPalette[spawnInfo.pokemonPalette].push(spawnInfo);
     }
 
-    if (!this.spawnByPokemonAndForm[pokemonID]) this.spawnByPokemonAndForm[pokemonID] = [];
+    if (!this.spawnByPokemonAndForm[pokemonID])
+      this.spawnByPokemonAndForm[pokemonID] = [];
     this.spawnByPokemonAndForm[pokemonID].push(spawnInfo);
   }
 
@@ -134,11 +172,11 @@ export class SpawnDataService extends BaseDataService {
   getAllBiomes(): { [key: string]: number } {
     const biomes: { [key: string]: number } = {};
     const allSpawns = this.getAllSpawns();
-  
+
     for (const [pokemonId, spawnInfos] of Object.entries(allSpawns)) {
-      spawnInfos.forEach(spawnInfo => {
+      spawnInfos.forEach((spawnInfo) => {
         if (spawnInfo.condition?.stringBiomes) {
-          spawnInfo.condition.stringBiomes.forEach(biome => {
+          spawnInfo.condition.stringBiomes.forEach((biome) => {
             if (!biomes[biome]) {
               biomes[biome] = 0;
             }
@@ -147,16 +185,24 @@ export class SpawnDataService extends BaseDataService {
         }
       });
     }
-  
+
     const sortedBiomes = Object.fromEntries(
-      Object.entries(biomes)
-        .sort(([, a], [, b]) => b - a)
+      Object.entries(biomes).sort(([, a], [, b]) => b - a),
     );
-  
+
     return sortedBiomes;
   }
 
-  getPokemonByBiome(biomeName: string): { [key: string]: Array<{ dex: number; species: string; form: string; palette: string; rarity: number; percentage: number; }> } {
+  getPokemonByBiome(biomeName: string): {
+    [key: string]: Array<{
+      dex: number;
+      species: string;
+      form: string;
+      palette: string;
+      rarity: number;
+      percentage: number;
+    }>;
+  } {
     const biomeData = this.getSpawnByBiome(biomeName);
     const spawns: {
       [key: string]: Array<{
@@ -166,7 +212,7 @@ export class SpawnDataService extends BaseDataService {
         palette: string;
         rarity: number;
         percentage: number;
-      }>
+      }>;
     } = {};
 
     const totals: { [key: string]: number } = {};
@@ -178,7 +224,7 @@ export class SpawnDataService extends BaseDataService {
         palette: string;
         rarity: number;
         percentage: number;
-      }
+      };
     } = {};
 
     biomeData.forEach((spawn) => {
@@ -193,7 +239,8 @@ export class SpawnDataService extends BaseDataService {
         pokemonAcc[id] = this.getPokemonSprite(spawn, totals[spawn.spawnType]);
       } else {
         pokemonAcc[id].rarity += spawn.rarity;
-        pokemonAcc[id].percentage = (pokemonAcc[id].rarity / totals[spawn.spawnType]) * 100;
+        pokemonAcc[id].percentage =
+          (pokemonAcc[id].rarity / totals[spawn.spawnType]) * 100;
       }
     }
 
@@ -208,7 +255,9 @@ export class SpawnDataService extends BaseDataService {
     }
 
     // Sort the spawn types by amount of pokemon
-    const sortedSpawns = Object.keys(spawns).sort((a, b) => spawns[b].length - spawns[a].length);
+    const sortedSpawns = Object.keys(spawns).sort(
+      (a, b) => spawns[b].length - spawns[a].length,
+    );
     const sortedSpawnsObj: { [key: string]: any } = {};
     sortedSpawns.forEach((key) => {
       sortedSpawnsObj[key] = spawns[key];

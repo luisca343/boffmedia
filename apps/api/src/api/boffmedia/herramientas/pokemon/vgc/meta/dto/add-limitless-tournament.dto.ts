@@ -1,4 +1,11 @@
-﻿import { IsInt, IsNotEmpty, IsOptional, IsString, IsUrl, Min } from 'class-validator';
+﻿import {
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUrl,
+  Min,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
@@ -22,7 +29,8 @@ export class AddLimitlessTournamentDto {
 
   @ApiPropertyOptional({
     example: 64,
-    description: 'Maximum number of players to import (top N by placing). Omit for all.',
+    description:
+      'Maximum number of players to import (top N by placing). Omit for all.',
   })
   @IsOptional()
   @Type(() => Number)

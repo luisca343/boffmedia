@@ -2,7 +2,11 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
-import { TwitchStream, TwitchStreamsResponse, TwitchTokenResponse } from '../interfaces/twitch-stream.interface';
+import {
+  TwitchStream,
+  TwitchStreamsResponse,
+  TwitchTokenResponse,
+} from '../interfaces/twitch-stream.interface';
 
 @Injectable()
 export class TwitchApiService {
@@ -48,7 +52,9 @@ export class TwitchApiService {
       );
 
       this.accessToken = response.data.access_token;
-      this.tokenExpiry = new Date(Date.now() + (response.data.expires_in - 60) * 1000); // Refresh 1 minute before expiry
+      this.tokenExpiry = new Date(
+        Date.now() + (response.data.expires_in - 60) * 1000,
+      ); // Refresh 1 minute before expiry
 
       this.logger.log('Successfully obtained Twitch access token');
       return this.accessToken;
@@ -75,7 +81,7 @@ export class TwitchApiService {
             },
             headers: {
               'Client-ID': clientId,
-              'Authorization': `Bearer ${accessToken}`,
+              Authorization: `Bearer ${accessToken}`,
             },
           },
         ),
@@ -83,7 +89,10 @@ export class TwitchApiService {
 
       return response.data.data.length > 0 ? response.data.data[0] : null;
     } catch (error: any) {
-      this.logger.error(`Failed to fetch stream for user "${username}"`, error.stack);
+      this.logger.error(
+        `Failed to fetch stream for user "${username}"`,
+        error.stack,
+      );
       throw error;
     }
   }
@@ -111,7 +120,7 @@ export class TwitchApiService {
               },
               headers: {
                 'Client-ID': clientId,
-                'Authorization': `Bearer ${accessToken}`,
+                Authorization: `Bearer ${accessToken}`,
               },
             },
           ),
@@ -120,7 +129,9 @@ export class TwitchApiService {
         allStreams.push(...response.data.data);
       }
 
-      this.logger.log(`Found ${allStreams.length} live streams from ${usernames.length} usernames`);
+      this.logger.log(
+        `Found ${allStreams.length} live streams from ${usernames.length} usernames`,
+      );
       return allStreams;
     } catch (error: any) {
       this.logger.error(`Failed to fetch streams for usernames`, error.stack);

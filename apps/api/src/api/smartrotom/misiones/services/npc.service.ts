@@ -15,9 +15,7 @@ export interface NPCUpdateResponse {
 
 @Injectable()
 export class NPCService {
-  constructor(
-    private readonly questCacheService: QuestCacheService,
-  ) {}
+  constructor(private readonly questCacheService: QuestCacheService) {}
 
   async updateNPCs(updateRequest: UpdateNPCsDto): Promise<NPCUpdateResponse> {
     if (!updateRequest.npcs || !Array.isArray(updateRequest.npcs)) {
@@ -26,7 +24,7 @@ export class NPCService {
 
     // Validate and clean NPC data
     const validNPCs = this.validateAndCleanNPCs(updateRequest.npcs);
-    
+
     if (validNPCs.length === 0) {
       throw new BadRequestException('No valid NPCs provided');
     }
@@ -37,7 +35,7 @@ export class NPCService {
     return {
       status: 'ok',
       updated: validNPCs.length,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
   }
 
@@ -48,18 +46,18 @@ export class NPCService {
 
   async getNPCById(npcId: number): Promise<NPC | null> {
     const npcs = await this.getAllNPCs();
-    return npcs.find(npc => npc.id === npcId) || null;
+    return npcs.find((npc) => npc.id === npcId) || null;
   }
 
   async getNPCsByQuestId(questId: number): Promise<NPC[]> {
     const npcs = await this.getAllNPCs();
-    return npcs.filter(npc => npc.questId === questId);
+    return npcs.filter((npc) => npc.questId === questId);
   }
 
   private validateAndCleanNPCs(npcs: any[]): NPC[] {
     return npcs
-      .filter(npc => this.isValidNPC(npc))
-      .map(npc => this.cleanNPCData(npc));
+      .filter((npc) => this.isValidNPC(npc))
+      .map((npc) => this.cleanNPCData(npc));
   }
 
   private isValidNPC(npc: any): boolean {
@@ -86,8 +84,8 @@ export class NPCService {
         requiredLevel: 0,
         requiredTime: 0,
         factionRequirements: [],
-        scoreboardRequirements: []
-      }
+        scoreboardRequirements: [],
+      },
     };
   }
 }

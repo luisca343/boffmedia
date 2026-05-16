@@ -5,16 +5,16 @@ import { parsePasteMeta } from './parse-paste-meta';
 import { POKEPASTE_BASE } from '../config/smogon.config';
 
 interface FetchResult {
-  pasteId:   number;
-  slots:     VgcMetaSlot[];
+  pasteId: number;
+  slots: VgcMetaSlot[];
   wasCached: boolean;
 }
 
 /** Metadata sourced from the importing CSV, preferred over pokepast.es scrape values. */
 interface PasteMeta {
-  author?:      string | null;
-  title?:       string | null;
-  sourceKey?:   string | null;
+  author?: string | null;
+  title?: string | null;
+  sourceKey?: string | null;
   replicaCode?: string | null;
 }
 
@@ -37,7 +37,11 @@ export class PokepasteService {
    *
    * `meta` values (from the importing CSV) take precedence over pokepast.es JSON fields.
    */
-  async fetchAndCache(pasteUrl: string, formatId?: string, meta?: PasteMeta): Promise<FetchResult> {
+  async fetchAndCache(
+    pasteUrl: string,
+    formatId?: string,
+    meta?: PasteMeta,
+  ): Promise<FetchResult> {
     const pokepasteId = this.extractPokepasteId(pasteUrl);
     if (!pokepasteId) throw new Error(`Invalid pokepaste URL: ${pasteUrl}`);
 
@@ -46,29 +50,36 @@ export class PokepasteService {
     if (existing) {
       if (meta) await this.pastesRepository.updateMeta(existing.id, meta);
       return {
-        pasteId:   existing.id,
-        slots:     JSON.parse(existing.parsedSlots) as VgcMetaSlot[],
+        pasteId: existing.id,
+        slots: JSON.parse(existing.parsedSlots) as VgcMetaSlot[],
         wasCached: true,
       };
     }
 
     // Fetch from pokepast.es JSON API
     const res = await fetch(`${POKEPASTE_BASE}/${pokepasteId}/json`);
-    if (!res.ok) throw new Error(`pokepast.es fetch failed: HTTP ${res.status} for ${pokepasteId}`);
+    if (!res.ok)
+      throw new Error(
+        `pokepast.es fetch failed: HTTP ${res.status} for ${pokepasteId}`,
+      );
 
-    const json = await res.json() as { paste: string; author?: string; title?: string };
+    const json = (await res.json()) as {
+      paste: string;
+      author?: string;
+      title?: string;
+    };
     const slots = parsePasteMeta(json.paste ?? '');
 
     const pasteId = await this.pastesRepository.upsertPaste({
       pokepasteId,
-      rawText:     json.paste ?? '',
+      rawText: json.paste ?? '',
       parsedSlots: slots,
       // CSV metadata takes precedence over pokepast.es fields
-      author:      meta?.author      ?? json.author ?? null,
-      title:       meta?.title       ?? json.title  ?? null,
-      sourceKey:   meta?.sourceKey   ?? null,
+      author: meta?.author ?? json.author ?? null,
+      title: meta?.title ?? json.title ?? null,
+      sourceKey: meta?.sourceKey ?? null,
       replicaCode: meta?.replicaCode ?? null,
-      formatId:    formatId          ?? null,
+      formatId: formatId ?? null,
     });
 
     this.logger.debug(`Fetched paste ${pokepasteId} (${slots.length} slots)`);

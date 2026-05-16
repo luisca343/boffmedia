@@ -2,41 +2,41 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsOptional, IsNumber, Min, Max } from 'class-validator';
 
 export class UploadImageDto {
-  @ApiProperty({ 
-    type: 'string', 
+  @ApiProperty({
+    type: 'string',
     format: 'binary',
     description: 'Image file to upload',
-    required: true 
+    required: true,
   })
   file: Express.Multer.File;
 
-  @ApiProperty({ 
-    type: 'string', 
+  @ApiProperty({
+    type: 'string',
     description: 'Subdirectory path within uploads folder',
     required: false,
-    example: 'avatars'
+    example: 'avatars',
   })
   @IsString()
   @IsOptional()
   path?: string;
 
-  @ApiProperty({ 
-    type: 'string', 
+  @ApiProperty({
+    type: 'string',
     description: 'Custom filename (with extension)',
     required: false,
-    example: 'profile-picture.jpg'
+    example: 'profile-picture.jpg',
   })
   @IsString()
   @IsOptional()
   filename?: string;
 
-  @ApiProperty({ 
-    type: 'number', 
+  @ApiProperty({
+    type: 'number',
     description: 'Maximum file size in MB',
     required: false,
     minimum: 1,
     maximum: 10,
-    default: 5
+    default: 5,
   })
   @IsNumber()
   @IsOptional()
@@ -46,27 +46,27 @@ export class UploadImageDto {
 }
 
 export class UploadFileDto {
-  @ApiProperty({ 
-    type: 'string', 
+  @ApiProperty({
+    type: 'string',
     format: 'binary',
     description: 'File to upload',
-    required: true 
+    required: true,
   })
   file: Express.Multer.File;
 
-  @ApiProperty({ 
-    type: 'string', 
+  @ApiProperty({
+    type: 'string',
     description: 'Subdirectory path within uploads folder',
-    required: false 
+    required: false,
   })
   @IsString()
   @IsOptional()
   path?: string;
 
-  @ApiProperty({ 
-    type: 'string', 
+  @ApiProperty({
+    type: 'string',
     description: 'Custom filename (with extension)',
-    required: false 
+    required: false,
   })
   @IsString()
   @IsOptional()
@@ -74,19 +74,19 @@ export class UploadFileDto {
 }
 
 export class DeleteFileDto {
-  @ApiProperty({ 
-    type: 'string', 
+  @ApiProperty({
+    type: 'string',
     description: 'Subdirectory path within uploads folder',
-    required: false 
+    required: false,
   })
   @IsString()
   @IsOptional()
   path?: string;
 
-  @ApiProperty({ 
-    type: 'string', 
+  @ApiProperty({
+    type: 'string',
     description: 'Filename to delete',
-    required: true 
+    required: true,
   })
   @IsString()
   filename: string;

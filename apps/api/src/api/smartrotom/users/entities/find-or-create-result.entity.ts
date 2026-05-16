@@ -2,22 +2,22 @@ import { ApiProperty } from '@nestjs/swagger';
 import { SmartRotomUser } from './user.entity';
 
 export class FindOrCreateResult {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'The user data',
-    type: SmartRotomUser
+    type: SmartRotomUser,
   })
   user: SmartRotomUser;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Whether this is a newly created user',
-    example: true
+    example: true,
   })
   isNew: boolean;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Status of the operation',
     example: 'created',
-    enum: ['found', 'created']
+    enum: ['found', 'created'],
   })
   status: 'found' | 'created';
 }

@@ -1,156 +1,156 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class PokedexStatistics {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Number of Pokémon seen',
-    example: 150
+    example: 150,
   })
   seenPokemon: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Number of Pokémon caught',
-    example: 100
+    example: 100,
   })
   caughtPokemon: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Total number of Pokémon',
-    example: 1025
+    example: 1025,
   })
   totalPokemon: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Number of Pokémon not yet seen',
-    example: 875
+    example: 875,
   })
   missingPokemon: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Number of Pokémon seen but not caught',
-    example: 925
+    example: 925,
   })
   missingCaughtPokemon: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Number of shiny Pokémon caught',
-    example: 5
+    example: 5,
   })
   shinyPokemon: number;
 }
 
 export class DetailedPokedexStatistics {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'List of seen Pokémon (format: id:form)',
     example: ['1:base', '2:base', '25:base'],
-    type: [String]
+    type: [String],
   })
   seenPokemon: string[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'List of caught Pokémon (format: id:form)',
     example: ['1:base', '25:base'],
-    type: [String]
+    type: [String],
   })
   caughtPokemon: string[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'List of shiny Pokémon caught (format: id:form)',
     example: ['25:base'],
-    type: [String]
+    type: [String],
   })
   shinyPokemon: string[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Total number of Pokémon species',
-    example: 1025
+    example: 1025,
   })
   totalPokemon: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Total number of forms',
-    example: 1200
+    example: 1200,
   })
   totalForms: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Number of unique Pokémon seen',
-    example: 150
+    example: 150,
   })
   seenCount: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Number of unique Pokémon caught',
-    example: 100
+    example: 100,
   })
   caughtCount: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Number of shiny Pokémon caught',
-    example: 5
+    example: 5,
   })
   shinyCount: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Number of Pokémon species not seen',
-    example: 875
+    example: 875,
   })
   missingSeenPokemon: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Number of Pokémon species not caught',
-    example: 925
+    example: 925,
   })
   missingCaughtPokemon: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Number of forms not seen',
-    example: 1050
+    example: 1050,
   })
   missingSeenForms: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Number of forms not caught',
-    example: 1100
+    example: 1100,
   })
   missingCaughtForms: number;
 }
 
 export class PokedexRegistry {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Pokémon ID',
-    example: 25
+    example: 25,
   })
   pokemonId: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Form ID',
-    example: 'base'
+    example: 'base',
   })
   formId: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Palette ID',
-    example: 'none'
+    example: 'none',
   })
   paletteId: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Date when first seen',
     example: '2025-06-29T10:00:00Z',
-    required: false
+    required: false,
   })
   seenAt: Date | null;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Date when caught',
     example: '2025-06-29T12:00:00Z',
-    required: false
+    required: false,
   })
   caughtAt: Date | null;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Pokémon name',
-    example: 'Pikachu'
+    example: 'Pikachu',
   })
   pokemonName: string;
 }

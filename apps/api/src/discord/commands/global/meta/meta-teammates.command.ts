@@ -9,9 +9,9 @@ import { VgcMetaFacadeService } from '@/api/boffmedia/herramientas/pokemon/vgc/m
 import { typeColor, spriteUrl } from './meta.util';
 
 interface TeammateScore {
-  name:       string;
+  name: string;
   avgPercent: number;
-  listCount:  number;
+  listCount: number;
 }
 
 function synergyTier(pct: number): string {
@@ -22,7 +22,10 @@ function synergyTier(pct: number): string {
 
 /** Intersect N teammate arrays, sorted by average percent across all inputs. */
 function intersectTeammates(
-  inputs: Array<{ pokemonName: string; teammates: Array<{ name: string; percent: number }> }>,
+  inputs: Array<{
+    pokemonName: string;
+    teammates: Array<{ name: string; percent: number }>;
+  }>,
 ): { scores: TeammateScore[]; strict: boolean } {
   const n = inputs.length;
   const tally: Record<string, { sum: number; count: number }> = {};
@@ -30,7 +33,7 @@ function intersectTeammates(
   for (const { teammates } of inputs) {
     for (const tm of teammates) {
       if (!tally[tm.name]) tally[tm.name] = { sum: 0, count: 0 };
-      tally[tm.name].sum   += tm.percent;
+      tally[tm.name].sum += tm.percent;
       tally[tm.name].count += 1;
     }
   }
@@ -38,13 +41,17 @@ function intersectTeammates(
   const scored: TeammateScore[] = Object.entries(tally).map(([name, v]) => ({
     name,
     avgPercent: v.sum / n,
-    listCount:  v.count,
+    listCount: v.count,
   }));
 
-  const strict = scored.filter((s) => s.listCount === n).sort((a, b) => b.avgPercent - a.avgPercent);
+  const strict = scored
+    .filter((s) => s.listCount === n)
+    .sort((a, b) => b.avgPercent - a.avgPercent);
   if (strict.length > 0) return { scores: strict, strict: true };
 
-  const fallback = scored.sort((a, b) => b.listCount - a.listCount || b.avgPercent - a.avgPercent);
+  const fallback = scored.sort(
+    (a, b) => b.listCount - a.listCount || b.avgPercent - a.avgPercent,
+  );
   return { scores: fallback, strict: false };
 }
 
@@ -57,38 +64,52 @@ export class MetaTeammatesCommand {
   ) {}
 
   @UseInterceptors(MetaVgcAutocompleteInterceptor)
-  @Subcommand({ name: 'teammates', description: 'Find most common teammates for one or more Pokémon' })
+  @Subcommand({
+    name: 'teammates',
+    description: 'Find most common teammates for one or more Pokémon',
+  })
   public async onTeammates(
     @Context() [interaction]: [ChatInputCommandInteraction],
     @Options() { regulation, pokemon, pokemon2, pokemon3 }: MetaTeammatesDto,
   ) {
     await interaction.deferReply();
 
-    const reg = (await this.metaFacade.getRegulations()).find((r) => r.id === regulation);
+    const reg = (await this.metaFacade.getRegulations()).find(
+      (r) => r.id === regulation,
+    );
     if (!reg) {
       await interaction.editReply(`Unknown regulation \`${regulation}\`.`);
       return;
     }
 
-    const source = reg.vgcPastesGid ? 'VGCPastes (Champions)' : reg.formatId ? 'Smogon Ladder' : 'Limitless (Combined)';
-    const names  = [pokemon, pokemon2, pokemon3].filter(Boolean) as string[];
+    const source = reg.vgcPastesGid
+      ? 'VGCPastes (Champions)'
+      : reg.formatId
+        ? 'Smogon Ladder'
+        : 'Limitless (Combined)';
+    const names = [pokemon, pokemon2, pokemon3].filter(Boolean) as string[];
 
     // ── Resolve speciesIds for all input Pokémon ────────────────────────────
-    let usageEntries: Awaited<ReturnType<typeof this.metaFacade.getUnifiedUsageList>>;
+    let usageEntries: Awaited<
+      ReturnType<typeof this.metaFacade.getUnifiedUsageList>
+    >;
     try {
       usageEntries = await this.cache.getOrFetch(
         `vgc:usage-entries:${regulation}`,
         () => this.metaFacade.getUnifiedUsageList(regulation),
       );
     } catch {
-      await interaction.editReply(`No usage data available for **${reg.name}** yet.`);
+      await interaction.editReply(
+        `No usage data available for **${reg.name}** yet.`,
+      );
       return;
     }
 
     const resolved = names.map((name) => {
       const q = name.toLowerCase();
       return usageEntries.find(
-        (e) => e.speciesName.toLowerCase() === q || e.speciesId.toLowerCase() === q,
+        (e) =>
+          e.speciesName.toLowerCase() === q || e.speciesId.toLowerCase() === q,
       );
     });
 
@@ -120,16 +141,20 @@ export class MetaTeammatesCommand {
       return;
     }
 
-    const details = detailResults.map((r) => (r as PromiseFulfilledResult<any>).value);
+    const details = detailResults.map(
+      (r) => (r as PromiseFulfilledResult<any>).value,
+    );
 
     // ── Build teammate scores ────────────────────────────────────────────────
     const inputs = details.map((d, i) => ({
       pokemonName: resolved[i]!.speciesName,
-      teammates:   d.teammates ?? [],
+      teammates: d.teammates ?? [],
     }));
 
     if (inputs.every((inp) => inp.teammates.length === 0)) {
-      await interaction.editReply(`No teammate data found for **${reg.name}**.`);
+      await interaction.editReply(
+        `No teammate data found for **${reg.name}**.`,
+      );
       return;
     }
 
@@ -138,15 +163,19 @@ export class MetaTeammatesCommand {
 
     // ── Build embed ──────────────────────────────────────────────────────────
     const primaryEntry = resolved[0]!;
-    const inputNames   = inputs.map((i) => i.pokemonName);
-    const title        = names.length === 1
-      ? `${inputNames[0]} — Teammates`
-      : `Common Teammates — ${inputNames.join(' + ')}`;
+    const inputNames = inputs.map((i) => i.pokemonName);
+    const title =
+      names.length === 1
+        ? `${inputNames[0]} — Teammates`
+        : `Common Teammates — ${inputNames.join(' + ')}`;
 
     const lines = top.map((tm, idx) => {
-      const tier     = synergyTier(tm.avgPercent);
-      const pctStr   = `${tm.avgPercent.toFixed(1)}%`;
-      const listNote = !strict && names.length > 1 ? ` *(${tm.listCount}/${names.length})*` : '';
+      const tier = synergyTier(tm.avgPercent);
+      const pctStr = `${tm.avgPercent.toFixed(1)}%`;
+      const listNote =
+        !strict && names.length > 1
+          ? ` *(${tm.listCount}/${names.length})*`
+          : '';
       return `\`#${String(idx + 1).padStart(2)}\` ${tier} **${tm.name}** — ${pctStr}${listNote}`;
     });
 

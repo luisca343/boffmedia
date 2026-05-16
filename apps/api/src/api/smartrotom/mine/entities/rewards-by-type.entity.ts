@@ -2,39 +2,39 @@ import { ApiProperty } from '@nestjs/swagger';
 import { MineReward } from './mine-reward.entity';
 
 export class RewardTypeGroup {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Array of rewards in this type',
-    type: [MineReward]
+    type: [MineReward],
   })
   items: MineReward[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Total value of all rewards in this type',
-    example: 1500
+    example: 1500,
   })
   totalValue: number;
 }
 
 export class RewardsByType {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Rewards grouped by type',
     example: {
       gema: { items: [], totalValue: 1500 },
-      piedra: { items: [], totalValue: 800 }
+      piedra: { items: [], totalValue: 800 },
     },
     additionalProperties: {
       type: 'object',
       properties: {
         items: { type: 'array' },
-        totalValue: { type: 'number' }
-      }
-    }
+        totalValue: { type: 'number' },
+      },
+    },
   })
   drops: { [key: string]: RewardTypeGroup };
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Total value of all rewards',
-    example: 2300
+    example: 2300,
   })
   totalValue: number;
 }

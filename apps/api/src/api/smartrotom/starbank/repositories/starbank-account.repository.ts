@@ -3,24 +3,29 @@ import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { eq } from 'drizzle-orm';
 import { RowDataPacket } from 'mysql2';
-import { 
-  StarBankAccount as DbStarBankAccount, 
-  starBankAccounts, 
-  starBankUsersAccounts 
+import {
+  StarBankAccount as DbStarBankAccount,
+  starBankAccounts,
+  starBankUsersAccounts,
 } from '@/_db/schema/SmartRotomStarBank';
 import { BaseRepositoryImpl } from '@api/_utils/repositories/base-repository';
 import { StarBankAccount } from '../entities/starbank-account.entity';
 import { AccountType } from '../enums/account-type.enum';
-import { CreateAccountData, IStarbankAccountRepository } from './interfaces/starbank-account.repository';
+import {
+  CreateAccountData,
+  IStarbankAccountRepository,
+} from './interfaces/starbank-account.repository';
 
 @Injectable()
-export class StarbankAccountRepository 
-  extends BaseRepositoryImpl<StarBankAccount, CreateAccountData, Partial<CreateAccountData>>
-  implements IStarbankAccountRepository {
-
-  constructor(
-    @Inject(DRIZZLE) db: MySql2Database<Record<string, never>>
-  ) {
+export class StarbankAccountRepository
+  extends BaseRepositoryImpl<
+    StarBankAccount,
+    CreateAccountData,
+    Partial<CreateAccountData>
+  >
+  implements IStarbankAccountRepository
+{
+  constructor(@Inject(DRIZZLE) db: MySql2Database<Record<string, never>>) {
     super(db, starBankAccounts);
   }
 
@@ -31,27 +36,32 @@ export class StarbankAccountRepository
     if (!result.success || !result.accountId) {
       throw new Error(result.message || 'Failed to create account');
     }
-    
+
     const account = await this.findById(result.accountId);
     if (!account) {
       throw new Error('Account created but not found');
     }
-    
+
     return account;
   }
 
-  async update(id: number, updateData: Partial<CreateAccountData>): Promise<StarBankAccount> {
-    await this.db.update(starBankAccounts)
+  async update(
+    id: number,
+    updateData: Partial<CreateAccountData>,
+  ): Promise<StarBankAccount> {
+    await this.db
+      .update(starBankAccounts)
       .set({
-        ...updateData
+        ...updateData,
       } as DbStarBankAccount)
       .where(eq(starBankAccounts.id, id));
-    
+
     return this.findById(id);
   }
 
   async delete(id: number): Promise<boolean> {
-    const result = await this.db.delete(starBankAccounts)
+    const result = await this.db
+      .delete(starBankAccounts)
       .where(eq(starBankAccounts.id, id));
     return result[0].affectedRows > 0;
   }
@@ -94,15 +104,20 @@ export class StarbankAccountRepository
     }
   }
 
-  async findUserMainAccount(uuid: string): Promise<{ id: number; balance: number } | null> {
+  async findUserMainAccount(
+    uuid: string,
+  ): Promise<{ id: number; balance: number } | null> {
     try {
       const result = await this.db
         .select({
           id: starBankAccounts.id,
-          balance: starBankAccounts.balance
+          balance: starBankAccounts.balance,
         })
         .from(starBankAccounts)
-        .innerJoin(starBankUsersAccounts, eq(starBankAccounts.id, starBankUsersAccounts.accountId))
+        .innerJoin(
+          starBankUsersAccounts,
+          eq(starBankAccounts.id, starBankUsersAccounts.accountId),
+        )
         .where(eq(starBankUsersAccounts.uuid, uuid))
         .execute();
 
@@ -125,7 +140,10 @@ export class StarbankAccountRepository
 
       return true;
     } catch (error: any) {
-      console.error(`Failed to update balance for account ${accountId}:`, error);
+      console.error(
+        `Failed to update balance for account ${accountId}:`,
+        error,
+      );
       throw new Error(`Failed to update account balance: ${error.message}`);
     }
   }
@@ -134,9 +152,9 @@ export class StarbankAccountRepository
     try {
       const accounts = await this.findUserAccounts(uuid);
       if (accounts.length === 0) return 0;
-      
+
       // Return main account balance or first account balance
-      const mainAccount = accounts.find(acc => acc.type === AccountType.MAIN);
+      const mainAccount = accounts.find((acc) => acc.type === AccountType.MAIN);
       return mainAccount ? mainAccount.balance : accounts[0].balance;
     } catch (error: any) {
       console.error(`Failed to get balance for user ${uuid}:`, error);
@@ -163,35 +181,48 @@ export class StarbankAccountRepository
       balance: dbResult.balance,
       type: dbResult.type as AccountType,
       uuid: dbResult.uuid,
-      image: dbResult.image
+      image: dbResult.image,
     };
   }
 
-  private async createAccount(accountData: CreateAccountData): Promise<{ success: boolean; accountId?: number; message?: string }> {
+  private async createAccount(
+    accountData: CreateAccountData,
+  ): Promise<{ success: boolean; accountId?: number; message?: string }> {
     try {
-      const result = await this.db.insert(starBankAccounts).values({
-        name: accountData.name,
-        balance: accountData.initialBalance || 0,
-        type: accountData.type || AccountType.SECONDARY,
-        image: accountData.image
-      } as DbStarBankAccount).execute() as RowDataPacket[];
+      const result = (await this.db
+        .insert(starBankAccounts)
+        .values({
+          name: accountData.name,
+          balance: accountData.initialBalance || 0,
+          type: accountData.type || AccountType.SECONDARY,
+          image: accountData.image,
+        } as DbStarBankAccount)
+        .execute()) as RowDataPacket[];
 
       const accountId = result[0].insertId;
 
       // Link account to user
-      await this.db.insert(starBankUsersAccounts).values({
-        uuid: accountData.uuid,
-        accountId: accountId
-      }).execute();
+      await this.db
+        .insert(starBankUsersAccounts)
+        .values({
+          uuid: accountData.uuid,
+          accountId: accountId,
+        })
+        .execute();
 
       return { success: true, accountId };
     } catch (error: any) {
       console.error('Failed to create account:', error);
-      return { success: false, message: `Account creation failed: ${error.message}` };
+      return {
+        success: false,
+        message: `Account creation failed: ${error.message}`,
+      };
     }
   }
 
-  private async findAccountById(accountId: number): Promise<StarBankAccount | null> {
+  private async findAccountById(
+    accountId: number,
+  ): Promise<StarBankAccount | null> {
     try {
       const result = await this.db
         .select({
@@ -199,10 +230,13 @@ export class StarbankAccountRepository
           balance: starBankAccounts.balance,
           name: starBankAccounts.name,
           type: starBankAccounts.type,
-          uuid: starBankUsersAccounts.uuid
+          uuid: starBankUsersAccounts.uuid,
         })
         .from(starBankAccounts)
-        .leftJoin(starBankUsersAccounts, eq(starBankAccounts.id, starBankUsersAccounts.accountId))
+        .leftJoin(
+          starBankUsersAccounts,
+          eq(starBankAccounts.id, starBankUsersAccounts.accountId),
+        )
         .where(eq(starBankAccounts.id, accountId))
         .execute();
 
@@ -221,10 +255,13 @@ export class StarbankAccountRepository
           balance: starBankAccounts.balance,
           name: starBankAccounts.name,
           type: starBankAccounts.type,
-          image: starBankAccounts.image
+          image: starBankAccounts.image,
         })
         .from(starBankAccounts)
-        .innerJoin(starBankUsersAccounts, eq(starBankAccounts.id, starBankUsersAccounts.accountId))
+        .innerJoin(
+          starBankUsersAccounts,
+          eq(starBankAccounts.id, starBankUsersAccounts.accountId),
+        )
         .where(eq(starBankUsersAccounts.uuid, uuid))
         .execute();
 
@@ -242,7 +279,7 @@ export class StarbankAccountRepository
           id: starBankAccounts.id,
           balance: starBankAccounts.balance,
           name: starBankAccounts.name,
-          type: starBankAccounts.type
+          type: starBankAccounts.type,
         })
         .from(starBankAccounts)
         .execute();

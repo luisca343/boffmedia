@@ -11,13 +11,14 @@ export class ChatUserRepository {
   ) {}
 
   async findUserByUuid(uuid: string): Promise<any | null> {
-    const result = await this.db.select({
-      uuid: smartrotomUsers.uuid,
-      username: smartrotomUsers.username
-    })
-    .from(smartrotomUsers)
-    .where(eq(smartrotomUsers.uuid, uuid))
-    .limit(1);
+    const result = await this.db
+      .select({
+        uuid: smartrotomUsers.uuid,
+        username: smartrotomUsers.username,
+      })
+      .from(smartrotomUsers)
+      .where(eq(smartrotomUsers.uuid, uuid))
+      .limit(1);
     return result[0] || null;
   }
 }

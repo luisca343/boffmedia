@@ -14,7 +14,12 @@ import { WingullFacadeService } from './wingull.facade.service';
 
 // Import controller
 import { WingullController } from './wingull.controller';
-import { WINGULL_ECONOMY_REPOSITORY_TOKEN, WINGULL_TRANSPORT_REPOSITORY_TOKEN, WINGULL_USER_REPOSITORY_TOKEN, WINGULL_WORLD_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
+import {
+  WINGULL_ECONOMY_REPOSITORY_TOKEN,
+  WINGULL_TRANSPORT_REPOSITORY_TOKEN,
+  WINGULL_USER_REPOSITORY_TOKEN,
+  WINGULL_WORLD_REPOSITORY_TOKEN,
+} from '@api/_utils/repositories/interfaces/repository.token';
 import { WingullEconomyRepository } from './repositories/wingull-economy.repository';
 import { WingullTransportRepository } from './repositories/wingull-transport.repository';
 import { WingullPlayerRepository } from './repositories/wingull-player.repository';
@@ -30,27 +35,27 @@ import { WingullSQL2Service } from '@/_utils/WingullSQL2Service';
     WingullPlayerService,
     WingullWorldService,
     WingullTransportService,
-    
+
     WingullFacadeService,
     WingullSQL2Service,
 
     {
       provide: WINGULL_ECONOMY_REPOSITORY_TOKEN,
       useClass: WingullEconomyRepository,
-    }, 
+    },
     {
       provide: WINGULL_TRANSPORT_REPOSITORY_TOKEN,
-      useClass: WingullTransportRepository
+      useClass: WingullTransportRepository,
     },
     {
       provide: WINGULL_USER_REPOSITORY_TOKEN,
-      useClass: WingullPlayerRepository
+      useClass: WingullPlayerRepository,
     },
     {
       provide: WINGULL_WORLD_REPOSITORY_TOKEN,
-      useClass: WingullWorldRepository
+      useClass: WingullWorldRepository,
     },
-    WingullRepository
+    WingullRepository,
   ],
   exports: [
     WingullFacadeService,

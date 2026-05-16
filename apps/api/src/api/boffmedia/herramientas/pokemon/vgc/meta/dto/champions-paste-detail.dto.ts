@@ -26,7 +26,10 @@ export class ChampionsPasteDetailDto {
   @ApiProperty({ example: 'Glimmora' })
   speciesName: string;
 
-  @ApiProperty({ example: 87, description: 'Number of pastes this Pokémon appeared in' })
+  @ApiProperty({
+    example: 87,
+    description: 'Number of pastes this Pokémon appeared in',
+  })
   pasteCount: number;
 
   @ApiProperty({ type: [UsageEntryDto] })
@@ -46,7 +49,10 @@ export class ChampionsPasteDetailDto {
 }
 
 export class BatchFetchResultDto {
-  @ApiProperty({ example: 120, description: 'Total teams with paste URLs that needed fetching' })
+  @ApiProperty({
+    example: 120,
+    description: 'Total teams with paste URLs that needed fetching',
+  })
   total: number;
 
   @ApiProperty({ example: 100, description: 'Newly fetched pastes' })

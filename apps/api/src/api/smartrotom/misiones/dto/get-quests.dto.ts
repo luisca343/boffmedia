@@ -4,11 +4,11 @@ import { IsOptional, IsIn } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class GetQuestsDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Force cache refresh (1 to force, 0 for normal)',
     example: 0,
     required: false,
-    enum: [0, 1]
+    enum: [0, 1],
   })
   @IsOptional()
   @Transform(({ value }) => parseInt(value, 10))

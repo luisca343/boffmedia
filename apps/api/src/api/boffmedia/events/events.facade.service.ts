@@ -26,7 +26,10 @@ import { AchievementWithProgress } from './entities/achievement-with-progress.en
 import { Team } from './entities/team.entity';
 import { TeamMember } from './entities/team-member.entity';
 import { Participant } from './entities/participant.entity';
-import { LeaderboardEntry, TeamLeaderboardEntry } from './entities/leaderboard.entity';
+import {
+  LeaderboardEntry,
+  TeamLeaderboardEntry,
+} from './entities/leaderboard.entity';
 
 @Injectable()
 export class EventsFacadeService {
@@ -53,7 +56,9 @@ export class EventsFacadeService {
   async createEvent(createEventDto: CreateEventDto): Promise<Event> {
     // Validate game exists if provided
     if (createEventDto.gameId) {
-      const gameExists = await this.gamesService.validateGameExists(createEventDto.gameId);
+      const gameExists = await this.gamesService.validateGameExists(
+        createEventDto.gameId,
+      );
       if (!gameExists) {
         throw new Error('Game not found');
       }
@@ -61,7 +66,9 @@ export class EventsFacadeService {
 
     // Validate parent event exists if provided and not -1
     if (createEventDto.parentId && createEventDto.parentId !== -1) {
-      const parentExists = await this.eventsService.validateEventExists(createEventDto.parentId);
+      const parentExists = await this.eventsService.validateEventExists(
+        createEventDto.parentId,
+      );
       if (!parentExists) {
         throw new Error('Parent event not found');
       }
@@ -70,14 +77,16 @@ export class EventsFacadeService {
     // Convert parentId -1 to null
     const processedDto = {
       ...createEventDto,
-      parentId: createEventDto.parentId === -1 ? null : createEventDto.parentId
+      parentId: createEventDto.parentId === -1 ? null : createEventDto.parentId,
     };
 
     return this.eventsService.createEvent(processedDto);
   }
 
-
-  async updateEvent(id: number, updateEventDto: UpdateEventDto): Promise<Event> {
+  async updateEvent(
+    id: number,
+    updateEventDto: UpdateEventDto,
+  ): Promise<Event> {
     // Validate event exists
     const eventExists = await this.eventsService.validateEventExists(id);
     if (!eventExists) {
@@ -86,7 +95,9 @@ export class EventsFacadeService {
 
     // Validate game exists if provided
     if (updateEventDto.gameId) {
-      const gameExists = await this.gamesService.validateGameExists(updateEventDto.gameId);
+      const gameExists = await this.gamesService.validateGameExists(
+        updateEventDto.gameId,
+      );
       if (!gameExists) {
         throw new Error('Game not found');
       }
@@ -94,7 +105,9 @@ export class EventsFacadeService {
 
     // Validate parent event exists if provided and not -1
     if (updateEventDto.parentId && updateEventDto.parentId !== -1) {
-      const parentExists = await this.eventsService.validateEventExists(updateEventDto.parentId);
+      const parentExists = await this.eventsService.validateEventExists(
+        updateEventDto.parentId,
+      );
       if (!parentExists) {
         throw new Error('Parent event not found');
       }
@@ -103,7 +116,7 @@ export class EventsFacadeService {
     // Convert parentId -1 to null
     const processedDto = {
       ...updateEventDto,
-      parentId: updateEventDto.parentId === -1 ? null : updateEventDto.parentId
+      parentId: updateEventDto.parentId === -1 ? null : updateEventDto.parentId,
     };
 
     return this.eventsService.updateEvent(id, processedDto);
@@ -167,19 +180,29 @@ export class EventsFacadeService {
     return this.achievementsService.getAchievementsByEventId(eventId);
   }
 
-  async createAchievement(eventId: number, createAchievementDto: CreateAchievementDto): Promise<Achievement> {
+  async createAchievement(
+    eventId: number,
+    createAchievementDto: CreateAchievementDto,
+  ): Promise<Achievement> {
     const eventExists = await this.eventsService.validateEventExists(eventId);
     if (!eventExists) {
       throw new Error('Event not found');
     }
 
-    return this.achievementsService.createAchievement(eventId, createAchievementDto);
+    return this.achievementsService.createAchievement(
+      eventId,
+      createAchievementDto,
+    );
   }
 
-  async updateAchievement(eventId: number, id: number, updateAchievementDto: UpdateAchievementDto): Promise<Achievement> {
+  async updateAchievement(
+    eventId: number,
+    id: number,
+    updateAchievementDto: UpdateAchievementDto,
+  ): Promise<Achievement> {
     const [eventExists, achievementExists] = await Promise.all([
       this.eventsService.validateEventExists(eventId),
-      this.achievementsService.validateAchievementExists(id)
+      this.achievementsService.validateAchievementExists(id),
     ]);
 
     if (!eventExists) {
@@ -192,12 +215,20 @@ export class EventsFacadeService {
     return this.achievementsService.updateAchievement(id, updateAchievementDto);
   }
 
-  async getParticipantProgress(participantId: number): Promise<AchievementWithProgress[]> {
+  async getParticipantProgress(
+    participantId: number,
+  ): Promise<AchievementWithProgress[]> {
     return this.achievementsService.getParticipantProgress(participantId);
   }
 
-  async getParticipantProgressByEvent(participantId: number, eventId: number): Promise<AchievementWithProgress[]> {
-    return this.achievementsService.getParticipantProgressByEvent(participantId, eventId);
+  async getParticipantProgressByEvent(
+    participantId: number,
+    eventId: number,
+  ): Promise<AchievementWithProgress[]> {
+    return this.achievementsService.getParticipantProgressByEvent(
+      participantId,
+      eventId,
+    );
   }
 
   // ==================== TEAM MANAGEMENT ====================
@@ -226,9 +257,9 @@ export class EventsFacadeService {
 
     // Get raw team members data
     const rawMembers = await this.teamsService.getTeamMembers(teamId);
-    
+
     // Transform to match TeamMember entity
-    return rawMembers.map(member => ({
+    return rawMembers.map((member) => ({
       userId: member.userId || 0,
       teamId: member.teamId,
       participantId: member.participantId,
@@ -237,11 +268,14 @@ export class EventsFacadeService {
       avatar: member.avatar,
       role: member.role,
       joinedAt: member.joinedAt,
-      updatedAt: member.updatedAt
+      updatedAt: member.updatedAt,
     }));
   }
 
-  async createTeam(eventId: number, createTeamDto: CreateTeamDto): Promise<Team> {
+  async createTeam(
+    eventId: number,
+    createTeamDto: CreateTeamDto,
+  ): Promise<Team> {
     const eventExists = await this.eventsService.validateEventExists(eventId);
     if (!eventExists) {
       throw new Error('Event not found');
@@ -250,11 +284,15 @@ export class EventsFacadeService {
     return this.teamsService.createTeam(eventId, createTeamDto);
   }
 
-  async updateTeam(eventId: number, teamId: number, updateTeamDto: UpdateTeamDto): Promise<Team> {
+  async updateTeam(
+    eventId: number,
+    teamId: number,
+    updateTeamDto: UpdateTeamDto,
+  ): Promise<Team> {
     const [eventExists, teamExists, teamInEvent] = await Promise.all([
       this.eventsService.validateEventExists(eventId),
       this.teamsService.validateTeamExists(teamId),
-      this.teamsService.validateTeamInEvent(teamId, eventId)
+      this.teamsService.validateTeamInEvent(teamId, eventId),
     ]);
 
     if (!eventExists) {
@@ -270,11 +308,15 @@ export class EventsFacadeService {
     return this.teamsService.updateTeam(teamId, updateTeamDto);
   }
 
-  async joinTeam(eventId: number, teamId: number, joinTeamDto: JoinTeamDto): Promise<{ success: boolean }> {
+  async joinTeam(
+    eventId: number,
+    teamId: number,
+    joinTeamDto: JoinTeamDto,
+  ): Promise<{ success: boolean }> {
     const [eventExists, teamExists, teamInEvent] = await Promise.all([
       this.eventsService.validateEventExists(eventId),
       this.teamsService.validateTeamExists(teamId),
-      this.teamsService.validateTeamInEvent(teamId, eventId)
+      this.teamsService.validateTeamInEvent(teamId, eventId),
     ]);
 
     if (!eventExists) {
@@ -287,15 +329,23 @@ export class EventsFacadeService {
       throw new Error('Team does not belong to this event');
     }
 
-    await this.teamsService.joinTeam(eventId, teamId, joinTeamDto.participantId);
+    await this.teamsService.joinTeam(
+      eventId,
+      teamId,
+      joinTeamDto.participantId,
+    );
     return { success: true };
   }
 
-  async leaveTeam(eventId: number, teamId: number, userId: number): Promise<{ success: boolean }> {
+  async leaveTeam(
+    eventId: number,
+    teamId: number,
+    userId: number,
+  ): Promise<{ success: boolean }> {
     const [eventExists, teamExists, teamInEvent] = await Promise.all([
       this.eventsService.validateEventExists(eventId),
       this.teamsService.validateTeamExists(teamId),
-      this.teamsService.validateTeamInEvent(teamId, eventId)
+      this.teamsService.validateTeamInEvent(teamId, eventId),
     ]);
 
     if (!eventExists) {
@@ -313,7 +363,10 @@ export class EventsFacadeService {
   }
 
   // ==================== PARTICIPANT MANAGEMENT ====================
-  async joinEvent(eventId: number, joinEventDto: JoinEventDto): Promise<{ success: boolean }> {
+  async joinEvent(
+    eventId: number,
+    joinEventDto: JoinEventDto,
+  ): Promise<{ success: boolean }> {
     // First, verify the event exists
     const eventExists = await this.eventsService.validateEventExists(eventId);
     if (!eventExists) {
@@ -321,15 +374,26 @@ export class EventsFacadeService {
     }
 
     // Get or create participant
-    const participant = await this.participantsService.getOrCreateParticipantByUserId(joinEventDto.userId);
+    const participant =
+      await this.participantsService.getOrCreateParticipantByUserId(
+        joinEventDto.userId,
+      );
 
     // Check if already participating
-    const existingParticipation = await this.participantsService.validateEventParticipation(participant.id, eventId);
+    const existingParticipation =
+      await this.participantsService.validateEventParticipation(
+        participant.id,
+        eventId,
+      );
     if (existingParticipation) {
       throw new Error('Participant is already registered for this event');
     }
 
-    await this.participantsService.joinEvent(eventId, participant.id, joinEventDto);
+    await this.participantsService.joinEvent(
+      eventId,
+      participant.id,
+      joinEventDto,
+    );
     return { success: true };
   }
 
@@ -340,10 +404,11 @@ export class EventsFacadeService {
     }
 
     // Get raw participants data
-    const rawParticipants = await this.participantsService.getEventParticipants(eventId);
-    
+    const rawParticipants =
+      await this.participantsService.getEventParticipants(eventId);
+
     // Transform to match Participant entity
-    return rawParticipants.map(participant => ({
+    return rawParticipants.map((participant) => ({
       id: participant.id,
       eventId: participant.eventId,
       participantId: participant.participantId,
@@ -353,7 +418,7 @@ export class EventsFacadeService {
       status: participant.status,
       comment: participant.comment,
       createdAt: participant.createdAt,
-      updatedAt: participant.updatedAt
+      updatedAt: participant.updatedAt,
     }));
   }
 
@@ -366,10 +431,15 @@ export class EventsFacadeService {
   }
 
   // ==================== PROGRESS MANAGEMENT ====================
-  async updateProgress(eventId: number, updateProgressDto: UpdateProgressDto): Promise<{ success: boolean }> {
+  async updateProgress(
+    eventId: number,
+    updateProgressDto: UpdateProgressDto,
+  ): Promise<{ success: boolean }> {
     const [eventExists, achievementExists] = await Promise.all([
       this.eventsService.validateEventExists(eventId),
-      this.achievementsService.validateAchievementExists(updateProgressDto.achievementId)
+      this.achievementsService.validateAchievementExists(
+        updateProgressDto.achievementId,
+      ),
     ]);
 
     if (!eventExists) {
@@ -380,10 +450,11 @@ export class EventsFacadeService {
     }
 
     // Validate participant is in the event
-    const participantInEvent = await this.participantsService.validateEventParticipation(
-      updateProgressDto.participantId, 
-      eventId
-    );
+    const participantInEvent =
+      await this.participantsService.validateEventParticipation(
+        updateProgressDto.participantId,
+        eventId,
+      );
     if (!participantInEvent) {
       throw new Error('Participant is not registered for this event');
     }
@@ -392,9 +463,9 @@ export class EventsFacadeService {
       updateProgressDto.participantId,
       updateProgressDto.achievementId,
       updateProgressDto.progress,
-      updateProgressDto.teamId
+      updateProgressDto.teamId,
     );
-    
+
     return { success: true };
   }
 
@@ -419,23 +490,30 @@ export class EventsFacadeService {
     }
 
     // Get raw leaderboard data
-    const rawLeaderboard = await this.leaderboardsService.getTeamLeaderboard(eventId);
-    
+    const rawLeaderboard =
+      await this.leaderboardsService.getTeamLeaderboard(eventId);
+
     // Transform to match TeamLeaderboardEntry entity
-    return rawLeaderboard.map(entry => ({
+    return rawLeaderboard.map((entry) => ({
       teamId: entry.teamId,
       teamName: entry.teamName,
       teamTag: entry.teamTag,
       totalPoints: entry.score, // Map score to totalPoints
       score: entry.score,
       memberCount: entry.memberCount,
-      rank: entry.rank
+      rank: entry.rank,
     }));
   }
 
   // ==================== ADDITIONAL LEADERBOARD FEATURES ====================
-  async getParticipantRanking(participantId: number, eventId?: number): Promise<any> {
-    return this.leaderboardsService.getParticipantRanking(participantId, eventId);
+  async getParticipantRanking(
+    participantId: number,
+    eventId?: number,
+  ): Promise<any> {
+    return this.leaderboardsService.getParticipantRanking(
+      participantId,
+      eventId,
+    );
   }
 
   async getTopAchievers(limit: number = 10, eventId?: number): Promise<any[]> {
@@ -449,7 +527,11 @@ export class EventsFacadeService {
     return this.leaderboardsService.getTopAchievers(limit, eventId);
   }
 
-  async getLeaderboardWithPagination(page: number = 1, pageSize: number = 20, eventId?: number): Promise<any> {
+  async getLeaderboardWithPagination(
+    page: number = 1,
+    pageSize: number = 20,
+    eventId?: number,
+  ): Promise<any> {
     if (eventId) {
       const eventExists = await this.eventsService.validateEventExists(eventId);
       if (!eventExists) {
@@ -457,10 +539,17 @@ export class EventsFacadeService {
       }
     }
 
-    return this.leaderboardsService.getLeaderboardWithPagination(page, pageSize, eventId);
+    return this.leaderboardsService.getLeaderboardWithPagination(
+      page,
+      pageSize,
+      eventId,
+    );
   }
 
-  async getRecentAchievements(limit: number = 5, eventId?: number): Promise<any[]> {
+  async getRecentAchievements(
+    limit: number = 5,
+    eventId?: number,
+  ): Promise<any[]> {
     if (eventId) {
       const eventExists = await this.eventsService.validateEventExists(eventId);
       if (!eventExists) {

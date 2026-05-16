@@ -1,113 +1,113 @@
 import { ApiProperty, getSchemaPath } from '@nestjs/swagger';
 
 export class EvolutionMethod {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Evolution target',
-    example: 'Ninetales form:base'
+    example: 'Ninetales form:base',
   })
   to: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Evolution type',
-    example: 'interact'
+    example: 'interact',
   })
   evoType: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Evolution conditions',
     type: [String],
-    example: []
+    example: [],
   })
   conditions: string[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Required item for evolution',
     required: false,
-    example: { itemID: 'pixelmon:fire_stone' }
+    example: { itemID: 'pixelmon:fire_stone' },
   })
   item?: {
     itemID: string;
   };
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Moves learned upon evolution',
     type: [String],
     required: false,
-    example: ['Dazzling Gleam']
+    example: ['Dazzling Gleam'],
   })
   moves?: string[];
 }
 
 export class EvolutionNode {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Pokémon name',
-    example: 'Vulpix'
+    example: 'Vulpix',
   })
   pkm: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Pokédex number',
-    example: 37
+    example: 37,
   })
   dex: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Form index',
     example: 1,
-    required: false
+    required: false,
   })
   index?: number | null;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Evolution methods',
     type: [EvolutionMethod],
-    required: false
+    required: false,
   })
   methods?: EvolutionMethod[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Child evolutions',
     type: 'object',
     additionalProperties: { $ref: '#/components/schemas/EvolutionNode' },
-    example: {}
+    example: {},
   })
   evos: { [key: string]: EvolutionNode };
 }
 
 export class EvolutionTree {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Maximum depth of the evolution tree',
-    example: 2
+    example: 2,
   })
   depth: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Evolution tree structure',
     type: 'object',
-    additionalProperties: { $ref:  getSchemaPath(EvolutionNode) },
+    additionalProperties: { $ref: getSchemaPath(EvolutionNode) },
     example: {
-      "Vulpix_base": {
-        "pkm": "Vulpix",
-        "dex": 37,
-        "index": null,
-        "evos": {
-          "ninetales_base": {
-            "pkm": "ninetales",
-            "dex": 38,
-            "index": 1,
-            "evos": {},
-            "methods": [
+      Vulpix_base: {
+        pkm: 'Vulpix',
+        dex: 37,
+        index: null,
+        evos: {
+          ninetales_base: {
+            pkm: 'ninetales',
+            dex: 38,
+            index: 1,
+            evos: {},
+            methods: [
               {
-                "item": { "itemID": "pixelmon:fire_stone" },
-                "to": "Ninetales form:base",
-                "conditions": [],
-                "evoType": "interact"
-              }
-            ]
-          }
-        }
-      }
-    }
+                item: { itemID: 'pixelmon:fire_stone' },
+                to: 'Ninetales form:base',
+                conditions: [],
+                evoType: 'interact',
+              },
+            ],
+          },
+        },
+      },
+    },
   })
   tree: { [key: string]: EvolutionNode };
 }

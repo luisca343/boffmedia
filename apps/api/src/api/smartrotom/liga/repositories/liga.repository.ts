@@ -2,11 +2,11 @@ import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { eq, and, desc, asc, inArray } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import { 
+import {
   smartRotomReplays,
   smartRotomUserReplays,
   SmartRotomReplay,
-  SmartRotomUserReplay
+  SmartRotomUserReplay,
 } from '@/_db/schema/SmartRotom';
 
 export interface LeagueReplay {
@@ -62,83 +62,88 @@ export class LigaRepository {
   // ==================== REPLAY OPERATIONS ====================
 
   async findReplayById(id: number): Promise<LeagueReplay | null> {
-    const result = await this.db.select({
-      id: smartRotomReplays.id,
-      team1: smartRotomReplays.team1,
-      team2: smartRotomReplays.team2,
-      replay: smartRotomReplays.replay,
-      winner: smartRotomReplays.winner,
-      side1: smartRotomReplays.side1,
-      side2: smartRotomReplays.side2,
-      createdAt: smartRotomReplays.createdAt,
-      updatedAt: smartRotomReplays.updatedAt
-    })
-    .from(smartRotomReplays)
-    .where(eq(smartRotomReplays.id, id))
-    .limit(1);
+    const result = await this.db
+      .select({
+        id: smartRotomReplays.id,
+        team1: smartRotomReplays.team1,
+        team2: smartRotomReplays.team2,
+        replay: smartRotomReplays.replay,
+        winner: smartRotomReplays.winner,
+        side1: smartRotomReplays.side1,
+        side2: smartRotomReplays.side2,
+        createdAt: smartRotomReplays.createdAt,
+        updatedAt: smartRotomReplays.updatedAt,
+      })
+      .from(smartRotomReplays)
+      .where(eq(smartRotomReplays.id, id))
+      .limit(1);
 
     return result[0] || null;
   }
 
   async findRecentReplays(limit: number = 10): Promise<LeagueReplay[]> {
-    return this.db.select({
-      id: smartRotomReplays.id,
-      team1: smartRotomReplays.team1,
-      team2: smartRotomReplays.team2,
-      replay: smartRotomReplays.replay,
-      winner: smartRotomReplays.winner,
-      side1: smartRotomReplays.side1,
-      side2: smartRotomReplays.side2,
-      createdAt: smartRotomReplays.createdAt,
-      updatedAt: smartRotomReplays.updatedAt
-    })
-    .from(smartRotomReplays)
-    .orderBy(desc(smartRotomReplays.createdAt))
-    .limit(limit);
+    return this.db
+      .select({
+        id: smartRotomReplays.id,
+        team1: smartRotomReplays.team1,
+        team2: smartRotomReplays.team2,
+        replay: smartRotomReplays.replay,
+        winner: smartRotomReplays.winner,
+        side1: smartRotomReplays.side1,
+        side2: smartRotomReplays.side2,
+        createdAt: smartRotomReplays.createdAt,
+        updatedAt: smartRotomReplays.updatedAt,
+      })
+      .from(smartRotomReplays)
+      .orderBy(desc(smartRotomReplays.createdAt))
+      .limit(limit);
   }
 
   async findReplaysByPlayer(playerUuid: string): Promise<LeagueReplay[]> {
-    return this.db.select({
-      id: smartRotomReplays.id,
-      team1: smartRotomReplays.team1,
-      team2: smartRotomReplays.team2,
-      replay: smartRotomReplays.replay,
-      winner: smartRotomReplays.winner,
-      side1: smartRotomReplays.side1,
-      side2: smartRotomReplays.side2,
-      createdAt: smartRotomReplays.createdAt,
-      updatedAt: smartRotomReplays.updatedAt
-    })
-    .from(smartRotomReplays)
-    .innerJoin(
-      smartRotomUserReplays,
-      eq(smartRotomReplays.id, smartRotomUserReplays.replayId)
-    )
-    .where(eq(smartRotomUserReplays.uuid, playerUuid))
-    .orderBy(desc(smartRotomReplays.createdAt));
+    return this.db
+      .select({
+        id: smartRotomReplays.id,
+        team1: smartRotomReplays.team1,
+        team2: smartRotomReplays.team2,
+        replay: smartRotomReplays.replay,
+        winner: smartRotomReplays.winner,
+        side1: smartRotomReplays.side1,
+        side2: smartRotomReplays.side2,
+        createdAt: smartRotomReplays.createdAt,
+        updatedAt: smartRotomReplays.updatedAt,
+      })
+      .from(smartRotomReplays)
+      .innerJoin(
+        smartRotomUserReplays,
+        eq(smartRotomReplays.id, smartRotomUserReplays.replayId),
+      )
+      .where(eq(smartRotomUserReplays.uuid, playerUuid))
+      .orderBy(desc(smartRotomReplays.createdAt));
   }
 
-  async findReplaysByPlayers(player1: string, player2: string): Promise<LeagueReplay[]> {
-    return this.db.select({
-      id: smartRotomReplays.id,
-      team1: smartRotomReplays.team1,
-      team2: smartRotomReplays.team2,
-      replay: smartRotomReplays.replay,
-      winner: smartRotomReplays.winner,
-      side1: smartRotomReplays.side1,
-      side2: smartRotomReplays.side2,
-      createdAt: smartRotomReplays.createdAt,
-      updatedAt: smartRotomReplays.updatedAt
-    })
-    .from(smartRotomReplays)
-    .innerJoin(
-      smartRotomUserReplays,
-      eq(smartRotomReplays.id, smartRotomUserReplays.replayId)
-    )
-    .where(
-      inArray(smartRotomUserReplays.uuid, [player1, player2])
-    )
-    .orderBy(desc(smartRotomReplays.createdAt));
+  async findReplaysByPlayers(
+    player1: string,
+    player2: string,
+  ): Promise<LeagueReplay[]> {
+    return this.db
+      .select({
+        id: smartRotomReplays.id,
+        team1: smartRotomReplays.team1,
+        team2: smartRotomReplays.team2,
+        replay: smartRotomReplays.replay,
+        winner: smartRotomReplays.winner,
+        side1: smartRotomReplays.side1,
+        side2: smartRotomReplays.side2,
+        createdAt: smartRotomReplays.createdAt,
+        updatedAt: smartRotomReplays.updatedAt,
+      })
+      .from(smartRotomReplays)
+      .innerJoin(
+        smartRotomUserReplays,
+        eq(smartRotomReplays.id, smartRotomUserReplays.replayId),
+      )
+      .where(inArray(smartRotomUserReplays.uuid, [player1, player2]))
+      .orderBy(desc(smartRotomReplays.createdAt));
   }
 
   // ==================== STATISTICS OPERATIONS ====================
@@ -150,9 +155,11 @@ export class LigaRepository {
     winRate: number;
   }> {
     const playerReplays = await this.findReplaysByPlayer(playerUuid);
-    
+
     const totalMatches = playerReplays.length;
-    const wins = playerReplays.filter(replay => replay.winner === playerUuid).length;
+    const wins = playerReplays.filter(
+      (replay) => replay.winner === playerUuid,
+    ).length;
     const losses = totalMatches - wins;
     const winRate = totalMatches > 0 ? (wins / totalMatches) * 100 : 0;
 
@@ -160,7 +167,7 @@ export class LigaRepository {
       totalMatches,
       wins,
       losses,
-      winRate: Math.round(winRate * 100) / 100
+      winRate: Math.round(winRate * 100) / 100,
     };
   }
 
@@ -168,19 +175,21 @@ export class LigaRepository {
     // This would require a more complex query in a real implementation
     // For now, we'll simulate the logic
     const allReplays = await this.findRecentReplays(1000);
-    const playerStats: { [key: string]: { wins: number; losses: number; totalMatches: number } } = {};
+    const playerStats: {
+      [key: string]: { wins: number; losses: number; totalMatches: number };
+    } = {};
 
     // Count stats for each player
     for (const replay of allReplays) {
       const players = [replay.side1, replay.side2].filter(Boolean);
-      
+
       for (const player of players) {
         if (!playerStats[player]) {
           playerStats[player] = { wins: 0, losses: 0, totalMatches: 0 };
         }
-        
+
         playerStats[player].totalMatches++;
-        
+
         if (replay.winner === player) {
           playerStats[player].wins++;
         } else {
@@ -195,11 +204,12 @@ export class LigaRepository {
         player,
         wins: stats.wins,
         losses: stats.losses,
-        winRate: stats.totalMatches > 0 ? (stats.wins / stats.totalMatches) * 100 : 0,
+        winRate:
+          stats.totalMatches > 0 ? (stats.wins / stats.totalMatches) * 100 : 0,
         points: stats.wins * 3 + stats.losses * 1, // 3 points for win, 1 for participation
-        rank: 0 // Will be set after sorting
+        rank: 0, // Will be set after sorting
       }))
-      .filter(standing => standing.wins + standing.losses >= 5) // Minimum 5 matches
+      .filter((standing) => standing.wins + standing.losses >= 5) // Minimum 5 matches
       .sort((a, b) => {
         if (b.winRate !== a.winRate) return b.winRate - a.winRate;
         if (b.wins !== a.wins) return b.wins - a.wins;

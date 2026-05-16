@@ -7,6 +7,6 @@ import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
   controllers: [NetfluisController],
   providers: [NetfluisService],
   exports: [NetfluisService],
-  imports: [DrizzleModule]
+  imports: [DrizzleModule],
 })
 export class NetfluisModule {}

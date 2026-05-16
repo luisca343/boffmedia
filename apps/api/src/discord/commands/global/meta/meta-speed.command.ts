@@ -12,14 +12,15 @@ import { typeColor, typeEmoji } from './meta.util';
 
 // ── Speed calc (level 50, 31 IVs) ────────────────────────────────────────────
 
-const SPEED_PLUS  = new Set(['jolly', 'timid', 'hasty', 'naive']);
+const SPEED_PLUS = new Set(['jolly', 'timid', 'hasty', 'naive']);
 const SPEED_MINUS = new Set(['brave', 'quiet', 'relaxed', 'sassy']);
 
 function calcSpe(baseSpe: number, evSpe: number, nature: string): number {
   const lower = nature.toLowerCase();
-  const mod   = SPEED_PLUS.has(lower) ? 1.1 : SPEED_MINUS.has(lower) ? 0.9 : 1.0;
+  const mod = SPEED_PLUS.has(lower) ? 1.1 : SPEED_MINUS.has(lower) ? 0.9 : 1.0;
   return Math.floor(
-    (Math.floor((2 * baseSpe + 31 + Math.floor(evSpe / 4)) * 50 / 100) + 5) * mod,
+    (Math.floor(((2 * baseSpe + 31 + Math.floor(evSpe / 4)) * 50) / 100) + 5) *
+      mod,
   );
 }
 
@@ -28,26 +29,31 @@ function parseEvSpe(spread?: string): number {
   return parseInt(spread.split('/')[5] ?? '0', 10) || 0;
 }
 
-function fmtSpeDetail(baseSpe: number, evSpe: number, nature: string, isFallback: boolean): string {
-  const lower  = nature.toLowerCase();
+function fmtSpeDetail(
+  baseSpe: number,
+  evSpe: number,
+  nature: string,
+  isFallback: boolean,
+): string {
+  const lower = nature.toLowerCase();
   const isPlus = SPEED_PLUS.has(lower);
-  let inner    = `${baseSpe} base`;
-  if (evSpe > 0 && isPlus)  inner += ` · ${evSpe}+ ${nature}`;
-  else if (evSpe > 0)       inner += ` · ${evSpe} EVs`;
-  else if (isPlus)          inner += ` · +${nature}`;
+  let inner = `${baseSpe} base`;
+  if (evSpe > 0 && isPlus) inner += ` · ${evSpe}+ ${nature}`;
+  else if (evSpe > 0) inner += ` · ${evSpe} EVs`;
+  else if (isPlus) inner += ` · +${nature}`;
   if (isFallback) inner += ' ≈';
   return `*(${inner})*`;
 }
 
 interface SpeedRow {
-  speciesId:  string;
-  rank:       number;
-  name:       string;
-  types:      string[];
-  baseSpe:    number;
-  metaSpe:    number;
-  nature:     string;
-  evSpe:      number;
+  speciesId: string;
+  rank: number;
+  name: string;
+  types: string[];
+  baseSpe: number;
+  metaSpe: number;
+  nature: string;
+  evSpe: number;
   isFallback: boolean;
 }
 
@@ -56,10 +62,10 @@ interface SpeedRow {
 const PAGE_SIZE = 10;
 
 function buildSpeedPages(
-  rows:        SpeedRow[],
+  rows: SpeedRow[],
   highlightId: string | undefined,
-  regName:     string,
-  source:      string,
+  regName: string,
+  source: string,
 ): EmbedBuilder[] {
   const total = Math.ceil(rows.length / PAGE_SIZE);
   const color = typeColor(rows[0]?.types ?? ['normal']);
@@ -67,9 +73,11 @@ function buildSpeedPages(
   return Array.from({ length: total }, (_, i) => {
     const slice = rows.slice(i * PAGE_SIZE, (i + 1) * PAGE_SIZE);
     const lines = slice.map((row, localIdx) => {
-      const globalIdx  = i * PAGE_SIZE + localIdx;
+      const globalIdx = i * PAGE_SIZE + localIdx;
       const isHighlight = row.speciesId === highlightId;
-      const prefix      = isHighlight ? '→' : `\`#${String(globalIdx + 1).padStart(2)}\``;
+      const prefix = isHighlight
+        ? '→'
+        : `\`#${String(globalIdx + 1).padStart(2)}\``;
       return `${prefix} ${typeEmoji(row.types)} **${row.name}** — **${row.metaSpe}** ${fmtSpeDetail(row.baseSpe, row.evSpe, row.nature, row.isFallback)}`;
     });
 
@@ -94,20 +102,29 @@ export class MetaSpeedCommand {
   ) {}
 
   @UseInterceptors(MetaVgcAutocompleteInterceptor)
-  @Subcommand({ name: 'speed', description: 'Full paginated speed tier table for a regulation' })
+  @Subcommand({
+    name: 'speed',
+    description: 'Full paginated speed tier table for a regulation',
+  })
   public async onSpeed(
     @Context() [interaction]: [ChatInputCommandInteraction],
     @Options() { regulation, compare }: MetaSpeedDto,
   ) {
     await interaction.deferReply();
 
-    const reg = (await this.metaFacade.getRegulations()).find((r) => r.id === regulation);
+    const reg = (await this.metaFacade.getRegulations()).find(
+      (r) => r.id === regulation,
+    );
     if (!reg) {
       await interaction.editReply(`Unknown regulation \`${regulation}\`.`);
       return;
     }
 
-    const source = reg.vgcPastesGid ? 'VGCPastes' : reg.formatId ? 'Smogon Ladder' : 'Limitless';
+    const source = reg.vgcPastesGid
+      ? 'VGCPastes'
+      : reg.formatId
+        ? 'Smogon Ladder'
+        : 'Limitless';
 
     // ── Fetch all details at once ─────────────────────────────────────────────
     let allDetails: PokemonUsageDetail[];
@@ -117,19 +134,24 @@ export class MetaSpeedCommand {
         () => this.metaFacade.getUnifiedUsageDetailList(regulation),
       );
     } catch {
-      await interaction.editReply(`No usage data available for **${reg.name}** yet.`);
+      await interaction.editReply(
+        `No usage data available for **${reg.name}** yet.`,
+      );
       return;
     }
 
     // ── Resolve compare entry ─────────────────────────────────────────────────
     let compareSpeciesId: string | undefined;
     if (compare) {
-      const q     = compare.toLowerCase();
+      const q = compare.toLowerCase();
       const match = allDetails.find(
-        (d) => d.speciesName.toLowerCase() === q || d.speciesId.toLowerCase() === q,
+        (d) =>
+          d.speciesName.toLowerCase() === q || d.speciesId.toLowerCase() === q,
       );
       if (!match) {
-        await interaction.editReply(`**${compare}** not found in **${reg.name}** usage data.`);
+        await interaction.editReply(
+          `**${compare}** not found in **${reg.name}** usage data.`,
+        );
         return;
       }
       compareSpeciesId = match.speciesId;
@@ -139,18 +161,30 @@ export class MetaSpeedCommand {
     const rows: SpeedRow[] = allDetails
       .filter((d) => d.baseStats.spe > 0)
       .map((d) => {
-        const top        = d.spreads?.[0];
+        const top = d.spreads?.[0];
         const isFallback = !top?.spread;
-        const nature     = top?.nature ?? 'Hardy';
-        const evSpe      = parseEvSpe(top?.spread);
-        const metaSpe    = calcSpe(d.baseStats.spe, evSpe, nature);
-        return { speciesId: d.speciesId, rank: d.rank, name: d.speciesName, types: d.types, baseSpe: d.baseStats.spe, metaSpe, nature, evSpe, isFallback };
+        const nature = top?.nature ?? 'Hardy';
+        const evSpe = parseEvSpe(top?.spread);
+        const metaSpe = calcSpe(d.baseStats.spe, evSpe, nature);
+        return {
+          speciesId: d.speciesId,
+          rank: d.rank,
+          name: d.speciesName,
+          types: d.types,
+          baseSpe: d.baseStats.spe,
+          metaSpe,
+          nature,
+          evSpe,
+          isFallback,
+        };
       });
 
     rows.sort((a, b) => b.metaSpe - a.metaSpe || a.rank - b.rank);
 
     if (rows.length === 0) {
-      await interaction.editReply(`No speed data available for **${reg.name}**.`);
+      await interaction.editReply(
+        `No speed data available for **${reg.name}**.`,
+      );
       return;
     }
 
@@ -163,12 +197,13 @@ export class MetaSpeedCommand {
       if (idx >= 0) startPage = Math.floor(idx / PAGE_SIZE);
     }
 
-    const iid  = interaction.id;
-    let   page = startPage;
+    const iid = interaction.id;
+    let page = startPage;
 
     const msg = await interaction.editReply({
-      embeds:     [pages[page]],
-      components: pages.length > 1 ? [buildNavRow(iid, page, pages.length)] : [],
+      embeds: [pages[page]],
+      components:
+        pages.length > 1 ? [buildNavRow(iid, page, pages.length)] : [],
     });
 
     if (pages.length <= 1) return;
@@ -176,7 +211,8 @@ export class MetaSpeedCommand {
     const collector = msg.createMessageComponentCollector({
       filter: (i) =>
         i.user.id === interaction.user.id &&
-        (i.customId === `meta_${iid}_prev` || i.customId === `meta_${iid}_next`),
+        (i.customId === `meta_${iid}_prev` ||
+          i.customId === `meta_${iid}_next`),
       time: COLLECTOR_TTL_MS,
     });
 
@@ -184,7 +220,7 @@ export class MetaSpeedCommand {
       page = btn.customId === `meta_${iid}_prev` ? page - 1 : page + 1;
       page = Math.max(0, Math.min(pages.length - 1, page));
       await btn.update({
-        embeds:     [pages[page]],
+        embeds: [pages[page]],
         components: [buildNavRow(iid, page, pages.length)],
       });
     });

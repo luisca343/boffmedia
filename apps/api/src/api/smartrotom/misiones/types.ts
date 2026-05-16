@@ -1,4 +1,4 @@
-import { text } from "stream/consumers";
+import { text } from 'stream/consumers';
 
 export enum QuestStatus {
   ACTIVE = 'ACTIVE',
@@ -71,16 +71,16 @@ export interface QuestData {
 }
 
 export interface NPC {
-  id: number
-  name: string
-  text: string
-  questId: number
-  requirements: IQuestRequirements
+  id: number;
+  name: string;
+  text: string;
+  questId: number;
+  requirements: IQuestRequirements;
 }
 
 export interface QuestSystemData {
-  quests: QuestData[]
-  categories: IQuestCategory[]
-  dialogs: IDialogue[]
-  npcs: NPC[]
+  quests: QuestData[];
+  categories: IQuestCategory[];
+  dialogs: IDialogue[];
+  npcs: NPC[];
 }

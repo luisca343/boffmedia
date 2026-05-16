@@ -1,5 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsArray, IsString, IsOptional, IsInt, Min, Max } from 'class-validator';
+import {
+  IsEnum,
+  IsArray,
+  IsString,
+  IsOptional,
+  IsInt,
+  Min,
+  Max,
+} from 'class-validator';
 import { MyrientConsole } from '../enums/myrient-console.enum';
 
 export class DownloadAllGamesDto {
@@ -12,7 +20,8 @@ export class DownloadAllGamesDto {
   console: MyrientConsole;
 
   @ApiProperty({
-    description: 'Region filters. A game is included when its filename contains ANY of these strings (case-insensitive). Leave empty to download everything.',
+    description:
+      'Region filters. A game is included when its filename contains ANY of these strings (case-insensitive). Leave empty to download everything.',
     type: [String],
     example: ['Europe'],
     required: false,
@@ -23,7 +32,8 @@ export class DownloadAllGamesDto {
   regions?: string[];
 
   @ApiProperty({
-    description: 'Maximum number of concurrent downloads (1–5). Lower values are kinder to the server.',
+    description:
+      'Maximum number of concurrent downloads (1–5). Lower values are kinder to the server.',
     example: 2,
     required: false,
     default: 2,

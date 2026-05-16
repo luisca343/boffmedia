@@ -7,5 +7,5 @@ export enum ElementType {
   POISON = 'poison',
   PARALYSIS = 'paralysis',
   SLEEP = 'sleep',
-  BLAST = 'blast'
+  BLAST = 'blast',
 }

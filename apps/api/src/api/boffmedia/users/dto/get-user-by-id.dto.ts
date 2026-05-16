@@ -1,38 +1,44 @@
 import { BaseDto } from '@api/_utils/dto/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsEmail, IsUUID, IsOptional, IsNumberString } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  IsUUID,
+  IsOptional,
+  IsNumberString,
+} from 'class-validator';
 
 export class GetUserByIdDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'User ID',
-    example: '1'
+    example: '1',
   })
   @IsNumberString()
   id: string;
 }
 
 export class GetUserByUsernameDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Username',
-    example: 'johndoe'
+    example: 'johndoe',
   })
   @IsString()
   username: string;
 }
 
 export class GetUserByEmailDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'User email',
-    example: 'user@example.com'
+    example: 'user@example.com',
   })
   @IsEmail()
   email: string;
 }
 
 export class GetUserByUuidDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'User UUID',
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
   })
   @IsString()
   @IsUUID()
@@ -40,9 +46,9 @@ export class GetUserByUuidDto extends BaseDto {
 }
 
 export class GetUserByGoogleIdDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Google ID',
-    example: 'google_123456789'
+    example: 'google_123456789',
   })
   @IsString()
   googleId: string;

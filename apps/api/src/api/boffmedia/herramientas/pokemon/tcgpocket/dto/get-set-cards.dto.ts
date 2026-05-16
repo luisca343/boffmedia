@@ -3,18 +3,18 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsOptional, IsIn } from 'class-validator';
 
 export class GetSetCardsDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Set ID',
-    example: 'A1'
+    example: 'A1',
   })
   @IsString()
   setId: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Language locale',
     example: 'en',
     enum: ['en', 'es'],
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsIn(['en', 'es'])

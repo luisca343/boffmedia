@@ -10,7 +10,12 @@ import { MangaController } from './manga.controller';
 @Module({
   imports: [LoggerModule, ResponseModule],
   controllers: [MangaController],
-  providers: [NovecoolService, CbzService, MangaDownloadService, MangaFacadeService],
+  providers: [
+    NovecoolService,
+    CbzService,
+    MangaDownloadService,
+    MangaFacadeService,
+  ],
   exports: [MangaFacadeService],
 })
 export class MangaModule {}

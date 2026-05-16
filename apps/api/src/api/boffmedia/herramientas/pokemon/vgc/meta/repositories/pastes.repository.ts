@@ -6,7 +6,9 @@ import { vgcPokepastes, VgcPokepaste, VgcMetaSlot } from '@/_db/schema/Vgc';
 
 @Injectable()
 export class PastesRepository {
-  constructor(@Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>) {}
+  constructor(
+    @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
+  ) {}
 
   async findById(id: number): Promise<VgcPokepaste | null> {
     const [row] = await this.db
@@ -35,14 +37,22 @@ export class PastesRepository {
     return row ?? null;
   }
 
-  async findByFormatId(formatId: string, limit = 500): Promise<Pick<VgcPokepaste, 'id' | 'parsedSlots' | 'rawText' | 'author' | 'title' | 'replicaCode'>[]> {
+  async findByFormatId(
+    formatId: string,
+    limit = 500,
+  ): Promise<
+    Pick<
+      VgcPokepaste,
+      'id' | 'parsedSlots' | 'rawText' | 'author' | 'title' | 'replicaCode'
+    >[]
+  > {
     return this.db
       .select({
-        id:          vgcPokepastes.id,
+        id: vgcPokepastes.id,
         parsedSlots: vgcPokepastes.parsedSlots,
-        rawText:     vgcPokepastes.rawText,
-        author:      vgcPokepastes.author,
-        title:       vgcPokepastes.title,
+        rawText: vgcPokepastes.rawText,
+        author: vgcPokepastes.author,
+        title: vgcPokepastes.title,
         replicaCode: vgcPokepastes.replicaCode,
       })
       .from(vgcPokepastes)
@@ -51,19 +61,25 @@ export class PastesRepository {
   }
 
   /** Update author/title/sourceKey/replicaCode without touching rawText or parsedSlots. */
-  async updateMeta(id: number, meta: {
-    author?:      string | null;
-    title?:       string | null;
-    sourceKey?:   string | null;
-    replicaCode?: string | null;
-  }): Promise<void> {
+  async updateMeta(
+    id: number,
+    meta: {
+      author?: string | null;
+      title?: string | null;
+      sourceKey?: string | null;
+      replicaCode?: string | null;
+    },
+  ): Promise<void> {
     const set: Partial<typeof vgcPokepastes.$inferInsert> = {};
-    if (meta.author      != null) set.author      = meta.author;
-    if (meta.title       != null) set.title       = meta.title;
-    if (meta.sourceKey   != null) set.sourceKey   = meta.sourceKey;
+    if (meta.author != null) set.author = meta.author;
+    if (meta.title != null) set.title = meta.title;
+    if (meta.sourceKey != null) set.sourceKey = meta.sourceKey;
     if (meta.replicaCode != null) set.replicaCode = meta.replicaCode;
     if (Object.keys(set).length === 0) return;
-    await this.db.update(vgcPokepastes).set(set).where(eq(vgcPokepastes.id, id));
+    await this.db
+      .update(vgcPokepastes)
+      .set(set)
+      .where(eq(vgcPokepastes.id, id));
   }
 
   /**
@@ -74,25 +90,25 @@ export class PastesRepository {
    * For truly anonymous inline pastes, omit both keys and rely on the MySQL insertId.
    */
   async upsertPaste(data: {
-    pokepasteId?:  string | null;
-    sourceKey?:    string | null;
-    rawText:       string;
-    parsedSlots:   VgcMetaSlot[];
-    author?:       string | null;
-    title?:        string | null;
-    formatId?:     string | null;
-    replicaCode?:  string | null;
+    pokepasteId?: string | null;
+    sourceKey?: string | null;
+    rawText: string;
+    parsedSlots: VgcMetaSlot[];
+    author?: string | null;
+    title?: string | null;
+    formatId?: string | null;
+    replicaCode?: string | null;
   }): Promise<number> {
     const row = {
-      pokepasteId:  data.pokepasteId  ?? null,
-      sourceKey:    data.sourceKey    ?? null,
-      rawText:      data.rawText,
-      parsedSlots:  JSON.stringify(data.parsedSlots),
-      author:       data.author       ?? null,
-      title:        data.title        ?? null,
-      formatId:     data.formatId     ?? null,
-      replicaCode:  data.replicaCode  ?? null,
-      fetchedAt:    new Date(),
+      pokepasteId: data.pokepasteId ?? null,
+      sourceKey: data.sourceKey ?? null,
+      rawText: data.rawText,
+      parsedSlots: JSON.stringify(data.parsedSlots),
+      author: data.author ?? null,
+      title: data.title ?? null,
+      formatId: data.formatId ?? null,
+      replicaCode: data.replicaCode ?? null,
+      fetchedAt: new Date(),
     };
 
     const result = await this.db
@@ -100,14 +116,14 @@ export class PastesRepository {
       .values(row)
       .onDuplicateKeyUpdate({
         set: {
-          rawText:     row.rawText,
+          rawText: row.rawText,
           parsedSlots: row.parsedSlots,
-          fetchedAt:   row.fetchedAt,
+          fetchedAt: row.fetchedAt,
           // Always overwrite metadata from the importing source so stale values
           // (e.g. pokepast.es scrape artifacts like replica codes in the title) get corrected.
-          ...(row.author      != null && { author:      row.author }),
-          ...(row.title       != null && { title:       row.title }),
-          ...(row.sourceKey   != null && { sourceKey:   row.sourceKey }),
+          ...(row.author != null && { author: row.author }),
+          ...(row.title != null && { title: row.title }),
+          ...(row.sourceKey != null && { sourceKey: row.sourceKey }),
           ...(row.replicaCode != null && { replicaCode: row.replicaCode }),
         },
       });
