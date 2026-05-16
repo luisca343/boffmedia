@@ -15,7 +15,7 @@ export async function getDb(): Promise<AgentDb> {
   const pool = mysql.createPool(url)
 
   await pool.execute(`
-    CREATE TABLE IF NOT EXISTS task_runs (
+    CREATE TABLE IF NOT EXISTS agent_task_runs (
       id VARCHAR(80) PRIMARY KEY,
       status VARCHAR(20) NOT NULL,
       title VARCHAR(255) NOT NULL,
@@ -28,7 +28,7 @@ export async function getDb(): Promise<AgentDb> {
   `)
 
   await pool.execute(`
-    CREATE TABLE IF NOT EXISTS verification_results (
+    CREATE TABLE IF NOT EXISTS agent_verification_results (
       id VARCHAR(80) PRIMARY KEY,
       run_id VARCHAR(80) NOT NULL,
       stage VARCHAR(50) NOT NULL,
