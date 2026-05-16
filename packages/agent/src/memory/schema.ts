@@ -1,4 +1,4 @@
-import { mysqlTable, varchar, text, int, datetime, json } from 'drizzle-orm/mysql-core'
+import { mysqlTable, varchar, text, int, float, datetime, json } from 'drizzle-orm/mysql-core'
 
 export const taskRuns = mysqlTable('agent_task_runs', {
   id: varchar('id', { length: 80 }).primaryKey(),
@@ -21,4 +21,15 @@ export const verificationResults = mysqlTable('agent_verification_results', {
   screenshotPaths: json('screenshot_paths'),
   durationMs: int('duration_ms'),
   createdAt: datetime('created_at').notNull()
+})
+
+export const metricsSnapshots = mysqlTable('agent_metrics_snapshots', {
+  id: varchar('id', { length: 36 }).primaryKey(),
+  runId: varchar('run_id', { length: 80 }).notNull(),
+  capturedAt: datetime('captured_at').notNull(),
+  phase: varchar('phase', { length: 10 }).notNull(),
+  apiErrorRate: float('api_error_rate'),
+  apiP95LatencyMs: float('api_p95_latency_ms'),
+  dbQueriesPerRequest: float('db_queries_per_request'),
+  memoryUsageMb: float('memory_usage_mb')
 })
