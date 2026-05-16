@@ -27,7 +27,10 @@
       "mcp__boff-agent__capture_metrics_baseline",
       "mcp__boff-agent__check_performance_regression",
       "mcp__boff-agent__git_operation",
-      "mcp__boff-agent__sync_openapi_docs"
+      "mcp__boff-agent__sync_openapi_docs",
+      "mcp__boff-agent__detect_structural_changes",
+      "mcp__boff-agent__sync_conventions",
+      "mcp__boff-agent__write_adr"
     ]
   }
 }
