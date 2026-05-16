@@ -11,6 +11,7 @@ import { stablePositionStrategy } from "@/lib/drag-and-drop"
 import { useActiveDragItem, useDndSensors, COLLISION_STRATEGIES, DROP_ANIMATIONS } from '@/lib/dnd-kit-setup'
 import AppSlot from './AppSlot'
 import { App } from "./App"
+import { LayoutGrid } from "lucide-react"
 // Grid configuration - 6 apps per row
 const GRID_COLS = 8
 const GRID_ROWS = 6
@@ -109,6 +110,29 @@ export default function AppGrid({ apps, setApps, className }: AppGridProps) {
           Updating order...
         </motion.div>
       </div>
+    )
+  }
+
+  if (apps.length === 0) {
+    return (
+      <motion.div
+        className="flex flex-col items-center justify-center h-64 gap-4 text-center"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        <LayoutGrid className="w-14 h-14 text-slate-600" />
+        <div>
+          <p className="text-slate-300 text-lg font-semibold">No apps yet</p>
+          <p className="text-slate-500 text-sm mt-1">Add your first app to get started</p>
+        </div>
+        <a
+          href="/smartrotom/admin/apps"
+          className="mt-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded-lg transition-colors"
+        >
+          Add app
+        </a>
+      </motion.div>
     )
   }
 

@@ -9,7 +9,7 @@
     "build": "next build",
     "build:nolint": "next build --no-lint",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint src",
     "test": "npx playwright test",
     "test:trace": "npx playwright test --trace on",
     "test:show": "npx playwright show-report"
