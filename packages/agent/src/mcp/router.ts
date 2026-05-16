@@ -16,8 +16,12 @@ import {
   createBookStackShelf,
   createBookStackBook,
   addBooksToShelf,
-  createBookStackChapter
+  createBookStackChapter,
+  writeAdr,
+  syncConventions
 } from '../tools/bookstack.js'
+import { detectStructuralChanges } from '../tools/structural.js'
+import { ADR_CHAPTER_IDS, CONVENTIONS_PAGE_IDS, TECHNICAL_BOOK_IDS } from '../agent.config.js'
 import {
   createGitLabMR,
   createGitLabIssue,
@@ -88,6 +92,8 @@ taskType: ${taskType}
 3. Make your code changes using your own file editing tools.
 4a. Call run_verification (runId: "${runId}") to run lint + tests. Fix failures before proceeding.
 ${playwrightStep}
+4c. Call detect_structural_changes. If adrRecommended=true, call write_adr with a generated context, decision, and consequences based on the changes you made. Always call sync_conventions after.
+4d. If you touched the NestJS API, call sync_openapi_docs (runId: "${runId}") with the affected module names to keep the BookStack API reference current.
 5. Call save_run (runId: "${runId}", status: "passed" | "failed") to close the task.
 
 Do not skip steps. Do not call save_run before run_verification passes.
@@ -286,6 +292,60 @@ ${bookstackSection}
     async ({ project, status }) => {
       const result = await listBookStackTasks({ project, status })
       return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] }
+    }
+  )
+
+  // ── E5: structural detection + ADR + conventions ────────────────────────
+
+  server.tool(
+    'detect_structural_changes',
+    'Analyse the current git diff to detect new NestJS modules, entities, services, controllers, and schema changes. Call after run_verification passes (step 4c). If adrRecommended=true, follow up with write_adr.',
+    {},
+    async () => {
+      const result = await detectStructuralChanges()
+      return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] }
+    }
+  )
+
+  server.tool(
+    'write_adr',
+    'Write an Architecture Decision Record to BookStack when a run introduces a new module, entity, or schema change. Call only when detect_structural_changes returns adrRecommended=true.',
+    {
+      title: z.string().describe('ADR title — use suggestedAdrTitle from detect_structural_changes or write your own'),
+      context: z.string().describe('Why this decision was needed — the forces at play'),
+      decision: z.string().describe('What was decided and how it was implemented'),
+      consequences: z.string().describe('Trade-offs, risks, and follow-up tasks'),
+      project: z.enum(['boffmedia', 'smartrotom']).describe('Project the ADR belongs to'),
+      runId: z.string().describe('Run ID from begin_task')
+    },
+    async ({ title, context, decision, consequences, project, runId }) => {
+      const result = await writeAdr({
+        bookId: TECHNICAL_BOOK_IDS[project],
+        chapterId: ADR_CHAPTER_IDS[project],
+        title,
+        context,
+        decision,
+        consequences,
+        project,
+        runId
+      })
+      return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] }
+    }
+  )
+
+  server.tool(
+    'sync_conventions',
+    'Sync the repo CONVENTIONS.md to the BookStack conventions page. Call as part of step 4c after detect_structural_changes.',
+    {
+      project: z.enum(['boffmedia', 'smartrotom']).describe('Project to sync conventions for')
+    },
+    async ({ project }) => {
+      const pageId = project === 'boffmedia' ? CONVENTIONS_PAGE_IDS.boffmedia : undefined
+      if (!pageId) {
+        return { content: [{ type: 'text', text: JSON.stringify({ ok: false, reason: 'No conventions page configured for this project' }) }] }
+      }
+      await syncConventions({ bookId: TECHNICAL_BOOK_IDS[project], pageId, project })
+      return { content: [{ type: 'text', text: JSON.stringify({ ok: true }) }] }
     }
   )
 
