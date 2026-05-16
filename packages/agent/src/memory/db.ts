@@ -41,6 +41,19 @@ export async function getDb(): Promise<AgentDb> {
     )
   `)
 
+  await pool.execute(`
+    CREATE TABLE IF NOT EXISTS agent_metrics_snapshots (
+      id VARCHAR(36) PRIMARY KEY,
+      run_id VARCHAR(80) NOT NULL,
+      captured_at DATETIME NOT NULL,
+      phase VARCHAR(10) NOT NULL,
+      api_error_rate FLOAT,
+      api_p95_latency_ms FLOAT,
+      db_queries_per_request FLOAT,
+      memory_usage_mb FLOAT
+    )
+  `)
+
   _db = drizzle(pool, { schema, mode: 'default' }) as AgentDb
   return _db
 }

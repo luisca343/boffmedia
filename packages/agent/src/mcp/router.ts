@@ -8,6 +8,29 @@ import { resolveContext } from '../tools/context.js'
 import { manageEnvironment } from '../tools/environment.js'
 import { seedDatabase } from '../tools/database.js'
 import { getRunHistory, saveRun } from '../memory/repository.js'
+import {
+  fetchBookStackPage,
+  searchBookStack,
+  writeBookStackPage,
+  listBookStackTasks,
+  createBookStackShelf,
+  createBookStackBook,
+  addBooksToShelf,
+  createBookStackChapter
+} from '../tools/bookstack.js'
+import {
+  createGitLabMR,
+  createGitLabIssue,
+  getGitLabPipelineStatus,
+  fetchGitLabIssue
+} from '../tools/gitlab.js'
+import {
+  checkSystemHealth,
+  captureMetricsBaseline,
+  checkPerformanceRegression,
+  getErrorContext
+} from '../tools/grafana.js'
+import { syncOpenApiDocs } from '../tools/openapi.js'
 
 export function registerTools(server: McpServer) {
 
@@ -32,6 +55,25 @@ export function registerTools(server: McpServer) {
         ? `4b. Call run_playwright (runId: "${runId}") — trace + screenshots. Present reviewInstructions to the user before proceeding to step 5.`
         : `4b. Skip run_playwright unless you made UI changes.`
 
+      const bookstackSection = context.bookstackPages.length > 0
+        ? `\n## BookStack context (${context.bookstackPages.length} pages)\n${context.bookstackPages.map(p => `- **${p.title}** (updated ${p.updatedAt})`).join('\n')}`
+        : ''
+
+      const performanceNotes = history
+        .filter(r => r.performanceDelta?.length)
+        .map(r => {
+          const notes = r.performanceDelta!.map(d => {
+            const sign = d.deltaPercent > 0 ? '+' : ''
+            return `${d.metric} ${sign}${d.deltaPercent}% (${d.before.toFixed(1)} → ${d.after.toFixed(1)})`
+          }).join(', ')
+          return `- "${r.title}" → ${r.status}. Performance: ${notes}`
+        })
+        .join('\n')
+
+      const performanceSection = performanceNotes
+        ? `\n## Performance notes from similar past runs\n${performanceNotes}`
+        : ''
+
       const workflow = `
 # Boff Agent — Task Started
 
@@ -52,12 +94,13 @@ Do not skip steps. Do not call save_run before run_verification passes.
 
 ## Prior runs on similar tasks
 ${history.length > 0 ? JSON.stringify(history, null, 2) : 'No prior runs found.'}
-
+${performanceSection}
 ## Codebase context
 Modules: ${context.moduleList.join(', ')}
 Pages: ${context.pageList.join(', ')}
 Conventions: loaded (${context.totalTokenEstimate} token estimate for full context)
 ${context.conventions ? '\n' + context.conventions : ''}
+${bookstackSection}
 `.trim()
 
       return { content: [{ type: 'text', text: workflow }] }
@@ -124,10 +167,10 @@ ${context.conventions ? '\n' + context.conventions : ''}
 
   server.tool(
     'git_operation',
-    'Perform a git operation: create a branch, commit all changes, reset the working tree, or get the current branch name.',
+    'Perform a git operation: create a branch, commit all changes, reset the working tree, get the current branch name, or push to all configured remotes.',
     {
-      action: z.enum(['branch', 'commit', 'reset', 'current_branch']),
-      branchName: z.string().optional().describe('Required for action=branch'),
+      action: z.enum(['branch', 'commit', 'reset', 'current_branch', 'push_mirrors']),
+      branchName: z.string().optional().describe('Required for action=branch and action=push_mirrors'),
       commitMessage: z.string().optional().describe('Required for action=commit')
     },
     async ({ action, branchName, commitMessage }) => {
@@ -138,7 +181,7 @@ ${context.conventions ? '\n' + context.conventions : ''}
 
   server.tool(
     'resolve_context',
-    'Given a task description, return the most relevant files from the codebase. Already called automatically by begin_task — use this only if you need to refresh context mid-task.',
+    'Given a task description, return the most relevant files from the codebase plus matching BookStack documentation pages. Already called automatically by begin_task — use this only if you need to refresh context mid-task.',
     {
       taskDescription: z.string(),
       maxFiles: z.number().default(20)
@@ -183,6 +226,249 @@ ${context.conventions ? '\n' + context.conventions : ''}
     },
     async ({ fixture }) => {
       const result = await seedDatabase({ fixture })
+      return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] }
+    }
+  )
+
+  // ── BookStack tools (E1–E5) ──────────────────────────────────────────────
+
+  server.tool(
+    'fetch_bookstack_page',
+    'Fetch a BookStack page by ID or URL and return its content as clean markdown. Use this to read a spec or documentation page as task input.',
+    {
+      pageId: z.number().optional().describe('BookStack page ID'),
+      url: z.string().optional().describe('Full BookStack page URL — will be resolved to a page ID')
+    },
+    async ({ pageId, url }) => {
+      const result = await fetchBookStackPage({ pageId, url })
+      return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] }
+    }
+  )
+
+  server.tool(
+    'search_bookstack',
+    'Search BookStack pages by query string and optional tag filter. Returns page summaries — use fetch_bookstack_page to get full content.',
+    {
+      query: z.string().describe('Search query'),
+      tags: z.array(z.string()).optional().describe('Optional tag filters (e.g. ["boffmedia", "api-reference"])'),
+      limit: z.number().default(5).describe('Maximum number of results')
+    },
+    async ({ query, tags, limit }) => {
+      const result = await searchBookStack({ query, tags, limit })
+      return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] }
+    }
+  )
+
+  server.tool(
+    'write_bookstack_page',
+    'Create or update a BookStack page with markdown content. Never writes to pages tagged agent:readonly.',
+    {
+      bookId: z.number().describe('BookStack book ID'),
+      chapterId: z.number().optional().describe('Optional chapter ID within the book'),
+      pageId: z.number().optional().describe('If provided, updates the existing page instead of creating a new one'),
+      title: z.string().describe('Page title'),
+      content: z.string().describe('Page content in markdown'),
+      tags: z.array(z.string()).optional().describe('Tags to apply to the page')
+    },
+    async ({ bookId, chapterId, pageId, title, content, tags }) => {
+      const result = await writeBookStackPage({ bookId, chapterId, pageId, title, content, tags })
+      return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] }
+    }
+  )
+
+  server.tool(
+    'list_bookstack_tasks',
+    'List all agent:task pages for a project. Use this to discover pending tasks without being given a specific page URL.',
+    {
+      project: z.enum(['boffmedia', 'smartrotom']),
+      status: z.enum(['pending', 'in-progress', 'done']).optional()
+    },
+    async ({ project, status }) => {
+      const result = await listBookStackTasks({ project, status })
+      return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] }
+    }
+  )
+
+  // ── GitLab tools (E6–E8) ────────────────────────────────────────────────
+
+  server.tool(
+    'create_gitlab_mr',
+    'Create a GitLab merge request after a successful run. The description is built from the task spec, verification results, and optional Playwright trace path.',
+    {
+      sourceBranch: z.string().describe('Branch to merge from'),
+      title: z.string().describe('MR title'),
+      taskSpec: z.string().describe('Task specification summary'),
+      verificationSummary: z.string().describe('Verification results summary'),
+      bookstackPageUrl: z.string().optional().describe('BookStack spec page URL to include in the MR description'),
+      tracePath: z.string().optional().describe('Path to Playwright trace.zip for visual review'),
+      runId: z.string().describe('Run ID from begin_task')
+    },
+    async ({ sourceBranch, title, taskSpec, verificationSummary, bookstackPageUrl, tracePath, runId }) => {
+      const result = await createGitLabMR({ sourceBranch, title, taskSpec, verificationSummary, bookstackPageUrl, tracePath, runId })
+      return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] }
+    }
+  )
+
+  server.tool(
+    'create_gitlab_issue',
+    'Create a GitLab issue when an agent run fails after max retries. Captures the failure summary and links back to the spec page.',
+    {
+      title: z.string().describe('Issue title (without [Agent failed] prefix — it is added automatically)'),
+      failureSummary: z.string().describe('Short explanation of why the run failed'),
+      failures: z.array(z.string()).describe('List of individual failure messages'),
+      runId: z.string().describe('Run ID from begin_task'),
+      bookstackPageUrl: z.string().optional().describe('BookStack spec page URL')
+    },
+    async ({ title, failureSummary, failures, runId, bookstackPageUrl }) => {
+      const result = await createGitLabIssue({ title, failureSummary, failures, runId, bookstackPageUrl })
+      return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] }
+    }
+  )
+
+  server.tool(
+    'get_gitlab_pipeline_status',
+    'Poll the GitLab CI pipeline for a branch and return its current status plus any failed job names.',
+    {
+      branch: z.string().describe('Branch name to check')
+    },
+    async ({ branch }) => {
+      const result = await getGitLabPipelineStatus({ branch })
+      return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] }
+    }
+  )
+
+  server.tool(
+    'fetch_gitlab_issue',
+    'Fetch a GitLab issue by ID and return its title and description as task input.',
+    {
+      issueId: z.number().describe('GitLab issue number')
+    },
+    async ({ issueId }) => {
+      const result = await fetchGitLabIssue({ issueId })
+      return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] }
+    }
+  )
+
+  // ── Grafana / Prometheus tools (E10–E12) ─────────────────────────────────
+
+  server.tool(
+    'check_system_health',
+    'Run a pre-task system health check against Prometheus. Returns safe=true when all metrics are within thresholds. Surface any warnings to the user before proceeding with code changes.',
+    {},
+    async () => {
+      const result = await checkSystemHealth()
+      return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] }
+    }
+  )
+
+  server.tool(
+    'capture_metrics_baseline',
+    'Snapshot current Prometheus metrics before a run starts. Call once at the start of a task so check_performance_regression has a baseline to compare against.',
+    {
+      runId: z.string().describe('Run ID from begin_task'),
+      endpoints: z.array(z.string()).optional().describe('Specific API endpoints to include in the snapshot')
+    },
+    async ({ runId, endpoints }) => {
+      const result = await captureMetricsBaseline({ runId, endpoints })
+      return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] }
+    }
+  )
+
+  server.tool(
+    'check_performance_regression',
+    'Compare current Prometheus metrics against the pre-run baseline captured by capture_metrics_baseline. Call this at the commit gate alongside the Playwright trace review.',
+    {
+      runId: z.string().describe('Run ID from begin_task')
+    },
+    async ({ runId }) => {
+      const result = await checkPerformanceRegression({ runId })
+      return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] }
+    }
+  )
+
+  server.tool(
+    'get_error_context',
+    'Fetch current error rates and anomaly detection data from Prometheus for a specific module or endpoint. Call before bugfix tasks to give the model real production context.',
+    {
+      module: z.string().optional().describe('NestJS module name to filter by'),
+      endpoint: z.string().optional().describe('Specific route path to filter by (e.g. /api/products)'),
+      windowMinutes: z.number().default(60).describe('Time window in minutes for rate calculations')
+    },
+    async ({ module, endpoint, windowMinutes }) => {
+      const result = await getErrorContext({ module, endpoint, windowMinutes })
+      return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] }
+    }
+  )
+
+  // ── BookStack structure tools ────────────────────────────────────────────
+
+  server.tool(
+    'create_bookstack_shelf',
+    'Create a new BookStack shelf (top-level container for books).',
+    {
+      name: z.string().describe('Shelf name'),
+      description: z.string().optional().describe('Short description shown under the shelf name'),
+      books: z.array(z.number()).optional().describe('Book IDs to include in the shelf on creation')
+    },
+    async ({ name, description, books }) => {
+      const result = await createBookStackShelf({ name, description, books })
+      return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] }
+    }
+  )
+
+  server.tool(
+    'create_bookstack_book',
+    'Create a new BookStack book. Books hold chapters and pages.',
+    {
+      name: z.string().describe('Book name'),
+      description: z.string().optional().describe('Short description shown under the book name')
+    },
+    async ({ name, description }) => {
+      const result = await createBookStackBook({ name, description })
+      return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] }
+    }
+  )
+
+  server.tool(
+    'add_books_to_shelf',
+    'Assign books to a shelf. Replaces the current book list — include all book IDs you want in the shelf.',
+    {
+      shelfId: z.number().describe('Shelf ID'),
+      bookIds: z.array(z.number()).describe('Complete list of book IDs to assign to the shelf')
+    },
+    async ({ shelfId, bookIds }) => {
+      await addBooksToShelf({ shelfId, bookIds })
+      return { content: [{ type: 'text', text: JSON.stringify({ ok: true }) }] }
+    }
+  )
+
+  server.tool(
+    'create_bookstack_chapter',
+    'Create a new chapter inside a book. Chapters are optional groupings of pages within a book.',
+    {
+      bookId: z.number().describe('Book ID to create the chapter in'),
+      name: z.string().describe('Chapter name'),
+      description: z.string().optional().describe('Short description')
+    },
+    async ({ bookId, name, description }) => {
+      const result = await createBookStackChapter({ bookId, name, description })
+      return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] }
+    }
+  )
+
+  // ── OpenAPI tool (E13) ───────────────────────────────────────────────────
+
+  server.tool(
+    'sync_openapi_docs',
+    'Fetch the NestJS OpenAPI spec and sync API reference pages to BookStack for all affected modules. Call this after run_verification passes and before create_gitlab_mr.',
+    {
+      runId: z.string().describe('Run ID from begin_task'),
+      affectedModules: z.array(z.string()).describe('NestJS module names that were changed in this run'),
+      bookId: z.number().describe('BookStack book ID for the API reference section'),
+      project: z.enum(['boffmedia', 'smartrotom'])
+    },
+    async ({ runId, affectedModules, bookId, project }) => {
+      const result = await syncOpenApiDocs({ runId, affectedModules, bookId, project })
       return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] }
     }
   )

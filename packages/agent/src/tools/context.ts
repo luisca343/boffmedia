@@ -2,13 +2,15 @@ import { glob } from 'glob'
 import fs from 'fs'
 import path from 'path'
 import { REPO_ROOT } from './runner.js'
+import { searchBookStack, fetchBookStackPage, inferProjectTag } from './bookstack.js'
+import type { ResolvedContext } from '../shared/types.js'
 
 interface ContextInput {
   taskDescription: string
   maxFiles: number
 }
 
-export async function resolveContext(input: ContextInput) {
+export async function resolveContext(input: ContextInput): Promise<ResolvedContext> {
   const { taskDescription, maxFiles } = input
   const desc = taskDescription.toLowerCase()
   const candidates: string[] = []
@@ -51,11 +53,38 @@ export async function resolveContext(input: ContextInput) {
   const pageList = await glob('apps/web/src/app/**/page.tsx', { cwd: REPO_ROOT })
     .then(f => f.map(p => path.dirname(p).replace('apps/web/src/app', '')))
 
+  // E2: inject relevant BookStack pages if BookStack is configured
+  const bookstackPages = await resolveBookStackPages(taskDescription)
+
   return {
     files,
     moduleList,
     pageList,
     conventions,
-    totalTokenEstimate: files.reduce((acc, f) => acc + Math.ceil(f.content.length / 4), 0)
+    totalTokenEstimate: files.reduce((acc, f) => acc + Math.ceil(f.content.length / 4), 0),
+    bookstackPages
+  }
+}
+
+async function resolveBookStackPages(
+  taskDescription: string
+): Promise<ResolvedContext['bookstackPages']> {
+  if (!process.env.BOOKSTACK_URL || !process.env.BOOKSTACK_TOKEN) return []
+
+  try {
+    const projectTag = inferProjectTag(taskDescription)
+    const results = await searchBookStack({
+      query: taskDescription,
+      tags: [projectTag],
+      limit: 3
+    })
+
+    const pages = await Promise.all(
+      results.map(r => fetchBookStackPage({ pageId: r.pageId }).catch(() => null))
+    )
+
+    return pages.filter((p): p is NonNullable<typeof p> => p !== null)
+  } catch {
+    return []
   }
 }

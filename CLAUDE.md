@@ -20,6 +20,7 @@ Domain context: `.claude/context/` — load the relevant file when switching dom
 
 - `packages/shared/src/` — 255+ auto-generated OpenAPI models
 - `node_modules/`, `.next/`, `dist/`, `*.lock`, `pnpm-lock.yaml`
+- `.env`, `.env.*`, `.env.agent`, `**/.env*` — environment files containing secrets. Never read, grep, cat, or inspect these. If env var debugging is needed, ask the user to confirm the key name only — never reveal values.
 
 ---
 

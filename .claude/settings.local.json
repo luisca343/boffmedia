@@ -10,7 +10,24 @@
       "mcp__boff-agent__resolve_context",
       "mcp__boff-agent__begin_task",
       "Bash(docker compose *)",
-      "mcp__boff-agent__run_playwright"
+      "mcp__boff-agent__run_playwright",
+      "mcp__boff-agent__search_bookstack",
+      "mcp__boff-agent__create_bookstack_shelf",
+      "mcp__boff-agent__create_bookstack_book",
+      "mcp__boff-agent__add_books_to_shelf",
+      "mcp__boff-agent__create_bookstack_chapter",
+      "mcp__boff-agent__write_bookstack_page",
+      "mcp__boff-agent__fetch_bookstack_page",
+      "mcp__boff-agent__list_bookstack_tasks",
+      "mcp__boff-agent__check_system_health",
+      "mcp__boff-agent__get_gitlab_pipeline_status",
+      "mcp__boff-agent__fetch_gitlab_issue",
+      "mcp__boff-agent__create_gitlab_issue",
+      "mcp__boff-agent__create_gitlab_mr",
+      "mcp__boff-agent__capture_metrics_baseline",
+      "mcp__boff-agent__check_performance_regression",
+      "mcp__boff-agent__git_operation",
+      "mcp__boff-agent__sync_openapi_docs"
     ]
   }
 }
