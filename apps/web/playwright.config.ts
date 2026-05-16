@@ -15,6 +15,7 @@ const config: PlaywrightTestConfig = {
     actionTimeout: 0,
     baseURL: "http://localhost:3000",
     trace: "on-first-retry",
+    screenshot: "only-on-failure",
   },
   projects: [
     {
@@ -25,8 +26,9 @@ const config: PlaywrightTestConfig = {
     },
   ],
   webServer: {
-    command: "npm run start",
+    command: "npm run dev",
     port: 3000,
+    timeout: 120000,
     reuseExistingServer: true,
     env: {
       ...process.env,
