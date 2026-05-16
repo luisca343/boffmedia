@@ -2,7 +2,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AppsFacadeService } from './apps.facade.service';
 import { AppsService } from './services/apps.service';
 import { UserAppsService } from './services/user-apps.service';
-import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { CreateAppDto } from './dto/create-app.dto';
 import { UpdateAppDto } from './dto/update-app.dto';
 
@@ -10,7 +9,6 @@ describe('AppsFacadeService', () => {
   let service: AppsFacadeService;
   let appsService: AppsService;
   let userAppsService: UserAppsService;
-  let mockDb: any;
 
   const mockAppsService = {
     getAllApps: jest.fn(),
@@ -27,24 +25,18 @@ describe('AppsFacadeService', () => {
     orderAppsForPlayer: jest.fn(),
   };
 
-  const mockDbTransaction = {
-    transaction: jest.fn(),
-  };
-
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AppsFacadeService,
         { provide: AppsService, useValue: mockAppsService },
         { provide: UserAppsService, useValue: mockUserAppsService },
-        { provide: DRIZZLE, useValue: mockDbTransaction },
       ],
     }).compile();
 
     service = module.get<AppsFacadeService>(AppsFacadeService);
     appsService = module.get<AppsService>(AppsService);
     userAppsService = module.get<UserAppsService>(UserAppsService);
-    mockDb = module.get(DRIZZLE);
   });
 
   afterEach(() => {
@@ -162,19 +154,15 @@ describe('AppsFacadeService', () => {
   });
 
   describe('orderApps', () => {
-    it('should order apps with transaction', async () => {
+    it('should delegate order to userAppsService', async () => {
       const order = [{ id: 1, order: 1 }];
       const uuid = 'test-uuid';
       const mockResult = { success: true };
-
-      mockDbTransaction.transaction.mockImplementation(async (callback) => {
-        return callback();
-      });
       mockUserAppsService.orderAppsForPlayer.mockResolvedValue(mockResult);
 
       const result = await service.orderApps(order, uuid);
 
-      expect(mockDbTransaction.transaction).toHaveBeenCalledTimes(1);
+      expect(userAppsService.orderAppsForPlayer).toHaveBeenCalledWith(order, uuid);
       expect(result).toEqual(mockResult);
     });
   });

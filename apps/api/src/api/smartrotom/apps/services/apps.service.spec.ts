@@ -1,13 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundException, ConflictException } from '@nestjs/common';
 import { AppsService } from './apps.service';
-import { AppsRepository } from '@api/smartrotom/apps/repositories/apps.repository';
+import { APPS_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 import { CreateAppDto } from '../dto/create-app.dto';
 import { UpdateAppDto } from '../dto/update-app.dto';
 
 describe('AppsService', () => {
   let service: AppsService;
-  let repository: AppsRepository;
 
   const mockAppsRepository = {
     findAll: jest.fn(),
@@ -15,7 +14,10 @@ describe('AppsService', () => {
     create: jest.fn(),
     update: jest.fn(),
     delete: jest.fn(),
-    findActiveApp: jest.fn(),
+    exists: jest.fn(),
+    findByUrl: jest.fn(),
+    findActiveApps: jest.fn(),
+    findByActive: jest.fn(),
   };
 
   const mockApp = {
@@ -31,12 +33,11 @@ describe('AppsService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AppsService,
-        { provide: AppsRepository, useValue: mockAppsRepository },
+        { provide: APPS_REPOSITORY_TOKEN, useValue: mockAppsRepository },
       ],
     }).compile();
 
     service = module.get<AppsService>(AppsService);
-    repository = module.get<AppsRepository>(AppsRepository);
   });
 
   afterEach(() => {
@@ -55,7 +56,7 @@ describe('AppsService', () => {
       const result = await service.getAllApps();
 
       expect(result).toEqual(mockApps);
-      expect(repository.findAll).toHaveBeenCalledTimes(1);
+      expect(mockAppsRepository.findAll).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -66,107 +67,78 @@ describe('AppsService', () => {
       const result = await service.getAppById(1);
 
       expect(result).toEqual(mockApp);
-      expect(repository.findById).toHaveBeenCalledWith(1);
+      expect(mockAppsRepository.findById).toHaveBeenCalledWith(1);
     });
 
     it('should throw NotFoundException when app not found', async () => {
       mockAppsRepository.findById.mockResolvedValue(null);
 
       await expect(service.getAppById(999)).rejects.toThrow(NotFoundException);
-      expect(repository.findById).toHaveBeenCalledWith(999);
+      expect(mockAppsRepository.findById).toHaveBeenCalledWith(999);
     });
   });
 
   describe('createApp', () => {
     it('should create and return new app', async () => {
       const createDto: CreateAppDto = { name: 'New App', url: 'new-app' };
-      mockAppsRepository.create.mockResolvedValue({ insertId: 1 });
-      mockAppsRepository.findById.mockResolvedValue({
-        ...mockApp,
-        ...createDto,
-      });
+      const createdApp = { ...mockApp, ...createDto };
+      mockAppsRepository.findByUrl.mockResolvedValue(null);
+      mockAppsRepository.create.mockResolvedValue(createdApp);
 
       const result = await service.createApp(createDto);
 
-      expect(repository.create).toHaveBeenCalledWith(createDto);
-      expect(repository.findById).toHaveBeenCalledWith(1);
+      expect(mockAppsRepository.findByUrl).toHaveBeenCalledWith(createDto.url);
+      expect(mockAppsRepository.create).toHaveBeenCalledWith(createDto);
       expect(result.name).toBe(createDto.name);
+    });
+
+    it('should throw ConflictException when URL already exists', async () => {
+      const createDto: CreateAppDto = { name: 'New App', url: 'test-app' };
+      mockAppsRepository.findByUrl.mockResolvedValue(mockApp);
+
+      await expect(service.createApp(createDto)).rejects.toThrow(ConflictException);
+      expect(mockAppsRepository.create).not.toHaveBeenCalled();
     });
   });
 
   describe('updateApp', () => {
     it('should update and return app', async () => {
       const updateDto: UpdateAppDto = { name: 'Updated App' };
-      mockAppsRepository.findById
-        .mockResolvedValueOnce(mockApp)
-        .mockResolvedValueOnce({ ...mockApp, ...updateDto });
+      const updatedApp = { ...mockApp, ...updateDto };
+      mockAppsRepository.findById.mockResolvedValue(mockApp);
+      mockAppsRepository.update.mockResolvedValue(updatedApp);
 
       const result = await service.updateApp(1, updateDto);
 
-      expect(repository.findById).toHaveBeenCalledTimes(2);
-      expect(repository.update).toHaveBeenCalledWith(1, updateDto);
+      expect(mockAppsRepository.findById).toHaveBeenCalledWith(1);
+      expect(mockAppsRepository.update).toHaveBeenCalledWith(1, updateDto);
       expect(result.name).toBe(updateDto.name);
     });
 
     it('should throw NotFoundException when app not found', async () => {
       mockAppsRepository.findById.mockResolvedValue(null);
 
-      await expect(service.updateApp(999, {})).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.updateApp(999, {})).rejects.toThrow(NotFoundException);
     });
   });
 
   describe('deleteApp', () => {
     it('should delete app successfully', async () => {
-      mockAppsRepository.delete.mockResolvedValue({ affectedRows: 1 });
+      mockAppsRepository.exists.mockResolvedValue(true);
+      mockAppsRepository.delete.mockResolvedValue(true);
 
       const result = await service.deleteApp(1);
 
       expect(result).toEqual({ success: true });
-      expect(repository.delete).toHaveBeenCalledWith(1);
+      expect(mockAppsRepository.exists).toHaveBeenCalledWith(1);
+      expect(mockAppsRepository.delete).toHaveBeenCalledWith(1);
     });
 
     it('should throw NotFoundException when app not found', async () => {
-      mockAppsRepository.delete.mockResolvedValue({ affectedRows: 0 });
+      mockAppsRepository.exists.mockResolvedValue(false);
 
       await expect(service.deleteApp(999)).rejects.toThrow(NotFoundException);
-    });
-  });
-
-  describe('validateAppExists', () => {
-    it('should return true when app exists', async () => {
-      mockAppsRepository.findById.mockResolvedValue(mockApp);
-
-      const result = await service.validateAppExists(1);
-
-      expect(result).toBe(true);
-    });
-
-    it('should return false when app does not exist', async () => {
-      mockAppsRepository.findById.mockResolvedValue(null);
-
-      const result = await service.validateAppExists(999);
-
-      expect(result).toBe(false);
-    });
-  });
-
-  describe('validateActiveApp', () => {
-    it('should return true when active app exists', async () => {
-      mockAppsRepository.findActiveApp.mockResolvedValue(mockApp);
-
-      const result = await service.validateActiveApp(1);
-
-      expect(result).toBe(true);
-    });
-
-    it('should return false when active app does not exist', async () => {
-      mockAppsRepository.findActiveApp.mockResolvedValue(null);
-
-      const result = await service.validateActiveApp(999);
-
-      expect(result).toBe(false);
+      expect(mockAppsRepository.delete).not.toHaveBeenCalled();
     });
   });
 });
