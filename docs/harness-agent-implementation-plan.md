@@ -1254,7 +1254,7 @@ A useful, connectable agent exists from Phase 4 onward. Build in this order.
 | 7 | ✅ Done | Agent memory + `save_run` + `get_run_history` | Claude Code can persist and query run history |
 | 8 | ✅ Done | `resolve_context` | Relevant file injection per task |
 | 9 | ✅ Done | MCP server (HTTP/SSE) | Remote and persistent connections |
-| 10 | 🔧 In progress | Opencode config + end-to-end workflow test | Agent fully connected, usable in daily work |
+| 10 | ✅ Done | Opencode config + end-to-end workflow test | Agent fully connected, usable in daily work |
 | V2 | ⬜ Not started | LLM adapters + orchestrator + queue + CLI | See `boff-agent-v2-autonomous.md` |
 
 > **Tip**: Phase 10 is a complete, production-ready agent for interactive use. V2 is purely additive — build it when you need to run tasks unattended, not before.
@@ -1323,4 +1323,4 @@ Once 23.1–23.3 are done, run a quick smoke test from inside Claude Code:
 → call agent:get_run_history { limit: 1, status: "all" }  # confirms memory works
 ```
 
-- [ ] Smoke test passes end-to-end
+- [x] Smoke test passes end-to-end (2026-05-16 — pipeline live, memory confirmed, revealed pre-existing test failures in `smartrotom/apps` unrelated to agent setup)
