@@ -1,5 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { HttpStatus, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
+import {
+  HttpStatus,
+  NotFoundException,
+  ConflictException,
+  BadRequestException,
+} from '@nestjs/common';
 import { AppsController } from './apps.controller';
 import { AppsFacadeService } from './apps.facade.service';
 import { CreateAppDto } from './dto/create-app.dto';
@@ -19,21 +24,21 @@ describe('AppsController', () => {
       id: 1,
       name: 'ChatApp',
       url: 'chatapp',
-      active: 1
+      active: 1,
     },
     {
       id: 2,
       name: 'Admin',
       url: 'admin',
-      active: 0
-    }
+      active: 0,
+    },
   ];
 
   const mockAppData: SmartRotomApp = {
     id: 1,
     name: 'ChatApp',
     url: 'chatapp',
-    active: 1
+    active: 1,
   };
 
   const mockPlayerAppsData: SmartRotomApp[] = [
@@ -41,19 +46,19 @@ describe('AppsController', () => {
       id: 2,
       name: 'Admin',
       url: 'admin',
-      active: 1
+      active: 1,
     },
     {
       id: 3,
       name: 'Arcade',
       url: 'arcade',
-      active: 0
-    }
+      active: 0,
+    },
   ];
 
   const mockSuccessResponse: SuccessResponse = {
     success: true,
-    message: 'Operation completed successfully'
+    message: 'Operation completed successfully',
   };
 
   const mockAppsFacadeService = {
@@ -123,7 +128,7 @@ describe('AppsController', () => {
     const createAppDto: CreateAppDto = {
       name: 'Test App',
       url: 'testapp',
-      active: 1
+      active: 1,
     };
 
     it('should create a new app', async () => {
@@ -140,10 +145,12 @@ describe('AppsController', () => {
     it('should handle validation errors', async () => {
       const invalidDto = { name: '' } as CreateAppDto;
       mockAppsFacadeService.createApp.mockRejectedValue(
-        new BadRequestException('Name is required')
+        new BadRequestException('Name is required'),
       );
 
-      await expect(controller.create(invalidDto)).rejects.toThrow(BadRequestException);
+      await expect(controller.create(invalidDto)).rejects.toThrow(
+        BadRequestException,
+      );
       expect(facadeService.createApp).toHaveBeenCalledWith(invalidDto);
     });
   });
@@ -152,48 +159,63 @@ describe('AppsController', () => {
     const orderDto: OrderAppDto = {
       order: [
         { id: 1, order: 1 },
-        { id: 2, order: 2 }
+        { id: 2, order: 2 },
       ],
-      uuid: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
+      uuid: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
     };
 
     it('should order apps successfully', async () => {
-      const expectedResult: SuccessResponse = { success: true, message: 'Apps ordered successfully' };
+      const expectedResult: SuccessResponse = {
+        success: true,
+        message: 'Apps ordered successfully',
+      };
       mockAppsFacadeService.orderApps.mockResolvedValue({ success: true });
 
       const result = await controller.order(orderDto);
 
       expect(result).toEqual(expectedResult);
-      expect(facadeService.orderApps).toHaveBeenCalledWith(orderDto.order, orderDto.uuid);
+      expect(facadeService.orderApps).toHaveBeenCalledWith(
+        orderDto.order,
+        orderDto.uuid,
+      );
       expect(facadeService.orderApps).toHaveBeenCalledTimes(1);
     });
 
     it('should handle invalid order data', async () => {
       const invalidOrderDto: OrderAppDto = {
         order: [],
-        uuid: ''
+        uuid: '',
       };
       mockAppsFacadeService.orderApps.mockRejectedValue(
-        new BadRequestException('Invalid uuid or order data')
+        new BadRequestException('Invalid uuid or order data'),
       );
 
-      await expect(controller.order(invalidOrderDto)).rejects.toThrow(BadRequestException);
-      expect(facadeService.orderApps).toHaveBeenCalledWith(invalidOrderDto.order, invalidOrderDto.uuid);
+      await expect(controller.order(invalidOrderDto)).rejects.toThrow(
+        BadRequestException,
+      );
+      expect(facadeService.orderApps).toHaveBeenCalledWith(
+        invalidOrderDto.order,
+        invalidOrderDto.uuid,
+      );
     });
   });
 
   describe('getForPlayer', () => {
     const getPlayerAppsDto: GetPlayerAppsDto = {
-      uuid: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
+      uuid: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
     };
 
     it('should return apps for a player', async () => {
-      mockAppsFacadeService.getAppsForPlayer.mockResolvedValue(mockPlayerAppsData);
+      mockAppsFacadeService.getAppsForPlayer.mockResolvedValue(
+        mockPlayerAppsData,
+      );
 
       const result = await controller.getForPlayer(getPlayerAppsDto);
 
       expect(result).toEqual(mockPlayerAppsData);
-      expect(facadeService.getAppsForPlayer).toHaveBeenCalledWith(getPlayerAppsDto.uuid);
+      expect(facadeService.getAppsForPlayer).toHaveBeenCalledWith(
+        getPlayerAppsDto.uuid,
+      );
       expect(facadeService.getAppsForPlayer).toHaveBeenCalledTimes(1);
     });
 
@@ -204,7 +226,9 @@ describe('AppsController', () => {
       const result = await controller.getForPlayer(nonExistentDto);
 
       expect(result).toEqual([]);
-      expect(facadeService.getAppsForPlayer).toHaveBeenCalledWith('non-existent-uuid');
+      expect(facadeService.getAppsForPlayer).toHaveBeenCalledWith(
+        'non-existent-uuid',
+      );
     });
 
     it('should handle empty uuid', async () => {
@@ -221,83 +245,122 @@ describe('AppsController', () => {
   describe('addAppToPlayer', () => {
     const playerAppDto: PlayerAppDto = {
       uuid: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
-      id: 1
+      id: 1,
     };
 
     it('should add app to player successfully', async () => {
-      const expectedResult: SuccessResponse = { success: true, message: 'App added to player successfully' };
+      const expectedResult: SuccessResponse = {
+        success: true,
+        message: 'App added to player successfully',
+      };
       mockAppsFacadeService.addAppToPlayer.mockResolvedValue(expectedResult);
 
       const result = await controller.addAppToPlayer(playerAppDto);
 
       expect(result).toEqual(expectedResult);
-      expect(facadeService.addAppToPlayer).toHaveBeenCalledWith(playerAppDto.uuid, playerAppDto.id);
+      expect(facadeService.addAppToPlayer).toHaveBeenCalledWith(
+        playerAppDto.uuid,
+        playerAppDto.id,
+      );
       expect(facadeService.addAppToPlayer).toHaveBeenCalledTimes(1);
     });
 
     it('should handle app not found', async () => {
       mockAppsFacadeService.addAppToPlayer.mockRejectedValue(
-        new NotFoundException('App not found or already active')
+        new NotFoundException('App not found or already active'),
       );
 
-      await expect(controller.addAppToPlayer(playerAppDto)).rejects.toThrow(NotFoundException);
-      expect(facadeService.addAppToPlayer).toHaveBeenCalledWith(playerAppDto.uuid, playerAppDto.id);
+      await expect(controller.addAppToPlayer(playerAppDto)).rejects.toThrow(
+        NotFoundException,
+      );
+      expect(facadeService.addAppToPlayer).toHaveBeenCalledWith(
+        playerAppDto.uuid,
+        playerAppDto.id,
+      );
     });
 
     it('should handle app already added', async () => {
       mockAppsFacadeService.addAppToPlayer.mockRejectedValue(
-        new ConflictException('App already added to player')
+        new ConflictException('App already added to player'),
       );
 
-      await expect(controller.addAppToPlayer(playerAppDto)).rejects.toThrow(ConflictException);
-      expect(facadeService.addAppToPlayer).toHaveBeenCalledWith(playerAppDto.uuid, playerAppDto.id);
+      await expect(controller.addAppToPlayer(playerAppDto)).rejects.toThrow(
+        ConflictException,
+      );
+      expect(facadeService.addAppToPlayer).toHaveBeenCalledWith(
+        playerAppDto.uuid,
+        playerAppDto.id,
+      );
     });
 
     it('should handle invalid data', async () => {
       const invalidDto: PlayerAppDto = { uuid: '', id: 0 };
       mockAppsFacadeService.addAppToPlayer.mockRejectedValue(
-        new BadRequestException('Invalid uuid or appId')
+        new BadRequestException('Invalid uuid or appId'),
       );
 
-      await expect(controller.addAppToPlayer(invalidDto)).rejects.toThrow(BadRequestException);
-      expect(facadeService.addAppToPlayer).toHaveBeenCalledWith(invalidDto.uuid, invalidDto.id);
+      await expect(controller.addAppToPlayer(invalidDto)).rejects.toThrow(
+        BadRequestException,
+      );
+      expect(facadeService.addAppToPlayer).toHaveBeenCalledWith(
+        invalidDto.uuid,
+        invalidDto.id,
+      );
     });
   });
 
   describe('removeAppFromPlayer', () => {
     const playerAppDto: PlayerAppDto = {
       uuid: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
-      id: 1
+      id: 1,
     };
 
     it('should remove app from player successfully', async () => {
-      const expectedResult: SuccessResponse = { success: true, message: 'App removed from player successfully' };
-      mockAppsFacadeService.removeAppFromPlayer.mockResolvedValue(expectedResult);
+      const expectedResult: SuccessResponse = {
+        success: true,
+        message: 'App removed from player successfully',
+      };
+      mockAppsFacadeService.removeAppFromPlayer.mockResolvedValue(
+        expectedResult,
+      );
 
       const result = await controller.removeAppFromPlayer(playerAppDto);
 
       expect(result).toEqual(expectedResult);
-      expect(facadeService.removeAppFromPlayer).toHaveBeenCalledWith(playerAppDto.uuid, playerAppDto.id);
+      expect(facadeService.removeAppFromPlayer).toHaveBeenCalledWith(
+        playerAppDto.uuid,
+        playerAppDto.id,
+      );
       expect(facadeService.removeAppFromPlayer).toHaveBeenCalledTimes(1);
     });
 
     it('should handle app not found in player list', async () => {
       mockAppsFacadeService.removeAppFromPlayer.mockRejectedValue(
-        new NotFoundException("App not found in player's list")
+        new NotFoundException("App not found in player's list"),
       );
 
-      await expect(controller.removeAppFromPlayer(playerAppDto)).rejects.toThrow(NotFoundException);
-      expect(facadeService.removeAppFromPlayer).toHaveBeenCalledWith(playerAppDto.uuid, playerAppDto.id);
+      await expect(
+        controller.removeAppFromPlayer(playerAppDto),
+      ).rejects.toThrow(NotFoundException);
+      expect(facadeService.removeAppFromPlayer).toHaveBeenCalledWith(
+        playerAppDto.uuid,
+        playerAppDto.id,
+      );
     });
 
     it('should handle invalid data', async () => {
       const invalidDto: PlayerAppDto = { uuid: '', id: 0 };
       mockAppsFacadeService.removeAppFromPlayer.mockRejectedValue(
-        new BadRequestException('Invalid uuid or appId')
+        new BadRequestException('Invalid uuid or appId'),
       );
 
-      await expect(controller.removeAppFromPlayer(invalidDto)).rejects.toThrow(BadRequestException);
-      expect(facadeService.removeAppFromPlayer).toHaveBeenCalledWith(invalidDto.uuid, invalidDto.id);
+      await expect(controller.removeAppFromPlayer(invalidDto)).rejects.toThrow(
+        BadRequestException,
+      );
+      expect(facadeService.removeAppFromPlayer).toHaveBeenCalledWith(
+        invalidDto.uuid,
+        invalidDto.id,
+      );
     });
   });
 
@@ -314,7 +377,7 @@ describe('AppsController', () => {
 
     it('should handle app not found', async () => {
       mockAppsFacadeService.getApp.mockRejectedValue(
-        new NotFoundException('App with ID 999 not found')
+        new NotFoundException('App with ID 999 not found'),
       );
 
       await expect(controller.findOne(999)).rejects.toThrow(NotFoundException);
@@ -324,10 +387,12 @@ describe('AppsController', () => {
     it('should handle invalid id format', async () => {
       const invalidId = NaN;
       mockAppsFacadeService.getApp.mockRejectedValue(
-        new BadRequestException('Invalid app ID')
+        new BadRequestException('Invalid app ID'),
       );
 
-      await expect(controller.findOne(invalidId)).rejects.toThrow(BadRequestException);
+      await expect(controller.findOne(invalidId)).rejects.toThrow(
+        BadRequestException,
+      );
       expect(facadeService.getApp).toHaveBeenCalledWith(invalidId);
     });
   });
@@ -335,7 +400,7 @@ describe('AppsController', () => {
   describe('update', () => {
     const updateAppDto: UpdateAppDto = {
       name: 'Updated App',
-      url: 'updated-app'
+      url: 'updated-app',
     };
 
     it('should update app successfully', async () => {
@@ -351,10 +416,12 @@ describe('AppsController', () => {
 
     it('should handle app not found', async () => {
       mockAppsFacadeService.updateApp.mockRejectedValue(
-        new NotFoundException('App with ID 999 not found')
+        new NotFoundException('App with ID 999 not found'),
       );
 
-      await expect(controller.update(999, updateAppDto)).rejects.toThrow(NotFoundException);
+      await expect(controller.update(999, updateAppDto)).rejects.toThrow(
+        NotFoundException,
+      );
       expect(facadeService.updateApp).toHaveBeenCalledWith(999, updateAppDto);
     });
 
@@ -382,7 +449,10 @@ describe('AppsController', () => {
 
   describe('remove', () => {
     it('should delete app successfully', async () => {
-      const expectedResult: SuccessResponse = { success: true, message: 'App deleted successfully' };
+      const expectedResult: SuccessResponse = {
+        success: true,
+        message: 'App deleted successfully',
+      };
       mockAppsFacadeService.deleteApp.mockResolvedValue(expectedResult);
 
       const result = await controller.remove(1);
@@ -394,7 +464,7 @@ describe('AppsController', () => {
 
     it('should handle app not found', async () => {
       mockAppsFacadeService.deleteApp.mockRejectedValue(
-        new NotFoundException('App with ID 999 not found')
+        new NotFoundException('App with ID 999 not found'),
       );
 
       await expect(controller.remove(999)).rejects.toThrow(NotFoundException);
@@ -403,7 +473,7 @@ describe('AppsController', () => {
 
     it('should handle database constraint errors', async () => {
       mockAppsFacadeService.deleteApp.mockRejectedValue(
-        new ConflictException('Cannot delete app with active users')
+        new ConflictException('Cannot delete app with active users'),
       );
 
       await expect(controller.remove(1)).rejects.toThrow(ConflictException);
@@ -414,13 +484,20 @@ describe('AppsController', () => {
   describe('Integration scenarios', () => {
     it('should handle multiple operations in sequence', async () => {
       // Create app
-      const createDto: CreateAppDto = { name: 'Test App', url: 'test', active: 1 };
+      const createDto: CreateAppDto = {
+        name: 'Test App',
+        url: 'test',
+        active: 1,
+      };
       const createdApp = { ...mockAppData, ...createDto, id: 3 };
       mockAppsFacadeService.createApp.mockResolvedValue(createdApp);
 
       // Add to player
       const playerDto: PlayerAppDto = { uuid: 'test-uuid', id: 3 };
-      const successResult: SuccessResponse = { success: true, message: 'App added to player successfully' };
+      const successResult: SuccessResponse = {
+        success: true,
+        message: 'App added to player successfully',
+      };
       mockAppsFacadeService.addAppToPlayer.mockResolvedValue(successResult);
 
       // Update app
@@ -440,7 +517,10 @@ describe('AppsController', () => {
 
       // Verify calls
       expect(facadeService.createApp).toHaveBeenCalledWith(createDto);
-      expect(facadeService.addAppToPlayer).toHaveBeenCalledWith(playerDto.uuid, playerDto.id);
+      expect(facadeService.addAppToPlayer).toHaveBeenCalledWith(
+        playerDto.uuid,
+        playerDto.id,
+      );
       expect(facadeService.updateApp).toHaveBeenCalledWith(3, updateDto);
     });
 
@@ -448,10 +528,7 @@ describe('AppsController', () => {
       mockAppsFacadeService.getApps.mockResolvedValue(mockAppsData);
       mockAppsFacadeService.getApp.mockResolvedValue(mockAppData);
 
-      const promises = [
-        controller.findAll(),
-        controller.findOne(1)
-      ];
+      const promises = [controller.findAll(), controller.findOne(1)];
 
       const results = await Promise.all(promises);
 
@@ -467,14 +544,18 @@ describe('AppsController', () => {
       const customError = new Error('Custom service error');
       mockAppsFacadeService.getApps.mockRejectedValue(customError);
 
-      await expect(controller.findAll()).rejects.toThrow('Custom service error');
+      await expect(controller.findAll()).rejects.toThrow(
+        'Custom service error',
+      );
     });
 
     it('should handle network timeouts', async () => {
       const timeoutError = new Error('Request timeout');
       mockAppsFacadeService.getAppsForPlayer.mockRejectedValue(timeoutError);
 
-      await expect(controller.getForPlayer({ uuid: 'test' })).rejects.toThrow('Request timeout');
+      await expect(controller.getForPlayer({ uuid: 'test' })).rejects.toThrow(
+        'Request timeout',
+      );
     });
   });
 });

@@ -1,5 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BadRequestException, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  BadRequestException,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { UserAppsService } from './user-apps.service';
 import { AppsRepository } from '@api/smartrotom/apps/repositories/apps.repository';
 
@@ -84,19 +88,29 @@ describe('UserAppsService', () => {
     });
 
     it('should throw BadRequestException for invalid uuid', async () => {
-      await expect(service.addAppToPlayer('', appId)).rejects.toThrow(BadRequestException);
-      await expect(service.addAppToPlayer(null, appId)).rejects.toThrow(BadRequestException);
+      await expect(service.addAppToPlayer('', appId)).rejects.toThrow(
+        BadRequestException,
+      );
+      await expect(service.addAppToPlayer(null, appId)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should throw BadRequestException for invalid appId', async () => {
-      await expect(service.addAppToPlayer(uuid, 0)).rejects.toThrow(BadRequestException);
-      await expect(service.addAppToPlayer(uuid, null)).rejects.toThrow(BadRequestException);
+      await expect(service.addAppToPlayer(uuid, 0)).rejects.toThrow(
+        BadRequestException,
+      );
+      await expect(service.addAppToPlayer(uuid, null)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should throw NotFoundException when app not found or not active', async () => {
       mockAppsRepository.findActiveApp.mockResolvedValue(null);
 
-      await expect(service.addAppToPlayer(uuid, appId)).rejects.toThrow(NotFoundException);
+      await expect(service.addAppToPlayer(uuid, appId)).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should throw ConflictException when app already added', async () => {
@@ -105,7 +119,9 @@ describe('UserAppsService', () => {
       mockAppsRepository.findActiveApp.mockResolvedValue(mockApp);
       mockAppsRepository.findUserApp.mockResolvedValue(mockUserApp);
 
-      await expect(service.addAppToPlayer(uuid, appId)).rejects.toThrow(ConflictException);
+      await expect(service.addAppToPlayer(uuid, appId)).rejects.toThrow(
+        ConflictException,
+      );
     });
   });
 
@@ -123,20 +139,29 @@ describe('UserAppsService', () => {
     });
 
     it('should throw BadRequestException for invalid parameters', async () => {
-      await expect(service.removeAppFromPlayer('', appId)).rejects.toThrow(BadRequestException);
-      await expect(service.removeAppFromPlayer(uuid, 0)).rejects.toThrow(BadRequestException);
+      await expect(service.removeAppFromPlayer('', appId)).rejects.toThrow(
+        BadRequestException,
+      );
+      await expect(service.removeAppFromPlayer(uuid, 0)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should throw NotFoundException when app not found in player list', async () => {
       mockAppsRepository.removeUserApp.mockResolvedValue({ affectedRows: 0 });
 
-      await expect(service.removeAppFromPlayer(uuid, appId)).rejects.toThrow(NotFoundException);
+      await expect(service.removeAppFromPlayer(uuid, appId)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
   describe('orderAppsForPlayer', () => {
     const uuid = 'test-uuid';
-    const order = [{ id: 1, order: 1 }, { id: 2, order: 2 }];
+    const order = [
+      { id: 1, order: 1 },
+      { id: 2, order: 2 },
+    ];
 
     it('should order apps successfully', async () => {
       const existingApps = [{ appId: 1 }, { appId: 2 }];
@@ -153,8 +178,12 @@ describe('UserAppsService', () => {
     });
 
     it('should throw BadRequestException for invalid parameters', async () => {
-      await expect(service.orderAppsForPlayer([], '')).rejects.toThrow(BadRequestException);
-      await expect(service.orderAppsForPlayer(null, uuid)).rejects.toThrow(BadRequestException);
+      await expect(service.orderAppsForPlayer([], '')).rejects.toThrow(
+        BadRequestException,
+      );
+      await expect(service.orderAppsForPlayer(null, uuid)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should filter out non-existing apps', async () => {
