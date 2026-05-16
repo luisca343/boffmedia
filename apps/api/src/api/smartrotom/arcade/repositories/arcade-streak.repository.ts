@@ -9,17 +9,19 @@ import { UpdateArcadeStreakDto } from '../dto/update-arcade-streak.dto';
 import { ArcadeStreak } from '../entities/arcade-streak.entity';
 import {
   SmartRotomArcadeStreak,
-  smartRotomArcadeStreaks
+  smartRotomArcadeStreaks,
 } from '@/_db/schema/SmartRotom';
 
 @Injectable()
-export class ArcadeStreakRepository 
-  extends BaseRepositoryImpl<ArcadeStreak, CreateArcadeStreakDto, UpdateArcadeStreakDto> 
-  implements IArcadeStreakRepository {
-
-  constructor(
-    @Inject(DRIZZLE) db: MySql2Database<Record<string, never>>,
-  ) {
+export class ArcadeStreakRepository
+  extends BaseRepositoryImpl<
+    ArcadeStreak,
+    CreateArcadeStreakDto,
+    UpdateArcadeStreakDto
+  >
+  implements IArcadeStreakRepository
+{
+  constructor(@Inject(DRIZZLE) db: MySql2Database<Record<string, never>>) {
     super(db, smartRotomArcadeStreaks);
   }
 
@@ -29,7 +31,7 @@ export class ArcadeStreakRepository
       streak: data.streak || 0,
       lastClaimed: data.lastClaimed ? new Date(data.lastClaimed) : null,
       lastBanner: data.lastBanner || null,
-      totalClaims: data.totalClaims || 0
+      totalClaims: data.totalClaims || 0,
     } as SmartRotomArcadeStreak);
     return this.findById(result[0].insertId) as Promise<ArcadeStreak>;
   }
@@ -40,19 +42,26 @@ export class ArcadeStreakRepository
     if (typeof data.streak !== 'undefined') updateData.streak = data.streak;
     if (data.lastClaimed) updateData.lastClaimed = new Date(data.lastClaimed);
     if (data.lastBanner) updateData.lastBanner = data.lastBanner;
-    if (typeof data.totalClaims !== 'undefined') updateData.totalClaims = data.totalClaims;
+    if (typeof data.totalClaims !== 'undefined')
+      updateData.totalClaims = data.totalClaims;
 
-    await this.db.update(smartRotomArcadeStreaks).set(updateData).where(eq(smartRotomArcadeStreaks.id, id));
+    await this.db
+      .update(smartRotomArcadeStreaks)
+      .set(updateData)
+      .where(eq(smartRotomArcadeStreaks.id, id));
     return this.findById(id) as Promise<ArcadeStreak>;
   }
 
   async delete(id: number): Promise<boolean> {
-    const result = await this.db.delete(smartRotomArcadeStreaks).where(eq(smartRotomArcadeStreaks.id, id));
+    const result = await this.db
+      .delete(smartRotomArcadeStreaks)
+      .where(eq(smartRotomArcadeStreaks.id, id));
     return result[0].affectedRows > 0;
   }
 
   async findByUuid(uuid: string): Promise<SmartRotomArcadeStreak> {
-    const result = await this.db.select()
+    const result = await this.db
+      .select()
       .from(smartRotomArcadeStreaks)
       .where(eq(smartRotomArcadeStreaks.uuid, uuid))
       .limit(1);
@@ -60,47 +69,56 @@ export class ArcadeStreakRepository
   }
 
   async createUserStreak(streakData: any): Promise<{ insertId: number }> {
-    const result = await this.db
-      .insert(smartRotomArcadeStreaks)
-      .values({
-        uuid: streakData.uuid,
-        streak: streakData.streak || 0,
-        lastClaimed: streakData.lastClaimed ? new Date(streakData.lastClaimed) : null,
-        lastBanner: streakData.lastBanner || null,
-        totalClaims: streakData.totalClaims || 0
-      } as SmartRotomArcadeStreak);
+    const result = await this.db.insert(smartRotomArcadeStreaks).values({
+      uuid: streakData.uuid,
+      streak: streakData.streak || 0,
+      lastClaimed: streakData.lastClaimed
+        ? new Date(streakData.lastClaimed)
+        : null,
+      lastBanner: streakData.lastBanner || null,
+      totalClaims: streakData.totalClaims || 0,
+    } as SmartRotomArcadeStreak);
     return { insertId: result[0].insertId };
   }
 
-  async updateUserStreak(uuid: string, streakData: any): Promise<SmartRotomArcadeStreak> {
+  async updateUserStreak(
+    uuid: string,
+    streakData: any,
+  ): Promise<SmartRotomArcadeStreak> {
     const updateData: Partial<SmartRotomArcadeStreak> = {};
-    if (typeof streakData.streak !== 'undefined') updateData.streak = streakData.streak;
-    if (streakData.lastClaimed) updateData.lastClaimed = new Date(streakData.lastClaimed);
+    if (typeof streakData.streak !== 'undefined')
+      updateData.streak = streakData.streak;
+    if (streakData.lastClaimed)
+      updateData.lastClaimed = new Date(streakData.lastClaimed);
     if (streakData.lastBanner) updateData.lastBanner = streakData.lastBanner;
-    if (typeof streakData.totalClaims !== 'undefined') updateData.totalClaims = streakData.totalClaims;
+    if (typeof streakData.totalClaims !== 'undefined')
+      updateData.totalClaims = streakData.totalClaims;
 
-    await this.db.update(smartRotomArcadeStreaks)
+    await this.db
+      .update(smartRotomArcadeStreaks)
       .set(updateData)
       .where(eq(smartRotomArcadeStreaks.uuid, uuid));
     return this.findByUuid(uuid) as Promise<SmartRotomArcadeStreak>;
   }
 
   async resetStreak(uuid: string): Promise<boolean> {
-    const result = await this.db.update(smartRotomArcadeStreaks)
-      .set({ 
+    const result = await this.db
+      .update(smartRotomArcadeStreaks)
+      .set({
         streak: 0,
-        lastClaimed: null
+        lastClaimed: null,
       } as SmartRotomArcadeStreak)
       .where(eq(smartRotomArcadeStreaks.uuid, uuid));
     return result[0].affectedRows > 0;
   }
 
   async incrementStreak(uuid: string): Promise<SmartRotomArcadeStreak> {
-    await this.db.update(smartRotomArcadeStreaks)
-      .set({ 
+    await this.db
+      .update(smartRotomArcadeStreaks)
+      .set({
         streak: sql`${smartRotomArcadeStreaks.streak} + 1`,
         lastClaimed: new Date(),
-        totalClaims: sql`${smartRotomArcadeStreaks.totalClaims} + 1`
+        totalClaims: sql`${smartRotomArcadeStreaks.totalClaims} + 1`,
       } as any)
       .where(eq(smartRotomArcadeStreaks.uuid, uuid));
     return this.findByUuid(uuid) as Promise<SmartRotomArcadeStreak>;
@@ -112,10 +130,10 @@ export class ArcadeStreakRepository
 
     const today = new Date();
     today.setUTCHours(0, 0, 0, 0); // Reset to start of day in UTC
-    
+
     const lastClaim = new Date(streak.lastClaimed);
     lastClaim.setUTCHours(0, 0, 0, 0); // Reset to start of day in UTC
-    
+
     return today.getTime() !== lastClaim.getTime();
   }
 

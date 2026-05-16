@@ -31,7 +31,7 @@ import { EventsFacadeService } from './events.facade.service';
     AchievementsRepository,
     ParticipantsRepository,
     TeamsRepository,
-    
+
     // Domain services
     EventsService,
     GamesService,
@@ -40,7 +40,7 @@ import { EventsFacadeService } from './events.facade.service';
     TeamsService,
     ProgressService,
     LeaderboardsService,
-    
+
     // Facade service
     EventsFacadeService,
   ],
@@ -48,7 +48,7 @@ import { EventsFacadeService } from './events.facade.service';
   exports: [
     // Export facade service as the main interface
     EventsFacadeService,
-    
+
     // Also export individual services for use by other modules if needed
     EventsService,
     GamesService,

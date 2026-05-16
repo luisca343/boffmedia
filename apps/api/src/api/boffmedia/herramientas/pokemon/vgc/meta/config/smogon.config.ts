@@ -5,15 +5,27 @@ export type SmogonCutoff = (typeof SMOGON_VALID_CUTOFFS)[number];
 const SMOGON_BASE = 'https://www.smogon.com/stats';
 
 /** @deprecated Use smogonUsageUrl + smogonMovesetUrl instead */
-export function smogonChaosUrl(format: string, month: string, cutoff: number): string {
+export function smogonChaosUrl(
+  format: string,
+  month: string,
+  cutoff: number,
+): string {
   return `${SMOGON_BASE}/${month}/chaos/${format}-${cutoff}.json`;
 }
 
-export function smogonUsageUrl(format: string, month: string, cutoff: number): string {
+export function smogonUsageUrl(
+  format: string,
+  month: string,
+  cutoff: number,
+): string {
   return `${SMOGON_BASE}/${month}/${format}-${cutoff}.txt`;
 }
 
-export function smogonMovesetUrl(format: string, month: string, cutoff: number): string {
+export function smogonMovesetUrl(
+  format: string,
+  month: string,
+  cutoff: number,
+): string {
   return `${SMOGON_BASE}/${month}/moveset/${format}-${cutoff}.txt`;
 }
 
@@ -23,11 +35,14 @@ export const VGCPASTES_SHEET_BASE =
 
 export const POKEPASTE_BASE = 'https://pokepast.es';
 
-export const LIMITLESS_BASE     = 'https://play.limitlesstcg.com/tournament';
+export const LIMITLESS_BASE = 'https://play.limitlesstcg.com/tournament';
 export const LIMITLESS_API_BASE = 'https://play.limitlesstcg.com/api';
 
 /** Rate limit for Limitless JSON API: 50 requests per 5 minutes */
-export const LIMITLESS_RATE_LIMIT = { requests: 50, windowMs: 5 * 60 * 1000 } as const;
+export const LIMITLESS_RATE_LIMIT = {
+  requests: 50,
+  windowMs: 5 * 60 * 1000,
+} as const;
 
 /** Max parallel requests when batch-fetching pastes */
 export const POKEPASTE_CONCURRENCY = 10;

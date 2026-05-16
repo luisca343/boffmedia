@@ -2,53 +2,53 @@ import { ApiProperty } from '@nestjs/swagger';
 import { TcgCard } from './tcg-card.entity';
 
 export class SeriesCardsGroup {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Set ID',
-    example: 'A1'
+    example: 'A1',
   })
   setId: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Set name (localized)',
-    example: 'Genetic Apex'
+    example: 'Genetic Apex',
   })
   setName: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Number of cards in this set',
-    example: 286
+    example: 286,
   })
   cardCount: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Cards in this set',
-    type: [TcgCard]
+    type: [TcgCard],
   })
   cards: TcgCard[];
 }
 
 export class SeriesCardsGrouped {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Success status',
-    example: true
+    example: true,
   })
   success: boolean;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Series cards grouped by set',
-    type: [SeriesCardsGroup]
+    type: [SeriesCardsGroup],
   })
   data: SeriesCardsGroup[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Total number of sets',
-    example: 3
+    example: 3,
   })
   setCount: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Total number of cards across all sets',
-    example: 858
+    example: 858,
   })
   totalCardCount: number;
 }

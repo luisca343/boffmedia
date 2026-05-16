@@ -1,6 +1,12 @@
 import { BaseDto } from '@api/_utils/dto/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, ValidateNested, IsNumber, IsString, IsOptional } from 'class-validator';
+import {
+  IsArray,
+  ValidateNested,
+  IsNumber,
+  IsString,
+  IsOptional,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 class NPCData {
@@ -12,7 +18,11 @@ class NPCData {
   @IsString()
   name: string;
 
-  @ApiProperty({ description: 'NPC text', example: 'Hello there!', required: false })
+  @ApiProperty({
+    description: 'NPC text',
+    example: 'Hello there!',
+    required: false,
+  })
   @IsString()
   @IsOptional()
   text?: string;
@@ -24,9 +34,9 @@ class NPCData {
 }
 
 export class UpdateNPCsDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Array of NPC objects',
-    type: [NPCData]
+    type: [NPCData],
   })
   @IsArray()
   @ValidateNested({ each: true })

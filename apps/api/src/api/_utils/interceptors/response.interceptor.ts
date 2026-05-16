@@ -33,9 +33,9 @@ export class ResponseInterceptor implements NestInterceptor {
         return this.createSuccessResponse(successMessage, data);
       }),
       catchError((error) => {
-        this.handleError(action, error, { 
-          body: request.body, 
-          params: request.params 
+        this.handleError(action, error, {
+          body: request.body,
+          params: request.params,
         });
         return throwError(() => error);
       }),
@@ -45,9 +45,10 @@ export class ResponseInterceptor implements NestInterceptor {
   private extractSwaggerMetadata(handler: Function) {
     // Get ApiOperation metadata
     const apiOperation = this.reflector.get('swagger/apiOperation', handler);
-    
+
     // Use summary as action and generate success message from it
-    const action = apiOperation?.summary || this.generateActionName(handler.name);
+    const action =
+      apiOperation?.summary || this.generateActionName(handler.name);
     const successMessage = this.generateSuccessMessage(action);
 
     return { action, successMessage };
@@ -55,7 +56,7 @@ export class ResponseInterceptor implements NestInterceptor {
 
   private generateSuccessMessage(action: string): string {
     const actionLower = action.toLowerCase();
-    
+
     if (actionLower.startsWith('get ')) {
       return action.replace(/^get /i, '') + ' retrieved successfully';
     } else if (actionLower.startsWith('create ')) {
@@ -64,20 +65,22 @@ export class ResponseInterceptor implements NestInterceptor {
       return action.replace(/^update /i, '') + ' updated successfully';
     } else if (actionLower.startsWith('delete ')) {
       return action.replace(/^delete /i, '') + ' deleted successfully';
-    } 
-    
+    }
+
     return action + ' completed successfully';
   }
 
   private logRequest(action: string, body: any, params: any, query: any) {
     // Log with different levels based on content sensitivity
     if (this.hasSensitiveData(body)) {
-      this.logger.log(`[REQUEST] ${action} - Request received (body hidden for security)`);
+      this.logger.log(
+        `[REQUEST] ${action} - Request received (body hidden for security)`,
+      );
     } else {
-      this.logger.log(`[REQUEST] ${action}`, { 
-        body: body || 'empty', 
-        params: params || 'none', 
-        query: query || 'none' 
+      this.logger.log(`[REQUEST] ${action}`, {
+        body: body || 'empty',
+        params: params || 'none',
+        query: query || 'none',
       });
     }
   }
@@ -101,10 +104,16 @@ export class ResponseInterceptor implements NestInterceptor {
       // ignore extraction errors
     }
 
-    const detailsForLog = responseDetails && (responseDetails.message || responseDetails) || error.message || error;
+    const detailsForLog =
+      (responseDetails && (responseDetails.message || responseDetails)) ||
+      error.message ||
+      error;
 
     // Primary error log (include stack if available)
-    this.logger.error(`[ERROR] Failed to ${action}: ${typeof detailsForLog === 'string' ? detailsForLog : JSON.stringify(detailsForLog)}`, error?.stack);
+    this.logger.error(
+      `[ERROR] Failed to ${action}: ${typeof detailsForLog === 'string' ? detailsForLog : JSON.stringify(detailsForLog)}`,
+      error?.stack,
+    );
 
     // Log extracted response details at debug level so we can see validation arrays/objects
     if (responseDetails) {
@@ -132,23 +141,33 @@ export class ResponseInterceptor implements NestInterceptor {
   }
 
   private generateActionName(methodName: string): string {
-    return methodName.replace(/([A-Z])/g, ' $1').toLowerCase().trim();
+    return methodName
+      .replace(/([A-Z])/g, ' $1')
+      .toLowerCase()
+      .trim();
   }
 
   // Helper methods for better logging
   private hasSensitiveData(body: any): boolean {
     if (!body || typeof body !== 'object') return false;
-    
-    const sensitiveFields = ['password', 'token', 'secret', 'key', 'credentials'];
+
+    const sensitiveFields = [
+      'password',
+      'token',
+      'secret',
+      'key',
+      'credentials',
+    ];
     const bodyStr = JSON.stringify(body).toLowerCase();
-    
-    return sensitiveFields.some(field => bodyStr.includes(field));
+
+    return sensitiveFields.some((field) => bodyStr.includes(field));
   }
 
   private getDataInfo(data: any): string {
     if (data === null || data === undefined) return 'No data';
     if (Array.isArray(data)) return `Array with ${data.length} items`;
-    if (typeof data === 'object') return `Object with ${Object.keys(data).length} properties`;
+    if (typeof data === 'object')
+      return `Object with ${Object.keys(data).length} properties`;
     if (typeof data === 'string') return `String (${data.length} chars)`;
     return `${typeof data} value`;
   }

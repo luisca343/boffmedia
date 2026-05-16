@@ -3,11 +3,19 @@ import { ArcadeInventoryItem } from '../../entities/arcade-inventory.entity';
 import { CreateInventoryItemDto } from '../../dto/create-inventory-item.dto';
 import { UpdateInventoryItemDto } from '../../dto/update-inventory-item.dto';
 
-export interface IArcadeInventoryRepository extends BaseRepository<ArcadeInventoryItem, CreateInventoryItemDto, UpdateInventoryItemDto>  {
+export interface IArcadeInventoryRepository extends BaseRepository<
+  ArcadeInventoryItem,
+  CreateInventoryItemDto,
+  UpdateInventoryItemDto
+> {
   findUserInventory(uuid: string): Promise<ArcadeInventoryItem[]>;
   findUserItem(uuid: string, itemId: string): Promise<any | null>;
   addItem(inventoryData: CreateInventoryItemDto): Promise<{ insertId: number }>;
-  updateItemQuantity(uuid: string, itemId: string, quantity: number): Promise<any>;
+  updateItemQuantity(
+    uuid: string,
+    itemId: string,
+    quantity: number,
+  ): Promise<any>;
   removeItem(uuid: string, itemId: string): Promise<boolean>;
   consumeItem(uuid: string, itemId: string, quantity: number): Promise<any>;
   getTotalItems(uuid: string): Promise<number>;

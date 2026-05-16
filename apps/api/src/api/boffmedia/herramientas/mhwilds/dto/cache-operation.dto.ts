@@ -5,24 +5,24 @@ import { Locale } from '../enums/locale.enum';
 import { ResourceType } from '../enums/resource-type.enum';
 
 export class ClearCacheDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Specific resource type to clear',
     example: ResourceType.WEAPONS,
     required: false,
     enum: ResourceType,
-    enumName: 'ResourceType'
+    enumName: 'ResourceType',
   })
   @IsOptional()
   @IsString()
   @IsEnum(ResourceType)
   resourceType?: ResourceType;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Language/locale to clear',
     example: Locale.SPANISH,
     required: false,
     enum: Locale,
-    enumName: 'Locale'
+    enumName: 'Locale',
   })
   @IsOptional()
   @IsString()
@@ -31,13 +31,13 @@ export class ClearCacheDto extends BaseDto {
 }
 
 export class WarmupCacheDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Language/locale to warmup',
     example: Locale.SPANISH,
     default: Locale.SPANISH,
     required: false,
     enum: Locale,
-    enumName: 'Locale'
+    enumName: 'Locale',
   })
   @IsOptional()
   @IsString()

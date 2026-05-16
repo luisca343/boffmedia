@@ -193,7 +193,9 @@ export class VgcIngestionJobDto {
   @ApiProperty()
   id!: string;
 
-  @ApiProperty({ enum: ['smogon_snapshot', 'champions_regulation', 'limitless_tournament'] })
+  @ApiProperty({
+    enum: ['smogon_snapshot', 'champions_regulation', 'limitless_tournament'],
+  })
   type!: 'smogon_snapshot' | 'champions_regulation' | 'limitless_tournament';
 
   @ApiProperty({ enum: ['idle', 'queued', 'running', 'done', 'error'] })
@@ -280,7 +282,9 @@ export class ChampionsRegulationDto {
   @ApiProperty({ nullable: true })
   vgcPastesGid!: string | null;
 
-  @ApiPropertyOptional({ enum: ['idle', 'running_csv', 'running_pastes', 'done', 'error'] })
+  @ApiPropertyOptional({
+    enum: ['idle', 'running_csv', 'running_pastes', 'done', 'error'],
+  })
   importStatus?: 'idle' | 'running_csv' | 'running_pastes' | 'done' | 'error';
 
   @ApiPropertyOptional({ nullable: true })

@@ -5,27 +5,27 @@ import { QuestCategory } from './quest-category.entity';
 import { NPC } from './npc.entity';
 
 export class QuestSystemData {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Available quests',
-    type: [Quest]
+    type: [Quest],
   })
   quests: Quest[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Quest categories',
-    type: [QuestCategory]
+    type: [QuestCategory],
   })
   categories: QuestCategory[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Available dialogues',
-    type: [Dialogue]
+    type: [Dialogue],
   })
   dialogs: Dialogue[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'NPCs in the system',
-    type: [NPC]
+    type: [NPC],
   })
   npcs: NPC[];
 }

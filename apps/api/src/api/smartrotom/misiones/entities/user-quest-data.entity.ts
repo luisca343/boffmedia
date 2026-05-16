@@ -5,27 +5,27 @@ import { QuestCategory } from './quest-category.entity';
 import { NPC } from './npc.entity';
 
 export class UserQuestData {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'User-specific quest data with progress',
-    type: [Quest]
+    type: [Quest],
   })
   quests: Quest[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Available dialogues for user',
-    type: [Dialogue]
+    type: [Dialogue],
   })
   dialogs: Dialogue[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Quest categories',
-    type: [QuestCategory]
+    type: [QuestCategory],
   })
   categories: QuestCategory[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'NPCs available to user',
-    type: [NPC]
+    type: [NPC],
   })
   npcs: NPC[];
 }

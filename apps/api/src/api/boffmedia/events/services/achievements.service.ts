@@ -20,7 +20,8 @@ export class AchievementsService {
 
   async getAchievementsByEventId(eventId: number): Promise<Achievement[]> {
     // Ensure the event exists first
-    const eventExists = await this.achievementsRepository.checkEventExists(eventId);
+    const eventExists =
+      await this.achievementsRepository.checkEventExists(eventId);
     if (!eventExists) {
       return [];
     }
@@ -28,7 +29,10 @@ export class AchievementsService {
     return this.achievementsRepository.findByEventId(eventId);
   }
 
-  async createAchievement(eventId: number, createAchievementDto: CreateAchievementDto): Promise<Achievement> {
+  async createAchievement(
+    eventId: number,
+    createAchievementDto: CreateAchievementDto,
+  ): Promise<Achievement> {
     const achievementData = {
       eventId,
       name: createAchievementDto.name,
@@ -46,7 +50,10 @@ export class AchievementsService {
     return this.getAchievementById(result.insertId);
   }
 
-  async updateAchievement(id: number, updateAchievementDto: UpdateAchievementDto): Promise<Achievement> {
+  async updateAchievement(
+    id: number,
+    updateAchievementDto: UpdateAchievementDto,
+  ): Promise<Achievement> {
     const achievementData = {
       name: updateAchievementDto.name,
       description: updateAchievementDto.description,
@@ -63,7 +70,8 @@ export class AchievementsService {
   }
 
   async validateAchievementExists(achievementId: number): Promise<boolean> {
-    const achievement = await this.achievementsRepository.findById(achievementId);
+    const achievement =
+      await this.achievementsRepository.findById(achievementId);
     return !!achievement;
   }
 
@@ -75,12 +83,19 @@ export class AchievementsService {
     return this.achievementsRepository.getParticipantProgress(participantId);
   }
 
-  async getParticipantProgressByEvent(participantId: number, eventId: number): Promise<any[]> {
-    const eventExists = await this.achievementsRepository.checkEventExists(eventId);
+  async getParticipantProgressByEvent(
+    participantId: number,
+    eventId: number,
+  ): Promise<any[]> {
+    const eventExists =
+      await this.achievementsRepository.checkEventExists(eventId);
     if (!eventExists) {
       return [];
     }
 
-    return this.achievementsRepository.getParticipantProgressByEvent(participantId, eventId);
+    return this.achievementsRepository.getParticipantProgressByEvent(
+      participantId,
+      eventId,
+    );
   }
 }

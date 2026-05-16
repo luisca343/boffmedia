@@ -26,8 +26,16 @@ export interface ITcgRepository {
   getUserCards(userId: number): Promise<UserCard[]>;
   getUserCard(userId: number, cardId: string): Promise<UserCard | null>;
   addUserCard(userId: number, cardId: string, quantity: number): Promise<void>;
-  updateUserCardQuantity(userId: number, cardId: string, quantity: number): Promise<void>;
+  updateUserCardQuantity(
+    userId: number,
+    cardId: string,
+    quantity: number,
+  ): Promise<void>;
   removeUserCard(userId: number, cardId: string): Promise<void>;
   getUserCardHistory(userId: number): Promise<UserCardHistory[]>;
-  addUserCardHistory(userId: number, cardId: string, quantityChange: number): Promise<void>;
+  addUserCardHistory(
+    userId: number,
+    cardId: string,
+    quantityChange: number,
+  ): Promise<void>;
 }

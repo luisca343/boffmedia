@@ -1,39 +1,39 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class HistoryEntry {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Game ID',
-    example: 123
+    example: 123,
   })
   id: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Item identifier',
-    example: 'gema_roja'
+    example: 'gema_roja',
   })
   itemId: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Item name',
-    example: 'Gema Roja'
+    example: 'Gema Roja',
   })
   itemName: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Whether item was claimed (0 or 1)',
-    example: 0
+    example: 0,
   })
   claimed: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Item value',
-    example: 500
+    example: 500,
   })
   value: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Date when item was obtained',
-    example: '2025-06-28T10:00:00Z'
+    example: '2025-06-28T10:00:00Z',
   })
   date: Date;
 }

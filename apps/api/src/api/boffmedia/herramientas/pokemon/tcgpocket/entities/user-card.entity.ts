@@ -19,7 +19,10 @@ export class UserCard {
   @ApiProperty({ example: 3, description: 'Quantity owned' })
   quantity: number;
 
-  @ApiProperty({ example: '2025-01-01T12:00:00Z', description: 'Date acquired' })
+  @ApiProperty({
+    example: '2025-01-01T12:00:00Z',
+    description: 'Date acquired',
+  })
   acquiredDate: string;
 
   @ApiProperty({ example: '2025-01-01T12:00:00Z', description: 'Created at' })
@@ -30,7 +33,10 @@ export class UserCard {
 }
 
 export class UserCardHistory {
-  @ApiProperty({ example: '123_tcgp-A1-001_1735200000000', description: 'History entry ID' })
+  @ApiProperty({
+    example: '123_tcgp-A1-001_1735200000000',
+    description: 'History entry ID',
+  })
   id: string;
 
   @ApiProperty({ example: 123, description: 'User ID' })
@@ -45,7 +51,11 @@ export class UserCardHistory {
   @ApiProperty({ example: 'Pikachu', description: 'Card name' })
   cardName: string;
 
-  @ApiProperty({ example: 2, description: 'Quantity change (+/-)', type: 'integer' })
+  @ApiProperty({
+    example: 2,
+    description: 'Quantity change (+/-)',
+    type: 'integer',
+  })
   quantityChange: number;
 
   @ApiProperty({ example: '2025-01-01T12:00:00Z', description: 'Timestamp' })

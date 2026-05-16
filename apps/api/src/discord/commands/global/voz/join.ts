@@ -17,7 +17,9 @@ export class JoinCommand {
       if (member.voice.channel) {
         channel = member.voice.channel as VoiceChannel;
       } else {
-        return interaction.reply('You need to be in a voice channel or specify one to join!');
+        return interaction.reply(
+          'You need to be in a voice channel or specify one to join!',
+        );
       }
     }
 

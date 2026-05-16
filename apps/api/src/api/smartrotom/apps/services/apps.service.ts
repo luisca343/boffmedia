@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, ConflictException, Inject } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+  Inject,
+} from '@nestjs/common';
 import { SmartRotomApp } from '@/_db/schema/SmartRotom';
 import { CreateAppDto } from '../dto/create-app.dto';
 import { UpdateAppDto } from '../dto/update-app.dto';
@@ -28,8 +33,8 @@ export class AppsService {
 
   async getActiveApps(): Promise<SmartRotomApp[]> {
     return this.appsRepository.findActiveApps();
-  }  
-  
+  }
+
   async getInactiveApps(): Promise<SmartRotomApp[]> {
     return this.appsRepository.findByActive(0);
   }
@@ -39,21 +44,30 @@ export class AppsService {
     if (createAppDto.url) {
       const existingApp = await this.appsRepository.findByUrl(createAppDto.url);
       if (existingApp) {
-        throw new ConflictException(`App with URL '${createAppDto.url}' already exists`);
+        throw new ConflictException(
+          `App with URL '${createAppDto.url}' already exists`,
+        );
       }
     }
 
     return this.appsRepository.create(createAppDto);
   }
 
-  async updateApp(id: number, updateAppDto: UpdateAppDto): Promise<SmartRotomApp> {
+  async updateApp(
+    id: number,
+    updateAppDto: UpdateAppDto,
+  ): Promise<SmartRotomApp> {
     const existingApp = await this.getAppById(id);
 
     // Check for duplicate URL if updating URL
     if (updateAppDto.url && updateAppDto.url !== existingApp.url) {
-      const duplicateApp = await this.appsRepository.findByUrl(updateAppDto.url);
+      const duplicateApp = await this.appsRepository.findByUrl(
+        updateAppDto.url,
+      );
       if (duplicateApp && duplicateApp.id !== id) {
-        throw new ConflictException(`App with URL '${updateAppDto.url}' already exists`);
+        throw new ConflictException(
+          `App with URL '${updateAppDto.url}' already exists`,
+        );
       }
     }
 

@@ -17,15 +17,17 @@ export class MetaRegulationAutocompleteInterceptor extends AutocompleteIntercept
     const regulations = await this.metaFacade.getRegulations();
     const query = focused.value.toString().toLowerCase();
 
-    let filtered = regulations.filter((r) =>
-      r.name.toLowerCase().includes(query) || r.id.toLowerCase().includes(query),
+    let filtered = regulations.filter(
+      (r) =>
+        r.name.toLowerCase().includes(query) ||
+        r.id.toLowerCase().includes(query),
     );
 
     if (filtered.length > 25) filtered = filtered.slice(0, 25);
 
     return interaction.respond(
       filtered.map((r) => ({
-        name:  r.vgcPastesGid ? `${r.name} (Preview)` : r.name,
+        name: r.vgcPastesGid ? `${r.name} (Preview)` : r.name,
         value: r.id,
       })),
     );

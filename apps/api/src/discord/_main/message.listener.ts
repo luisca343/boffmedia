@@ -25,7 +25,7 @@ export class MessageListener {
     }
 
     const voiceChannel = message.member.voice.channel;
-    
+
     // Check if the bot is in the same voice channel as the user
     const botMember = message.guild?.members.cache.get(message.client.user.id);
     if (!botMember?.voice?.channel) {
@@ -35,9 +35,11 @@ export class MessageListener {
     if (botMember.voice.channelId !== voiceChannel.id) {
       return;
     }
-    
+
     try {
-      this.logger.log(`Playing audio for message: ${message.content} in channel: ${voiceChannel.name}`);
+      this.logger.log(
+        `Playing audio for message: ${message.content} in channel: ${voiceChannel.name}`,
+      );
       await playAudio(message, this.commandsService);
     } catch (error) {
       this.logger.error(`Error playing audio: ${error.message}`, error.stack);

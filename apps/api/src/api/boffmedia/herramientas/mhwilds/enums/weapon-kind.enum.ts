@@ -12,5 +12,5 @@ export enum WeaponKind {
   INSECT_GLAIVE = 'insect-glaive',
   LIGHT_BOWGUN = 'light-bowgun',
   HEAVY_BOWGUN = 'heavy-bowgun',
-  BOW = 'bow'
+  BOW = 'bow',
 }

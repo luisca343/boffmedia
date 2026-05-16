@@ -21,26 +21,26 @@ const BASE_URL = 'https://es.novelcool.com';
 const SOURCE_NAME = 'Novecool';
 
 // ── Search result selectors ─────────────────────────────────────────────────
-const SEL_BOOK_ITEM  = '.book-item';            // each search result card
-const SEL_BOOK_LINK  = 'a';                     // first anchor in the card (detail link)
+const SEL_BOOK_ITEM = '.book-item'; // each search result card
+const SEL_BOOK_LINK = 'a'; // first anchor in the card (detail link)
 const SEL_BOOK_TITLE = '.book-name, .title, h4, .novel-title'; // title text
-const SEL_BOOK_COVER = 'img';                   // cover image
-const SEL_BOOK_TAGS  = '.tag-item, .genre-item, .categories a'; // tag badges
+const SEL_BOOK_COVER = 'img'; // cover image
+const SEL_BOOK_TAGS = '.tag-item, .genre-item, .categories a'; // tag badges
 
 // ── Detail page selectors ───────────────────────────────────────────────────
-const SEL_DETAIL_TITLE   = 'h1, .book-name, .novel-title';
-const SEL_DETAIL_COVER   = '.book-pic img, .novel-cover img, .book-cover img';
-const SEL_DETAIL_TAGS    = '.tag-item, .genre-item, .tag-links a, .categories a';
+const SEL_DETAIL_TITLE = 'h1, .book-name, .novel-title';
+const SEL_DETAIL_COVER = '.book-pic img, .novel-cover img, .book-cover img';
+const SEL_DETAIL_TAGS = '.tag-item, .genre-item, .tag-links a, .categories a';
 // Each chapter is a .chp-item; the <a> holds the href and the title attribute;
 // the visible text is in span.chapter-item-headtitle.
-const SEL_CHAPTER_ITEM   = '.chp-item';
-const SEL_CHAPTER_LINK   = 'a';
-const SEL_CHAPTER_TITLE  = 'span.chapter-item-headtitle';
+const SEL_CHAPTER_ITEM = '.chp-item';
+const SEL_CHAPTER_LINK = 'a';
+const SEL_CHAPTER_TITLE = 'span.chapter-item-headtitle';
 
 // ── Chapter image selectors ─────────────────────────────────────────────────
 // Novelcool typically uses lazy-loaded images; check data-src first then src.
-const SEL_CHAPTER_IMAGES = '.chapter-img, .reading-content img, .manga-images img, #chapter-images img, .page-img';
-
+const SEL_CHAPTER_IMAGES =
+  '.chapter-img, .reading-content img, .manga-images img, #chapter-images img, .page-img';
 
 // ---------------------------------------------------------------------------
 // Headers sent for every HTML page request.
@@ -49,24 +49,28 @@ const SEL_CHAPTER_IMAGES = '.chapter-img, .reading-content img, .manga-images im
 // (which undici negotiates via ALPN) doesn't use it.
 // ---------------------------------------------------------------------------
 const HTML_HEADERS: Record<string, string> = {
-  'User-Agent':                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-  'Accept':                    'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-  'Accept-Language':           'es-ES,es;q=0.9,en;q=0.8',
-  'Cache-Control':             'max-age=0',
+  'User-Agent':
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+  Accept:
+    'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+  'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8',
+  'Cache-Control': 'max-age=0',
   'Upgrade-Insecure-Requests': '1',
-  'Sec-Fetch-Dest':            'document',
-  'Sec-Fetch-Mode':            'navigate',
-  'Sec-Fetch-Site':            'same-origin',
-  'Sec-Fetch-User':            '?1',
-  'Sec-Ch-Ua':                 '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
-  'Sec-Ch-Ua-Mobile':          '?0',
-  'Sec-Ch-Ua-Platform':        '"Windows"',
+  'Sec-Fetch-Dest': 'document',
+  'Sec-Fetch-Mode': 'navigate',
+  'Sec-Fetch-Site': 'same-origin',
+  'Sec-Fetch-User': '?1',
+  'Sec-Ch-Ua':
+    '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
+  'Sec-Ch-Ua-Mobile': '?0',
+  'Sec-Ch-Ua-Platform': '"Windows"',
 };
 
 // Separate, minimal headers for binary image downloads (axios, stays HTTP/1.1).
 const IMAGE_HEADERS: Record<string, string> = {
-  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-  'Accept':     'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
+  'User-Agent':
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+  Accept: 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
 };
 
 /** Resolves a potentially relative URL against the base. */
@@ -77,8 +81,12 @@ function resolveUrl(href: string): string {
 }
 
 /** Extracts the image URL from an element, preferring data-src over src (lazy-load). */
-function extractImageSrc($el: { attr(name: string): string | undefined }): string {
-  return $el.attr('data-src') || $el.attr('data-lazy-src') || $el.attr('src') || '';
+function extractImageSrc($el: {
+  attr(name: string): string | undefined;
+}): string {
+  return (
+    $el.attr('data-src') || $el.attr('data-lazy-src') || $el.attr('src') || ''
+  );
 }
 
 @Injectable()
@@ -89,7 +97,9 @@ export class NovecoolService implements OnModuleDestroy {
   private browser: Browser | null = null;
 
   constructor() {
-    this.logger.log('[Novecool] Service initialised — chapter pages use Playwright Chromium');
+    this.logger.log(
+      '[Novecool] Service initialised — chapter pages use Playwright Chromium',
+    );
   }
 
   async onModuleDestroy() {
@@ -105,11 +115,19 @@ export class NovecoolService implements OnModuleDestroy {
     try {
       this.browser = await chromium.launch({
         headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
-        ...(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {}),
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+        ],
+        ...(process.env.CHROME_PATH
+          ? { executablePath: process.env.CHROME_PATH }
+          : {}),
       });
     } catch (e) {
-      this.logger.error(`[Novecool] Browser launch failed: ${(e as Error)?.message ?? e}`);
+      this.logger.error(
+        `[Novecool] Browser launch failed: ${(e as Error)?.message ?? e}`,
+      );
       throw e;
     }
     this.logger.log('[Novecool] Playwright Chromium launched');
@@ -122,17 +140,24 @@ export class NovecoolService implements OnModuleDestroy {
   private cookieJar: Map<string, string> = new Map();
 
   private cookieHeader(): string {
-    return [...this.cookieJar.entries()].map(([k, v]) => `${k}=${v}`).join('; ');
+    return [...this.cookieJar.entries()]
+      .map(([k, v]) => `${k}=${v}`)
+      .join('; ');
   }
 
   private captureCookies(setCookieHeader: string | string[] | undefined): void {
     if (!setCookieHeader) return;
-    const cookies = Array.isArray(setCookieHeader) ? setCookieHeader : [setCookieHeader];
+    const cookies = Array.isArray(setCookieHeader)
+      ? setCookieHeader
+      : [setCookieHeader];
     for (const raw of cookies) {
       const nameValue = raw.split(';')[0].trim();
       const eqIdx = nameValue.indexOf('=');
       if (eqIdx > 0) {
-        this.cookieJar.set(nameValue.slice(0, eqIdx), nameValue.slice(eqIdx + 1));
+        this.cookieJar.set(
+          nameValue.slice(0, eqIdx),
+          nameValue.slice(eqIdx + 1),
+        );
       }
     }
   }
@@ -162,7 +187,9 @@ export class NovecoolService implements OnModuleDestroy {
       if (!title) return; // skip entries without a title
 
       // Cover
-      const coverUrl = resolveUrl(extractImageSrc($el.find(SEL_BOOK_COVER).first()));
+      const coverUrl = resolveUrl(
+        extractImageSrc($el.find(SEL_BOOK_COVER).first()),
+      );
 
       // Tags
       const tags: string[] = [];
@@ -171,10 +198,18 @@ export class NovecoolService implements OnModuleDestroy {
         if (t) tags.push(t);
       });
 
-      results.push({ title, url: detailUrl, source: SOURCE_NAME, coverUrl, tags });
+      results.push({
+        title,
+        url: detailUrl,
+        source: SOURCE_NAME,
+        coverUrl,
+        tags,
+      });
     });
 
-    this.logger.log(`[Novecool] Found ${results.length} result(s) for "${query}"`);
+    this.logger.log(
+      `[Novecool] Found ${results.length} result(s) for "${query}"`,
+    );
     return results;
   }
 
@@ -220,7 +255,9 @@ export class NovecoolService implements OnModuleDestroy {
       chapters.push({ title: rawTitle, url: chapterUrl, number });
     });
 
-    this.logger.log(`[Novecool] Found ${chapters.length} chapter(s) for "${title}"`);
+    this.logger.log(
+      `[Novecool] Found ${chapters.length} chapter(s) for "${title}"`,
+    );
 
     return {
       title,
@@ -245,7 +282,10 @@ export class NovecoolService implements OnModuleDestroy {
    * @param chapterUrl  The chapter URL from the manga detail page (may end with "/")
    * @param mangaUrl    The manga detail page URL – used as Referer to avoid 403s
    */
-  async getChapterImageUrls(chapterUrl: string, mangaUrl?: string): Promise<string[]> {
+  async getChapterImageUrls(
+    chapterUrl: string,
+    mangaUrl?: string,
+  ): Promise<string[]> {
     const base = chapterUrl.replace(/\/+$/, '');
     const IMGS_PER_PAGE = 10;
     const allImages: string[] = [];
@@ -261,19 +301,23 @@ export class NovecoolService implements OnModuleDestroy {
       let page = 1;
       while (true) {
         const url = `${base}-${IMGS_PER_PAGE}-${page}.html`;
-        this.logger.log(`[Novecool] Fetching chapter page ${page} via Playwright: ${url}`);
+        this.logger.log(
+          `[Novecool] Fetching chapter page ${page} via Playwright: ${url}`,
+        );
 
         await tab.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
 
         // Extract all manga page image sources directly from the live DOM
         const pageImages: string[] = await tab.evaluate(() =>
           Array.from(document.querySelectorAll('img.mangaread-manga-pic'))
-            .map(img => (img as HTMLImageElement).src)
-            .filter(src => Boolean(src)),
+            .map((img) => (img as HTMLImageElement).src)
+            .filter((src) => Boolean(src)),
         );
 
         allImages.push(...pageImages);
-        this.logger.log(`[Novecool] Page ${page}: ${pageImages.length} image(s)`);
+        this.logger.log(
+          `[Novecool] Page ${page}: ${pageImages.length} image(s)`,
+        );
 
         if (pageImages.length < IMGS_PER_PAGE) break;
         page++;
@@ -283,7 +327,9 @@ export class NovecoolService implements OnModuleDestroy {
       await context.close();
     }
 
-    this.logger.log(`[Novecool] Total: ${allImages.length} image(s) in chapter`);
+    this.logger.log(
+      `[Novecool] Total: ${allImages.length} image(s) in chapter`,
+    );
     return allImages;
   }
 
@@ -311,7 +357,9 @@ export class NovecoolService implements OnModuleDestroy {
         const { data } = await axios.get<Buffer>(imageUrl, config);
         return Buffer.from(data);
       } catch (secondErr) {
-        throw new Error(`Failed to download image ${imageUrl}: ${secondErr?.message ?? secondErr}`);
+        throw new Error(
+          `Failed to download image ${imageUrl}: ${secondErr?.message ?? secondErr}`,
+        );
       }
     }
   }
@@ -323,7 +371,10 @@ export class NovecoolService implements OnModuleDestroy {
    * Unlike axios, undici negotiates HTTP/2 via ALPN, which passes the browser
    * fingerprint check that Novelcool applies on chapter pages.
    */
-  private async fetchHtml(url: string, extraHeaders?: Record<string, string>): Promise<string> {
+  private async fetchHtml(
+    url: string,
+    extraHeaders?: Record<string, string>,
+  ): Promise<string> {
     const cookieStr = this.cookieHeader();
     const headers: Record<string, string> = {
       ...HTML_HEADERS,
@@ -331,7 +382,11 @@ export class NovecoolService implements OnModuleDestroy {
       ...(extraHeaders ?? {}),
     };
 
-    const response = await fetch(url, { method: 'GET', headers, redirect: 'follow' });
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+      redirect: 'follow',
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP ${response.status} for ${url}`);
@@ -348,4 +403,3 @@ export class NovecoolService implements OnModuleDestroy {
     return response.text();
   }
 }
-

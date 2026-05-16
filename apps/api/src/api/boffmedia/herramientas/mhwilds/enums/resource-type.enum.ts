@@ -3,5 +3,5 @@ export enum ResourceType {
   ARMOR = 'armor',
   CHARMS = 'charms',
   DECORATIONS = 'decorations',
-  SKILLS = 'skills'
+  SKILLS = 'skills',
 }

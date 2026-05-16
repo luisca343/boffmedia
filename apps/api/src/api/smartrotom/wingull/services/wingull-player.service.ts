@@ -13,7 +13,7 @@ export class WingullPlayerService {
     @Inject(WINGULL_USER_REPOSITORY_TOKEN)
     private readonly wingullPlayerRepository: IWingullPlayerRepository,
   ) {}
-  
+
   async getStats(uuid: string): Promise<PlayerStats> {
     try {
       return await this.wingullPlayerRepository.getStatsFromAPI(uuid);
@@ -22,7 +22,7 @@ export class WingullPlayerService {
       throw new Error(`Stats retrieval failed: ${error.message}`);
     }
   }
-  
+
   async getTeam(uuid: string): Promise<PokemonW[]> {
     try {
       return await this.wingullPlayerRepository.getTeamFromAPI(uuid);
@@ -43,7 +43,9 @@ export class WingullPlayerService {
 
   async movePokemon(movePokemonDto: any): Promise<any> {
     try {
-      return await this.wingullPlayerRepository.movePokemonInAPI(movePokemonDto);
+      return await this.wingullPlayerRepository.movePokemonInAPI(
+        movePokemonDto,
+      );
     } catch (error: any) {
       console.error(`Failed to move Pokémon:`, error);
       throw new Error(`Pokémon move failed: ${error.message}`);
@@ -58,7 +60,7 @@ export class WingullPlayerService {
       throw new Error(`Dex update failed: ${error.message}`);
     }
   }
-  
+
   async getQuests(uuid: string): Promise<any> {
     try {
       return await this.wingullPlayerRepository.getQuestsFromAPI(uuid);
@@ -67,7 +69,7 @@ export class WingullPlayerService {
       throw new Error(`Quests retrieval failed: ${error.message}`);
     }
   }
-  
+
   async sendMessage(uuid: string, message: string): Promise<any> {
     try {
       const request: MessageRequestDto = { uuid, message };
@@ -87,8 +89,12 @@ export class WingullPlayerService {
       throw new Error(`Global chat message sending failed: ${error.message}`);
     }
   }
-  
-  async givePokemon(uuid: string, pokespec: string, sendMessage: boolean = true): Promise<any> {
+
+  async givePokemon(
+    uuid: string,
+    pokespec: string,
+    sendMessage: boolean = true,
+  ): Promise<any> {
     try {
       const request: PokemonGiveRequestDto = { uuid, pokespec, sendMessage };
       return await this.wingullPlayerRepository.givePokemonInAPI(request);
@@ -97,13 +103,16 @@ export class WingullPlayerService {
       throw new Error(`Pokémon giving failed: ${error.message}`);
     }
   }
-  
-  async giveItems(uuid: string, items: Array<{
-    id: string,
-    amount: number,
-    display_name?: string,
-    lore?: string[]
-  }>): Promise<any> {
+
+  async giveItems(
+    uuid: string,
+    items: Array<{
+      id: string;
+      amount: number;
+      display_name?: string;
+      lore?: string[];
+    }>,
+  ): Promise<any> {
     try {
       return await this.wingullPlayerRepository.giveItemsInAPI(uuid, items);
     } catch (error: any) {
@@ -121,9 +130,13 @@ export class WingullPlayerService {
     }
   }
 
-  async updateBattleTeam(updateBattleTeamDto: UpdateBattleTeamDto): Promise<any> {
+  async updateBattleTeam(
+    updateBattleTeamDto: UpdateBattleTeamDto,
+  ): Promise<any> {
     try {
-      return await this.wingullPlayerRepository.updateBattleTeamInAPI(updateBattleTeamDto);
+      return await this.wingullPlayerRepository.updateBattleTeamInAPI(
+        updateBattleTeamDto,
+      );
     } catch (error: any) {
       console.error('Failed to update battle team:', error);
       throw new Error(`Battle team update failed: ${error.message}`);

@@ -1,5 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { MhwildsRepository, ResourceFetchResult, WeaponTreeNode } from '@api/boffmedia/herramientas/mhwilds/repositories/mhwilds.repository';
+import {
+  MhwildsRepository,
+  ResourceFetchResult,
+  WeaponTreeNode,
+} from '@api/boffmedia/herramientas/mhwilds/repositories/mhwilds.repository';
 import { MHWILDS_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 import { IMhwildsRepository } from '../repositories/interface/mhwilds.repository.interface';
 
@@ -39,7 +43,9 @@ export class MhwildsDataService {
 
   // ==================== BASIC DATA RETRIEVAL ====================
 
-  async getWeapons(locale: string): Promise<{ data: any[]; cacheInfo: CacheInfo }> {
+  async getWeapons(
+    locale: string,
+  ): Promise<{ data: any[]; cacheInfo: CacheInfo }> {
     try {
       const result = await this.mhwildsRepository.getWeapons(locale);
       return this.formatResultWithCacheInfo(result);
@@ -48,7 +54,9 @@ export class MhwildsDataService {
     }
   }
 
-  async getArmor(locale: string): Promise<{ data: any[]; cacheInfo: CacheInfo }> {
+  async getArmor(
+    locale: string,
+  ): Promise<{ data: any[]; cacheInfo: CacheInfo }> {
     try {
       const result = await this.mhwildsRepository.getArmor(locale);
       return this.formatResultWithCacheInfo(result);
@@ -57,7 +65,9 @@ export class MhwildsDataService {
     }
   }
 
-  async getCharms(locale: string): Promise<{ data: any[]; cacheInfo: CacheInfo }> {
+  async getCharms(
+    locale: string,
+  ): Promise<{ data: any[]; cacheInfo: CacheInfo }> {
     try {
       const result = await this.mhwildsRepository.getCharms(locale);
       return this.formatResultWithCacheInfo(result);
@@ -66,7 +76,9 @@ export class MhwildsDataService {
     }
   }
 
-  async getDecorations(locale: string): Promise<{ data: any[]; cacheInfo: CacheInfo }> {
+  async getDecorations(
+    locale: string,
+  ): Promise<{ data: any[]; cacheInfo: CacheInfo }> {
     try {
       const result = await this.mhwildsRepository.getDecorations(locale);
       return this.formatResultWithCacheInfo(result);
@@ -75,7 +87,9 @@ export class MhwildsDataService {
     }
   }
 
-  async getSkills(locale: string): Promise<{ data: any[]; cacheInfo: CacheInfo }> {
+  async getSkills(
+    locale: string,
+  ): Promise<{ data: any[]; cacheInfo: CacheInfo }> {
     try {
       const result = await this.mhwildsRepository.getSkills(locale);
       return this.formatResultWithCacheInfo(result);
@@ -86,24 +100,28 @@ export class MhwildsDataService {
 
   // ==================== PROCESSED DATA OPERATIONS ====================
 
-  async getAllCharmRanks(locale: string): Promise<{ data: CharmRankResult[]; cacheInfo: CacheInfo }> {
+  async getAllCharmRanks(
+    locale: string,
+  ): Promise<{ data: CharmRankResult[]; cacheInfo: CacheInfo }> {
     try {
       const result = await this.mhwildsRepository.getCharms(locale);
       const charms = result.data;
 
       const allRanks = charms.reduce((ranks: CharmRankResult[], charm: any) => {
-        return ranks.concat(charm.ranks.map((rank: any) => ({
-          ...rank,
-          charm: {
-            id: charm.id,
-            gameId: charm.gameId
-          }
-        })));
+        return ranks.concat(
+          charm.ranks.map((rank: any) => ({
+            ...rank,
+            charm: {
+              id: charm.id,
+              gameId: charm.gameId,
+            },
+          })),
+        );
       }, []);
 
       return {
         data: allRanks,
-        cacheInfo: this.extractCacheInfo(result)
+        cacheInfo: this.extractCacheInfo(result),
       };
     } catch (error: any) {
       throw new Error(`Failed to get charm ranks: ${error.message}`);
@@ -113,15 +131,21 @@ export class MhwildsDataService {
   async createWeaponTree(locale: string): Promise<WeaponTreeResult> {
     try {
       // Check if we have cached weapon tree
-      const cachedTree = await this.mhwildsRepository.getProcessedData('weapon-tree.json', locale);
-      const cachedTreeByKind = await this.mhwildsRepository.getProcessedData('weapon-tree-by-kind.json', locale);
+      const cachedTree = await this.mhwildsRepository.getProcessedData(
+        'weapon-tree.json',
+        locale,
+      );
+      const cachedTreeByKind = await this.mhwildsRepository.getProcessedData(
+        'weapon-tree-by-kind.json',
+        locale,
+      );
 
       if (cachedTree && cachedTreeByKind) {
         return {
           tree: cachedTree,
           treeByKind: cachedTreeByKind,
           totalWeapons: this.countWeaponsInTree(cachedTree),
-          weaponKinds: Object.keys(cachedTreeByKind)
+          weaponKinds: Object.keys(cachedTreeByKind),
         };
       }
 
@@ -134,13 +158,13 @@ export class MhwildsDataService {
         return map;
       }, {});
 
-      const rootWeapons = weapons.filter(weapon => 
-        weapon.crafting?.craftable === true && 
-        !weapon.crafting?.previous
+      const rootWeapons = weapons.filter(
+        (weapon) =>
+          weapon.crafting?.craftable === true && !weapon.crafting?.previous,
       );
 
-      const weaponTree = rootWeapons.map(rootWeapon => 
-        this.buildWeaponBranch(rootWeapon, weaponsById)
+      const weaponTree = rootWeapons.map((rootWeapon) =>
+        this.buildWeaponBranch(rootWeapon, weaponsById),
       );
 
       const weaponTreeByKind = weapons.reduce((tree, weapon) => {
@@ -157,14 +181,22 @@ export class MhwildsDataService {
       }, {});
 
       // Save the processed data
-      await this.mhwildsRepository.saveProcessedData('weapon-tree.json', locale, weaponTree);
-      await this.mhwildsRepository.saveProcessedData('weapon-tree-by-kind.json', locale, weaponTreeByKind);
+      await this.mhwildsRepository.saveProcessedData(
+        'weapon-tree.json',
+        locale,
+        weaponTree,
+      );
+      await this.mhwildsRepository.saveProcessedData(
+        'weapon-tree-by-kind.json',
+        locale,
+        weaponTreeByKind,
+      );
 
       return {
         tree: weaponTree,
         treeByKind: weaponTreeByKind,
         totalWeapons: this.countWeaponsInTree(weaponTree),
-        weaponKinds: Object.keys(weaponTreeByKind)
+        weaponKinds: Object.keys(weaponTreeByKind),
       };
     } catch (error: any) {
       throw new Error(`Failed to create weapon tree: ${error.message}`);
@@ -173,52 +205,61 @@ export class MhwildsDataService {
 
   // ==================== SEARCH AND FILTER OPERATIONS ====================
 
-  async searchWeaponsByName(locale: string, searchTerm: string): Promise<{ data: any[]; cacheInfo: CacheInfo }> {
+  async searchWeaponsByName(
+    locale: string,
+    searchTerm: string,
+  ): Promise<{ data: any[]; cacheInfo: CacheInfo }> {
     try {
       const result = await this.mhwildsRepository.getWeapons(locale);
       const weapons = result.data;
 
-      const filteredWeapons = weapons.filter(weapon => 
-        weapon.name.toLowerCase().includes(searchTerm.toLowerCase())
+      const filteredWeapons = weapons.filter((weapon) =>
+        weapon.name.toLowerCase().includes(searchTerm.toLowerCase()),
       );
 
       return {
         data: filteredWeapons,
-        cacheInfo: this.extractCacheInfo(result)
+        cacheInfo: this.extractCacheInfo(result),
       };
     } catch (error: any) {
       throw new Error(`Failed to search weapons: ${error.message}`);
     }
   }
 
-  async getWeaponsByKind(locale: string, kind: string): Promise<{ data: any[]; cacheInfo: CacheInfo }> {
+  async getWeaponsByKind(
+    locale: string,
+    kind: string,
+  ): Promise<{ data: any[]; cacheInfo: CacheInfo }> {
     try {
       const result = await this.mhwildsRepository.getWeapons(locale);
       const weapons = result.data;
 
-      const filteredWeapons = weapons.filter(weapon => 
-        weapon.kind.toLowerCase() === kind.toLowerCase()
+      const filteredWeapons = weapons.filter(
+        (weapon) => weapon.kind.toLowerCase() === kind.toLowerCase(),
       );
 
       return {
         data: filteredWeapons,
-        cacheInfo: this.extractCacheInfo(result)
+        cacheInfo: this.extractCacheInfo(result),
       };
     } catch (error: any) {
       throw new Error(`Failed to get weapons by kind: ${error.message}`);
     }
   }
 
-  async getArmorByRarity(locale: string, rarity: number): Promise<{ data: any[]; cacheInfo: CacheInfo }> {
+  async getArmorByRarity(
+    locale: string,
+    rarity: number,
+  ): Promise<{ data: any[]; cacheInfo: CacheInfo }> {
     try {
       const result = await this.mhwildsRepository.getArmor(locale);
       const armor = result.data;
 
-      const filteredArmor = armor.filter(piece => piece.rarity === rarity);
+      const filteredArmor = armor.filter((piece) => piece.rarity === rarity);
 
       return {
         data: filteredArmor,
-        cacheInfo: this.extractCacheInfo(result)
+        cacheInfo: this.extractCacheInfo(result),
       };
     } catch (error: any) {
       throw new Error(`Failed to get armor by rarity: ${error.message}`);
@@ -235,12 +276,18 @@ export class MhwildsDataService {
     skills: { total: number };
   }> {
     try {
-      const [weaponsResult, armorResult, charmsResult, decorationsResult, skillsResult] = await Promise.all([
+      const [
+        weaponsResult,
+        armorResult,
+        charmsResult,
+        decorationsResult,
+        skillsResult,
+      ] = await Promise.all([
         this.mhwildsRepository.getWeapons(locale),
         this.mhwildsRepository.getArmor(locale),
         this.mhwildsRepository.getCharms(locale),
         this.mhwildsRepository.getDecorations(locale),
-        this.mhwildsRepository.getSkills(locale)
+        this.mhwildsRepository.getSkills(locale),
       ]);
 
       // Weapons statistics
@@ -256,10 +303,13 @@ export class MhwildsDataService {
       }, {});
 
       // Decorations statistics
-      const decorationsByRarity = decorationsResult.data.reduce((acc, decoration) => {
-        acc[decoration.rarity] = (acc[decoration.rarity] || 0) + 1;
-        return acc;
-      }, {});
+      const decorationsByRarity = decorationsResult.data.reduce(
+        (acc, decoration) => {
+          acc[decoration.rarity] = (acc[decoration.rarity] || 0) + 1;
+          return acc;
+        },
+        {},
+      );
 
       // Charm ranks count
       const totalCharmRanks = charmsResult.data.reduce((total, charm) => {
@@ -269,23 +319,23 @@ export class MhwildsDataService {
       return {
         weapons: {
           total: weaponsResult.data.length,
-          byKind: weaponsByKind
+          byKind: weaponsByKind,
         },
         armor: {
           total: armorResult.data.length,
-          byRarity: armorByRarity
+          byRarity: armorByRarity,
         },
         charms: {
           total: charmsResult.data.length,
-          totalRanks: totalCharmRanks
+          totalRanks: totalCharmRanks,
         },
         decorations: {
           total: decorationsResult.data.length,
-          byRarity: decorationsByRarity
+          byRarity: decorationsByRarity,
         },
         skills: {
-          total: skillsResult.data.length
-        }
+          total: skillsResult.data.length,
+        },
       };
     } catch (error: any) {
       throw new Error(`Failed to get data statistics: ${error.message}`);
@@ -294,7 +344,10 @@ export class MhwildsDataService {
 
   // ==================== UTILITY METHODS ====================
 
-  private buildWeaponBranch(weapon: any, weaponsById: Record<string, any>): WeaponTreeNode {
+  private buildWeaponBranch(
+    weapon: any,
+    weaponsById: Record<string, any>,
+  ): WeaponTreeNode {
     if (!weapon) return null;
 
     const node: WeaponTreeNode = {
@@ -308,12 +361,12 @@ export class MhwildsDataService {
       craftingZennyCost: weapon.crafting?.craftingZennyCost || 0,
       upgradeMaterials: weapon.crafting?.upgradeMaterials || [],
       upgradeZennyCost: weapon.crafting?.upgradeZennyCost || 0,
-      children: []
+      children: [],
     };
 
     if (weapon.crafting?.branches && weapon.crafting.branches.length > 0) {
       node.children = weapon.crafting.branches
-        .map(branch => {
+        .map((branch) => {
           const branchWeapon = weaponsById[branch.id];
           return this.buildWeaponBranch(branchWeapon, weaponsById);
         })
@@ -329,17 +382,20 @@ export class MhwildsDataService {
     }, 0);
   }
 
-  private formatResultWithCacheInfo(result: ResourceFetchResult): { data: any; cacheInfo: CacheInfo } {
+  private formatResultWithCacheInfo(result: ResourceFetchResult): {
+    data: any;
+    cacheInfo: CacheInfo;
+  } {
     return {
       data: result.data,
-      cacheInfo: this.extractCacheInfo(result)
+      cacheInfo: this.extractCacheInfo(result),
     };
   }
 
   private extractCacheInfo(result: ResourceFetchResult): CacheInfo {
     const cacheInfo: CacheInfo = {
       fromCache: result.fromCache,
-      fetchTime: result.fetchTime
+      fetchTime: result.fetchTime,
     };
 
     if (result.fromCache) {

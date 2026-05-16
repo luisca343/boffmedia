@@ -35,17 +35,26 @@ export class PokemonIntegrationService {
 
   // ==================== BULK DEX UPDATE WITH WINGULL SYNC ====================
 
-  async updateDexWithSync(uuid: string, data: { SEEN: number[], CAUGHT: number[] }): Promise<any> {
+  async updateDexWithSync(
+    uuid: string,
+    data: { SEEN: number[]; CAUGHT: number[] },
+  ): Promise<any> {
     try {
       // Update local pokedex
-      const updateResult = await this.pokedexManagementService.bulkUpdateDex(uuid, data);
+      const updateResult = await this.pokedexManagementService.bulkUpdateDex(
+        uuid,
+        data,
+      );
 
       // Sync with Wingull if successful
       if (updateResult.success) {
         try {
           await this.updateWingullDex(uuid);
         } catch (wingullError) {
-          console.error(`Failed to sync with Wingull for ${uuid}:`, wingullError);
+          console.error(
+            `Failed to sync with Wingull for ${uuid}:`,
+            wingullError,
+          );
           // Don't fail the entire operation if Wingull sync fails
         }
       }

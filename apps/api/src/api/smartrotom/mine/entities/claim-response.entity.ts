@@ -1,22 +1,22 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ClaimResponse {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Array of claimed item IDs',
     example: [1, 2, 3],
-    type: [Number]
+    type: [Number],
   })
   claimedIds: number[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Total number of items claimed',
-    example: 3
+    example: 3,
   })
   totalClaimed: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Success status',
-    example: true
+    example: true,
   })
   success: boolean;
 }

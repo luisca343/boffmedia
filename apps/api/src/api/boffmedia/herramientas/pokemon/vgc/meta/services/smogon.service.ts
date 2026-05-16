@@ -1,7 +1,10 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Dex } from '@pkmn/sim';
 import { SmogonRepository } from '../repositories/smogon.repository';
-import { PokemonUsageDetail, PokemonUsageEntry } from '../entities/pokemon-usage.entity';
+import {
+  PokemonUsageDetail,
+  PokemonUsageEntry,
+} from '../entities/pokemon-usage.entity';
 import { VgcSmogonSnapshot, VgcSmogonPokemonRow } from '@/_db/schema/Vgc';
 import { smogonUsageUrl, smogonMovesetUrl } from '../config/smogon.config';
 import { parseUsageTxt } from '../utils/parse-usage-txt';
@@ -51,44 +54,60 @@ export class SmogonService {
     ]);
 
     const usageEntries = parseUsageTxt(usageTxt);
-    const movesetMap   = parseMovesetTxt(movesetTxt);
-    const now          = new Date();
+    const movesetMap = parseMovesetTxt(movesetTxt);
+    const now = new Date();
 
     const rows = usageEntries.map((entry) => {
       const moveset = movesetMap[entry.name] ?? {
-        abilities: [], items: [], moves: [], teraTypes: [], teammates: [], spreads: [],
+        abilities: [],
+        items: [],
+        moves: [],
+        teraTypes: [],
+        teammates: [],
+        spreads: [],
       };
       return {
         formatId,
         month,
         cutoff,
-        speciesId:    resolveSpeciesId(entry.name, Dex),
-        speciesName:  entry.name,
-        rank:         entry.rank,
+        speciesId: resolveSpeciesId(entry.name, Dex),
+        speciesName: entry.name,
+        rank: entry.rank,
         usagePercent: entry.usagePercent,
-        rawCount:     entry.rawCount,
-        topItem:      moveset.items[0]?.name     ?? null,
-        topMove:      moveset.moves[0]?.name     ?? null,
-        topTeraType:  moveset.teraTypes[0]?.name ?? null,
-        abilities:    JSON.stringify(moveset.abilities),
-        items:        JSON.stringify(moveset.items),
-        moves:        JSON.stringify(moveset.moves),
-        teraTypes:    JSON.stringify(moveset.teraTypes),
-        teammates:    JSON.stringify(moveset.teammates),
-        spreads:      JSON.stringify(moveset.spreads),
-        fetchedAt:    now,
+        rawCount: entry.rawCount,
+        topItem: moveset.items[0]?.name ?? null,
+        topMove: moveset.moves[0]?.name ?? null,
+        topTeraType: moveset.teraTypes[0]?.name ?? null,
+        abilities: JSON.stringify(moveset.abilities),
+        items: JSON.stringify(moveset.items),
+        moves: JSON.stringify(moveset.moves),
+        teraTypes: JSON.stringify(moveset.teraTypes),
+        teammates: JSON.stringify(moveset.teammates),
+        spreads: JSON.stringify(moveset.spreads),
+        fetchedAt: now,
       };
     });
 
     await this.smogonRepository.deletePokemon(formatId, month, cutoff);
     await this.smogonRepository.insertPokemonBatch(rows);
-    await this.smogonRepository.upsertSnapshot({ formatId, month, cutoff, pokemonCount: rows.length });
+    await this.smogonRepository.upsertSnapshot({
+      formatId,
+      month,
+      cutoff,
+      pokemonCount: rows.length,
+    });
 
-    this.logger.log(`Stored ${rows.length} Pokémon for ${formatId} ${month}-${cutoff}`);
+    this.logger.log(
+      `Stored ${rows.length} Pokémon for ${formatId} ${month}-${cutoff}`,
+    );
     return { count: rows.length };
   }
 
-  async deleteSnapshot(formatId: string, month: string, cutoff: number): Promise<void> {
+  async deleteSnapshot(
+    formatId: string,
+    month: string,
+    cutoff: number,
+  ): Promise<void> {
     await this.smogonRepository.deletePokemon(formatId, month, cutoff);
     await this.smogonRepository.deleteSnapshot(formatId, month, cutoff);
     this.logger.log(`Deleted snapshot for ${formatId} ${month}-${cutoff}`);
@@ -105,7 +124,11 @@ export class SmogonService {
     month: string,
     cutoff: number,
   ): Promise<PokemonUsageDetail[]> {
-    const rows = await this.smogonRepository.findAllPokemon(formatId, month, cutoff);
+    const rows = await this.smogonRepository.findAllPokemon(
+      formatId,
+      month,
+      cutoff,
+    );
     if (rows.length === 0) {
       throw new NotFoundException(
         `No data for ${formatId} ${month}-${cutoff}. Fetch from the admin panel first.`,
@@ -120,7 +143,11 @@ export class SmogonService {
     month: string,
     cutoff: number,
   ): Promise<PokemonUsageEntry[]> {
-    const rows = await this.smogonRepository.findAllPokemon(formatId, month, cutoff);
+    const rows = await this.smogonRepository.findAllPokemon(
+      formatId,
+      month,
+      cutoff,
+    );
     if (rows.length === 0) {
       throw new NotFoundException(
         `No data for ${formatId} ${month}-${cutoff}. Fetch from the admin panel first.`,
@@ -136,7 +163,12 @@ export class SmogonService {
     cutoff: number,
     speciesId: string,
   ): Promise<PokemonUsageDetail> {
-    const row = await this.smogonRepository.findPokemon(formatId, month, cutoff, speciesId);
+    const row = await this.smogonRepository.findPokemon(
+      formatId,
+      month,
+      cutoff,
+      speciesId,
+    );
     if (!row) {
       throw new NotFoundException(
         `Species "${speciesId}" not found in ${formatId} ${month}-${cutoff}`,
@@ -163,44 +195,54 @@ export class SmogonService {
 
   // ─── Private ────────────────────────────────────────────────────────────────
 
-  private toDetail(row: VgcSmogonPokemonRow, dex: typeof Dex): PokemonUsageDetail {
-    const species  = dex.species.get(row.speciesName);
+  private toDetail(
+    row: VgcSmogonPokemonRow,
+    dex: typeof Dex,
+  ): PokemonUsageDetail {
+    const species = dex.species.get(row.speciesName);
     const baseStats = species.exists
       ? species.baseStats
       : { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
 
     return {
-      speciesId:    row.speciesId,
-      speciesName:  row.speciesName,
-      rank:         row.rank,
-      types:        species.exists ? ([...species.types] as string[]).filter(Boolean) : [],
+      speciesId: row.speciesId,
+      speciesName: row.speciesName,
+      rank: row.rank,
+      types: species.exists
+        ? ([...species.types] as string[]).filter(Boolean)
+        : [],
       usagePercent: row.usagePercent,
-      rawCount:     row.rawCount,
-      topItem:      row.topItem     ?? undefined,
-      topMove:      row.topMove     ?? undefined,
-      topTeraType:  row.topTeraType ?? undefined,
+      rawCount: row.rawCount,
+      topItem: row.topItem ?? undefined,
+      topMove: row.topMove ?? undefined,
+      topTeraType: row.topTeraType ?? undefined,
       baseStats,
-      abilities:    JSON.parse(row.abilities),
-      items:        JSON.parse(row.items),
-      moves:        JSON.parse(row.moves),
-      teraTypes:    JSON.parse(row.teraTypes),
-      teammates:    JSON.parse(row.teammates),
-      spreads:      JSON.parse(row.spreads),
+      abilities: JSON.parse(row.abilities),
+      items: JSON.parse(row.items),
+      moves: JSON.parse(row.moves),
+      teraTypes: JSON.parse(row.teraTypes),
+      teammates: JSON.parse(row.teammates),
+      spreads: JSON.parse(row.spreads),
     };
   }
 
-  private toEntry(row: VgcSmogonPokemonRow, dex: typeof Dex): PokemonUsageEntry {
+  private toEntry(
+    row: VgcSmogonPokemonRow,
+    dex: typeof Dex,
+  ): PokemonUsageEntry {
     const species = dex.species.get(row.speciesName);
     return {
-      speciesId:    row.speciesId,
-      speciesName:  row.speciesName,
-      rank:         row.rank,
-      types:        species.exists ? ([...species.types] as string[]).filter(Boolean) : [],
+      speciesId: row.speciesId,
+      speciesName: row.speciesName,
+      rank: row.rank,
+      types: species.exists
+        ? ([...species.types] as string[]).filter(Boolean)
+        : [],
       usagePercent: row.usagePercent,
-      rawCount:     row.rawCount,
-      topItem:      row.topItem ?? undefined,
-      topMove:      row.topMove ?? undefined,
-      topTeraType:  row.topTeraType ?? undefined,
+      rawCount: row.rawCount,
+      topItem: row.topItem ?? undefined,
+      topMove: row.topMove ?? undefined,
+      topTeraType: row.topTeraType ?? undefined,
     };
   }
 }

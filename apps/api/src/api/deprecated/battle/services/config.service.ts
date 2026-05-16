@@ -19,7 +19,7 @@ export class ConfigService {
   constructor() {
     this.configBasePath = path.join(
       process.cwd(),
-      'public/smartrotom/combates/entrenadores'
+      'public/smartrotom/combates/entrenadores',
     );
   }
 
@@ -30,7 +30,11 @@ export class ConfigService {
 
     // Sanitize the config name to prevent directory traversal
     const sanitizedName = this.sanitizeConfigName(npcConfigName);
-    const configPath = path.join(this.configBasePath, sanitizedName, 'config.json');
+    const configPath = path.join(
+      this.configBasePath,
+      sanitizedName,
+      'config.json',
+    );
 
     try {
       // Check if file exists
@@ -48,7 +52,9 @@ export class ConfigService {
       return config;
     } catch (error: any) {
       if (error instanceof SyntaxError) {
-        throw new Error(`Invalid JSON in config file for NPC: ${npcConfigName}`);
+        throw new Error(
+          `Invalid JSON in config file for NPC: ${npcConfigName}`,
+        );
       }
       throw error;
     }
@@ -60,12 +66,18 @@ export class ConfigService {
         return [];
       }
 
-      const directories = await fsPromises.readdir(this.configBasePath, { withFileTypes: true });
+      const directories = await fsPromises.readdir(this.configBasePath, {
+        withFileTypes: true,
+      });
       const configNames: string[] = [];
 
       for (const dir of directories) {
         if (dir.isDirectory()) {
-          const configPath = path.join(this.configBasePath, dir.name, 'config.json');
+          const configPath = path.join(
+            this.configBasePath,
+            dir.name,
+            'config.json',
+          );
           if (fs.existsSync(configPath)) {
             configNames.push(dir.name);
           }
@@ -88,7 +100,10 @@ export class ConfigService {
     }
   }
 
-  async createConfig(npcConfigName: string, config: BattleConfig): Promise<void> {
+  async createConfig(
+    npcConfigName: string,
+    config: BattleConfig,
+  ): Promise<void> {
     const sanitizedName = this.sanitizeConfigName(npcConfigName);
     const configDir = path.join(this.configBasePath, sanitizedName);
     const configPath = path.join(configDir, 'config.json');
@@ -103,22 +118,31 @@ export class ConfigService {
       this.validateConfig(config);
 
       // Write config file
-      await fsPromises.writeFile(configPath, JSON.stringify(config, null, 2), 'utf8');
+      await fsPromises.writeFile(
+        configPath,
+        JSON.stringify(config, null, 2),
+        'utf8',
+      );
     } catch (error: any) {
-      throw new Error(`Failed to create config for NPC: ${npcConfigName}. ${error.message}`);
+      throw new Error(
+        `Failed to create config for NPC: ${npcConfigName}. ${error.message}`,
+      );
     }
   }
 
-  async updateConfig(npcConfigName: string, config: Partial<BattleConfig>): Promise<BattleConfig> {
+  async updateConfig(
+    npcConfigName: string,
+    config: Partial<BattleConfig>,
+  ): Promise<BattleConfig> {
     // Get existing config
     const existingConfig = await this.getBattleConfig(npcConfigName);
-    
+
     // Merge with updates
     const updatedConfig = { ...existingConfig, ...config };
-    
+
     // Save updated config
     await this.createConfig(npcConfigName, updatedConfig);
-    
+
     return updatedConfig;
   }
 
@@ -131,7 +155,9 @@ export class ConfigService {
         await fsPromises.rm(configDir, { recursive: true, force: true });
       }
     } catch (error: any) {
-      throw new Error(`Failed to delete config for NPC: ${npcConfigName}. ${error.message}`);
+      throw new Error(
+        `Failed to delete config for NPC: ${npcConfigName}. ${error.message}`,
+      );
     }
   }
 

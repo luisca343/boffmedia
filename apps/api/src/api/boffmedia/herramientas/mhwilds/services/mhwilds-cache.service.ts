@@ -18,13 +18,16 @@ export class MhwildsCacheService {
 
   // ==================== CACHE MANAGEMENT ====================
 
-  async clearCache(resourceType?: string, locale?: string): Promise<CacheOperationResult> {
+  async clearCache(
+    resourceType?: string,
+    locale?: string,
+  ): Promise<CacheOperationResult> {
     try {
       return await this.mhwildsRepository.clearCache(resourceType, locale);
     } catch (error: any) {
       return {
         success: false,
-        message: `Cache clearing failed: ${error.message}`
+        message: `Cache clearing failed: ${error.message}`,
       };
     }
   }
@@ -35,12 +38,12 @@ export class MhwildsCacheService {
       return {
         success: true,
         message: 'Cache statistics retrieved successfully',
-        stats
+        stats,
       };
     } catch (error: any) {
       return {
         success: false,
-        message: `Failed to get cache statistics: ${error.message}`
+        message: `Failed to get cache statistics: ${error.message}`,
       };
     }
   }
@@ -64,13 +67,13 @@ export class MhwildsCacheService {
         message: `Cache warmup completed for locale ${locale}`,
         stats: {
           locale,
-          results
-        }
+          results,
+        },
       };
     } catch (error: any) {
       return {
         success: false,
-        message: `Cache warmup failed: ${error.message}`
+        message: `Cache warmup failed: ${error.message}`,
       };
     }
   }
@@ -82,22 +85,27 @@ export class MhwildsCacheService {
 
       for (const resource of resources) {
         try {
-          const metadata = await this.mhwildsRepository.getCacheMetadata(resource, locale);
+          const metadata = await this.mhwildsRepository.getCacheMetadata(
+            resource,
+            locale,
+          );
           const isValid = await this.mhwildsRepository.isCacheValid(metadata);
-          
+
           validationResults.push({
             resource,
             exists: metadata.exists,
             valid: isValid,
             lastModified: metadata.lastModified,
-            age: metadata.exists ? Date.now() - metadata.lastModified.getTime() : null
+            age: metadata.exists
+              ? Date.now() - metadata.lastModified.getTime()
+              : null,
           });
         } catch (error: any) {
           validationResults.push({
             resource,
             exists: false,
             valid: false,
-            error: error.message
+            error: error.message,
           });
         }
       }
@@ -107,13 +115,13 @@ export class MhwildsCacheService {
         message: `Cache validation completed for locale ${locale}`,
         stats: {
           locale,
-          resources: validationResults
-        }
+          resources: validationResults,
+        },
       };
     } catch (error: any) {
       return {
         success: false,
-        message: `Cache validation failed: ${error.message}`
+        message: `Cache validation failed: ${error.message}`,
       };
     }
   }
@@ -137,11 +145,21 @@ export class MhwildsCacheService {
       }
 
       // Check for orphaned files
-      const expectedResources = ['weapons', 'armor', 'charms', 'decorations', 'skills'];
-      const unexpectedResources = stats.resources.filter(r => !expectedResources.includes(r));
-      
+      const expectedResources = [
+        'weapons',
+        'armor',
+        'charms',
+        'decorations',
+        'skills',
+      ];
+      const unexpectedResources = stats.resources.filter(
+        (r) => !expectedResources.includes(r),
+      );
+
       if (unexpectedResources.length > 0) {
-        optimizations.push(`Found unexpected cached resources: ${unexpectedResources.join(', ')}`);
+        optimizations.push(
+          `Found unexpected cached resources: ${unexpectedResources.join(', ')}`,
+        );
       }
 
       return {
@@ -150,20 +168,23 @@ export class MhwildsCacheService {
         stats: {
           currentStats: stats,
           recommendations: optimizations,
-          healthScore: this.calculateCacheHealthScore(stats, optimizations)
-        }
+          healthScore: this.calculateCacheHealthScore(stats, optimizations),
+        },
       };
     } catch (error: any) {
       return {
         success: false,
-        message: `Cache optimization failed: ${error.message}`
+        message: `Cache optimization failed: ${error.message}`,
       };
     }
   }
 
   // ==================== UTILITY METHODS ====================
 
-  private calculateCacheHealthScore(stats: any, optimizations: string[]): number {
+  private calculateCacheHealthScore(
+    stats: any,
+    optimizations: string[],
+  ): number {
     let score = 100;
 
     // Deduct points for optimizations needed
@@ -172,7 +193,10 @@ export class MhwildsCacheService {
     // Deduct points for excessive cache size
     const maxSize = 100 * 1024 * 1024; // 100MB
     if (stats.totalSize > maxSize) {
-      score -= Math.min(30, (stats.totalSize - maxSize) / (10 * 1024 * 1024) * 10);
+      score -= Math.min(
+        30,
+        ((stats.totalSize - maxSize) / (10 * 1024 * 1024)) * 10,
+      );
     }
 
     // Deduct points for too many locales

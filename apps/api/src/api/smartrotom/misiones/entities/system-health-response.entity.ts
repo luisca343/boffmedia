@@ -1,28 +1,28 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class SystemHealthResponse {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Overall system health',
     enum: ['healthy', 'degraded', 'unhealthy'],
-    example: 'healthy'
+    example: 'healthy',
   })
   overall: 'healthy' | 'degraded' | 'unhealthy';
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Cache system status',
-    example: true
+    example: true,
   })
   cache: boolean;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'External API status',
-    example: true
+    example: true,
   })
   externalAPI: boolean;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'File system status',
-    example: true
+    example: true,
   })
   fileSystem: boolean;
 }

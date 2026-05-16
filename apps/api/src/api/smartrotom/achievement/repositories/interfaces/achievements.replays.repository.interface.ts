@@ -5,7 +5,13 @@ import { UserReplayEntity } from '../../entities/user-replay.entity';
 import { CreateReplayFullDto } from '../../dto/create-replay-full.dto';
 import { UpdateReplayDto } from '../../dto/update-replay.dto';
 
-export interface IReplaysRepository extends BaseRepository<Replay, CreateReplayFullDto, UpdateReplayDto> {
-  createUserReplay(userReplayData: UserReplayEntity): Promise<BaseInsertResponse>;
+export interface IReplaysRepository extends BaseRepository<
+  Replay,
+  CreateReplayFullDto,
+  UpdateReplayDto
+> {
+  createUserReplay(
+    userReplayData: UserReplayEntity,
+  ): Promise<BaseInsertResponse>;
   findUserReplay(uuid: string, replayId: number): Promise<Replay | null>;
 }

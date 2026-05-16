@@ -33,10 +33,17 @@ export class PersonalMetaAnalyticsService {
     source: 'auto' | 'smogon' | 'champions' | 'limitless';
     month?: string;
     cutoff?: number;
-  }): Promise<{ source: 'smogon' | 'champions' | 'limitless'; entries: PokemonUsageEntry[] }> {
-    const regulation = await this.regulationsRepository.findById(params.regulationId);
+  }): Promise<{
+    source: 'smogon' | 'champions' | 'limitless';
+    entries: PokemonUsageEntry[];
+  }> {
+    const regulation = await this.regulationsRepository.findById(
+      params.regulationId,
+    );
     if (!regulation) {
-      throw new NotFoundException(`Regulation "${params.regulationId}" not found`);
+      throw new NotFoundException(
+        `Regulation "${params.regulationId}" not found`,
+      );
     }
 
     let resolvedSource: 'smogon' | 'champions' | 'limitless';
@@ -48,39 +55,54 @@ export class PersonalMetaAnalyticsService {
 
     if (resolvedSource === 'champions') {
       if (!regulation.vgcPastesGid) {
-        throw new NotFoundException(`No VGCPastes GID configured for "${params.regulationId}"`);
+        throw new NotFoundException(
+          `No VGCPastes GID configured for "${params.regulationId}"`,
+        );
       }
       return {
         source: 'champions',
-        entries: await this.vgcPastesService.getUsageEntries(params.regulationId),
+        entries: await this.vgcPastesService.getUsageEntries(
+          params.regulationId,
+        ),
       };
     }
 
     if (resolvedSource === 'limitless') {
       return {
         source: 'limitless',
-        entries: await this.limitlessService.getCombinedUsageEntries(params.regulationId),
+        entries: await this.limitlessService.getCombinedUsageEntries(
+          params.regulationId,
+        ),
       };
     }
 
     const formatId = regulation.formatId;
     const cutoff = params.cutoff ?? SMOGON_DEFAULT_CUTOFF;
-    const month = params.month ?? await this.smogonService.resolveLatestMonth();
+    const month =
+      params.month ?? (await this.smogonService.resolveLatestMonth());
     return {
       source: 'smogon',
-      entries: await this.smogonService.getUsageEntries(formatId, month, cutoff),
+      entries: await this.smogonService.getUsageEntries(
+        formatId,
+        month,
+        cutoff,
+      ),
     };
   }
 
-  private async getPersonalUsage(userId: number, regulationId: string): Promise<{ sampleSize: number; rows: PersonalUsageRow[] }> {
-    const { sessions, matches } = await this.trackerRepository.findAllByUser(userId);
+  private async getPersonalUsage(
+    userId: number,
+    regulationId: string,
+  ): Promise<{ sampleSize: number; rows: PersonalUsageRow[] }> {
+    const { sessions, matches } =
+      await this.trackerRepository.findAllByUser(userId);
     const allowedSessionIds = new Set(
-      sessions
-        .filter((s) => s.regulationId === regulationId)
-        .map((s) => s.id),
+      sessions.filter((s) => s.regulationId === regulationId).map((s) => s.id),
     );
 
-    const filteredMatches = matches.filter((m) => allowedSessionIds.has(m.sessionId));
+    const filteredMatches = matches.filter((m) =>
+      allowedSessionIds.has(m.sessionId),
+    );
     const sampleSize = filteredMatches.length;
 
     if (sampleSize === 0) {
@@ -90,9 +112,10 @@ export class PersonalMetaAnalyticsService {
     const speciesCounts = new Map<string, { name: string; count: number }>();
 
     for (const match of filteredMatches) {
-      const parsedOpponentTeam = typeof match.opponentTeam === 'string'
-        ? JSON.parse(match.opponentTeam)
-        : match.opponentTeam;
+      const parsedOpponentTeam =
+        typeof match.opponentTeam === 'string'
+          ? JSON.parse(match.opponentTeam)
+          : match.opponentTeam;
 
       const seenInMatch = new Set<string>();
       for (const slot of parsedOpponentTeam?.slots ?? []) {
@@ -125,18 +148,23 @@ export class PersonalMetaAnalyticsService {
     return { sampleSize, rows };
   }
 
-  async comparePersonalVsMeta(userId: number, params: {
-    regulationId: string;
-    source: 'auto' | 'smogon' | 'champions' | 'limitless';
-    month?: string;
-    cutoff?: number;
-  }) {
+  async comparePersonalVsMeta(
+    userId: number,
+    params: {
+      regulationId: string;
+      source: 'auto' | 'smogon' | 'champions' | 'limitless';
+      month?: string;
+      cutoff?: number;
+    },
+  ) {
     const [personal, meta] = await Promise.all([
       this.getPersonalUsage(userId, params.regulationId),
       this.getMetaUsageEntries(params),
     ]);
 
-    const personalMap = new Map(personal.rows.map((row) => [row.speciesId, row]));
+    const personalMap = new Map(
+      personal.rows.map((row) => [row.speciesId, row]),
+    );
     const metaMap = new Map(meta.entries.map((row) => [row.speciesId, row]));
     const allIds = new Set<string>([...personalMap.keys(), ...metaMap.keys()]);
 

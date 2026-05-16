@@ -7,7 +7,10 @@ export class ArceuSpeakEntity {
   @ApiProperty({ example: 'arceus', description: 'Character name' })
   name: string;
 
-  @ApiProperty({ example: 'https://...', description: 'Character voice or asset value' })
+  @ApiProperty({
+    example: 'https://...',
+    description: 'Character voice or asset value',
+  })
   value: string;
 
   @ApiProperty({ example: 'mp3', description: 'Audio or asset format' })

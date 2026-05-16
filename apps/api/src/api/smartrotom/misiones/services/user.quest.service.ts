@@ -1,5 +1,11 @@
 import { Injectable, Inject, BadRequestException } from '@nestjs/common';
-import { QuestSystemData, QuestData, IDialogue, IQuestCategory, NPC } from '../types';
+import {
+  QuestSystemData,
+  QuestData,
+  IDialogue,
+  IQuestCategory,
+  NPC,
+} from '../types';
 import { QUEST_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 import { IQuestRepository } from '../repositories/interfaces/quest.repository.interface';
 import { QuestCacheService } from './quest.cache.service';
@@ -26,17 +32,18 @@ export class UserQuestService {
 
     // Get the current quest system data
     const systemData = await this.questCacheService.getQuestSystemData();
-    
+
     // Get user-specific quest progress
-    const userQuestResponse = await this.questRepository.fetchUserQuestsFromAPI(uuid);
-    
+    const userQuestResponse =
+      await this.questRepository.fetchUserQuestsFromAPI(uuid);
+
     // Merge system and user data
     return this.mergeSystemAndUserData(systemData, userQuestResponse);
   }
 
   private mergeSystemAndUserData(
-    systemData: QuestSystemData, 
-    userQuestResponse: any
+    systemData: QuestSystemData,
+    userQuestResponse: any,
   ): UserQuestData {
     // Create a map of user quest progress
     const userQuestMap = new Map();
@@ -45,9 +52,9 @@ export class UserQuestService {
     });
 
     // Merge system quests with user progress
-    const mergedQuests = systemData.quests.map(systemQuest => {
+    const mergedQuests = systemData.quests.map((systemQuest) => {
       const userQuest = userQuestMap.get(systemQuest.id);
-      
+
       if (userQuest) {
         // Merge user progress with system quest data
         return {
@@ -55,10 +62,10 @@ export class UserQuestService {
           status: userQuest.status || systemQuest.status,
           objectives: userQuest.objectives || systemQuest.objectives,
           // Preserve any other user-specific data
-          ...userQuest
+          ...userQuest,
         };
       }
-      
+
       return systemQuest;
     });
 
@@ -66,7 +73,7 @@ export class UserQuestService {
       quests: mergedQuests,
       dialogs: systemData.dialogs,
       categories: systemData.categories,
-      npcs: systemData.npcs
+      npcs: systemData.npcs,
     };
   }
 

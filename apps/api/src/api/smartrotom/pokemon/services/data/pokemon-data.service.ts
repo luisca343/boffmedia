@@ -1,11 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { BaseDataService } from './base-data.service';
 import { MoveDataService } from './move-data.service';
-import { Pokemon, PokemonForm, SpeciesMoveEntry } from '../../interfaces/pokemon.interface';
+import {
+  Pokemon,
+  PokemonForm,
+  SpeciesMoveEntry,
+} from '../../interfaces/pokemon.interface';
 import * as fs from 'fs';
 import * as path from 'path';
 import { promises as fsPromises } from 'fs';
-
 
 export interface EvoTreeNode {
   pkm: string;
@@ -14,7 +17,6 @@ export interface EvoTreeNode {
   index: number;
   methods?: any[];
 }
-
 
 @Injectable()
 export class PokemonDataService extends BaseDataService {
@@ -28,7 +30,9 @@ export class PokemonDataService extends BaseDataService {
   private speciesByDex: { [key: number]: Pokemon } = {};
   private speciesByName: { [key: string]: Pokemon } = {};
   private speciesByNameWithForm: { [key: string]: PokemonForm } = {};
-  private speciesByNameFormPalette: { [key: string]: { name: string; sprite: string } } = {};
+  private speciesByNameFormPalette: {
+    [key: string]: { name: string; sprite: string };
+  } = {};
   private speciesByForm: { [key: string]: PokemonForm[] } = {};
   private speciesByPalette: { [key: string]: PokemonForm[] } = {};
   private speciesByType: { [key: string]: PokemonForm[] } = {};
@@ -42,18 +46,27 @@ export class PokemonDataService extends BaseDataService {
 
   async loadPokemonData() {
     const startingTime = Date.now();
-    const defaultDir = path.join(process.cwd(), 'public/smartrotom/packs/default_datapack/data/pixelmon/species');
-    const publicDir = path.join(process.cwd(), 'public/smartrotom/packs/datapack/data/pixelmon/species');
+    const defaultDir = path.join(
+      process.cwd(),
+      'public/smartrotom/packs/default_datapack/data/pixelmon/species',
+    );
+    const publicDir = path.join(
+      process.cwd(),
+      'public/smartrotom/packs/datapack/data/pixelmon/species',
+    );
 
     try {
       const publicFiles = await fsPromises.readdir(publicDir);
-      publicFiles.forEach(file => {
+      publicFiles.forEach((file) => {
         if (file.endsWith('.json')) {
           this.customSpeciesFiles.add(file.split('_')[1]);
         }
       });
     } catch (error: any) {
-      console.warn('No custom species directory found or error reading it:', error.message);
+      console.warn(
+        'No custom species directory found or error reading it:',
+        error.message,
+      );
     }
 
     const pokemonData = await this.readJsonFiles(defaultDir, publicDir);
@@ -62,7 +75,6 @@ export class PokemonDataService extends BaseDataService {
       const isCustom = this.isFileCustom(`${data.name.toLowerCase()}.json`);
       this.processSpecies(data, isCustom);
     });
-    
 
     this.sortByDex(this.species);
     this.sortMovesByCount();
@@ -75,10 +87,10 @@ export class PokemonDataService extends BaseDataService {
 
   private processSpecies(data: Pokemon, isCustom: boolean) {
     if (!data.dex) return;
-    
+
     // Add isCustom field
     data.isCustom = isCustom;
-    
+
     this.species.push(data);
     this.speciesByDex[data.dex] = data;
     this.speciesByName[data.name.toLowerCase()] = data;
@@ -87,7 +99,7 @@ export class PokemonDataService extends BaseDataService {
   }
 
   getCustomSpecies(): Pokemon[] {
-    return this.species.filter(pokemon => pokemon.isCustom);
+    return this.species.filter((pokemon) => pokemon.isCustom);
   }
 
   private processForm(species: Pokemon, form: PokemonForm, index: number) {
@@ -129,7 +141,7 @@ export class PokemonDataService extends BaseDataService {
   }
 
   private updateSpeciesByType(form: PokemonForm) {
-    form.types?.forEach(type => {
+    form.types?.forEach((type) => {
       if (!this.speciesByType[type]) {
         this.speciesByType[type] = [];
       }
@@ -138,7 +150,7 @@ export class PokemonDataService extends BaseDataService {
   }
 
   private updateSpeciesByEggGroup(form: PokemonForm) {
-    form.eggGroups?.forEach(eggGroup => {
+    form.eggGroups?.forEach((eggGroup) => {
       if (!this.speciesByEggGroup[eggGroup]) {
         this.speciesByEggGroup[eggGroup] = [];
       }
@@ -147,14 +159,14 @@ export class PokemonDataService extends BaseDataService {
   }
 
   private updateSpeciesByAbility(form: PokemonForm) {
-    form.abilities?.abilities.forEach(ability => {
+    form.abilities?.abilities.forEach((ability) => {
       if (!this.speciesByAbility[ability]) {
         this.speciesByAbility[ability] = [];
       }
       this.speciesByAbility[ability].push(form);
     });
 
-    form.abilities?.hiddenAbilities?.forEach(ability => {
+    form.abilities?.hiddenAbilities?.forEach((ability) => {
       if (!this.speciesByAbility[ability]) {
         this.speciesByAbility[ability] = [];
       }
@@ -162,11 +174,17 @@ export class PokemonDataService extends BaseDataService {
     });
   }
 
-  private updateSpeciesByMove(species: Pokemon, form: PokemonForm, formName: string) {
-    Object.values(form.moves || {}).forEach(moveList => {
-      moveList.forEach(move => {
+  private updateSpeciesByMove(
+    species: Pokemon,
+    form: PokemonForm,
+    formName: string,
+  ) {
+    Object.values(form.moves || {}).forEach((moveList) => {
+      moveList.forEach((move) => {
         if (typeof move === 'object' && move.attacks) {
-          move.attacks.forEach(attack => this.addMoveToSpecies(attack, species.dex, formName));
+          move.attacks.forEach((attack) =>
+            this.addMoveToSpecies(attack, species.dex, formName),
+          );
         } else if (typeof move === 'string') {
           this.addMoveToSpecies(move, species.dex, formName);
         }
@@ -178,12 +196,20 @@ export class PokemonDataService extends BaseDataService {
     if (!this.speciesByMove[move]) {
       this.speciesByMove[move] = [];
     }
-    if (!this.speciesByMove[move].find(s => s.speciesID === speciesID && s.form === formName)) {
+    if (
+      !this.speciesByMove[move].find(
+        (s) => s.speciesID === speciesID && s.form === formName,
+      )
+    ) {
       this.speciesByMove[move].push({ speciesID, form: formName });
     }
   }
 
-  private updateWordleData(species: Pokemon, form: PokemonForm, formName: string) {
+  private updateWordleData(
+    species: Pokemon,
+    form: PokemonForm,
+    formName: string,
+  ) {
     if (formName !== 'gmax') {
       this.wordleData.push({
         name: `${species.name.toLowerCase()}_${formName.toLowerCase()}`,
@@ -200,7 +226,7 @@ export class PokemonDataService extends BaseDataService {
   private processPalettes(nameWithForm: string, form: PokemonForm) {
     const palettes = form.genderProperties?.[0]?.palettes;
     if (palettes) {
-      palettes.forEach(palette => {
+      palettes.forEach((palette) => {
         if (!this.speciesByPalette[palette.name]) {
           this.speciesByPalette[palette.name] = [];
         }
@@ -226,19 +252,30 @@ export class PokemonDataService extends BaseDataService {
 
   private sortMovesByCount() {
     const moveCounts = Object.fromEntries(
-      Object.entries(this.speciesByMove).map(([move, species]) => [move, species.length])
+      Object.entries(this.speciesByMove).map(([move, species]) => [
+        move,
+        species.length,
+      ]),
     );
 
     this.speciesByMove = Object.fromEntries(
-      Object.entries(this.speciesByMove)
-        .sort(([a], [b]) => moveCounts[b] - moveCounts[a])
+      Object.entries(this.speciesByMove).sort(
+        ([a], [b]) => moveCounts[b] - moveCounts[a],
+      ),
     );
   }
 
   private logStatistics(startTime: number) {
-    const totalForms = Object.values(this.speciesByForm).reduce((sum, forms) => sum + forms.length, 0);
-    console.log(`Loaded ${this.species.length} species and ${Object.keys(this.speciesByForm).length} different forms, for a total of ${totalForms} Pokémon`);
-    console.log(`Loaded ${Object.keys(this.finalForms).length} final evolutionary forms`);
+    const totalForms = Object.values(this.speciesByForm).reduce(
+      (sum, forms) => sum + forms.length,
+      0,
+    );
+    console.log(
+      `Loaded ${this.species.length} species and ${Object.keys(this.speciesByForm).length} different forms, for a total of ${totalForms} Pokémon`,
+    );
+    console.log(
+      `Loaded ${Object.keys(this.finalForms).length} final evolutionary forms`,
+    );
     console.log(`Loading time: ${Date.now() - startTime}ms`);
   }
 
@@ -286,7 +323,9 @@ export class PokemonDataService extends BaseDataService {
     return this.finalForms;
   }
 
-  getSpeciesByMove(move: string): { speciesID: number; form: string }[] | undefined {
+  getSpeciesByMove(
+    move: string,
+  ): { speciesID: number; form: string }[] | undefined {
     return this.speciesByMove[move];
   }
 
@@ -298,124 +337,136 @@ export class PokemonDataService extends BaseDataService {
     return this.speciesByNameFormPalette;
   }
 
-  getAllSpeciesByMove(): { [key: string]: { speciesID: number; form: string }[] } {
+  getAllSpeciesByMove(): {
+    [key: string]: { speciesID: number; form: string }[];
+  } {
     return this.speciesByMove;
   }
 
   getAllMovesSortedByCount(): { name: string; count: number }[] {
     const moveCounts: { [key: string]: number } = {};
-  
+
     for (const move in this.speciesByMove) {
       if (this.speciesByMove.hasOwnProperty(move)) {
         moveCounts[move] = this.speciesByMove[move].length;
       }
     }
-  
+
     const sortedMoves = Object.entries(moveCounts)
       .map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count);
-  
+
     return sortedMoves;
   }
 
   getEvoTree(id: number) {
-    const pkm = this.getSpeciesByDex(id)
-    let preEvo = pkm
-    
+    const pkm = this.getSpeciesByDex(id);
+    let preEvo = pkm;
+
     // Find base pre-evolution
-    while(preEvo.forms[0].preEvolutions?.length > 0){
-        const preEvoName = preEvo.forms[0].preEvolutions[0].toLowerCase()
-        preEvo = this.getSpeciesByName(preEvoName)
+    while (preEvo.forms[0].preEvolutions?.length > 0) {
+      const preEvoName = preEvo.forms[0].preEvolutions[0].toLowerCase();
+      preEvo = this.getSpeciesByName(preEvoName);
     }
-    
+
     // Get evolution tree with sprites
-    const evoTree = this.getEvos(preEvo, 'all')
-    
-    return evoTree
-}
+    const evoTree = this.getEvos(preEvo, 'all');
 
+    return evoTree;
+  }
 
-getEvos(pokemon: Pokemon, currentForm: string, evos = {} as any ){
-  if(currentForm === '') currentForm = 'base'
-  let index = 0
-  for(const form of pokemon.forms){
-      const formName = form.name || 'base'
-      const pkmId = `${pokemon.name}_${formName}`
-      let currentPokemon = evos[pkmId]
-      if((currentForm !='all' || formName.includes('gmax')) && formName !== currentForm )  continue;
-      
+  getEvos(pokemon: Pokemon, currentForm: string, evos = {} as any) {
+    if (currentForm === '') currentForm = 'base';
+    let index = 0;
+    for (const form of pokemon.forms) {
+      const formName = form.name || 'base';
+      const pkmId = `${pokemon.name}_${formName}`;
+      let currentPokemon = evos[pkmId];
+      if (
+        (currentForm != 'all' || formName.includes('gmax')) &&
+        formName !== currentForm
+      )
+        continue;
 
-      if(Object.keys(evos).length === 0 || ! evos.pkm){
-          evos[pkmId] = {
-              pkm: pokemon.name, 
-              evos: {}, 
-              dex: pokemon.dex, 
-              index: form.index + 1,
-          }
-          currentPokemon = evos[pkmId]
+      if (Object.keys(evos).length === 0 || !evos.pkm) {
+        evos[pkmId] = {
+          pkm: pokemon.name,
+          evos: {},
+          dex: pokemon.dex,
+          index: form.index + 1,
+        };
+        currentPokemon = evos[pkmId];
       } else {
-          currentPokemon = evos
+        currentPokemon = evos;
       }
 
-      if(!form.evolutions) {
-          continue;
+      if (!form.evolutions) {
+        continue;
       }
 
-      for (const evo of form.evolutions){
-          const [evoPokemonName, evoFormName] = this.getFormName(evo.to)
-          const evoId = `${evoPokemonName}_${evoFormName}`
-          if(!currentPokemon.evos) currentPokemon.evos = {}
-          const evoArray = currentPokemon.evos
-          const evoFormIndex = this.getSpeciesByName(evoPokemonName).forms?.findIndex((f) => f.name === evoFormName) > -1 ? this.getSpeciesByName(evoPokemonName).forms?.findIndex((f) => f.name === evoFormName) : 0
-          if(!evoArray[evoId]){
-              const evoPkmDex = this.getSpeciesByName(evoPokemonName).dex;
-              evoArray[evoId] = {
-                  pkm: evoPokemonName, 
-                  evos: {}, 
-                  dex: evoPkmDex, 
-                  index: evoFormIndex + 1,
-              }
-          }
-          
-          const thisEvo = evoArray[evoId]
-          if(! evoArray[evoId].methods){
-              evoArray[evoId].methods = []
-          }
-          evoArray[evoId].methods.push(evo)
+      for (const evo of form.evolutions) {
+        const [evoPokemonName, evoFormName] = this.getFormName(evo.to);
+        const evoId = `${evoPokemonName}_${evoFormName}`;
+        if (!currentPokemon.evos) currentPokemon.evos = {};
+        const evoArray = currentPokemon.evos;
+        const evoFormIndex =
+          this.getSpeciesByName(evoPokemonName).forms?.findIndex(
+            (f) => f.name === evoFormName,
+          ) > -1
+            ? this.getSpeciesByName(evoPokemonName).forms?.findIndex(
+                (f) => f.name === evoFormName,
+              )
+            : 0;
+        if (!evoArray[evoId]) {
+          const evoPkmDex = this.getSpeciesByName(evoPokemonName).dex;
+          evoArray[evoId] = {
+            pkm: evoPokemonName,
+            evos: {},
+            dex: evoPkmDex,
+            index: evoFormIndex + 1,
+          };
+        }
 
-          const evoPkm = this.getSpeciesByName(evoPokemonName)
-          let evoEvo = this.getEvos(evoPkm, evoFormName, evoArray[evoId]) as any
+        const thisEvo = evoArray[evoId];
+        if (!evoArray[evoId].methods) {
+          evoArray[evoId].methods = [];
+        }
+        evoArray[evoId].methods.push(evo);
+
+        const evoPkm = this.getSpeciesByName(evoPokemonName);
+        const evoEvo = this.getEvos(
+          evoPkm,
+          evoFormName,
+          evoArray[evoId],
+        ) as any;
       }
-      index++
-  }
-  return {depth: this.getEvoTreeDepth(evos), tree:evos }
-}
-
-getEvoTreeDepth(evos: any, depth = 0){
-    let maxDepth = depth
-    for(const evo in evos){
-        const evoDepth = this.getEvoTreeDepth(evos[evo].evos, depth + 1)
-        if(evoDepth > maxDepth) maxDepth = evoDepth
+      index++;
     }
-    return maxDepth
-}
-  
-getFormName(nombre:string){
-  nombre = nombre.toLowerCase()
-  let [nombrePkm, forma] = [nombre, 'base']
-  if(nombre.includes(' form:')){
-      [nombrePkm, forma] = nombre.split(' form:')
-  }
-  if(nombre.includes(' f:')){
-      [nombrePkm, forma] = nombre.split(' f:')
-  }
-  if(nombre.includes(' palette:')){
-      [nombrePkm, forma] = nombre.split(' palette:')
+    return { depth: this.getEvoTreeDepth(evos), tree: evos };
   }
 
-  return [nombrePkm, forma]
+  getEvoTreeDepth(evos: any, depth = 0) {
+    let maxDepth = depth;
+    for (const evo in evos) {
+      const evoDepth = this.getEvoTreeDepth(evos[evo].evos, depth + 1);
+      if (evoDepth > maxDepth) maxDepth = evoDepth;
+    }
+    return maxDepth;
+  }
+
+  getFormName(nombre: string) {
+    nombre = nombre.toLowerCase();
+    let [nombrePkm, forma] = [nombre, 'base'];
+    if (nombre.includes(' form:')) {
+      [nombrePkm, forma] = nombre.split(' form:');
+    }
+    if (nombre.includes(' f:')) {
+      [nombrePkm, forma] = nombre.split(' f:');
+    }
+    if (nombre.includes(' palette:')) {
+      [nombrePkm, forma] = nombre.split(' palette:');
+    }
+
+    return [nombrePkm, forma];
+  }
 }
-
-}
-
-

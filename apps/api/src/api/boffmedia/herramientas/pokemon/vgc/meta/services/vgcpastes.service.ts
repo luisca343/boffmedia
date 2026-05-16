@@ -2,8 +2,16 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Dex } from '@pkmn/sim';
 import { VgcPastesRepository } from '../repositories/vgcpastes.repository';
 import { VgcRegulationsRepository } from '../repositories/regulations.repository';
-import { BatchFetchResult, ChampionsPasteDetail, PokemonUsageDetail, PokemonUsageEntry } from '../entities/pokemon-usage.entity';
-import { POKEPASTE_CONCURRENCY, VGCPASTES_SHEET_BASE } from '../config/smogon.config';
+import {
+  BatchFetchResult,
+  ChampionsPasteDetail,
+  PokemonUsageDetail,
+  PokemonUsageEntry,
+} from '../entities/pokemon-usage.entity';
+import {
+  POKEPASTE_CONCURRENCY,
+  VGCPASTES_SHEET_BASE,
+} from '../config/smogon.config';
 import { VgcMetaSlot, StatSpread } from '@/_db/schema/Vgc';
 import { PokepasteService } from './pokepaste.service';
 import { getDexForFormat, resolveSpeciesId } from '../utils/dex-resolver';
@@ -23,15 +31,31 @@ function parseCsv(raw: string): string[][] {
   for (let i = 0; i < raw.length; i++) {
     const ch = raw[i];
     if (inQuotes) {
-      if (ch === '"' && raw[i + 1] === '"') { field += '"'; i++; }  // escaped quote
-      else if (ch === '"')                   { inQuotes = false; }
-      else                                   { field += ch; }         // embedded \n stays in field
+      if (ch === '"' && raw[i + 1] === '"') {
+        field += '"';
+        i++;
+      } // escaped quote
+      else if (ch === '"') {
+        inQuotes = false;
+      } else {
+        field += ch;
+      } // embedded \n stays in field
     } else {
-      if      (ch === '"')  { inQuotes = true; }
-      else if (ch === ',')  { row.push(field); field = ''; }
-      else if (ch === '\r') { /* ignore – handled by \n */ }
-      else if (ch === '\n') { row.push(field); field = ''; rows.push(row); row = []; }
-      else                  { field += ch; }
+      if (ch === '"') {
+        inQuotes = true;
+      } else if (ch === ',') {
+        row.push(field);
+        field = '';
+      } else if (ch === '\r') {
+        /* ignore – handled by \n */
+      } else if (ch === '\n') {
+        row.push(field);
+        field = '';
+        rows.push(row);
+        row = [];
+      } else {
+        field += ch;
+      }
     }
   }
   // flush final row
@@ -62,7 +86,10 @@ export class VgcPastesService {
     return this.regulationsRepository.findActive();
   }
 
-  async refreshRegulation(regulationId: string, gid: string): Promise<{ count: number }> {
+  async refreshRegulation(
+    regulationId: string,
+    gid: string,
+  ): Promise<{ count: number }> {
     await this.regulationsRepository.updateImportState(regulationId, {
       importStatus: 'running_csv',
       importError: null,
@@ -75,7 +102,9 @@ export class VgcPastesService {
       const url = `${VGCPASTES_SHEET_BASE}${gid}`;
       const res = await fetch(url);
       if (!res.ok) {
-        throw new NotFoundException(`Failed to fetch VGCPastes CSV: HTTP ${res.status}`);
+        throw new NotFoundException(
+          `Failed to fetch VGCPastes CSV: HTTP ${res.status}`,
+        );
       }
 
       const rows = parseCsv(await res.text());
@@ -84,7 +113,9 @@ export class VgcPastesService {
       // "Team ID" appears twice (first and last column); "Pokemon Text for Copypasta"
       // uniquely identifies the header row alongside it.
       const headerRowIdx = rows.findIndex(
-        (cols) => cols.includes('Team ID') && cols.some((h) => h.includes('Pokemon Text for Copypasta')),
+        (cols) =>
+          cols.includes('Team ID') &&
+          cols.some((h) => h.includes('Pokemon Text for Copypasta')),
       );
       if (headerRowIdx === -1) {
         throw new NotFoundException(
@@ -92,32 +123,36 @@ export class VgcPastesService {
         );
       }
 
-      const headers          = rows[headerRowIdx];
-      const idxTeamId        = headers.indexOf('Team ID');          // first occurrence = col 0
-      const idxTeamDesc      = headers.indexOf('Team Description');
-      const idxFullName      = headers.indexOf('Full Name');
-      const idxPokepaste     = headers.indexOf('Pokepaste');
-      const idxHasEvs        = headers.indexOf('EVs');
+      const headers = rows[headerRowIdx];
+      const idxTeamId = headers.indexOf('Team ID'); // first occurrence = col 0
+      const idxTeamDesc = headers.indexOf('Team Description');
+      const idxFullName = headers.indexOf('Full Name');
+      const idxPokepaste = headers.indexOf('Pokepaste');
+      const idxHasEvs = headers.indexOf('EVs');
       const idxReplicaStatus = headers.findIndex((h) => h === 'Replica Status');
-      const idxDate          = headers.indexOf('Date Shared');
-      const idxTournament    = headers.indexOf('Tournament / Event');
-      const idxRank          = headers.indexOf('Rank');
-      const idxSourceUrl     = headers.indexOf('Link to Source');
-      const idxOwner         = headers.indexOf('Owner');
-      const idxPokeText      = headers.findIndex((h) => h.includes('Pokemon Text for Copypasta'));
+      const idxDate = headers.indexOf('Date Shared');
+      const idxTournament = headers.indexOf('Tournament / Event');
+      const idxRank = headers.indexOf('Rank');
+      const idxSourceUrl = headers.indexOf('Link to Source');
+      const idxOwner = headers.indexOf('Owner');
+      const idxPokeText = headers.findIndex((h) =>
+        h.includes('Pokemon Text for Copypasta'),
+      );
       // Species are in the 6 columns starting AT idxPokeText (the header reads "Pokemon Text for
       // Copypasta" but each data row stores the first Pokémon name there, not paste text).
-      const speciesStart     = idxPokeText;
+      const speciesStart = idxPokeText;
 
       // The per-Pokémon item columns sit in the upper "sprite slot" groups.
       // Each group has 3 sub-cols; the 3rd sub-col (index 2 within the group) is the held item.
       // Groups start at col 5 and repeat every 3 cols → item cols: 7, 10, 13, 16, 19, 22.
       // Relative to idxPokepaste (col 24): offsets are -17, -14, -11, -8, -5, -2.
-      const itemCols = [-17, -14, -11, -8, -5, -2].map((offset) => idxPokepaste + offset);
+      const itemCols = [-17, -14, -11, -8, -5, -2].map(
+        (offset) => idxPokepaste + offset,
+      );
 
       this.logger.debug(
         `Header at row ${headerRowIdx}: Team ID @ col ${idxTeamId}, ` +
-        `PokeText @ col ${idxPokeText}, species @ cols ${speciesStart}–${speciesStart + 5}`,
+          `PokeText @ col ${idxPokeText}, species @ cols ${speciesStart}–${speciesStart + 5}`,
       );
 
       const seenTeamIds = new Set<string>();
@@ -126,7 +161,8 @@ export class VgcPastesService {
       for (const cols of rows.slice(headerRowIdx + 1)) {
         const teamId = cols[idxTeamId]?.trim();
         // Skip blank rows, repeated headers, and anything that can't be a valid team ID
-        if (!teamId || teamId.length > 16 || !/^[A-Za-z0-9]+$/.test(teamId)) continue;
+        if (!teamId || teamId.length > 16 || !/^[A-Za-z0-9]+$/.test(teamId))
+          continue;
 
         const species = cols
           .slice(speciesStart, speciesStart + 6)
@@ -138,17 +174,17 @@ export class VgcPastesService {
           .filter((s) => s.length > 0);
 
         await this.vgcPastesRepository.upsertTeam({
-          id:              teamId,
-          playerName:      cols[idxFullName]?.trim()        || null,
-          teamDescription: cols[idxTeamDesc]?.trim()        || null,
-          pasteUrl:        cols[idxPokepaste]?.trim()       || null,
-          hasEvs:          cols[idxHasEvs]?.trim()          || null,
-          replicaStatus:   cols[idxReplicaStatus]?.trim()   || null,
-          dateShared:      cols[idxDate]?.trim()             || null,
-          tournament:      cols[idxTournament]?.trim()       || null,
-          rank:            cols[idxRank]?.trim()             || null,
-          sourceUrl:       cols[idxSourceUrl]?.trim()        || null,
-          owner:           cols[idxOwner]?.trim()            || null,
+          id: teamId,
+          playerName: cols[idxFullName]?.trim() || null,
+          teamDescription: cols[idxTeamDesc]?.trim() || null,
+          pasteUrl: cols[idxPokepaste]?.trim() || null,
+          hasEvs: cols[idxHasEvs]?.trim() || null,
+          replicaStatus: cols[idxReplicaStatus]?.trim() || null,
+          dateShared: cols[idxDate]?.trim() || null,
+          tournament: cols[idxTournament]?.trim() || null,
+          rank: cols[idxRank]?.trim() || null,
+          sourceUrl: cols[idxSourceUrl]?.trim() || null,
+          owner: cols[idxOwner]?.trim() || null,
           regulationId,
           species,
           items,
@@ -157,11 +193,14 @@ export class VgcPastesService {
         count++;
       }
 
-      const existingIds = await this.vgcPastesRepository.findTeamIdsByRegulation(regulationId);
+      const existingIds =
+        await this.vgcPastesRepository.findTeamIdsByRegulation(regulationId);
       const staleIds = existingIds.filter((id) => !seenTeamIds.has(id));
       await this.vgcPastesRepository.deleteTeamsByIds(staleIds);
 
-      this.logger.log(`Refreshed ${count} teams for regulation ${regulationId} (removed stale=${staleIds.length})`);
+      this.logger.log(
+        `Refreshed ${count} teams for regulation ${regulationId} (removed stale=${staleIds.length})`,
+      );
 
       await this.regulationsRepository.updateImportState(regulationId, {
         importStatus: 'running_pastes',
@@ -198,8 +237,11 @@ export class VgcPastesService {
    */
   async batchFetchRegulation(regulationId: string): Promise<BatchFetchResult> {
     const regulation = await this.regulationsRepository.findById(regulationId);
-    const teams = await this.vgcPastesRepository.findTeamsNeedingFetch(regulationId);
-    let fetched = 0, cached = 0, failed = 0;
+    const teams =
+      await this.vgcPastesRepository.findTeamsNeedingFetch(regulationId);
+    let fetched = 0,
+      cached = 0,
+      failed = 0;
 
     await this.regulationsRepository.updateImportState(regulationId, {
       importStatus: 'running_pastes',
@@ -213,20 +255,24 @@ export class VgcPastesService {
         await Promise.all(
           chunk.map(async (team) => {
             try {
-              const { pasteId, wasCached } = await this.pokepasteService.fetchAndCache(
-                team.pasteUrl,
-                regulation?.formatId ?? undefined,
-                {
-                  author:    team.owner           || null,
-                  title:     team.teamDescription || null,
-                  sourceKey: `vgcpastes:${team.id}`,
-                },
-              );
+              const { pasteId, wasCached } =
+                await this.pokepasteService.fetchAndCache(
+                  team.pasteUrl,
+                  regulation?.formatId ?? undefined,
+                  {
+                    author: team.owner || null,
+                    title: team.teamDescription || null,
+                    sourceKey: `vgcpastes:${team.id}`,
+                  },
+                );
               await this.vgcPastesRepository.linkPaste(team.id, pasteId);
-              if (wasCached) cached++; else fetched++;
+              if (wasCached) cached++;
+              else fetched++;
             } catch (e) {
               const msg = e instanceof Error ? e.message : String(e);
-              this.logger.warn(`Paste fetch failed for team ${team.id}: ${msg}`);
+              this.logger.warn(
+                `Paste fetch failed for team ${team.id}: ${msg}`,
+              );
               failed++;
             }
           }),
@@ -265,20 +311,24 @@ export class VgcPastesService {
    * Aggregate moves / items / abilities / spreads from fetched pastes for a species.
    * Returns a ChampionsPasteDetail with top-8 entries per category.
    */
-  async getPasteDetail(regulationId: string, speciesId: string): Promise<ChampionsPasteDetail> {
-    const rows = await this.vgcPastesRepository.findParsedSlotsByRegulation(regulationId);
+  async getPasteDetail(
+    regulationId: string,
+    speciesId: string,
+  ): Promise<ChampionsPasteDetail> {
+    const rows =
+      await this.vgcPastesRepository.findParsedSlotsByRegulation(regulationId);
     if (rows.length === 0) {
       throw new NotFoundException(
         `No paste data for "${regulationId}". Run fetch-pastes first.`,
       );
     }
 
-    const moveCounts    = new Map<string, number>();
-    const itemCounts    = new Map<string, number>();
+    const moveCounts = new Map<string, number>();
+    const itemCounts = new Map<string, number>();
     const abilityCounts = new Map<string, number>();
-    const spreadCounts  = new Map<string, number>();
-    let   matchCount    = 0;
-    let   speciesName   = speciesId;
+    const spreadCounts = new Map<string, number>();
+    let matchCount = 0;
+    let speciesName = speciesId;
 
     for (const { parsedSlots } of rows) {
       const slots = JSON.parse(parsedSlots) as VgcMetaSlot[];
@@ -290,8 +340,13 @@ export class VgcPastesService {
         for (const move of slot.moves) {
           if (move) moveCounts.set(move, (moveCounts.get(move) ?? 0) + 1);
         }
-        if (slot.item)    itemCounts.set(slot.item,       (itemCounts.get(slot.item)       ?? 0) + 1);
-        if (slot.ability) abilityCounts.set(slot.ability, (abilityCounts.get(slot.ability) ?? 0) + 1);
+        if (slot.item)
+          itemCounts.set(slot.item, (itemCounts.get(slot.item) ?? 0) + 1);
+        if (slot.ability)
+          abilityCounts.set(
+            slot.ability,
+            (abilityCounts.get(slot.ability) ?? 0) + 1,
+          );
         if (slot.nature && slot.spread) {
           const key = `${slot.nature}|${formatSpread(slot.spread)}`;
           spreadCounts.set(key, (spreadCounts.get(key) ?? 0) + 1);
@@ -309,16 +364,19 @@ export class VgcPastesService {
       [...map.entries()]
         .sort((a, b) => b[1] - a[1])
         .slice(0, limit)
-        .map(([name, count]) => ({ name, percent: (count / matchCount) * 100 }));
+        .map(([name, count]) => ({
+          name,
+          percent: (count / matchCount) * 100,
+        }));
 
     return {
       speciesId,
       speciesName,
       pasteCount: matchCount,
-      abilities:  toEntries(abilityCounts),
-      items:      toEntries(itemCounts),
-      moves:      toEntries(moveCounts),
-      teraTypes:  [], // Not used in Champions format
+      abilities: toEntries(abilityCounts),
+      items: toEntries(itemCounts),
+      moves: toEntries(moveCounts),
+      teraTypes: [], // Not used in Champions format
       spreads: [...spreadCounts.entries()]
         .sort((a, b) => b[1] - a[1])
         .slice(0, 8)
@@ -340,14 +398,14 @@ export class VgcPastesService {
       );
     }
 
-    const totalTeams  = teams.length;
+    const totalTeams = teams.length;
     const parsedTeams = teams.map((t) => ({
       species: (JSON.parse(t.species) as string[]).filter(Boolean),
-      items:   (JSON.parse(t.items   ?? '[]') as string[]).filter(Boolean),
+      items: (JSON.parse(t.items ?? '[]') as string[]).filter(Boolean),
     }));
 
     // ── Count species occurrences ─────────────────────────────────────────────
-    const speciesCounts  = new Map<string, number>();
+    const speciesCounts = new Map<string, number>();
     const speciesDisplay = new Map<string, string>();
 
     for (const { species } of parsedTeams) {
@@ -369,7 +427,7 @@ export class VgcPastesService {
       for (let i = 0; i < species.length; i++) {
         const itemName = items[i];
         if (!itemName) continue;
-        const id  = resolveSpeciesId(species[i], dexForFormat);
+        const id = resolveSpeciesId(species[i], dexForFormat);
         const row = itemMatrix.get(id) ?? new Map<string, number>();
         row.set(itemName, (row.get(itemName) ?? 0) + 1);
         itemMatrix.set(id, row);
@@ -393,8 +451,8 @@ export class VgcPastesService {
 
     return sorted.map(([speciesId, count], idx) => {
       const speciesName = speciesDisplay.get(speciesId) ?? speciesId;
-      const species     = dexForFormat.species.get(speciesName);
-      const baseStats   = species.exists
+      const species = dexForFormat.species.get(speciesName);
+      const baseStats = species.exists
         ? species.baseStats
         : { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
       const types = species.exists
@@ -410,25 +468,25 @@ export class VgcPastesService {
         .sort((a, b) => b[1] - a[1])
         .slice(0, 12)
         .map(([tmId, tmCount]) => ({
-          name:    speciesDisplay.get(tmId) ?? tmId,
+          name: speciesDisplay.get(tmId) ?? tmId,
           percent: (tmCount / count) * 100,
         }));
 
       return {
         speciesId,
         speciesName,
-        rank:         idx + 1,
+        rank: idx + 1,
         types,
         usagePercent: (count / totalTeams) * 100,
-        rawCount:     count,
-        topItem:      items[0]?.name,
+        rawCount: count,
+        topItem: items[0]?.name,
         baseStats,
-        abilities:    [],
+        abilities: [],
         items,
-        moves:        [],
-        teraTypes:    [],
+        moves: [],
+        teraTypes: [],
         teammates,
-        spreads:      [],
+        spreads: [],
       };
     });
   }

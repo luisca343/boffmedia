@@ -1,6 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { MhwildsDataService, WeaponTreeResult, CharmRankResult } from './services/mhwilds-data.service';
-import { MhwildsCacheService, CacheOperationResult } from './services/mhwilds-cache.service';
+import {
+  MhwildsDataService,
+  WeaponTreeResult,
+  CharmRankResult,
+} from './services/mhwilds-data.service';
+import {
+  MhwildsCacheService,
+  CacheOperationResult,
+} from './services/mhwilds-cache.service';
 
 @Injectable()
 export class MhwildsFacadeService {
@@ -77,13 +84,19 @@ export class MhwildsFacadeService {
 
   // ==================== SEARCH AND FILTER OPERATIONS ====================
 
-  async searchWeaponsByName(locale: string, searchTerm: string): Promise<any[]> {
+  async searchWeaponsByName(
+    locale: string,
+    searchTerm: string,
+  ): Promise<any[]> {
     try {
       if (!searchTerm || searchTerm.trim().length < 2) {
         throw new Error('Search term must be at least 2 characters long');
       }
-      
-      const result = await this.mhwildsDataService.searchWeaponsByName(locale, searchTerm.trim());
+
+      const result = await this.mhwildsDataService.searchWeaponsByName(
+        locale,
+        searchTerm.trim(),
+      );
       return result.data;
     } catch (error: any) {
       throw new Error(`Failed to search weapons: ${error.message}`);
@@ -95,8 +108,11 @@ export class MhwildsFacadeService {
       if (!kind || kind.trim().length === 0) {
         throw new Error('Weapon kind is required');
       }
-      
-      const result = await this.mhwildsDataService.getWeaponsByKind(locale, kind.trim());
+
+      const result = await this.mhwildsDataService.getWeaponsByKind(
+        locale,
+        kind.trim(),
+      );
       return result.data;
     } catch (error: any) {
       throw new Error(`Failed to get weapons by kind: ${error.message}`);
@@ -108,8 +124,11 @@ export class MhwildsFacadeService {
       if (!Number.isInteger(rarity) || rarity < 1 || rarity > 10) {
         throw new Error('Rarity must be an integer between 1 and 10');
       }
-      
-      const result = await this.mhwildsDataService.getArmorByRarity(locale, rarity);
+
+      const result = await this.mhwildsDataService.getArmorByRarity(
+        locale,
+        rarity,
+      );
       return result.data;
     } catch (error: any) {
       throw new Error(`Failed to get armor by rarity: ${error.message}`);
@@ -134,13 +153,16 @@ export class MhwildsFacadeService {
 
   // ==================== CACHE MANAGEMENT OPERATIONS ====================
 
-  async clearCache(resourceType?: string, locale?: string): Promise<CacheOperationResult> {
+  async clearCache(
+    resourceType?: string,
+    locale?: string,
+  ): Promise<CacheOperationResult> {
     try {
       return await this.mhwildsCacheService.clearCache(resourceType, locale);
     } catch (error: any) {
       return {
         success: false,
-        message: `Cache clearing failed: ${error.message}`
+        message: `Cache clearing failed: ${error.message}`,
       };
     }
   }
@@ -151,7 +173,7 @@ export class MhwildsFacadeService {
     } catch (error: any) {
       return {
         success: false,
-        message: `Failed to get cache statistics: ${error.message}`
+        message: `Failed to get cache statistics: ${error.message}`,
       };
     }
   }
@@ -162,7 +184,7 @@ export class MhwildsFacadeService {
     } catch (error: any) {
       return {
         success: false,
-        message: `Cache warmup failed: ${error.message}`
+        message: `Cache warmup failed: ${error.message}`,
       };
     }
   }
@@ -173,7 +195,7 @@ export class MhwildsFacadeService {
     } catch (error: any) {
       return {
         success: false,
-        message: `Cache validation failed: ${error.message}`
+        message: `Cache validation failed: ${error.message}`,
       };
     }
   }
@@ -184,7 +206,7 @@ export class MhwildsFacadeService {
     } catch (error: any) {
       return {
         success: false,
-        message: `Cache optimization failed: ${error.message}`
+        message: `Cache optimization failed: ${error.message}`,
       };
     }
   }
@@ -197,7 +219,7 @@ export class MhwildsFacadeService {
       if (cacheStats.success && cacheStats.stats) {
         return cacheStats.stats.locales;
       }
-      
+
       // Return default supported locales if cache stats fail
       return ['es', 'en', 'ja', 'fr', 'de', 'it', 'ko', 'zh-CN', 'zh-TW'];
     } catch (error: any) {
@@ -212,7 +234,7 @@ export class MhwildsFacadeService {
       if (cacheStats.success && cacheStats.stats) {
         return cacheStats.stats.resources;
       }
-      
+
       // Return default resources if cache stats fail
       return ['weapons', 'armor', 'charms', 'decorations', 'skills'];
     } catch (error: any) {

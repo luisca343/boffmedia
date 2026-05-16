@@ -2,37 +2,37 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsOptional, IsInt, MaxLength, Min } from 'class-validator';
 
 export class CreateTeamDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'The name of the team',
-    example: 'Team Alpha'
+    example: 'Team Alpha',
   })
   @IsString()
   @MaxLength(255)
   name: string;
 
-  @ApiProperty({ 
-    description: 'The team tag/code', 
+  @ApiProperty({
+    description: 'The team tag/code',
     example: 'ALPH',
-    required: false 
+    required: false,
   })
   @IsOptional()
   @IsString()
   @MaxLength(10)
   tag?: string;
 
-  @ApiProperty({ 
-    description: 'The team icon URL', 
+  @ApiProperty({
+    description: 'The team icon URL',
     example: '/icons/team-alpha.png',
-    required: false 
+    required: false,
   })
   @IsOptional()
   @IsString()
   @MaxLength(500)
   icon?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'The user ID of the team leader',
-    example: 1
+    example: 1,
   })
   @IsInt()
   @Min(1)

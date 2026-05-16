@@ -1,10 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { BoffMediaUsersManagementService, UserCreationResult, SessionUser, GoogleUserData, MinecraftRegistrationData, MinecraftLinkData } from './services/users-management.service';
+import {
+  BoffMediaUsersManagementService,
+  UserCreationResult,
+  SessionUser,
+  GoogleUserData,
+  MinecraftRegistrationData,
+  MinecraftLinkData,
+} from './services/users-management.service';
 import { UsersFacadeService as SmartRotomUsersFacadeService } from '@api/smartrotom/users/users.facade.service';
 import { StarbankFacadeService } from '@api/smartrotom/starbank/starbank.facade.service';
 import { BoffMediaUser } from '@/_db/schema/BoffMedia';
 import { SmartRotomUser } from '@/_db/schema/SmartRotom';
-import { BoffMediaUserSafe, FullUserData, FullUserDataSafe } from './repositories/interfaces/users.repository.interface';
+import {
+  BoffMediaUserSafe,
+  FullUserData,
+  FullUserDataSafe,
+} from './repositories/interfaces/users.repository.interface';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -75,9 +86,14 @@ export class BoffMediaUsersFacadeService {
     }
   }
 
-  async initializeFullUser(data: BoffMediaUserInitializationData): Promise<IntegratedUserCreationResult> {
+  async initializeFullUser(
+    data: BoffMediaUserInitializationData,
+  ): Promise<IntegratedUserCreationResult> {
     try {
-      console.log('Initializing full user with integrations:', { username: data.username, email: data.email });
+      console.log('Initializing full user with integrations:', {
+        username: data.username,
+        email: data.email,
+      });
 
       let smartRotomUser: SmartRotomUser | null = null;
       let isNewSmartRotomUser = false;
@@ -85,11 +101,12 @@ export class BoffMediaUsersFacadeService {
 
       if (data.minecraft) {
         try {
-          const smartRotomResult = await this.smartRotomUsersFacadeService.initializeUserAndAccounts({
-            uuid: data.minecraft.uuid,
-            username: data.minecraft.username,
-            world: data.minecraft.world
-          });
+          const smartRotomResult =
+            await this.smartRotomUsersFacadeService.initializeUserAndAccounts({
+              uuid: data.minecraft.uuid,
+              username: data.minecraft.username,
+              world: data.minecraft.world,
+            });
 
           smartRotomUser = smartRotomResult.user;
           isNewSmartRotomUser = smartRotomResult.isNewUser;
@@ -98,10 +115,13 @@ export class BoffMediaUsersFacadeService {
           console.log('SmartRotom integration completed:', {
             uuid: smartRotomUser.uuid,
             isNew: isNewSmartRotomUser,
-            accountsCount: starbankAccounts.length
+            accountsCount: starbankAccounts.length,
           });
         } catch (error: any) {
-          console.error('SmartRotom integration failed, continuing without it:', error);
+          console.error(
+            'SmartRotom integration failed, continuing without it:',
+            error,
+          );
         }
       }
 
@@ -111,7 +131,7 @@ export class BoffMediaUsersFacadeService {
         password: data.password,
         uuid: data.minecraft?.uuid,
         googleId: data.google?.googleId,
-        profilePicture: data.google?.profilePicture
+        profilePicture: data.google?.profilePicture,
       };
 
       const boffMediaResult = await this.findOrCreateUser(boffMediaUserData);
@@ -121,7 +141,7 @@ export class BoffMediaUsersFacadeService {
         smartRotomUser,
         starbankAccounts,
         isNewBoffMediaUser: boffMediaResult.isNew,
-        isNewSmartRotomUser
+        isNewSmartRotomUser,
       };
     } catch (error: any) {
       console.error('Failed to initialize full user:', error);
@@ -153,7 +173,10 @@ export class BoffMediaUsersFacadeService {
     try {
       return await this.usersManagementService.getUserByUsername(username);
     } catch (error: any) {
-      console.error(`Failed to get BoffMedia user by username ${username}:`, error);
+      console.error(
+        `Failed to get BoffMedia user by username ${username}:`,
+        error,
+      );
       throw new Error(`Failed to retrieve user: ${error.message}`);
     }
   }
@@ -169,7 +192,10 @@ export class BoffMediaUsersFacadeService {
 
   // ==================== INTEGRATED USER RETRIEVAL ====================
 
-  async getUserWithIntegrations(identifier: string, type: 'id' | 'username' | 'email' | 'uuid'): Promise<UserWithIntegrations | null> {
+  async getUserWithIntegrations(
+    identifier: string,
+    type: 'id' | 'username' | 'email' | 'uuid',
+  ): Promise<UserWithIntegrations | null> {
     try {
       let fullUser: FullUserDataSafe | null = null;
 
@@ -177,17 +203,22 @@ export class BoffMediaUsersFacadeService {
         case 'id':
           const user = await this.getUserById(parseInt(identifier));
           if (user) {
-            fullUser = await this.usersManagementService.getFullUserByUsername(user.username);
+            fullUser = await this.usersManagementService.getFullUserByUsername(
+              user.username,
+            );
           }
           break;
         case 'username':
-          fullUser = await this.usersManagementService.getFullUserByUsername(identifier);
+          fullUser =
+            await this.usersManagementService.getFullUserByUsername(identifier);
           break;
         case 'email':
-          fullUser = await this.usersManagementService.getFullUserByEmail(identifier);
+          fullUser =
+            await this.usersManagementService.getFullUserByEmail(identifier);
           break;
         case 'uuid':
-          fullUser = await this.usersManagementService.getFullUserByUuid(identifier);
+          fullUser =
+            await this.usersManagementService.getFullUserByUuid(identifier);
           break;
       }
 
@@ -196,13 +227,18 @@ export class BoffMediaUsersFacadeService {
       }
 
       // Get user roles
-      const roles = await this.usersManagementService.getUserRoles(fullUser.boffmedia_users.id);
+      const roles = await this.usersManagementService.getUserRoles(
+        fullUser.boffmedia_users.id,
+      );
 
       // Get Starbank accounts if SmartRotom user exists
       let starbankAccounts: any[] = [];
       if (fullUser.rotom_users) {
         try {
-          const userWithAccounts = await this.smartRotomUsersFacadeService.getUserWithAccounts(fullUser.rotom_users.uuid);
+          const userWithAccounts =
+            await this.smartRotomUsersFacadeService.getUserWithAccounts(
+              fullUser.rotom_users.uuid,
+            );
           starbankAccounts = userWithAccounts?.accounts || [];
         } catch (error: any) {
           console.error('Failed to get Starbank accounts:', error);
@@ -213,15 +249,20 @@ export class BoffMediaUsersFacadeService {
         boffMediaUser: fullUser.boffmedia_users,
         smartRotomUser: fullUser.rotom_users,
         starbankAccounts,
-        roles
+        roles,
       };
     } catch (error: any) {
-      console.error(`Failed to get user with integrations ${identifier}:`, error);
+      console.error(
+        `Failed to get user with integrations ${identifier}:`,
+        error,
+      );
       throw new Error(`Failed to retrieve integrated user: ${error.message}`);
     }
   }
 
-  async getFullUserByUsername(username: string): Promise<FullUserDataSafe | null> {
+  async getFullUserByUsername(
+    username: string,
+  ): Promise<FullUserDataSafe | null> {
     try {
       return await this.usersManagementService.getFullUserByUsername(username);
     } catch (error: any) {
@@ -241,7 +282,10 @@ export class BoffMediaUsersFacadeService {
 
   // ==================== USER UPDATE ====================
 
-  async updateUser(id: number, updateData: UpdateUserDto): Promise<BoffMediaUserSafe> {
+  async updateUser(
+    id: number,
+    updateData: UpdateUserDto,
+  ): Promise<BoffMediaUserSafe> {
     try {
       return await this.usersManagementService.updateUser(id, updateData);
     } catch (error: any) {
@@ -259,31 +303,41 @@ export class BoffMediaUsersFacadeService {
       console.error(`Failed to delete BoffMedia user ${id}:`, error);
       return {
         success: false,
-        message: `User deletion failed: ${error.message}`
+        message: `User deletion failed: ${error.message}`,
       };
     }
   }
 
   // ==================== AUTHENTICATION ====================
 
-  async validateUser(username: string, password: string): Promise<AuthenticationResult | null> {
+  async validateUser(
+    username: string,
+    password: string,
+  ): Promise<AuthenticationResult | null> {
     try {
-      const sessionUser = await this.usersManagementService.validateUser(username, password);
-      
+      const sessionUser = await this.usersManagementService.validateUser(
+        username,
+        password,
+      );
+
       if (!sessionUser) {
         return null;
       }
 
       // Get user integrations info
-      const userWithIntegrations = await this.getUserWithIntegrations(username, 'username');
-      
+      const userWithIntegrations = await this.getUserWithIntegrations(
+        username,
+        'username',
+      );
+
       return {
         sessionUser,
         integrations: {
           hasSmartRotom: !!userWithIntegrations?.smartRotomUser,
-          hasStarbank: (userWithIntegrations?.starbankAccounts?.length || 0) > 0,
-          rolesCount: userWithIntegrations?.roles?.length || 0
-        }
+          hasStarbank:
+            (userWithIntegrations?.starbankAccounts?.length || 0) > 0,
+          rolesCount: userWithIntegrations?.roles?.length || 0,
+        },
       };
     } catch (error: any) {
       console.error(`Failed to validate user ${username}:`, error);
@@ -293,7 +347,8 @@ export class BoffMediaUsersFacadeService {
 
   async findByEmail(email: string): Promise<SessionUser | null> {
     try {
-      const fullUser = await this.usersManagementService.getFullUserByEmail(email);
+      const fullUser =
+        await this.usersManagementService.getFullUserByEmail(email);
       if (!fullUser) {
         return null;
       }
@@ -302,11 +357,13 @@ export class BoffMediaUsersFacadeService {
         id: fullUser.boffmedia_users.id,
         name: fullUser.boffmedia_users.username,
         email: fullUser.boffmedia_users.email,
-        smartRotomUser: fullUser.rotom_users ? {
-          username: fullUser.rotom_users.username,
-          uuid: fullUser.rotom_users.uuid,
-          world: fullUser.rotom_users.world || ''
-        } : null
+        smartRotomUser: fullUser.rotom_users
+          ? {
+              username: fullUser.rotom_users.username,
+              uuid: fullUser.rotom_users.uuid,
+              world: fullUser.rotom_users.world || '',
+            }
+          : null,
       };
     } catch (error: any) {
       console.error(`Failed to find user by email ${email}:`, error);
@@ -327,12 +384,14 @@ export class BoffMediaUsersFacadeService {
 
   // ==================== MINECRAFT INTEGRATION ====================
 
-  async createMinecraftUser(registerData: MinecraftRegistrationData): Promise<IntegratedUserCreationResult> {
+  async createMinecraftUser(
+    registerData: MinecraftRegistrationData,
+  ): Promise<IntegratedUserCreationResult> {
     try {
       console.log('Creating integrated Minecraft user:', {
         username: registerData.username,
         mcUsername: registerData.minecraft.username,
-        uuid: registerData.minecraft.uuid
+        uuid: registerData.minecraft.uuid,
       });
 
       // Initialize full user with Minecraft integration
@@ -340,13 +399,13 @@ export class BoffMediaUsersFacadeService {
         email: registerData.email,
         username: registerData.username,
         password: registerData.password,
-        minecraft: registerData.minecraft
+        minecraft: registerData.minecraft,
       });
 
       console.log('Minecraft user creation completed:', {
         boffMediaUserId: result.boffMediaUser.id,
         smartRotomUserId: result.smartRotomUser?.id,
-        hasStarbank: result.starbankAccounts.length > 0
+        hasStarbank: result.starbankAccounts.length > 0,
       });
 
       return result;
@@ -356,43 +415,48 @@ export class BoffMediaUsersFacadeService {
     }
   }
 
-  async linkMinecraftAccount(linkData: MinecraftLinkData): Promise<{ 
-    boffMediaUser: BoffMediaUserSafe; 
+  async linkMinecraftAccount(linkData: MinecraftLinkData): Promise<{
+    boffMediaUser: BoffMediaUserSafe;
     smartRotomUser: SmartRotomUser;
     starbankAccounts: any[];
   }> {
     try {
       console.log('Linking Minecraft account:', {
         username: linkData.username,
-        mcUuid: linkData.minecraft.uuid
+        mcUuid: linkData.minecraft.uuid,
       });
 
       // Validate user credentials first
-      const sessionUser = await this.usersManagementService.validateUser(linkData.username, linkData.password);
+      const sessionUser = await this.usersManagementService.validateUser(
+        linkData.username,
+        linkData.password,
+      );
       if (!sessionUser) {
         throw new Error('Invalid credentials');
       }
 
       // Create/find SmartRotom user FIRST (this creates the UUID in rotom_users table)
-      const smartRotomResult = await this.smartRotomUsersFacadeService.initializeUserAndAccounts({
-        uuid: linkData.minecraft.uuid,
-        username: linkData.minecraft.username,
-        world: linkData.minecraft.world
-      });
+      const smartRotomResult =
+        await this.smartRotomUsersFacadeService.initializeUserAndAccounts({
+          uuid: linkData.minecraft.uuid,
+          username: linkData.minecraft.username,
+          world: linkData.minecraft.world,
+        });
 
       // Now update BoffMedia user with UUID (the UUID exists in rotom_users now)
-      const boffMediaUser = await this.usersManagementService.linkMinecraftAccount(linkData);
+      const boffMediaUser =
+        await this.usersManagementService.linkMinecraftAccount(linkData);
 
       console.log('Minecraft account linking completed:', {
         boffMediaUserId: boffMediaUser.id,
         smartRotomUserId: smartRotomResult.user.id,
-        accountsCount: smartRotomResult.accounts.length
+        accountsCount: smartRotomResult.accounts.length,
       });
 
       return {
         boffMediaUser,
         smartRotomUser: smartRotomResult.user,
-        starbankAccounts: smartRotomResult.accounts
+        starbankAccounts: smartRotomResult.accounts,
       };
     } catch (error: any) {
       console.error('Failed to link Minecraft account:', error);
@@ -413,7 +477,9 @@ export class BoffMediaUsersFacadeService {
 
   // ==================== BATCH OPERATIONS ====================
 
-  async getMultipleUsersWithIntegrations(userIds: number[]): Promise<{ [id: number]: UserWithIntegrations | null }> {
+  async getMultipleUsersWithIntegrations(
+    userIds: number[],
+  ): Promise<{ [id: number]: UserWithIntegrations | null }> {
     if (!Array.isArray(userIds) || userIds.length === 0) {
       return {};
     }
@@ -424,10 +490,16 @@ export class BoffMediaUsersFacadeService {
       // Process users in parallel
       const promises = userIds.map(async (id) => {
         try {
-          const userWithIntegrations = await this.getUserWithIntegrations(id.toString(), 'id');
+          const userWithIntegrations = await this.getUserWithIntegrations(
+            id.toString(),
+            'id',
+          );
           results[id] = userWithIntegrations;
         } catch (error: any) {
-          console.error(`Failed to get user with integrations for ID ${id}:`, error);
+          console.error(
+            `Failed to get user with integrations for ID ${id}:`,
+            error,
+          );
           results[id] = null;
         }
       });
@@ -459,10 +531,14 @@ export class BoffMediaUsersFacadeService {
       // Count integrations for each user
       const promises = allUsers.map(async (user) => {
         try {
-          const userWithIntegrations = await this.getUserWithIntegrations(user.id.toString(), 'id');
+          const userWithIntegrations = await this.getUserWithIntegrations(
+            user.id.toString(),
+            'id',
+          );
           if (userWithIntegrations) {
             if (userWithIntegrations.smartRotomUser) usersWithSmartRotom++;
-            if (userWithIntegrations.starbankAccounts.length > 0) usersWithStarbank++;
+            if (userWithIntegrations.starbankAccounts.length > 0)
+              usersWithStarbank++;
             if (userWithIntegrations.roles.length > 0) usersWithRoles++;
           }
         } catch (error: any) {
@@ -476,7 +552,7 @@ export class BoffMediaUsersFacadeService {
         totalBoffMediaUsers,
         usersWithSmartRotom,
         usersWithStarbank,
-        usersWithRoles
+        usersWithRoles,
       };
     } catch (error: any) {
       console.error('Failed to get user statistics:', error);
@@ -484,7 +560,7 @@ export class BoffMediaUsersFacadeService {
         totalBoffMediaUsers: 0,
         usersWithSmartRotom: 0,
         usersWithStarbank: 0,
-        usersWithRoles: 0
+        usersWithRoles: 0,
       };
     }
   }
@@ -500,7 +576,10 @@ export class BoffMediaUsersFacadeService {
 
   // ==================== VALIDATION ====================
 
-  async validateUserExists(identifier: string, type: 'id' | 'username' | 'email' | 'uuid'): Promise<boolean> {
+  async validateUserExists(
+    identifier: string,
+    type: 'id' | 'username' | 'email' | 'uuid',
+  ): Promise<boolean> {
     try {
       const user = await this.getUserWithIntegrations(identifier, type);
       return !!user;
@@ -517,17 +596,25 @@ export class BoffMediaUsersFacadeService {
       id: fullUser.boffmedia_users.id,
       name: fullUser.boffmedia_users.username,
       email: fullUser.boffmedia_users.email,
-      smartRotomUser: fullUser.rotom_users ? {
-        username: fullUser.rotom_users.username,
-        uuid: fullUser.rotom_users.uuid,
-        world: fullUser.rotom_users.world || ''
-      } : null
+      smartRotomUser: fullUser.rotom_users
+        ? {
+            username: fullUser.rotom_users.username,
+            uuid: fullUser.rotom_users.uuid,
+            world: fullUser.rotom_users.world || '',
+          }
+        : null,
     };
   }
 
   // Support for the original createFromBoffMedia method
-  async createFromBoffMedia(boffMediaUser: Partial<BoffMediaUser>): Promise<BoffMediaUserSafe> {
-    if (!boffMediaUser.email || !boffMediaUser.username || !boffMediaUser.password) {
+  async createFromBoffMedia(
+    boffMediaUser: Partial<BoffMediaUser>,
+  ): Promise<BoffMediaUserSafe> {
+    if (
+      !boffMediaUser.email ||
+      !boffMediaUser.username ||
+      !boffMediaUser.password
+    ) {
       throw new Error('Email, username, and password are required');
     }
 
@@ -538,7 +625,7 @@ export class BoffMediaUsersFacadeService {
       uuid: boffMediaUser.uuid,
       profilePicture: boffMediaUser.profilePicture,
       googleId: boffMediaUser.googleId,
-      discordId: boffMediaUser.discordId
+      discordId: boffMediaUser.discordId,
     };
 
     return await this.createUser(userData);

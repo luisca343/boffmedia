@@ -51,7 +51,12 @@ export function initChampionsMod(): void {
       name: '[Gen 9 Champions] VGC 2026 Reg M-A (Bo3)',
       mod: 'champions',
       gameType: 'doubles',
-      ruleset: ['Flat Rules', 'VGC Timer', 'Force Open Team Sheets', 'Best of = 3'],
+      ruleset: [
+        'Flat Rules',
+        'VGC Timer',
+        'Force Open Team Sheets',
+        'Best of = 3',
+      ],
     },
     {
       name: '[Gen 9 Champions] BSS Reg M-A',
@@ -63,7 +68,14 @@ export function initChampionsMod(): void {
       name: '[Gen 9 Champions] OU',
       mod: 'champions',
       ruleset: ['Standard'],
-      banlist: ['AG', 'Uber', 'Moody', 'Baton Pass', 'Last Respects', 'Shed Tail'],
+      banlist: [
+        'AG',
+        'Uber',
+        'Moody',
+        'Baton Pass',
+        'Last Respects',
+        'Shed Tail',
+      ],
     },
     {
       name: '[Gen 9 Champions] Draft',

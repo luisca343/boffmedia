@@ -11,10 +11,15 @@ import axios from 'axios';
 import { Actions } from '@pkmn/login';
 
 @WebSocketGateway({ namespace: '/showdown', cors: true })
-export class ShowdownGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class ShowdownGateway
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer() server: Server;
 
-  private clients: Map<string, { socket: Socket; showdownWs: WebSocket | null }> = new Map();
+  private clients: Map<
+    string,
+    { socket: Socket; showdownWs: WebSocket | null }
+  > = new Map();
   private showdownServer = 'wss://sim3.psim.us/showdown/websocket';
 
   handleConnection(client: Socket) {
@@ -43,7 +48,10 @@ export class ShowdownGateway implements OnGatewayConnection, OnGatewayDisconnect
     });
 
     showdownWs.on('error', (err) => {
-      console.error(`Showdown WebSocket error for client ${clientId}:`, err.message);
+      console.error(
+        `Showdown WebSocket error for client ${clientId}:`,
+        err.message,
+      );
       const entry = this.clients.get(clientId);
       if (entry) this.clients.set(clientId, { ...entry, showdownWs: null });
     });
@@ -82,7 +90,10 @@ export class ShowdownGateway implements OnGatewayConnection, OnGatewayDisconnect
   }
 
   @SubscribeMessage('login')
-  async handleLogin(client: Socket, payload: { username: string; password: string; challstr: string }): Promise<void> {
+  async handleLogin(
+    client: Socket,
+    payload: { username: string; password: string; challstr: string },
+  ): Promise<void> {
     const { username, password, challstr } = payload;
     try {
       const action = Actions.login({ username, password, challstr });
@@ -122,4 +133,3 @@ export class ShowdownGateway implements OnGatewayConnection, OnGatewayDisconnect
     return undefined;
   }
 }
-

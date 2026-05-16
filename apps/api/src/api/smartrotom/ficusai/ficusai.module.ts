@@ -16,18 +16,16 @@ import { FICUSAI_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/re
     LoggerModule,
     PokemonModule, // Import PokemonModule to get PokemonFacadeService
   ],
-  controllers: [
-    FicusAIController,
-  ],
+  controllers: [FicusAIController],
   providers: [
     // Facade Service
     FicusAIFacadeService,
-    
+
     // Business Logic Services
     MessageService,
     AIService,
     PokemonDataService,
-    
+
     // Repository
     {
       provide: FICUSAI_REPOSITORY_TOKEN,

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { MySql2Database, drizzle } from "drizzle-orm/mysql2";
+import { MySql2Database, drizzle } from 'drizzle-orm/mysql2';
 import mysql from 'mysql2/promise';
 
 @Injectable()

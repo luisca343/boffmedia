@@ -1,10 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { EnergyService, EnergyStatus } from './services/energy.service';
-import { GameService, GameStartResponse, GameEndResponse } from './services/game.service';
+import {
+  GameService,
+  GameStartResponse,
+  GameEndResponse,
+} from './services/game.service';
 import { RewardService, RewardsByType } from './services/reward.service';
-import { PlayerService, PlayerHistory, ClaimResponse } from './services/player.service';
-import { MineRewardItem, RankingEntry } from '@api/smartrotom/mine/repositories/mine.repository';
-import { PlayerStatistics, UnclaimedItem } from './repositories/interfaces/mine.repository.interface';
+import {
+  PlayerService,
+  PlayerHistory,
+  ClaimResponse,
+} from './services/player.service';
+import {
+  MineRewardItem,
+  RankingEntry,
+} from '@api/smartrotom/mine/repositories/mine.repository';
+import {
+  PlayerStatistics,
+  UnclaimedItem,
+} from './repositories/interfaces/mine.repository.interface';
 
 export interface PlayGameRequest {
   uuid: string;
@@ -41,14 +55,16 @@ export class MineFacadeService {
 
   // ==================== GAME MANAGEMENT ====================
 
-  async playGame(request: PlayGameRequest): Promise<GameStartResponse | { error: string }> {
+  async playGame(
+    request: PlayGameRequest,
+  ): Promise<GameStartResponse | { error: string }> {
     try {
       const { uuid } = request;
 
       // Check if player has enough energy
       const hasEnergy = await this.energyService.validateEnergyForPlay(uuid);
       if (!hasEnergy) {
-        return { error: "No tienes suficiente energía para jugar." };
+        return { error: 'No tienes suficiente energía para jugar.' };
       }
 
       // Consume energy
@@ -67,8 +83,9 @@ export class MineFacadeService {
       const { uuid, rewards } = request;
 
       // Validate rewards exist
-      const rewardIds = rewards.map(r => r.id);
-      const rewardsExist = await this.rewardService.validateRewardsExist(rewardIds);
+      const rewardIds = rewards.map((r) => r.id);
+      const rewardsExist =
+        await this.rewardService.validateRewardsExist(rewardIds);
       if (!rewardsExist) {
         throw new Error('Some rewards do not exist');
       }
@@ -100,7 +117,9 @@ export class MineFacadeService {
     }
   }
 
-  async getRewardDropRates(): Promise<{ [rewardId: number]: { name: string; dropRate: number } }> {
+  async getRewardDropRates(): Promise<{
+    [rewardId: number]: { name: string; dropRate: number };
+  }> {
     try {
       return await this.rewardService.getRewardDropRates();
     } catch (error: any) {
@@ -129,7 +148,9 @@ export class MineFacadeService {
     }
   }
 
-  async getPlayerRank(uuid: string): Promise<{ rank: number; totalValue: number } | null> {
+  async getPlayerRank(
+    uuid: string,
+  ): Promise<{ rank: number; totalValue: number } | null> {
     try {
       return await this.playerService.getPlayerRank(uuid);
     } catch (error: any) {
@@ -142,7 +163,10 @@ export class MineFacadeService {
     try {
       return await this.playerService.getUnclaimedRewards(uuid);
     } catch (error: any) {
-      console.error(`Error getting unclaimed rewards for player ${uuid}:`, error);
+      console.error(
+        `Error getting unclaimed rewards for player ${uuid}:`,
+        error,
+      );
       throw new Error(`Failed to retrieve unclaimed rewards: ${error.message}`);
     }
   }
@@ -151,7 +175,10 @@ export class MineFacadeService {
     try {
       return await this.playerService.claimRewards(request.uuid);
     } catch (error: any) {
-      console.error(`Error claiming rewards for player ${request.uuid}:`, error);
+      console.error(
+        `Error claiming rewards for player ${request.uuid}:`,
+        error,
+      );
       throw new Error(`Failed to claim rewards: ${error.message}`);
     }
   }

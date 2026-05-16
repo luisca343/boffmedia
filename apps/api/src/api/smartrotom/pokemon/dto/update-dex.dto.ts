@@ -3,27 +3,27 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsUUID, IsArray, IsNumber } from 'class-validator';
 
 export class UpdateDexDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'User UUID',
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
   })
   @IsString()
   @IsUUID()
   uuid: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Array of seen Pokémon IDs',
     example: [1, 2, 3, 4, 5],
-    type: [Number]
+    type: [Number],
   })
   @IsArray()
   @IsNumber({}, { each: true })
   SEEN: number[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Array of caught Pokémon IDs',
     example: [1, 2, 3],
-    type: [Number]
+    type: [Number],
   })
   @IsArray()
   @IsNumber({}, { each: true })

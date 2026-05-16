@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PokemonDataManagementService } from './services/pokemon-data-management.service';
-import { PokedexManagementService, RegistrationResult } from './services/pokedex-management.service';
+import {
+  PokedexManagementService,
+  RegistrationResult,
+} from './services/pokedex-management.service';
 import { PokemonIntegrationService } from './services/pokemon-integration.service';
 import { Pokemon, Attack } from './interfaces/pokemon.interface';
 import { EvoTreeNode } from './services/data/pokemon-data.service';
@@ -23,7 +26,9 @@ export class PokemonFacadeService {
       await this.pokemonDataService.initializeData();
     } catch (error: any) {
       console.error('Error initializing Pokemon service:', error);
-      throw new Error(`Pokemon service initialization failed: ${error.message}`);
+      throw new Error(
+        `Pokemon service initialization failed: ${error.message}`,
+      );
     }
   }
 
@@ -56,9 +61,11 @@ export class PokemonFacadeService {
     }
   }
 
-  searchPokemonByName(name: string, amount: number = 16): FuseResult<Pokemon>[] {
+  searchPokemonByName(
+    name: string,
+    amount: number = 16,
+  ): FuseResult<Pokemon>[] {
     try {
-      
       return this.pokemonDataService.searchPokemonByName(name, amount);
     } catch (error: any) {
       console.error(`Error searching Pokemon by name ${name}:`, error);
@@ -86,7 +93,10 @@ export class PokemonFacadeService {
 
   // ==================== EVOLUTION OPERATIONS ====================
 
-  getEvoTree(id: number): { depth: number; tree: { [key: string]: EvoTreeNode } } {
+  getEvoTree(id: number): {
+    depth: number;
+    tree: { [key: string]: EvoTreeNode };
+  } {
     try {
       return this.pokemonDataService.getEvoTree(id);
     } catch (error: any) {
@@ -95,7 +105,10 @@ export class PokemonFacadeService {
     }
   }
 
-  getNextPrev(id: number): { prev: Pokemon | undefined; next: Pokemon | undefined } {
+  getNextPrev(id: number): {
+    prev: Pokemon | undefined;
+    next: Pokemon | undefined;
+  } {
     try {
       return this.pokemonDataService.getNextPrev(id);
     } catch (error: any) {
@@ -128,12 +141,17 @@ export class PokemonFacadeService {
     try {
       return this.pokemonDataService.getPokemonMoves(id, formIndex);
     } catch (error: any) {
-      console.error(`Error getting moves for Pokemon ${id}, form ${formIndex}:`, error);
+      console.error(
+        `Error getting moves for Pokemon ${id}, form ${formIndex}:`,
+        error,
+      );
       throw new Error(`Failed to retrieve Pokemon moves: ${error.message}`);
     }
   }
 
-  getPokemonByMove(name: string): { speciesID: number; form: string }[] | undefined {
+  getPokemonByMove(
+    name: string,
+  ): { speciesID: number; form: string }[] | undefined {
     try {
       return this.pokemonDataService.getPokemonByMove(name);
     } catch (error: any) {
@@ -162,12 +180,16 @@ export class PokemonFacadeService {
     }
   }
 
-  getPokemonByAbility(name: string): { speciesID: number; form: string; speciesName: string }[] {
+  getPokemonByAbility(
+    name: string,
+  ): { speciesID: number; form: string; speciesName: string }[] {
     try {
       return this.pokemonDataService.getPokemonByAbility(name);
     } catch (error: any) {
       console.error(`Error getting Pokemon by ability ${name}:`, error);
-      throw new Error(`Failed to retrieve Pokemon by ability: ${error.message}`);
+      throw new Error(
+        `Failed to retrieve Pokemon by ability: ${error.message}`,
+      );
     }
   }
 
@@ -183,19 +205,28 @@ export class PokemonFacadeService {
   }
 
   getBiomes(): { name: string; count: number }[] {
-      try {
-          const biomesObject = this.pokemonDataService.getBiomes();
-          return Object.entries(biomesObject).map(([name, count]) => ({
-              name,
-              count
-          }));
-      } catch (error: any) {
-          console.error('Error getting biomes:', error);
-          throw new Error(`Failed to retrieve biomes: ${error.message}`);
-      }
+    try {
+      const biomesObject = this.pokemonDataService.getBiomes();
+      return Object.entries(biomesObject).map(([name, count]) => ({
+        name,
+        count,
+      }));
+    } catch (error: any) {
+      console.error('Error getting biomes:', error);
+      throw new Error(`Failed to retrieve biomes: ${error.message}`);
+    }
   }
 
-  getPokemonByBiome(name: string): { [key: string]: Array<{ dex: number; species: string; form: string; palette: string; rarity: number; percentage: number }> } {
+  getPokemonByBiome(name: string): {
+    [key: string]: Array<{
+      dex: number;
+      species: string;
+      form: string;
+      palette: string;
+      rarity: number;
+      percentage: number;
+    }>;
+  } {
     try {
       return this.pokemonDataService.getPokemonByBiome(name);
     } catch (error: any) {
@@ -209,7 +240,9 @@ export class PokemonFacadeService {
       return this.pokemonDataService.getBiomesByPokemon(name);
     } catch (error: any) {
       console.error(`Error getting biomes for Pokemon ${name}:`, error);
-      throw new Error(`Failed to retrieve biomes for Pokemon: ${error.message}`);
+      throw new Error(
+        `Failed to retrieve biomes for Pokemon: ${error.message}`,
+      );
     }
   }
 
@@ -247,17 +280,26 @@ export class PokemonFacadeService {
     pokemonId: number,
     form: string,
     palette: string,
-    status: number
+    status: number,
   ): Promise<RegistrationResult> {
     try {
-      return await this.pokedexService.registerPokemon(uuid, pokemonId, form, palette, status);
+      return await this.pokedexService.registerPokemon(
+        uuid,
+        pokemonId,
+        form,
+        palette,
+        status,
+      );
     } catch (error: any) {
       console.error('Error registering Pokemon:', error);
       throw new Error(`Failed to register Pokemon: ${error.message}`);
     }
   }
 
-  async updateDex(uuid: string, data: { SEEN: number[], CAUGHT: number[] }): Promise<any> {
+  async updateDex(
+    uuid: string,
+    data: { SEEN: number[]; CAUGHT: number[] },
+  ): Promise<any> {
     try {
       return await this.integrationService.updateDexWithSync(uuid, data);
     } catch (error: any) {
@@ -271,7 +313,9 @@ export class PokemonFacadeService {
       return await this.pokedexService.getPokedexStatistics(uuid);
     } catch (error: any) {
       console.error(`Error getting pokedex statistics for ${uuid}:`, error);
-      throw new Error(`Failed to retrieve pokedex statistics: ${error.message}`);
+      throw new Error(
+        `Failed to retrieve pokedex statistics: ${error.message}`,
+      );
     }
   }
 
@@ -279,8 +323,13 @@ export class PokemonFacadeService {
     try {
       return await this.pokedexService.getDetailedPokedexStatus(uuid);
     } catch (error: any) {
-      console.error(`Error getting detailed pokedex status for ${uuid}:`, error);
-      throw new Error(`Failed to retrieve detailed pokedex status: ${error.message}`);
+      console.error(
+        `Error getting detailed pokedex status for ${uuid}:`,
+        error,
+      );
+      throw new Error(
+        `Failed to retrieve detailed pokedex status: ${error.message}`,
+      );
     }
   }
 
@@ -289,7 +338,9 @@ export class PokemonFacadeService {
       return await this.pokedexService.getPokedexRegistries(uuid);
     } catch (error: any) {
       console.error(`Error getting pokedex registries for ${uuid}:`, error);
-      throw new Error(`Failed to retrieve pokedex registries: ${error.message}`);
+      throw new Error(
+        `Failed to retrieve pokedex registries: ${error.message}`,
+      );
     }
   }
 

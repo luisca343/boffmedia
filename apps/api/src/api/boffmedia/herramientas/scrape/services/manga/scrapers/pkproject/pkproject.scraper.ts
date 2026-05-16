@@ -54,15 +54,22 @@ function toSagaUrl(url: string): string {
 
 /** True when the URL ends at the saga level (no tomo/capitulo segment). */
 function isSagaUrl(url: string): boolean {
-  return /pkproject\.net\/manga\/[^/]+\/[^/]+$/.test(url) && !url.endsWith('/sagas');
+  return (
+    /pkproject\.net\/manga\/[^/]+\/[^/]+$/.test(url) && !url.endsWith('/sagas')
+  );
 }
 
 /** Normalise a potentially relative or CDN-prefixed image URL. */
 function normalizeImgUrl(src: string): string {
   // Strip Cloudflare image-resize prefix.
-  const stripped = src.replace(/^https:\/\/pkproject\.net\/cdn-cgi\/image\/[^/]+\//, '');
+  const stripped = src.replace(
+    /^https:\/\/pkproject\.net\/cdn-cgi\/image\/[^/]+\//,
+    '',
+  );
   if (stripped.startsWith('http')) return stripped;
-  return stripped.startsWith('./') ? `${BASE}/${stripped.slice(2)}` : `${BASE}${stripped}`;
+  return stripped.startsWith('./')
+    ? `${BASE}/${stripped.slice(2)}`
+    : `${BASE}${stripped}`;
 }
 
 const IMAGE_EXTS = /\.(jpg|jpeg|png|webp|gif|avif)(\?.*)?$/i;
@@ -89,18 +96,23 @@ export class PkProjectScraper implements IMangaScraper {
    * Accepts a plain text query or a full pkproject URL.
    */
   async search(query: string): Promise<MangaSearchResult[]> {
-    const indexUrl = query.startsWith('http') && query.includes('pkproject.net')
-      ? sagasIndexUrl(query)
-      : `${BASE}/manga/pokemon-adventures/sagas`;
+    const indexUrl =
+      query.startsWith('http') && query.includes('pkproject.net')
+        ? sagasIndexUrl(query)
+        : `${BASE}/manga/pokemon-adventures/sagas`;
 
     const sagas = await this.loadSagas(indexUrl);
     const lower = query.toLowerCase();
 
-    if (!lower.trim() || query.startsWith('http')) return sagas.map(this.toSearchResult);
-    return sagas.filter(s =>
-      s.sagaName.toLowerCase().includes(lower) ||
-      s.fullTitle.toLowerCase().includes(lower),
-    ).map(this.toSearchResult);
+    if (!lower.trim() || query.startsWith('http'))
+      return sagas.map(this.toSearchResult);
+    return sagas
+      .filter(
+        (s) =>
+          s.sagaName.toLowerCase().includes(lower) ||
+          s.fullTitle.toLowerCase().includes(lower),
+      )
+      .map(this.toSearchResult);
   }
 
   // ── Title ─────────────────────────────────────────────────────────────────
@@ -109,7 +121,7 @@ export class PkProjectScraper implements IMangaScraper {
     const sagaUrl = toSagaUrl(novelUrl);
     const indexUrl = sagasIndexUrl(novelUrl);
     const sagas = await this.loadSagas(indexUrl);
-    const match = sagas.find(s => s.url === sagaUrl);
+    const match = sagas.find((s) => s.url === sagaUrl);
     // Return the full aria-label title minus the " - Tomo N" suffix.
     if (match) return match.fullTitle.replace(/\s*-\s*Tomo\s*\d+$/i, '').trim();
     return this.titleFromUrl(sagaUrl);
@@ -134,9 +146,13 @@ export class PkProjectScraper implements IMangaScraper {
 
   // ── Chapter images ────────────────────────────────────────────────────────
 
-  async getChapterImages(chapterUrl: string, _context: BrowserContext): Promise<string[]> {
+  async getChapterImages(
+    chapterUrl: string,
+    _context: BrowserContext,
+  ): Promise<string[]> {
     const html = await fetchHtmlSafe(chapterUrl);
-    if (!html) throw new Error(`[pkproject] Failed to fetch chapter: ${chapterUrl}`);
+    if (!html)
+      throw new Error(`[pkproject] Failed to fetch chapter: ${chapterUrl}`);
 
     const $ = cheerio.load(html);
     const seen = new Set<string>();
@@ -218,10 +234,12 @@ export class PkProjectScraper implements IMangaScraper {
   }
 
   /** Fetch chapters from every volume in a saga, in order. */
-  private async getAllChaptersForSaga(sagaUrl: string): Promise<MangaChapter[]> {
+  private async getAllChaptersForSaga(
+    sagaUrl: string,
+  ): Promise<MangaChapter[]> {
     const indexUrl = sagasIndexUrl(sagaUrl);
     const sagas = await this.loadSagas(indexUrl);
-    const saga = sagas.find(s => s.url === sagaUrl);
+    const saga = sagas.find((s) => s.url === sagaUrl);
 
     if (!saga) {
       console.warn(`[pkproject] Saga not found for URL: ${sagaUrl}`);
@@ -260,14 +278,17 @@ export class PkProjectScraper implements IMangaScraper {
 
   private toSearchResult(saga: SagaEntry): MangaSearchResult {
     // Strip " - Tomo N" from the full title for the display title.
-    const title = saga.fullTitle.replace(/\s*-\s*Tomo\s*\d+$/i, '').trim() || saga.sagaName;
+    const title =
+      saga.fullTitle.replace(/\s*-\s*Tomo\s*\d+$/i, '').trim() || saga.sagaName;
     return { title, url: saga.url, cover: saga.cover };
   }
 
   private titleFromUrl(url: string): string {
-    const parts = url.replace(/^https?:\/\/pkproject\.net\/manga\//, '').split('/');
+    const parts = url
+      .replace(/^https?:\/\/pkproject\.net\/manga\//, '')
+      .split('/');
     return parts
-      .map(p => p.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()))
+      .map((p) => p.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()))
       .join(' - ');
   }
 }

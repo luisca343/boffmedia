@@ -4,18 +4,18 @@ import { IsString, IsInt, Min } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class CreateParticipantDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'User ID',
-    example: 1
+    example: 1,
   })
   @Transform(({ value }) => parseInt(value))
   @IsInt()
   @Min(1)
   userId: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Participant username',
-    example: 'johndoe'
+    example: 'johndoe',
   })
   @IsString()
   username: string;

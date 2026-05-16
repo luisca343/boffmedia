@@ -12,26 +12,22 @@ import { BattleAchievementService } from './services/battle-achievement.service'
 
 import { AchievementsRepository } from './repositories/achievements.repository';
 import { ReplaysRepository } from './repositories/replays.repository';
-import { 
-  ACHIEVEMENTS_REPOSITORY_TOKEN, 
-  REPLAYS_REPOSITORY_TOKEN 
+import {
+  ACHIEVEMENTS_REPOSITORY_TOKEN,
+  REPLAYS_REPOSITORY_TOKEN,
 } from '@api/_utils/repositories/interfaces/repository.token';
 
 @Module({
-  imports: [
-    LoggerModule, 
-    ResponseModule, 
-    DrizzleModule
-  ],
+  imports: [LoggerModule, ResponseModule, DrizzleModule],
   controllers: [AchievementController],
   providers: [
     AchievementFacadeService,
-    
+
     // Services
     AchievementsService,
     ReplaysService,
     BattleAchievementService,
-    
+
     // Repository Providers
     {
       provide: ACHIEVEMENTS_REPOSITORY_TOKEN,

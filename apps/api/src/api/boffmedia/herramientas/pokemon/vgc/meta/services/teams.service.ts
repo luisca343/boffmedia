@@ -11,8 +11,8 @@ const TEAMS_LIMIT = 30;
 export class TeamsService {
   constructor(
     private readonly vgcPastesRepository: VgcPastesRepository,
-    private readonly limitlessRepository:  LimitlessRepository,
-    private readonly pastesRepository:     PastesRepository,
+    private readonly limitlessRepository: LimitlessRepository,
+    private readonly pastesRepository: PastesRepository,
   ) {}
 
   /**
@@ -21,14 +21,16 @@ export class TeamsService {
    * Teams are sorted by numeric rank (ascending) — unranked teams come last.
    */
   async getTeamsForSpecies(
-    speciesId:    string,
+    speciesId: string,
     regulationId: string,
-    formatId?:    string,
+    formatId?: string,
   ): Promise<SpeciesTeamEntry[]> {
     const [vgcPastesTeams, limitlessTeams, rawPastes] = await Promise.all([
       this.vgcPastesRepository.findTeamsByRegulationWithPastes(regulationId),
       this.limitlessRepository.findTeamsByRegulationWithPastes(regulationId),
-      formatId ? this.pastesRepository.findByFormatId(formatId) : Promise.resolve([]),
+      formatId
+        ? this.pastesRepository.findByFormatId(formatId)
+        : Promise.resolve([]),
     ]);
 
     const results: SpeciesTeamEntry[] = [];
@@ -37,13 +39,13 @@ export class TeamsService {
       const slots = JSON.parse(team.parsedSlots) as VgcMetaSlot[];
       if (!slots.some((s) => s.speciesId === speciesId)) continue;
       results.push({
-        source:      'vgcpastes',
-        playerId:    team.teamId,
-        playerName:  team.playerName,
-        record:      null,
-        rank:        team.rank,
+        source: 'vgcpastes',
+        playerId: team.teamId,
+        playerName: team.playerName,
+        record: null,
+        rank: team.rank,
         slots,
-        rawText:     team.rawText,
+        rawText: team.rawText,
         replicaCode: team.replicaCode ?? null,
       });
     }
@@ -52,13 +54,13 @@ export class TeamsService {
       const slots = JSON.parse(team.parsedSlots) as VgcMetaSlot[];
       if (!slots.some((s) => s.speciesId === speciesId)) continue;
       results.push({
-        source:      'limitless',
-        playerId:    team.playerSlug,
-        playerName:  team.playerName,
-        record:      team.record,
-        rank:        team.placing != null ? String(team.placing) : null,
+        source: 'limitless',
+        playerId: team.playerSlug,
+        playerName: team.playerName,
+        record: team.record,
+        rank: team.placing != null ? String(team.placing) : null,
         slots,
-        rawText:     team.rawText,
+        rawText: team.rawText,
         replicaCode: null,
       });
     }
@@ -68,10 +70,12 @@ export class TeamsService {
     // raw paste that was already linked via those tables would otherwise appear twice.
     const linkedPasteIds = new Set<number>();
     for (const team of vgcPastesTeams) {
-      if ((team as any).pasteId != null) linkedPasteIds.add((team as any).pasteId);
+      if ((team as any).pasteId != null)
+        linkedPasteIds.add((team as any).pasteId);
     }
     for (const team of limitlessTeams) {
-      if ((team as any).pasteId != null) linkedPasteIds.add((team as any).pasteId);
+      if ((team as any).pasteId != null)
+        linkedPasteIds.add((team as any).pasteId);
     }
 
     for (const paste of rawPastes) {
@@ -79,13 +83,13 @@ export class TeamsService {
       const slots = JSON.parse(paste.parsedSlots) as VgcMetaSlot[];
       if (!slots.some((s) => s.speciesId === speciesId)) continue;
       results.push({
-        source:      'paste',
-        playerId:    String(paste.id),
-        playerName:  paste.author ?? null,
-        record:      null,
-        rank:        null,
+        source: 'paste',
+        playerId: String(paste.id),
+        playerName: paste.author ?? null,
+        record: null,
+        rank: null,
         slots,
-        rawText:     paste.rawText,
+        rawText: paste.rawText,
         replicaCode: paste.replicaCode ?? null,
       });
     }

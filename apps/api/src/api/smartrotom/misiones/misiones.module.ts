@@ -20,38 +20,36 @@ import { MisionesController } from './misiones.controller';
 @Module({
   imports: [
     ConfigModule, // Add this to make ConfigService available
-    LoggerModule, 
-    ResponseModule
+    LoggerModule,
+    ResponseModule,
   ],
-  controllers: [
-    MisionesController
-  ],
+  controllers: [MisionesController],
   providers: [
     // Repository with token binding
     {
       provide: QUEST_REPOSITORY_TOKEN,
       useClass: QuestRepository,
     },
-    
+
     // Core Services
     QuestCacheService,
     UserQuestService,
     NPCService,
     ImageService,
-    
+
     // Facade Service
     MisionesFacadeService,
   ],
   exports: [
     // Export facade for other modules
     MisionesFacadeService,
-    
+
     // Export services for potential reuse
     QuestCacheService,
     UserQuestService,
     NPCService,
     ImageService,
-    
+
     // Export repository token for testing
     QUEST_REPOSITORY_TOKEN,
   ],

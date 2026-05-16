@@ -1,105 +1,105 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class RotomMessage {
-  @ApiProperty({ 
+  @ApiProperty({
     example: 123,
-    description: 'Message ID'
+    description: 'Message ID',
   })
   id: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 'Hello everyone!',
-    description: 'Message text content'
+    description: 'Message text content',
   })
   text: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: '2025-06-13T23:06:15.000Z',
-    description: 'Message creation date'
+    description: 'Message creation date',
   })
   date: Date;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
-    description: 'Sender UUID'
+    description: 'Sender UUID',
   })
   uuid: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 'text',
-    description: 'Message type'
+    description: 'Message type',
   })
   type?: string;
 }
 
 export class MessageDetails {
-  @ApiProperty({ 
+  @ApiProperty({
     example: 123,
-    description: 'Message ID'
+    description: 'Message ID',
   })
   id: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 'Hello everyone!',
-    description: 'Message content'
+    description: 'Message content',
   })
   content: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
-    description: 'Sender UUID'
+    description: 'Sender UUID',
   })
   senderUUID: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 'text',
-    description: 'Message type'
+    description: 'Message type',
   })
   type: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: '2025-06-13T23:06:15.000Z',
-    description: 'Message creation date'
+    description: 'Message creation date',
   })
   createdAt: Date;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 1,
-    description: 'Chat ID'
+    description: 'Chat ID',
   })
   chatId: number;
 }
 
 export class CreateMessageResponse {
-  @ApiProperty({ 
+  @ApiProperty({
     example: true,
-    description: 'Whether the operation was successful'
+    description: 'Whether the operation was successful',
   })
   success: boolean;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 'Message created successfully',
-    description: 'Response message'
+    description: 'Response message',
   })
   message: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Created message details',
-    type: RotomMessage
+    type: RotomMessage,
   })
   data: RotomMessage;
 }
 
 export class MessageResponse {
-  @ApiProperty({ 
+  @ApiProperty({
     example: true,
-    description: 'Whether the operation was successful'
+    description: 'Whether the operation was successful',
   })
   success: boolean;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 'Operation completed successfully',
-    description: 'Response message'
+    description: 'Response message',
   })
   message: string;
 }

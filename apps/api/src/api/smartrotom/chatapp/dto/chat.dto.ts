@@ -1,52 +1,62 @@
 import { BaseDto } from '@api/_utils/dto/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsArray, IsOptional, IsInt, IsEnum } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsArray,
+  IsOptional,
+  IsInt,
+  IsEnum,
+} from 'class-validator';
 
 export enum ChatType {
   PUBLIC = 0,
   PRIVATE = 1,
   DIRECT = 2,
-  GROUP = 3
+  GROUP = 3,
 }
 
 export class CreateChatDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'UUID of the player creating the chat',
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
   })
   @IsNotEmpty()
   @IsString()
   player: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Array of user UUIDs to add to the chat',
-    example: ['67d9b543-5ac9-41e1-a8a5-20d7689e24a4', '67d9b543-5ac9-41e1-a8a5-20d7689e24a4']
+    example: [
+      '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
+      '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
+    ],
   })
   @IsArray()
   @IsString({ each: true })
   users: string[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Name of the chat',
-    example: 'My Group Chat'
+    example: 'My Group Chat',
   })
   @IsOptional()
   @IsString()
   name?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Chat description',
     example: 'A chat for discussing game strategies',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
   description?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Chat image URL',
     example: 'group_chat.png',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
@@ -54,9 +64,9 @@ export class CreateChatDto extends BaseDto {
 }
 
 export class GetChatsDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Player UUID',
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
   })
   @IsNotEmpty()
   @IsString()
@@ -64,17 +74,17 @@ export class GetChatsDto {
 }
 
 export class GetChatByIdDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Chat ID',
-    example: 1
+    example: 1,
   })
   @IsNotEmpty()
   @IsInt()
   chatId: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Requesting user UUID',
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
   })
   @IsNotEmpty()
   @IsString()

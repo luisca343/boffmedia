@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class GameStartResponse {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Game session ID',
-    example: 123
+    example: 123,
   })
   idPartida: number;
 }

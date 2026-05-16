@@ -1,4 +1,10 @@
-import { Controller, Get, NotFoundException, Param, UseInterceptors } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  UseInterceptors,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { VgcService, VgcPokemon, SpeedTierEntry } from './vgc.service';
@@ -23,11 +29,20 @@ export class VgcController {
     description: 'Champions regulation shorthand ID',
     example: 'vgc2026regma',
   })
-  @ApiResponse({ status: 200, description: 'Legal Pokémon retrieved successfully.', type: VgcPokemonDto, isArray: true })
-  async getChampionsLegalPokemon(@Param('regulationId') regulationId: string): Promise<VgcPokemon[]> {
+  @ApiResponse({
+    status: 200,
+    description: 'Legal Pokémon retrieved successfully.',
+    type: VgcPokemonDto,
+    isArray: true,
+  })
+  async getChampionsLegalPokemon(
+    @Param('regulationId') regulationId: string,
+  ): Promise<VgcPokemon[]> {
     const regulation = await this.vgcService.getRegulationById(regulationId);
     if (!regulation) {
-      throw new NotFoundException(`Champions regulation "${regulationId}" not found.`);
+      throw new NotFoundException(
+        `Champions regulation "${regulationId}" not found.`,
+      );
     }
     return this.vgcService.getLegalPokemon(regulation.formatId);
   }
@@ -44,11 +59,20 @@ export class VgcController {
     description: 'Champions regulation shorthand ID',
     example: 'vgc2026regma',
   })
-  @ApiResponse({ status: 200, description: 'Speed tiers retrieved successfully.', type: SpeedTierEntryDto, isArray: true })
-  async getChampionsSpeedTiers(@Param('regulationId') regulationId: string): Promise<SpeedTierEntry[]> {
+  @ApiResponse({
+    status: 200,
+    description: 'Speed tiers retrieved successfully.',
+    type: SpeedTierEntryDto,
+    isArray: true,
+  })
+  async getChampionsSpeedTiers(
+    @Param('regulationId') regulationId: string,
+  ): Promise<SpeedTierEntry[]> {
     const regulation = await this.vgcService.getRegulationById(regulationId);
     if (!regulation) {
-      throw new NotFoundException(`Champions regulation "${regulationId}" not found.`);
+      throw new NotFoundException(
+        `Champions regulation "${regulationId}" not found.`,
+      );
     }
     return this.vgcService.getSpeedTiers(regulation.formatId);
   }

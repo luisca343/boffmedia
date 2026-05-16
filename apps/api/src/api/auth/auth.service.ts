@@ -24,7 +24,7 @@ export class AuthService {
       sub: user.id,
       email: user.email,
       roles: user.roles,
-      mcUuid: user.mcUUid
+      mcUuid: user.mcUUid,
     };
 
     return {
@@ -36,17 +36,20 @@ export class AuthService {
         email: user.email,
         roles: user.roles,
         mcUuid: user.mcUUid,
-        smartRotomUser: user.smartRotomUser || {}
-      }
+        smartRotomUser: user.smartRotomUser || {},
+      },
     };
   }
 
-  async loginMC(loginData: {username: string, uuid: string, world: string}) {
+  async loginMC(loginData: { username: string; uuid: string; world: string }) {
     if (loginData.world !== process.env.MC_WORLD) {
       throw new UnauthorizedException('Invalid world');
     }
 
-    const user = await this.usersService.getUserWithIntegrations(loginData.uuid, "uuid");
+    const user = await this.usersService.getUserWithIntegrations(
+      loginData.uuid,
+      'uuid',
+    );
     if (!user) {
       return { error: 'User not found in BoffMedia system' };
     }
@@ -58,8 +61,8 @@ export class AuthService {
         email: user.boffMediaUser.email,
         roles: user.roles,
         mcUUid: user.boffMediaUser.uuid,
-        smartRotomUser: user.smartRotomUser
-      }
+        smartRotomUser: user.smartRotomUser,
+      },
     };
 
     return this.login(loginUser);
@@ -83,12 +86,13 @@ export class AuthService {
     try {
       // Create the user accounts
       const result = await this.usersService.createMinecraftUser(registerData);
-      
+
       // Get the created user with all integrations for login
-      const userWithIntegrations = await this.usersService.getUserWithIntegrations(
-        result.boffMediaUser.id.toString(), 
-        'id'
-      );
+      const userWithIntegrations =
+        await this.usersService.getUserWithIntegrations(
+          result.boffMediaUser.id.toString(),
+          'id',
+        );
 
       if (!userWithIntegrations) {
         return { error: 'Failed to retrieve created user' };
@@ -101,7 +105,7 @@ export class AuthService {
         email: userWithIntegrations.boffMediaUser.email,
         roles: userWithIntegrations.roles,
         mcUUid: userWithIntegrations.boffMediaUser.uuid,
-        smartRotomUser: userWithIntegrations.smartRotomUser
+        smartRotomUser: userWithIntegrations.smartRotomUser,
       };
 
       return this.login(loginUser);
@@ -129,12 +133,13 @@ export class AuthService {
     try {
       // Link the Minecraft account to existing BoffMedia account
       const result = await this.usersService.linkMinecraftAccount(linkData);
-      
+
       // Get the user with all integrations for login
-      const userWithIntegrations = await this.usersService.getUserWithIntegrations(
-        result.boffMediaUser.id.toString(), 
-        'id'
-      );
+      const userWithIntegrations =
+        await this.usersService.getUserWithIntegrations(
+          result.boffMediaUser.id.toString(),
+          'id',
+        );
 
       if (!userWithIntegrations) {
         return { error: 'Failed to retrieve linked user' };
@@ -147,7 +152,7 @@ export class AuthService {
         email: userWithIntegrations.boffMediaUser.email,
         roles: userWithIntegrations.roles,
         mcUUid: userWithIntegrations.boffMediaUser.uuid,
-        smartRotomUser: userWithIntegrations.smartRotomUser
+        smartRotomUser: userWithIntegrations.smartRotomUser,
       };
 
       return this.login(loginUser);
@@ -161,7 +166,7 @@ export class AuthService {
     try {
       // Handle both string tokens and token objects from NextAuth
       let payload;
-      
+
       if (typeof tokenData === 'string') {
         // If it's a JWT string, verify it
         payload = this.jwtService.verify(tokenData);
@@ -173,8 +178,10 @@ export class AuthService {
       }
 
       // Get fresh user data
-      const user = await this.usersService.getUserById(payload.sub || payload.id);
-      
+      const user = await this.usersService.getUserById(
+        payload.sub || payload.id,
+      );
+
       if (!user) {
         throw new UnauthorizedException('User not found');
       }
@@ -187,7 +194,7 @@ export class AuthService {
         sub: user.id,
         email: user.email,
         roles: roles,
-        mcUuid: user.uuid
+        mcUuid: user.uuid,
       };
 
       return {
@@ -199,8 +206,8 @@ export class AuthService {
           email: user.email,
           roles: roles,
           image: user.profilePicture || null,
-          smartRotomUser: payload.smartRotomUser || {}
-        }
+          smartRotomUser: payload.smartRotomUser || {},
+        },
       };
     } catch (error: any) {
       console.error('Refresh token error:', error);
@@ -210,7 +217,7 @@ export class AuthService {
 
   async googleLogin(googleUser: any) {
     let user = await this.usersService.findByEmail(googleUser.email);
-    
+
     if (!user) {
       user = await this.usersService.createFromGoogle(googleUser);
     }

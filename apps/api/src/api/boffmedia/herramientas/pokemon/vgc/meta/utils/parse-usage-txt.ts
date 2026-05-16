@@ -1,8 +1,8 @@
 export interface UsageTxtEntry {
-  rank:         number;
-  name:         string;
+  rank: number;
+  name: string;
   usagePercent: number;
-  rawCount:     number;
+  rawCount: number;
 }
 
 /**
@@ -15,10 +15,10 @@ export function parseUsageTxt(text: string): UsageTxtEntry[] {
   let match: RegExpExecArray | null;
   while ((match = re.exec(text)) !== null) {
     results.push({
-      rank:         parseInt(match[1], 10),
-      name:         match[2].trim(),
+      rank: parseInt(match[1], 10),
+      name: match[2].trim(),
       usagePercent: parseFloat(match[3]),
-      rawCount:     parseInt(match[4], 10),
+      rawCount: parseInt(match[4], 10),
     });
   }
   return results;

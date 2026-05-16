@@ -47,7 +47,9 @@ export interface SpeedTierEntry {
 
 @Injectable()
 export class VgcService {
-  constructor(private readonly regulationsRepository: VgcRegulationsRepository) {
+  constructor(
+    private readonly regulationsRepository: VgcRegulationsRepository,
+  ) {
     // Register the Champions mod into @pkmn/sim so that Champions format IDs
     // (e.g. 'gen9championsvgc2026regma') are queryable via Dex.forFormat().
     initChampionsMod();
@@ -63,8 +65,8 @@ export class VgcService {
     if (!format.exists) {
       throw new NotFoundException(
         `Format "${formatId}" not found. ` +
-        `Use GET /tools/vgc/formats for standard VGC formats or ` +
-        `GET /tools/vgc/meta/regulations for Champions format IDs.`,
+          `Use GET /tools/vgc/formats for standard VGC formats or ` +
+          `GET /tools/vgc/meta/regulations for Champions format IDs.`,
       );
     }
 
@@ -86,7 +88,11 @@ export class VgcService {
         // are intentionally included regardless of the base species status.
         if (s.baseSpecies !== s.name && (!s.tier || s.tier === 'Illegal')) {
           const base = dex.species.get(s.baseSpecies);
-          if (!base.exists || (base.isNonstandard && (!base.tier || base.tier === 'Illegal'))) return false;
+          if (
+            !base.exists ||
+            (base.isNonstandard && (!base.tier || base.tier === 'Illegal'))
+          )
+            return false;
         }
         return true;
       })
@@ -104,7 +110,11 @@ export class VgcService {
         },
         abilities: s.abilities as unknown as { [slot: string]: string },
         weightkg: s.weightkg,
-        isRestricted: s.tags ? s.tags.some((t) => restrictedTags.has(t) && t === 'Restricted Legendary') : false,
+        isRestricted: s.tags
+          ? s.tags.some(
+              (t) => restrictedTags.has(t) && t === 'Restricted Legendary',
+            )
+          : false,
         isMythical: s.tags?.includes('Mythical') ?? false,
         requiredItem: s.requiredItem ?? null,
       }));
@@ -130,8 +140,12 @@ export class VgcService {
           minPlus: this.calcSpeed(p.baseStats.spe, 0, 1.1),
           max: this.calcSpeed(p.baseStats.spe, 252, 1.0),
           maxPlus: this.calcSpeed(p.baseStats.spe, 252, 1.1),
-          scarf: p.requiredItem ? null : Math.floor(this.calcSpeed(p.baseStats.spe, 252, 1.0) * 1.5),
-          scarfPlus: p.requiredItem ? null : Math.floor(this.calcSpeed(p.baseStats.spe, 252, 1.1) * 1.5),
+          scarf: p.requiredItem
+            ? null
+            : Math.floor(this.calcSpeed(p.baseStats.spe, 252, 1.0) * 1.5),
+          scarfPlus: p.requiredItem
+            ? null
+            : Math.floor(this.calcSpeed(p.baseStats.spe, 252, 1.1) * 1.5),
         },
       }))
       .sort((a, b) => b.baseSpeed - a.baseSpeed);
@@ -149,9 +163,16 @@ export class VgcService {
    * Speed stat formula at level 50:
    * floor((floor((2*base + iv + floor(ev/4)) * level/100) + 5) * nature)
    */
-  private calcSpeed(base: number, evs: number, nature: number, iv = 31, level = 50): number {
+  private calcSpeed(
+    base: number,
+    evs: number,
+    nature: number,
+    iv = 31,
+    level = 50,
+  ): number {
     return Math.floor(
-      (Math.floor(((2 * base + iv + Math.floor(evs / 4)) * level) / 100) + 5) * nature,
+      (Math.floor(((2 * base + iv + Math.floor(evs / 4)) * level) / 100) + 5) *
+        nature,
     );
   }
 }

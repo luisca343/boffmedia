@@ -1,20 +1,35 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, MaxLength, IsOptional, IsIn } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  MaxLength,
+  IsOptional,
+  IsIn,
+} from 'class-validator';
 
 export class UpsertRegulationDto {
-  @ApiProperty({ example: 'vgc2026regma', description: 'Unique regulation ID (matches Drizzle PK)' })
+  @ApiProperty({
+    example: 'vgc2026regma',
+    description: 'Unique regulation ID (matches Drizzle PK)',
+  })
   @IsString()
   @IsNotEmpty()
   @MaxLength(64)
   id!: string;
 
-  @ApiProperty({ example: 'gen9championsvgc2026regma', description: '@pkmn/sim format ID' })
+  @ApiProperty({
+    example: 'gen9championsvgc2026regma',
+    description: '@pkmn/sim format ID',
+  })
   @IsString()
   @IsNotEmpty()
   @MaxLength(128)
   formatId!: string;
 
-  @ApiProperty({ example: '[Gen 9 Champions] VGC 2026 Reg M-A', description: 'Display name' })
+  @ApiProperty({
+    example: '[Gen 9 Champions] VGC 2026 Reg M-A',
+    description: 'Display name',
+  })
   @IsString()
   @IsNotEmpty()
   @MaxLength(255)
@@ -26,7 +41,10 @@ export class UpsertRegulationDto {
   @IsIn(['singles', 'doubles'])
   gameType?: string;
 
-  @ApiPropertyOptional({ example: '791705272', description: 'Google Sheet GID for VGCPastes data (null = no sheet)' })
+  @ApiPropertyOptional({
+    example: '791705272',
+    description: 'Google Sheet GID for VGCPastes data (null = no sheet)',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(32)

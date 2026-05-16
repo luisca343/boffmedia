@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { InvitesRepository, CreateInviteData, InviteResult } from '@repositories/boffmedia/invites.repository';
+import {
+  InvitesRepository,
+  CreateInviteData,
+  InviteResult,
+} from '@repositories/boffmedia/invites.repository';
 
 export interface InviteCreationResult {
   success: boolean;
@@ -16,42 +20,42 @@ export interface InviteStatistics {
 
 @Injectable()
 export class InviteManagementService {
-  constructor(
-    private readonly invitesRepository: InvitesRepository,
-  ) {}
+  constructor(private readonly invitesRepository: InvitesRepository) {}
 
   // ==================== INVITE CREATION ====================
 
   async createInvite(data: CreateInviteData): Promise<InviteCreationResult> {
     try {
       // Check if invite with this ID already exists
-      const existingInvite = await this.invitesRepository.findInviteById(data.id);
+      const existingInvite = await this.invitesRepository.findInviteById(
+        data.id,
+      );
       if (existingInvite) {
         return {
           success: false,
-          message: 'Invite with this ID already exists'
+          message: 'Invite with this ID already exists',
         };
       }
 
       const result = await this.invitesRepository.createInvite(data);
-      
+
       if (result.success) {
         return {
           success: true,
           invite: result.invite,
-          message: 'Invite created successfully'
+          message: 'Invite created successfully',
         };
       } else {
         return {
           success: false,
-          message: result.message || 'Failed to create invite'
+          message: result.message || 'Failed to create invite',
         };
       }
     } catch (error: any) {
       console.error('Failed to create invite:', error);
       return {
         success: false,
-        message: `Invite creation failed: ${error.message}`
+        message: `Invite creation failed: ${error.message}`,
       };
     }
   }
@@ -105,115 +109,123 @@ export class InviteManagementService {
 
   // ==================== INVITE STATUS MANAGEMENT ====================
 
-  async markInviteAsUsed(id: string): Promise<{ success: boolean; message: string }> {
+  async markInviteAsUsed(
+    id: string,
+  ): Promise<{ success: boolean; message: string }> {
     try {
       // Check if invite exists and is active
       const invite = await this.invitesRepository.findActiveInviteById(id);
       if (!invite) {
         return {
           success: false,
-          message: 'Invite not found or already used/deleted'
+          message: 'Invite not found or already used/deleted',
         };
       }
 
       const result = await this.invitesRepository.markInviteAsUsed(id);
-      
+
       if (result.success) {
         return {
           success: true,
-          message: 'Invite marked as used successfully'
+          message: 'Invite marked as used successfully',
         };
       } else {
         return {
           success: false,
-          message: result.message || 'Failed to mark invite as used'
+          message: result.message || 'Failed to mark invite as used',
         };
       }
     } catch (error: any) {
       console.error(`Failed to mark invite ${id} as used:`, error);
       return {
         success: false,
-        message: `Mark as used failed: ${error.message}`
+        message: `Mark as used failed: ${error.message}`,
       };
     }
   }
 
-  async deleteInvite(id: string): Promise<{ success: boolean; message: string }> {
+  async deleteInvite(
+    id: string,
+  ): Promise<{ success: boolean; message: string }> {
     try {
       // Check if invite exists
       const invite = await this.invitesRepository.findInviteById(id);
       if (!invite) {
         return {
           success: false,
-          message: 'Invite not found'
+          message: 'Invite not found',
         };
       }
 
       const result = await this.invitesRepository.markInviteAsDeleted(id);
-      
+
       if (result.success) {
         return {
           success: true,
-          message: 'Invite deleted successfully'
+          message: 'Invite deleted successfully',
         };
       } else {
         return {
           success: false,
-          message: result.message || 'Failed to delete invite'
+          message: result.message || 'Failed to delete invite',
         };
       }
     } catch (error: any) {
       console.error(`Failed to delete invite ${id}:`, error);
       return {
         success: false,
-        message: `Invite deletion failed: ${error.message}`
+        message: `Invite deletion failed: ${error.message}`,
       };
     }
   }
 
-  async permanentlyDeleteInvite(id: string): Promise<{ success: boolean; message: string }> {
+  async permanentlyDeleteInvite(
+    id: string,
+  ): Promise<{ success: boolean; message: string }> {
     try {
       // Check if invite exists
       const invite = await this.invitesRepository.findInviteById(id);
       if (!invite) {
         return {
           success: false,
-          message: 'Invite not found'
+          message: 'Invite not found',
         };
       }
 
       const result = await this.invitesRepository.deleteInvite(id);
-      
+
       if (result.success) {
         return {
           success: true,
-          message: 'Invite permanently deleted successfully'
+          message: 'Invite permanently deleted successfully',
         };
       } else {
         return {
           success: false,
-          message: result.message || 'Failed to permanently delete invite'
+          message: result.message || 'Failed to permanently delete invite',
         };
       }
     } catch (error: any) {
       console.error(`Failed to permanently delete invite ${id}:`, error);
       return {
         success: false,
-        message: `Permanent deletion failed: ${error.message}`
+        message: `Permanent deletion failed: ${error.message}`,
       };
     }
   }
 
   // ==================== INVITE VALIDATION ====================
 
-  async validateInvite(id: string): Promise<{ valid: boolean; message: string; invite?: InviteResult }> {
+  async validateInvite(
+    id: string,
+  ): Promise<{ valid: boolean; message: string; invite?: InviteResult }> {
     try {
       const invite = await this.invitesRepository.findInviteById(id);
-      
+
       if (!invite) {
         return {
           valid: false,
-          message: 'Invite not found'
+          message: 'Invite not found',
         };
       }
 
@@ -221,7 +233,7 @@ export class InviteManagementService {
         return {
           valid: false,
           message: 'Invite has already been used',
-          invite
+          invite,
         };
       }
 
@@ -229,20 +241,20 @@ export class InviteManagementService {
         return {
           valid: false,
           message: 'Invite has been deleted',
-          invite
+          invite,
         };
       }
 
       return {
         valid: true,
         message: 'Invite is valid and active',
-        invite
+        invite,
       };
     } catch (error: any) {
       console.error(`Failed to validate invite ${id}:`, error);
       return {
         valid: false,
-        message: `Validation failed: ${error.message}`
+        message: `Validation failed: ${error.message}`,
       };
     }
   }
@@ -254,14 +266,14 @@ export class InviteManagementService {
       const [total, active, used] = await Promise.all([
         this.invitesRepository.getInviteCount(),
         this.invitesRepository.getActiveInviteCount(),
-        this.invitesRepository.getUsedInviteCount()
+        this.invitesRepository.getUsedInviteCount(),
       ]);
 
       return {
         total,
         active,
         used,
-        deleted: total - active - used
+        deleted: total - active - used,
       };
     } catch (error: any) {
       console.error('Failed to get invite statistics:', error);
@@ -285,18 +297,20 @@ export class InviteManagementService {
     // Generate a 6-character invite ID
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let result = '';
-    
+
     for (let i = 0; i < 6; i++) {
-      result += characters.charAt(Math.floor(Math.random() * characters.length));
+      result += characters.charAt(
+        Math.floor(Math.random() * characters.length),
+      );
     }
-    
+
     // Check if this ID already exists
     const existingInvite = await this.invitesRepository.findInviteById(result);
     if (existingInvite) {
       // Recursively generate a new ID if this one exists
       return await this.generateInviteId();
     }
-    
+
     return result;
   }
 }

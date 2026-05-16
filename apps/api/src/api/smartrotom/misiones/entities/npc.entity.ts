@@ -2,33 +2,33 @@ import { ApiProperty } from '@nestjs/swagger';
 import { QuestRequirements } from './quest.entity';
 
 export class NPC {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'NPC ID',
-    example: 1
+    example: 1,
   })
   id: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'NPC name',
-    example: 'Professor Oak'
+    example: 'Professor Oak',
   })
   name: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'NPC dialogue text',
-    example: 'Hello there! Welcome to the Pokemon world!'
+    example: 'Hello there! Welcome to the Pokemon world!',
   })
   text: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Associated quest ID',
-    example: 1
+    example: 1,
   })
   questId: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'NPC requirements',
-    type: QuestRequirements
+    type: QuestRequirements,
   })
   requirements: QuestRequirements;
 }

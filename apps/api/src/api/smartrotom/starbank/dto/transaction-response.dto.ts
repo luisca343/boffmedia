@@ -3,23 +3,23 @@ import { ApiProperty } from '@nestjs/swagger';
 import { StarBankTransaction } from '../entities/starbank-transaction.entity';
 
 export class TransactionResponseDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Operation result',
-    example: true
+    example: true,
   })
   success: boolean;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Transaction data',
     type: StarBankTransaction,
-    required: false
+    required: false,
   })
   transaction?: StarBankTransaction;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Response message',
     example: 'Transaction completed successfully',
-    required: false
+    required: false,
   })
   message?: string;
 }

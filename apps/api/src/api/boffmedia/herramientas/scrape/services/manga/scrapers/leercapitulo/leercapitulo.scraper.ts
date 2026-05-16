@@ -46,7 +46,8 @@ export class LeerCapituloScraper implements IMangaScraper {
     const mangaUrl = this.toMangaUrl(novelUrl);
     console.log(`[LeerCapituloScraper] Fetching title from: ${mangaUrl}`);
     const html = await fetchHtmlSafe(mangaUrl);
-    if (!html) throw new Error(`[leercapitulo] Failed to fetch manga page: ${mangaUrl}`);
+    if (!html)
+      throw new Error(`[leercapitulo] Failed to fetch manga page: ${mangaUrl}`);
 
     const $ = cheerio.load(html);
     // Prefer h1; fall back to <title> (strip site suffix if any).
@@ -59,9 +60,12 @@ export class LeerCapituloScraper implements IMangaScraper {
 
   async getChapterList(novelUrl: string): Promise<MangaChapter[]> {
     const mangaUrl = this.toMangaUrl(novelUrl);
-    console.log(`[LeerCapituloScraper] Fetching chapter list from: ${mangaUrl}`);
+    console.log(
+      `[LeerCapituloScraper] Fetching chapter list from: ${mangaUrl}`,
+    );
     const html = await fetchHtmlSafe(mangaUrl);
-    if (!html) throw new Error(`[leercapitulo] Failed to fetch manga page: ${mangaUrl}`);
+    if (!html)
+      throw new Error(`[leercapitulo] Failed to fetch manga page: ${mangaUrl}`);
 
     const $ = cheerio.load(html);
     const chapters: MangaChapter[] = [];
@@ -87,12 +91,18 @@ export class LeerCapituloScraper implements IMangaScraper {
    * Navigates to the chapter page via Playwright, switches to "Vista: Todo en uno"
    * (the view that shows all images at once), then collects every image URL.
    */
-  async getChapterImages(chapterUrl: string, context: BrowserContext): Promise<string[]> {
+  async getChapterImages(
+    chapterUrl: string,
+    context: BrowserContext,
+  ): Promise<string[]> {
     console.log(`[LeerCapituloScraper] Opening chapter: ${chapterUrl}`);
     const page = await context.newPage();
 
     try {
-      await page.goto(chapterUrl, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+      await page.goto(chapterUrl, {
+        waitUntil: 'domcontentloaded',
+        timeout: 30_000,
+      });
 
       // Switch to "Todo en uno" view so all pages render at once.
       console.log(`[LeerCapituloScraper] Selecting "Vista: Todo en uno"`);
@@ -116,7 +126,9 @@ export class LeerCapituloScraper implements IMangaScraper {
       );
 
       const deduplicated = [...new Set(images)];
-      console.log(`[LeerCapituloScraper] Found ${deduplicated.length} image(s) in chapter`);
+      console.log(
+        `[LeerCapituloScraper] Found ${deduplicated.length} image(s) in chapter`,
+      );
       return deduplicated;
     } finally {
       await page.close();
@@ -132,7 +144,9 @@ export class LeerCapituloScraper implements IMangaScraper {
    * Manga URL   : /manga/{id}/{slug}/
    */
   private toMangaUrl(url: string): string {
-    const m = url.match(/^(https?:\/\/(?:www\.)?leercapitulo\.co)\/leer\/([^/]+)\/([^/]+)\//);
+    const m = url.match(
+      /^(https?:\/\/(?:www\.)?leercapitulo\.co)\/leer\/([^/]+)\/([^/]+)\//,
+    );
     if (m) return `${m[1]}/manga/${m[2]}/${m[3]}/`;
     // Already a manga URL or unknown — return as-is.
     return url;

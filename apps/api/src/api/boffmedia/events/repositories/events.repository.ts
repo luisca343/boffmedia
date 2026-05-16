@@ -37,98 +37,112 @@ export class EventsRepository {
   async findAll(): Promise<EventWithGameNameAndParent[]> {
     const parentEvent = alias(boffMediaEvents, 'parentEvent') as any;
 
-    return this.db.select({
-      ...this.eventSelect,
-      gameName: boffMediaGames.title,
-      parentEventName: parentEvent.title,
-    })
+    return this.db
+      .select({
+        ...this.eventSelect,
+        gameName: boffMediaGames.title,
+        parentEventName: parentEvent.title,
+      })
       .from(boffMediaEvents)
       .leftJoin(boffMediaGames, eq(boffMediaGames.id, boffMediaEvents.gameId))
       .leftJoin(parentEvent, eq(parentEvent.id, boffMediaEvents.parentId))
-      .where(and(
-        isNull(boffMediaEvents.deletedAt),
-        or(isNull(boffMediaEvents.gameId), isNull(boffMediaGames.deletedAt))
-      ));
+      .where(
+        and(
+          isNull(boffMediaEvents.deletedAt),
+          or(isNull(boffMediaEvents.gameId), isNull(boffMediaGames.deletedAt)),
+        ),
+      );
   }
 
   async findById(id: number): Promise<EventWithGameNameAndParent | null> {
     const parentEvent = alias(boffMediaEvents, 'parentEvent') as any;
 
-    const result = await this.db.select({
-      ...this.eventSelect,
-      gameName: boffMediaGames.title,
-      parentEventName: parentEvent.title,
-    })
+    const result = await this.db
+      .select({
+        ...this.eventSelect,
+        gameName: boffMediaGames.title,
+        parentEventName: parentEvent.title,
+      })
       .from(boffMediaEvents)
       .leftJoin(boffMediaGames, eq(boffMediaGames.id, boffMediaEvents.gameId))
       .leftJoin(parentEvent, eq(parentEvent.id, boffMediaEvents.parentId))
-      .where(and(
-        eq(boffMediaEvents.id, id), 
-        isNull(boffMediaEvents.deletedAt),
-        or(isNull(boffMediaEvents.gameId), isNull(boffMediaGames.deletedAt))
-      ));
+      .where(
+        and(
+          eq(boffMediaEvents.id, id),
+          isNull(boffMediaEvents.deletedAt),
+          or(isNull(boffMediaEvents.gameId), isNull(boffMediaGames.deletedAt)),
+        ),
+      );
 
     return result.length ? result[0] : null;
   }
 
-  async findChildEvents(parentId: number): Promise<EventWithGameNameAndParent[]> {
+  async findChildEvents(
+    parentId: number,
+  ): Promise<EventWithGameNameAndParent[]> {
     const parentEvent = alias(boffMediaEvents, 'parentEvent') as any;
 
-    return this.db.select({
-      ...this.eventSelect,
-      gameName: boffMediaGames.title,
-      parentEventName: parentEvent.title,
-    })
+    return this.db
+      .select({
+        ...this.eventSelect,
+        gameName: boffMediaGames.title,
+        parentEventName: parentEvent.title,
+      })
       .from(boffMediaEvents)
       .leftJoin(boffMediaGames, eq(boffMediaGames.id, boffMediaEvents.gameId))
       .leftJoin(parentEvent, eq(parentEvent.id, boffMediaEvents.parentId))
-      .where(and(
-        eq(boffMediaEvents.parentId, parentId), 
-        isNull(boffMediaEvents.deletedAt),
-        or(isNull(boffMediaEvents.gameId), isNull(boffMediaGames.deletedAt))
-      ));
+      .where(
+        and(
+          eq(boffMediaEvents.parentId, parentId),
+          isNull(boffMediaEvents.deletedAt),
+          or(isNull(boffMediaEvents.gameId), isNull(boffMediaGames.deletedAt)),
+        ),
+      );
   }
 
   async create(eventData: Partial<Event>): Promise<{ insertId: number }> {
-    const result = await this.db.insert(boffMediaEvents)
-      .values({
-        ...eventData,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      } as Event);
-    
+    const result = await this.db.insert(boffMediaEvents).values({
+      ...eventData,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as Event);
+
     return { insertId: result[0].insertId };
   }
 
   async update(id: number, eventData: Partial<Event>): Promise<void> {
-    await this.db.update(boffMediaEvents)
+    await this.db
+      .update(boffMediaEvents)
       .set({
         ...eventData,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       } as Event)
       .where(eq(boffMediaEvents.id, id));
   }
 
   async delete(id: number): Promise<void> {
-    await this.db.update(boffMediaEvents)
+    await this.db
+      .update(boffMediaEvents)
       .set({
-        deletedAt: new Date()
+        deletedAt: new Date(),
       } as Event)
       .where(eq(boffMediaEvents.id, id));
   }
 
   async softDelete(id: number): Promise<void> {
-    await this.db.update(boffMediaEvents)
+    await this.db
+      .update(boffMediaEvents)
       .set({
-        deletedAt: new Date()
+        deletedAt: new Date(),
       } as Partial<Event>)
       .where(eq(boffMediaEvents.id, id));
   }
 
   async softDeleteChildren(parentId: number): Promise<void> {
-    await this.db.update(boffMediaEvents)
+    await this.db
+      .update(boffMediaEvents)
       .set({
-        deletedAt: new Date()
+        deletedAt: new Date(),
       } as Partial<Event>)
       .where(eq(boffMediaEvents.parentId, parentId));
   }

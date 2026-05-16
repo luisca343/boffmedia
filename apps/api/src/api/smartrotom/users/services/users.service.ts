@@ -1,4 +1,10 @@
-import { Injectable, NotFoundException, ConflictException, BadRequestException, Inject } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+  BadRequestException,
+  Inject,
+} from '@nestjs/common';
 import { SmartRotomUser } from '@/_db/schema/SmartRotom';
 import { CreateSmartrotomUserDto } from '../dto/create-user.dto';
 import { UpdateSmartrotomUserDto } from '../dto/update-user.dto';
@@ -36,47 +42,75 @@ export class UsersService {
     return this.usersRepository.findByUuid(uuid);
   }
 
-  async createUser(createUserDto: CreateSmartrotomUserDto): Promise<SmartRotomUser> {
+  async createUser(
+    createUserDto: CreateSmartrotomUserDto,
+  ): Promise<SmartRotomUser> {
     // Check for duplicate UUID
-    const existingUser = await this.usersRepository.findByUuid(createUserDto.uuid);
+    const existingUser = await this.usersRepository.findByUuid(
+      createUserDto.uuid,
+    );
     if (existingUser) {
-      throw new ConflictException(`User with UUID '${createUserDto.uuid}' already exists`);
+      throw new ConflictException(
+        `User with UUID '${createUserDto.uuid}' already exists`,
+      );
     }
 
     // Check for duplicate username
-    const existingUsername = await this.usersRepository.findByUsername(createUserDto.username);
+    const existingUsername = await this.usersRepository.findByUsername(
+      createUserDto.username,
+    );
     if (existingUsername) {
-      throw new ConflictException(`User with username '${createUserDto.username}' already exists`);
+      throw new ConflictException(
+        `User with username '${createUserDto.username}' already exists`,
+      );
     }
 
     return this.usersRepository.create(createUserDto);
   }
 
-  async findOrCreateUser(createUserDto: CreateSmartrotomUserDto): Promise<UserCreationResult> {
+  async findOrCreateUser(
+    createUserDto: CreateSmartrotomUserDto,
+  ): Promise<UserCreationResult> {
     // Check if user already exists
-    const existingUser = await this.usersRepository.findByUuid(createUserDto.uuid);
+    const existingUser = await this.usersRepository.findByUuid(
+      createUserDto.uuid,
+    );
     if (existingUser) {
       return { user: existingUser, isNew: false };
     }
 
     // Check for duplicate username
-    const existingUsername = await this.usersRepository.findByUsername(createUserDto.username);
+    const existingUsername = await this.usersRepository.findByUsername(
+      createUserDto.username,
+    );
     if (existingUsername) {
-      throw new ConflictException(`Username '${createUserDto.username}' is already taken`);
+      throw new ConflictException(
+        `Username '${createUserDto.username}' is already taken`,
+      );
     }
 
     const newUser = await this.usersRepository.create(createUserDto);
     return { user: newUser, isNew: true };
   }
 
-  async updateUser(id: number, updateUserDto: UpdateSmartrotomUserDto): Promise<SmartRotomUser> {
+  async updateUser(
+    id: number,
+    updateUserDto: UpdateSmartrotomUserDto,
+  ): Promise<SmartRotomUser> {
     const existingUser = await this.getUserById(id);
 
     // Check for duplicate username if updating username
-    if (updateUserDto.username && updateUserDto.username !== existingUser.username) {
-      const duplicateUser = await this.usersRepository.findByUsername(updateUserDto.username);
+    if (
+      updateUserDto.username &&
+      updateUserDto.username !== existingUser.username
+    ) {
+      const duplicateUser = await this.usersRepository.findByUsername(
+        updateUserDto.username,
+      );
       if (duplicateUser && duplicateUser.id !== id) {
-        throw new ConflictException(`Username '${updateUserDto.username}' is already taken`);
+        throw new ConflictException(
+          `Username '${updateUserDto.username}' is already taken`,
+        );
       }
     }
 
@@ -90,21 +124,23 @@ export class UsersService {
     }
 
     const deleted = await this.usersRepository.delete(id);
-    return { 
+    return {
       success: deleted,
-      message: deleted ? 'User deleted successfully' : 'Failed to delete user'
+      message: deleted ? 'User deleted successfully' : 'Failed to delete user',
     };
   }
 
   // ==================== BATCH OPERATIONS ====================
 
-  async getMultipleUsers(uuids: string[]): Promise<{ [uuid: string]: SmartRotomUser | null }> {
+  async getMultipleUsers(
+    uuids: string[],
+  ): Promise<{ [uuid: string]: SmartRotomUser | null }> {
     if (!Array.isArray(uuids) || uuids.length === 0) {
       return {};
     }
 
     // Validate UUIDs
-    uuids.forEach(uuid => this.validateUuid(uuid));
+    uuids.forEach((uuid) => this.validateUuid(uuid));
 
     return this.usersRepository.findByUuids(uuids);
   }
@@ -129,7 +165,8 @@ export class UsersService {
     }
 
     // Basic UUID validation
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
     if (!uuidRegex.test(uuid)) {
       throw new BadRequestException('Invalid UUID format');
     }

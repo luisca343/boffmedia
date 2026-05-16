@@ -1,45 +1,45 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class BaseIdResponse {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Generated ID',
-    example: 123
+    example: 123,
   })
   id: number;
 }
 
 export class BaseInsertResponse {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Insert ID of the created record',
-    example: 123
+    example: 123,
   })
   insertId: number;
 }
 
 export class BaseSuccessResponse {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Operation success status',
-    example: true
+    example: true,
   })
   success: boolean;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Success or error message',
-    example: 'Operation completed successfully'
+    example: 'Operation completed successfully',
   })
   message: string;
 }
 
 export class BaseStatusResponse {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Status value',
-    example: 1
+    example: 1,
   })
   status: number | null;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Error message if any',
-    required: false
+    required: false,
   })
   error?: string;
 }

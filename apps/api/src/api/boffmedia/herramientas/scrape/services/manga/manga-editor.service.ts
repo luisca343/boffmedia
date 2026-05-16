@@ -5,7 +5,11 @@ import * as path from 'path';
 import AdmZip from 'adm-zip';
 import { ChapterPageInfo } from './manga.types';
 import { MANGA_ROOT } from './manga-constants';
-import { buildEpub, injectEpubMetadata, type EpubMetadata } from './manga-epub.builder';
+import {
+  buildEpub,
+  injectEpubMetadata,
+  type EpubMetadata,
+} from './manga-epub.builder';
 
 const IMAGE_RE = /\.(webp|jpg|jpeg|png|gif)$/i;
 const COMIC_INFO_RE = /^ComicInfo\.xml$/i;
@@ -32,7 +36,7 @@ function assertSafe(resolved: string): void {
 
 /** Extract the chapter title from ComicInfo.xml inside a zip, or return undefined. */
 function readComicInfoTitle(zip: AdmZip): string | undefined {
-  const entry = zip.getEntries().find(e => COMIC_INFO_RE.test(e.name));
+  const entry = zip.getEntries().find((e) => COMIC_INFO_RE.test(e.name));
   if (!entry) return undefined;
   try {
     const xml = zip.readAsText(entry);
@@ -47,14 +51,19 @@ function readComicInfoTitle(zip: AdmZip): string | undefined {
 function sortedImageEntries(zip: AdmZip) {
   return zip
     .getEntries()
-    .filter(e => !e.isDirectory && IMAGE_RE.test(e.name))
-    .sort((a, b) => a.entryName.localeCompare(b.entryName, undefined, { numeric: true }));
+    .filter((e) => !e.isDirectory && IMAGE_RE.test(e.name))
+    .sort((a, b) =>
+      a.entryName.localeCompare(b.entryName, undefined, { numeric: true }),
+    );
 }
 
 @Injectable()
 export class MangaEditorService {
   /** List all pages in a chapter (CBZ preferred; falls back to EPUB). */
-  async getChapterPageList(series: string, chapter: string): Promise<ChapterPageInfo[]> {
+  async getChapterPageList(
+    series: string,
+    chapter: string,
+  ): Promise<ChapterPageInfo[]> {
     const archivePath = this.resolveArchive(series, chapter);
     const zip = this.openArchive(archivePath);
     return sortedImageEntries(zip).map((entry, index) => ({
@@ -123,7 +132,10 @@ export class MangaEditorService {
         const data = zip.readFile(entry);
         if (!data) continue;
         const ext = path.extname(entry.name) || '.jpg';
-        const dest = path.join(tempDir, `${String(i + 1).padStart(3, '0')}${ext}`);
+        const dest = path.join(
+          tempDir,
+          `${String(i + 1).padStart(3, '0')}${ext}`,
+        );
         await writeFile(dest, data);
         imageFiles.push(dest);
       }
@@ -147,10 +159,18 @@ export class MangaEditorService {
     return { outputPath: epubPath };
   }
 
-  async patchEpubMetadata(series: string, chapter: string, metadata: EpubMetadata): Promise<{ updated: boolean }> {
+  async patchEpubMetadata(
+    series: string,
+    chapter: string,
+    metadata: EpubMetadata,
+  ): Promise<{ updated: boolean }> {
     const epubPath = path.resolve(MANGA_ROOT, series, `${chapter}.epub`);
     assertSafe(epubPath);
-    try { new AdmZip(epubPath); } catch { return { updated: false }; }
+    try {
+      new AdmZip(epubPath);
+    } catch {
+      return { updated: false };
+    }
     await injectEpubMetadata(epubPath, metadata);
     return { updated: true };
   }
@@ -172,7 +192,9 @@ export class MangaEditorService {
         new AdmZip(epub);
         return epub;
       } catch {
-        throw new NotFoundException(`Chapter "${chapter}" not found in series "${series}"`);
+        throw new NotFoundException(
+          `Chapter "${chapter}" not found in series "${series}"`,
+        );
       }
     }
   }
@@ -184,7 +206,9 @@ export class MangaEditorService {
       new AdmZip(cbz);
       return cbz;
     } catch {
-      throw new NotFoundException(`CBZ for chapter "${chapter}" not found — cannot convert`);
+      throw new NotFoundException(
+        `CBZ for chapter "${chapter}" not found — cannot convert`,
+      );
     }
   }
 

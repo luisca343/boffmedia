@@ -1,4 +1,9 @@
-import { Injectable, Inject, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { IAchievementsRepository } from '../repositories/interfaces/achievements.repository.interface';
 import { ACHIEVEMENTS_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 import { BaseInsertResponse } from '@api/_utils/dto/base-responses.dto';
@@ -18,11 +23,18 @@ export class AchievementsService {
     return this.achievementsRepository.findUserAchievements(uuid);
   }
 
-  async getUserAchievementById(uuid: string, achievementId: string): Promise<UserAchievement> {
+  async getUserAchievementById(
+    uuid: string,
+    achievementId: string,
+  ): Promise<UserAchievement> {
     this.validateUuid(uuid);
     this.validateAchievementId(achievementId);
 
-    const achievement = await this.achievementsRepository.findUserAchievementById(uuid, achievementId);
+    const achievement =
+      await this.achievementsRepository.findUserAchievementById(
+        uuid,
+        achievementId,
+      );
     if (!achievement) {
       throw new NotFoundException('Achievement not found');
     }
@@ -30,11 +42,17 @@ export class AchievementsService {
     return achievement;
   }
 
-  async checkUserHasAchievement(uuid: string, achievementId: string): Promise<{ completed: number | null; error?: string }> {
+  async checkUserHasAchievement(
+    uuid: string,
+    achievementId: string,
+  ): Promise<{ completed: number | null; error?: string }> {
     this.validateUuid(uuid);
     this.validateAchievementId(achievementId);
 
-    const status = await this.achievementsRepository.findUserAchievementStatus(uuid, achievementId);
+    const status = await this.achievementsRepository.findUserAchievementStatus(
+      uuid,
+      achievementId,
+    );
     if (!status) {
       return { error: 'Achievement not found', completed: null };
     }
@@ -50,7 +68,9 @@ export class AchievementsService {
     }
   }
 
-  async createUserAchievement(achievementData: UserAchievementEntity): Promise<BaseInsertResponse> {
+  async createUserAchievement(
+    achievementData: UserAchievementEntity,
+  ): Promise<BaseInsertResponse> {
     this.validateUuid(achievementData.uuid);
     this.validateAchievementId(achievementData.achievementId);
 

@@ -1,168 +1,168 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class HeldItem {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Item ID',
-    example: 'pixelmon:charcoal'
+    example: 'pixelmon:charcoal',
   })
   itemID: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Chance percentage for held item',
-    example: 5
+    example: 5,
   })
   percentChance: number;
 }
 
 export class SpawnCondition {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Time conditions',
     type: [String],
     example: ['NIGHT'],
-    required: false
+    required: false,
   })
   times?: string[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Weather conditions',
     type: [String],
     example: ['CLEAR'],
-    required: false
+    required: false,
   })
   weathers?: string[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Biome conditions',
     type: [String],
-    example: ['redwoods', 'biomesoplenty:seasonal_forest']
+    example: ['redwoods', 'biomesoplenty:seasonal_forest'],
   })
   stringBiomes: string[];
 }
 
 export class SpawnInfo {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Species specification',
-    example: 'species:Vulpix'
+    example: 'species:Vulpix',
   })
   spec: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Location types where Pokemon spawns',
     type: [String],
-    example: ['Land']
+    example: ['Land'],
   })
   stringLocationTypes: string[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Minimum spawn level',
-    example: 10
+    example: 10,
   })
   minLevel: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Maximum spawn level',
-    example: 19
+    example: 19,
   })
   maxLevel: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Type ID',
-    example: 'pokemon'
+    example: 'pokemon',
   })
   typeID: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Held items with drop chances',
     type: [HeldItem],
-    required: false
+    required: false,
   })
   heldItems?: HeldItem[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Spawn conditions',
-    type: SpawnCondition
+    type: SpawnCondition,
   })
   condition: SpawnCondition;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Spawn rarity',
-    example: 90
+    example: 90,
   })
   rarity: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Spawn type',
-    example: 'standard'
+    example: 'standard',
   })
   spawnType: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Pokémon name',
-    example: 'vulpix'
+    example: 'vulpix',
   })
   pokemonName: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Pokémon form',
-    example: 'base'
+    example: 'base',
   })
   pokemonForm: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Pokémon palette',
     example: 'strike',
-    required: false
+    required: false,
   })
   pokemonPalette?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Pokédex number',
-    example: 37
+    example: 37,
   })
   pokemonDex: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Gender',
     example: 'all',
-    required: false
+    required: false,
   })
   gender?: string;
 }
 
 export class BiomeSpawnData {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Pokédex number',
-    example: 25
+    example: 25,
   })
   dex: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Species name',
-    example: 'Pikachu'
+    example: 'Pikachu',
   })
   species: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Form name',
-    example: 'base'
+    example: 'base',
   })
   form: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Palette name',
-    example: 'none'
+    example: 'none',
   })
   palette: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Spawn rarity',
-    example: 10
+    example: 10,
   })
   rarity: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Spawn percentage',
-    example: 5.2
+    example: 5.2,
   })
   percentage: number;
 }

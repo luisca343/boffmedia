@@ -12,8 +12,8 @@ export class PokemonBiomes {
       'biomesoplenty:burnt_forest',
       'teras:pueblo_sakura',
       'pixelmon:ultra_forest',
-      'pixelmon:ultra_plant'
-    ]
+      'pixelmon:ultra_plant',
+    ],
   })
   biomes: string[];
 }

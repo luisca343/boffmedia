@@ -20,8 +20,8 @@ export class WingullEconomyRepository implements IWingullEconomyRepository {
           timeout: this.DEFAULT_TIMEOUT,
           headers: {
             'Content-Type': 'application/json',
-          }
-        }
+          },
+        },
       );
       return response.data.data;
     } catch (error: any) {
@@ -45,8 +45,8 @@ export class WingullEconomyRepository implements IWingullEconomyRepository {
           timeout: this.DEFAULT_TIMEOUT,
           headers: {
             'Content-Type': 'application/json',
-          }
-        }
+          },
+        },
       );
       return response.data.data;
     } catch (error: any) {
@@ -70,8 +70,8 @@ export class WingullEconomyRepository implements IWingullEconomyRepository {
           timeout: this.DEFAULT_TIMEOUT,
           headers: {
             'Content-Type': 'application/json',
-          }
-        }
+          },
+        },
       );
       return response.data.data;
     } catch (error: any) {

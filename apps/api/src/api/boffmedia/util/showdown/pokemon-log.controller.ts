@@ -10,21 +10,25 @@ export class PokemonLogController {
   constructor(private readonly pokemonLogService: PokemonLogService) {}
 
   @Get('process/:spreadsheetId')
-  async processLogs(@Param('spreadsheetId') spreadsheetId: string): Promise<{ message: string; processed: number; errors: number }> {
+  async processLogs(
+    @Param('spreadsheetId') spreadsheetId: string,
+  ): Promise<{ message: string; processed: number; errors: number }> {
     try {
-      this.logger.log(`Starting Pokemon log processing for spreadsheet: ${spreadsheetId}`);
-      
-      const result = await this.pokemonLogService.processShowdownLogs(spreadsheetId);
-      
+      this.logger.log(
+        `Starting Pokemon log processing for spreadsheet: ${spreadsheetId}`,
+      );
+
+      const result =
+        await this.pokemonLogService.processShowdownLogs(spreadsheetId);
+
       const message = `Processing complete. ${result.processed} logs processed successfully, ${result.errors} errors.`;
       this.logger.log(message);
 
       return {
         message,
         processed: result.processed,
-        errors: result.errors
+        errors: result.errors,
       };
-
     } catch (error: any) {
       this.logger.error('Error in processLogs:', error);
       throw error;

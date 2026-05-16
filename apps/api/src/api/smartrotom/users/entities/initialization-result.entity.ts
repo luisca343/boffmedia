@@ -2,28 +2,28 @@ import { ApiProperty } from '@nestjs/swagger';
 import { SmartRotomUser } from './user.entity';
 
 export class InitializationResult {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'The user data',
-    type: SmartRotomUser
+    type: SmartRotomUser,
   })
   user: SmartRotomUser;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'User accounts data',
     type: 'array',
-    items: { type: 'object' }
+    items: { type: 'object' },
   })
   accounts: any[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Whether this is a newly created user',
-    example: true
+    example: true,
   })
   isNewUser: boolean;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Whether new accounts were created',
-    example: false
+    example: false,
   })
   isNewAccount: boolean;
 }

@@ -3,30 +3,30 @@ import { ApiProperty } from '@nestjs/swagger';
 import { StarBankAccount } from '../entities/starbank-account.entity';
 
 export class AccountResponseDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Operation result',
-    example: true
+    example: true,
   })
   success: boolean;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Account data',
     type: StarBankAccount,
-    required: false
+    required: false,
   })
   account?: StarBankAccount;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Account ID for newly created accounts',
     example: 123,
-    required: false
+    required: false,
   })
   accountId?: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Response message',
     example: 'Account created successfully',
-    required: false
+    required: false,
   })
   message?: string;
 }

@@ -30,24 +30,22 @@ import { PokemonController } from './pokemon.controller';
 
 @Module({
   imports: [
-    LoggerModule, 
-    ResponseModule, 
-    DrizzleModule, 
-    WingullModule  // Keep this - PokemonIntegrationService needs WingullFacadeService
+    LoggerModule,
+    ResponseModule,
+    DrizzleModule,
+    WingullModule, // Keep this - PokemonIntegrationService needs WingullFacadeService
   ],
-  controllers: [
-    PokemonController
-  ],
+  controllers: [PokemonController],
   providers: [
     // Repository with token binding (add this for clean architecture)
     {
       provide: POKEMON_REPOSITORY_TOKEN,
       useClass: PokemonRepository,
     },
-    
+
     // Keep the original repository for existing code compatibility
     PokemonRepository,
-    
+
     // Existing file-based services
     BaseDataService,
     PokemonDataService,
@@ -56,22 +54,22 @@ import { PokemonController } from './pokemon.controller';
     PokemonImageService,
     SpriteManifestService,
     PokemonShowdownService,
-    
+
     // Domain services
     PokemonDataManagementService,
     PokedexManagementService,
-    PokemonIntegrationService,  // This needs WingullFacadeService
-    
+    PokemonIntegrationService, // This needs WingullFacadeService
+
     // Facade service
     PokemonFacadeService,
   ],
   exports: [
     // Export facade for other modules
     PokemonFacadeService,
-    
+
     // Export core services for potential reuse
     PokemonDataManagementService,
-    
+
     // Export repository token for testing/clean architecture
     POKEMON_REPOSITORY_TOKEN,
   ],

@@ -1,7 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class TcgCardAttack {
-  @ApiProperty({ example: ['Grass', 'Colorless'], description: 'Energy cost for the attack' })
+  @ApiProperty({
+    example: ['Grass', 'Colorless'],
+    description: 'Energy cost for the attack',
+  })
   cost: string[];
 
   @ApiProperty({ example: 'Vine Whip', description: 'Attack name' })
@@ -58,7 +61,7 @@ export class TcgCard {
 
   @ApiProperty({ example: 'A1', description: 'Set ID' })
   setId: string;
-  
+
   @ApiProperty({ example: 'Genetic Apex', description: 'Set name (localized)' })
   setName: string;
 
@@ -68,13 +71,21 @@ export class TcgCard {
   @ApiProperty({ example: 'Pikachu', description: 'Card name' })
   name: string;
 
-  @ApiProperty({ example: '/img/games/tcg/cards/A1/tcgp-A1-001_en.webp', description: 'Card image URL', required: false })
+  @ApiProperty({
+    example: '/img/games/tcg/cards/A1/tcgp-A1-001_en.webp',
+    description: 'Card image URL',
+    required: false,
+  })
   image?: string;
 
   @ApiProperty({ example: 'Pokemon', description: 'Card category' })
   category: string;
 
-  @ApiProperty({ example: 'Atsuko Nishida', description: 'Card illustrator', required: false })
+  @ApiProperty({
+    example: 'Atsuko Nishida',
+    description: 'Card illustrator',
+    required: false,
+  })
   illustrator?: string;
 
   @ApiProperty({ example: 'Common', description: 'Card rarity' })
@@ -83,56 +94,67 @@ export class TcgCard {
   @ApiProperty({ example: 60, description: 'Pokemon HP', required: false })
   hp?: number;
 
-  @ApiProperty({ example: 'Basic', description: 'Pokemon stage', required: false })
+  @ApiProperty({
+    example: 'Basic',
+    description: 'Pokemon stage',
+    required: false,
+  })
   stage?: string;
 
-  @ApiProperty({ example: 'A lightning-fast Pokemon...', description: 'Card description', required: false })
+  @ApiProperty({
+    example: 'A lightning-fast Pokemon...',
+    description: 'Card description',
+    required: false,
+  })
   description?: string;
 
-  @ApiProperty({ example: '2023-12-01T00:00:00Z', description: 'Last updated timestamp' })
+  @ApiProperty({
+    example: '2023-12-01T00:00:00Z',
+    description: 'Last updated timestamp',
+  })
   updated: string;
 
   // New complex fields
-  @ApiProperty({ 
-    example: ['Grass'], 
+  @ApiProperty({
+    example: ['Grass'],
     description: 'Pokemon types',
     type: [String],
-    required: false 
+    required: false,
   })
   types?: string[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Pokemon weaknesses',
     type: [TcgCardWeakness],
-    required: false 
+    required: false,
   })
   weaknesses?: TcgCardWeakness[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Pokemon attacks',
     type: [TcgCardAttack],
-    required: false 
+    required: false,
   })
   attacks?: TcgCardAttack[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Boosters containing this card',
     type: [TcgCardBooster],
-    required: false 
+    required: false,
   })
   boosters?: TcgCardBooster[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Card variants',
     type: TcgCardVariants,
-    required: false 
+    required: false,
   })
   variants?: TcgCardVariants;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Format legality',
     type: TcgCardLegal,
-    required: false 
+    required: false,
   })
   legal?: TcgCardLegal;
 

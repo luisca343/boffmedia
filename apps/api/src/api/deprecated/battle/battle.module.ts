@@ -13,17 +13,12 @@ import { BattleController } from './battle.controller';
   controllers: [BattleController],
   providers: [
     BattleRepository,
-    
+
     ReplayService,
     ConfigService,
-    
+
     BattleFacadeService,
   ],
-  exports: [
-    BattleFacadeService,
-    
-    ReplayService,
-    ConfigService,
-  ],
+  exports: [BattleFacadeService, ReplayService, ConfigService],
 })
 export class BattleModule {}

@@ -19,7 +19,9 @@ export interface ParsedLog {
 export class PokemonLogService {
   private readonly logger = new Logger(PokemonLogService.name);
 
-  async processShowdownLogs(spreadsheetId: string): Promise<{ processed: number; errors: number }> {
+  async processShowdownLogs(
+    spreadsheetId: string,
+  ): Promise<{ processed: number; errors: number }> {
     let processed = 0;
     let errors = 0;
 
@@ -51,7 +53,7 @@ export class PokemonLogService {
       for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
         const actualRowNumber = i + 2; // Starting from row 2
-        
+
         // Check if there's a link in this row
         if (!row[0] || typeof row[0] !== 'string') {
           continue; // Skip empty cells
@@ -64,25 +66,32 @@ export class PokemonLogService {
         }
 
         try {
-          this.logger.log(`Processing link ${i + 1}/${rows.length}: ${cellValue} (row ${actualRowNumber})`);
-          
+          this.logger.log(
+            `Processing link ${i + 1}/${rows.length}: ${cellValue} (row ${actualRowNumber})`,
+          );
+
           // Fetch log data
           const logData = await this.fetchLogData(cellValue);
-          
+
           // Parse log data
           const parsedLog = this.parseShowdownLog(logData);
-          
+
           if (parsedLog) {
             parsedLog.row = actualRowNumber;
             parsedLogs.push(parsedLog);
             processed++;
-            this.logger.log(`Successfully parsed log for row ${actualRowNumber}`);
+            this.logger.log(
+              `Successfully parsed log for row ${actualRowNumber}`,
+            );
           } else {
             this.logger.warn(`Could not parse log for row ${actualRowNumber}`);
             errors++;
           }
         } catch (error: any) {
-          this.logger.error(`Error processing link in row ${actualRowNumber}:`, error);
+          this.logger.error(
+            `Error processing link in row ${actualRowNumber}:`,
+            error,
+          );
           errors++;
         }
 
@@ -106,14 +115,15 @@ export class PokemonLogService {
     try {
       // Add .log if not present
       const logUrl = url.endsWith('.log') ? url : `${url}.log`;
-      
+
       const response = await axios.get(logUrl, {
         timeout: 10000,
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-        }
+          'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        },
       });
-      
+
       return response.data;
     } catch (error: any) {
       this.logger.error(`Error fetching log data from ${url}:`, error.message);
@@ -130,14 +140,14 @@ export class PokemonLogService {
     const luiscaTeam: string[] = [];
     let rivalLead: string[] = [];
     let luiscaLead: string[] = [];
-    
+
     // Find players
     for (const line of lines) {
       if (line.startsWith('|player|')) {
         const parts = line.split('|');
         const playerKey = parts[2]; // p1 or p2
         const playerName = parts[3];
-        
+
         if (playerName === 'Luisca343') {
           luiscaPlayer = playerKey;
         } else {
@@ -152,7 +162,9 @@ export class PokemonLogService {
       return null;
     }
 
-    this.logger.log(`Found players - Rival: ${rivalPlayerName} (${rivalPlayer}), Luisca: ${luiscaPlayer}`);
+    this.logger.log(
+      `Found players - Rival: ${rivalPlayerName} (${rivalPlayer}), Luisca: ${luiscaPlayer}`,
+    );
 
     // Extract teams from |poke| lines
     for (const line of lines) {
@@ -161,7 +173,7 @@ export class PokemonLogService {
         const playerKey = parts[2];
         const pokemonInfo = parts[3];
         const pokemonName = pokemonInfo.split(',')[0].trim();
-        
+
         if (playerKey === rivalPlayer) {
           rivalTeam.push(pokemonName);
         } else if (playerKey === luiscaPlayer) {
@@ -173,16 +185,16 @@ export class PokemonLogService {
     // Extract leads from first |switch| commands after |start|
     let gameStarted = false;
     const firstSwitches: string[] = [];
-    
+
     for (const line of lines) {
       if (line.startsWith('|start')) {
         gameStarted = true;
         continue;
       }
-      
+
       if (gameStarted && line.startsWith('|switch|')) {
         firstSwitches.push(line);
-        
+
         // We need 4 switches total (2 for each player in doubles)
         if (firstSwitches.length === 4) {
           break;
@@ -191,44 +203,55 @@ export class PokemonLogService {
     }
 
     // Parse the leads from first switches
-    const rivalSwitches = firstSwitches.filter(line => 
-      line.includes(`${rivalPlayer}a:`) || line.includes(`${rivalPlayer}b:`)
+    const rivalSwitches = firstSwitches.filter(
+      (line) =>
+        line.includes(`${rivalPlayer}a:`) || line.includes(`${rivalPlayer}b:`),
     );
-    const luiscaSwitches = firstSwitches.filter(line => 
-      line.includes(`${luiscaPlayer}a:`) || line.includes(`${luiscaPlayer}b:`)
+    const luiscaSwitches = firstSwitches.filter(
+      (line) =>
+        line.includes(`${luiscaPlayer}a:`) ||
+        line.includes(`${luiscaPlayer}b:`),
     );
 
-    rivalLead = rivalSwitches.map(line => {
+    rivalLead = rivalSwitches.map((line) => {
       const parts = line.split('|');
       const pokemonInfo = parts[3];
       return pokemonInfo.split(',')[0].trim();
     });
 
-    luiscaLead = luiscaSwitches.map(line => {
+    luiscaLead = luiscaSwitches.map((line) => {
       const parts = line.split('|');
       const pokemonInfo = parts[3];
       return pokemonInfo.split(',')[0].trim();
     });
 
-    this.logger.log(`Rival team: [${rivalTeam.join(', ')}], Lead: [${rivalLead.join(', ')}]`);
-    this.logger.log(`Luisca team: [${luiscaTeam.join(', ')}], Lead: [${luiscaLead.join(', ')}]`);
+    this.logger.log(
+      `Rival team: [${rivalTeam.join(', ')}], Lead: [${rivalLead.join(', ')}]`,
+    );
+    this.logger.log(
+      `Luisca team: [${luiscaTeam.join(', ')}], Lead: [${luiscaLead.join(', ')}]`,
+    );
 
     return {
       rivalPlayer,
       rivalPlayerName,
       rivalTeam: {
         pokemon: rivalTeam,
-        lead: rivalLead
+        lead: rivalLead,
       },
       luiscaTeam: {
         pokemon: luiscaTeam,
-        lead: luiscaLead
+        lead: luiscaLead,
       },
-      row: 0 // Will be set by caller
+      row: 0, // Will be set by caller
     };
   }
 
-  private async updateGoogleSheet(spreadsheetId: string, parsedLogs: ParsedLog[], sheets: sheets_v4.Sheets): Promise<void> {
+  private async updateGoogleSheet(
+    spreadsheetId: string,
+    parsedLogs: ParsedLog[],
+    sheets: sheets_v4.Sheets,
+  ): Promise<void> {
     try {
       // Prepare batch update requests
       const updateData: any[] = [];
@@ -240,13 +263,13 @@ export class PokemonLogService {
         if (log.luiscaTeam.lead[0]) {
           updateData.push({
             range: `VGC!Q${row}`,
-            values: [[log.luiscaTeam.lead[0]]]
+            values: [[log.luiscaTeam.lead[0]]],
           });
         }
         if (log.luiscaTeam.lead[1]) {
           updateData.push({
             range: `VGC!R${row}`,
-            values: [[log.luiscaTeam.lead[1]]]
+            values: [[log.luiscaTeam.lead[1]]],
           });
         }
 
@@ -256,7 +279,7 @@ export class PokemonLogService {
           const pokemon = log.rivalTeam.pokemon[i];
           updateData.push({
             range: `VGC!${columns[i]}${row}`,
-            values: [[pokemon]]
+            values: [[pokemon]],
           });
         }
       }
@@ -267,8 +290,8 @@ export class PokemonLogService {
           spreadsheetId,
           requestBody: {
             valueInputOption: 'RAW',
-            data: updateData
-          }
+            data: updateData,
+          },
         });
 
         // Apply formatting (bold + underline for leads, underline for team)
@@ -276,12 +299,12 @@ export class PokemonLogService {
 
         for (const log of parsedLogs) {
           const row = log.row;
-          
+
           for (let i = 0; i < 6 && i < log.rivalTeam.pokemon.length; i++) {
             const pokemon = log.rivalTeam.pokemon[i];
             const isLead = log.rivalTeam.lead.includes(pokemon);
             const columnIndex = 20 + i; // U=20, V=21, etc.
-            
+
             formatRequests.push({
               repeatCell: {
                 range: {
@@ -289,18 +312,18 @@ export class PokemonLogService {
                   startRowIndex: row - 1,
                   endRowIndex: row,
                   startColumnIndex: columnIndex,
-                  endColumnIndex: columnIndex + 1
+                  endColumnIndex: columnIndex + 1,
                 },
                 cell: {
                   userEnteredFormat: {
                     textFormat: {
                       bold: isLead,
-                      underline: true
-                    }
-                  }
+                      underline: true,
+                    },
+                  },
                 },
-                fields: 'userEnteredFormat.textFormat'
-              }
+                fields: 'userEnteredFormat.textFormat',
+              },
             });
           }
         }
@@ -309,8 +332,8 @@ export class PokemonLogService {
           await sheets.spreadsheets.batchUpdate({
             spreadsheetId,
             requestBody: {
-              requests: formatRequests
-            }
+              requests: formatRequests,
+            },
           });
         }
       }
@@ -323,6 +346,6 @@ export class PokemonLogService {
   }
 
   private async delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }

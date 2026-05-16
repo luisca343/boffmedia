@@ -1,550 +1,550 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class PokemonDimensions {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Height in meters',
-    example: 0.5
+    example: 0.5,
   })
   height: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Width in meters',
-    example: 0.4
+    example: 0.4,
   })
   width: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Length in meters',
-    example: 1.0
+    example: 1.0,
   })
   length: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Eye height in meters',
     example: 0.5,
-    required: false
+    required: false,
   })
   eyeHeight?: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Hover height in meters',
     example: 0.5,
-    required: false
+    required: false,
   })
   hoverHeight?: number;
 }
 
 export class PokemonAbilities {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Regular abilities',
     example: ['FlashFire'],
-    type: [String]
+    type: [String],
   })
   abilities: string[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Hidden abilities',
     example: ['Drought'],
     type: [String],
-    required: false
+    required: false,
   })
   hiddenAbilities?: string[];
 }
 
 export class PokemonBattleStats {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'HP stat',
-    example: 38
+    example: 38,
   })
   hp: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Attack stat',
-    example: 41
+    example: 41,
   })
   attack: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Defense stat',
-    example: 40
+    example: 40,
   })
   defense: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Special Attack stat',
-    example: 50
+    example: 50,
   })
   specialAttack: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Special Defense stat',
-    example: 65
+    example: 65,
   })
   specialDefense: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Speed stat',
-    example: 65
+    example: 65,
   })
   speed: number;
 }
 
 export class PokemonEvolution {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Evolution target',
-    example: 'Ninetales form:base'
+    example: 'Ninetales form:base',
   })
   to: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Evolution type',
-    example: 'interact'
+    example: 'interact',
   })
   evoType: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Evolution conditions',
-    required: false
+    required: false,
   })
   conditions?: any[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Required item for evolution',
-    required: false
+    required: false,
   })
   item?: { itemID: string };
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Moves learned upon evolution',
     type: [String],
-    required: false
+    required: false,
   })
   moves?: string[];
 }
 
 export class PokemonModelLocator {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Factory type',
-    example: 'NORMAL'
+    example: 'NORMAL',
   })
   factoryType: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'PQC files',
     type: [String],
-    example: ['pixelmon:pokemon/037_vulpix/all/base/none/model.pqc']
+    example: ['pixelmon:pokemon/037_vulpix/all/base/none/model.pqc'],
   })
   pqc: string[];
 }
 
 export class PokemonPalette {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Palette name',
-    example: 'none'
+    example: 'none',
   })
   name: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Texture path',
-    example: 'pixelmon:pokemon/037_vulpix/all/base/none/texture.png'
+    example: 'pixelmon:pokemon/037_vulpix/all/base/none/texture.png',
   })
   texture: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Sprite path',
     example: 'pixelmon:pokemon/037_vulpix/all/base/none/sprite.png',
-    required: false
+    required: false,
   })
   sprite?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Particle effect',
     example: 'arcanery:shiny',
-    required: false
+    required: false,
   })
   particle?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Emissive texture path',
-    required: false
+    required: false,
   })
   emissive?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Model locator',
     type: PokemonModelLocator,
-    required: false
+    required: false,
   })
   modelLocator?: PokemonModelLocator;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Sound effects',
     type: [String],
-    required: false
+    required: false,
   })
   sounds?: string[];
 }
 
 export class PokemonGenderProperties {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Gender',
     example: 'ALL',
-    required: false  // Add this line
+    required: false, // Add this line
   })
-  gender?: string;  // Make this optional
+  gender?: string; // Make this optional
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Available palettes',
-    type: [PokemonPalette]
+    type: [PokemonPalette],
   })
   palettes: PokemonPalette[];
 }
 
 export class PokemonMovement {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Can be ridden',
-    example: false
+    example: false,
   })
   rideable: boolean;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Can fly',
-    example: false
+    example: false,
   })
   canFly: boolean;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Can surf',
-    example: false
+    example: false,
   })
   canSurf: boolean;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Can ride on shoulder',
-    example: false
+    example: false,
   })
   canRideShoulder: boolean;
 }
 
 export class PokemonAggression {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Timid percentage',
-    example: 80
+    example: 80,
   })
   timid: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Passive percentage',
-    example: 0
+    example: 0,
   })
   passive: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Aggressive percentage',
-    example: 20
+    example: 20,
   })
   aggressive: number;
 }
 
 export class PokemonSpawn {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Base experience points',
-    example: 63
+    example: 63,
   })
   baseExp: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Base friendship level',
-    example: 70
+    example: 70,
   })
   baseFriendship: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Spawn level',
-    example: 10
+    example: 10,
   })
   spawnLevel: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Spawn level range',
-    example: 9
+    example: 9,
   })
   spawnLevelRange: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Spawn locations',
     type: [String],
-    example: ['LAND']
+    example: ['LAND'],
   })
   spawnLocations: string[];
 }
 
 export class PokemonGigantamax {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Can have Gigantamax factor',
-    example: false
+    example: false,
   })
   canHaveFactor: boolean;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Can Gigantamax',
-    example: false
+    example: false,
   })
   canGigantamax: boolean;
 }
 
 export class PokemonEvYields {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'HP EV yield',
-    required: false
+    required: false,
   })
   hp?: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Attack EV yield',
-    required: false
+    required: false,
   })
   attack?: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Defense EV yield',
-    required: false
+    required: false,
   })
   defense?: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Special Attack EV yield',
-    required: false
+    required: false,
   })
   specialAttack?: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Special Defense EV yield',
-    required: false
+    required: false,
   })
   specialDefense?: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Speed EV yield',
     example: 1,
-    required: false
+    required: false,
   })
   speed?: number;
 }
 
 export class PokemonForm {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Form name',
     example: 'base',
-    required: false
+    required: false,
   })
   name?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Experience group',
     example: 'MEDIUM_FAST',
-    required: false
+    required: false,
   })
   experienceGroup?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Pokémon types',
     example: ['FIRE'],
-    type: [String]
+    type: [String],
   })
   types: string[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Pokémon dimensions',
     type: PokemonDimensions,
-    required: false
+    required: false,
   })
   dimensions?: PokemonDimensions;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Weight in kilograms',
     example: 9.9,
-    required: false
+    required: false,
   })
   weight?: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Pokémon abilities',
     type: PokemonAbilities,
-    required: false
+    required: false,
   })
   abilities?: PokemonAbilities;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Pokémon moves by category',
-    required: false
+    required: false,
   })
   moves?: { [key: string]: any };
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Movement capabilities',
     type: PokemonMovement,
-    required: false
+    required: false,
   })
   movement?: PokemonMovement;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Aggression stats',
     type: PokemonAggression,
-    required: false
+    required: false,
   })
   aggression?: PokemonAggression;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Battle stats',
     type: PokemonBattleStats,
-    required: false
+    required: false,
   })
   battleStats?: PokemonBattleStats;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Tags',
     type: [String],
-    required: false
+    required: false,
   })
   tags?: string[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Spawn information',
     type: PokemonSpawn,
-    required: false
+    required: false,
   })
   spawn?: PokemonSpawn;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Possible genders',
     type: [String],
     example: ['MALE', 'FEMALE'],
-    required: false
+    required: false,
   })
   possibleGenders?: string[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Gender properties with palettes',
     type: [PokemonGenderProperties],
-    required: false
+    required: false,
   })
   genderProperties?: PokemonGenderProperties[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Egg groups',
     type: [String],
     example: ['FIELD'],
-    required: false
+    required: false,
   })
   eggGroups?: string[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Pre-evolution names',
     type: [String],
-    required: false
+    required: false,
   })
   preEvolutions?: string[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Default base form',
     example: '',
-    required: false
+    required: false,
   })
   defaultBaseForm?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Mega items',
     type: [String],
-    required: false
+    required: false,
   })
   megaItems?: string[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Mega forms',
-    required: false
+    required: false,
   })
   megas?: any[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Gigantamax information',
     type: PokemonGigantamax,
-    required: false
+    required: false,
   })
   gigantamax?: PokemonGigantamax;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Egg cycles',
     example: 21,
-    required: false
+    required: false,
   })
   eggCycles?: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Catch rate',
     example: 190,
-    required: false
+    required: false,
   })
   catchRate?: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Male percentage',
     example: 25,
-    required: false
+    required: false,
   })
   malePercentage?: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Possible evolutions',
     type: [PokemonEvolution],
-    required: false
+    required: false,
   })
   evolutions?: PokemonEvolution[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'EV yields',
     type: PokemonEvYields,
-    required: false
+    required: false,
   })
   evYields?: PokemonEvYields;
 }
 
 export class Pokemon {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Pokémon name',
-    example: 'Vulpix'
+    example: 'Vulpix',
   })
   name: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Pokédex number',
-    example: 37
+    example: 37,
   })
   dex: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Default form names',
     example: [''],
-    type: [String]
+    type: [String],
   })
   defaultForms: string[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Available forms',
-    type: [PokemonForm]
+    type: [PokemonForm],
   })
   forms: PokemonForm[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Generation number',
-    example: 1
+    example: 1,
   })
   generation: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Whether this is a custom Pokémon',
     example: false,
-    required: false
+    required: false,
   })
   isCustom?: boolean;
 }

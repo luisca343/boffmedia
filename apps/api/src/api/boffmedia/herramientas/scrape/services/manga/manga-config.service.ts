@@ -47,8 +47,14 @@ export class MangaConfigService {
     return this.config;
   }
 
-  async updateSeriesConfig(slug: string, patch: Partial<SeriesConfig>): Promise<SeriesConfig> {
-    this.config.series[slug] = { ...(this.config.series[slug] ?? {}), ...patch };
+  async updateSeriesConfig(
+    slug: string,
+    patch: Partial<SeriesConfig>,
+  ): Promise<SeriesConfig> {
+    this.config.series[slug] = {
+      ...(this.config.series[slug] ?? {}),
+      ...patch,
+    };
     await this.save();
     return this.config.series[slug];
   }
@@ -66,7 +72,9 @@ export class MangaConfigService {
   }
 
   async markLastChecked(slug: string): Promise<void> {
-    await this.updateSeriesConfig(slug, { lastChecked: new Date().toISOString() });
+    await this.updateSeriesConfig(slug, {
+      lastChecked: new Date().toISOString(),
+    });
   }
 
   private async load(): Promise<MangaConfig> {
@@ -85,9 +93,15 @@ export class MangaConfigService {
   private async save(): Promise<void> {
     try {
       await mkdir(MANGA_ROOT, { recursive: true });
-      await writeFile(CONFIG_PATH, JSON.stringify(this.config, null, 2), 'utf-8');
+      await writeFile(
+        CONFIG_PATH,
+        JSON.stringify(this.config, null, 2),
+        'utf-8',
+      );
     } catch (err) {
-      this.logger.error(`Failed to save manga config: ${(err as Error).message}`);
+      this.logger.error(
+        `Failed to save manga config: ${(err as Error).message}`,
+      );
     }
   }
 }

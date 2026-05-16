@@ -1,4 +1,9 @@
-import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleDestroy,
+  OnModuleInit,
+} from '@nestjs/common';
 import { CronJob } from 'cron';
 import { MangaConfigService } from './manga-config.service';
 import { MangaDownloadService } from './manga-download.service';
@@ -35,13 +40,19 @@ export class MangaCronService implements OnModuleInit, OnModuleDestroy {
     try {
       this.cronJob = new CronJob(config.cron.schedule, () => {
         this.runAutoUpdate().catch((err) =>
-          this.logger.error(`Cron auto-update error: ${(err as Error).message}`),
+          this.logger.error(
+            `Cron auto-update error: ${(err as Error).message}`,
+          ),
         );
       });
       this.cronJob.start();
-      this.logger.log(`Manga auto-update cron scheduled: ${config.cron.schedule}`);
+      this.logger.log(
+        `Manga auto-update cron scheduled: ${config.cron.schedule}`,
+      );
     } catch (err) {
-      this.logger.error(`Invalid cron expression "${config.cron.schedule}": ${(err as Error).message}`);
+      this.logger.error(
+        `Invalid cron expression "${config.cron.schedule}": ${(err as Error).message}`,
+      );
     }
   }
 
@@ -60,17 +71,26 @@ export class MangaCronService implements OnModuleInit, OnModuleDestroy {
       this.logger.log(`Checking ${slug} for new chapters…`);
       try {
         // Consume the SSE stream to trigger the download
-        for await (const _event of this.downloadService.streamDownloadNovel(sourceUrl, 1, undefined, true)) {
+        for await (const _event of this.downloadService.streamDownloadNovel(
+          sourceUrl,
+          1,
+          undefined,
+          true,
+        )) {
           // events are ignored; download happens as a side effect
         }
         await this.configService.markLastChecked(slug);
       } catch (err) {
-        this.logger.error(`Auto-update failed for ${slug}: ${(err as Error).message}`);
+        this.logger.error(
+          `Auto-update failed for ${slug}: ${(err as Error).message}`,
+        );
         failed.push(slug);
       }
     }
 
-    this.logger.log(`Manga auto-update complete. Checked: ${ongoing.length}, failed: ${failed.length}`);
+    this.logger.log(
+      `Manga auto-update complete. Checked: ${ongoing.length}, failed: ${failed.length}`,
+    );
     return { checked: ongoing.length, failed };
   }
 }

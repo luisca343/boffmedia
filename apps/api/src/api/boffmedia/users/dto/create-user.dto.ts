@@ -1,64 +1,71 @@
 import { BaseDto } from '@api/_utils/dto/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsEmail, IsOptional, IsUUID, Length, MinLength } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  IsOptional,
+  IsUUID,
+  Length,
+  MinLength,
+} from 'class-validator';
 
 export class CreateUserDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'User email address',
-    example: 'user@example.com'
+    example: 'user@example.com',
   })
   @IsEmail()
   @IsOptional()
   email?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Username for the user',
-    example: 'johndoe'
+    example: 'johndoe',
   })
   @IsString()
   @Length(3, 32)
   username: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'User password',
-    example: 'securePassword123'
+    example: 'securePassword123',
   })
   @IsString()
   @MinLength(6)
   password: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'User UUID',
     required: false,
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
   })
   @IsOptional()
   @IsString()
   @IsUUID()
   uuid?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Profile picture URL',
     required: false,
-    example: 'https://example.com/avatar.jpg'
+    example: 'https://example.com/avatar.jpg',
   })
   @IsOptional()
   @IsString()
   profilePicture?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Google ID for OAuth',
     required: false,
-    example: 'google_123456789'
+    example: 'google_123456789',
   })
   @IsOptional()
   @IsString()
   googleId?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Discord ID for OAuth',
     required: false,
-    example: 'discord_123456789'
+    example: 'discord_123456789',
   })
   @IsOptional()
   @IsString()

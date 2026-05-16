@@ -2,7 +2,11 @@ import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import { QuestData, IDialogue, IQuestCategory, NPC } from '../types';
-import { ExternalQuestResponse, IQuestRepository, UserQuestResponse } from './interfaces/quest.repository.interface';
+import {
+  ExternalQuestResponse,
+  IQuestRepository,
+  UserQuestResponse,
+} from './interfaces/quest.repository.interface';
 
 @Injectable()
 export class QuestRepository implements IQuestRepository {
@@ -10,7 +14,9 @@ export class QuestRepository implements IQuestRepository {
   private readonly baseUrl: string;
 
   constructor(private readonly configService: ConfigService) {
-    this.baseUrl = this.configService.get<string>('EXTERNAL_API_URL') || 'http://localhost:3001';
+    this.baseUrl =
+      this.configService.get<string>('EXTERNAL_API_URL') ||
+      'http://localhost:3001';
   }
 
   // ==================== EXTERNAL API OPERATIONS ====================
@@ -18,13 +24,13 @@ export class QuestRepository implements IQuestRepository {
   async fetchAllQuestsFromAPI(): Promise<ExternalQuestResponse> {
     try {
       this.logger.log('Fetching all quests from external API');
-      
+
       const response = await axios.get(`${this.baseUrl}/api/quests/all`, {
         timeout: 10000,
         headers: {
           'Content-Type': 'application/json',
-          'User-Agent': 'FicusLabs-QuestService/1.0'
-        }
+          'User-Agent': 'FicusLabs-QuestService/1.0',
+        },
       });
 
       if (!response.data) {
@@ -35,15 +41,21 @@ export class QuestRepository implements IQuestRepository {
         quests: response.data.quests || {},
         dialogs: response.data.dialogs || {},
         categories: response.data.categories || {},
-        npcs: response.data.npcs || []
+        npcs: response.data.npcs || [],
       };
 
-      this.logger.log(`Successfully fetched ${Object.keys(questResponse.quests).length} quests`);
+      this.logger.log(
+        `Successfully fetched ${Object.keys(questResponse.quests).length} quests`,
+      );
       return questResponse;
-
     } catch (error: any) {
-      this.logger.error('Failed to fetch quests from external API', error.stack);
-      throw new BadRequestException(`Failed to fetch quest data: ${error.message}`);
+      this.logger.error(
+        'Failed to fetch quests from external API',
+        error.stack,
+      );
+      throw new BadRequestException(
+        `Failed to fetch quest data: ${error.message}`,
+      );
     }
   }
 
@@ -54,29 +66,33 @@ export class QuestRepository implements IQuestRepository {
 
     try {
       this.logger.log(`Fetching user quests for UUID: ${uuid}`);
-      
-      const response = await axios.get(`${this.baseUrl}/api/quests/user/${uuid}`, {
-        timeout: 10000,
-        headers: {
-          'Content-Type': 'application/json',
-          'User-Agent': 'FicusLabs-QuestService/1.0'
-        }
-      });
+
+      const response = await axios.get(
+        `${this.baseUrl}/api/quests/user/${uuid}`,
+        {
+          timeout: 10000,
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': 'FicusLabs-QuestService/1.0',
+          },
+        },
+      );
 
       if (!response.data) {
         throw new Error('No user quest data received from external API');
       }
 
       const userQuestResponse: UserQuestResponse = {
-        quests: response.data.quests || {}
+        quests: response.data.quests || {},
       };
 
       this.logger.log(`Successfully fetched user quests for ${uuid}`);
       return userQuestResponse;
-
     } catch (error: any) {
       this.logger.error(`Failed to fetch user quests for ${uuid}`, error.stack);
-      throw new BadRequestException(`Failed to fetch user quest data: ${error.message}`);
+      throw new BadRequestException(
+        `Failed to fetch user quest data: ${error.message}`,
+      );
     }
   }
 
@@ -84,7 +100,7 @@ export class QuestRepository implements IQuestRepository {
 
   validateQuestData(questData: any): boolean {
     if (!questData || typeof questData !== 'object') return false;
-    
+
     return !!(
       questData.id &&
       questData.name &&
@@ -96,7 +112,7 @@ export class QuestRepository implements IQuestRepository {
 
   validateDialogueData(dialogueData: any): boolean {
     if (!dialogueData || typeof dialogueData !== 'object') return false;
-    
+
     return !!(
       dialogueData.id &&
       dialogueData.name &&
@@ -107,7 +123,7 @@ export class QuestRepository implements IQuestRepository {
 
   validateNPCData(npcData: any): boolean {
     if (!npcData || typeof npcData !== 'object') return false;
-    
+
     return !!(
       npcData.id &&
       npcData.name &&

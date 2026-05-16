@@ -8,7 +8,10 @@ import { UserAppsRepository } from './repositories/user-apps.repository';
 import { ResponseService } from '@api/_utils/response/response.service';
 import { LoggerModule } from '@api/_utils/logger/logger.module';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
-import { APPS_REPOSITORY_TOKEN, USER_APPS_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
+import {
+  APPS_REPOSITORY_TOKEN,
+  USER_APPS_REPOSITORY_TOKEN,
+} from '@api/_utils/repositories/interfaces/repository.token';
 
 @Module({
   imports: [LoggerModule, DrizzleModule],

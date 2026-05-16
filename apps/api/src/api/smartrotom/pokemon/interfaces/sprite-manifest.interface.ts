@@ -6,7 +6,7 @@ export interface SpriteLocation {
    * Path to the sprite file
    */
   path: string;
-  
+
   /**
    * Whether the sprite is from the default resourcepack or custom
    */
@@ -21,7 +21,7 @@ export interface SpriteManifest {
    * Mapping of pokemonId:form:palette to sprite locations
    */
   sprites: { [key: string]: SpriteLocation };
-  
+
   /**
    * Count of sprites in the manifest
    */
@@ -30,7 +30,7 @@ export interface SpriteManifest {
     default: number;
     custom: number;
   };
-  
+
   /**
    * When the manifest was last generated
    */

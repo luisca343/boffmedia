@@ -3,7 +3,10 @@ import { NovecoolService } from './services/novecool.service';
 import { CbzService } from './services/cbz.service';
 import { MangaDownloadService } from './services/manga-download.service';
 import { MangaSearchResult } from './entities/manga-result.entity';
-import { MangaDetail, LocalChaptersResult } from './entities/manga-chapter.entity';
+import {
+  MangaDetail,
+  LocalChaptersResult,
+} from './entities/manga-chapter.entity';
 import { DownloadChaptersDto } from './dto/download-chapters.dto';
 
 @Injectable()

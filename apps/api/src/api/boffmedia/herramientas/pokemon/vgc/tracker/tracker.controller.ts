@@ -1,12 +1,32 @@
 import {
-  Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards, UseInterceptors,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Req,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { TrackerService } from './tracker.service';
-import { CreateMatchDto, CreatePresetDto, CreateSessionDto, UpsertSeriesDto } from './dto';
-import { MatchDto, SeriesDto, SessionDto, TeamPresetDto, TrackerSyncDataDto } from './response.dto';
+import {
+  CreateMatchDto,
+  CreatePresetDto,
+  CreateSessionDto,
+  UpsertSeriesDto,
+} from './dto';
+import {
+  MatchDto,
+  SeriesDto,
+  SessionDto,
+  TeamPresetDto,
+  TrackerSyncDataDto,
+} from './response.dto';
 
 @ApiTags('BoffMedia 🛠 | Pokémon VGC Tracker')
 @Controller('tools/vgc/tracker')
@@ -18,8 +38,15 @@ export class TrackerController {
   // ─── Sync ─────────────────────────────────────────────────────────────────────
 
   @Get('sync')
-  @ApiOperation({ summary: 'Pull all tracker data for a user (sessions, matches, series, presets)' })
-  @ApiResponse({ status: 200, description: 'Full tracker payload returned.', type: TrackerSyncDataDto })
+  @ApiOperation({
+    summary:
+      'Pull all tracker data for a user (sessions, matches, series, presets)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Full tracker payload returned.',
+    type: TrackerSyncDataDto,
+  })
   syncAll(@Req() req: any) {
     return this.service.syncAll(req.user.userId);
   }
@@ -28,7 +55,12 @@ export class TrackerController {
 
   @Get('presets')
   @ApiOperation({ summary: 'List team presets' })
-  @ApiResponse({ status: 200, description: 'Presets returned.', type: TeamPresetDto, isArray: true })
+  @ApiResponse({
+    status: 200,
+    description: 'Presets returned.',
+    type: TeamPresetDto,
+    isArray: true,
+  })
   getPresets(@Req() req: any) {
     return this.service.getPresets(req.user.userId);
   }
@@ -36,7 +68,11 @@ export class TrackerController {
   @Put('presets/:id')
   @ApiParam({ name: 'id', description: 'Preset UUID' })
   @ApiOperation({ summary: 'Create or update a team preset' })
-  upsertPreset(@Param('id') id: string, @Body() dto: CreatePresetDto, @Req() req: any) {
+  upsertPreset(
+    @Param('id') id: string,
+    @Body() dto: CreatePresetDto,
+    @Req() req: any,
+  ) {
     return this.service.upsertPreset(req.user.userId, id, dto);
   }
 
@@ -50,14 +86,23 @@ export class TrackerController {
 
   @Get('sessions')
   @ApiOperation({ summary: 'List tracking sessions' })
-  @ApiResponse({ status: 200, description: 'Sessions returned.', type: SessionDto, isArray: true })
+  @ApiResponse({
+    status: 200,
+    description: 'Sessions returned.',
+    type: SessionDto,
+    isArray: true,
+  })
   getSessions(@Req() req: any) {
     return this.service.getSessions(req.user.userId);
   }
 
   @Put('sessions/:id')
   @ApiOperation({ summary: 'Create or update a session' })
-  upsertSession(@Param('id') id: string, @Body() dto: CreateSessionDto, @Req() req: any) {
+  upsertSession(
+    @Param('id') id: string,
+    @Body() dto: CreateSessionDto,
+    @Req() req: any,
+  ) {
     return this.service.upsertSession(req.user.userId, { ...dto, id });
   }
 
@@ -71,7 +116,12 @@ export class TrackerController {
 
   @Get('sessions/:sessionId/matches')
   @ApiOperation({ summary: 'List matches for a session' })
-  @ApiResponse({ status: 200, description: 'Matches returned.', type: MatchDto, isArray: true })
+  @ApiResponse({
+    status: 200,
+    description: 'Matches returned.',
+    type: MatchDto,
+    isArray: true,
+  })
   getMatches(@Param('sessionId') sessionId: string, @Req() req: any) {
     return this.service.getMatchesForSession(req.user.userId, sessionId);
   }
@@ -84,7 +134,11 @@ export class TrackerController {
 
   @Put('matches/:id')
   @ApiOperation({ summary: 'Upsert (create or update) a match' })
-  upsertMatch(@Param('id') id: string, @Body() dto: CreateMatchDto, @Req() req: any) {
+  upsertMatch(
+    @Param('id') id: string,
+    @Body() dto: CreateMatchDto,
+    @Req() req: any,
+  ) {
     return this.service.upsertMatch(req.user.userId, { ...dto, id });
   }
 
@@ -98,7 +152,12 @@ export class TrackerController {
 
   @Get('sessions/:sessionId/series')
   @ApiOperation({ summary: 'List series for a session' })
-  @ApiResponse({ status: 200, description: 'Series returned.', type: SeriesDto, isArray: true })
+  @ApiResponse({
+    status: 200,
+    description: 'Series returned.',
+    type: SeriesDto,
+    isArray: true,
+  })
   getSeries(@Param('sessionId') sessionId: string, @Req() req: any) {
     return this.service.getSeriesForSession(req.user.userId, sessionId);
   }
@@ -106,7 +165,11 @@ export class TrackerController {
   @Put('series/:id')
   @ApiParam({ name: 'id', description: 'Series UUID' })
   @ApiOperation({ summary: 'Create or update a series' })
-  upsertSeries(@Param('id') id: string, @Body() dto: UpsertSeriesDto, @Req() req: any) {
+  upsertSeries(
+    @Param('id') id: string,
+    @Body() dto: UpsertSeriesDto,
+    @Req() req: any,
+  ) {
     return this.service.upsertSeries(req.user.userId, { ...dto, id });
   }
 

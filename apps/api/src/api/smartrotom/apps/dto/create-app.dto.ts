@@ -4,28 +4,28 @@ import { IsString, IsOptional, IsEnum, Length } from 'class-validator';
 import { AppStatus } from '../enums/app-status.enum';
 
 export class CreateAppDto extends BaseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'The name of the app',
-    example: 'Pokedex'
+    example: 'Pokedex',
   })
   @IsString()
   @Length(1, 32)
   name: string;
 
-  @ApiProperty({ 
-    description: 'The URL of the app', 
+  @ApiProperty({
+    description: 'The URL of the app',
     required: false,
-    example: 'pokedex'
+    example: 'pokedex',
   })
   @IsOptional()
   @IsString()
   url?: string;
 
-  @ApiProperty({ 
-    description: 'The active status of the app', 
+  @ApiProperty({
+    description: 'The active status of the app',
     required: false,
     example: AppStatus.ACTIVE,
-    enum: AppStatus
+    enum: AppStatus,
   })
   @IsOptional()
   @IsEnum(AppStatus)

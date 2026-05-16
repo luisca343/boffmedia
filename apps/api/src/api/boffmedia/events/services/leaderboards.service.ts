@@ -2,13 +2,13 @@ import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { eq, and, desc, sql, isNull } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import { 
+import {
   boffMediaParticipantProgress,
   boffMediaAchievements,
   boffMediaParticipants,
   boffMediaEvents,
   boffMediaEventTeams,
-  boffMediaEventTeamMembers
+  boffMediaEventTeamMembers,
 } from '@/_db/schema/Events';
 import { LeaderboardEntry } from '../entities/leaderboard.entity';
 
@@ -46,42 +46,63 @@ export class LeaderboardsService {
         nickname: boffMediaParticipants.nickname,
         avatar: boffMediaParticipants.avatar,
         userId: boffMediaParticipants.userId,
-        achievementPoints: sql<number>`COALESCE(SUM(CASE WHEN ${boffMediaAchievements.itemType} = 'achievement' AND ${boffMediaParticipantProgress.isCompleted} = 1 THEN ${boffMediaAchievements.points} ELSE 0 END), 0)`.as('achievement_points'),
-        medalPoints: sql<number>`COALESCE(SUM(CASE WHEN ${boffMediaAchievements.itemType} = 'medal' AND ${boffMediaParticipantProgress.isCompleted} = 1 THEN ${boffMediaAchievements.points} ELSE 0 END), 0)`.as('medal_points'),
-        totalPoints: sql<number>`COALESCE(SUM(CASE WHEN ${boffMediaParticipantProgress.isCompleted} = 1 THEN ${boffMediaAchievements.points} ELSE 0 END), 0)`.as('total_points'),
-        achievementCount: sql<number>`COALESCE(COUNT(DISTINCT CASE WHEN ${boffMediaAchievements.itemType} = 'achievement' AND ${boffMediaParticipantProgress.isCompleted} = 1 THEN ${boffMediaParticipantProgress.achievementId} END), 0)`.as('achievement_count'),
-        medalCount: sql<number>`COALESCE(COUNT(DISTINCT CASE WHEN ${boffMediaAchievements.itemType} = 'medal' AND ${boffMediaParticipantProgress.isCompleted} = 1 THEN ${boffMediaParticipantProgress.achievementId} END), 0)`.as('medal_count'),
-        lastUpdated: sql<Date>`COALESCE(MAX(${boffMediaParticipantProgress.lastUpdated}), NULL)`.as('last_updated')
+        achievementPoints:
+          sql<number>`COALESCE(SUM(CASE WHEN ${boffMediaAchievements.itemType} = 'achievement' AND ${boffMediaParticipantProgress.isCompleted} = 1 THEN ${boffMediaAchievements.points} ELSE 0 END), 0)`.as(
+            'achievement_points',
+          ),
+        medalPoints:
+          sql<number>`COALESCE(SUM(CASE WHEN ${boffMediaAchievements.itemType} = 'medal' AND ${boffMediaParticipantProgress.isCompleted} = 1 THEN ${boffMediaAchievements.points} ELSE 0 END), 0)`.as(
+            'medal_points',
+          ),
+        totalPoints:
+          sql<number>`COALESCE(SUM(CASE WHEN ${boffMediaParticipantProgress.isCompleted} = 1 THEN ${boffMediaAchievements.points} ELSE 0 END), 0)`.as(
+            'total_points',
+          ),
+        achievementCount:
+          sql<number>`COALESCE(COUNT(DISTINCT CASE WHEN ${boffMediaAchievements.itemType} = 'achievement' AND ${boffMediaParticipantProgress.isCompleted} = 1 THEN ${boffMediaParticipantProgress.achievementId} END), 0)`.as(
+            'achievement_count',
+          ),
+        medalCount:
+          sql<number>`COALESCE(COUNT(DISTINCT CASE WHEN ${boffMediaAchievements.itemType} = 'medal' AND ${boffMediaParticipantProgress.isCompleted} = 1 THEN ${boffMediaParticipantProgress.achievementId} END), 0)`.as(
+            'medal_count',
+          ),
+        lastUpdated:
+          sql<Date>`COALESCE(MAX(${boffMediaParticipantProgress.lastUpdated}), NULL)`.as(
+            'last_updated',
+          ),
       })
       .from(boffMediaParticipants)
       .leftJoin(
         boffMediaParticipantProgress,
-        eq(boffMediaParticipantProgress.participantId, boffMediaParticipants.id)
+        eq(
+          boffMediaParticipantProgress.participantId,
+          boffMediaParticipants.id,
+        ),
       )
       .leftJoin(
         boffMediaAchievements,
         and(
-          eq(boffMediaAchievements.id, boffMediaParticipantProgress.achievementId),
-          isNull(boffMediaAchievements.deletedAt)
-        )
+          eq(
+            boffMediaAchievements.id,
+            boffMediaParticipantProgress.achievementId,
+          ),
+          isNull(boffMediaAchievements.deletedAt),
+        ),
       )
       .leftJoin(
         boffMediaEvents,
         and(
           eq(boffMediaEvents.id, boffMediaAchievements.eventId),
-          isNull(boffMediaEvents.deletedAt)
-        )
+          isNull(boffMediaEvents.deletedAt),
+        ),
       )
       .groupBy(
         boffMediaParticipants.id,
         boffMediaParticipants.nickname,
         boffMediaParticipants.avatar,
-        boffMediaParticipants.userId
+        boffMediaParticipants.userId,
       )
-      .orderBy(
-        desc(sql<number>`total_points`),
-        desc(sql<Date>`last_updated`)
-      );
+      .orderBy(desc(sql<number>`total_points`), desc(sql<Date>`last_updated`));
 
     // Add ranking
     return this.addRankingToResults(results);
@@ -97,36 +118,58 @@ export class LeaderboardsService {
         nickname: boffMediaParticipants.nickname,
         avatar: boffMediaParticipants.avatar,
         userId: boffMediaParticipants.userId,
-        achievementPoints: sql<number>`SUM(CASE WHEN ${boffMediaAchievements.itemType} = 'achievement' THEN ${boffMediaAchievements.points} ELSE 0 END)`.as('achievement_points'),
-        medalPoints: sql<number>`SUM(CASE WHEN ${boffMediaAchievements.itemType} = 'medal' THEN ${boffMediaAchievements.points} ELSE 0 END)`.as('medal_points'),
-        totalPoints: sql<number>`SUM(${boffMediaAchievements.points})`.as('total_points'),
-        achievementCount: sql<number>`COUNT(DISTINCT CASE WHEN ${boffMediaAchievements.itemType} = 'achievement' THEN ${boffMediaParticipantProgress.achievementId} END)`.as('achievement_count'),
-        medalCount: sql<number>`COUNT(DISTINCT CASE WHEN ${boffMediaAchievements.itemType} = 'medal' THEN ${boffMediaParticipantProgress.achievementId} END)`.as('medal_count'),
-        lastUpdated: sql<Date>`COALESCE(MAX(${boffMediaParticipantProgress.lastUpdated}), NULL)`.as('last_updated')
+        achievementPoints:
+          sql<number>`SUM(CASE WHEN ${boffMediaAchievements.itemType} = 'achievement' THEN ${boffMediaAchievements.points} ELSE 0 END)`.as(
+            'achievement_points',
+          ),
+        medalPoints:
+          sql<number>`SUM(CASE WHEN ${boffMediaAchievements.itemType} = 'medal' THEN ${boffMediaAchievements.points} ELSE 0 END)`.as(
+            'medal_points',
+          ),
+        totalPoints: sql<number>`SUM(${boffMediaAchievements.points})`.as(
+          'total_points',
+        ),
+        achievementCount:
+          sql<number>`COUNT(DISTINCT CASE WHEN ${boffMediaAchievements.itemType} = 'achievement' THEN ${boffMediaParticipantProgress.achievementId} END)`.as(
+            'achievement_count',
+          ),
+        medalCount:
+          sql<number>`COUNT(DISTINCT CASE WHEN ${boffMediaAchievements.itemType} = 'medal' THEN ${boffMediaParticipantProgress.achievementId} END)`.as(
+            'medal_count',
+          ),
+        lastUpdated:
+          sql<Date>`COALESCE(MAX(${boffMediaParticipantProgress.lastUpdated}), NULL)`.as(
+            'last_updated',
+          ),
       })
       .from(boffMediaParticipantProgress)
       .innerJoin(
         boffMediaAchievements,
-        eq(boffMediaAchievements.id, boffMediaParticipantProgress.achievementId)
+        eq(
+          boffMediaAchievements.id,
+          boffMediaParticipantProgress.achievementId,
+        ),
       )
       .leftJoin(
         boffMediaParticipants,
-        eq(boffMediaParticipants.id, boffMediaParticipantProgress.participantId)
+        eq(
+          boffMediaParticipants.id,
+          boffMediaParticipantProgress.participantId,
+        ),
       )
-      .where(and(
-        eq(boffMediaAchievements.eventId, eventId),
-        eq(boffMediaParticipantProgress.isCompleted, 1)
-      ))
+      .where(
+        and(
+          eq(boffMediaAchievements.eventId, eventId),
+          eq(boffMediaParticipantProgress.isCompleted, 1),
+        ),
+      )
       .groupBy(
-        boffMediaParticipantProgress.participantId, 
-        boffMediaParticipants.nickname, 
-        boffMediaParticipants.avatar, 
-        boffMediaParticipants.userId
+        boffMediaParticipantProgress.participantId,
+        boffMediaParticipants.nickname,
+        boffMediaParticipants.avatar,
+        boffMediaParticipants.userId,
       )
-      .orderBy(
-        desc(sql<number>`total_points`),
-        desc(sql<Date>`last_updated`)
-      );
+      .orderBy(desc(sql<number>`total_points`), desc(sql<Date>`last_updated`));
 
     // Add ranking
     return this.addRankingToResults(results);
@@ -142,44 +185,56 @@ export class LeaderboardsService {
         teamName: boffMediaEventTeams.name,
         teamTag: boffMediaEventTeams.tag,
         score: boffMediaEventTeams.totalScore,
-        memberCount: sql<number>`COUNT(DISTINCT ${boffMediaEventTeamMembers.participantId})`.as('member_count')
+        memberCount:
+          sql<number>`COUNT(DISTINCT ${boffMediaEventTeamMembers.participantId})`.as(
+            'member_count',
+          ),
       })
       .from(boffMediaEventTeams)
       .leftJoin(
         boffMediaEventTeamMembers,
-        eq(boffMediaEventTeamMembers.teamId, boffMediaEventTeams.id)
+        eq(boffMediaEventTeamMembers.teamId, boffMediaEventTeams.id),
       )
-      .where(and(
-        eq(boffMediaEventTeams.eventId, eventId),
-        isNull(boffMediaEventTeams.deletedAt)
-      ))
+      .where(
+        and(
+          eq(boffMediaEventTeams.eventId, eventId),
+          isNull(boffMediaEventTeams.deletedAt),
+        ),
+      )
       .groupBy(
-        boffMediaEventTeams.id, 
-        boffMediaEventTeams.name, 
-        boffMediaEventTeams.tag, 
-        boffMediaEventTeams.totalScore
+        boffMediaEventTeams.id,
+        boffMediaEventTeams.name,
+        boffMediaEventTeams.tag,
+        boffMediaEventTeams.totalScore,
       )
       .orderBy(desc(boffMediaEventTeams.totalScore));
 
     // Add ranking
     return results.map((result, index) => ({
       ...result,
-      rank: index + 1
+      rank: index + 1,
     }));
   }
 
   /**
    * Get participant's ranking across global and specific event
    */
-  async getParticipantRanking(participantId: number, eventId?: number): Promise<ParticipantRanking> {
+  async getParticipantRanking(
+    participantId: number,
+    eventId?: number,
+  ): Promise<ParticipantRanking> {
     // Get global ranking
     const globalLeaderboard = await this.getGlobalLeaderboard();
-    const globalEntry = globalLeaderboard.find(entry => entry.participantId === participantId);
-    
+    const globalEntry = globalLeaderboard.find(
+      (entry) => entry.participantId === participantId,
+    );
+
     let eventRank: number | undefined;
     if (eventId) {
       const eventLeaderboard = await this.getEventLeaderboard(eventId);
-      const eventEntry = eventLeaderboard.find(entry => entry.participantId === participantId);
+      const eventEntry = eventLeaderboard.find(
+        (entry) => entry.participantId === participantId,
+      );
       eventRank = eventEntry?.rank;
     }
 
@@ -189,17 +244,20 @@ export class LeaderboardsService {
       eventRank,
       totalPoints: globalEntry?.totalPoints || 0,
       achievementCount: globalEntry?.achievementCount || 0,
-      medalCount: globalEntry?.medalCount || 0
+      medalCount: globalEntry?.medalCount || 0,
     };
   }
 
   /**
    * Get top performers by achievement count
    */
-  async getTopAchievers(limit: number = 10, eventId?: number): Promise<LeaderboardEntry[]> {
+  async getTopAchievers(
+    limit: number = 10,
+    eventId?: number,
+  ): Promise<LeaderboardEntry[]> {
     const whereConditions = [
       eq(boffMediaParticipantProgress.isCompleted, 1),
-      eq(boffMediaAchievements.itemType, 'achievement')
+      eq(boffMediaAchievements.itemType, 'achievement'),
     ];
 
     if (eventId) {
@@ -214,31 +272,44 @@ export class LeaderboardsService {
         nickname: boffMediaParticipants.nickname,
         avatar: boffMediaParticipants.avatar,
         userId: boffMediaParticipants.userId,
-        achievementPoints: sql<number>`SUM(${boffMediaAchievements.points})`.as('achievement_points'),
+        achievementPoints: sql<number>`SUM(${boffMediaAchievements.points})`.as(
+          'achievement_points',
+        ),
         medalPoints: sql<number>`0`.as('medal_points'),
-        totalPoints: sql<number>`SUM(${boffMediaAchievements.points})`.as('total_points'),
-        achievementCount: sql<number>`COUNT(DISTINCT ${boffMediaParticipantProgress.achievementId})`.as('achievement_count'),
-        medalCount: sql<number>`0`.as('medal_count')
+        totalPoints: sql<number>`SUM(${boffMediaAchievements.points})`.as(
+          'total_points',
+        ),
+        achievementCount:
+          sql<number>`COUNT(DISTINCT ${boffMediaParticipantProgress.achievementId})`.as(
+            'achievement_count',
+          ),
+        medalCount: sql<number>`0`.as('medal_count'),
       })
       .from(boffMediaParticipantProgress)
       .innerJoin(
         boffMediaAchievements,
-        eq(boffMediaAchievements.id, boffMediaParticipantProgress.achievementId)
+        eq(
+          boffMediaAchievements.id,
+          boffMediaParticipantProgress.achievementId,
+        ),
       )
       .leftJoin(
         boffMediaEvents,
-        eq(boffMediaEvents.id, boffMediaAchievements.eventId)
+        eq(boffMediaEvents.id, boffMediaAchievements.eventId),
       )
       .leftJoin(
         boffMediaParticipants,
-        eq(boffMediaParticipants.id, boffMediaParticipantProgress.participantId)
+        eq(
+          boffMediaParticipants.id,
+          boffMediaParticipantProgress.participantId,
+        ),
       )
       .where(and(...whereConditions))
       .groupBy(
-        boffMediaParticipantProgress.participantId, 
-        boffMediaParticipants.nickname, 
-        boffMediaParticipants.avatar, 
-        boffMediaParticipants.userId
+        boffMediaParticipantProgress.participantId,
+        boffMediaParticipants.nickname,
+        boffMediaParticipants.avatar,
+        boffMediaParticipants.userId,
       )
       .orderBy(desc(sql<number>`achievement_count`))
       .limit(limit);
@@ -250,9 +321,9 @@ export class LeaderboardsService {
    * Get leaderboard with pagination
    */
   async getLeaderboardWithPagination(
-    page: number = 1, 
-    pageSize: number = 20, 
-    eventId?: number
+    page: number = 1,
+    pageSize: number = 20,
+    eventId?: number,
   ): Promise<{
     data: LeaderboardEntry[];
     pagination: {
@@ -263,47 +334,52 @@ export class LeaderboardsService {
     };
   }> {
     const offset = (page - 1) * pageSize;
-    
+
     // Get total count
-    const countQuery = eventId 
+    const countQuery = eventId
       ? this.getEventLeaderboardCountQuery(eventId)
       : this.getGlobalLeaderboardCountQuery();
-    
+
     const [countResult] = await countQuery;
     const total = countResult.count;
-    
+
     // Get paginated results
-    const leaderboard = eventId 
+    const leaderboard = eventId
       ? await this.getEventLeaderboard(eventId)
       : await this.getGlobalLeaderboard();
-    
+
     const paginatedResults = leaderboard.slice(offset, offset + pageSize);
-    
+
     return {
       data: paginatedResults,
       pagination: {
         page,
         pageSize,
         total,
-        totalPages: Math.ceil(total / pageSize)
-      }
+        totalPages: Math.ceil(total / pageSize),
+      },
     };
   }
 
   /**
    * Get recent achievements for leaderboard highlights
    */
-  async getRecentAchievements(limit: number = 5, eventId?: number): Promise<{
-    participantId: number;
-    nickname: string;
-    avatar: string;
-    achievementName: string;
-    achievementIcon: string;
-    points: number;
-    completedAt: Date;
-  }[]> {
+  async getRecentAchievements(
+    limit: number = 5,
+    eventId?: number,
+  ): Promise<
+    {
+      participantId: number;
+      nickname: string;
+      avatar: string;
+      achievementName: string;
+      achievementIcon: string;
+      points: number;
+      completedAt: Date;
+    }[]
+  > {
     const whereConditions = [eq(boffMediaParticipantProgress.isCompleted, 1)];
-    
+
     if (eventId) {
       whereConditions.push(eq(boffMediaAchievements.eventId, eventId));
     } else {
@@ -318,20 +394,26 @@ export class LeaderboardsService {
         achievementName: boffMediaAchievements.name,
         achievementIcon: boffMediaAchievements.icon,
         points: boffMediaAchievements.points,
-        completedAt: boffMediaParticipantProgress.completedAt
+        completedAt: boffMediaParticipantProgress.completedAt,
       })
       .from(boffMediaParticipantProgress)
       .innerJoin(
         boffMediaAchievements,
-        eq(boffMediaAchievements.id, boffMediaParticipantProgress.achievementId)
+        eq(
+          boffMediaAchievements.id,
+          boffMediaParticipantProgress.achievementId,
+        ),
       )
       .leftJoin(
         boffMediaEvents,
-        eq(boffMediaEvents.id, boffMediaAchievements.eventId)
+        eq(boffMediaEvents.id, boffMediaAchievements.eventId),
       )
       .leftJoin(
         boffMediaParticipants,
-        eq(boffMediaParticipants.id, boffMediaParticipantProgress.participantId)
+        eq(
+          boffMediaParticipants.id,
+          boffMediaParticipantProgress.participantId,
+        ),
       )
       .where(and(...whereConditions))
       .orderBy(desc(boffMediaParticipantProgress.completedAt))
@@ -339,47 +421,63 @@ export class LeaderboardsService {
   }
 
   // ==================== PRIVATE HELPER METHODS ====================
-  
+
   private addRankingToResults(results: any[]): LeaderboardEntry[] {
     return results.map((result, index) => ({
       ...result,
-      rank: index + 1
+      rank: index + 1,
     }));
   }
 
   private getGlobalLeaderboardCountQuery() {
     return this.db
       .select({
-        count: sql<number>`COUNT(DISTINCT ${boffMediaParticipantProgress.participantId})`.as('count')
+        count:
+          sql<number>`COUNT(DISTINCT ${boffMediaParticipantProgress.participantId})`.as(
+            'count',
+          ),
       })
       .from(boffMediaParticipantProgress)
       .innerJoin(
         boffMediaAchievements,
-        eq(boffMediaAchievements.id, boffMediaParticipantProgress.achievementId)
+        eq(
+          boffMediaAchievements.id,
+          boffMediaParticipantProgress.achievementId,
+        ),
       )
       .leftJoin(
         boffMediaEvents,
-        eq(boffMediaEvents.id, boffMediaAchievements.eventId)
+        eq(boffMediaEvents.id, boffMediaAchievements.eventId),
       )
-      .where(and(
-        eq(boffMediaParticipantProgress.isCompleted, 1),
-        isNull(boffMediaEvents.deletedAt)
-      ));
+      .where(
+        and(
+          eq(boffMediaParticipantProgress.isCompleted, 1),
+          isNull(boffMediaEvents.deletedAt),
+        ),
+      );
   }
 
   private getEventLeaderboardCountQuery(eventId: number) {
     return this.db
       .select({
-        count: sql<number>`COUNT(DISTINCT ${boffMediaParticipantProgress.participantId})`.as('count')
+        count:
+          sql<number>`COUNT(DISTINCT ${boffMediaParticipantProgress.participantId})`.as(
+            'count',
+          ),
       })
       .from(boffMediaParticipantProgress)
       .innerJoin(
         boffMediaAchievements,
-        eq(boffMediaAchievements.id, boffMediaParticipantProgress.achievementId)
+        eq(
+          boffMediaAchievements.id,
+          boffMediaParticipantProgress.achievementId,
+        ),
       )
-      .where(and(
-        eq(boffMediaAchievements.eventId, eventId),
-        eq(boffMediaParticipantProgress.isCompleted, 1)
-      ));
+      .where(
+        and(
+          eq(boffMediaAchievements.eventId, eventId),
+          eq(boffMediaParticipantProgress.isCompleted, 1),
+        ),
+      );
   }
 }
