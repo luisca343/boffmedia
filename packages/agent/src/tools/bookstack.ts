@@ -103,6 +103,20 @@ export async function createBookStackChapter(input: {
   return { chapterId: result.id, url: result.url }
 }
 
+// E4: update the status:* tag on a task page without touching its content
+export async function updateTaskStatus(
+  pageId: number,
+  status: 'pending' | 'in-progress' | 'done'
+): Promise<void> {
+  const page = await bsGet(`pages/${pageId}`)
+  const currentTags: string[] = page.tags?.map((t: { name: string }) => t.name) ?? []
+  const newTags = [
+    ...currentTags.filter((t: string) => !t.startsWith('status:')),
+    `status:${status}`
+  ]
+  await bsPut(`pages/${pageId}`, { tags: newTags.map((name: string) => ({ name })) })
+}
+
 // E2: infer project tag from task description
 export function inferProjectTag(text: string): 'boffmedia' | 'smartrotom' {
   const lower = text.toLowerCase()

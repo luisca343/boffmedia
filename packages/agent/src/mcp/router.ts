@@ -18,7 +18,8 @@ import {
   addBooksToShelf,
   createBookStackChapter,
   writeAdr,
-  syncConventions
+  syncConventions,
+  updateTaskStatus
 } from '../tools/bookstack.js'
 import { detectStructuralChanges } from '../tools/structural.js'
 import { ADR_CHAPTER_IDS, CONVENTIONS_PAGE_IDS, TECHNICAL_BOOK_IDS } from '../agent.config.js'
@@ -44,11 +45,15 @@ export function registerTools(server: McpServer) {
     {
       title: z.string().describe('Short human-readable task title'),
       taskDescription: z.string().describe('Full description of what needs to be done'),
-      taskType: z.enum(['feature', 'ui-ux', 'refactor', 'bugfix']).default('feature').describe('Type of task — drives whether Playwright is included in the workflow')
+      taskType: z.enum(['feature', 'ui-ux', 'refactor', 'bugfix']).default('feature').describe('Type of task — drives whether Playwright is included in the workflow'),
+      bookstackTaskPageId: z.number().optional().describe('BookStack page ID of the agent:task page — if provided, status tag is updated to in-progress automatically')
     },
-    async ({ title, taskDescription, taskType }) => {
+    async ({ title, taskDescription, taskType, bookstackTaskPageId }) => {
       const runId = `${title.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40)}-${Date.now()}`
       await saveRun({ runId, status: 'running', title })
+      if (bookstackTaskPageId) {
+        await updateTaskStatus(bookstackTaskPageId, 'in-progress').catch(() => {})
+      }
 
       const [context, history] = await Promise.all([
         resolveContext({ taskDescription, maxFiles: 20 }),
@@ -95,7 +100,7 @@ ${playwrightStep}
 4c. Call detect_structural_changes. If adrRecommended=true, call write_adr with a generated context, decision, and consequences based on the changes you made. Always call sync_conventions after.
 4d. If you touched the NestJS API, call sync_openapi_docs (runId: "${runId}") with the affected module names to keep the BookStack API reference current.
 5. Create a branch (git_operation branch), commit (git_operation commit), and push to both remotes (git_operation push_mirrors).
-6. Call save_run (runId: "${runId}", status: "passed" | "failed") to close the task.
+6. Call save_run (runId: "${runId}", status: "passed" | "failed"${bookstackTaskPageId ? `, bookstackTaskPageId: ${bookstackTaskPageId}` : ''}) to close the task.
 
 Do not skip steps. Do not call save_run before run_verification passes.
 Do NOT call create_gitlab_mr — MR creation is the user's decision after reviewing the pushed branch.
@@ -143,17 +148,22 @@ ${bookstackSection}
 
   server.tool(
     'save_run',
-    'CALL THIS LAST — step 5 of the workflow. Persists the final run status after run_verification completes. Every task started with begin_task must be closed with save_run. Use the runId returned by begin_task.',
+    'CALL THIS LAST — step 6 of the workflow. Persists the final run status after run_verification completes. Every task started with begin_task must be closed with save_run. Use the runId returned by begin_task. If bookstackTaskPageId is provided, updates the task page status to done (passed) or pending (failed).',
     {
       runId: z.string().describe('The runId returned by begin_task'),
       status: z.enum(['running', 'passed', 'failed']),
       title: z.string(),
       branch: z.string().optional(),
       commitSha: z.string().optional(),
-      failureSummary: z.string().optional()
+      failureSummary: z.string().optional(),
+      bookstackTaskPageId: z.number().optional().describe('BookStack page ID of the agent:task page — if provided, status tag is updated to done (passed) or pending (failed)')
     },
     async (input) => {
       await saveRun(input)
+      if (input.bookstackTaskPageId) {
+        const newStatus = input.status === 'passed' ? 'done' : 'pending'
+        await updateTaskStatus(input.bookstackTaskPageId, newStatus).catch(() => {})
+      }
       return { content: [{ type: 'text', text: JSON.stringify({ ok: true }) }] }
     }
   )
