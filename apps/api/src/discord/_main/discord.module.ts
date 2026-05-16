@@ -30,11 +30,6 @@ import { MetaSpeedCommand } from '../commands/global/meta/meta-speed.command';
 import { MetaThreatsCommand } from '../commands/global/meta/meta-threats.command';
 import { MetaDamageCommand } from '../commands/global/meta/meta-damage.command';
 
-console.log(
-  '[DEBUG] Initializing NecordModule with token:',
-  process.env.DISCORD_KEY,
-);
-
 @Global()
 @Module({
   imports: [
