@@ -10,10 +10,13 @@ import { EvoTreeNode } from './services/data/pokemon-data.service';
 import { FuseResult } from 'fuse.js';
 import { FullMove } from './entities/pokemon-move.entity';
 import { SpawnInfo } from './entities/pokemon-spawn.entity';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class PokemonFacadeService {
   constructor(
+    private readonly logger: Logger,
+
     private readonly pokemonDataService: PokemonDataManagementService,
     private readonly pokedexService: PokedexManagementService,
     private readonly integrationService: PokemonIntegrationService,
@@ -25,7 +28,7 @@ export class PokemonFacadeService {
     try {
       await this.pokemonDataService.initializeData();
     } catch (error: any) {
-      console.error('Error initializing Pokemon service:', error);
+      this.logger.error('Error initializing Pokemon service:', error);
       throw new Error(
         `Pokemon service initialization failed: ${error.message}`,
       );
@@ -38,7 +41,7 @@ export class PokemonFacadeService {
     try {
       return this.pokemonDataService.getAllPokemon();
     } catch (error: any) {
-      console.error('Error getting all Pokemon:', error);
+      this.logger.error('Error getting all Pokemon:', error);
       throw new Error(`Failed to retrieve all Pokemon: ${error.message}`);
     }
   }
@@ -47,7 +50,7 @@ export class PokemonFacadeService {
     try {
       return this.pokemonDataService.getPokemonByDex(dex);
     } catch (error: any) {
-      console.error(`Error getting Pokemon by dex ${dex}:`, error);
+      this.logger.error(`Error getting Pokemon by dex ${dex}:`, error);
       throw new Error(`Failed to retrieve Pokemon by dex: ${error.message}`);
     }
   }
@@ -56,7 +59,7 @@ export class PokemonFacadeService {
     try {
       return this.pokemonDataService.getPokemonByName(name);
     } catch (error: any) {
-      console.error(`Error getting Pokemon by name ${name}:`, error);
+      this.logger.error(`Error getting Pokemon by name ${name}:`, error);
       throw new Error(`Failed to retrieve Pokemon by name: ${error.message}`);
     }
   }
@@ -68,7 +71,7 @@ export class PokemonFacadeService {
     try {
       return this.pokemonDataService.searchPokemonByName(name, amount);
     } catch (error: any) {
-      console.error(`Error searching Pokemon by name ${name}:`, error);
+      this.logger.error(`Error searching Pokemon by name ${name}:`, error);
       throw new Error(`Failed to search Pokemon: ${error.message}`);
     }
   }
@@ -77,7 +80,7 @@ export class PokemonFacadeService {
     try {
       return this.pokemonDataService.getPokemonNames();
     } catch (error: any) {
-      console.error('Error getting Pokemon names:', error);
+      this.logger.error('Error getting Pokemon names:', error);
       throw new Error(`Failed to retrieve Pokemon names: ${error.message}`);
     }
   }
@@ -86,7 +89,7 @@ export class PokemonFacadeService {
     try {
       return this.pokemonDataService.countPokemon();
     } catch (error: any) {
-      console.error('Error counting Pokemon:', error);
+      this.logger.error('Error counting Pokemon:', error);
       return 0;
     }
   }
@@ -100,7 +103,7 @@ export class PokemonFacadeService {
     try {
       return this.pokemonDataService.getEvoTree(id);
     } catch (error: any) {
-      console.error(`Error getting evolution tree for ${id}:`, error);
+      this.logger.error(`Error getting evolution tree for ${id}:`, error);
       throw new Error(`Failed to retrieve evolution tree: ${error.message}`);
     }
   }
@@ -112,7 +115,7 @@ export class PokemonFacadeService {
     try {
       return this.pokemonDataService.getNextPrev(id);
     } catch (error: any) {
-      console.error(`Error getting next/prev for ${id}:`, error);
+      this.logger.error(`Error getting next/prev for ${id}:`, error);
       throw new Error(`Failed to retrieve next/prev Pokemon: ${error.message}`);
     }
   }
@@ -123,7 +126,7 @@ export class PokemonFacadeService {
     try {
       return this.pokemonDataService.getAllMoves();
     } catch (error: any) {
-      console.error('Error getting all moves:', error);
+      this.logger.error('Error getting all moves:', error);
       throw new Error(`Failed to retrieve all moves: ${error.message}`);
     }
   }
@@ -132,7 +135,7 @@ export class PokemonFacadeService {
     try {
       return this.pokemonDataService.getMove(name);
     } catch (error: any) {
-      console.error(`Error getting move ${name}:`, error);
+      this.logger.error(`Error getting move ${name}:`, error);
       throw new Error(`Failed to retrieve move: ${error.message}`);
     }
   }
@@ -141,7 +144,7 @@ export class PokemonFacadeService {
     try {
       return this.pokemonDataService.getPokemonMoves(id, formIndex);
     } catch (error: any) {
-      console.error(
+      this.logger.error(
         `Error getting moves for Pokemon ${id}, form ${formIndex}:`,
         error,
       );
@@ -155,7 +158,7 @@ export class PokemonFacadeService {
     try {
       return this.pokemonDataService.getPokemonByMove(name);
     } catch (error: any) {
-      console.error(`Error getting Pokemon by move ${name}:`, error);
+      this.logger.error(`Error getting Pokemon by move ${name}:`, error);
       throw new Error(`Failed to retrieve Pokemon by move: ${error.message}`);
     }
   }
@@ -166,7 +169,7 @@ export class PokemonFacadeService {
     try {
       return this.pokemonDataService.getAllAbilities();
     } catch (error: any) {
-      console.error('Error getting all abilities:', error);
+      this.logger.error('Error getting all abilities:', error);
       throw new Error(`Failed to retrieve all abilities: ${error.message}`);
     }
   }
@@ -175,7 +178,7 @@ export class PokemonFacadeService {
     try {
       return this.pokemonDataService.getAbility(name);
     } catch (error: any) {
-      console.error(`Error getting ability ${name}:`, error);
+      this.logger.error(`Error getting ability ${name}:`, error);
       throw new Error(`Failed to retrieve ability: ${error.message}`);
     }
   }
@@ -186,7 +189,7 @@ export class PokemonFacadeService {
     try {
       return this.pokemonDataService.getPokemonByAbility(name);
     } catch (error: any) {
-      console.error(`Error getting Pokemon by ability ${name}:`, error);
+      this.logger.error(`Error getting Pokemon by ability ${name}:`, error);
       throw new Error(
         `Failed to retrieve Pokemon by ability: ${error.message}`,
       );
@@ -199,7 +202,7 @@ export class PokemonFacadeService {
     try {
       return this.pokemonDataService.getSpawnByPokemon(name);
     } catch (error: any) {
-      console.error(`Error getting spawns for Pokemon ${name}:`, error);
+      this.logger.error(`Error getting spawns for Pokemon ${name}:`, error);
       throw new Error(`Failed to retrieve Pokemon spawns: ${error.message}`);
     }
   }
@@ -212,7 +215,7 @@ export class PokemonFacadeService {
         count,
       }));
     } catch (error: any) {
-      console.error('Error getting biomes:', error);
+      this.logger.error('Error getting biomes:', error);
       throw new Error(`Failed to retrieve biomes: ${error.message}`);
     }
   }
@@ -230,7 +233,7 @@ export class PokemonFacadeService {
     try {
       return this.pokemonDataService.getPokemonByBiome(name);
     } catch (error: any) {
-      console.error(`Error getting Pokemon by biome ${name}:`, error);
+      this.logger.error(`Error getting Pokemon by biome ${name}:`, error);
       throw new Error(`Failed to retrieve Pokemon by biome: ${error.message}`);
     }
   }
@@ -239,7 +242,7 @@ export class PokemonFacadeService {
     try {
       return this.pokemonDataService.getBiomesByPokemon(name);
     } catch (error: any) {
-      console.error(`Error getting biomes for Pokemon ${name}:`, error);
+      this.logger.error(`Error getting biomes for Pokemon ${name}:`, error);
       throw new Error(
         `Failed to retrieve biomes for Pokemon: ${error.message}`,
       );
@@ -259,7 +262,7 @@ export class PokemonFacadeService {
     try {
       return await this.pokemonDataService.getImage(params);
     } catch (error: any) {
-      console.error('Error getting Pokemon image:', error);
+      this.logger.error('Error getting Pokemon image:', error);
       throw new Error(`Failed to retrieve Pokemon image: ${error.message}`);
     }
   }
@@ -268,7 +271,7 @@ export class PokemonFacadeService {
     try {
       return this.pokemonDataService.getItemSprite(name);
     } catch (error: any) {
-      console.error(`Error getting item sprite ${name}:`, error);
+      this.logger.error(`Error getting item sprite ${name}:`, error);
       throw new Error(`Failed to retrieve item sprite: ${error.message}`);
     }
   }
@@ -291,7 +294,7 @@ export class PokemonFacadeService {
         status,
       );
     } catch (error: any) {
-      console.error('Error registering Pokemon:', error);
+      this.logger.error('Error registering Pokemon:', error);
       throw new Error(`Failed to register Pokemon: ${error.message}`);
     }
   }
@@ -303,7 +306,7 @@ export class PokemonFacadeService {
     try {
       return await this.integrationService.updateDexWithSync(uuid, data);
     } catch (error: any) {
-      console.error('Error updating dex:', error);
+      this.logger.error('Error updating dex:', error);
       throw new Error(`Failed to update dex: ${error.message}`);
     }
   }
@@ -312,7 +315,7 @@ export class PokemonFacadeService {
     try {
       return await this.pokedexService.getPokedexStatistics(uuid);
     } catch (error: any) {
-      console.error(`Error getting pokedex statistics for ${uuid}:`, error);
+      this.logger.error(`Error getting pokedex statistics for ${uuid}:`, error);
       throw new Error(
         `Failed to retrieve pokedex statistics: ${error.message}`,
       );
@@ -323,7 +326,7 @@ export class PokemonFacadeService {
     try {
       return await this.pokedexService.getDetailedPokedexStatus(uuid);
     } catch (error: any) {
-      console.error(
+      this.logger.error(
         `Error getting detailed pokedex status for ${uuid}:`,
         error,
       );
@@ -337,7 +340,7 @@ export class PokemonFacadeService {
     try {
       return await this.pokedexService.getPokedexRegistries(uuid);
     } catch (error: any) {
-      console.error(`Error getting pokedex registries for ${uuid}:`, error);
+      this.logger.error(`Error getting pokedex registries for ${uuid}:`, error);
       throw new Error(
         `Failed to retrieve pokedex registries: ${error.message}`,
       );
@@ -350,7 +353,7 @@ export class PokemonFacadeService {
     try {
       return await this.integrationService.getTerasPokemonShowdownData();
     } catch (error: any) {
-      console.error('Error getting Teras Pokemon Showdown data:', error);
+      this.logger.error('Error getting Teras Pokemon Showdown data:', error);
       throw new Error(`Failed to retrieve Showdown data: ${error.message}`);
     }
   }
@@ -361,7 +364,7 @@ export class PokemonFacadeService {
     try {
       return this.pokemonDataService.getWordleData();
     } catch (error: any) {
-      console.error('Error getting Wordle data:', error);
+      this.logger.error('Error getting Wordle data:', error);
       throw new Error(`Failed to retrieve Wordle data: ${error.message}`);
     }
   }
@@ -372,7 +375,7 @@ export class PokemonFacadeService {
     try {
       return this.pokemonDataService.getSpriteManifest();
     } catch (error: any) {
-      console.error('Error getting sprite manifest:', error);
+      this.logger.error('Error getting sprite manifest:', error);
       throw new Error(`Failed to retrieve sprite manifest: ${error.message}`);
     }
   }
@@ -381,7 +384,7 @@ export class PokemonFacadeService {
     try {
       await this.pokemonDataService.refreshSpriteManifest();
     } catch (error: any) {
-      console.error('Error refreshing sprite manifest:', error);
+      this.logger.error('Error refreshing sprite manifest:', error);
       throw new Error(`Failed to refresh sprite manifest: ${error.message}`);
     }
   }
@@ -392,7 +395,7 @@ export class PokemonFacadeService {
     try {
       return await this.pokemonDataService.getPmdPortrait(name);
     } catch (error: any) {
-      console.error(`Error getting PMD portrait for ${name}:`, error);
+      this.logger.error(`Error getting PMD portrait for ${name}:`, error);
       throw new Error(`Failed to retrieve PMD portrait: ${error.message}`);
     }
   }

@@ -21,12 +21,15 @@ import { PokemonW } from './entities/pokemon-w-.entity';
 import { WingullWorldService } from './services/wingull-world.service';
 import { UpdateDex } from './entities/update-dex.entity';
 import { UpdateBattleTeamDto } from './dto/battle-team.dto';
+import { Logger } from 'nestjs-pino';
 
 @ApiTags('SmartRotom | Wingull')
 @Controller('wingull')
 @UseInterceptors(ResponseInterceptor)
 export class WingullController {
   constructor(
+    private readonly logger: Logger,
+
     private readonly wingullFacadeService: WingullFacadeService,
     private readonly wingullWorldService: WingullWorldService,
   ) {}
@@ -228,7 +231,7 @@ export class WingullController {
     description: 'Failed to retrieve taxi stops.',
   })
   async getTaxiStops() {
-    console.log('Fetching all taxi stops');
+    this.logger.log('Fetching all taxi stops');
     return await this.wingullFacadeService.getTaxiStops();
   }
 
@@ -370,8 +373,8 @@ export class WingullController {
     description: 'Failed to retrieve weather information.',
   })
   async getWeather(): Promise<Weather> {
-    console.log('Fetching current weather information');
-    console.log(await this.wingullFacadeService.getWeather());
+    this.logger.log('Fetching current weather information');
+    this.logger.log(await this.wingullFacadeService.getWeather());
     return await this.wingullFacadeService.getWeather();
   }
 

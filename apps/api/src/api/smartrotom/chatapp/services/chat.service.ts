@@ -6,6 +6,7 @@ import {
 import { IChatRepository } from '../repositories/interfaces/chat.repository.interface';
 import { IMemberRepository } from '../repositories/interfaces/chat-member.repository.interface';
 import { ChatDetails } from '../repositories/chatapp.repository';
+import { Logger } from 'nestjs-pino';
 
 export interface CreateChatRequest {
   player: string;
@@ -16,6 +17,8 @@ export interface CreateChatRequest {
 @Injectable()
 export class ChatService {
   constructor(
+    private readonly logger: Logger,
+
     @Inject(CHAT_REPOSITORY_TOKEN)
     private readonly chatRepository: IChatRepository,
     @Inject(CHAT_MEMBER_REPOSITORY_TOKEN)
@@ -38,7 +41,7 @@ export class ChatService {
         (chat) => chat.name === chatName && chat.type === 1,
       );
       if (existingChat) {
-        console.log(
+        this.logger.log(
           `User ${uuids[0]} already has a "${chatName}" chat (ID: ${existingChat.id})`,
         );
         return existingChat.id;
@@ -64,7 +67,7 @@ export class ChatService {
       await this.chatMemberRepository.addChatMember(newChat.insertId, uuid);
     }
 
-    console.log(
+    this.logger.log(
       `Created new chat "${chatName}" (ID: ${newChat.insertId}) for user(s): ${uuids.join(', ')}`,
     );
     return newChat.insertId;

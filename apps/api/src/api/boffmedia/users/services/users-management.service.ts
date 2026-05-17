@@ -12,6 +12,7 @@ import {
 } from '../repositories/interfaces/users.repository.interface';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
+import { Logger } from 'nestjs-pino';
 
 export interface UserCreationResult {
   user: BoffMediaUserSafe;
@@ -68,6 +69,8 @@ export class BoffMediaUsersManagementService {
   private readonly saltRounds = 12;
 
   constructor(
+    private readonly logger: Logger,
+
     private readonly usersRepository: BoffMediaUsersRepository,
     private readonly passwordService: PasswordService,
   ) {}
@@ -126,7 +129,7 @@ export class BoffMediaUsersManagementService {
           'https://cdn.boffmedia.com/default-profile.png',
       };
 
-      console.log('Creating new BoffMedia user:', {
+      this.logger.log('Creating new BoffMedia user:', {
         username: userData.username,
         email: userData.email,
       });
@@ -148,7 +151,7 @@ export class BoffMediaUsersManagementService {
       ) {
         throw error;
       }
-      console.error('Failed to create user:', error);
+      this.logger.error('Failed to create user:', error);
       throw new Error(`User creation failed: ${error.message}`);
     }
   }
@@ -172,7 +175,7 @@ export class BoffMediaUsersManagementService {
       const newUser = await this.createUser(userData);
       return { user: newUser, isNew: true };
     } catch (error: any) {
-      console.error('Error in findOrCreateUser:', error);
+      this.logger.error('Error in findOrCreateUser:', error);
       throw new Error(`Failed to find or create user: ${error.message}`);
     }
   }
@@ -183,7 +186,7 @@ export class BoffMediaUsersManagementService {
     try {
       return await this.usersRepository.findAllUsers();
     } catch (error: any) {
-      console.error('Failed to get all users:', error);
+      this.logger.error('Failed to get all users:', error);
       throw new Error(`Failed to retrieve users: ${error.message}`);
     }
   }
@@ -196,7 +199,7 @@ export class BoffMediaUsersManagementService {
     try {
       return await this.usersRepository.findUserById(id);
     } catch (error: any) {
-      console.error(`Failed to get user by ID ${id}:`, error);
+      this.logger.error(`Failed to get user by ID ${id}:`, error);
       throw new Error(`Failed to retrieve user: ${error.message}`);
     }
   }
@@ -209,7 +212,7 @@ export class BoffMediaUsersManagementService {
     try {
       return await this.usersRepository.findUserByUsername(username);
     } catch (error: any) {
-      console.error(`Failed to get user by username ${username}:`, error);
+      this.logger.error(`Failed to get user by username ${username}:`, error);
       throw new Error(`Failed to retrieve user: ${error.message}`);
     }
   }
@@ -222,7 +225,7 @@ export class BoffMediaUsersManagementService {
     try {
       return await this.usersRepository.findUserByEmail(email);
     } catch (error: any) {
-      console.error(`Failed to get user by email ${email}:`, error);
+      this.logger.error(`Failed to get user by email ${email}:`, error);
       throw new Error(`Failed to retrieve user: ${error.message}`);
     }
   }
@@ -235,7 +238,7 @@ export class BoffMediaUsersManagementService {
     try {
       return await this.usersRepository.findUserByUuid(uuid);
     } catch (error: any) {
-      console.error(`Failed to get user by UUID ${uuid}:`, error);
+      this.logger.error(`Failed to get user by UUID ${uuid}:`, error);
       throw new Error(`Failed to retrieve user: ${error.message}`);
     }
   }
@@ -248,7 +251,7 @@ export class BoffMediaUsersManagementService {
     try {
       return await this.usersRepository.findUserByGoogleId(googleId);
     } catch (error: any) {
-      console.error(`Failed to get user by Google ID ${googleId}:`, error);
+      this.logger.error(`Failed to get user by Google ID ${googleId}:`, error);
       throw new Error(`Failed to retrieve user: ${error.message}`);
     }
   }
@@ -266,7 +269,10 @@ export class BoffMediaUsersManagementService {
         username,
       );
     } catch (error: any) {
-      console.error(`Failed to get full user by username ${username}:`, error);
+      this.logger.error(
+        `Failed to get full user by username ${username}:`,
+        error,
+      );
       throw new Error(`Failed to retrieve full user: ${error.message}`);
     }
   }
@@ -281,7 +287,10 @@ export class BoffMediaUsersManagementService {
     try {
       return await this.usersRepository.findFullUserByUsername(username);
     } catch (error: any) {
-      console.error(`Failed to get full user by username ${username}:`, error);
+      this.logger.error(
+        `Failed to get full user by username ${username}:`,
+        error,
+      );
       throw new Error(`Failed to retrieve full user: ${error.message}`);
     }
   }
@@ -294,7 +303,7 @@ export class BoffMediaUsersManagementService {
     try {
       return await this.usersRepository.findFullUserByEmail(email);
     } catch (error: any) {
-      console.error(`Failed to get full user by email ${email}:`, error);
+      this.logger.error(`Failed to get full user by email ${email}:`, error);
       throw new Error(`Failed to retrieve full user: ${error.message}`);
     }
   }
@@ -307,7 +316,7 @@ export class BoffMediaUsersManagementService {
     try {
       return await this.usersRepository.findFullUserByUuid(uuid);
     } catch (error: any) {
-      console.error(`Failed to get full user by UUID ${uuid}:`, error);
+      this.logger.error(`Failed to get full user by UUID ${uuid}:`, error);
       throw new Error(`Failed to retrieve full user: ${error.message}`);
     }
   }
@@ -349,7 +358,7 @@ export class BoffMediaUsersManagementService {
 
       return await this.usersRepository.updateUser(id, updateData);
     } catch (error: any) {
-      console.error(`Failed to update user ${id}:`, error);
+      this.logger.error(`Failed to update user ${id}:`, error);
       throw new Error(`User update failed: ${error.message}`);
     }
   }
@@ -371,7 +380,7 @@ export class BoffMediaUsersManagementService {
           : 'Failed to delete user',
       };
     } catch (error: any) {
-      console.error(`Failed to delete user ${id}:`, error);
+      this.logger.error(`Failed to delete user ${id}:`, error);
       return {
         success: false,
         message: `User deletion failed: ${error.message}`,
@@ -406,7 +415,7 @@ export class BoffMediaUsersManagementService {
 
       return this.createSessionUser(fullUser);
     } catch (error: any) {
-      console.error(`Failed to validate user ${username}:`, error);
+      this.logger.error(`Failed to validate user ${username}:`, error);
       return null;
     }
   }
@@ -456,7 +465,7 @@ export class BoffMediaUsersManagementService {
 
       return this.createSessionUser(fullUser);
     } catch (error: any) {
-      console.error('Failed to create user from Google:', error);
+      this.logger.error('Failed to create user from Google:', error);
       throw new Error(`Google authentication failed: ${error.message}`);
     }
   }
@@ -476,7 +485,7 @@ export class BoffMediaUsersManagementService {
 
       return await this.createUser(userData);
     } catch (error: any) {
-      console.error('Failed to create Minecraft user:', error);
+      this.logger.error('Failed to create Minecraft user:', error);
       throw new Error(`Minecraft user creation failed: ${error.message}`);
     }
   }
@@ -504,7 +513,7 @@ export class BoffMediaUsersManagementService {
         uuid: linkData.minecraft.uuid,
       });
     } catch (error: any) {
-      console.error('Failed to link Minecraft account:', error);
+      this.logger.error('Failed to link Minecraft account:', error);
       throw new Error(`Minecraft account linking failed: ${error.message}`);
     }
   }
@@ -519,7 +528,7 @@ export class BoffMediaUsersManagementService {
     try {
       return await this.usersRepository.getUserRoles(userId);
     } catch (error: any) {
-      console.error(`Failed to get user roles for ${userId}:`, error);
+      this.logger.error(`Failed to get user roles for ${userId}:`, error);
       throw new Error(`Failed to get user roles: ${error.message}`);
     }
   }
@@ -530,7 +539,7 @@ export class BoffMediaUsersManagementService {
     try {
       return await this.usersRepository.getUserCount();
     } catch (error: any) {
-      console.error('Failed to get user count:', error);
+      this.logger.error('Failed to get user count:', error);
       return 0;
     }
   }
@@ -563,7 +572,7 @@ export class BoffMediaUsersManagementService {
   private validateUserData(userData: CreateUserDto): UserValidationResult {
     const errors: string[] = [];
 
-    console.log('Validating user data:', userData);
+    this.logger.log('Validating user data:', userData);
 
     if (!userData.email || userData.email.trim() === '') {
       errors.push('Email is required');

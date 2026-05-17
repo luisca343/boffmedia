@@ -18,6 +18,9 @@ import { MangaChapter, MangaSearchResult } from '../../manga.types';
 import { fetchHtmlSafe } from '../../manga-http';
 import { normalizeChapterNumber } from '../../chapter-normalizer';
 import { MangaBrowserService } from '../../manga-browser.service';
+import pino from 'pino';
+
+const logger = pino({ name: 'util' });
 
 const BASE = 'https://www.leercapitulo.co';
 
@@ -44,7 +47,7 @@ export class LeerCapituloScraper implements IMangaScraper {
 
   async getTitle(novelUrl: string): Promise<string> {
     const mangaUrl = this.toMangaUrl(novelUrl);
-    console.log(`[LeerCapituloScraper] Fetching title from: ${mangaUrl}`);
+    logger.info(`[LeerCapituloScraper] Fetching title from: ${mangaUrl}`);
     const html = await fetchHtmlSafe(mangaUrl);
     if (!html)
       throw new Error(`[leercapitulo] Failed to fetch manga page: ${mangaUrl}`);
@@ -60,7 +63,7 @@ export class LeerCapituloScraper implements IMangaScraper {
 
   async getChapterList(novelUrl: string): Promise<MangaChapter[]> {
     const mangaUrl = this.toMangaUrl(novelUrl);
-    console.log(
+    logger.info(
       `[LeerCapituloScraper] Fetching chapter list from: ${mangaUrl}`,
     );
     const html = await fetchHtmlSafe(mangaUrl);
@@ -81,7 +84,7 @@ export class LeerCapituloScraper implements IMangaScraper {
 
     // Page lists newest-first → reverse so oldest chapter is index 0.
     chapters.reverse();
-    console.log(`[LeerCapituloScraper] Found ${chapters.length} chapter(s)`);
+    logger.info(`[LeerCapituloScraper] Found ${chapters.length} chapter(s)`);
     return chapters;
   }
 
@@ -95,7 +98,7 @@ export class LeerCapituloScraper implements IMangaScraper {
     chapterUrl: string,
     context: BrowserContext,
   ): Promise<string[]> {
-    console.log(`[LeerCapituloScraper] Opening chapter: ${chapterUrl}`);
+    logger.info(`[LeerCapituloScraper] Opening chapter: ${chapterUrl}`);
     const page = await context.newPage();
 
     try {
@@ -105,7 +108,7 @@ export class LeerCapituloScraper implements IMangaScraper {
       });
 
       // Switch to "Todo en uno" view so all pages render at once.
-      console.log(`[LeerCapituloScraper] Selecting "Vista: Todo en uno"`);
+      logger.info(`[LeerCapituloScraper] Selecting "Vista: Todo en uno"`);
       await page.selectOption('select[name="number"].loadImgType', '1');
 
       // Wait for at least one page-image to appear.
@@ -126,7 +129,7 @@ export class LeerCapituloScraper implements IMangaScraper {
       );
 
       const deduplicated = [...new Set(images)];
-      console.log(
+      logger.info(
         `[LeerCapituloScraper] Found ${deduplicated.length} image(s) in chapter`,
       );
       return deduplicated;

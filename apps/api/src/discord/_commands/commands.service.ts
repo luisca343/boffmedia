@@ -9,10 +9,14 @@ import { Injectable } from '@nestjs/common';
 import { User } from 'discord.js';
 import { and, eq, sql } from 'drizzle-orm';
 import { getVoiceName } from '../_util/audio';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class CommandsService {
-  constructor(private db: MySQL2Service) {}
+  constructor(
+    private readonly logger: Logger,
+    private db: MySQL2Service,
+  ) {}
   private testServerGUID = '516237304101339156';
 
   async getFrases(
@@ -21,7 +25,7 @@ export class CommandsService {
     page = 1,
     maxQuotes = 10,
   ) {
-    console.log(
+    this.logger.log(
       `Fetching quotes for guild: ${guildID}, user: ${userID}, page: ${page}`,
     );
     let condition;
@@ -39,8 +43,8 @@ export class CommandsService {
         )
       : condition;
 
-    console.log('Final condition for fetching quotes:');
-    console.log(finalCondition);
+    this.logger.log('Final condition for fetching quotes:');
+    this.logger.log(finalCondition);
 
     // Count the total number of quotes
     const totalCountQuery = await this.db
@@ -51,7 +55,7 @@ export class CommandsService {
       .from(ficusFrases)
       .where(finalCondition);
 
-    console.log(`Total quotes found: ${totalCountQuery[0].count}`);
+    this.logger.log(`Total quotes found: ${totalCountQuery[0].count}`);
     const totalCount = totalCountQuery[0].count as number;
     const totalPages = Math.ceil(totalCount / maxQuotes);
 
@@ -90,7 +94,7 @@ export class CommandsService {
       .where(eq(discordUsers.userId, user.id))
       .limit(1);
 
-    console.log(`User exists: ${userExists.length > 0}`);
+    this.logger.log(`User exists: ${userExists.length > 0}`);
 
     if (userExists.length === 0) {
       await this.db
@@ -115,7 +119,7 @@ export class CommandsService {
         comment: comment,
       } as FicusFrase);
 
-    console.log(`Quote inserted: ${quoteInsert}`);
+    this.logger.log(`Quote inserted: ${quoteInsert}`);
 
     return {
       content: `Frase añadida correctamente "${quote}" - ${user.globalName}`,
@@ -130,7 +134,7 @@ export class CommandsService {
     global = false,
   ) {
     if (quoteNum === 0) {
-      console.log('Getting random quote');
+      this.logger.log('Getting random quote');
       // Get a random quote
       const queryBuilder = this.db
         .getDrizzle()

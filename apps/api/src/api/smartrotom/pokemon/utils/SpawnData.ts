@@ -3,6 +3,9 @@ import * as path from 'path';
 import { promises as fsPromises } from 'fs';
 import { SpawnInfo, SpawnInfos } from '@/types/spawnInfo';
 import { PokemonData } from './PokemonData';
+import pino from 'pino';
+
+const logger = pino({ name: 'util' });
 
 export class SpawnData {
   pokemonData: PokemonData;
@@ -113,9 +116,9 @@ export class SpawnData {
 
             /*
                         if(!this.pokemonData.speciesByName[speciesName]?.dex ){
-                            console.log(species)
-                            console.log(`No se ha encontrado el pokemon ${speciesName}`)
-                            console.log(Object.keys(this.pokemonData.speciesByName).length)
+                            logger.info(species)
+                            logger.info(`No se ha encontrado el pokemon ${speciesName}`)
+                            logger.info(Object.keys(this.pokemonData.speciesByName).length)
                         }*/
 
             if (!speciesName) return;
@@ -147,7 +150,7 @@ export class SpawnData {
       }),
     );
 
-    console.log(
+    logger.info(
       `Cargados ${terasCounter} spawns de Teras y ${defaultCounter} spawns por defecto en ${Date.now() - startingTime}ms`,
     );
   }

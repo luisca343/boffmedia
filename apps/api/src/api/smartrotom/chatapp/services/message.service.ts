@@ -8,10 +8,13 @@ import {
 import { IChatRepository } from '../repositories/interfaces/chat.repository.interface';
 import { IMessageRepository } from '../repositories/interfaces/chat-message.repository.interface';
 import { RotomMessage } from '../entities/message.entity';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class MessageService {
   constructor(
+    private readonly logger: Logger,
+
     @Inject(CHAT_REPOSITORY_TOKEN)
     private readonly chatRepository: IChatRepository,
     @Inject(CHAT_MESSAGE_REPOSITORY_TOKEN)
@@ -83,7 +86,7 @@ export class MessageService {
             }
 
             contentToStore = JSON.stringify({ imageUrl: publicUrl, meta });
-            console.log(`Saved chat image to ${filePath}`);
+            this.logger.log(`Saved chat image to ${filePath}`);
           } else {
             // Image is already a URL path, not base64
             const meta: Record<string, unknown> = { ...screenshot };
@@ -96,13 +99,13 @@ export class MessageService {
               imageUrl: screenshot.image,
               meta,
             });
-            console.log(`Using existing image URL: ${screenshot.image}`);
+            this.logger.log(`Using existing image URL: ${screenshot.image}`);
           }
         } else {
-          console.warn('Image payload missing screenshot.image');
+          this.logger.warn('Image payload missing screenshot.image');
         }
       } catch (err: any) {
-        console.error('Failed to parse/process image message', err);
+        this.logger.error('Failed to parse/process image message', err);
       }
     }
 

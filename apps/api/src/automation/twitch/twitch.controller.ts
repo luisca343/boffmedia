@@ -4,11 +4,14 @@ import { TwitchMonitorService } from './services/twitch-monitor.service';
 import { TwitchApiService } from './services/twitch-api.service';
 import { NotificationService } from './services/notification.service';
 import { NotificationTarget } from './interfaces/notification.interface';
+import { Logger } from 'nestjs-pino';
 
 @ApiTags('Automation - Twitch')
 @Controller('automation/twitch')
 export class TwitchController {
   constructor(
+    private readonly logger: Logger,
+
     private readonly twitchMonitorService: TwitchMonitorService,
     private readonly twitchApiService: TwitchApiService,
     private readonly notificationService: NotificationService,
@@ -44,7 +47,7 @@ export class TwitchController {
   @ApiResponse({ status: 200, description: 'Stream information for the user' })
   async getStreamByUsername(@Param('username') username: string) {
     const stream = await this.twitchApiService.getStreamByUsername(username);
-    console.log(stream);
+    this.logger.log(stream);
     return {
       username,
       isLive: !!stream,

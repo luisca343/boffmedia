@@ -4,10 +4,14 @@ import { PokemonDataService } from './pokemon-data.service';
 import { SpawnInfos } from '../../interfaces/pokemon.interface';
 import * as path from 'path';
 import { SpawnInfo } from '../../entities/pokemon-spawn.entity';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class SpawnDataService extends BaseDataService {
-  constructor(private readonly pokemonDataService: PokemonDataService) {
+  constructor(
+    private readonly logger: Logger,
+    private readonly pokemonDataService: PokemonDataService,
+  ) {
     super();
   }
 
@@ -53,7 +57,7 @@ export class SpawnDataService extends BaseDataService {
       );
     }
 
-    console.log(`Loaded spawn data in ${Date.now() - startingTime}ms`);
+    this.logger.log(`Loaded spawn data in ${Date.now() - startingTime}ms`);
   }
 
   private processSpawnInfos(data: SpawnInfos, folder: string) {

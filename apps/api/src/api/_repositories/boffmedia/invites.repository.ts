@@ -3,6 +3,7 @@ import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { wingullInvites, Invite } from '@/_db/schema/Wingull';
 import { eq, and, isNull, isNotNull, count } from 'drizzle-orm';
+import { Logger } from 'nestjs-pino';
 
 export interface CreateInviteData {
   id: string;
@@ -27,6 +28,8 @@ export interface InviteResult {
 @Injectable()
 export class InvitesRepository {
   constructor(
+    private readonly logger: Logger,
+
     @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
   ) {}
 
@@ -68,7 +71,7 @@ export class InvitesRepository {
         message: 'Failed to create invite',
       };
     } catch (error: any) {
-      console.error('Failed to create invite:', error);
+      this.logger.error('Failed to create invite:', error);
       return {
         success: false,
         message: `Invite creation failed: ${error.message}`,
@@ -86,7 +89,7 @@ export class InvitesRepository {
       const query = this.db.select(this.inviteSelect).from(wingullInvites);
       return await query.execute();
     } catch (error: any) {
-      console.error('Failed to get all invites:', error);
+      this.logger.error('Failed to get all invites:', error);
       throw new Error(`Invites retrieval failed: ${error.message}`);
     }
   }
@@ -101,7 +104,7 @@ export class InvitesRepository {
 
       return result.length > 0 ? result[0] : null;
     } catch (error: any) {
-      console.error(`Failed to find invite ${id}:`, error);
+      this.logger.error(`Failed to find invite ${id}:`, error);
       throw new Error(`Invite lookup failed: ${error.message}`);
     }
   }
@@ -122,7 +125,7 @@ export class InvitesRepository {
 
       return result.length > 0 ? result[0] : null;
     } catch (error: any) {
-      console.error(`Failed to find active invite ${id}:`, error);
+      this.logger.error(`Failed to find active invite ${id}:`, error);
       throw new Error(`Active invite lookup failed: ${error.message}`);
     }
   }
@@ -135,7 +138,7 @@ export class InvitesRepository {
         .where(eq(wingullInvites.uuid, uuid))
         .execute();
     } catch (error: any) {
-      console.error(`Failed to find invites for UUID ${uuid}:`, error);
+      this.logger.error(`Failed to find invites for UUID ${uuid}:`, error);
       throw new Error(`UUID invites lookup failed: ${error.message}`);
     }
   }
@@ -148,7 +151,10 @@ export class InvitesRepository {
         .where(eq(wingullInvites.username, username))
         .execute();
     } catch (error: any) {
-      console.error(`Failed to find invites for username ${username}:`, error);
+      this.logger.error(
+        `Failed to find invites for username ${username}:`,
+        error,
+      );
       throw new Error(`Username invites lookup failed: ${error.message}`);
     }
   }
@@ -175,7 +181,7 @@ export class InvitesRepository {
         message: 'No invite found to update',
       };
     } catch (error: any) {
-      console.error(`Failed to update invite ${id}:`, error);
+      this.logger.error(`Failed to update invite ${id}:`, error);
       return {
         success: false,
         message: `Invite update failed: ${error.message}`,
@@ -189,7 +195,7 @@ export class InvitesRepository {
     try {
       return await this.updateInvite(id, { usedAt: new Date() });
     } catch (error: any) {
-      console.error(`Failed to mark invite ${id} as used:`, error);
+      this.logger.error(`Failed to mark invite ${id} as used:`, error);
       return {
         success: false,
         message: `Mark as used failed: ${error.message}`,
@@ -203,7 +209,7 @@ export class InvitesRepository {
     try {
       return await this.updateInvite(id, { deletedAt: new Date() });
     } catch (error: any) {
-      console.error(`Failed to mark invite ${id} as deleted:`, error);
+      this.logger.error(`Failed to mark invite ${id} as deleted:`, error);
       return {
         success: false,
         message: `Mark as deleted failed: ${error.message}`,
@@ -231,7 +237,7 @@ export class InvitesRepository {
         message: 'No invite found to delete',
       };
     } catch (error: any) {
-      console.error(`Failed to delete invite ${id}:`, error);
+      this.logger.error(`Failed to delete invite ${id}:`, error);
       return {
         success: false,
         message: `Invite deletion failed: ${error.message}`,
@@ -246,7 +252,7 @@ export class InvitesRepository {
       const invite = await this.findInviteById(id);
       return !!invite;
     } catch (error: any) {
-      console.error(`Failed to check invite existence ${id}:`, error);
+      this.logger.error(`Failed to check invite existence ${id}:`, error);
       return false;
     }
   }
@@ -256,7 +262,7 @@ export class InvitesRepository {
       const invite = await this.findActiveInviteById(id);
       return !!invite;
     } catch (error: any) {
-      console.error(`Failed to check invite active status ${id}:`, error);
+      this.logger.error(`Failed to check invite active status ${id}:`, error);
       return false;
     }
   }
@@ -270,7 +276,7 @@ export class InvitesRepository {
 
       return result[0].count;
     } catch (error: any) {
-      console.error('Failed to get invite count:', error);
+      this.logger.error('Failed to get invite count:', error);
       return 0;
     }
   }
@@ -287,7 +293,7 @@ export class InvitesRepository {
 
       return result[0].count;
     } catch (error: any) {
-      console.error('Failed to get active invite count:', error);
+      this.logger.error('Failed to get active invite count:', error);
       return 0;
     }
   }
@@ -307,7 +313,7 @@ export class InvitesRepository {
 
       return result[0].count;
     } catch (error: any) {
-      console.error('Failed to get used invite count:', error);
+      this.logger.error('Failed to get used invite count:', error);
       return 0;
     }
   }

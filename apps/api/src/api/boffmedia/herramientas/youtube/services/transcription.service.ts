@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 // Type-only import - this won't be emitted in JavaScript
 import type { Innertube } from 'youtubei.js';
+import { Logger } from 'nestjs-pino';
 
 export interface TranscriptSegment {
   text: string;
@@ -35,6 +36,8 @@ export interface VideoInfoResult {
 
 @Injectable()
 export class TranscriptionService {
+  constructor(private readonly logger: Logger) {}
+
   private youtubeClient: Innertube | null = null;
 
   // ==================== CLIENT INITIALIZATION ====================
@@ -119,7 +122,7 @@ export class TranscriptionService {
         transcript,
       };
     } catch (error: any) {
-      console.error('Failed to get transcription:', error);
+      this.logger.error('Failed to get transcription:', error);
       return {
         success: false,
         message: `Failed to get transcription: ${error.message}`,
@@ -149,7 +152,7 @@ export class TranscriptionService {
         thumbnails: info.basic_info.thumbnail,
       };
     } catch (error: any) {
-      console.error('Failed to get video info:', error);
+      this.logger.error('Failed to get video info:', error);
       return {
         success: false,
         message: `Failed to get video info: ${error.message}`,

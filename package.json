@@ -1,9 +1,10 @@
 {
   "name": "boffmedia",
   "private": true,
+  "packageManager": "pnpm@10.24.0",
   "engines": {
-    "node": ">=20",
-    "pnpm": ">=9"
+    "node": ">=22",
+    "pnpm": ">=10"
   },
   "scripts": {
     "setup": "node scripts/setup-junctions.js",

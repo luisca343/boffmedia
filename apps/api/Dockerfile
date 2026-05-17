@@ -54,7 +54,7 @@ COPY --from=builder /app/apps/api/package.json ./
 # NOTE: mount your Google service-account JSON at runtime, e.g.:
 #   docker run -v /etc/boffmedia/boffmedia-b6e4f721c326.json:/app/boffmedia-b6e4f721c326.json ...
 
-EXPOSE 3000
+EXPOSE 34301
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 
 CMD ["node", "dist/main.js"]

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
+import { Logger } from 'nestjs-pino';
 
 export interface PasswordValidationResult {
   isValid: boolean;
@@ -19,6 +20,8 @@ export interface PasswordOptions {
 
 @Injectable()
 export class PasswordService {
+  constructor(private readonly logger: Logger) {}
+
   private readonly saltRounds = 12;
   private readonly minLength = 8;
   private readonly maxLength = 128;
@@ -59,7 +62,7 @@ export class PasswordService {
     try {
       return bcrypt.compare(password, hash);
     } catch (error: any) {
-      console.error('Password verification error:', error);
+      this.logger.error('Password verification error:', error);
       return false;
     }
   }

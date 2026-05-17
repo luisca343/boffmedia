@@ -157,7 +157,7 @@ export class NotificationService {
     _target: NotificationTarget,
   ): Promise<void> {
     const message = this.formatMessage(notification);
-    console.log(`[STREAM NOTIFICATION] ${message}`);
+    this.logger.log(`[STREAM NOTIFICATION] ${message}`);
 
     // Here you could save to your database instead
     // await this.saveToDatabase(notification);

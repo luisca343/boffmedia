@@ -18,6 +18,7 @@ import {
 } from './repositories/interfaces/users.repository.interface';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Logger } from 'nestjs-pino';
 
 export interface BoffMediaUserInitializationData {
   email: string;
@@ -61,6 +62,8 @@ export interface AuthenticationResult {
 @Injectable()
 export class BoffMediaUsersFacadeService {
   constructor(
+    private readonly logger: Logger,
+
     private readonly usersManagementService: BoffMediaUsersManagementService,
     private readonly smartRotomUsersFacadeService: SmartRotomUsersFacadeService,
     private readonly starbankService: StarbankFacadeService,
@@ -72,7 +75,7 @@ export class BoffMediaUsersFacadeService {
     try {
       return await this.usersManagementService.createUser(userData);
     } catch (error: any) {
-      console.error('Failed to create BoffMedia user:', error);
+      this.logger.error('Failed to create BoffMedia user:', error);
       throw new Error(`BoffMedia user creation failed: ${error.message}`);
     }
   }
@@ -81,7 +84,7 @@ export class BoffMediaUsersFacadeService {
     try {
       return await this.usersManagementService.findOrCreateUser(userData);
     } catch (error: any) {
-      console.error('Failed to find or create BoffMedia user:', error);
+      this.logger.error('Failed to find or create BoffMedia user:', error);
       throw new Error(`BoffMedia user find/create failed: ${error.message}`);
     }
   }
@@ -90,7 +93,7 @@ export class BoffMediaUsersFacadeService {
     data: BoffMediaUserInitializationData,
   ): Promise<IntegratedUserCreationResult> {
     try {
-      console.log('Initializing full user with integrations:', {
+      this.logger.log('Initializing full user with integrations:', {
         username: data.username,
         email: data.email,
       });
@@ -112,13 +115,13 @@ export class BoffMediaUsersFacadeService {
           isNewSmartRotomUser = smartRotomResult.isNewUser;
           starbankAccounts = smartRotomResult.accounts;
 
-          console.log('SmartRotom integration completed:', {
+          this.logger.log('SmartRotom integration completed:', {
             uuid: smartRotomUser.uuid,
             isNew: isNewSmartRotomUser,
             accountsCount: starbankAccounts.length,
           });
         } catch (error: any) {
-          console.error(
+          this.logger.error(
             'SmartRotom integration failed, continuing without it:',
             error,
           );
@@ -144,7 +147,7 @@ export class BoffMediaUsersFacadeService {
         isNewSmartRotomUser,
       };
     } catch (error: any) {
-      console.error('Failed to initialize full user:', error);
+      this.logger.error('Failed to initialize full user:', error);
       throw new Error(`User initialization failed: ${error.message}`);
     }
   }
@@ -155,7 +158,7 @@ export class BoffMediaUsersFacadeService {
     try {
       return await this.usersManagementService.getAllUsers();
     } catch (error: any) {
-      console.error('Failed to get all BoffMedia users:', error);
+      this.logger.error('Failed to get all BoffMedia users:', error);
       throw new Error(`Failed to retrieve users: ${error.message}`);
     }
   }
@@ -164,7 +167,7 @@ export class BoffMediaUsersFacadeService {
     try {
       return await this.usersManagementService.getUserById(id);
     } catch (error: any) {
-      console.error(`Failed to get BoffMedia user by ID ${id}:`, error);
+      this.logger.error(`Failed to get BoffMedia user by ID ${id}:`, error);
       throw new Error(`Failed to retrieve user: ${error.message}`);
     }
   }
@@ -173,7 +176,7 @@ export class BoffMediaUsersFacadeService {
     try {
       return await this.usersManagementService.getUserByUsername(username);
     } catch (error: any) {
-      console.error(
+      this.logger.error(
         `Failed to get BoffMedia user by username ${username}:`,
         error,
       );
@@ -185,7 +188,10 @@ export class BoffMediaUsersFacadeService {
     try {
       return await this.usersManagementService.getUserByEmail(email);
     } catch (error: any) {
-      console.error(`Failed to get BoffMedia user by email ${email}:`, error);
+      this.logger.error(
+        `Failed to get BoffMedia user by email ${email}:`,
+        error,
+      );
       throw new Error(`Failed to retrieve user: ${error.message}`);
     }
   }
@@ -241,7 +247,7 @@ export class BoffMediaUsersFacadeService {
             );
           starbankAccounts = userWithAccounts?.accounts || [];
         } catch (error: any) {
-          console.error('Failed to get Starbank accounts:', error);
+          this.logger.error('Failed to get Starbank accounts:', error);
         }
       }
 
@@ -252,7 +258,7 @@ export class BoffMediaUsersFacadeService {
         roles,
       };
     } catch (error: any) {
-      console.error(
+      this.logger.error(
         `Failed to get user with integrations ${identifier}:`,
         error,
       );
@@ -266,7 +272,10 @@ export class BoffMediaUsersFacadeService {
     try {
       return await this.usersManagementService.getFullUserByUsername(username);
     } catch (error: any) {
-      console.error(`Failed to get full user by username ${username}:`, error);
+      this.logger.error(
+        `Failed to get full user by username ${username}:`,
+        error,
+      );
       throw new Error(`Failed to retrieve full user: ${error.message}`);
     }
   }
@@ -275,7 +284,7 @@ export class BoffMediaUsersFacadeService {
     try {
       return await this.usersManagementService.getFullUserByEmail(email);
     } catch (error: any) {
-      console.error(`Failed to get full user by email ${email}:`, error);
+      this.logger.error(`Failed to get full user by email ${email}:`, error);
       throw new Error(`Failed to retrieve full user: ${error.message}`);
     }
   }
@@ -289,7 +298,7 @@ export class BoffMediaUsersFacadeService {
     try {
       return await this.usersManagementService.updateUser(id, updateData);
     } catch (error: any) {
-      console.error(`Failed to update BoffMedia user ${id}:`, error);
+      this.logger.error(`Failed to update BoffMedia user ${id}:`, error);
       throw new Error(`User update failed: ${error.message}`);
     }
   }
@@ -300,7 +309,7 @@ export class BoffMediaUsersFacadeService {
     try {
       return await this.usersManagementService.deleteUser(id);
     } catch (error: any) {
-      console.error(`Failed to delete BoffMedia user ${id}:`, error);
+      this.logger.error(`Failed to delete BoffMedia user ${id}:`, error);
       return {
         success: false,
         message: `User deletion failed: ${error.message}`,
@@ -340,7 +349,7 @@ export class BoffMediaUsersFacadeService {
         },
       };
     } catch (error: any) {
-      console.error(`Failed to validate user ${username}:`, error);
+      this.logger.error(`Failed to validate user ${username}:`, error);
       return null;
     }
   }
@@ -366,7 +375,7 @@ export class BoffMediaUsersFacadeService {
           : null,
       };
     } catch (error: any) {
-      console.error(`Failed to find user by email ${email}:`, error);
+      this.logger.error(`Failed to find user by email ${email}:`, error);
       return null;
     }
   }
@@ -377,7 +386,7 @@ export class BoffMediaUsersFacadeService {
     try {
       return await this.usersManagementService.createFromGoogle(googleUser);
     } catch (error: any) {
-      console.error('Failed to create user from Google:', error);
+      this.logger.error('Failed to create user from Google:', error);
       throw new Error(`Google authentication failed: ${error.message}`);
     }
   }
@@ -388,7 +397,7 @@ export class BoffMediaUsersFacadeService {
     registerData: MinecraftRegistrationData,
   ): Promise<IntegratedUserCreationResult> {
     try {
-      console.log('Creating integrated Minecraft user:', {
+      this.logger.log('Creating integrated Minecraft user:', {
         username: registerData.username,
         mcUsername: registerData.minecraft.username,
         uuid: registerData.minecraft.uuid,
@@ -402,7 +411,7 @@ export class BoffMediaUsersFacadeService {
         minecraft: registerData.minecraft,
       });
 
-      console.log('Minecraft user creation completed:', {
+      this.logger.log('Minecraft user creation completed:', {
         boffMediaUserId: result.boffMediaUser.id,
         smartRotomUserId: result.smartRotomUser?.id,
         hasStarbank: result.starbankAccounts.length > 0,
@@ -410,7 +419,7 @@ export class BoffMediaUsersFacadeService {
 
       return result;
     } catch (error: any) {
-      console.error('Failed to create Minecraft user:', error);
+      this.logger.error('Failed to create Minecraft user:', error);
       throw new Error(`Minecraft user creation failed: ${error.message}`);
     }
   }
@@ -421,7 +430,7 @@ export class BoffMediaUsersFacadeService {
     starbankAccounts: any[];
   }> {
     try {
-      console.log('Linking Minecraft account:', {
+      this.logger.log('Linking Minecraft account:', {
         username: linkData.username,
         mcUuid: linkData.minecraft.uuid,
       });
@@ -447,7 +456,7 @@ export class BoffMediaUsersFacadeService {
       const boffMediaUser =
         await this.usersManagementService.linkMinecraftAccount(linkData);
 
-      console.log('Minecraft account linking completed:', {
+      this.logger.log('Minecraft account linking completed:', {
         boffMediaUserId: boffMediaUser.id,
         smartRotomUserId: smartRotomResult.user.id,
         accountsCount: smartRotomResult.accounts.length,
@@ -459,7 +468,7 @@ export class BoffMediaUsersFacadeService {
         starbankAccounts: smartRotomResult.accounts,
       };
     } catch (error: any) {
-      console.error('Failed to link Minecraft account:', error);
+      this.logger.error('Failed to link Minecraft account:', error);
       throw new Error(`Minecraft account linking failed: ${error.message}`);
     }
   }
@@ -470,7 +479,7 @@ export class BoffMediaUsersFacadeService {
     try {
       return await this.usersManagementService.getUserRoles(userId);
     } catch (error: any) {
-      console.error(`Failed to get user roles for ${userId}:`, error);
+      this.logger.error(`Failed to get user roles for ${userId}:`, error);
       throw new Error(`Failed to get user roles: ${error.message}`);
     }
   }
@@ -496,7 +505,7 @@ export class BoffMediaUsersFacadeService {
           );
           results[id] = userWithIntegrations;
         } catch (error: any) {
-          console.error(
+          this.logger.error(
             `Failed to get user with integrations for ID ${id}:`,
             error,
           );
@@ -507,7 +516,10 @@ export class BoffMediaUsersFacadeService {
       await Promise.all(promises);
       return results;
     } catch (error: any) {
-      console.error('Failed to get multiple users with integrations:', error);
+      this.logger.error(
+        'Failed to get multiple users with integrations:',
+        error,
+      );
       throw new Error(`Batch user retrieval failed: ${error.message}`);
     }
   }
@@ -542,7 +554,10 @@ export class BoffMediaUsersFacadeService {
             if (userWithIntegrations.roles.length > 0) usersWithRoles++;
           }
         } catch (error: any) {
-          console.error(`Failed to get statistics for user ${user.id}:`, error);
+          this.logger.error(
+            `Failed to get statistics for user ${user.id}:`,
+            error,
+          );
         }
       });
 
@@ -555,7 +570,7 @@ export class BoffMediaUsersFacadeService {
         usersWithRoles,
       };
     } catch (error: any) {
-      console.error('Failed to get user statistics:', error);
+      this.logger.error('Failed to get user statistics:', error);
       return {
         totalBoffMediaUsers: 0,
         usersWithSmartRotom: 0,
@@ -569,7 +584,7 @@ export class BoffMediaUsersFacadeService {
     try {
       return await this.usersManagementService.getUserCount();
     } catch (error: any) {
-      console.error('Failed to get user count:', error);
+      this.logger.error('Failed to get user count:', error);
       return 0;
     }
   }
@@ -584,7 +599,7 @@ export class BoffMediaUsersFacadeService {
       const user = await this.getUserWithIntegrations(identifier, type);
       return !!user;
     } catch (error: any) {
-      console.error(`Failed to validate user exists ${identifier}:`, error);
+      this.logger.error(`Failed to validate user exists ${identifier}:`, error);
       return false;
     }
   }

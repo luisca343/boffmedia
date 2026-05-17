@@ -19,10 +19,13 @@ import { ArcadeInventoryResponse } from './entities/inventory-response.entity';
 import { LootboxConfigEntity } from './entities/lootbox-config.entity';
 import { DailyRewardsConfig } from './entities/daily-rewards.entity';
 import { ClaimItemsDto, ClaimItemsResponseDto } from './dto/claim-items.dto';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class ArcadeFacadeService implements OnModuleInit {
   constructor(
+    private readonly logger: Logger,
+
     private readonly streakService: StreakService,
     private readonly inventoryService: InventoryService,
     private readonly lootboxService: LootboxService,
@@ -31,7 +34,7 @@ export class ArcadeFacadeService implements OnModuleInit {
 
   async onModuleInit() {
     // Initialize any required data or configurations
-    console.log('ArcadeFacadeService initialized');
+    this.logger.log('ArcadeFacadeService initialized');
   }
 
   // ==================== STREAK MANAGEMENT ====================
@@ -320,7 +323,7 @@ export class ArcadeFacadeService implements OnModuleInit {
   // ==================== COMBINED OPERATIONS ====================
 
   async claimItems(claimData: ClaimItemsDto): Promise<ClaimItemsResponseDto> {
-    console.log('Claiming items:', claimData);
+    this.logger.log('Claiming items:', claimData);
 
     const { uuid, items } = claimData;
 
@@ -338,7 +341,7 @@ export class ArcadeFacadeService implements OnModuleInit {
     // Validate items structure
     const validItems = items.filter((item) => {
       if (!item || !item.id || !item.itemId || !item.itemType) {
-        console.warn(`Invalid item detected:`, item);
+        this.logger.warn(`Invalid item detected:`, item);
         return false;
       }
       return true;
@@ -378,7 +381,7 @@ export class ArcadeFacadeService implements OnModuleInit {
               availableAmount,
             );
           } catch (consumeError) {
-            console.error(
+            this.logger.error(
               `Error consuming item ${item.itemId} (ID: ${item.id}):`,
               consumeError,
             );
@@ -405,7 +408,7 @@ export class ArcadeFacadeService implements OnModuleInit {
               pokemonItems.push(item.itemId);
               claimedItems.push(item.itemId);
             } catch (pokemonError) {
-              console.error(
+              this.logger.error(
                 `Failed to give Pokemon ${item.itemId} to ${uuid}:`,
                 pokemonError,
               );
@@ -430,7 +433,7 @@ export class ArcadeFacadeService implements OnModuleInit {
               regularItems.push(item.itemId);
               claimedItems.push(item.itemId);
             } catch (itemError) {
-              console.error(
+              this.logger.error(
                 `Failed to give item ${item.itemId} to ${uuid}:`,
                 itemError,
               );
@@ -441,7 +444,7 @@ export class ArcadeFacadeService implements OnModuleInit {
             }
           }
         } catch (itemError) {
-          console.error(
+          this.logger.error(
             `Error processing item ${item.itemId} for user ${uuid}:`,
             itemError,
           );
@@ -461,7 +464,7 @@ export class ArcadeFacadeService implements OnModuleInit {
       }
 
       if (errors.length > 0) {
-        console.warn('Claim items errors:', errors);
+        this.logger.warn('Claim items errors:', errors);
       }
 
       return {
@@ -473,7 +476,7 @@ export class ArcadeFacadeService implements OnModuleInit {
         message,
       };
     } catch (error: any) {
-      console.error('Critical error in claimItems:', error);
+      this.logger.error('Critical error in claimItems:', error);
       throw new BadRequestException(`Failed to claim items: ${error.message}`);
     }
   }

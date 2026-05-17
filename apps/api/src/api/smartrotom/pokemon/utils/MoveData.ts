@@ -2,6 +2,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { promises as fsPromises } from 'fs';
 import { Attack } from '@/types/move';
+import pino from 'pino';
+
+const logger = pino({ name: 'util' });
 
 export class MoveData {
   constructor() {}
@@ -55,7 +58,7 @@ export class MoveData {
       this.movesByCategory[data.attackCategory] = data;
     }
 
-    console.log(
+    logger.info(
       `Cargados ${terasCounter} movimientos de Teras y ${defaultCounter} movimientos por defecto en ${Date.now() - startingTime}ms`,
     );
   }

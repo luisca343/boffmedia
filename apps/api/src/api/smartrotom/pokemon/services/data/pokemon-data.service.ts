@@ -8,6 +8,7 @@ import {
 } from '../../interfaces/pokemon.interface';
 import * as path from 'path';
 import { promises as fsPromises } from 'fs';
+import { Logger } from 'nestjs-pino';
 
 export interface EvoTreeNode {
   pkm: string;
@@ -19,7 +20,10 @@ export interface EvoTreeNode {
 
 @Injectable()
 export class PokemonDataService extends BaseDataService {
-  constructor(private readonly moveDataService: MoveDataService) {
+  constructor(
+    private readonly logger: Logger,
+    private readonly moveDataService: MoveDataService,
+  ) {
     super();
   }
 
@@ -62,7 +66,7 @@ export class PokemonDataService extends BaseDataService {
         }
       });
     } catch (error: any) {
-      console.warn(
+      this.logger.warn(
         'No custom species directory found or error reading it:',
         error.message,
       );
@@ -269,13 +273,13 @@ export class PokemonDataService extends BaseDataService {
       (sum, forms) => sum + forms.length,
       0,
     );
-    console.log(
+    this.logger.log(
       `Loaded ${this.species.length} species and ${Object.keys(this.speciesByForm).length} different forms, for a total of ${totalForms} Pokémon`,
     );
-    console.log(
+    this.logger.log(
       `Loaded ${Object.keys(this.finalForms).length} final evolutionary forms`,
     );
-    console.log(`Loading time: ${Date.now() - startTime}ms`);
+    this.logger.log(`Loading time: ${Date.now() - startTime}ms`);
   }
 
   getAllSpecies(): Pokemon[] {

@@ -9,6 +9,7 @@ import { MessageSender } from './enums/message-sender.enum';
 import { firstLetterToUpperCase } from '@/_utils/stringUtils';
 import { MessagePartType } from './dto/message-part.dto';
 import { PokemonNotFoundError } from './errors/pokemon-not-found.error';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class FicusAIFacadeService {
@@ -17,6 +18,8 @@ export class FicusAIFacadeService {
   private currentContextMessages: FicusMessageContentDto[];
 
   constructor(
+    private readonly logger: Logger,
+
     private readonly messageService: MessageService,
     private readonly aiService: AIService,
     private readonly pokemonDataService: PokemonDataService,
@@ -80,15 +83,15 @@ export class FicusAIFacadeService {
         this.currentContextMessages,
       );
 
-      console.log('================= Gemini Response ================');
-      console.log(geminiResponse);
+      this.logger.log('================= Gemini Response ================');
+      this.logger.log(geminiResponse);
 
       // Process function calls if present
       if (
         geminiResponse.functionCalls &&
         geminiResponse.functionCalls.length > 0
       ) {
-        console.log(
+        this.logger.log(
           'Function calls found in Gemini response:',
           geminiResponse.functionCalls,
         );
@@ -99,7 +102,7 @@ export class FicusAIFacadeService {
         );
       } else {
         // No function calls, return simple text response
-        console.log(
+        this.logger.log(
           'No function calls found in Gemini response. Sending raw text response.',
         );
         return {
@@ -114,7 +117,7 @@ export class FicusAIFacadeService {
         };
       }
     } catch (error: any) {
-      console.error('Error generating AI response:', error);
+      this.logger.error('Error generating AI response:', error);
       return {
         sender: MessageSender.BOT,
         parts: [
@@ -140,7 +143,7 @@ export class FicusAIFacadeService {
 
     // Deduplicate function calls
     const uniqueCalls = this.aiService.deduplicateFunctionCalls(functionCalls);
-    console.log(
+    this.logger.log(
       `[Deduplication] Original calls: ${functionCalls.length}, Unique calls: ${uniqueCalls.length}`,
     );
 
@@ -150,7 +153,7 @@ export class FicusAIFacadeService {
 
     // Process each function call
     for (const call of uniqueCalls) {
-      console.log(
+      this.logger.log(
         `Processing function call: ${call.name} with args:`,
         call.args,
       );
@@ -171,7 +174,7 @@ export class FicusAIFacadeService {
         );
       } catch (error: any) {
         if (error instanceof PokemonNotFoundError) {
-          console.log(`Handling Pokémon not found: ${error.pokemonName}`);
+          this.logger.log(`Handling Pokémon not found: ${error.pokemonName}`);
 
           // Generate intelligent response using Gemma
           const fallbackResponse =
@@ -185,7 +188,7 @@ export class FicusAIFacadeService {
           // Return the fallback response directly
           return fallbackResponse;
         } else {
-          console.error('Error executing function call:', error);
+          this.logger.error('Error executing function call:', error);
           allParts.push({
             type: MessagePartType.TEXT,
             content: 'Lo siento, ocurrió un error al procesar tu solicitud.',
@@ -213,7 +216,7 @@ export class FicusAIFacadeService {
     if (randomPokemonCalls.length > 1) {
       const randomResult = this.pokemonDataService.getRandomPokemon(['basic']);
       if (randomResult.pokemon) {
-        console.log(
+        this.logger.log(
           `[Multiple Random Calls] Selected shared random Pokémon: ${randomResult.pokemon.name} for ${randomPokemonCalls.length} calls`,
         );
         return randomResult.pokemon;
@@ -270,7 +273,7 @@ export class FicusAIFacadeService {
 
           // If Pokémon not found, throw error to trigger fallback response
           if (pokemonData === null) {
-            console.log(
+            this.logger.log(
               `Pokémon "${call.args.pokemon}" not found, will generate fallback response with Gemma`,
             );
 
@@ -287,7 +290,7 @@ export class FicusAIFacadeService {
 
           return pokemonData;
         } else {
-          console.error(
+          this.logger.error(
             'Invalid pokemon argument type for getPokemonData:',
             call.args.pokemon,
           );
@@ -300,7 +303,7 @@ export class FicusAIFacadeService {
         }
 
       default:
-        console.log(`Unhandled function call: ${call.name}`);
+        this.logger.log(`Unhandled function call: ${call.name}`);
         return [
           {
             type: MessagePartType.TEXT,

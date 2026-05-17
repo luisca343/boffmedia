@@ -2,9 +2,12 @@ import { promises as fs } from 'fs';
 import * as path from 'path';
 import axios from 'axios';
 import { Injectable } from '@nestjs/common';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class TcgImageService {
+  constructor(private readonly logger: Logger) {}
+
   async downloadSetImages(sets: any[]): Promise<void> {
     for (const set of sets) {
       const setImgDir = path.join(
@@ -30,7 +33,10 @@ export class TcgImageService {
           // Store path WITHOUT /public prefix
           set.logo_local = `/img/games/tcg/sets/${set.id}/logo.webp`;
         } catch (err: any) {
-          console.warn(`[TCG] Failed to download logo for set ${set.id}:`, err);
+          this.logger.warn(
+            `[TCG] Failed to download logo for set ${set.id}:`,
+            err,
+          );
           set.logo_local = null;
         }
       }
@@ -47,7 +53,7 @@ export class TcgImageService {
           // Store path WITHOUT /public prefix
           set.symbol_local = `/img/games/tcg/sets/${set.id}/symbol.webp`;
         } catch (err: any) {
-          console.warn(
+          this.logger.warn(
             `[TCG] Failed to download symbol for set ${set.id}:`,
             err,
           );
@@ -66,7 +72,7 @@ export class TcgImageService {
     if (!cardData.image) return null;
 
     try {
-      console.log(
+      this.logger.log(
         `[TCG] Downloading ${locale.toUpperCase()} image for card ${cardId}...`,
       );
       const cardImgDir = path.join(
@@ -90,7 +96,7 @@ export class TcgImageService {
 
       return `/img/games/tcg/cards/${setId}/${cardId}_${locale}.webp`;
     } catch (err: any) {
-      console.warn(
+      this.logger.warn(
         `[TCG] Failed to download ${locale} image for card ${cardId}:`,
         err,
       );
@@ -107,7 +113,7 @@ export class TcgImageService {
   ): Promise<string | null> {
     // If image already exists in DB, return it
     if (existingImagePath) {
-      console.log(
+      this.logger.log(
         `[TCG] ${locale.toUpperCase()} image for card ${cardId} already exists: ${existingImagePath}`,
       );
       return existingImagePath;
@@ -121,7 +127,7 @@ export class TcgImageService {
       locale,
     );
     if (imagePath) {
-      console.log(
+      this.logger.log(
         `[TCG] ${locale.toUpperCase()} image downloaded for card ${cardId}: ${imagePath}`,
       );
     }

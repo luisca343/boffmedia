@@ -8,7 +8,10 @@ import { LoggerModule as PinoLoggerModule } from 'nestjs-pino';
         level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
         transport:
           process.env.NODE_ENV !== 'production'
-            ? { target: 'pino-pretty', options: { colorize: true, singleLine: false } }
+            ? {
+                target: 'pino-pretty',
+                options: { colorize: true, singleLine: false },
+              }
             : undefined,
         customProps: () => ({
           service: 'boffmedia-api',

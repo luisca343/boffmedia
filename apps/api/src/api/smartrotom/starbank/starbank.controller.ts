@@ -33,12 +33,16 @@ import { StarBankAccount } from './entities/starbank-account.entity';
 import { StarBankTransaction } from './entities/starbank-transaction.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import { Logger } from 'nestjs-pino';
 
 @ApiTags('SmartRotom | Starbank')
 @Controller('smartrotom/starbank')
 @UseInterceptors(ResponseInterceptor)
 export class StarbankController {
-  constructor(private readonly starbankFacadeService: StarbankFacadeService) {}
+  constructor(
+    private readonly logger: Logger,
+    private readonly starbankFacadeService: StarbankFacadeService,
+  ) {}
 
   // ==================== ACCOUNT OPERATIONS ====================
 
@@ -144,7 +148,7 @@ export class StarbankController {
         .replace(/^public[\\/]/, '')
         .replace(/\\/g, '/');
       imagePath = `/${relativePath}`;
-      console.log('Image saved:', {
+      this.logger.log('Image saved:', {
         filename: image.filename,
         originalPath: image.path,
         relativePath: imagePath,

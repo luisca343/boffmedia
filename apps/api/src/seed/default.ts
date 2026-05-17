@@ -9,6 +9,9 @@ import {
   boffMediaUsers,
 } from '../_db/schema/BoffMedia';
 import { smartrotomApps, smartrotomUsers } from '../_db/schema/SmartRotom';
+import pino from 'pino';
+
+const logger = pino({ name: 'util' });
 
 async function main() {
   const DATABASE_URL = process.env.DATABASE_URL;
@@ -18,7 +21,7 @@ async function main() {
   const db = drizzle(connection);
 
   // ── Roles ──────────────────────────────────────────────────────────────────
-  console.log('Seeding roles…');
+  logger.info('Seeding roles…');
   for (const name of ['BOFF_ADMIN', 'ROTOM_ADMIN']) {
     await db
       .insert(boffMediaRoles)
@@ -27,7 +30,7 @@ async function main() {
   }
 
   // ── SmartRotom user (parent FK — must precede boffmedia_users) ─────────────
-  console.log('Seeding rotom_users…');
+  logger.info('Seeding rotom_users…');
   const ADMIN_UUID = '00000000-0000-0000-0000-000000000001';
   await db
     .insert(smartrotomUsers)
@@ -35,7 +38,7 @@ async function main() {
     .onDuplicateKeyUpdate({ set: { username: sql`username` } });
 
   // ── BoffMedia user ──────────────────────────────────────────────────────────
-  console.log('Seeding boffmedia_users…');
+  logger.info('Seeding boffmedia_users…');
   const hashedPassword = await bcrypt.hash('admin123', 12);
   await db
     .insert(boffMediaUsers)
@@ -48,7 +51,7 @@ async function main() {
     .onDuplicateKeyUpdate({ set: { username: sql`username` } });
 
   // ── User → role assignments ─────────────────────────────────────────────────
-  console.log('Seeding user roles…');
+  logger.info('Seeding user roles…');
   const [adminUser] = await db
     .select({ id: boffMediaUsers.id })
     .from(boffMediaUsers)
@@ -74,7 +77,7 @@ async function main() {
   }
 
   // ── Apps ────────────────────────────────────────────────────────────────────
-  console.log('Seeding rotom_apps…');
+  logger.info('Seeding rotom_apps…');
   const apps = [
     { name: 'ChatApp', active: 1 },
     { name: 'StarBank', active: 1 },
@@ -91,10 +94,10 @@ async function main() {
   }
 
   await connection.end();
-  console.log('✓ Seed complete');
+  logger.info('✓ Seed complete');
 }
 
 main().catch((err) => {
-  console.error(err);
+  logger.error(err);
   process.exit(1);
 });

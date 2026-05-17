@@ -1,3 +1,7 @@
+import pino from 'pino';
+
+const logger = pino({ name: 'util' });
+
 export class LoggingUtil {
   private static instance: LoggingUtil;
   private logging: boolean;
@@ -15,7 +19,7 @@ export class LoggingUtil {
 
   toggleLogging(): boolean {
     this.logging = !this.logging;
-    console.log(`Logging is now ${this.logging}`);
+    logger.info(`Logging is now ${this.logging}`);
     return this.logging;
   }
 

@@ -4,6 +4,9 @@
 
 import axios from 'axios';
 import type { AxiosRequestConfig } from 'axios';
+import pino from 'pino';
+
+const logger = pino({ name: 'util' });
 
 // ── Proxy pool ─────────────────────────────────────────────────────────────
 
@@ -39,9 +42,9 @@ async function loadProxyPool(): Promise<string[]> {
         return `http://${user}:${pass}@${host}:${port}`;
       });
     proxyPoolLoadedAt = Date.now();
-    console.log(`[manga-http] Loaded ${proxyPool.length} proxies from pool`);
+    logger.info(`[manga-http] Loaded ${proxyPool.length} proxies from pool`);
   } catch (err) {
-    console.warn(
+    logger.warn(
       `[manga-http] Failed to load proxy list: ${(err as Error).message}`,
     );
     proxyPool = [];

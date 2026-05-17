@@ -4,10 +4,13 @@ import { StarBankAccount } from '../entities/starbank-account.entity';
 import { AccountType } from '../enums/account-type.enum';
 import { CreateAccountDto } from '../dto/create-account.dto';
 import { IStarbankAccountRepository } from '../repositories/interfaces/starbank-account.repository';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class StarbankAccountService {
   constructor(
+    private readonly logger: Logger,
+
     @Inject(STARBANK_ACCOUNT_REPOSITORY_TOKEN)
     private readonly accountRepository: IStarbankAccountRepository,
   ) {}
@@ -41,7 +44,7 @@ export class StarbankAccountService {
       image: createAccountDto.image,
     };
 
-    console.log('Creating account with data:', accountData);
+    this.logger.log('Creating account with data:', accountData);
 
     return await this.accountRepository.create(accountData);
   }
@@ -85,7 +88,7 @@ export class StarbankAccountService {
       const balance = await this.accountRepository.getUserBalance(uuid);
       return { balance };
     } catch (error: any) {
-      console.error(`Failed to get balance for user ${uuid}:`, error);
+      this.logger.error(`Failed to get balance for user ${uuid}:`, error);
       return { balance: 0 };
     }
   }
@@ -102,7 +105,10 @@ export class StarbankAccountService {
     try {
       return await this.accountRepository.checkAccountExists(accountId);
     } catch (error: any) {
-      console.error(`Failed to check if account ${accountId} exists:`, error);
+      this.logger.error(
+        `Failed to check if account ${accountId} exists:`,
+        error,
+      );
       return false;
     }
   }

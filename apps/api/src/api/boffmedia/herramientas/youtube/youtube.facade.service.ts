@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Logger } from 'nestjs-pino';
 import {
   TranscriptionService,
   TranscriptionResult,
@@ -7,7 +8,10 @@ import {
 
 @Injectable()
 export class YoutubeFacadeService {
-  constructor(private readonly transcriptionService: TranscriptionService) {}
+  constructor(
+    private readonly logger: Logger,
+    private readonly transcriptionService: TranscriptionService,
+  ) {}
 
   // ==================== TRANSCRIPTION OPERATIONS ====================
 
@@ -15,7 +19,7 @@ export class YoutubeFacadeService {
     try {
       return await this.transcriptionService.getTranscription(videoId);
     } catch (error: any) {
-      console.error('Error getting transcription:', error);
+      this.logger.error('Error getting transcription:', error);
       throw new Error(`Failed to retrieve transcription: ${error.message}`);
     }
   }
@@ -24,7 +28,7 @@ export class YoutubeFacadeService {
     try {
       return await this.transcriptionService.getVideoInfo(videoId);
     } catch (error: any) {
-      console.error('Error getting video info:', error);
+      this.logger.error('Error getting video info:', error);
       throw new Error(`Failed to retrieve video info: ${error.message}`);
     }
   }

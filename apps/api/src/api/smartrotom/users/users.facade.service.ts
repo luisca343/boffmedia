@@ -5,6 +5,7 @@ import { CreateSmartrotomUserDto } from './dto/create-user.dto';
 import { UpdateSmartrotomUserDto } from './dto/update-user.dto';
 import { StarbankFacadeService } from '../starbank/starbank.facade.service';
 import { ChatappFacadeService } from '../chatapp/chatapp.facade.service';
+import { Logger } from 'nestjs-pino';
 
 export interface UserInitializationData {
   uuid: string;
@@ -27,6 +28,8 @@ export interface UserWithAccounts {
 @Injectable()
 export class UsersFacadeService {
   constructor(
+    private readonly logger: Logger,
+
     private readonly usersService: UsersService,
     private readonly starbankService: StarbankFacadeService,
     private readonly chatAppService: ChatappFacadeService,
@@ -96,7 +99,7 @@ export class UsersFacadeService {
         1000,
         'Ingreso de Bienvenida',
       );
-      console.log(`Welcome bonus credited to user ${data.uuid}`);
+      this.logger.log(`Welcome bonus credited to user ${data.uuid}`);
     }
 
     // Create saved messages chat (non-blocking)
@@ -106,9 +109,9 @@ export class UsersFacadeService {
         users: [],
         name: 'Mensajes Guardados',
       });
-      console.log(`Saved Messages chat created for user ${data.uuid}`);
+      this.logger.log(`Saved Messages chat created for user ${data.uuid}`);
     } catch (error: any) {
-      console.warn(
+      this.logger.warn(
         `Failed to create Saved Messages chat for user ${data.uuid}, continuing anyway:`,
         error.message,
       );
@@ -159,7 +162,10 @@ export class UsersFacadeService {
           const userWithAccounts = await this.getUserWithAccounts(uuid);
           return { uuid, result: userWithAccounts };
         } catch (error: any) {
-          console.error(`Failed to get user with accounts for ${uuid}:`, error);
+          this.logger.error(
+            `Failed to get user with accounts for ${uuid}:`,
+            error,
+          );
           return { uuid, result: null };
         }
       });

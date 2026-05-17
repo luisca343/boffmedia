@@ -2,9 +2,12 @@ import { Injectable } from '@nestjs/common';
 import axios, { AxiosResponse } from 'axios';
 import { WingullBalanceDto } from '../dto/wingull-balance.dto';
 import { IWingullEconomyRepository } from './interfaces/wingull-economy.repository.interface';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class WingullEconomyRepository implements IWingullEconomyRepository {
+  constructor(private readonly logger: Logger) {}
+
   private readonly WINGULL_API_BASE_URL = process.env.WINGULL_API;
   private readonly DEFAULT_TIMEOUT = 10000;
 
@@ -25,7 +28,7 @@ export class WingullEconomyRepository implements IWingullEconomyRepository {
       );
       return response.data.data;
     } catch (error: any) {
-      console.error('Failed to update balance in WINGULL API:', error);
+      this.logger.error('Failed to update balance in WINGULL API:', error);
       throw new Error(`Balance update failed: ${error.message}`);
     }
   }
@@ -50,7 +53,10 @@ export class WingullEconomyRepository implements IWingullEconomyRepository {
       );
       return response.data.data;
     } catch (error: any) {
-      console.error(`Failed to get current balance for UUID ${uuid}:`, error);
+      this.logger.error(
+        `Failed to get current balance for UUID ${uuid}:`,
+        error,
+      );
       throw new Error(`Current balance retrieval failed: ${error.message}`);
     }
   }
@@ -75,7 +81,7 @@ export class WingullEconomyRepository implements IWingullEconomyRepository {
       );
       return response.data.data;
     } catch (error: any) {
-      console.error(`Failed to get money for UUID ${uuid}:`, error);
+      this.logger.error(`Failed to get money for UUID ${uuid}:`, error);
       throw new Error(`Money retrieval failed: ${error.message}`);
     }
   }

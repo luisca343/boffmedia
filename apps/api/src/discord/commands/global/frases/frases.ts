@@ -17,10 +17,14 @@ import {
   ButtonStyle,
 } from 'discord.js';
 import { FrasesDto } from './_dto/frases.dto';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class FrasesCommand {
-  constructor(private readonly service: CommandsService) {}
+  constructor(
+    private readonly logger: Logger,
+    private readonly service: CommandsService,
+  ) {}
 
   @SlashCommand({
     name: 'frases',
@@ -38,7 +42,7 @@ export class FrasesCommand {
     try {
       await interaction.reply({ embeds: [embed], components: [row] });
     } catch (error: any) {
-      console.error('Error replying to interaction:', error);
+      this.logger.error('Error replying to interaction:', error);
     }
   }
 
@@ -119,7 +123,7 @@ export class FrasesCommand {
 
       await interaction.update({ embeds: [embed], components: [row] });
     } catch (error: any) {
-      console.error('Error handling button interaction:', error);
+      this.logger.error('Error handling button interaction:', error);
       if (!interaction.replied) {
         await interaction.reply({
           content: 'There was an error while processing the interaction.',

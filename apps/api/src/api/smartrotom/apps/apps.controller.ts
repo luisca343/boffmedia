@@ -19,12 +19,16 @@ import { GetPlayerAppsDto } from './dto/get-player-apps.dto';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { SmartRotomApp } from './entities/app.entity';
 import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
+import { Logger } from 'nestjs-pino';
 
 @ApiTags('SmartRotom | Apps')
 @Controller('/smartrotom/apps')
 @UseInterceptors(ResponseInterceptor)
 export class AppsController {
-  constructor(private readonly appsFacadeService: AppsFacadeService) {}
+  constructor(
+    private readonly logger: Logger,
+    private readonly appsFacadeService: AppsFacadeService,
+  ) {}
 
   // ==================== APP MANAGEMENT ====================
 
@@ -167,7 +171,7 @@ export class AppsController {
   async getForPlayer(
     @Body() { uuid }: GetPlayerAppsDto,
   ): Promise<SmartRotomApp[]> {
-    console.log('Fetching apps for player:', uuid);
+    this.logger.log('Fetching apps for player:', uuid);
     return this.appsFacadeService.getAppsForPlayer(uuid);
   }
 
@@ -210,7 +214,7 @@ export class AppsController {
   })
   @ApiBody({ type: OrderAppDto })
   async order(@Body() orderDto: OrderAppDto): Promise<SuccessResponse> {
-    console.log('Ordering apps with data:', orderDto);
+    this.logger.log('Ordering apps with data:', orderDto);
     const result = await this.appsFacadeService.orderApps(
       orderDto.order,
       orderDto.uuid,
