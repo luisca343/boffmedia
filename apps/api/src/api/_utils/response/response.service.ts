@@ -1,4 +1,5 @@
-import { Injectable, HttpStatus, HttpException, Logger } from '@nestjs/common';
+import { Injectable, HttpStatus, HttpException } from '@nestjs/common';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class ResponseService {
