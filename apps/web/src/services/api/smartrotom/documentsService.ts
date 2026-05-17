@@ -1,4 +1,4 @@
-import { rotomGET, rotomPOST, rotomPUT, rotomDELETE } from '@/services/boffAPI';
+import { rotomGET, rotomPOST, rotomPUT, rotomDELETE, apiAuthedPOST, apiAuthedPUT, apiAuthedDELETE } from '@/services/boffAPI';
 import type {
   CreateDocumentDto,
   CreateDocumentDtoWithUuid,
@@ -114,24 +114,24 @@ export class DocumentsService {
   }
   
   /**
-   * Create a new news article
+   * Create a new news article (requires auth token)
    */
-  static createNews(data: CreateNewsDto) {
-    return rotomPOST<News>('/documents/news', data);
+  static createNews(data: CreateNewsDto, token: string) {
+    return apiAuthedPOST<News>('/smartrotom/documents/news', data, token);
   }
   
   /**
-   * Update an existing news article
+   * Update an existing news article (requires auth token)
    */
-  static updateNews(newsId: number, data: UpdateNewsDto) {
-    return rotomPUT<News>(`/documents/news/${newsId}`, data);
+  static updateNews(newsId: number, data: UpdateNewsDto, token: string) {
+    return apiAuthedPUT<News>(`/smartrotom/documents/news/${newsId}`, data, token);
   }
   
   /**
-   * Delete a news article
+   * Delete a news article (requires auth token)
    */
-  static deleteNews(newsId: number) {
-    return rotomDELETE<SuccessResponse>(`/documents/news/${newsId}`);
+  static deleteNews(newsId: number, token: string) {
+    return apiAuthedDELETE<SuccessResponse>(`/smartrotom/documents/news/${newsId}`, token);
   }
   
   /**
@@ -151,9 +151,9 @@ export class DocumentsService {
   }
 
   /**
-   * Legacy method: Update active news
+   * Legacy method: Update active news (requires auth token)
    */
-  static updateActiveNews(newsId: number, data: UpdateNewsDto) {
-    return rotomPUT<News>(`/documents/news/${newsId}`, data);
+  static updateActiveNews(newsId: number, data: UpdateNewsDto, token: string) {
+    return apiAuthedPUT<News>(`/smartrotom/documents/news/${newsId}`, data, token);
   }
 }

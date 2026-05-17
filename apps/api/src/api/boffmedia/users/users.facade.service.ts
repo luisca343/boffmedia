@@ -366,6 +366,7 @@ export class BoffMediaUsersFacadeService {
         id: fullUser.boffmedia_users.id,
         name: fullUser.boffmedia_users.username,
         email: fullUser.boffmedia_users.email,
+        roles: [],
         smartRotomUser: fullUser.rotom_users
           ? {
               username: fullUser.rotom_users.username,
@@ -611,6 +612,7 @@ export class BoffMediaUsersFacadeService {
       id: fullUser.boffmedia_users.id,
       name: fullUser.boffmedia_users.username,
       email: fullUser.boffmedia_users.email,
+      roles: [],
       smartRotomUser: fullUser.rotom_users
         ? {
             username: fullUser.rotom_users.username,
