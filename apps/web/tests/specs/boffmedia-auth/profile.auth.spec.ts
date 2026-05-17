@@ -1,13 +1,12 @@
-import { test, expect } from "../fixtures"
+import { test, expect } from "../../fixtures"
 
 test.describe("Profile page — unauthenticated", () => {
-  // Override the session so this describe block runs without a user
   test.use({ storageState: { cookies: [], origins: [] } })
 
-  test("shows access required message when not logged in", async ({ profilePage }) => {
+  test("shows access required gate when not logged in", { tag: "@smoke" }, async ({ profilePage }) => {
     await profilePage.goto()
     await expect(profilePage.accessRequiredHeading).toBeVisible()
-    await expect(profilePage.page.getByText("Inicia sesión para ver tu perfil.")).toBeVisible()
+    await expect(profilePage.accessRequiredText).toBeVisible()
   })
 })
 
@@ -16,7 +15,7 @@ test.describe("Profile page — authenticated", () => {
     await profilePage.goto()
   })
 
-  test("renders user name and email", async ({ profilePage }) => {
+  test("renders user name and profile fields", { tag: "@smoke" }, async ({ profilePage }) => {
     await expect(profilePage.userNameHeading).toBeVisible()
     await expect(profilePage.nameInput).toBeVisible()
     await expect(profilePage.emailInput).toBeVisible()
@@ -27,12 +26,16 @@ test.describe("Profile page — authenticated", () => {
     await expect(profilePage.emailInput).toBeDisabled()
   })
 
-  test("Edit profile button is visible and Edit button is not in editing mode initially", async ({ profilePage }) => {
+  test("Edit profile button is visible in view mode", async ({ profilePage }) => {
     await expect(profilePage.editProfileButton).toBeVisible()
-    await expect(profilePage.saveChangesButton).not.toBeVisible()
   })
 
-  test("clicking Edit profile enables inputs and shows Save / Cancel", async ({ profilePage }) => {
+  test("Save and Cancel buttons are hidden in view mode", async ({ profilePage }) => {
+    await expect(profilePage.saveChangesButton).not.toBeVisible()
+    await expect(profilePage.cancelButton).not.toBeVisible()
+  })
+
+  test("clicking Edit profile enables inputs and shows Save and Cancel", async ({ profilePage }) => {
     await profilePage.editProfileButton.click()
     await expect(profilePage.nameInput).toBeEnabled()
     await expect(profilePage.emailInput).toBeEnabled()
@@ -40,7 +43,7 @@ test.describe("Profile page — authenticated", () => {
     await expect(profilePage.cancelButton).toBeVisible()
   })
 
-  test("Cancel returns to view mode without saving", async ({ profilePage }) => {
+  test("Cancel returns to view mode", async ({ profilePage }) => {
     await profilePage.editProfileButton.click()
     await profilePage.nameInput.fill("Changed Name")
     await profilePage.cancelButton.click()
