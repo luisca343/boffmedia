@@ -21,6 +21,10 @@ import { PokemonW } from './entities/pokemon-w-.entity';
 import { WingullWorldService } from './services/wingull-world.service';
 import { UpdateDex } from './entities/update-dex.entity';
 import { UpdateBattleTeamDto } from './dto/battle-team.dto';
+import { WingullBalanceDto } from './dto/wingull-balance.dto';
+import { GetBalanceDto } from './dto/get-balance.dto';
+import { MessageRequestDto } from './dto/message-request.dto';
+import { PokemonGiveRequestDto } from './dto/pokemon-give-request.dto';
 import { Logger } from 'nestjs-pino';
 
 @ApiTags('SmartRotom | Wingull')
@@ -76,9 +80,7 @@ export class WingullController {
     description: 'Failed to update balance.',
   })
   @ApiBody({ type: UuidDto })
-  async updateBalance(
-    @Body() account: { balance: number; type: string; uuid: string },
-  ) {
+  async updateBalance(@Body() account: WingullBalanceDto) {
     return await this.wingullFacadeService.updateBalance(account);
   }
 
@@ -94,9 +96,7 @@ export class WingullController {
     description: 'Failed to retrieve current balance.',
   })
   @ApiBody({ type: UuidDto })
-  async getCurrentBalance(
-    @Body() { uuid, amount }: { uuid: string; amount?: number },
-  ) {
+  async getCurrentBalance(@Body() { uuid, amount }: GetBalanceDto) {
     const balance = await this.wingullFacadeService.getCurrentBalance(
       uuid,
       amount,
@@ -276,9 +276,7 @@ export class WingullController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: 'Failed to send message.',
   })
-  async sendMessage(
-    @Body() { uuid, message }: { uuid: string; message: string },
-  ) {
+  async sendMessage(@Body() { uuid, message }: MessageRequestDto) {
     return await this.wingullFacadeService.sendMessage(uuid, message);
   }
 
@@ -292,9 +290,7 @@ export class WingullController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: 'Failed to send message.',
   })
-  async globalchat(
-    @Body() { uuid, message }: { uuid: string; message: string },
-  ) {
+  async globalchat(@Body() { uuid, message }: MessageRequestDto) {
     return await this.wingullFacadeService.globalchat(uuid, message);
   }
 
@@ -309,16 +305,7 @@ export class WingullController {
     description: 'Failed to give Pokémon.',
   })
   async givePokemon(
-    @Body()
-    {
-      uuid,
-      pokespec,
-      sendMessage = true,
-    }: {
-      uuid: string;
-      pokespec: string;
-      sendMessage?: boolean;
-    },
+    @Body() { uuid, pokespec, sendMessage = true }: PokemonGiveRequestDto,
   ) {
     return await this.wingullFacadeService.givePokemon(
       uuid,

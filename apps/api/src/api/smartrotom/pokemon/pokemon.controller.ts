@@ -28,6 +28,7 @@ import { PokemonFacadeService } from './pokemon.facade.service';
 // Import DTOs
 import { RegisterPokemonDto } from './dto/register-pokemon.dto';
 import { UpdateDexDto } from './dto/update-dex.dto';
+import { UuidDto } from '../_dto/smartrotom-request-dto';
 
 // Import Response Entities
 import { Pokemon } from './entities/pokemon.entity';
@@ -573,7 +574,7 @@ export class PokemonController {
   @ApiBadRequestResponse({ description: 'Invalid sync data.' })
   @ApiInternalServerErrorResponse({ description: 'Failed to sync Pokédex.' })
   @ApiBody({ schema: { properties: { uuid: { type: 'string' } } } })
-  async syncDex(@Body() body: { uuid: string }) {
+  async syncDex(@Body() body: UuidDto) {
     const wingullDex = await this.wingullFacadeService.updateDex(body.uuid);
     return await this.pokemonFacadeService.updateDex(body.uuid, {
       SEEN: wingullDex.SEEN,

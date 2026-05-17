@@ -8,6 +8,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { AppService } from './app.service';
+import { UrlBodyDto } from './common/dto/url-body.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { createWriteStream } from 'fs';
 import { mkdir } from 'fs/promises';
@@ -107,7 +108,7 @@ export class AppController {
   }
 
   @Post('googlemaps')
-  async googlemap(@Body() body: { url: string }) {
+  async googlemap(@Body() body: UrlBodyDto) {
     const data = await axios.get(body.url);
     return data.data;
   }
@@ -118,7 +119,7 @@ export class AppController {
   }
 
   @Post('netfluis')
-  async netfluis(@Body() _body: { url: string }) {
+  async netfluis(@Body() _body: UrlBodyDto) {
     return { url: '' };
   }
 
