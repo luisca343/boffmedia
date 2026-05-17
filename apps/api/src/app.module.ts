@@ -7,6 +7,8 @@ import {
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
+import { MetricsMiddleware } from './_utils/metrics/metrics.middleware';
 import { SmartRotomAppsModule } from '@api/smartrotom/apps/apps.module';
 import { SmartRotomUsersModule } from '@api/smartrotom/users/users.module';
 import { InvitesModule } from './api/wingull/invites/invites.module';
@@ -77,6 +79,10 @@ import { VgcModule } from '@api/boffmedia/herramientas/pokemon/vgc/vgc.module';
 
 @Module({
   imports: [
+    PrometheusModule.register({
+      defaultMetrics: { enabled: true },
+      path: '/metrics',
+    }),
     ConfigModule.forRoot(),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
@@ -165,6 +171,7 @@ import { VgcModule } from '@api/boffmedia/herramientas/pokemon/vgc/vgc.module';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
+    consumer.apply(MetricsMiddleware).forRoutes('*');
     consumer
       .apply(MinecraftMiddleware)
       .exclude({

@@ -1,6 +1,7 @@
 # Boffmedia Monorepo — Cleanup Audit
 
 > Generated 2026-05-17. All items are pre-existing technical debt, not introduced by the agent branch.
+> Last updated: 2026-05-17 — Sections 1, 2, 3, 6 completed.
 
 ---
 
@@ -25,226 +26,207 @@ These files are dead, have no importers, and need no investigation.
 | `apps/web/src/app/smartrotom/chatapp/page copy.tsx` | Delete |
 | `apps/web/src/app/(boffmedia)/(herramientas)/mhwilds/tree/page copy.tsx` | Delete |
 
-- [ ] Delete all 3 `page copy.tsx` files
+- [x] Delete all 3 `page copy.tsx` files
 
 ### 1b. Dev/test/debug routes (11 pages)
 
 All confirmed as dev scaffolding — delete the entire folders.
 
-- [ ] `apps/web/src/app/test/` — root test page
-- [ ] `apps/web/src/app/localtest/` — 4 pages (personal-meta-comparison, tracker-sync-badge, tracker-sync-provider)
-- [ ] `apps/web/src/app/smartrotom/(debug)/` — 2 pages (components, error-preview)
-- [ ] `apps/web/src/app/smartrotom/arcade/test/` — 3 pages (root, sprite, tama)
-- [ ] `apps/web/src/app/(boffmedia)/(herramientas)/pokemon/vgc/meta/test/` — 1 page
-
-After deletion: verify no remaining imports point to any of these pages.
+- [x] `apps/web/src/app/test/` — root test page
+- [x] `apps/web/src/app/localtest/` — 4 pages (personal-meta-comparison, tracker-sync-badge, tracker-sync-provider)
+- [x] `apps/web/src/app/smartrotom/(debug)/` — 2 pages (components, error-preview)
+- [x] `apps/web/src/app/smartrotom/arcade/test/` — 3 pages (root, sprite, tama)
+- [x] `apps/web/src/app/(boffmedia)/(herramientas)/pokemon/vgc/meta/test/` — 1 page
 
 ---
 
 ## 2. API — `no-unused-vars` (216 warnings → 0 errors)
 
-**Decision**: Rule is now set to `error`. Each file below must be fixed before it can be modified in future PRs.
+**Decision**: Rule is now set to `error` with `_` prefix ignore patterns applied. All errors resolved.
 
-### Rule change (already applied)
+### Rule change (applied)
 
 In `apps/api/.eslintrc.js`:
 ```js
-'@typescript-eslint/no-unused-vars': 'error'   // was: 'warn'
+'@typescript-eslint/no-unused-vars': ['error', {
+  argsIgnorePattern: '^_',
+  varsIgnorePattern: '^_',
+  caughtErrorsIgnorePattern: '^_',
+}]
 ```
 
 ### File-by-file checklist
 
-Fix strategy per type:
-- **Unused import** → delete the import line
-- **Unused function parameter required by interface/NestJS** → prefix with `_` (e.g. `_error`)
-- **Unused local variable** → delete or refactor
-
-#### Schema files (simple — just delete unused Drizzle helper imports)
-
-- [ ] `_db/schema/FicusAI.ts` — remove `mysqlSchema`, `text`, `varchar`, `smartrotomUsers` (L7–L12)
-- [ ] `_db/schema/SmartRotomDocuments.ts` — remove `date` (L2)
-- [ ] `_db/schema/SmartRotomStarBank.ts` — remove `exp` (L1)
+#### Schema files
+- [x] `_db/schema/FicusAI.ts`
+- [x] `_db/schema/SmartRotomDocuments.ts`
+- [x] `_db/schema/SmartRotomStarBank.ts`
 
 #### Utils / Infrastructure
-
-- [ ] `_utils/MySQL2Service.ts` — `fields` L87 → `_fields`
-- [ ] `_utils/WingullSQL2Service.ts` — `fields` L87 → `_fields`
-- [ ] `_utils/interceptors/response.interceptor.ts` — `response` L21 → `_response`; `e` L104 → `_e`
-- [ ] `_utils/response/response.service.ts` — remove `action` (L7, L11), `data` (L7, L11, L24)
-- [ ] `_utils/sockets/sockets.gateway.ts` — `existingUser` L44, `sockets` L101/L130 → `_sockets`
-- [ ] `app.controller.ts` — `err` L55 → `_err`; `body` L121 → `_body`
-- [ ] `app.module.ts` — remove `DiscordService` import (L36)
-- [ ] `minecraft.middleware.ts` — remove `multer` import (L4)
+- [x] `_utils/MySQL2Service.ts`
+- [x] `_utils/WingullSQL2Service.ts`
+- [x] `_utils/interceptors/response.interceptor.ts`
+- [x] `_utils/response/response.service.ts`
+- [x] `_utils/sockets/sockets.gateway.ts`
+- [x] `app.controller.ts`
+- [x] `app.module.ts`
+- [x] `minecraft.middleware.ts`
 
 #### Auth / Users
-
-- [ ] `api/auth/auth.module.ts` — remove `BoffMediaUsersManagementService` import (L10)
-- [ ] `api/boffmedia/users/repositories/users.repository.ts` — remove `SmartRotomUser` (L11)
-- [ ] `api/boffmedia/users/users.controller.ts` — remove `UserWithRolesEntity` (L33)
-- [ ] `api/boffmedia/users/services/users-management.service.ts` — remove `bcrypt` (L6), `BoffMediaUser` (L8)
-- [ ] `api/boffmedia/users/dto/get-user-by-id.dto.ts` — remove `IsOptional` (L7)
+- [x] `api/auth/auth.module.ts`
+- [x] `api/boffmedia/users/repositories/users.repository.ts`
+- [x] `api/boffmedia/users/users.controller.ts`
+- [x] `api/boffmedia/users/services/users-management.service.ts`
+- [x] `api/boffmedia/users/dto/get-user-by-id.dto.ts`
 
 #### BoffMedia — Events
-
-- [ ] `api/boffmedia/events/services/participants.service.ts` — remove `Achievement` (L6); `participantId` L135 → `_participantId`
-- [ ] `api/boffmedia/events/services/progress.service.ts` — remove `boffMediaAchievements` (L7)
-- [ ] `api/boffmedia/events/services/teams.service.ts` — remove `TeamMember` (L6)
-- [ ] `api/boffmedia/events/dto/join-event.dto.ts` — remove `IsUrl` (L2)
-- [ ] `api/_repositories/boffmedia/participants.repository.ts` — remove `ParticipantProgress` (L12), `Achievement` (L13), `PARTICIPANT_STATUS` (L14)
-- [ ] `api/_repositories/boffmedia/invites.repository.ts` — `limit` L82, `offset` L83 → prefix with `_`
+- [x] `api/boffmedia/events/services/participants.service.ts`
+- [x] `api/boffmedia/events/services/progress.service.ts`
+- [x] `api/boffmedia/events/services/teams.service.ts`
+- [x] `api/boffmedia/events/dto/join-event.dto.ts`
+- [x] `api/_repositories/boffmedia/participants.repository.ts`
+- [x] `api/_repositories/boffmedia/invites.repository.ts`
 
 #### BoffMedia — Herramientas
-
-- [ ] `api/boffmedia/herramientas/pokemon/tcgpocket/services/tcg.service.ts` — remove `UserCard`, `UserCardHistory` (L17), `fs` (L20); `existingCardsMap` L210 → investigate if needed; `error` L451 → `_error`
-- [ ] `api/boffmedia/herramientas/pokemon/tcgpocket/tcg.controller.ts` — `error` L42 → `_error`
-- [ ] `api/boffmedia/herramientas/pokemon/tcgpocket/tcg.module.ts` — remove `BoffMediaUsersManagementService` (L15)
-- [ ] `api/boffmedia/herramientas/pokemon/vgc/meta/services/vgcpastes.service.ts` — remove `Dex` (L2)
-- [ ] `api/boffmedia/herramientas/pokemon/vgc/mod/scripts.ts` — `ppUps` L32, `pokemon` L246 → investigate if needed
-- [ ] `api/boffmedia/herramientas/pokemon/vgc/mod/items.ts` — `pokemon` L1031 → `_pokemon`
-- [ ] `api/boffmedia/herramientas/mhwilds/mhwilds.facade.service.ts` — `error` L225, L240 → `_error`
-- [ ] `api/boffmedia/herramientas/mhwilds/repositories/mhwilds.repository.ts` — `fallbackError` L181 → `_fallbackError`; `error` L250 → `_error`
-- [ ] `api/boffmedia/herramientas/mhwilds/services/mhwilds-cache.service.ts` — remove `MhwildsRepository` (L2)
-- [ ] `api/boffmedia/herramientas/mhwilds/services/mhwilds-data.service.ts` — remove `MhwildsRepository` (L3)
-- [ ] `api/boffmedia/herramientas/manga/services/manga-download.service.ts` — remove `ChapterDownloadStatus` (L10)
-- [ ] `api/boffmedia/herramientas/manga/services/novecool.service.ts` — `SEL_CHAPTER_IMAGES` L42 → investigate if needed
-- [ ] `api/boffmedia/herramientas/scrape/services/myrient.service.ts` — remove `MYRIENT_BASE_URL` (L28)
-- [ ] `api/boffmedia/herramientas/scrape/services/manga/manga-cron.service.ts` — already prefixed `_event` (L74) — verify then mark done
-- [ ] `api/boffmedia/herramientas/scrape/services/manga/scrapers/leercapitulo/leercapitulo.scraper.ts` — `_query` L39 already prefixed — verify
-- [ ] `api/boffmedia/herramientas/scrape/services/manga/scrapers/pkproject/pkproject.scraper.ts` — `_context` L151 already prefixed — verify
-- [ ] `api/boffmedia/herramientas/scrape/dto/download-selected-games.dto.ts` — remove `IsString` (L8)
+- [x] `api/boffmedia/herramientas/pokemon/tcgpocket/services/tcg.service.ts`
+- [x] `api/boffmedia/herramientas/pokemon/tcgpocket/tcg.controller.ts`
+- [x] `api/boffmedia/herramientas/pokemon/tcgpocket/tcg.module.ts`
+- [x] `api/boffmedia/herramientas/pokemon/vgc/meta/services/vgcpastes.service.ts`
+- [x] `api/boffmedia/herramientas/pokemon/vgc/mod/scripts.ts`
+- [x] `api/boffmedia/herramientas/pokemon/vgc/mod/items.ts`
+- [x] `api/boffmedia/herramientas/mhwilds/mhwilds.facade.service.ts`
+- [x] `api/boffmedia/herramientas/mhwilds/repositories/mhwilds.repository.ts`
+- [x] `api/boffmedia/herramientas/mhwilds/services/mhwilds-cache.service.ts`
+- [x] `api/boffmedia/herramientas/mhwilds/services/mhwilds-data.service.ts`
+- [x] `api/boffmedia/herramientas/manga/services/manga-download.service.ts`
+- [x] `api/boffmedia/herramientas/manga/services/novecool.service.ts`
+- [x] `api/boffmedia/herramientas/scrape/services/myrient.service.ts`
+- [x] `api/boffmedia/herramientas/scrape/services/manga/manga-cron.service.ts`
+- [x] `api/boffmedia/herramientas/scrape/services/manga/scrapers/leercapitulo/leercapitulo.scraper.ts`
+- [x] `api/boffmedia/herramientas/scrape/services/manga/scrapers/pkproject/pkproject.scraper.ts`
+- [x] `api/boffmedia/herramientas/scrape/dto/download-selected-games.dto.ts`
 
 #### BoffMedia — Util
-
-- [ ] `api/boffmedia/util/sharex/sharex.controller.ts` — remove `Get` (L6); `error` L61 → `_error`
-- [ ] `api/boffmedia/util/sharex/sharex.service.ts` — remove `Inject` (L3)
-- [ ] `api/boffmedia/util/upload/upload.controller.ts` — remove `Param` (L8), `ApiParam` (L21)
-- [ ] `api/boffmedia/util/upload/services/file-upload.service.ts` — remove `UploadedFileDetails` (L5)
+- [x] `api/boffmedia/util/sharex/sharex.controller.ts`
+- [x] `api/boffmedia/util/sharex/sharex.service.ts`
+- [x] `api/boffmedia/util/upload/upload.controller.ts`
+- [x] `api/boffmedia/util/upload/services/file-upload.service.ts`
 
 #### SmartRotom — Pokemon
-
-- [ ] `api/smartrotom/pokemon/pokemon.controller.ts` — remove `GetPokemonByDexDto`, `SearchPokemonDto`, `GetPokemonMovesDto`, `GetPokemonImageDto` (L30–L34), `Move` (L43), `BiomeSpawnData` (L53), `PokemonBiomes` (L65)
-- [ ] `api/smartrotom/pokemon/pokemon.facade.service.ts` — remove `Attack` (L8), `Fuse` (L10)
-- [ ] `api/smartrotom/pokemon/services/data/pokemon-data.service.ts` — remove `fs` (L9); `index` L105 → `_index`; `thisEvo` L430, `evoEvo` L437 → investigate; `index` L443 → `_index`
-- [ ] `api/smartrotom/pokemon/services/data/spawn-data.service.ts` — remove `fs` (L6), `Console` (L7); `pokemonId` L176 → `_pokemonId`
-- [ ] `api/smartrotom/pokemon/services/pokemon-showdown.service.ts` — remove `ShowdownPokemon` (L4), `fs` (L7), `path` (L8), `fsPromises` (L9); `pokemonName` L91 → `_pokemonName`
-- [ ] `api/smartrotom/pokemon/services/data/move-data.service.ts` — remove `Attack` (L3)
-- [ ] `api/smartrotom/pokemon/services/pokemon-data-management.service.ts` — remove `PokemonForm` (L7), `Attack` (L7); `key` L138 → `_key`
-- [ ] `api/smartrotom/pokemon/services/data/pokemon-image.service.ts` — `error` L265 → `_error`
-- [ ] `api/smartrotom/pokemon/services/sprite-manifest.service.ts` — remove `SpriteLocation` (L3)
-- [ ] `api/smartrotom/pokemon/repositories/interfaces/pokemon.repository.interface.ts` — remove `BulkUpdateData` (L5), `BulkUpdateResult` (L6)
-- [ ] `api/smartrotom/pokemon/interfaces/pokemon.interface.ts` — remove `index` (L1)
-- [ ] `api/smartrotom/pokemon/utils/types.ts` — remove `off` (L1), `fsPromises` (L4); `result` L344 → investigate
-- [ ] `api/smartrotom/pokemon/utils/MoveData.ts` — remove `wolfeyTypeRanking` (L4)
-- [ ] `api/smartrotom/pokemon/utils/SpawnData.ts` — remove `MoveData` (L5)
-- [ ] `api/smartrotom/pokemon/utils/PokemonData.ts` — `formIndex` L82 → `_formIndex`; `species` L257 → investigate
+- [x] `api/smartrotom/pokemon/pokemon.controller.ts`
+- [x] `api/smartrotom/pokemon/pokemon.facade.service.ts`
+- [x] `api/smartrotom/pokemon/services/data/pokemon-data.service.ts`
+- [x] `api/smartrotom/pokemon/services/data/spawn-data.service.ts`
+- [x] `api/smartrotom/pokemon/services/pokemon-showdown.service.ts`
+- [x] `api/smartrotom/pokemon/services/data/move-data.service.ts`
+- [x] `api/smartrotom/pokemon/services/pokemon-data-management.service.ts`
+- [x] `api/smartrotom/pokemon/services/data/pokemon-image.service.ts`
+- [x] `api/smartrotom/pokemon/services/sprite-manifest.service.ts`
+- [x] `api/smartrotom/pokemon/repositories/interfaces/pokemon.repository.interface.ts`
+- [x] `api/smartrotom/pokemon/interfaces/pokemon.interface.ts`
+- [x] `api/smartrotom/pokemon/utils/types.ts`
+- [x] `api/smartrotom/pokemon/utils/MoveData.ts`
+- [x] `api/smartrotom/pokemon/utils/SpawnData.ts`
+- [x] `api/smartrotom/pokemon/utils/PokemonData.ts`
+- [x] `types/pokemon.ts`
 
 #### SmartRotom — Other modules
-
-- [ ] `api/smartrotom/liga/liga.facade.service.ts` — remove `LeagueStanding` (L15)
-- [ ] `api/smartrotom/liga/repositories/liga.repository.ts` — remove `and` (L3), `asc` (L3), `SmartRotomReplay` (L8), `SmartRotomUserReplay` (L9); `tournamentId` L236, L241 → `_tournamentId`
-- [ ] `api/smartrotom/liga/services/tournament.service.ts` — `registration` L72 → investigate
-- [ ] `api/smartrotom/mine/repositories/mine.repository.ts` — remove `asc` (L3), `sum` (L3), `count` (L3), `RecompensaMina` (L11)
-- [ ] `api/smartrotom/mine/services/energy.service.ts` — remove `PlayerEnergy` (L2)
-- [ ] `api/smartrotom/mine/types.ts` — remove `HistoryEntry` (L1), `RankingEntry` (L10), `RewardEntry` (L15)
-- [ ] `api/smartrotom/misiones/repositories/quest.repository.ts` — remove `QuestData`, `IDialogue`, `IQuestCategory`, `NPC` (L4)
-- [ ] `api/smartrotom/misiones/repositories/interfaces/quest.repository.interface.ts` — remove `QuestSystemData` (L6)
-- [ ] `api/smartrotom/misiones/misiones.controller.ts` — remove `Delete` (L8), `CheckImageDto` (L33)
-- [ ] `api/smartrotom/misiones/misiones.facade.service.ts` — remove `NPCUpdateRequest` (L4); `error` L193 → `_error`
-- [ ] `api/smartrotom/misiones/services/quest.cache.service.ts` — remove `QuestData` (L4), `IDialogue` (L5), `IQuestCategory` (L6)
-- [ ] `api/smartrotom/misiones/types.ts` — remove `text` (L1)
-- [ ] `api/smartrotom/achievement/achievement.controller.ts` — remove `BaseInsertResponse` (L28)
-- [ ] `api/smartrotom/achievement/services/achievements.service.ts` — remove `AchievementStatusEntity` (L12)
-- [ ] `api/smartrotom/achievement/repositories/achievements.repository.ts` — `id` L40, L45 → `_id`; `data` L40 → `_data`
-- [ ] `api/smartrotom/apps/apps.facade.service.ts` — remove `Inject` (L1)
-- [ ] `api/smartrotom/apps/repositories/user-apps.repository.ts` — remove `or` (L3); `result` L46 → investigate
-- [ ] `api/smartrotom/apps/apps.controller.spec.ts` — remove `HttpStatus` (L3); `mockSuccessResponse` L59 → investigate if test assertion is missing
-- [ ] `api/smartrotom/arcade/arcade.controller.ts` — `itemType` L162, `rarity` L163 → `_itemType`, `_rarity`
-- [ ] `api/smartrotom/arcade/arcade.facade.service.ts` — remove `ConflictException` (L6)
-- [ ] `api/smartrotom/arcade/arcade.module.ts` — remove `IArcadeStreakRepository` (L15), `IArcadeInventoryRepository` (L16)
-- [ ] `api/smartrotom/arcade/dto/lottbox.dto.ts` — remove `IsNumber` (L3), `LootItemDto` (L35)
-- [ ] `api/smartrotom/arcade/entities/arcade-inventory.entity.ts` — remove `IsNumber` (L9)
-- [ ] `api/smartrotom/arcade/services/inventory.service.ts` — `sourceType` L59 → `_sourceType`
-- [ ] `api/smartrotom/arcade/services/lootbox.service.ts` — `newItemResult` L52 → investigate
-- [ ] `api/smartrotom/arcade/services/streak.service.ts` — `streak` L217 → investigate
-- [ ] `api/smartrotom/chatapp/chatapp.controller.ts` — `limit` L135 → `_limit`
-- [ ] `api/smartrotom/chatapp/chatapp.facade.service.ts` — `chatId` L344 → investigate
-- [ ] `api/smartrotom/chatapp/dto/call.dto.ts` — remove `IsEnum` (L3)
-- [ ] `api/smartrotom/chatapp/dto/chat.dto.ts` — remove `IsEnum` (L9)
-- [ ] `api/smartrotom/chatapp/services/call.service.ts` — `status` L90 → `_status`
-- [ ] `api/smartrotom/documents/entities/document.entity.ts` — remove `Optional` (L1)
-- [ ] `api/smartrotom/documents/dto/news.dto.ts` — remove `IsUrl` (L10), `Base` (L12)
-- [ ] `api/smartrotom/ficusai/ficusai.facade.service.ts` — `server` L50 → investigate
-- [ ] `api/smartrotom/ficusai/repositories/ficusai.repository.ts` — `id` L29, `updateDto` L29 → `_id`, `_updateDto`
-- [ ] `api/smartrotom/starbank/starbank.controller.ts` — remove `Req` (L12), `CreateAccountDto` (L27), `extname` (L38), `join` (L38), `mkdir` (L39)
-- [ ] `api/smartrotom/users/users.controller.ts` — remove `ApiBody` (L18)
-- [ ] `api/smartrotom/_dto/taxi-stop.dto.ts` — remove `ApiProperty` (L1)
-- [ ] `api/smartrotom/_main/smartrotom.service.ts` — remove `OnModuleInit` (L1)
-- [ ] `api/smartrotom/wingull/dto/battle-team.dto.ts` — remove `IsArray` (L5), `IsUUID` (L6)
-- [ ] `api/smartrotom/wingull/services/wingull-transport.service.ts` — remove `WingullTransportRepository` (L3)
-- [ ] `api/smartrotom/wingull/wingull.module.ts` — remove `DrizzleModule` (L4)
-- [ ] `api/wingull/invites/invites.controller.ts` — remove `Patch` (L6)
+- [x] `api/smartrotom/liga/liga.facade.service.ts`
+- [x] `api/smartrotom/liga/repositories/liga.repository.ts`
+- [x] `api/smartrotom/liga/services/tournament.service.ts`
+- [x] `api/smartrotom/mine/repositories/mine.repository.ts`
+- [x] `api/smartrotom/mine/services/energy.service.ts`
+- [x] `api/smartrotom/mine/types.ts` — deleted (file was entirely dead code, no importers)
+- [x] `api/smartrotom/misiones/repositories/quest.repository.ts`
+- [x] `api/smartrotom/misiones/repositories/interfaces/quest.repository.interface.ts`
+- [x] `api/smartrotom/misiones/misiones.controller.ts`
+- [x] `api/smartrotom/misiones/misiones.facade.service.ts`
+- [x] `api/smartrotom/misiones/services/quest.cache.service.ts`
+- [x] `api/smartrotom/misiones/types.ts`
+- [x] `api/smartrotom/achievement/achievement.controller.ts`
+- [x] `api/smartrotom/achievement/services/achievements.service.ts`
+- [x] `api/smartrotom/achievement/repositories/achievements.repository.ts`
+- [x] `api/smartrotom/apps/apps.facade.service.ts`
+- [x] `api/smartrotom/apps/repositories/user-apps.repository.ts`
+- [x] `api/smartrotom/apps/apps.controller.spec.ts`
+- [x] `api/smartrotom/arcade/arcade.controller.ts`
+- [x] `api/smartrotom/arcade/arcade.facade.service.ts`
+- [x] `api/smartrotom/arcade/arcade.module.ts`
+- [x] `api/smartrotom/arcade/dto/lottbox.dto.ts`
+- [x] `api/smartrotom/arcade/entities/arcade-inventory.entity.ts`
+- [x] `api/smartrotom/arcade/services/inventory.service.ts`
+- [x] `api/smartrotom/arcade/services/lootbox.service.ts`
+- [x] `api/smartrotom/arcade/services/streak.service.ts`
+- [x] `api/smartrotom/chatapp/chatapp.controller.ts`
+- [x] `api/smartrotom/chatapp/chatapp.facade.service.ts`
+- [x] `api/smartrotom/chatapp/dto/call.dto.ts`
+- [x] `api/smartrotom/chatapp/dto/chat.dto.ts`
+- [x] `api/smartrotom/chatapp/services/call.service.ts`
+- [x] `api/smartrotom/documents/entities/document.entity.ts`
+- [x] `api/smartrotom/documents/dto/news.dto.ts`
+- [x] `api/smartrotom/ficusai/ficusai.facade.service.ts`
+- [x] `api/smartrotom/ficusai/repositories/ficusai.repository.ts`
+- [x] `api/smartrotom/starbank/starbank.controller.ts`
+- [x] `api/smartrotom/users/users.controller.ts`
+- [x] `api/smartrotom/_dto/taxi-stop.dto.ts`
+- [x] `api/smartrotom/_main/smartrotom.service.ts`
+- [x] `api/smartrotom/wingull/dto/battle-team.dto.ts`
+- [x] `api/smartrotom/wingull/services/wingull-transport.service.ts`
+- [x] `api/smartrotom/wingull/wingull.module.ts`
+- [x] `api/wingull/invites/invites.controller.ts`
 
 #### Automation / Discord
+- [x] `automation/twitch/services/twitch-monitor.service.ts`
+- [x] `automation/twitch/services/notification.service.ts`
+- [x] `automation/twitch/twitch-debug.controller.ts`
+- [x] `discord/_main/discord.controller.ts`
+- [x] `discord/_main/message.listener.ts`
+- [x] `discord/_commands/commands.service.ts`
+- [x] `discord/commands/global/meta/meta-matchup.command.ts`
 
-- [ ] `automation/twitch/services/twitch-monitor.service.ts` — remove `Cron`, `CronExpression` (L2); `source` L150 → `_source`; `userId` L202 → `_userId`
-- [ ] `automation/twitch/services/notification.service.ts` — `target` L107, L157 → `_target`
-- [ ] `automation/twitch/twitch-debug.controller.ts` — remove `Query` (L1), `ApiQuery` (L2)
-- [ ] `discord/_main/discord.controller.ts` — remove `Post` (L1), `DiscordService` (L2)
-- [ ] `discord/_main/message.listener.ts` — remove `Message` (L3)
-- [ ] `discord/_commands/commands.service.ts` — remove `or` (L10)
-- [ ] `discord/commands/global/meta/meta-matchup.command.ts` — `buildCalcPage` L253 → investigate
-- [ ] `api/smartrotom/_main/smartrotom.service.ts` — remove `OnModuleInit` (L1)
+#### BattleSimulator (found during audit)
+- [x] `api/battlesimulator/battle/battle.controller.ts`
 
 #### Deprecated module
+- [x] `api/deprecated/` — entire folder deleted (no external importers confirmed)
 
-- [ ] `api/deprecated/battle/_dto/battle-config.dto.ts` — remove `IsObject` (L7) — **also check if entire `deprecated/` folder can be deleted**
+Also removed during audit:
+- [x] `api/boffmedia/herramientas/pokemon/vgc/meta/config/smogon.config.ts` — deleted `smogonChaosUrl` (unused, deprecated)
 
 ---
 
 ## 3. Needs investigation before touching
 
-These items require reading the surrounding code before deciding how to proceed.
-
 ### 3a. Migration status — `users.module.ts`
 
-```
-apps/api/src/api/boffmedia/users/users.module.ts L36, L44
-// REMOVE THIS AFTER MIGRATION — BoffMediaUsersRepository
-```
-
-- [?] Verify whether the BoffMedia → SmartRotom users migration is complete
-- [?] If complete: remove `BoffMediaUsersRepository` import + usage from `users.module.ts`, then re-run type-check
+- [x] **Investigated**: Migration incomplete. `BoffMediaUsersManagementService` still injects `BoffMediaUsersRepository` directly (not via token). TODOs at L36, L44 are intentional blockers — leave them until the service is migrated.
 
 ### 3b. `@deprecated` entities — are they still used?
 
-| Symbol | File |
-|---|---|
-| `ArceuSpeakEntity` | `smartrotomService.ts` |
-| `PokemonW` | `playerService.ts` |
-| `FicusAiHealthEntity` | `ficusAiService.ts` |
-| `smogonUsageUrl`, `smogonMovesetUrl` | `smogon.config.ts` |
-
-- [?] For each: `grep -r "ArceuSpeakEntity" apps/api/src --include="*.ts"` to find all usages
-- [?] If 0 usages outside the declaration file: delete the class, its imports, and the `@deprecated` comment
+| Symbol | File | Status |
+|---|---|---|
+| `ArceuSpeakEntity` | `smartrotom.controller.ts` | **Active** — used in Swagger `@ApiResponse` |
+| `PokemonW` | multiple wingull files | **Active** — return type for team endpoints |
+| `FicusAiHealthEntity` | `ficusai.controller.ts` | **Active** — used in Swagger `@ApiResponse` |
+| `smogonChaosUrl` | `smogon.config.ts` | **Deleted** — was truly unused |
+| `smogonUsageUrl`, `smogonMovesetUrl` | `smogon.config.ts` | **Active** — used in `smogon.service.ts` |
 
 ### 3c. Active TODOs
 
-| File | Line | Comment |
-|---|---|---|
-| `api/boffmedia/users/users.module.ts` | L36, L44 | REMOVE THIS AFTER MIGRATION (see 3a) |
-| `api/smartrotom/chatapp/services/group.service.ts` | L190 | TODO: Implement unread count logic |
-| `apps/web/src/app/smartrotom/arcade/loot/_hooks/useLootBoxInventory.ts` | L124 | FIX THIS (weight: 0) |
-| `api/smartrotom/pokemon/pokemon.controller.ts` | L648 | API FIX |
-| `apps/web/src/app/smartrotom/liga/camaralucha/page.tsx` | L12 | TODO: implement useBattleReplays |
-
-- [?] Review each TODO in context and either implement, ticket it, or delete if stale
+| File | Line | Comment | Decision |
+|---|---|---|---|
+| `api/boffmedia/users/users.module.ts` | L36, L44 | REMOVE THIS AFTER MIGRATION | Leave — migration incomplete |
+| `api/smartrotom/chatapp/services/group.service.ts` | L190 | TODO: Implement unread count logic | Leave — feature work |
+| `apps/web/src/app/smartrotom/arcade/loot/_hooks/useLootBoxInventory.ts` | L124 | FIX THIS (weight: 0) | Leave — needs domain context |
+| `api/smartrotom/pokemon/pokemon.controller.ts` | L648 | API FIX | Leave — needs investigation |
+| `apps/web/src/app/smartrotom/liga/camaralucha/page.tsx` | L12 | TODO: implement useBattleReplays | Leave — feature work |
 
 ---
 
 ## 4. Console.log → structured logger
 
-**Scale**: ~1,044 statements (API ~900, Web ~140)  
-**Decision**: Replace with NestJS Logger in API, thin wrapper in Web.
+**Scale**: ~1,044 statements (API ~900, Web ~140)
+**Status**: `[ ]` Pending — planned for a future sprint.
 
 ### Plan
 
@@ -297,25 +279,21 @@ These are not actively blocking anything but create repository bloat.
 
 ## 6. Deprecated folder
 
-```
-apps/api/src/api/deprecated/
-```
-
-- [?] Check if any code outside `deprecated/` imports from it
-- [?] If no external importers: delete the entire folder
+- [x] **No external importers confirmed** — entire `apps/api/src/api/deprecated/` folder deleted.
 
 ---
 
 ## Summary
 
-| Category | Items | Priority |
+| Category | Items | Status |
 |---|---|---|
-| Delete page copies | 3 files | High — do now |
-| Delete test routes | 11 pages | High — do now |
-| API unused-vars (rule is now `error`) | 91 files, 216 warnings | High — fix before editing each file |
-| Migration status investigation | 1 | Medium |
-| @deprecated investigation | 4 symbols | Medium |
-| Active TODOs | 5 | Medium |
-| Console.log → Logger migration | ~1,044 calls | Medium — plan a sprint |
-| Large data files | 4 files | Low |
-| `deprecated/` folder | 1 folder | Low — investigate first |
+| Delete page copies | 3 files | ✅ Done |
+| Delete test routes | 11 pages | ✅ Done |
+| Delete deprecated/ folder | 1 folder | ✅ Done |
+| API unused-vars (now error + _-prefix config) | ~100 files | ✅ Done — `pnpm lint` exits 0 |
+| `tsc --noEmit` (API + Web) | both apps | ✅ Clean |
+| Migration status investigation | 1 | ✅ Investigated — incomplete, TODOs kept |
+| @deprecated investigation | 5 symbols | ✅ Investigated — 1 deleted, 4 active |
+| Active TODOs | 5 | ✅ Reviewed — all kept (feature/domain work) |
+| Console.log → Logger migration | ~1,044 calls | ⏳ Pending — future sprint |
+| Large data files | 4 files | ⏳ Pending — low priority |
