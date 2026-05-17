@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from 'react';
+import React, { useRef } from 'react';
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import Editor from "./ckeditor.js"
 import './styles.css'
@@ -75,7 +75,7 @@ const editorConfiguration = {
 };
 
 function createSaveButton (data: any, props: {
-    updateNews: any; documentId: any; documentType: any; refresh: () => void; type?: string; 
+    updateNews: any; documentId: any; documentType: any; refresh: () => void; type?: string; getToken: () => string;
 }) {
     console.log("=== CREATE SAVE BUTTON ===");
     const endpoint = props.type === 'news' ? 'news' : 'save';
@@ -93,7 +93,7 @@ function createSaveButton (data: any, props: {
                 content: data,
                 id: documentId,
                 title: title || "Sin título",
-              } as CreateNewsDto)
+              } as CreateNewsDto, props.getToken())
             .then(() => {
                 if(props.refresh) props.refresh();
                 if(props.updateNews) props.updateNews(props.documentId, data);
@@ -113,6 +113,13 @@ function createSaveButton (data: any, props: {
 // @ts-ignore
 function CustomEditor(props) {
     if(!props.document) return null;
+
+    // Keep a mutable ref so the save button's onclick always reads the latest token,
+    // even if CKEditor doesn't re-bind its event listeners after a React re-render.
+    const tokenRef = useRef<string>(props.token ?? '');
+    tokenRef.current = props.token ?? '';
+    const getToken = () => tokenRef.current;
+
     return (
         <CKEditor
             // @ts-ignore
@@ -127,7 +134,7 @@ function CustomEditor(props) {
                     editor.enableReadOnlyMode("sdfsedgd");
                     document.querySelector('.ck-editor__top')?.classList.add('hidden');
                 }
-                const saveButton = createSaveButton(editor, props);
+                const saveButton = createSaveButton(editor, { ...props, getToken });
                 editorBarElement?.prepend(saveButton);
             }}
             onChange={(event, editor) => {
@@ -138,7 +145,7 @@ function CustomEditor(props) {
                     saveButton.remove();
                 }
                 const editorBarElement = document.querySelector('.ck-toolbar__items');
-                const newSaveButton = createSaveButton(data, props);
+                const newSaveButton = createSaveButton(data, { ...props, getToken });
                 editorBarElement?.prepend(newSaveButton);
             }}
         />

@@ -21,6 +21,8 @@
 | TypeScript | Strict mode enforced | Enforced via `tsconfig.json` + ESLint rules |
 | Validation | Global `ValidationPipe` | Applies to all current and future agent-generated endpoints |
 | Exception handling | Global filter, typed exceptions | Consistent error shape across entire API |
+| Auth roles in JWT | `SessionUser` interface extended with `roles: string[]`; `validateUser` and `createFromGoogle` fetch roles from DB at login time | Roles were missing from the initial JWT, causing `RolesGuard` to always reject despite the user having the correct role in the DB. Refresh path already fetched fresh roles — initial login did not. Fixed 2026-05-17 |
+| Furret Today editor auth | `MinecraftMiddleware` excludes `POST/PUT/DELETE /smartrotom/documents/news*` and `POST /smartrotom/documents/newsstatus`; `documentsService.ts` news mutations use `apiAuthedPUT/POST/DELETE`; `NewsContent.tsx` and `editar/[id]/page.tsx` pass `token` prop to `CustomEditor` | Middleware blocked all non-GET smartrotom requests without `server` field; editor save button had no token (was receiving `undefined`). Fixed 2026-05-17 |
 
 ---
 
