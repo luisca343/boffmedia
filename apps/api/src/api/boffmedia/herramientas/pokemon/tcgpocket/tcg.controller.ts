@@ -26,12 +26,16 @@ import { SeriesCardsGroup } from './entities/series-cards-grouped.entity';
 import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
 import { AddUserCardDto, UpdateUserCardQuantityDto } from './dto/user-card.dto';
 import { UserCard, UserCardHistory } from './entities/user-card.entity';
+import { Logger } from 'nestjs-pino';
 
 @ApiTags('BoffMedia 🛠 | Pokemon TCG Pocket')
 @Controller('tools/ptcgp')
 @UseInterceptors(ResponseInterceptor)
 export class TcgController {
-  constructor(private readonly tcgFacade: TcgFacadeService) {}
+  constructor(
+    private readonly logger: Logger,
+    private readonly tcgFacade: TcgFacadeService,
+  ) {}
 
   // ==================== HELPER METHODS ====================
 
@@ -46,7 +50,7 @@ export class TcgController {
 
   private parseCardData(card: any, locale: string): TcgCard {
     if (!card[`image_es`]) {
-      console.warn(
+      this.logger.warn(
         `[TCG] No image found for card ${card.id} in locale ${locale}`,
       );
       return null;
@@ -371,7 +375,10 @@ export class TcgController {
     try {
       sets = await this.tcgFacade.fetchSetsForSeriesBothLanguages(seriesId);
     } catch (err: any) {
-      console.error(`[TCG] Failed to fetch sets for series ${seriesId}:`, err);
+      this.logger.error(
+        `[TCG] Failed to fetch sets for series ${seriesId}:`,
+        err,
+      );
       return [
         {
           setId: seriesId,
@@ -387,7 +394,7 @@ export class TcgController {
       let cards = null;
       let error = null;
 
-      console.log(`[TCG] Fetching cards for set ${set.id}...`);
+      this.logger.log(`[TCG] Fetching cards for set ${set.id}...`);
 
       try {
         cards = await this.tcgFacade.fetchAndStoreCardsForSetBothLanguages(
@@ -395,7 +402,7 @@ export class TcgController {
         );
       } catch (err: any) {
         error = err?.message || err;
-        console.error(
+        this.logger.error(
           `[TCG] Failed to fetch/store cards for set ${set.id}:`,
           err,
         );

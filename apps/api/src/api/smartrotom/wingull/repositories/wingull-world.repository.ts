@@ -5,9 +5,12 @@ import { IWingullWorldRepository } from './interfaces/wingull-world.repository.i
 import { Performance } from '../entities/performance.entity';
 import { Region } from '../entities/region.entity';
 import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class WingullWorldRepository implements IWingullWorldRepository {
+  constructor(private readonly logger: Logger) {}
+
   private readonly WINGULL_API_BASE_URL = process.env.WINGULL_API;
   private readonly DEFAULT_TIMEOUT = 10000;
 
@@ -27,7 +30,7 @@ export class WingullWorldRepository implements IWingullWorldRepository {
       );
       return response.data.data;
     } catch (error: any) {
-      console.error('Failed to get performance data:', error);
+      this.logger.error('Failed to get performance data:', error);
       throw new Error(`Performance data retrieval failed: ${error.message}`);
     }
   }
@@ -52,7 +55,7 @@ export class WingullWorldRepository implements IWingullWorldRepository {
       }*/
       return response.data.data;
     } catch (error: any) {
-      console.error('Failed to get regions data:', error);
+      this.logger.error('Failed to get regions data:', error);
       throw new Error(`Regions data retrieval failed: ${error.message}`);
     }
   }
@@ -73,7 +76,7 @@ export class WingullWorldRepository implements IWingullWorldRepository {
       );
       return response.data.data as Weather;
     } catch (error: any) {
-      console.error('Failed to get weather data:', error);
+      this.logger.error('Failed to get weather data:', error);
       throw new Error(`Weather data retrieval failed: ${error.message}`);
     }
   }
@@ -95,7 +98,7 @@ export class WingullWorldRepository implements IWingullWorldRepository {
       );
       return response.data.data;
     } catch (error: any) {
-      console.error('Failed to update NPCs:', error);
+      this.logger.error('Failed to update NPCs:', error);
       throw new Error(`NPCs update failed: ${error.message}`);
     }
   }

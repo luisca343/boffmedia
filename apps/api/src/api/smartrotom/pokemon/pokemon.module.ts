@@ -27,6 +27,9 @@ import { PokemonFacadeService } from './pokemon.facade.service';
 
 // Import controller
 import { PokemonController } from './pokemon.controller';
+import pino from 'pino';
+
+const logger = pino({ name: 'util' });
 
 @Module({
   imports: [
@@ -78,12 +81,12 @@ export class PokemonModule implements OnModuleInit {
   constructor(private readonly pokemonFacadeService: PokemonFacadeService) {}
 
   async onModuleInit() {
-    console.log('Initializing Pokemon service...');
+    logger.info('Initializing Pokemon service...');
     try {
       await this.pokemonFacadeService.initializeService();
-      console.log('Pokemon service initialized successfully');
+      logger.info('Pokemon service initialized successfully');
     } catch (error: any) {
-      console.error('Failed to initialize Pokemon service:', error);
+      logger.error({ err: error }, 'Failed to initialize Pokemon service:');
       throw error;
     }
   }

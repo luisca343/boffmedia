@@ -22,6 +22,9 @@ import {
   UA,
 } from '../../manga-http';
 import { MangaBrowserService } from '../../manga-browser.service';
+import pino from 'pino';
+
+const logger = pino({ name: 'util' });
 
 export class NovelCoolScraper implements IMangaScraper {
   readonly name = 'novelcool-es';
@@ -102,11 +105,11 @@ export class NovelCoolScraper implements IMangaScraper {
     context: BrowserContext,
   ): Promise<string[]> {
     const firstPageUrl = this.normalizeChapterUrl(chapterUrl);
-    console.log(
+    logger.info(
       `[NovelCoolScraper] Detecting total pages for chapter: ${firstPageUrl}`,
     );
     const totalPages = await this.detectTotalPages(context, firstPageUrl);
-    console.log(`[NovelCoolScraper] Chapter has ${totalPages} page(s)`);
+    logger.info(`[NovelCoolScraper] Chapter has ${totalPages} page(s)`);
 
     // Strip any existing page suffix to get the canonical base URL.
     const canonicalBase = chapterUrl
@@ -117,11 +120,11 @@ export class NovelCoolScraper implements IMangaScraper {
 
     for (let page = 1; page <= totalPages; page++) {
       const pageUrl = this.buildPageUrl(canonicalBase, page);
-      console.log(
+      logger.info(
         `[NovelCoolScraper] Scraping page ${page}/${totalPages}: ${pageUrl}`,
       );
       const images = await this.scrapePageWithRetry(context, pageUrl, page);
-      console.log(
+      logger.info(
         `[NovelCoolScraper] Page ${page}/${totalPages}: found ${images.length} image(s)`,
       );
       allImages.push(...images);
@@ -129,7 +132,7 @@ export class NovelCoolScraper implements IMangaScraper {
     }
 
     const deduplicated = [...new Set(allImages)];
-    console.log(
+    logger.info(
       `[NovelCoolScraper] Chapter done — ${deduplicated.length} unique image(s) total`,
     );
     return deduplicated;
@@ -146,13 +149,13 @@ export class NovelCoolScraper implements IMangaScraper {
    */
   private async fetchWithFallback(url: string): Promise<string> {
     // 1. Direct — no proxy.
-    console.log(`[NovelCoolScraper] Fetching (direct): ${url}`);
+    logger.info(`[NovelCoolScraper] Fetching (direct): ${url}`);
     const direct = await fetchHtmlSafe(url);
     if (direct !== null) {
-      console.log(`[NovelCoolScraper] Direct fetch succeeded for ${url}`);
+      logger.info(`[NovelCoolScraper] Direct fetch succeeded for ${url}`);
       return direct;
     }
-    console.warn(
+    logger.warn(
       `[NovelCoolScraper] Direct fetch blocked — trying proxies for ${url}`,
     );
 
@@ -160,29 +163,29 @@ export class NovelCoolScraper implements IMangaScraper {
     const tunnelEnabled = this.browserService.getTunnelEnabled();
     const proxies = tunnelEnabled ? await getProxies(3) : [];
     if (!tunnelEnabled) {
-      console.log(
+      logger.info(
         `[NovelCoolScraper] Tunnel disabled — skipping proxy tier for ${url}`,
       );
     } else if (proxies.length === 0) {
-      console.warn(
+      logger.warn(
         `[NovelCoolScraper] Tunnel enabled but no proxies configured — skipping proxy tier`,
       );
     }
     for (let i = 0; i < proxies.length; i++) {
-      console.log(
+      logger.info(
         `[NovelCoolScraper] Proxy attempt ${i + 1}/${proxies.length} for ${url}`,
       );
       const proxied = await fetchHtmlSafe(url, proxies[i]);
       if (proxied !== null) {
-        console.log(`[NovelCoolScraper] Proxy ${i + 1} succeeded for ${url}`);
+        logger.info(`[NovelCoolScraper] Proxy ${i + 1} succeeded for ${url}`);
         return proxied;
       }
-      console.warn(`[NovelCoolScraper] Proxy ${i + 1} blocked for ${url}`);
+      logger.warn(`[NovelCoolScraper] Proxy ${i + 1} blocked for ${url}`);
     }
 
     // 3. Playwright fallback — use proxy only when tunnel is enabled.
     const fallbackProxy = tunnelEnabled ? proxies[0] : undefined;
-    console.warn(
+    logger.warn(
       `[NovelCoolScraper] All HTTP attempts failed — falling back to Playwright${fallbackProxy ? ' (with proxy)' : ' (direct)'} for ${url}`,
     );
     return this.fetchHtmlWithPlaywright(url, fallbackProxy);
@@ -192,7 +195,7 @@ export class NovelCoolScraper implements IMangaScraper {
     url: string,
     proxyUrl?: string,
   ): Promise<string> {
-    console.log(
+    logger.info(
       `[NovelCoolScraper] Launching Playwright for ${url}${proxyUrl ? ' (with proxy)' : ' (no proxy)'}`,
     );
     const browser = await this.browserService.getBrowser();
@@ -208,7 +211,7 @@ export class NovelCoolScraper implements IMangaScraper {
     });
 
     try {
-      console.log(`[NovelCoolScraper] Playwright navigating to ${url}`);
+      logger.info(`[NovelCoolScraper] Playwright navigating to ${url}`);
       await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
 
       // Dismiss age/content warning if present (e.g. violence/adult content gate).
@@ -218,14 +221,14 @@ export class NovelCoolScraper implements IMangaScraper {
         .then(() => true)
         .catch(() => false);
       if (warned)
-        console.log(`[NovelCoolScraper] Dismissed content warning on ${url}`);
+        logger.info(`[NovelCoolScraper] Dismissed content warning on ${url}`);
 
       await page
         .waitForSelector('[class*="book-item"], a[href*="/chapter/"], h1', {
           timeout: 15_000,
         })
         .catch(() => {});
-      console.log(`[NovelCoolScraper] Playwright page loaded for ${url}`);
+      logger.info(`[NovelCoolScraper] Playwright page loaded for ${url}`);
       return await page.content();
     } finally {
       await page.close();
@@ -280,7 +283,7 @@ export class NovelCoolScraper implements IMangaScraper {
       } catch (err) {
         lastError = err as Error;
         if (attempt <= MAX_RETRIES) {
-          console.warn(
+          logger.warn(
             `[NovelCoolScraper] Page ${pageNum} attempt ${attempt} failed — retrying… (${lastError.message})`,
           );
           await sleep(1000 * attempt);
@@ -288,7 +291,7 @@ export class NovelCoolScraper implements IMangaScraper {
       }
     }
 
-    console.error(
+    logger.error(
       `[NovelCoolScraper] Page ${pageNum} failed after ${MAX_RETRIES} retries: ${lastError?.message}`,
     );
     return [];

@@ -4,13 +4,14 @@ import * as mysql from 'mysql2/promise';
 import { migrate } from 'drizzle-orm/mysql2/migrator';
 
 import * as SmartRotomSchema from '../_db/schema/SmartRotom';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class MySQL2Service {
   private pool: mysql.Pool;
   private db: MySql2Database<Record<string, never>>;
 
-  constructor() {
+  constructor(private readonly logger: Logger) {
     this.connect();
   }
 
@@ -45,10 +46,10 @@ export class MySQL2Service {
     await this.connect();
     migrate(this.db, { migrationsFolder: './drizzle/migrations' })
       .then(() => {
-        console.log('Base de datos migrada');
+        this.logger.log('Base de datos migrada');
       })
       .catch((error) => {
-        console.error('Error al migrar base de datos: ', error.message);
+        this.logger.error('Error al migrar base de datos: ', error.message);
         throw error;
       });
   }
@@ -91,7 +92,7 @@ export class MySQL2Service {
 
       return rows as T[];
     } catch (error: any) {
-      console.error('Error al insertar y retornar ', error.message);
+      this.logger.error('Error al insertar y retornar ', error.message);
       throw error; // re-throw the error to be handled by the calling code
     }
   }

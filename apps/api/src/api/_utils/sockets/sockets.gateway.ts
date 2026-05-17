@@ -10,6 +10,7 @@ import {
 import type { Server, Socket } from 'socket.io';
 import { Inject, forwardRef } from '@nestjs/common';
 import { ChatappFacadeService } from '@api/smartrotom/chatapp/chatapp.facade.service';
+import { Logger } from 'nestjs-pino';
 
 @WebSocketGateway(34304, {
   cors: {
@@ -24,13 +25,15 @@ export class SocketsGateway
   users: Map<string, { uuid: string; socketId: string }> = new Map();
 
   constructor(
+    private readonly logger: Logger,
+
     @Inject(forwardRef(() => ChatappFacadeService))
     private chatAppService: ChatappFacadeService,
   ) {}
 
   handleConnection(client: Socket) {
-    console.log(`Client with ID ${client.id} connected`);
-    console.log('Total connections:', this.server.sockets.sockets.size);
+    this.logger.log(`Client with ID ${client.id} connected`);
+    this.logger.log('Total connections:', this.server.sockets.sockets.size);
   }
 
   @SubscribeMessage('smartrotom:connection')
@@ -38,7 +41,7 @@ export class SocketsGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() smartRotomUser: any,
   ): boolean {
-    console.log(`SmartRotom connection for user ${smartRotomUser.uuid}`);
+    this.logger.log(`SmartRotom connection for user ${smartRotomUser.uuid}`);
 
     // If the user already has a connection, disconnect the old one
     const _existingUser = this.users.get(smartRotomUser.uuid);
@@ -46,7 +49,7 @@ export class SocketsGateway
       if (existingUser && existingUser.socketId !== client.id) {
         const oldSocket = this.server.sockets.sockets.get(existingUser.socketId)
         if (oldSocket) {
-          console.log(`Disconnecting old socket for user ${smartRotomUser.uuid}`)
+          this.logger.log(`Disconnecting old socket for user ${smartRotomUser.uuid}`)
           oldSocket.disconnect(true)
         }
       }*/
@@ -56,26 +59,26 @@ export class SocketsGateway
       uuid: smartRotomUser.uuid,
       socketId: client.id,
     });
-    console.log(`Updated connection for user ${smartRotomUser.uuid}`);
-    console.log('Current users:', this.users.size);
+    this.logger.log(`Updated connection for user ${smartRotomUser.uuid}`);
+    this.logger.log('Current users:', this.users.size);
 
     return client.emit('smartrotom:connection', smartRotomUser);
   }
 
   handleDisconnect(client: Socket) {
-    console.log(`Client with ID ${client.id} disconnected`);
+    this.logger.log(`Client with ID ${client.id} disconnected`);
 
     // Find and remove the disconnected user
     for (const [uuid, user] of this.users.entries()) {
       if (user.socketId === client.id) {
         this.users.delete(uuid);
-        console.log(`Removed user ${uuid} from connections`);
+        this.logger.log(`Removed user ${uuid} from connections`);
         break;
       }
     }
 
-    console.log('Current users:', this.users.size);
-    console.log('Total connections:', this.server.sockets.sockets.size);
+    this.logger.log('Current users:', this.users.size);
+    this.logger.log('Total connections:', this.server.sockets.sockets.size);
   }
 
   /* ChatApp */
@@ -94,7 +97,7 @@ export class SocketsGateway
     },
   ): void {
     // Remove the user from the call
-    console.log(`Exit call signal sent by ${data.user.uuid}`);
+    this.logger.log(`Exit call signal sent by ${data.user.uuid}`);
     data.call.users = data.call.users.filter(
       (user) => user.uuid !== data.user.uuid,
     );
@@ -102,12 +105,12 @@ export class SocketsGateway
     const currentUsers = data.call.users.filter(
       (user) => user.status === 'IN_CALL',
     );
-    console.log('Current users in call: ', currentUsers);
+    this.logger.log('Current users in call: ', currentUsers);
 
     data.call.users.forEach((user) => {
       const userSocket = this.users.get(user.uuid);
       if (userSocket) {
-        console.log(`Sending exit call signal to ${user.uuid}`);
+        this.logger.log(`Sending exit call signal to ${user.uuid}`);
         this.server.to(userSocket.socketId).emit('chat:exitcall', data);
       }
     });
@@ -126,18 +129,18 @@ export class SocketsGateway
       user: any;
     },
   ): void {
-    console.log(`Join call signal sent by ${data.user.uuid}`);
+    this.logger.log(`Join call signal sent by ${data.user.uuid}`);
     const _sockets = this.server.sockets.sockets;
     const users = data.call.users.map((user) => user.uuid);
     const connectedUsers = Array.from(this.users.keys());
 
-    console.log('Users: ', users);
-    console.log('Connected users: ', connectedUsers);
+    this.logger.log('Users: ', users);
+    this.logger.log('Connected users: ', connectedUsers);
 
     data.call.users.forEach((user) => {
       const userSocket = this.users.get(user.uuid);
       if (userSocket) {
-        console.log(`Sending join call signal to ${user.uuid}`);
+        this.logger.log(`Sending join call signal to ${user.uuid}`);
         this.server
           .to(userSocket.socketId)
           .emit('chat:joincall', { uuid: data.user.uuid });
@@ -171,7 +174,7 @@ export class SocketsGateway
         }
       });
     } catch (error: any) {
-      console.error('Error broadcasting typing start:', error);
+      this.logger.error('Error broadcasting typing start:', error);
     }
   }
 
@@ -180,7 +183,7 @@ export class SocketsGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { chatId: number; uuid: string },
   ): Promise<void> {
-    console.log(`Typing stopped by ${data.uuid} in chat ${data.chatId}`);
+    this.logger.log(`Typing stopped by ${data.uuid} in chat ${data.chatId}`);
 
     try {
       // Get chat members to broadcast to
@@ -202,7 +205,7 @@ export class SocketsGateway
         }
       });
     } catch (error: any) {
-      console.error('Error broadcasting typing stop:', error);
+      this.logger.error('Error broadcasting typing stop:', error);
     }
   }
 }

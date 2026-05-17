@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import axios, { AxiosResponse } from 'axios';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class PlayerRepository {
+  constructor(private readonly logger: Logger) {}
+
   private readonly WINGULL_API_BASE_URL = process.env.WINGULL_API;
   private readonly DEFAULT_TIMEOUT = 10000; // 10 seconds
 
@@ -30,7 +33,10 @@ export class PlayerRepository {
 
       return response.data.data;
     } catch (error: any) {
-      console.error(`Failed to fetch player stats for UUID ${uuid}:`, error);
+      this.logger.error(
+        `Failed to fetch player stats for UUID ${uuid}:`,
+        error,
+      );
 
       if (error.code === 'ECONNABORTED') {
         throw new Error('Wingull API request timed out');
@@ -67,7 +73,7 @@ export class PlayerRepository {
 
       return response.data.data;
     } catch (error: any) {
-      console.error(`Failed to fetch player team for UUID ${uuid}:`, error);
+      this.logger.error(`Failed to fetch player team for UUID ${uuid}:`, error);
 
       if (error.code === 'ECONNABORTED') {
         throw new Error('Wingull API request timed out');

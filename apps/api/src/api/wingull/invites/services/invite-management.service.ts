@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Logger } from 'nestjs-pino';
 import {
   InvitesRepository,
   CreateInviteData,
@@ -20,7 +21,10 @@ export interface InviteStatistics {
 
 @Injectable()
 export class InviteManagementService {
-  constructor(private readonly invitesRepository: InvitesRepository) {}
+  constructor(
+    private readonly logger: Logger,
+    private readonly invitesRepository: InvitesRepository,
+  ) {}
 
   // ==================== INVITE CREATION ====================
 
@@ -52,7 +56,7 @@ export class InviteManagementService {
         };
       }
     } catch (error: any) {
-      console.error('Failed to create invite:', error);
+      this.logger.error('Failed to create invite:', error);
       return {
         success: false,
         message: `Invite creation failed: ${error.message}`,
@@ -66,7 +70,7 @@ export class InviteManagementService {
     try {
       return await this.invitesRepository.findAllInvites();
     } catch (error: any) {
-      console.error('Failed to get all invites:', error);
+      this.logger.error('Failed to get all invites:', error);
       throw new Error(`Invites retrieval failed: ${error.message}`);
     }
   }
@@ -75,7 +79,7 @@ export class InviteManagementService {
     try {
       return await this.invitesRepository.findInviteById(id);
     } catch (error: any) {
-      console.error(`Failed to get invite ${id}:`, error);
+      this.logger.error(`Failed to get invite ${id}:`, error);
       throw new Error(`Invite retrieval failed: ${error.message}`);
     }
   }
@@ -84,7 +88,7 @@ export class InviteManagementService {
     try {
       return await this.invitesRepository.findActiveInviteById(id);
     } catch (error: any) {
-      console.error(`Failed to get active invite ${id}:`, error);
+      this.logger.error(`Failed to get active invite ${id}:`, error);
       throw new Error(`Active invite retrieval failed: ${error.message}`);
     }
   }
@@ -93,7 +97,7 @@ export class InviteManagementService {
     try {
       return await this.invitesRepository.findInvitesByUuid(uuid);
     } catch (error: any) {
-      console.error(`Failed to get invites for user ${uuid}:`, error);
+      this.logger.error(`Failed to get invites for user ${uuid}:`, error);
       throw new Error(`User invites retrieval failed: ${error.message}`);
     }
   }
@@ -102,7 +106,10 @@ export class InviteManagementService {
     try {
       return await this.invitesRepository.findInvitesByUsername(username);
     } catch (error: any) {
-      console.error(`Failed to get invites for username ${username}:`, error);
+      this.logger.error(
+        `Failed to get invites for username ${username}:`,
+        error,
+      );
       throw new Error(`Username invites retrieval failed: ${error.message}`);
     }
   }
@@ -136,7 +143,7 @@ export class InviteManagementService {
         };
       }
     } catch (error: any) {
-      console.error(`Failed to mark invite ${id} as used:`, error);
+      this.logger.error(`Failed to mark invite ${id} as used:`, error);
       return {
         success: false,
         message: `Mark as used failed: ${error.message}`,
@@ -171,7 +178,7 @@ export class InviteManagementService {
         };
       }
     } catch (error: any) {
-      console.error(`Failed to delete invite ${id}:`, error);
+      this.logger.error(`Failed to delete invite ${id}:`, error);
       return {
         success: false,
         message: `Invite deletion failed: ${error.message}`,
@@ -206,7 +213,7 @@ export class InviteManagementService {
         };
       }
     } catch (error: any) {
-      console.error(`Failed to permanently delete invite ${id}:`, error);
+      this.logger.error(`Failed to permanently delete invite ${id}:`, error);
       return {
         success: false,
         message: `Permanent deletion failed: ${error.message}`,
@@ -251,7 +258,7 @@ export class InviteManagementService {
         invite,
       };
     } catch (error: any) {
-      console.error(`Failed to validate invite ${id}:`, error);
+      this.logger.error(`Failed to validate invite ${id}:`, error);
       return {
         valid: false,
         message: `Validation failed: ${error.message}`,
@@ -276,7 +283,7 @@ export class InviteManagementService {
         deleted: total - active - used,
       };
     } catch (error: any) {
-      console.error('Failed to get invite statistics:', error);
+      this.logger.error('Failed to get invite statistics:', error);
       throw new Error(`Statistics retrieval failed: ${error.message}`);
     }
   }
@@ -288,7 +295,7 @@ export class InviteManagementService {
       const validation = await this.validateInvite(id);
       return validation.valid;
     } catch (error: any) {
-      console.error(`Failed to check invite validity ${id}:`, error);
+      this.logger.error(`Failed to check invite validity ${id}:`, error);
       return false;
     }
   }

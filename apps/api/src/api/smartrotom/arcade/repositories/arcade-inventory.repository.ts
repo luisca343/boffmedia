@@ -10,6 +10,7 @@ import {
   ArcadeInventoryItem,
   ItemRarity,
 } from '../entities/arcade-inventory.entity';
+import { Logger } from 'nestjs-pino';
 import {
   SmartRotomInventoryItem,
   smartRotomInventory,
@@ -24,7 +25,10 @@ export class ArcadeInventoryRepository
   >
   implements IArcadeInventoryRepository
 {
-  constructor(@Inject(DRIZZLE) db: MySql2Database<Record<string, never>>) {
+  constructor(
+    private readonly logger: Logger,
+    @Inject(DRIZZLE) db: MySql2Database<Record<string, never>>,
+  ) {
     super(db, smartRotomInventory);
   }
 
@@ -143,7 +147,7 @@ export class ArcadeInventoryRepository
     itemId: string,
     amount: number,
   ): Promise<ArcadeInventoryItem> {
-    console.log(`Consuming ${amount} of ${itemId} for ${uuid}`);
+    this.logger.log(`Consuming ${amount} of ${itemId} for ${uuid}`);
 
     // Get all items matching this itemId for the user that have available quantity
     const items = await this.db
@@ -158,7 +162,7 @@ export class ArcadeInventoryRepository
       )
       .orderBy(asc(smartRotomInventory.used), asc(smartRotomInventory.id));
 
-    console.log(`Found items for consumption:`, items);
+    this.logger.log(`Found items for consumption:`, items);
 
     if (!items.length) {
       throw new Error('Item not found or no available quantity');
@@ -192,7 +196,7 @@ export class ArcadeInventoryRepository
       if (toConsumeFromThisItem > 0) {
         const newUsedCount = (item.used || 0) + toConsumeFromThisItem;
 
-        console.log(
+        this.logger.log(
           `Updating item ${item.id}: used from ${item.used || 0} to ${newUsedCount}`,
         );
 
@@ -229,7 +233,7 @@ export class ArcadeInventoryRepository
       0,
     );
 
-    console.log(`Consumption complete. Total remaining: ${totalRemaining}`);
+    this.logger.log(`Consumption complete. Total remaining: ${totalRemaining}`);
 
     // Return the last updated item with remaining amount information
     return {

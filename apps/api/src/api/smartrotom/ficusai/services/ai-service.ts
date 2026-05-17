@@ -3,9 +3,12 @@ import { GoogleGenAI, Type } from '@google/genai';
 import { FicusMessageContentDto } from '../dto/ficus-message-content.dto';
 import { MessagePartType } from '../dto/message-part.dto';
 import { MessageSender } from '../enums/message-sender.enum';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class AIService {
+  constructor(private readonly logger: Logger) {}
+
   private gemini: GoogleGenAI;
 
   async initialize(): Promise<void> {
@@ -147,7 +150,10 @@ export class AIService {
         ],
       };
     } catch (error: any) {
-      console.error('Error generating fallback response with Gemma:', error);
+      this.logger.error(
+        'Error generating fallback response with Gemma:',
+        error,
+      );
 
       // Fallback to basic response if Gemma fails
       return {
@@ -176,7 +182,7 @@ export class AIService {
         seen.add(key);
         unique.push(call);
       } else {
-        console.log(
+        this.logger.log(
           `[Deduplication] Skipping duplicate call: ${call.name} with args:`,
           call.args,
         );

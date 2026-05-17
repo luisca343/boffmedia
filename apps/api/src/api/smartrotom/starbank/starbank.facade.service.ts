@@ -10,10 +10,13 @@ import { TrainerDefeatMoneyDto } from './dto/trainer-defeat-money.dto';
 import { StarBankAccount } from './entities/starbank-account.entity';
 import { StarBankTransaction } from './entities/starbank-transaction.entity';
 import { AccountType } from './enums/account-type.enum';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class StarbankFacadeService {
   constructor(
+    private readonly logger: Logger,
+
     private readonly accountService: StarbankAccountService,
     private readonly transactionService: StarbankTransactionService,
     private readonly wingullFacadeService: WingullFacadeService,
@@ -105,7 +108,7 @@ export class StarbankFacadeService {
         }
       }
     } catch (error: any) {
-      console.warn(
+      this.logger.warn(
         'Failed to update balance in game after transfer, continuing anyway:',
         error.message,
       );
@@ -138,7 +141,7 @@ export class StarbankFacadeService {
         });
       }
     } catch (error: any) {
-      console.warn(
+      this.logger.warn(
         `Failed to update balance in game for user ${uuid}, continuing anyway:`,
         error.message,
       );
@@ -167,7 +170,7 @@ export class StarbankFacadeService {
         });
       }
     } catch (error: any) {
-      console.warn(
+      this.logger.warn(
         `Failed to update balance in game for account ${accountId}, continuing anyway:`,
         error.message,
       );
@@ -188,7 +191,7 @@ export class StarbankFacadeService {
         });
       }
     } catch (error: any) {
-      console.warn(
+      this.logger.warn(
         `Failed to update balance in game after shop transaction for user ${shopData.uuid}, continuing anyway:`,
         error.message,
       );
@@ -244,7 +247,7 @@ export class StarbankFacadeService {
     try {
       await this.wingullFacadeService.updateBalance(account);
     } catch (error: any) {
-      console.error('Error updating balance in game:', error);
+      this.logger.error('Error updating balance in game:', error);
       throw new Error(`Balance update failed: ${error.message}`);
     }
   }

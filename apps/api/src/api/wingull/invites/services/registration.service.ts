@@ -3,6 +3,7 @@ import { InviteManagementService } from './invite-management.service';
 import { UsersFacadeService } from '@api/smartrotom/users/users.facade.service';
 import { shortToLongUUID } from '@/_utils/stringUtils';
 import { BoffMediaUsersFacadeService } from '@api/boffmedia/users/users.facade.service';
+import { Logger } from 'nestjs-pino';
 
 export interface RegistrationData {
   username: string;
@@ -30,6 +31,8 @@ export interface MinecraftUser {
 @Injectable()
 export class RegistrationService {
   constructor(
+    private readonly logger: Logger,
+
     private readonly inviteManagementService: InviteManagementService,
     private readonly boffMediaUsersService: BoffMediaUsersFacadeService,
     private readonly smartRotomUsersService: UsersFacadeService,
@@ -42,7 +45,7 @@ export class RegistrationService {
     registrationData: RegistrationData,
   ): Promise<RegistrationResult> {
     try {
-      console.log(`Starting registration process for invite ${inviteId}`);
+      this.logger.log(`Starting registration process for invite ${inviteId}`);
 
       // 1. Validate the invite
       const inviteValidation =
@@ -69,7 +72,7 @@ export class RegistrationService {
 
       // 3. Convert short UUID to long UUID
       const uuid = shortToLongUUID(minecraftUser.id);
-      console.log(`Minecraft UUID: ${minecraftUser.id} -> ${uuid}`);
+      this.logger.log(`Minecraft UUID: ${minecraftUser.id} -> ${uuid}`);
 
       // 4. Create user with full Minecraft integration using the new facade service
       const registrationDataForFacade = {
@@ -88,7 +91,7 @@ export class RegistrationService {
           registrationDataForFacade,
         );
 
-      console.log('User creation completed:', {
+      this.logger.log('User creation completed:', {
         boffMediaUserId: creationResult.boffMediaUser.id,
         smartRotomUserId: creationResult.smartRotomUser?.id,
         hasStarbank: creationResult.starbankAccounts.length > 0,
@@ -100,11 +103,14 @@ export class RegistrationService {
       const markUsedResult =
         await this.inviteManagementService.markInviteAsUsed(inviteId);
       if (!markUsedResult.success) {
-        console.error('Error marking invite as used:', markUsedResult.message);
+        this.logger.error(
+          'Error marking invite as used:',
+          markUsedResult.message,
+        );
         // This is not a critical error, so we'll continue
       }
 
-      console.log('User registration completed successfully');
+      this.logger.log('User registration completed successfully');
 
       return {
         success: true,
@@ -116,7 +122,7 @@ export class RegistrationService {
         },
       };
     } catch (error: any) {
-      console.error('Registration failed:', error);
+      this.logger.error('Registration failed:', error);
       return {
         success: false,
         message: `Registration failed: ${error.message}`,
@@ -131,31 +137,31 @@ export class RegistrationService {
     username: string,
   ): Promise<MinecraftUser | null> {
     try {
-      console.log(`Validating Minecraft username: ${username}`);
+      this.logger.log(`Validating Minecraft username: ${username}`);
 
       const response = await fetch(
         `https://api.mojang.com/users/profiles/minecraft/${username}`,
       );
 
       if (!response.ok) {
-        console.error(`Minecraft API error: ${response.status}`);
+        this.logger.error(`Minecraft API error: ${response.status}`);
         return null;
       }
 
       const data = await response.json();
 
       if (!data.id || !data.name) {
-        console.error('Invalid response from Minecraft API:', data);
+        this.logger.error('Invalid response from Minecraft API:', data);
         return null;
       }
 
-      console.log(`Minecraft user found: ${data.name} (${data.id})`);
+      this.logger.log(`Minecraft user found: ${data.name} (${data.id})`);
       return {
         id: data.id,
         name: data.name,
       };
     } catch (error: any) {
-      console.error('Error validating Minecraft username:', error);
+      this.logger.error('Error validating Minecraft username:', error);
       return null;
     }
   }
@@ -223,7 +229,7 @@ export class RegistrationService {
         message: 'Invite is valid for registration',
       };
     } catch (error: any) {
-      console.error(
+      this.logger.error(
         `Failed to check registration eligibility for invite ${inviteId}:`,
         error,
       );

@@ -2,9 +2,14 @@ import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
 import { promises as fsPromises } from 'fs';
+import pino from 'pino';
+
+const logger = pino({ name: 'base-data' });
 
 @Injectable()
 export class BaseDataService {
+  constructor() {}
+
   protected async readJsonFiles(
     defaultDir: string,
     publicDir: string,
@@ -36,7 +41,7 @@ export class BaseDataService {
       const data = await fsPromises.readFile(filePath, 'utf8');
       return JSON.parse(data);
     } catch (error: any) {
-      console.error(`Error reading JSON file at ${filePath}:`, error);
+      logger.error({ err: error }, `Error reading JSON file at ${filePath}`);
       throw error;
     }
   }

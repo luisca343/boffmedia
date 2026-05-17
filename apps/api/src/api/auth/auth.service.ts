@@ -1,10 +1,13 @@
 import { BoffMediaUsersFacadeService } from '@api/boffmedia/users/users.facade.service';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class AuthService {
   constructor(
+    private readonly logger: Logger,
+
     private readonly usersService: BoffMediaUsersFacadeService,
     private readonly jwtService: JwtService,
   ) {}
@@ -110,7 +113,7 @@ export class AuthService {
 
       return this.login(loginUser);
     } catch (error: any) {
-      console.error('Minecraft registration error:', error);
+      this.logger.error('Minecraft registration error:', error);
       return { error: error.message || 'Registration failed' };
     }
   }
@@ -157,7 +160,7 @@ export class AuthService {
 
       return this.login(loginUser);
     } catch (error: any) {
-      console.error('Minecraft linking error:', error);
+      this.logger.error('Minecraft linking error:', error);
       return { error: error.message || 'Linking failed' };
     }
   }
@@ -210,7 +213,7 @@ export class AuthService {
         },
       };
     } catch (error: any) {
-      console.error('Refresh token error:', error);
+      this.logger.error('Refresh token error:', error);
       throw new UnauthorizedException('Invalid refresh token');
     }
   }

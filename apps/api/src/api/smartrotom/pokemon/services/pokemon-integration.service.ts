@@ -2,10 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { PokemonShowdownService } from './pokemon-showdown.service';
 import { WingullFacadeService } from '../../wingull/wingull.facade.service';
 import { PokedexManagementService } from './pokedex-management.service';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class PokemonIntegrationService {
   constructor(
+    private readonly logger: Logger,
+
     private readonly pokemonShowdownService: PokemonShowdownService,
     private readonly wingullFacadeService: WingullFacadeService,
     private readonly pokedexManagementService: PokedexManagementService,
@@ -17,7 +20,7 @@ export class PokemonIntegrationService {
     try {
       return await this.pokemonShowdownService.getTerasPokemonShowdownData();
     } catch (error: any) {
-      console.error('Failed to get Teras Pokemon Showdown data:', error);
+      this.logger.error('Failed to get Teras Pokemon Showdown data:', error);
       throw new Error(`Showdown data retrieval failed: ${error.message}`);
     }
   }
@@ -28,7 +31,7 @@ export class PokemonIntegrationService {
     try {
       return await this.wingullFacadeService.updateDex(uuid);
     } catch (error: any) {
-      console.error(`Failed to update Wingull dex for ${uuid}:`, error);
+      this.logger.error(`Failed to update Wingull dex for ${uuid}:`, error);
       throw new Error(`Wingull dex update failed: ${error.message}`);
     }
   }
@@ -51,7 +54,7 @@ export class PokemonIntegrationService {
         try {
           await this.updateWingullDex(uuid);
         } catch (wingullError) {
-          console.error(
+          this.logger.error(
             `Failed to sync with Wingull for ${uuid}:`,
             wingullError,
           );
@@ -61,7 +64,7 @@ export class PokemonIntegrationService {
 
       return updateResult;
     } catch (error: any) {
-      console.error(`Failed to update dex with sync for ${uuid}:`, error);
+      this.logger.error(`Failed to update dex with sync for ${uuid}:`, error);
       throw new Error(`Dex update with sync failed: ${error.message}`);
     }
   }

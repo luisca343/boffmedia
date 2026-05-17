@@ -15,10 +15,11 @@ import { LogFormatter } from '@pkmn/view';
 import { Sprites } from '@pkmn/img';
 import { Protocol } from '@pkmn/protocol';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
+import { Logger } from 'nestjs-pino';
 
 function getPokemonTeam(team: Pokemon[]) {
   const pokemonTeam = [] as any[];
-  console.log(team[0]);
+  this.logger.log(team[0]);
   team.map((pokemon) => {
     pokemonTeam.push({
       speciesForme: pokemon.speciesForme || pokemon.name,
@@ -35,7 +36,7 @@ function getPokemonTeam(team: Pokemon[]) {
 @Controller('battlesimulator/battle')
 @UseInterceptors(ResponseInterceptor)
 export class BattleController {
-  constructor() {}
+  constructor(private readonly logger: Logger) {}
 
   @Get()
   @ApiOperation({ summary: 'Simulate a Pokémon battle' })
@@ -120,7 +121,7 @@ export class BattleController {
       kwArgs: { [k: string]: any },
       line?: string,
     ) {
-      //console.log(turn, text);
+      //this.logger.log(turn, text);
       let img1 = {} as {
         gen: number;
         w: number;
@@ -137,7 +138,7 @@ export class BattleController {
       };
 
       for (const active of battle.p1.active) {
-        //console.log(active?.speciesForme);
+        //this.logger.log(active?.speciesForme);
         if (!active)
           img1 = {} as {
             gen: number;
@@ -154,7 +155,7 @@ export class BattleController {
       }
 
       for (const active of battle.p2.active) {
-        //console.log(active?.speciesForme);
+        //this.logger.log(active?.speciesForme);
         if (!active)
           img2 = {} as {
             gen: number;
@@ -189,14 +190,14 @@ export class BattleController {
 
     return new Promise((resolve, _reject) => {
       (async () => {
-        //console.log("async");
+        //this.logger.log("async");
         let turn = 0;
         for await (const chunk of streams.omniscient) {
           // TODO: why does Parcel not like Protocol.parse?
           for (const line of chunk.split('\n')) {
-            //console.log(line);
+            //this.logger.log(line);
             const { args, kwArgs } = Protocol.parseBattleLine(line);
-            //console.log(args, kwArgs);
+            //this.logger.log(args, kwArgs);
 
             if (args[0] === 'turn') {
               const turnNum = parseInt(args[1]);

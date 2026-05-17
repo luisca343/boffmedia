@@ -17,10 +17,13 @@ import {
 import * as path from 'path';
 import { promises as fsPromises } from 'fs';
 import { BoffMediaUsersManagementService } from '@api/boffmedia/users/services/users-management.service';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class TcgService {
   constructor(
+    private readonly logger: Logger,
+
     @Inject(TCGPOCKET_REPOSITORY_TOKEN)
     private readonly tcgRepository: ITcgRepository,
     private readonly errorService: TcgErrorService,
@@ -209,11 +212,11 @@ export class TcgService {
         existingCards.map((card) => [card.id, card]),
       );
 
-      console.log(`[TCG] Fetching cards for set ${setId}...`);
+      this.logger.log(`[TCG] Fetching cards for set ${setId}...`);
       const mergedCards =
         await this.fetchService.fetchAndMergeCardsForSet(setId);
 
-      console.log(
+      this.logger.log(
         `[TCG] Storing ${mergedCards.length} cards for set ${setId}...`,
       );
       // Store in database (images are already downloaded and URLs are set)
@@ -496,7 +499,7 @@ export class TcgService {
 
       // Insert each card into the database
       for (const userCard of newUserCards) {
-        console.log(
+        this.logger.log(
           `Inserting user card: ${userCard.user_id} - ${userCard.card_id} (${userCard.quantity})`,
         );
         await this.tcgRepository.addUserCard(

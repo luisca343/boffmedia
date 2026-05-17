@@ -1,5 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import pino from 'pino';
+
+const logger = pino({ name: 'util' });
 
 const typeChart = {
   normal: { ghost: 0, rock: 0.5, steel: 0.5 },
@@ -216,7 +219,7 @@ export function getDeffensiveScore(type1: string, type2?: string) {
       const type2Effectiveness = typeChart[type][type2.toLowerCase()] ?? 1;
       const result = type1Effectiveness * type2Effectiveness;
       total += factorFrequency(result, type, true);
-      console.log(
+      logger.info(
         `${type1} ${type2} ${type} ${factorFrequency(result, type, true)} ${total}`,
       );
     } else {

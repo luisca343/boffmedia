@@ -4,6 +4,9 @@ import { promises as fsPromises } from 'fs';
 import { Pokemon } from '@/types/pokemon';
 import { wolfeyTypeRanking } from './types';
 import { MoveData } from './MoveData';
+import pino from 'pino';
+
+const logger = pino({ name: 'util' });
 
 export class PokemonData {
   moveData: MoveData;
@@ -269,23 +272,23 @@ export class PokemonData {
 
     this.speciesByMove = sortedMovesCopy;
 
-    //console.log(`Moves sorted by count: ${sortedMoves.map((m) => `${m} (${countMoves[m]})`).join(', ')}`);
+    //logger.info(`Moves sorted by count: ${sortedMoves.map((m) => `${m} (${countMoves[m]})`).join(', ')}`);
 
     let totalForms = 0;
     Object.values(this.speciesByForm).forEach((forms: any[]) => {
       totalForms += forms.length;
     });
 
-    console.log(
+    logger.info(
       `Cargadas ${this.species.length} especies y ${Object.keys(this.speciesByForm).length} formas diferentes, para un total de ${totalForms} Pokémon`,
     );
-    console.log(
+    logger.info(
       `Cargadas ${Object.keys(this.finalForms).length} formas evolutivas finales`,
     );
-    console.log(
+    logger.info(
       `Cargados ${defaultCounter} archivos predeterminados y ${terasCounter} archivos modificados`,
     );
     const endTime = Date.now();
-    console.log(`Tiempo de carga: ${endTime - startingTime}ms`);
+    logger.info(`Tiempo de carga: ${endTime - startingTime}ms`);
   }
 }
