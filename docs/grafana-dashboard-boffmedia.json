@@ -1,0 +1,225 @@
+{
+  "title": "Boffmedia — Application Overview",
+  "uid": "boffmedia-overview",
+  "tags": ["boffmedia", "api", "mariadb"],
+  "timezone": "browser",
+  "refresh": "30s",
+  "schemaVersion": 38,
+  "time": { "from": "now-1h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Request Rate",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 0, "w": 6, "h": 6 },
+      "targets": [{
+        "expr": "sum(rate(http_requests_total[5m]))",
+        "legendFormat": "req/s"
+      }],
+      "fieldConfig": {
+        "defaults": { "unit": "reqps", "color": { "mode": "palette-classic" } }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Error Rate %",
+      "type": "timeseries",
+      "gridPos": { "x": 6, "y": 0, "w": 6, "h": 6 },
+      "targets": [{
+        "expr": "sum(rate(http_requests_total{status_code=~\"5..\"}[5m])) / sum(rate(http_requests_total[5m])) * 100",
+        "legendFormat": "5xx %"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.5 },
+              { "color": "red", "value": 1 }
+            ]
+          },
+          "color": { "mode": "thresholds" }
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "p95 Latency",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 0, "w": 6, "h": 6 },
+      "targets": [{
+        "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_ms_bucket[5m])) by (le))",
+        "legendFormat": "p95"
+      }],
+      "fieldConfig": {
+        "defaults": { "unit": "ms" }
+      }
+    },
+    {
+      "id": 4,
+      "title": "p50 Latency",
+      "type": "timeseries",
+      "gridPos": { "x": 18, "y": 0, "w": 6, "h": 6 },
+      "targets": [{
+        "expr": "histogram_quantile(0.50, sum(rate(http_request_duration_ms_bucket[5m])) by (le))",
+        "legendFormat": "p50"
+      }],
+      "fieldConfig": {
+        "defaults": { "unit": "ms" }
+      }
+    },
+    {
+      "id": 5,
+      "title": "Active DB Connections",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 6, "w": 6, "h": 6 },
+      "targets": [{
+        "expr": "mysql_global_status_threads_connected",
+        "legendFormat": "connections"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 80 },
+              { "color": "red", "value": 120 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "API Memory (MB)",
+      "type": "timeseries",
+      "gridPos": { "x": 6, "y": 6, "w": 6, "h": 6 },
+      "targets": [{
+        "expr": "process_resident_memory_bytes{job=\"boffmedia-api\"} / 1024 / 1024",
+        "legendFormat": "RSS MB"
+      }],
+      "fieldConfig": {
+        "defaults": { "unit": "decmbytes" }
+      }
+    },
+    {
+      "id": 7,
+      "title": "DB Connections vs Max",
+      "type": "gauge",
+      "gridPos": { "x": 12, "y": 6, "w": 6, "h": 6 },
+      "targets": [{
+        "expr": "mysql_global_status_threads_connected / mysql_global_variables_max_connections * 100",
+        "legendFormat": "% used"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 60 },
+              { "color": "red", "value": 80 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 8,
+      "title": "Last Backup Age (hours)",
+      "type": "stat",
+      "gridPos": { "x": 18, "y": 6, "w": 6, "h": 6 },
+      "targets": [{
+        "expr": "(time() - node_filestat_modification_time{path=\"/opt/backups/.last-backup-success\"}) / 3600",
+        "legendFormat": "hours since backup"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "h",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 20 },
+              { "color": "red", "value": 25 }
+            ]
+          },
+          "color": { "mode": "thresholds" }
+        }
+      }
+    },
+    {
+      "id": 9,
+      "title": "Top 5 Slowest Routes (p95 ms)",
+      "type": "table",
+      "gridPos": { "x": 0, "y": 12, "w": 12, "h": 8 },
+      "targets": [{
+        "expr": "topk(5, histogram_quantile(0.95, sum(rate(http_request_duration_ms_bucket[5m])) by (le, route)))",
+        "legendFormat": "{{route}}",
+        "instant": true
+      }],
+      "fieldConfig": {
+        "defaults": { "unit": "ms" }
+      },
+      "options": { "sortBy": [{ "displayName": "Value", "desc": true }] }
+    },
+    {
+      "id": 10,
+      "title": "Top 5 Erroring Routes",
+      "type": "table",
+      "gridPos": { "x": 12, "y": 12, "w": 12, "h": 8 },
+      "targets": [{
+        "expr": "topk(5, sum(rate(http_requests_total{status_code=~\"5..\"}[5m])) by (route))",
+        "legendFormat": "{{route}}",
+        "instant": true
+      }],
+      "fieldConfig": {
+        "defaults": { "unit": "reqps" }
+      },
+      "options": { "sortBy": [{ "displayName": "Value", "desc": true }] }
+    },
+    {
+      "id": 11,
+      "title": "MySQL Queries per Second",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 20, "w": 12, "h": 6 },
+      "targets": [
+        {
+          "expr": "rate(mysql_global_status_queries[5m])",
+          "legendFormat": "queries/s"
+        },
+        {
+          "expr": "rate(mysql_global_status_slow_queries[5m])",
+          "legendFormat": "slow queries/s"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "qps" }
+      }
+    },
+    {
+      "id": 12,
+      "title": "MySQL InnoDB Buffer Pool Hit Rate %",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 20, "w": 12, "h": 6 },
+      "targets": [{
+        "expr": "(1 - rate(mysql_global_status_innodb_buffer_pool_reads[5m]) / rate(mysql_global_status_innodb_buffer_pool_read_requests[5m])) * 100",
+        "legendFormat": "hit rate %"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100
+        }
+      }
+    }
+  ]
+}
