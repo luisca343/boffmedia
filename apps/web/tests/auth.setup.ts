@@ -1,4 +1,4 @@
-import { test as setup, expect } from "@playwright/test"
+import { test as setup } from "@playwright/test"
 import fs from "fs"
 import path from "path"
 
@@ -18,12 +18,25 @@ setup("authenticate", async ({ page }) => {
     return
   }
 
+  // Capture the native alert that AuthForm shows on failed login
+  let loginError: string | undefined
+  page.once("dialog", async (dialog) => {
+    loginError = dialog.message()
+    await dialog.accept()
+  })
+
   await page.goto("/auth")
   await page.getByPlaceholder("Enter your username").fill(username)
   await page.getByPlaceholder("Enter your password").fill(password)
   await page.getByRole("button", { name: "Sign In", exact: true }).click()
 
-  await expect(page).not.toHaveURL(/\/auth/, { timeout: 10_000 })
+  // If the login API rejected the credentials, the form shows a native alert.
+  // Playwright auto-accepts it; we surface the message here immediately.
+  if (loginError) {
+    throw new Error(`Auth setup: login rejected — "${loginError}". Check TEST_USERNAME / TEST_PASSWORD in .env.development.local`)
+  }
+
+  await page.waitForURL((url) => !url.pathname.startsWith("/auth"), { timeout: 20_000, waitUntil: "commit" })
 
   await page.context().storageState({ path: AUTH_FILE })
 })

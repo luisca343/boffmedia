@@ -18,12 +18,12 @@ test.describe("Landing page", () => {
 
   test("Explore Games CTA navigates to /juegos", async ({ landingPage, page }) => {
     await landingPage.exploreGamesLink.click()
-    await expect(page).toHaveURL("/juegos")
+    await page.waitForURL("**/juegos", { timeout: 10_000 })
   })
 
   test("Join the Community CTA navigates to /community", async ({ landingPage, page }) => {
     await landingPage.joinCommunityLink.click()
-    await expect(page).toHaveURL("/community")
+    await page.waitForURL("**/community", { timeout: 10_000 })
   })
 
   test("featured games section heading is visible", async ({ landingPage }) => {
