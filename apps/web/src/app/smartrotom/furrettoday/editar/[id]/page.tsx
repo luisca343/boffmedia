@@ -15,7 +15,8 @@ import { InternalLink } from "@/components/ui/navigation/Link";
 const CustomEditor = dynamic(() => import('@/components/shared/ckeditor/TestEditor'), { ssr: false });
 
 export default function EditNote({ params }: { params: { id: string } }) {
-  const { hasRole, status } = useBoffSession();
+  const { hasRole, status, session } = useBoffSession();
+  const token = session?.user?.accessToken ?? '';
   const canManageNews = hasRole([USER_ROLES.ROTOM_ADMIN, USER_ROLES.ROTOM_FURRET]);
   const { id } = params;
   const { article, error, isLoading } = useGetNewsById(id);
@@ -190,6 +191,7 @@ export default function EditNote({ params }: { params: { id: string } }) {
                 documentId={id}
                 documentType={1}
                 type='news'
+                token={token}
               />
             </div>
           </div>

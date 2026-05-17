@@ -1,5 +1,6 @@
 "use client"
 import CustomEditor from '@/components/shared/ckeditor/TestEditor'
+import { useBoffSession } from '@/services/useBoffSession'
 
 interface NewsContentProps {
   selectedNewsId: number | null
@@ -12,6 +13,8 @@ export default function NewsContent({
   news,
   updateNews,
 }: NewsContentProps) {
+  const { session } = useBoffSession();
+  const token = session?.user?.accessToken ?? '';
   const selectedNews = selectedNewsId !== null ? news.find((item) => item.id === selectedNewsId) : null;
   
   return (
@@ -44,6 +47,7 @@ export default function NewsContent({
               documentId={selectedNewsId}
               documentType={1}
               updateNews={updateNews}
+              token={token}
             />
           </div>
         </>

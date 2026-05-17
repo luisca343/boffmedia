@@ -174,10 +174,13 @@ export class AppModule implements NestModule {
     consumer.apply(MetricsMiddleware).forRoutes('*');
     consumer
       .apply(MinecraftMiddleware)
-      .exclude({
-        path: 'smartrotom/starbank/accounts',
-        method: RequestMethod.POST,
-      })
+      .exclude(
+        { path: 'smartrotom/starbank/accounts', method: RequestMethod.POST },
+        { path: 'smartrotom/documents/news', method: RequestMethod.POST },
+        { path: 'smartrotom/documents/news/(.*)', method: RequestMethod.PUT },
+        { path: 'smartrotom/documents/news/(.*)', method: RequestMethod.DELETE },
+        { path: 'smartrotom/documents/newsstatus', method: RequestMethod.POST },
+      )
       .forRoutes('/smartrotom/');
   }
 }

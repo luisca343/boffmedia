@@ -28,6 +28,7 @@ export interface SessionUser {
   id: number;
   name: string;
   email: string;
+  roles: string[];
   smartRotomUser: {
     username: string;
     uuid: string;
@@ -413,7 +414,8 @@ export class BoffMediaUsersManagementService {
         return null;
       }
 
-      return this.createSessionUser(fullUser);
+      const roles = await this.getUserRoles(fullUser.boffmedia_users.id);
+      return this.createSessionUser(fullUser, roles);
     } catch (error: any) {
       this.logger.error(`Failed to validate user ${username}:`, error);
       return null;
@@ -463,7 +465,8 @@ export class BoffMediaUsersManagementService {
         );
       }
 
-      return this.createSessionUser(fullUser);
+      const roles = await this.getUserRoles(fullUser.boffmedia_users.id);
+      return this.createSessionUser(fullUser, roles);
     } catch (error: any) {
       this.logger.error('Failed to create user from Google:', error);
       throw new Error(`Google authentication failed: ${error.message}`);
@@ -546,11 +549,12 @@ export class BoffMediaUsersManagementService {
 
   // ==================== PRIVATE HELPER METHODS ====================
 
-  private createSessionUser(fullUser: FullUserData): SessionUser {
+  private createSessionUser(fullUser: FullUserData, roles: string[] = []): SessionUser {
     return {
       id: fullUser.boffmedia_users.id,
       name: fullUser.boffmedia_users.username,
       email: fullUser.boffmedia_users.email,
+      roles,
       smartRotomUser: fullUser.rotom_users
         ? {
             username: fullUser.rotom_users.username,

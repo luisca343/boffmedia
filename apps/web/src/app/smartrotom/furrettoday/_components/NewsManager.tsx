@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/primitives/input";
 import { DocumentsService } from "@/services/api/smartrotom/documentsService";
 import { CreateNewsDto, News } from "@boffmedia/shared";
 import { sendToast } from "@/lib/toast";
+import { useBoffSession } from "@/services/useBoffSession";
 
 interface NewsManagerProps {
   initialNews?: CreateNewsDto;
@@ -12,6 +13,7 @@ interface NewsManagerProps {
 }
 
 const NewsManager: React.FC<NewsManagerProps> = ({ initialNews, onClose, onSaved }) => {
+  const { session } = useBoffSession();
   const [isSaving, setIsSaving] = useState(false);
   const [news, setNews] = useState<CreateNewsDto>(
     initialNews || {
@@ -33,9 +35,10 @@ const NewsManager: React.FC<NewsManagerProps> = ({ initialNews, onClose, onSaved
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
+    const token = session?.user?.accessToken ?? '';
     const saveRequest = initialNews
-      ? DocumentsService.updateNews(news.id, news)
-      : DocumentsService.createNews(news);
+      ? DocumentsService.updateNews(news.id, news, token)
+      : DocumentsService.createNews(news, token);
 
     saveRequest
       .then((response) => {
