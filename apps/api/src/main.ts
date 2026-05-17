@@ -9,7 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { apiReference } from '@scalar/nestjs-api-reference';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { DuplicateEntryExceptionFilter } from './_filters/DuplicateEntryExceptionFilter';
+import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { Logger } from 'nestjs-pino';
 
 async function bootstrap() {
@@ -39,7 +39,7 @@ async function bootstrap() {
   app.use(express.json({ limit: '50mb' }));
 
   const configService = app.get(ConfigService);
-  app.useGlobalFilters(new DuplicateEntryExceptionFilter());
+  app.useGlobalFilters(new GlobalExceptionFilter(app.get(Logger)));
 
   app.use('/', express.static(join(__dirname, '..', 'public')));
 

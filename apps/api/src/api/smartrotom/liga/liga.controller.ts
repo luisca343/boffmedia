@@ -18,10 +18,7 @@ import {
 } from '@nestjs/swagger';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { LigaFacadeService } from './liga.facade.service';
-import {
-  TournamentCreationRequest,
-  TournamentRegistration,
-} from './services/tournament.service';
+import { CreateTournamentDto, TournamentRegistrationDto } from './dto/tournament.dto';
 
 @ApiTags('SmartRotom | Liga')
 @Controller('smartrotom/liga')
@@ -231,7 +228,7 @@ export class LigaController {
       },
     },
   })
-  async createTournament(@Body() tournamentRequest: TournamentCreationRequest) {
+  async createTournament(@Body() tournamentRequest: CreateTournamentDto) {
     return await this.ligaFacadeService.createTournament(tournamentRequest);
   }
 
@@ -254,7 +251,7 @@ export class LigaController {
       },
     },
   })
-  async registerForTournament(@Body() registration: TournamentRegistration) {
+  async registerForTournament(@Body() registration: TournamentRegistrationDto) {
     return await this.ligaFacadeService.registerForTournament(registration);
   }
 

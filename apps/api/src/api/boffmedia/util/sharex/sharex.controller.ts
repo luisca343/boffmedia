@@ -13,6 +13,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { SharexService } from './sharex.service';
 import { ApiTags } from '@nestjs/swagger';
+import { SharexUploadDto } from './dto/sharex-upload.dto';
 
 @ApiTags('BoffMedia 🛠 | ShareX')
 @Controller('sharex')
@@ -20,7 +21,7 @@ export class SharexController {
   constructor(private readonly sharexService: SharexService) {}
   @Post()
   @UseInterceptors(FileInterceptor('file'))
-  async post(@UploadedFile() file: Express.Multer.File, @Body() body) {
+  async post(@UploadedFile() file: Express.Multer.File, @Body() body: SharexUploadDto) {
     if (!file) {
       throw new BadRequestException('No file uploaded');
     }

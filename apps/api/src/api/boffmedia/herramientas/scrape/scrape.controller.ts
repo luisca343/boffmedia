@@ -33,6 +33,12 @@ import { DownloadAllGamesDto } from './dto/download-all-games.dto';
 import { DownloadSelectedGamesDto } from './dto/download-selected-games.dto';
 import { DownloadMangaNovelDto } from './dto/download-manga-novel.dto';
 import { MyrientConsole } from './enums/myrient-console.enum';
+import { DownloadGameDto } from './dto/download-game.dto';
+import { SetBrowserTunnelDto } from './dto/set-browser-tunnel.dto';
+import { ConvertChapterDto } from './dto/convert-chapter.dto';
+import { PatchEpubMetadataDto } from './dto/patch-epub-metadata.dto';
+import { UpdateMangaConfigDto } from './dto/update-manga-config.dto';
+import { UpdateSeriesStatusDto } from './dto/update-series-status.dto';
 
 @ApiTags('BoffMedia | Scrape')
 @Controller('boffmedia/herramientas/scrape')
@@ -224,7 +230,7 @@ export class ScrapeController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: 'Failed to download file.',
   })
-  async downloadGame(@Body() body: { url: string }): Promise<DownloadResult> {
+  async downloadGame(@Body() body: DownloadGameDto): Promise<DownloadResult> {
     return this.scrapeFacadeService.downloadGame(body.url);
   }
 
@@ -303,7 +309,7 @@ export class ScrapeController {
     status: HttpStatus.OK,
     description: 'Updated browser config.',
   })
-  async setBrowserTunnel(@Body() body: { tunnelEnabled: boolean }) {
+  async setBrowserTunnel(@Body() body: SetBrowserTunnelDto) {
     return this.scrapeFacadeService.setBrowserTunnel(body.tunnelEnabled);
   }
 
@@ -463,14 +469,7 @@ export class ScrapeController {
     description: 'EPUB created. Returns output path.',
   })
   async convertChapter(
-    @Body()
-    body: {
-      series: string;
-      chapter: string;
-      excludePages?: number[];
-      includeCover?: boolean;
-      metadata?: import('./services/manga/manga-epub.builder').EpubMetadata;
-    },
+    @Body() body: ConvertChapterDto,
   ): Promise<{ outputPath: string }> {
     if (!body.series?.trim())
       throw new BadRequestException('series is required');
@@ -493,14 +492,7 @@ export class ScrapeController {
     status: HttpStatus.CREATED,
     description: 'Results per chapter.',
   })
-  async patchEpubMetadata(
-    @Body()
-    body: {
-      series: string;
-      chapters: string[];
-      metadata?: import('./services/manga/manga-epub.builder').EpubMetadata;
-    },
-  ) {
+  async patchEpubMetadata(@Body() body: PatchEpubMetadataDto) {
     if (!body.series?.trim())
       throw new BadRequestException('series is required');
     if (!Array.isArray(body.chapters) || body.chapters.length === 0)
@@ -528,9 +520,7 @@ export class ScrapeController {
     summary: 'Update manga admin config (cron enable/disable + schedule)',
   })
   @ApiResponse({ status: HttpStatus.OK })
-  async updateMangaConfig(
-    @Body() body: { cron?: { enabled?: boolean; schedule?: string } },
-  ) {
+  async updateMangaConfig(@Body() body: UpdateMangaConfigDto) {
     return this.scrapeFacadeService.updateMangaConfig(body);
   }
 
@@ -539,10 +529,9 @@ export class ScrapeController {
   @ApiResponse({ status: HttpStatus.OK })
   async updateSeriesStatus(
     @Param('slug') slug: string,
-    @Body() body: { status: 'ongoing' | 'completed' | 'hiatus' },
+    @Body() body: UpdateSeriesStatusDto,
   ) {
     if (!slug?.trim()) throw new BadRequestException('slug is required');
-    if (!body.status) throw new BadRequestException('status is required');
     return this.scrapeFacadeService.updateSeriesStatus(slug, body.status);
   }
 
