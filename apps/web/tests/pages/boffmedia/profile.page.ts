@@ -1,11 +1,13 @@
 import { type Locator, type Page } from "@playwright/test"
-import { BasePage } from "./base.page"
+import { BasePage } from "../base.page"
 
 export class ProfilePage extends BasePage {
   // Unauthenticated state
   readonly accessRequiredHeading: Locator
+  readonly accessRequiredText: Locator
 
   // Authenticated state — identity
+  // .first() guards against ToolSectionHeader rendering additional h2s lower in the page
   readonly userNameHeading: Locator
 
   // Profile fields
@@ -17,14 +19,15 @@ export class ProfilePage extends BasePage {
   readonly saveChangesButton: Locator
   readonly cancelButton: Locator
 
-  // Connections
+  // Connections section
   readonly discordCard: Locator
   readonly minecraftCard: Locator
 
   constructor(page: Page) {
     super(page)
     this.accessRequiredHeading = page.getByRole("heading", { name: "Acceso Requerido" })
-    this.userNameHeading = page.getByRole("heading", { level: 2 })
+    this.accessRequiredText = page.getByText("Inicia sesión para ver tu perfil.")
+    this.userNameHeading = page.getByRole("heading", { level: 2 }).first()
     this.nameInput = page.getByLabel("Nombre", { exact: false })
     this.emailInput = page.getByLabel("Email", { exact: false })
     this.editProfileButton = page.getByRole("button", { name: "Editar perfil" })
