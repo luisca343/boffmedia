@@ -1,6 +1,5 @@
-import { test, expect } from "../fixtures"
+import { test, expect } from "../../fixtures"
 
-// Public page — clear any session state so tests run unauthenticated
 test.use({ storageState: { cookies: [], origins: [] } })
 
 test.describe("Landing page", () => {
@@ -8,7 +7,7 @@ test.describe("Landing page", () => {
     await landingPage.goto()
   })
 
-  test("hero title and description are visible", async ({ landingPage }) => {
+  test("hero title and description are visible", { tag: "@smoke" }, async ({ landingPage }) => {
     await expect(landingPage.heroTitle).toBeVisible()
     await expect(landingPage.heroDescription).toBeVisible()
   })

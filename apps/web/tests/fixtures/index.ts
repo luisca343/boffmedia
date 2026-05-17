@@ -1,7 +1,7 @@
 import { test as base, expect } from "@playwright/test"
-import { LandingPage } from "../pages/landing.page"
-import { AuthPage } from "../pages/auth.page"
-import { ProfilePage } from "../pages/profile.page"
+import { LandingPage } from "../pages/boffmedia/landing.page"
+import { AuthPage } from "../pages/boffmedia/auth.page"
+import { ProfilePage } from "../pages/boffmedia/profile.page"
 
 type Pages = {
   landingPage: LandingPage
