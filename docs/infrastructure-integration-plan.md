@@ -30,7 +30,7 @@
 |---|---|---|---|---|
 | 1 | Database backups | Permanent data loss | Half a day | `[~]` cron pending first run |
 | 2 | Prometheus + Grafana wired to app | Blind to production failures | Half a day | `[~]` MariaDB live, API pending deploy |
-| 3 | Automated Portainer deploy | Manual deploys forever, no rollback | 2 hours | `[ ]` |
+| 3 | Automated Portainer deploy | Manual deploys forever, no rollback | 2 hours | `[~]` validate ✅, build ⚠ failing, deploy ⏳ untested |
 | 4 | Structured logging (Pino) | Unqueryable logs, blind debugging | 1 day | `[ ]` |
 | 5 | Global ValidationPipe + DTOs | Security gaps, inconsistent API | 1 day | `[ ]` |
 | 6 | GitLab CI validate stage | Broken code reaches production | 2 hours | `[ ]` |
@@ -374,9 +374,11 @@ Mark one option above before continuing. Both options share the same setup steps
 
 ---
 
+> **Implementation note 2026-05-17**: Portainer CE webhooks are a paid feature. Deploy uses SSH instead — see `docs/runbooks/runbook-ci-cd-pipeline.md`. Portainer section below replaced by SSH-based approach.
+
 ### Docker image tagging
 
-- [ ] Update GitLab CI build stage to tag with both commit SHA and `latest`:
+- [x] GitLab CI already tags with `:latest` and `:{CI_PIPELINE_IID}` (pipeline number used instead of commit SHA):
 
 ```yaml
 build:
@@ -396,15 +398,17 @@ build:
     - test
 ```
 
-- [ ] Add `DOCKER_HUB_USER` to GitLab CI/CD variables
-- [ ] Add `DOCKER_HUB_PASSWORD` to GitLab CI/CD variables (masked)
-- [ ] Verify both image tags appear in Docker Hub after a push
+- [x] `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` already in GitLab CI/CD variables
+- [ ] Verify both image tags appear in Docker Hub after a passing build
 
-### Portainer webhook
+### Deploy method — SSH (replaces Portainer webhook)
 
-- [ ] In Portainer: navigate to the Boffmedia stack → Webhooks → Enable
-- [ ] Copy generated webhook URL
-- [ ] Add as `PORTAINER_WEBHOOK_URL` to GitLab CI/CD variables (masked)
+> Portainer CE container webhooks are a paid feature. Using SSH deploy instead.
+
+- [x] Generated Ed25519 deploy key pair locally
+- [x] Public key added to `~/.ssh/authorized_keys` on production server
+- [x] `SSH_PRIVATE_KEY` added to GitLab CI/CD variables (File type, Protected)
+- [x] `DEPLOY_HOST` added to GitLab CI/CD variables (`148.251.3.244`, Protected)
 
 ### GitLab CI deploy stage — Option A (automatic on main)
 
@@ -460,12 +464,11 @@ stages:
 
 ### Verification
 
-- [ ] Push a trivial change to trigger the full pipeline
-- [ ] Confirm validate → build → deploy all pass
-- [ ] Confirm Portainer shows updated container with new image SHA
-- [ ] Confirm application responds correctly after automated deploy
-- [ ] Simulate rollback: manually trigger deploy job from a previous pipeline
-- [ ] Confirm rollback brings up the previous image correctly
+- [x] Validate stage passes (v0.0.2 — typecheck clean after adding cron + sharp deps)
+- [!] Build stage failing as of v0.0.2 — under investigation, user to fix
+- [ ] Confirm validate → build → deploy all pass end-to-end
+- [ ] Confirm application responds correctly after first automated deploy
+- [ ] Simulate rollback: re-run deploy job from a previous pipeline in GitLab UI
 
 ---
 
