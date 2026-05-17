@@ -1,4 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
+ 
 "use client";
 import "./test.css";
 import { Chat } from "./_components/Chat";

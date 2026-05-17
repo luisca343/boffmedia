@@ -43,7 +43,7 @@ function SpeedPageContent() {
       })
       .catch(() => {});
     // selectedReg intentionally excluded — only run on mount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   useEffect(() => {

@@ -1,5 +1,14 @@
 import { apiGET, apiPATCH, apiPOST } from '@/services/boffAPI';
-import type { LocalGamesResult, CatalogSearchResult, SearchLocalGamesResult } from '@boffmedia/shared';
+import type {
+  LocalGamesResult,
+  CatalogSearchResult,
+  SearchLocalGamesResult,
+  SearchConsoleResult,
+  CatalogSearchConsoleResult,
+  BulkDownloadResult,
+} from '@boffmedia/shared';
+
+export type { SearchConsoleResult, SearchLocalGamesResult, CatalogSearchResult, CatalogSearchConsoleResult, BulkDownloadResult };
 
 export interface GameFileEntry {
   name: string;
@@ -22,13 +31,6 @@ export interface FileDownloadEntry {
   size?: string;
   sizeBytes?: number;
   error?: string;
-}
-
-export interface CatalogResult {
-  count: number;
-  totalSize: string;
-  totalSizeBytes: number;
-  files: GameFileEntry[];
 }
 
 // SSE event types emitted by the stream endpoint

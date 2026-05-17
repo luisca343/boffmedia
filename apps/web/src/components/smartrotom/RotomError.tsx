@@ -58,14 +58,14 @@ export function RotomError(props: RotomErrorProps) {
     if (isEnhancedErrorProps(props)) {
       logErrorToMonitoring(props.errorCode, props.context ?? {});
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [isEnhancedErrorProps(props) ? props.errorCode : undefined, isEnhancedErrorProps(props) ? props.context : undefined]);
 
   useEffect(() => {
     if (isEnhancedErrorProps(props)) {
       setShowHelp(props.showHelp ?? false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [isEnhancedErrorProps(props) ? props.showHelp : undefined]);
 
   if (!isEnhancedErrorProps(props)) {

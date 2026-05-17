@@ -45,7 +45,7 @@ export function useDivergence(
       .then((res) => setResult(res.data ?? null))
       .catch(() => setError("Failed to load divergence data."))
       .finally(() => setLoading(false));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [regulationId, tournamentId, month, cutoff]);
 
   return { result, loading, error };

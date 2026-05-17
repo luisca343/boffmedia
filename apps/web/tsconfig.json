@@ -58,6 +58,7 @@
   "exclude": [
     "node_modules",
     "public",
-    ".next"
+    ".next",
+    "src/ckeditor5"
   ]
 }

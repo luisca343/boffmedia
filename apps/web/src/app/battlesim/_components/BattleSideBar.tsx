@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-img-element */
+ 
 import { Battle, Pokemon } from "@pkmn/client";
 import {
     GraphicsGen, Icons, Sprites
