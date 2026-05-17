@@ -3,7 +3,6 @@ import { TeamsRepository } from '../../../_repositories/boffmedia/teams.reposito
 import { ParticipantsService } from './participants.service';
 import { EventTeam, EventTeamMember } from '@/_db/schema/Events';
 import { CreateTeamDto } from '../dto/create-team.dto';
-import { TeamMember } from '../entities/team-member.entity';
 import { UpdateTeamDto } from '../dto/update-team.dto';
 
 @Injectable()

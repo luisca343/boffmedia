@@ -1,12 +1,10 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq, and, desc, asc, inArray } from 'drizzle-orm';
+import { eq, desc, inArray } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   smartRotomReplays,
   smartRotomUserReplays,
-  SmartRotomReplay,
-  SmartRotomUserReplay,
 } from '@/_db/schema/SmartRotom';
 
 export interface LeagueReplay {
@@ -233,12 +231,12 @@ export class LigaRepository {
     return [];
   }
 
-  async findTournamentById(tournamentId: number): Promise<Tournament | null> {
+  async findTournamentById(_tournamentId: number): Promise<Tournament | null> {
     // Placeholder for future tournament functionality
     return null;
   }
 
-  async findTournamentMatches(tournamentId: number): Promise<LeagueMatch[]> {
+  async findTournamentMatches(_tournamentId: number): Promise<LeagueMatch[]> {
     // Placeholder for future tournament functionality
     return [];
   }

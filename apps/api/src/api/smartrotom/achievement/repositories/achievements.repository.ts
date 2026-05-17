@@ -37,12 +37,12 @@ export class AchievementsRepository
     return this.findByStringId(data.id) as Promise<Achievement>;
   }
 
-  async update(id: number, data: UpdateAchievementDto): Promise<Achievement> {
+  async update(_id: number, _data: UpdateAchievementDto): Promise<Achievement> {
     // For achievements, we need to handle string ID differently
     throw new Error('Use updateByStringId for achievements');
   }
 
-  async delete(id: number): Promise<boolean> {
+  async delete(_id: number): Promise<boolean> {
     // For achievements, we need to handle string ID differently
     throw new Error('Use deleteByStringId for achievements');
   }

@@ -1,5 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
 import { TwitchApiService } from './twitch-api.service';
 import { NotificationService } from './notification.service';
 import { TwitchStream } from '../interfaces/twitch-stream.interface';
@@ -147,7 +146,7 @@ export class TwitchMonitorService {
    */
   private async processStream(
     stream: TwitchStream,
-    source: 'user',
+    _source: 'user',
   ): Promise<boolean> {
     const cacheKey = stream.user_id;
     const existing = this.streamCache.get(cacheKey);
@@ -199,7 +198,7 @@ export class TwitchMonitorService {
   private async markStreamsOffline(
     currentStreamIds: Set<string>,
   ): Promise<void> {
-    for (const [userId, cached] of this.streamCache) {
+    for (const [_userId, cached] of this.streamCache) {
       if (cached.isCurrentlyLive && !currentStreamIds.has(cached.streamId)) {
         // Stream went offline
         cached.isCurrentlyLive = false;

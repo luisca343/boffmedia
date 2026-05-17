@@ -1,7 +1,5 @@
-import { off } from 'process';
 import * as fs from 'fs';
 import * as path from 'path';
-import { promises as fsPromises } from 'fs';
 
 const typeChart = {
   normal: { ghost: 0, rock: 0.5, steel: 0.5 },
@@ -341,7 +339,7 @@ export function getDeffensiveScoreRanking() {
 }
 
 export function findInRanking(type1: string, type2: string) {
-  const result = Array.isArray(wolfeyTypeRanking)
+  const _result = Array.isArray(wolfeyTypeRanking)
     ? wolfeyTypeRanking.find((item: any) => {
         return (
           (item.type1 === type1 && item.type2 === type2) ||

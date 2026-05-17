@@ -87,7 +87,7 @@ export class CallService {
   async updateCallUserStatus(
     chatId: number,
     uuid: string,
-    status: CallUser['status'],
+    _status: CallUser['status'],
   ): Promise<void> {
     // Validate user is in the chat
     const userInChat = await this.chatMemberRepository.findUserInChat(

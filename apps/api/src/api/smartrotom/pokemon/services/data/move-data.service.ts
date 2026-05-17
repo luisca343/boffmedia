@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { BaseDataService } from './base-data.service';
-import { Attack } from '../../interfaces/pokemon.interface';
 import * as path from 'path';
 import { FullMove } from '../../entities/pokemon-move.entity';
 

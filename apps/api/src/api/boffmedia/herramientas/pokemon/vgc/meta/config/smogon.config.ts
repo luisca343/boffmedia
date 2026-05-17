@@ -4,15 +4,6 @@ export type SmogonCutoff = (typeof SMOGON_VALID_CUTOFFS)[number];
 
 const SMOGON_BASE = 'https://www.smogon.com/stats';
 
-/** @deprecated Use smogonUsageUrl + smogonMovesetUrl instead */
-export function smogonChaosUrl(
-  format: string,
-  month: string,
-  cutoff: number,
-): string {
-  return `${SMOGON_BASE}/${month}/chaos/${format}-${cutoff}.json`;
-}
-
 export function smogonUsageUrl(
   format: string,
   month: string,

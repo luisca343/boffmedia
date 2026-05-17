@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq, and, desc, asc, inArray, max, sum, count, sql } from 'drizzle-orm';
+import { eq, and, desc, inArray, max, sql } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   mineGames,
@@ -8,7 +8,6 @@ import {
   mineRewards,
   PartidaMina,
   DetallePartidaMina,
-  RecompensaMina,
 } from '@/_db/schema/SmartRotomMine';
 import {
   smartrotomUsers,

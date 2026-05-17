@@ -23,10 +23,7 @@ import {
 import { DownloadAllGamesDto } from '../dto/download-all-games.dto';
 import { DownloadSelectedGamesDto } from '../dto/download-selected-games.dto';
 import { MyrientConsole } from '../enums/myrient-console.enum';
-import {
-  CONSOLE_CATALOG,
-  MYRIENT_BASE_URL,
-} from '../constants/myrient-catalog.constants';
+import { CONSOLE_CATALOG } from '../constants/myrient-catalog.constants';
 
 // ---------------------------------------------------------------------------
 // Size helpers

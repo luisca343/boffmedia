@@ -214,7 +214,7 @@ export class StreakService {
   // ==================== PRIVATE HELPER METHODS ====================
 
   /* For now, we won't reset streaks */
-  private shouldResetStreak(streak: ArcadeStreak): boolean {
+  private shouldResetStreak(_streak: ArcadeStreak): boolean {
     return false;
     /*
       if (!streak.lastClaimed) return false;

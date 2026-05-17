@@ -1,7 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { promises as fsPromises } from 'fs';
-import { wolfeyTypeRanking } from './types';
 import { Attack } from '@/types/move';
 
 export class MoveData {

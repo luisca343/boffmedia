@@ -1,6 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Context, ContextOf, On } from 'necord';
-import { Message } from 'discord.js';
 import { playAudio } from '../_util/audio';
 import { CommandsService } from '../_commands/commands.service';
 

@@ -7,9 +7,7 @@ import {
   IsOptional,
   Min,
   Max,
-  IsUrl,
 } from 'class-validator';
-import { Base } from 'discord.js';
 
 export class CreateNewsDto extends BaseDto {
   @ApiProperty({

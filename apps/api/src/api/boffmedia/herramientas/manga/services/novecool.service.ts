@@ -39,7 +39,7 @@ const SEL_CHAPTER_TITLE = 'span.chapter-item-headtitle';
 
 // ── Chapter image selectors ─────────────────────────────────────────────────
 // Novelcool typically uses lazy-loaded images; check data-src first then src.
-const SEL_CHAPTER_IMAGES =
+const _SEL_CHAPTER_IMAGES =
   '.chapter-img, .reading-content img, .manga-images img, #chapter-images img, .page-img';
 
 // ---------------------------------------------------------------------------

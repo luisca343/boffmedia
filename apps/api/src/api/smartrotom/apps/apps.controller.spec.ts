@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import {
-  HttpStatus,
   NotFoundException,
   ConflictException,
   BadRequestException,
@@ -56,7 +55,7 @@ describe('AppsController', () => {
     },
   ];
 
-  const mockSuccessResponse: SuccessResponse = {
+  const _mockSuccessResponse: SuccessResponse = {
     success: true,
     message: 'Operation completed successfully',
   };

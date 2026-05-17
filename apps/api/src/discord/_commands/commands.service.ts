@@ -7,7 +7,7 @@ import {
 import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { Injectable } from '@nestjs/common';
 import { User } from 'discord.js';
-import { and, eq, or, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { getVoiceName } from '../_util/audio';
 
 @Injectable()

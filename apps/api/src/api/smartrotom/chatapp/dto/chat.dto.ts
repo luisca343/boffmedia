@@ -6,7 +6,6 @@ import {
   IsArray,
   IsOptional,
   IsInt,
-  IsEnum,
 } from 'class-validator';
 
 export enum ChatType {

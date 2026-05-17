@@ -1,5 +1,3 @@
-import { index } from 'drizzle-orm/mysql-core';
-
 export interface Pokemon {
   dex: number;
   name: string;

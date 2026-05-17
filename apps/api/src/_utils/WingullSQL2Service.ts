@@ -84,7 +84,7 @@ export class WingullSQL2Service {
         throw new Error('No rows were inserted.');
       }
 
-      const [rows, fields] = await this.query<mysql.RowDataPacket[]>(
+      const [rows, _fields] = await this.query<mysql.RowDataPacket[]>(
         `SELECT * FROM ?? WHERE id IN (?)`,
         [table, ids],
       );

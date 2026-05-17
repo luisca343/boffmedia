@@ -4,7 +4,7 @@ import { MoveDataService } from './data/move-data.service';
 import { SpawnDataService } from './data/spawn-data.service';
 import { PokemonImageService } from './data/pokemon-image.service';
 import { SpriteManifestService } from './sprite-manifest.service';
-import { Pokemon, PokemonForm, Attack } from '../interfaces/pokemon.interface';
+import { Pokemon } from '../interfaces/pokemon.interface';
 import { EvoTreeNode } from './data/pokemon-data.service';
 import Fuse, { IFuseOptions, FuseResult } from 'fuse.js';
 import { FullMove } from '../entities/pokemon-move.entity';
@@ -135,7 +135,7 @@ export class PokemonDataManagementService {
 
     const moveDataSet = {};
 
-    Object.entries(moves).forEach(([key, moveList]) => {
+    Object.entries(moves).forEach(([_key, moveList]) => {
       moveList.forEach((move: any) => {
         if (typeof move === 'object' && move.attacks) {
           move.attacks.forEach((attack: string) => {

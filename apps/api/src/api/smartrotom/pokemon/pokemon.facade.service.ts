@@ -5,9 +5,9 @@ import {
   RegistrationResult,
 } from './services/pokedex-management.service';
 import { PokemonIntegrationService } from './services/pokemon-integration.service';
-import { Pokemon, Attack } from './interfaces/pokemon.interface';
+import { Pokemon } from './interfaces/pokemon.interface';
 import { EvoTreeNode } from './services/data/pokemon-data.service';
-import Fuse, { FuseResult } from 'fuse.js';
+import { FuseResult } from 'fuse.js';
 import { FullMove } from './entities/pokemon-move.entity';
 import { SpawnInfo } from './entities/pokemon-spawn.entity';
 

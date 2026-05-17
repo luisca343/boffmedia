@@ -178,7 +178,7 @@ export class MhwildsRepository implements IMhwildsRepository {
             fetchTime: cacheMetadata.lastModified,
           };
         }
-      } catch (fallbackError) {
+      } catch (_fallbackError) {
         // Ignore fallback errors
       }
 
@@ -247,7 +247,7 @@ export class MhwildsRepository implements IMhwildsRepository {
       }
 
       return null;
-    } catch (error: any) {
+    } catch (_error: any) {
       return null;
     }
   }

@@ -39,7 +39,7 @@ export class TcgController {
     if (!jsonString) return null;
     try {
       return JSON.parse(jsonString);
-    } catch (error: any) {
+    } catch (_error: any) {
       return null;
     }
   }

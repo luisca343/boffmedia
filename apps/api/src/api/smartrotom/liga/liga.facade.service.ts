@@ -12,7 +12,6 @@ import {
 } from './services/tournament.service';
 import {
   LeagueReplay,
-  LeagueStanding,
   Tournament,
   LeagueMatch,
 } from '@api/smartrotom/liga/repositories/liga.repository';

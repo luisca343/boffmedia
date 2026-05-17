@@ -4,12 +4,12 @@ import { Injectable, HttpStatus, HttpException, Logger } from '@nestjs/common';
 export class ResponseService {
   constructor(private readonly logger: Logger) {}
 
-  logRequest(action: string, data: any) {
-    //this.logger.log(`${action} data:`, data);
+  logRequest(_action: string, _data: any) {
+    //this.logger.log(`${_action} data:`, _data);
   }
 
-  logSuccess(action: string, data: any) {
-    //this.logger.log(`${action} successfully:`, data);
+  logSuccess(_action: string, _data: any) {
+    //this.logger.log(`${_action} successfully:`, _data);
   }
 
   createSuccessResponse(message: string, data: any) {
@@ -21,7 +21,7 @@ export class ResponseService {
     };
   }
 
-  handleError(action: string, error: any, data?: any) {
+  handleError(action: string, error: any, _data?: any) {
     this.logger.error(`Failed to ${action}:`, error.message);
     throw new HttpException(
       {

@@ -3,7 +3,6 @@ import {
   BadRequestException,
   Body,
   Controller,
-  Get,
   InternalServerErrorException,
   Post,
   UploadedFile,
@@ -58,7 +57,7 @@ export class SharexController {
           type: file.mimetype,
         },
       };
-    } catch (error: any) {
+    } catch (_error: any) {
       throw new InternalServerErrorException('Failed to save file');
     }
   }

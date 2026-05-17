@@ -1,15 +1,5 @@
 import { sql } from 'drizzle-orm';
-import {
-  char,
-  datetime,
-  int,
-  json,
-  mysqlSchema,
-  mysqlTable,
-  text,
-  varchar,
-} from 'drizzle-orm/mysql-core';
-import { smartrotomUsers } from './SmartRotom';
+import { char, datetime, int, json, mysqlTable } from 'drizzle-orm/mysql-core';
 
 export const ficusMessages = mysqlTable('ficus_messages', {
   uuid: char('uuid', { length: 36 }),

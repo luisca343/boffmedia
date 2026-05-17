@@ -1,6 +1,6 @@
 import { BaseDto } from '@api/_utils/dto/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 import { LootboxItemConfig } from '../entities/lootbox-config.entity';
 
 export class OpenLootBoxDto extends BaseDto {
@@ -32,7 +32,7 @@ class SpinnerItemDto {
   isWinningItem: boolean;
 }
 
-class LootItemDto {
+class _LootItemDto {
   @ApiProperty({ description: 'Item ID', example: 'pixelmon:master_ball' })
   id: string;
 

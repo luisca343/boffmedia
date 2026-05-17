@@ -5,7 +5,6 @@ import {
   Delete,
   Get,
   HttpStatus,
-  Param,
   Post,
   Query,
   UploadedFile,
@@ -18,7 +17,6 @@ import {
   ApiResponse,
   ApiConsumes,
   ApiBody,
-  ApiParam,
   ApiQuery,
 } from '@nestjs/swagger';
 import { diskStorage } from 'multer';

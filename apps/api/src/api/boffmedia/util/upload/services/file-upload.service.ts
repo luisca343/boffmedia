@@ -1,9 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import * as nodePath from 'path';
-import {
-  UploadRepository,
-  UploadedFileDetails,
-} from '@repositories/boffmedia/upload.repository';
+import { UploadRepository } from '@repositories/boffmedia/upload.repository';
 
 export interface FileUploadRequest {
   file: Express.Multer.File;
