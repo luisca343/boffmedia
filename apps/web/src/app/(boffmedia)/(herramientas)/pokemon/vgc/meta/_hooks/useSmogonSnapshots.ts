@@ -11,7 +11,7 @@ export function useSmogonSnapshots(): SmogonSnapshot[] {
     VgcMetaService.getAvailableSnapshots().then((res) => {
       setSnapshots(res.data ?? []);
     });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);  
 
   return snapshots;
 }

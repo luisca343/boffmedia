@@ -30,7 +30,7 @@ export default function ChapterGrid({ series, chapter, pages, discarded, onToggl
               aria-label={`Page ${page.index + 1}${isDiscarded ? " (discarded)" : ""}`}
               aria-pressed={isDiscarded}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
+              { }
               <img
                 src={ScrapeService.getChapterImageUrl(series, chapter, page.index)}
                 alt={`Page ${page.index + 1}`}

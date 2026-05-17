@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-img-element */
+ 
 "use client"
 
 import { useEffect, useState } from "react"
@@ -60,7 +60,7 @@ export default function Jugar(){
         setDamage(49)
         gameOver()
        }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
     }, [damage])
 
     async function click (fila: number , columna: number) {

@@ -510,7 +510,7 @@ export default function MyrientDownloader() {
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <p className="text-sm text-surface-300">
                   {multiCatalog.query
-                    ? <>Resultados para <span className="text-primary-300 font-medium">"{multiCatalog.query}"</span></>
+                    ? <>Resultados para <span className="text-primary-300 font-medium">&ldquo;{multiCatalog.query}&rdquo;</span></>
                     : <span>Todos los catálogos</span>
                   }
                 </p>

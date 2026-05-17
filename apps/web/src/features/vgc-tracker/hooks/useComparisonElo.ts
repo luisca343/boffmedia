@@ -41,7 +41,7 @@ export function useComparisonElo(
       setMatchMap(new Map(results));
       setLoading(false);
     });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [idsKey]);
 
   const series = useMemo((): ComparisonSeries[] => {
@@ -68,7 +68,7 @@ export function useComparisonElo(
       return [{ id, label: session.label, startElo: session.startElo, points }];
     });
   // allSessions ref changes each render (filtered array from parent) — acceptable cost for useMemo
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [idsKey, matchMap, allSessions]);
 
   return { series, loading };

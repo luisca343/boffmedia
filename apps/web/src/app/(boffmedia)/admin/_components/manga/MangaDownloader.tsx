@@ -111,7 +111,7 @@ function SearchResultCard({ result, onSelect }: { result: MangaSearchResult; onS
     <button onClick={() => onSelect(result)}
       className="flex items-center gap-3 px-4 py-3 rounded-lg border border-surface-700/50 bg-surface-800/40 hover:bg-surface-800/70 hover:border-primary-600/40 transition-all text-left w-full group">
       {result.cover
-        // eslint-disable-next-line @next/next/no-img-element
+         
         ? <img src={result.cover} alt={result.title} className="h-14 w-10 object-cover rounded shrink-0 border border-surface-700/40" />
         : <div className="h-14 w-10 rounded bg-surface-700/40 border border-surface-700/40 flex items-center justify-center shrink-0">
             <BookOpen className="h-5 w-5 text-surface-500" />
@@ -586,7 +586,7 @@ export default function MangaDownloader() {
                   <CardHeader className="pb-3">
                     <div className="flex items-start gap-3">
                       {selectedNovel.cover && (
-                        // eslint-disable-next-line @next/next/no-img-element
+                         
                         <img src={selectedNovel.cover} alt={selectedNovel.title}
                           className="h-16 w-12 object-cover rounded border border-surface-700/40 shrink-0" />
                       )}

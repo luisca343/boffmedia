@@ -226,7 +226,7 @@ export function useMetaNavigation({
     if (regulations.length > 0 && !searchParams.get("regulation")) {
       router.replace(buildUrl({ speciesId, tab, format, month, cutoff, regulation: regulations[0].id, tournamentId, view }));
     }
-  }, [regulations]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [regulations]);  
 
   // Auto-navigate to first tournament when Tournament tab has a regulation but no tournamentId
   useEffect(() => {
@@ -234,7 +234,7 @@ export function useMetaNavigation({
     if (tournaments.length > 0 && !searchParams.get("tournamentId")) {
       router.replace(buildUrl({ speciesId, tab, format, month, cutoff, regulation, tournamentId: String(tournaments[0].id), view }));
     }
-  }, [tournaments]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [tournaments]);  
 
   // Auto-navigate to first Pokémon when list loads and no selection
   useEffect(() => {
@@ -242,7 +242,7 @@ export function useMetaNavigation({
     if (!speciesId && entries.length > 0 && view === "aggregate") {
       router.replace(buildUrl({ speciesId: entries[0].speciesId, tab, format, month, cutoff, regulation, tournamentId, view }));
     }
-  }, [isDesktop, entries, speciesId, view, router, tab, format, month, cutoff, regulation, tournamentId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isDesktop, entries, speciesId, view, router, tab, format, month, cutoff, regulation, tournamentId]);  
 
   const detail = useMemo(
     () => (speciesId ? (entriesMap.get(speciesId) ?? null) : null),

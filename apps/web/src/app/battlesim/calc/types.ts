@@ -1,5 +1,6 @@
-import { SpeciesAbility } from "@pkmn/dex-types";
 import { AbilityName, GenderName, StatusName, TypeName } from "@smogon/calc/dist/data/interface";
+
+interface SpeciesAbility<A = string> { 0: A; 1?: A; H?: A; S?: A }
 
 // Pokemon data structure
 export interface PokemonData {
