@@ -4,6 +4,7 @@ import {
   ConflictException,
   BadRequestException,
 } from '@nestjs/common';
+import { Logger } from 'nestjs-pino';
 import { AppsController } from './apps.controller';
 import { AppsFacadeService } from './apps.facade.service';
 import { CreateAppDto } from './dto/create-app.dto';
@@ -76,6 +77,7 @@ describe('AppsController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AppsController],
       providers: [
+        { provide: Logger, useValue: { log: jest.fn(), error: jest.fn(), warn: jest.fn() } },
         {
           provide: AppsFacadeService,
           useValue: mockAppsFacadeService,
