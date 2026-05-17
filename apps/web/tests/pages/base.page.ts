@@ -1,0 +1,6 @@
+import { Page } from "@playwright/test"
+
+export abstract class BasePage {
+  constructor(readonly page: Page) {}
+  abstract goto(): Promise<void>
+}
