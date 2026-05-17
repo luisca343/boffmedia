@@ -2,10 +2,13 @@ import { Inject, Injectable } from '@nestjs/common';
 import { WingullBalanceDto } from '../dto/wingull-balance.dto';
 import { WINGULL_ECONOMY_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 import { IWingullEconomyRepository } from '../repositories/interfaces/wingull-economy.repository.interface';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class WingullEconomyService {
   constructor(
+    private readonly logger: Logger,
+
     @Inject(WINGULL_ECONOMY_REPOSITORY_TOKEN)
     private readonly wingullEconomyRepository: IWingullEconomyRepository,
   ) {}
@@ -16,7 +19,7 @@ export class WingullEconomyService {
         balanceData,
       );
     } catch (error: any) {
-      console.error('Failed to update balance:', error);
+      this.logger.error('Failed to update balance:', error);
       throw new Error(`Balance update failed: ${error.message}`);
     }
   }
@@ -30,7 +33,7 @@ export class WingullEconomyService {
         );
       return result || 0;
     } catch (error: any) {
-      console.error(`Failed to get current balance for ${uuid}:`, error);
+      this.logger.error(`Failed to get current balance for ${uuid}:`, error);
       throw new Error(`Current balance retrieval failed: ${error.message}`);
     }
   }
@@ -40,7 +43,7 @@ export class WingullEconomyService {
       const result = await this.wingullEconomyRepository.getMoneyFromAPI(uuid);
       return result.money || 0;
     } catch (error: any) {
-      console.error(`Failed to get money for ${uuid}:`, error);
+      this.logger.error(`Failed to get money for ${uuid}:`, error);
       throw new Error(`Money retrieval failed: ${error.message}`);
     }
   }

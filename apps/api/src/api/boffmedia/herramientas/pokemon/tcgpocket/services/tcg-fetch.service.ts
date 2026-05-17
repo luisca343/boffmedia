@@ -7,10 +7,13 @@ import { firstValueFrom } from 'rxjs';
 import { TcgSeriesDto } from '../dto/tcg-series.dto';
 import { TcgErrorService } from './tcg-error.service';
 import { TcgConfigService } from './tcg-config.service';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class TcgFetchService {
   constructor(
+    private readonly logger: Logger,
+
     private readonly httpService: HttpService,
     private readonly errorService: TcgErrorService,
     private readonly configService: TcgConfigService,
@@ -175,7 +178,7 @@ export class TcgFetchService {
       const mergedCards: any[] = [];
 
       for (const card of cards) {
-        console.log(
+        this.logger.log(
           `Fetching card ${card.id} for set ${setId} in locale ${locale}`,
         );
         // Fetch full card data
@@ -244,10 +247,10 @@ export class TcgFetchService {
           this.httpService.get(this.configService.getSetUrl('es', setId)),
         );
         esCards = esSetRes.data.cards || [];
-        console.log(`[TCG] Successfully fetched ES cards for set ${setId}`);
+        this.logger.log(`[TCG] Successfully fetched ES cards for set ${setId}`);
       } catch (esError) {
         if (esError.response?.status === 404) {
-          console.warn(
+          this.logger.warn(
             `[TCG] ES locale not available for set ${setId}, proceeding with EN only`,
           );
           esCards = [];
@@ -289,13 +292,13 @@ export class TcgFetchService {
       const mergedBriefs = Array.from(cardBriefMap.values());
       const mergedCards: any[] = [];
 
-      console.log(
+      this.logger.log(
         `[TCG] Starting detailed card fetching for ${mergedBriefs.length} cards in set ${setId}`,
       );
 
       for (let i = 0; i < mergedBriefs.length; i++) {
         const brief = mergedBriefs[i];
-        console.log(
+        this.logger.log(
           `[TCG] Fetching detailed data for card ${i + 1}/${mergedBriefs.length}: ${brief.id} in set ${setId}`,
         );
 
@@ -314,13 +317,13 @@ export class TcgFetchService {
           esCard = esCardRes.data;
         } catch (esCardError) {
           if (esCardError.response?.status === 404) {
-            console.warn(
+            this.logger.warn(
               `[TCG] ES version not available for card ${brief.id}, using EN description`,
             );
             esCard = enCard; // Use EN data as fallback
           } else {
             // For other errors, still use EN as fallback but log the error
-            console.warn(
+            this.logger.warn(
               `[TCG] Error fetching ES version for card ${brief.id}:`,
               esCardError.message,
             );
@@ -378,7 +381,9 @@ export class TcgFetchService {
         await new Promise((res) => setTimeout(res, 250));
       }
 
-      console.log(`[TCG] Completed detailed card fetching for set ${setId}`);
+      this.logger.log(
+        `[TCG] Completed detailed card fetching for set ${setId}`,
+      );
       return mergedCards;
     } catch (error: any) {
       if (error instanceof BadRequestException) {
@@ -398,7 +403,7 @@ export class TcgFetchService {
     if (!cardData.image) return null;
 
     try {
-      console.log(
+      this.logger.log(
         `[TCG] Downloading ${locale.toUpperCase()} image for card ${cardId}...`,
       );
       const cardImgDir = path.join(
@@ -422,7 +427,7 @@ export class TcgFetchService {
 
       return `/img/games/tcg/cards/${setId}/${cardId}_${locale}.webp`;
     } catch (err: any) {
-      console.warn(
+      this.logger.warn(
         `[TCG] Failed to download ${locale} image for card ${cardId}:`,
         err,
       );

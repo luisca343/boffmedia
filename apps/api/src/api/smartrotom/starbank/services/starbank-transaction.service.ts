@@ -11,10 +11,13 @@ import { TrainerDefeatMoneyDto } from '../dto/trainer-defeat-money.dto';
 import { StarBankTransaction } from '../entities/starbank-transaction.entity';
 import { IStarbankAccountRepository } from '../repositories/interfaces/starbank-account.repository';
 import { IStarbankTransactionRepository } from '../repositories/interfaces/starbank-transaction.repository';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class StarbankTransactionService {
   constructor(
+    private readonly logger: Logger,
+
     @Inject(STARBANK_ACCOUNT_REPOSITORY_TOKEN)
     private readonly accountRepository: IStarbankAccountRepository,
     @Inject(STARBANK_TRANSACTION_REPOSITORY_TOKEN)
@@ -128,7 +131,7 @@ export class StarbankTransactionService {
         throw new Error('Insufficient balance for purchase');
       }
 
-      console.log(
+      this.logger.log(
         `Compra de ${shopDto.count} ${shopDto.itemName} a ${shopDto.npcName} por ${total}`,
       );
 
@@ -146,7 +149,7 @@ export class StarbankTransactionService {
       }
     } else {
       // VENTA
-      console.log(
+      this.logger.log(
         `Venta de ${shopDto.count} ${shopDto.itemName} a ${shopDto.npcName} por ${total}`,
       );
 

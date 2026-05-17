@@ -1,9 +1,13 @@
 import { WingullSQL2Service } from '@/_utils/WingullSQL2Service';
 import { Injectable } from '@nestjs/common';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class WingullRepository {
-  constructor(private readonly wingullSQL2Service: WingullSQL2Service) {}
+  constructor(
+    private readonly logger: Logger,
+    private readonly wingullSQL2Service: WingullSQL2Service,
+  ) {}
 
   async getWorldGuardWorlds(): Promise<{ id: number; name: string }[]> {
     try {
@@ -11,7 +15,7 @@ export class WingullRepository {
       const [rows] = await this.wingullSQL2Service.query(query);
       return rows as { id: number; name: string }[];
     } catch (error: any) {
-      console.error('Error fetching WorldGuard worlds:', error);
+      this.logger.error('Error fetching WorldGuard worlds:', error);
       throw new Error('Failed to fetch WorldGuard worlds');
     }
   }
@@ -28,7 +32,7 @@ export class WingullRepository {
       uuid: string;
     }[]
   > {
-    console.log(`Fetching owned regions for UUID: ${uuid}`);
+    this.logger.log(`Fetching owned regions for UUID: ${uuid}`);
     try {
       const query = `
         SELECT r.region_id, r.world_id, r.owner, u.name, u.uuid
@@ -37,7 +41,7 @@ export class WingullRepository {
         WHERE u.uuid = ? AND r.owner = true
         `;
       const [rows] = await this.wingullSQL2Service.query(query, [uuid]);
-      console.log('Raw query result:', rows);
+      this.logger.log('Raw query result:', rows);
 
       return (
         rows as {
@@ -66,7 +70,7 @@ export class WingullRepository {
         };
       });
     } catch (error: any) {
-      console.error('Error fetching players owned regions:', error);
+      this.logger.error('Error fetching players owned regions:', error);
       throw new Error('Failed to fetch players owned regions');
     }
   }
@@ -103,7 +107,7 @@ export class WingullRepository {
         })
         .filter(Boolean); // Remove null values
     } catch (error: any) {
-      console.error('Error fetching all plots:', error);
+      this.logger.error('Error fetching all plots:', error);
       throw new Error('Failed to fetch all plots');
     }
   }

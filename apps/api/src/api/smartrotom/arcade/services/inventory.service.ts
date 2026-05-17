@@ -14,6 +14,7 @@ import {
   ItemRarity,
 } from '../entities/arcade-inventory.entity';
 import { ArcadeInventoryResponse } from '../entities/inventory-response.entity';
+import { Logger } from 'nestjs-pino';
 
 export interface ClaimItemData {
   uuid: string;
@@ -28,6 +29,8 @@ export interface ClaimItemData {
 @Injectable()
 export class InventoryService {
   constructor(
+    private readonly logger: Logger,
+
     @Inject(ARCADE_INVENTORY_REPOSITORY_TOKEN)
     private readonly arcadeInventoryRepository: IArcadeInventoryRepository,
   ) {}
@@ -179,9 +182,9 @@ export class InventoryService {
       // Get all matching items to calculate total
       const allItems =
         await this.arcadeInventoryRepository.findUserInventory(uuid);
-      console.log('All Items:', allItems);
+      this.logger.log('All Items:', allItems);
       const targetItems = allItems.filter((item) => item.itemId === itemId);
-      console.log(
+      this.logger.log(
         `Target Items for ${uuid} with itemId ${itemId}:`,
         targetItems,
       );
@@ -190,7 +193,7 @@ export class InventoryService {
         throw new NotFoundException('Item not found in inventory');
       }
 
-      console.log(`Consuming ${amount} of ${itemId} for ${uuid}`);
+      this.logger.log(`Consuming ${amount} of ${itemId} for ${uuid}`);
 
       const updatedItem = await this.arcadeInventoryRepository.consumeItem(
         uuid,
@@ -198,7 +201,7 @@ export class InventoryService {
         amount,
       );
 
-      console.log(
+      this.logger.log(
         `Updated Item for ${uuid} with itemId ${itemId}:`,
         updatedItem,
       );
@@ -214,7 +217,7 @@ export class InventoryService {
         );
       }, 0);
 
-      console.log(
+      this.logger.log(
         `Total remaining for ${itemId} after consumption:`,
         totalRemaining,
       );

@@ -6,10 +6,13 @@ import { CreateMessageDto } from '../dto/create-message.dto';
 import { FicusMessageContentDto } from '../dto/ficus-message-content.dto';
 import { MessageSender } from '../enums/message-sender.enum';
 import { MessagePartType } from '../dto/message-part.dto';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class MessageService {
   constructor(
+    private readonly logger: Logger,
+
     @Inject(FICUSAI_REPOSITORY_TOKEN)
     private readonly ficusaiRepository: IFicusAiRepository,
   ) {}
@@ -35,7 +38,7 @@ export class MessageService {
 
         parsedMessages.push(content);
       } catch (error: any) {
-        console.error('Error parsing message content:', error);
+        this.logger.error('Error parsing message content:', error);
         // Skip malformed messages
       }
     }
@@ -75,7 +78,10 @@ export class MessageService {
             ? JSON.parse(message.content)
             : message.content;
         } catch (error: any) {
-          console.error('Error parsing message content for context:', error);
+          this.logger.error(
+            'Error parsing message content for context:',
+            error,
+          );
           return null;
         }
       })

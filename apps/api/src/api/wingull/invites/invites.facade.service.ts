@@ -9,6 +9,7 @@ import {
   RegistrationData,
   RegistrationResult,
 } from './services/registration.service';
+import { Logger } from 'nestjs-pino';
 import {
   CreateInviteData,
   InviteResult,
@@ -17,6 +18,8 @@ import {
 @Injectable()
 export class InvitesFacadeService {
   constructor(
+    private readonly logger: Logger,
+
     private readonly inviteManagementService: InviteManagementService,
     private readonly registrationService: RegistrationService,
   ) {}
@@ -38,7 +41,7 @@ export class InvitesFacadeService {
 
       return await this.inviteManagementService.createInvite(createData);
     } catch (error: any) {
-      console.error('Error creating invite:', error);
+      this.logger.error('Error creating invite:', error);
       return {
         success: false,
         message: `Invite creation failed: ${error.message}`,
@@ -50,7 +53,7 @@ export class InvitesFacadeService {
     try {
       return await this.inviteManagementService.getAllInvites();
     } catch (error: any) {
-      console.error('Error getting all invites:', error);
+      this.logger.error('Error getting all invites:', error);
       throw new Error(`Failed to retrieve invites: ${error.message}`);
     }
   }
@@ -59,7 +62,7 @@ export class InvitesFacadeService {
     try {
       return await this.inviteManagementService.getInviteById(id);
     } catch (error: any) {
-      console.error(`Error getting invite ${id}:`, error);
+      this.logger.error(`Error getting invite ${id}:`, error);
       throw new Error(`Failed to retrieve invite: ${error.message}`);
     }
   }
@@ -68,7 +71,7 @@ export class InvitesFacadeService {
     try {
       return await this.inviteManagementService.getActiveInviteById(id);
     } catch (error: any) {
-      console.error(`Error getting active invite ${id}:`, error);
+      this.logger.error(`Error getting active invite ${id}:`, error);
       throw new Error(`Failed to retrieve active invite: ${error.message}`);
     }
   }
@@ -79,7 +82,7 @@ export class InvitesFacadeService {
     try {
       return await this.inviteManagementService.deleteInvite(id);
     } catch (error: any) {
-      console.error(`Error deleting invite ${id}:`, error);
+      this.logger.error(`Error deleting invite ${id}:`, error);
       return {
         success: false,
         message: `Failed to delete invite: ${error.message}`,
@@ -93,7 +96,7 @@ export class InvitesFacadeService {
     try {
       return await this.inviteManagementService.permanentlyDeleteInvite(id);
     } catch (error: any) {
-      console.error(`Error permanently deleting invite ${id}:`, error);
+      this.logger.error(`Error permanently deleting invite ${id}:`, error);
       return {
         success: false,
         message: `Failed to permanently delete invite: ${error.message}`,
@@ -126,7 +129,7 @@ export class InvitesFacadeService {
         registrationData,
       );
     } catch (error: any) {
-      console.error('Error in registration process:', error);
+      this.logger.error('Error in registration process:', error);
       return {
         success: false,
         message: `Registration failed: ${error.message}`,
@@ -141,7 +144,7 @@ export class InvitesFacadeService {
     try {
       return await this.registrationService.canRegisterWithInvite(inviteId);
     } catch (error: any) {
-      console.error(
+      this.logger.error(
         `Error checking registration eligibility for invite ${inviteId}:`,
         error,
       );
@@ -160,7 +163,7 @@ export class InvitesFacadeService {
     try {
       return await this.inviteManagementService.validateInvite(id);
     } catch (error: any) {
-      console.error(`Error validating invite ${id}:`, error);
+      this.logger.error(`Error validating invite ${id}:`, error);
       return {
         valid: false,
         message: `Validation failed: ${error.message}`,
@@ -174,7 +177,7 @@ export class InvitesFacadeService {
     try {
       return await this.inviteManagementService.getInviteStatistics();
     } catch (error: any) {
-      console.error('Error getting invite statistics:', error);
+      this.logger.error('Error getting invite statistics:', error);
       throw new Error(`Failed to retrieve invite statistics: ${error.message}`);
     }
   }
@@ -185,7 +188,7 @@ export class InvitesFacadeService {
     try {
       return await this.inviteManagementService.getInvitesByUser(uuid);
     } catch (error: any) {
-      console.error(`Error getting invites for user ${uuid}:`, error);
+      this.logger.error(`Error getting invites for user ${uuid}:`, error);
       throw new Error(`Failed to retrieve user invites: ${error.message}`);
     }
   }
@@ -194,7 +197,10 @@ export class InvitesFacadeService {
     try {
       return await this.inviteManagementService.getInvitesByUsername(username);
     } catch (error: any) {
-      console.error(`Error getting invites for username ${username}:`, error);
+      this.logger.error(
+        `Error getting invites for username ${username}:`,
+        error,
+      );
       throw new Error(`Failed to retrieve username invites: ${error.message}`);
     }
   }

@@ -7,6 +7,7 @@ import {
 } from '@/_db/schema/SmartRotomPokedex';
 import { eq, and, desc } from 'drizzle-orm';
 import { IPokemonRepository } from './interfaces/pokemon.repository.interface';
+import { Logger } from 'nestjs-pino';
 
 export interface PokedexRegistryData {
   uuid: string;
@@ -63,6 +64,8 @@ export interface BulkUpdateResult {
 @Injectable()
 export class PokemonRepository implements IPokemonRepository {
   constructor(
+    private readonly logger: Logger,
+
     @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
   ) {}
 
@@ -90,7 +93,7 @@ export class PokemonRepository implements IPokemonRepository {
 
       return { success: false, message: 'Failed to create registry entry' };
     } catch (error: any) {
-      console.error('Failed to create pokedex registry:', error);
+      this.logger.error('Failed to create pokedex registry:', error);
       return {
         success: false,
         message: `Registry creation failed: ${error.message}`,
@@ -126,7 +129,7 @@ export class PokemonRepository implements IPokemonRepository {
 
       return result.length > 0 ? result[0] : null;
     } catch (error: any) {
-      console.error('Failed to find pokedex registry:', error);
+      this.logger.error('Failed to find pokedex registry:', error);
       throw new Error(`Registry lookup failed: ${error.message}`);
     }
   }
@@ -158,7 +161,7 @@ export class PokemonRepository implements IPokemonRepository {
 
       return { success: false, message: 'No registry found to update' };
     } catch (error: any) {
-      console.error('Failed to update pokedex registry:', error);
+      this.logger.error('Failed to update pokedex registry:', error);
       return {
         success: false,
         message: `Registry update failed: ${error.message}`,
@@ -185,7 +188,7 @@ export class PokemonRepository implements IPokemonRepository {
         .limit(limit)
         .execute();
     } catch (error: any) {
-      console.error(`Failed to get registries for user ${uuid}:`, error);
+      this.logger.error(`Failed to get registries for user ${uuid}:`, error);
       throw new Error(`User registries retrieval failed: ${error.message}`);
     }
   }
@@ -206,7 +209,10 @@ export class PokemonRepository implements IPokemonRepository {
         .where(eq(pokedexRegistry.uuid, uuid))
         .execute();
     } catch (error: any) {
-      console.error(`Failed to get all registries for user ${uuid}:`, error);
+      this.logger.error(
+        `Failed to get all registries for user ${uuid}:`,
+        error,
+      );
       throw new Error(`All user registries retrieval failed: ${error.message}`);
     }
   }
@@ -243,7 +249,7 @@ export class PokemonRepository implements IPokemonRepository {
         insertedCount: result[0].affectedRows || 0,
       };
     } catch (error: any) {
-      console.error('Failed to bulk insert pokedex registries:', error);
+      this.logger.error('Failed to bulk insert pokedex registries:', error);
       return { success: false, insertedCount: 0 };
     }
   }
@@ -288,7 +294,7 @@ export class PokemonRepository implements IPokemonRepository {
 
       return { success: true, updatedCount };
     } catch (error: any) {
-      console.error('Failed to bulk update pokedex registries:', error);
+      this.logger.error('Failed to bulk update pokedex registries:', error);
       return { success: false, updatedCount: 0 };
     }
   }
@@ -324,7 +330,7 @@ export class PokemonRepository implements IPokemonRepository {
         shinyPokemon,
       };
     } catch (error: any) {
-      console.error(`Failed to get pokedex statistics for ${uuid}:`, error);
+      this.logger.error(`Failed to get pokedex statistics for ${uuid}:`, error);
       throw new Error(`Pokedex statistics retrieval failed: ${error.message}`);
     }
   }
@@ -347,7 +353,7 @@ export class PokemonRepository implements IPokemonRepository {
         .where(eq(pokedexRegistry.uuid, uuid))
         .execute();
     } catch (error: any) {
-      console.error(`Failed to get registries for cache ${uuid}:`, error);
+      this.logger.error(`Failed to get registries for cache ${uuid}:`, error);
       throw new Error(`Cache registries retrieval failed: ${error.message}`);
     }
   }
@@ -369,7 +375,7 @@ export class PokemonRepository implements IPokemonRepository {
       );
       return !!registry;
     } catch (error: any) {
-      console.error('Failed to check registry existence:', error);
+      this.logger.error('Failed to check registry existence:', error);
       return false;
     }
   }
@@ -379,7 +385,7 @@ export class PokemonRepository implements IPokemonRepository {
       const registries = await this.getAllUserPokedexRegistries(uuid);
       return registries.length;
     } catch (error: any) {
-      console.error(`Failed to get registry count for ${uuid}:`, error);
+      this.logger.error(`Failed to get registry count for ${uuid}:`, error);
       return 0;
     }
   }

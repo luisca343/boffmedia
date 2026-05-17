@@ -15,6 +15,7 @@ import {
   MineRewardItem,
   RankingEntry,
 } from '@api/smartrotom/mine/repositories/mine.repository';
+import { Logger } from 'nestjs-pino';
 import {
   PlayerStatistics,
   UnclaimedItem,
@@ -36,6 +37,8 @@ export interface ClaimRequest {
 @Injectable()
 export class MineFacadeService {
   constructor(
+    private readonly logger: Logger,
+
     private readonly energyService: EnergyService,
     private readonly gameService: GameService,
     private readonly rewardService: RewardService,
@@ -48,7 +51,7 @@ export class MineFacadeService {
     try {
       return await this.energyService.getPlayerEnergy(uuid);
     } catch (error: any) {
-      console.error(`Error getting energy for player ${uuid}:`, error);
+      this.logger.error(`Error getting energy for player ${uuid}:`, error);
       throw new Error(`Failed to retrieve energy: ${error.message}`);
     }
   }
@@ -73,7 +76,10 @@ export class MineFacadeService {
       // Start game
       return await this.gameService.startGame(uuid);
     } catch (error: any) {
-      console.error(`Error starting game for player ${request.uuid}:`, error);
+      this.logger.error(
+        `Error starting game for player ${request.uuid}:`,
+        error,
+      );
       throw new Error(`Failed to start game: ${error.message}`);
     }
   }
@@ -92,7 +98,7 @@ export class MineFacadeService {
 
       return await this.gameService.endGame(uuid, rewards);
     } catch (error: any) {
-      console.error(`Error ending game for player ${request.uuid}:`, error);
+      this.logger.error(`Error ending game for player ${request.uuid}:`, error);
       throw new Error(`Failed to end game: ${error.message}`);
     }
   }
@@ -103,7 +109,7 @@ export class MineFacadeService {
     try {
       return await this.rewardService.getAllRewards();
     } catch (error: any) {
-      console.error('Error getting all rewards:', error);
+      this.logger.error('Error getting all rewards:', error);
       throw new Error(`Failed to retrieve rewards: ${error.message}`);
     }
   }
@@ -112,7 +118,7 @@ export class MineFacadeService {
     try {
       return await this.rewardService.getRewardsByType();
     } catch (error: any) {
-      console.error('Error getting rewards by type:', error);
+      this.logger.error('Error getting rewards by type:', error);
       throw new Error(`Failed to retrieve rewards by type: ${error.message}`);
     }
   }
@@ -123,7 +129,7 @@ export class MineFacadeService {
     try {
       return await this.rewardService.getRewardDropRates();
     } catch (error: any) {
-      console.error('Error getting reward drop rates:', error);
+      this.logger.error('Error getting reward drop rates:', error);
       throw new Error(`Failed to retrieve drop rates: ${error.message}`);
     }
   }
@@ -134,7 +140,7 @@ export class MineFacadeService {
     try {
       return await this.playerService.getPlayerHistory(uuid);
     } catch (error: any) {
-      console.error(`Error getting history for player ${uuid}:`, error);
+      this.logger.error(`Error getting history for player ${uuid}:`, error);
       throw new Error(`Failed to retrieve player history: ${error.message}`);
     }
   }
@@ -143,7 +149,7 @@ export class MineFacadeService {
     try {
       return await this.playerService.getPlayerRanking();
     } catch (error: any) {
-      console.error('Error getting player ranking:', error);
+      this.logger.error('Error getting player ranking:', error);
       throw new Error(`Failed to retrieve ranking: ${error.message}`);
     }
   }
@@ -154,7 +160,7 @@ export class MineFacadeService {
     try {
       return await this.playerService.getPlayerRank(uuid);
     } catch (error: any) {
-      console.error(`Error getting rank for player ${uuid}:`, error);
+      this.logger.error(`Error getting rank for player ${uuid}:`, error);
       throw new Error(`Failed to retrieve player rank: ${error.message}`);
     }
   }
@@ -163,7 +169,7 @@ export class MineFacadeService {
     try {
       return await this.playerService.getUnclaimedRewards(uuid);
     } catch (error: any) {
-      console.error(
+      this.logger.error(
         `Error getting unclaimed rewards for player ${uuid}:`,
         error,
       );
@@ -175,7 +181,7 @@ export class MineFacadeService {
     try {
       return await this.playerService.claimRewards(request.uuid);
     } catch (error: any) {
-      console.error(
+      this.logger.error(
         `Error claiming rewards for player ${request.uuid}:`,
         error,
       );
@@ -187,7 +193,7 @@ export class MineFacadeService {
     try {
       return await this.playerService.getPlayerStatistics(uuid);
     } catch (error: any) {
-      console.error(`Error getting statistics for player ${uuid}:`, error);
+      this.logger.error(`Error getting statistics for player ${uuid}:`, error);
       throw new Error(`Failed to retrieve player statistics: ${error.message}`);
     }
   }
@@ -198,7 +204,7 @@ export class MineFacadeService {
     try {
       return await this.playerService.validatePlayerExists(uuid);
     } catch (error: any) {
-      console.error(`Error validating player ${uuid}:`, error);
+      this.logger.error(`Error validating player ${uuid}:`, error);
       return false;
     }
   }
@@ -207,7 +213,7 @@ export class MineFacadeService {
     try {
       return await this.rewardService.validateRewardsExist(rewardIds);
     } catch (error: any) {
-      console.error('Error validating rewards:', error);
+      this.logger.error('Error validating rewards:', error);
       return false;
     }
   }

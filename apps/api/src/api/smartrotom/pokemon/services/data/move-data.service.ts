@@ -2,9 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { BaseDataService } from './base-data.service';
 import * as path from 'path';
 import { FullMove } from '../../entities/pokemon-move.entity';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class MoveDataService extends BaseDataService {
+  constructor(private readonly logger: Logger) {
+    super();
+  }
+
   private moveList: FullMove[] = [];
   private movesByName: { [key: string]: FullMove } = {};
   private movesByType: { [key: string]: FullMove[] } = {};
@@ -34,7 +39,7 @@ export class MoveDataService extends BaseDataService {
       this.movesByCategory[move.attackCategory].push(move);
     });
 
-    console.log(
+    this.logger.log(
       `Loaded ${moves.length} moves in ${Date.now() - startingTime}ms`,
     );
   }

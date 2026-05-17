@@ -9,6 +9,7 @@ import {
 import { PokemonDataManagementService } from './pokemon-data-management.service';
 import { POKEMON_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 import { IPokemonRepository } from '../repositories/interfaces/pokemon.repository.interface';
+import { Logger } from 'nestjs-pino';
 
 export interface RegistrationResult {
   success: boolean;
@@ -22,6 +23,8 @@ export class PokedexManagementService {
   private dexCache: { [key: string]: { date: Date; data: any[] } } = {};
 
   constructor(
+    private readonly logger: Logger,
+
     @Inject(POKEMON_REPOSITORY_TOKEN)
     private readonly pokemonRepository: IPokemonRepository,
     private readonly pokemonDataService: PokemonDataManagementService,
@@ -106,7 +109,7 @@ export class PokedexManagementService {
         };
       }
     } catch (error: any) {
-      console.error('Failed to register pokemon:', error);
+      this.logger.error('Failed to register pokemon:', error);
       return {
         success: false,
         message: `Registration failed: ${error.message}`,
@@ -119,8 +122,8 @@ export class PokedexManagementService {
     data: BulkUpdateData,
   ): Promise<{ success: boolean; message: string; results: BulkUpdateResult }> {
     try {
-      console.log('BULK UPDATING POKEDEX', uuid);
-      console.log(
+      this.logger.log('BULK UPDATING POKEDEX', uuid);
+      this.logger.log(
         `Registering ${data.SEEN.length} seen and ${data.CAUGHT.length} caught Pokemon`,
       );
 
@@ -214,14 +217,14 @@ export class PokedexManagementService {
       // Clear cache for this user
       delete this.dexCache[uuid];
 
-      console.log('POKEDEX UPDATE COMPLETED', results);
+      this.logger.log('POKEDEX UPDATE COMPLETED', results);
       return {
         success: true,
         message: 'Pokedex updated successfully',
         results,
       };
     } catch (error: any) {
-      console.error('Failed to bulk update pokedex:', error);
+      this.logger.error('Failed to bulk update pokedex:', error);
       return {
         success: false,
         message: `Bulk update failed: ${error.message}`,
@@ -242,7 +245,7 @@ export class PokedexManagementService {
         totalPokemonCount,
       );
     } catch (error: any) {
-      console.error(`Failed to get pokedex statistics for ${uuid}:`, error);
+      this.logger.error(`Failed to get pokedex statistics for ${uuid}:`, error);
       throw new Error(`Pokedex statistics retrieval failed: ${error.message}`);
     }
   }
@@ -303,7 +306,7 @@ export class PokedexManagementService {
         missingCaughtForms: totalForms - caughtPokemon.size,
       };
     } catch (error: any) {
-      console.error(
+      this.logger.error(
         `Failed to get detailed pokedex status for ${uuid}:`,
         error,
       );
@@ -333,7 +336,7 @@ export class PokedexManagementService {
         };
       });
     } catch (error: any) {
-      console.error(`Failed to get pokedex registries for ${uuid}:`, error);
+      this.logger.error(`Failed to get pokedex registries for ${uuid}:`, error);
       throw new Error(`Pokedex registries retrieval failed: ${error.message}`);
     }
   }

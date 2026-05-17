@@ -30,10 +30,13 @@ import {
 import { DownloadAllGamesDto } from './dto/download-all-games.dto';
 import { DownloadSelectedGamesDto } from './dto/download-selected-games.dto';
 import { MyrientConsole } from './enums/myrient-console.enum';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class ScrapeFacadeService {
   constructor(
+    private readonly logger: Logger,
+
     private readonly myrientScrapeService: MyrientScrapeService,
     private readonly mangaScraperService: MangaScraperService,
     private readonly mangaBrowserService: MangaBrowserService,
@@ -79,7 +82,7 @@ export class ScrapeFacadeService {
     try {
       return await this.myrientScrapeService.scrapeCatalog(consoleKey, regions);
     } catch (error) {
-      console.error('Error scraping Myrient catalog:', error);
+      this.logger.error('Error scraping Myrient catalog:', error);
       throw new Error(`Failed to scrape catalog: ${(error as Error).message}`);
     }
   }
@@ -90,7 +93,7 @@ export class ScrapeFacadeService {
     try {
       return await this.myrientScrapeService.downloadGame(url);
     } catch (error) {
-      console.error('Error downloading game from Myrient:', error);
+      this.logger.error('Error downloading game from Myrient:', error);
       throw new Error(`Failed to download game: ${(error as Error).message}`);
     }
   }
@@ -101,7 +104,7 @@ export class ScrapeFacadeService {
     try {
       return await this.myrientScrapeService.downloadAllGames(dto);
     } catch (error) {
-      console.error('Error in bulk download from Myrient:', error);
+      this.logger.error('Error in bulk download from Myrient:', error);
       throw new Error(`Bulk download failed: ${(error as Error).message}`);
     }
   }
@@ -112,7 +115,7 @@ export class ScrapeFacadeService {
     try {
       return await this.myrientScrapeService.downloadSelectedGames(dto);
     } catch (error) {
-      console.error('Error in selected download from Myrient:', error);
+      this.logger.error('Error in selected download from Myrient:', error);
       throw new Error(`Selected download failed: ${(error as Error).message}`);
     }
   }

@@ -7,10 +7,13 @@ import { Performance } from '../entities/performance.entity';
 import { Region } from '../entities/region.entity';
 import { Weather } from '../entities/weather.entity';
 import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class WingullWorldService {
   constructor(
+    private readonly logger: Logger,
+
     @Inject(WINGULL_WORLD_REPOSITORY_TOKEN)
     private readonly wingullWorldRepository: IWingullWorldRepository,
   ) {}
@@ -19,7 +22,7 @@ export class WingullWorldService {
     try {
       return await this.wingullWorldRepository.getPerformanceFromAPI();
     } catch (error: any) {
-      console.error('Failed to get performance data:', error);
+      this.logger.error('Failed to get performance data:', error);
       throw new Error(`Performance data retrieval failed: ${error.message}`);
     }
   }
@@ -28,7 +31,7 @@ export class WingullWorldService {
     try {
       return await this.wingullWorldRepository.getRegionsFromAPI();
     } catch (error: any) {
-      console.error('Failed to get regions data:', error);
+      this.logger.error('Failed to get regions data:', error);
       throw new Error(`Regions data retrieval failed: ${error.message}`);
     }
   }
@@ -37,7 +40,7 @@ export class WingullWorldService {
     try {
       return await this.wingullWorldRepository.getWeatherFromAPI();
     } catch (error: any) {
-      console.error('Failed to get weather data:', error);
+      this.logger.error('Failed to get weather data:', error);
       throw new Error(`Weather data retrieval failed: ${error.message}`);
     }
   }
@@ -46,7 +49,7 @@ export class WingullWorldService {
     try {
       return await this.wingullWorldRepository.updateNPCsInAPI(data);
     } catch (error: any) {
-      console.error('Failed to update NPCs:', error);
+      this.logger.error('Failed to update NPCs:', error);
       throw new Error(`NPCs update failed: ${error.message}`);
     }
   }
@@ -69,7 +72,7 @@ export class WingullWorldService {
 
       return towns;
     } catch (error: any) {
-      console.error('Failed to fetch all towns:', error);
+      this.logger.error('Failed to fetch all towns:', error);
       throw new Error(`Could not fetch towns list: ${error.message}`);
     }
   }
@@ -109,7 +112,7 @@ export class WingullWorldService {
         ),
       };
     } catch (error: any) {
-      console.error(`Failed to fetch town info for ${townName}:`, error);
+      this.logger.error(`Failed to fetch town info for ${townName}:`, error);
       throw new Error(
         `Could not fetch town info for ${townName}: ${error.message}`,
       );

@@ -10,6 +10,7 @@ import {
   TournamentCreationRequest,
   TournamentRegistration,
 } from './services/tournament.service';
+import { Logger } from 'nestjs-pino';
 import {
   LeagueReplay,
   Tournament,
@@ -19,6 +20,8 @@ import {
 @Injectable()
 export class LigaFacadeService {
   constructor(
+    private readonly logger: Logger,
+
     private readonly replayService: ReplayService,
     private readonly statisticsService: StatisticsService,
     private readonly tournamentService: TournamentService,
@@ -30,7 +33,7 @@ export class LigaFacadeService {
     try {
       return await this.replayService.getReplayById(id);
     } catch (error: any) {
-      console.error(`Error getting replay ${id}:`, error);
+      this.logger.error(`Error getting replay ${id}:`, error);
       throw new Error(`Failed to retrieve replay: ${error.message}`);
     }
   }
@@ -39,7 +42,7 @@ export class LigaFacadeService {
     try {
       return await this.replayService.getRecentReplays(limit);
     } catch (error: any) {
-      console.error('Error getting recent replays:', error);
+      this.logger.error('Error getting recent replays:', error);
       throw new Error(`Failed to retrieve recent replays: ${error.message}`);
     }
   }
@@ -48,7 +51,10 @@ export class LigaFacadeService {
     try {
       return await this.replayService.getPlayerReplays(playerUuid);
     } catch (error: any) {
-      console.error(`Error getting replays for player ${playerUuid}:`, error);
+      this.logger.error(
+        `Error getting replays for player ${playerUuid}:`,
+        error,
+      );
       throw new Error(`Failed to retrieve player replays: ${error.message}`);
     }
   }
@@ -60,7 +66,7 @@ export class LigaFacadeService {
     try {
       return await this.replayService.getMatchHistory(player1, player2);
     } catch (error: any) {
-      console.error(
+      this.logger.error(
         `Error getting match history between ${player1} and ${player2}:`,
         error,
       );
@@ -74,7 +80,7 @@ export class LigaFacadeService {
     try {
       return await this.statisticsService.getPlayerStatistics(playerUuid);
     } catch (error: any) {
-      console.error(
+      this.logger.error(
         `Error getting statistics for player ${playerUuid}:`,
         error,
       );
@@ -86,7 +92,7 @@ export class LigaFacadeService {
     try {
       return await this.statisticsService.getLeaderboard(limit);
     } catch (error: any) {
-      console.error('Error getting leaderboard:', error);
+      this.logger.error('Error getting leaderboard:', error);
       throw new Error(`Failed to retrieve leaderboard: ${error.message}`);
     }
   }
@@ -97,7 +103,10 @@ export class LigaFacadeService {
     try {
       return await this.statisticsService.getPlayerRanking(playerUuid);
     } catch (error: any) {
-      console.error(`Error getting ranking for player ${playerUuid}:`, error);
+      this.logger.error(
+        `Error getting ranking for player ${playerUuid}:`,
+        error,
+      );
       throw new Error(`Failed to retrieve player ranking: ${error.message}`);
     }
   }
@@ -117,7 +126,7 @@ export class LigaFacadeService {
     try {
       return await this.statisticsService.comparePlayers(player1, player2);
     } catch (error: any) {
-      console.error(
+      this.logger.error(
         `Error comparing players ${player1} and ${player2}:`,
         error,
       );
@@ -131,7 +140,7 @@ export class LigaFacadeService {
     try {
       return await this.tournamentService.getActiveTournaments();
     } catch (error: any) {
-      console.error('Error getting active tournaments:', error);
+      this.logger.error('Error getting active tournaments:', error);
       throw new Error(
         `Failed to retrieve active tournaments: ${error.message}`,
       );
@@ -142,7 +151,7 @@ export class LigaFacadeService {
     try {
       return await this.tournamentService.getTournamentById(tournamentId);
     } catch (error: any) {
-      console.error(`Error getting tournament ${tournamentId}:`, error);
+      this.logger.error(`Error getting tournament ${tournamentId}:`, error);
       throw new Error(`Failed to retrieve tournament: ${error.message}`);
     }
   }
@@ -151,7 +160,7 @@ export class LigaFacadeService {
     try {
       return await this.tournamentService.getTournamentMatches(tournamentId);
     } catch (error: any) {
-      console.error(
+      this.logger.error(
         `Error getting matches for tournament ${tournamentId}:`,
         error,
       );
@@ -167,7 +176,7 @@ export class LigaFacadeService {
     try {
       return await this.tournamentService.createTournament(request);
     } catch (error: any) {
-      console.error('Error creating tournament:', error);
+      this.logger.error('Error creating tournament:', error);
       throw new Error(`Failed to create tournament: ${error.message}`);
     }
   }
@@ -178,7 +187,7 @@ export class LigaFacadeService {
     try {
       return await this.tournamentService.registerForTournament(registration);
     } catch (error: any) {
-      console.error('Error registering for tournament:', error);
+      this.logger.error('Error registering for tournament:', error);
       throw new Error(`Failed to register for tournament: ${error.message}`);
     }
   }
@@ -189,7 +198,7 @@ export class LigaFacadeService {
     try {
       return await this.replayService.validateReplayExists(id);
     } catch (error: any) {
-      console.error(`Error validating replay ${id}:`, error);
+      this.logger.error(`Error validating replay ${id}:`, error);
       return false;
     }
   }
@@ -200,7 +209,7 @@ export class LigaFacadeService {
         tournamentId,
       );
     } catch (error: any) {
-      console.error(`Error validating tournament ${tournamentId}:`, error);
+      this.logger.error(`Error validating tournament ${tournamentId}:`, error);
       return false;
     }
   }

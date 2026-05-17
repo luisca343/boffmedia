@@ -9,11 +9,14 @@ import { Server, Socket } from 'socket.io';
 import WebSocket from 'ws';
 import axios from 'axios';
 import { Actions } from '@pkmn/login';
+import { Logger } from 'nestjs-pino';
 
 @WebSocketGateway({ namespace: '/showdown', cors: true })
 export class ShowdownGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {
+  constructor(private readonly logger: Logger) {}
+
   @WebSocketServer() server: Server;
 
   private clients: Map<
@@ -24,7 +27,7 @@ export class ShowdownGateway
 
   handleConnection(client: Socket) {
     const clientId = crypto.randomUUID();
-    console.log(`Client connected: ${clientId}`);
+    this.logger.log(`Client connected: ${clientId}`);
     this.clients.set(clientId, { socket: client, showdownWs: null });
     client.emit('connection', { clientId });
   }
@@ -40,7 +43,7 @@ export class ShowdownGateway
     const showdownWs = new WebSocket(this.showdownServer);
 
     showdownWs.on('open', () => {
-      console.log(`Connected to Showdown server for client: ${clientId}`);
+      this.logger.log(`Connected to Showdown server for client: ${clientId}`);
     });
 
     showdownWs.on('message', (data) => {
@@ -48,7 +51,7 @@ export class ShowdownGateway
     });
 
     showdownWs.on('error', (err) => {
-      console.error(
+      this.logger.error(
         `Showdown WebSocket error for client ${clientId}:`,
         err.message,
       );
@@ -57,7 +60,9 @@ export class ShowdownGateway
     });
 
     showdownWs.on('close', () => {
-      console.log(`Disconnected from Showdown server for client: ${clientId}`);
+      this.logger.log(
+        `Disconnected from Showdown server for client: ${clientId}`,
+      );
       const entry = this.clients.get(clientId);
       if (entry) this.clients.set(clientId, { ...entry, showdownWs: null });
       client.disconnect();
@@ -69,7 +74,7 @@ export class ShowdownGateway
   handleDisconnect(client: Socket) {
     const clientId = this.getClientId(client);
     if (clientId) {
-      console.log(`Client disconnected: ${clientId}`);
+      this.logger.log(`Client disconnected: ${clientId}`);
       const clientData = this.clients.get(clientId);
       if (clientData?.showdownWs) {
         clientData.showdownWs.terminate();
@@ -119,7 +124,7 @@ export class ShowdownGateway
         client.emit('loginError', 'Login failed: No command returned');
       }
     } catch (error: any) {
-      console.error('Login error:', error);
+      this.logger.error('Login error:', error);
       client.emit('loginError', 'An error occurred during login');
     }
   }

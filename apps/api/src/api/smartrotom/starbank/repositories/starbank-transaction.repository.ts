@@ -13,6 +13,7 @@ import { StarBankTransaction } from '../entities/starbank-transaction.entity';
 import { TransactionType } from '../enums/transaction-type.enum';
 import { STARBANK_ACCOUNT_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 import { IStarbankAccountRepository } from './interfaces/starbank-account.repository';
+import { Logger } from 'nestjs-pino';
 import {
   CreateTransactionData,
   IStarbankTransactionRepository,
@@ -21,6 +22,8 @@ import {
 @Injectable()
 export class StarbankTransactionRepository implements IStarbankTransactionRepository {
   constructor(
+    private readonly logger: Logger,
+
     @Inject(DRIZZLE) private readonly db: MySql2Database<Record<string, never>>,
     @Inject(STARBANK_ACCOUNT_REPOSITORY_TOKEN)
     private readonly accountRepository: IStarbankAccountRepository,
@@ -94,7 +97,7 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
 
       return { success: true };
     } catch (error: any) {
-      console.error('Failed to create transaction:', error);
+      this.logger.error('Failed to create transaction:', error);
       return {
         success: false,
         message: `Transaction failed: ${error.message}`,
@@ -148,7 +151,7 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
 
       return result.map(this.mapToEntity);
     } catch (error: any) {
-      console.error(
+      this.logger.error(
         `Failed to find transactions for account ${accountId}:`,
         error,
       );
@@ -196,7 +199,7 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
 
       return result.map(this.mapToEntity);
     } catch (error: any) {
-      console.error(`Failed to find transactions for user ${uuid}:`, error);
+      this.logger.error(`Failed to find transactions for user ${uuid}:`, error);
       throw new Error(`Failed to find user transactions: ${error.message}`);
     }
   }
@@ -241,7 +244,7 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
 
       return result.map(this.mapToEntity);
     } catch (error: any) {
-      console.error(
+      this.logger.error(
         `Failed to find transfers for account ${accountId}:`,
         error,
       );
@@ -290,7 +293,7 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
 
       return result.map(this.mapToEntity);
     } catch (error: any) {
-      console.error(`Failed to find transfers for user ${uuid}:`, error);
+      this.logger.error(`Failed to find transfers for user ${uuid}:`, error);
       throw new Error(`Failed to find user transfers: ${error.message}`);
     }
   }
@@ -327,7 +330,7 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
 
       return result.map(this.mapToEntity);
     } catch (error: any) {
-      console.error(`Failed to find transactions by type ${type}:`, error);
+      this.logger.error(`Failed to find transactions by type ${type}:`, error);
       throw new Error(`Failed to find transactions by type: ${error.message}`);
     }
   }

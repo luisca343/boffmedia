@@ -6,10 +6,13 @@ import { WINGULL_USER_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfac
 import { IWingullPlayerRepository } from '../repositories/interfaces/wingull-player.repository.interface';
 import { PlayerStats } from '../entities/player-stats.entity';
 import { PokemonW } from '../entities/pokemon-w-.entity';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class WingullPlayerService {
   constructor(
+    private readonly logger: Logger,
+
     @Inject(WINGULL_USER_REPOSITORY_TOKEN)
     private readonly wingullPlayerRepository: IWingullPlayerRepository,
   ) {}
@@ -18,7 +21,7 @@ export class WingullPlayerService {
     try {
       return await this.wingullPlayerRepository.getStatsFromAPI(uuid);
     } catch (error: any) {
-      console.error(`Failed to get stats for ${uuid}:`, error);
+      this.logger.error(`Failed to get stats for ${uuid}:`, error);
       throw new Error(`Stats retrieval failed: ${error.message}`);
     }
   }
@@ -27,7 +30,7 @@ export class WingullPlayerService {
     try {
       return await this.wingullPlayerRepository.getTeamFromAPI(uuid);
     } catch (error: any) {
-      console.error(`Failed to get team for ${uuid}:`, error);
+      this.logger.error(`Failed to get team for ${uuid}:`, error);
       throw new Error(`Team retrieval failed: ${error.message}`);
     }
   }
@@ -36,7 +39,7 @@ export class WingullPlayerService {
     try {
       return await this.wingullPlayerRepository.getPCFromAPI(uuid);
     } catch (error: any) {
-      console.error(`Failed to get PC for ${uuid}:`, error);
+      this.logger.error(`Failed to get PC for ${uuid}:`, error);
       throw new Error(`PC retrieval failed: ${error.message}`);
     }
   }
@@ -47,7 +50,7 @@ export class WingullPlayerService {
         movePokemonDto,
       );
     } catch (error: any) {
-      console.error(`Failed to move Pokémon:`, error);
+      this.logger.error(`Failed to move Pokémon:`, error);
       throw new Error(`Pokémon move failed: ${error.message}`);
     }
   }
@@ -56,7 +59,7 @@ export class WingullPlayerService {
     try {
       return await this.wingullPlayerRepository.updateDexInAPI(uuid);
     } catch (error: any) {
-      console.error(`Failed to update dex for ${uuid}:`, error);
+      this.logger.error(`Failed to update dex for ${uuid}:`, error);
       throw new Error(`Dex update failed: ${error.message}`);
     }
   }
@@ -65,7 +68,7 @@ export class WingullPlayerService {
     try {
       return await this.wingullPlayerRepository.getQuestsFromAPI(uuid);
     } catch (error: any) {
-      console.error(`Failed to get quests for ${uuid}:`, error);
+      this.logger.error(`Failed to get quests for ${uuid}:`, error);
       throw new Error(`Quests retrieval failed: ${error.message}`);
     }
   }
@@ -75,7 +78,7 @@ export class WingullPlayerService {
       const request: MessageRequestDto = { uuid, message };
       return await this.wingullPlayerRepository.sendMessageInAPI(request);
     } catch (error: any) {
-      console.error(`Failed to send message to ${uuid}:`, error);
+      this.logger.error(`Failed to send message to ${uuid}:`, error);
       throw new Error(`Message sending failed: ${error.message}`);
     }
   }
@@ -85,7 +88,10 @@ export class WingullPlayerService {
       const request: MessageRequestDto = { uuid, message };
       return await this.wingullPlayerRepository.globalchatInAPI(request);
     } catch (error: any) {
-      console.error(`Failed to send global chat message for ${uuid}:`, error);
+      this.logger.error(
+        `Failed to send global chat message for ${uuid}:`,
+        error,
+      );
       throw new Error(`Global chat message sending failed: ${error.message}`);
     }
   }
@@ -99,7 +105,7 @@ export class WingullPlayerService {
       const request: PokemonGiveRequestDto = { uuid, pokespec, sendMessage };
       return await this.wingullPlayerRepository.givePokemonInAPI(request);
     } catch (error: any) {
-      console.error(`Failed to give Pokémon to ${uuid}:`, error);
+      this.logger.error(`Failed to give Pokémon to ${uuid}:`, error);
       throw new Error(`Pokémon giving failed: ${error.message}`);
     }
   }
@@ -116,7 +122,7 @@ export class WingullPlayerService {
     try {
       return await this.wingullPlayerRepository.giveItemsInAPI(uuid, items);
     } catch (error: any) {
-      console.error(`Failed to give items to ${uuid}:`, error);
+      this.logger.error(`Failed to give items to ${uuid}:`, error);
       throw new Error(`Items giving failed: ${error.message}`);
     }
   }
@@ -125,7 +131,7 @@ export class WingullPlayerService {
     try {
       return await this.wingullPlayerRepository.getBattleTeamsFromAPI(uuid);
     } catch (error: any) {
-      console.error(`Failed to get battle teams for ${uuid}:`, error);
+      this.logger.error(`Failed to get battle teams for ${uuid}:`, error);
       throw new Error(`Battle teams retrieval failed: ${error.message}`);
     }
   }
@@ -138,7 +144,7 @@ export class WingullPlayerService {
         updateBattleTeamDto,
       );
     } catch (error: any) {
-      console.error('Failed to update battle team:', error);
+      this.logger.error('Failed to update battle team:', error);
       throw new Error(`Battle team update failed: ${error.message}`);
     }
   }

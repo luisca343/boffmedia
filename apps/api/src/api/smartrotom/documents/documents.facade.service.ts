@@ -11,6 +11,7 @@ import {
   UpdateNewsRequest,
   NewsResponse,
 } from './services/news.service';
+import { Logger } from 'nestjs-pino';
 import {
   DocumentDetails,
   NotePreview,
@@ -27,6 +28,8 @@ export interface CreateNoteWithUserRequest {
 @Injectable()
 export class DocumentsFacadeService {
   constructor(
+    private readonly logger: Logger,
+
     private readonly documentService: DocumentService,
     private readonly noteService: NoteService,
     private readonly newsService: NewsService,
@@ -38,7 +41,7 @@ export class DocumentsFacadeService {
     try {
       return await this.documentService.getDocumentById(id);
     } catch (error: any) {
-      console.error(`Error getting document ${id}:`, error);
+      this.logger.error(`Error getting document ${id}:`, error);
       throw new Error(`Failed to retrieve document: ${error.message}`);
     }
   }
@@ -49,7 +52,7 @@ export class DocumentsFacadeService {
     try {
       return await this.documentService.createDocument(createDocumentRequest);
     } catch (error: any) {
-      console.error('Error creating document:', error);
+      this.logger.error('Error creating document:', error);
       throw new Error(`Failed to create document: ${error.message}`);
     }
   }
@@ -64,7 +67,7 @@ export class DocumentsFacadeService {
         updateDocumentRequest,
       );
     } catch (error: any) {
-      console.error(`Error updating document ${id}:`, error);
+      this.logger.error(`Error updating document ${id}:`, error);
       throw new Error(`Failed to update document: ${error.message}`);
     }
   }
@@ -79,7 +82,7 @@ export class DocumentsFacadeService {
         message: 'Document deleted successfully',
       };
     } catch (error: any) {
-      console.error(`Error deleting document ${id}:`, error);
+      this.logger.error(`Error deleting document ${id}:`, error);
       throw new Error(`Failed to delete document: ${error.message}`);
     }
   }
@@ -93,7 +96,7 @@ export class DocumentsFacadeService {
     try {
       return await this.documentService.saveDocument(id, title, content, type);
     } catch (error: any) {
-      console.error(`Error saving document:`, error);
+      this.logger.error(`Error saving document:`, error);
       throw new Error(`Failed to save document: ${error.message}`);
     }
   }
@@ -104,7 +107,7 @@ export class DocumentsFacadeService {
     try {
       return await this.documentService.getUserDocuments(uuid);
     } catch (error: any) {
-      console.error(`Error getting notes for user ${uuid}:`, error);
+      this.logger.error(`Error getting notes for user ${uuid}:`, error);
       throw new Error(`Failed to retrieve notes: ${error.message}`);
     }
   }
@@ -123,7 +126,7 @@ export class DocumentsFacadeService {
 
       return { id: document.id, success: true };
     } catch (error: any) {
-      console.error('Error creating note with user:', error);
+      this.logger.error('Error creating note with user:', error);
       throw new Error(`Failed to create note: ${error.message}`);
     }
   }
@@ -135,7 +138,10 @@ export class DocumentsFacadeService {
     try {
       return await this.noteService.addNoteToUser(documentId, uuid);
     } catch (error: any) {
-      console.error(`Error adding note ${documentId} to user ${uuid}:`, error);
+      this.logger.error(
+        `Error adding note ${documentId} to user ${uuid}:`,
+        error,
+      );
       throw new Error(`Failed to add note to user: ${error.message}`);
     }
   }
@@ -147,7 +153,7 @@ export class DocumentsFacadeService {
     try {
       return await this.noteService.removeNoteFromUser(documentId, uuid);
     } catch (error: any) {
-      console.error(
+      this.logger.error(
         `Error removing note ${documentId} from user ${uuid}:`,
         error,
       );
@@ -161,7 +167,7 @@ export class DocumentsFacadeService {
     try {
       return await this.newsService.getAllNews();
     } catch (error: any) {
-      console.error('Error getting all news:', error);
+      this.logger.error('Error getting all news:', error);
       throw new Error(`Failed to retrieve news: ${error.message}`);
     }
   }
@@ -170,7 +176,7 @@ export class DocumentsFacadeService {
     try {
       return await this.newsService.getPublishedNews();
     } catch (error: any) {
-      console.error('Error getting published news:', error);
+      this.logger.error('Error getting published news:', error);
       throw new Error(`Failed to retrieve published news: ${error.message}`);
     }
   }
@@ -179,7 +185,7 @@ export class DocumentsFacadeService {
     try {
       return await this.newsService.getNewsById(newsId);
     } catch (error: any) {
-      console.error(`Error getting news ${newsId}:`, error);
+      this.logger.error(`Error getting news ${newsId}:`, error);
       throw new Error(`Failed to retrieve news: ${error.message}`);
     }
   }
@@ -188,7 +194,7 @@ export class DocumentsFacadeService {
     try {
       return await this.newsService.getFeaturedNews();
     } catch (error: any) {
-      console.error('Error getting featured news:', error);
+      this.logger.error('Error getting featured news:', error);
       throw new Error(`Failed to retrieve featured news: ${error.message}`);
     }
   }
@@ -197,7 +203,7 @@ export class DocumentsFacadeService {
     try {
       return await this.newsService.createNews(createNewsRequest);
     } catch (error: any) {
-      console.error('Error creating news:', error);
+      this.logger.error('Error creating news:', error);
       throw new Error(`Failed to create news: ${error.message}`);
     }
   }
@@ -209,7 +215,7 @@ export class DocumentsFacadeService {
     try {
       return await this.newsService.updateNews(newsId, updateNewsRequest);
     } catch (error: any) {
-      console.error(`Error updating news ${newsId}:`, error);
+      this.logger.error(`Error updating news ${newsId}:`, error);
       throw new Error(`Failed to update news: ${error.message}`);
     }
   }
@@ -224,7 +230,7 @@ export class DocumentsFacadeService {
         message: 'News deleted successfully',
       };
     } catch (error: any) {
-      console.error(`Error deleting news ${newsId}:`, error);
+      this.logger.error(`Error deleting news ${newsId}:`, error);
       throw new Error(`Failed to delete news: ${error.message}`);
     }
   }
@@ -236,7 +242,7 @@ export class DocumentsFacadeService {
     try {
       return await this.newsService.updateNewsStatus(publishedIds, featuredId);
     } catch (error: any) {
-      console.error('Error updating news status:', error);
+      this.logger.error('Error updating news status:', error);
       throw new Error(`Failed to update news status: ${error.message}`);
     }
   }
@@ -248,7 +254,7 @@ export class DocumentsFacadeService {
     try {
       return await this.newsService.saveNews(news, newsId);
     } catch (error: any) {
-      console.error('Error saving news:', error);
+      this.logger.error('Error saving news:', error);
       throw new Error(`Failed to save news: ${error.message}`);
     }
   }
@@ -262,7 +268,7 @@ export class DocumentsFacadeService {
     try {
       return await this.noteService.validateUserHasAccess(documentId, uuid);
     } catch (error: any) {
-      console.error(`Error validating document access:`, error);
+      this.logger.error(`Error validating document access:`, error);
       return false;
     }
   }
@@ -271,7 +277,7 @@ export class DocumentsFacadeService {
     try {
       return await this.documentService.validateDocumentExists(documentId);
     } catch (error: any) {
-      console.error(`Error validating document exists:`, error);
+      this.logger.error(`Error validating document exists:`, error);
       return false;
     }
   }

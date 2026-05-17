@@ -10,6 +10,7 @@ import axios from 'axios';
 import { PokemonDataManagementService } from '@api/smartrotom/pokemon/services/pokemon-data-management.service';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { MySql2Database } from 'drizzle-orm/mysql2';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class AppService {
@@ -21,6 +22,8 @@ export class AppService {
   );
 
   constructor(
+    private readonly logger: Logger,
+
     private configService: ConfigService,
     private pokemonService: PokemonDataManagementService,
     @Inject(DRIZZLE) private db: MySql2Database,
@@ -33,7 +36,7 @@ export class AppService {
   }
 
   uploadFile(file: Express.Multer.File) {
-    console.log(file);
+    this.logger.log(file);
   }
 
   toggleLogging() {
@@ -134,7 +137,7 @@ export class AppService {
       }, {});
       return filesObj;
     } catch (error: any) {
-      console.error('Error reading the icons folder:', error);
+      this.logger.error('Error reading the icons folder:', error);
       return []; // Return an empty array in case of an error
     }
   }
@@ -149,9 +152,9 @@ export class AppService {
         this.CACHE_FILE_PATH,
         JSON.stringify(this.imageCache, null, 2),
       );
-      console.log('Cache saved to file.');
+      this.logger.log('Cache saved to file.');
     } catch (error: any) {
-      console.error('Error saving cache to file:', error);
+      this.logger.error('Error saving cache to file:', error);
     }
   }
 
@@ -159,9 +162,9 @@ export class AppService {
     try {
       const data = await fs.readFile(this.CACHE_FILE_PATH, 'utf-8');
       this.imageCache = JSON.parse(data);
-      console.log('Cache loaded from file.');
+      this.logger.log('Cache loaded from file.');
     } catch (error: any) {
-      console.error('Error loading cache from file:', error);
+      this.logger.error('Error loading cache from file:', error);
     }
   }
 
@@ -211,12 +214,12 @@ export class AppService {
   }
 
   async getSteamData(steamID: string): Promise<GameData> {
-    console.log('GETSTEAMDATA= ' + steamID);
+    this.logger.log('GETSTEAMDATA= ' + steamID);
     const url = `https://store.steampowered.com/api/appdetails?appids=${steamID}&l=spanish`;
     const response = await axios.get(url);
     const gameData = response.data[steamID].data;
 
-    console.log(gameData);
+    this.logger.log(gameData);
 
     const initialPrice = gameData.price_overview?.initial;
     const finalPrice = gameData.price_overview?.final;
@@ -264,8 +267,8 @@ export class AppService {
       media: media,
     };
 
-    console.log('== RESULTADO ==');
-    console.log(data);
+    this.logger.log('== RESULTADO ==');
+    this.logger.log(data);
 
     return data;
   }

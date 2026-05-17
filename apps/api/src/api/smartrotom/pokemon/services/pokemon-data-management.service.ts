@@ -9,12 +9,15 @@ import { EvoTreeNode } from './data/pokemon-data.service';
 import Fuse, { IFuseOptions, FuseResult } from 'fuse.js';
 import { FullMove } from '../entities/pokemon-move.entity';
 import { SpawnInfo } from '../entities/pokemon-spawn.entity';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class PokemonDataManagementService {
   private fusePokemon: Fuse<Pokemon>;
 
   constructor(
+    private readonly logger: Logger,
+
     private readonly pokemonDataService: PokemonDataService,
     private readonly moveDataService: MoveDataService,
     private readonly spawnDataService: SpawnDataService,
@@ -30,7 +33,7 @@ export class PokemonDataManagementService {
       await this.spriteManifestService.loadSpriteManifest();
       this.initializeFuse();
     } catch (error: any) {
-      console.error('Failed to initialize Pokemon data:', error);
+      this.logger.error('Failed to initialize Pokemon data:', error);
       throw new Error(`Data initialization failed: ${error.message}`);
     }
   }
@@ -326,16 +329,16 @@ export class PokemonDataManagementService {
     try {
       // Search for the Pokemon by name using the search method
       const searchResults = this.searchPokemonByName(name, 1);
-      console.log('Searching for PMD portrait for:', name);
-      console.log('Search results:', searchResults);
+      this.logger.log('Searching for PMD portrait for:', name);
+      this.logger.log('Search results:', searchResults);
 
       if (searchResults.length === 0) {
-        console.log('Pokemon not found:', name);
+        this.logger.log('Pokemon not found:', name);
         return { url: '/smartrotom/img/pmd/portrait/0000/Normal.png' };
       }
 
       const pokemon = searchResults[0].item;
-      console.log('Found Pokemon:', pokemon.name, 'Dex:', pokemon.dex);
+      this.logger.log('Found Pokemon:', pokemon.name, 'Dex:', pokemon.dex);
 
       // Format dex number with leading zeros (4 digits)
       const dex = pokemon.dex.toString().padStart(4, '0');
@@ -343,10 +346,10 @@ export class PokemonDataManagementService {
       // Construct the PMD sprite URL
       const spriteUrl = `/smartrotom/img/pmd/portrait/${dex}/Normal.png`;
 
-      console.log('PMD sprite URL:', spriteUrl);
+      this.logger.log('PMD sprite URL:', spriteUrl);
       return { url: spriteUrl };
     } catch (error: any) {
-      console.error('Error in getPmdPortrait:', error);
+      this.logger.error('Error in getPmdPortrait:', error);
       return { url: '/smartrotom/img/pmd/portrait/0000/Normal.png' };
     }
   }

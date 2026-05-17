@@ -8,10 +8,13 @@ import {
   smartrotomApps,
 } from '@/_db/schema/SmartRotom';
 import { IUserAppsRepository } from './interfaces/user-apps-repository.interface';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class UserAppsRepository implements IUserAppsRepository {
   constructor(
+    private readonly logger: Logger,
+
     @Inject(DRIZZLE) private readonly db: MySql2Database<Record<string, never>>,
   ) {}
 
@@ -81,7 +84,7 @@ export class UserAppsRepository implements IUserAppsRepository {
   }
 
   async resetOrderExcept(uuid: string, excludeAppIds: number[]): Promise<void> {
-    console.log(
+    this.logger.log(
       'Resetting order for user:',
       uuid,
       'excluding apps:',

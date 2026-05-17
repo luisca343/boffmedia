@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Logger } from 'nestjs-pino';
 import {
   FileUploadService,
   FileUploadRequest,
@@ -12,6 +13,8 @@ import {
 @Injectable()
 export class UploadFacadeService {
   constructor(
+    private readonly logger: Logger,
+
     private readonly fileUploadService: FileUploadService,
     private readonly imageUploadService: ImageUploadService,
   ) {}
@@ -24,7 +27,7 @@ export class UploadFacadeService {
     try {
       return await this.imageUploadService.uploadImage(imageRequest);
     } catch (error: any) {
-      console.error('Error uploading image:', error);
+      this.logger.error('Error uploading image:', error);
       throw new Error(`Failed to upload image: ${error.message}`);
     }
   }
@@ -42,7 +45,7 @@ export class UploadFacadeService {
           : 'Failed to delete image',
       };
     } catch (error: any) {
-      console.error(`Error deleting image ${filename}:`, error);
+      this.logger.error(`Error deleting image ${filename}:`, error);
       throw new Error(`Failed to delete image: ${error.message}`);
     }
   }
@@ -54,7 +57,7 @@ export class UploadFacadeService {
     try {
       return await this.imageUploadService.getImageInfo(path, filename);
     } catch (error: any) {
-      console.error(`Error getting image info for ${filename}:`, error);
+      this.logger.error(`Error getting image info for ${filename}:`, error);
       throw new Error(`Failed to get image info: ${error.message}`);
     }
   }
@@ -67,7 +70,7 @@ export class UploadFacadeService {
     try {
       return await this.fileUploadService.uploadFile(fileRequest);
     } catch (error: any) {
-      console.error('Error uploading file:', error);
+      this.logger.error('Error uploading file:', error);
       throw new Error(`Failed to upload file: ${error.message}`);
     }
   }
@@ -85,7 +88,7 @@ export class UploadFacadeService {
           : 'Failed to delete file',
       };
     } catch (error: any) {
-      console.error(`Error deleting file ${filename}:`, error);
+      this.logger.error(`Error deleting file ${filename}:`, error);
       throw new Error(`Failed to delete file: ${error.message}`);
     }
   }
@@ -97,7 +100,7 @@ export class UploadFacadeService {
     try {
       return await this.fileUploadService.getFileInfo(path, filename);
     } catch (error: any) {
-      console.error(`Error getting file info for ${filename}:`, error);
+      this.logger.error(`Error getting file info for ${filename}:`, error);
       throw new Error(`Failed to get file info: ${error.message}`);
     }
   }
@@ -149,7 +152,7 @@ export class UploadFacadeService {
 
       return { valid: true };
     } catch (error: any) {
-      console.error('Error validating image file:', error);
+      this.logger.error('Error validating image file:', error);
       return { valid: false, error: 'Failed to validate file' };
     }
   }

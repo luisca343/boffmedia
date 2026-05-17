@@ -40,6 +40,7 @@ import { UsersPaginatedResponseEntity } from './entities/users-paginated-respons
 import { UserRolesResponseEntity } from './entities/user-roles-response.entity';
 import { UserValidationResponseEntity } from './entities/user-validation-response.entity';
 import { BatchUsersDto } from './dto/batch-users.dto';
+import { Logger } from 'nestjs-pino';
 
 // Additional DTOs for specialized endpoints
 export class MinecraftDetails {
@@ -108,6 +109,8 @@ export class LoginDto {
 @UseInterceptors(ResponseInterceptor)
 export class BoffMediaUsersController {
   constructor(
+    private readonly logger: Logger,
+
     private readonly usersFacadeService: BoffMediaUsersFacadeService,
   ) {}
 
@@ -124,7 +127,7 @@ export class BoffMediaUsersController {
   @ApiResponse({ status: 409, description: 'User already exists' })
   @ApiBody({ type: CreateUserDto })
   async create(@Body() createUserDto: CreateUserDto) {
-    console.log('Creating user with data:', createUserDto);
+    this.logger.log('Creating user with data:', createUserDto);
     try {
       const user = await this.usersFacadeService.createUser({
         email: createUserDto.email,

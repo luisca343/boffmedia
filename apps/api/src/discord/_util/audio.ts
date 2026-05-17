@@ -11,6 +11,9 @@ import { Message } from 'discord.js';
 import { Readable } from 'stream';
 import axios from 'axios';
 import { CommandsService } from '../_commands/commands.service';
+import pino from 'pino';
+
+const logger = pino({ name: 'util' });
 
 const voiceCache = new Map<string, string>();
 
@@ -43,9 +46,9 @@ export async function playAudio(message: Message, service: CommandsService) {
   const connection = getVoiceConnection(voiceChannel.guild.id);
 
   if (!connection) {
-    console.error(
+    logger.error(
+      { guildId: voiceChannel.guild.id },
       'No active voice connection for guild',
-      voiceChannel.guild.id,
     );
     return;
   }
@@ -77,9 +80,7 @@ function playNext() {
     }
   });
 
-  player.on('error', (err) =>
-    console.error('Audio player error:', err.message, err),
-  );
+  player.on('error', (err) => logger.error({ err }, 'Audio player error'));
 
   connection.subscribe(player);
   player.play(resource);
@@ -104,10 +105,9 @@ export async function downloadAudio(
     return Buffer.from(response.data);
   } catch (error: any) {
     const err = error as any;
-    console.error(
-      'Error downloading audio:',
-      err.response?.status,
-      err.message,
+    logger.error(
+      { err, status: err.response?.status },
+      'Error downloading audio',
     );
     return null;
   }

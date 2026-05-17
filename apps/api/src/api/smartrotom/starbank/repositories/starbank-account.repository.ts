@@ -11,6 +11,7 @@ import {
 import { BaseRepositoryImpl } from '@api/_utils/repositories/base-repository';
 import { StarBankAccount } from '../entities/starbank-account.entity';
 import { AccountType } from '../enums/account-type.enum';
+import { Logger } from 'nestjs-pino';
 import {
   CreateAccountData,
   IStarbankAccountRepository,
@@ -25,7 +26,10 @@ export class StarbankAccountRepository
   >
   implements IStarbankAccountRepository
 {
-  constructor(@Inject(DRIZZLE) db: MySql2Database<Record<string, never>>) {
+  constructor(
+    private readonly logger: Logger,
+    @Inject(DRIZZLE) db: MySql2Database<Record<string, never>>,
+  ) {
     super(db, starBankAccounts);
   }
 
@@ -99,7 +103,7 @@ export class StarbankAccountRepository
 
       return result.map(this.mapToEntity);
     } catch (error: any) {
-      console.error(`Failed to find accounts by type ${type}:`, error);
+      this.logger.error(`Failed to find accounts by type ${type}:`, error);
       throw new Error(`Failed to find accounts by type: ${error.message}`);
     }
   }
@@ -123,7 +127,7 @@ export class StarbankAccountRepository
 
       return result.length > 0 ? result[0] : null;
     } catch (error: any) {
-      console.error(`Failed to find main account for ${uuid}:`, error);
+      this.logger.error(`Failed to find main account for ${uuid}:`, error);
       throw new Error(`Failed to find main account: ${error.message}`);
     }
   }
@@ -140,7 +144,7 @@ export class StarbankAccountRepository
 
       return true;
     } catch (error: any) {
-      console.error(
+      this.logger.error(
         `Failed to update balance for account ${accountId}:`,
         error,
       );
@@ -157,7 +161,7 @@ export class StarbankAccountRepository
       const mainAccount = accounts.find((acc) => acc.type === AccountType.MAIN);
       return mainAccount ? mainAccount.balance : accounts[0].balance;
     } catch (error: any) {
-      console.error(`Failed to get balance for user ${uuid}:`, error);
+      this.logger.error(`Failed to get balance for user ${uuid}:`, error);
       return 0;
     }
   }
@@ -167,7 +171,10 @@ export class StarbankAccountRepository
       const account = await this.findAccountById(accountId);
       return !!account;
     } catch (error: any) {
-      console.error(`Failed to check if account ${accountId} exists:`, error);
+      this.logger.error(
+        `Failed to check if account ${accountId} exists:`,
+        error,
+      );
       return false;
     }
   }
@@ -212,7 +219,7 @@ export class StarbankAccountRepository
 
       return { success: true, accountId };
     } catch (error: any) {
-      console.error('Failed to create account:', error);
+      this.logger.error('Failed to create account:', error);
       return {
         success: false,
         message: `Account creation failed: ${error.message}`,
@@ -242,7 +249,7 @@ export class StarbankAccountRepository
 
       return result.length > 0 ? this.mapToEntity(result[0]) : null;
     } catch (error: any) {
-      console.error(`Failed to find account ${accountId}:`, error);
+      this.logger.error(`Failed to find account ${accountId}:`, error);
       throw new Error(`Failed to find account: ${error.message}`);
     }
   }
@@ -267,7 +274,7 @@ export class StarbankAccountRepository
 
       return result.map(this.mapToEntity);
     } catch (error: any) {
-      console.error(`Failed to find accounts for ${uuid}:`, error);
+      this.logger.error(`Failed to find accounts for ${uuid}:`, error);
       throw new Error(`Failed to find user accounts: ${error.message}`);
     }
   }
@@ -286,7 +293,7 @@ export class StarbankAccountRepository
 
       return result.map(this.mapToEntity);
     } catch (error: any) {
-      console.error('Failed to find all accounts:', error);
+      this.logger.error('Failed to find all accounts:', error);
       throw new Error(`Failed to find all accounts: ${error.message}`);
     }
   }

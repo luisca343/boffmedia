@@ -9,10 +9,13 @@ import { UpdateBattleTeamDto } from './dto/battle-team.dto';
 import { TaxiStop } from './entities/taxi-stop.entity';
 import { PokemonW } from './entities/pokemon-w-.entity';
 import { PlayerStats } from './entities/player-stats.entity';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class WingullFacadeService {
   constructor(
+    private readonly logger: Logger,
+
     private readonly wingullEconomyService: WingullEconomyService,
     private readonly wingullPlayerService: WingullPlayerService,
     private readonly wingullWorldService: WingullWorldService,
@@ -26,7 +29,7 @@ export class WingullFacadeService {
     try {
       return await this.wingullEconomyService.updateBalance(balanceData);
     } catch (error: any) {
-      console.error('Error updating balance:', error);
+      this.logger.error('Error updating balance:', error);
       throw new Error(`Failed to update balance: ${error.message}`);
     }
   }
@@ -35,7 +38,7 @@ export class WingullFacadeService {
     try {
       return await this.wingullEconomyService.getCurrentBalance(uuid, amount);
     } catch (error: any) {
-      console.error(`Error getting current balance for ${uuid}:`, error);
+      this.logger.error(`Error getting current balance for ${uuid}:`, error);
       throw new Error(`Failed to get current balance: ${error.message}`);
     }
   }
@@ -44,7 +47,7 @@ export class WingullFacadeService {
     try {
       return await this.wingullEconomyService.getMoney(uuid);
     } catch (error: any) {
-      console.error(`Error getting money for ${uuid}:`, error);
+      this.logger.error(`Error getting money for ${uuid}:`, error);
       throw new Error(`Failed to get money: ${error.message}`);
     }
   }
@@ -55,7 +58,7 @@ export class WingullFacadeService {
     try {
       return await this.wingullPlayerService.getStats(uuid);
     } catch (error: any) {
-      console.error(`Error getting stats for ${uuid}:`, error);
+      this.logger.error(`Error getting stats for ${uuid}:`, error);
       throw new Error(`Failed to get stats: ${error.message}`);
     }
   }
@@ -64,7 +67,7 @@ export class WingullFacadeService {
     try {
       return await this.wingullPlayerService.getTeam(uuid);
     } catch (error: any) {
-      console.error(`Error getting team for ${uuid}:`, error);
+      this.logger.error(`Error getting team for ${uuid}:`, error);
       throw new Error(`Failed to get team: ${error.message}`);
     }
   }
@@ -73,7 +76,7 @@ export class WingullFacadeService {
     try {
       return await this.wingullPlayerService.getPC(uuid);
     } catch (error: any) {
-      console.error(`Error getting PC for ${uuid}:`, error);
+      this.logger.error(`Error getting PC for ${uuid}:`, error);
       throw new Error(`Failed to get PC: ${error.message}`);
     }
   }
@@ -82,7 +85,7 @@ export class WingullFacadeService {
     try {
       return await this.wingullPlayerService.movePokemon(movePokemonDto);
     } catch (error: any) {
-      console.error(`Error moving Pokémon:`, error);
+      this.logger.error(`Error moving Pokémon:`, error);
       throw new Error(`Failed to move Pokémon: ${error.message}`);
     }
   }
@@ -91,7 +94,7 @@ export class WingullFacadeService {
     try {
       return await this.wingullPlayerService.updateDex(uuid);
     } catch (error: any) {
-      console.error(`Error updating dex for ${uuid}:`, error);
+      this.logger.error(`Error updating dex for ${uuid}:`, error);
       throw new Error(`Failed to update dex: ${error.message}`);
     }
   }
@@ -100,7 +103,7 @@ export class WingullFacadeService {
     try {
       return await this.wingullPlayerService.getQuests(uuid);
     } catch (error: any) {
-      console.error(`Error getting quests for ${uuid}:`, error);
+      this.logger.error(`Error getting quests for ${uuid}:`, error);
       throw new Error(`Failed to get quests: ${error.message}`);
     }
   }
@@ -109,7 +112,7 @@ export class WingullFacadeService {
     try {
       return await this.wingullPlayerService.sendMessage(uuid, message);
     } catch (error: any) {
-      console.error(`Error sending message to ${uuid}:`, error);
+      this.logger.error(`Error sending message to ${uuid}:`, error);
       throw new Error(`Failed to send message: ${error.message}`);
     }
   }
@@ -118,7 +121,10 @@ export class WingullFacadeService {
     try {
       return await this.wingullPlayerService.globalchat(uuid, message);
     } catch (error: any) {
-      console.error(`Error sending global chat message for ${uuid}:`, error);
+      this.logger.error(
+        `Error sending global chat message for ${uuid}:`,
+        error,
+      );
       throw new Error(`Failed to send global chat message: ${error.message}`);
     }
   }
@@ -135,7 +141,7 @@ export class WingullFacadeService {
         sendMessage,
       );
     } catch (error: any) {
-      console.error(`Error giving Pokémon to ${uuid}:`, error);
+      this.logger.error(`Error giving Pokémon to ${uuid}:`, error);
       throw new Error(`Failed to give Pokémon: ${error.message}`);
     }
   }
@@ -152,7 +158,7 @@ export class WingullFacadeService {
     try {
       return await this.wingullPlayerService.giveItems(uuid, items);
     } catch (error: any) {
-      console.error(`Error giving items to ${uuid}:`, error);
+      this.logger.error(`Error giving items to ${uuid}:`, error);
       throw new Error(`Failed to give items: ${error.message}`);
     }
   }
@@ -182,7 +188,7 @@ export class WingullFacadeService {
 
       return data;
     } catch (error: any) {
-      console.error(`Error getting battle teams for ${uuid}:`, error);
+      this.logger.error(`Error getting battle teams for ${uuid}:`, error);
       throw new Error(`Failed to get battle teams: ${error.message}`);
     }
   }
@@ -195,7 +201,7 @@ export class WingullFacadeService {
         updateBattleTeamDto,
       );
     } catch (error: any) {
-      console.error('Error updating battle team:', error);
+      this.logger.error('Error updating battle team:', error);
       throw new Error(`Failed to update battle team: ${error.message}`);
     }
   }
@@ -206,7 +212,7 @@ export class WingullFacadeService {
     try {
       return await this.wingullWorldService.getPerformance();
     } catch (error: any) {
-      console.error('Error getting performance data:', error);
+      this.logger.error('Error getting performance data:', error);
       throw new Error(`Failed to get performance data: ${error.message}`);
     }
   }
@@ -215,7 +221,7 @@ export class WingullFacadeService {
     try {
       return await this.wingullWorldService.getRegions();
     } catch (error: any) {
-      console.error('Error getting regions data:', error);
+      this.logger.error('Error getting regions data:', error);
       throw new Error(`Failed to get regions data: ${error.message}`);
     }
   }
@@ -224,7 +230,7 @@ export class WingullFacadeService {
     try {
       return await this.wingullWorldService.getWeather();
     } catch (error: any) {
-      console.error('Error getting weather data:', error);
+      this.logger.error('Error getting weather data:', error);
       throw new Error(`Failed to get weather data: ${error.message}`);
     }
   }
@@ -233,7 +239,7 @@ export class WingullFacadeService {
     try {
       return await this.wingullWorldService.updateNPCs(data);
     } catch (error: any) {
-      console.error('Error updating NPCs:', error);
+      this.logger.error('Error updating NPCs:', error);
       throw new Error(`Failed to update NPCs: ${error.message}`);
     }
   }
@@ -248,7 +254,7 @@ export class WingullFacadeService {
     try {
       return await this.wingullTransportService.getTaxiStops();
     } catch (error: any) {
-      console.error('Error getting taxi stops:', error);
+      this.logger.error('Error getting taxi stops:', error);
       throw new Error(`Failed to get taxi stops: ${error.message}`);
     }
   }
@@ -257,7 +263,7 @@ export class WingullFacadeService {
     try {
       return await this.wingullTransportService.teleportPlayer(id, uuid);
     } catch (error: any) {
-      console.error(`Error teleporting player ${uuid} to ${id}:`, error);
+      this.logger.error(`Error teleporting player ${uuid} to ${id}:`, error);
       throw new Error(`Failed to teleport player: ${error.message}`);
     }
   }

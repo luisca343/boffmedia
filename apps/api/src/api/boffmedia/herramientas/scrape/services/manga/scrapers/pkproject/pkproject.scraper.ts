@@ -19,6 +19,9 @@ import { IMangaScraper } from '../manga-scraper.interface';
 import { MangaChapter, MangaSearchResult } from '../../manga.types';
 import { fetchHtmlSafe } from '../../manga-http';
 import { normalizeChapterNumber } from '../../chapter-normalizer';
+import pino from 'pino';
+
+const logger = pino({ name: 'util' });
 
 const BASE = 'https://pkproject.net';
 
@@ -192,7 +195,7 @@ export class PkProjectScraper implements IMangaScraper {
 
     const html = await fetchHtmlSafe(indexUrl);
     if (!html) {
-      console.warn(`[pkproject] Could not load sagas page: ${indexUrl}`);
+      logger.warn(`[pkproject] Could not load sagas page: ${indexUrl}`);
       return [];
     }
 
@@ -242,7 +245,7 @@ export class PkProjectScraper implements IMangaScraper {
     const saga = sagas.find((s) => s.url === sagaUrl);
 
     if (!saga) {
-      console.warn(`[pkproject] Saga not found for URL: ${sagaUrl}`);
+      logger.warn(`[pkproject] Saga not found for URL: ${sagaUrl}`);
       return [];
     }
 
@@ -258,7 +261,7 @@ export class PkProjectScraper implements IMangaScraper {
   private async getVolumeChapters(volumeUrl: string): Promise<MangaChapter[]> {
     const html = await fetchHtmlSafe(volumeUrl);
     if (!html) {
-      console.warn(`[pkproject] Failed to fetch volume: ${volumeUrl}`);
+      logger.warn(`[pkproject] Failed to fetch volume: ${volumeUrl}`);
       return [];
     }
 
