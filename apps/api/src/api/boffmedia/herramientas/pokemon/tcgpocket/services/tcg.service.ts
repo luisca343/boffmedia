@@ -14,10 +14,8 @@ import {
   AddUserCardDto,
   UpdateUserCardQuantityDto,
 } from '../dto/user-card.dto';
-import { UserCard, UserCardHistory } from '@/_db/schema/TCG';
 import * as path from 'path';
 import { promises as fsPromises } from 'fs';
-import * as fs from 'fs';
 import { BoffMediaUsersManagementService } from '@api/boffmedia/users/services/users-management.service';
 
 @Injectable()
@@ -207,7 +205,7 @@ export class TcgService {
     try {
       // Fetch all existing cards for this set
       const existingCards = await this.tcgRepository.getCardsBySetId(setId);
-      const existingCardsMap = new Map(
+      const _existingCardsMap = new Map(
         existingCards.map((card) => [card.id, card]),
       );
 
@@ -448,7 +446,7 @@ export class TcgService {
               ? cardDetails.name_en || cardDetails.name_es
               : 'Unknown Card',
           });
-        } catch (error: any) {
+        } catch (_error: any) {
           enrichedHistory.push({
             ...historyEntry,
             setId: 'unknown',

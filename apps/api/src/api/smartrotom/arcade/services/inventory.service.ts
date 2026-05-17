@@ -56,7 +56,7 @@ export class InventoryService {
 
   async getUserInventory(
     uuid: string,
-    sourceType?: string,
+    _sourceType?: string,
   ): Promise<ArcadeInventoryResponse> {
     this.validateUuid(uuid);
     const rawItems =

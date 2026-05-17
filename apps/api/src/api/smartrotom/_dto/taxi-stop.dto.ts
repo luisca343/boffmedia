@@ -1,5 +1,3 @@
-import { ApiProperty } from '@nestjs/swagger';
-
 export interface TaxiStop {
   id: string;
   x: number;

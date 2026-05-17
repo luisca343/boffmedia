@@ -26,12 +26,6 @@ import { ResponseInterceptor } from '@api/_utils/interceptors/response.intercept
 import { PokemonFacadeService } from './pokemon.facade.service';
 
 // Import DTOs
-import {
-  GetPokemonByDexDto,
-  SearchPokemonDto,
-  GetPokemonMovesDto,
-} from './dto/get-pokemon.dto';
-import { GetPokemonImageDto } from './dto/get-pokemon-image.dto';
 import { RegisterPokemonDto } from './dto/register-pokemon.dto';
 import { UpdateDexDto } from './dto/update-dex.dto';
 
@@ -40,7 +34,6 @@ import { Pokemon } from './entities/pokemon.entity';
 import { PokemonSearchResult } from './entities/pokemon-search.entity';
 import {
   PokemonLearnset,
-  Move,
   MoveCount,
   FullMove,
   PokemonMoveEntry,
@@ -50,7 +43,7 @@ import {
   AbilityInfo,
   PokemonAbilityEntry,
 } from './entities/pokemon-ability.entity';
-import { SpawnInfo, BiomeSpawnData } from './entities/pokemon-spawn.entity';
+import { SpawnInfo } from './entities/pokemon-spawn.entity';
 import { PokemonImage, ItemSprite } from './entities/pokemon-image.entity';
 import {
   PokedexStatistics,
@@ -62,7 +55,6 @@ import {
   EvolutionTree,
 } from './entities/pokemon-evolution-tree';
 import { BiomeSpawnCollection } from './entities/biome-spawn-collection.entity';
-import { PokemonBiomes } from './entities/pokemon-biomes';
 import { WingullFacadeService } from '../wingull/wingull.facade.service';
 
 @ApiTags('SmartRotom | Pokémon')

@@ -104,7 +104,7 @@ export class NotificationService {
    */
   private async sendDiscordNotification(
     notification: StreamNotification,
-    target: NotificationTarget,
+    _target: NotificationTarget,
   ): Promise<void> {
     // This would require discord.js integration
     // For now, we'll log it
@@ -154,7 +154,7 @@ export class NotificationService {
    */
   private async logToConsole(
     notification: StreamNotification,
-    target: NotificationTarget,
+    _target: NotificationTarget,
   ): Promise<void> {
     const message = this.formatMessage(notification);
     console.log(`[STREAM NOTIFICATION] ${message}`);

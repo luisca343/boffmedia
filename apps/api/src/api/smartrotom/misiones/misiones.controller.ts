@@ -5,7 +5,6 @@ import {
   Post,
   Query,
   Param,
-  Delete,
   HttpStatus,
   UseInterceptors,
   ValidationPipe,
@@ -30,7 +29,6 @@ import { GetQuestsDto } from './dto/get-quests.dto';
 import { GetUserQuestsDto } from './dto/get-user-quests.dto';
 import { UpdateNPCsDto } from './dto/update-npcs.dto';
 import { UploadNpcImageDto } from './dto/upload-image.dto';
-import { CheckImageDto } from './dto/check-image.dto';
 
 // Import Response Entities
 import { QuestSystemData } from './entities/quest-system-data.entity';

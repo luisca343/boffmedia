@@ -42,8 +42,8 @@ export class BattleController {
   @ApiResponse({ status: 200, description: 'Battle simulated successfully.' })
   @ApiResponse({ status: 500, description: 'Failed to simulate battle.' })
   async getBattle() {
-    let equipo1;
-    let equipo2;
+    let _equipo1;
+    let _equipo2;
     const log = {} as {
       [turn: number]: {
         events: {
@@ -74,8 +74,8 @@ export class BattleController {
 
     const prng = new PRNG();
     const FORMAT = 'gen9randomdoublesbattle';
-    const dex = Dex.forFormat(FORMAT);
-    const validator = new TeamValidator(FORMAT);
+    const _dex = Dex.forFormat(FORMAT);
+    const _validator = new TeamValidator(FORMAT);
     const GRAPHICS:
       | 'ani'
       | 'gen1rg'
@@ -187,7 +187,7 @@ export class BattleController {
     void streams.omniscient.write(`>player p1 ${JSON.stringify(p1spec)}`);
     void streams.omniscient.write(`>player p2 ${JSON.stringify(p2spec)}`);
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, _reject) => {
       (async () => {
         //console.log("async");
         let turn = 0;
@@ -211,7 +211,7 @@ export class BattleController {
             }
 
             const html = formatter.formatHTML(args, kwArgs);
-            const key = Protocol.key(args);
+            const _key = Protocol.key(args);
 
             battle.add(args, kwArgs);
 

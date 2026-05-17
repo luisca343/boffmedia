@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { LoggerModule } from '@api/_utils/logger/logger.module';
 import { ResponseModule } from '@api/_utils/response/response.module';
-import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 
 // Import domain services
 import { WingullEconomyService } from './services/wingull-economy.service';

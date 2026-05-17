@@ -69,7 +69,7 @@ export class TournamentService {
   }
 
   async registerForTournament(
-    registration: TournamentRegistration,
+    _registration: TournamentRegistration,
   ): Promise<{ success: boolean; message: string }> {
     // Placeholder for future implementation
     throw new Error('Tournament registration is not yet implemented');

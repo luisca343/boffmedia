@@ -9,7 +9,6 @@ import {
   UseInterceptors,
   ValidationPipe,
   UploadedFile,
-  Req,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -24,7 +23,6 @@ import { ResponseInterceptor } from '@api/_utils/interceptors/response.intercept
 import { StarbankFacadeService } from './starbank.facade.service';
 
 // Import DTOs
-import { CreateAccountDto } from './dto/create-account.dto';
 import { TrainerDefeatMoneyDto } from './dto/trainer-defeat-money.dto';
 import { CreateShopTransactionDto } from './dto/create-shop-transaction.dto';
 import { CreateTransferDto } from './dto/create-transfer.dto';
@@ -35,8 +33,6 @@ import { StarBankAccount } from './entities/starbank-account.entity';
 import { StarBankTransaction } from './entities/starbank-transaction.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { extname, join } from 'path';
-import { mkdir } from 'fs/promises';
 
 @ApiTags('SmartRotom | Starbank')
 @Controller('smartrotom/starbank')

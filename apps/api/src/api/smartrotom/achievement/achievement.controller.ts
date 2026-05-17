@@ -25,7 +25,6 @@ import {
 // Entities
 import { UserAchievement } from './entities/achievement.entity';
 import { Replay } from './entities/replay.entity';
-import { BaseInsertResponse } from '@api/_utils/dto/base-responses.dto';
 
 @ApiTags('SmartRotom | Achievements')
 @Controller('smartrotom/achievement')

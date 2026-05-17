@@ -18,7 +18,7 @@ export class ResponseInterceptor implements NestInterceptor {
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();
-    const response = context.switchToHttp().getResponse();
+    const _response = context.switchToHttp().getResponse();
     const handler = context.getHandler();
 
     // Get action name and success message from ApiOperation
@@ -101,7 +101,7 @@ export class ResponseInterceptor implements NestInterceptor {
       } else if (error && error.response) {
         responseDetails = error.response;
       }
-    } catch (e) {
+    } catch (_e) {
       // ignore extraction errors
     }
 

@@ -3,8 +3,6 @@ import { BaseDataService } from './base-data.service';
 import { PokemonDataService } from './pokemon-data.service';
 import { SpawnInfos } from '../../interfaces/pokemon.interface';
 import * as path from 'path';
-import * as fs from 'fs';
-import { Console } from 'console';
 import { SpawnInfo } from '../../entities/pokemon-spawn.entity';
 
 @Injectable()
@@ -173,7 +171,7 @@ export class SpawnDataService extends BaseDataService {
     const biomes: { [key: string]: number } = {};
     const allSpawns = this.getAllSpawns();
 
-    for (const [pokemonId, spawnInfos] of Object.entries(allSpawns)) {
+    for (const [_pokemonId, spawnInfos] of Object.entries(allSpawns)) {
       spawnInfos.forEach((spawnInfo) => {
         if (spawnInfo.condition?.stringBiomes) {
           spawnInfo.condition.stringBiomes.forEach((biome) => {

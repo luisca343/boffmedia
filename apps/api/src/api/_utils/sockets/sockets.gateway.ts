@@ -41,7 +41,7 @@ export class SocketsGateway
     console.log(`SmartRotom connection for user ${smartRotomUser.uuid}`);
 
     // If the user already has a connection, disconnect the old one
-    const existingUser = this.users.get(smartRotomUser.uuid);
+    const _existingUser = this.users.get(smartRotomUser.uuid);
     /*
       if (existingUser && existingUser.socketId !== client.id) {
         const oldSocket = this.server.sockets.sockets.get(existingUser.socketId)
@@ -98,7 +98,7 @@ export class SocketsGateway
     data.call.users = data.call.users.filter(
       (user) => user.uuid !== data.user.uuid,
     );
-    const sockets = this.server.sockets.sockets;
+    const _sockets = this.server.sockets.sockets;
     const currentUsers = data.call.users.filter(
       (user) => user.status === 'IN_CALL',
     );
@@ -127,7 +127,7 @@ export class SocketsGateway
     },
   ): void {
     console.log(`Join call signal sent by ${data.user.uuid}`);
-    const sockets = this.server.sockets.sockets;
+    const _sockets = this.server.sockets.sockets;
     const users = data.call.users.map((user) => user.uuid);
     const connectedUsers = Array.from(this.users.keys());
 

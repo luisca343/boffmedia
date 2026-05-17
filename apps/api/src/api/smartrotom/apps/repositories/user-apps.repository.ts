@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq, and, sql, or, asc } from 'drizzle-orm';
+import { eq, and, sql, asc } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   SmartRotomUserApp,
@@ -43,7 +43,7 @@ export class UserAppsRepository implements IUserAppsRepository {
     appId: number,
     order: number = 999,
   ): Promise<SmartRotomUserApp> {
-    const result = await this.db.insert(smartrotomUserApps).values({
+    const _result = await this.db.insert(smartrotomUserApps).values({
       uuid,
       appId,
       order,

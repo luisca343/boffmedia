@@ -1,10 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ParticipantsRepository } from '../../../_repositories/boffmedia/participants.repository';
-import {
-  Participant,
-  EventParticipant,
-  Achievement,
-} from '@/_db/schema/Events';
+import { Participant, EventParticipant } from '@/_db/schema/Events';
 import { JoinEventDto } from '../dto/join-event.dto';
 
 @Injectable()
@@ -132,7 +128,7 @@ export class ParticipantsService {
     );
   }
 
-  async validateParticipantExists(participantId: number): Promise<boolean> {
+  async validateParticipantExists(_participantId: number): Promise<boolean> {
     // We can implement this by trying to find by userId if needed
     // For now, we'll assume it exists if we get here
     return true;

@@ -6,7 +6,6 @@ import {
   PokemonForm,
   SpeciesMoveEntry,
 } from '../../interfaces/pokemon.interface';
-import * as fs from 'fs';
 import * as path from 'path';
 import { promises as fsPromises } from 'fs';
 
@@ -102,7 +101,7 @@ export class PokemonDataService extends BaseDataService {
     return this.species.filter((pokemon) => pokemon.isCustom);
   }
 
-  private processForm(species: Pokemon, form: PokemonForm, index: number) {
+  private processForm(species: Pokemon, form: PokemonForm, _index: number) {
     const formName = form.name || 'base';
     const nameWithForm = `${species.name.toLowerCase()}_${formName.toLowerCase()}`;
 
@@ -377,7 +376,7 @@ export class PokemonDataService extends BaseDataService {
 
   getEvos(pokemon: Pokemon, currentForm: string, evos = {} as any) {
     if (currentForm === '') currentForm = 'base';
-    let index = 0;
+    let _index = 0;
     for (const form of pokemon.forms) {
       const formName = form.name || 'base';
       const pkmId = `${pokemon.name}_${formName}`;
@@ -427,20 +426,20 @@ export class PokemonDataService extends BaseDataService {
           };
         }
 
-        const thisEvo = evoArray[evoId];
+        const _thisEvo = evoArray[evoId];
         if (!evoArray[evoId].methods) {
           evoArray[evoId].methods = [];
         }
         evoArray[evoId].methods.push(evo);
 
         const evoPkm = this.getSpeciesByName(evoPokemonName);
-        const evoEvo = this.getEvos(
+        const _evoEvo = this.getEvos(
           evoPkm,
           evoFormName,
           evoArray[evoId],
         ) as any;
       }
-      index++;
+      _index++;
     }
     return { depth: this.getEvoTreeDepth(evos), tree: evos };
   }

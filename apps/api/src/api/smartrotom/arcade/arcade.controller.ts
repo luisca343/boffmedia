@@ -159,8 +159,8 @@ export class ArcadeController {
   })
   async getInventory(
     @Param('uuid') uuid: string,
-    @Query('itemType') itemType?: string,
-    @Query('rarity') rarity?: string,
+    @Query('itemType') _itemType?: string,
+    @Query('rarity') _rarity?: string,
   ): Promise<ArcadeInventoryResponse> {
     /*
     if (itemType) {

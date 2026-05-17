@@ -30,7 +30,6 @@ import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
 
 // Import entities
 import { BoffMediaUserEntity } from './entities/user.entity';
-import { UserWithRolesEntity } from './entities/user-with-roles.entity';
 import { FullUserEntity } from './entities/full-user.entity';
 import { UserWithIntegrationsEntity } from './entities/user-with-integrations.entity';
 import { SessionUserEntity } from './entities/session-user.entity';

@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { AppsService } from './services/apps.service';
 import { UserAppsService } from './services/user-apps.service';
 import { SmartRotomApp } from '@/_db/schema/SmartRotom';

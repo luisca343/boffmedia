@@ -79,8 +79,8 @@ export class InvitesRepository {
   // ==================== READ OPERATIONS ====================
 
   async findAllInvites(
-    limit?: number,
-    offset?: number,
+    _limit?: number,
+    _offset?: number,
   ): Promise<InviteResult[]> {
     try {
       const query = this.db.select(this.inviteSelect).from(wingullInvites);

@@ -47,7 +47,7 @@ export class FicusAIFacadeService {
   async sendMessage(
     sendMessageDto: SendMessageDto,
   ): Promise<FicusMessageContentDto> {
-    const { uuid, mensaje, server } = sendMessageDto;
+    const { uuid, mensaje } = sendMessageDto;
 
     // Store user message if it's from user
     if (mensaje.sender === MessageSender.USER) {

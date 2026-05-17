@@ -49,7 +49,7 @@ export class LootboxService {
     const rarity = getRarityFromWeight(selectedItem.weight);
 
     // Add item to inventory using new repository
-    const newItemResult = await this.arcadeInventoryRepository.addItem({
+    const _newItemResult = await this.arcadeInventoryRepository.addItem({
       uuid,
       itemId: selectedItem.id,
       itemData: selectedItem.data || null,

@@ -250,7 +250,7 @@ function buildTypeMatchupPage(
     .setFooter({ text: `Source: ${source}  ·  Best STAB type matchup shown` });
 }
 
-function buildCalcPage(
+function _buildCalcPage(
   yourDetail: PokemonUsageDetail,
   vsDetail: PokemonUsageDetail,
   yourSet: BuiltSet,

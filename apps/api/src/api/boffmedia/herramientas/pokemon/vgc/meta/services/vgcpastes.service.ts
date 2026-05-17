@@ -1,5 +1,4 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { Dex } from '@pkmn/sim';
 import { VgcPastesRepository } from '../repositories/vgcpastes.repository';
 import { VgcRegulationsRepository } from '../repositories/regulations.repository';
 import {

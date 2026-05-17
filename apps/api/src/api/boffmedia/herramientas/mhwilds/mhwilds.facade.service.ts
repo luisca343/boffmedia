@@ -222,7 +222,7 @@ export class MhwildsFacadeService {
 
       // Return default supported locales if cache stats fail
       return ['es', 'en', 'ja', 'fr', 'de', 'it', 'ko', 'zh-CN', 'zh-TW'];
-    } catch (error: any) {
+    } catch (_error: any) {
       // Fallback to default locales
       return ['es', 'en'];
     }
@@ -237,7 +237,7 @@ export class MhwildsFacadeService {
 
       // Return default resources if cache stats fail
       return ['weapons', 'armor', 'charms', 'decorations', 'skills'];
-    } catch (error: any) {
+    } catch (_error: any) {
       // Fallback to default resources
       return ['weapons', 'armor', 'charms', 'decorations', 'skills'];
     }

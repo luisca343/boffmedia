@@ -2,8 +2,6 @@ import {
   PokedexRegistryData,
   PokedexRegistryResult,
   PokedexStatistics,
-  BulkUpdateData,
-  BulkUpdateResult,
 } from '../pokemon.repository';
 
 export interface IPokemonRepository {

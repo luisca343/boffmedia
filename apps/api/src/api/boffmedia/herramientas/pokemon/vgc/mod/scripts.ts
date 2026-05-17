@@ -29,7 +29,7 @@ export const Scripts: ModdedBattleScriptsData = {
     }
     return stat;
   },
-  calculatePP(move, ppUps) {
+  calculatePP(move, _ppUps) {
     return move.noPPBoosts ? move.pp : (move.pp / 5 + 1) * 4;
   },
   pokemon: {
@@ -243,7 +243,7 @@ export const Scripts: ModdedBattleScriptsData = {
     },
   } as any,
   actions: {
-    canTerastallize(pokemon) {
+    canTerastallize(_pokemon) {
       return null;
     },
     canMegaEvo(pokemon: Pokemon) {

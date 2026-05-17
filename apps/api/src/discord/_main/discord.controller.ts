@@ -1,5 +1,4 @@
-import { Controller, Post } from '@nestjs/common';
-import { DiscordService } from './discord.service';
+import { Controller } from '@nestjs/common';
 
 @Controller('discord')
 export class DiscordController {

@@ -1,8 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import {
-  SpriteLocation,
-  SpriteManifest,
-} from '../interfaces/sprite-manifest.interface';
+import { SpriteManifest } from '../interfaces/sprite-manifest.interface';
 import { PokemonDataService } from './data/pokemon-data.service';
 import * as fs from 'fs';
 import * as path from 'path';

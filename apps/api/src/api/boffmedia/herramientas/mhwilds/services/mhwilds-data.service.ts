@@ -1,6 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
 import {
-  MhwildsRepository,
   ResourceFetchResult,
   WeaponTreeNode,
 } from '@api/boffmedia/herramientas/mhwilds/repositories/mhwilds.repository';

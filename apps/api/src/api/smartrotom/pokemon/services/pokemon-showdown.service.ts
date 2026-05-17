@@ -1,12 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PokemonDataService } from './data/pokemon-data.service';
-import {
-  ShowdownPokemon,
-  ShowdownPokemonData,
-} from '../interfaces/showdown.interface';
-import * as fs from 'fs';
-import * as path from 'path';
-import { promises as fsPromises } from 'fs';
+import { ShowdownPokemonData } from '../interfaces/showdown.interface';
 import {
   standardizeFormDisplayName,
   standardizeFormIdSegment,
@@ -88,7 +82,7 @@ export class PokemonShowdownService {
     }
 
     // Second pass - generate Showdown data with proper form relationships
-    for (const [pokemonName, pokemonData] of pokemonWithForms.entries()) {
+    for (const [_pokemonName, pokemonData] of pokemonWithForms.entries()) {
       const pokemon = pokemonData.basePokemon;
       const forms = pokemonData.forms;
       const formNames = pokemonData.allFormNames;

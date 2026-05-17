@@ -6,7 +6,6 @@ import {
   IsEnum,
   IsArray,
   IsDate,
-  IsNumber,
 } from 'class-validator';
 
 export type ItemRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';

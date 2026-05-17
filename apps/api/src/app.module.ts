@@ -33,7 +33,6 @@ import { BattleModule } from './api/battlesimulator/battle/battle.module';
 import { SharexModule } from './api/boffmedia/util/sharex/sharex.module';
 import { ArcadeModule } from '@api/smartrotom/arcade/arcade.module';
 import { ArcadeController } from '@api/smartrotom/arcade/arcade.controller';
-import { DiscordService } from './discord/_main/discord.service';
 import { DiscordModule } from './discord/_main/discord.module';
 import { CommandsService } from './discord/_commands/commands.service';
 import { CommandsModule } from './discord/_commands/commands.module';

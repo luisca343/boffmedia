@@ -1,7 +1,6 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
-import { QuestData, IDialogue, IQuestCategory, NPC } from '../types';
 import {
   ExternalQuestResponse,
   IQuestRepository,

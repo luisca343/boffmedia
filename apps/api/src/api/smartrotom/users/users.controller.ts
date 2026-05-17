@@ -10,13 +10,7 @@ import {
   UseInterceptors,
   ParseIntPipe,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiParam,
-  ApiBody,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { UsersFacadeService } from './users.facade.service';
 import { CreateSmartrotomUserDto } from './dto/create-user.dto';

@@ -9,7 +9,6 @@ import { ACHIEVEMENTS_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfac
 import { BaseInsertResponse } from '@api/_utils/dto/base-responses.dto';
 import { UserAchievement } from '../entities/achievement.entity';
 import { UserAchievementEntity } from '../entities/user-achievement.entity';
-import { AchievementStatusEntity } from '../entities/achievement-status.entity';
 
 @Injectable()
 export class AchievementsService {

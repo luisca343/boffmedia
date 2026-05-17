@@ -1,6 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { TeleportRequestDto } from '../dto/teleport-request.dto';
-import { WingullTransportRepository } from '../repositories/wingull-transport.repository';
 import { WINGULL_TRANSPORT_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 import { IWingullTransportRepository } from '../repositories/interfaces/wingull-transport.repository.interface';
 import { TaxiStop } from '../entities/taxi-stop.entity';

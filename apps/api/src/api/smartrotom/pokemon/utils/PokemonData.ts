@@ -79,9 +79,9 @@ export class PokemonData {
         this.highestDex = data.dex;
       }
 
-      let formIndex = 0;
+      let _formIndex = 0;
       data.forms?.forEach((form, index) => {
-        formIndex++;
+        _formIndex++;
         if (!form) return;
         const formName = form.name || 'base';
         if (!this.speciesByForm[formName]) {
@@ -254,7 +254,7 @@ export class PokemonData {
 
     const countMoves = [];
 
-    Object.entries(this.speciesByMove).forEach(([move, species]) => {
+    Object.entries(this.speciesByMove).forEach(([move, _species]) => {
       countMoves[move] = this.speciesByMove[move].length;
     });
 
