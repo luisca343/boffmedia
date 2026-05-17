@@ -1,0 +1,47 @@
+import { type Locator, type Page } from "@playwright/test"
+import { BasePage } from "./base.page"
+
+export class AuthPage extends BasePage {
+  readonly heading: Locator
+  readonly usernameInput: Locator
+  readonly passwordInput: Locator
+  readonly emailInput: Locator
+  readonly confirmPasswordInput: Locator
+  readonly signInButton: Locator
+  readonly registerButton: Locator
+  readonly processingButton: Locator
+
+  constructor(page: Page) {
+    super(page)
+    this.heading = page.getByRole("heading", { level: 2 })
+    this.usernameInput = page.getByPlaceholder("Enter your username")
+    this.passwordInput = page.getByPlaceholder("Enter your password")
+    this.emailInput = page.getByPlaceholder("Enter your email")
+    this.confirmPasswordInput = page.getByPlaceholder("Confirm your password")
+    this.signInButton = page.getByRole("button", { name: "Sign In", exact: true })
+    this.registerButton = page.getByRole("button", { name: "Register", exact: true })
+    this.processingButton = page.getByRole("button", { name: "Processing..." })
+  }
+
+  async goto() {
+    await this.page.goto("/auth")
+  }
+
+  async gotoRegister() {
+    await this.page.goto("/auth?mode=register")
+  }
+
+  async submitLogin(username: string, password: string) {
+    await this.usernameInput.fill(username)
+    await this.passwordInput.fill(password)
+    await this.signInButton.click()
+  }
+
+  async submitRegister(username: string, email: string, password: string, confirmPassword: string) {
+    await this.usernameInput.fill(username)
+    await this.emailInput.fill(email)
+    await this.passwordInput.fill(password)
+    await this.confirmPasswordInput.fill(confirmPassword)
+    await this.registerButton.click()
+  }
+}
