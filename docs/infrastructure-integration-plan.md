@@ -31,7 +31,7 @@
 | 1 | Database backups | Permanent data loss | Half a day | `[~]` cron pending first run |
 | 2 | Prometheus + Grafana wired to app | Blind to production failures | Half a day | `[~]` MariaDB live, API pending deploy |
 | 3 | Automated Portainer deploy | Manual deploys forever, no rollback | 2 hours | `[~]` validate ✅, build ⚠ failing, deploy ⏳ untested |
-| 4 | Structured logging (Pino) | Unqueryable logs, blind debugging | 1 day | `[ ]` |
+| 4 | Structured logging (Pino) | Unqueryable logs, blind debugging | 1 day | `[~]` Pino wired, 639 console calls pending |
 | 5 | Global ValidationPipe + DTOs | Security gaps, inconsistent API | 1 day | `[ ]` |
 | 6 | GitLab CI validate stage | Broken code reaches production | 2 hours | `[ ]` |
 | 7 | Strict TypeScript enforcement | Compounding type debt | 1 day | `[ ]` |
@@ -486,7 +486,7 @@ The NestJS built-in logger outputs formatted strings — readable in development
 
 ### Installation
 
-- [ ] Install dependencies:
+- [x] Install dependencies:
 
 ```bash
 pnpm --filter api add nestjs-pino pino-http pino
@@ -495,7 +495,7 @@ pnpm --filter api add -D pino-pretty
 
 ### Configuration
 
-- [ ] Replace default NestJS logger in `main.ts`:
+- [x] Replace default NestJS logger in `main.ts`:
 
 ```typescript
 // apps/api/src/main.ts
@@ -509,7 +509,7 @@ async function bootstrap(): Promise<void> {
 bootstrap()
 ```
 
-- [ ] Register `LoggerModule` in `AppModule`:
+- [x] Register `LoggerModule` in `AppModule` — configured in `apps/api/src/api/_utils/logger/logger.module.ts`, already imported in AppModule:
 
 ```typescript
 import { LoggerModule } from 'nestjs-pino'
@@ -579,7 +579,7 @@ export class BankService {
 
 > **Agent task**: create a BookStack spec page per module: "Replace all console.log calls in [module] with nestjs-pino Logger injection". The agent handles the mechanical replacement. Run one module at a time and review the diff.
 
-- [ ] Replace all `console.log` → `this.logger.log()`
+- [ ] Replace all `console.log` → `this.logger.log()` — **639 calls across codebase, do module by module**
 - [ ] Replace all `console.error` → `this.logger.error()`
 - [ ] Replace all `console.warn` → `this.logger.warn()`
 - [ ] Add structured context fields to critical log lines: `userId`, `module`, `requestId` where available
