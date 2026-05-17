@@ -15,4 +15,23 @@ module.exports = {
       '/node_modules./',
       '<rootDir>/(coverage|dist|lib|tmp)./',
     ],
+    collectCoverageFrom: [
+      'src/**/*.ts',
+      '!src/**/*.spec.ts',
+      '!src/**/*.e2e-spec.ts',
+      '!src/main.ts',
+      '!src/**/*.entity.ts',
+      '!src/**/*.dto.ts',
+      '!src/**/*.enum.ts',
+      '!src/**/*.module.ts',
+      '!src/**/*.interface.ts',
+    ],
+    coverageThreshold: {
+      global: {
+        branches: 40,
+        functions: 50,
+        lines: 50,
+        statements: 50,
+      },
+    },
   };
