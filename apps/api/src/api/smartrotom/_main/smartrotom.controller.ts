@@ -12,6 +12,7 @@ import { TeleportPlayerDto } from '../_dto/teleport-player.dto';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { WingullFacadeService } from '../wingull/wingull.facade.service';
 import { ArceuSpeakEntity } from './entities/arceuspeak.entity';
+import { ArceusspeakDto } from '../_dto/arceuspeak.dto';
 
 export class ParticipanteCarreraDto {
   uuid: string;
@@ -89,10 +90,7 @@ export class SmartrotomController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: 'Failed to create or update character.',
   })
-  async createOrUpdateArceuspeak(
-    @Body()
-    { name, value, format }: { name: string; value: string; format: string },
-  ) {
+  async createOrUpdateArceuspeak(@Body() { name, value, format }: ArceusspeakDto) {
     return await this.smartrotomService.createOrUpdateArceuspeak(
       name,
       value,

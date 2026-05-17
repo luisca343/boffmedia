@@ -23,6 +23,7 @@ import { ResponseInterceptor } from '@api/_utils/interceptors/response.intercept
 import { StarbankFacadeService } from './starbank.facade.service';
 
 // Import DTOs
+import { CreateMainAccountDto } from './dto/create-main-account.dto';
 import { TrainerDefeatMoneyDto } from './dto/trainer-defeat-money.dto';
 import { CreateShopTransactionDto } from './dto/create-shop-transaction.dto';
 import { CreateTransferDto } from './dto/create-transfer.dto';
@@ -191,7 +192,7 @@ export class StarbankController {
     description: 'Failed to create main account.',
   })
   async createMainAccount(
-    @Body() body: { uuid: string; username: string },
+    @Body() body: CreateMainAccountDto,
   ): Promise<StarBankAccount> {
     return await this.starbankFacadeService.createMainAccount(
       body.uuid,

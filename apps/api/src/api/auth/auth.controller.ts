@@ -9,6 +9,10 @@ import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { CreateUserDto } from '@api/boffmedia/users/dto/create-user.dto';
+import { LoginMcDto } from './dto/login-mc.dto';
+import { RegisterMinecraftDto } from './dto/register-minecraft.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { GoogleCallbackDto } from './dto/google-callback.dto';
 
 @ApiTags('BoffMedia | Authentication')
 @Controller('auth')
@@ -44,9 +48,7 @@ export class AuthController {
     status: HttpStatus.OK,
     description: 'Minecraft user logged in successfully.',
   })
-  async loginMC(
-    @Body() loginMC: { username: string; uuid: string; world: string },
-  ) {
+  async loginMC(@Body() loginMC: LoginMcDto) {
     return this.authService.loginMC(loginMC);
   }
 
@@ -60,19 +62,7 @@ export class AuthController {
     status: HttpStatus.BAD_REQUEST,
     description: 'Invalid input data.',
   })
-  async registerMinecraft(
-    @Body()
-    registerDto: {
-      username: string;
-      email: string;
-      password: string;
-      minecraft: {
-        username: string;
-        uuid: string;
-        world: string;
-      };
-    },
-  ) {
+  async registerMinecraft(@Body() registerDto: RegisterMinecraftDto) {
     return this.authService.registerMinecraft(registerDto);
   }
 
@@ -86,19 +76,7 @@ export class AuthController {
     status: HttpStatus.BAD_REQUEST,
     description: 'Invalid input data.',
   })
-  async linkMinecraft(
-    @Body()
-    linkDto: {
-      username: string;
-      email: string;
-      password: string;
-      minecraft: {
-        username: string;
-        uuid: string;
-        world: string;
-      };
-    },
-  ) {
+  async linkMinecraft(@Body() linkDto: RegisterMinecraftDto) {
     return this.authService.linkMinecraft(linkDto);
   }
 
@@ -108,13 +86,13 @@ export class AuthController {
     status: HttpStatus.OK,
     description: 'Token refreshed successfully.',
   })
-  async refreshToken(@Body() body: { refresh_token: string }) {
+  async refreshToken(@Body() body: RefreshTokenDto) {
     return this.authService.refreshToken(body.refresh_token);
   }
 
   @Post('google/callback')
   @ApiOperation({ summary: 'Handle Google authentication callback' })
-  async googleAuthRedirect(@Body() body) {
+  async googleAuthRedirect(@Body() body: GoogleCallbackDto) {
     return this.authService.googleLogin(body);
   }
 }

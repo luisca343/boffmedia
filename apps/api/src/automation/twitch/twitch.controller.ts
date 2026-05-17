@@ -3,7 +3,7 @@ import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { TwitchMonitorService } from './services/twitch-monitor.service';
 import { TwitchApiService } from './services/twitch-api.service';
 import { NotificationService } from './services/notification.service';
-import { NotificationTarget } from './interfaces/notification.interface';
+import { NotificationTargetDto } from './dto/notification-target.dto';
 import { Logger } from 'nestjs-pino';
 
 @ApiTags('Automation - Twitch')
@@ -91,7 +91,7 @@ export class TwitchController {
   @Post('notifications/target')
   @ApiOperation({ summary: 'Add notification target' })
   @ApiResponse({ status: 200, description: 'Notification target added' })
-  addNotificationTarget(@Body() target: NotificationTarget) {
+  addNotificationTarget(@Body() target: NotificationTargetDto) {
     this.notificationService.addTarget(target);
     return {
       message: 'Notification target added successfully',

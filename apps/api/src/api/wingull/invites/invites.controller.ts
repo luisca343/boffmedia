@@ -18,6 +18,7 @@ import {
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { InvitesFacadeService } from './invites.facade.service';
 import { RegistrationData } from './services/registration.service';
+import { CreateInviteBodyDto } from './dto/create-invite-body.dto';
 
 @ApiTags('Wingull | Invites')
 @Controller('wingull/invites')
@@ -51,7 +52,7 @@ export class InvitesController {
       required: ['uuid', 'username'],
     },
   })
-  async createInvite(@Body() body: { uuid: string; username: string }) {
+  async createInvite(@Body() body: CreateInviteBodyDto) {
     return await this.invitesFacadeService.createInvite(
       body.uuid,
       body.username,
