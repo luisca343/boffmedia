@@ -49,7 +49,7 @@ export function StandingsView({ players, loading, error, tournamentId }: Props) 
         })
         .catch(() => {/* ignore individual fetch errors */});
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [tournamentId, players]);
 
   const handleRowClick = async (player: LimitlessPlayerEntry) => {
@@ -159,7 +159,7 @@ export function StandingsView({ players, loading, error, tournamentId }: Props) 
                       ) : team ? (
                         <div className="flex items-center gap-1">
                           {team.slots.slice(0, 6).map((slot) => (
-                            /* eslint-disable-next-line @next/next/no-img-element */
+                             
                             <img
                               key={slot.slotIndex}
                               src={spriteUrl(slot.speciesName)}
@@ -202,7 +202,7 @@ export function StandingsView({ players, loading, error, tournamentId }: Props) 
                               key={slot.slotIndex}
                               className="flex flex-col items-center gap-1 bg-surface-800/75 border border-surface-700/70 rounded-lg p-2"
                             >
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              { }
                               <img
                                 src={spriteUrl(slot.speciesName)}
                                 alt={slot.speciesName}

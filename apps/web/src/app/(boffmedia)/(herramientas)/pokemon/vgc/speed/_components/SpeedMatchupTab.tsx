@@ -116,7 +116,7 @@ export function SpeedMatchupTab({
       onPrefillConsumed();
     }
     // onPrefillConsumed is stable (inline arrow on parent); prefillEntry drives the effect
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [prefillEntry]);
 
   useEffect(() => {
@@ -244,7 +244,7 @@ export function SpeedMatchupTab({
                       onMouseDown={() => selectPokemon(p)}
                       className="w-full text-left px-3 py-2 hover:bg-surface-800 transition-colors flex items-center gap-2"
                     >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      { }
                       <img
                         src={spriteUrl(p.name)}
                         onError={handleSpriteError}

@@ -84,7 +84,7 @@ export function PokemonSidebar({ entries, loading, error, selectedId, onSelect }
                     #{rank}
                   </span>
 
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  { }
                   <img
                     src={spriteUrl(entry.speciesName)}
                     alt={entry.speciesName}

@@ -56,7 +56,7 @@ const TERA_COLOURS: Record<string, string> = {
 function SlotDetail({ slot }: { slot: SpeciesTeamSlot }) {
   return (
     <div className="flex gap-2 items-start min-w-0">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
+      { }
       <img
         src={spriteUrl(slot.speciesName)}
         alt={slot.speciesName}
@@ -141,7 +141,7 @@ function TeamRow({ entry }: { entry: SpeciesTeamEntry }) {
         {/* 6 sprites */}
         <div className="flex items-center gap-0.5 flex-1 min-w-0">
           {entry.slots.map((slot, i) => (
-            /* eslint-disable-next-line @next/next/no-img-element */
+             
             <img
               key={i}
               src={spriteUrl(slot.speciesName)}

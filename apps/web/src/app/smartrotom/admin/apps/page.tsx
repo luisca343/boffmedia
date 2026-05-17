@@ -94,7 +94,7 @@ export default function PlayerAppManagement() {
       setPlayerApps([]);
       setAllApps([]);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [selectedPlayerUuid]);
 
   // Memoized filtered apps

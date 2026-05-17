@@ -86,7 +86,7 @@ export function VgcLimitlessFetcher() {
     return () => {
       pollingRef.current.forEach((id) => clearInterval(id));
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   useEffect(() => {
@@ -100,7 +100,7 @@ export function VgcLimitlessFetcher() {
   useEffect(() => {
     if (!regulationId) return;
     loadTournaments(regulationId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [regulationId]);
 
   const startPolling = (tournamentId: number) => {

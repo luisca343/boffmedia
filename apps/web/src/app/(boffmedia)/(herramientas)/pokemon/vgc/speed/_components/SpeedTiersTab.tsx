@@ -237,7 +237,7 @@ function ReferencePanel({
                       }}
                       className="w-full text-left px-3 py-2 hover:bg-surface-800 transition-colors flex items-center gap-2"
                     >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      { }
                       <img
                         src={spriteUrl(p.name)}
                         onError={handleSpriteError}
@@ -300,7 +300,7 @@ function ReferencePanel({
             <div className="mt-2 flex flex-wrap items-center justify-center gap-1.5 text-xs text-surface-400">
               {refState.entry && (
                 <>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  { }
                   <img
                     src={spriteUrl(refState.entry.name)}
                     onError={handleSpriteError}
@@ -586,7 +586,7 @@ export function SpeedTiersTab({
       if (va > vb) return sortDir === "asc" ? 1 : -1;
       return 0;
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [speedTiers, tableSearch, sortKey, sortDir, computedMap]);
 
   // Separator position: index of the first non-faster row when sorted desc by 252+
@@ -802,7 +802,7 @@ export function SpeedTiersTab({
                         <td className="px-3 py-2.5">
                           <div className="flex items-center gap-2 min-w-[180px]">
                             <div className="w-9 h-9 flex items-center justify-center shrink-0">
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              { }
                               <img
                                 src={spriteUrl(pokemon.name)}
                                 onError={handleSpriteError}

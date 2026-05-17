@@ -106,7 +106,7 @@ function MangaLibraryInner() {
         else setPagesError(t("errorLoadingPages"));
       })
       .catch(() => { setLoadingPages(false); setPagesError(t("errorLoadingPages")); });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [seriesSlug, chapterSlug]);
 
   // Reset bulk state when leaving series

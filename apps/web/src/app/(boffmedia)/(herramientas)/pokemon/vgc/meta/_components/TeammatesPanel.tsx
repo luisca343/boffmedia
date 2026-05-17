@@ -36,7 +36,7 @@ export function TeammatesPanel({ title, items, onSelect }: Props) {
                   : "cursor-default"
               )}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
+              { }
               <img
                 src={spriteUrl(item.name)}
                 alt={item.name}

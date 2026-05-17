@@ -65,7 +65,7 @@ export default function MangaMetadataForm({ seriesSlug }: Props) {
     });
     setSubjectsText((s.subjects ?? []).join(", "));
     setSaved(false);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [seriesSlug]);
 
   function field(key: keyof EpubMetadata) {

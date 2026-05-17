@@ -16,7 +16,7 @@ export function MangaCard({ manga, onClick }: MangaCardProps) {
       {/* Cover */}
       <div className="relative w-full aspect-[3/4] bg-surface-900 overflow-hidden">
         {manga.coverUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
+           
           <img
             src={manga.coverUrl}
             alt={manga.title}

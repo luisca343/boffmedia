@@ -205,7 +205,7 @@ function ChapterRow({
                       aria-label={`Página ${page.index + 1}${excluded ? " (excluida)" : ""}`}
                       aria-pressed={excluded}
                     >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      { }
                       <img
                         src={ScrapeService.getChapterImageUrl(seriesSlug, chapter.slug, page.index)}
                         alt=""

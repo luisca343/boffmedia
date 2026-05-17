@@ -165,7 +165,7 @@ export function PokemonDetailView({ detail, loading, speciesId, regulationId, on
           {t("detail.backToList")}
         </button>
 
-        {/* eslint-disable-next-line @next/next/no-img-element */}
+        { }
         <img
           src={spriteUrl(detail.speciesName)}
           alt={detail.speciesName}
