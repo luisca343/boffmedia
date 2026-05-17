@@ -1,5 +1,4 @@
 import { Injectable, Inject, BadRequestException } from '@nestjs/common';
-import { PlayerEnergy } from '../entities/player-energy.entity';
 import { MINE_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 import { IMineRepository } from '../repositories/interfaces/mine.repository.interface';
 

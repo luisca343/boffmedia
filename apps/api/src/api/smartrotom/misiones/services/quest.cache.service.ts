@@ -1,11 +1,5 @@
 import { Injectable, Inject, Logger } from '@nestjs/common';
-import {
-  QuestSystemData,
-  QuestData,
-  IDialogue,
-  IQuestCategory,
-  NPC,
-} from '../types';
+import { QuestSystemData, NPC } from '../types';
 import { QUEST_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 import { IQuestRepository } from '../repositories/interfaces/quest.repository.interface';
 

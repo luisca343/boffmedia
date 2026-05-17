@@ -9,9 +9,6 @@ import {
   boffMediaAchievements,
   Participant,
   EventParticipant,
-  ParticipantProgress,
-  Achievement,
-  PARTICIPANT_STATUS,
 } from '@/_db/schema/Events';
 import { boffMediaUsers } from '@/_db/schema/BoffMedia';
 

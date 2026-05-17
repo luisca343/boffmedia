@@ -8,7 +8,7 @@ import {
   boffMediaRoles,
   boffMediaUserRoles,
 } from '@/_db/schema/BoffMedia';
-import { smartrotomUsers, SmartRotomUser } from '@/_db/schema/SmartRotom';
+import { smartrotomUsers } from '@/_db/schema/SmartRotom';
 import { boffMediaParticipants } from '@/_db/schema/Events';
 import {
   BoffMediaUserSafe,

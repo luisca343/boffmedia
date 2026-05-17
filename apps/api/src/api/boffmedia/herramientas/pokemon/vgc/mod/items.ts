@@ -1028,7 +1028,7 @@ export const Items: ModdedItemDataTable = {
         pokemon: this.effectState.target,
       });
     },
-    onWhiteHerb(pokemon) {
+    onWhiteHerb(_pokemon) {
       ((this.effect as any).onStart as (p: Pokemon) => void).call(
         this,
         this.effectState.target,

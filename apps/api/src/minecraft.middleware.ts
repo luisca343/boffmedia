@@ -1,7 +1,6 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { LoggingUtil } from './_utils/LoggingUtils';
-import multer from 'multer';
 
 @Injectable()
 export class MinecraftMiddleware implements NestMiddleware {

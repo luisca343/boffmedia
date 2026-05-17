@@ -1,5 +1,4 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { MhwildsRepository } from '@api/boffmedia/herramientas/mhwilds/repositories/mhwilds.repository';
 import { MHWILDS_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 import { IMhwildsRepository } from '../repositories/interface/mhwilds.repository.interface';
 

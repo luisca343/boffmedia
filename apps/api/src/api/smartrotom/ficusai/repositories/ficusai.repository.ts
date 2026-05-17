@@ -26,7 +26,7 @@ export class FicusAIRepository
     return this.findById(result[0].insertId);
   }
 
-  async update(id: number, updateDto: never): Promise<FicusMessage> {
+  async update(_id: number, _updateDto: never): Promise<FicusMessage> {
     // Messages are typically immutable, but we can implement if needed
     throw new Error('Messages cannot be updated');
   }

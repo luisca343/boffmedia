@@ -52,7 +52,7 @@ export class AppController {
       });
 
       return result;
-    } catch (err: any) {
+    } catch (_err: any) {
       return { error: 'Failed to read file' };
     }
   }
@@ -118,7 +118,7 @@ export class AppController {
   }
 
   @Post('netfluis')
-  async netfluis(@Body() body: { url: string }) {
+  async netfluis(@Body() _body: { url: string }) {
     return { url: '' };
   }
 

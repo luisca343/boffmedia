@@ -1,6 +1,6 @@
 import { sharexImages } from '@/_db/schema/Sharex';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class SharexService {

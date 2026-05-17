@@ -1,4 +1,3 @@
-import exp from 'constants';
 import { bigint, int, mysqlTable, varchar } from 'drizzle-orm/mysql-core';
 import { smartrotomUsers } from './SmartRotom';
 

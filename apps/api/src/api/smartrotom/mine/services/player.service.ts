@@ -4,6 +4,7 @@ import {
   PlayerStatistics,
   RankingEntry,
   UnclaimedItem,
+  HistoryEntry,
 } from '../repositories/interfaces/mine.repository.interface';
 import { MINE_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 

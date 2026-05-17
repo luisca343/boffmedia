@@ -12,8 +12,6 @@ import { ArcadeStreakRepository } from './repositories/arcade-streak.repository'
 import { ArcadeInventoryRepository } from './repositories/arcade-inventory.repository';
 
 // Repository Interfaces & Tokens
-import { IArcadeStreakRepository } from './repositories/interfaces/arcade-streak.repository.interface';
-import { IArcadeInventoryRepository } from './repositories/interfaces/arcade-inventory.repository.interface';
 import {
   ARCADE_STREAK_REPOSITORY_TOKEN,
   ARCADE_INVENTORY_REPOSITORY_TOKEN,

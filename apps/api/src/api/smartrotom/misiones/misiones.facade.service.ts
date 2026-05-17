@@ -1,9 +1,5 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import {
-  NPCService,
-  NPCUpdateRequest,
-  NPCUpdateResponse,
-} from './services/npc.service';
+import { NPCService, NPCUpdateResponse } from './services/npc.service';
 import {
   ImageService,
   ImageUploadRequest,
@@ -190,7 +186,7 @@ export class MisionesFacadeService {
         externalAPI: externalAPIHealthy,
         fileSystem: fileSystemHealthy,
       };
-    } catch (error: any) {
+    } catch (_error: any) {
       return {
         overall: 'unhealthy',
         cache: false,

@@ -132,7 +132,7 @@ export class ChatappController {
   })
   async getMessages(
     @Param('chatId') chatId: string,
-    @Query('limit') limit?: string,
+    @Query('limit') _limit?: string,
   ): Promise<RotomMessage[]> {
     const chatIdNum = parseInt(chatId, 10);
     if (isNaN(chatIdNum)) {

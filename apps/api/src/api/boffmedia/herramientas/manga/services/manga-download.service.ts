@@ -5,10 +5,7 @@ import {
   DownloadChaptersDto,
   ChapterEntry,
 } from '../dto/download-chapters.dto';
-import {
-  ChapterDownloadEntry,
-  ChapterDownloadStatus,
-} from '../entities/download-result.entity';
+import { ChapterDownloadEntry } from '../entities/download-result.entity';
 
 // ---------------------------------------------------------------------------
 // MangaDownloadService

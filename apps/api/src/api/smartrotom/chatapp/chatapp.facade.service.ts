@@ -341,7 +341,7 @@ export class ChatappFacadeService {
 
   private async emitCallToChat(callSession: CallSession): Promise<void> {
     try {
-      const { chatId, caller, users } = callSession;
+      const { caller, users } = callSession;
 
       // Get caller socket
       const callerSocket = this.socketGateway.users.get(caller);

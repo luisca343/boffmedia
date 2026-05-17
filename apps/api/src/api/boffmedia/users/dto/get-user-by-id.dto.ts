@@ -1,12 +1,6 @@
 import { BaseDto } from '@api/_utils/dto/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsString,
-  IsEmail,
-  IsUUID,
-  IsOptional,
-  IsNumberString,
-} from 'class-validator';
+import { IsString, IsEmail, IsUUID, IsNumberString } from 'class-validator';
 
 export class GetUserByIdDto extends BaseDto {
   @ApiProperty({

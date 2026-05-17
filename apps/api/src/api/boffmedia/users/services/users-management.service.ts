@@ -3,9 +3,7 @@ import {
   BadRequestException,
   ConflictException,
 } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
 import { BoffMediaUsersRepository } from '@api/boffmedia/users/repositories/users.repository';
-import { BoffMediaUser } from '@/_db/schema/BoffMedia';
 import { PasswordService } from '@api/auth/password.service';
 import {
   BoffMediaUserSafe,

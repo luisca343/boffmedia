@@ -4,7 +4,6 @@ import { eq, and } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   boffMediaParticipantProgress,
-  boffMediaAchievements,
   ParticipantProgress,
   validateParticipantCanReceiveAchievement,
 } from '@/_db/schema/Events';
