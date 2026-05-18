@@ -80,7 +80,7 @@ test:
     - pnpm config set store-dir .pnpm-store
     - pnpm install --frozen-lockfile
   script:
-    - pnpm --filter api test -- --runInBand --forceExit --coverage
+    - pnpm --filter api exec jest --runInBand --forceExit --coverage
   coverage: '/Lines\s*:\s*(\d+\.?\d*)%/'
   artifacts:
     reports:
