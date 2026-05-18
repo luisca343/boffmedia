@@ -5,8 +5,8 @@ import { CreateNewsDto } from "@boffmedia/shared";
 export function useUpdateActiveNews() {
   const { data, error, isLoading, refetch, setData } = useRotomRequest(DocumentsService.updateActiveNews)
 
-  const updateActiveNews = (newsId: number, newsData: CreateNewsDto) => {
-    return DocumentsService.updateActiveNews(newsId, newsData);
+  const updateActiveNews = (newsId: number, newsData: CreateNewsDto, token: string) => {
+    return DocumentsService.updateActiveNews(newsId, newsData, token);
   }
 
   return {
