@@ -172,9 +172,9 @@ curl -s -X POST \
 
 ## Grafana alerts (TODO)
 
-> **Blocked on SMTP** — contact point creation returned no response 2026-05-17.  
-> SMTP is configured in `/docker/config/grafana/grafana.ini` (smtp.gmail.com:587, luisca343@gmail.com) but not delivering.  
-> To unblock: generate a Gmail App Password at myaccount.google.com → Security → App passwords (requires 2FA). Update the `password` field in grafana.ini, `docker restart grafana`, then retry the contact point and come back to this section.
+> **SMTP working as of 2026-05-18.** Contact point (luisca343@gmail.com) tested and delivering.  
+> Fix applied: all `[smtp]` lines in `/docker/config/grafana/grafana.ini` were commented out with `;` — uncommented the required fields and restarted Grafana.  
+> **Next: create the 4 alert rules below.**
 
 | Alert | Condition | Threshold |
 |---|---|---|
