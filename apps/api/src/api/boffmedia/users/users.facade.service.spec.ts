@@ -33,14 +33,13 @@ describe('BoffMediaUsersFacadeService', () => {
       | 'deleteUser'
       | 'getUserRoles'
       | 'validateUser'
-      | 'findByEmail'
+      | 'getFullUserByEmail'
       | 'createFromGoogle'
       | 'getUserCount'
-      | 'validateUserExists'
     >
   >;
   let smartRotomUsersFacadeService: jest.Mocked<
-    Pick<SmartRotomUsersFacadeService, 'findOrCreateUser' | 'getUserByUuid' | 'getAccounts' | 'getUserCount'>
+    Pick<SmartRotomUsersFacadeService, 'initializeUserAndAccounts' | 'getUserWithAccounts'>
   >;
   let starbankService: jest.Mocked<
     Pick<StarbankFacadeService, 'getAccounts' | 'createMainAccount'>
@@ -58,17 +57,14 @@ describe('BoffMediaUsersFacadeService', () => {
       deleteUser: jest.fn(),
       getUserRoles: jest.fn(),
       validateUser: jest.fn(),
-      findByEmail: jest.fn(),
+      getFullUserByEmail: jest.fn(),
       createFromGoogle: jest.fn(),
       getUserCount: jest.fn(),
-      validateUserExists: jest.fn(),
     };
 
     const mockSmartRotomUsersFacadeService = {
-      findOrCreateUser: jest.fn(),
-      getUserByUuid: jest.fn(),
-      getAccounts: jest.fn(),
-      getUserCount: jest.fn(),
+      initializeUserAndAccounts: jest.fn(),
+      getUserWithAccounts: jest.fn(),
     };
 
     const mockStarbankService = {
@@ -204,13 +200,18 @@ describe('BoffMediaUsersFacadeService', () => {
 
   describe('validateUser', () => {
     it('should return authentication result when credentials valid', async () => {
-      const authResult = { sessionUser: { id: 1, username: 'Ash' }, integrations: { hasSmartRotom: true, hasStarbank: true, rolesCount: 1 } };
-      usersManagementService.validateUser.mockResolvedValue(authResult as any);
+      const sessionUser = { id: 1, username: 'Ash' };
+      usersManagementService.validateUser.mockResolvedValue(sessionUser as any);
+      jest.spyOn(service as any, 'getUserWithIntegrations').mockResolvedValue({
+        smartRotomUser: { username: 'Ash' },
+        starbankAccounts: [{ id: 1 }],
+        roles: ['admin'],
+      });
 
       const result = await service.validateUser('Ash', 'pass123');
 
       expect(usersManagementService.validateUser).toHaveBeenCalledWith('Ash', 'pass123');
-      expect(result).toEqual(authResult);
+      expect(result).toMatchObject({ sessionUser, integrations: { hasSmartRotom: true, hasStarbank: true, rolesCount: 1 } });
     });
 
     it('should return null when credentials invalid', async () => {
@@ -224,7 +225,7 @@ describe('BoffMediaUsersFacadeService', () => {
 
   describe('validateUserExists', () => {
     it('should return true when user exists', async () => {
-      usersManagementService.validateUserExists.mockResolvedValue(true);
+      jest.spyOn(service as any, 'getUserWithIntegrations').mockResolvedValue({ id: 1 });
 
       const result = await service.validateUserExists('Ash', 'username');
 
@@ -232,7 +233,7 @@ describe('BoffMediaUsersFacadeService', () => {
     });
 
     it('should return false when user does not exist', async () => {
-      usersManagementService.validateUserExists.mockResolvedValue(false);
+      jest.spyOn(service as any, 'getUserWithIntegrations').mockResolvedValue(null);
 
       const result = await service.validateUserExists('unknown@email.com', 'email');
 

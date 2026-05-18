@@ -3,7 +3,7 @@
 > **Purpose**: Track test coverage across all 37 NestJS controllers. Used to plan and record integration test work.  
 > **Pattern**: Integration tests use Supertest + ValidationPipe + GlobalExceptionFilter — see existing examples in `auth.controller.integration.spec.ts`, `events.controller.integration.spec.ts`, `apps.controller.integration.spec.ts`, `starbank.controller.integration.spec.ts`.  
 > **Legend**: `[x]` done · `[ ]` pending · `[~]` partial · `[-]` not applicable (no logic to test)  
-> **Last updated**: 2026-05-18 — 765 tests, 39 suites (1 skipped), all passing
+> **Last updated**: 2026-05-18 — 2161 tests, 132 suites (1 skipped), all passing
 
 ---
 
@@ -12,7 +12,7 @@
 | Layer | Done | Partial | Pending | N/A |
 |---|---|---|---|---|
 | **Integration specs (controllers)** | 32 | 0 | 1 | 3 |
-| **Unit specs (services)** | 8 | 0 | ~20 | — |
+| **Unit specs (services)** | 104 | 0 | 0 | — |
 
 ---
 
@@ -501,27 +501,219 @@ Empty controller — all endpoints commented out. Skip until implemented.
 
 ## Service unit test status
 
-| Service | Spec file | Status |
-|---|---|---|
-| `starbank-account.service` | `starbank-account.service.spec.ts` | [x] |
-| `starbank-transaction.service` | `starbank-transaction.service.spec.ts` | [x] |
-| `apps.service` | `apps.service.spec.ts` | [x] |
-| `user-apps.service` | `user-apps.service.spec.ts` | [x] |
-| `apps.facade.service` | `apps.facade.service.spec.ts` | [x] |
-| `auth.service` | `auth.service.spec.ts` | [x] |
-| `events.service` | `events.service.spec.ts` | [x] |
-| `leaderboards.service` | `leaderboards.service.spec.ts` | [x] |
- | `starbank.facade.service` | `starbank.facade.service.spec.ts` | [x] |
- | `events.facade.service` | `events.facade.service.spec.ts` | [x] |
- | `wingull.facade.service` | `wingull.facade.service.spec.ts` | [x] |
- | `pokemon.facade.service` | `pokemon.facade.service.spec.ts` | [x] |
- | `mine.facade.service` | `mine.facade.service.spec.ts` | [x] |
- | `misiones.facade.service` | `misiones.facade.service.spec.ts` | [x] |
- | `arcade.facade.service` | `arcade.facade.service.spec.ts` | [x] |
- | `achievement.facade.service` | `achievement.facade.service.spec.ts` | [x] |
- | `users.facade.service` (boffmedia) | `users.facade.service.spec.ts` | [x] |
- | `users.facade.service` (smartrotom) | `users.facade.service.spec.ts` | [x] |
-| All other service layers | — | [ ] |
+### auth
+| Service | Status |
+|---|---|
+| `auth.service` | [x] |
+| `password.service` | [x] |
+
+### boffmedia/events
+| Service | Status |
+|---|---|
+| `events.service` | [x] |
+| `leaderboards.service` | [x] |
+| `achievements.service` | [x] |
+| `games.service` | [x] |
+| `participants.service` | [x] |
+| `progress.service` | [x] |
+| `teams.service` | [x] |
+| `events.facade.service` | [x] |
+
+### boffmedia/users
+| Service | Status |
+|---|---|
+| `users-management.service` | [x] |
+| `users.facade.service` | [x] |
+
+### boffmedia/util
+| Service | Status |
+|---|---|
+| `sharex.service` | [x] |
+| `pokemon-log.service` | [x] |
+| `file-upload.service` | [x] |
+| `image-upload.service` | [x] |
+| `upload.facade.service` | [x] |
+
+### smartrotom/apps
+| Service | Status |
+|---|---|
+| `apps.service` | [x] |
+| `user-apps.service` | [x] |
+| `apps.facade.service` | [x] |
+
+### smartrotom/achievement
+| Service | Status |
+|---|---|
+| `achievements.service` | [x] |
+| `battle-achievement.service` | [x] |
+| `replays.service` | [x] |
+| `achievement.facade.service` | [x] |
+
+### smartrotom/arcade
+| Service | Status |
+|---|---|
+| `inventory.service` | [x] |
+| `lootbox.service` | [x] |
+| `streak.service` | [x] |
+| `arcade.facade.service` | [x] |
+
+### smartrotom/chatapp
+| Service | Status |
+|---|---|
+| `chat.service` | [x] |
+| `message.service` | [x] |
+| `group.service` | [x] |
+| `call.service` | [x] |
+
+### smartrotom/documents
+| Service | Status |
+|---|---|
+| `document.service` | [x] |
+| `news.service` | [x] |
+| `note.service` | [x] |
+
+### smartrotom/ficusai
+| Service | Status |
+|---|---|
+| `messages.service` | [x] |
+| `pokemon-data.service` | [x] |
+| `ficusai.facade.service` | [x] |
+
+### smartrotom/liga
+| Service | Status |
+|---|---|
+| `replay.service` | [x] |
+| `statistics.service` | [x] |
+| `tournament.service` | [x] |
+| `liga.facade.service` | [x] |
+
+### smartrotom/mine
+| Service | Status |
+|---|---|
+| `energy.service` | [x] |
+| `game.service` | [x] |
+| `player.service` | [x] |
+| `reward.service` | [x] |
+| `mine.facade.service` | [x] |
+
+### smartrotom/misiones
+| Service | Status |
+|---|---|
+| `quest.cache.service` | [x] |
+| `npc.service` | [x] |
+| `user.quest.service` | [x] |
+| `image.service` | [x] |
+| `misiones.facade.service` | [x] |
+
+### smartrotom/player
+| Service | Status |
+|---|---|
+| `player.stats.service` | [x] |
+| `player.team.service` | [x] |
+| `player.facade.service` | [x] |
+
+### smartrotom/pokemon
+| Service | Status |
+|---|---|
+| `pokemon.facade.service` | [x] |
+| `pokemon-data.service` (sub) | [x] |
+| `pokemon-image.service` | [x] |
+| `pokedex-management.service` | [x] |
+| `pokemon-showdown.service` | [x] |
+| `base-data.service` | [-] (abstract, tested via subclasses) |
+| `move-data.service` | [x] |
+| `spawn-data.service` | [x] |
+| `sprite-manifest.service` | [x] |
+| `pokemon-data-management.service` | [x] |
+| `pokemon-integration.service` | [x] |
+
+### smartrotom/starbank
+| Service | Status |
+|---|---|
+| `starbank-account.service` | [x] |
+| `starbank-transaction.service` | [x] |
+| `starbank.facade.service` | [x] |
+
+### smartrotom/users
+| Service | Status |
+|---|---|
+| `users.service` | [x] |
+| `users.facade.service` | [x] |
+
+### smartrotom/wingull
+| Service | Status |
+|---|---|
+| `wingull-economy.service` | [x] |
+| `wingull-player.service` | [x] |
+| `wingull-transport.service` | [x] |
+| `wingull-world.service` | [x] |
+| `wingull.facade.service` | [x] |
+
+### wingull/invites
+| Service | Status |
+|---|---|
+| `invite-management.service` | [x] |
+| `registration.service` | [x] |
+| `invites.facade.service` | [x] |
+
+### automation/twitch
+| Service | Status |
+|---|---|
+| `twitch-notification.service` | [x] |
+| `twitch-api.service` | [x] |
+| `twitch-monitor.service` | [x] |
+
+### boffmedia/herramientas/manga
+| Service | Status |
+|---|---|
+| `manga-download.service` | [ ] |
+| `novecool.service` | [ ] |
+| `cbz.service` | [ ] |
+| manga scrape sub-services | [ ] |
+
+### boffmedia/herramientas/mhwilds
+| Service | Status |
+|---|---|
+| `mhwilds-cache.service` | [x] |
+| `mhwilds-data.service` | [x] |
+| `mhwilds.facade.service` | [x] |
+
+### boffmedia/herramientas/pokemon/tcgpocket
+| Service | Status |
+|---|---|
+| `tcg.service` | [ ] |
+| `tcg.facade.service` | [x] |
+| `tcg-fetch.service` | [x] |
+| `tcg-config.service` | [x] |
+| `tcg-error.service` | [x] |
+| `tcg-image.service` | [x] |
+
+### boffmedia/herramientas/pokemon/vgc
+| Service | Status |
+|---|---|
+| `meta.facade.service` | [x] |
+| `vgc.service` | [ ] |
+| `limitless.service` | [ ] |
+| `divergence.service` | [x] |
+| `ingestion-jobs.service` | [x] |
+
+### boffmedia/herramientas/youtube
+| Service | Status |
+|---|---|
+| `youtube.facade.service` | [x] |
+| `transcription.service` | [x] |
+
+### battlesimulator
+| Service | Status |
+|---|---|
+| `battle.service` | [-] (empty stub — smoke test only) |
+
+### misc
+| Service | Status |
+|---|---|
+| `netfluis.service` | [x] |
+| `smartrotom.service` (_main) | [x] |
+| `scrape.facade.service` | [x] |
 
 ---
 
