@@ -19,12 +19,13 @@ import {
   ApiParam,
   ApiQuery,
   ApiBody,
-  ApiProperty,
-  ApiPropertyOptional,
 } from '@nestjs/swagger';
 import { BoffMediaUsersFacadeService } from './users.facade.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { MinecraftRegistrationDto, MinecraftLinkDto } from './dto/minecraft-registration.dto';
+import { GoogleAuthDto } from './dto/google-auth.dto';
+import { UserLoginDto } from './dto/user-login.dto';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
 
@@ -42,67 +43,6 @@ import { UserValidationResponseEntity } from './entities/user-validation-respons
 import { BatchUsersDto } from './dto/batch-users.dto';
 import { Logger } from 'nestjs-pino';
 
-// Additional DTOs for specialized endpoints
-export class MinecraftDetails {
-  @ApiProperty({ example: 'Steve' })
-  username: string;
-
-  @ApiProperty({ example: '069a79f4-44e9-4726-a5be-fca90e38aaf5' })
-  uuid: string;
-
-  @ApiProperty({ example: 'world' })
-  world: string;
-}
-
-export class MinecraftRegistrationDto {
-  @ApiProperty({ example: 'steve123' })
-  username: string;
-
-  @ApiProperty({ example: 'steve@example.com' })
-  email: string;
-
-  @ApiProperty({ example: 'password123' })
-  password: string;
-
-  @ApiProperty({ type: MinecraftDetails })
-  minecraft: MinecraftDetails;
-}
-
-export class MinecraftLinkDto {
-  @ApiProperty({ example: 'steve123' })
-  username: string;
-
-  @ApiProperty({ example: 'steve@example.com' })
-  email: string;
-
-  @ApiProperty({ example: 'password123' })
-  password: string;
-
-  @ApiProperty({ type: MinecraftDetails })
-  minecraft: MinecraftDetails;
-}
-
-export class GoogleAuthDto {
-  @ApiProperty({ example: 'steve@gmail.com' })
-  email: string;
-
-  @ApiProperty({ example: 'Steve Player' })
-  name: string;
-
-  @ApiProperty({ example: '1234567890' })
-  googleId: string;
-
-  @ApiPropertyOptional({ example: 'https://lh3.googleusercontent.com/...' })
-  profilePicture?: string;
-}
-
-export class LoginDto {
-  @ApiProperty({ example: 'steve123' })
-  username: string;
-
-  @ApiProperty({ example: 'password123' })
-  password: string;
-}
 
 @ApiTags('BoffMedia | Users')
 @Controller('users')
@@ -486,8 +426,8 @@ export class BoffMediaUsersController {
     type: AuthenticationResultEntity,
   })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
-  @ApiBody({ type: LoginDto })
-  async login(@Body() loginDto: LoginDto) {
+  @ApiBody({ type: UserLoginDto })
+  async login(@Body() loginDto: UserLoginDto) {
     try {
       const authResult = await this.usersFacadeService.validateUser(
         loginDto.username,

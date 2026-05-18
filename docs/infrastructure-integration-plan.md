@@ -739,7 +739,7 @@ export class CreateTransferDto {
 
 ### Updated pipeline structure
 
-- [ ] Update `.gitlab-ci.yml` — add validate stage at the top:
+- [x] Update `.gitlab-ci.yml` — add validate stage at the top:
 
 ```yaml
 stages:
@@ -825,12 +825,12 @@ build:
     - tags
 ```
 
-- [ ] Add `merge_requests` to validate jobs so they run on every MR — not just merges to `main`
+- [x] Add `merge_requests` to validate jobs so they run on every MR — not just merges to `main`
 - [ ] Verify pnpm cache restores correctly between pipeline runs (check CI logs for cache hit)
 
 ### Coverage configuration in Jest
 
-- [ ] Add to `apps/api/jest.config.ts`:
+- [x] Add to `apps/api/jest.config.ts`:
 
 ```typescript
 export default {
@@ -1244,7 +1244,7 @@ Test the full HTTP stack including middleware, pipes, guards, and the exception 
 - [x] Confirm ValidationPipe active: unknown field in body → 400 (`auth.controller.integration.spec.ts`, `starbank.controller.integration.spec.ts`)
 - [x] Confirm GlobalExceptionFilter active: all error responses match standard shape `{ statusCode, error, message, timestamp, path }`
 
-> **149 tests, 11 suites, all passing — 2026-05-17**
+> **165 tests, 12 suites, all passing — 2026-05-18**
 
 ### E2e tests — Playwright
 
@@ -1278,7 +1278,7 @@ coverageThreshold: {
 
 ### Verification
 
-- [x] All tests pass — 149 tests, 11 suites, zero failures (`jest --runInBand --forceExit`) — updated 2026-05-17
+- [x] All tests pass — 165 tests, 12 suites, zero failures (`jest --runInBand --forceExit`) — updated 2026-05-18
 - [ ] Coverage report generated — deferred (full coverage run risks OOM; run in CI with resource limits)
 - [ ] Coverage warnings appear in CI output (not failures)
 - [ ] Deliberately break `StarbankTransactionService.transfer()` — confirm Jest catches it

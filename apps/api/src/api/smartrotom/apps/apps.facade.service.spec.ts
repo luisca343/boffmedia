@@ -7,25 +7,25 @@ import { UpdateAppDto } from './dto/update-app.dto';
 
 describe('AppsFacadeService', () => {
   let service: AppsFacadeService;
-  let appsService: AppsService;
-  let userAppsService: UserAppsService;
-
-  const mockAppsService = {
-    getAllApps: jest.fn(),
-    getAppById: jest.fn(),
-    createApp: jest.fn(),
-    updateApp: jest.fn(),
-    deleteApp: jest.fn(),
-  };
-
-  const mockUserAppsService = {
-    getAppsForPlayer: jest.fn(),
-    addAppToPlayer: jest.fn(),
-    removeAppFromPlayer: jest.fn(),
-    orderAppsForPlayer: jest.fn(),
-  };
+  let appsService: jest.Mocked<Pick<AppsService, 'getAllApps' | 'getAppById' | 'createApp' | 'updateApp' | 'deleteApp'>>;
+  let userAppsService: jest.Mocked<Pick<UserAppsService, 'getAppsForPlayer' | 'addAppToPlayer' | 'removeAppFromPlayer' | 'orderAppsForPlayer'>>;
 
   beforeEach(async () => {
+    const mockAppsService = {
+      getAllApps: jest.fn(),
+      getAppById: jest.fn(),
+      createApp: jest.fn(),
+      updateApp: jest.fn(),
+      deleteApp: jest.fn(),
+    };
+
+    const mockUserAppsService = {
+      getAppsForPlayer: jest.fn(),
+      addAppToPlayer: jest.fn(),
+      removeAppFromPlayer: jest.fn(),
+      orderAppsForPlayer: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AppsFacadeService,
@@ -35,12 +35,8 @@ describe('AppsFacadeService', () => {
     }).compile();
 
     service = module.get<AppsFacadeService>(AppsFacadeService);
-    appsService = module.get<AppsService>(AppsService);
-    userAppsService = module.get<UserAppsService>(UserAppsService);
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
+    appsService = module.get(AppsService);
+    userAppsService = module.get(UserAppsService);
   });
 
   it('should be defined', () => {
@@ -50,7 +46,7 @@ describe('AppsFacadeService', () => {
   describe('getApps', () => {
     it('should return all apps', async () => {
       const mockApps = [{ id: 1, name: 'Test App' }];
-      mockAppsService.getAllApps.mockResolvedValue(mockApps);
+      appsService.getAllApps.mockResolvedValue(mockApps as any);
 
       const result = await service.getApps();
 
@@ -62,7 +58,7 @@ describe('AppsFacadeService', () => {
   describe('getApp', () => {
     it('should return app by id', async () => {
       const mockApp = { id: 1, name: 'Test App' };
-      mockAppsService.getAppById.mockResolvedValue(mockApp);
+      appsService.getAppById.mockResolvedValue(mockApp as any);
 
       const result = await service.getApp(1);
 
@@ -75,7 +71,7 @@ describe('AppsFacadeService', () => {
     it('should create a new app', async () => {
       const createDto: CreateAppDto = { name: 'New App', url: 'new-app' };
       const mockApp = { id: 1, ...createDto };
-      mockAppsService.createApp.mockResolvedValue(mockApp);
+      appsService.createApp.mockResolvedValue(mockApp as any);
 
       const result = await service.createApp(createDto);
 
@@ -88,7 +84,7 @@ describe('AppsFacadeService', () => {
     it('should update an app', async () => {
       const updateDto: UpdateAppDto = { name: 'Updated App' };
       const mockApp = { id: 1, name: 'Updated App' };
-      mockAppsService.updateApp.mockResolvedValue(mockApp);
+      appsService.updateApp.mockResolvedValue(mockApp as any);
 
       const result = await service.updateApp(1, updateDto);
 
@@ -100,7 +96,7 @@ describe('AppsFacadeService', () => {
   describe('deleteApp', () => {
     it('should delete an app', async () => {
       const mockResult = { success: true };
-      mockAppsService.deleteApp.mockResolvedValue(mockResult);
+      appsService.deleteApp.mockResolvedValue(mockResult as any);
 
       const result = await service.deleteApp(1);
 
@@ -113,7 +109,7 @@ describe('AppsFacadeService', () => {
     it('should return apps for player', async () => {
       const uuid = 'test-uuid';
       const mockApps = [{ id: 1, name: 'Player App' }];
-      mockUserAppsService.getAppsForPlayer.mockResolvedValue(mockApps);
+      userAppsService.getAppsForPlayer.mockResolvedValue(mockApps as any);
 
       const result = await service.getAppsForPlayer(uuid);
 
@@ -127,7 +123,7 @@ describe('AppsFacadeService', () => {
       const uuid = 'test-uuid';
       const appId = 1;
       const mockResult = { success: true };
-      mockUserAppsService.addAppToPlayer.mockResolvedValue(mockResult);
+      userAppsService.addAppToPlayer.mockResolvedValue(mockResult as any);
 
       const result = await service.addAppToPlayer(uuid, appId);
 
@@ -141,15 +137,12 @@ describe('AppsFacadeService', () => {
       const uuid = 'test-uuid';
       const appId = 1;
       const mockResult = { success: true };
-      mockUserAppsService.removeAppFromPlayer.mockResolvedValue(mockResult);
+      userAppsService.removeAppFromPlayer.mockResolvedValue(mockResult as any);
 
       const result = await service.removeAppFromPlayer(uuid, appId);
 
       expect(result).toEqual(mockResult);
-      expect(userAppsService.removeAppFromPlayer).toHaveBeenCalledWith(
-        uuid,
-        appId,
-      );
+      expect(userAppsService.removeAppFromPlayer).toHaveBeenCalledWith(uuid, appId);
     });
   });
 
@@ -158,14 +151,11 @@ describe('AppsFacadeService', () => {
       const order = [{ id: 1, order: 1 }];
       const uuid = 'test-uuid';
       const mockResult = { success: true };
-      mockUserAppsService.orderAppsForPlayer.mockResolvedValue(mockResult);
+      userAppsService.orderAppsForPlayer.mockResolvedValue(mockResult as any);
 
       const result = await service.orderApps(order, uuid);
 
-      expect(userAppsService.orderAppsForPlayer).toHaveBeenCalledWith(
-        order,
-        uuid,
-      );
+      expect(userAppsService.orderAppsForPlayer).toHaveBeenCalledWith(order, uuid);
       expect(result).toEqual(mockResult);
     });
   });
