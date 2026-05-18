@@ -64,6 +64,35 @@ lint-typecheck:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_TAG
 
+test:
+  stage: validate
+  image: node:22-alpine
+  tags:
+    - docker
+  cache:
+    key:
+      files:
+        - pnpm-lock.yaml
+    paths:
+      - .pnpm-store/
+  before_script:
+    - npm install -g pnpm
+    - pnpm config set store-dir .pnpm-store
+    - pnpm install --frozen-lockfile
+  script:
+    - pnpm --filter api test -- --runInBand --forceExit --coverage
+  coverage: '/Lines\s*:\s*(\d+\.?\d*)%/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: apps/api/coverage/cobertura-coverage.xml
+    expire_in: 7 days
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_TAG
+
 
 # ── Build ─────────────────────────────────────────────────────────────────────
 

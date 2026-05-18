@@ -3,17 +3,6 @@ import { EventsService } from './events.service';
 import { EventsRepository } from '../repositories/events.repository';
 import { CreateEventDto } from '../dto/create-event.dto';
 
-const mockEventsRepository = {
-  findAll: jest.fn(),
-  findById: jest.fn(),
-  findChildEvents: jest.fn(),
-  create: jest.fn(),
-  update: jest.fn(),
-  delete: jest.fn(),
-  softDelete: jest.fn(),
-  softDeleteChildren: jest.fn(),
-};
-
 const mockEvent = {
   id: 1,
   title: 'Tournament Season 1',
@@ -33,8 +22,22 @@ const mockEvent = {
 
 describe('EventsService', () => {
   let service: EventsService;
+  let eventsRepository: jest.Mocked<Pick<EventsRepository,
+    'findAll' | 'findById' | 'findChildEvents' | 'create' | 'update' |
+    'delete' | 'softDelete' | 'softDeleteChildren'>>;
 
   beforeEach(async () => {
+    const mockEventsRepository = {
+      findAll: jest.fn(),
+      findById: jest.fn(),
+      findChildEvents: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      softDelete: jest.fn(),
+      softDeleteChildren: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         EventsService,
@@ -43,9 +46,8 @@ describe('EventsService', () => {
     }).compile();
 
     service = module.get<EventsService>(EventsService);
+    eventsRepository = module.get(EventsRepository);
   });
-
-  afterEach(() => jest.clearAllMocks());
 
   it('should be defined', () => {
     expect(service).toBeDefined();
@@ -53,7 +55,7 @@ describe('EventsService', () => {
 
   describe('getAllEvents()', () => {
     it('should return all events', async () => {
-      mockEventsRepository.findAll.mockResolvedValue([mockEvent]);
+      eventsRepository.findAll.mockResolvedValue([mockEvent] as any);
 
       const result = await service.getAllEvents();
 
@@ -62,7 +64,7 @@ describe('EventsService', () => {
     });
 
     it('should return empty array when no events', async () => {
-      mockEventsRepository.findAll.mockResolvedValue([]);
+      eventsRepository.findAll.mockResolvedValue([]);
 
       const result = await service.getAllEvents();
 
@@ -73,8 +75,8 @@ describe('EventsService', () => {
   describe('getEventById()', () => {
     it('should return event with child events', async () => {
       const childEvent = { ...mockEvent, id: 2, parentId: 1 };
-      mockEventsRepository.findById.mockResolvedValue(mockEvent);
-      mockEventsRepository.findChildEvents.mockResolvedValue([childEvent]);
+      eventsRepository.findById.mockResolvedValue(mockEvent as any);
+      eventsRepository.findChildEvents.mockResolvedValue([childEvent] as any);
 
       const result = await service.getEventById(1);
 
@@ -83,8 +85,8 @@ describe('EventsService', () => {
     });
 
     it('should return event with empty childEvents when none exist', async () => {
-      mockEventsRepository.findById.mockResolvedValue(mockEvent);
-      mockEventsRepository.findChildEvents.mockResolvedValue([]);
+      eventsRepository.findById.mockResolvedValue(mockEvent as any);
+      eventsRepository.findChildEvents.mockResolvedValue([]);
 
       const result = await service.getEventById(1);
 
@@ -92,7 +94,7 @@ describe('EventsService', () => {
     });
 
     it('should return null for unknown event', async () => {
-      mockEventsRepository.findById.mockResolvedValue(null);
+      eventsRepository.findById.mockResolvedValue(null);
 
       const result = await service.getEventById(999);
 
@@ -113,26 +115,26 @@ describe('EventsService', () => {
     };
 
     it('should create and return the new event', async () => {
-      mockEventsRepository.create.mockResolvedValue({ insertId: 2 });
-      mockEventsRepository.findById.mockResolvedValue({ ...mockEvent, id: 2, title: 'New Tournament' });
-      mockEventsRepository.findChildEvents.mockResolvedValue([]);
+      eventsRepository.create.mockResolvedValue({ insertId: 2 } as any);
+      eventsRepository.findById.mockResolvedValue({ ...mockEvent, id: 2, title: 'New Tournament' } as any);
+      eventsRepository.findChildEvents.mockResolvedValue([]);
 
       const result = await service.createEvent(createDto);
 
       expect(result.title).toBe('New Tournament');
-      expect(mockEventsRepository.create).toHaveBeenCalledWith(
+      expect(eventsRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({ title: 'New Tournament', gameId: 1 }),
       );
     });
 
     it('should convert startDate string to Date object', async () => {
-      mockEventsRepository.create.mockResolvedValue({ insertId: 1 });
-      mockEventsRepository.findById.mockResolvedValue(mockEvent);
-      mockEventsRepository.findChildEvents.mockResolvedValue([]);
+      eventsRepository.create.mockResolvedValue({ insertId: 1 } as any);
+      eventsRepository.findById.mockResolvedValue(mockEvent as any);
+      eventsRepository.findChildEvents.mockResolvedValue([]);
 
       await service.createEvent(createDto);
 
-      expect(mockEventsRepository.create).toHaveBeenCalledWith(
+      expect(eventsRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({ startDate: new Date('2026-07-01') }),
       );
     });
@@ -149,35 +151,35 @@ describe('EventsService', () => {
     };
 
     it('should update and return the updated event', async () => {
-      mockEventsRepository.update.mockResolvedValue(undefined);
-      mockEventsRepository.findById.mockResolvedValue({ ...mockEvent, title: 'Updated Tournament' });
-      mockEventsRepository.findChildEvents.mockResolvedValue([]);
+      eventsRepository.update.mockResolvedValue(undefined);
+      eventsRepository.findById.mockResolvedValue({ ...mockEvent, title: 'Updated Tournament' } as any);
+      eventsRepository.findChildEvents.mockResolvedValue([]);
 
       const result = await service.updateEvent(1, updateDto);
 
       expect(result.title).toBe('Updated Tournament');
-      expect(mockEventsRepository.update).toHaveBeenCalledWith(1, expect.any(Object));
+      expect(eventsRepository.update).toHaveBeenCalledWith(1, expect.any(Object));
     });
   });
 
   describe('deleteEvent()', () => {
     it('should soft delete the event and its children', async () => {
-      mockEventsRepository.softDeleteChildren.mockResolvedValue(undefined);
-      mockEventsRepository.softDelete.mockResolvedValue(undefined);
+      eventsRepository.softDeleteChildren.mockResolvedValue(undefined);
+      eventsRepository.softDelete.mockResolvedValue(undefined);
 
       await service.deleteEvent(1);
 
-      expect(mockEventsRepository.softDeleteChildren).toHaveBeenCalledWith(1);
-      expect(mockEventsRepository.softDelete).toHaveBeenCalledWith(1);
+      expect(eventsRepository.softDeleteChildren).toHaveBeenCalledWith(1);
+      expect(eventsRepository.softDelete).toHaveBeenCalledWith(1);
     });
 
     it('should delete children before the parent', async () => {
       const callOrder: string[] = [];
-      mockEventsRepository.softDeleteChildren.mockImplementation(() => {
+      eventsRepository.softDeleteChildren.mockImplementation(() => {
         callOrder.push('children');
         return Promise.resolve();
       });
-      mockEventsRepository.softDelete.mockImplementation(() => {
+      eventsRepository.softDelete.mockImplementation(() => {
         callOrder.push('parent');
         return Promise.resolve();
       });
@@ -190,7 +192,7 @@ describe('EventsService', () => {
 
   describe('validateEventExists()', () => {
     it('should return true when event exists', async () => {
-      mockEventsRepository.findById.mockResolvedValue(mockEvent);
+      eventsRepository.findById.mockResolvedValue(mockEvent as any);
 
       const result = await service.validateEventExists(1);
 
@@ -198,7 +200,7 @@ describe('EventsService', () => {
     });
 
     it('should return false when event does not exist', async () => {
-      mockEventsRepository.findById.mockResolvedValue(null);
+      eventsRepository.findById.mockResolvedValue(null);
 
       const result = await service.validateEventExists(999);
 

@@ -8,6 +8,7 @@ module.exports = {
     moduleNameMapper: {
       '^@/(.*)$': '<rootDir>/src/$1',
       '^@api/(.*)$': '<rootDir>/src/api/$1',
+      '^@repositories/(.*)$': '<rootDir>/src/api/_repositories/$1',
       '^@boffmedia/shared(.*)$': '<rootDir>/../../packages/shared/src$1',
     },
     modulePathIgnorePatterns: ['src/typings'],
@@ -15,6 +16,9 @@ module.exports = {
       '/node_modules./',
       '<rootDir>/(coverage|dist|lib|tmp)./',
     ],
+    coverageDirectory: 'coverage',
+    coverageReporters: ['text-summary', 'cobertura', 'lcov'],
+    collectCoverage: false,
     collectCoverageFrom: [
       'src/**/*.ts',
       '!src/**/*.spec.ts',
@@ -25,6 +29,7 @@ module.exports = {
       '!src/**/*.enum.ts',
       '!src/**/*.module.ts',
       '!src/**/*.interface.ts',
+      '!src/**/vgc/mod/**',
     ],
     coverageThreshold: {
       global: {

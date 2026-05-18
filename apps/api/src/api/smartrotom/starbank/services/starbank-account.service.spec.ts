@@ -5,23 +5,6 @@ import { STARBANK_ACCOUNT_REPOSITORY_TOKEN } from '@api/_utils/repositories/inte
 import { AccountType } from '../enums/account-type.enum';
 import { CreateAccountDto } from '../dto/create-account.dto';
 
-const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn() };
-
-const mockAccountRepository = {
-  findAll: jest.fn(),
-  findById: jest.fn(),
-  findByUuid: jest.fn(),
-  findUserMainAccount: jest.fn(),
-  findByType: jest.fn(),
-  create: jest.fn(),
-  update: jest.fn(),
-  delete: jest.fn(),
-  exists: jest.fn(),
-  updateBalance: jest.fn(),
-  getUserBalance: jest.fn(),
-  checkAccountExists: jest.fn(),
-};
-
 const mockAccount = {
   id: 1,
   uuid: 'abc-123',
@@ -34,20 +17,49 @@ const mockAccount = {
 
 describe('StarbankAccountService', () => {
   let service: StarbankAccountService;
+  let mockLogger: { log: jest.Mock; error: jest.Mock; warn: jest.Mock };
+  let accountRepository: {
+    findAll: jest.Mock;
+    findById: jest.Mock;
+    findByUuid: jest.Mock;
+    findUserMainAccount: jest.Mock;
+    findByType: jest.Mock;
+    create: jest.Mock;
+    update: jest.Mock;
+    delete: jest.Mock;
+    exists: jest.Mock;
+    updateBalance: jest.Mock;
+    getUserBalance: jest.Mock;
+    checkAccountExists: jest.Mock;
+  };
 
   beforeEach(async () => {
+    mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn() };
+    accountRepository = {
+      findAll: jest.fn(),
+      findById: jest.fn(),
+      findByUuid: jest.fn(),
+      findUserMainAccount: jest.fn(),
+      findByType: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      exists: jest.fn(),
+      updateBalance: jest.fn(),
+      getUserBalance: jest.fn(),
+      checkAccountExists: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         StarbankAccountService,
         { provide: Logger, useValue: mockLogger },
-        { provide: STARBANK_ACCOUNT_REPOSITORY_TOKEN, useValue: mockAccountRepository },
+        { provide: STARBANK_ACCOUNT_REPOSITORY_TOKEN, useValue: accountRepository },
       ],
     }).compile();
 
     service = module.get<StarbankAccountService>(StarbankAccountService);
   });
-
-  afterEach(() => jest.clearAllMocks());
 
   it('should be defined', () => {
     expect(service).toBeDefined();
@@ -61,41 +73,37 @@ describe('StarbankAccountService', () => {
     };
 
     it('should create a secondary account', async () => {
-      mockAccountRepository.create.mockResolvedValue(mockAccount);
+      accountRepository.create.mockResolvedValue(mockAccount);
 
       const result = await service.createAccount(dto);
 
       expect(result).toEqual(mockAccount);
-      expect(mockAccountRepository.create).toHaveBeenCalledWith(
+      expect(accountRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({ uuid: 'abc-123', name: 'TrainerAsh' }),
       );
     });
 
     it('should throw when uuid is empty', async () => {
-      await expect(service.createAccount({ ...dto, uuid: '' })).rejects.toThrow(
-        'UUID is required',
-      );
-      expect(mockAccountRepository.create).not.toHaveBeenCalled();
+      await expect(service.createAccount({ ...dto, uuid: '' })).rejects.toThrow('UUID is required');
+      expect(accountRepository.create).not.toHaveBeenCalled();
     });
 
     it('should throw when name is empty', async () => {
-      await expect(service.createAccount({ ...dto, name: '' })).rejects.toThrow(
-        'Account name is required',
-      );
+      await expect(service.createAccount({ ...dto, name: '' })).rejects.toThrow('Account name is required');
     });
 
     it('should throw when main account already exists', async () => {
-      mockAccountRepository.findUserMainAccount.mockResolvedValue({ id: 5, balance: 0 });
+      accountRepository.findUserMainAccount.mockResolvedValue({ id: 5, balance: 0 });
 
       await expect(
         service.createAccount({ ...dto, type: AccountType.MAIN }),
       ).rejects.toThrow('User already has a main account');
-      expect(mockAccountRepository.create).not.toHaveBeenCalled();
+      expect(accountRepository.create).not.toHaveBeenCalled();
     });
 
     it('should allow creating a main account when none exists', async () => {
-      mockAccountRepository.findUserMainAccount.mockResolvedValue(null);
-      mockAccountRepository.create.mockResolvedValue({ ...mockAccount, type: AccountType.MAIN });
+      accountRepository.findUserMainAccount.mockResolvedValue(null);
+      accountRepository.create.mockResolvedValue({ ...mockAccount, type: AccountType.MAIN });
 
       const result = await service.createAccount({ ...dto, type: AccountType.MAIN });
 
@@ -105,8 +113,8 @@ describe('StarbankAccountService', () => {
 
   describe('createMainAccount()', () => {
     it('should create a main account for a new user', async () => {
-      mockAccountRepository.findUserMainAccount.mockResolvedValue(null);
-      mockAccountRepository.create.mockResolvedValue(mockAccount);
+      accountRepository.findUserMainAccount.mockResolvedValue(null);
+      accountRepository.create.mockResolvedValue(mockAccount);
 
       const result = await service.createMainAccount('abc-123', 'TrainerAsh');
 
@@ -114,7 +122,7 @@ describe('StarbankAccountService', () => {
     });
 
     it('should throw when main account already exists', async () => {
-      mockAccountRepository.findUserMainAccount.mockResolvedValue({ id: 5, balance: 100 });
+      accountRepository.findUserMainAccount.mockResolvedValue({ id: 5, balance: 100 });
 
       await expect(service.createMainAccount('abc-123', 'TrainerAsh')).rejects.toThrow(
         'Main account already exists',
@@ -124,7 +132,7 @@ describe('StarbankAccountService', () => {
 
   describe('getUserBalance()', () => {
     it('should return the balance for a known user', async () => {
-      mockAccountRepository.getUserBalance.mockResolvedValue(1500);
+      accountRepository.getUserBalance.mockResolvedValue(1500);
 
       const result = await service.getUserBalance('abc-123');
 
@@ -132,7 +140,7 @@ describe('StarbankAccountService', () => {
     });
 
     it('should return zero on repository error', async () => {
-      mockAccountRepository.getUserBalance.mockRejectedValue(new Error('DB error'));
+      accountRepository.getUserBalance.mockRejectedValue(new Error('DB error'));
 
       const result = await service.getUserBalance('unknown-uuid');
 
@@ -143,12 +151,12 @@ describe('StarbankAccountService', () => {
 
   describe('getAllAccounts()', () => {
     it('should return all accounts', async () => {
-      mockAccountRepository.findAll.mockResolvedValue([mockAccount]);
+      accountRepository.findAll.mockResolvedValue([mockAccount]);
 
       const result = await service.getAllAccounts();
 
       expect(result).toHaveLength(1);
-      expect(mockAccountRepository.findAll).toHaveBeenCalledTimes(1);
+      expect(accountRepository.findAll).toHaveBeenCalledTimes(1);
     });
   });
 });
