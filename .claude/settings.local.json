@@ -31,7 +31,8 @@
       "mcp__boff-agent__detect_structural_changes",
       "mcp__boff-agent__sync_conventions",
       "mcp__boff-agent__write_adr",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(npx jest *)"
     ]
   }
 }

@@ -15,28 +15,31 @@ const makeParticipant = (id: number, totalPoints: number, achievementCount = 1, 
   lastUpdated: new Date(),
 });
 
-const buildMockDb = (resolveWith: any) => {
-  const builder: any = {};
-  const methods = ['select', 'from', 'leftJoin', 'innerJoin', 'where', 'groupBy', 'orderBy', 'limit'];
-  for (const m of methods) {
-    builder[m] = jest.fn().mockReturnValue(builder);
+type DrizzleQueryBuilder = Record<string, jest.Mock> & {
+  then: (resolve: (v: unknown) => void) => Promise<unknown>;
+};
+
+const buildMockDb = (resolveWith: unknown): { select: jest.Mock; _builder: DrizzleQueryBuilder } => {
+  const builder = {} as DrizzleQueryBuilder;
+  const chainedMethods = ['select', 'from', 'leftJoin', 'innerJoin', 'where', 'groupBy', 'orderBy', 'limit'];
+  for (const method of chainedMethods) {
+    builder[method] = jest.fn().mockReturnValue(builder);
   }
-  builder.then = (resolve: (v: any) => void) => Promise.resolve(resolveWith).then(resolve);
+  builder.then = (resolve) => Promise.resolve(resolveWith).then(resolve);
   return { select: jest.fn().mockReturnValue(builder), _builder: builder };
 };
 
 describe('LeaderboardsService', () => {
   let service: LeaderboardsService;
 
-  describe('addRankingToResults — via getGlobalLeaderboard()', () => {
-    it('should add rank 1-based index to results', async () => {
+  describe('getGlobalLeaderboard()', () => {
+    beforeEach(async () => {
       const rawData = [
         makeParticipant(3, 300),
         makeParticipant(1, 200),
         makeParticipant(2, 100),
       ];
-      const { select, _builder } = buildMockDb(rawData);
-      _builder.then = (resolve: (v: any) => void) => Promise.resolve(rawData).then(resolve);
+      const { select } = buildMockDb(rawData);
 
       const module: TestingModule = await Test.createTestingModule({
         providers: [
@@ -46,21 +49,27 @@ describe('LeaderboardsService', () => {
       }).compile();
 
       service = module.get<LeaderboardsService>(LeaderboardsService);
+    });
 
+    it('should add 1-based rank to results in order', async () => {
       const result = await service.getGlobalLeaderboard();
 
       expect(result[0].rank).toBe(1);
       expect(result[1].rank).toBe(2);
       expect(result[2].rank).toBe(3);
+    });
+
+    it('should preserve the facade-provided ordering', async () => {
+      const result = await service.getGlobalLeaderboard();
+
       expect(result[0].participantId).toBe(3);
     });
   });
 
   describe('getEventLeaderboard()', () => {
-    it('should return ranked results for a specific event', async () => {
+    beforeEach(async () => {
       const rawData = [makeParticipant(1, 150), makeParticipant(2, 75)];
-      const { select, _builder } = buildMockDb(rawData);
-      _builder.then = (resolve: (v: any) => void) => Promise.resolve(rawData).then(resolve);
+      const { select } = buildMockDb(rawData);
 
       const module: TestingModule = await Test.createTestingModule({
         providers: [
@@ -70,7 +79,9 @@ describe('LeaderboardsService', () => {
       }).compile();
 
       service = module.get<LeaderboardsService>(LeaderboardsService);
+    });
 
+    it('should return ranked results for a specific event', async () => {
       const result = await service.getEventLeaderboard(42);
 
       expect(result).toHaveLength(2);
@@ -80,14 +91,11 @@ describe('LeaderboardsService', () => {
   });
 
   describe('getParticipantRanking()', () => {
-    let module: TestingModule;
-
     beforeEach(async () => {
       const rawGlobal = [makeParticipant(5, 500), makeParticipant(10, 300)];
-      const { select, _builder } = buildMockDb(rawGlobal);
-      _builder.then = (resolve: (v: any) => void) => Promise.resolve(rawGlobal).then(resolve);
+      const { select } = buildMockDb(rawGlobal);
 
-      module = await Test.createTestingModule({
+      const module: TestingModule = await Test.createTestingModule({
         providers: [
           LeaderboardsService,
           { provide: DRIZZLE, useValue: { select } },
@@ -114,10 +122,9 @@ describe('LeaderboardsService', () => {
   });
 
   describe('getTopAchievers()', () => {
-    it('should return achievers up to the requested limit', async () => {
+    beforeEach(async () => {
       const rawData = [makeParticipant(1, 100, 5), makeParticipant(2, 80, 3)];
-      const { select, _builder } = buildMockDb(rawData);
-      _builder.then = (resolve: (v: any) => void) => Promise.resolve(rawData).then(resolve);
+      const { select } = buildMockDb(rawData);
 
       const module: TestingModule = await Test.createTestingModule({
         providers: [
@@ -127,7 +134,9 @@ describe('LeaderboardsService', () => {
       }).compile();
 
       service = module.get<LeaderboardsService>(LeaderboardsService);
+    });
 
+    it('should return achievers up to the requested limit with rank', async () => {
       const result = await service.getTopAchievers(5);
 
       expect(result).toHaveLength(2);

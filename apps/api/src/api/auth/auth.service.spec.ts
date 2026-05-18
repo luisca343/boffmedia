@@ -5,24 +5,6 @@ import { Logger } from 'nestjs-pino';
 import { AuthService } from './auth.service';
 import { BoffMediaUsersFacadeService } from '@api/boffmedia/users/users.facade.service';
 
-const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn() };
-
-const mockUsersService = {
-  validateUser: jest.fn(),
-  getUserWithIntegrations: jest.fn(),
-  getUserById: jest.fn(),
-  getUserRoles: jest.fn(),
-  findByEmail: jest.fn(),
-  createFromGoogle: jest.fn(),
-  createMinecraftUser: jest.fn(),
-  linkMinecraftAccount: jest.fn(),
-};
-
-const mockJwtService = {
-  sign: jest.fn().mockReturnValue('mock-token'),
-  verify: jest.fn(),
-};
-
 const mockUser = {
   id: 1,
   username: 'TrainerAsh',
@@ -39,21 +21,41 @@ const mockUserWithIntegrations = {
 
 describe('AuthService', () => {
   let service: AuthService;
+  let usersService: jest.Mocked<Pick<BoffMediaUsersFacadeService,
+    'validateUser' | 'getUserWithIntegrations' | 'getUserById' | 'getUserRoles' |
+    'findByEmail' | 'createFromGoogle' | 'createMinecraftUser' | 'linkMinecraftAccount'>>;
+  let jwtService: jest.Mocked<Pick<JwtService, 'sign' | 'verify'>>;
 
   beforeEach(async () => {
+    const mockUsersService = {
+      validateUser: jest.fn(),
+      getUserWithIntegrations: jest.fn(),
+      getUserById: jest.fn(),
+      getUserRoles: jest.fn(),
+      findByEmail: jest.fn(),
+      createFromGoogle: jest.fn(),
+      createMinecraftUser: jest.fn(),
+      linkMinecraftAccount: jest.fn(),
+    };
+
+    const mockJwtService = {
+      sign: jest.fn().mockReturnValue('mock-token'),
+      verify: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
-        { provide: Logger, useValue: mockLogger },
+        { provide: Logger, useValue: { log: jest.fn(), error: jest.fn(), warn: jest.fn() } },
         { provide: BoffMediaUsersFacadeService, useValue: mockUsersService },
         { provide: JwtService, useValue: mockJwtService },
       ],
     }).compile();
 
     service = module.get<AuthService>(AuthService);
+    usersService = module.get(BoffMediaUsersFacadeService);
+    jwtService = module.get(JwtService);
   });
-
-  afterEach(() => jest.clearAllMocks());
 
   it('should be defined', () => {
     expect(service).toBeDefined();
@@ -76,7 +78,7 @@ describe('AuthService', () => {
       expect(result.refresh_token).toBe('mock-token');
       expect(result.user.id).toBe(1);
       expect(result.user.username).toBe('TrainerAsh');
-      expect(mockJwtService.sign).toHaveBeenCalledTimes(2);
+      expect(jwtService.sign).toHaveBeenCalledTimes(2);
     });
 
     it('should unwrap sessionUser when present', async () => {
@@ -95,11 +97,11 @@ describe('AuthService', () => {
     });
 
     it('should return tokens for a valid MC login', async () => {
-      mockUsersService.getUserWithIntegrations.mockResolvedValue(mockUserWithIntegrations);
+      usersService.getUserWithIntegrations.mockResolvedValue(mockUserWithIntegrations as any);
 
-      const result = await service.loginMC(loginData) as any;
+      const result = await service.loginMC(loginData);
 
-      expect(result.access_token).toBe('mock-token');
+      expect((result as { access_token: string }).access_token).toBe('mock-token');
     });
 
     it('should throw UnauthorizedException for invalid world', async () => {
@@ -109,7 +111,7 @@ describe('AuthService', () => {
     });
 
     it('should return error object when user not found', async () => {
-      mockUsersService.getUserWithIntegrations.mockResolvedValue(null);
+      usersService.getUserWithIntegrations.mockResolvedValue(null);
 
       const result = await service.loginMC(loginData);
 
@@ -120,9 +122,9 @@ describe('AuthService', () => {
   describe('refreshToken()', () => {
     it('should issue new tokens from a valid JWT string', async () => {
       const payload = { sub: 1, username: 'TrainerAsh', smartRotomUser: {} };
-      mockJwtService.verify.mockReturnValue(payload);
-      mockUsersService.getUserById.mockResolvedValue(mockUser);
-      mockUsersService.getUserRoles.mockResolvedValue(['user']);
+      jwtService.verify.mockReturnValue(payload);
+      usersService.getUserById.mockResolvedValue(mockUser as any);
+      usersService.getUserRoles.mockResolvedValue(['user'] as any);
 
       const result = await service.refreshToken('valid-token-string');
 
@@ -132,13 +134,13 @@ describe('AuthService', () => {
 
     it('should issue new tokens from a token object', async () => {
       const tokenObj = { sub: 1, username: 'TrainerAsh', smartRotomUser: {} };
-      mockUsersService.getUserById.mockResolvedValue(mockUser);
-      mockUsersService.getUserRoles.mockResolvedValue(['user']);
+      usersService.getUserById.mockResolvedValue(mockUser as any);
+      usersService.getUserRoles.mockResolvedValue(['user'] as any);
 
       const result = await service.refreshToken(tokenObj);
 
       expect(result.access_token).toBe('mock-token');
-      expect(mockJwtService.verify).not.toHaveBeenCalled();
+      expect(jwtService.verify).not.toHaveBeenCalled();
     });
 
     it('should throw UnauthorizedException for invalid token format', async () => {
@@ -146,14 +148,14 @@ describe('AuthService', () => {
     });
 
     it('should throw UnauthorizedException when user not found', async () => {
-      mockJwtService.verify.mockReturnValue({ sub: 999 });
-      mockUsersService.getUserById.mockResolvedValue(null);
+      jwtService.verify.mockReturnValue({ sub: 999 });
+      usersService.getUserById.mockResolvedValue(null);
 
       await expect(service.refreshToken('valid-token')).rejects.toThrow(UnauthorizedException);
     });
 
     it('should throw UnauthorizedException when JWT verification fails', async () => {
-      mockJwtService.verify.mockImplementation(() => {
+      jwtService.verify.mockImplementation(() => {
         throw new Error('jwt expired');
       });
 
@@ -163,7 +165,7 @@ describe('AuthService', () => {
 
   describe('validateUser()', () => {
     it('should return user when credentials are valid', async () => {
-      mockUsersService.validateUser.mockResolvedValue(mockUser);
+      usersService.validateUser.mockResolvedValue(mockUser as any);
 
       const result = await service.validateUser('TrainerAsh', 'password');
 
@@ -171,7 +173,7 @@ describe('AuthService', () => {
     });
 
     it('should return null when credentials are invalid', async () => {
-      mockUsersService.validateUser.mockResolvedValue(null);
+      usersService.validateUser.mockResolvedValue(null);
 
       const result = await service.validateUser('TrainerAsh', 'wrong');
 
