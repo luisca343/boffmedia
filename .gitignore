@@ -16,6 +16,7 @@ apps/*/package-lock.json
 apps/api/*.json
 !apps/api/package.json
 !apps/api/nest-cli.json
+!apps/api/tsconfig.spec.json
 
 public/
 laboon/
