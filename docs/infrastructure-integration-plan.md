@@ -38,7 +38,7 @@
 | 6 | GitLab CI validate stage | Broken code reaches production | 2 hours | `[ ]` |
 | 7 | Strict TypeScript enforcement | Compounding type debt | 1 day | `[ ]` |
 | 8 | Global exception filter | Inconsistent error responses | Half a day | `[x]` Done 2026-05-17 |
-| 9 | Core test coverage baseline | Agent verification has no teeth | Ongoing | `[ ]` |
+| 9 | Core test coverage baseline | Agent verification has no teeth | Ongoing | `[x]` 104 service specs + 32 controller specs done — 2161 tests |
 | 10 | End-to-end validation | No proof the full stack works together | 1 session | `[ ]` |
 
 ---
@@ -298,11 +298,10 @@ export class AppModule implements NestModule {
 
 ### Grafana alerts
 
-- [!] Configure notification channel — email BLOCKED 2026-05-17:
+- [x] Configure notification channel — email working 2026-05-18:
   - SMTP configured in `/docker/config/grafana/grafana.ini` (smtp.gmail.com:587, luisca343@gmail.com)
-  - Contact point API call returned no response — SMTP not delivering yet
-  - Likely cause: Gmail App Password not set correctly, or 2FA not enabled on account
-  - **Before retrying**: confirm App Password is generated at myaccount.google.com → Security → App passwords
+  - Fix: lines were commented out with `;` — uncommented `enabled`, `host`, `user`, `password`, `from_address`, `from_name`
+  - Gmail App Password generated at myaccount.google.com → Security → App passwords (requires 2FA)
   - Alerts below are NOT created yet — no contact point to route to
 
 - [ ] Create alert: **API error rate > 1% for 5 minutes**
@@ -1180,7 +1179,8 @@ CREATE DATABASE smartrotom_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
 
 ### Unit tests — service layer
 
-**130 tests, 9 suites — all passing.**
+**2161 tests, 132 suites (1 skipped) — all passing 2026-05-18.**
+**104 service unit specs complete. 32 controller integration specs complete.**
 
 **SmartRotom Bank (highest risk — virtual currency)**
 - [x] `transfer()` — happy path, zero/negative amount rejected, same account rejected, insufficient balance, source/dest not found, DB failure
@@ -1278,7 +1278,7 @@ coverageThreshold: {
 
 ### Verification
 
-- [x] All tests pass — 165 tests, 12 suites, zero failures (`jest --runInBand --forceExit`) — updated 2026-05-18
+- [x] All tests pass — 2161 tests, 132 suites (1 skipped), zero failures (`jest --runInBand --forceExit`) — updated 2026-05-18
 - [ ] Coverage report generated — deferred (full coverage run risks OOM; run in CI with resource limits)
 - [ ] Coverage warnings appear in CI output (not failures)
 - [ ] Deliberately break `StarbankTransactionService.transfer()` — confirm Jest catches it

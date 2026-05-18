@@ -215,7 +215,7 @@ describe('WingullFacadeService', () => {
 
       const result = await service.givePokemon('test-uuid', 'pikachu lvl:5');
 
-      expect(playerService.givePokemon).toHaveBeenCalledWith('test-uuid', 'pikachu lvl:5', undefined);
+      expect(playerService.givePokemon).toHaveBeenCalledWith('test-uuid', 'pikachu lvl:5', true);
     });
   });
 
@@ -232,12 +232,13 @@ describe('WingullFacadeService', () => {
 
   describe('getPerformance', () => {
     it('should return server performance data', async () => {
-      worldService.getPerformance.mockResolvedValue({ tps: 20 });
+      const perf = { tps: '20', players: 5, memory: 4.2, uptime: '1d 2h' };
+      worldService.getPerformance.mockResolvedValue(perf);
 
       const result = await service.getPerformance();
 
       expect(worldService.getPerformance).toHaveBeenCalledTimes(1);
-      expect(result).toEqual({ tps: 20 });
+      expect(result).toEqual(perf);
     });
   });
 

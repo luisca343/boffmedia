@@ -60,7 +60,7 @@ export class PasswordService {
     }
 
     try {
-      return bcrypt.compare(password, hash);
+      return await bcrypt.compare(password, hash);
     } catch (error: any) {
       this.logger.error('Password verification error:', error);
       return false;

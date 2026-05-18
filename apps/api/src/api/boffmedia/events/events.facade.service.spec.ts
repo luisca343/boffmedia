@@ -51,8 +51,8 @@ describe('EventsFacadeService', () => {
       | 'updateTeam'
       | 'validateTeamExists'
       | 'validateTeamInEvent'
-      | 'addMemberToTeam'
-      | 'removeMemberFromTeam'
+      | 'joinTeam'
+      | 'leaveTeam'
     >
   >;
   let participantsService: jest.Mocked<
@@ -61,15 +61,15 @@ describe('EventsFacadeService', () => {
       | 'getEventParticipants'
       | 'getOrCreateParticipantByUserId'
       | 'getParticipantAchievements'
-      | 'registerParticipant'
+      | 'joinEvent'
     >
   >;
   let progressService: jest.Mocked<Pick<ProgressService, 'updateProgress'>>;
   let leaderboardsService: jest.Mocked<
     Pick<
       LeaderboardsService,
-      | 'getLeaderboards'
-      | 'getLeaderboard'
+      | 'getGlobalLeaderboard'
+      | 'getEventLeaderboard'
       | 'getTeamLeaderboard'
       | 'getParticipantRanking'
       | 'getTopAchievers'
@@ -114,19 +114,19 @@ describe('EventsFacadeService', () => {
       updateTeam: jest.fn(),
       validateTeamExists: jest.fn(),
       validateTeamInEvent: jest.fn(),
-      addMemberToTeam: jest.fn(),
-      removeMemberFromTeam: jest.fn(),
+      joinTeam: jest.fn(),
+      leaveTeam: jest.fn(),
     };
     const mockParticipantsService = {
       getEventParticipants: jest.fn(),
       getOrCreateParticipantByUserId: jest.fn(),
       getParticipantAchievements: jest.fn(),
-      registerParticipant: jest.fn(),
+      joinEvent: jest.fn(),
     };
     const mockProgressService = { updateProgress: jest.fn() };
     const mockLeaderboardsService = {
-      getLeaderboards: jest.fn(),
-      getLeaderboard: jest.fn(),
+      getGlobalLeaderboard: jest.fn(),
+      getEventLeaderboard: jest.fn(),
       getTeamLeaderboard: jest.fn(),
       getParticipantRanking: jest.fn(),
       getTopAchievers: jest.fn(),
@@ -482,7 +482,7 @@ describe('EventsFacadeService', () => {
 
   describe('getLeaderboards', () => {
     it('should return global leaderboard', async () => {
-      leaderboardsService.getLeaderboards.mockResolvedValue([mockLeaderboardEntry] as any);
+      leaderboardsService.getGlobalLeaderboard.mockResolvedValue([mockLeaderboardEntry] as any);
 
       const result = await service.getLeaderboards();
 
@@ -493,7 +493,7 @@ describe('EventsFacadeService', () => {
   describe('getLeaderboard', () => {
     it('should return event leaderboard when event exists', async () => {
       eventsService.validateEventExists.mockResolvedValue(true);
-      leaderboardsService.getLeaderboard.mockResolvedValue([mockLeaderboardEntry] as any);
+      leaderboardsService.getEventLeaderboard.mockResolvedValue([mockLeaderboardEntry] as any);
 
       const result = await service.getLeaderboard(1);
 
