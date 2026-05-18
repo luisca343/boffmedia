@@ -17,6 +17,7 @@ module.exports = {
       '<rootDir>/(coverage|dist|lib|tmp)./',
     ],
     coverageDirectory: 'coverage',
+    coverageProvider: 'v8',
     coverageReporters: ['text-summary', 'cobertura', 'lcov'],
     collectCoverage: false,
     collectCoverageFrom: [
