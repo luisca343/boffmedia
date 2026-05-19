@@ -11,7 +11,10 @@ const mockDb = {
   insert: jest.fn().mockReturnValue(mockInsert),
 };
 
-const mockStarbank = { getMainAccount: jest.fn(), transferFromSystem: jest.fn() };
+const mockStarbank = {
+  getMainAccount: jest.fn(),
+  transferFromSystem: jest.fn(),
+};
 const mockLogger = { log: jest.fn(), warn: jest.fn(), error: jest.fn() };
 
 describe('SmartrotomService', () => {

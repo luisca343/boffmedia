@@ -86,10 +86,19 @@ describe('ScrapeFacadeService', () => {
 
   describe('resolveLocalFile()', () => {
     it('delegates to myrientScrapeService', async () => {
-      mockMyrientService.resolveLocalFile.mockResolvedValue({ filePath: '/path', safeName: 'game' });
-      const result = await service.resolveLocalFile(MyrientConsole.PS2, 'game.iso');
+      mockMyrientService.resolveLocalFile.mockResolvedValue({
+        filePath: '/path',
+        safeName: 'game',
+      });
+      const result = await service.resolveLocalFile(
+        MyrientConsole.PS2,
+        'game.iso',
+      );
       expect(result.filePath).toBe('/path');
-      expect(mockMyrientService.resolveLocalFile).toHaveBeenCalledWith(MyrientConsole.PS2, 'game.iso');
+      expect(mockMyrientService.resolveLocalFile).toHaveBeenCalledWith(
+        MyrientConsole.PS2,
+        'game.iso',
+      );
     });
   });
 
@@ -97,7 +106,10 @@ describe('ScrapeFacadeService', () => {
     it('delegates to myrientScrapeService', async () => {
       mockMyrientService.getLocalGames.mockResolvedValue({ games: [] });
       await service.getLocalGames(MyrientConsole.PS2, ['EUR']);
-      expect(mockMyrientService.getLocalGames).toHaveBeenCalledWith(MyrientConsole.PS2, ['EUR']);
+      expect(mockMyrientService.getLocalGames).toHaveBeenCalledWith(
+        MyrientConsole.PS2,
+        ['EUR'],
+      );
     });
   });
 
@@ -105,14 +117,19 @@ describe('ScrapeFacadeService', () => {
     it('delegates to myrientScrapeService.scrapeCatalog', async () => {
       mockMyrientService.scrapeCatalog.mockResolvedValue({ items: [] });
       await service.getMyrientCatalog(MyrientConsole.PS2, ['EUR']);
-      expect(mockMyrientService.scrapeCatalog).toHaveBeenCalledWith(MyrientConsole.PS2, ['EUR']);
+      expect(mockMyrientService.scrapeCatalog).toHaveBeenCalledWith(
+        MyrientConsole.PS2,
+        ['EUR'],
+      );
     });
 
     it('wraps scrape errors with a descriptive message', async () => {
-      mockMyrientService.scrapeCatalog.mockRejectedValue(new Error('network timeout'));
-      await expect(service.getMyrientCatalog(MyrientConsole.PS2, ['EUR'])).rejects.toThrow(
-        'Failed to scrape catalog: network timeout',
+      mockMyrientService.scrapeCatalog.mockRejectedValue(
+        new Error('network timeout'),
       );
+      await expect(
+        service.getMyrientCatalog(MyrientConsole.PS2, ['EUR']),
+      ).rejects.toThrow('Failed to scrape catalog: network timeout');
     });
   });
 
@@ -120,20 +137,26 @@ describe('ScrapeFacadeService', () => {
     it('delegates to myrientScrapeService.downloadGame', async () => {
       mockMyrientService.downloadGame.mockResolvedValue({ success: true });
       await service.downloadGame('http://example.com/game.iso');
-      expect(mockMyrientService.downloadGame).toHaveBeenCalledWith('http://example.com/game.iso');
+      expect(mockMyrientService.downloadGame).toHaveBeenCalledWith(
+        'http://example.com/game.iso',
+      );
     });
 
     it('wraps download errors with a descriptive message', async () => {
-      mockMyrientService.downloadGame.mockRejectedValue(new Error('connection refused'));
-      await expect(service.downloadGame('http://example.com/game.iso')).rejects.toThrow(
-        'Failed to download game: connection refused',
+      mockMyrientService.downloadGame.mockRejectedValue(
+        new Error('connection refused'),
       );
+      await expect(
+        service.downloadGame('http://example.com/game.iso'),
+      ).rejects.toThrow('Failed to download game: connection refused');
     });
   });
 
   describe('downloadAllGames()', () => {
     it('wraps errors with a descriptive message', async () => {
-      mockMyrientService.downloadAllGames.mockRejectedValue(new Error('storage full'));
+      mockMyrientService.downloadAllGames.mockRejectedValue(
+        new Error('storage full'),
+      );
       await expect(service.downloadAllGames({} as any)).rejects.toThrow(
         'Bulk download failed: storage full',
       );
@@ -142,7 +165,9 @@ describe('ScrapeFacadeService', () => {
 
   describe('downloadSelectedGames()', () => {
     it('wraps errors with a descriptive message', async () => {
-      mockMyrientService.downloadSelectedGames.mockRejectedValue(new Error('missing file'));
+      mockMyrientService.downloadSelectedGames.mockRejectedValue(
+        new Error('missing file'),
+      );
       await expect(service.downloadSelectedGames({} as any)).rejects.toThrow(
         'Selected download failed: missing file',
       );
@@ -153,13 +178,17 @@ describe('ScrapeFacadeService', () => {
 
   describe('searchManga()', () => {
     it('delegates to mangaScraperService.searchNovels', async () => {
-      mockMangaScraperService.searchNovels.mockResolvedValue([{ title: 'One Piece' }]);
+      mockMangaScraperService.searchNovels.mockResolvedValue([
+        { title: 'One Piece' },
+      ]);
       const result = await service.searchManga('one piece');
       expect(result).toHaveLength(1);
     });
 
     it('wraps search errors', async () => {
-      mockMangaScraperService.searchNovels.mockRejectedValue(new Error('scrape failed'));
+      mockMangaScraperService.searchNovels.mockRejectedValue(
+        new Error('scrape failed'),
+      );
       await expect(service.searchManga('query')).rejects.toThrow(
         'Failed to search manga: scrape failed',
       );
@@ -177,19 +206,23 @@ describe('ScrapeFacadeService', () => {
 
   describe('getMangaChapters()', () => {
     it('wraps chapter list errors', async () => {
-      mockMangaScraperService.getChapterList.mockRejectedValue(new Error('timeout'));
-      await expect(service.getMangaChapters('http://example.com')).rejects.toThrow(
-        'Failed to fetch chapter list: timeout',
+      mockMangaScraperService.getChapterList.mockRejectedValue(
+        new Error('timeout'),
       );
+      await expect(
+        service.getMangaChapters('http://example.com'),
+      ).rejects.toThrow('Failed to fetch chapter list: timeout');
     });
   });
 
   describe('downloadMangaChapter()', () => {
     it('wraps download chapter errors', async () => {
-      mockMangaScraperService.downloadChapter.mockRejectedValue(new Error('io error'));
-      await expect(service.downloadMangaChapter('http://ch', '/dir')).rejects.toThrow(
-        'Failed to download chapter: io error',
+      mockMangaScraperService.downloadChapter.mockRejectedValue(
+        new Error('io error'),
       );
+      await expect(
+        service.downloadMangaChapter('http://ch', '/dir'),
+      ).rejects.toThrow('Failed to download chapter: io error');
     });
   });
 
@@ -222,7 +255,9 @@ describe('ScrapeFacadeService', () => {
 
       const result = await service.setBrowserTunnel(false);
 
-      expect(mockMangaBrowserService.setTunnelEnabled).toHaveBeenCalledWith(false);
+      expect(mockMangaBrowserService.setTunnelEnabled).toHaveBeenCalledWith(
+        false,
+      );
       expect(result).toEqual({ tunnelEnabled: false, tunnelAvailable: true });
     });
   });
@@ -244,7 +279,9 @@ describe('ScrapeFacadeService', () => {
       mockMangaCronService.syncCronJob.mockResolvedValue(undefined);
       mockMangaConfigService.getConfig.mockReturnValue(config);
 
-      const result = await service.updateMangaConfig({ cron: { enabled: false } });
+      const result = await service.updateMangaConfig({
+        cron: { enabled: false },
+      });
 
       expect(mockMangaConfigService.updateCron).toHaveBeenCalled();
       expect(mockMangaCronService.syncCronJob).toHaveBeenCalled();
@@ -290,7 +327,11 @@ describe('ScrapeFacadeService', () => {
         .mockResolvedValueOnce({ updated: true })
         .mockResolvedValueOnce({ updated: false });
 
-      const result = await service.patchMangaEpubMetadata('one-piece', ['ch1', 'ch2'], { title: 'OP' } as any);
+      const result = await service.patchMangaEpubMetadata(
+        'one-piece',
+        ['ch1', 'ch2'],
+        { title: 'OP' } as any,
+      );
 
       expect(result.updated).toBe(1);
       expect(result.results).toHaveLength(2);

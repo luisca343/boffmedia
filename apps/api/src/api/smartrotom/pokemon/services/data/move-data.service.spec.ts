@@ -5,10 +5,34 @@ import { MoveDataService } from './move-data.service';
 const mockLogger = { log: jest.fn(), warn: jest.fn(), error: jest.fn() };
 
 const mockMoves = [
-  { attackName: 'Tackle', attackType: 'Normal', attackCategory: 'Physical', power: 40, accuracy: 100 },
-  { attackName: 'Thunderbolt', attackType: 'Electric', attackCategory: 'Special', power: 90, accuracy: 100 },
-  { attackName: 'Thunder Wave', attackType: 'Electric', attackCategory: 'Status', power: 0, accuracy: 90 },
-  { attackName: 'Surf', attackType: 'Water', attackCategory: 'Special', power: 90, accuracy: 100 },
+  {
+    attackName: 'Tackle',
+    attackType: 'Normal',
+    attackCategory: 'Physical',
+    power: 40,
+    accuracy: 100,
+  },
+  {
+    attackName: 'Thunderbolt',
+    attackType: 'Electric',
+    attackCategory: 'Special',
+    power: 90,
+    accuracy: 100,
+  },
+  {
+    attackName: 'Thunder Wave',
+    attackType: 'Electric',
+    attackCategory: 'Status',
+    power: 0,
+    accuracy: 90,
+  },
+  {
+    attackName: 'Surf',
+    attackType: 'Water',
+    attackCategory: 'Special',
+    power: 90,
+    accuracy: 100,
+  },
 ];
 
 describe('MoveDataService', () => {
@@ -18,10 +42,7 @@ describe('MoveDataService', () => {
     jest.clearAllMocks();
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        MoveDataService,
-        { provide: Logger, useValue: mockLogger },
-      ],
+      providers: [MoveDataService, { provide: Logger, useValue: mockLogger }],
     }).compile();
 
     service = module.get<MoveDataService>(MoveDataService);

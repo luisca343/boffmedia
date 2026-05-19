@@ -8,7 +8,12 @@ import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter'
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { Reflector } from '@nestjs/core';
 
-const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn() };
+const mockLogger = {
+  log: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  debug: jest.fn(),
+};
 
 const mockFacade = {
   getAllQuests: jest.fn(),
@@ -27,7 +32,8 @@ const mockFacade = {
 };
 
 const VALID_UUID = '67d9b543-5ac9-41e1-a8a5-20d7689e24a4';
-const VALID_IMAGE = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJ';
+const VALID_IMAGE =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJ';
 
 describe('MisionesController — integration (ValidationPipe + GlobalExceptionFilter)', () => {
   let app: INestApplication;
@@ -44,7 +50,11 @@ describe('MisionesController — integration (ValidationPipe + GlobalExceptionFi
 
     app = moduleRef.createNestApplication();
     app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
     );
     app.useGlobalFilters(new GlobalExceptionFilter(mockLogger as any));
     await app.init();
@@ -64,7 +74,9 @@ describe('MisionesController — integration (ValidationPipe + GlobalExceptionFi
     it('returns 200 and delegates to facade.getAllQuests', async () => {
       mockFacade.getAllQuests.mockResolvedValue({ quests: [] });
 
-      const res = await request(app.getHttpServer()).get('/smartrotom/misiones');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/misiones',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getAllQuests).toHaveBeenCalledTimes(1);
@@ -73,7 +85,9 @@ describe('MisionesController — integration (ValidationPipe + GlobalExceptionFi
     it('passes force query param to facade', async () => {
       mockFacade.getAllQuests.mockResolvedValue({ quests: [] });
 
-      const res = await request(app.getHttpServer()).get('/smartrotom/misiones?force=1');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/misiones?force=1',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getAllQuests).toHaveBeenCalledWith(1);
@@ -115,8 +129,9 @@ describe('MisionesController — integration (ValidationPipe + GlobalExceptionFi
     it('returns 201 and delegates to facade.refreshQuestCache', async () => {
       mockFacade.refreshQuestCache.mockResolvedValue({ success: true });
 
-      const res = await request(app.getHttpServer())
-        .post('/smartrotom/misiones/cache/refresh');
+      const res = await request(app.getHttpServer()).post(
+        '/smartrotom/misiones/cache/refresh',
+      );
 
       expect(res.status).toBe(201);
       expect(mockFacade.refreshQuestCache).toHaveBeenCalledTimes(1);
@@ -129,7 +144,9 @@ describe('MisionesController — integration (ValidationPipe + GlobalExceptionFi
     it('returns 200 and delegates to facade.getCacheStatus', async () => {
       mockFacade.getCacheStatus.mockResolvedValue({ cached: true });
 
-      const res = await request(app.getHttpServer()).get('/smartrotom/misiones/cache/status');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/misiones/cache/status',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getCacheStatus).toHaveBeenCalledTimes(1);
@@ -168,7 +185,9 @@ describe('MisionesController — integration (ValidationPipe + GlobalExceptionFi
     it('returns 200 and delegates to facade.getAllNPCs', async () => {
       mockFacade.getAllNPCs.mockResolvedValue([]);
 
-      const res = await request(app.getHttpServer()).get('/smartrotom/misiones/npcs');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/misiones/npcs',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getAllNPCs).toHaveBeenCalledTimes(1);
@@ -181,7 +200,9 @@ describe('MisionesController — integration (ValidationPipe + GlobalExceptionFi
     it('returns 200 and delegates to facade.getNPCById with numeric id', async () => {
       mockFacade.getNPCById.mockResolvedValue({ id: 1, name: 'Professor Oak' });
 
-      const res = await request(app.getHttpServer()).get('/smartrotom/misiones/npcs/1');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/misiones/npcs/1',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getNPCById).toHaveBeenCalledWith(1);
@@ -194,8 +215,9 @@ describe('MisionesController — integration (ValidationPipe + GlobalExceptionFi
     it('returns 200 and delegates to facade.getNPCsByQuestId', async () => {
       mockFacade.getNPCsByQuestId.mockResolvedValue([]);
 
-      const res = await request(app.getHttpServer())
-        .get('/smartrotom/misiones/npcs/quest/5');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/misiones/npcs/quest/5',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getNPCsByQuestId).toHaveBeenCalledWith(5);
@@ -241,11 +263,14 @@ describe('MisionesController — integration (ValidationPipe + GlobalExceptionFi
     it('returns 200 and delegates to facade.checkNPCRenderExists', async () => {
       mockFacade.checkNPCRenderExists.mockResolvedValue({ exists: true });
 
-      const res = await request(app.getHttpServer())
-        .get('/smartrotom/misiones/images/render/professor_oak');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/misiones/images/render/professor_oak',
+      );
 
       expect(res.status).toBe(200);
-      expect(mockFacade.checkNPCRenderExists).toHaveBeenCalledWith('professor_oak');
+      expect(mockFacade.checkNPCRenderExists).toHaveBeenCalledWith(
+        'professor_oak',
+      );
     });
   });
 
@@ -255,8 +280,9 @@ describe('MisionesController — integration (ValidationPipe + GlobalExceptionFi
     it('returns 200 and delegates to facade.checkNPCImageExists', async () => {
       mockFacade.checkNPCImageExists.mockResolvedValue({ exists: false });
 
-      const res = await request(app.getHttpServer())
-        .get('/smartrotom/misiones/images/jessie');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/misiones/images/jessie',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.checkNPCImageExists).toHaveBeenCalledWith('jessie');
@@ -269,8 +295,9 @@ describe('MisionesController — integration (ValidationPipe + GlobalExceptionFi
     it('returns 200 and returns exists flag', async () => {
       mockFacade.validateUserExists.mockResolvedValue(true);
 
-      const res = await request(app.getHttpServer())
-        .get(`/smartrotom/misiones/validate/user/${VALID_UUID}`);
+      const res = await request(app.getHttpServer()).get(
+        `/smartrotom/misiones/validate/user/${VALID_UUID}`,
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.validateUserExists).toHaveBeenCalledWith(VALID_UUID);
@@ -283,7 +310,9 @@ describe('MisionesController — integration (ValidationPipe + GlobalExceptionFi
     it('returns 200 and delegates to facade.getSystemHealth', async () => {
       mockFacade.getSystemHealth.mockResolvedValue({ status: 'healthy' });
 
-      const res = await request(app.getHttpServer()).get('/smartrotom/misiones/health');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/misiones/health',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getSystemHealth).toHaveBeenCalledTimes(1);

@@ -149,7 +149,9 @@ describe('PokemonController — integration (ValidationPipe + GlobalExceptionFil
       );
 
       expect(res.status).toBe(200);
-      expect(mockPokemonFacade.getPokemonByName).toHaveBeenCalledWith('Pikachu');
+      expect(mockPokemonFacade.getPokemonByName).toHaveBeenCalledWith(
+        'Pikachu',
+      );
     });
 
     it('returns 500 when pokemon not found', async () => {
@@ -638,7 +640,9 @@ describe('PokemonController — integration (ValidationPipe + GlobalExceptionFil
 
   describe('GET /smartrotom/pokemon/pmd/portrait/:name', () => {
     it('returns 200 and delegates to facade.getPmdPortrait', async () => {
-      mockPokemonFacade.getPmdPortrait.mockResolvedValue({ url: 'https://...' });
+      mockPokemonFacade.getPmdPortrait.mockResolvedValue({
+        url: 'https://...',
+      });
 
       const res = await request(app.getHttpServer()).get(
         '/smartrotom/pokemon/pmd/portrait/Pikachu',

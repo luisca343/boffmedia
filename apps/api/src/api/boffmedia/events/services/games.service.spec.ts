@@ -77,7 +77,10 @@ describe('GamesService', () => {
       const result = await service.createGame(dto);
 
       expect(mockRepo.create).toHaveBeenCalledWith(
-        expect.objectContaining({ title: dto.title, description: dto.description }),
+        expect.objectContaining({
+          title: dto.title,
+          description: dto.description,
+        }),
       );
       expect(mockRepo.findById).toHaveBeenCalledWith(1);
       expect(result).toEqual(mockGame);
@@ -87,11 +90,18 @@ describe('GamesService', () => {
   // ─── updateGame ───────────────────────────────────────────────────────────────
 
   describe('updateGame()', () => {
-    const dto = { title: 'Updated Title', description: 'New desc', icon: 'new.png' } as any;
+    const dto = {
+      title: 'Updated Title',
+      description: 'New desc',
+      icon: 'new.png',
+    } as any;
 
     it('updates game and returns refreshed entity', async () => {
       mockRepo.update.mockResolvedValue(undefined);
-      mockRepo.findById.mockResolvedValue({ ...mockGame, title: 'Updated Title' });
+      mockRepo.findById.mockResolvedValue({
+        ...mockGame,
+        title: 'Updated Title',
+      });
 
       const result = await service.updateGame(1, dto);
 

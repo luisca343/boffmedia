@@ -1,4 +1,9 @@
-import { CanActivate, ExecutionContext, INestApplication, ValidationPipe } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  INestApplication,
+  ValidationPipe,
+} from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const request = require('supertest') as typeof import('supertest');
@@ -299,7 +304,12 @@ describe('TrackerController — integration (ValidationPipe + GlobalExceptionFil
     it('returns 400 when myTeam is missing', async () => {
       const res = await request(app.getHttpServer())
         .post('/tools/vgc/tracker/matches')
-        .send({ id: 'match-1', sessionId: 'sess-1', format: 'BO3', opponentTeam: {} });
+        .send({
+          id: 'match-1',
+          sessionId: 'sess-1',
+          format: 'BO3',
+          opponentTeam: {},
+        });
 
       expect(res.status).toBe(400);
     });

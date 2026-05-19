@@ -50,7 +50,9 @@ describe('PlayerFacadeService', () => {
     it('wraps and re-throws on error', async () => {
       mockStatsService.getPlayerStats.mockRejectedValue(new Error('API down'));
 
-      await expect(service.getStats(UUID)).rejects.toThrow('Failed to retrieve player stats');
+      await expect(service.getStats(UUID)).rejects.toThrow(
+        'Failed to retrieve player stats',
+      );
     });
   });
 
@@ -68,7 +70,9 @@ describe('PlayerFacadeService', () => {
     it('wraps and re-throws on error', async () => {
       mockTeamService.getPlayerTeam.mockRejectedValue(new Error('timeout'));
 
-      await expect(service.getTeam(UUID)).rejects.toThrow('Failed to retrieve player team');
+      await expect(service.getTeam(UUID)).rejects.toThrow(
+        'Failed to retrieve player team',
+      );
     });
   });
 });

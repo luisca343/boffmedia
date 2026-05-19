@@ -29,7 +29,12 @@ const mockFacade: jest.Mocked<Partial<ArcadeFacadeService>> = {
   getCompleteUserData: jest.fn(),
 };
 
-const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn() };
+const mockLogger = {
+  log: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  debug: jest.fn(),
+};
 
 describe('ArcadeController — integration (ValidationPipe + GlobalExceptionFilter)', () => {
   let app: INestApplication;
@@ -45,7 +50,11 @@ describe('ArcadeController — integration (ValidationPipe + GlobalExceptionFilt
 
     app = module.createNestApplication();
     app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
     );
     app.useGlobalFilters(new GlobalExceptionFilter(mockLogger as any));
     app.useGlobalInterceptors(new ResponseInterceptor(new Reflector()));
@@ -58,7 +67,6 @@ describe('ArcadeController — integration (ValidationPipe + GlobalExceptionFilt
 
   // ==================== GET /smartrotom/arcade ====================
 
-
   // ── GET /smartrotom/arcade ─────────────────────────────────────────────
   describe('GET /smartrotom/arcade', () => {
     it('returns 200', async () => {
@@ -69,13 +77,16 @@ describe('ArcadeController — integration (ValidationPipe + GlobalExceptionFilt
 
   // ==================== GET /smartrotom/arcade/banner ====================
 
-
   // ── GET /smartrotom/arcade/banner ──────────────────────────────────────
   describe('GET /smartrotom/arcade/banner', () => {
     it('returns 200 and delegates to facade.getRewardsBanner', async () => {
-      mockFacade.getRewardsBanner!.mockResolvedValue({ name: 'Test Banner' } as any);
+      mockFacade.getRewardsBanner!.mockResolvedValue({
+        name: 'Test Banner',
+      } as any);
 
-      const res = await request(app.getHttpServer()).get('/smartrotom/arcade/banner');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/arcade/banner',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getRewardsBanner).toHaveBeenCalled();
@@ -84,14 +95,14 @@ describe('ArcadeController — integration (ValidationPipe + GlobalExceptionFilt
 
   // ==================== GET /smartrotom/arcade/streak/:uuid ====================
 
-
   // ── GET /smartrotom/arcade/streak/:uuid ────────────────────────────────
   describe('GET /smartrotom/arcade/streak/:uuid', () => {
     it('returns 200 and delegates to facade.getUserStreak', async () => {
       mockFacade.getUserStreak!.mockReturnValue({ streak: 5 } as any);
 
-      const res = await request(app.getHttpServer())
-        .get(`/smartrotom/arcade/streak/${MOCK_UUID}`);
+      const res = await request(app.getHttpServer()).get(
+        `/smartrotom/arcade/streak/${MOCK_UUID}`,
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getUserStreak).toHaveBeenCalledWith(MOCK_UUID);
@@ -99,7 +110,6 @@ describe('ArcadeController — integration (ValidationPipe + GlobalExceptionFilt
   });
 
   // ==================== POST /smartrotom/arcade/streak/claim ====================
-
 
   // ── POST /smartrotom/arcade/streak/claim ───────────────────────────────
   describe('POST /smartrotom/arcade/streak/claim', () => {
@@ -125,14 +135,14 @@ describe('ArcadeController — integration (ValidationPipe + GlobalExceptionFilt
 
   // ==================== GET /smartrotom/arcade/streak/:uuid/stats ====================
 
-
   // ── GET /smartrotom/arcade/streak/:uuid/stats ──────────────────────────
   describe('GET /smartrotom/arcade/streak/:uuid/stats', () => {
     it('returns 200 and delegates to facade.getStreakStats', async () => {
       mockFacade.getStreakStats!.mockResolvedValue({ streak: 3 } as any);
 
-      const res = await request(app.getHttpServer())
-        .get(`/smartrotom/arcade/streak/${MOCK_UUID}/stats`);
+      const res = await request(app.getHttpServer()).get(
+        `/smartrotom/arcade/streak/${MOCK_UUID}/stats`,
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getStreakStats).toHaveBeenCalledWith(MOCK_UUID);
@@ -141,14 +151,14 @@ describe('ArcadeController — integration (ValidationPipe + GlobalExceptionFilt
 
   // ==================== POST /smartrotom/arcade/streak/:uuid/reset ====================
 
-
   // ── POST /smartrotom/arcade/streak/:uuid/reset ─────────────────────────
   describe('POST /smartrotom/arcade/streak/:uuid/reset', () => {
     it('returns 201 and delegates to facade.resetUserStreak', async () => {
       mockFacade.resetUserStreak!.mockResolvedValue(undefined);
 
-      const res = await request(app.getHttpServer())
-        .post(`/smartrotom/arcade/streak/${MOCK_UUID}/reset`);
+      const res = await request(app.getHttpServer()).post(
+        `/smartrotom/arcade/streak/${MOCK_UUID}/reset`,
+      );
 
       expect(res.status).toBe(201);
       expect(mockFacade.resetUserStreak).toHaveBeenCalledWith(MOCK_UUID);
@@ -157,14 +167,14 @@ describe('ArcadeController — integration (ValidationPipe + GlobalExceptionFilt
 
   // ==================== GET /smartrotom/arcade/inventory/:uuid ====================
 
-
   // ── GET /smartrotom/arcade/inventory/:uuid ─────────────────────────────
   describe('GET /smartrotom/arcade/inventory/:uuid', () => {
     it('returns 200 and delegates to facade.getUserInventory', async () => {
       mockFacade.getUserInventory!.mockResolvedValue({ items: [] } as any);
 
-      const res = await request(app.getHttpServer())
-        .get(`/smartrotom/arcade/inventory/${MOCK_UUID}`);
+      const res = await request(app.getHttpServer()).get(
+        `/smartrotom/arcade/inventory/${MOCK_UUID}`,
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getUserInventory).toHaveBeenCalledWith(MOCK_UUID);
@@ -173,16 +183,18 @@ describe('ArcadeController — integration (ValidationPipe + GlobalExceptionFilt
 
   // ==================== GET /smartrotom/arcade/inventory/:uuid/stats ====================
 
-
   // ── GET /smartrotom/arcade/inventory/:uuid/stats ───────────────────────
   describe('GET /smartrotom/arcade/inventory/:uuid/stats', () => {
     it('returns 200 and delegates to facade.getInventoryStats', async () => {
       mockFacade.getInventoryStats!.mockResolvedValue({
-        totalItems: 10, itemsByType: {}, itemsByRarity: {},
+        totalItems: 10,
+        itemsByType: {},
+        itemsByRarity: {},
       });
 
-      const res = await request(app.getHttpServer())
-        .get(`/smartrotom/arcade/inventory/${MOCK_UUID}/stats`);
+      const res = await request(app.getHttpServer()).get(
+        `/smartrotom/arcade/inventory/${MOCK_UUID}/stats`,
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getInventoryStats).toHaveBeenCalledWith(MOCK_UUID);
@@ -191,22 +203,26 @@ describe('ArcadeController — integration (ValidationPipe + GlobalExceptionFilt
 
   // ==================== GET /smartrotom/arcade/inventory/:uuid/item/:itemId ====================
 
-
   // ── GET /smartrotom/arcade/inventory/:uuid/item/:itemId ────────────────
   describe('GET /smartrotom/arcade/inventory/:uuid/item/:itemId', () => {
     it('returns 200 and delegates to facade.getUserItem', async () => {
-      mockFacade.getUserItem!.mockResolvedValue({ itemId: 'potion_heal' } as any);
+      mockFacade.getUserItem!.mockResolvedValue({
+        itemId: 'potion_heal',
+      } as any);
 
-      const res = await request(app.getHttpServer())
-        .get(`/smartrotom/arcade/inventory/${MOCK_UUID}/item/potion_heal`);
+      const res = await request(app.getHttpServer()).get(
+        `/smartrotom/arcade/inventory/${MOCK_UUID}/item/potion_heal`,
+      );
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getUserItem).toHaveBeenCalledWith(MOCK_UUID, 'potion_heal');
+      expect(mockFacade.getUserItem).toHaveBeenCalledWith(
+        MOCK_UUID,
+        'potion_heal',
+      );
     });
   });
 
   // ==================== POST /smartrotom/arcade/inventory/add ====================
-
 
   // ── POST /smartrotom/arcade/inventory/add ──────────────────────────────
   describe('POST /smartrotom/arcade/inventory/add', () => {
@@ -237,7 +253,11 @@ describe('ArcadeController — integration (ValidationPipe + GlobalExceptionFilt
     it('returns 400 when name is missing', async () => {
       const res = await request(app.getHttpServer())
         .post('/smartrotom/arcade/inventory/add')
-        .send({ uuid: MOCK_UUID, itemId: 'pixelmon:master_ball', itemType: 'ITEM' });
+        .send({
+          uuid: MOCK_UUID,
+          itemId: 'pixelmon:master_ball',
+          itemType: 'ITEM',
+        });
 
       expect(res.status).toBe(400);
     });
@@ -245,18 +265,24 @@ describe('ArcadeController — integration (ValidationPipe + GlobalExceptionFilt
 
   // ==================== POST /smartrotom/arcade/inventory/consume ====================
 
-
   // ── POST /smartrotom/arcade/inventory/consume ──────────────────────────
   describe('POST /smartrotom/arcade/inventory/consume', () => {
     it('returns 201 and delegates to facade.consumeInventoryItem', async () => {
-      mockFacade.consumeInventoryItem!.mockResolvedValue({ item: null, consumed: 1 });
+      mockFacade.consumeInventoryItem!.mockResolvedValue({
+        item: null,
+        consumed: 1,
+      });
 
       const res = await request(app.getHttpServer())
         .post('/smartrotom/arcade/inventory/consume')
         .send({ uuid: MOCK_UUID, itemId: 'trainer_box' });
 
       expect(res.status).toBe(201);
-      expect(mockFacade.consumeInventoryItem).toHaveBeenCalledWith(MOCK_UUID, 'trainer_box', 1);
+      expect(mockFacade.consumeInventoryItem).toHaveBeenCalledWith(
+        MOCK_UUID,
+        'trainer_box',
+        1,
+      );
     });
 
     it('returns 400 when itemId is missing', async () => {
@@ -270,34 +296,41 @@ describe('ArcadeController — integration (ValidationPipe + GlobalExceptionFilt
 
   // ==================== POST /smartrotom/arcade/inventory/:uuid/item/:itemId/use ====================
 
-
   // ── POST /smartrotom/arcade/inventory/:uuid/item/:itemId/use ───────────
   describe('POST /smartrotom/arcade/inventory/:uuid/item/:itemId/use', () => {
     it('returns 201 and delegates to facade.markItemAsUsed', async () => {
       mockFacade.markItemAsUsed!.mockResolvedValue({ id: 1 } as any);
 
-      const res = await request(app.getHttpServer())
-        .post(`/smartrotom/arcade/inventory/${MOCK_UUID}/item/potion_heal/use`);
+      const res = await request(app.getHttpServer()).post(
+        `/smartrotom/arcade/inventory/${MOCK_UUID}/item/potion_heal/use`,
+      );
 
       expect(res.status).toBe(201);
-      expect(mockFacade.markItemAsUsed).toHaveBeenCalledWith(MOCK_UUID, 'potion_heal');
+      expect(mockFacade.markItemAsUsed).toHaveBeenCalledWith(
+        MOCK_UUID,
+        'potion_heal',
+      );
     });
   });
 
   // ==================== POST /smartrotom/arcade/lootbox/open ====================
 
-
   // ── POST /smartrotom/arcade/lootbox/open ───────────────────────────────
   describe('POST /smartrotom/arcade/lootbox/open', () => {
     it('returns 201 and delegates to facade.openLootbox', async () => {
-      mockFacade.openLootbox!.mockResolvedValue({ item: { id: 'master_ball' } } as any);
+      mockFacade.openLootbox!.mockResolvedValue({
+        item: { id: 'master_ball' },
+      } as any);
 
       const res = await request(app.getHttpServer())
         .post('/smartrotom/arcade/lootbox/open')
         .send({ uuid: MOCK_UUID, boxId: 'trainer_box' });
 
       expect(res.status).toBe(201);
-      expect(mockFacade.openLootbox).toHaveBeenCalledWith(MOCK_UUID, 'trainer_box');
+      expect(mockFacade.openLootbox).toHaveBeenCalledWith(
+        MOCK_UUID,
+        'trainer_box',
+      );
     });
 
     it('returns 400 when boxId is missing', async () => {
@@ -311,7 +344,6 @@ describe('ArcadeController — integration (ValidationPipe + GlobalExceptionFilt
 
   // ==================== POST /smartrotom/arcade/lootbox/give ====================
 
-
   // ── POST /smartrotom/arcade/lootbox/give ───────────────────────────────
   describe('POST /smartrotom/arcade/lootbox/give', () => {
     it('returns 201 and delegates to facade.giveLootbox', async () => {
@@ -322,7 +354,11 @@ describe('ArcadeController — integration (ValidationPipe + GlobalExceptionFilt
         .send({ uuid: MOCK_UUID, lootboxType: 'trainer_box' });
 
       expect(res.status).toBe(201);
-      expect(mockFacade.giveLootbox).toHaveBeenCalledWith(MOCK_UUID, 'trainer_box', 1);
+      expect(mockFacade.giveLootbox).toHaveBeenCalledWith(
+        MOCK_UUID,
+        'trainer_box',
+        1,
+      );
     });
 
     it('returns 400 when lootboxType is missing', async () => {
@@ -336,13 +372,14 @@ describe('ArcadeController — integration (ValidationPipe + GlobalExceptionFilt
 
   // ==================== GET /smartrotom/arcade/lootbox/config ====================
 
-
   // ── GET /smartrotom/arcade/lootbox/config ──────────────────────────────
   describe('GET /smartrotom/arcade/lootbox/config', () => {
     it('returns 200 and delegates to facade.getLootboxConfig', async () => {
       mockFacade.getLootboxConfig!.mockResolvedValue({ boxes: [] } as any);
 
-      const res = await request(app.getHttpServer()).get('/smartrotom/arcade/lootbox/config');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/arcade/lootbox/config',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getLootboxConfig).toHaveBeenCalled();
@@ -350,7 +387,6 @@ describe('ArcadeController — integration (ValidationPipe + GlobalExceptionFilt
   });
 
   // ==================== POST /smartrotom/arcade/claim-items ====================
-
 
   // ── POST /smartrotom/arcade/claim-items ────────────────────────────────
   describe('POST /smartrotom/arcade/claim-items', () => {
@@ -397,7 +433,6 @@ describe('ArcadeController — integration (ValidationPipe + GlobalExceptionFilt
 
   // ==================== GET /smartrotom/arcade/user/:uuid/complete-data ====================
 
-
   // ── GET /smartrotom/arcade/user/:uuid/complete-data ────────────────────
   describe('GET /smartrotom/arcade/user/:uuid/complete-data', () => {
     it('returns 200 and delegates to facade.getCompleteUserData', async () => {
@@ -407,8 +442,9 @@ describe('ArcadeController — integration (ValidationPipe + GlobalExceptionFilt
         inventoryStats: { totalItems: 0, itemsByType: {}, itemsByRarity: {} },
       });
 
-      const res = await request(app.getHttpServer())
-        .get(`/smartrotom/arcade/user/${MOCK_UUID}/complete-data`);
+      const res = await request(app.getHttpServer()).get(
+        `/smartrotom/arcade/user/${MOCK_UUID}/complete-data`,
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getCompleteUserData).toHaveBeenCalledWith(MOCK_UUID);

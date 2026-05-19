@@ -57,7 +57,11 @@ describe('TranscriptionService', () => {
             body: {
               initial_segments: [
                 { snippet: { text: 'Hello' }, start_ms: '0', end_ms: '1000' },
-                { snippet: { text: 'World' }, start_ms: '1000', end_ms: '2000' },
+                {
+                  snippet: { text: 'World' },
+                  start_ms: '1000',
+                  end_ms: '2000',
+                },
               ],
             },
           },
@@ -97,7 +101,9 @@ describe('TranscriptionService', () => {
     });
 
     it('returns success=false for an invalid video ID', async () => {
-      jest.spyOn(service as any, 'getYoutubeClient').mockResolvedValue(mockYoutubeClient);
+      jest
+        .spyOn(service as any, 'getYoutubeClient')
+        .mockResolvedValue(mockYoutubeClient);
 
       const result = await service.getTranscription('not-a-valid-id!!');
 

@@ -7,8 +7,21 @@ import { UpdateAppDto } from './dto/update-app.dto';
 
 describe('AppsFacadeService', () => {
   let service: AppsFacadeService;
-  let appsService: jest.Mocked<Pick<AppsService, 'getAllApps' | 'getAppById' | 'createApp' | 'updateApp' | 'deleteApp'>>;
-  let userAppsService: jest.Mocked<Pick<UserAppsService, 'getAppsForPlayer' | 'addAppToPlayer' | 'removeAppFromPlayer' | 'orderAppsForPlayer'>>;
+  let appsService: jest.Mocked<
+    Pick<
+      AppsService,
+      'getAllApps' | 'getAppById' | 'createApp' | 'updateApp' | 'deleteApp'
+    >
+  >;
+  let userAppsService: jest.Mocked<
+    Pick<
+      UserAppsService,
+      | 'getAppsForPlayer'
+      | 'addAppToPlayer'
+      | 'removeAppFromPlayer'
+      | 'orderAppsForPlayer'
+    >
+  >;
 
   beforeEach(async () => {
     const mockAppsService = {
@@ -142,7 +155,10 @@ describe('AppsFacadeService', () => {
       const result = await service.removeAppFromPlayer(uuid, appId);
 
       expect(result).toEqual(mockResult);
-      expect(userAppsService.removeAppFromPlayer).toHaveBeenCalledWith(uuid, appId);
+      expect(userAppsService.removeAppFromPlayer).toHaveBeenCalledWith(
+        uuid,
+        appId,
+      );
     });
   });
 
@@ -155,7 +171,10 @@ describe('AppsFacadeService', () => {
 
       const result = await service.orderApps(order, uuid);
 
-      expect(userAppsService.orderAppsForPlayer).toHaveBeenCalledWith(order, uuid);
+      expect(userAppsService.orderAppsForPlayer).toHaveBeenCalledWith(
+        order,
+        uuid,
+      );
       expect(result).toEqual(mockResult);
     });
   });

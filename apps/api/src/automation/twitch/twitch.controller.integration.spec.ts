@@ -9,7 +9,12 @@ import { NotificationService } from './services/notification.service';
 import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter';
 import { Logger } from 'nestjs-pino';
 
-const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn() };
+const mockLogger = {
+  log: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  debug: jest.fn(),
+};
 
 const mockMonitor = {
   getMonitoringStatus: jest.fn(),
@@ -44,7 +49,11 @@ describe('TwitchController — integration (ValidationPipe + GlobalExceptionFilt
 
     app = moduleRef.createNestApplication();
     app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
     );
     app.useGlobalFilters(new GlobalExceptionFilter(mockLogger as any));
     await app.init();
@@ -65,8 +74,9 @@ describe('TwitchController — integration (ValidationPipe + GlobalExceptionFilt
       mockMonitor.getMonitoringStatus.mockReturnValue({ active: true });
       mockNotification.getTargets.mockReturnValue([{ type: 'discord' }]);
 
-      const res = await request(app.getHttpServer())
-        .get('/automation/twitch/status');
+      const res = await request(app.getHttpServer()).get(
+        '/automation/twitch/status',
+      );
 
       expect(res.status).toBeLessThan(300);
       expect(res.body).toMatchObject({ status: 'active' });
@@ -79,11 +89,15 @@ describe('TwitchController — integration (ValidationPipe + GlobalExceptionFilt
   describe('POST /automation/twitch/check-now', () => {
     it('triggers manual check and returns result', async () => {
       mockMonitor.checkStreamsNow.mockResolvedValue({ checked: 3 });
-      const res = await request(app.getHttpServer())
-        .post('/automation/twitch/check-now');
+      const res = await request(app.getHttpServer()).post(
+        '/automation/twitch/check-now',
+      );
 
       expect(res.status).toBeLessThan(300);
-      expect(res.body).toMatchObject({ message: 'Manual stream check completed', checked: 3 });
+      expect(res.body).toMatchObject({
+        message: 'Manual stream check completed',
+        checked: 3,
+      });
     });
   });
 
@@ -97,19 +111,23 @@ describe('TwitchController — integration (ValidationPipe + GlobalExceptionFilt
         game_name: 'Minecraft',
       });
 
-      const res = await request(app.getHttpServer())
-        .get('/automation/twitch/streams/user/testuser');
+      const res = await request(app.getHttpServer()).get(
+        '/automation/twitch/streams/user/testuser',
+      );
 
       expect(res.status).toBeLessThan(300);
       expect(res.body).toMatchObject({ username: 'testuser', isLive: true });
-      expect(mockTwitchApi.getStreamByUsername).toHaveBeenCalledWith('testuser');
+      expect(mockTwitchApi.getStreamByUsername).toHaveBeenCalledWith(
+        'testuser',
+      );
     });
 
     it('returns isLive false when stream is null', async () => {
       mockTwitchApi.getStreamByUsername.mockResolvedValue(null);
 
-      const res = await request(app.getHttpServer())
-        .get('/automation/twitch/streams/user/offlineuser');
+      const res = await request(app.getHttpServer()).get(
+        '/automation/twitch/streams/user/offlineuser',
+      );
 
       expect(res.status).toBeLessThan(300);
       expect(res.body).toMatchObject({ isLive: false, containsWingull: false });
@@ -122,8 +140,9 @@ describe('TwitchController — integration (ValidationPipe + GlobalExceptionFilt
         game_name: 'Minecraft',
       });
 
-      const res = await request(app.getHttpServer())
-        .get('/automation/twitch/streams/user/streamer');
+      const res = await request(app.getHttpServer()).get(
+        '/automation/twitch/streams/user/streamer',
+      );
 
       expect(res.status).toBeLessThan(300);
       expect(res.body.containsWingull).toBe(true);
@@ -137,8 +156,9 @@ describe('TwitchController — integration (ValidationPipe + GlobalExceptionFilt
       mockMonitor.addMonitoredUser.mockReturnValue(undefined);
       mockMonitor.getMonitoringStatus.mockReturnValue({ users: ['newuser'] });
 
-      const res = await request(app.getHttpServer())
-        .post('/automation/twitch/monitor/user/newuser');
+      const res = await request(app.getHttpServer()).post(
+        '/automation/twitch/monitor/user/newuser',
+      );
 
       expect(res.status).toBeLessThan(300);
       expect(mockMonitor.addMonitoredUser).toHaveBeenCalledWith('newuser');
@@ -153,8 +173,9 @@ describe('TwitchController — integration (ValidationPipe + GlobalExceptionFilt
       mockMonitor.removeMonitoredUser.mockReturnValue(undefined);
       mockMonitor.getMonitoringStatus.mockReturnValue({ users: [] });
 
-      const res = await request(app.getHttpServer())
-        .delete('/automation/twitch/monitor/user/olduser');
+      const res = await request(app.getHttpServer()).delete(
+        '/automation/twitch/monitor/user/olduser',
+      );
 
       expect(res.status).toBeLessThan(300);
       expect(mockMonitor.removeMonitoredUser).toHaveBeenCalledWith('olduser');
@@ -171,7 +192,10 @@ describe('TwitchController — integration (ValidationPipe + GlobalExceptionFilt
 
       const res = await request(app.getHttpServer())
         .post('/automation/twitch/notifications/target')
-        .send({ type: 'discord', config: { channelId: '12345', botToken: 'token' } });
+        .send({
+          type: 'discord',
+          config: { channelId: '12345', botToken: 'token' },
+        });
 
       expect(res.status).toBeLessThan(300);
       expect(mockNotification.addTarget).toHaveBeenCalled();
@@ -193,8 +217,9 @@ describe('TwitchController — integration (ValidationPipe + GlobalExceptionFilt
       mockNotification.removeTarget.mockReturnValue(undefined);
       mockNotification.getTargets.mockReturnValue([]);
 
-      const res = await request(app.getHttpServer())
-        .delete('/automation/twitch/notifications/target/discord');
+      const res = await request(app.getHttpServer()).delete(
+        '/automation/twitch/notifications/target/discord',
+      );
 
       expect(res.status).toBeLessThan(300);
       expect(mockNotification.removeTarget).toHaveBeenCalledWith('discord');

@@ -15,11 +15,20 @@ const mockRanking = [{ uuid: 'test-uuid', totalValue: 500, rank: 1 }];
 describe('MineFacadeService', () => {
   let service: MineFacadeService;
   let energyService: jest.Mocked<
-    Pick<EnergyService, 'getPlayerEnergy' | 'validateEnergyForPlay' | 'consumeEnergy'>
+    Pick<
+      EnergyService,
+      'getPlayerEnergy' | 'validateEnergyForPlay' | 'consumeEnergy'
+    >
   >;
   let gameService: jest.Mocked<Pick<GameService, 'startGame' | 'endGame'>>;
   let rewardService: jest.Mocked<
-    Pick<RewardService, 'getAllRewards' | 'getRewardsByType' | 'getRewardDropRates' | 'validateRewardsExist'>
+    Pick<
+      RewardService,
+      | 'getAllRewards'
+      | 'getRewardsByType'
+      | 'getRewardDropRates'
+      | 'validateRewardsExist'
+    >
   >;
   let playerService: jest.Mocked<
     Pick<
@@ -98,7 +107,9 @@ describe('MineFacadeService', () => {
     it('should throw descriptive error when energy service fails', async () => {
       energyService.getPlayerEnergy.mockRejectedValue(new Error('DB error'));
 
-      await expect(service.getPlayerEnergy('test-uuid')).rejects.toThrow('Failed to retrieve energy');
+      await expect(service.getPlayerEnergy('test-uuid')).rejects.toThrow(
+        'Failed to retrieve energy',
+      );
     });
   });
 
@@ -120,7 +131,9 @@ describe('MineFacadeService', () => {
 
       const result = await service.playGame({ uuid: 'test-uuid' });
 
-      expect(result).toEqual({ error: 'No tienes suficiente energía para jugar.' });
+      expect(result).toEqual({
+        error: 'No tienes suficiente energía para jugar.',
+      });
       expect(gameService.startGame).not.toHaveBeenCalled();
     });
   });
@@ -130,7 +143,10 @@ describe('MineFacadeService', () => {
       rewardService.validateRewardsExist.mockResolvedValue(true);
       gameService.endGame.mockResolvedValue(mockGameEnd as any);
 
-      const result = await service.endGame({ uuid: 'test-uuid', rewards: [{ id: 1, value: 100 }] });
+      const result = await service.endGame({
+        uuid: 'test-uuid',
+        rewards: [{ id: 1, value: 100 }],
+      });
 
       expect(gameService.endGame).toHaveBeenCalled();
       expect(result).toEqual(mockGameEnd);
@@ -183,7 +199,10 @@ describe('MineFacadeService', () => {
 
   describe('getPlayerRank', () => {
     it('should return rank for specific player', async () => {
-      playerService.getPlayerRank.mockResolvedValue({ rank: 1, totalValue: 500 });
+      playerService.getPlayerRank.mockResolvedValue({
+        rank: 1,
+        totalValue: 500,
+      });
 
       const result = await service.getPlayerRank('test-uuid');
 
@@ -207,7 +226,9 @@ describe('MineFacadeService', () => {
 
       const result = await service.getUnclaimedRewards('test-uuid');
 
-      expect(playerService.getUnclaimedRewards).toHaveBeenCalledWith('test-uuid');
+      expect(playerService.getUnclaimedRewards).toHaveBeenCalledWith(
+        'test-uuid',
+      );
       expect(result).toEqual(unclaimed);
     });
   });
@@ -259,7 +280,9 @@ describe('MineFacadeService', () => {
 
       const result = await service.validateRewardsExist([1, 2, 3]);
 
-      expect(rewardService.validateRewardsExist).toHaveBeenCalledWith([1, 2, 3]);
+      expect(rewardService.validateRewardsExist).toHaveBeenCalledWith([
+        1, 2, 3,
+      ]);
       expect(result).toBe(true);
     });
 

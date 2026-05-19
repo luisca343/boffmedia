@@ -54,16 +54,23 @@ describe('BattleAchievementService', () => {
   describe('processBattleAchievement() — happy path', () => {
     beforeEach(() => {
       mockAchievementsService.validateAchievementExists.mockResolvedValue(true);
-      mockAchievementsService.checkUserHasAchievement.mockResolvedValue({ completed: null });
+      mockAchievementsService.checkUserHasAchievement.mockResolvedValue({
+        completed: null,
+      });
       mockReplaysService.createReplay.mockResolvedValue({ insertId: 10 });
       mockReplaysService.createUserReplay.mockResolvedValue({ insertId: 99 });
-      mockAchievementsService.createUserAchievement.mockResolvedValue({ insertId: 200 });
+      mockAchievementsService.createUserAchievement.mockResolvedValue({
+        insertId: 200,
+      });
     });
 
     it('returns success and unlocks achievement', async () => {
       const result = await service.processBattleAchievement(validBattle);
 
-      expect(result).toEqual({ success: true, message: 'Achievement unlocked successfully' });
+      expect(result).toEqual({
+        success: true,
+        message: 'Achievement unlocked successfully',
+      });
     });
 
     it('creates replay with name1 as winner', async () => {
@@ -92,13 +99,18 @@ describe('BattleAchievementService', () => {
     it('creates user-replay association with the replay insertId', async () => {
       await service.processBattleAchievement(validBattle);
 
-      expect(mockReplaysService.createUserReplay).toHaveBeenCalledWith(UUID, 10);
+      expect(mockReplaysService.createUserReplay).toHaveBeenCalledWith(
+        UUID,
+        10,
+      );
     });
 
     it('creates user achievement with completed=1 and dataId=replayId', async () => {
       await service.processBattleAchievement(validBattle);
 
-      expect(mockAchievementsService.createUserAchievement).toHaveBeenCalledWith(
+      expect(
+        mockAchievementsService.createUserAchievement,
+      ).toHaveBeenCalledWith(
         expect.objectContaining({
           uuid: UUID,
           achievementId: LOGRO,
@@ -111,14 +123,18 @@ describe('BattleAchievementService', () => {
 
     it('executes steps in order: validate → check status → replay → user-replay → achievement', async () => {
       const callOrder: string[] = [];
-      mockAchievementsService.validateAchievementExists.mockImplementation(async () => {
-        callOrder.push('validateExists');
-        return true;
-      });
-      mockAchievementsService.checkUserHasAchievement.mockImplementation(async () => {
-        callOrder.push('checkStatus');
-        return { completed: null };
-      });
+      mockAchievementsService.validateAchievementExists.mockImplementation(
+        async () => {
+          callOrder.push('validateExists');
+          return true;
+        },
+      );
+      mockAchievementsService.checkUserHasAchievement.mockImplementation(
+        async () => {
+          callOrder.push('checkStatus');
+          return { completed: null };
+        },
+      );
       mockReplaysService.createReplay.mockImplementation(async () => {
         callOrder.push('createReplay');
         return { insertId: 10 };
@@ -127,10 +143,12 @@ describe('BattleAchievementService', () => {
         callOrder.push('createUserReplay');
         return { insertId: 99 };
       });
-      mockAchievementsService.createUserAchievement.mockImplementation(async () => {
-        callOrder.push('createAchievement');
-        return { insertId: 200 };
-      });
+      mockAchievementsService.createUserAchievement.mockImplementation(
+        async () => {
+          callOrder.push('createAchievement');
+          return { insertId: 200 };
+        },
+      );
 
       await service.processBattleAchievement(validBattle);
 
@@ -148,38 +166,60 @@ describe('BattleAchievementService', () => {
 
   describe('processBattleAchievement() — early exits', () => {
     it('throws NotFoundException when achievement does not exist', async () => {
-      mockAchievementsService.validateAchievementExists.mockResolvedValue(false);
+      mockAchievementsService.validateAchievementExists.mockResolvedValue(
+        false,
+      );
 
-      await expect(service.processBattleAchievement(validBattle)).rejects.toThrow(NotFoundException);
+      await expect(
+        service.processBattleAchievement(validBattle),
+      ).rejects.toThrow(NotFoundException);
       expect(mockReplaysService.createReplay).not.toHaveBeenCalled();
     });
 
     it('returns already-completed response when achievement is already done', async () => {
       mockAchievementsService.validateAchievementExists.mockResolvedValue(true);
-      mockAchievementsService.checkUserHasAchievement.mockResolvedValue({ completed: 1 });
+      mockAchievementsService.checkUserHasAchievement.mockResolvedValue({
+        completed: 1,
+      });
 
       const result = await service.processBattleAchievement(validBattle);
 
-      expect(result).toEqual({ success: false, message: 'Achievement already completed' });
+      expect(result).toEqual({
+        success: false,
+        message: 'Achievement already completed',
+      });
       expect(mockReplaysService.createReplay).not.toHaveBeenCalled();
     });
 
     it('returns requires-victory response when victoria is false', async () => {
       mockAchievementsService.validateAchievementExists.mockResolvedValue(true);
-      mockAchievementsService.checkUserHasAchievement.mockResolvedValue({ completed: null });
+      mockAchievementsService.checkUserHasAchievement.mockResolvedValue({
+        completed: null,
+      });
 
-      const result = await service.processBattleAchievement({ ...validBattle, victoria: false });
+      const result = await service.processBattleAchievement({
+        ...validBattle,
+        victoria: false,
+      });
 
-      expect(result).toEqual({ success: false, message: 'Achievement requires victory' });
+      expect(result).toEqual({
+        success: false,
+        message: 'Achievement requires victory',
+      });
       expect(mockReplaysService.createReplay).not.toHaveBeenCalled();
     });
 
     it('proceeds when completed is null (achievement exists but user has not done it)', async () => {
       mockAchievementsService.validateAchievementExists.mockResolvedValue(true);
-      mockAchievementsService.checkUserHasAchievement.mockResolvedValue({ completed: null, error: 'Achievement not found' });
+      mockAchievementsService.checkUserHasAchievement.mockResolvedValue({
+        completed: null,
+        error: 'Achievement not found',
+      });
       mockReplaysService.createReplay.mockResolvedValue({ insertId: 10 });
       mockReplaysService.createUserReplay.mockResolvedValue({ insertId: 99 });
-      mockAchievementsService.createUserAchievement.mockResolvedValue({ insertId: 200 });
+      mockAchievementsService.createUserAchievement.mockResolvedValue({
+        insertId: 200,
+      });
 
       const result = await service.processBattleAchievement(validBattle);
 
@@ -204,19 +244,28 @@ describe('BattleAchievementService', () => {
 
     it('throws BadRequestException when team1 is not an array', async () => {
       await expect(
-        service.processBattleAchievement({ ...validBattle, team1: null as any }),
+        service.processBattleAchievement({
+          ...validBattle,
+          team1: null as any,
+        }),
       ).rejects.toThrow(BadRequestException);
     });
 
     it('throws BadRequestException when team2 is not an array', async () => {
       await expect(
-        service.processBattleAchievement({ ...validBattle, team2: 'not-array' as any }),
+        service.processBattleAchievement({
+          ...validBattle,
+          team2: 'not-array' as any,
+        }),
       ).rejects.toThrow(BadRequestException);
     });
 
     it('throws BadRequestException when victoria is not a boolean', async () => {
       await expect(
-        service.processBattleAchievement({ ...validBattle, victoria: undefined as any }),
+        service.processBattleAchievement({
+          ...validBattle,
+          victoria: undefined as any,
+        }),
       ).rejects.toThrow(BadRequestException);
     });
   });

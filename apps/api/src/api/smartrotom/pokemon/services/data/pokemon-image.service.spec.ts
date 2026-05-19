@@ -28,7 +28,9 @@ const mockForm = {
       palettes: [
         {
           name: 'none',
-          sprite: { resource: 'pixelmon:pokemon/025_pikachu/all/base/none/sprite.png' },
+          sprite: {
+            resource: 'pixelmon:pokemon/025_pikachu/all/base/none/sprite.png',
+          },
         },
       ],
     },
@@ -144,7 +146,9 @@ describe('PokemonImageService', () => {
     });
 
     it('returns palette.sprite.resource when available', () => {
-      const palette = { sprite: { resource: 'pixelmon:pokemon/025/sprite.png' } };
+      const palette = {
+        sprite: { resource: 'pixelmon:pokemon/025/sprite.png' },
+      };
       const result = service.getSpriteURL(palette, 25);
       expect(result).toBe('pixelmon:pokemon/025/sprite.png');
     });

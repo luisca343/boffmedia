@@ -4,7 +4,11 @@ import { AchievementsService } from './services/achievements.service';
 import { ReplaysService } from './services/replays.service';
 import { BattleAchievementService } from './services/battle-achievement.service';
 
-const mockAchievement = { uuid: 'test-uuid', achievementId: 'first_win', completed: 1 };
+const mockAchievement = {
+  uuid: 'test-uuid',
+  achievementId: 'first_win',
+  completed: 1,
+};
 const mockReplay = { id: 1, uuid: 'test-uuid', data: 'replay-data' };
 
 describe('AchievementFacadeService', () => {
@@ -12,7 +16,10 @@ describe('AchievementFacadeService', () => {
   let achievementsService: jest.Mocked<
     Pick<
       AchievementsService,
-      'getUserAchievements' | 'getUserAchievementById' | 'checkUserHasAchievement' | 'createUserAchievement'
+      | 'getUserAchievements'
+      | 'getUserAchievementById'
+      | 'checkUserHasAchievement'
+      | 'createUserAchievement'
     >
   >;
   let replaysService: jest.Mocked<
@@ -45,7 +52,10 @@ describe('AchievementFacadeService', () => {
         AchievementFacadeService,
         { provide: AchievementsService, useValue: mockAchievementsService },
         { provide: ReplaysService, useValue: mockReplaysService },
-        { provide: BattleAchievementService, useValue: mockBattleAchievementService },
+        {
+          provide: BattleAchievementService,
+          useValue: mockBattleAchievementService,
+        },
       ],
     }).compile();
 
@@ -61,39 +71,61 @@ describe('AchievementFacadeService', () => {
 
   describe('getUserAchievements', () => {
     it('should return all achievements for a player', async () => {
-      achievementsService.getUserAchievements.mockResolvedValue([mockAchievement] as any);
+      achievementsService.getUserAchievements.mockResolvedValue([
+        mockAchievement,
+      ] as any);
 
       const result = await service.getUserAchievements('test-uuid');
 
-      expect(achievementsService.getUserAchievements).toHaveBeenCalledWith('test-uuid');
+      expect(achievementsService.getUserAchievements).toHaveBeenCalledWith(
+        'test-uuid',
+      );
       expect(result).toEqual([mockAchievement]);
     });
   });
 
   describe('getUserAchievementById', () => {
     it('should return specific achievement for player', async () => {
-      achievementsService.getUserAchievementById.mockResolvedValue(mockAchievement as any);
+      achievementsService.getUserAchievementById.mockResolvedValue(
+        mockAchievement as any,
+      );
 
-      const result = await service.getUserAchievementById('test-uuid', 'first_win');
+      const result = await service.getUserAchievementById(
+        'test-uuid',
+        'first_win',
+      );
 
-      expect(achievementsService.getUserAchievementById).toHaveBeenCalledWith('test-uuid', 'first_win');
+      expect(achievementsService.getUserAchievementById).toHaveBeenCalledWith(
+        'test-uuid',
+        'first_win',
+      );
       expect(result).toEqual(mockAchievement);
     });
   });
 
   describe('checkUserHasAchievement', () => {
     it('should return completed status', async () => {
-      achievementsService.checkUserHasAchievement.mockResolvedValue({ completed: 1 });
+      achievementsService.checkUserHasAchievement.mockResolvedValue({
+        completed: 1,
+      });
 
-      const result = await service.checkUserHasAchievement('test-uuid', 'first_win');
+      const result = await service.checkUserHasAchievement(
+        'test-uuid',
+        'first_win',
+      );
 
       expect(result).toEqual({ completed: 1 });
     });
 
     it('should return null when achievement not found', async () => {
-      achievementsService.checkUserHasAchievement.mockResolvedValue({ completed: null });
+      achievementsService.checkUserHasAchievement.mockResolvedValue({
+        completed: null,
+      });
 
-      const result = await service.checkUserHasAchievement('test-uuid', 'unknown_achievement');
+      const result = await service.checkUserHasAchievement(
+        'test-uuid',
+        'unknown_achievement',
+      );
 
       expect(result.completed).toBeNull();
     });
@@ -116,7 +148,10 @@ describe('AchievementFacadeService', () => {
 
       const result = await service.createUserReplay('test-uuid', 1);
 
-      expect(replaysService.createUserReplay).toHaveBeenCalledWith('test-uuid', 1);
+      expect(replaysService.createUserReplay).toHaveBeenCalledWith(
+        'test-uuid',
+        1,
+      );
       expect(result).toEqual({ insertId: 1 });
     });
   });
@@ -147,7 +182,10 @@ describe('AchievementFacadeService', () => {
         message: 'Achievement unlocked',
       });
 
-      const result = await service.processBattleAchievement({ uuid: 'test-uuid', won: true } as any);
+      const result = await service.processBattleAchievement({
+        uuid: 'test-uuid',
+        won: true,
+      } as any);
 
       expect(result.success).toBe(true);
     });
@@ -160,13 +198,22 @@ describe('AchievementFacadeService', () => {
       const result = await service.unlockAchievement('test-uuid', 'first_win');
 
       expect(achievementsService.createUserAchievement).toHaveBeenCalledWith(
-        expect.objectContaining({ uuid: 'test-uuid', achievementId: 'first_win', completed: 1 }),
+        expect.objectContaining({
+          uuid: 'test-uuid',
+          achievementId: 'first_win',
+          completed: 1,
+        }),
       );
-      expect(result).toEqual({ success: true, message: 'Achievement unlocked successfully' });
+      expect(result).toEqual({
+        success: true,
+        message: 'Achievement unlocked successfully',
+      });
     });
 
     it('should return failure if createUserAchievement throws', async () => {
-      achievementsService.createUserAchievement.mockRejectedValue(new Error('DB error'));
+      achievementsService.createUserAchievement.mockRejectedValue(
+        new Error('DB error'),
+      );
 
       const result = await service.unlockAchievement('test-uuid', 'first_win');
 

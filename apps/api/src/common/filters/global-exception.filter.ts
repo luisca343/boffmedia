@@ -22,7 +22,11 @@ function isDuplicateEntryError(err: unknown): boolean {
   // MySQL2 native error
   if (e['code'] === 'ER_DUP_ENTRY') return true;
   // Fallback: message-based check (covers TypeORM/Drizzle wrappers)
-  if (typeof e['message'] === 'string' && e['message'].includes('Duplicate entry')) return true;
+  if (
+    typeof e['message'] === 'string' &&
+    e['message'].includes('Duplicate entry')
+  )
+    return true;
   return false;
 }
 
@@ -38,22 +42,37 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const body = this.resolveErrorBody(exception, request);
 
     if (body.statusCode >= 500) {
-      this.logger.error({
-        err: exception instanceof Error ? { message: exception.message, stack: exception.stack } : exception,
-        path: request.url,
-        method: request.method,
-      }, 'Unhandled exception');
+      this.logger.error(
+        {
+          err:
+            exception instanceof Error
+              ? { message: exception.message, stack: exception.stack }
+              : exception,
+          path: request.url,
+          method: request.method,
+        },
+        'Unhandled exception',
+      );
     }
 
     response.status(body.statusCode).json(body);
   }
 
-  private resolveErrorBody(exception: unknown, request: Request): ErrorResponse {
+  private resolveErrorBody(
+    exception: unknown,
+    request: Request,
+  ): ErrorResponse {
     const timestamp = new Date().toISOString();
     const path = request.url;
 
     if (isDuplicateEntryError(exception)) {
-      return { statusCode: 409, error: 'CONFLICT', message: 'Duplicate entry', timestamp, path };
+      return {
+        statusCode: 409,
+        error: 'CONFLICT',
+        message: 'Duplicate entry',
+        timestamp,
+        path,
+      };
     }
 
     if (exception instanceof HttpException) {
@@ -65,7 +84,8 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
       if (typeof raw === 'object' && raw !== null) {
         const body = raw as Record<string, unknown>;
-        if (typeof body['errorCode'] === 'string') errorCode = body['errorCode'];
+        if (typeof body['errorCode'] === 'string')
+          errorCode = body['errorCode'];
         // ValidationPipe returns { message: string[] } — join into a single string
         if (Array.isArray(body['message'])) {
           message = (body['message'] as string[]).join('; ');

@@ -54,7 +54,10 @@ describe('StarbankAccountService', () => {
       providers: [
         StarbankAccountService,
         { provide: Logger, useValue: mockLogger },
-        { provide: STARBANK_ACCOUNT_REPOSITORY_TOKEN, useValue: accountRepository },
+        {
+          provide: STARBANK_ACCOUNT_REPOSITORY_TOKEN,
+          useValue: accountRepository,
+        },
       ],
     }).compile();
 
@@ -84,16 +87,23 @@ describe('StarbankAccountService', () => {
     });
 
     it('should throw when uuid is empty', async () => {
-      await expect(service.createAccount({ ...dto, uuid: '' })).rejects.toThrow('UUID is required');
+      await expect(service.createAccount({ ...dto, uuid: '' })).rejects.toThrow(
+        'UUID is required',
+      );
       expect(accountRepository.create).not.toHaveBeenCalled();
     });
 
     it('should throw when name is empty', async () => {
-      await expect(service.createAccount({ ...dto, name: '' })).rejects.toThrow('Account name is required');
+      await expect(service.createAccount({ ...dto, name: '' })).rejects.toThrow(
+        'Account name is required',
+      );
     });
 
     it('should throw when main account already exists', async () => {
-      accountRepository.findUserMainAccount.mockResolvedValue({ id: 5, balance: 0 });
+      accountRepository.findUserMainAccount.mockResolvedValue({
+        id: 5,
+        balance: 0,
+      });
 
       await expect(
         service.createAccount({ ...dto, type: AccountType.MAIN }),
@@ -103,9 +113,15 @@ describe('StarbankAccountService', () => {
 
     it('should allow creating a main account when none exists', async () => {
       accountRepository.findUserMainAccount.mockResolvedValue(null);
-      accountRepository.create.mockResolvedValue({ ...mockAccount, type: AccountType.MAIN });
+      accountRepository.create.mockResolvedValue({
+        ...mockAccount,
+        type: AccountType.MAIN,
+      });
 
-      const result = await service.createAccount({ ...dto, type: AccountType.MAIN });
+      const result = await service.createAccount({
+        ...dto,
+        type: AccountType.MAIN,
+      });
 
       expect(result.type).toBe(AccountType.MAIN);
     });
@@ -122,11 +138,14 @@ describe('StarbankAccountService', () => {
     });
 
     it('should throw when main account already exists', async () => {
-      accountRepository.findUserMainAccount.mockResolvedValue({ id: 5, balance: 100 });
+      accountRepository.findUserMainAccount.mockResolvedValue({
+        id: 5,
+        balance: 100,
+      });
 
-      await expect(service.createMainAccount('abc-123', 'TrainerAsh')).rejects.toThrow(
-        'Main account already exists',
-      );
+      await expect(
+        service.createMainAccount('abc-123', 'TrainerAsh'),
+      ).rejects.toThrow('Main account already exists');
     });
   });
 

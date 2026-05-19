@@ -16,13 +16,14 @@ const mockRepo = {
   updateNewsFeaturedStatus: jest.fn(),
 };
 
-const makeNews = (id: number, featured = 0) => ({
-  id,
-  title: `News ${id}`,
-  content: 'content',
-  featured,
-  published: 1,
-} as any);
+const makeNews = (id: number, featured = 0) =>
+  ({
+    id,
+    title: `News ${id}`,
+    content: 'content',
+    featured,
+    published: 1,
+  }) as any;
 
 describe('NewsService', () => {
   let service: NewsService;
@@ -76,7 +77,9 @@ describe('NewsService', () => {
     });
 
     it('throws when id is 0', async () => {
-      await expect(service.getNewsById(0)).rejects.toThrow('Valid news ID is required');
+      await expect(service.getNewsById(0)).rejects.toThrow(
+        'Valid news ID is required',
+      );
     });
 
     it('throws when not found', async () => {
@@ -94,15 +97,18 @@ describe('NewsService', () => {
       mockRepo.createNews.mockResolvedValue({ insertId: 1 });
       mockRepo.findNewsById.mockResolvedValue(item);
 
-      const result = await service.createNews({ title: 'Breaking News', content: 'Body' });
+      const result = await service.createNews({
+        title: 'Breaking News',
+        content: 'Body',
+      });
 
       expect(result).toEqual(item);
     });
 
     it('throws when title is missing', async () => {
-      await expect(service.createNews({ title: '', content: 'Body' })).rejects.toThrow(
-        'Title is required',
-      );
+      await expect(
+        service.createNews({ title: '', content: 'Body' }),
+      ).rejects.toThrow('Title is required');
     });
 
     it('throws when imageUrl is invalid', async () => {
@@ -116,7 +122,11 @@ describe('NewsService', () => {
       mockRepo.findNewsById.mockResolvedValue(makeNews(1));
 
       await expect(
-        service.createNews({ title: 'T', content: 'C', imageUrl: 'https://example.com/img.png' }),
+        service.createNews({
+          title: 'T',
+          content: 'C',
+          imageUrl: 'https://example.com/img.png',
+        }),
       ).resolves.toBeDefined();
     });
   });
@@ -133,7 +143,10 @@ describe('NewsService', () => {
       const result = await service.updateNews(1, { title: 'Updated' });
 
       expect(result.title).toBe('Updated');
-      expect(mockRepo.updateNews).toHaveBeenCalledWith(1, expect.objectContaining({ title: 'Updated' }));
+      expect(mockRepo.updateNews).toHaveBeenCalledWith(
+        1,
+        expect.objectContaining({ title: 'Updated' }),
+      );
     });
 
     it('creates news when not found (upsert)', async () => {
@@ -142,7 +155,10 @@ describe('NewsService', () => {
       mockRepo.createNews.mockResolvedValue({ insertId: 5 });
       mockRepo.findNewsById.mockResolvedValue(item);
 
-      const result = await service.updateNews(99, { title: 'New Article', content: 'Body' });
+      const result = await service.updateNews(99, {
+        title: 'New Article',
+        content: 'Body',
+      });
 
       expect(result.id).toBe(5);
     });
@@ -150,9 +166,9 @@ describe('NewsService', () => {
     it('throws when imageUrl is invalid', async () => {
       mockRepo.findNewsById.mockResolvedValue(makeNews(1));
 
-      await expect(service.updateNews(1, { imageUrl: 'bad-url' })).rejects.toThrow(
-        'Invalid image URL format',
-      );
+      await expect(
+        service.updateNews(1, { imageUrl: 'bad-url' }),
+      ).rejects.toThrow('Invalid image URL format');
     });
   });
 
@@ -181,7 +197,9 @@ describe('NewsService', () => {
       mockRepo.findNewsById.mockResolvedValue(makeNews(1)); // featured check
       mockRepo.findNewsById.mockResolvedValue(makeNews(2)); // published[0] check
 
-      mockRepo.findNewsById.mockImplementation((id) => Promise.resolve(makeNews(id)));
+      mockRepo.findNewsById.mockImplementation((id) =>
+        Promise.resolve(makeNews(id)),
+      );
       mockRepo.updateAllNewsPublishedStatus.mockResolvedValue(undefined);
       mockRepo.updateAllNewsFeaturedStatus.mockResolvedValue(undefined);
       mockRepo.updateNewsPublishedStatus.mockResolvedValue(undefined);
@@ -192,7 +210,10 @@ describe('NewsService', () => {
       expect(result.success).toBe(true);
       expect(mockRepo.updateAllNewsPublishedStatus).toHaveBeenCalledWith(0);
       expect(mockRepo.updateAllNewsFeaturedStatus).toHaveBeenCalledWith(0);
-      expect(mockRepo.updateNewsPublishedStatus).toHaveBeenCalledWith([2, 3], 1);
+      expect(mockRepo.updateNewsPublishedStatus).toHaveBeenCalledWith(
+        [2, 3],
+        1,
+      );
       expect(mockRepo.updateNewsFeaturedStatus).toHaveBeenCalledWith(1, 1);
     });
 
@@ -205,7 +226,9 @@ describe('NewsService', () => {
     it('throws when featured news not found', async () => {
       mockRepo.findNewsById.mockResolvedValue(null);
 
-      await expect(service.updateNewsStatus([], 99)).rejects.toThrow('Featured news not found');
+      await expect(service.updateNewsStatus([], 99)).rejects.toThrow(
+        'Featured news not found',
+      );
     });
   });
 
@@ -227,7 +250,10 @@ describe('NewsService', () => {
       mockRepo.updateNews.mockResolvedValue(undefined);
       mockRepo.findNewsById.mockResolvedValue(makeNews(3));
 
-      const result = await service.saveNews({ title: 'Updated', content: 'C' }, 3);
+      const result = await service.saveNews(
+        { title: 'Updated', content: 'C' },
+        3,
+      );
 
       expect(result.success).toBe(true);
       expect(result.id).toBe(3);

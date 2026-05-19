@@ -32,7 +32,10 @@ describe('MhwildsCacheService', () => {
 
   describe('clearCache()', () => {
     it('delegates to the repository', async () => {
-      mockRepo.clearCache.mockResolvedValue({ success: true, message: 'Cleared' });
+      mockRepo.clearCache.mockResolvedValue({
+        success: true,
+        message: 'Cleared',
+      });
 
       const result = await service.clearCache('weapons', 'en');
 

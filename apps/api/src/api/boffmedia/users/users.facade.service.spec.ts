@@ -39,7 +39,10 @@ describe('BoffMediaUsersFacadeService', () => {
     >
   >;
   let smartRotomUsersFacadeService: jest.Mocked<
-    Pick<SmartRotomUsersFacadeService, 'initializeUserAndAccounts' | 'getUserWithAccounts'>
+    Pick<
+      SmartRotomUsersFacadeService,
+      'initializeUserAndAccounts' | 'getUserWithAccounts'
+    >
   >;
   let starbankService: jest.Mocked<
     Pick<StarbankFacadeService, 'getAccounts' | 'createMainAccount'>
@@ -77,14 +80,22 @@ describe('BoffMediaUsersFacadeService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         BoffMediaUsersFacadeService,
-        { provide: BoffMediaUsersManagementService, useValue: mockUsersManagementService },
-        { provide: SmartRotomUsersFacadeService, useValue: mockSmartRotomUsersFacadeService },
+        {
+          provide: BoffMediaUsersManagementService,
+          useValue: mockUsersManagementService,
+        },
+        {
+          provide: SmartRotomUsersFacadeService,
+          useValue: mockSmartRotomUsersFacadeService,
+        },
         { provide: StarbankFacadeService, useValue: mockStarbankService },
         { provide: Logger, useValue: mockLogger },
       ],
     }).compile();
 
-    service = module.get<BoffMediaUsersFacadeService>(BoffMediaUsersFacadeService);
+    service = module.get<BoffMediaUsersFacadeService>(
+      BoffMediaUsersFacadeService,
+    );
     usersManagementService = module.get(BoffMediaUsersManagementService);
     smartRotomUsersFacadeService = module.get(SmartRotomUsersFacadeService);
     starbankService = module.get(StarbankFacadeService);
@@ -97,26 +108,40 @@ describe('BoffMediaUsersFacadeService', () => {
 
   describe('createUser', () => {
     it('should create a BoffMedia user', async () => {
-      usersManagementService.createUser.mockResolvedValue(mockBoffMediaUser as any);
+      usersManagementService.createUser.mockResolvedValue(
+        mockBoffMediaUser as any,
+      );
 
-      const result = await service.createUser({ username: 'Ash', email: 'ash@example.com', password: 'pass123' });
+      const result = await service.createUser({
+        username: 'Ash',
+        email: 'ash@example.com',
+        password: 'pass123',
+      });
 
       expect(usersManagementService.createUser).toHaveBeenCalled();
       expect(result).toEqual(mockBoffMediaUser);
     });
 
     it('should rethrow errors with descriptive message', async () => {
-      usersManagementService.createUser.mockRejectedValue(new Error('DB error'));
+      usersManagementService.createUser.mockRejectedValue(
+        new Error('DB error'),
+      );
 
       await expect(
-        service.createUser({ username: 'Ash', email: 'ash@example.com', password: 'pass123' }),
+        service.createUser({
+          username: 'Ash',
+          email: 'ash@example.com',
+          password: 'pass123',
+        }),
       ).rejects.toThrow('BoffMedia user creation failed');
     });
   });
 
   describe('getAllUsers', () => {
     it('should return all users', async () => {
-      usersManagementService.getAllUsers.mockResolvedValue([mockBoffMediaUser] as any);
+      usersManagementService.getAllUsers.mockResolvedValue([
+        mockBoffMediaUser,
+      ] as any);
 
       const result = await service.getAllUsers();
 
@@ -127,7 +152,9 @@ describe('BoffMediaUsersFacadeService', () => {
 
   describe('getUserById', () => {
     it('should return user by id', async () => {
-      usersManagementService.getUserById.mockResolvedValue(mockBoffMediaUser as any);
+      usersManagementService.getUserById.mockResolvedValue(
+        mockBoffMediaUser as any,
+      );
 
       const result = await service.getUserById(1);
 
@@ -146,22 +173,30 @@ describe('BoffMediaUsersFacadeService', () => {
 
   describe('getUserByUsername', () => {
     it('should return user by username', async () => {
-      usersManagementService.getUserByUsername.mockResolvedValue(mockBoffMediaUser as any);
+      usersManagementService.getUserByUsername.mockResolvedValue(
+        mockBoffMediaUser as any,
+      );
 
       const result = await service.getUserByUsername('Ash');
 
-      expect(usersManagementService.getUserByUsername).toHaveBeenCalledWith('Ash');
+      expect(usersManagementService.getUserByUsername).toHaveBeenCalledWith(
+        'Ash',
+      );
       expect(result).toEqual(mockBoffMediaUser);
     });
   });
 
   describe('getUserByEmail', () => {
     it('should return user by email', async () => {
-      usersManagementService.getUserByEmail.mockResolvedValue(mockBoffMediaUser as any);
+      usersManagementService.getUserByEmail.mockResolvedValue(
+        mockBoffMediaUser as any,
+      );
 
       const result = await service.getUserByEmail('ash@example.com');
 
-      expect(usersManagementService.getUserByEmail).toHaveBeenCalledWith('ash@example.com');
+      expect(usersManagementService.getUserByEmail).toHaveBeenCalledWith(
+        'ash@example.com',
+      );
       expect(result).toEqual(mockBoffMediaUser);
     });
   });
@@ -179,7 +214,10 @@ describe('BoffMediaUsersFacadeService', () => {
 
   describe('deleteUser', () => {
     it('should delete user and return success', async () => {
-      usersManagementService.deleteUser.mockResolvedValue({ success: true, message: 'Deleted' });
+      usersManagementService.deleteUser.mockResolvedValue({
+        success: true,
+        message: 'Deleted',
+      });
 
       const result = await service.deleteUser(1);
 
@@ -210,8 +248,14 @@ describe('BoffMediaUsersFacadeService', () => {
 
       const result = await service.validateUser('Ash', 'pass123');
 
-      expect(usersManagementService.validateUser).toHaveBeenCalledWith('Ash', 'pass123');
-      expect(result).toMatchObject({ sessionUser, integrations: { hasSmartRotom: true, hasStarbank: true, rolesCount: 1 } });
+      expect(usersManagementService.validateUser).toHaveBeenCalledWith(
+        'Ash',
+        'pass123',
+      );
+      expect(result).toMatchObject({
+        sessionUser,
+        integrations: { hasSmartRotom: true, hasStarbank: true, rolesCount: 1 },
+      });
     });
 
     it('should return null when credentials invalid', async () => {
@@ -225,7 +269,9 @@ describe('BoffMediaUsersFacadeService', () => {
 
   describe('validateUserExists', () => {
     it('should return true when user exists', async () => {
-      jest.spyOn(service as any, 'getUserWithIntegrations').mockResolvedValue({ id: 1 });
+      jest
+        .spyOn(service as any, 'getUserWithIntegrations')
+        .mockResolvedValue({ id: 1 });
 
       const result = await service.validateUserExists('Ash', 'username');
 
@@ -233,9 +279,14 @@ describe('BoffMediaUsersFacadeService', () => {
     });
 
     it('should return false when user does not exist', async () => {
-      jest.spyOn(service as any, 'getUserWithIntegrations').mockResolvedValue(null);
+      jest
+        .spyOn(service as any, 'getUserWithIntegrations')
+        .mockResolvedValue(null);
 
-      const result = await service.validateUserExists('unknown@email.com', 'email');
+      const result = await service.validateUserExists(
+        'unknown@email.com',
+        'email',
+      );
 
       expect(result).toBe(false);
     });

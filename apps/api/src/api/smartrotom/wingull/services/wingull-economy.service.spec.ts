@@ -39,7 +39,9 @@ describe('WingullEconomyService', () => {
     it('delegates to repo and returns result', async () => {
       mockRepo.updateBalanceInAPI.mockResolvedValue({ success: true });
 
-      await expect(service.updateBalance(dto)).resolves.toEqual({ success: true });
+      await expect(service.updateBalance(dto)).resolves.toEqual({
+        success: true,
+      });
       expect(mockRepo.updateBalanceInAPI).toHaveBeenCalledWith(dto);
     });
 

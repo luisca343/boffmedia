@@ -8,7 +8,12 @@ import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter'
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { Reflector } from '@nestjs/core';
 
-const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn() };
+const mockLogger = {
+  log: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  debug: jest.fn(),
+};
 
 const mockFacade = {
   getMessages: jest.fn(),
@@ -40,7 +45,11 @@ describe('FicusAIController — integration (ValidationPipe + GlobalExceptionFil
 
     app = moduleRef.createNestApplication();
     app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
     );
     app.useGlobalFilters(new GlobalExceptionFilter(mockLogger as any));
     await app.init();
@@ -58,8 +67,9 @@ describe('FicusAIController — integration (ValidationPipe + GlobalExceptionFil
 
   describe('GET /smartrotom/ficusai/health', () => {
     it('returns service health info', async () => {
-      const res = await request(app.getHttpServer())
-        .get('/smartrotom/ficusai/health');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/ficusai/health',
+      );
 
       expect(res.status).toBeLessThan(300);
       expect(res.body.data).toMatchObject({
@@ -99,8 +109,9 @@ describe('FicusAIController — integration (ValidationPipe + GlobalExceptionFil
     });
 
     it('returns 400 when uuid is missing', async () => {
-      const res = await request(app.getHttpServer())
-        .get('/smartrotom/ficusai/messages');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/ficusai/messages',
+      );
 
       expect(res.status).toBe(400);
     });
@@ -156,7 +167,10 @@ describe('FicusAIController — integration (ValidationPipe + GlobalExceptionFil
     it('returns 400 when uuid is missing', async () => {
       const res = await request(app.getHttpServer())
         .post('/smartrotom/ficusai/send')
-        .send({ server: 'server-1', mensaje: { sender: 'user', parts: [{ type: 'text', content: 'Hi' }] } });
+        .send({
+          server: 'server-1',
+          mensaje: { sender: 'user', parts: [{ type: 'text', content: 'Hi' }] },
+        });
 
       expect(res.status).toBe(400);
     });
@@ -175,7 +189,10 @@ describe('FicusAIController — integration (ValidationPipe + GlobalExceptionFil
       mockFacade.sendMessage.mockResolvedValue(SAMPLE_MESSAGE);
       const res = await request(app.getHttpServer())
         .post('/smartrotom/ficusai/send')
-        .send({ uuid: VALID_UUID, mensaje: { sender: 'user', parts: [{ type: 'text', content: 'Hi' }] } });
+        .send({
+          uuid: VALID_UUID,
+          mensaje: { sender: 'user', parts: [{ type: 'text', content: 'Hi' }] },
+        });
 
       expect(res.status).toBeLessThan(300);
     });
@@ -254,7 +271,10 @@ describe('FicusAIController — integration (ValidationPipe + GlobalExceptionFil
         .query({ uuid: VALID_UUID });
 
       expect(res.status).toBeLessThan(300);
-      expect(res.body.data).toMatchObject({ messageCount: 0, hasHistory: false });
+      expect(res.body.data).toMatchObject({
+        messageCount: 0,
+        hasHistory: false,
+      });
     });
 
     it('returns 500 when facade throws', async () => {

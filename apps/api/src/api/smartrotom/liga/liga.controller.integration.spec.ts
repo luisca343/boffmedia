@@ -27,7 +27,12 @@ const mockFacade: jest.Mocked<Partial<LigaFacadeService>> = {
   registerForTournament: jest.fn(),
 };
 
-const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn() };
+const mockLogger = {
+  log: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  debug: jest.fn(),
+};
 
 describe('LigaController — integration (ValidationPipe + GlobalExceptionFilter)', () => {
   let app: INestApplication;
@@ -43,7 +48,11 @@ describe('LigaController — integration (ValidationPipe + GlobalExceptionFilter
 
     app = module.createNestApplication();
     app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
     );
     app.useGlobalFilters(new GlobalExceptionFilter(mockLogger as any));
     app.useGlobalInterceptors(new ResponseInterceptor(new Reflector()));
@@ -56,20 +65,23 @@ describe('LigaController — integration (ValidationPipe + GlobalExceptionFilter
 
   // ==================== GET /smartrotom/liga/replay/:id ====================
 
-
   // ── GET /smartrotom/liga/replay/:id ────────────────────────────────────
   describe('GET /smartrotom/liga/replay/:id', () => {
     it('returns 200 and delegates to facade.getReplayById', async () => {
       mockFacade.getReplayById!.mockResolvedValue({ id: 1 } as any);
 
-      const res = await request(app.getHttpServer()).get('/smartrotom/liga/replay/1');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/liga/replay/1',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getReplayById).toHaveBeenCalledWith(1);
     });
 
     it('returns 500 when id is not numeric', async () => {
-      const res = await request(app.getHttpServer()).get('/smartrotom/liga/replay/abc');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/liga/replay/abc',
+      );
 
       // Controller manually throws Error('Invalid replay ID') — caught by GlobalExceptionFilter as 500
       expect(res.status).toBe(500);
@@ -78,13 +90,14 @@ describe('LigaController — integration (ValidationPipe + GlobalExceptionFilter
 
   // ==================== GET /smartrotom/liga/replays/recent ====================
 
-
   // ── GET /smartrotom/liga/replays/recent ────────────────────────────────
   describe('GET /smartrotom/liga/replays/recent', () => {
     it('returns 200 with default limit of 10', async () => {
       mockFacade.getRecentReplays!.mockResolvedValue([] as any);
 
-      const res = await request(app.getHttpServer()).get('/smartrotom/liga/replays/recent');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/liga/replays/recent',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getRecentReplays).toHaveBeenCalledWith(10);
@@ -93,14 +106,18 @@ describe('LigaController — integration (ValidationPipe + GlobalExceptionFilter
     it('returns 200 with custom limit', async () => {
       mockFacade.getRecentReplays!.mockResolvedValue([] as any);
 
-      const res = await request(app.getHttpServer()).get('/smartrotom/liga/replays/recent?limit=5');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/liga/replays/recent?limit=5',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getRecentReplays).toHaveBeenCalledWith(5);
     });
 
     it('returns 500 when limit is non-numeric', async () => {
-      const res = await request(app.getHttpServer()).get('/smartrotom/liga/replays/recent?limit=abc');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/liga/replays/recent?limit=abc',
+      );
 
       expect(res.status).toBe(500);
     });
@@ -108,14 +125,14 @@ describe('LigaController — integration (ValidationPipe + GlobalExceptionFilter
 
   // ==================== GET /smartrotom/liga/replays/player/:uuid ====================
 
-
   // ── GET /smartrotom/liga/replays/player/:uuid ──────────────────────────
   describe('GET /smartrotom/liga/replays/player/:uuid', () => {
     it('returns 200 and delegates to facade.getPlayerReplays', async () => {
       mockFacade.getPlayerReplays!.mockResolvedValue([] as any);
 
-      const res = await request(app.getHttpServer())
-        .get(`/smartrotom/liga/replays/player/${MOCK_UUID}`);
+      const res = await request(app.getHttpServer()).get(
+        `/smartrotom/liga/replays/player/${MOCK_UUID}`,
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getPlayerReplays).toHaveBeenCalledWith(MOCK_UUID);
@@ -124,30 +141,33 @@ describe('LigaController — integration (ValidationPipe + GlobalExceptionFilter
 
   // ==================== GET /smartrotom/liga/replays/history/:player1/:player2 ====================
 
-
   // ── GET /smartrotom/liga/replays/history/:player1/:player2 ─────────────
   describe('GET /smartrotom/liga/replays/history/:player1/:player2', () => {
     it('returns 200 and delegates to facade.getMatchHistory', async () => {
       mockFacade.getMatchHistory!.mockResolvedValue([] as any);
 
-      const res = await request(app.getHttpServer())
-        .get(`/smartrotom/liga/replays/history/${MOCK_UUID}/${MOCK_UUID2}`);
+      const res = await request(app.getHttpServer()).get(
+        `/smartrotom/liga/replays/history/${MOCK_UUID}/${MOCK_UUID2}`,
+      );
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getMatchHistory).toHaveBeenCalledWith(MOCK_UUID, MOCK_UUID2);
+      expect(mockFacade.getMatchHistory).toHaveBeenCalledWith(
+        MOCK_UUID,
+        MOCK_UUID2,
+      );
     });
   });
 
   // ==================== GET /smartrotom/liga/stats/player/:uuid ====================
-
 
   // ── GET /smartrotom/liga/stats/player/:uuid ────────────────────────────
   describe('GET /smartrotom/liga/stats/player/:uuid', () => {
     it('returns 200 and delegates to facade.getPlayerStatistics', async () => {
       mockFacade.getPlayerStatistics!.mockResolvedValue({ wins: 5 } as any);
 
-      const res = await request(app.getHttpServer())
-        .get(`/smartrotom/liga/stats/player/${MOCK_UUID}`);
+      const res = await request(app.getHttpServer()).get(
+        `/smartrotom/liga/stats/player/${MOCK_UUID}`,
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getPlayerStatistics).toHaveBeenCalledWith(MOCK_UUID);
@@ -156,13 +176,14 @@ describe('LigaController — integration (ValidationPipe + GlobalExceptionFilter
 
   // ==================== GET /smartrotom/liga/leaderboard ====================
 
-
   // ── GET /smartrotom/liga/leaderboard ───────────────────────────────────
   describe('GET /smartrotom/liga/leaderboard', () => {
     it('returns 200 with default limit of 20', async () => {
       mockFacade.getLeaderboard!.mockResolvedValue([] as any);
 
-      const res = await request(app.getHttpServer()).get('/smartrotom/liga/leaderboard');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/liga/leaderboard',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getLeaderboard).toHaveBeenCalledWith(20);
@@ -171,14 +192,14 @@ describe('LigaController — integration (ValidationPipe + GlobalExceptionFilter
 
   // ==================== GET /smartrotom/liga/ranking/:uuid ====================
 
-
   // ── GET /smartrotom/liga/ranking/:uuid ─────────────────────────────────
   describe('GET /smartrotom/liga/ranking/:uuid', () => {
     it('returns 200 when player is ranked', async () => {
       mockFacade.getPlayerRanking!.mockResolvedValue({ rank: 1 } as any);
 
-      const res = await request(app.getHttpServer())
-        .get(`/smartrotom/liga/ranking/${MOCK_UUID}`);
+      const res = await request(app.getHttpServer()).get(
+        `/smartrotom/liga/ranking/${MOCK_UUID}`,
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getPlayerRanking).toHaveBeenCalledWith(MOCK_UUID);
@@ -187,8 +208,9 @@ describe('LigaController — integration (ValidationPipe + GlobalExceptionFilter
     it('returns 500 when player is not ranked', async () => {
       mockFacade.getPlayerRanking!.mockResolvedValue(null as any);
 
-      const res = await request(app.getHttpServer())
-        .get(`/smartrotom/liga/ranking/${MOCK_UUID}`);
+      const res = await request(app.getHttpServer()).get(
+        `/smartrotom/liga/ranking/${MOCK_UUID}`,
+      );
 
       // Controller throws Error('Player not found in rankings') — GlobalExceptionFilter returns 500
       expect(res.status).toBe(500);
@@ -197,29 +219,33 @@ describe('LigaController — integration (ValidationPipe + GlobalExceptionFilter
 
   // ==================== GET /smartrotom/liga/compare/:player1/:player2 ====================
 
-
   // ── GET /smartrotom/liga/compare/:player1/:player2 ─────────────────────
   describe('GET /smartrotom/liga/compare/:player1/:player2', () => {
     it('returns 200 and delegates to facade.comparePlayerStatistics', async () => {
       mockFacade.comparePlayerStatistics!.mockResolvedValue({ diff: 0 } as any);
 
-      const res = await request(app.getHttpServer())
-        .get(`/smartrotom/liga/compare/${MOCK_UUID}/${MOCK_UUID2}`);
+      const res = await request(app.getHttpServer()).get(
+        `/smartrotom/liga/compare/${MOCK_UUID}/${MOCK_UUID2}`,
+      );
 
       expect(res.status).toBe(200);
-      expect(mockFacade.comparePlayerStatistics).toHaveBeenCalledWith(MOCK_UUID, MOCK_UUID2);
+      expect(mockFacade.comparePlayerStatistics).toHaveBeenCalledWith(
+        MOCK_UUID,
+        MOCK_UUID2,
+      );
     });
   });
 
   // ==================== GET /smartrotom/liga/tournaments ====================
-
 
   // ── GET /smartrotom/liga/tournaments ───────────────────────────────────
   describe('GET /smartrotom/liga/tournaments', () => {
     it('returns 200 and delegates to facade.getActiveTournaments', async () => {
       mockFacade.getActiveTournaments!.mockResolvedValue([] as any);
 
-      const res = await request(app.getHttpServer()).get('/smartrotom/liga/tournaments');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/liga/tournaments',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getActiveTournaments).toHaveBeenCalled();
@@ -228,20 +254,23 @@ describe('LigaController — integration (ValidationPipe + GlobalExceptionFilter
 
   // ==================== GET /smartrotom/liga/tournament/:id ====================
 
-
   // ── GET /smartrotom/liga/tournament/:id ────────────────────────────────
   describe('GET /smartrotom/liga/tournament/:id', () => {
     it('returns 200 and delegates to facade.getTournamentById', async () => {
       mockFacade.getTournamentById!.mockResolvedValue({ id: 1 } as any);
 
-      const res = await request(app.getHttpServer()).get('/smartrotom/liga/tournament/1');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/liga/tournament/1',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getTournamentById).toHaveBeenCalledWith(1);
     });
 
     it('returns 500 when id is not numeric', async () => {
-      const res = await request(app.getHttpServer()).get('/smartrotom/liga/tournament/abc');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/liga/tournament/abc',
+      );
 
       expect(res.status).toBe(500);
     });
@@ -249,13 +278,14 @@ describe('LigaController — integration (ValidationPipe + GlobalExceptionFilter
 
   // ==================== GET /smartrotom/liga/tournament/:id/matches ====================
 
-
   // ── GET /smartrotom/liga/tournament/:id/matches ────────────────────────
   describe('GET /smartrotom/liga/tournament/:id/matches', () => {
     it('returns 200 and delegates to facade.getTournamentMatches', async () => {
       mockFacade.getTournamentMatches!.mockResolvedValue([] as any);
 
-      const res = await request(app.getHttpServer()).get('/smartrotom/liga/tournament/1/matches');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/liga/tournament/1/matches',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getTournamentMatches).toHaveBeenCalledWith(1);
@@ -263,7 +293,6 @@ describe('LigaController — integration (ValidationPipe + GlobalExceptionFilter
   });
 
   // ==================== POST /smartrotom/liga/tournament ====================
-
 
   // ── POST /smartrotom/liga/tournament ───────────────────────────────────
   describe('POST /smartrotom/liga/tournament', () => {
@@ -293,7 +322,11 @@ describe('LigaController — integration (ValidationPipe + GlobalExceptionFilter
     it('returns 400 when maxParticipants is below Min(2)', async () => {
       const res = await request(app.getHttpServer())
         .post('/smartrotom/liga/tournament')
-        .send({ name: 'Copa', maxParticipants: 1, startDate: '2026-06-01T10:00:00.000Z' });
+        .send({
+          name: 'Copa',
+          maxParticipants: 1,
+          startDate: '2026-06-01T10:00:00.000Z',
+        });
 
       expect(res.status).toBe(400);
     });
@@ -301,11 +334,12 @@ describe('LigaController — integration (ValidationPipe + GlobalExceptionFilter
 
   // ==================== POST /smartrotom/liga/tournament/register ====================
 
-
   // ── POST /smartrotom/liga/tournament/register ──────────────────────────
   describe('POST /smartrotom/liga/tournament/register', () => {
     it('returns 201 and delegates to facade.registerForTournament', async () => {
-      mockFacade.registerForTournament!.mockResolvedValue({ success: true } as any);
+      mockFacade.registerForTournament!.mockResolvedValue({
+        success: true,
+      } as any);
 
       const res = await request(app.getHttpServer())
         .post('/smartrotom/liga/tournament/register')

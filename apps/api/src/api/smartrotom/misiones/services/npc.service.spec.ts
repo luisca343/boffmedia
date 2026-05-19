@@ -50,7 +50,9 @@ describe('NPCService', () => {
       const validNPC = { id: 1, name: 'Oak', text: 'Hello!', questId: 1 };
       const invalidNPC = { id: 'bad', name: '', text: 'hi', questId: 1 };
 
-      const result = await service.updateNPCs({ npcs: [validNPC, invalidNPC] as any });
+      const result = await service.updateNPCs({
+        npcs: [validNPC, invalidNPC] as any,
+      });
 
       expect(result.updated).toBe(1);
       expect(result.status).toBe('ok');
@@ -67,7 +69,9 @@ describe('NPCService', () => {
 
     it('throws when no valid NPCs remain after filtering', async () => {
       await expect(
-        service.updateNPCs({ npcs: [{ id: 'bad', name: '', text: '', questId: 'x' }] as any }),
+        service.updateNPCs({
+          npcs: [{ id: 'bad', name: '', text: '', questId: 'x' }] as any,
+        }),
       ).rejects.toThrow('No valid NPCs provided');
     });
 
@@ -107,7 +111,9 @@ describe('NPCService', () => {
     });
 
     it('returns null when NPC not found', async () => {
-      mockQuestCache.getQuestSystemData.mockResolvedValue({ npcs: [makeNPC(1)] });
+      mockQuestCache.getQuestSystemData.mockResolvedValue({
+        npcs: [makeNPC(1)],
+      });
 
       await expect(service.getNPCById(99)).resolves.toBeNull();
     });
@@ -128,7 +134,9 @@ describe('NPCService', () => {
     });
 
     it('returns empty array when no NPCs match', async () => {
-      mockQuestCache.getQuestSystemData.mockResolvedValue({ npcs: [makeNPC(1, 1)] });
+      mockQuestCache.getQuestSystemData.mockResolvedValue({
+        npcs: [makeNPC(1, 1)],
+      });
 
       await expect(service.getNPCsByQuestId(99)).resolves.toEqual([]);
     });

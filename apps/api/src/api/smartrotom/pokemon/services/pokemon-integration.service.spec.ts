@@ -42,14 +42,20 @@ describe('PokemonIntegrationService', () => {
 
       const result = await service.getTerasPokemonShowdownData();
 
-      expect(mockShowdownService.getTerasPokemonShowdownData).toHaveBeenCalledTimes(1);
+      expect(
+        mockShowdownService.getTerasPokemonShowdownData,
+      ).toHaveBeenCalledTimes(1);
       expect(result).toEqual(data);
     });
 
     it('wraps errors with descriptive message', async () => {
-      mockShowdownService.getTerasPokemonShowdownData.mockRejectedValue(new Error('data missing'));
+      mockShowdownService.getTerasPokemonShowdownData.mockRejectedValue(
+        new Error('data missing'),
+      );
 
-      await expect(service.getTerasPokemonShowdownData()).rejects.toThrow('Showdown data retrieval failed');
+      await expect(service.getTerasPokemonShowdownData()).rejects.toThrow(
+        'Showdown data retrieval failed',
+      );
     });
   });
 
@@ -68,7 +74,9 @@ describe('PokemonIntegrationService', () => {
     it('wraps errors with descriptive message', async () => {
       mockWingullFacade.updateDex.mockRejectedValue(new Error('server down'));
 
-      await expect(service.updateWingullDex('test-uuid')).rejects.toThrow('Wingull dex update failed');
+      await expect(service.updateWingullDex('test-uuid')).rejects.toThrow(
+        'Wingull dex update failed',
+      );
     });
   });
 
@@ -78,18 +86,29 @@ describe('PokemonIntegrationService', () => {
     const data = { SEEN: [1, 4, 7], CAUGHT: [1, 4] };
 
     it('updates local dex and syncs with Wingull on success', async () => {
-      mockPokedexManagement.bulkUpdateDex.mockResolvedValue({ success: true, message: 'ok', results: {} });
+      mockPokedexManagement.bulkUpdateDex.mockResolvedValue({
+        success: true,
+        message: 'ok',
+        results: {},
+      });
       mockWingullFacade.updateDex.mockResolvedValue(undefined);
 
       const result = await service.updateDexWithSync('test-uuid', data);
 
-      expect(mockPokedexManagement.bulkUpdateDex).toHaveBeenCalledWith('test-uuid', data);
+      expect(mockPokedexManagement.bulkUpdateDex).toHaveBeenCalledWith(
+        'test-uuid',
+        data,
+      );
       expect(mockWingullFacade.updateDex).toHaveBeenCalledWith('test-uuid');
       expect(result.success).toBe(true);
     });
 
     it('does not sync with Wingull when bulkUpdateDex returns success=false', async () => {
-      mockPokedexManagement.bulkUpdateDex.mockResolvedValue({ success: false, message: 'fail', results: {} });
+      mockPokedexManagement.bulkUpdateDex.mockResolvedValue({
+        success: false,
+        message: 'fail',
+        results: {},
+      });
 
       await service.updateDexWithSync('test-uuid', data);
 
@@ -97,8 +116,14 @@ describe('PokemonIntegrationService', () => {
     });
 
     it('still returns update result when Wingull sync fails', async () => {
-      mockPokedexManagement.bulkUpdateDex.mockResolvedValue({ success: true, message: 'ok', results: {} });
-      mockWingullFacade.updateDex.mockRejectedValue(new Error('wingull offline'));
+      mockPokedexManagement.bulkUpdateDex.mockResolvedValue({
+        success: true,
+        message: 'ok',
+        results: {},
+      });
+      mockWingullFacade.updateDex.mockRejectedValue(
+        new Error('wingull offline'),
+      );
 
       const result = await service.updateDexWithSync('test-uuid', data);
 
@@ -107,9 +132,13 @@ describe('PokemonIntegrationService', () => {
     });
 
     it('throws when bulkUpdateDex throws', async () => {
-      mockPokedexManagement.bulkUpdateDex.mockRejectedValue(new Error('db error'));
+      mockPokedexManagement.bulkUpdateDex.mockRejectedValue(
+        new Error('db error'),
+      );
 
-      await expect(service.updateDexWithSync('test-uuid', data)).rejects.toThrow('Dex update with sync failed');
+      await expect(
+        service.updateDexWithSync('test-uuid', data),
+      ).rejects.toThrow('Dex update with sync failed');
     });
   });
 });

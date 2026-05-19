@@ -27,7 +27,12 @@ const mockFacade: jest.Mocked<Partial<ChatappFacadeService>> = {
   endCall: jest.fn(),
 };
 
-const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn() };
+const mockLogger = {
+  log: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  debug: jest.fn(),
+};
 
 describe('ChatappController — integration (ValidationPipe + GlobalExceptionFilter)', () => {
   let app: INestApplication;
@@ -43,7 +48,11 @@ describe('ChatappController — integration (ValidationPipe + GlobalExceptionFil
 
     app = module.createNestApplication();
     app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
     );
     app.useGlobalFilters(new GlobalExceptionFilter(mockLogger as any));
     app.useGlobalInterceptors(new ResponseInterceptor(new Reflector()));
@@ -55,7 +64,6 @@ describe('ChatappController — integration (ValidationPipe + GlobalExceptionFil
   beforeEach(() => jest.clearAllMocks());
 
   // ==================== POST /smartrotom/chatapp/chat ====================
-
 
   // ── POST /smartrotom/chatapp/chat ──────────────────────────────────────
   describe('POST /smartrotom/chatapp/chat', () => {
@@ -93,14 +101,14 @@ describe('ChatappController — integration (ValidationPipe + GlobalExceptionFil
 
   // ==================== GET /smartrotom/chatapp/chats/:uuid ====================
 
-
   // ── GET /smartrotom/chatapp/chats/:uuid ────────────────────────────────
   describe('GET /smartrotom/chatapp/chats/:uuid', () => {
     it('returns 200 and calls facade.getChats', async () => {
       mockFacade.getChats!.mockResolvedValue([]);
 
-      const res = await request(app.getHttpServer())
-        .get(`/smartrotom/chatapp/chats/${MOCK_UUID}`);
+      const res = await request(app.getHttpServer()).get(
+        `/smartrotom/chatapp/chats/${MOCK_UUID}`,
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getChats).toHaveBeenCalledWith(MOCK_UUID);
@@ -108,7 +116,6 @@ describe('ChatappController — integration (ValidationPipe + GlobalExceptionFil
   });
 
   // ==================== GET /smartrotom/chatapp/chat/:chatId ====================
-
 
   // ── GET /smartrotom/chatapp/chat/:chatId ───────────────────────────────
   describe('GET /smartrotom/chatapp/chat/:chatId', () => {
@@ -126,14 +133,14 @@ describe('ChatappController — integration (ValidationPipe + GlobalExceptionFil
 
   // ==================== GET /smartrotom/chatapp/messages/:chatId ====================
 
-
   // ── GET /smartrotom/chatapp/messages/:chatId ───────────────────────────
   describe('GET /smartrotom/chatapp/messages/:chatId', () => {
     it('returns 200 and calls facade.getMessages', async () => {
       mockFacade.getMessages!.mockResolvedValue([]);
 
-      const res = await request(app.getHttpServer())
-        .get('/smartrotom/chatapp/messages/5');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/chatapp/messages/5',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getMessages).toHaveBeenCalledWith(5);
@@ -141,7 +148,6 @@ describe('ChatappController — integration (ValidationPipe + GlobalExceptionFil
   });
 
   // ==================== POST /smartrotom/chatapp/messages/:chatId ====================
-
 
   // ── POST /smartrotom/chatapp/messages/:chatId ──────────────────────────
   describe('POST /smartrotom/chatapp/messages/:chatId', () => {
@@ -179,7 +185,6 @@ describe('ChatappController — integration (ValidationPipe + GlobalExceptionFil
 
   // ==================== POST /smartrotom/chatapp/global-message ====================
 
-
   // ── POST /smartrotom/chatapp/global-message ────────────────────────────
   describe('POST /smartrotom/chatapp/global-message', () => {
     it('returns 201 and calls facade.createGlobalMessage', async () => {
@@ -200,7 +205,6 @@ describe('ChatappController — integration (ValidationPipe + GlobalExceptionFil
 
   // ==================== PUT /smartrotom/chatapp/message/:messageId ====================
 
-
   // ── PUT /smartrotom/chatapp/message/:messageId ─────────────────────────
   describe('PUT /smartrotom/chatapp/message/:messageId', () => {
     it('returns 200 and calls facade.updateMessage', async () => {
@@ -211,7 +215,11 @@ describe('ChatappController — integration (ValidationPipe + GlobalExceptionFil
         .send({ messageId: 10, content: 'Updated', uuid: MOCK_UUID });
 
       expect(res.status).toBe(200);
-      expect(mockFacade.updateMessage).toHaveBeenCalledWith(10, 'Updated', MOCK_UUID);
+      expect(mockFacade.updateMessage).toHaveBeenCalledWith(
+        10,
+        'Updated',
+        MOCK_UUID,
+      );
     });
 
     it('returns 400 when content is missing', async () => {
@@ -224,7 +232,6 @@ describe('ChatappController — integration (ValidationPipe + GlobalExceptionFil
   });
 
   // ==================== DELETE /smartrotom/chatapp/message/:messageId ====================
-
 
   // ── DELETE /smartrotom/chatapp/message/:messageId ──────────────────────
   describe('DELETE /smartrotom/chatapp/message/:messageId', () => {
@@ -250,7 +257,6 @@ describe('ChatappController — integration (ValidationPipe + GlobalExceptionFil
 
   // ==================== POST /smartrotom/chatapp/message/:messageId/read ====================
 
-
   // ── POST /smartrotom/chatapp/message/:messageId/read ───────────────────
   describe('POST /smartrotom/chatapp/message/:messageId/read', () => {
     it('returns 201 and calls facade.markMessageAsRead', async () => {
@@ -267,7 +273,6 @@ describe('ChatappController — integration (ValidationPipe + GlobalExceptionFil
 
   // ==================== POST /smartrotom/chatapp/group/:groupId/member ====================
 
-
   // ── POST /smartrotom/chatapp/group/:groupId/member ─────────────────────
   describe('POST /smartrotom/chatapp/group/:groupId/member', () => {
     it('returns 201 and calls facade.addMemberToGroup', async () => {
@@ -278,7 +283,11 @@ describe('ChatappController — integration (ValidationPipe + GlobalExceptionFil
         .send({ groupId: 3, uuid: MOCK_UUID_2, requestingUserUuid: MOCK_UUID });
 
       expect(res.status).toBe(201);
-      expect(mockFacade.addMemberToGroup).toHaveBeenCalledWith(3, MOCK_UUID_2, MOCK_UUID);
+      expect(mockFacade.addMemberToGroup).toHaveBeenCalledWith(
+        3,
+        MOCK_UUID_2,
+        MOCK_UUID,
+      );
     });
 
     it('returns 400 when uuid is missing', async () => {
@@ -292,23 +301,27 @@ describe('ChatappController — integration (ValidationPipe + GlobalExceptionFil
 
   // ==================== DELETE /smartrotom/chatapp/group/:groupId/member/:uuid ====================
 
-
   // ── DELETE /smartrotom/chatapp/group/:groupId/member/:uuid ─────────────
   describe('DELETE /smartrotom/chatapp/group/:groupId/member/:uuid', () => {
     it('returns 200 and calls facade.removeMemberFromGroup', async () => {
-      mockFacade.removeMemberFromGroup!.mockResolvedValue({ success: true } as any);
+      mockFacade.removeMemberFromGroup!.mockResolvedValue({
+        success: true,
+      } as any);
 
       const res = await request(app.getHttpServer())
         .delete(`/smartrotom/chatapp/group/3/member/${MOCK_UUID_2}`)
         .send({ groupId: 3, uuid: MOCK_UUID_2, requestingUserUuid: MOCK_UUID });
 
       expect(res.status).toBe(200);
-      expect(mockFacade.removeMemberFromGroup).toHaveBeenCalledWith(3, MOCK_UUID_2, MOCK_UUID);
+      expect(mockFacade.removeMemberFromGroup).toHaveBeenCalledWith(
+        3,
+        MOCK_UUID_2,
+        MOCK_UUID,
+      );
     });
   });
 
   // ==================== POST /smartrotom/chatapp/call/:chatId ====================
-
 
   // ── POST /smartrotom/chatapp/call/:chatId ──────────────────────────────
   describe('POST /smartrotom/chatapp/call/:chatId', () => {
@@ -333,7 +346,6 @@ describe('ChatappController — integration (ValidationPipe + GlobalExceptionFil
   });
 
   // ==================== POST /smartrotom/chatapp/call/:chatId/end ====================
-
 
   // ── POST /smartrotom/chatapp/call/:chatId/end ──────────────────────────
   describe('POST /smartrotom/chatapp/call/:chatId/end', () => {

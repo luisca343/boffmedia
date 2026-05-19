@@ -108,7 +108,9 @@ describe('WingullPlayerService', () => {
     it('delegates to repo and returns result', async () => {
       mockRepo.movePokemonInAPI.mockResolvedValue({ success: true });
 
-      await expect(service.movePokemon(dto)).resolves.toEqual({ success: true });
+      await expect(service.movePokemon(dto)).resolves.toEqual({
+        success: true,
+      });
       expect(mockRepo.movePokemonInAPI).toHaveBeenCalledWith(dto);
     });
 
@@ -211,7 +213,11 @@ describe('WingullPlayerService', () => {
       await service.givePokemon(UUID, 'Pikachu');
 
       expect(mockRepo.givePokemonInAPI).toHaveBeenCalledWith(
-        expect.objectContaining({ uuid: UUID, pokespec: 'Pikachu', sendMessage: true }),
+        expect.objectContaining({
+          uuid: UUID,
+          pokespec: 'Pikachu',
+          sendMessage: true,
+        }),
       );
     });
 
@@ -283,12 +289,16 @@ describe('WingullPlayerService', () => {
     it('delegates DTO to repo and returns result', async () => {
       mockRepo.updateBattleTeamInAPI.mockResolvedValue({ updated: true });
 
-      await expect(service.updateBattleTeam(dto)).resolves.toEqual({ updated: true });
+      await expect(service.updateBattleTeam(dto)).resolves.toEqual({
+        updated: true,
+      });
       expect(mockRepo.updateBattleTeamInAPI).toHaveBeenCalledWith(dto);
     });
 
     it('wraps and re-throws repo error', async () => {
-      mockRepo.updateBattleTeamInAPI.mockRejectedValue(new Error('invalid team'));
+      mockRepo.updateBattleTeamInAPI.mockRejectedValue(
+        new Error('invalid team'),
+      );
 
       await expect(service.updateBattleTeam(dto)).rejects.toThrow(
         'Battle team update failed: invalid team',

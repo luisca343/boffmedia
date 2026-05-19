@@ -10,7 +10,13 @@ const mockRepo = {
   deleteDocument: jest.fn(),
 };
 
-const mockDocument = { id: 1, title: 'Notes', content: 'Hello', type: 1, public: 0 } as any;
+const mockDocument = {
+  id: 1,
+  title: 'Notes',
+  content: 'Hello',
+  type: 1,
+  public: 0,
+} as any;
 
 describe('DocumentService', () => {
   let service: DocumentService;
@@ -42,14 +48,18 @@ describe('DocumentService', () => {
     });
 
     it('throws when id is 0', async () => {
-      await expect(service.getDocumentById(0)).rejects.toThrow('Valid document ID is required');
+      await expect(service.getDocumentById(0)).rejects.toThrow(
+        'Valid document ID is required',
+      );
       expect(mockRepo.findDocumentById).not.toHaveBeenCalled();
     });
 
     it('throws when document not found', async () => {
       mockRepo.findDocumentById.mockResolvedValue(null);
 
-      await expect(service.getDocumentById(99)).rejects.toThrow('Document not found');
+      await expect(service.getDocumentById(99)).rejects.toThrow(
+        'Document not found',
+      );
     });
   });
 
@@ -60,12 +70,16 @@ describe('DocumentService', () => {
       const docs = [mockDocument];
       mockRepo.findUserDocuments.mockResolvedValue(docs);
 
-      await expect(service.getUserDocuments('user-uuid')).resolves.toEqual(docs);
+      await expect(service.getUserDocuments('user-uuid')).resolves.toEqual(
+        docs,
+      );
       expect(mockRepo.findUserDocuments).toHaveBeenCalledWith('user-uuid');
     });
 
     it('throws when uuid is empty', async () => {
-      await expect(service.getUserDocuments('')).rejects.toThrow('UUID is required');
+      await expect(service.getUserDocuments('')).rejects.toThrow(
+        'UUID is required',
+      );
     });
   });
 
@@ -84,7 +98,12 @@ describe('DocumentService', () => {
 
       expect(result).toEqual(mockDocument);
       expect(mockRepo.createDocument).toHaveBeenCalledWith(
-        expect.objectContaining({ title: 'Notes', content: 'Hello', type: 1, public: 0 }),
+        expect.objectContaining({
+          title: 'Notes',
+          content: 'Hello',
+          type: 1,
+          public: 0,
+        }),
       );
     });
 
@@ -113,7 +132,11 @@ describe('DocumentService', () => {
 
     it('throws when type is not provided', async () => {
       await expect(
-        service.createDocument({ title: 'Notes', content: 'Hello', type: undefined as any }),
+        service.createDocument({
+          title: 'Notes',
+          content: 'Hello',
+          type: undefined as any,
+        }),
       ).rejects.toThrow('Document type is required');
     });
   });
@@ -124,18 +147,25 @@ describe('DocumentService', () => {
     it('updates existing document', async () => {
       mockRepo.findDocumentById.mockResolvedValueOnce(mockDocument);
       mockRepo.updateDocument.mockResolvedValue(undefined);
-      mockRepo.findDocumentById.mockResolvedValueOnce({ ...mockDocument, title: 'Updated' });
+      mockRepo.findDocumentById.mockResolvedValueOnce({
+        ...mockDocument,
+        title: 'Updated',
+      });
 
       const result = await service.updateDocument(1, { title: 'Updated' });
 
       expect(result.title).toBe('Updated');
-      expect(mockRepo.updateDocument).toHaveBeenCalledWith(1, { title: 'Updated' });
+      expect(mockRepo.updateDocument).toHaveBeenCalledWith(1, {
+        title: 'Updated',
+      });
     });
 
     it('throws when document not found', async () => {
       mockRepo.findDocumentById.mockResolvedValue(null);
 
-      await expect(service.updateDocument(99, { title: 'X' })).rejects.toThrow('Document not found');
+      await expect(service.updateDocument(99, { title: 'X' })).rejects.toThrow(
+        'Document not found',
+      );
     });
   });
 
@@ -153,7 +183,9 @@ describe('DocumentService', () => {
     it('throws when document not found', async () => {
       mockRepo.findDocumentById.mockResolvedValue(null);
 
-      await expect(service.deleteDocument(99)).rejects.toThrow('Document not found');
+      await expect(service.deleteDocument(99)).rejects.toThrow(
+        'Document not found',
+      );
       expect(mockRepo.deleteDocument).not.toHaveBeenCalled();
     });
   });

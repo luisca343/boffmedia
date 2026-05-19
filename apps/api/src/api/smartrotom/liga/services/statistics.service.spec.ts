@@ -19,7 +19,7 @@ const makeStats = (wins: number, losses: number) => ({
   winRate: wins / (wins + losses),
 });
 
-const makeReplay = (winner: string) => ({ winner } as any);
+const makeReplay = (winner: string) => ({ winner }) as any;
 
 describe('StatisticsService', () => {
   let service: StatisticsService;
@@ -98,7 +98,9 @@ describe('StatisticsService', () => {
     });
 
     it('throws when playerUuid is empty', async () => {
-      await expect(service.getPlayerStatistics('')).rejects.toThrow('Player UUID is required');
+      await expect(service.getPlayerStatistics('')).rejects.toThrow(
+        'Player UUID is required',
+      );
       expect(mockRepo.getPlayerStats).not.toHaveBeenCalled();
     });
   });
@@ -184,7 +186,9 @@ describe('StatisticsService', () => {
     });
 
     it('throws when playerUuid is empty', async () => {
-      await expect(service.getPlayerRanking('')).rejects.toThrow('Player UUID is required');
+      await expect(service.getPlayerRanking('')).rejects.toThrow(
+        'Player UUID is required',
+      );
     });
   });
 
@@ -233,7 +237,11 @@ describe('StatisticsService', () => {
 
       const result = await service.comparePlayers(PLAYER1, PLAYER2);
 
-      expect(result.headToHead).toEqual({ player1Wins: 0, player2Wins: 0, totalMatches: 0 });
+      expect(result.headToHead).toEqual({
+        player1Wins: 0,
+        player2Wins: 0,
+        totalMatches: 0,
+      });
     });
 
     it('throws when player1 is empty', async () => {

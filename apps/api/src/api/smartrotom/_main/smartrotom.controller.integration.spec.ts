@@ -9,7 +9,12 @@ import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter'
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { Reflector } from '@nestjs/core';
 
-const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn() };
+const mockLogger = {
+  log: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  debug: jest.fn(),
+};
 
 const mockSmartrotomService = {
   processRaceResult: jest.fn(),
@@ -41,7 +46,11 @@ describe('SmartrotomController — integration (ValidationPipe + GlobalException
 
     app = moduleRef.createNestApplication();
     app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
     );
     app.useGlobalFilters(new GlobalExceptionFilter(mockLogger as any));
     await app.init();
@@ -60,8 +69,9 @@ describe('SmartrotomController — integration (ValidationPipe + GlobalException
   describe('GET /smartrotom/performance', () => {
     it('returns performance data', async () => {
       mockWingullService.getPerformance.mockResolvedValue({ tps: 20 });
-      const res = await request(app.getHttpServer())
-        .get('/smartrotom/performance');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/performance',
+      );
 
       expect(res.status).toBeLessThan(300);
       expect(mockWingullService.getPerformance).toHaveBeenCalled();
@@ -69,7 +79,9 @@ describe('SmartrotomController — integration (ValidationPipe + GlobalException
     });
 
     it('returns 500 when service throws', async () => {
-      mockWingullService.getPerformance.mockRejectedValue(new Error('server error'));
+      mockWingullService.getPerformance.mockRejectedValue(
+        new Error('server error'),
+      );
       await request(app.getHttpServer())
         .get('/smartrotom/performance')
         .expect(500);
@@ -93,7 +105,9 @@ describe('SmartrotomController — integration (ValidationPipe + GlobalException
     });
 
     it('returns 500 when service throws', async () => {
-      mockSmartrotomService.processRaceResult.mockRejectedValue(new Error('db error'));
+      mockSmartrotomService.processRaceResult.mockRejectedValue(
+        new Error('db error'),
+      );
       await request(app.getHttpServer())
         .post('/smartrotom/karts/carrera')
         .send({})
@@ -105,16 +119,21 @@ describe('SmartrotomController — integration (ValidationPipe + GlobalException
 
   describe('GET /smartrotom/arceuspeak', () => {
     it('returns characters list', async () => {
-      mockSmartrotomService.getArceuspeak.mockResolvedValue([{ name: 'Arceus' }]);
-      const res = await request(app.getHttpServer())
-        .get('/smartrotom/arceuspeak');
+      mockSmartrotomService.getArceuspeak.mockResolvedValue([
+        { name: 'Arceus' },
+      ]);
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/arceuspeak',
+      );
 
       expect(res.status).toBeLessThan(300);
       expect(res.body.data).toHaveLength(1);
     });
 
     it('returns 500 when service throws', async () => {
-      mockSmartrotomService.getArceuspeak.mockRejectedValue(new Error('db error'));
+      mockSmartrotomService.getArceuspeak.mockRejectedValue(
+        new Error('db error'),
+      );
       await request(app.getHttpServer())
         .get('/smartrotom/arceuspeak')
         .expect(500);
@@ -127,17 +146,17 @@ describe('SmartrotomController — integration (ValidationPipe + GlobalException
     const validBody = { name: 'Arceus', value: 'speak_value', format: 'text' };
 
     it('creates or updates character', async () => {
-      mockSmartrotomService.createOrUpdateArceuspeak.mockResolvedValue({ ok: true });
+      mockSmartrotomService.createOrUpdateArceuspeak.mockResolvedValue({
+        ok: true,
+      });
       const res = await request(app.getHttpServer())
         .post('/smartrotom/arceuspeak')
         .send(validBody);
 
       expect(res.status).toBeLessThan(300);
-      expect(mockSmartrotomService.createOrUpdateArceuspeak).toHaveBeenCalledWith(
-        'Arceus',
-        'speak_value',
-        'text',
-      );
+      expect(
+        mockSmartrotomService.createOrUpdateArceuspeak,
+      ).toHaveBeenCalledWith('Arceus', 'speak_value', 'text');
     });
 
     it('rejects missing required fields', async () => {
@@ -153,8 +172,9 @@ describe('SmartrotomController — integration (ValidationPipe + GlobalException
   describe('GET /smartrotom/taxi/stops', () => {
     it('returns taxi stops', async () => {
       mockWingullService.getTaxiStops.mockResolvedValue([{ id: 'stop1' }]);
-      const res = await request(app.getHttpServer())
-        .get('/smartrotom/taxi/stops');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/taxi/stops',
+      );
 
       expect(res.status).toBeLessThan(300);
       expect(res.body.data).toHaveLength(1);
@@ -195,7 +215,9 @@ describe('SmartrotomController — integration (ValidationPipe + GlobalException
     });
 
     it('returns 500 when service throws', async () => {
-      mockWingullService.teleportPlayer.mockRejectedValue(new Error('wingull error'));
+      mockWingullService.teleportPlayer.mockRejectedValue(
+        new Error('wingull error'),
+      );
       await request(app.getHttpServer())
         .post('/smartrotom/taxi/teleport')
         .send(validBody)

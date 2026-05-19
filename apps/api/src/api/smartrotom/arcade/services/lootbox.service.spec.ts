@@ -51,13 +51,24 @@ describe('LootboxService', () => {
 
   describe('openLootBox()', () => {
     it('consumes a box and adds the selected item to inventory', async () => {
-      mockRepo.findUserItem.mockResolvedValue({ id: 1, itemId: 'basic-box', amount: 3 });
+      mockRepo.findUserItem.mockResolvedValue({
+        id: 1,
+        itemId: 'basic-box',
+        amount: 3,
+      });
       mockRepo.consumeItem.mockResolvedValue(undefined);
       mockRepo.addItem.mockResolvedValue({ insertId: 10 });
 
-      const result = await service.openLootBox({ uuid: 'player-uuid', boxId: 'basic-box' });
+      const result = await service.openLootBox({
+        uuid: 'player-uuid',
+        boxId: 'basic-box',
+      });
 
-      expect(mockRepo.consumeItem).toHaveBeenCalledWith('player-uuid', 'basic-box', 1);
+      expect(mockRepo.consumeItem).toHaveBeenCalledWith(
+        'player-uuid',
+        'basic-box',
+        1,
+      );
       expect(mockRepo.addItem).toHaveBeenCalled();
       expect(result.item).toBeDefined();
       expect(result.spinnerItems).toHaveLength(300);
@@ -79,7 +90,11 @@ describe('LootboxService', () => {
     });
 
     it('throws when user box amount is 0', async () => {
-      mockRepo.findUserItem.mockResolvedValue({ id: 1, itemId: 'basic-box', amount: 0 });
+      mockRepo.findUserItem.mockResolvedValue({
+        id: 1,
+        itemId: 'basic-box',
+        amount: 0,
+      });
 
       await expect(
         service.openLootBox({ uuid: 'player-uuid', boxId: 'basic-box' }),
@@ -108,9 +123,9 @@ describe('LootboxService', () => {
     });
 
     it('throws when boxId does not exist in config', async () => {
-      await expect(service.giveLootbox('player-uuid', 'mystery-box')).rejects.toThrow(
-        'Lootbox not found',
-      );
+      await expect(
+        service.giveLootbox('player-uuid', 'mystery-box'),
+      ).rejects.toThrow('Lootbox not found');
     });
   });
 

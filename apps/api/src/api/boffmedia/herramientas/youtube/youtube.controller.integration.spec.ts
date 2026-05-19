@@ -8,7 +8,12 @@ import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter'
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { Reflector } from '@nestjs/core';
 
-const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn() };
+const mockLogger = {
+  log: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  debug: jest.fn(),
+};
 
 const mockFacade = {
   getTranscription: jest.fn(),
@@ -30,7 +35,11 @@ describe('YoutubeController — integration (ValidationPipe + GlobalExceptionFil
 
     app = moduleRef.createNestApplication();
     app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
     );
     app.useGlobalFilters(new GlobalExceptionFilter(mockLogger as any));
     await app.init();
@@ -49,8 +58,9 @@ describe('YoutubeController — integration (ValidationPipe + GlobalExceptionFil
   describe('GET /boffmedia/herramientas/youtube/transcription/:videoId', () => {
     it('returns transcription for valid video id', async () => {
       mockFacade.getTranscription.mockResolvedValue({ text: 'Hello world' });
-      const res = await request(app.getHttpServer())
-        .get('/boffmedia/herramientas/youtube/transcription/dQw4w9WgXcQ');
+      const res = await request(app.getHttpServer()).get(
+        '/boffmedia/herramientas/youtube/transcription/dQw4w9WgXcQ',
+      );
 
       expect(res.status).toBeLessThan(300);
       expect(mockFacade.getTranscription).toHaveBeenCalledWith('dQw4w9WgXcQ');
@@ -69,9 +79,13 @@ describe('YoutubeController — integration (ValidationPipe + GlobalExceptionFil
 
   describe('GET /boffmedia/herramientas/youtube/video-info/:videoId', () => {
     it('returns video info for valid video id', async () => {
-      mockFacade.getVideoInfo.mockResolvedValue({ title: 'Test Video', duration: 300 });
-      const res = await request(app.getHttpServer())
-        .get('/boffmedia/herramientas/youtube/video-info/dQw4w9WgXcQ');
+      mockFacade.getVideoInfo.mockResolvedValue({
+        title: 'Test Video',
+        duration: 300,
+      });
+      const res = await request(app.getHttpServer()).get(
+        '/boffmedia/herramientas/youtube/video-info/dQw4w9WgXcQ',
+      );
 
       expect(res.status).toBeLessThan(300);
       expect(mockFacade.getVideoInfo).toHaveBeenCalledWith('dQw4w9WgXcQ');

@@ -7,7 +7,12 @@ import { AppService } from './app.service';
 import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter';
 import { Logger } from 'nestjs-pino';
 
-const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn() };
+const mockLogger = {
+  log: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  debug: jest.fn(),
+};
 
 const mockAppService = {
   getHealth: jest.fn(),
@@ -32,7 +37,9 @@ describe('AppController — integration (smoke tests)', () => {
     }).compile();
 
     app = moduleRef.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
+    );
     app.useGlobalFilters(new GlobalExceptionFilter(mockLogger as any));
     await app.init();
   });
@@ -52,7 +59,12 @@ describe('AppController — integration (smoke tests)', () => {
         timestamp: new Date().toISOString(),
         uptime: 123.45,
         connections: { database: true, wingullApi: true },
-        memory: { rss: '100MB', heapTotal: '50MB', heapUsed: '30MB', external: '5MB' },
+        memory: {
+          rss: '100MB',
+          heapTotal: '50MB',
+          heapUsed: '30MB',
+          external: '5MB',
+        },
       };
       mockAppService.getHealth.mockResolvedValue(healthResponse);
 

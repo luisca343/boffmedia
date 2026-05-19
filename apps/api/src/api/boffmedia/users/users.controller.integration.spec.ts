@@ -9,7 +9,12 @@ import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter'
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { Reflector } from '@nestjs/core';
 
-const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn() };
+const mockLogger = {
+  log: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  debug: jest.fn(),
+};
 
 const mockFacade = {
   createUser: jest.fn(),
@@ -50,7 +55,11 @@ describe('BoffMediaUsersController — integration (ValidationPipe + GlobalExcep
 
     app = moduleRef.createNestApplication();
     app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
     );
     app.useGlobalFilters(new GlobalExceptionFilter(mockLogger as any));
     await app.init();
@@ -164,7 +173,9 @@ describe('BoffMediaUsersController — integration (ValidationPipe + GlobalExcep
     it('returns paginated response shape', async () => {
       mockFacade.getAllUsers.mockResolvedValue([mockUser, mockUser]);
 
-      const res = await request(app.getHttpServer()).get('/users?limit=1&offset=0');
+      const res = await request(app.getHttpServer()).get(
+        '/users?limit=1&offset=0',
+      );
 
       expect(res.status).toBe(200);
     });
@@ -174,7 +185,10 @@ describe('BoffMediaUsersController — integration (ValidationPipe + GlobalExcep
 
   describe('GET /users/statistics', () => {
     it('returns 200 and delegates to facade.getUserStatistics', async () => {
-      mockFacade.getUserStatistics.mockResolvedValue({ total: 5, withSmartRotom: 3 });
+      mockFacade.getUserStatistics.mockResolvedValue({
+        total: 5,
+        withSmartRotom: 3,
+      });
 
       const res = await request(app.getHttpServer()).get('/users/statistics');
 
@@ -214,16 +228,26 @@ describe('BoffMediaUsersController — integration (ValidationPipe + GlobalExcep
 
   describe('GET /users/:id/integrations', () => {
     it('returns 200 and delegates to facade.getUserWithIntegrations', async () => {
-      mockFacade.getUserWithIntegrations.mockResolvedValue({ ...mockUser, smartRotom: null });
+      mockFacade.getUserWithIntegrations.mockResolvedValue({
+        ...mockUser,
+        smartRotom: null,
+      });
 
-      const res = await request(app.getHttpServer()).get('/users/1/integrations');
+      const res = await request(app.getHttpServer()).get(
+        '/users/1/integrations',
+      );
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getUserWithIntegrations).toHaveBeenCalledWith('1', 'id');
+      expect(mockFacade.getUserWithIntegrations).toHaveBeenCalledWith(
+        '1',
+        'id',
+      );
     });
 
     it('returns 400 when id is not numeric', async () => {
-      const res = await request(app.getHttpServer()).get('/users/abc/integrations');
+      const res = await request(app.getHttpServer()).get(
+        '/users/abc/integrations',
+      );
 
       expect(res.status).toBe(400);
     });
@@ -235,7 +259,9 @@ describe('BoffMediaUsersController — integration (ValidationPipe + GlobalExcep
     it('returns 200 and delegates to facade.getUserByUsername', async () => {
       mockFacade.getUserByUsername.mockResolvedValue(mockUser);
 
-      const res = await request(app.getHttpServer()).get('/users/username/TrainerAsh');
+      const res = await request(app.getHttpServer()).get(
+        '/users/username/TrainerAsh',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getUserByUsername).toHaveBeenCalledWith('TrainerAsh');
@@ -244,7 +270,9 @@ describe('BoffMediaUsersController — integration (ValidationPipe + GlobalExcep
     it('returns 404 when user is not found', async () => {
       mockFacade.getUserByUsername.mockResolvedValue(null);
 
-      const res = await request(app.getHttpServer()).get('/users/username/nobody');
+      const res = await request(app.getHttpServer()).get(
+        '/users/username/nobody',
+      );
 
       expect(res.status).toBe(404);
     });
@@ -256,7 +284,9 @@ describe('BoffMediaUsersController — integration (ValidationPipe + GlobalExcep
     it('returns 200 and delegates to facade.findByEmail', async () => {
       mockFacade.findByEmail.mockResolvedValue(mockUser);
 
-      const res = await request(app.getHttpServer()).get('/users/email/ash@pokemon.com');
+      const res = await request(app.getHttpServer()).get(
+        '/users/email/ash@pokemon.com',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.findByEmail).toHaveBeenCalledWith('ash@pokemon.com');
@@ -265,7 +295,9 @@ describe('BoffMediaUsersController — integration (ValidationPipe + GlobalExcep
     it('returns 404 when email not found', async () => {
       mockFacade.findByEmail.mockResolvedValue(null);
 
-      const res = await request(app.getHttpServer()).get('/users/email/nobody@test.com');
+      const res = await request(app.getHttpServer()).get(
+        '/users/email/nobody@test.com',
+      );
 
       expect(res.status).toBe(404);
     });
@@ -288,14 +320,20 @@ describe('BoffMediaUsersController — integration (ValidationPipe + GlobalExcep
 
   describe('PATCH /users/:id — UpdateUserDto validation', () => {
     it('returns 200 and calls facade.updateUser', async () => {
-      mockFacade.updateUser.mockResolvedValue({ ...mockUser, username: 'NewName' });
+      mockFacade.updateUser.mockResolvedValue({
+        ...mockUser,
+        username: 'NewName',
+      });
 
       const res = await request(app.getHttpServer())
         .patch('/users/1')
         .send({ username: 'NewName' });
 
       expect(res.status).toBe(200);
-      expect(mockFacade.updateUser).toHaveBeenCalledWith(1, expect.objectContaining({ username: 'NewName' }));
+      expect(mockFacade.updateUser).toHaveBeenCalledWith(
+        1,
+        expect.objectContaining({ username: 'NewName' }),
+      );
     });
 
     it('returns 400 when unknown field is present (forbidNonWhitelisted)', async () => {
@@ -319,7 +357,10 @@ describe('BoffMediaUsersController — integration (ValidationPipe + GlobalExcep
 
   describe('DELETE /users/:id', () => {
     it('returns 200 on successful delete', async () => {
-      mockFacade.deleteUser.mockResolvedValue({ success: true, message: 'Deleted' });
+      mockFacade.deleteUser.mockResolvedValue({
+        success: true,
+        message: 'Deleted',
+      });
 
       const res = await request(app.getHttpServer()).delete('/users/1');
 
@@ -345,7 +386,9 @@ describe('BoffMediaUsersController — integration (ValidationPipe + GlobalExcep
         .send({ userIds: [1, 2, 3] });
 
       expect(res.status).toBeLessThan(300);
-      expect(mockFacade.getMultipleUsersWithIntegrations).toHaveBeenCalledWith([1, 2, 3]);
+      expect(mockFacade.getMultipleUsersWithIntegrations).toHaveBeenCalledWith([
+        1, 2, 3,
+      ]);
     });
 
     it('returns 400 when userIds is missing', async () => {
@@ -379,18 +422,23 @@ describe('BoffMediaUsersController — integration (ValidationPipe + GlobalExcep
     it('returns 200 and delegates to facade.validateUserExists', async () => {
       mockFacade.validateUserExists.mockResolvedValue(true);
 
-      const res = await request(app.getHttpServer())
-        .get('/users/validate/username/TrainerAsh');
+      const res = await request(app.getHttpServer()).get(
+        '/users/validate/username/TrainerAsh',
+      );
 
       expect(res.status).toBe(200);
-      expect(mockFacade.validateUserExists).toHaveBeenCalledWith('TrainerAsh', 'username');
+      expect(mockFacade.validateUserExists).toHaveBeenCalledWith(
+        'TrainerAsh',
+        'username',
+      );
     });
 
     it('returns exists:false when user does not exist', async () => {
       mockFacade.validateUserExists.mockResolvedValue(false);
 
-      const res = await request(app.getHttpServer())
-        .get('/users/validate/email/nobody@test.com');
+      const res = await request(app.getHttpServer()).get(
+        '/users/validate/email/nobody@test.com',
+      );
 
       expect(res.status).toBe(200);
     });
@@ -399,8 +447,17 @@ describe('BoffMediaUsersController — integration (ValidationPipe + GlobalExcep
   // ── POST /users/minecraft/register — MinecraftRegistrationDto ───────────
 
   describe('POST /users/minecraft/register — MinecraftRegistrationDto validation', () => {
-    const validMinecraft = { username: 'AshMC', uuid: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4', world: 'world1' };
-    const validBody = { username: 'TrainerAsh', email: 'ash@pokemon.com', password: 'securepw1', minecraft: validMinecraft };
+    const validMinecraft = {
+      username: 'AshMC',
+      uuid: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
+      world: 'world1',
+    };
+    const validBody = {
+      username: 'TrainerAsh',
+      email: 'ash@pokemon.com',
+      password: 'securepw1',
+      minecraft: validMinecraft,
+    };
 
     it('returns 400 when username is missing', async () => {
       const { username: _u, ...body } = validBody;
@@ -439,15 +496,21 @@ describe('BoffMediaUsersController — integration (ValidationPipe + GlobalExcep
     it('returns 400 when minecraft.uuid is invalid', async () => {
       const res = await request(app.getHttpServer())
         .post('/users/minecraft/register')
-        .send({ ...validBody, minecraft: { ...validMinecraft, uuid: 'not-a-uuid' } });
+        .send({
+          ...validBody,
+          minecraft: { ...validMinecraft, uuid: 'not-a-uuid' },
+        });
 
       expect(res.status).toBe(400);
     });
 
     it('calls facade.createMinecraftUser when body is valid', async () => {
       mockFacade.createMinecraftUser.mockResolvedValue({
-        boffMediaUser: mockUser, smartRotomUser: null, starbankAccounts: [],
-        isNewBoffMediaUser: true, isNewSmartRotomUser: false,
+        boffMediaUser: mockUser,
+        smartRotomUser: null,
+        starbankAccounts: [],
+        isNewBoffMediaUser: true,
+        isNewSmartRotomUser: false,
       });
 
       const res = await request(app.getHttpServer())
@@ -456,7 +519,10 @@ describe('BoffMediaUsersController — integration (ValidationPipe + GlobalExcep
 
       expect(res.status).toBeLessThan(300);
       expect(mockFacade.createMinecraftUser).toHaveBeenCalledWith(
-        expect.objectContaining({ username: 'TrainerAsh', email: 'ash@pokemon.com' }),
+        expect.objectContaining({
+          username: 'TrainerAsh',
+          email: 'ash@pokemon.com',
+        }),
       );
     });
   });
@@ -464,8 +530,17 @@ describe('BoffMediaUsersController — integration (ValidationPipe + GlobalExcep
   // ── POST /users/minecraft/link — MinecraftLinkDto ────────────────────────
 
   describe('POST /users/minecraft/link — MinecraftLinkDto validation', () => {
-    const validMinecraft = { username: 'AshMC', uuid: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4', world: 'world1' };
-    const validBody = { username: 'TrainerAsh', email: 'ash@pokemon.com', password: 'securepw1', minecraft: validMinecraft };
+    const validMinecraft = {
+      username: 'AshMC',
+      uuid: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
+      world: 'world1',
+    };
+    const validBody = {
+      username: 'TrainerAsh',
+      email: 'ash@pokemon.com',
+      password: 'securepw1',
+      minecraft: validMinecraft,
+    };
 
     it('returns 400 when minecraft object is missing', async () => {
       const { minecraft: _mc, ...body } = validBody;
@@ -478,7 +553,9 @@ describe('BoffMediaUsersController — integration (ValidationPipe + GlobalExcep
 
     it('calls facade.linkMinecraftAccount when body is valid', async () => {
       mockFacade.linkMinecraftAccount.mockResolvedValue({
-        boffMediaUser: mockUser, smartRotomUser: null, starbankAccounts: [],
+        boffMediaUser: mockUser,
+        smartRotomUser: null,
+        starbankAccounts: [],
       });
 
       const res = await request(app.getHttpServer())
@@ -495,7 +572,11 @@ describe('BoffMediaUsersController — integration (ValidationPipe + GlobalExcep
   // ── POST /users/google/auth — GoogleAuthDto ───────────────────────────────
 
   describe('POST /users/google/auth — GoogleAuthDto validation', () => {
-    const validBody = { email: 'ash@gmail.com', name: 'Ash Ketchum', googleId: '1234567890' };
+    const validBody = {
+      email: 'ash@gmail.com',
+      name: 'Ash Ketchum',
+      googleId: '1234567890',
+    };
 
     it('returns 400 when email is missing', async () => {
       const { email: _e, ...body } = validBody;
@@ -540,7 +621,10 @@ describe('BoffMediaUsersController — integration (ValidationPipe + GlobalExcep
 
       expect(res.status).toBeLessThan(300);
       expect(mockFacade.createFromGoogle).toHaveBeenCalledWith(
-        expect.objectContaining({ email: 'ash@gmail.com', googleId: '1234567890' }),
+        expect.objectContaining({
+          email: 'ash@gmail.com',
+          googleId: '1234567890',
+        }),
       );
     });
 
@@ -592,7 +676,10 @@ describe('BoffMediaUsersController — integration (ValidationPipe + GlobalExcep
         .send(validBody);
 
       expect(res.status).toBeLessThan(300);
-      expect(mockFacade.validateUser).toHaveBeenCalledWith('TrainerAsh', 'secure123');
+      expect(mockFacade.validateUser).toHaveBeenCalledWith(
+        'TrainerAsh',
+        'secure123',
+      );
     });
   });
 
@@ -600,9 +687,7 @@ describe('BoffMediaUsersController — integration (ValidationPipe + GlobalExcep
 
   describe('GlobalExceptionFilter — error shape contract', () => {
     it('all error responses include statusCode, error, message, timestamp, path', async () => {
-      const res = await request(app.getHttpServer())
-        .post('/users')
-        .send({});
+      const res = await request(app.getHttpServer()).post('/users').send({});
 
       expect(res.body).toHaveProperty('statusCode', 400);
       expect(res.body).toHaveProperty('error');

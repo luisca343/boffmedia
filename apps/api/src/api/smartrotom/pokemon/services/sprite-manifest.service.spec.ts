@@ -23,7 +23,11 @@ const MISSINGNO =
 
 const makeManifest = (sprites: Record<string, any> = {}) => ({
   sprites,
-  count: { total: Object.keys(sprites).length, default: Object.keys(sprites).length, custom: 0 },
+  count: {
+    total: Object.keys(sprites).length,
+    default: Object.keys(sprites).length,
+    custom: 0,
+  },
   lastUpdated: new Date().toISOString(),
 });
 
@@ -75,20 +79,28 @@ describe('SpriteManifestService', () => {
     });
 
     it('returns exact match when key exists', () => {
-      expect(service.getSprite(25, 'base', 'shiny')).toBe('/pikachu/base/shiny.png');
+      expect(service.getSprite(25, 'base', 'shiny')).toBe(
+        '/pikachu/base/shiny.png',
+      );
     });
 
     it('falls back to none palette when specific palette not found', () => {
-      expect(service.getSprite(25, 'base', 'unknownpalette')).toBe('/pikachu/base/none.png');
+      expect(service.getSprite(25, 'base', 'unknownpalette')).toBe(
+        '/pikachu/base/none.png',
+      );
     });
 
     it('falls back to base form when specific form not found', () => {
       // '25:unknownform:none' → not found; fallback checks '25:base:none' → found
-      expect(service.getSprite(25, 'unknownform', 'none')).toBe('/pikachu/base/none.png');
+      expect(service.getSprite(25, 'unknownform', 'none')).toBe(
+        '/pikachu/base/none.png',
+      );
     });
 
     it('falls back to base+none when both form and palette are unknown', () => {
-      expect(service.getSprite(25, 'unknownform', 'unknownpalette')).toBe('/pikachu/base/none.png');
+      expect(service.getSprite(25, 'unknownform', 'unknownpalette')).toBe(
+        '/pikachu/base/none.png',
+      );
     });
 
     it('returns missingno when no matching key exists', () => {
@@ -102,12 +114,17 @@ describe('SpriteManifestService', () => {
     it('reads from file when manifest path exists', async () => {
       const storedManifest = makeManifest();
       (fs.existsSync as jest.Mock).mockReturnValue(true);
-      (fsPromises.readFile as jest.Mock).mockResolvedValue(JSON.stringify(storedManifest));
+      (fsPromises.readFile as jest.Mock).mockResolvedValue(
+        JSON.stringify(storedManifest),
+      );
 
       await service.loadSpriteManifest();
 
       expect(fsPromises.readFile).toHaveBeenCalled();
-      expect(service.getManifest()).toMatchObject({ sprites: {}, count: { total: 0 } });
+      expect(service.getManifest()).toMatchObject({
+        sprites: {},
+        count: { total: 0 },
+      });
     });
 
     it('generates manifest when file does not exist', async () => {
@@ -121,7 +138,9 @@ describe('SpriteManifestService', () => {
 
     it('generates manifest when reading file fails', async () => {
       (fs.existsSync as jest.Mock).mockReturnValue(true);
-      (fsPromises.readFile as jest.Mock).mockRejectedValue(new Error('disk error'));
+      (fsPromises.readFile as jest.Mock).mockRejectedValue(
+        new Error('disk error'),
+      );
       mockPokemonDataService.getAllSpecies.mockReturnValue([]);
 
       await expect(service.loadSpriteManifest()).resolves.not.toThrow();
@@ -156,7 +175,10 @@ describe('SpriteManifestService', () => {
                   palettes: [
                     {
                       name: 'shiny',
-                      sprite: { resource: 'pixelmon:pokemon/025_pikachu/all/base/shiny/sprite.png' },
+                      sprite: {
+                        resource:
+                          'pixelmon:pokemon/025_pikachu/all/base/shiny/sprite.png',
+                      },
                     },
                   ],
                 },
@@ -212,7 +234,10 @@ describe('SpriteManifestService', () => {
                   palettes: [
                     {
                       name: 'none',
-                      sprite: { resource: 'pixelmon:pokemon/025_pikachu/all/base/none/sprite.png' },
+                      sprite: {
+                        resource:
+                          'pixelmon:pokemon/025_pikachu/all/base/none/sprite.png',
+                      },
                     },
                   ],
                 },

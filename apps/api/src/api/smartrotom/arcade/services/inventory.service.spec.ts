@@ -18,8 +18,22 @@ const mockRepo = {
 
 const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn() };
 
-const makeItem = (id: number, itemId: string, itemType: string, amount = 1, rarity = 'common') =>
-  ({ id, itemId, itemType, amount, rarity, used: 0, sourceType: 'test' }) as any;
+const makeItem = (
+  id: number,
+  itemId: string,
+  itemType: string,
+  amount = 1,
+  rarity = 'common',
+) =>
+  ({
+    id,
+    itemId,
+    itemType,
+    amount,
+    rarity,
+    used: 0,
+    sourceType: 'test',
+  }) as any;
 
 const UUID = 'player-uuid';
 
@@ -67,13 +81,17 @@ describe('InventoryService', () => {
 
       const result = await service.getUserInventory(UUID);
 
-      const lootboxSlot = result.items.find((i: any) => i.itemId === 'lootbox-basic');
+      const lootboxSlot = result.items.find(
+        (i: any) => i.itemId === 'lootbox-basic',
+      );
       // consumable: net = total amount - used = 5 - 0 = 5
       expect(lootboxSlot.amount).toBe(5);
     });
 
     it('throws when uuid is empty', async () => {
-      await expect(service.getUserInventory('')).rejects.toThrow('UUID is required');
+      await expect(service.getUserInventory('')).rejects.toThrow(
+        'UUID is required',
+      );
     });
   });
 
@@ -89,11 +107,15 @@ describe('InventoryService', () => {
     });
 
     it('throws when uuid is empty', async () => {
-      await expect(service.getUserItem('', 'sword-1')).rejects.toThrow('UUID is required');
+      await expect(service.getUserItem('', 'sword-1')).rejects.toThrow(
+        'UUID is required',
+      );
     });
 
     it('throws when itemId is empty', async () => {
-      await expect(service.getUserItem(UUID, '')).rejects.toThrow('Item ID is required');
+      await expect(service.getUserItem(UUID, '')).rejects.toThrow(
+        'Item ID is required',
+      );
     });
   });
 
@@ -120,7 +142,12 @@ describe('InventoryService', () => {
       mockRepo.addItem.mockResolvedValue({ insertId: 1 });
       mockRepo.findById.mockResolvedValue(makeItem(1, 'sword-1', 'weapon'));
 
-      await service.addItemToInventory({ uuid: UUID, itemId: 'sword-1', itemType: 'weapon', amount: 1 });
+      await service.addItemToInventory({
+        uuid: UUID,
+        itemId: 'sword-1',
+        itemType: 'weapon',
+        amount: 1,
+      });
 
       expect(mockRepo.addItem).toHaveBeenCalledWith(
         expect.objectContaining({ rarity: 'common', sourceType: 'unknown' }),
@@ -129,7 +156,12 @@ describe('InventoryService', () => {
 
     it('throws when amount is 0', async () => {
       await expect(
-        service.addItemToInventory({ uuid: UUID, itemId: 'sword-1', itemType: 'weapon', amount: 0 }),
+        service.addItemToInventory({
+          uuid: UUID,
+          itemId: 'sword-1',
+          itemType: 'weapon',
+          amount: 0,
+        }),
       ).rejects.toThrow('Amount must be greater than 0');
     });
   });
@@ -150,7 +182,9 @@ describe('InventoryService', () => {
     it('throws NotFoundException when item not in inventory', async () => {
       mockRepo.findUserItem.mockResolvedValue(null);
 
-      await expect(service.removeItem(UUID, 'ghost')).rejects.toThrow('Item not found');
+      await expect(service.removeItem(UUID, 'ghost')).rejects.toThrow(
+        'Item not found',
+      );
     });
   });
 

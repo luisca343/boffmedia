@@ -13,7 +13,12 @@ const mockUser = {
   createdAt: new Date(),
 };
 
-const mockAccount = { id: 1, uuid: 'test-uuid-1234', type: 'MAIN', balance: 1000 };
+const mockAccount = {
+  id: 1,
+  uuid: 'test-uuid-1234',
+  type: 'MAIN',
+  balance: 1000,
+};
 
 describe('UsersFacadeService (SmartRotom)', () => {
   let service: UsersFacadeService;
@@ -35,7 +40,10 @@ describe('UsersFacadeService (SmartRotom)', () => {
   let starbankService: jest.Mocked<
     Pick<
       StarbankFacadeService,
-      'getAccounts' | 'createMainAccount' | 'getMainAccount' | 'transferFromSystem'
+      | 'getAccounts'
+      | 'createMainAccount'
+      | 'getMainAccount'
+      | 'transferFromSystem'
     >
   >;
   let chatAppService: jest.Mocked<Pick<ChatappFacadeService, 'createChat'>>;
@@ -132,7 +140,10 @@ describe('UsersFacadeService (SmartRotom)', () => {
     it('should create a user', async () => {
       usersService.createUser.mockResolvedValue(mockUser as any);
 
-      const result = await service.createUser({ uuid: 'test-uuid-1234', username: 'Ash' } as any);
+      const result = await service.createUser({
+        uuid: 'test-uuid-1234',
+        username: 'Ash',
+      } as any);
 
       expect(result).toEqual(mockUser);
     });
@@ -140,9 +151,15 @@ describe('UsersFacadeService (SmartRotom)', () => {
 
   describe('findOrCreateUser', () => {
     it('should return user creation result', async () => {
-      usersService.findOrCreateUser.mockResolvedValue({ user: mockUser, isNew: false } as any);
+      usersService.findOrCreateUser.mockResolvedValue({
+        user: mockUser,
+        isNew: false,
+      } as any);
 
-      const result = await service.findOrCreateUser({ uuid: 'test-uuid-1234', username: 'Ash' } as any);
+      const result = await service.findOrCreateUser({
+        uuid: 'test-uuid-1234',
+        username: 'Ash',
+      } as any);
 
       expect(result.user).toEqual(mockUser);
       expect(result.isNew).toBe(false);
@@ -154,16 +171,23 @@ describe('UsersFacadeService (SmartRotom)', () => {
       const updated = { ...mockUser, username: 'Pikachu' };
       usersService.updateUser.mockResolvedValue(updated as any);
 
-      const result = await service.updateUser(1, { username: 'Pikachu' } as any);
+      const result = await service.updateUser(1, {
+        username: 'Pikachu',
+      } as any);
 
-      expect(usersService.updateUser).toHaveBeenCalledWith(1, { username: 'Pikachu' });
+      expect(usersService.updateUser).toHaveBeenCalledWith(1, {
+        username: 'Pikachu',
+      });
       expect(result.username).toBe('Pikachu');
     });
   });
 
   describe('deleteUser', () => {
     it('should delete user', async () => {
-      usersService.deleteUser.mockResolvedValue({ success: true, message: 'Deleted' });
+      usersService.deleteUser.mockResolvedValue({
+        success: true,
+        message: 'Deleted',
+      });
 
       const result = await service.deleteUser(1);
 
@@ -174,7 +198,10 @@ describe('UsersFacadeService (SmartRotom)', () => {
 
   describe('initializeUserAndAccounts', () => {
     it('should create main account and welcome bonus for new users with no accounts', async () => {
-      usersService.findOrCreateUser.mockResolvedValue({ user: mockUser, isNew: true } as any);
+      usersService.findOrCreateUser.mockResolvedValue({
+        user: mockUser,
+        isNew: true,
+      } as any);
       starbankService.getAccounts.mockResolvedValue([]);
       starbankService.createMainAccount.mockResolvedValue(mockAccount as any);
       starbankService.getMainAccount.mockResolvedValue({ id: 1, balance: 0 });
@@ -186,14 +213,24 @@ describe('UsersFacadeService (SmartRotom)', () => {
         username: 'Ash',
       });
 
-      expect(starbankService.createMainAccount).toHaveBeenCalledWith('test-uuid-1234', 'Ash');
-      expect(starbankService.transferFromSystem).toHaveBeenCalledWith(1, 1000, 'Ingreso de Bienvenida');
+      expect(starbankService.createMainAccount).toHaveBeenCalledWith(
+        'test-uuid-1234',
+        'Ash',
+      );
+      expect(starbankService.transferFromSystem).toHaveBeenCalledWith(
+        1,
+        1000,
+        'Ingreso de Bienvenida',
+      );
       expect(result.isNewAccount).toBe(true);
       expect(result.isNewUser).toBe(true);
     });
 
     it('should not create account if accounts already exist', async () => {
-      usersService.findOrCreateUser.mockResolvedValue({ user: mockUser, isNew: false } as any);
+      usersService.findOrCreateUser.mockResolvedValue({
+        user: mockUser,
+        isNew: false,
+      } as any);
       starbankService.getAccounts.mockResolvedValue([mockAccount] as any);
       chatAppService.createChat.mockResolvedValue(undefined as any);
 
@@ -207,12 +244,18 @@ describe('UsersFacadeService (SmartRotom)', () => {
     });
 
     it('should not throw if chat creation fails', async () => {
-      usersService.findOrCreateUser.mockResolvedValue({ user: mockUser, isNew: false } as any);
+      usersService.findOrCreateUser.mockResolvedValue({
+        user: mockUser,
+        isNew: false,
+      } as any);
       starbankService.getAccounts.mockResolvedValue([mockAccount] as any);
       chatAppService.createChat.mockRejectedValue(new Error('chat error'));
 
       await expect(
-        service.initializeUserAndAccounts({ uuid: 'test-uuid-1234', username: 'Ash' }),
+        service.initializeUserAndAccounts({
+          uuid: 'test-uuid-1234',
+          username: 'Ash',
+        }),
       ).resolves.not.toThrow();
       expect(logger.warn).toHaveBeenCalled();
     });
@@ -240,11 +283,15 @@ describe('UsersFacadeService (SmartRotom)', () => {
 
   describe('getMultipleUsers', () => {
     it('should delegate to usersService', async () => {
-      usersService.getMultipleUsers.mockResolvedValue({ 'test-uuid-1234': mockUser } as any);
+      usersService.getMultipleUsers.mockResolvedValue({
+        'test-uuid-1234': mockUser,
+      } as any);
 
       const result = await service.getMultipleUsers(['test-uuid-1234']);
 
-      expect(usersService.getMultipleUsers).toHaveBeenCalledWith(['test-uuid-1234']);
+      expect(usersService.getMultipleUsers).toHaveBeenCalledWith([
+        'test-uuid-1234',
+      ]);
       expect(result['test-uuid-1234']).toEqual(mockUser);
     });
   });

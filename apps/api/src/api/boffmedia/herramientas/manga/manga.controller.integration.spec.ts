@@ -8,7 +8,12 @@ import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter'
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { Reflector } from '@nestjs/core';
 
-const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn() };
+const mockLogger = {
+  log: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  debug: jest.fn(),
+};
 
 const mockFacade = {
   search: jest.fn(),
@@ -32,7 +37,11 @@ describe('MangaController — integration (ValidationPipe + GlobalExceptionFilte
 
     app = moduleRef.createNestApplication();
     app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
     );
     app.useGlobalFilters(new GlobalExceptionFilter(mockLogger as any));
     await app.init();
@@ -62,8 +71,9 @@ describe('MangaController — integration (ValidationPipe + GlobalExceptionFilte
 
     it('returns empty results with no query', async () => {
       mockFacade.search.mockResolvedValue({ results: [] });
-      const res = await request(app.getHttpServer())
-        .get('/boffmedia/herramientas/manga/search');
+      const res = await request(app.getHttpServer()).get(
+        '/boffmedia/herramientas/manga/search',
+      );
 
       expect(res.status).toBeLessThan(300);
       expect(mockFacade.search).toHaveBeenCalledWith('');
@@ -82,13 +92,18 @@ describe('MangaController — integration (ValidationPipe + GlobalExceptionFilte
 
   describe('GET /boffmedia/herramientas/manga/detail', () => {
     it('returns manga detail for url', async () => {
-      mockFacade.getDetail.mockResolvedValue({ title: 'Test Manga', chapters: [] });
+      mockFacade.getDetail.mockResolvedValue({
+        title: 'Test Manga',
+        chapters: [],
+      });
       const res = await request(app.getHttpServer())
         .get('/boffmedia/herramientas/manga/detail')
         .query({ url: 'https://example.com/manga/test' });
 
       expect(res.status).toBeLessThan(300);
-      expect(mockFacade.getDetail).toHaveBeenCalledWith('https://example.com/manga/test');
+      expect(mockFacade.getDetail).toHaveBeenCalledWith(
+        'https://example.com/manga/test',
+      );
       expect(res.body.data).toMatchObject({ title: 'Test Manga' });
     });
 
@@ -105,7 +120,10 @@ describe('MangaController — integration (ValidationPipe + GlobalExceptionFilte
 
   describe('GET /boffmedia/herramientas/manga/local', () => {
     it('returns local chapters for series', async () => {
-      mockFacade.getLocalChapters.mockResolvedValue({ series: 'Test', chapters: ['ch1.cbz'] });
+      mockFacade.getLocalChapters.mockResolvedValue({
+        series: 'Test',
+        chapters: ['ch1.cbz'],
+      });
       const res = await request(app.getHttpServer())
         .get('/boffmedia/herramientas/manga/local')
         .query({ series: 'TestManga' });

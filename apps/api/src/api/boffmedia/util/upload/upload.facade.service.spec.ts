@@ -23,16 +23,32 @@ const mockImageUploadService = {
 const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn() };
 
 const makeFile = (name = 'photo.jpg', size = 1024) =>
-  ({ originalname: name, filename: name, mimetype: 'image/jpeg', size, path: `/tmp/${name}` }) as Express.Multer.File;
+  ({
+    originalname: name,
+    filename: name,
+    mimetype: 'image/jpeg',
+    size,
+    path: `/tmp/${name}`,
+  }) as Express.Multer.File;
 
-const uploadResult = { filename: 'photo.jpg', path: '/uploads/photo.jpg', url: '/uploads/photo.jpg', size: 1024, mimetype: 'image/jpeg' };
+const uploadResult = {
+  filename: 'photo.jpg',
+  path: '/uploads/photo.jpg',
+  url: '/uploads/photo.jpg',
+  size: 1024,
+  mimetype: 'image/jpeg',
+};
 
 describe('UploadFacadeService', () => {
   let service: UploadFacadeService;
 
   beforeEach(async () => {
     jest.clearAllMocks();
-    mockImageUploadService.getSupportedImageTypes.mockReturnValue(['.jpg', '.png', '.webp']);
+    mockImageUploadService.getSupportedImageTypes.mockReturnValue([
+      '.jpg',
+      '.png',
+      '.webp',
+    ]);
     mockImageUploadService.getMaxImageSize.mockReturnValue(5 * 1024 * 1024);
 
     const module: TestingModule = await Test.createTestingModule({
@@ -64,9 +80,13 @@ describe('UploadFacadeService', () => {
     });
 
     it('wraps and re-throws on error', async () => {
-      mockImageUploadService.uploadImage.mockRejectedValue(new Error('disk full'));
+      mockImageUploadService.uploadImage.mockRejectedValue(
+        new Error('disk full'),
+      );
 
-      await expect(service.uploadImage({ file: makeFile() })).rejects.toThrow('Failed to upload image');
+      await expect(service.uploadImage({ file: makeFile() })).rejects.toThrow(
+        'Failed to upload image',
+      );
     });
   });
 
@@ -83,9 +103,13 @@ describe('UploadFacadeService', () => {
     });
 
     it('wraps and re-throws on error', async () => {
-      mockImageUploadService.deleteImage.mockRejectedValue(new Error('not found'));
+      mockImageUploadService.deleteImage.mockRejectedValue(
+        new Error('not found'),
+      );
 
-      await expect(service.deleteImage('', 'photo.jpg')).rejects.toThrow('Failed to delete image');
+      await expect(service.deleteImage('', 'photo.jpg')).rejects.toThrow(
+        'Failed to delete image',
+      );
     });
   });
 
@@ -101,9 +125,13 @@ describe('UploadFacadeService', () => {
     });
 
     it('wraps and re-throws on error', async () => {
-      mockFileUploadService.uploadFile.mockRejectedValue(new Error('quota exceeded'));
+      mockFileUploadService.uploadFile.mockRejectedValue(
+        new Error('quota exceeded'),
+      );
 
-      await expect(service.uploadFile({ file: makeFile() })).rejects.toThrow('Failed to upload file');
+      await expect(service.uploadFile({ file: makeFile() })).rejects.toThrow(
+        'Failed to upload file',
+      );
     });
   });
 
@@ -152,7 +180,9 @@ describe('UploadFacadeService', () => {
       mockFileUploadService.validateFileType.mockResolvedValue(true);
       mockFileUploadService.validateFileSize.mockResolvedValue(false);
 
-      const result = await service.validateImageFile(makeFile('big.jpg', 100 * 1024 * 1024));
+      const result = await service.validateImageFile(
+        makeFile('big.jpg', 100 * 1024 * 1024),
+      );
 
       expect(result.valid).toBe(false);
       expect(result.error).toContain('exceeds');

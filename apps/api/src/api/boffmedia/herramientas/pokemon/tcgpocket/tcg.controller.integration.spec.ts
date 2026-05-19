@@ -130,7 +130,10 @@ describe('TcgController — integration (ValidationPipe + GlobalExceptionFilter)
 
   describe('GET /tools/ptcgp/cards/:cardId', () => {
     it('returns 200 and passes cardId to facade.getCardById', async () => {
-      mockFacade.getCardById.mockResolvedValue({ id: 'tcgp-A1-001', name: 'Bulbasaur' });
+      mockFacade.getCardById.mockResolvedValue({
+        id: 'tcgp-A1-001',
+        name: 'Bulbasaur',
+      });
 
       const res = await request(app.getHttpServer()).get(
         '/tools/ptcgp/cards/tcgp-A1-001',

@@ -5,17 +5,24 @@ import { TeamsService } from './teams.service';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 
 jest.mock('@/_db/schema/Events', () => ({
-  boffMediaParticipantProgress: { participantId: 'participantId', achievementId: 'achievementId' },
+  boffMediaParticipantProgress: {
+    participantId: 'participantId',
+    achievementId: 'achievementId',
+  },
   validateParticipantCanReceiveAchievement: jest.fn(),
 }));
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const { validateParticipantCanReceiveAchievement } = require('@/_db/schema/Events');
+const {
+  validateParticipantCanReceiveAchievement,
+} = require('@/_db/schema/Events');
 
 const mockWhere = jest.fn();
 const mockFrom = jest.fn().mockReturnValue({ where: mockWhere });
 const mockOnDuplicateKeyUpdate = jest.fn();
-const mockValues = jest.fn().mockReturnValue({ onDuplicateKeyUpdate: mockOnDuplicateKeyUpdate });
+const mockValues = jest
+  .fn()
+  .mockReturnValue({ onDuplicateKeyUpdate: mockOnDuplicateKeyUpdate });
 
 const mockDb = {
   select: jest.fn().mockReturnValue({ from: mockFrom }),
@@ -58,7 +65,9 @@ describe('ProgressService', () => {
     mockFrom.mockReturnValue({ where: mockWhere });
     mockWhere.mockResolvedValue([mockProgress]);
     mockDb.insert.mockReturnValue({ values: mockValues });
-    mockValues.mockReturnValue({ onDuplicateKeyUpdate: mockOnDuplicateKeyUpdate });
+    mockValues.mockReturnValue({
+      onDuplicateKeyUpdate: mockOnDuplicateKeyUpdate,
+    });
     mockOnDuplicateKeyUpdate.mockResolvedValue(undefined);
 
     const module: TestingModule = await Test.createTestingModule({
@@ -82,7 +91,9 @@ describe('ProgressService', () => {
   describe('updateProgress()', () => {
     beforeEach(() => {
       validateParticipantCanReceiveAchievement.mockResolvedValue(true);
-      mockAchievementsService.getAchievementById.mockResolvedValue(mockAchievement);
+      mockAchievementsService.getAchievementById.mockResolvedValue(
+        mockAchievement,
+      );
     });
 
     it('inserts/updates progress record and returns result', async () => {
@@ -92,7 +103,11 @@ describe('ProgressService', () => {
 
       expect(mockDb.insert).toHaveBeenCalled();
       expect(mockValues).toHaveBeenCalledWith(
-        expect.objectContaining({ participantId: 1, achievementId: 2, currentProgress: 3 }),
+        expect.objectContaining({
+          participantId: 1,
+          achievementId: 2,
+          currentProgress: 3,
+        }),
       );
       expect(result).toEqual(mockProgress);
     });
