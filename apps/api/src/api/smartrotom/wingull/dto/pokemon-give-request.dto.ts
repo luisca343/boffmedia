@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsUUID, IsString, IsNotEmpty, IsBoolean, IsOptional } from 'class-validator';
+import {
+  IsUUID,
+  IsString,
+  IsNotEmpty,
+  IsBoolean,
+  IsOptional,
+} from 'class-validator';
 
 export class PokemonGiveRequestDto {
   @ApiProperty({

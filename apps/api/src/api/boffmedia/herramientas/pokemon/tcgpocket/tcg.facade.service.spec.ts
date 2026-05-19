@@ -63,7 +63,10 @@ describe('TcgFacadeService', () => {
 
   describe('getCardById()', () => {
     it('delegates to TcgService', async () => {
-      mockTcgService.getCardById.mockResolvedValue({ id: 'sv1-1', name: 'Pikachu' });
+      mockTcgService.getCardById.mockResolvedValue({
+        id: 'sv1-1',
+        name: 'Pikachu',
+      });
 
       const result = await service.getCardById('sv1-1');
 
@@ -77,7 +80,10 @@ describe('TcgFacadeService', () => {
 
       await service.fetchAndStoreCardsForSet('sv1');
 
-      expect(mockTcgService.fetchAndStoreCardsForSet).toHaveBeenCalledWith('sv1', 'en');
+      expect(mockTcgService.fetchAndStoreCardsForSet).toHaveBeenCalledWith(
+        'sv1',
+        'en',
+      );
     });
   });
 
@@ -94,7 +100,9 @@ describe('TcgFacadeService', () => {
 
   describe('getUserCards()', () => {
     it('delegates to TcgService', async () => {
-      mockTcgService.getUserCards.mockResolvedValue([{ cardId: 'sv1-1', qty: 2 }]);
+      mockTcgService.getUserCards.mockResolvedValue([
+        { cardId: 'sv1-1', qty: 2 },
+      ]);
 
       const result = await service.getUserCards('Ash');
 

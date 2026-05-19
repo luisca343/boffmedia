@@ -69,7 +69,9 @@ describe('MhwildsFacadeService', () => {
 
     it('throws on data service error', async () => {
       mockDataService.getWeapons.mockRejectedValue(new Error('fail'));
-      await expect(service.getWeapons('en')).rejects.toThrow('Failed to get weapons');
+      await expect(service.getWeapons('en')).rejects.toThrow(
+        'Failed to get weapons',
+      );
     });
   });
 
@@ -120,7 +122,12 @@ describe('MhwildsFacadeService', () => {
 
   describe('createWeaponTree()', () => {
     it('delegates to data service', async () => {
-      const tree = { tree: [], treeByKind: {}, totalWeapons: 0, weaponKinds: [] };
+      const tree = {
+        tree: [],
+        treeByKind: {},
+        totalWeapons: 0,
+        weaponKinds: [],
+      };
       mockDataService.createWeaponTree.mockResolvedValue(tree);
 
       const result = await service.createWeaponTree('en');
@@ -133,11 +140,16 @@ describe('MhwildsFacadeService', () => {
 
   describe('searchWeaponsByName()', () => {
     it('delegates when search term is valid', async () => {
-      mockDataService.searchWeaponsByName.mockResolvedValue({ data: [{ id: 1 }] });
+      mockDataService.searchWeaponsByName.mockResolvedValue({
+        data: [{ id: 1 }],
+      });
 
       const result = await service.searchWeaponsByName('en', 'sword');
 
-      expect(mockDataService.searchWeaponsByName).toHaveBeenCalledWith('en', 'sword');
+      expect(mockDataService.searchWeaponsByName).toHaveBeenCalledWith(
+        'en',
+        'sword',
+      );
       expect(result).toHaveLength(1);
     });
 
@@ -156,11 +168,16 @@ describe('MhwildsFacadeService', () => {
     it('delegates when kind is provided', async () => {
       mockDataService.getWeaponsByKind.mockResolvedValue({ data: [] });
       await service.getWeaponsByKind('en', 'bow');
-      expect(mockDataService.getWeaponsByKind).toHaveBeenCalledWith('en', 'bow');
+      expect(mockDataService.getWeaponsByKind).toHaveBeenCalledWith(
+        'en',
+        'bow',
+      );
     });
 
     it('throws for empty kind', async () => {
-      await expect(service.getWeaponsByKind('en', '')).rejects.toThrow('Weapon kind is required');
+      await expect(service.getWeaponsByKind('en', '')).rejects.toThrow(
+        'Weapon kind is required',
+      );
     });
   });
 
@@ -172,15 +189,21 @@ describe('MhwildsFacadeService', () => {
     });
 
     it('throws for rarity 0', async () => {
-      await expect(service.getArmorByRarity('en', 0)).rejects.toThrow('between 1 and 10');
+      await expect(service.getArmorByRarity('en', 0)).rejects.toThrow(
+        'between 1 and 10',
+      );
     });
 
     it('throws for rarity 11', async () => {
-      await expect(service.getArmorByRarity('en', 11)).rejects.toThrow('between 1 and 10');
+      await expect(service.getArmorByRarity('en', 11)).rejects.toThrow(
+        'between 1 and 10',
+      );
     });
 
     it('throws for non-integer rarity', async () => {
-      await expect(service.getArmorByRarity('en', 3.5)).rejects.toThrow('integer');
+      await expect(service.getArmorByRarity('en', 3.5)).rejects.toThrow(
+        'integer',
+      );
     });
   });
 
@@ -188,7 +211,13 @@ describe('MhwildsFacadeService', () => {
 
   describe('getDataStatistics()', () => {
     it('returns statistics from data service', async () => {
-      const stats = { weapons: { total: 10, byKind: {} }, armor: { total: 5, byRarity: {} }, charms: { total: 3, totalRanks: 9 }, decorations: { total: 7, byRarity: {} }, skills: { total: 20 } };
+      const stats = {
+        weapons: { total: 10, byKind: {} },
+        armor: { total: 5, byRarity: {} },
+        charms: { total: 3, totalRanks: 9 },
+        decorations: { total: 7, byRarity: {} },
+        skills: { total: 20 },
+      };
       mockDataService.getDataStatistics.mockResolvedValue(stats);
 
       const result = await service.getDataStatistics('en');
@@ -201,7 +230,10 @@ describe('MhwildsFacadeService', () => {
 
   describe('clearCache()', () => {
     it('delegates to cache service', async () => {
-      mockCacheService.clearCache.mockResolvedValue({ success: true, message: 'Cleared' });
+      mockCacheService.clearCache.mockResolvedValue({
+        success: true,
+        message: 'Cleared',
+      });
       const result = await service.clearCache('weapons', 'en');
       expect(mockCacheService.clearCache).toHaveBeenCalledWith('weapons', 'en');
       expect(result.success).toBe(true);
@@ -216,7 +248,10 @@ describe('MhwildsFacadeService', () => {
 
   describe('getCacheStatistics()', () => {
     it('delegates to cache service', async () => {
-      mockCacheService.getCacheStatistics.mockResolvedValue({ success: true, stats: { size: 1 } });
+      mockCacheService.getCacheStatistics.mockResolvedValue({
+        success: true,
+        stats: { size: 1 },
+      });
       const result = await service.getCacheStatistics();
       expect(result.success).toBe(true);
     });
@@ -224,7 +259,10 @@ describe('MhwildsFacadeService', () => {
 
   describe('warmupCache()', () => {
     it('delegates to cache service', async () => {
-      mockCacheService.warmupCache.mockResolvedValue({ success: true, message: 'Done' });
+      mockCacheService.warmupCache.mockResolvedValue({
+        success: true,
+        message: 'Done',
+      });
       const result = await service.warmupCache('en');
       expect(result.success).toBe(true);
     });

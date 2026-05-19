@@ -23,8 +23,12 @@ const makeLog = (
 
   // Game start + leads
   lines.push('|start');
-  lead1.forEach((p, i) => lines.push(`|switch|p1${i === 0 ? 'a' : 'b'}: ${player1}|${p},|`));
-  lead2.forEach((p, i) => lines.push(`|switch|p2${i === 0 ? 'a' : 'b'}: ${player2}|${p},|`));
+  lead1.forEach((p, i) =>
+    lines.push(`|switch|p1${i === 0 ? 'a' : 'b'}: ${player1}|${p},|`),
+  );
+  lead2.forEach((p, i) =>
+    lines.push(`|switch|p2${i === 0 ? 'a' : 'b'}: ${player2}|${p},|`),
+  );
 
   return lines.join('\n');
 };

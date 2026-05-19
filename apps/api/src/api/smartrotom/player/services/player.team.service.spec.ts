@@ -39,16 +39,22 @@ describe('PlayerTeamService', () => {
     });
 
     it('throws when uuid is empty', async () => {
-      await expect(service.getPlayerTeam('')).rejects.toThrow('Player UUID is required');
+      await expect(service.getPlayerTeam('')).rejects.toThrow(
+        'Player UUID is required',
+      );
       expect(mockRepo.fetchPlayerTeamFromAPI).not.toHaveBeenCalled();
     });
 
     it('throws when uuid is whitespace only', async () => {
-      await expect(service.getPlayerTeam('   ')).rejects.toThrow('Player UUID is required');
+      await expect(service.getPlayerTeam('   ')).rejects.toThrow(
+        'Player UUID is required',
+      );
     });
 
     it('wraps and re-throws repo error with context', async () => {
-      mockRepo.fetchPlayerTeamFromAPI.mockRejectedValue(new Error('server error'));
+      mockRepo.fetchPlayerTeamFromAPI.mockRejectedValue(
+        new Error('server error'),
+      );
 
       await expect(service.getPlayerTeam(UUID)).rejects.toThrow(
         'Player team retrieval failed: server error',

@@ -8,7 +8,12 @@ import { ResponseInterceptor } from '@api/_utils/interceptors/response.intercept
 import { Reflector } from '@nestjs/core';
 import { Logger } from 'nestjs-pino';
 
-const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn() };
+const mockLogger = {
+  log: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  debug: jest.fn(),
+};
 
 describe('BattleController — integration (ValidationPipe + GlobalExceptionFilter)', () => {
   let app: INestApplication;
@@ -25,7 +30,11 @@ describe('BattleController — integration (ValidationPipe + GlobalExceptionFilt
 
     app = moduleRef.createNestApplication();
     app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
     );
     app.useGlobalFilters(new GlobalExceptionFilter(mockLogger as any));
     await app.init();

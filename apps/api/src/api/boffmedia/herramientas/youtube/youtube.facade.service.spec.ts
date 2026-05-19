@@ -35,16 +35,22 @@ describe('YoutubeFacadeService', () => {
   describe('getTranscription()', () => {
     it('delegates to TranscriptionService and returns the result', async () => {
       const transcription = { success: true, videoId: 'abc', transcript: [] };
-      mockTranscriptionService.getTranscription.mockResolvedValue(transcription);
+      mockTranscriptionService.getTranscription.mockResolvedValue(
+        transcription,
+      );
 
       const result = await service.getTranscription('abc');
 
-      expect(mockTranscriptionService.getTranscription).toHaveBeenCalledWith('abc');
+      expect(mockTranscriptionService.getTranscription).toHaveBeenCalledWith(
+        'abc',
+      );
       expect(result).toEqual(transcription);
     });
 
     it('wraps errors and rethrows', async () => {
-      mockTranscriptionService.getTranscription.mockRejectedValue(new Error('unavailable'));
+      mockTranscriptionService.getTranscription.mockRejectedValue(
+        new Error('unavailable'),
+      );
 
       await expect(service.getTranscription('abc')).rejects.toThrow(
         'Failed to retrieve transcription',
@@ -66,7 +72,9 @@ describe('YoutubeFacadeService', () => {
     });
 
     it('wraps errors and rethrows', async () => {
-      mockTranscriptionService.getVideoInfo.mockRejectedValue(new Error('not found'));
+      mockTranscriptionService.getVideoInfo.mockRejectedValue(
+        new Error('not found'),
+      );
 
       await expect(service.getVideoInfo('abc')).rejects.toThrow(
         'Failed to retrieve video info',

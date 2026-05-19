@@ -28,9 +28,18 @@ const mockUserRepo = {
 };
 
 const makeChat = (id: number, type: number, name = 'chat') =>
-  ({ id, name, type, image: null, description: '', createdAt: new Date(), updatedAt: new Date() }) as any;
+  ({
+    id,
+    name,
+    type,
+    image: null,
+    description: '',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  }) as any;
 
-const makeMember = (uuid: string, username = 'Player') => ({ uuid, username }) as any;
+const makeMember = (uuid: string, username = 'Player') =>
+  ({ uuid, username }) as any;
 
 const UUID = 'player-uuid';
 
@@ -83,7 +92,9 @@ describe('GroupService', () => {
     });
 
     it('uses "Mensajes guardados" name and mc-heads avatar for type=1 (saved messages)', async () => {
-      mockChatRepo.findUserChats.mockResolvedValue([makeChat(1, 1, 'some-name')]);
+      mockChatRepo.findUserChats.mockResolvedValue([
+        makeChat(1, 1, 'some-name'),
+      ]);
 
       const groups = await service.getUserGroups(UUID);
 
@@ -95,7 +106,10 @@ describe('GroupService', () => {
       const otherUUID = 'other-player-uuid';
       const chatName = [UUID, otherUUID].sort().join('_');
       mockChatRepo.findUserChats.mockResolvedValue([makeChat(1, 2, chatName)]);
-      mockUserRepo.findUserByUuid.mockResolvedValue({ username: 'Misty', uuid: otherUUID });
+      mockUserRepo.findUserByUuid.mockResolvedValue({
+        username: 'Misty',
+        uuid: otherUUID,
+      });
 
       const groups = await service.getUserGroups(UUID);
 
@@ -118,14 +132,18 @@ describe('GroupService', () => {
     it('throws when group not found', async () => {
       mockChatRepo.findChatById.mockResolvedValue(null);
 
-      await expect(service.getGroupById(99, UUID)).rejects.toThrow('Group not found');
+      await expect(service.getGroupById(99, UUID)).rejects.toThrow(
+        'Group not found',
+      );
     });
 
     it('throws when user has no access to private group chat', async () => {
       mockChatRepo.findChatById.mockResolvedValue(makeChat(1, 3)); // type=3 (group)
       mockMemberRepo.findUserInChat.mockResolvedValue(null); // not a member
 
-      await expect(service.getGroupById(1, UUID)).rejects.toThrow('does not have access');
+      await expect(service.getGroupById(1, UUID)).rejects.toThrow(
+        'does not have access',
+      );
     });
 
     it('allows access to public group (type=0) without membership check', async () => {
@@ -145,37 +163,41 @@ describe('GroupService', () => {
       mockChatRepo.findChatById.mockResolvedValue(makeChat(1, 3));
       mockMemberRepo.findUserInChat
         .mockResolvedValueOnce(makeMember(UUID)) // requester is member
-        .mockResolvedValueOnce(null);           // new user is not yet member
+        .mockResolvedValueOnce(null); // new user is not yet member
       mockMemberRepo.addChatMember.mockResolvedValue(undefined);
 
-      await expect(service.addMemberToGroup(1, 'new-uuid', UUID)).resolves.toBeUndefined();
+      await expect(
+        service.addMemberToGroup(1, 'new-uuid', UUID),
+      ).resolves.toBeUndefined();
       expect(mockMemberRepo.addChatMember).toHaveBeenCalledWith(1, 'new-uuid');
     });
 
     it('throws when group not found', async () => {
       mockChatRepo.findChatById.mockResolvedValue(null);
 
-      await expect(service.addMemberToGroup(99, 'new-uuid', UUID)).rejects.toThrow('Group not found');
+      await expect(
+        service.addMemberToGroup(99, 'new-uuid', UUID),
+      ).rejects.toThrow('Group not found');
     });
 
     it('throws when requester is not in the group', async () => {
       mockChatRepo.findChatById.mockResolvedValue(makeChat(1, 3));
       mockMemberRepo.findUserInChat.mockResolvedValue(null); // requester not a member
 
-      await expect(service.addMemberToGroup(1, 'new-uuid', UUID)).rejects.toThrow(
-        'does not have permission',
-      );
+      await expect(
+        service.addMemberToGroup(1, 'new-uuid', UUID),
+      ).rejects.toThrow('does not have permission');
     });
 
     it('throws when new user is already a member', async () => {
       mockChatRepo.findChatById.mockResolvedValue(makeChat(1, 3));
       mockMemberRepo.findUserInChat
-        .mockResolvedValueOnce(makeMember(UUID))     // requester is member
+        .mockResolvedValueOnce(makeMember(UUID)) // requester is member
         .mockResolvedValueOnce(makeMember('new-uuid')); // new user already member
 
-      await expect(service.addMemberToGroup(1, 'new-uuid', UUID)).rejects.toThrow(
-        'already a member',
-      );
+      await expect(
+        service.addMemberToGroup(1, 'new-uuid', UUID),
+      ).rejects.toThrow('already a member');
     });
   });
 
@@ -187,7 +209,9 @@ describe('GroupService', () => {
       mockMemberRepo.findUserInChat.mockResolvedValue(makeMember(UUID));
       mockMemberRepo.removeChatMember.mockResolvedValue(undefined);
 
-      await expect(service.removeMemberFromGroup(1, UUID, UUID)).resolves.toBeUndefined();
+      await expect(
+        service.removeMemberFromGroup(1, UUID, UUID),
+      ).resolves.toBeUndefined();
       expect(mockMemberRepo.removeChatMember).toHaveBeenCalledWith(1, UUID);
     });
 
@@ -196,11 +220,11 @@ describe('GroupService', () => {
       // requester check passes (first call), member check (second call) returns null
       mockMemberRepo.findUserInChat
         .mockResolvedValueOnce(makeMember(UUID)) // requester ok
-        .mockResolvedValueOnce(null);            // target not a member
+        .mockResolvedValueOnce(null); // target not a member
 
-      await expect(service.removeMemberFromGroup(1, 'nonmember', UUID)).rejects.toThrow(
-        'not a member',
-      );
+      await expect(
+        service.removeMemberFromGroup(1, 'nonmember', UUID),
+      ).rejects.toThrow('not a member');
     });
   });
 });

@@ -76,7 +76,11 @@ describe('StreakService', () => {
     it('creates new streak record when none exists', async () => {
       mockRepo.findByUuid.mockResolvedValue(null);
       mockRepo.createUserStreak.mockResolvedValue({ insertId: 1 });
-      mockRepo.findById.mockResolvedValue({ ...mockStreak, streak: 0, totalClaims: 0 });
+      mockRepo.findById.mockResolvedValue({
+        ...mockStreak,
+        streak: 0,
+        totalClaims: 0,
+      });
 
       const result = await service.getUserStreak(UUID);
 
@@ -87,7 +91,10 @@ describe('StreakService', () => {
     });
 
     it('returns bannerChanged=true when lastBanner differs from current config', async () => {
-      mockRepo.findByUuid.mockResolvedValue({ ...mockStreak, lastBanner: 'Season-0' });
+      mockRepo.findByUuid.mockResolvedValue({
+        ...mockStreak,
+        lastBanner: 'Season-0',
+      });
 
       const result = await service.getUserStreak(UUID);
 
@@ -95,7 +102,9 @@ describe('StreakService', () => {
     });
 
     it('throws when uuid is empty', async () => {
-      await expect(service.getUserStreak('')).rejects.toThrow('UUID is required');
+      await expect(service.getUserStreak('')).rejects.toThrow(
+        'UUID is required',
+      );
     });
   });
 
@@ -187,7 +196,9 @@ describe('StreakService', () => {
     });
 
     it('throws when banner name is empty', async () => {
-      await expect(service.updateLastBanner(UUID, '')).rejects.toThrow('Banner name is required');
+      await expect(service.updateLastBanner(UUID, '')).rejects.toThrow(
+        'Banner name is required',
+      );
     });
 
     it('throws when streak record not found', async () => {

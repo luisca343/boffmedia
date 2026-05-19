@@ -18,35 +18,47 @@ describe('TcgConfigService', () => {
 
   describe('getApiUrl()', () => {
     it('builds a URL from locale and endpoint', () => {
-      expect(service.getApiUrl('en', 'series')).toBe('https://api.tcgdex.net/v2/en/series');
+      expect(service.getApiUrl('en', 'series')).toBe(
+        'https://api.tcgdex.net/v2/en/series',
+      );
     });
 
     it('throws for unsupported locale', () => {
-      expect(() => service.getApiUrl('fr', 'series')).toThrow('Unsupported locale');
+      expect(() => service.getApiUrl('fr', 'series')).toThrow(
+        'Unsupported locale',
+      );
     });
   });
 
   describe('getSeriesUrl()', () => {
     it('returns the series endpoint URL', () => {
-      expect(service.getSeriesUrl('es')).toBe('https://api.tcgdex.net/v2/es/series');
+      expect(service.getSeriesUrl('es')).toBe(
+        'https://api.tcgdex.net/v2/es/series',
+      );
     });
   });
 
   describe('getSeriesDetailUrl()', () => {
     it('includes the series id in the path', () => {
-      expect(service.getSeriesDetailUrl('en', 'sv')).toBe('https://api.tcgdex.net/v2/en/series/sv');
+      expect(service.getSeriesDetailUrl('en', 'sv')).toBe(
+        'https://api.tcgdex.net/v2/en/series/sv',
+      );
     });
   });
 
   describe('getSetUrl()', () => {
     it('builds the set URL', () => {
-      expect(service.getSetUrl('en', 'sv1')).toBe('https://api.tcgdex.net/v2/en/sets/sv1');
+      expect(service.getSetUrl('en', 'sv1')).toBe(
+        'https://api.tcgdex.net/v2/en/sets/sv1',
+      );
     });
   });
 
   describe('getCardUrl()', () => {
     it('builds the card URL', () => {
-      expect(service.getCardUrl('en', 'sv1-1')).toBe('https://api.tcgdex.net/v2/en/cards/sv1-1');
+      expect(service.getCardUrl('en', 'sv1-1')).toBe(
+        'https://api.tcgdex.net/v2/en/cards/sv1-1',
+      );
     });
   });
 

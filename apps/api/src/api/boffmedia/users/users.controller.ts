@@ -23,7 +23,10 @@ import {
 import { BoffMediaUsersFacadeService } from './users.facade.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { MinecraftRegistrationDto, MinecraftLinkDto } from './dto/minecraft-registration.dto';
+import {
+  MinecraftRegistrationDto,
+  MinecraftLinkDto,
+} from './dto/minecraft-registration.dto';
 import { GoogleAuthDto } from './dto/google-auth.dto';
 import { UserLoginDto } from './dto/user-login.dto';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
@@ -42,7 +45,6 @@ import { UserRolesResponseEntity } from './entities/user-roles-response.entity';
 import { UserValidationResponseEntity } from './entities/user-validation-response.entity';
 import { BatchUsersDto } from './dto/batch-users.dto';
 import { Logger } from 'nestjs-pino';
-
 
 @ApiTags('BoffMedia | Users')
 @Controller('users')

@@ -90,7 +90,9 @@ export class SmartrotomController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: 'Failed to create or update character.',
   })
-  async createOrUpdateArceuspeak(@Body() { name, value, format }: ArceusspeakDto) {
+  async createOrUpdateArceuspeak(
+    @Body() { name, value, format }: ArceusspeakDto,
+  ) {
     return await this.smartrotomService.createOrUpdateArceuspeak(
       name,
       value,

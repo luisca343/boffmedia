@@ -10,8 +10,18 @@ const mockFileUploadService = {
   getFileInfo: jest.fn(),
 };
 
-const makeFile = (name = 'photo.jpg', size = 1024 * 1024, mimetype = 'image/jpeg') =>
-  ({ originalname: name, filename: name, mimetype, size, path: `/tmp/${name}` }) as Express.Multer.File;
+const makeFile = (
+  name = 'photo.jpg',
+  size = 1024 * 1024,
+  mimetype = 'image/jpeg',
+) =>
+  ({
+    originalname: name,
+    filename: name,
+    mimetype,
+    size,
+    path: `/tmp/${name}`,
+  }) as Express.Multer.File;
 
 describe('ImageUploadService', () => {
   let service: ImageUploadService;
@@ -37,7 +47,13 @@ describe('ImageUploadService', () => {
   describe('uploadImage()', () => {
     it('uploads valid image and returns response', async () => {
       const file = makeFile();
-      const uploadResult = { filename: 'photo.jpg', path: '/uploads/photo.jpg', url: '/uploads/photo.jpg', size: 1024, mimetype: 'image/jpeg' };
+      const uploadResult = {
+        filename: 'photo.jpg',
+        path: '/uploads/photo.jpg',
+        url: '/uploads/photo.jpg',
+        size: 1024,
+        mimetype: 'image/jpeg',
+      };
       mockFileUploadService.validateFileType.mockResolvedValue(true);
       mockFileUploadService.validateFileSize.mockResolvedValue(true);
       mockFileUploadService.uploadFile.mockResolvedValue(uploadResult);
@@ -57,18 +73,18 @@ describe('ImageUploadService', () => {
     it('throws when file type is not an allowed image type', async () => {
       mockFileUploadService.validateFileType.mockResolvedValue(false);
 
-      await expect(service.uploadImage({ file: makeFile('doc.pdf') })).rejects.toThrow(
-        'Only image files',
-      );
+      await expect(
+        service.uploadImage({ file: makeFile('doc.pdf') }),
+      ).rejects.toThrow('Only image files');
     });
 
     it('throws when file exceeds default size limit (5MB)', async () => {
       mockFileUploadService.validateFileType.mockResolvedValue(true);
       mockFileUploadService.validateFileSize.mockResolvedValue(false);
 
-      await expect(service.uploadImage({ file: makeFile('big.jpg', 10 * 1024 * 1024) })).rejects.toThrow(
-        'Image size must be less than',
-      );
+      await expect(
+        service.uploadImage({ file: makeFile('big.jpg', 10 * 1024 * 1024) }),
+      ).rejects.toThrow('Image size must be less than');
     });
 
     it('uses custom maxSizeInMB when provided', async () => {
@@ -92,8 +108,13 @@ describe('ImageUploadService', () => {
     it('delegates deletion to FileUploadService', async () => {
       mockFileUploadService.deleteFile.mockResolvedValue({ success: true });
 
-      await expect(service.deleteImage('', 'photo.jpg')).resolves.toEqual({ success: true });
-      expect(mockFileUploadService.deleteFile).toHaveBeenCalledWith('', 'photo.jpg');
+      await expect(service.deleteImage('', 'photo.jpg')).resolves.toEqual({
+        success: true,
+      });
+      expect(mockFileUploadService.deleteFile).toHaveBeenCalledWith(
+        '',
+        'photo.jpg',
+      );
     });
   });
 
@@ -101,9 +122,14 @@ describe('ImageUploadService', () => {
 
   describe('getImageInfo()', () => {
     it('delegates to FileUploadService', async () => {
-      mockFileUploadService.getFileInfo.mockResolvedValue({ exists: true, size: 512 });
+      mockFileUploadService.getFileInfo.mockResolvedValue({
+        exists: true,
+        size: 512,
+      });
 
-      await expect(service.getImageInfo('', 'photo.jpg')).resolves.toMatchObject({ exists: true });
+      await expect(
+        service.getImageInfo('', 'photo.jpg'),
+      ).resolves.toMatchObject({ exists: true });
     });
   });
 

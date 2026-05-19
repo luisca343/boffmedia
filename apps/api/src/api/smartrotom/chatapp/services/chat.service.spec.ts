@@ -21,7 +21,8 @@ const mockMemberRepo = {
 
 const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn() };
 
-const makeChat = (id: number, name = 'chat', type = 2) => ({ id, name, type }) as any;
+const makeChat = (id: number, name = 'chat', type = 2) =>
+  ({ id, name, type }) as any;
 
 describe('ChatService', () => {
   let service: ChatService;
@@ -49,7 +50,9 @@ describe('ChatService', () => {
   describe('createChat()', () => {
     describe('single user chat (type=1)', () => {
       it('returns existing chat id when same-name chat already exists', async () => {
-        mockChatRepo.findUserChats.mockResolvedValue([makeChat(5, 'Mensajes Guardados', 1)]);
+        mockChatRepo.findUserChats.mockResolvedValue([
+          makeChat(5, 'Mensajes Guardados', 1),
+        ]);
 
         const result = await service.createChat({
           player: 'uuid-A',
@@ -103,7 +106,10 @@ describe('ChatService', () => {
         });
 
         expect(result).toBe(20);
-        expect(mockMemberRepo.addChatMember).toHaveBeenCalledWith(20, expect.any(String));
+        expect(mockMemberRepo.addChatMember).toHaveBeenCalledWith(
+          20,
+          expect.any(String),
+        );
       });
     });
 

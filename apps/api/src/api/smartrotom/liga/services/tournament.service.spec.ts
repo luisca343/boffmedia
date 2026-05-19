@@ -43,7 +43,9 @@ describe('TournamentService', () => {
     it('returns active tournaments from repo', async () => {
       mockRepo.findActiveTournaments.mockResolvedValue([mockTournament]);
 
-      await expect(service.getActiveTournaments()).resolves.toEqual([mockTournament]);
+      await expect(service.getActiveTournaments()).resolves.toEqual([
+        mockTournament,
+      ]);
       expect(mockRepo.findActiveTournaments).toHaveBeenCalledTimes(1);
     });
   });
@@ -54,13 +56,17 @@ describe('TournamentService', () => {
     it('returns tournament when found', async () => {
       mockRepo.findTournamentById.mockResolvedValue(mockTournament);
 
-      await expect(service.getTournamentById(1)).resolves.toEqual(mockTournament);
+      await expect(service.getTournamentById(1)).resolves.toEqual(
+        mockTournament,
+      );
     });
 
     it('throws when tournament not found', async () => {
       mockRepo.findTournamentById.mockResolvedValue(null);
 
-      await expect(service.getTournamentById(999)).rejects.toThrow('Tournament not found');
+      await expect(service.getTournamentById(999)).rejects.toThrow(
+        'Tournament not found',
+      );
     });
 
     it('throws when id is 0', async () => {
@@ -95,7 +101,9 @@ describe('TournamentService', () => {
     it('throws when tournament does not exist', async () => {
       mockRepo.findTournamentById.mockResolvedValue(null);
 
-      await expect(service.getTournamentMatches(999)).rejects.toThrow('Tournament not found');
+      await expect(service.getTournamentMatches(999)).rejects.toThrow(
+        'Tournament not found',
+      );
       expect(mockRepo.findTournamentMatches).not.toHaveBeenCalled();
     });
   });
@@ -116,15 +124,15 @@ describe('TournamentService', () => {
     });
 
     it('throws when name is empty', async () => {
-      await expect(service.createTournament({ ...validRequest, name: '' })).rejects.toThrow(
-        'Tournament name is required',
-      );
+      await expect(
+        service.createTournament({ ...validRequest, name: '' }),
+      ).rejects.toThrow('Tournament name is required');
     });
 
     it('throws when name is whitespace only', async () => {
-      await expect(service.createTournament({ ...validRequest, name: '   ' })).rejects.toThrow(
-        'Tournament name is required',
-      );
+      await expect(
+        service.createTournament({ ...validRequest, name: '   ' }),
+      ).rejects.toThrow('Tournament name is required');
     });
 
     it('throws when maxParticipants is fewer than 4', async () => {

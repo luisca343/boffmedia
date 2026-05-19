@@ -14,10 +14,7 @@ describe('PasswordService', () => {
     jest.clearAllMocks();
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        PasswordService,
-        { provide: Logger, useValue: mockLogger },
-      ],
+      providers: [PasswordService, { provide: Logger, useValue: mockLogger }],
     }).compile();
 
     service = module.get<PasswordService>(PasswordService);
@@ -48,7 +45,9 @@ describe('PasswordService', () => {
     });
 
     it('throws when bcrypt fails', async () => {
-      (bcrypt.genSalt as jest.Mock).mockRejectedValue(new Error('bcrypt error'));
+      (bcrypt.genSalt as jest.Mock).mockRejectedValue(
+        new Error('bcrypt error'),
+      );
 
       await expect(service.hashPassword('Secret1!')).rejects.toThrow(
         'Password hashing failed: bcrypt error',
@@ -87,15 +86,16 @@ describe('PasswordService', () => {
     });
 
     it('returns false and logs when bcrypt throws', async () => {
-      (bcrypt.compare as jest.Mock).mockRejectedValue(new Error('compare fail'));
+      (bcrypt.compare as jest.Mock).mockRejectedValue(
+        new Error('compare fail'),
+      );
 
       const result = await service.verifyPassword('Secret1!', '$hashed');
 
       expect(result).toBe(false);
       expect(mockLogger.error).toHaveBeenCalled();
     });
-
-});
+  });
 
   // ─── validatePassword ────────────────────────────────────────────────────────
 

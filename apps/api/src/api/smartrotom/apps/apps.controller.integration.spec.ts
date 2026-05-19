@@ -9,7 +9,12 @@ import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter'
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { Reflector } from '@nestjs/core';
 
-const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn() };
+const mockLogger = {
+  log: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  debug: jest.fn(),
+};
 
 const mockFacade = {
   getApps: jest.fn(),
@@ -46,7 +51,11 @@ describe('AppsController — integration (ValidationPipe + GlobalExceptionFilter
 
     app = moduleRef.createNestApplication();
     app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
     );
     app.useGlobalFilters(new GlobalExceptionFilter(mockLogger as any));
     await app.init();
@@ -92,7 +101,9 @@ describe('AppsController — integration (ValidationPipe + GlobalExceptionFilter
     it('returns 200 and delegates to facade.getActiveApps', async () => {
       mockFacade.getActiveApps.mockResolvedValue([mockApp]);
 
-      const res = await request(app.getHttpServer()).get('/smartrotom/apps/active');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/apps/active',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getActiveApps).toHaveBeenCalledTimes(1);
@@ -105,7 +116,9 @@ describe('AppsController — integration (ValidationPipe + GlobalExceptionFilter
     it('returns 200 and delegates to facade.getInactiveApps', async () => {
       mockFacade.getInactiveApps.mockResolvedValue([]);
 
-      const res = await request(app.getHttpServer()).get('/smartrotom/apps/inactive');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/apps/inactive',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getInactiveApps).toHaveBeenCalledTimes(1);
@@ -147,7 +160,12 @@ describe('AppsController — integration (ValidationPipe + GlobalExceptionFilter
     });
 
     it('calls facade.createApp when body is valid', async () => {
-      mockFacade.createApp.mockResolvedValue({ id: 2, name: 'TestApp', url: 'testapp', active: 1 });
+      mockFacade.createApp.mockResolvedValue({
+        id: 2,
+        name: 'TestApp',
+        url: 'testapp',
+        active: 1,
+      });
 
       const res = await request(app.getHttpServer())
         .post('/smartrotom/apps')
@@ -190,9 +208,14 @@ describe('AppsController — integration (ValidationPipe + GlobalExceptionFilter
 
   describe('DELETE /smartrotom/apps/:id', () => {
     it('returns 200 and calls facade.deleteApp with numeric id', async () => {
-      mockFacade.deleteApp.mockResolvedValue({ success: true, message: 'Deleted' });
+      mockFacade.deleteApp.mockResolvedValue({
+        success: true,
+        message: 'Deleted',
+      });
 
-      const res = await request(app.getHttpServer()).delete('/smartrotom/apps/5');
+      const res = await request(app.getHttpServer()).delete(
+        '/smartrotom/apps/5',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.deleteApp).toHaveBeenCalledWith(5);
@@ -205,7 +228,9 @@ describe('AppsController — integration (ValidationPipe + GlobalExceptionFilter
     it('returns 200 and calls facade.activateApp with numeric id', async () => {
       mockFacade.activateApp.mockResolvedValue({ ...mockApp, active: 1 });
 
-      const res = await request(app.getHttpServer()).patch('/smartrotom/apps/2/activate');
+      const res = await request(app.getHttpServer()).patch(
+        '/smartrotom/apps/2/activate',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.activateApp).toHaveBeenCalledWith(2);
@@ -218,7 +243,9 @@ describe('AppsController — integration (ValidationPipe + GlobalExceptionFilter
     it('returns 200 and calls facade.deactivateApp with numeric id', async () => {
       mockFacade.deactivateApp.mockResolvedValue({ ...mockApp, active: 0 });
 
-      const res = await request(app.getHttpServer()).patch('/smartrotom/apps/2/deactivate');
+      const res = await request(app.getHttpServer()).patch(
+        '/smartrotom/apps/2/deactivate',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.deactivateApp).toHaveBeenCalledWith(2);
@@ -314,7 +341,10 @@ describe('AppsController — integration (ValidationPipe + GlobalExceptionFilter
         .send({ uuid: VALID_UUID, id: 3 });
 
       expect(res.status).toBeLessThan(300);
-      expect(mockFacade.removeAppFromPlayer).toHaveBeenCalledWith(VALID_UUID, 3);
+      expect(mockFacade.removeAppFromPlayer).toHaveBeenCalledWith(
+        VALID_UUID,
+        3,
+      );
     });
   });
 
@@ -350,7 +380,13 @@ describe('AppsController — integration (ValidationPipe + GlobalExceptionFilter
 
       const res = await request(app.getHttpServer())
         .post('/smartrotom/apps/order')
-        .send({ uuid: VALID_UUID, order: [{ id: 1, order: 1 }, { id: 2, order: 2 }] });
+        .send({
+          uuid: VALID_UUID,
+          order: [
+            { id: 1, order: 1 },
+            { id: 2, order: 2 },
+          ],
+        });
 
       expect(res.status).toBeLessThan(300);
       expect(mockFacade.orderApps).toHaveBeenCalledWith(

@@ -9,7 +9,12 @@ import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter'
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { Reflector } from '@nestjs/core';
 
-const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn() };
+const mockLogger = {
+  log: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  debug: jest.fn(),
+};
 
 const mockFacade = {
   getAllUsers: jest.fn(),
@@ -47,7 +52,11 @@ describe('UsersController (SmartRotom) — integration (ValidationPipe + GlobalE
 
     app = moduleRef.createNestApplication();
     app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
     );
     app.useGlobalFilters(new GlobalExceptionFilter(mockLogger as any));
     await app.init();
@@ -141,7 +150,10 @@ describe('UsersController (SmartRotom) — integration (ValidationPipe + GlobalE
     });
 
     it('accepts optional world field', async () => {
-      mockFacade.createUser.mockResolvedValue({ ...mockUser, world: 'survival' });
+      mockFacade.createUser.mockResolvedValue({
+        ...mockUser,
+        world: 'survival',
+      });
 
       const res = await request(app.getHttpServer())
         .post('/smartrotom/users')
@@ -167,7 +179,9 @@ describe('UsersController (SmartRotom) — integration (ValidationPipe + GlobalE
     });
 
     it('returns 400 when id is not numeric (ParseIntPipe)', async () => {
-      const res = await request(app.getHttpServer()).get('/smartrotom/users/abc');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/users/abc',
+      );
 
       expect(res.status).toBe(400);
     });
@@ -179,8 +193,9 @@ describe('UsersController (SmartRotom) — integration (ValidationPipe + GlobalE
     it('returns 200 and passes uuid to facade.getUserByUuid', async () => {
       mockFacade.getUserByUuid.mockResolvedValue(mockUser);
 
-      const res = await request(app.getHttpServer())
-        .get(`/smartrotom/users/uuid/${VALID_UUID}`);
+      const res = await request(app.getHttpServer()).get(
+        `/smartrotom/users/uuid/${VALID_UUID}`,
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getUserByUuid).toHaveBeenCalledWith(VALID_UUID);
@@ -191,14 +206,20 @@ describe('UsersController (SmartRotom) — integration (ValidationPipe + GlobalE
 
   describe('PATCH /smartrotom/users/:id — UpdateSmartrotomUserDto validation', () => {
     it('returns 200 and calls facade.updateUser', async () => {
-      mockFacade.updateUser.mockResolvedValue({ ...mockUser, username: 'NewName' });
+      mockFacade.updateUser.mockResolvedValue({
+        ...mockUser,
+        username: 'NewName',
+      });
 
       const res = await request(app.getHttpServer())
         .patch('/smartrotom/users/1')
         .send({ username: 'NewName' });
 
       expect(res.status).toBe(200);
-      expect(mockFacade.updateUser).toHaveBeenCalledWith(1, expect.objectContaining({ username: 'NewName' }));
+      expect(mockFacade.updateUser).toHaveBeenCalledWith(
+        1,
+        expect.objectContaining({ username: 'NewName' }),
+      );
     });
 
     it('returns 400 when unknown field is present (forbidNonWhitelisted)', async () => {
@@ -222,16 +243,23 @@ describe('UsersController (SmartRotom) — integration (ValidationPipe + GlobalE
 
   describe('DELETE /smartrotom/users/:id', () => {
     it('returns 200 and calls facade.deleteUser', async () => {
-      mockFacade.deleteUser.mockResolvedValue({ success: true, message: 'Deleted' });
+      mockFacade.deleteUser.mockResolvedValue({
+        success: true,
+        message: 'Deleted',
+      });
 
-      const res = await request(app.getHttpServer()).delete('/smartrotom/users/1');
+      const res = await request(app.getHttpServer()).delete(
+        '/smartrotom/users/1',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.deleteUser).toHaveBeenCalledWith(1);
     });
 
     it('returns 400 when id is not numeric', async () => {
-      const res = await request(app.getHttpServer()).delete('/smartrotom/users/abc');
+      const res = await request(app.getHttpServer()).delete(
+        '/smartrotom/users/abc',
+      );
 
       expect(res.status).toBe(400);
     });
@@ -251,7 +279,10 @@ describe('UsersController (SmartRotom) — integration (ValidationPipe + GlobalE
     });
 
     it('calls facade.findOrCreateUser when body is valid', async () => {
-      mockFacade.findOrCreateUser.mockResolvedValue({ user: mockUser, isNew: false });
+      mockFacade.findOrCreateUser.mockResolvedValue({
+        user: mockUser,
+        isNew: false,
+      });
 
       const res = await request(app.getHttpServer())
         .post('/smartrotom/users/find-or-create')
@@ -286,7 +317,10 @@ describe('UsersController (SmartRotom) — integration (ValidationPipe + GlobalE
     });
 
     it('calls facade.initializeUserAndAccounts when body is valid', async () => {
-      mockFacade.initializeUserAndAccounts.mockResolvedValue({ user: mockUser, accounts: [] });
+      mockFacade.initializeUserAndAccounts.mockResolvedValue({
+        user: mockUser,
+        accounts: [],
+      });
 
       const res = await request(app.getHttpServer())
         .post('/smartrotom/users/initialize')
@@ -342,7 +376,10 @@ describe('UsersController (SmartRotom) — integration (ValidationPipe + GlobalE
         .send({ uuids: [VALID_UUID, VALID_UUID_2] });
 
       expect(res.status).toBeLessThan(300);
-      expect(mockFacade.getMultipleUsers).toHaveBeenCalledWith([VALID_UUID, VALID_UUID_2]);
+      expect(mockFacade.getMultipleUsers).toHaveBeenCalledWith([
+        VALID_UUID,
+        VALID_UUID_2,
+      ]);
     });
   });
 
@@ -358,14 +395,18 @@ describe('UsersController (SmartRotom) — integration (ValidationPipe + GlobalE
     });
 
     it('calls facade.getMultipleUsersWithAccounts when body is valid', async () => {
-      mockFacade.getMultipleUsersWithAccounts.mockResolvedValue({ [VALID_UUID]: mockUser });
+      mockFacade.getMultipleUsersWithAccounts.mockResolvedValue({
+        [VALID_UUID]: mockUser,
+      });
 
       const res = await request(app.getHttpServer())
         .post('/smartrotom/users/batch/accounts')
         .send({ uuids: [VALID_UUID] });
 
       expect(res.status).toBeLessThan(300);
-      expect(mockFacade.getMultipleUsersWithAccounts).toHaveBeenCalledWith([VALID_UUID]);
+      expect(mockFacade.getMultipleUsersWithAccounts).toHaveBeenCalledWith([
+        VALID_UUID,
+      ]);
     });
   });
 
@@ -375,7 +416,9 @@ describe('UsersController (SmartRotom) — integration (ValidationPipe + GlobalE
     it('returns 200 and delegates to facade.getUserStatistics', async () => {
       mockFacade.getUserStatistics.mockResolvedValue({ total: 10 });
 
-      const res = await request(app.getHttpServer()).get('/smartrotom/users/stats/overview');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/users/stats/overview',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getUserStatistics).toHaveBeenCalledTimes(1);
@@ -388,8 +431,9 @@ describe('UsersController (SmartRotom) — integration (ValidationPipe + GlobalE
     it('returns 200 with exists:true when user exists', async () => {
       mockFacade.validateUserExists.mockResolvedValue(true);
 
-      const res = await request(app.getHttpServer())
-        .get(`/smartrotom/users/validate/${VALID_UUID}`);
+      const res = await request(app.getHttpServer()).get(
+        `/smartrotom/users/validate/${VALID_UUID}`,
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.validateUserExists).toHaveBeenCalledWith(VALID_UUID);
@@ -398,8 +442,9 @@ describe('UsersController (SmartRotom) — integration (ValidationPipe + GlobalE
     it('returns 200 with exists:false when user does not exist', async () => {
       mockFacade.validateUserExists.mockResolvedValue(false);
 
-      const res = await request(app.getHttpServer())
-        .get(`/smartrotom/users/validate/${VALID_UUID}`);
+      const res = await request(app.getHttpServer()).get(
+        `/smartrotom/users/validate/${VALID_UUID}`,
+      );
 
       expect(res.status).toBe(200);
     });

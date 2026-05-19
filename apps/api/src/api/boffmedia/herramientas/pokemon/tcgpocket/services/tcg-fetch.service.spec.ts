@@ -7,7 +7,12 @@ import { TcgFetchService } from './tcg-fetch.service';
 import { TcgErrorService } from './tcg-error.service';
 import { TcgConfigService } from './tcg-config.service';
 
-const mockLogger = { log: jest.fn(), warn: jest.fn(), error: jest.fn(), debug: jest.fn() };
+const mockLogger = {
+  log: jest.fn(),
+  warn: jest.fn(),
+  error: jest.fn(),
+  debug: jest.fn(),
+};
 const mockHttpService = { get: jest.fn() };
 const mockErrorService = {
   handleApiError: jest.fn().mockImplementation((error: any, op: string) => {
@@ -18,15 +23,20 @@ const mockErrorService = {
   validateLocale: jest.fn(),
 };
 const mockConfigService = {
-  getSeriesUrl: jest.fn((locale: string) => `https://api.tcgdex.net/v2/${locale}/series`),
+  getSeriesUrl: jest.fn(
+    (locale: string) => `https://api.tcgdex.net/v2/${locale}/series`,
+  ),
   getSeriesDetailUrl: jest.fn(
-    (locale: string, id: string) => `https://api.tcgdex.net/v2/${locale}/series/${id}`,
+    (locale: string, id: string) =>
+      `https://api.tcgdex.net/v2/${locale}/series/${id}`,
   ),
   getSetUrl: jest.fn(
-    (locale: string, id: string) => `https://api.tcgdex.net/v2/${locale}/sets/${id}`,
+    (locale: string, id: string) =>
+      `https://api.tcgdex.net/v2/${locale}/sets/${id}`,
   ),
   getCardUrl: jest.fn(
-    (locale: string, id: string) => `https://api.tcgdex.net/v2/${locale}/cards/${id}`,
+    (locale: string, id: string) =>
+      `https://api.tcgdex.net/v2/${locale}/cards/${id}`,
   ),
 };
 
@@ -35,20 +45,25 @@ describe('TcgFetchService', () => {
 
   beforeEach(async () => {
     jest.resetAllMocks();
-    mockErrorService.handleApiError.mockImplementation((error: any, op: string) => {
-      throw new HttpException(`${op} failed`, HttpStatus.BAD_GATEWAY);
-    });
+    mockErrorService.handleApiError.mockImplementation(
+      (error: any, op: string) => {
+        throw new HttpException(`${op} failed`, HttpStatus.BAD_GATEWAY);
+      },
+    );
     mockConfigService.getSeriesUrl.mockImplementation(
       (locale: string) => `https://api.tcgdex.net/v2/${locale}/series`,
     );
     mockConfigService.getSeriesDetailUrl.mockImplementation(
-      (locale: string, id: string) => `https://api.tcgdex.net/v2/${locale}/series/${id}`,
+      (locale: string, id: string) =>
+        `https://api.tcgdex.net/v2/${locale}/series/${id}`,
     );
     mockConfigService.getSetUrl.mockImplementation(
-      (locale: string, id: string) => `https://api.tcgdex.net/v2/${locale}/sets/${id}`,
+      (locale: string, id: string) =>
+        `https://api.tcgdex.net/v2/${locale}/sets/${id}`,
     );
     mockConfigService.getCardUrl.mockImplementation(
-      (locale: string, id: string) => `https://api.tcgdex.net/v2/${locale}/cards/${id}`,
+      (locale: string, id: string) =>
+        `https://api.tcgdex.net/v2/${locale}/cards/${id}`,
     );
 
     const module: TestingModule = await Test.createTestingModule({
@@ -73,8 +88,28 @@ describe('TcgFetchService', () => {
   describe('fetchAndMergeSeries()', () => {
     it('merges EN and ES series by id', async () => {
       mockHttpService.get
-        .mockReturnValueOnce(of({ data: [{ id: 'sv', name: 'Scarlet & Violet', logo: 'https://img/sv.png' }] }))
-        .mockReturnValueOnce(of({ data: [{ id: 'sv', name: 'Escarlata y Violeta', logo: 'https://img/sv.png' }] }));
+        .mockReturnValueOnce(
+          of({
+            data: [
+              {
+                id: 'sv',
+                name: 'Scarlet & Violet',
+                logo: 'https://img/sv.png',
+              },
+            ],
+          }),
+        )
+        .mockReturnValueOnce(
+          of({
+            data: [
+              {
+                id: 'sv',
+                name: 'Escarlata y Violeta',
+                logo: 'https://img/sv.png',
+              },
+            ],
+          }),
+        );
 
       const result = await service.fetchAndMergeSeries();
 
@@ -87,7 +122,9 @@ describe('TcgFetchService', () => {
     it('includes ES-only series with empty name_en', async () => {
       mockHttpService.get
         .mockReturnValueOnce(of({ data: [] }))
-        .mockReturnValueOnce(of({ data: [{ id: 'sv', name: 'Escarlata y Violeta', logo: null }] }));
+        .mockReturnValueOnce(
+          of({ data: [{ id: 'sv', name: 'Escarlata y Violeta', logo: null }] }),
+        );
 
       const result = await service.fetchAndMergeSeries();
 
@@ -96,9 +133,13 @@ describe('TcgFetchService', () => {
     });
 
     it('delegates to errorService on HTTP failure', async () => {
-      mockHttpService.get.mockReturnValue(throwError(() => new Error('network')));
+      mockHttpService.get.mockReturnValue(
+        throwError(() => new Error('network')),
+      );
 
-      await expect(service.fetchAndMergeSeries()).rejects.toThrow(HttpException);
+      await expect(service.fetchAndMergeSeries()).rejects.toThrow(
+        HttpException,
+      );
       expect(mockErrorService.handleApiError).toHaveBeenCalled();
     });
   });
@@ -128,7 +169,9 @@ describe('TcgFetchService', () => {
         throw new BadRequestException('Invalid series id');
       });
 
-      await expect(service.fetchSetsForSeries('', 'en')).rejects.toThrow(BadRequestException);
+      await expect(service.fetchSetsForSeries('', 'en')).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('returns empty array when API returns no sets', async () => {
@@ -143,8 +186,20 @@ describe('TcgFetchService', () => {
 
   describe('fetchAndMergeSetsForSeries()', () => {
     it('merges EN and ES sets by id', async () => {
-      const enSet = { id: 'sv1', name: 'Base Set', logo: null, symbol: null, cardCount: { official: 64, total: 72 } };
-      const esSet = { id: 'sv1', name: 'Set Base', logo: null, symbol: null, cardCount: { official: 64, total: 72 } };
+      const enSet = {
+        id: 'sv1',
+        name: 'Base Set',
+        logo: null,
+        symbol: null,
+        cardCount: { official: 64, total: 72 },
+      };
+      const esSet = {
+        id: 'sv1',
+        name: 'Set Base',
+        logo: null,
+        symbol: null,
+        cardCount: { official: 64, total: 72 },
+      };
 
       mockHttpService.get
         .mockReturnValueOnce(of({ data: { sets: [enSet] } }))

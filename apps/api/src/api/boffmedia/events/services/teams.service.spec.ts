@@ -100,10 +100,17 @@ describe('TeamsService', () => {
   // ─── createTeam ───────────────────────────────────────────────────────────────
 
   describe('createTeam()', () => {
-    const dto = { name: 'Team Rocket', tag: 'TR', icon: 'rocket.png', leaderId: 1 };
+    const dto = {
+      name: 'Team Rocket',
+      tag: 'TR',
+      icon: 'rocket.png',
+      leaderId: 1,
+    };
 
     beforeEach(() => {
-      mockParticipantsService.getOrCreateParticipantByUserId.mockResolvedValue(mockParticipant);
+      mockParticipantsService.getOrCreateParticipantByUserId.mockResolvedValue(
+        mockParticipant,
+      );
       mockTeamsRepo.create.mockResolvedValue({ insertId: 1 });
       mockTeamsRepo.addMember.mockResolvedValue(undefined);
       mockParticipantsService.joinEvent.mockResolvedValue({});
@@ -113,12 +120,22 @@ describe('TeamsService', () => {
     it('creates team, adds leader as member, and joins event', async () => {
       const result = await service.createTeam(10, dto);
 
-      expect(mockParticipantsService.getOrCreateParticipantByUserId).toHaveBeenCalledWith(1);
+      expect(
+        mockParticipantsService.getOrCreateParticipantByUserId,
+      ).toHaveBeenCalledWith(1);
       expect(mockTeamsRepo.create).toHaveBeenCalledWith(
-        expect.objectContaining({ eventId: 10, name: 'Team Rocket', tag: 'TR' }),
+        expect.objectContaining({
+          eventId: 10,
+          name: 'Team Rocket',
+          tag: 'TR',
+        }),
       );
       expect(mockTeamsRepo.addMember).toHaveBeenCalledWith(
-        expect.objectContaining({ teamId: 1, participantId: 5, role: 'leader' }),
+        expect.objectContaining({
+          teamId: 1,
+          participantId: 5,
+          role: 'leader',
+        }),
       );
       expect(mockParticipantsService.joinEvent).toHaveBeenCalledWith(
         10,
@@ -146,11 +163,17 @@ describe('TeamsService', () => {
 
     it('updates team and returns refreshed entity', async () => {
       mockTeamsRepo.update.mockResolvedValue(undefined);
-      mockTeamsRepo.findById.mockResolvedValue({ ...mockTeam, name: 'Team Magma' });
+      mockTeamsRepo.findById.mockResolvedValue({
+        ...mockTeam,
+        name: 'Team Magma',
+      });
 
       const result = await service.updateTeam(1, dto);
 
-      expect(mockTeamsRepo.update).toHaveBeenCalledWith(1, expect.objectContaining({ name: 'Team Magma' }));
+      expect(mockTeamsRepo.update).toHaveBeenCalledWith(
+        1,
+        expect.objectContaining({ name: 'Team Magma' }),
+      );
       expect(result.name).toBe('Team Magma');
     });
   });
@@ -159,7 +182,9 @@ describe('TeamsService', () => {
 
   describe('joinTeam()', () => {
     beforeEach(() => {
-      mockParticipantsService.getOrCreateParticipantByUserId.mockResolvedValue(mockParticipant);
+      mockParticipantsService.getOrCreateParticipantByUserId.mockResolvedValue(
+        mockParticipant,
+      );
       mockTeamsRepo.findParticipantTeamInEvent.mockResolvedValue([]);
       mockTeamsRepo.addMember.mockResolvedValue(undefined);
       mockParticipantsService.joinEvent.mockResolvedValue({});
@@ -170,7 +195,11 @@ describe('TeamsService', () => {
       const result = await service.joinTeam(10, 1, 1);
 
       expect(mockTeamsRepo.addMember).toHaveBeenCalledWith(
-        expect.objectContaining({ teamId: 1, participantId: 5, role: 'member' }),
+        expect.objectContaining({
+          teamId: 1,
+          participantId: 5,
+          role: 'member',
+        }),
       );
       expect(mockParticipantsService.joinEvent).toHaveBeenCalled();
       expect(result).toEqual(mockMember);
@@ -179,11 +208,16 @@ describe('TeamsService', () => {
     it('returns member fetched after adding', async () => {
       await service.joinTeam(10, 1, 1);
 
-      expect(mockTeamsRepo.findMember).toHaveBeenCalledWith(1, mockParticipant.id);
+      expect(mockTeamsRepo.findMember).toHaveBeenCalledWith(
+        1,
+        mockParticipant.id,
+      );
     });
 
     it('throws when participant is already in a team for this event', async () => {
-      mockTeamsRepo.findParticipantTeamInEvent.mockResolvedValue([{ teamId: 2 }]);
+      mockTeamsRepo.findParticipantTeamInEvent.mockResolvedValue([
+        { teamId: 2 },
+      ]);
 
       await expect(service.joinTeam(10, 1, 1)).rejects.toThrow(
         'Participant is already in a team for this event',
@@ -196,16 +230,24 @@ describe('TeamsService', () => {
 
   describe('leaveTeam()', () => {
     beforeEach(() => {
-      mockParticipantsService.getOrCreateParticipantByUserId.mockResolvedValue(mockParticipant);
+      mockParticipantsService.getOrCreateParticipantByUserId.mockResolvedValue(
+        mockParticipant,
+      );
     });
 
     it('removes member from team and returns success', async () => {
-      mockTeamsRepo.findMember.mockResolvedValue({ ...mockMember, role: 'member' });
+      mockTeamsRepo.findMember.mockResolvedValue({
+        ...mockMember,
+        role: 'member',
+      });
       mockTeamsRepo.removeMember.mockResolvedValue(undefined);
 
       const result = await service.leaveTeam(1, 1);
 
-      expect(mockTeamsRepo.removeMember).toHaveBeenCalledWith(1, mockParticipant.id);
+      expect(mockTeamsRepo.removeMember).toHaveBeenCalledWith(
+        1,
+        mockParticipant.id,
+      );
       expect(result).toEqual({ success: true });
     });
 
@@ -219,7 +261,10 @@ describe('TeamsService', () => {
     });
 
     it('throws when the leader tries to leave', async () => {
-      mockTeamsRepo.findMember.mockResolvedValue({ ...mockMember, role: 'leader' });
+      mockTeamsRepo.findMember.mockResolvedValue({
+        ...mockMember,
+        role: 'leader',
+      });
 
       await expect(service.leaveTeam(1, 1)).rejects.toThrow(
         'Team leader cannot leave the team.',

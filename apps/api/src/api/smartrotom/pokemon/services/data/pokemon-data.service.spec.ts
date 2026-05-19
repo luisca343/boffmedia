@@ -86,9 +86,9 @@ describe('PokemonDataService', () => {
 
   describe('after loadPokemonData()', () => {
     beforeEach(async () => {
-      jest.spyOn(service as any, 'readJsonFiles').mockResolvedValue([
-        makePokemon(),
-      ]);
+      jest
+        .spyOn(service as any, 'readJsonFiles')
+        .mockResolvedValue([makePokemon()]);
       await service.loadPokemonData();
     });
 

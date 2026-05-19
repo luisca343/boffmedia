@@ -59,7 +59,9 @@ describe('PlayerService (mine)', () => {
     });
 
     it('throws BadRequestException when uuid is empty', async () => {
-      await expect(service.getPlayerHistory('')).rejects.toThrow(BadRequestException);
+      await expect(service.getPlayerHistory('')).rejects.toThrow(
+        BadRequestException,
+      );
       expect(mockRepo.findPlayerHistory).not.toHaveBeenCalled();
     });
   });
@@ -80,7 +82,10 @@ describe('PlayerService (mine)', () => {
 
   describe('getPlayerRank()', () => {
     it('returns rank from repo', async () => {
-      mockRepo.findPlayerRanking.mockResolvedValue({ rank: 3, totalValue: 5000 });
+      mockRepo.findPlayerRanking.mockResolvedValue({
+        rank: 3,
+        totalValue: 5000,
+      });
 
       const result = await service.getPlayerRank(UUID);
 
@@ -94,7 +99,9 @@ describe('PlayerService (mine)', () => {
     });
 
     it('throws BadRequestException when uuid is empty', async () => {
-      await expect(service.getPlayerRank('')).rejects.toThrow(BadRequestException);
+      await expect(service.getPlayerRank('')).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
@@ -144,7 +151,9 @@ describe('PlayerService (mine)', () => {
     });
 
     it('throws BadRequestException when uuid is empty', async () => {
-      await expect(service.getUnclaimedRewards('')).rejects.toThrow(BadRequestException);
+      await expect(service.getUnclaimedRewards('')).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
@@ -156,7 +165,11 @@ describe('PlayerService (mine)', () => {
 
       const result = await service.claimRewards(UUID);
 
-      expect(result).toEqual({ claimedIds: [], totalClaimed: 0, success: true });
+      expect(result).toEqual({
+        claimedIds: [],
+        totalClaimed: 0,
+        success: true,
+      });
       expect(mockRepo.claimInventoryItems).not.toHaveBeenCalled();
     });
 
@@ -176,7 +189,9 @@ describe('PlayerService (mine)', () => {
     });
 
     it('throws BadRequestException when uuid is empty', async () => {
-      await expect(service.claimRewards('')).rejects.toThrow(BadRequestException);
+      await expect(service.claimRewards('')).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
@@ -204,7 +219,9 @@ describe('PlayerService (mine)', () => {
     });
 
     it('throws BadRequestException when uuid is empty', async () => {
-      await expect(service.getPlayerStatistics('')).rejects.toThrow(BadRequestException);
+      await expect(service.getPlayerStatistics('')).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 

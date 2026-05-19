@@ -118,8 +118,14 @@ describe('PokemonShowdownService', () => {
         name: 'formmon',
         defaultForms: ['base'],
         forms: [
-          makeForm({ name: 'base', abilities: { abilities: ['Torrent'], hiddenAbilities: [] } }),
-          makeForm({ name: 'shadow', abilities: { abilities: ['Hustle'], hiddenAbilities: [] } }),
+          makeForm({
+            name: 'base',
+            abilities: { abilities: ['Torrent'], hiddenAbilities: [] },
+          }),
+          makeForm({
+            name: 'shadow',
+            abilities: { abilities: ['Hustle'], hiddenAbilities: [] },
+          }),
         ],
       });
       mockPokemonDataService.getCustomSpecies.mockReturnValue([multiForm]);
@@ -138,8 +144,14 @@ describe('PokemonShowdownService', () => {
         name: 'formmon',
         defaultForms: ['base'],
         forms: [
-          makeForm({ name: 'base', abilities: { abilities: ['Torrent'], hiddenAbilities: [] } }),
-          makeForm({ name: 'shadow', abilities: { abilities: ['Hustle'], hiddenAbilities: [] } }),
+          makeForm({
+            name: 'base',
+            abilities: { abilities: ['Torrent'], hiddenAbilities: [] },
+          }),
+          makeForm({
+            name: 'shadow',
+            abilities: { abilities: ['Hustle'], hiddenAbilities: [] },
+          }),
         ],
       });
       mockPokemonDataService.getCustomSpecies.mockReturnValue([multiForm]);
@@ -149,7 +161,9 @@ describe('PokemonShowdownService', () => {
 
       // base entry + shadow form entry
       expect(keys).toHaveLength(2);
-      const shadowEntry = Object.values(result).find((e: any) => e.baseSpecies === 'formmon');
+      const shadowEntry = Object.values(result).find(
+        (e: any) => e.baseSpecies === 'formmon',
+      );
       expect(shadowEntry).toBeDefined();
       expect((shadowEntry as any).forme).toBeDefined();
     });
@@ -160,14 +174,22 @@ describe('PokemonShowdownService', () => {
         name: 'formmon',
         defaultForms: ['base'],
         forms: [
-          makeForm({ name: 'base', abilities: { abilities: ['Torrent'], hiddenAbilities: [] } }),
-          makeForm({ name: 'shadow', abilities: { abilities: ['Hustle'], hiddenAbilities: [] } }),
+          makeForm({
+            name: 'base',
+            abilities: { abilities: ['Torrent'], hiddenAbilities: [] },
+          }),
+          makeForm({
+            name: 'shadow',
+            abilities: { abilities: ['Hustle'], hiddenAbilities: [] },
+          }),
         ],
       });
       mockPokemonDataService.getCustomSpecies.mockReturnValue([multiForm]);
 
       const result = await service.getTerasPokemonShowdownData();
-      const shadowEntry = Object.values(result).find((e: any) => e.baseSpecies === 'formmon') as any;
+      const shadowEntry = Object.values(result).find(
+        (e: any) => e.baseSpecies === 'formmon',
+      ) as any;
 
       expect(shadowEntry.changesFrom).toBe('formmon');
     });
@@ -178,11 +200,19 @@ describe('PokemonShowdownService', () => {
         name: 'megamon',
         defaultForms: ['base'],
         forms: [
-          makeForm({ name: 'base', abilities: { abilities: ['Blaze'], hiddenAbilities: [] } }),
-          makeForm({ name: 'mega', abilities: { abilities: ['TurboBlazer'], hiddenAbilities: [] } }),
+          makeForm({
+            name: 'base',
+            abilities: { abilities: ['Blaze'], hiddenAbilities: [] },
+          }),
+          makeForm({
+            name: 'mega',
+            abilities: { abilities: ['TurboBlazer'], hiddenAbilities: [] },
+          }),
         ],
       });
-      mockPokemonDataService.getCustomSpecies.mockReturnValue([pokemonWithMega]);
+      mockPokemonDataService.getCustomSpecies.mockReturnValue([
+        pokemonWithMega,
+      ]);
 
       const result = await service.getTerasPokemonShowdownData();
 
@@ -191,14 +221,20 @@ describe('PokemonShowdownService', () => {
       expect((result['megamon'] as any).otherFormes).toBeUndefined();
 
       // mega form is still added to the output via the form loop
-      const megaEntry = Object.values(result).find((e: any) => e.baseSpecies === 'megamon');
+      const megaEntry = Object.values(result).find(
+        (e: any) => e.baseSpecies === 'megamon',
+      );
       expect(megaEntry).toBeDefined();
     });
 
     it('handles pokemon with no hidden abilities', async () => {
       mockPokemonDataService.getCustomSpecies.mockReturnValue([
         makePokemon({
-          forms: [makeForm({ abilities: { abilities: ['Overgrow'], hiddenAbilities: [] } })],
+          forms: [
+            makeForm({
+              abilities: { abilities: ['Overgrow'], hiddenAbilities: [] },
+            }),
+          ],
         }),
       ]);
       const result = await service.getTerasPokemonShowdownData();

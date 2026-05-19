@@ -10,7 +10,12 @@ const mockService: jest.Mocked<Partial<SharexService>> = {
   createImage: jest.fn(),
 };
 
-const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn() };
+const mockLogger = {
+  log: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  debug: jest.fn(),
+};
 
 describe('SharexController — integration (ValidationPipe + GlobalExceptionFilter)', () => {
   let app: INestApplication;
@@ -23,7 +28,11 @@ describe('SharexController — integration (ValidationPipe + GlobalExceptionFilt
 
     app = module.createNestApplication();
     app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
     );
     app.useGlobalFilters(new GlobalExceptionFilter(mockLogger as any));
     await app.init();

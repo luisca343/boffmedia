@@ -70,7 +70,9 @@ describe('LigaFacadeService', () => {
     it('wraps and re-throws on error', async () => {
       mockReplayService.getReplayById.mockRejectedValue(new Error('not found'));
 
-      await expect(service.getReplayById(99)).rejects.toThrow('Failed to retrieve replay');
+      await expect(service.getReplayById(99)).rejects.toThrow(
+        'Failed to retrieve replay',
+      );
     });
   });
 
@@ -87,7 +89,9 @@ describe('LigaFacadeService', () => {
     it('delegates to ReplayService with player uuid', async () => {
       mockReplayService.getPlayerReplays.mockResolvedValue([mockReplay]);
 
-      await expect(service.getPlayerReplays(UUID)).resolves.toEqual([mockReplay]);
+      await expect(service.getPlayerReplays(UUID)).resolves.toEqual([
+        mockReplay,
+      ]);
     });
   });
 
@@ -95,8 +99,13 @@ describe('LigaFacadeService', () => {
     it('fetches H2H replays between two players', async () => {
       mockReplayService.getMatchHistory.mockResolvedValue([mockReplay]);
 
-      await expect(service.getMatchHistory('p1', 'p2')).resolves.toEqual([mockReplay]);
-      expect(mockReplayService.getMatchHistory).toHaveBeenCalledWith('p1', 'p2');
+      await expect(service.getMatchHistory('p1', 'p2')).resolves.toEqual([
+        mockReplay,
+      ]);
+      expect(mockReplayService.getMatchHistory).toHaveBeenCalledWith(
+        'p1',
+        'p2',
+      );
     });
   });
 
@@ -106,13 +115,19 @@ describe('LigaFacadeService', () => {
     it('delegates to StatisticsService', async () => {
       mockStatisticsService.getPlayerStatistics.mockResolvedValue(mockStats);
 
-      await expect(service.getPlayerStatistics(UUID)).resolves.toEqual(mockStats);
+      await expect(service.getPlayerStatistics(UUID)).resolves.toEqual(
+        mockStats,
+      );
     });
 
     it('wraps and re-throws on error', async () => {
-      mockStatisticsService.getPlayerStatistics.mockRejectedValue(new Error('fail'));
+      mockStatisticsService.getPlayerStatistics.mockRejectedValue(
+        new Error('fail'),
+      );
 
-      await expect(service.getPlayerStatistics(UUID)).rejects.toThrow('Failed to retrieve player statistics');
+      await expect(service.getPlayerStatistics(UUID)).rejects.toThrow(
+        'Failed to retrieve player statistics',
+      );
     });
   });
 
@@ -128,7 +143,10 @@ describe('LigaFacadeService', () => {
 
   describe('getPlayerRanking()', () => {
     it('returns ranking data', async () => {
-      mockStatisticsService.getPlayerRanking.mockResolvedValue({ rank: 3, totalPlayers: 50 });
+      mockStatisticsService.getPlayerRanking.mockResolvedValue({
+        rank: 3,
+        totalPlayers: 50,
+      });
 
       const result = await service.getPlayerRanking(UUID);
 
@@ -168,7 +186,10 @@ describe('LigaFacadeService', () => {
         message: 'not yet implemented',
       });
 
-      const result = await service.createTournament({ name: 'Cup', maxParticipants: 8 } as any);
+      const result = await service.createTournament({
+        name: 'Cup',
+        maxParticipants: 8,
+      } as any);
 
       expect(result.success).toBe(true);
     });
@@ -176,9 +197,15 @@ describe('LigaFacadeService', () => {
 
   describe('registerForTournament()', () => {
     it('delegates registration', async () => {
-      mockTournamentService.registerForTournament.mockResolvedValue({ success: true, message: 'ok' });
+      mockTournamentService.registerForTournament.mockResolvedValue({
+        success: true,
+        message: 'ok',
+      });
 
-      const result = await service.registerForTournament({ tournamentId: 1, playerUuid: UUID } as any);
+      const result = await service.registerForTournament({
+        tournamentId: 1,
+        playerUuid: UUID,
+      } as any);
 
       expect(result.success).toBe(true);
     });
@@ -194,7 +221,9 @@ describe('LigaFacadeService', () => {
     });
 
     it('returns false on error (does not throw)', async () => {
-      mockReplayService.validateReplayExists.mockRejectedValue(new Error('fail'));
+      mockReplayService.validateReplayExists.mockRejectedValue(
+        new Error('fail'),
+      );
 
       await expect(service.validateReplayExists(99)).resolves.toBe(false);
     });
@@ -202,7 +231,9 @@ describe('LigaFacadeService', () => {
 
   describe('validateTournamentExists()', () => {
     it('returns false on error (does not throw)', async () => {
-      mockTournamentService.validateTournamentExists.mockRejectedValue(new Error('fail'));
+      mockTournamentService.validateTournamentExists.mockRejectedValue(
+        new Error('fail'),
+      );
 
       await expect(service.validateTournamentExists(99)).resolves.toBe(false);
     });

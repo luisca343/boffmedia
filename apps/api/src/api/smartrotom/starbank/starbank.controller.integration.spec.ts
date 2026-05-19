@@ -9,7 +9,12 @@ import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter'
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { Reflector } from '@nestjs/core';
 
-const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn() };
+const mockLogger = {
+  log: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  debug: jest.fn(),
+};
 
 const mockFacade = {
   getAllAccounts: jest.fn(),
@@ -43,7 +48,11 @@ describe('StarbankController — integration (ValidationPipe + GlobalExceptionFi
 
     app = moduleRef.createNestApplication();
     app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
     );
     app.useGlobalFilters(new GlobalExceptionFilter(mockLogger as any));
     await app.init();
@@ -133,8 +142,9 @@ describe('StarbankController — integration (ValidationPipe + GlobalExceptionFi
     it('returns balance from facade', async () => {
       mockFacade.getBalance.mockResolvedValue({ balance: 1500 });
 
-      const res = await request(app.getHttpServer())
-        .get('/smartrotom/starbank/balance/67d9b543-5ac9-41e1-a8a5-20d7689e24a4');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/starbank/balance/67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getBalance).toHaveBeenCalledWith(
@@ -147,9 +157,13 @@ describe('StarbankController — integration (ValidationPipe + GlobalExceptionFi
 
   describe('GET /smartrotom/starbank/accounts', () => {
     it('returns 200 and delegates to facade.getAllAccounts', async () => {
-      mockFacade.getAllAccounts.mockResolvedValue([{ id: 1, uuid: 'test', balance: 100 }]);
+      mockFacade.getAllAccounts.mockResolvedValue([
+        { id: 1, uuid: 'test', balance: 100 },
+      ]);
 
-      const res = await request(app.getHttpServer()).get('/smartrotom/starbank/accounts');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/starbank/accounts',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getAllAccounts).toHaveBeenCalledTimes(1);
@@ -161,10 +175,13 @@ describe('StarbankController — integration (ValidationPipe + GlobalExceptionFi
   describe('GET /smartrotom/starbank/accounts/:uuid', () => {
     it('returns 200 and passes uuid to facade.getAccounts', async () => {
       const VALID_UUID = '67d9b543-5ac9-41e1-a8a5-20d7689e24a4';
-      mockFacade.getAccounts.mockResolvedValue([{ id: 1, uuid: VALID_UUID, balance: 500 }]);
+      mockFacade.getAccounts.mockResolvedValue([
+        { id: 1, uuid: VALID_UUID, balance: 500 },
+      ]);
 
-      const res = await request(app.getHttpServer())
-        .get(`/smartrotom/starbank/accounts/${VALID_UUID}`);
+      const res = await request(app.getHttpServer()).get(
+        `/smartrotom/starbank/accounts/${VALID_UUID}`,
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getAccounts).toHaveBeenCalledWith(VALID_UUID);
@@ -175,7 +192,12 @@ describe('StarbankController — integration (ValidationPipe + GlobalExceptionFi
 
   describe('POST /smartrotom/starbank/transfer/from-main — TransferFromMainDto validation', () => {
     const VALID_UUID = '67d9b543-5ac9-41e1-a8a5-20d7689e24a4';
-    const validBody = { uuid: VALID_UUID, to: 2, amount: 100, concept: 'payment' };
+    const validBody = {
+      uuid: VALID_UUID,
+      to: 2,
+      amount: 100,
+      concept: 'payment',
+    };
 
     it('returns 400 when uuid is missing', async () => {
       const { uuid: _uuid, ...body } = validBody;
@@ -218,7 +240,12 @@ describe('StarbankController — integration (ValidationPipe + GlobalExceptionFi
         .send(validBody);
 
       expect(res.status).toBeLessThan(300);
-      expect(mockFacade.transferFromMain).toHaveBeenCalledWith(VALID_UUID, 2, 100, 'payment');
+      expect(mockFacade.transferFromMain).toHaveBeenCalledWith(
+        VALID_UUID,
+        2,
+        100,
+        'payment',
+      );
     });
   });
 
@@ -270,7 +297,11 @@ describe('StarbankController — integration (ValidationPipe + GlobalExceptionFi
 
       expect(res.status).toBeLessThan(300);
       expect(mockFacade.shop).toHaveBeenCalledWith(
-        expect.objectContaining({ uuid: 'player-uuid', itemName: 'Potion', count: 3 }),
+        expect.objectContaining({
+          uuid: 'player-uuid',
+          itemName: 'Potion',
+          count: 3,
+        }),
       );
     });
   });
@@ -323,8 +354,9 @@ describe('StarbankController — integration (ValidationPipe + GlobalExceptionFi
     it('returns 200 and delegates to facade.getTransactions with default limit', async () => {
       mockFacade.getTransactions.mockResolvedValue([]);
 
-      const res = await request(app.getHttpServer())
-        .get('/smartrotom/starbank/transactions/1');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/starbank/transactions/1',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getTransactions).toHaveBeenCalledWith(1, 50);
@@ -333,8 +365,9 @@ describe('StarbankController — integration (ValidationPipe + GlobalExceptionFi
     it('passes custom limit query param to facade', async () => {
       mockFacade.getTransactions.mockResolvedValue([]);
 
-      const res = await request(app.getHttpServer())
-        .get('/smartrotom/starbank/transactions/1?limit=10');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/starbank/transactions/1?limit=10',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getTransactions).toHaveBeenCalledWith(1, 10);
@@ -348,11 +381,15 @@ describe('StarbankController — integration (ValidationPipe + GlobalExceptionFi
       const VALID_UUID = '67d9b543-5ac9-41e1-a8a5-20d7689e24a4';
       mockFacade.getTransactionsByUUID.mockResolvedValue([]);
 
-      const res = await request(app.getHttpServer())
-        .get(`/smartrotom/starbank/transactions/user/${VALID_UUID}`);
+      const res = await request(app.getHttpServer()).get(
+        `/smartrotom/starbank/transactions/user/${VALID_UUID}`,
+      );
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getTransactionsByUUID).toHaveBeenCalledWith(VALID_UUID, 50);
+      expect(mockFacade.getTransactionsByUUID).toHaveBeenCalledWith(
+        VALID_UUID,
+        50,
+      );
     });
   });
 
@@ -362,8 +399,9 @@ describe('StarbankController — integration (ValidationPipe + GlobalExceptionFi
     it('returns 200 and delegates to facade.getTransfers', async () => {
       mockFacade.getTransfers.mockResolvedValue([]);
 
-      const res = await request(app.getHttpServer())
-        .get('/smartrotom/starbank/transfers/5');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/starbank/transfers/5',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getTransfers).toHaveBeenCalledWith(5);
@@ -377,8 +415,9 @@ describe('StarbankController — integration (ValidationPipe + GlobalExceptionFi
       const VALID_UUID = '67d9b543-5ac9-41e1-a8a5-20d7689e24a4';
       mockFacade.getTransfersByUUID.mockResolvedValue([]);
 
-      const res = await request(app.getHttpServer())
-        .get(`/smartrotom/starbank/transfers/user/${VALID_UUID}`);
+      const res = await request(app.getHttpServer()).get(
+        `/smartrotom/starbank/transfers/user/${VALID_UUID}`,
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getTransfersByUUID).toHaveBeenCalledWith(VALID_UUID);

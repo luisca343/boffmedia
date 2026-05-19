@@ -22,9 +22,19 @@ const mockEvent = {
 
 describe('EventsService', () => {
   let service: EventsService;
-  let eventsRepository: jest.Mocked<Pick<EventsRepository,
-    'findAll' | 'findById' | 'findChildEvents' | 'create' | 'update' |
-    'delete' | 'softDelete' | 'softDeleteChildren'>>;
+  let eventsRepository: jest.Mocked<
+    Pick<
+      EventsRepository,
+      | 'findAll'
+      | 'findById'
+      | 'findChildEvents'
+      | 'create'
+      | 'update'
+      | 'delete'
+      | 'softDelete'
+      | 'softDeleteChildren'
+    >
+  >;
 
   beforeEach(async () => {
     const mockEventsRepository = {
@@ -116,7 +126,11 @@ describe('EventsService', () => {
 
     it('should create and return the new event', async () => {
       eventsRepository.create.mockResolvedValue({ insertId: 2 } as any);
-      eventsRepository.findById.mockResolvedValue({ ...mockEvent, id: 2, title: 'New Tournament' } as any);
+      eventsRepository.findById.mockResolvedValue({
+        ...mockEvent,
+        id: 2,
+        title: 'New Tournament',
+      } as any);
       eventsRepository.findChildEvents.mockResolvedValue([]);
 
       const result = await service.createEvent(createDto);
@@ -152,13 +166,19 @@ describe('EventsService', () => {
 
     it('should update and return the updated event', async () => {
       eventsRepository.update.mockResolvedValue(undefined);
-      eventsRepository.findById.mockResolvedValue({ ...mockEvent, title: 'Updated Tournament' } as any);
+      eventsRepository.findById.mockResolvedValue({
+        ...mockEvent,
+        title: 'Updated Tournament',
+      } as any);
       eventsRepository.findChildEvents.mockResolvedValue([]);
 
       const result = await service.updateEvent(1, updateDto);
 
       expect(result.title).toBe('Updated Tournament');
-      expect(eventsRepository.update).toHaveBeenCalledWith(1, expect.any(Object));
+      expect(eventsRepository.update).toHaveBeenCalledWith(
+        1,
+        expect.any(Object),
+      );
     });
   });
 

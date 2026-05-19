@@ -10,7 +10,10 @@ import { Logger } from 'nestjs-pino';
 describe('WingullFacadeService', () => {
   let service: WingullFacadeService;
   let economyService: jest.Mocked<
-    Pick<WingullEconomyService, 'updateBalance' | 'getCurrentBalance' | 'getMoney'>
+    Pick<
+      WingullEconomyService,
+      'updateBalance' | 'getCurrentBalance' | 'getMoney'
+    >
   >;
   let playerService: jest.Mocked<
     Pick<
@@ -30,13 +33,19 @@ describe('WingullFacadeService', () => {
     >
   >;
   let worldService: jest.Mocked<
-    Pick<WingullWorldService, 'getPerformance' | 'getRegions' | 'getWeather' | 'updateNPCs'>
+    Pick<
+      WingullWorldService,
+      'getPerformance' | 'getRegions' | 'getWeather' | 'updateNPCs'
+    >
   >;
   let transportService: jest.Mocked<
     Pick<WingullTransportService, 'getTaxiStops' | 'teleportPlayer'>
   >;
   let wingullRepository: jest.Mocked<
-    Pick<WingullRepository, 'getWorldGuardWorlds' | 'getPlayersOwnedRegions' | 'getAllPlots'>
+    Pick<
+      WingullRepository,
+      'getWorldGuardWorlds' | 'getPlayersOwnedRegions' | 'getAllPlots'
+    >
   >;
   let logger: jest.Mocked<Pick<Logger, 'log' | 'warn' | 'error'>>;
 
@@ -121,9 +130,13 @@ describe('WingullFacadeService', () => {
     it('should throw descriptive error when economy service fails', async () => {
       economyService.updateBalance.mockRejectedValue(new Error('server down'));
 
-      await expect(service.updateBalance({ uuid: 'test', balance: 0, type: 'MAIN' } as any)).rejects.toThrow(
-        'Failed to update balance',
-      );
+      await expect(
+        service.updateBalance({
+          uuid: 'test',
+          balance: 0,
+          type: 'MAIN',
+        } as any),
+      ).rejects.toThrow('Failed to update balance');
     });
   });
 
@@ -133,14 +146,19 @@ describe('WingullFacadeService', () => {
 
       const result = await service.getCurrentBalance('test-uuid');
 
-      expect(economyService.getCurrentBalance).toHaveBeenCalledWith('test-uuid', undefined);
+      expect(economyService.getCurrentBalance).toHaveBeenCalledWith(
+        'test-uuid',
+        undefined,
+      );
       expect(result).toBe(1000);
     });
 
     it('should throw when economy service fails', async () => {
       economyService.getCurrentBalance.mockRejectedValue(new Error('timeout'));
 
-      await expect(service.getCurrentBalance('test-uuid')).rejects.toThrow('Failed to get current balance');
+      await expect(service.getCurrentBalance('test-uuid')).rejects.toThrow(
+        'Failed to get current balance',
+      );
     });
   });
 
@@ -156,7 +174,9 @@ describe('WingullFacadeService', () => {
     it('should throw when service fails', async () => {
       economyService.getMoney.mockRejectedValue(new Error('network error'));
 
-      await expect(service.getMoney('test-uuid')).rejects.toThrow('Failed to get money');
+      await expect(service.getMoney('test-uuid')).rejects.toThrow(
+        'Failed to get money',
+      );
     });
   });
 
@@ -174,7 +194,9 @@ describe('WingullFacadeService', () => {
     it('should throw when service fails', async () => {
       playerService.getStats.mockRejectedValue(new Error('error'));
 
-      await expect(service.getStats('test-uuid')).rejects.toThrow('Failed to get stats');
+      await expect(service.getStats('test-uuid')).rejects.toThrow(
+        'Failed to get stats',
+      );
     });
   });
 
@@ -205,7 +227,10 @@ describe('WingullFacadeService', () => {
 
       const result = await service.sendMessage('test-uuid', 'Hello!');
 
-      expect(playerService.sendMessage).toHaveBeenCalledWith('test-uuid', 'Hello!');
+      expect(playerService.sendMessage).toHaveBeenCalledWith(
+        'test-uuid',
+        'Hello!',
+      );
     });
   });
 
@@ -215,7 +240,11 @@ describe('WingullFacadeService', () => {
 
       const result = await service.givePokemon('test-uuid', 'pikachu lvl:5');
 
-      expect(playerService.givePokemon).toHaveBeenCalledWith('test-uuid', 'pikachu lvl:5', true);
+      expect(playerService.givePokemon).toHaveBeenCalledWith(
+        'test-uuid',
+        'pikachu lvl:5',
+        true,
+      );
     });
   });
 
@@ -259,7 +288,10 @@ describe('WingullFacadeService', () => {
 
       const result = await service.teleportPlayer('stop-1', 'test-uuid');
 
-      expect(transportService.teleportPlayer).toHaveBeenCalledWith('stop-1', 'test-uuid');
+      expect(transportService.teleportPlayer).toHaveBeenCalledWith(
+        'stop-1',
+        'test-uuid',
+      );
       expect(result).toBe(true);
     });
   });

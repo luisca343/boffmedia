@@ -20,7 +20,12 @@ const mockFacade: jest.Mocked<Partial<AchievementFacadeService>> = {
   getUserReplay: jest.fn(),
 };
 
-const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn() };
+const mockLogger = {
+  log: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  debug: jest.fn(),
+};
 
 const MOCK_TEAM = [
   {
@@ -56,7 +61,11 @@ describe('AchievementController — integration (ValidationPipe + GlobalExceptio
 
     app = module.createNestApplication();
     app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
     );
     app.useGlobalFilters(new GlobalExceptionFilter(mockLogger as any));
     app.useGlobalInterceptors(new ResponseInterceptor(new Reflector()));
@@ -68,7 +77,6 @@ describe('AchievementController — integration (ValidationPipe + GlobalExceptio
   beforeEach(() => jest.clearAllMocks());
 
   // ==================== POST /smartrotom/achievement/get-achievements ====================
-
 
   // ── POST /smartrotom/achievement/get-achievements ──────────────────────
   describe('POST /smartrotom/achievement/get-achievements', () => {
@@ -102,7 +110,6 @@ describe('AchievementController — integration (ValidationPipe + GlobalExceptio
 
   // ==================== POST /smartrotom/achievement/get-achievement-by-id ====================
 
-
   // ── POST /smartrotom/achievement/get-achievement-by-id ─────────────────
   describe('POST /smartrotom/achievement/get-achievement-by-id', () => {
     it('returns 201 and delegates to facade', async () => {
@@ -113,7 +120,10 @@ describe('AchievementController — integration (ValidationPipe + GlobalExceptio
         .send({ uuid: MOCK_UUID, achievementId: 'medalla_denki' });
 
       expect(res.status).toBe(201);
-      expect(mockFacade.getUserAchievementById).toHaveBeenCalledWith(MOCK_UUID, 'medalla_denki');
+      expect(mockFacade.getUserAchievementById).toHaveBeenCalledWith(
+        MOCK_UUID,
+        'medalla_denki',
+      );
     });
 
     it('returns 400 when achievementId is missing', async () => {
@@ -127,28 +137,33 @@ describe('AchievementController — integration (ValidationPipe + GlobalExceptio
 
   // ==================== POST /smartrotom/achievement/check-achievement ====================
 
-
   // ── POST /smartrotom/achievement/check-achievement ─────────────────────
   describe('POST /smartrotom/achievement/check-achievement', () => {
     it('returns 201 and delegates to facade', async () => {
-      mockFacade.checkUserHasAchievement!.mockResolvedValue({ completed: 1 } as any);
+      mockFacade.checkUserHasAchievement!.mockResolvedValue({
+        completed: 1,
+      } as any);
 
       const res = await request(app.getHttpServer())
         .post('/smartrotom/achievement/check-achievement')
         .send({ uuid: MOCK_UUID, achievementId: 'medalla_denki' });
 
       expect(res.status).toBe(201);
-      expect(mockFacade.checkUserHasAchievement).toHaveBeenCalledWith(MOCK_UUID, 'medalla_denki');
+      expect(mockFacade.checkUserHasAchievement).toHaveBeenCalledWith(
+        MOCK_UUID,
+        'medalla_denki',
+      );
     });
   });
 
   // ==================== POST /smartrotom/achievement/battle-achievement ====================
 
-
   // ── POST /smartrotom/achievement/battle-achievement ────────────────────
   describe('POST /smartrotom/achievement/battle-achievement', () => {
     it('returns 201 when battle achievement is processed', async () => {
-      mockFacade.processBattleAchievement!.mockResolvedValue({ success: true } as any);
+      mockFacade.processBattleAchievement!.mockResolvedValue({
+        success: true,
+      } as any);
 
       const res = await request(app.getHttpServer())
         .post('/smartrotom/achievement/battle-achievement')
@@ -201,7 +216,9 @@ describe('AchievementController — integration (ValidationPipe + GlobalExceptio
     });
 
     it('returns 201 with success:false when facade throws', async () => {
-      mockFacade.processBattleAchievement!.mockRejectedValue(new Error('battle failed'));
+      mockFacade.processBattleAchievement!.mockRejectedValue(
+        new Error('battle failed'),
+      );
 
       const res = await request(app.getHttpServer())
         .post('/smartrotom/achievement/battle-achievement')
@@ -223,7 +240,6 @@ describe('AchievementController — integration (ValidationPipe + GlobalExceptio
   });
 
   // ==================== POST /smartrotom/achievement/create-replay ====================
-
 
   // ── POST /smartrotom/achievement/create-replay ─────────────────────────
   describe('POST /smartrotom/achievement/create-replay', () => {
@@ -262,7 +278,6 @@ describe('AchievementController — integration (ValidationPipe + GlobalExceptio
 
   // ==================== POST /smartrotom/achievement/create-user-replay ====================
 
-
   // ── POST /smartrotom/achievement/create-user-replay ────────────────────
   describe('POST /smartrotom/achievement/create-user-replay', () => {
     it('returns 201 and delegates to facade.createUserReplay', async () => {
@@ -294,7 +309,6 @@ describe('AchievementController — integration (ValidationPipe + GlobalExceptio
   });
 
   // ==================== POST /smartrotom/achievement/get-replay ====================
-
 
   // ── POST /smartrotom/achievement/get-replay ────────────────────────────
   describe('POST /smartrotom/achievement/get-replay', () => {

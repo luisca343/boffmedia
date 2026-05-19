@@ -28,7 +28,9 @@ describe('SpawnDataService', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     mockPokemonDataService.getSpeciesByName.mockReturnValue({ dex: 25 });
-    mockPokemonDataService.getSpeciesByNameWithForm.mockReturnValue({ gender: 'M' });
+    mockPokemonDataService.getSpeciesByNameWithForm.mockReturnValue({
+      gender: 'M',
+    });
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -49,15 +51,17 @@ describe('SpawnDataService', () => {
 
   describe('loadSpawnData()', () => {
     it('indexes spawn data after loading', async () => {
-      jest.spyOn(service as any, 'readJsonFiles').mockResolvedValue([
-        makeSpawnData(),
-      ]);
+      jest
+        .spyOn(service as any, 'readJsonFiles')
+        .mockResolvedValue([makeSpawnData()]);
 
       await service.loadSpawnData();
 
       // 7 non-banned folders (11 total minus legendaries, megas, npcs, grass)
       expect(service.getSpawnByDex(25).length).toBeGreaterThan(0);
-      expect(service.getSpawnByPokemon('pikachu_base').length).toBeGreaterThan(0);
+      expect(service.getSpawnByPokemon('pikachu_base').length).toBeGreaterThan(
+        0,
+      );
     });
 
     it('skips banned folders (legendaries, megas, npcs, grass)', async () => {
@@ -75,7 +79,9 @@ describe('SpawnDataService', () => {
 
       // The 'standard' and other non-banned folders should process — since all
       // readJsonFiles calls return the same data, we check pikachu was indexed
-      expect(service.getSpawnByPokemon('pikachu_base').length).toBeGreaterThan(0);
+      expect(service.getSpawnByPokemon('pikachu_base').length).toBeGreaterThan(
+        0,
+      );
     });
   });
 
@@ -83,9 +89,9 @@ describe('SpawnDataService', () => {
 
   describe('accessors after loading', () => {
     beforeEach(async () => {
-      jest.spyOn(service as any, 'readJsonFiles').mockResolvedValue([
-        makeSpawnData(),
-      ]);
+      jest
+        .spyOn(service as any, 'readJsonFiles')
+        .mockResolvedValue([makeSpawnData()]);
       await service.loadSpawnData();
     });
 

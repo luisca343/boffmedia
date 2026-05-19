@@ -49,7 +49,9 @@ describe('WingullWorldService', () => {
     });
 
     it('wraps and re-throws repo error', async () => {
-      mockRepo.getPerformanceFromAPI.mockRejectedValue(new Error('server down'));
+      mockRepo.getPerformanceFromAPI.mockRejectedValue(
+        new Error('server down'),
+      );
 
       await expect(service.getPerformance()).rejects.toThrow(
         'Performance data retrieval failed: server down',
@@ -104,7 +106,9 @@ describe('WingullWorldService', () => {
     it('delegates to repo and returns result', async () => {
       mockRepo.updateNPCsInAPI.mockResolvedValue({ success: true });
 
-      await expect(service.updateNPCs(data)).resolves.toEqual({ success: true });
+      await expect(service.updateNPCs(data)).resolves.toEqual({
+        success: true,
+      });
       expect(mockRepo.updateNPCsInAPI).toHaveBeenCalledWith(data);
     });
 
@@ -150,13 +154,20 @@ describe('WingullWorldService', () => {
     const config = { name: 'Pallet Town', description: 'A quiet town.' };
 
     beforeEach(() => {
-      jest.spyOn(service, 'getAllTowns').mockResolvedValue(['Pallet', 'Viridian']);
+      jest
+        .spyOn(service, 'getAllTowns')
+        .mockResolvedValue(['Pallet', 'Viridian']);
     });
 
     it('returns town data when town exists', async () => {
       (fs.existsSync as jest.Mock).mockReturnValue(true);
       (fs.readFileSync as jest.Mock).mockReturnValue(JSON.stringify(config));
-      (fs.readdirSync as jest.Mock).mockReturnValue(['shop.webp', 'gym.webp', 'config.json', 'fondo.webp']);
+      (fs.readdirSync as jest.Mock).mockReturnValue([
+        'shop.webp',
+        'gym.webp',
+        'config.json',
+        'fondo.webp',
+      ]);
 
       const result = await service.getTownInfo(townName);
 

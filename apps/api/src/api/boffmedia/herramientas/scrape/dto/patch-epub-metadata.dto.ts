@@ -1,4 +1,10 @@
-import { IsString, IsNotEmpty, IsArray, IsOptional, ValidateNested } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsArray,
+  IsOptional,
+  ValidateNested,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { EpubMetadataDto } from './epub-metadata.dto';
 

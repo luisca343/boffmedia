@@ -16,7 +16,14 @@ const makePokemon = (name: string, types = ['fire'], hp = 45) => ({
     {
       name: 'base',
       types,
-      battleStats: { hp, attack: 49, defense: 49, specialAttack: 65, specialDefense: 65, speed: 45 },
+      battleStats: {
+        hp,
+        attack: 49,
+        defense: 49,
+        specialAttack: 65,
+        specialDefense: 65,
+        speed: 45,
+      },
       moves: { levelUpMoves: [{ name: 'Scratch' }] },
     },
   ],
@@ -45,7 +52,9 @@ describe('PokemonDataService', () => {
 
   describe('getPokemonCount()', () => {
     it('returns count of all pokemon with text description', () => {
-      mockPokemonService.getAllPokemon.mockReturnValue(new Array(151).fill(null));
+      mockPokemonService.getAllPokemon.mockReturnValue(
+        new Array(151).fill(null),
+      );
 
       const result = service.getPokemonCount();
 
@@ -66,7 +75,9 @@ describe('PokemonDataService', () => {
       const result = service.getRandomPokemon(['basic']);
 
       expect(result.pokemon).toEqual(charmander);
-      expect(result.parts.some((p) => p.type === MessagePartType.POKEMON_DATA)).toBe(true);
+      expect(
+        result.parts.some((p) => p.type === MessagePartType.POKEMON_DATA),
+      ).toBe(true);
     });
 
     it('returns empty parts message when no pokemon available', () => {
@@ -84,7 +95,9 @@ describe('PokemonDataService', () => {
   describe('getPokemonDataParts()', () => {
     it('returns POKEMON_DATA part with type info when dataTypes includes "type"', () => {
       const charmander = makePokemon('charmander', ['fire']);
-      mockPokemonService.searchPokemonByName.mockReturnValue([{ item: charmander }]);
+      mockPokemonService.searchPokemonByName.mockReturnValue([
+        { item: charmander },
+      ]);
 
       const parts = service.getPokemonDataParts('charmander', ['type']);
 
@@ -95,7 +108,9 @@ describe('PokemonDataService', () => {
 
     it('returns POKEMON_DATA part with stats when dataTypes includes "stats"', () => {
       const charmander = makePokemon('charmander');
-      mockPokemonService.searchPokemonByName.mockReturnValue([{ item: charmander }]);
+      mockPokemonService.searchPokemonByName.mockReturnValue([
+        { item: charmander },
+      ]);
 
       const parts = service.getPokemonDataParts('charmander', ['stats']);
 
@@ -104,12 +119,20 @@ describe('PokemonDataService', () => {
 
     it('returns POKEMON_DATA part with habitat when dataTypes includes "habitat"', () => {
       const charmander = makePokemon('charmander');
-      mockPokemonService.searchPokemonByName.mockReturnValue([{ item: charmander }]);
-      mockPokemonService.getBiomesByPokemon.mockReturnValue(['volcano', 'mountain']);
+      mockPokemonService.searchPokemonByName.mockReturnValue([
+        { item: charmander },
+      ]);
+      mockPokemonService.getBiomesByPokemon.mockReturnValue([
+        'volcano',
+        'mountain',
+      ]);
 
       const parts = service.getPokemonDataParts('charmander', ['habitat']);
 
-      expect((parts![0].content as any).habitat).toEqual(['volcano', 'mountain']);
+      expect((parts![0].content as any).habitat).toEqual([
+        'volcano',
+        'mountain',
+      ]);
     });
 
     it('returns null when pokemon not found', () => {
@@ -133,7 +156,9 @@ describe('PokemonDataService', () => {
 
   describe('pokemonExists()', () => {
     it('returns true when pokemon is found', () => {
-      mockPokemonService.searchPokemonByName.mockReturnValue([{ item: makePokemon('charmander') }]);
+      mockPokemonService.searchPokemonByName.mockReturnValue([
+        { item: makePokemon('charmander') },
+      ]);
 
       expect(service.pokemonExists('charmander')).toBe(true);
     });

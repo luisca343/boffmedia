@@ -9,7 +9,12 @@ import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter'
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { Reflector } from '@nestjs/core';
 
-const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn() };
+const mockLogger = {
+  log: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  debug: jest.fn(),
+};
 
 const mockFacade = {
   getEvents: jest.fn(),
@@ -82,7 +87,11 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
 
     app = moduleRef.createNestApplication();
     app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
     );
     app.useGlobalFilters(new GlobalExceptionFilter(mockLogger as any));
     await app.init();
@@ -243,7 +252,9 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
       ];
       mockFacade.getLeaderboard.mockResolvedValue(mockLeaderboard);
 
-      const res = await request(app.getHttpServer()).get('/events/1/leaderboard');
+      const res = await request(app.getHttpServer()).get(
+        '/events/1/leaderboard',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getLeaderboard).toHaveBeenCalledWith(1);
@@ -256,7 +267,9 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
       ];
       mockFacade.getLeaderboard.mockResolvedValue(rankedEntries);
 
-      const res = await request(app.getHttpServer()).get('/events/5/leaderboard');
+      const res = await request(app.getHttpServer()).get(
+        '/events/5/leaderboard',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getLeaderboard).toHaveBeenCalledWith(5);
@@ -265,7 +278,9 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
     it('returns empty array when event has no participants', async () => {
       mockFacade.getLeaderboard.mockResolvedValue([]);
 
-      const res = await request(app.getHttpServer()).get('/events/99/leaderboard');
+      const res = await request(app.getHttpServer()).get(
+        '/events/99/leaderboard',
+      );
 
       expect(res.status).toBe(200);
     });
@@ -288,7 +303,10 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
 
   describe('PATCH /events/event/:id', () => {
     it('returns 200 and calls facade.updateEvent with numeric id', async () => {
-      mockFacade.updateEvent.mockResolvedValue({ ...mockEvent, title: 'Updated' });
+      mockFacade.updateEvent.mockResolvedValue({
+        ...mockEvent,
+        title: 'Updated',
+      });
 
       const res = await request(app.getHttpServer())
         .patch('/events/event/1')
@@ -324,7 +342,9 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
 
   describe('GET /events/games', () => {
     it('returns 200 and delegates to facade.getGames', async () => {
-      const mockGames = [{ id: 1, title: 'Pokemon VGC', description: 'desc', icon: '/icon.png' }];
+      const mockGames = [
+        { id: 1, title: 'Pokemon VGC', description: 'desc', icon: '/icon.png' },
+      ];
       mockFacade.getGames.mockResolvedValue(mockGames);
 
       const res = await request(app.getHttpServer()).get('/events/games');
@@ -338,7 +358,12 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
 
   describe('GET /events/games/:id', () => {
     it('returns 200 and delegates to facade.getGame with numeric id', async () => {
-      const mockGame = { id: 2, title: 'Minecraft', description: 'desc', icon: '/icon.png' };
+      const mockGame = {
+        id: 2,
+        title: 'Minecraft',
+        description: 'desc',
+        icon: '/icon.png',
+      };
       mockFacade.getGame.mockResolvedValue(mockGame);
 
       const res = await request(app.getHttpServer()).get('/events/games/2');
@@ -374,7 +399,9 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
 
     it('returns 400 when title is missing', async () => {
       const { title: _t, ...body } = VALID_CREATE_GAME;
-      const res = await request(app.getHttpServer()).post('/events/games').send(body);
+      const res = await request(app.getHttpServer())
+        .post('/events/games')
+        .send(body);
       expect(res.status).toBe(400);
     });
 
@@ -397,7 +424,10 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
 
   describe('PATCH /events/games/:id', () => {
     it('returns 200 and calls facade.updateGame', async () => {
-      mockFacade.updateGame.mockResolvedValue({ ...mockGame, title: 'New Title' });
+      mockFacade.updateGame.mockResolvedValue({
+        ...mockGame,
+        title: 'New Title',
+      });
 
       const res = await request(app.getHttpServer())
         .patch('/events/games/1')
@@ -430,7 +460,9 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
     it('returns 200 and delegates to facade.getAchievements', async () => {
       mockFacade.getAchievements.mockResolvedValue([]);
 
-      const res = await request(app.getHttpServer()).get('/events/achievements');
+      const res = await request(app.getHttpServer()).get(
+        '/events/achievements',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getAchievements).toHaveBeenCalledTimes(1);
@@ -443,7 +475,9 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
     it('returns 200 and delegates to facade.getEventAchievements', async () => {
       mockFacade.getEventAchievements.mockResolvedValue([]);
 
-      const res = await request(app.getHttpServer()).get('/events/5/achievements');
+      const res = await request(app.getHttpServer()).get(
+        '/events/5/achievements',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getEventAchievements).toHaveBeenCalledWith(5);
@@ -504,7 +538,10 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
 
   describe('PATCH /events/:eventId/achievements/:achievementId', () => {
     it('returns 200 and calls facade.updateAchievement', async () => {
-      mockFacade.updateAchievement.mockResolvedValue({ ...mockAchievement, points: 200 });
+      mockFacade.updateAchievement.mockResolvedValue({
+        ...mockAchievement,
+        points: 200,
+      });
 
       const res = await request(app.getHttpServer())
         .patch('/events/5/achievements/1')
@@ -525,7 +562,9 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
     it('returns 200 and delegates to facade.getParticipantProgress', async () => {
       mockFacade.getParticipantProgress.mockResolvedValue([]);
 
-      const res = await request(app.getHttpServer()).get('/events/participants/7/progress');
+      const res = await request(app.getHttpServer()).get(
+        '/events/participants/7/progress',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getParticipantProgress).toHaveBeenCalledWith(7);
@@ -538,10 +577,15 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
     it('returns 200 and delegates to facade.getParticipantProgressByEvent', async () => {
       mockFacade.getParticipantProgressByEvent.mockResolvedValue([]);
 
-      const res = await request(app.getHttpServer()).get('/events/5/participants/7/progress');
+      const res = await request(app.getHttpServer()).get(
+        '/events/5/participants/7/progress',
+      );
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getParticipantProgressByEvent).toHaveBeenCalledWith(7, 5);
+      expect(mockFacade.getParticipantProgressByEvent).toHaveBeenCalledWith(
+        7,
+        5,
+      );
     });
   });
 
@@ -590,7 +634,9 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
     it('returns 200 and delegates to facade.getTeamMembers', async () => {
       mockFacade.getTeamMembers.mockResolvedValue([]);
 
-      const res = await request(app.getHttpServer()).get('/events/teams/3/members');
+      const res = await request(app.getHttpServer()).get(
+        '/events/teams/3/members',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getTeamMembers).toHaveBeenCalledWith(3);
@@ -637,7 +683,11 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
     });
 
     it('accepts optional tag and icon', async () => {
-      mockFacade.createTeam.mockResolvedValue({ ...mockTeam, tag: 'TRK', icon: '/icon.png' });
+      mockFacade.createTeam.mockResolvedValue({
+        ...mockTeam,
+        tag: 'TRK',
+        icon: '/icon.png',
+      });
 
       const res = await request(app.getHttpServer())
         .post('/events/5/teams')
@@ -651,7 +701,10 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
 
   describe('PATCH /events/:eventId/teams/:teamId', () => {
     it('returns 200 and calls facade.updateTeam', async () => {
-      mockFacade.updateTeam.mockResolvedValue({ ...mockTeam, name: 'Elite Four' });
+      mockFacade.updateTeam.mockResolvedValue({
+        ...mockTeam,
+        name: 'Elite Four',
+      });
 
       const res = await request(app.getHttpServer())
         .patch('/events/5/teams/1')
@@ -705,8 +758,9 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
     it('returns 200 and calls facade.leaveTeam', async () => {
       mockFacade.leaveTeam.mockResolvedValue({ success: true });
 
-      const res = await request(app.getHttpServer())
-        .delete('/events/5/teams/1/members/10');
+      const res = await request(app.getHttpServer()).delete(
+        '/events/5/teams/1/members/10',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.leaveTeam).toHaveBeenCalledWith(5, 1, 10);
@@ -754,7 +808,9 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
     it('returns 200 and delegates to facade.getEventParticipants', async () => {
       mockFacade.getEventParticipants.mockResolvedValue([]);
 
-      const res = await request(app.getHttpServer()).get('/events/5/participants');
+      const res = await request(app.getHttpServer()).get(
+        '/events/5/participants',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getEventParticipants).toHaveBeenCalledWith(5);
@@ -780,7 +836,11 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
       expect(res.status).toBe(200);
       expect(mockFacade.updateProgress).toHaveBeenCalledWith(
         5,
-        expect.objectContaining({ participantId: 10, achievementId: 1, progress: 5 }),
+        expect.objectContaining({
+          participantId: 10,
+          achievementId: 1,
+          progress: 5,
+        }),
       );
     });
 
@@ -816,7 +876,9 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
     it('returns 200 and delegates to facade.getLeaderboards', async () => {
       mockFacade.getLeaderboards.mockResolvedValue([]);
 
-      const res = await request(app.getHttpServer()).get('/events/leaderboards');
+      const res = await request(app.getHttpServer()).get(
+        '/events/leaderboards',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getLeaderboards).toHaveBeenCalledTimes(1);
@@ -827,10 +889,14 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
 
   describe('GET /events/:eventId/teams/leaderboard', () => {
     it('returns 200 and delegates to facade.getTeamLeaderboard', async () => {
-      const mockTeamLb = [{ teamId: 1, teamName: 'Team Rocket', score: 500, rank: 1 }];
+      const mockTeamLb = [
+        { teamId: 1, teamName: 'Team Rocket', score: 500, rank: 1 },
+      ];
       mockFacade.getTeamLeaderboard.mockResolvedValue(mockTeamLb);
 
-      const res = await request(app.getHttpServer()).get('/events/5/teams/leaderboard');
+      const res = await request(app.getHttpServer()).get(
+        '/events/5/teams/leaderboard',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getTeamLeaderboard).toHaveBeenCalledWith(5);
@@ -839,7 +905,9 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
     it('returns empty array when no teams exist', async () => {
       mockFacade.getTeamLeaderboard.mockResolvedValue([]);
 
-      const res = await request(app.getHttpServer()).get('/events/10/teams/leaderboard');
+      const res = await request(app.getHttpServer()).get(
+        '/events/10/teams/leaderboard',
+      );
 
       expect(res.status).toBe(200);
     });

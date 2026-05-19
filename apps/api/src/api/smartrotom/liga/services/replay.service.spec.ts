@@ -52,16 +52,22 @@ describe('ReplayService', () => {
     it('throws when replay not found', async () => {
       mockRepo.findReplayById.mockResolvedValue(null);
 
-      await expect(service.getReplayById(999)).rejects.toThrow('Replay not found');
+      await expect(service.getReplayById(999)).rejects.toThrow(
+        'Replay not found',
+      );
     });
 
     it('throws when id is 0', async () => {
-      await expect(service.getReplayById(0)).rejects.toThrow('Valid replay ID is required');
+      await expect(service.getReplayById(0)).rejects.toThrow(
+        'Valid replay ID is required',
+      );
       expect(mockRepo.findReplayById).not.toHaveBeenCalled();
     });
 
     it('throws when id is negative', async () => {
-      await expect(service.getReplayById(-1)).rejects.toThrow('Valid replay ID is required');
+      await expect(service.getReplayById(-1)).rejects.toThrow(
+        'Valid replay ID is required',
+      );
     });
   });
 
@@ -102,12 +108,16 @@ describe('ReplayService', () => {
     it('returns replays for a player', async () => {
       mockRepo.findReplaysByPlayer.mockResolvedValue([mockReplay]);
 
-      await expect(service.getPlayerReplays(PLAYER1)).resolves.toEqual([mockReplay]);
+      await expect(service.getPlayerReplays(PLAYER1)).resolves.toEqual([
+        mockReplay,
+      ]);
       expect(mockRepo.findReplaysByPlayer).toHaveBeenCalledWith(PLAYER1);
     });
 
     it('throws when playerUuid is empty', async () => {
-      await expect(service.getPlayerReplays('')).rejects.toThrow('Player UUID is required');
+      await expect(service.getPlayerReplays('')).rejects.toThrow(
+        'Player UUID is required',
+      );
       expect(mockRepo.findReplaysByPlayer).not.toHaveBeenCalled();
     });
   });
@@ -118,8 +128,13 @@ describe('ReplayService', () => {
     it('returns head-to-head replays between two players', async () => {
       mockRepo.findReplaysByPlayers.mockResolvedValue([mockReplay]);
 
-      await expect(service.getMatchHistory(PLAYER1, PLAYER2)).resolves.toEqual([mockReplay]);
-      expect(mockRepo.findReplaysByPlayers).toHaveBeenCalledWith(PLAYER1, PLAYER2);
+      await expect(service.getMatchHistory(PLAYER1, PLAYER2)).resolves.toEqual([
+        mockReplay,
+      ]);
+      expect(mockRepo.findReplaysByPlayers).toHaveBeenCalledWith(
+        PLAYER1,
+        PLAYER2,
+      );
     });
 
     it('throws when player1 is empty', async () => {

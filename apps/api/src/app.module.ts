@@ -178,7 +178,10 @@ export class AppModule implements NestModule {
         { path: 'smartrotom/starbank/accounts', method: RequestMethod.POST },
         { path: 'smartrotom/documents/news', method: RequestMethod.POST },
         { path: 'smartrotom/documents/news/(.*)', method: RequestMethod.PUT },
-        { path: 'smartrotom/documents/news/(.*)', method: RequestMethod.DELETE },
+        {
+          path: 'smartrotom/documents/news/(.*)',
+          method: RequestMethod.DELETE,
+        },
         { path: 'smartrotom/documents/newsstatus', method: RequestMethod.POST },
       )
       .forRoutes('/smartrotom/');

@@ -19,7 +19,10 @@ const UUID = 'player-uuid';
 
 const makeDbMsg = (content: object) => ({ content: JSON.stringify(content) });
 
-const msgContent = { sender: MessageSender.BOT, parts: [{ type: MessagePartType.TEXT, content: 'Hello!' }] };
+const msgContent = {
+  sender: MessageSender.BOT,
+  parts: [{ type: MessagePartType.TEXT, content: 'Hello!' }],
+};
 
 describe('MessageService (ficusai)', () => {
   let service: MessageService;
@@ -45,8 +48,14 @@ describe('MessageService (ficusai)', () => {
 
   describe('getMessages()', () => {
     it('returns parsed messages in chronological order (reversed)', async () => {
-      const msg1 = makeDbMsg({ sender: 'user', parts: [{ type: 'text', content: 'First' }] });
-      const msg2 = makeDbMsg({ sender: 'bot', parts: [{ type: 'text', content: 'Second' }] });
+      const msg1 = makeDbMsg({
+        sender: 'user',
+        parts: [{ type: 'text', content: 'First' }],
+      });
+      const msg2 = makeDbMsg({
+        sender: 'bot',
+        parts: [{ type: 'text', content: 'Second' }],
+      });
       // findByUuid returns newest-first; reversed = chronological
       mockRepo.findByUuid.mockResolvedValue([msg2, msg1]);
 
@@ -81,7 +90,9 @@ describe('MessageService (ficusai)', () => {
     });
 
     it('throws when uuid is whitespace only', async () => {
-      await expect(service.getMessages('   ')).rejects.toThrow('UUID is required');
+      await expect(service.getMessages('   ')).rejects.toThrow(
+        'UUID is required',
+      );
     });
   });
 
@@ -89,7 +100,11 @@ describe('MessageService (ficusai)', () => {
 
   describe('storeMessage()', () => {
     it('stores message and returns created entity', async () => {
-      const created = { id: 1, uuid: UUID, content: JSON.stringify(msgContent) } as any;
+      const created = {
+        id: 1,
+        uuid: UUID,
+        content: JSON.stringify(msgContent),
+      } as any;
       mockRepo.create.mockResolvedValue(created);
 
       const result = await service.storeMessage(UUID, msgContent);

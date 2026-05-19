@@ -10,7 +10,12 @@ import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter'
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { Reflector } from '@nestjs/core';
 
-const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn() };
+const mockLogger = {
+  log: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  debug: jest.fn(),
+};
 
 const mockFacade = {
   updateBalance: jest.fn(),
@@ -61,7 +66,11 @@ describe('WingullController — integration (ValidationPipe + GlobalExceptionFil
 
     app = moduleRef.createNestApplication();
     app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
     );
     app.useGlobalFilters(new GlobalExceptionFilter(mockLogger as any));
     await app.init();
@@ -89,13 +98,19 @@ describe('WingullController — integration (ValidationPipe + GlobalExceptionFil
 
       expect(res.status).toBe(201);
       expect(mockFacade.updateBalance).toHaveBeenCalledWith(
-        expect.objectContaining({ balance: 1000, type: 'money', uuid: VALID_UUID }),
+        expect.objectContaining({
+          balance: 1000,
+          type: 'money',
+          uuid: VALID_UUID,
+        }),
       );
     });
 
     it('returns 400 when uuid is missing', async () => {
       const { uuid: _u, ...body } = VALID_BALANCE;
-      const res = await request(app.getHttpServer()).post('/wingull/updateBalance').send(body);
+      const res = await request(app.getHttpServer())
+        .post('/wingull/updateBalance')
+        .send(body);
       expect(res.status).toBe(400);
     });
 
@@ -108,7 +123,9 @@ describe('WingullController — integration (ValidationPipe + GlobalExceptionFil
 
     it('returns 400 when balance is missing', async () => {
       const { balance: _b, ...body } = VALID_BALANCE;
-      const res = await request(app.getHttpServer()).post('/wingull/updateBalance').send(body);
+      const res = await request(app.getHttpServer())
+        .post('/wingull/updateBalance')
+        .send(body);
       expect(res.status).toBe(400);
     });
   });
@@ -124,7 +141,10 @@ describe('WingullController — integration (ValidationPipe + GlobalExceptionFil
         .send({ uuid: VALID_UUID });
 
       expect(res.status).toBe(201);
-      expect(mockFacade.getCurrentBalance).toHaveBeenCalledWith(VALID_UUID, undefined);
+      expect(mockFacade.getCurrentBalance).toHaveBeenCalledWith(
+        VALID_UUID,
+        undefined,
+      );
     });
 
     it('returns 400 when uuid is not a valid UUID', async () => {
@@ -150,7 +170,9 @@ describe('WingullController — integration (ValidationPipe + GlobalExceptionFil
     });
 
     it('returns 400 when uuid is missing', async () => {
-      const res = await request(app.getHttpServer()).post('/wingull/money').send({});
+      const res = await request(app.getHttpServer())
+        .post('/wingull/money')
+        .send({});
       expect(res.status).toBe(400);
     });
   });
@@ -327,12 +349,17 @@ describe('WingullController — integration (ValidationPipe + GlobalExceptionFil
         .send(VALID_MSG);
 
       expect(res.status).toBe(201);
-      expect(mockFacade.sendMessage).toHaveBeenCalledWith(VALID_UUID, 'Hello, trainer!');
+      expect(mockFacade.sendMessage).toHaveBeenCalledWith(
+        VALID_UUID,
+        'Hello, trainer!',
+      );
     });
 
     it('returns 400 when message is missing', async () => {
       const { message: _m, ...body } = VALID_MSG;
-      const res = await request(app.getHttpServer()).post('/wingull/message').send(body);
+      const res = await request(app.getHttpServer())
+        .post('/wingull/message')
+        .send(body);
       expect(res.status).toBe(400);
     });
   });
@@ -348,7 +375,10 @@ describe('WingullController — integration (ValidationPipe + GlobalExceptionFil
         .send({ uuid: VALID_UUID, message: 'Global message!' });
 
       expect(res.status).toBe(201);
-      expect(mockFacade.globalchat).toHaveBeenCalledWith(VALID_UUID, 'Global message!');
+      expect(mockFacade.globalchat).toHaveBeenCalledWith(
+        VALID_UUID,
+        'Global message!',
+      );
     });
   });
 
@@ -365,12 +395,18 @@ describe('WingullController — integration (ValidationPipe + GlobalExceptionFil
         .send(VALID_GIVE);
 
       expect(res.status).toBe(201);
-      expect(mockFacade.givePokemon).toHaveBeenCalledWith(VALID_UUID, 'pikachu shiny', true);
+      expect(mockFacade.givePokemon).toHaveBeenCalledWith(
+        VALID_UUID,
+        'pikachu shiny',
+        true,
+      );
     });
 
     it('returns 400 when pokespec is missing', async () => {
       const { pokespec: _p, ...body } = VALID_GIVE;
-      const res = await request(app.getHttpServer()).post('/wingull/givePokemon').send(body);
+      const res = await request(app.getHttpServer())
+        .post('/wingull/givePokemon')
+        .send(body);
       expect(res.status).toBe(400);
     });
 
@@ -382,7 +418,11 @@ describe('WingullController — integration (ValidationPipe + GlobalExceptionFil
         .send({ ...VALID_GIVE, sendMessage: false });
 
       expect(res.status).toBe(201);
-      expect(mockFacade.givePokemon).toHaveBeenCalledWith(VALID_UUID, 'pikachu shiny', false);
+      expect(mockFacade.givePokemon).toHaveBeenCalledWith(
+        VALID_UUID,
+        'pikachu shiny',
+        false,
+      );
     });
   });
 
@@ -392,7 +432,9 @@ describe('WingullController — integration (ValidationPipe + GlobalExceptionFil
     it('returns 200 and delegates to facade.getPerformance', async () => {
       mockFacade.getPerformance.mockResolvedValue({ tps: 20 });
 
-      const res = await request(app.getHttpServer()).get('/wingull/performance');
+      const res = await request(app.getHttpServer()).get(
+        '/wingull/performance',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getPerformance).toHaveBeenCalledTimes(1);
@@ -445,9 +487,14 @@ describe('WingullController — integration (ValidationPipe + GlobalExceptionFil
 
   describe('GET /wingull/worldguard-worlds', () => {
     it('returns 200 and delegates to facade.getWorldGuardWorlds', async () => {
-      mockFacade.getWorldGuardWorlds.mockResolvedValue(['world', 'world_nether']);
+      mockFacade.getWorldGuardWorlds.mockResolvedValue([
+        'world',
+        'world_nether',
+      ]);
 
-      const res = await request(app.getHttpServer()).get('/wingull/worldguard-worlds');
+      const res = await request(app.getHttpServer()).get(
+        '/wingull/worldguard-worlds',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getWorldGuardWorlds).toHaveBeenCalledTimes(1);
@@ -460,11 +507,14 @@ describe('WingullController — integration (ValidationPipe + GlobalExceptionFil
     it('returns 200 and passes uuid string to facade', async () => {
       mockFacade.getPlayersOwnedRegions.mockResolvedValue([]);
 
-      const res = await request(app.getHttpServer())
-        .get(`/wingull/owned-regions/${VALID_UUID}`);
+      const res = await request(app.getHttpServer()).get(
+        `/wingull/owned-regions/${VALID_UUID}`,
+      );
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getPlayersOwnedRegions).toHaveBeenCalledWith(VALID_UUID);
+      expect(mockFacade.getPlayersOwnedRegions).toHaveBeenCalledWith(
+        VALID_UUID,
+      );
     });
   });
 
@@ -485,7 +535,10 @@ describe('WingullController — integration (ValidationPipe + GlobalExceptionFil
 
   describe('GET /wingull/towns', () => {
     it('returns 200 and delegates to wingullWorldService.getAllTowns', async () => {
-      mockWorldService.getAllTowns.mockResolvedValue(['ARRECIFE_WINGULL', 'PUERTO_WINGULL']);
+      mockWorldService.getAllTowns.mockResolvedValue([
+        'ARRECIFE_WINGULL',
+        'PUERTO_WINGULL',
+      ]);
 
       const res = await request(app.getHttpServer()).get('/wingull/towns');
 
@@ -498,13 +551,21 @@ describe('WingullController — integration (ValidationPipe + GlobalExceptionFil
 
   describe('GET /wingull/towns/:townName', () => {
     it('returns 200 and passes townName to wingullWorldService.getTownInfo', async () => {
-      const mockTown = { name: 'ARRECIFE_WINGULL', fill: 0x5500bfff, border: 0x00bfff };
+      const mockTown = {
+        name: 'ARRECIFE_WINGULL',
+        fill: 0x5500bfff,
+        border: 0x00bfff,
+      };
       mockWorldService.getTownInfo.mockResolvedValue(mockTown);
 
-      const res = await request(app.getHttpServer()).get('/wingull/towns/ARRECIFE_WINGULL');
+      const res = await request(app.getHttpServer()).get(
+        '/wingull/towns/ARRECIFE_WINGULL',
+      );
 
       expect(res.status).toBe(200);
-      expect(mockWorldService.getTownInfo).toHaveBeenCalledWith('ARRECIFE_WINGULL');
+      expect(mockWorldService.getTownInfo).toHaveBeenCalledWith(
+        'ARRECIFE_WINGULL',
+      );
     });
   });
 

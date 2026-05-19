@@ -52,11 +52,18 @@ describe('InviteManagementService', () => {
   // ─── createInvite ─────────────────────────────────────────────────────────────
 
   describe('createInvite()', () => {
-    const data = { id: 'ABC123', uuid: 'user-uuid', username: 'TrainerAsh' } as any;
+    const data = {
+      id: 'ABC123',
+      uuid: 'user-uuid',
+      username: 'TrainerAsh',
+    } as any;
 
     it('returns success when invite is created', async () => {
       mockRepo.findInviteById.mockResolvedValue(null);
-      mockRepo.createInvite.mockResolvedValue({ success: true, invite: mockInvite });
+      mockRepo.createInvite.mockResolvedValue({
+        success: true,
+        invite: mockInvite,
+      });
 
       const result = await service.createInvite(data);
 
@@ -76,7 +83,10 @@ describe('InviteManagementService', () => {
 
     it('returns failure when repo creation fails', async () => {
       mockRepo.findInviteById.mockResolvedValue(null);
-      mockRepo.createInvite.mockResolvedValue({ success: false, message: 'DB error' });
+      mockRepo.createInvite.mockResolvedValue({
+        success: false,
+        message: 'DB error',
+      });
 
       const result = await service.createInvite(data);
 
@@ -105,7 +115,9 @@ describe('InviteManagementService', () => {
     it('wraps and re-throws repo error', async () => {
       mockRepo.findAllInvites.mockRejectedValue(new Error('DB down'));
 
-      await expect(service.getAllInvites()).rejects.toThrow('Invites retrieval failed: DB down');
+      await expect(service.getAllInvites()).rejects.toThrow(
+        'Invites retrieval failed: DB down',
+      );
     });
   });
 
@@ -113,13 +125,17 @@ describe('InviteManagementService', () => {
     it('returns invite by id', async () => {
       mockRepo.findInviteById.mockResolvedValue(mockInvite);
 
-      await expect(service.getInviteById('ABC123')).resolves.toEqual(mockInvite);
+      await expect(service.getInviteById('ABC123')).resolves.toEqual(
+        mockInvite,
+      );
     });
 
     it('wraps and re-throws repo error', async () => {
       mockRepo.findInviteById.mockRejectedValue(new Error('not found'));
 
-      await expect(service.getInviteById('XYZ')).rejects.toThrow('Invite retrieval failed');
+      await expect(service.getInviteById('XYZ')).rejects.toThrow(
+        'Invite retrieval failed',
+      );
     });
   });
 
@@ -127,7 +143,9 @@ describe('InviteManagementService', () => {
     it('returns active invite', async () => {
       mockRepo.findActiveInviteById.mockResolvedValue(mockInvite);
 
-      await expect(service.getActiveInviteById('ABC123')).resolves.toEqual(mockInvite);
+      await expect(service.getActiveInviteById('ABC123')).resolves.toEqual(
+        mockInvite,
+      );
     });
   });
 
@@ -230,7 +248,10 @@ describe('InviteManagementService', () => {
     });
 
     it('returns invalid when invite has already been used', async () => {
-      mockRepo.findInviteById.mockResolvedValue({ ...mockInvite, usedAt: new Date() });
+      mockRepo.findInviteById.mockResolvedValue({
+        ...mockInvite,
+        usedAt: new Date(),
+      });
 
       const result = await service.validateInvite('ABC123');
 
@@ -239,7 +260,10 @@ describe('InviteManagementService', () => {
     });
 
     it('returns invalid when invite has been deleted', async () => {
-      mockRepo.findInviteById.mockResolvedValue({ ...mockInvite, deletedAt: new Date() });
+      mockRepo.findInviteById.mockResolvedValue({
+        ...mockInvite,
+        deletedAt: new Date(),
+      });
 
       const result = await service.validateInvite('ABC123');
 
@@ -271,9 +295,18 @@ describe('InviteManagementService', () => {
 
     it('fetches the three counts in parallel', async () => {
       const callOrder: string[] = [];
-      mockRepo.getInviteCount.mockImplementation(async () => { callOrder.push('total'); return 10; });
-      mockRepo.getActiveInviteCount.mockImplementation(async () => { callOrder.push('active'); return 5; });
-      mockRepo.getUsedInviteCount.mockImplementation(async () => { callOrder.push('used'); return 3; });
+      mockRepo.getInviteCount.mockImplementation(async () => {
+        callOrder.push('total');
+        return 10;
+      });
+      mockRepo.getActiveInviteCount.mockImplementation(async () => {
+        callOrder.push('active');
+        return 5;
+      });
+      mockRepo.getUsedInviteCount.mockImplementation(async () => {
+        callOrder.push('used');
+        return 3;
+      });
 
       await service.getInviteStatistics();
 
@@ -303,7 +336,10 @@ describe('InviteManagementService', () => {
     });
 
     it('returns false when invite is invalid', async () => {
-      mockRepo.findInviteById.mockResolvedValue({ ...mockInvite, usedAt: new Date() });
+      mockRepo.findInviteById.mockResolvedValue({
+        ...mockInvite,
+        usedAt: new Date(),
+      });
 
       await expect(service.isInviteValid('ABC123')).resolves.toBe(false);
     });

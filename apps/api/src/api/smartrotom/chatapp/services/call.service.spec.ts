@@ -20,7 +20,8 @@ const mockMessageRepo = {
 };
 
 const makeChat = (id: number) => ({ id, name: 'group', type: 3 }) as any;
-const makeMember = (uuid: string, username = 'Player') => ({ uuid, username }) as any;
+const makeMember = (uuid: string, username = 'Player') =>
+  ({ uuid, username }) as any;
 
 describe('CallService', () => {
   let service: CallService;
@@ -48,7 +49,9 @@ describe('CallService', () => {
   describe('initializeCall()', () => {
     it('returns call session with caller IN_CALL and others RINGING', async () => {
       mockChatRepo.findChatById.mockResolvedValue(makeChat(1));
-      mockMemberRepo.findUserInChat.mockResolvedValue(makeMember('caller-uuid'));
+      mockMemberRepo.findUserInChat.mockResolvedValue(
+        makeMember('caller-uuid'),
+      );
       mockMemberRepo.findChatMembers.mockResolvedValue([
         makeMember('caller-uuid', 'Ash'),
         makeMember('other-uuid', 'Misty'),
@@ -69,7 +72,9 @@ describe('CallService', () => {
     it('throws when chat not found', async () => {
       mockChatRepo.findChatById.mockResolvedValue(null);
 
-      await expect(service.initializeCall(99, 'caller-uuid')).rejects.toThrow('Chat not found');
+      await expect(service.initializeCall(99, 'caller-uuid')).rejects.toThrow(
+        'Chat not found',
+      );
     });
 
     it('throws when caller is not a chat member', async () => {
@@ -83,8 +88,12 @@ describe('CallService', () => {
 
     it('throws when no other members exist to call', async () => {
       mockChatRepo.findChatById.mockResolvedValue(makeChat(1));
-      mockMemberRepo.findUserInChat.mockResolvedValue(makeMember('caller-uuid'));
-      mockMemberRepo.findChatMembers.mockResolvedValue([makeMember('caller-uuid')]);
+      mockMemberRepo.findUserInChat.mockResolvedValue(
+        makeMember('caller-uuid'),
+      );
+      mockMemberRepo.findChatMembers.mockResolvedValue([
+        makeMember('caller-uuid'),
+      ]);
 
       await expect(service.initializeCall(1, 'caller-uuid')).rejects.toThrow(
         'No other users in chat',
@@ -104,7 +113,11 @@ describe('CallService', () => {
       expect(result.messageId).toBe(99);
       expect(result.duration).toBeGreaterThanOrEqual(29);
       expect(mockMessageRepo.createMessage).toHaveBeenCalledWith(
-        expect.objectContaining({ chatId: 1, type: 'call', senderUUID: 'system' }),
+        expect.objectContaining({
+          chatId: 1,
+          type: 'call',
+          senderUUID: 'system',
+        }),
       );
     });
   });
@@ -115,13 +128,17 @@ describe('CallService', () => {
     it('returns true when user is in chat', async () => {
       mockMemberRepo.findUserInChat.mockResolvedValue(makeMember('uuid'));
 
-      await expect(service.validateCallPermissions(1, 'uuid')).resolves.toBe(true);
+      await expect(service.validateCallPermissions(1, 'uuid')).resolves.toBe(
+        true,
+      );
     });
 
     it('returns false when user is not in chat', async () => {
       mockMemberRepo.findUserInChat.mockResolvedValue(null);
 
-      await expect(service.validateCallPermissions(1, 'stranger')).resolves.toBe(false);
+      await expect(
+        service.validateCallPermissions(1, 'stranger'),
+      ).resolves.toBe(false);
     });
   });
 });

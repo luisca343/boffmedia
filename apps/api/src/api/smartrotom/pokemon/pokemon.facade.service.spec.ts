@@ -57,9 +57,15 @@ describe('PokemonFacadeService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PokemonFacadeService,
-        { provide: PokemonDataManagementService, useValue: mockPokemonDataService },
+        {
+          provide: PokemonDataManagementService,
+          useValue: mockPokemonDataService,
+        },
         { provide: PokedexManagementService, useValue: mockPokedexService },
-        { provide: PokemonIntegrationService, useValue: mockIntegrationService },
+        {
+          provide: PokemonIntegrationService,
+          useValue: mockIntegrationService,
+        },
         { provide: Logger, useValue: mockLogger },
       ],
     }).compile();
@@ -76,7 +82,9 @@ describe('PokemonFacadeService', () => {
 
   describe('initializeService', () => {
     it('should call pokemonDataService.initializeData', async () => {
-      (pokemonDataService.initializeData as jest.Mock).mockResolvedValue(undefined);
+      (pokemonDataService.initializeData as jest.Mock).mockResolvedValue(
+        undefined,
+      );
 
       await service.initializeService();
 
@@ -84,15 +92,21 @@ describe('PokemonFacadeService', () => {
     });
 
     it('should rethrow error when initialization fails', async () => {
-      (pokemonDataService.initializeData as jest.Mock).mockRejectedValue(new Error('DB error'));
+      (pokemonDataService.initializeData as jest.Mock).mockRejectedValue(
+        new Error('DB error'),
+      );
 
-      await expect(service.initializeService()).rejects.toThrow('Pokemon service initialization failed');
+      await expect(service.initializeService()).rejects.toThrow(
+        'Pokemon service initialization failed',
+      );
     });
   });
 
   describe('getAllPokemon', () => {
     it('should return all Pokémon', () => {
-      (pokemonDataService.getAllPokemon as jest.Mock).mockReturnValue([mockPokemon]);
+      (pokemonDataService.getAllPokemon as jest.Mock).mockReturnValue([
+        mockPokemon,
+      ]);
 
       const result = service.getAllPokemon();
 
@@ -105,13 +119,17 @@ describe('PokemonFacadeService', () => {
         throw new Error('Data not loaded');
       });
 
-      expect(() => service.getAllPokemon()).toThrow('Failed to retrieve all Pokemon');
+      expect(() => service.getAllPokemon()).toThrow(
+        'Failed to retrieve all Pokemon',
+      );
     });
   });
 
   describe('getPokemonByDex', () => {
     it('should return Pokémon by dex number', () => {
-      (pokemonDataService.getPokemonByDex as jest.Mock).mockReturnValue(mockPokemon);
+      (pokemonDataService.getPokemonByDex as jest.Mock).mockReturnValue(
+        mockPokemon,
+      );
 
       const result = service.getPokemonByDex(25);
 
@@ -120,7 +138,9 @@ describe('PokemonFacadeService', () => {
     });
 
     it('should return undefined when not found', () => {
-      (pokemonDataService.getPokemonByDex as jest.Mock).mockReturnValue(undefined);
+      (pokemonDataService.getPokemonByDex as jest.Mock).mockReturnValue(
+        undefined,
+      );
 
       const result = service.getPokemonByDex(9999);
 
@@ -130,11 +150,15 @@ describe('PokemonFacadeService', () => {
 
   describe('getPokemonByName', () => {
     it('should return Pokémon by name', () => {
-      (pokemonDataService.getPokemonByName as jest.Mock).mockReturnValue(mockPokemon);
+      (pokemonDataService.getPokemonByName as jest.Mock).mockReturnValue(
+        mockPokemon,
+      );
 
       const result = service.getPokemonByName('Pikachu');
 
-      expect(pokemonDataService.getPokemonByName).toHaveBeenCalledWith('Pikachu');
+      expect(pokemonDataService.getPokemonByName).toHaveBeenCalledWith(
+        'Pikachu',
+      );
       expect(result).toEqual(mockPokemon);
     });
   });
@@ -142,11 +166,16 @@ describe('PokemonFacadeService', () => {
   describe('searchPokemonByName', () => {
     it('should search Pokémon by name with default amount', () => {
       const fuseResults = [{ item: mockPokemon, score: 0.9 }];
-      (pokemonDataService.searchPokemonByName as jest.Mock).mockReturnValue(fuseResults);
+      (pokemonDataService.searchPokemonByName as jest.Mock).mockReturnValue(
+        fuseResults,
+      );
 
       const result = service.searchPokemonByName('Pika');
 
-      expect(pokemonDataService.searchPokemonByName).toHaveBeenCalledWith('Pika', 16);
+      expect(pokemonDataService.searchPokemonByName).toHaveBeenCalledWith(
+        'Pika',
+        16,
+      );
       expect(result).toEqual(fuseResults);
     });
 
@@ -155,13 +184,19 @@ describe('PokemonFacadeService', () => {
 
       service.searchPokemonByName('Char', 5);
 
-      expect(pokemonDataService.searchPokemonByName).toHaveBeenCalledWith('Char', 5);
+      expect(pokemonDataService.searchPokemonByName).toHaveBeenCalledWith(
+        'Char',
+        5,
+      );
     });
   });
 
   describe('getPokemonNames', () => {
     it('should return all Pokémon names', () => {
-      (pokemonDataService.getPokemonNames as jest.Mock).mockReturnValue(['Pikachu', 'Charizard']);
+      (pokemonDataService.getPokemonNames as jest.Mock).mockReturnValue([
+        'Pikachu',
+        'Charizard',
+      ]);
 
       const result = service.getPokemonNames();
 
@@ -239,7 +274,9 @@ describe('PokemonFacadeService', () => {
   describe('getPokemonMoves', () => {
     it('should return moves for a Pokémon form', () => {
       const moveset = { levelUp: [], tm: [] };
-      (pokemonDataService.getPokemonMoves as jest.Mock).mockReturnValue(moveset);
+      (pokemonDataService.getPokemonMoves as jest.Mock).mockReturnValue(
+        moveset,
+      );
 
       const result = service.getPokemonMoves(25, 0);
 
@@ -262,7 +299,9 @@ describe('PokemonFacadeService', () => {
   describe('getAllAbilities', () => {
     it('should return all abilities', () => {
       const abilities = [{ name: 'Overgrow', count: 3 }];
-      (pokemonDataService.getAllAbilities as jest.Mock).mockReturnValue(abilities);
+      (pokemonDataService.getAllAbilities as jest.Mock).mockReturnValue(
+        abilities,
+      );
 
       const result = service.getAllAbilities();
 
@@ -283,8 +322,12 @@ describe('PokemonFacadeService', () => {
 
   describe('getPokemonByAbility', () => {
     it('should return Pokémon with the ability', () => {
-      const list = [{ speciesID: 1, form: 'default', speciesName: 'Bulbasaur' }];
-      (pokemonDataService.getPokemonByAbility as jest.Mock).mockReturnValue(list);
+      const list = [
+        { speciesID: 1, form: 'default', speciesName: 'Bulbasaur' },
+      ];
+      (pokemonDataService.getPokemonByAbility as jest.Mock).mockReturnValue(
+        list,
+      );
 
       const result = service.getPokemonByAbility('Overgrow');
 
@@ -295,7 +338,9 @@ describe('PokemonFacadeService', () => {
   describe('getSpawnByPokemon', () => {
     it('should return spawn info', () => {
       const spawns = [{ biome: 'forest', rarity: 0.5 }];
-      (pokemonDataService.getSpawnByPokemon as jest.Mock).mockReturnValue(spawns);
+      (pokemonDataService.getSpawnByPokemon as jest.Mock).mockReturnValue(
+        spawns,
+      );
 
       const result = service.getSpawnByPokemon('Pikachu');
 
@@ -305,7 +350,10 @@ describe('PokemonFacadeService', () => {
 
   describe('getBiomes', () => {
     it('should return biomes as name/count array', () => {
-      (pokemonDataService.getBiomes as jest.Mock).mockReturnValue({ forest: 20, plains: 35 });
+      (pokemonDataService.getBiomes as jest.Mock).mockReturnValue({
+        forest: 20,
+        plains: 35,
+      });
 
       const result = service.getBiomes();
 
@@ -320,7 +368,18 @@ describe('PokemonFacadeService', () => {
 
   describe('getPokemonByBiome', () => {
     it('should return Pokémon grouped by biome variant', () => {
-      const data = { forest: [{ dex: 25, species: 'pikachu', form: 'default', palette: 'shiny', rarity: 1, percentage: 10 }] };
+      const data = {
+        forest: [
+          {
+            dex: 25,
+            species: 'pikachu',
+            form: 'default',
+            palette: 'shiny',
+            rarity: 1,
+            percentage: 10,
+          },
+        ],
+      };
       (pokemonDataService.getPokemonByBiome as jest.Mock).mockReturnValue(data);
 
       const result = service.getPokemonByBiome('forest');
@@ -331,7 +390,10 @@ describe('PokemonFacadeService', () => {
 
   describe('getBiomesByPokemon', () => {
     it('should return biomes for a Pokémon', () => {
-      (pokemonDataService.getBiomesByPokemon as jest.Mock).mockReturnValue(['forest', 'plains']);
+      (pokemonDataService.getBiomesByPokemon as jest.Mock).mockReturnValue([
+        'forest',
+        'plains',
+      ]);
 
       const result = service.getBiomesByPokemon('Pikachu');
 
@@ -344,7 +406,11 @@ describe('PokemonFacadeService', () => {
       const imageData = { url: 'http://example.com/pikachu.png' };
       (pokemonDataService.getImage as jest.Mock).mockResolvedValue(imageData);
 
-      const result = await service.getImage({ pokemonId: 25, formName: 'default', uuid: 'test-uuid' });
+      const result = await service.getImage({
+        pokemonId: 25,
+        formName: 'default',
+        uuid: 'test-uuid',
+      });
 
       expect(pokemonDataService.getImage).toHaveBeenCalledWith({
         pokemonId: 25,
@@ -369,25 +435,47 @@ describe('PokemonFacadeService', () => {
   describe('registerPokemon', () => {
     it('should register a Pokémon encounter', async () => {
       const registrationResult = { success: true, isNew: true };
-      (pokedexService.registerPokemon as jest.Mock).mockResolvedValue(registrationResult);
+      (pokedexService.registerPokemon as jest.Mock).mockResolvedValue(
+        registrationResult,
+      );
 
-      const result = await service.registerPokemon('test-uuid', 25, 'default', null, 2);
+      const result = await service.registerPokemon(
+        'test-uuid',
+        25,
+        'default',
+        null,
+        2,
+      );
 
-      expect(pokedexService.registerPokemon).toHaveBeenCalledWith('test-uuid', 25, 'default', null, 2);
+      expect(pokedexService.registerPokemon).toHaveBeenCalledWith(
+        'test-uuid',
+        25,
+        'default',
+        null,
+        2,
+      );
       expect(result).toEqual(registrationResult);
     });
   });
 
   describe('updateDex', () => {
     it('should call integrationService.updateDexWithSync', async () => {
-      (integrationService.updateDexWithSync as jest.Mock).mockResolvedValue({ updated: 50 });
+      (integrationService.updateDexWithSync as jest.Mock).mockResolvedValue({
+        updated: 50,
+      });
 
-      const result = await service.updateDex('test-uuid', { SEEN: [1, 2], CAUGHT: [1] });
-
-      expect(integrationService.updateDexWithSync).toHaveBeenCalledWith('test-uuid', {
+      const result = await service.updateDex('test-uuid', {
         SEEN: [1, 2],
         CAUGHT: [1],
       });
+
+      expect(integrationService.updateDexWithSync).toHaveBeenCalledWith(
+        'test-uuid',
+        {
+          SEEN: [1, 2],
+          CAUGHT: [1],
+        },
+      );
       expect(result).toEqual({ updated: 50 });
     });
   });
@@ -395,7 +483,9 @@ describe('PokemonFacadeService', () => {
   describe('getPokedexStatistics', () => {
     it('should return Pokédex statistics', async () => {
       const stats = { seen: 100, caught: 50 };
-      (pokedexService.getPokedexStatistics as jest.Mock).mockResolvedValue(stats);
+      (pokedexService.getPokedexStatistics as jest.Mock).mockResolvedValue(
+        stats,
+      );
 
       const result = await service.getPokedexStatistics('test-uuid');
 
@@ -406,11 +496,15 @@ describe('PokemonFacadeService', () => {
   describe('getDetailedPokedexStatus', () => {
     it('should return detailed Pokédex status', async () => {
       const status = { caught: [25], seen: [25, 1] };
-      (pokedexService.getDetailedPokedexStatus as jest.Mock).mockResolvedValue(status);
+      (pokedexService.getDetailedPokedexStatus as jest.Mock).mockResolvedValue(
+        status,
+      );
 
       const result = await service.getDetailedPokedexStatus('test-uuid');
 
-      expect(pokedexService.getDetailedPokedexStatus).toHaveBeenCalledWith('test-uuid');
+      expect(pokedexService.getDetailedPokedexStatus).toHaveBeenCalledWith(
+        'test-uuid',
+      );
       expect(result).toEqual(status);
     });
   });
@@ -418,7 +512,9 @@ describe('PokemonFacadeService', () => {
   describe('getPokedexRegistries', () => {
     it('should return Pokédex registries', async () => {
       const registries = [{ pokemonId: 25, form: 'default', status: 2 }];
-      (pokedexService.getPokedexRegistries as jest.Mock).mockResolvedValue(registries);
+      (pokedexService.getPokedexRegistries as jest.Mock).mockResolvedValue(
+        registries,
+      );
 
       const result = await service.getPokedexRegistries('test-uuid');
 
@@ -429,11 +525,15 @@ describe('PokemonFacadeService', () => {
   describe('getTerasPokemonShowdownData', () => {
     it('should return Showdown data', async () => {
       const data = { pokemon: [] };
-      (integrationService.getTerasPokemonShowdownData as jest.Mock).mockResolvedValue(data);
+      (
+        integrationService.getTerasPokemonShowdownData as jest.Mock
+      ).mockResolvedValue(data);
 
       const result = await service.getTerasPokemonShowdownData();
 
-      expect(integrationService.getTerasPokemonShowdownData).toHaveBeenCalledTimes(1);
+      expect(
+        integrationService.getTerasPokemonShowdownData,
+      ).toHaveBeenCalledTimes(1);
       expect(result).toEqual(data);
     });
   });
@@ -441,7 +541,9 @@ describe('PokemonFacadeService', () => {
   describe('getWordleData', () => {
     it('should return Wordle data', () => {
       const wordleData = [{ name: 'Pikachu', types: ['Electric'] }];
-      (pokemonDataService.getWordleData as jest.Mock).mockReturnValue(wordleData);
+      (pokemonDataService.getWordleData as jest.Mock).mockReturnValue(
+        wordleData,
+      );
 
       const result = service.getWordleData();
 
@@ -452,7 +554,9 @@ describe('PokemonFacadeService', () => {
   describe('getSpriteManifest', () => {
     it('should return sprite manifest', () => {
       const manifest = { sprites: ['pikachu', 'charizard'] };
-      (pokemonDataService.getSpriteManifest as jest.Mock).mockReturnValue(manifest);
+      (pokemonDataService.getSpriteManifest as jest.Mock).mockReturnValue(
+        manifest,
+      );
 
       const result = service.getSpriteManifest();
 
@@ -462,7 +566,9 @@ describe('PokemonFacadeService', () => {
 
   describe('refreshSpriteManifest', () => {
     it('should refresh sprite manifest', async () => {
-      (pokemonDataService.refreshSpriteManifest as jest.Mock).mockResolvedValue(undefined);
+      (pokemonDataService.refreshSpriteManifest as jest.Mock).mockResolvedValue(
+        undefined,
+      );
 
       await service.refreshSpriteManifest();
 

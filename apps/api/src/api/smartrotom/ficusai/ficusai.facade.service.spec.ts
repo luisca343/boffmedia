@@ -72,9 +72,15 @@ describe('FicusAIFacadeService', () => {
     it('delegates to MessageService with uuid and limit', async () => {
       mockMessageService.getMessages.mockResolvedValue([botMessage]);
 
-      const result = await service.getMessages({ uuid: 'test-uuid', limit: 10 } as any);
+      const result = await service.getMessages({
+        uuid: 'test-uuid',
+        limit: 10,
+      } as any);
 
-      expect(mockMessageService.getMessages).toHaveBeenCalledWith('test-uuid', 10);
+      expect(mockMessageService.getMessages).toHaveBeenCalledWith(
+        'test-uuid',
+        10,
+      );
       expect(result).toEqual([botMessage]);
     });
   });
@@ -87,7 +93,9 @@ describe('FicusAIFacadeService', () => {
 
       const result = await service.initializeChat('test-uuid');
 
-      expect(mockMessageService.createWelcomeMessage).toHaveBeenCalledWith('test-uuid');
+      expect(mockMessageService.createWelcomeMessage).toHaveBeenCalledWith(
+        'test-uuid',
+      );
       expect(result).toEqual(botMessage);
     });
   });
@@ -120,7 +128,9 @@ describe('FicusAIFacadeService', () => {
 
       const result = await service.getUserMessageCount('test-uuid');
 
-      expect(mockMessageService.getUserMessageCount).toHaveBeenCalledWith('test-uuid');
+      expect(mockMessageService.getUserMessageCount).toHaveBeenCalledWith(
+        'test-uuid',
+      );
       expect(result).toBe(42);
     });
   });
@@ -131,13 +141,22 @@ describe('FicusAIFacadeService', () => {
     it('stores user message, gets AI response with no function calls, returns bot message', async () => {
       mockMessageService.storeMessage.mockResolvedValue(undefined);
       mockMessageService.getMessagesForContext.mockResolvedValue([]);
-      mockAiService.generateResponse.mockResolvedValue({ text: 'Hola! Soy FicusAI.', functionCalls: [] });
+      mockAiService.generateResponse.mockResolvedValue({
+        text: 'Hola! Soy FicusAI.',
+        functionCalls: [],
+      });
 
       const dto = { uuid: 'test-uuid', mensaje: userMessage } as any;
       const result = await service.sendMessage(dto);
 
-      expect(mockMessageService.storeMessage).toHaveBeenCalledWith('test-uuid', userMessage);
-      expect(mockAiService.generateResponse).toHaveBeenCalledWith(userMessage, []);
+      expect(mockMessageService.storeMessage).toHaveBeenCalledWith(
+        'test-uuid',
+        userMessage,
+      );
+      expect(mockAiService.generateResponse).toHaveBeenCalledWith(
+        userMessage,
+        [],
+      );
       expect(result.sender).toBe(MessageSender.BOT);
       expect(result.parts[0].content).toBe('Hola! Soy FicusAI.');
     });
@@ -145,7 +164,10 @@ describe('FicusAIFacadeService', () => {
     it('does not store message when sender is BOT', async () => {
       const botSentDto = { uuid: 'test-uuid', mensaje: botMessage } as any;
       mockMessageService.getMessagesForContext.mockResolvedValue([]);
-      mockAiService.generateResponse.mockResolvedValue({ text: 'OK', functionCalls: [] });
+      mockAiService.generateResponse.mockResolvedValue({
+        text: 'OK',
+        functionCalls: [],
+      });
       mockMessageService.storeMessage.mockResolvedValue(undefined);
 
       await service.sendMessage(botSentDto);
@@ -157,7 +179,9 @@ describe('FicusAIFacadeService', () => {
     it('returns error message when AI service throws', async () => {
       mockMessageService.storeMessage.mockResolvedValue(undefined);
       mockMessageService.getMessagesForContext.mockResolvedValue([]);
-      mockAiService.generateResponse.mockRejectedValue(new Error('AI unavailable'));
+      mockAiService.generateResponse.mockRejectedValue(
+        new Error('AI unavailable'),
+      );
 
       const dto = { uuid: 'test-uuid', mensaje: userMessage } as any;
       const result = await service.sendMessage(dto);

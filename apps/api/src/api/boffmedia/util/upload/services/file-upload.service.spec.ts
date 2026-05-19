@@ -51,7 +51,10 @@ describe('FileUploadService', () => {
   describe('uploadFile()', () => {
     it('saves file and returns response with url and metadata', async () => {
       const file = makeFile();
-      mockRepo.saveFile.mockResolvedValue({ path: '/uploads/photo.png', size: 1024 });
+      mockRepo.saveFile.mockResolvedValue({
+        path: '/uploads/photo.png',
+        size: 1024,
+      });
 
       const result = await service.uploadFile({ file });
 
@@ -59,12 +62,19 @@ describe('FileUploadService', () => {
       expect(result.filename).toBe('photo.png');
       expect(result.mimetype).toBe('image/png');
       expect(result.size).toBe(1024);
-      expect(mockRepo.saveFile).toHaveBeenCalledWith('/tmp/photo.png', '/uploads', 'photo.png');
+      expect(mockRepo.saveFile).toHaveBeenCalledWith(
+        '/tmp/photo.png',
+        '/uploads',
+        'photo.png',
+      );
     });
 
     it('uses custom filename when provided', async () => {
       const file = makeFile('original.png');
-      mockRepo.saveFile.mockResolvedValue({ path: '/uploads/custom.png', size: 1024 });
+      mockRepo.saveFile.mockResolvedValue({
+        path: '/uploads/custom.png',
+        size: 1024,
+      });
       mockRepo.constructUrlPath.mockReturnValue('/uploads/custom.png');
 
       const result = await service.uploadFile({ file, filename: 'custom.png' });
@@ -75,7 +85,10 @@ describe('FileUploadService', () => {
     it('generates unique filename when file has no filename or custom override', async () => {
       const file = { ...makeFile(), filename: undefined } as any;
       mockRepo.generateUniqueFilename.mockReturnValue('unique-123.png');
-      mockRepo.saveFile.mockResolvedValue({ path: '/uploads/unique-123.png', size: 512 });
+      mockRepo.saveFile.mockResolvedValue({
+        path: '/uploads/unique-123.png',
+        size: 512,
+      });
 
       await service.uploadFile({ file });
 
@@ -83,13 +96,17 @@ describe('FileUploadService', () => {
     });
 
     it('throws when no file is provided', async () => {
-      await expect(service.uploadFile({ file: null as any })).rejects.toThrow('No file provided');
+      await expect(service.uploadFile({ file: null as any })).rejects.toThrow(
+        'No file provided',
+      );
     });
 
     it('throws when filename is invalid', async () => {
       mockRepo.validateFilename.mockReturnValue(false);
 
-      await expect(service.uploadFile({ file: makeFile() })).rejects.toThrow('Invalid filename');
+      await expect(service.uploadFile({ file: makeFile() })).rejects.toThrow(
+        'Invalid filename',
+      );
     });
   });
 
@@ -100,18 +117,24 @@ describe('FileUploadService', () => {
       mockRepo.fileExists.mockResolvedValue(true);
       mockRepo.deleteFile.mockResolvedValue(undefined);
 
-      await expect(service.deleteFile('', 'photo.png')).resolves.toEqual({ success: true });
+      await expect(service.deleteFile('', 'photo.png')).resolves.toEqual({
+        success: true,
+      });
       expect(mockRepo.deleteFile).toHaveBeenCalled();
     });
 
     it('throws when filename is empty', async () => {
-      await expect(service.deleteFile('', '')).rejects.toThrow('Filename is required');
+      await expect(service.deleteFile('', '')).rejects.toThrow(
+        'Filename is required',
+      );
     });
 
     it('throws when file does not exist', async () => {
       mockRepo.fileExists.mockResolvedValue(false);
 
-      await expect(service.deleteFile('', 'ghost.png')).rejects.toThrow('File not found');
+      await expect(service.deleteFile('', 'ghost.png')).rejects.toThrow(
+        'File not found',
+      );
     });
   });
 
@@ -120,7 +143,10 @@ describe('FileUploadService', () => {
   describe('getFileInfo()', () => {
     it('returns file info when file exists', async () => {
       mockRepo.fileExists.mockResolvedValue(true);
-      mockRepo.getFileInfo.mockResolvedValue({ size: 2048, createdAt: new Date('2026-01-01') });
+      mockRepo.getFileInfo.mockResolvedValue({
+        size: 2048,
+        createdAt: new Date('2026-01-01'),
+      });
 
       const result = await service.getFileInfo('', 'photo.png');
 
@@ -137,7 +163,9 @@ describe('FileUploadService', () => {
     });
 
     it('throws when filename is empty', async () => {
-      await expect(service.getFileInfo('', '')).rejects.toThrow('Filename is required');
+      await expect(service.getFileInfo('', '')).rejects.toThrow(
+        'Filename is required',
+      );
     });
   });
 
@@ -157,7 +185,9 @@ describe('FileUploadService', () => {
     });
 
     it('returns false when file is null', async () => {
-      await expect(service.validateFileType(null as any, ['.png'])).resolves.toBe(false);
+      await expect(
+        service.validateFileType(null as any, ['.png']),
+      ).resolves.toBe(false);
     });
   });
 
@@ -165,11 +195,15 @@ describe('FileUploadService', () => {
 
   describe('validateFileSize()', () => {
     it('returns true when file size is within limit', async () => {
-      await expect(service.validateFileSize(makeFile('f.png', 1024), 2048)).resolves.toBe(true);
+      await expect(
+        service.validateFileSize(makeFile('f.png', 1024), 2048),
+      ).resolves.toBe(true);
     });
 
     it('returns false when file size exceeds limit', async () => {
-      await expect(service.validateFileSize(makeFile('f.png', 5000), 2048)).resolves.toBe(false);
+      await expect(
+        service.validateFileSize(makeFile('f.png', 5000), 2048),
+      ).resolves.toBe(false);
     });
   });
 });

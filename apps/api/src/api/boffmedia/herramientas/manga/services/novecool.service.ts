@@ -121,9 +121,7 @@ export class NovecoolService implements OnModuleDestroy {
           '--disable-setuid-sandbox',
           '--disable-dev-shm-usage',
         ],
-        ...(env.CHROME_PATH
-          ? { executablePath: env.CHROME_PATH }
-          : {}),
+        ...(env.CHROME_PATH ? { executablePath: env.CHROME_PATH } : {}),
       });
     } catch (e) {
       this.logger.error(
