@@ -39,7 +39,7 @@ importers:
         version: 0.19.2(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       '@google/genai':
         specifier: ^1.13.0
-        version: 1.46.0(@modelcontextprotocol/sdk@1.29.0(zod@3.25.76))(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+        version: 1.46.0(@modelcontextprotocol/sdk@1.29.0(zod@4.4.3))(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       '@google/generative-ai':
         specifier: ^0.24.1
         version: 0.24.1
@@ -186,7 +186,7 @@ importers:
         version: 4.6.1(@nestjs/common@11.1.17(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2))(pino-http@11.0.0)(pino@10.3.1)(rxjs@7.8.2)
       openai:
         specifier: ^5.12.2
-        version: 5.23.2(ws@8.20.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(zod@3.25.76)
+        version: 5.23.2(ws@8.20.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(zod@4.4.3)
       passport:
         specifier: ^0.7.0
         version: 0.7.0
@@ -235,6 +235,9 @@ importers:
       youtubei.js:
         specifier: ^16.0.1
         version: 16.0.1
+      zod:
+        specifier: ^4.4.3
+        version: 4.4.3
     devDependencies:
       '@nestjs/cli':
         specifier: ^11.0.10
@@ -10525,6 +10528,9 @@ packages:
   zod@4.3.6:
     resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
 
+  zod@4.4.3:
+    resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
+
   zustand@3.7.2:
     resolution: {integrity: sha512-PIJDIZKtokhof+9+60cpockVOq05sJzHCriyvaLBmEJixseQ1a5Kdov6fWZfWOu5SK9c+FhH1jU0tntLxRJYMA==}
     engines: {node: '>=12.7.0'}
@@ -11049,8 +11055,6 @@ snapshots:
       '@ckeditor/ckeditor5-utils': 47.6.1
       ckeditor5: 47.6.1
       es-toolkit: 1.39.5
-    transitivePeerDependencies:
-      - supports-color
 
   '@ckeditor/ckeditor5-editor-decoupled@47.6.1':
     dependencies:
@@ -11103,12 +11107,16 @@ snapshots:
     dependencies:
       '@ckeditor/ckeditor5-utils': 47.6.1
       es-toolkit: 1.39.5
+    transitivePeerDependencies:
+      - supports-color
 
   '@ckeditor/ckeditor5-enter@47.6.1':
     dependencies:
       '@ckeditor/ckeditor5-core': 47.6.1
       '@ckeditor/ckeditor5-engine': 47.6.1
       '@ckeditor/ckeditor5-utils': 47.6.1
+    transitivePeerDependencies:
+      - supports-color
 
   '@ckeditor/ckeditor5-essentials@47.6.1':
     dependencies:
@@ -11131,8 +11139,6 @@ snapshots:
       '@ckeditor/ckeditor5-utils': 47.6.1
       ckeditor5: 47.6.1
       es-toolkit: 1.39.5
-    transitivePeerDependencies:
-      - supports-color
 
   '@ckeditor/ckeditor5-font@47.6.1':
     dependencies:
@@ -11188,8 +11194,6 @@ snapshots:
       '@ckeditor/ckeditor5-utils': 47.6.1
       '@ckeditor/ckeditor5-widget': 47.6.1
       ckeditor5: 47.6.1
-    transitivePeerDependencies:
-      - supports-color
 
   '@ckeditor/ckeditor5-html-embed@47.6.1':
     dependencies:
@@ -11507,6 +11511,8 @@ snapshots:
       '@ckeditor/ckeditor5-icons': 47.6.1
       '@ckeditor/ckeditor5-ui': 47.6.1
       '@ckeditor/ckeditor5-utils': 47.6.1
+    transitivePeerDependencies:
+      - supports-color
 
   '@ckeditor/ckeditor5-upload@47.6.1':
     dependencies:
@@ -11517,6 +11523,8 @@ snapshots:
     dependencies:
       '@ckeditor/ckeditor5-ui': 47.6.1
       es-toolkit: 1.39.5
+    transitivePeerDependencies:
+      - supports-color
 
   '@ckeditor/ckeditor5-watchdog@47.6.1':
     dependencies:
@@ -12077,14 +12085,14 @@ snapshots:
       postcss: 7.0.32
       purgecss: 2.3.0
 
-  '@google/genai@1.46.0(@modelcontextprotocol/sdk@1.29.0(zod@3.25.76))(bufferutil@4.1.0)(utf-8-validate@5.0.10)':
+  '@google/genai@1.46.0(@modelcontextprotocol/sdk@1.29.0(zod@4.4.3))(bufferutil@4.1.0)(utf-8-validate@5.0.10)':
     dependencies:
       google-auth-library: 10.6.2
       p-retry: 4.6.2
       protobufjs: 7.5.4
       ws: 8.20.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     optionalDependencies:
-      '@modelcontextprotocol/sdk': 1.29.0(zod@3.25.76)
+      '@modelcontextprotocol/sdk': 1.29.0(zod@4.4.3)
     transitivePeerDependencies:
       - bufferutil
       - supports-color
@@ -12706,6 +12714,29 @@ snapshots:
       zod-to-json-schema: 3.25.2(zod@3.25.76)
     transitivePeerDependencies:
       - supports-color
+
+  '@modelcontextprotocol/sdk@1.29.0(zod@4.4.3)':
+    dependencies:
+      '@hono/node-server': 1.19.14(hono@4.12.18)
+      ajv: 8.18.0
+      ajv-formats: 3.0.1(ajv@8.18.0)
+      content-type: 1.0.5
+      cors: 2.8.6
+      cross-spawn: 7.0.6
+      eventsource: 3.0.7
+      eventsource-parser: 3.0.8
+      express: 5.2.1
+      express-rate-limit: 8.5.2(express@5.2.1)
+      hono: 4.12.18
+      jose: 6.2.3
+      json-schema-typed: 8.0.2
+      pkce-challenge: 5.0.1
+      raw-body: 3.0.2
+      zod: 4.4.3
+      zod-to-json-schema: 3.25.2(zod@4.4.3)
+    transitivePeerDependencies:
+      - supports-color
+    optional: true
 
   '@monogrid/gainmap-js@3.4.0(three@0.163.0)':
     dependencies:
@@ -19871,10 +19902,10 @@ snapshots:
       regex: 6.1.0
       regex-recursion: 6.0.2
 
-  openai@5.23.2(ws@8.20.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(zod@3.25.76):
+  openai@5.23.2(ws@8.20.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(zod@4.4.3):
     optionalDependencies:
       ws: 8.20.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
-      zod: 3.25.76
+      zod: 4.4.3
 
   openapi-typescript-codegen@0.29.0:
     dependencies:
@@ -22445,6 +22476,11 @@ snapshots:
     dependencies:
       zod: 3.25.76
 
+  zod-to-json-schema@3.25.2(zod@4.4.3):
+    dependencies:
+      zod: 4.4.3
+    optional: true
+
   zod-validation-error@4.0.2(zod@3.25.76):
     dependencies:
       zod: 3.25.76
@@ -22454,6 +22490,8 @@ snapshots:
   zod@3.25.76: {}
 
   zod@4.3.6: {}
+
+  zod@4.4.3: {}
 
   zustand@3.7.2(react@19.2.3):
     optionalDependencies:

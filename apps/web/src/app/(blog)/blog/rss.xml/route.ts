@@ -1,9 +1,10 @@
 import { getPosts } from '../get-posts'
+import { env } from '@/config/env'
 
 const CONFIG = {
   title: 'BoffMedia Blog',
-  siteUrl: process.env.NODE_ENV === 'production' 
-    ? 'https://boffmedia.es' 
+  siteUrl: env.NODE_ENV === 'production'
+    ? 'https://boffmedia.es'
     : 'http://localhost:3000',
   description: 'Latest blog posts from BoffMedia',
   lang: 'en-us'

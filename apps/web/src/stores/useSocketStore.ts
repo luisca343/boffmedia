@@ -1,6 +1,7 @@
 import type { SmartRotomUser } from "@/types"
 import io, { type Socket } from "socket.io-client"
 import { create } from "zustand"
+import { env } from "@/config/env.public"
 
 interface SocketStore {
   socket: Socket | null
@@ -28,7 +29,7 @@ const useSocketStore = create<SocketStore>((set, get) => ({
 
     // Connect to NestJS Socket.io server
     //console.log("Creating new socket connection")
-    const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL as string, {
+    const socket = io(env.NEXT_PUBLIC_SOCKET_URL, {
       transports: ["websocket"],
       reconnectionAttempts: RECONNECTION_ATTEMPTS,
       reconnectionDelay: RECONNECTION_DELAY,

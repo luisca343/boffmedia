@@ -1,5 +1,6 @@
 "use client"
 import { useEffect, useRef, useState } from "react";
+import { env } from "@/config/env.public";
 import { ReplayControls } from "./ReplayControls";
 import { ASPECT_RATIO } from "../../_utils/viewUtils";
 import { PokemonIdent, Protocol } from "@pkmn/protocol";
@@ -186,7 +187,7 @@ export function Game({battleName = 'medalla_doku', replayData}: {battleName?: st
       <div className="bg-surface-800 flex-1" />
       </div>
     </div>
-    {process.env.NODE_ENV === 'development' && (
+    {env.NODE_ENV === 'development' && (
       <div className="mt-4">
         <h3 className="text-lg font-bold mb-2">Debug Information</h3>
         <div className="bg-surface-800 p-4 rounded">

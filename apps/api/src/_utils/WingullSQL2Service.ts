@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { MySql2Database, drizzle } from 'drizzle-orm/mysql2';
 import * as mysql from 'mysql2/promise';
+import { env } from '@/config/env';
 import { migrate } from 'drizzle-orm/mysql2/migrator';
 
 import * as SmartRotomSchema from '../_db/schema/SmartRotom';
@@ -17,11 +18,11 @@ export class WingullSQL2Service {
 
   private async connect() {
     this.pool = mysql.createPool({
-      host: process.env.DB_HOST,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.WINGULL_DB_NAME,
-      port: parseInt(process.env.DB_PORT),
+      host: env.DB_HOST,
+      user: env.DB_USER,
+      password: env.DB_PASSWORD,
+      database: env.WINGULL_DB_NAME,
+      port: env.DB_PORT,
       waitForConnections: true,
       connectionLimit: 10,
       queueLimit: 0,

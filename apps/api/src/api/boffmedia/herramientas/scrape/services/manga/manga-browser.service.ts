@@ -7,6 +7,7 @@
 
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { chromium, Browser } from 'playwright';
+import { env } from '@/config/env';
 
 @Injectable()
 export class MangaBrowserService implements OnModuleDestroy {
@@ -22,7 +23,7 @@ export class MangaBrowserService implements OnModuleDestroy {
   // ── Tunnel toggle ─────────────────────────────────────────────────────────
 
   tunnelAvailable(): boolean {
-    return !!process.env.MANGA_BROWSER_WS_ENDPOINT;
+    return !!env.MANGA_BROWSER_WS_ENDPOINT;
   }
 
   getTunnelEnabled(): boolean {
@@ -47,7 +48,7 @@ export class MangaBrowserService implements OnModuleDestroy {
 
   async getBrowser(): Promise<Browser> {
     if (!this.browser || !this.browser.isConnected()) {
-      const wsEndpoint = process.env.MANGA_BROWSER_WS_ENDPOINT;
+      const wsEndpoint = env.MANGA_BROWSER_WS_ENDPOINT;
       if (this.useTunnel && wsEndpoint) {
         this.logger.log(`Connecting to remote browser (tunnel): ${wsEndpoint}`);
         this.browser = await chromium.connect(wsEndpoint);

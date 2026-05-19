@@ -1,12 +1,13 @@
 "use client"
 import { isMinecraft } from "@/services/mcef/mcefHelper";
+import { env } from "@/config/env.public";
 import { useBoffSession } from "@/services/useBoffSession";
 import { signIn, signOut } from "next-auth/react";
 import { useState } from "react";
 import { SmartRotomButton } from "@/components/smartrotom/ui/button";
 import { Copy, Check, LogIn, LogOut, Palette, Bug, Monitor, Smartphone } from "lucide-react";
 
-const isDev = process.env.NODE_ENV === "development";
+const isDev = env.NODE_ENV === "development";
 
 const themes = [
   { id: '', label: 'Clásico', colors: ['bg-surface-800', 'bg-surface-700', 'bg-primary-500'] },

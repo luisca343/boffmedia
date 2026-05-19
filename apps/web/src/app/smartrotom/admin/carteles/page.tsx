@@ -11,6 +11,7 @@ import HighwaySign from './_components/HighwaySign'
 import AdminPageLayout from '../_components/AdminPageLayout'
 import TerminalCard from '../_components/TerminalCard'
 import TerminalLabel from '../_components/TerminalLabel'
+import { env } from '@/config/env.public'
 
 interface Destination {
   name: string;
@@ -42,7 +43,7 @@ export default function CartelesAutopista() {
   }
 
   useEffect(() => {
-    const baseUrl = process.env.NEXT_PUBLIC_URL || ''
+    const baseUrl = env.NEXT_PUBLIC_URL
     let url = `${baseUrl}/smartrotom/cartel?highway=${encodeURIComponent(highway)}`
     destinations.forEach((dest, index) => {
       if (dest.name || dest.distance) {

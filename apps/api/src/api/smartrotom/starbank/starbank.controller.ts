@@ -35,6 +35,7 @@ import { StarBankTransaction } from './entities/starbank-transaction.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { Logger } from 'nestjs-pino';
+import { env } from '@/config/env';
 
 @ApiTags('SmartRotom | Starbank')
 @Controller('smartrotom/starbank')
@@ -137,7 +138,7 @@ export class StarbankController {
     @Body('server') server: string,
     @UploadedFile() image?: Express.Multer.File,
   ): Promise<StarBankAccount> {
-    const mcWorld = process.env.MC_WORLD;
+    const mcWorld = env.MC_WORLD;
     if (server !== mcWorld) {
       throw new Error('You are not authorized to access this route.');
     }

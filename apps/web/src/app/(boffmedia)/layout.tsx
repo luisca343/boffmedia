@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { env } from "@/config/env";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FicusNav } from "@/components/boffmedia/navigation/FicusNav";
@@ -9,8 +10,8 @@ import '../globals.css'
 import { BoffFooter } from "./_components/layout/BoffFooter";
 
 export const metadata: Metadata = {
-  title: process.env.NODE_ENV === 'production' ? "BoffMedia" : "FicusLab",
-  description: process.env.NODE_ENV === 'production' ? "BoffMedia" : "FicusLab"
+  title: env.NODE_ENV === 'production' ? "BoffMedia" : "FicusLab",
+  description: env.NODE_ENV === 'production' ? "BoffMedia" : "FicusLab"
 };
 
 export default async function RootLayout({

@@ -1,4 +1,5 @@
 import { useSpriteManifestStore } from '@/stores/spriteManifestStore';
+import { env } from '@/config/env.public';
 
 interface GetSpriteUrlOptions {
   id: number;
@@ -13,7 +14,7 @@ interface GetSpriteUrlOptions {
  * @returns The complete sprite URL or null if not found
  */
 export function getSpriteUrl(options: GetSpriteUrlOptions): string | null {
-  const { id, form = 'base', palette = 'none', baseUrl = process.env.NEXT_PUBLIC_ROTOM_API_URL || '' } = options;
+  const { id, form = 'base', palette = 'none', baseUrl = env.NEXT_PUBLIC_ROTOM_API_URL } = options;
   
   const spriteInfo = useSpriteManifestStore.getState().getSprite({ id, form, palette });
   if (!spriteInfo) return null;
