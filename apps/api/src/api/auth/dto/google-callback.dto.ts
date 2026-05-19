@@ -1,10 +1,6 @@
-import { IsString, IsNotEmpty, IsEmail, IsOptional } from 'class-validator';
+import { IsString, IsEmail, IsOptional } from 'class-validator';
 
 export class GoogleCallbackDto {
-  @IsString()
-  @IsNotEmpty()
-  token: string;
-
   @IsEmail()
   @IsOptional()
   email?: string;
@@ -12,4 +8,8 @@ export class GoogleCallbackDto {
   @IsString()
   @IsOptional()
   name?: string;
+
+  @IsString()
+  @IsOptional()
+  picture?: string;
 }
