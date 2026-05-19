@@ -24,7 +24,7 @@
     "@emoji-mart/data": "^1.2.1",
     "@emoji-mart/react": "^1.1.1",
     "@heroicons/react": "^2.1.1",
-    "@hookform/resolvers": "^3.3.4",
+    "@hookform/resolvers": "3.9.0",
     "@next/bundle-analyzer": "16.0.7",
     "@pkmn/client": "^0.7.0",
     "@pkmn/data": "^0.10.7",
