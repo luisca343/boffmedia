@@ -1,6 +1,7 @@
 module.exports = {
     testEnvironment: 'node',
     rootDir: './',
+    setupFiles: ['<rootDir>/jest.setup.ts'],
     transform: {
       '^.+\\.tsx?$': ['ts-jest', { tsconfig: './tsconfig.spec.json' }],
     },

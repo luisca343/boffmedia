@@ -135,19 +135,9 @@ describe('AuthService', () => {
       expect(result.user.id).toBe(1);
     });
 
-    it('should issue new tokens from a token object', async () => {
-      const tokenObj = { sub: 1, username: 'TrainerAsh', smartRotomUser: {} };
-      usersService.getUserById.mockResolvedValue(mockUser as any);
-      usersService.getUserRoles.mockResolvedValue(['user'] as any);
-
-      const result = await service.refreshToken(tokenObj);
-
-      expect(result.access_token).toBe('mock-token');
-      expect(jwtService.verify).not.toHaveBeenCalled();
-    });
-
-    it('should throw UnauthorizedException for invalid token format', async () => {
+    it('should throw UnauthorizedException when passed a non-string', async () => {
       await expect(service.refreshToken(null)).rejects.toThrow(UnauthorizedException);
+      await expect(service.refreshToken({ sub: 1 })).rejects.toThrow(UnauthorizedException);
     });
 
     it('should throw UnauthorizedException when user not found', async () => {
