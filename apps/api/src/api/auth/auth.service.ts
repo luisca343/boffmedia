@@ -168,17 +168,15 @@ export class AuthService {
 
   async refreshToken(tokenData: any) {
     try {
-      // Handle both string tokens and token objects from NextAuth
-      let payload;
-
-      if (typeof tokenData === 'string') {
-        // If it's a JWT string, verify it
-        payload = this.jwtService.verify(tokenData);
-      } else if (tokenData && typeof tokenData === 'object') {
-        // If it's already a token object (from NextAuth), use it directly
-        payload = tokenData;
-      } else {
+      if (typeof tokenData !== 'string') {
         throw new UnauthorizedException('Invalid token format');
+      }
+
+      let payload;
+      try {
+        payload = this.jwtService.verify(tokenData);
+      } catch {
+        throw new UnauthorizedException('Invalid or expired refresh token');
       }
 
       // Get fresh user data
