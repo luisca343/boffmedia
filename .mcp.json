@@ -1,9 +1,12 @@
 {
   "mcpServers": {
     "boff-agent": {
-      "command": "pnpm",
-      "args": ["--filter", "@repo/agent", "mcp"],
-      "cwd": "/home/luis/Ficus Labs/boffmedia"
+      "command": "/bin/bash",
+      "args": [
+        "-c",
+        "source /home/luisca/.nvm/nvm.sh && exec pnpm --filter @repo/agent mcp"
+      ],
+      "cwd": "/home/luisca/Programacion/Ficus Labs/boffmedia"
     }
   }
 }
