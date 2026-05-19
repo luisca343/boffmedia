@@ -1,13 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { env } from '@/config/env.public'
 import { io, Socket } from 'socket.io-client'
 
 import { Args, Protocol } from '@pkmn/protocol'
 import { UpdateUserResult, QueryType } from './util/types'
 import { handleChallstr, handleFormats, handleUpdateSearch, handleUpdateUser } from './util/queryHandler'
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API ?? 'http://localhost:34301'
+const API_BASE_URL = env.NEXT_PUBLIC_API
 const SERVER = `${API_BASE_URL}/showdown`
 const RECONNECT_INTERVAL = 5000 // 5 seconds
 

@@ -1,4 +1,5 @@
 import { Settings } from 'lucide-react'
+import { env } from '@/config/env.public'
 
 export function TopBar() {
   return (
@@ -6,7 +7,7 @@ export function TopBar() {
       <div></div>
       <span className="flex items-center [text-shadow:_-1px_-1px_#770000]">
         <Settings className="mr-2 text-[1.26em]" />
-        {process.env.NODE_ENV.toUpperCase() || 'LOCALHOST'}
+        {env.NODE_ENV.toUpperCase() || 'LOCALHOST'}
       </span>
       <div></div>
     </div>

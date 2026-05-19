@@ -2,6 +2,7 @@ import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import axios, { AxiosRequestConfig } from 'axios';
 import * as cheerio from 'cheerio';
 import { chromium, Browser } from 'playwright';
+import { env } from '@/config/env';
 import { MangaResult } from '../entities/manga-result.entity';
 import { MangaChapter, MangaDetail } from '../entities/manga-chapter.entity';
 
@@ -120,8 +121,8 @@ export class NovecoolService implements OnModuleDestroy {
           '--disable-setuid-sandbox',
           '--disable-dev-shm-usage',
         ],
-        ...(process.env.CHROME_PATH
-          ? { executablePath: process.env.CHROME_PATH }
+        ...(env.CHROME_PATH
+          ? { executablePath: env.CHROME_PATH }
           : {}),
       });
     } catch (e) {

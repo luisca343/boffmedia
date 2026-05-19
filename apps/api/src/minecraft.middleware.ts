@@ -2,6 +2,7 @@ import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { LoggingUtil } from './_utils/LoggingUtils';
 import { Logger } from 'nestjs-pino';
+import { env } from '@/config/env';
 
 @Injectable()
 export class MinecraftMiddleware implements NestMiddleware {
@@ -9,7 +10,7 @@ export class MinecraftMiddleware implements NestMiddleware {
 
   use(req: Request, res: Response, next: NextFunction) {
     const isGet = req.method === 'GET';
-    const mcWorld = process.env.MC_WORLD;
+    const mcWorld = env.MC_WORLD;
     const serverField = req.body && req.body.server;
     if (isGet || (serverField && serverField === mcWorld)) {
       if (LoggingUtil.getInstance().getLogging()) {

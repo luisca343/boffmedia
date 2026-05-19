@@ -5,6 +5,13 @@ import { Logger } from 'nestjs-pino';
 import { AuthService } from './auth.service';
 import { BoffMediaUsersFacadeService } from '@api/boffmedia/users/users.facade.service';
 
+jest.mock('@/config/env', () => ({
+  env: {
+    MC_WORLD: 'test-world',
+    JWT_SECRET: 'test-secret-that-is-long-enough-32chars',
+  },
+}));
+
 const mockUser = {
   id: 1,
   username: 'TrainerAsh',
@@ -91,10 +98,6 @@ describe('AuthService', () => {
 
   describe('loginMC()', () => {
     const loginData = { username: 'TrainerAsh', uuid: 'abc-123', world: 'test-world' };
-
-    beforeEach(() => {
-      process.env.MC_WORLD = 'test-world';
-    });
 
     it('should return tokens for a valid MC login', async () => {
       usersService.getUserWithIntegrations.mockResolvedValue(mockUserWithIntegrations as any);

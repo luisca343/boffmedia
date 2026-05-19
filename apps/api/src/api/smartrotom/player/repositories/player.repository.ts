@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import axios, { AxiosResponse } from 'axios';
 import { Logger } from 'nestjs-pino';
+import { env } from '@/config/env';
 
 @Injectable()
 export class PlayerRepository {
   constructor(private readonly logger: Logger) {}
 
-  private readonly WINGULL_API_BASE_URL = process.env.WINGULL_API;
+  private readonly WINGULL_API_BASE_URL = env.WINGULL_API;
   private readonly DEFAULT_TIMEOUT = 10000; // 10 seconds
 
   // TODO: Add type definitions for the return types of these methods

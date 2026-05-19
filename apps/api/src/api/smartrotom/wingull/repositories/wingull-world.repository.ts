@@ -6,12 +6,13 @@ import { Performance } from '../entities/performance.entity';
 import { Region } from '../entities/region.entity';
 import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
 import { Logger } from 'nestjs-pino';
+import { env } from '@/config/env';
 
 @Injectable()
 export class WingullWorldRepository implements IWingullWorldRepository {
   constructor(private readonly logger: Logger) {}
 
-  private readonly WINGULL_API_BASE_URL = process.env.WINGULL_API;
+  private readonly WINGULL_API_BASE_URL = env.WINGULL_API;
   private readonly DEFAULT_TIMEOUT = 10000;
 
   async getPerformanceFromAPI(): Promise<Performance> {

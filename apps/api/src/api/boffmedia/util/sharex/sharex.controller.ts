@@ -1,4 +1,5 @@
 import { randomString } from '@/_utils/stringUtils';
+import { env } from '@/config/env';
 import {
   BadRequestException,
   Body,
@@ -52,7 +53,7 @@ export class SharexController {
 
       return {
         file: {
-          url: `${process.env.PUBLIC_DIR}/smartrotom/img/sharex/${newName}.${extension}`,
+          url: `${env.PUBLIC_DIR}/smartrotom/img/sharex/${newName}.${extension}`,
           name: newName + '.' + extension,
           size: file.size,
           type: file.mimetype,

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { env } from "@/config/env.public";
 import { Loader2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/primitives/button";
 import { boffPOST } from "@/services/boffAPI";
@@ -23,7 +24,7 @@ export function TcgpScraper() {
 
   useEffect(() => {
     const eventSource = new EventSource(
-      `${process.env.NEXT_PUBLIC_API}/tools/ptcgp/scrape/status`
+      `${env.NEXT_PUBLIC_API}/tools/ptcgp/scrape/status`
     );
     eventSource.onmessage = (event) => {
       setStatus(JSON.parse(event.data) as FetchStatusData);

@@ -1,4 +1,5 @@
 import { Global, Module } from '@nestjs/common';
+import { env } from '@/config/env';
 import { DiscordController } from './discord.controller';
 import { DiscordService } from './discord.service';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
@@ -36,7 +37,7 @@ import { MetaDamageCommand } from '../commands/global/meta/meta-damage.command';
     ConfigModule,
     VgcMetaModule,
     NecordModule.forRoot({
-      token: process.env.DISCORD_KEY,
+      token: env.DISCORD_KEY,
       intents: [
         IntentsBitField.Flags.Guilds,
         IntentsBitField.Flags.GuildMembers,

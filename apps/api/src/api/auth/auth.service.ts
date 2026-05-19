@@ -2,6 +2,7 @@ import { BoffMediaUsersFacadeService } from '@api/boffmedia/users/users.facade.s
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Logger } from 'nestjs-pino';
+import { env } from '@/config/env';
 
 @Injectable()
 export class AuthService {
@@ -45,7 +46,7 @@ export class AuthService {
   }
 
   async loginMC(loginData: { username: string; uuid: string; world: string }) {
-    if (loginData.world !== process.env.MC_WORLD) {
+    if (loginData.world !== env.MC_WORLD) {
       throw new UnauthorizedException('Invalid world');
     }
 
@@ -82,7 +83,7 @@ export class AuthService {
     };
   }) {
     // Validate world
-    if (registerData.minecraft.world !== process.env.MC_WORLD) {
+    if (registerData.minecraft.world !== env.MC_WORLD) {
       throw new UnauthorizedException('Invalid world');
     }
 
@@ -129,7 +130,7 @@ export class AuthService {
     };
   }) {
     // Validate world
-    if (linkData.minecraft.world !== process.env.MC_WORLD) {
+    if (linkData.minecraft.world !== env.MC_WORLD) {
       throw new UnauthorizedException('Invalid world');
     }
 
