@@ -44,6 +44,7 @@ jobs:
           echo "NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}" >> .env.production.local
           echo "NEXT_PUBLIC_TWITCH_CLIENT_ID=${{ secrets.NEXT_PUBLIC_TWITCH_CLIENT_ID }}" >> .env.production.local
           echo "NEXT_PUBLIC_TWITCH_CLIENT_SECRET=${{ secrets.NEXT_PUBLIC_TWITCH_CLIENT_SECRET }}" >> .env.production.local
+          echo "NEXT_PUBLIC_TERAS_API=${{ secrets.NEXT_PUBLIC_TERAS_API }}" >> .env.production.local
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
