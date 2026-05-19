@@ -1,4 +1,9 @@
-import { INestApplication, ValidationPipe, CanActivate, ExecutionContext } from '@nestjs/common';
+import {
+  INestApplication,
+  ValidationPipe,
+  CanActivate,
+  ExecutionContext,
+} from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Reflector } from '@nestjs/core';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -39,7 +44,12 @@ const mockFacade: jest.Mocked<Partial<DocumentsFacadeService>> = {
   updateNewsStatus: jest.fn(),
 };
 
-const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn() };
+const mockLogger = {
+  log: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  debug: jest.fn(),
+};
 
 describe('DocumentsController — integration (ValidationPipe + GlobalExceptionFilter)', () => {
   let app: INestApplication;
@@ -60,7 +70,11 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
 
     app = module.createNestApplication();
     app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
     );
     app.useGlobalFilters(new GlobalExceptionFilter(mockLogger as any));
     app.useGlobalInterceptors(new ResponseInterceptor(new Reflector()));
@@ -73,20 +87,26 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
 
   // ==================== GET /smartrotom/documents/document/:id ====================
 
-
   // ── GET /smartrotom/documents/document/:id ─────────────────────────────
   describe('GET /smartrotom/documents/document/:id', () => {
     it('returns 200 and delegates to facade.getDocumentById', async () => {
-      mockFacade.getDocumentById!.mockResolvedValue({ id: 1, title: 'Test' } as any);
+      mockFacade.getDocumentById!.mockResolvedValue({
+        id: 1,
+        title: 'Test',
+      } as any);
 
-      const res = await request(app.getHttpServer()).get('/smartrotom/documents/document/1');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/documents/document/1',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getDocumentById).toHaveBeenCalledWith(1);
     });
 
     it('returns 500 when id is non-numeric', async () => {
-      const res = await request(app.getHttpServer()).get('/smartrotom/documents/document/abc');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/documents/document/abc',
+      );
 
       expect(res.status).toBe(500);
     });
@@ -94,11 +114,13 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
 
   // ==================== POST /smartrotom/documents/document ====================
 
-
   // ── POST /smartrotom/documents/document ────────────────────────────────
   describe('POST /smartrotom/documents/document', () => {
     it('returns 201 and delegates to facade.createDocument', async () => {
-      mockFacade.createDocument!.mockResolvedValue({ id: 1, title: 'Doc' } as any);
+      mockFacade.createDocument!.mockResolvedValue({
+        id: 1,
+        title: 'Doc',
+      } as any);
 
       const res = await request(app.getHttpServer())
         .post('/smartrotom/documents/document')
@@ -131,18 +153,22 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
 
   // ==================== PUT /smartrotom/documents/document/:id ====================
 
-
   // ── PUT /smartrotom/documents/document/:id ─────────────────────────────
   describe('PUT /smartrotom/documents/document/:id', () => {
     it('returns 200 and delegates to facade.updateDocument', async () => {
-      mockFacade.updateDocument!.mockResolvedValue({ id: 1, title: 'Updated' } as any);
+      mockFacade.updateDocument!.mockResolvedValue({
+        id: 1,
+        title: 'Updated',
+      } as any);
 
       const res = await request(app.getHttpServer())
         .put('/smartrotom/documents/document/1')
         .send({ title: 'Updated' });
 
       expect(res.status).toBe(200);
-      expect(mockFacade.updateDocument).toHaveBeenCalledWith(1, { title: 'Updated' });
+      expect(mockFacade.updateDocument).toHaveBeenCalledWith(1, {
+        title: 'Updated',
+      });
     });
 
     it('returns 500 when id is non-numeric', async () => {
@@ -156,13 +182,14 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
 
   // ==================== DELETE /smartrotom/documents/document/:id ====================
 
-
   // ── DELETE /smartrotom/documents/document/:id ──────────────────────────
   describe('DELETE /smartrotom/documents/document/:id', () => {
     it('returns 200 and delegates to facade.deleteDocument', async () => {
       mockFacade.deleteDocument!.mockResolvedValue({ success: true } as any);
 
-      const res = await request(app.getHttpServer()).delete('/smartrotom/documents/document/1');
+      const res = await request(app.getHttpServer()).delete(
+        '/smartrotom/documents/document/1',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.deleteDocument).toHaveBeenCalledWith(1);
@@ -170,7 +197,6 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
   });
 
   // ==================== POST /smartrotom/documents/notes ====================
-
 
   // ── POST /smartrotom/documents/notes ───────────────────────────────────
   describe('POST /smartrotom/documents/notes', () => {
@@ -196,14 +222,14 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
 
   // ==================== GET /smartrotom/documents/all/:uuid ====================
 
-
   // ── GET /smartrotom/documents/all/:uuid ────────────────────────────────
   describe('GET /smartrotom/documents/all/:uuid', () => {
     it('returns 200 and delegates to facade.getUserNotes (legacy)', async () => {
       mockFacade.getUserNotes!.mockResolvedValue([] as any);
 
-      const res = await request(app.getHttpServer())
-        .get(`/smartrotom/documents/all/${MOCK_UUID}`);
+      const res = await request(app.getHttpServer()).get(
+        `/smartrotom/documents/all/${MOCK_UUID}`,
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getUserNotes).toHaveBeenCalledWith(MOCK_UUID);
@@ -212,11 +238,13 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
 
   // ==================== POST /smartrotom/documents/create ====================
 
-
   // ── POST /smartrotom/documents/create ──────────────────────────────────
   describe('POST /smartrotom/documents/create', () => {
     it('returns 201 and delegates to facade.createNoteWithUser', async () => {
-      mockFacade.createNoteWithUser!.mockResolvedValue({ noteId: 1, relationId: 2 } as any);
+      mockFacade.createNoteWithUser!.mockResolvedValue({
+        noteId: 1,
+        relationId: 2,
+      } as any);
 
       const res = await request(app.getHttpServer())
         .post('/smartrotom/documents/create')
@@ -234,18 +262,25 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
 
   // ==================== POST /smartrotom/documents/save/:id ====================
 
-
   // ── POST /smartrotom/documents/save/:id ────────────────────────────────
   describe('POST /smartrotom/documents/save/:id', () => {
     it('returns 201 and delegates to facade.saveDocument', async () => {
-      mockFacade.saveDocument!.mockResolvedValue({ id: 1, created: false } as any);
+      mockFacade.saveDocument!.mockResolvedValue({
+        id: 1,
+        created: false,
+      } as any);
 
       const res = await request(app.getHttpServer())
         .post('/smartrotom/documents/save/1')
         .send({ title: 'My Note', content: 'Updated content', type: 1 });
 
       expect(res.status).toBe(201);
-      expect(mockFacade.saveDocument).toHaveBeenCalledWith(1, 'My Note', 'Updated content', 1);
+      expect(mockFacade.saveDocument).toHaveBeenCalledWith(
+        1,
+        'My Note',
+        'Updated content',
+        1,
+      );
     });
 
     it('returns 500 when id is non-numeric', async () => {
@@ -258,7 +293,6 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
   });
 
   // ==================== POST /smartrotom/documents/note/user ====================
-
 
   // ── POST /smartrotom/documents/note/user ───────────────────────────────
   describe('POST /smartrotom/documents/note/user', () => {
@@ -284,11 +318,12 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
 
   // ==================== DELETE /smartrotom/documents/note/user ====================
 
-
   // ── DELETE /smartrotom/documents/note/user ─────────────────────────────
   describe('DELETE /smartrotom/documents/note/user', () => {
     it('returns 200 and delegates to facade.removeNoteFromUser', async () => {
-      mockFacade.removeNoteFromUser!.mockResolvedValue({ success: true } as any);
+      mockFacade.removeNoteFromUser!.mockResolvedValue({
+        success: true,
+      } as any);
 
       const res = await request(app.getHttpServer())
         .delete('/smartrotom/documents/note/user')
@@ -301,22 +336,28 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
 
   // ==================== GET /smartrotom/documents/news ====================
 
-
   // ── GET /smartrotom/documents/news ─────────────────────────────────────
   describe('GET /smartrotom/documents/news', () => {
     it('returns 200 and fetches all news by default', async () => {
       mockFacade.getAllNews!.mockResolvedValue({ total: 0, news: [] } as any);
 
-      const res = await request(app.getHttpServer()).get('/smartrotom/documents/news');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/documents/news',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getAllNews).toHaveBeenCalled();
     });
 
     it('returns 200 and fetches published news when published=true', async () => {
-      mockFacade.getPublishedNews!.mockResolvedValue({ total: 0, news: [] } as any);
+      mockFacade.getPublishedNews!.mockResolvedValue({
+        total: 0,
+        news: [],
+      } as any);
 
-      const res = await request(app.getHttpServer()).get('/smartrotom/documents/news?published=true');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/documents/news?published=true',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getPublishedNews).toHaveBeenCalled();
@@ -325,13 +366,14 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
 
   // ==================== GET /smartrotom/documents/news/featured ====================
 
-
   // ── GET /smartrotom/documents/news/featured ────────────────────────────
   describe('GET /smartrotom/documents/news/featured', () => {
     it('returns 200 and delegates to facade.getFeaturedNews', async () => {
       mockFacade.getFeaturedNews!.mockResolvedValue({ id: 1 } as any);
 
-      const res = await request(app.getHttpServer()).get('/smartrotom/documents/news/featured');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/documents/news/featured',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getFeaturedNews).toHaveBeenCalled();
@@ -340,27 +382,29 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
 
   // ==================== GET /smartrotom/documents/news/:newsId ====================
 
-
   // ── GET /smartrotom/documents/news/:newsId ─────────────────────────────
   describe('GET /smartrotom/documents/news/:newsId', () => {
     it('returns 200 and delegates to facade.getNewsById', async () => {
       mockFacade.getNewsById!.mockResolvedValue({ id: 1 } as any);
 
-      const res = await request(app.getHttpServer()).get('/smartrotom/documents/news/1');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/documents/news/1',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getNewsById).toHaveBeenCalledWith(1);
     });
 
     it('returns 500 when newsId is non-numeric', async () => {
-      const res = await request(app.getHttpServer()).get('/smartrotom/documents/news/abc');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/documents/news/abc',
+      );
 
       expect(res.status).toBe(500);
     });
   });
 
   // ==================== POST /smartrotom/documents/news (admin) ====================
-
 
   // ── POST /smartrotom/documents/news ────────────────────────────────────
   describe('POST /smartrotom/documents/news', () => {
@@ -386,11 +430,13 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
 
   // ==================== PUT /smartrotom/documents/news/:newsId (admin) ====================
 
-
   // ── PUT /smartrotom/documents/news/:newsId ─────────────────────────────
   describe('PUT /smartrotom/documents/news/:newsId', () => {
     it('returns 200 and delegates to facade.updateNews', async () => {
-      mockFacade.updateNews!.mockResolvedValue({ id: 1, title: 'Updated' } as any);
+      mockFacade.updateNews!.mockResolvedValue({
+        id: 1,
+        title: 'Updated',
+      } as any);
 
       const res = await request(app.getHttpServer())
         .put('/smartrotom/documents/news/1')
@@ -403,13 +449,14 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
 
   // ==================== DELETE /smartrotom/documents/news/:newsId (admin) ====================
 
-
   // ── DELETE /smartrotom/documents/news/:newsId ──────────────────────────
   describe('DELETE /smartrotom/documents/news/:newsId', () => {
     it('returns 200 and delegates to facade.deleteNews', async () => {
       mockFacade.deleteNews!.mockResolvedValue({ success: true } as any);
 
-      const res = await request(app.getHttpServer()).delete('/smartrotom/documents/news/1');
+      const res = await request(app.getHttpServer()).delete(
+        '/smartrotom/documents/news/1',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.deleteNews).toHaveBeenCalledWith(1);
@@ -417,7 +464,6 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
   });
 
   // ==================== POST /smartrotom/documents/newsstatus (admin) ====================
-
 
   // ── POST /smartrotom/documents/newsstatus ──────────────────────────────
   describe('POST /smartrotom/documents/newsstatus', () => {

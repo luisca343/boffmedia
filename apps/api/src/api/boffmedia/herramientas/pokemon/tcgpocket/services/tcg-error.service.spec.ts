@@ -34,7 +34,10 @@ describe('TcgErrorService', () => {
 
     it('throws with the response status for 4xx client errors', () => {
       try {
-        service.handleApiError({ response: { status: 422 }, message: 'unprocessable' }, 'Get set');
+        service.handleApiError(
+          { response: { status: 422 }, message: 'unprocessable' },
+          'Get set',
+        );
       } catch (e: any) {
         expect(e.getStatus()).toBe(422);
       }

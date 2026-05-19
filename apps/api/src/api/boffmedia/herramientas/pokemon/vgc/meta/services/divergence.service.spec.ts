@@ -65,7 +65,10 @@ describe('DivergenceService', () => {
         DivergenceService,
         { provide: SmogonService, useValue: mockSmogonService },
         { provide: LimitlessService, useValue: mockLimitlessService },
-        { provide: VgcRegulationsRepository, useValue: mockRegulationsRepository },
+        {
+          provide: VgcRegulationsRepository,
+          useValue: mockRegulationsRepository,
+        },
       ],
     }).compile();
 
@@ -147,7 +150,9 @@ describe('DivergenceService', () => {
         month: '2024-11',
       });
 
-      expect(mockLimitlessService.getCombinedUsageEntries).toHaveBeenCalledWith('regulation-h');
+      expect(mockLimitlessService.getCombinedUsageEntries).toHaveBeenCalledWith(
+        'regulation-h',
+      );
       expect(mockLimitlessService.getUsageEntries).not.toHaveBeenCalled();
     });
 
@@ -159,7 +164,9 @@ describe('DivergenceService', () => {
       });
 
       expect(mockLimitlessService.getUsageEntries).toHaveBeenCalledWith(42);
-      expect(mockLimitlessService.getCombinedUsageEntries).not.toHaveBeenCalled();
+      expect(
+        mockLimitlessService.getCombinedUsageEntries,
+      ).not.toHaveBeenCalled();
     });
 
     it('returns a DivergenceResult with correct metadata', async () => {
@@ -186,8 +193,12 @@ describe('DivergenceService', () => {
     });
 
     it('computes delta as ladderPercent minus tournamentPercent', async () => {
-      mockSmogonService.getUsageEntries.mockResolvedValue([makeEntry('garchomp', 30)]);
-      mockLimitlessService.getCombinedUsageEntries.mockResolvedValue([makeEntry('garchomp', 20)]);
+      mockSmogonService.getUsageEntries.mockResolvedValue([
+        makeEntry('garchomp', 30),
+      ]);
+      mockLimitlessService.getCombinedUsageEntries.mockResolvedValue([
+        makeEntry('garchomp', 20),
+      ]);
 
       const result = await service.compareLadderVsTournament({
         regulationId: 'regulation-h',
@@ -199,8 +210,12 @@ describe('DivergenceService', () => {
     });
 
     it('assigns ladder-trap badge when ladder >= 10, tournament <= 5, delta >= 5', async () => {
-      mockSmogonService.getUsageEntries.mockResolvedValue([makeEntry('meowth', 15)]);
-      mockLimitlessService.getCombinedUsageEntries.mockResolvedValue([makeEntry('meowth', 3)]);
+      mockSmogonService.getUsageEntries.mockResolvedValue([
+        makeEntry('meowth', 15),
+      ]);
+      mockLimitlessService.getCombinedUsageEntries.mockResolvedValue([
+        makeEntry('meowth', 3),
+      ]);
 
       const result = await service.compareLadderVsTournament({
         regulationId: 'regulation-h',
@@ -212,8 +227,12 @@ describe('DivergenceService', () => {
     });
 
     it('assigns tournament-staple badge when tournament >= 10, ladder <= 5, delta <= -5', async () => {
-      mockSmogonService.getUsageEntries.mockResolvedValue([makeEntry('amoonguss', 2)]);
-      mockLimitlessService.getCombinedUsageEntries.mockResolvedValue([makeEntry('amoonguss', 15)]);
+      mockSmogonService.getUsageEntries.mockResolvedValue([
+        makeEntry('amoonguss', 2),
+      ]);
+      mockLimitlessService.getCombinedUsageEntries.mockResolvedValue([
+        makeEntry('amoonguss', 15),
+      ]);
 
       const result = await service.compareLadderVsTournament({
         regulationId: 'regulation-h',
@@ -225,8 +244,12 @@ describe('DivergenceService', () => {
     });
 
     it('assigns null badge when thresholds are not met', async () => {
-      mockSmogonService.getUsageEntries.mockResolvedValue([makeEntry('pikachu', 10)]);
-      mockLimitlessService.getCombinedUsageEntries.mockResolvedValue([makeEntry('pikachu', 8)]);
+      mockSmogonService.getUsageEntries.mockResolvedValue([
+        makeEntry('pikachu', 10),
+      ]);
+      mockLimitlessService.getCombinedUsageEntries.mockResolvedValue([
+        makeEntry('pikachu', 8),
+      ]);
 
       const result = await service.compareLadderVsTournament({
         regulationId: 'regulation-h',
@@ -238,7 +261,9 @@ describe('DivergenceService', () => {
     });
 
     it('includes species only in ladder with 0 tournament usage', async () => {
-      mockSmogonService.getUsageEntries.mockResolvedValue([makeEntry('snorlax', 8)]);
+      mockSmogonService.getUsageEntries.mockResolvedValue([
+        makeEntry('snorlax', 8),
+      ]);
       mockLimitlessService.getCombinedUsageEntries.mockResolvedValue([]);
 
       const result = await service.compareLadderVsTournament({
@@ -256,7 +281,7 @@ describe('DivergenceService', () => {
         makeEntry('b', 5),
       ]);
       mockLimitlessService.getCombinedUsageEntries.mockResolvedValue([
-        makeEntry('a', 5),  // delta = 15
+        makeEntry('a', 5), // delta = 15
         makeEntry('b', 15), // delta = -10
       ]);
 
@@ -265,7 +290,9 @@ describe('DivergenceService', () => {
         month: '2024-11',
       });
 
-      expect(result.rows[0].absDeltaPercent).toBeGreaterThanOrEqual(result.rows[1].absDeltaPercent);
+      expect(result.rows[0].absDeltaPercent).toBeGreaterThanOrEqual(
+        result.rows[1].absDeltaPercent,
+      );
     });
   });
 });

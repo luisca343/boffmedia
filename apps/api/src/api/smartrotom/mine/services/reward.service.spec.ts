@@ -8,7 +8,7 @@ const mockRepo = {
 };
 
 const makeReward = (id: number, type: string, name: string, value: number) =>
-  ({ id, type, name, value } as any);
+  ({ id, type, name, value }) as any;
 
 describe('RewardService', () => {
   let service: RewardService;
@@ -128,7 +128,9 @@ describe('RewardService', () => {
     });
 
     it('returns false when some ids are not found', async () => {
-      mockRepo.findRewardsByIds.mockResolvedValue([makeReward(1, 'weapon', 'Sword', 100)]);
+      mockRepo.findRewardsByIds.mockResolvedValue([
+        makeReward(1, 'weapon', 'Sword', 100),
+      ]);
 
       await expect(service.validateRewardsExist([1, 999])).resolves.toBe(false);
     });
@@ -150,7 +152,9 @@ describe('RewardService', () => {
     });
 
     it('includes the reward name in each entry', async () => {
-      mockRepo.findAllRewards.mockResolvedValue([makeReward(1, 'weapon', 'Iron Sword', 100)]);
+      mockRepo.findAllRewards.mockResolvedValue([
+        makeReward(1, 'weapon', 'Iron Sword', 100),
+      ]);
 
       const result = await service.getRewardDropRates();
 

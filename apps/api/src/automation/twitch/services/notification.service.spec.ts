@@ -72,12 +72,20 @@ describe('NotificationService', () => {
     });
 
     it('removes by type + identifier (url)', () => {
-      service.addTarget({ type: 'webhook', config: { url: 'https://hook1.example.com' } });
-      service.addTarget({ type: 'webhook', config: { url: 'https://hook2.example.com' } });
+      service.addTarget({
+        type: 'webhook',
+        config: { url: 'https://hook1.example.com' },
+      });
+      service.addTarget({
+        type: 'webhook',
+        config: { url: 'https://hook2.example.com' },
+      });
 
       service.removeTarget('webhook', 'https://hook1.example.com');
 
-      const remaining = service.getTargets().filter((t) => t.type === 'webhook');
+      const remaining = service
+        .getTargets()
+        .filter((t) => t.type === 'webhook');
       expect(remaining).toHaveLength(1);
       expect(remaining[0].config.url).toBe('https://hook2.example.com');
     });
@@ -106,12 +114,17 @@ describe('NotificationService', () => {
     it('sends to all registered targets without throwing', async () => {
       const notification = makeNotification();
 
-      await expect(service.sendStreamNotification(notification)).resolves.not.toThrow();
+      await expect(
+        service.sendStreamNotification(notification),
+      ).resolves.not.toThrow();
     });
 
     it('sends webhook notification via HttpService when webhook target added', async () => {
       mockHttpService.post.mockReturnValue(of({ data: 'ok', status: 200 }));
-      service.addTarget({ type: 'webhook', config: { url: 'https://webhook.example.com' } });
+      service.addTarget({
+        type: 'webhook',
+        config: { url: 'https://webhook.example.com' },
+      });
 
       await service.sendStreamNotification(makeNotification());
 
@@ -124,9 +137,14 @@ describe('NotificationService', () => {
 
     it('does not throw when a target fails', async () => {
       mockHttpService.post.mockReturnValue(of(new Error('fail')));
-      service.addTarget({ type: 'webhook', config: { url: 'https://bad.example.com' } });
+      service.addTarget({
+        type: 'webhook',
+        config: { url: 'https://bad.example.com' },
+      });
 
-      await expect(service.sendStreamNotification(makeNotification())).resolves.not.toThrow();
+      await expect(
+        service.sendStreamNotification(makeNotification()),
+      ).resolves.not.toThrow();
     });
   });
 
@@ -134,7 +152,9 @@ describe('NotificationService', () => {
 
   describe('when DISCORD_WEBHOOK_URL is configured', () => {
     it('adds a webhook target on init', async () => {
-      mockConfigService.get.mockReturnValue('https://discord.com/api/webhooks/test');
+      mockConfigService.get.mockReturnValue(
+        'https://discord.com/api/webhooks/test',
+      );
 
       const module: TestingModule = await Test.createTestingModule({
         providers: [
@@ -146,10 +166,14 @@ describe('NotificationService', () => {
       }).compile();
 
       const svc = module.get<NotificationService>(NotificationService);
-      const webhookTargets = svc.getTargets().filter((t) => t.type === 'webhook');
+      const webhookTargets = svc
+        .getTargets()
+        .filter((t) => t.type === 'webhook');
 
       expect(webhookTargets).toHaveLength(1);
-      expect(webhookTargets[0].config.url).toBe('https://discord.com/api/webhooks/test');
+      expect(webhookTargets[0].config.url).toBe(
+        'https://discord.com/api/webhooks/test',
+      );
     });
   });
 });

@@ -2,7 +2,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { LeaderboardsService } from './leaderboards.service';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 
-const makeParticipant = (id: number, totalPoints: number, achievementCount = 1, medalCount = 0) => ({
+const makeParticipant = (
+  id: number,
+  totalPoints: number,
+  achievementCount = 1,
+  medalCount = 0,
+) => ({
   participantId: id,
   nickname: `Player${id}`,
   avatar: null,
@@ -19,9 +24,20 @@ type DrizzleQueryBuilder = Record<string, jest.Mock> & {
   then: (resolve: (v: unknown) => void) => Promise<unknown>;
 };
 
-const buildMockDb = (resolveWith: unknown): { select: jest.Mock; _builder: DrizzleQueryBuilder } => {
+const buildMockDb = (
+  resolveWith: unknown,
+): { select: jest.Mock; _builder: DrizzleQueryBuilder } => {
   const builder = {} as DrizzleQueryBuilder;
-  const chainedMethods = ['select', 'from', 'leftJoin', 'innerJoin', 'where', 'groupBy', 'orderBy', 'limit'];
+  const chainedMethods = [
+    'select',
+    'from',
+    'leftJoin',
+    'innerJoin',
+    'where',
+    'groupBy',
+    'orderBy',
+    'limit',
+  ];
   for (const method of chainedMethods) {
     builder[method] = jest.fn().mockReturnValue(builder);
   }

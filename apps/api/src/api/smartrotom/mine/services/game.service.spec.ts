@@ -17,7 +17,13 @@ const mockRepo = {
 const mockSession = { id: 42, uuid: UUID };
 
 const mockRewards = [
-  { id: 1, itemId: 'item-sword', type: 'weapon', name: 'Iron Sword', value: 300 },
+  {
+    id: 1,
+    itemId: 'item-sword',
+    type: 'weapon',
+    name: 'Iron Sword',
+    value: 300,
+  },
   { id: 2, itemId: 'item-gem', type: 'material', name: 'Ruby', value: 1200 },
 ];
 
@@ -76,7 +82,11 @@ describe('GameService', () => {
     it('returns success response with rewardsProcessed count', async () => {
       const result = await service.endGame(UUID, rewards);
 
-      expect(result).toEqual({ idPartida: 42, success: true, rewardsProcessed: 2 });
+      expect(result).toEqual({
+        idPartida: 42,
+        success: true,
+        rewardsProcessed: 2,
+      });
     });
 
     it('creates game rewards with rewardId and value', async () => {
@@ -93,29 +103,41 @@ describe('GameService', () => {
 
       const entries = mockRepo.createInventoryEntries.mock.calls[0][0];
       // reward id=1 value=300 → RARE; id=2 value=1200 → LEGENDARY
-      expect(entries[0]).toMatchObject({ rarity: ItemRarity.RARE, sourceType: 'mine', uuid: UUID });
+      expect(entries[0]).toMatchObject({
+        rarity: ItemRarity.RARE,
+        sourceType: 'mine',
+        uuid: UUID,
+      });
       expect(entries[1]).toMatchObject({ rarity: ItemRarity.LEGENDARY });
     });
 
     it('throws NotFoundException when no active game session found', async () => {
       mockRepo.findLatestGameSession.mockResolvedValue(null);
 
-      await expect(service.endGame(UUID, rewards)).rejects.toThrow(NotFoundException);
+      await expect(service.endGame(UUID, rewards)).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('throws when rewards count does not match valid rewards count', async () => {
       mockRepo.findRewardsByIds.mockResolvedValue([mockRewards[0]]); // only 1 of 2
 
-      await expect(service.endGame(UUID, rewards)).rejects.toThrow('Some rewards do not exist');
+      await expect(service.endGame(UUID, rewards)).rejects.toThrow(
+        'Some rewards do not exist',
+      );
       expect(mockRepo.createGameRewards).not.toHaveBeenCalled();
     });
 
     it('throws BadRequestException when uuid is empty', async () => {
-      await expect(service.endGame('', rewards)).rejects.toThrow(BadRequestException);
+      await expect(service.endGame('', rewards)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('throws BadRequestException when rewards is not an array', async () => {
-      await expect(service.endGame(UUID, null as any)).rejects.toThrow(BadRequestException);
+      await expect(service.endGame(UUID, null as any)).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
@@ -124,7 +146,9 @@ describe('GameService', () => {
   describe('calculateRarityFromWeight() — tested via endGame()', () => {
     const runWithWeight = async (weight: number): Promise<string> => {
       const reward = { id: 1, value: weight };
-      const rewardData = [{ id: 1, itemId: 'item-x', type: 'misc', name: 'X', value: weight }];
+      const rewardData = [
+        { id: 1, itemId: 'item-x', type: 'misc', name: 'X', value: weight },
+      ];
       mockRepo.findLatestGameSession.mockResolvedValue(mockSession);
       mockRepo.findRewardsByIds.mockResolvedValue(rewardData);
       mockRepo.createGameRewards.mockResolvedValue(undefined);

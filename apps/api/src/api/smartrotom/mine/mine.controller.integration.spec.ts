@@ -8,7 +8,12 @@ import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter'
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { Reflector } from '@nestjs/core';
 
-const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn() };
+const mockLogger = {
+  log: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  debug: jest.fn(),
+};
 
 const mockFacade = {
   getPlayerEnergy: jest.fn(),
@@ -43,7 +48,11 @@ describe('MineController — integration (ValidationPipe + GlobalExceptionFilter
 
     app = moduleRef.createNestApplication();
     app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
     );
     app.useGlobalFilters(new GlobalExceptionFilter(mockLogger as any));
     await app.init();
@@ -61,10 +70,14 @@ describe('MineController — integration (ValidationPipe + GlobalExceptionFilter
 
   describe('GET /smartrotom/mine/energy/:uuid', () => {
     it('returns 200 and delegates to facade.getPlayerEnergy', async () => {
-      mockFacade.getPlayerEnergy.mockResolvedValue({ energy: 100, maxEnergy: 100 });
+      mockFacade.getPlayerEnergy.mockResolvedValue({
+        energy: 100,
+        maxEnergy: 100,
+      });
 
-      const res = await request(app.getHttpServer())
-        .get(`/smartrotom/mine/energy/${VALID_UUID}`);
+      const res = await request(app.getHttpServer()).get(
+        `/smartrotom/mine/energy/${VALID_UUID}`,
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getPlayerEnergy).toHaveBeenCalledWith(VALID_UUID);
@@ -144,7 +157,9 @@ describe('MineController — integration (ValidationPipe + GlobalExceptionFilter
     it('returns 200 and delegates to facade.getAllRewards', async () => {
       mockFacade.getAllRewards.mockResolvedValue([]);
 
-      const res = await request(app.getHttpServer()).get('/smartrotom/mine/rewards');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/mine/rewards',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getAllRewards).toHaveBeenCalledTimes(1);
@@ -157,7 +172,9 @@ describe('MineController — integration (ValidationPipe + GlobalExceptionFilter
     it('returns 200 and delegates to facade.getRewardsByType', async () => {
       mockFacade.getRewardsByType.mockResolvedValue({});
 
-      const res = await request(app.getHttpServer()).get('/smartrotom/mine/rewardsbytype');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/mine/rewardsbytype',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getRewardsByType).toHaveBeenCalledTimes(1);
@@ -170,7 +187,9 @@ describe('MineController — integration (ValidationPipe + GlobalExceptionFilter
     it('returns 200 and delegates to facade.getRewardDropRates', async () => {
       mockFacade.getRewardDropRates.mockResolvedValue({});
 
-      const res = await request(app.getHttpServer()).get('/smartrotom/mine/rewards/droprates');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/mine/rewards/droprates',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getRewardDropRates).toHaveBeenCalledTimes(1);
@@ -183,8 +202,9 @@ describe('MineController — integration (ValidationPipe + GlobalExceptionFilter
     it('returns 200 and delegates to facade.getPlayerHistory', async () => {
       mockFacade.getPlayerHistory.mockResolvedValue({});
 
-      const res = await request(app.getHttpServer())
-        .get(`/smartrotom/mine/history/${VALID_UUID}`);
+      const res = await request(app.getHttpServer()).get(
+        `/smartrotom/mine/history/${VALID_UUID}`,
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getPlayerHistory).toHaveBeenCalledWith(VALID_UUID);
@@ -197,7 +217,9 @@ describe('MineController — integration (ValidationPipe + GlobalExceptionFilter
     it('returns 200 and delegates to facade.getPlayerRanking', async () => {
       mockFacade.getPlayerRanking.mockResolvedValue([]);
 
-      const res = await request(app.getHttpServer()).get('/smartrotom/mine/ranking');
+      const res = await request(app.getHttpServer()).get(
+        '/smartrotom/mine/ranking',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getPlayerRanking).toHaveBeenCalledTimes(1);
@@ -208,10 +230,14 @@ describe('MineController — integration (ValidationPipe + GlobalExceptionFilter
 
   describe('GET /smartrotom/mine/rank/:uuid', () => {
     it('returns 200 and delegates to facade.getPlayerRank', async () => {
-      mockFacade.getPlayerRank.mockResolvedValue({ rank: 1, totalValue: 25100 });
+      mockFacade.getPlayerRank.mockResolvedValue({
+        rank: 1,
+        totalValue: 25100,
+      });
 
-      const res = await request(app.getHttpServer())
-        .get(`/smartrotom/mine/rank/${VALID_UUID}`);
+      const res = await request(app.getHttpServer()).get(
+        `/smartrotom/mine/rank/${VALID_UUID}`,
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getPlayerRank).toHaveBeenCalledWith(VALID_UUID);
@@ -224,8 +250,9 @@ describe('MineController — integration (ValidationPipe + GlobalExceptionFilter
     it('returns 200 and delegates to facade.getUnclaimedRewards', async () => {
       mockFacade.getUnclaimedRewards.mockResolvedValue([]);
 
-      const res = await request(app.getHttpServer())
-        .get(`/smartrotom/mine/unclaimed/${VALID_UUID}`);
+      const res = await request(app.getHttpServer()).get(
+        `/smartrotom/mine/unclaimed/${VALID_UUID}`,
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getUnclaimedRewards).toHaveBeenCalledWith(VALID_UUID);
@@ -262,8 +289,9 @@ describe('MineController — integration (ValidationPipe + GlobalExceptionFilter
     it('returns 200 and delegates to facade.getPlayerStatistics', async () => {
       mockFacade.getPlayerStatistics.mockResolvedValue({ gamesPlayed: 10 });
 
-      const res = await request(app.getHttpServer())
-        .get(`/smartrotom/mine/stats/${VALID_UUID}`);
+      const res = await request(app.getHttpServer()).get(
+        `/smartrotom/mine/stats/${VALID_UUID}`,
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getPlayerStatistics).toHaveBeenCalledWith(VALID_UUID);
@@ -276,8 +304,9 @@ describe('MineController — integration (ValidationPipe + GlobalExceptionFilter
     it('returns 200 and returns exists flag from facade', async () => {
       mockFacade.validatePlayerExists.mockResolvedValue(true);
 
-      const res = await request(app.getHttpServer())
-        .get(`/smartrotom/mine/validate/player/${VALID_UUID}`);
+      const res = await request(app.getHttpServer()).get(
+        `/smartrotom/mine/validate/player/${VALID_UUID}`,
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.validatePlayerExists).toHaveBeenCalledWith(VALID_UUID);

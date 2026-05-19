@@ -1,4 +1,11 @@
-import { IsString, IsEmail, IsNotEmpty, IsDefined, MinLength, ValidateNested } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  IsNotEmpty,
+  IsDefined,
+  MinLength,
+  ValidateNested,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { MinecraftAccountDto } from './minecraft-account.dto';
 

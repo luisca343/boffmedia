@@ -62,13 +62,17 @@ describe('NoteService', () => {
     });
 
     it('throws when uuid is empty', async () => {
-      await expect(service.addNoteToUser(1, '')).rejects.toThrow('UUID is required');
+      await expect(service.addNoteToUser(1, '')).rejects.toThrow(
+        'UUID is required',
+      );
     });
 
     it('throws when document does not exist', async () => {
       mockRepo.findDocumentById.mockResolvedValue(null);
 
-      await expect(service.addNoteToUser(99, UUID)).rejects.toThrow('Document not found');
+      await expect(service.addNoteToUser(99, UUID)).rejects.toThrow(
+        'Document not found',
+      );
     });
   });
 
@@ -100,7 +104,9 @@ describe('NoteService', () => {
     });
 
     it('throws when uuid is empty', async () => {
-      await expect(service.removeNoteFromUser(1, '')).rejects.toThrow('UUID is required');
+      await expect(service.removeNoteFromUser(1, '')).rejects.toThrow(
+        'UUID is required',
+      );
     });
   });
 

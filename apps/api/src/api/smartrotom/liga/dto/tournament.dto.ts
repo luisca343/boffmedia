@@ -1,4 +1,11 @@
-import { IsString, IsNotEmpty, IsInt, IsOptional, IsDate, Min } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsInt,
+  IsOptional,
+  IsDate,
+  Min,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateTournamentDto {

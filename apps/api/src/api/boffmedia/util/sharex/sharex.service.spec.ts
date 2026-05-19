@@ -12,10 +12,7 @@ describe('SharexService', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        SharexService,
-        { provide: MySQL2Service, useValue: mockDb },
-      ],
+      providers: [SharexService, { provide: MySQL2Service, useValue: mockDb }],
     }).compile();
 
     service = module.get<SharexService>(SharexService);

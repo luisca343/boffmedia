@@ -33,9 +33,19 @@ const mockPasswordService = {
 
 const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn() };
 
-const mockUser = { id: 1, username: 'TrainerAsh', email: 'ash@pokemon.com', uuid: 'abc-123' } as any;
+const mockUser = {
+  id: 1,
+  username: 'TrainerAsh',
+  email: 'ash@pokemon.com',
+  uuid: 'abc-123',
+} as any;
 const mockFullUser = {
-  boffmedia_users: { id: 1, username: 'TrainerAsh', email: 'ash@pokemon.com', password: '$hashed$' },
+  boffmedia_users: {
+    id: 1,
+    username: 'TrainerAsh',
+    email: 'ash@pokemon.com',
+    password: '$hashed$',
+  },
   rotom_users: { username: 'TrainerAsh', uuid: 'abc-123', world: 'main' },
 } as any;
 
@@ -53,7 +63,9 @@ describe('BoffMediaUsersManagementService', () => {
       ],
     }).compile();
 
-    service = module.get<BoffMediaUsersManagementService>(BoffMediaUsersManagementService);
+    service = module.get<BoffMediaUsersManagementService>(
+      BoffMediaUsersManagementService,
+    );
   });
 
   it('should be defined', () => {
@@ -77,7 +89,9 @@ describe('BoffMediaUsersManagementService', () => {
       const result = await service.createUser(validData);
 
       expect(result.username).toBe('TrainerAsh');
-      expect(mockPasswordService.hashPassword).toHaveBeenCalledWith('Pikach00!');
+      expect(mockPasswordService.hashPassword).toHaveBeenCalledWith(
+        'Pikach00!',
+      );
       expect(mockRepo.createUser).toHaveBeenCalledWith(
         expect.objectContaining({ password: '$hashed$' }),
       );
@@ -85,13 +99,17 @@ describe('BoffMediaUsersManagementService', () => {
     });
 
     it('throws ConflictException when username already exists', async () => {
-      mockRepo.checkMultipleFieldsExist.mockResolvedValue([{ username: 'TrainerAsh' }]);
+      mockRepo.checkMultipleFieldsExist.mockResolvedValue([
+        { username: 'TrainerAsh' },
+      ]);
 
       await expect(service.createUser(validData)).rejects.toThrow('username');
     });
 
     it('throws ConflictException when email already exists', async () => {
-      mockRepo.checkMultipleFieldsExist.mockResolvedValue([{ email: 'ash@pokemon.com' }]);
+      mockRepo.checkMultipleFieldsExist.mockResolvedValue([
+        { email: 'ash@pokemon.com' },
+      ]);
 
       await expect(service.createUser(validData)).rejects.toThrow('email');
     });
@@ -155,11 +173,15 @@ describe('BoffMediaUsersManagementService', () => {
     it('returns user when found', async () => {
       mockRepo.findUserByUsername.mockResolvedValue(mockUser);
 
-      await expect(service.getUserByUsername('TrainerAsh')).resolves.toEqual(mockUser);
+      await expect(service.getUserByUsername('TrainerAsh')).resolves.toEqual(
+        mockUser,
+      );
     });
 
     it('throws BadRequestException when username is empty', async () => {
-      await expect(service.getUserByUsername('')).rejects.toThrow('Username is required');
+      await expect(service.getUserByUsername('')).rejects.toThrow(
+        'Username is required',
+      );
     });
   });
 
@@ -167,7 +189,9 @@ describe('BoffMediaUsersManagementService', () => {
 
   describe('validateUser()', () => {
     it('returns session user when credentials are valid', async () => {
-      mockRepo.findFullUserByUsernameWithPassword.mockResolvedValue(mockFullUser);
+      mockRepo.findFullUserByUsernameWithPassword.mockResolvedValue(
+        mockFullUser,
+      );
       mockPasswordService.verifyPassword.mockResolvedValue(true);
       mockRepo.getUserRoles.mockResolvedValue(['user']);
 
@@ -185,10 +209,14 @@ describe('BoffMediaUsersManagementService', () => {
     });
 
     it('returns null when password is wrong', async () => {
-      mockRepo.findFullUserByUsernameWithPassword.mockResolvedValue(mockFullUser);
+      mockRepo.findFullUserByUsernameWithPassword.mockResolvedValue(
+        mockFullUser,
+      );
       mockPasswordService.verifyPassword.mockResolvedValue(false);
 
-      await expect(service.validateUser('TrainerAsh', 'wrongpass')).resolves.toBeNull();
+      await expect(
+        service.validateUser('TrainerAsh', 'wrongpass'),
+      ).resolves.toBeNull();
     });
 
     it('throws BadRequestException when credentials are missing', async () => {
@@ -202,12 +230,17 @@ describe('BoffMediaUsersManagementService', () => {
 
   describe('updateUser()', () => {
     it('hashes password when updating password field', async () => {
-      mockPasswordService.validatePassword.mockReturnValue({ isValid: true, errors: [] });
+      mockPasswordService.validatePassword.mockReturnValue({
+        isValid: true,
+        errors: [],
+      });
       mockRepo.updateUser.mockResolvedValue(mockUser);
 
       await service.updateUser(1, { password: 'NewPass123!' });
 
-      expect(mockPasswordService.hashPassword).toHaveBeenCalledWith('NewPass123!');
+      expect(mockPasswordService.hashPassword).toHaveBeenCalledWith(
+        'NewPass123!',
+      );
     });
 
     it('throws when password fails validation', async () => {
@@ -222,7 +255,9 @@ describe('BoffMediaUsersManagementService', () => {
     });
 
     it('throws BadRequestException when id is 0', async () => {
-      await expect(service.updateUser(0, {})).rejects.toThrow('Valid ID is required');
+      await expect(service.updateUser(0, {})).rejects.toThrow(
+        'Valid ID is required',
+      );
     });
   });
 

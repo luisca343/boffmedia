@@ -25,7 +25,11 @@ const systemData = {
 
 const userApiResponse = {
   quests: {
-    '1': { id: 1, status: 'in_progress', objectives: [{ id: 1, completed: true }] },
+    '1': {
+      id: 1,
+      status: 'in_progress',
+      objectives: [{ id: 1, completed: true }],
+    },
   },
 };
 
@@ -79,11 +83,15 @@ describe('UserQuestService', () => {
     });
 
     it('throws when uuid is empty', async () => {
-      await expect(service.getUserQuests('')).rejects.toThrow('UUID is required');
+      await expect(service.getUserQuests('')).rejects.toThrow(
+        'UUID is required',
+      );
     });
 
     it('throws when uuid is whitespace only', async () => {
-      await expect(service.getUserQuests('   ')).rejects.toThrow('UUID is required');
+      await expect(service.getUserQuests('   ')).rejects.toThrow(
+        'UUID is required',
+      );
     });
   });
 
@@ -93,7 +101,9 @@ describe('UserQuestService', () => {
     it('returns true when user API call succeeds', async () => {
       mockRepo.fetchUserQuestsFromAPI.mockResolvedValue(userApiResponse);
 
-      await expect(service.validateUserExists('player-uuid')).resolves.toBe(true);
+      await expect(service.validateUserExists('player-uuid')).resolves.toBe(
+        true,
+      );
     });
 
     it('returns false when API call throws', async () => {

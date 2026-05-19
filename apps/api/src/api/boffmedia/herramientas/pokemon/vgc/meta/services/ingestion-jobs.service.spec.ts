@@ -68,7 +68,10 @@ describe('IngestionJobsService', () => {
       providers: [
         IngestionJobsService,
         { provide: SmogonRepository, useValue: mockSmogonRepository },
-        { provide: VgcRegulationsRepository, useValue: mockRegulationsRepository },
+        {
+          provide: VgcRegulationsRepository,
+          useValue: mockRegulationsRepository,
+        },
         { provide: LimitlessRepository, useValue: mockLimitlessRepository },
       ],
     }).compile();
@@ -89,7 +92,9 @@ describe('IngestionJobsService', () => {
     });
 
     it('maps a smogon snapshot to a smogon_snapshot job with status done', async () => {
-      mockSmogonRepository.findAvailableSnapshots.mockResolvedValue([makeSnapshot()]);
+      mockSmogonRepository.findAvailableSnapshots.mockResolvedValue([
+        makeSnapshot(),
+      ]);
 
       const jobs = await service.listJobs();
       const job = jobs.find((j) => j.type === 'smogon_snapshot');
@@ -106,7 +111,9 @@ describe('IngestionJobsService', () => {
     });
 
     it('maps a regulation to a champions_regulation job', async () => {
-      mockRegulationsRepository.findActive.mockResolvedValue([makeRegulation()]);
+      mockRegulationsRepository.findActive.mockResolvedValue([
+        makeRegulation(),
+      ]);
 
       const jobs = await service.listJobs();
       const job = jobs.find((j) => j.type === 'champions_regulation');
@@ -119,7 +126,9 @@ describe('IngestionJobsService', () => {
     });
 
     it('maps a tournament to a limitless_tournament job', async () => {
-      mockLimitlessRepository.findAllTournaments.mockResolvedValue([makeTournament()]);
+      mockLimitlessRepository.findAllTournaments.mockResolvedValue([
+        makeTournament(),
+      ]);
 
       const jobs = await service.listJobs();
       const job = jobs.find((j) => j.type === 'limitless_tournament');
@@ -127,32 +136,49 @@ describe('IngestionJobsService', () => {
       expect(job).toBeDefined();
       expect(job!.id).toBe('limitless:1');
       expect(job!.status).toBe('done');
-      expect(job!.metadata).toMatchObject({ tournamentId: 1, regulationId: 'regulation-h' });
+      expect(job!.metadata).toMatchObject({
+        tournamentId: 1,
+        regulationId: 'regulation-h',
+      });
     });
 
     it('returns jobs in order: champions → limitless → smogon', async () => {
-      mockSmogonRepository.findAvailableSnapshots.mockResolvedValue([makeSnapshot()]);
-      mockRegulationsRepository.findActive.mockResolvedValue([makeRegulation()]);
-      mockLimitlessRepository.findAllTournaments.mockResolvedValue([makeTournament()]);
+      mockSmogonRepository.findAvailableSnapshots.mockResolvedValue([
+        makeSnapshot(),
+      ]);
+      mockRegulationsRepository.findActive.mockResolvedValue([
+        makeRegulation(),
+      ]);
+      mockLimitlessRepository.findAllTournaments.mockResolvedValue([
+        makeTournament(),
+      ]);
 
       const jobs = await service.listJobs();
       const types = jobs.map((j) => j.type);
 
-      expect(types.indexOf('champions_regulation')).toBeLessThan(types.indexOf('limitless_tournament'));
-      expect(types.indexOf('limitless_tournament')).toBeLessThan(types.indexOf('smogon_snapshot'));
+      expect(types.indexOf('champions_regulation')).toBeLessThan(
+        types.indexOf('limitless_tournament'),
+      );
+      expect(types.indexOf('limitless_tournament')).toBeLessThan(
+        types.indexOf('smogon_snapshot'),
+      );
     });
 
     it('uses findAllTournaments when no regulationId is provided', async () => {
       await service.listJobs();
 
       expect(mockLimitlessRepository.findAllTournaments).toHaveBeenCalled();
-      expect(mockLimitlessRepository.findTournamentsByRegulation).not.toHaveBeenCalled();
+      expect(
+        mockLimitlessRepository.findTournamentsByRegulation,
+      ).not.toHaveBeenCalled();
     });
 
     it('uses findTournamentsByRegulation when regulationId is provided', async () => {
       await service.listJobs('regulation-h');
 
-      expect(mockLimitlessRepository.findTournamentsByRegulation).toHaveBeenCalledWith('regulation-h');
+      expect(
+        mockLimitlessRepository.findTournamentsByRegulation,
+      ).toHaveBeenCalledWith('regulation-h');
       expect(mockLimitlessRepository.findAllTournaments).not.toHaveBeenCalled();
     });
 

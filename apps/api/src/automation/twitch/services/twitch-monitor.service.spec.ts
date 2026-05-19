@@ -109,13 +109,18 @@ describe('TwitchMonitorService', () => {
 
       expect(result.foundStreams).toBe(1);
       expect(result.notifications).toBe(1);
-      expect(mockNotificationService.sendStreamNotification).toHaveBeenCalledTimes(1);
+      expect(
+        mockNotificationService.sendStreamNotification,
+      ).toHaveBeenCalledTimes(1);
     });
 
     it('sends a notification for wingull game category', async () => {
       service.addMonitoredUser('luisca343');
       mockTwitchApiService.getStreamsByUsernames.mockResolvedValue([
-        makeStream({ title: 'Just streaming', game_name: 'Pixelmon Wingull 2' }),
+        makeStream({
+          title: 'Just streaming',
+          game_name: 'Pixelmon Wingull 2',
+        }),
       ]);
 
       const result = await service.checkStreamsNow();
@@ -137,7 +142,11 @@ describe('TwitchMonitorService', () => {
     it('does not notify for non-wingull streams', async () => {
       service.addMonitoredUser('luisca343');
       mockTwitchApiService.getStreamsByUsernames.mockResolvedValue([
-        makeStream({ title: 'Playing Minecraft', game_name: 'Minecraft', tags: [] }),
+        makeStream({
+          title: 'Playing Minecraft',
+          game_name: 'Minecraft',
+          tags: [],
+        }),
       ]);
 
       const result = await service.checkStreamsNow();
@@ -148,18 +157,26 @@ describe('TwitchMonitorService', () => {
 
     it('does not send a second notification for the same ongoing stream', async () => {
       service.addMonitoredUser('luisca343');
-      const stream = makeStream({ title: 'wingull stream', id: 's1', user_id: 'u1' });
+      const stream = makeStream({
+        title: 'wingull stream',
+        id: 's1',
+        user_id: 'u1',
+      });
       mockTwitchApiService.getStreamsByUsernames.mockResolvedValue([stream]);
 
       await service.checkStreamsNow();
       await service.checkStreamsNow();
 
-      expect(mockNotificationService.sendStreamNotification).toHaveBeenCalledTimes(1);
+      expect(
+        mockNotificationService.sendStreamNotification,
+      ).toHaveBeenCalledTimes(1);
     });
 
     it('returns zero counts when the API service throws (error is swallowed)', async () => {
       service.addMonitoredUser('luisca343');
-      mockTwitchApiService.getStreamsByUsernames.mockRejectedValue(new Error('network'));
+      mockTwitchApiService.getStreamsByUsernames.mockRejectedValue(
+        new Error('network'),
+      );
 
       const result = await service.checkStreamsNow();
       expect(result.foundStreams).toBe(0);

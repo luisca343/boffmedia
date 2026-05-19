@@ -9,7 +9,12 @@ import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter'
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { Reflector } from '@nestjs/core';
 
-const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn() };
+const mockLogger = {
+  log: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  debug: jest.fn(),
+};
 
 const mockAuthService = {
   validateUser: jest.fn(),
@@ -37,7 +42,11 @@ describe('AuthController — integration (ValidationPipe + GlobalExceptionFilter
 
     app = moduleRef.createNestApplication();
     app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
     );
     app.useGlobalFilters(new GlobalExceptionFilter(mockLogger as any));
     await app.init();
@@ -50,7 +59,6 @@ describe('AuthController — integration (ValidationPipe + GlobalExceptionFilter
   beforeEach(() => {
     jest.resetAllMocks();
   });
-
 
   // ── POST /auth/login — ValidationPipe ──────────────────────────────────
   describe('POST /auth/login — ValidationPipe', () => {
@@ -88,9 +96,11 @@ describe('AuthController — integration (ValidationPipe + GlobalExceptionFilter
     });
 
     it('returns 400 when unknown field is present (forbidNonWhitelisted)', async () => {
-      const res = await request(app.getHttpServer())
-        .post('/auth/login')
-        .send({ username: 'validuser', password: 'validpass', unknownField: 'x' });
+      const res = await request(app.getHttpServer()).post('/auth/login').send({
+        username: 'validuser',
+        password: 'validpass',
+        unknownField: 'x',
+      });
 
       expect(res.status).toBe(400);
       expect(res.body.statusCode).toBe(400);
@@ -104,10 +114,12 @@ describe('AuthController — integration (ValidationPipe + GlobalExceptionFilter
         .send({ username: 'validuser', password: 'validpass' });
 
       expect(res.status).toBeLessThan(300);
-      expect(mockAuthService.validateUser).toHaveBeenCalledWith('validuser', 'validpass');
+      expect(mockAuthService.validateUser).toHaveBeenCalledWith(
+        'validuser',
+        'validpass',
+      );
     });
   });
-
 
   // ── POST /auth/loginmc — DTO validation ────────────────────────────────
   describe('POST /auth/loginmc — DTO validation', () => {
@@ -131,7 +143,10 @@ describe('AuthController — integration (ValidationPipe + GlobalExceptionFilter
     it('returns 400 when world is missing', async () => {
       const res = await request(app.getHttpServer())
         .post('/auth/loginmc')
-        .send({ username: 'ash', uuid: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4' });
+        .send({
+          username: 'ash',
+          uuid: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
+        });
 
       expect(res.status).toBe(400);
     });
@@ -141,13 +156,16 @@ describe('AuthController — integration (ValidationPipe + GlobalExceptionFilter
 
       const res = await request(app.getHttpServer())
         .post('/auth/loginmc')
-        .send({ username: 'ash', uuid: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4', world: 'world1' });
+        .send({
+          username: 'ash',
+          uuid: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
+          world: 'world1',
+        });
 
       expect(res.status).toBeLessThan(300);
       expect(mockAuthService.loginMC).toHaveBeenCalled();
     });
   });
-
 
   // ── POST /auth/register-minecraft — RegisterMinecraftDto validation ────
   describe('POST /auth/register-minecraft — RegisterMinecraftDto validation', () => {
@@ -200,7 +218,10 @@ describe('AuthController — integration (ValidationPipe + GlobalExceptionFilter
     it('returns 400 when minecraft.uuid is not a valid UUID', async () => {
       const res = await request(app.getHttpServer())
         .post('/auth/register-minecraft')
-        .send({ ...validBody, minecraft: { ...validBody.minecraft, uuid: 'not-a-uuid' } });
+        .send({
+          ...validBody,
+          minecraft: { ...validBody.minecraft, uuid: 'not-a-uuid' },
+        });
 
       expect(res.status).toBe(400);
     });
@@ -208,13 +229,21 @@ describe('AuthController — integration (ValidationPipe + GlobalExceptionFilter
     it('returns 400 when minecraft.world is missing', async () => {
       const res = await request(app.getHttpServer())
         .post('/auth/register-minecraft')
-        .send({ ...validBody, minecraft: { username: 'AshMC', uuid: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4' } });
+        .send({
+          ...validBody,
+          minecraft: {
+            username: 'AshMC',
+            uuid: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
+          },
+        });
 
       expect(res.status).toBe(400);
     });
 
     it('calls AuthService when body is valid', async () => {
-      mockAuthService.registerMinecraft.mockResolvedValue({ access_token: 'tok' });
+      mockAuthService.registerMinecraft.mockResolvedValue({
+        access_token: 'tok',
+      });
 
       const res = await request(app.getHttpServer())
         .post('/auth/register-minecraft')
@@ -222,11 +251,13 @@ describe('AuthController — integration (ValidationPipe + GlobalExceptionFilter
 
       expect(res.status).toBeLessThan(300);
       expect(mockAuthService.registerMinecraft).toHaveBeenCalledWith(
-        expect.objectContaining({ username: 'TrainerAsh', email: 'ash@pokemon.com' }),
+        expect.objectContaining({
+          username: 'TrainerAsh',
+          email: 'ash@pokemon.com',
+        }),
       );
     });
   });
-
 
   // ── POST /auth/refresh — RefreshTokenDto validation ────────────────────
   describe('POST /auth/refresh — RefreshTokenDto validation', () => {
@@ -239,7 +270,9 @@ describe('AuthController — integration (ValidationPipe + GlobalExceptionFilter
     });
 
     it('calls AuthService.refreshToken when token is present', async () => {
-      mockAuthService.refreshToken.mockResolvedValue({ access_token: 'new-tok' });
+      mockAuthService.refreshToken.mockResolvedValue({
+        access_token: 'new-tok',
+      });
 
       const res = await request(app.getHttpServer())
         .post('/auth/refresh')
@@ -249,7 +282,6 @@ describe('AuthController — integration (ValidationPipe + GlobalExceptionFilter
       expect(mockAuthService.refreshToken).toHaveBeenCalledWith('some-token');
     });
   });
-
 
   // ── POST /auth/link-minecraft — RegisterMinecraftDto validation ────────
   describe('POST /auth/link-minecraft — RegisterMinecraftDto validation', () => {
@@ -301,7 +333,10 @@ describe('AuthController — integration (ValidationPipe + GlobalExceptionFilter
     it('returns 400 when minecraft.uuid is not a valid UUID', async () => {
       const res = await request(app.getHttpServer())
         .post('/auth/link-minecraft')
-        .send({ ...validBody, minecraft: { ...validBody.minecraft, uuid: 'not-a-uuid' } });
+        .send({
+          ...validBody,
+          minecraft: { ...validBody.minecraft, uuid: 'not-a-uuid' },
+        });
 
       expect(res.status).toBe(400);
     });
@@ -315,11 +350,13 @@ describe('AuthController — integration (ValidationPipe + GlobalExceptionFilter
 
       expect(res.status).toBeLessThan(300);
       expect(mockAuthService.linkMinecraft).toHaveBeenCalledWith(
-        expect.objectContaining({ username: 'TrainerAsh', email: 'ash@pokemon.com' }),
+        expect.objectContaining({
+          username: 'TrainerAsh',
+          email: 'ash@pokemon.com',
+        }),
       );
     });
   });
-
 
   // ── POST /auth/google/callback — GoogleCallbackDto validation ──────────
   // DTO has optional email, name, picture fields — no required token field.
@@ -359,7 +396,10 @@ describe('AuthController — integration (ValidationPipe + GlobalExceptionFilter
 
       expect(res.status).toBeLessThan(300);
       expect(mockAuthService.googleLogin).toHaveBeenCalledWith(
-        expect.objectContaining({ email: 'ash@pokemon.com', name: 'TrainerAsh' }),
+        expect.objectContaining({
+          email: 'ash@pokemon.com',
+          name: 'TrainerAsh',
+        }),
       );
     });
 
@@ -368,7 +408,11 @@ describe('AuthController — integration (ValidationPipe + GlobalExceptionFilter
 
       const res = await request(app.getHttpServer())
         .post('/auth/google/callback')
-        .send({ email: 'ash@pokemon.com', name: 'TrainerAsh', picture: 'https://example.com/pic.jpg' });
+        .send({
+          email: 'ash@pokemon.com',
+          name: 'TrainerAsh',
+          picture: 'https://example.com/pic.jpg',
+        });
 
       expect(res.status).toBeLessThan(300);
       expect(mockAuthService.googleLogin).toHaveBeenCalledWith(
@@ -376,7 +420,6 @@ describe('AuthController — integration (ValidationPipe + GlobalExceptionFilter
       );
     });
   });
-
 
   // ── GlobalExceptionFilter — error shape ────────────────────────────────
   describe('GlobalExceptionFilter — error shape', () => {

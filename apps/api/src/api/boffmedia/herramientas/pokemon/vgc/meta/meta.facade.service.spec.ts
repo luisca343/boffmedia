@@ -92,9 +92,15 @@ describe('VgcMetaFacadeService', () => {
         { provide: LimitlessService, useValue: mockLimitlessService },
         { provide: TeamsService, useValue: mockTeamsService },
         { provide: StatCalcService, useValue: mockStatCalcService },
-        { provide: VgcRegulationsRepository, useValue: mockRegulationsRepository },
+        {
+          provide: VgcRegulationsRepository,
+          useValue: mockRegulationsRepository,
+        },
         { provide: IngestionJobsService, useValue: mockIngestionJobsService },
-        { provide: PersonalMetaAnalyticsService, useValue: mockPersonalMetaAnalyticsService },
+        {
+          provide: PersonalMetaAnalyticsService,
+          useValue: mockPersonalMetaAnalyticsService,
+        },
         { provide: DivergenceService, useValue: mockDivergenceService },
       ],
     }).compile();
@@ -110,7 +116,9 @@ describe('VgcMetaFacadeService', () => {
 
   describe('getAvailableSmogonSnapshots()', () => {
     it('delegates to SmogonService', async () => {
-      mockSmogonService.getAvailableSnapshots.mockResolvedValue([{ month: '2025-12' }]);
+      mockSmogonService.getAvailableSnapshots.mockResolvedValue([
+        { month: '2025-12' },
+      ]);
       const result = await service.getAvailableSmogonSnapshots();
       expect(result).toHaveLength(1);
     });
@@ -118,10 +126,15 @@ describe('VgcMetaFacadeService', () => {
 
   describe('fetchSmogonSnapshot()', () => {
     it('delegates to SmogonService when regulation exists', async () => {
-      mockRegulationsRepository.findByFormatId.mockResolvedValue(mockRegulation);
+      mockRegulationsRepository.findByFormatId.mockResolvedValue(
+        mockRegulation,
+      );
       mockSmogonService.fetchAndStore.mockResolvedValue({ rows: 100 });
 
-      const result = await service.fetchSmogonSnapshot({ format: 'gen9vgc2024regg', month: '2025-12' });
+      const result = await service.fetchSmogonSnapshot({
+        format: 'gen9vgc2024regg',
+        month: '2025-12',
+      });
 
       expect(mockSmogonService.fetchAndStore).toHaveBeenCalled();
       expect(result).toEqual({ rows: 100 });
@@ -140,7 +153,10 @@ describe('VgcMetaFacadeService', () => {
     it('uses provided month directly', async () => {
       mockSmogonService.getUsageList.mockResolvedValue([]);
 
-      await service.getSmogonUsage({ format: 'gen9vgc2024regg', month: '2025-12' });
+      await service.getSmogonUsage({
+        format: 'gen9vgc2024regg',
+        month: '2025-12',
+      });
 
       expect(mockSmogonService.getUsageList).toHaveBeenCalledWith(
         'gen9vgc2024regg',
@@ -179,7 +195,9 @@ describe('VgcMetaFacadeService', () => {
     it('returns usage when regulation has vgcPastesGid', async () => {
       const reg = { ...mockRegulation, vgcPastesGid: 'gid-1' };
       mockRegulationsRepository.findById.mockResolvedValue(reg);
-      mockVgcPastesService.getUsageList.mockResolvedValue([{ speciesId: 'pikachu' }]);
+      mockVgcPastesService.getUsageList.mockResolvedValue([
+        { speciesId: 'pikachu' },
+      ]);
 
       const result = await service.getChampionsUsage({ regulationId: 'reg-g' });
 
@@ -195,7 +213,10 @@ describe('VgcMetaFacadeService', () => {
     });
 
     it('throws NotFoundException when regulation has no vgcPastesGid', async () => {
-      mockRegulationsRepository.findById.mockResolvedValue({ ...mockRegulation, vgcPastesGid: null });
+      mockRegulationsRepository.findById.mockResolvedValue({
+        ...mockRegulation,
+        vgcPastesGid: null,
+      });
 
       await expect(
         service.getChampionsUsage({ regulationId: 'reg-g' }),
@@ -207,7 +228,9 @@ describe('VgcMetaFacadeService', () => {
 
   describe('importLimitlessTournament()', () => {
     it('delegates to LimitlessService', async () => {
-      mockLimitlessService.importTournament.mockResolvedValue({ tournamentId: 1 });
+      mockLimitlessService.importTournament.mockResolvedValue({
+        tournamentId: 1,
+      });
 
       const result = await service.importLimitlessTournament({
         url: 'https://limitless.gg/tournament/abc',
@@ -259,17 +282,25 @@ describe('VgcMetaFacadeService', () => {
     });
 
     it('falls back to Limitless when no formatId and no vgcPastesGid', async () => {
-      mockRegulationsRepository.findById.mockResolvedValue({ id: 'reg-g', formatId: null, vgcPastesGid: null });
+      mockRegulationsRepository.findById.mockResolvedValue({
+        id: 'reg-g',
+        formatId: null,
+        vgcPastesGid: null,
+      });
       mockLimitlessService.getCombinedUsage.mockResolvedValue([]);
 
       await service.getUnifiedUsageDetailList('reg-g');
 
-      expect(mockLimitlessService.getCombinedUsage).toHaveBeenCalledWith('reg-g');
+      expect(mockLimitlessService.getCombinedUsage).toHaveBeenCalledWith(
+        'reg-g',
+      );
     });
 
     it('throws NotFoundException when regulation not found', async () => {
       mockRegulationsRepository.findById.mockResolvedValue(null);
-      await expect(service.getUnifiedUsageDetailList('missing')).rejects.toThrow(NotFoundException);
+      await expect(
+        service.getUnifiedUsageDetailList('missing'),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -315,11 +346,15 @@ describe('VgcMetaFacadeService', () => {
 
   describe('getDivergence()', () => {
     it('delegates to DivergenceService', async () => {
-      mockDivergenceService.compareLadderVsTournament.mockResolvedValue({ rows: [] });
+      mockDivergenceService.compareLadderVsTournament.mockResolvedValue({
+        rows: [],
+      });
 
       const result = await service.getDivergence({ regulationId: 'reg-g' });
 
-      expect(mockDivergenceService.compareLadderVsTournament).toHaveBeenCalledWith(
+      expect(
+        mockDivergenceService.compareLadderVsTournament,
+      ).toHaveBeenCalledWith(
         expect.objectContaining({ regulationId: 'reg-g' }),
       );
       expect(result).toEqual({ rows: [] });

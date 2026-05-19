@@ -53,43 +53,45 @@ describe('ReplaysService', () => {
     });
 
     it('throws BadRequestException when side1 is missing', async () => {
-      await expect(service.createReplay({ ...validReplayDto, side1: '' })).rejects.toThrow(
-        'Player 1 name is required',
-      );
+      await expect(
+        service.createReplay({ ...validReplayDto, side1: '' }),
+      ).rejects.toThrow('Player 1 name is required');
     });
 
     it('throws BadRequestException when side2 is missing', async () => {
-      await expect(service.createReplay({ ...validReplayDto, side2: '' })).rejects.toThrow(
-        'Player 2 name is required',
-      );
+      await expect(
+        service.createReplay({ ...validReplayDto, side2: '' }),
+      ).rejects.toThrow('Player 2 name is required');
     });
 
     it('throws BadRequestException when team1 is missing', async () => {
-      await expect(service.createReplay({ ...validReplayDto, team1: '' })).rejects.toThrow(
-        'Player 1 team data is required',
-      );
+      await expect(
+        service.createReplay({ ...validReplayDto, team1: '' }),
+      ).rejects.toThrow('Player 1 team data is required');
     });
 
     it('throws BadRequestException when team2 is missing', async () => {
-      await expect(service.createReplay({ ...validReplayDto, team2: '' })).rejects.toThrow(
-        'Player 2 team data is required',
-      );
+      await expect(
+        service.createReplay({ ...validReplayDto, team2: '' }),
+      ).rejects.toThrow('Player 2 team data is required');
     });
 
     it('throws BadRequestException when replay data is missing', async () => {
-      await expect(service.createReplay({ ...validReplayDto, replay: '' })).rejects.toThrow(
-        'Replay data is required',
-      );
+      await expect(
+        service.createReplay({ ...validReplayDto, replay: '' }),
+      ).rejects.toThrow('Replay data is required');
     });
 
     it('throws BadRequestException when winner is missing', async () => {
-      await expect(service.createReplay({ ...validReplayDto, winner: '' })).rejects.toThrow(
-        'Winner is required',
-      );
+      await expect(
+        service.createReplay({ ...validReplayDto, winner: '' }),
+      ).rejects.toThrow('Winner is required');
     });
 
     it('does not call repo when validation fails', async () => {
-      await expect(service.createReplay({ ...validReplayDto, side1: '' })).rejects.toThrow(BadRequestException);
+      await expect(
+        service.createReplay({ ...validReplayDto, side1: '' }),
+      ).rejects.toThrow(BadRequestException);
       expect(mockRepo.create).not.toHaveBeenCalled();
     });
   });
@@ -131,12 +133,18 @@ describe('ReplaysService', () => {
   // ─── getUserReplay ────────────────────────────────────────────────────────────
 
   describe('getUserReplay()', () => {
-    const mockReplay = { id: REPLAY_ID, side1: 'TrainerAsh', winner: 'TrainerAsh' } as any;
+    const mockReplay = {
+      id: REPLAY_ID,
+      side1: 'TrainerAsh',
+      winner: 'TrainerAsh',
+    } as any;
 
     it('returns replay from repo', async () => {
       mockRepo.findUserReplay.mockResolvedValue(mockReplay);
 
-      await expect(service.getUserReplay(UUID, REPLAY_ID)).resolves.toEqual(mockReplay);
+      await expect(service.getUserReplay(UUID, REPLAY_ID)).resolves.toEqual(
+        mockReplay,
+      );
       expect(mockRepo.findUserReplay).toHaveBeenCalledWith(UUID, REPLAY_ID);
     });
 
@@ -147,11 +155,15 @@ describe('ReplaysService', () => {
     });
 
     it('throws BadRequestException when uuid is empty', async () => {
-      await expect(service.getUserReplay('', REPLAY_ID)).rejects.toThrow('UUID is required');
+      await expect(service.getUserReplay('', REPLAY_ID)).rejects.toThrow(
+        'UUID is required',
+      );
     });
 
     it('throws BadRequestException when replayId is invalid', async () => {
-      await expect(service.getUserReplay(UUID, -5)).rejects.toThrow('Valid replay ID is required');
+      await expect(service.getUserReplay(UUID, -5)).rejects.toThrow(
+        'Valid replay ID is required',
+      );
     });
   });
 });

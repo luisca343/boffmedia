@@ -39,16 +39,22 @@ describe('PlayerStatsService', () => {
     });
 
     it('throws when uuid is empty', async () => {
-      await expect(service.getPlayerStats('')).rejects.toThrow('Player UUID is required');
+      await expect(service.getPlayerStats('')).rejects.toThrow(
+        'Player UUID is required',
+      );
       expect(mockRepo.fetchPlayerStatsFromAPI).not.toHaveBeenCalled();
     });
 
     it('throws when uuid is whitespace only', async () => {
-      await expect(service.getPlayerStats('   ')).rejects.toThrow('Player UUID is required');
+      await expect(service.getPlayerStats('   ')).rejects.toThrow(
+        'Player UUID is required',
+      );
     });
 
     it('wraps and re-throws repo error with context', async () => {
-      mockRepo.fetchPlayerStatsFromAPI.mockRejectedValue(new Error('API timeout'));
+      mockRepo.fetchPlayerStatsFromAPI.mockRejectedValue(
+        new Error('API timeout'),
+      );
 
       await expect(service.getPlayerStats(UUID)).rejects.toThrow(
         'Player stats retrieval failed: API timeout',

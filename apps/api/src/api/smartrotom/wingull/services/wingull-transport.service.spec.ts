@@ -42,7 +42,9 @@ describe('WingullTransportService', () => {
     });
 
     it('wraps and re-throws repo error', async () => {
-      mockRepo.getTaxiStopsFromAPI.mockRejectedValue(new Error('API unavailable'));
+      mockRepo.getTaxiStopsFromAPI.mockRejectedValue(
+        new Error('API unavailable'),
+      );
 
       await expect(service.getTaxiStops()).rejects.toThrow(
         'Taxi stops retrieval failed: API unavailable',
@@ -80,7 +82,9 @@ describe('WingullTransportService', () => {
     });
 
     it('wraps and re-throws repo error', async () => {
-      mockRepo.teleportPlayerInAPI.mockRejectedValue(new Error('player offline'));
+      mockRepo.teleportPlayerInAPI.mockRejectedValue(
+        new Error('player offline'),
+      );
 
       await expect(service.teleportPlayer(stopId, uuid)).rejects.toThrow(
         'Player teleportation failed: player offline',

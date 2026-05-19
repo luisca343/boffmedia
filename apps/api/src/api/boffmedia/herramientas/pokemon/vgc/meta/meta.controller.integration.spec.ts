@@ -152,7 +152,10 @@ describe('VgcMetaController — integration (ValidationPipe + GlobalExceptionFil
 
       expect(res.status).toBe(201);
       expect(mockFacade.fetchSmogonSnapshot).toHaveBeenCalledWith(
-        expect.objectContaining({ format: 'gen9vgc2026regi', month: '2026-03' }),
+        expect.objectContaining({
+          format: 'gen9vgc2026regi',
+          month: '2026-03',
+        }),
       );
     });
 
@@ -325,9 +328,9 @@ describe('VgcMetaController — integration (ValidationPipe + GlobalExceptionFil
         .query({ regulationId: 'vgc2026regma' });
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getLimitlessTournamentsByRegulation).toHaveBeenCalledWith(
-        'vgc2026regma',
-      );
+      expect(
+        mockFacade.getLimitlessTournamentsByRegulation,
+      ).toHaveBeenCalledWith('vgc2026regma');
     });
   });
 
@@ -473,7 +476,10 @@ describe('VgcMetaController — integration (ValidationPipe + GlobalExceptionFil
       );
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getLimitlessPlayerTeam).toHaveBeenCalledWith(5, 'johndoe');
+      expect(mockFacade.getLimitlessPlayerTeam).toHaveBeenCalledWith(
+        5,
+        'johndoe',
+      );
     });
   });
 
@@ -572,7 +578,11 @@ describe('VgcMetaController — integration (ValidationPipe + GlobalExceptionFil
 
       const res = await request(app.getHttpServer())
         .get('/tools/vgc/meta/compare/personal')
-        .query({ source: 'smogon', regulationId: 'vgc2026regma', month: '2026-03' });
+        .query({
+          source: 'smogon',
+          regulationId: 'vgc2026regma',
+          month: '2026-03',
+        });
 
       expect(res.status).toBe(200);
       expect(mockFacade.comparePersonalVsMeta).toHaveBeenCalledWith(

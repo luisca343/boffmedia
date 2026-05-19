@@ -46,16 +46,23 @@ describe('ImageService', () => {
     });
 
     it('sanitizes npcName in the filepath', async () => {
-      await service.uploadCustomNPCImage({ npcName: 'NPC Brock!', image: PNG_BASE64 });
+      await service.uploadCustomNPCImage({
+        npcName: 'NPC Brock!',
+        image: PNG_BASE64,
+      });
 
-      const writePath = (fsMock.writeFile as jest.Mock).mock.calls[0][0] as string;
+      const writePath = (fsMock.writeFile as jest.Mock).mock
+        .calls[0][0] as string;
       expect(writePath).toContain('npc_brock');
       expect(writePath).not.toContain(' ');
       expect(writePath).not.toContain('!');
     });
 
     it('returns ERROR status when npcName is missing', async () => {
-      const result = await service.uploadCustomNPCImage({ npcName: '', image: PNG_BASE64 });
+      const result = await service.uploadCustomNPCImage({
+        npcName: '',
+        image: PNG_BASE64,
+      });
 
       expect(result.status).toBe('ERROR');
       expect(fsMock.writeFile).not.toHaveBeenCalled();
@@ -74,7 +81,10 @@ describe('ImageService', () => {
     it('returns ERROR status when writeFile fails', async () => {
       (fsMock.writeFile as jest.Mock).mockRejectedValue(new Error('disk full'));
 
-      const result = await service.uploadCustomNPCImage({ npcName: 'Oak', image: PNG_BASE64 });
+      const result = await service.uploadCustomNPCImage({
+        npcName: 'Oak',
+        image: PNG_BASE64,
+      });
 
       expect(result.status).toBe('ERROR');
       expect(result.error).toContain('disk full');

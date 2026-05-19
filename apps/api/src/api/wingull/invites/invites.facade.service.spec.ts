@@ -26,7 +26,11 @@ const mockRegistration = {
 
 const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn() };
 
-const mockInvite = { id: 'ABC123', uuid: 'user-uuid', username: 'TrainerAsh' } as any;
+const mockInvite = {
+  id: 'ABC123',
+  uuid: 'user-uuid',
+  username: 'TrainerAsh',
+} as any;
 
 describe('InvitesFacadeService', () => {
   let service: InvitesFacadeService;
@@ -54,18 +58,27 @@ describe('InvitesFacadeService', () => {
   describe('createInvite()', () => {
     it('generates id and delegates creation', async () => {
       mockInviteManagement.generateInviteId.mockResolvedValue('XYZ789');
-      mockInviteManagement.createInvite.mockResolvedValue({ success: true, invite: mockInvite });
+      mockInviteManagement.createInvite.mockResolvedValue({
+        success: true,
+        invite: mockInvite,
+      });
 
       const result = await service.createInvite('user-uuid', 'TrainerAsh');
 
       expect(result.success).toBe(true);
       expect(mockInviteManagement.createInvite).toHaveBeenCalledWith(
-        expect.objectContaining({ id: 'XYZ789', uuid: 'user-uuid', username: 'TrainerAsh' }),
+        expect.objectContaining({
+          id: 'XYZ789',
+          uuid: 'user-uuid',
+          username: 'TrainerAsh',
+        }),
       );
     });
 
     it('returns failure on error (does not throw)', async () => {
-      mockInviteManagement.generateInviteId.mockRejectedValue(new Error('collision'));
+      mockInviteManagement.generateInviteId.mockRejectedValue(
+        new Error('collision'),
+      );
 
       const result = await service.createInvite('uuid', 'user');
 
@@ -84,9 +97,13 @@ describe('InvitesFacadeService', () => {
     });
 
     it('wraps and re-throws on error', async () => {
-      mockInviteManagement.getAllInvites.mockRejectedValue(new Error('DB down'));
+      mockInviteManagement.getAllInvites.mockRejectedValue(
+        new Error('DB down'),
+      );
 
-      await expect(service.getAllInvites()).rejects.toThrow('Failed to retrieve invites');
+      await expect(service.getAllInvites()).rejects.toThrow(
+        'Failed to retrieve invites',
+      );
     });
   });
 
@@ -96,7 +113,9 @@ describe('InvitesFacadeService', () => {
     it('delegates to management service', async () => {
       mockInviteManagement.getInviteById.mockResolvedValue(mockInvite);
 
-      await expect(service.getInviteById('ABC123')).resolves.toEqual(mockInvite);
+      await expect(service.getInviteById('ABC123')).resolves.toEqual(
+        mockInvite,
+      );
     });
   });
 
@@ -106,7 +125,9 @@ describe('InvitesFacadeService', () => {
     it('returns success when soft-deleted', async () => {
       mockInviteManagement.deleteInvite.mockResolvedValue({ success: true });
 
-      await expect(service.deleteInvite('ABC123')).resolves.toEqual({ success: true });
+      await expect(service.deleteInvite('ABC123')).resolves.toEqual({
+        success: true,
+      });
     });
 
     it('returns failure on error (does not throw)', async () => {
@@ -121,16 +142,30 @@ describe('InvitesFacadeService', () => {
   // ─── registerWithInvite ───────────────────────────────────────────────────────
 
   describe('registerWithInvite()', () => {
-    const regData = { username: 'Ash', mc_username: 'Ash_MC', email: 'ash@pokemon.com', password: 'Pikach00!' };
+    const regData = {
+      username: 'Ash',
+      mc_username: 'Ash_MC',
+      email: 'ash@pokemon.com',
+      password: 'Pikach00!',
+    };
 
     it('validates data then delegates registration', async () => {
-      mockRegistration.validateRegistrationData.mockResolvedValue({ valid: true, errors: [] });
-      mockRegistration.registerUser.mockResolvedValue({ success: true, user: mockInvite });
+      mockRegistration.validateRegistrationData.mockResolvedValue({
+        valid: true,
+        errors: [],
+      });
+      mockRegistration.registerUser.mockResolvedValue({
+        success: true,
+        user: mockInvite,
+      });
 
       const result = await service.registerWithInvite('ABC123', regData);
 
       expect(result.success).toBe(true);
-      expect(mockRegistration.registerUser).toHaveBeenCalledWith('ABC123', regData);
+      expect(mockRegistration.registerUser).toHaveBeenCalledWith(
+        'ABC123',
+        regData,
+      );
     });
 
     it('returns VALIDATION_ERROR when registration data is invalid', async () => {
@@ -147,7 +182,9 @@ describe('InvitesFacadeService', () => {
     });
 
     it('returns REGISTRATION_ERROR on unexpected exception (does not throw)', async () => {
-      mockRegistration.validateRegistrationData.mockRejectedValue(new Error('crash'));
+      mockRegistration.validateRegistrationData.mockRejectedValue(
+        new Error('crash'),
+      );
 
       const result = await service.registerWithInvite('ABC123', regData);
 
@@ -160,13 +197,20 @@ describe('InvitesFacadeService', () => {
 
   describe('canRegisterWithInvite()', () => {
     it('returns eligibility from registration service', async () => {
-      mockRegistration.canRegisterWithInvite.mockResolvedValue({ canRegister: true, message: '' });
+      mockRegistration.canRegisterWithInvite.mockResolvedValue({
+        canRegister: true,
+        message: '',
+      });
 
-      await expect(service.canRegisterWithInvite('ABC123')).resolves.toMatchObject({ canRegister: true });
+      await expect(
+        service.canRegisterWithInvite('ABC123'),
+      ).resolves.toMatchObject({ canRegister: true });
     });
 
     it('returns canRegister=false on error (does not throw)', async () => {
-      mockRegistration.canRegisterWithInvite.mockRejectedValue(new Error('fail'));
+      mockRegistration.canRegisterWithInvite.mockRejectedValue(
+        new Error('fail'),
+      );
 
       const result = await service.canRegisterWithInvite('ABC123');
 
@@ -178,7 +222,10 @@ describe('InvitesFacadeService', () => {
 
   describe('validateInvite()', () => {
     it('delegates validation to management service', async () => {
-      mockInviteManagement.validateInvite.mockResolvedValue({ valid: true, invite: mockInvite });
+      mockInviteManagement.validateInvite.mockResolvedValue({
+        valid: true,
+        invite: mockInvite,
+      });
 
       const result = await service.validateInvite('ABC123');
 
@@ -211,7 +258,9 @@ describe('InvitesFacadeService', () => {
     it('returns invites by user uuid', async () => {
       mockInviteManagement.getInvitesByUser.mockResolvedValue([mockInvite]);
 
-      await expect(service.getUserInvites('user-uuid')).resolves.toEqual([mockInvite]);
+      await expect(service.getUserInvites('user-uuid')).resolves.toEqual([
+        mockInvite,
+      ]);
     });
   });
 
@@ -219,7 +268,9 @@ describe('InvitesFacadeService', () => {
     it('returns invites by username', async () => {
       mockInviteManagement.getInvitesByUsername.mockResolvedValue([mockInvite]);
 
-      await expect(service.getUserInvitesByUsername('TrainerAsh')).resolves.toEqual([mockInvite]);
+      await expect(
+        service.getUserInvitesByUsername('TrainerAsh'),
+      ).resolves.toEqual([mockInvite]);
     });
   });
 });

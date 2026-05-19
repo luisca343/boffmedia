@@ -87,7 +87,9 @@ describe('TwitchApiService', () => {
         throwError(() => new Error('network')),
       );
 
-      await expect(service.getStreamByUsername('luisca343')).rejects.toThrow('network');
+      await expect(service.getStreamByUsername('luisca343')).rejects.toThrow(
+        'network',
+      );
     });
   });
 
@@ -126,7 +128,9 @@ describe('TwitchApiService', () => {
         throwError(() => new Error('rate limited')),
       );
 
-      await expect(service.getStreamsByUsernames(['luisca343'])).rejects.toThrow('rate limited');
+      await expect(
+        service.getStreamsByUsernames(['luisca343']),
+      ).rejects.toThrow('rate limited');
     });
   });
 

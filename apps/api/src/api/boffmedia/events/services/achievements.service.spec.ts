@@ -52,7 +52,9 @@ describe('AchievementsService', () => {
     it('returns all achievements from repo', async () => {
       mockRepo.findAll.mockResolvedValue([mockAchievement]);
 
-      await expect(service.getAllAchievements()).resolves.toEqual([mockAchievement]);
+      await expect(service.getAllAchievements()).resolves.toEqual([
+        mockAchievement,
+      ]);
       expect(mockRepo.findAll).toHaveBeenCalledTimes(1);
     });
   });
@@ -63,7 +65,9 @@ describe('AchievementsService', () => {
     it('returns achievement by id', async () => {
       mockRepo.findById.mockResolvedValue(mockAchievement);
 
-      await expect(service.getAchievementById(1)).resolves.toEqual(mockAchievement);
+      await expect(service.getAchievementById(1)).resolves.toEqual(
+        mockAchievement,
+      );
       expect(mockRepo.findById).toHaveBeenCalledWith(1);
     });
   });
@@ -172,11 +176,17 @@ describe('AchievementsService', () => {
 
     it('updates and returns refreshed achievement', async () => {
       mockRepo.update.mockResolvedValue(undefined);
-      mockRepo.findById.mockResolvedValue({ ...mockAchievement, name: 'Updated Name' });
+      mockRepo.findById.mockResolvedValue({
+        ...mockAchievement,
+        name: 'Updated Name',
+      });
 
       const result = await service.updateAchievement(1, dto);
 
-      expect(mockRepo.update).toHaveBeenCalledWith(1, expect.objectContaining({ name: 'Updated Name' }));
+      expect(mockRepo.update).toHaveBeenCalledWith(
+        1,
+        expect.objectContaining({ name: 'Updated Name' }),
+      );
       expect(mockRepo.findById).toHaveBeenCalledWith(1);
       expect(result.name).toBe('Updated Name');
     });
@@ -187,7 +197,10 @@ describe('AchievementsService', () => {
 
       await service.updateAchievement(1, { ...dto, maxProgress: undefined });
 
-      expect(mockRepo.update).toHaveBeenCalledWith(1, expect.objectContaining({ maxProgress: 1 }));
+      expect(mockRepo.update).toHaveBeenCalledWith(
+        1,
+        expect.objectContaining({ maxProgress: 1 }),
+      );
     });
   });
 
@@ -225,7 +238,9 @@ describe('AchievementsService', () => {
       const progress = [{ achievementId: 1, currentProgress: 2 }];
       mockRepo.getParticipantProgress.mockResolvedValue(progress);
 
-      await expect(service.getParticipantProgress(5)).resolves.toEqual(progress);
+      await expect(service.getParticipantProgress(5)).resolves.toEqual(
+        progress,
+      );
       expect(mockRepo.getParticipantProgress).toHaveBeenCalledWith(5);
     });
   });
@@ -241,7 +256,10 @@ describe('AchievementsService', () => {
       const result = await service.getParticipantProgressByEvent(5, 10);
 
       expect(result).toEqual(progress);
-      expect(mockRepo.getParticipantProgressByEvent).toHaveBeenCalledWith(5, 10);
+      expect(mockRepo.getParticipantProgressByEvent).toHaveBeenCalledWith(
+        5,
+        10,
+      );
     });
 
     it('returns empty array when event does not exist', async () => {

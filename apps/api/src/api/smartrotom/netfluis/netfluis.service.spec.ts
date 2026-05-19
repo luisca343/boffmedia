@@ -20,10 +20,7 @@ describe('NetfluisService', () => {
     jest.clearAllMocks();
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        NetfluisService,
-        { provide: DRIZZLE, useValue: mockDb },
-      ],
+      providers: [NetfluisService, { provide: DRIZZLE, useValue: mockDb }],
     }).compile();
 
     service = module.get<NetfluisService>(NetfluisService);

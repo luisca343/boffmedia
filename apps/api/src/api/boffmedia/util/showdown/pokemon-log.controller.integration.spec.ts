@@ -6,7 +6,12 @@ import { PokemonLogController } from './pokemon-log.controller';
 import { PokemonLogService } from './pokemon-log.service';
 import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter';
 
-const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn() };
+const mockLogger = {
+  log: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  debug: jest.fn(),
+};
 
 const mockService = {
   processShowdownLogs: jest.fn(),
@@ -19,14 +24,16 @@ describe('PokemonLogController — integration (ValidationPipe + GlobalException
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       controllers: [PokemonLogController],
-      providers: [
-        { provide: PokemonLogService, useValue: mockService },
-      ],
+      providers: [{ provide: PokemonLogService, useValue: mockService }],
     }).compile();
 
     app = moduleRef.createNestApplication();
     app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
     );
     app.useGlobalFilters(new GlobalExceptionFilter(mockLogger as any));
     await app.init();
@@ -44,9 +51,13 @@ describe('PokemonLogController — integration (ValidationPipe + GlobalException
 
   describe('GET /pokemon-log/process/:spreadsheetId', () => {
     it('processes logs and returns summary', async () => {
-      mockService.processShowdownLogs.mockResolvedValue({ processed: 5, errors: 0 });
-      const res = await request(app.getHttpServer())
-        .get('/pokemon-log/process/sheet123');
+      mockService.processShowdownLogs.mockResolvedValue({
+        processed: 5,
+        errors: 0,
+      });
+      const res = await request(app.getHttpServer()).get(
+        '/pokemon-log/process/sheet123',
+      );
 
       expect(res.status).toBeLessThan(300);
       expect(mockService.processShowdownLogs).toHaveBeenCalledWith('sheet123');
@@ -55,7 +66,9 @@ describe('PokemonLogController — integration (ValidationPipe + GlobalException
     });
 
     it('returns 500 when service throws', async () => {
-      mockService.processShowdownLogs.mockRejectedValue(new Error('sheet error'));
+      mockService.processShowdownLogs.mockRejectedValue(
+        new Error('sheet error'),
+      );
       await request(app.getHttpServer())
         .get('/pokemon-log/process/badsheet')
         .expect(500);
@@ -66,9 +79,13 @@ describe('PokemonLogController — integration (ValidationPipe + GlobalException
 
   describe('GET /pokemon-log/test-parse', () => {
     it('parses sample log and returns result', async () => {
-      mockService.parseShowdownLog.mockReturnValue({ players: ['p1', 'p2'], turns: 10 });
-      const res = await request(app.getHttpServer())
-        .get('/pokemon-log/test-parse');
+      mockService.parseShowdownLog.mockReturnValue({
+        players: ['p1', 'p2'],
+        turns: 10,
+      });
+      const res = await request(app.getHttpServer()).get(
+        '/pokemon-log/test-parse',
+      );
 
       expect(res.status).toBeLessThan(300);
       expect(mockService.parseShowdownLog).toHaveBeenCalled();

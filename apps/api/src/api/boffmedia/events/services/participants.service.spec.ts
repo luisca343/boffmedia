@@ -65,7 +65,10 @@ describe('ParticipantsService', () => {
 
     it('creates and returns participant when user has no participant record', async () => {
       mockRepo.findByUserId.mockResolvedValue(null);
-      mockRepo.findUserById.mockResolvedValue({ id: 1, username: 'TrainerAsh' });
+      mockRepo.findUserById.mockResolvedValue({
+        id: 1,
+        username: 'TrainerAsh',
+      });
       mockRepo.createParticipant.mockResolvedValue({ insertId: 5 });
 
       const result = await service.getOrCreateParticipantByUserId(1);
@@ -161,7 +164,9 @@ describe('ParticipantsService', () => {
     it('creates participation and returns record by insertId', async () => {
       mockRepo.findEventParticipation.mockResolvedValue(null);
       mockRepo.createEventParticipation.mockResolvedValue({ insertId: 10 });
-      mockRepo.findEventParticipationById.mockResolvedValue(mockEventParticipation);
+      mockRepo.findEventParticipationById.mockResolvedValue(
+        mockEventParticipation,
+      );
 
       const result = await service.joinEvent(20, 5, joinDto);
 
@@ -180,7 +185,9 @@ describe('ParticipantsService', () => {
     it('uses null comment when not provided', async () => {
       mockRepo.findEventParticipation.mockResolvedValue(null);
       mockRepo.createEventParticipation.mockResolvedValue({ insertId: 10 });
-      mockRepo.findEventParticipationById.mockResolvedValue(mockEventParticipation);
+      mockRepo.findEventParticipationById.mockResolvedValue(
+        mockEventParticipation,
+      );
 
       await service.joinEvent(20, 5, { userId: 1 });
 
@@ -206,7 +213,9 @@ describe('ParticipantsService', () => {
       const participants = [{ id: 1, nickname: 'TrainerAsh' }] as any;
       mockRepo.findEventParticipants.mockResolvedValue(participants);
 
-      await expect(service.getEventParticipants(20)).resolves.toEqual(participants);
+      await expect(service.getEventParticipants(20)).resolves.toEqual(
+        participants,
+      );
       expect(mockRepo.findEventParticipants).toHaveBeenCalledWith(20);
     });
   });
@@ -240,7 +249,9 @@ describe('ParticipantsService', () => {
         status: 'confirmed',
       });
 
-      await expect(service.validateEventParticipation(5, 20)).resolves.toBe(true);
+      await expect(service.validateEventParticipation(5, 20)).resolves.toBe(
+        true,
+      );
     });
 
     it('returns false when status is not confirmed', async () => {
@@ -249,13 +260,17 @@ describe('ParticipantsService', () => {
         status: 'registered',
       });
 
-      await expect(service.validateEventParticipation(5, 20)).resolves.toBe(false);
+      await expect(service.validateEventParticipation(5, 20)).resolves.toBe(
+        false,
+      );
     });
 
     it('returns false when no participation record exists', async () => {
       mockRepo.findEventParticipation.mockResolvedValue(null);
 
-      await expect(service.validateEventParticipation(5, 999)).resolves.toBe(false);
+      await expect(service.validateEventParticipation(5, 999)).resolves.toBe(
+        false,
+      );
     });
   });
 });

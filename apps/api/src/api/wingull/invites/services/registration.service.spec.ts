@@ -70,8 +70,13 @@ describe('RegistrationService', () => {
 
   describe('registerUser()', () => {
     beforeEach(() => {
-      mockInviteService.validateInvite.mockResolvedValue({ valid: true, invite: {} });
-      mockBoffMediaUsers.createMinecraftUser.mockResolvedValue(mockCreationResult);
+      mockInviteService.validateInvite.mockResolvedValue({
+        valid: true,
+        invite: {},
+      });
+      mockBoffMediaUsers.createMinecraftUser.mockResolvedValue(
+        mockCreationResult,
+      );
       mockInviteService.markInviteAsUsed.mockResolvedValue({ success: true });
     });
 
@@ -153,7 +158,9 @@ describe('RegistrationService', () => {
     });
 
     it('returns REGISTRATION_ERROR on unexpected exception (does not throw)', async () => {
-      mockBoffMediaUsers.createMinecraftUser.mockRejectedValue(new Error('DB crash'));
+      mockBoffMediaUsers.createMinecraftUser.mockRejectedValue(
+        new Error('DB crash'),
+      );
 
       const result = await service.registerUser('ABC123', validRegistration);
 
@@ -162,7 +169,10 @@ describe('RegistrationService', () => {
     });
 
     it('continues and succeeds even when markInviteAsUsed fails', async () => {
-      mockInviteService.markInviteAsUsed.mockResolvedValue({ success: false, message: 'already used' });
+      mockInviteService.markInviteAsUsed.mockResolvedValue({
+        success: false,
+        message: 'already used',
+      });
 
       const result = await service.registerUser('ABC123', validRegistration);
 
@@ -188,45 +198,73 @@ describe('RegistrationService', () => {
     });
 
     it('rejects username shorter than 3 characters', async () => {
-      const result = await service.validateRegistrationData({ ...valid, username: 'ab' });
+      const result = await service.validateRegistrationData({
+        ...valid,
+        username: 'ab',
+      });
 
       expect(result.valid).toBe(false);
-      expect(result.errors).toContain('Username must be at least 3 characters long');
+      expect(result.errors).toContain(
+        'Username must be at least 3 characters long',
+      );
     });
 
     it('rejects username longer than 32 characters', async () => {
-      const result = await service.validateRegistrationData({ ...valid, username: 'a'.repeat(33) });
+      const result = await service.validateRegistrationData({
+        ...valid,
+        username: 'a'.repeat(33),
+      });
 
       expect(result.valid).toBe(false);
-      expect(result.errors).toContain('Username must be less than 32 characters');
+      expect(result.errors).toContain(
+        'Username must be less than 32 characters',
+      );
     });
 
     it('rejects invalid email format', async () => {
-      const result = await service.validateRegistrationData({ ...valid, email: 'not-an-email' });
+      const result = await service.validateRegistrationData({
+        ...valid,
+        email: 'not-an-email',
+      });
 
       expect(result.valid).toBe(false);
       expect(result.errors).toContain('Invalid email format');
     });
 
     it('rejects password shorter than 6 characters', async () => {
-      const result = await service.validateRegistrationData({ ...valid, password: '12345' });
+      const result = await service.validateRegistrationData({
+        ...valid,
+        password: '12345',
+      });
 
       expect(result.valid).toBe(false);
-      expect(result.errors).toContain('Password must be at least 6 characters long');
+      expect(result.errors).toContain(
+        'Password must be at least 6 characters long',
+      );
     });
 
     it('rejects Minecraft username shorter than 3 characters', async () => {
-      const result = await service.validateRegistrationData({ ...valid, mc_username: 'ab' });
+      const result = await service.validateRegistrationData({
+        ...valid,
+        mc_username: 'ab',
+      });
 
       expect(result.valid).toBe(false);
-      expect(result.errors).toContain('Minecraft username must be at least 3 characters long');
+      expect(result.errors).toContain(
+        'Minecraft username must be at least 3 characters long',
+      );
     });
 
     it('rejects Minecraft username longer than 16 characters', async () => {
-      const result = await service.validateRegistrationData({ ...valid, mc_username: 'a'.repeat(17) });
+      const result = await service.validateRegistrationData({
+        ...valid,
+        mc_username: 'a'.repeat(17),
+      });
 
       expect(result.valid).toBe(false);
-      expect(result.errors).toContain('Minecraft username must be less than 16 characters');
+      expect(result.errors).toContain(
+        'Minecraft username must be less than 16 characters',
+      );
     });
 
     it('accumulates multiple errors at once', async () => {

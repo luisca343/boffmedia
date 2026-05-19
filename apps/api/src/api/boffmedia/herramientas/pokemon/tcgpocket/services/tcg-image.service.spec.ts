@@ -31,10 +31,7 @@ describe('TcgImageService', () => {
     (axios.get as jest.Mock).mockResolvedValue({ data: Buffer.from('img') });
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        TcgImageService,
-        { provide: Logger, useValue: mockLogger },
-      ],
+      providers: [TcgImageService, { provide: Logger, useValue: mockLogger }],
     }).compile();
 
     service = module.get<TcgImageService>(TcgImageService);
@@ -48,7 +45,9 @@ describe('TcgImageService', () => {
 
   describe('downloadSetImages()', () => {
     it('creates the set directory and downloads logo and symbol', async () => {
-      const sets: any[] = [{ id: 'sv1', logo: 'https://cdn/sv1', symbol: 'https://cdn/sv1-sym' }];
+      const sets: any[] = [
+        { id: 'sv1', logo: 'https://cdn/sv1', symbol: 'https://cdn/sv1-sym' },
+      ];
 
       await service.downloadSetImages(sets);
 
@@ -61,7 +60,9 @@ describe('TcgImageService', () => {
 
     it('sets logo_local to null when logo download fails', async () => {
       (axios.get as jest.Mock).mockRejectedValueOnce(new Error('network'));
-      const sets: any[] = [{ id: 'sv1', logo: 'https://cdn/sv1', symbol: null }];
+      const sets: any[] = [
+        { id: 'sv1', logo: 'https://cdn/sv1', symbol: null },
+      ];
 
       await service.downloadSetImages(sets);
 
@@ -95,7 +96,9 @@ describe('TcgImageService', () => {
       );
 
       expect(result).toBe('/img/games/tcg/cards/sv1/sv1-1_en.webp');
-      expect(axios.get).toHaveBeenCalledWith('https://cdn/sv1-1/high.webp', { responseType: 'arraybuffer' });
+      expect(axios.get).toHaveBeenCalledWith('https://cdn/sv1-1/high.webp', {
+        responseType: 'arraybuffer',
+      });
     });
 
     it('returns null and warns on download failure', async () => {
@@ -145,13 +148,24 @@ describe('TcgImageService', () => {
 
   describe('downloadImagesForCards()', () => {
     it('downloads EN and ES images for each card', async () => {
-      const cards = [{ id: 'sv1-1', image: 'https://cdn/sv1-1', image_local_en: null, image_local_es: null }];
+      const cards = [
+        {
+          id: 'sv1-1',
+          image: 'https://cdn/sv1-1',
+          image_local_en: null,
+          image_local_es: null,
+        },
+      ];
 
       await service.downloadImagesForCards(cards, 'sv1');
 
       expect(axios.get).toHaveBeenCalledTimes(2);
-      expect(cards[0].image_local_en).toBe('/img/games/tcg/cards/sv1/sv1-1_en.webp');
-      expect(cards[0].image_local_es).toBe('/img/games/tcg/cards/sv1/sv1-1_es.webp');
+      expect(cards[0].image_local_en).toBe(
+        '/img/games/tcg/cards/sv1/sv1-1_en.webp',
+      );
+      expect(cards[0].image_local_es).toBe(
+        '/img/games/tcg/cards/sv1/sv1-1_es.webp',
+      );
     });
 
     it('skips download when image already set on card', async () => {
@@ -170,9 +184,22 @@ describe('TcgImageService', () => {
     });
 
     it('uses existing DB paths when existingCardsMap is provided', async () => {
-      const cards = [{ id: 'sv1-1', image: 'https://cdn/sv1-1', image_local_en: null, image_local_es: null }];
+      const cards = [
+        {
+          id: 'sv1-1',
+          image: 'https://cdn/sv1-1',
+          image_local_en: null,
+          image_local_es: null,
+        },
+      ];
       const existingCardsMap = new Map([
-        ['sv1-1', { image_local_en: '/cached/en.webp', image_local_es: '/cached/es.webp' }],
+        [
+          'sv1-1',
+          {
+            image_local_en: '/cached/en.webp',
+            image_local_es: '/cached/es.webp',
+          },
+        ],
       ]);
 
       await service.downloadImagesForCards(cards, 'sv1', existingCardsMap);

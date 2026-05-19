@@ -72,13 +72,24 @@ describe('StarbankTransactionService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         StarbankTransactionService,
-        { provide: Logger, useValue: { log: jest.fn(), error: jest.fn(), warn: jest.fn() } },
-        { provide: STARBANK_ACCOUNT_REPOSITORY_TOKEN, useValue: accountRepository },
-        { provide: STARBANK_TRANSACTION_REPOSITORY_TOKEN, useValue: transactionRepository },
+        {
+          provide: Logger,
+          useValue: { log: jest.fn(), error: jest.fn(), warn: jest.fn() },
+        },
+        {
+          provide: STARBANK_ACCOUNT_REPOSITORY_TOKEN,
+          useValue: accountRepository,
+        },
+        {
+          provide: STARBANK_TRANSACTION_REPOSITORY_TOKEN,
+          useValue: transactionRepository,
+        },
       ],
     }).compile();
 
-    service = module.get<StarbankTransactionService>(StarbankTransactionService);
+    service = module.get<StarbankTransactionService>(
+      StarbankTransactionService,
+    );
   });
 
   it('should be defined', () => {
@@ -106,28 +117,30 @@ describe('StarbankTransactionService', () => {
     });
 
     it('should reject zero amount', async () => {
-      await expect(service.transfer({ ...transferDto, amount: 0 })).rejects.toThrow(
-        'Transfer amount must be positive',
-      );
+      await expect(
+        service.transfer({ ...transferDto, amount: 0 }),
+      ).rejects.toThrow('Transfer amount must be positive');
       expect(accountRepository.findById).not.toHaveBeenCalled();
     });
 
     it('should reject negative amount', async () => {
-      await expect(service.transfer({ ...transferDto, amount: -50 })).rejects.toThrow(
-        'Transfer amount must be positive',
-      );
+      await expect(
+        service.transfer({ ...transferDto, amount: -50 }),
+      ).rejects.toThrow('Transfer amount must be positive');
     });
 
     it('should reject transfer to same account', async () => {
-      await expect(service.transfer({ ...transferDto, from: 1, to: 1 })).rejects.toThrow(
-        'Source and destination accounts must be different',
-      );
+      await expect(
+        service.transfer({ ...transferDto, from: 1, to: 1 }),
+      ).rejects.toThrow('Source and destination accounts must be different');
     });
 
     it('should throw when source account not found', async () => {
       accountRepository.findById.mockResolvedValueOnce(null);
 
-      await expect(service.transfer(transferDto)).rejects.toThrow('Source account not found');
+      await expect(service.transfer(transferDto)).rejects.toThrow(
+        'Source account not found',
+      );
       expect(transactionRepository.create).not.toHaveBeenCalled();
     });
 
@@ -136,7 +149,9 @@ describe('StarbankTransactionService', () => {
         .mockResolvedValueOnce(mockAccount(1, 500))
         .mockResolvedValueOnce(null);
 
-      await expect(service.transfer(transferDto)).rejects.toThrow('Destination account not found');
+      await expect(service.transfer(transferDto)).rejects.toThrow(
+        'Destination account not found',
+      );
     });
 
     it('should throw on insufficient balance', async () => {
@@ -144,14 +159,19 @@ describe('StarbankTransactionService', () => {
         .mockResolvedValueOnce(mockAccount(1, 50))
         .mockResolvedValueOnce(mockAccount(2, 100));
 
-      await expect(service.transfer(transferDto)).rejects.toThrow('Insufficient balance');
+      await expect(service.transfer(transferDto)).rejects.toThrow(
+        'Insufficient balance',
+      );
     });
 
     it('should throw when transaction creation fails', async () => {
       accountRepository.findById
         .mockResolvedValueOnce(mockAccount(1, 500))
         .mockResolvedValueOnce(mockAccount(2, 100));
-      transactionRepository.create.mockResolvedValue({ success: false, message: 'DB error' });
+      transactionRepository.create.mockResolvedValue({
+        success: false,
+        message: 'DB error',
+      });
 
       await expect(service.transfer(transferDto)).rejects.toThrow('DB error');
     });
@@ -172,14 +192,19 @@ describe('StarbankTransactionService', () => {
       accountRepository.findUserMainAccount.mockResolvedValue(mainAccount);
       transactionRepository.create.mockResolvedValue({ success: true });
 
-      await expect(service.processShopTransaction(buyDto)).resolves.toBeUndefined();
+      await expect(
+        service.processShopTransaction(buyDto),
+      ).resolves.toBeUndefined();
       expect(transactionRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({ from: 10, to: 0, amount: 200 }),
       );
     });
 
     it('should reject purchase with insufficient balance', async () => {
-      accountRepository.findUserMainAccount.mockResolvedValue({ id: 10, balance: 100 });
+      accountRepository.findUserMainAccount.mockResolvedValue({
+        id: 10,
+        balance: 100,
+      });
 
       await expect(service.processShopTransaction(buyDto)).rejects.toThrow(
         'Insufficient balance for purchase',
@@ -187,11 +212,16 @@ describe('StarbankTransactionService', () => {
     });
 
     it('should process a sale successfully', async () => {
-      const sellDto: CreateShopTransactionDto = { ...buyDto, operation: TransactionType.VENTA };
+      const sellDto: CreateShopTransactionDto = {
+        ...buyDto,
+        operation: TransactionType.VENTA,
+      };
       accountRepository.findUserMainAccount.mockResolvedValue(mainAccount);
       transactionRepository.create.mockResolvedValue({ success: true });
 
-      await expect(service.processShopTransaction(sellDto)).resolves.toBeUndefined();
+      await expect(
+        service.processShopTransaction(sellDto),
+      ).resolves.toBeUndefined();
       expect(transactionRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({ from: 0, to: 10, amount: 200 }),
       );
@@ -200,13 +230,18 @@ describe('StarbankTransactionService', () => {
     it('should throw when main account not found', async () => {
       accountRepository.findUserMainAccount.mockResolvedValue(null);
 
-      await expect(service.processShopTransaction(buyDto)).rejects.toThrow('Main account not found');
+      await expect(service.processShopTransaction(buyDto)).rejects.toThrow(
+        'Main account not found',
+      );
     });
   });
 
   describe('getAccountTransactions()', () => {
     it('should return transactions for an account', async () => {
-      const mockTxns = [{ id: 1, amount: 100 }, { id: 2, amount: 50 }];
+      const mockTxns = [
+        { id: 1, amount: 100 },
+        { id: 2, amount: 50 },
+      ];
       transactionRepository.findByAccountId.mockResolvedValue(mockTxns);
 
       const result = await service.getAccountTransactions(1, 10);

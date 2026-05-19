@@ -549,7 +549,10 @@ export class BoffMediaUsersManagementService {
 
   // ==================== PRIVATE HELPER METHODS ====================
 
-  private createSessionUser(fullUser: FullUserData, roles: string[] = []): SessionUser {
+  private createSessionUser(
+    fullUser: FullUserData,
+    roles: string[] = [],
+  ): SessionUser {
     return {
       id: fullUser.boffmedia_users.id,
       name: fullUser.boffmedia_users.username,

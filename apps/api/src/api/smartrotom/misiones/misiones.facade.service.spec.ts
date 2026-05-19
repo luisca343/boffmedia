@@ -12,16 +12,27 @@ const mockNpc = { id: 1, name: 'Professor Oak', questId: 1 };
 describe('MisionesFacadeService', () => {
   let service: MisionesFacadeService;
   let questCacheService: jest.Mocked<
-    Pick<QuestCacheService, 'getQuestSystemData' | 'refreshCache' | 'getCacheStatus'>
+    Pick<
+      QuestCacheService,
+      'getQuestSystemData' | 'refreshCache' | 'getCacheStatus'
+    >
   >;
   let userQuestService: jest.Mocked<
     Pick<UserQuestService, 'getUserQuests' | 'validateUserExists'>
   >;
   let npcService: jest.Mocked<
-    Pick<NPCService, 'updateNPCs' | 'getAllNPCs' | 'getNPCById' | 'getNPCsByQuestId'>
+    Pick<
+      NPCService,
+      'updateNPCs' | 'getAllNPCs' | 'getNPCById' | 'getNPCsByQuestId'
+    >
   >;
   let imageService: jest.Mocked<
-    Pick<ImageService, 'uploadCustomNPCImage' | 'checkCustomNPCRenderExists' | 'checkCustomNPCImageExists'>
+    Pick<
+      ImageService,
+      | 'uploadCustomNPCImage'
+      | 'checkCustomNPCRenderExists'
+      | 'checkCustomNPCImageExists'
+    >
   >;
 
   beforeEach(async () => {
@@ -69,7 +80,9 @@ describe('MisionesFacadeService', () => {
 
   describe('getAllQuests', () => {
     it('should return quest system data without force refresh', async () => {
-      questCacheService.getQuestSystemData.mockResolvedValue(mockQuestData as any);
+      questCacheService.getQuestSystemData.mockResolvedValue(
+        mockQuestData as any,
+      );
 
       const result = await service.getAllQuests();
 
@@ -78,7 +91,9 @@ describe('MisionesFacadeService', () => {
     });
 
     it('should force cache refresh when force=1', async () => {
-      questCacheService.getQuestSystemData.mockResolvedValue(mockQuestData as any);
+      questCacheService.getQuestSystemData.mockResolvedValue(
+        mockQuestData as any,
+      );
 
       await service.getAllQuests(1);
 
@@ -98,7 +113,9 @@ describe('MisionesFacadeService', () => {
     });
 
     it('should throw BadRequestException when uuid is empty', async () => {
-      await expect(service.getQuestsForUser('')).rejects.toThrow(BadRequestException);
+      await expect(service.getQuestsForUser('')).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
@@ -131,7 +148,10 @@ describe('MisionesFacadeService', () => {
 
   describe('updateNPCs', () => {
     it('should delegate NPC updates to npcService', async () => {
-      npcService.updateNPCs.mockResolvedValue({ success: true, updated: 3 } as any);
+      npcService.updateNPCs.mockResolvedValue({
+        success: true,
+        updated: 3,
+      } as any);
 
       const result = await service.updateNPCs({ npcs: [] } as any);
 
@@ -179,33 +199,47 @@ describe('MisionesFacadeService', () => {
 
   describe('uploadNPCImage', () => {
     it('should upload NPC image', async () => {
-      imageService.uploadCustomNPCImage.mockResolvedValue({ status: 'SUCCESS', path: '/npc/oak.png' });
+      imageService.uploadCustomNPCImage.mockResolvedValue({
+        status: 'SUCCESS',
+        path: '/npc/oak.png',
+      });
 
-      const result = await service.uploadNPCImage({ npcName: 'oak', image: 'base64data' } as any);
+      const result = await service.uploadNPCImage({
+        npcName: 'oak',
+        image: 'base64data',
+      } as any);
 
       expect(imageService.uploadCustomNPCImage).toHaveBeenCalled();
       expect(result.status).toBe('SUCCESS');
     });
 
     it('should throw when npcName is missing', async () => {
-      await expect(service.uploadNPCImage({ npcName: '', image: 'data' } as any)).rejects.toThrow();
+      await expect(
+        service.uploadNPCImage({ npcName: '', image: 'data' } as any),
+      ).rejects.toThrow();
     });
   });
 
   describe('checkNPCRenderExists', () => {
     it('should check if render exists', async () => {
-      imageService.checkCustomNPCRenderExists.mockResolvedValue({ exists: true } as any);
+      imageService.checkCustomNPCRenderExists.mockResolvedValue({
+        exists: true,
+      } as any);
 
       const result = await service.checkNPCRenderExists('oak');
 
-      expect(imageService.checkCustomNPCRenderExists).toHaveBeenCalledWith('oak');
+      expect(imageService.checkCustomNPCRenderExists).toHaveBeenCalledWith(
+        'oak',
+      );
       expect(result.exists).toBe(true);
     });
   });
 
   describe('checkNPCImageExists', () => {
     it('should check if image exists', async () => {
-      imageService.checkCustomNPCImageExists.mockResolvedValue({ exists: false } as any);
+      imageService.checkCustomNPCImageExists.mockResolvedValue({
+        exists: false,
+      } as any);
 
       const result = await service.checkNPCImageExists('unknown');
 

@@ -94,7 +94,9 @@ describe('ArcadeFacadeService', () => {
     });
 
     it('should throw BadRequestException when uuid is empty', async () => {
-      await expect(service.getUserStreak('')).rejects.toThrow(BadRequestException);
+      await expect(service.getUserStreak('')).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
@@ -112,7 +114,9 @@ describe('ArcadeFacadeService', () => {
     });
 
     it('should throw BadRequestException when uuid is empty', async () => {
-      await expect(service.canClaimDailyReward('')).rejects.toThrow(BadRequestException);
+      await expect(service.canClaimDailyReward('')).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
@@ -156,13 +160,17 @@ describe('ArcadeFacadeService', () => {
     });
 
     it('should throw BadRequestException when uuid is empty', async () => {
-      await expect(service.claimDailyReward('')).rejects.toThrow(BadRequestException);
+      await expect(service.claimDailyReward('')).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
   describe('resetUserStreak', () => {
     it('should reset user streak when reset succeeds', async () => {
-      (streakService.resetUserStreak as jest.Mock).mockResolvedValue({ success: true });
+      (streakService.resetUserStreak as jest.Mock).mockResolvedValue({
+        success: true,
+      });
 
       await service.resetUserStreak('test-uuid');
 
@@ -170,13 +178,19 @@ describe('ArcadeFacadeService', () => {
     });
 
     it('should throw NotFoundException when reset fails', async () => {
-      (streakService.resetUserStreak as jest.Mock).mockResolvedValue({ success: false });
+      (streakService.resetUserStreak as jest.Mock).mockResolvedValue({
+        success: false,
+      });
 
-      await expect(service.resetUserStreak('test-uuid')).rejects.toThrow(NotFoundException);
+      await expect(service.resetUserStreak('test-uuid')).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should throw BadRequestException when uuid is empty', async () => {
-      await expect(service.resetUserStreak('')).rejects.toThrow(BadRequestException);
+      await expect(service.resetUserStreak('')).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
@@ -191,49 +205,74 @@ describe('ArcadeFacadeService', () => {
     });
 
     it('should throw BadRequestException when uuid is empty', async () => {
-      await expect(service.getStreakStats('')).rejects.toThrow(BadRequestException);
+      await expect(service.getStreakStats('')).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
   describe('updateLastBanner', () => {
     it('should update last banner', async () => {
-      (streakService.updateLastBanner as jest.Mock).mockResolvedValue(mockStreak);
+      (streakService.updateLastBanner as jest.Mock).mockResolvedValue(
+        mockStreak,
+      );
 
-      const result = await service.updateLastBanner('test-uuid', 'spring_banner');
+      const result = await service.updateLastBanner(
+        'test-uuid',
+        'spring_banner',
+      );
 
-      expect(streakService.updateLastBanner).toHaveBeenCalledWith('test-uuid', 'spring_banner');
+      expect(streakService.updateLastBanner).toHaveBeenCalledWith(
+        'test-uuid',
+        'spring_banner',
+      );
       expect(result).toEqual(mockStreak);
     });
 
     it('should throw BadRequestException when uuid or banner is empty', async () => {
-      await expect(service.updateLastBanner('', 'banner')).rejects.toThrow(BadRequestException);
-      await expect(service.updateLastBanner('uuid', '')).rejects.toThrow(BadRequestException);
+      await expect(service.updateLastBanner('', 'banner')).rejects.toThrow(
+        BadRequestException,
+      );
+      await expect(service.updateLastBanner('uuid', '')).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
   describe('getUserInventory', () => {
     it('should return user inventory', async () => {
       const inventory = { items: [mockInventoryItem], total: 1 };
-      (inventoryService.getUserInventory as jest.Mock).mockResolvedValue(inventory);
+      (inventoryService.getUserInventory as jest.Mock).mockResolvedValue(
+        inventory,
+      );
 
       const result = await service.getUserInventory('test-uuid');
 
-      expect(inventoryService.getUserInventory).toHaveBeenCalledWith('test-uuid');
+      expect(inventoryService.getUserInventory).toHaveBeenCalledWith(
+        'test-uuid',
+      );
       expect(result).toEqual(inventory);
     });
 
     it('should throw BadRequestException when uuid is empty', async () => {
-      await expect(service.getUserInventory('')).rejects.toThrow(BadRequestException);
+      await expect(service.getUserInventory('')).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
   describe('getUserItem', () => {
     it('should return specific inventory item', async () => {
-      (inventoryService.getUserItem as jest.Mock).mockResolvedValue(mockInventoryItem);
+      (inventoryService.getUserItem as jest.Mock).mockResolvedValue(
+        mockInventoryItem,
+      );
 
       const result = await service.getUserItem('test-uuid', 'lootbox_basic');
 
-      expect(inventoryService.getUserItem).toHaveBeenCalledWith('test-uuid', 'lootbox_basic');
+      expect(inventoryService.getUserItem).toHaveBeenCalledWith(
+        'test-uuid',
+        'lootbox_basic',
+      );
       expect(result).toEqual(mockInventoryItem);
     });
 
@@ -246,8 +285,12 @@ describe('ArcadeFacadeService', () => {
     });
 
     it('should throw BadRequestException when uuid or itemId is empty', async () => {
-      await expect(service.getUserItem('', 'item-1')).rejects.toThrow(BadRequestException);
-      await expect(service.getUserItem('uuid', '')).rejects.toThrow(BadRequestException);
+      await expect(service.getUserItem('', 'item-1')).rejects.toThrow(
+        BadRequestException,
+      );
+      await expect(service.getUserItem('uuid', '')).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
@@ -270,7 +313,12 @@ describe('ArcadeFacadeService', () => {
 
     it('should throw BadRequestException when required fields missing', async () => {
       await expect(
-        service.addItemToInventory({ uuid: '', itemId: 'x', itemType: 'lootbox', amount: 1 }),
+        service.addItemToInventory({
+          uuid: '',
+          itemId: 'x',
+          itemType: 'lootbox',
+          amount: 1,
+        }),
       ).rejects.toThrow(BadRequestException);
     });
   });
@@ -283,9 +331,17 @@ describe('ArcadeFacadeService', () => {
         consumed: 1,
       });
 
-      const result = await service.consumeInventoryItem('test-uuid', 'lootbox_basic', 1);
+      const result = await service.consumeInventoryItem(
+        'test-uuid',
+        'lootbox_basic',
+        1,
+      );
 
-      expect(inventoryService.consumeItem).toHaveBeenCalledWith('test-uuid', 'lootbox_basic', 1);
+      expect(inventoryService.consumeItem).toHaveBeenCalledWith(
+        'test-uuid',
+        'lootbox_basic',
+        1,
+      );
       expect(result.consumed).toBe(1);
     });
 
@@ -296,33 +352,40 @@ describe('ArcadeFacadeService', () => {
         consumed: 0,
       });
 
-      await expect(service.consumeInventoryItem('test-uuid', 'lootbox_basic', 1)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(
+        service.consumeInventoryItem('test-uuid', 'lootbox_basic', 1),
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('should throw BadRequestException when amount < 1', async () => {
-      await expect(service.consumeInventoryItem('test-uuid', 'item-1', 0)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(
+        service.consumeInventoryItem('test-uuid', 'item-1', 0),
+      ).rejects.toThrow(BadRequestException);
     });
   });
 
   describe('removeInventoryItem', () => {
     it('should remove item when successful', async () => {
-      (inventoryService.removeItem as jest.Mock).mockResolvedValue({ success: true });
+      (inventoryService.removeItem as jest.Mock).mockResolvedValue({
+        success: true,
+      });
 
       await service.removeInventoryItem('test-uuid', 'lootbox_basic');
 
-      expect(inventoryService.removeItem).toHaveBeenCalledWith('test-uuid', 'lootbox_basic');
+      expect(inventoryService.removeItem).toHaveBeenCalledWith(
+        'test-uuid',
+        'lootbox_basic',
+      );
     });
 
     it('should throw BadRequestException when remove fails', async () => {
-      (inventoryService.removeItem as jest.Mock).mockResolvedValue({ success: false });
+      (inventoryService.removeItem as jest.Mock).mockResolvedValue({
+        success: false,
+      });
 
-      await expect(service.removeInventoryItem('test-uuid', 'lootbox_basic')).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(
+        service.removeInventoryItem('test-uuid', 'lootbox_basic'),
+      ).rejects.toThrow(BadRequestException);
     });
   });
 
@@ -348,23 +411,36 @@ describe('ArcadeFacadeService', () => {
 
       const result = await service.openLootbox('test-uuid', 'basic');
 
-      expect(lootboxService.openLootBox).toHaveBeenCalledWith({ uuid: 'test-uuid', boxId: 'basic' });
+      expect(lootboxService.openLootBox).toHaveBeenCalledWith({
+        uuid: 'test-uuid',
+        boxId: 'basic',
+      });
       expect(result.item).toEqual(mockInventoryItem);
     });
 
     it('should throw BadRequestException when uuid or lootboxType is empty', async () => {
-      await expect(service.openLootbox('', 'basic')).rejects.toThrow(BadRequestException);
-      await expect(service.openLootbox('uuid', '')).rejects.toThrow(BadRequestException);
+      await expect(service.openLootbox('', 'basic')).rejects.toThrow(
+        BadRequestException,
+      );
+      await expect(service.openLootbox('uuid', '')).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
   describe('giveLootbox', () => {
     it('should give lootbox to user', async () => {
-      (lootboxService.giveLootbox as jest.Mock).mockResolvedValue({ success: true });
+      (lootboxService.giveLootbox as jest.Mock).mockResolvedValue({
+        success: true,
+      });
 
       await service.giveLootbox('test-uuid', 'basic', 1);
 
-      expect(lootboxService.giveLootbox).toHaveBeenCalledWith('test-uuid', 'basic', 1);
+      expect(lootboxService.giveLootbox).toHaveBeenCalledWith(
+        'test-uuid',
+        'basic',
+        1,
+      );
     });
 
     it('should throw BadRequestException when give fails', async () => {
@@ -373,11 +449,15 @@ describe('ArcadeFacadeService', () => {
         message: 'Lootbox not available',
       });
 
-      await expect(service.giveLootbox('test-uuid', 'basic', 1)).rejects.toThrow(BadRequestException);
+      await expect(
+        service.giveLootbox('test-uuid', 'basic', 1),
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('should throw BadRequestException when amount < 1', async () => {
-      await expect(service.giveLootbox('test-uuid', 'basic', 0)).rejects.toThrow(BadRequestException);
+      await expect(
+        service.giveLootbox('test-uuid', 'basic', 0),
+      ).rejects.toThrow(BadRequestException);
     });
   });
 
@@ -388,7 +468,9 @@ describe('ArcadeFacadeService', () => {
         item: mockInventoryItem,
         consumed: 1,
       });
-      (wingullFacadeService.giveItems as jest.Mock).mockResolvedValue(undefined);
+      (wingullFacadeService.giveItems as jest.Mock).mockResolvedValue(
+        undefined,
+      );
 
       const result = await service.claimItems({
         uuid: 'test-uuid',
@@ -412,14 +494,28 @@ describe('ArcadeFacadeService', () => {
 
     it('should throw BadRequestException when uuid is missing', async () => {
       await expect(
-        service.claimItems({ uuid: '', items: [{ id: 1, uuid: 'u', itemId: 'x', itemType: 'item', amount: 1, rarity: 'common' as any, sourceType: 'manual', used: 0 }] }),
+        service.claimItems({
+          uuid: '',
+          items: [
+            {
+              id: 1,
+              uuid: 'u',
+              itemId: 'x',
+              itemType: 'item',
+              amount: 1,
+              rarity: 'common' as any,
+              sourceType: 'manual',
+              used: 0,
+            },
+          ],
+        }),
       ).rejects.toThrow(BadRequestException);
     });
 
     it('should throw BadRequestException when items array is empty', async () => {
-      await expect(service.claimItems({ uuid: 'test-uuid', items: [] })).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(
+        service.claimItems({ uuid: 'test-uuid', items: [] }),
+      ).rejects.toThrow(BadRequestException);
     });
   });
 
@@ -428,8 +524,12 @@ describe('ArcadeFacadeService', () => {
       const inventory = { items: [], total: 0 };
       const stats = { totalItems: 0, itemsByType: {}, itemsByRarity: {} };
       (streakService.getUserStreak as jest.Mock).mockResolvedValue(mockStreak);
-      (inventoryService.getUserInventory as jest.Mock).mockResolvedValue(inventory);
-      (inventoryService.getInventoryStats as jest.Mock).mockResolvedValue(stats);
+      (inventoryService.getUserInventory as jest.Mock).mockResolvedValue(
+        inventory,
+      );
+      (inventoryService.getInventoryStats as jest.Mock).mockResolvedValue(
+        stats,
+      );
 
       const result = await service.getCompleteUserData('test-uuid');
 
@@ -439,7 +539,9 @@ describe('ArcadeFacadeService', () => {
     });
 
     it('should throw BadRequestException when uuid is empty', async () => {
-      await expect(service.getCompleteUserData('')).rejects.toThrow(BadRequestException);
+      await expect(service.getCompleteUserData('')).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 });

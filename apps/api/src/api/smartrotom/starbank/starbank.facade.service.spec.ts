@@ -102,7 +102,10 @@ describe('StarbankFacadeService', () => {
       providers: [
         StarbankFacadeService,
         { provide: StarbankAccountService, useValue: mockAccountService },
-        { provide: StarbankTransactionService, useValue: mockTransactionService },
+        {
+          provide: StarbankTransactionService,
+          useValue: mockTransactionService,
+        },
         { provide: WingullFacadeService, useValue: mockWingullFacadeService },
         { provide: Logger, useValue: mockLogger },
       ],
@@ -121,16 +124,23 @@ describe('StarbankFacadeService', () => {
 
   describe('createAccount', () => {
     it('should create a MAIN account when name is empty', async () => {
-      accountService.createMainAccount.mockResolvedValue(mockMainAccount as any);
+      accountService.createMainAccount.mockResolvedValue(
+        mockMainAccount as any,
+      );
 
       const result = await service.createAccount('test-uuid-1234', '');
 
-      expect(accountService.createMainAccount).toHaveBeenCalledWith('test-uuid-1234', '');
+      expect(accountService.createMainAccount).toHaveBeenCalledWith(
+        'test-uuid-1234',
+        '',
+      );
       expect(result).toEqual(mockMainAccount);
     });
 
     it('should create a SECONDARY account when name is provided', async () => {
-      accountService.createAccount.mockResolvedValue(mockSecondaryAccount as any);
+      accountService.createAccount.mockResolvedValue(
+        mockSecondaryAccount as any,
+      );
 
       const result = await service.createAccount('test-uuid-1234', 'Savings');
 
@@ -146,11 +156,19 @@ describe('StarbankFacadeService', () => {
 
   describe('createMainAccount', () => {
     it('should delegate to accountService.createMainAccount', async () => {
-      accountService.createMainAccount.mockResolvedValue(mockMainAccount as any);
+      accountService.createMainAccount.mockResolvedValue(
+        mockMainAccount as any,
+      );
 
-      const result = await service.createMainAccount('test-uuid-1234', 'TestUser');
+      const result = await service.createMainAccount(
+        'test-uuid-1234',
+        'TestUser',
+      );
 
-      expect(accountService.createMainAccount).toHaveBeenCalledWith('test-uuid-1234', 'TestUser');
+      expect(accountService.createMainAccount).toHaveBeenCalledWith(
+        'test-uuid-1234',
+        'TestUser',
+      );
       expect(result).toEqual(mockMainAccount);
     });
   });
@@ -168,22 +186,31 @@ describe('StarbankFacadeService', () => {
 
   describe('getAccounts', () => {
     it('should return accounts for a player', async () => {
-      accountService.getUserAccounts.mockResolvedValue([mockMainAccount] as any);
+      accountService.getUserAccounts.mockResolvedValue([
+        mockMainAccount,
+      ] as any);
 
       const result = await service.getAccounts('test-uuid-1234');
 
-      expect(accountService.getUserAccounts).toHaveBeenCalledWith('test-uuid-1234');
+      expect(accountService.getUserAccounts).toHaveBeenCalledWith(
+        'test-uuid-1234',
+      );
       expect(result).toEqual([mockMainAccount]);
     });
   });
 
   describe('getMainAccount', () => {
     it('should return main account for a player', async () => {
-      accountService.getUserMainAccount.mockResolvedValue({ id: 1, balance: 500 });
+      accountService.getUserMainAccount.mockResolvedValue({
+        id: 1,
+        balance: 500,
+      });
 
       const result = await service.getMainAccount('test-uuid-1234');
 
-      expect(accountService.getUserMainAccount).toHaveBeenCalledWith('test-uuid-1234');
+      expect(accountService.getUserMainAccount).toHaveBeenCalledWith(
+        'test-uuid-1234',
+      );
       expect(result).toEqual({ id: 1, balance: 500 });
     });
 
@@ -202,7 +229,9 @@ describe('StarbankFacadeService', () => {
 
       const result = await service.getBalance('test-uuid-1234');
 
-      expect(accountService.getUserBalance).toHaveBeenCalledWith('test-uuid-1234');
+      expect(accountService.getUserBalance).toHaveBeenCalledWith(
+        'test-uuid-1234',
+      );
       expect(result).toEqual({ balance: 500 });
     });
   });
@@ -248,7 +277,9 @@ describe('StarbankFacadeService', () => {
 
     it('should not throw if in-game balance sync fails after transfer', async () => {
       transactionService.transfer.mockResolvedValue(undefined);
-      accountService.getAccountInfo.mockRejectedValue(new Error('wingull down'));
+      accountService.getAccountInfo.mockRejectedValue(
+        new Error('wingull down'),
+      );
 
       await expect(service.transfer(1, 2, 50, 'test')).resolves.not.toThrow();
       expect(logger.warn).toHaveBeenCalled();
@@ -258,7 +289,10 @@ describe('StarbankFacadeService', () => {
   describe('transferFromMain', () => {
     it('should transfer from main and sync in-game balance', async () => {
       transactionService.transferFromMain.mockResolvedValue(undefined);
-      accountService.getUserMainAccount.mockResolvedValue({ id: 1, balance: 400 });
+      accountService.getUserMainAccount.mockResolvedValue({
+        id: 1,
+        balance: 400,
+      });
       wingullFacadeService.updateBalance.mockResolvedValue(undefined);
 
       await service.transferFromMain('test-uuid-1234', 2, 100, 'rent');
@@ -291,13 +325,19 @@ describe('StarbankFacadeService', () => {
 
       await service.transferFromSystem(1, 100, 'welcome bonus');
 
-      expect(transactionService.transferFromSystem).toHaveBeenCalledWith(1, 100, 'welcome bonus');
+      expect(transactionService.transferFromSystem).toHaveBeenCalledWith(
+        1,
+        100,
+        'welcome bonus',
+      );
       expect(wingullFacadeService.updateBalance).toHaveBeenCalled();
     });
 
     it('should not sync balance for SECONDARY accounts', async () => {
       transactionService.transferFromSystem.mockResolvedValue(undefined);
-      accountService.getAccountInfo.mockResolvedValue(mockSecondaryAccount as any);
+      accountService.getAccountInfo.mockResolvedValue(
+        mockSecondaryAccount as any,
+      );
 
       await service.transferFromSystem(2, 50, 'reward');
 
@@ -309,12 +349,17 @@ describe('StarbankFacadeService', () => {
     it('should process shop transaction and sync balance', async () => {
       const shopData = { uuid: 'test-uuid-1234', items: [], total: 100 };
       transactionService.processShopTransaction.mockResolvedValue(undefined);
-      accountService.getUserMainAccount.mockResolvedValue({ id: 1, balance: 400 });
+      accountService.getUserMainAccount.mockResolvedValue({
+        id: 1,
+        balance: 400,
+      });
       wingullFacadeService.updateBalance.mockResolvedValue(undefined);
 
       await service.shop(shopData as any);
 
-      expect(transactionService.processShopTransaction).toHaveBeenCalledWith(shopData);
+      expect(transactionService.processShopTransaction).toHaveBeenCalledWith(
+        shopData,
+      );
       expect(wingullFacadeService.updateBalance).toHaveBeenCalled();
     });
   });
@@ -326,7 +371,10 @@ describe('StarbankFacadeService', () => {
 
       await service.trainerDefeat(200, 'test-uuid-1234');
 
-      expect(wingullFacadeService.getCurrentBalance).toHaveBeenCalledWith('test-uuid-1234', 200);
+      expect(wingullFacadeService.getCurrentBalance).toHaveBeenCalledWith(
+        'test-uuid-1234',
+        200,
+      );
       expect(transactionService.processTrainerDefeat).toHaveBeenCalledWith(
         { uuid: 'test-uuid-1234', money: 200 },
         1000,
@@ -336,11 +384,16 @@ describe('StarbankFacadeService', () => {
 
   describe('getTransactions', () => {
     it('should return transactions with default limit', async () => {
-      transactionService.getAccountTransactions.mockResolvedValue([mockTransaction] as any);
+      transactionService.getAccountTransactions.mockResolvedValue([
+        mockTransaction,
+      ] as any);
 
       const result = await service.getTransactions(1);
 
-      expect(transactionService.getAccountTransactions).toHaveBeenCalledWith(1, 50);
+      expect(transactionService.getAccountTransactions).toHaveBeenCalledWith(
+        1,
+        50,
+      );
       expect(result).toEqual([mockTransaction]);
     });
 
@@ -349,39 +402,57 @@ describe('StarbankFacadeService', () => {
 
       await service.getTransactions(1, 10);
 
-      expect(transactionService.getAccountTransactions).toHaveBeenCalledWith(1, 10);
+      expect(transactionService.getAccountTransactions).toHaveBeenCalledWith(
+        1,
+        10,
+      );
     });
   });
 
   describe('getTransactionsByUUID', () => {
     it('should return transactions for user by UUID with default limit', async () => {
-      transactionService.getUserTransactions.mockResolvedValue([mockTransaction] as any);
+      transactionService.getUserTransactions.mockResolvedValue([
+        mockTransaction,
+      ] as any);
 
       const result = await service.getTransactionsByUUID('test-uuid-1234');
 
-      expect(transactionService.getUserTransactions).toHaveBeenCalledWith('test-uuid-1234', 50);
+      expect(transactionService.getUserTransactions).toHaveBeenCalledWith(
+        'test-uuid-1234',
+        50,
+      );
       expect(result).toEqual([mockTransaction]);
     });
   });
 
   describe('getTransfers', () => {
     it('should return last 10 transfers for account', async () => {
-      transactionService.getAccountTransfers.mockResolvedValue([mockTransaction] as any);
+      transactionService.getAccountTransfers.mockResolvedValue([
+        mockTransaction,
+      ] as any);
 
       const result = await service.getTransfers(1);
 
-      expect(transactionService.getAccountTransfers).toHaveBeenCalledWith(1, 10);
+      expect(transactionService.getAccountTransfers).toHaveBeenCalledWith(
+        1,
+        10,
+      );
       expect(result).toEqual([mockTransaction]);
     });
   });
 
   describe('getTransfersByUUID', () => {
     it('should return last 10 transfers for player by UUID', async () => {
-      transactionService.getUserTransfers.mockResolvedValue([mockTransaction] as any);
+      transactionService.getUserTransfers.mockResolvedValue([
+        mockTransaction,
+      ] as any);
 
       const result = await service.getTransfersByUUID('test-uuid-1234');
 
-      expect(transactionService.getUserTransfers).toHaveBeenCalledWith('test-uuid-1234', 10);
+      expect(transactionService.getUserTransfers).toHaveBeenCalledWith(
+        'test-uuid-1234',
+        10,
+      );
       expect(result).toEqual([mockTransaction]);
     });
   });

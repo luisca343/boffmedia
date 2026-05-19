@@ -18,7 +18,10 @@ import {
 } from '@nestjs/swagger';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { LigaFacadeService } from './liga.facade.service';
-import { CreateTournamentDto, TournamentRegistrationDto } from './dto/tournament.dto';
+import {
+  CreateTournamentDto,
+  TournamentRegistrationDto,
+} from './dto/tournament.dto';
 
 @ApiTags('SmartRotom | Liga')
 @Controller('smartrotom/liga')

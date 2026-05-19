@@ -16,7 +16,12 @@ const mockRepo = {
 };
 
 const VALID_UUID = '550e8400-e29b-41d4-a716-446655440000';
-const mockUser = { id: 1, username: 'TrainerAsh', uuid: VALID_UUID, world: 'main' } as any;
+const mockUser = {
+  id: 1,
+  username: 'TrainerAsh',
+  uuid: VALID_UUID,
+  world: 'main',
+} as any;
 
 describe('UsersService (SmartRotom)', () => {
   let service: UsersService;
@@ -69,22 +74,32 @@ describe('UsersService (SmartRotom)', () => {
     it('returns user when found', async () => {
       mockRepo.findByUuid.mockResolvedValue(mockUser);
 
-      await expect(service.getUserByUuid(VALID_UUID)).resolves.toEqual(mockUser);
+      await expect(service.getUserByUuid(VALID_UUID)).resolves.toEqual(
+        mockUser,
+      );
     });
 
     it('throws BadRequestException when uuid is empty', async () => {
-      await expect(service.getUserByUuid('')).rejects.toThrow('UUID is required');
+      await expect(service.getUserByUuid('')).rejects.toThrow(
+        'UUID is required',
+      );
     });
 
     it('throws BadRequestException when uuid format is invalid', async () => {
-      await expect(service.getUserByUuid('not-a-valid-uuid')).rejects.toThrow('Invalid UUID format');
+      await expect(service.getUserByUuid('not-a-valid-uuid')).rejects.toThrow(
+        'Invalid UUID format',
+      );
     });
   });
 
   // ─── createUser ───────────────────────────────────────────────────────────────
 
   describe('createUser()', () => {
-    const dto = { uuid: VALID_UUID, username: 'TrainerAsh', world: 'main' } as any;
+    const dto = {
+      uuid: VALID_UUID,
+      username: 'TrainerAsh',
+      world: 'main',
+    } as any;
 
     it('creates user when uuid and username are unique', async () => {
       mockRepo.findByUuid.mockResolvedValue(null);
@@ -112,7 +127,11 @@ describe('UsersService (SmartRotom)', () => {
   // ─── findOrCreateUser ─────────────────────────────────────────────────────────
 
   describe('findOrCreateUser()', () => {
-    const dto = { uuid: VALID_UUID, username: 'TrainerAsh', world: 'main' } as any;
+    const dto = {
+      uuid: VALID_UUID,
+      username: 'TrainerAsh',
+      world: 'main',
+    } as any;
 
     it('returns existing user with isNew=false', async () => {
       mockRepo.findByUuid.mockResolvedValue(mockUser);
@@ -136,9 +155,14 @@ describe('UsersService (SmartRotom)', () => {
 
     it('throws ConflictException when username is taken by another uuid', async () => {
       mockRepo.findByUuid.mockResolvedValue(null);
-      mockRepo.findByUsername.mockResolvedValue({ ...mockUser, uuid: 'different-uuid' });
+      mockRepo.findByUsername.mockResolvedValue({
+        ...mockUser,
+        uuid: 'different-uuid',
+      });
 
-      await expect(service.findOrCreateUser(dto)).rejects.toThrow('already taken');
+      await expect(service.findOrCreateUser(dto)).rejects.toThrow(
+        'already taken',
+      );
     });
   });
 
@@ -150,7 +174,9 @@ describe('UsersService (SmartRotom)', () => {
       mockRepo.findByUsername.mockResolvedValue(null);
       mockRepo.update.mockResolvedValue({ ...mockUser, username: 'NewName' });
 
-      const result = await service.updateUser(1, { username: 'NewName' } as any);
+      const result = await service.updateUser(1, {
+        username: 'NewName',
+      } as any);
 
       expect(result.username).toBe('NewName');
     });
@@ -159,9 +185,9 @@ describe('UsersService (SmartRotom)', () => {
       mockRepo.findById.mockResolvedValue(mockUser);
       mockRepo.findByUsername.mockResolvedValue({ ...mockUser, id: 999 }); // different user has that name
 
-      await expect(service.updateUser(1, { username: 'TakenName' } as any)).rejects.toThrow(
-        'already taken',
-      );
+      await expect(
+        service.updateUser(1, { username: 'TakenName' } as any),
+      ).rejects.toThrow('already taken');
     });
   });
 
@@ -193,7 +219,9 @@ describe('UsersService (SmartRotom)', () => {
     });
 
     it('throws BadRequestException when any uuid is invalid', async () => {
-      await expect(service.getMultipleUsers(['bad-uuid'])).rejects.toThrow('Invalid UUID format');
+      await expect(service.getMultipleUsers(['bad-uuid'])).rejects.toThrow(
+        'Invalid UUID format',
+      );
     });
 
     it('fetches multiple users by uuid array', async () => {

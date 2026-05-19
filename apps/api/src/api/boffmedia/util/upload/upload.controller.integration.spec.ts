@@ -15,7 +15,12 @@ const mockFacade: jest.Mocked<Partial<UploadFacadeService>> = {
   getMaxImageSize: jest.fn(),
 };
 
-const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn() };
+const mockLogger = {
+  log: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  debug: jest.fn(),
+};
 
 describe('UploadController — integration (ValidationPipe + GlobalExceptionFilter)', () => {
   let app: INestApplication;
@@ -28,7 +33,11 @@ describe('UploadController — integration (ValidationPipe + GlobalExceptionFilt
 
     app = module.createNestApplication();
     app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
     );
     app.useGlobalFilters(new GlobalExceptionFilter(mockLogger as any));
     await app.init();
@@ -42,7 +51,10 @@ describe('UploadController — integration (ValidationPipe + GlobalExceptionFilt
 
   describe('DELETE /upload/file', () => {
     it('returns 200 and calls facade.deleteFile', async () => {
-      mockFacade.deleteFile!.mockResolvedValue({ success: true, message: 'File deleted' });
+      mockFacade.deleteFile!.mockResolvedValue({
+        success: true,
+        message: 'File deleted',
+      });
 
       const res = await request(app.getHttpServer())
         .delete('/upload/file')
@@ -53,7 +65,10 @@ describe('UploadController — integration (ValidationPipe + GlobalExceptionFilt
     });
 
     it('returns 200 when path is omitted (defaults to empty string)', async () => {
-      mockFacade.deleteFile!.mockResolvedValue({ success: true, message: 'File deleted' });
+      mockFacade.deleteFile!.mockResolvedValue({
+        success: true,
+        message: 'File deleted',
+      });
 
       const res = await request(app.getHttpServer())
         .delete('/upload/file')
@@ -68,14 +83,22 @@ describe('UploadController — integration (ValidationPipe + GlobalExceptionFilt
 
   describe('GET /upload/info', () => {
     it('returns 200 and calls facade.getFileInfo', async () => {
-      mockFacade.getFileInfo!.mockResolvedValue({ exists: true, size: 1024, filename: 'test.jpg', path: '' } as any);
+      mockFacade.getFileInfo!.mockResolvedValue({
+        exists: true,
+        size: 1024,
+        filename: 'test.jpg',
+        path: '',
+      } as any);
 
       const res = await request(app.getHttpServer())
         .get('/upload/info')
         .query({ filename: 'test.jpg', path: 'avatars' });
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getFileInfo).toHaveBeenCalledWith('avatars', 'test.jpg');
+      expect(mockFacade.getFileInfo).toHaveBeenCalledWith(
+        'avatars',
+        'test.jpg',
+      );
     });
 
     it('returns 400 when filename is missing', async () => {
@@ -103,13 +126,27 @@ describe('UploadController — integration (ValidationPipe + GlobalExceptionFilt
 
   describe('GET /upload/supported-types', () => {
     it('returns 200 and the list of supported types', async () => {
-      mockFacade.getSupportedImageTypes!.mockReturnValue(['jpg', 'jpeg', 'png', 'gif', 'webp']);
+      mockFacade.getSupportedImageTypes!.mockReturnValue([
+        'jpg',
+        'jpeg',
+        'png',
+        'gif',
+        'webp',
+      ]);
 
-      const res = await request(app.getHttpServer()).get('/upload/supported-types');
+      const res = await request(app.getHttpServer()).get(
+        '/upload/supported-types',
+      );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getSupportedImageTypes).toHaveBeenCalled();
-      expect(res.body.data.supportedTypes).toEqual(['jpg', 'jpeg', 'png', 'gif', 'webp']);
+      expect(res.body.data.supportedTypes).toEqual([
+        'jpg',
+        'jpeg',
+        'png',
+        'gif',
+        'webp',
+      ]);
     });
   });
 

@@ -74,7 +74,9 @@ describe('PokemonDataManagementService', () => {
       ],
     }).compile();
 
-    service = module.get<PokemonDataManagementService>(PokemonDataManagementService);
+    service = module.get<PokemonDataManagementService>(
+      PokemonDataManagementService,
+    );
   });
 
   it('should be defined', () => {
@@ -86,10 +88,20 @@ describe('PokemonDataManagementService', () => {
   describe('initializeData()', () => {
     it('loads all data services in order', async () => {
       const order: string[] = [];
-      mockPokemonDataService.loadPokemonData.mockImplementation(async () => { order.push('pokemon'); });
-      mockMoveDataService.loadMoveData.mockImplementation(async () => { order.push('move'); });
-      mockSpawnDataService.loadSpawnData.mockImplementation(async () => { order.push('spawn'); });
-      mockSpriteManifestService.loadSpriteManifest.mockImplementation(async () => { order.push('sprite'); });
+      mockPokemonDataService.loadPokemonData.mockImplementation(async () => {
+        order.push('pokemon');
+      });
+      mockMoveDataService.loadMoveData.mockImplementation(async () => {
+        order.push('move');
+      });
+      mockSpawnDataService.loadSpawnData.mockImplementation(async () => {
+        order.push('spawn');
+      });
+      mockSpriteManifestService.loadSpriteManifest.mockImplementation(
+        async () => {
+          order.push('sprite');
+        },
+      );
 
       await service.initializeData();
 
@@ -97,9 +109,13 @@ describe('PokemonDataManagementService', () => {
     });
 
     it('rethrows initialization errors', async () => {
-      mockPokemonDataService.loadPokemonData.mockRejectedValue(new Error('disk read failed'));
+      mockPokemonDataService.loadPokemonData.mockRejectedValue(
+        new Error('disk read failed'),
+      );
 
-      await expect(service.initializeData()).rejects.toThrow('Data initialization failed');
+      await expect(service.initializeData()).rejects.toThrow(
+        'Data initialization failed',
+      );
     });
   });
 
@@ -107,21 +123,27 @@ describe('PokemonDataManagementService', () => {
 
   describe('getAllPokemon()', () => {
     it('delegates to pokemonDataService.getAllSpecies', () => {
-      mockPokemonDataService.getAllSpecies.mockReturnValue([makePokemon(25, 'pikachu')]);
+      mockPokemonDataService.getAllSpecies.mockReturnValue([
+        makePokemon(25, 'pikachu'),
+      ]);
       expect(service.getAllPokemon()).toHaveLength(1);
     });
   });
 
   describe('getPokemonByDex()', () => {
     it('delegates to pokemonDataService.getSpeciesByDex', () => {
-      mockPokemonDataService.getSpeciesByDex.mockReturnValue(makePokemon(25, 'pikachu'));
+      mockPokemonDataService.getSpeciesByDex.mockReturnValue(
+        makePokemon(25, 'pikachu'),
+      );
       expect(service.getPokemonByDex(25)?.name).toBe('pikachu');
     });
   });
 
   describe('getPokemonByName()', () => {
     it('delegates to pokemonDataService.getSpeciesByName', () => {
-      mockPokemonDataService.getSpeciesByName.mockReturnValue(makePokemon(25, 'pikachu'));
+      mockPokemonDataService.getSpeciesByName.mockReturnValue(
+        makePokemon(25, 'pikachu'),
+      );
       expect(service.getPokemonByName('pikachu')?.name).toBe('pikachu');
     });
   });
@@ -138,7 +160,9 @@ describe('PokemonDataManagementService', () => {
 
   describe('getCustomSpecies()', () => {
     it('delegates to pokemonDataService.getCustomSpecies', () => {
-      mockPokemonDataService.getCustomSpecies.mockReturnValue([makePokemon(1026, 'terasmon')]);
+      mockPokemonDataService.getCustomSpecies.mockReturnValue([
+        makePokemon(1026, 'terasmon'),
+      ]);
       expect(service.getCustomSpecies()).toHaveLength(1);
     });
   });
@@ -180,7 +204,11 @@ describe('PokemonDataManagementService', () => {
   // ─── getNextPrev ──────────────────────────────────────────────────────────────
 
   describe('getNextPrev()', () => {
-    const species = [makePokemon(1, 'bulbasaur'), makePokemon(2, 'ivysaur'), makePokemon(3, 'venusaur')];
+    const species = [
+      makePokemon(1, 'bulbasaur'),
+      makePokemon(2, 'ivysaur'),
+      makePokemon(3, 'venusaur'),
+    ];
 
     beforeEach(() => {
       mockPokemonDataService.getAllSpecies.mockReturnValue(species);
@@ -215,14 +243,18 @@ describe('PokemonDataManagementService', () => {
 
   describe('getAllMoves()', () => {
     it('delegates to pokemonDataService.getAllMovesSortedByCount', () => {
-      mockPokemonDataService.getAllMovesSortedByCount.mockReturnValue([{ name: 'thunderbolt', count: 5 }]);
+      mockPokemonDataService.getAllMovesSortedByCount.mockReturnValue([
+        { name: 'thunderbolt', count: 5 },
+      ]);
       expect(service.getAllMoves()).toHaveLength(1);
     });
   });
 
   describe('getMove()', () => {
     it('delegates to moveDataService.getMove', () => {
-      mockMoveDataService.getMove.mockReturnValue({ attackName: 'Thunderbolt' });
+      mockMoveDataService.getMove.mockReturnValue({
+        attackName: 'Thunderbolt',
+      });
       expect(service.getMove('thunderbolt')?.attackName).toBe('Thunderbolt');
     });
   });
@@ -231,7 +263,9 @@ describe('PokemonDataManagementService', () => {
 
   describe('getSpawnByPokemon()', () => {
     it('delegates to spawnDataService.getSpawnByPokemon', () => {
-      mockSpawnDataService.getSpawnByPokemon.mockReturnValue([{ pokemonName: 'pikachu' }]);
+      mockSpawnDataService.getSpawnByPokemon.mockReturnValue([
+        { pokemonName: 'pikachu' },
+      ]);
       expect(service.getSpawnByPokemon('pikachu_base')).toHaveLength(1);
     });
   });
@@ -247,7 +281,9 @@ describe('PokemonDataManagementService', () => {
 
   describe('getWordleData()', () => {
     it('delegates to pokemonDataService.getWordleData', () => {
-      mockPokemonDataService.getWordleData.mockReturnValue([{ name: 'pikachu_base' }]);
+      mockPokemonDataService.getWordleData.mockReturnValue([
+        { name: 'pikachu_base' },
+      ]);
       expect(service.getWordleData()).toHaveLength(1);
     });
   });
@@ -278,7 +314,9 @@ describe('PokemonDataManagementService', () => {
     });
 
     it('returns a dex-formatted portrait URL for a matched pokemon', async () => {
-      mockPokemonDataService.getAllSpecies.mockReturnValue([makePokemon(25, 'pikachu')]);
+      mockPokemonDataService.getAllSpecies.mockReturnValue([
+        makePokemon(25, 'pikachu'),
+      ]);
       const result = await service.getPmdPortrait('pikachu');
       expect(result.url).toBe('/smartrotom/img/pmd/portrait/0025/Normal.png');
     });

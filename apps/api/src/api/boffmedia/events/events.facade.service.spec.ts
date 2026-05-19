@@ -21,11 +21,24 @@ describe('EventsFacadeService', () => {
   let eventsService: jest.Mocked<
     Pick<
       EventsService,
-      'getAllEvents' | 'getEventById' | 'createEvent' | 'updateEvent' | 'deleteEvent' | 'validateEventExists'
+      | 'getAllEvents'
+      | 'getEventById'
+      | 'createEvent'
+      | 'updateEvent'
+      | 'deleteEvent'
+      | 'validateEventExists'
     >
   >;
   let gamesService: jest.Mocked<
-    Pick<GamesService, 'getAllGames' | 'getGameById' | 'createGame' | 'updateGame' | 'deleteGame' | 'validateGameExists'>
+    Pick<
+      GamesService,
+      | 'getAllGames'
+      | 'getGameById'
+      | 'createGame'
+      | 'updateGame'
+      | 'deleteGame'
+      | 'validateGameExists'
+    >
   >;
   let achievementsService: jest.Mocked<
     Pick<
@@ -202,7 +215,9 @@ describe('EventsFacadeService', () => {
     it('should throw if game not found', async () => {
       gamesService.validateGameExists.mockResolvedValue(false);
 
-      await expect(service.createEvent({ name: 'T', gameId: 99 } as any)).rejects.toThrow('Game not found');
+      await expect(
+        service.createEvent({ name: 'T', gameId: 99 } as any),
+      ).rejects.toThrow('Game not found');
     });
 
     it('should convert parentId -1 to null', async () => {
@@ -231,7 +246,9 @@ describe('EventsFacadeService', () => {
     it('should throw if event not found', async () => {
       eventsService.validateEventExists.mockResolvedValue(false);
 
-      await expect(service.updateEvent(99, {} as any)).rejects.toThrow('Event not found');
+      await expect(service.updateEvent(99, {} as any)).rejects.toThrow(
+        'Event not found',
+      );
     });
   });
 
@@ -298,7 +315,9 @@ describe('EventsFacadeService', () => {
     it('should throw if game not found', async () => {
       gamesService.validateGameExists.mockResolvedValue(false);
 
-      await expect(service.updateGame(99, {} as any)).rejects.toThrow('Game not found');
+      await expect(service.updateGame(99, {} as any)).rejects.toThrow(
+        'Game not found',
+      );
     });
   });
 
@@ -323,7 +342,9 @@ describe('EventsFacadeService', () => {
 
   describe('getAchievements', () => {
     it('should return all achievements', async () => {
-      achievementsService.getAllAchievements.mockResolvedValue([mockAchievement] as any);
+      achievementsService.getAllAchievements.mockResolvedValue([
+        mockAchievement,
+      ] as any);
 
       const result = await service.getAchievements();
 
@@ -334,7 +355,9 @@ describe('EventsFacadeService', () => {
   describe('getEventAchievements', () => {
     it('should return event achievements when event exists', async () => {
       eventsService.validateEventExists.mockResolvedValue(true);
-      achievementsService.getAchievementsByEventId.mockResolvedValue([mockAchievement] as any);
+      achievementsService.getAchievementsByEventId.mockResolvedValue([
+        mockAchievement,
+      ] as any);
 
       const result = await service.getEventAchievements(1);
 
@@ -344,14 +367,18 @@ describe('EventsFacadeService', () => {
     it('should throw if event not found', async () => {
       eventsService.validateEventExists.mockResolvedValue(false);
 
-      await expect(service.getEventAchievements(99)).rejects.toThrow('Event not found');
+      await expect(service.getEventAchievements(99)).rejects.toThrow(
+        'Event not found',
+      );
     });
   });
 
   describe('createAchievement', () => {
     it('should create achievement when event exists', async () => {
       eventsService.validateEventExists.mockResolvedValue(true);
-      achievementsService.createAchievement.mockResolvedValue(mockAchievement as any);
+      achievementsService.createAchievement.mockResolvedValue(
+        mockAchievement as any,
+      );
 
       const result = await service.createAchievement(1, { name: 'Win' } as any);
 
@@ -361,7 +388,9 @@ describe('EventsFacadeService', () => {
     it('should throw if event not found', async () => {
       eventsService.validateEventExists.mockResolvedValue(false);
 
-      await expect(service.createAchievement(99, {} as any)).rejects.toThrow('Event not found');
+      await expect(service.createAchievement(99, {} as any)).rejects.toThrow(
+        'Event not found',
+      );
     });
   });
 
@@ -369,9 +398,13 @@ describe('EventsFacadeService', () => {
     it('should update achievement when both event and achievement exist', async () => {
       eventsService.validateEventExists.mockResolvedValue(true);
       achievementsService.validateAchievementExists.mockResolvedValue(true);
-      achievementsService.updateAchievement.mockResolvedValue(mockAchievement as any);
+      achievementsService.updateAchievement.mockResolvedValue(
+        mockAchievement as any,
+      );
 
-      const result = await service.updateAchievement(1, 1, { name: 'Updated' } as any);
+      const result = await service.updateAchievement(1, 1, {
+        name: 'Updated',
+      } as any);
 
       expect(result).toEqual(mockAchievement);
     });
@@ -380,14 +413,18 @@ describe('EventsFacadeService', () => {
       eventsService.validateEventExists.mockResolvedValue(false);
       achievementsService.validateAchievementExists.mockResolvedValue(true);
 
-      await expect(service.updateAchievement(99, 1, {} as any)).rejects.toThrow('Event not found');
+      await expect(service.updateAchievement(99, 1, {} as any)).rejects.toThrow(
+        'Event not found',
+      );
     });
 
     it('should throw if achievement not found', async () => {
       eventsService.validateEventExists.mockResolvedValue(true);
       achievementsService.validateAchievementExists.mockResolvedValue(false);
 
-      await expect(service.updateAchievement(1, 99, {} as any)).rejects.toThrow('Achievement not found');
+      await expect(service.updateAchievement(1, 99, {} as any)).rejects.toThrow(
+        'Achievement not found',
+      );
     });
   });
 
@@ -416,7 +453,9 @@ describe('EventsFacadeService', () => {
     it('should throw if event not found', async () => {
       eventsService.validateEventExists.mockResolvedValue(false);
 
-      await expect(service.getEventTeams(99)).rejects.toThrow('Event not found');
+      await expect(service.getEventTeams(99)).rejects.toThrow(
+        'Event not found',
+      );
     });
   });
 
@@ -424,7 +463,17 @@ describe('EventsFacadeService', () => {
     it('should return normalized team members', async () => {
       teamsService.validateTeamExists.mockResolvedValue(true);
       teamsService.getTeamMembers.mockResolvedValue([
-        { userId: 1, teamId: 1, participantId: 1, username: 'Ash', displayName: 'Ash K', avatar: null, role: 'member', joinedAt: new Date(), updatedAt: new Date() },
+        {
+          userId: 1,
+          teamId: 1,
+          participantId: 1,
+          username: 'Ash',
+          displayName: 'Ash K',
+          avatar: null,
+          role: 'member',
+          joinedAt: new Date(),
+          updatedAt: new Date(),
+        },
       ] as any);
 
       const result = await service.getTeamMembers(1);
@@ -436,7 +485,9 @@ describe('EventsFacadeService', () => {
     it('should throw if team not found', async () => {
       teamsService.validateTeamExists.mockResolvedValue(false);
 
-      await expect(service.getTeamMembers(99)).rejects.toThrow('Team not found');
+      await expect(service.getTeamMembers(99)).rejects.toThrow(
+        'Team not found',
+      );
     });
   });
 
@@ -453,7 +504,9 @@ describe('EventsFacadeService', () => {
     it('should throw if event not found', async () => {
       eventsService.validateEventExists.mockResolvedValue(false);
 
-      await expect(service.createTeam(99, {} as any)).rejects.toThrow('Event not found');
+      await expect(service.createTeam(99, {} as any)).rejects.toThrow(
+        'Event not found',
+      );
     });
   });
 
@@ -474,7 +527,9 @@ describe('EventsFacadeService', () => {
       teamsService.validateTeamExists.mockResolvedValue(true);
       teamsService.validateTeamInEvent.mockResolvedValue(false);
 
-      await expect(service.updateTeam(1, 2, {} as any)).rejects.toThrow('Team does not belong to this event');
+      await expect(service.updateTeam(1, 2, {} as any)).rejects.toThrow(
+        'Team does not belong to this event',
+      );
     });
   });
 
@@ -482,7 +537,9 @@ describe('EventsFacadeService', () => {
 
   describe('getLeaderboards', () => {
     it('should return global leaderboard', async () => {
-      leaderboardsService.getGlobalLeaderboard.mockResolvedValue([mockLeaderboardEntry] as any);
+      leaderboardsService.getGlobalLeaderboard.mockResolvedValue([
+        mockLeaderboardEntry,
+      ] as any);
 
       const result = await service.getLeaderboards();
 
@@ -493,7 +550,9 @@ describe('EventsFacadeService', () => {
   describe('getLeaderboard', () => {
     it('should return event leaderboard when event exists', async () => {
       eventsService.validateEventExists.mockResolvedValue(true);
-      leaderboardsService.getEventLeaderboard.mockResolvedValue([mockLeaderboardEntry] as any);
+      leaderboardsService.getEventLeaderboard.mockResolvedValue([
+        mockLeaderboardEntry,
+      ] as any);
 
       const result = await service.getLeaderboard(1);
 
@@ -503,7 +562,9 @@ describe('EventsFacadeService', () => {
     it('should throw if event not found', async () => {
       eventsService.validateEventExists.mockResolvedValue(false);
 
-      await expect(service.getLeaderboard(99)).rejects.toThrow('Event not found');
+      await expect(service.getLeaderboard(99)).rejects.toThrow(
+        'Event not found',
+      );
     });
   });
 });

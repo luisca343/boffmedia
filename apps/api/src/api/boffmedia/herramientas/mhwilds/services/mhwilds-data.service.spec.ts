@@ -55,20 +55,26 @@ describe('MhwildsDataService', () => {
 
     it('throws on repository error', async () => {
       mockRepo.getWeapons.mockRejectedValue(new Error('timeout'));
-      await expect(service.getWeapons('en')).rejects.toThrow('Failed to get weapons');
+      await expect(service.getWeapons('en')).rejects.toThrow(
+        'Failed to get weapons',
+      );
     });
   });
 
   describe('getArmor()', () => {
     it('returns armor data', async () => {
-      mockRepo.getArmor.mockResolvedValue(makeWeaponsResult([{ id: 1, rarity: 5 }]));
+      mockRepo.getArmor.mockResolvedValue(
+        makeWeaponsResult([{ id: 1, rarity: 5 }]),
+      );
       const result = await service.getArmor('en');
       expect(result.data[0].rarity).toBe(5);
     });
 
     it('throws on repository error', async () => {
       mockRepo.getArmor.mockRejectedValue(new Error('fail'));
-      await expect(service.getArmor('en')).rejects.toThrow('Failed to get armor');
+      await expect(service.getArmor('en')).rejects.toThrow(
+        'Failed to get armor',
+      );
     });
   });
 
@@ -101,7 +107,14 @@ describe('MhwildsDataService', () => {
   describe('getAllCharmRanks()', () => {
     it('flattens all charm ranks with charm reference', async () => {
       const charms = [
-        { id: 10, gameId: 100, ranks: [{ id: 1, level: 1 }, { id: 2, level: 2 }] },
+        {
+          id: 10,
+          gameId: 100,
+          ranks: [
+            { id: 1, level: 1 },
+            { id: 2, level: 2 },
+          ],
+        },
         { id: 11, gameId: 101, ranks: [{ id: 3, level: 1 }] },
       ];
       mockRepo.getCharms.mockResolvedValue(makeWeaponsResult(charms));
@@ -115,7 +128,9 @@ describe('MhwildsDataService', () => {
 
     it('throws on repository error', async () => {
       mockRepo.getCharms.mockRejectedValue(new Error('db fail'));
-      await expect(service.getAllCharmRanks('en')).rejects.toThrow('Failed to get charm ranks');
+      await expect(service.getAllCharmRanks('en')).rejects.toThrow(
+        'Failed to get charm ranks',
+      );
     });
   });
 
@@ -159,7 +174,9 @@ describe('MhwildsDataService', () => {
 
     it('throws on error', async () => {
       mockRepo.getProcessedData.mockRejectedValue(new Error('fail'));
-      await expect(service.createWeaponTree('en')).rejects.toThrow('Failed to create weapon tree');
+      await expect(service.createWeaponTree('en')).rejects.toThrow(
+        'Failed to create weapon tree',
+      );
     });
   });
 
@@ -201,7 +218,10 @@ describe('MhwildsDataService', () => {
 
   describe('getArmorByRarity()', () => {
     it('filters armor by exact rarity', async () => {
-      const armor = [{ id: 1, rarity: 5 }, { id: 2, rarity: 3 }];
+      const armor = [
+        { id: 1, rarity: 5 },
+        { id: 2, rarity: 3 },
+      ];
       mockRepo.getArmor.mockResolvedValue(makeWeaponsResult(armor));
 
       const result = await service.getArmorByRarity('en', 5);
@@ -215,11 +235,25 @@ describe('MhwildsDataService', () => {
 
   describe('getDataStatistics()', () => {
     it('returns aggregate counts across all resource types', async () => {
-      mockRepo.getWeapons.mockResolvedValue(makeWeaponsResult([{ kind: 'bow' }, { kind: 'bow' }, { kind: 'sword-and-shield' }]));
-      mockRepo.getArmor.mockResolvedValue(makeWeaponsResult([{ rarity: 5 }, { rarity: 5 }]));
-      mockRepo.getCharms.mockResolvedValue(makeWeaponsResult([{ ranks: [{ level: 1 }] }]));
-      mockRepo.getDecorations.mockResolvedValue(makeWeaponsResult([{ rarity: 3 }]));
-      mockRepo.getSkills.mockResolvedValue(makeWeaponsResult([{ id: 1 }, { id: 2 }]));
+      mockRepo.getWeapons.mockResolvedValue(
+        makeWeaponsResult([
+          { kind: 'bow' },
+          { kind: 'bow' },
+          { kind: 'sword-and-shield' },
+        ]),
+      );
+      mockRepo.getArmor.mockResolvedValue(
+        makeWeaponsResult([{ rarity: 5 }, { rarity: 5 }]),
+      );
+      mockRepo.getCharms.mockResolvedValue(
+        makeWeaponsResult([{ ranks: [{ level: 1 }] }]),
+      );
+      mockRepo.getDecorations.mockResolvedValue(
+        makeWeaponsResult([{ rarity: 3 }]),
+      );
+      mockRepo.getSkills.mockResolvedValue(
+        makeWeaponsResult([{ id: 1 }, { id: 2 }]),
+      );
 
       const result = await service.getDataStatistics('en');
 
@@ -232,7 +266,9 @@ describe('MhwildsDataService', () => {
 
     it('throws on any sub-fetch error', async () => {
       mockRepo.getWeapons.mockRejectedValue(new Error('db fail'));
-      await expect(service.getDataStatistics('en')).rejects.toThrow('Failed to get data statistics');
+      await expect(service.getDataStatistics('en')).rejects.toThrow(
+        'Failed to get data statistics',
+      );
     });
   });
 });

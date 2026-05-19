@@ -22,7 +22,10 @@ export class SharexController {
   constructor(private readonly sharexService: SharexService) {}
   @Post()
   @UseInterceptors(FileInterceptor('file'))
-  async post(@UploadedFile() file: Express.Multer.File, @Body() body: SharexUploadDto) {
+  async post(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() body: SharexUploadDto,
+  ) {
     if (!file) {
       throw new BadRequestException('No file uploaded');
     }

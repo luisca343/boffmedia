@@ -53,7 +53,13 @@ describe('PokedexManagementService', () => {
       mockRepo.findPokedexRegistry.mockResolvedValue(null);
       mockRepo.createPokedexRegistry.mockResolvedValue({ success: true });
 
-      const result = await service.registerPokemon('uuid-1', 25, 'base', 'none', 0);
+      const result = await service.registerPokemon(
+        'uuid-1',
+        25,
+        'base',
+        'none',
+        0,
+      );
 
       expect(mockRepo.createPokedexRegistry).toHaveBeenCalled();
       expect(result).toMatchObject({ success: true, isNew: true });
@@ -73,7 +79,13 @@ describe('PokedexManagementService', () => {
       mockRepo.findPokedexRegistry.mockResolvedValue({ caughtAt: null });
       mockRepo.updatePokedexRegistry.mockResolvedValue({ success: true });
 
-      const result = await service.registerPokemon('uuid-1', 25, 'base', 'none', 1);
+      const result = await service.registerPokemon(
+        'uuid-1',
+        25,
+        'base',
+        'none',
+        1,
+      );
 
       expect(mockRepo.updatePokedexRegistry).toHaveBeenCalled();
       expect(result).toMatchObject({ success: true, wasUpdated: true });
@@ -82,7 +94,13 @@ describe('PokedexManagementService', () => {
     it('returns already-registered message when registry exists with correct status', async () => {
       mockRepo.findPokedexRegistry.mockResolvedValue({ caughtAt: new Date() });
 
-      const result = await service.registerPokemon('uuid-1', 25, 'base', 'none', 1);
+      const result = await service.registerPokemon(
+        'uuid-1',
+        25,
+        'base',
+        'none',
+        1,
+      );
 
       expect(result.success).toBe(false);
       expect(result.message).toContain('already registered');
@@ -91,7 +109,13 @@ describe('PokedexManagementService', () => {
     it('returns failure on repo error', async () => {
       mockRepo.findPokedexRegistry.mockRejectedValue(new Error('db timeout'));
 
-      const result = await service.registerPokemon('uuid-1', 25, 'base', 'none', 0);
+      const result = await service.registerPokemon(
+        'uuid-1',
+        25,
+        'base',
+        'none',
+        0,
+      );
 
       expect(result.success).toBe(false);
       expect(result.message).toContain('Registration failed');
@@ -103,7 +127,12 @@ describe('PokedexManagementService', () => {
 
       await service.registerPokemon('uuid-1', 25, '', '', 0);
 
-      expect(mockRepo.findPokedexRegistry).toHaveBeenCalledWith('uuid-1', 25, 'base', 'none');
+      expect(mockRepo.findPokedexRegistry).toHaveBeenCalledWith(
+        'uuid-1',
+        25,
+        'base',
+        'none',
+      );
     });
   });
 
@@ -112,9 +141,17 @@ describe('PokedexManagementService', () => {
   describe('bulkUpdateDex()', () => {
     it('inserts new seen and caught pokemon, skipping duplicates', async () => {
       mockRepo.getAllUserPokedexRegistries.mockResolvedValue([
-        { pokemonId: 1, formId: 'base', paletteId: 'none', seenAt: new Date(), caughtAt: null },
+        {
+          pokemonId: 1,
+          formId: 'base',
+          paletteId: 'none',
+          seenAt: new Date(),
+          caughtAt: null,
+        },
       ]);
-      mockRepo.bulkInsertPokedexRegistries.mockResolvedValue({ insertedCount: 2 });
+      mockRepo.bulkInsertPokedexRegistries.mockResolvedValue({
+        insertedCount: 2,
+      });
 
       const result = await service.bulkUpdateDex('uuid-1', {
         SEEN: [2, 3],
@@ -127,20 +164,43 @@ describe('PokedexManagementService', () => {
 
     it('upgrades seen-only pokemon to caught', async () => {
       mockRepo.getAllUserPokedexRegistries.mockResolvedValue([
-        { pokemonId: 25, formId: 'base', paletteId: 'none', seenAt: new Date(), caughtAt: null },
+        {
+          pokemonId: 25,
+          formId: 'base',
+          paletteId: 'none',
+          seenAt: new Date(),
+          caughtAt: null,
+        },
       ]);
-      mockRepo.bulkInsertPokedexRegistries.mockResolvedValue({ insertedCount: 0 });
-      mockRepo.bulkUpdatePokedexRegistriesStatus.mockResolvedValue({ updatedCount: 1 });
+      mockRepo.bulkInsertPokedexRegistries.mockResolvedValue({
+        insertedCount: 0,
+      });
+      mockRepo.bulkUpdatePokedexRegistriesStatus.mockResolvedValue({
+        updatedCount: 1,
+      });
 
-      const result = await service.bulkUpdateDex('uuid-1', { SEEN: [], CAUGHT: [25] });
+      const result = await service.bulkUpdateDex('uuid-1', {
+        SEEN: [],
+        CAUGHT: [25],
+      });
 
-      expect(mockRepo.bulkUpdatePokedexRegistriesStatus).toHaveBeenCalledWith('uuid-1', [25], 'caught');
+      expect(mockRepo.bulkUpdatePokedexRegistriesStatus).toHaveBeenCalledWith(
+        'uuid-1',
+        [25],
+        'caught',
+      );
       expect(result.success).toBe(true);
     });
 
     it('skips already-caught pokemon without updating', async () => {
       mockRepo.getAllUserPokedexRegistries.mockResolvedValue([
-        { pokemonId: 1, formId: 'base', paletteId: 'none', seenAt: new Date(), caughtAt: new Date() },
+        {
+          pokemonId: 1,
+          formId: 'base',
+          paletteId: 'none',
+          seenAt: new Date(),
+          caughtAt: new Date(),
+        },
       ]);
 
       await service.bulkUpdateDex('uuid-1', { SEEN: [], CAUGHT: [1] });
@@ -149,9 +209,14 @@ describe('PokedexManagementService', () => {
     });
 
     it('returns failure on error', async () => {
-      mockRepo.getAllUserPokedexRegistries.mockRejectedValue(new Error('db error'));
+      mockRepo.getAllUserPokedexRegistries.mockRejectedValue(
+        new Error('db error'),
+      );
 
-      const result = await service.bulkUpdateDex('uuid-1', { SEEN: [1], CAUGHT: [] });
+      const result = await service.bulkUpdateDex('uuid-1', {
+        SEEN: [1],
+        CAUGHT: [],
+      });
 
       expect(result.success).toBe(false);
       expect(result.message).toContain('Bulk update failed');
@@ -167,7 +232,10 @@ describe('PokedexManagementService', () => {
 
       const result = await service.getPokedexStatistics('uuid-1');
 
-      expect(mockRepo.getPokedexStatistics).toHaveBeenCalledWith('uuid-1', 1025);
+      expect(mockRepo.getPokedexStatistics).toHaveBeenCalledWith(
+        'uuid-1',
+        1025,
+      );
       expect(result).toEqual({ seen: 50, caught: 30 });
     });
 
@@ -175,7 +243,9 @@ describe('PokedexManagementService', () => {
       mockDataManagement.countPokemon.mockReturnValue(0);
       mockRepo.getPokedexStatistics.mockRejectedValue(new Error('repo error'));
 
-      await expect(service.getPokedexStatistics('uuid-1')).rejects.toThrow('Pokedex statistics retrieval failed');
+      await expect(service.getPokedexStatistics('uuid-1')).rejects.toThrow(
+        'Pokedex statistics retrieval failed',
+      );
     });
   });
 
@@ -184,19 +254,32 @@ describe('PokedexManagementService', () => {
   describe('getPokedexRegistries()', () => {
     it('enhances each registry with pokemon name', async () => {
       mockRepo.getUserPokedexRegistries.mockResolvedValue([
-        { pokemonId: 25, formId: 'base', paletteId: 'none', seenAt: new Date() },
+        {
+          pokemonId: 25,
+          formId: 'base',
+          paletteId: 'none',
+          seenAt: new Date(),
+        },
       ]);
       mockDataManagement.getPokemonByDex.mockReturnValue({ name: 'Pikachu' });
 
       const result = await service.getPokedexRegistries('uuid-1', 10);
 
       expect(result[0].pokemonName).toBe('Pikachu');
-      expect(mockRepo.getUserPokedexRegistries).toHaveBeenCalledWith('uuid-1', 10);
+      expect(mockRepo.getUserPokedexRegistries).toHaveBeenCalledWith(
+        'uuid-1',
+        10,
+      );
     });
 
     it('uses "Unknown" when pokemon not found by dex', async () => {
       mockRepo.getUserPokedexRegistries.mockResolvedValue([
-        { pokemonId: 9999, formId: 'base', paletteId: 'none', seenAt: new Date() },
+        {
+          pokemonId: 9999,
+          formId: 'base',
+          paletteId: 'none',
+          seenAt: new Date(),
+        },
       ]);
       mockDataManagement.getPokemonByDex.mockReturnValue(null);
 

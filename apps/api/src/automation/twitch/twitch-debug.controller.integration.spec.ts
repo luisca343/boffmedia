@@ -7,7 +7,12 @@ import { TwitchApiService } from './services/twitch-api.service';
 import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter';
 import { Logger } from 'nestjs-pino';
 
-const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn() };
+const mockLogger = {
+  log: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  debug: jest.fn(),
+};
 
 const mockTwitchApi = {
   getStreamByUsername: jest.fn(),
@@ -33,7 +38,9 @@ describe('TwitchDebugController — integration', () => {
     }).compile();
 
     app = moduleRef.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
+    );
     app.useGlobalFilters(new GlobalExceptionFilter(mockLogger as any));
     await app.init();
   });
@@ -50,8 +57,9 @@ describe('TwitchDebugController — integration', () => {
     it('should return live stream details when user is streaming', async () => {
       mockTwitchApi.getStreamByUsername.mockResolvedValue(mockStream);
 
-      const res = await request(app.getHttpServer())
-        .get('/automation/twitch/debug/check-user/someuser');
+      const res = await request(app.getHttpServer()).get(
+        '/automation/twitch/debug/check-user/someuser',
+      );
 
       expect(res.status).toBe(200);
       expect(res.body.username).toBe('someuser');
@@ -68,8 +76,9 @@ describe('TwitchDebugController — integration', () => {
     it('should return isLive false when user is not streaming', async () => {
       mockTwitchApi.getStreamByUsername.mockResolvedValue(null);
 
-      const res = await request(app.getHttpServer())
-        .get('/automation/twitch/debug/check-user/offlineuser');
+      const res = await request(app.getHttpServer()).get(
+        '/automation/twitch/debug/check-user/offlineuser',
+      );
 
       expect(res.status).toBe(200);
       expect(res.body.isLive).toBe(false);
@@ -84,8 +93,9 @@ describe('TwitchDebugController — integration', () => {
         tags: ['minecraft'],
       });
 
-      const res = await request(app.getHttpServer())
-        .get('/automation/twitch/debug/check-user/normalstreamer');
+      const res = await request(app.getHttpServer()).get(
+        '/automation/twitch/debug/check-user/normalstreamer',
+      );
 
       expect(res.status).toBe(200);
       expect(res.body.isLive).toBe(true);
@@ -93,10 +103,13 @@ describe('TwitchDebugController — integration', () => {
     });
 
     it('should return error object when TwitchApiService throws', async () => {
-      mockTwitchApi.getStreamByUsername.mockRejectedValue(new Error('Twitch API unavailable'));
+      mockTwitchApi.getStreamByUsername.mockRejectedValue(
+        new Error('Twitch API unavailable'),
+      );
 
-      const res = await request(app.getHttpServer())
-        .get('/automation/twitch/debug/check-user/anyuser');
+      const res = await request(app.getHttpServer()).get(
+        '/automation/twitch/debug/check-user/anyuser',
+      );
 
       expect(res.status).toBe(200);
       expect(res.body.error).toBe('Twitch API unavailable');
@@ -111,8 +124,9 @@ describe('TwitchDebugController — integration', () => {
         tags: [],
       });
 
-      const res = await request(app.getHttpServer())
-        .get('/automation/twitch/debug/check-user/titleuser');
+      const res = await request(app.getHttpServer()).get(
+        '/automation/twitch/debug/check-user/titleuser',
+      );
 
       expect(res.status).toBe(200);
       expect(res.body.containsWingull).toBe(true);

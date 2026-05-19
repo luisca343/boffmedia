@@ -28,13 +28,14 @@ const mockMessageRepo = {
 
 const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn() };
 
-const makeDbMsg = (id: number, uuid = 'player-uuid', content = 'hello') => ({
-  id,
-  content,
-  uuid,
-  type: 'text',
-  createdAt: new Date('2026-01-01'),
-} as any);
+const makeDbMsg = (id: number, uuid = 'player-uuid', content = 'hello') =>
+  ({
+    id,
+    content,
+    uuid,
+    type: 'text',
+    createdAt: new Date('2026-01-01'),
+  }) as any;
 
 describe('MessageService', () => {
   let service: MessageService;
@@ -100,7 +101,11 @@ describe('MessageService', () => {
       mockChatRepo.findChatById.mockResolvedValue(null);
 
       await expect(
-        service.createMessage(99, { message: 'Hi', uuid: 'uuid', type: 'text' }),
+        service.createMessage(99, {
+          message: 'Hi',
+          uuid: 'uuid',
+          type: 'text',
+        }),
       ).rejects.toThrow('Chat not found');
     });
 
@@ -165,15 +170,19 @@ describe('MessageService', () => {
     it('throws when message not found', async () => {
       mockMessageRepo.findMessageById.mockResolvedValue(null);
 
-      await expect(service.updateMessage(99, 'X', 'uuid')).rejects.toThrow('Message not found');
+      await expect(service.updateMessage(99, 'X', 'uuid')).rejects.toThrow(
+        'Message not found',
+      );
     });
 
     it('throws when sender does not own the message', async () => {
-      mockMessageRepo.findMessageById.mockResolvedValue(makeDbMsg(1, 'owner-uuid'));
-
-      await expect(service.updateMessage(1, 'Hack', 'other-uuid')).rejects.toThrow(
-        'does not have permission',
+      mockMessageRepo.findMessageById.mockResolvedValue(
+        makeDbMsg(1, 'owner-uuid'),
       );
+
+      await expect(
+        service.updateMessage(1, 'Hack', 'other-uuid'),
+      ).rejects.toThrow('does not have permission');
     });
   });
 
@@ -181,15 +190,21 @@ describe('MessageService', () => {
 
   describe('deleteMessage()', () => {
     it('deletes message when sender matches', async () => {
-      mockMessageRepo.findMessageById.mockResolvedValue(makeDbMsg(1, 'player-uuid'));
+      mockMessageRepo.findMessageById.mockResolvedValue(
+        makeDbMsg(1, 'player-uuid'),
+      );
       mockMessageRepo.deleteMessage.mockResolvedValue(undefined);
 
-      await expect(service.deleteMessage(1, 'player-uuid')).resolves.toBeUndefined();
+      await expect(
+        service.deleteMessage(1, 'player-uuid'),
+      ).resolves.toBeUndefined();
       expect(mockMessageRepo.deleteMessage).toHaveBeenCalledWith(1);
     });
 
     it('throws when sender does not own the message', async () => {
-      mockMessageRepo.findMessageById.mockResolvedValue(makeDbMsg(1, 'owner-uuid'));
+      mockMessageRepo.findMessageById.mockResolvedValue(
+        makeDbMsg(1, 'owner-uuid'),
+      );
 
       await expect(service.deleteMessage(1, 'other-uuid')).rejects.toThrow(
         'does not have permission',
