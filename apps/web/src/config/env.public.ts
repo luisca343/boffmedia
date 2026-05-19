@@ -1,6 +1,8 @@
 import { z } from 'zod';
 
-// Safe to import in client components — only NEXT_PUBLIC_* and NODE_ENV.
+// Each var is referenced directly so Next.js inlines the value at build time.
+// Passing `process.env` as a whole object does NOT work on the client — Next.js
+// only performs static replacement for explicit `process.env.NEXT_PUBLIC_*` accesses.
 export const env = z
   .object({
     NODE_ENV: z.string().default('development'),
@@ -13,4 +15,14 @@ export const env = z
     NEXT_PUBLIC_TWITCH_CLIENT_ID: z.string().default(''),
     NEXT_PUBLIC_TWITCH_CLIENT_SECRET: z.string().default(''),
   })
-  .parse(process.env);
+  .parse({
+    NODE_ENV: process.env.NODE_ENV,
+    NEXT_PUBLIC_API: process.env.NEXT_PUBLIC_API,
+    NEXT_PUBLIC_TERAS_API: process.env.NEXT_PUBLIC_TERAS_API,
+    NEXT_PUBLIC_MC_WORLD: process.env.NEXT_PUBLIC_MC_WORLD,
+    NEXT_PUBLIC_SOCKET_URL: process.env.NEXT_PUBLIC_SOCKET_URL,
+    NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
+    NEXT_PUBLIC_ROTOM_API_URL: process.env.NEXT_PUBLIC_ROTOM_API_URL,
+    NEXT_PUBLIC_TWITCH_CLIENT_ID: process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID,
+    NEXT_PUBLIC_TWITCH_CLIENT_SECRET: process.env.NEXT_PUBLIC_TWITCH_CLIENT_SECRET,
+  });
