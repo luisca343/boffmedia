@@ -3,12 +3,13 @@ import axios, { AxiosResponse } from 'axios';
 import { WingullBalanceDto } from '../dto/wingull-balance.dto';
 import { IWingullEconomyRepository } from './interfaces/wingull-economy.repository.interface';
 import { Logger } from 'nestjs-pino';
+import { env } from '@/config/env';
 
 @Injectable()
 export class WingullEconomyRepository implements IWingullEconomyRepository {
   constructor(private readonly logger: Logger) {}
 
-  private readonly WINGULL_API_BASE_URL = process.env.WINGULL_API;
+  private readonly WINGULL_API_BASE_URL = env.WINGULL_API;
   private readonly DEFAULT_TIMEOUT = 10000;
 
   async updateBalanceInAPI(balanceData: WingullBalanceDto): Promise<any> {

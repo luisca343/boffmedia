@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { env } from '@/config/env.public';
 import type { SpeciesEntry } from '../types';
 
 // Module-level cache keyed by regulationId — fetched once per key per page load.
@@ -11,7 +12,7 @@ async function loadSpecies(regulationId: string): Promise<SpeciesEntry[]> {
   if (!regulationId) return [];
   if (_cache[regulationId]) return _cache[regulationId];
   if (!_fetchPromise[regulationId]) {
-    const apiBase = process.env.NEXT_PUBLIC_API ?? '';
+    const apiBase = env.NEXT_PUBLIC_API;
     _fetchPromise[regulationId] = fetch(
       `${apiBase}/tools/vgc/champions/${regulationId}/pokemon`,
       { next: { revalidate: 0 } },

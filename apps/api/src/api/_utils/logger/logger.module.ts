@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common';
 import { LoggerModule as PinoLoggerModule } from 'nestjs-pino';
+import { env } from '@/config/env';
 
 @Module({
   imports: [
     PinoLoggerModule.forRoot({
       pinoHttp: {
-        level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
+        level: env.NODE_ENV === 'production' ? 'info' : 'debug',
         transport:
-          process.env.NODE_ENV !== 'production'
+          env.NODE_ENV !== 'production'
             ? {
                 target: 'pino-pretty',
                 options: { colorize: true, singleLine: false },
@@ -15,7 +16,7 @@ import { LoggerModule as PinoLoggerModule } from 'nestjs-pino';
             : undefined,
         customProps: () => ({
           service: 'boffmedia-api',
-          environment: process.env.NODE_ENV,
+          environment: env.NODE_ENV,
         }),
         redact: [
           'req.headers.authorization',

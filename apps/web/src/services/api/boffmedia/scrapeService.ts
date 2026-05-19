@@ -1,4 +1,5 @@
 import { apiGET, apiPATCH, apiPOST } from '@/services/boffAPI';
+import { env } from '@/config/env.public';
 import type {
   LocalGamesResult,
   CatalogSearchResult,
@@ -136,7 +137,7 @@ export class ScrapeService {
   }
 
   static getServeFileUrl(consoleKey: string, filename: string): string {
-    const apiUrl = process.env.NEXT_PUBLIC_API ?? '';
+    const apiUrl = env.NEXT_PUBLIC_API;
     return `${apiUrl}/boffmedia/herramientas/scrape/myrient/serve-file?console=${encodeURIComponent(consoleKey)}&filename=${encodeURIComponent(filename)}`;
   }
 
@@ -182,7 +183,7 @@ export class ScrapeService {
     body: { url: string; from?: number; to?: number; skipDownloaded?: boolean },
     onEvent: (event: MangaDownloadSseEvent) => void,
   ): Promise<void> {
-    const apiUrl = process.env.NEXT_PUBLIC_API ?? '';
+    const apiUrl = env.NEXT_PUBLIC_API;
     const res = await fetch(
       `${apiUrl}/boffmedia/herramientas/scrape/manga/download/novel/stream`,
       {
@@ -221,7 +222,7 @@ export class ScrapeService {
     dto: { console: string; games: GameFileEntry[]; concurrency?: number },
     onEvent: (event: SseEvent) => void,
   ): Promise<void> {
-    const apiUrl = process.env.NEXT_PUBLIC_API ?? '';
+    const apiUrl = env.NEXT_PUBLIC_API;
     const res = await fetch(
       `${apiUrl}/boffmedia/herramientas/scrape/myrient/download-selected/stream`,
       {
@@ -267,7 +268,7 @@ export class ScrapeService {
 
   /** Returns a URL suitable for use as an <img src>. No auth needed. */
   static getChapterImageUrl(series: string, chapter: string, page: number): string {
-    const apiUrl = process.env.NEXT_PUBLIC_API ?? '';
+    const apiUrl = env.NEXT_PUBLIC_API;
     const params = new URLSearchParams({ series, chapter, page: String(page) });
     return `${apiUrl}/boffmedia/herramientas/scrape/manga/chapter-image?${params}`;
   }

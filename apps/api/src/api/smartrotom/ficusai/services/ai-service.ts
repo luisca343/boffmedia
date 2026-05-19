@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { GoogleGenAI, Type } from '@google/genai';
+import { env } from '@/config/env';
 import { FicusMessageContentDto } from '../dto/ficus-message-content.dto';
 import { MessagePartType } from '../dto/message-part.dto';
 import { MessageSender } from '../enums/message-sender.enum';
@@ -13,7 +14,7 @@ export class AIService {
 
   async initialize(): Promise<void> {
     if (!this.gemini) {
-      this.gemini = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      this.gemini = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
     }
   }
 

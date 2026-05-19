@@ -7,6 +7,7 @@ import {
   VoiceConnection,
   NoSubscriberBehavior,
 } from '@discordjs/voice';
+import { env } from '@/config/env';
 import { Message } from 'discord.js';
 import { Readable } from 'stream';
 import axios from 'axios';
@@ -90,7 +91,7 @@ export async function downloadAudio(
   voice: string,
   text: string,
 ): Promise<Buffer | null> {
-  const key = process.env.STREAMELEMENTS_KEY;
+  const key = env.STREAMELEMENTS_KEY;
   const url = `https://api.streamelements.com/kappa/v2/speech?voice=${voice}&text=${encodeURIComponent(text)}&key=${key}`;
 
   try {

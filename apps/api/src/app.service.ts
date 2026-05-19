@@ -11,6 +11,7 @@ import { PokemonDataManagementService } from '@api/smartrotom/pokemon/services/p
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { Logger } from 'nestjs-pino';
+import { env } from '@/config/env';
 
 @Injectable()
 export class AppService {
@@ -96,7 +97,7 @@ export class AppService {
     responseTime?: string;
     error?: string;
   }> {
-    const wingullApiUrl = process.env.WINGULL_API;
+    const wingullApiUrl = env.WINGULL_API;
 
     if (!wingullApiUrl) {
       return {

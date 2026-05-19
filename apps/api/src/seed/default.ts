@@ -1,7 +1,11 @@
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 import { and, eq, sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/mysql2';
 import * as mysql from 'mysql2/promise';
 import * as bcrypt from 'bcrypt';
+import { env } from '@/config/env';
 
 import {
   boffMediaRoles,
@@ -14,7 +18,7 @@ import pino from 'pino';
 const logger = pino({ name: 'util' });
 
 async function main() {
-  const DATABASE_URL = process.env.DATABASE_URL;
+  const DATABASE_URL = env.DATABASE_URL;
   if (!DATABASE_URL) throw new Error('DATABASE_URL env var is required');
 
   const connection = await mysql.createConnection(DATABASE_URL);

@@ -1,6 +1,7 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
+import { env } from "@/config/env";
 import { boffPOST } from '@/services/boffAPI';
 import { BoffUser } from "@/types";
 import type { UserRole } from "@boffmedia/shared/roles";
@@ -82,8 +83,8 @@ export const authOptions: NextAuthOptions = {
       }
     }),
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
       authorization: {
         params: {
           prompt: "select_account"
@@ -204,7 +205,7 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
     maxAge: 60 * 60 * 24 * 30, // 30 days
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: env.NEXTAUTH_SECRET,
   cookies: {
     sessionToken: {
       name: `__Secure-next-auth.session-token`,
@@ -213,7 +214,7 @@ export const authOptions: NextAuthOptions = {
         sameSite: 'none',
         path: '/',
         secure: true,
-        domain: process.env.NODE_ENV === 'production' ? '.boffmedia.es' : '.ficuslab.es'
+        domain: env.NODE_ENV === 'production' ? '.boffmedia.es' : '.ficuslab.es'
       }
     }
   } as Partial<CookiesOptions>,

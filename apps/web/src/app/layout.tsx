@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import "./globals.css"
+import { env } from "@/config/env"
 
 
 import { NextIntlClientProvider } from "next-intl"
@@ -10,7 +11,7 @@ import type React from "react" // Import React
 export const revalidate = 60
 
 export const metadata: Metadata = {
-  title: process.env.NODE_ENV === "production" ? "BoffMedia" : "FicusLab",
+  title: env.NODE_ENV === "production" ? "BoffMedia" : "FicusLab",
   description: "BoffMedia",
 }
 

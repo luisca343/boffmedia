@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
+import { env } from '@/config/env';
 import { GoogleStrategy } from './google.strategy';
 import { JwtStrategy } from './jwt.strategy';
 import { AuthService } from './auth.service';
@@ -16,7 +17,7 @@ import { BoffMediaUsersModule } from '@api/boffmedia/users/users.module';
     StarbankModule,
     BoffMediaUsersModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'your-secret-key',
+      secret: env.JWT_SECRET,
       signOptions: { expiresIn: '1h' },
     }),
   ],

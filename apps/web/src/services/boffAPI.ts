@@ -1,3 +1,5 @@
+import { env } from "@/config/env.public";
+
 export interface ApiResponse<T = any> {
   statusCode: number;
   message: string;
@@ -178,27 +180,15 @@ export async function apiAuthedDELETE<T>(url: string, token: string): Promise<Ap
 }
 
 const getApiUrl = (): string => {
-  const apiUrl = process.env.NEXT_PUBLIC_API;
-  if (!apiUrl) {
-    throw new Error("NEXT_PUBLIC_API environment variable is not set");
-  }
-  return apiUrl;
+  return env.NEXT_PUBLIC_API;
 };
 
 const getTerasApiUrl = (): string => {
-  const terasApiUrl = process.env.NEXT_PUBLIC_TERAS_API;
-  if (!terasApiUrl) {
-    throw new Error("NEXT_PUBLIC_TERAS_API environment variable is not set");
-  }
-  return terasApiUrl;
+  return env.NEXT_PUBLIC_TERAS_API;
 };
 
 const getServer = (): string => {
-  const server = process.env.NEXT_PUBLIC_MC_WORLD;
-  if (!server) {
-    throw new Error("NEXT_PUBLIC_MC_WORLD environment variable is not set");
-  }
-  return server;
+  return env.NEXT_PUBLIC_MC_WORLD;
 };
 
 export async function apiGET<T>(url: string): Promise<ApiResponse<T>> {

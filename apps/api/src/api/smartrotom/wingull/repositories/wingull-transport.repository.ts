@@ -4,12 +4,13 @@ import { TeleportRequestDto } from '../dto/teleport-request.dto';
 import { IWingullTransportRepository } from './interfaces/wingull-transport.repository.interface';
 import { TaxiStop } from '../entities/taxi-stop.entity';
 import { Logger } from 'nestjs-pino';
+import { env } from '@/config/env';
 
 @Injectable()
 export class WingullTransportRepository implements IWingullTransportRepository {
   constructor(private readonly logger: Logger) {}
 
-  private readonly WINGULL_API_BASE_URL = process.env.WINGULL_API;
+  private readonly WINGULL_API_BASE_URL = env.WINGULL_API;
   private readonly DEFAULT_TIMEOUT = 10000;
 
   async getTaxiStopsFromAPI(): Promise<TaxiStop[]> {

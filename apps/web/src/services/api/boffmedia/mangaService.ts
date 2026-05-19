@@ -1,4 +1,5 @@
 import { apiGET, apiPOST } from '@/services/boffAPI';
+import { env } from '@/config/env.public';
 import type {
   ChapterEntry,
   DownloadChaptersDto,
@@ -69,7 +70,7 @@ export class MangaService {
     dto: DownloadChaptersDto,
     onEvent: (event: SseEvent) => void,
   ): Promise<void> {
-    const apiUrl = process.env.NEXT_PUBLIC_API ?? '';
+    const apiUrl = env.NEXT_PUBLIC_API;
     const res = await fetch(`${apiUrl}${BASE}/download/stream`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

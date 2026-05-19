@@ -1,3 +1,5 @@
+import { env } from '@/config/env.public';
+
 export interface TwitchStream {
   id: string;
   user_id: string;
@@ -165,5 +167,5 @@ export const getTimeSince = (dateString: string): string => {
 };
 
 // Twitch API configuration (would ideally be in environment variables)
-export const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID || "";
-export const TWITCH_CLIENT_SECRET = process.env.NEXT_PUBLIC_TWITCH_CLIENT_SECRET || "";
+export const TWITCH_CLIENT_ID = env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
+export const TWITCH_CLIENT_SECRET = env.NEXT_PUBLIC_TWITCH_CLIENT_SECRET;

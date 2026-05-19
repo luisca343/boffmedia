@@ -5,6 +5,7 @@
 import axios from 'axios';
 import type { AxiosRequestConfig } from 'axios';
 import pino from 'pino';
+import { env } from '@/config/env';
 
 const logger = pino({ name: 'util' });
 
@@ -25,7 +26,7 @@ async function loadProxyPool(): Promise<string[]> {
   if (proxyPool !== null && Date.now() - proxyPoolLoadedAt < PROXY_POOL_TTL_MS)
     return proxyPool;
 
-  const listUrl = process.env.MANGA_SCRAPER_PROXY_LIST_URL;
+  const listUrl = env.MANGA_SCRAPER_PROXY_LIST_URL;
   if (!listUrl) {
     proxyPool = [];
     return proxyPool;
@@ -62,7 +63,7 @@ export async function getProxy(): Promise<string | undefined> {
   if (pool.length > 0) {
     return pool[Math.floor(Math.random() * pool.length)];
   }
-  return process.env.MANGA_SCRAPER_PROXY || undefined;
+  return env.MANGA_SCRAPER_PROXY || undefined;
 }
 
 /**
@@ -72,7 +73,7 @@ export async function getProxy(): Promise<string | undefined> {
 export async function getProxies(n = 3): Promise<string[]> {
   const pool = await loadProxyPool();
   if (pool.length === 0) {
-    const single = process.env.MANGA_SCRAPER_PROXY;
+    const single = env.MANGA_SCRAPER_PROXY;
     return single ? [single] : [];
   }
   const shuffled = [...pool].sort(() => Math.random() - 0.5);

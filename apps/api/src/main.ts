@@ -2,6 +2,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 import { join } from 'path';
+import { env } from './config/env';
 import * as express from 'express';
 import { AppModule } from './app.module';
 import { NestFactory } from '@nestjs/core';
@@ -45,7 +46,7 @@ async function bootstrap() {
 
   console.log('EL PUERTO ES: ' + configService.get('PORT'));
 
-  if (process.env.NODE_ENV !== 'production') {
+  if (env.NODE_ENV !== 'production') {
     const config = new DocumentBuilder()
       .setTitle('Ficus Labs API')
       .setDescription(
