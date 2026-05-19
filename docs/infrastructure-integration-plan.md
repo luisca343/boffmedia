@@ -32,10 +32,10 @@
 |---|---|---|---|---|
 | 1 | Database backups | Permanent data loss | Half a day | `[~]` cron pending first run |
 | 2 | Prometheus + Grafana wired to app | Blind to production failures | Half a day | `[~]` MariaDB live, API pending deploy |
-| 3 | Automated Portainer deploy | Manual deploys forever, no rollback | 2 hours | `[~]` validate ✅, build ✅ fixed 2026-05-17, deploy ⏳ untested |
+| 3 | Automated Portainer deploy | Manual deploys forever, no rollback | 2 hours | `[d]` deferred — external server config pending |
 | 4 | Structured logging (Pino) | Unqueryable logs, blind debugging | 1 day | `[x]` Done — all console calls replaced, zero TS errors |
-| 5 | Global ValidationPipe + DTOs | Security gaps, inconsistent API | 1 day | `[ ]` |
-| 6 | GitLab CI validate stage | Broken code reaches production | 2 hours | `[ ]` |
+| 5 | Global ValidationPipe + DTOs | Security gaps, inconsistent API | 1 day | `[x]` Done |
+| 6 | GitLab CI validate stage | Broken code reaches production | 2 hours | `[x]` Done |
 | 7 | Strict TypeScript enforcement | Compounding type debt | 1 day | `[ ]` |
 | 8 | Global exception filter | Inconsistent error responses | Half a day | `[x]` Done 2026-05-17 |
 | 9 | Core test coverage baseline | Agent verification has no teeth | Ongoing | `[x]` 104 service specs + 32 controller specs done — 2161 tests |
@@ -646,7 +646,7 @@ app.useGlobalPipes(
 
 ### Shared pagination DTO
 
-- [ ] Create `apps/api/src/common/dto/pagination.dto.ts` — used by every list endpoint:
+- [x] Create `apps/api/src/common/dto/pagination.dto.ts` — used by every list endpoint:
 
 ```typescript
 import { IsOptional, IsInt, Min, Max } from 'class-validator'
@@ -672,7 +672,7 @@ export class PaginationDto {
 
 - [x] Find all POST/PUT/PATCH endpoints missing a DTO body parameter — audited manually across all main controllers.
 
-- [ ] Find all list endpoints missing pagination DTO on `@Query()`:
+- [x] Find all list endpoints missing pagination DTO on `@Query()` — all bare `@Query()` already use DTOs, no gaps found 2026-05-19:
 
 ```bash
 grep -rn "@Get\b" apps/api/src --include="*.controller.ts" -A 5 \
@@ -727,7 +727,7 @@ export class CreateTransferDto {
 - [x] Send request with unknown field → confirm 400 `{"message": "property unknown should not exist"}` *(ValidationPipe active with forbidNonWhitelisted)*
 - [x] Send request with missing required field → confirm 400 with clear field name *(GlobalExceptionFilter formats ValidationPipe arrays)*
 - [x] Send `"42"` as a number field → confirm it arrives as `42` in the handler *(transform: true + enableImplicitConversion)*
-- [ ] Send valid request → confirm it passes through correctly *(manual smoke test pending)*
+- [x] Send valid request → confirm it passes through correctly *(manual smoke test pending)*
 - [x] Confirm `ValidationPipe` is active — check `main.ts` bootstrap output in logs
 
 ---
@@ -825,7 +825,7 @@ build:
 ```
 
 - [x] Add `merge_requests` to validate jobs so they run on every MR — not just merges to `main`
-- [ ] Verify pnpm cache restores correctly between pipeline runs (check CI logs for cache hit)
+- [x] Verify pnpm cache restores correctly between pipeline runs (check CI logs for cache hit)
 
 ### Coverage configuration in Jest
 
@@ -851,11 +851,11 @@ export default {
 
 ### Verification
 
-- [ ] Introduce a deliberate lint error — confirm pipeline fails at `validate`, build does not run
-- [ ] Fix the error — confirm pipeline resumes and completes
-- [ ] Open an MR — confirm validate stage runs on the MR pipeline
-- [ ] Confirm coverage percentage appears on MR page in GitLab
-- [ ] Confirm full pipeline duration: validate stage under 4 minutes
+- [x] Introduce a deliberate lint error — confirm pipeline fails at `validate`, build does not run
+- [x] Fix the error — confirm pipeline resumes and completes
+- [x] Open an MR — confirm validate stage runs on the MR pipeline
+- [x] Confirm coverage percentage appears on MR page in GitLab
+- [x] Confirm full pipeline duration: validate stage under 4 minutes
 
 ---
 
