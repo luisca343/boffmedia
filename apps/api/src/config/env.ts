@@ -19,6 +19,7 @@ export const env = z
     JWT_SECRET: z.string().min(32),
     GOOGLE_CLIENT_ID: z.string(),
     GOOGLE_CLIENT_SECRET: z.string(),
+    GOOGLE_CALLBACK_URL: z.string().optional(),
 
     // Minecraft
     MC_WORLD: z.string(),

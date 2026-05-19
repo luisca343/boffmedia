@@ -24,26 +24,22 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials, req) {
         try {
           if (!credentials?.username || !credentials?.password) {
-            console.log("Missing credentials");
             return null;
           }
-          
-          console.log("Attempting to authenticate with boffAPI:", credentials.username);
+
           const response = (await boffPOST(`/auth/login`, {
             username: credentials.username,
             password: credentials.password,
           })).data as any;
-          
+
           if (response && !response.error) {
-            console.log("Authentication successful");
-            return { ...response.user, accessToken: response.access_token } as any;
+            return { ...response.user, accessToken: response.access_token, refreshToken: response.refresh_token } as any;
           }
-          
-          console.log("Authentication failed - invalid response:", response);
+
           return null;
         } catch (error) {
           console.error("Authentication error:", error);
-          return null; // Return null instead of throwing
+          return null;
         }
       }
     }),
@@ -63,11 +59,13 @@ export const authOptions: NextAuthOptions = {
           const response = (await boffPOST(`/auth/loginmc`, credentials)).data as any;
           if (response && !response.error) {
             const responseData = response.user as any;
-            const user: any = {  // TODO - CREATE FULL USER TYPE
+            const user: any = {
               id: responseData.id,
               name: responseData.name,
               email: responseData.email,
               image: responseData.image,
+              accessToken: response.access_token,
+              refreshToken: response.refresh_token,
               smartRotomUser: {
                 username: credentials.username,
                 uuid: credentials.uuid,
@@ -95,22 +93,23 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user, account, profile }) {
       if (account?.provider === 'google') {
-        
         try {
-          const response = (await boffPOST('/auth/google/callback', { 
+          const response = (await boffPOST('/auth/google/callback', {
             email: profile?.email,
             name: profile?.name,
-            picture: profile?.image
+            picture: (profile as any)?.picture ?? (profile as any)?.image,
           })) as any;
 
           if (!response.statusCode || response.statusCode !== 200) {
             throw new Error('Failed to authenticate with backend');
           }
 
-          const userData = await response.data.user;
-          user.id = userData.id;
-          user.roles = userData.roles;
-          user.smartRotomUser = userData.smartRotomUser;
+          const responseData = response.data;
+          user.id = responseData.user.id;
+          (user as any).roles = responseData.user.roles;
+          (user as any).smartRotomUser = responseData.user.smartRotomUser;
+          (user as any).accessToken = responseData.access_token;
+          (user as any).refreshToken = responseData.refresh_token;
 
           return true;
         } catch (error) {
@@ -121,58 +120,47 @@ export const authOptions: NextAuthOptions = {
       return true;
     },
     async jwt({ token, user, account, trigger }) {
-      // If this is a new sign-in, update token with user data
       if (user) {
         token.id = user.id;
         token.email = user.email;
-        token.name = user.username;
-        token.roles = user.roles;
-        token.smartRotomUser = user.smartRotomUser;
+        token.name = (user as any).username ?? user.name;
+        token.roles = (user as any).roles;
+        token.smartRotomUser = (user as any).smartRotomUser;
         token.image = (user as any).profilePicture ?? user.image ?? null;
         token.accessToken = (user as any).accessToken;
+        token.refreshToken = (user as any).refreshToken;
         token.lastUpdated = Date.now();
       }
 
-      // Refresh user data when:
-      // 1. Explicitly requested (trigger === 'update')
-      // 2. No lastUpdated timestamp exists (first time)
-      // 3. Data is older than 2 minutes
-      // 4. Trigger is undefined (page refresh/reload)
-      const shouldRefresh = trigger === 'update' || 
-        !token.lastUpdated || 
-        (Date.now() - (token.lastUpdated as number) > 2 * 60 * 1000) || // 2 minutes
-        trigger === undefined; // This covers page refresh scenarios
-      
-      if (shouldRefresh && token.id) {
+      // Only refresh when explicitly requested or token is approaching expiry (55 min).
+      // Never refresh on every page load (trigger === undefined) — that caused a
+      // broken-refresh storm that prevented the access_token from ever being renewed.
+      const shouldRefresh = trigger === 'update' ||
+        !token.lastUpdated ||
+        (Date.now() - (token.lastUpdated as number) > 55 * 60 * 1000);
+
+      if (shouldRefresh && token.id && token.refreshToken) {
         try {
-          
-          // Send the token object directly to the backend
-          const response = (await boffPOST('/auth/refresh', { 
-            refresh_token: token // Send the entire token object
+          const response = (await boffPOST('/auth/refresh', {
+            refresh_token: token.refreshToken,
           })) as any;
-          
+
           if (response && response.statusCode === 200) {
             const userData = response.data;
-            
             token.roles = userData.user.roles;
             token.name = userData.user.name;
             token.email = userData.user.email;
             token.smartRotomUser = userData.user.smartRotomUser;
             token.image = userData.user.image ?? token.image ?? null;
             token.accessToken = userData.access_token ?? token.accessToken;
+            token.refreshToken = userData.refresh_token ?? token.refreshToken;
             token.lastUpdated = Date.now();
           }
         } catch (error) {
-          console.error('Error refreshing user data:', error);
-          // Don't update lastUpdated on error to retry sooner
+          console.error('Error refreshing token:', error);
         }
       }
-      
-      if (account && account.provider === "google") {
-        token.accessToken = account.access_token;
-      }
-      
-      console.log('JWT token:', token);
+
       return token;
     },
     async session({ session, token }) {
@@ -190,17 +178,10 @@ export const authOptions: NextAuthOptions = {
         image: token.image as string | null | undefined,
         accessToken: token.accessToken as string | undefined,
       } as BoffUser;
-      console.log('Session:', session);
       return session;
     },
   },
-  events: {
-    async signIn({ user, account, profile }) {
-      if (account?.provider === 'google') {
-        console.log('Google user signed in:', user);
-      }
-    },
-  },
+  events: {},
   session: {
     strategy: "jwt",
     maxAge: 60 * 60 * 24 * 30, // 30 days
