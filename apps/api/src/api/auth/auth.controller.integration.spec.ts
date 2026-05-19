@@ -322,27 +322,22 @@ describe('AuthController — integration (ValidationPipe + GlobalExceptionFilter
 
 
   // ── POST /auth/google/callback — GoogleCallbackDto validation ──────────
+  // DTO has optional email, name, picture fields — no required token field.
   describe('POST /auth/google/callback — GoogleCallbackDto validation', () => {
-    it('returns 400 when token is missing', async () => {
+    it('returns 2xx with empty body (all fields optional)', async () => {
+      mockAuthService.googleLogin.mockResolvedValue({ access_token: 'tok' });
+
       const res = await request(app.getHttpServer())
         .post('/auth/google/callback')
         .send({});
 
-      expect(res.status).toBe(400);
-    });
-
-    it('returns 400 when token is empty string', async () => {
-      const res = await request(app.getHttpServer())
-        .post('/auth/google/callback')
-        .send({ token: '' });
-
-      expect(res.status).toBe(400);
+      expect(res.status).toBeLessThan(300);
     });
 
     it('returns 400 when email is present but invalid', async () => {
       const res = await request(app.getHttpServer())
         .post('/auth/google/callback')
-        .send({ token: 'google-token', email: 'not-an-email' });
+        .send({ email: 'not-an-email' });
 
       expect(res.status).toBe(400);
     });
@@ -350,34 +345,34 @@ describe('AuthController — integration (ValidationPipe + GlobalExceptionFilter
     it('returns 400 when unknown field is present (forbidNonWhitelisted)', async () => {
       const res = await request(app.getHttpServer())
         .post('/auth/google/callback')
-        .send({ token: 'google-token', hackerField: 'x' });
+        .send({ hackerField: 'x' });
 
       expect(res.status).toBe(400);
     });
 
-    it('calls AuthService.googleLogin with token only', async () => {
+    it('calls AuthService.googleLogin with email and name', async () => {
       mockAuthService.googleLogin.mockResolvedValue({ access_token: 'tok' });
 
       const res = await request(app.getHttpServer())
         .post('/auth/google/callback')
-        .send({ token: 'google-token' });
+        .send({ email: 'ash@pokemon.com', name: 'TrainerAsh' });
 
       expect(res.status).toBeLessThan(300);
       expect(mockAuthService.googleLogin).toHaveBeenCalledWith(
-        expect.objectContaining({ token: 'google-token' }),
+        expect.objectContaining({ email: 'ash@pokemon.com', name: 'TrainerAsh' }),
       );
     });
 
-    it('calls AuthService.googleLogin with optional email and name', async () => {
+    it('calls AuthService.googleLogin with optional picture', async () => {
       mockAuthService.googleLogin.mockResolvedValue({ access_token: 'tok' });
 
       const res = await request(app.getHttpServer())
         .post('/auth/google/callback')
-        .send({ token: 'google-token', email: 'ash@pokemon.com', name: 'TrainerAsh' });
+        .send({ email: 'ash@pokemon.com', name: 'TrainerAsh', picture: 'https://example.com/pic.jpg' });
 
       expect(res.status).toBeLessThan(300);
       expect(mockAuthService.googleLogin).toHaveBeenCalledWith(
-        expect.objectContaining({ token: 'google-token', email: 'ash@pokemon.com', name: 'TrainerAsh' }),
+        expect.objectContaining({ picture: 'https://example.com/pic.jpg' }),
       );
     });
   });

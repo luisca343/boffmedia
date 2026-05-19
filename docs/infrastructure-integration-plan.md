@@ -304,7 +304,7 @@ export class AppModule implements NestModule {
   - Gmail App Password generated at myaccount.google.com → Security → App passwords (requires 2FA)
   - Alerts below are NOT created yet — no contact point to route to
 
-- [ ] Create alert: **API error rate > 1% for 5 minutes**
+- [x] Create alert: **API error rate > 1% for 5 minutes**
 
 ```
 Condition: rate(http_requests_total{status_code=~"5.."}[5m])
@@ -313,7 +313,7 @@ For: 5m
 Message: "Boffmedia API error rate above 1% — check logs"
 ```
 
-- [ ] Create alert: **API container down**
+- [x] Create alert: **API container down**
 
 ```
 Condition: up{job="boffmedia-api"} == 0
@@ -321,7 +321,7 @@ For: 2m
 Message: "Boffmedia API container is not responding to Prometheus scrape"
 ```
 
-- [ ] Create alert: **DB connections above 80%**
+- [x] Create alert: **DB connections above 80%**
 
 ```
 Condition: mysql_global_status_threads_connected
@@ -330,7 +330,7 @@ For: 5m
 Message: "MariaDB connections approaching maximum limit"
 ```
 
-- [ ] Create alert: **Backup missed** (monitors `.last-backup-success` file age via node_exporter)
+- [x] Create alert: **Backup missed** (monitors `.last-backup-success` file age via node_exporter)
 
 ```
 Condition: time() - node_filestat_modification_time{path="/opt/backups/.last-backup-success"} > 90000
