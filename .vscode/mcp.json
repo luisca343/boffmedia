@@ -8,11 +8,6 @@
         "source /home/luisca/.nvm/nvm.sh && exec pnpm --filter @repo/agent mcp"
       ],
       "cwd": "/home/luisca/Programacion/Ficus Labs/boffmedia",
-      "env": {
-        "BOOKSTACK_URL": "",
-        "BOOKSTACK_TOKEN": "",
-        "BOOKSTACK_SECRET": ""
-      }
     }
   }
 }
