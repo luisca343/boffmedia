@@ -116,3 +116,8 @@ export const TECHNICAL_BOOK_IDS = {
   boffmedia: bookstack.books.technicalBoffmedia,
   smartrotom: bookstack.books.technicalSmartrotom
 } as const
+
+export const AGENT_TASK_BOOK_IDS = {
+  boffmedia: bookstack.books.agentTasksBoffmedia,
+  smartrotom: bookstack.books.agentTasksSmartrotom
+} as const
