@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/primitives/card"
-import { Terminal, Wifi, Shield, Database, AlertTriangle } from "lucide-react"
+import { Terminal, Wifi, Shield, Database, AlertTriangle, Bell } from "lucide-react"
 import GlitchStyles from './_components/GlitchStyles'
 import MatrixRain from './_components/MatrixRain'
 import Scanline from './_components/ScanLine'
@@ -39,6 +39,13 @@ const appsAdmin = [
     icono: <Shield className="w-6 h-6" />,
     enlace: "/smartrotom/admin/apps",
     id: "app-04"
+  },
+  {
+    nombre: "NotifyBell",
+    descripcion: "Enviar notificaciones a jugadores",
+    icono: <Bell className="w-6 h-6" />,
+    enlace: "/smartrotom/admin/notifications",
+    id: "app-05"
   }
 ]
 
