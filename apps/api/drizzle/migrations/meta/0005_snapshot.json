@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "a7a1fa98-194d-4814-95cc-30e3994ea87d",
+  "id": "cef9da85-6d8d-4862-97b1-2cc577090655",
   "prevId": "b8718bad-917d-420b-b69c-d62d77bebbd0",
   "tables": {
     "boffmedia_roles": {
@@ -2114,8 +2114,8 @@
       },
       "checkConstraint": {}
     },
-    "sr_notifications": {
-      "name": "sr_notifications",
+    "rotom_notifications": {
+      "name": "rotom_notifications",
       "columns": {
         "id": {
           "name": "id",
@@ -2178,9 +2178,9 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "sr_notifications_user_uuid_rotom_users_uuid_fk": {
-          "name": "sr_notifications_user_uuid_rotom_users_uuid_fk",
-          "tableFrom": "sr_notifications",
+        "rotom_notifications_user_uuid_rotom_users_uuid_fk": {
+          "name": "rotom_notifications_user_uuid_rotom_users_uuid_fk",
+          "tableFrom": "rotom_notifications",
           "tableTo": "rotom_users",
           "columnsFrom": [
             "user_uuid"
@@ -2193,8 +2193,8 @@
         }
       },
       "compositePrimaryKeys": {
-        "sr_notifications_id": {
-          "name": "sr_notifications_id",
+        "rotom_notifications_id": {
+          "name": "rotom_notifications_id",
           "columns": [
             "id"
           ]
