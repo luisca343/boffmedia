@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, MaxLength } from 'class-validator';
 
 export class NotificationResponseDto {
   @ApiProperty({ description: 'Notification ID', example: 1 })
@@ -58,4 +58,37 @@ export class MarkReadBodyDto {
   @IsString()
   @IsNotEmpty()
   uuid: string;
+}
+
+export class SendNotificationDto {
+  @ApiProperty({ description: 'Recipient user UUID' })
+  @IsString()
+  @IsNotEmpty()
+  userUuid: string;
+
+  @ApiProperty({
+    description: 'Notification type (chatapp, starbank, system, …)',
+    example: 'system',
+  })
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(64)
+  type: string;
+
+  @ApiProperty({ description: 'Short notification title', example: 'Mensaje del servidor' })
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(255)
+  title: string;
+
+  @ApiProperty({ description: 'Notification body text' })
+  @IsString()
+  @IsNotEmpty()
+  body: string;
+
+  @ApiProperty({ description: 'Optional deep-link URL', required: false, nullable: true })
+  @IsOptional()
+  @IsString()
+  @MaxLength(512)
+  link?: string;
 }

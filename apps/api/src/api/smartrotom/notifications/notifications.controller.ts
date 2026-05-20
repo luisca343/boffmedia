@@ -5,7 +5,9 @@ import {
   Param,
   ParseIntPipe,
   Patch,
+  Post,
   Query,
+  HttpCode,
   HttpStatus,
   UseInterceptors,
 } from '@nestjs/common';
@@ -23,6 +25,7 @@ import {
   MarkReadBodyDto,
   NotificationsInboxDto,
   NotificationResponseDto,
+  SendNotificationDto,
 } from './notifications.dto';
 
 @ApiTags('SmartRotom | Notifications')
@@ -69,5 +72,24 @@ export class NotificationsController {
   })
   async markAllRead(@Body() body: MarkReadBodyDto): Promise<void> {
     return this.notificationsService.markAllRead(body.uuid);
+  }
+
+  @Post('send')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Send a notification to a player (admin)' })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Notification created and delivered',
+    type: NotificationResponseDto,
+  })
+  async send(@Body() dto: SendNotificationDto): Promise<NotificationResponseDto> {
+    const result = await this.notificationsService.createNotification({
+      userUuid: dto.userUuid,
+      type: dto.type,
+      title: dto.title,
+      body: dto.body,
+      link: dto.link,
+    });
+    return result as unknown as NotificationResponseDto;
   }
 }

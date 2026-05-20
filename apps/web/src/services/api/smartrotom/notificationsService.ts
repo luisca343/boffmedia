@@ -1,5 +1,13 @@
-import { rotomGET, rotomPATCH, ApiResponse } from '@/services/boffAPI';
+import { rotomGET, rotomPATCH, rotomPOST, ApiResponse } from '@/services/boffAPI';
 import { NotificationResponseDto, NotificationsInboxDto } from '@boffmedia/shared';
+
+export interface SendNotificationPayload {
+  userUuid: string;
+  type: string;
+  title: string;
+  body: string;
+  link?: string;
+}
 
 export class NotificationsService {
   /**
@@ -30,6 +38,15 @@ export class NotificationsService {
    */
   static markAllNotificationsRead(uuid: string): Promise<ApiResponse<void>> {
     return rotomPATCH<void>('/notifications/read-all', { uuid });
+  }
+
+  /**
+   * Send a notification to a player (admin use).
+   */
+  static sendNotification(
+    payload: SendNotificationPayload,
+  ): Promise<ApiResponse<NotificationResponseDto>> {
+    return rotomPOST<NotificationResponseDto>('/notifications/send', payload);
   }
 }
 
