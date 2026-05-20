@@ -91,4 +91,10 @@ export class SendNotificationDto {
   @IsString()
   @MaxLength(512)
   link?: string;
+
+  @ApiProperty({ description: 'SmartRotom server name (injected by client)', required: false, nullable: true })
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  server?: string;
 }
