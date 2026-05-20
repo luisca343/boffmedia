@@ -1,13 +1,13 @@
 import {
   AuthenticationResultEntity, BatchUsersDto, BoffMediaUserEntity, CreateUserDto, FullUserEntity,
-  GoogleAuthDto, IntegratedUserCreationResultEntity, LoginDto,
+  GoogleAuthDto, IntegratedUserCreationResultEntity, UserLoginDto,
   MinecraftLinkDto, MinecraftRegistrationDto,
   SessionUserEntity, SuccessResponse, UpdateUserDto, UserStatistics, UserValidationResponseEntity,
   UserRolesResponseEntity, UsersPaginatedResponseEntity, UserWithIntegrationsEntity,
 } from '@boffmedia/shared';
 import { apiGET, apiPOST, apiPUT, apiDELETE, apiPATCH } from '@/services/boffAPI';
 
-export type { GoogleAuthDto, LoginDto, MinecraftLinkDto, MinecraftRegistrationDto };
+export type { GoogleAuthDto, UserLoginDto, MinecraftLinkDto, MinecraftRegistrationDto };
 
 export type BatchUsersRequest = BatchUsersDto;
 export type UsersPaginatedResponse = UsersPaginatedResponseEntity;
@@ -133,7 +133,7 @@ export class UsersService {
   /**
    * Authenticate user with username and password
    */
-  static login(data: LoginDto) {
+  static login(data: UserLoginDto) {
     return apiPOST<AuthenticationResultEntity>('/users/auth/login', data);
   }
 
