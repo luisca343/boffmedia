@@ -22,3 +22,4 @@ public/
 laboon/
 .env.agent
 .agent-runs/
+.github/agents/agent-talkative.md
