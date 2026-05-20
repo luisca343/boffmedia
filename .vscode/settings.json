@@ -1,0 +1,22 @@
+{
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/public/**": true,
+    "**/.next/**": true,
+    "**/dist/**": true,
+    "**/build/**": true
+  },
+  "files.exclude": {
+    "**/node_modules": true,
+    "**/public": true,
+    "**/.next": true,
+    "**/dist": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/public": true,
+    "**/.next": true,
+    "**/dist": true
+  },
+  "github.copilot.chat.codesearch.enabled": false
+}
