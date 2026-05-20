@@ -173,3 +173,22 @@ export const smartRotomInventory = mysqlTable('rotom_inventory', {
 });
 
 export type SmartRotomInventoryItem = typeof smartRotomInventory.$inferSelect;
+
+export const srNotifications = mysqlTable('sr_notifications', {
+  id: int('id').primaryKey().autoincrement(),
+  userUuid: char('user_uuid', { length: 36 })
+    .notNull()
+    .references(() => smartrotomUsers.uuid, {
+      onDelete: 'cascade',
+      onUpdate: 'cascade',
+    }),
+  type: varchar('type', { length: 64 }).notNull(),
+  title: varchar('title', { length: 255 }).notNull(),
+  body: text('body').notNull(),
+  link: varchar('link', { length: 512 }),
+  isRead: int('is_read').default(0),
+  createdAt: datetime('created_at').default(sql`CURRENT_TIMESTAMP()`),
+});
+
+export type SrNotification = typeof srNotifications.$inferSelect;
+export type NewSrNotification = typeof srNotifications.$inferInsert;
