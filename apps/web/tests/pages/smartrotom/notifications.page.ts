@@ -21,16 +21,15 @@ export class NotificationsPage extends BasePage {
 
   constructor(page: Page) {
     super(page)
-    this.bellButton = page.getByRole("button", { name: /notifications|notificaciones/i })
-    this.unreadBadge = page.locator("[data-testid='unread-badge']").or(
-      // SmartRotomBadge positioned on the bell — match by proximity to the notification button
-      page.locator(".relative > div.inline-flex").first()
-    )
-    this.popover = page.locator(".w-80.bg-surface-800.border-2.border-black")
-    this.title = page.getByRole("heading", { name: /notifications|notificaciones/i })
-    this.emptyState = page.getByText(/no.*notificaciones|no notifications/i)
-    this.loadingState = page.getByText(/cargando|loading/i)
-    this.notificationItems = page.locator(".w-80.bg-surface-800 > .p-3 > div")
+    // PopoverTrigger renders a <button> containing NotificationButton's <span aria-label="Notifications">
+    this.bellButton = page.locator('button:has([aria-label="Notifications"])')
+    // SmartRotomBadge rendered as absolute badge over the bell button (-bottom-2 -right-2 absolute)
+    this.unreadBadge = page.locator(".\\-bottom-2.\\-right-2.absolute")
+    this.popover = page.locator(".w-80.bg-surface-800")
+    this.title = page.locator(".w-80.bg-surface-800 h2")
+    this.emptyState = page.locator(".w-80.bg-surface-800").getByText(/no.*notificaciones|no notifications|vacío|empty/i)
+    this.loadingState = page.locator(".w-80.bg-surface-800").getByText(/cargando|loading/i)
+    this.notificationItems = page.locator(".w-80.bg-surface-800 .p-3.space-y-2 > div")
     this.markAllReadButton = page.getByRole("button", { name: /marcar todas|mark all/i })
   }
 
@@ -40,8 +39,9 @@ export class NotificationsPage extends BasePage {
 
   /** Open the notifications popover by clicking the bell trigger */
   async openPopover() {
-    // The NotificationButton is wrapped in PopoverTrigger
-    await this.page.locator("button").filter({ has: this.page.locator("svg") }).nth(3).click()
+    await this.bellButton.click()
+    // Wait for popover to appear
+    await this.popover.waitFor({ state: "visible", timeout: 5000 })
   }
 
   /** Get the mark-as-read button for a specific notification item (0-indexed) */
