@@ -1,24 +1,27 @@
 "use client";
 import { Hora } from "@/components/ui/Hora";
-import { useEffect } from "react";
-import { Badge } from "@/components/ui/primitives/badge";
+import { useEffect, useState, useCallback } from "react";
 import { Socket } from "socket.io-client";
 import BreadcrumbNav from "@/components/smartrotom/BreadcrumbNav";
 import FicusAI from "@/features/ficusai/components/FicusAI";
 import { usePathname } from "next/navigation";
 import { getSmartRotomUser } from "@/lib/utils";
-import { Bell, Check, Trash2, X } from "lucide-react";
+import { Bell, Check, X } from "lucide-react";
 import { SettingsPage } from "@/components/smartrotom/Settings";
 import { Popover, PopoverTrigger } from "@/components/ui/primitives/popover";
 import { PopoverContent } from "@radix-ui/react-popover";
 import { useBoffSession } from "@/services/useBoffSession";
 import { MinecraftFunctions } from "@/components/smartrotom/MinecraftFunctions";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/primitives/tooltip";
-import { useNotificationCenter } from "react-toastify/addons/use-notification-center";
 import { SettingsButton, AIButton, NextButton, NotificationButton, PrevButton, ReloadButton } from "@/components/ui/navigation/NavButton";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/primitives/sheet";
 import useSocketStore from "@/stores/useSocketStore";
 import LanguageSwitcher from "@/components/ui/navigation/LanguageSwitcher";
+import { SmartRotomBadge } from "@/components/smartrotom/ui/badge";
+import { SmartRotomButton } from "@/components/smartrotom/ui/button";
+import { NotificationsService } from "@/services/api/smartrotom/notificationsService";
+import type { NotificationResponseDto } from "@boffmedia/shared";
+import { useTranslations } from "next-intl";
 
 export function RotomNav({
   setTema,
@@ -27,15 +30,24 @@ export function RotomNav({
 }) {
   const { socket, connect } = useSocketStore();
   const { session } = useBoffSession();
+  const t = useTranslations("nav.notifications");
 
-  const {
-    notifications,
-    clear,
-    markAllAsRead,
-    markAsRead,
-    remove,
-    unreadCount,
-  } = useNotificationCenter();
+  const [notifications, setNotifications] = useState<NotificationResponseDto[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const unreadCount = notifications.filter((n) => n.isRead === 0).length;
+
+  const loadNotifications = useCallback(async () => {
+    if (!session) return;
+    const uuid = getSmartRotomUser(session).uuid;
+    setIsLoading(true);
+    try {
+      const res = await NotificationsService.getNotifications(uuid);
+      if (res.data) setNotifications(res.data.items);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [session]);
 
   const pathname = usePathname();
 
@@ -44,92 +56,110 @@ export function RotomNav({
       connect(getSmartRotomUser(session));
       return;
     }
-
-    /*
-        socket.on('patata', () => console.log('Patata'));
-        socket.on('connection', () => console.log('Connected'));
-        socket.emit('patata', null);*/
   }, [socket, connect, session]);
+
+  useEffect(() => {
+    loadNotifications();
+  }, [loadNotifications]);
+
+  useEffect(() => {
+    if (!socket) return;
+    const handler = (notification: NotificationResponseDto) => {
+      setNotifications((prev) => [notification, ...prev]);
+    };
+    socket.on("notification:new", handler);
+    return () => {
+      socket.off("notification:new", handler);
+    };
+  }, [socket]);
 
   useEffect(() => {}, [pathname]);
 
-  useEffect(() => {
-    /*
-        const handleKeyDown = (event: KeyboardEvent) => {
-            toast('Tecla pulsada: ' + event.key);
-        };
-    
-        window.addEventListener('keydown', handleKeyDown);
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown);
-        };*/
-  }, []);
+  async function handleMarkRead(id: number) {
+    if (!session) return;
+    const uuid = getSmartRotomUser(session).uuid;
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, isRead: 1 } : n))
+    );
+    await NotificationsService.markNotificationRead(id, uuid);
+  }
+
+  async function handleMarkAllRead() {
+    if (!session) return;
+    const uuid = getSmartRotomUser(session).uuid;
+    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: 1 })));
+    await NotificationsService.markAllNotificationsRead(uuid);
+  }
 
   function Notifications() {
     return (
-      <div className="w-80 bg-surface-800 rounded-lg shadow-lg overflow-hidden">
-        <header className="bg-surface-700 p-4 flex items-center justify-between">
+      <div className="w-80 bg-surface-800 rounded-none border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+        <header className="bg-surface-700 border-b-2 border-black p-3 flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Bell className="text-surface-300" size={20} />
-            <h2 className="text-surface-100 font-semibold">Notificaciones</h2>
+            <Bell className="text-surface-300" size={18} />
+            <h2 className="text-surface-100 font-bold text-sm uppercase tracking-wide">
+              {t("title")}
+            </h2>
           </div>
-          <span className="bg-secondary-500 text-white px-2 py-1 rounded-full text-xs">
-            {unreadCount}
-          </span>
+          {unreadCount > 0 && (
+            <SmartRotomBadge variant="default">{unreadCount}</SmartRotomBadge>
+          )}
         </header>
-        <div className="p-4 space-y-2 max-h-80 overflow-y-auto">
+        <div className="p-3 space-y-2 max-h-80 overflow-y-auto">
+          {isLoading && (
+            <p className="text-surface-400 text-xs text-center py-4">{t("loading")}</p>
+          )}
+          {!isLoading && notifications.length === 0 && (
+            <p className="text-surface-400 text-xs text-center py-4">{t("emptyState")}</p>
+          )}
           {notifications.map((notif) => (
             <div
               key={notif.id}
-              className={`p-3 rounded text-sm flex flex-col ${
-                notif.read
+              className={`p-2 rounded-none border-2 border-black text-sm flex flex-col gap-1 ${
+                notif.isRead
                   ? "bg-surface-700 text-surface-400"
                   : "bg-surface-600 text-surface-200"
               }`}
             >
-              <div className="flex justify-between items-start mb-2">
-                <span className="flex-grow">{notif.content?.toString()}</span>
-                {!notif.read && (
-                  <span className="bg-secondary-500 w-2 h-2 rounded-full flex-shrink-0 ml-2 mt-1"></span>
+              <div className="flex justify-between items-start gap-2">
+                <div className="flex-grow">
+                  <p className="font-bold text-xs">{notif.title}</p>
+                  <p className="text-xs mt-0.5">{notif.body}</p>
+                </div>
+                {!notif.isRead && (
+                  <span className="bg-primary-500 border-2 border-black w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1" />
                 )}
               </div>
-              <div className="flex justify-end space-x-2">
-                {!notif.read && (
-                  <button
-                    onClick={() => markAsRead(notif.id)}
-                    className="text-surface-400 hover:text-white"
-                    aria-label="Mark as read"
+              {!notif.isRead && (
+                <div className="flex justify-end">
+                  <SmartRotomButton
+                    variant="noShadow"
+                    size="sm"
+                    className="h-6 px-2 text-xs"
+                    onClick={() => handleMarkRead(notif.id)}
+                    aria-label={t("markRead")}
                   >
-                    <Check size={16} />
-                  </button>
-                )}
-                <button
-                  onClick={() => remove(notif.id)}
-                  className="text-surface-400 hover:text-white"
-                  aria-label="Delete notification"
-                >
-                  <X size={16} />
-                </button>
-              </div>
+                    <Check size={12} className="mr-1" />
+                    {t("markRead")}
+                  </SmartRotomButton>
+                </div>
+              )}
             </div>
           ))}
         </div>
-        <footer className="bg-surface-700 p-2 flex justify-between">
-          <button
-            onClick={clear}
-            className="flex items-center space-x-1 text-surface-300 hover:text-white text-sm"
-          >
-            <Trash2 size={16} />
-            <span>Limpiar</span>
-          </button>
-          <button
-            onClick={markAllAsRead}
-            className="flex items-center space-x-1 text-surface-300 hover:text-white text-sm"
-          >
-            <Check size={16} />
-            <span>Marcar todas como leídas</span>
-          </button>
-        </footer>
+        {notifications.length > 0 && (
+          <footer className="bg-surface-700 border-t-2 border-black p-2 flex justify-end">
+            <SmartRotomButton
+              variant="neutral"
+              size="sm"
+              className="h-7 px-3 text-xs"
+              onClick={handleMarkAllRead}
+            >
+              <Check size={12} className="mr-1" />
+              {t("markAllRead")}
+            </SmartRotomButton>
+          </footer>
+        )}
       </div>
     );
   }
@@ -191,10 +221,13 @@ export function RotomNav({
       <Popover>
         <PopoverTrigger className="relative">
           <NotificationButton />
-          {notifications.length > 0 && (
-            <Badge className="z-50 px-2 -bottom-2 -right-2 absolute bg-primary-400 text-black hover:bg-primary-400">
+          {unreadCount > 0 && (
+            <SmartRotomBadge
+              variant="button"
+              className="z-50 px-1.5 -bottom-2 -right-2 absolute"
+            >
               {unreadCount}
-            </Badge>
+            </SmartRotomBadge>
           )}
         </PopoverTrigger>
         <PopoverContent className="z-50">

@@ -1,5 +1,5 @@
 {
- "nav": {
+  "nav": {
     "ariaLabel": "Main Navigation",
     "openMenu": "Open menu",
     "links": {
@@ -120,6 +120,15 @@
           }
         }
       }
+    },
+    "notifications": {
+      "title": "Notifications",
+      "emptyState": "No notifications",
+      "loading": "Loading...",
+      "clearAll": "Clear all",
+      "markAllRead": "Mark all as read",
+      "markRead": "Mark as read",
+      "unread": "unread"
     }
   }
 }
