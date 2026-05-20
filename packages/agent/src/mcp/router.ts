@@ -22,7 +22,7 @@ import {
   updateTaskStatus
 } from '../tools/bookstack.js'
 import { detectStructuralChanges } from '../tools/structural.js'
-import { ADR_CHAPTER_IDS, CONVENTIONS_PAGE_IDS, TECHNICAL_BOOK_IDS } from '../agent.config.js'
+import { ADR_CHAPTER_IDS, API_REFERENCE_BOOK_IDS, CONVENTIONS_PAGE_IDS, TECHNICAL_BOOK_IDS } from '../agent.config.js'
 import {
   createGitLabMR,
   createGitLabIssue,
@@ -49,20 +49,31 @@ export function registerTools(server: McpServer) {
       bookstackTaskPageId: z.number().optional().describe('BookStack page ID of the agent:task page — if provided, status tag is updated to in-progress automatically')
     },
     async ({ title, taskDescription, taskType, bookstackTaskPageId }) => {
-      const runId = `${title.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40)}-${Date.now()}`
+      // Fix 4: clean slug — strip leading/trailing hyphens, fall back to 'task'
+      const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'task'
+      const runId = `${slug}-${Date.now()}`
       await saveRun({ runId, status: 'running', title })
       if (bookstackTaskPageId) {
         await updateTaskStatus(bookstackTaskPageId, 'in-progress').catch(() => {})
       }
 
-      const [context, history] = await Promise.all([
+      // Fix 1: run health check and capture metrics baseline in parallel with context/history
+      const [context, history, health, _baseline] = await Promise.all([
         resolveContext({ taskDescription, maxFiles: 20 }),
-        getRunHistory({ limit: 5, similarTo: title, status: 'all' })
+        getRunHistory({ limit: 5, similarTo: title, status: 'all' }),
+        checkSystemHealth(),
+        captureMetricsBaseline({ runId }).catch(() => null)
       ])
 
+      // Fix 1: surface health warnings in the workflow output
+      const healthSection = !health.safe
+        ? `\n## ⚠ System health warning\nThe following issues were detected before starting:\n${health.warnings.map((w: string) => `- ${w}`).join('\n')}\n\nConsider investigating before proceeding. Ask the user if you should continue.\n`
+        : ''
+
+      // Fix 6: explicit playwright condition with file-type criteria
       const playwrightStep = taskType === 'ui-ux'
-        ? `4b. Call run_playwright (runId: "${runId}") — trace + screenshots. Present reviewInstructions to the user before proceeding to step 5.`
-        : `4b. Skip run_playwright unless you made UI changes.`
+        ? `4b. Call run_playwright (runId: "${runId}") — REQUIRED for ui-ux tasks. Present reviewInstructions to the user before proceeding to step 5.`
+        : `4b. Call run_playwright (runId: "${runId}") only if you modified .tsx or .jsx files inside apps/web/src. Skip if all changes were in apps/api or packages only.`
 
       const bookstackSection = context.bookstackPages.length > 0
         ? `\n## BookStack context (${context.bookstackPages.length} pages)\n${context.bookstackPages.map(p => `- **${p.title}** (updated ${p.updatedAt})`).join('\n')}`
@@ -83,35 +94,93 @@ export function registerTools(server: McpServer) {
         ? `\n## Performance notes from similar past runs\n${performanceNotes}`
         : ''
 
+      // Fix 5: compact history format — no raw JSON dump
+      const historyBlock = history.length > 0
+        ? history.map(r => {
+            const failure = r.failureSummary ? ` — failed: ${r.failureSummary}` : ''
+            return `- "${r.title}" → ${r.status} · branch: ${r.branch ?? 'unknown'}${failure}`
+          }).join('\n')
+        : 'No prior runs found.'
+
+      const branchSlug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 50) || 'task'
+
       const workflow = `
 # Boff Agent — Task Started
 
 runId: ${runId}
 title: ${title}
 taskType: ${taskType}
-
+${healthSection}
 ## Workflow (follow in order)
 
-1. ✅ begin_task — done
-2. Call check_guardrails with every file path you intend to write or modify. Stop if violations are returned.
-3. Make your code changes using your own file editing tools.
-4a. Call run_verification (runId: "${runId}") to run lint + tests. Fix failures before proceeding.
-${playwrightStep}
-4c. Call detect_structural_changes. If adrRecommended=true, call write_adr with a generated context, decision, and consequences based on the changes you made. Always call sync_conventions after.
-4d. If you touched the NestJS API, call sync_openapi_docs (runId: "${runId}") with the affected module names to keep the BookStack API reference current.
-5. Create a branch (git_operation branch), commit (git_operation commit), and push to both remotes (git_operation push_mirrors).
-6. Call save_run (runId: "${runId}", status: "passed" | "failed"${bookstackTaskPageId ? `, bookstackTaskPageId: ${bookstackTaskPageId}` : ''}) to close the task.
+1. ✅ begin_task — done. Health checked. Metrics baseline captured.
 
-Do not skip steps. Do not call save_run before run_verification passes.
-Do NOT call create_gitlab_mr — MR creation is the user's decision after reviewing the pushed branch.
+2. Call check_guardrails with every file path you intend to write or modify.
+   Stop if violations are returned.
+   If you discover additional files are needed during implementation, call check_guardrails
+   again before writing them.
+
+3. Make your code changes using your own file editing tools.
+
+3b. Call reset_environment (action: "up") and seed_database (fixture: "default")
+    to guarantee a clean test environment.
+
+4a. Call run_verification (runId: "${runId}") to run lint + tests.
+    Fix failures before proceeding.
+
+### If verification fails and you cannot fix the code:
+    - Call git_operation (action: "reset") to restore the working tree to a clean state
+    - Call save_run (runId: "${runId}", status: "failed", failureSummary: "<reason>")
+    - Consider calling create_gitlab_issue to document the failure for future review.
+    - Stop. Do not proceed to step 5.
+
+${playwrightStep}
+
+4c. Call detect_structural_changes. If adrRecommended=true, call write_adr.
+    Always call sync_conventions after (non-fatal if BookStack is unreachable).
+    Always call write_adr if you made any of these structural changes, regardless of adrRecommended:
+    - New NestJS module, controller, service, or repository
+    - New or modified Drizzle/TypeORM schema (tables, columns, relations)
+    - New or modified shared DTO in packages/shared (public API surface change)
+    - Auth flow change, shared type change, new cron job or background process
+
+4d. If you created or modified any NestJS controller, DTO, or route decorator,
+    call sync_openapi_docs (runId: "${runId}") with the affected module names.
+    Non-fatal if BookStack is unreachable — log and continue.
+
+4e. Call check_performance_regression (runId: "${runId}").
+    If hasRegression=true, present regressions to the user and ask whether to proceed.
+    Performance regressions do NOT automatically block — the user decides.
+
+5. Git operations:
+   a. Create branch: git_operation (action: "branch", branchName: "${branchSlug}")
+   b. Commit changes: git_operation (action: "commit", commitMessage: "<descriptive message>")
+   c. Push: git_operation (action: "push_mirrors", branchName: "<same branch name>")
+   If the branch already exists, use it — do not abort.
+   If GitHub mirror push fails, log the warning and continue.
+   If GitLab push fails, call save_run(failed) and abort.
+
+6. Call save_run (runId: "${runId}", status: "passed"${bookstackTaskPageId ? `, bookstackTaskPageId: ${bookstackTaskPageId}` : ''})
+   to close the task.
+
+## Rules
+- Do not skip steps. Do not call save_run before run_verification passes.
+- Steps 4c, 4d (BookStack sync) are non-fatal. If BookStack is unreachable, continue to step 5 and inform the user that BookStack sync was skipped.
+- ⚠ NEVER call create_gitlab_mr during this workflow.
+  MR creation is the user's explicit decision after reviewing the pushed branch.
+  Calling it automatically bypasses the visual review and commit approval step.
+  If the user wants an MR, they will ask you separately after reviewing the branch.
 
 ## Prior runs on similar tasks
-${history.length > 0 ? JSON.stringify(history, null, 2) : 'No prior runs found.'}
+${historyBlock}
 ${performanceSection}
 ## Codebase context
+⚠ Context was resolved at task start. If you create new modules or entities
+during this task, they won't appear below. Call resolve_context mid-task if needed.
+
 Modules: ${context.moduleList.join(', ')}
 Pages: ${context.pageList.join(', ')}
-Conventions: loaded (${context.totalTokenEstimate} token estimate for full context)
+Conventions: loaded (${context.totalTokenEstimate} token estimate)
 ${context.conventions ? '\n' + context.conventions : ''}
 ${bookstackSection}
 `.trim()
@@ -122,7 +191,8 @@ ${bookstackSection}
 
   server.tool(
     'check_guardrails',
-    'CALL THIS BEFORE WRITING ANY FILES — step 2 of the workflow. Check whether file paths violate protected path rules from .agent-ignore. If any violations are returned, do not write those files and inform the user.',
+    'CALL THIS BEFORE WRITING ANY FILES — step 2 of the workflow. Check whether file paths violate protected path rules from .agent-ignore. If any violations are returned, do not write those files and inform the user. If you discover additional files are needed during implementation, call check_guardrails again before writing them.',
+
     {
       paths: z.array(z.string()).describe('File paths to check, relative to repo root')
     },
@@ -321,7 +391,8 @@ ${bookstackSection}
 
   server.tool(
     'write_adr',
-    'Write an Architecture Decision Record to BookStack when a run introduces a new module, entity, or schema change. Call only when detect_structural_changes returns adrRecommended=true.',
+    'Write an Architecture Decision Record to BookStack when a run introduces a structural change (new module, entity, schema, shared DTO, auth flow change, or new background process). Call when detect_structural_changes returns adrRecommended=true, or whenever you make a structural change regardless of that flag.',
+
     {
       title: z.string().describe('ADR title — use suggestedAdrTitle from detect_structural_changes or write your own'),
       context: z.string().describe('Why this decision was needed — the forces at play'),
@@ -331,6 +402,9 @@ ${bookstackSection}
       runId: z.string().describe('Run ID from begin_task')
     },
     async ({ title, context, decision, consequences, project, runId }) => {
+      // Fix 13: get current branch for traceability in the ADR footer
+      const branchResult = await gitOperation({ action: 'current_branch' }).catch(() => ({ output: 'unknown', success: false }))
+      const branch = branchResult.output?.trim() || 'unknown'
       const result = await writeAdr({
         bookId: TECHNICAL_BOOK_IDS[project],
         chapterId: ADR_CHAPTER_IDS[project],
@@ -339,7 +413,8 @@ ${bookstackSection}
         decision,
         consequences,
         project,
-        runId
+        runId,
+        branch
       })
       return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] }
     }
@@ -352,10 +427,8 @@ ${bookstackSection}
       project: z.enum(['boffmedia', 'smartrotom']).describe('Project to sync conventions for')
     },
     async ({ project }) => {
-      const pageId = project === 'boffmedia' ? CONVENTIONS_PAGE_IDS.boffmedia : undefined
-      if (!pageId) {
-        return { content: [{ type: 'text', text: JSON.stringify({ ok: false, reason: 'No conventions page configured for this project' }) }] }
-      }
+      // Fix 9: both projects share the same CONVENTIONS.md — fall back to boffmedia page for SmartRotom
+      const pageId = (CONVENTIONS_PAGE_IDS as Record<string, number>)[project] ?? CONVENTIONS_PAGE_IDS.boffmedia
       await syncConventions({ bookId: TECHNICAL_BOOK_IDS[project], pageId, project })
       return { content: [{ type: 'text', text: JSON.stringify({ ok: true }) }] }
     }
@@ -476,7 +549,8 @@ ${bookstackSection}
 
   server.tool(
     'create_bookstack_shelf',
-    'Create a new BookStack shelf (top-level container for books).',
+    '[SETUP ONLY — do not call during normal task workflow] Create a new BookStack shelf (top-level container for books).',
+
     {
       name: z.string().describe('Shelf name'),
       description: z.string().optional().describe('Short description shown under the shelf name'),
@@ -490,7 +564,8 @@ ${bookstackSection}
 
   server.tool(
     'create_bookstack_book',
-    'Create a new BookStack book. Books hold chapters and pages.',
+    '[SETUP ONLY — do not call during normal task workflow] Create a new BookStack book. Books hold chapters and pages.',
+
     {
       name: z.string().describe('Book name'),
       description: z.string().optional().describe('Short description shown under the book name')
@@ -503,7 +578,8 @@ ${bookstackSection}
 
   server.tool(
     'add_books_to_shelf',
-    'Assign books to a shelf. Replaces the current book list — include all book IDs you want in the shelf.',
+    '[SETUP ONLY — do not call during normal task workflow] Assign books to a shelf. Replaces the current book list — include all book IDs you want in the shelf.',
+
     {
       shelfId: z.number().describe('Shelf ID'),
       bookIds: z.array(z.number()).describe('Complete list of book IDs to assign to the shelf')
@@ -516,7 +592,8 @@ ${bookstackSection}
 
   server.tool(
     'create_bookstack_chapter',
-    'Create a new chapter inside a book. Chapters are optional groupings of pages within a book.',
+    '[SETUP ONLY — do not call during normal task workflow] Create a new chapter inside a book. Chapters are optional groupings of pages within a book.',
+
     {
       bookId: z.number().describe('Book ID to create the chapter in'),
       name: z.string().describe('Chapter name'),
@@ -532,14 +609,18 @@ ${bookstackSection}
 
   server.tool(
     'sync_openapi_docs',
-    'Fetch the NestJS OpenAPI spec and sync API reference pages to BookStack for all affected modules. Call this after run_verification passes and before create_gitlab_mr.',
+    'Fetch the NestJS OpenAPI spec and sync API reference pages to BookStack for all affected modules. Call this after run_verification passes (step 4d). Non-fatal if BookStack is unreachable.',
     {
       runId: z.string().describe('Run ID from begin_task'),
       affectedModules: z.array(z.string()).describe('NestJS module names that were changed in this run'),
-      bookId: z.number().describe('BookStack book ID for the API reference section'),
       project: z.enum(['boffmedia', 'smartrotom'])
     },
-    async ({ runId, affectedModules, bookId, project }) => {
+    async ({ runId, affectedModules, project }) => {
+      // Fix 8: bookId is a static config value — read from config instead of requiring the caller to know it
+      const bookId = API_REFERENCE_BOOK_IDS[project]
+      if (!bookId) {
+        return { content: [{ type: 'text', text: JSON.stringify({ ok: false, reason: `No API reference book configured for project: ${project}` }) }] }
+      }
       const result = await syncOpenApiDocs({ runId, affectedModules, bookId, project })
       return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] }
     }
