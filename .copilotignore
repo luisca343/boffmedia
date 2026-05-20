@@ -1,0 +1,65 @@
+cat > ~/Programacion/Ficus\ Labs/boffmedia/.copilotignore << 'EOF'
+# Dependencies
+**/node_modules/
+**/vendor/
+**/.pnp/
+
+# Build output
+**/dist/
+**/build/
+**/.next/
+**/.nuxt/
+**/.turbo/
+**/.cache/
+**/out/
+**/.output/
+
+# Media & uploads (large binary files)
+**/public/
+**/uploads/
+**/media/
+**/assets/images/
+**/assets/videos/
+**/*.jpg
+**/*.jpeg
+**/*.png
+**/*.gif
+**/*.webp
+**/*.svg
+**/*.mp4
+**/*.mp3
+**/*.wav
+**/*.pdf
+**/*.zip
+**/*.tar
+**/*.gz
+
+# Database
+**/*.sql
+**/*.dump
+**/*.db
+**/*.sqlite
+
+# Logs & locks
+**/*.log
+**/pnpm-lock.yaml
+**/package-lock.json
+**/yarn.lock
+
+# Generated / migrations
+**/drizzle/
+**/migrations/
+**/__pycache__/
+**/*.pyc
+
+# Env & secrets
+**/.env*
+
+# Test coverage
+**/coverage/
+**/.nyc_output/
+
+# IDE
+**/.vscode/
+**/.idea/
+EOF
