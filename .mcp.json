@@ -1,6 +1,7 @@
 {
-  "mcpServers": {
+  "servers": {
     "boff-agent": {
+      "type": "stdio",
       "command": "/bin/bash",
       "args": [
         "-c",

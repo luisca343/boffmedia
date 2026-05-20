@@ -106,7 +106,7 @@ export async function createBookStackChapter(input: {
 // E4: update the status:* tag on a task page without touching its content
 export async function updateTaskStatus(
   pageId: number,
-  status: 'pending' | 'in-progress' | 'done'
+  status: 'draft' | 'pending' | 'in-progress' | 'done'
 ): Promise<void> {
   const page = await bsGet(`pages/${pageId}`)
   const currentTags: string[] = page.tags?.map((t: { name: string }) => t.name) ?? []
