@@ -6,6 +6,7 @@ import { ResponseModule } from '@api/_utils/response/response.module';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 import { StarbankModule } from '../starbank/starbank.module';
 import { WingullModule } from '../wingull/wingull.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { WingullModule } from '../wingull/wingull.module';
     DrizzleModule,
     StarbankModule,
     WingullModule,
+    NotificationsModule,
   ],
   controllers: [SmartrotomController],
   providers: [SmartrotomService],
