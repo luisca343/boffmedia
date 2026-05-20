@@ -15,6 +15,7 @@ import { FurretTodayPage } from "../pages/smartrotom/furrettoday.page"
 import { StarbankPage } from "../pages/smartrotom/starbank.page"
 import { MisionesPage } from "../pages/smartrotom/misiones.page"
 import { PasaportePage } from "../pages/smartrotom/pasaporte.page"
+import { NotificationsPage } from "../pages/smartrotom/notifications.page"
 
 type Pages = {
   landingPage: LandingPage
@@ -33,6 +34,7 @@ type Pages = {
   starbankPage: StarbankPage
   misionesPage: MisionesPage
   pasaportePage: PasaportePage
+  notificationsPage: NotificationsPage
 }
 
 export const test = base.extend<Pages>({
@@ -52,6 +54,7 @@ export const test = base.extend<Pages>({
   starbankPage: async ({ page }, use) => { await use(new StarbankPage(page)) },
   misionesPage: async ({ page }, use) => { await use(new MisionesPage(page)) },
   pasaportePage: async ({ page }, use) => { await use(new PasaportePage(page)) },
+  notificationsPage: async ({ page }, use) => { await use(new NotificationsPage(page)) },
 })
 
 export { expect }
