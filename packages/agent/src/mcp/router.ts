@@ -22,7 +22,7 @@ import {
   updateTaskStatus
 } from '../tools/bookstack.js'
 import { detectStructuralChanges } from '../tools/structural.js'
-import { ADR_CHAPTER_IDS, API_REFERENCE_BOOK_IDS, CONVENTIONS_PAGE_IDS, TECHNICAL_BOOK_IDS } from '../agent.config.js'
+import { ADR_CHAPTER_IDS, AGENT_TASK_BOOK_IDS, API_REFERENCE_BOOK_IDS, CONVENTIONS_PAGE_IDS, TECHNICAL_BOOK_IDS } from '../agent.config.js'
 import {
   createGitLabMR,
   createGitLabIssue,
@@ -49,6 +49,37 @@ export function registerTools(server: McpServer) {
       bookstackTaskPageId: z.number().optional().describe('BookStack page ID of the agent:task page — if provided, status tag is updated to in-progress automatically')
     },
     async ({ title, taskDescription, taskType, bookstackTaskPageId }) => {
+      // Part 2 (Sect. 24): dependency awareness — check task page status before starting
+      let dependencyWarning = ''
+      if (bookstackTaskPageId) {
+        const taskPage = await fetchBookStackPage({ pageId: bookstackTaskPageId }).catch(() => null)
+        if (taskPage) {
+          if (taskPage.tags.includes('status:draft')) {
+            return { content: [{ type: 'text', text:
+              `❌ Cannot execute task "${taskPage.title}" — it has status:draft.\n` +
+              `The user must review and approve it first by changing the tag to status:pending in BookStack.`
+            }] }
+          }
+          if (taskPage.tags.includes('status:done')) {
+            return { content: [{ type: 'text', text:
+              `❌ Task "${taskPage.title}" is already done. To re-run it, change the status tag to status:pending in BookStack.`
+            }] }
+          }
+          const dependsOnMatch = taskPage.content.match(/dependsOn:\s*(.+)/i)
+          const dependsOn = dependsOnMatch?.[1]?.trim()
+          if (dependsOn && dependsOn.toLowerCase() !== 'none') {
+            const depResults = await searchBookStack({ query: dependsOn, tags: ['agent:task'], limit: 1 })
+            if (depResults.length > 0) {
+              const depPage = await fetchBookStackPage({ pageId: depResults[0].pageId }).catch(() => null)
+              if (depPage && !depPage.tags.includes('status:done')) {
+                const depStatus = depPage.tags.find(t => t.startsWith('status:'))?.replace('status:', '') ?? 'unknown'
+                dependencyWarning = `\n## ⚠ Dependency warning\nThis task depends on "${dependsOn}" which has not completed yet (status: ${depStatus}).\nProceeding may cause failures if the prerequisite work is not done. Ask the user whether to continue.\n`
+              }
+            }
+          }
+        }
+      }
+
       // Fix 4: clean slug — strip leading/trailing hyphens, fall back to 'task'
       const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'task'
       const runId = `${slug}-${Date.now()}`
@@ -110,7 +141,7 @@ export function registerTools(server: McpServer) {
 runId: ${runId}
 title: ${title}
 taskType: ${taskType}
-${healthSection}
+${healthSection}${dependencyWarning}
 ## Workflow (follow in order)
 
 1. ✅ begin_task — done. Health checked. Metrics baseline captured.
@@ -366,14 +397,147 @@ ${bookstackSection}
 
   server.tool(
     'list_bookstack_tasks',
-    'List all agent:task pages for a project. Use this to discover pending tasks without being given a specific page URL.',
+    'List agent:task pages for a project. Plan tasks are grouped by chapter and sorted by order:N tag. Standalone loose pages are listed separately. Use planId to filter to a specific plan.',
     {
       project: z.enum(['boffmedia', 'smartrotom']),
-      status: z.enum(['pending', 'in-progress', 'done']).optional()
+      status: z.enum(['draft', 'pending', 'in-progress', 'done', 'all']).optional().default('all').describe('Filter by status. Omit or use "all" to return all statuses.'),
+      planId: z.string().optional().describe('Filter to tasks from a specific plan (plan:X tag)')
     },
-    async ({ project, status }) => {
-      const result = await listBookStackTasks({ project, status })
+    async ({ project, status, planId }) => {
+      const result = await listBookStackTasks({ project, status, planId })
       return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] }
+    }
+  )
+
+  server.tool(
+    'plan_goal',
+    'PLANNING TOOL — decomposes a high-level goal into a BookStack chapter containing '
+    + 'individual draft task pages. Creates a dated chapter (YYYY-MM-DD — goal title), '
+    + 'then instructs the LLM to write each task as a page inside it. '
+    + 'All tasks are status:draft — NOT executed until the user reviews and approves them '
+    + '(status:draft → status:pending). '
+    + 'Single small tasks do NOT need plan_goal — use begin_task directly. '
+    + 'Use plan_goal only for goals that span multiple modules, apps, or sessions.',
+    {
+      goal: z.string().describe('High-level goal description — what the user wants to achieve'),
+      project: z.enum(['boffmedia', 'smartrotom']).describe('Which project this goal belongs to'),
+      context: z.string().optional().describe('Additional context — constraints, preferences, BookStack page URLs')
+    },
+    async ({ goal, project, context: additionalContext }) => {
+      const [codeContext, history] = await Promise.all([
+        resolveContext({ taskDescription: goal, maxFiles: 15 }),
+        getRunHistory({ limit: 5, similarTo: goal, status: 'all' })
+      ])
+
+      const planId = `plan-${Date.now()}`
+      const today = new Date().toISOString().slice(0, 10)
+      const chapterName = `${today} — ${goal}`
+      const bookId = AGENT_TASK_BOOK_IDS[project]
+
+      const chapter = await createBookStackChapter({
+        bookId,
+        name: chapterName,
+        description: `Plan created ${today}. planId: ${planId}. Goal: ${goal}`
+      })
+      const chapterId = chapter.chapterId
+
+      const historyBlock = history.length > 0
+        ? history.map(r => {
+            const icon = r.status === 'passed' ? '✔' : '✖'
+            const note = r.failureSummary ? `. Note: ${r.failureSummary}` : ''
+            return `- "${r.title}" → ${icon} ${r.status}${note}`
+          }).join('\n')
+        : 'No prior runs found.'
+
+      const instructions = `
+# Plan Goal — Decomposition Instructions
+
+planId: ${planId}
+goal: ${goal}
+project: ${project}
+chapterId: ${chapterId}
+chapterName: ${chapterName}
+bookId: ${bookId}
+
+## Chapter created ✔
+
+A BookStack chapter has been created: "${chapterName}"
+All task pages MUST be written inside this chapter using chapterId: ${chapterId}
+
+## What to do now
+
+Decompose this goal into **individual, atomic tasks**. For each task, call
+write_bookstack_page with:
+- bookId: ${bookId}
+- chapterId: ${chapterId}          ← REQUIRED — all pages inside the chapter
+- title: a clear, actionable task title
+- tags: ["agent:task", "${project}", "status:draft", "plan:${planId}", "order:N"]
+- content: use the task template below
+
+After writing all draft pages, present a summary to the user:
+1. Chapter URL in BookStack (so the user can review all drafts in one place)
+2. All drafted tasks listed in execution order with estimated scope
+3. Dependencies between tasks
+4. Total estimated scope for the full plan
+
+The user will review the chapter in BookStack, edit pages if needed, and approve
+each task by changing status:draft → status:pending. Only status:pending pages
+can be executed by begin_task.
+
+## Task template
+
+Use this exact markdown structure for every draft page:
+
+\`\`\`markdown
+# [Task title]
+
+## Description
+[Clear, specific description of what this task implements — one task, one concern]
+
+## Affected apps
+- api / web / both
+
+## Acceptance criteria
+- [ ] [Specific, testable criterion — Jest or Playwright must be able to verify this]
+- [ ] [Another criterion]
+
+## Do not touch
+- [Any files or areas that must not be modified by this task]
+
+## Dependencies
+- dependsOn: [exact title of the prerequisite task, or "none"]
+- order: [sequence number — 1, 2, 3...]
+
+## Plan reference
+- planId: ${planId}
+- chapterId: ${chapterId}
+- goal: ${goal}
+\`\`\`
+
+## Decomposition rules
+- Each task must be completable in a single begin_task run (< 10 files changed)
+- Tasks must be ordered so no task depends on work not yet done:
+    1. Shared types / packages/shared changes first
+    2. DrizzleORM schema and migration tasks second
+    3. NestJS service and repository tasks third
+    4. NestJS controller and DTO tasks fourth
+    5. NextJS pages and components last
+- Each task must have at least one testable acceptance criterion
+- Do NOT create tasks for things that already exist — check existing modules below
+- Do NOT create tasks that mix API and UI work — keep them separate
+- If a task would change more than ~10 files, split it further
+
+## Codebase context
+Existing modules: ${codeContext.moduleList.join(', ')}
+Existing pages: ${codeContext.pageList.join(', ')}
+${codeContext.conventions ? '\nConventions:\n' + codeContext.conventions : ''}
+${additionalContext ? '\nUser-provided context:\n' + additionalContext : ''}
+
+## Prior runs on similar work
+${historyBlock}
+`.trim()
+
+      return { content: [{ type: 'text', text: instructions }] }
     }
   )
 

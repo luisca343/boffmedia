@@ -243,31 +243,120 @@ ${input.description}
   })
 }
 
-// E4: list agent:task pages for a project
+// E4: list agent:task pages for a project — grouped by plan chapter vs standalone
 export async function listBookStackTasks(input: {
   project: 'boffmedia' | 'smartrotom'
-  status?: 'pending' | 'in-progress' | 'done'
-}): Promise<Array<{ pageId: number; title: string; tags: string[]; url: string }>> {
-  // Use the search API with tag filters — the pages list API does not support multi-tag filtering
+  status?: 'draft' | 'pending' | 'in-progress' | 'done' | 'all'
+  planId?: string
+}): Promise<{
+  plans: Array<{
+    planId: string
+    chapterName: string
+    chapterId: number
+    tasks: Array<{ pageId: number; title: string; status: string; order: number; url: string }>
+  }>
+  standalone: Array<{ pageId: number; title: string; status: string; url: string }>
+}> {
   const tagQuery = `[agent:task] [${input.project}]`
-  const results = await bsGet(
-    `search?query=${encodeURIComponent(tagQuery)}&count=20`
+  const results = await bsGet(`search?query=${encodeURIComponent(tagQuery)}&count=50`)
+
+  type RawPage = {
+    id: number
+    name: string
+    chapter_id?: number
+    tags?: Array<{ name: string }>
+    url: string
+    type?: string
+  }
+
+  const pages: RawPage[] = (results.data ?? []).filter(
+    (r: RawPage) => r.type === 'page' || !r.type
   )
 
-  const pages = (results.data ?? []).filter(
-    (r: { type?: string }) => r.type === 'page' || !r.type
+  // Status filter
+  const statusFiltered = pages.filter(p => {
+    if (!input.status || input.status === 'all') return true
+    return p.tags?.some(t => t.name === `status:${input.status}`)
+  })
+
+  // planId filter
+  const planFiltered = input.planId
+    ? statusFiltered.filter(p => p.tags?.some(t => t.name === `plan:${input.planId}`))
+    : statusFiltered
+
+  // Separate plan pages from standalone pages
+  const planPages: RawPage[] = []
+  const standalonePages: RawPage[] = []
+  for (const p of planFiltered) {
+    const hasPlanTag = p.tags?.some(t => t.name.startsWith('plan:'))
+    if (hasPlanTag) {
+      planPages.push(p)
+    } else {
+      standalonePages.push(p)
+    }
+  }
+
+  // Fetch unique chapter names for plan pages
+  const uniqueChapterIds = [
+    ...new Set(planPages.map(p => p.chapter_id).filter((id): id is number => id != null))
+  ]
+  const chapterNames: Record<number, string> = {}
+  await Promise.all(
+    uniqueChapterIds.map(async chapterId => {
+      try {
+        const ch = await bsGet(`chapters/${chapterId}`)
+        chapterNames[chapterId] = ch.name
+      } catch {
+        chapterNames[chapterId] = `Chapter ${chapterId}`
+      }
+    })
   )
 
-  return pages
-    .filter((p: { tags?: Array<{ name: string }> }) =>
-      !input.status || p.tags?.some((t: { name: string }) => t.name === `status:${input.status}`)
-    )
-    .map((p: { id: number; name: string; tags?: Array<{ name: string }>; url: string }) => ({
-      pageId: p.id,
-      title: p.name,
-      tags: p.tags?.map((t: { name: string }) => t.name) ?? [],
-      url: p.url
-    }))
+  // Group plan pages by planId and sort by order:N tag
+  const planGroups = new Map<string, {
+    planId: string
+    chapterName: string
+    chapterId: number
+    tasks: Array<{ pageId: number; title: string; status: string; order: number; url: string }>
+  }>()
+
+  for (const p of planPages) {
+    const planTag = p.tags?.find(t => t.name.startsWith('plan:'))
+    const planId = planTag?.name.replace('plan:', '') ?? 'unknown'
+    const orderTag = p.tags?.find(t => t.name.startsWith('order:'))
+    const order = orderTag ? parseInt(orderTag.name.replace('order:', ''), 10) : 999
+    const statusTag = p.tags?.find(t => t.name.startsWith('status:'))
+    const status = statusTag?.name.replace('status:', '') ?? 'unknown'
+
+    if (!planGroups.has(planId)) {
+      planGroups.set(planId, {
+        planId,
+        chapterId: p.chapter_id ?? 0,
+        chapterName: p.chapter_id
+          ? (chapterNames[p.chapter_id] ?? `Chapter ${p.chapter_id}`)
+          : 'Unknown chapter',
+        tasks: []
+      })
+    }
+    planGroups.get(planId)!.tasks.push({ pageId: p.id, title: p.name, status, order, url: p.url })
+  }
+
+  for (const group of planGroups.values()) {
+    group.tasks.sort((a, b) => a.order - b.order)
+  }
+
+  return {
+    plans: Array.from(planGroups.values()),
+    standalone: standalonePages.map(p => {
+      const statusTag = p.tags?.find(t => t.name.startsWith('status:'))
+      return {
+        pageId: p.id,
+        title: p.name,
+        status: statusTag?.name.replace('status:', '') ?? 'unknown',
+        url: p.url
+      }
+    })
+  }
 }
 
 // E5: write an ADR page to the project's ADR chapter
