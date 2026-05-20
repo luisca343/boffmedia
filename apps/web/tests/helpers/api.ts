@@ -15,3 +15,13 @@ export async function mockPost(page: Page, url: string, body: unknown) {
     route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(body) })
   )
 }
+
+export async function mockPatch(page: Page, url: string, body: unknown) {
+  await page.route(url, (route) => {
+    if (route.request().method() === "PATCH") {
+      route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(body) })
+    } else {
+      route.continue()
+    }
+  })
+}
