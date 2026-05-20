@@ -174,7 +174,7 @@ export const smartRotomInventory = mysqlTable('rotom_inventory', {
 
 export type SmartRotomInventoryItem = typeof smartRotomInventory.$inferSelect;
 
-export const srNotifications = mysqlTable('sr_notifications', {
+export const srNotifications = mysqlTable('rotom_notifications', {
   id: int('id').primaryKey().autoincrement(),
   userUuid: char('user_uuid', { length: 36 })
     .notNull()
