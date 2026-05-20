@@ -2,11 +2,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { MinecraftDetails } from './MinecraftDetails';
+import type { MinecraftDetailsDto } from './MinecraftDetailsDto';
 export type MinecraftLinkDto = {
     username: string;
     email: string;
     password: string;
-    minecraft: MinecraftDetails;
+    minecraft: MinecraftDetailsDto;
 };
 
