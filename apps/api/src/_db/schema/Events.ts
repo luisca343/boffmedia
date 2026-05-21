@@ -52,10 +52,13 @@ export const boffMediaEvents = mysqlTable(
   'boffmedia_events',
   {
     id: int('id').primaryKey().autoincrement(),
-    parentId: int('parent_id').references((): AnyMySqlColumn => boffMediaEvents.id, {
-      onDelete: 'cascade',
-      onUpdate: 'cascade',
-    }),
+    parentId: int('parent_id').references(
+      (): AnyMySqlColumn => boffMediaEvents.id,
+      {
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+      },
+    ),
     title: varchar('title', { length: 255 }).notNull(),
     gameId: int('game').references(() => boffMediaGames.id, {
       onDelete: 'cascade',

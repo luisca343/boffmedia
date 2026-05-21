@@ -132,10 +132,14 @@ export class AppService {
     const iconsFolderPath = path.join(process.cwd(), 'public/blog', 'icons');
     try {
       const files = await fs.readdir(iconsFolderPath);
-      const filesObj = files.reduce((acc, file) => {
-        acc[file.split('.')[0]] = `https://api.boffmedia.es/blog/icons/${file}`;
-        return acc;
-      }, {} as Record<string, string>);
+      const filesObj = files.reduce(
+        (acc, file) => {
+          acc[file.split('.')[0]] =
+            `https://api.boffmedia.es/blog/icons/${file}`;
+          return acc;
+        },
+        {} as Record<string, string>,
+      );
       return filesObj;
     } catch (error: any) {
       this.logger.error('Error reading the icons folder:', error);

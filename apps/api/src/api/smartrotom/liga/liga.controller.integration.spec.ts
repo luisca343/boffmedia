@@ -68,7 +68,9 @@ describe('LigaController — integration (ValidationPipe + GlobalExceptionFilter
   // ── GET /smartrotom/liga/replay/:id ────────────────────────────────────
   describe('GET /smartrotom/liga/replay/:id', () => {
     it('returns 200 and delegates to facade.getReplayById', async () => {
-      (mockFacade.getReplayById! as jest.Mock).mockResolvedValue({ id: 1 } as any);
+      (mockFacade.getReplayById! as jest.Mock).mockResolvedValue({
+        id: 1,
+      } as any);
 
       const res = await request(app.getHttpServer()).get(
         '/smartrotom/liga/replay/1',
@@ -163,7 +165,9 @@ describe('LigaController — integration (ValidationPipe + GlobalExceptionFilter
   // ── GET /smartrotom/liga/stats/player/:uuid ────────────────────────────
   describe('GET /smartrotom/liga/stats/player/:uuid', () => {
     it('returns 200 and delegates to facade.getPlayerStatistics', async () => {
-      (mockFacade.getPlayerStatistics! as jest.Mock).mockResolvedValue({ wins: 5 } as any);
+      (mockFacade.getPlayerStatistics! as jest.Mock).mockResolvedValue({
+        wins: 5,
+      } as any);
 
       const res = await request(app.getHttpServer()).get(
         `/smartrotom/liga/stats/player/${MOCK_UUID}`,
@@ -195,7 +199,9 @@ describe('LigaController — integration (ValidationPipe + GlobalExceptionFilter
   // ── GET /smartrotom/liga/ranking/:uuid ─────────────────────────────────
   describe('GET /smartrotom/liga/ranking/:uuid', () => {
     it('returns 200 when player is ranked', async () => {
-      (mockFacade.getPlayerRanking! as jest.Mock).mockResolvedValue({ rank: 1 } as any);
+      (mockFacade.getPlayerRanking! as jest.Mock).mockResolvedValue({
+        rank: 1,
+      } as any);
 
       const res = await request(app.getHttpServer()).get(
         `/smartrotom/liga/ranking/${MOCK_UUID}`,
@@ -206,7 +212,9 @@ describe('LigaController — integration (ValidationPipe + GlobalExceptionFilter
     });
 
     it('returns 500 when player is not ranked', async () => {
-      (mockFacade.getPlayerRanking! as jest.Mock).mockResolvedValue(null as any);
+      (mockFacade.getPlayerRanking! as jest.Mock).mockResolvedValue(
+        null as any,
+      );
 
       const res = await request(app.getHttpServer()).get(
         `/smartrotom/liga/ranking/${MOCK_UUID}`,
@@ -222,7 +230,9 @@ describe('LigaController — integration (ValidationPipe + GlobalExceptionFilter
   // ── GET /smartrotom/liga/compare/:player1/:player2 ─────────────────────
   describe('GET /smartrotom/liga/compare/:player1/:player2', () => {
     it('returns 200 and delegates to facade.comparePlayerStatistics', async () => {
-      (mockFacade.comparePlayerStatistics! as jest.Mock).mockResolvedValue({ diff: 0 } as any);
+      (mockFacade.comparePlayerStatistics! as jest.Mock).mockResolvedValue({
+        diff: 0,
+      } as any);
 
       const res = await request(app.getHttpServer()).get(
         `/smartrotom/liga/compare/${MOCK_UUID}/${MOCK_UUID2}`,
@@ -241,7 +251,9 @@ describe('LigaController — integration (ValidationPipe + GlobalExceptionFilter
   // ── GET /smartrotom/liga/tournaments ───────────────────────────────────
   describe('GET /smartrotom/liga/tournaments', () => {
     it('returns 200 and delegates to facade.getActiveTournaments', async () => {
-      (mockFacade.getActiveTournaments! as jest.Mock).mockResolvedValue([] as any);
+      (mockFacade.getActiveTournaments! as jest.Mock).mockResolvedValue(
+        [] as any,
+      );
 
       const res = await request(app.getHttpServer()).get(
         '/smartrotom/liga/tournaments',
@@ -257,7 +269,9 @@ describe('LigaController — integration (ValidationPipe + GlobalExceptionFilter
   // ── GET /smartrotom/liga/tournament/:id ────────────────────────────────
   describe('GET /smartrotom/liga/tournament/:id', () => {
     it('returns 200 and delegates to facade.getTournamentById', async () => {
-      (mockFacade.getTournamentById! as jest.Mock).mockResolvedValue({ id: 1 } as any);
+      (mockFacade.getTournamentById! as jest.Mock).mockResolvedValue({
+        id: 1,
+      } as any);
 
       const res = await request(app.getHttpServer()).get(
         '/smartrotom/liga/tournament/1',
@@ -281,7 +295,9 @@ describe('LigaController — integration (ValidationPipe + GlobalExceptionFilter
   // ── GET /smartrotom/liga/tournament/:id/matches ────────────────────────
   describe('GET /smartrotom/liga/tournament/:id/matches', () => {
     it('returns 200 and delegates to facade.getTournamentMatches', async () => {
-      (mockFacade.getTournamentMatches! as jest.Mock).mockResolvedValue([] as any);
+      (mockFacade.getTournamentMatches! as jest.Mock).mockResolvedValue(
+        [] as any,
+      );
 
       const res = await request(app.getHttpServer()).get(
         '/smartrotom/liga/tournament/1/matches',
@@ -297,7 +313,9 @@ describe('LigaController — integration (ValidationPipe + GlobalExceptionFilter
   // ── POST /smartrotom/liga/tournament ───────────────────────────────────
   describe('POST /smartrotom/liga/tournament', () => {
     it('returns 201 and delegates to facade.createTournament', async () => {
-      (mockFacade.createTournament! as jest.Mock).mockResolvedValue({ id: 1 } as any);
+      (mockFacade.createTournament! as jest.Mock).mockResolvedValue({
+        id: 1,
+      } as any);
 
       const res = await request(app.getHttpServer())
         .post('/smartrotom/liga/tournament')

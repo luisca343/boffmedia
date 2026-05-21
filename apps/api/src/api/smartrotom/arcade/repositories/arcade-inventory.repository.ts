@@ -77,7 +77,9 @@ export class ArcadeInventoryRepository
     return this.db
       .select()
       .from(smartRotomInventory)
-      .where(eq(smartRotomInventory.uuid, uuid)) as unknown as ArcadeInventoryItem[];
+      .where(
+        eq(smartRotomInventory.uuid, uuid),
+      ) as unknown as ArcadeInventoryItem[];
   }
 
   async findUserItem(

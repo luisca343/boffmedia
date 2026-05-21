@@ -220,7 +220,10 @@ export class PokemonDataService {
     let filteredMoves: any = {};
     if (moveTypes && moveTypes.length > 0) {
       Object.keys(moves).forEach((key) => {
-        if ((keyMapping as any)[key] && moveTypes.includes((keyMapping as any)[key])) {
+        if (
+          (keyMapping as any)[key] &&
+          moveTypes.includes((keyMapping as any)[key])
+        ) {
           filteredMoves[key] = moves[key];
         }
       });

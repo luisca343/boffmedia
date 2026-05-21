@@ -21,6 +21,8 @@ module.exports = {
     ],
     coverageDirectory: 'coverage',
     coverageProvider: 'v8',
+    maxWorkers: Number(process.env.JEST_MAX_WORKERS ?? 2),
+    workerIdleMemoryLimit: '512MB',
     coverageReporters: ['text-summary', 'cobertura', 'lcov'],
     collectCoverage: false,
     collectCoverageFrom: [

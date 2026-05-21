@@ -1,8 +1,6 @@
 import { Injectable, Inject, Optional } from '@nestjs/common';
 import { NOTIFICATIONS_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
-import {
-  INotificationsRepository,
-} from './notifications.repository';
+import { INotificationsRepository } from './notifications.repository';
 import { SrNotification } from '@/_db/schema/SmartRotom';
 import { SocketsGateway } from '@api/_utils/sockets/sockets.gateway';
 

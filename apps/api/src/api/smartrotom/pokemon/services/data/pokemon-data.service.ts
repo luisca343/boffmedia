@@ -368,7 +368,8 @@ export class PokemonDataService extends BaseDataService {
 
     // Find base pre-evolution
     while ((preEvo!.forms[0]?.preEvolutions?.length ?? 0) > 0) {
-      const preEvoName = preEvo!.forms[0]?.preEvolutions?.[0]?.toLowerCase() ?? '';
+      const preEvoName =
+        preEvo!.forms[0]?.preEvolutions?.[0]?.toLowerCase() ?? '';
       preEvo = this.getSpeciesByName(preEvoName);
     }
 

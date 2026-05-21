@@ -105,7 +105,12 @@ export class WingullRepository {
           }
           return null; // Explicitly return null for invalid entries
         })
-        .filter(Boolean) as { town: string; type: string; number: number; ownerUuid?: string | undefined; }[];
+        .filter(Boolean) as {
+        town: string;
+        type: string;
+        number: number;
+        ownerUuid?: string | undefined;
+      }[];
     } catch (error: any) {
       this.logger.error('Error fetching all plots:', error);
       throw new Error('Failed to fetch all plots');

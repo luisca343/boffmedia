@@ -206,18 +206,18 @@ export class TrackerService {
       opponentTeam:
         dto.opponentTeam ??
         JSON.parse(existing.opponentTeam as unknown as string),
-      opponentName: (dto.opponentName ?? existing.opponentName) ?? undefined,
+      opponentName: dto.opponentName ?? existing.opponentName ?? undefined,
       opponentArchetype:
-        (dto.opponentArchetype ?? existing.opponentArchetype) ?? undefined,
-      result: (dto.result ?? existing.result) ?? undefined,
-      outcomeTag: (dto.outcomeTag ?? existing.outcomeTag) ?? undefined,
-      turnCount: (dto.turnCount ?? existing.turnCount) ?? undefined,
-      eloAfter: (dto.eloAfter ?? existing.eloAfter) ?? undefined,
-      opponentElo: (dto.opponentElo ?? existing.opponentElo) ?? undefined,
+        dto.opponentArchetype ?? existing.opponentArchetype ?? undefined,
+      result: dto.result ?? existing.result ?? undefined,
+      outcomeTag: dto.outcomeTag ?? existing.outcomeTag ?? undefined,
+      turnCount: dto.turnCount ?? existing.turnCount ?? undefined,
+      eloAfter: dto.eloAfter ?? existing.eloAfter ?? undefined,
+      opponentElo: dto.opponentElo ?? existing.opponentElo ?? undefined,
       notes: dto.notes ?? JSON.parse(existing.notes as unknown as string),
       completedAt: dto.completedAt
         ? new Date(dto.completedAt)
-        : existing.completedAt ?? undefined,
+        : (existing.completedAt ?? undefined),
     });
     return this.repo.findMatch(id) as Promise<VgcMatch>;
   }

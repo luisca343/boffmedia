@@ -98,7 +98,9 @@ describe('ArcadeController — integration (ValidationPipe + GlobalExceptionFilt
   // ── GET /smartrotom/arcade/streak/:uuid ────────────────────────────────
   describe('GET /smartrotom/arcade/streak/:uuid', () => {
     it('returns 200 and delegates to facade.getUserStreak', async () => {
-      (mockFacade.getUserStreak! as jest.Mock).mockReturnValue({ streak: 5 } as any);
+      (mockFacade.getUserStreak! as jest.Mock).mockReturnValue({
+        streak: 5,
+      } as any);
 
       const res = await request(app.getHttpServer()).get(
         `/smartrotom/arcade/streak/${MOCK_UUID}`,
@@ -114,7 +116,9 @@ describe('ArcadeController — integration (ValidationPipe + GlobalExceptionFilt
   // ── POST /smartrotom/arcade/streak/claim ───────────────────────────────
   describe('POST /smartrotom/arcade/streak/claim', () => {
     it('returns 201 and delegates to facade.claimDailyReward', async () => {
-      (mockFacade.claimDailyReward! as jest.Mock).mockResolvedValue({ success: true } as any);
+      (mockFacade.claimDailyReward! as jest.Mock).mockResolvedValue({
+        success: true,
+      } as any);
 
       const res = await request(app.getHttpServer())
         .post('/smartrotom/arcade/streak/claim')
@@ -138,7 +142,9 @@ describe('ArcadeController — integration (ValidationPipe + GlobalExceptionFilt
   // ── GET /smartrotom/arcade/streak/:uuid/stats ──────────────────────────
   describe('GET /smartrotom/arcade/streak/:uuid/stats', () => {
     it('returns 200 and delegates to facade.getStreakStats', async () => {
-      (mockFacade.getStreakStats! as jest.Mock).mockResolvedValue({ streak: 3 } as any);
+      (mockFacade.getStreakStats! as jest.Mock).mockResolvedValue({
+        streak: 3,
+      } as any);
 
       const res = await request(app.getHttpServer()).get(
         `/smartrotom/arcade/streak/${MOCK_UUID}/stats`,
@@ -170,7 +176,9 @@ describe('ArcadeController — integration (ValidationPipe + GlobalExceptionFilt
   // ── GET /smartrotom/arcade/inventory/:uuid ─────────────────────────────
   describe('GET /smartrotom/arcade/inventory/:uuid', () => {
     it('returns 200 and delegates to facade.getUserInventory', async () => {
-      (mockFacade.getUserInventory! as jest.Mock).mockResolvedValue({ items: [] } as any);
+      (mockFacade.getUserInventory! as jest.Mock).mockResolvedValue({
+        items: [],
+      } as any);
 
       const res = await request(app.getHttpServer()).get(
         `/smartrotom/arcade/inventory/${MOCK_UUID}`,
@@ -227,7 +235,9 @@ describe('ArcadeController — integration (ValidationPipe + GlobalExceptionFilt
   // ── POST /smartrotom/arcade/inventory/add ──────────────────────────────
   describe('POST /smartrotom/arcade/inventory/add', () => {
     it('returns 201 and delegates to facade.addItemToInventory', async () => {
-      (mockFacade.addItemToInventory! as jest.Mock).mockResolvedValue({ id: 1 } as any);
+      (mockFacade.addItemToInventory! as jest.Mock).mockResolvedValue({
+        id: 1,
+      } as any);
 
       const res = await request(app.getHttpServer())
         .post('/smartrotom/arcade/inventory/add')
@@ -299,7 +309,9 @@ describe('ArcadeController — integration (ValidationPipe + GlobalExceptionFilt
   // ── POST /smartrotom/arcade/inventory/:uuid/item/:itemId/use ───────────
   describe('POST /smartrotom/arcade/inventory/:uuid/item/:itemId/use', () => {
     it('returns 201 and delegates to facade.markItemAsUsed', async () => {
-      (mockFacade.markItemAsUsed! as jest.Mock).mockResolvedValue({ id: 1 } as any);
+      (mockFacade.markItemAsUsed! as jest.Mock).mockResolvedValue({
+        id: 1,
+      } as any);
 
       const res = await request(app.getHttpServer()).post(
         `/smartrotom/arcade/inventory/${MOCK_UUID}/item/potion_heal/use`,
@@ -375,7 +387,9 @@ describe('ArcadeController — integration (ValidationPipe + GlobalExceptionFilt
   // ── GET /smartrotom/arcade/lootbox/config ──────────────────────────────
   describe('GET /smartrotom/arcade/lootbox/config', () => {
     it('returns 200 and delegates to facade.getLootboxConfig', async () => {
-      (mockFacade.getLootboxConfig! as jest.Mock).mockResolvedValue({ boxes: [] } as any);
+      (mockFacade.getLootboxConfig! as jest.Mock).mockResolvedValue({
+        boxes: [],
+      } as any);
 
       const res = await request(app.getHttpServer()).get(
         '/smartrotom/arcade/lootbox/config',

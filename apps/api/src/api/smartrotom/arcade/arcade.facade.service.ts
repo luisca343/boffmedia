@@ -449,7 +449,9 @@ export class ArcadeFacadeService implements OnModuleInit {
             itemError,
           );
           failedItems.push(item.itemId);
-          errors.push(`Error processing ${item.itemId}: ${(itemError as any).message}`);
+          errors.push(
+            `Error processing ${item.itemId}: ${(itemError as any).message}`,
+          );
         }
       }
 
