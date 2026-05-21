@@ -417,7 +417,15 @@ export class LeaderboardsService {
       )
       .where(and(...whereConditions))
       .orderBy(desc(boffMediaParticipantProgress.completedAt))
-      .limit(limit) as unknown as { participantId: number; nickname: string; avatar: string; achievementName: string; achievementIcon: string; points: number; completedAt: Date; }[];
+      .limit(limit) as unknown as {
+      participantId: number;
+      nickname: string;
+      avatar: string;
+      achievementName: string;
+      achievementIcon: string;
+      points: number;
+      completedAt: Date;
+    }[];
   }
 
   // ==================== PRIVATE HELPER METHODS ====================

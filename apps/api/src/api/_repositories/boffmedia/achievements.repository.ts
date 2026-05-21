@@ -98,7 +98,9 @@ export class AchievementsRepository {
         boffMediaEvents,
         eq(boffMediaEvents.id, boffMediaAchievements.eventId),
       )
-      .where(isNull(boffMediaEvents.deletedAt)) as unknown as AchievementWithEventName[];
+      .where(
+        isNull(boffMediaEvents.deletedAt),
+      ) as unknown as AchievementWithEventName[];
   }
 
   async findById(id: number): Promise<Achievement | null> {

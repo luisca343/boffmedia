@@ -221,9 +221,9 @@ describe('UserAppsService', () => {
     });
 
     it('should throw BadRequestException for null order', async () => {
-      await expect(service.orderAppsForPlayer(null as any, uuid)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(
+        service.orderAppsForPlayer(null as any, uuid),
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('should filter out non-existing apps and reset remainder', async () => {

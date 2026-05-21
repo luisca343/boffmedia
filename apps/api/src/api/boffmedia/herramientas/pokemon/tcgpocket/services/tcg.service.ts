@@ -236,9 +236,7 @@ export class TcgService {
         throw new BadRequestException('User Name is required');
       }
 
-      const userId = (
-        await this.usersService.getUserByUsername(userName)
-      )!.id;
+      const userId = (await this.usersService.getUserByUsername(userName))!.id;
 
       const userCards = await this.tcgRepository.getUserCards(userId);
 

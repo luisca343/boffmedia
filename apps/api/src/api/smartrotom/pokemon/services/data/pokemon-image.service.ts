@@ -133,12 +133,14 @@ export class PokemonImageService {
     }
 
     let palette;
-    Object.values(form.genderProperties as any).forEach((genderProperty: any) => {
-      genderProperty.palettes.forEach((p: any) => {
-        if (p.name === paletteName) palette = p;
-        return;
-      });
-    });
+    Object.values(form.genderProperties as any).forEach(
+      (genderProperty: any) => {
+        genderProperty.palettes.forEach((p: any) => {
+          if (p.name === paletteName) palette = p;
+          return;
+        });
+      },
+    );
 
     if (!palette) {
       palette = form.genderProperties![0].palettes[0];

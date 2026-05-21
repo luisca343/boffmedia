@@ -226,8 +226,9 @@ export async function buildEpub(opts: EpubChapterOptions): Promise<void> {
 
     await execFileAsync('ebook-convert', args, { timeout: 180_000 });
     if (opts.metadata) await injectEpubMetadata(outputPath, opts.metadata);
-  } catch (err: any) {
-    if (err.code === 'ENOENT') {
+  } catch (err: unknown) {
+    const errCode = (err as NodeJS.ErrnoException)?.code;
+    if (errCode === 'ENOENT') {
       throw new Error(
         'ebook-convert not found. Install Calibre (https://calibre-ebook.com) and ensure it is on PATH.',
       );

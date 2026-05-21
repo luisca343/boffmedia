@@ -69,7 +69,9 @@ export class UsersController {
   async create(
     @Body() createUserDto: CreateSmartrotomUserDto,
   ): Promise<SmartRotomUser> {
-    return this.usersFacadeService.createUser(createUserDto) as unknown as SmartRotomUser;
+    return this.usersFacadeService.createUser(
+      createUserDto,
+    ) as unknown as SmartRotomUser;
   }
 
   @Get(':id')
@@ -133,7 +135,10 @@ export class UsersController {
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateSmartrotomUserDto,
   ): Promise<SmartRotomUser> {
-    return this.usersFacadeService.updateUser(id, updateUserDto) as unknown as SmartRotomUser;
+    return this.usersFacadeService.updateUser(
+      id,
+      updateUserDto,
+    ) as unknown as SmartRotomUser;
   }
 
   @Delete(':id')
@@ -204,7 +209,9 @@ export class UsersController {
   async initialize(
     @Body() data: UserInitializationDataDto,
   ): Promise<InitializationResult> {
-    return this.usersFacadeService.initializeUserAndAccounts(data) as unknown as InitializationResult;
+    return this.usersFacadeService.initializeUserAndAccounts(
+      data,
+    ) as unknown as InitializationResult;
   }
 
   // ==================== USER WITH ACCOUNTS ====================
@@ -250,7 +257,9 @@ export class UsersController {
   async getMultipleUsers(
     @Body() request: BatchUsersRequestDto,
   ): Promise<{ [uuid: string]: SmartRotomUser | null }> {
-    return this.usersFacadeService.getMultipleUsers(request.uuids) as unknown as { [uuid: string]: SmartRotomUser | null };
+    return this.usersFacadeService.getMultipleUsers(
+      request.uuids,
+    ) as unknown as { [uuid: string]: SmartRotomUser | null };
   }
 
   @Post('batch/accounts')
@@ -275,7 +284,9 @@ export class UsersController {
   async getMultipleUsersWithAccounts(
     @Body() request: BatchUsersRequestDto,
   ): Promise<{ [uuid: string]: UserWithAccounts | null }> {
-    return this.usersFacadeService.getMultipleUsersWithAccounts(request.uuids) as unknown as { [uuid: string]: UserWithAccounts | null };
+    return this.usersFacadeService.getMultipleUsersWithAccounts(
+      request.uuids,
+    ) as unknown as { [uuid: string]: UserWithAccounts | null };
   }
 
   // ==================== STATISTICS ====================

@@ -4,6 +4,7 @@
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",
   "setupFiles": ["<rootDir>/setup-env.e2e.ts"],
+  "maxWorkers": 1,
   "moduleNameMapper": {
     "^@repositories/(.*)$": "<rootDir>/../src/api/_repositories/$1",
     "^@api/(.*)$": "<rootDir>/../src/api/$1",

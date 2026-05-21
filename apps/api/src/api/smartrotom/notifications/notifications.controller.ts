@@ -44,10 +44,16 @@ export class NotificationsController {
     description: 'Notification inbox',
     type: NotificationsInboxDto,
   })
-  async getInbox(@Query() query: GetInboxQueryDto): Promise<NotificationsInboxDto> {
+  async getInbox(
+    @Query() query: GetInboxQueryDto,
+  ): Promise<NotificationsInboxDto> {
     const limit = query.limit ? Number(query.limit) : 20;
     const offset = query.offset ? Number(query.offset) : 0;
-    return this.notificationsService.getInbox(query.uuid, limit, offset) as unknown as NotificationsInboxDto;
+    return this.notificationsService.getInbox(
+      query.uuid,
+      limit,
+      offset,
+    ) as unknown as NotificationsInboxDto;
   }
 
   @Patch(':id/read')
@@ -82,7 +88,9 @@ export class NotificationsController {
     description: 'Notification created and delivered',
     type: NotificationResponseDto,
   })
-  async send(@Body() dto: SendNotificationDto): Promise<NotificationResponseDto> {
+  async send(
+    @Body() dto: SendNotificationDto,
+  ): Promise<NotificationResponseDto> {
     const result = await this.notificationsService.createNotification({
       userUuid: dto.userUuid,
       type: dto.type,
