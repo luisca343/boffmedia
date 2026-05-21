@@ -65,7 +65,7 @@ describe('InvitesController — integration (ValidationPipe + GlobalExceptionFil
   // ── POST /wingull/invites ──────────────────────────────────────────────
   describe('POST /wingull/invites', () => {
     it('returns 201 and delegates to facade.createInvite', async () => {
-      mockFacade.createInvite!.mockResolvedValue({ id: 'abc-123' } as any);
+      (mockFacade.createInvite! as jest.Mock).mockResolvedValue({ id: 'abc-123' } as any);
 
       const res = await request(app.getHttpServer())
         .post('/wingull/invites')
@@ -116,7 +116,7 @@ describe('InvitesController — integration (ValidationPipe + GlobalExceptionFil
   // ── GET /wingull/invites ───────────────────────────────────────────────
   describe('GET /wingull/invites', () => {
     it('returns 200 and delegates to facade.getAllInvites', async () => {
-      mockFacade.getAllInvites!.mockResolvedValue([{ id: 'abc' }] as any);
+      (mockFacade.getAllInvites! as jest.Mock).mockResolvedValue([{ id: 'abc' }] as any);
 
       const res = await request(app.getHttpServer()).get('/wingull/invites');
 
@@ -130,7 +130,7 @@ describe('InvitesController — integration (ValidationPipe + GlobalExceptionFil
   // ── GET /wingull/invites/statistics ────────────────────────────────────
   describe('GET /wingull/invites/statistics', () => {
     it('returns 200 and delegates to facade.getInviteStatistics', async () => {
-      mockFacade.getInviteStatistics!.mockResolvedValue({ total: 5 } as any);
+      (mockFacade.getInviteStatistics! as jest.Mock).mockResolvedValue({ total: 5 } as any);
 
       const res = await request(app.getHttpServer()).get(
         '/wingull/invites/statistics',
@@ -146,7 +146,7 @@ describe('InvitesController — integration (ValidationPipe + GlobalExceptionFil
   // ── GET /wingull/invites/user/:uuid ────────────────────────────────────
   describe('GET /wingull/invites/user/:uuid', () => {
     it('returns 200 and delegates to facade.getUserInvites', async () => {
-      mockFacade.getUserInvites!.mockResolvedValue([] as any);
+      (mockFacade.getUserInvites! as jest.Mock).mockResolvedValue([] as any);
 
       const res = await request(app.getHttpServer()).get(
         `/wingull/invites/user/${MOCK_UUID}`,
@@ -162,7 +162,7 @@ describe('InvitesController — integration (ValidationPipe + GlobalExceptionFil
   // ── GET /wingull/invites/username/:username ────────────────────────────
   describe('GET /wingull/invites/username/:username', () => {
     it('returns 200 and delegates to facade.getUserInvitesByUsername', async () => {
-      mockFacade.getUserInvitesByUsername!.mockResolvedValue([] as any);
+      (mockFacade.getUserInvitesByUsername! as jest.Mock).mockResolvedValue([] as any);
 
       const res = await request(app.getHttpServer()).get(
         '/wingull/invites/username/Luisca343',
@@ -180,7 +180,7 @@ describe('InvitesController — integration (ValidationPipe + GlobalExceptionFil
   // ── GET /wingull/invites/:id ───────────────────────────────────────────
   describe('GET /wingull/invites/:id', () => {
     it('returns 200 when invite exists', async () => {
-      mockFacade.getInviteById!.mockResolvedValue({ id: 'abc-123' } as any);
+      (mockFacade.getInviteById! as jest.Mock).mockResolvedValue({ id: 'abc-123' } as any);
 
       const res = await request(app.getHttpServer()).get(
         '/wingull/invites/abc-123',
@@ -191,7 +191,7 @@ describe('InvitesController — integration (ValidationPipe + GlobalExceptionFil
     });
 
     it('returns 200 with not-found body when invite does not exist', async () => {
-      mockFacade.getInviteById!.mockResolvedValue(null as any);
+      (mockFacade.getInviteById! as jest.Mock).mockResolvedValue(null as any);
 
       const res = await request(app.getHttpServer()).get(
         '/wingull/invites/nonexistent',
@@ -208,7 +208,7 @@ describe('InvitesController — integration (ValidationPipe + GlobalExceptionFil
   // ── GET /wingull/invites/:id/validate ──────────────────────────────────
   describe('GET /wingull/invites/:id/validate', () => {
     it('returns 200 and delegates to facade.validateInvite', async () => {
-      mockFacade.validateInvite!.mockResolvedValue({ valid: true } as any);
+      (mockFacade.validateInvite! as jest.Mock).mockResolvedValue({ valid: true } as any);
 
       const res = await request(app.getHttpServer()).get(
         '/wingull/invites/abc-123/validate',
@@ -224,7 +224,7 @@ describe('InvitesController — integration (ValidationPipe + GlobalExceptionFil
   // ── GET /wingull/invites/:id/can-register ──────────────────────────────
   describe('GET /wingull/invites/:id/can-register', () => {
     it('returns 200 and delegates to facade.canRegisterWithInvite', async () => {
-      mockFacade.canRegisterWithInvite!.mockResolvedValue({
+      (mockFacade.canRegisterWithInvite! as jest.Mock).mockResolvedValue({
         canRegister: true,
       } as any);
 
@@ -242,7 +242,7 @@ describe('InvitesController — integration (ValidationPipe + GlobalExceptionFil
   // ── POST /wingull/invites/:id/register ─────────────────────────────────
   describe('POST /wingull/invites/:id/register', () => {
     it('returns 201 and delegates to facade.registerWithInvite', async () => {
-      mockFacade.registerWithInvite!.mockResolvedValue({
+      (mockFacade.registerWithInvite! as jest.Mock).mockResolvedValue({
         success: true,
       } as any);
 
@@ -272,7 +272,7 @@ describe('InvitesController — integration (ValidationPipe + GlobalExceptionFil
   // ── DELETE /wingull/invites/:id ────────────────────────────────────────
   describe('DELETE /wingull/invites/:id', () => {
     it('returns 200 and delegates to facade.deleteInvite', async () => {
-      mockFacade.deleteInvite!.mockResolvedValue({ success: true } as any);
+      (mockFacade.deleteInvite! as jest.Mock).mockResolvedValue({ success: true } as any);
 
       const res = await request(app.getHttpServer()).delete(
         '/wingull/invites/abc-123',
@@ -288,7 +288,7 @@ describe('InvitesController — integration (ValidationPipe + GlobalExceptionFil
   // ── DELETE /wingull/invites/:id/permanent ──────────────────────────────
   describe('DELETE /wingull/invites/:id/permanent', () => {
     it('returns 200 and delegates to facade.permanentlyDeleteInvite', async () => {
-      mockFacade.permanentlyDeleteInvite!.mockResolvedValue({
+      (mockFacade.permanentlyDeleteInvite! as jest.Mock).mockResolvedValue({
         success: true,
       } as any);
 

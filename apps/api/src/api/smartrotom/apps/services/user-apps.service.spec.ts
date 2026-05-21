@@ -71,7 +71,7 @@ describe('UserAppsService', () => {
     });
 
     it('should throw BadRequestException for null uuid', async () => {
-      await expect(service.getAppsForPlayer(null)).rejects.toThrow(
+      await expect(service.getAppsForPlayer(null as any)).rejects.toThrow(
         BadRequestException,
       );
       expect(userAppsRepository.getAppsForPlayer).not.toHaveBeenCalled();
@@ -104,7 +104,7 @@ describe('UserAppsService', () => {
     });
 
     it('should throw BadRequestException for null uuid', async () => {
-      await expect(service.addAppToPlayer(null, appId)).rejects.toThrow(
+      await expect(service.addAppToPlayer(null as any, appId)).rejects.toThrow(
         BadRequestException,
       );
     });
@@ -116,7 +116,7 @@ describe('UserAppsService', () => {
     });
 
     it('should throw BadRequestException for null appId', async () => {
-      await expect(service.addAppToPlayer(uuid, null)).rejects.toThrow(
+      await expect(service.addAppToPlayer(uuid, null as any)).rejects.toThrow(
         BadRequestException,
       );
     });
@@ -221,7 +221,7 @@ describe('UserAppsService', () => {
     });
 
     it('should throw BadRequestException for null order', async () => {
-      await expect(service.orderAppsForPlayer(null, uuid)).rejects.toThrow(
+      await expect(service.orderAppsForPlayer(null as any, uuid)).rejects.toThrow(
         BadRequestException,
       );
     });

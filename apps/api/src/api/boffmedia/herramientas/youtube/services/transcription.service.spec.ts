@@ -74,8 +74,8 @@ describe('TranscriptionService', () => {
       expect(result.videoId).toBe('dQw4w9WgXcQ');
       expect(result.title).toBe('Test Video');
       expect(result.transcript).toHaveLength(2);
-      expect(result.transcript[0].text).toBe('Hello');
-      expect(result.transcript[0].startTime).toBe('0:00');
+      expect(result.transcript![0].text).toBe('Hello');
+      expect(result.transcript![0].startTime).toBe('0:00');
     });
 
     it('returns success=false when transcript is unavailable', async () => {

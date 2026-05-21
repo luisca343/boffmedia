@@ -132,7 +132,10 @@ describe('AchievementsService', () => {
       mockRepo.create.mockResolvedValue({ insertId: 1 });
       mockRepo.findById.mockResolvedValue(mockAchievement);
 
-      await service.createAchievement(10, { ...dto, maxProgress: undefined });
+      await service.createAchievement(10, {
+        ...dto,
+        maxProgress: undefined as unknown as number,
+      });
 
       expect(mockRepo.create).toHaveBeenCalledWith(
         expect.objectContaining({ maxProgress: 1 }),

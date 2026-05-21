@@ -116,7 +116,7 @@ describe('MineFacadeService', () => {
   describe('playGame', () => {
     it('should consume energy and start game when player has energy', async () => {
       energyService.validateEnergyForPlay.mockResolvedValue(true);
-      energyService.consumeEnergy.mockResolvedValue(undefined);
+      energyService.consumeEnergy.mockResolvedValue(undefined as any);
       gameService.startGame.mockResolvedValue(mockGameStart as any);
 
       const result = await service.playGame({ uuid: 'test-uuid' });
