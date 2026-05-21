@@ -324,10 +324,10 @@ export class FicusAIFacadeService {
     if (call.name === 'countPokemon') {
       requestedTypes.add('conteo');
     } else if (call.name === 'getRandomPokemon' && call.args.dataTypes) {
-      call.args.dataTypes.forEach((type) => requestedTypes.add(type));
+      call.args.dataTypes.forEach((type: any) => requestedTypes.add(type));
     } else if (call.name === 'getPokemonData') {
       if (call.args.dataTypes) {
-        call.args.dataTypes.forEach((type) => requestedTypes.add(type));
+        call.args.dataTypes.forEach((type: any) => requestedTypes.add(type));
       }
       if (call.args.pokemon) {
         pokemonNames.add(call.args.pokemon);

@@ -29,7 +29,7 @@ export class NewsRepository implements INewsRepository {
         updatedAt: rotomNews.updatedAt,
       })
       .from(rotomNews)
-      .orderBy(desc(rotomNews.id));
+      .orderBy(desc(rotomNews.id)) as unknown as NewsDetails[];
   }
 
   async findPublishedNews(): Promise<NewsDetails[]> {
@@ -50,7 +50,7 @@ export class NewsRepository implements INewsRepository {
       })
       .from(rotomNews)
       .where(eq(rotomNews.published, 1))
-      .orderBy(desc(rotomNews.id));
+      .orderBy(desc(rotomNews.id)) as unknown as NewsDetails[];
   }
 
   async findNewsById(newsId: number): Promise<NewsDetails | null> {
@@ -72,7 +72,7 @@ export class NewsRepository implements INewsRepository {
       .from(rotomNews)
       .where(eq(rotomNews.id, newsId))
       .limit(1);
-    return result[0] || null;
+    return (result[0] || null) as unknown as NewsDetails | null;
   }
 
   async findFeaturedNews(): Promise<NewsDetails | null> {
@@ -94,7 +94,7 @@ export class NewsRepository implements INewsRepository {
       .from(rotomNews)
       .where(eq(rotomNews.featured, 1))
       .limit(1);
-    return result[0] || null;
+    return (result[0] || null) as unknown as NewsDetails | null;
   }
 
   async createNews(newsData: {

@@ -88,7 +88,7 @@ export class NewsService {
     const result = await this.newsRepository.createNews({
       ...createNewsRequest,
       title: title.trim(),
-      content: content.trim(),
+      content: (content ?? '').trim(),
     });
 
     return this.getNewsById(result.insertId);

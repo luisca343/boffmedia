@@ -26,7 +26,7 @@ interface QueueEntry {
 const audioQueue: QueueEntry[] = [];
 
 export async function playAudio(message: Message, service: CommandsService) {
-  const voiceChannel = message.member.voice.channel;
+  const voiceChannel = message.member!.voice.channel;
 
   if (!voiceChannel) {
     const channel = message.channel as any;
@@ -118,7 +118,7 @@ export async function getVoices() {
   const url = 'https://api.streamelements.com/kappa/v2/speech/voices';
   const response = await axios.get(url);
 
-  const voices = [];
+  const voices: any[] = [];
   Object.keys(response.data.voices).forEach((key, id) => {
     const nombre = `[${response.data.voices[key].languageName}] ${key}`;
     voices.push({ id: id++, value: id++, name: nombre });
@@ -130,7 +130,7 @@ export async function getVoiceName(value: number): Promise<string | null> {
   const url = 'https://api.streamelements.com/kappa/v2/speech/voices';
   const response = await axios.get(url);
 
-  const voices = [];
+  const voices: any[] = [];
   Object.keys(response.data.voices).forEach((key, id) => {
     voices.push({ id: id++, value: id++, name: key });
   });
@@ -145,7 +145,7 @@ export async function setVoice(
   voice: number,
 ) {
   await service.setTTSVoice(userId, voice);
-  voiceCache.set(userId, await getVoiceName(voice));
+  voiceCache.set(userId, (await getVoiceName(voice)) ?? '');
 }
 
 export async function getVoice(

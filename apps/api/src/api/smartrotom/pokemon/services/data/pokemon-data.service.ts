@@ -249,8 +249,8 @@ export class PokemonDataService extends BaseDataService {
     }
   }
 
-  public sortByDex(list, dex = 'dex') {
-    return list.sort((a, b) => a[dex] - b[dex]);
+  public sortByDex(list: any, dex = 'dex') {
+    return list.sort((a: any, b: any) => a[dex] - b[dex]);
   }
 
   private sortMovesByCount() {
@@ -367,13 +367,13 @@ export class PokemonDataService extends BaseDataService {
     let preEvo = pkm;
 
     // Find base pre-evolution
-    while (preEvo.forms[0].preEvolutions?.length > 0) {
-      const preEvoName = preEvo.forms[0].preEvolutions[0].toLowerCase();
+    while ((preEvo!.forms[0]?.preEvolutions?.length ?? 0) > 0) {
+      const preEvoName = preEvo!.forms[0]?.preEvolutions?.[0]?.toLowerCase() ?? '';
       preEvo = this.getSpeciesByName(preEvoName);
     }
 
     // Get evolution tree with sprites
-    const evoTree = this.getEvos(preEvo, 'all');
+    const evoTree = this.getEvos(preEvo!, 'all');
 
     return evoTree;
   }
@@ -413,15 +413,15 @@ export class PokemonDataService extends BaseDataService {
         if (!currentPokemon.evos) currentPokemon.evos = {};
         const evoArray = currentPokemon.evos;
         const evoFormIndex =
-          this.getSpeciesByName(evoPokemonName).forms?.findIndex(
+          this.getSpeciesByName(evoPokemonName)!.forms?.findIndex(
             (f) => f.name === evoFormName,
           ) > -1
-            ? this.getSpeciesByName(evoPokemonName).forms?.findIndex(
+            ? this.getSpeciesByName(evoPokemonName)!.forms?.findIndex(
                 (f) => f.name === evoFormName,
               )
             : 0;
         if (!evoArray[evoId]) {
-          const evoPkmDex = this.getSpeciesByName(evoPokemonName).dex;
+          const evoPkmDex = this.getSpeciesByName(evoPokemonName)!.dex;
           evoArray[evoId] = {
             pkm: evoPokemonName,
             evos: {},
@@ -436,7 +436,7 @@ export class PokemonDataService extends BaseDataService {
         }
         evoArray[evoId].methods.push(evo);
 
-        const evoPkm = this.getSpeciesByName(evoPokemonName);
+        const evoPkm = this.getSpeciesByName(evoPokemonName)!;
         const _evoEvo = this.getEvos(
           evoPkm,
           evoFormName,

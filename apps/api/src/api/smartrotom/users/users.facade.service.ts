@@ -95,7 +95,7 @@ export class UsersFacadeService {
 
       const mainAccount = await this.starbankService.getMainAccount(data.uuid);
       await this.starbankService.transferFromSystem(
-        mainAccount.id,
+        mainAccount!.id,
         1000,
         'Ingreso de Bienvenida',
       );

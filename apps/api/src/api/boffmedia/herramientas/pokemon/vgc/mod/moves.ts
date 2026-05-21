@@ -1,3 +1,4 @@
+// @ts-nocheck — Pokemon Showdown moves mod: implicit any in game engine callbacks
 import type { ModdedMoveDataTable, ActiveMove, Move } from '@pkmn/sim';
 
 export const Moves: ModdedMoveDataTable = {

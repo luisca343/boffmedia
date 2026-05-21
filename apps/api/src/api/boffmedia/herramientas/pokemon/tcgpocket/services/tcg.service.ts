@@ -76,7 +76,7 @@ export class TcgService {
         logo: s.logo || null,
       }));
 
-      await this.tcgRepository.insertSeries(formattedSeries);
+      await this.tcgRepository.insertSeries(formattedSeries as any);
     } catch (error: any) {
       if (error instanceof BadRequestException) {
         throw error;
@@ -236,9 +236,9 @@ export class TcgService {
         throw new BadRequestException('User Name is required');
       }
 
-      const userId = await (
+      const userId = (
         await this.usersService.getUserByUsername(userName)
-      ).id;
+      )!.id;
 
       const userCards = await this.tcgRepository.getUserCards(userId);
 

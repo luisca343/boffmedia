@@ -35,7 +35,7 @@ export class AppController {
     try {
       const data = await fs.readFile(filePath, 'utf8');
       const lines = data.split('\n');
-      const result = {};
+      const result: Record<string, any> = {};
 
       lines.forEach((line) => {
         const [key, value] = line.split('=');

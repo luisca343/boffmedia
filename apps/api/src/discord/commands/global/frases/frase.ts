@@ -20,8 +20,8 @@ export class FraseCommand {
   ) {
     const userId = usuario?.id || null;
     const frase = await this.service.getQuote(
-      interaction.guildId,
-      userId,
+      interaction.guildId!,
+      userId ?? '',
       num || 0,
       global || false,
     );

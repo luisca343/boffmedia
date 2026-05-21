@@ -249,7 +249,7 @@ export class TcgFetchService {
         esCards = esSetRes.data.cards || [];
         this.logger.log(`[TCG] Successfully fetched ES cards for set ${setId}`);
       } catch (esError) {
-        if (esError.response?.status === 404) {
+        if ((esError as any).response?.status === 404) {
           this.logger.warn(
             `[TCG] ES locale not available for set ${setId}, proceeding with EN only`,
           );
@@ -316,7 +316,7 @@ export class TcgFetchService {
           );
           esCard = esCardRes.data;
         } catch (esCardError) {
-          if (esCardError.response?.status === 404) {
+          if ((esCardError as any).response?.status === 404) {
             this.logger.warn(
               `[TCG] ES version not available for card ${brief.id}, using EN description`,
             );
@@ -325,7 +325,7 @@ export class TcgFetchService {
             // For other errors, still use EN as fallback but log the error
             this.logger.warn(
               `[TCG] Error fetching ES version for card ${brief.id}:`,
-              esCardError.message,
+              (esCardError as Error).message,
             );
             esCard = enCard;
           }

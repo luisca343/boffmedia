@@ -152,21 +152,21 @@ export class MhwildsDataService {
       const weaponsResult = await this.mhwildsRepository.getWeapons(locale);
       const weapons = weaponsResult.data;
 
-      const weaponsById = weapons.reduce((map, weapon) => {
+      const weaponsById = weapons.reduce((map: Record<string, any>, weapon: any) => {
         map[weapon.id] = weapon;
         return map;
       }, {});
 
       const rootWeapons = weapons.filter(
-        (weapon) =>
+        (weapon: any) =>
           weapon.crafting?.craftable === true && !weapon.crafting?.previous,
       );
 
-      const weaponTree = rootWeapons.map((rootWeapon) =>
+      const weaponTree = rootWeapons.map((rootWeapon: any) =>
         this.buildWeaponBranch(rootWeapon, weaponsById),
       );
 
-      const weaponTreeByKind = weapons.reduce((tree, weapon) => {
+      const weaponTreeByKind = weapons.reduce((tree: Record<string, any[]>, weapon: any) => {
         const kind = weapon.kind;
         if (!tree[kind]) {
           tree[kind] = [];
@@ -212,7 +212,7 @@ export class MhwildsDataService {
       const result = await this.mhwildsRepository.getWeapons(locale);
       const weapons = result.data;
 
-      const filteredWeapons = weapons.filter((weapon) =>
+      const filteredWeapons = weapons.filter((weapon: any) =>
         weapon.name.toLowerCase().includes(searchTerm.toLowerCase()),
       );
 
@@ -234,7 +234,7 @@ export class MhwildsDataService {
       const weapons = result.data;
 
       const filteredWeapons = weapons.filter(
-        (weapon) => weapon.kind.toLowerCase() === kind.toLowerCase(),
+        (weapon: any) => weapon.kind.toLowerCase() === kind.toLowerCase(),
       );
 
       return {
@@ -254,7 +254,7 @@ export class MhwildsDataService {
       const result = await this.mhwildsRepository.getArmor(locale);
       const armor = result.data;
 
-      const filteredArmor = armor.filter((piece) => piece.rarity === rarity);
+      const filteredArmor = armor.filter((piece: any) => piece.rarity === rarity);
 
       return {
         data: filteredArmor,
@@ -290,20 +290,20 @@ export class MhwildsDataService {
       ]);
 
       // Weapons statistics
-      const weaponsByKind = weaponsResult.data.reduce((acc, weapon) => {
+      const weaponsByKind = weaponsResult.data.reduce((acc: Record<string, number>, weapon: any) => {
         acc[weapon.kind] = (acc[weapon.kind] || 0) + 1;
         return acc;
       }, {});
 
       // Armor statistics
-      const armorByRarity = armorResult.data.reduce((acc, piece) => {
+      const armorByRarity = armorResult.data.reduce((acc: Record<number, number>, piece: any) => {
         acc[piece.rarity] = (acc[piece.rarity] || 0) + 1;
         return acc;
       }, {});
 
       // Decorations statistics
       const decorationsByRarity = decorationsResult.data.reduce(
-        (acc, decoration) => {
+        (acc: Record<number, number>, decoration: any) => {
           acc[decoration.rarity] = (acc[decoration.rarity] || 0) + 1;
           return acc;
         },
@@ -311,7 +311,7 @@ export class MhwildsDataService {
       );
 
       // Charm ranks count
-      const totalCharmRanks = charmsResult.data.reduce((total, charm) => {
+      const totalCharmRanks = charmsResult.data.reduce((total: number, charm: any) => {
         return total + (charm.ranks ? charm.ranks.length : 0);
       }, 0);
 
@@ -346,7 +346,7 @@ export class MhwildsDataService {
   private buildWeaponBranch(
     weapon: any,
     weaponsById: Record<string, any>,
-  ): WeaponTreeNode {
+  ): WeaponTreeNode | null {
     if (!weapon) return null;
 
     const node: WeaponTreeNode = {
@@ -365,11 +365,11 @@ export class MhwildsDataService {
 
     if (weapon.crafting?.branches && weapon.crafting.branches.length > 0) {
       node.children = weapon.crafting.branches
-        .map((branch) => {
+        .map((branch: any) => {
           const branchWeapon = weaponsById[branch.id];
           return this.buildWeaponBranch(branchWeapon, weaponsById);
         })
-        .filter(Boolean);
+        .filter(Boolean) as WeaponTreeNode[];
     }
 
     return node;

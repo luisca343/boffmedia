@@ -3,7 +3,7 @@
 > **Scope**: all fixes to the current `router.ts` workflow + the new `plan_goal` tool for task decomposition and planning.  
 > **Prerequisite**: `harness-agent-implementation-plan.md` (v1) fully implemented.  
 > **Agent usage**: every section is a self-contained checklist. Status: ` ` not started · `x` complete · `~` in progress · `!` blocked.  
-> **Last updated**: 2026-05-19
+> **Last updated**: 2026-05-20 (Phase A+B+C1+D1–D5 complete)
 
 ---
 
@@ -2343,34 +2343,34 @@ Build in this order. Each phase is independently useful.
 
 ### Phase A — Critical workflow fixes (do first)
 
-- [ ] A1: `runId` slug fix (section 4) — trivial, prevents edge case bugs
-- [ ] A2: history format fix (section 5) — token savings, cleaner context
-- [ ] A3: health check + baseline in `begin_task` (section 1) — core safety
-- [ ] A4: rollback instruction in workflow (section 2) — prevents dirty state
-- [ ] A5: environment setup step (section 3) — decide option A or B, implement
-- [ ] A6: guardrails re-check wording (section 7) — trivial wording change
-- [ ] A7: Playwright condition made explicit (section 6) — clarity
-- [ ] A8: git error handling (section 15) — prevents stuck states
+- [x] A1: `runId` slug fix (section 4) — trivial, prevents edge case bugs
+- [x] A2: history format fix (section 5) — token savings, cleaner context
+- [x] A3: health check + baseline in `begin_task` (section 1) — core safety
+- [x] A4: rollback instruction in workflow (section 2) — prevents dirty state
+- [x] A5: environment setup step (section 3) — Option A (explicit workflow step 3b) implemented
+- [x] A6: guardrails re-check wording (section 7) — trivial wording change
+- [x] A7: Playwright condition made explicit (section 6) — clarity
+- [x] A8: git error handling (section 15) — prevents stuck states
 
 After Phase A: **the core task workflow is robust.** Test by running a full task end-to-end.
 
 ### Phase B — Tool-level fixes
 
-- [ ] B1: `sync_openapi_docs` remove `bookId` from caller (section 8) — clean API
-- [ ] B2: `sync_conventions` handle SmartRotom (section 9) — completeness
-- [ ] B3: `write_adr` include branch link (section 13) — traceability
-- [ ] B4: `check_performance_regression` in workflow (section 10) — observability
-- [ ] B5: non-fatal sync failures (section 14) — resilience
-- [ ] B6: `create_gitlab_mr` prohibition hardened (section 11) — safety
-- [ ] B7: BookStack structure tools marked setup-only (section 12) — clarity
-- [ ] B8: ADR trigger examples (section 17) — explicitness
-- [ ] B9: context staleness warning (section 16) — awareness
+- [x] B1: `sync_openapi_docs` remove `bookId` from caller (section 8) — clean API
+- [x] B2: `sync_conventions` handle SmartRotom (section 9) — completeness
+- [x] B3: `write_adr` include branch link (section 13) — traceability
+- [x] B4: `check_performance_regression` in workflow (section 10) — observability
+- [x] B5: non-fatal sync failures (section 14) — resilience
+- [x] B6: `create_gitlab_mr` prohibition hardened (section 11) — safety
+- [x] B7: BookStack structure tools marked setup-only (section 12) — clarity
+- [x] B8: ADR trigger examples (section 17) — explicitness
+- [x] B9: context staleness warning (section 16) — awareness
 
 After Phase B: **all tools behave correctly.** Assemble the updated workflow template (section 18).
 
 ### Phase C — Updated workflow template
 
-- [ ] C1: Replace the workflow template in `begin_task` with the version from section 18
+- [x] C1: Replace the workflow template in `begin_task` with the version from section 18
 - [ ] C2: Full end-to-end test: `begin_task` → code change → verification → commit
 - [ ] C3: Test failure path: deliberately fail verification → confirm rollback + save_run(failed)
 - [ ] C4: Test health warning: stop API container → `begin_task` → confirm health warning shown
@@ -2380,11 +2380,11 @@ After Phase C: **the corrected workflow is live and tested.**
 
 ### Phase D — Planning mode
 
-- [ ] D1: Add `AGENT_TASK_BOOK_IDS` to `agent.config.ts`
-- [ ] D2: Add `status:draft` to the status tag vocabulary in `updateTaskStatus`
-- [ ] D3: Register `plan_goal` tool in `router.ts` — with chapter creation logic (section 21)
-- [ ] D4: Update `begin_task` with draft/done guards + dependency check (section 24)
-- [ ] D5: Update `list_bookstack_tasks` with `planId` filter, chapter grouping, and ordering (section 25)
+- [x] D1: Add `AGENT_TASK_BOOK_IDS` to `agent.config.ts`
+- [x] D2: Add `status:draft` to the status tag vocabulary in `updateTaskStatus`
+- [x] D3: Register `plan_goal` tool in `router.ts` — with chapter creation logic (section 21)
+- [x] D4: Update `begin_task` with draft/done guards + dependency check (section 24)
+- [x] D5: Update `list_bookstack_tasks` with `planId` filter, chapter grouping, and ordering (section 25)
 - [ ] D6: Test: call `plan_goal` with a multi-step goal
   - [ ] Confirm: a chapter is created in BookStack with name `YYYY-MM-DD — <goal>`
   - [ ] Confirm: all draft task pages are inside the chapter, not loose in the book

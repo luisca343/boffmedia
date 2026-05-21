@@ -259,7 +259,7 @@ export class StreakService {
   private getRewardForDay(day: number, rewardsConfig: any): any {
     const dayInCycle = ((day - 1) % rewardsConfig.totalDays) + 1;
     const rewardConfig = rewardsConfig.rewards.find(
-      (r) => r.day === dayInCycle,
+      (r: any) => r.day === dayInCycle,
     );
 
     return (

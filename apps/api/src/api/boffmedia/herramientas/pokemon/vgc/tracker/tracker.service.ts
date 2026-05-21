@@ -199,26 +199,27 @@ export class TrackerService {
     this.ensureOwnership(existing.userId, userId, `Match "${id}"`);
     await this.repo.upsertMatch({
       id,
-      sessionId: existing.sessionId,
+      sessionId: existing.sessionId ?? '',
       userId,
-      format: existing.format,
+      format: existing.format ?? '',
       myTeam: dto.myTeam ?? JSON.parse(existing.myTeam as unknown as string),
       opponentTeam:
         dto.opponentTeam ??
         JSON.parse(existing.opponentTeam as unknown as string),
-      opponentName: dto.opponentName ?? existing.opponentName,
-      opponentArchetype: dto.opponentArchetype ?? existing.opponentArchetype,
-      result: dto.result ?? existing.result,
-      outcomeTag: dto.outcomeTag ?? existing.outcomeTag,
-      turnCount: dto.turnCount ?? existing.turnCount,
-      eloAfter: dto.eloAfter ?? existing.eloAfter,
-      opponentElo: dto.opponentElo ?? existing.opponentElo,
+      opponentName: (dto.opponentName ?? existing.opponentName) ?? undefined,
+      opponentArchetype:
+        (dto.opponentArchetype ?? existing.opponentArchetype) ?? undefined,
+      result: (dto.result ?? existing.result) ?? undefined,
+      outcomeTag: (dto.outcomeTag ?? existing.outcomeTag) ?? undefined,
+      turnCount: (dto.turnCount ?? existing.turnCount) ?? undefined,
+      eloAfter: (dto.eloAfter ?? existing.eloAfter) ?? undefined,
+      opponentElo: (dto.opponentElo ?? existing.opponentElo) ?? undefined,
       notes: dto.notes ?? JSON.parse(existing.notes as unknown as string),
       completedAt: dto.completedAt
         ? new Date(dto.completedAt)
-        : existing.completedAt,
+        : existing.completedAt ?? undefined,
     });
-    return this.repo.findMatch(id);
+    return this.repo.findMatch(id) as Promise<VgcMatch>;
   }
 
   async deleteMatch(userId: number, id: string): Promise<void> {
