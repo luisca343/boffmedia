@@ -154,7 +154,7 @@ export class MangaDownloadService {
         let imageUrls: string[] = [];
         try {
           imageUrls = await scraper.getChapterImages(ch.url, context);
-        } catch (err) {
+        } catch (err: unknown) {
           this.logger.error(
             `Failed to scrape images for "${ch.title}": ${(err as Error).message}`,
           );
@@ -276,7 +276,7 @@ export class MangaDownloadService {
       try {
         await this.downloadImage(url, filePath);
         downloaded++;
-      } catch (err) {
+      } catch (err: unknown) {
         this.logger.error(
           `  ✗ [${i + 1}/${imageUrls.length}] ${(err as Error).message}`,
         );
@@ -415,7 +415,7 @@ export class MangaDownloadService {
         await this.downloadImage(url, filePath);
         files.push(filePath);
         downloaded++;
-      } catch (err) {
+      } catch (err: unknown) {
         this.logger.error(
           `  ✗ [${i + 1}/${imageUrls.length}] ${(err as Error).message}`,
         );

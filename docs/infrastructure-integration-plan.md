@@ -36,10 +36,10 @@
 | 4 | Structured logging (Pino) | Unqueryable logs, blind debugging | 1 day | `[x]` Done — all console calls replaced, zero TS errors |
 | 5 | Global ValidationPipe + DTOs | Security gaps, inconsistent API | 1 day | `[x]` Done |
 | 6 | GitLab CI validate stage | Broken code reaches production | 2 hours | `[x]` Done |
-| 7 | Strict TypeScript enforcement | Compounding type debt | 1 day | `[ ]` |
+| 7 | Strict TypeScript enforcement | Compounding type debt | 1 day | `[~]` API strict mode + spec typing backlog resolved 2026-05-21; remaining cross-workspace hardening pending |
 | 8 | Global exception filter | Inconsistent error responses | Half a day | `[x]` Done 2026-05-17 |
 | 9 | Core test coverage baseline | Agent verification has no teeth | Ongoing | `[x]` 104 service specs + 32 controller specs done — 2161 tests |
-| 10 | End-to-end validation | No proof the full stack works together | 1 session | `[ ]` |
+| 10 | End-to-end validation | No proof the full stack works together | 1 session | `[~]` API Jest e2e baseline green 2026-05-21; production-like full-stack scenarios still pending |
 
 ---
 

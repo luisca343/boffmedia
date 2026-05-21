@@ -98,7 +98,7 @@ export class MangaConfigService {
         JSON.stringify(this.config, null, 2),
         'utf-8',
       );
-    } catch (err) {
+    } catch (err: unknown) {
       this.logger.error(
         `Failed to save manga config: ${(err as Error).message}`,
       );

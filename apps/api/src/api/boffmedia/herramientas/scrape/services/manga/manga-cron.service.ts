@@ -49,7 +49,7 @@ export class MangaCronService implements OnModuleInit, OnModuleDestroy {
       this.logger.log(
         `Manga auto-update cron scheduled: ${config.cron.schedule}`,
       );
-    } catch (err) {
+    } catch (err: unknown) {
       this.logger.error(
         `Invalid cron expression "${config.cron.schedule}": ${(err as Error).message}`,
       );
@@ -80,7 +80,7 @@ export class MangaCronService implements OnModuleInit, OnModuleDestroy {
           // events are ignored; download happens as a side effect
         }
         await this.configService.markLastChecked(slug);
-      } catch (err) {
+      } catch (err: unknown) {
         this.logger.error(
           `Auto-update failed for ${slug}: ${(err as Error).message}`,
         );
