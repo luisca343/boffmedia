@@ -18,7 +18,7 @@ export class NetfluisService {
 
   async readFolder(dir: string) {
     const files = await fsPromises.readdir(dir);
-    const fileList = {};
+    const fileList: Record<string, any> = {};
     await files.forEach(async (file) => {
       const filePath = path.join(dir, file);
       const stats = await fsPromises.stat(filePath);

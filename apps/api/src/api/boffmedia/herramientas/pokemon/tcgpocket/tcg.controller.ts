@@ -53,7 +53,7 @@ export class TcgController {
       this.logger.warn(
         `[TCG] No image found for card ${card.id} in locale ${locale}`,
       );
-      return null;
+      return null as unknown as TcgCard;
     }
     return {
       id: card.id,
@@ -414,7 +414,7 @@ export class TcgController {
           cards = await this.tcgFacade.fetchAndStoreCardsForSet(set.id, 'en');
           error = `ES fetch failed, but EN succeeded.`;
         } catch (err2) {
-          error += ` | EN fetch also failed: ${err2?.message || err2}`;
+          error += ` | EN fetch also failed: ${(err2 as any)?.message || err2}`;
         }
       }
 

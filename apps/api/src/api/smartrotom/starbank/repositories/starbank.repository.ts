@@ -117,7 +117,7 @@ export class StarbankRepository {
         .where(eq(starBankAccounts.id, accountId))
         .execute();
 
-      return result.length > 0 ? result[0] : null;
+      return result.length > 0 ? (result[0] as unknown as AccountInfo) : null;
     } catch (error: any) {
       this.logger.error(`Failed to find account ${accountId}:`, error);
       throw new Error(`Failed to find account: ${error.message}`);
@@ -141,7 +141,7 @@ export class StarbankRepository {
         .where(eq(starBankUsersAccounts.uuid, uuid))
         .execute();
 
-      return result.length > 0 ? result[0] : null;
+      return result.length > 0 ? (result[0] as unknown as { id: number; balance: number }) : null;
     } catch (error: any) {
       this.logger.error(`Failed to find main account for ${uuid}:`, error);
       throw new Error(`Failed to find main account: ${error.message}`);
@@ -166,7 +166,7 @@ export class StarbankRepository {
         .where(eq(starBankUsersAccounts.uuid, uuid))
         .execute();
 
-      return result;
+      return result as unknown as AccountInfo[];
     } catch (error: any) {
       this.logger.error(`Failed to find accounts for ${uuid}:`, error);
       throw new Error(`Failed to find user accounts: ${error.message}`);
@@ -175,7 +175,7 @@ export class StarbankRepository {
 
   async findAllAccounts(): Promise<AccountInfo[]> {
     try {
-      return await this.db
+      return (await this.db
         .selectDistinct({
           id: starBankAccounts.id,
           balance: starBankAccounts.balance,
@@ -184,7 +184,7 @@ export class StarbankRepository {
           image: starBankAccounts.image,
         })
         .from(starBankAccounts)
-        .execute();
+        .execute()) as unknown as AccountInfo[];
     } catch (error: any) {
       this.logger.error('Failed to find all accounts:', error);
       throw new Error(`Failed to find all accounts: ${error.message}`);

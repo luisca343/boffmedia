@@ -56,7 +56,7 @@ export class TeamsService {
 
     // 4. Add leader to event participants
     await this.participantsService.joinEvent(eventId, leaderParticipant.id, {
-      userId: leaderParticipant.userId,
+      userId: leaderParticipant.userId!,
       comment: `Created team ${createTeamDto.name}`,
     });
 
@@ -107,7 +107,7 @@ export class TeamsService {
 
     // 4. Add to event participants
     await this.participantsService.joinEvent(eventId, participant.id, {
-      userId: participant.userId,
+      userId: participant.userId!,
       comment: `Joined team ${teamId}`,
     });
 

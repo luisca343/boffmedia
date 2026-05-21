@@ -46,11 +46,11 @@ export class EventsFacadeService {
 
   // ==================== EVENT MANAGEMENT ====================
   async getEvents(): Promise<Event[]> {
-    return this.eventsService.getAllEvents();
+    return this.eventsService.getAllEvents() as unknown as Event[];
   }
 
   async getEvent(id: number): Promise<Event & { childEvents?: Event[] }> {
-    return this.eventsService.getEventById(id);
+    return this.eventsService.getEventById(id) as unknown as Event & { childEvents?: Event[] };
   }
 
   async createEvent(createEventDto: CreateEventDto): Promise<Event> {
@@ -80,7 +80,7 @@ export class EventsFacadeService {
       parentId: createEventDto.parentId === -1 ? null : createEventDto.parentId,
     };
 
-    return this.eventsService.createEvent(processedDto);
+    return this.eventsService.createEvent(processedDto as CreateEventDto) as unknown as Event;
   }
 
   async updateEvent(
@@ -119,7 +119,7 @@ export class EventsFacadeService {
       parentId: updateEventDto.parentId === -1 ? null : updateEventDto.parentId,
     };
 
-    return this.eventsService.updateEvent(id, processedDto);
+    return this.eventsService.updateEvent(id, processedDto as UpdateEventDto) as unknown as Event;
   }
 
   async deleteEvent(id: number): Promise<void> {
@@ -133,15 +133,15 @@ export class EventsFacadeService {
 
   // ==================== GAME MANAGEMENT ====================
   async getGames(): Promise<Game[]> {
-    return this.gamesService.getAllGames();
+    return this.gamesService.getAllGames() as unknown as Game[];
   }
 
   async getGame(id: number): Promise<Game> {
-    return this.gamesService.getGameById(id);
+    return this.gamesService.getGameById(id) as unknown as Game;
   }
 
   async createGame(createGameDto: CreateGameDto): Promise<Game> {
-    return this.gamesService.createGame(createGameDto);
+    return this.gamesService.createGame(createGameDto) as unknown as Game;
   }
 
   async updateGame(id: number, updateGameDto: UpdateGameDto): Promise<Game> {
@@ -150,7 +150,7 @@ export class EventsFacadeService {
       throw new Error('Game not found');
     }
 
-    return this.gamesService.updateGame(id, updateGameDto);
+    return this.gamesService.updateGame(id, updateGameDto) as unknown as Game;
   }
 
   async deleteGame(id: number): Promise<void> {
@@ -164,11 +164,11 @@ export class EventsFacadeService {
 
   // ==================== ACHIEVEMENT MANAGEMENT ====================
   async getAchievements(): Promise<Achievement[]> {
-    return this.achievementsService.getAllAchievements();
+    return this.achievementsService.getAllAchievements() as unknown as Achievement[];
   }
 
   async getAchievement(id: number): Promise<Achievement> {
-    return this.achievementsService.getAchievementById(id);
+    return this.achievementsService.getAchievementById(id) as unknown as Achievement;
   }
 
   async getEventAchievements(eventId: number): Promise<Achievement[]> {
@@ -177,7 +177,7 @@ export class EventsFacadeService {
       throw new Error('Event not found');
     }
 
-    return this.achievementsService.getAchievementsByEventId(eventId);
+    return this.achievementsService.getAchievementsByEventId(eventId) as unknown as Achievement[];
   }
 
   async createAchievement(
@@ -192,7 +192,7 @@ export class EventsFacadeService {
     return this.achievementsService.createAchievement(
       eventId,
       createAchievementDto,
-    );
+    ) as unknown as Achievement;
   }
 
   async updateAchievement(
@@ -212,7 +212,7 @@ export class EventsFacadeService {
       throw new Error('Achievement not found');
     }
 
-    return this.achievementsService.updateAchievement(id, updateAchievementDto);
+    return this.achievementsService.updateAchievement(id, updateAchievementDto) as unknown as Achievement;
   }
 
   async getParticipantProgress(
@@ -233,7 +233,7 @@ export class EventsFacadeService {
 
   // ==================== TEAM MANAGEMENT ====================
   async getTeams(): Promise<Team[]> {
-    return this.teamsService.getAllTeams();
+    return this.teamsService.getAllTeams() as unknown as Team[];
   }
 
   async getEventTeams(eventId: number): Promise<Team[]> {
@@ -242,11 +242,11 @@ export class EventsFacadeService {
       throw new Error('Event not found');
     }
 
-    return this.teamsService.getTeamsByEventId(eventId);
+    return this.teamsService.getTeamsByEventId(eventId) as unknown as Team[];
   }
 
   async getTeam(teamId: number): Promise<Team> {
-    return this.teamsService.getTeamById(teamId);
+    return this.teamsService.getTeamById(teamId) as unknown as Team;
   }
 
   async getTeamMembers(teamId: number): Promise<TeamMember[]> {
@@ -281,7 +281,7 @@ export class EventsFacadeService {
       throw new Error('Event not found');
     }
 
-    return this.teamsService.createTeam(eventId, createTeamDto);
+    return this.teamsService.createTeam(eventId, createTeamDto) as unknown as Team;
   }
 
   async updateTeam(
@@ -305,7 +305,7 @@ export class EventsFacadeService {
       throw new Error('Team does not belong to this event');
     }
 
-    return this.teamsService.updateTeam(teamId, updateTeamDto);
+    return this.teamsService.updateTeam(teamId, updateTeamDto) as unknown as Team;
   }
 
   async joinTeam(
@@ -419,7 +419,7 @@ export class EventsFacadeService {
       comment: participant.comment,
       createdAt: participant.createdAt,
       updatedAt: participant.updatedAt,
-    }));
+    })) as unknown as Participant[];
   }
 
   async getOrCreateParticipantByUserId(userId: number): Promise<any> {

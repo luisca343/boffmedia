@@ -175,7 +175,7 @@ export class ParticipantsRepository {
         boffMediaParticipants,
         eq(boffMediaParticipants.id, boffMediaEventParticipants.participantId),
       )
-      .where(eq(boffMediaEventParticipants.eventId, eventId));
+      .where(eq(boffMediaEventParticipants.eventId, eventId)) as any;
   }
 
   async deleteEventParticipation(

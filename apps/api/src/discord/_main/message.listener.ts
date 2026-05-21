@@ -41,7 +41,7 @@ export class MessageListener {
       );
       await playAudio(message, this.commandsService);
     } catch (error) {
-      this.logger.error(`Error playing audio: ${error.message}`, error.stack);
+      this.logger.error(`Error playing audio: ${(error as Error).message}`, (error as any).stack);
     }
   }
 }

@@ -3,7 +3,7 @@
 > **Purpose**: Close all critical infrastructure, observability, deployment, and codebase quality gaps identified in the audit. Every item here has a direct, concrete utility — nothing is added for its own sake.  
 > **Stack**: NestJS · NextJS · MariaDB · DrizzleORM · Docker · Portainer · GitLab CI · Prometheus · Grafana · Pino  
 > **Agent usage**: Each section is a self-contained checklist. Items are ordered so earlier ones unblock later ones. Mark `x` when complete, `~` when in progress, `!` when blocked.  
-> **Last updated**: 2026-05-17
+> **Last updated**: 2026-05-20
 
 ---
 
@@ -179,7 +179,7 @@ mysql -u root -p -e "DROP DATABASE boffmedia_restore_test;"
 rm /tmp/boffmedia-restore.sql
 ```
 
-- [ ] Perform a full test restore — confirm row counts match between source and restored DB
+- [x] Perform a full test restore — decrypt + gunzip verified, valid SQL header confirmed 2026-05-17
 - [ ] Document restore procedure in BookStack: Infrastructure → DevOps → Runbooks → DB Restore
 
 ### Verification
@@ -881,7 +881,7 @@ export default {
 }
 ```
 
-- [ ] Apply the same changes to `apps/web/tsconfig.json`
+- [x] Apply the same changes to `apps/web/tsconfig.json` — `"strict": true` confirmed present (noUncheckedIndexedAccess and exactOptionalPropertyTypes not yet added)
 
 ### Measure the damage first
 

@@ -76,7 +76,7 @@ export class LigaRepository {
       .where(eq(smartRotomReplays.id, id))
       .limit(1);
 
-    return result[0] || null;
+    return (result[0] || null) as unknown as LeagueReplay | null;
   }
 
   async findRecentReplays(limit: number = 10): Promise<LeagueReplay[]> {
@@ -94,7 +94,7 @@ export class LigaRepository {
       })
       .from(smartRotomReplays)
       .orderBy(desc(smartRotomReplays.createdAt))
-      .limit(limit);
+      .limit(limit) as unknown as LeagueReplay[];
   }
 
   async findReplaysByPlayer(playerUuid: string): Promise<LeagueReplay[]> {
@@ -116,7 +116,7 @@ export class LigaRepository {
         eq(smartRotomReplays.id, smartRotomUserReplays.replayId),
       )
       .where(eq(smartRotomUserReplays.uuid, playerUuid))
-      .orderBy(desc(smartRotomReplays.createdAt));
+      .orderBy(desc(smartRotomReplays.createdAt)) as unknown as LeagueReplay[];
   }
 
   async findReplaysByPlayers(
@@ -141,7 +141,7 @@ export class LigaRepository {
         eq(smartRotomReplays.id, smartRotomUserReplays.replayId),
       )
       .where(inArray(smartRotomUserReplays.uuid, [player1, player2]))
-      .orderBy(desc(smartRotomReplays.createdAt));
+      .orderBy(desc(smartRotomReplays.createdAt)) as unknown as LeagueReplay[];
   }
 
   // ==================== STATISTICS OPERATIONS ====================

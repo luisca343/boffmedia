@@ -17,13 +17,15 @@ export class SmartRotomApp {
   @ApiProperty({
     example: 'mina',
     description: 'URL or path to the app',
+    nullable: true,
   })
-  url: string;
+  url: string | null;
 
   @ApiProperty({
     example: AppStatus.ACTIVE,
     description: 'Whether the app is active',
     enum: AppStatus,
+    nullable: true,
   })
-  active: AppStatus;
+  active: number | null;
 }

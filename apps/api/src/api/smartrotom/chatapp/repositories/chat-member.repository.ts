@@ -24,7 +24,7 @@ export class ChatMemberRepository implements IMemberRepository {
         .leftJoin(
           smartrotomUsers,
           eq(rotomChatUsers.uuid, smartrotomUsers.uuid),
-        );
+        ) as unknown as Promise<ChatMember[]>;
     }
 
     return this.db
@@ -34,7 +34,7 @@ export class ChatMemberRepository implements IMemberRepository {
       })
       .from(rotomChatUsers)
       .leftJoin(smartrotomUsers, eq(rotomChatUsers.uuid, smartrotomUsers.uuid))
-      .where(eq(rotomChatUsers.chatId, chatId));
+      .where(eq(rotomChatUsers.chatId, chatId)) as unknown as ChatMember[];
   }
 
   async addChatMember(

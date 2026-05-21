@@ -15,7 +15,7 @@ export class AchievementsService {
   }
 
   async getAchievementById(id: number): Promise<Achievement> {
-    return this.achievementsRepository.findById(id);
+    return this.achievementsRepository.findById(id) as Promise<Achievement>;
   }
 
   async getAchievementsByEventId(eventId: number): Promise<Achievement[]> {

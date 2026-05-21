@@ -47,7 +47,7 @@ export class NotificationsController {
   async getInbox(@Query() query: GetInboxQueryDto): Promise<NotificationsInboxDto> {
     const limit = query.limit ? Number(query.limit) : 20;
     const offset = query.offset ? Number(query.offset) : 0;
-    return this.notificationsService.getInbox(query.uuid, limit, offset);
+    return this.notificationsService.getInbox(query.uuid, limit, offset) as unknown as NotificationsInboxDto;
   }
 
   @Patch(':id/read')

@@ -101,7 +101,7 @@ export class ConfigService extends NestConfigService {
       this.logger.error(
         `Failed to save image from URL ${imageUrl}: ${error.message}`,
       );
-      //throw new Error(`Failed to save image from URL ${imageUrl}: ${error.message}`);
+      return '';
     }
   }
 

@@ -22,7 +22,7 @@ export class AppsRepository
       ...createAppDto,
     });
 
-    return this.findById(result[0].insertId);
+    return this.findById(result[0].insertId) as Promise<SmartRotomApp>;
   }
 
   async update(id: number, updateAppDto: UpdateAppDto): Promise<SmartRotomApp> {
@@ -33,7 +33,7 @@ export class AppsRepository
       } as SmartRotomApp)
       .where(eq(smartrotomApps.id, id));
 
-    return this.findById(id);
+    return this.findById(id) as Promise<SmartRotomApp>;
   }
 
   async delete(id: number): Promise<boolean> {

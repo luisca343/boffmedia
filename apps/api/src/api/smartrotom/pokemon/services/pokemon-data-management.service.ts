@@ -232,7 +232,7 @@ export class PokemonDataManagementService {
     name: string,
   ): { speciesID: number; form: string; speciesName: string }[] {
     const forms = this.pokemonDataService.getSpeciesByAbility(name) || [];
-    const result = [];
+    const result: any[] = [];
 
     forms.forEach((form) => {
       const pokemon = this.pokemonDataService

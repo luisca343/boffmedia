@@ -23,7 +23,7 @@ export class FicusAIRepository
       content: createMessageDto.content,
     });
 
-    return this.findById(result[0].insertId);
+    return this.findById(result[0].insertId) as Promise<FicusMessage>;
   }
 
   async update(_id: number, _updateDto: never): Promise<FicusMessage> {
@@ -49,7 +49,7 @@ export class FicusAIRepository
       .from(ficusMessages)
       .where(eq(ficusMessages.uuid, uuid))
       .orderBy(desc(ficusMessages.id))
-      .limit(limit);
+      .limit(limit) as unknown as FicusMessage[];
   }
 
   async findRecentByUuid(uuid: string, limit: number): Promise<FicusMessage[]> {
@@ -61,7 +61,7 @@ export class FicusAIRepository
       .limit(limit);
 
     // Return in chronological order (oldest first) for context
-    return messages.reverse();
+    return (messages as unknown as FicusMessage[]).reverse();
   }
 
   async deleteByUuid(uuid: string): Promise<boolean> {

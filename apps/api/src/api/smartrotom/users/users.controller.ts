@@ -44,7 +44,7 @@ export class UsersController {
     description: 'Failed to retrieve users.',
   })
   async findAll(): Promise<SmartRotomUser[]> {
-    return this.usersFacadeService.getAllUsers();
+    return this.usersFacadeService.getAllUsers() as unknown as SmartRotomUser[];
   }
 
   @Post()
@@ -69,7 +69,7 @@ export class UsersController {
   async create(
     @Body() createUserDto: CreateSmartrotomUserDto,
   ): Promise<SmartRotomUser> {
-    return this.usersFacadeService.createUser(createUserDto);
+    return this.usersFacadeService.createUser(createUserDto) as unknown as SmartRotomUser;
   }
 
   @Get(':id')
@@ -88,7 +88,7 @@ export class UsersController {
   async findOne(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<SmartRotomUser> {
-    return this.usersFacadeService.getUserById(id);
+    return this.usersFacadeService.getUserById(id) as unknown as SmartRotomUser;
   }
 
   @Get('uuid/:uuid')
@@ -109,7 +109,7 @@ export class UsersController {
     if (!user) {
       throw new Error('User not found');
     }
-    return user;
+    return user as unknown as SmartRotomUser;
   }
 
   @Patch(':id')
@@ -133,7 +133,7 @@ export class UsersController {
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateSmartrotomUserDto,
   ): Promise<SmartRotomUser> {
-    return this.usersFacadeService.updateUser(id, updateUserDto);
+    return this.usersFacadeService.updateUser(id, updateUserDto) as unknown as SmartRotomUser;
   }
 
   @Delete(':id')
@@ -187,7 +187,7 @@ export class UsersController {
       user: result.user,
       isNew: result.isNew,
       status: result.isNew ? 'created' : 'found',
-    };
+    } as unknown as FindOrCreateResult;
   }
 
   @Post('initialize')
@@ -204,7 +204,7 @@ export class UsersController {
   async initialize(
     @Body() data: UserInitializationDataDto,
   ): Promise<InitializationResult> {
-    return this.usersFacadeService.initializeUserAndAccounts(data);
+    return this.usersFacadeService.initializeUserAndAccounts(data) as unknown as InitializationResult;
   }
 
   // ==================== USER WITH ACCOUNTS ====================
@@ -225,10 +225,8 @@ export class UsersController {
     if (!result) {
       throw new Error('User not found');
     }
-    return result;
+    return result as unknown as UserWithAccounts;
   }
-
-  // ==================== BATCH OPERATIONS ====================
 
   @Post('batch')
   @ApiOperation({ summary: 'Get multiple users by UUIDs' })
@@ -252,7 +250,7 @@ export class UsersController {
   async getMultipleUsers(
     @Body() request: BatchUsersRequestDto,
   ): Promise<{ [uuid: string]: SmartRotomUser | null }> {
-    return this.usersFacadeService.getMultipleUsers(request.uuids);
+    return this.usersFacadeService.getMultipleUsers(request.uuids) as unknown as { [uuid: string]: SmartRotomUser | null };
   }
 
   @Post('batch/accounts')
@@ -277,7 +275,7 @@ export class UsersController {
   async getMultipleUsersWithAccounts(
     @Body() request: BatchUsersRequestDto,
   ): Promise<{ [uuid: string]: UserWithAccounts | null }> {
-    return this.usersFacadeService.getMultipleUsersWithAccounts(request.uuids);
+    return this.usersFacadeService.getMultipleUsersWithAccounts(request.uuids) as unknown as { [uuid: string]: UserWithAccounts | null };
   }
 
   // ==================== STATISTICS ====================

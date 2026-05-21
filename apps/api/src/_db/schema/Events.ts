@@ -9,6 +9,7 @@ import {
   index,
   foreignKey,
   boolean,
+  AnyMySqlColumn,
 } from 'drizzle-orm/mysql-core';
 import { boffMediaUsers } from './BoffMedia';
 import { sql } from 'drizzle-orm';
@@ -42,7 +43,7 @@ export const boffMediaGames = mysqlTable('boffmedia_games', {
   updatedAt: datetime('updated_at')
     .notNull()
     .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
-  deletedAt: datetime('deleted_at').default(null),
+  deletedAt: datetime('deleted_at'),
 });
 
 export type Game = typeof boffMediaGames.$inferSelect;
@@ -51,7 +52,7 @@ export const boffMediaEvents = mysqlTable(
   'boffmedia_events',
   {
     id: int('id').primaryKey().autoincrement(),
-    parentId: int('parent_id').references(() => boffMediaEvents.id, {
+    parentId: int('parent_id').references((): AnyMySqlColumn => boffMediaEvents.id, {
       onDelete: 'cascade',
       onUpdate: 'cascade',
     }),
@@ -85,7 +86,7 @@ export const boffMediaEvents = mysqlTable(
     updatedAt: datetime('updated_at')
       .notNull()
       .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
-    deletedAt: datetime('deleted_at').default(null),
+    deletedAt: datetime('deleted_at'),
   },
   (table) => {
     return {
@@ -148,7 +149,7 @@ export const boffMediaEventTeams = mysqlTable(
     updatedAt: datetime('updated_at')
       .notNull()
       .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
-    deletedAt: datetime('deleted_at').default(null),
+    deletedAt: datetime('deleted_at'),
   },
   (table) => {
     return {
@@ -275,7 +276,7 @@ export const boffMediaAchievements = mysqlTable(
     updatedAt: datetime('updated_at')
       .notNull()
       .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
-    deletedAt: datetime('deleted_at').default(null),
+    deletedAt: datetime('deleted_at'),
   },
   (table) => {
     return {
@@ -349,7 +350,7 @@ export async function validateParticipantCanReceiveAchievement(
 ): Promise<boolean> {
   // 1. Get the event ID for the achievement
   const achievement = await db.query.boffMediaAchievements.findFirst({
-    where: (achievements, { eq, and, isNull }) =>
+    where: (achievements: any, { eq, and, isNull }: any) =>
       and(
         eq(achievements.id, achievementId),
         isNull(achievements.deletedAt), // Ensure achievement is not soft-deleted
@@ -360,14 +361,14 @@ export async function validateParticipantCanReceiveAchievement(
 
   // Check if the event itself is soft-deleted
   const event = await db.query.boffMediaEvents.findFirst({
-    where: (events, { eq, and, isNull }) =>
+    where: (events: any, { eq, and, isNull }: any) =>
       and(eq(events.id, achievement.eventId), isNull(events.deletedAt)),
   });
   if (!event) return false; // Event is soft-deleted
 
   // 2. Check if participant is registered for this event
   const eventParticipant = await db.query.boffMediaEventParticipants.findFirst({
-    where: (p, { eq, and }) =>
+    where: (p: any, { eq, and }: any) =>
       and(
         eq(p.participantId, participantId),
         eq(p.eventId, achievement.eventId), // Use achievement.eventId safely now

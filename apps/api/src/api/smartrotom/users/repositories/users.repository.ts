@@ -37,7 +37,7 @@ export class UsersRepository
       world: createUserDto.world,
     } as SmartRotomUser);
 
-    return this.findById(result[0].insertId);
+    return this.findById(result[0].insertId) as Promise<SmartRotomUser>;
   }
 
   async update(
@@ -51,7 +51,7 @@ export class UsersRepository
       } as SmartRotomUser)
       .where(eq(smartrotomUsers.id, id));
 
-    return this.findById(id);
+    return this.findById(id) as Promise<SmartRotomUser>;
   }
 
   async delete(id: number): Promise<boolean> {

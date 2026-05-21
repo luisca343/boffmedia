@@ -89,7 +89,7 @@ export class MineRepository {
       .where(eq(smartrotomUsers.uuid, uuid))
       .limit(1);
 
-    return result[0] || null;
+    return (result[0] || null) as unknown as { energy: number } | null;
   }
 
   async findPlayerLastCharge(uuid: string): Promise<Date | null> {
@@ -140,7 +140,7 @@ export class MineRepository {
       .orderBy(desc(mineGames.id))
       .limit(1);
 
-    return result[0] || null;
+    return (result[0] || null) as unknown as GameSession | null;
   }
 
   async findGameSession(gameId: number): Promise<GameSession | null> {
@@ -154,7 +154,7 @@ export class MineRepository {
       .where(eq(mineGames.id, gameId))
       .limit(1);
 
-    return result[0] || null;
+    return (result[0] || null) as unknown as GameSession | null;
   }
 
   // ==================== REWARD OPERATIONS ====================
@@ -230,7 +230,7 @@ export class MineRepository {
       .leftJoin(mineGamesDetail, eq(mineGames.id, mineGamesDetail.gameId))
       .leftJoin(mineRewards, eq(mineRewards.id, mineGamesDetail.rewardId))
       .where(eq(mineGames.uuid, uuid))
-      .orderBy(desc(mineGames.createdAt));
+      .orderBy(desc(mineGames.createdAt)) as unknown as HistoryEntry[];
   }
 
   // ==================== RANKING OPERATIONS ====================

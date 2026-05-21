@@ -387,7 +387,7 @@ export class ArcadeFacadeService implements OnModuleInit {
             );
             failedItems.push(item.itemId);
             errors.push(
-              `Failed to claim item ${item.itemId}: ${consumeError.message}`,
+              `Failed to claim item ${item.itemId}: ${(consumeError as any).message}`,
             );
             continue;
           }
@@ -413,7 +413,7 @@ export class ArcadeFacadeService implements OnModuleInit {
                 pokemonError,
               );
               errors.push(
-                `Failed to distribute Pokemon ${item.itemId}: ${pokemonError.message}`,
+                `Failed to distribute Pokemon ${item.itemId}: ${(pokemonError as any).message}`,
               );
               failedItems.push(item.itemId);
             }
@@ -438,7 +438,7 @@ export class ArcadeFacadeService implements OnModuleInit {
                 itemError,
               );
               errors.push(
-                `Failed to distribute item ${item.itemId}: ${itemError.message}`,
+                `Failed to distribute item ${item.itemId}: ${(itemError as any).message}`,
               );
               failedItems.push(item.itemId);
             }
@@ -449,7 +449,7 @@ export class ArcadeFacadeService implements OnModuleInit {
             itemError,
           );
           failedItems.push(item.itemId);
-          errors.push(`Error processing ${item.itemId}: ${itemError.message}`);
+          errors.push(`Error processing ${item.itemId}: ${(itemError as any).message}`);
         }
       }
 

@@ -67,9 +67,9 @@ export class ChatappController {
   @ApiBody({ type: CreateChatDto })
   async createChat(@Body() createChatDto: CreateChatDto): Promise<number> {
     const createChatRequest: CreateChatRequest = {
-      player: createChatDto.player,
+      player: createChatDto.player!,
       users: createChatDto.users,
-      name: createChatDto.name,
+      name: createChatDto.name ?? '',
     };
     return await this.chatappFacadeService.createChat(createChatRequest);
   }
@@ -166,7 +166,7 @@ export class ChatappController {
     const createMessageRequest: CreateChatMessageRequest = {
       uuid: createMessageDto.uuid,
       message: createMessageDto.message,
-      type: createMessageDto.type,
+      type: createMessageDto.type!,
     };
 
     return await this.chatappFacadeService.createMessage(
@@ -193,7 +193,7 @@ export class ChatappController {
     const createMessageRequest: CreateChatMessageRequest = {
       uuid: createMessageDto.uuid,
       message: createMessageDto.message,
-      type: createMessageDto.type,
+      type: createMessageDto.type!,
     };
 
     return await this.chatappFacadeService.createGlobalMessage(

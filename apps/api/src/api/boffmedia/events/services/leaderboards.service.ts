@@ -213,7 +213,7 @@ export class LeaderboardsService {
     return results.map((result, index) => ({
       ...result,
       rank: index + 1,
-    }));
+    })) as unknown as TeamLeaderboardEntry[];
   }
 
   /**
@@ -417,7 +417,7 @@ export class LeaderboardsService {
       )
       .where(and(...whereConditions))
       .orderBy(desc(boffMediaParticipantProgress.completedAt))
-      .limit(limit);
+      .limit(limit) as unknown as { participantId: number; nickname: string; avatar: string; achievementName: string; achievementIcon: string; points: number; completedAt: Date; }[];
   }
 
   // ==================== PRIVATE HELPER METHODS ====================
