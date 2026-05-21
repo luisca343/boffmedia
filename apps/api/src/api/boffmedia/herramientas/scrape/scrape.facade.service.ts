@@ -81,7 +81,7 @@ export class ScrapeFacadeService {
   ): Promise<EuropeAggregateResult> {
     try {
       return await this.myrientScrapeService.scrapeCatalog(consoleKey, regions);
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Error scraping Myrient catalog:', error);
       throw new Error(`Failed to scrape catalog: ${(error as Error).message}`);
     }
@@ -92,7 +92,7 @@ export class ScrapeFacadeService {
   async downloadGame(url: string): Promise<DownloadResult> {
     try {
       return await this.myrientScrapeService.downloadGame(url);
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Error downloading game from Myrient:', error);
       throw new Error(`Failed to download game: ${(error as Error).message}`);
     }
@@ -103,7 +103,7 @@ export class ScrapeFacadeService {
   ): Promise<BulkDownloadResult> {
     try {
       return await this.myrientScrapeService.downloadAllGames(dto);
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Error in bulk download from Myrient:', error);
       throw new Error(`Bulk download failed: ${(error as Error).message}`);
     }
@@ -114,7 +114,7 @@ export class ScrapeFacadeService {
   ): Promise<BulkDownloadResult> {
     try {
       return await this.myrientScrapeService.downloadSelectedGames(dto);
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Error in selected download from Myrient:', error);
       throw new Error(`Selected download failed: ${(error as Error).message}`);
     }
@@ -131,7 +131,7 @@ export class ScrapeFacadeService {
   async searchManga(query: string): Promise<MangaSearchResult[]> {
     try {
       return await this.mangaScraperService.searchNovels(query);
-    } catch (error) {
+    } catch (error: unknown) {
       throw new Error(`Failed to search manga: ${(error as Error).message}`);
     }
   }
@@ -141,7 +141,7 @@ export class ScrapeFacadeService {
   ): Promise<{ title: string; url: string }> {
     try {
       return await this.mangaScraperService.getNovelInfo(novelUrl);
-    } catch (error) {
+    } catch (error: unknown) {
       throw new Error(
         `Failed to fetch novel info: ${(error as Error).message}`,
       );
@@ -151,7 +151,7 @@ export class ScrapeFacadeService {
   async getMangaChapters(novelUrl: string): Promise<MangaChapter[]> {
     try {
       return await this.mangaScraperService.getChapterList(novelUrl);
-    } catch (error) {
+    } catch (error: unknown) {
       throw new Error(
         `Failed to fetch chapter list: ${(error as Error).message}`,
       );
@@ -167,7 +167,7 @@ export class ScrapeFacadeService {
         chapterUrl,
         saveDir,
       );
-    } catch (error) {
+    } catch (error: unknown) {
       throw new Error(
         `Failed to download chapter: ${(error as Error).message}`,
       );

@@ -123,7 +123,7 @@ export class NovecoolService implements OnModuleDestroy {
         ],
         ...(env.CHROME_PATH ? { executablePath: env.CHROME_PATH } : {}),
       });
-    } catch (e) {
+    } catch (e: unknown) {
       this.logger.error(
         `[Novecool] Browser launch failed: ${(e as Error)?.message ?? e}`,
       );

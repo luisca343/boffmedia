@@ -280,7 +280,7 @@ export class NovelCoolScraper implements IMangaScraper {
     for (let attempt = 1; attempt <= MAX_RETRIES + 1; attempt++) {
       try {
         return await this.scrapeSinglePage(context, pageUrl);
-      } catch (err) {
+      } catch (err: unknown) {
         lastError = err as Error;
         if (attempt <= MAX_RETRIES) {
           logger.warn(

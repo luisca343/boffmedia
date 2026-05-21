@@ -40,7 +40,7 @@ export class MessageListener {
         `Playing audio for message: ${message.content} in channel: ${voiceChannel.name}`,
       );
       await playAudio(message, this.commandsService);
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Error playing audio: ${(error as Error).message}`, (error as any).stack);
     }
   }
