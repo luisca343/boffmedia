@@ -120,7 +120,9 @@ describe('ChatappController — integration (ValidationPipe + GlobalExceptionFil
   // ── GET /smartrotom/chatapp/chat/:chatId ───────────────────────────────
   describe('GET /smartrotom/chatapp/chat/:chatId', () => {
     it('returns 200 and calls facade.getChatById', async () => {
-      (mockFacade.getChatById! as jest.Mock).mockResolvedValue({ id: 1 } as any);
+      (mockFacade.getChatById! as jest.Mock).mockResolvedValue({
+        id: 1,
+      } as any);
 
       const res = await request(app.getHttpServer())
         .get('/smartrotom/chatapp/chat/1')
@@ -152,7 +154,9 @@ describe('ChatappController — integration (ValidationPipe + GlobalExceptionFil
   // ── POST /smartrotom/chatapp/messages/:chatId ──────────────────────────
   describe('POST /smartrotom/chatapp/messages/:chatId', () => {
     it('returns 201 and calls facade.createMessage', async () => {
-      (mockFacade.createMessage! as jest.Mock).mockResolvedValue({ id: 1 } as any);
+      (mockFacade.createMessage! as jest.Mock).mockResolvedValue({
+        id: 1,
+      } as any);
 
       const res = await request(app.getHttpServer())
         .post('/smartrotom/chatapp/messages/5')
@@ -188,7 +192,9 @@ describe('ChatappController — integration (ValidationPipe + GlobalExceptionFil
   // ── POST /smartrotom/chatapp/global-message ────────────────────────────
   describe('POST /smartrotom/chatapp/global-message', () => {
     it('returns 201 and calls facade.createGlobalMessage', async () => {
-      (mockFacade.createGlobalMessage! as jest.Mock).mockResolvedValue({ id: 2 } as any);
+      (mockFacade.createGlobalMessage! as jest.Mock).mockResolvedValue({
+        id: 2,
+      } as any);
 
       const res = await request(app.getHttpServer())
         .post('/smartrotom/chatapp/global-message')
@@ -208,7 +214,9 @@ describe('ChatappController — integration (ValidationPipe + GlobalExceptionFil
   // ── PUT /smartrotom/chatapp/message/:messageId ─────────────────────────
   describe('PUT /smartrotom/chatapp/message/:messageId', () => {
     it('returns 200 and calls facade.updateMessage', async () => {
-      (mockFacade.updateMessage! as jest.Mock).mockResolvedValue({ id: 10 } as any);
+      (mockFacade.updateMessage! as jest.Mock).mockResolvedValue({
+        id: 10,
+      } as any);
 
       const res = await request(app.getHttpServer())
         .put('/smartrotom/chatapp/message/10')
@@ -236,7 +244,9 @@ describe('ChatappController — integration (ValidationPipe + GlobalExceptionFil
   // ── DELETE /smartrotom/chatapp/message/:messageId ──────────────────────
   describe('DELETE /smartrotom/chatapp/message/:messageId', () => {
     it('returns 200 and calls facade.deleteMessage', async () => {
-      (mockFacade.deleteMessage! as jest.Mock).mockResolvedValue({ success: true } as any);
+      (mockFacade.deleteMessage! as jest.Mock).mockResolvedValue({
+        success: true,
+      } as any);
 
       const res = await request(app.getHttpServer())
         .delete('/smartrotom/chatapp/message/10')
@@ -260,7 +270,9 @@ describe('ChatappController — integration (ValidationPipe + GlobalExceptionFil
   // ── POST /smartrotom/chatapp/message/:messageId/read ───────────────────
   describe('POST /smartrotom/chatapp/message/:messageId/read', () => {
     it('returns 201 and calls facade.markMessageAsRead', async () => {
-      (mockFacade.markMessageAsRead! as jest.Mock).mockResolvedValue({ success: true } as any);
+      (mockFacade.markMessageAsRead! as jest.Mock).mockResolvedValue({
+        success: true,
+      } as any);
 
       const res = await request(app.getHttpServer())
         .post('/smartrotom/chatapp/message/10/read')
@@ -276,7 +288,9 @@ describe('ChatappController — integration (ValidationPipe + GlobalExceptionFil
   // ── POST /smartrotom/chatapp/group/:groupId/member ─────────────────────
   describe('POST /smartrotom/chatapp/group/:groupId/member', () => {
     it('returns 201 and calls facade.addMemberToGroup', async () => {
-      (mockFacade.addMemberToGroup! as jest.Mock).mockResolvedValue({ success: true } as any);
+      (mockFacade.addMemberToGroup! as jest.Mock).mockResolvedValue({
+        success: true,
+      } as any);
 
       const res = await request(app.getHttpServer())
         .post('/smartrotom/chatapp/group/3/member')
@@ -326,7 +340,9 @@ describe('ChatappController — integration (ValidationPipe + GlobalExceptionFil
   // ── POST /smartrotom/chatapp/call/:chatId ──────────────────────────────
   describe('POST /smartrotom/chatapp/call/:chatId', () => {
     it('returns 201 and calls facade.initiateCall', async () => {
-      (mockFacade.initiateCall! as jest.Mock).mockResolvedValue({ callId: 'abc' } as any);
+      (mockFacade.initiateCall! as jest.Mock).mockResolvedValue({
+        callId: 'abc',
+      } as any);
 
       const res = await request(app.getHttpServer())
         .post('/smartrotom/chatapp/call/5')

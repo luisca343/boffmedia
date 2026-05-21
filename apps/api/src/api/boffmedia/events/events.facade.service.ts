@@ -50,7 +50,9 @@ export class EventsFacadeService {
   }
 
   async getEvent(id: number): Promise<Event & { childEvents?: Event[] }> {
-    return this.eventsService.getEventById(id) as unknown as Event & { childEvents?: Event[] };
+    return this.eventsService.getEventById(id) as unknown as Event & {
+      childEvents?: Event[];
+    };
   }
 
   async createEvent(createEventDto: CreateEventDto): Promise<Event> {
@@ -80,7 +82,9 @@ export class EventsFacadeService {
       parentId: createEventDto.parentId === -1 ? null : createEventDto.parentId,
     };
 
-    return this.eventsService.createEvent(processedDto as CreateEventDto) as unknown as Event;
+    return this.eventsService.createEvent(
+      processedDto as CreateEventDto,
+    ) as unknown as Event;
   }
 
   async updateEvent(
@@ -119,7 +123,10 @@ export class EventsFacadeService {
       parentId: updateEventDto.parentId === -1 ? null : updateEventDto.parentId,
     };
 
-    return this.eventsService.updateEvent(id, processedDto as UpdateEventDto) as unknown as Event;
+    return this.eventsService.updateEvent(
+      id,
+      processedDto as UpdateEventDto,
+    ) as unknown as Event;
   }
 
   async deleteEvent(id: number): Promise<void> {
@@ -168,7 +175,9 @@ export class EventsFacadeService {
   }
 
   async getAchievement(id: number): Promise<Achievement> {
-    return this.achievementsService.getAchievementById(id) as unknown as Achievement;
+    return this.achievementsService.getAchievementById(
+      id,
+    ) as unknown as Achievement;
   }
 
   async getEventAchievements(eventId: number): Promise<Achievement[]> {
@@ -177,7 +186,9 @@ export class EventsFacadeService {
       throw new Error('Event not found');
     }
 
-    return this.achievementsService.getAchievementsByEventId(eventId) as unknown as Achievement[];
+    return this.achievementsService.getAchievementsByEventId(
+      eventId,
+    ) as unknown as Achievement[];
   }
 
   async createAchievement(
@@ -212,7 +223,10 @@ export class EventsFacadeService {
       throw new Error('Achievement not found');
     }
 
-    return this.achievementsService.updateAchievement(id, updateAchievementDto) as unknown as Achievement;
+    return this.achievementsService.updateAchievement(
+      id,
+      updateAchievementDto,
+    ) as unknown as Achievement;
   }
 
   async getParticipantProgress(
@@ -281,7 +295,10 @@ export class EventsFacadeService {
       throw new Error('Event not found');
     }
 
-    return this.teamsService.createTeam(eventId, createTeamDto) as unknown as Team;
+    return this.teamsService.createTeam(
+      eventId,
+      createTeamDto,
+    ) as unknown as Team;
   }
 
   async updateTeam(
@@ -305,7 +322,10 @@ export class EventsFacadeService {
       throw new Error('Team does not belong to this event');
     }
 
-    return this.teamsService.updateTeam(teamId, updateTeamDto) as unknown as Team;
+    return this.teamsService.updateTeam(
+      teamId,
+      updateTeamDto,
+    ) as unknown as Team;
   }
 
   async joinTeam(

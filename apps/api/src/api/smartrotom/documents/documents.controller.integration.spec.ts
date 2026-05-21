@@ -185,7 +185,9 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
   // ── DELETE /smartrotom/documents/document/:id ──────────────────────────
   describe('DELETE /smartrotom/documents/document/:id', () => {
     it('returns 200 and delegates to facade.deleteDocument', async () => {
-      (mockFacade.deleteDocument! as jest.Mock).mockResolvedValue({ success: true } as any);
+      (mockFacade.deleteDocument! as jest.Mock).mockResolvedValue({
+        success: true,
+      } as any);
 
       const res = await request(app.getHttpServer()).delete(
         '/smartrotom/documents/document/1',
@@ -297,7 +299,9 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
   // ── POST /smartrotom/documents/note/user ───────────────────────────────
   describe('POST /smartrotom/documents/note/user', () => {
     it('returns 201 and delegates to facade.addNoteToUser', async () => {
-      (mockFacade.addNoteToUser! as jest.Mock).mockResolvedValue({ success: true } as any);
+      (mockFacade.addNoteToUser! as jest.Mock).mockResolvedValue({
+        success: true,
+      } as any);
 
       const res = await request(app.getHttpServer())
         .post('/smartrotom/documents/note/user')
@@ -339,7 +343,10 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
   // ── GET /smartrotom/documents/news ─────────────────────────────────────
   describe('GET /smartrotom/documents/news', () => {
     it('returns 200 and fetches all news by default', async () => {
-      (mockFacade.getAllNews! as jest.Mock).mockResolvedValue({ total: 0, news: [] } as any);
+      (mockFacade.getAllNews! as jest.Mock).mockResolvedValue({
+        total: 0,
+        news: [],
+      } as any);
 
       const res = await request(app.getHttpServer()).get(
         '/smartrotom/documents/news',
@@ -369,7 +376,9 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
   // ── GET /smartrotom/documents/news/featured ────────────────────────────
   describe('GET /smartrotom/documents/news/featured', () => {
     it('returns 200 and delegates to facade.getFeaturedNews', async () => {
-      (mockFacade.getFeaturedNews! as jest.Mock).mockResolvedValue({ id: 1 } as any);
+      (mockFacade.getFeaturedNews! as jest.Mock).mockResolvedValue({
+        id: 1,
+      } as any);
 
       const res = await request(app.getHttpServer()).get(
         '/smartrotom/documents/news/featured',
@@ -385,7 +394,9 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
   // ── GET /smartrotom/documents/news/:newsId ─────────────────────────────
   describe('GET /smartrotom/documents/news/:newsId', () => {
     it('returns 200 and delegates to facade.getNewsById', async () => {
-      (mockFacade.getNewsById! as jest.Mock).mockResolvedValue({ id: 1 } as any);
+      (mockFacade.getNewsById! as jest.Mock).mockResolvedValue({
+        id: 1,
+      } as any);
 
       const res = await request(app.getHttpServer()).get(
         '/smartrotom/documents/news/1',
@@ -452,7 +463,9 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
   // ── DELETE /smartrotom/documents/news/:newsId ──────────────────────────
   describe('DELETE /smartrotom/documents/news/:newsId', () => {
     it('returns 200 and delegates to facade.deleteNews', async () => {
-      (mockFacade.deleteNews! as jest.Mock).mockResolvedValue({ success: true } as any);
+      (mockFacade.deleteNews! as jest.Mock).mockResolvedValue({
+        success: true,
+      } as any);
 
       const res = await request(app.getHttpServer()).delete(
         '/smartrotom/documents/news/1',
@@ -468,7 +481,9 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
   // ── POST /smartrotom/documents/newsstatus ──────────────────────────────
   describe('POST /smartrotom/documents/newsstatus', () => {
     it('returns 201 and delegates to facade.updateNewsStatus', async () => {
-      (mockFacade.updateNewsStatus! as jest.Mock).mockResolvedValue({ success: true } as any);
+      (mockFacade.updateNewsStatus! as jest.Mock).mockResolvedValue({
+        success: true,
+      } as any);
 
       const res = await request(app.getHttpServer())
         .post('/smartrotom/documents/newsstatus')

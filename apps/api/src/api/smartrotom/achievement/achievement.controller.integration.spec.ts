@@ -81,7 +81,9 @@ describe('AchievementController — integration (ValidationPipe + GlobalExceptio
   // ── POST /smartrotom/achievement/get-achievements ──────────────────────
   describe('POST /smartrotom/achievement/get-achievements', () => {
     it('returns 201 and delegates to facade.getUserAchievements', async () => {
-      (mockFacade.getUserAchievements! as jest.Mock).mockResolvedValue([] as any);
+      (mockFacade.getUserAchievements! as jest.Mock).mockResolvedValue(
+        [] as any,
+      );
 
       const res = await request(app.getHttpServer())
         .post('/smartrotom/achievement/get-achievements')
@@ -113,7 +115,9 @@ describe('AchievementController — integration (ValidationPipe + GlobalExceptio
   // ── POST /smartrotom/achievement/get-achievement-by-id ─────────────────
   describe('POST /smartrotom/achievement/get-achievement-by-id', () => {
     it('returns 201 and delegates to facade', async () => {
-      (mockFacade.getUserAchievementById! as jest.Mock).mockResolvedValue({ id: 1 } as any);
+      (mockFacade.getUserAchievementById! as jest.Mock).mockResolvedValue({
+        id: 1,
+      } as any);
 
       const res = await request(app.getHttpServer())
         .post('/smartrotom/achievement/get-achievement-by-id')
@@ -244,7 +248,9 @@ describe('AchievementController — integration (ValidationPipe + GlobalExceptio
   // ── POST /smartrotom/achievement/create-replay ─────────────────────────
   describe('POST /smartrotom/achievement/create-replay', () => {
     it('returns 201 and delegates to facade.createReplay', async () => {
-      (mockFacade.createReplay! as jest.Mock).mockResolvedValue({ insertId: 42 } as any);
+      (mockFacade.createReplay! as jest.Mock).mockResolvedValue({
+        insertId: 42,
+      } as any);
 
       const res = await request(app.getHttpServer())
         .post('/smartrotom/achievement/create-replay')
@@ -281,7 +287,9 @@ describe('AchievementController — integration (ValidationPipe + GlobalExceptio
   // ── POST /smartrotom/achievement/create-user-replay ────────────────────
   describe('POST /smartrotom/achievement/create-user-replay', () => {
     it('returns 201 and delegates to facade.createUserReplay', async () => {
-      (mockFacade.createUserReplay! as jest.Mock).mockResolvedValue({ insertId: 99 } as any);
+      (mockFacade.createUserReplay! as jest.Mock).mockResolvedValue({
+        insertId: 99,
+      } as any);
 
       const res = await request(app.getHttpServer())
         .post('/smartrotom/achievement/create-user-replay')
@@ -313,7 +321,9 @@ describe('AchievementController — integration (ValidationPipe + GlobalExceptio
   // ── POST /smartrotom/achievement/get-replay ────────────────────────────
   describe('POST /smartrotom/achievement/get-replay', () => {
     it('returns 201 and delegates to facade.getUserReplay', async () => {
-      (mockFacade.getUserReplay! as jest.Mock).mockResolvedValue({ id: 42 } as any);
+      (mockFacade.getUserReplay! as jest.Mock).mockResolvedValue({
+        id: 42,
+      } as any);
 
       const res = await request(app.getHttpServer())
         .post('/smartrotom/achievement/get-replay')

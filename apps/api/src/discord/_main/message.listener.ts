@@ -41,7 +41,10 @@ export class MessageListener {
       );
       await playAudio(message, this.commandsService);
     } catch (error: unknown) {
-      this.logger.error(`Error playing audio: ${(error as Error).message}`, (error as any).stack);
+      this.logger.error(
+        `Error playing audio: ${(error as Error).message}`,
+        (error as any).stack,
+      );
     }
   }
 }

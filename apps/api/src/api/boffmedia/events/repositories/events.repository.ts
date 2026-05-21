@@ -35,7 +35,7 @@ export class EventsRepository {
   };
 
   async findAll(): Promise<EventWithGameNameAndParent[]> {
-    const parentEvent = alias(boffMediaEvents, 'parentEvent') as any;
+    const parentEvent = alias(boffMediaEvents, 'parentEvent');
 
     return this.db
       .select({
@@ -55,7 +55,7 @@ export class EventsRepository {
   }
 
   async findById(id: number): Promise<EventWithGameNameAndParent | null> {
-    const parentEvent = alias(boffMediaEvents, 'parentEvent') as any;
+    const parentEvent = alias(boffMediaEvents, 'parentEvent');
 
     const result = await this.db
       .select({
@@ -74,13 +74,15 @@ export class EventsRepository {
         ),
       );
 
-    return (result.length ? result[0] : null) as unknown as EventWithGameNameAndParent | null;
+    return (result.length
+      ? result[0]
+      : null) as unknown as EventWithGameNameAndParent | null;
   }
 
   async findChildEvents(
     parentId: number,
   ): Promise<EventWithGameNameAndParent[]> {
-    const parentEvent = alias(boffMediaEvents, 'parentEvent') as any;
+    const parentEvent = alias(boffMediaEvents, 'parentEvent');
 
     return this.db
       .select({

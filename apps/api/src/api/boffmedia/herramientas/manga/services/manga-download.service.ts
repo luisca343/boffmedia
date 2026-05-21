@@ -182,8 +182,8 @@ export class MangaDownloadService {
         status: 'downloaded',
         pages: images.length,
       };
-    } catch (err: any) {
-      const error = String(err?.message ?? err);
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err.message : String(err);
       this.logger.error(`${prefix} FAILED: ${error}`);
       return {
         index,

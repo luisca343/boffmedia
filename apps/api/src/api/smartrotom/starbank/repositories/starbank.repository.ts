@@ -141,7 +141,9 @@ export class StarbankRepository {
         .where(eq(starBankUsersAccounts.uuid, uuid))
         .execute();
 
-      return result.length > 0 ? (result[0] as unknown as { id: number; balance: number }) : null;
+      return result.length > 0
+        ? (result[0] as unknown as { id: number; balance: number })
+        : null;
     } catch (error: any) {
       this.logger.error(`Failed to find main account for ${uuid}:`, error);
       throw new Error(`Failed to find main account: ${error.message}`);

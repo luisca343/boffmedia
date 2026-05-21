@@ -476,14 +476,15 @@ export class MyrientScrapeService {
             size: formatBytes(sizeBytes),
             sizeBytes,
           };
-        } catch (err: any) {
+        } catch (err: unknown) {
+          const errMsg = err instanceof Error ? err.message : String(err);
           this.logger.error(
-            `${prefix} FAILED ${filename}: ${err?.message ?? err} — URL: ${entry.link}`,
+            `${prefix} FAILED ${filename}: ${errMsg} — URL: ${entry.link}`,
           );
           return {
             filename,
             status: 'failed',
-            error: String(err?.message ?? err),
+            error: errMsg,
           };
         }
       },
@@ -598,14 +599,13 @@ export class MyrientScrapeService {
           size: formatBytes(sizeBytes),
           sizeBytes,
         };
-      } catch (err: any) {
-        this.logger.error(
-          `${prefix} FAILED ${filename}: ${err?.message ?? err}`,
-        );
+      } catch (err: unknown) {
+        const errMsg = err instanceof Error ? err.message : String(err);
+        this.logger.error(`${prefix} FAILED ${filename}: ${errMsg}`);
         return {
           filename,
           status: 'failed',
-          error: String(err?.message ?? err),
+          error: errMsg,
         };
       }
     };
@@ -730,14 +730,15 @@ export class MyrientScrapeService {
             size: formatBytes(sizeBytes),
             sizeBytes,
           };
-        } catch (err: any) {
+        } catch (err: unknown) {
+          const errMsg = err instanceof Error ? err.message : String(err);
           this.logger.error(
-            `${prefix} FAILED ${filename}: ${err?.message ?? err} — URL: ${entry.link}`,
+            `${prefix} FAILED ${filename}: ${errMsg} — URL: ${entry.link}`,
           );
           return {
             filename,
             status: 'failed',
-            error: String(err?.message ?? err),
+            error: errMsg,
           };
         }
       },

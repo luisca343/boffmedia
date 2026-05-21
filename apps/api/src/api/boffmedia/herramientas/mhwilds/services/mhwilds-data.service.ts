@@ -152,10 +152,13 @@ export class MhwildsDataService {
       const weaponsResult = await this.mhwildsRepository.getWeapons(locale);
       const weapons = weaponsResult.data;
 
-      const weaponsById = weapons.reduce((map: Record<string, any>, weapon: any) => {
-        map[weapon.id] = weapon;
-        return map;
-      }, {});
+      const weaponsById = weapons.reduce(
+        (map: Record<string, any>, weapon: any) => {
+          map[weapon.id] = weapon;
+          return map;
+        },
+        {},
+      );
 
       const rootWeapons = weapons.filter(
         (weapon: any) =>
@@ -166,18 +169,24 @@ export class MhwildsDataService {
         this.buildWeaponBranch(rootWeapon, weaponsById),
       );
 
-      const weaponTreeByKind = weapons.reduce((tree: Record<string, any[]>, weapon: any) => {
-        const kind = weapon.kind;
-        if (!tree[kind]) {
-          tree[kind] = [];
-        }
+      const weaponTreeByKind = weapons.reduce(
+        (tree: Record<string, any[]>, weapon: any) => {
+          const kind = weapon.kind;
+          if (!tree[kind]) {
+            tree[kind] = [];
+          }
 
-        if (weapon.crafting?.craftable === true && !weapon.crafting?.previous) {
-          tree[kind].push(this.buildWeaponBranch(weapon, weaponsById));
-        }
+          if (
+            weapon.crafting?.craftable === true &&
+            !weapon.crafting?.previous
+          ) {
+            tree[kind].push(this.buildWeaponBranch(weapon, weaponsById));
+          }
 
-        return tree;
-      }, {});
+          return tree;
+        },
+        {},
+      );
 
       // Save the processed data
       await this.mhwildsRepository.saveProcessedData(
@@ -254,7 +263,9 @@ export class MhwildsDataService {
       const result = await this.mhwildsRepository.getArmor(locale);
       const armor = result.data;
 
-      const filteredArmor = armor.filter((piece: any) => piece.rarity === rarity);
+      const filteredArmor = armor.filter(
+        (piece: any) => piece.rarity === rarity,
+      );
 
       return {
         data: filteredArmor,
@@ -290,16 +301,22 @@ export class MhwildsDataService {
       ]);
 
       // Weapons statistics
-      const weaponsByKind = weaponsResult.data.reduce((acc: Record<string, number>, weapon: any) => {
-        acc[weapon.kind] = (acc[weapon.kind] || 0) + 1;
-        return acc;
-      }, {});
+      const weaponsByKind = weaponsResult.data.reduce(
+        (acc: Record<string, number>, weapon: any) => {
+          acc[weapon.kind] = (acc[weapon.kind] || 0) + 1;
+          return acc;
+        },
+        {},
+      );
 
       // Armor statistics
-      const armorByRarity = armorResult.data.reduce((acc: Record<number, number>, piece: any) => {
-        acc[piece.rarity] = (acc[piece.rarity] || 0) + 1;
-        return acc;
-      }, {});
+      const armorByRarity = armorResult.data.reduce(
+        (acc: Record<number, number>, piece: any) => {
+          acc[piece.rarity] = (acc[piece.rarity] || 0) + 1;
+          return acc;
+        },
+        {},
+      );
 
       // Decorations statistics
       const decorationsByRarity = decorationsResult.data.reduce(
@@ -311,9 +328,12 @@ export class MhwildsDataService {
       );
 
       // Charm ranks count
-      const totalCharmRanks = charmsResult.data.reduce((total: number, charm: any) => {
-        return total + (charm.ranks ? charm.ranks.length : 0);
-      }, 0);
+      const totalCharmRanks = charmsResult.data.reduce(
+        (total: number, charm: any) => {
+          return total + (charm.ranks ? charm.ranks.length : 0);
+        },
+        0,
+      );
 
       return {
         weapons: {

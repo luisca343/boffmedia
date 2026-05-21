@@ -14,19 +14,33 @@ export class NotificationResponseDto {
   })
   type: string;
 
-  @ApiProperty({ description: 'Short notification title', example: 'New message from Ash' })
+  @ApiProperty({
+    description: 'Short notification title',
+    example: 'New message from Ash',
+  })
   title: string;
 
   @ApiProperty({ description: 'Notification body text' })
   body: string;
 
-  @ApiProperty({ description: 'Optional deep-link URL', nullable: true, required: false })
+  @ApiProperty({
+    description: 'Optional deep-link URL',
+    nullable: true,
+    required: false,
+  })
   link: string | null;
 
-  @ApiProperty({ description: 'Whether the notification has been read', example: 0 })
+  @ApiProperty({
+    description: 'Whether the notification has been read',
+    example: 0,
+  })
   isRead: number;
 
-  @ApiProperty({ description: 'Creation timestamp', type: String, format: 'date-time' })
+  @ApiProperty({
+    description: 'Creation timestamp',
+    type: String,
+    format: 'date-time',
+  })
   createdAt: Date | null;
 }
 
@@ -34,7 +48,10 @@ export class NotificationsInboxDto {
   @ApiProperty({ type: [NotificationResponseDto] })
   items: NotificationResponseDto[];
 
-  @ApiProperty({ description: 'Total number of notifications for the user', example: 42 })
+  @ApiProperty({
+    description: 'Total number of notifications for the user',
+    example: 42,
+  })
   total: number;
 }
 
@@ -44,11 +61,19 @@ export class GetInboxQueryDto {
   @IsNotEmpty()
   uuid: string;
 
-  @ApiProperty({ description: 'Max results to return', example: 20, required: false })
+  @ApiProperty({
+    description: 'Max results to return',
+    example: 20,
+    required: false,
+  })
   @IsOptional()
   limit?: number;
 
-  @ApiProperty({ description: 'Pagination offset', example: 0, required: false })
+  @ApiProperty({
+    description: 'Pagination offset',
+    example: 0,
+    required: false,
+  })
   @IsOptional()
   offset?: number;
 }
@@ -75,7 +100,10 @@ export class SendNotificationDto {
   @MaxLength(64)
   type: string;
 
-  @ApiProperty({ description: 'Short notification title', example: 'Mensaje del servidor' })
+  @ApiProperty({
+    description: 'Short notification title',
+    example: 'Mensaje del servidor',
+  })
   @IsString()
   @IsNotEmpty()
   @MaxLength(255)
@@ -86,13 +114,21 @@ export class SendNotificationDto {
   @IsNotEmpty()
   body: string;
 
-  @ApiProperty({ description: 'Optional deep-link URL', required: false, nullable: true })
+  @ApiProperty({
+    description: 'Optional deep-link URL',
+    required: false,
+    nullable: true,
+  })
   @IsOptional()
   @IsString()
   @MaxLength(512)
   link?: string;
 
-  @ApiProperty({ description: 'SmartRotom server name (injected by client)', required: false, nullable: true })
+  @ApiProperty({
+    description: 'SmartRotom server name (injected by client)',
+    required: false,
+    nullable: true,
+  })
   @IsOptional()
   @IsString()
   @MaxLength(64)

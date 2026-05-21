@@ -111,7 +111,9 @@ describe('UploadController — integration (ValidationPipe + GlobalExceptionFilt
     });
 
     it('returns 200 when path is omitted', async () => {
-      (mockFacade.getFileInfo! as jest.Mock).mockResolvedValue({ exists: true } as any);
+      (mockFacade.getFileInfo! as jest.Mock).mockResolvedValue({
+        exists: true,
+      } as any);
 
       const res = await request(app.getHttpServer())
         .get('/upload/info')
@@ -154,7 +156,9 @@ describe('UploadController — integration (ValidationPipe + GlobalExceptionFilt
 
   describe('GET /upload/limits', () => {
     it('returns 200 and upload limits', async () => {
-      (mockFacade.getMaxImageSize! as jest.Mock).mockReturnValue(5 * 1024 * 1024);
+      (mockFacade.getMaxImageSize! as jest.Mock).mockReturnValue(
+        5 * 1024 * 1024,
+      );
 
       const res = await request(app.getHttpServer()).get('/upload/limits');
 

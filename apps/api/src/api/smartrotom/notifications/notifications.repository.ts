@@ -65,10 +65,7 @@ export class NotificationsRepository implements INotificationsRepository {
       .update(srNotifications)
       .set({ isRead: 1 })
       .where(
-        and(
-          eq(srNotifications.id, id),
-          eq(srNotifications.userUuid, userUuid),
-        ),
+        and(eq(srNotifications.id, id), eq(srNotifications.userUuid, userUuid)),
       );
   }
 

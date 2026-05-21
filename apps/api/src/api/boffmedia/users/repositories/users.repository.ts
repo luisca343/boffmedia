@@ -307,7 +307,8 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       if (rows.length === 0) return null;
 
       return {
-        boffmedia_users: rows[0].boffmedia_users as unknown as BoffMediaUserSafe,
+        boffmedia_users: rows[0]
+          .boffmedia_users as unknown as BoffMediaUserSafe,
         rotom_users: rows[0].rotom_users,
       };
     } catch (error: any) {
@@ -360,7 +361,9 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
         .where(eq(boffMediaUserRoles.userId, userId))
         .execute();
 
-      return data.map((d: { role: string | null }) => d.role ?? '').filter(Boolean);
+      return data
+        .map((d: { role: string | null }) => d.role ?? '')
+        .filter(Boolean);
     } catch (error: any) {
       this.logger.error(`Failed to get user roles for user ${userId}:`, error);
       throw new Error(`Failed to get user roles: ${error.message}`);
