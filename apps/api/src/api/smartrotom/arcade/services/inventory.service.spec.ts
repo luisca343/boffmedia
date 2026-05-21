@@ -85,7 +85,7 @@ describe('InventoryService', () => {
         (i: any) => i.itemId === 'lootbox-basic',
       );
       // consumable: net = total amount - used = 5 - 0 = 5
-      expect(lootboxSlot.amount).toBe(5);
+      expect(lootboxSlot!.amount).toBe(5);
     });
 
     it('throws when uuid is empty', async () => {
