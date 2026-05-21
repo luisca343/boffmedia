@@ -77,7 +77,7 @@ export class ArcadeInventoryRepository
     return this.db
       .select()
       .from(smartRotomInventory)
-      .where(eq(smartRotomInventory.uuid, uuid));
+      .where(eq(smartRotomInventory.uuid, uuid)) as unknown as ArcadeInventoryItem[];
   }
 
   async findUserItem(
@@ -94,7 +94,7 @@ export class ArcadeInventoryRepository
         ),
       )
       .limit(1);
-    return result[0] || null;
+    return (result[0] || null) as unknown as ArcadeInventoryItem | null;
   }
 
   async addItem(
@@ -170,7 +170,7 @@ export class ArcadeInventoryRepository
 
     // Calculate total available quantity
     const totalAvailable = items.reduce(
-      (total, item) => total + (item.amount - (item.used || 0)),
+      (total, item) => total + ((item.amount ?? 0) - (item.used ?? 0)),
       0,
     );
 
@@ -187,7 +187,7 @@ export class ArcadeInventoryRepository
     for (const item of items) {
       if (remainingToConsume <= 0) break;
 
-      const availableInThisItem = item.amount - (item.used || 0);
+      const availableInThisItem = (item.amount ?? 0) - (item.used ?? 0);
       const toConsumeFromThisItem = Math.min(
         remainingToConsume,
         availableInThisItem,
@@ -229,7 +229,7 @@ export class ArcadeInventoryRepository
       );
 
     const totalRemaining = updatedItems.reduce(
-      (total, item) => total + (item.amount - (item.used || 0)),
+      (total, item) => total + ((item.amount ?? 0) - (item.used ?? 0)),
       0,
     );
 
@@ -262,7 +262,7 @@ export class ArcadeInventoryRepository
           eq(smartRotomInventory.uuid, uuid),
           eq(smartRotomInventory.itemType, type),
         ),
-      );
+      ) as unknown as ArcadeInventoryItem[];
   }
 
   async getItemsByRarity(
@@ -277,6 +277,6 @@ export class ArcadeInventoryRepository
           eq(smartRotomInventory.uuid, uuid),
           eq(smartRotomInventory.rarity, rarity),
         ),
-      );
+      ) as unknown as ArcadeInventoryItem[];
   }
 }

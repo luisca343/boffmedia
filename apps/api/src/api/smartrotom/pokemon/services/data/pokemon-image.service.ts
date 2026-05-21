@@ -110,7 +110,7 @@ export class PokemonImageService {
       const pokemonImageName =
         formName == 'base'
           ? pokemon.name.toUpperCase()
-          : `${pokemon.name.toUpperCase()}_${form.name.toUpperCase()}`;
+          : `${pokemon.name.toUpperCase()}_${form.name!.toUpperCase()}`;
 
       const image = path.join(
         __dirname,
@@ -133,15 +133,15 @@ export class PokemonImageService {
     }
 
     let palette;
-    Object.values(form.genderProperties).forEach((genderProperty) => {
-      genderProperty.palettes.forEach((p) => {
+    Object.values(form.genderProperties as any).forEach((genderProperty: any) => {
+      genderProperty.palettes.forEach((p: any) => {
         if (p.name === paletteName) palette = p;
         return;
       });
     });
 
     if (!palette) {
-      palette = form.genderProperties[0].palettes[0];
+      palette = form.genderProperties![0].palettes[0];
     }
 
     const sprite = this.getSpriteURL(palette, pokemonId);
@@ -181,7 +181,7 @@ export class PokemonImageService {
     };
   }
 
-  getSpriteURL(palette, pokemonId?: number) {
+  getSpriteURL(palette: any, pokemonId?: number) {
     if (pokemonId == 774)
       return 'pixelmon:pokemon/774_minior/all/meteor/none/sprite.png';
     return palette?.sprite?.resource ? palette.sprite.resource : palette.sprite;
@@ -234,7 +234,7 @@ export class PokemonImageService {
       const spriteResource =
         pokemonId === 774
           ? 'pixelmon:pokemon/774_minior/all/meteor/none/sprite.png'
-          : palette.sprite?.resource || palette.sprite;
+          : (palette as any).sprite?.resource || (palette as any).sprite;
 
       if (!spriteResource) {
         return '/smartrotom/packs/default_resourcepack/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png';

@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq, and, sql } from 'drizzle-orm';
+import { eq, and, sql, SQL } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   smartRotomArcadeStreaks,
@@ -63,7 +63,7 @@ export class ArcadeRepository {
       condition = and(
         condition,
         eq(smartRotomInventory.sourceType, sourceType),
-      );
+      ) as SQL<unknown>;
     }
 
     return this.db

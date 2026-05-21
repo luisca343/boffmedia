@@ -76,7 +76,7 @@ export class ChatService {
   async getChatById(chatId: number): Promise<ChatDetails> {
     const chat = await this.chatRepository.findChatById(chatId);
     if (!chat) throw new Error('Chat not found');
-    return chat;
+    return chat as unknown as ChatDetails;
   }
 
   async updateChat(

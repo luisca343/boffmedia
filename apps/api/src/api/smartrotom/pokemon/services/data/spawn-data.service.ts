@@ -64,7 +64,7 @@ export class SpawnDataService extends BaseDataService {
     const bannedFolders = ['legendaries', 'megas', 'npcs', 'grass'];
     if (bannedFolders.includes(folder)) return;
 
-    data.spawnInfos.forEach((spawnInfo: SpawnInfo) => {
+    data.spawnInfos.forEach((spawnInfo: any) => {
       if (spawnInfo.typeID !== 'pokemon') return;
 
       const species = spawnInfo.spec.split('species:')[1].toLowerCase();
@@ -77,15 +77,15 @@ export class SpawnDataService extends BaseDataService {
       const form = match?.groups?.form || 'base';
       const palette = match?.groups?.palette;
 
-      const pokemonID = `${speciesName.toLowerCase()}_${form.toLowerCase()}`;
+      const pokemonID = `${speciesName!.toLowerCase()}_${form.toLowerCase()}`;
       spawnInfo.spawnType = folder;
-      spawnInfo.pokemonName = speciesName;
+      spawnInfo.pokemonName = speciesName!;
       spawnInfo.pokemonForm = form;
       spawnInfo.pokemonPalette = palette;
       spawnInfo.gender =
         this.pokemonDataService.getSpeciesByNameWithForm(pokemonID)?.gender;
       spawnInfo.pokemonDex =
-        this.pokemonDataService.getSpeciesByName(speciesName)?.dex || 0;
+        this.pokemonDataService.getSpeciesByName(speciesName!)?.dex || 0;
 
       this.addSpawnInfoToBiomes(biomes, spawnInfo);
       this.addSpawnInfoToCollections(speciesName, form, pokemonID, spawnInfo);
@@ -274,7 +274,7 @@ export class SpawnDataService extends BaseDataService {
       dex: pokemon?.dex || 0,
       species: spawn.pokemonName,
       form: spawn.pokemonForm,
-      palette: spawn.pokemonPalette,
+      palette: spawn.pokemonPalette ?? '',
       rarity: spawn.rarity,
       percentage: (spawn.rarity / total) * 100,
     };

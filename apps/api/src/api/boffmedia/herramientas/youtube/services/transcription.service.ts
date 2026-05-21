@@ -48,7 +48,7 @@ export class TranscriptionService {
       const { Innertube: InnertubeClass } = await eval('import("youtubei.js")');
       this.youtubeClient = await InnertubeClass.create();
     }
-    return this.youtubeClient;
+    return this.youtubeClient!;
   }
 
   // ==================== VIDEO ID EXTRACTION ====================

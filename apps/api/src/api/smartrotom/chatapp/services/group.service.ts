@@ -185,7 +185,7 @@ export class GroupService {
       description: chat.description,
       image: chatImage,
       createdAt: chat.createdAt,
-      updatedAt: chat.updatedAt,
+      updatedAt: chat.updatedAt!,
       messages,
       unread: 0, // TODO: Implement unread count logic
       members: members,

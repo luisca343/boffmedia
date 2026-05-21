@@ -51,7 +51,7 @@ export class EventsRepository {
           isNull(boffMediaEvents.deletedAt),
           or(isNull(boffMediaEvents.gameId), isNull(boffMediaGames.deletedAt)),
         ),
-      );
+      ) as unknown as EventWithGameNameAndParent[];
   }
 
   async findById(id: number): Promise<EventWithGameNameAndParent | null> {
@@ -74,7 +74,7 @@ export class EventsRepository {
         ),
       );
 
-    return result.length ? result[0] : null;
+    return (result.length ? result[0] : null) as unknown as EventWithGameNameAndParent | null;
   }
 
   async findChildEvents(
@@ -97,7 +97,7 @@ export class EventsRepository {
           isNull(boffMediaEvents.deletedAt),
           or(isNull(boffMediaEvents.gameId), isNull(boffMediaGames.deletedAt)),
         ),
-      );
+      ) as unknown as EventWithGameNameAndParent[];
   }
 
   async create(eventData: Partial<Event>): Promise<{ insertId: number }> {

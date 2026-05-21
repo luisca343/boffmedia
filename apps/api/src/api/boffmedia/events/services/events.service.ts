@@ -14,7 +14,7 @@ export class EventsService {
 
   async getEventById(id: number): Promise<Event & { childEvents?: Event[] }> {
     const event = await this.eventsRepository.findById(id);
-    if (!event) return null;
+    if (!event) return null as unknown as Event & { childEvents?: Event[] };
 
     const childEvents = await this.eventsRepository.findChildEvents(id);
 
@@ -39,7 +39,7 @@ export class EventsService {
     };
 
     const result = await this.eventsRepository.create(eventData);
-    return this.getEventById(result.insertId);
+    return this.getEventById(result.insertId) as unknown as Promise<Event>;
   }
 
   async updateEvent(
@@ -51,7 +51,7 @@ export class EventsService {
       title: updateEventDto.title,
       description: updateEventDto.description,
       gameId: updateEventDto.gameId,
-      startDate: new Date(updateEventDto.startDate),
+      startDate: new Date(updateEventDto.startDate!),
       endDate: updateEventDto.endDate ? new Date(updateEventDto.endDate) : null,
       visibility: updateEventDto.visibility,
       icon: updateEventDto.icon,

@@ -71,7 +71,7 @@ export class AchievementsRepository
       .from(smartRotomAchievements)
       .where(eq(smartRotomAchievements.id, id))
       .limit(1);
-    return result[0] || null;
+    return (result[0] || null) as unknown as Achievement | null;
   }
 
   async findUserAchievements(uuid: string): Promise<any[]> {

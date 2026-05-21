@@ -52,7 +52,7 @@ export class LootboxService {
     const _newItemResult = await this.arcadeInventoryRepository.addItem({
       uuid,
       itemId: selectedItem.id,
-      itemData: selectedItem.data || null,
+      itemData: selectedItem.data ?? undefined,
       itemType: selectedItem.type || 'lootbox_item',
       amount: selectedItem.amount || 1,
       sourceType: 'arcade',

@@ -19,7 +19,6 @@ import { Logger } from 'nestjs-pino';
 
 function getPokemonTeam(team: Pokemon[]) {
   const pokemonTeam = [] as any[];
-  this.logger.log(team[0]);
   team.map((pokemon) => {
     pokemonTeam.push({
       speciesForme: pokemon.speciesForme || pokemon.name,
@@ -147,11 +146,11 @@ export class BattleController {
             url: string;
             pixelated: boolean;
           };
-        img1 = Sprites.getPokemon(active?.speciesForme, {
+        img1 = Sprites.getPokemon(active?.speciesForme ?? '', {
           gen: GRAPHICS,
           gender: active?.gender || undefined,
           shiny: active?.shiny,
-        });
+        } as any);
       }
 
       for (const active of battle.p2.active) {
@@ -164,15 +163,15 @@ export class BattleController {
             url: string;
             pixelated: boolean;
           };
-        img2 = Sprites.getPokemon(active?.speciesForme, {
+        img2 = Sprites.getPokemon(active?.speciesForme ?? '', {
           gen: GRAPHICS,
           gender: active?.gender || undefined,
           shiny: active?.shiny,
-        });
+        } as any);
       }
 
       log[turn] = log[turn] || { events: [], t1: img1, t2: img2 };
-      log[turn].events.push({ args, kwArgs, text, line });
+      log[turn].events.push({ args, kwArgs, text, line: line ?? '' });
     }
 
     function end() {

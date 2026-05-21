@@ -13,7 +13,7 @@ export class GamesService {
   }
 
   async getGameById(id: number): Promise<Game> {
-    return this.gamesRepository.findById(id);
+    return this.gamesRepository.findById(id) as Promise<Game>;
   }
 
   async createGame(createGameDto: CreateGameDto): Promise<Game> {

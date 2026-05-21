@@ -33,7 +33,7 @@ export class AppService {
   }
 
   getDBPort(): number {
-    return this.configService.get<number>('DB_PORT');
+    return this.configService.get<number>('DB_PORT') ?? 0;
   }
 
   uploadFile(file: Express.Multer.File) {
@@ -135,7 +135,7 @@ export class AppService {
       const filesObj = files.reduce((acc, file) => {
         acc[file.split('.')[0]] = `https://api.boffmedia.es/blog/icons/${file}`;
         return acc;
-      }, {});
+      }, {} as Record<string, string>);
       return filesObj;
     } catch (error: any) {
       this.logger.error('Error reading the icons folder:', error);
@@ -191,7 +191,7 @@ export class AppService {
     const rows = response.data.values;
 
     const steamKeys = await Promise.all(
-      rows.map(async (row) => {
+      (rows ?? []).map(async (row) => {
         const steamID = row[5];
         let imageUrl = '';
 

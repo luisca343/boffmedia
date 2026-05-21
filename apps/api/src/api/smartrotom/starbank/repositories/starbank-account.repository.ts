@@ -60,7 +60,7 @@ export class StarbankAccountRepository
       } as DbStarBankAccount)
       .where(eq(starBankAccounts.id, id));
 
-    return this.findById(id);
+    return this.findById(id) as Promise<StarBankAccount>;
   }
 
   async delete(id: number): Promise<boolean> {
@@ -125,7 +125,7 @@ export class StarbankAccountRepository
         .where(eq(starBankUsersAccounts.uuid, uuid))
         .execute();
 
-      return result.length > 0 ? result[0] : null;
+      return result.length > 0 ? result[0] as { id: number; balance: number } : null;
     } catch (error: any) {
       this.logger.error(`Failed to find main account for ${uuid}:`, error);
       throw new Error(`Failed to find main account: ${error.message}`);

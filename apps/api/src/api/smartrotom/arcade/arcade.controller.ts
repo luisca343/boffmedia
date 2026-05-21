@@ -226,7 +226,7 @@ export class ArcadeController {
       uuid: data.uuid,
       itemId: data.itemId,
       itemType: data.itemType,
-      amount: data.amount,
+      amount: data.amount ?? 1,
       rarity: data.rarity,
       sourceType: data.sourceType,
     });

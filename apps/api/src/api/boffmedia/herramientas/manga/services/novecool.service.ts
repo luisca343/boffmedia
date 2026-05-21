@@ -357,7 +357,7 @@ export class NovecoolService implements OnModuleDestroy {
         return Buffer.from(data);
       } catch (secondErr) {
         throw new Error(
-          `Failed to download image ${imageUrl}: ${secondErr?.message ?? secondErr}`,
+          `Failed to download image ${imageUrl}: ${(secondErr as any)?.message ?? secondErr}`,
         );
       }
     }

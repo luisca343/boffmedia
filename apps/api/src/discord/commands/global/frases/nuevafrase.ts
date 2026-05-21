@@ -17,7 +17,7 @@ export class NuevaFraseCommand {
     @Options() { usuario, frase, comentario }: NuevaFraseDto,
   ) {
     const response = await this.service.addQuote(
-      interaction.guildId,
+      interaction.guildId!,
       usuario,
       frase,
       comentario,

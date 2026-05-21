@@ -35,7 +35,7 @@ export class SharexController {
 
     const fileName = file.originalname;
     const app = fileName.split('.')[0].slice(0, -11);
-    const extension = fileName.split('.').pop();
+    const extension = fileName.split('.').pop()!;
 
     let newName = randomString(10);
     const dir = path.join(process.cwd(), 'public/smartrotom/img/sharex');

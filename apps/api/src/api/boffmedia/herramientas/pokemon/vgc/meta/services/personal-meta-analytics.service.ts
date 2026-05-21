@@ -101,7 +101,7 @@ export class PersonalMetaAnalyticsService {
     );
 
     const filteredMatches = matches.filter((m) =>
-      allowedSessionIds.has(m.sessionId),
+      allowedSessionIds.has(m.sessionId!),
     );
     const sampleSize = filteredMatches.length;
 

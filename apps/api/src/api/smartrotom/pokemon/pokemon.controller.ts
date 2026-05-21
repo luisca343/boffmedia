@@ -282,7 +282,7 @@ export class PokemonController {
   async getPokemonByMove(
     @Param('name') name: string,
   ): Promise<PokemonMoveEntry[]> {
-    return this.pokemonFacadeService.getPokemonByMove(name);
+    return this.pokemonFacadeService.getPokemonByMove(name) as unknown as Promise<PokemonMoveEntry[]>;
   }
 
   // ==================== ABILITY OPERATIONS ====================

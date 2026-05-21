@@ -639,10 +639,10 @@ export class BoffMediaUsersFacadeService {
       email: boffMediaUser.email,
       username: boffMediaUser.username,
       password: boffMediaUser.password,
-      uuid: boffMediaUser.uuid,
+      uuid: boffMediaUser.uuid ?? undefined,
       profilePicture: boffMediaUser.profilePicture,
-      googleId: boffMediaUser.googleId,
-      discordId: boffMediaUser.discordId,
+      googleId: boffMediaUser.googleId ?? undefined,
+      discordId: boffMediaUser.discordId ?? undefined,
     };
 
     return await this.createUser(userData);

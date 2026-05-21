@@ -71,7 +71,7 @@ export class ChatappRepository {
           .select({ ...params })
           .from(rotomChats)
           .where(eq(rotomChats.type, 0)),
-      );
+      ) as unknown as ChatDetails[];
   }
 
   async findChatById(chatId: number): Promise<ChatDetails | null> {
@@ -89,7 +89,7 @@ export class ChatappRepository {
       .where(eq(rotomChats.id, chatId))
       .limit(1);
 
-    return result[0] || null;
+    return (result[0] || null) as unknown as ChatDetails | null;
   }
 
   async findChatByName(name: string): Promise<ChatDetails | null> {
@@ -107,7 +107,7 @@ export class ChatappRepository {
       .where(eq(rotomChats.name, name))
       .limit(1);
 
-    return result[0] || null;
+    return (result[0] || null) as unknown as ChatDetails | null;
   }
 
   async createChat(chatData: {
@@ -205,7 +205,7 @@ export class ChatappRepository {
       .from(rotomChatMessages)
       .where(eq(rotomChatMessages.chatId, chatId))
       .orderBy(desc(rotomChatMessages.createdAt))
-      .limit(limit);
+      .limit(limit) as unknown as ChatMessage[];
   }
 
   async findChatMessagesAscending(chatId: number): Promise<ChatMessage[]> {
@@ -219,7 +219,7 @@ export class ChatappRepository {
       })
       .from(rotomChatMessages)
       .where(eq(rotomChatMessages.chatId, chatId))
-      .orderBy(asc(rotomChatMessages.createdAt));
+      .orderBy(asc(rotomChatMessages.createdAt)) as unknown as ChatMessage[];
   }
 
   async createMessage(messageData: {
@@ -250,7 +250,7 @@ export class ChatappRepository {
       .where(eq(rotomChatMessages.id, messageId))
       .limit(1);
 
-    return result[0] || null;
+    return (result[0] || null) as unknown as ChatMessage | null;
   }
 
   async updateMessage(messageId: number, content: string): Promise<void> {

@@ -159,10 +159,10 @@ export class MessageService {
     const updatedMessage =
       await this.chatMessageRepository.findMessageById(messageId);
     return {
-      id: updatedMessage.id,
-      text: updatedMessage.content,
-      date: updatedMessage.createdAt,
-      uuid: updatedMessage.uuid,
+      id: updatedMessage!.id,
+      text: updatedMessage!.content,
+      date: updatedMessage!.createdAt,
+      uuid: updatedMessage!.uuid,
     };
   }
 

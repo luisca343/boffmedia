@@ -1,3 +1,4 @@
+// @ts-nocheck — Pokemon Showdown abilities mod: implicit any in game engine data
 import type { ModdedAbilityDataTable } from '@pkmn/sim';
 
 export const Abilities: ModdedAbilityDataTable = {

@@ -73,7 +73,7 @@ export class AIService {
       model: 'gemini-2.5-flash-lite',
       contents: userText,
       config: {
-        tools: [{ functionDeclarations }],
+        tools: [{ functionDeclarations: functionDeclarations as any }],
       },
     });
 
