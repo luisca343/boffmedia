@@ -64,7 +64,7 @@ describe('SharexController — integration (ValidationPipe + GlobalExceptionFilt
     });
 
     it('returns 200 when file and key are provided', async () => {
-      mockService.createImage!.mockImplementation(() => {});
+      (mockService.createImage! as jest.Mock).mockImplementation(() => {});
 
       const res = await request(app.getHttpServer())
         .post('/sharex')

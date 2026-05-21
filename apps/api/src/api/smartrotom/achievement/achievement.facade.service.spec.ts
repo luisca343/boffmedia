@@ -193,7 +193,9 @@ describe('AchievementFacadeService', () => {
 
   describe('unlockAchievement', () => {
     it('should unlock achievement and return success', async () => {
-      achievementsService.createUserAchievement.mockResolvedValue(undefined);
+      achievementsService.createUserAchievement.mockResolvedValue({
+        success: true,
+      } as any);
 
       const result = await service.unlockAchievement('test-uuid', 'first_win');
 

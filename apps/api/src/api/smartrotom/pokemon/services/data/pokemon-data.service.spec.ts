@@ -100,7 +100,7 @@ describe('PokemonDataService', () => {
     it('getSpeciesByDex returns the pokemon by dex number', () => {
       const pkm = service.getSpeciesByDex(25);
       expect(pkm).toBeDefined();
-      expect(pkm.name).toBe('pikachu');
+      expect(pkm!.name).toBe('pikachu');
     });
 
     it('getSpeciesByDex returns undefined for unknown dex', () => {

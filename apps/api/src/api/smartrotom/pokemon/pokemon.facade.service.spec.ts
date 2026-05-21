@@ -443,7 +443,7 @@ describe('PokemonFacadeService', () => {
         'test-uuid',
         25,
         'default',
-        null,
+        null as any,
         2,
       );
 

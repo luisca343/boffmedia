@@ -3,6 +3,14 @@
   "rootDir": ".",
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",
+  "setupFiles": ["<rootDir>/setup-env.e2e.ts"],
+  "moduleNameMapper": {
+    "^@repositories/(.*)$": "<rootDir>/../src/api/_repositories/$1",
+    "^@api/(.*)$": "<rootDir>/../src/api/$1",
+    "^@/(.*)$": "<rootDir>/../src/$1",
+    "^@boffmedia/shared$": "<rootDir>/../../packages/shared/src",
+    "^@boffmedia/shared/(.*)$": "<rootDir>/../../packages/shared/src/$1"
+  },
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
   }
