@@ -217,7 +217,7 @@ export class VgcPastesService {
       });
 
       return { count };
-    } catch (error) {
+    } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : String(error);
       await this.regulationsRepository.updateImportState(regulationId, {
         importStatus: 'error',
@@ -267,7 +267,7 @@ export class VgcPastesService {
               await this.vgcPastesRepository.linkPaste(team.id, pasteId);
               if (wasCached) cached++;
               else fetched++;
-            } catch (e) {
+            } catch (e: unknown) {
               const msg = e instanceof Error ? e.message : String(e);
               this.logger.warn(
                 `Paste fetch failed for team ${team.id}: ${msg}`,
@@ -290,7 +290,7 @@ export class VgcPastesService {
         importFetchedCount: fetched + cached + failed,
         importCompletedAt: new Date(),
       });
-    } catch (error) {
+    } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : String(error);
       await this.regulationsRepository.updateImportState(regulationId, {
         importStatus: 'error',

@@ -44,7 +44,7 @@ async function loadProxyPool(): Promise<string[]> {
       });
     proxyPoolLoadedAt = Date.now();
     logger.info(`[manga-http] Loaded ${proxyPool.length} proxies from pool`);
-  } catch (err) {
+  } catch (err: unknown) {
     logger.warn(
       `[manga-http] Failed to load proxy list: ${(err as Error).message}`,
     );
