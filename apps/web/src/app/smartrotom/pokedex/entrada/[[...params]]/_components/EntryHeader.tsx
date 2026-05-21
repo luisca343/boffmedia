@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { useEffect, useRef, useState } from "react"
 import { PokemonSprite } from "../../../_components/PokemonSprite"
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline"
 import { getDisplayStatus, getPokemonNameAndForm } from "../../../dexUtils"
@@ -37,6 +38,35 @@ export function EntryHeader({
   const t = useTranslations("pokedex")
   const types = pokemon.forms[0]?.types as string[] | undefined
   const isVisible = getDisplayStatus(pokemon.dex, formName, true)
+  const [activeTab, setActiveTab] = useState<string>("info")
+  const observerRef = useRef<IntersectionObserver | null>(null)
+
+  // Track which section is currently in view using IntersectionObserver
+  useEffect(() => {
+    if (observerRef.current) observerRef.current.disconnect()
+
+    const callback: IntersectionObserverCallback = (entries) => {
+      // Find the first entry that is intersecting, topmost in the viewport
+      const visible = entries
+        .filter((e) => e.isIntersecting)
+        .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
+      if (visible.length > 0) {
+        setActiveTab(visible[0].target.id)
+      }
+    }
+
+    observerRef.current = new IntersectionObserver(callback, {
+      rootMargin: "-10% 0px -80% 0px",
+      threshold: 0,
+    })
+
+    TABS.forEach(({ id }) => {
+      const el = document.getElementById(id)
+      if (el) observerRef.current!.observe(el)
+    })
+
+    return () => observerRef.current?.disconnect()
+  }, [])
 
   return (
     <div className="flex h-full bg-surface-950">
@@ -96,16 +126,36 @@ export function EntryHeader({
           </div>
 
           <nav className="flex gap-0.5 overflow-x-auto scrollbar-none -mx-1 px-1">
-            {TABS.map((tab) => (
-              <Link
-                key={tab.id}
-                href={`#${tab.id}`}
-                className="relative px-3.5 py-2.5 text-[13px] font-medium text-surface-400 hover:text-surface-100 transition-colors whitespace-nowrap flex items-center gap-[7px]"
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-surface-600" />
-                {t(tab.labelKey as any)}
-              </Link>
-            ))}
+            {TABS.map((tab) => {
+              const isActive = activeTab === tab.id
+              return (
+                <Link
+                  key={tab.id}
+                  href={`#${tab.id}`}
+                  className="relative px-3.5 py-2.5 text-[13px] font-medium transition-colors whitespace-nowrap flex items-center gap-[7px]"
+                  style={{ color: isActive ? "rgb(var(--primary-300))" : "rgb(var(--surface-400))" }}
+                >
+                  {/* Active underline glow */}
+                  {isActive && (
+                    <span
+                      className="absolute bottom-0 left-3 right-3 h-[2px] rounded-full"
+                      style={{
+                        background: "rgb(var(--primary-400))",
+                        boxShadow: "0 0 6px rgb(var(--primary-400))",
+                      }}
+                    />
+                  )}
+                  <span
+                    className="w-1.5 h-1.5 rounded-full transition-colors"
+                    style={{
+                      background: isActive ? "rgb(var(--primary-400))" : "rgb(var(--surface-600))",
+                      boxShadow: isActive ? "0 0 4px rgb(var(--primary-400))" : "none",
+                    }}
+                  />
+                  {t(tab.labelKey as any)}
+                </Link>
+              )
+            })}
           </nav>
         </header>
 

@@ -2,7 +2,7 @@
 import { useTranslations } from "next-intl"
 import { useGetAllAbilities } from "@/hooks/pokemon/useGetAllAbilities"
 import { useGetAbility } from "@/hooks/pokemon/useGetAbility"
-import type { AbilityCount } from "@/services/api/smartrotom/pokemonService"
+import type { AbilityCount } from "@boffmedia/shared"
 import { MagnifyingGlassIcon, SparklesIcon, StarIcon } from "@heroicons/react/24/outline"
 import { useState, useMemo } from "react"
 import { HubSidebar } from "../_components/HubSidebar"
@@ -123,9 +123,15 @@ export default function Habilidades() {
       const matchesSearch =
         name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         desc.toLowerCase().includes(searchQuery.toLowerCase())
-      return matchesSearch
+      // The list API may return isHidden even though the shared type doesn't declare it.
+      const isHiddenAbility = (ability as AbilityCount & { isHidden?: boolean }).isHidden ?? false
+      const matchesFilter =
+        showHidden === "all" ||
+        (showHidden === "hidden" && isHiddenAbility) ||
+        (showHidden === "standard" && !isHiddenAbility)
+      return matchesSearch && matchesFilter
     })
-  }, [abilities, searchQuery, t])
+  }, [abilities, searchQuery, showHidden, t])
 
   if (!abilities)
     return (
@@ -141,7 +147,7 @@ export default function Habilidades() {
     )
 
   const maxCount = Math.max(...abilities.map((a) => a.count), 1)
-  const hiddenCount = abilities.filter((a) => a.name.includes("hidden") || false).length
+  const hiddenCount = abilities.filter((a) => (a as AbilityCount & { isHidden?: boolean }).isHidden).length
 
   return (
     <div className="flex h-full bg-surface-950">

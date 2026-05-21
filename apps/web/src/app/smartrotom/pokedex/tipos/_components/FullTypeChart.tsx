@@ -3,14 +3,7 @@ import React from "react"
 import { typeChart } from "../../dexUtils"
 import { TypeChip } from "../../_components/TypeChip"
 import { useTranslations } from "next-intl"
-
-const TYPE_COLORS: Record<string, string> = {
-  normal: "#9fa19f", fire: "#e62829", water: "#2980ef", grass: "#3fa129",
-  electric: "#fac000", ice: "#3fd8ff", fighting: "#ff8000", poison: "#9141cb",
-  ground: "#d6985c", flying: "#81b9ef", psychic: "#ef4179", bug: "#91a119",
-  rock: "#afa981", ghost: "#704170", dragon: "#5061e1", dark: "#50413f",
-  steel: "#60a1b8", fairy: "#ef71ef",
-}
+import { TYPE_COLORS } from "../../_utils/typeColors"
 
 const MULT_META: Record<string, { bg: string; fg: string; label: string; es: string }> = {
   "4": { bg: "rgba(239,68,68,0.12)", fg: "#ef4444", label: "×4", es: "Súper débil" },

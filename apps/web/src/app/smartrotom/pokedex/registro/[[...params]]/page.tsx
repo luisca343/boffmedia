@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation"
 import { PokemonSprite } from "../../_components/PokemonSprite"
 import { useTranslations } from "next-intl"
 import { HubSidebar } from "../../_components/HubSidebar"
+import { usePokemonStore } from "@/stores/pokemonStore"
+import { getPokemonNameAndForm } from "../../dexUtils"
 
 export default function Registro({ params }: { params: Promise<{ params?: string[] }> }) {
   const t = useTranslations("pokedex")
@@ -11,6 +13,22 @@ export default function Registro({ params }: { params: Promise<{ params?: string
   const { params: routeParams } = use(params)
   let [pokemonIndex, formIndex] = routeParams as unknown as [number, string]
   const [phase, setPhase] = useState<"scanning" | "flash" | "reveal">("scanning")
+  const getPokemonByDex = usePokemonStore((state) => state.getPokemonByDex)
+  const pokemonByDex = usePokemonStore((state) => state.pokemonByDex)
+  const [pokemonName, setPokemonName] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (pokemonIndex) {
+      const cached = pokemonByDex[Number(pokemonIndex)]
+      if (cached) {
+        setPokemonName(getPokemonNameAndForm(cached.name, String(formIndex || "base"), t))
+      } else {
+        getPokemonByDex(Number(pokemonIndex)).then((p) => {
+          if (p) setPokemonName(getPokemonNameAndForm(p.name, String(formIndex || "base"), t))
+        })
+      }
+    }
+  }, [pokemonIndex])
 
   useEffect(() => {
     const t1 = setTimeout(() => setPhase("flash"), 1200)
@@ -97,6 +115,7 @@ export default function Registro({ params }: { params: Promise<{ params?: string
           </div>
           <div className="font-orbitron font-extrabold text-[34px] tracking-tight text-surface-50 flex items-baseline gap-3">
             <span className="font-jetbrains text-base text-surface-500 font-medium">#{String(pokemonIndex).padStart(3, "0")}</span>
+            {pokemonName && <span>{pokemonName}</span>}
           </div>
         </div>
 

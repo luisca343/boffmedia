@@ -6,6 +6,8 @@ import { HubSidebar } from "../_components/HubSidebar"
 import { TypeChip } from "../_components/TypeChip"
 import { MagnifyingGlassIcon, MapIcon } from "@heroicons/react/24/outline"
 import { useState, useMemo, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { TYPE_COLORS } from "../_utils/typeColors"
 
 const BIOME_CONFIG: Record<string, { type: string; c: string; glyph: string }> = {
   plains: { type: "grass", c: "#7cb342", glyph: "\u{1F33E}" },
@@ -79,6 +81,7 @@ function getBiomeConfig(biomeName: string) {
 
 export default function Localizacion() {
   const t = useTranslations("pokedex")
+  const router = useRouter()
   const [biomes, setBiomes] = useState<{ name: string; count: number }[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
@@ -222,9 +225,14 @@ export default function Localizacion() {
               const isLightBg = ["grass", "ground", "rock", "ice", "fairy", "electric"].includes(config.type)
               const textColor = isLightBg ? "rgba(0,0,0,0.85)" : "#fff"
 
+              const biomeId = biome.name.toLowerCase().replace("minecraft:", "").replace(/\s+/g, "_")
               return (
                 <div
                   key={biome.name}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => router.push(`/smartrotom/pokedex/localizacion/${biomeId}`)}
+                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") router.push(`/smartrotom/pokedex/localizacion/${biomeId}`) }}
                   className="relative rounded-xl p-3.5 min-h-[116px] flex flex-col gap-2 cursor-pointer overflow-hidden transition-transform hover:-translate-y-0.5 border border-transparent"
                   style={{
                     background: `linear-gradient(135deg, ${config.c}, color-mix(in oklab, ${config.c} 60%, #000))`,
@@ -269,10 +277,4 @@ export default function Localizacion() {
   )
 }
 
-const TYPE_COLORS: Record<string, string> = {
-  normal: "#9fa19f", fire: "#e62829", water: "#2980ef", grass: "#3fa129",
-  electric: "#fac000", ice: "#3fd8ff", fighting: "#ff8000", poison: "#9141cb",
-  ground: "#d6985c", flying: "#81b9ef", psychic: "#ef4179", bug: "#91a119",
-  rock: "#afa981", ghost: "#704170", dragon: "#5061e1", dark: "#50413f",
-  steel: "#60a1b8", fairy: "#ef71ef",
-}
+
