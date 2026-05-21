@@ -346,7 +346,13 @@ export class PokemonDataService extends BaseDataService {
     return this.speciesByMove;
   }
 
-  getAllMovesSortedByCount(): { name: string; count: number }[] {
+  getAllMovesSortedByCount(): {
+    name: string;
+    count: number;
+    attackType?: string;
+    attackCategory?: string;
+    basePower?: number;
+  }[] {
     const moveCounts: { [key: string]: number } = {};
 
     for (const move in this.speciesByMove) {
@@ -356,7 +362,16 @@ export class PokemonDataService extends BaseDataService {
     }
 
     const sortedMoves = Object.entries(moveCounts)
-      .map(([name, count]) => ({ name, count }))
+      .map(([name, count]) => {
+        const moveData = this.moveDataService.getMove(name);
+        return {
+          name,
+          count,
+          attackType: moveData?.attackType,
+          attackCategory: moveData?.attackCategory,
+          basePower: moveData?.basePower,
+        };
+      })
       .sort((a, b) => b.count - a.count);
 
     return sortedMoves;

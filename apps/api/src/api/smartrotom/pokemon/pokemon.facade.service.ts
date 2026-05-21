@@ -122,7 +122,13 @@ export class PokemonFacadeService {
 
   // ==================== MOVE OPERATIONS ====================
 
-  getAllMoves(): { name: string; count: number }[] {
+  getAllMoves(): {
+    name: string;
+    count: number;
+    attackType?: string;
+    attackCategory?: string;
+    basePower?: number;
+  }[] {
     try {
       return this.pokemonDataService.getAllMoves();
     } catch (error: any) {

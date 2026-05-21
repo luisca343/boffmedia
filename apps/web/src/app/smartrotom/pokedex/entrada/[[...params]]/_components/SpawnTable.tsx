@@ -1,119 +1,95 @@
-import { TableBody } from "@/components/ui/primitives/table";
-import { SpawnInfo } from "../../../_types/spawnInfo";
-import PokedexTable, { PokedexCell, PokedexHead, PokedexHeader, PokedexRow } from "../../../_components/PokedexTable";
-import { PokemonSprite } from "../../../_components/PokemonSprite";
-import { InternalLink } from "@/components/ui/navigation/Link";
-import { useTranslations } from "next-intl";
-import { MapPinIcon } from "@heroicons/react/24/outline";
+import { SpawnInfo } from "../../../_types/spawnInfo"
+import { useTranslations } from "next-intl"
+import { MapPinIcon } from "@heroicons/react/24/outline"
+import { RARITY_META } from "../../../_components/dexUtils"
 
-export function SpawnTable({spawns}: {spawns: SpawnInfo[]}){
-    const t = useTranslations("pokedex");
-    
-    function getRarity(rarity: number){
-        if(rarity < 1) return t('extremely_rare')
-        if(rarity <= 10) return t('ultra_rare')
-        if(rarity <= 100) return t('rare')
-        if(rarity <= 200) return t('uncommon')
-        if(rarity <= 300) return t('common')
-        return rarity.toString()
-    }
+export function SpawnTable({ spawns }: { spawns: SpawnInfo[] }) {
+  const t = useTranslations("pokedex")
 
-    function getRarityColor(rarity: number){
-        if(rarity < 1) return 'bg-pink-800'
-        if(rarity <= 10) return 'bg-accent-600'
-        if(rarity <= 100) return 'bg-red-800'
-        if(rarity <= 200) return 'bg-yellow-800'
-        if(rarity <= 300) return 'bg-highlight-800'
-        return ''
-    }
+  function getRarityMeta(rarity: number) {
+    if (rarity < 1) return RARITY_META.legendary
+    if (rarity <= 10) return RARITY_META.ultra
+    if (rarity <= 100) return RARITY_META.rare
+    if (rarity <= 200) return RARITY_META.uncommon
+    return RARITY_META.common
+  }
 
-    if(spawns.length === 0) {
-        return (
-            <div className="bg-surface-700/20 rounded-lg p-8 text-center border border-surface-600/30">
-                <MapPinIcon className="h-12 w-12 mx-auto text-surface-400 mb-3" />
-                <div className="text-xl text-surface-300">Este Pokémon no spawnea naturalmente</div>
-                <div className="text-sm text-surface-400 mt-2">Puede ser obtenido por otros medios (evolución, evento, intercambio, etc.)</div>
-            </div>
-        )
-    }
-
+  if (spawns.length === 0) {
     return (
-        <div className="overflow-x-auto">
-            <PokedexTable>
-              <PokedexHeader>
-                <PokedexRow>
-                  <PokedexHead className="w-16"> </PokedexHead>
-                  <PokedexHead className="text-center">Variante</PokedexHead>
-                  <PokedexHead className="text-center">Tipo</PokedexHead>
-                  <PokedexHead className="text-center">Biomas</PokedexHead>
-                  <PokedexHead className="text-center">Niveles</PokedexHead>
-                  <PokedexHead className="text-center">Localización</PokedexHead>
-                  <PokedexHead className="text-center">Horas</PokedexHead>
-                  <PokedexHead className="text-center">Altura</PokedexHead>
-                  <PokedexHead className="text-center">Rareza</PokedexHead>
-                </PokedexRow>
-              </PokedexHeader>
-              <TableBody>
-                {spawns.map((spawn, index) => {
-                    const fullName = `${spawn.pokemonName} ${spawn.pokemonForm} ${spawn.pokemonPalette || ''}`
-                    const biomas = spawn.condition?.stringBiomes?.filter(biome =>
-                         !biome.includes('biomesoplenty') && !biome.includes('terraforged')
-                    ).map((biome) => {
-                        return {biome, translated:t(`${biome.replace(" ", "_").replace(':','_')}`)}
-                    })
-                    const stringLocationTypes = spawn.stringLocationTypes?.map((location) => {
-                        return t(`${location.replace(" ", "_").replace(':','_').toLowerCase()}`)
-                    })
-
-                    let height = spawn.condition?.minY || spawn.condition?.maxY ? '' : 'Cualquiera'
-                    if(spawn.condition?.minY) {
-                        height += `> ${spawn.condition.minY} `
-                    } 
-                    if(spawn.condition?.maxY) {
-                        height += `< ${spawn.condition.maxY}`
-                    }
-
-                    const times = spawn.condition?.times?.map((time) => {
-                        return t(`${time.toLowerCase()}`)
-                    }) || [t("anytime")]
-
-                    return (
-                      <PokedexRow key={`${spawn.spawnType}-${index}`}>
-                        <PokedexCell hard className="w-16">
-                          <PokemonSprite id={spawn.pokemonDex} form={spawn.pokemonForm} palette={spawn.pokemonPalette || 'none'} width={50} height={50} hide={true} url={spawn.spriteUrl} />
-                        </PokedexCell>
-                        <PokedexCell className="text-center">{getFormPalette(spawn)}</PokedexCell>
-                        <PokedexCell className="text-center">{t(spawn.spawnType)}</PokedexCell>
-                        <PokedexCell className="text-center">
-                          {biomas && biomas.length > 0 ? biomas.map((biome, index) => (
-                            <span key={biome.biome} className="hover:text-primary-400 transition-colors">
-                              <InternalLink href={`pokedex/localizacion/${biome.biome}`}>{biome.translated}</InternalLink>
-                              {index < biomas.length - 1 ? ', ' : ''}
-                            </span>
-                          )) : 'Cualquiera'}
-                        </PokedexCell>
-                        <PokedexCell className="text-center">{`${spawn.minLevel} - ${spawn.maxLevel}`}</PokedexCell>
-                        <PokedexCell className="text-center">{stringLocationTypes.join(', ')}</PokedexCell>
-                        <PokedexCell className="text-center">{times.join(', ')}</PokedexCell>
-                        <PokedexCell className="text-center">{height}</PokedexCell>
-                        <PokedexCell className={`text-center font-medium ${getRarityColor(spawn.rarity)}`}>{getRarity(spawn.rarity)}</PokedexCell>
-                      </PokedexRow>
-                    )
-                })}
-              </TableBody>
-            </PokedexTable>
-        </div>
+      <div className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-8 text-center">
+        <MapPinIcon className="h-12 w-12 mx-auto text-surface-400 mb-3" />
+        <div className="text-xl text-surface-300">{t("entry_no_spawns")}</div>
+        <div className="text-sm text-surface-400 mt-2">{t("entry_no_spawns_desc")}</div>
+      </div>
     )
+  }
 
-    function getFormPalette(spawn: SpawnInfo){
-        const form = spawn.pokemonForm === 'base' ? '' : t(`form_${spawn.pokemonForm}`)
-        const palette = spawn.pokemonPalette ? t(`palette_${spawn.pokemonPalette}`) : ''
+  return (
+    <div className="flex flex-col gap-3">
+      {spawns.map((spawn, index) => {
+        const meta = getRarityMeta(spawn.rarity)
+        const biomas = spawn.condition?.stringBiomes
+          ?.filter((biome) => !biome.includes("biomesoplenty") && !biome.includes("terraforged"))
+          .map((biome) => ({
+            biome,
+            translated: t(`${biome.replace(" ", "_").replace(":", "_")}`),
+          }))
+
+        const times = spawn.condition?.times?.map((time) => t(`${time.toLowerCase()}`)) || [t("anytime")]
+        const method = spawn.stringLocationTypes?.[0] || "Tierra"
+        const levels = `${spawn.minLevel}-${spawn.maxLevel}`
+        const height = spawn.condition?.minY ? `y > ${spawn.condition.minY}` : null
 
         return (
-            <div>
-                <span>{palette || form ? form : 'Base'}</span>
-                {palette && <span className="block text-xs text-primary-300">{palette}</span>}
+          <div
+            key={`${spawn.spawnType}-${index}`}
+            className="grid grid-cols-[auto_1fr_auto] gap-3.5 p-3.5 bg-white/[0.02] border border-white/[0.06] rounded-xl items-center"
+            style={{ borderLeftWidth: 3, borderLeftColor: meta.fg }}
+          >
+            {/* Icon */}
+            <div
+              className="w-11 h-11 rounded-[10px] grid place-items-center"
+              style={{ background: "rgba(255,255,255,0.04)", color: meta.fg }}
+            >
+              <MapPinIcon className="w-5 h-5" />
             </div>
+
+            {/* Biome + chips */}
+            <div>
+              <div className="font-orbitron font-semibold text-sm text-surface-50 mb-1.5">
+                {biomas?.map((b) => b.translated).join(", ") || t("unknown_biome")}
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                <span className="inline-flex items-center gap-1 text-[11px] text-surface-300 bg-white/[0.04] px-2 py-0.5 rounded">
+                  {method}
+                </span>
+                <span className="inline-flex items-center gap-1 text-[11px] text-surface-300 bg-white/[0.04] px-2 py-0.5 rounded">
+                  Nv. {levels}
+                </span>
+                <span className="inline-flex items-center gap-1 text-[11px] text-surface-300 bg-white/[0.04] px-2 py-0.5 rounded">
+                  {times.join(", ")}
+                </span>
+                {height && (
+                  <span className="inline-flex items-center gap-1 text-[11px] text-surface-300 bg-white/[0.04] px-2 py-0.5 rounded">
+                    {height}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Rarity */}
+            <div className="text-right">
+              <div className="font-jetbrains text-[11px] text-surface-500">{spawn.rarity}%</div>
+              <div
+                className="font-orbitron font-semibold text-[13px] uppercase tracking-wider"
+                style={{ color: meta.fg }}
+              >
+                {t(meta.label as any)}
+              </div>
+            </div>
+          </div>
         )
-    }
+      })}
+    </div>
+  )
 }

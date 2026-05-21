@@ -70,7 +70,7 @@ export function getEvolutionMethod(evolution: Evolution, t: any) {
     >
       <div className="space-y-1 text-shadow-border1">
         {conditions?.map((condition, i) => (
-          <div key={`cond-${i}`} className="text-sm">{condition}</div>
+          <div key={`cond-${i}`} className="text-sm text-surface-100">{condition}</div>
         ))}
       </div>
     </div>
@@ -120,7 +120,7 @@ function addConditionByType(condition: any, conditionKey: string, conditions: Re
             <span>En biomas específicos</span>
             <InformationCircleIcon className="h-4 w-4 ml-1 text-primary-300" />
           </HoverCardTrigger>
-          <HoverCardContent className="w-96 bg-surface-800 text-surface-50 border border-surface-600/50 z-50">
+          <HoverCardContent className="w-96 bg-surface-800 text-surface-50 border border-white/[0.06] rounded-lg z-50 shadow-xl p-4 font-normal">
             {biomes.map(biome => t(biome)).join(', ')}
           </HoverCardContent>
         </HoverCard>

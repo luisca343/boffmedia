@@ -1,122 +1,78 @@
 "use client"
-import { TypeBadgeSmall } from '@/components/shared/pokemon/TypeBadge';
-import { getPokemonDefense } from '../../dexUtils';
+import { getPokemonDefense } from "../../dexUtils"
+import { TypeChip } from "../../_components/TypeChip"
+import { useTranslations } from "next-intl"
 
 interface DualTypeAnalysisProps {
-    type1: string;
-    type2: string;
+  type1: string
+  type2: string
 }
 
-export default function DualTypeAnalysis({ type1, type2 }: DualTypeAnalysisProps) {
-    // Use the existing function from dexUtils to get effectiveness
-    const defenses = getPokemonDefense(type1, type2);
-    
-    // Sort types by their effectiveness multipliers
-    const x4: string[] = [];  // Very weak (4x damage)
-    const x2: string[] = [];  // Weak (2x damage)
-    const x1: string[] = [];  // Normal (1x damage)
-    const x05: string[] = []; // Resistant (0.5x damage)
-    const x025: string[] = []; // Very resistant (0.25x damage)
-    const x0: string[] = [];  // Immune (0x damage)
-    
-    // Categorize types based on the calculated effectiveness
-    Object.entries(defenses).forEach(([type, effectiveness]) => {
-        if (effectiveness === 4) {
-            x4.push(type);
-        } else if (effectiveness === 2) {
-            x2.push(type);
-        } else if (effectiveness === 1) {
-            x1.push(type);
-        } else if (effectiveness === 0.5) {
-            x05.push(type);
-        } else if (effectiveness === 0.25) {
-            x025.push(type);
-        } else if (effectiveness === 0) {
-            x0.push(type);
-        }
-    });
+const MULT_META: Record<string, { bg: string; fg: string; label: string; es: string }> = {
+  "4": { bg: "rgba(239,68,68,0.12)", fg: "#ef4444", label: "×4", es: "Súper débil" },
+  "2": { bg: "rgba(251,146,60,0.12)", fg: "#fb923c", label: "×2", es: "Débil" },
+  "1": { bg: "rgba(255,255,255,0.02)", fg: "var(--surface-400)", label: "×1", es: "Normal" },
+  "0.5": { bg: "rgba(163,230,53,0.1)", fg: "#a3e635", label: "×½", es: "Resistente" },
+  "0.25": { bg: "rgba(34,211,238,0.1)", fg: "#22d3ee", label: "×¼", es: "Muy resistente" },
+  "0": { bg: "rgba(192,132,252,0.1)", fg: "#c084fc", label: "×0", es: "Inmune" },
+}
 
-    return (
-        <div className="space-y-4">
-            <div>
-                <h3 className="text-lg font-medium text-surface-100 mb-2 flex items-center">
-                    <span className="bg-red-600 text-white px-2 py-1 rounded-lg mr-2 font-bold">4×</span>
-                    Muy débil contra:
-                </h3>
-                <div className="bg-surface-700/50 rounded-lg p-3 min-h-12 flex flex-wrap gap-2">
-                    {x4.length > 0 ? (
-                        x4.map(t => (
-                            <TypeBadgeSmall key={t} type={t} />
-                        ))
-                    ) : (
-                        <p className="text-surface-300">Ningún tipo</p>
-                    )}
-                </div>
+const MULT_ORDER = ["4", "2", "1", "0.5", "0.25", "0"]
+
+export default function DualTypeAnalysis({ type1, type2 }: DualTypeAnalysisProps) {
+  const t = useTranslations("pokedex")
+  const defenses = getPokemonDefense(type1, type2)
+
+  // Group by multiplier
+  const grouped: Record<string, string[]> = {}
+  MULT_ORDER.forEach((m) => { grouped[m] = [] })
+  Object.entries(defenses).forEach(([type, effectiveness]) => {
+    const key = String(effectiveness)
+    if (grouped[key]) grouped[key].push(type)
+  })
+
+  return (
+    <div className="bg-white/[0.015] border border-white/[0.05] rounded-xl p-[16px_18px]">
+      <h4 className="font-orbitron font-semibold text-sm text-surface-50 mb-3.5 pb-3 border-b border-white/[0.05]">
+        Daño recibido (defensa combinada)
+      </h4>
+      <div className="flex flex-col gap-1.5">
+        {MULT_ORDER.map((mult) => {
+          const types = grouped[mult]
+          if (!types || types.length === 0) return null
+          const meta = MULT_META[mult]
+          return (
+            <div
+              key={mult}
+              className="grid grid-cols-[110px_1fr_32px] gap-3 items-center min-h-[46px] rounded-[10px] px-3 py-2.5 border"
+              style={{
+                background: meta.bg,
+                borderColor: `color-mix(in oklab, ${meta.fg} 22%, transparent)`,
+              }}
+            >
+              <div
+                className="flex flex-col border-r pr-2.5"
+                style={{ borderColor: `color-mix(in oklab, ${meta.fg} 18%, transparent)` }}
+              >
+                <span className="font-orbitron font-bold text-lg leading-none tabular-nums" style={{ color: meta.fg }}>
+                  {meta.label}
+                </span>
+                <span className="font-jetbrains text-[10px] tracking-[0.08em] uppercase text-surface-400">
+                  {meta.es}
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-1 items-center">
+                {types.map((tp) => (
+                  <TypeChip key={tp} type={tp} size="sm" />
+                ))}
+              </div>
+              <span className="font-jetbrains text-[11px] font-semibold text-surface-400 bg-black/25 px-1.5 py-0.5 rounded text-center tabular-nums">
+                {types.length}
+              </span>
             </div>
-            
-            <div>
-                <h3 className="text-lg font-medium text-surface-100 mb-2 flex items-center">
-                    <span className="bg-orange-500 text-white px-2 py-1 rounded-lg mr-2 font-bold">2×</span>
-                    Débil contra:
-                </h3>
-                <div className="bg-surface-700/50 rounded-lg p-3 min-h-12 flex flex-wrap gap-2">
-                    {x2.length > 0 ? (
-                        x2.map(t => (
-                            <TypeBadgeSmall key={t} type={t} />
-                        ))
-                    ) : (
-                        <p className="text-surface-300">Ningún tipo</p>
-                    )}
-                </div>
-            </div>
-            
-            <div>
-                <h3 className="text-lg font-medium text-surface-100 mb-2 flex items-center">
-                    <span className="bg-highlight-500 text-white px-2 py-1 rounded-lg mr-2 font-bold">½×</span>
-                    Resistente contra:
-                </h3>
-                <div className="bg-surface-700/50 rounded-lg p-3 min-h-12 flex flex-wrap gap-2">
-                    {x05.length > 0 ? (
-                        x05.map(t => (
-                            <TypeBadgeSmall key={t} type={t} />
-                        ))
-                    ) : (
-                        <p className="text-surface-300">Ningún tipo</p>
-                    )}
-                </div>
-            </div>
-            
-            <div>
-                <h3 className="text-lg font-medium text-surface-100 mb-2 flex items-center">
-                    <span className="bg-secondary-500 text-white px-2 py-1 rounded-lg mr-2 font-bold">¼×</span>
-                    Muy resistente contra:
-                </h3>
-                <div className="bg-surface-700/50 rounded-lg p-3 min-h-12 flex flex-wrap gap-2">
-                    {x025.length > 0 ? (
-                        x025.map(t => (
-                            <TypeBadgeSmall key={t} type={t} />
-                        ))
-                    ) : (
-                        <p className="text-surface-300">Ningún tipo</p>
-                    )}
-                </div>
-            </div>
-            
-            <div>
-                <h3 className="text-lg font-medium text-surface-100 mb-2 flex items-center">
-                    <span className="bg-accent-600 text-white px-2 py-1 rounded-lg mr-2 font-bold">0×</span>
-                    Inmune contra:
-                </h3>
-                <div className="bg-surface-700/50 rounded-lg p-3 min-h-12 flex flex-wrap gap-2">
-                    {x0.length > 0 ? (
-                        x0.map(t => (
-                            <TypeBadgeSmall key={t} type={t} />
-                        ))
-                    ) : (
-                        <p className="text-surface-300">Ningún tipo</p>
-                    )}
-                </div>
-            </div>
-        </div>
-    );
+          )
+        })}
+      </div>
+    </div>
+  )
 }

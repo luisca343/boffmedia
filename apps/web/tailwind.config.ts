@@ -26,6 +26,8 @@ const config: Config = {
         inter: ["Inter", "sans-serif"],
         roboto: ["Roboto", "sans-serif"],
         bebas: ["Bebas Neue", "sans-serif"],
+        orbitron: ["Orbitron", "system-ui", "sans-serif"],
+        jetbrains: ["JetBrains Mono", "Roboto Mono", "ui-monospace", "monospace"],
       },
       fontSize: {
         "4xl": ["2.25rem", { lineHeight: "normal" }],
@@ -61,6 +63,9 @@ const config: Config = {
         "inner-glow": "inset 0 0 20px rgba(249, 115, 22, 0.1)",
         elevated: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
         "elevated-lg": "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+        "dex-glow": "0 0 24px rgba(249, 115, 22, 0.25)",
+        "dex-elevated": "0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.3)",
+        "dex-inner": "inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -1px 0 rgba(0,0,0,0.4)",
       },
       backdropBlur: {
         xs: "2px",
@@ -198,6 +203,42 @@ const config: Config = {
           900: "rgb(var(--info-900) / <alpha-value>)",
           950: "rgb(var(--info-950) / <alpha-value>)",
         },
+        // Pokémon type colors
+        type: {
+          normal: "rgb(var(--type-normal) / <alpha-value>)",
+          fire: "rgb(var(--type-fire) / <alpha-value>)",
+          water: "rgb(var(--type-water) / <alpha-value>)",
+          grass: "rgb(var(--type-grass) / <alpha-value>)",
+          electric: "rgb(var(--type-electric) / <alpha-value>)",
+          ice: "rgb(var(--type-ice) / <alpha-value>)",
+          fighting: "rgb(var(--type-fighting) / <alpha-value>)",
+          poison: "rgb(var(--type-poison) / <alpha-value>)",
+          ground: "rgb(var(--type-ground) / <alpha-value>)",
+          flying: "rgb(var(--type-flying) / <alpha-value>)",
+          psychic: "rgb(var(--type-psychic) / <alpha-value>)",
+          bug: "rgb(var(--type-bug) / <alpha-value>)",
+          rock: "rgb(var(--type-rock) / <alpha-value>)",
+          ghost: "rgb(var(--type-ghost) / <alpha-value>)",
+          dragon: "rgb(var(--type-dragon) / <alpha-value>)",
+          dark: "rgb(var(--type-dark) / <alpha-value>)",
+          steel: "rgb(var(--type-steel) / <alpha-value>)",
+          fairy: "rgb(var(--type-fairy) / <alpha-value>)",
+        },
+        // Rarity colors
+        rarity: {
+          common: "rgb(var(--rarity-common-fg) / <alpha-value>)",
+          uncommon: "rgb(var(--rarity-uncommon-fg) / <alpha-value>)",
+          rare: "rgb(var(--rarity-rare-fg) / <alpha-value>)",
+          ultra: "rgb(var(--rarity-ultra-fg) / <alpha-value>)",
+          legendary: "rgb(var(--rarity-legendary-fg) / <alpha-value>)",
+        },
+        // Status colors
+        dexStatus: {
+          seen: "rgb(var(--status-seen-fg) / <alpha-value>)",
+          caught: "rgb(var(--status-caught-fg) / <alpha-value>)",
+          shiny: "rgb(var(--status-shiny-fg) / <alpha-value>)",
+          unknown: "rgb(var(--status-unknown-fg) / <alpha-value>)",
+        },
         // Standard gray palette for compatibility
         gray: {
           50: "#f9fafb",
@@ -279,6 +320,23 @@ const config: Config = {
           "0%, 100%": { boxShadow: "0 0 5px rgba(249, 115, 22, 0.3)" },
           "50%": { boxShadow: "0 0 20px rgba(249, 115, 22, 0.6)" },
         },
+        "fadein": {
+          from: { opacity: "0", transform: "translateY(4px)" },
+          to: { opacity: "1", transform: "none" },
+        },
+        "dropIn": {
+          from: { opacity: "0", transform: "translateY(-4px)" },
+          to: { opacity: "1", transform: "none" },
+        },
+        "rotomPulse": {
+          "0%, 100%": { opacity: "1", transform: "scale(1)" },
+          "50%": { opacity: "0.4", transform: "scale(0.65)" },
+        },
+        "scanLine": {
+          "0%": { top: "12%", opacity: "0.2" },
+          "50%": { top: "88%", opacity: "1" },
+          "100%": { top: "12%", opacity: "0.2" },
+        },
       },
       animation: {
         // Existing animations
@@ -293,6 +351,10 @@ const config: Config = {
         "slide-down": "slide-down 0.3s ease-out",
         pulse: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
         "pulse-glow": "pulse-glow 2s ease-in-out infinite",
+        fadein: "fadein 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
+        dropIn: "dropIn 0.18s cubic-bezier(0.16, 1, 0.3, 1)",
+        rotomPulse: "rotomPulse 1.4s ease-in-out infinite",
+        scanLine: "scanLine 1.6s ease-in-out infinite",
       },
       spacing: {
         18: "4.5rem",

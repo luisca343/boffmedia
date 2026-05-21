@@ -121,7 +121,13 @@ export class PokemonDataManagementService {
 
   // ==================== MOVE OPERATIONS ====================
 
-  getAllMoves(): { name: string; count: number }[] {
+  getAllMoves(): {
+    name: string;
+    count: number;
+    attackType?: string;
+    attackCategory?: string;
+    basePower?: number;
+  }[] {
     return this.pokemonDataService.getAllMovesSortedByCount();
   }
 

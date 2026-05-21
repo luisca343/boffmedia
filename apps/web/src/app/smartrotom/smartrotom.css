@@ -1,4 +1,48 @@
 :root {
+  /* ===== Pokédex Design System Tokens ===== */
+  /* Type colors */
+  --type-normal: 159 161 159;
+  --type-fire: 230 40 41;
+  --type-water: 41 128 239;
+  --type-grass: 63 161 41;
+  --type-electric: 250 192 0;
+  --type-ice: 63 216 255;
+  --type-fighting: 255 128 0;
+  --type-poison: 145 65 203;
+  --type-ground: 214 152 92;
+  --type-flying: 129 185 239;
+  --type-psychic: 239 65 121;
+  --type-bug: 145 161 25;
+  --type-rock: 175 169 129;
+  --type-ghost: 112 65 112;
+  --type-dragon: 80 97 225;
+  --type-dark: 80 65 63;
+  --type-steel: 96 161 184;
+  --type-fairy: 239 113 239;
+
+  /* Status palette */
+  --status-seen-fg: 251 191 36;
+  --status-seen-bg: 251 191 36;
+  --status-caught-fg: 52 211 153;
+  --status-caught-bg: 52 211 153;
+  --status-shiny-fg: 240 171 252;
+  --status-shiny-bg: 240 171 252;
+  --status-unknown-fg: 151 166 187;
+  --status-unknown-bg: 151 166 187;
+
+  /* Rarity palette */
+  --rarity-common-fg: 163 230 53;
+  --rarity-common-bg: 163 230 53;
+  --rarity-uncommon-fg: 34 211 238;
+  --rarity-uncommon-bg: 34 211 238;
+  --rarity-rare-fg: 251 146 60;
+  --rarity-rare-bg: 251 146 60;
+  --rarity-ultra-fg: 192 132 252;
+  --rarity-ultra-bg: 192 132 252;
+  --rarity-legendary-fg: 240 171 252;
+  --rarity-legendary-bg: 240 171 252;
+
+  /* Primary palette - Orange (BoffMedia brand) */
   --primary-50: 255 247 237;
   --primary-100: 255 237 213;
   --primary-200: 254 215 170;

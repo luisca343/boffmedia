@@ -11,5 +11,16 @@ export type MoveCount = {
      * Number of Pokémon that can learn this move
      */
     count: number;
+    /**
+     * Move type
+     */
+    attackType?: string;
+    /**
+     * Move category
+     */
+    attackCategory?: string;
+    /**
+     * Base power
+     */
+    basePower?: number;
 };
-

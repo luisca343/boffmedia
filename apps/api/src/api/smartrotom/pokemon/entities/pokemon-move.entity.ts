@@ -260,6 +260,27 @@ export class MoveCount {
     example: 1202,
   })
   count: number;
+
+  @ApiProperty({
+    description: 'Move type',
+    example: 'ELECTRIC',
+    required: false,
+  })
+  attackType?: string;
+
+  @ApiProperty({
+    description: 'Move category',
+    example: 'SPECIAL',
+    required: false,
+  })
+  attackCategory?: string;
+
+  @ApiProperty({
+    description: 'Base power',
+    example: 90,
+    required: false,
+  })
+  basePower?: number;
 }
 
 export class PokemonMoveData {

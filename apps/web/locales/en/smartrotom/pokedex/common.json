@@ -156,6 +156,12 @@
         "nature_bashful": "Bashful",
         "nature_calm": "Calm",
         "nature_gentle": "Gentle",
-        "nature_careful": "Careful"
+        "nature_careful": "Careful",
+
+        "move_pokemon_section": "Pokémon that learn this move",
+        "ability_pokemon_section": "Pokémon with this ability",
+        "show_all": "Show all ({count}) →",
+        "show_less": "Show less",
+        "no_pokemon_found": "No Pokémon found"
     }
 }
