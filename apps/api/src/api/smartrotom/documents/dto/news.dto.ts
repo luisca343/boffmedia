@@ -1,5 +1,5 @@
 import { BaseDto } from '@api/_utils/dto/base.dto';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
 import {
   IsNotEmpty,
   IsString,
@@ -110,16 +110,7 @@ export class CreateNewsDto extends BaseDto {
   imageUrl?: string;
 }
 
-export class UpdateNewsDto extends CreateNewsDto {
-  @ApiProperty({
-    description: 'News content',
-    example: 'Updated content...',
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  content?: string;
-}
+export class UpdateNewsDto extends PartialType(CreateNewsDto) {}
 
 export class NewsStatusDto extends BaseDto {
   @ApiProperty({
