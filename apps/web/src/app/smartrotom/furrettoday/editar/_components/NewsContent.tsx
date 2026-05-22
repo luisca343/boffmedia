@@ -1,5 +1,5 @@
 "use client"
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import CustomEditor from '@/components/shared/ckeditor/TestEditor'
 import { useBoffSession } from '@/services/useBoffSession'
 import { DocumentsService } from '@/services/api/smartrotom/documentsService'
@@ -59,6 +59,25 @@ export default function NewsContent({
   const token = session?.user?.accessToken ?? ''
   const selectedNews = selectedNewsId !== null ? news.find((item) => item.id === selectedNewsId) : null
   const [savingMeta, setSavingMeta] = useState(false)
+  const [meta, setMeta] = useState({
+    title: selectedNews?.title ?? '',
+    author: (selectedNews as any)?.author ?? '',
+    category: (selectedNews as any)?.category ?? 'comunidad',
+    buttonText: selectedNews?.buttonText ?? '',
+    imageUrl: selectedNews?.imageUrl ?? '',
+  })
+
+  useEffect(() => {
+    if (selectedNews) {
+      setMeta({
+        title: selectedNews.title ?? '',
+        author: (selectedNews as any).author ?? '',
+        category: (selectedNews as any).category ?? 'comunidad',
+        buttonText: selectedNews.buttonText ?? '',
+        imageUrl: selectedNews.imageUrl ?? '',
+      })
+    }
+  }, [selectedNewsId])
 
   if (!selectedNews) {
     return (
@@ -75,9 +94,7 @@ export default function NewsContent({
   }
 
   function handleMetaChange(field: string, value: string) {
-    const updated = { ...selectedNews, [field]: value }
-    // Optimistic local update via parent
-    updateNews(selectedNews.id, selectedNews.content)
+    setMeta((prev) => ({ ...prev, [field]: value }))
   }
 
   async function saveMeta() {
@@ -85,13 +102,13 @@ export default function NewsContent({
     try {
       await DocumentsService.updateActiveNews(selectedNews.id, {
         id: selectedNews.id,
-        title: selectedNews.title,
+        title: meta.title,
         subtitle: selectedNews.subtitle,
         content: selectedNews.content,
-        author: (selectedNews as any).author,
-        category: (selectedNews as any).category,
-        buttonText: selectedNews.buttonText,
-        imageUrl: selectedNews.imageUrl,
+        author: meta.author,
+        category: meta.category,
+        buttonText: meta.buttonText,
+        imageUrl: meta.imageUrl,
       } as CreateNewsDto, token)
       sendToast('Metadatos guardados')
     } catch {
@@ -100,6 +117,8 @@ export default function NewsContent({
       setSavingMeta(false)
     }
   }
+
+  const documentWithMeta = { ...selectedNews, ...meta }
 
   return (
     <div className="ft-card-flat" style={{ padding: 0, overflow: "hidden", background: "#fff" }}>
@@ -115,20 +134,23 @@ export default function NewsContent({
         </div>
 
         {/* Metadata fields */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginTop: 4 }}>
-          <MetaField label="Autor/a" value={(selectedNews as any).author || ""} onChange={(v) => handleMetaChange("author", v)} />
-          <MetaField label="Etiqueta" value={(selectedNews as any).category || "comunidad"} onChange={(v) => handleMetaChange("category", v)} type="select" />
-          <MetaField label="Botón" value={selectedNews.buttonText || ""} onChange={(v) => handleMetaChange("buttonText", v)} />
+        <div style={{ marginTop: 4, marginBottom: 10 }}>
+          <MetaField label="Título" value={meta.title} onChange={(v) => handleMetaChange("title", v)} />
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+          <MetaField label="Autor/a" value={meta.author} onChange={(v) => handleMetaChange("author", v)} />
+          <MetaField label="Etiqueta" value={meta.category} onChange={(v) => handleMetaChange("category", v)} type="select" />
+          <MetaField label="Botón" value={meta.buttonText} onChange={(v) => handleMetaChange("buttonText", v)} />
         </div>
         <div style={{ marginTop: 10 }}>
-          <MetaField label="URL imagen" value={selectedNews.imageUrl || ""} onChange={(v) => handleMetaChange("imageUrl", v)} />
+          <MetaField label="URL imagen" value={meta.imageUrl} onChange={(v) => handleMetaChange("imageUrl", v)} />
         </div>
       </div>
 
       {/* Editor area */}
       <div style={{ minHeight: 460 }}>
         <CustomEditor
-          document={selectedNews}
+          document={documentWithMeta}
           documentId={selectedNewsId}
           documentType={1}
           updateNews={updateNews}

@@ -73,9 +73,9 @@ export default function CardComponent({ variant = "default", news }: CardCompone
         <h3 className="ft-display" style={{ margin: 0, fontSize: 26, lineHeight: 1.0, letterSpacing: "0.02em" }}>
           {news.title}
         </h3>
-        <p className="ft-body" style={{ margin: 0, fontSize: 14, color: "#3a3645", lineHeight: 1.5 }}>
+        <div className="ft-body" style={{ margin: 0, fontSize: 14, color: "#3a3645", lineHeight: 1.5 }}>
           {getPreview(news, 120)}
-        </p>
+        </div>
         <div style={{ marginTop: "auto", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, paddingTop: 8 }}>
           <span className="ft-meta">{news.author || "Redacción"}{news.readtime ? ` · ${news.readtime}` : ""}</span>
           <InternalLink

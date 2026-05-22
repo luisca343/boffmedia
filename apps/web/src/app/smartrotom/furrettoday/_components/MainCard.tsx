@@ -71,9 +71,9 @@ export default function MainCard({ news }: MainCardProps) {
             {news.subtitle}
           </p>
         )}
-        <p className="ft-body" style={{ margin: 0, color: "#3a3645" }}>
+        <div className="ft-body" style={{ margin: 0, color: "#3a3645" }}>
           {getPreview(news, 200)}
-        </p>
+        </div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, marginTop: 4 }}>
           <span className="ft-meta">{news.author || "Redacción Furret Today"}{news.readtime ? ` · ${news.readtime}` : ""}</span>
           <InternalLink href={`furrettoday/leer/${news.id}`} className="ft-btn">

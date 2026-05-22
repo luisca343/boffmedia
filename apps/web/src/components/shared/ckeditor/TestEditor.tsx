@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import Editor from "./ckeditor.js"
 import './styles.css'
@@ -74,62 +74,78 @@ const editorConfiguration = {
     }
 };
 
-function createSaveButton (data: any, props: {
-    updateNews: any; documentId: any; documentType: any; refresh: () => void; type?: string; getToken: () => string; document?: any;
-}) {
-    console.log("=== CREATE SAVE BUTTON ===");
-    const endpoint = props.type === 'news' ? 'news' : 'save';
-    const saveButton = document.createElement('button');
-    saveButton.id = 'saveButton';
-    saveButton.innerHTML = '💾';
-    saveButton.classList.add('ck-button');
-    saveButton.onclick = () => {
-        const documentId = props.documentId;
-        const h1 = data.match(/<h1>(.*?)<\/h1>/);
-        let title = !h1 || h1[1] === '&nbsp;' ? 'Sin título' : h1[1];
-        
-        if(props.documentType === 1) {
-            const doc = props.document as CreateNewsDto;
-            DocumentsService.updateActiveNews(documentId, {
-                id: documentId,
-                title: title || "Sin título",
+interface SaveButtonConfig {
+    documentId: number;
+    documentType: number;
+    type?: string;
+    getToken: () => string;
+    getDocument: () => CreateNewsDto;
+    afterSave: (content: string) => void;
+}
+
+function createSaveButton(content: string, cfg: SaveButtonConfig) {
+    const endpoint = cfg.type === 'news' ? 'news' : 'save';
+    const btn = document.createElement('button');
+    btn.id = 'saveButton';
+    btn.innerHTML = '💾';
+    btn.classList.add('ck-button');
+    btn.onclick = () => {
+        if (cfg.documentType === 1) {
+            const doc = cfg.getDocument();
+            DocumentsService.updateActiveNews(cfg.documentId, {
+                id: cfg.documentId,
+                title: doc.title || "Sin título",
                 subtitle: doc.subtitle,
                 category: doc.category,
                 subcategory: doc.subcategory,
                 author: doc.author,
                 published: doc.published,
                 featured: doc.featured,
-                content: data,
+                content,
                 buttonText: doc.buttonText,
                 imageUrl: doc.imageUrl,
-              } as CreateNewsDto, props.getToken())
-            .then(() => {
-                if(props.refresh) props.refresh();
-                if(props.updateNews) props.updateNews(props.documentId, data);
-            }).catch((error) => {
-                console.error("Error updating news content:", error);
-            });
-        } else rotomPOST(`/documents/${endpoint}/${documentId}`, { title, content: data, type: props.documentType })
-            .then(() => {
-                sendToast(`Cambios guardados en ${title}`);
-                if(props.refresh) props.refresh();
-                if(props.updateNews) props.updateNews(props.documentId, data);
-            });
+            } as CreateNewsDto, cfg.getToken())
+            .then(() => cfg.afterSave(content))
+            .catch((err) => console.error("Error updating news content:", err));
+        } else {
+            const h1 = content.match(/<h1>(.*?)<\/h1>/);
+            const title = !h1 || h1[1] === '&nbsp;' ? 'Sin título' : h1[1];
+            rotomPOST(`/documents/${endpoint}/${cfg.documentId}`, { title, content, type: cfg.documentType })
+                .then(() => {
+                    sendToast(`Cambios guardados en ${title}`);
+                    cfg.afterSave(content);
+                });
+        }
     };
-    return saveButton;
-};
+    return btn;
+}
 
 // @ts-ignore
 function CustomEditor(props) {
-    // Keep a mutable ref so the save button's onclick always reads the latest token,
-    // even if CKEditor doesn't re-bind its event listeners after a React re-render.
+    // Refs ensure the save button's onclick always reads the latest values
+    // even when CKEditor doesn't re-bind its callbacks after React re-renders.
     const tokenRef = useRef<string>(props.token ?? '');
     tokenRef.current = props.token ?? '';
 
-    if(!props.document) return null;
-    const getToken = () => tokenRef.current;
+    const documentRef = useRef<CreateNewsDto>(props.document);
+    documentRef.current = props.document;
 
-    if(!props.document) return null;
+    const afterSaveRef = useRef<(content: string) => void>(() => {});
+    afterSaveRef.current = (content: string) => {
+        if (props.updateNews) props.updateNews(props.documentId, content);
+        if (props.refresh) props.refresh();
+    };
+
+    if (!props.document) return null;
+
+    const cfg: SaveButtonConfig = {
+        documentId: props.documentId,
+        documentType: props.documentType,
+        type: props.type,
+        getToken: () => tokenRef.current,
+        getDocument: () => documentRef.current,
+        afterSave: (content) => afterSaveRef.current(content),
+    };
 
     return (
         <CKEditor
@@ -139,25 +155,17 @@ function CustomEditor(props) {
             data={props.document.content || ''}
 
             onReady={editor => {
-                console.log('Editor is ready to use!', editor);
                 const editorBarElement = document.querySelector('.ck-toolbar__items');
                 if (props.readonly) {
                     editor.enableReadOnlyMode("sdfsedgd");
                     document.querySelector('.ck-editor__top')?.classList.add('hidden');
                 }
-                const saveButton = createSaveButton(editor, { ...props, getToken });
-                editorBarElement?.prepend(saveButton);
+                editorBarElement?.prepend(createSaveButton(editor.getData(), cfg));
             }}
-            onChange={(event, editor) => {
-                const data = editor.getData();
-                // Recreate the save button
-                const saveButton = document.getElementById('saveButton');
-                if (saveButton) {
-                    saveButton.remove();
-                }
-                const editorBarElement = document.querySelector('.ck-toolbar__items');
-                const newSaveButton = createSaveButton(data, { ...props, getToken });
-                editorBarElement?.prepend(newSaveButton);
+            onChange={(_event, editor) => {
+                const content = editor.getData();
+                document.getElementById('saveButton')?.remove();
+                document.querySelector('.ck-toolbar__items')?.prepend(createSaveButton(content, cfg));
             }}
         />
     )
