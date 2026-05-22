@@ -128,7 +128,7 @@ export default function ReadPage({ params }: { params: Promise<{ id: string }> |
         </header>
 
         {/* Body + sidebar */}
-        <main style={{ padding: "16px 24px 48px" }}>
+        <main style={{ padding: "16px 24px 48px", background: "var(--ft-paper-2)" }}>
           <div className="ft-wrap-wide" style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) 300px", gap: 48, alignItems: "flex-start" }}>
             {/* Article body */}
             <article>
@@ -165,7 +165,7 @@ export default function ReadPage({ params }: { params: Promise<{ id: string }> |
             {/* Sidebar */}
             <aside style={{ position: "sticky", top: 24, display: "flex", flexDirection: "column", gap: 20 }}>
               {/* Share */}
-              <div style={{ padding: 16, background: "#fff", borderRadius: "var(--ft-radius)" }}>
+              <div className="ft-card-flat" style={{ padding: 16 }}>
                 <div className="ft-eyebrow" style={{ color: "var(--ft-pink)", marginBottom: 8 }}>COMPARTIR</div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 8 }}>
                   <button className="ft-btn is-sm">Discord</button>
@@ -175,7 +175,7 @@ export default function ReadPage({ params }: { params: Promise<{ id: string }> |
 
               {/* Related articles */}
               {related.length > 0 && (
-                <div style={{ padding: 16, background: "#fff", borderRadius: "var(--ft-radius)" }}>
+                <div className="ft-card-flat" style={{ padding: 16 }}>
                   <div className="ft-eyebrow" style={{ color: "var(--ft-pink)", marginBottom: 12 }}>SEGUIR LEYENDO</div>
                   <div style={{ display: "grid", gap: 12 }}>
                     {related.map((a, i) => (
