@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useState, Suspense } from 'react'
-import { Button } from '@/components/ui/primitives/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/primitives/dialog'
 import { useNews } from '../_hooks/useNews'
 import FurretHeader from '../../_components/Header'
@@ -11,23 +10,38 @@ import { InternalLink } from "@/components/ui/navigation/Link"
 import { sendToast } from '@/lib/toast'
 import { useBoffSession } from '@/services/useBoffSession'
 import { USER_ROLES } from '@boffmedia/shared/roles'
+import Image from 'next/image'
 
 const NewsList = React.lazy(() => import('./NewsList'))
 const NewsContent = React.lazy(() => import('./NewsContent'))
 const NewsManager = React.lazy(() => import('../../_components/NewsManager'))
 const PopStyles = React.lazy(() => import('../../_components/PopStyles'))
 
+function Stat({ label, value, tone }: { label: string; value: number; tone: string }) {
+  return (
+    <div style={{
+      background: `var(--ft-${tone})`,
+      color: tone === "yellow" || tone === "lime" || tone === "cyan" ? "var(--ft-ink)" : "#fff",
+      border: "var(--ft-border)", borderRadius: 14, padding: "8px 14px", minWidth: 72, textAlign: "center",
+      boxShadow: "var(--ft-shadow-pop-sm)",
+    }}>
+      <div className="ft-display" style={{ fontSize: 32, lineHeight: 1 }}>{value}</div>
+      <div className="ft-eyebrow" style={{ fontSize: 10, marginTop: 2 }}>{label}</div>
+    </div>
+  )
+}
+
 export default function NewsEditor() {
   const { hasRole, status } = useBoffSession()
   const canManageNews = hasRole([USER_ROLES.ROTOM_ADMIN, USER_ROLES.ROTOM_FURRET])
 
-  const { 
-    news, 
-    setNews, 
+  const {
+    news,
+    setNews,
     fetchNews,
-    publishedNewsIds, 
-    featuredNewsId, 
-    handleSave, 
+    publishedNewsIds,
+    featuredNewsId,
+    handleSave,
     hasUnsavedChanges,
     handlePublishToggle,
     handleFeaturedToggle,
@@ -38,14 +52,15 @@ export default function NewsEditor() {
 
   if (status === 'loading') {
     return (
-      <div className="min-h-full relative overflow-auto">
-        <div className="absolute inset-0">
-          <PopArtWallpaper />
-        </div>
-        <div className="relative z-10 min-h-full flex items-center justify-center p-8">
-          <div className="bg-yellow-300 card-pop p-8 text-center">
-            <h2 className="text-pop-4xl font-bold mb-6 text-pink-500 pop-shadow">¡CARGANDO!</h2>
-            <p className="text-pop-xl font-comic text-secondary-600">Verificando permisos... 🔐</p>
+      <div className="ft-root" style={{ position: "relative" }}>
+        <PopArtWallpaper />
+        <div style={{ position: "relative", zIndex: 1 }}>
+          <FurretHeader />
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh", padding: 48 }}>
+            <div className="ft-card" style={{ padding: 48, textAlign: "center", background: "var(--ft-yellow)", maxWidth: 480 }}>
+              <div className="ft-display" style={{ fontSize: 44, color: "var(--ft-pink)" }}>¡CARGANDO!</div>
+              <p className="ft-body" style={{ margin: "12px 0" }}>Verificando permisos...</p>
+            </div>
           </div>
         </div>
       </div>
@@ -54,19 +69,16 @@ export default function NewsEditor() {
 
   if (!canManageNews) {
     return (
-      <div className="min-h-full relative overflow-auto">
-        <div className="absolute inset-0">
-          <PopArtWallpaper />
-        </div>
-        <div className="relative z-10 min-h-full flex items-center justify-center p-8">
-          <div className="bg-red-100 card-pop p-8 text-center border-4 border-black max-w-2xl">
-            <h2 className="text-pop-3xl font-bold mb-4 text-red-600 pop-shadow">ACCESO DENEGADO</h2>
-            <p className="text-pop-lg font-comic text-secondary-700 mb-6">
-              Necesitas el rol ROTOM_ADMIN o ROTOM_FURRET para editar noticias.
-            </p>
-            <InternalLink href="/smartrotom/furrettoday" className="btn-pop-primary pop-focus animate-button-press">
-              🏠 Volver a Furret Today
-            </InternalLink>
+      <div className="ft-root" style={{ position: "relative" }}>
+        <PopArtWallpaper />
+        <div style={{ position: "relative", zIndex: 1 }}>
+          <FurretHeader />
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh", padding: 48 }}>
+            <div className="ft-card" style={{ padding: 48, textAlign: "center", background: "var(--ft-pink-soft)", maxWidth: 520 }}>
+              <div className="ft-display" style={{ fontSize: 44, color: "var(--ft-pink)" }}>ACCESO DENEGADO</div>
+              <p className="ft-body" style={{ margin: "12px 0 24px" }}>Necesitas el rol ROTOM_ADMIN o ROTOM_FURRET para editar noticias.</p>
+              <InternalLink href="/smartrotom/furrettoday" className="ft-btn is-primary">VOLVER A PORTADA</InternalLink>
+            </div>
           </div>
         </div>
       </div>
@@ -74,23 +86,15 @@ export default function NewsEditor() {
   }
 
   function updateNews(id: number, content: string) {
-    const newNews = news.map(item => ({...item}));
-    const itemToUpdate = newNews.find(item => item.id === id);
-    
-    if (itemToUpdate) {
-      itemToUpdate.content = content;
+    const newNews = news.map(item => ({ ...item }))
+    const itemToUpdate = newNews.find(item => item.id === id)
 
-      const featuredNews = newNews.find(item => item.id === featuredNewsId);
-      const otherNews = newNews.filter(item => item.id !== featuredNewsId);
-      
-      setNews({
-        featured: featuredNews!,
-        news: otherNews
-      });
-      
-      sendToast(`Cambios guardados en ${itemToUpdate.title}`);
-    } else {
-      console.error(`News item with ID ${id} not found`);
+    if (itemToUpdate) {
+      itemToUpdate.content = content
+      const featuredNews = newNews.find(item => item.id === featuredNewsId)
+      const otherNews = newNews.filter(item => item.id !== featuredNewsId)
+      setNews({ featured: featuredNews!, news: otherNews })
+      sendToast(`Cambios guardados en ${itemToUpdate.title}`)
     }
   }
 
@@ -99,86 +103,101 @@ export default function NewsEditor() {
     setIsDialogOpen(false)
   }
 
+  const total = news.length
+  const published = publishedNewsIds.length
+  const featured = featuredNewsId ? 1 : 0
+  const drafts = total - published
+
   return (
-      <div className="min-h-full relative overflow-auto">
-        <div className="absolute inset-0">
-          <PopArtWallpaper />
-        </div>
-        <div className="relative z-10 min-h-full text-black p-4 md:p-8">
-          <div className="max-w-7xl mx-auto bg-white card-pop flex flex-col overflow-hidden">
-            <FurretHeader />
-          
-          {/* Navigation breadcrumbs */}
-          <div className="bg-secondary-100 p-6 flex flex-wrap items-center font-comic border-b-4 border-black">
-            <InternalLink href="furrettoday" className="text-secondary-500 hover:underline text-pop-lg pop-focus">
-              🏠 Inicio
-            </InternalLink>
-            <span className="mx-3 text-pop-lg font-bold"> ⚡ </span>
-            <span className="font-bold text-pink-500 text-pop-lg pop-shadow">📝 Editor de Noticias</span>
-            
-            {/* Action buttons in breadcrumb bar */}
-            <div className="ml-auto">
+    <div className="ft-root" style={{ position: "relative" }}>
+      <PopArtWallpaper />
+      <div style={{ position: "relative", zIndex: 1 }}>
+        <FurretHeader />
+
+        {/* Editor utility bar */}
+        <div style={{ background: "var(--ft-paper-2)", borderBottom: "1.5px dashed var(--ft-ink)" }}>
+          <div className="ft-wrap-wide" style={{ padding: "12px 24px", display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+            <InternalLink href="/smartrotom/furrettoday" className="ft-btn is-sm is-ghost">← Portada</InternalLink>
+            <span className="ft-meta">/</span>
+            <span className="ft-meta" style={{ fontWeight: 800, color: "var(--ft-pink)" }}>REDACCIÓN · EDITOR</span>
+            {hasUnsavedChanges && (
+              <span className="ft-pill is-yellow" style={{ marginLeft: 6 }}>● Cambios sin guardar</span>
+            )}
+            <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
               <button
+                className={`ft-btn is-sm ${hasUnsavedChanges ? 'is-primary' : ''}`}
                 onClick={handleSave}
                 disabled={!hasUnsavedChanges}
-                className={`btn-pop-primary pop-focus animate-button-press ${
-                  !hasUnsavedChanges ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
+                style={!hasUnsavedChanges ? { opacity: 0.55, cursor: 'not-allowed' } : {}}
               >
-                💾 Guardar Cambios
+                💾 Guardar cambios
               </button>
             </div>
           </div>
-          
-          {/* Main editor interface - with proper height and structure */}
-          <div className="flex flex-grow flex-col md:flex-row">
-            {/* Sidebar - Ensuring it stretches full height */}
-            <div className="w-full md:w-[30%] lg:w-[25%] bg-pink-500 border-r-8 border-black editor-sidebar relative">
-              {/* Subtle halftone background */}
-              <div className="absolute inset-0 ben-day-dots-strong"></div>
-              
-              <div className="p-6 relative z-10">
+        </div>
+
+        {/* Header strip */}
+        <section style={{ position: "relative", borderBottom: "var(--ft-border)", background: "var(--ft-paper-dark)", color: "#fff", overflow: "hidden" }}>
+          <div aria-hidden="true" style={{
+            position: "absolute", inset: 0, opacity: 0.18,
+            backgroundImage: "radial-gradient(#fff 1.4px, transparent 1.6px)",
+            backgroundSize: "14px 14px",
+          }} />
+          <div className="ft-wrap-wide" style={{ position: "relative", padding: "36px 24px 28px", display: "grid", gridTemplateColumns: "1fr auto", alignItems: "end", gap: 24 }}>
+            <div>
+              <div className="ft-eyebrow" style={{ color: "var(--ft-yellow)" }}>SALA DE REDACCIÓN</div>
+              <h1 className="ft-display" style={{
+                margin: "6px 0 0", fontSize: "clamp(40px, 6vw, 72px)", lineHeight: 0.95, color: "var(--ft-yellow)",
+                textShadow: "5px 5px 0 var(--ft-pink)",
+              }}>
+                Editor de Noticias
+              </h1>
+              <p className="ft-deck" style={{ margin: "12px 0 0", color: "rgba(255,255,255,0.85)", fontSize: 18, maxWidth: 600 }}>
+                Escribe, publica y destaca. La portada se decide aquí.
+              </p>
+            </div>
+            <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+              <Stat label="TOTAL" value={total} tone="cyan" />
+              <Stat label="PUBLIC." value={published} tone="lime" />
+              <Stat label="DESTAC." value={featured} tone="pink" />
+              <Stat label="BORRAD." value={drafts} tone="yellow" />
+            </div>
+          </div>
+        </section>
+
+        {/* Editor split */}
+        <main className="ft-wrap-wide" style={{ padding: "24px 24px 48px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "360px minmax(0, 1fr)", gap: 24, alignItems: "flex-start" }}>
+            {/* Sidebar */}
+            <aside className="ft-card-flat" style={{ background: "#fff", padding: 0, position: "sticky", top: 24, maxHeight: "calc(100vh - 60px)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+              {/* Header */}
+              <div style={{ padding: 16, borderBottom: "var(--ft-border)", background: "var(--ft-pink)", color: "#fff" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                  <span className="ft-eyebrow" style={{ color: "var(--ft-yellow)" }}>LISTA DE NOTICIAS</span>
+                  <span className="ft-meta" style={{ color: "#fff", opacity: 0.85 }}>{total}</span>
+                </div>
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                   <DialogTrigger asChild>
-                    <button className="btn-pop-secondary w-full pop-focus animate-button-press">
-                      ✨ Nueva Noticia
+                    <button className="ft-btn is-lg is-ink" style={{ width: "100%", justifyContent: "center" }}>
+                      + Nueva noticia
                     </button>
                   </DialogTrigger>
                   <DialogContent className="w-[min(92vw,48rem)] max-w-3xl border-4 border-black bg-[#fff7d6] p-0 overflow-hidden">
                     <DialogHeader className="sr-only">
                       <DialogTitle>Crear nueva noticia</DialogTitle>
                     </DialogHeader>
-                    <Suspense fallback={
-                      <div className="text-pop-3xl font-comic text-center p-8">
-                        Cargando editor... 📝
-                      </div>
-                    }>
+                    <Suspense fallback={<div style={{ padding: 24, textAlign: "center" }} className="ft-body">Cargando editor...</div>}>
                       <NewsManager onClose={() => setIsDialogOpen(false)} onSaved={handleNewsSaved} />
                     </Suspense>
                   </DialogContent>
                 </Dialog>
               </div>
-              
-              {/* Comic style title banner */}
-              <div className="bg-yellow-300 py-4 border-y-4 border-black relative z-10">
-                <h2 className="text-center text-secondary-500 text-pop-xl font-bold pop-shadow">
-                  📰 LISTA DE NOTICIAS
-                </h2>
-              </div>
-              
-              {/* News list - Ensuring it takes all remaining space */}
-              <div className="flex-grow flex flex-col px-6 py-4 overflow-y-auto relative z-10">
-                <Suspense fallback={
-                  <div className="text-white text-center p-4">
-                    <div className="animate-spin h-8 w-8 border-4 border-white border-t-transparent rounded-full mx-auto mb-2"></div>
-                    <span className="font-comic text-pop-lg">Cargando noticias... 📰</span>
-                  </div>
-                }>
+
+              {/* News list */}
+              <div className="ft-scroll" style={{ overflowY: "auto", flexGrow: 1 }}>
+                <Suspense fallback={<div style={{ padding: 24, textAlign: "center" }} className="ft-meta">Cargando...</div>}>
                   {isLoading ? (
-                    <div className="text-white text-center p-4">
-                      <div className="animate-spin h-8 w-8 border-4 border-white border-t-transparent rounded-full mx-auto mb-2"></div>
-                      <span className="font-comic text-pop-lg">Cargando noticias... 📰</span>
-                    </div>
+                    <div style={{ padding: 24, textAlign: "center" }} className="ft-meta">Cargando noticias...</div>
                   ) : (
                     <NewsList
                       news={news}
@@ -192,30 +211,24 @@ export default function NewsEditor() {
                   )}
                 </Suspense>
               </div>
-            </div>
-            
-            {/* Main content area */}
-            <Suspense fallback={
-              <div className="w-full md:w-[70%] lg:w-[75%] bg-white flex items-center justify-center text-pop-3xl font-comic p-8 text-center">
-                <div className="animate-bounce">Cargando editor... ✏️</div>
-              </div>
-            }>
-              <div className="w-full md:w-[70%] lg:w-[75%]">
-                <NewsContent
-                  selectedNewsId={selectedNewsId}
-                  news={news}
-                  updateNews={updateNews}
-                />
-              </div>
+            </aside>
+
+            {/* Content area */}
+            <Suspense fallback={<div className="ft-card" style={{ padding: 48, textAlign: "center" }}><div className="ft-display" style={{ fontSize: 32 }}>Cargando editor...</div></div>}>
+              <NewsContent
+                selectedNewsId={selectedNewsId}
+                news={news}
+                updateNews={updateNews}
+              />
             </Suspense>
           </div>
-          
-          {/* Footer */}
-          <FurretFooter />
-        </div>
+        </main>
+
+        <FurretFooter />
       </div>
-      
-      <PopStyles />
+      <Suspense fallback={null}>
+        <PopStyles />
+      </Suspense>
     </div>
   )
 }

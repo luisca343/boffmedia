@@ -1,0 +1,1 @@
+ALTER TABLE `rotom_news` DROP COLUMN `readtime`;

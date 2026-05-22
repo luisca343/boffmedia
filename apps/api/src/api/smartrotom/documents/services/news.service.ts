@@ -8,6 +8,7 @@ export interface CreateNewsRequest {
   subtitle?: string;
   category?: string;
   subcategory?: string;
+  author?: string;
   published?: number;
   featured?: number;
   content?: string;
@@ -20,6 +21,7 @@ export interface UpdateNewsRequest {
   subtitle?: string;
   category?: string;
   subcategory?: string;
+  author?: string;
   published?: number;
   featured?: number;
   content?: string;
@@ -202,7 +204,7 @@ export class NewsService {
       new URL(url);
       return true;
     } catch {
-      return false;
+      return url.startsWith('/');
     }
   }
 }

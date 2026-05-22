@@ -254,6 +254,7 @@ export type { ScoreboardRequirements } from './models/ScoreboardRequirements';
 export type { SearchConsoleResult } from './models/SearchConsoleResult';
 export type { SearchLocalGamesResult } from './models/SearchLocalGamesResult';
 export type { SendMessageDto } from './models/SendMessageDto';
+export type { SendNotificationDto } from './models/SendNotificationDto';
 export type { SeriesCardsGroup } from './models/SeriesCardsGroup';
 export { SeriesDto } from './models/SeriesDto';
 export { SeriesGameDto } from './models/SeriesGameDto';

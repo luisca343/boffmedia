@@ -5,7 +5,7 @@
 import type { DivergenceRowDto } from './DivergenceRowDto';
 export type DivergenceResultDto = {
     regulationId: string;
-    tournamentId: number | null;
+    tournamentId: Record<string, any> | null;
     ladderFormat: string;
     ladderMonth: string;
     ladderCutoff: number;

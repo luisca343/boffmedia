@@ -2,15 +2,15 @@
 
 import React from "react";
 import dynamic from "next/dynamic";
-import { Card, CardContent } from "@/components/ui/primitives/card";
-import { Button } from "@/components/ui/primitives/button";
-import { InternalLink } from "@/components/ui/navigation/Link";
 import Image from "next/image";
+import Link from "next/link";
+import { InternalLink } from "@/components/ui/navigation/Link";
 import FurretHeader from "../../_components/Header";
 import FurretFooter from "../../_components/Footer";
 import { useGetNewsById } from "@/hooks/documents/useGetNewsById";
 import PopArtWallpaper from "../../_components/PopArtWallpaper";
 import PopStyles from "../../_components/PopStyles";
+import { useGetAllNews } from "@/hooks/documents/useGetAllNews";
 
 const CustomEditor = dynamic(() => import("@/components/shared/ckeditor/TestEditor"), {
   ssr: false,
@@ -19,34 +19,21 @@ const CustomEditor = dynamic(() => import("@/components/shared/ckeditor/TestEdit
 export default function ReadPage({ params }: { params: Promise<{ id: string }> | { id: string } }) {
   const { id } = React.use(params as any) as { id: string };
   const { article, error, isLoading } = useGetNewsById(id);
+  const { published } = useGetAllNews();
 
+  /* ---------- Loading state ---------- */
   if (isLoading) {
     return (
-      <div className="min-h-full relative overflow-auto">
-        <div className="absolute inset-0">
-          <PopArtWallpaper />
-        </div>
-        <div className="relative z-10 min-h-full flex items-center justify-center p-8">
-          <div className="bg-yellow-300 card-pop p-8 text-center max-w-2xl">
-            <h2 className="text-pop-4xl font-bold mb-6 text-secondary-500 pop-shadow">
-              ¡CARGANDO! 📰
-            </h2>
-            <p className="text-pop-xl font-comic mb-8 text-secondary-600">
-              Furret está preparando tu noticia...
-            </p>
-            <div className="relative h-40 w-full mb-6">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-16 h-16 border-8 border-secondary-500 border-t-transparent rounded-full animate-spin"></div>
-              </div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-6xl animate-bounce">🔍</span>
-              </div>
+      <div className="ft-root" style={{ position: "relative" }}>
+        <PopArtWallpaper />
+        <div style={{ position: "relative", zIndex: 1 }}>
+          <FurretHeader />
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh", padding: 48 }}>
+            <div className="ft-card" style={{ padding: 48, textAlign: "center", background: "var(--ft-yellow)", maxWidth: 480 }}>
+              <div className="ft-display" style={{ fontSize: 44, color: "var(--ft-pink)" }}>¡CARGANDO!</div>
+              <p className="ft-body" style={{ margin: "12px 0" }}>Furret está preparando tu noticia...</p>
+              <div className="ft-skel" style={{ height: 12, marginTop: 16 }} />
             </div>
-            {/* Comic-style action lines */}
-            <svg className="mx-auto" width="200" height="40" viewBox="0 0 200 40">
-              <line x1="0" y1="20" x2="200" y2="20" stroke="#000" strokeWidth="4" strokeDasharray="10 5" />
-              <line x1="20" y1="30" x2="180" y2="30" stroke="#000" strokeWidth="2" strokeDasharray="8 4" />
-            </svg>
           </div>
         </div>
         <PopStyles />
@@ -54,55 +41,21 @@ export default function ReadPage({ params }: { params: Promise<{ id: string }> |
     );
   }
 
-  if (error) {
+  /* ---------- Error state ---------- */
+  if (error || !article) {
     return (
-      <div className="min-h-full relative overflow-auto">
-        <div className="absolute inset-0">
-          <PopArtWallpaper />
-        </div>
-        <div className="relative z-10 min-h-full flex items-center justify-center p-8">
-          <div className="max-w-3xl bg-white card-pop p-8 text-center">
-            <h2 className="text-pop-4xl font-bold mb-6 pop-shadow text-red-500">
-              ¡OOPS! 💥
-            </h2>
-            <div className="relative w-64 h-64 mx-auto mb-8">
-              <Image
-                src="/smartrotom/img/apps/furrettoday/furret2.png"
-                alt="Furret confundido"
-                layout="fill"
-                className="object-contain"
-              />
-              <div className="absolute -top-4 -right-4 animate-pulse">
-                <div className="bg-red-500 text-white rounded-full w-16 h-16 flex items-center justify-center border-4 border-black transform rotate-12">
-                  <span className="text-2xl">❓</span>
-                </div>
+      <div className="ft-root" style={{ position: "relative" }}>
+        <PopArtWallpaper />
+        <div style={{ position: "relative", zIndex: 1 }}>
+          <FurretHeader />
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh", padding: 48 }}>
+            <div className="ft-card" style={{ padding: 48, textAlign: "center", background: "var(--ft-yellow-soft)", maxWidth: 520 }}>
+              <div style={{ position: "relative", width: 160, height: 160, margin: "0 auto 16px" }}>
+                <Image src="/smartrotom/img/apps/furrettoday/furret2.png" alt="Furret confundido" fill className="object-contain" />
               </div>
-            </div>
-            
-            {/* Comic style speech bubble */}
-            <div className="relative bg-yellow-300 border-4 border-black p-6 mb-8 mx-auto max-w-lg transform rotate-1 card-pop">
-              <div className="absolute h-6 w-6 bg-yellow-300 border-r-4 border-b-4 border-black transform rotate-45 -bottom-3 left-[calc(50%-12px)]"></div>
-              <p className="text-pop-xl font-comic mb-3 text-black pop-shadow">
-                ¡Oh no! Hubo un error al cargar la noticia.
-              </p>
-              <p className="text-pop-lg font-comic text-secondary-600">
-                ¿Quizás Furret está jugando con los cables? 🔌
-              </p>
-            </div>
-            
-            <div className="flex flex-wrap justify-center gap-6">
-              <InternalLink
-                href="furrettoday"
-                className="btn-pop-primary pop-focus animate-button-press"
-              >
-                🏠 Volver a las Noticias
-              </InternalLink>
-              <button
-                onClick={() => window.location.reload()}
-                className="btn-pop-secondary pop-focus animate-button-press"
-              >
-                🔄 ¡Intentar de Nuevo!
-              </button>
+              <div className="ft-display" style={{ fontSize: 44, color: "var(--ft-pink)" }}>¡OOPS!</div>
+              <p className="ft-deck" style={{ fontSize: 20, margin: "12px 0 24px" }}>No se pudo cargar la noticia. Quizás Furret se la comió.</p>
+              <InternalLink href="/smartrotom/furrettoday" className="ft-btn is-primary">VOLVER A PORTADA</InternalLink>
             </div>
           </div>
         </div>
@@ -111,165 +64,146 @@ export default function ReadPage({ params }: { params: Promise<{ id: string }> |
     );
   }
 
-  function getContent() {
-    const modifiedContent = article?.content.replace(/<h1>.*?<\/h1>/, "<h1></h1>");
-    return modifiedContent;
-  }
-
-  function getModifiedData() {
-    return {
-      ...article,
-      content: getContent(),
-    };
-  }
+  /* ---------- Article content ---------- */
+  const articleContent = article!.content.replace(/<h1>.*?<\/h1>/, "<h1></h1>");
+  const related = (published || []).filter(n => n.id !== article!.id).slice(0, 3);
 
   return (
-      <div className="min-h-full relative overflow-auto">
-        <div className="absolute inset-0">
-          <PopArtWallpaper />
-        </div>
-        <div className="relative z-10 min-h-full text-black p-4 md:p-8">
-          <div className="max-w-7xl mx-auto bg-white card-pop flex flex-col  overflow-hidden">
-            <FurretHeader />
-          
-          {/* Navigation breadcrumbs - Enhanced */}
-          <div className="bg-secondary-100 p-6 flex flex-wrap items-center font-comic border-b-4 border-black">
-            <InternalLink href="furrettoday" className="text-secondary-500 hover:underline text-pop-lg pop-focus">
-              🏠 Inicio
-            </InternalLink>
-            <span className="mx-3 text-pop-lg font-bold"> ⚡ </span>
-            <span className="font-bold text-pink-500 text-pop-lg pop-shadow">
-              📖 Leyendo: {article?.title}
-            </span>
-            
-            {/* Action button in breadcrumb bar */}
-            <div className="ml-auto">
-              <InternalLink
-                href="furrettoday"
-                className="btn-pop-primary pop-focus animate-button-press"
-              >
-                📰 Todas las Noticias
-              </InternalLink>
-            </div>
-          </div>
-          
-          {/* Article content - Enhanced */}
-          <div className="p-8 relative flex-grow">
-            {/* Hero section with improved title design */}
-            <div className="relative mb-12">
-              {/* Comic-style burst backgrounds */}
-              <div className="absolute -top-8 -right-8 w-24 h-24 opacity-20">
-                <svg viewBox="0 0 100 100" className="w-full h-full transform rotate-12">
-                  <path d="M50,5 L60,35 L90,35 L70,55 L80,85 L50,70 L20,85 L30,55 L10,35 L40,35 Z" 
-                        fill="#EC4899" stroke="#000" strokeWidth="2" />
-                </svg>
-              </div>
-              
-              {/* Main title container */}
-              <div className="relative">
-                {/* "EXTRA" badge */}
-                <div className="absolute -top-6 -right-6 bg-red-500 text-white px-6 py-3 rounded-2xl border-4 border-black transform rotate-12 z-10 card-pop">
-                  <span className="font-bold text-pop-lg pop-shadow">¡EXTRA!</span>
-                </div>
-                
-                {/* Title with improved styling */}
-                <div className="bg-gradient-to-r from-pink-500 via-yellow-400 to-red-500 p-8 border-4 border-black transform -rotate-1 card-pop relative overflow-hidden">
-                  {/* Subtle halftone pattern */}
-                  <div className="absolute inset-0 ben-day-dots opacity-20"></div>
-                  
-                  <h1 className="relative z-10 text-pop-3xl md:text-pop-4xl font-bold text-white pop-shadow-strong text-center leading-tight">
-                    {article?.title}
-                  </h1>
-                  
-                  {/* Decorative elements */}
-                  <div className="absolute top-2 left-2 w-8 h-8 bg-yellow-300 rounded-full border-3 border-black"></div>
-                  <div className="absolute bottom-2 right-2 w-6 h-6 bg-white rounded-full border-3 border-black"></div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Content area with enhanced design */}
-            <div className="relative">
-              {/* Main content container */}
-              <div className="bg-white border-8 border-black rounded-3xl p-8 relative overflow-hidden card-pop">
-                {/* Decorative background elements */}
-                <div className="absolute top-8 right-8 opacity-10 pointer-events-none">
-                  <svg viewBox="0 0 100 100" width="120" height="120" className="transform rotate-45">
-                    <path d="M20,0 L40,30 L80,40 L40,60 L30,100 L10,50 Z" fill="#EC4899" />
-                  </svg>
-                </div>
-                <div className="absolute bottom-8 left-8 opacity-10 pointer-events-none">
-                  <svg viewBox="0 0 100 100" width="100" height="100">
-                    <circle cx="50" cy="50" r="40" fill="#3B82F6" />
-                  </svg>
-                </div>
-                
-                {/* Inner content border */}
-                <div className="border-4 border-dotted border-secondary-300 p-6 rounded-2xl bg-gray-50 relative">
-                  {/* Corner decorations */}
-                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-yellow-300 border-3 border-black rounded-full flex items-center justify-center transform rotate-12">
-                    <span className="text-black font-bold text-pop-sm">✨</span>
-                  </div>
-                  
-                  {/* Article content */}
-                  <div className="relative z-10 font-comic prose prose-lg max-w-none">
-                    <CustomEditor
-                      document={getModifiedData()}
-                      documentId={id}
-                      documentType={1}
-                      readonly={true}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Navigation buttons - Enhanced */}
-          <div className="bg-secondary-100 p-8 text-center border-t-4 border-black relative">
-            {/* Background pattern */}
-            <div className="absolute inset-0 ben-day-dots opacity-30"></div>
-            
-            <div className="relative z-10">
-              <h3 className="text-pop-xl font-bold mb-6 text-secondary-600 pop-shadow">
-                📰 ¿Te gustó esta noticia?
-              </h3>
-              
-              <div className="flex flex-wrap justify-center gap-6">
-                <InternalLink
-                  href="furrettoday"
-                  className="btn-pop-primary pop-focus animate-button-press"
-                >
-                  🏠 Volver a las Noticias
-                </InternalLink>
-                
-                <InternalLink
-                  href="furrettoday/editar"
-                  className="btn-pop-secondary pop-focus animate-button-press"
-                >
-                  ✏️ Editor de Noticias
-                </InternalLink>
-              </div>
-              
-              {/* Fun message */}
-              <div className="mt-8 bg-yellow-300 inline-block px-6 py-3 border-3 border-black rounded-2xl transform rotate-1 card-pop">
-                <p className="text-pop-base font-comic text-secondary-600 pop-shadow">
-                  ¡Gracias por leer Furret Today! 🎉
-                </p>
-              </div>
-            </div>
-          </div>
+    <div className="ft-root" style={{ position: "relative" }}>
+      <PopArtWallpaper />
+      <div style={{ position: "relative", zIndex: 1 }}>
+        <FurretHeader />
 
-          <FurretFooter />
+        {/* Breadcrumb / utility row */}
+        <div style={{ background: "var(--ft-paper-2)", borderBottom: "1.5px dashed var(--ft-ink)" }}>
+          <div className="ft-wrap-wide" style={{ padding: "12px 24px", display: "flex", alignItems: "center", gap: 12 }}>
+            <InternalLink href="/smartrotom/furrettoday" className="ft-btn is-sm is-ghost">
+              ← Portada
+            </InternalLink>
+            <span className="ft-meta">/</span>
+            <span className="ft-meta">ARTÍCULO</span>
+          </div>
         </div>
+
+        {/* Title block */}
+        <header style={{ position: "relative", borderBottom: "var(--ft-border)", background: "var(--ft-paper)", overflow: "hidden" }}>
+          <div aria-hidden="true" style={{
+            position: "absolute", inset: 0, opacity: 0.10,
+            backgroundImage: "radial-gradient(var(--ft-ink) 1.4px, transparent 1.6px)",
+            backgroundSize: "14px 14px",
+          }} />
+          <div className="ft-wrap" style={{ position: "relative", padding: "48px 24px 32px", maxWidth: 880, margin: "0 auto" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+              <span className="ft-pill is-pink">ARTÍCULO</span>
+              <span className="ft-meta">Furret Today</span>
+            </div>
+            <h1 className="ft-display" style={{
+              fontSize: "clamp(40px, 7vw, 88px)", lineHeight: 0.96, margin: "0 0 18px",
+              textShadow: "5px 5px 0 var(--ft-pink)",
+            }}>
+              {article.title}
+            </h1>
+            {article.subtitle && (
+              <p className="ft-deck" style={{ fontSize: "clamp(18px, 2.2vw, 24px)", marginTop: 0, color: "#262030", maxWidth: 760 }}>
+                {article.subtitle}
+              </p>
+            )}
+
+            {/* Byline row */}
+            <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 22 }}>
+              <div style={{
+                width: 56, height: 56, borderRadius: 999, background: "var(--ft-cyan)",
+                border: "var(--ft-border)", display: "flex", alignItems: "center", justifyContent: "center",
+                fontFamily: "var(--ft-font-display)", fontSize: 30, color: "var(--ft-ink)",
+              }}>{((article as any).author || "F")[0].toUpperCase()}</div>
+              <div>
+                <div className="ft-byline" style={{ fontSize: 18 }}>{(article as any).author || "Redacción Furret Today"}</div>
+                <div className="ft-meta">{(article as any).readtime || "Semanario Pop"}</div>
+              </div>
+              {(article as any).category && (
+                <span className="ft-chip" style={{ marginLeft: "auto" }}>{(article as any).category}</span>
+              )}
+            </div>
+          </div>
+        </header>
+
+        {/* Body + sidebar */}
+        <main style={{ padding: "16px 24px 48px" }}>
+          <div className="ft-wrap-wide" style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) 300px", gap: 48, alignItems: "flex-start" }}>
+            {/* Article body */}
+            <article>
+              <div className="ft-card-flat" style={{ overflow: "hidden", border: "var(--ft-border-thick)", boxShadow: "var(--ft-shadow-pop)", marginBottom: 32 }}>
+                <div style={{ position: "relative", minHeight: 400, background: "var(--ft-paper-2)" }}>
+                  <CustomEditor
+                    document={{ ...article!, content: articleContent }}
+                    documentId={id}
+                    documentType={1}
+                    readonly={true}
+                  />
+                </div>
+              </div>
+
+              {/* Article footer CTA */}
+              <div className="ft-card" style={{ padding: 24, background: "var(--ft-yellow-soft)" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+                  <div style={{ position: "relative", width: 64, height: 64, flexShrink: 0 }}>
+                    <Image src="/smartrotom/img/apps/furrettoday/furret2.png" alt="Furret" fill className="object-contain" />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 200 }}>
+                    <div className="ft-display" style={{ fontSize: 28, lineHeight: 0.95 }}>¿Te gustó el reportaje?</div>
+                    <p className="ft-body" style={{ margin: "4px 0 0" }}>
+                      Vuelve a la portada para leer más noticias de Furret Today.
+                    </p>
+                  </div>
+                  <InternalLink href="/smartrotom/furrettoday" className="ft-btn is-primary">
+                    VOLVER A PORTADA
+                  </InternalLink>
+                </div>
+              </div>
+            </article>
+
+            {/* Sidebar */}
+            <aside style={{ position: "sticky", top: 24, display: "flex", flexDirection: "column", gap: 20 }}>
+              {/* Share */}
+              <div className="ft-card-flat" style={{ padding: 16 }}>
+                <div className="ft-eyebrow" style={{ color: "var(--ft-pink)", marginBottom: 8 }}>COMPARTIR</div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 8 }}>
+                  <button className="ft-btn is-sm">Discord</button>
+                  <button className="ft-btn is-sm is-cyan">Twitter</button>
+                </div>
+              </div>
+
+              {/* Related articles */}
+              {related.length > 0 && (
+                <div className="ft-card-flat" style={{ padding: 16 }}>
+                  <div className="ft-eyebrow" style={{ color: "var(--ft-pink)", marginBottom: 12 }}>SEGUIR LEYENDO</div>
+                  <div style={{ display: "grid", gap: 12 }}>
+                    {related.map((a, i) => (
+                      <Link key={a.id} href={`/smartrotom/furrettoday/leer/${a.id}`} style={{
+                        display: "grid", gridTemplateColumns: "40px 1fr", gap: 10, padding: 8, alignItems: "center",
+                        borderRadius: 12,
+                      }}>
+                        <div className="ft-stamp" style={{ fontSize: 38, color: ["var(--ft-pink)", "var(--ft-cyan)", "var(--ft-purple)"][i % 3] }}>
+                          {String(i + 1).padStart(2, "0")}
+                        </div>
+                        <div>
+                          <div className="ft-display" style={{ fontSize: 16, lineHeight: 1.05 }}>{a.title}</div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </aside>
+          </div>
+        </main>
+
+        <FurretFooter />
       </div>
       <PopStyles />
-      
-    <style jsx global>{`
-      .ck-placeholder{
-        display: none !important;
-      }
-    `}</style>
+      <style jsx global>{`
+        .ck-placeholder { display: none !important; }
+      `}</style>
     </div>
   );
 }

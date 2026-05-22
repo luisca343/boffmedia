@@ -1,144 +1,91 @@
 import React from "react";
-import { Card, CardContent } from "@/components/ui/primitives/card";
+import Image from "next/image";
 import { InternalLink } from "@/components/ui/navigation/Link";
 import { NewsItem } from "../page";
 import { getPreview } from "../_util";
-import Image from "next/image";
 
 interface CardComponentProps {
-  variant: "blue" | "purple" | "green" | "red" | "yellow" | "pink" | "default";
+  variant?: string;
   news: NewsItem;
 }
 
-const variantStyles = {
-  blue: {
-    cardClass: "bg-secondary-500 text-white",
-    buttonClass: "btn-pop-primary",
-    accentColor: "bg-yellow-300",
-    titleBgColor: "bg-yellow-300",
-    titleTextColor: "text-secondary-600",
-  },
-  purple: {
-    cardClass: "bg-accent-500 text-white",
-    buttonClass: "btn-pop-primary",
-    accentColor: "bg-highlight-300",
-    titleBgColor: "bg-highlight-300",
-    titleTextColor: "text-accent-700",
-  },
-  green: {
-    cardClass: "bg-highlight-500 text-white",
-    buttonClass: "btn-pop-primary",
-    accentColor: "bg-pink-300",
-    titleBgColor: "bg-pink-300",
-    titleTextColor: "text-highlight-700",
-  },
-  red: {
-    cardClass: "bg-red-500 text-white",
-    buttonClass: "btn-pop-primary",
-    accentColor: "bg-secondary-300",
-    titleBgColor: "bg-secondary-300",
-    titleTextColor: "text-red-600",
-  },
-  yellow: {
-    cardClass: "bg-yellow-500 text-black",
-    buttonClass: "btn-pop-secondary",
-    accentColor: "bg-pink-500",
-    titleBgColor: "bg-secondary-300",
-    titleTextColor: "text-yellow-600",
-  },
-  pink: {
-    cardClass: "bg-pink-500 text-white",
-    buttonClass: "btn-pop-primary",
-    accentColor: "bg-secondary-300",
-    titleBgColor: "bg-yellow-300",
-    titleTextColor: "text-pink-600",
-  },
-  default: {
-    cardClass: "bg-white text-black",
-    buttonClass: "btn-pop-primary",
-    accentColor: "bg-black",
-    titleBgColor: "bg-secondary-300",
-    titleTextColor: "text-black",
-  },
+const accentColors: Record<string, string> = {
+  pink: "var(--ft-pink)",
+  cyan: "var(--ft-cyan)",
+  yellow: "var(--ft-yellow)",
+  purple: "var(--ft-purple)",
+  orange: "var(--ft-orange)",
+  lime: "var(--ft-lime)",
+  red: "var(--ft-red)",
+  default: "var(--ft-yellow)",
 };
 
-const CardComponent: React.FC<CardComponentProps> = ({ variant, news }) => {
-  const { cardClass, buttonClass, accentColor, titleBgColor, titleTextColor } = variantStyles[variant];
+const pillColors: Record<string, string> = {
+  pink: "is-pink",
+  cyan: "is-cyan",
+  yellow: "is-yellow",
+  purple: "is-purple",
+  orange: "is-orange",
+  lime: "is-lime",
+  red: "is-pink",
+  default: "is-yellow",
+};
 
-  if (!news)
+export default function CardComponent({ variant = "default", news }: CardComponentProps) {
+  if (!news) {
     return (
-      <Card className={`card-pop ${cardClass}`}>
-        <CardContent className="p-8">
-          <h3 className="text-pop-2xl font-bold mb-6 pop-shadow text-white">¡VACÍO!</h3>
-          <p className="text-pop-lg mb-6 font-comic leading-relaxed">
-            Furret está buscando más noticias para llenar este espacio...
-          </p>
-          <div className="w-24 h-24 mx-auto mb-4 bg-yellow-300 rounded-full border-3 border-black flex items-center justify-center">
-            <span className="text-pop-2xl">🔍</span>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="ft-card" style={{ padding: 24, textAlign: "center", background: "var(--ft-yellow-soft)" }}>
+        <div className="ft-display" style={{ fontSize: 28, color: "var(--ft-pink)" }}>¡VACÍO!</div>
+        <p className="ft-body" style={{ margin: "8px 0 0" }}>Furret está buscando más noticias...</p>
+      </div>
     );
-    
-  // Extract image URL if it exists in content
+  }
+
+  const accent = accentColors[variant] || accentColors.default;
+  const pill = pillColors[variant] || pillColors.default;
   const hasImage = news.imageUrl && news.imageUrl !== "";
-    
+
   return (
-    <Card className={`card-pop ${cardClass} relative`}>
-      <CardContent className="p-6 relative">
-        {/* Top accent bar */}
-        <div className={`h-2 ${accentColor} absolute top-0 left-8 right-8 rounded-b-lg`}></div>
-        
-        {/* Title with improved readability */}
-        <div className="relative mb-6 transform -rotate-1">
-          <h3 className={`text-pop-lg font-bold pop-shadow inline-block px-4 py-2 ${titleBgColor} ${titleTextColor} border-3 border-black rounded-lg`}>
-            {news.title}
-          </h3>
-        </div>
-        
-        {/* Show image if available */}
+    <article className="ft-card ft-lift" style={{ overflow: "hidden", display: "flex", flexDirection: "column", height: "100%" }}>
+      {/* Hero area */}
+      <div style={{ position: "relative", height: 180, borderBottom: "var(--ft-border)", background: accent }}>
+        {/* Halftone overlay */}
+        <div aria-hidden="true" style={{
+          position: "absolute", inset: 0, opacity: 0.15,
+          backgroundImage: `radial-gradient(var(--ft-ink) 1.4px, transparent 1.6px)`,
+          backgroundSize: "12px 12px",
+        }} />
         {hasImage && (
-          <div className="relative h-32 mb-6 border-3 border-black rounded-lg overflow-hidden transform rotate-1 card-pop bg-white">
-            <Image 
-              src={news.imageUrl} 
-              alt={`Imagen de ${news.title}`}
-              layout="fill"
-              objectFit="cover" 
-              className="hover:scale-105 transition-transform duration-240ms"
-            />
-            {/* Comic style starburst accent */}
-            <div className="absolute -top-2 -right-2 w-8 h-8" aria-hidden="true">
-              <svg viewBox="0 0 24 24" className="w-full h-full">
-                <path d="M12,2 L13.5,9.5 L21,12 L13.5,14.5 L12,22 L10.5,14.5 L3,12 L10.5,9.5 Z" 
-                      fill="#FFD700" stroke="#000" strokeWidth="1" />
-              </svg>
-            </div>
-          </div>
+          <Image
+            src={news.imageUrl}
+            alt={news.title}
+            fill
+            className="object-cover"
+          />
         )}
-        
-        <div className="text-pop-base font-comic mb-6 relative leading-relaxed">
-          <div className="relative z-10">
-            {getPreview(news, 100)}
-          </div>
-        </div>
-        
-        <div className="relative">
+        <span className={`ft-pill ${pill}`} style={{ position: "absolute", top: 12, left: 12 }}>
+          {news.subtitle || "NOTICIA"}
+        </span>
+      </div>
+
+      {/* Content */}
+      <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 10, flexGrow: 1 }}>
+        <h3 className="ft-display" style={{ margin: 0, fontSize: 26, lineHeight: 1.0, letterSpacing: "0.02em" }}>
+          {news.title}
+        </h3>
+        <p className="ft-body" style={{ margin: 0, fontSize: 14, color: "#3a3645", lineHeight: 1.5 }}>
+          {getPreview(news, 120)}
+        </p>
+        <div style={{ marginTop: "auto", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, paddingTop: 8 }}>
+          <span className="ft-meta">{news.author || "Redacción"}{news.readtime ? ` · ${news.readtime}` : ""}</span>
           <InternalLink
             href={`furrettoday/leer/${news.id}`}
-            className={`${buttonClass} pop-focus animate-button-press inline-block`}
+            className="ft-btn is-sm"
           >
-            {news.buttonText || "Leer más"}
+            LEER →
           </InternalLink>
-          
-          {/* Simplified action lines */}
-          <svg className="absolute -right-2 bottom-0 opacity-60" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
-            <line x1="24" y1="24" x2="12" y2="12" stroke="currentColor" strokeWidth="2" />
-            <line x1="18" y1="24" x2="9" y2="15" stroke="currentColor" strokeWidth="1" />
-          </svg>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </article>
   );
-};
-
-export default CardComponent;
+}

@@ -32,6 +32,18 @@ export class News {
   subcategory: string;
 
   @ApiProperty({
+    example: 'Lúa Caminante',
+    description: 'News author name',
+  })
+  author: string;
+
+  @ApiProperty({
+    example: '3 min',
+    description: 'Estimated read time (calculated from content)',
+  })
+  readtime: string;
+
+  @ApiProperty({
     example: 1,
     description: 'Published status (0=draft, 1=published)',
   })

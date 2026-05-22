@@ -137,7 +137,7 @@ export default function AppWrapper({
     >
       <RotomNav setTema={setTema} />
       <ToastContainer position="bottom-right" theme="dark" />
-      <main className="relative flex-1 pt-12 flex overflow-hidden">
+      <main className="relative flex-1 pt-12 flex ">
         <CallStatus />
         <div className="h-full w-full [&>*]:w-full flex overflow-hidden">{children}</div>
       </main>

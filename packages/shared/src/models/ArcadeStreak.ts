@@ -6,7 +6,7 @@ export type ArcadeStreak = {
     /**
      * Last time the user claimed a reward
      */
-    lastClaimed: string | null;
+    lastClaimed: Record<string, any> | null;
     /**
      * Current streak count
      */
@@ -18,7 +18,7 @@ export type ArcadeStreak = {
     /**
      * Last banner the user interacted with
      */
-    lastBanner: string | null;
+    lastBanner: Record<string, any> | null;
     /**
      * Current day in the reward cycle
      */

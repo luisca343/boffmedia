@@ -1,7 +1,5 @@
 import React from "react";
 import Image from "next/image";
-import { Card, CardContent } from "@/components/ui/primitives/card";
-import { Button } from "@/components/ui/primitives/button";
 import { InternalLink } from "@/components/ui/navigation/Link";
 import { NewsItem } from "../page";
 import { getPreview } from "../_util";
@@ -10,86 +8,79 @@ interface MainCardProps {
   news: NewsItem | undefined;
 }
 
-const MainCard: React.FC<MainCardProps> = ({ news }) => {
-  if (!news)
+export default function MainCard({ news }: MainCardProps) {
+  if (!news) {
     return (
-      <Card className="col-span-1 md:col-span-2 card-pop bg-yellow-300 relative">
-        <div className="absolute top-4 right-4 bg-red-500 text-white py-2 px-4 font-bold text-pop-base transform rotate-12 z-10 border-3 border-black rounded-lg pop-shadow">
-          ¡EXCLUSIVA!
-        </div>
-        <CardContent className="p-8 relative">
-          <h2 className="text-pop-4xl font-bold text-red-500 pop-shadow-strong mb-6">
-            ¡OOPS!
-          </h2>
-          <p className="text-pop-xl mb-6 font-comic leading-relaxed text-black">
-            ¡Parece que Furret se ha comido la noticia principal!
-          </p>
-          <div className="relative w-full h-64 mb-4">
-            <Image
-              src="/smartrotom/img/apps/furrettoday/furret2.png"
-              alt="Furret comiendo papel - Imagen de error"
-              layout="fill"
-              objectFit="contain"
-            />
+      <div className="ft-card" style={{ overflow: "hidden", gridColumn: "span 2" }}>
+        <div style={{ position: "relative", height: 320, borderBottom: "var(--ft-border)", background: "var(--ft-yellow)" }}>
+          <div aria-hidden="true" style={{
+            position: "absolute", inset: 0, opacity: 0.15,
+            backgroundImage: "radial-gradient(var(--ft-ink) 1.4px, transparent 1.6px)",
+            backgroundSize: "12px 12px",
+          }} />
+          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ position: "relative", width: 200, height: 200 }}>
+              <Image src="/smartrotom/img/apps/furrettoday/furret2.png" alt="Furret" fill className="object-contain" />
+            </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+        <div style={{ padding: "24px 26px" }}>
+          <h2 className="ft-display" style={{ fontSize: 44, margin: "0 0 8px", color: "var(--ft-pink)" }}>¡OOPS!</h2>
+          <p className="ft-deck" style={{ fontSize: 20, margin: 0 }}>Parece que Furret se ha comido la noticia principal.</p>
+        </div>
+      </div>
     );
+  }
 
-  const image = news.imageUrl
-    ? news.imageUrl
-    : "/smartrotom/img/apps/furrettoday/default.webp";
-    
+  const image = news.imageUrl || "/smartrotom/img/apps/furrettoday/default.webp";
+
   return (
-    <Card className="col-span-1 md:col-span-2 card-pop bg-white relative">
-      {/* News Flash Banner */}
-      <div className="absolute top-4 right-4 bg-red-500 text-white py-3 px-6 font-bold text-pop-base transform rotate-12 z-10 border-3 border-black rounded-lg pop-shadow">
-        ¡ÚLTIMA HORA!
-      </div>
-      
-      <div className="relative h-96">
-        <Image 
-          src={image} 
-          alt={`Imagen de ${news.title}`} 
-          layout="fill" 
-          objectFit="cover" 
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-pink-300 to-pink-500 mix-blend-multiply opacity-20"></div>
-        
-        {/* Comic style speech bubble with improved readability */}
-        <div className="speech-bubble absolute top-6 left-6 bg-yellow-300 max-w-[70%] transform -rotate-1">
-          <h2 className="text-pop-2xl md:text-pop-3xl font-bold text-black leading-tight">
-            {news.title}
-          </h2>
+    <article className="ft-card ft-lift" style={{ overflow: "hidden", display: "flex", flexDirection: "column" }}>
+      {/* Hero image */}
+      <div style={{ position: "relative", height: 320, borderBottom: "var(--ft-border)" }}>
+        <Image src={image} alt={news.title} fill className="object-cover" />
+        {/* Gradient overlay */}
+        <div style={{
+          position: "absolute", inset: 0,
+          background: "linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.5) 100%)",
+        }} />
+        {/* Badge */}
+        <div style={{ position: "absolute", top: 14, left: 14, display: "flex", gap: 8 }}>
+          <span className="ft-pill is-pink">PORTADA</span>
+        </div>
+        {/* Comic burst accent */}
+        <div style={{
+          position: "absolute", bottom: 14, right: 14,
+          background: "var(--ft-pink)", color: "#fff",
+          fontFamily: "var(--ft-font-display)", fontSize: 22,
+          padding: "8px 16px", borderRadius: 999,
+          border: "var(--ft-border)", boxShadow: "var(--ft-shadow-pop-sm)",
+          transform: "rotate(8deg)",
+        }}>
+          ¡HOT!
         </div>
       </div>
-      
-      <CardContent className="p-8 relative">
-        <div className="flex items-center mb-6">
-          <div className="h-1 bg-black flex-grow" aria-hidden="true"></div>
-          {news.subtitle && (
-            <p className="text-pop-xl font-bold mx-6 text-pink-500 font-comic">
-              {news.subtitle}
-            </p>
-          )}
-          <div className="h-1 bg-black flex-grow" aria-hidden="true"></div>
-        </div>
-        
-        <div className="text-pop-lg mb-8 font-comic leading-relaxed text-black border-l-4 border-secondary-500 pl-6">
-          {getPreview(news, 300)}
-        </div>
-        
-        <div className="text-center">
-          <InternalLink
-            href={`furrettoday/leer/${news.id}`}
-            className="btn-pop-secondary pop-focus animate-button-press inline-block"
-          >
-            {news.buttonText || "¡Leer la noticia completa!"}
+
+      {/* Content */}
+      <div style={{ padding: "24px 26px", display: "flex", flexDirection: "column", gap: 12 }}>
+        <h2 className="ft-display" style={{ margin: 0, fontSize: 44, lineHeight: 0.95 }}>
+          {news.title}
+        </h2>
+        {news.subtitle && (
+          <p className="ft-deck" style={{ margin: 0, fontSize: 20, color: "#3a3645" }}>
+            {news.subtitle}
+          </p>
+        )}
+        <p className="ft-body" style={{ margin: 0, color: "#3a3645" }}>
+          {getPreview(news, 200)}
+        </p>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, marginTop: 4 }}>
+          <span className="ft-meta">{news.author || "Redacción Furret Today"}{news.readtime ? ` · ${news.readtime}` : ""}</span>
+          <InternalLink href={`furrettoday/leer/${news.id}`} className="ft-btn">
+            {news.buttonText || "LEER LA PORTADA →"}
           </InternalLink>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </article>
   );
-};
-
-export default MainCard;
+}

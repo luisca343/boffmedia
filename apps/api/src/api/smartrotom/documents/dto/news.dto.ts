@@ -54,6 +54,15 @@ export class CreateNewsDto extends BaseDto {
   subcategory?: string;
 
   @ApiProperty({
+    description: 'News author name',
+    example: 'Lúa Caminante',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  author?: string;
+
+  @ApiProperty({
     description: 'Published status (0=draft, 1=published)',
     example: 1,
     required: false,

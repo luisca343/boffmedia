@@ -15,7 +15,7 @@ export type EvolutionNode = {
     /**
      * Form index
      */
-    index?: number;
+    index?: Record<string, any>;
     /**
      * Evolution methods
      */

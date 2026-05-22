@@ -25,6 +25,8 @@ export interface NewsDetails {
   subtitle: string;
   category: string;
   subcategory: string;
+  author: string;
+  readtime: string; // computed from content
   published: number;
   featured: number;
   content: string;

@@ -1,15 +1,15 @@
 "use client";
 
-import React from 'react';
+import React from "react";
+import Image from "next/image";
 import MainCard from "./_components/MainCard";
 import CardComponent from "./_components/CardComponent";
 import PopStyles from "./_components/PopStyles";
+import FurretHeader from "./_components/Header";
+import FurretFooter from "./_components/Footer";
+import PopArtWallpaper from "./_components/PopArtWallpaper";
+import { useGetAllNews } from "@/hooks/documents/useGetAllNews";
 import { InternalLink } from "@/components/ui/navigation/Link";
-import FurretHeader from './_components/Header';
-import FurretFooter from './_components/Footer';
-import PopArtWallpaper from './_components/PopArtWallpaper';
-import { useGetAllNews } from '@/hooks/documents/useGetAllNews';
-import { Button } from "@/components/ui/primitives/button";
 
 export interface NewsItem {
   id: number;
@@ -18,121 +18,321 @@ export interface NewsItem {
   content: string;
   buttonText: string;
   imageUrl: string;
+  author?: string;
+  category?: string;
+  readtime?: string;
 }
 
+/* ---------- Marquee ticker ---------- */
+function Ticker({ items }: { items: string[] }) {
+  const doubled = [...items, ...items];
+  return (
+    <div className="ft-marquee" role="marquee" aria-label="Titulares">
+      <div className="ft-marquee__track">
+        {doubled.map((t, i) => (
+          <span key={i} className="ft-marquee__item">
+            <span className="ft-marquee__sep" aria-hidden="true"></span>
+            {t}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Section header ---------- */
+function SectionHeader({ eyebrow, title, number }: { eyebrow: string; title: string; number: string }) {
+  return (
+    <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 24, borderBottom: "var(--ft-border)", paddingBottom: 12 }}>
+      <div style={{ display: "flex", alignItems: "flex-end", gap: 18 }}>
+        <span className="ft-stamp">{number}</span>
+        <div>
+          <div className="ft-eyebrow" style={{ color: "var(--ft-pink)" }}>{eyebrow}</div>
+          <h2 className="ft-display" style={{ margin: "4px 0 0", fontSize: "clamp(36px, 5vw, 64px)", lineHeight: 0.95 }}>
+            {title}
+          </h2>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Subscribe strip ---------- */
+function SubscribeStrip() {
+  return (
+    <section className="ft-wrap-wide" style={{ padding: "24px 24px" }}>
+      <div className="ft-card" style={{
+        background: "var(--ft-yellow)",
+        padding: "28px 32px",
+        display: "flex", alignItems: "center", justifyContent: "space-between", gap: 24, flexWrap: "wrap"
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
+          <div style={{
+            background: "var(--ft-pink)", color: "#fff",
+            fontFamily: "var(--ft-font-display)", fontSize: 20,
+            padding: "10px 18px", borderRadius: 999,
+            border: "var(--ft-border)", boxShadow: "var(--ft-shadow-pop-sm)",
+            transform: "rotate(-4deg)",
+          }}>
+            ¡POP!
+          </div>
+          <div>
+            <div className="ft-eyebrow" style={{ color: "var(--ft-ink)" }}>SEMANARIO</div>
+            <h3 className="ft-display" style={{ margin: "2px 0 6px", fontSize: 36, lineHeight: 1 }}>
+              Furret en tu SmartRotom cada semana
+            </h3>
+            <p className="ft-body" style={{ margin: 0 }}>
+              Noticias, meta, torneos y diversión de la comunidad Pokémon.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- Collector strip ---------- */
+function CollectorStrip() {
+  const issues = [
+    { n: 46, t: "Pikachu en el ladder", c: "var(--ft-yellow)" },
+    { n: 45, t: "El año del Snorlax", c: "var(--ft-cyan)" },
+    { n: 44, t: "TCG: el oro de mayo", c: "var(--ft-orange)" },
+    { n: 43, t: "Liga BoffMedia", c: "var(--ft-pink)" },
+    { n: 42, t: "Shinies: la verdad", c: "var(--ft-purple)" },
+    { n: 41, t: "VGC para todos", c: "var(--ft-lime)" },
+  ];
+  return (
+    <section className="ft-wrap-wide" style={{ padding: "16px 24px 32px" }}>
+      <SectionHeader eyebrow="ARCHIVO COLECCIONABLE" title="Números Anteriores" number="03" />
+      <div className="ft-scroll" style={{
+        display: "grid",
+        gridAutoFlow: "column",
+        gridAutoColumns: "minmax(220px, 1fr)",
+        gap: 18,
+        marginTop: 28,
+        overflowX: "auto",
+        paddingBottom: 12,
+      }}>
+        {issues.map((iss) => (
+          <div key={iss.n} className="ft-card ft-lift" style={{
+            textAlign: "left", padding: 0, overflow: "hidden", background: "#fff",
+          }}>
+            <div style={{
+              position: "relative", height: 220, background: iss.c, borderBottom: "var(--ft-border)",
+              backgroundImage: "radial-gradient(var(--ft-ink) 1.4px, transparent 1.6px)",
+              backgroundSize: "12px 12px",
+            }}>
+              <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <div style={{ position: "relative", width: 120, height: 120 }}>
+                  <Image src="/smartrotom/img/apps/furrettoday/furret2.png" alt="Furret" fill className="object-contain" style={{ transform: "rotate(-6deg)" }} />
+                </div>
+              </div>
+              <span className="ft-pill is-paper" style={{ position: "absolute", top: 10, left: 10 }}>Nº {iss.n}</span>
+            </div>
+            <div style={{ padding: "12px 14px" }}>
+              <div className="ft-display" style={{ fontSize: 22, lineHeight: 1 }}>{iss.t}</div>
+              <div className="ft-meta" style={{ marginTop: 4 }}>2026</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ---------- Main page ---------- */
 export default function FurretToday() {
-  const {featured, published} = useGetAllNews();
-  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  const { featured, published } = useGetAllNews();
+
+  const tickerItems = [
+    "NUEVO METASHIFT EN OU",
+    "TORNEO COPA FURRET EN JULIO",
+    "FILTRACIÓN: SHINY POOCHYENA",
+    "WINGULL 2.4 EN BETA",
+    "SMARTROTOM CUMPLE UN AÑO",
+    "TOP 50 DEL LADDER REVELADO",
+  ];
 
   return (
-    <div className="min-h-full relative overflow-auto">
-      <div className="absolute inset-0">
-        <PopArtWallpaper />
-      </div>
-      <div className="relative z-10 min-h-full text-black p-4 md:p-8">
-        <div className="max-w-7xl mx-auto bg-white card-pop flex flex-col overflow-hidden">
-          <FurretHeader />
-          
-          {/* Improved navigation with 8pt grid spacing */}
-          <nav 
-            id="main-navigation"
-            className="bg-gradient-to-r from-secondary-600 to-secondary-400 p-6 flex flex-wrap justify-center gap-4 relative"
-            role="navigation"
-            aria-label="Navegación principal"
-          >
-            {/* Subtle halftone pattern - positioned behind content */}
-            <div className="absolute inset-0 ben-day-dots" aria-hidden="true"></div>
-            
-            <div className="relative z-10 w-full flex flex-wrap justify-center gap-4">
-              <Button 
-                onClick={() => setIsMenuOpen(!isMenuOpen)} 
-                className="md:hidden btn-pop-primary pop-focus animate-button-press"
-                aria-expanded={isMenuOpen}
-                aria-controls="mobile-navigation"
-              >
-                {isMenuOpen ? '✕ Cerrar' : '☰ Menú'}
-              </Button>
-              
-              <div 
-                id="mobile-navigation"
-                className={`${isMenuOpen ? 'flex' : 'hidden'} md:flex flex-col md:flex-row md:space-x-4 space-y-2 md:space-y-0 w-full md:w-auto items-center justify-center`}
-              >
-                <InternalLink 
-                  href="furrettoday" 
-                  className="btn-pop-primary pop-focus animate-button-press"
+    <div className="ft-root" style={{ position: "relative" }}>
+      <PopArtWallpaper />
+      <div style={{ position: "relative", zIndex: 1 }}>
+        <FurretHeader />
+
+        {/* Cover hero */}
+        <section style={{
+          borderBottom: "var(--ft-border)",
+          background: "var(--ft-paper)",
+          position: "relative",
+          overflow: "hidden",
+        }}>
+          {/* Background halftone */}
+          <div aria-hidden="true" style={{
+            position: "absolute", inset: 0, opacity: 0.12,
+            backgroundImage: "radial-gradient(var(--ft-ink) 1.4px, transparent 1.6px)",
+            backgroundSize: "14px 14px",
+            maskImage: "linear-gradient(180deg, transparent 0%, #000 30%, #000 80%, transparent 100%)",
+            WebkitMaskImage: "linear-gradient(180deg, transparent 0%, #000 30%, #000 80%, transparent 100%)",
+          }} />
+
+          <div className="ft-wrap-wide" style={{ position: "relative", padding: "40px 24px 56px", display: "grid", gridTemplateColumns: "1.15fr 1fr", gap: 56, alignItems: "center" }}>
+            <div style={{ position: "relative", minWidth: 0 }}>
+              <span className="ft-pill is-yellow" style={{ marginBottom: 18 }}>
+                PORTADA · EDICIÓN ESPECIAL
+              </span>
+
+              <h1 className="ft-display" style={{
+                fontSize: "clamp(48px, 8vw, 120px)",
+                margin: "12px 0",
+                letterSpacing: "0.005em",
+                lineHeight: 0.86,
+                color: "var(--ft-ink)",
+                textShadow: "6px 6px 0 var(--ft-pink)",
+                wordBreak: "break-word",
+              }}>
+                {featured ? featured.title : "FURRET TODAY"}
+              </h1>
+
+              <p className="ft-deck" style={{
+                margin: "16px 0 24px",
+                fontSize: "clamp(18px, 2vw, 26px)",
+                maxWidth: 640,
+                color: "#262030",
+              }}>
+                {featured ? featured.subtitle || "Las noticias más POP de la comunidad Pokémon" : "El semanario pop de la comunidad Pokémon hispanohablante."}
+              </p>
+
+              <div style={{ display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
+                <InternalLink
+                  href={featured ? `furrettoday/leer/${featured.id}` : "#"}
+                  className="ft-btn is-primary is-lg"
                 >
-                  Inicio
+                  {featured ? "LEER LA PORTADA →" : "EXPLORAR"}
                 </InternalLink>
-                <InternalLink 
-                  href="furrettoday/editar" 
-                  className="btn-pop-primary pop-focus animate-button-press"
-                >
-                  Editar Noticias
-                </InternalLink>
-                <InternalLink 
-                  href="" 
-                  className="btn-pop-secondary pop-focus animate-button-press"
-                >
-                  SmartRotom
-                </InternalLink>
+                <span className="ft-meta">Redacción Furret Today</span>
               </div>
             </div>
-          </nav>
 
-          <div className="flex-grow">
-            {/* Featured news section with improved contrast and spacing */}
-            <section className="bg-secondary-100 py-8 px-6">
-              <div className="flex items-center mb-6">
-                <div className="h-1 bg-black flex-grow" aria-hidden="true"></div>
-                <h2 className="text-pop-3xl font-bold mx-6 text-pink-500 pop-shadow-strong px-8 py-4 bg-yellow-300 border-3 border-black transform -rotate-2 rounded-lg">
-                  ¡ÚLTIMAS NOTICIAS!
-                </h2>
-                <div className="h-1 bg-black flex-grow" aria-hidden="true"></div>
+            {/* Cover illustration area */}
+            <div style={{ position: "relative", minHeight: 400, minWidth: 0, overflow: "visible" }}>
+              {/* Big yellow circle */}
+              <div style={{
+                position: "absolute", right: "8%", top: "10%",
+                width: 300, height: 300, borderRadius: 999,
+                background: "var(--ft-yellow)",
+                border: "var(--ft-border-thick)",
+                boxShadow: "var(--ft-shadow-pop-lg)",
+              }} />
+              {/* Halftone band */}
+              <div aria-hidden="true" style={{
+                position: "absolute", right: "-4%", top: "32%",
+                width: 400, height: 180,
+                backgroundImage: "radial-gradient(var(--ft-ink) 2px, transparent 2.4px)",
+                backgroundSize: "14px 14px",
+                transform: "rotate(-8deg)",
+                opacity: 0.85,
+                maskImage: "linear-gradient(90deg, transparent 0%, #000 30%, #000 70%, transparent 100%)",
+              }} />
+              {/* Furret mascot */}
+              <div style={{
+                position: "absolute", left: "5%", bottom: "0%",
+                transform: "rotate(-6deg)",
+                filter: "drop-shadow(8px 8px 0 var(--ft-ink))",
+              }}>
+                <Image
+                  src="/smartrotom/img/apps/furrettoday/furret2.png"
+                  alt="Furret mascot"
+                  width={340}
+                  height={340}
+                  className="object-contain"
+                />
               </div>
-            </section>
-
-            <main 
-              id="main-content"
-              className="grid grid-cols-1 md:grid-cols-3 gap-8 p-8 relative"
-              role="main"
-              aria-label="Contenido principal de noticias"
-            >
-              {/* Add subtle background pattern without interfering with content */}
-              <div className="absolute inset-0 ben-day-dots" aria-hidden="true"></div>
-              
-              <div className="relative z-10 col-span-1 md:col-span-2">
-                <MainCard news={featured!} />
+              {/* Sticker */}
+              <div className="ft-sticker ft-bob" style={{
+                position: "absolute", right: 36, top: 36, fontSize: 22, padding: "10px 18px",
+                background: "var(--ft-pink)", color: "#fff",
+              }}>
+                ¡EXCLUSIVA!
               </div>
-
-              <section aria-label="Noticias destacadas" className="relative z-10">
-                <div className="space-y-8">
-                  {published && published[0] && <CardComponent variant="pink" news={published[0]} />}
-                  {published && published[1] && <CardComponent variant="red" news={published[1]} />}
-                  {published && published[2] && <CardComponent variant="yellow" news={published[2]} />}
-                </div>
-              </section>
-            </main>
-
-            {published && published.length > 3 && (
-              <section className="p-8 relative bg-white/90" aria-label="Más noticias">
-                <div className="flex items-center mb-8">
-                  <div className="h-1 bg-black flex-grow" aria-hidden="true"></div>
-                  <h2 className="text-pop-2xl font-bold mx-6 text-secondary-500 pop-shadow">
-                    Más Noticias
-                  </h2>
-                  <div className="h-1 bg-black flex-grow" aria-hidden="true"></div>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {published.slice(3).map((item, index) => (
-                    <CardComponent key={item.id} variant={index % 3 === 0 ? "blue" : index % 3 === 1 ? "purple" : "green"} news={item} />
-                  ))}
-                </div>
-              </section>
-            )}
+            </div>
           </div>
-          
-          <FurretFooter />
-        </div>
+        </section>
+
+        {/* Ticker */}
+        <Ticker items={tickerItems} />
+
+        {/* Top featured section */}
+        <section className="ft-wrap-wide" style={{ padding: "56px 24px 24px" }}>
+          <SectionHeader
+            eyebrow="LO MÁS LEÍDO ESTA SEMANA"
+            title="Las Noticias en Boca de Todos"
+            number="01"
+          />
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "1.4fr 1fr 1fr",
+            gap: 24,
+            marginTop: 32,
+          }}>
+            <div style={{ gridColumn: "span 1" }}>
+              <MainCard news={featured ?? undefined} />
+            </div>
+            <div>
+              {published && published[0] ? (
+                <CardComponent variant="pink" news={published[0]} />
+              ) : (
+                <div className="ft-card" style={{ padding: 24, height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <span className="ft-meta">Próximamente</span>
+                </div>
+              )}
+            </div>
+            <div>
+              {published && published[1] ? (
+                <CardComponent variant="purple" news={published[1]} />
+              ) : (
+                <div className="ft-card" style={{ padding: 24, height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <span className="ft-meta">Próximamente</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* Subscribe strip */}
+        <SubscribeStrip />
+
+        {/* More articles grid */}
+        {published && published.length > 2 && (
+          <section className="ft-wrap-wide" style={{ padding: "24px 24px 56px" }}>
+            <SectionHeader
+              eyebrow="REPORTAJES · COMUNIDAD · GUÍAS"
+              title="Más Páginas Que Pasar"
+              number="02"
+            />
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(3, minmax(0,1fr))",
+              gap: 24,
+              marginTop: 32,
+            }}>
+              {published.slice(2).map((item, index) => {
+                const variants = ["cyan", "orange", "lime", "yellow", "pink", "purple"];
+                return (
+                  <CardComponent
+                    key={item.id}
+                    variant={variants[index % variants.length]}
+                    news={item}
+                  />
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+        {/* Collector strip */}
+        <CollectorStrip />
+
+        <FurretFooter />
       </div>
       <PopStyles />
     </div>

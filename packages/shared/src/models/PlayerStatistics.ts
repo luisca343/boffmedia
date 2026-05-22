@@ -19,7 +19,7 @@ export type PlayerStatistics = {
     /**
      * Date of last game played
      */
-    lastPlayed: string | null;
+    lastPlayed: Record<string, any> | null;
     /**
      * Player ranking information
      */

@@ -7,7 +7,7 @@ export type SpeedTierValuesDto = {
     minPlus: number;
     max: number;
     maxPlus: number;
-    scarf: number | null;
-    scarfPlus: number | null;
+    scarf: Record<string, any> | null;
+    scarfPlus: Record<string, any> | null;
 };
 

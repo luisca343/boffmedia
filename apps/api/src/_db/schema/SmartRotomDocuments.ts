@@ -41,6 +41,7 @@ export const rotomNews = mysqlTable('rotom_news', {
   subtitle: varchar('subtitle', { length: 255 }),
   category: varchar('category', { length: 255 }),
   subcategory: varchar('subcategory', { length: 255 }),
+  author: varchar('author', { length: 255 }),
   published: int('published').notNull().default(0),
   featured: int('featured').notNull().default(0),
   content: text('content').notNull(),

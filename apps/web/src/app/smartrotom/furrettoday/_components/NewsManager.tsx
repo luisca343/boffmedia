@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Button } from "@/components/ui/primitives/button";
 import { Input } from "@/components/ui/primitives/input";
 import { DocumentsService } from "@/services/api/smartrotom/documentsService";
 import { CreateNewsDto, News } from "@boffmedia/shared";
@@ -10,6 +9,15 @@ interface NewsManagerProps {
   initialNews?: CreateNewsDto;
   onClose?: () => void;
   onSaved?: (news: News) => void;
+}
+
+function Field({ label, full, children }: { label: string; full?: boolean; children: React.ReactNode }) {
+  return (
+    <label style={{ display: "block", gridColumn: full ? "1 / -1" : "auto" }}>
+      <span className="ft-eyebrow" style={{ display: "block", marginBottom: 6, color: "var(--ft-pink)" }}>{label}</span>
+      {children}
+    </label>
+  )
 }
 
 const NewsManager: React.FC<NewsManagerProps> = ({ initialNews, onClose, onSaved }) => {
@@ -23,7 +31,9 @@ const NewsManager: React.FC<NewsManagerProps> = ({ initialNews, onClose, onSaved
       content: "",
       buttonText: "Leer más",
       imageUrl: "",
-    } as CreateNewsDto
+      author: "",
+      category: "comunidad",
+    } as CreateNewsDto & { author?: string; category?: string }
   );
 
   const handleChange = (
@@ -45,7 +55,6 @@ const NewsManager: React.FC<NewsManagerProps> = ({ initialNews, onClose, onSaved
         if (!response?.data) {
           throw new Error('No se pudo guardar la noticia');
         }
-
         sendToast(initialNews ? 'Noticia actualizada' : 'Noticia creada');
         onSaved?.(response.data);
         onClose?.();
@@ -57,110 +66,99 @@ const NewsManager: React.FC<NewsManagerProps> = ({ initialNews, onClose, onSaved
   };
 
   return (
-    <div className="bg-[#fff7d6] text-black">
-      <div className="border-b-4 border-black bg-yellow-300 px-6 py-5">
-        <h2 className="text-3xl font-bold text-pink-500 pop-shadow">
-          {initialNews ? "¡Edita la Noticia!" : "¡Crea una Nueva Noticia!"}
-        </h2>
-        <p className="mt-2 text-sm font-comic text-secondary-700">
-          Completa los datos principales y guarda para actualizar la lista al instante.
-        </p>
-      </div>
+    <form onSubmit={handleSubmit} style={{ padding: 24, position: "relative", overflow: "hidden" }}>
+      <div className="ft-eyebrow" style={{ color: "var(--ft-pink)" }}>NUEVA NOTICIA</div>
+      <h3 className="ft-display" style={{ margin: "4px 0 6px", fontSize: 38, lineHeight: 0.95 }}>
+        {initialNews ? "Editar noticia" : "Empieza un borrador"}
+      </h3>
+      <p className="ft-body" style={{ margin: "0 0 18px" }}>
+        Crea el borrador y rellena el cuerpo después en el editor.
+      </p>
 
-      <form onSubmit={handleSubmit} className="space-y-5 p-6">
-        <div className="space-y-2">
-          <label htmlFor="news-title" className="block text-sm font-bold uppercase tracking-wide text-secondary-700">
-            Titulo
-          </label>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+        <Field label="Título" full>
           <Input
-            id="news-title"
             name="title"
             value={news.title}
             onChange={handleChange}
-            placeholder="Titulo"
-            className="border-4 border-black bg-white text-base font-comic"
+            placeholder="P. ej. La dinastía Furret"
+            required
+            className="ft-input"
+            style={{ borderRadius: 14, width: "100%" }}
           />
-        </div>
-
-        <div className="space-y-2">
-          <label htmlFor="news-subtitle" className="block text-sm font-bold uppercase tracking-wide text-secondary-700">
-            Subtitulo
-          </label>
-          <Input
-            id="news-subtitle"
+        </Field>
+        <Field label="Entradilla" full>
+          <textarea
             name="subtitle"
             value={news.subtitle}
             onChange={handleChange}
-            placeholder="Subtitulo"
-            className="border-4 border-black bg-white text-base font-comic"
+            placeholder="Una frase: qué cuentas."
+            rows={2}
+            className="ft-input"
+            style={{ borderRadius: 14, width: "100%", resize: "vertical", fontFamily: "var(--ft-font-ui)", fontSize: 15, padding: "12px 16px", border: "var(--ft-border)", background: "#fff" }}
           />
-        </div>
-
-        <div className="space-y-2">
-          <label htmlFor="news-content" className="block text-sm font-bold uppercase tracking-wide text-secondary-700">
-            Contenido
-          </label>
-          <textarea
-            id="news-content"
-            name="content"
-            value={news.content}
+        </Field>
+        <Field label="Texto del botón">
+          <Input
+            name="buttonText"
+            value={news.buttonText}
             onChange={handleChange}
-            placeholder="Escribe el contenido de la noticia"
-            rows={8}
-            className="w-full resize-y rounded-xl border-4 border-black bg-white px-4 py-3 text-base font-comic outline-none focus:border-pink-500"
+            placeholder="Leer más"
+            className="ft-input"
+            style={{ borderRadius: 14, width: "100%" }}
           />
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <label htmlFor="news-button" className="block text-sm font-bold uppercase tracking-wide text-secondary-700">
-              Texto del boton
-            </label>
-            <Input
-              id="news-button"
-              name="buttonText"
-              value={news.buttonText}
-              onChange={handleChange}
-              placeholder="Leer mas"
-              className="border-4 border-black bg-white text-base font-comic"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="news-image" className="block text-sm font-bold uppercase tracking-wide text-secondary-700">
-              URL de la imagen
-            </label>
-            <Input
-              id="news-image"
-              name="imageUrl"
-              value={news.imageUrl}
-              onChange={handleChange}
-              placeholder="https://..."
-              className="border-4 border-black bg-white text-base font-comic"
-            />
-          </div>
-        </div>
-
-        <div className="flex items-center justify-end gap-3 border-t-4 border-black pt-5">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onClose}
-            disabled={isSaving}
-            className="border-4 border-black bg-white text-black hover:bg-slate-100"
+        </Field>
+        <Field label="URL imagen">
+          <Input
+            name="imageUrl"
+            value={news.imageUrl}
+            onChange={handleChange}
+            placeholder="https://…"
+            className="ft-input"
+            style={{ borderRadius: 14, width: "100%" }}
+          />
+        </Field>
+        <Field label="Autor/a">
+          <Input
+            name="author"
+            value={(news as any).author || ""}
+            onChange={handleChange}
+            placeholder="Tu nombre o alias"
+            className="ft-input"
+            style={{ borderRadius: 14, width: "100%" }}
+          />
+        </Field>
+        <Field label="Etiqueta">
+          <select
+            name="category"
+            value={(news as any).category || "comunidad"}
+            onChange={(e) => setNews({ ...news, category: e.target.value } as any)}
+            className="ft-input"
+            style={{ borderRadius: 14, width: "100%", fontFamily: "var(--ft-font-ui)", fontSize: 15, padding: "12px 16px", border: "var(--ft-border)", background: "#fff" }}
           >
-            Cancelar
-          </Button>
-          <Button
-            type="submit"
-            disabled={isSaving}
-            className="border-4 border-black bg-pink-500 px-6 text-white hover:bg-pink-600 disabled:opacity-60"
-          >
-            {isSaving ? 'Guardando...' : 'Guardar noticia'}
-          </Button>
-        </div>
-      </form>
-    </div>
+            <option value="comunidad">Comunidad</option>
+            <option value="meta">Meta · Competitivo</option>
+            <option value="torneos">Torneos</option>
+            <option value="filtraciones">Filtraciones</option>
+            <option value="fanart">Fan Art</option>
+            <option value="guias">Guías</option>
+            <option value="entrevistas">Entrevistas</option>
+          </select>
+        </Field>
+      </div>
+
+      <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 18 }}>
+        <button type="button" className="ft-btn is-ghost" onClick={onClose}>Cancelar</button>
+        <button type="submit" className="ft-btn is-primary is-lg" disabled={isSaving}>
+          {isSaving ? 'Guardando...' : initialNews ? 'Guardar cambios' : 'Crear borrador'}
+        </button>
+      </div>
+
+      {/* Decorative burst */}
+      <div aria-hidden="true" style={{ position: "absolute", top: -30, right: -30, transform: "rotate(12deg)", background: "var(--ft-yellow)", width: 120, height: 120, borderRadius: 999, display: "flex", alignItems: "center", justifyContent: "center", border: "var(--ft-border)", opacity: 0.3 }}>
+        <span className="ft-display" style={{ fontSize: 22, color: "var(--ft-ink)" }}>NEW!</span>
+      </div>
+    </form>
   );
 };
 

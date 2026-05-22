@@ -7,13 +7,13 @@ export type ChampionsRegulationDto = {
     formatId: string;
     name: string;
     gameType: string;
-    vgcPastesGid: string | null;
+    vgcPastesGid: Record<string, any> | null;
     importStatus?: ChampionsRegulationDto.importStatus;
-    importError?: string | null;
+    importError?: Record<string, any> | null;
     importTeamCount?: number;
     importFetchedCount?: number;
-    importStartedAt?: string | null;
-    importCompletedAt?: string | null;
+    importStartedAt?: Record<string, any> | null;
+    importCompletedAt?: Record<string, any> | null;
     active: number;
     createdAt: string;
 };

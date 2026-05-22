@@ -4,8 +4,8 @@
 /* eslint-disable */
 export type MatchSlotDto = {
     slotIndex: number;
-    speciesId: string | null;
-    speciesName: string | null;
+    speciesId: Record<string, any> | null;
+    speciesName: Record<string, any> | null;
     role: MatchSlotDto.role;
 };
 export namespace MatchSlotDto {

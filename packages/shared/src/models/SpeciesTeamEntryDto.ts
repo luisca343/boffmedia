@@ -6,12 +6,12 @@ import type { VgcMetaSlotDto } from './VgcMetaSlotDto';
 export type SpeciesTeamEntryDto = {
     source: SpeciesTeamEntryDto.source;
     playerId: string;
-    playerName: string | null;
-    record: string | null;
-    rank: string | null;
+    playerName: Record<string, any> | null;
+    record: Record<string, any> | null;
+    rank: Record<string, any> | null;
     slots: Array<VgcMetaSlotDto>;
     rawText: string;
-    replicaCode: string | null;
+    replicaCode: Record<string, any> | null;
 };
 export namespace SpeciesTeamEntryDto {
     export enum source {

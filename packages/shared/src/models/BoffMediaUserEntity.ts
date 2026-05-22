@@ -18,26 +18,26 @@ export type BoffMediaUserEntity = {
     /**
      * User UUID
      */
-    uuid: string | null;
+    uuid: Record<string, any> | null;
     /**
      * Profile picture URL
      */
-    profilePicture: string | null;
+    profilePicture: Record<string, any> | null;
     /**
      * Google ID for OAuth
      */
-    googleId: string | null;
+    googleId: Record<string, any> | null;
     /**
      * Discord ID for OAuth
      */
-    discordId: string | null;
+    discordId: Record<string, any> | null;
     /**
      * User creation timestamp
      */
-    createdAt: string | null;
+    createdAt: Record<string, any> | null;
     /**
      * User last update timestamp
      */
-    updatedAt: string | null;
+    updatedAt: Record<string, any> | null;
 };
 

@@ -5,15 +5,15 @@
 export type LimitlessTournamentDto = {
     id: number;
     limitlessId: string;
-    name: string | null;
-    date: string | null;
-    format: string | null;
+    name: Record<string, any> | null;
+    date: Record<string, any> | null;
+    format: Record<string, any> | null;
     regulationId: string;
-    playerCount: number | null;
+    playerCount: Record<string, any> | null;
     status: string;
     progress: number;
     total: number;
-    errorMessage?: string | null;
+    errorMessage?: Record<string, any> | null;
     fetchedAt: string;
 };
 

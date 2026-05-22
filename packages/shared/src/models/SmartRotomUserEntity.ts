@@ -18,14 +18,14 @@ export type SmartRotomUserEntity = {
     /**
      * Current Minecraft world
      */
-    world: string | null;
+    world: Record<string, any> | null;
     /**
      * User energy level
      */
-    energy: number | null;
+    energy: Record<string, any> | null;
     /**
      * Last energy charge timestamp
      */
-    lastCharge: string | null;
+    lastCharge: Record<string, any> | null;
 };
 

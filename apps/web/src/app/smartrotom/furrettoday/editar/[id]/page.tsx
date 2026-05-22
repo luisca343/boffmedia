@@ -1,214 +1,144 @@
 'use client'
 
-import dynamic from 'next/dynamic';
-import { useGetNewsById } from '@/hooks/documents/useGetNewsById';
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/primitives/alert"
-import { AlertCircle, Loader2 } from 'lucide-react'
-import { useBoffSession } from '@/services/useBoffSession';
-import { USER_ROLES } from '@boffmedia/shared/roles';
-import FurretHeader from '../../_components/Header';
-import FurretFooter from '../../_components/Footer';
-import PopArtWallpaper from '../../_components/PopArtWallpaper';
-import PopStyles from '../../_components/PopStyles';
-import { InternalLink } from "@/components/ui/navigation/Link";
+import dynamic from 'next/dynamic'
+import { useGetNewsById } from '@/hooks/documents/useGetNewsById'
+import { useBoffSession } from '@/services/useBoffSession'
+import { USER_ROLES } from '@boffmedia/shared/roles'
+import FurretHeader from '../../_components/Header'
+import FurretFooter from '../../_components/Footer'
+import PopArtWallpaper from '../../_components/PopArtWallpaper'
+import PopStyles from '../../_components/PopStyles'
+import { InternalLink } from "@/components/ui/navigation/Link"
+import Image from 'next/image'
 
-const CustomEditor = dynamic(() => import('@/components/shared/ckeditor/TestEditor'), { ssr: false });
+const CustomEditor = dynamic(() => import('@/components/shared/ckeditor/TestEditor'), { ssr: false })
 
 export default function EditNote({ params }: { params: { id: string } }) {
-  const { hasRole, status, session } = useBoffSession();
-  const token = session?.user?.accessToken ?? '';
-  const canManageNews = hasRole([USER_ROLES.ROTOM_ADMIN, USER_ROLES.ROTOM_FURRET]);
-  const { id } = params;
-  const { article, error, isLoading } = useGetNewsById(id);
+  const { hasRole, status, session } = useBoffSession()
+  const token = session?.user?.accessToken ?? ''
+  const canManageNews = hasRole([USER_ROLES.ROTOM_ADMIN, USER_ROLES.ROTOM_FURRET])
+  const { id } = params
+  const { article, error, isLoading } = useGetNewsById(id)
 
-  if (status === 'loading') {
+  /* ---------- Loading ---------- */
+  if (status === 'loading' || isLoading) {
     return (
-      <div className="min-h-full relative overflow-auto">
-        <div className="absolute inset-0">
-          <PopArtWallpaper />
-        </div>
-        <div className="relative z-10 min-h-full flex items-center justify-center p-8">
-          <div className="bg-yellow-300 card-pop p-8 text-center">
-            <h2 className="text-pop-4xl font-bold mb-6 text-pink-500 pop-shadow">
-              ¡CARGANDO!
-            </h2>
-            <p className="text-pop-xl font-comic text-secondary-600">
-              Verificando permisos... 🔐
-            </p>
+      <div className="ft-root" style={{ position: "relative" }}>
+        <PopArtWallpaper />
+        <div style={{ position: "relative", zIndex: 1 }}>
+          <FurretHeader />
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh", padding: 48 }}>
+            <div className="ft-card" style={{ padding: 48, textAlign: "center", background: "var(--ft-yellow)", maxWidth: 480 }}>
+              <div className="ft-display" style={{ fontSize: 44, color: "var(--ft-pink)" }}>¡CARGANDO!</div>
+              <p className="ft-body" style={{ margin: "12px 0" }}>Furret está preparando el editor...</p>
+              <div className="ft-skel" style={{ height: 12, marginTop: 16 }} />
+            </div>
           </div>
         </div>
         <PopStyles />
       </div>
-    );
+    )
   }
 
+  /* ---------- Access denied ---------- */
   if (!canManageNews) {
     return (
-      <div className="min-h-full relative overflow-auto">
-        <div className="absolute inset-0">
-          <PopArtWallpaper />
-        </div>
-        <div className="relative z-10 min-h-full flex items-center justify-center p-8">
-          <Alert className="card-pop bg-red-100 border-red-500 max-w-2xl">
-            <AlertCircle className="h-8 w-8" />
-            <AlertTitle className="text-pop-2xl font-bold pop-shadow text-red-600">
-              ACCESO DENEGADO
-            </AlertTitle>
-            <AlertDescription className="text-pop-lg font-comic mt-4">
-              Necesitas el rol ROTOM_ADMIN o ROTOM_FURRET para editar noticias.
-            </AlertDescription>
-            <div className="mt-6">
-              <InternalLink 
-                href="/smartrotom/furrettoday" 
-                className="btn-pop-primary pop-focus animate-button-press"
-              >
-                🏠 Volver a Furret Today
-              </InternalLink>
-            </div>
-          </Alert>
-        </div>
-        <PopStyles />
-      </div>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <div className="min-h-full relative overflow-auto">
-        <div className="absolute inset-0">
-          <PopArtWallpaper />
-        </div>
-        <div className="relative z-10 min-h-full flex items-center justify-center p-8">
-          <div className="bg-yellow-300 card-pop p-8 text-center">
-            <h2 className="text-pop-4xl font-bold mb-6 text-pink-500 pop-shadow">
-              ¡CARGANDO!
-            </h2>
-            <div className="flex justify-center mb-4">
-              <Loader2 className="h-16 w-16 animate-spin text-secondary-500" />
-            </div>
-            <p className="text-pop-xl font-comic text-secondary-600">
-              Furret está preparando el editor... 📝
-            </p>
-          </div>
-        </div>
-        <PopStyles />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-full relative overflow-auto">
-        <div className="absolute inset-0">
-          <PopArtWallpaper />
-        </div>
-        <div className="relative z-10 min-h-full flex items-center justify-center p-8">
-          <Alert className="card-pop bg-red-100 border-red-500 max-w-2xl">
-            <AlertCircle className="h-8 w-8" />
-            <AlertTitle className="text-pop-2xl font-bold pop-shadow text-red-600">
-              ¡ERROR! 💥
-            </AlertTitle>
-            <AlertDescription className="text-pop-lg font-comic mt-4">
-              No se pudo cargar el artículo. Por favor, intenta de nuevo más tarde.
-            </AlertDescription>
-            <div className="mt-6">
-              <InternalLink 
-                href="furrettoday/editar" 
-                className="btn-pop-primary pop-focus animate-button-press"
-              >
-                🏠 Volver al Editor
-              </InternalLink>
-            </div>
-          </Alert>
-        </div>
-        <PopStyles />
-      </div>
-    );
-  }
-
-  if (!article) {
-    return (
-      <div className="min-h-full relative overflow-auto">
-        <div className="absolute inset-0">
-          <PopArtWallpaper />
-        </div>
-        <div className="relative z-10 min-h-full flex items-center justify-center p-8">
-          <Alert className="card-pop bg-orange-100 border-orange-500 max-w-2xl">
-            <AlertCircle className="h-8 w-8" />
-            <AlertTitle className="text-pop-2xl font-bold pop-shadow text-orange-600">
-              ¡NO ENCONTRADO! 🔍
-            </AlertTitle>
-            <AlertDescription className="text-pop-lg font-comic mt-4">
-              El artículo solicitado no se pudo encontrar.
-            </AlertDescription>
-            <div className="mt-6">
-              <InternalLink 
-                href="furrettoday/editar" 
-                className="btn-pop-primary pop-focus animate-button-press"
-              >
-                🏠 Volver al Editor
-              </InternalLink>
-            </div>
-          </Alert>
-        </div>
-        <PopStyles />
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-full relative overflow-auto">
-      <div className="absolute inset-0">
+      <div className="ft-root" style={{ position: "relative" }}>
         <PopArtWallpaper />
-      </div>
-      <div className="relative z-10 min-h-full p-4 md:p-8">
-        <div className="max-w-7xl mx-auto bg-white card-pop flex flex-col">
+        <div style={{ position: "relative", zIndex: 1 }}>
           <FurretHeader />
-          
-          {/* Navigation breadcrumbs */}
-          <div className="bg-secondary-100 p-6 flex flex-wrap items-center font-comic border-b-4 border-black">
-            <InternalLink href="furrettoday" className="text-secondary-500 hover:underline text-pop-lg pop-focus">
-              🏠 Inicio
-            </InternalLink>
-            <span className="mx-3 text-pop-lg font-bold"> ⚡ </span>
-            <InternalLink href="furrettoday/editar" className="text-secondary-500 hover:underline text-pop-lg pop-focus">
-              📝 Editor
-            </InternalLink>
-            <span className="mx-3 text-pop-lg font-bold"> ⚡ </span>
-            <span className="font-bold text-pink-500 text-pop-lg pop-shadow">✏️ {article.title}</span>
-          </div>
-          
-          {/* Editor area */}
-          <div className="flex-grow p-6">
-            <div className="h-[70vh] border-8 border-dotted border-secondary-200 rounded-3xl bg-white relative overflow-hidden">
-              {/* Comic-style corner decoration */}
-              <div className="absolute -top-2 -right-2 w-12 h-12 bg-yellow-300 border-3 border-black rounded-full flex items-center justify-center transform rotate-12 z-10">
-                <span className="text-black font-bold text-pop-lg">✨</span>
-              </div>
-              
-              <CustomEditor
-                document={article}
-                documentId={id}
-                documentType={1}
-                type='news'
-                token={token}
-              />
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh", padding: 48 }}>
+            <div className="ft-card" style={{ padding: 48, textAlign: "center", background: "var(--ft-pink-soft)", maxWidth: 520 }}>
+              <div className="ft-display" style={{ fontSize: 44, color: "var(--ft-pink)" }}>ACCESO DENEGADO</div>
+              <p className="ft-body" style={{ margin: "12px 0 24px" }}>Necesitas el rol ROTOM_ADMIN o ROTOM_FURRET para editar noticias.</p>
+              <InternalLink href="/smartrotom/furrettoday" className="ft-btn is-primary">VOLVER A PORTADA</InternalLink>
             </div>
           </div>
-          
-          {/* Bottom decoration */}
-          <div className="h-12 bg-yellow-300 border-t-4 border-black relative overflow-hidden">
-            <div className="absolute inset-0 ben-day-dots"></div>
-            <div className="relative z-10 flex justify-center items-center h-full">
-              <span className="text-secondary-600 font-bold text-pop-base pop-shadow">📝 EDITOR INDIVIDUAL FURRET TODAY 📝</span>
-            </div>
-          </div>
-          
-          <FurretFooter />
         </div>
+        <PopStyles />
+      </div>
+    )
+  }
+
+  /* ---------- Error / Not found ---------- */
+  if (error || !article) {
+    return (
+      <div className="ft-root" style={{ position: "relative" }}>
+        <PopArtWallpaper />
+        <div style={{ position: "relative", zIndex: 1 }}>
+          <FurretHeader />
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh", padding: 48 }}>
+            <div className="ft-card" style={{ padding: 48, textAlign: "center", background: "var(--ft-yellow-soft)", maxWidth: 520 }}>
+              <div style={{ position: "relative", width: 160, height: 160, margin: "0 auto 16px" }}>
+                <Image src="/smartrotom/img/apps/furrettoday/furret2.png" alt="Furret" fill className="object-contain" />
+              </div>
+              <div className="ft-display" style={{ fontSize: 44, color: "var(--ft-pink)" }}>¡NO ENCONTRADO!</div>
+              <p className="ft-deck" style={{ fontSize: 20, margin: "12px 0 24px" }}>El artículo no se pudo encontrar.</p>
+              <InternalLink href="/smartrotom/furrettoday/editar" className="ft-btn is-primary">VOLVER AL EDITOR</InternalLink>
+            </div>
+          </div>
+        </div>
+        <PopStyles />
+      </div>
+    )
+  }
+
+  /* ---------- Editor ---------- */
+  return (
+    <div className="ft-root" style={{ position: "relative" }}>
+      <PopArtWallpaper />
+      <div style={{ position: "relative", zIndex: 1 }}>
+        <FurretHeader />
+
+        {/* Breadcrumb */}
+        <div style={{ background: "var(--ft-paper-2)", borderBottom: "1.5px dashed var(--ft-ink)" }}>
+          <div className="ft-wrap-wide" style={{ padding: "12px 24px", display: "flex", alignItems: "center", gap: 12 }}>
+            <InternalLink href="/smartrotom/furrettoday" className="ft-btn is-sm is-ghost">← Portada</InternalLink>
+            <span className="ft-meta">/</span>
+            <InternalLink href="/smartrotom/furrettoday/editar" className="ft-btn is-sm is-ghost">Editor</InternalLink>
+            <span className="ft-meta">/</span>
+            <span className="ft-meta" style={{ fontWeight: 800, color: "var(--ft-pink)" }}>{article.title}</span>
+          </div>
+        </div>
+
+        {/* Editor area */}
+        <main style={{ padding: "24px 24px 48px" }}>
+          <div className="ft-wrap-wide">
+            <div className="ft-card-flat" style={{ padding: 0, overflow: "hidden", background: "#fff" }}>
+              {/* Title row */}
+              <div style={{ padding: 20, borderBottom: "1.5px dashed var(--ft-ink)", background: "var(--ft-paper-2)" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                  <div className="ft-eyebrow" style={{ color: "var(--ft-pink)" }}>EDITANDO · #{id}</div>
+                  <span className="ft-meta">CKEditor · Furret Today</span>
+                </div>
+                <h2 className="ft-display" style={{ margin: "8px 0 0", fontSize: "clamp(28px, 3vw, 42px)", lineHeight: 1 }}>
+                  {article.title}
+                </h2>
+              </div>
+
+              {/* Editor */}
+              <div style={{ minHeight: "60vh" }}>
+                <CustomEditor
+                  document={article}
+                  documentId={id}
+                  documentType={1}
+                  type="news"
+                  token={token}
+                />
+              </div>
+
+              {/* Footer status */}
+              <div style={{ padding: "12px 20px", borderTop: "1.5px dashed var(--ft-ink)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, background: "var(--ft-paper-2)" }}>
+                <span className="ft-meta">CKEditor · estilo Furret</span>
+                <InternalLink href="/smartrotom/furrettoday/editar" className="ft-btn is-sm">← Volver a la lista</InternalLink>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <FurretFooter />
       </div>
       <PopStyles />
     </div>
-  );
+  )
 }
-

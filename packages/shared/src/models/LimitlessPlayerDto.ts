@@ -7,7 +7,7 @@ export type LimitlessPlayerDto = {
     playerName: string;
     placing: number;
     record: string;
-    drop?: number;
+    drop?: Record<string, any>;
     hasTeam: boolean;
 };
 

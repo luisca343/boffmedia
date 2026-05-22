@@ -18,11 +18,11 @@ export type PokedexRegistry = {
     /**
      * Date when first seen
      */
-    seenAt?: string;
+    seenAt?: Record<string, any>;
     /**
      * Date when caught
      */
-    caughtAt?: string;
+    caughtAt?: Record<string, any>;
     /**
      * Pokémon name
      */

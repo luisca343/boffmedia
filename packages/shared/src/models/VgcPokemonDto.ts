@@ -12,6 +12,6 @@ export type VgcPokemonDto = {
     weightkg: number;
     isRestricted: boolean;
     isMythical: boolean;
-    requiredItem: string | null;
+    requiredItem: Record<string, any> | null;
 };
 

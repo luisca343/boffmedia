@@ -24,6 +24,14 @@ export type News = {
      */
     subcategory: string;
     /**
+     * News author name
+     */
+    author: string;
+    /**
+     * Estimated read time
+     */
+    readtime: string;
+    /**
      * Published status (0=draft, 1=published)
      */
     published: number;

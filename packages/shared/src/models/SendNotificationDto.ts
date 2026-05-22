@@ -2,17 +2,13 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type NotificationResponseDto = {
-    /**
-     * Notification ID
-     */
-    id: number;
+export type SendNotificationDto = {
     /**
      * Recipient user UUID
      */
     userUuid: string;
     /**
-     * Notification type (chatapp, starbank, arcade, misiones, …)
+     * Notification type (chatapp, starbank, system, …)
      */
     type: string;
     /**
@@ -26,14 +22,10 @@ export type NotificationResponseDto = {
     /**
      * Optional deep-link URL
      */
-    link?: Record<string, any> | null;
+    link?: string | null;
     /**
-     * Whether the notification has been read
+     * SmartRotom server name (injected by client)
      */
-    isRead: number;
-    /**
-     * Creation timestamp
-     */
-    createdAt: string;
+    server?: string | null;
 };
 

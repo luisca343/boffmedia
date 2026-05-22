@@ -11,7 +11,7 @@ export type SpeedTierEntryDto = {
     abilities: Record<string, string>;
     isRestricted: boolean;
     isMythical: boolean;
-    requiredItem: string | null;
+    requiredItem: Record<string, any> | null;
     speedTiers: SpeedTierValuesDto;
 };
 

@@ -75,7 +75,7 @@ const editorConfiguration = {
 };
 
 function createSaveButton (data: any, props: {
-    updateNews: any; documentId: any; documentType: any; refresh: () => void; type?: string; getToken: () => string;
+    updateNews: any; documentId: any; documentType: any; refresh: () => void; type?: string; getToken: () => string; document?: any;
 }) {
     console.log("=== CREATE SAVE BUTTON ===");
     const endpoint = props.type === 'news' ? 'news' : 'save';
@@ -89,10 +89,19 @@ function createSaveButton (data: any, props: {
         let title = !h1 || h1[1] === '&nbsp;' ? 'Sin título' : h1[1];
         
         if(props.documentType === 1) {
+            const doc = props.document as CreateNewsDto;
             DocumentsService.updateActiveNews(documentId, {
-                content: data,
                 id: documentId,
                 title: title || "Sin título",
+                subtitle: doc.subtitle,
+                category: doc.category,
+                subcategory: doc.subcategory,
+                author: doc.author,
+                published: doc.published,
+                featured: doc.featured,
+                content: data,
+                buttonText: doc.buttonText,
+                imageUrl: doc.imageUrl,
               } as CreateNewsDto, props.getToken())
             .then(() => {
                 if(props.refresh) props.refresh();
@@ -119,6 +128,8 @@ function CustomEditor(props) {
 
     if(!props.document) return null;
     const getToken = () => tokenRef.current;
+
+    if(!props.document) return null;
 
     return (
         <CKEditor
