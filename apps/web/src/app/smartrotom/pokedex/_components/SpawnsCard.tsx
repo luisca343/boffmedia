@@ -145,7 +145,7 @@ export function SpawnsCard() {
                       <InternalLink
                         key={`${s.dex}-${s.form}-${i}`}
                         href={`/smartrotom/pokedex/entrada/${s.dex}/${s.form || "base"}`}
-                        className="relative bg-white/[0.025] border border-white/[0.06] rounded-[10px] p-2.5 flex flex-col items-center gap-1 text-surface-100 transition-all hover:-translate-y-0.5 isolation-auto hover:border-primary-400/30"
+                        className="relative bg-white/[0.025] border border-white/[0.06] rounded-[10px] p-2.5 flex flex-col items-center gap-1 text-surface-100 transition-all hover:-translate-y-0.5 isolation-isolate hover:border-primary-400/30"
                       >
                         <div
                           className="absolute inset-0 rounded-[10px] opacity-50 pointer-events-none -z-10"
