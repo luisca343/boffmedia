@@ -1,14 +1,21 @@
 import Image from "next/image";
 
-function MarqueeBanner() {
-  const items = Array.from({ length: 14 });
+function MarqueeBanner({ categories }: { categories: string[] }) {
+  const baseItems = categories.length > 0
+    ? ["FURRET TODAY", ...categories.map((c) => c.toUpperCase()), "SEMANARIO POP"]
+    : ["FURRET TODAY", "SEMANARIO POP"];
+  const repeatCount = Math.ceil(14 / baseItems.length);
+  const items = [
+    ...Array.from({ length: repeatCount }, () => baseItems).flat(),
+    ...Array.from({ length: repeatCount }, () => baseItems).flat(),
+  ];
   return (
     <div className="ft-marquee" style={{ background: "var(--ft-pink)", borderColor: "var(--ft-ink)" }}>
       <div className="ft-marquee__track">
-        {items.map((_, i) => (
+        {items.map((text, i) => (
           <span key={i} className="ft-marquee__item" style={{ color: "#fff" }}>
             <span className="ft-marquee__sep" style={{ background: "var(--ft-yellow)" }}></span>
-            FURRET TODAY · SEMANARIO POP
+            {text}
           </span>
         ))}
       </div>
@@ -16,10 +23,10 @@ function MarqueeBanner() {
   );
 }
 
-export default function FurretFooter() {
+export default function FurretFooter({ categories = [] }: { categories?: string[] }) {
   return (
     <footer style={{ background: "var(--ft-ink)", color: "var(--ft-paper)", marginTop: 64 }}>
-      <MarqueeBanner />
+      <MarqueeBanner categories={categories} />
       <div className="ft-wrap-wide" style={{ padding: "48px 24px", textAlign: "center" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 12 }}>
           <div style={{ position: "relative", width: 48, height: 48, flexShrink: 0 }}>

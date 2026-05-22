@@ -144,14 +144,17 @@ function CollectorStrip() {
 export default function FurretToday() {
   const { featured, published } = useGetAllNews();
 
-  const tickerItems = [
-    "NUEVO METASHIFT EN OU",
-    "TORNEO COPA FURRET EN JULIO",
-    "FILTRACIÓN: SHINY POOCHYENA",
-    "WINGULL 2.4 EN BETA",
-    "SMARTROTOM CUMPLE UN AÑO",
-    "TOP 50 DEL LADDER REVELADO",
-  ];
+  const allTitles = [
+    ...(featured ? [featured.title] : []),
+    ...published.map((n) => n.title),
+  ].slice(0, 8);
+  const tickerItems = allTitles.length > 0
+    ? allTitles.map((t) => t.toUpperCase())
+    : ["FURRET TODAY", "SEMANARIO POP"];
+
+  const footerCategories = Array.from(
+    new Set(published.map((n) => n.category).filter((c): c is string => Boolean(c)))
+  );
 
   return (
     <div className="ft-root" style={{ position: "relative" }}>
@@ -332,7 +335,7 @@ export default function FurretToday() {
         {/* Collector strip */}
         <CollectorStrip />
 
-        <FurretFooter />
+        <FurretFooter categories={footerCategories} />
       </div>
       <PopStyles />
     </div>
