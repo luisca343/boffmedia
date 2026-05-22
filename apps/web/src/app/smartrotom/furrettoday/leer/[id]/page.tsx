@@ -74,7 +74,7 @@ export default function ReadPage({ params }: { params: Promise<{ id: string }> |
       <div style={{ position: "relative", zIndex: 1 }}>
         <FurretHeader />
 
-        {/* Breadcrumb / utility row */}
+          {/* Breadcrumb / utility row */}
         <div style={{ background: "var(--ft-paper-2)" }}>
           <div className="ft-wrap-wide" style={{ padding: "12px 24px", display: "flex", alignItems: "center", gap: 12 }}>
             <InternalLink href="/smartrotom/furrettoday" className="ft-btn is-sm is-ghost">
@@ -84,6 +84,7 @@ export default function ReadPage({ params }: { params: Promise<{ id: string }> |
             <span className="ft-meta">ARTÍCULO</span>
           </div>
         </div>
+        <hr className="ft-divider-dashed" />
 
         {/* Title block */}
         <header style={{ position: "relative", background: "var(--ft-paper)", overflow: "hidden" }}>
@@ -160,8 +161,10 @@ export default function ReadPage({ params }: { params: Promise<{ id: string }> |
                 </div>
               </div>
 
+              <hr className="ft-divider" />
+
               {/* Article footer CTA */}
-              <div style={{ padding: 24, background: "var(--ft-yellow-soft)", borderRadius: "var(--ft-radius-lg)" }}>
+              <div style={{ padding: 24, background: "var(--ft-yellow-soft)", borderRadius: "var(--ft-radius-lg)", border: "var(--ft-border)", boxShadow: "var(--ft-shadow-pop)" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
                   <div style={{ position: "relative", width: 64, height: 64, flexShrink: 0 }}>
                     <Image src="/smartrotom/img/apps/furrettoday/furret2.png" alt="Furret" fill className="object-contain" />

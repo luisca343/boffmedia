@@ -249,6 +249,12 @@ export default function PopStyles() {
         border-top: 3px dotted var(--ft-ink);
         margin: 24px 0;
       }
+      /* Dashed divider */
+      .ft-divider-dashed {
+        border: 0;
+        border-top: 3px dashed var(--ft-ink);
+        margin: 0;
+      }
 
       /* Animations */
       @keyframes ft-pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.4 } }
