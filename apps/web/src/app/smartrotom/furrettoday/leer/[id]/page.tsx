@@ -127,6 +127,23 @@ export default function ReadPage({ params }: { params: Promise<{ id: string }> |
           </div>
         </header>
 
+        {/* Hero image strip */}
+        {article.imageUrl && (
+          <div style={{ background: "var(--ft-paper)", padding: "24px" }}>
+            <div className="ft-wrap-wide" style={{ position: "relative" }}>
+              <div className="ft-card-flat" style={{ overflow: "hidden", border: "var(--ft-border-thick)", boxShadow: "var(--ft-shadow-pop-lg)" }}>
+                <div style={{ position: "relative", width: "100%", aspectRatio: "16/9", maxHeight: "70vh" }}>
+                  <Image src={article.imageUrl} alt={article.title} fill className="object-cover" sizes="(max-width: 1200px) 100vw, 1200px" />
+                </div>
+              </div>
+              <div style={{ marginTop: 10, display: "flex", justifyContent: "space-between" }}>
+                <span className="ft-meta">Ilustración · Estudio POP de Furret Today</span>
+                <span className="ft-meta">Fig. 01</span>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Body + sidebar */}
         <main style={{ padding: "16px 24px 48px", background: "var(--ft-paper-2)" }}>
           <div className="ft-wrap-wide" style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) 300px", gap: 48, alignItems: "flex-start" }}>

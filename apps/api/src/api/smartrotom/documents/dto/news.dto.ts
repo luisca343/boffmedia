@@ -110,7 +110,16 @@ export class CreateNewsDto extends BaseDto {
   imageUrl?: string;
 }
 
-export class UpdateNewsDto extends CreateNewsDto {}
+export class UpdateNewsDto extends CreateNewsDto {
+  @ApiProperty({
+    description: 'News content',
+    example: 'Updated content...',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  content?: string;
+}
 
 export class NewsStatusDto extends BaseDto {
   @ApiProperty({

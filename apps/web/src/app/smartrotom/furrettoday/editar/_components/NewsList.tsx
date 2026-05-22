@@ -61,7 +61,7 @@ export default function NewsList({
   }, [news, searchTerm])
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+    <div style={{ display: "flex", flexDirection: "column", flexGrow: 1, minHeight: 0 }}>
       {/* Search */}
       <div style={{ padding: 14, borderBottom: "1.5px dashed var(--ft-ink)" }}>
         <input
@@ -74,7 +74,7 @@ export default function NewsList({
       </div>
 
       {/* List */}
-      <div style={{ padding: 8, display: "flex", flexDirection: "column", gap: 8, overflowY: "auto", flexGrow: 1 }}>
+      <div style={{ padding: 8, display: "flex", flexDirection: "column", gap: 8, overflowY: "auto", flexGrow: 1, minHeight: 0 }}>
         {filteredNews.length > 0 ? (
           filteredNews.map((item) => {
             const isPublished = publishedNewsIds.includes(item.id)

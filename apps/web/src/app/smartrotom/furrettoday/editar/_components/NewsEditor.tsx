@@ -32,7 +32,8 @@ function Stat({ label, value, tone }: { label: string; value: number; tone: stri
 }
 
 export default function NewsEditor() {
-  const { hasRole, status } = useBoffSession()
+  const { session, hasRole, status } = useBoffSession()
+  const token = session?.user?.accessToken ?? ''
   const canManageNews = hasRole([USER_ROLES.ROTOM_ADMIN, USER_ROLES.ROTOM_FURRET])
 
   const {
@@ -126,7 +127,7 @@ export default function NewsEditor() {
             <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
               <button
                 className={`ft-btn is-sm ${hasUnsavedChanges ? 'is-primary' : ''}`}
-                onClick={handleSave}
+                onClick={() => handleSave(token)}
                 disabled={!hasUnsavedChanges}
                 style={!hasUnsavedChanges ? { opacity: 0.55, cursor: 'not-allowed' } : {}}
               >
@@ -194,7 +195,7 @@ export default function NewsEditor() {
               </div>
 
               {/* News list */}
-              <div className="ft-scroll" style={{ overflowY: "auto", flexGrow: 1 }}>
+              <div className="ft-scroll" style={{ display: "flex", flexDirection: "column", flexGrow: 1, minHeight: 0 }}>
                 <Suspense fallback={<div style={{ padding: 24, textAlign: "center" }} className="ft-meta">Cargando...</div>}>
                   {isLoading ? (
                     <div style={{ padding: 24, textAlign: "center" }} className="ft-meta">Cargando noticias...</div>
@@ -219,6 +220,7 @@ export default function NewsEditor() {
                 selectedNewsId={selectedNewsId}
                 news={news}
                 updateNews={updateNews}
+                refreshNews={fetchNews}
               />
             </Suspense>
           </div>

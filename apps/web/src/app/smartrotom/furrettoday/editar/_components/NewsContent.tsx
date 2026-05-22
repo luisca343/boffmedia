@@ -11,6 +11,7 @@ interface NewsContentProps {
   selectedNewsId: number | null
   news: any[]
   updateNews: (id: number, content: string) => void
+  refreshNews?: () => void
 }
 
 function MetaField({ label, value, onChange, type = "input" }: { label: string; value: string; onChange: (v: string) => void; type?: "input" | "select" }) {
@@ -54,6 +55,7 @@ export default function NewsContent({
   selectedNewsId,
   news,
   updateNews,
+  refreshNews,
 }: NewsContentProps) {
   const { session } = useBoffSession()
   const token = session?.user?.accessToken ?? ''
@@ -61,6 +63,7 @@ export default function NewsContent({
   const [savingMeta, setSavingMeta] = useState(false)
   const [meta, setMeta] = useState({
     title: selectedNews?.title ?? '',
+    subtitle: (selectedNews as any)?.subtitle ?? '',
     author: (selectedNews as any)?.author ?? '',
     category: (selectedNews as any)?.category ?? 'comunidad',
     buttonText: selectedNews?.buttonText ?? '',
@@ -71,6 +74,7 @@ export default function NewsContent({
     if (selectedNews) {
       setMeta({
         title: selectedNews.title ?? '',
+        subtitle: (selectedNews as any).subtitle ?? '',
         author: (selectedNews as any).author ?? '',
         category: (selectedNews as any).category ?? 'comunidad',
         buttonText: selectedNews.buttonText ?? '',
@@ -100,17 +104,19 @@ export default function NewsContent({
   async function saveMeta() {
     setSavingMeta(true)
     try {
-      await DocumentsService.updateActiveNews(selectedNews.id, {
+      const response = await DocumentsService.updateActiveNews(selectedNews.id, {
         id: selectedNews.id,
         title: meta.title,
-        subtitle: selectedNews.subtitle,
-        content: selectedNews.content,
+        subtitle: meta.subtitle ?? selectedNews.subtitle,
+        content: selectedNews.content ?? '',
         author: meta.author,
         category: meta.category,
         buttonText: meta.buttonText,
         imageUrl: meta.imageUrl,
       } as CreateNewsDto, token)
+      if (response.error) throw new Error(response.error)
       sendToast('Metadatos guardados')
+      refreshNews?.()
     } catch {
       sendToast('Error al guardar metadatos')
     } finally {
@@ -137,6 +143,9 @@ export default function NewsContent({
         <div style={{ marginTop: 4, marginBottom: 10 }}>
           <MetaField label="Título" value={meta.title} onChange={(v) => handleMetaChange("title", v)} />
         </div>
+        <div style={{ marginBottom: 10 }}>
+          <MetaField label="Entradilla" value={meta.subtitle} onChange={(v) => handleMetaChange("subtitle", v)} />
+        </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
           <MetaField label="Autor/a" value={meta.author} onChange={(v) => handleMetaChange("author", v)} />
           <MetaField label="Etiqueta" value={meta.category} onChange={(v) => handleMetaChange("category", v)} type="select" />
@@ -155,6 +164,7 @@ export default function NewsContent({
           documentType={1}
           updateNews={updateNews}
           token={token}
+          refresh={refreshNews}
         />
       </div>
 

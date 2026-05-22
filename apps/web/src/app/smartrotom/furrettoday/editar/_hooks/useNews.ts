@@ -53,7 +53,7 @@ export function useNews() {
     }
   }
 
-  function handleSave() {
+  function handleSave(token: string) {
     if (!featuredNewsId) {
       return toast.error('Debes seleccionar una noticia destacada')
     }
@@ -62,7 +62,7 @@ export function useNews() {
       published: publishedNewsIds,
       featured: featuredNewsId,
     }
-    updateNewsStatus(statusData)
+    updateNewsStatus(statusData, token)
       .then(() => {
         setHasUnsavedChanges(false)
         toast.success('News status updated successfully')

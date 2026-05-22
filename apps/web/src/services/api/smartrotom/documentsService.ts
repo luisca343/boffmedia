@@ -137,8 +137,8 @@ export class DocumentsService {
   /**
    * Update news article status
    */
-  static updateNewsStatus(data: NewsStatusDto) {
-    return rotomPOST<SuccessResponse>('/documents/newsstatus', data);
+  static updateNewsStatus(data: NewsStatusDto, token: string) {
+    return apiAuthedPOST<SuccessResponse>('/smartrotom/documents/newsstatus', data, token);
   }
 
   // ==================== CONVENIENCE METHODS ====================
