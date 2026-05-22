@@ -142,37 +142,38 @@ export function SpawnsCard() {
                     const isNew = status === PokedexStatus.UNSEEN
                     const spriteUrl = getSpriteUrl({ id: s.dex, form: s.form || "base", palette: s.palette || "none" })
                     return (
-                      <InternalLink
+                      <div
                         key={`${s.dex}-${s.form}-${i}`}
-                        href={`/smartrotom/pokedex/entrada/${s.dex}/${s.form || "base"}`}
-                        className="relative bg-white/[0.025] border border-white/[0.06] rounded-[10px] p-2.5 flex flex-col items-center gap-1 text-surface-100 transition-all hover:-translate-y-0.5 isolation-isolate hover:border-primary-400/30"
+                        className="rounded-[10px] transition-all hover:-translate-y-0.5"
+                        style={{
+                          background: `radial-gradient(80px 60px at 50% 0%, ${meta.fg}, transparent 70%), rgba(255, 255, 255, 0.025)`,
+                        }}
                       >
-                        <div
-                          className="absolute inset-0 rounded-[10px] opacity-50 pointer-events-none -z-10"
-                          style={{
-                            background: `radial-gradient(80px 60px at 50% 0%, ${meta.fg}, transparent 70%)`,
-                          }}
-                        />
-                        {isNew && (
-                          <span
-                            className="absolute top-1.5 right-1.5 font-jetbrains text-[8px] font-bold tracking-widest px-1 py-px rounded"
-                            style={{ background: meta.fg, color: "#030609" }}
-                          >
-                            {t("hub_spawns_new")}
+                        <InternalLink
+                          href={`/smartrotom/pokedex/entrada/${s.dex}/${s.form || "base"}`}
+                          className="relative border border-white/[0.06] rounded-[10px] p-2.5 flex flex-col items-center gap-1 text-surface-100 hover:border-primary-400/30"
+                        >
+                          {isNew && (
+                            <span
+                              className="absolute top-1.5 right-1.5 font-jetbrains text-[8px] font-bold tracking-widest px-1 py-px rounded"
+                              style={{ background: meta.fg, color: "#030609" }}
+                            >
+                              {t("hub_spawns_new")}
+                            </span>
+                          )}
+                          <Image
+                            src={spriteUrl!}
+                            alt={s.species}
+                            width={56}
+                            height={56}
+                            style={{ imageRendering: "pixelated", filter: "drop-shadow(0 3px 4px rgba(0,0,0,.3))" }}
+                          />
+                          <span className="text-[11px] font-medium text-surface-200 text-center leading-tight">{s.species}</span>
+                          <span className="font-jetbrains text-[11px] tabular-nums font-semibold" style={{ color: meta.fg }}>
+                            {formatPercentage(s.percentage)}%
                           </span>
-                        )}
-                        <Image
-                          src={spriteUrl!}
-                          alt={s.species}
-                          width={56}
-                          height={56}
-                          style={{ imageRendering: "pixelated", filter: "drop-shadow(0 3px 4px rgba(0,0,0,.3))" }}
-                        />
-                        <span className="text-[11px] font-medium text-surface-200 text-center leading-tight">{s.species}</span>
-                        <span className="font-jetbrains text-[11px] tabular-nums font-semibold" style={{ color: meta.fg }}>
-                          {formatPercentage(s.percentage)}%
-                        </span>
-                      </InternalLink>
+                        </InternalLink>
+                      </div>
                     )
                   })}
                 </div>
