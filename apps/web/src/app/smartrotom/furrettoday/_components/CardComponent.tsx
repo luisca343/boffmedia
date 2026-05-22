@@ -48,20 +48,39 @@ export default function CardComponent({ variant = "default", news }: CardCompone
   return (
     <article className="ft-card ft-lift" style={{ overflow: "hidden", display: "flex", flexDirection: "column", height: "100%" }}>
       {/* Hero area */}
-      <div style={{ position: "relative", height: 180, borderBottom: "var(--ft-border)", background: accent }}>
+      <div style={{ position: "relative", height: 180, borderBottom: "var(--ft-border)", background: accent, overflow: "hidden" }}>
         {/* Halftone overlay */}
         <div aria-hidden="true" style={{
           position: "absolute", inset: 0, opacity: 0.15,
           backgroundImage: `radial-gradient(var(--ft-ink) 1.4px, transparent 1.6px)`,
           backgroundSize: "12px 12px",
         }} />
-        {hasImage && (
+        {hasImage ? (
           <Image
             src={news.imageUrl}
             alt={news.title}
             fill
             className="object-cover"
           />
+        ) : (
+          <div aria-hidden="true" style={{
+            position: "absolute", inset: 0,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            padding: "16px 20px",
+          }}>
+            <span style={{
+              fontFamily: "var(--ft-font-display)",
+              fontSize: "clamp(22px, 3.5vw, 36px)",
+              lineHeight: 1.0,
+              letterSpacing: "0.02em",
+              color: "var(--ft-ink)",
+              textAlign: "center",
+              wordBreak: "break-word",
+              textShadow: "3px 3px 0 rgba(255,255,255,0.35)",
+            }}>
+              {news.category?.toUpperCase() || news.subtitle?.toUpperCase() || "NOTICIA"}
+            </span>
+          </div>
         )}
         <span className={`ft-pill ${pill}`} style={{ position: "absolute", top: 12, left: 12 }}>
           {news.subtitle || "NOTICIA"}
