@@ -75,7 +75,7 @@ export default function ReadPage({ params }: { params: Promise<{ id: string }> |
         <FurretHeader />
 
         {/* Breadcrumb / utility row */}
-        <div style={{ background: "var(--ft-paper-2)", borderBottom: "1.5px dashed var(--ft-ink)" }}>
+        <div style={{ background: "var(--ft-paper-2)" }}>
           <div className="ft-wrap-wide" style={{ padding: "12px 24px", display: "flex", alignItems: "center", gap: 12 }}>
             <InternalLink href="/smartrotom/furrettoday" className="ft-btn is-sm is-ghost">
               ← Portada
@@ -86,7 +86,7 @@ export default function ReadPage({ params }: { params: Promise<{ id: string }> |
         </div>
 
         {/* Title block */}
-        <header style={{ position: "relative", borderBottom: "var(--ft-border)", background: "var(--ft-paper)", overflow: "hidden" }}>
+        <header style={{ position: "relative", background: "var(--ft-paper)", overflow: "hidden" }}>
           <div aria-hidden="true" style={{
             position: "absolute", inset: 0, opacity: 0.10,
             backgroundImage: "radial-gradient(var(--ft-ink) 1.4px, transparent 1.6px)",
@@ -132,7 +132,7 @@ export default function ReadPage({ params }: { params: Promise<{ id: string }> |
           <div className="ft-wrap-wide" style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) 300px", gap: 48, alignItems: "flex-start" }}>
             {/* Article body */}
             <article>
-              <div className="ft-card-flat" style={{ overflow: "hidden", border: "var(--ft-border-thick)", boxShadow: "var(--ft-shadow-pop)", marginBottom: 32 }}>
+              <div style={{ overflow: "hidden", marginBottom: 32, background: "#fff", borderRadius: "var(--ft-radius)" }}>
                 <div style={{ position: "relative", minHeight: 400, background: "var(--ft-paper-2)" }}>
                   <CustomEditor
                     document={{ ...article!, content: articleContent }}
@@ -144,7 +144,7 @@ export default function ReadPage({ params }: { params: Promise<{ id: string }> |
               </div>
 
               {/* Article footer CTA */}
-              <div className="ft-card" style={{ padding: 24, background: "var(--ft-yellow-soft)" }}>
+              <div style={{ padding: 24, background: "var(--ft-yellow-soft)", borderRadius: "var(--ft-radius-lg)" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
                   <div style={{ position: "relative", width: 64, height: 64, flexShrink: 0 }}>
                     <Image src="/smartrotom/img/apps/furrettoday/furret2.png" alt="Furret" fill className="object-contain" />
@@ -165,7 +165,7 @@ export default function ReadPage({ params }: { params: Promise<{ id: string }> |
             {/* Sidebar */}
             <aside style={{ position: "sticky", top: 24, display: "flex", flexDirection: "column", gap: 20 }}>
               {/* Share */}
-              <div className="ft-card-flat" style={{ padding: 16 }}>
+              <div style={{ padding: 16, background: "#fff", borderRadius: "var(--ft-radius)" }}>
                 <div className="ft-eyebrow" style={{ color: "var(--ft-pink)", marginBottom: 8 }}>COMPARTIR</div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 8 }}>
                   <button className="ft-btn is-sm">Discord</button>
@@ -175,7 +175,7 @@ export default function ReadPage({ params }: { params: Promise<{ id: string }> |
 
               {/* Related articles */}
               {related.length > 0 && (
-                <div className="ft-card-flat" style={{ padding: 16 }}>
+                <div style={{ padding: 16, background: "#fff", borderRadius: "var(--ft-radius)" }}>
                   <div className="ft-eyebrow" style={{ color: "var(--ft-pink)", marginBottom: 12 }}>SEGUIR LEYENDO</div>
                   <div style={{ display: "grid", gap: 12 }}>
                     {related.map((a, i) => (
