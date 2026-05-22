@@ -150,7 +150,7 @@ export function SpawnsCard() {
                         <div
                           className="absolute inset-0 rounded-[10px] opacity-50 pointer-events-none -z-10"
                           style={{
-                            background: `radial-gradient(80px_60px_at_50%_0%,${meta.fg},transparent_70%)`,
+                            background: `radial-gradient(80px 60px at 50% 0%, ${meta.fg}, transparent 70%)`,
                           }}
                         />
                         {isNew && (
