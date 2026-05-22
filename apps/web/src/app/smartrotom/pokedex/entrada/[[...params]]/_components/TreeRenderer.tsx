@@ -1,5 +1,5 @@
 import React from "react"
-import { SubTree } from "@/types/pokedex"
+import { SubTree, PokemonEvo } from "@/types/pokedex"
 import { Evolution } from "@/types/Pokemon"
 import { PokemonSpriteLink } from "../../../_components/PokemonSprite"
 import { getEvolutionMethod } from "./EvolutionConditions"
@@ -10,68 +10,127 @@ interface TreeRendererProps {
   isCurrent?: boolean
 }
 
+function PokemonCard({ node, formKey, isCurrent }: { node: PokemonEvo; formKey: string; isCurrent: boolean }) {
+  const form = formKey.split("_")[1] || "base"
+  return (
+    <div
+      className={`flex flex-col items-center gap-1.5 p-3 min-w-[100px] rounded-xl transition-all shrink-0 ${
+        isCurrent
+          ? "bg-primary-400/[0.08] border border-primary-400/50 shadow-[0_0_18px_rgba(249,115,22,0.15)]"
+          : "bg-white/[0.02] border border-white/[0.06] hover:border-primary-400/30 hover:bg-primary-400/[0.04]"
+      }`}
+    >
+      <PokemonSpriteLink
+        id={node.dex}
+        form={form}
+        palette="none"
+        width={64}
+        height={64}
+        hide={true}
+        displayName={true}
+        url={node.spriteUrl}
+      />
+      <span className="font-jetbrains text-[10px] text-surface-400">
+        #{String(node.dex).padStart(3, "0")}
+      </span>
+    </div>
+  )
+}
+
 export function TreeRenderer({ tree, t, isCurrent = false }: TreeRendererProps) {
   return (
-    <div className="flex flex-col justify-center items-start">
+    <div className="flex flex-col gap-4">
       {Object.keys(tree).map((key: string) => {
-        const [, form] = key.split("_")
-        const subTree = tree[key]
-        const evos = subTree.evos
-
-        if (Object.keys(subTree).length === 0 || !subTree.pkm) return null
+        const node = tree[key]
+        const evoKeys = Object.keys(node.evos || {})
+        if (!node.pkm) return null
+        const branchCount = evoKeys.length
 
         return (
           <div key={key} className="flex flex-row items-center">
-            {/* Pokémon card */}
-            <div
-              className={`flex flex-col items-center gap-2 p-3.5 min-w-[120px] rounded-xl cursor-pointer transition-all ${
-                isCurrent
-                  ? "bg-primary-400/[0.08] border border-primary-400/50 shadow-[0_0_18px_rgba(249,115,22,0.15)]"
-                  : "bg-white/[0.02] border border-white/[0.06] hover:border-primary-400/30 hover:bg-primary-400/[0.04]"
-              }`}
-            >
-              <PokemonSpriteLink
-                id={subTree.dex}
-                form={form}
-                palette="none"
-                width={64}
-                height={64}
-                hide={true}
-                displayName={true}
-                url={subTree.spriteUrl}
-              />
-              <span className="font-jetbrains text-[10px] text-surface-400">
-                #{String(subTree.dex).padStart(3, "0")}
-              </span>
-            </div>
+            {/* Base Pokémon card */}
+            <PokemonCard node={node} formKey={key} isCurrent={isCurrent} />
 
-            {/* Evolutions column — stacked vertically for branching trees */}
-            {Object.keys(evos)?.length > 0 && (
-              <div className="flex flex-col">
-                {Object.keys(evos).map((evo: any) => {
-                  const thisEvos = evos[evo]
-                  return (
-                    <div key={evo} className="flex items-center gap-1 p-2">
-                      {/* Arrow + method */}
-                      <div className="flex flex-col items-center gap-1 shrink-0 px-1">
-                        {thisEvos.methods?.map((method: Evolution, methodIndex: number) => (
-                          <div key={`method-${methodIndex}`} className="font-jetbrains text-[10px] text-surface-300 tracking-wider text-center">
-                            {getEvolutionMethod(method, t)}
-                          </div>
-                        ))}
-                        <div className="flex flex-col items-center gap-1">
-                          <div className="w-9 h-px bg-surface-600" />
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className="text-surface-500">
-                            <path d="M9 18l6-6-6-6" />
-                          </svg>
+            {branchCount > 0 && (
+              <>
+                {/*
+                  Single horizontal stub from the card's center to the junction point.
+                  items-center on the parent ensures this stub sits at the card's midline,
+                  which for multiple branches is also the midpoint of the vertical junction bar.
+                */}
+                <div className="w-5 h-px bg-white/[0.2] shrink-0" />
+
+                {/*
+                  Branch column. left: 0 here is the junction point (end of stub).
+                  The vertical bar is anchored here and spans from first-branch-center
+                  to last-branch-center using the (50% / N) formula.
+                */}
+                <div className="relative flex flex-col">
+                  {branchCount > 1 && (
+                    <div
+                      className="absolute w-px bg-white/[0.2] pointer-events-none"
+                      style={{
+                        left: 0,
+                        top: `calc(50% / ${branchCount})`,
+                        bottom: `calc(50% / ${branchCount})`,
+                      }}
+                    />
+                  )}
+
+                  {evoKeys.map((evoKey: string) => {
+                    const evoNode = node.evos[evoKey]
+                    const methods = evoNode.methods ?? []
+
+                    return (
+                      <div key={evoKey} className="flex flex-row items-center py-2">
+                        {/* Short elbow from junction bar to method pill */}
+                        <div className="w-4 h-px bg-white/[0.2] shrink-0" />
+
+                        {/*
+                          Method pill — fixed 170 px so every branch has identical
+                          horizontal span regardless of method text length.
+                          Multiple methods for the same target are stacked with "o" divider.
+                        */}
+                        <div className="w-[170px] bg-white/[0.05] border border-white/[0.1] rounded-lg px-2.5 py-1.5 text-center shrink-0 overflow-hidden">
+                          {methods.map((method: Evolution, i: number) => (
+                            <React.Fragment key={i}>
+                              {i > 0 && (
+                                <div className="font-jetbrains text-[8px] uppercase tracking-widest text-surface-600 my-0.5">
+                                  o
+                                </div>
+                              )}
+                              {getEvolutionMethod(method, t)}
+                            </React.Fragment>
+                          ))}
+                        </div>
+
+                        {/* Arrow connector to the next card */}
+                        <div className="w-3 h-px bg-white/[0.2] shrink-0" />
+                        <svg
+                          width="8"
+                          height="12"
+                          viewBox="0 0 8 12"
+                          fill="none"
+                          className="text-surface-500 shrink-0"
+                        >
+                          <path
+                            d="M1 1.5 6.5 6 1 10.5"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+
+                        {/* Recursive subtree for the evolution target */}
+                        <div className="ml-1">
+                          <TreeRenderer tree={{ [evoKey]: evoNode }} t={t} />
                         </div>
                       </div>
-                      {/* Recursive subtree */}
-                      <TreeRenderer tree={{ [evo]: thisEvos }} t={t} />
-                    </div>
-                  )
-                })}
-              </div>
+                    )
+                  })}
+                </div>
+              </>
             )}
           </div>
         )

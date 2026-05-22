@@ -4,7 +4,7 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
-type TableVariant = "default" | "wingull"
+type TableVariant = "default" | "wingull" | "dex"
 
 const TableVariantContext = React.createContext<TableVariant>("default")
 
@@ -16,12 +16,13 @@ const Table = React.forwardRef<HTMLTableElement, TableProps>(
   ({ className, variant = "default", ...props }, ref) => {
     const variantStyles = {
       default: "bg-surface-800",
-      wingull: "border-0"
+      wingull: "border-0",
+      dex: ""
     }
 
     return (
       <TableVariantContext.Provider value={variant}>
-        <div className={cn("relative w-full overflow-auto rounded-lg", variantStyles[variant])}>
+        <div className={cn("relative w-full overflow-auto", variantStyles[variant])}>
           <table
             ref={ref}
             className={cn("w-full caption-bottom text-sm", className)}
@@ -44,7 +45,8 @@ const TableHeader = React.forwardRef<
 
   const variantStyles = {
     default: "border-surface-700/60 bg-surface-950/70",
-    wingull: "border-secondary-900 bg-secondary-950"
+    wingull: "border-secondary-900 bg-secondary-950",
+    dex: ""
   }
 
   return (
@@ -69,7 +71,8 @@ const TableBody = React.forwardRef<
 
   const variantStyles = {
     default: "bg-surface-800",
-    wingull: "bg-white"
+    wingull: "bg-white",
+    dex: ""
   }
 
   return (
@@ -90,7 +93,8 @@ const TableFooter = React.forwardRef<
 
   const variantStyles = {
     default: "border-surface-700 bg-surface-700/50",
-    wingull: "border-secondary-200 bg-secondary-50"
+    wingull: "border-secondary-200 bg-secondary-50",
+    dex: ""
   }
 
   return (
@@ -115,7 +119,8 @@ const TableRow = React.forwardRef<
 
   const variantStyles = {
     default: "border-surface-700/50 hover:bg-primary-500/[0.05] data-[state=selected]:bg-primary-500/10 transition-colors duration-150",
-    wingull: "border-secondary-100 hover:bg-secondary-50 data-[state=selected]:bg-secondary-100"
+    wingull: "border-secondary-100 hover:bg-secondary-50 data-[state=selected]:bg-secondary-100",
+    dex: ""
   }
 
   return (
@@ -140,7 +145,8 @@ const TableHead = React.forwardRef<
 
   const variantStyles = {
     default: "text-primary-400 text-[11px] uppercase tracking-wider font-bold",
-    wingull: "text-white font-semibold text-xs uppercase tracking-wider"
+    wingull: "text-white font-semibold text-xs uppercase tracking-wider",
+    dex: ""
   }
 
   return (
@@ -165,7 +171,8 @@ const TableCell = React.forwardRef<
 
   const variantStyles = {
     default: "text-surface-200",
-    wingull: "text-secondary-950"
+    wingull: "text-secondary-950",
+    dex: ""
   }
 
   return (
@@ -190,7 +197,8 @@ const TableCaption = React.forwardRef<
 
   const variantStyles = {
     default: "text-surface-500",
-    wingull: "text-secondary-500"
+    wingull: "text-secondary-500",
+    dex: ""
   }
 
   return (

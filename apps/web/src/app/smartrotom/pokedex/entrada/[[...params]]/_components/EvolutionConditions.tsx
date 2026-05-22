@@ -13,32 +13,32 @@ export function getEvolutionMethod(evolution: Evolution, t: any) {
       const [modId, itemId] = evolution.item?.itemID.split(':') || []
       conditions.push(
         <div className="flex items-center justify-center" key="interact">
-          <span className='mx-1'>{t(`pokedex.evolution_interact`, {item: t(`pokedex.item_${itemId}`)})}</span>
+          <span className='mx-1'>{t(`evolution_interact`, {item: t(`item_${itemId}`)})}</span>
           <ItemSprite name={itemId} width={30} height={30}/>
         </div>
       )
       break
     case "leveling":
       if(evolution.level) conditions.push(
-        <span key="leveling" className="font-medium">{t(`pokedex.evolution_level`, {level: evolution.level})}</span>
+        <span key="leveling" className="font-medium">{t(`evolution_level`, {level: evolution.level})}</span>
       )
       else conditions.push(
-        <span key="leveling" className="font-medium">{t(`pokedex.evolution_leveling`)}</span>
+        <span key="leveling" className="font-medium">{t(`evolution_leveling`)}</span>
       )
       break
     case "trade":
       conditions.push(
-        <span key="trade" className="font-medium">{t(`pokedex.evolution_trade`)}</span>
+        <span key="trade" className="font-medium">{t(`evolution_trade`)}</span>
       )
       break
     case "ticking":
       conditions.push(
-        <span key="ticking" className="font-medium">{t(`pokedex.evolution_ticking`)}</span>
+        <span key="ticking" className="font-medium">{t(`evolution_ticking`)}</span>
       )
       break
     case "emptyslot":
       conditions.push(
-        <span key="emptyslot" className="font-medium">{t(`pokedex.evolution_emptyslot`)}</span>
+        <span key="emptyslot" className="font-medium">{t(`evolution_emptyslot`)}</span>
       )
       break
     default:
@@ -59,20 +59,10 @@ export function getEvolutionMethod(evolution: Evolution, t: any) {
   }
 
   return (
-    <div
-      className="flex flex-col text-center w-[300px] h-[100px] justify-center rounded-lg"
-      style={{
-        backgroundImage: 'url(/smartrotom/img/apps/pokedex/arrow.webp)',
-        backgroundSize: 'contain',
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center',
-      }}
-    >
-      <div className="space-y-1 text-shadow-border1">
-        {conditions?.map((condition, i) => (
-          <div key={`cond-${i}`} className="text-sm text-surface-100">{condition}</div>
-        ))}
-      </div>
+    <div className="flex flex-col items-center gap-0.5 text-center">
+      {conditions.map((condition, i) => (
+        <div key={`cond-${i}`} className="text-[11px] text-surface-200 leading-tight">{condition}</div>
+      ))}
     </div>
   )
 }
@@ -84,7 +74,7 @@ function addConditionByType(condition: any, conditionKey: string, conditions: Re
   switch(conditionType) {
     case "friendship":
       conditions.push(
-        <span key={conditionKey}>{t(`pokedex.evolution_friendship`, {value: condition.friendship})}</span>
+        <span key={conditionKey}>{t(`evolution_friendship`, {value: condition.friendship})}</span>
       )
       break
       
@@ -103,7 +93,7 @@ function addConditionByType(condition: any, conditionKey: string, conditions: Re
       
     case "moveType":
       conditions.push(
-        <span key={conditionKey}>{t(`pokedex.evolution_moveType`, {type: condition.type})}</span>
+        <span key={conditionKey}>{t(`evolution_moveType`, {type: condition.type})}</span>
       )
       break
       
@@ -121,7 +111,7 @@ function addConditionByType(condition: any, conditionKey: string, conditions: Re
             <InformationCircleIcon className="h-4 w-4 ml-1 text-primary-300" />
           </HoverCardTrigger>
           <HoverCardContent className="w-96 bg-surface-800 text-surface-50 border border-white/[0.06] rounded-lg z-50 shadow-xl p-4 font-normal">
-            {biomes.map(biome => t(biome)).join(', ')}
+            {biomes.join(', ')}
           </HoverCardContent>
         </HoverCard>
       )
@@ -129,7 +119,7 @@ function addConditionByType(condition: any, conditionKey: string, conditions: Re
       
     case "evolutionRock":
       conditions.push(
-        <span key={conditionKey}>{t(`pokedex.evolution_rock`, {evolutionRock: t(`${condition.evolutionRock}`)})}</span>
+        <span key={conditionKey}>{t(`evolution_rock`, {evolutionRock: t(`${condition.evolutionRock}`)})}</span>
       )
       break
       
@@ -138,7 +128,7 @@ function addConditionByType(condition: any, conditionKey: string, conditions: Re
       const natures = condition.natures
       const nature = natures.map((nature: string) => t(`nature_${nature.toLowerCase()}`)).join(", ")
       conditions.push(
-        <span key={conditionKey}>{t(`pokedex.evolution_nature`, {nature})}</span>
+        <span key={conditionKey}>{t(`evolution_nature`, {nature})}</span>
       )
       break
       
@@ -150,7 +140,7 @@ function addConditionByType(condition: any, conditionKey: string, conditions: Re
         ...(condition.withPalettes as string[] || [])
       ]
       conditions.push(
-        <span key={conditionKey}>{t(`pokedex.evolution_party`, {party: partyMembers.join(", ")})}</span>
+        <span key={conditionKey}>{t(`evolution_party`, {party: partyMembers.join(", ")})}</span>
       )
       break
       
@@ -158,7 +148,7 @@ function addConditionByType(condition: any, conditionKey: string, conditions: Re
       const [modId, itemId] = condition.item.itemID.split(':') || []
       conditions.push(
         <div key={conditionKey} className="flex items-center justify-center">
-          <span className='mx-1'>{t(`pokedex.evolution_heldItem`, {item: t(`item_${itemId}`)})}</span>
+          <span className='mx-1'>{t(`evolution_heldItem`, {item: t(`item_${itemId}`)})}</span>
           <ItemSprite name={itemId} width={30} height={30}/>
         </div>
       )
@@ -166,14 +156,14 @@ function addConditionByType(condition: any, conditionKey: string, conditions: Re
       
     case "critical":
       conditions.push(
-        <span key={conditionKey}>{t(`pokedex.evolution_critical`, {critical: condition.critical})}</span>
+        <span key={conditionKey}>{t(`evolution_critical`, {critical: condition.critical})}</span>
       )
       break
       
     case "statRatio":
       if(condition.ratio === 1) {
         conditions.push(
-          <span key={conditionKey}>{t(`pokedex.evolution_statRatio`, {stat1: condition.stat1, stat2: condition.stat2})}</span>
+          <span key={conditionKey}>{t(`evolution_statRatio`, {stat1: condition.stat1, stat2: condition.stat2})}</span>
         )
       }
       break
@@ -181,21 +171,21 @@ function addConditionByType(condition: any, conditionKey: string, conditions: Re
     case "move":
       const attackName = condition.attackName.toLowerCase().replace(" ", "_")
       conditions.push(
-        <span key={conditionKey}>{t(`pokedex.evolution_move`, {attackName: t(`attack_${attackName}`)})}</span>
+        <span key={conditionKey}>{t(`evolution_move`, {attackName: t(`attack_${attackName}`)})}</span>
       )
       break
       
     case "status":
       const status = condition.type.toLowerCase()
       conditions.push(
-        <span key={conditionKey}>{t(`pokedex.evolution_status`, {status: t(`status_${status}`)})}</span>
+        <span key={conditionKey}>{t(`evolution_status`, {status: t(`status_${status}`)})}</span>
       )
       break
       
     case "chance":
       const chance = condition.chance * 100
       conditions.push(
-        <span key={conditionKey}>{t(`pokedex.evolution_chance`, {chance})}</span>
+        <span key={conditionKey}>{t(`evolution_chance`, {chance})}</span>
       )
       break
       
@@ -203,70 +193,70 @@ function addConditionByType(condition: any, conditionKey: string, conditions: Re
       const move = condition.move.toLowerCase().replace(" ", "_") as string
       const uses = condition.uses as number
       conditions.push(
-        <span key={conditionKey}>{t(`pokedex.evolution_moveuses`, {move: t(`attack_${move}`), uses})}</span>
+        <span key={conditionKey}>{t(`evolution_moveuses`, {move: t(`attack_${move}`), uses})}</span>
       )
       break
       
     case "gender":
       const genders = condition.genders as string[]	
       conditions.push(
-        <span key={conditionKey}>{t(`pokedex.evolution_gender`, {genders: genders?.join(", ")})}</span>
+        <span key={conditionKey}>{t(`evolution_gender`, {genders: genders?.join(", ")})}</span>
       )
       break
       
     case "recoil":
       conditions.push(
-        <span key={conditionKey}>{t(`pokedex.evolution_recoil`, {recoil: condition.recoil})}</span>
+        <span key={conditionKey}>{t(`evolution_recoil`, {recoil: condition.recoil})}</span>
       )
       break
       
     case "healthAbsence":
       conditions.push(
-        <span key={conditionKey}>{t(`pokedex.evolution_healthAbsence`, {health: condition.health})}</span>
+        <span key={conditionKey}>{t(`evolution_healthAbsence`, {health: condition.health})}</span>
       )
       break
       
     case "shiny":
       if(condition.shiny) {
         conditions.push(
-          <span key={conditionKey} className="text-yellow-300 font-medium">{t(`pokedex.palette_shiny`)}</span>
+          <span key={conditionKey} className="text-yellow-300 font-medium">{t(`palette_shiny`)}</span>
         )
       }
       break
       
     case "highAltitude":
       conditions.push(
-        <span key={conditionKey}>{t(`pokedex.evolution_highAltitude`, {minAltitude: condition.minAltitude})}</span>
+        <span key={conditionKey}>{t(`evolution_highAltitude`, {minAltitude: condition.minAltitude})}</span>
       )
       break
       
     case "weather":
       conditions.push(
-        <span key={conditionKey}>{t(`pokedex.evolution_weather`, {weather: t(`weather_${condition.weather.toLowerCase()}`)})}</span>
+        <span key={conditionKey}>{t(`evolution_weather`, {weather: t(`weather_${condition.weather.toLowerCase()}`)})}</span>
       )
       break
       
     case "nuggets":
       conditions.push(
-        <span key={conditionKey}>{t(`pokedex.evolution_nuggets`, {nuggets: condition.nuggets})}</span>
+        <span key={conditionKey}>{t(`evolution_nuggets`, {nuggets: condition.nuggets})}</span>
       )
       break
       
     case "evolutionScroll":
       conditions.push(
-        <span key={conditionKey}>{t(`pokedex.evolution_scroll`, {scroll: t(`${condition.evolutionScroll}`)})}</span>
+        <span key={conditionKey}>{t(`evolution_scroll`, {scroll: t(`${condition.evolutionScroll}`)})}</span>
       )
       break
       
     case "blocksWalkedOutsideBall":
       conditions.push(
-        <span key={conditionKey}>{t(`pokedex.evolution_blocksWalkedOutsideBall`, {blocks: condition.blocksToWalk})}</span>
+        <span key={conditionKey}>{t(`evolution_blocksWalkedOutsideBall`, {blocks: condition.blocksToWalk})}</span>
       )
       break
       
     case "insideBattle":
       conditions.push(
-        <span key={conditionKey}>{t(`pokedex.evolution_insideBattle`)}</span>
+        <span key={conditionKey}>{t(`evolution_insideBattle`)}</span>
       )
       break
       

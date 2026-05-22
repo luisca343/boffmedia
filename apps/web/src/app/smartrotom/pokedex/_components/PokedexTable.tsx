@@ -10,7 +10,7 @@ interface PokedexTableProps {
 export function PokedexTable({ children, className }: PokedexTableProps) {
   return (
     <div className={cn("w-full overflow-x-auto rounded-xl border border-white/[0.05] bg-white/[0.012]", className)}>
-      <Table className="w-full text-sm border-separate border-spacing-0">
+      <Table variant="dex" className="w-full text-sm border-separate border-spacing-0">
         {children}
       </Table>
     </div>

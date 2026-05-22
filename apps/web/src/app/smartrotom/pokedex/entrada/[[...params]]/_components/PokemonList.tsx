@@ -3,7 +3,7 @@ import { useState, useEffect } from "react"
 import { PokemonService } from "@/services/api/smartrotom/pokemonService"
 import { InternalLink } from "@/components/ui/navigation/Link"
 import { useTranslations } from "next-intl"
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline"
+import { MagnifyingGlassIcon, BookOpenIcon } from "@heroicons/react/24/outline"
 import { getDisplayStatus } from "../../../dexUtils"
 import { PokemonSprite } from "../../../_components/PokemonSprite"
 import { HubSidebar } from "../../../_components/HubSidebar"
@@ -46,12 +46,12 @@ export default function PokemonList() {
     return (
       <div className="flex h-full bg-surface-950">
         <HubSidebar />
-        <div className="flex-1 flex items-center justify-center">
+        <main className="flex-1 flex items-center justify-center">
           <div className="flex items-center gap-3">
             <div className="animate-spin h-5 w-5 border-2 border-primary-300 rounded-full border-t-transparent" />
             <div className="text-surface-100 text-xl font-orbitron">Cargando Pokédex...</div>
           </div>
-        </div>
+        </main>
       </div>
     )
   }
@@ -59,77 +59,96 @@ export default function PokemonList() {
   return (
     <div className="flex h-full bg-surface-950">
       <HubSidebar />
-      <div className="flex-1 overflow-auto min-w-0">
-        <div className="p-6 max-w-7xl mx-auto">
-          {/* Header */}
-          <div className="mb-6">
-            <span className="font-jetbrains text-[10.5px] tracking-[0.12em] uppercase text-surface-500">
-              Pokédex
-            </span>
-            <h1 className="font-orbitron font-bold text-[28px] tracking-tight text-surface-50 mt-1">
-              Explorar Pokédex
-            </h1>
-            <p className="text-surface-300 text-sm mt-1">
-              Explora todos los Pokémon registrados. Haz clic en un Pokémon para ver su información detallada.
-            </p>
+      <main className="flex-1 min-w-0 flex flex-col overflow-auto">
+        {/* Header */}
+        <div className="p-6 pb-4 border-b border-white/[0.05]">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="w-5 h-5 rounded bg-primary-400/[0.12] text-primary-300 grid place-items-center">
+                  <BookOpenIcon className="w-3 h-3" />
+                </span>
+                <span className="font-jetbrains text-[10.5px] tracking-[0.12em] uppercase text-surface-500">
+                  Pokédex
+                </span>
+              </div>
+              <h1 className="font-orbitron font-bold text-[28px] tracking-tight text-surface-50">
+                Explorar Pokédex
+              </h1>
+              <p className="text-surface-400 text-sm mt-1 max-w-[600px]">
+                {pokemonList.length} Pokémon registrados. Haz clic en cualquiera para ver su ficha completa.
+              </p>
+            </div>
+            <div className="flex items-center gap-4 text-sm text-surface-400 font-jetbrains">
+              <span>
+                Total<b className="ml-1 text-surface-100">{pokemonList.length}</b>
+              </span>
+              <span>
+                Resultados<b className="ml-1 text-surface-100">{filteredPokemon.length}</b>
+              </span>
+            </div>
           </div>
+        </div>
 
-          {/* Search bar */}
-          <div className="relative mb-6">
+        {/* Toolbar: search */}
+        <div className="p-6 pb-0">
+          <div className="relative">
             <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-500" />
             <input
               type="search"
               placeholder="Buscar por nombre o número..."
-              className="w-full bg-white/[0.03] border border-white/[0.07] rounded-[10px] text-surface-100 text-sm px-3 py-2.5 pl-9 outline-none focus:border-primary-400/50 focus:shadow-[0_0_0_3px_rgba(249,115,22,0.12)]"
+              className="w-full bg-white/[0.03] border border-white/[0.07] rounded-[10px] py-2.5 pr-3 pl-9 text-[13px] text-surface-50 outline-none placeholder:text-surface-500 focus:border-primary-400/50 focus:shadow-[0_0_0_3px_rgba(249,115,22,0.12)] transition-colors"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
+        </div>
 
-          {/* Pokemon grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 lg:grid-cols-8 gap-2.5">
-            {filteredPokemon.map((pokemon) => {
-              const isSeen = getDisplayStatus(pokemon.dex, "base", true)
-              return (
-                <InternalLink
-                  href={`/smartrotom/pokedex/entrada/${pokemon.dex}`}
-                  key={pokemon.dex}
-                  className="block"
-                >
-                  <div className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-3 hover:bg-white/[0.04] hover:border-primary-400/20 transition-all flex flex-col items-center group">
-                    <PokemonSprite
-                      id={pokemon.dex}
-                      form="base"
-                      palette="none"
-                      width={72}
-                      height={72}
-                      hide={true}
-                      url={pokemon.spriteUrl}
-                      className="group-hover:-translate-y-0.5 transition-transform"
-                    />
-                    <div className="text-center mt-1.5 w-full">
-                      <div className="font-jetbrains text-[10px] text-surface-500">
-                        #{pokemon.dex.toString().padStart(3, "0")}
-                      </div>
-                      <div className="text-surface-100 text-xs font-medium truncate w-full">
-                        {isSeen
-                          ? t(`pixelmon_${pokemon.name.toLowerCase()}`) || pokemon.name
-                          : "???"}
+        {/* Pokémon grid */}
+        <div className="p-6">
+          {filteredPokemon.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-2.5">
+              {filteredPokemon.map((pokemon) => {
+                const isSeen = getDisplayStatus(pokemon.dex, "base", true)
+                return (
+                  <InternalLink
+                    href={`/smartrotom/pokedex/entrada/${pokemon.dex}`}
+                    key={pokemon.dex}
+                    className="block"
+                  >
+                    <div className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-3 hover:bg-white/[0.04] hover:border-primary-400/20 transition-all flex flex-col items-center group">
+                      <PokemonSprite
+                        id={pokemon.dex}
+                        form="base"
+                        palette="none"
+                        width={72}
+                        height={72}
+                        hide={true}
+                        url={pokemon.spriteUrl}
+                        className="group-hover:-translate-y-0.5 transition-transform"
+                      />
+                      <div className="text-center mt-1.5 w-full">
+                        <div className="font-jetbrains text-[10px] text-surface-500">
+                          #{pokemon.dex.toString().padStart(3, "0")}
+                        </div>
+                        <div className="text-surface-100 text-xs font-medium truncate w-full">
+                          {isSeen
+                            ? t(`pixelmon_${pokemon.name.toLowerCase()}`) || pokemon.name
+                            : "???"}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </InternalLink>
-              )
-            })}
-          </div>
-
-          {filteredPokemon.length === 0 && (
-            <div className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-8 text-center mt-4">
-              <p className="text-surface-300 text-lg">No se encontraron Pokémon que coincidan con la búsqueda</p>
+                  </InternalLink>
+                )
+              })}
+            </div>
+          ) : (
+            <div className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-8 text-center">
+              <p className="text-surface-400 text-sm">No se encontraron Pokémon que coincidan con la búsqueda.</p>
             </div>
           )}
         </div>
-      </div>
+      </main>
     </div>
   )
 }

@@ -68,58 +68,60 @@ export default function Movimiento({ params }: { params: Promise<{ id: string }>
           </div>
         </div>
 
-        {/* Content: vertical stack — move data first, then Pokémon list */}
-        <div className="flex-1 p-6 flex flex-col gap-5">
-          {/* Move data */}
-          <div className="bg-white/[0.025] border border-white/[0.06] rounded-xl p-5">
-            <MoveDataElement id={id} isFullPage={true} />
-          </div>
-
-          {/* Pokémon list — last section, below Alcance */}
-          <div className="bg-white/[0.025] border border-white/[0.06] rounded-xl p-5">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-orbitron font-semibold text-[15px] tracking-tight text-surface-50">
-                {t("move_pokemon_section")}
-              </h2>
-              <span className="font-jetbrains text-xs text-primary-300 bg-primary-400/[0.12] px-2 py-0.5 rounded-full">
-                {pokemon?.length || 0}
-              </span>
+        {/* Content: 2-column — move data left, Pokémon list right */}
+        <div className="flex-1 p-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+            {/* Move data */}
+            <div className="lg:col-span-5 bg-white/[0.025] border border-white/[0.06] rounded-xl p-5 h-fit">
+              <MoveDataElement id={id} isFullPage={true} />
             </div>
-            {pokemon && pokemon.length > 0 ? (
-              <div className="grid grid-cols-[repeat(auto-fill,minmax(72px,1fr))] gap-1.5">
-                {displayedPokemon?.map((poke) => (
-                  <div
-                    key={poke.speciesID + poke.form}
-                    className="bg-white/[0.02] border border-white/[0.05] rounded-[9px] p-2 flex flex-col items-center gap-1 cursor-pointer transition-all hover:-translate-y-px hover:border-primary-400/20"
+
+            {/* Pokémon list */}
+            <div className="lg:col-span-7 bg-white/[0.025] border border-white/[0.06] rounded-xl p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="font-orbitron font-semibold text-[15px] tracking-tight text-surface-50">
+                  {t("move_pokemon_section")}
+                </h2>
+                <span className="font-jetbrains text-xs text-primary-300 bg-primary-400/[0.12] px-2 py-0.5 rounded-full">
+                  {pokemon?.length || 0}
+                </span>
+              </div>
+              {pokemon && pokemon.length > 0 ? (
+                <div className="grid grid-cols-[repeat(auto-fill,minmax(72px,1fr))] gap-1.5">
+                  {displayedPokemon?.map((poke) => (
+                    <div
+                      key={poke.speciesID + poke.form}
+                      className="bg-white/[0.02] border border-white/[0.05] rounded-[9px] p-2 flex flex-col items-center gap-1 cursor-pointer transition-all hover:-translate-y-px hover:border-primary-400/20"
+                    >
+                      <PokemonSpriteLink
+                        id={poke.speciesID}
+                        form={poke.form}
+                        palette="none"
+                        width={48}
+                        height={48}
+                        hide={true}
+                        url={poke.spriteUrl}
+                      />
+                      <span className="font-jetbrains text-[9px] text-surface-500">
+                        #{String(poke.speciesID).padStart(3, "0")}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-6 text-center text-surface-400">{t("no_pokemon_found")}</div>
+              )}
+              {hasMoreToShow && (
+                <div className="mt-4 text-center">
+                  <button
+                    onClick={() => setShowAll(!showAll)}
+                    className="px-4 py-2 bg-white/[0.04] border border-white/[0.06] rounded-lg text-sm text-surface-200 hover:bg-white/[0.07] transition-colors cursor-pointer"
                   >
-                    <PokemonSpriteLink
-                      id={poke.speciesID}
-                      form={poke.form}
-                      palette="none"
-                      width={48}
-                      height={48}
-                      hide={true}
-                      url={poke.spriteUrl}
-                    />
-                    <span className="font-jetbrains text-[9px] text-surface-500">
-                      #{String(poke.speciesID).padStart(3, "0")}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="p-6 text-center text-surface-400">{t("no_pokemon_found")}</div>
-            )}
-            {hasMoreToShow && (
-              <div className="mt-4 text-center">
-                <button
-                  onClick={() => setShowAll(!showAll)}
-                  className="px-4 py-2 bg-white/[0.04] border border-white/[0.06] rounded-lg text-sm text-surface-200 hover:bg-white/[0.07] transition-colors cursor-pointer"
-                >
-                  {showAll ? t("show_less") : t("show_all", { count: pokemon.length })}
-                </button>
-              </div>
-            )}
+                    {showAll ? t("show_less") : t("show_all", { count: pokemon.length })}
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </main>

@@ -44,19 +44,19 @@ export default function FullTypeChart() {
       <div className="overflow-x-auto">
         <div
           className="grid gap-px bg-white/[0.03] border border-white/[0.05] rounded-xl p-1.5 w-fit"
-          style={{ gridTemplateColumns: `28px repeat(18, minmax(28px, 1fr))` }}
+          style={{ gridTemplateColumns: `36px repeat(18, 36px)` }}
         >
           {/* Corner */}
-          <div className="grid place-items-center text-surface-500 font-jetbrains text-[8px]">↓→</div>
+          <div className="w-9 h-9 grid place-items-center text-surface-500 font-jetbrains text-[8px]">↓→</div>
 
           {/* Column headers */}
           {pokemonTypes.map((type) => (
             <div
               key={`head-${type}`}
-              className="aspect-square grid place-items-center rounded-sm"
+              className="w-9 h-9 grid place-items-center rounded-sm"
               style={{ background: TYPE_COLORS[type] }}
             >
-              <img src={`/smartrotom/img/types/${type}.png`} className="w-3.5 h-3.5" alt={t(`type_${type}`)} />
+              <img src={`/smartrotom/img/types/${type}.png`} className="w-[18px] h-[18px]" alt={t(`type_${type}`)} />
             </div>
           ))}
 
@@ -64,10 +64,10 @@ export default function FullTypeChart() {
           {pokemonTypes.map((attackType) => (
             <React.Fragment key={`row-${attackType}`}>
               <div
-                className="grid place-items-center rounded-sm"
+                className="w-9 h-9 grid place-items-center rounded-sm"
                 style={{ background: TYPE_COLORS[attackType] }}
               >
-                <img src={`/smartrotom/img/types/${attackType}.png`} className="w-3.5 h-3.5" alt={t(`type_${attackType}`)} />
+                <img src={`/smartrotom/img/types/${attackType}.png`} className="w-[18px] h-[18px]" alt={t(`type_${attackType}`)} />
               </div>
 
               {pokemonTypes.map((defenseType) => {
@@ -76,7 +76,7 @@ export default function FullTypeChart() {
                 return (
                   <div
                     key={`${attackType}-${defenseType}`}
-                    className="aspect-square grid place-items-center rounded-sm font-jetbrains text-[9px] font-semibold tabular-nums cursor-default"
+                    className="w-9 h-9 grid place-items-center rounded-sm font-jetbrains text-[10px] font-semibold tabular-nums cursor-default"
                     style={{ background: meta.bg, color: meta.fg }}
                     title={`${t(`type_${attackType}`)} → ${t(`type_${defenseType}`)}: ${eff}×`}
                   >

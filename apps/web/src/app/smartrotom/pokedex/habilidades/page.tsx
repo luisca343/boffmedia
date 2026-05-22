@@ -25,7 +25,7 @@ function AbilityDetailCard({ abilityName, t }: { abilityName: string; t: any }) 
   const name = t(`ability_${ability.name.replace(/\s+/g, "")}`)
   const description = t(`ability_${ability.name.replace(/\s+/g, "")}_description`)
   const isHidden = ability.isHidden
-  const displayLimit = 12
+  const displayLimit = 50
   const displayPokemon = showAll ? (pokemon || []) : (pokemon?.slice(0, displayLimit) || [])
 
   return (
@@ -227,7 +227,7 @@ export default function Habilidades() {
 
         {/* Content: list + detail */}
         <div className="p-6">
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-[18px] items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-[66%_33%] gap-[18px] items-start">
             {/* List */}
             <div className="flex flex-col border border-white/[0.05] rounded-xl overflow-hidden bg-white/[0.012]">
               {filteredAbilities.length > 0 ? (

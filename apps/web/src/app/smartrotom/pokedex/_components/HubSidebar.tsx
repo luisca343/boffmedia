@@ -76,7 +76,10 @@ function NavSection({
         {label}
       </div>
       {items.map((item) => {
-        const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
+        const isActive =
+          item.href === "/smartrotom/pokedex"
+            ? pathname === item.href
+            : pathname === item.href || pathname.startsWith(item.href + "/")
         const Icon = item.icon
         return (
           <InternalLink
