@@ -112,12 +112,12 @@ function createSaveButton (data: any, props: {
 
 // @ts-ignore
 function CustomEditor(props) {
-    if(!props.document) return null;
-
     // Keep a mutable ref so the save button's onclick always reads the latest token,
     // even if CKEditor doesn't re-bind its event listeners after a React re-render.
     const tokenRef = useRef<string>(props.token ?? '');
     tokenRef.current = props.token ?? '';
+
+    if(!props.document) return null;
     const getToken = () => tokenRef.current;
 
     return (
