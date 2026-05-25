@@ -179,23 +179,29 @@ export class AuthService {
         throw new UnauthorizedException('Invalid or expired refresh token');
       }
 
-      // Get fresh user data
-      const user = await this.usersService.getUserById(
-        payload.sub || payload.id,
-      );
+      // Fetch full user with integrations so smartRotomUser comes from DB,
+      // not from the JWT payload (where it was never encoded).
+      const userWithIntegrations =
+        await this.usersService.getUserWithIntegrations(
+          (payload.sub || payload.id).toString(),
+          'id',
+        );
 
-      if (!user) {
+      if (!userWithIntegrations) {
         throw new UnauthorizedException('User not found');
       }
 
-      // Get fresh roles
-      const roles = await this.usersService.getUserRoles(user.id);
+      const {
+        boffMediaUser: user,
+        roles,
+        smartRotomUser,
+      } = userWithIntegrations;
 
       const newPayload = {
         username: user.username,
         sub: user.id,
         email: user.email,
-        roles: roles,
+        roles,
         mcUuid: user.uuid,
       };
 
@@ -206,9 +212,15 @@ export class AuthService {
           id: user.id,
           name: user.username,
           email: user.email,
-          roles: roles,
+          roles,
           image: user.profilePicture || null,
-          smartRotomUser: payload.smartRotomUser || {},
+          smartRotomUser: smartRotomUser
+            ? {
+                username: smartRotomUser.username,
+                uuid: smartRotomUser.uuid,
+                world: smartRotomUser.world || '',
+              }
+            : null,
         },
       };
     } catch (error: any) {
