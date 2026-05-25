@@ -299,6 +299,98 @@ export default function EnviarDinero() {
               marginInline: "auto",
             }}
           >
+            {/* FROM account section */}
+            <div>
+              <p
+                style={{
+                  fontSize: 12,
+                  fontWeight: 500,
+                  color: "var(--sb-fg-muted, #5b6b85)",
+                  marginBottom: 10,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.06em",
+                }}
+              >
+                Pagar desde
+              </p>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                {(myAccounts ?? []).map((acc: Account) => (
+                  <button
+                    key={acc.id}
+                    onClick={() => setFrom(acc.id)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 10,
+                      padding: "10px 14px",
+                      borderRadius: 12,
+                      border:
+                        from === acc.id
+                          ? "2px solid var(--sb-600, #2463eb)"
+                          : "1px solid var(--sb-border, #e3ebf5)",
+                      background: from === acc.id ? "var(--sb-50, #eff6ff)" : "var(--sb-surface, #fff)",
+                      cursor: "pointer",
+                      transition: "all 150ms ease",
+                      flex: "1 1 160px",
+                      minWidth: 0,
+                    }}
+                    onMouseEnter={(e) => {
+                      if (from !== acc.id) {
+                        e.currentTarget.style.borderColor = "var(--sb-300, #93c5fd)";
+                        e.currentTarget.style.background = "var(--sb-50, #eff6ff)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (from !== acc.id) {
+                        e.currentTarget.style.borderColor = "var(--sb-border, #e3ebf5)";
+                        e.currentTarget.style.background = "var(--sb-surface, #fff)";
+                      }
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: 36,
+                        height: 36,
+                        borderRadius: 999,
+                        overflow: "hidden",
+                        flexShrink: 0,
+                        background: "var(--sb-surface-3, #eef3fb)",
+                      }}
+                    >
+                      <AccountImage
+                        width={36}
+                        height={36}
+                        type={acc.type}
+                        name={acc.name}
+                        image={(acc as any).image}
+                      />
+                    </div>
+                    <div style={{ textAlign: "left", minWidth: 0 }}>
+                      <div
+                        style={{
+                          fontSize: 13,
+                          fontWeight: 600,
+                          color: "var(--sb-fg, #0c1830)",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {acc.name.replace(/_/g, " ")}
+                      </div>
+                      <div style={{ fontSize: 11, color: "var(--sb-fg-muted, #5b6b85)" }}>
+                        {formatMoney(acc.balance)}
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div
+              style={{ height: 1, background: "var(--sb-border, #e3ebf5)", margin: "0 -2px" }}
+            />
+
             <div>
               <label
                 htmlFor="recip-search"

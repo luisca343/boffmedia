@@ -174,7 +174,7 @@ export default function Calendario() {
   if (isLoading) return <ChartsSkeleton />;
 
   return (
-    <>
+    <main style={{ padding: "24px 28px", display: "flex", flexDirection: "column", gap: 20 }}>
       {/* Page header */}
       <div
         style={{
@@ -656,6 +656,6 @@ export default function Calendario() {
           </div>
         </div>
       </div>
-    </>
+    </main>
   );
 }

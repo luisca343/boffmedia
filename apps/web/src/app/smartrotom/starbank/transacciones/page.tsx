@@ -51,7 +51,7 @@ type PeriodId = typeof PERIODS[number]["id"];
 type TypeId = typeof TYPES[number]["id"];
 
 export default function Transacciones() {
-  const { accounts, activeAccount } = useStarBank();
+  const { accounts, activeAccount, setActiveAccount } = useStarBank();
   const [transactions, setTransactions] = useState<StarBankTransaction[]>([]);
   const [period, setPeriod] = useState<PeriodId>("30d");
   const [type, setType] = useState<TypeId>("all");
@@ -223,6 +223,38 @@ export default function Transacciones() {
             background: "var(--sb-surface, #fff)",
           }}
         >
+          {/* Account selector */}
+          <select
+            value={activeAccount?.id ?? -1}
+            onChange={(e) => {
+              setActiveAccount(parseInt(e.target.value));
+              table.setPageIndex(0);
+            }}
+            style={{
+              height: 32,
+              padding: "0 28px 0 10px",
+              fontSize: 12,
+              fontWeight: 500,
+              borderRadius: 10,
+              border: "1px solid var(--sb-border, #e3ebf5)",
+              background: "var(--sb-surface-2, #f7faff)",
+              color: "var(--sb-fg, #0c1830)",
+              cursor: "pointer",
+              outline: "none",
+              appearance: "none",
+              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 20 20' fill='%235b6b85'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z'/%3E%3C/svg%3E")`,
+              backgroundRepeat: "no-repeat",
+              backgroundPosition: "right 8px center",
+              minWidth: 120,
+            }}
+          >
+            {(accounts ?? []).map((a) => (
+              <option key={a.id} value={a.id}>
+                {a.name.replace(/_/g, " ")}
+              </option>
+            ))}
+          </select>
+
           {/* Period segmented control */}
           <div
             role="tablist"
