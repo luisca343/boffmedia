@@ -1,32 +1,27 @@
 "use client";
-import { useEffect, useState } from "react";
-import { getValidAccountId } from "../bankUtils";
+import { useEffect, useState, useMemo, type ReactNode } from "react";
 import {
   useReactTable,
   getCoreRowModel,
-  flexRender,
-  getFilteredRowModel,
   getPaginationRowModel,
-  ColumnFiltersState,
+  getSortedRowModel,
+  SortingState,
   Table,
   Row,
   Column,
   Cell,
-  getSortedRowModel,
-  SortingState,
 } from "@tanstack/react-table";
-import { BankSection, BankSectionButton } from "../_components/BankSection";
 import { TransactionsTable, columns } from "./_components/TransactionsTable";
-import { useBoffSession } from "@/services/useBoffSession";
-import { useGetAccounts } from "@/hooks/starbank/useGetAccounts";
 import { useGetTransactions } from "@/hooks/starbank/useGetTransactions";
-import { AccountSelect } from "../_components/AccountSelect";
-import { Input } from "@/components/ui/primitives/input";
-import { formatMoney, getActiveAccountBalance, changeActiveAccount } from "../bankUtils";
-import { Search } from "lucide-react";
+import { formatMoney, getActiveAccountBalance } from "../bankUtils";
 import { TransactionSkeleton } from "./_components/TransactionSkeleton";
-import { SummaryCard } from "../_components/SummaryCard";
-import { ArrowDownIcon, ArrowUpIcon, ChevronUpDownIcon, ListBulletIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowUpRightIcon,
+  ArrowDownRightIcon,
+  CreditCardIcon,
+  ArrowDownTrayIcon,
+  MagnifyingGlassIcon,
+} from "@heroicons/react/24/outline";
 import { StarBankTransaction } from "@boffmedia/shared";
 import useStarBank from "../_hooks/useStarBank";
 
@@ -39,200 +34,477 @@ export interface CellDefProps<TData> {
   renderValue: () => any;
 }
 
-function calculateTransactionStats(transactions: StarBankTransaction[], activeAccount: number) {
-  let income = 0;
-  let expense = 0;
+const PERIODS = [
+  { id: "7d",  label: "7 días",  daysBack: 7 },
+  { id: "30d", label: "30 días", daysBack: 30 },
+  { id: "90d", label: "90 días", daysBack: 90 },
+  { id: "all", label: "Todas",   daysBack: 9999 },
+] as const;
 
-  transactions.forEach(transaction => {
-    if (!transaction.isPayer) {
-      income += transaction.amount;
-    } else {
-      expense += transaction.amount;
-    }
-  });
+const TYPES = [
+  { id: "all", label: "Todas" },
+  { id: "in",  label: "Entradas" },
+  { id: "out", label: "Salidas" },
+] as const;
 
-  return { income, expense, net: income - expense };
-}
+type PeriodId = typeof PERIODS[number]["id"];
+type TypeId = typeof TYPES[number]["id"];
 
 export default function Transacciones() {
-  const { session } = useBoffSession();
-  const { accounts, activeAccount, setActiveAccount } = useStarBank();
+  const { accounts, activeAccount } = useStarBank();
   const [transactions, setTransactions] = useState<StarBankTransaction[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [period, setPeriod] = useState<PeriodId>("30d");
+  const [type, setType] = useState<TypeId>("all");
+  const [q, setQ] = useState("");
   const [sorting, setSorting] = useState<SortingState>([{ id: "date", desc: true }]);
-  const [stats, setStats] = useState({ income: 0, expense: 0, net: 0 });
 
-  const { transactions: fetchedTransactions, error: transactionsError, isLoading: transactionsLoading } = useGetTransactions(activeAccount?.id ?? -1);
+  const {
+    transactions: fetchedTransactions,
+    error: transactionsError,
+    isLoading: transactionsLoading,
+  } = useGetTransactions(activeAccount?.id ?? -1);
+
+  useEffect(() => {
+    if (fetchedTransactions) {
+      setTransactions(fetchedTransactions);
+    }
+  }, [fetchedTransactions]);
+
+  const filteredData = useMemo(() => {
+    const days = PERIODS.find((p) => p.id === period)!.daysBack;
+    const cutoff = Date.now() - days * 86400000;
+    return transactions
+      .filter((t) => new Date(t.date).getTime() >= cutoff)
+      .filter(
+        (t) =>
+          type === "all" ||
+          (type === "in" && !t.isPayer) ||
+          (type === "out" && t.isPayer),
+      )
+      .filter(
+        (t) =>
+          !q ||
+          t.reason?.toLowerCase().includes(q.toLowerCase()) ||
+          t.toName?.toLowerCase().includes(q.toLowerCase()),
+      );
+  }, [transactions, period, type, q]);
+
+  const income = useMemo(
+    () => filteredData.filter((t) => !t.isPayer).reduce((s, t) => s + t.amount, 0),
+    [filteredData],
+  );
+  const expense = useMemo(
+    () => filteredData.filter((t) => t.isPayer).reduce((s, t) => s + t.amount, 0),
+    [filteredData],
+  );
+
+  const currentBalance = getActiveAccountBalance(accounts ?? [], activeAccount?.id ?? 0);
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
-    data: transactions,
+    data: filteredData,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    state: {
-      globalFilter: searchTerm,
-      columnFilters,
-      sorting,
-    },
-    initialState: {
-      pagination: {
-        pageIndex: 0,
-        pageSize: 10,
-      },
-    },
-    onSortingChange: setSorting,
     getPaginationRowModel: getPaginationRowModel(),
-    meta: {
-      activeAccount,
-    },
+    state: { sorting },
+    onSortingChange: setSorting,
+    initialState: { pagination: { pageIndex: 0, pageSize: 10 } },
+    meta: { activeAccount },
   });
-
-  useEffect(() => {
-    if (fetchedTransactions && activeAccount) {
-      setTransactions(fetchedTransactions);
-      setStats(calculateTransactionStats(fetchedTransactions, activeAccount.id));
-    }
-  }, [fetchedTransactions, activeAccount]);
-
-  function updateFilters(columnId: string, value: string) {
-    const newFilters = columnFilters.filter((f) => f.id !== columnId);
-    if (value) {
-      newFilters.push({ id: columnId, value });
-    }
-    setColumnFilters(newFilters);
-  }
-
-  function handleAccountChange(accountId: any) {
-    changeActiveAccount(Number(accountId));
-    setActiveAccount(Number(accountId));
-  }
-
-  function handleSearchChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setSearchTerm(e.target.value);
-  }
 
   if (!accounts || transactionsLoading) return <TransactionSkeleton />;
   if (transactionsError) return <div>Error: {transactionsError}</div>;
 
-  const currentAccount = activeAccount;
-
   return (
-    <main className="max-w-[90%] mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6">
-      {/* Header with stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <BankSection className="md:col-span-4 mb-4">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 flex-wrap">
-            <div>
-              <h1 className="text-2xl font-bold text-blue-900">Historial de Transacciones</h1>
-              <p className="text-blue-600">
-                Mostrando transacciones para la cuenta <span className="font-medium">{currentAccount?.name || 'Cargando...'}</span>
-              </p>
-            </div>
-            
-            <div className="w-full md:w-auto">
-              <AccountSelect
-                accounts={accounts}
-                activeAccount={activeAccount}
-                setActiveAccount={handleAccountChange}
-                className="w-full md:w-64"
-              />
-            </div>
-          </div>
-        </BankSection>
-        
-        <SummaryCard 
-          title="Balance Actual"
-          value={formatMoney(getActiveAccountBalance(accounts!, activeAccount?.id ?? 0))}
-          icon={<ChevronUpDownIcon className="h-6 w-6" />}
-          className="md:col-span-1"
-        />
-        
-        <SummaryCard 
-          title="Ingresos Totales"
-          value={formatMoney(stats.income)}
-          icon={<ArrowUpIcon className="h-6 w-6 text-success-500" />}
-          //change={{ value: 5.2, isPositive: true }}
-          className="md:col-span-1"
-        />
-        
-        <SummaryCard 
-          title="Gastos Totales"
-          value={formatMoney(stats.expense)}
-          icon={<ArrowDownIcon className="h-6 w-6 text-error-500" />}
-          //change={{ value: 2.8, isPositive: false }}
-          className="md:col-span-1"
-        />
-  {/* Removed 'Total Neto' card as net is always equal to current balance */}
+    <main style={{ padding: "24px 28px", display: "flex", flexDirection: "column", gap: 20 }}>
+      {/* Page header */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-end",
+          gap: 16,
+          flexWrap: "wrap",
+        }}
+      >
+        <div>
+          <h1
+            style={{
+              fontFamily: "var(--sb-font-display, 'Space Grotesk', sans-serif)",
+              fontWeight: 600,
+              fontSize: 28,
+              letterSpacing: "-0.02em",
+              color: "var(--sb-fg, #0c1830)",
+              margin: 0,
+            }}
+          >
+            Transacciones
+          </h1>
+          <p style={{ color: "var(--sb-fg-muted, #5b6b85)", fontSize: 13.5, marginTop: 4 }}>
+            Movimientos de la cuenta {activeAccount?.name?.replace(/_/g, " ") ?? ""}
+          </p>
+        </div>
+        <button
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            height: 36,
+            padding: "0 14px",
+            borderRadius: 10,
+            fontSize: 13,
+            fontWeight: 500,
+            border: "1px solid var(--sb-border, #e3ebf5)",
+            background: "var(--sb-surface, #fff)",
+            color: "var(--sb-fg, #0c1830)",
+            cursor: "pointer",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "var(--sb-surface-2, #f7faff)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "var(--sb-surface, #fff)";
+          }}
+        >
+          <ArrowDownTrayIcon style={{ width: 14, height: 14 }} />
+          Exportar
+        </button>
       </div>
 
-      {/* Search and Filter */}
-      <BankSection className="bg-white rounded-lg border border-blue-200 py-4">
-        <div className="flex flex-wrap gap-4 items-center">
-          <div className="relative flex-1 min-w-[240px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-blue-500" />
-            <Input 
-              placeholder="Buscar transacciones..."
-              value={searchTerm}
-              onChange={handleSearchChange}
-              className="pl-10 bg-blue-50"
+      {/* KPI strip */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+          gap: 16,
+        }}
+      >
+        <KpiCard
+          label="Saldo actual"
+          value={formatMoney(currentBalance)}
+          icon={<CreditCardIcon style={{ width: 16, height: 16 }} />}
+        />
+        <KpiCard
+          label="Ingresos · periodo"
+          value={formatMoney(income)}
+          sub={`${filteredData.filter((t) => !t.isPayer).length} entradas`}
+          icon={<ArrowUpRightIcon style={{ width: 16, height: 16 }} />}
+          tone="pos"
+        />
+        <KpiCard
+          label="Gastos · periodo"
+          value={formatMoney(expense)}
+          sub={`${filteredData.filter((t) => t.isPayer).length} salidas`}
+          icon={<ArrowDownRightIcon style={{ width: 16, height: 16 }} />}
+          tone="neg"
+        />
+      </div>
+
+      {/* Card: filterbar + table + footer */}
+      <div
+        style={{
+          borderRadius: 16,
+          border: "1px solid var(--sb-border, #e3ebf5)",
+          background: "var(--sb-surface, #fff)",
+          overflow: "hidden",
+          boxShadow: "var(--sb-sh-1, 0 1px 4px rgba(15,30,60,.06))",
+        }}
+      >
+        {/* Filterbar */}
+        <div
+          style={{
+            display: "flex",
+            gap: 8,
+            flexWrap: "wrap",
+            alignItems: "center",
+            padding: "12px 16px",
+            borderBottom: "1px solid var(--sb-border, #e3ebf5)",
+            background: "var(--sb-surface, #fff)",
+          }}
+        >
+          {/* Period segmented control */}
+          <div
+            role="tablist"
+            style={{
+              display: "inline-flex",
+              background: "var(--sb-surface-2, #f7faff)",
+              padding: 3,
+              borderRadius: 10,
+              border: "1px solid var(--sb-border, #e3ebf5)",
+            }}
+          >
+            {PERIODS.map((p) => (
+              <button
+                key={p.id}
+                role="tab"
+                aria-selected={period === p.id}
+                onClick={() => {
+                  setPeriod(p.id);
+                  table.setPageIndex(0);
+                }}
+                style={{
+                  padding: "5px 12px",
+                  fontSize: 12,
+                  fontWeight: 500,
+                  borderRadius: 7,
+                  color: period === p.id ? "var(--sb-fg, #0c1830)" : "var(--sb-fg-muted, #5b6b85)",
+                  background: period === p.id ? "var(--sb-surface, #fff)" : "transparent",
+                  boxShadow:
+                    period === p.id ? "var(--sb-sh-1, 0 1px 4px rgba(15,30,60,.06))" : "none",
+                  whiteSpace: "nowrap",
+                  transition: "all 150ms ease",
+                  cursor: "pointer",
+                }}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Type segmented control */}
+          <div
+            role="tablist"
+            style={{
+              display: "inline-flex",
+              background: "var(--sb-surface-2, #f7faff)",
+              padding: 3,
+              borderRadius: 10,
+              border: "1px solid var(--sb-border, #e3ebf5)",
+            }}
+          >
+            {TYPES.map((t) => (
+              <button
+                key={t.id}
+                role="tab"
+                aria-selected={type === t.id}
+                onClick={() => {
+                  setType(t.id);
+                  table.setPageIndex(0);
+                }}
+                style={{
+                  padding: "5px 12px",
+                  fontSize: 12,
+                  fontWeight: 500,
+                  borderRadius: 7,
+                  color: type === t.id ? "var(--sb-fg, #0c1830)" : "var(--sb-fg-muted, #5b6b85)",
+                  background: type === t.id ? "var(--sb-surface, #fff)" : "transparent",
+                  boxShadow:
+                    type === t.id ? "var(--sb-sh-1, 0 1px 4px rgba(15,30,60,.06))" : "none",
+                  whiteSpace: "nowrap",
+                  transition: "all 150ms ease",
+                  cursor: "pointer",
+                }}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Search */}
+          <div style={{ marginLeft: "auto", position: "relative", minWidth: 200 }}>
+            <MagnifyingGlassIcon
+              style={{
+                position: "absolute",
+                left: 10,
+                top: "50%",
+                transform: "translateY(-50%)",
+                width: 14,
+                height: 14,
+                color: "var(--sb-fg-subtle, #8d99b3)",
+                pointerEvents: "none",
+              }}
+            />
+            <input
+              style={{
+                height: 32,
+                paddingLeft: 30,
+                paddingRight: 10,
+                fontSize: 13,
+                width: "100%",
+                borderRadius: 10,
+                border: "1px solid var(--sb-border, #e3ebf5)",
+                background: "var(--sb-surface-2, #f7faff)",
+                color: "var(--sb-fg, #0c1830)",
+                outline: "none",
+              }}
+              placeholder="Buscar…"
+              value={q}
+              onChange={(e) => {
+                setQ(e.target.value);
+                table.setPageIndex(0);
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = "var(--sb-400, #60a5fa)";
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = "var(--sb-border, #e3ebf5)";
+              }}
             />
           </div>
-          
-          <div className="flex items-center gap-2 text-sm text-blue-700">
-            <span>Mostrando {table.getFilteredRowModel().rows.length} de {transactions.length} transacciones</span>
-          </div>
         </div>
-      </BankSection>
 
-      {/* Transactions Table */}
-      <BankSection variant="noPadding" className="bg-white rounded-lg overflow-hidden border border-blue-200">
-        <TransactionsTable
-          table={table}
-          columnFilters={columnFilters}
-          updateFilters={updateFilters}
-        />
-      </BankSection>
-      
-      {/* Pagination */}
-      <div className="flex justify-between items-center bg-white p-4 shadow-sm rounded-md border border-blue-200">
-        <div className="flex items-center gap-2">
-          <BankSectionButton 
-            onClick={() => table.previousPage()} 
-            disabled={!table.getCanPreviousPage()}
-          >
-            Anterior
-          </BankSectionButton>
-          
-          <BankSectionButton 
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Siguiente
-          </BankSectionButton>
-        </div>
-        
-        <div className="flex items-center gap-2 text-sm">
-          <span className="text-blue-700">
-            Página {table.getState().pagination.pageIndex + 1} de{" "}
-            {table.getPageCount() || 1}
-          </span>
-          
-          <select
-            value={table.getState().pagination.pageSize}
-            onChange={e => table.setPageSize(Number(e.target.value))}
-            className="px-2 py-1 border border-blue-200 rounded text-sm bg-blue-50"
-          >
-            {[10, 25, 50].map(pageSize => (
-              <option key={pageSize} value={pageSize}>
-                Mostrar {pageSize}
-              </option>
-            ))}
-          </select>
+        {/* Table */}
+        <TransactionsTable table={table} />
+
+        {/* Footer */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: 16,
+            borderTop: "1px solid var(--sb-border, #e3ebf5)",
+          }}
+        >
+          <p style={{ fontSize: 13, color: "var(--sb-fg-muted, #5b6b85)" }}>
+            Mostrando{" "}
+            <strong style={{ color: "var(--sb-fg, #0c1830)" }}>{filteredData.length}</strong>{" "}
+            transacciones
+          </p>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <button
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+              style={{
+                height: 32,
+                padding: "0 12px",
+                borderRadius: 8,
+                fontSize: 12.5,
+                fontWeight: 500,
+                border: "1px solid var(--sb-border, #e3ebf5)",
+                background: "var(--sb-surface, #fff)",
+                color: "var(--sb-fg, #0c1830)",
+                cursor: table.getCanPreviousPage() ? "pointer" : "default",
+                opacity: table.getCanPreviousPage() ? 1 : 0.55,
+              }}
+              onMouseEnter={(e) => {
+                if (table.getCanPreviousPage())
+                  e.currentTarget.style.background = "var(--sb-surface-2, #f7faff)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "var(--sb-surface, #fff)";
+              }}
+            >
+              ← Anterior
+            </button>
+            <button
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+              style={{
+                height: 32,
+                padding: "0 12px",
+                borderRadius: 8,
+                fontSize: 12.5,
+                fontWeight: 500,
+                border: "1px solid var(--sb-border, #e3ebf5)",
+                background: "var(--sb-surface, #fff)",
+                color: "var(--sb-fg, #0c1830)",
+                cursor: table.getCanNextPage() ? "pointer" : "default",
+                opacity: table.getCanNextPage() ? 1 : 0.55,
+              }}
+              onMouseEnter={(e) => {
+                if (table.getCanNextPage())
+                  e.currentTarget.style.background = "var(--sb-surface-2, #f7faff)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "var(--sb-surface, #fff)";
+              }}
+            >
+              Siguiente →
+            </button>
+            <select
+              value={table.getState().pagination.pageSize}
+              onChange={(e) => table.setPageSize(Number(e.target.value))}
+              style={{
+                height: 32,
+                padding: "0 8px",
+                borderRadius: 8,
+                fontSize: 12.5,
+                border: "1px solid var(--sb-border, #e3ebf5)",
+                background: "var(--sb-surface-2, #f7faff)",
+                color: "var(--sb-fg, #0c1830)",
+                cursor: "pointer",
+              }}
+            >
+              {[10, 25, 50].map((size) => (
+                <option key={size} value={size}>
+                  Mostrar {size}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
     </main>
+  );
+}
+
+function KpiCard({
+  label,
+  value,
+  sub,
+  icon,
+  tone = "",
+}: {
+  label: string;
+  value: string;
+  sub?: string;
+  icon: ReactNode;
+  tone?: string;
+}) {
+  return (
+    <div
+      style={{
+        borderRadius: 14,
+        border: "1px solid var(--sb-border, #e3ebf5)",
+        background: "var(--sb-surface, #fff)",
+        padding: "18px 20px",
+        boxShadow: "var(--sb-sh-1, 0 1px 4px rgba(15,30,60,.06))",
+        display: "flex",
+        flexDirection: "column",
+        gap: 6,
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <span style={{ fontSize: 12, color: "var(--sb-fg-muted, #5b6b85)" }}>{label}</span>
+        <span
+          style={{
+            display: "grid",
+            placeItems: "center",
+            width: 28,
+            height: 28,
+            borderRadius: 8,
+            background:
+              tone === "pos"
+                ? "var(--sb-pos-soft, rgba(5,150,105,.1))"
+                : tone === "neg"
+                  ? "var(--sb-neg-soft, rgba(220,38,38,.1))"
+                  : "var(--sb-surface-2, #f7faff)",
+            color:
+              tone === "pos"
+                ? "var(--sb-pos-2, #059669)"
+                : tone === "neg"
+                  ? "var(--sb-neg-2, #dc2626)"
+                  : "var(--sb-fg-muted, #5b6b85)",
+          }}
+        >
+          {icon}
+        </span>
+      </div>
+      <div
+        style={{
+          fontFamily: "var(--sb-font-display, 'Space Grotesk', sans-serif)",
+          fontSize: 26,
+          fontWeight: 600,
+          letterSpacing: "-0.01em",
+          fontVariantNumeric: "tabular-nums",
+          color: "var(--sb-fg, #0c1830)",
+        }}
+      >
+        {value}
+      </div>
+      {sub && <div style={{ fontSize: 12, color: "var(--sb-fg-muted, #5b6b85)" }}>{sub}</div>}
+    </div>
   );
 }

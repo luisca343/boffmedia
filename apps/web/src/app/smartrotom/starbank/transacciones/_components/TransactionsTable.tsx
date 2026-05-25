@@ -1,12 +1,4 @@
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  Table,
-  flexRender,
-  Row,
-  Cell,
-  Column,
-} from "@tanstack/react-table";
+import { ColumnDef, Table, flexRender } from "@tanstack/react-table";
 import { AccountImage } from "../../_components/AccountImage";
 import {
   filterAmount,
@@ -14,78 +6,95 @@ import {
   filterReason,
 } from "../../_util/TransactionFilter";
 import { CellDefProps } from "../page";
-import { Input } from "@/components/ui/primitives/input";
-import { strToDate, cn } from "@/lib/utils";
+import { strToDate } from "@/lib/utils";
 import { formatMoney } from "../../bankUtils";
 import { ArrowDownIcon, ArrowUpIcon, ArrowsUpDownIcon } from "@heroicons/react/24/outline";
-import { Card } from "@/components/ui/primitives/card";
-
-// Import shadcn table components
-import {
-  Table as ShadcnTable,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/primitives/table";
 import { StarBankTransaction } from "@boffmedia/shared";
 
 export const columns: ColumnDef<StarBankTransaction>[] = [
   {
-    header: "Cuenta",
+    header: "Contraparte",
     accessorKey: "isPayer",
     enableSorting: false,
     cell: (props: CellDefProps<StarBankTransaction>) => {
       const { row } = props;
       return (
-        <div className="flex items-center gap-2">
-          <AccountImage
-            height={40}
-            width={40}
-            type={row.original.toType!}
-            name={row.original.toName!}
-            image={(row.original as any).toImage}
-          />
-          <div className="hidden md:block">
-            <p className="text-sm font-medium text-blue-900">{row.original.toName}</p>
-            <p className="text-xs text-blue-600">{row.original.isPayer ? 'Salida' : 'Entrada'}</p>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div
+            style={{
+              flexShrink: 0,
+              borderRadius: "50%",
+              overflow: "hidden",
+              width: 32,
+              height: 32,
+            }}
+          >
+            <AccountImage
+              height={32}
+              width={32}
+              type={row.original.toType!}
+              name={row.original.toName!}
+              image={(row.original as any).toImage}
+            />
+          </div>
+          <div>
+            <p style={{ fontSize: 13, fontWeight: 600, color: "var(--sb-fg, #0c1830)" }}>
+              {row.original.toName}
+            </p>
+            <p style={{ fontSize: 11, color: "var(--sb-fg-muted, #5b6b85)" }}>
+              {row.original.isPayer ? "Salida" : "Entrada"}
+            </p>
           </div>
         </div>
       );
     },
   },
-  { 
+  {
     header: ({ column }) => {
-      const isSorted = column.getIsSorted();
+      const sorted = column.getIsSorted();
       return (
-        <div 
-          className="flex items-center cursor-pointer hover:text-blue-900 transition-colors" 
+        <span
+          style={{ display: "inline-flex", alignItems: "center", gap: 6, cursor: "pointer" }}
           onClick={() => column.toggleSorting()}
         >
           Concepto
-          {isSorted === "asc" && <ArrowUpIcon className="ml-1 h-4 w-4 text-blue-700" />}
-          {isSorted === "desc" && <ArrowDownIcon className="ml-1 h-4 w-4 text-blue-700" />}
-          {!isSorted && <ArrowsUpDownIcon className="ml-1 h-4 w-4 text-blue-400" />}
-        </div>
+          {sorted === "asc" ? (
+            <ArrowUpIcon style={{ width: 12, height: 12 }} />
+          ) : sorted === "desc" ? (
+            <ArrowDownIcon style={{ width: 12, height: 12 }} />
+          ) : (
+            <ArrowsUpDownIcon style={{ width: 12, height: 12, opacity: 0.4 }} />
+          )}
+        </span>
       );
-    }, 
-    accessorKey: "reason", 
-    filterFn: filterReason 
+    },
+    accessorKey: "reason",
+    filterFn: filterReason,
   },
   {
     header: ({ column }) => {
-      const isSorted = column.getIsSorted();
+      const sorted = column.getIsSorted();
       return (
-        <div 
-          className="flex items-center cursor-pointer hover:text-blue-900 transition-colors" 
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            cursor: "pointer",
+            justifyContent: "flex-end",
+            width: "100%",
+          }}
           onClick={() => column.toggleSorting()}
         >
           Cantidad
-          {isSorted === "asc" && <ArrowUpIcon className="ml-1 h-4 w-4 text-blue-700" />}
-          {isSorted === "desc" && <ArrowDownIcon className="ml-1 h-4 w-4 text-blue-700" />}
-          {!isSorted && <ArrowsUpDownIcon className="ml-1 h-4 w-4 text-blue-400" />}
-        </div>
+          {sorted === "asc" ? (
+            <ArrowUpIcon style={{ width: 12, height: 12 }} />
+          ) : sorted === "desc" ? (
+            <ArrowDownIcon style={{ width: 12, height: 12 }} />
+          ) : (
+            <ArrowsUpDownIcon style={{ width: 12, height: 12, opacity: 0.4 }} />
+          )}
+        </span>
       );
     },
     accessorKey: "amount",
@@ -95,38 +104,60 @@ export const columns: ColumnDef<StarBankTransaction>[] = [
   },
   {
     header: ({ column }) => {
-      const isSorted = column.getIsSorted();
+      const sorted = column.getIsSorted();
       return (
-        <div 
-          className="flex items-center cursor-pointer hover:text-blue-900 transition-colors" 
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            cursor: "pointer",
+            justifyContent: "flex-end",
+            width: "100%",
+          }}
           onClick={() => column.toggleSorting()}
         >
           Saldo
-          {isSorted === "asc" && <ArrowUpIcon className="ml-1 h-4 w-4 text-blue-700" />}
-          {isSorted === "desc" && <ArrowDownIcon className="ml-1 h-4 w-4 text-blue-700" />}
-          {!isSorted && <ArrowsUpDownIcon className="ml-1 h-4 w-4 text-blue-400" />}
-        </div>
+          {sorted === "asc" ? (
+            <ArrowUpIcon style={{ width: 12, height: 12 }} />
+          ) : sorted === "desc" ? (
+            <ArrowDownIcon style={{ width: 12, height: 12 }} />
+          ) : (
+            <ArrowsUpDownIcon style={{ width: 12, height: 12, opacity: 0.4 }} />
+          )}
+        </span>
       );
     },
     id: "balance",
-    accessorFn: (row) => row.isPayer ? row.fromBalance : row.toBalance,
+    accessorFn: (row) => (row.isPayer ? row.fromBalance : row.toBalance),
     filterFn: filterAmount,
     cell: renderBalance,
     sortingFn: "alphanumeric",
   },
   {
     header: ({ column }) => {
-      const isSorted = column.getIsSorted();
+      const sorted = column.getIsSorted();
       return (
-        <div 
-          className="flex items-center cursor-pointer hover:text-blue-900 transition-colors" 
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            cursor: "pointer",
+            justifyContent: "flex-end",
+            width: "100%",
+          }}
           onClick={() => column.toggleSorting()}
         >
           Fecha
-          {isSorted === "asc" && <ArrowUpIcon className="ml-1 h-4 w-4 text-blue-700" />}
-          {isSorted === "desc" && <ArrowDownIcon className="ml-1 h-4 w-4 text-blue-700" />}
-          {!isSorted && <ArrowsUpDownIcon className="ml-1 h-4 w-4 text-blue-400" />}
-        </div>
+          {sorted === "asc" ? (
+            <ArrowUpIcon style={{ width: 12, height: 12 }} />
+          ) : sorted === "desc" ? (
+            <ArrowDownIcon style={{ width: 12, height: 12 }} />
+          ) : (
+            <ArrowsUpDownIcon style={{ width: 12, height: 12, opacity: 0.4 }} />
+          )}
+        </span>
       );
     },
     accessorKey: "date",
@@ -139,15 +170,16 @@ function renderMoney(props: CellDefProps<StarBankTransaction>) {
   const { cell, row } = props;
   const isPayer = row.original.isPayer;
   const amount = cell.getValue() as number;
-  
   return (
-    <div className={`flex items-center font-medium ${isPayer ? "text-red-600" : "text-emerald-600"}`}>
-      {isPayer ? (
-        <ArrowDownIcon className="h-4 w-4 mr-1" />
-      ) : (
-        <ArrowUpIcon className="h-4 w-4 mr-1" />
-      )}
-      {isPayer ? "- " : "+ "}
+    <div
+      style={{
+        textAlign: "right",
+        fontWeight: 600,
+        fontVariantNumeric: "tabular-nums",
+        color: isPayer ? "var(--sb-neg-2, #dc2626)" : "var(--sb-pos-2, #059669)",
+      }}
+    >
+      {isPayer ? "− " : "+ "}
       {formatMoney(amount)}
     </div>
   );
@@ -156,7 +188,14 @@ function renderMoney(props: CellDefProps<StarBankTransaction>) {
 function renderBalance(props: CellDefProps<StarBankTransaction>) {
   const { cell } = props;
   return (
-    <div className="font-medium text-blue-900">
+    <div
+      style={{
+        textAlign: "right",
+        fontVariantNumeric: "tabular-nums",
+        fontWeight: 500,
+        color: "var(--sb-fg, #0c1830)",
+      }}
+    >
       {formatMoney(cell.getValue() as number)}
     </div>
   );
@@ -165,109 +204,124 @@ function renderBalance(props: CellDefProps<StarBankTransaction>) {
 function renderDate(props: CellDefProps<StarBankTransaction>) {
   const { cell } = props;
   return (
-    <div className="text-sm text-blue-700">
+    <div
+      style={{
+        textAlign: "right",
+        color: "var(--sb-fg-muted, #5b6b85)",
+        fontVariantNumeric: "tabular-nums",
+      }}
+    >
       {strToDate(cell.getValue() as string)}
     </div>
   );
 }
 
-export function TransactionsTable({
-  table,
-  columnFilters,
-  updateFilters,
-  className,
-}: {
-  table: Table<StarBankTransaction>;
-  columnFilters: ColumnFiltersState;
-  updateFilters: any;
-  className?: string;
-}) {
+export function TransactionsTable({ table }: { table: Table<StarBankTransaction> }) {
+  const rows = table.getRowModel().rows;
+
   return (
-    <div className={className}>
-      {/* Desktop view */}
-      <div className="hidden md:block">
-        <ShadcnTable variant="wingull">
-        <TableHeader className="bg-blue-50 sticky top-0">
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <TableHead key={header.id} className="text-blue-800 font-medium py-4">
-                  {flexRender(
-                    header.column.columnDef.header,
-                    header.getContext()
-                  )}
-                </TableHead>
-              ))}
-            </TableRow>
-          ))}
-          <TableRow>
-            <TableHead className="p-2">
-              {/* Account filter intentionally left empty */}
-            </TableHead>
-            <TableHead>
-              <Input
-                className="mb-1 mx-auto w-[95%] h-8 bg-blue-100 bg-opacity-80 placeholder:text-blue-900 border-blue-200"
-                placeholder="Filtrar Conceptos"
-                value={(columnFilters.find((f) => f.id === "reason")?.value as string) || ""}
-                onChange={(e) => updateFilters("reason", e.target.value)}
-              />
-            </TableHead>
-            <TableHead>
-              <Input
-                className="mb-1 mx-auto w-[95%] h-8 bg-blue-100 bg-opacity-80 placeholder:text-blue-900 border-blue-200"
-                placeholder="Filtrar Cantidad"
-                value={(columnFilters.find((f) => f.id === "amount")?.value as string) || ""}
-                onChange={(e) => updateFilters("amount", e.target.value)}
-              />
-            </TableHead>
-            <TableHead>
-              <Input
-                className="mb-1 mx-auto w-[95%] h-8 bg-blue-100 bg-opacity-80 placeholder:text-blue-900 border-blue-200"
-                placeholder="Filtrar Saldo"
-                value={(columnFilters.find((f) => f.id === "balance")?.value as string) || ""}
-                onChange={(e) => updateFilters("balance", e.target.value)}
-              />
-            </TableHead>
-            <TableHead>
-              <Input
-                className="mb-1 mx-auto w-[95%] h-8 bg-blue-100 bg-opacity-80 placeholder:text-blue-900 border-blue-200"
-                placeholder="Filtrar Fecha"
-                value={(columnFilters.find((f) => f.id === "date")?.value as string) || ""}
-                onChange={(e) => updateFilters("date", e.target.value)}
-              />
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows.length > 0 ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id} className="hover:bg-blue-50 transition-colors">
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="py-2">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
+    <div>
+      {/* Desktop */}
+      <div className="hidden md:block" style={{ overflowX: "auto" }}>
+        <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: 0 }}>
+          <thead>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <th
+                    key={header.id}
+                    style={{
+                      padding: "12px 16px",
+                      textAlign: "left",
+                      fontSize: 11,
+                      fontWeight: 600,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.06em",
+                      color: "var(--sb-fg-muted, #5b6b85)",
+                      background: "var(--sb-surface-2, #f7faff)",
+                      borderBottom: "1px solid var(--sb-border, #e3ebf5)",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {flexRender(header.column.columnDef.header, header.getContext())}
+                  </th>
                 ))}
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="py-8 text-center text-blue-800">
-                No se encontraron transacciones
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </ShadcnTable>
+              </tr>
+            ))}
+          </thead>
+          <tbody>
+            {rows.length > 0 ? (
+              rows.map((row, i) => (
+                <tr
+                  key={row.id}
+                  style={{ cursor: "pointer", transition: "background 150ms ease" }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "var(--sb-surface-2, #f7faff)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "transparent";
+                  }}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <td
+                      key={cell.id}
+                      style={{
+                        padding: "12px 16px",
+                        fontSize: 13,
+                        color: "var(--sb-fg-2, #2c3a55)",
+                        borderBottom:
+                          i < rows.length - 1
+                            ? "1px solid var(--sb-border, #e3ebf5)"
+                            : "none",
+                      }}
+                    >
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan={columns.length}
+                  style={{
+                    padding: 40,
+                    textAlign: "center",
+                    color: "var(--sb-fg-muted, #5b6b85)",
+                    fontSize: 13,
+                  }}
+                >
+                  No se encontraron transacciones con estos filtros
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
-      
-      {/* Mobile view */}
-      <div className="md:hidden space-y-3 p-4">
-        {table.getRowModel().rows.length > 0 ? (
-          table.getRowModel().rows.map((row) => (
-            <Card key={row.id} className="p-4" variant="wingull">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
+
+      {/* Mobile */}
+      <div className="md:hidden flex flex-col gap-3 p-4">
+        {rows.length > 0 ? (
+          rows.map((row) => (
+            <div
+              key={row.id}
+              style={{
+                borderRadius: 12,
+                border: "1px solid var(--sb-border, #e3ebf5)",
+                background: "var(--sb-surface, #fff)",
+                padding: 16,
+                display: "flex",
+                flexDirection: "column",
+                gap: 10,
+              }}
+            >
+              <div
+                style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div
+                    style={{ borderRadius: "50%", overflow: "hidden", width: 32, height: 32, flexShrink: 0 }}
+                  >
                     <AccountImage
                       height={32}
                       width={32}
@@ -275,36 +329,56 @@ export function TransactionsTable({
                       name={row.original.toName!}
                       image={(row.original as any).toImage}
                     />
-                    <div>
-                      <p className="font-medium text-sm">{row.original.toName}</p>
-                      <p className="text-xs text-blue-600">
-                        {row.original.isPayer ? 'Salida' : 'Entrada'}
-                      </p>
-                    </div>
                   </div>
-                  <p className={cn(
-                    "font-semibold",
-                    row.original.isPayer ? "text-red-600" : "text-emerald-600"
-                  )}>
-                    {row.original.isPayer ? '-' : '+'} {formatMoney(row.original.amount)}
-                  </p>
+                  <div>
+                    <p style={{ fontSize: 13, fontWeight: 600, color: "var(--sb-fg, #0c1830)" }}>
+                      {row.original.toName}
+                    </p>
+                    <p style={{ fontSize: 11, color: "var(--sb-fg-muted, #5b6b85)" }}>
+                      {row.original.isPayer ? "Salida" : "Entrada"}
+                    </p>
+                  </div>
                 </div>
-                
-                <div className="text-sm text-surface-600">
-                  {row.original.reason || "Sin concepto"}
-                </div>
-                
-                <div className="flex justify-between text-xs text-surface-500">
-                  <span>{strToDate(row.original.date)}</span>
-                  <span>Balance: {formatMoney(row.original.isPayer ? row.original.fromBalance : row.original.toBalance)}</span>
-                </div>
+                <p
+                  style={{
+                    fontWeight: 600,
+                    fontVariantNumeric: "tabular-nums",
+                    color: row.original.isPayer
+                      ? "var(--sb-neg-2, #dc2626)"
+                      : "var(--sb-pos-2, #059669)",
+                  }}
+                >
+                  {row.original.isPayer ? "− " : "+ "}
+                  {formatMoney(row.original.amount)}
+                </p>
               </div>
-            </Card>
+              <p style={{ fontSize: 13, color: "var(--sb-fg-2, #2c3a55)" }}>
+                {row.original.reason || "Sin concepto"}
+              </p>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  fontSize: 12,
+                  color: "var(--sb-fg-muted, #5b6b85)",
+                }}
+              >
+                <span>{strToDate(row.original.date)}</span>
+                <span>
+                  Saldo:{" "}
+                  {formatMoney(
+                    row.original.isPayer ? row.original.fromBalance : row.original.toBalance,
+                  )}
+                </span>
+              </div>
+            </div>
           ))
         ) : (
-          <div className="py-8 text-center text-blue-800">
-            No se encontraron transacciones
-          </div>
+          <p
+            style={{ padding: 40, textAlign: "center", color: "var(--sb-fg-muted, #5b6b85)", fontSize: 13 }}
+          >
+            No se encontraron transacciones con estos filtros
+          </p>
         )}
       </div>
     </div>
