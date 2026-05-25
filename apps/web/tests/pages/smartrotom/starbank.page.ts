@@ -11,12 +11,12 @@ export class StarbankPage extends BasePage {
 
   constructor(page: Page) {
     super(page)
-    this.balanceSection = page.getByText("Balance de cuenta")
-    this.quickActionsSection = page.getByText("Acciones Rápidas")
-    this.transferMoneyLink = page.getByRole("link", { name: /Transferir Dinero/i })
-    this.manageAccountsLink = page.getByRole("link", { name: /Administrar Cuentas/i })
-    this.payBillsLink = page.getByRole("link", { name: /Pagar Facturas/i })
-    this.noTransactionsMessage = page.getByText("No hay transacciones")
+    this.balanceSection = page.getByText("Balance disponible")
+    this.quickActionsSection = page.getByText("Acciones rápidas")
+    this.transferMoneyLink = page.getByRole("link", { name: /Enviar dinero/i }).first()
+    this.manageAccountsLink = page.getByRole("link", { name: /Mover entre cuentas/i }).first()
+    this.payBillsLink = page.getByRole("link", { name: /Programar pago/i })
+    this.noTransactionsMessage = page.getByText("No hay transacciones recientes")
   }
 
   async goto() {

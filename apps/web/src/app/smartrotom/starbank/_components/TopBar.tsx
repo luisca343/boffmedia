@@ -5,6 +5,8 @@ import {
   BellIcon,
   ChevronDownIcon,
   Bars3Icon,
+  SunIcon,
+  MoonIcon,
 } from "@heroicons/react/24/outline";
 import useStarBank from "../_hooks/useStarBank";
 import { AccountImage } from "./AccountImage";
@@ -26,7 +28,14 @@ const PAGE_INFO: Record<string, { title: string; breadcrumbs: string[] }> = {
 export default function TopBar({
   currentPage,
   onToggleSidebar,
-}: Readonly<{ currentPage: string; onToggleSidebar?: () => void }>) {
+  theme,
+  onToggleTheme,
+}: Readonly<{
+  currentPage: string;
+  onToggleSidebar?: () => void;
+  theme: "light" | "dark";
+  onToggleTheme: () => void;
+}>) {
   const { accounts, activeAccount, setActiveAccount } = useStarBank();
   const { session } = useBoffSession();
   const [showDropdown, setShowDropdown] = useState(false);
@@ -58,7 +67,7 @@ export default function TopBar({
       style={{
         gap: 16,
         padding: "14px 28px",
-        background: "rgba(255,255,255,0.85)",
+        background: "var(--sb-topbar-bg, rgba(255,255,255,0.85))",
         backdropFilter: "saturate(140%) blur(10px)",
         WebkitBackdropFilter: "saturate(140%) blur(10px)",
         borderBottom: "1px solid var(--sb-border, #e3ebf5)",
@@ -66,17 +75,19 @@ export default function TopBar({
     >
       {/* Sidebar toggle */}
       <button
-        className="grid place-items-center rounded-[14px] border transition-colors hover:bg-[#f7faff]"
+        className="grid place-items-center rounded-[14px] border transition-colors"
         style={{
           width: 38,
           height: 38,
-          color: "#2c3a55",
+          color: "var(--sb-fg-2, #2c3a55)",
           borderColor: "var(--sb-border, #e3ebf5)",
-          background: "#ffffff",
+          background: "var(--sb-surface, #ffffff)",
           flexShrink: 0,
         }}
         onClick={onToggleSidebar}
         aria-label="Alternar menú lateral"
+        onMouseEnter={(e) => { e.currentTarget.style.background = "var(--sb-surface-2, #f7faff)"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.background = "var(--sb-surface, #ffffff)"; }}
       >
         <Bars3Icon style={{ width: 18, height: 18 }} />
       </button>
@@ -127,7 +138,7 @@ export default function TopBar({
           aria-label="Buscar"
           onFocus={(e) => {
             e.currentTarget.style.borderColor = "var(--sb-400, #60a5fa)";
-            e.currentTarget.style.background = "#ffffff";
+            e.currentTarget.style.background = "var(--sb-surface, #ffffff)";
           }}
           onBlur={(e) => {
             e.currentTarget.style.borderColor = "var(--sb-border, #e3ebf5)";
@@ -139,7 +150,7 @@ export default function TopBar({
           style={{
             color: "var(--sb-fg-subtle, #8d99b3)",
             borderColor: "var(--sb-border, #e3ebf5)",
-            background: "#ffffff",
+            background: "var(--sb-surface, #ffffff)",
           }}
           aria-hidden
         >
@@ -149,17 +160,40 @@ export default function TopBar({
 
       {/* Action cluster */}
       <div className="ml-auto flex items-center" style={{ gap: 8 }}>
-        {/* Notification bell */}
+        {/* Theme toggle */}
         <button
-          className="relative grid place-items-center rounded-[14px] border transition-colors hover:bg-[#f7faff]"
+          className="grid place-items-center rounded-[14px] border transition-colors"
           style={{
             width: 38,
             height: 38,
             color: "var(--sb-fg-2, #2c3a55)",
             borderColor: "var(--sb-border, #e3ebf5)",
-            background: "#ffffff",
+            background: "var(--sb-surface, #ffffff)",
+          }}
+          onClick={onToggleTheme}
+          aria-label={theme === "dark" ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
+          onMouseEnter={(e) => { e.currentTarget.style.background = "var(--sb-surface-2, #f7faff)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = "var(--sb-surface, #ffffff)"; }}
+        >
+          {theme === "dark"
+            ? <SunIcon style={{ width: 16, height: 16 }} />
+            : <MoonIcon style={{ width: 16, height: 16 }} />
+          }
+        </button>
+
+        {/* Notification bell */}
+        <button
+          className="relative grid place-items-center rounded-[14px] border transition-colors"
+          style={{
+            width: 38,
+            height: 38,
+            color: "var(--sb-fg-2, #2c3a55)",
+            borderColor: "var(--sb-border, #e3ebf5)",
+            background: "var(--sb-surface, #ffffff)",
           }}
           aria-label="Notificaciones"
+          onMouseEnter={(e) => { e.currentTarget.style.background = "var(--sb-surface-2, #f7faff)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = "var(--sb-surface, #ffffff)"; }}
         >
           <BellIcon style={{ width: 16, height: 16 }} />
           <span
@@ -170,7 +204,7 @@ export default function TopBar({
               width: 8,
               height: 8,
               background: "var(--sb-neg-2, #dc2626)",
-              boxShadow: "0 0 0 2px #ffffff",
+              boxShadow: "0 0 0 2px var(--sb-surface, #ffffff)",
             }}
             aria-hidden
           />
@@ -180,16 +214,18 @@ export default function TopBar({
         <div className="relative" ref={dropdownRef}>
           {activeAccount && (
             <button
-              className="flex items-center rounded-full border transition-colors hover:bg-[#f7faff]"
+              className="flex items-center rounded-full border transition-colors"
               style={{
                 gap: 10,
                 padding: "4px 10px 4px 4px",
                 borderColor: "var(--sb-border, #e3ebf5)",
-                background: "#ffffff",
+                background: "var(--sb-surface, #ffffff)",
               }}
               onClick={() => setShowDropdown((v) => !v)}
               aria-label="Cuenta activa"
               aria-expanded={showDropdown}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "var(--sb-surface-2, #f7faff)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "var(--sb-surface, #ffffff)"; }}
             >
               <span
                 className="rounded-full overflow-hidden"
@@ -238,10 +274,11 @@ export default function TopBar({
           {/* Account dropdown */}
           {showDropdown && (
             <div
-              className="absolute top-full right-0 mt-2 w-64 bg-white z-50 py-2 overflow-hidden"
+              className="absolute top-full right-0 mt-2 w-64 z-50 py-2 overflow-hidden"
               style={{
                 borderRadius: 14,
                 border: "1px solid var(--sb-border, #e3ebf5)",
+                background: "var(--sb-surface, #ffffff)",
                 boxShadow: "0 1px 0 rgba(15,30,60,.03), 0 6px 18px -8px rgba(15,30,60,.15)",
               }}
             >
@@ -330,6 +367,8 @@ export default function TopBar({
                   href="/smartrotom/starbank/cuentas"
                   className="block px-4 py-2 transition-colors"
                   style={{ fontSize: 13, color: "var(--sb-600, #2463eb)" }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = "var(--sb-surface-2, #f7faff)"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
                 >
                   Gestionar cuentas
                 </Link>

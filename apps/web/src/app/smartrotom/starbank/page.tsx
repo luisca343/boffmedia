@@ -1,427 +1,911 @@
 "use client";
-import { strToDate } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import Link from "next/link";
 import {
-  BankSection,
-  BankSectionButton,
-  BankSectionContent,
-  BankSectionFooter,
-  BankSectionHeader,
-} from "./_components/BankSection";
-import { AccountImage } from "./_components/AccountImage";
-import { formatMoney, getActiveAccountBalance, changeActiveAccount } from "./bankUtils";
-import { useRouter } from "next/navigation";
-import { AccountSelect } from "./_components/AccountSelect";
-import {
-  AreaChart,
-  Area,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
-
-import { ArrowRight, DollarSign, CreditCard, Send } from 'lucide-react';
+  EyeIcon,
+  EyeSlashIcon,
+  ArrowTrendingUpIcon,
+  ArrowTrendingDownIcon,
+  ShieldCheckIcon,
+  PaperAirplaneIcon,
+  QrCodeIcon,
+  ArrowsRightLeftIcon,
+  ChartBarIcon,
+  CreditCardIcon,
+  CalendarIcon,
+} from "@heroicons/react/24/outline";
+import { AreaChart, Area, ResponsiveContainer } from "recharts";
+import useStarBank from "./_hooks/useStarBank";
 import { useBoffSession } from "@/services/useBoffSession";
 import { useGetTransactions } from "@/hooks/starbank/useGetTransactions";
-import { useGetTransfers } from "@/hooks/starbank/useGetTransfers";
-import { InternalLink } from "@/components/ui/navigation/Link";
+import { AccountImage } from "./_components/AccountImage";
+import { formatMoney, changeActiveAccount } from "./bankUtils";
 import { DashboardSkeleton } from "./_components/DashBoardSkeleton";
-import { StarBankTransaction } from "@boffmedia/shared";
-import useStarBank from "./_hooks/useStarBank";
+import { StarBankTransaction, StarBankAccount } from "@boffmedia/shared";
+import { strToDate } from "@/lib/utils";
 
 export default function StarBank() {
-  const router = useRouter();
   const { session } = useBoffSession();
   const { accounts, activeAccount, setActiveAccount } = useStarBank();
+  const { transactions, isLoading: transactionsLoading } = useGetTransactions(
+    activeAccount?.id ?? -1,
+    100
+  );
+  const [hideBal, setHideBal] = useState(false);
 
-  const { transactions, error: transactionsError, isLoading: transactionsLoading } = useGetTransactions(activeAccount?.id ?? -1, 100);
-  const { transfers, error: transfersError, isLoading: transfersLoading } = useGetTransfers(activeAccount?.id ?? -1);
-
-  function changeAccount(account: number) {
-    changeActiveAccount(account);
-    setActiveAccount(account);
-  }
-
-  function getData() {
-    return transactions
-      ?.slice()
-      .reverse()
-      .reduce((acc: any, transaction: any) => {
-        const transactionType =
-          transaction.from === activeAccount?.id ? "out" : "in";
-        const currentBalance =
-          transactionType === "out"
-            ? transaction.fromBalance
-            : transaction.toBalance;
-
-        acc.push({
-          name: strToDate(transaction.date),
-          balance: currentBalance,
-        });
-        return acc;
-      }, []) || [];
-  }
-
-  function TestChart({
-    data,
-    className,
-  }: {
-    data?: { name: string; balance: number }[];
-    className?: string;
-  }) {
+  function getChartData() {
     return (
-      <ResponsiveContainer width="100%" height="100%">
-        <AreaChart
-          width={100}
-          height={100}
-          data={data}
-          margin={{
-            top: 5,
-            right: 5,
-            left: -25,
-            bottom: 5,
+      transactions
+        ?.slice()
+        .reverse()
+        .reduce(
+          (acc: { name: string; balance: number }[], tx: StarBankTransaction) => {
+            const bal = tx.isPayer ? tx.fromBalance : tx.toBalance;
+            if (bal != null) acc.push({ name: strToDate(tx.date), balance: bal });
+            return acc;
+          },
+          []
+        ) ?? []
+    );
+  }
+
+  const chartData = getChartData();
+  const currentBalance = activeAccount?.balance ?? 0;
+  const weekStart =
+    chartData.length >= 8
+      ? chartData[chartData.length - 8].balance
+      : chartData[0]?.balance ?? currentBalance;
+  const weekDelta =
+    weekStart > 0 ? ((currentBalance - weekStart) / weekStart) * 100 : 0;
+  const weekAbsDiff = currentBalance - weekStart;
+
+  const incomeMonth =
+    transactions
+      ?.filter((t: StarBankTransaction) => !t.isPayer)
+      .reduce((s: number, t: StarBankTransaction) => s + t.amount, 0) ?? 0;
+  const expenseMonth =
+    transactions
+      ?.filter((t: StarBankTransaction) => t.isPayer)
+      .reduce((s: number, t: StarBankTransaction) => s + t.amount, 0) ?? 0;
+  const savingsRate =
+    incomeMonth > 0
+      ? ((incomeMonth - expenseMonth) / incomeMonth) * 100
+      : 0;
+
+  const recent: StarBankTransaction[] = transactions?.slice(0, 6) ?? [];
+  const firstName =
+    session?.user?.name?.split(" ")[0] ?? activeAccount?.name ?? "Usuario";
+  const today = new Date().toLocaleDateString("es-ES", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
+
+  if (!accounts || transactionsLoading) return <DashboardSkeleton />;
+
+  return (
+    <div
+      style={{
+        padding: 28,
+        display: "flex",
+        flexDirection: "column",
+        gap: 20,
+        maxWidth: 1480,
+        width: "100%",
+        margin: "0 auto",
+      }}
+    >
+      {/* ── Page header ── */}
+      <div className="flex items-end justify-between gap-4 flex-wrap">
+        <div>
+          <h1
+            style={{
+              fontFamily: "var(--sb-font-display, 'Space Grotesk', sans-serif)",
+              fontWeight: 600,
+              fontSize: 28,
+              letterSpacing: "-0.02em",
+              margin: 0,
+              color: "var(--sb-fg, #0c1830)",
+            }}
+          >
+            Hola, {firstName}
+          </h1>
+          <p
+            style={{
+              color: "var(--sb-fg-muted, #5b6b85)",
+              fontSize: 13.5,
+              marginTop: 4,
+              margin: "4px 0 0",
+            }}
+          >
+            {today.charAt(0).toUpperCase() + today.slice(1)}
+          </p>
+        </div>
+        <Link
+          href="/smartrotom/starbank/enviar"
+          className="inline-flex items-center gap-2 rounded-[14px] font-semibold text-sm transition-colors"
+          style={{
+            padding: "9px 14px",
+            background: "var(--sb-600, #2463eb)",
+            color: "#fff",
+            boxShadow: "var(--sb-sh-brand, 0 14px 40px -16px rgba(36,99,235,.55))",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "var(--sb-700, #1d4ed8)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "var(--sb-600, #2463eb)";
           }}
         >
-          <CartesianGrid strokeDasharray="3 3" />
-          <YAxis />
-          <Tooltip />
-          <Area
-            type="monotone"
-            dataKey="balance"
-            stroke="#1e3a8a"
-            fill="#3b82f6"
-            activeDot={{ r: 8 }}
-          />
-        </AreaChart>
-      </ResponsiveContainer>
-    );
-  }
+          <PaperAirplaneIcon style={{ width: 16, height: 16 }} />
+          Enviar
+        </Link>
+      </div>
 
-  function GraficaYTal() {
-    return <TestChart data={getData()} className="h-full " />;
-  }
+      {/* ── Hero balance card ── */}
+      <div
+        className="relative overflow-hidden rounded-[24px]"
+        style={{
+          background:
+            "radial-gradient(600px 280px at 100% 0%, rgba(96,165,250,.35), transparent 70%), radial-gradient(800px 400px at -10% 110%, rgba(36,99,235,.5), transparent 60%), linear-gradient(135deg, #0b1638, #1e3a8a 55%, #2463eb)",
+          color: "#fff",
+          padding: 28,
+          boxShadow:
+            "var(--sb-sh-brand, 0 14px 40px -16px rgba(36,99,235,.55))",
+          display: "grid",
+          gridTemplateColumns: "minmax(0, 1.2fr) minmax(0, 1fr)",
+          gap: 28,
+          alignItems: "stretch",
+        }}
+      >
+        {/* grid mesh */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            pointerEvents: "none",
+            opacity: 0.35,
+            backgroundImage:
+              "linear-gradient(transparent 95%, rgba(255,255,255,.18) 95%), linear-gradient(90deg, transparent 95%, rgba(255,255,255,.12) 95%)",
+            backgroundSize: "28px 28px",
+            WebkitMaskImage:
+              "radial-gradient(ellipse at 20% 30%, black 0%, transparent 70%)",
+            maskImage:
+              "radial-gradient(ellipse at 20% 30%, black 0%, transparent 70%)",
+          }}
+        />
 
-  if (!accounts || transactionsLoading || transfersLoading) {
-    return <DashboardSkeleton />;
-  }
+        {/* Left */}
+        <div className="relative flex flex-col gap-3.5">
+          {/* Account pill */}
+          <div
+            className="self-start inline-flex items-center gap-2"
+            style={{
+              background: "rgba(255,255,255,.12)",
+              border: "1px solid rgba(255,255,255,.18)",
+              padding: "5px 11px 5px 5px",
+              borderRadius: 999,
+              fontSize: 12,
+              fontWeight: 500,
+              backdropFilter: "blur(8px)",
+            }}
+          >
+            <span
+              className="rounded-full overflow-hidden block shrink-0"
+              style={{ width: 22, height: 22 }}
+            >
+              <AccountImage
+                width={22}
+                height={22}
+                type={activeAccount?.type}
+                name={activeAccount?.name}
+                image={(activeAccount as any)?.image}
+              />
+            </span>
+            Cuenta principal · {activeAccount?.name ?? ""}
+          </div>
 
-  if (transactionsError || transfersError) {
-    return <div>Error: {transactionsError || transfersError}</div>;
-  }
+          <div
+            style={{
+              fontSize: 12,
+              color: "#c8d4ec",
+              textTransform: "uppercase",
+              letterSpacing: "0.15em",
+            }}
+          >
+            Balance disponible
+          </div>
 
-  return (
-    <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8 py-8 h-full flex flex-col">
-      <section className="w-full grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Balance Card */}
-        <BankSection className="h-64 md:col-span-1">
-          <BankSectionHeader>Balance de cuenta</BankSectionHeader>
-          <BankSectionContent>
-            <div className="flex flex-col h-full justify-center">
-              <div className="text-4xl 2xl:text-5xl font-bold text-blue-700">
-                {formatMoney(activeAccount?.balance ?? 0)}
-              </div>
-              <div className="text-sm text-blue-500 mt-2">
-                Cuenta {activeAccount?.name || "Principal"}
-              </div>
+          {/* Balance amount */}
+          <div
+            className="inline-flex items-baseline gap-1.5"
+            style={{
+              fontFamily: "var(--sb-font-display, 'Space Grotesk', sans-serif)",
+              fontSize: "clamp(40px, 6vw, 64px)",
+              lineHeight: 1,
+              fontWeight: 700,
+              letterSpacing: "-0.03em",
+              fontVariantNumeric: "tabular-nums",
+            }}
+          >
+            {hideBal
+              ? "•••••••"
+              : new Intl.NumberFormat("es-ES").format(currentBalance)}
+            <span style={{ fontSize: "0.42em", color: "#93c5fd", fontWeight: 600 }}>
+              ¥
+            </span>
+            <button
+              onClick={() => setHideBal((h) => !h)}
+              aria-label={hideBal ? "Mostrar saldo" : "Ocultar saldo"}
+              style={{ marginLeft: 8, opacity: 0.6, color: "#fff", padding: 4 }}
+              onMouseEnter={(e) => { e.currentTarget.style.opacity = "1"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.opacity = "0.6"; }}
+            >
+              {hideBal ? (
+                <EyeIcon style={{ width: 20, height: 20 }} />
+              ) : (
+                <EyeSlashIcon style={{ width: 20, height: 20 }} />
+              )}
+            </button>
+          </div>
+
+          {/* Delta */}
+          <div
+            className="inline-flex gap-1.5 items-center"
+            style={{ fontSize: 13, color: "#b6d3ff" }}
+          >
+            <span
+              style={{
+                color: weekDelta >= 0 ? "#6ee7b7" : "#fca5a5",
+                fontWeight: 600,
+              }}
+            >
+              {weekDelta >= 0 ? "▲" : "▼"} {formatMoney(Math.abs(weekAbsDiff))} (
+              {weekDelta.toFixed(1)}%)
+            </span>
+            <span style={{ color: "#9bb3da" }}>en los últimos 7 días</span>
+          </div>
+
+          {/* Actions row */}
+          <div className="flex flex-wrap gap-2" style={{ marginTop: 6 }}>
+            <Link
+              href="/smartrotom/starbank/enviar"
+              className="inline-flex items-center gap-2 rounded-[14px] font-semibold text-sm px-3.5 py-2 transition-colors"
+              style={{
+                backdropFilter: "blur(8px)",
+                background: "#fff",
+                color: "#172554",
+              }}
+            >
+              <PaperAirplaneIcon style={{ width: 14, height: 14 }} /> Enviar
+            </Link>
+            <button
+              className="inline-flex items-center gap-2 rounded-[14px] font-semibold text-sm px-3.5 py-2 transition-colors"
+              style={{
+                backdropFilter: "blur(8px)",
+                background: "rgba(255,255,255,.13)",
+                color: "#fff",
+                border: "1px solid rgba(255,255,255,.22)",
+              }}
+            >
+              <QrCodeIcon style={{ width: 14, height: 14 }} /> Solicitar
+            </button>
+            <Link
+              href="/smartrotom/starbank/cuentas"
+              className="inline-flex items-center gap-2 rounded-[14px] font-semibold text-sm px-3.5 py-2 transition-colors"
+              style={{
+                backdropFilter: "blur(8px)",
+                background: "rgba(255,255,255,.13)",
+                color: "#fff",
+                border: "1px solid rgba(255,255,255,.22)",
+              }}
+            >
+              <ArrowsRightLeftIcon style={{ width: 14, height: 14 }} /> Mover entre
+              cuentas
+            </Link>
+            <Link
+              href="/smartrotom/starbank/graficas"
+              className="inline-flex items-center gap-2 rounded-[14px] font-semibold text-sm px-3.5 py-2 transition-colors"
+              style={{
+                backdropFilter: "blur(8px)",
+                background: "rgba(255,255,255,.13)",
+                color: "#fff",
+                border: "1px solid rgba(255,255,255,.22)",
+              }}
+            >
+              <ChartBarIcon style={{ width: 14, height: 14 }} /> Insights
+            </Link>
+          </div>
+        </div>
+
+        {/* Right: sparkline */}
+        <div className="relative" style={{ minHeight: 180 }}>
+          <div
+            className="absolute inset-0 flex flex-col"
+            style={{ padding: "0 8px 8px" }}
+          >
+            <div
+              className="flex justify-between"
+              style={{ color: "#9bb3da", fontSize: 11, marginBottom: 6 }}
+            >
+              <span>Hace 30 días</span>
+              <span>Hoy</span>
             </div>
-          </BankSectionContent>
-          <BankSectionFooter>
-            <div className="flex flex-col w-full justify-center">
-              <span className="text-xs xl:text-lg text-blue-800">
-                Cambiar de Cuenta
-              </span>
-              <AccountSelect
-                accounts={accounts}
-                activeAccount={activeAccount?.id ?? -1}
-                setActiveAccount={changeAccount}
+            <div className="flex-1" style={{ borderRadius: 12, overflow: "hidden" }}>
+              {chartData.length > 1 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart
+                    data={chartData}
+                    margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
+                  >
+                    <defs>
+                      <linearGradient
+                        id="sbSparkGrad"
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="1"
+                      >
+                        <stop
+                          offset="0%"
+                          stopColor="#93c5fd"
+                          stopOpacity={0.35}
+                        />
+                        <stop
+                          offset="100%"
+                          stopColor="#93c5fd"
+                          stopOpacity={0}
+                        />
+                      </linearGradient>
+                    </defs>
+                    <Area
+                      type="monotone"
+                      dataKey="balance"
+                      stroke="#93c5fd"
+                      strokeWidth={2.5}
+                      fill="url(#sbSparkGrad)"
+                      dot={false}
+                      activeDot={false}
+                      isAnimationActive={false}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              ) : (
+                <div
+                  className="h-full flex items-center justify-center"
+                  style={{ color: "#9bb3da", fontSize: 12 }}
+                >
+                  Sin datos de historial
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── KPI strip ── */}
+      <div
+        className="grid gap-4"
+        style={{ gridTemplateColumns: "repeat(3, minmax(0, 1fr))" }}
+      >
+        <KpiCard
+          label="Ingresos del mes"
+          value={formatMoney(incomeMonth)}
+          icon="up"
+          tone="pos"
+          delta={null}
+          sub="Entradas totales"
+        />
+        <KpiCard
+          label="Gastos del mes"
+          value={formatMoney(expenseMonth)}
+          icon="dn"
+          tone="neg"
+          delta={null}
+          sub="Salidas totales"
+        />
+        <KpiCard
+          label="Tasa de ahorro"
+          value={savingsRate.toFixed(0) + " %"}
+          icon="shield"
+          tone={null}
+          delta={null}
+          sub={`Has guardado ${formatMoney(Math.max(0, incomeMonth - expenseMonth))}`}
+        />
+      </div>
+
+      {/* ── Quick actions + Accounts ── */}
+      <div
+        className="grid gap-4"
+        style={{ gridTemplateColumns: "repeat(12, minmax(0, 1fr))" }}
+      >
+        {/* Quick actions */}
+        <div
+          className="rounded-[18px] overflow-hidden flex flex-col"
+          style={{
+            gridColumn: "span 8",
+            background: "var(--sb-surface, #fff)",
+            border: "1px solid var(--sb-border, #e3ebf5)",
+            boxShadow: "var(--sb-sh-1)",
+          }}
+        >
+          <SectionHead title="Acciones rápidas" eyebrow="Atajos" />
+          <div style={{ padding: "14px 20px 20px", flex: 1 }}>
+            <div
+              className="grid gap-2.5"
+              style={{ gridTemplateColumns: "repeat(4, 1fr)" }}
+            >
+              <QuickAction
+                icon={<PaperAirplaneIcon style={{ width: 18, height: 18 }} />}
+                title="Enviar dinero"
+                sub="A un entrenador o tienda"
+                href="/smartrotom/starbank/enviar"
+              />
+              <QuickAction
+                icon={<CreditCardIcon style={{ width: 18, height: 18 }} />}
+                title="Mover entre cuentas"
+                sub="Reorganiza tu dinero"
+                href="/smartrotom/starbank/cuentas"
+              />
+              <QuickAction
+                icon={<QrCodeIcon style={{ width: 18, height: 18 }} />}
+                title="Solicitar pago"
+                sub="Comparte tu código"
+              />
+              <QuickAction
+                icon={<CalendarIcon style={{ width: 18, height: 18 }} />}
+                title="Programar pago"
+                sub="Pagos recurrentes"
+                href="/smartrotom/starbank/calendario"
               />
             </div>
-          </BankSectionFooter>
-        </BankSection>
-  
-        {/* Chart Card */}
-        <BankSection className="h-64 md:col-span-2">
-          <BankSectionHeader>Movimientos Recientes</BankSectionHeader>
-          <BankSectionContent>
-            <GraficaYTal />
-          </BankSectionContent>
-        </BankSection>
-  
-        {/* Quick Actions */}
-        <BankSection className="md:col-span-3">
-          <BankSectionHeader>Acciones Rápidas</BankSectionHeader>
-          <BankSectionContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <InternalLink 
-                href="starbank/enviar" 
-                className="group relative overflow-hidden flex flex-1 items-center justify-center p-6 border-2 border-blue-200 rounded-xl bg-gradient-to-br from-blue-50 to-white hover:from-blue-100 hover:to-blue-50 transition-all duration-300 hover:shadow-lg hover:scale-105"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-3 bg-blue-100 rounded-full group-hover:bg-blue-200 transition-colors">
-                    <DollarSign className="text-blue-700 h-6 w-6" />
-                  </div>
-                  <div>
-                    <span className="text-blue-900 font-semibold block">Transferir Dinero</span>
-                    <span className="text-blue-600 text-sm">Envía dinero rápidamente</span>
-                  </div>
-                </div>
-                <div className="absolute top-0 right-0 w-20 h-20 bg-blue-200 rounded-full -mr-10 -mt-10 opacity-20"></div>
-              </InternalLink>
-              
-              <InternalLink 
-                href="starbank/cuentas" 
-                className="group relative overflow-hidden flex flex-1 items-center justify-center p-6 border-2 border-blue-200 rounded-xl bg-gradient-to-br from-blue-50 to-white hover:from-blue-100 hover:to-blue-50 transition-all duration-300 hover:shadow-lg hover:scale-105"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-3 bg-blue-100 rounded-full group-hover:bg-blue-200 transition-colors">
-                    <CreditCard className="text-blue-700 h-6 w-6" />
-                  </div>
-                  <div>
-                    <span className="text-blue-900 font-semibold block">Administrar Cuentas</span>
-                    <span className="text-blue-600 text-sm">Gestiona tus cuentas</span>
-                  </div>
-                </div>
-                <div className="absolute top-0 right-0 w-20 h-20 bg-blue-200 rounded-full -mr-10 -mt-10 opacity-20"></div>
-              </InternalLink>
-              
-              <InternalLink 
-                href="starbank/facturas" 
-                className="group relative overflow-hidden flex flex-1 items-center justify-center p-6 border-2 border-blue-200 rounded-xl bg-gradient-to-br from-blue-50 to-white hover:from-blue-100 hover:to-blue-50 transition-all duration-300 hover:shadow-lg hover:scale-105"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-3 bg-blue-100 rounded-full group-hover:bg-blue-200 transition-colors">
-                    <Send className="text-blue-700 h-6 w-6" />
-                  </div>
-                  <div>
-                    <span className="text-blue-900 font-semibold block">Pagar Facturas</span>
-                    <span className="text-blue-600 text-sm">Gestiona tus pagos</span>
-                  </div>
-                </div>
-                <div className="absolute top-0 right-0 w-20 h-20 bg-blue-200 rounded-full -mr-10 -mt-10 opacity-20"></div>
-              </InternalLink>
-            </div>
-          </BankSectionContent>
-        </BankSection>
-  
-        {/* Recent Transactions */}
-        <BankSection className="h-96 overflow-auto md:col-span-3">
-          <BankSectionHeader>Transacciones Recientes</BankSectionHeader>
-          <BankSectionContent>
-            <Transactions
-              trans={transactions}
-              activeAccount={activeAccount?.id ?? -1}
-              fecth={false}
-            />
-          </BankSectionContent>
-          <BankSectionFooter>
-            <InternalLink
-              href="starbank/transacciones"
-              className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center py-2 rounded-lg transition-colors"
-            >
-              Ver todas las transacciones <ArrowRight className="ml-2 -mr-1 h-4 w-4" />
-            </InternalLink>
-          </BankSectionFooter>
-        </BankSection>
-      </section>
-    </div>
-  );
-}
-
-function TransfersShort({
-  transfers,
-  activeAccount,
-}: {
-  transfers: any;
-  activeAccount: any;
-}) {
-  return (
-    <div className="flex justify-evenly flex-wrap ">
-      {transfers.map((transfer: any) => {
-        const transactionType =
-          transfer.from === activeAccount.id ? "out" : "in";
-        const amount =
-          transactionType === "out" ? -transfer.amount : transfer.amount;
-        const currentBalance =
-          transactionType === "out" ? transfer.fromBalance : transfer.toBalance;
-        const name =
-          transactionType === "out" ? transfer.toName : transfer.fromName;
-        const type =
-          transactionType === "out" ? transfer.toType : transfer.fromType;
-
-        return (
-          <div
-            className="flex flex-col justify-center items-center"
-            key={transfer.date}
-          >
-            <div className="flex hover:bg-opacity-50 items-center my-1">
-              <AccountImage width={32} type={type} name={name} image={(transfer as any).image} />
-              <div
-                className={`text-right my-auto mx-2 ${
-                  esPagador(transfer, activeAccount)
-                    ? "text-red-800"
-                    : "text-highlight-700"
-                }`}
-              >
-                <div className="font-bold text-lg text-shadow-border05">
-                  {formatMoney(amount)}
-                </div>
-              </div>
-            </div>
-            <div className="flex text-xs text-center">
-              {strToDate(transfer.date)} - {name}
-            </div>
           </div>
-        );
-      })}
-    </div>
-  );
-}
+        </div>
 
-function TablaTransacciones({
-  transactions,
-  activeAccount,
-}: {
-  transactions: any;
-  activeAccount: any;
-}) {
-  return (
-    <div className="relative overflow-x-auto shadow-sm rounded-lg">
-      <table className="min-w-full divide-y divide-surface-200">
-        <thead className="sticky top-0 z-10 bg-blue-50">
-          <tr>
-            <th colSpan={2} className="px-6 py-3 text-left text-xs font-medium text-blue-800 uppercase tracking-wider">Información</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-blue-800 uppercase tracking-wider">
-              Cantidad
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-blue-800 uppercase tracking-wider">
-              Fecha
-            </th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-surface-200">
-          {transactions.map((transaction: StarBankTransaction) => {
-            const isPayer = esPagador(transaction, activeAccount);
-            return (
-              <tr key={transaction.date} className="hover:bg-blue-50 transition-colors">
-                <td className="py-4 pl-6 whitespace-nowrap">
-                  <AccountImage type={transaction.displayAccountType} name={transaction.displayName} image={(transaction as any).displayImage}/>
-                </td>
-                <td className="pr-6 py-4">
-                  <div className="text-sm font-medium text-blue-900">{transaction.reason}</div>
-                  <div className="text-xs text-blue-500">{transaction.displayName}</div>
-                </td>
-                <td className={`px-6 py-4 whitespace-nowrap font-medium ${
-                  isPayer ? "text-red-600" : "text-emerald-600"
-                }`}>
-                  <div className="flex items-center">
-                    {isPayer ? "- " : "+ "}
-                    {formatMoney(transaction.amount)}
+        {/* Accounts overview */}
+        <div
+          className="rounded-[18px] overflow-hidden flex flex-col"
+          style={{
+            gridColumn: "span 4",
+            background: "var(--sb-surface, #fff)",
+            border: "1px solid var(--sb-border, #e3ebf5)",
+            boxShadow: "var(--sb-sh-1)",
+          }}
+        >
+          <SectionHead
+            title="Tus cuentas"
+            eyebrow={`${accounts.length} cuenta${accounts.length !== 1 ? "s" : ""}`}
+            action={
+              <Link
+                href="/smartrotom/starbank/cuentas"
+                className="inline-flex items-center font-semibold rounded-[10px] transition-colors"
+                style={{
+                  fontSize: 12.5,
+                  padding: "5px 10px",
+                  color: "var(--sb-600, #2463eb)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "var(--sb-50, #eff6ff)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "transparent";
+                }}
+              >
+                Gestionar
+              </Link>
+            }
+          />
+          <div style={{ padding: 0 }}>
+            {accounts.map((acc: StarBankAccount) => (
+              <Link
+                key={acc.id}
+                href="/smartrotom/starbank/cuentas"
+                className="flex items-center gap-3 transition-colors"
+                style={{
+                  padding: "10px 20px",
+                  borderTop: "1px solid var(--sb-border, #e3ebf5)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "var(--sb-surface-2, #f7faff)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "transparent";
+                }}
+              >
+                <div
+                  className="shrink-0 rounded-full overflow-hidden"
+                  style={{ width: 36, height: 36 }}
+                >
+                  <AccountImage
+                    width={36}
+                    height={36}
+                    type={acc.type}
+                    name={acc.name}
+                    image={(acc as any).image}
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div
+                    className="font-semibold truncate"
+                    style={{ fontSize: 13.5, color: "var(--sb-fg, #0c1830)" }}
+                  >
+                    {acc.name}
                   </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-900">
-                  {strToDate(transaction.date)}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+                  <div
+                    style={{
+                      fontSize: 11.5,
+                      color: "var(--sb-fg-muted, #5b6b85)",
+                    }}
+                  >
+                    {acc.type === "MAIN" ? "Cuenta principal" : "Cuenta secundaria"}
+                  </div>
+                </div>
+                <div
+                  className="tabular-nums font-semibold shrink-0"
+                  style={{ fontSize: 13.5, color: "var(--sb-fg, #0c1830)" }}
+                >
+                  {formatMoney(acc.balance)}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Recent transactions ── */}
+      <div
+        className="rounded-[18px] overflow-hidden flex flex-col"
+        style={{
+          background: "var(--sb-surface, #fff)",
+          border: "1px solid var(--sb-border, #e3ebf5)",
+          boxShadow: "var(--sb-sh-1)",
+        }}
+      >
+        <SectionHead
+          title="Transacciones recientes"
+          eyebrow="Últimos movimientos"
+          action={
+            <Link
+              href="/smartrotom/starbank/transacciones"
+              className="inline-flex items-center font-semibold rounded-[10px] transition-colors"
+              style={{
+                fontSize: 12.5,
+                padding: "5px 10px",
+                color: "var(--sb-600, #2463eb)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "var(--sb-50, #eff6ff)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "transparent";
+              }}
+            >
+              Ver todas
+            </Link>
+          }
+        />
+        {recent.length === 0 ? (
+          <div
+            style={{
+              padding: "24px 20px",
+              textAlign: "center",
+              color: "var(--sb-fg-muted, #5b6b85)",
+              fontSize: 13,
+            }}
+          >
+            No hay transacciones recientes
+          </div>
+        ) : (
+          recent.map((tx: StarBankTransaction, i) => (
+            <TxRow key={`${tx.date}-${i}`} tx={tx} isLast={i === recent.length - 1} />
+          ))
+        )}
+      </div>
     </div>
   );
 }
 
-/*
-        return (
-          <div
-            key={transaction.date}
-            className="flex  hover:bg-opacity-50 items-center my-1"
-          >
-            <AccountImage type={type} name={name} />
-            <div className="min-h-9 my-auto mx-4 flex flex-col flex-1">
-              <div className="text-lg font-bold break-all">
-                {transaction.reason}
-              </div>
-              <div className="text-sm ">
-                {strToDate(transaction.date)} - {name}
-              </div>
-            </div>
-            <div
-              className={`text-right my-auto ${
-                esPagador(transaction, activeAccount)
-                  ? "text-red-800"
-                  : "text-highlight-700"
-              }`}
-            >
-              <div className="font-bold text-xl text-shadow-border05">
-                {formatMoney(amount)}
-              </div>
-              <div className="text-md">{formatMoney(currentBalance)}</div>
-            </div>
-          </div>
-        );*/
+/* ── Sub-components ── */
 
-function Transactions({
-  trans,
-  activeAccount,
-  className,
-  fecth = true,
+function KpiCard({
+  label,
+  value,
+  icon,
+  tone,
+  delta,
+  sub,
 }: {
-  trans: any;
-  activeAccount: number;
-  className?: string;
-  fecth?: boolean;
+  label: string;
+  value: string;
+  icon: "up" | "dn" | "shield";
+  tone: "pos" | "neg" | null;
+  delta: number | null;
+  sub: string;
 }) {
-  const [transactions, setTransactions] = useState<StarBankTransaction[]>([]);
-  const { transactions: fetchedTransactions, isLoading, error } = useGetTransactions(activeAccount, 100);
+  const iconBg =
+    tone === "pos"
+      ? "var(--sb-pos-soft, #e7f7ef)"
+      : tone === "neg"
+      ? "var(--sb-neg-soft, #fdecec)"
+      : "var(--sb-surface-2, #f7faff)";
+  const iconColor =
+    tone === "pos"
+      ? "var(--sb-pos, #047857)"
+      : tone === "neg"
+      ? "var(--sb-neg, #b91c1c)"
+      : "var(--sb-600, #2463eb)";
+  const IconComp =
+    icon === "up"
+      ? ArrowTrendingUpIcon
+      : icon === "dn"
+      ? ArrowTrendingDownIcon
+      : ShieldCheckIcon;
 
-
-  useEffect(() => {
-    if (!fetch) {
-      setTransactions(trans);
-    } else if (fetchedTransactions) {
-      setTransactions(fetchedTransactions);
-    }
-  }, [fetch, trans, fetchedTransactions]);
-
-  if (isLoading) {
-    return (
-      <div className="h-full p-2 overflow-auto">
-        <div className="text-center 2xl:text-2xl font-bold">
-          Cargando transacciones...
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="h-full p-2 overflow-auto">
-        <div className="text-center 2xl:text-2xl font-bold text-red-600">
-          Error al cargar las transacciones
-        </div>
-      </div>
-    );
-  }
-
-  if (transactions.length === 0) {
-    return (
-      <div className="h-full p-2 overflow-auto">
-        <div className="text-center 2xl:text-2xl font-bold">
-          No hay transacciones
-        </div>
-      </div>
-    );
-  }
-  
   return (
-    <TablaTransacciones
-      transactions={transactions}
-      activeAccount={activeAccount}
-    />
+    <div
+      className="rounded-[18px]"
+      style={{
+        background: "var(--sb-surface, #fff)",
+        border: "1px solid var(--sb-border, #e3ebf5)",
+        boxShadow: "var(--sb-sh-1)",
+      }}
+    >
+      <div
+        style={{ display: "flex", flexDirection: "column", gap: 6, padding: "18px 20px" }}
+      >
+        <div
+          className="flex items-center justify-between"
+          style={{ fontSize: 12, color: "var(--sb-fg-muted, #5b6b85)" }}
+        >
+          <span>{label}</span>
+          <div
+            className="grid place-items-center rounded-[10px]"
+            style={{ width: 32, height: 32, background: iconBg, color: iconColor }}
+          >
+            <IconComp style={{ width: 16, height: 16 }} />
+          </div>
+        </div>
+        <div
+          style={{
+            fontFamily: "var(--sb-font-display, 'Space Grotesk', sans-serif)",
+            fontSize: 26,
+            fontWeight: 600,
+            letterSpacing: "-0.01em",
+            fontVariantNumeric: "tabular-nums",
+            color: "var(--sb-fg, #0c1830)",
+          }}
+        >
+          {value}
+        </div>
+        <div
+          className="flex items-center gap-1.5"
+          style={{ fontSize: 12, color: "var(--sb-fg-muted, #5b6b85)" }}
+        >
+          {delta != null && (
+            <span
+              style={{
+                color:
+                  delta >= 0
+                    ? "var(--sb-pos, #047857)"
+                    : "var(--sb-neg, #b91c1c)",
+                fontWeight: 600,
+              }}
+            >
+              {delta >= 0 ? "▲" : "▼"} {Math.abs(delta).toFixed(1)}%
+            </span>
+          )}
+          <span>{sub}</span>
+        </div>
+      </div>
+    </div>
   );
 }
 
-function esPagador(transaction: any, activeAccount: any) {
-  return transaction.from == activeAccount?.id;
+function SectionHead({
+  title,
+  eyebrow,
+  action,
+}: {
+  title: string;
+  eyebrow?: string;
+  action?: React.ReactNode;
+}) {
+  return (
+    <div
+      className="flex items-center justify-between gap-3"
+      style={{ padding: "18px 20px 6px" }}
+    >
+      <div>
+        {eyebrow && (
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 600,
+              color: "var(--sb-fg-muted, #5b6b85)",
+              textTransform: "uppercase",
+              letterSpacing: "0.06em",
+              marginBottom: 2,
+            }}
+          >
+            {eyebrow}
+          </div>
+        )}
+        <h3
+          className="truncate"
+          style={{
+            fontFamily: "var(--sb-font-display, 'Space Grotesk', sans-serif)",
+            fontSize: 15,
+            fontWeight: 600,
+            letterSpacing: "-0.005em",
+            margin: 0,
+            color: "var(--sb-fg, #0c1830)",
+          }}
+        >
+          {title}
+        </h3>
+      </div>
+      {action}
+    </div>
+  );
+}
+
+function QuickAction({
+  icon,
+  title,
+  sub,
+  href,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  sub: string;
+  href?: string;
+}) {
+  const content = (
+    <>
+      <div
+        className="shrink-0 grid place-items-center rounded-[10px] transition-colors"
+        style={{
+          width: 38,
+          height: 38,
+          background: "var(--sb-surface-3, #eef3fb)",
+          color: "var(--sb-600, #2463eb)",
+        }}
+      >
+        {icon}
+      </div>
+      <div>
+        <div
+          className="font-semibold"
+          style={{ fontSize: 13.5, color: "var(--sb-fg, #0c1830)" }}
+        >
+          {title}
+        </div>
+        <div style={{ fontSize: 11.5, color: "var(--sb-fg-muted, #5b6b85)" }}>
+          {sub}
+        </div>
+      </div>
+    </>
+  );
+
+  const baseStyle: React.CSSProperties = {
+    display: "flex",
+    alignItems: "center",
+    gap: 12,
+    padding: 14,
+    border: "1px solid var(--sb-border, #e3ebf5)",
+    borderRadius: 14,
+    background: "var(--sb-surface, #fff)",
+    transition: "all 200ms cubic-bezier(.2,.8,.2,1)",
+    textAlign: "left",
+    width: "100%",
+  };
+
+  function handleEnter(e: React.MouseEvent<HTMLElement>) {
+    e.currentTarget.style.borderColor = "var(--sb-300, #93c5fd)";
+    e.currentTarget.style.background = "var(--sb-50, #eff6ff)";
+    e.currentTarget.style.boxShadow = "var(--sb-sh-2)";
+  }
+  function handleLeave(e: React.MouseEvent<HTMLElement>) {
+    e.currentTarget.style.borderColor = "var(--sb-border, #e3ebf5)";
+    e.currentTarget.style.background = "var(--sb-surface, #fff)";
+    e.currentTarget.style.boxShadow = "none";
+  }
+
+  if (href) {
+    return (
+      <Link
+        href={href}
+        style={baseStyle}
+        onMouseEnter={handleEnter}
+        onMouseLeave={handleLeave}
+      >
+        {content}
+      </Link>
+    );
+  }
+  return (
+    <button
+      style={baseStyle}
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
+    >
+      {content}
+    </button>
+  );
+}
+
+function TxRow({
+  tx,
+  isLast,
+}: {
+  tx: StarBankTransaction;
+  isLast: boolean;
+}) {
+  const isIncoming = !tx.isPayer;
+  return (
+    <div
+      className="grid items-center gap-3 cursor-pointer transition-colors"
+      style={{
+        gridTemplateColumns: "36px 1fr auto auto",
+        padding: "14px 20px",
+        borderBottom: isLast ? "none" : "1px solid var(--sb-border, #e3ebf5)",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.background = "var(--sb-surface-2, #f7faff)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = "transparent";
+      }}
+    >
+      <div
+        className="rounded-full overflow-hidden shrink-0"
+        style={{ width: 36, height: 36 }}
+      >
+        <AccountImage
+          width={36}
+          height={36}
+          type={tx.displayAccountType}
+          name={tx.displayName}
+          image={(tx as any).displayImage}
+        />
+      </div>
+      <div className="min-w-0">
+        <div
+          className="font-semibold truncate"
+          style={{ fontSize: 13.5, color: "var(--sb-fg, #0c1830)" }}
+        >
+          {tx.reason || tx.displayName}
+        </div>
+        <div
+          className="flex items-center gap-2"
+          style={{ fontSize: 12, color: "var(--sb-fg-muted, #5b6b85)" }}
+        >
+          <span>{tx.displayName}</span>
+        </div>
+      </div>
+      <div
+        className="tabular-nums font-semibold"
+        style={{
+          fontSize: 14,
+          textAlign: "right",
+          color: isIncoming
+            ? "var(--sb-pos, #047857)"
+            : "var(--sb-neg, #b91c1c)",
+        }}
+      >
+        {isIncoming ? "+ " : "− "}
+        {formatMoney(tx.amount)}
+      </div>
+      <div
+        style={{
+          fontSize: 12,
+          color: "var(--sb-fg-muted, #5b6b85)",
+          textAlign: "right",
+          fontVariantNumeric: "tabular-nums",
+        }}
+      >
+        {strToDate(tx.date)}
+      </div>
+    </div>
+  );
 }
