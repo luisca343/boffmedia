@@ -167,3 +167,83 @@
   --error: var(--light-error);
   --info: var(--light-info);
 }
+
+/* ============================================================
+   Starbank v2 — Design Tokens
+   Blue-anchored fintech system (light canonical, dark via data-theme)
+   ============================================================ */
+
+:root {
+  /* Brand blue (11-step scale) */
+  --sb-50:  #eff6ff;
+  --sb-100: #dbeafe;
+  --sb-200: #bfdbfe;
+  --sb-300: #93c5fd;
+  --sb-400: #60a5fa;
+  --sb-500: #3b82f6;
+  --sb-600: #2463eb;
+  --sb-700: #1d4ed8;
+  --sb-800: #1e3a8a;
+  --sb-900: #172554;
+  --sb-950: #0b1638;
+
+  /* Page surfaces */
+  --sb-bg:            #f3f6fc;
+  --sb-surface:       #ffffff;
+  --sb-surface-2:     #f7faff;
+  --sb-surface-3:     #eef3fb;
+  --sb-border:        #e3ebf5;
+  --sb-border-strong: #c9d6ec;
+  --sb-ring:          #2463eb;
+
+  /* Text */
+  --sb-fg:        #0c1830;
+  --sb-fg-2:      #2c3a55;
+  --sb-fg-muted:  #5b6b85;
+  --sb-fg-subtle: #8d99b3;
+
+  /* Semantic — income / expense / warn / info */
+  --sb-pos:       #047857;
+  --sb-pos-2:     #059669;
+  --sb-pos-soft:  #e7f7ef;
+  --sb-neg:       #b91c1c;
+  --sb-neg-2:     #dc2626;
+  --sb-neg-soft:  #fdecec;
+  --sb-warn:      #b45309;
+  --sb-warn-soft: #fff5e0;
+  --sb-info:      #1d4ed8;
+  --sb-info-soft: #e8f0ff;
+
+  /* Categorical accents (chips / charts) */
+  --sb-cat-1: #2463eb;
+  --sb-cat-2: #06b6d4;
+  --sb-cat-3: #8b5cf6;
+  --sb-cat-4: #f59e0b;
+  --sb-cat-5: #10b981;
+  --sb-cat-6: #ec4899;
+
+  /* Shadows */
+  --sb-sh-1:     0 1px 0 rgba(15,30,60,.04), 0 1px 2px rgba(15,30,60,.04);
+  --sb-sh-2:     0 1px 0 rgba(15,30,60,.03), 0 6px 18px -8px rgba(15,30,60,.15);
+  --sb-sh-3:     0 10px 30px -12px rgba(15,30,60,.25);
+  --sb-sh-brand: 0 14px 40px -16px rgba(36,99,235,.55);
+  --sb-sh-focus: 0 0 0 3px rgba(36,99,235,.22);
+
+  /* Radii */
+  --sb-r-xs:   6px;
+  --sb-r-sm:   10px;
+  --sb-r-md:   14px;
+  --sb-r-lg:   18px;
+  --sb-r-xl:   24px;
+  --sb-r-pill: 999px;
+
+  /* Motion */
+  --sb-ease:   cubic-bezier(.2,.8,.2,1);
+  --sb-t-fast: 120ms var(--sb-ease);
+  --sb-t-base: 200ms var(--sb-ease);
+  --sb-t-slow: 360ms var(--sb-ease);
+
+  /* Typography */
+  --sb-font-ui:      "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --sb-font-display: "Space Grotesk", "Inter", ui-sans-serif, system-ui, sans-serif;
+}

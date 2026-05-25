@@ -1,7 +1,10 @@
 "use client";
+import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { SideMenu } from "./_components/SideMenu";
 import TopBar from "./_components/TopBar";
+// @ts-ignore — CSS side-effect import for Starbank design tokens
+import "../smartrotom.css";
 
 interface RootLayoutProps {
   children: React.ReactNode;
@@ -9,25 +12,27 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
   const currentRoute = usePathname();
-  let currentPage = currentRoute.split("/").pop();
+  const segments = currentRoute.split("/");
+  const currentPage = segments.pop() || segments.pop() || "starbank";
 
-  if(currentPage === undefined) {
-    currentPage = "home";
-  }
-
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
     <div
-      className="flex overflow-hidden bg-blue-50 "
-      style={{
-        backgroundRepeat: "no-repeat",
-        backgroundSize: "cover",
-      }}
+      className="flex h-full"
+      style={{ background: "var(--sb-bg, #f3f6fc)" }}
     >
-      <SideMenu currentPage={currentPage}/>
-      <div className="h-full w-full overflow-auto">
-        <TopBar  currentPage={currentPage}/>
-        <div className="h-full w-full">{children}</div>
+      <SideMenu
+        currentPage={currentPage}
+        isCollapsed={isCollapsed}
+        onToggle={() => setIsCollapsed((c) => !c)}
+      />
+      <div className="flex flex-col flex-1 min-w-0 overflow-y-auto">
+        <TopBar
+          currentPage={currentPage}
+          onToggleSidebar={() => setIsCollapsed((c) => !c)}
+        />
+        <div className="flex-1">{children}</div>
       </div>
     </div>
   );
