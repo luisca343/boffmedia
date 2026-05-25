@@ -275,9 +275,11 @@ export default function StarBank() {
                 backdropFilter: "blur(8px)",
                 background: "#fff",
                 color: "#172554",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
               }}
             >
-              <PaperAirplaneIcon style={{ width: 14, height: 14 }} /> Enviar
+              <PaperAirplaneIcon style={{ width: 14, height: 14, flexShrink: 0 }} /> Enviar
             </Link>
             <button
               className="inline-flex items-center gap-2 rounded-[14px] font-semibold text-sm px-3.5 py-2 transition-colors"
@@ -286,9 +288,11 @@ export default function StarBank() {
                 background: "rgba(255,255,255,.13)",
                 color: "#fff",
                 border: "1px solid rgba(255,255,255,.22)",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
               }}
             >
-              <QrCodeIcon style={{ width: 14, height: 14 }} /> Solicitar
+              <QrCodeIcon style={{ width: 14, height: 14, flexShrink: 0 }} /> Solicitar
             </button>
             <Link
               href="/smartrotom/starbank/cuentas"
@@ -298,10 +302,11 @@ export default function StarBank() {
                 background: "rgba(255,255,255,.13)",
                 color: "#fff",
                 border: "1px solid rgba(255,255,255,.22)",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
               }}
             >
-              <ArrowsRightLeftIcon style={{ width: 14, height: 14 }} /> Mover entre
-              cuentas
+              <ArrowsRightLeftIcon style={{ width: 14, height: 14, flexShrink: 0 }} /> Mover entre cuentas
             </Link>
             <Link
               href="/smartrotom/starbank/graficas"
@@ -311,9 +316,11 @@ export default function StarBank() {
                 background: "rgba(255,255,255,.13)",
                 color: "#fff",
                 border: "1px solid rgba(255,255,255,.22)",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
               }}
             >
-              <ChartBarIcon style={{ width: 14, height: 14 }} /> Insights
+              <ChartBarIcon style={{ width: 14, height: 14, flexShrink: 0 }} /> Insights
             </Link>
           </div>
         </div>
