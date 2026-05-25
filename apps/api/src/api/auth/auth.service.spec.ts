@@ -150,10 +150,11 @@ describe('AuthService', () => {
 
   describe('refreshToken()', () => {
     it('should issue new tokens from a valid JWT string', async () => {
-      const payload = { sub: 1, username: 'TrainerAsh', smartRotomUser: {} };
+      const payload = { sub: 1, username: 'TrainerAsh' };
       jwtService.verify.mockReturnValue(payload);
-      usersService.getUserById.mockResolvedValue(mockUser as any);
-      usersService.getUserRoles.mockResolvedValue(['user'] as any);
+      usersService.getUserWithIntegrations.mockResolvedValue(
+        mockUserWithIntegrations as any,
+      );
 
       const result = await service.refreshToken('valid-token-string');
 
@@ -172,7 +173,7 @@ describe('AuthService', () => {
 
     it('should throw UnauthorizedException when user not found', async () => {
       jwtService.verify.mockReturnValue({ sub: 999 });
-      usersService.getUserById.mockResolvedValue(null);
+      usersService.getUserWithIntegrations.mockResolvedValue(null);
 
       await expect(service.refreshToken('valid-token')).rejects.toThrow(
         UnauthorizedException,
