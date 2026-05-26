@@ -68,8 +68,9 @@ export class QuestRepository implements IQuestRepository {
     try {
       this.logger.log(`Fetching user quests for UUID: ${uuid}`);
 
-      const response = await axios.get(
-        `${this.baseUrl}/quests/user/${uuid}`,
+      const response = await axios.post(
+        `${this.baseUrl}/quests`,
+        { uuid },
         {
           timeout: 10000,
           headers: {
@@ -82,10 +83,11 @@ export class QuestRepository implements IQuestRepository {
       if (!response.data) {
         throw new Error('No user quest data received from external API');
       }
-
+      
       const userQuestResponse: UserQuestResponse = {
-        quests: response.data.quests || {},
+        quests: response.data.data.quests || {},
       };
+      
 
       this.logger.log(`Successfully fetched user quests for ${uuid}`);
       return userQuestResponse;

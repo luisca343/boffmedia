@@ -34,12 +34,16 @@ export function tiltFor(id: number): number {
   return ((seed % 100) / 100 - 0.5) * 3.4
 }
 
-export function makeRegions(categories: Record<string, number[]>): Region[] {
-  return Object.keys(categories).map((name) => ({
-    id: name,
-    name,
-    glyph: name.substring(0, 2).toUpperCase(),
-  }))
+export function makeRegions(quests: QuestData[]): Region[] {
+  const seen = new Set<string>()
+  const regions: Region[] = []
+  for (const q of quests) {
+    if (q.category && !seen.has(q.category)) {
+      seen.add(q.category)
+      regions.push({ id: q.category, name: q.category, glyph: q.category.substring(0, 2).toUpperCase() })
+    }
+  }
+  return regions
 }
 
 export function getNpcForQuest(quest: QuestData, npcs: NPC[]): NPC | undefined {

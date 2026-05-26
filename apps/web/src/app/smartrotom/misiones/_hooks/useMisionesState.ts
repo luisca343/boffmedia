@@ -31,7 +31,7 @@ export function useMisionesState() {
     }
   }, [firstActiveId, trackedQuestId])
 
-  const regions = useMemo(() => makeRegions(categories), [categories])
+  const regions = useMemo(() => makeRegions(quests), [quests])
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 900)

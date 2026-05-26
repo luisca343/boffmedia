@@ -74,7 +74,7 @@ export function QuestLetter({ quest, npcs, dialogs, regions, onClose }: QuestLet
           display: "flex", justifyContent: "center", gap: 16, fontSize: 13,
           color: "var(--ink-3)", marginBottom: 18, fontStyle: "italic", flexWrap: "wrap",
         }}>
-          {npc && <span><Icon.Quill size={11}/> de <strong style={{ color: "var(--ink-2)", fontStyle: "normal" }}>{npc.name}</strong></span>}
+          {(quest.npcName || npc) && <span><Icon.Quill size={11}/> de <strong style={{ color: "var(--ink-2)", fontStyle: "normal" }}>{quest.npcName ?? npc?.name}</strong></span>}
           {regionName && <span><Icon.Pin size={11}/> {regionName}</span>}
           {quest.requirements?.requiredLevel > 0 && (
             <span style={{ color: "var(--gold-3)" }}>{t("quest_level_required")} {quest.requirements.requiredLevel}</span>

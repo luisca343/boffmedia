@@ -37,6 +37,7 @@ export interface QuestData {
   type: number;
   nextQuest: number;
   category: string;
+  npcName?: string;
   status: QuestStatus;
   objectives: IQuestObjective[];
   requirements: IQuestRequirements;

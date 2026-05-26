@@ -56,7 +56,7 @@ export function TrackedQuestPaper({ quest, npc, regionName, onOpen }: TrackedQue
           <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--ink-3)", fontSize: 13, fontStyle: "italic", marginBottom: 12 }}>
             <Icon.Quill size={12}/>
             <span>{t("tracked_by")}</span>
-            <strong style={{ color: "var(--ink-2)", fontStyle: "normal" }}>{npc?.name ?? t("quest_unknown_npc")}</strong>
+            <strong style={{ color: "var(--ink-2)", fontStyle: "normal" }}>{quest.npcName ?? npc?.name ?? t("quest_unknown_npc")}</strong>
             {regionName && (
               <>
                 <span style={{ opacity: 0.5 }}>·</span>

@@ -16,7 +16,7 @@ export function useQuestBoard({
   quests, search, statusFilter, regionFilter, sort, trackedQuestId,
 }: UseQuestBoardProps) {
   const fuse = useMemo(() => new Fuse(quests, {
-    keys: ["name", "logText", "category"],
+    keys: ["name", "logText", "category", "npcName"],
     threshold: 0.4,
   }), [quests])
 

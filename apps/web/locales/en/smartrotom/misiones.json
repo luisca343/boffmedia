@@ -5,7 +5,7 @@
 
     "board_label": "Adventurer's log",
     "board_title": "The Quest Board",
-    "board_subtitle": "Guild of Teras Adventurers · Pixelmon",
+    "board_subtitle": "Teras Adventurers' Guild · Pixelmon",
     "board_stat_active": "Active",
     "board_stat_available": "Available",
     "board_stat_completed": "Done",
@@ -27,7 +27,7 @@
     "quest_stamp_completed": "Completed",
     "quest_stamp_failed": "Failed",
 
-    "sidenav_header": "✦ GUILD OF ADVENTURERS ✦",
+    "sidenav_header": "✦ ADVENTURERS' GUILD ✦",
     "sidenav_title": "Quests",
     "sidenav_subtitle": "— Adventurer's log —",
     "sidenav_footer": "◆ ROTOM·CODEX v3.2",
@@ -47,7 +47,7 @@
     "rewards_section": "⚜ Rewards ⚜",
     "npc_says_suffix": "says:",
     "conclusion": "Conclusion",
-    "sealed_footer": "Sealed at the Guild of Teras Adventurers",
+    "sealed_footer": "Sealed at the Teras Adventurers' Guild",
 
     "atlas_label": "Atlas",
     "atlas_title": "Kingdom Map",

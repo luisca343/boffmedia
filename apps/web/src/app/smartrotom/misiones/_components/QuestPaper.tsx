@@ -88,7 +88,7 @@ export function QuestPaper({ quest, npc, regionName, selected, tilt, onClick }: 
       {/* NPC + region */}
       <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, marginBottom: 10, color: "var(--ink-3)", fontStyle: "italic" }}>
         <Icon.Quill size={11}/>
-        <span>de <strong style={{ color: "var(--ink-2)", fontStyle: "normal" }}>{npc?.name ?? t("quest_unknown_npc")}</strong></span>
+        <span>de <strong style={{ color: "var(--ink-2)", fontStyle: "normal" }}>{quest.npcName ?? npc?.name ?? t("quest_unknown_npc")}</strong></span>
         {regionName && (
           <>
             <span style={{ opacity: 0.5 }}>·</span>
