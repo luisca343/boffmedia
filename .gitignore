@@ -24,4 +24,4 @@ laboon/
 .agent-runs/
 .github/agents/agent-talkative.md
 
-docs/handoffs/**
+docs/**
