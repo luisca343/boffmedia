@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react"
+import { useTranslations } from "next-intl"
 import { Section } from "../_types/board"
 
 export interface SideRailProps {
@@ -9,11 +10,12 @@ export interface SideRailProps {
 }
 
 export function SideRail({ section, setSection }: SideRailProps) {
+  const t = useTranslations("misiones")
   const items: { id: Section; label: string; glyph: string }[] = [
-    { id: "board", label: "El Tablón", glyph: "❦" },
-    { id: "atlas", label: "Mapa del Reino", glyph: "✦" },
-    { id: "trophy", label: "Sala de Trofeos", glyph: "⚜" },
-    { id: "journal", label: "Bitácora", glyph: "✥" },
+    { id: "board", label: t("nav_board"), glyph: "❦" },
+    { id: "atlas", label: t("nav_atlas"), glyph: "✦" },
+    { id: "trophy", label: t("nav_trophy"), glyph: "⚜" },
+    { id: "journal", label: t("nav_journal"), glyph: "✥" },
   ]
   return (
     <aside className="wood-frame hide-mobile" style={{
@@ -24,13 +26,13 @@ export function SideRail({ section, setSection }: SideRailProps) {
     }}>
       <div style={{ padding: "22px 16px 18px 16px", textAlign: "center", background: "linear-gradient(180deg, rgba(0,0,0,0.4), transparent)" }}>
         <div style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11, color: "var(--gold-2)", letterSpacing: "0.20em", fontFamily: "var(--font-uppercase)" }}>
-          ✦ POSADA DEL ROTOM ✦
+          {t("sidenav_header")}
         </div>
         <h1 className="dec-title" style={{ margin: "8px 0 0 0", fontSize: 26, color: "var(--gold-1)", lineHeight: 1, textShadow: "0 2px 4px rgba(0,0,0,0.7)" }}>
-          Misiones
+          {t("sidenav_title")}
         </h1>
         <div style={{ marginTop: 8, fontSize: 10, color: "var(--gold-3)", letterSpacing: "0.16em", fontFamily: "var(--font-uppercase)", fontStyle: "italic", opacity: 0.8 }}>
-          — Bitácora del aventurero —
+          {t("sidenav_subtitle")}
         </div>
       </div>
 
@@ -46,7 +48,7 @@ export function SideRail({ section, setSection }: SideRailProps) {
       </nav>
 
       <div style={{ padding: "8px 14px 14px 14px", fontSize: 9, color: "rgba(217, 182, 115, 0.5)", fontFamily: "var(--font-uppercase)", letterSpacing: "0.16em", textAlign: "center" }}>
-        ◆ ROTOM·CODEX v3.2
+        {t("sidenav_footer")}
       </div>
     </aside>
   )

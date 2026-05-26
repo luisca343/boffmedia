@@ -10,11 +10,11 @@ export class MisionesPage extends BasePage {
 
   constructor(page: Page) {
     super(page)
-    this.heading = page.getByRole("heading", { level: 1 })
-    this.misionesTab = page.getByRole("tab", { name: /Misiones/i })
-    this.dialogosTab = page.getByRole("tab", { name: /Diálogos/i })
-    this.searchInput = page.getByPlaceholder("Buscar misiones...")
-    this.emptyQuestDetail = page.getByText(/Selecciona una misión para ver sus detalles/i)
+    this.heading = page.locator("h1.dec-title").first()
+    this.misionesTab = page.locator(".leather-tab").first()
+    this.dialogosTab = page.locator(".leather-tab").nth(3)
+    this.searchInput = page.getByPlaceholder(/buscar|search/i)
+    this.emptyQuestDetail = page.locator(".dec-title")
   }
 
   questItem(name: string) {

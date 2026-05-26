@@ -1,12 +1,13 @@
 "use client"
 
 import React from "react"
+import { useTranslations } from "next-intl"
 import { QuestData, NPC, QuestStatus } from "@/types/misiones"
 import {
   WaxSeal, Nail, Thumbtack, Sparkles, Stamp, Icon,
   STATUS_GLYPH, STATUS_COLOR,
 } from "./misiones-atoms"
-import { getQuestTypeLabel } from "../_utils/questUtils"
+import { getQuestTypeKey } from "../_utils/questUtils"
 
 export interface QuestPaperProps {
   quest: QuestData
@@ -18,6 +19,7 @@ export interface QuestPaperProps {
 }
 
 export function QuestPaper({ quest, npc, regionName, selected, tilt, onClick }: QuestPaperProps) {
+  const t = useTranslations("misiones")
   const objectivesDone = (quest.objectives || []).filter((o) => o.progress >= o.total).length
   const objectivesTotal = (quest.objectives || []).length
   const progressValue = (quest.objectives || []).reduce((s, o) => s + Math.min(o.progress, o.total), 0)
@@ -58,10 +60,10 @@ export function QuestPaper({ quest, npc, regionName, selected, tilt, onClick }: 
 
       {isActive && <Sparkles count={5}/>}
 
-      {quest.status === QuestStatus.COMPLETED && <Stamp kind="completed">Completada</Stamp>}
-      {quest.status === QuestStatus.FAILED && <Stamp kind="failed">Fallida</Stamp>}
+      {quest.status === QuestStatus.COMPLETED && <Stamp kind="completed">{t("quest_stamp_completed")}</Stamp>}
+      {quest.status === QuestStatus.FAILED && <Stamp kind="failed">{t("quest_stamp_failed")}</Stamp>}
 
-      {(quest.status === QuestStatus.LOCKED || quest.status === QuestStatus.NOT_STARTED) && (
+      {quest.status === QuestStatus.LOCKED && (
         <div style={{
           position: "absolute", inset: 0, pointerEvents: "none",
           background: "linear-gradient(135deg, transparent 48%, rgba(60,30,10,0.35) 50%, transparent 52%), linear-gradient(45deg, transparent 48%, rgba(60,30,10,0.35) 50%, transparent 52%)",
@@ -71,10 +73,10 @@ export function QuestPaper({ quest, npc, regionName, selected, tilt, onClick }: 
       {/* Type + level (uses requiredLevel from requirements) */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
         <span className="label" style={{ color: STATUS_COLOR[quest.status] }}>
-          {getQuestTypeLabel(quest.type)}
+          {t(getQuestTypeKey(quest.type))}
         </span>
         {quest.requirements?.requiredLevel > 0 && (
-          <span className="label">Nv. {quest.requirements.requiredLevel}</span>
+          <span className="label">{t("quest_level")} {quest.requirements.requiredLevel}</span>
         )}
       </div>
 
@@ -86,7 +88,7 @@ export function QuestPaper({ quest, npc, regionName, selected, tilt, onClick }: 
       {/* NPC + region */}
       <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, marginBottom: 10, color: "var(--ink-3)", fontStyle: "italic" }}>
         <Icon.Quill size={11}/>
-        <span>de <strong style={{ color: "var(--ink-2)", fontStyle: "normal" }}>{npc?.name ?? "Desconocido"}</strong></span>
+        <span>de <strong style={{ color: "var(--ink-2)", fontStyle: "normal" }}>{npc?.name ?? t("quest_unknown_npc")}</strong></span>
         {regionName && (
           <>
             <span style={{ opacity: 0.5 }}>·</span>
@@ -114,7 +116,7 @@ export function QuestPaper({ quest, npc, regionName, selected, tilt, onClick }: 
             display: "flex", justifyContent: "space-between", fontSize: 10, marginBottom: 4,
             fontFamily: "var(--font-uppercase)", letterSpacing: "0.12em", color: "var(--ink-3)",
           }}>
-            <span>{objectivesDone}/{objectivesTotal} OBJETIVOS</span>
+            <span>{objectivesDone}/{objectivesTotal} {t("quest_objectives")}</span>
             <span>{pct}%</span>
           </div>
           <div className="bar"><span style={{ width: pct + "%" }}/></div>
@@ -129,7 +131,7 @@ export function QuestPaper({ quest, npc, regionName, selected, tilt, onClick }: 
       }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
           {quest.repeatable && (
-            <span className="label" style={{ color: "var(--gold-3)" }}>Repetible</span>
+            <span className="label" style={{ color: "var(--gold-3)" }}>{t("quest_repeatable")}</span>
           )}
           <span className="label" style={{ color: "var(--ink-3)" }}>{quest.category}</span>
         </div>

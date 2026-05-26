@@ -1,12 +1,13 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
+import { useTranslations } from "next-intl"
 import { QuestData, QuestStatus, IDialogue, NPC } from "@/types/misiones"
 import {
   WaxSeal, FlourishCorners, Ribbon, Divider, Icon,
   STATUS_LABEL, STATUS_GLYPH, STATUS_COLOR,
 } from "./misiones-atoms"
-import { getQuestTypeLabel, formatItemName, getNpcForQuest } from "../_utils/questUtils"
+import { getQuestTypeKey, formatItemName, getNpcForQuest } from "../_utils/questUtils"
 import { Region } from "../_types/board"
 
 export interface QuestLetterProps {
@@ -18,6 +19,7 @@ export interface QuestLetterProps {
 }
 
 export function QuestLetter({ quest, npcs, dialogs, regions, onClose }: QuestLetterProps) {
+  const t = useTranslations("misiones")
   const [tick, setTick] = useState(0)
   useEffect(() => { setTick((t) => t + 1) }, [quest?.id])
 
@@ -44,7 +46,7 @@ export function QuestLetter({ quest, npcs, dialogs, regions, onClose }: QuestLet
       {/* Close */}
       <button className="btn btn-ghost btn-sm" onClick={onClose}
         style={{ position: "absolute", top: 14, right: 14, zIndex: 5 }}>
-        <Icon.X size={14}/> Cerrar
+        <Icon.X size={14}/> {t("close")}
       </button>
 
       <div style={{ flex: 1, overflow: "auto", padding: "60px 56px 24px 56px", position: "relative", zIndex: 1 }}>
@@ -56,7 +58,7 @@ export function QuestLetter({ quest, npcs, dialogs, regions, onClose }: QuestLet
         {/* Ribbon */}
         <div style={{ textAlign: "center", marginBottom: 14, marginLeft: 60, marginTop: -32 }}>
           <Ribbon color={STATUS_COLOR[quest.status]} width={280} height={50}>
-            {STATUS_LABEL[quest.status]} · {getQuestTypeLabel(quest.type)}
+            {STATUS_LABEL[quest.status]} · {t(getQuestTypeKey(quest.type))}
           </Ribbon>
         </div>
 
@@ -75,9 +77,9 @@ export function QuestLetter({ quest, npcs, dialogs, regions, onClose }: QuestLet
           {npc && <span><Icon.Quill size={11}/> de <strong style={{ color: "var(--ink-2)", fontStyle: "normal" }}>{npc.name}</strong></span>}
           {regionName && <span><Icon.Pin size={11}/> {regionName}</span>}
           {quest.requirements?.requiredLevel > 0 && (
-            <span style={{ color: "var(--gold-3)" }}>Nv. requerido: {quest.requirements.requiredLevel}</span>
+            <span style={{ color: "var(--gold-3)" }}>{t("quest_level_required")} {quest.requirements.requiredLevel}</span>
           )}
-          {quest.repeatable && <span style={{ color: "var(--gold-3)" }}>· Repetible</span>}
+          {quest.repeatable && <span style={{ color: "var(--gold-3)" }}>· {t("quest_repeatable")}</span>}
         </div>
 
         {/* Description with drop cap */}
@@ -96,7 +98,7 @@ export function QuestLetter({ quest, npcs, dialogs, regions, onClose }: QuestLet
           <div className="fade-up" style={{ animationDelay: "0.18s", marginTop: 26 }}>
             <div style={{ textAlign: "center", marginBottom: 12 }}>
               <span className="dec-title" style={{ fontSize: 18, color: "var(--gold-3)", letterSpacing: "0.08em" }}>
-                ⚜ Objetivos ⚜
+                {t("objectives_section")}
               </span>
             </div>
             <ol style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 10 }}>
@@ -147,7 +149,7 @@ export function QuestLetter({ quest, npcs, dialogs, regions, onClose }: QuestLet
           <div className="fade-up" style={{ animationDelay: "0.26s", marginTop: 26 }}>
             <div style={{ textAlign: "center", marginBottom: 12 }}>
               <span className="dec-title" style={{ fontSize: 18, color: "var(--gold-3)", letterSpacing: "0.08em" }}>
-                ⚜ Recompensas ⚜
+                {t("rewards_section")}
               </span>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 10 }}>
@@ -191,7 +193,7 @@ export function QuestLetter({ quest, npcs, dialogs, regions, onClose }: QuestLet
               marginTop: 14,
             }}>
               <div style={{ fontSize: 11, color: "var(--ink-3)", fontFamily: "var(--font-uppercase)", letterSpacing: "0.14em", marginBottom: 6 }}>
-                {npc?.name ?? "NPC"} dice:
+                {npc?.name ?? "NPC"} {t("npc_says_suffix")}
               </div>
               <p style={{ fontSize: 14, lineHeight: 1.65, color: "var(--ink-1)", fontStyle: "italic", borderLeft: "2px solid var(--ink-3)", paddingLeft: 12, margin: 0 }}>
                 &ldquo;{dialog.text}&rdquo;
@@ -210,7 +212,7 @@ export function QuestLetter({ quest, npcs, dialogs, regions, onClose }: QuestLet
               borderRadius: 2,
             }}>
               <div style={{ fontSize: 11, color: "var(--seal-completed)", fontFamily: "var(--font-uppercase)", letterSpacing: "0.12em", marginBottom: 4 }}>
-                Conclusión
+                {t("conclusion")}
               </div>
               <p style={{ fontSize: 14, color: "var(--ink-2)", lineHeight: 1.5, margin: 0 }}>
                 {quest.completeText}
@@ -223,7 +225,7 @@ export function QuestLetter({ quest, npcs, dialogs, regions, onClose }: QuestLet
         <div className="fade-up" style={{ animationDelay: "0.50s", marginTop: 28, paddingTop: 16, borderTop: "1px dashed rgba(60,40,20,0.3)" }}>
           <Divider color="var(--ink-4)" glyph="✥"/>
           <div style={{ textAlign: "center", marginTop: 8, fontSize: 11, color: "var(--ink-4)", fontFamily: "var(--font-uppercase)", letterSpacing: "0.12em", fontStyle: "italic" }}>
-            Sellado en la Posada del Rotom
+            {t("sealed_footer")}
           </div>
         </div>
       </div>

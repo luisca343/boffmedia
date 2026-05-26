@@ -1,12 +1,13 @@
 "use client"
 
 import React from "react"
+import { useTranslations } from "next-intl"
 import { QuestData, NPC } from "@/types/misiones"
 import {
   WaxSeal, Nail, FlourishCorners, Ribbon, Sparkles, Icon,
   STATUS_LABEL, STATUS_GLYPH, STATUS_COLOR,
 } from "./misiones-atoms"
-import { getQuestTypeLabel } from "../_utils/questUtils"
+import { getQuestTypeKey } from "../_utils/questUtils"
 
 export interface TrackedQuestPaperProps {
   quest: QuestData
@@ -16,6 +17,7 @@ export interface TrackedQuestPaperProps {
 }
 
 export function TrackedQuestPaper({ quest, npc, regionName, onOpen }: TrackedQuestPaperProps) {
+  const t = useTranslations("misiones")
   const nextObjective = (quest.objectives || []).find((o) => o.progress < o.total)
   const progressValue = (quest.objectives || []).reduce((s, o) => s + Math.min(o.progress, o.total), 0)
   const progressTotal = (quest.objectives || []).reduce((s, o) => s + o.total, 0)
@@ -31,7 +33,7 @@ export function TrackedQuestPaper({ quest, npc, regionName, onOpen }: TrackedQue
       <Sparkles count={9}/>
 
       <div style={{ position: "absolute", top: -28, left: "50%", transform: "translateX(-50%)", zIndex: 8 }}>
-        <Ribbon color="var(--stamp-red)" width={260} height={48}>¶ Misión Rastreada</Ribbon>
+        <Ribbon color="var(--stamp-red)" width={260} height={48}>{t("tracked_ribbon")}</Ribbon>
       </div>
 
       <div style={{ position: "absolute", top: 10, left: 10 }}><Nail size={14}/></div>
@@ -46,15 +48,15 @@ export function TrackedQuestPaper({ quest, npc, regionName, onOpen }: TrackedQue
 
         <div style={{ flex: 1, minWidth: 0 }}>
           <span className="label" style={{ color: STATUS_COLOR[quest.status] }}>
-            {STATUS_LABEL[quest.status]} · {getQuestTypeLabel(quest.type)}
+            {STATUS_LABEL[quest.status]} · {t(getQuestTypeKey(quest.type))}
           </span>
           <h2 className="dec-title" style={{ fontSize: 28, margin: "4px 0 6px 0", color: "var(--ink-1)" }}>
             {quest.name}
           </h2>
           <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--ink-3)", fontSize: 13, fontStyle: "italic", marginBottom: 12 }}>
             <Icon.Quill size={12}/>
-            <span>encomendada por</span>
-            <strong style={{ color: "var(--ink-2)", fontStyle: "normal" }}>{npc?.name ?? "Desconocido"}</strong>
+            <span>{t("tracked_by")}</span>
+            <strong style={{ color: "var(--ink-2)", fontStyle: "normal" }}>{npc?.name ?? t("quest_unknown_npc")}</strong>
             {regionName && (
               <>
                 <span style={{ opacity: 0.5 }}>·</span>
@@ -74,7 +76,7 @@ export function TrackedQuestPaper({ quest, npc, regionName, onOpen }: TrackedQue
             }}>
               <Icon.Target size={16}/>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 11, color: "var(--ink-3)", fontFamily: "var(--font-uppercase)", letterSpacing: "0.12em" }}>SIGUIENTE</div>
+                <div style={{ fontSize: 11, color: "var(--ink-3)", fontFamily: "var(--font-uppercase)", letterSpacing: "0.12em" }}>{t("tracked_next_label")}</div>
                 <div style={{ fontSize: 14, color: "var(--ink-1)", fontWeight: 500 }}>{nextObjective.name}</div>
               </div>
               <span style={{ fontFamily: "var(--font-mono)", fontSize: 14, color: "var(--ink-2)" }}>
@@ -89,7 +91,7 @@ export function TrackedQuestPaper({ quest, npc, regionName, onOpen }: TrackedQue
               {pct}%
             </span>
             <button className="btn btn-primary" onClick={(e) => { e.stopPropagation(); onOpen() }}>
-              <Icon.Quill size={12}/> Continuar
+              <Icon.Quill size={12}/> {t("tracked_continue")}
             </button>
           </div>
         </div>

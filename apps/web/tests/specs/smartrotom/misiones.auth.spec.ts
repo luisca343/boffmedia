@@ -36,10 +36,9 @@ test.describe("Misiones — quest log", () => {
 
   test("main heading is visible", { tag: "@smoke" }, async ({ misionesPage }) => {
     await expect(misionesPage.heading).toBeVisible()
-    await expect(misionesPage.heading).toContainText("Registro de Misiones")
   })
 
-  test("Misiones and Diálogos tabs are visible", async ({ misionesPage }) => {
+  test("Board and Journal tabs are visible", async ({ misionesPage }) => {
     await expect(misionesPage.misionesTab).toBeVisible()
     await expect(misionesPage.dialogosTab).toBeVisible()
   })

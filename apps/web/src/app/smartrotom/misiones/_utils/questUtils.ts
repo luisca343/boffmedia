@@ -6,6 +6,15 @@ export const QUEST_TYPE_LABELS: Record<number, string> = {
   3: "Gimnasio", 4: "Rival", 5: "Endgame",
 }
 
+const QUEST_TYPE_KEYS: Record<number, string> = {
+  0: "type_main", 1: "type_side", 2: "type_daily",
+  3: "type_gym", 4: "type_rival", 5: "type_endgame",
+}
+
+export function getQuestTypeKey(type: number): string {
+  return QUEST_TYPE_KEYS[type] ?? "type_mission"
+}
+
 export const STATUS_ORDER: Record<string, number> = {
   ACTIVE: 1, AVAILABLE: 2, COMPLETED: 3, FAILED: 4, LOCKED: 5, NOT_STARTED: 6,
 }

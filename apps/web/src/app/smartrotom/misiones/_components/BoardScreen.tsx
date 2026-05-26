@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react"
+import { useTranslations } from "next-intl"
 import { QuestData, QuestStatus, NPC, IDialogue } from "@/types/misiones"
 import { Nail, FlourishCorners, Shield, Icon } from "./misiones-atoms"
 import { getNpcForQuest, tiltFor } from "../_utils/questUtils"
@@ -36,6 +37,7 @@ export function BoardScreen({
   sort, setSort, regionFilter, setRegionFilter,
   selectedId, onSelect, trackedQuestId, setTrackedQuestId,
 }: BoardScreenProps) {
+  const t = useTranslations("misiones")
   const { counts, filtered } = useQuestBoard({
     quests, search, statusFilter, regionFilter, sort, trackedQuestId,
   })
@@ -59,15 +61,15 @@ export function BoardScreen({
         <div style={{ display: "flex", gap: 20, alignItems: "center", flexWrap: "wrap" }}>
           <Shield size={68} color="var(--gold-2)"><Icon.Sword size={22}/></Shield>
           <div style={{ flex: "1 1 240px", minWidth: 0 }}>
-            <span className="label" style={{ color: "var(--gold-3)" }}>Bitácora del aventurero</span>
-            <h1 className="dec-title" style={{ fontSize: 28, margin: "2px 0 2px 0", color: "var(--ink-1)" }}>El Tablón de Misiones</h1>
-            <div style={{ fontSize: 13, color: "var(--ink-3)", fontStyle: "italic" }}>Posada del Rotom · Pixelmon</div>
+            <span className="label" style={{ color: "var(--gold-3)" }}>{t("board_label")}</span>
+            <h1 className="dec-title" style={{ fontSize: 28, margin: "2px 0 2px 0", color: "var(--ink-1)" }}>{t("board_title")}</h1>
+            <div style={{ fontSize: 13, color: "var(--ink-3)", fontStyle: "italic" }}>{t("board_subtitle")}</div>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(72px, 1fr))", gap: 10, flex: "1 1 260px" }}>
             {[
-              { label: "Vigentes", value: activeCount, color: "var(--seal-active)" },
-              { label: "Disponibles", value: availableCount, color: "var(--seal-available)" },
-              { label: "Hechas", value: completedCount, color: "var(--seal-completed)" },
+              { label: t("board_stat_active"), value: activeCount, color: "var(--seal-active)" },
+              { label: t("board_stat_available"), value: availableCount, color: "var(--seal-available)" },
+              { label: t("board_stat_completed"), value: completedCount, color: "var(--seal-completed)" },
             ].map((s) => (
               <div key={s.label} style={{
                 padding: "10px 6px", textAlign: "center",
@@ -98,11 +100,11 @@ export function BoardScreen({
       {regions.length > 0 && (
         <div style={{ marginBottom: 18 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10, color: "var(--gold-1)" }}>
-            <span className="dec-title" style={{ fontSize: 18, letterSpacing: "0.04em" }}>Filtrar por categoría</span>
+            <span className="dec-title" style={{ fontSize: 18, letterSpacing: "0.04em" }}>{t("board_filter_category")}</span>
             <div style={{ flex: 1, height: 1, background: "linear-gradient(90deg, var(--gold-3), transparent)", opacity: 0.5 }}/>
             {regionFilter && (
               <button className="btn btn-sm btn-dark" onClick={() => setRegionFilter(null)}>
-                <Icon.X size={11}/> Quitar
+                <Icon.X size={11}/> {t("board_filter_remove")}
               </button>
             )}
           </div>
@@ -150,7 +152,7 @@ export function BoardScreen({
         }}/>
         {filtered.length === 0 ? (
           <div style={{ padding: "60px 20px", textAlign: "center", color: "var(--paper-2)", fontFamily: "var(--font-display)", fontSize: 18, fontStyle: "italic" }}>
-            ✥ El tablón está vacío con esos criterios. Cambia los filtros.
+            {t("board_empty")}
           </div>
         ) : (
           <div className="board-grid">

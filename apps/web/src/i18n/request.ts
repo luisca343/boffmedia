@@ -128,6 +128,7 @@ export default getRequestConfig(async () => {
     'smartrotom/pokedex/forms.json',
     'smartrotom/pokedex/moves.json',
     'smartrotom/pokedex/spawns.json',
+    'smartrotom/misiones.json',
     'tools/pmdsky/common.json',
     'tools/pmdsky/dungeons.json',
     'tools/tcgpocket/common.json',

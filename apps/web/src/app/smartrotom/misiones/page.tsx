@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react"
+import { useTranslations } from "next-intl"
 import "./misiones-board.css"
 import { useMisionesState } from "./_hooks/useMisionesState"
 import { FlourishCorners } from "./_components/misiones-atoms"
@@ -14,6 +15,7 @@ import { QuestLetter } from "./_components/QuestLetter"
 import { Palette } from "./_types/board"
 
 export default function QuestLog() {
+  const t = useTranslations("misiones")
   const {
     quests,
     categories,
@@ -47,10 +49,10 @@ export default function QuestLog() {
           <div className="paper" style={{ padding: "28px 44px", textAlign: "center", position: "relative" }}>
             <FlourishCorners size={28} color="var(--gold-3)" offset={8} opacity={0.6}/>
             <div className="dec-title" style={{ fontSize: 22, color: "var(--ink-1)", margin: "0 0 8px 0" }}>
-              Consultando el tablón…
+              {t("loading_title")}
             </div>
             <div style={{ color: "var(--ink-3)", fontStyle: "italic", fontSize: 14 }}>
-              Un momento, viajero.
+              {t("loading_subtitle")}
             </div>
           </div>
         </div>
@@ -61,19 +63,7 @@ export default function QuestLog() {
   return (
     <div className="misiones-board" data-palette={palette}>
       <div className="tavern-bg" style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}>
-        {/* Palette switcher */}
-        <div style={{
-          position: "absolute", top: 10, right: 10, zIndex: 20,
-          display: "flex", gap: 4,
-        }}>
-          {(["pergamino", "grimdark", "royal", "forest"] as Palette[]).map((p) => (
-            <button key={p} onClick={() => setPalette(p)} style={{
-              width: 14, height: 14, borderRadius: "50%", border: palette === p ? "2px solid var(--gold-1)" : "1px solid rgba(255,200,100,0.4)",
-              background: p === "pergamino" ? "#e7d094" : p === "grimdark" ? "#2a1810" : p === "royal" ? "#1e2756" : "#2a3e22",
-              cursor: "pointer", padding: 0,
-            }}/>
-          ))}
-        </div>
+        {/* Palette switcher removed — kept in state for future use */}
 
         <div style={{ display: "flex", flex: 1, minHeight: 0, position: "relative" }}>
           <SideRail section={section} setSection={setSection}/>

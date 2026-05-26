@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react"
+import { useTranslations } from "next-intl"
 import { QuestStatus } from "@/types/misiones"
 import { Icon, STATUS_LABEL } from "./misiones-atoms"
 
@@ -15,6 +16,7 @@ export interface BoardFiltersProps {
 }
 
 export function BoardFilters({ search, setSearch, statusFilter, setStatusFilter, sort, setSort, counts }: BoardFiltersProps) {
+  const t = useTranslations("misiones")
   const statuses = ["ALL", QuestStatus.ACTIVE, QuestStatus.AVAILABLE, QuestStatus.COMPLETED, QuestStatus.FAILED, QuestStatus.LOCKED]
   return (
     <div style={{
@@ -30,7 +32,7 @@ export function BoardFilters({ search, setSearch, statusFilter, setStatusFilter,
         <input
           className="field"
           type="text"
-          placeholder="Buscar misión, NPC, lugar…"
+          placeholder={t("search_placeholder")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           style={{ paddingLeft: 34 }}
@@ -43,7 +45,7 @@ export function BoardFilters({ search, setSearch, statusFilter, setStatusFilter,
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
         {statuses.map((s) => (
           <button key={s} className={`chip ${statusFilter === s ? "active" : ""}`} onClick={() => setStatusFilter(s)}>
-            {s === "ALL" ? "Todas" : STATUS_LABEL[s as QuestStatus]}
+            {s === "ALL" ? t("filter_all") : STATUS_LABEL[s as QuestStatus]}
             <span style={{ opacity: 0.65 }}>({counts[s] || 0})</span>
           </button>
         ))}
@@ -54,9 +56,9 @@ export function BoardFilters({ search, setSearch, statusFilter, setStatusFilter,
       <select value={sort} onChange={(e) => setSort(e.target.value)} className="field" style={{
         width: "auto", padding: "9px 12px", fontFamily: "var(--font-uppercase)", fontSize: 11, letterSpacing: "0.10em",
       }}>
-        <option value="status">Orden: por sello</option>
-        <option value="name">Orden: alfabético</option>
-        <option value="type">Orden: por tipo</option>
+        <option value="status">{t("sort_status")}</option>
+        <option value="name">{t("sort_name")}</option>
+        <option value="type">{t("sort_type")}</option>
       </select>
     </div>
   )
