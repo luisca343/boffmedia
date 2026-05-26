@@ -1,0 +1,558 @@
+/* === Misiones · El Tablón ===
+   Classic D&D / Baldur's Gate parchment + tavern cork board
+   Scoped to .misiones-board wrapper — no global resets. */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IM+Fell+English+SC&family=IM+Fell+DW+Pica&display=swap');
+
+/* ---- Default palette: PERGAMINO ---- */
+.misiones-board {
+  --board-1: #6b3f1c;
+  --board-2: #4a2b12;
+  --board-3: #38200c;
+  --board-frame: #2a180a;
+  --board-frame-hi: #6a4520;
+
+  --paper-1: #f3e2b1;
+  --paper-2: #e7d094;
+  --paper-3: #d4b673;
+  --paper-edge: #8a5e2e;
+  --paper-shadow: rgba(40, 22, 8, 0.45);
+
+  --ink-1: #2a1a0a;
+  --ink-2: #4a341c;
+  --ink-3: #6b4c2e;
+  --ink-4: #8a6a48;
+
+  --gold-1: #f5d785;
+  --gold-2: #d6a13f;
+  --gold-3: #a26c1a;
+  --gold-4: #6b440f;
+
+  --seal-active:    #c89026;
+  --seal-available: #b3411a;
+  --seal-completed: #6b1410;
+  --seal-failed:    #2a2a2a;
+  --seal-locked:    #5a4632;
+
+  --stamp-red:  #aa1c1c;
+  --stamp-gold: #a26c1a;
+
+  --line-soft: rgba(60, 40, 20, 0.18);
+
+  --font-display: "Cinzel Decorative", "Cinzel", "Trajan Pro", serif;
+  --font-body: "EB Garamond", "Garamond", "Iowan Old Style", serif;
+  --font-uppercase: "IM Fell English SC", "Cinzel", serif;
+  --font-mono: "IM Fell DW Pica", "Courier Prime", ui-monospace, monospace;
+}
+
+/* ---- Palette: GRIMDARK ---- */
+.misiones-board[data-palette="grimdark"] {
+  --board-1: #2a1810;
+  --board-2: #1a0e07;
+  --board-3: #0e0805;
+  --board-frame: #050201;
+  --board-frame-hi: #3a2418;
+  --paper-1: #c8b489;
+  --paper-2: #a8946d;
+  --paper-3: #7a684a;
+  --paper-edge: #4a3a22;
+  --paper-shadow: rgba(0, 0, 0, 0.7);
+  --ink-1: #18100a;
+  --ink-2: #281e12;
+  --ink-3: #4a3a22;
+  --ink-4: #6a5a3a;
+  --gold-1: #d8c08a;
+  --gold-2: #a8841c;
+  --gold-3: #6e5418;
+  --gold-4: #3a2c0c;
+  --seal-active:    #8a6818;
+  --seal-available: #8e1c0e;
+  --seal-completed: #4a0a08;
+  --seal-failed:    #0a0a0a;
+  --seal-locked:    #2a2018;
+  --stamp-red: #8a1414;
+  --stamp-gold: #6e5418;
+}
+
+/* ---- Palette: REAL ---- */
+.misiones-board[data-palette="royal"] {
+  --board-1: #1e2756;
+  --board-2: #12183a;
+  --board-3: #0a0e26;
+  --board-frame: #0a0e26;
+  --board-frame-hi: #3a4682;
+  --paper-1: #f2e6c8;
+  --paper-2: #e2d4ad;
+  --paper-3: #c4b78a;
+  --paper-edge: #6e6038;
+  --paper-shadow: rgba(8, 12, 38, 0.55);
+  --ink-1: #1b1a2e;
+  --ink-2: #2a2640;
+  --ink-3: #4a4668;
+  --ink-4: #6a6688;
+  --gold-1: #e8d8a0;
+  --gold-2: #c2a04c;
+  --gold-3: #8e6c20;
+  --gold-4: #5a440c;
+  --seal-active:    #c2a04c;
+  --seal-available: #4a4c9e;
+  --seal-completed: #2c2a5e;
+  --seal-failed:    #2a2a3a;
+  --seal-locked:    #5a4c6a;
+  --stamp-red: #8a3434;
+  --stamp-gold: #8e6c20;
+}
+
+/* ---- Palette: BOSQUE ---- */
+.misiones-board[data-palette="forest"] {
+  --board-1: #2a3e22;
+  --board-2: #1b2a16;
+  --board-3: #0e1a0a;
+  --board-frame: #1a2a14;
+  --board-frame-hi: #4a5e3a;
+  --paper-1: #efe0b8;
+  --paper-2: #ddc998;
+  --paper-3: #c0aa78;
+  --paper-edge: #6a5430;
+  --paper-shadow: rgba(20, 30, 12, 0.55);
+  --ink-1: #1e2410;
+  --ink-2: #2e3a18;
+  --ink-3: #4a5a28;
+  --ink-4: #6a7a44;
+  --gold-1: #e8c890;
+  --gold-2: #c08a3c;
+  --gold-3: #8a5a20;
+  --gold-4: #4a2e0c;
+  --seal-active:    #3e7a3a;
+  --seal-available: #b04a1c;
+  --seal-completed: #4a2410;
+  --seal-failed:    #2a1812;
+  --seal-locked:    #3a3422;
+  --stamp-red: #9c3a28;
+  --stamp-gold: #8a5a20;
+}
+
+/* ============== GLOBAL (scoped) ============== */
+.misiones-board * { box-sizing: border-box; }
+
+.misiones-board {
+  font-family: var(--font-body);
+  color: var(--ink-1);
+  -webkit-font-smoothing: antialiased;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.misiones-board .font-display { font-family: var(--font-display); }
+.misiones-board .font-body { font-family: var(--font-body); }
+.misiones-board .font-uppercase { font-family: var(--font-uppercase); letter-spacing: 0.08em; }
+.misiones-board .font-mono { font-family: var(--font-mono); }
+
+/* ============== CORK / WOOD BOARD ============== */
+.misiones-board .tavern-bg {
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(255, 220, 140, 0.10), transparent 50%),
+    radial-gradient(ellipse at 50% 120%, rgba(0,0,0,0.7), transparent 60%),
+    linear-gradient(180deg, var(--board-1), var(--board-2) 70%, var(--board-3));
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.misiones-board .tavern-bg::before {
+  content: "";
+  position: absolute; inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 12% 22%, rgba(255,220,160,0.06) 0 1.5px, transparent 2px),
+    radial-gradient(circle at 78% 11%, rgba(0,0,0,0.25) 0 1px, transparent 2px),
+    radial-gradient(circle at 33% 76%, rgba(0,0,0,0.18) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 88% 60%, rgba(255,220,160,0.06) 0 1px, transparent 2px),
+    radial-gradient(circle at 50% 45%, rgba(0,0,0,0.18) 0 1.2px, transparent 2px),
+    radial-gradient(circle at 18% 92%, rgba(255,220,160,0.05) 0 1.5px, transparent 2px);
+  background-size: 280px 280px;
+  opacity: 0.85;
+}
+.misiones-board .tavern-bg::after {
+  content: "";
+  position: absolute; inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='200' height='200' filter='url(%23n)' opacity='0.55'/></svg>");
+  mix-blend-mode: overlay;
+  opacity: 0.35;
+}
+
+/* Wooden plank frame */
+.misiones-board .wood-frame {
+  background:
+    repeating-linear-gradient(90deg,
+      var(--board-frame) 0px,
+      var(--board-frame-hi) 18px,
+      var(--board-frame) 24px,
+      var(--board-frame-hi) 60px,
+      var(--board-frame) 84px),
+    var(--board-frame);
+  box-shadow:
+    inset 0 0 20px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(255,255,200,0.06),
+    inset 0 -1px 0 rgba(0,0,0,0.4);
+  color: var(--gold-1);
+}
+
+/* ============== PAPER ============== */
+.misiones-board .paper {
+  position: relative;
+  background:
+    radial-gradient(ellipse at 15% 20%, rgba(120, 70, 30, 0.10), transparent 50%),
+    radial-gradient(ellipse at 85% 80%, rgba(90, 50, 20, 0.12), transparent 60%),
+    radial-gradient(ellipse at 50% 50%, var(--paper-1), var(--paper-2) 80%, var(--paper-3));
+  color: var(--ink-1);
+  box-shadow:
+    inset 0 0 40px rgba(80, 50, 20, 0.16),
+    inset 0 0 6px rgba(80, 50, 20, 0.10),
+    0 1px 2px rgba(0,0,0,0.3),
+    0 6px 16px var(--paper-shadow),
+    0 18px 36px -8px rgba(0,0,0,0.4);
+  border-radius: 2px;
+}
+.misiones-board .paper::before {
+  content: "";
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100' height='100' filter='url(%23n)' opacity='0.5'/></svg>");
+  mix-blend-mode: multiply;
+  opacity: 0.25;
+  pointer-events: none;
+  border-radius: inherit;
+}
+.misiones-board .paper::after {
+  content: "";
+  position: absolute; inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(80, 50, 20, 0.22);
+  background:
+    radial-gradient(circle at 0% 0%, rgba(60, 30, 10, 0.35), transparent 18%),
+    radial-gradient(circle at 100% 0%, rgba(60, 30, 10, 0.30), transparent 16%),
+    radial-gradient(circle at 0% 100%, rgba(60, 30, 10, 0.28), transparent 18%),
+    radial-gradient(circle at 100% 100%, rgba(60, 30, 10, 0.32), transparent 16%);
+}
+
+.misiones-board .pinnable { position: relative; }
+
+/* ============== QUEST CARD ============== */
+.misiones-board .quest-paper {
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+              filter 0.2s ease,
+              box-shadow 0.2s ease;
+  transform-origin: 50% 0%;
+}
+.misiones-board .quest-paper:hover {
+  transform: translateY(-4px) rotate(0deg) !important;
+  filter: brightness(1.04);
+  box-shadow:
+    inset 0 0 40px rgba(80, 50, 20, 0.18),
+    0 4px 8px rgba(0,0,0,0.4),
+    0 16px 32px var(--paper-shadow),
+    0 24px 50px -10px rgba(0,0,0,0.5);
+  z-index: 5;
+}
+.misiones-board .quest-paper.is-locked { filter: grayscale(0.5) brightness(0.78); }
+.misiones-board .quest-paper.is-failed { filter: grayscale(0.3) brightness(0.85); }
+.misiones-board .quest-paper.is-completed { filter: brightness(0.95); }
+.misiones-board .quest-paper.is-selected {
+  box-shadow:
+    inset 0 0 40px rgba(80, 50, 20, 0.18),
+    0 0 0 2px var(--gold-2),
+    0 4px 8px rgba(0,0,0,0.4),
+    0 16px 32px var(--paper-shadow);
+}
+
+/* ============== TEXT / INK ============== */
+.misiones-board .ink { color: var(--ink-1); text-shadow: 0 0 0.4px var(--ink-1); }
+.misiones-board .ink-soft { color: var(--ink-2); }
+.misiones-board .ink-faint { color: var(--ink-3); }
+.misiones-board .ink-faintest { color: var(--ink-4); }
+
+.misiones-board .dec-title {
+  font-family: var(--font-display);
+  color: var(--ink-1);
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+}
+
+.misiones-board .drop-cap::first-letter {
+  font-family: var(--font-display);
+  float: left;
+  font-size: 3.2em;
+  line-height: 0.85;
+  margin: 0.05em 0.1em 0 0;
+  color: var(--gold-3);
+  text-shadow: 1px 1px 0 rgba(255,220,160,0.4);
+}
+
+/* ============== ANIMATIONS ============== */
+@keyframes mis-fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.misiones-board .fade-up { animation: mis-fade-up 0.35s ease both; }
+
+@keyframes mis-stamp-down {
+  0% { transform: rotate(-14deg) scale(2.4); opacity: 0; filter: blur(2px); }
+  60% { transform: rotate(-14deg) scale(1.05); opacity: 0.9; filter: blur(0); }
+  80% { transform: rotate(-14deg) scale(0.96); opacity: 0.84; }
+  100% { transform: rotate(-14deg) scale(1); opacity: 0.84; }
+}
+
+@keyframes mis-slide-in {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes mis-spark {
+  0% { opacity: 0; transform: scale(0.4) translateY(0); }
+  40% { opacity: 1; transform: scale(1) translateY(-6px); }
+  100% { opacity: 0; transform: scale(0.5) translateY(-16px); }
+}
+
+/* ============== STAMP ============== */
+.misiones-board .stamp {
+  position: absolute;
+  pointer-events: none;
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--stamp-red);
+  border: 3px double var(--stamp-red);
+  padding: 6px 14px 4px 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 22px;
+  opacity: 0.84;
+  text-shadow: 1px 1px 0 rgba(255,255,255,0.06);
+  transform: rotate(-14deg);
+  mix-blend-mode: multiply;
+  filter: contrast(1.05);
+  white-space: nowrap;
+}
+.misiones-board .stamp::before, .misiones-board .stamp::after {
+  content: "";
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='2.4' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 -2 1.5'/></filter><rect width='100' height='100' filter='url(%23n)'/></svg>");
+  mix-blend-mode: lighten;
+  opacity: 0.6;
+}
+.misiones-board .stamp-failed { color: var(--ink-1); border-color: var(--ink-1); transform: rotate(-8deg); }
+.misiones-board .stamp-active {
+  color: var(--stamp-gold);
+  border-color: var(--stamp-gold);
+  transform: rotate(-6deg);
+  font-size: 16px;
+  padding: 4px 10px 3px 10px;
+}
+.misiones-board .stamp-anim { animation: mis-stamp-down 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
+/* ============== SPARKLES ============== */
+.misiones-board .sparkle-host { position: relative; overflow: visible; }
+.misiones-board .sparkle-host .sparkle {
+  position: absolute;
+  width: 6px; height: 6px;
+  background: radial-gradient(circle, var(--gold-1) 0%, var(--gold-2) 40%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(0.4px);
+  opacity: 0;
+  animation: mis-spark 3s ease-in-out infinite;
+}
+
+/* ============== BUTTONS ============== */
+.misiones-board .btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 16px;
+  font-family: var(--font-uppercase);
+  font-size: 13px;
+  letter-spacing: 0.10em;
+  color: var(--ink-1);
+  background: linear-gradient(180deg, var(--paper-1), var(--paper-3));
+  border: 1.5px solid var(--ink-3);
+  border-radius: 3px;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 2px 0 rgba(0,0,0,0.2);
+  transition: transform 0.1s, box-shadow 0.1s, filter 0.1s;
+}
+.misiones-board .btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.misiones-board .btn:active { transform: translateY(1px); box-shadow: inset 0 1px 2px rgba(0,0,0,0.3); }
+
+.misiones-board .btn-primary {
+  background: linear-gradient(180deg, var(--gold-2), var(--gold-3));
+  color: #1e120a;
+  border-color: var(--gold-4);
+}
+.misiones-board .btn-ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--ink-2);
+  box-shadow: none;
+}
+.misiones-board .btn-ghost:hover { background: rgba(60,40,20,0.08); color: var(--ink-1); }
+.misiones-board .btn-sm { padding: 6px 11px; font-size: 11px; }
+.misiones-board .btn-dark {
+  background: linear-gradient(180deg, #2a1810, #18100a);
+  border-color: #6a4a28;
+  color: var(--gold-1);
+  font-family: var(--font-uppercase);
+  letter-spacing: 0.10em;
+}
+
+/* ============== LABEL / CHIP ============== */
+.misiones-board .label {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-uppercase);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--ink-3);
+  text-transform: uppercase;
+}
+
+.misiones-board .divider-rule {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--ink-3) 20%, var(--ink-3) 80%, transparent);
+  opacity: 0.4;
+  margin: 14px 0;
+}
+
+/* ============== LEATHER TABS ============== */
+.misiones-board .leather-tab {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px;
+  font-family: var(--font-uppercase);
+  font-size: 12px;
+  letter-spacing: 0.10em;
+  color: #d9b673;
+  background: linear-gradient(90deg, #3a2418, #2a1810 80%, transparent);
+  border-left: 3px solid transparent;
+  cursor: pointer;
+  position: relative;
+  text-transform: uppercase;
+  transition: all 0.15s;
+}
+.misiones-board .leather-tab:hover {
+  background: linear-gradient(90deg, #4a2e1c, #38201a 80%, transparent);
+  color: var(--gold-1);
+}
+.misiones-board .leather-tab.active {
+  background: linear-gradient(90deg, #5a3818, #38201a 80%, transparent);
+  color: var(--gold-1);
+  border-left-color: var(--gold-2);
+  box-shadow: inset 6px 0 18px -6px rgba(255,200,100,0.25);
+}
+.misiones-board .leather-tab.active::after {
+  content: "▶";
+  position: absolute; right: 10px;
+  font-size: 9px;
+  color: var(--gold-2);
+}
+
+/* ============== FILTER CHIPS ============== */
+.misiones-board .chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 12px;
+  font-family: var(--font-uppercase);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--ink-2);
+  background: linear-gradient(180deg, var(--paper-2), var(--paper-3));
+  border: 1px solid var(--ink-3);
+  border-radius: 99px;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.35);
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.misiones-board .chip:hover { filter: brightness(1.05); }
+.misiones-board .chip.active {
+  background: linear-gradient(180deg, var(--gold-2), var(--gold-3));
+  color: #1e120a;
+  border-color: var(--gold-4);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.45), 0 0 12px -3px var(--gold-2);
+}
+
+/* ============== INPUT / FIELD ============== */
+.misiones-board .field {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--ink-1);
+  padding: 9px 14px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.3), transparent),
+    var(--paper-2);
+  border: 1px solid var(--ink-3);
+  border-radius: 2px;
+  outline: none;
+  width: 100%;
+  box-shadow: inset 0 2px 4px rgba(60,40,20,0.15);
+}
+.misiones-board .field::placeholder { color: var(--ink-3); font-style: italic; }
+
+/* ============== PROGRESS BAR ============== */
+.misiones-board .bar {
+  height: 6px;
+  background: rgba(60,40,20,0.18);
+  border-radius: 0;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--ink-3);
+}
+.misiones-board .bar > span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--ink-2), var(--ink-1));
+  transition: width 0.5s ease;
+}
+.misiones-board .bar.gold > span { background: linear-gradient(90deg, var(--gold-3), var(--gold-2)); }
+.misiones-board .bar.full > span { background: linear-gradient(90deg, var(--seal-active), var(--seal-active)); }
+
+/* ============== DETAIL LETTER ============== */
+.misiones-board .letter {
+  position: relative;
+  background:
+    radial-gradient(ellipse at 20% 15%, rgba(120,70,30,0.06), transparent 50%),
+    radial-gradient(ellipse at 50% 50%, var(--paper-1), var(--paper-2) 70%, var(--paper-3));
+  color: var(--ink-1);
+  box-shadow:
+    inset 0 0 80px rgba(80, 50, 20, 0.18),
+    inset 0 0 12px rgba(80, 50, 20, 0.12),
+    -10px 0 30px var(--paper-shadow),
+    -2px 0 8px rgba(0,0,0,0.4);
+}
+
+/* ============== CORK BOARD INNER ============== */
+.misiones-board .board-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 28px;
+}
+
+/* ============== SCROLLBAR ============== */
+.misiones-board ::-webkit-scrollbar { width: 10px; height: 10px; }
+.misiones-board ::-webkit-scrollbar-track { background: transparent; }
+.misiones-board ::-webkit-scrollbar-thumb { background: rgba(150,110,60,0.25); border-radius: 99px; }
+.misiones-board ::-webkit-scrollbar-thumb:hover { background: rgba(150,110,60,0.45); }
+
+/* ============== MOTION ============== */
+@media (prefers-reduced-motion: reduce) {
+  .misiones-board *, .misiones-board *::before, .misiones-board *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ============== MOBILE ============== */
+@media (max-width: 900px) {
+  .misiones-board .hide-mobile { display: none !important; }
+  .misiones-board .board-grid { grid-template-columns: 1fr !important; }
+  .misiones-board .quest-paper { transform: none !important; }
+}
