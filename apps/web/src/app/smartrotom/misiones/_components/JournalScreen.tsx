@@ -1,0 +1,99 @@
+"use client"
+
+import React, { useState, useMemo } from "react"
+import { IDialogue, NPC, QuestData } from "@/types/misiones"
+import { WaxSeal, FlourishCorners, Divider, Icon } from "./misiones-atoms"
+
+export interface JournalScreenProps {
+  dialogs: IDialogue[]
+  npcs: NPC[]
+  quests: QuestData[]
+  onSelectQuest: (q: QuestData) => void
+}
+
+export function JournalScreen({ dialogs, npcs, quests, onSelectQuest }: JournalScreenProps) {
+  const [searchD, setSearchD] = useState("")
+
+  const filtered = useMemo(() => {
+    if (!searchD.trim()) return dialogs
+    const s = searchD.toLowerCase()
+    return dialogs.filter((d) =>
+      d.text.toLowerCase().includes(s) ||
+      d.name.toLowerCase().includes(s)
+    )
+  }, [dialogs, searchD])
+
+  return (
+    <div>
+      <div style={{ textAlign: "center", marginBottom: 24, marginTop: 10 }}>
+        <span className="label" style={{ color: "var(--gold-1)" }}>Diario</span>
+        <h1 className="dec-title" style={{ fontSize: 38, color: "var(--paper-1)", margin: "4px 0 6px 0", textShadow: "0 2px 12px rgba(0,0,0,0.6)" }}>
+          Bitácora de Diálogos
+        </h1>
+        <div style={{ color: "var(--paper-3)", fontSize: 14, fontStyle: "italic" }}>
+          Cada palabra registrada con tinta indeleble
+        </div>
+        <div style={{ marginTop: 16, color: "var(--gold-2)", opacity: 0.7 }}>
+          <Divider color="var(--gold-2)" glyph="✦"/>
+        </div>
+      </div>
+
+      <div style={{ maxWidth: 800, margin: "0 auto" }}>
+        <div style={{ position: "relative", maxWidth: 380, marginBottom: 20 }}>
+          <input className="field" value={searchD} onChange={(e) => setSearchD(e.target.value)}
+            placeholder="Buscar en la bitácora…" style={{ paddingLeft: 34 }}/>
+          <div style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "var(--ink-3)" }}>
+            <Icon.Search size={14}/>
+          </div>
+        </div>
+
+        {filtered.length === 0 && (
+          <div style={{ textAlign: "center", color: "var(--paper-2)", fontStyle: "italic", padding: "40px 0" }}>
+            No hay entradas que coincidan.
+          </div>
+        )}
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {filtered.map((d) => {
+            const npc = npcs.find((n) => n.dialogId === d.id)
+            const quest = quests.find((q) => q.id === d.questId)
+            const tilt = ((d.id * 13) % 100) / 100 * 1.6 - 0.8
+            const npcInitial = (npc?.name ?? d.name ?? "?")[0].toUpperCase()
+            return (
+              <div key={d.id} className="paper" style={{ padding: "20px 26px", position: "relative", transform: `rotate(${tilt}deg)` }}>
+                <FlourishCorners size={20} color="var(--gold-3)" offset={6} opacity={0.4}/>
+                <div style={{ position: "absolute", top: -10, left: 30 }}>
+                  <WaxSeal glyph={npcInitial} color="var(--seal-available)" size={36} tilt={-12}/>
+                </div>
+
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginTop: 20, marginBottom: 8, gap: 14 }}>
+                  <div>
+                    <div className="dec-title" style={{ fontSize: 18, color: "var(--ink-1)" }}>{npc?.name ?? d.name}</div>
+                    <div style={{ fontSize: 12, color: "var(--ink-3)", fontStyle: "italic" }}>{d.name}</div>
+                  </div>
+                </div>
+
+                <p style={{
+                  fontSize: 15, lineHeight: 1.65, color: "var(--ink-1)", fontStyle: "italic",
+                  borderLeft: "2px solid var(--ink-3)", paddingLeft: 14, margin: "8px 0",
+                }}>
+                  &ldquo;{d.text}&rdquo;
+                </p>
+
+                {quest && (
+                  <div style={{ marginTop: 12, paddingTop: 10, borderTop: "1px dashed rgba(60,40,20,0.3)",
+                    display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
+                    <span className="label">— misión relacionada</span>
+                    <button className="btn btn-sm" onClick={() => onSelectQuest(quest)}>
+                      <Icon.Scroll size={11}/> {quest.name} <Icon.Arrow size={11}/>
+                    </button>
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    </div>
+  )
+}
