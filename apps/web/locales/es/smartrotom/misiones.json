@@ -91,6 +91,12 @@
     "type_gym": "Gimnasio",
     "type_rival": "Rival",
     "type_endgame": "Endgame",
-    "type_mission": "Misión"
+    "type_mission": "Misión",
+
+    "chain_section": "⚜ Cadena de Misiones ⚜",
+    "chain_here": "AQUÍ",
+
+    "atlas_npc_pin_label": "NPCs en este mundo",
+    "atlas_subtitle_map": "Coordenadas reales del servidor · haz clic para explorar"
   }
 }

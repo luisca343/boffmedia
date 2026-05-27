@@ -4,6 +4,7 @@ import axios from 'axios';
 import {
   ExternalQuestResponse,
   IQuestRepository,
+  NpcCatalogResponse,
   UserQuestResponse,
 } from './interfaces/quest.repository.interface';
 
@@ -83,7 +84,7 @@ export class QuestRepository implements IQuestRepository {
       if (!response.data) {
         throw new Error('No user quest data received from external API');
       }
-      
+
       const userQuestResponse: UserQuestResponse = {
         quests: response.data.data.quests || {},
       };
@@ -95,6 +96,31 @@ export class QuestRepository implements IQuestRepository {
       this.logger.error(`Failed to fetch user quests for ${uuid}`, error.stack);
       throw new BadRequestException(
         `Failed to fetch user quest data: ${error.message}`,
+      );
+    }
+  }
+
+  async fetchNpcCatalogFromAPI(): Promise<NpcCatalogResponse> {
+    try {
+      this.logger.log('Fetching NPC catalog from external API');
+
+      const response = await axios.get(`${this.baseUrl}/npcCatalog`, {
+        timeout: 10000,
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'FicusLabs-QuestService/1.0',
+        },
+      });
+
+      if (!response.data) {
+        throw new Error('No data received from external API');
+      }
+
+      return (response.data.data ?? response.data) as NpcCatalogResponse;
+    } catch (error: any) {
+      this.logger.error('Failed to fetch NPC catalog from external API', error.stack);
+      throw new BadRequestException(
+        `Failed to fetch NPC catalog: ${error.message}`,
       );
     }
   }

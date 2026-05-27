@@ -91,6 +91,12 @@
     "type_gym": "Gym",
     "type_rival": "Rival",
     "type_endgame": "Endgame",
-    "type_mission": "Quest"
+    "type_mission": "Quest",
+
+    "chain_section": "⚜ Quest Chain ⚜",
+    "chain_here": "HERE",
+
+    "atlas_npc_pin_label": "NPCs in this world",
+    "atlas_subtitle_map": "Real server coordinates · click to explore"
   }
 }

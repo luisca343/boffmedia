@@ -5,9 +5,11 @@ import { QuestData, QuestStatus } from "@/types/misiones"
 import { Palette, Section } from "../_types/board"
 import { makeRegions } from "../_utils/questUtils"
 import { useGetRotomQuests } from "./useGetRotomQuests"
+import { useGetNpcCatalog } from "@/hooks/misiones/useGetNpcCatalog"
 
 export function useMisionesState() {
   const { quests, categories, dialogs, npcs, isLoading } = useGetRotomQuests()
+  const { npcCatalog } = useGetNpcCatalog()
 
   const [section, setSection] = useState<Section>("board")
   const [selectedQuest, setSelectedQuest] = useState<QuestData | null>(null)
@@ -45,6 +47,7 @@ export function useMisionesState() {
     categories,
     dialogs,
     npcs,
+    npcCatalog,
     isLoading,
     section,
     setSection,

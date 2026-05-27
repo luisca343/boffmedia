@@ -2,6 +2,7 @@
 
 import React, { useMemo } from "react"
 import { QuestStatus } from "@/types/misiones"
+import { CravatarHead } from "@/components/smartrotom/CravatarHead"
 
 // ============ WAX SEAL ============
 function ridgedPath(cx: number, cy: number, rOuter: number, rInner: number, points = 28): string {
@@ -306,4 +307,263 @@ export const STATUS_COLOR: Record<QuestStatus, string> = {
   [QuestStatus.FAILED]: "var(--seal-failed)",
   [QuestStatus.LOCKED]: "var(--seal-locked)",
   [QuestStatus.NOT_STARTED]: "var(--seal-locked)",
+}
+
+// ============ PAPER RUSTLE SOUND ============
+export function playPaperRustle() {
+  if (typeof window === "undefined") return;
+  if ((window as any).__paperSoundEnabled === false) return;
+  try {
+    const win = window as any;
+    const ctx: AudioContext = win.__audioCtx || (win.__audioCtx = new (window.AudioContext || (win as any).webkitAudioContext)());
+    const buf = ctx.createBuffer(1, ctx.sampleRate * 0.18, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < data.length; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 2) * 0.18;
+    }
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const filter = ctx.createBiquadFilter();
+    filter.type = "highpass";
+    filter.frequency.value = 1200;
+    const g = ctx.createGain();
+    g.gain.value = 0.6;
+    src.connect(filter).connect(g).connect(ctx.destination);
+    src.start();
+  } catch (_) {}
+}
+
+// ============ MINECRAFT HEAD (cravatar.eu face) ============
+interface MinecraftHeadProps { skin?: string; size?: number }
+export function MinecraftHead({ skin, size = 32 }: MinecraftHeadProps) {
+  return <CravatarHead username={skin} size={size} variant="face" />
+}
+
+// ============ MINECRAFT SKIN AVATAR ============
+interface MinecraftSkinAvatarProps {
+  skin?: string;
+  size?: number;
+  ring?: boolean;
+  ringColor?: string;
+  headOnly?: boolean;
+}
+export function MinecraftSkinAvatar({ skin, size = 56, ring = false, ringColor = "var(--gold-2)", headOnly = false }: MinecraftSkinAvatarProps) {
+  const inner = (
+    <CravatarHead username={skin} size={size} variant={headOnly ? "face" : "head3d"} />
+  );
+
+  if (ring) {
+    return (
+      <div style={{
+        borderRadius: 3,
+        background: "#1a1208",
+        padding: 2,
+        outline: `1.5px solid ${ringColor}`,
+        display: "inline-block",
+        flexShrink: 0,
+      }}>
+        {inner}
+      </div>
+    );
+  }
+
+  return inner;
+}
+
+// ============ CORK BOARD PAPER DECORATIONS ============
+interface PostItProps { children?: React.ReactNode; color?: string; tilt?: number; size?: number; footer?: string }
+export function PostIt({ children, color = "#fff77a", tilt = -3, size = 130, footer = "" }: PostItProps) {
+  return (
+    <div style={{
+      width: size, minHeight: size * 0.9,
+      padding: "16px 14px 12px 14px",
+      background: `linear-gradient(180deg, ${color}, ${color}cc)`,
+      transform: `rotate(${tilt}deg)`,
+      boxShadow: "0 1px 0 rgba(0,0,0,0.1), 4px 8px 12px rgba(0,0,0,0.35), 12px 16px 24px -8px rgba(0,0,0,0.3)",
+      position: "relative",
+      fontFamily: "'Patrick Hand', 'Caveat', cursive",
+      fontSize: 14, color: "#3a2a18", lineHeight: 1.3,
+    }}>
+      <div style={{
+        position: "absolute", top: -8, left: "50%",
+        transform: "translateX(-50%) rotate(-3deg)",
+        width: 50, height: 16,
+        background: "rgba(220,200,160,0.55)",
+        border: "1px solid rgba(180,150,100,0.3)",
+        boxShadow: "0 2px 3px rgba(0,0,0,0.2)",
+      }}/>
+      {children}
+      {footer && (
+        <div style={{
+          marginTop: 8, fontSize: 11, opacity: 0.55, textAlign: "right",
+          borderTop: "1px solid rgba(60,40,20,0.2)", paddingTop: 4,
+        }}>{footer}</div>
+      )}
+    </div>
+  );
+}
+
+interface NewspaperClippingProps { headline: string; body: string; source?: string; tilt?: number; width?: number }
+export function NewspaperClipping({ headline, body, source = "The Pewter Times", tilt = 1.6, width = 220 }: NewspaperClippingProps) {
+  return (
+    <div style={{
+      width, padding: "12px 14px",
+      background: "linear-gradient(180deg, #efe8d2, #d6cca6)",
+      transform: `rotate(${tilt}deg)`,
+      boxShadow: "inset 0 0 30px rgba(80,50,20,0.15), 4px 6px 10px rgba(0,0,0,0.35), 10px 14px 22px -10px rgba(0,0,0,0.4)",
+      color: "#1a1208",
+      fontFamily: "'IM Fell English SC', 'Times New Roman', serif",
+      clipPath: "polygon(2% 0%, 98% 1%, 100% 4%, 99% 96%, 97% 100%, 3% 99%, 1% 96%, 2% 4%)",
+    }}>
+      <div style={{ fontSize: 8, letterSpacing: "0.20em", textTransform: "uppercase", textAlign: "center", opacity: 0.7, marginBottom: 4, borderBottom: "1px solid rgba(0,0,0,0.4)", paddingBottom: 3 }}>{source}</div>
+      <div style={{ fontFamily: "'IM Fell English SC', serif", fontWeight: 700, fontSize: 14, lineHeight: 1.05, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.02em" }}>{headline}</div>
+      <div style={{ fontSize: 9, lineHeight: 1.4, columnCount: 2, columnGap: 6, fontFamily: "'EB Garamond', serif", textAlign: "justify", color: "#2a1810" }}>{body}</div>
+    </div>
+  );
+}
+
+interface PolaroidProps { caption?: string; tilt?: number; size?: number; image?: React.ReactNode }
+export function Polaroid({ caption = "Ruta 1", tilt = -4, size = 130, image }: PolaroidProps) {
+  return (
+    <div style={{
+      width: size, padding: "10px 10px 22px 10px",
+      background: "#f5efde",
+      transform: `rotate(${tilt}deg)`,
+      boxShadow: "0 1px 0 rgba(0,0,0,0.06), 4px 8px 14px rgba(0,0,0,0.4), 12px 20px 28px -10px rgba(0,0,0,0.45)",
+      position: "relative",
+    }}>
+      <div style={{ position: "absolute", top: -10, right: -10, width: 38, height: 22, background: "rgba(220,200,160,0.6)", border: "1px solid rgba(180,150,100,0.3)", transform: "rotate(28deg)" }}/>
+      <div style={{ width: "100%", aspectRatio: "1 / 0.95", background: "linear-gradient(135deg, #4a5a2c 0%, #7a8a4a 40%, #c8b86a 90%)", position: "relative", overflow: "hidden", boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.4)" }}>
+        {image || (
+          <svg viewBox="0 0 100 95" width="100%" height="100%">
+            <rect x="0" y="60" width="100" height="35" fill="#5a4830"/>
+            <path d="M 0 60 L 30 35 L 50 50 L 80 25 L 100 45 L 100 60 Z" fill="#3a4a22"/>
+            <circle cx="78" cy="20" r="9" fill="#f5d785" opacity="0.85"/>
+            <path d="M 15 70 L 22 60 L 28 70 Z" fill="#2a1810"/>
+            <path d="M 60 76 L 68 64 L 74 76 Z" fill="#2a1810"/>
+          </svg>
+        )}
+      </div>
+      <div style={{ textAlign: "center", marginTop: 8, fontFamily: "'Patrick Hand', 'Caveat', cursive", fontSize: 13, color: "#3a2a18" }}>{caption}</div>
+    </div>
+  );
+}
+
+type DoodleKind = "arrow" | "star" | "check" | "skull"
+interface DoodleProps { tilt?: number; size?: number; kind?: DoodleKind }
+export function Doodle({ tilt = 0, size = 110, kind = "arrow" }: DoodleProps) {
+  const doodles: Record<DoodleKind, React.ReactNode> = {
+    arrow: (
+      <svg viewBox="0 0 100 60" width={size} height={size * 0.6}>
+        <path d="M 8 30 C 20 6, 60 6, 86 28 L 78 22 M 86 28 L 78 36" fill="none" stroke="#2a1810" strokeWidth="2.5" strokeLinecap="round"/>
+      </svg>
+    ),
+    star: (
+      <svg viewBox="0 0 60 60" width={size * 0.6} height={size * 0.6}>
+        <path d="M 30 6 L 36 24 L 54 24 L 40 35 L 46 53 L 30 42 L 14 53 L 20 35 L 6 24 L 24 24 Z" fill="none" stroke="#2a1810" strokeWidth="2" strokeLinejoin="round"/>
+      </svg>
+    ),
+    check: (
+      <svg viewBox="0 0 60 60" width={size * 0.6} height={size * 0.6}>
+        <path d="M 8 32 L 22 48 L 52 12" fill="none" stroke="#6b1410" strokeWidth="3.5" strokeLinecap="round"/>
+      </svg>
+    ),
+    skull: (
+      <svg viewBox="0 0 60 60" width={size * 0.6} height={size * 0.6}>
+        <circle cx="30" cy="26" r="16" fill="none" stroke="#2a1810" strokeWidth="2"/>
+        <circle cx="24" cy="26" r="3" fill="#2a1810"/>
+        <circle cx="36" cy="26" r="3" fill="#2a1810"/>
+        <path d="M 22 42 L 24 50 M 28 42 L 28 50 M 32 42 L 32 50 M 36 42 L 38 50" stroke="#2a1810" strokeWidth="2" strokeLinecap="round"/>
+      </svg>
+    ),
+  };
+  return (
+    <div style={{ transform: `rotate(${tilt}deg)`, display: "inline-block" }}>
+      {doodles[kind]}
+    </div>
+  );
+}
+
+interface InkBlotProps { size?: number; color?: string; tilt?: number }
+export function InkBlot({ size = 60, color = "#1a1208", tilt = 0 }: InkBlotProps) {
+  return (
+    <svg viewBox="0 0 100 100" width={size} height={size}
+      style={{ transform: `rotate(${tilt}deg)`, filter: "drop-shadow(0 2px 3px rgba(0,0,0,0.3))" }}>
+      <path d="M 30 18 C 14 24, 8 44, 14 58 C 6 72, 22 86, 38 80 C 48 90, 70 86, 76 72 C 92 70, 94 50, 82 42 C 88 28, 70 14, 56 22 C 48 12, 32 12, 30 18 Z" fill={color} opacity="0.88"/>
+      <circle cx="86" cy="20" r="3" fill={color} opacity="0.7"/>
+      <circle cx="12" cy="78" r="2" fill={color} opacity="0.6"/>
+      <circle cx="96" cy="60" r="2" fill={color} opacity="0.7"/>
+    </svg>
+  );
+}
+
+// ============ INKWELL + QUILL (letter desk decor) ============
+interface InkwellProps { size?: number }
+export function Inkwell({ size = 84 }: InkwellProps) {
+  return (
+    <svg viewBox="0 0 100 120" width={size} height={size * 1.2}
+      style={{ filter: "drop-shadow(2px 6px 6px rgba(0,0,0,0.55))" }}>
+      <defs>
+        <radialGradient id="ink-glass" cx="35%" cy="30%" r="70%">
+          <stop offset="0%" stopColor="#7e6450"/>
+          <stop offset="40%" stopColor="#3a2618" stopOpacity="0.95"/>
+          <stop offset="100%" stopColor="#120a04"/>
+        </radialGradient>
+        <linearGradient id="ink-rim" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#d6a13f"/>
+          <stop offset="100%" stopColor="#6b440f"/>
+        </linearGradient>
+      </defs>
+      <ellipse cx="50" cy="106" rx="44" ry="8" fill="#1a0e07" opacity="0.6"/>
+      <path d="M 12 96 L 88 96 L 84 110 L 16 110 Z" fill="url(#ink-rim)" stroke="#3a1e0a" strokeWidth="1"/>
+      <path d="M 22 48 Q 22 24 50 24 Q 78 24 78 48 L 78 96 L 22 96 Z" fill="url(#ink-glass)" stroke="#1a0e07" strokeWidth="1.5"/>
+      <ellipse cx="50" cy="28" rx="22" ry="6" fill="url(#ink-rim)" stroke="#3a1e0a" strokeWidth="1"/>
+      <ellipse cx="50" cy="28" rx="18" ry="4" fill="#0a0604"/>
+      <ellipse cx="50" cy="30" rx="14" ry="2.5" fill="#1a0a05"/>
+      <ellipse cx="44" cy="29" rx="4" ry="1" fill="rgba(255,255,255,0.18)"/>
+      <path d="M 30 52 Q 32 70 36 90" stroke="rgba(255,255,255,0.16)" strokeWidth="2" fill="none"/>
+    </svg>
+  );
+}
+
+interface QuillProps { size?: number; tilt?: number }
+export function Quill({ size = 140, tilt = 18 }: QuillProps) {
+  return (
+    <svg viewBox="0 0 200 200" width={size} height={size}
+      style={{ transform: `rotate(${tilt}deg)`, filter: "drop-shadow(2px 4px 5px rgba(0,0,0,0.5))" }}>
+      <defs>
+        <linearGradient id="feather-g" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#f5e8b8"/>
+          <stop offset="45%" stopColor="#c89a4a"/>
+          <stop offset="100%" stopColor="#5a3a18"/>
+        </linearGradient>
+      </defs>
+      <path d="M 30 170 Q 60 110 100 60 Q 140 20 170 20 Q 168 50 140 80 Q 100 120 60 160 Q 50 168 30 170 Z" fill="url(#feather-g)" stroke="#3a2410" strokeWidth="1.5"/>
+      <path d="M 30 170 Q 80 110 165 25" fill="none" stroke="#3a2410" strokeWidth="2.5" strokeLinecap="round"/>
+      {Array.from({ length: 14 }).map((_, i) => {
+        const t = i / 14;
+        const x1 = 30 + (165 - 30) * t;
+        const y1 = 170 + (25 - 170) * t;
+        return (
+          <line key={i} x1={x1} y1={y1} x2={x1 + (-22 + i * 1.4)} y2={y1 + (-28 + i * 0.4)}
+            stroke="#3a2410" strokeWidth="0.6" opacity="0.5"/>
+        );
+      })}
+      <path d="M 20 180 L 30 168 L 38 178 L 28 188 Z" fill="#1a0e07" stroke="#000" strokeWidth="0.8"/>
+      <path d="M 24 184 L 30 178" stroke="#6b1410" strokeWidth="1.5"/>
+    </svg>
+  );
+}
+
+// ============ ROPE PATH (SVG, renders inside <svg> context) ============
+interface RopePathProps { d: string; thickness?: number; color?: string }
+export function RopePath({ d, thickness = 6, color = "#6b4a28" }: RopePathProps) {
+  return (
+    <>
+      <path d={d} fill="none" stroke="#1a0e07" strokeWidth={thickness + 2} strokeLinecap="round"/>
+      <path d={d} fill="none" stroke={color} strokeWidth={thickness} strokeLinecap="round"/>
+      <path d={d} fill="none" stroke="#3a2410" strokeWidth={thickness} strokeLinecap="round" strokeDasharray="6 4" opacity="0.55"/>
+      <path d={d} fill="none" stroke="#c8a26a" strokeWidth="1" strokeLinecap="round" strokeDasharray="3 3" opacity="0.65"/>
+    </>
+  );
 }

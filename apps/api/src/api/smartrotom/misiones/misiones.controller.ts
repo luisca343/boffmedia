@@ -44,6 +44,7 @@ import {
 } from './entities/cache-response.entity';
 import { SystemHealthResponse } from './entities/system-health-response.entity';
 import { NPC } from './entities/npc.entity';
+import { NpcCatalogEntry } from './entities/npc-catalog.entity';
 
 @ApiTags('SmartRotom | Misiones')
 @Controller('smartrotom/misiones')
@@ -115,6 +116,24 @@ export class MisionesController {
   }
 
   // ==================== NPC ENDPOINTS ====================
+
+  @Get('npcs/catalog')
+  @ApiOperation({ summary: 'Get NPC catalog grouped by dialog ID' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'NPC catalog retrieved successfully.',
+    schema: {
+      type: 'object',
+      additionalProperties: {
+        type: 'array',
+        items: { $ref: '#/components/schemas/NpcCatalogEntry' },
+      },
+    },
+  })
+  @ApiInternalServerErrorResponse({ description: 'Failed to retrieve NPC catalog.' })
+  async getNpcCatalog() {
+    return await this.misionesFacadeService.getNpcCatalog();
+  }
 
   @Post('npcs')
   @ApiOperation({ summary: 'Update NPCs data in the system' })

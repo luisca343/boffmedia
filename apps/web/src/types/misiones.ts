@@ -64,5 +64,20 @@ export interface QuestSystemData {
   npcs: NPC[];
 }
 
+// NPC with real world coordinates from /npcs/catalog endpoint
+export interface NPCCatalogEntry {
+  name: string;
+  dialogId: number;
+  skin: string;
+  x: number;
+  y: number;
+  z: number;
+  world: string;
+  uuid: string;
+}
+
+// Response shape: keys are dialogId strings
+export type NPCCatalogResponse = Record<string, NPCCatalogEntry[]>;
+
 
 

@@ -2,21 +2,24 @@
 
 import React from "react"
 import { useTranslations } from "next-intl"
-import { QuestData, NPC } from "@/types/misiones"
+import { QuestData, NPC, NPCCatalogResponse } from "@/types/misiones"
 import {
-  WaxSeal, Nail, FlourishCorners, Ribbon, Sparkles, Icon,
-  STATUS_LABEL, STATUS_GLYPH, STATUS_COLOR,
+  Nail, FlourishCorners, Ribbon, Sparkles, Icon,
+  MinecraftSkinAvatar,
+  STATUS_LABEL, STATUS_COLOR,
 } from "./misiones-atoms"
 import { getQuestTypeKey } from "../_utils/questUtils"
 
 export interface TrackedQuestPaperProps {
   quest: QuestData
   npc: NPC | undefined
+  npcCatalog?: NPCCatalogResponse
   regionName: string
   onOpen: () => void
 }
 
-export function TrackedQuestPaper({ quest, npc, regionName, onOpen }: TrackedQuestPaperProps) {
+export function TrackedQuestPaper({ quest, npc, npcCatalog, regionName, onOpen }: TrackedQuestPaperProps) {
+  const catalogSkin = npcCatalog?.[String(quest.dialogId)]?.[0]?.skin
   const t = useTranslations("misiones")
   const nextObjective = (quest.objectives || []).find((o) => o.progress < o.total)
   const progressValue = (quest.objectives || []).reduce((s, o) => s + Math.min(o.progress, o.total), 0)
@@ -44,7 +47,7 @@ export function TrackedQuestPaper({ quest, npc, regionName, onOpen }: TrackedQue
       <FlourishCorners size={32} color="var(--gold-3)" offset={20} opacity={0.7}/>
 
       <div style={{ display: "flex", gap: 20, alignItems: "center", marginTop: 14 }}>
-        <WaxSeal glyph={STATUS_GLYPH[quest.status]} color={STATUS_COLOR[quest.status]} size={68} tilt={-12}/>
+        <MinecraftSkinAvatar skin={catalogSkin} size={68} ring ringColor={STATUS_COLOR[quest.status]}/>
 
         <div style={{ flex: 1, minWidth: 0 }}>
           <span className="label" style={{ color: STATUS_COLOR[quest.status] }}>
@@ -54,7 +57,6 @@ export function TrackedQuestPaper({ quest, npc, regionName, onOpen }: TrackedQue
             {quest.name}
           </h2>
           <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--ink-3)", fontSize: 13, fontStyle: "italic", marginBottom: 12 }}>
-            <Icon.Quill size={12}/>
             <span>{t("tracked_by")}</span>
             <strong style={{ color: "var(--ink-2)", fontStyle: "normal" }}>{quest.npcName ?? npc?.name ?? t("quest_unknown_npc")}</strong>
             {regionName && (

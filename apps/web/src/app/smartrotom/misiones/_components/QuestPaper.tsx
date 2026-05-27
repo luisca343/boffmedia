@@ -2,9 +2,10 @@
 
 import React from "react"
 import { useTranslations } from "next-intl"
-import { QuestData, NPC, QuestStatus } from "@/types/misiones"
+import { QuestData, NPC, QuestStatus, NPCCatalogResponse } from "@/types/misiones"
 import {
   WaxSeal, Nail, Thumbtack, Sparkles, Stamp, Icon,
+  MinecraftSkinAvatar, playPaperRustle,
   STATUS_GLYPH, STATUS_COLOR,
 } from "./misiones-atoms"
 import { getQuestTypeKey } from "../_utils/questUtils"
@@ -12,13 +13,15 @@ import { getQuestTypeKey } from "../_utils/questUtils"
 export interface QuestPaperProps {
   quest: QuestData
   npc: NPC | undefined
+  npcCatalog?: NPCCatalogResponse
   regionName: string
   selected: boolean
   tilt: number
   onClick: () => void
 }
 
-export function QuestPaper({ quest, npc, regionName, selected, tilt, onClick }: QuestPaperProps) {
+export function QuestPaper({ quest, npc, npcCatalog, regionName, selected, tilt, onClick }: QuestPaperProps) {
+  const catalogSkin = npcCatalog?.[String(quest.dialogId)]?.[0]?.skin
   const t = useTranslations("misiones")
   const objectivesDone = (quest.objectives || []).filter((o) => o.progress >= o.total).length
   const objectivesTotal = (quest.objectives || []).length
@@ -39,6 +42,7 @@ export function QuestPaper({ quest, npc, regionName, selected, tilt, onClick }: 
     <div
       className={cls.join(" ")}
       onClick={onClick}
+      onMouseEnter={playPaperRustle}
       style={{
         padding: "20px 22px 16px 22px",
         transform: `rotate(${tilt}deg)`,
@@ -87,7 +91,7 @@ export function QuestPaper({ quest, npc, regionName, selected, tilt, onClick }: 
 
       {/* NPC + region */}
       <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, marginBottom: 10, color: "var(--ink-3)", fontStyle: "italic" }}>
-        <Icon.Quill size={11}/>
+        <MinecraftSkinAvatar skin={catalogSkin} size={22}/>
         <span>de <strong style={{ color: "var(--ink-2)", fontStyle: "normal" }}>{quest.npcName ?? npc?.name ?? t("quest_unknown_npc")}</strong></span>
         {regionName && (
           <>

@@ -21,6 +21,7 @@ export default function QuestLog() {
     categories,
     dialogs,
     npcs,
+    npcCatalog,
     isLoading,
     section,
     setSection,
@@ -80,6 +81,7 @@ export default function QuestLog() {
                     dialogs={dialogs}
                     regions={regions}
                     categories={categories}
+                    npcCatalog={npcCatalog}
                     search={search} setSearch={setSearch}
                     statusFilter={statusFilter} setStatusFilter={setStatusFilter}
                     sort={sort} setSort={setSort}
@@ -94,6 +96,7 @@ export default function QuestLog() {
                   <AtlasScreen
                     quests={quests}
                     regions={regions}
+                    npcCatalog={npcCatalog}
                     onSelect={(q) => { setSelectedQuest(q); setSection("board") }}
                   />
                 )}
@@ -123,15 +126,18 @@ export default function QuestLog() {
                 />
                 <div style={{
                   position: "absolute", inset: "0 0 0 auto",
-                  width: "min(620px, 90%)", zIndex: 50,
+                  width: "min(760px, 62%)", zIndex: 50,
                   animation: "mis-slide-in 0.32s cubic-bezier(0.16, 1, 0.3, 1)",
                 }}>
                   <QuestLetter
                     quest={selectedQuest}
+                    allQuests={quests}
                     npcs={npcs}
                     dialogs={dialogs}
                     regions={regions}
+                    npcCatalog={npcCatalog}
                     onClose={() => setSelectedQuest(null)}
+                    onSelectQuest={(q) => setSelectedQuest(q)}
                   />
                 </div>
               </>

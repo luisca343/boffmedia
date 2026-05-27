@@ -44,6 +44,8 @@ export class QuestCacheService {
         categories: Object.values(externalData.categories),
         npcs: externalData.npcs || [],
       };
+      
+      this.logger.log(`Fetched ${questSystemData.quests.length} quests, ${questSystemData.dialogs.length} dialogs, ${questSystemData.categories.length} categories, and ${questSystemData.npcs.length} NPCs`);
 
       this.questCache = {
         data: questSystemData,

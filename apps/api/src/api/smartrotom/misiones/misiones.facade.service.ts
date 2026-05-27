@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, Inject } from '@nestjs/common';
 import { NPCService, NPCUpdateResponse } from './services/npc.service';
 import {
   ImageService,
@@ -10,6 +10,11 @@ import { QuestSystemData, NPC } from './types';
 import { QuestCacheService } from './services/quest.cache.service';
 import { UserQuestData, UserQuestService } from './services/user.quest.service';
 import { UpdateNPCsDto } from './dto/update-npcs.dto';
+import { QUEST_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
+import {
+  IQuestRepository,
+  NpcCatalogResponse,
+} from './repositories/interfaces/quest.repository.interface';
 
 export interface GetQuestsRequest {
   force?: number;
@@ -49,6 +54,8 @@ export class MisionesFacadeService {
     private readonly userQuestService: UserQuestService,
     private readonly npcService: NPCService,
     private readonly imageService: ImageService,
+    @Inject(QUEST_REPOSITORY_TOKEN)
+    private readonly questRepository: IQuestRepository,
   ) {}
 
   // ==================== QUEST MANAGEMENT ====================
@@ -92,6 +99,10 @@ export class MisionesFacadeService {
   }
 
   // ==================== NPC MANAGEMENT ====================
+
+  async getNpcCatalog(): Promise<NpcCatalogResponse> {
+    return this.questRepository.fetchNpcCatalogFromAPI();
+  }
 
   async updateNPCs(request: UpdateNPCsDto): Promise<NPCUpdateResponse> {
     return this.npcService.updateNPCs(request);
