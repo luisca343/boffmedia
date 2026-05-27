@@ -36,22 +36,6 @@ export function MinecraftSkinAvatar({
     />
   )
 
-  if (ring) {
-    return (
-      <div
-        style={{
-          borderRadius: 3,
-          background: "#1a1208",
-          padding: 2,
-          outline: `1.5px solid ${ringColor}`,
-          display: "inline-block",
-          flexShrink: 0,
-        }}
-      >
-        {inner}
-      </div>
-    )
-  }
 
   return inner
 }

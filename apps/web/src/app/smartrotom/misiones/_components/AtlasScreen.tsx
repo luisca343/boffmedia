@@ -44,6 +44,7 @@ export function AtlasScreen({ quests, regions, npcCatalog, onSelect }: AtlasScre
   const [mapCenter, setMapCenter] = useState<Position>({ x: 0, z: 0 })
   const [zoomLevel, setZoomLevel] = useState(1)
   const [hoveredUuid, setHoveredUuid] = useState<string | null>(null)
+  const [showCompleted, setShowCompleted] = useState(false)
 
   const pins: NpcPin[] = useMemo(() => {
     if (!npcCatalog) return []
@@ -90,7 +91,7 @@ export function AtlasScreen({ quests, regions, npcCatalog, onSelect }: AtlasScre
       {/* Map with NPC pins */}
       <div className="paper" style={{ padding: 0, overflow: "hidden", position: "relative", borderRadius: 4, marginBottom: 20 }}>
         <FlourishCorners size={36} color="var(--ink-2)" offset={10} opacity={0.4}/>
-        <div style={{ height: 520, position: "relative" }}>
+        <div style={{ height: "clamp(520px, 48vh, 760px)", position: "relative" }}>
           <StandardizedMap
             mapCenter={mapCenter}
             zoomLevel={zoomLevel}
@@ -101,18 +102,18 @@ export function AtlasScreen({ quests, regions, npcCatalog, onSelect }: AtlasScre
             maxZoom={15}
           >
             {/* NPC pins positioned as % of the map image */}
-            {pins.map((pin) => (
+            {pins.filter((pin) => showCompleted || hasActive(pin) || hasAvailable(pin)).map((pin) => (
               <div
-                key={pin.entry.uuid}
+                key={`${pin.entry.uuid}-${pin.dialogId}`}
                 style={{
                   position: "absolute",
                   left: pin.pct.left,
                   top: pin.pct.top,
                   transform: "translate(-50%, -100%)",
-                  zIndex: hoveredUuid === pin.entry.uuid ? 30 : 20,
+                  zIndex: hoveredUuid === `${pin.entry.uuid}-${pin.dialogId}` ? 30 : 20,
                   cursor: "pointer",
                 }}
-                onMouseEnter={() => setHoveredUuid(pin.entry.uuid)}
+                onMouseEnter={() => setHoveredUuid(`${pin.entry.uuid}-${pin.dialogId}`)}
                 onMouseLeave={() => setHoveredUuid(null)}
               >
                 {/* Pin needle + head */}
@@ -128,7 +129,7 @@ export function AtlasScreen({ quests, regions, npcCatalog, onSelect }: AtlasScre
                 </svg>
 
                 {/* Hover popover */}
-                {hoveredUuid === pin.entry.uuid && (
+                {hoveredUuid === `${pin.entry.uuid}-${pin.dialogId}` && (
                   <div style={{
                     position: "absolute",
                     bottom: "110%",
@@ -166,11 +167,21 @@ export function AtlasScreen({ quests, regions, npcCatalog, onSelect }: AtlasScre
         <div style={{ display: "flex", gap: 18, flexWrap: "wrap", alignItems: "center", justifyContent: "center" }}>
           <span className="label" style={{ color: "var(--ink-2)" }}>Leyenda</span>
           {[
-            { c: "var(--seal-active)", l: "NPC con misión vigente" },
-            { c: "var(--seal-available)", l: "Disponible" },
-            { c: "var(--seal-locked)", l: "Sin misiones nuevas" },
+            { c: "var(--seal-active)", l: "NPC con misión vigente", toggle: false },
+            { c: "var(--seal-available)", l: "Disponible", toggle: false },
+            { c: "var(--seal-locked)", l: "Completadas", toggle: true },
           ].map((it, i) => (
-            <span key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "var(--ink-2)" }}>
+            <span
+              key={i}
+              onClick={it.toggle ? () => setShowCompleted((v) => !v) : undefined}
+              style={{
+                display: "flex", alignItems: "center", gap: 8, fontSize: 12,
+                color: "var(--ink-2)",
+                cursor: it.toggle ? "pointer" : "default",
+                opacity: it.toggle && !showCompleted ? 0.4 : 1,
+                userSelect: "none",
+              }}
+            >
               <svg viewBox="-12 -16 24 24" width="18" height="18">
                 <line x1="0" y1="-4" x2="0" y2="6" stroke="#1a0e07" strokeWidth="1.5"/>
                 <circle cx="0" cy="-8" r="7" fill={it.c} stroke="#1a0e07" strokeWidth="1"/>

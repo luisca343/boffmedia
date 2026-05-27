@@ -44,7 +44,7 @@ export function JournalScreen({ dialogs, npcs, quests, npcCatalog, onSelectQuest
         </div>
       </div>
 
-      <div style={{ maxWidth: 800, margin: "0 auto" }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         <div style={{ position: "relative", maxWidth: 380, marginBottom: 20 }}>
           <input className="field" value={searchD} onChange={(e) => setSearchD(e.target.value)}
             placeholder={t("journal_search_placeholder")} style={{ paddingLeft: 34 }}/>

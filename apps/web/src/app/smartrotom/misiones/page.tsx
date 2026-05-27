@@ -73,7 +73,7 @@ export default function QuestLog() {
             {isMobile && <MobileTop section={section} setSection={setSection}/>}
 
             <main style={{ flex: 1, overflow: "auto", padding: "28px 36px", position: "relative", zIndex: 1 }}>
-              <div style={{ maxWidth: 1280, margin: "0 auto", paddingBottom: 80 }}>
+              <div style={{ maxWidth: 1760, margin: "0 auto", paddingBottom: 80 }}>
                 {section === "board" && (
                   <BoardScreen
                     quests={quests}
@@ -127,7 +127,7 @@ export default function QuestLog() {
                 />
                 <div style={{
                   position: "absolute", inset: "0 0 0 auto",
-                  width: "min(760px, 62%)", zIndex: 50,
+                  width: "min(1000px, 68%)", zIndex: 50,
                   animation: "mis-slide-in 0.32s cubic-bezier(0.16, 1, 0.3, 1)",
                 }}>
                   <QuestLetter

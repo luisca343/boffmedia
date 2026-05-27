@@ -15,11 +15,11 @@ export function SideRail({ section, setSection }: SideRailProps) {
     { id: "board", label: t("nav_board"), glyph: "❦" },
     { id: "atlas", label: t("nav_atlas"), glyph: "✦" },
     { id: "trophy", label: t("nav_trophy"), glyph: "⚜" },
-    { id: "journal", label: t("nav_journal"), glyph: "✥" },
+    /*{ id: "journal", label: t("nav_journal"), glyph: "✥" },*/
   ]
   return (
     <aside className="wood-frame hide-mobile" style={{
-      width: 240, flexShrink: 0,
+      width: 'clamp(160px, 15vw, 240px)', flexShrink: 0,
       display: "flex", flexDirection: "column",
       borderRight: "3px solid #050201",
       position: "relative",

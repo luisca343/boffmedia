@@ -556,3 +556,18 @@
   .misiones-board .board-grid { grid-template-columns: 1fr !important; }
   .misiones-board .quest-paper { transform: none !important; }
 }
+
+/* ============== LARGE SCREEN ============== */
+@media (min-width: 1400px) {
+  .misiones-board .board-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+  }
+}
+
+@media (min-width: 1800px) {
+  .misiones-board .board-grid {
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 34px;
+  }
+}
