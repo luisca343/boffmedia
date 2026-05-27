@@ -4,7 +4,7 @@ import React from "react"
 import { useTranslations } from "next-intl"
 import "./misiones-board.css"
 import { useMisionesState } from "./_hooks/useMisionesState"
-import { FlourishCorners } from "./_components/misiones-atoms"
+import { FlourishCorners } from "./_ui/flourishes/FlourishCorners"
 import { SideRail } from "./_components/SideRail"
 import { MobileTop } from "./_components/MobileTop"
 import { BoardScreen } from "./_components/BoardScreen"
@@ -106,6 +106,7 @@ export default function QuestLog() {
                     dialogs={dialogs}
                     npcs={npcs}
                     quests={quests}
+                    npcCatalog={npcCatalog}
                     onSelectQuest={(q) => { setSection("board"); setSelectedQuest(q) }}
                   />
                 )}

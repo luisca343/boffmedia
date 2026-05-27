@@ -3,8 +3,10 @@
 import React, { useState, useMemo } from "react"
 import { useTranslations } from "next-intl"
 import { QuestData, QuestStatus, NPCCatalogResponse, NPCCatalogEntry } from "@/types/misiones"
-import { WaxSeal, FlourishCorners, Divider } from "./misiones-atoms"
-import { STATUS_GLYPH, STATUS_COLOR } from "./misiones-atoms"
+import { WaxSeal } from "../_ui/primitives/WaxSeal"
+import { FlourishCorners } from "../_ui/flourishes/FlourishCorners"
+import { Divider } from "../_ui/flourishes/Divider"
+import { STATUS_GLYPH, STATUS_COLOR } from "../_constants/questStatus"
 import { Region } from "../_types/board"
 import {
   StandardizedMap,

@@ -3,7 +3,10 @@
 import React, { useMemo } from "react"
 import { useTranslations } from "next-intl"
 import { QuestData, QuestStatus } from "@/types/misiones"
-import { FlourishCorners, Divider, Shield, Stamp } from "./misiones-atoms"
+import { FlourishCorners } from "../_ui/flourishes/FlourishCorners"
+import { Divider } from "../_ui/flourishes/Divider"
+import { Shield } from "../_ui/primitives/Shield"
+import { Stamp } from "../_ui/stamps"
 import { getQuestTypeKey } from "../_utils/questUtils"
 
 export interface TrophyScreenProps {

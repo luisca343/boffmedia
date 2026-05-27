@@ -3,11 +3,13 @@
 import React from "react"
 import { useTranslations } from "next-intl"
 import { QuestData, NPC, NPCCatalogResponse } from "@/types/misiones"
-import {
-  Nail, FlourishCorners, Ribbon, Sparkles, Icon,
-  MinecraftSkinAvatar,
-  STATUS_LABEL, STATUS_COLOR,
-} from "./misiones-atoms"
+import { Nail } from "../_ui/primitives/Nail"
+import { FlourishCorners } from "../_ui/flourishes/FlourishCorners"
+import { Ribbon } from "../_ui/flourishes/Ribbon"
+import { Sparkles } from "../_ui/stamps"
+import { Icon } from "../_ui/icons"
+import { MinecraftSkinAvatar } from "../_ui/minecraft/MinecraftAvatar"
+import { STATUS_LABEL, STATUS_COLOR } from "../_constants/questStatus"
 import { getQuestTypeKey } from "../_utils/questUtils"
 
 export interface TrackedQuestPaperProps {
@@ -19,7 +21,8 @@ export interface TrackedQuestPaperProps {
 }
 
 export function TrackedQuestPaper({ quest, npc, npcCatalog, regionName, onOpen }: TrackedQuestPaperProps) {
-  const catalogSkin = npcCatalog?.[String(quest.dialogId)]?.[0]?.skin
+  const catalogEntry = npcCatalog?.[String(quest.dialogId)]?.[0]
+  const catalogSkin = catalogEntry?.skin
   const t = useTranslations("misiones")
   const nextObjective = (quest.objectives || []).find((o) => o.progress < o.total)
   const progressValue = (quest.objectives || []).reduce((s, o) => s + Math.min(o.progress, o.total), 0)
@@ -58,7 +61,7 @@ export function TrackedQuestPaper({ quest, npc, npcCatalog, regionName, onOpen }
           </h2>
           <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--ink-3)", fontSize: 13, fontStyle: "italic", marginBottom: 12 }}>
             <span>{t("tracked_by")}</span>
-            <strong style={{ color: "var(--ink-2)", fontStyle: "normal" }}>{quest.npcName ?? npc?.name ?? t("quest_unknown_npc")}</strong>
+            <strong style={{ color: "var(--ink-2)", fontStyle: "normal" }}>{catalogEntry?.name ?? quest.npcName ?? npc?.name ?? t("quest_unknown_npc")}</strong>
             {regionName && (
               <>
                 <span style={{ opacity: 0.5 }}>·</span>

@@ -3,7 +3,9 @@
 import React, { useMemo } from "react"
 import { useTranslations } from "next-intl"
 import { QuestData } from "@/types/misiones"
-import { WaxSeal, RopePath, STATUS_LABEL, STATUS_GLYPH, STATUS_COLOR } from "./misiones-atoms"
+import { WaxSeal } from "../_ui/primitives/WaxSeal"
+import { RopePath } from "../_ui/letter-decor/RopePath"
+import { STATUS_LABEL, STATUS_GLYPH, STATUS_COLOR } from "../_constants/questStatus"
 
 type ChainEntry = QuestData & { _rel: "prev" | "self" | "next" }
 

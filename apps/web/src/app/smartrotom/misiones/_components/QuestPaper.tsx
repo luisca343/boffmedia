@@ -3,11 +3,14 @@
 import React from "react"
 import { useTranslations } from "next-intl"
 import { QuestData, NPC, QuestStatus, NPCCatalogResponse } from "@/types/misiones"
-import {
-  WaxSeal, Nail, Thumbtack, Sparkles, Stamp, Icon,
-  MinecraftSkinAvatar, playPaperRustle,
-  STATUS_GLYPH, STATUS_COLOR,
-} from "./misiones-atoms"
+import { WaxSeal } from "../_ui/primitives/WaxSeal"
+import { Nail } from "../_ui/primitives/Nail"
+import { Thumbtack } from "../_ui/primitives/Thumbtack"
+import { Sparkles, Stamp } from "../_ui/stamps"
+import { Icon } from "../_ui/icons"
+import { MinecraftSkinAvatar } from "../_ui/minecraft/MinecraftAvatar"
+import { playPaperRustle } from "../_utils/sound"
+import { STATUS_GLYPH, STATUS_COLOR } from "../_constants/questStatus"
 import { getQuestTypeKey } from "../_utils/questUtils"
 
 export interface QuestPaperProps {
@@ -21,7 +24,8 @@ export interface QuestPaperProps {
 }
 
 export function QuestPaper({ quest, npc, npcCatalog, regionName, selected, tilt, onClick }: QuestPaperProps) {
-  const catalogSkin = npcCatalog?.[String(quest.dialogId)]?.[0]?.skin
+  const catalogEntry = npcCatalog?.[String(quest.dialogId)]?.[0]
+  const catalogSkin = catalogEntry?.skin
   const t = useTranslations("misiones")
   const objectivesDone = (quest.objectives || []).filter((o) => o.progress >= o.total).length
   const objectivesTotal = (quest.objectives || []).length
@@ -92,7 +96,7 @@ export function QuestPaper({ quest, npc, npcCatalog, regionName, selected, tilt,
       {/* NPC + region */}
       <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, marginBottom: 10, color: "var(--ink-3)", fontStyle: "italic" }}>
         <MinecraftSkinAvatar skin={catalogSkin} size={22}/>
-        <span>de <strong style={{ color: "var(--ink-2)", fontStyle: "normal" }}>{quest.npcName ?? npc?.name ?? t("quest_unknown_npc")}</strong></span>
+        <span>de <strong style={{ color: "var(--ink-2)", fontStyle: "normal" }}>{catalogEntry?.name ?? quest.npcName ?? npc?.name ?? t("quest_unknown_npc")}</strong></span>
         {regionName && (
           <>
             <span style={{ opacity: 0.5 }}>·</span>

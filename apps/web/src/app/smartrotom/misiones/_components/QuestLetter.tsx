@@ -3,11 +3,16 @@
 import React, { useState, useEffect } from "react"
 import { useTranslations } from "next-intl"
 import { QuestData, QuestStatus, IDialogue, NPC, NPCCatalogResponse } from "@/types/misiones"
-import {
-  WaxSeal, FlourishCorners, Ribbon, Divider, Icon,
-  MinecraftSkinAvatar, Inkwell, Quill, InkBlot,
-  STATUS_LABEL, STATUS_GLYPH, STATUS_COLOR,
-} from "./misiones-atoms"
+import { WaxSeal } from "../_ui/primitives/WaxSeal"
+import { FlourishCorners } from "../_ui/flourishes/FlourishCorners"
+import { Ribbon } from "../_ui/flourishes/Ribbon"
+import { Divider } from "../_ui/flourishes/Divider"
+import { Icon } from "../_ui/icons"
+import { MinecraftSkinAvatar } from "../_ui/minecraft/MinecraftAvatar"
+import { Inkwell } from "../_ui/letter-decor/Inkwell"
+import { Quill } from "../_ui/letter-decor/Quill"
+import { InkBlot } from "../_ui/board-decor/InkBlot"
+import { STATUS_LABEL, STATUS_GLYPH, STATUS_COLOR } from "../_constants/questStatus"
 import { QuestChain } from "./QuestChain"
 import { getQuestTypeKey, formatItemName, getNpcForQuest } from "../_utils/questUtils"
 import { Region } from "../_types/board"
@@ -31,7 +36,8 @@ export function QuestLetter({ quest, allQuests, npcs, dialogs, regions, npcCatal
   const npc = getNpcForQuest(quest, npcs)
   const dialog = dialogs.find((d) => d.questId === quest.id || d.id === quest.dialogId)
   const objectivesTotal = (quest.objectives || []).length
-  const catalogSkin = npcCatalog?.[String(quest.dialogId)]?.[0]?.skin
+  const catalogEntry = npcCatalog?.[String(quest.dialogId)]?.[0]
+  const catalogSkin = catalogEntry?.skin
 
   return (
     <div key={tick} style={{
@@ -110,7 +116,7 @@ export function QuestLetter({ quest, allQuests, npcs, dialogs, regions, npcCatal
                 {t("npc_says_suffix")}
               </div>
               <div className="dec-title" style={{ fontSize: 18, color: "var(--ink-2)" }}>
-                {quest.npcName ?? npc?.name ?? t("quest_unknown_npc")}
+                {catalogEntry?.name ?? quest.npcName ?? npc?.name ?? t("quest_unknown_npc")}
               </div>
             </div>
           </div>
@@ -227,7 +233,7 @@ export function QuestLetter({ quest, allQuests, npcs, dialogs, regions, npcCatal
               <Divider color="var(--ink-3)" glyph="✦"/>
               <div style={{ padding: 14, background: "rgba(255,240,200,0.3)", border: "1px solid rgba(60,40,20,0.22)", borderRadius: 2, marginTop: 14 }}>
                 <div style={{ fontSize: 11, color: "var(--ink-3)", fontFamily: "var(--font-uppercase)", letterSpacing: "0.14em", marginBottom: 6 }}>
-                  {npc?.name ?? "NPC"} {t("npc_says_suffix")}
+                  {catalogEntry?.name ?? npc?.name ?? "NPC"} {t("npc_says_suffix")}
                 </div>
                 <p style={{ fontSize: 14, lineHeight: 1.65, color: "var(--ink-1)", fontStyle: "italic", borderLeft: "2px solid var(--ink-3)", paddingLeft: 12, margin: 0 }}>
                   &ldquo;{dialog.text}&rdquo;

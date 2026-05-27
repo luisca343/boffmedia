@@ -1,9 +1,16 @@
 "use client"
 
-import React from "react"
 import { useTranslations } from "next-intl"
 import { QuestData, QuestStatus, NPC, IDialogue, NPCCatalogResponse } from "@/types/misiones"
-import { Nail, FlourishCorners, Shield, Icon, PostIt, NewspaperClipping, Polaroid, Doodle, InkBlot } from "./misiones-atoms"
+import { Nail } from "../_ui/primitives/Nail"
+import { FlourishCorners } from "../_ui/flourishes/FlourishCorners"
+import { Shield } from "../_ui/primitives/Shield"
+import { Icon } from "../_ui/icons"
+import { PostIt } from "../_ui/board-decor/PostIt"
+import { NewspaperClipping } from "../_ui/board-decor/NewspaperClipping"
+import { ScatterLayer } from "./ScatterLayer"
+import type { ScatterItem } from "../_ui/board-decor/ScatterConfig"
+import { DEFAULT_SCATTER_TOP, DEFAULT_SCATTER_BOTTOM } from "../_utils/defaultScatterConfig"
 import { getNpcForQuest, tiltFor } from "../_utils/questUtils"
 import { Region } from "../_types/board"
 import { useQuestBoard } from "../_hooks/useQuestBoard"
@@ -30,48 +37,10 @@ export interface BoardScreenProps {
   onSelect: (q: QuestData) => void
   trackedQuestId: number | null
   setTrackedQuestId: (id: number | null) => void
-}
-
-function ScatterLayer() {
-  return (
-    <>
-      <div style={{ position: "absolute", top: 18, right: 30, zIndex: 1, pointerEvents: "none", transform: "rotate(5deg)", opacity: 0.95 }}>
-        <div style={{ width: 150, padding: "10px 12px", background: "linear-gradient(180deg, #f0e0a8, #d8c080)", border: "1px solid rgba(60,40,20,0.4)", boxShadow: "4px 6px 10px rgba(0,0,0,0.4)", fontFamily: "Cinzel Decorative, serif", color: "#1a0e07", textAlign: "center" }}>
-          <div style={{ fontSize: 9, letterSpacing: "0.25em", marginBottom: 2 }}>SE BUSCA</div>
-          <div style={{ fontSize: 16, fontWeight: 700, lineHeight: 1 }}>TEAM ROCKET</div>
-          <div style={{ margin: "8px auto", width: 60, height: 60, background: "linear-gradient(135deg, #aa2a2a, #6b1410)", display: "grid", placeItems: "center", color: "#f5d785", fontSize: 30, fontWeight: 900, border: "1px solid rgba(0,0,0,0.5)" }}>R</div>
-          <div style={{ fontSize: 10, fontStyle: "italic" }}>Recompensa 5000₽</div>
-        </div>
-      </div>
-      <div style={{ position: "absolute", top: 90, left: 32, zIndex: 1, pointerEvents: "none" }}>
-        <Doodle kind="arrow" tilt={-12} size={130}/>
-      </div>
-      <div style={{ position: "absolute", top: 270, left: 8, zIndex: 1, pointerEvents: "none" }}>
-        <InkBlot size={50} tilt={30}/>
-      </div>
-      <div style={{ position: "absolute", top: 360, right: 20, zIndex: 1, pointerEvents: "none" }}>
-        <PostIt color="#a4d4ff" tilt={6} size={150} footer="— Oak">
-          Si encuentras a <strong>Mew</strong>, ¡tráelo al laboratorio inmediatamente!
-        </PostIt>
-      </div>
-    </>
-  )
-}
-
-function ScatterBottom() {
-  return (
-    <>
-      <div style={{ position: "absolute", bottom: 12, left: 30, zIndex: 1, pointerEvents: "none" }}>
-        <NewspaperClipping tilt={3.5} width={210} source="Daily Pokémon" headline="ROTOM DESAPARECE DE UNA TELEVISIÓN" body="El extraño Pokémon eléctrico fantasma ha vuelto a hacer de las suyas. Los testigos aseguran haberle visto colarse en una bicicleta vieja."/>
-      </div>
-      <div style={{ position: "absolute", bottom: 30, right: 70, zIndex: 1, pointerEvents: "none" }}>
-        <Doodle kind="check" tilt={8} size={90}/>
-      </div>
-      <div style={{ position: "absolute", bottom: 18, left: "44%", zIndex: 1, pointerEvents: "none" }}>
-        <Doodle kind="star" tilt={-20} size={80}/>
-      </div>
-    </>
-  )
+  /** Override top-overlay scatter items. Defaults to DEFAULT_SCATTER_TOP. */
+  scatterTopItems?: ScatterItem[]
+  /** Override bottom-overlay scatter items. Defaults to DEFAULT_SCATTER_BOTTOM. */
+  scatterBottomItems?: ScatterItem[]
 }
 
 export function BoardScreen({
@@ -79,10 +48,12 @@ export function BoardScreen({
   search, setSearch, statusFilter, setStatusFilter,
   sort, setSort, regionFilter, setRegionFilter,
   selectedId, onSelect, trackedQuestId, setTrackedQuestId,
+  scatterTopItems = DEFAULT_SCATTER_TOP,
+  scatterBottomItems = DEFAULT_SCATTER_BOTTOM,
 }: BoardScreenProps) {
   const t = useTranslations("misiones")
   const { counts, filtered } = useQuestBoard({
-    quests, search, statusFilter, regionFilter, sort, trackedQuestId,
+    quests, search, statusFilter, regionFilter, sort,
   })
 
   const trackedQuest = quests.find((q) => q.id === trackedQuestId)
@@ -178,12 +149,13 @@ export function BoardScreen({
       {/* Cork board */}
       <div style={{
         position: "relative",
-        padding: "32px 24px 60px 24px",
+        isolation: "isolate",
+        padding: "32px 24px 140px 24px",
         background: "radial-gradient(ellipse at 30% 20%, rgba(255,220,160,0.08), transparent 50%), linear-gradient(180deg, rgba(40,24,12,0.4), rgba(20,12,6,0.5))",
         border: "1px solid rgba(0,0,0,0.45)",
         borderRadius: 4,
         boxShadow: "inset 0 1px 0 rgba(255,200,100,0.12), inset 0 0 80px rgba(0,0,0,0.5)",
-        minHeight: 200,
+        minHeight: 500,
       }}>
         <div style={{
           position: "absolute", inset: 0, pointerEvents: "none", borderRadius: "inherit",
@@ -195,7 +167,7 @@ export function BoardScreen({
           backgroundSize: "240px 240px",
         }}/>
 
-        <ScatterLayer/>
+        <ScatterLayer items={scatterTopItems} />
 
         {filtered.length === 0 ? (
           <div style={{ padding: "60px 20px", textAlign: "center", color: "var(--paper-2)", fontFamily: "var(--font-display)", fontSize: 18, fontStyle: "italic", position: "relative", zIndex: 2 }}>
@@ -203,43 +175,34 @@ export function BoardScreen({
           </div>
         ) : (
           <div className="board-grid" style={{ position: "relative", zIndex: 2 }}>
-            {filtered.map((q, idx) => (
-              <React.Fragment key={q.id}>
-                <QuestPaper
-                  quest={q}
-                  npc={getNpcForQuest(q, npcs)}
-                  npcCatalog={npcCatalog}
-                  regionName={q.category ?? ""}
-                  selected={selectedId === q.id}
-                  onClick={() => {
-                    onSelect(q)
-                    if (q.status === QuestStatus.ACTIVE && !trackedQuestId) setTrackedQuestId(q.id)
-                  }}
-                  tilt={tiltFor(q.id)}
-                />
-                {idx === 1 && (
-                  <div style={{ display: "grid", placeItems: "center", minHeight: 220, position: "relative" }}>
-                    <PostIt color="#fff77a" tilt={4} size={180} footer="— Misty">
-                      Recuerda: <strong>SÚPER POCIÓN</strong> antes del gimnasio. ¡No otra vez!
-                    </PostIt>
-                  </div>
-                )}
-                {idx === 3 && (
-                  <div style={{ display: "grid", placeItems: "center", minHeight: 220, position: "relative" }}>
-                    <NewspaperClipping tilt={-2.5} width={250} headline="LÍDER BROCK RECIBE RETADORES" body="El Gimnasio de Ciudad Plateada vuelve a abrir sus puertas. Brock asegura que su equipo está más duro que nunca. Se recomienda llegar antes del atardecer para inscribirse." source="The Pewter Times"/>
-                  </div>
-                )}
-                {idx === 5 && (
-                  <div style={{ display: "grid", placeItems: "center", minHeight: 220, position: "relative" }}>
-                    <Polaroid tilt={-6} caption="Ruta 1 — primer Pidgey"/>
-                  </div>
-                )}
-              </React.Fragment>
+            {filtered.map((q) => (
+              <QuestPaper
+                key={q.id}
+                quest={q}
+                npc={getNpcForQuest(q, npcs)}
+                npcCatalog={npcCatalog}
+                regionName={q.category ?? ""}
+                selected={selectedId === q.id}
+                onClick={() => {
+                  onSelect(q)
+                  if (q.status === QuestStatus.ACTIVE && !trackedQuestId) setTrackedQuestId(q.id)
+                }}
+                tilt={tiltFor(q.id)}
+              />
             ))}
+            {/* Decoration cells — fill empty grid slots so the last row never looks bare */}
+            <div style={{ display: "grid", placeItems: "center", minHeight: 220, pointerEvents: "none" }}>
+              <PostIt color="#fff77a" tilt={-4} size={150} footer="— Misty">
+                Recuerda llevar <strong>SÚPER POCIÓN</strong> antes de entrar al gimnasio.
+              </PostIt>
+            </div>
+            <div style={{ display: "grid", placeItems: "center", minHeight: 220, pointerEvents: "none" }}>
+              <NewspaperClipping tilt={1.8} width={200} source="The Pewter Times" headline="LÍDER BROCK INVICTO" body="El líder del gimnasio de Pewter City lleva 40 días sin perder ningún combate oficial." />
+            </div>
           </div>
         )}
 
-        <ScatterBottom/>
+        <ScatterLayer items={scatterBottomItems} />
       </div>
     </div>
   )

@@ -3,7 +3,8 @@
 import React from "react"
 import { useTranslations } from "next-intl"
 import { QuestStatus } from "@/types/misiones"
-import { Icon, STATUS_LABEL } from "./misiones-atoms"
+import { Icon } from "../_ui/icons"
+import { STATUS_LABEL } from "../_constants/questStatus"
 
 export interface BoardFiltersProps {
   search: string

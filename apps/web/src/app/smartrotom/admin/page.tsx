@@ -46,6 +46,13 @@ const appsAdmin = [
     icono: <Bell className="w-6 h-6" />,
     enlace: "/smartrotom/admin/notifications",
     id: "app-05"
+  },
+  {
+    nombre: "NPC Skins",
+    descripcion: "Verificar y regenerar renders de skins de NPCs",
+    icono: <Wifi className="w-6 h-6" />,
+    enlace: "/smartrotom/admin/skins",
+    id: "app-06"
   }
 ]
 

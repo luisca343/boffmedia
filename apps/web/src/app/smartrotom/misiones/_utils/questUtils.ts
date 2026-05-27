@@ -1,4 +1,4 @@
-import { QuestData, NPC } from "@/types/misiones"
+import { QuestData, NPC, NPCCatalogEntry, NPCCatalogResponse } from "@/types/misiones"
 import { Region } from "../_types/board"
 
 export const QUEST_TYPE_LABELS: Record<number, string> = {
@@ -48,4 +48,8 @@ export function makeRegions(quests: QuestData[]): Region[] {
 
 export function getNpcForQuest(quest: QuestData, npcs: NPC[]): NPC | undefined {
   return npcs.find((n) => n.dialogId === quest.dialogId)
+}
+
+export function getCatalogEntryForDialog(dialogId: number, npcCatalog: NPCCatalogResponse | undefined): NPCCatalogEntry | undefined {
+  return npcCatalog?.[String(dialogId)]?.[0]
 }

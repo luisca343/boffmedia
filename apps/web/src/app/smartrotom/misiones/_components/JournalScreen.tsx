@@ -2,17 +2,21 @@
 
 import React, { useState, useMemo } from "react"
 import { useTranslations } from "next-intl"
-import { IDialogue, NPC, QuestData } from "@/types/misiones"
-import { WaxSeal, FlourishCorners, Divider, Icon } from "./misiones-atoms"
+import { IDialogue, NPC, QuestData, NPCCatalogResponse } from "@/types/misiones"
+import { WaxSeal } from "../_ui/primitives/WaxSeal"
+import { FlourishCorners } from "../_ui/flourishes/FlourishCorners"
+import { Divider } from "../_ui/flourishes/Divider"
+import { Icon } from "../_ui/icons"
 
 export interface JournalScreenProps {
   dialogs: IDialogue[]
   npcs: NPC[]
   quests: QuestData[]
+  npcCatalog?: NPCCatalogResponse
   onSelectQuest: (q: QuestData) => void
 }
 
-export function JournalScreen({ dialogs, npcs, quests, onSelectQuest }: JournalScreenProps) {
+export function JournalScreen({ dialogs, npcs, quests, npcCatalog, onSelectQuest }: JournalScreenProps) {
   const t = useTranslations("misiones")
   const [searchD, setSearchD] = useState("")
 
@@ -58,9 +62,11 @@ export function JournalScreen({ dialogs, npcs, quests, onSelectQuest }: JournalS
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {filtered.map((d) => {
             const npc = npcs.find((n) => n.dialogId === d.id)
+            const catalogEntry = npcCatalog?.[String(d.id)]?.[0]
             const quest = quests.find((q) => q.id === d.questId)
             const tilt = ((d.id * 13) % 100) / 100 * 1.6 - 0.8
-            const npcInitial = (npc?.name ?? d.name ?? "?")[0].toUpperCase()
+            const npcName = catalogEntry?.name ?? npc?.name
+            const npcInitial = (npcName ?? d.name ?? "?")[0].toUpperCase()
             return (
               <div key={d.id} className="paper" style={{ padding: "20px 26px", position: "relative", transform: `rotate(${tilt}deg)` }}>
                 <FlourishCorners size={20} color="var(--gold-3)" offset={6} opacity={0.4}/>
@@ -70,7 +76,7 @@ export function JournalScreen({ dialogs, npcs, quests, onSelectQuest }: JournalS
 
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginTop: 20, marginBottom: 8, gap: 14 }}>
                   <div>
-                    <div className="dec-title" style={{ fontSize: 18, color: "var(--ink-1)" }}>{npc?.name ?? d.name}</div>
+                    <div className="dec-title" style={{ fontSize: 18, color: "var(--ink-1)" }}>{npcName ?? d.name}</div>
                     <div style={{ fontSize: 12, color: "var(--ink-3)", fontStyle: "italic" }}>{d.name}</div>
                   </div>
                 </div>

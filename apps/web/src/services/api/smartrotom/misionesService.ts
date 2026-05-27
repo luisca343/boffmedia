@@ -61,7 +61,7 @@ export class MisionesService {
   }
 
   /**
-   * Get all NPCs
+   * @deprecated Use getNpcCatalog() instead.
    */
   static getAllNPCs() {
     return rotomGET<INPC[]>('/misiones/npcs');
