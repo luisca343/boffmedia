@@ -10,8 +10,20 @@ import type {
 
 export type { FactionRequirements, ScoreboardRequirements };
 
-// Backward-compatible I-prefix aliases for shared types
-export type IDialogue          = Dialogue;
+// NPC world location embedded in each dialogue
+export interface NpcLocation {
+  name: string;
+  dialogId: number;
+  skin: string;
+  x: number;
+  y: number;
+  z: number;
+  world: string;
+  uuid: string;
+}
+
+// Extends shared Dialogue with npcLocations (present after shared regen)
+export type IDialogue          = Dialogue & { npcLocations?: NpcLocation[] };
 export type IQuestCategory     = QuestCategory;
 export type IQuestObjective    = QuestObjective;
 export type IQuestReward       = QuestReward;

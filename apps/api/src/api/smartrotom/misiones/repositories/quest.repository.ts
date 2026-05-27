@@ -36,18 +36,16 @@ export class QuestRepository implements IQuestRepository {
       if (!response.data) {
         throw new Error('No data received from external API');
       }
-      
 
       const questResponse: ExternalQuestResponse = {
-        quests: response.data.data.quests || {},
-        dialogs: response.data.data.dialogs || {},
-        categories: response.data.data.categories || {},
+        quests: response.data.data.quests || [],
+        dialogs: response.data.data.dialogs || [],
+        categories: response.data.data.categories || [],
         npcs: response.data.data.npcs || [],
       };
-      
 
       this.logger.log(
-        `Successfully fetched ${Object.keys(questResponse.quests).length} quests`,
+        `Successfully fetched ${questResponse.quests.length} quests, ${questResponse.dialogs.length} dialogs, ${questResponse.categories.length} categories, ${questResponse.npcs!.length} NPCs`,
       );
       return questResponse;
     } catch (error: any) {
@@ -88,7 +86,6 @@ export class QuestRepository implements IQuestRepository {
       const userQuestResponse: UserQuestResponse = {
         quests: response.data.data.quests || {},
       };
-      
 
       this.logger.log(`Successfully fetched user quests for ${uuid}`);
       return userQuestResponse;
@@ -118,7 +115,10 @@ export class QuestRepository implements IQuestRepository {
 
       return (response.data.data ?? response.data) as NpcCatalogResponse;
     } catch (error: any) {
-      this.logger.error('Failed to fetch NPC catalog from external API', error.stack);
+      this.logger.error(
+        'Failed to fetch NPC catalog from external API',
+        error.stack,
+      );
       throw new BadRequestException(
         `Failed to fetch NPC catalog: ${error.message}`,
       );

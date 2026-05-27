@@ -38,6 +38,7 @@ export function QuestLetter({ quest, allQuests, npcs, dialogs, regions, npcCatal
   const objectivesTotal = (quest.objectives || []).length
   const catalogEntry = npcCatalog?.[String(quest.dialogId)]?.[0]
   const catalogSkin = catalogEntry?.skin
+  const npcLocation = dialog?.npcLocations?.[0]
 
   return (
     <div key={tick} style={{
@@ -232,8 +233,16 @@ export function QuestLetter({ quest, allQuests, npcs, dialogs, regions, npcCatal
             <div className="fade-up" style={{ animationDelay: "0.34s", marginTop: 26 }}>
               <Divider color="var(--ink-3)" glyph="✦"/>
               <div style={{ padding: 14, background: "rgba(255,240,200,0.3)", border: "1px solid rgba(60,40,20,0.22)", borderRadius: 2, marginTop: 14 }}>
-                <div style={{ fontSize: 11, color: "var(--ink-3)", fontFamily: "var(--font-uppercase)", letterSpacing: "0.14em", marginBottom: 6 }}>
-                  {catalogEntry?.name ?? npc?.name ?? "NPC"} {t("npc_says_suffix")}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 6, marginBottom: 6 }}>
+                  <div style={{ fontSize: 11, color: "var(--ink-3)", fontFamily: "var(--font-uppercase)", letterSpacing: "0.14em" }}>
+                    {catalogEntry?.name ?? npc?.name ?? "NPC"} {t("npc_says_suffix")}
+                  </div>
+                  {npcLocation && (
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 11, color: "var(--ink-3)", fontFamily: "var(--font-mono)" }}>
+                      <Icon.Pin size={10}/>
+                      {npcLocation.x.toFixed(0)}, {npcLocation.z.toFixed(0)}
+                    </div>
+                  )}
                 </div>
                 <p style={{ fontSize: 14, lineHeight: 1.65, color: "var(--ink-1)", fontStyle: "italic", borderLeft: "2px solid var(--ink-3)", paddingLeft: 12, margin: 0 }}>
                   &ldquo;{dialog.text}&rdquo;

@@ -1,9 +1,9 @@
-import { QuestData, IDialogue, IQuestCategory, NPC } from '../../types';
+import { QuestData, IDialogue, NPC } from '../../types';
 
 export interface ExternalQuestResponse {
-  quests: { [key: string]: QuestData };
-  dialogs: { [key: string]: IDialogue };
-  categories: { [key: string]: IQuestCategory };
+  quests: QuestData[];
+  dialogs: IDialogue[];
+  categories: number[][];
   npcs?: NPC[];
 }
 

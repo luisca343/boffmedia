@@ -7,12 +7,24 @@ export enum QuestStatus {
   NOT_STARTED = 'NOT_STARTED',
 }
 
+export interface NpcLocation {
+  name: string;
+  dialogId: number;
+  skin: string;
+  x: number;
+  y: number;
+  z: number;
+  world: string;
+  uuid: string;
+}
+
 export interface IDialogue {
   id: number;
   name: string;
   text: string;
   questId: number;
   requirements: IQuestRequirements;
+  npcLocations: NpcLocation[];
 }
 
 export interface IQuestCategory {

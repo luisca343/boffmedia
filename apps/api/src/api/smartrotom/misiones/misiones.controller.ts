@@ -130,7 +130,9 @@ export class MisionesController {
       },
     },
   })
-  @ApiInternalServerErrorResponse({ description: 'Failed to retrieve NPC catalog.' })
+  @ApiInternalServerErrorResponse({
+    description: 'Failed to retrieve NPC catalog.',
+  })
   async getNpcCatalog() {
     return await this.misionesFacadeService.getNpcCatalog();
   }
