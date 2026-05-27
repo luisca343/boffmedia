@@ -37,11 +37,21 @@ export class QuestRepository implements IQuestRepository {
         throw new Error('No data received from external API');
       }
 
+      const raw = response.data.data;
+
+      // Normalize: external API may return dicts (old format) or arrays (new format)
+      const quests = Array.isArray(raw.quests) ? raw.quests : Object.values(raw.quests ?? {});
+      const dialogs = Array.isArray(raw.dialogs) ? raw.dialogs : Object.values(raw.dialogs ?? {});
+      const rawCats = raw.categories ?? [];
+      const categories: number[][] = Array.isArray(rawCats)
+        ? rawCats
+        : Object.values(rawCats as Record<string, { quests: number[] }>).map((c) => c.quests);
+
       const questResponse: ExternalQuestResponse = {
-        quests: response.data.data.quests || [],
-        dialogs: response.data.data.dialogs || [],
-        categories: response.data.data.categories || [],
-        npcs: response.data.data.npcs || [],
+        quests,
+        dialogs,
+        categories,
+        npcs: raw.npcs || [],
       };
 
       this.logger.log(
