@@ -2,32 +2,18 @@
 
 import { useState, useEffect } from "react"
 import { Bell, Send, CheckCircle, XCircle, Search } from "lucide-react"
-import { Input } from "@/components/ui/primitives/input"
-import { Textarea } from "@/components/ui/primitives/textarea"
-import { Button } from "@/components/ui/primitives/button"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/primitives/select"
-import AdminPageLayout from "../_components/AdminPageLayout"
-import TerminalCard from "../_components/TerminalCard"
-import TerminalHeader from "../_components/TerminalHeader"
-import TerminalLabel from "../_components/TerminalLabel"
 import { NotificationsService } from "@/services/api/smartrotom/notificationsService"
 import { UsersService } from "@/services/api/smartrotom/usersService"
 import type { SmartRotomUser } from "@boffmedia/shared"
 
 const NOTIFICATION_TYPES = [
-  { value: "system", label: "System" },
-  { value: "chatapp", label: "ChatApp" },
-  { value: "starbank", label: "StarBank" },
-  { value: "arcade", label: "Arcade" },
-  { value: "misiones", label: "Misiones" },
-  { value: "bidkea", label: "Bidkea" },
-  { value: "admin", label: "Admin" },
+  { value: "system",   label: "System",   icon: "⚙" },
+  { value: "chatapp",  label: "ChatApp",  icon: "💬" },
+  { value: "starbank", label: "StarBank", icon: "⭐" },
+  { value: "arcade",   label: "Arcade",   icon: "🎮" },
+  { value: "misiones", label: "Misiones", icon: "📋" },
+  { value: "bidkea",   label: "Bidkea",   icon: "🏪" },
+  { value: "admin",    label: "Admin",    icon: "🔒" },
 ]
 
 type SendStatus = "idle" | "sending" | "success" | "error"
@@ -44,15 +30,12 @@ export default function AdminNotificationsPage() {
   const [statusMessage, setStatusMessage] = useState("")
 
   useEffect(() => {
-    UsersService.findAll().then((res) => {
-      if (res.data) setUsers(res.data)
-    })
+    UsersService.findAll().then(res => { if (res.data) setUsers(res.data) })
   }, [])
 
-  const filteredUsers = users.filter(
-    (u) =>
-      u.username.toLowerCase().includes(userSearch.toLowerCase()) ||
-      u.uuid.toLowerCase().includes(userSearch.toLowerCase()),
+  const filteredUsers = users.filter(u =>
+    u.username.toLowerCase().includes(userSearch.toLowerCase()) ||
+    u.uuid.toLowerCase().includes(userSearch.toLowerCase())
   )
 
   const canSend =
@@ -65,7 +48,6 @@ export default function AdminNotificationsPage() {
     if (!canSend) return
     setStatus("sending")
     setStatusMessage("")
-
     const res = await NotificationsService.sendNotification({
       userUuid: selectedUuid.trim(),
       type,
@@ -73,210 +55,137 @@ export default function AdminNotificationsPage() {
       body: body.trim(),
       link: link.trim() || undefined,
     })
-
     if (res.data) {
       setStatus("success")
-      setStatusMessage(`✓ Notificación #${res.data.id} enviada a ${selectedUuid.slice(0, 8)}…`)
-      setTitle("")
-      setBody("")
-      setLink("")
+      setStatusMessage(`Notificación #${res.data.id} enviada a ${selectedUuid.slice(0, 8)}…`)
+      setTitle(""); setBody(""); setLink("")
     } else {
       setStatus("error")
       setStatusMessage(res.error ?? "Error desconocido al enviar la notificación")
     }
-
     setTimeout(() => setStatus("idle"), 4000)
   }
 
   return (
-    <AdminPageLayout title="NotifyBell" version="1.0.0">
-      <div className="z-10 relative space-y-4">
-        <TerminalHeader title="notification-sender" username="rotom-admin" />
+    <>
+      <div className="sr-page-head">
+        <h1 className="sr-page-title"><Bell size={20} /> NotifyBell</h1>
+        <p className="sr-page-sub">Envía notificaciones push a jugadores del servidor</p>
+      </div>
 
-        {/* Player selector */}
-        <TerminalCard
-          title="Destinatario"
-          description="Busca y selecciona el jugador que recibirá la notificación"
-          roundedTop={false}
-          className="bg-black"
-        >
-          <div className="space-y-3">
-            <div>
-              <TerminalLabel htmlFor="user-search" indicator="comment">
-                Buscar jugador
-              </TerminalLabel>
-              <div className="relative">
-                <Search className="absolute left-2 top-2.5 w-4 h-4 text-highlight-600" />
-                <Input
-                  id="user-search"
-                  placeholder="Nombre o UUID…"
+      <div className="sr-grid2" style={{ alignItems: 'start' }}>
+        <div className="sr-col" style={{ gap: 'var(--gap)' }}>
+          {/* User selector */}
+          <div className="sr-panel">
+            <div className="sr-panel-head">
+              <span className="sr-ttl">Destinatario</span>
+            </div>
+            <div className="sr-panel-body sr-col" style={{ gap: 10 }}>
+              <div className="sr-search">
+                <Search size={13} />
+                <input
+                  placeholder="Buscar jugador por nombre o UUID…"
                   value={userSearch}
-                  onChange={(e) => setUserSearch(e.target.value)}
-                  className="pl-8 bg-black text-highlight-400 border-highlight-700 placeholder:text-highlight-800"
+                  onChange={e => setUserSearch(e.target.value)}
+                />
+              </div>
+
+              {userSearch.length > 0 && (
+                <div className="sr-user-pick">
+                  {filteredUsers.length === 0 ? (
+                    <div style={{ padding: '8px 12px', fontSize: 12, color: 'var(--fg-faint)' }}>Sin resultados</div>
+                  ) : (
+                    filteredUsers.slice(0, 20).map(u => (
+                      <button
+                        key={u.uuid}
+                        className={selectedUuid === u.uuid ? 'sr-on' : ''}
+                        onClick={() => { setSelectedUuid(u.uuid); setUserSearch(u.username) }}
+                      >
+                        <span style={{ color: 'var(--fg-strong)', fontWeight: 500 }}>{u.username}</span>
+                        <span style={{ color: 'var(--fg-faint)', fontSize: 11 }}>{u.uuid}</span>
+                      </button>
+                    ))
+                  )}
+                </div>
+              )}
+
+              <div className="sr-field">
+                <label>// UUID manual</label>
+                <input
+                  className="sr-input"
+                  placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                  value={selectedUuid}
+                  onChange={e => setSelectedUuid(e.target.value)}
                 />
               </div>
             </div>
+          </div>
 
-            {userSearch.length > 0 && (
-              <div className="border border-highlight-700 rounded max-h-40 overflow-y-auto">
-                {filteredUsers.length === 0 ? (
-                  <p className="text-highlight-700 text-xs p-2">// sin resultados</p>
-                ) : (
-                  filteredUsers.slice(0, 20).map((u) => (
-                    <button
-                      key={u.uuid}
-                      onClick={() => {
-                        setSelectedUuid(u.uuid)
-                        setUserSearch(u.username)
-                      }}
-                      className={`w-full text-left px-3 py-2 text-sm hover:bg-highlight-900/30 border-b border-highlight-900 last:border-0 transition-colors ${
-                        selectedUuid === u.uuid
-                          ? "text-highlight-300 bg-highlight-900/20"
-                          : "text-highlight-600"
-                      }`}
-                    >
-                      <span className="text-highlight-400 font-bold">{u.username}</span>
-                      <span className="text-highlight-700 ml-2 text-xs">{u.uuid}</span>
-                    </button>
-                  ))
-                )}
+          {/* Notification type */}
+          <div className="sr-panel">
+            <div className="sr-panel-head">
+              <span className="sr-ttl">Tipo de notificación</span>
+            </div>
+            <div className="sr-panel-body">
+              <div style={{ display: 'grid', gap: 8, gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))' }}>
+                {NOTIFICATION_TYPES.map(t => (
+                  <button
+                    key={t.value}
+                    className={`sr-opt-card${type === t.value ? ' sr-on' : ''}`}
+                    onClick={() => setType(t.value)}
+                  >
+                    <span className="sr-oc-ic">{t.icon}</span>
+                    <span style={{ fontSize: 12, color: 'var(--fg-strong)' }}>{t.label}</span>
+                  </button>
+                ))}
               </div>
-            )}
-
-            {selectedUuid && (
-              <p className="text-xs text-highlight-600 font-mono">
-                <span className="text-highlight-700">// uuid: </span>
-                <span className="text-highlight-400">{selectedUuid}</span>
-              </p>
-            )}
-
-            {/* Manual UUID input fallback */}
-            <div>
-              <TerminalLabel htmlFor="uuid-input" indicator="dot">
-                O introduce UUID manualmente
-              </TerminalLabel>
-              <Input
-                id="uuid-input"
-                placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-                value={selectedUuid}
-                onChange={(e) => setSelectedUuid(e.target.value)}
-                className="bg-black text-highlight-400 border-highlight-700 font-mono placeholder:text-highlight-800"
-              />
             </div>
           </div>
-        </TerminalCard>
+        </div>
 
-        {/* Notification content */}
-        <TerminalCard
-          title="Contenido de la Notificación"
-          description="Define tipo, título, cuerpo y enlace opcional"
-          className="bg-black"
-        >
-          <div className="space-y-4">
-            <div>
-              <TerminalLabel htmlFor="type-select" indicator="comment">
-                Tipo de notificación
-              </TerminalLabel>
-              <Select value={type} onValueChange={setType}>
-                <SelectTrigger
-                  id="type-select"
-                  className="bg-black text-highlight-400 border-highlight-700"
-                >
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-black text-highlight-400 border-highlight-700">
-                  {NOTIFICATION_TYPES.map((t) => (
-                    <SelectItem
-                      key={t.value}
-                      value={t.value}
-                      className="hover:bg-highlight-900/30"
-                    >
-                      {t.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+        <div className="sr-col" style={{ gap: 'var(--gap)' }}>
+          {/* Content */}
+          <div className="sr-panel">
+            <div className="sr-panel-head">
+              <span className="sr-ttl">Contenido</span>
             </div>
-
-            <div>
-              <TerminalLabel htmlFor="notif-title" indicator="comment" required>
-                Título
-              </TerminalLabel>
-              <Input
-                id="notif-title"
-                placeholder="Ej: Mensaje del servidor"
-                value={title}
-                maxLength={255}
-                onChange={(e) => setTitle(e.target.value)}
-                className="bg-black text-highlight-400 border-highlight-700 placeholder:text-highlight-800"
-              />
-              <p className="text-highlight-800 text-xs mt-1">
-                {title.length}/255
-              </p>
-            </div>
-
-            <div>
-              <TerminalLabel htmlFor="notif-body" indicator="comment" required>
-                Cuerpo del mensaje
-              </TerminalLabel>
-              <Textarea
-                id="notif-body"
-                placeholder="Escribe el contenido de la notificación…"
-                value={body}
-                onChange={(e) => setBody(e.target.value)}
-                className="bg-black text-highlight-400 border-highlight-700 min-h-[90px] placeholder:text-highlight-800"
-              />
-            </div>
-
-            <div>
-              <TerminalLabel htmlFor="notif-link" indicator="dot">
-                Enlace (opcional)
-              </TerminalLabel>
-              <Input
-                id="notif-link"
-                placeholder="/smartrotom/starbank"
-                value={link}
-                maxLength={512}
-                onChange={(e) => setLink(e.target.value)}
-                className="bg-black text-highlight-400 border-highlight-700 placeholder:text-highlight-800"
-              />
-            </div>
-
-            {/* Status feedback */}
-            {status === "success" && (
-              <div className="flex items-center gap-2 text-green-400 text-sm border border-green-900 bg-green-950/30 rounded p-2">
-                <CheckCircle className="w-4 h-4 flex-shrink-0" />
-                <span className="font-mono">{statusMessage}</span>
+            <div className="sr-panel-body sr-col" style={{ gap: 12 }}>
+              <div className="sr-field">
+                <label>// Título <span className="sr-req">*</span></label>
+                <input className="sr-input" placeholder="Título de la notificación" value={title} onChange={e => setTitle(e.target.value)} />
               </div>
-            )}
-            {status === "error" && (
-              <div className="flex items-center gap-2 text-red-400 text-sm border border-red-900 bg-red-950/30 rounded p-2">
-                <XCircle className="w-4 h-4 flex-shrink-0" />
-                <span className="font-mono">{statusMessage}</span>
+              <div className="sr-field">
+                <label>// Mensaje <span className="sr-req">*</span></label>
+                <textarea className="sr-textarea" rows={3} placeholder="Cuerpo del mensaje" value={body} onChange={e => setBody(e.target.value)} />
               </div>
-            )}
+              <div className="sr-field">
+                <label>// Enlace <span className="sr-c">(opcional)</span></label>
+                <input className="sr-input" placeholder="app://…" value={link} onChange={e => setLink(e.target.value)} />
+              </div>
 
-            <Button
-              onClick={handleSend}
-              disabled={!canSend}
-              variant="highlight"
-              className="w-full"
-            >
-              {status === "sending" ? (
-                <span className="animate-pulse flex items-center gap-2">
-                  <Bell className="w-4 h-4" />
-                  Enviando…
-                </span>
-              ) : (
-                <>
-                  <Send className="mr-2 w-4 h-4" />
-                  Enviar Notificación
-                </>
+              {status === "success" && (
+                <div className="sr-banner sr-ok">
+                  <CheckCircle size={14} /> {statusMessage}
+                </div>
               )}
-            </Button>
+              {status === "error" && (
+                <div className="sr-banner sr-crit">
+                  <XCircle size={14} /> {statusMessage}
+                </div>
+              )}
+
+              <button
+                className="sr-btn sr-solid"
+                disabled={!canSend}
+                onClick={handleSend}
+              >
+                {status === "sending" ? <span className="sr-spin" /> : <Send size={14} />}
+                {status === "sending" ? "Enviando…" : "Enviar notificación"}
+              </button>
+            </div>
           </div>
-        </TerminalCard>
+        </div>
       </div>
-    </AdminPageLayout>
+    </>
   )
 }
