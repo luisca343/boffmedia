@@ -1,4 +1,3 @@
-import type { ActiveTeam as ActiveTeamType } from "@/types/Pokemon"
 import { PokemonSprite } from "../../pokedex/_components/PokemonSprite"
 import { useTranslations } from "next-intl"
 import { PokemonW } from "@boffmedia/shared";
@@ -42,11 +41,14 @@ export default function ActiveTeam({ team, className }: { team: PokemonW[]; clas
             {/* Moves */}
             <div className="w-[20%] px-4 border-l border-dashed border-surface-600/50 min-h-[80px] flex flex-col justify-center">
               <div className="space-y-1 text-sm">
-                {pokemon.moves.map((move, idx) => (
-                  <p key={idx} className="font-medium">
-                    {move ? t(`attack_${move.toLowerCase().replace(" ", "_")}`) : "-"}
-                  </p>
-                ))}
+                {pokemon.moves.map((move, idx) => {
+                  const moveName = typeof move === "string" ? move : (move as {name?: string})?.name
+                  return (
+                    <p key={idx} className="font-medium">
+                      {moveName ? t(`attack_${moveName.toLowerCase().replace(" ", "_")}`) : "-"}
+                    </p>
+                  )
+                })}
               </div>
             </div>
 
