@@ -14,8 +14,8 @@ export class QuestRepository implements IQuestRepository {
 
   constructor(private readonly configService: ConfigService) {
     this.baseUrl =
-      this.configService.get<string>('EXTERNAL_API_URL') ||
-      'http://localhost:3001';
+      this.configService.get<string>('WINGULL_API') ||
+      'http://148.251.3.244:34370';
   }
 
   // ==================== EXTERNAL API OPERATIONS ====================
@@ -24,7 +24,7 @@ export class QuestRepository implements IQuestRepository {
     try {
       this.logger.log('Fetching all quests from external API');
 
-      const response = await axios.get(`${this.baseUrl}/api/quests/all`, {
+      const response = await axios.get(`${this.baseUrl}/quests/all`, {
         timeout: 10000,
         headers: {
           'Content-Type': 'application/json',
@@ -35,13 +35,15 @@ export class QuestRepository implements IQuestRepository {
       if (!response.data) {
         throw new Error('No data received from external API');
       }
+      
 
       const questResponse: ExternalQuestResponse = {
-        quests: response.data.quests || {},
-        dialogs: response.data.dialogs || {},
-        categories: response.data.categories || {},
-        npcs: response.data.npcs || [],
+        quests: response.data.data.quests || {},
+        dialogs: response.data.data.dialogs || {},
+        categories: response.data.data.categories || {},
+        npcs: response.data.data.npcs || [],
       };
+      
 
       this.logger.log(
         `Successfully fetched ${Object.keys(questResponse.quests).length} quests`,
@@ -67,7 +69,7 @@ export class QuestRepository implements IQuestRepository {
       this.logger.log(`Fetching user quests for UUID: ${uuid}`);
 
       const response = await axios.get(
-        `${this.baseUrl}/api/quests/user/${uuid}`,
+        `${this.baseUrl}/quests/user/${uuid}`,
         {
           timeout: 10000,
           headers: {
