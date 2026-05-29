@@ -39,11 +39,17 @@ export class QuestCacheService {
 
       // Transform the data structure
       const questSystemData: QuestSystemData = {
-        quests: Object.values(externalData.quests),
-        dialogs: Object.values(externalData.dialogs),
-        categories: Object.values(externalData.categories),
+        quests: externalData.quests,
+        dialogs: externalData.dialogs,
+        categories: externalData.categories.map((questIds) => ({
+          quests: questIds,
+        })),
         npcs: externalData.npcs || [],
       };
+
+      this.logger.log(
+        `Fetched ${questSystemData.quests.length} quests, ${questSystemData.dialogs.length} dialogs, ${questSystemData.categories.length} categories, and ${questSystemData.npcs.length} NPCs`,
+      );
 
       this.questCache = {
         data: questSystemData,

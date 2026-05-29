@@ -4,6 +4,7 @@ import axios from 'axios';
 import {
   ExternalQuestResponse,
   IQuestRepository,
+  NpcCatalogResponse,
   UserQuestResponse,
 } from './interfaces/quest.repository.interface';
 
@@ -35,18 +36,26 @@ export class QuestRepository implements IQuestRepository {
       if (!response.data) {
         throw new Error('No data received from external API');
       }
-      
+
+      const raw = response.data.data;
+
+      // Normalize: external API may return dicts (old format) or arrays (new format)
+      const quests = Array.isArray(raw.quests) ? raw.quests : Object.values(raw.quests ?? {});
+      const dialogs = Array.isArray(raw.dialogs) ? raw.dialogs : Object.values(raw.dialogs ?? {});
+      const rawCats = raw.categories ?? [];
+      const categories: number[][] = Array.isArray(rawCats)
+        ? rawCats
+        : Object.values(rawCats as Record<string, { quests: number[] }>).map((c) => c.quests);
 
       const questResponse: ExternalQuestResponse = {
-        quests: response.data.data.quests || {},
-        dialogs: response.data.data.dialogs || {},
-        categories: response.data.data.categories || {},
-        npcs: response.data.data.npcs || [],
+        quests,
+        dialogs,
+        categories,
+        npcs: raw.npcs || [],
       };
-      
 
       this.logger.log(
-        `Successfully fetched ${Object.keys(questResponse.quests).length} quests`,
+        `Successfully fetched ${questResponse.quests.length} quests, ${questResponse.dialogs.length} dialogs, ${questResponse.categories.length} categories, ${questResponse.npcs!.length} NPCs`,
       );
       return questResponse;
     } catch (error: any) {
@@ -68,8 +77,9 @@ export class QuestRepository implements IQuestRepository {
     try {
       this.logger.log(`Fetching user quests for UUID: ${uuid}`);
 
-      const response = await axios.get(
-        `${this.baseUrl}/quests/user/${uuid}`,
+      const response = await axios.post(
+        `${this.baseUrl}/quests`,
+        { uuid },
         {
           timeout: 10000,
           headers: {
@@ -84,7 +94,7 @@ export class QuestRepository implements IQuestRepository {
       }
 
       const userQuestResponse: UserQuestResponse = {
-        quests: response.data.quests || {},
+        quests: response.data.data.quests || {},
       };
 
       this.logger.log(`Successfully fetched user quests for ${uuid}`);
@@ -93,6 +103,34 @@ export class QuestRepository implements IQuestRepository {
       this.logger.error(`Failed to fetch user quests for ${uuid}`, error.stack);
       throw new BadRequestException(
         `Failed to fetch user quest data: ${error.message}`,
+      );
+    }
+  }
+
+  async fetchNpcCatalogFromAPI(): Promise<NpcCatalogResponse> {
+    try {
+      this.logger.log('Fetching NPC catalog from external API');
+
+      const response = await axios.get(`${this.baseUrl}/npcCatalog`, {
+        timeout: 10000,
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'FicusLabs-QuestService/1.0',
+        },
+      });
+
+      if (!response.data) {
+        throw new Error('No data received from external API');
+      }
+
+      return (response.data.data ?? response.data) as NpcCatalogResponse;
+    } catch (error: any) {
+      this.logger.error(
+        'Failed to fetch NPC catalog from external API',
+        error.stack,
+      );
+      throw new BadRequestException(
+        `Failed to fetch NPC catalog: ${error.message}`,
       );
     }
   }
