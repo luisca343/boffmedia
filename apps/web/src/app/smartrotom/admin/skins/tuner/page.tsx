@@ -2,9 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { SkinViewer } from "skinview3d"
-import { Copy, RefreshCw, Check } from "lucide-react"
-import AdminPageLayout from "@/app/smartrotom/admin/_components/AdminPageLayout"
-import TerminalCard from "@/app/smartrotom/admin/_components/TerminalCard"
+import { Copy, RefreshCw, Check, SlidersHorizontal, ChevronLeft } from "lucide-react"
+import Link from "next/link"
 import { MisionesService } from "@/services/api/smartrotom/misionesService"
 import { NPCCatalogResponse } from "@/types/misiones"
 
@@ -88,15 +87,16 @@ interface SliderProps {
 function Slider({ label, value, min, max, step, onChange }: SliderProps) {
   const display = step <= 0.01 ? value.toFixed(3) : step < 1 ? value.toFixed(1) : String(value)
   return (
-    <div className="flex items-center gap-2 py-0.5">
-      <span className="text-highlight-600 text-xs font-mono w-14 shrink-0">{label}</span>
+    <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "3px 0" }}>
+      <span style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--fg-faint)", width: 56, flexShrink: 0 }}>{label}</span>
       <input
         type="range" min={min} max={max} step={step} value={value}
         onChange={e => onChange(parseFloat(e.target.value))}
-        className="flex-1 cursor-pointer accent-green-400"
-        style={{ height: "4px" }}
+        style={{ flex: 1, cursor: "pointer", accentColor: "rgb(var(--term))", height: 4 }}
       />
-      <span className="text-highlight-300 text-xs font-mono w-14 text-right tabular-nums">{display}</span>
+      <span style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--fg-strong)", width: 56, textAlign: "right", flexShrink: 0 }}>
+        {display}
+      </span>
     </div>
   )
 }
@@ -107,11 +107,17 @@ function Toggle({ label, value, onChange }: ToggleProps) {
   return (
     <button
       onClick={() => onChange(!value)}
-      className={`text-xs px-2 py-0.5 border rounded-sm font-mono transition-colors ${
-        value
-          ? "border-green-500 text-green-400 bg-green-900/20"
-          : "border-highlight-700 text-highlight-600 hover:border-highlight-500 hover:text-highlight-400"
-      }`}
+      style={{
+        padding: "3px 10px",
+        fontFamily: "var(--mono)",
+        fontSize: 11,
+        borderRadius: "var(--radius)",
+        border: value ? "1px solid rgb(var(--term))" : "1px solid var(--line)",
+        background: value ? "rgb(var(--term) / 0.12)" : "transparent",
+        color: value ? "var(--fg-strong)" : "var(--fg-faint)",
+        cursor: "pointer",
+        transition: "all .15s",
+      }}
     >
       {value ? "✓" : "·"} {label}
     </button>
@@ -228,108 +234,136 @@ export default function SkinTunerPage() {
   }
 
   return (
-    <AdminPageLayout title="Skin Camera Tuner" backLink="/smartrotom/admin/skins" addBackgroundEffects>
-      <div className="flex flex-col xl:flex-row gap-4">
+    <>
+      <div className="sr-page-head">
+        <h1 className="sr-page-title"><SlidersHorizontal size={20} /> Camera Tuner</h1>
+        <p className="sr-page-sub">
+          Ajusta la cámara de skinview3d para los renders de NPCs
+          {" · "}
+          <Link href="/smartrotom/admin/skins" className="sr-faint" style={{ textDecoration: "underline", fontSize: 12 }}>
+            <ChevronLeft size={11} style={{ display: "inline", verticalAlign: "middle" }} /> Volver a Skins
+          </Link>
+        </p>
+      </div>
+
+      <div style={{ display: "flex", gap: "var(--gap)", alignItems: "flex-start", flexWrap: "wrap" }}>
 
         {/* ── Left: preview + skin + code ── */}
-        <div className="flex flex-col gap-4 xl:w-80 shrink-0">
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--gap)", width: 320, flexShrink: 0 }}>
 
-          <TerminalCard title="Preview" description={`${params.canvasW} × ${params.canvasH} px`}>
-            <div
-              ref={containerRef}
-              className="bg-black/60 border border-highlight-800/40 rounded overflow-hidden"
-              style={{ width: params.canvasW, height: params.canvasH }}
-            />
-          </TerminalCard>
+          <div className="sr-panel">
+            <div className="sr-panel-head">
+              <span className="sr-ttl">Preview</span>
+              <span className="sr-meta sr-faint">{params.canvasW} × {params.canvasH} px</span>
+            </div>
+            <div className="sr-panel-body" style={{ display: "flex", justifyContent: "center", background: "#000" }}>
+              <div
+                ref={containerRef}
+                style={{ width: params.canvasW, height: params.canvasH, overflow: "hidden" }}
+              />
+            </div>
+          </div>
 
-          <TerminalCard title="Skin">
-            <div className="flex flex-col gap-2">
+          <div className="sr-panel">
+            <div className="sr-panel-head"><span className="sr-ttl">// Skin</span></div>
+            <div className="sr-panel-body sr-col" style={{ gap: 8 }}>
               <select
-                className="text-xs bg-black border border-highlight-700 text-highlight-300 px-2 py-1 rounded-sm font-mono w-full"
+                className="sr-select"
                 value={skinInput}
                 onChange={e => { setSkinInput(e.target.value); loadSkin(e.target.value) }}
               >
                 {skinOptions.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
-              <div className="flex gap-2">
+              <div style={{ display: "flex", gap: 6 }}>
                 <input
+                  className="sr-input"
+                  style={{ flex: 1 }}
                   value={skinInput}
                   onChange={e => setSkinInput(e.target.value)}
                   onKeyDown={e => e.key === "Enter" && loadSkin(skinInput)}
                   placeholder="custom name…"
-                  className="flex-1 text-xs bg-black border border-highlight-700 text-highlight-300 px-2 py-1 rounded-sm font-mono"
                 />
-                <button
-                  onClick={() => loadSkin(skinInput)}
-                  className="text-xs px-2 py-1 border border-highlight-600 text-highlight-400 hover:bg-highlight-900/40 flex items-center gap-1 rounded-sm"
-                >
-                  <RefreshCw className="w-3 h-3" /> Load
+                <button onClick={() => loadSkin(skinInput)} className="sr-btn sr-sm">
+                  <RefreshCw size={12} /> Load
                 </button>
               </div>
             </div>
-          </TerminalCard>
+          </div>
 
-          <TerminalCard title="Presets">
-            <div className="flex gap-2 flex-wrap">
-              <button onClick={() => applyPreset(HEAD_PRESET)}
-                className="text-xs px-2 py-1 border border-highlight-600 text-highlight-400 hover:bg-highlight-900/40 rounded-sm">
-                Head only
-              </button>
-              <button onClick={() => applyPreset(BODY_PRESET)}
-                className="text-xs px-2 py-1 border border-highlight-600 text-highlight-400 hover:bg-highlight-900/40 rounded-sm">
-                Full body
+          <div className="sr-panel">
+            <div className="sr-panel-head"><span className="sr-ttl">// Presets</span></div>
+            <div className="sr-panel-body" style={{ display: "flex", gap: 8 }}>
+              <button className="sr-btn" onClick={() => applyPreset(HEAD_PRESET)}>Head only</button>
+              <button className="sr-btn" onClick={() => applyPreset(BODY_PRESET)}>Full body</button>
+            </div>
+          </div>
+
+          <div className="sr-panel">
+            <div className="sr-panel-head">
+              <span className="sr-ttl">// Code output</span>
+              <button onClick={copyCode} className="sr-btn sr-ghost sr-sm">
+                {copied ? <Check size={13} /> : <Copy size={13} />}
+                {copied ? "Copied!" : "Copy"}
               </button>
             </div>
-          </TerminalCard>
-
-          <TerminalCard title="Code output" description="Paste into generateNpcHeadRender">
-            <pre className="text-xs text-highlight-400 font-mono leading-relaxed whitespace-pre-wrap break-all bg-black/40 p-2 rounded border border-highlight-800/40">
-              {generateCode(params)}
-            </pre>
-            <button onClick={copyCode}
-              className="mt-2 text-xs px-2 py-1 border border-highlight-600 text-highlight-400 hover:bg-highlight-900/40 flex items-center gap-1 rounded-sm">
-              {copied ? <Check className="w-3 h-3 text-green-400" /> : <Copy className="w-3 h-3" />}
-              {copied ? "Copied!" : "Copy"}
-            </button>
-          </TerminalCard>
+            <div className="sr-panel-body">
+              <pre style={{ margin: 0, fontFamily: "var(--mono)", fontSize: 11, color: "var(--fg-muted)", whiteSpace: "pre-wrap", wordBreak: "break-all", lineHeight: 1.7 }}>
+                {generateCode(params)}
+              </pre>
+            </div>
+          </div>
         </div>
 
         {/* ── Right: controls ── */}
-        <div className="flex-1 flex flex-col gap-4">
+        <div style={{ flex: 1, minWidth: 280, display: "flex", flexDirection: "column", gap: "var(--gap)" }}>
 
-          <TerminalCard title="Camera Position">
-            <div className="flex flex-col gap-1">
+          <div className="sr-panel">
+            <div className="sr-panel-head"><span className="sr-ttl">// Camera Position</span></div>
+            <div className="sr-panel-body sr-col" style={{ gap: 2 }}>
               <Slider label="posX" value={params.posX} min={-60} max={60} step={0.5} onChange={v => set("posX", v)} />
               <Slider label="posY" value={params.posY} min={-60} max={60} step={0.5} onChange={v => set("posY", v)} />
               <Slider label="posZ" value={params.posZ} min={-60} max={60} step={0.5} onChange={v => set("posZ", v)} />
             </div>
-          </TerminalCard>
+          </div>
 
-          <TerminalCard title="Camera Rotation" description="Euler XYZ (radians, −π to π)">
-            <div className="flex flex-col gap-1">
+          <div className="sr-panel">
+            <div className="sr-panel-head">
+              <span className="sr-ttl">// Camera Rotation</span>
+              <span className="sr-meta sr-faint">Euler XYZ (rad)</span>
+            </div>
+            <div className="sr-panel-body sr-col" style={{ gap: 2 }}>
               <Slider label="rotX" value={params.rotX} min={-3.14} max={3.14} step={0.01} onChange={v => set("rotX", v)} />
               <Slider label="rotY" value={params.rotY} min={-3.14} max={3.14} step={0.01} onChange={v => set("rotY", v)} />
               <Slider label="rotZ" value={params.rotZ} min={-3.14} max={3.14} step={0.01} onChange={v => set("rotZ", v)} />
             </div>
-          </TerminalCard>
+          </div>
 
-          <TerminalCard title="Player Position" description="Shifts the model in scene space">
-            <div className="flex flex-col gap-1">
+          <div className="sr-panel">
+            <div className="sr-panel-head">
+              <span className="sr-ttl">// Player Position</span>
+              <span className="sr-meta sr-faint">shifts model in scene</span>
+            </div>
+            <div className="sr-panel-body sr-col" style={{ gap: 2 }}>
               <Slider label="playerX" value={params.playerX} min={-20} max={20} step={0.5} onChange={v => set("playerX", v)} />
               <Slider label="playerY" value={params.playerY} min={-20} max={20} step={0.5} onChange={v => set("playerY", v)} />
               <Slider label="playerZ" value={params.playerZ} min={-20} max={20} step={0.5} onChange={v => set("playerZ", v)} />
             </div>
-          </TerminalCard>
+          </div>
 
-          <TerminalCard title="Canvas Size">
-            <div className="flex flex-col gap-1">
+          <div className="sr-panel">
+            <div className="sr-panel-head"><span className="sr-ttl">// Canvas Size</span></div>
+            <div className="sr-panel-body sr-col" style={{ gap: 2 }}>
               <Slider label="width"  value={params.canvasW} min={64} max={512} step={8} onChange={v => set("canvasW", v)} />
               <Slider label="height" value={params.canvasH} min={64} max={512} step={8} onChange={v => set("canvasH", v)} />
             </div>
-          </TerminalCard>
+          </div>
 
-          <TerminalCard title="Visibility" description="Toggle which body parts are rendered">
-            <div className="flex flex-wrap gap-2">
+          <div className="sr-panel">
+            <div className="sr-panel-head">
+              <span className="sr-ttl">// Visibility</span>
+              <span className="sr-meta sr-faint">toggle body parts</span>
+            </div>
+            <div className="sr-panel-body" style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
               <Toggle label="head"     value={params.showHead}     onChange={v => set("showHead", v)} />
               <Toggle label="body"     value={params.showBody}     onChange={v => set("showBody", v)} />
               <Toggle label="leftArm"  value={params.showLeftArm}  onChange={v => set("showLeftArm", v)} />
@@ -338,10 +372,10 @@ export default function SkinTunerPage() {
               <Toggle label="rightLeg" value={params.showRightLeg} onChange={v => set("showRightLeg", v)} />
               <Toggle label="cape"     value={params.showCape}     onChange={v => set("showCape", v)} />
             </div>
-          </TerminalCard>
+          </div>
 
         </div>
       </div>
-    </AdminPageLayout>
+    </>
   )
 }

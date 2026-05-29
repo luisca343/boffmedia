@@ -1,22 +1,14 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { Button } from "@/components/ui/primitives/button"
-import { Input } from "@/components/ui/primitives/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/primitives/select"
-import { ArrowDown, ArrowLeft, ArrowRight, Plus, Minus, Copy, Check } from 'lucide-react'
+import { ArrowDown, ArrowLeft, ArrowRight, Plus, Minus, Copy, Check, MapPin } from 'lucide-react'
 import HighwaySign from './_components/HighwaySign'
-
-// Import our reusable terminal components
-import AdminPageLayout from '../_components/AdminPageLayout'
-import TerminalCard from '../_components/TerminalCard'
-import TerminalLabel from '../_components/TerminalLabel'
 import { env } from '@/config/env.public'
 
 interface Destination {
-  name: string;
-  distance: string;
-  direction: "down" | "left" | "right";
+  name: string
+  distance: string
+  direction: "down" | "left" | "right"
 }
 
 export default function CartelesAutopista() {
@@ -32,14 +24,13 @@ export default function CartelesAutopista() {
   }
 
   const handleRemoveDestination = (index: number) => {
-    const newDestinations = destinations.filter((_, i) => i !== index)
-    setDestinations(newDestinations)
+    setDestinations(destinations.filter((_, i) => i !== index))
   }
 
   const handleDestinationChange = (index: number, field: string, value: string) => {
-    const newDestinations = [...destinations]
-    newDestinations[index] = { ...newDestinations[index], [field]: value }
-    setDestinations(newDestinations)
+    const next = [...destinations]
+    next[index] = { ...next[index], [field]: value }
+    setDestinations(next)
   }
 
   useEffect(() => {
@@ -58,163 +49,127 @@ export default function CartelesAutopista() {
       await navigator.clipboard.writeText(signUrl)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
-    } catch (err) {
-      console.error('Failed to copy text: ', err)
-    }
+    } catch { /* ignore */ }
   }
 
   return (
-    <AdminPageLayout title="Generador de Señales" version="2.3.4" addBackgroundEffects={true}>
-      {/* Main Configuration Card */}
-      <TerminalCard 
-        title="Configuración de Señal" 
-        description="Ingrese los detalles de la señal de carretera"
-        terminalTitle="sign-generator"
-        username="ficus-labs"
-        roundedTop={true}
-      >
-        <div className="space-y-4">
-          <div>
-            <TerminalLabel htmlFor="highway" indicator="dot" required>
-              Nombre de la Carretera
-            </TerminalLabel>
-            <Input
-              id="highway"
-              value={highway}
-              onChange={(e) => setHighway(e.target.value)}
-              required
-              placeholder="ej., A-2"
-              className="bg-black text-highlight-400 border-highlight-700 focus:border-highlight-500 focus:ring-0"
-            />
+    <>
+      <div className="sr-page-head">
+        <h1 className="sr-page-title"><MapPin size={20} /> OGT Explorer</h1>
+        <p className="sr-page-sub">Generador de señales de carretera para el servidor</p>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--gap)', alignItems: 'start' }}>
+        {/* Form */}
+        <div className="sr-panel">
+          <div className="sr-panel-head">
+            <span className="sr-ttl">Configuración de señal</span>
           </div>
-          
-          {destinations.map((dest, index) => (
-            <div key={index} className="space-y-2 border border-highlight-800/30 p-3 rounded">
-              <h2 className="text-lg font-semibold text-highlight-400 flex items-center">
-                <span className="text-highlight-600 w-6">{index + 1}{">"}</span> Destino
-              </h2>
-              <div className="flex flex-col md:flex-row gap-3">
-                <div className="flex-1">
-                  <TerminalLabel htmlFor={`dest-${index}`} indicator="comment">
-                    Nombre
-                  </TerminalLabel>
-                  <Input
-                    id={`dest-${index}`}
+          <div className="sr-panel-body sr-col" style={{ gap: 14 }}>
+            <div className="sr-field">
+              <label>// Nombre de la carretera</label>
+              <input
+                className="sr-input"
+                value={highway}
+                onChange={e => setHighway(e.target.value)}
+                placeholder="ej. A-2"
+              />
+            </div>
+
+            {destinations.map((dest, index) => (
+              <div key={index} style={{ border: '1px solid var(--line)', borderRadius: 'var(--radius)', padding: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                  <span className="sr-faint" style={{ fontSize: 11 }}>// Destino {index + 1}</span>
+                  {index > 0 && (
+                    <button className="sr-btn sr-danger sr-sm" onClick={() => handleRemoveDestination(index)}>
+                      <Minus size={12} />
+                    </button>
+                  )}
+                </div>
+                <div className="sr-col" style={{ gap: 8 }}>
+                  <input
+                    className="sr-input"
+                    placeholder="Nombre del destino"
                     value={dest.name}
-                    onChange={(e) => handleDestinationChange(index, 'name', e.target.value)}
-                    placeholder="ej., Madrid"
-                    className="bg-black text-highlight-400 border-highlight-700 focus:border-highlight-500 focus:ring-0"
+                    onChange={e => handleDestinationChange(index, 'name', e.target.value)}
                   />
-                </div>
-                <div className="flex-1">
-                  <TerminalLabel htmlFor={`dist-${index}`} indicator="comment">
-                    Distancia (bq)
-                  </TerminalLabel>
-                  <Input
-                    id={`dist-${index}`}
+                  <input
+                    className="sr-input"
+                    placeholder="Distancia (ej. 2.5km)"
                     value={dest.distance}
-                    onChange={(e) => handleDestinationChange(index, 'distance', e.target.value)}
-                    placeholder="ej., 300"
-                    type="number"
-                    className="bg-black text-highlight-400 border-highlight-700 focus:border-highlight-500 focus:ring-0"
+                    onChange={e => handleDestinationChange(index, 'distance', e.target.value)}
                   />
+                  <div className="sr-seg">
+                    {(['down', 'left', 'right'] as const).map(dir => (
+                      <button
+                        key={dir}
+                        className={dest.direction === dir ? 'sr-on' : ''}
+                        onClick={() => handleDestinationChange(index, 'direction', dir)}
+                        title={dir}
+                      >
+                        {dir === 'down' ? <ArrowDown size={13} /> : dir === 'left' ? <ArrowLeft size={13} /> : <ArrowRight size={13} />}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <TerminalLabel htmlFor={`dir-${index}`} indicator="comment">
-                    Dirección
-                  </TerminalLabel>
-                  <Select
-                    value={dest.direction}
-                    onValueChange={(value: any) => handleDestinationChange(index, 'direction', value)}
-                  >
-                    <SelectTrigger id={`dir-${index}`} className="bg-black text-highlight-400 border-highlight-700">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-black text-highlight-400 border-highlight-700 select-content">
-                      <SelectItem value="down" className="hover:bg-highlight-900/30">
-                        <div className="flex items-center">
-                          <ArrowDown className="mr-2 h-4 w-4" />
-                          <span>Recto</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="left" className="hover:bg-highlight-900/30">
-                        <div className="flex items-center">
-                          <ArrowLeft className="mr-2 h-4 w-4" />
-                          <span>Izquierda</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="right" className="hover:bg-highlight-900/30">
-                        <div className="flex items-center">
-                          <ArrowRight className="mr-2 h-4 w-4" />
-                          <span>Derecha</span>
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <Button 
-                  type="button" 
-                  onClick={() => handleRemoveDestination(index)} 
-                  className="h-10 mt-auto"
-                  variant="error"
-                >
-                  <Minus className="h-4 w-4" />
-                </Button>
               </div>
-            </div>
-          ))}
-          
-          {destinations.length < 4 && (
-            <Button 
-              type="button" 
-              onClick={handleAddDestination} 
-              className="w-full"
-              variant="highlight"
-            >
-              <Plus className="mr-2 h-4 w-4" /> Agregar Destino
-            </Button>
-          )}
-          
-          <div className="relative border-t border-highlight-700/30 pt-4 mt-4">
-            <div className="text-xs text-highlight-600 mb-2 flex items-center">
-              <span className="animate-pulse text-highlight-500 mr-2">[URL]</span>
-              Click para copiar
-            </div>
-            <Input
-              value={signUrl}
-              readOnly
-              className="pr-10 bg-black text-highlight-400 border-highlight-700 font-mono text-xs"
-              onClick={copyToClipboard}
-            />
-            <Button
-              type="button"
-              variant="highlightGhost"
-              size="zero"
-              className="absolute  inset-y-0 right-0 px-3 flex items-center top-10"
-              onClick={copyToClipboard}
-            >
-              {copied ? 
-                <Check className="h-4 w-4 text-highlight-500" /> : 
-                <Copy className="h-4 w-4 text-highlight-400" />
-              }
-            </Button>
-            {copied && <p className="text-sm text-highlight-500 mt-1 flex items-center">
-              <span className="w-2 h-2 bg-highlight-500 rounded-full mr-2 animate-pulse"></span>
-              URL copiada al portapapeles
-            </p>}
+            ))}
+
+            {destinations.length < 4 && (
+              <button className="sr-btn" onClick={handleAddDestination}>
+                <Plus size={14} /> Agregar destino
+              </button>
+            )}
           </div>
         </div>
-      </TerminalCard>
-      
-      {/* Preview Card */}
-      <TerminalCard 
-        title="Vista Previa"
-        className="mt-6"
-      >
-        <div className="flex justify-center bg-black/60 p-2 rounded border border-highlight-900/30">
-          <HighwaySign highway={highway} destinations={destinations} width={500} height={300} />
+
+        {/* Preview + URL */}
+        <div className="sr-col" style={{ gap: 'var(--gap)' }}>
+          <div className="sr-panel">
+            <div className="sr-panel-head">
+              <span className="sr-ttl">Vista previa</span>
+            </div>
+            <div className="sr-panel-body" style={{ display: 'flex', justifyContent: 'center', background: '#0a0a0a' }}>
+              <HighwaySign
+                highway={highway}
+                destinations={destinations}
+                width={400}
+                height={200}
+              />
+            </div>
+          </div>
+
+          <div className="sr-panel">
+            <div className="sr-panel-head">
+              <span className="sr-ttl">URL generada</span>
+            </div>
+            <div className="sr-panel-body sr-col" style={{ gap: 10 }}>
+              <div style={{
+                background: 'var(--bg-0)',
+                border: '1px solid var(--line)',
+                borderRadius: 'var(--radius)',
+                padding: '10px 12px',
+                fontSize: 12,
+                color: 'var(--fg-muted)',
+                wordBreak: 'break-all',
+                fontFamily: 'var(--mono)',
+                maxHeight: 80,
+                overflowY: 'auto',
+              }}>
+                {signUrl || <span style={{ color: 'var(--fg-faint)' }}>Completa el formulario…</span>}
+              </div>
+              <button
+                className="sr-btn"
+                onClick={copyToClipboard}
+                disabled={!signUrl}
+              >
+                {copied ? <Check size={14} /> : <Copy size={14} />}
+                {copied ? 'Copiado' : 'Copiar URL'}
+              </button>
+            </div>
+          </div>
         </div>
-      </TerminalCard>
-    </AdminPageLayout>
+      </div>
+    </>
   )
 }

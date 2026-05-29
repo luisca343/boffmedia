@@ -2,9 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { RefreshCw, CheckCircle, XCircle, Loader2, ImageOff, SlidersHorizontal } from "lucide-react"
-import AdminPageLayout from "@/app/smartrotom/admin/_components/AdminPageLayout"
-import TerminalCard from "@/app/smartrotom/admin/_components/TerminalCard"
+import { RefreshCw, CheckCircle, XCircle, Loader2, ImageOff, SlidersHorizontal, Palette } from "lucide-react"
 import { MisionesService } from "@/services/api/smartrotom/misionesService"
 import {
   generateNpcFaceRender,
@@ -40,10 +38,10 @@ function MiniPreview({ url, size, pixelated }: { url: string | null; size: numbe
   if (!url || errored) {
     return (
       <div
-        className="flex items-center justify-center bg-highlight-900/20 border border-highlight-800/40 rounded-sm"
-        style={{ width: size, height: size, flexShrink: 0 }}
+        className="sr-faint"
+        style={{ width: size, height: size, display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid var(--line)", borderRadius: "var(--radius)", flexShrink: 0 }}
       >
-        <ImageOff className="w-3 h-3 text-highlight-700" />
+        <ImageOff style={{ width: 10, height: 10 }} />
       </div>
     )
   }
@@ -61,10 +59,10 @@ function MiniPreview({ url, size, pixelated }: { url: string | null; size: numbe
 }
 
 function StatusDot({ exists }: { exists: boolean | null }) {
-  if (exists === null) return <Loader2 className="w-3 h-3 animate-spin text-highlight-600" />
+  if (exists === null) return <Loader2 style={{ width: 12, height: 12, color: "var(--fg-faint)" }} className="sr-spin" />
   return exists
-    ? <CheckCircle className="w-3 h-3 text-green-400" />
-    : <XCircle className="w-3 h-3 text-red-400" />
+    ? <CheckCircle style={{ width: 12, height: 12, color: "var(--ok)" }} />
+    : <XCircle style={{ width: 12, height: 12, color: "var(--crit)" }} />
 }
 
 export default function SkinsAdminPage() {
@@ -159,122 +157,102 @@ export default function SkinsAdminPage() {
   }
 
   return (
-    <AdminPageLayout title="NPC Skins" backLink="/smartrotom/admin" addBackgroundEffects>
-      <div className="flex gap-2 mb-4 flex-wrap items-center">
-        <Link
-          href="/smartrotom/admin/skins/tuner"
-          className="text-xs px-2 py-1 border border-highlight-600 text-highlight-400 hover:bg-highlight-900/40 flex items-center gap-1 rounded-sm transition-colors"
-        >
-          <SlidersHorizontal className="w-3 h-3" /> Camera Tuner
-        </Link>
-        <span className="text-highlight-800 text-xs">|</span>
-        <button
-          onClick={() => runBulk(false)}
-          className="text-xs px-2 py-1 border border-highlight-600 text-highlight-400 hover:bg-highlight-900/40 flex items-center gap-1 rounded-sm transition-colors"
-        >
-          <RefreshCw className="w-3 h-3" /> Fill all missing
-        </button>
-        <button
-          onClick={() => runBulk(true)}
-          className="text-xs px-2 py-1 border border-highlight-600 text-highlight-400 hover:bg-highlight-900/40 flex items-center gap-1 rounded-sm transition-colors"
-        >
-          <RefreshCw className="w-3 h-3" /> Force re-render all
-        </button>
-        <span className="text-xs text-highlight-700 ml-2">
-          {loading ? "Loading NPCs…" : `${skins.length} unique skins`}
-        </span>
+    <>
+      <div className="sr-page-head">
+        <h1 className="sr-page-title"><Palette size={20} /> NPC Skins</h1>
+        <p className="sr-page-sub">Renders por skin — cara (2D) + cabeza (3D) + cuerpo (3D)</p>
       </div>
 
-      {loading ? (
-        <div className="flex items-center gap-2 text-highlight-600 text-sm">
-          <Loader2 className="w-4 h-4 animate-spin" /> Cargando NPCs...
+      <div className="sr-panel">
+        <div className="sr-toolbar">
+          <Link href="/smartrotom/admin/skins/tuner" className="sr-btn" style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <SlidersHorizontal size={13} /> Camera Tuner
+          </Link>
+          <button onClick={() => runBulk(false)} className="sr-btn" disabled={loading}>
+            <RefreshCw size={13} /> Fill missing
+          </button>
+          <button onClick={() => runBulk(true)} className="sr-btn sr-danger" disabled={loading}>
+            <RefreshCw size={13} /> Force re-render all
+          </button>
+          <span className="sr-faint" style={{ fontSize: 12, marginLeft: "auto" }}>
+            {loading ? "Cargando NPCs…" : `${skins.length} skins únicas`}
+          </span>
         </div>
-      ) : (
-        <TerminalCard title="Skin catalog" description="Face (2D) + head (3D) + body (3D) renders per NPC skin">
-          {/* Header */}
-          <div className="grid grid-cols-[1fr_36px_44px_52px_auto_auto] gap-x-3 items-center px-2 py-1 text-xs text-highlight-700 border-b border-highlight-800/40 mb-1">
-            <span>Skin / NPCs</span>
-            <span className="text-center">2D</span>
-            <span className="text-center">Head</span>
-            <span className="text-center">Body</span>
-            <span>Status</span>
-            <span>Actions</span>
-          </div>
 
-          <div className="flex flex-col divide-y divide-highlight-800/30">
+        {loading ? (
+          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: 24, color: "var(--fg-muted)", fontSize: 13 }}>
+            <Loader2 size={16} className="sr-spin" /> Cargando catálogo de NPCs…
+          </div>
+        ) : skins.length === 0 ? (
+          <div className="sr-empty" style={{ margin: 16 }}>
+            <div className="sr-ic"><Palette size={28} /></div>
+            <div className="sr-t">No se encontraron skins</div>
+          </div>
+        ) : (
+          <>
+            {/* Header row */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 36px 44px 52px auto auto", gap: "0 12px", alignItems: "center", padding: "6px 12px", fontSize: 11, color: "var(--fg-faint)", borderBottom: "1px solid var(--line)" }}>
+              <span>Skin / NPCs</span>
+              <span style={{ textAlign: "center" }}>2D</span>
+              <span style={{ textAlign: "center" }}>Head</span>
+              <span style={{ textAlign: "center" }}>Body</span>
+              <span>Status</span>
+              <span>Acciones</span>
+            </div>
+
             {skins.map((entry, idx) => {
               const busy = entry.working !== null
               return (
                 <div
                   key={entry.skinName}
-                  className="grid grid-cols-[1fr_36px_44px_52px_auto_auto] gap-x-3 items-center px-2 py-1.5 hover:bg-highlight-900/10 transition-colors"
+                  className="sr-svc-row"
+                  style={{ display: "grid", gridTemplateColumns: "1fr 36px 44px 52px auto auto", gap: "0 12px", alignItems: "center" }}
                 >
-                  {/* Name + NPCs */}
-                  <div className="min-w-0">
-                    <p className="text-highlight-300 text-xs font-mono truncate">{entry.skinName}</p>
-                    <p className="text-highlight-700 text-xs truncate">{entry.npcNames.join(", ")}</p>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontFamily: "var(--mono)", fontSize: 12, color: "var(--fg-strong)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{entry.skinName}</div>
+                    <div className="sr-faint" style={{ fontSize: 11, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{entry.npcNames.join(", ")}</div>
                   </div>
 
-                  {/* Face (2D) preview */}
-                  <div className="flex justify-center">
+                  <div style={{ display: "flex", justifyContent: "center" }}>
                     <MiniPreview key={entry.faceUrl ?? "face-empty"} url={entry.faceUrl} size={28} pixelated />
                   </div>
-
-                  {/* Head (3D) preview */}
-                  <div className="flex justify-center">
+                  <div style={{ display: "flex", justifyContent: "center" }}>
                     <MiniPreview key={entry.headUrl ?? "head-empty"} url={entry.headUrl} size={36} />
                   </div>
-
-                  {/* Body (3D) preview */}
-                  <div className="flex justify-center">
+                  <div style={{ display: "flex", justifyContent: "center" }}>
                     <MiniPreview key={entry.bodyUrl ?? "body-empty"} url={entry.bodyUrl} size={40} />
                   </div>
 
-                  {/* Status dots */}
-                  <div className="flex flex-col gap-0.5">
-                    <div className="flex items-center gap-1">
-                      <StatusDot exists={entry.status?.sourceExists ?? null} />
-                      <span className="text-xs text-highlight-700">src</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <StatusDot exists={entry.status?.faceRenderExists ?? null} />
-                      <span className="text-xs text-highlight-700">2d</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <StatusDot exists={entry.status?.headRenderExists ?? null} />
-                      <span className="text-xs text-highlight-700">head</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <StatusDot exists={entry.status?.bodyRenderExists ?? null} />
-                      <span className="text-xs text-highlight-700">body</span>
-                    </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                    {([
+                      { key: "sourceExists" as const,     label: "src" },
+                      { key: "faceRenderExists" as const, label: "2d" },
+                      { key: "headRenderExists" as const, label: "head" },
+                      { key: "bodyRenderExists" as const, label: "body" },
+                    ]).map(({ key, label }) => (
+                      <div key={label} style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                        <StatusDot exists={entry.status ? entry.status[key] : null} />
+                        <span className="sr-faint" style={{ fontSize: 10 }}>{label}</span>
+                      </div>
+                    ))}
                   </div>
 
-                  {/* Action buttons */}
-                  <div className="flex flex-col gap-1">
-                    <button
-                      onClick={() => runRender(idx, "all", false)}
-                      disabled={busy}
-                      className="text-xs px-1.5 py-0.5 border border-highlight-700 text-highlight-500 hover:bg-highlight-900/40 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 rounded-sm transition-colors whitespace-nowrap"
-                    >
-                      {busy ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
+                  <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                    <button onClick={() => runRender(idx, "all", false)} disabled={busy} className="sr-btn sr-sm">
+                      {busy ? <Loader2 size={11} className="sr-spin" /> : <RefreshCw size={11} />}
                       Fill
                     </button>
-                    <button
-                      onClick={() => runRender(idx, "all", true)}
-                      disabled={busy}
-                      className="text-xs px-1.5 py-0.5 border border-highlight-700 text-highlight-500 hover:bg-highlight-900/40 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 rounded-sm transition-colors whitespace-nowrap"
-                    >
-                      {busy ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
+                    <button onClick={() => runRender(idx, "all", true)} disabled={busy} className="sr-btn sr-sm sr-danger">
+                      {busy ? <Loader2 size={11} className="sr-spin" /> : <RefreshCw size={11} />}
                       Force
                     </button>
                   </div>
                 </div>
               )
             })}
-          </div>
-        </TerminalCard>
-      )}
-    </AdminPageLayout>
+          </>
+        )}
+      </div>
+    </>
   )
 }

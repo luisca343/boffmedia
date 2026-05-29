@@ -1,37 +1,26 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/primitives/select"
-import { Button } from "@/components/ui/primitives/button"
-import { Textarea } from "@/components/ui/primitives/textarea"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/primitives/dialog"
 import CharacterCreator from "./_components/CharacterCreator"
 import { sendChatMessage } from "@/services/mcef/mcefApi"
 import { useGetArceuSpeak } from "@/hooks/_main/useGetArceuSpeak"
-import { Send, UserPlus } from "lucide-react"
-import AdminPageLayout from "../_components/AdminPageLayout"
-import TerminalCard from "../_components/TerminalCard"
-import TerminalHeader from "../_components/TerminalHeader"
-import TerminalLabel from "../_components/TerminalLabel"
+import { Send, UserPlus, MessageSquare } from "lucide-react"
 
 const formatToHtml = (format: string) => {
-  return format.replace(/§([0-9a-fk-or])/g, (match, p1) => {
-    switch (p1) {
-      case "l":
-        return '<span style="font-weight: bold;">'
-      case "k":
-        return '<span style="text-decoration: blink;">'
-      case "o":
-        return '<span style="font-style: italic;">'
-      case "n":
-        return '<span style="text-decoration: underline;">'
-      case "m":
-        return '<span style="text-decoration: line-through;">'
-      case "r":
-        return "</span>"
-      default:
-        return `<span style="color: #${p1 === "0" ? "000" : p1 === "1" ? "00A" : p1 === "2" ? "0A0" : p1 === "3" ? "0AA" : p1 === "4" ? "A00" : p1 === "5" ? "A0A" : p1 === "6" ? "FA0" : p1 === "7" ? "AAA" : p1 === "8" ? "555" : p1 === "9" ? "55F" : p1 === "a" ? "5F5" : p1 === "b" ? "5FF" : p1 === "c" ? "F55" : p1 === "d" ? "F5F" : p1 === "e" ? "FF5" : "FFF"};">`
+  return format.replace(/§([0-9a-fk-or])/g, (_match, p1) => {
+    const COLOR_MAP: Record<string, string> = {
+      '0': '000', '1': '00A', '2': '0A0', '3': '0AA', '4': 'A00',
+      '5': 'A0A', '6': 'FA0', '7': 'AAA', '8': '555', '9': '55F',
+      'a': '5F5', 'b': '5FF', 'c': 'F55', 'd': 'F5F', 'e': 'FF5', 'f': 'FFF',
     }
+    if (p1 === 'l') return '<span style="font-weight:bold">'
+    if (p1 === 'o') return '<span style="font-style:italic">'
+    if (p1 === 'n') return '<span style="text-decoration:underline">'
+    if (p1 === 'm') return '<span style="text-decoration:line-through">'
+    if (p1 === 'r') return '</span>'
+    if (COLOR_MAP[p1]) return `<span style="color:#${COLOR_MAP[p1]}">`
+    return ''
   })
 }
 
@@ -49,129 +38,124 @@ export default function ArceuSpeak() {
 
   const sendMessage = () => {
     if (!speakers) return
-    const selectedSpeaker = speakers.find((s) => s.value === speaker)
+    const selectedSpeaker = speakers.find(s => s.value === speaker)
     if (!selectedSpeaker || !message.trim()) return
-    
     setSending(true)
-    console.log(`Enviando mensaje como ${selectedSpeaker.format}: ${message}`)
     sendChatMessage(selectedSpeaker.format + ":§r " + message)
-    
-    // Simulate a sent message and reset the form
-    setTimeout(() => {
-      setMessage("")
-      setSending(false)
-    }, 800)
+    setTimeout(() => { setMessage(""); setSending(false) }, 800)
   }
 
+  const selectedSpeaker = speakers?.find(s => s.value === speaker)
+
   if (!speakers) return (
-    <div className="w-full h-screen flex items-center justify-center">
-      <div className="text-highlight-400 animate-pulse font-mono">Cargando sistema de comunicación...</div>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh' }}>
+      <div className="sr-spin" />
     </div>
   )
 
   return (
-    <AdminPageLayout title="ArceuSpeak" version="1.2.7">
-      <div className="z-10 relative">
-        {/* Terminal Card with Header */}
-        <TerminalHeader title="communication" username="ficus-labs" />
-        <TerminalCard 
-          title="Sistema de Comunicación" 
-          roundedTop={false}
-          className="bg-black"
-        >
-          <>
-            <div className="space-y-4">
-              <div>
-                <TerminalLabel htmlFor="speaker-select" indicator="comment">
-                  Selecciona un emisor para enviar mensaje
-                </TerminalLabel>
-                
-                <Select onValueChange={setSpeaker} value={speaker}>
-                  <SelectTrigger id="speaker-select" className="w-full bg-black text-highlight-400 border-highlight-700">
-                    <SelectValue placeholder="Seleccionar emisor" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-black text-highlight-400 border-highlight-700">
-                    {speakers.map((s) => (
-                      <SelectItem key={s.value} value={s.value} className="hover:bg-highlight-900/30">
-                        <span dangerouslySetInnerHTML={{ __html: formatToHtml(s.format) }} />
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+    <>
+      <div className="sr-page-head">
+        <h1 className="sr-page-title"><MessageSquare size={20} /> ArceuSpeak</h1>
+        <p className="sr-page-sub">Transmite mensajes al chat de Minecraft como personajes del servidor</p>
+      </div>
+
+      <div className="sr-grid2" style={{ alignItems: 'start' }}>
+        <div className="sr-col" style={{ gap: 'var(--gap)' }}>
+          <div className="sr-panel">
+            <div className="sr-panel-head">
+              <span className="sr-ttl">Personaje y mensaje</span>
+            </div>
+            <div className="sr-panel-body sr-col" style={{ gap: 'var(--gap)' }}>
+              <div className="sr-field">
+                <label>// Personaje</label>
+                <select
+                  className="sr-select"
+                  value={speaker}
+                  onChange={e => setSpeaker(e.target.value)}
+                >
+                  {speakers.map(s => (
+                    <option key={s.value} value={s.value}>{s.name}</option>
+                  ))}
+                </select>
               </div>
-              
-              <div>
-                <TerminalLabel htmlFor="message-text" indicator="comment">
-                  Mensaje para transmitir
-                </TerminalLabel>
-                
-                <Textarea
-                  id="message-text"
-                  placeholder="Escribe tu mensaje aquí"
+
+              <div className="sr-field">
+                <label>// Mensaje</label>
+                <textarea
+                  className="sr-textarea"
+                  rows={4}
+                  placeholder="Escribe el mensaje aquí…"
                   value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  className="bg-black text-highlight-400 border-highlight-700 min-h-[100px]"
+                  onChange={e => setMessage(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) sendMessage()
+                  }}
                 />
               </div>
-              
-              <div className="flex space-x-4">
-                <Button 
-                  onClick={sendMessage} 
-                  disabled={sending || !message.trim()} 
-                  variant="highlight"
-                  className="flex-1"
+
+              <div className="sr-row">
+                <button
+                  className="sr-btn sr-solid"
+                  onClick={sendMessage}
+                  disabled={sending || !message.trim()}
+                  style={{ flex: 1 }}
                 >
-                  {sending ? 
-                    <span className="animate-pulse flex items-center">Transmitiendo...</span> : 
-                    <>
-                      <Send className="mr-2 w-4 h-4" />
-                      Enviar Mensaje
-                    </>
-                  }
-                </Button>
-                
+                  {sending ? <span className="sr-spin" /> : <Send size={14} />}
+                  {sending ? 'Enviando…' : 'Enviar mensaje'}
+                </button>
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button 
-                      variant="highlight"
-                    >
-                      <UserPlus className="mr-2 w-4 h-4" />
-                      Crear Personaje
-                    </Button>
+                    <button className="sr-btn">
+                      <UserPlus size={14} /> Personajes
+                    </button>
                   </DialogTrigger>
-                  <DialogContent className="bg-black border-highlight-500 border">
+                  <DialogContent className="bg-black border-none max-w-2xl">
                     <DialogHeader>
-                      <DialogTitle className="text-highlight-400">
-                        <span className="text-highlight-600 mr-2">&gt;</span>
-                        Crear Nuevo Personaje
-                      </DialogTitle>
+                      <DialogTitle className="text-highlight-400 font-mono">Gestionar personajes</DialogTitle>
                     </DialogHeader>
                     <CharacterCreator />
                   </DialogContent>
                 </Dialog>
               </div>
-              
-              <div className="mt-4 border-t border-highlight-700/30 pt-2">
-                <div className="flex justify-between text-xs text-highlight-700">
-                  <span>ESTADO:</span>
-                  <span className="text-highlight-400 flex items-center">
-                    CONECTADO
-                    <span className="w-2 h-2 bg-highlight-500 animate-pulse rounded-full ml-2"></span>
-                  </span>
-                </div>
-                <div className="flex justify-between text-xs text-highlight-700">
-                  <span>PERMISOS:</span>
-                  <span className="text-highlight-400">ROOT</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="sr-panel">
+          <div className="sr-panel-head">
+            <span className="sr-ttl">Vista previa</span>
+          </div>
+          <div className="sr-panel-body">
+            {selectedSpeaker ? (
+              <div>
+                <div className="sr-faint" style={{ marginBottom: 8, fontSize: 11 }}>// Formato Minecraft</div>
+                <div
+                  style={{
+                    background: '#000',
+                    padding: 12,
+                    borderRadius: 4,
+                    border: '1px solid var(--line)',
+                    fontFamily: 'monospace',
+                    fontSize: 13,
+                    minHeight: 60,
+                  }}
+                  dangerouslySetInnerHTML={{
+                    __html: formatToHtml(selectedSpeaker.format) + ':§r ' + (message || '…')
+                  }}
+                />
+                <div className="sr-faint" style={{ marginTop: 8, fontSize: 11 }}>
+                  // raw: {selectedSpeaker.format}
                 </div>
               </div>
-            </div>
-          </>
-        </TerminalCard>
-        
-        <div className="text-xs text-highlight-700 mt-2 text-center">
-          ArceuSpeak | Sistema de Comunicación Remota | Acceso Restringido
+            ) : (
+              <div className="sr-empty">
+                <div className="sr-t">Selecciona un personaje</div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </AdminPageLayout>
+    </>
   )
 }
