@@ -571,3 +571,103 @@
     gap: 34px;
   }
 }
+
+/* ---- Palette: NOCTURNO (Candlelit Midnight) ---- */
+.misiones-board[data-palette="nocturno"] {
+  --board-1: #1a2238;
+  --board-2: #0e1424;
+  --board-3: #070b16;
+  --board-frame: #060912;
+  --board-frame-hi: #2e3a5e;
+  --paper-1: #efe2bc;
+  --paper-2: #ddca9a;
+  --paper-3: #c2ab78;
+  --paper-edge: #6a5a38;
+  --paper-shadow: rgba(2, 5, 14, 0.7);
+  --ink-1: #221a10;
+  --ink-2: #36291a;
+  --ink-3: #5a4830;
+  --ink-4: #7a6848;
+  --gold-1: #ffd98a;
+  --gold-2: #e8b04c;
+  --gold-3: #b07c24;
+  --gold-4: #6e4a10;
+  --seal-active:    #d99828;
+  --seal-available: #b8431c;
+  --seal-completed: #6a2410;
+  --seal-failed:    #161616;
+  --seal-locked:    #3a3650;
+  --stamp-red: #b03426;
+  --stamp-gold: #b07c24;
+}
+
+/* ============== RARITY SYSTEM ============== */
+.misiones-board .reward-shimmer {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.5) 48%, rgba(255,240,200,0.7) 50%, transparent 68%);
+  background-size: 280% 100%;
+  background-position: 120% 0;
+  animation: mis-shimmer-sweep 3.4s ease-in-out infinite;
+  mix-blend-mode: soft-light;
+}
+@keyframes mis-shimmer-sweep {
+  0%   { background-position: 130% 0; }
+  55%  { background-position: -60% 0; }
+  100% { background-position: -60% 0; }
+}
+.misiones-board .reward-card { transition: transform 0.18s ease, box-shadow 0.18s ease; position: relative; overflow: hidden; }
+.misiones-board .reward-card.rarity-legendary:hover,
+.misiones-board .reward-card.rarity-epic:hover { transform: translateY(-2px); }
+
+/* ============== SATCHEL / INVENTORY ============== */
+.misiones-board .satchel-slot { transition: transform 0.16s ease, box-shadow 0.16s ease; }
+.misiones-board .satchel-slot:hover { transform: translateY(-3px) scale(1.04); z-index: 5; }
+
+/* ============== HOURGLASS COUNTDOWN ============== */
+.misiones-board .countdown .hourglass {
+  display: inline-block;
+  animation: mis-hourglass-turn 4s ease-in-out infinite;
+  transform-origin: 50% 50%;
+}
+@keyframes mis-hourglass-turn {
+  0%, 42%  { transform: rotate(0deg); }
+  50%, 92% { transform: rotate(180deg); }
+  100%     { transform: rotate(360deg); }
+}
+
+/* ============== THREAD CARD (conspiracy wall) ============== */
+.misiones-board .thread-card { transition: transform 0.2s cubic-bezier(0.16,1,0.3,1), box-shadow 0.2s ease, filter 0.2s ease; }
+.misiones-board .thread-card:hover {
+  transform: rotate(0deg) translateY(-4px) scale(1.025) !important;
+  box-shadow: inset 0 0 20px rgba(80,50,20,0.16), 0 8px 16px rgba(0,0,0,0.5), 0 22px 36px -10px rgba(0,0,0,0.6) !important;
+  z-index: 10;
+}
+
+/* ============== CANDLE GLOW ============== */
+.misiones-board .candle-glow { animation: mis-candle-flicker 5.5s ease-in-out infinite; will-change: opacity; }
+@keyframes mis-candle-flicker {
+  0%, 100% { opacity: 0.92; }
+  18%      { opacity: 1; }
+  33%      { opacity: 0.84; }
+  47%      { opacity: 0.97; }
+  62%      { opacity: 0.8; }
+  78%      { opacity: 0.95; }
+}
+
+/* ============== REGION COMPLETION RING ============== */
+.misiones-board .region-ring-track { stroke: rgba(0,0,0,0.28); }
+.misiones-board .region-ring-fill  { transition: stroke-dashoffset 0.7s cubic-bezier(0.16,1,0.3,1); }
+
+/* ============== NPC DOSSIER MODAL ============== */
+.misiones-board .npc-dossier-overlay {
+  position: fixed; inset: 0; z-index: 120;
+  background: rgba(20,12,6,0.82); backdrop-filter: blur(4px);
+  display: grid; place-items: center; padding: 24;
+}
+
+/* ============== REDUCED MOTION EXTRAS ============== */
+@media (prefers-reduced-motion: reduce) {
+  .misiones-board .reward-shimmer,
+  .misiones-board .countdown .hourglass,
+  .misiones-board .candle-glow { animation: none !important; }
+}

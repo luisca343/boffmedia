@@ -14,6 +14,8 @@ import { Quill } from "../_ui/letter-decor/Quill"
 import { InkBlot } from "../_ui/board-decor/InkBlot"
 import { STATUS_LABEL, STATUS_GLYPH, STATUS_COLOR } from "../_constants/questStatus"
 import { QuestChain } from "./QuestChain"
+import { RewardCard } from "./RewardCard"
+import { CountdownRibbon } from "./CountdownRibbon"
 import { getQuestTypeKey, formatItemName, getNpcForQuest } from "../_utils/questUtils"
 import { Region } from "../_types/board"
 
@@ -26,9 +28,10 @@ export interface QuestLetterProps {
   npcCatalog?: NPCCatalogResponse
   onClose: () => void
   onSelectQuest?: (q: QuestData) => void
+  onOpenNpc?: (npc: NPC) => void
 }
 
-export function QuestLetter({ quest, allQuests, npcs, dialogs, regions, npcCatalog, onClose, onSelectQuest }: QuestLetterProps) {
+export function QuestLetter({ quest, allQuests, npcs, dialogs, regions, npcCatalog, onClose, onSelectQuest, onOpenNpc }: QuestLetterProps) {
   const t = useTranslations("misiones")
   const [tick, setTick] = useState(0)
   useEffect(() => { setTick((p) => p + 1) }, [quest?.id])
@@ -109,16 +112,33 @@ export function QuestLetter({ quest, allQuests, npcs, dialogs, regions, npcCatal
             </Ribbon>
           </div>
 
-          {/* NPC avatar + name row */}
+          {/* NPC avatar + name row — clickable for dossier */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 14, marginBottom: 12 }}>
             <MinecraftSkinAvatar skin={catalogSkin} size={72} ring ringColor={STATUS_COLOR[quest.status]}/>
             <div>
               <div style={{ fontSize: 12, color: "var(--ink-3)", fontFamily: "var(--font-uppercase)", letterSpacing: "0.14em" }}>
                 {t("npc_says_suffix")}
               </div>
-              <div className="dec-title" style={{ fontSize: 18, color: "var(--ink-2)" }}>
-                {catalogEntry?.name ?? quest.npcName ?? npc?.name ?? t("quest_unknown_npc")}
-              </div>
+              {onOpenNpc && npc ? (
+                <button
+                  onClick={(e) => { e.stopPropagation(); onOpenNpc(npc) }}
+                  title={t("npc_dossier_open", { name: catalogEntry?.name ?? npc.name })}
+                  style={{
+                    appearance: "none", border: "none", background: "transparent", padding: 0,
+                    font: "inherit", color: "inherit", cursor: "pointer",
+                    display: "inline-flex", alignItems: "center", gap: 6,
+                    borderBottom: "1px dashed rgba(60,40,20,0.4)",
+                  }}
+                >
+                  <span className="dec-title" style={{ fontSize: 18, color: "var(--ink-2)" }}>
+                    {catalogEntry?.name ?? quest.npcName ?? npc.name}
+                  </span>
+                </button>
+              ) : (
+                <div className="dec-title" style={{ fontSize: 18, color: "var(--ink-2)" }}>
+                  {catalogEntry?.name ?? quest.npcName ?? npc?.name ?? t("quest_unknown_npc")}
+                </div>
+              )}
             </div>
           </div>
 
@@ -130,12 +150,19 @@ export function QuestLetter({ quest, allQuests, npcs, dialogs, regions, npcCatal
           <Divider color="var(--ink-3)" glyph="❦" className="fade-up"/>
 
           {/* Meta */}
-          <div className="fade-up" style={{ display: "flex", justifyContent: "center", gap: 16, fontSize: 13, color: "var(--ink-3)", marginBottom: 18, fontStyle: "italic", flexWrap: "wrap" }}>
+          <div className="fade-up" style={{ display: "flex", justifyContent: "center", gap: 16, fontSize: 13, color: "var(--ink-3)", marginBottom: 18, fontStyle: "italic", flexWrap: "wrap", alignItems: "center" }}>
             {quest.requirements?.requiredLevel > 0 && (
               <span style={{ color: "var(--gold-3)" }}>{t("quest_level_required")} {quest.requirements.requiredLevel}</span>
             )}
             {quest.repeatable && <span style={{ color: "var(--gold-3)" }}>· {t("quest_repeatable")}</span>}
           </div>
+
+          {/* Countdown for daily / repeatable */}
+          {(quest.repeatable || quest.type === 2) && quest.status !== QuestStatus.LOCKED && quest.status !== QuestStatus.COMPLETED && (
+            <div className="fade-up" style={{ display: "flex", justifyContent: "center", marginBottom: 18 }}>
+              <CountdownRibbon quest={quest}/>
+            </div>
+          )}
 
           {/* Quest chain */}
           <div className="fade-up" style={{ animationDelay: "0.08s", marginBottom: 22 }}>
@@ -202,7 +229,7 @@ export function QuestLetter({ quest, allQuests, npcs, dialogs, regions, npcCatal
             </div>
           )}
 
-          {/* Rewards */}
+          {/* Rewards with rarity glow */}
           {(quest.rewards || []).length > 0 && (
             <div className="fade-up" style={{ animationDelay: "0.26s", marginTop: 26 }}>
               <div style={{ textAlign: "center", marginBottom: 12 }}>
@@ -210,19 +237,9 @@ export function QuestLetter({ quest, allQuests, npcs, dialogs, regions, npcCatal
                   {t("rewards_section")}
                 </span>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 10 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 10 }}>
                 {quest.rewards.map((r, ri) => (
-                  <div key={ri} style={{ padding: 12, borderRadius: 2, background: "rgba(255,240,200,0.45)", border: "1px solid rgba(60,40,20,0.3)", display: "flex", gap: 12, alignItems: "center" }}>
-                    <div style={{ width: 40, height: 40, borderRadius: 2, flexShrink: 0, background: "linear-gradient(135deg, var(--gold-1), var(--gold-2))", border: "1px solid var(--gold-3)", display: "grid", placeItems: "center", fontFamily: "var(--font-display)", fontSize: 20, color: "var(--ink-1)" }}>
-                      <Icon.Gift size={18}/>
-                    </div>
-                    <div style={{ minWidth: 0, flex: 1 }}>
-                      <div style={{ fontSize: 13, color: "var(--ink-1)", fontWeight: 600, lineHeight: 1.2 }}>
-                        {formatItemName(r.item)}
-                      </div>
-                      {r.count > 1 && <div style={{ fontSize: 11, color: "var(--ink-3)", marginTop: 2 }}>×{r.count}</div>}
-                    </div>
-                  </div>
+                  <RewardCard key={ri} name={formatItemName(r.item)} icon="●" rarity="common"/>
                 ))}
               </div>
             </div>

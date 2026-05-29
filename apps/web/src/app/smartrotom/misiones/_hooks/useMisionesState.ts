@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useMemo, useEffect } from "react"
-import { QuestData, QuestStatus } from "@/types/misiones"
-import { Palette, Section } from "../_types/board"
+import { QuestData, QuestStatus, NPC } from "@/types/misiones"
+import { Palette, Section, YarnColor } from "../_types/board"
 import { makeRegions } from "../_utils/questUtils"
 import { useGetRotomQuests } from "./useGetRotomQuests"
 import { useGetNpcCatalog } from "@/hooks/misiones/useGetNpcCatalog"
@@ -20,6 +20,10 @@ export function useMisionesState() {
   const [palette, setPalette] = useState<Palette>("pergamino")
   const [isMobile, setIsMobile] = useState(false)
   const [trackedQuestId, setTrackedQuestId] = useState<number | null>(null)
+  const [candlelight, setCandlelight] = useState(false)
+  const [candleIntensity, setCandleIntensity] = useState(0.55)
+  const [yarn, setYarn] = useState<YarnColor>("carmesi")
+  const [npcDossier, setNpcDossier] = useState<NPC | null>(null)
 
   // Auto-track the first ACTIVE quest
   const firstActiveId = useMemo(
@@ -67,5 +71,13 @@ export function useMisionesState() {
     trackedQuestId,
     setTrackedQuestId,
     regions,
+    candlelight,
+    setCandlelight,
+    candleIntensity,
+    setCandleIntensity,
+    yarn,
+    setYarn,
+    npcDossier,
+    setNpcDossier,
   }
 }

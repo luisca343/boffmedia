@@ -12,6 +12,7 @@ import { MinecraftSkinAvatar } from "../_ui/minecraft/MinecraftAvatar"
 import { playPaperRustle } from "../_utils/sound"
 import { STATUS_GLYPH, STATUS_COLOR } from "../_constants/questStatus"
 import { getQuestTypeKey } from "../_utils/questUtils"
+import { CountdownRibbon } from "./CountdownRibbon"
 
 export interface QuestPaperProps {
   quest: QuestData
@@ -106,6 +107,13 @@ export function QuestPaper({ quest, npc, npcCatalog, regionName, selected, tilt,
           </>
         )}
       </div>
+
+      {/* Countdown for daily / repeatable */}
+      {(quest.repeatable || quest.type === 2) && quest.status !== QuestStatus.LOCKED && quest.status !== QuestStatus.COMPLETED && (
+        <div style={{ marginBottom: 10 }}>
+          <CountdownRibbon quest={quest} compact/>
+        </div>
+      )}
 
       {/* Log text excerpt */}
       <p style={{

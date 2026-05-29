@@ -12,6 +12,10 @@ import { AtlasScreen } from "./_components/AtlasScreen"
 import { TrophyScreen } from "./_components/TrophyScreen"
 import { JournalScreen } from "./_components/JournalScreen"
 import { QuestLetter } from "./_components/QuestLetter"
+import { ConspiracyScreen } from "./_components/ConspiracyScreen"
+import { InventoryScreen } from "./_components/InventoryScreen"
+import { NpcDossier } from "./_components/NpcDossier"
+import { CandleGlow } from "./_components/CandleGlow"
 import { Palette } from "./_types/board"
 
 export default function QuestLog() {
@@ -41,6 +45,14 @@ export default function QuestLog() {
     trackedQuestId,
     setTrackedQuestId,
     regions,
+    candlelight,
+    setCandlelight,
+    candleIntensity,
+    setCandleIntensity,
+    yarn,
+    setYarn,
+    npcDossier,
+    setNpcDossier,
   } = useMisionesState()
 
   if (isLoading) {
@@ -92,6 +104,16 @@ export default function QuestLog() {
                     setTrackedQuestId={setTrackedQuestId}
                   />
                 )}
+                {section === "trama" && (
+                  <ConspiracyScreen
+                    quests={quests}
+                    npcs={npcs}
+                    regions={regions}
+                    npcCatalog={npcCatalog}
+                    yarn={yarn}
+                    onSelect={setSelectedQuest}
+                  />
+                )}
                 {section === "atlas" && (
                   <AtlasScreen
                     quests={quests}
@@ -99,6 +121,9 @@ export default function QuestLog() {
                     npcCatalog={npcCatalog}
                     onSelect={(q) => { setSelectedQuest(q); setSection("board") }}
                   />
+                )}
+                {section === "mochila" && (
+                  <InventoryScreen quests={quests}/>
                 )}
                 {section === "trophy" && <TrophyScreen quests={quests}/>}
                 {section === "journal" && (
@@ -139,6 +164,7 @@ export default function QuestLog() {
                     npcCatalog={npcCatalog}
                     onClose={() => setSelectedQuest(null)}
                     onSelectQuest={(q) => setSelectedQuest(q)}
+                    onOpenNpc={(npc) => setNpcDossier(npc)}
                   />
                 </div>
               </>
@@ -146,6 +172,22 @@ export default function QuestLog() {
           </div>
         </div>
       </div>
+
+      {/* Candle glow overlay */}
+      <CandleGlow on={candlelight} intensity={candleIntensity}/>
+
+      {/* NPC dossier modal */}
+      {npcDossier && (
+        <NpcDossier
+          npc={npcDossier}
+          quests={quests}
+          dialogs={dialogs}
+          regions={regions}
+          npcCatalog={npcCatalog}
+          onClose={() => setNpcDossier(null)}
+          onSelectQuest={(q) => { setSelectedQuest(q); setNpcDossier(null) }}
+        />
+      )}
     </div>
   )
 }

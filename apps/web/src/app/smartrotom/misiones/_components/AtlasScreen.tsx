@@ -116,8 +116,26 @@ export function AtlasScreen({ quests, regions, npcCatalog, onSelect }: AtlasScre
                 onMouseEnter={() => setHoveredUuid(`${pin.entry.uuid}-${pin.dialogId}`)}
                 onMouseLeave={() => setHoveredUuid(null)}
               >
-                {/* Pin needle + head */}
-                <svg viewBox="-12 -20 24 28" width="24" height="28" style={{ display: "block", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.6))" }}>
+                {/* Pin needle + head with completion ring */}
+                <svg viewBox="-14 -24 28 32" width="28" height="32" style={{ display: "block", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.6))" }}>
+                  {/* Completion ring */}
+                  {(() => {
+                    const done = pin.questsHere.filter((q) => q.status === QuestStatus.COMPLETED).length
+                    const total = pin.questsHere.length
+                    const frac = total > 0 ? done / total : 0
+                    const R = 13
+                    const C = 2 * Math.PI * R
+                    return total > 0 ? (
+                      <>
+                        <circle cx="0" cy="-10" r={R} fill="none" className="region-ring-track" strokeWidth="2.5"/>
+                        <circle cx="0" cy="-10" r={R} fill="none" stroke="var(--gold-2)" strokeWidth="2.5"
+                          strokeLinecap="round" className="region-ring-fill"
+                          transform="rotate(-90 0 -10)"
+                          strokeDasharray={C} strokeDashoffset={C * (1 - frac)}
+                          opacity={0.95}/>
+                      </>
+                    ) : null
+                  })()}
                   <line x1="0" y1="-4" x2="0" y2="8" stroke="#1a0e07" strokeWidth="1.5"/>
                   <circle cx="0" cy="-10" r="9" fill={pinColor(pin)} stroke="#1a0e07" strokeWidth="1.2"/>
                   <circle cx="-3" cy="-13" r="3" fill="rgba(255,255,255,0.45)"/>

@@ -13,7 +13,9 @@ export function MobileTop({ section, setSection }: MobileTopProps) {
   const t = useTranslations("misiones")
   const items: { id: Section; label: string }[] = [
     { id: "board", label: t("mobile_nav_board") },
+    { id: "trama", label: t("nav_trama") },
     { id: "atlas", label: t("mobile_nav_atlas") },
+    { id: "mochila", label: t("nav_mochila") },
     { id: "trophy", label: t("mobile_nav_trophy") },
     { id: "journal", label: t("mobile_nav_journal") },
   ]

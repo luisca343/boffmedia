@@ -13,9 +13,11 @@ export function SideRail({ section, setSection }: SideRailProps) {
   const t = useTranslations("misiones")
   const items: { id: Section; label: string; glyph: string }[] = [
     { id: "board", label: t("nav_board"), glyph: "❦" },
+    { id: "trama", label: t("nav_trama"), glyph: "✶" },
     { id: "atlas", label: t("nav_atlas"), glyph: "✦" },
+    { id: "mochila", label: t("nav_mochila"), glyph: "◆" },
     { id: "trophy", label: t("nav_trophy"), glyph: "⚜" },
-    /*{ id: "journal", label: t("nav_journal"), glyph: "✥" },*/
+    { id: "journal", label: t("nav_journal"), glyph: "✥" },
   ]
   return (
     <aside className="wood-frame hide-mobile" style={{

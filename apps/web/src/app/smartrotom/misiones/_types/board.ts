@@ -4,6 +4,8 @@ export interface Region {
   glyph: string
 }
 
-export type Palette = "pergamino" | "grimdark" | "royal" | "forest"
+export type Palette = "pergamino" | "grimdark" | "royal" | "forest" | "nocturno"
 
-export type Section = "board" | "atlas" | "trophy" | "journal"
+export type Section = "board" | "trama" | "atlas" | "mochila" | "trophy" | "journal"
+
+export type YarnColor = "carmesi" | "cordel" | "tinta"

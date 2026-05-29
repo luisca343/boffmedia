@@ -97,6 +97,30 @@
     "chain_here": "HERE",
 
     "atlas_npc_pin_label": "NPCs in this world",
-    "atlas_subtitle_map": "Real server coordinates · click to explore"
+    "atlas_subtitle_map": "Real server coordinates · click to explore",
+
+    "nav_trama": "The Web",
+    "nav_mochila": "The Satchel",
+
+    "trama_label": "The connecting thread",
+    "trama_title": "The Web",
+    "trama_subtitle": "Each quest tied to the next with yarn and thumbtacks — follow the trail",
+    "trama_thread": "Thread",
+    "trama_loose": "Loose ends",
+
+    "mochila_label": "Belongings",
+    "mochila_title": "The Satchel",
+    "mochila_subtitle": "{owned} treasures claimed · {locked} still to earn",
+    "mochila_owned": "◆ In the satchel",
+    "mochila_locked": "◇ Loot to claim",
+    "mochila_empty": "Your satchel is empty. Complete quests to fill it.",
+
+    "npc_dossier_title": "Dossier",
+    "npc_dossier_open": "View dossier for {name}",
+    "npc_dossier_quests": "Quests",
+    "npc_dossier_active": "Active",
+    "npc_dossier_done": "Completed",
+    "npc_dossier_given_by": "Quests from",
+    "npc_dossier_no_quests": "No quests recorded."
   }
 }

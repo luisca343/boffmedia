@@ -97,6 +97,30 @@
     "chain_here": "AQUÍ",
 
     "atlas_npc_pin_label": "NPCs en este mundo",
-    "atlas_subtitle_map": "Coordenadas reales del servidor · haz clic para explorar"
+    "atlas_subtitle_map": "Coordenadas reales del servidor · haz clic para explorar",
+
+    "nav_trama": "La Trama",
+    "nav_mochila": "La Mochila",
+
+    "trama_label": "El hilo conductor",
+    "trama_title": "La Trama",
+    "trama_subtitle": "Cada encargo atado al siguiente con hilo y chinchetas — sigue el rastro",
+    "trama_thread": "Hilo",
+    "trama_loose": "Cabos sueltos",
+
+    "mochila_label": "Pertenencias",
+    "mochila_title": "La Mochila",
+    "mochila_subtitle": "{owned} tesoros reclamados · {locked} por ganar",
+    "mochila_owned": "◆ En la mochila",
+    "mochila_locked": "◇ Botín por reclamar",
+    "mochila_empty": "Tu mochila está vacía. Completa misiones para llenarla.",
+
+    "npc_dossier_title": "Expediente",
+    "npc_dossier_open": "Ver expediente de {name}",
+    "npc_dossier_quests": "Encargos",
+    "npc_dossier_active": "Vigentes",
+    "npc_dossier_done": "Cumplidos",
+    "npc_dossier_given_by": "Encargos de",
+    "npc_dossier_no_quests": "Sin encargos registrados."
   }
 }
