@@ -1,7 +1,7 @@
 import { INPC } from '@/app/smartrotom/misiones/_types/Quest';
 import { rotomGET, rotomPOST, ApiResponse } from '@/services/boffAPI';
 import { SuccessResponse, UploadNpcImageDto } from '@boffmedia/shared';
-import { QuestSystemData } from '@/types/misiones';
+import { NPCCatalogResponse, QuestSystemData } from '@/types/misiones';
 
 export class MisionesService {
   /**
@@ -61,7 +61,7 @@ export class MisionesService {
   }
 
   /**
-   * Get all NPCs
+   * @deprecated Use getNpcCatalog() instead.
    */
   static getAllNPCs() {
     return rotomGET<INPC[]>('/misiones/npcs');
@@ -100,5 +100,12 @@ export class MisionesService {
    */
   static getHealth() {
     return rotomGET<SuccessResponse>('/misiones/health');
+  }
+
+  /**
+   * Get NPC catalog with real-world coordinates and Minecraft UUIDs
+   */
+  static getNpcCatalog() {
+    return rotomGET<NPCCatalogResponse>('/misiones/npcs/catalog');
   }
 }

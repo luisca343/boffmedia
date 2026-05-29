@@ -10,8 +10,20 @@ import type {
 
 export type { FactionRequirements, ScoreboardRequirements };
 
-// Backward-compatible I-prefix aliases for shared types
-export type IDialogue          = Dialogue;
+// NPC world location embedded in each dialogue
+export interface NpcLocation {
+  name: string;
+  dialogId: number;
+  skin: string;
+  x: number;
+  y: number;
+  z: number;
+  world: string;
+  uuid: string;
+}
+
+// Extends shared Dialogue with npcLocations (present after shared regen)
+export type IDialogue          = Dialogue & { npcLocations?: NpcLocation[] };
 export type IQuestCategory     = QuestCategory;
 export type IQuestObjective    = QuestObjective;
 export type IQuestReward       = QuestReward;
@@ -37,6 +49,7 @@ export interface QuestData {
   type: number;
   nextQuest: number;
   category: string;
+  npcName?: string;
   status: QuestStatus;
   objectives: IQuestObjective[];
   requirements: IQuestRequirements;
@@ -62,6 +75,21 @@ export interface QuestSystemData {
   dialogs: IDialogue[];
   npcs: NPC[];
 }
+
+// NPC with real world coordinates from /npcs/catalog endpoint
+export interface NPCCatalogEntry {
+  name: string;
+  dialogId: number;
+  skin: string;
+  x: number;
+  y: number;
+  z: number;
+  world: string;
+  uuid: string;
+}
+
+// Response shape: keys are dialogId strings
+export type NPCCatalogResponse = Record<string, NPCCatalogEntry[]>;
 
 
 

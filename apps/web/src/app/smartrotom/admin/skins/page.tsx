@@ -1,154 +1,166 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
-import { SkinViewer } from "skinview3d"
-import { RefreshCw, CheckCircle, XCircle, Loader2, ImageOff, SlidersHorizontal, Users } from "lucide-react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
+import { RefreshCw, CheckCircle, XCircle, Loader2, ImageOff, SlidersHorizontal, Palette } from "lucide-react"
 import { MisionesService } from "@/services/api/smartrotom/misionesService"
-import { INPC } from "@/app/smartrotom/misiones/_types/Quest"
+import {
+  generateNpcFaceRender,
+  generateNpcBodyRender,
+  generateNpcHeadRender,
+  checkNpcRenderStatus,
+  invalidateNpcRenderCache,
+} from "@/components/smartrotom/MinecraftSkin"
+import { NPCCatalogResponse } from "@/types/misiones"
+import { env } from "@/config/env.public"
 
-const RENDER_BASE = "/smartrotom/img/customNPC/renders"
-const SKIN_BASE   = "/smartrotom/img/customNPC"
+const RENDER_BASE = `${env.NEXT_PUBLIC_API}/public/smartrotom/img/customNPC/renders`
 
-async function generateRender(npcName: string, skinFile: string): Promise<void> {
-  const viewer = new SkinViewer({ width: 200, height: 400, enableControls: false })
-  viewer.camera.rotation.x = -0.620
-  viewer.camera.rotation.y = 0.534
-  viewer.camera.rotation.z = 0.348
-  viewer.camera.position.x = -30.5
-  viewer.camera.position.y = 22.0
-  viewer.camera.position.z = 42.0
-  const skin = skinFile.replace(/[.]png$/i, "")
-  await viewer.loadSkin(`${SKIN_BASE}/${skin}.png`)
-    .catch(() => viewer.loadSkin(`${SKIN_BASE}/steve.png`))
-  viewer.render()
-  const image = viewer.canvas.toDataURL()
-  await MisionesService.uploadCustomNpcImage({ npcName, image })
-  viewer.dispose()
+type RenderStatus = {
+  sourceExists: boolean
+  faceRenderExists: boolean
+  bodyRenderExists: boolean
+  headRenderExists: boolean
 }
 
-type NpcRow = { npc: INPC; hasRender: boolean | null; working: boolean }
-type SkinGroup = { skinName: string; rows: NpcRow[] }
+type SkinEntry = {
+  skinName: string
+  npcNames: string[]
+  status: RenderStatus | null
+  faceUrl: string | null
+  headUrl: string | null
+  bodyUrl: string | null
+  working: "face" | "body" | "head" | "all" | null
+}
 
-function MiniPreview({ npcName }: { npcName: string }) {
-  const [state, setState] = useState<"loading" | "ok" | "err">("loading")
-  const url = `${RENDER_BASE}/${npcName}.png`
+function MiniPreview({ url, size, pixelated }: { url: string | null; size: number; pixelated?: boolean }) {
+  const [errored, setErrored] = useState(false)
+  if (!url || errored) {
+    return (
+      <div
+        className="sr-faint"
+        style={{ width: size, height: size, display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid var(--line)", borderRadius: "var(--radius)", flexShrink: 0 }}
+      >
+        <ImageOff style={{ width: 10, height: 10 }} />
+      </div>
+    )
+  }
   return (
-    <div style={{ width: 32, height: 64, flexShrink: 0, position: "relative" }}>
-      {state !== "err" && (
-        <img
-          key={url}
-          src={url}
-          width={32}
-          height={64}
-          alt=""
-          onLoad={() => setState("ok")}
-          onError={() => setState("err")}
-          style={{ display: state === "ok" ? "block" : "none", imageRendering: "pixelated" }}
-        />
-      )}
-      {state !== "ok" && (
-        <div style={{ width: 32, height: 64, display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid var(--line)", borderRadius: "var(--radius)" }}>
-          {state === "loading"
-            ? <Loader2 size={12} className="sr-spin" style={{ color: "var(--fg-faint)" }} />
-            : <ImageOff size={12} style={{ color: "var(--fg-faint)" }} />
-          }
-        </div>
-      )}
-    </div>
+    <img
+      key={url}
+      src={url}
+      width={size}
+      height={size}
+      alt=""
+      onError={() => setErrored(true)}
+      style={{ imageRendering: pixelated ? "pixelated" : "auto", display: "block", flexShrink: 0 }}
+    />
   )
 }
 
+function StatusDot({ exists }: { exists: boolean | null }) {
+  if (exists === null) return <Loader2 style={{ width: 12, height: 12, color: "var(--fg-faint)" }} className="sr-spin" />
+  return exists
+    ? <CheckCircle style={{ width: 12, height: 12, color: "var(--ok)" }} />
+    : <XCircle style={{ width: 12, height: 12, color: "var(--crit)" }} />
+}
+
 export default function SkinsAdminPage() {
-  const [groups, setGroups] = useState<SkinGroup[]>([])
+  const [skins, setSkins] = useState<SkinEntry[]>([])
   const [loading, setLoading] = useState(true)
 
-  const buildGroups = useCallback((npcs: INPC[]): SkinGroup[] => {
-    const map = new Map<string, INPC[]>()
-    for (const npc of npcs) {
-      const key = (npc.skin || "steve").replace(/[.]png$/i, "")
-      if (!map.has(key)) map.set(key, [])
-      map.get(key)!.push(npc)
-    }
-    return Array.from(map.entries())
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([skinName, npcList]) => ({
-        skinName,
-        rows: npcList.map(npc => ({ npc, hasRender: null, working: false })),
-      }))
-  }, [])
-
   useEffect(() => {
-    MisionesService.getAllNPCs()
-      .then(res => {
-        const npcs = (res.data as unknown as INPC[]) ?? []
-        const built = buildGroups(npcs)
-        setGroups(built)
+    MisionesService.getNpcCatalog()
+      .then((res) => {
+        const catalog = (res.data as unknown as NPCCatalogResponse) ?? {}
+        const npcs = Object.values(catalog).flat()
+        const byName = new Map<string, string[]>()
+        for (const npc of npcs) {
+          const s = npc.skin || "steve"
+          if (!byName.has(s)) byName.set(s, [])
+          byName.get(s)!.push(npc.name)
+        }
+
+        const entries: SkinEntry[] = Array.from(byName.entries()).map(([skinName, npcNames]) => ({
+          skinName,
+          npcNames,
+          status: null,
+          faceUrl: null,
+          headUrl: null,
+          bodyUrl: null,
+          working: null,
+        }))
+        setSkins(entries)
         setLoading(false)
-        // Fire off render-status checks
-        built.forEach((group, gi) => {
-          group.rows.forEach((row, ri) => {
-            MisionesService.checkCustomNPCRender(row.npc.name)
-              .then(r => {
-                const has = !!(r.data as any)?.success || !!(r.data as any)?.img
-                setGroups(prev => prev.map((g, gIdx) =>
-                  gIdx !== gi ? g : {
-                    ...g,
-                    rows: g.rows.map((rw, rIdx) =>
-                      rIdx !== ri ? rw : { ...rw, hasRender: has }
-                    ),
-                  }
-                ))
-              })
-              .catch(() => {
-                setGroups(prev => prev.map((g, gIdx) =>
-                  gIdx !== gi ? g : {
-                    ...g,
-                    rows: g.rows.map((rw, rIdx) =>
-                      rIdx !== ri ? rw : { ...rw, hasRender: false }
-                    ),
-                  }
-                ))
-              })
+
+        entries.forEach((entry, idx) => {
+          const base = entry.skinName.replace(/\.png$/i, "")
+          checkNpcRenderStatus(entry.skinName).then((status) => {
+            setSkins((prev) =>
+              prev.map((e, i) =>
+                i !== idx
+                  ? e
+                  : {
+                      ...e,
+                      status,
+                      faceUrl: status.faceRenderExists ? `${RENDER_BASE}/${base}_face.png` : null,
+                      headUrl: status.headRenderExists ? `${RENDER_BASE}/${base}_head.png` : null,
+                      bodyUrl: status.bodyRenderExists ? `${RENDER_BASE}/${base}.png` : null,
+                    }
+              )
+            )
           })
         })
       })
       .catch(() => setLoading(false))
-  }, [buildGroups])
+  }, [])
 
-  const runRender = useCallback(async (gi: number, ri: number) => {
-    setGroups(prev => prev.map((g, gIdx) =>
-      gIdx !== gi ? g : { ...g, rows: g.rows.map((rw, rIdx) => rIdx !== ri ? rw : { ...rw, working: true }) }
-    ))
-    const row = groups[gi].rows[ri]
-    try {
-      await generateRender(row.npc.name, row.npc.skin || row.npc.name)
-      setGroups(prev => prev.map((g, gIdx) =>
-        gIdx !== gi ? g : { ...g, rows: g.rows.map((rw, rIdx) => rIdx !== ri ? rw : { ...rw, working: false, hasRender: true }) }
-      ))
-    } catch {
-      setGroups(prev => prev.map((g, gIdx) =>
-        gIdx !== gi ? g : { ...g, rows: g.rows.map((rw, rIdx) => rIdx !== ri ? rw : { ...rw, working: false }) }
-      ))
+  const runRender = async (idx: number, mode: "face" | "body" | "head" | "all", force: boolean) => {
+    setSkins((prev) => prev.map((e, i) => (i === idx ? { ...e, working: mode } : e)))
+    const skin = skins[idx]
+    invalidateNpcRenderCache(skin.skinName)
+
+    if (mode === "face" || mode === "all") {
+      const url = await generateNpcFaceRender(skin.skinName, force)
+      setSkins((prev) =>
+        prev.map((e, i) =>
+          i !== idx ? e : { ...e, faceUrl: url, status: e.status ? { ...e.status, faceRenderExists: !!url } : null }
+        )
+      )
     }
-  }, [groups])
-
-  const runGroup = useCallback(async (gi: number, forceAll: boolean) => {
-    const g = groups[gi]
-    for (let ri = 0; ri < g.rows.length; ri++) {
-      if (!forceAll && g.rows[ri].hasRender === true) continue
-      await runRender(gi, ri)
+    if (mode === "head" || mode === "all") {
+      const url = await generateNpcHeadRender(skin.skinName, force)
+      setSkins((prev) =>
+        prev.map((e, i) =>
+          i !== idx ? e : { ...e, headUrl: url, status: e.status ? { ...e.status, headRenderExists: !!url } : null }
+        )
+      )
     }
-  }, [groups, runRender])
+    if (mode === "body" || mode === "all") {
+      const url = await generateNpcBodyRender(skin.skinName, force)
+      setSkins((prev) =>
+        prev.map((e, i) =>
+          i !== idx ? e : { ...e, bodyUrl: url, status: e.status ? { ...e.status, bodyRenderExists: !!url } : null }
+        )
+      )
+    }
 
-  const totalNpcs = groups.reduce((s, g) => s + g.rows.length, 0)
-  const doneNpcs  = groups.reduce((s, g) => s + g.rows.filter(r => r.hasRender === true).length, 0)
+    setSkins((prev) => prev.map((e, i) => (i === idx ? { ...e, working: null } : e)))
+  }
+
+  const runBulk = async (force: boolean) => {
+    for (let i = 0; i < skins.length; i++) {
+      const s = skins[i]
+      if (!force && s.status?.faceRenderExists && s.status?.headRenderExists && s.status?.bodyRenderExists) continue
+      await runRender(i, "all", force)
+    }
+  }
 
   return (
     <>
       <div className="sr-page-head">
-        <h1 className="sr-page-title"><Users size={20} /> Skins de NPCs</h1>
-        <p className="sr-page-sub">Renders de NPCs agrupados por skin base</p>
+        <h1 className="sr-page-title"><Palette size={20} /> NPC Skins</h1>
+        <p className="sr-page-sub">Renders por skin — cara (2D) + cabeza (3D) + cuerpo (3D)</p>
       </div>
 
       <div className="sr-panel">
@@ -156,87 +168,89 @@ export default function SkinsAdminPage() {
           <Link href="/smartrotom/admin/skins/tuner" className="sr-btn" style={{ display: "flex", alignItems: "center", gap: 6 }}>
             <SlidersHorizontal size={13} /> Camera Tuner
           </Link>
-          {!loading && (
-            <span className="sr-faint" style={{ fontSize: 12, marginLeft: "auto" }}>
-              {doneNpcs}/{totalNpcs} renders listos · {groups.length} skins
-            </span>
-          )}
+          <button onClick={() => runBulk(false)} className="sr-btn" disabled={loading}>
+            <RefreshCw size={13} /> Fill missing
+          </button>
+          <button onClick={() => runBulk(true)} className="sr-btn sr-danger" disabled={loading}>
+            <RefreshCw size={13} /> Force re-render all
+          </button>
+          <span className="sr-faint" style={{ fontSize: 12, marginLeft: "auto" }}>
+            {loading ? "Cargando NPCs…" : `${skins.length} skins únicas`}
+          </span>
         </div>
 
         {loading ? (
           <div style={{ display: "flex", alignItems: "center", gap: 8, padding: 24, color: "var(--fg-muted)", fontSize: 13 }}>
-            <Loader2 size={16} className="sr-spin" /> Cargando NPCs…
+            <Loader2 size={16} className="sr-spin" /> Cargando catálogo de NPCs…
           </div>
-        ) : groups.length === 0 ? (
+        ) : skins.length === 0 ? (
           <div className="sr-empty" style={{ margin: 16 }}>
-            <div className="sr-ic"><Users size={28} /></div>
-            <div className="sr-t">No se encontraron NPCs</div>
+            <div className="sr-ic"><Palette size={28} /></div>
+            <div className="sr-t">No se encontraron skins</div>
           </div>
         ) : (
-          groups.map((group, gi) => {
-            const allDone   = group.rows.every(r => r.hasRender === true)
-            const anyWorking = group.rows.some(r => r.working)
-            return (
-              <div key={group.skinName} style={{ borderBottom: "1px solid var(--line)" }}>
-                {/* Group header */}
-                <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 12px", background: "rgb(var(--term)/0.04)" }}>
-                  <span style={{ fontFamily: "var(--mono)", fontSize: 12, color: "var(--fg-strong)", flex: 1 }}>
-                    {group.skinName}
-                  </span>
-                  <span className="sr-faint" style={{ fontSize: 11 }}>
-                    {group.rows.filter(r => r.hasRender === true).length}/{group.rows.length}
-                  </span>
-                  {!allDone && (
-                    <button
-                      onClick={() => runGroup(gi, false)}
-                      disabled={anyWorking}
-                      className="sr-btn sr-sm"
-                    >
-                      {anyWorking ? <Loader2 size={11} className="sr-spin" /> : <RefreshCw size={11} />}
+          <>
+            {/* Header row */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 36px 44px 52px auto auto", gap: "0 12px", alignItems: "center", padding: "6px 12px", fontSize: 11, color: "var(--fg-faint)", borderBottom: "1px solid var(--line)" }}>
+              <span>Skin / NPCs</span>
+              <span style={{ textAlign: "center" }}>2D</span>
+              <span style={{ textAlign: "center" }}>Head</span>
+              <span style={{ textAlign: "center" }}>Body</span>
+              <span>Status</span>
+              <span>Acciones</span>
+            </div>
+
+            {skins.map((entry, idx) => {
+              const busy = entry.working !== null
+              return (
+                <div
+                  key={entry.skinName}
+                  className="sr-svc-row"
+                  style={{ display: "grid", gridTemplateColumns: "1fr 36px 44px 52px auto auto", gap: "0 12px", alignItems: "center" }}
+                >
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontFamily: "var(--mono)", fontSize: 12, color: "var(--fg-strong)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{entry.skinName}</div>
+                    <div className="sr-faint" style={{ fontSize: 11, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{entry.npcNames.join(", ")}</div>
+                  </div>
+
+                  <div style={{ display: "flex", justifyContent: "center" }}>
+                    <MiniPreview key={entry.faceUrl ?? "face-empty"} url={entry.faceUrl} size={28} pixelated />
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "center" }}>
+                    <MiniPreview key={entry.headUrl ?? "head-empty"} url={entry.headUrl} size={36} />
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "center" }}>
+                    <MiniPreview key={entry.bodyUrl ?? "body-empty"} url={entry.bodyUrl} size={40} />
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                    {([
+                      { key: "sourceExists" as const,     label: "src" },
+                      { key: "faceRenderExists" as const, label: "2d" },
+                      { key: "headRenderExists" as const, label: "head" },
+                      { key: "bodyRenderExists" as const, label: "body" },
+                    ]).map(({ key, label }) => (
+                      <div key={label} style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                        <StatusDot exists={entry.status ? entry.status[key] : null} />
+                        <span className="sr-faint" style={{ fontSize: 10 }}>{label}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                    <button onClick={() => runRender(idx, "all", false)} disabled={busy} className="sr-btn sr-sm">
+                      {busy ? <Loader2 size={11} className="sr-spin" /> : <RefreshCw size={11} />}
                       Fill
                     </button>
-                  )}
-                  <button
-                    onClick={() => runGroup(gi, true)}
-                    disabled={anyWorking}
-                    className="sr-btn sr-sm sr-danger"
-                  >
-                    {anyWorking ? <Loader2 size={11} className="sr-spin" /> : <RefreshCw size={11} />}
-                    Re-render
-                  </button>
-                </div>
-
-                {/* NPC rows */}
-                {group.rows.map((row, ri) => (
-                  <div
-                    key={row.npc.name}
-                    className="sr-svc-row"
-                    style={{ display: "flex", alignItems: "center", gap: 10, paddingLeft: 28 }}
-                  >
-                    <MiniPreview npcName={row.npc.name} />
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontFamily: "var(--mono)", fontSize: 12, color: "var(--fg)" }}>{row.npc.name}</div>
-                      <div className="sr-faint" style={{ fontSize: 11 }}>dialogId: {row.npc.dialogId}</div>
-                    </div>
-                    {row.hasRender === null
-                      ? <Loader2 size={13} className="sr-spin sr-faint" />
-                      : row.hasRender
-                        ? <CheckCircle size={13} style={{ color: "var(--ok)", flexShrink: 0 }} />
-                        : <XCircle size={13} style={{ color: "var(--crit)", flexShrink: 0 }} />
-                    }
-                    <button
-                      onClick={() => runRender(gi, ri)}
-                      disabled={row.working}
-                      className="sr-btn sr-sm"
-                    >
-                      {row.working ? <Loader2 size={11} className="sr-spin" /> : <RefreshCw size={11} />}
-                      {row.hasRender === false ? "Generate" : "Re-render"}
+                    <button onClick={() => runRender(idx, "all", true)} disabled={busy} className="sr-btn sr-sm sr-danger">
+                      {busy ? <Loader2 size={11} className="sr-spin" /> : <RefreshCw size={11} />}
+                      Force
                     </button>
                   </div>
-                ))}
-              </div>
-            )
-          })
+                </div>
+              )
+            })}
+          </>
         )}
       </div>
     </>
