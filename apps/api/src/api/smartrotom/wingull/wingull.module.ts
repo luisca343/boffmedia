@@ -25,9 +25,10 @@ import { WingullPlayerRepository } from './repositories/wingull-player.repositor
 import { WingullWorldRepository } from './repositories/wingull-world.repository';
 import { WingullRepository } from './repositories/wingull.repository';
 import { WingullSQL2Service } from '@/_utils/WingullSQL2Service';
+import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 
 @Module({
-  imports: [LoggerModule, ResponseModule],
+  imports: [LoggerModule, ResponseModule, DrizzleModule],
   controllers: [WingullController],
   providers: [
     WingullEconomyService,

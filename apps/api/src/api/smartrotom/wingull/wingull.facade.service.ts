@@ -1,14 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { WingullEconomyService } from './services/wingull-economy.service';
 import { WingullPlayerService } from './services/wingull-player.service';
 import { WingullWorldService } from './services/wingull-world.service';
 import { WingullTransportService } from './services/wingull-transport.service';
-import { WingullRepository } from './repositories/wingull.repository';
+import { WingullRepository, RawPlot } from './repositories/wingull.repository';
 import { WingullBalanceDto } from './dto/wingull-balance.dto';
 import { UpdateBattleTeamDto } from './dto/battle-team.dto';
 import { TaxiStop } from './entities/taxi-stop.entity';
 import { PokemonW } from './entities/pokemon-w-.entity';
 import { PlayerStats } from './entities/player-stats.entity';
+import { PlotEntry } from './entities/plot.entity';
+import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
+import { MySql2Database } from 'drizzle-orm/mysql2';
+import { inArray } from 'drizzle-orm';
+import { smartrotomUsers } from '@/_db/schema/SmartRotom';
 import { Logger } from 'nestjs-pino';
 
 @Injectable()
@@ -21,6 +26,7 @@ export class WingullFacadeService {
     private readonly wingullWorldService: WingullWorldService,
     private readonly wingullTransportService: WingullTransportService,
     private readonly wingullRepository: WingullRepository,
+    @Inject(DRIZZLE) private readonly db: MySql2Database<Record<string, never>>,
   ) {}
 
   // ==================== ECONOMY OPERATIONS ====================
@@ -280,7 +286,40 @@ export class WingullFacadeService {
     return await this.wingullRepository.getPlayersOwnedRegions(uuid);
   }
 
-  async getAllPlots(): Promise<any[]> {
-    return await this.wingullRepository.getAllPlots();
+  async getAllRegions(): Promise<PlotEntry[]> {
+    const raw = await this.wingullRepository.getAllRegions();
+    return this.enrichWithOwners(raw);
+  }
+
+  async getPlots(): Promise<PlotEntry[]> {
+    const raw = await this.wingullRepository.getAllRegions();
+    return this.enrichWithOwners(raw.filter((p) => p.type === 'parcela'));
+  }
+
+  private async enrichWithOwners(plots: RawPlot[]): Promise<PlotEntry[]> {
+    const ownerUuids = [
+      ...new Set(plots.map((p) => p.ownerUuid).filter(Boolean)),
+    ] as string[];
+
+    const userMap: Record<string, string> = {};
+    if (ownerUuids.length) {
+      const rows = await this.db
+        .select({ uuid: smartrotomUsers.uuid, username: smartrotomUsers.username })
+        .from(smartrotomUsers)
+        .where(inArray(smartrotomUsers.uuid, ownerUuids));
+      rows.forEach((r) => (userMap[r.uuid] = r.username));
+    }
+
+    return plots.map((p) => ({
+      town: p.town,
+      type: p.type,
+      number: p.number,
+      owner:
+        p.ownerUuid && userMap[p.ownerUuid]
+          ? { uuid: p.ownerUuid, username: userMap[p.ownerUuid] }
+          : null,
+      centerX: p.centerX,
+      centerZ: p.centerZ,
+    }));
   }
 }

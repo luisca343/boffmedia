@@ -39,7 +39,7 @@ const mockFacade = {
   updateNPCs: jest.fn(),
   getWorldGuardWorlds: jest.fn(),
   getPlayersOwnedRegions: jest.fn(),
-  getAllPlots: jest.fn(),
+  getAllRegions: jest.fn(),
 };
 
 const mockWorldService = {
@@ -521,13 +521,13 @@ describe('WingullController — integration (ValidationPipe + GlobalExceptionFil
   // ── GET /wingull/plots ────────────────────────────────────────────────────
 
   describe('GET /wingull/plots', () => {
-    it('returns 200 and delegates to facade.getAllPlots', async () => {
-      mockFacade.getAllPlots.mockResolvedValue([]);
+    it('returns 200 and delegates to facade.getAllRegions', async () => {
+      mockFacade.getAllRegions.mockResolvedValue([]);
 
       const res = await request(app.getHttpServer()).get('/wingull/plots');
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getAllPlots).toHaveBeenCalledTimes(1);
+      expect(mockFacade.getAllRegions).toHaveBeenCalledTimes(1);
     });
   });
 

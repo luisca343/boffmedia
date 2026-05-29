@@ -1,3 +1,5 @@
+import { PlotEntry } from '../../entities/plot.entity';
+
 export interface IWingullRepository {
   getWorldGuardWorlds(): Promise<{ id: number; name: string }[]>;
   getPlayersOwnedRegions(uuid: string): Promise<
@@ -9,4 +11,5 @@ export interface IWingullRepository {
       uuid: string;
     }[]
   >;
+  getAllRegions(): Promise<PlotEntry[]>;
 }

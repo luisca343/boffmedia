@@ -26,6 +26,7 @@ import { GetBalanceDto } from './dto/get-balance.dto';
 import { MessageRequestDto } from './dto/message-request.dto';
 import { PokemonGiveRequestDto } from './dto/pokemon-give-request.dto';
 import { Logger } from 'nestjs-pino';
+import { PlotEntry } from './entities/plot.entity';
 
 @ApiTags('SmartRotom | Wingull')
 @Controller('wingull')
@@ -410,17 +411,35 @@ export class WingullController {
   }
 
   @Get('plots')
-  @ApiOperation({ summary: 'Fetch all plots' })
+  @ApiOperation({ summary: 'Fetch all plots (all region types)' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Plots fetched successfully.',
+    type: PlotEntry,
+    isArray: true,
   })
   @ApiResponse({
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: 'Failed to fetch plots.',
   })
-  async getAllPlots() {
-    return await this.wingullFacadeService.getAllPlots();
+  async getAllRegions() {
+    return await this.wingullFacadeService.getAllRegions();
+  }
+
+  @Get('parcelas')
+  @ApiOperation({ summary: 'Fetch all parcelas (residential plots only)' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Parcelas fetched successfully.',
+    type: PlotEntry,
+    isArray: true,
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Failed to fetch parcelas.',
+  })
+  async getPlots() {
+    return await this.wingullFacadeService.getPlots();
   }
 
   @Get('towns')

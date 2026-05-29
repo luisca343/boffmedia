@@ -5,6 +5,7 @@ import { WingullPlayerService } from './services/wingull-player.service';
 import { WingullWorldService } from './services/wingull-world.service';
 import { WingullTransportService } from './services/wingull-transport.service';
 import { WingullRepository } from './repositories/wingull.repository';
+import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { Logger } from 'nestjs-pino';
 
 describe('WingullFacadeService', () => {
@@ -44,7 +45,7 @@ describe('WingullFacadeService', () => {
   let wingullRepository: jest.Mocked<
     Pick<
       WingullRepository,
-      'getWorldGuardWorlds' | 'getPlayersOwnedRegions' | 'getAllPlots'
+      'getWorldGuardWorlds' | 'getPlayersOwnedRegions' | 'getAllRegions'
     >
   >;
   let logger: jest.Mocked<Pick<Logger, 'log' | 'warn' | 'error'>>;
@@ -86,7 +87,7 @@ describe('WingullFacadeService', () => {
     const mockWingullRepository = {
       getWorldGuardWorlds: jest.fn(),
       getPlayersOwnedRegions: jest.fn(),
-      getAllPlots: jest.fn(),
+      getAllRegions: jest.fn(),
     };
 
     const mockLogger = { log: jest.fn(), warn: jest.fn(), error: jest.fn() };
@@ -99,6 +100,7 @@ describe('WingullFacadeService', () => {
         { provide: WingullWorldService, useValue: mockWorldService },
         { provide: WingullTransportService, useValue: mockTransportService },
         { provide: WingullRepository, useValue: mockWingullRepository },
+        { provide: DRIZZLE, useValue: { select: jest.fn().mockReturnValue({ from: jest.fn().mockReturnValue({ where: jest.fn().mockResolvedValue([]) }) }) } },
         { provide: Logger, useValue: mockLogger },
       ],
     }).compile();
@@ -307,11 +309,11 @@ describe('WingullFacadeService', () => {
     });
   });
 
-  describe('getAllPlots', () => {
-    it('should return all plots', async () => {
-      wingullRepository.getAllPlots.mockResolvedValue([]);
+  describe('getAllRegions', () => {
+    it('should return all regions enriched with owner info', async () => {
+      wingullRepository.getAllRegions.mockResolvedValue([]);
 
-      const result = await service.getAllPlots();
+      const result = await service.getAllRegions();
 
       expect(result).toEqual([]);
     });

@@ -7,6 +7,21 @@ import {
     UpdateBattleTeamRequest
 } from '@/types/dto/battle-team.dto';
 
+// TODO: replace with import from '@boffmedia/shared' after running `pnpm generate:shared`
+export interface PlotOwner {
+    uuid: string;
+    username: string;
+}
+
+export interface PlotEntry {
+    town: string;
+    type: string;
+    number?: number;
+    owner: PlotOwner | null;
+    centerX?: number;
+    centerZ?: number;
+}
+
 
 
 export type ServerRegion = Region;
@@ -132,10 +147,17 @@ export class WingullService {
     }
     
     /**
-     * Fetch all plots
+     * Fetch all regions (all region types)
      */
-    static getAllPlots() {
-        return wingullGET<any>('/plots');
+    static getAllRegions() {
+        return wingullGET<PlotEntry[]>('/plots');
+    }
+
+    /**
+     * Fetch all plots (residential plots only)
+     */
+    static getPlots() {
+        return wingullGET<PlotEntry[]>('/parcelas');
     }
     
     /**

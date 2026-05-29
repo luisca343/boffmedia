@@ -2,6 +2,15 @@ import { WingullSQL2Service } from '@/_utils/WingullSQL2Service';
 import { Injectable } from '@nestjs/common';
 import { Logger } from 'nestjs-pino';
 
+export interface RawPlot {
+  town: string;
+  type: string;
+  number?: number;
+  ownerUuid?: string;
+  centerX?: number;
+  centerZ?: number;
+}
+
 @Injectable()
 export class WingullRepository {
   constructor(
@@ -75,19 +84,20 @@ export class WingullRepository {
     }
   }
 
-  async getAllPlots(): Promise<
-    { town: string; type: string; number: number; ownerUuid?: string }[]
-  > {
+  async getAllRegions(): Promise<RawPlot[]> {
     try {
       const query = `
-        SELECT r.id, u.uuid AS ownerUuid
+        SELECT r.id, u.uuid AS ownerUuid,
+               FLOOR((rc.min_x + rc.max_x) / 2) AS centerX,
+               FLOOR((rc.min_z + rc.max_z) / 2) AS centerZ
         FROM worldguard_region r
         LEFT JOIN worldguard_region_players rp ON r.id = rp.region_id
         LEFT JOIN worldguard_user u ON rp.user_id = u.id AND rp.owner = true
+        LEFT JOIN worldguard_region_cuboid rc ON rc.region_id = r.id
       `;
       const [rows] = await this.wingullSQL2Service.query(query);
 
-      return (rows as { id: string; ownerUuid?: string }[])
+      return (rows as { id: string; ownerUuid?: string; centerX?: number; centerZ?: number }[])
         .map((row) => {
           const regionParts = row.id.split('__');
           const town = regionParts[0]; // e.g., "pueblo_mizu"
@@ -101,16 +111,13 @@ export class WingullRepository {
               type,
               number: isNaN(number) ? undefined : number,
               ownerUuid: row.ownerUuid || undefined,
+              centerX: row.centerX != null ? Number(row.centerX) : undefined,
+              centerZ: row.centerZ != null ? Number(row.centerZ) : undefined,
             };
           }
           return null; // Explicitly return null for invalid entries
         })
-        .filter(Boolean) as {
-        town: string;
-        type: string;
-        number: number;
-        ownerUuid?: string | undefined;
-      }[];
+        .filter(Boolean) as RawPlot[];
     } catch (error: any) {
       this.logger.error('Error fetching all plots:', error);
       throw new Error('Failed to fetch all plots');
