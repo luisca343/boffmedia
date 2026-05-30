@@ -63,7 +63,7 @@ export function processDamageResult(result: Result, direction: string) {
 /**
  * Calculates minimum and maximum damage from a damage calculation result
  */
-export function getDamageMinMax(damage: number | number[] | [number[], number[]]) {
+export function getDamageMinMax(damage: number | number[] | number[][]) {
   let minDamage: number, maxDamage: number;
   
   if (Array.isArray(damage)) {
