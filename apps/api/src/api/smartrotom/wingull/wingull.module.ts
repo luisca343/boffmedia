@@ -26,6 +26,8 @@ import { WingullWorldRepository } from './repositories/wingull-world.repository'
 import { WingullRepository } from './repositories/wingull.repository';
 import { WingullSQL2Service } from '@/_utils/WingullSQL2Service';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
+import { PoliciaService } from './services/policia.service';
+import { PoliciaDenunciasRepository } from './repositories/policia-denuncias.repository';
 
 @Module({
   imports: [LoggerModule, ResponseModule, DrizzleModule],
@@ -56,6 +58,8 @@ import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
       useClass: WingullWorldRepository,
     },
     WingullRepository,
+    PoliciaService,
+    PoliciaDenunciasRepository,
   ],
   exports: [
     WingullFacadeService,
@@ -71,6 +75,8 @@ import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
     WINGULL_WORLD_REPOSITORY_TOKEN,
 
     WingullRepository,
+    PoliciaService,
+    PoliciaDenunciasRepository,
   ],
 })
 export class WingullModule {}

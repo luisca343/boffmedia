@@ -3,11 +3,13 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
   HttpStatus,
   UseInterceptors,
   Param,
+  Query,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiQuery } from '@nestjs/swagger';
 import { WingullFacadeService } from './wingull.facade.service';
 import { UuidDto } from '../_dto/smartrotom-request-dto';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
@@ -27,6 +29,8 @@ import { MessageRequestDto } from './dto/message-request.dto';
 import { PokemonGiveRequestDto } from './dto/pokemon-give-request.dto';
 import { Logger } from 'nestjs-pino';
 import { PlotEntry } from './entities/plot.entity';
+import { PoliciaService } from './services/policia.service';
+import { CreateDenunciaDto, DenunciaDto, DenunciaStatus, UpdateDenunciaStatusDto } from './dto/denuncia.dto';
 
 @ApiTags('SmartRotom | Wingull')
 @Controller('wingull')
@@ -37,6 +41,7 @@ export class WingullController {
 
     private readonly wingullFacadeService: WingullFacadeService,
     private readonly wingullWorldService: WingullWorldService,
+    private readonly policiaService: PoliciaService,
   ) {}
 
   // Town colors configuration
@@ -466,5 +471,42 @@ export class WingullController {
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Town not found.' })
   async getTownInfo(@Param('townName') townName: string) {
     return await this.wingullWorldService.getTownInfo(townName);
+  }
+
+  //=====================================================
+  // Policia endpoints
+  //=====================================================
+
+  @Post('policia/denuncias')
+  @ApiOperation({ summary: 'Submit a new denuncia (complaint/report)' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Denuncia created.', type: DenunciaDto })
+  @ApiBody({ type: CreateDenunciaDto })
+  async createDenuncia(@Body() dto: CreateDenunciaDto) {
+    return this.policiaService.createDenuncia(dto);
+  }
+
+  @Get('policia/denuncias')
+  @ApiOperation({ summary: 'List all denuncias with optional filters' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'List of denuncias.', type: DenunciaDto, isArray: true })
+  @ApiQuery({ name: 'town', required: false })
+  @ApiQuery({ name: 'status', required: false, enum: ['pending', 'reviewing', 'resolved'] })
+  @ApiQuery({ name: 'accusedUuid', required: false })
+  async getDenuncias(
+    @Query('town') town?: string,
+    @Query('status') status?: DenunciaStatus,
+    @Query('accusedUuid') accusedUuid?: string,
+  ) {
+    return this.policiaService.getDenuncias({ town, status, accusedUuid });
+  }
+
+  @Patch('policia/denuncias/:id/status')
+  @ApiOperation({ summary: 'Update status of a denuncia' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Denuncia updated.', type: DenunciaDto })
+  @ApiBody({ type: UpdateDenunciaStatusDto })
+  async updateDenunciaStatus(
+    @Param('id') id: string,
+    @Body() dto: UpdateDenunciaStatusDto,
+  ) {
+    return this.policiaService.updateDenunciaStatus(Number(id), dto);
   }
 }
