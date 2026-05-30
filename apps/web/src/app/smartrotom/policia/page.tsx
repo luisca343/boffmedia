@@ -52,6 +52,19 @@ export default function PoliciaApp() {
   const [multas, setMultas] = useState<any[]>([]);
   const [multasLoading, setMultasLoading] = useState(false);
 
+  // Oficiales state
+  const [oficiales, setOficiales] = useState<any[]>([]);
+  const [oficialesLoading, setOficialesLoading] = useState(false);
+
+  // Historial state
+  const [historial, setHistorial] = useState<any[]>([]);
+  const [historialLoading, setHistorialLoading] = useState(false);
+
+  // Zonas restringidas overlay
+  const [showZonas, setShowZonas] = useState(false);
+  const [zonas, setZonas] = useState<any[]>([]);
+  const [zonasLoading, setZonasLoading] = useState(false);
+
   const transformer = useMemo(
     () => new CoordinateTransformer(MAP_CONSTANTS.WORLD_BOUNDS),
     [],
@@ -111,6 +124,38 @@ export default function PoliciaApp() {
     }
   };
 
+  const fetchOficiales = async () => {
+    setOficialesLoading(true);
+    try {
+      const res = await WingullService.getPoliciaOficiales();
+      if (res.data) setOficiales(res.data);
+    } finally {
+      setOficialesLoading(false);
+    }
+  };
+
+  const fetchHistorial = async (plot: PlotEntry) => {
+    if (!plot.town || plot.number == null) return;
+    setHistorialLoading(true);
+    setHistorial([]);
+    try {
+      const res = await WingullService.getPoliciaPlotHistorial(plot.town, plot.number);
+      if (res.data) setHistorial(res.data);
+    } finally {
+      setHistorialLoading(false);
+    }
+  };
+
+  const fetchZonas = async () => {
+    setZonasLoading(true);
+    try {
+      const res = await WingullService.getPoliciaZonasRestringidas();
+      if (res.data) setZonas(res.data);
+    } finally {
+      setZonasLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchParcelas();
   }, []);
@@ -119,6 +164,15 @@ export default function PoliciaApp() {
     if (activeTab === 'denuncias' && denuncias.length === 0) fetchDenuncias();
     if (activeTab === 'buscados' && buscados.length === 0) fetchBuscados();
     if (activeTab === 'multas' && multas.length === 0) fetchMultas();
+    if (activeTab === 'oficiales') { fetchOficiales(); }
+    if (activeTab === 'historial' && selectedPlot) fetchHistorial(selectedPlot);
+  }, [activeTab]);
+
+  // Auto-refresh oficiales every 30s
+  useEffect(() => {
+    if (activeTab !== 'oficiales') return;
+    const interval = setInterval(fetchOficiales, 30000);
+    return () => clearInterval(interval);
   }, [activeTab]);
 
   const filtered = parcelas.filter((p) => {
@@ -351,12 +405,28 @@ export default function PoliciaApp() {
                       ({selectedPlot.centerX}, {selectedPlot.centerZ})
                     </span>
                   </div>
-                  <button
-                    onClick={() => setSelectedPlot(null)}
-                    className="text-surface-400 hover:text-surface-700 p-0.5 rounded"
-                  >
-                    <X className="h-3.5 w-3.5" />
-                  </button>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => {
+                        setShowZonas((v) => {
+                          if (!v && zonas.length === 0) fetchZonas();
+                          return !v;
+                        });
+                      }}
+                      className={`text-[10px] px-1.5 py-0.5 rounded border font-medium flex items-center gap-0.5 transition-colors ${
+                        showZonas ? 'bg-yellow-500 text-white border-yellow-600' : 'bg-white text-surface-600 border-surface-300 hover:bg-surface-100'
+                      }`}
+                    >
+                      <AlertTriangle className="h-2.5 w-2.5" />
+                      Zonas
+                    </button>
+                    <button
+                      onClick={() => setSelectedPlot(null)}
+                      className="text-surface-400 hover:text-surface-700 p-0.5 rounded"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
                 </div>
                 <div className="h-[240px]">
                   <StandardizedMap
@@ -375,6 +445,14 @@ export default function PoliciaApp() {
                     >
                       <MapPin className="h-5 w-5 text-red-500 drop-shadow" style={{ marginTop: '-20px' }} />
                     </BaseMarker>
+                    {showZonas && zonas.filter(z => z.centerX != null && z.centerZ != null).map((z, i) => (
+                      <BaseMarker key={i} worldPosition={{ x: z.centerX, z: z.centerZ }} transformer={transformer}>
+                        <div className="flex flex-col items-center" style={{ marginTop: '-24px' }}>
+                          <AlertTriangle className="h-4 w-4 text-yellow-500 drop-shadow" />
+                          <span className="text-[9px] font-bold bg-yellow-100 text-yellow-800 rounded px-0.5 border border-yellow-400 whitespace-nowrap">{z.zoneType ?? z.type}</span>
+                        </div>
+                      </BaseMarker>
+                    ))}
                   </StandardizedMap>
                 </div>
               </div>
@@ -592,21 +670,111 @@ export default function PoliciaApp() {
           </div>
         )}
 
-        {/* ======================== PLACEHOLDERS FOR T8 ======================== */}
-        {(activeTab === 'oficiales' || activeTab === 'historial') && (
-          <div className="flex-1 flex items-center justify-center p-8">
-            <div className="text-center">
-              {(() => {
-                const tab = TABS.find((t) => t.id === activeTab)!;
-                const Icon = tab.icon;
-                return (
-                  <>
-                    <Icon className="h-10 w-10 text-surface-300 mx-auto mb-3" />
-                    <p className="text-surface-500 font-medium">{tab.label}</p>
-                    <p className="text-surface-400 text-xs mt-1">Próximamente</p>
-                  </>
-                );
-              })()}
+        {/* ======================== OFICIALES TAB ======================== */}
+        {activeTab === 'oficiales' && (
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex items-center justify-between px-3 py-2 border-b border-surface-200 bg-surface-50 flex-shrink-0">
+              <span className="text-xs font-semibold text-surface-700">
+                {oficiales.length} oficial{oficiales.length !== 1 ? 'es' : ''}
+              </span>
+              <button
+                onClick={fetchOficiales}
+                disabled={oficialesLoading}
+                className="p-1 text-surface-400 hover:text-surface-700 disabled:opacity-50"
+              >
+                <RefreshCw className={`h-3.5 w-3.5 ${oficialesLoading ? 'animate-spin' : ''}`} />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-3">
+              {oficialesLoading && oficiales.length === 0 ? (
+                <div className="flex items-center justify-center py-10">
+                  <RefreshCw className="h-5 w-5 animate-spin text-surface-400" />
+                </div>
+              ) : oficiales.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-10 text-surface-400">
+                  <Users className="h-8 w-8 mb-2 opacity-40" />
+                  <p className="text-xs">No hay oficiales registrados</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {oficiales.map((oficial: any, i: number) => (
+                    <div key={oficial.uuid ?? i} className="bg-white border border-surface-200 rounded-lg p-3 flex flex-col gap-1 shadow-sm hover:shadow-md transition-shadow">
+                      <div className="flex items-center gap-1.5">
+                        <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                          <Users className="h-3 w-3 text-blue-600" />
+                        </div>
+                        <span className="text-xs font-semibold text-surface-800 truncate">{oficial.username}</span>
+                      </div>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 font-medium self-start">
+                        {oficial.role}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <p className="text-[10px] text-surface-300 text-center mt-3">Auto-actualiza cada 30s</p>
             </div>
           </div>
         )}
+
+        {/* ======================== HISTORIAL TAB ======================== */}
+        {activeTab === 'historial' && (
+          <div className="flex-1 flex flex-col overflow-hidden">
+            {!selectedPlot ? (
+              <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
+                <Clock className="h-10 w-10 text-surface-300 mx-auto mb-3" />
+                <p className="text-surface-500 font-medium text-sm">Sin parcela seleccionada</p>
+                <p className="text-surface-400 text-xs mt-1">Selecciona una parcela en la pestaña Parcelas para ver su historial</p>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center justify-between px-3 py-2 border-b border-surface-200 bg-surface-50 flex-shrink-0">
+                  <span className="text-xs font-semibold text-surface-700">
+                    Historial: {formatTownName(selectedPlot.town)} #{selectedPlot.number}
+                  </span>
+                  <button
+                    onClick={() => fetchHistorial(selectedPlot)}
+                    disabled={historialLoading}
+                    className="p-1 text-surface-400 hover:text-surface-700 disabled:opacity-50"
+                  >
+                    <RefreshCw className={`h-3.5 w-3.5 ${historialLoading ? 'animate-spin' : ''}`} />
+                  </button>
+                </div>
+                <div className="flex-1 overflow-y-auto p-3">
+                  {historialLoading ? (
+                    <div className="flex items-center justify-center py-10">
+                      <RefreshCw className="h-5 w-5 animate-spin text-surface-400" />
+                    </div>
+                  ) : historial.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-10 text-surface-400">
+                      <Clock className="h-8 w-8 mb-2 opacity-40" />
+                      <p className="text-xs">Sin historial de cambios</p>
+                    </div>
+                  ) : (
+                    <ol className="relative border-l border-surface-200 ml-2 space-y-4">
+                      {historial.map((entry: any, i: number) => (
+                        <li key={entry.id ?? i} className="ml-4">
+                          <span className="absolute -left-1.5 h-3 w-3 rounded-full border-2 border-white bg-blue-400 mt-1" />
+                          <div className="bg-white border border-surface-200 rounded-lg p-2.5 shadow-sm">
+                            <div className="flex flex-col gap-0.5 text-xs">
+                              <div className="flex items-center gap-1 text-surface-500">
+                                <Clock className="h-3 w-3" />
+                                <span>{entry.changedAt ? new Date(entry.changedAt).toLocaleString('es-ES') : '—'}</span>
+                              </div>
+                              <div className="flex items-center gap-1 mt-1">
+                                <span className="text-red-500 font-medium truncate">{entry.previousOwnerUsername ?? 'Sin dueño'}</span>
+                                <span className="text-surface-400">→</span>
+                                <span className="text-green-600 font-medium truncate">{entry.newOwnerUsername ?? 'Sin dueño'}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </li>
+                      ))}
+                    </ol>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
