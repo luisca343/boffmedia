@@ -97,7 +97,14 @@ export class WingullRepository {
       `;
       const [rows] = await this.wingullSQL2Service.query(query);
 
-      return (rows as { id: string; ownerUuid?: string; centerX?: number; centerZ?: number }[])
+      return (
+        rows as {
+          id: string;
+          ownerUuid?: string;
+          centerX?: number;
+          centerZ?: number;
+        }[]
+      )
         .map((row) => {
           const regionParts = row.id.split('__');
           const town = regionParts[0]; // e.g., "pueblo_mizu"

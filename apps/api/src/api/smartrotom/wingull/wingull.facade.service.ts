@@ -304,7 +304,10 @@ export class WingullFacadeService {
     const userMap: Record<string, string> = {};
     if (ownerUuids.length) {
       const rows = await this.db
-        .select({ uuid: smartrotomUsers.uuid, username: smartrotomUsers.username })
+        .select({
+          uuid: smartrotomUsers.uuid,
+          username: smartrotomUsers.username,
+        })
         .from(smartrotomUsers)
         .where(inArray(smartrotomUsers.uuid, ownerUuids));
       rows.forEach((r) => (userMap[r.uuid] = r.username));

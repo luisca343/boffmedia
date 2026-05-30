@@ -100,7 +100,16 @@ describe('WingullFacadeService', () => {
         { provide: WingullWorldService, useValue: mockWorldService },
         { provide: WingullTransportService, useValue: mockTransportService },
         { provide: WingullRepository, useValue: mockWingullRepository },
-        { provide: DRIZZLE, useValue: { select: jest.fn().mockReturnValue({ from: jest.fn().mockReturnValue({ where: jest.fn().mockResolvedValue([]) }) }) } },
+        {
+          provide: DRIZZLE,
+          useValue: {
+            select: jest.fn().mockReturnValue({
+              from: jest
+                .fn()
+                .mockReturnValue({ where: jest.fn().mockResolvedValue([]) }),
+            }),
+          },
+        },
         { provide: Logger, useValue: mockLogger },
       ],
     }).compile();

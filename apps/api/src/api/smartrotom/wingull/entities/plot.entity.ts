@@ -40,14 +40,16 @@ export class PlotEntry {
 
   @ApiProperty({
     example: -1240,
-    description: 'Center X coordinate of the plot (from worldguard_region_cuboid)',
+    description:
+      'Center X coordinate of the plot (from worldguard_region_cuboid)',
     required: false,
   })
   centerX?: number;
 
   @ApiProperty({
     example: 320,
-    description: 'Center Z coordinate of the plot (from worldguard_region_cuboid)',
+    description:
+      'Center Z coordinate of the plot (from worldguard_region_cuboid)',
     required: false,
   })
   centerZ?: number;
