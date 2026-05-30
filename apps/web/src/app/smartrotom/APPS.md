@@ -70,6 +70,9 @@ Breeding tool app inspired by "Tinder"-style swipe mechanics. Helps players find
 **Status:** Active  
 News and daily events feed, themed around Furret. Shows server news, event announcements, and daily content for players.
 
+**Planned sub-sections:**
+- **Eventos** — Structured event calendar living at `/smartrotom/furrettoday/eventos`. Separates the time-based event schedule (countdowns, registration, event-exclusive spawns) from the news feed, while keeping both under one app. FurretToday becomes a two-tab app: *Noticias* (feed) + *Eventos* (calendar). No separate home screen slot needed.
+
 ---
 
 ### Guías ⭐ New
@@ -276,13 +279,30 @@ Wallapop/marketplace-style trading app. Allows players to list Pokémon and item
 These are proposed standalone apps not yet scaffolded.
 
 ### Correo (Mail)
-Async in-game mail for sending items or messages between players. Different from ChatApp (real-time) — closer to in-game mail for gifting, formal messages, or admin communications. Would integrate with StarBank for star-attached letters and with Wigglypop for confirmed trades.
+**Status:** Planned  
+Async in-game mail for sending items or messages between players. Different from ChatApp (real-time) — closer to in-game mail for gifting, formal messages, or admin communications.
 
-### Eventos (Events)
-Dedicated event calendar separate from FurretToday. Shows scheduled server events with countdowns, event-exclusive Pokémon spawns, limited-time activities, and registration when applicable. FurretToday covers news; Eventos covers the calendar.
+**Planned features:**
+- Inbox / Sent / Drafts view
+- Attach stars (StarBank integration) to a letter
+- Attach a Wigglypop listing link to confirm a trade
+- Admin broadcast mail (server-wide announcements, one-to-many)
+- Read receipts and mail expiry (unclaimed items returned after X days)
 
 ### Equipo (Team Builder)
-Team composition tool with type coverage matrix, weakness analysis, and move compatibility checker. Allows building hypothetical teams from the Pokédex or from PC box Pokémon. Feeds into Liga (tournament prep) and Cinder (find the missing piece in your team).
+**Status:** Planned (standalone)  
+Team composition tool. PC already has a team slot builder for Pokémon you own — Equipo extends beyond that: build hypothetical teams with any Pokémon (owned or not), run scenarios for Liga/Torneos prep, and analyze coverage without being limited to your box.
+
+**Rationale for standalone over PC sub-route:** PC is box management (what you have). Equipo is theory-crafting (what you want to build). The workflows and audience overlap but the depth warrants its own space — and it can deep-link *from* PC ("analyze this team in Equipo") without being buried inside it.
+
+**Planned features:**
+- Pick any Pokémon from Pokédex (not just your box) and build a team of 6
+- Type coverage matrix: offensive coverage + defensive weaknesses at a glance
+- Move set selector with damage class breakdown
+- EV spread optimizer for a given role (tank, sweeper, support)
+- Export team to clipboard (Showdown format) — direct link to the Showdown embed
+- "Send to Equipo" button from PC team builder
+- Save and name multiple team drafts (Liga tournament prep)
 
 ---
 
