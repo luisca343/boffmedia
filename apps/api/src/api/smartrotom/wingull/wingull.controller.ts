@@ -31,6 +31,8 @@ import { Logger } from 'nestjs-pino';
 import { PlotEntry } from './entities/plot.entity';
 import { PoliciaService } from './services/policia.service';
 import { CreateDenunciaDto, DenunciaDto, DenunciaStatus, UpdateDenunciaStatusDto } from './dto/denuncia.dto';
+import { BuscadoDto, BuscadoSeverity, BuscadoStatus, CreateBuscadoDto, UpdateBuscadoStatusDto } from './dto/buscado.dto';
+import { CreateMultaDto, MultaDto, MultaStatus, UpdateMultaStatusDto } from './dto/multa.dto';
 
 @ApiTags('SmartRotom | Wingull')
 @Controller('wingull')
@@ -508,5 +510,75 @@ export class WingullController {
     @Body() dto: UpdateDenunciaStatusDto,
   ) {
     return this.policiaService.updateDenunciaStatus(Number(id), dto);
+  }
+
+  //=====================================================
+  // Buscados endpoints
+  //=====================================================
+
+  @Post('policia/buscados')
+  @ApiOperation({ summary: 'Add a player to the wanted list' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Buscado created.', type: BuscadoDto })
+  @ApiBody({ type: CreateBuscadoDto })
+  async createBuscado(@Body() dto: CreateBuscadoDto) {
+    return this.policiaService.createBuscado(dto);
+  }
+
+  @Get('policia/buscados')
+  @ApiOperation({ summary: 'List wanted players with optional filters' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'List of buscados.', type: BuscadoDto, isArray: true })
+  @ApiQuery({ name: 'status', required: false, enum: ['active', 'resolved'] })
+  @ApiQuery({ name: 'severity', required: false, enum: ['low', 'medium', 'high', 'critical'] })
+  async getBuscados(
+    @Query('status') status?: BuscadoStatus,
+    @Query('severity') severity?: BuscadoSeverity,
+  ) {
+    return this.policiaService.getBuscados({ status, severity });
+  }
+
+  @Patch('policia/buscados/:id/status')
+  @ApiOperation({ summary: 'Update status of a buscado' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Buscado updated.', type: BuscadoDto })
+  @ApiBody({ type: UpdateBuscadoStatusDto })
+  async updateBuscadoStatus(
+    @Param('id') id: string,
+    @Body() dto: UpdateBuscadoStatusDto,
+  ) {
+    return this.policiaService.updateBuscadoStatus(Number(id), dto);
+  }
+
+  //=====================================================
+  // Multas endpoints
+  //=====================================================
+
+  @Post('policia/multas')
+  @ApiOperation({ summary: 'Issue a new fine (multa)' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Multa created.', type: MultaDto })
+  @ApiBody({ type: CreateMultaDto })
+  async createMulta(@Body() dto: CreateMultaDto) {
+    return this.policiaService.createMulta(dto);
+  }
+
+  @Get('policia/multas')
+  @ApiOperation({ summary: 'List fines with optional filters' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'List of multas.', type: MultaDto, isArray: true })
+  @ApiQuery({ name: 'playerUuid', required: false })
+  @ApiQuery({ name: 'status', required: false, enum: ['pending', 'paid', 'cancelled'] })
+  async getMultas(
+    @Query('playerUuid') playerUuid?: string,
+    @Query('status') status?: MultaStatus,
+  ) {
+    return this.policiaService.getMultas({ playerUuid, status });
+  }
+
+  @Patch('policia/multas/:id/status')
+  @ApiOperation({ summary: 'Update status of a multa' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Multa updated.', type: MultaDto })
+  @ApiBody({ type: UpdateMultaStatusDto })
+  async updateMultaStatus(
+    @Param('id') id: string,
+    @Body() dto: UpdateMultaStatusDto,
+  ) {
+    return this.policiaService.updateMultaStatus(Number(id), dto);
   }
 }
