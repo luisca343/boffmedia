@@ -431,7 +431,10 @@ ${bookstackSection}
 
       const planId = `plan-${Date.now()}`
       const today = new Date().toISOString().slice(0, 10)
-      const chapterName = `${today} — ${goal}`
+      const prefix = `${today} — `
+      const maxGoalLen = 240 - prefix.length
+      const truncatedGoal = goal.length > maxGoalLen ? goal.slice(0, maxGoalLen - 1) + '…' : goal
+      const chapterName = `${prefix}${truncatedGoal}`
       const bookId = AGENT_TASK_BOOK_IDS[project]
 
       const chapter = await createBookStackChapter({
