@@ -777,4 +777,7 @@ export default function PoliciaApp() {
             )}
           </div>
         )}
-
+      </div>
+    </div>
+  );
+}
