@@ -408,15 +408,144 @@ The apps form a connected ecosystem. These are the intentional deep-links and da
 | **Liga/Gimnasios** | **Pasaporte** | Same badge data source — both show the badge wall |
 | **Liga/Torneos** | **Equipo** | "Prep for this tournament" CTA opens Equipo with current team |
 
-### Notification layer
-Multiple apps need push notifications. Rather than duplicating plumbing, Rooker's backend will provide a **shared notification service** consumed by all apps:
+---
 
-| App | Notification triggers |
-|-----|----------------------|
-| Wigglypop | Listing sold, offer received, deal confirmed |
-| Correo | New mail received |
-| Karts | Race starting in 15 min |
-| FurretToday/Eventos | Event starting soon (player set reminder) |
-| Misiones | New mission available, daily reset |
-| Rooker | Like, reply, new follower, mention |
-| Equipo | (future) Teammate online |
+## Notification System
+
+### Architecture
+
+Notifications are a **standalone NestJS module** (`NotificationsModule`) — not owned by Rooker. Rooker reads and displays notifications alongside its social feed; other apps (Wigglypop, Correo, Karts) inject `NotificationsService` without depending on Rooker being built first.
+
+```
+NestJS NotificationsModule
+  ├── NotificationsService       ← all apps inject this to create notifications
+  ├── NotificationsGateway       ← Socket.io gateway, emits notification:new to player:{uuid} rooms
+  └── NotificationsController    ← REST: GET /notifications, PATCH /notifications/:id/read, etc.
+```
+
+### Data model
+
+```
+notifications
+  id              uuid
+  recipientUuid   string
+  type            enum (see types below)
+  title           string
+  body            string
+  deepLinkUrl     string        ← e.g. /smartrotom/wigglypop/listing/123
+  relatedEntity   { type, id }  ← optional, for rendering context
+  isRead          boolean
+  createdAt       datetime
+  expiresAt       datetime?     ← auto-expire event reminders after the event passes
+```
+
+### Notification types and triggers
+
+| Type | Trigger | MCEF in-game? |
+|------|---------|---------------|
+| `wigglypop.sold` | Buyer confirms receipt | No |
+| `wigglypop.offer` | Someone makes an offer on your listing | No |
+| `wigglypop.deal_closed` | Both parties confirm | No |
+| `correo.received` | New mail in inbox | Yes — brief chat message |
+| `karts.race_starting` | X minutes before scheduled race | Yes — countdown in chat |
+| `karts.results` | Race results available | No |
+| `eventos.reminder` | Player set a reminder on an event | Yes — event name + time in chat |
+| `misiones.new` | New mission unlocked or daily reset | No |
+| `misiones.expiring` | Active mission expiring in < 24h | No |
+| `liga.match_scheduled` | Torneos match time assigned | No |
+| `liga.match_result` | Opponent posted result | No |
+| `rooker.like` | Someone liked your post | No |
+| `rooker.reply` | Reply on your post | No |
+| `rooker.follow` | New follower | No |
+| `rooker.mention` | @mention in a post | Yes — username + preview |
+| `starbank.received` | Incoming transfer | No |
+| `starbank.low_balance` | Balance drops below user-set threshold | No |
+| `admin.broadcast` | Staff sends a server-wide or targeted announcement | Yes |
+
+### Real-time delivery (Socket.io)
+
+- On SmartRotom mount: client joins `player:{uuid}` Socket.io room
+- NestJS emits `notification:new` to the room whenever a notification is created
+- Client updates notification bell badge count instantly — no polling
+- `AppGrid` receives a `{ appId: unreadCount }` map via `useNotifications()` hook and renders per-icon badge numbers (matching real smartphone UX)
+
+### MCEF in-game delivery
+
+A secondary channel for time-critical events only. `NotificationsService` calls `sendChatMessage` via the MCEF relay endpoint for the notification types marked above. The in-game message is formatted as:
+
+```
+[SmartRotom] {icon} {short message}  →  /smartrotom/{deepLinkPath}
+```
+
+### Notification preferences
+
+Players can configure per-category in a SmartRotom Settings screen:
+- Enable/disable in-app notification per type group
+- Enable/disable MCEF in-game delivery per type group
+- Rooker social notifications can be individually toggled (opt-out of follows but keep mentions, etc.)
+
+Settings stored in a `notification_preferences` table keyed by player UUID.
+
+### App icon badges
+
+`AppGrid` (home screen) shows a badge number on each app icon when there are unread notifications for that app. Mapping:
+
+| App | Badge driven by |
+|-----|----------------|
+| Wigglypop | `wigglypop.*` unread count |
+| Correo | `correo.received` unread count |
+| Karts | `karts.race_starting` + `karts.results` |
+| Rooker | `rooker.*` unread count |
+| FurretToday | `eventos.reminder` + new content |
+| Misiones | `misiones.new` + `misiones.expiring` |
+| Liga | `liga.match_*` unread count |
+| StarBank | `starbank.received` + `starbank.low_balance` |
+
+---
+
+## Ecosystem & General Flow Improvements
+
+### SmartRotom home screen as a dashboard
+
+The current home screen shows app icons + clock. With the notification layer and live data in place, the home screen could surface contextual widgets above the app grid — analogous to a real phone's lock screen:
+
+- **Active Misiones** count badge — "3 active missions"
+- **Karts** — "Race in 12 minutes: Circuito Wingull" with a join CTA
+- **Wigglypop** — "2 offers on your listings"
+- **Correo** — "1 new message from Admin"
+- **FurretToday** — today's event title if one is running
+
+Widgets are opt-in and configurable. They don't replace app icons; they sit above the grid as a collapsible panel.
+
+### Global search
+
+A single search entry point (magnifier icon on home screen) queries across all apps simultaneously:
+
+| Source | Result type |
+|--------|-------------|
+| Pokédex | Pokémon entries |
+| Wigglypop | Active listings |
+| Guías | Guide articles |
+| Rooker | Posts and player profiles |
+| Misiones | Mission names |
+
+Results are grouped by source and tap directly into the relevant app with the search term pre-applied.
+
+### Cross-app back navigation
+
+When deep-linking between apps (PC → Equipo, Pokédex → Guías), a contextual "← back to {origin}" bar appears inside the destination app. AppWrapper tracks the navigation stack so players don't lose their place.
+
+### Onboarding flow
+
+New players receive a guided tour on first login:
+1. **Welcome** — what SmartRotom is
+2. **Pokédex** — find your starter's entry
+3. **PC** — see your box
+4. **Pasaporte** — your trainer card
+5. **Misiones** — your first mission
+
+The tour is a special featured article in Guías (`/guias/bienvenida`) and can be replayed. Completion marks the `onboardingDone` flag on the player record.
+
+### App store (Admin-managed)
+
+Admins can enable/disable individual apps per player group (VIP, staff, all players) without a redeploy. The existing `rotom_apps` + `rotom_user_apps` system already supports this. The Admin app's "Apps" section should expose a full matrix: app × player group = enabled/disabled, with bulk assign.
