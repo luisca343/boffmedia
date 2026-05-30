@@ -39,7 +39,12 @@ Mini-game hub. Contains multiple standalone games: Squirdle, Voltorb Flip, Typed
 In-game screenshot camera integration. Allows players to take and view photos from within Minecraft using the MCEF bridge. Supports screenshot capture with/without UI, gallery view, and a screenshot preview dialog.
 
 **Planned sub-sections:**
-- **Álbum** — Collection album: shiny checklist, event Pokémon showcase, rarity display. Completion-driven feature for collectors. Lives at `/smartrotom/camara/album` (not a standalone app).
+- **Álbum** — Pokémon collection album living at `/smartrotom/camara/album`. Shows the full server-available Pokédex as a collection grid. Each entry has three states: unseen / seen / caught / shiny caught. Completion-driven feature for collectors.
+  - Filter by type, generation, biome, egg group
+  - Progress bars: overall %, per-type %, recently added entries
+  - Shiny showcase: highlight your rarest catches
+  - Share card: "I completed my Bug-type album!" → one-tap share to Rooker
+  - Data sourced from the same Pokédex registry already tracked in `/smartrotom/pokedex/registro`
 
 ---
 
@@ -55,13 +60,23 @@ Real-time in-game chat application. Enables player-to-player and group messaging
 **Status:** Scaffold (in development)  
 Breeding tool app inspired by "Tinder"-style swipe mechanics. Helps players find compatible Pokémon for breeding by matching IVs, natures, egg groups, and other criteria.
 
+**UX flow:**
+1. Choose your target — what Pokémon + stat spread do you want to produce
+2. App scans your PC box and scores every Pokémon by breeding relevance
+3. Top candidates presented for selection — swipe/pick a breeding pair
+4. Result preview: expected IV spread, probability of hitting target, generations needed
+5. Held item recommendations: Destiny Knot (pass 5 IVs), Everstone (pass nature), Power items (pin specific IV)
+6. One-tap chain planner: if 3+ generations are needed, shows the full chain step-by-step
+
 **Planned features:**
-- Pull Pokémon directly from the player's PC box (PC integration)
-- Compatibility score based on egg groups, nature, IVs
-- Swipe-to-match interface between two Pokémon
-- Breeding chain calculator (multiple generations for hidden ability or specific nature)
-- EV training suggestion based on desired competitive build
-- Cross-link with Pokédex egg group entries
+- Pull Pokémon directly from the player's PC box via PC integration
+- Egg group compatibility check (using `@pkmn` libraries)
+- Hidden ability inheritance rules (female or Ditto required)
+- Masuda method indicator when a foreign-language Ditto is detected
+- Breeding chain calculator with generation-by-generation breakdown
+- Cross-link to Pokédex egg group entries ("Other Pokémon in this egg group")
+- Cross-link to Wigglypop ("Ditto not in your PC? Find one on the market")
+- EV training suggestion for the target build once breeding is done
 
 ---
 
@@ -71,7 +86,12 @@ Breeding tool app inspired by "Tinder"-style swipe mechanics. Helps players find
 News and daily events feed, themed around Furret. Shows server news, event announcements, and daily content for players.
 
 **Planned sub-sections:**
-- **Eventos** — Structured event calendar living at `/smartrotom/furrettoday/eventos`. Separates the time-based event schedule (countdowns, registration, event-exclusive spawns) from the news feed, while keeping both under one app. FurretToday becomes a two-tab app: *Noticias* (feed) + *Eventos* (calendar). No separate home screen slot needed.
+- **Eventos** — Structured event calendar at `/smartrotom/furrettoday/eventos`. FurretToday becomes a two-tab app: *Noticias* (news feed) + *Eventos* (calendar). No separate home screen slot needed for events.
+  - Calendar view + list view, filterable by type: Competitive, Shiny Hunt, Social, Seasonal
+  - Countdown timer per event
+  - "Recordatorio" reminder feature: sends a notification (via Rooker notification layer) before the event starts
+  - Integration with Misiones: event-exclusive missions surface with an event badge during active events
+  - Integration with Karts: upcoming races appear in the Eventos calendar
 
 ---
 
@@ -81,13 +101,19 @@ News and daily events feed, themed around Furret. Shows server news, event annou
 Tutorial and guide library for players. Hosts written guides, tips, and how-to articles covering server mechanics, Pixelmon gameplay, and SmartRotom features.
 
 **Planned sub-sections:**
-- **Crafting** — Pixelmon-specific crafting recipes: Apricorn Pokéballs, fossil restoration machines, held items, evolution stones. Lives at `/smartrotom/guias/crafting` (not a standalone app).
+- **Crafting** — Pixelmon-specific crafting recipes: Apricorn Pokéballs, fossil restoration machines, held items, evolution stones. Searchable by output item or by ingredient. Lives at `/smartrotom/guias/crafting`.
 
 **Planned features:**
-- Category browser: Breeding, Combat, Items, Locations, Crafting, Server Rules
-- Staff-curated content with Markdown + image support
-- Full-text search
-- Deep-links from Pokédex entries ("Guía para capturar este Pokémon")
+- Category browser: Breeding, Combat, Items, Locations, Crafting, Server Rules, SmartRotom How-To
+- Staff-curated content authored in Markdown with image support (rich content stored backend-side)
+- Full-text search across all guides
+- Difficulty tags: Beginner / Intermediate / Advanced
+- Deep-links into guide context from other apps:
+  - Pokédex entry → "Guide: how to catch this Pokémon"
+  - Wigglypop item listing → "Guide: how to craft this item"
+  - Cinder pair result → "Guide: breeding chain for this species"
+- Crafting sub-section cross-links: rare ingredients with Wigglypop price indicator ("this item costs ~X stars on the market")
+- "Suggested for you" based on player progression (new player sees basics first)
 
 ---
 
@@ -96,12 +122,16 @@ Tutorial and guide library for players. Hosts written guides, tips, and how-to a
 **Status:** Scaffold (in development)  
 Racing companion app. Displays available kart races, circuits, personal best times, leaderboards, and upcoming race events on the server.
 
+**Data flow:** Lap times and race results are submitted by the server plugin after each race finishes. The app is read-only for players; staff manages circuits and events.
+
 **Planned features:**
-- Circuit catalog with map previews
-- Personal best times and global leaderboard per circuit
-- Event calendar with countdowns and sign-up
-- Season standings (points, wins, podium history)
-- Post-race results and replay links
+- Circuit catalog: name, biome/theme, length, difficulty rating, preview image
+- Global leaderboard per circuit + personal best with delta vs. your previous record
+- Season standings: points, wins, podium count, star reward for top finishers
+- Live race indicator: when a race is in progress, show a live view with current lap/position (via Socket.io)
+- Event calendar (surfaces in FurretToday/Eventos): upcoming races with countdown and how-to-join instructions (in-game command)
+- Race history: personal results per circuit with a podium summary
+- Post-race results view: full finishing order, fastest lap, time gaps
 
 ---
 
@@ -111,14 +141,26 @@ Racing companion app. Displays available kart races, circuits, personal best tim
 Pokémon League tracker. Shows trainer ranking and competitive status, collected gym badges, battle replays (via Camara Lucha sub-route), and progress through the server's official league structure.
 
 **Planned sub-sections:**
-- **Torneos** — Tournament bracket viewer: active brackets, results, standings, sign-up. Lives at `/smartrotom/liga/torneos` (not a standalone app).
-- **Raids** — Raid boss tracker: active raids, difficulty tiers, rewards, how to join. Lives at `/smartrotom/liga/raids` (if implemented; not a standalone app).
-- **Gimnasios** — Gym map: leaders, their Pokémon teams, badge requirements, and personal badge progress. Complements the existing Pasaporte badge wall.
+- **Torneos** (`/smartrotom/liga/torneos`) — Tournament bracket viewer.
+  - Bracket types: single elimination, double elimination, Swiss, round-robin
+  - Active bracket visualization with results filled in as matches complete
+  - Player sign-up flow: tournament opens → register in app → bracket generated
+  - Staff controls bracket generation and result entry (from Admin app)
+  - Season history with champion records
+- **Raids** (`/smartrotom/liga/raids`) — Raid boss tracker. *(if implemented)*
+  - Active raid bosses: name, level tier, difficulty stars, rewards
+  - Player count needed + current sign-ups
+  - Join code or in-game location
+  - Countdown to raid expiry
+- **Gimnasios** (`/smartrotom/liga/gimnasios`) — Gym leader directory.
+  - Each gym: leader profile, type specialization, current team (staff-updated), badge image
+  - Personal badge progress per player (same data source as Pasaporte badge wall)
+  - "Challenger" status: whether you've beaten this gym or have an open challenge
 
 **Planned improvements:**
-- ELO/rating graph over time
-- Battle replay list with player/Pokémon tagging (linked from Camara Lucha)
-- Full badge wall display independent of Pasaporte
+- ELO/rating graph over time (line chart per season)
+- Battle replay list with player and Pokémon tagging (linked from Camara Lucha records)
+- Full badge wall independent of Pasaporte — both share the same data
 
 ---
 
@@ -214,13 +256,22 @@ Full Pokédex browser. Features quick search, localization by biome, move lists,
 **Status:** Scaffold (in development)  
 Twitter/X-inspired social network for server players. Will allow posting short updates, following other trainers, liking and commenting on posts, and building a community feed.
 
+**Technical note:** Rooker is also the natural home for the **shared notification layer** — multiple apps need push notifications (Wigglypop sold, Correo received, Karts race starting, FurretToday event reminder). Building this infra as part of Rooker's backend means other apps can tap into it without duplicating notification plumbing. Rogues uses Socket.io already present in the stack.
+
 **Planned features:**
-- Profile page tied to Pasaporte data (trainer card header)
-- Hashtag/topic system: `#breeding`, `#trades`, `#shiny`, `#eventos`
-- Staff-pinned announcements (complement or replace FurretToday feed)
-- Follow system — trainer posts surface in your feed first
+- Feed: follows-based chronological, with staff-pinned posts anchored at top
+- Post composer with attachments:
+  - Screenshot from Cámara gallery
+  - Wigglypop listing link ("WTS Shiny Charizard — see listing")
+  - Trainer card preview (from Pasaporte data)
+  - Liga rank badge
+- Profile page: trainer card header pulled from Pasaporte, post history, follower/following count
+- Hashtag/topic system: `#breeding`, `#trades`, `#shiny`, `#eventos`, `#liga`
 - Like, reply, repost
-- Wigglypop deep-link: attach a trade listing to a post
+- Follow system — mutual follow unlocks DM (or routes to ChatApp conversation)
+- Staff-verified badge for gym leaders / server staff
+- Notification inbox: likes, replies, new followers, mentions
+- Report system for moderation (staff acts from Admin app)
 
 ---
 
@@ -237,10 +288,12 @@ Embeds the server's Pokémon Showdown instance using `WebExterna`. Allows player
 In-game economy and banking app. Manages the server's star currency — balance, transactions, and transfers.
 
 **Planned improvements:**
-- Full transaction history with filters (sent/received, date range)
-- P2P transfer flow with confirmation step
-- Savings vault / interest mechanic (deposit stars for a time-locked bonus)
-- Economy stats: global circulation, top spenders, recent market activity
+- Full transaction history with filters (sent/received, date range, counterparty)
+- P2P transfer flow: recipient selector → amount → note (optional) → confirmation step with summary
+- Escrow display: stars locked in active Wigglypop deals shown separately from free balance
+- Savings vault: deposit stars for a time-locked period and earn a star bonus on return (server-controlled interest rate)
+- Economy dashboard (public stats): total stars in circulation, top transactions of the day, market activity summary
+- Low-balance notification via Rooker notification layer
 
 ---
 
@@ -263,14 +316,20 @@ In-game weather and time display. Shows current server time, weather conditions,
 **Status:** Scaffold (in development)  
 Wallapop/marketplace-style trading app. Allows players to list Pokémon and items for trade or sale, browse other players' listings, and complete peer-to-peer exchanges within the server economy.
 
+**Exchange model:** The app handles the agreement and payment. The physical Pokémon/item handoff happens in-game (players meet and use `/trade` or the server plugin facilitates it). StarBank stars are locked in escrow when a deal is struck and released to the seller after the buyer confirms receipt.
+
 **Planned features:**
-- Category filters: Pokémon, held items, TMs, evolution items, berries
-- Price history and market trend indicators per item type
-- Wishlist — get notified when a desired Pokémon/item is listed
-- Direct trade request vs. public listing
-- StarBank integration for in-app transactions
-- Listing reports / safety moderation system
-- Rooker deep-link: attach a Wigglypop listing to a social post
+- Listing categories: Pokémon, held items, TMs/HMs, evolution items, berries, rare candy, Apricorn Pokéballs, decorations
+- Listing creation: pull Pokémon from PC box directly (IV/nature pre-filled) or pick an item from catalog
+- Pricing: fixed price or "make an offer" mode
+- Price history chart per item type + market trend indicator (rising/stable/falling)
+- Wishlist: notify when a matching listing appears (via Rooker notification layer)
+- Direct offer to a specific player vs. public listing
+- Escrow: stars locked on both sides until trade is confirmed in-app post in-game handoff
+- Transaction history with status tracking (pending / completed / cancelled / disputed)
+- Listing reports → Admin moderation queue (Admin app)
+- Rooker deep-link: attach a live listing to a social post
+- Cinder cross-link: "Need this Pokémon for a breeding chain? Check Wigglypop"
 
 ---
 
@@ -297,12 +356,15 @@ Team composition tool. PC already has a team slot builder for Pokémon you own �
 
 **Planned features:**
 - Pick any Pokémon from Pokédex (not just your box) and build a team of 6
-- Type coverage matrix: offensive coverage + defensive weaknesses at a glance
-- Move set selector with damage class breakdown
-- EV spread optimizer for a given role (tank, sweeper, support)
-- Export team to clipboard (Showdown format) — direct link to the Showdown embed
-- "Send to Equipo" button from PC team builder
-- Save and name multiple team drafts (Liga tournament prep)
+- Type coverage matrix: 18-type grid showing offensive coverage and defensive weaknesses for the full team
+- Move set selector with damage class breakdown (physical/special/status)
+- Nature + EV spread optimizer for a given role: tank, sweeper, wall, support, lead
+- Held item slot with stat preview (Leftovers regen, Choice Band multiplier, etc.)
+- Export team to clipboard in Showdown format — direct deep-link to the Showdown embed app
+- "Send to Equipo" CTA from PC team builder (pre-fills the team)
+- "Bring to PC" indicator: highlights Pokémon in your team plan that you don't own yet → links to Wigglypop search
+- Save and name multiple team drafts (e.g. "Torneos Abril", "Rain team")
+- Weakness summary: shows which types your team is weak to more than once
 
 ---
 
@@ -315,3 +377,46 @@ Team composition tool. PC already has a team slot builder for Pokémon you own �
 - Apps use the SmartRotom design system (`components/smartrotom/ui/`) — **do not use Boffmedia's shadcn/Radix primitives**.
 - MCEF functions (for Minecraft bridge) are imported from `services/mcef/mcefApi.ts`.
 - App registration is database-driven via the `rotom_apps` table — new apps must be seeded before they appear on the home screen.
+
+---
+
+## Cross-App Connections
+
+The apps form a connected ecosystem. These are the intentional deep-links and data flows between apps:
+
+| From | To | Connection |
+|------|-----|------------|
+| **PC** | **Equipo** | "Analyze this team" CTA pre-fills Equipo with your current team |
+| **PC** | **Cinder** | Breeding candidates pulled from PC box |
+| **Pokédex** | **Equipo** | Pick any Pokémon (not just owned) to fill team slots |
+| **Pokédex** | **Cinder** | Egg group cross-reference on species detail |
+| **Pokédex** | **Guías** | "Guide: how to catch this Pokémon" deep-link from species entry |
+| **Equipo** | **Showdown** | Export team in Showdown format → direct link to Showdown embed |
+| **Equipo** | **Wigglypop** | "You don't own this Pokémon" → search Wigglypop for it |
+| **Cinder** | **Wigglypop** | "Don't have a compatible Ditto?" → search Wigglypop |
+| **Wigglypop** | **StarBank** | Stars locked in escrow during active deals |
+| **Wigglypop** | **Rooker** | Attach an active listing to a post |
+| **Guías/Crafting** | **Wigglypop** | Rare ingredients show live market price |
+| **Rooker** | **Pasaporte** | Trainer card header on profile page |
+| **Rooker** | **Cámara** | Attach a screenshot from gallery to a post |
+| **Rooker** | **Liga** | Share rank badge or match result |
+| **Cámara/Álbum** | **Rooker** | "Share my completion" one-tap to Rooker |
+| **FurretToday/Eventos** | **Misiones** | Event-exclusive missions surface with event badge |
+| **FurretToday/Eventos** | **Karts** | Upcoming races appear in the event calendar |
+| **Correo** | **StarBank** | Stars attached to a letter locked until claimed |
+| **Correo** | **Wigglypop** | Trade confirmation letter auto-generated when deal closes |
+| **Liga/Gimnasios** | **Pasaporte** | Same badge data source — both show the badge wall |
+| **Liga/Torneos** | **Equipo** | "Prep for this tournament" CTA opens Equipo with current team |
+
+### Notification layer
+Multiple apps need push notifications. Rather than duplicating plumbing, Rooker's backend will provide a **shared notification service** consumed by all apps:
+
+| App | Notification triggers |
+|-----|----------------------|
+| Wigglypop | Listing sold, offer received, deal confirmed |
+| Correo | New mail received |
+| Karts | Race starting in 15 min |
+| FurretToday/Eventos | Event starting soon (player set reminder) |
+| Misiones | New mission available, daily reset |
+| Rooker | Like, reply, new follower, mention |
+| Equipo | (future) Teammate online |
