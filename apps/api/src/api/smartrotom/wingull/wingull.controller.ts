@@ -33,6 +33,9 @@ import { PoliciaService } from './services/policia.service';
 import { CreateDenunciaDto, DenunciaDto, DenunciaStatus, UpdateDenunciaStatusDto } from './dto/denuncia.dto';
 import { BuscadoDto, BuscadoSeverity, BuscadoStatus, CreateBuscadoDto, UpdateBuscadoStatusDto } from './dto/buscado.dto';
 import { CreateMultaDto, MultaDto, MultaStatus, UpdateMultaStatusDto } from './dto/multa.dto';
+import { OficialDto } from './dto/oficial.dto';
+import { PlotHistoryEntryDto } from './dto/plot-history.dto';
+import { ZonaRestringidaDto } from './dto/zona-restringida.dto';
 
 @ApiTags('SmartRotom | Wingull')
 @Controller('wingull')
@@ -580,5 +583,29 @@ export class WingullController {
     @Body() dto: UpdateMultaStatusDto,
   ) {
     return this.policiaService.updateMultaStatus(Number(id), dto);
+  }
+
+  @Get('policia/oficiales')
+  @ApiOperation({ summary: 'List staff/admin officers' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'List of oficiales.', type: OficialDto, isArray: true })
+  async getOficiales() {
+    return this.policiaService.getOficiales();
+  }
+
+  @Get('policia/historial/:town/:number')
+  @ApiOperation({ summary: 'Get plot ownership history' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Plot history.', type: PlotHistoryEntryDto, isArray: true })
+  async getPlotHistory(
+    @Param('town') town: string,
+    @Param('number') number: string,
+  ) {
+    return this.policiaService.getPlotHistory(town, Number(number));
+  }
+
+  @Get('policia/zonas-restringidas')
+  @ApiOperation({ summary: 'Get restricted/special zones (non-parcela WorldGuard regions)' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'List of restricted zones.', type: ZonaRestringidaDto, isArray: true })
+  async getZonasRestringidas() {
+    return this.policiaService.getZonasRestringidas();
   }
 }

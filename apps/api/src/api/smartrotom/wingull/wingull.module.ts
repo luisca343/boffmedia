@@ -30,6 +30,7 @@ import { PoliciaService } from './services/policia.service';
 import { PoliciaDenunciasRepository } from './repositories/policia-denuncias.repository';
 import { PoliciaBuscadosRepository } from './repositories/policia-buscados.repository';
 import { PoliciaMultasRepository } from './repositories/policia-multas.repository';
+import { PoliciaPlotHistoryRepository } from './repositories/policia-plot-history.repository';
 
 @Module({
   imports: [LoggerModule, ResponseModule, DrizzleModule],
@@ -64,6 +65,7 @@ import { PoliciaMultasRepository } from './repositories/policia-multas.repositor
     PoliciaDenunciasRepository,
     PoliciaBuscadosRepository,
     PoliciaMultasRepository,
+    PoliciaPlotHistoryRepository,
   ],
   exports: [
     WingullFacadeService,
@@ -83,6 +85,7 @@ import { PoliciaMultasRepository } from './repositories/policia-multas.repositor
     PoliciaDenunciasRepository,
     PoliciaBuscadosRepository,
     PoliciaMultasRepository,
+    PoliciaPlotHistoryRepository,
   ],
 })
 export class WingullModule {}
