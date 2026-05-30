@@ -261,6 +261,10 @@ export async function wingullPOST<T>(url: string, data: any): Promise<ApiRespons
   return apiPOST<T>(`/wingull${url}`, data);
 }
 
+export async function wingullPATCH<T>(url: string, data: any): Promise<ApiResponse<T>> {
+  return apiPATCH<T>(`/wingull${url}`, data);
+}
+
 export async function boffGET<T>(url: string): Promise<ApiResponse<T>> {
   return apiGET<T>(url);
 }
