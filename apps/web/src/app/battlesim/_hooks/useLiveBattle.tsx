@@ -10,6 +10,9 @@ import { env } from '@/config/env.public';
 import { Scene } from '../_utils/Scene';
 import { useBattleFlow } from './useBattleFlow';
 
+// Module-level socket — survives React strict mode mount/unmount/mount
+let globalSocket: Socket | null = null;
+
 export type LiveBattleStatus = 'idle' | 'connecting' | 'active' | 'finished' | 'error';
 
 export interface LiveBattleState {
@@ -27,7 +30,8 @@ export interface LiveBattleState {
 }
 
 export function useLiveBattle() {
-  const socketRef = useRef<Socket | null>(null);
+  const socketRef = useRef<Socket | null>(globalSocket);
+  const eventsRegisteredRef = useRef(false);
   const battleRef = useRef<Battle>(new Battle(new Generations(Dex as any) as any));
   const [battle, setBattle] = useState(battleRef.current);
   const [scene, setScene] = useState<Scene | null>(null);
@@ -82,27 +86,67 @@ export function useLiveBattle() {
   }, [battle, scene]);
 
   const connect = useCallback(() => {
-    if (socketRef.current?.connected) {
-      console.log('[LiveBattle] Already connected');
+    if (globalSocket?.connected) {
+      console.log('[LiveBattle] Already connected (global)');
+      socketRef.current = globalSocket;
       return;
     }
-    if (socketRef.current) {
-      console.log('[LiveBattle] Socket exists but disconnected, reconnecting...');
-      socketRef.current.connect();
+    if (globalSocket) {
+      console.log('[LiveBattle] Global socket exists but disconnected, reconnecting...');
+      globalSocket.connect();
+      socketRef.current = globalSocket;
       return;
     }
     console.log('[LiveBattle] Creating new connection...');
-
     setStatus('connecting');
     setError(null);
-
     const API_BASE_URL = env.NEXT_PUBLIC_API;
     const socket = io(`${API_BASE_URL}/battle`);
+    globalSocket = socket;
     socketRef.current = socket;
 
-    socket.on('connect', () => {
-      console.log('[LiveBattle] Connected to battle gateway');
-    });
+    if (!eventsRegisteredRef.current) {
+      eventsRegisteredRef.current = true;
+
+      socket.on('connect', () => {
+        console.log('[LiveBattle] Connected to battle gateway');
+      });
+
+      socket.on('connected', (data: { playerId: string }) => {
+        console.log('[LiveBattle] Player ID:', data.playerId);
+      });
+
+      socket.on('battleCreated', (data: { roomId: string; format: string }) => {
+        console.log('[LiveBattle] Battle created:', data.roomId);
+        setRoomId(data.roomId);
+        setStatus('active');
+      });
+
+      socket.on('protocol', (data: { roomId: string; line: string }) => {
+        battleFlow.addLine(data.line);
+      });
+
+      socket.on('request', (data: { roomId: string; request: Protocol.Request }) => {
+        setCurrentRequest(data.request);
+        setIsWaitingForChoice(true);
+      });
+
+      socket.on('battleEnd', (data: { roomId: string; winner: string; replay: string; replayId?: number }) => {
+        setWinner(data.winner);
+        setReplay(data.replay);
+        setReplayId(data.replayId ?? null);
+        setStatus('finished');
+      });
+
+      socket.on('error', (data: { message: string; roomId?: string }) => {
+        console.error('[LiveBattle] Error:', data.message);
+        setError(data.message);
+      });
+
+      socket.on('disconnect', () => {
+        console.log('[LiveBattle] Disconnected');
+      });
+    }
 
     socket.on('connected', (data: { playerId: string }) => {
       console.log('[LiveBattle] Player ID:', data.playerId);
