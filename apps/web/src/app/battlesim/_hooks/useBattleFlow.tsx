@@ -7,6 +7,7 @@ import { LogFormatter } from '@pkmn/view';
 import { Scene } from "../_utils/Scene";
 import { switchAction, faintAction } from "../_utils/battleActions";
 import { useBattleActions } from './useBattleActions';
+import { ReplayTimeline, ReplayEvent } from '../_utils/replayTimeline';
 
 export function useBattleFlow(
   battle: Battle,
@@ -23,7 +24,8 @@ export function useBattleFlow(
   setHtmlLog: React.Dispatch<React.SetStateAction<string[]>>,
   setIsPlaying: (playing: boolean) => void,
   setMessageBar: React.Dispatch<React.SetStateAction<string[]>>,
-  setSettingTurn: (setting: boolean) => void
+  setSettingTurn: (setting: boolean) => void,
+  timeline: ReplayTimeline | null = null
 ) {
   const battleActions = useBattleActions(battle, scene, pov);
   const formatter = new LogFormatter('p1', battle);
@@ -44,6 +46,8 @@ export function useBattleFlow(
   currentActionRef.current = currentAction;
   const sceneRef = useRef(scene);
   sceneRef.current = scene;
+  const timelineRef = useRef(timeline);
+  timelineRef.current = timeline;
 
   // Cleanup on unmount — cancel pending async chains
   useEffect(() => {
@@ -59,14 +63,14 @@ export function useBattleFlow(
 
   // Main battle flow control
   useEffect(() => {
+    const tl = timelineRef.current;
     if(isPlaying && currentAction !== -1) {
-      const lines = battleLogRef.current ? battleLogRef.current.split('\n') : [];
-      if(lines.length === 0 || currentAction >= lines.length) {
+      if(!tl || tl.events.length === 0 || currentAction >= tl.events.length) {
         setIsPlaying(false);
         return;
       }
-      const action = lines[currentAction];
-      playAction(action);
+      const event = tl.events[currentAction];
+      playActionFromEvent(event);
       return;
     }
     
@@ -76,7 +80,7 @@ export function useBattleFlow(
   }, [currentAction, isPlaying]);
 
   const handleTurnChange = () => {
-    const lines = battleLogRef.current ? battleLogRef.current.split('\n') : [];
+    const tl = timelineRef.current;
     const currBattle = new Battle(new Generations(Dex as any) as any);
     
     let changeTurn = newTurnRef.current;
@@ -90,48 +94,37 @@ export function useBattleFlow(
     
     setHtmlLog([]);
     
+    if (!tl) return;
+    
     // If we're going to the state after the last turn (battle end)
     if(changeTurn === lastTurnRef.current + 1) {
-      // Process ALL actions to ensure the win action is included
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        if (!line.trim()) continue; // Skip empty lines
-        
-        const {args, kwArgs} = Protocol.parseBattleLine(line);
-        currBattle.add(line);
-        
-        // If this is a win action, make sure we properly set the winner
-        if (args[0] === 'win') {
-          console.log("Processing win action:", args[1]);
-          currBattle.winner = args[1] as string;
+      for (const event of tl.events) {
+        currBattle.add(event.args, event.kwArgs);
+        if (event.actionType === 'win') {
+          currBattle.winner = event.args[1] as string;
         }
-        
-        setHtmlLog((prev) => [...prev, formatter.formatHTML(args, kwArgs)]);
+        setHtmlLog((prev) => [...prev, event.html]);
       }
-      
-      // Set current action to the last action (not 0)
-      const lastActionIndex = lines.filter(line => line.trim()).length;
+      const lastActionIndex = tl.events.length;
       updateBattleState(currBattle, changeTurn, lastActionIndex);
       return;
     }
     
-    // Normal turn change logic (existing code)
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      if (!line.trim()) continue; // Skip empty lines
-      
-      const {args, kwArgs} = Protocol.parseBattleLine(line);
-      currBattle.add(line);
-      
-      if (args[0] === 'turn') {
-        const currentTurn = parseInt(args[1]);
-        if (currentTurn === changeTurn) {
-          updateBattleState(currBattle, changeTurn, i);
-          break;
-        }
-      }
-      setHtmlLog((prev) => [...prev, formatter.formatHTML(args, kwArgs)]);
+    // Use turnIndices for O(1) lookup
+    const turnStartIndex = tl.turnIndices.get(changeTurn);
+    if (turnStartIndex === undefined) {
+      // Turn not found, go to end
+      updateBattleState(currBattle, changeTurn, tl.events.length);
+      return;
     }
+    
+    // Process events up to the target turn
+    for (let i = 0; i <= turnStartIndex; i++) {
+      const event = tl.events[i];
+      currBattle.add(event.args, event.kwArgs);
+      setHtmlLog((prev) => [...prev, event.html]);
+    }
+    updateBattleState(currBattle, changeTurn, turnStartIndex);
   };
 
   const resetBattle = (currBattle: Battle, turn: number) => {
@@ -216,6 +209,26 @@ export function useBattleFlow(
         resolve();
       } catch (error) {
         console.error('Error in playAction:', error);
+        resolve();
+      }
+    });
+  }
+
+  async function playActionFromEvent(event: ReplayEvent) {
+    const currentBattle = copyBattle(battle);
+    
+    return new Promise<void>(async (resolve) => {
+      try {
+        if (cancelledRef.current) { resolve(); return; }
+        const params = await getParams(event.args, event.kwArgs as BattleArgsKWArgsTypes);
+        
+        currentBattle.add(event.args, event.kwArgs);
+        updateBattleLog(event.html, currentBattle, event.actionType);
+        
+        await performAction(params, currentBattle);
+        resolve();
+      } catch (error) {
+        console.error('Error in playActionFromEvent:', error);
         resolve();
       }
     });

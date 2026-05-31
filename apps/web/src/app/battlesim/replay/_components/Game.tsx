@@ -84,11 +84,11 @@ export function Game({battleName = 'medalla_doku', replayData}: {battleName?: st
   const { battle, setBattle, battleLog, currentAction, scene, htmlLog, isPlaying, messageBar,
     turnInput, newTurn, settingTurn, lastTurn, simulatedAttack, logVisible, pov, setBattleLog,
     setCurrentAction, countActions, setScene, setHtmlLog: setLog, setIsPlaying, setMessageBar, setTurnInput,
-    setNewTurn, setSettingTurn, setLastTurn, setSimulatedAttack, setLogVisible, setPov, setCurrentTurn} = useGameState(loadedReplayData);
+    setNewTurn, setSettingTurn, setLastTurn, setSimulatedAttack, setLogVisible, setPov, setCurrentTurn, timeline} = useGameState(loadedReplayData);
   
   const battleFlow = useBattleFlow(
     battle, setBattle, battleLog, currentAction, scene, isPlaying, newTurn, lastTurn,
-    settingTurn, pov, setCurrentAction, setLog, setIsPlaying, setMessageBar, setSettingTurn);
+    settingTurn, pov, setCurrentAction, setLog, setIsPlaying, setMessageBar, setSettingTurn, timeline);
   
   // Refs
   const battleCanvasRef = useRef<any>(null);

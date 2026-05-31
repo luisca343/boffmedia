@@ -6,6 +6,7 @@ import { create } from 'zustand';
 import { Protocol } from '@pkmn/protocol';
 import { Scene } from '../_utils/Scene';
 import { ReplayData } from '../types';
+import { ReplayTimeline, parseReplayTimeline } from '../_utils/replayTimeline';
 
 // Battle Store Types and Implementation
 interface BattleStore {
@@ -75,6 +76,7 @@ export function useGameState(replayData?: ReplayData) {
     const [simulatedAttack, setSimulatedAttack] = useState<string>('contactattack');
     const [logVisible, setLogVisible] = useState(false);
     const [pov, setPov] = useState<0 | 1>(0);
+    const [timeline, setTimeline] = useState<ReplayTimeline | null>(null);
     
     // Refs for cleanup
     const observerRef = useRef<MutationObserver | null>(null);
@@ -96,36 +98,26 @@ export function useGameState(replayData?: ReplayData) {
             loadScene();
             return;
         }
-
-        fetch(`https://api.boffmedia.es/smartrotom/combates/booststera.txt`)
-        .then(response => response.text())
-        .then(text => {
-            setBattleLog(text);
-            loadScene();
-        })
-        .catch(error => console.error("Error fetching battle log:", error));
     }, [replayData]);
     
-    // Load initial game data
+    // Load initial game data and parse timeline
     useEffect(() => {
         if (battleLog) {
             loadGameData();
+            const parsed = parseReplayTimeline(battleLog);
+            setTimeline(parsed);
+            setLastTurn(parsed.lastTurn);
         }
     }, [battleLog]);
     
     const loadGameData = () => {
         const lines = battleLog ? battleLog.split('\n') : [];
         let started = false;
-        let finalTurn = 0;
         
         for (const line of lines) {
-            const {args, kwArgs} = Protocol.parseBattleLine(line);
             if(line.includes('|start')) started = true;
             if(!started) battle.add(line);
-            if(line.includes('|turn|')) finalTurn++;
         }
-        
-        setLastTurn(finalTurn);
     };
     
     const setCurrentTurn = (turn?: number) => {
@@ -163,7 +155,7 @@ export function useGameState(replayData?: ReplayData) {
     };
 
     function countActions(): number {
-        return battleLog ? battleLog.split('\n').length : 0;
+        return timeline ? timeline.events.length : 0;
     }
     
     return {
@@ -176,6 +168,7 @@ export function useGameState(replayData?: ReplayData) {
         htmlLog,
         isPlaying,
         messageBar,
+        timeline,
         
         // UI state
         turnInput,
