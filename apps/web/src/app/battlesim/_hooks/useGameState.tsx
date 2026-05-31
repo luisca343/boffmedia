@@ -81,7 +81,6 @@ export function useGameState(replayData?: ReplayData) {
     useEffect(() => {
         if(replayData) {
             setBattleLog(replayData.replay);
-            loadScene();
             return;
         }
         
@@ -90,10 +89,17 @@ export function useGameState(replayData?: ReplayData) {
         .then(response => response.text())
         .then(text => {
             setBattleLog(text);
-            loadScene();
         })
         .catch(error => console.error("Error fetching battle log:", error));
     }, [replayData]);
+    
+    // Called by BattleCanvas ref callback when the #game element mounts
+    const initScene = (gameElement: HTMLElement) => {
+        if (!scene && gameElement) {
+            const battleScene = new Scene(battle, gameElement);
+            setScene(battleScene);
+        }
+    };
     
     // Load initial game data
     useEffect(() => {
@@ -178,5 +184,6 @@ export function useGameState(replayData?: ReplayData) {
         setLogVisible,
         setPov,
         setCurrentTurn,
+        initScene,
     };
 }
