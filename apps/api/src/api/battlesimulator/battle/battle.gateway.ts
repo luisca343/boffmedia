@@ -35,7 +35,25 @@ export class BattleGateway
   private readonly RECONNECT_GRACE_MS = 30_000;
 
   handleConnection(client: Socket) {
-    const playerId = crypto.randomUUID();
+    // Use stable clientId from handshake if available
+    const handshakeClientId = (client.handshake.auth as any)?.clientId;
+    let playerId = handshakeClientId || crypto.randomUUID();
+
+    // If this clientId already exists (reconnect), update the socket
+    const existing = this.clients.get(playerId);
+    if (existing) {
+      this.logger.log(`Battle client reconnected: ${playerId}`);
+      // Clear any disconnect timer
+      const timer = this.disconnectTimers.get(playerId);
+      if (timer) {
+        clearTimeout(timer);
+        this.disconnectTimers.delete(playerId);
+      }
+      existing.socket = client;
+      client.emit('connected', { playerId, reconnected: true });
+      return;
+    }
+
     this.logger.log(`Battle client connected: ${playerId}`);
     this.clients.set(playerId, { socket: client, roomId: null, playerId });
     client.emit('connected', { playerId });
