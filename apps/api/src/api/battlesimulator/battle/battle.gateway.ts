@@ -42,7 +42,7 @@ export class BattleGateway
     // If this clientId already exists (reconnect), update the socket
     const existing = this.clients.get(playerId);
     if (existing) {
-      this.logger.log(`Battle client reconnected: ${playerId}`);
+      this.logger.log(`Battle client reconnected: ${playerId} (existing roomId: ${existing.roomId})`);
       // Clear any disconnect timer
       const timer = this.disconnectTimers.get(playerId);
       if (timer) {
@@ -54,7 +54,7 @@ export class BattleGateway
       return;
     }
 
-    this.logger.log(`Battle client connected: ${playerId}`);
+    this.logger.log(`Battle client connected: ${playerId} (clientId from query: ${handshakeClientId})`);
     this.clients.set(playerId, { socket: client, roomId: null, playerId });
     client.emit('connected', { playerId });
   }
