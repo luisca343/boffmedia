@@ -129,25 +129,25 @@ Deliverables:
 
 ## Task Breakdown (Execution Backlog)
 
-### Critical
+### Critical ✅
 
-- C1: Replay API contract alignment (web service + API controller).
-- C2: Remove hardcoded replay IDs/URLs from replay route entry files.
-- C3: Add hook/animation cleanup for observer + timer + queue lifecycle.
-- C4: Eliminate unsanitized replay HTML render path.
+- ~~C1: Replay API contract alignment (web service + API controller).~~ ✅ Done
+- ~~C2: Remove hardcoded replay IDs/URLs from replay route entry files.~~ ✅ Done
+- ~~C3: Add hook/animation cleanup for observer + timer + queue lifecycle.~~ ✅ Done
+- ~~C4: Eliminate unsanitized replay HTML render path.~~ ✅ Done
 
-### High
+### High ✅
 
-- H1: Build one-pass replay timeline parser.
-- H2: Refactor playback loop to use normalized timeline.
-- H3: Move module-scoped battle state to instance-scoped state.
-- H4: Wire dynamic route parameter to actual replay loading behavior.
+- ~~H1: Build one-pass replay timeline parser.~~ ✅ Done
+- ~~H2: Refactor playback loop to use normalized timeline.~~ ✅ Done
+- ~~H3: Move module-scoped battle state to instance-scoped state.~~ ✅ Done
+- ~~H4: Wire dynamic route parameter to actual replay loading behavior.~~ ✅ Done (via C2)
 
-### Medium
+### Medium ✅/⏳
 
-- M1: Remove dead replay artifacts after verification.
-- M2: Harden control input validation and error states.
-- M3: Reduce rerenders via component boundary cleanup.
+- ~~M1: Remove dead replay artifacts after verification.~~ ✅ Done
+- ~~M2: Harden control input validation and error states.~~ ✅ Done
+- M3: Reduce rerenders via component boundary cleanup. ⏳ Follow-up
 
 ## Week 1 Start Plan
 
