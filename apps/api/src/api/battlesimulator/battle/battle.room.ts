@@ -148,7 +148,16 @@ export class BattleRoom {
 
           if (args[0] === 'request') {
             try {
-              this.currentRequest = JSON.parse(args[1] as string) as Protocol.Request;
+              const rawRequest = JSON.parse(args[1] as string);
+              // PS protocol doesn't include requestType — infer from structure
+              if (!rawRequest.requestType) {
+                if (rawRequest.active) {
+                  rawRequest.requestType = 'move';
+                } else if (rawRequest.side) {
+                  rawRequest.requestType = 'switch';
+                }
+              }
+              this.currentRequest = rawRequest as Protocol.Request;
               this.logger?.log(`[P1] REQUEST detected! Type: ${this.currentRequest.requestType}`);
               this.callbacks.onRequest(this.currentRequest);
             } catch (e: any) {
