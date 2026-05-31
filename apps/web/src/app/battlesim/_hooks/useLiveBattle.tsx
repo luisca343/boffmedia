@@ -71,6 +71,11 @@ export function useLiveBattle() {
     p2: { turnRemaining: number; totalRemaining: number };
     activeSide: 'p1' | 'p2' | null;
   } | null>(null);
+  const [animateMode, setAnimateMode] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    const stored = localStorage.getItem('battlesim_animate_mode');
+    return stored !== 'instant';
+  });
 
   // useBattleFlow in live mode
   const battleFlow = useBattleFlow(
@@ -91,6 +96,7 @@ export function useLiveBattle() {
     () => {}, // setSettingTurn — not used in live mode
     {
       liveMode: true,
+      animateMode,
       onRequest: (request) => {
         setCurrentRequest(request);
         setIsWaitingForChoice(true);
@@ -103,6 +109,14 @@ export function useLiveBattle() {
       setIsWaitingForChoice,
     },
   );
+
+  const toggleAnimateMode = useCallback(() => {
+    setAnimateMode((prev) => {
+      const next = !prev;
+      localStorage.setItem('battlesim_animate_mode', next ? 'animated' : 'instant');
+      return next;
+    });
+  }, []);
 
   const initScene = useCallback((gameElement: HTMLElement) => {
     if (!scene && gameElement) {
@@ -278,6 +292,7 @@ export function useLiveBattle() {
     replayId,
     error,
     timerState,
+    animateMode,
 
     // Actions
     createBattle,
@@ -285,5 +300,6 @@ export function useLiveBattle() {
     forfeit,
     connect,
     initScene,
+    toggleAnimateMode,
   };
 }
