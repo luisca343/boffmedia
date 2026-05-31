@@ -1,5 +1,4 @@
 import { Pokemon } from "@pkmn/client";
-import '../test.css';
 import { getScaleMultiplier } from "../_utils/viewUtils";
 import { PokemonSprite } from "./PokemonSprite";
 

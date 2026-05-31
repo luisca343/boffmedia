@@ -108,8 +108,6 @@ export class SceneEffects {
     const effectData = BattleEffects[effect];
     if (!effectData) return;
 
-    console.log('showEffect', effect, start, end, transition, after, additionalCss, callback);
-    
     const startTime = start.time || 0;
     const endTime = end.time || 500;
     const animationTime = endTime - startTime;
