@@ -108,19 +108,15 @@ export function useLiveBattle() {
 
   const connect = useCallback(() => {
     const existing = getGlobalSocket();
-    console.log('[LiveBattle] connect() called, existing:', !!existing, 'connected:', existing?.connected);
     if (existing?.connected) {
-      console.log('[LiveBattle] Already connected (window)');
       socketRef.current = existing;
       return;
     }
     if (existing) {
-      console.log('[LiveBattle] Socket exists but disconnected, reconnecting...');
       existing.connect();
       socketRef.current = existing;
       return;
     }
-    console.log('[LiveBattle] Creating new connection...');
     setStatus('connecting');
     setError(null);
     const API_BASE_URL = env.NEXT_PUBLIC_API;
@@ -136,19 +132,15 @@ export function useLiveBattle() {
 
     if (!getEventsRegistered()) {
       setEventsRegistered(true);
-      console.log('[LiveBattle] Registering event handlers');
 
       socket.on('connect', () => {
-        console.log('[LiveBattle] Connected, registering with clientId:', clientId);
         socket.emit('register', { clientId });
       });
 
       socket.on('connected', (data: { playerId: string }) => {
-        console.log('[LiveBattle] Player ID:', data.playerId);
       });
 
       socket.on('battleCreated', (data: { roomId: string; format: string }) => {
-        console.log('[LiveBattle] Battle created:', data.roomId);
         setRoomId(data.roomId);
         setStatus('active');
       });
@@ -175,16 +167,13 @@ export function useLiveBattle() {
       });
 
       socket.on('disconnect', () => {
-        console.log('[LiveBattle] Disconnected');
       });
     }
 
     socket.on('connected', (data: { playerId: string }) => {
-      console.log('[LiveBattle] Player ID:', data.playerId);
     });
 
     socket.on('battleCreated', (data: { roomId: string; format: string }) => {
-      console.log('[LiveBattle] Battle created:', data.roomId);
       setRoomId(data.roomId);
       setStatus('active');
     });
@@ -212,7 +201,6 @@ export function useLiveBattle() {
     });
 
     socket.on('disconnect', () => {
-      console.log('[LiveBattle] Disconnected');
       if (status === 'active') {
         setError('Disconnected from server');
       }
@@ -222,18 +210,15 @@ export function useLiveBattle() {
   const createBattle = useCallback((format?: string) => {
     // Don't create if we already have a battle
     if (roomIdRef.current) {
-      console.log('[LiveBattle] Already have roomId:', roomIdRef.current, '- skipping createBattle');
       setStatus('active');
       return;
     }
-    console.log('[LiveBattle] createBattle() called, socket connected:', socketRef.current?.connected);
     if (!socketRef.current?.connected) {
       connect();
       // Wait for connection, then create
       const checkConnected = setInterval(() => {
         if (socketRef.current?.connected) {
           clearInterval(checkConnected);
-          console.log('[LiveBattle] Emitting createBattle event');
           socketRef.current.emit('createBattle', { format: format || 'gen9randombattle' });
         }
       }, 100);
@@ -241,7 +226,6 @@ export function useLiveBattle() {
       setTimeout(() => clearInterval(checkConnected), 5000);
       return;
     }
-    console.log('[LiveBattle] Emitting createBattle event (already connected)');
     socketRef.current.emit('createBattle', { format: format || 'gen9randombattle' });
   }, [connect]);
 
