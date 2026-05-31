@@ -87,8 +87,6 @@ export class BattleRoom {
           this.replayLines.push(line);
           const { args, kwArgs } = Protocol.parseBattleLine(line);
 
-          this.logger?.log(`[OMNISCIENT] ${args[0]}: ${line.substring(0, 100)}`);
-
           const html = this.formatter.formatHTML(args, kwArgs);
           this.battle.add(args, kwArgs);
 
@@ -132,19 +130,14 @@ export class BattleRoom {
 
   private async readP1(): Promise<void> {
     try {
-      this.logger?.log(`[P1] Starting to read from p1 stream...`);
       for await (const chunk of this.streams.p1) {
         const trimmed = chunk.trim();
         if (!trimmed) continue;
-
-        this.logger?.log(`[P1] Received chunk (${trimmed.length} chars): ${trimmed.substring(0, 150)}`);
 
         const lines = trimmed.split('\n');
         for (const line of lines) {
           if (!line.trim()) continue;
           const { args } = Protocol.parseBattleLine(line);
-
-          this.logger?.log(`[P1] Parsed line: args[0]=${args[0]}`);
 
           if (args[0] === 'request') {
             try {
@@ -158,7 +151,6 @@ export class BattleRoom {
                 }
               }
               this.currentRequest = rawRequest as Protocol.Request;
-              this.logger?.log(`[P1] REQUEST detected! Type: ${this.currentRequest.requestType}`);
               this.callbacks.onRequest(this.currentRequest);
             } catch (e: any) {
               this.logger?.error(`[P1] Failed to parse request: ${e.message}`);
@@ -167,7 +159,6 @@ export class BattleRoom {
           }
         }
       }
-      this.logger?.log(`[P1] Stream ended`);
     } catch (error: any) {
       this.logger?.error(`[P1] Stream error: ${error.message}`);
       if (this.status !== 'finished') {

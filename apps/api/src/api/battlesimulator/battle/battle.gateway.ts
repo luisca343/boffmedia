@@ -36,17 +36,14 @@ export class BattleGateway
 
   handleConnection(client: Socket) {
     // Don't register here — wait for 'register' event with clientId
-    this.logger.log(`Socket connected (awaiting register): ${client.id}`);
   }
 
   @SubscribeMessage('register')
   handleRegister(client: Socket, payload: { clientId: string }): void {
     const playerId = payload.clientId;
-    this.logger.log(`[register] Received register for playerId=${playerId}, clients Map size=${this.clients.size}, hasKey=${this.clients.has(playerId)}`);
 
     const existing = this.clients.get(playerId);
     if (existing) {
-      this.logger.log(`Battle client reconnected: ${playerId} (existing roomId: ${existing.roomId})`);
       const timer = this.disconnectTimers.get(playerId);
       if (timer) {
         clearTimeout(timer);
@@ -57,20 +54,13 @@ export class BattleGateway
       return;
     }
 
-    this.logger.log(`Battle client registered: ${playerId}`);
     this.clients.set(playerId, { socket: client, roomId: null, playerId });
-    this.logger.log(`[register] After set, clients Map size=${this.clients.size}, hasKey=${this.clients.has(playerId)}`);
     client.emit('connected', { playerId });
   }
 
   handleDisconnect(client: Socket) {
     const state = this.getClientState(client);
-    if (!state) {
-      this.logger.log(`Socket disconnected (unregistered): ${client.id}`);
-      return;
-    }
-
-    this.logger.log(`Battle client disconnected: ${state.playerId}`);
+    if (!state) return;
 
     if (state.roomId) {
       const timer = setTimeout(() => {
@@ -98,7 +88,6 @@ export class BattleGateway
     if (state.roomId) {
       const existingRoom = this.rooms.get(state.roomId);
       if (existingRoom && existingRoom.getStatus() === 'active') {
-        this.logger.log(`Client already in battle ${state.roomId}, returning existing`);
         client.emit('battleCreated', {
           roomId: state.roomId,
           format: payload?.format || 'gen9randombattle',
@@ -152,7 +141,6 @@ export class BattleGateway
           roomId,
           format: payload?.format || 'gen9randombattle',
         });
-        this.logger.log(`Battle created: ${roomId} for ${state.playerId}`);
       })
       .catch((err) => {
         this.logger.error(`Failed to create battle: ${err.message}`);
@@ -170,7 +158,6 @@ export class BattleGateway
     if (!state) return;
 
     if (state.roomId !== payload.roomId) {
-      this.logger.warn(`[makeChoice] roomId mismatch: state=${state.roomId} payload=${payload.roomId}`);
       client.emit('error', { message: 'Not in this battle' });
       return;
     }
@@ -233,7 +220,6 @@ export class BattleGateway
     }
 
     existingState.socket = client;
-    this.logger.log(`Client reconnected: ${payload.playerId}`);
 
     const room = this.rooms.get(payload.roomId);
     if (room) {
@@ -265,6 +251,5 @@ export class BattleGateway
     }
 
     this.rooms.delete(roomId);
-    this.logger.log(`Room cleaned up: ${roomId}`);
   }
 }
