@@ -10,6 +10,7 @@ import { useBattleFlow } from "../../_hooks/useBattleFlow";
 import { BattleCanvas } from "../../_components/BattleCanvas";
 import { moveAction, } from "../../_utils/battleActions";
 import { ReplayData } from "../../types";
+import { sanitizeHtml } from "../../_utils/sanitizeHtml";
 import BattlePreview from "../../_components/BattlePreview";
 
 // Replay Loader component for when no replay data is provided
@@ -180,7 +181,7 @@ export function Game({battleName = 'medalla_doku', replayData}: {battleName?: st
             style={{height:`${canvasWidth * ASPECT_RATIO}px`}}
           >
             {htmlLog.map((line, index) => (
-              <div key={index} dangerouslySetInnerHTML={{ __html: line }} />
+              <div key={index} dangerouslySetInnerHTML={{ __html: sanitizeHtml(line) }} />
             ))}
           </div>
         )}
