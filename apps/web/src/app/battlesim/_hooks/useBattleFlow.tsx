@@ -351,31 +351,30 @@ export function useBattleFlow(
     if(!scene) return;
     const { args, kwArgs, data } = params;
     const accel = scene.acceleration;
-    const instantMode = !animateModeRef.current;
-    let timeout = instantMode ? 0 : 300 / accel;
+    let timeout = 300 / accel;
     
     try {
-      // Skip visual animations in instant mode or when acceleration is very high (fast-forward)
-      const skipAnims = instantMode || accel >= 3;
+      // Skip visual animations when acceleration is very high (fast-forward)
+      const skipAnims = accel >= 3;
 
       switch (args[0]) {
         case 'switch':
-          timeout = skipAnims ? 0 : await battleActions.handleSwitchAction(args);
+          timeout = skipAnims ? 100 : await battleActions.handleSwitchAction(args);
           break;
         case 'turn':
-          timeout = skipAnims ? 0 : await battleActions.handleTurnAction(args, currentBattle);
+          timeout = skipAnims ? 50 : await battleActions.handleTurnAction(args, currentBattle);
           break;
         case '-damage':
-          timeout = skipAnims ? 0 : battleActions.handleDamageAction(args, data);
+          timeout = skipAnims ? 50 : battleActions.handleDamageAction(args, data);
           break;
         case '-heal':
-          timeout = skipAnims ? 0 : battleActions.handleHealAction(args, data);
+          timeout = skipAnims ? 50 : battleActions.handleHealAction(args, data);
           break;
         case 'move':
-          timeout = skipAnims ? 0 : await battleActions.handleMoveAction(args, currentBattle);
+          timeout = skipAnims ? 100 : await battleActions.handleMoveAction(args, currentBattle);
           break;
         case '-miss':
-          timeout = skipAnims ? 0 : await battleActions.handleMissAction(args);
+          timeout = skipAnims ? 50 : await battleActions.handleMissAction(args);
           break;
         case 'win':
           currentBattle.winner = args[1] as string;
@@ -389,6 +388,11 @@ export function useBattleFlow(
           break;
         default:
           break;
+      }
+
+      // In live instant mode, skip all delays
+      if (liveMode && !animateModeRef.current) {
+        timeout = 0;
       }
       
       return await new Promise<void>((resolve) => {
