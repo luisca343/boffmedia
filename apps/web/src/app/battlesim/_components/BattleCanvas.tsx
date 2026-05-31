@@ -37,6 +37,8 @@ export const BattleCanvas = forwardRef(({
     showFullInfo = false,
     initScene,
     liveMode = false,
+    liveStatus,
+    onPlayAgain,
 }: { 
     battle: Battle, 
     pov: 0 | 1 | any, 
@@ -49,6 +51,8 @@ export const BattleCanvas = forwardRef(({
     showFullInfo?: boolean,
     initScene?: (gameElement: HTMLElement) => void,
     liveMode?: boolean,
+    liveStatus?: 'idle' | 'connecting' | 'active' | 'finished' | 'error',
+    onPlayAgain?: () => void,
 }, ref: React.Ref<BattleCanvasRefProps>) => {
     const pokemonRefs = useRef<{ [key: string]: PokemonRefType }>({});
     const [, canvasWidth] = useViewportWidth();
@@ -67,6 +71,14 @@ export const BattleCanvas = forwardRef(({
         p2a: p2.active[0], p2b: p2.active[1], p2c: p2.active[2], p2d: p2.active[3], p2e: p2.active[4]
     } as {[key: string]: Pokemon};
     
+    if(liveMode && liveStatus === 'connecting') {
+        return (
+            <div className="flex flex-col items-center justify-center gap-3" style={{ width: canvasWidth, height: canvasWidth * ASPECT_RATIO, backgroundImage: 'url(/battlesim/fx/bg/hagane.png)', backgroundSize: '100% 100%' }}>
+                <Loading />
+                <span className="text-surface-200 text-sm">Waiting for battle...</span>
+            </div>
+        )
+    }
     if(!liveMode && !battle.pokemonControlled && !battleLog) return <Loading/>
 
     return (
@@ -99,6 +111,16 @@ export const BattleCanvas = forwardRef(({
                                 setIsPlaying(false);
                             }
                         }
+                      />
+                    </div>
+                  )}
+
+                  {liveMode && liveStatus === 'finished' && (
+                    <div className="absolute inset-0">
+                      <BattleEndScreen 
+                        battle={battle} 
+                        pov={pov}
+                        onRestart={onPlayAgain}
                       />
                     </div>
                   )}
