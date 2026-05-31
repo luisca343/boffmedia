@@ -90,6 +90,10 @@ export function Game({battleName = 'medalla_doku', replayData}: {battleName?: st
   const [loadedReplayData, setLoadedReplayData] = useState<ReplayData | undefined>(replayData);
   // State to track if battle has been started, regardless of current play state
   const [battleStarted, setBattleStarted] = useState<boolean>(false);
+  // State for log virtualization
+  const [showAllLogs, setShowAllLogs] = useState<boolean>(false);
+  
+  const VISIBLE_LOG_LIMIT = 200;
   
   const { battle, setBattle, battleLog, currentAction, scene, htmlLog, isPlaying, messageBar,
     turnInput, newTurn, settingTurn, lastTurn, simulatedAttack, logVisible, pov, setBattleLog,
@@ -189,8 +193,16 @@ export function Game({battleName = 'medalla_doku', replayData}: {battleName?: st
             ref={logRef} 
             style={{height:`${canvasWidth * ASPECT_RATIO}px`}}
           >
-            {htmlLog.map((line, index) => (
-              <div key={index} dangerouslySetInnerHTML={{ __html: sanitizeHtml(line) }} />
+            {htmlLog.length > VISIBLE_LOG_LIMIT && !showAllLogs && (
+              <button 
+                onClick={() => setShowAllLogs(true)}
+                className="w-full p-1 mb-1 text-xs bg-surface-600 rounded hover:bg-surface-500 text-surface-200"
+              >
+                Show all {htmlLog.length} lines (showing last {VISIBLE_LOG_LIMIT})
+              </button>
+            )}
+            {(showAllLogs ? htmlLog : htmlLog.slice(-VISIBLE_LOG_LIMIT)).map((line, index) => (
+              <div key={showAllLogs ? index : htmlLog.length - VISIBLE_LOG_LIMIT + index} dangerouslySetInnerHTML={{ __html: sanitizeHtml(line) }} />
             ))}
           </div>
         )}
