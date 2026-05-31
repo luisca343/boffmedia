@@ -42,8 +42,8 @@ export class BattleGateway
   @SubscribeMessage('register')
   handleRegister(client: Socket, payload: { clientId: string }): void {
     const playerId = payload.clientId;
+    this.logger.log(`[register] Received register for playerId=${playerId}, clients Map size=${this.clients.size}, hasKey=${this.clients.has(playerId)}`);
 
-    // If this clientId already exists (reconnect), update the socket
     const existing = this.clients.get(playerId);
     if (existing) {
       this.logger.log(`Battle client reconnected: ${playerId} (existing roomId: ${existing.roomId})`);
@@ -59,6 +59,7 @@ export class BattleGateway
 
     this.logger.log(`Battle client registered: ${playerId}`);
     this.clients.set(playerId, { socket: client, roomId: null, playerId });
+    this.logger.log(`[register] After set, clients Map size=${this.clients.size}, hasKey=${this.clients.has(playerId)}`);
     client.emit('connected', { playerId });
   }
 
