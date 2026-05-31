@@ -124,7 +124,13 @@ export function useLiveBattle() {
     setStatus('connecting');
     setError(null);
     const API_BASE_URL = env.NEXT_PUBLIC_API;
-    const socket = io(`${API_BASE_URL}/battle`);
+    // Send a stable clientId so server recognizes us across reconnects
+    let clientId = localStorage.getItem('battlesim_client_id');
+    if (!clientId) {
+      clientId = crypto.randomUUID();
+      localStorage.setItem('battlesim_client_id', clientId);
+    }
+    const socket = io(`${API_BASE_URL}/battle`, { auth: { clientId } });
     setGlobalSocket(socket);
     socketRef.current = socket;
     console.log('[LiveBattle] Socket created and stored on window');
