@@ -16,7 +16,6 @@ export default function PlayPage() {
     isWaitingForChoice,
     htmlLog,
     messageBar,
-    winner,
     replayId,
     error,
     createBattle,
@@ -123,6 +122,8 @@ export default function PlayPage() {
           battleLog={null}
           initScene={initScene}
           liveMode={true}
+          liveStatus={status}
+          onPlayAgain={handlePlayAgain}
         />
       </div>
 
@@ -135,28 +136,17 @@ export default function PlayPage() {
         />
       )}
 
-      {/* Battle End Screen */}
+      {/* Post-battle actions */}
       {status === 'finished' && (
-        <div className="flex flex-col items-center gap-4 p-6 bg-card rounded-lg border">
-          <h2 className="text-2xl font-bold">
-            {winner === 'tie' ? 'Draw!' : `${winner} wins!`}
-          </h2>
-          <div className="flex gap-3">
-            <button
-              onClick={handlePlayAgain}
-              className="px-6 py-2 bg-primary text-primary-foreground rounded-md font-medium hover:bg-primary/90 transition-colors"
+        <div className="flex items-center justify-center gap-3">
+          {replayId && (
+            <Link
+              href={`/battlesim/replay/${replayId}`}
+              className="px-6 py-2 bg-secondary text-secondary-foreground rounded-md font-medium hover:bg-secondary/90 transition-colors"
             >
-              Play Again
-            </button>
-            {replayId && (
-              <Link
-                href={`/battlesim/replay/${replayId}`}
-                className="px-6 py-2 bg-secondary text-secondary-foreground rounded-md font-medium hover:bg-secondary/90 transition-colors"
-              >
-                Watch Replay
-              </Link>
-            )}
-          </div>
+              Watch Replay
+            </Link>
+          )}
         </div>
       )}
 
