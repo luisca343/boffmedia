@@ -49,6 +49,21 @@ export function useBattleFlow(
   const liveBufferRef = useRef<string[]>([]);
   const liveProcessingRef = useRef(false);
   const liveActionIndexRef = useRef(0);
+  const liveWaitingRef = useRef(false);
+  const liveCallbacksRef = useRef<{ onRequest?: (req: Protocol.Request) => void; onBattleEnd?: (winner: string) => void }>({});
+
+  // Keep callbacks ref up to date (avoids stale closures)
+  liveCallbacksRef.current = {
+    onRequest: options?.onRequest,
+    onBattleEnd: options?.onBattleEnd,
+  };
+
+  // Sync the waiting ref with the prop
+  useEffect(() => {
+    if (liveMode) {
+      liveWaitingRef.current = options?.isWaitingForChoice ?? false;
+    }
+  }, [liveMode, options?.isWaitingForChoice]);
 
   // Cache: turn number → line index (O(1) seeking instead of O(n) scan)
   const turnIndexMap = useMemo(() => {
@@ -71,13 +86,13 @@ export function useBattleFlow(
 
   const processNextLiveLine = useCallback(async () => {
     if (liveProcessingRef.current) return;
-    if (isWaitingForChoice) return;
+    if (liveWaitingRef.current) return;
 
     liveProcessingRef.current = true;
 
     try {
       while (liveActionIndexRef.current < liveBufferRef.current.length) {
-        if (isWaitingForChoice) break;
+        if (liveWaitingRef.current) break;
 
         const line = liveBufferRef.current[liveActionIndexRef.current];
         liveActionIndexRef.current++;
@@ -90,8 +105,9 @@ export function useBattleFlow(
         if (args[0] === 'request') {
           try {
             const request = JSON.parse(args[1] as string) as Protocol.Request;
-            setIsWaitingForChoice?.(true);
-            onRequest?.(request);
+            liveWaitingRef.current = true;
+            options?.setIsWaitingForChoice?.(true);
+            liveCallbacksRef.current.onRequest?.(request);
           } catch (e) {
             console.error('Failed to parse request:', e);
           }
@@ -107,7 +123,7 @@ export function useBattleFlow(
 
         if (args[0] === 'win' || args[0] === 'tie') {
           battle.winner = args[1] as string;
-          onBattleEnd?.(args[1] as string);
+          liveCallbacksRef.current.onBattleEnd?.(args[1] as string);
           break;
         }
 
@@ -116,20 +132,22 @@ export function useBattleFlow(
     } finally {
       liveProcessingRef.current = false;
     }
-  }, [battle, isWaitingForChoice, formatter, onRequest, onBattleEnd, setIsWaitingForChoice]);
+  }, [battle, formatter]);
 
   const addLine = useCallback((line: string) => {
     liveBufferRef.current.push(line);
-    processNextLiveLine();
+    // Use setTimeout to avoid synchronous re-entrance
+    setTimeout(() => processNextLiveLine(), 0);
   }, [processNextLiveLine]);
 
   const resumeAfterChoice = useCallback(() => {
-    setIsWaitingForChoice?.(false);
+    liveWaitingRef.current = false;
+    options?.setIsWaitingForChoice?.(false);
     // Re-trigger processing after a microtask to let state settle
     setTimeout(() => {
       processNextLiveLine();
     }, 0);
-  }, [setIsWaitingForChoice, processNextLiveLine]);
+  }, [processNextLiveLine]);
 
   // ─── REPLAY MODE: existing flow control (unchanged) ───
 
