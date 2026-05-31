@@ -1,11 +1,65 @@
-import React from 'react';
-import { Game } from '../_components/Game';
+'use client';
 
-export default function Test({params} : {params: {name: string}}): React.JSX.Element {
+import React, { useEffect, useState } from 'react';
+import { Game } from '../_components/Game';
+import { LigaService } from '@/services/api/smartrotom/ligaService';
+import { ReplayData } from '../../types';
+import { Loading } from '@/components/smartrotom/Loading';
+
+export default function ReplayPage({ params }: { params: { name: string } }) {
+  const [replayData, setReplayData] = useState<ReplayData | undefined>();
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const id = parseInt(params.name, 10);
+    if (isNaN(id)) {
+      setError('Invalid replay ID');
+      setLoading(false);
+      return;
+    }
+
+    LigaService.getReplay(id)
+      .then((res) => {
+        if (res.error || !res.data) {
+          setError('Replay not found');
+        } else {
+          const r = res.data as any;
+          setReplayData({
+            side1: r.side1,
+            side2: r.side2,
+            team1: r.team1 ?? '',
+            team2: r.team2 ?? '',
+            replay: r.replay,
+            winner: r.winner,
+            createdAt: r.createdAt,
+          });
+        }
+      })
+      .catch(() => setError('Failed to load replay'))
+      .finally(() => setLoading(false));
+  }, [params.name]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loading />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+        <p className="text-muted-foreground">{error}</p>
+        <a href="/battlesim/replay" className="text-primary underline">Paste replay manually</a>
+      </div>
+    );
+  }
 
   return (
     <section className="flex flex-col">
-      <Game battleName={params.name}/>
+      <Game battleName={params.name} replayData={replayData} />
     </section>
   );
 }
