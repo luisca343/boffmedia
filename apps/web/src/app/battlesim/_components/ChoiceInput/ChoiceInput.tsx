@@ -13,7 +13,10 @@ interface ChoiceInputProps {
 export function ChoiceInput({ request, makeChoice, isWaiting }: ChoiceInputProps) {
   if (!isWaiting || !request) return null;
 
-  if (request.requestType === 'move') {
+  // Infer requestType if missing (raw PS protocol doesn't include it)
+  const requestType = request.requestType || (request.active ? 'move' : request.side ? 'switch' : null);
+
+  if (requestType === 'move') {
     return (
       <MoveSelector
         request={request}
@@ -22,7 +25,7 @@ export function ChoiceInput({ request, makeChoice, isWaiting }: ChoiceInputProps
     );
   }
 
-  if (request.requestType === 'switch') {
+  if (requestType === 'switch') {
     return (
       <SwitchMenu
         request={request}
@@ -32,7 +35,7 @@ export function ChoiceInput({ request, makeChoice, isWaiting }: ChoiceInputProps
   }
 
   // Team preview (rarely used in random battles)
-  if (request.requestType === 'team') {
+  if (requestType === 'team') {
     return (
       <div className="flex flex-col gap-2 p-4 bg-card rounded-lg border">
         <p className="text-sm text-muted-foreground">Team Preview — sending default order</p>
