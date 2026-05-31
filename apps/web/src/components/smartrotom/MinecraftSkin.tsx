@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { SkinViewer } from "skinview3d";
 import { MisionesService } from "@/services/api/smartrotom/misionesService";
 
 const skinCache = new Map<string, string>();
@@ -11,6 +10,8 @@ export default function NpcSkin({ npcName, width = 150, height = 150, style }: {
     const fetchSkin = async () => {
       let skin = (await MisionesService.getCustomNpcRender(npcName)).data as any;
       if (!skin) {
+        // Lazy-load skinview3d only when actually needed
+        const { SkinViewer } = await import("skinview3d");
         const skinViewer = new SkinViewer({
           width: 200,
           height: 400,
