@@ -12,6 +12,7 @@ import { moveAction, } from "../../_utils/battleActions";
 import { ReplayData } from "../../types";
 import { sanitizeHtml } from "../../_utils/sanitizeHtml";
 import { countActions } from "../../_utils/replayUtils";
+import { ReplayErrorBoundary } from "./ReplayErrorBoundary";
 import BattlePreview from "../../_components/BattlePreview";
 
 // Replay Loader component for when no replay data is provided
@@ -93,7 +94,7 @@ export function Game({battleName = 'medalla_doku', replayData}: {battleName?: st
   const { battle, setBattle, battleLog, currentAction, scene, htmlLog, isPlaying, messageBar,
     turnInput, newTurn, settingTurn, lastTurn, simulatedAttack, logVisible, pov, setBattleLog,
     setCurrentAction, setScene, setHtmlLog: setLog, setIsPlaying, setMessageBar, setTurnInput,
-    setNewTurn, setSettingTurn, setLastTurn, setSimulatedAttack, setLogVisible, setPov, setCurrentTurn} = useGameState(loadedReplayData);
+    setNewTurn, setSettingTurn, setLastTurn, setSimulatedAttack, setLogVisible, setPov, setCurrentTurn, initScene} = useGameState(loadedReplayData);
   
   const battleFlow = useBattleFlow(
     battle, setBattle, battleLog, currentAction, scene, isPlaying, newTurn, lastTurn,
@@ -134,7 +135,7 @@ export function Game({battleName = 'medalla_doku', replayData}: {battleName?: st
   }
   
   return (
-    <>
+    <ReplayErrorBoundary>
     <div className="flex">
     <div className="flex flex-col relative">
       {/* Battle Canvas is always rendered */}
@@ -149,6 +150,7 @@ export function Game({battleName = 'medalla_doku', replayData}: {battleName?: st
         currentAction={currentAction}
         battleLog={battleLog}
         showFullInfo={false}
+        initScene={initScene}
       />
 
       <ReplayControls 
@@ -208,7 +210,7 @@ export function Game({battleName = 'medalla_doku', replayData}: {battleName?: st
         </div>
       </div>
     )}
-    </>
+    </ReplayErrorBoundary>
   );
 }
 
