@@ -28,6 +28,7 @@ export interface LiveBattleState {
 
 export function useLiveBattle() {
   const socketRef = useRef<Socket | null>(null);
+  const initializedRef = useRef(false);
   const battleRef = useRef<Battle>(new Battle(new Generations(Dex as any) as any));
   const [battle, setBattle] = useState(battleRef.current);
   const [scene, setScene] = useState<Scene | null>(null);
@@ -82,7 +83,8 @@ export function useLiveBattle() {
   }, [battle, scene]);
 
   const connect = useCallback(() => {
-    if (socketRef.current?.connected) return;
+    if (socketRef.current?.connected || initializedRef.current) return;
+    initializedRef.current = true;
 
     setStatus('connecting');
     setError(null);
@@ -171,6 +173,7 @@ export function useLiveBattle() {
   useEffect(() => {
     return () => {
       socketRef.current?.disconnect();
+      initializedRef.current = false;
     };
   }, []);
 
