@@ -114,7 +114,7 @@ pnpm dev:api          # NestJS dev only (watch mode)
 pnpm build:web        # Next.js production build
 pnpm build:api        # NestJS production build
 pnpm lint             # Lint all packages
-pnpm type-check       # TypeScript check all packages
+pnpm type-check       # TypeScript check all packages ⚠ HIGH MEMORY — see note below
 pnpm generate:shared  # Regenerate shared types (requires api on port 34301)
 pnpm setup            # Create public folder symlinks (first-time setup)
 
@@ -127,6 +127,11 @@ pnpm --filter api test:e2e   # End-to-end tests
 # apps/web only
 pnpm --filter web test        # Playwright e2e tests
 ```
+
+> **⚠ WSL Memory Constraint:** `pnpm type-check` (and `npx tsc --noEmit`) can exhaust
+> memory in WSL environments and crash the system. **Do NOT run type-checks unless
+> the user explicitly requests it.** If needed, limit memory with:
+> `NODE_OPTIONS="--max-old-space-size=512" npx tsc --noEmit` on individual packages only.
 
 ---
 

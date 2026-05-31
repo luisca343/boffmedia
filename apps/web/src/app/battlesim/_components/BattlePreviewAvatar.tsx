@@ -86,7 +86,7 @@ export function BattlePreviewAvatar({
           <img
             style={{width: '100%', height: '100%', objectFit: 'contain'}}
             alt={`${player.name} avatar`}
-            src={`https://crafatar.com/renders/body/${uuid}`}
+            src={`https://api.mineatar.io/body/full/${uuid}`}
           />
         </div>
       ) : !player.name.includes('npc:') ? (
