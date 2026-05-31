@@ -12,7 +12,15 @@ export interface ShellResult {
   exitCode: number
 }
 
-export async function shell(script: string, args: string[] = []): Promise<ShellResult> {
+export interface ShellOptions {
+  env?: NodeJS.ProcessEnv
+}
+
+export async function shell(
+  script: string,
+  args: string[] = [],
+  options: ShellOptions = {}
+): Promise<ShellResult> {
   const isScript = script.endsWith('.sh')
   const cmd = isScript ? 'bash' : script
   const cmdArgs = isScript ? [path.join(SCRIPTS_DIR, script), ...args] : args
@@ -21,7 +29,7 @@ export async function shell(script: string, args: string[] = []): Promise<ShellR
     const result = await execa(cmd, cmdArgs, {
       reject: false,
       cwd: REPO_ROOT,
-      env: { ...process.env }
+      env: { ...process.env, ...options.env }
     })
 
     return {
