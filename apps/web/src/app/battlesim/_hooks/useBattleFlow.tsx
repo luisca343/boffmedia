@@ -139,7 +139,7 @@ export function useBattleFlow(
     } finally {
       liveProcessingRef.current = false;
     }
-  }, [battle, formatter]);
+  }, [battle, formatter, scene]);
 
   const addLine = useCallback((line: string) => {
     // In animated mode, buffer lines that arrive while waiting for a choice
