@@ -8,6 +8,7 @@ import { Battle } from '@pkmn/client';
 import { LogFormatter } from '@pkmn/view';
 import { Protocol } from '@pkmn/protocol';
 import { Dex } from '@pkmn/sim';
+import { Logger } from 'nestjs-pino';
 import { getRandomTeam } from '../_utils/teams';
 
 export type BattleRoomStatus = 'waiting' | 'active' | 'finished';
@@ -43,7 +44,7 @@ export class BattleRoom {
   private omniscientPromise: Promise<void> | null = null;
   private gens: Generations;
 
-  constructor(id: string, callbacks: BattleRoomCallbacks) {
+  constructor(id: string, callbacks: BattleRoomCallbacks, private readonly logger?: Logger) {
     this.id = id;
     this.callbacks = callbacks;
     this.gens = new Generations(Dex as any);
@@ -85,6 +86,8 @@ export class BattleRoom {
 
           this.replayLines.push(line);
           const { args, kwArgs } = Protocol.parseBattleLine(line);
+
+          this.logger?.log(`[OMNISCIENT] ${args[0]}: ${line.substring(0, 100)}`);
 
           const html = this.formatter.formatHTML(args, kwArgs);
           this.battle.add(args, kwArgs);
@@ -129,26 +132,35 @@ export class BattleRoom {
 
   private async readP1(): Promise<void> {
     try {
+      this.logger?.log(`[P1] Starting to read from p1 stream...`);
       for await (const chunk of this.streams.p1) {
         const trimmed = chunk.trim();
         if (!trimmed) continue;
+
+        this.logger?.log(`[P1] Received chunk (${trimmed.length} chars): ${trimmed.substring(0, 150)}`);
 
         const lines = trimmed.split('\n');
         for (const line of lines) {
           if (!line.trim()) continue;
           const { args } = Protocol.parseBattleLine(line);
 
+          this.logger?.log(`[P1] Parsed line: args[0]=${args[0]}`);
+
           if (args[0] === 'request') {
             try {
               this.currentRequest = JSON.parse(args[1] as string) as Protocol.Request;
+              this.logger?.log(`[P1] REQUEST detected! Type: ${this.currentRequest.requestType}`);
               this.callbacks.onRequest(this.currentRequest);
             } catch (e: any) {
+              this.logger?.error(`[P1] Failed to parse request: ${e.message}`);
               this.callbacks.onError(`Failed to parse request: ${e.message}`);
             }
           }
         }
       }
+      this.logger?.log(`[P1] Stream ended`);
     } catch (error: any) {
+      this.logger?.error(`[P1] Stream error: ${error.message}`);
       if (this.status !== 'finished') {
         this.callbacks.onError(`P1 stream error: ${error.message}`);
       }
