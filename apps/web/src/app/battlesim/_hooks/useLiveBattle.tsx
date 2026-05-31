@@ -28,7 +28,6 @@ export interface LiveBattleState {
 
 export function useLiveBattle() {
   const socketRef = useRef<Socket | null>(null);
-  const initializedRef = useRef(false);
   const battleRef = useRef<Battle>(new Battle(new Generations(Dex as any) as any));
   const [battle, setBattle] = useState(battleRef.current);
   const [scene, setScene] = useState<Scene | null>(null);
@@ -83,12 +82,16 @@ export function useLiveBattle() {
   }, [battle, scene]);
 
   const connect = useCallback(() => {
-    if (socketRef.current?.connected || initializedRef.current) {
-      console.log('[LiveBattle] Already connected or initialized, skipping');
+    if (socketRef.current?.connected) {
+      console.log('[LiveBattle] Already connected');
       return;
     }
-    initializedRef.current = true;
-    console.log('[LiveBattle] Connecting...');
+    if (socketRef.current) {
+      console.log('[LiveBattle] Socket exists but disconnected, reconnecting...');
+      socketRef.current.connect();
+      return;
+    }
+    console.log('[LiveBattle] Creating new connection...');
 
     setStatus('connecting');
     setError(null);
@@ -173,12 +176,8 @@ export function useLiveBattle() {
     socketRef.current.emit('forfeit', { roomId });
   }, [roomId]);
 
-  // Cleanup on unmount (don't reset initializedRef — React strict mode unmounts/remounts)
-  useEffect(() => {
-    return () => {
-      socketRef.current?.disconnect();
-    };
-  }, []);
+  // No cleanup — socket persists across React strict mode mounts
+  // Socket will be garbage collected when page navigates away
 
   return {
     // State
