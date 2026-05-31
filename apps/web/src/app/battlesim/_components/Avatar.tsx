@@ -10,12 +10,6 @@ export function Avatar({ side, pov} : { side: Side, pov: 0 | 1}) {
     const uuid = player.name.includes('player:') ? player.name.split(':')[1] : null;
     const avatar = player.name.includes('npc:') ? player.name.split(':')[1] : Sprites.getAvatar(avatarId);
 
-    console.log('=====================')
-    console.log(player.name)
-    console.log(avatarId)
-    console.log(avatar)
-    console.log(uuid)
-
     const baseStyles: React.CSSProperties = {
         position: 'absolute',
         top: `${povCentered ? 307 * getScaleMultiplier() : 98 * getScaleMultiplier()}px`,
@@ -58,7 +52,7 @@ export function Avatar({ side, pov} : { side: Side, pov: 0 | 1}) {
                     className="mx-auto"
                     alt="avatar"
                     style={baseStyles}
-                    src={`https://crafatar.com/renders/body/${uuid}`}
+                    src={`https://api.mineatar.io/body/full${uuid}`}
                 />
             ) : !player.name.includes('npc:') ? (
                 <img

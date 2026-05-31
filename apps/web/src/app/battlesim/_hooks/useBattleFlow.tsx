@@ -75,7 +75,6 @@ export function useBattleFlow(
         
         // If this is a win action, make sure we properly set the winner
         if (args[0] === 'win') {
-          console.log("Processing win action:", args[1]);
           currBattle.winner = args[1] as string;
         }
         
@@ -174,23 +173,18 @@ export function useBattleFlow(
 
   async function playAction(line: string) {
     const { args, kwArgs } = Protocol.parseBattleLine(line);
-    const currentBattle = copyBattle(battle);
-    
-    return new Promise<void>(async (resolve) => {
-      try {
-        const html = formatter.formatHTML(args, kwArgs);
-        const params = await getParams(args, kwArgs as BattleArgsKWArgsTypes);
-        
-        currentBattle.add(args, kwArgs);
-        updateBattleLog(html, currentBattle, args[0]);
-        
-        await performAction(params, currentBattle);
-        resolve();
-      } catch (error) {
-        console.error('Error in playAction:', error);
-        resolve();
-      }
-    });
+
+    try {
+      const html = formatter.formatHTML(args, kwArgs);
+      const params = await getParams(args, kwArgs as BattleArgsKWArgsTypes);
+
+      battle.add(args, kwArgs);
+      updateBattleLog(html, battle, args[0]);
+
+      await performAction(params, battle);
+    } catch (error) {
+      console.error('Error in playAction:', error);
+    }
   }
 
   const updateBattleLog = (html: string, currentBattle: Battle, actionType: string) => {
@@ -241,7 +235,6 @@ export function useBattleFlow(
           timeout = 0;
           break;
         default:
-          console.log('Unknown action:', args[0]);
           break;
       }
       

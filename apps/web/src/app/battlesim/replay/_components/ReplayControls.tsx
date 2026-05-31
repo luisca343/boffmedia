@@ -73,18 +73,22 @@ export function ReplayControls({
                 <ReplayControlsButton onClick={() => setLogVisible(!logVisible)} label="Toggle Log">
                     <PlusIcon className="h-5 w-5" />
                 </ReplayControlsButton>
-                <ReplayControlsButton onClick={() => simulateAttack()} label="Simulate Attack">
-                    <BoltIcon className="h-5 w-5" />
-                </ReplayControlsButton>
-                <Input
-                    variant={'dark'}
-                    className="w-32 border border-surface-900"
-                    type="string"
-                    value={simulatedAttack}
-                    onChange={(e) => setSimulatedAttack(e.target.value)}
-                    min={1}
-                    max={lastTurn}
-                />
+                {process.env.NODE_ENV === 'development' && (
+                    <>
+                        <ReplayControlsButton onClick={() => simulateAttack()} label="Simulate Attack">
+                            <BoltIcon className="h-5 w-5" />
+                        </ReplayControlsButton>
+                        <Input
+                            variant={'dark'}
+                            className="w-32 border border-surface-900"
+                            type="string"
+                            value={simulatedAttack}
+                            onChange={(e) => setSimulatedAttack(e.target.value)}
+                            min={1}
+                            max={lastTurn}
+                        />
+                    </>
+                )}
             </div>
             <div className="flex space-x-2">
                 <ReplayControlsButton onClick={() => setCurrentTurn()} label="Go to Turn">
