@@ -75,7 +75,7 @@ export const BattleCanvas = forwardRef(({
             backgroundSize: `100% 100%`, width: canvasWidth, height: canvasWidth * ASPECT_RATIO }}>        
                   
                   {/* Preview overlay only shows when needed */}
-                  {showPreviewOverlay && (
+                  {!liveMode && showPreviewOverlay && (
                     <div className="absolute inset-0">
                       <BattlePreview 
                         battle={battle} 
@@ -88,7 +88,7 @@ export const BattleCanvas = forwardRef(({
                     </div>
                   )}
 
-                  {currentAction >= countActions(battleLog) - 1 && (
+                  {!liveMode && currentAction >= countActions(battleLog) - 1 && (
                     <div className="absolute inset-0">
                       <BattleEndScreen 
                         battle={battle} 
