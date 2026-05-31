@@ -100,7 +100,6 @@ export class PokemonSprite {
   
     const element = this.scene.getPokemonElement(this.position);
     if (!element) {
-      console.log('Element not found');
       return;
     }
 
