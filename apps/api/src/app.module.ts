@@ -32,6 +32,7 @@ import { SmartrotomModule } from '@api/smartrotom/_main/smartrotom.module';
 import { BattleService } from './api/battlesimulator/battle/battle.service';
 import { BattleController } from './api/battlesimulator/battle/battle.controller';
 import { BattleModule } from './api/battlesimulator/battle/battle.module';
+import { BattleGateway } from './api/battlesimulator/battle/battle.gateway';
 import { SharexModule } from './api/boffmedia/util/sharex/sharex.module';
 import { ArcadeModule } from '@api/smartrotom/arcade/arcade.module';
 import { ArcadeController } from '@api/smartrotom/arcade/arcade.controller';
@@ -114,7 +115,6 @@ import { VgcModule } from '@api/boffmedia/herramientas/pokemon/vgc/vgc.module';
     AuthModule,
     DrizzleModule,
     AchievementModule,
-    BattleModule,
     PlayerModule,
     SmartrotomModule,
     EventsModule,
@@ -154,7 +154,7 @@ import { VgcModule } from '@api/boffmedia/herramientas/pokemon/vgc/vgc.module';
     PokemonImageService,
     CommandsService,
     ShowdownGateway,
-    BattleService,
+    BattleGateway,
     PlayerService,
     SmartrotomService,
     PokemonShowdownService,
