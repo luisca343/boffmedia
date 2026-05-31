@@ -122,6 +122,7 @@ export default function PlayPage() {
           currentAction={0}
           battleLog={null}
           initScene={initScene}
+          liveMode={true}
         />
       </div>
 
