@@ -221,12 +221,21 @@ export class BattleRoom {
   async forfeit(): Promise<void> {
     if (this.status !== 'active') return;
     this.stopTimer();
+    this.status = 'finished';
+
+    const result: BattleEndResult = {
+      winner: 'Bot',
+      replay: this.replayLines.join('\n'),
+      team1: this.getTeamData(this.battle.p1.team),
+      team2: this.getTeamData(this.battle.p2.team),
+      side1: 'Player',
+      side2: 'Bot',
+    };
+    this.callbacks.onBattleEnd(result);
 
     try {
-      await this.streams.omniscient.write('>forfeit p1');
-    } catch (error: any) {
-      this.callbacks.onError(`Forfeit error: ${error.message}`);
-    }
+      this.streams.omniscient.destroy();
+    } catch {}
   }
 
   getStatus(): BattleRoomStatus {
