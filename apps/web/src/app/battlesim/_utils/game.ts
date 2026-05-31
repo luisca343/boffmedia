@@ -1,3 +1,4 @@
+// TRACKED: dead code — candidate for deletion (not imported by any active module)
 import { Protocol } from "@pkmn/protocol";
 import { GenerationNum, Generations } from '@pkmn/data';
 import { Dex, PRNG, TeamValidator, Teams as DTeams, BattleStreams, RandomPlayerAI } from '@pkmn/sim';

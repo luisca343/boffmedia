@@ -14,6 +14,7 @@ import BattlePreview from "./BattlePreview";
 import countActions from "../_utils/battleUtils";
 import BattleEndScreen from "./BattleEndScreen";
 import { sanitizeHtml } from "../_utils/sanitizeHtml";
+import { getParticipantName } from "../_utils/replayUtils";
 
 export type BattleCanvasRefProps = {
   bounceAll: () => void;
@@ -23,18 +24,6 @@ export type BattleCanvasRefProps = {
     defender: PokemonIdent
   ) => void;
 };
-
-function getParticipantName(name:string){
-    if(name.includes('player:')){
-        return name.split(':')[2];
-    }
-
-    if(name.includes('npc:')){
-        return name.split(':')[1];
-    }
-
-    return name;
-}
 
 export const BattleCanvas = forwardRef(({ 
     battle, 

@@ -11,6 +11,7 @@ import { BattleCanvas } from "../../_components/BattleCanvas";
 import { moveAction, } from "../../_utils/battleActions";
 import { ReplayData } from "../../types";
 import { sanitizeHtml } from "../../_utils/sanitizeHtml";
+import { countActions } from "../../_utils/replayUtils";
 import BattlePreview from "../../_components/BattlePreview";
 
 // Replay Loader component for when no replay data is provided
@@ -24,18 +25,26 @@ function ReplayLoader({ onReplayLoad }: { onReplayLoad: (data: ReplayData) => vo
         throw new Error("Please paste a valid replay text");
       }
 
-      // Create a basic ReplayData object using the pasted text
+      const text = replayText.trim();
+
+      // Basic validation: check for required PS replay protocol lines
+      const hasPlayer = text.includes('|player|');
+      const hasTurn = text.includes('|turn|') || text.includes('|start|');
+      
+      if (!hasPlayer || !hasTurn) {
+        throw new Error("Invalid replay format. Expected Pokémon Showdown replay text with |player| and |turn| lines.");
+      }
+
       const mockReplayData: ReplayData = {
         side1: "Player 1",
         side2: "Player 2",
         team1: "",
         team2: "",
-        replay: replayText.trim(),
-        winner: 0,  // Unknown winner by default
+        replay: text,
+        winner: 0,
         createdAt: new Date().toISOString()
       };
 
-      // Pass the created replay data to the parent component
       onReplayLoad(mockReplayData);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unknown error occurred");
@@ -83,7 +92,7 @@ export function Game({battleName = 'medalla_doku', replayData}: {battleName?: st
   
   const { battle, setBattle, battleLog, currentAction, scene, htmlLog, isPlaying, messageBar,
     turnInput, newTurn, settingTurn, lastTurn, simulatedAttack, logVisible, pov, setBattleLog,
-    setCurrentAction, countActions, setScene, setHtmlLog: setLog, setIsPlaying, setMessageBar, setTurnInput,
+    setCurrentAction, setScene, setHtmlLog: setLog, setIsPlaying, setMessageBar, setTurnInput,
     setNewTurn, setSettingTurn, setLastTurn, setSimulatedAttack, setLogVisible, setPov, setCurrentTurn} = useGameState(loadedReplayData);
   
   const battleFlow = useBattleFlow(
@@ -120,11 +129,9 @@ export function Game({battleName = 'medalla_doku', replayData}: {battleName?: st
     await moveAction(battle, scene, 'p1a' as PokemonIdent, simulatedAttack, 'p2a' as PokemonIdent);
   }  
 
-  /*
   if(!loadedReplayData) {
     return <ReplayLoader onReplayLoad={setLoadedReplayData} />;
   }
-    */
   
   return (
     <>

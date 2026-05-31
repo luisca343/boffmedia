@@ -2,8 +2,6 @@ import { Button } from "@/components/ui/primitives/button";
 import PokemonDetail from "./PokemonDetail";
 import { forwardRef, useImperativeHandle } from "react";
 import { Pokemon, Side } from "@pkmn/client";
-import { useSpring, animated as animatedSpring, useTransition  } from "@react-spring/web";
-const animated = animatedSpring as any;
 import { getImageSize, getOffset, getScaleMultiplier } from "../_utils/viewUtils";
 import { PokemonImage } from "./PokemonImage";
 import useViewportWidth from "@/services/useViewPortWidth";
@@ -30,7 +28,7 @@ export const PokemonElement = forwardRef(({
 }: PokemonElementProps, ref: any) => {
     const sideId = side.n % 2 === 0 ? 'p1' : 'p2';
     return (
-        <animated.div
+        <div
             id={position}
             className="absolute"
             style={{
@@ -48,7 +46,7 @@ export const PokemonElement = forwardRef(({
                     <PokemonImage id={`${position}-pkm`} side={sideId} pokemon={pokemon} />
                 </PokemonDetail>
             </div>
-        </animated.div>
+        </div>
     );
 });
     
