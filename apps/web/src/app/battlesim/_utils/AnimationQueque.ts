@@ -1,3 +1,4 @@
+// TRACKED: dead code — candidate for deletion (not imported by any active module)
 import { AnimationData } from "../types";
 
 /**

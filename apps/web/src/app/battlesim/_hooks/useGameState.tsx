@@ -6,6 +6,7 @@ import { create } from 'zustand';
 import { Protocol } from '@pkmn/protocol';
 import { Scene } from '../_utils/Scene';
 import { ReplayData } from '../types';
+import { countActions } from '../_utils/replayUtils';
 
 // Battle Store Types and Implementation
 interface BattleStore {
@@ -142,10 +143,6 @@ export function useGameState(replayData?: ReplayData) {
         });
     };
 
-    function countActions(): number {
-        return battleLog ? battleLog.split('\n').length : 0;
-    }
-    
     return {
         // Core state
         battle,
@@ -181,6 +178,5 @@ export function useGameState(replayData?: ReplayData) {
         setLogVisible,
         setPov,
         setCurrentTurn,
-        countActions
     };
 }

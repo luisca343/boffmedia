@@ -1,3 +1,4 @@
+// TRACKED: dead code — candidate for deletion (not imported by any active module)
 import React, { useEffect, useState } from 'react';
 import { Protocol } from "@pkmn/protocol";
 
