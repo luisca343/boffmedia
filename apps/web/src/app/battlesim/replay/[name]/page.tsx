@@ -1,16 +1,10 @@
-import React from 'react'; // Ensure React is imported if using JSX
-import { Battle, Pokemon, Side } from "@pkmn/client";
-import { Dex } from '@pkmn/sim';
-import { Generations } from '@pkmn/data';
+import React from 'react';
 import { Game } from '../_components/Game';
 
-const battle = new Battle(new Generations(Dex as any) as any); // Use const if battle is not reassigned
-
-export default function Test({params} : {params: {name: string}}): React.JSX.Element { // Explicitly type the return value
-
+export default async function ReplayByNamePage({params}: {params: {name: string}}) {
   return (
     <section className="flex flex-col">
-      <Game battleName={params.name}/>
+      <Game battleName={params.name} />
     </section>
   );
 }

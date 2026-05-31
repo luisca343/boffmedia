@@ -83,15 +83,6 @@ export function useGameState(replayData?: ReplayData) {
             loadScene();
             return;
         }
-        
-        
-        fetch(`https://api.boffmedia.es/smartrotom/combates/booststera.txt`)
-        .then(response => response.text())
-        .then(text => {
-            setBattleLog(text);
-            loadScene();
-        })
-        .catch(error => console.error("Error fetching battle log:", error));
     }, [replayData]);
     
     // Load initial game data
