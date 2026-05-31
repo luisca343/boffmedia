@@ -10,8 +10,19 @@ import { env } from '@/config/env.public';
 import { Scene } from '../_utils/Scene';
 import { useBattleFlow } from './useBattleFlow';
 
-// Module-level socket — survives React strict mode mount/unmount/mount
-let globalSocket: Socket | null = null;
+// Use window to store socket — survives React strict mode and module boundaries
+function getGlobalSocket(): Socket | null {
+  return (window as any).__battlesim_socket ?? null;
+}
+function setGlobalSocket(socket: Socket | null) {
+  (window as any).__battlesim_socket = socket;
+}
+function getEventsRegistered(): boolean {
+  return (window as any).__battlesim_events_registered ?? false;
+}
+function setEventsRegistered(val: boolean) {
+  (window as any).__battlesim_events_registered = val;
+}
 
 export type LiveBattleStatus = 'idle' | 'connecting' | 'active' | 'finished' | 'error';
 
@@ -30,8 +41,7 @@ export interface LiveBattleState {
 }
 
 export function useLiveBattle() {
-  const socketRef = useRef<Socket | null>(globalSocket);
-  const eventsRegisteredRef = useRef(false);
+  const socketRef = useRef<Socket | null>(getGlobalSocket());
   const battleRef = useRef<Battle>(new Battle(new Generations(Dex as any) as any));
   const [battle, setBattle] = useState(battleRef.current);
   const [scene, setScene] = useState<Scene | null>(null);
@@ -86,15 +96,16 @@ export function useLiveBattle() {
   }, [battle, scene]);
 
   const connect = useCallback(() => {
-    if (globalSocket?.connected) {
-      console.log('[LiveBattle] Already connected (global)');
-      socketRef.current = globalSocket;
+    const existing = getGlobalSocket();
+    if (existing?.connected) {
+      console.log('[LiveBattle] Already connected (window)');
+      socketRef.current = existing;
       return;
     }
-    if (globalSocket) {
-      console.log('[LiveBattle] Global socket exists but disconnected, reconnecting...');
-      globalSocket.connect();
-      socketRef.current = globalSocket;
+    if (existing) {
+      console.log('[LiveBattle] Socket exists but disconnected, reconnecting...');
+      existing.connect();
+      socketRef.current = existing;
       return;
     }
     console.log('[LiveBattle] Creating new connection...');
@@ -102,11 +113,12 @@ export function useLiveBattle() {
     setError(null);
     const API_BASE_URL = env.NEXT_PUBLIC_API;
     const socket = io(`${API_BASE_URL}/battle`);
-    globalSocket = socket;
+    setGlobalSocket(socket);
     socketRef.current = socket;
 
-    if (!eventsRegisteredRef.current) {
-      eventsRegisteredRef.current = true;
+    if (!getEventsRegistered()) {
+      setEventsRegistered(true);
+      console.log('[LiveBattle] Registering event handlers');
 
       socket.on('connect', () => {
         console.log('[LiveBattle] Connected to battle gateway');
