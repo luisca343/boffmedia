@@ -9,6 +9,7 @@ import { Server, Socket } from 'socket.io';
 import { Logger } from 'nestjs-pino';
 import { BattleRoom, BattleEndResult, BattleRoomCallbacks } from './battle.room';
 import { Protocol } from '@pkmn/protocol';
+import { AchievementFacadeService } from '@api/smartrotom/achievement/achievement.facade.service';
 
 interface ClientState {
   socket: Socket;
@@ -20,7 +21,10 @@ interface ClientState {
 export class BattleGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {
-  constructor(private readonly logger: Logger) {}
+  constructor(
+    private readonly logger: Logger,
+    private readonly achievementFacade: AchievementFacadeService,
+  ) {}
 
   @WebSocketServer() server: Server;
 
@@ -80,8 +84,23 @@ export class BattleGateway
       onRequest: (request: Protocol.Request) => {
         client.emit('request', { roomId, request });
       },
-      onBattleEnd: (result: BattleEndResult) => {
-        client.emit('battleEnd', { roomId, ...result });
+      onBattleEnd: async (result: BattleEndResult) => {
+        let replayId: number | undefined;
+        try {
+          const replayResult = await this.achievementFacade.createReplay({
+            side1: result.side1,
+            side2: result.side2,
+            team1: JSON.stringify(result.team1),
+            team2: JSON.stringify(result.team2),
+            replay: result.replay,
+            winner: result.winner,
+          });
+          replayId = replayResult.insertId;
+          this.logger.log(`Replay saved: ${replayId}`);
+        } catch (err: any) {
+          this.logger.error(`Failed to save replay: ${err.message}`);
+        }
+        client.emit('battleEnd', { roomId, ...result, replayId });
         this.cleanupRoom(roomId);
       },
       onError: (error: string) => {
