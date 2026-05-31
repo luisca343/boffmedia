@@ -220,6 +220,12 @@ export function useLiveBattle() {
   }, [battleFlow, status]);
 
   const createBattle = useCallback((format?: string) => {
+    // Don't create if we already have a battle
+    if (roomIdRef.current) {
+      console.log('[LiveBattle] Already have roomId:', roomIdRef.current, '- skipping createBattle');
+      setStatus('active');
+      return;
+    }
     console.log('[LiveBattle] createBattle() called, socket connected:', socketRef.current?.connected);
     if (!socketRef.current?.connected) {
       connect();
