@@ -1,3 +1,4 @@
+// TRACKED: dead code — candidate for deletion (stub with empty methods, imported only by Scene.ts)
 /**
  * Handles battle background effects and animations
  */

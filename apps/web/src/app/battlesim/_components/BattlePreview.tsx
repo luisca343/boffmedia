@@ -4,18 +4,7 @@ import useViewportWidth from "@/services/useViewPortWidth"
 import { PokemonTeam } from "./PokemonTeam"
 import { useEffect, useState } from "react"
 import BattlePreviewAvatar from "./BattlePreviewAvatar"
-
-function getParticipantName(name: string) {
-  if (name.includes("player:")) {
-    return name.split(":")[2]
-  }
-
-  if (name.includes("npc:")) {
-    return name.split(":")[1]
-  }
-
-  return name
-}
+import { getParticipantName } from "../_utils/replayUtils"
 
 export const EnhancedBattlePreview = ({
   battle,
