@@ -67,6 +67,7 @@
     "cmdk": "^1.0.0",
     "date-fns": "^3.6.0",
     "dexie": "^4.4.2",
+    "dompurify": "^3.4.7",
     "eslint": "^9.0.0",
     "fast-xml-parser": "^4.5.0",
     "framer-motion": "^11.0.6",
