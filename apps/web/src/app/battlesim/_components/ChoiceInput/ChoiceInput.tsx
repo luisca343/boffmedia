@@ -17,11 +17,14 @@ export function ChoiceInput({ request, makeChoice, isWaiting }: ChoiceInputProps
   const requestType = request.requestType || (request.active ? 'move' : request.side ? 'switch' : null);
 
   if (requestType === 'move') {
+    const trapped = request.active?.[0]?.trapped;
     return (
-      <MoveSelector
-        request={request}
-        makeChoice={makeChoice}
-      />
+      <div className="flex flex-col gap-3">
+        <MoveSelector request={request} makeChoice={makeChoice} />
+        {!trapped && request.side?.pokemon && (
+          <SwitchMenu request={request} makeChoice={makeChoice} />
+        )}
+      </div>
     );
   }
 
