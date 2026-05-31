@@ -109,7 +109,7 @@ export class BattleGateway
       },
     };
 
-    const room = new BattleRoom(roomId, callbacks);
+    const room = new BattleRoom(roomId, callbacks, this.logger);
     this.rooms.set(roomId, room);
     state.roomId = roomId;
 
