@@ -52,6 +52,7 @@ export function useBattleFlow(
   const liveProcessingRef = useRef(false);
   const liveActionIndexRef = useRef(0);
   const liveWaitingRef = useRef(false);
+  const pendingBufferRef = useRef<string[]>([]);
   const animateModeRef = useRef(animateMode);
   const liveCallbacksRef = useRef<{ onRequest?: (req: Protocol.Request) => void; onBattleEnd?: (winner: string) => void }>({});
 
@@ -141,6 +142,11 @@ export function useBattleFlow(
   }, [battle, formatter]);
 
   const addLine = useCallback((line: string) => {
+    // In animated mode, buffer lines that arrive while waiting for a choice
+    if (animateModeRef.current && liveWaitingRef.current) {
+      pendingBufferRef.current.push(line);
+      return;
+    }
     liveBufferRef.current.push(line);
     // Use setTimeout to avoid synchronous re-entrance
     setTimeout(() => processNextLiveLine(), 0);
@@ -149,6 +155,13 @@ export function useBattleFlow(
   const resumeAfterChoice = useCallback(() => {
     liveWaitingRef.current = false;
     options?.setIsWaitingForChoice?.(false);
+
+    // Move pending lines to the main buffer (animated mode only)
+    if (pendingBufferRef.current.length > 0) {
+      liveBufferRef.current.push(...pendingBufferRef.current);
+      pendingBufferRef.current = [];
+    }
+
     // Re-trigger processing after a microtask to let state settle
     setTimeout(() => {
       processNextLiveLine();
