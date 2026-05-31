@@ -133,14 +133,18 @@ export class BattleRoom {
         const trimmed = chunk.trim();
         if (!trimmed) continue;
 
-        const { args, kwArgs } = Protocol.parseBattleLine(trimmed);
+        const lines = trimmed.split('\n');
+        for (const line of lines) {
+          if (!line.trim()) continue;
+          const { args } = Protocol.parseBattleLine(line);
 
-        if (args[0] === 'request') {
-          try {
-            this.currentRequest = JSON.parse(args[1] as string) as Protocol.Request;
-            this.callbacks.onRequest(this.currentRequest);
-          } catch (e: any) {
-            this.callbacks.onError(`Failed to parse request: ${e.message}`);
+          if (args[0] === 'request') {
+            try {
+              this.currentRequest = JSON.parse(args[1] as string) as Protocol.Request;
+              this.callbacks.onRequest(this.currentRequest);
+            } catch (e: any) {
+              this.callbacks.onError(`Failed to parse request: ${e.message}`);
+            }
           }
         }
       }

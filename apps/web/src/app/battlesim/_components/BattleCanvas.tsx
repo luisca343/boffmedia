@@ -59,7 +59,7 @@ export const BattleCanvas = forwardRef(({
         p2a: p2.active[0], p2b: p2.active[1], p2c: p2.active[2], p2d: p2.active[3], p2e: p2.active[4]
     } as {[key: string]: Pokemon};
     
-    if(!battle.pokemonControlled && !battleLog) return <Loading/>
+    if(!battle.pokemonControlled && !battleLog && battle.turn === 0) return <Loading/>
 
     const gameRefCallback = useCallback((node: HTMLElement | null) => {
         if (node && initScene) {
