@@ -256,7 +256,7 @@ Full Pokédex browser. Features quick search, localization by biome, move lists,
 **Status:** Scaffold (in development)  
 Twitter/X-inspired social network for server players. Will allow posting short updates, following other trainers, liking and commenting on posts, and building a community feed.
 
-**Technical note:** Rooker is also the natural home for the **shared notification layer** — multiple apps need push notifications (Wigglypop sold, Correo received, Karts race starting, FurretToday event reminder). Building this infra as part of Rooker's backend means other apps can tap into it without duplicating notification plumbing. Rogues uses Socket.io already present in the stack.
+**Technical note:** Rooker is also the natural home for the **shared notification layer** — multiple apps need push notifications (Wigglypop sold, new ChatApp message, Karts race starting, FurretToday event reminder). Building this infra as part of Rooker's backend means other apps can tap into it without duplicating notification plumbing. Socket.io is already present in the stack.
 
 **Planned features:**
 - Feed: follows-based chronological, with staff-pinned posts anchored at top
@@ -333,23 +333,9 @@ Wallapop/marketplace-style trading app. Allows players to list Pokémon and item
 
 ---
 
-## Roadmap — New Apps
-
-These are proposed standalone apps not yet scaffolded.
-
-### Correo (Mail)
-**Status:** Planned  
-Async in-game mail for sending items or messages between players. Different from ChatApp (real-time) — closer to in-game mail for gifting, formal messages, or admin communications.
-
-**Planned features:**
-- Inbox / Sent / Drafts view
-- Attach stars (StarBank integration) to a letter
-- Attach a Wigglypop listing link to confirm a trade
-- Admin broadcast mail (server-wide announcements, one-to-many)
-- Read receipts and mail expiry (unclaimed items returned after X days)
-
-### Equipo (Team Builder)
-**Status:** Planned (standalone)  
+### Equipo (Team Builder) ⭐ New
+**Route:** `/smartrotom/equipo`  
+**Status:** Scaffold (in development)  
 Team composition tool. PC already has a team slot builder for Pokémon you own — Equipo extends beyond that: build hypothetical teams with any Pokémon (owned or not), run scenarios for Liga/Torneos prep, and analyze coverage without being limited to your box.
 
 **Rationale for standalone over PC sub-route:** PC is box management (what you have). Equipo is theory-crafting (what you want to build). The workflows and audience overlap but the depth warrants its own space — and it can deep-link *from* PC ("analyze this team in Equipo") without being buried inside it.
@@ -403,8 +389,6 @@ The apps form a connected ecosystem. These are the intentional deep-links and da
 | **Cámara/Álbum** | **Rooker** | "Share my completion" one-tap to Rooker |
 | **FurretToday/Eventos** | **Misiones** | Event-exclusive missions surface with event badge |
 | **FurretToday/Eventos** | **Karts** | Upcoming races appear in the event calendar |
-| **Correo** | **StarBank** | Stars attached to a letter locked until claimed |
-| **Correo** | **Wigglypop** | Trade confirmation letter auto-generated when deal closes |
 | **Liga/Gimnasios** | **Pasaporte** | Same badge data source — both show the badge wall |
 | **Liga/Torneos** | **Equipo** | "Prep for this tournament" CTA opens Equipo with current team |
 
@@ -414,7 +398,7 @@ The apps form a connected ecosystem. These are the intentional deep-links and da
 
 ### Architecture
 
-Notifications are a **standalone NestJS module** (`NotificationsModule`) — not owned by Rooker. Rooker reads and displays notifications alongside its social feed; other apps (Wigglypop, Correo, Karts) inject `NotificationsService` without depending on Rooker being built first.
+Notifications are a **standalone NestJS module** (`NotificationsModule`) — not owned by Rooker. Rooker reads and displays notifications alongside its social feed; other apps (Wigglypop, ChatApp, Karts) inject `NotificationsService` without depending on Rooker being built first.
 
 ```
 NestJS NotificationsModule
@@ -446,7 +430,7 @@ notifications
 | `wigglypop.sold` | Buyer confirms receipt | No |
 | `wigglypop.offer` | Someone makes an offer on your listing | No |
 | `wigglypop.deal_closed` | Both parties confirm | No |
-| `correo.received` | New mail in inbox | Yes — brief chat message |
+| `chatapp.message` | New direct message received | Yes — sender name in chat |
 | `karts.race_starting` | X minutes before scheduled race | Yes — countdown in chat |
 | `karts.results` | Race results available | No |
 | `eventos.reminder` | Player set a reminder on an event | Yes — event name + time in chat |
@@ -493,7 +477,7 @@ Settings stored in a `notification_preferences` table keyed by player UUID.
 | App | Badge driven by |
 |-----|----------------|
 | Wigglypop | `wigglypop.*` unread count |
-| Correo | `correo.received` unread count |
+| ChatApp | `chatapp.message` unread count |
 | Karts | `karts.race_starting` + `karts.results` |
 | Rooker | `rooker.*` unread count |
 | FurretToday | `eventos.reminder` + new content |
@@ -512,7 +496,7 @@ The current home screen shows app icons + clock. With the notification layer and
 - **Active Misiones** count badge — "3 active missions"
 - **Karts** — "Race in 12 minutes: Circuito Wingull" with a join CTA
 - **Wigglypop** — "2 offers on your listings"
-- **Correo** — "1 new message from Admin"
+- **ChatApp** — "1 new message from [player]"
 - **FurretToday** — today's event title if one is running
 
 Widgets are opt-in and configurable. They don't replace app icons; they sit above the grid as a collapsible panel.
