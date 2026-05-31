@@ -1,7 +1,7 @@
 "use client"
 import { Battle, Pokemon, Side } from "@pkmn/client";
 import { Loading } from "@/components/smartrotom/Loading";
-import { forwardRef, useRef } from "react";
+import { forwardRef, useCallback, useRef } from "react";
 import { positionsP1, positionsP2, ASPECT_RATIO, getScaleMultiplier } from "../_utils/viewUtils";
 import { PokemonStatus } from "./PokemonStatus";
 import { PokemonElement, PokemonRefType } from "./PokemonElement";
@@ -34,7 +34,8 @@ export const BattleCanvas = forwardRef(({
     setIsPlaying, 
     currentAction, 
     battleLog,
-    showFullInfo = false // Single prop for full info display mode
+    showFullInfo = false,
+    initScene,
 }: { 
     battle: Battle, 
     pov: 0 | 1 | any, 
@@ -44,7 +45,8 @@ export const BattleCanvas = forwardRef(({
     setIsPlaying: (playing: boolean) => void, 
     currentAction: number, 
     battleLog: string | null,
-    showFullInfo?: boolean // For replays or debug modes
+    showFullInfo?: boolean,
+    initScene?: (gameElement: HTMLElement) => void,
 }, ref: React.Ref<BattleCanvasRefProps>) => {
     const pokemonRefs = useRef<{ [key: string]: PokemonRefType }>({});
     const [, canvasWidth] = useViewportWidth();
@@ -57,9 +59,16 @@ export const BattleCanvas = forwardRef(({
         p2a: p2.active[0], p2b: p2.active[1], p2c: p2.active[2], p2d: p2.active[3], p2e: p2.active[4]
     } as {[key: string]: Pokemon};
     
-    if(!battle.pokemonControlled) return <Loading/>
+    if(!battle.pokemonControlled && !battleLog) return <Loading/>
+
+    const gameRefCallback = useCallback((node: HTMLElement | null) => {
+        if (node && initScene) {
+            initScene(node);
+        }
+    }, [initScene]);
+
     return (
-        <div  id="game" className="flex overflow-hidden relative select-none" style={{
+        <div  id="game" ref={gameRefCallback} className="flex overflow-hidden relative select-none" style={{
             backgroundImage: 'url(/battlesim/fx/bg/hagane.png)', 
             backgroundSize: `100% 100%`, width: canvasWidth, height: canvasWidth * ASPECT_RATIO }}>        
                   
