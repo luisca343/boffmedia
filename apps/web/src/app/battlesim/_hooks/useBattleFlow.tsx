@@ -29,6 +29,22 @@ export function useBattleFlow(
   const formatter = new LogFormatter('p1', battle);
   const cancelledRef = useRef(false);
 
+  // Refs for latest values — effect reads these without adding to deps
+  const battleLogRef = useRef(battleLog);
+  battleLogRef.current = battleLog;
+  const newTurnRef = useRef(newTurn);
+  newTurnRef.current = newTurn;
+  const lastTurnRef = useRef(lastTurn);
+  lastTurnRef.current = lastTurn;
+  const settingTurnRef = useRef(settingTurn);
+  settingTurnRef.current = settingTurn;
+  const povRef = useRef(pov);
+  povRef.current = pov;
+  const currentActionRef = useRef(currentAction);
+  currentActionRef.current = currentAction;
+  const sceneRef = useRef(scene);
+  sceneRef.current = scene;
+
   // Cleanup on unmount — cancel pending async chains
   useEffect(() => {
     return () => {
@@ -44,7 +60,7 @@ export function useBattleFlow(
   // Main battle flow control
   useEffect(() => {
     if(isPlaying && currentAction !== -1) {
-      const lines = battleLog ? battleLog.split('\n') : [];
+      const lines = battleLogRef.current ? battleLogRef.current.split('\n') : [];
       if(lines.length === 0 || currentAction >= lines.length) {
         setIsPlaying(false);
         return;
@@ -54,18 +70,18 @@ export function useBattleFlow(
       return;
     }
     
-    if(currentAction === -1 || newTurn === -1) {
+    if(currentAction === -1 || newTurnRef.current === -1) {
       handleTurnChange();
     }
   }, [currentAction, isPlaying]);
 
   const handleTurnChange = () => {
-    const lines = battleLog ? battleLog.split('\n') : [];
+    const lines = battleLogRef.current ? battleLogRef.current.split('\n') : [];
     const currBattle = new Battle(new Generations(Dex as any) as any);
     
-    let changeTurn = newTurn;
+    let changeTurn = newTurnRef.current;
     if(changeTurn < 0) changeTurn = 0;
-    if(changeTurn > lastTurn + 1) changeTurn = lastTurn + 1;
+    if(changeTurn > lastTurnRef.current + 1) changeTurn = lastTurnRef.current + 1;
   
     if(changeTurn === 0) {
       resetBattle(currBattle, changeTurn);
@@ -75,7 +91,7 @@ export function useBattleFlow(
     setHtmlLog([]);
     
     // If we're going to the state after the last turn (battle end)
-    if(changeTurn === lastTurn + 1) {
+    if(changeTurn === lastTurnRef.current + 1) {
       // Process ALL actions to ensure the win action is included
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
@@ -260,7 +276,7 @@ export function useBattleFlow(
       return await new Promise<void>((resolve) => {
         const timerId = setTimeout(() => {
           if (cancelledRef.current) { resolve(); return; }
-          let nextAction = settingTurn ? -1 : currentAction + 1;
+          let nextAction = settingTurnRef.current ? -1 : currentActionRef.current + 1;
           setCurrentAction(nextAction);
           resolve();
         }, timeout);
