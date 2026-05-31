@@ -8,7 +8,8 @@ interface MoveSelectorProps {
 }
 
 interface MoveData {
-  name: string;
+  name?: string;
+  move?: string;
   id: string;
   pp: number;
   maxpp: number;
@@ -44,7 +45,7 @@ export function MoveSelector({ request, makeChoice }: MoveSelectorProps) {
               `}
             >
               <div className="flex items-center justify-between gap-2">
-                <span className="font-semibold text-sm truncate">{move.name}</span>
+                <span className="font-semibold text-sm truncate">{move.move || move.name}</span>
               </div>
               <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span>PP: {move.pp}/{move.maxpp}</span>
