@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useLiveBattle, LiveBattleStatus } from '../_hooks/useLiveBattle';
 import { BattleCanvas } from '../_components/BattleCanvas';
 import { ChoiceInput } from '../_components/ChoiceInput/ChoiceInput';
+import { TurnTimer } from '../_components/TurnTimer';
 
 export default function PlayPage() {
   const {
@@ -18,6 +19,7 @@ export default function PlayPage() {
     messageBar,
     replayId,
     error,
+    timerState,
     createBattle,
     makeChoice,
     forfeit,
@@ -126,6 +128,11 @@ export default function PlayPage() {
           onPlayAgain={handlePlayAgain}
         />
       </div>
+
+      {/* Turn Timer */}
+      {timerState && status === 'active' && (
+        <TurnTimer p1={timerState.p1} p2={timerState.p2} activeSide={timerState.activeSide} />
+      )}
 
       {/* Choice Input */}
       {isWaitingForChoice && currentRequest && (

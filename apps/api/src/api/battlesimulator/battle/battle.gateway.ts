@@ -7,7 +7,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Logger } from 'nestjs-pino';
-import { BattleRoom, BattleEndResult, BattleRoomCallbacks } from './battle.room';
+import { BattleRoom, BattleEndResult, BattleRoomCallbacks, TimerConfig } from './battle.room';
 import { Protocol } from '@pkmn/protocol';
 import { AchievementFacadeService } from '@api/smartrotom/achievement/achievement.facade.service';
 
@@ -81,7 +81,7 @@ export class BattleGateway
   }
 
   @SubscribeMessage('createBattle')
-  handleCreateBattle(client: Socket, payload?: { format?: string }): void {
+  handleCreateBattle(client: Socket, payload?: { format?: string; timer?: Partial<TimerConfig> }): void {
     const state = this.getClientState(client);
     if (!state) return;
 
@@ -128,9 +128,12 @@ export class BattleGateway
         this.logger.error(`Battle error [${roomId}]: ${error}`);
         client.emit('error', { roomId, message: error });
       },
+      onTimerUpdate: (state) => {
+        client.emit('timerUpdate', { roomId, ...state });
+      },
     };
 
-    const room = new BattleRoom(roomId, callbacks, this.logger);
+    const room = new BattleRoom(roomId, callbacks, this.logger, payload?.timer);
     this.rooms.set(roomId, room);
     state.roomId = roomId;
 

@@ -66,6 +66,11 @@ export function useLiveBattle() {
   const [replay, setReplay] = useState<string | null>(null);
   const [replayId, setReplayId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [timerState, setTimerState] = useState<{
+    p1: { turnRemaining: number; totalRemaining: number };
+    p2: { turnRemaining: number; totalRemaining: number };
+    activeSide: 'p1' | 'p2' | null;
+  } | null>(null);
 
   // useBattleFlow in live mode
   const battleFlow = useBattleFlow(
@@ -161,6 +166,10 @@ export function useLiveBattle() {
         setStatus('finished');
       });
 
+      socket.on('timerUpdate', (data: { roomId: string; p1: { turnRemaining: number; totalRemaining: number }; p2: { turnRemaining: number; totalRemaining: number }; activeSide: 'p1' | 'p2' | null }) => {
+        setTimerState({ p1: data.p1, p2: data.p2, activeSide: data.activeSide });
+      });
+
       socket.on('error', (data: { message: string; roomId?: string }) => {
         console.error('[LiveBattle] Error:', data.message);
         setError(data.message);
@@ -194,6 +203,10 @@ export function useLiveBattle() {
       setStatus('finished');
     });
 
+    socket.on('timerUpdate', (data: { roomId: string; p1: { turnRemaining: number; totalRemaining: number }; p2: { turnRemaining: number; totalRemaining: number }; activeSide: 'p1' | 'p2' | null }) => {
+      setTimerState({ p1: data.p1, p2: data.p2, activeSide: data.activeSide });
+    });
+
     socket.on('error', (data: { message: string; roomId?: string }) => {
       console.error('[LiveBattle] Error:', data.message);
       setError(data.message);
@@ -213,6 +226,7 @@ export function useLiveBattle() {
       setStatus('active');
       return;
     }
+    setTimerState(null);
     if (!socketRef.current?.connected) {
       connect();
       // Wait for connection, then create
@@ -263,6 +277,7 @@ export function useLiveBattle() {
     replay,
     replayId,
     error,
+    timerState,
 
     // Actions
     createBattle,
