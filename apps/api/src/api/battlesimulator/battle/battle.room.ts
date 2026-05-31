@@ -18,6 +18,7 @@ export interface BattleRoomCallbacks {
   onRequest: (request: Protocol.Request) => void;
   onBattleEnd: (result: BattleEndResult) => void;
   onError: (error: string) => void;
+  onTimerUpdate?: (state: TimerState) => void;
 }
 
 export interface BattleEndResult {
@@ -27,6 +28,18 @@ export interface BattleEndResult {
   team2: any[];
   side1: string;
   side2: string;
+}
+
+export interface TimerConfig {
+  enabled: boolean;
+  turnMs: number;
+  totalMs: number;
+}
+
+export interface TimerState {
+  p1: { turnRemaining: number; totalRemaining: number };
+  p2: { turnRemaining: number; totalRemaining: number };
+  activeSide: 'p1' | 'p2' | null;
 }
 
 export class BattleRoom {
@@ -43,11 +56,25 @@ export class BattleRoom {
   private aiPromise: Promise<void> | null = null;
   private omniscientPromise: Promise<void> | null = null;
   private gens: Generations;
+  private timerConfig: TimerConfig;
+  private timerState: TimerState;
+  private turnStartTime: number | null = null;
+  private timerInterval: ReturnType<typeof setInterval> | null = null;
 
-  constructor(id: string, callbacks: BattleRoomCallbacks, private readonly logger?: Logger) {
+  constructor(id: string, callbacks: BattleRoomCallbacks, private readonly logger?: Logger, timerConfig?: Partial<TimerConfig>) {
     this.id = id;
     this.callbacks = callbacks;
     this.gens = new Generations(Dex as any);
+    this.timerConfig = {
+      enabled: timerConfig?.enabled ?? true,
+      turnMs: timerConfig?.turnMs ?? 60_000,
+      totalMs: timerConfig?.totalMs ?? 300_000,
+    };
+    this.timerState = {
+      p1: { turnRemaining: this.timerConfig.turnMs, totalRemaining: this.timerConfig.totalMs },
+      p2: { turnRemaining: this.timerConfig.turnMs, totalRemaining: this.timerConfig.totalMs },
+      activeSide: null,
+    };
   }
 
   async create(format: string = 'gen9randombattle'): Promise<void> {
@@ -94,6 +121,7 @@ export class BattleRoom {
 
           if (args[0] === 'win') {
             this.status = 'finished';
+            this.stopTimer();
             const result: BattleEndResult = {
               winner: args[1] as string,
               replay: this.replayLines.join('\n'),
@@ -108,6 +136,7 @@ export class BattleRoom {
 
           if (args[0] === 'tie') {
             this.status = 'finished';
+            this.stopTimer();
             const result: BattleEndResult = {
               winner: 'tie',
               replay: this.replayLines.join('\n'),
@@ -152,6 +181,7 @@ export class BattleRoom {
               }
               this.currentRequest = rawRequest as Protocol.Request;
               this.callbacks.onRequest(this.currentRequest);
+              this.startTurnTimer('p1');
             } catch (e: any) {
               this.logger?.error(`[P1] Failed to parse request: ${e.message}`);
               this.callbacks.onError(`Failed to parse request: ${e.message}`);
@@ -179,6 +209,7 @@ export class BattleRoom {
     }
 
     this.currentRequest = null;
+    this.pauseTurnTimer();
 
     try {
       await this.streams.p1.write(choice);
@@ -189,6 +220,7 @@ export class BattleRoom {
 
   async forfeit(): Promise<void> {
     if (this.status !== 'active') return;
+    this.stopTimer();
 
     try {
       await this.streams.omniscient.write('>forfeit p1');
@@ -207,6 +239,52 @@ export class BattleRoom {
 
   getReplay(): string {
     return this.replayLines.join('\n');
+  }
+
+  getTimerState(): TimerState {
+    return { ...this.timerState };
+  }
+
+  private startTurnTimer(side: 'p1' | 'p2'): void {
+    if (!this.timerConfig.enabled) return;
+    this.stopTimer();
+    this.turnStartTime = Date.now();
+    this.timerState.activeSide = side;
+    this.timerInterval = setInterval(() => {
+      if (!this.turnStartTime) return;
+      const elapsed = Date.now() - this.turnStartTime;
+      const player = this.timerState[side];
+      player.turnRemaining = Math.max(0, this.timerConfig.turnMs - elapsed);
+      player.totalRemaining = Math.max(0, player.totalRemaining - 1000);
+
+      this.callbacks.onTimerUpdate?.(this.timerState);
+
+      if (player.turnRemaining <= 0 || player.totalRemaining <= 0) {
+        this.logger?.log(`Timer expired for ${side}, auto-forfeiting`);
+        this.forfeit();
+      }
+    }, 1000);
+  }
+
+  private pauseTurnTimer(): void {
+    if (!this.timerConfig.enabled || !this.turnStartTime) return;
+    this.stopTimer();
+    const side = this.timerState.activeSide;
+    if (side) {
+      const elapsed = Date.now() - this.turnStartTime;
+      const player = this.timerState[side];
+      player.turnRemaining = Math.max(0, this.timerConfig.turnMs - elapsed);
+      player.totalRemaining = Math.max(0, player.totalRemaining - elapsed);
+    }
+    this.turnStartTime = null;
+    this.timerState.activeSide = null;
+  }
+
+  private stopTimer(): void {
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+    }
   }
 
   private getTeamData(team: any[]): any[] {
