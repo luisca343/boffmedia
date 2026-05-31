@@ -1,18 +1,19 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, use } from 'react';
 import { Game } from '../_components/Game';
 import { LigaService } from '@/services/api/smartrotom/ligaService';
 import { ReplayData } from '../../types';
 import { Loading } from '@/components/smartrotom/Loading';
 
-export default function ReplayPage({ params }: { params: { name: string } }) {
+export default function ReplayPage({ params }: { params: Promise<{ name: string }> }) {
+  const { name } = use(params);
   const [replayData, setReplayData] = useState<ReplayData | undefined>();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const id = parseInt(params.name, 10);
+    const id = parseInt(name, 10);
     if (isNaN(id)) {
       setError('Invalid replay ID');
       setLoading(false);
@@ -38,7 +39,7 @@ export default function ReplayPage({ params }: { params: { name: string } }) {
       })
       .catch(() => setError('Failed to load replay'))
       .finally(() => setLoading(false));
-  }, [params.name]);
+  }, [name]);
 
   if (loading) {
     return (
@@ -59,7 +60,7 @@ export default function ReplayPage({ params }: { params: { name: string } }) {
 
   return (
     <section className="flex flex-col">
-      <Game battleName={params.name} replayData={replayData} />
+      <Game battleName={name} replayData={replayData} />
     </section>
   );
 }
