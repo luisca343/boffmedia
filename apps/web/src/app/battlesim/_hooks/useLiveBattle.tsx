@@ -130,7 +130,7 @@ export function useLiveBattle() {
       clientId = crypto.randomUUID();
       localStorage.setItem('battlesim_client_id', clientId);
     }
-    const socket = io(`${API_BASE_URL}/battle`, { auth: { clientId } });
+    const socket = io(`${API_BASE_URL}/battle`, { query: { clientId } });
     setGlobalSocket(socket);
     socketRef.current = socket;
     console.log('[LiveBattle] Socket created and stored on window');

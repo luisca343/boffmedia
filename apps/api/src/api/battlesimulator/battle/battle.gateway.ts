@@ -35,8 +35,8 @@ export class BattleGateway
   private readonly RECONNECT_GRACE_MS = 30_000;
 
   handleConnection(client: Socket) {
-    // Use stable clientId from handshake if available
-    const handshakeClientId = (client.handshake.auth as any)?.clientId;
+    // Use stable clientId from query if available
+    const handshakeClientId = client.handshake.query?.clientId as string;
     let playerId = handshakeClientId || crypto.randomUUID();
 
     // If this clientId already exists (reconnect), update the socket
