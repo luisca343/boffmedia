@@ -47,11 +47,17 @@ export interface LiveBattleState {
 
 export function useLiveBattle() {
   const socketRef = useRef<Socket | null>(getGlobalSocket());
+  const roomIdRef = useRef<string | null>(null);
   const battleRef = useRef<Battle>(new Battle(new Generations(Dex as any) as any));
   const [battle, setBattle] = useState(battleRef.current);
   const [scene, setScene] = useState<Scene | null>(null);
-  const [roomId, setRoomId] = useState<string | null>(null);
+  const [roomId, setRoomIdRaw] = useState<string | null>(null);
   const [status, setStatus] = useState<LiveBattleStatus>('idle');
+
+  const setRoomId = useCallback((id: string | null) => {
+    roomIdRef.current = id;
+    setRoomIdRaw(id);
+  }, []);
   const [currentRequest, setCurrentRequest] = useState<Protocol.Request | null>(null);
   const [isWaitingForChoice, setIsWaitingForChoice] = useState(false);
   const [htmlLog, setHtmlLog] = useState<string[]>([]);
@@ -228,19 +234,21 @@ export function useLiveBattle() {
   }, [connect]);
 
   const makeChoice = useCallback((choice: string) => {
-    if (!socketRef.current?.connected || !roomId) return;
+    const currentRoomId = roomIdRef.current;
+    if (!socketRef.current?.connected || !currentRoomId) return;
 
-    socketRef.current.emit('makeChoice', { roomId, choice });
+    socketRef.current.emit('makeChoice', { roomId: currentRoomId, choice });
     setIsWaitingForChoice(false);
     setCurrentRequest(null);
     battleFlow.resumeAfterChoice();
-  }, [roomId, battleFlow]);
+  }, [battleFlow]);
 
   const forfeit = useCallback(() => {
-    if (!socketRef.current?.connected || !roomId) return;
+    const currentRoomId = roomIdRef.current;
+    if (!socketRef.current?.connected || !currentRoomId) return;
 
-    socketRef.current.emit('forfeit', { roomId });
-  }, [roomId]);
+    socketRef.current.emit('forfeit', { roomId: currentRoomId });
+  }, []);
 
   // No cleanup — socket persists across React strict mode mounts
   // Socket will be garbage collected when page navigates away
