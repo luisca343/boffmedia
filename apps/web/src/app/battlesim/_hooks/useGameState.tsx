@@ -1,23 +1,13 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { Battle } from "@pkmn/client";
 import { Generations } from '@pkmn/data';
 import { Dex } from '@pkmn/sim';
-import { create } from 'zustand';
 import { Protocol } from '@pkmn/protocol';
 import { Scene } from '../_utils/Scene';
 import { ReplayData } from '../types';
 import { ReplayTimeline, parseReplayTimeline } from '../_utils/replayTimeline';
 
-// Battle Store Types and Implementation
-interface BattleStore {
-    battle: Battle;
-    setBattle: (battle: Battle) => void;
-}
-
-const useBattleStore = create<BattleStore>((set) => ({
-    battle: new Battle(new Generations(Dex as any) as any),
-    setBattle: (battle: Battle) => set({ battle }),
-}));
+const createFreshBattle = () => new Battle(new Generations(Dex as any) as any);
 
 interface GameState {
     // Core state
@@ -56,9 +46,14 @@ interface GameState {
 }
 
 export function useGameState(replayData?: ReplayData) {
-    // Battle state from store
-    const battle = useBattleStore((state) => state.battle);
-    const setBattle = useBattleStore((state) => state.setBattle);
+    // Instance-scoped battle state (no module-level store leakage)
+    const battleRef = useRef<Battle>(createFreshBattle());
+    const [battle, setBattleState] = useState<Battle>(battleRef.current);
+    
+    const setBattle = useCallback((newBattle: Battle) => {
+        battleRef.current = newBattle;
+        setBattleState(newBattle);
+    }, []);
     
     // Core state
     const [battleLog, setBattleLog] = useState<string | null>(null);
