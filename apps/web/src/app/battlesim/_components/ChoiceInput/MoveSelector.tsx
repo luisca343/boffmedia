@@ -1,6 +1,8 @@
 'use client';
 
 import { Protocol } from '@pkmn/protocol';
+import { Dex } from '@pkmn/dex';
+import { TypeBadgeSmall } from '@/components/shared/pokemon/TypeBadge';
 
 interface MoveSelectorProps {
   request: Protocol.Request;
@@ -46,6 +48,10 @@ export function MoveSelector({ request, makeChoice }: MoveSelectorProps) {
             >
               <div className="flex items-center justify-between gap-2">
                 <span className="font-semibold text-sm truncate">{move.move || move.name}</span>
+                {(() => {
+                  const moveData = Dex.moves.get(move.id);
+                  return moveData?.exists ? <TypeBadgeSmall type={moveData.type} /> : null;
+                })()}
               </div>
               <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span>PP: {move.pp}/{move.maxpp}</span>
