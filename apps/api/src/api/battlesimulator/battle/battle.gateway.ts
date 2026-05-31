@@ -138,6 +138,7 @@ export class BattleGateway
     if (!state) return;
 
     if (state.roomId !== payload.roomId) {
+      this.logger.warn(`[makeChoice] roomId mismatch: state=${state.roomId} payload=${payload.roomId}`);
       client.emit('error', { message: 'Not in this battle' });
       return;
     }

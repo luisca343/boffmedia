@@ -83,8 +83,12 @@ export function useLiveBattle() {
   }, [battle, scene]);
 
   const connect = useCallback(() => {
-    if (socketRef.current?.connected || initializedRef.current) return;
+    if (socketRef.current?.connected || initializedRef.current) {
+      console.log('[LiveBattle] Already connected or initialized, skipping');
+      return;
+    }
     initializedRef.current = true;
+    console.log('[LiveBattle] Connecting...');
 
     setStatus('connecting');
     setError(null);
@@ -169,11 +173,10 @@ export function useLiveBattle() {
     socketRef.current.emit('forfeit', { roomId });
   }, [roomId]);
 
-  // Cleanup on unmount
+  // Cleanup on unmount (don't reset initializedRef — React strict mode unmounts/remounts)
   useEffect(() => {
     return () => {
       socketRef.current?.disconnect();
-      initializedRef.current = false;
     };
   }, []);
 
