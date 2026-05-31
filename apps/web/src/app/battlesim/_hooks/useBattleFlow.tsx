@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef, useCallback } from 'react';
 import { Battle } from "@pkmn/client";
 import { Generations } from '@pkmn/data';
 import { Dex } from '@pkmn/sim';
@@ -8,6 +8,14 @@ import { Scene } from "../_utils/Scene";
 import { switchAction, faintAction } from "../_utils/battleActions";
 import { useBattleActions } from './useBattleActions';
 import { getRelativeIdent } from "../_utils/replayUtils";
+
+export interface UseBattleFlowOptions {
+  liveMode?: boolean;
+  onRequest?: (request: Protocol.Request) => void;
+  onBattleEnd?: (winner: string) => void;
+  isWaitingForChoice?: boolean;
+  setIsWaitingForChoice?: (waiting: boolean) => void;
+}
 
 export function useBattleFlow(
   battle: Battle,
@@ -24,11 +32,23 @@ export function useBattleFlow(
   setHtmlLog: React.Dispatch<React.SetStateAction<string[]>>,
   setIsPlaying: (playing: boolean) => void,
   setMessageBar: React.Dispatch<React.SetStateAction<string[]>>,
-  setSettingTurn: (setting: boolean) => void
+  setSettingTurn: (setting: boolean) => void,
+  options?: UseBattleFlowOptions
 ) {
+  const liveMode = options?.liveMode ?? false;
+  const onRequest = options?.onRequest;
+  const onBattleEnd = options?.onBattleEnd;
+  const isWaitingForChoice = options?.isWaitingForChoice ?? false;
+  const setIsWaitingForChoice = options?.setIsWaitingForChoice;
+
   const battleActions = useBattleActions(battle, scene, pov);
   const formatter = useMemo(() => new LogFormatter('p1', battle), [battle]);
   const battleLines = useMemo(() => battleLog ? battleLog.split('\n') : [], [battleLog]);
+
+  // Live mode: internal line buffer and processing state
+  const liveBufferRef = useRef<string[]>([]);
+  const liveProcessingRef = useRef(false);
+  const liveActionIndexRef = useRef(0);
 
   // Cache: turn number → line index (O(1) seeking instead of O(n) scan)
   const turnIndexMap = useMemo(() => {
@@ -47,8 +67,75 @@ export function useBattleFlow(
 
   const clearActions = ['switch', 'move', 'turn'];
 
-  // Main battle flow control
+  // ─── LIVE MODE: addLine and processing loop ───
+
+  const processNextLiveLine = useCallback(async () => {
+    if (liveProcessingRef.current) return;
+    if (isWaitingForChoice) return;
+
+    liveProcessingRef.current = true;
+
+    try {
+      while (liveActionIndexRef.current < liveBufferRef.current.length) {
+        if (isWaitingForChoice) break;
+
+        const line = liveBufferRef.current[liveActionIndexRef.current];
+        liveActionIndexRef.current++;
+
+        if (!line.trim()) continue;
+
+        const { args, kwArgs } = Protocol.parseBattleLine(line);
+
+        // Check for request — pause and notify
+        if (args[0] === 'request') {
+          try {
+            const request = JSON.parse(args[1] as string) as Protocol.Request;
+            setIsWaitingForChoice?.(true);
+            onRequest?.(request);
+          } catch (e) {
+            console.error('Failed to parse request:', e);
+          }
+          break;
+        }
+
+        // Process the line through animation engine
+        const html = formatter.formatHTML(args, kwArgs);
+        const params = await getParams(args, kwArgs as BattleArgsKWArgsTypes);
+
+        battle.add(args, kwArgs);
+        updateBattleLog(html, battle, args[0]);
+
+        if (args[0] === 'win' || args[0] === 'tie') {
+          battle.winner = args[1] as string;
+          onBattleEnd?.(args[1] as string);
+          break;
+        }
+
+        await performAction(params, battle);
+      }
+    } finally {
+      liveProcessingRef.current = false;
+    }
+  }, [battle, isWaitingForChoice, formatter, onRequest, onBattleEnd, setIsWaitingForChoice]);
+
+  const addLine = useCallback((line: string) => {
+    liveBufferRef.current.push(line);
+    processNextLiveLine();
+  }, [processNextLiveLine]);
+
+  const resumeAfterChoice = useCallback(() => {
+    setIsWaitingForChoice?.(false);
+    // Re-trigger processing after a microtask to let state settle
+    setTimeout(() => {
+      processNextLiveLine();
+    }, 0);
+  }, [setIsWaitingForChoice, processNextLiveLine]);
+
+  // ─── REPLAY MODE: existing flow control (unchanged) ───
+
   useEffect(() => {
+    if (liveMode) return; // Skip replay logic in live mode
+
     if(isPlaying && currentAction !== -1) {
       if(battleLines.length === 0 || currentAction >= battleLines.length) {
         setIsPlaying(false);
@@ -62,7 +149,7 @@ export function useBattleFlow(
     if(currentAction === -1 || newTurn === -1) {
       handleTurnChange();
     }
-  }, [currentAction, isPlaying]);
+  }, [currentAction, isPlaying, liveMode]);
 
   const handleTurnChange = () => {
     let changeTurn = newTurn;
@@ -141,6 +228,13 @@ export function useBattleFlow(
     
     // Reset current action to start
     setCurrentAction(0);
+
+    // Reset live mode buffer
+    if (liveMode) {
+      liveBufferRef.current = [];
+      liveActionIndexRef.current = 0;
+      liveProcessingRef.current = false;
+    }
     
     // Clear scene if available
     if (scene) {
@@ -158,7 +252,7 @@ export function useBattleFlow(
     }
     
     // Process initial setup lines from the battle log
-    if (battleLines.length > 0) {
+    if (!liveMode && battleLines.length > 0) {
       let startFound = false;
       
       for (const line of battleLines) {
@@ -261,8 +355,10 @@ export function useBattleFlow(
       
       return await new Promise<void>((resolve) => {
         setTimeout(() => {
-          let nextAction = settingTurn ? -1 : currentAction + 1;
-          setCurrentAction(nextAction);
+          if (!liveMode) {
+            let nextAction = settingTurn ? -1 : currentAction + 1;
+            setCurrentAction(nextAction);
+          }
           resolve();
         }, timeout);
       });
@@ -312,7 +408,10 @@ export function useBattleFlow(
     handleTurnChange,
     playAction,
     updateBattleState,
-    resetBattle
+    resetBattle,
+    // Live mode additions
+    addLine,
+    resumeAfterChoice,
   };
 }
 
