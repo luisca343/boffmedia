@@ -36,6 +36,7 @@ export const BattleCanvas = forwardRef(({
     battleLog,
     showFullInfo = false,
     initScene,
+    liveMode = false,
 }: { 
     battle: Battle, 
     pov: 0 | 1 | any, 
@@ -47,9 +48,16 @@ export const BattleCanvas = forwardRef(({
     battleLog: string | null,
     showFullInfo?: boolean,
     initScene?: (gameElement: HTMLElement) => void,
+    liveMode?: boolean,
 }, ref: React.Ref<BattleCanvasRefProps>) => {
     const pokemonRefs = useRef<{ [key: string]: PokemonRefType }>({});
     const [, canvasWidth] = useViewportWidth();
+
+    const gameRefCallback = useCallback((node: HTMLElement | null) => {
+        if (node && initScene) {
+            initScene(node);
+        }
+    }, [initScene]);
 
     const p1 = pov === 0 ? battle.p1 : battle.p2;
     const p2 = pov === 0 ? battle.p2 : battle.p1;
@@ -59,13 +67,7 @@ export const BattleCanvas = forwardRef(({
         p2a: p2.active[0], p2b: p2.active[1], p2c: p2.active[2], p2d: p2.active[3], p2e: p2.active[4]
     } as {[key: string]: Pokemon};
     
-    if(!battle.pokemonControlled && !battleLog && battle.turn === 0) return <Loading/>
-
-    const gameRefCallback = useCallback((node: HTMLElement | null) => {
-        if (node && initScene) {
-            initScene(node);
-        }
-    }, [initScene]);
+    if(!liveMode && !battle.pokemonControlled && !battleLog) return <Loading/>
 
     return (
         <div  id="game" ref={gameRefCallback} className="flex overflow-hidden relative select-none" style={{
