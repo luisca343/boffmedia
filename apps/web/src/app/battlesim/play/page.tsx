@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useLiveBattle, LiveBattleStatus } from '../_hooks/useLiveBattle';
 import { BattleCanvas } from '../_components/BattleCanvas';
 import { ChoiceInput } from '../_components/ChoiceInput/ChoiceInput';
@@ -16,6 +17,7 @@ export default function PlayPage() {
     htmlLog,
     messageBar,
     winner,
+    replayId,
     error,
     createBattle,
     makeChoice,
@@ -145,6 +147,14 @@ export default function PlayPage() {
             >
               Play Again
             </button>
+            {replayId && (
+              <Link
+                href={`/battlesim/replay/${replayId}`}
+                className="px-6 py-2 bg-secondary text-secondary-foreground rounded-md font-medium hover:bg-secondary/90 transition-colors"
+              >
+                Watch Replay
+              </Link>
+            )}
           </div>
         </div>
       )}

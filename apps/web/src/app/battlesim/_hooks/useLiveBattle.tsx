@@ -39,6 +39,7 @@ export function useLiveBattle() {
   const [messageBar, setMessageBar] = useState<string[]>([]);
   const [winner, setWinner] = useState<string | null>(null);
   const [replay, setReplay] = useState<string | null>(null);
+  const [replayId, setReplayId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   // useBattleFlow in live mode
@@ -113,9 +114,10 @@ export function useLiveBattle() {
       setIsWaitingForChoice(true);
     });
 
-    socket.on('battleEnd', (data: { roomId: string; winner: string; replay: string }) => {
+    socket.on('battleEnd', (data: { roomId: string; winner: string; replay: string; replayId?: number }) => {
       setWinner(data.winner);
       setReplay(data.replay);
+      setReplayId(data.replayId ?? null);
       setStatus('finished');
     });
 
@@ -184,6 +186,7 @@ export function useLiveBattle() {
     messageBar,
     winner,
     replay,
+    replayId,
     error,
 
     // Actions
