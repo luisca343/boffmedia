@@ -1,6 +1,13 @@
 import { shell } from './runner.js'
 import type { VerificationResult, ToolResult } from '../shared/types.js'
 
+const SAFE_NODE_OPTIONS = process.env.AGENT_NODE_OPTIONS ?? '--max-old-space-size=1536'
+const SAFE_ENV = {
+  NODE_OPTIONS: SAFE_NODE_OPTIONS,
+  CI: '1',
+  JEST_MAX_WORKERS: '1'
+}
+
 interface VerificationInput {
   runId: string
   apps?: ('api' | 'web')[]
@@ -15,7 +22,7 @@ export async function runVerification(input: VerificationInput): Promise<Verific
 
   if (!skipStages.includes('lint')) {
     const s = Date.now()
-    const r = await shell('lint.sh', [apps.join(',')])
+    const r = await shell('lint.sh', [apps.join(',')], { env: SAFE_ENV })
     stages.lint = {
       status: r.exitCode === 0 ? 'pass' : 'fail',
       output: r.stdout + r.stderr,
@@ -29,7 +36,11 @@ export async function runVerification(input: VerificationInput): Promise<Verific
 
   if (!skipStages.includes('jest_unit')) {
     const s = Date.now()
-    const r = await shell('pnpm', ['--filter', 'api', 'test', '--passWithNoTests'])
+    const r = await shell(
+      'pnpm',
+      ['--filter', 'api', 'exec', 'jest', '--passWithNoTests', '--maxWorkers=1'],
+      { env: SAFE_ENV }
+    )
     stages.jestUnit = {
       status: r.exitCode === 0 ? 'pass' : 'fail',
       output: r.stdout + r.stderr,
@@ -43,7 +54,20 @@ export async function runVerification(input: VerificationInput): Promise<Verific
 
   if (!skipStages.includes('jest_e2e')) {
     const s = Date.now()
-    const r = await shell('pnpm', ['--filter', 'api', 'test:e2e', '--passWithNoTests'])
+    const r = await shell(
+      'pnpm',
+      [
+        '--filter',
+        'api',
+        'exec',
+        'jest',
+        '--config',
+        './test/jest-e2e.json',
+        '--passWithNoTests',
+        '--maxWorkers=1'
+      ],
+      { env: SAFE_ENV }
+    )
     stages.jestE2e = {
       status: r.exitCode === 0 ? 'pass' : 'fail',
       output: r.stdout + r.stderr,
