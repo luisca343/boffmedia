@@ -11,6 +11,7 @@ import { getRelativeIdent } from "../_utils/replayUtils";
 
 export interface UseBattleFlowOptions {
   liveMode?: boolean;
+  animateMode?: boolean;
   onRequest?: (request: Protocol.Request) => void;
   onBattleEnd?: (winner: string) => void;
   isWaitingForChoice?: boolean;
@@ -36,6 +37,7 @@ export function useBattleFlow(
   options?: UseBattleFlowOptions
 ) {
   const liveMode = options?.liveMode ?? false;
+  const animateMode = options?.animateMode ?? false;
   const onRequest = options?.onRequest;
   const onBattleEnd = options?.onBattleEnd;
   const isWaitingForChoice = options?.isWaitingForChoice ?? false;
@@ -50,7 +52,11 @@ export function useBattleFlow(
   const liveProcessingRef = useRef(false);
   const liveActionIndexRef = useRef(0);
   const liveWaitingRef = useRef(false);
+  const animateModeRef = useRef(animateMode);
   const liveCallbacksRef = useRef<{ onRequest?: (req: Protocol.Request) => void; onBattleEnd?: (winner: string) => void }>({});
+
+  // Keep animateMode ref in sync
+  animateModeRef.current = animateMode;
 
   // Keep callbacks ref up to date (avoids stale closures)
   liveCallbacksRef.current = {
@@ -332,30 +338,31 @@ export function useBattleFlow(
     if(!scene) return;
     const { args, kwArgs, data } = params;
     const accel = scene.acceleration;
-    let timeout = 300 / accel;
+    const instantMode = !animateModeRef.current;
+    let timeout = instantMode ? 0 : 300 / accel;
     
     try {
-      // Skip visual animations when acceleration is very high (fast-forward)
-      const skipAnims = accel >= 3;
+      // Skip visual animations in instant mode or when acceleration is very high (fast-forward)
+      const skipAnims = instantMode || accel >= 3;
 
       switch (args[0]) {
         case 'switch':
-          timeout = skipAnims ? 100 : await battleActions.handleSwitchAction(args);
+          timeout = skipAnims ? 0 : await battleActions.handleSwitchAction(args);
           break;
         case 'turn':
-          timeout = skipAnims ? 50 : await battleActions.handleTurnAction(args, currentBattle);
+          timeout = skipAnims ? 0 : await battleActions.handleTurnAction(args, currentBattle);
           break;
         case '-damage':
-          timeout = skipAnims ? 50 : battleActions.handleDamageAction(args, data);
+          timeout = skipAnims ? 0 : battleActions.handleDamageAction(args, data);
           break;
         case '-heal':
-          timeout = skipAnims ? 50 : battleActions.handleHealAction(args, data);
+          timeout = skipAnims ? 0 : battleActions.handleHealAction(args, data);
           break;
         case 'move':
-          timeout = skipAnims ? 100 : await battleActions.handleMoveAction(args, currentBattle);
+          timeout = skipAnims ? 0 : await battleActions.handleMoveAction(args, currentBattle);
           break;
         case '-miss':
-          timeout = skipAnims ? 50 : await battleActions.handleMissAction(args);
+          timeout = skipAnims ? 0 : await battleActions.handleMissAction(args);
           break;
         case 'win':
           currentBattle.winner = args[1] as string;
