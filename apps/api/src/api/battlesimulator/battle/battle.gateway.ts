@@ -71,8 +71,15 @@ export class BattleGateway
     if (!state) return;
 
     if (state.roomId) {
-      client.emit('error', { message: 'Already in a battle' });
-      return;
+      const existingRoom = this.rooms.get(state.roomId);
+      if (existingRoom && existingRoom.getStatus() === 'active') {
+        this.logger.log(`Client already in battle ${state.roomId}, returning existing`);
+        client.emit('battleCreated', {
+          roomId: state.roomId,
+          format: payload?.format || 'gen9randombattle',
+        });
+        return;
+      }
     }
 
     const roomId = crypto.randomUUID();
