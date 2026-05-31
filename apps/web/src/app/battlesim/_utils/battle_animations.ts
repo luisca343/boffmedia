@@ -321,7 +321,6 @@ export class Scene {
 
 		Promise.all(this.currentAnimations).then(() => {
 			this.currentAnimations = [];
-			console.log('All animations completed');
 			this.animating = false;
 		});
 		
@@ -333,7 +332,6 @@ export class Scene {
 		//const animFunc = BattleMoveAnims['contactattack'] || BattleOtherAnims['contactattack'];
 		const animFunc = BattleMoveAnims[anim] || BattleOtherAnims[anim];
 		if(anim === 'faint'){
-			console.log('faint')
 		}
 		if (animFunc === undefined) {
 			await this.playBattleAnim('contactattack', attacker, defender);
@@ -353,7 +351,6 @@ export class Scene {
 			this.currentAnimations = [];
 		
 			if(anim === 'faint') {
-				console.log('Faint animation completed');
 				return;
 			}
 			return new Promise<void>((resolve) => {
@@ -365,7 +362,6 @@ export class Scene {
 					scale: 1,
 					time: 200,
 				}, 'back', () => {
-					console.log('Attacker animation completed');
 					resolve();
 				});
 			});

@@ -33,7 +33,7 @@ import NpcSkin from "@/components/smartrotom/MinecraftSkin";
                   height: '100px', width: '45px',
                   transform: side === 'p2' ? 'scaleX(-1)' : undefined
                 }}
-                src={`https://crafatar.com/renders/body/${uuid}`}
+                src={`https://api.mineatar.io/body/full/${uuid}`}
               />
             ) : (
               avatarNmber >= 0 ? (
