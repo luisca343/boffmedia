@@ -11,6 +11,8 @@ import {
 import { getRelativeIdent } from "../_utils/replayUtils";
 
 export function useBattleActions(battle: Battle, scene: Scene | null, pov: 0 | 1) {
+  const accel = scene?.acceleration || 1;
+
   const handleSwitchAction = async (args: ArgType): Promise<number> => {
     const pokemonIdent = getRelativeIdent(args[1] as PokemonIdent, pov);
     
@@ -19,34 +21,34 @@ export function useBattleActions(battle: Battle, scene: Scene | null, pov: 0 | 1
       await scene.clearPokemonElement(pokemonIdent);
     }
   
-    return 1000 / (scene?.acceleration || 1);
+    return 1200 / accel;
   };
 
   const handleTurnAction = async (args: ArgType, currentBattle: Battle): Promise<number> => {
     currentBattle.setTurn(parseInt(args[1] as string));
     await turnAction(currentBattle, args[1] as Num);
-    return 1000 / (scene?.acceleration || 1);
+    return 500 / accel;
   };
   
   const handleDamageAction = (args: ArgType, data: any): number => {
     damageAction(battle, scene, getRelativeIdent(args[1] as PokemonIdent, pov), data.damage as string);
-    return 1000 / (scene?.acceleration || 1);
+    return 800 / accel;
   };
   
   const handleHealAction = (args: ArgType, data: any): number => {
     healAction(battle, scene, getRelativeIdent(args[1] as PokemonIdent, pov), data.health as number[]);
-    return 1000 / (scene?.acceleration || 1);
+    return 800 / accel;
   };
   
   const handleMoveAction = async (args: ArgType, currentBattle: Battle): Promise<number> => {
     const defender = args[3] as PokemonIdent || args[1] as PokemonIdent;
     await moveAction(currentBattle, scene, getRelativeIdent(args[1] as PokemonIdent, pov), args[2] as string, getRelativeIdent(defender, pov));
-    return 500 / (scene?.acceleration || 1);
+    return 1500 / accel;
   };
   
   const handleMissAction = async (args: ArgType): Promise<number> => {
     await missAction(battle, scene, getRelativeIdent(args[1] as PokemonIdent, pov));
-    return 500 / (scene?.acceleration || 1);
+    return 800 / accel;
   };
 
   return {
