@@ -79,11 +79,9 @@ export function ReplayControls({
                 <Input
                     variant={'dark'}
                     className="w-32 border border-surface-900"
-                    type="string"
+                    type="text"
                     value={simulatedAttack}
                     onChange={(e) => setSimulatedAttack(e.target.value)}
-                    min={1}
-                    max={lastTurn}
                 />
             </div>
             <div className="flex space-x-2">
@@ -95,9 +93,14 @@ export function ReplayControls({
                     className="w-20 border border-surface-900"
                     type="number"
                     value={turnInput}
-                    onChange={(e) => setTurnInput(parseInt(e.target.value))}
-                    min={1}
-                    max={lastTurn}
+                    onChange={(e) => {
+                        const val = parseInt(e.target.value);
+                        if (isNaN(val)) return;
+                        const clamped = Math.max(0, Math.min(lastTurn + 1, val));
+                        setTurnInput(clamped);
+                    }}
+                    min={0}
+                    max={lastTurn + 1}
                 />
             </div>
         </div>
