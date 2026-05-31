@@ -118,6 +118,10 @@ export class Scene {
     
     return wrapper.querySelector('img') as HTMLImageElement;
   }
+  
+  dispose(): void {
+    this.currentAnimations = [];
+  }
 }
 
 // This class was moved to its own file

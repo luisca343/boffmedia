@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Battle } from "@pkmn/client";
 import { Generations } from '@pkmn/data';
 import { Dex } from '@pkmn/sim';
@@ -27,6 +27,17 @@ export function useBattleFlow(
 ) {
   const battleActions = useBattleActions(battle, scene, pov);
   const formatter = new LogFormatter('p1', battle);
+  const cancelledRef = useRef(false);
+
+  // Cleanup on unmount — cancel pending async chains
+  useEffect(() => {
+    return () => {
+      cancelledRef.current = true;
+      if (scene) {
+        scene.dispose();
+      }
+    };
+  }, [scene]);
 
   const clearActions = ['switch', 'move', 'turn'];
 
@@ -178,6 +189,7 @@ export function useBattleFlow(
     
     return new Promise<void>(async (resolve) => {
       try {
+        if (cancelledRef.current) { resolve(); return; }
         const html = formatter.formatHTML(args, kwArgs);
         const params = await getParams(args, kwArgs as BattleArgsKWArgsTypes);
         
@@ -205,7 +217,7 @@ export function useBattleFlow(
   };
 
   async function performAction(params: any, currentBattle: Battle) {
-    if(!scene) return;
+    if(!scene || cancelledRef.current) return;
     const { args, kwArgs, data } = params;
     let timeout = 500 / scene.acceleration;
     
@@ -230,7 +242,6 @@ export function useBattleFlow(
           timeout = await battleActions.handleMissAction(args);
           break;
         case 'win':
-          // Handle win action - store the winner in battle state
           currentBattle.winner = args[1] as string;
           timeout = 0;
           break;
@@ -241,12 +252,14 @@ export function useBattleFlow(
           timeout = 0;
           break;
         default:
-          console.log('Unknown action:', args[0]);
           break;
       }
       
+      if (cancelledRef.current) return;
+      
       return await new Promise<void>((resolve) => {
-        setTimeout(() => {
+        const timerId = setTimeout(() => {
+          if (cancelledRef.current) { resolve(); return; }
           let nextAction = settingTurn ? -1 : currentAction + 1;
           setCurrentAction(nextAction);
           resolve();

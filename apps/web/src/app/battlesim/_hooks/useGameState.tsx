@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Battle } from "@pkmn/client";
 import { Generations } from '@pkmn/data';
 import { Dex } from '@pkmn/sim';
@@ -76,6 +76,19 @@ export function useGameState(replayData?: ReplayData) {
     const [logVisible, setLogVisible] = useState(false);
     const [pov, setPov] = useState<0 | 1>(0);
     
+    // Refs for cleanup
+    const observerRef = useRef<MutationObserver | null>(null);
+    
+    // Cleanup observer on unmount
+    useEffect(() => {
+        return () => {
+            if (observerRef.current) {
+                observerRef.current.disconnect();
+                observerRef.current = null;
+            }
+        };
+    }, []);
+    
     // Initialize battle data
     useEffect(() => {
         if(replayData) {
@@ -118,14 +131,22 @@ export function useGameState(replayData?: ReplayData) {
     };
     
     const loadScene = () => {
+        // Disconnect any previous observer
+        if (observerRef.current) {
+            observerRef.current.disconnect();
+        }
+        
         const observer = new MutationObserver((mutations, obs) => {
             const gameElement = document.getElementById('game') as HTMLElement;
             if (gameElement) {
                 const battleScene = new Scene(battle, gameElement);
                 setScene(battleScene);
                 obs.disconnect();
+                observerRef.current = null;
             }
         });
+        
+        observerRef.current = observer;
         
         observer.observe(document.body, {
             childList: true,
