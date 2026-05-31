@@ -3,7 +3,6 @@ import { PokemonIdent } from "@pkmn/protocol";
 import { BattleMoveAnims, BattleOtherAnims } from "../_utils/battle-animations-moves";
 import { getScaleMultiplier } from "../_utils/viewUtils";
 import { AnimationProps, ScenePos } from "../types";
-import { BattleBackground } from "./BattleBackground";
 import { PokemonSprite } from "./PokemonSprite";
 import { SceneEffects } from "./SceneEffects";
 
@@ -15,14 +14,12 @@ export class Scene {
   gameElement: HTMLElement;
   currentAnimations: Promise<void>[] = [];
   acceleration: number;
-  $bg: BattleBackground;
   sceneEffects: SceneEffects;
   
   constructor(battle: Battle, gameElement: HTMLElement) {
     this.battle = battle;
     this.gameElement = gameElement;
     this.acceleration = 1;
-    this.$bg = new BattleBackground();
     this.sceneEffects = new SceneEffects(this);
   }
 
@@ -35,8 +32,7 @@ export class Scene {
   }
   
   backgroundEffect(background: string, duration: number, opacity: number, idontknow?: number) {
-    // Implementation moved to BattleBackground
-    return this.$bg.showEffect(background, duration, opacity, idontknow);
+    // No-op — background effects not yet implemented
   }
   
   async showPopup(position: PokemonIdent, text: string, duration: number = 1000): Promise<void> {

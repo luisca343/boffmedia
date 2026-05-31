@@ -30,6 +30,21 @@ export function useBattleFlow(
   const formatter = useMemo(() => new LogFormatter('p1', battle), [battle]);
   const battleLines = useMemo(() => battleLog ? battleLog.split('\n') : [], [battleLog]);
 
+  // Cache: turn number → line index (O(1) seeking instead of O(n) scan)
+  const turnIndexMap = useMemo(() => {
+    const map = new Map<number, number>();
+    for (let i = 0; i < battleLines.length; i++) {
+      const line = battleLines[i];
+      if (line.includes('|turn|')) {
+        const match = line.match(/\|turn\|(\d+)/);
+        if (match) {
+          map.set(parseInt(match[1]), i);
+        }
+      }
+    }
+    return map;
+  }, [battleLines]);
+
   const clearActions = ['switch', 'move', 'turn'];
 
   // Main battle flow control
@@ -50,44 +65,39 @@ export function useBattleFlow(
   }, [currentAction, isPlaying]);
 
   const handleTurnChange = () => {
-    const currBattle = new Battle(new Generations(Dex as any) as any);
-    
     let changeTurn = newTurn;
     if(changeTurn < 0) changeTurn = 0;
     if(changeTurn > lastTurn + 1) changeTurn = lastTurn + 1;
   
     if(changeTurn === 0) {
-      resetBattle(currBattle, changeTurn);
+      const freshBattle = new Battle(new Generations(Dex as any) as any);
+      resetBattle(freshBattle, changeTurn);
       return;
     }
-    
-    setHtmlLog([]);
-    
-    // If we're going to the state after the last turn (battle end)
-    if(changeTurn === lastTurn + 1) {
-      // Process ALL actions to ensure the win action is included
+
+    const currBattle = new Battle(new Generations(Dex as any) as any);
+    const newHtmlLog: string[] = [];
+
+    // If going to battle end, process all lines
+    const isEnd = changeTurn === lastTurn + 1;
+    const targetLineIndex = isEnd ? battleLines.length : turnIndexMap.get(changeTurn);
+
+    if(targetLineIndex === undefined) {
+      // Turn not found, fall back to processing all lines
       for (let i = 0; i < battleLines.length; i++) {
         const line = battleLines[i];
-        if (!line.trim()) continue; // Skip empty lines
-        
+        if (!line.trim()) continue;
         const {args, kwArgs} = Protocol.parseBattleLine(line);
         currBattle.add(line);
-        
-        // If this is a win action, make sure we properly set the winner
-        if (args[0] === 'win') {
-          currBattle.winner = args[1] as string;
-        }
-        
-        setHtmlLog((prev) => [...prev, formatter.formatHTML(args, kwArgs)]);
+        if (args[0] === 'win') currBattle.winner = args[1] as string;
+        newHtmlLog.push(formatter.formatHTML(args, kwArgs));
       }
-      
-      // Set current action to the last action (not 0)
-      const lastActionIndex = battleLines.filter(line => line.trim()).length;
-      updateBattleState(currBattle, changeTurn, lastActionIndex);
+      setHtmlLog(newHtmlLog);
+      updateBattleState(currBattle, changeTurn, battleLines.length);
       return;
     }
-    
-    // Normal turn change logic
+
+    // Process lines up to the target turn using cached index
     for (let i = 0; i < battleLines.length; i++) {
       const line = battleLines[i];
       if (!line.trim()) continue;
@@ -95,15 +105,24 @@ export function useBattleFlow(
       const {args, kwArgs} = Protocol.parseBattleLine(line);
       currBattle.add(line);
       
-      if (args[0] === 'turn') {
+      if (args[0] === 'win') currBattle.winner = args[1] as string;
+      newHtmlLog.push(formatter.formatHTML(args, kwArgs));
+      
+      // Stop after processing the target turn's last action
+      if (!isEnd && args[0] === 'turn') {
         const currentTurn = parseInt(args[1]);
         if (currentTurn === changeTurn) {
+          setHtmlLog(newHtmlLog);
           updateBattleState(currBattle, changeTurn, i);
-          break;
+          return;
         }
       }
-      setHtmlLog((prev) => [...prev, formatter.formatHTML(args, kwArgs)]);
     }
+
+    // Reached end (for isEnd case)
+    setHtmlLog(newHtmlLog);
+    const lastActionIndex = battleLines.filter(line => line.trim()).length;
+    updateBattleState(currBattle, changeTurn, lastActionIndex);
   };
 
   const resetBattle = (currBattle: Battle, turn: number) => {
@@ -200,30 +219,33 @@ export function useBattleFlow(
   async function performAction(params: any, currentBattle: Battle) {
     if(!scene) return;
     const { args, kwArgs, data } = params;
-    let timeout = 500 / scene.acceleration;
+    const accel = scene.acceleration;
+    let timeout = 300 / accel;
     
     try {
+      // Skip visual animations when acceleration is very high (fast-forward)
+      const skipAnims = accel >= 3;
+
       switch (args[0]) {
         case 'switch':
-          timeout = await battleActions.handleSwitchAction(args);
+          timeout = skipAnims ? 100 : await battleActions.handleSwitchAction(args);
           break;
         case 'turn':
-          timeout = await battleActions.handleTurnAction(args, currentBattle);
+          timeout = skipAnims ? 50 : await battleActions.handleTurnAction(args, currentBattle);
           break;
         case '-damage':
-          timeout = battleActions.handleDamageAction(args, data);
+          timeout = skipAnims ? 50 : battleActions.handleDamageAction(args, data);
           break;
         case '-heal':
-          timeout = battleActions.handleHealAction(args, data);
+          timeout = skipAnims ? 50 : battleActions.handleHealAction(args, data);
           break;
         case 'move':
-          timeout = await battleActions.handleMoveAction(args, currentBattle);
+          timeout = skipAnims ? 100 : await battleActions.handleMoveAction(args, currentBattle);
           break;
         case '-miss':
-          timeout = await battleActions.handleMissAction(args);
+          timeout = skipAnims ? 50 : await battleActions.handleMissAction(args);
           break;
         case 'win':
-          // Handle win action - store the winner in battle state
           currentBattle.winner = args[1] as string;
           timeout = 0;
           break;
