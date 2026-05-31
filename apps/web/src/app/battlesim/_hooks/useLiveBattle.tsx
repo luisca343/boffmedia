@@ -11,16 +11,21 @@ import { Scene } from '../_utils/Scene';
 import { useBattleFlow } from './useBattleFlow';
 
 // Use window to store socket — survives React strict mode and module boundaries
+// Guard against SSR where window doesn't exist
 function getGlobalSocket(): Socket | null {
+  if (typeof window === 'undefined') return null;
   return (window as any).__battlesim_socket ?? null;
 }
 function setGlobalSocket(socket: Socket | null) {
+  if (typeof window === 'undefined') return;
   (window as any).__battlesim_socket = socket;
 }
 function getEventsRegistered(): boolean {
+  if (typeof window === 'undefined') return false;
   return (window as any).__battlesim_events_registered ?? false;
 }
 function setEventsRegistered(val: boolean) {
+  if (typeof window === 'undefined') return;
   (window as any).__battlesim_events_registered = val;
 }
 
@@ -97,6 +102,7 @@ export function useLiveBattle() {
 
   const connect = useCallback(() => {
     const existing = getGlobalSocket();
+    console.log('[LiveBattle] connect() called, existing:', !!existing, 'connected:', existing?.connected);
     if (existing?.connected) {
       console.log('[LiveBattle] Already connected (window)');
       socketRef.current = existing;
@@ -115,6 +121,7 @@ export function useLiveBattle() {
     const socket = io(`${API_BASE_URL}/battle`);
     setGlobalSocket(socket);
     socketRef.current = socket;
+    console.log('[LiveBattle] Socket created and stored on window');
 
     if (!getEventsRegistered()) {
       setEventsRegistered(true);
@@ -201,12 +208,14 @@ export function useLiveBattle() {
   }, [battleFlow, status]);
 
   const createBattle = useCallback((format?: string) => {
+    console.log('[LiveBattle] createBattle() called, socket connected:', socketRef.current?.connected);
     if (!socketRef.current?.connected) {
       connect();
       // Wait for connection, then create
       const checkConnected = setInterval(() => {
         if (socketRef.current?.connected) {
           clearInterval(checkConnected);
+          console.log('[LiveBattle] Emitting createBattle event');
           socketRef.current.emit('createBattle', { format: format || 'gen9randombattle' });
         }
       }, 100);
@@ -214,6 +223,7 @@ export function useLiveBattle() {
       setTimeout(() => clearInterval(checkConnected), 5000);
       return;
     }
+    console.log('[LiveBattle] Emitting createBattle event (already connected)');
     socketRef.current.emit('createBattle', { format: format || 'gen9randombattle' });
   }, [connect]);
 
