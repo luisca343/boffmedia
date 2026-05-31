@@ -130,17 +130,17 @@ export function useLiveBattle() {
       clientId = crypto.randomUUID();
       localStorage.setItem('battlesim_client_id', clientId);
     }
-    const socket = io(`${API_BASE_URL}/battle`, { query: { clientId } });
+    const socket = io(`${API_BASE_URL}/battle`);
     setGlobalSocket(socket);
     socketRef.current = socket;
-    console.log('[LiveBattle] Socket created and stored on window');
 
     if (!getEventsRegistered()) {
       setEventsRegistered(true);
       console.log('[LiveBattle] Registering event handlers');
 
       socket.on('connect', () => {
-        console.log('[LiveBattle] Connected to battle gateway');
+        console.log('[LiveBattle] Connected, registering with clientId:', clientId);
+        socket.emit('register', { clientId });
       });
 
       socket.on('connected', (data: { playerId: string }) => {
