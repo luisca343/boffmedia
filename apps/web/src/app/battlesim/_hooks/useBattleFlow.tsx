@@ -367,22 +367,22 @@ export function useBattleFlow(
 
       switch (args[0]) {
         case 'switch':
-          timeout = skipAnims ? 0 : await currentActions.handleSwitchAction(args);
+          timeout = instantMode ? 0 : skipAnims ? 100 : await currentActions.handleSwitchAction(args);
           break;
         case 'turn':
-          timeout = skipAnims ? 0 : await currentActions.handleTurnAction(args, currentBattle);
+          timeout = instantMode ? 0 : skipAnims ? 50 : await currentActions.handleTurnAction(args, currentBattle);
           break;
         case '-damage':
-          timeout = skipAnims ? 0 : currentActions.handleDamageAction(args, data);
+          timeout = instantMode ? 0 : skipAnims ? 50 : currentActions.handleDamageAction(args, data);
           break;
         case '-heal':
-          timeout = skipAnims ? 0 : currentActions.handleHealAction(args, data);
+          timeout = instantMode ? 0 : skipAnims ? 50 : currentActions.handleHealAction(args, data);
           break;
         case 'move':
-          timeout = skipAnims ? 0 : await currentActions.handleMoveAction(args, currentBattle);
+          timeout = instantMode ? 0 : skipAnims ? 100 : await currentActions.handleMoveAction(args, currentBattle);
           break;
         case '-miss':
-          timeout = skipAnims ? 0 : await currentActions.handleMissAction(args);
+          timeout = instantMode ? 0 : skipAnims ? 50 : await currentActions.handleMissAction(args);
           break;
         case 'win':
           currentBattle.winner = args[1] as string;
