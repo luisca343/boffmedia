@@ -112,6 +112,27 @@ export class GetReplayDto {
   replayId: number;
 }
 
+export class GetReplayParamsDto {
+  @ApiProperty({
+    description: 'Player UUID',
+    example: '007d1a64-661c-4396-8844-e27856f2ddfa',
+  })
+  @IsNotEmpty()
+  @IsString()
+  @IsUUID()
+  uuid: string;
+
+  @ApiProperty({
+    description: 'Replay ID',
+    example: 123,
+  })
+  @IsNotEmpty()
+  @IsNumber()
+  @IsInt()
+  @Min(1)
+  replayId: number;
+}
+
 export class CreateReplayResponse {
   @ApiProperty({
     description: 'ID of the created replay',

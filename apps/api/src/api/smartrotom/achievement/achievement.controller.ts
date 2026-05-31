@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseInterceptors } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { AchievementFacadeService } from './achievement.facade.service';
@@ -18,6 +18,7 @@ import {
   CreateReplayDto,
   CreateUserReplayDto,
   GetReplayDto,
+  GetReplayParamsDto,
   CreateReplayResponse,
   CreateUserReplayResponse,
 } from './dto/replay.dto';
@@ -151,6 +152,30 @@ export class AchievementController {
   }
 
   // ==================== REPLAY ENDPOINTS ====================
+
+  @Get('replays/:uuid/:replayId')
+  @ApiOperation({
+    summary: 'Get user replay by params',
+    description: 'Retrieve replay data for a specific user and replay ID via URL parameters',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'User replay retrieved successfully',
+    type: Replay,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid UUID or replay ID',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Replay not found',
+  })
+  async getUserReplayByParams(
+    @Param() params: GetReplayParamsDto,
+  ): Promise<Replay | null> {
+    return this.achievementFacadeService.getUserReplay(params.uuid, params.replayId);
+  }
 
   @Post('create-replay')
   @ApiOperation({
