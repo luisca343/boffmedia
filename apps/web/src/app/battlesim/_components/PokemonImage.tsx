@@ -17,7 +17,7 @@ type PokemonImageProps = {
 export function PokemonImage(
     {id, pokemon, side = 'p2', className, viewportWidth, battle}:  PokemonImageProps) {
     if (!pokemon) return <div></div>;
-    if(!viewportWidth) viewportWidth = window.innerWidth;
+    if(!viewportWidth) viewportWidth = TARGET_WIDTH;
     if(!battle) battle = null;
     let {url, w, h, pixelated} = Sprites.getPokemon(pokemon.speciesForme, {gen: 'ani', shiny: pokemon.shiny, side});
     

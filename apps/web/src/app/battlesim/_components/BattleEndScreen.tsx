@@ -1,17 +1,6 @@
 "use client"
 import { Battle } from "@pkmn/client";
-
-function getParticipantName(name: string) {
-  if (name.includes('player:')) {
-    return name.split(':')[2];
-  }
-
-  if (name.includes('npc:')) {
-    return name.split(':')[1];
-  }
-
-  return name;
-}
+import { getParticipantName } from "../_utils/replayUtils";
 
 export const BattleEndScreen = ({ battle, pov, onRestart }: { 
   battle: Battle, 
