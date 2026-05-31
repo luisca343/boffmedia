@@ -35,15 +35,18 @@ export class BattleGateway
   private readonly RECONNECT_GRACE_MS = 30_000;
 
   handleConnection(client: Socket) {
-    // Use stable clientId from query if available
-    const handshakeClientId = client.handshake.query?.clientId as string;
-    let playerId = handshakeClientId || crypto.randomUUID();
+    // Don't register here — wait for 'register' event with clientId
+    this.logger.log(`Socket connected (awaiting register): ${client.id}`);
+  }
+
+  @SubscribeMessage('register')
+  handleRegister(client: Socket, payload: { clientId: string }): void {
+    const playerId = payload.clientId;
 
     // If this clientId already exists (reconnect), update the socket
     const existing = this.clients.get(playerId);
     if (existing) {
       this.logger.log(`Battle client reconnected: ${playerId} (existing roomId: ${existing.roomId})`);
-      // Clear any disconnect timer
       const timer = this.disconnectTimers.get(playerId);
       if (timer) {
         clearTimeout(timer);
@@ -54,14 +57,17 @@ export class BattleGateway
       return;
     }
 
-    this.logger.log(`Battle client connected: ${playerId} (clientId from query: ${handshakeClientId})`);
+    this.logger.log(`Battle client registered: ${playerId}`);
     this.clients.set(playerId, { socket: client, roomId: null, playerId });
     client.emit('connected', { playerId });
   }
 
   handleDisconnect(client: Socket) {
     const state = this.getClientState(client);
-    if (!state) return;
+    if (!state) {
+      this.logger.log(`Socket disconnected (unregistered): ${client.id}`);
+      return;
+    }
 
     this.logger.log(`Battle client disconnected: ${state.playerId}`);
 
