@@ -44,6 +44,8 @@ export function useBattleFlow(
   const setIsWaitingForChoice = options?.setIsWaitingForChoice;
 
   const battleActions = useBattleActions(battle, scene, pov);
+  const battleActionsRef = useRef(battleActions);
+  battleActionsRef.current = battleActions;
   const formatter = useMemo(() => new LogFormatter('p1', battle), [battle]);
   const battleLines = useMemo(() => battleLog ? battleLog.split('\n') : [], [battleLog]);
 
@@ -54,10 +56,12 @@ export function useBattleFlow(
   const liveWaitingRef = useRef(false);
   const pendingBufferRef = useRef<string[]>([]);
   const animateModeRef = useRef(animateMode);
+  const sceneRef = useRef(scene);
   const liveCallbacksRef = useRef<{ onRequest?: (req: Protocol.Request) => void; onBattleEnd?: (winner: string) => void }>({});
 
-  // Keep animateMode ref in sync
+  // Keep refs in sync
   animateModeRef.current = animateMode;
+  sceneRef.current = scene;
 
   // Keep callbacks ref up to date (avoids stale closures)
   liveCallbacksRef.current = {
@@ -139,7 +143,7 @@ export function useBattleFlow(
     } finally {
       liveProcessingRef.current = false;
     }
-  }, [battle, formatter, scene]);
+  }, [battle, formatter]);
 
   const addLine = useCallback((line: string) => {
     // In animated mode, buffer lines that arrive while waiting for a choice
@@ -274,7 +278,8 @@ export function useBattleFlow(
     }
     
     // Clear scene if available
-    if (scene) {
+    const currentScene = sceneRef.current;
+    if (currentScene) {
       // Clear any active Pokemon on the field
       Object.keys(freshBattle.sides).forEach(side => {
         const sideObj = freshBattle.sides[side as keyof typeof freshBattle.sides];
@@ -282,7 +287,7 @@ export function useBattleFlow(
           const activePokemon = sideObj.active[0];
           if (activePokemon) {
             const pokemonIdent = `${side}a:` as PokemonIdent;
-            scene.clearPokemonElement(pokemonIdent);
+            currentScene.clearPokemonElement(pokemonIdent);
           }
         }
       });
@@ -348,9 +353,11 @@ export function useBattleFlow(
   };
 
   async function performAction(params: any, currentBattle: Battle) {
-    if(!scene) return;
+    const currentScene = sceneRef.current;
+    const currentActions = battleActionsRef.current;
+    if(!currentScene) return;
     const { args, kwArgs, data } = params;
-    const accel = scene.acceleration;
+    const accel = currentScene.acceleration;
     const instantMode = !animateModeRef.current;
     let timeout = instantMode ? 0 : 300 / accel;
     
@@ -360,22 +367,22 @@ export function useBattleFlow(
 
       switch (args[0]) {
         case 'switch':
-          timeout = skipAnims ? 0 : await battleActions.handleSwitchAction(args);
+          timeout = skipAnims ? 0 : await currentActions.handleSwitchAction(args);
           break;
         case 'turn':
-          timeout = skipAnims ? 0 : await battleActions.handleTurnAction(args, currentBattle);
+          timeout = skipAnims ? 0 : await currentActions.handleTurnAction(args, currentBattle);
           break;
         case '-damage':
-          timeout = skipAnims ? 0 : battleActions.handleDamageAction(args, data);
+          timeout = skipAnims ? 0 : currentActions.handleDamageAction(args, data);
           break;
         case '-heal':
-          timeout = skipAnims ? 0 : battleActions.handleHealAction(args, data);
+          timeout = skipAnims ? 0 : currentActions.handleHealAction(args, data);
           break;
         case 'move':
-          timeout = skipAnims ? 0 : await battleActions.handleMoveAction(args, currentBattle);
+          timeout = skipAnims ? 0 : await currentActions.handleMoveAction(args, currentBattle);
           break;
         case '-miss':
-          timeout = skipAnims ? 0 : await battleActions.handleMissAction(args);
+          timeout = skipAnims ? 0 : await currentActions.handleMissAction(args);
           break;
         case 'win':
           currentBattle.winner = args[1] as string;
@@ -407,13 +414,14 @@ export function useBattleFlow(
   }
 
   async function getParams(args: ArgType, kwArgs: BattleArgsKWArgsTypes): Promise<{ args: ArgType, kwArgs: BattleArgsKWArgsTypes, data?: any }> {
+    const currentScene = sceneRef.current;
     switch (args[0]) {
       case 'switch':
         try {
-          await switchAction(scene, getRelativeIdent(args[1] as PokemonIdent, pov), args[2] as PokemonDetails, args[3] as PokemonHPStatus);
+          await switchAction(currentScene, getRelativeIdent(args[1] as PokemonIdent, pov), args[2] as PokemonDetails, args[3] as PokemonHPStatus);
           const pokemonIdent = getRelativeIdent(args[1] as PokemonIdent, pov);
-          if (scene) {
-            await scene.clearPokemonElement(pokemonIdent);
+          if (currentScene) {
+            await currentScene.clearPokemonElement(pokemonIdent);
           }
           const pokemon = battle.getPokemon(args[1] as PokemonIdent);
           if (pokemon?.baseSpeciesForme) {
@@ -435,7 +443,7 @@ export function useBattleFlow(
         const health = poke.healthParse(args[2]);
         return { args, kwArgs, data: { health } };
       case 'faint':
-        await faintAction(battle, scene, getRelativeIdent(args[1] as PokemonIdent, pov));
+        await faintAction(battle, currentScene, getRelativeIdent(args[1] as PokemonIdent, pov));
         return { args, kwArgs };
       default:
         return { args, kwArgs };
