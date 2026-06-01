@@ -67,7 +67,7 @@ export function useBattleFlow(
   // Advance to next line — called after each line is fully processed
   const bumpLiveIndex = useCallback(() => {
     liveIndexRef.current++;
-    setLiveTrigger(liveIndexRef.current);
+    setLiveTrigger((t) => t + 1);
   }, []);
 
   // Sync the waiting ref with the prop
@@ -158,8 +158,7 @@ export function useBattleFlow(
       return;
     }
     liveBufferRef.current.push(line);
-    // Trigger the useEffect — ref already points to the right index
-    setLiveTrigger(liveIndexRef.current);
+    setLiveTrigger((t) => t + 1);
   }, []);
 
   // resumeAfterChoice: clear waiting, move pending lines, trigger next cycle
@@ -172,7 +171,7 @@ export function useBattleFlow(
       pendingBufferRef.current = [];
     }
 
-    setLiveTrigger(liveIndexRef.current);
+    setLiveTrigger((t) => t + 1);
   }, []);
 
   // ─── REPLAY MODE: existing flow control (unchanged) ───
