@@ -2,11 +2,10 @@ import { useEffect, useMemo, useRef, useCallback, useState } from 'react';
 import { Battle } from "@pkmn/client";
 import { Generations } from '@pkmn/data';
 import { Dex } from '@pkmn/sim';
-import { ArgType, BattleArgsKWArgsTypes, PokemonIdent, Protocol } from "@pkmn/protocol";
+import { PokemonIdent, Protocol } from "@pkmn/protocol";
 import { LogFormatter } from '@pkmn/view';
 import { Scene } from "../_utils/Scene";
-import { getEventPayload } from "../_utils/eventPayload";
-import { AnimationRegistry, AnimationContext } from "../_utils/AnimationRegistry";
+import { BattleEventProcessor, ProcessedBattleEvent } from "../_utils/BattleEventProcessor";
 
 export interface UseBattleFlowOptions {
   liveMode?: boolean;
@@ -40,7 +39,10 @@ export function useBattleFlow(
   const isWaitingForChoice = options?.isWaitingForChoice ?? false;
   const setIsWaitingForChoice = options?.setIsWaitingForChoice;
 
-  const animationRegistry = useMemo(() => new AnimationRegistry(), []);
+  const processorRef = useRef<BattleEventProcessor | null>(null);
+  if (scene && (!processorRef.current || processorRef.current.context.scene !== scene)) {
+    processorRef.current = new BattleEventProcessor({ scene, battle, pov });
+  }
 
   const formatter = useMemo(() => new LogFormatter('p1', battle), [battle]);
   const battleLines = useMemo(() => battleLog ? battleLog.split('\n') : [], [battleLog]);
@@ -117,33 +119,34 @@ export function useBattleFlow(
       return;
     }
 
-    // Process the line — EXACT same order as replay mode's playAction:
-    // 1. formatter.formatHTML (generate HTML from args/kwArgs — independent of battle state)
-    // 2. getParams (fire animations — MUST run before battle.add, reads old state)
-    // 3. battle.add (mutate state in place)
-    // 4. updateBattleLog (trigger re-render via setHtmlLog/setMessageBar)
-    // 5. performAction (wait for animation timeout, then bump index)
-
+    // Process the line through the shared BattleEventProcessor
+    // Canonical order: parse → format → payload → battle.add → pre-anim → log → post-anim → timeout
     (async () => {
       liveProcessingRef.current = true;
-      const html = formatter.formatHTML(args, kwArgs);
-      try { battle.add(line); } catch (e) { /* battle.add can fail on malformed lines */ }
-      let params: { args: ArgType; kwArgs: BattleArgsKWArgsTypes; data?: any };
-      try {
-        params = await getParams(args, kwArgs as BattleArgsKWArgsTypes);
-      } catch (e) {
-        params = { args, kwArgs: kwArgs as BattleArgsKWArgsTypes };
-      }
-      updateBattleLog(html, battle, args[0]);
+      const processor = processorRef.current;
+      if (!processor) { liveProcessingRef.current = false; return; }
 
-      if (args[0] === 'win' || args[0] === 'tie') {
-        battle.winner = args[1] as string;
-        liveCallbacksRef.current.onBattleEnd?.(args[1] as string);
+      let event: ProcessedBattleEvent;
+      try {
+        event = await processor.processLine(line);
+      } catch (e) {
+        liveProcessingRef.current = false;
+        bumpLiveIndex();
+        return;
+      }
+
+      updateBattleLog(event.html, battle, event.type);
+
+      if (event.type === 'win' || event.type === 'tie') {
+        battle.winner = event.args[1] as string;
+        liveCallbacksRef.current.onBattleEnd?.(event.args[1] as string);
         liveProcessingRef.current = false;
         return;
       }
 
-      await performAction(params, battle);
+      const timeout = await processor.runAnimation(event);
+      await new Promise<void>(resolve => setTimeout(resolve, timeout));
+
       liveProcessingRef.current = false;
       bumpLiveIndex();
     })();
@@ -329,16 +332,20 @@ export function useBattleFlow(
   };
 
   async function playAction(line: string) {
-    const { args, kwArgs } = Protocol.parseBattleLine(line);
+    const processor = processorRef.current;
+    if (!processor) return;
 
     try {
-      const html = formatter.formatHTML(args, kwArgs);
-      const params = await getParams(args, kwArgs as BattleArgsKWArgsTypes);
+      const event = await processor.processLine(line);
+      updateBattleLog(event.html, battle, event.type);
 
-      battle.add(args, kwArgs);
-      updateBattleLog(html, battle, args[0]);
+      const timeout = await processor.runAnimation(event);
+      await new Promise<void>(resolve => setTimeout(resolve, timeout));
 
-      await performAction(params, battle);
+      if (!liveMode) {
+        const nextAction = settingTurn ? -1 : currentAction + 1;
+        setCurrentAction(nextAction);
+      }
     } catch (error) {
       console.error('Error in playAction:', error);
     }
@@ -354,57 +361,6 @@ export function useBattleFlow(
       setMessageBar((prev) => [...prev, html]);
     }
   };
-
-  async function performAction(params: any, currentBattle: Battle) {
-    const { args, kwArgs, data } = params;
-    const ctx = buildAnimationContext(args, kwArgs, data);
-    if (!ctx) return;
-
-    try {
-      const timeout = await animationRegistry.runAfterStateChange(ctx);
-
-      return await new Promise<void>((resolve) => {
-        setTimeout(() => {
-          if (!liveMode) {
-            let nextAction = settingTurn ? -1 : currentAction + 1;
-            setCurrentAction(nextAction);
-          }
-          resolve();
-        }, timeout);
-      });
-    } catch (error) {
-      console.error('Error in performAction:', error);
-      throw error;
-    }
-  }
-
-  function buildAnimationContext(args: ArgType, kwArgs: BattleArgsKWArgsTypes, data: any): AnimationContext | null {
-    const currentScene = sceneRef.current;
-    if (!currentScene) return null;
-    return {
-      scene: currentScene,
-      battle,
-      args,
-      kwArgs,
-      data,
-      pov,
-      acceleration: currentScene.acceleration,
-      skipAnims: currentScene.acceleration >= 3,
-    };
-  }
-
-  async function getParams(args: ArgType, kwArgs: BattleArgsKWArgsTypes): Promise<{ args: ArgType, kwArgs: BattleArgsKWArgsTypes, data?: any }> {
-    // Pure data extraction
-    const eventPayload = getEventPayload(args[0], args, kwArgs as BattleArgsKWArgsTypes, battle);
-
-    // Pre-state-change animations (switch effect, faint anim — before battle.add)
-    const ctx = buildAnimationContext(args, kwArgs, eventPayload.payload);
-    if (ctx) {
-      await animationRegistry.runBeforeStateChange(ctx);
-    }
-
-    return { args, kwArgs, data: eventPayload.payload };
-  }
 
   return {
     handleTurnChange,
