@@ -115,6 +115,22 @@ export const eventHandlers: Record<string, EventHandler> = {
       return 0;
     },
   },
+
+  '-terastallize': {
+    afterStateChange: async (ctx) => {
+      if (ctx.skipAnims) return 50;
+      const pokemonIdent = getRelativeIdent(ctx.args[1] as PokemonIdent, ctx.pov);
+      const teraType = ctx.args[2] as string;
+      await ctx.scene.showPopup(pokemonIdent, `Terastallized ${teraType}!`, 1500);
+      return 1500 / ctx.acceleration;
+    },
+  },
+
+  '-message': {
+    afterStateChange: async (ctx) => {
+      return 0;
+    },
+  },
 };
 
 export const noAnimEvents = new Set([

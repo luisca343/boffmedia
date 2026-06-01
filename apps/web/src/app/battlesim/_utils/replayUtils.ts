@@ -18,6 +18,7 @@ export function getRelativeIdent(pokemonIdent: PokemonIdent, pov: 0 | 1): Pokemo
  */
 export function getParticipantName(name: string): string {
   if (!name) return 'Unknown';
+  name = name.trim();
   if (name.includes('player:')) {
     return name.split(':')[2] || name;
   }
