@@ -8,6 +8,7 @@ import { Scene } from "../_utils/Scene";
 import { switchAction, faintAction } from "../_utils/battleActions";
 import { useBattleActions } from './useBattleActions';
 import { getRelativeIdent } from "../_utils/replayUtils";
+import { getEventPayload } from "../_utils/eventPayload";
 
 export interface UseBattleFlowOptions {
   liveMode?: boolean;
@@ -420,6 +421,11 @@ export function useBattleFlow(
 
   async function getParams(args: ArgType, kwArgs: BattleArgsKWArgsTypes): Promise<{ args: ArgType, kwArgs: BattleArgsKWArgsTypes, data?: any }> {
     const currentScene = sceneRef.current;
+
+    // Pure data extraction via getEventPayload
+    const eventPayload = getEventPayload(args[0], args, kwArgs as BattleArgsKWArgsTypes, battle);
+
+    // Animation side effects (to be moved to AnimationRegistry in a later task)
     switch (args[0]) {
       case 'switch':
         try {
@@ -433,26 +439,16 @@ export function useBattleFlow(
             const audio = new Audio(`https://play.pokemonshowdown.com/audio/cries/${pokemon.baseSpeciesForme.toLowerCase()}.mp3`);
             audio.play().catch(console.error);
           }
-          return { args, kwArgs };
         } catch (error) {
           console.error('Error during switch:', error);
-          return { args, kwArgs };
         }
-      case '-damage':
-        const damage = battle.damagePercentage(args[1] as PokemonIdent, args[2] as PokemonHPStatus);
-        return { args, kwArgs, data: { damage } };
-      case '-heal':
-        const fromEffect = kwArgs.from && battle.get('conditions', kwArgs.from);
-        const revival = fromEffect?.id === 'revivalblessing';
-        const poke = battle.getPokemon(args[1], revival)!;
-        const health = poke.healthParse(args[2]);
-        return { args, kwArgs, data: { health } };
+        break;
       case 'faint':
         await faintAction(battle, currentScene, getRelativeIdent(args[1] as PokemonIdent, pov));
-        return { args, kwArgs };
-      default:
-        return { args, kwArgs };
+        break;
     }
+
+    return { args, kwArgs, data: eventPayload.payload };
   }
 
   return {
