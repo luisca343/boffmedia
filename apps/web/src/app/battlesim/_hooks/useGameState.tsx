@@ -67,6 +67,7 @@ export function useGameState(replayData?: ReplayData) {
     const [htmlLog, setHtmlLog] = useState<string[]>([]);
     const [isPlaying, setIsPlaying] = useState(false);
     const [messageBar, setMessageBar] = useState<string[]>([]);
+    const [battleComplete, setBattleComplete] = useState(false);
     
     // UI state
     const [turnInput, setTurnInput] = useState<number>(0);
@@ -126,6 +127,7 @@ export function useGameState(replayData?: ReplayData) {
     const setCurrentTurn = (turn?: number) => {
         if(turn === undefined) turn = turnInput;
         setNewTurn(turn);
+        setBattleComplete(false);
         if(isPlaying) {
             setSettingTurn(true);
         } else {
@@ -159,6 +161,7 @@ export function useGameState(replayData?: ReplayData) {
         htmlLog,
         isPlaying,
         messageBar,
+        battleComplete,
         
         // UI state
         turnInput,
@@ -176,6 +179,7 @@ export function useGameState(replayData?: ReplayData) {
         setHtmlLog,
         setIsPlaying,
         setMessageBar,
+        setBattleComplete,
         setTurnInput,
         setNewTurn,
         setSettingTurn,
