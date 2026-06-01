@@ -9,7 +9,7 @@ import { Scene } from "./Scene";
 export class PokemonSprite {
   scene: Scene;
   position: PokemonIdent;
-  element: HTMLElement;
+  element: HTMLElement | null;
   
   startingOffsetLeft: number = 0;
   startingOffsetTop: number = 0;
@@ -25,9 +25,9 @@ export class PokemonSprite {
     this.position = position;
   
     const element = scene.getPokemonElement(position);
-    if (!element) {
-      throw new Error(`Element not found for position: ${position}`);
-    }
+    this.element = element;
+    
+    if (!element) return;
     
     this.startingOffsetLeft = this.x();
     this.startingOffsetTop = this.y();
@@ -41,8 +41,6 @@ export class PokemonSprite {
     element.style.transition = 'none';
     element.style.opacity = '1';
     element.style.transform = 'none';
-  
-    this.element = element;
   }
   
   /**
@@ -159,6 +157,7 @@ export class PokemonSprite {
    * Clears element styling
    */
   async clearElement(): Promise<void> {
+    if (!this.element) return;
     this.element.style.transition = 'none';
     this.element.style.transform = 'none';
     this.element.style.opacity = '1';
