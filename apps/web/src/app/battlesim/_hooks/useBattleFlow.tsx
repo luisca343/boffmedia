@@ -31,6 +31,7 @@ export function useBattleFlow(
   setIsPlaying: (playing: boolean) => void,
   setMessageBar: React.Dispatch<React.SetStateAction<string[]>>,
   setSettingTurn: (setting: boolean) => void,
+  setBattleComplete?: (complete: boolean) => void,
   options?: UseBattleFlowOptions
 ) {
   const liveMode = options?.liveMode ?? false;
@@ -44,7 +45,7 @@ export function useBattleFlow(
     processorRef.current = new BattleEventProcessor({ scene, battle, pov });
   }
 
-  const battleLines = useMemo(() => battleLog ? battleLog.split('\n') : [], [battleLog]);
+  const battleLines = useMemo(() => battleLog ? battleLog.split('\n').filter(l => l.trim()) : [], [battleLog]);
 
   // ─── LIVE MODE STATE ───
   const liveBufferRef = useRef<string[]>([]);
@@ -137,7 +138,11 @@ export function useBattleFlow(
       updateBattleLog(event.html, battle, event.type);
 
       if (event.type === 'win' || event.type === 'tie') {
-        battle.winner = event.args[1] as string;
+        // Run the win/tie handler to set battle.winner correctly
+        const timeout = await processor.runAnimation(event);
+        await new Promise<void>(resolve => setTimeout(resolve, timeout));
+        // Mark complete AFTER winner is set — end screen will render with correct result
+        setBattleComplete?.(true);
         liveCallbacksRef.current.onBattleEnd?.(event.args[1] as string);
         liveProcessingRef.current = false;
         return;
@@ -305,6 +310,9 @@ export function useBattleFlow(
       if (!liveMode) {
         const nextAction = settingTurn ? -1 : currentAction + 1;
         setCurrentAction(nextAction);
+        if (nextAction >= battleLines.length) {
+          setBattleComplete?.(true);
+        }
       }
     } catch (error) {
       console.error('Error in playAction:', error);
