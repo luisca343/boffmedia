@@ -66,7 +66,7 @@ export class BattleRoom {
     this.callbacks = callbacks;
     this.gens = new Generations(Dex as any);
     this.timerConfig = {
-      enabled: timerConfig?.enabled ?? true,
+      enabled: timerConfig?.enabled ?? false,
       turnMs: timerConfig?.turnMs ?? 60_000,
       totalMs: timerConfig?.totalMs ?? 300_000,
     };

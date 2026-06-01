@@ -64,6 +64,14 @@ export function useBattleFlow(
     onBattleEnd: options?.onBattleEnd,
   };
 
+  // When scene becomes available, re-trigger processing for any buffered lines
+  // that arrived before the processor was ready (e.g. turn 0 setup lines)
+  useEffect(() => {
+    if (liveMode && scene && liveBufferRef.current.length > liveIndexRef.current && !liveProcessingRef.current) {
+      setLiveTrigger((t) => t + 1);
+    }
+  }, [scene, liveMode]);
+
   // Advance to next line — called after each line is fully processed
   const bumpLiveIndex = useCallback(() => {
     liveIndexRef.current++;
