@@ -11,7 +11,6 @@ import { Hazard } from "./Hazard";
 import { PokemonIdent } from "@pkmn/protocol";
 import useViewportWidth from "@/services/useViewPortWidth";
 import BattlePreview from "./BattlePreview";
-import countActions from "../_utils/battleUtils";
 import BattleEndScreen from "./BattleEndScreen";
 import { sanitizeHtml } from "../_utils/sanitizeHtml";
 import { getParticipantName } from "../_utils/replayUtils";
@@ -39,6 +38,7 @@ export const BattleCanvas = forwardRef(({
     liveMode = false,
     liveStatus,
     onPlayAgain,
+    battleComplete = false,
 }: { 
     battle: Battle, 
     pov: 0 | 1 | any, 
@@ -53,6 +53,7 @@ export const BattleCanvas = forwardRef(({
     liveMode?: boolean,
     liveStatus?: 'idle' | 'connecting' | 'active' | 'finished' | 'error',
     onPlayAgain?: () => void,
+    battleComplete?: boolean,
 }, ref: React.Ref<BattleCanvasRefProps>) => {
     const pokemonRefs = useRef<{ [key: string]: PokemonRefType }>({});
     const [, canvasWidth] = useViewportWidth();
@@ -100,7 +101,7 @@ export const BattleCanvas = forwardRef(({
                     </div>
                   )}
 
-                  {!liveMode && currentAction >= countActions(battleLog) - 1 && (
+                  {!liveMode && battleComplete && (
                     <div className="absolute inset-0">
                       <BattleEndScreen 
                         battle={battle} 
@@ -115,7 +116,7 @@ export const BattleCanvas = forwardRef(({
                     </div>
                   )}
 
-                  {liveMode && liveStatus === 'finished' && (
+                  {liveMode && battleComplete && (
                     <div className="absolute inset-0">
                       <BattleEndScreen 
                         battle={battle} 

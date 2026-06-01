@@ -63,6 +63,7 @@ export function useLiveBattle() {
   const [htmlLog, setHtmlLog] = useState<string[]>([]);
   const [messageBar, setMessageBar] = useState<string[]>([]);
   const [winner, setWinner] = useState<string | null>(null);
+  const [battleComplete, setBattleComplete] = useState(false);
   const [replay, setReplay] = useState<string | null>(null);
   const [replayId, setReplayId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -89,6 +90,7 @@ export function useLiveBattle() {
     () => {}, // setIsPlaying — not used in live mode
     setMessageBar,
     () => {}, // setSettingTurn — not used in live mode
+    setBattleComplete,
     {
       liveMode: true,
       onRequest: (request) => {
@@ -238,8 +240,10 @@ export function useLiveBattle() {
     replayId,
     error,
     timerState,
+    battleComplete,
 
     // Actions
+    setBattleComplete,
     createBattle,
     makeChoice,
     forfeit,

@@ -98,11 +98,12 @@ export function Game({battleName = 'medalla_doku', replayData}: {battleName?: st
   const { battle, setBattle, battleLog, currentAction, scene, htmlLog, isPlaying, messageBar,
     turnInput, newTurn, settingTurn, lastTurn, simulatedAttack, logVisible, pov, setBattleLog,
     setCurrentAction, setScene, setHtmlLog: setLog, setIsPlaying, setMessageBar, setTurnInput,
-    setNewTurn, setSettingTurn, setLastTurn, setSimulatedAttack, setLogVisible, setPov, setCurrentTurn, initScene} = useGameState(loadedReplayData);
+    setNewTurn, setSettingTurn, setLastTurn, setSimulatedAttack, setLogVisible, setPov, setCurrentTurn, initScene,
+    battleComplete, setBattleComplete} = useGameState(loadedReplayData);
   
   const battleFlow = useBattleFlow(
     battle, setBattle, battleLog, currentAction, scene, isPlaying, newTurn, lastTurn,
-    settingTurn, pov, setCurrentAction, setLog, setIsPlaying, setMessageBar, setSettingTurn);
+    settingTurn, pov, setCurrentAction, setLog, setIsPlaying, setMessageBar, setSettingTurn, setBattleComplete);
   
   // Refs
   const battleCanvasRef = useRef<any>(null);
@@ -155,6 +156,7 @@ export function Game({battleName = 'medalla_doku', replayData}: {battleName?: st
         battleLog={battleLog}
         showFullInfo={false}
         initScene={initScene}
+        battleComplete={battleComplete}
       />
 
       <ReplayControls 
@@ -164,6 +166,8 @@ export function Game({battleName = 'medalla_doku', replayData}: {battleName?: st
           // Mark battle as started if playing
           if (playing) {
             setBattleStarted(true);
+          } else {
+            setBattleComplete(false);
           }
           setIsPlaying(playing);
         }}
