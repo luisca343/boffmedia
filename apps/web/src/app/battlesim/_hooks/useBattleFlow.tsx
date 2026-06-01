@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useCallback, useState } from 'react';
 import { Battle } from "@pkmn/client";
 import { Generations } from '@pkmn/data';
 import { Dex } from '@pkmn/sim';
-import { ArgType, BattleArgsKWArgsTypes, BattleArgsKWArgType, PokemonDetails, PokemonHPStatus, PokemonIdent, Protocol } from "@pkmn/protocol";
+import { ArgType, BattleArgsKWArgsTypes, PokemonDetails, PokemonHPStatus, PokemonIdent, Protocol } from "@pkmn/protocol";
 import { LogFormatter } from '@pkmn/view';
 import { Scene } from "../_utils/Scene";
 import { switchAction, faintAction } from "../_utils/battleActions";
@@ -51,6 +51,7 @@ export function useBattleFlow(
   // ─── LIVE MODE STATE ───
   const liveBufferRef = useRef<string[]>([]);
   const liveIndexRef = useRef(0);
+  const liveProcessingRef = useRef(false);
   const [liveTrigger, setLiveTrigger] = useState(0);
   const liveWaitingRef = useRef(false);
   const pendingBufferRef = useRef<string[]>([]);
@@ -69,13 +70,6 @@ export function useBattleFlow(
     liveIndexRef.current++;
     setLiveTrigger((t) => t + 1);
   }, []);
-
-  // Sync the waiting ref with the prop
-  useEffect(() => {
-    if (liveMode) {
-      liveWaitingRef.current = options?.isWaitingForChoice ?? false;
-    }
-  }, [liveMode, options?.isWaitingForChoice]);
 
   // Cache: turn number → line index (O(1) seeking instead of O(n) scan)
   const turnIndexMap = useMemo(() => {
@@ -99,7 +93,6 @@ export function useBattleFlow(
   // Uses a ref for the index to prevent React batching from skipping lines.
 
   useEffect(() => {
-    console.log(`[LiveFlow] useEffect fired. liveMode=${liveMode}, trigger=${liveTrigger}, idx=${liveIndexRef.current}, bufferSize=${liveBufferRef.current.length}, waiting=${liveWaitingRef.current}`);
     if (!liveMode) return;
     if (liveWaitingRef.current) return;
 
@@ -113,7 +106,6 @@ export function useBattleFlow(
     }
 
     const { args, kwArgs } = Protocol.parseBattleLine(line);
-    console.log(`[LiveFlow] Processing line ${idx}: ${args[0]}`, args[1]?.toString().substring(0, 50));
 
     // Check for request — pause and notify
     if (args[0] === 'request') {
@@ -128,39 +120,49 @@ export function useBattleFlow(
       return;
     }
 
-    const html = formatter.formatHTML(args, kwArgs);
-
-    // Process the line — same order as replay mode's playAction:
-    // 1. battle.add (mutate state in place — must happen BEFORE getParams)
-    // 2. getParams (fire animations — reads pokemon from battle)
-    // 3. updateBattleLog (trigger re-render via setHtmlLog/setMessageBar)
-    // 4. performAction (wait for animation timeout, then bump index)
+    // Process the line — EXACT same order as replay mode's playAction:
+    // 1. formatter.formatHTML (generate HTML from args/kwArgs — independent of battle state)
+    // 2. getParams (fire animations — MUST run before battle.add, reads old state)
+    // 3. battle.add (mutate state in place)
+    // 4. updateBattleLog (trigger re-render via setHtmlLog/setMessageBar)
+    // 5. performAction (wait for animation timeout, then bump index)
 
     (async () => {
-      battle.add(line);
-      const params = await getParams(args, kwArgs as BattleArgsKWArgsTypes);
+      liveProcessingRef.current = true;
+      const html = formatter.formatHTML(args, kwArgs);
+      try { battle.add(line); } catch (e) { /* battle.add can fail on malformed lines */ }
+      let params: { args: ArgType; kwArgs: BattleArgsKWArgsTypes; data?: any };
+      try {
+        params = await getParams(args, kwArgs as BattleArgsKWArgsTypes);
+      } catch (e) {
+        params = { args, kwArgs: kwArgs as BattleArgsKWArgsTypes };
+      }
       updateBattleLog(html, battle, args[0]);
 
       if (args[0] === 'win' || args[0] === 'tie') {
         battle.winner = args[1] as string;
         liveCallbacksRef.current.onBattleEnd?.(args[1] as string);
+        liveProcessingRef.current = false;
         return;
       }
 
       await performAction(params, battle);
+      liveProcessingRef.current = false;
       bumpLiveIndex();
     })();
   }, [liveTrigger, liveMode]);
 
-  // addLine: push to buffer and trigger the useEffect cycle
+  // addLine: push to buffer. Only trigger effect if nothing is currently processing.
+  // bumpLiveIndex will trigger after each line completes.
   const addLine = useCallback((line: string) => {
-    console.log(`[LiveFlow] addLine called. waiting=${liveWaitingRef.current}, line=${line.substring(0, 60)}`);
     if (liveWaitingRef.current) {
       pendingBufferRef.current.push(line);
       return;
     }
     liveBufferRef.current.push(line);
-    setLiveTrigger((t) => t + 1);
+    if (!liveProcessingRef.current) {
+      setLiveTrigger((t) => t + 1);
+    }
   }, []);
 
   // resumeAfterChoice: clear waiting, move pending lines, trigger next cycle
