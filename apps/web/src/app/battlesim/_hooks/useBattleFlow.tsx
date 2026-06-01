@@ -119,28 +119,27 @@ export function useBattleFlow(
     }
 
     // Process the line — same order as replay mode's playAction:
-    // 1. getParams (fire animations)
-    // 2. battle.add (mutate state in place)
+    // 1. battle.add (mutate state in place — must happen BEFORE getParams)
+    // 2. getParams (fire animations — reads pokemon from battle)
     // 3. updateBattleLog (trigger re-render via setHtmlLog/setMessageBar)
     // 4. performAction (wait for animation timeout, then advance index)
 
     const html = formatter.formatHTML(args, kwArgs);
 
-    getParams(args, kwArgs as BattleArgsKWArgsTypes).then((params) => {
-      battle.add(args, kwArgs);
-      updateBattleLog(html, battle, args[0]);
+    battle.add(line);
+    const params = await getParams(args, kwArgs as BattleArgsKWArgsTypes);
+    updateBattleLog(html, battle, args[0]);
 
-      if (args[0] === 'win' || args[0] === 'tie') {
-        battle.winner = args[1] as string;
-        liveCallbacksRef.current.onBattleEnd?.(args[1] as string);
-        return; // Don't advance — battle is over
-      }
+    if (args[0] === 'win' || args[0] === 'tie') {
+      battle.winner = args[1] as string;
+      liveCallbacksRef.current.onBattleEnd?.(args[1] as string);
+      return; // Don't advance — battle is over
+    }
 
-      // performAction waits for animation timeout, then advances index
-      performAction(params, battle).then(() => {
-        // Advance to next line — triggers re-render → this useEffect fires again
-        setLiveActionIndex((prev) => prev + 1);
-      });
+    // performAction waits for animation timeout, then advances index
+    performAction(params, battle).then(() => {
+      // Advance to next line — triggers re-render → this useEffect fires again
+      setLiveActionIndex((prev) => prev + 1);
     });
   }, [liveActionIndex, liveMode]);
 
