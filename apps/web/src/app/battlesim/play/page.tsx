@@ -20,12 +20,10 @@ export default function PlayPage() {
     replayId,
     error,
     timerState,
-    animateMode,
     createBattle,
     makeChoice,
     forfeit,
     initScene,
-    toggleAnimateMode,
   } = useLiveBattle();
 
   const [battleStarted, setBattleStarted] = useState(false);
@@ -102,13 +100,6 @@ export default function PlayPage() {
           )}
         </div>
         <div className="flex items-center gap-2">
-          <button
-            onClick={toggleAnimateMode}
-            className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${animateMode ? 'bg-primary/20 text-primary border border-primary/30' : 'bg-muted text-muted-foreground border'}`}
-            title={animateMode ? 'Animated mode (click for instant)' : 'Instant mode (click for animated)'}
-          >
-            {animateMode ? '▶ Animated' : '⚡ Instant'}
-          </button>
           {status === 'active' && (
             <button
               onClick={forfeit}
