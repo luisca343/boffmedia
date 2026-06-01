@@ -1,5 +1,6 @@
 import { Battle } from "@pkmn/client";
-import { ArgType, BattleArgsKWArgsTypes, PokemonHPStatus, PokemonIdent } from "@pkmn/protocol";
+import { ArgType, BattleArgsKWArgsTypes } from "@pkmn/protocol";
+import { getEventHandler } from "./eventHandlers";
 
 export interface EventPayload {
   type: string;
@@ -12,19 +13,9 @@ export function getEventPayload(
   kwArgs: BattleArgsKWArgsTypes,
   battle: Battle
 ): EventPayload {
-  switch (type) {
-    case '-damage': {
-      const damage = battle.damagePercentage(args[1] as PokemonIdent, args[2] as PokemonHPStatus);
-      return { type, payload: { damage } };
-    }
-    case '-heal': {
-      const fromEffect = kwArgs.from && battle.get('conditions', kwArgs.from);
-      const revival = fromEffect?.id === 'revivalblessing';
-      const poke = battle.getPokemon(args[1], revival)!;
-      const health = poke.healthParse(args[2]);
-      return { type, payload: { health } };
-    }
-    default:
-      return { type, payload: null };
+  const handler = getEventHandler(type);
+  if (handler?.getPayload) {
+    return { type, payload: handler.getPayload(args, kwArgs, battle) };
   }
+  return { type, payload: null };
 }
