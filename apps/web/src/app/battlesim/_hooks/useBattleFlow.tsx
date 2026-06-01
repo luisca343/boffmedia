@@ -316,6 +316,11 @@ export function useBattleFlow(
       await new Promise<void>(resolve => setTimeout(resolve, timeout));
 
       if (!liveMode) {
+        if (event.type === 'win' || event.type === 'tie') {
+          setBattleComplete?.(true);
+          setIsPlaying(false);
+          return;
+        }
         const nextAction = settingTurn ? -1 : currentAction + 1;
         setCurrentAction(nextAction);
         if (nextAction >= battleLines.length) {
@@ -329,7 +334,7 @@ export function useBattleFlow(
 
   const updateBattleLog = (html: string, currentBattle: Battle, actionType: string) => {
     setHtmlLog((prev) => [...prev, html]);
-    setBattle(currentBattle);
+    setBattle(copyBattle(currentBattle));
     
     if(clearActions.includes(actionType)) {
       setMessageBar([html]);
@@ -350,7 +355,5 @@ export function useBattleFlow(
 }
 
 function copyBattle(battle: Battle) {
-  const newBattle = new Battle(new Generations(Dex as any) as any);
-  Object.assign(newBattle, battle);
-  return newBattle;
+  return structuredClone(battle);
 }

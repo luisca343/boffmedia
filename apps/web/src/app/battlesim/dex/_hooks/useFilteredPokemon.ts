@@ -148,7 +148,7 @@ export function useFilteredPokemon({
           results = searchResults;
         }
       }
-      console.log('Filtered Pokémon:', results);
+
       setFilteredPokemon(results);
     } else {
       // If not viewing Pokémon category, just apply search query

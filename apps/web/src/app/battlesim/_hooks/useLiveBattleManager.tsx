@@ -107,9 +107,9 @@ export function useLiveBattleManager() {
           session.status = 'finished';
           session.isWaitingForChoice = false;
           session.currentRequest = null;
-          session.battleComplete = true;
           // Set battle.winner so BattleEndScreen can determine the result
           (session.battle as any).winner = data.winner;
+          // Do NOT set battleComplete here — let flushBuffer set it after all animations finish
           triggerUpdate();
         }
       });
