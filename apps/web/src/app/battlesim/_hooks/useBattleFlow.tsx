@@ -3,9 +3,9 @@ import { Battle } from "@pkmn/client";
 import { Generations } from '@pkmn/data';
 import { Dex } from '@pkmn/sim';
 import { PokemonIdent, Protocol } from "@pkmn/protocol";
-import { LogFormatter } from '@pkmn/view';
 import { Scene } from "../_utils/Scene";
 import { BattleEventProcessor, ProcessedBattleEvent } from "../_utils/BattleEventProcessor";
+import { BattleStateBuilder } from "../_utils/BattleStateBuilder";
 
 export interface UseBattleFlowOptions {
   liveMode?: boolean;
@@ -44,7 +44,6 @@ export function useBattleFlow(
     processorRef.current = new BattleEventProcessor({ scene, battle, pov });
   }
 
-  const formatter = useMemo(() => new LogFormatter('p1', battle), [battle]);
   const battleLines = useMemo(() => battleLog ? battleLog.split('\n') : [], [battleLog]);
 
   // ─── LIVE MODE STATE ───
@@ -202,61 +201,22 @@ export function useBattleFlow(
     let changeTurn = newTurn;
     if(changeTurn < 0) changeTurn = 0;
     if(changeTurn > lastTurn + 1) changeTurn = lastTurn + 1;
-  
+
+    const builder = new BattleStateBuilder(battleLines, turnIndexMap);
+
     if(changeTurn === 0) {
-      const freshBattle = new Battle(new Generations(Dex as any) as any);
-      resetBattle(freshBattle, changeTurn);
+      const result = builder.buildSetupState();
+      resetBattle(result.battle, changeTurn);
       return;
     }
 
-    const currBattle = new Battle(new Generations(Dex as any) as any);
-    const newHtmlLog: string[] = [];
-
-    // If going to battle end, process all lines
-    const isEnd = changeTurn === lastTurn + 1;
-    const targetLineIndex = isEnd ? battleLines.length : turnIndexMap.get(changeTurn);
-
-    if(targetLineIndex === undefined) {
-      // Turn not found, fall back to processing all lines
-      for (let i = 0; i < battleLines.length; i++) {
-        const line = battleLines[i];
-        if (!line.trim()) continue;
-        const {args, kwArgs} = Protocol.parseBattleLine(line);
-        currBattle.add(line);
-        if (args[0] === 'win') currBattle.winner = args[1] as string;
-        newHtmlLog.push(formatter.formatHTML(args, kwArgs));
-      }
-      setHtmlLog(newHtmlLog);
-      updateBattleState(currBattle, changeTurn, battleLines.length);
-      return;
-    }
-
-    // Process lines up to the target turn using cached index
-    for (let i = 0; i < battleLines.length; i++) {
-      const line = battleLines[i];
-      if (!line.trim()) continue;
-      
-      const {args, kwArgs} = Protocol.parseBattleLine(line);
-      currBattle.add(line);
-      
-      if (args[0] === 'win') currBattle.winner = args[1] as string;
-      newHtmlLog.push(formatter.formatHTML(args, kwArgs));
-      
-      // Stop after processing the target turn's last action
-      if (!isEnd && args[0] === 'turn') {
-        const currentTurn = parseInt(args[1]);
-        if (currentTurn === changeTurn) {
-          setHtmlLog(newHtmlLog);
-          updateBattleState(currBattle, changeTurn, i);
-          return;
-        }
-      }
-    }
-
-    // Reached end (for isEnd case)
-    setHtmlLog(newHtmlLog);
-    const lastActionIndex = battleLines.filter(line => line.trim()).length;
-    updateBattleState(currBattle, changeTurn, lastActionIndex);
+    const result = builder.buildStateUntilTurn(changeTurn, lastTurn);
+    result.battle.setTurn(changeTurn);
+    setBattle(copyBattle(result.battle));
+    setHtmlLog(result.htmlLog);
+    setCurrentAction(result.actionIndex);
+    setSettingTurn(false);
+    setMessageBar([]);
   };
 
   const resetBattle = (currBattle: Battle, turn: number) => {
