@@ -2,13 +2,11 @@ import { useEffect, useMemo, useRef, useCallback, useState } from 'react';
 import { Battle } from "@pkmn/client";
 import { Generations } from '@pkmn/data';
 import { Dex } from '@pkmn/sim';
-import { ArgType, BattleArgsKWArgsTypes, PokemonDetails, PokemonHPStatus, PokemonIdent, Protocol } from "@pkmn/protocol";
+import { ArgType, BattleArgsKWArgsTypes, PokemonIdent, Protocol } from "@pkmn/protocol";
 import { LogFormatter } from '@pkmn/view';
 import { Scene } from "../_utils/Scene";
-import { switchAction, faintAction } from "../_utils/battleActions";
-import { useBattleActions } from './useBattleActions';
-import { getRelativeIdent } from "../_utils/replayUtils";
 import { getEventPayload } from "../_utils/eventPayload";
+import { AnimationRegistry, AnimationContext } from "../_utils/AnimationRegistry";
 
 export interface UseBattleFlowOptions {
   liveMode?: boolean;
@@ -42,9 +40,7 @@ export function useBattleFlow(
   const isWaitingForChoice = options?.isWaitingForChoice ?? false;
   const setIsWaitingForChoice = options?.setIsWaitingForChoice;
 
-  const battleActions = useBattleActions(battle, scene, pov);
-  const battleActionsRef = useRef(battleActions);
-  battleActionsRef.current = battleActions;
+  const animationRegistry = useMemo(() => new AnimationRegistry(), []);
 
   const formatter = useMemo(() => new LogFormatter('p1', battle), [battle]);
   const battleLines = useMemo(() => battleLog ? battleLog.split('\n') : [], [battleLog]);
@@ -360,50 +356,13 @@ export function useBattleFlow(
   };
 
   async function performAction(params: any, currentBattle: Battle) {
-    const currentScene = sceneRef.current;
-    const currentActions = battleActionsRef.current;
-    if(!currentScene) return;
     const { args, kwArgs, data } = params;
-    const accel = currentScene.acceleration;
-    let timeout = 300 / accel;
-    
-    try {
-      // Skip visual animations when acceleration is very high (fast-forward)
-      const skipAnims = accel >= 3;
+    const ctx = buildAnimationContext(args, kwArgs, data);
+    if (!ctx) return;
 
-      switch (args[0]) {
-        case 'switch':
-          timeout = skipAnims ? 100 : await currentActions.handleSwitchAction(args);
-          break;
-        case 'turn':
-          timeout = skipAnims ? 50 : await currentActions.handleTurnAction(args, currentBattle);
-          break;
-        case '-damage':
-          timeout = skipAnims ? 50 : currentActions.handleDamageAction(args, data);
-          break;
-        case '-heal':
-          timeout = skipAnims ? 50 : currentActions.handleHealAction(args, data);
-          break;
-        case 'move':
-          timeout = skipAnims ? 100 : await currentActions.handleMoveAction(args, currentBattle);
-          break;
-        case '-miss':
-          timeout = skipAnims ? 50 : await currentActions.handleMissAction(args);
-          break;
-        case 'win':
-          currentBattle.winner = args[1] as string;
-          timeout = 0;
-          break;
-        case 'inactive': case 't:': case '-resisted': case '':
-        case 'join': case 'gametype': case 'player': case 'teamsize': case 'gen': case 'tier':
-        case 'rated': case 'rule': case 'clearpoke': case 'poke': case 'rule': case 'start': 
-        case 'faint':
-          timeout = 0;
-          break;
-        default:
-          break;
-      }
-      
+    try {
+      const timeout = await animationRegistry.runAfterStateChange(ctx);
+
       return await new Promise<void>((resolve) => {
         setTimeout(() => {
           if (!liveMode) {
@@ -419,33 +378,29 @@ export function useBattleFlow(
     }
   }
 
-  async function getParams(args: ArgType, kwArgs: BattleArgsKWArgsTypes): Promise<{ args: ArgType, kwArgs: BattleArgsKWArgsTypes, data?: any }> {
+  function buildAnimationContext(args: ArgType, kwArgs: BattleArgsKWArgsTypes, data: any): AnimationContext | null {
     const currentScene = sceneRef.current;
+    if (!currentScene) return null;
+    return {
+      scene: currentScene,
+      battle,
+      args,
+      kwArgs,
+      data,
+      pov,
+      acceleration: currentScene.acceleration,
+      skipAnims: currentScene.acceleration >= 3,
+    };
+  }
 
-    // Pure data extraction via getEventPayload
+  async function getParams(args: ArgType, kwArgs: BattleArgsKWArgsTypes): Promise<{ args: ArgType, kwArgs: BattleArgsKWArgsTypes, data?: any }> {
+    // Pure data extraction
     const eventPayload = getEventPayload(args[0], args, kwArgs as BattleArgsKWArgsTypes, battle);
 
-    // Animation side effects (to be moved to AnimationRegistry in a later task)
-    switch (args[0]) {
-      case 'switch':
-        try {
-          await switchAction(currentScene, getRelativeIdent(args[1] as PokemonIdent, pov), args[2] as PokemonDetails, args[3] as PokemonHPStatus);
-          const pokemonIdent = getRelativeIdent(args[1] as PokemonIdent, pov);
-          if (currentScene) {
-            await currentScene.clearPokemonElement(pokemonIdent);
-          }
-          const pokemon = battle.getPokemon(args[1] as PokemonIdent);
-          if (pokemon?.baseSpeciesForme) {
-            const audio = new Audio(`https://play.pokemonshowdown.com/audio/cries/${pokemon.baseSpeciesForme.toLowerCase()}.mp3`);
-            audio.play().catch(console.error);
-          }
-        } catch (error) {
-          console.error('Error during switch:', error);
-        }
-        break;
-      case 'faint':
-        await faintAction(battle, currentScene, getRelativeIdent(args[1] as PokemonIdent, pov));
-        break;
+    // Pre-state-change animations (switch effect, faint anim — before battle.add)
+    const ctx = buildAnimationContext(args, kwArgs, eventPayload.payload);
+    if (ctx) {
+      await animationRegistry.runBeforeStateChange(ctx);
     }
 
     return { args, kwArgs, data: eventPayload.payload };
