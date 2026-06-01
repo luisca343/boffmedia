@@ -20,6 +20,8 @@ export default function PlayPage() {
     replayId,
     error,
     timerState,
+    battleComplete,
+    setBattleComplete,
     createBattle,
     makeChoice,
     forfeit,
@@ -35,6 +37,7 @@ export default function PlayPage() {
 
   const handlePlayAgain = () => {
     setBattleStarted(false);
+    setBattleComplete(false);
     createBattle('gen9randombattle');
   };
 
@@ -126,6 +129,7 @@ export default function PlayPage() {
           liveMode={true}
           liveStatus={status}
           onPlayAgain={handlePlayAgain}
+          battleComplete={battleComplete}
         />
       </div>
 
