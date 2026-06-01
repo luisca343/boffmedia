@@ -39,14 +39,15 @@ export const BattleCanvas = forwardRef(({
     liveStatus,
     onPlayAgain,
     battleComplete = false,
-}: { 
-    battle: Battle, 
-    pov: 0 | 1 | any, 
-    messageBar?: string[], 
-    showPreviewOverlay: boolean, 
-    setBattleStarted: (started: boolean) => void, 
-    setIsPlaying: (playing: boolean) => void, 
-    currentAction: number, 
+    username,
+}: {
+    battle: Battle,
+    pov: 0 | 1 | any,
+    messageBar?: string[],
+    showPreviewOverlay: boolean,
+    setBattleStarted: (started: boolean) => void,
+    setIsPlaying: (playing: boolean) => void,
+    currentAction: number,
     battleLog: string | null,
     showFullInfo?: boolean,
     initScene?: (gameElement: HTMLElement) => void,
@@ -54,6 +55,7 @@ export const BattleCanvas = forwardRef(({
     liveStatus?: 'idle' | 'connecting' | 'active' | 'finished' | 'error',
     onPlayAgain?: () => void,
     battleComplete?: boolean,
+    username?: string | null,
 }, ref: React.Ref<BattleCanvasRefProps>) => {
     const pokemonRefs = useRef<{ [key: string]: PokemonRefType }>({});
     const [, canvasWidth] = useViewportWidth();
@@ -103,9 +105,10 @@ export const BattleCanvas = forwardRef(({
 
                   {!liveMode && battleComplete && (
                     <div className="absolute inset-0">
-                      <BattleEndScreen 
-                        battle={battle} 
+                      <BattleEndScreen
+                        battle={battle}
                         pov={pov}
+                        username={username}
                         onRestart={
                             () => {
                                 setBattleStarted(false);
@@ -118,9 +121,10 @@ export const BattleCanvas = forwardRef(({
 
                   {liveMode && battleComplete && (
                     <div className="absolute inset-0">
-                      <BattleEndScreen 
-                        battle={battle} 
+                      <BattleEndScreen
+                        battle={battle}
                         pov={pov}
+                        username={username}
                         onRestart={onPlayAgain}
                       />
                     </div>

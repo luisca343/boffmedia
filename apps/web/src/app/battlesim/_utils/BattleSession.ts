@@ -58,7 +58,7 @@ export class BattleSession {
   private processing = false;
   private waiting = false;
   private pendingRequest: Protocol.Request | null = null;
-  private callbacks: SessionCallbacks;
+  callbacks: SessionCallbacks;
   private hasWinEvent = false;
 
   constructor(roomId: string, callbacks: SessionCallbacks) {
@@ -67,14 +67,14 @@ export class BattleSession {
     this.callbacks = callbacks;
   }
 
-  initScene(gameElement: HTMLElement): void {
+  initScene(gameElement: HTMLElement, pov: 0 | 1 = 0): void {
     // Always re-create scene if gameElement changed (tab switch unmounts/remounts canvas)
     if (!this.scene || this.scene.gameElement !== gameElement) {
       this.scene = new Scene(this.battle, gameElement);
       this.processor = new BattleEventProcessor({
         scene: this.scene,
         battle: this.battle,
-        pov: 0,
+        pov,
       });
       // Flush any lines that arrived before scene was ready
       this.flushBuffer();
@@ -93,6 +93,10 @@ export class BattleSession {
   }
 
   handleRequest(request: Protocol.Request): void {
+    // "wait" requests mean the opponent is still acting — don't prompt the user
+    if ((request as any).wait) {
+      return;
+    }
     if (this.processing) {
       this.pendingRequest = request;
     } else {
@@ -117,10 +121,11 @@ export class BattleSession {
     if (this.hasWinEvent) {
       this.battleComplete = true;
       this.hasWinEvent = false;
+      this.pendingRequest = null; // Don't prompt for choice after battle ends
       this.callbacks.onUpdate();
     }
 
-    if (this.pendingRequest && !this.waiting) {
+    if (this.pendingRequest && !this.waiting && !this.battleComplete) {
       const req = this.pendingRequest;
       this.pendingRequest = null;
       this.waiting = true;
@@ -133,6 +138,15 @@ export class BattleSession {
 
   private async processLine(line: string): Promise<void> {
     const { args } = Protocol.parseBattleLine(line);
+
+    // Request lines are not battle events — handle them directly
+    if (args[0] === 'request') {
+      try {
+        const request = JSON.parse(args[1] as string) as Protocol.Request;
+        this.handleRequest(request);
+      } catch {}
+      return;
+    }
 
     if (!this.processor) {
       return;
