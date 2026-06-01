@@ -71,12 +71,11 @@ export class SceneEffects {
    */
   async playEffect(effect: string, position: PokemonIdent, callback?: () => void): Promise<void> {
     const pos = position.split(':')[0] as PokemonIdent;
-    const element = getOffset(this.scene.battle, pos, getScaleMultiplier());
-    if (!element) return;
+    const scaleMulti = getScaleMultiplier();
+    const offset = getOffset(this.scene.battle, pos, scaleMulti);
+    if (!offset) return;
     
-    const startingPosition = position.includes('p1') 
-      ? {top: 275, left: 180} 
-      : {top: 90, left: 630};
+    const startingPosition = { top: offset.top, left: offset.left };
 
     // Find effect data
     const effectData = BattleMoveAnims[effect] || BattleOtherAnims[effect];
