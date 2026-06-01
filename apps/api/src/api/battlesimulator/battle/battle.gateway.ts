@@ -13,7 +13,7 @@ import { AchievementFacadeService } from '@api/smartrotom/achievement/achievemen
 
 interface ClientState {
   socket: Socket;
-  roomId: string | null;
+  roomIds: Set<string>;
   playerId: string;
 }
 
@@ -54,7 +54,7 @@ export class BattleGateway
       return;
     }
 
-    this.clients.set(playerId, { socket: client, roomId: null, playerId });
+    this.clients.set(playerId, { socket: client, roomIds: new Set(), playerId });
     client.emit('connected', { playerId });
   }
 
@@ -62,16 +62,18 @@ export class BattleGateway
     const state = this.getClientState(client);
     if (!state) return;
 
-    if (state.roomId) {
+    if (state.roomIds.size > 0) {
       const timer = setTimeout(() => {
         this.logger.log(
-          `Grace period expired for ${state.playerId}, forfeiting room ${state.roomId}`,
+          `Grace period expired for ${state.playerId}, forfeiting ${state.roomIds.size} rooms`,
         );
-        const room = this.rooms.get(state.roomId!);
-        if (room && room.getStatus() === 'active') {
-          room.forfeit();
+        for (const roomId of state.roomIds) {
+          const room = this.rooms.get(roomId);
+          if (room && room.getStatus() === 'active') {
+            room.forfeit();
+          }
+          this.cleanupRoom(roomId);
         }
-        this.cleanupRoom(state.roomId!);
       }, this.RECONNECT_GRACE_MS);
 
       this.disconnectTimers.set(state.playerId, timer);
@@ -81,22 +83,11 @@ export class BattleGateway
   }
 
   @SubscribeMessage('createBattle')
-  handleCreateBattle(client: Socket, payload?: { format?: string; timer?: Partial<TimerConfig> }): void {
+  handleCreateBattle(client: Socket, payload?: { format?: string; roomId?: string; timer?: Partial<TimerConfig> }): void {
     const state = this.getClientState(client);
     if (!state) return;
 
-    if (state.roomId) {
-      const existingRoom = this.rooms.get(state.roomId);
-      if (existingRoom && existingRoom.getStatus() === 'active') {
-        client.emit('battleCreated', {
-          roomId: state.roomId,
-          format: payload?.format || 'gen9randombattle',
-        });
-        return;
-      }
-    }
-
-    const roomId = crypto.randomUUID();
+    const roomId = payload?.roomId || crypto.randomUUID();
 
     const callbacks: BattleRoomCallbacks = {
       onProtocol: (line: string) => {
@@ -128,14 +119,14 @@ export class BattleGateway
         this.logger.error(`Battle error [${roomId}]: ${error}`);
         client.emit('error', { roomId, message: error });
       },
-      onTimerUpdate: (state) => {
-        client.emit('timerUpdate', { roomId, ...state });
+      onTimerUpdate: (timerState) => {
+        client.emit('timerUpdate', { roomId, ...timerState });
       },
     };
 
     const room = new BattleRoom(roomId, callbacks, this.logger, payload?.timer);
     this.rooms.set(roomId, room);
-    state.roomId = roomId;
+    state.roomIds.add(roomId);
 
     room
       .create(payload?.format || 'gen9randombattle')
@@ -147,7 +138,7 @@ export class BattleGateway
       })
       .catch((err) => {
         this.logger.error(`Failed to create battle: ${err.message}`);
-        client.emit('error', { message: `Failed to create battle: ${err.message}` });
+        client.emit('error', { roomId, message: `Failed to create battle: ${err.message}` });
         this.cleanupRoom(roomId);
       });
   }
@@ -160,14 +151,14 @@ export class BattleGateway
     const state = this.getClientState(client);
     if (!state) return;
 
-    if (state.roomId !== payload.roomId) {
-      client.emit('error', { message: 'Not in this battle' });
+    if (!state.roomIds.has(payload.roomId)) {
+      client.emit('error', { roomId: payload.roomId, message: 'Not in this battle' });
       return;
     }
 
     const room = this.rooms.get(payload.roomId);
     if (!room) {
-      client.emit('error', { message: 'Battle not found' });
+      client.emit('error', { roomId: payload.roomId, message: 'Battle not found' });
       return;
     }
 
@@ -179,8 +170,8 @@ export class BattleGateway
     const state = this.getClientState(client);
     if (!state) return;
 
-    if (state.roomId !== payload.roomId) {
-      client.emit('error', { message: 'Not in this battle' });
+    if (!state.roomIds.has(payload.roomId)) {
+      client.emit('error', { roomId: payload.roomId, message: 'Not in this battle' });
       return;
     }
 
@@ -226,7 +217,7 @@ export class BattleGateway
 
     const room = this.rooms.get(payload.roomId);
     if (room) {
-      existingState.roomId = payload.roomId;
+      existingState.roomIds.add(payload.roomId);
       client.emit('reconnected', { roomId: payload.roomId, status: room.getStatus() });
     }
   }
@@ -242,15 +233,8 @@ export class BattleGateway
     const room = this.rooms.get(roomId);
     if (!room) return;
 
-    for (const [pid, state] of this.clients.entries()) {
-      if (state.roomId === roomId) {
-        state.roomId = null;
-        const timer = this.disconnectTimers.get(pid);
-        if (timer) {
-          clearTimeout(timer);
-          this.disconnectTimers.delete(pid);
-        }
-      }
+    for (const [, state] of this.clients.entries()) {
+      state.roomIds.delete(roomId);
     }
 
     this.rooms.delete(roomId);
