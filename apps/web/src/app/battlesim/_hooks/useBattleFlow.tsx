@@ -50,7 +50,8 @@ export function useBattleFlow(
 
   // ─── LIVE MODE STATE ───
   const liveBufferRef = useRef<string[]>([]);
-  const [liveActionIndex, setLiveActionIndex] = useState(0);
+  const liveIndexRef = useRef(0);
+  const [liveTrigger, setLiveTrigger] = useState(0);
   const liveWaitingRef = useRef(false);
   const pendingBufferRef = useRef<string[]>([]);
   const sceneRef = useRef(scene);
@@ -62,6 +63,12 @@ export function useBattleFlow(
     onRequest: options?.onRequest,
     onBattleEnd: options?.onBattleEnd,
   };
+
+  // Advance to next line — called after each line is fully processed
+  const bumpLiveIndex = useCallback(() => {
+    liveIndexRef.current++;
+    setLiveTrigger(liveIndexRef.current);
+  }, []);
 
   // Sync the waiting ref with the prop
   useEffect(() => {
@@ -89,21 +96,23 @@ export function useBattleFlow(
 
   // ─── LIVE MODE: useEffect-driven one-line-per-render cycle ───
   // Mirrors replay mode's useEffect([currentAction]) pattern exactly.
-  // Each iteration: read buffer[lineIndex] → battle.add → animation → setTimeout → increment index → re-trigger.
+  // Uses a ref for the index to prevent React batching from skipping lines.
 
   useEffect(() => {
     if (!liveMode) return;
     if (liveWaitingRef.current) return;
-    if (liveActionIndex >= liveBufferRef.current.length) return;
 
-    const line = liveBufferRef.current[liveActionIndex];
+    const idx = liveIndexRef.current;
+    if (idx >= liveBufferRef.current.length) return;
+
+    const line = liveBufferRef.current[idx];
     if (!line?.trim()) {
-      // Skip empty lines, advance immediately
-      setLiveActionIndex(liveActionIndex + 1);
+      bumpLiveIndex();
       return;
     }
 
     const { args, kwArgs } = Protocol.parseBattleLine(line);
+    console.log(`[LiveFlow] Processing line ${idx}: ${args[0]}`, args[1]?.toString().substring(0, 50));
 
     // Check for request — pause and notify
     if (args[0] === 'request') {
@@ -115,16 +124,16 @@ export function useBattleFlow(
       } catch (e) {
         console.error('Failed to parse request:', e);
       }
-      return; // Don't advance — wait for resumeAfterChoice
+      return;
     }
+
+    const html = formatter.formatHTML(args, kwArgs);
 
     // Process the line — same order as replay mode's playAction:
     // 1. battle.add (mutate state in place — must happen BEFORE getParams)
     // 2. getParams (fire animations — reads pokemon from battle)
     // 3. updateBattleLog (trigger re-render via setHtmlLog/setMessageBar)
-    // 4. performAction (wait for animation timeout, then advance index)
-
-    const html = formatter.formatHTML(args, kwArgs);
+    // 4. performAction (wait for animation timeout, then bump index)
 
     (async () => {
       battle.add(line);
@@ -138,9 +147,9 @@ export function useBattleFlow(
       }
 
       await performAction(params, battle);
-      setLiveActionIndex((prev) => prev + 1);
+      bumpLiveIndex();
     })();
-  }, [liveActionIndex, liveMode]);
+  }, [liveTrigger, liveMode]);
 
   // addLine: push to buffer and trigger the useEffect cycle
   const addLine = useCallback((line: string) => {
@@ -149,8 +158,8 @@ export function useBattleFlow(
       return;
     }
     liveBufferRef.current.push(line);
-    // Trigger the useEffect to process the next line
-    setLiveActionIndex(liveBufferRef.current.length - 1);
+    // Trigger the useEffect — ref already points to the right index
+    setLiveTrigger(liveIndexRef.current);
   }, []);
 
   // resumeAfterChoice: clear waiting, move pending lines, trigger next cycle
@@ -163,8 +172,7 @@ export function useBattleFlow(
       pendingBufferRef.current = [];
     }
 
-    // Trigger the useEffect to process the next line
-    setLiveActionIndex((prev) => Math.max(prev, 0));
+    setLiveTrigger(liveIndexRef.current);
   }, []);
 
   // ─── REPLAY MODE: existing flow control (unchanged) ───
@@ -268,7 +276,8 @@ export function useBattleFlow(
     // Reset live mode buffer
     if (liveMode) {
       liveBufferRef.current = [];
-      setLiveActionIndex(0);
+      liveIndexRef.current = 0;
+      setLiveTrigger(0);
     }
     
     // Clear scene if available
