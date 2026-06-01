@@ -35,7 +35,9 @@ export const eventHandlers: Record<string, EventHandler> = {
     beforeStateChange: async (ctx) => {
       await faintAction(ctx.battle, ctx.scene, getRelativeIdent(ctx.args[1] as PokemonIdent, ctx.pov));
     },
-    afterStateChange: async () => 0,
+    afterStateChange: async (ctx) => {
+      return 600 / ctx.acceleration;
+    },
   },
 
   'turn': {
