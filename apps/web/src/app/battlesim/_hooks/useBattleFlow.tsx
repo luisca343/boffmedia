@@ -41,7 +41,7 @@ export function useBattleFlow(
   const setIsWaitingForChoice = options?.setIsWaitingForChoice;
 
   const processorRef = useRef<BattleEventProcessor | null>(null);
-  if (scene && (!processorRef.current || processorRef.current.context.scene !== scene)) {
+  if (scene && (!processorRef.current || processorRef.current.context.scene !== scene || processorRef.current.context.battle !== battle)) {
     processorRef.current = new BattleEventProcessor({ scene, battle, pov });
   }
 
@@ -225,7 +225,7 @@ export function useBattleFlow(
 
     const result = builder.buildStateUntilTurn(changeTurn, lastTurn);
     result.battle.setTurn(changeTurn);
-    setBattle(copyBattle(result.battle));
+    setBattle(result.battle);
     setHtmlLog(result.htmlLog);
     setCurrentAction(result.actionIndex);
     setSettingTurn(false);
@@ -298,7 +298,7 @@ export function useBattleFlow(
 
   const updateBattleState = (currBattle: Battle, turn: number, actionIndex: number) => {
     currBattle.setTurn(turn);
-    setBattle(copyBattle(currBattle));
+    setBattle(currBattle);
     setCurrentAction(actionIndex);
     setSettingTurn(false);
     setMessageBar([]);
@@ -334,7 +334,7 @@ export function useBattleFlow(
 
   const updateBattleLog = (html: string, currentBattle: Battle, actionType: string) => {
     setHtmlLog((prev) => [...prev, html]);
-    setBattle(copyBattle(currentBattle));
+    setBattle(currentBattle);
     
     if(clearActions.includes(actionType)) {
       setMessageBar([html]);
@@ -352,8 +352,4 @@ export function useBattleFlow(
     addLine,
     resumeAfterChoice,
   };
-}
-
-function copyBattle(battle: Battle) {
-  return structuredClone(battle);
 }
