@@ -178,46 +178,6 @@ export function useLiveBattle() {
       socket.on('disconnect', () => {
       });
     }
-
-    socket.on('connected', (data: { playerId: string }) => {
-    });
-
-    socket.on('battleCreated', (data: { roomId: string; format: string }) => {
-      setRoomId(data.roomId);
-      setStatus('active');
-    });
-
-    socket.on('protocol', (data: { roomId: string; line: string }) => {
-      battleFlow.addLine(data.line);
-    });
-
-    socket.on('request', (data: { roomId: string; request: Protocol.Request }) => {
-      setCurrentRequest(data.request);
-      setIsWaitingForChoice(true);
-    });
-
-    socket.on('battleEnd', (data: { roomId: string; winner: string; replay: string; replayId?: number }) => {
-      setWinner(data.winner);
-      setReplay(data.replay);
-      setReplayId(data.replayId ?? null);
-      setStatus('finished');
-    });
-
-    socket.on('timerUpdate', (data: { roomId: string; p1: { turnRemaining: number; totalRemaining: number }; p2: { turnRemaining: number; totalRemaining: number }; activeSide: 'p1' | 'p2' | null }) => {
-      setTimerState({ p1: data.p1, p2: data.p2, activeSide: data.activeSide });
-    });
-
-    socket.on('error', (data: { message: string; roomId?: string }) => {
-      console.error('[LiveBattle] Error:', data.message);
-      setError(data.message);
-      setStatus('error');
-    });
-
-    socket.on('disconnect', () => {
-      if (status === 'active') {
-        setError('Disconnected from server');
-      }
-    });
   }, [battleFlow, status]);
 
   const createBattle = useCallback((format?: string) => {
