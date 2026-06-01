@@ -2,28 +2,33 @@
 import { Battle } from "@pkmn/client";
 import { getParticipantName } from "../_utils/replayUtils";
 
-export const BattleEndScreen = ({ battle, pov, onRestart }: { 
-  battle: Battle, 
+export const BattleEndScreen = ({ battle, pov, username, onRestart }: {
+  battle: Battle,
   pov: 0 | 1 | any,
-  onRestart?: () => void 
+  username?: string | null,
+  onRestart?: () => void
 }) => {
   const p1 = pov === 0 ? battle.p1 : battle.p2;
   const p2 = pov === 0 ? battle.p2 : battle.p1;
-  
+
   const p1Name = getParticipantName(p1.name)
   const p2Name = getParticipantName(p2.name)
-  
+
   let winner: string;
   let resultText: string;
-  
+
   // First use the explicit winner from the battle if available
   if (battle.winner) {
     const winnerName = getParticipantName(battle.winner);
     winner = winnerName.trim();
 
-    // Determine if the player (POV) won
-    if ((pov === 0 && winner === p1Name) || 
-        (pov === 1 && winner === p2Name)) {
+    // Determine victory by comparing the winner against our logged-in username
+    const myName = username?.trim() || (pov === 0 ? battle.p1.name : battle.p2.name);
+    const isWin = winner === myName;
+
+    console.log('[EndScreen]', { pov, winner, myName, isWin, p1Name, p2Name, battleWinner: battle.winner, username });
+
+    if (isWin) {
       resultText = "¡VICTORIA!";
     } else {
       resultText = "DERROTA";
