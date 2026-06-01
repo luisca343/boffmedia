@@ -36,7 +36,7 @@ export default function PokemonGrid() {
   
   const handleItemClick = (name: string) => {
     // For items, we might just want to show a tooltip or details
-    console.log('Item selected:', name);
+    // Item selected
   };
   
   const handleLoadMore = () => {
