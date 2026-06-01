@@ -126,21 +126,20 @@ export function useBattleFlow(
 
     const html = formatter.formatHTML(args, kwArgs);
 
-    battle.add(line);
-    const params = await getParams(args, kwArgs as BattleArgsKWArgsTypes);
-    updateBattleLog(html, battle, args[0]);
+    (async () => {
+      battle.add(line);
+      const params = await getParams(args, kwArgs as BattleArgsKWArgsTypes);
+      updateBattleLog(html, battle, args[0]);
 
-    if (args[0] === 'win' || args[0] === 'tie') {
-      battle.winner = args[1] as string;
-      liveCallbacksRef.current.onBattleEnd?.(args[1] as string);
-      return; // Don't advance — battle is over
-    }
+      if (args[0] === 'win' || args[0] === 'tie') {
+        battle.winner = args[1] as string;
+        liveCallbacksRef.current.onBattleEnd?.(args[1] as string);
+        return;
+      }
 
-    // performAction waits for animation timeout, then advances index
-    performAction(params, battle).then(() => {
-      // Advance to next line — triggers re-render → this useEffect fires again
+      await performAction(params, battle);
       setLiveActionIndex((prev) => prev + 1);
-    });
+    })();
   }, [liveActionIndex, liveMode]);
 
   // addLine: push to buffer and trigger the useEffect cycle
