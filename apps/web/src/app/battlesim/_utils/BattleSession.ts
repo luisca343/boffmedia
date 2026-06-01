@@ -59,6 +59,7 @@ export class BattleSession {
   private waiting = false;
   private pendingRequest: Protocol.Request | null = null;
   private callbacks: SessionCallbacks;
+  private hasWinEvent = false;
 
   constructor(roomId: string, callbacks: SessionCallbacks) {
     this.roomId = roomId;
@@ -111,6 +112,14 @@ export class BattleSession {
       await this.processLine(line);
     }
     this.processing = false;
+
+    // All lines processed — safe to show end screen now
+    if (this.hasWinEvent) {
+      this.battleComplete = true;
+      this.hasWinEvent = false;
+      this.callbacks.onUpdate();
+    }
+
     if (this.pendingRequest && !this.waiting) {
       const req = this.pendingRequest;
       this.pendingRequest = null;
@@ -146,11 +155,11 @@ export class BattleSession {
       this.messageBar.push(event.html);
     }
 
-    // Win/tie
+    // Win/tie — run animation but don't set battleComplete yet (more lines may follow)
     if (event.type === 'win' || event.type === 'tie') {
+      this.hasWinEvent = true;
       const timeout = await this.processor.runAnimation(event);
       await new Promise<void>(resolve => setTimeout(resolve, timeout));
-      this.battleComplete = true;
       this.callbacks.onBattleEnd(event.args[1] as string);
       this.callbacks.onUpdate();
       return;
