@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useCallback } from 'react';
+import { useEffect, useMemo, useRef, useCallback, useState } from 'react';
 import { Battle } from "@pkmn/client";
 import { Generations } from '@pkmn/data';
 import { Dex } from '@pkmn/sim';
@@ -11,7 +11,6 @@ import { getRelativeIdent } from "../_utils/replayUtils";
 
 export interface UseBattleFlowOptions {
   liveMode?: boolean;
-  animateMode?: boolean;
   onRequest?: (request: Protocol.Request) => void;
   onBattleEnd?: (winner: string) => void;
   isWaitingForChoice?: boolean;
@@ -37,7 +36,6 @@ export function useBattleFlow(
   options?: UseBattleFlowOptions
 ) {
   const liveMode = options?.liveMode ?? false;
-  const animateMode = options?.animateMode ?? false;
   const onRequest = options?.onRequest;
   const onBattleEnd = options?.onBattleEnd;
   const isWaitingForChoice = options?.isWaitingForChoice ?? false;
@@ -50,21 +48,16 @@ export function useBattleFlow(
   const formatter = useMemo(() => new LogFormatter('p1', battle), [battle]);
   const battleLines = useMemo(() => battleLog ? battleLog.split('\n') : [], [battleLog]);
 
-  // Live mode: internal line buffer and processing state
+  // ─── LIVE MODE STATE ───
   const liveBufferRef = useRef<string[]>([]);
-  const liveProcessingRef = useRef(false);
-  const liveActionIndexRef = useRef(0);
+  const [liveActionIndex, setLiveActionIndex] = useState(0);
   const liveWaitingRef = useRef(false);
   const pendingBufferRef = useRef<string[]>([]);
-  const animateModeRef = useRef(animateMode);
   const sceneRef = useRef(scene);
   const liveCallbacksRef = useRef<{ onRequest?: (req: Protocol.Request) => void; onBattleEnd?: (winner: string) => void }>({});
 
   // Keep refs in sync
-  animateModeRef.current = animateMode;
   sceneRef.current = scene;
-
-  // Keep callbacks ref up to date (avoids stale closures)
   liveCallbacksRef.current = {
     onRequest: options?.onRequest,
     onBattleEnd: options?.onBattleEnd,
@@ -94,84 +87,87 @@ export function useBattleFlow(
 
   const clearActions = ['switch', 'move', 'turn'];
 
-  // ─── LIVE MODE: addLine and processing loop ───
+  // ─── LIVE MODE: useEffect-driven one-line-per-render cycle ───
+  // Mirrors replay mode's useEffect([currentAction]) pattern exactly.
+  // Each iteration: read buffer[lineIndex] → battle.add → animation → setTimeout → increment index → re-trigger.
 
-  const processNextLiveLine = useCallback(async () => {
-    if (liveProcessingRef.current) return;
+  useEffect(() => {
+    if (!liveMode) return;
     if (liveWaitingRef.current) return;
+    if (liveActionIndex >= liveBufferRef.current.length) return;
 
-    liveProcessingRef.current = true;
-
-    try {
-      while (liveActionIndexRef.current < liveBufferRef.current.length) {
-        if (liveWaitingRef.current) break;
-
-        const line = liveBufferRef.current[liveActionIndexRef.current];
-        liveActionIndexRef.current++;
-
-        if (!line.trim()) continue;
-
-        const { args, kwArgs } = Protocol.parseBattleLine(line);
-
-        // Check for request — pause and notify
-        if (args[0] === 'request') {
-          try {
-            const request = JSON.parse(args[1] as string) as Protocol.Request;
-            liveWaitingRef.current = true;
-            options?.setIsWaitingForChoice?.(true);
-            liveCallbacksRef.current.onRequest?.(request);
-          } catch (e) {
-            console.error('Failed to parse request:', e);
-          }
-          break;
-        }
-
-        // Process the line through animation engine
-        const html = formatter.formatHTML(args, kwArgs);
-        const params = await getParams(args, kwArgs as BattleArgsKWArgsTypes);
-
-        battle.add(args, kwArgs);
-        updateBattleLog(html, battle, args[0]);
-
-        if (args[0] === 'win' || args[0] === 'tie') {
-          battle.winner = args[1] as string;
-          liveCallbacksRef.current.onBattleEnd?.(args[1] as string);
-          break;
-        }
-
-        await performAction(params, battle);
-      }
-    } finally {
-      liveProcessingRef.current = false;
+    const line = liveBufferRef.current[liveActionIndex];
+    if (!line?.trim()) {
+      // Skip empty lines, advance immediately
+      setLiveActionIndex(liveActionIndex + 1);
+      return;
     }
-  }, [battle, formatter]);
 
+    const { args, kwArgs } = Protocol.parseBattleLine(line);
+
+    // Check for request — pause and notify
+    if (args[0] === 'request') {
+      try {
+        const request = JSON.parse(args[1] as string) as Protocol.Request;
+        liveWaitingRef.current = true;
+        setIsWaitingForChoice?.(true);
+        liveCallbacksRef.current.onRequest?.(request);
+      } catch (e) {
+        console.error('Failed to parse request:', e);
+      }
+      return; // Don't advance — wait for resumeAfterChoice
+    }
+
+    // Process the line — same order as replay mode's playAction:
+    // 1. getParams (fire animations)
+    // 2. battle.add (mutate state in place)
+    // 3. updateBattleLog (trigger re-render via setHtmlLog/setMessageBar)
+    // 4. performAction (wait for animation timeout, then advance index)
+
+    const html = formatter.formatHTML(args, kwArgs);
+
+    getParams(args, kwArgs as BattleArgsKWArgsTypes).then((params) => {
+      battle.add(args, kwArgs);
+      updateBattleLog(html, battle, args[0]);
+
+      if (args[0] === 'win' || args[0] === 'tie') {
+        battle.winner = args[1] as string;
+        liveCallbacksRef.current.onBattleEnd?.(args[1] as string);
+        return; // Don't advance — battle is over
+      }
+
+      // performAction waits for animation timeout, then advances index
+      performAction(params, battle).then(() => {
+        // Advance to next line — triggers re-render → this useEffect fires again
+        setLiveActionIndex((prev) => prev + 1);
+      });
+    });
+  }, [liveActionIndex, liveMode]);
+
+  // addLine: push to buffer and trigger the useEffect cycle
   const addLine = useCallback((line: string) => {
-    // In animated mode, buffer lines that arrive while waiting for a choice
-    if (animateModeRef.current && liveWaitingRef.current) {
+    if (liveWaitingRef.current) {
       pendingBufferRef.current.push(line);
       return;
     }
     liveBufferRef.current.push(line);
-    // Use setTimeout to avoid synchronous re-entrance
-    setTimeout(() => processNextLiveLine(), 0);
-  }, [processNextLiveLine]);
+    // Trigger the useEffect to process the next line
+    setLiveActionIndex(liveBufferRef.current.length - 1);
+  }, []);
 
+  // resumeAfterChoice: clear waiting, move pending lines, trigger next cycle
   const resumeAfterChoice = useCallback(() => {
     liveWaitingRef.current = false;
-    options?.setIsWaitingForChoice?.(false);
+    setIsWaitingForChoice?.(false);
 
-    // Move pending lines to the main buffer (animated mode only)
     if (pendingBufferRef.current.length > 0) {
       liveBufferRef.current.push(...pendingBufferRef.current);
       pendingBufferRef.current = [];
     }
 
-    // Re-trigger processing after a microtask to let state settle
-    setTimeout(() => {
-      processNextLiveLine();
-    }, 0);
-  }, [processNextLiveLine]);
+    // Trigger the useEffect to process the next line
+    setLiveActionIndex((prev) => Math.max(prev, 0));
+  }, []);
 
   // ─── REPLAY MODE: existing flow control (unchanged) ───
 
@@ -274,8 +270,7 @@ export function useBattleFlow(
     // Reset live mode buffer
     if (liveMode) {
       liveBufferRef.current = [];
-      liveActionIndexRef.current = 0;
-      liveProcessingRef.current = false;
+      setLiveActionIndex(0);
     }
     
     // Clear scene if available
@@ -396,11 +391,6 @@ export function useBattleFlow(
           break;
         default:
           break;
-      }
-
-      // In live instant mode, skip all delays
-      if (liveMode && !animateModeRef.current) {
-        timeout = 0;
       }
       
       return await new Promise<void>((resolve) => {
