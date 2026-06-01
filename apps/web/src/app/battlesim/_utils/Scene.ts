@@ -15,12 +15,16 @@ export class Scene {
   currentAnimations: Promise<void>[] = [];
   acceleration: number;
   sceneEffects: SceneEffects;
+  $bg: { animate: () => any; delay: () => any };
   
   constructor(battle: Battle, gameElement: HTMLElement) {
     this.battle = battle;
     this.gameElement = gameElement;
     this.acceleration = 1;
     this.sceneEffects = new SceneEffects(this);
+    // Stub for animations that reference scene.$bg (earthquake, scorching sands, etc.)
+    const bgStub: any = { animate: () => bgStub, delay: () => bgStub };
+    this.$bg = bgStub;
   }
 
   setAcceleration(acceleration: number) {
