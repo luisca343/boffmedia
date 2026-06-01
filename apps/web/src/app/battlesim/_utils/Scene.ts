@@ -1,7 +1,7 @@
 import { Battle } from "@pkmn/client";
 import { PokemonIdent } from "@pkmn/protocol";
 import { BattleMoveAnims, BattleOtherAnims } from "../_utils/battle-animations-moves";
-import { getScaleMultiplier } from "../_utils/viewUtils";
+import { getOffset, getScaleMultiplier } from "../_utils/viewUtils";
 import { AnimationProps, ScenePos } from "../types";
 import { PokemonSprite } from "./PokemonSprite";
 import { SceneEffects } from "./SceneEffects";
@@ -56,9 +56,9 @@ export class Scene {
       return await this.playBattleAnim('contactattack', attacker, defender);
     }
     
-    const startingPosition = attacker.includes('p1') 
-      ? {top: 275, left: 180} 
-      : {top: 90, left: 630};
+    const scaleMulti = getScaleMultiplier();
+    const attackerOffset = getOffset(this.battle, attacker, scaleMulti);
+    const startingPosition = { top: attackerOffset.top, left: attackerOffset.left };
 
     const attackerSprite = new PokemonSprite(this, attacker);
     const defenderSprite = new PokemonSprite(this, defender);
