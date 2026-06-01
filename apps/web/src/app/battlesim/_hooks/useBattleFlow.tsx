@@ -100,6 +100,7 @@ export function useBattleFlow(
   // Uses a ref for the index to prevent React batching from skipping lines.
 
   useEffect(() => {
+    console.log(`[LiveFlow] useEffect fired. liveMode=${liveMode}, trigger=${liveTrigger}, idx=${liveIndexRef.current}, bufferSize=${liveBufferRef.current.length}, waiting=${liveWaitingRef.current}`);
     if (!liveMode) return;
     if (liveWaitingRef.current) return;
 
@@ -167,6 +168,7 @@ export function useBattleFlow(
   // addLine: push to buffer. Only trigger effect if nothing is currently processing.
   // bumpLiveIndex will trigger after each line completes.
   const addLine = useCallback((line: string) => {
+    console.log(`[LiveFlow] addLine called. waiting=${liveWaitingRef.current}, line=${line.substring(0, 60)}`);
     if (liveWaitingRef.current) {
       pendingBufferRef.current.push(line);
       return;
