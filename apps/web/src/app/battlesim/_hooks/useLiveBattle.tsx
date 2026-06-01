@@ -6,22 +6,9 @@ import { Generations } from '@pkmn/data';
 import { Dex } from '@pkmn/sim';
 import { Protocol } from '@pkmn/protocol';
 import { io, Socket } from 'socket.io-client';
-import { create } from 'zustand';
 import { env } from '@/config/env.public';
 import { Scene } from '../_utils/Scene';
 import { useBattleFlow } from './useBattleFlow';
-
-// Battle store — same pattern as useGameState.tsx
-// Zustand triggers re-renders even when the object reference is the same
-// (React useState bails out on same reference, skipping status bar updates)
-interface LiveBattleStore {
-  battle: Battle;
-  setBattle: (battle: Battle) => void;
-}
-const useLiveBattleStore = create<LiveBattleStore>((set) => ({
-  battle: new Battle(new Generations(Dex as any) as any),
-  setBattle: (battle: Battle) => set({ battle }),
-}));
 
 // Use window to store socket — survives React strict mode and module boundaries
 // Guard against SSR where window doesn't exist
@@ -62,7 +49,7 @@ export function useLiveBattle() {
   const socketRef = useRef<Socket | null>(getGlobalSocket());
   const roomIdRef = useRef<string | null>(null);
   const battleRef = useRef<Battle>(new Battle(new Generations(Dex as any) as any));
-  const { battle, setBattle } = useLiveBattleStore();
+  const [battle, setBattle] = useState(battleRef.current);
   const [scene, setScene] = useState<Scene | null>(null);
   const [roomId, setRoomIdRaw] = useState<string | null>(null);
   const [status, setStatus] = useState<LiveBattleStatus>('idle');
@@ -84,11 +71,6 @@ export function useLiveBattle() {
     p2: { turnRemaining: number; totalRemaining: number };
     activeSide: 'p1' | 'p2' | null;
   } | null>(null);
-  const [animateMode, setAnimateMode] = useState(() => {
-    if (typeof window === 'undefined') return true;
-    const stored = localStorage.getItem('battlesim_animate_mode');
-    return stored !== 'instant';
-  });
 
   // useBattleFlow in live mode
   const battleFlow = useBattleFlow(
@@ -109,7 +91,6 @@ export function useLiveBattle() {
     () => {}, // setSettingTurn — not used in live mode
     {
       liveMode: true,
-      animateMode,
       onRequest: (request) => {
         setCurrentRequest(request);
         setIsWaitingForChoice(true);
@@ -122,14 +103,6 @@ export function useLiveBattle() {
       setIsWaitingForChoice,
     },
   );
-
-  const toggleAnimateMode = useCallback(() => {
-    setAnimateMode((prev) => {
-      const next = !prev;
-      localStorage.setItem('battlesim_animate_mode', next ? 'animated' : 'instant');
-      return next;
-    });
-  }, []);
 
   const initScene = useCallback((gameElement: HTMLElement) => {
     if (!scene && gameElement) {
@@ -305,7 +278,6 @@ export function useLiveBattle() {
     replayId,
     error,
     timerState,
-    animateMode,
 
     // Actions
     createBattle,
@@ -313,6 +285,5 @@ export function useLiveBattle() {
     forfeit,
     connect,
     initScene,
-    toggleAnimateMode,
   };
 }
