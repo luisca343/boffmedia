@@ -4,35 +4,350 @@
 @import '../styles/utilities.css';
 @import '../styles/animations.css';
 
+/* ============================================================================
+   HANDOFF DESIGN TOKENS — Neon direction, token-driven
+   Exact 1:1 reproduction of styles.css from handoff
+   ============================================================================ */
+
+/* Brand constants (fixed — do not vary by theme) */
+:root {
+  --orange-300: #fdba74;
+  --orange-400: #fb923c;
+  --orange-500: #f97316;
+  --orange-600: #ea580c;
+  --orange-700: #c2410c;
+
+  --cyan-300: #67e8f9;
+  --cyan-400: #22d3ee;
+  --cyan-500: #06b6d4;
+  --cyan-600: #0891b2;
+
+  --purple-400: #c084fc;
+  --purple-500: #a855f7;
+  --purple-600: #9333ea;
+
+  --emerald-400: #34d399;
+  --emerald-500: #10b981;
+  --amber-400: #fbbf24;
+  --rose-400: #fb7185;
+  --rose-500: #f43f5e;
+
+  /* Accent role — swappable via tweak; defaults to cyan */
+  --accent: var(--cyan-500);
+  --accent-bright: var(--cyan-400);
+  --accent-soft: rgba(6, 182, 212, 0.14);
+  --on-accent: #04141a;
+
+  /* Type families */
+  --font-display: 'Orbitron', sans-serif;
+  --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Modular type scale (tightened, 1.25 ratio anchored at 16) */
+  --t-xs: 0.75rem;
+  --t-sm: 0.875rem;
+  --t-base: 1rem;
+  --t-lg: 1.125rem;
+  --t-xl: 1.375rem;
+  --t-2xl: 1.75rem;
+  --t-3xl: 2.25rem;
+  --t-4xl: 3rem;
+  --t-5xl: 3.9rem;
+  --t-6xl: 5rem;
+
+  /* Spacing rhythm (4px base) */
+  --space-section: clamp(4rem, 9vw, 8rem);
+  --gutter: clamp(1.25rem, 4vw, 2.5rem);
+  --maxw: 1240px;
+
+  /* Motion */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur: 0.32s;
+}
+
+/* ===========================================================================
+   THEME TOKENS  (surfaces + text)
+   =========================================================================== */
+:root,
+[data-theme="dark"] {
+  --bg: #0a0a0f;
+  --bg-grad-1: #0c0c14;
+  --bg-grad-2: #07070b;
+  --surface: #12121b;
+  --surface-2: #181826;
+  --surface-3: #1f1f30;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --text: #f4f4f7;
+  --text-muted: #a9abb8;
+  --text-dim: #71737f;
+  --shadow-color: rgba(0, 0, 0, 0.55);
+  --hud-shadow: #000000;
+  --grid-dot: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="light"] {
+  --bg: #f4f3f0;
+  --bg-grad-1: #f7f6f3;
+  --bg-grad-2: #ece9e3;
+  --surface: #ffffff;
+  --surface-2: #faf9f6;
+  --surface-3: #f1efe9;
+  --border: rgba(20, 18, 14, 0.10);
+  --border-strong: rgba(20, 18, 14, 0.22);
+  --text: #18161f;
+  --text-muted: #57545f;
+  --text-dim: #8b8893;
+  --shadow-color: rgba(40, 30, 20, 0.16);
+  --hud-shadow: #18161f;
+  --grid-dot: rgba(20, 18, 14, 0.05);
+}
+
+/* ===========================================================================
+   DIRECTION TOKENS — Neon (default)
+   =========================================================================== */
+:root {
+  --radius: 14px;
+  --radius-lg: 22px;
+  --radius-pill: 9999px;
+  --card-bg: color-mix(in srgb, var(--surface) 72%, transparent);
+  --card-border: 1px solid var(--border);
+  --card-shadow: 0 24px 60px -28px var(--shadow-color), inset 0 1px 0 rgba(255,255,255,0.05);
+  --card-shadow-hover: 0 30px 70px -26px var(--shadow-color), inset 0 1px 0 rgba(255,255,255,0.08);
+  --btn-radius: 9999px;
+  --btn-shadow: 0 8px 24px -8px var(--accent);
+  --glow: 0 0 40px -8px;
+  --hairline: 1px;
+  --label-font: var(--font-mono);
+  --label-spacing: 0.22em;
+  --display-spacing: 0em;
+}
+
+/* ===========================================================================
+   BASE — Exact reproduction of styles.css §4
+   =========================================================================== */
+* { box-sizing: border-box; }
+html.theme-switching * { transition: none !important; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--bg) !important;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-size: var(--t-base);
+  line-height: 1.6;
+}
+h1, h2, h3, h4, h5 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: var(--display-spacing);
+  line-height: 1.08;
+  margin: 0;
+  text-wrap: balance;
+}
+p { text-wrap: pretty; }
+a { color: inherit; text-decoration: none; }
+button { font-family: var(--font-body); }
+img { display: block; max-width: 100%; }
+::selection { background: var(--orange-500); color: #fff; }
+
+.app-shell { min-height: 100vh; display: flex; flex-direction: column; background: var(--bg); }
+.container { width: 100%; max-width: var(--maxw); margin: 0 inline; margin-inline: auto; padding-inline: var(--gutter); }
+
+/* ===========================================================================
+   KICKER — Exact reproduction of styles.css §4
+   =========================================================================== */
+.kicker {
+  font-family: var(--label-font);
+  font-size: var(--t-xs);
+  letter-spacing: var(--label-spacing);
+  text-transform: uppercase;
+  color: var(--accent-bright);
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.kicker::before {
+  content: "";
+  width: 1.4rem;
+  height: var(--hairline);
+  background: var(--accent-bright);
+}
+
+/* ===========================================================================
+   BUTTONS — Exact reproduction of styles.css §5
+   =========================================================================== */
+.btn {
+  --btn-bg: var(--orange-500);
+  --btn-fg: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: var(--t-sm);
+  line-height: 1;
+  padding: 0.85rem 1.5rem;
+  border-radius: var(--btn-radius);
+  border: var(--hairline) solid transparent;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  cursor: pointer;
+  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease),
+    background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+  box-shadow: var(--btn-shadow);
+  white-space: nowrap;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(1px); }
+[data-direction="hud"] .btn { text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
+[data-direction="hud"] .btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 0 var(--hud-shadow); }
+[data-direction="hud"] .btn:active { transform: translate(1px, 1px); box-shadow: 2px 2px 0 0 var(--hud-shadow); }
+
+.btn--primary { --btn-bg: var(--orange-500); border-color: var(--orange-500); }
+.btn--primary:hover { --btn-bg: var(--orange-400); }
+[data-direction="neon"] .btn--primary { box-shadow: 0 10px 30px -10px var(--orange-500); }
+
+.btn--accent { --btn-bg: var(--accent); --btn-fg: var(--on-accent); border-color: var(--accent); }
+.btn--accent:hover { filter: brightness(1.08); }
+
+.btn--ghost {
+  --btn-bg: transparent; --btn-fg: var(--text);
+  border-color: var(--border-strong);
+  box-shadow: none;
+}
+.btn--ghost:hover { --btn-bg: color-mix(in srgb, var(--text) 7%, transparent); }
+[data-direction="hud"] .btn--ghost:hover { box-shadow: 4px 4px 0 0 var(--hud-shadow); }
+
+.btn--outline {
+  --btn-bg: transparent; --btn-fg: var(--orange-500);
+  border-color: color-mix(in srgb, var(--orange-500) 55%, transparent);
+  box-shadow: none;
+}
+.btn--outline:hover { --btn-bg: color-mix(in srgb, var(--orange-500) 12%, transparent); border-color: var(--orange-500); }
+
+.btn--lg { padding: 1.05rem 2rem; font-size: var(--t-base); }
+.btn--sm { padding: 0.55rem 1rem; font-size: var(--t-xs); }
+.btn--block { width: 100%; }
+.btn:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--accent-bright); }
+
+/* ===========================================================================
+   CARDS — Exact reproduction of styles.css §6
+   =========================================================================== */
+.card {
+  background: var(--card-bg);
+  border: var(--card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow);
+  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease),
+    border-color var(--dur) var(--ease);
+  position: relative;
+}
+[data-direction="neon"] .card { backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+.card--hover:hover { box-shadow: var(--card-shadow-hover); }
+[data-direction="hud"] .card--hover:hover { transform: translate(-2px, -2px); }
+[data-direction="neon"] .card--hover:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--accent) 40%, var(--border)); }
+[data-direction="grid"] .card--hover:hover { transform: translateY(-3px); border-color: var(--border-strong); }
+
+/* HUD corner tick decoration */
+[data-direction="hud"] .card--ticks::before,
+[data-direction="hud"] .card--ticks::after {
+  content: "";
+  position: absolute;
+  width: 10px; height: 10px;
+  border: 2px solid var(--orange-500);
+  pointer-events: none;
+}
+[data-direction="hud"] .card--ticks::before { top: 6px; left: 6px; border-right: 0; border-bottom: 0; }
+[data-direction="hud"] .card--ticks::after { bottom: 6px; right: 6px; border-left: 0; border-top: 0; }
+
+/* ===========================================================================
+   BADGES — Exact reproduction of styles.css §7
+   =========================================================================== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--label-font);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.65rem;
+  border-radius: var(--radius-pill);
+  border: var(--hairline) solid var(--border-strong);
+  color: var(--text-muted);
+  background: var(--surface-2);
+}
+.badge--new { color: var(--orange-400); border-color: color-mix(in srgb, var(--orange-500) 45%, transparent); background: color-mix(in srgb, var(--orange-500) 12%, transparent); }
+.badge--soon { color: var(--purple-400); border-color: color-mix(in srgb, var(--purple-500) 45%, transparent); background: color-mix(in srgb, var(--purple-500) 12%, transparent); }
+.badge--live { color: var(--emerald-400); border-color: color-mix(in srgb, var(--emerald-500) 45%, transparent); background: color-mix(in srgb, var(--emerald-500) 12%, transparent); }
+.badge--accent { color: var(--accent-bright); border-color: color-mix(in srgb, var(--accent) 45%, transparent); background: var(--accent-soft); }
+.badge .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.badge--live .dot { animation: pulse-dot 1.6s var(--ease) infinite; }
+@keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+/* ===========================================================================
+   INPUTS — Exact reproduction of styles.css §8
+   =========================================================================== */
+.field-label {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-size: var(--t-sm); font-weight: 600; color: var(--text-muted);
+  margin-bottom: 0.45rem;
+}
+.input {
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: var(--t-sm);
+  color: var(--text);
+  background: var(--surface-2);
+  border: var(--hairline) solid var(--border-strong);
+  border-radius: var(--btn-radius);
+  padding: 0.7rem 0.9rem;
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.input::placeholder { color: var(--text-dim); }
+.input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.input:disabled { opacity: 0.55; cursor: not-allowed; }
+
+/* ===========================================================================
+   UTILITY — Exact reproduction of styles.css §9
+   =========================================================================== */
+.eyebrow-num { font-family: var(--font-mono); color: var(--orange-500); font-weight: 700; }
+.text-muted { color: var(--text-muted); }
+.text-dim { color: var(--text-dim); }
+.accent-text { color: var(--accent-bright); }
+.orange-text { color: var(--orange-500); }
+.divider { height: var(--hairline); background: var(--border); border: 0; margin: 0; }
+.grid-dots {
+  background-image: radial-gradient(var(--grid-dot) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+.section { padding-block: var(--space-section); }
+.section-head { display: flex; flex-direction: column; gap: 1.1rem; margin-bottom: 2.75rem; }
+.section-title { font-size: var(--t-4xl); line-height: 1.1; }
+.section-sub { color: var(--text-muted); font-size: var(--t-lg); max-width: 42ch; }
+
+/* Reveal-on-scroll */
+.reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.6s var(--ease), transform 0.6s var(--ease); }
+.reveal.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+  * { scroll-behavior: auto !important; }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 11px; height: 11px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 6px; border: 3px solid var(--bg); }
+::-webkit-scrollbar-thumb:hover { background: var(--orange-600); }
 
 /* Tailwind directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@layer base {
-  body {
-    font-family: "Inter", serif;
-  }
-  
-  nav a {
-    font-family: "Inter", serif;
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 700;
-  }
-
-  button {
-    font-family: "Inter", serif;
-  }
-
-  * {
-    @apply border-border;
-  }
-  
-  body {
-    @apply bg-background text-foreground;
-  }
-}
