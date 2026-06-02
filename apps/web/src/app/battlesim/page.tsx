@@ -10,7 +10,7 @@ export default function Page() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full max-w-4xl">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 w-full max-w-5xl">
         <Link
           href="/battlesim/play"
           className="flex flex-col items-center gap-2 p-6 bg-card rounded-lg border hover:shadow-lg transition-all hover:scale-[1.02]"
@@ -19,6 +19,17 @@ export default function Page() {
           <h2 className="text-lg font-semibold">Play</h2>
           <p className="text-sm text-muted-foreground text-center">
             Battle against an AI opponent
+          </p>
+        </Link>
+
+        <Link
+          href="/battlesim/pvp"
+          className="flex flex-col items-center gap-2 p-6 bg-card rounded-lg border hover:shadow-lg transition-all hover:scale-[1.02]"
+        >
+          <span className="text-2xl">🏆</span>
+          <h2 className="text-lg font-semibold">PvP</h2>
+          <p className="text-sm text-muted-foreground text-center">
+            Battle other players on our server
           </p>
         </Link>
 
