@@ -1,6 +1,7 @@
 import { Pokemon } from "@pkmn/client";
 import { getScaleMultiplier } from "../_utils/viewUtils";
 import { PokemonSprite } from "./PokemonSprite";
+import { TypeBadgeSmall } from "@/components/shared/pokemon/TypeBadge";
 
 export function PokemonStatus({pokemon, className}: {pokemon: Pokemon | null, className?: string}) {
     if(!pokemon) return <div className={`mx-2 p-1  ${className}`} />
@@ -25,6 +26,15 @@ export function PokemonStatus({pokemon, className}: {pokemon: Pokemon | null, cl
                 <span className="px-1 text-surface-50 font-bold">
                     {pokemon.name} L{pokemon.level}
                 </span>
+            </div>
+            <div className="flex items-center gap-0.5">
+                {pokemon.terastallized ? (
+                    <TypeBadgeSmall type={pokemon.terastallized} className="!m-0" />
+                ) : (
+                    pokemon.types?.map((type) => (
+                        <TypeBadgeSmall key={type} type={type} className="!m-0" />
+                    ))
+                )}
             </div>
             <div className="relative border border-surface-50 rounded-xl overflow-hidden h-3 sm:h-4 md:h-6 text-shadow-border1">
                 <div className="hp-bar h-full" style={{ width: `${hpPercent}%`, backgroundColor: hpColor, transition: 'width 0.5s ease-out, background-color 0.5s ease-out'}}/>
