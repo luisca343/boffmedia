@@ -15,14 +15,40 @@ interface SegmentedProps {
 export function Segmented({ value, options, onChange, className }: SegmentedProps) {
   const items = options.map((o) => typeof o === "string" ? { value: o, label: o } : o)
   return (
-    <div className={cn("segmented", className)} role="tablist">
-      {items.map((o) => (
-        <button key={o.value} role="tab" aria-selected={value === o.value}
-          className={cn("segmented__btn", value === o.value && "segmented__btn--active")}
-          onClick={() => onChange(o.value)}>
-          {o.icon && <Icon name={o.icon} size={16} />}{o.label}
-        </button>
-      ))}
+    <div
+      className={cn(
+        "inline-flex p-[3px] gap-[2px]",
+        "bg-[var(--surface-2)]",
+        "border border-solid border-[var(--border)]",
+        "rounded-[var(--radius-pill,9999px)]",
+        className,
+      )}
+      role="tablist"
+    >
+      {items.map((o) => {
+        const active = value === o.value
+        return (
+          <button
+            key={o.value}
+            role="tab"
+            aria-selected={active}
+            className={cn(
+              "inline-flex items-center gap-1.5",
+              "font-body text-sm font-semibold",
+              "text-[var(--text-muted)]",
+              "py-[7px] px-3.5",
+              "border-0 bg-transparent",
+              "rounded-[calc(var(--radius-pill,9999px)-3px)]",
+              "cursor-pointer",
+              "transition-[color,background] duration-[var(--dur,0.32s)]",
+              active && "text-[var(--on-accent)] bg-[var(--accent-bright)]",
+            )}
+            onClick={() => onChange(o.value)}
+          >
+            {o.icon && <Icon name={o.icon} size={16} />}{o.label}
+          </button>
+        )
+      })}
     </div>
   )
 }

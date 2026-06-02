@@ -9,11 +9,27 @@ interface BoffProgressProps {
   className?: string
 }
 
+const barTones = {
+  accent: "bg-[var(--accent)]",
+  orange: "bg-orange-500",
+  emerald: "bg-emerald-500",
+}
+
 export function BoffProgress({ value = 0, tone = "accent", label, className }: BoffProgressProps) {
   return (
-    <div className={cn("k-prog", className)}>
-      {label && <div className="k-prog__top"><span>{label}</span><span className="k-prog__pct">{Math.round(value)}%</span></div>}
-      <div className="k-prog__track"><div className={cn("k-prog__bar", `k-prog__bar--${tone}`)} style={{ width: `${Math.max(0, Math.min(100, value))}%` }} /></div>
+    <div className={cn("flex flex-col gap-[7px]", className)}>
+      {label && (
+        <div className="flex justify-between text-sm font-semibold">
+          <span>{label}</span>
+          <span className="font-mono text-[var(--text-muted)]">{Math.round(value)}%</span>
+        </div>
+      )}
+      <div className={cn("h-2 rounded-[999px] bg-[var(--surface-3)] overflow-hidden", "data-[direction=hud]:rounded-sm")}>
+        <div
+          className={cn("h-full rounded-[inherit] transition-[width] duration-[0.6s] ease-[var(--ease)]", barTones[tone])}
+          style={{ width: `${Math.max(0, Math.min(100, value))}%` }}
+        />
+      </div>
     </div>
   )
 }
@@ -30,12 +46,12 @@ export function BoffRing({ value = 0, size = 64, tone = "orange", className }: B
   const c = 2 * Math.PI * r
   const color = tone === "accent" ? "var(--accent-bright)" : tone === "emerald" ? "var(--emerald-400)" : "var(--orange-500)"
   return (
-    <span className={cn("k-ring", className)} style={{ width: size, height: size }}>
+    <span className={cn("relative inline-grid place-items-center", className)} style={{ width: size, height: size }}>
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="var(--surface-3)" strokeWidth="6" />
-        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth="6" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c * (1 - value / 100)} transform={`rotate(-90 ${size/2} ${size/2})`} />
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--surface-3)" strokeWidth="6" />
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth="6" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c * (1 - value / 100)} transform={`rotate(-90 ${size / 2} ${size / 2})`} />
       </svg>
-      <span className="k-ring__num">{Math.round(value)}</span>
+      <span className="absolute font-display font-extrabold text-base">{Math.round(value)}</span>
     </span>
   )
 }
