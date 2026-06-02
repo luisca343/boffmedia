@@ -12,6 +12,14 @@ import useViewportWidth from '@/services/useViewPortWidth';
 
 const VISIBLE_LOG_LIMIT = 50;
 
+const BATTLE_FORMATS = [
+  { value: 'gen9randombattle', label: 'Gen 9 Random Battle' },
+  { value: 'gen8randombattle', label: 'Gen 8 Random Battle' },
+  { value: 'gen7randombattle', label: 'Gen 7 Random Battle' },
+  { value: 'gen6randombattle', label: 'Gen 6 Random Battle' },
+  { value: 'gen9nationaldex', label: 'National Dex' },
+] as const;
+
 export default function PlayPage() {
   const {
     sessions,
@@ -28,6 +36,7 @@ export default function PlayPage() {
   const [battleStarted, setBattleStarted] = useState(false);
   const [showTimer, setShowTimer] = useState(false);
   const [showAllLogs, setShowAllLogs] = useState(false);
+  const [selectedFormat, setSelectedFormat] = useState<string>('gen9randombattle');
   const [, canvasWidth] = useViewportWidth();
   const logRef = useRef<HTMLDivElement>(null);
 
@@ -36,12 +45,12 @@ export default function PlayPage() {
 
   const handleCreateBattle = () => {
     setBattleStarted(true);
-    createBattle('gen9randombattle');
+    createBattle(selectedFormat);
   };
 
   const handlePlayAgain = () => {
     setBattleStarted(false);
-    createBattle('gen9randombattle');
+    createBattle(selectedFormat);
   };
 
   const handleInitScene = useCallback((el: HTMLElement) => {
@@ -67,12 +76,25 @@ export default function PlayPage() {
             Play a Pokémon battle against an AI opponent
           </p>
         </div>
-        <button
-          onClick={handleCreateBattle}
-          className="px-8 py-3 bg-primary text-primary-foreground rounded-lg text-lg font-semibold hover:bg-primary/90 transition-colors shadow-lg"
-        >
-          Start Battle
-        </button>
+        <div className="flex flex-col items-center gap-3">
+          <select
+            value={selectedFormat}
+            onChange={(e) => setSelectedFormat(e.target.value)}
+            className="px-4 py-2 bg-card border rounded-md text-sm font-medium cursor-pointer"
+          >
+            {BATTLE_FORMATS.map((fmt) => (
+              <option key={fmt.value} value={fmt.value}>
+                {fmt.label}
+              </option>
+            ))}
+          </select>
+          <button
+            onClick={handleCreateBattle}
+            className="px-8 py-3 bg-primary text-primary-foreground rounded-lg text-lg font-semibold hover:bg-primary/90 transition-colors shadow-lg"
+          >
+            Start Battle
+          </button>
+        </div>
       </div>
     );
   }
