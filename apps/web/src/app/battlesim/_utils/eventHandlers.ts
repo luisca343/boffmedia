@@ -126,6 +126,53 @@ export const eventHandlers: Record<string, EventHandler> = {
     },
   },
 
+  '-mega': {
+    afterStateChange: async (ctx) => {
+      if (ctx.skipAnims) return 50;
+      const pokemonIdent = getRelativeIdent(ctx.args[1] as PokemonIdent, ctx.pov);
+      const species = ctx.args[2] as string;
+      await ctx.scene.showPopup(pokemonIdent, `Mega Evolved${species ? ` into ${species}` : ''}!`, 1500);
+      return 1500 / ctx.acceleration;
+    },
+  },
+
+  '-primal': {
+    afterStateChange: async (ctx) => {
+      if (ctx.skipAnims) return 50;
+      const pokemonIdent = getRelativeIdent(ctx.args[1] as PokemonIdent, ctx.pov);
+      await ctx.scene.showPopup(pokemonIdent, 'Primal Reversion!', 1500);
+      return 1500 / ctx.acceleration;
+    },
+  },
+
+  '-burst': {
+    afterStateChange: async (ctx) => {
+      if (ctx.skipAnims) return 50;
+      const pokemonIdent = getRelativeIdent(ctx.args[1] as PokemonIdent, ctx.pov);
+      const species = ctx.args[2] as string;
+      await ctx.scene.showPopup(pokemonIdent, `Ultra Burst${species ? ` into ${species}` : ''}!`, 1500);
+      return 1500 / ctx.acceleration;
+    },
+  },
+
+  '-zpower': {
+    afterStateChange: async (ctx) => {
+      if (ctx.skipAnims) return 50;
+      const pokemonIdent = getRelativeIdent(ctx.args[1] as PokemonIdent, ctx.pov);
+      await ctx.scene.showPopup(pokemonIdent, 'Z-Move!', 1000);
+      return 1000 / ctx.acceleration;
+    },
+  },
+
+  '-zbroken': {
+    afterStateChange: async (ctx) => {
+      if (ctx.skipAnims) return 50;
+      const pokemonIdent = getRelativeIdent(ctx.args[1] as PokemonIdent, ctx.pov);
+      await ctx.scene.showPopup(pokemonIdent, 'Z-Broken!', 1000);
+      return 1000 / ctx.acceleration;
+    },
+  },
+
   '-message': {
     afterStateChange: async (ctx) => {
       return 0;
