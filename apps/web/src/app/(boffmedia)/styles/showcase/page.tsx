@@ -2101,6 +2101,7 @@ function ShowcaseInner() {
               {links.map(([id, label, icon]) => (
                 <button
                   key={id}
+                  suppressHydrationWarning
                   className={
                     "dsh-rail__link" +
                     (active === id ? " dsh-rail__link--on" : "")

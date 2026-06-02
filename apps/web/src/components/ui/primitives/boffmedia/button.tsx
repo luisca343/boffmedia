@@ -13,11 +13,23 @@ export interface BoffButtonProps extends React.ButtonHTMLAttributes<HTMLButtonEl
   href?: string
 }
 
-const variantClass: Record<string, string> = {
-  primary: "btn--primary",
-  accent: "btn--accent",
-  ghost: "btn--ghost",
-  outline: "btn--outline",
+const variants: Record<string, { cls: string; style: React.CSSProperties }> = {
+  primary: {
+    cls: "bg-orange-500 text-white border-orange-500 hover:bg-orange-400",
+    style: { boxShadow: "0 8px 24px -8px var(--orange-500)" },
+  },
+  accent: {
+    cls: "bg-[var(--accent)] text-[var(--on-accent)] border-[var(--accent)] hover:brightness-110",
+    style: { boxShadow: "0 8px 24px -8px var(--accent)" },
+  },
+  ghost: {
+    cls: "bg-transparent text-[var(--text)] border-[var(--border-strong)] hover:bg-[color-mix(in_srgb,var(--text)_7%,transparent)]",
+    style: { boxShadow: "none" },
+  },
+  outline: {
+    cls: "bg-transparent text-orange-500 hover:bg-[color-mix(in_srgb,var(--orange-500)_12%,transparent)] hover:border-orange-500",
+    style: { boxShadow: "none", borderColor: "color-mix(in srgb, var(--orange-500) 55%, transparent)" },
+  },
 }
 
 export function BoffButton({
@@ -31,13 +43,20 @@ export function BoffButton({
   children,
   ...props
 }: BoffButtonProps) {
+  const v = variants[variant] || variants.primary
   const cls = cn(
-    "btn",
-    variantClass[variant] || "btn--primary",
-    size === "sm" && "btn--sm",
-    size === "lg" && "btn--lg",
-    block && "btn--block",
-    className
+    "inline-flex items-center justify-center gap-2.5",
+    "font-body font-semibold text-sm leading-none",
+    "border border-solid cursor-pointer whitespace-nowrap",
+    "transition-[transform,box-shadow,background,border-color] duration-[var(--dur,0.32s)] ease-[var(--ease)]",
+    "hover:-translate-y-px active:translate-y-px",
+    "focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_var(--bg),0_0_0_5px_var(--accent-bright)]",
+    v.cls,
+    size === "sm" && "py-2 px-4 text-t-xs",
+    size === "lg" && "py-4 px-8 text-base",
+    block && "w-full",
+    !size && "py-3.5 px-6",
+    className,
   )
 
   const inner = (
@@ -48,9 +67,11 @@ export function BoffButton({
     </>
   )
 
+  const mergedStyle = { borderRadius: "var(--btn-radius, 9999px)", ...v.style }
+
   if (href !== undefined) {
-    return <a className={cls} href={href} {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)}>{inner}</a>
+    return <a className={cls} style={mergedStyle} href={href} {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)}>{inner}</a>
   }
 
-  return <button className={cls} {...props}>{inner}</button>
+  return <button className={cls} style={mergedStyle} {...props}>{inner}</button>
 }

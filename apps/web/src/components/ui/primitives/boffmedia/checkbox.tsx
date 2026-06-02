@@ -21,11 +21,27 @@ export function BoffCheckbox({ checked, defaultChecked = false, onChange, onChec
   const toggle = () => { if (disabled) return; const n = !val; if (checked == null) setOn(n); onChange && onChange(n); onCheckedChange && onCheckedChange(n) }
 
   return (
-    <label className={cn("k-cbrow", disabled && "k-cbrow--dis", className)} htmlFor={id}>
-      <button type="button" role="checkbox" aria-checked={val} id={id} className="k-cb" data-on={val ? "" : undefined} disabled={disabled} onClick={toggle}>
+    <label className={cn("inline-flex items-center gap-2 cursor-pointer", disabled && "opacity-50 cursor-not-allowed", className)} htmlFor={id}>
+      <button
+        type="button"
+        role="checkbox"
+        aria-checked={val}
+        id={id}
+        className={cn(
+          "grid place-items-center w-5 h-5 rounded-md p-0",
+          "border-[1.5px] border-solid border-[var(--border-strong)]",
+          "bg-[var(--surface-2)] text-white",
+          "cursor-pointer",
+          "transition-[background,border-color] duration-[var(--dur,0.32s)]",
+          "data-[direction=hud]:rounded-[3px]",
+          val && "bg-[var(--accent)] border-[var(--accent)] text-[var(--on-accent)]",
+        )}
+        disabled={disabled}
+        onClick={toggle}
+      >
         {val && <Icon name="check" size={13} stroke={3} />}
       </button>
-      {label && <span className="k-cbrow__label">{label}</span>}
+      {label && <span className="text-sm font-medium">{label}</span>}
     </label>
   )
 }

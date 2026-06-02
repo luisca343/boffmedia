@@ -329,6 +329,26 @@ const config: Config = {
           "0%, 100%": { boxShadow: "0 0 5px rgba(249, 115, 22, 0.3)" },
           "50%": { boxShadow: "0 0 20px rgba(249, 115, 22, 0.6)" },
         },
+        "k-shimmer": {
+          from: { backgroundPosition: "200% 0" },
+          to: { backgroundPosition: "-200% 0" },
+        },
+        "k-toast-in": {
+          from: { opacity: "0", transform: "translateX(20px)" },
+        },
+        "k-fade": {
+          from: { opacity: "0" },
+        },
+        "k-modal-in": {
+          from: { opacity: "0", transform: "translateY(14px) scale(0.98)" },
+        },
+        "dd-in": {
+          from: { opacity: "0", transform: "translateY(-6px)" },
+        },
+        "pulse-dot": {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.3" },
+        },
       },
       animation: {
         // Existing animations
@@ -343,6 +363,12 @@ const config: Config = {
         "slide-down": "slide-down 0.3s ease-out",
         pulse: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
         "pulse-glow": "pulse-glow 2s ease-in-out infinite",
+        "k-shimmer": "k-shimmer 1.5s linear infinite",
+        "k-toast-in": "k-toast-in 0.28s var(--ease)",
+        "k-fade": "k-fade 0.2s var(--ease)",
+        "k-modal-in": "k-modal-in 0.26s var(--ease)",
+        "dd-in": "dd-in 0.16s var(--ease)",
+        "pulse-dot": "pulse-dot 1.6s var(--ease) infinite",
       },
       spacing: {
         18: "4.5rem",
