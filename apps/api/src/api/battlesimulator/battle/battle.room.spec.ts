@@ -68,7 +68,8 @@ describe('BattleRoom — diagnostic', () => {
                   }
                 } else if (request.requestType === 'switch' && request.side) {
                   const switchIndex = request.side.pokemon.findIndex(
-                    (p: any, i: number) => !p.active && !p.condition.includes('fnt'),
+                    (p: any, i: number) =>
+                      !p.active && !p.condition.includes('fnt'),
                   );
                   if (switchIndex >= 0) {
                     streams.p1.write(`switch ${switchIndex + 1}`);
@@ -92,7 +93,11 @@ describe('BattleRoom — diagnostic', () => {
 
     // Safety timeout
     setTimeout(() => {
-      done(new Error(`Timeout: omniscientLines=${omniscientLines}, p1Chunks=${p1Chunks}, requestCount=${requestCount}, winReceived=${winReceived}`));
+      done(
+        new Error(
+          `Timeout: omniscientLines=${omniscientLines}, p1Chunks=${p1Chunks}, requestCount=${requestCount}, winReceived=${winReceived}`,
+        ),
+      );
     }, 30_000);
   }, 35_000);
 });

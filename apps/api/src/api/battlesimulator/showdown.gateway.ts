@@ -32,8 +32,7 @@ export class ShowdownGateway
 
   private clients: Map<string, ShowdownClientEntry> = new Map();
   private showdownServer =
-    process.env.SHOWDOWN_SERVER_URL ||
-    'wss://sim3.psim.us/showdown/websocket';
+    process.env.SHOWDOWN_SERVER_URL || 'wss://sim3.psim.us/showdown/websocket';
 
   handleConnection(client: Socket) {
     const clientId = crypto.randomUUID();
@@ -62,11 +61,15 @@ export class ShowdownGateway
       return;
     }
     if (entry.showdownWs) {
-      this.logger.warn(`connectToShowdown: already connected for client ${clientId}`);
+      this.logger.warn(
+        `connectToShowdown: already connected for client ${clientId}`,
+      );
       return;
     }
 
-    this.logger.log(`connectToShowdown: opening PS connection for client ${clientId}`);
+    this.logger.log(
+      `connectToShowdown: opening PS connection for client ${clientId}`,
+    );
     this.openShowdownConnection(clientId, entry);
   }
 
@@ -110,7 +113,9 @@ export class ShowdownGateway
       );
       return;
     }
-    this.logger.log(`sendToShowdown: forwarding to PS for client ${clientId}: ${payload.substring(0, 80)}`);
+    this.logger.log(
+      `sendToShowdown: forwarding to PS for client ${clientId}: ${payload.substring(0, 80)}`,
+    );
     entry.showdownWs.send(payload);
   }
 
@@ -154,7 +159,10 @@ export class ShowdownGateway
       }
     } catch (error: any) {
       this.logger.error('Login error:', error.message);
-      client.emit('loginError', error.message || 'An error occurred during login');
+      client.emit(
+        'loginError',
+        error.message || 'An error occurred during login',
+      );
     }
   }
 
@@ -202,7 +210,10 @@ export class ShowdownGateway
     entry.showdownWs = showdownWs;
   }
 
-  private scheduleReconnect(clientId: string, entry: ShowdownClientEntry): void {
+  private scheduleReconnect(
+    clientId: string,
+    entry: ShowdownClientEntry,
+  ): void {
     if (entry.reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
       this.logger.error(
         `Max reconnect attempts reached for client ${clientId}`,
