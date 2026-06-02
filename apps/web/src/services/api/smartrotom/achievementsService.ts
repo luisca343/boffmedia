@@ -39,6 +39,20 @@ export class AchievementService {
   }
 
   /**
+   * Create a new replay (used by Showdown battles to persist replays client-side)
+   */
+  static createReplay(data: {
+    side1: string;
+    side2: string;
+    team1: string;
+    team2: string;
+    replay: string;
+    winner: string;
+  }): Promise<ApiResponse<{ replayId: number }>> {
+    return rotomPOST<{ replayId: number }>('/achievement/create-replay', data);
+  }
+
+  /**
    * Check if player has completed a specific achievement
    */
   static checkAchievementStatus(checkDto: GetAchievementByIdDto): Promise<ApiResponse<AchievementStatusResponse>> {

@@ -24,16 +24,20 @@ export default function ShowdownBattlePage({
     username,
     session,
     chatMessages,
+    spectatorCount,
     error,
     reconnectInfo,
     sendChoice,
     forfeit,
     sendChat,
     initScene,
+    saveShowdownReplay,
   } = useShowdownBattle(decodedRoomId, { autoCreateSession: true });
 
   const [showAllLogs, setShowAllLogs] = useState(false);
   const [chatInput, setChatInput] = useState('');
+  const [savedReplayId, setSavedReplayId] = useState<number | null>(null);
+  const [savingReplay, setSavingReplay] = useState(false);
   const [, canvasWidth] = useViewportWidth();
   const logRef = useRef<HTMLDivElement>(null);
   const chatRef = useRef<HTMLDivElement>(null);
@@ -93,6 +97,17 @@ export default function ShowdownBattlePage({
       forfeit();
     }
   };
+
+  // Auto-save replay when battle ends
+  useEffect(() => {
+    if (state?.battleComplete && !savedReplayId && !savingReplay) {
+      setSavingReplay(true);
+      saveShowdownReplay().then((id) => {
+        if (id) setSavedReplayId(id);
+        setSavingReplay(false);
+      });
+    }
+  }, [state?.battleComplete, savedReplayId, savingReplay, saveShowdownReplay]);
 
   // Connecting / waiting state
   if (!session || !state || status === 'connecting' || status === 'authenticating' || status === 'joining') {
@@ -159,6 +174,11 @@ export default function ShowdownBattlePage({
           {username && (
             <span className="text-xs text-muted-foreground">
               Playing as <strong>{username}</strong>
+            </span>
+          )}
+          {spectatorCount > 0 && (
+            <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
+              {spectatorCount} spectator{spectatorCount !== 1 ? 's' : ''}
             </span>
           )}
         </div>
@@ -303,6 +323,20 @@ export default function ShowdownBattlePage({
                   : `${state.winner} won!`}
             </h2>
           </div>
+          {savingReplay && (
+            <p className="text-sm text-muted-foreground">Saving replay...</p>
+          )}
+          {savedReplayId && (
+            <div className="flex flex-col items-center gap-2">
+              <p className="text-sm text-green-600">Replay saved!</p>
+              <Link
+                href={`/battlesim/replay/${savedReplayId}`}
+                className="px-6 py-2 bg-secondary text-secondary-foreground rounded-md font-medium hover:bg-secondary/80 transition-colors"
+              >
+                Watch Replay
+              </Link>
+            </div>
+          )}
           <Link
             href="/battlesim/showdown"
             className="px-6 py-2 bg-primary text-primary-foreground rounded-md font-medium hover:bg-primary/90 transition-colors"
