@@ -26,11 +26,24 @@ const config: Config = {
         inter: ["Inter", "sans-serif"],
         roboto: ["Roboto", "sans-serif"],
         bebas: ["Bebas Neue", "sans-serif"],
+        display: ["Orbitron", "sans-serif"],
+        body: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        mono: ["JetBrains Mono", "ui-monospace", "monospace"],
       },
       fontSize: {
         "4xl": ["2.25rem", { lineHeight: "normal" }],
         "5xl": ["3rem", { lineHeight: "normal" }],
         "6xl": ["3.75rem", { lineHeight: "normal" }],
+        "t-xs": ["0.75rem", { lineHeight: "1" }],
+        "t-sm": ["0.875rem", { lineHeight: "1.4" }],
+        "t-base": ["1rem", { lineHeight: "1.6" }],
+        "t-lg": ["1.125rem", { lineHeight: "1.5" }],
+        "t-xl": ["1.375rem", { lineHeight: "1.3" }],
+        "t-2xl": ["1.75rem", { lineHeight: "1.2" }],
+        "t-3xl": ["2.25rem", { lineHeight: "1.1" }],
+        "t-4xl": ["3rem", { lineHeight: "1.08" }],
+        "t-5xl": ["3.9rem", { lineHeight: "1.05" }],
+        "t-6xl": ["5rem", { lineHeight: "1" }],
       },
       fontWeight: {
         light: "300",
@@ -61,6 +74,13 @@ const config: Config = {
         "inner-glow": "inset 0 0 20px rgba(249, 115, 22, 0.1)",
         elevated: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
         "elevated-lg": "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+        // Neon direction shadows
+        "neon-card": "0 24px 60px -28px var(--shadow-color, rgba(0,0,0,0.55)), inset 0 1px 0 rgba(255,255,255,0.05)",
+        "neon-card-hover": "0 30px 70px -26px var(--shadow-color, rgba(0,0,0,0.55)), inset 0 1px 0 rgba(255,255,255,0.08)",
+        "neon-btn": "0 8px 24px -8px var(--accent-color, #06b6d4)",
+        "neon-toast": "0 24px 50px -20px var(--shadow-color, rgba(0,0,0,0.55))",
+        "neon-modal": "0 40px 90px -30px var(--shadow-color, rgba(0,0,0,0.55))",
+        "neon-popover": "0 24px 50px -20px var(--shadow-color, rgba(0,0,0,0.55))",
       },
       backdropBlur: {
         xs: "2px",
@@ -72,6 +92,36 @@ const config: Config = {
         reverseBoxShadowY: "-4px",
       },
       colors: {
+        // Handoff brand colors (direct hex)
+        orange: {
+          300: "#fdba74",
+          400: "#fb923c",
+          500: "#f97316",
+          600: "#ea580c",
+          700: "#c2410c",
+        },
+        cyan: {
+          300: "#67e8f9",
+          400: "#22d3ee",
+          500: "#06b6d4",
+          600: "#0891b2",
+        },
+        purple: {
+          400: "#c084fc",
+          500: "#a855f7",
+          600: "#9333ea",
+        },
+        emerald: {
+          400: "#34d399",
+          500: "#10b981",
+        },
+        amber: {
+          400: "#fbbf24",
+        },
+        rose: {
+          400: "#fb7185",
+          500: "#f43f5e",
+        },
         // Primary palette - Orange (BoffMedia brand)
         primary: {
           50: "rgb(var(--primary-50) / <alpha-value>)",
@@ -301,6 +351,9 @@ const config: Config = {
       },
       borderRadius: {
         "4xl": "2rem",
+        "neon": "14px",
+        "neon-lg": "22px",
+        "neon-pill": "9999px",
       },
     },
   },
