@@ -6,6 +6,29 @@ import { Icon } from "./icon"
 
 const ALERT_ICONS: Record<string, string> = { info: "info", success: "check", warning: "flame", error: "x", neutral: "sparkles" }
 
+const toneStyles: Record<string, { box: string; icon: string }> = {
+  info: {
+    box: "border-[color-mix(in_srgb,var(--cyan-500)_38%,transparent)]",
+    icon: "text-cyan-400 bg-[color-mix(in_srgb,var(--cyan-500)_14%,transparent)]",
+  },
+  success: {
+    box: "border-[color-mix(in_srgb,var(--emerald-500)_38%,transparent)]",
+    icon: "text-emerald-400 bg-[color-mix(in_srgb,var(--emerald-500)_14%,transparent)]",
+  },
+  warning: {
+    box: "border-[color-mix(in_srgb,var(--amber-400)_42%,transparent)]",
+    icon: "text-amber-400 bg-[color-mix(in_srgb,var(--amber-400)_14%,transparent)]",
+  },
+  error: {
+    box: "border-[color-mix(in_srgb,var(--rose-500)_42%,transparent)]",
+    icon: "text-rose-400 bg-[color-mix(in_srgb,var(--rose-500)_14%,transparent)]",
+  },
+  neutral: {
+    box: "",
+    icon: "text-[var(--text-muted)] bg-[var(--surface-3)]",
+  },
+}
+
 interface BoffAlertProps extends React.HTMLAttributes<HTMLDivElement> {
   tone?: "info" | "success" | "warning" | "error" | "neutral"
   title?: string
@@ -16,14 +39,41 @@ interface BoffAlertProps extends React.HTMLAttributes<HTMLDivElement> {
 export const BoffAlert = React.forwardRef<HTMLDivElement, BoffAlertProps>(
   ({ tone = "info", title, onClose, action, className, children, ...props }, ref) => {
     return (
-      <div ref={ref} role={tone === "error" ? "alert" : "status"} className={cn("k-alert", `k-alert--${tone}`, className)} {...props}>
-        <span className="k-alert__icon"><Icon name={ALERT_ICONS[tone] || "info"} size={18} /></span>
-        <div className="k-alert__body">
-          {title && <p className="k-alert__title">{title}</p>}
-          {children && <div className="k-alert__text">{children}</div>}
-          {action && <div className="k-alert__action">{action}</div>}
+      <div
+        ref={ref}
+        role={tone === "error" ? "alert" : "status"}
+        className={cn(
+          "flex gap-3.5 items-start p-4",
+          "rounded-[var(--radius-lg,22px)]",
+          "border border-solid border-[var(--border-strong)]",
+          "bg-[var(--surface-2)]",
+          "relative",
+          "data-[direction=hud]:shadow-[4px_4px_0_0_var(--hud-shadow)]",
+          toneStyles[tone]?.box,
+          className,
+        )}
+        {...props}
+      >
+        <span className={cn(
+          "grid place-items-center w-[30px] h-[30px] rounded-[var(--radius,14px)] shrink-0",
+          toneStyles[tone]?.icon,
+        )}>
+          <Icon name={ALERT_ICONS[tone] || "info"} size={18} />
+        </span>
+        <div className="flex-1 min-w-0">
+          {title && <p className="font-bold text-sm mb-0.5">{title}</p>}
+          {children && <div className="text-sm text-[var(--text-muted)] leading-relaxed">{children}</div>}
+          {action && <div className="mt-2.5 flex gap-2">{action}</div>}
         </div>
-        {onClose && <button className="k-alert__x" aria-label="Cerrar" onClick={onClose}><Icon name="x" size={15} /></button>}
+        {onClose && (
+          <button
+            className="absolute top-2.5 right-2.5 border-0 bg-transparent text-[var(--text-dim)] cursor-pointer p-1 rounded-md hover:text-[var(--text)] hover:bg-[var(--surface-3)]"
+            aria-label="Cerrar"
+            onClick={onClose}
+          >
+            <Icon name="x" size={15} />
+          </button>
+        )}
       </div>
     )
   }

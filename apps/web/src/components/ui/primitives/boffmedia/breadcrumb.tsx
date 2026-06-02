@@ -13,13 +13,13 @@ interface BreadcrumbProps {
 
 export function Breadcrumb({ items, go, className }: BreadcrumbProps) {
   return (
-    <nav className={cn("crumb", className)} aria-label="Ruta">
+    <nav className={cn("flex items-center flex-wrap gap-px text-sm mb-6", className)} aria-label="Ruta">
       {items.map((it, i) => (
-        <span key={i} className="crumb__seg">
-          {i > 0 && <Icon name="chevron" size={14} className="crumb__sep" style={{ transform: "rotate(-90deg)" }} />}
+        <span key={i} className="inline-flex items-center gap-px">
+          {i > 0 && <Icon name="chevron" size={14} className="text-[var(--text-dim)] mx-1" style={{ transform: "rotate(-90deg)" }} />}
           {it.href && i < items.length - 1
-            ? <a href={it.href} className="crumb__link" onClick={(e) => { e.preventDefault(); go && go(it.href!.replace(/^#/, "")) }}>{it.label}</a>
-            : <span className="crumb__current">{it.label}</span>}
+            ? <a href={it.href} className="text-[var(--text-muted)] transition-colors duration-[var(--dur,0.32s)] hover:text-orange-500" onClick={(e) => { e.preventDefault(); go && go(it.href!.replace(/^#/, "")) }}>{it.label}</a>
+            : <span className="text-[var(--text)] font-semibold">{it.label}</span>}
         </span>
       ))}
     </nav>
