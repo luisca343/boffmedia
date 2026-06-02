@@ -1,16 +1,34 @@
 'use client';
 
+import { useState, useCallback } from 'react';
 import { Protocol } from '@pkmn/protocol';
 import { MoveSelector } from './MoveSelector';
 import { SwitchMenu } from './SwitchMenu';
+import { ActionButtons, type BattleMechanic } from './ActionButtons';
 
 interface ChoiceInputProps {
   request: Protocol.Request;
   makeChoice: (choice: string) => void;
   isWaiting: boolean;
+  mechanicUsed: boolean;
 }
 
-export function ChoiceInput({ request, makeChoice, isWaiting }: ChoiceInputProps) {
+export function ChoiceInput({ request, makeChoice, isWaiting, mechanicUsed }: ChoiceInputProps) {
+  const [activeMechanic, setActiveMechanic] = useState<BattleMechanic | null>(null);
+
+  const handleToggle = useCallback((mechanic: BattleMechanic) => {
+    setActiveMechanic((prev) => (prev === mechanic ? null : mechanic));
+  }, []);
+
+  const handleMakeChoice = useCallback((choice: string) => {
+    if (activeMechanic) {
+      makeChoice(`${choice} ${activeMechanic}`);
+    } else {
+      makeChoice(choice);
+    }
+    setActiveMechanic(null);
+  }, [activeMechanic, makeChoice]);
+
   if (!isWaiting || !request) return null;
 
   // Infer requestType if missing (raw PS protocol doesn't include it)
@@ -18,9 +36,28 @@ export function ChoiceInput({ request, makeChoice, isWaiting }: ChoiceInputProps
 
   if (requestType === 'move') {
     const trapped = request.active?.[0]?.trapped;
+    const hasActions = request.active?.[0] && (
+      request.active[0].canMegaEvo ||
+      request.active[0].zMoves ||
+      request.active[0].canDynamax ||
+      request.active[0].canTerastallize
+    );
+
     return (
       <div className="flex flex-col gap-3">
-        <MoveSelector request={request} makeChoice={makeChoice} />
+        <MoveSelector
+          request={request}
+          makeChoice={handleMakeChoice}
+          activeMechanic={activeMechanic}
+        />
+        {hasActions && (
+          <ActionButtons
+            request={request}
+            activeMechanic={activeMechanic}
+            onToggle={handleToggle}
+            disabled={mechanicUsed}
+          />
+        )}
         {!trapped && request.side?.pokemon && (
           <SwitchMenu request={request} makeChoice={makeChoice} />
         )}
