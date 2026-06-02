@@ -1,5 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { BattleRoom, BattleEndResult, BattleRoomCallbacks } from './battle.room';
+import {
+  BattleRoom,
+  BattleEndResult,
+  BattleRoomCallbacks,
+} from './battle.room';
 
 @Injectable()
 export class BattleService {
