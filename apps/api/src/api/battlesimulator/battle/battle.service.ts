@@ -3,6 +3,7 @@ import {
   BattleRoom,
   BattleEndResult,
   BattleRoomCallbacks,
+  BattleRoomMode,
 } from './battle.room';
 
 @Injectable()
@@ -15,8 +16,9 @@ export class BattleService {
     roomId: string,
     callbacks: BattleRoomCallbacks,
     format: string = 'gen9randombattle',
+    mode: BattleRoomMode = 'ai',
   ): BattleRoom {
-    const room = new BattleRoom(roomId, callbacks);
+    const room = new BattleRoom(roomId, callbacks, undefined, undefined, mode);
     this.rooms.set(roomId, room);
     this.logger.log(`Room created: ${roomId}`);
     return room;
