@@ -11,6 +11,7 @@ export default function ShowdownLobbyPage() {
   const [loginPass, setLoginPass] = useState('boffmedia');
   const [chatInput, setChatInput] = useState('');
   const [challengeTarget, setChallengeTarget] = useState('');
+  const [selectedFormat, setSelectedFormat] = useState('gen9randombattle');
   const chatRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -18,6 +19,8 @@ export default function ShowdownLobbyPage() {
     username,
     lobbyChat,
     challenges,
+    formats,
+    onlineUsers,
     error,
     reconnectInfo,
     challstr,
@@ -62,13 +65,12 @@ export default function ShowdownLobbyPage() {
   };
 
   const handleFindBattle = () => {
-    findBattle('gen9randombattle');
+    findBattle(selectedFormat);
   };
 
   const handleChallenge = () => {
     if (!challengeTarget.trim()) return;
-    // Try with | prefix like the debug page uses
-    sendRaw(`|/challenge ${challengeTarget.trim()},gen9randombattle`);
+    sendRaw(`|/challenge ${challengeTarget.trim()},${selectedFormat}`);
   };
 
   const isConnected = status !== 'idle' && status !== 'error';
@@ -220,11 +222,25 @@ export default function ShowdownLobbyPage() {
               <p className="text-sm text-muted-foreground mb-3">
                 Find a random opponent on the official Showdown server.
               </p>
+              <select
+                value={selectedFormat}
+                onChange={(e) => setSelectedFormat(e.target.value)}
+                className="w-full px-3 py-2 bg-background border rounded-md text-sm text-foreground mb-3"
+              >
+                {formats.length > 0
+                  ? formats.map((f) => (
+                      <option key={f.name} value={f.name}>
+                        {f.section ? `${f.section} — ` : ''}{f.name}
+                      </option>
+                    ))
+                  : <option value="gen9randombattle">Gen 9 Random Battle</option>
+                }
+              </select>
               <button
                 onClick={handleFindBattle}
                 className="w-full px-4 py-3 bg-primary text-primary-foreground rounded-md text-sm font-semibold hover:bg-primary/90 transition-colors"
               >
-                Find Battle (Gen 9 Random)
+                Find Battle
               </button>
             </div>
 
@@ -232,7 +248,7 @@ export default function ShowdownLobbyPage() {
             <div className="bg-card border rounded-lg p-4">
               <h2 className="font-semibold mb-3">Challenge Player</h2>
               <p className="text-sm text-muted-foreground mb-3">
-                Challenge a specific player to a Gen 9 Random Battle.
+                Challenge a specific player to a battle.
               </p>
               <div className="flex gap-2">
                 <input
@@ -253,12 +269,36 @@ export default function ShowdownLobbyPage() {
               </div>
             </div>
 
-            {/* Quick info */}
+            {/* Online users */}
             <div className="bg-card border rounded-lg p-4">
-              <h2 className="font-semibold mb-2">Connected as</h2>
-              <p className="text-lg font-mono">{username}</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Server: sim3.psim.us
+              <h2 className="font-semibold mb-2">
+                Online Users
+                {onlineUsers.length > 0 && (
+                  <span className="text-xs text-muted-foreground font-normal ml-2">
+                    ({onlineUsers.length})
+                  </span>
+                )}
+              </h2>
+              {onlineUsers.length === 0 ? (
+                <p className="text-xs text-muted-foreground">Loading users...</p>
+              ) : (
+                <div className="max-h-[200px] overflow-y-auto space-y-0.5">
+                  {onlineUsers.map((user) => (
+                    <div
+                      key={user}
+                      className={`text-xs px-2 py-1 rounded ${
+                        user === username
+                          ? 'bg-primary/10 text-primary font-semibold'
+                          : 'text-muted-foreground'
+                      }`}
+                    >
+                      {user} {user === username && '(you)'}
+                    </div>
+                  ))}
+                </div>
+              )}
+              <p className="text-xs text-muted-foreground mt-2 border-t pt-2">
+                Connected as <strong>{username}</strong> — sim3.psim.us
               </p>
             </div>
           </div>
