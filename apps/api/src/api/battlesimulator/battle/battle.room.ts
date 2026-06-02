@@ -8,13 +8,20 @@ import { Logger } from 'nestjs-pino';
 import { getRandomTeam } from '../_utils/teams';
 
 export type BattleRoomStatus = 'waiting' | 'active' | 'finished';
+export type BattleRoomMode = 'ai' | 'pvp';
 
 export interface BattleRoomCallbacks {
   onProtocol: (line: string) => void;
-  onRequest: (request: Protocol.Request) => void;
+  onRequestP1: (request: Protocol.Request) => void;
+  onRequestP2?: (request: Protocol.Request) => void;
   onBattleEnd: (result: BattleEndResult) => void;
   onError: (error: string) => void;
   onTimerUpdate?: (state: TimerState) => void;
+}
+
+export interface PlayerSpec {
+  name: string;
+  team: any[];
 }
 
 export interface BattleEndResult {
@@ -40,13 +47,15 @@ export interface TimerState {
 
 export class BattleRoom {
   readonly id: string;
+  readonly mode: BattleRoomMode;
   private streams!: ReturnType<typeof BattleStreams.getPlayerStreams>;
   private battle!: Battle;
   private formatter!: LogFormatter;
   private ai!: RandomPlayerAI;
   private status: BattleRoomStatus = 'waiting';
   private replayLines: string[] = [];
-  private currentRequest: Protocol.Request | null = null;
+  private p1Request: Protocol.Request | null = null;
+  private p2Request: Protocol.Request | null = null;
   private callbacks: BattleRoomCallbacks;
   private readPromise: Promise<void> | null = null;
   private aiPromise: Promise<void> | null = null;
@@ -62,9 +71,11 @@ export class BattleRoom {
     callbacks: BattleRoomCallbacks,
     private readonly logger?: Logger,
     timerConfig?: Partial<TimerConfig>,
+    mode: BattleRoomMode = 'ai',
   ) {
     this.id = id;
     this.callbacks = callbacks;
+    this.mode = mode;
     this.gens = new Generations(Dex as any);
     this.timerConfig = {
       enabled: timerConfig?.enabled ?? false,
@@ -84,9 +95,13 @@ export class BattleRoom {
     };
   }
 
-  async create(format: string = 'gen9randombattle'): Promise<void> {
-    const team1 = getRandomTeam(format);
-    const team2 = getRandomTeam(format);
+  async create(
+    format: string = 'gen9randombattle',
+    p1Spec?: PlayerSpec,
+    p2Spec?: PlayerSpec,
+  ): Promise<void> {
+    const team1 = p1Spec?.team ?? getRandomTeam(format);
+    const team2 = p2Spec?.team ?? getRandomTeam(format);
 
     this.streams = BattleStreams.getPlayerStreams(
       new BattleStreams.BattleStream(),
@@ -95,21 +110,26 @@ export class BattleRoom {
     this.battle = new Battle(this.gens);
     this.formatter = new LogFormatter('p1', this.battle);
 
-    this.ai = new RandomPlayerAI(this.streams.p2);
-    this.aiPromise = this.ai.start();
+    if (this.mode === 'ai') {
+      this.ai = new RandomPlayerAI(this.streams.p2);
+      this.aiPromise = this.ai.start();
+    }
 
     const spec = { formatid: format };
-    const p1spec = { name: 'Player', team: Teams.pack(team1) };
-    const p2spec = { name: 'Bot', team: Teams.pack(team2) };
+    const p1 = { name: p1Spec?.name ?? 'Player', team: Teams.pack(team1) };
+    const p2 = { name: p2Spec?.name ?? 'Bot', team: Teams.pack(team2) };
 
     this.omniscientPromise = this.readOmniscient();
 
     await this.streams.omniscient.write(
-      `>start ${JSON.stringify(spec)}\n>player p1 ${JSON.stringify(p1spec)}\n>player p2 ${JSON.stringify(p2spec)}`,
+      `>start ${JSON.stringify(spec)}\n>player p1 ${JSON.stringify(p1)}\n>player p2 ${JSON.stringify(p2)}`,
     );
 
     this.status = 'active';
     this.readP1();
+    if (this.mode === 'pvp') {
+      this.readP2();
+    }
   }
 
   private async readOmniscient(): Promise<void> {
@@ -134,8 +154,8 @@ export class BattleRoom {
               replay: this.replayLines.join('\n'),
               team1: this.getTeamData(this.battle.p1.team),
               team2: this.getTeamData(this.battle.p2.team),
-              side1: 'Player',
-              side2: 'Bot',
+              side1: this.battle.p1.name || 'Player',
+              side2: this.battle.p2.name || (this.mode === 'pvp' ? 'Player 2' : 'Bot'),
             };
             this.callbacks.onBattleEnd(result);
             return;
@@ -149,8 +169,8 @@ export class BattleRoom {
               replay: this.replayLines.join('\n'),
               team1: this.getTeamData(this.battle.p1.team),
               team2: this.getTeamData(this.battle.p2.team),
-              side1: 'Player',
-              side2: 'Bot',
+              side1: this.battle.p1.name || 'Player',
+              side2: this.battle.p2.name || (this.mode === 'pvp' ? 'Player 2' : 'Bot'),
             };
             this.callbacks.onBattleEnd(result);
             return;
@@ -178,7 +198,6 @@ export class BattleRoom {
           if (args[0] === 'request') {
             try {
               const rawRequest = JSON.parse(args[1] as string);
-              // PS protocol doesn't include requestType — infer from structure
               if (!rawRequest.requestType) {
                 if (rawRequest.active) {
                   rawRequest.requestType = 'move';
@@ -186,8 +205,8 @@ export class BattleRoom {
                   rawRequest.requestType = 'switch';
                 }
               }
-              this.currentRequest = rawRequest as Protocol.Request;
-              this.callbacks.onRequest(this.currentRequest);
+              this.p1Request = rawRequest as Protocol.Request;
+              this.callbacks.onRequestP1(this.p1Request);
               this.startTurnTimer('p1');
             } catch (e: any) {
               this.logger?.error(`[P1] Failed to parse request: ${e.message}`);
@@ -204,39 +223,92 @@ export class BattleRoom {
     }
   }
 
-  async playerChoice(choice: string): Promise<void> {
+  private async readP2(): Promise<void> {
+    try {
+      for await (const chunk of this.streams.p2) {
+        const trimmed = chunk.trim();
+        if (!trimmed) continue;
+
+        const lines = trimmed.split('\n');
+        for (const line of lines) {
+          if (!line.trim()) continue;
+          const { args } = Protocol.parseBattleLine(line);
+
+          if (args[0] === 'request') {
+            try {
+              const rawRequest = JSON.parse(args[1] as string);
+              if (!rawRequest.requestType) {
+                if (rawRequest.active) {
+                  rawRequest.requestType = 'move';
+                } else if (rawRequest.side) {
+                  rawRequest.requestType = 'switch';
+                }
+              }
+              this.p2Request = rawRequest as Protocol.Request;
+              this.callbacks.onRequestP2?.(this.p2Request);
+              this.startTurnTimer('p2');
+            } catch (e: any) {
+              this.logger?.error(`[P2] Failed to parse request: ${e.message}`);
+              this.callbacks.onError(`Failed to parse P2 request: ${e.message}`);
+            }
+          }
+        }
+      }
+    } catch (error: any) {
+      this.logger?.error(`[P2] Stream error: ${error.message}`);
+      if (this.status !== 'finished') {
+        this.callbacks.onError(`P2 stream error: ${error.message}`);
+      }
+    }
+  }
+
+  async playerChoice(choice: string, side: 'p1' | 'p2' = 'p1'): Promise<void> {
     if (this.status !== 'active') {
       this.callbacks.onError('Battle is not active');
       return;
     }
 
-    if (!this.currentRequest) {
-      this.callbacks.onError('No pending request');
+    const hasRequest = side === 'p1' ? this.p1Request : this.p2Request;
+    if (!hasRequest) {
+      this.callbacks.onError(`No pending request for ${side}`);
       return;
     }
 
-    this.currentRequest = null;
+    if (side === 'p1') {
+      this.p1Request = null;
+    } else {
+      this.p2Request = null;
+    }
     this.pauseTurnTimer();
 
     try {
-      await this.streams.p1.write(choice);
+      await this.streams[side].write(choice);
     } catch (error: any) {
-      this.callbacks.onError(`Failed to write choice: ${error.message}`);
+      this.callbacks.onError(`Failed to write ${side} choice: ${error.message}`);
     }
   }
 
-  async forfeit(): Promise<void> {
+  async forfeit(side?: 'p1' | 'p2'): Promise<void> {
     if (this.status !== 'active') return;
     this.stopTimer();
     this.status = 'finished';
 
+    let winner: string;
+    if (side === 'p1') {
+      winner = 'p2';
+    } else if (side === 'p2') {
+      winner = 'p1';
+    } else {
+      winner = this.mode === 'pvp' ? 'tie' : 'Bot';
+    }
+
     const result: BattleEndResult = {
-      winner: 'Bot',
+      winner,
       replay: this.replayLines.join('\n'),
       team1: this.getTeamData(this.battle.p1.team),
       team2: this.getTeamData(this.battle.p2.team),
-      side1: 'Player',
-      side2: 'Bot',
+      side1: this.battle.p1.name || 'Player',
+      side2: this.battle.p2.name || (this.mode === 'pvp' ? 'Player 2' : 'Bot'),
     };
     this.callbacks.onBattleEnd(result);
 
@@ -249,8 +321,8 @@ export class BattleRoom {
     return this.status;
   }
 
-  getCurrentRequest(): Protocol.Request | null {
-    return this.currentRequest;
+  getCurrentRequest(side: 'p1' | 'p2' = 'p1'): Protocol.Request | null {
+    return side === 'p1' ? this.p1Request : this.p2Request;
   }
 
   getReplay(): string {
@@ -277,7 +349,7 @@ export class BattleRoom {
 
       if (player.turnRemaining <= 0 || player.totalRemaining <= 0) {
         this.logger?.log(`Timer expired for ${side}, auto-forfeiting`);
-        this.forfeit();
+        this.forfeit(side);
       }
     }, 1000);
   }
