@@ -15,11 +15,21 @@ interface FieldProps {
 
 export function Field({ label, icon, hint, error, htmlFor, children, className }: FieldProps) {
   return (
-    <label className={cn("field", className)} htmlFor={htmlFor}>
-      {label && <span className="field-label">{icon && <Icon name={icon} size={15} />}{label}</span>}
+    <label className={cn("flex flex-col", className)} htmlFor={htmlFor}>
+      {label && (
+        <span className="flex items-center gap-2 text-sm font-semibold text-[var(--text-muted)] mb-2">
+          {icon && <Icon name={icon} size={15} />}
+          {label}
+        </span>
+      )}
       {children}
-      {error ? <span className="field-msg field-msg--error"><Icon name="x" size={13} />{error}</span>
-        : hint ? <span className="field-msg">{hint}</span> : null}
+      {error ? (
+        <span className="text-xs text-rose-400 mt-1.5 inline-flex items-center gap-1.5">
+          <Icon name="x" size={13} />{error}
+        </span>
+      ) : hint ? (
+        <span className="text-xs text-[var(--text-dim)] mt-1.5 inline-flex items-center gap-1.5">{hint}</span>
+      ) : null}
     </label>
   )
 }

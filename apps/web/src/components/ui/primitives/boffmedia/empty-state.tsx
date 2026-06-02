@@ -13,10 +13,10 @@ interface EmptyStateProps {
 
 export function EmptyState({ icon = "search", title, sub, action, className }: EmptyStateProps) {
   return (
-    <div className={cn("empty", className)}>
+    <div className={cn("flex flex-col items-center text-center gap-4 py-16 px-4", className)}>
       <IconBox icon={icon} size="lg" tone="muted" />
-      <h3 className="empty__title">{title}</h3>
-      {sub && <p className="text-muted empty__sub">{sub}</p>}
+      <h3 className="text-xl">{title}</h3>
+      {sub && <p className="text-[var(--text-muted)] max-w-[40ch]">{sub}</p>}
       {action}
     </div>
   )
