@@ -12,6 +12,12 @@ import useViewportWidth from '@/services/useViewPortWidth';
 
 const VISIBLE_LOG_LIMIT = 50;
 
+const MECHANIC_EVENT_MARKERS = ['|-mega|', '|-terastallize|', '|-zpower|', '|-burst|', '|-primal|'];
+
+function hasMechanicBeenUsed(htmlLog: string[]): boolean {
+  return htmlLog.some((line) => MECHANIC_EVENT_MARKERS.some((marker) => line.includes(marker)));
+}
+
 const BATTLE_FORMATS = [
   { value: 'gen9randombattle', label: 'Gen 9 Random Battle' },
   { value: 'gen8randombattle', label: 'Gen 8 Random Battle' },
@@ -243,6 +249,7 @@ export default function PlayPage() {
           request={state.currentRequest}
           makeChoice={(choice) => makeChoice(state.roomId, choice)}
           isWaiting={state.isWaitingForChoice}
+          mechanicUsed={hasMechanicBeenUsed(state.htmlLog)}
         />
       )}
 
