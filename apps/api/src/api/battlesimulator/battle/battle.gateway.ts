@@ -7,7 +7,12 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Logger } from 'nestjs-pino';
-import { BattleRoom, BattleEndResult, BattleRoomCallbacks, TimerConfig } from './battle.room';
+import {
+  BattleRoom,
+  BattleEndResult,
+  BattleRoomCallbacks,
+  TimerConfig,
+} from './battle.room';
 import { Protocol } from '@pkmn/protocol';
 import { AchievementFacadeService } from '@api/smartrotom/achievement/achievement.facade.service';
 
@@ -18,9 +23,7 @@ interface ClientState {
 }
 
 @WebSocketGateway({ namespace: '/battle', cors: true })
-export class BattleGateway
-  implements OnGatewayConnection, OnGatewayDisconnect
-{
+export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private readonly logger: Logger,
     private readonly achievementFacade: AchievementFacadeService,
@@ -54,7 +57,11 @@ export class BattleGateway
       return;
     }
 
-    this.clients.set(playerId, { socket: client, roomIds: new Set(), playerId });
+    this.clients.set(playerId, {
+      socket: client,
+      roomIds: new Set(),
+      playerId,
+    });
     client.emit('connected', { playerId });
   }
 
@@ -83,7 +90,14 @@ export class BattleGateway
   }
 
   @SubscribeMessage('createBattle')
-  handleCreateBattle(client: Socket, payload?: { format?: string; roomId?: string; timer?: Partial<TimerConfig> }): void {
+  handleCreateBattle(
+    client: Socket,
+    payload?: {
+      format?: string;
+      roomId?: string;
+      timer?: Partial<TimerConfig>;
+    },
+  ): void {
     const state = this.getClientState(client);
     if (!state) return;
 
@@ -138,7 +152,10 @@ export class BattleGateway
       })
       .catch((err) => {
         this.logger.error(`Failed to create battle: ${err.message}`);
-        client.emit('error', { roomId, message: `Failed to create battle: ${err.message}` });
+        client.emit('error', {
+          roomId,
+          message: `Failed to create battle: ${err.message}`,
+        });
         this.cleanupRoom(roomId);
       });
   }
@@ -152,13 +169,19 @@ export class BattleGateway
     if (!state) return;
 
     if (!state.roomIds.has(payload.roomId)) {
-      client.emit('error', { roomId: payload.roomId, message: 'Not in this battle' });
+      client.emit('error', {
+        roomId: payload.roomId,
+        message: 'Not in this battle',
+      });
       return;
     }
 
     const room = this.rooms.get(payload.roomId);
     if (!room) {
-      client.emit('error', { roomId: payload.roomId, message: 'Battle not found' });
+      client.emit('error', {
+        roomId: payload.roomId,
+        message: 'Battle not found',
+      });
       return;
     }
 
@@ -171,7 +194,10 @@ export class BattleGateway
     if (!state) return;
 
     if (!state.roomIds.has(payload.roomId)) {
-      client.emit('error', { roomId: payload.roomId, message: 'Not in this battle' });
+      client.emit('error', {
+        roomId: payload.roomId,
+        message: 'Not in this battle',
+      });
       return;
     }
 
@@ -218,7 +244,10 @@ export class BattleGateway
     const room = this.rooms.get(payload.roomId);
     if (room) {
       existingState.roomIds.add(payload.roomId);
-      client.emit('reconnected', { roomId: payload.roomId, status: room.getStatus() });
+      client.emit('reconnected', {
+        roomId: payload.roomId,
+        status: room.getStatus(),
+      });
     }
   }
 
