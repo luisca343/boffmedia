@@ -35,7 +35,6 @@ export class QuestRepository implements IQuestRepository {
       if (!response.data) {
         throw new Error('No data received from external API');
       }
-      
 
       const questResponse: ExternalQuestResponse = {
         quests: response.data.data.quests || {},
@@ -43,7 +42,6 @@ export class QuestRepository implements IQuestRepository {
         categories: response.data.data.categories || {},
         npcs: response.data.data.npcs || [],
       };
-      
 
       this.logger.log(
         `Successfully fetched ${Object.keys(questResponse.quests).length} quests`,
@@ -68,16 +66,13 @@ export class QuestRepository implements IQuestRepository {
     try {
       this.logger.log(`Fetching user quests for UUID: ${uuid}`);
 
-      const response = await axios.get(
-        `${this.baseUrl}/quests/user/${uuid}`,
-        {
-          timeout: 10000,
-          headers: {
-            'Content-Type': 'application/json',
-            'User-Agent': 'FicusLabs-QuestService/1.0',
-          },
+      const response = await axios.get(`${this.baseUrl}/quests/user/${uuid}`, {
+        timeout: 10000,
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'FicusLabs-QuestService/1.0',
         },
-      );
+      });
 
       if (!response.data) {
         throw new Error('No user quest data received from external API');

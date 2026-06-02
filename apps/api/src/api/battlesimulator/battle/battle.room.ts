@@ -1,8 +1,4 @@
-import {
-  BattleStreams,
-  RandomPlayerAI,
-  Teams,
-} from '@pkmn/sim';
+import { BattleStreams, RandomPlayerAI, Teams } from '@pkmn/sim';
 import { Generations } from '@pkmn/data';
 import { Battle } from '@pkmn/client';
 import { LogFormatter } from '@pkmn/view';
@@ -61,7 +57,12 @@ export class BattleRoom {
   private turnStartTime: number | null = null;
   private timerInterval: ReturnType<typeof setInterval> | null = null;
 
-  constructor(id: string, callbacks: BattleRoomCallbacks, private readonly logger?: Logger, timerConfig?: Partial<TimerConfig>) {
+  constructor(
+    id: string,
+    callbacks: BattleRoomCallbacks,
+    private readonly logger?: Logger,
+    timerConfig?: Partial<TimerConfig>,
+  ) {
     this.id = id;
     this.callbacks = callbacks;
     this.gens = new Generations(Dex as any);
@@ -71,15 +72,21 @@ export class BattleRoom {
       totalMs: timerConfig?.totalMs ?? 300_000,
     };
     this.timerState = {
-      p1: { turnRemaining: this.timerConfig.turnMs, totalRemaining: this.timerConfig.totalMs },
-      p2: { turnRemaining: this.timerConfig.turnMs, totalRemaining: this.timerConfig.totalMs },
+      p1: {
+        turnRemaining: this.timerConfig.turnMs,
+        totalRemaining: this.timerConfig.totalMs,
+      },
+      p2: {
+        turnRemaining: this.timerConfig.turnMs,
+        totalRemaining: this.timerConfig.totalMs,
+      },
       activeSide: null,
     };
   }
 
   async create(format: string = 'gen9randombattle'): Promise<void> {
-    const team1 = getRandomTeam();
-    const team2 = getRandomTeam();
+    const team1 = getRandomTeam(format);
+    const team2 = getRandomTeam(format);
 
     this.streams = BattleStreams.getPlayerStreams(
       new BattleStreams.BattleStream(),
