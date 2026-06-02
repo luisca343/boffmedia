@@ -5,11 +5,18 @@ import { Protocol } from '@pkmn/protocol';
 import { io, Socket } from 'socket.io-client';
 import { env } from '@/config/env.public';
 import { ShowdownBaseSession, ChatMessage } from '../_utils/ShowdownBaseSession';
+import { AchievementService } from '@/services/api/smartrotom/achievementsService';
 
 export interface ChallengeRequest {
   from: string;
   format: string;
   timestamp: number;
+}
+
+export interface ShowdownFormat {
+  name: string;
+  section: string;
+  rated: boolean;
 }
 
 export type ShowdownStatus =
@@ -104,6 +111,9 @@ export function useShowdownBattle(
   const [lobbyChat, setLobbyChat] = useState<ChatMessage[]>([]);
   const [challstr, setChallstr] = useState<string>('');
   const [challenges, setChallenges] = useState<ChallengeRequest[]>([]);
+  const [formats, setFormats] = useState<ShowdownFormat[]>([]);
+  const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
+  const [spectatorCount, setSpectatorCount] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [reconnectInfo, setReconnectInfo] = useState<{
     attempt: number;
@@ -180,6 +190,47 @@ export function useShowdownBattle(
 
         case 'updatesearch': {
           console.log('[Showdown] updatesearch:', parsed[1]);
+          break;
+        }
+
+        case 'formats': {
+          // |formats|FORMATS_JSON — only on lobby hook (autoCreateSession=false)
+          if (!autoCreateSession) {
+            try {
+              const raw = typeof parsed[1] === 'string' ? parsed[1] : JSON.stringify(parsed[1]);
+              const parsed_formats = JSON.parse(raw);
+              // PS sends formats as: [["Section", ["Format1", rated, ...], ...], ...]
+              const result: ShowdownFormat[] = [];
+              let currentSection = '';
+              for (const entry of parsed_formats) {
+                if (typeof entry === 'string') {
+                  currentSection = entry;
+                } else if (Array.isArray(entry) && typeof entry[0] === 'string') {
+                  result.push({
+                    name: entry[0],
+                    section: currentSection,
+                    rated: entry[1] === 1,
+                  });
+                }
+              }
+              setFormats(result);
+            } catch {
+              console.warn('[Showdown] Failed to parse formats');
+            }
+          }
+          break;
+        }
+
+        case 'users': {
+          // |users|COUNT,USER1,USER2,... — lobby user list
+          if (roomid === 'lobby') {
+            const usersStr = parsed[1] as string;
+            if (usersStr) {
+              const parts = usersStr.split(',');
+              // First element is the count, rest are usernames
+              setOnlineUsers(parts.slice(1).map((u: string) => u.trim()).filter(Boolean));
+            }
+          }
           break;
         }
 
@@ -276,6 +327,20 @@ export function useShowdownBattle(
             : getGlobalSessions().get(roomid);
           if (winSession) {
             winSession.addLine(line);
+          }
+          break;
+        }
+
+        case 'spectator': {
+          if (roomid === roomId) {
+            setSpectatorCount((prev) => prev + 1);
+          }
+          break;
+        }
+
+        case 'spectatorleave': {
+          if (roomid === roomId) {
+            setSpectatorCount((prev) => Math.max(0, prev - 1));
           }
           break;
         }
@@ -573,7 +638,7 @@ export function useShowdownBattle(
         joinedRoomsRef.current.add(roomId);
       }
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   // Auto-join room if provided and authenticated
   useEffect(() => {
@@ -588,6 +653,62 @@ export function useShowdownBattle(
     }
   }, [roomId, status, joinBattle, autoCreateSession]);
 
+  const saveShowdownReplay = useCallback(async (): Promise<number | null> => {
+    const sess = sessionRef.current;
+    if (!sess || !sess.battleComplete) return null;
+
+    const lines = sess.psLines || getGlobalLines().get(sess.roomId) || [];
+    if (lines.length === 0) return null;
+
+    // Extract player names and teams from protocol lines
+    let side1 = '';
+    let side2 = '';
+    const team1Pokes: string[] = [];
+    const team2Pokes: string[] = [];
+    let currentPlayer = 0;
+
+    for (const line of lines) {
+      const { args } = Protocol.parseBattleLine(line);
+      if (args[0] === 'player') {
+        const pNum = (args[1] as string) === 'p1' ? 1 : 2;
+        const pName = args[2] as string;
+        if (pNum === 1) side1 = pName;
+        else side2 = pName;
+      }
+      if (args[0] === 'poke') {
+        const owner = (args[1] as string) || '';
+        const details = (args[2] as string) || '';
+        const pokeName = details.split(',')[0].trim();
+        if (owner === 'p1') team1Pokes.push(pokeName);
+        else if (owner === 'p2') team2Pokes.push(pokeName);
+      }
+    }
+
+    if (!side1 || !side2) return null;
+
+    const replay = lines.join('\n');
+    const winner = sess.winner || 'tie';
+
+    try {
+      const res = await AchievementService.createReplay({
+        side1,
+        side2,
+        team1: JSON.stringify(team1Pokes),
+        team2: JSON.stringify(team2Pokes),
+        replay,
+        winner,
+      });
+      if (res.data?.replayId) {
+        sess.replayId = res.data.replayId;
+        triggerUpdate();
+        return res.data.replayId;
+      }
+    } catch (err) {
+      console.error('[Showdown] Failed to save replay:', err);
+    }
+    return null;
+  }, [triggerUpdate]);
+
   return {
     status,
     username,
@@ -595,6 +716,9 @@ export function useShowdownBattle(
     chatMessages,
     lobbyChat,
     challenges,
+    formats,
+    onlineUsers,
+    spectatorCount,
     error,
     reconnectInfo,
     challstr,
@@ -610,6 +734,7 @@ export function useShowdownBattle(
     leaveRoom,
     sendRaw,
     initScene,
+    saveShowdownReplay,
   };
 }
 
