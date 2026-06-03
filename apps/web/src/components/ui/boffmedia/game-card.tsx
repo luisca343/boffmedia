@@ -69,8 +69,8 @@ export function GameCard({ game, go, delay = 0, className }: GameCardProps) {
             {game.logoLabel}
           </span>
           <div>
-            <h3 className="text-t-lg font-bold">{game.name}</h3>
-            <p className="text-t-sm text-[var(--text-muted,#a9abb8)]">
+            <h3 className="text-lg font-bold">{game.name}</h3>
+            <p className="text-sm text-[var(--text-muted,#a9abb8)]">
               {game.tagline}
             </p>
           </div>
@@ -80,7 +80,7 @@ export function GameCard({ game, go, delay = 0, className }: GameCardProps) {
           {game.categories.slice(0, 3).map((c) => (
             <span
               key={c.name}
-              className="inline-flex items-center gap-2 text-t-xs font-mono px-2.5 py-1 rounded-[var(--radius,14px)] bg-[var(--surface-3,#1f1f30)] text-[var(--text-muted,#a9abb8)]"
+              className="inline-flex items-center gap-2 text-xs font-mono px-2.5 py-1 rounded-[var(--radius,14px)] bg-[var(--surface-3,#1f1f30)] text-[var(--text-muted,#a9abb8)]"
             >
               <span>{c.name}</span>
               <span className="text-[var(--accent-bright,var(--cyan-400))]">
@@ -91,11 +91,11 @@ export function GameCard({ game, go, delay = 0, className }: GameCardProps) {
         </div>
         {/* Footer */}
         <div className="flex items-center justify-between pt-3 border-t-[var(--hairline,1px)] border-solid border-t-[var(--border,rgba(255,255,255,0.08))]">
-          <span className="flex items-center gap-1.5 text-t-xs text-[var(--text-muted,#a9abb8)]">
+          <span className="flex items-center gap-1.5 text-xs text-[var(--text-muted,#a9abb8)]">
             <Icon name="layers" size={14} />
             {count} herramientas
           </span>
-          <span className="flex items-center gap-1 text-t-xs font-semibold text-[var(--accent-bright,var(--cyan-400))]">
+          <span className="flex items-center gap-1 text-xs font-semibold text-[var(--accent-bright,var(--cyan-400))]">
             Explorar <Icon name="arrow" size={14} />
           </span>
         </div>
