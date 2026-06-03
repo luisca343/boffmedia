@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import "@/styles/boffmedia-primitives.css"
+import "./showcase.css"
 
 // Primitives — boffmedia design system
 import { Icon } from "@/components/ui/primitives/boffmedia/icon"
@@ -40,8 +41,90 @@ import { GameCard } from "@/components/ui/boffmedia/game-card"
 import { FeaturedTool } from "@/components/ui/boffmedia/featured-tool"
 import { ToolCard } from "@/components/ui/boffmedia/tool-card"
 
+// Domain blocks
+import { Metric, IconButton, CardTitle, ToolRow, EventCard, Leaderboard, LeaderRow, LinkedRow, ActivityItem, AchievementTile, Marquee, Footer } from "@/components/ui/boffmedia/blocks"
+
+// New tool components
+import { FavStar } from "@/components/ui/boffmedia/fav-star"
+import { ToolTile } from "@/components/ui/boffmedia/tool-tile"
+import { ToolCardFav } from "@/components/ui/boffmedia/tool-card-fav"
+import { GameSwitcher } from "@/components/ui/boffmedia/game-switcher"
+import { ToolCommand } from "@/components/ui/boffmedia/tool-command"
+import { useFavorites, useRecent } from "@/components/ui/boffmedia/tools-store"
+
 // Data
-import { GAMES, GAMES_ORDER } from "./_data/games-data"
+import { GAMES, GAMES_ORDER, type GameData } from "./_data/games-data"
+
+// ============================================================================
+// Data helpers (unify categories.tools nav + game.tools rich entries)
+// ============================================================================
+interface NormalizedTool {
+  title: string
+  name: string
+  desc: string
+  icon: string
+  features: string[]
+  href: string
+  popularity?: string
+  isNew?: boolean
+  soon?: boolean
+  status: string
+  cat: string
+  hue: number
+}
+
+function gameToolList(game: GameData) {
+  const rich: Record<string, (typeof game.tools)[number]> = {}
+  ;(game.tools || []).forEach((t) => {
+    rich[t.href] = t
+  })
+  const cats = (game.categories || []).map((c) => ({
+    name: c.name,
+    tools: c.tools.map((nav) => {
+      const r = rich[nav.href] || ({} as Record<string, unknown>)
+      const status = nav.badge || ((r as { soon?: boolean }).soon ? "soon" : (r as { isNew?: boolean }).isNew ? "new" : "live")
+      return {
+        title: (r as { title?: string }).title || nav.name,
+        name: nav.name,
+        desc: (r as { desc?: string }).desc || "Herramienta del set de " + game.short + ".",
+        icon: nav.icon || (r as { icon?: string }).icon || "wrench",
+        features: (r as { features?: string[] }).features || [],
+        href: nav.href,
+        popularity: (r as { popularity?: string }).popularity,
+        isNew: status === "new",
+        soon: status === "soon",
+        status,
+        cat: c.name,
+        hue: game.hue,
+      } as NormalizedTool
+    }),
+  }))
+  return { cats, all: cats.flatMap((c) => c.tools) }
+}
+
+function allGamesList() {
+  return GAMES_ORDER.map((s) => GAMES[s])
+}
+
+function lookupTool(href: string): { tool: NormalizedTool; game: GameData } | null {
+  for (const s of GAMES_ORDER) {
+    const { all } = gameToolList(GAMES[s])
+    const t = all.find((x) => x.href === href)
+    if (t) return { tool: t, game: GAMES[s] }
+  }
+  return null
+}
+
+function rankedTools() {
+  const out: (NormalizedTool & { game: GameData })[] = []
+  GAMES_ORDER.forEach((s) => {
+    const { all } = gameToolList(GAMES[s])
+    all.forEach((t) => out.push({ ...t, game: GAMES[s] }))
+  })
+  const score = (t: NormalizedTool) =>
+    (t.popularity === "high" ? 3 : t.popularity === "medium" ? 2 : t.soon ? 0 : 1) + (t.isNew ? 0.5 : 0)
+  return out.sort((a, b) => score(b) - score(a))
+}
 
 // ============================================================================
 // Shared helpers
@@ -171,6 +254,7 @@ const HUB_NAV = [
   [
    ["primitives", "Primitivos", "puzzle"],
    ["composition", "Composición", "layers"],
+   ["blocks", "Bloques", "grid"],
    ["patterns", "Patrones", "grid"],
    ["boff", "Boffmedia", "gamepad"],
   ],
@@ -331,7 +415,7 @@ app/(boffmedia)/
    <Callout
     icon="sparkles"
     title="Regla de oro"
-    style={{ marginTop: "1.5rem", padding: "1rem" }}
+    style={{ marginTop: "1.5rem" }}
    >
     Usa el{" "}
     <strong>
@@ -1313,7 +1397,243 @@ function CompositionSection() {
 }
 
 // ============================================================================
-// 6. PATTERNS
+// 6. BLOCKS (from the handoff's segunda pasada)
+// ============================================================================
+const NOOP = () => {}
+
+function BlocksSection() {
+  const tags = ["Pokémon VGC", "Singles", "Clima", "Compartir"]
+
+  return (
+   <div>
+    <div className="mb-8 pb-6 border-b border-[var(--border)]">
+     <Kicker>Bloques</Kicker>
+     <h2 className="text-[length:var(--t-3xl)] mt-2.5">Compuestos extraídos de las páginas</h2>
+     <p className="text-[length:var(--t-base)] text-[color:var(--text-muted)] max-w-[64ch] mt-[0.7rem] leading-[1.65]">
+      Durante la segunda pasada sobre Inicio, Perfil, Navegación y Footer
+      detectamos composiciones que se repetían en línea. Aquí viven ahora
+      como piezas únicas — la página solo las invoca.
+     </p>
+    </div>
+
+    <Callout icon="sparkles" title="De dónde salió cada bloque" tone="orange" style={{ marginBottom: "1.75rem" }}>
+     <code>Metric</code>, <code>Marquee</code>, <code>ToolRow</code>,{" "}
+     <code>EventCard</code> y <code>Leaderboard</code> vienen de{" "}
+     <strong>Inicio</strong>. <code>LinkedRow</code>, <code>ActivityItem</code>,{" "}
+     <code>AchievementTile</code> y <code>CardTitle</code> de{" "}
+     <strong>Perfil</strong>. <code>IconButton</code> estaba duplicado en{" "}
+     <strong>navbar, footer y perfil</strong>.
+    </Callout>
+
+    {/* METRIC */}
+    <Spec2
+     title="Metric"
+     tag="blocks.tsx"
+     intro="Número grande + etiqueta. Unifica los tres tratamientos que existían sueltos: el héroe de Inicio, las cifras del Hub y la cabecera de Perfil. Props size · tone · mono · boxed."
+     a11y="Usa tabular display para las cifras; la etiqueta describe la métrica y no depende solo de color."
+    >
+     <div className="flex gap-10 items-end flex-wrap">
+      <Metric value="12K+" label="Jugadores" />
+      <Metric value="#42" label="Ranking" size="sm" tone="orange" mono />
+      <Metric value="28+" label="Componentes" size="lg" tone="orange" mono boxed />
+     </div>
+     <PropTable
+      rows={[
+       ["value", "node", "—", "Cifra principal."],
+       ["label", "node", "—", "Etiqueta descriptiva."],
+       ['size', '"sm"|"md"|"lg"', '"md"', "Escala de la cifra."],
+       ['tone', '"text"|"orange"|"accent"', '"text"', "Color de la cifra."],
+       ["mono", "boolean", "false", "Etiqueta en mono mayúsculas."],
+       ["boxed", "boolean", "false", "Envuelve en superficie de tarjeta."],
+      ]}
+     />
+    </Spec2>
+
+    {/* ICONBUTTON */}
+    <Spec2
+     title="IconButton"
+     tag="blocks.tsx"
+     intro="El control cuadrado de 38px que aparece en la navbar, el footer y los sheets. Variante bordeada y punto de notificación incluidos."
+     a11y="Siempre exige aria-label; el área cumple el mínimo táctil. Renderiza &lt;a&gt; si se pasa href, &lt;button&gt; si no."
+    >
+     <Row2>
+      <IconButton icon="search" label="Buscar" />
+      <IconButton icon="bell" label="Notificaciones" dot />
+      <IconButton icon="sun" label="Tema" />
+      <IconButton icon="discord" label="Discord" bordered href="#" />
+      <IconButton icon="globe" label="Web" bordered href="#" />
+     </Row2>
+     <PropTable
+      rows={[
+       ["icon", "string", "—", "Nombre del icono."],
+       ["label", "string", "—", "aria-label (obligatorio)."],
+       ["dot", "boolean", "false", "Punto de notificación."],
+       ["bordered", "boolean", "false", "Variante con borde."],
+       ["href", "string", "—", "Si se pasa, renderiza enlace."],
+      ]}
+     />
+    </Spec2>
+
+    {/* CARDTITLE */}
+    <Spec2
+     title="CardTitle"
+     tag="blocks.tsx"
+     intro='El encabezado "icono + título" dentro de una Card. Con la prop right añade una acción o contador alineado a la derecha.'
+     a11y="Es un h3 real: mantiene la jerarquía de encabezados dentro de la tarjeta."
+    >
+     <div className="grid grid-cols-2 gap-5 max-[1000px]:grid-cols-1">
+      <Card style={{ padding: "1.5rem" }}>
+       <CardTitle icon="user">Datos de la cuenta</CardTitle>
+       <p className="text-[color:var(--text-muted)] text-[length:var(--t-sm)] m-0">
+        Encabezado simple con icono.
+       </p>
+      </Card>
+      <Card style={{ padding: "1.5rem" }}>
+       <CardTitle icon="star" right={<span className="text-[color:var(--text-dim)] font-mono text-xs">37 / 60</span>}>
+        Logros
+       </CardTitle>
+       <p className="text-[color:var(--text-muted)] text-[length:var(--t-sm)] m-0">
+        Con acción/contador a la derecha.
+       </p>
+      </Card>
+     </div>
+    </Spec2>
+
+    {/* TOOLROW */}
+    <Spec2
+     title="ToolRow"
+     tag="blocks.tsx"
+     intro="El hermano horizontal de ToolCard: mismo propósito (una herramienta), formato denso de lista. Se usa en la sección «Herramientas» de Inicio."
+     a11y="Es un botón completo, enfocable y activable con teclado; el estado se comunica con Badge (texto), no solo color."
+    >
+     <div className="flex flex-col gap-5">
+      <ToolRow
+       tool={{ icon: "calc", name: "Calculadora de Daño", cat: "Pokémon", desc: "Cálculo de daño VGC y singles.", status: "live" }}
+       onClick={NOOP}
+      />
+      <ToolRow
+       tool={{ icon: "cards", name: "TCG Pocket", cat: "TCG", desc: "Constructor de mazos y meta.", status: "new" }}
+       onClick={NOOP}
+      />
+     </div>
+    </Spec2>
+
+    {/* EVENTCARD */}
+    <Spec2
+     title="EventCard"
+     tag="blocks.tsx"
+     intro="Una entrada de torneo / evento: bloque de fecha, cuerpo y CTA. Vive en Inicio y alimentará la futura página de Eventos."
+     a11y="La fecha se lee como día + mes; el estado de inscripción usa Badge con texto."
+    >
+     <div className="max-w-[560px]">
+      <EventCard
+       event={{ date: "14 JUN", title: "VGC Regional — Series 3", game: "Pokémon", players: 128, status: "open" }}
+       go={NOOP}
+      />
+     </div>
+    </Spec2>
+
+    {/* LEADERBOARD */}
+    <Spec2
+     title="Leaderboard"
+     tag="blocks.tsx"
+     intro="Tabla de clasificación con cabecera, top-3 destacado y fila «tú». Compuesta por filas LeaderRow."
+     a11y="Lista semántica; el rango usa tabular-nums; los tres primeros se distinguen por estilo además de posición."
+    >
+     <div className="max-w-[420px]">
+      <Leaderboard
+       leaders={[
+        { rank: 1, name: "RotomChef", pts: 4820 },
+        { rank: 2, name: "Zephyr_VGC", pts: 4610 },
+        { rank: 3, name: "Mikiri.K", pts: 4395 },
+        { rank: 4, name: "AlexBoff", pts: 4180, you: true },
+       ]}
+       onViewAll={NOOP}
+      />
+     </div>
+    </Spec2>
+
+    {/* LINKEDROW + ACTIVITY + ACHIEVEMENTS */}
+    <Spec2
+     title="LinkedRow · ActivityItem · AchievementTile"
+     tag="blocks.tsx"
+     intro="Los tres bloques de listado del Perfil: cuenta vinculada, fila de actividad y casilla de logro."
+     a11y="Iconos decorativos; el significado vive en el texto. Los logros bloqueados muestran un candado, no solo un color apagado."
+    >
+     <div className="grid grid-cols-2 gap-5 items-start max-[1000px]:grid-cols-1">
+      <Card style={{ padding: "1.25rem" }}>
+       <CardTitle icon="link">Cuentas vinculadas</CardTitle>
+       <div className="flex flex-col gap-3">
+        <LinkedRow icon="discord" iconClass="discord" name="Discord" sub="alexboff#0420" end={<Badge kind="live">Vinculado</Badge>} />
+        <LinkedRow icon="gamepad" name="Minecraft" sub="Sin vincular" end={<Button variant="outline" size="sm">Vincular</Button>} />
+       </div>
+      </Card>
+      <Card style={{ padding: "1.25rem" }}>
+       <CardTitle icon="bell">Actividad</CardTitle>
+       <ul className="list-none m-0 p-0 flex flex-col">
+        <ActivityItem icon="trophy" text="Quedó 2º en VGC Regional" time="hace 2 días" color="var(--orange-500)" />
+        <ActivityItem icon="calc" text="Guardó 3 sets en la Calculadora" time="hace 4 días" color="var(--accent-bright)" />
+       </ul>
+      </Card>
+     </div>
+     <div className="grid grid-cols-3 gap-3 mt-5 max-[620px]:grid-cols-2">
+      <AchievementTile icon="trophy" name="Campeón Regional" done />
+      <AchievementTile icon="zap" name="Racha de 10" done />
+      <AchievementTile icon="cards" name="Coleccionista TCG" />
+     </div>
+    </Spec2>
+
+    {/* MARQUEE */}
+    <Spec2
+     title="Marquee"
+     tag="blocks.tsx"
+     intro="Tira de etiquetas en desplazamiento infinito. Decorativa; se detiene con el toggle de movimiento y prefers-reduced-motion."
+     a11y="aria-hidden: es decoración, su contenido se anuncia en otro lugar de la página."
+    >
+     <div className="rounded-[var(--radius-lg)] overflow-hidden border border-[var(--border)]">
+      <Marquee items={["POKÉMON VGC", "MONSTER HUNTER", "MYSTERY DUNGEON", "TCG POCKET", "MINECRAFT", "SHOWDOWN"]} />
+     </div>
+    </Spec2>
+
+    {/* NAVBAR (documented, not rendered) */}
+    <Spec2
+     title="Navbar"
+     tag="ui.jsx"
+     intro="La barra de navegación global. Logo + enlaces con icono + acciones (IconButton) + usuario. Fija arriba, gana fondo al hacer scroll, y colapsa en un sheet en móvil. No se renderiza aquí porque es position:fixed."
+     a11y="nav con aria-label; aria-current en el enlace activo; el sheet móvil atrapa el foco y cierra con Escape."
+    >
+     <PropTable
+      rows={[
+       ["route", "string", "—", "Ruta activa para resaltar el enlace."],
+       ["go", "(route) => void", "—", "Navegación hash."],
+       ['theme', '"dark"|"light"', "—", "Tema actual (icono sol/luna)."],
+       ["onToggleTheme", "() => void", "—", "Alterna el tema."],
+      ]}
+     />
+     <p className="text-[length:var(--t-sm)] text-[color:var(--text-muted)] max-w-[66ch] mt-3 leading-[1.6]">
+      Compuesta por <code>Logo</code>, <code>Icon</code>,{" "}
+      <code>IconButton</code> y <code>Button</code> — cero clases sueltas
+      tras la segunda pasada.
+     </p>
+    </Spec2>
+
+    {/* FOOTER */}
+    <Spec2
+     title="Footer"
+     tag="blocks.tsx"
+     intro="El pie global: marca + tagline + IconButtons sociales, columnas de enlaces, newsletter y barra legal."
+     a11y="Enlaces agrupados por encabezado; iconos sociales con aria-label; el formulario es enfocable y enviable con teclado."
+    >
+     <div className="rounded-[var(--radius-lg)] overflow-hidden border border-[var(--border)]">
+      <Footer go={NOOP as (path: string) => void} />
+     </div>
+    </Spec2>
+   </div>
+  )
+}
+
+// ============================================================================
+// 7. PATTERNS
 // ============================================================================
 function PatternsSection() {
  const [seg, setSeg] = React.useState("grid")
@@ -1503,105 +1823,219 @@ function CommandPaletteDemo() {
 }
 
 // ============================================================================
-// 7. BOFFMEDIA
+// 8. BOFFMEDIA
 // ============================================================================
-function BoffSection({ go }: { go: (path: string) => void }) {
+function BoffSection({ go }: { go?: (path: string) => void }) {
  const g = GAMES.mhwilds
+ const pokemonGame = GAMES.pokemon
+ const { all: pokemonTools } = gameToolList(pokemonGame)
+ const allRanked = rankedTools()
+ const allGames = allGamesList()
+ const goFn = go || (() => {})
 
  return (
-  <div>
-   <div className="mb-8 pb-6 border-b border-[var(--border)]">
-    <Kicker>Boffmedia</Kicker>
-    <h2 className="text-[length:var(--t-3xl)] mt-2.5">Componentes del producto</h2>
-    <p className="text-[length:var(--t-base)] text-[color:var(--text-muted)] max-w-[64ch] mt-[0.7rem] leading-[1.65]">
-     Piezas específicas de BoffMedia, compuestas sobre el sistema. Una sola
-     fuente de datos (<code>games-data</code>) alimenta tarjetas,
-     herramientas destacadas y navegación.
-    </p>
-   </div>
-
-   <Spec2
-    title="GameCard"
-    tag="boffmedia/game-card.tsx"
-    intro="La entrada de un juego en el hub de Herramientas. Muestra logo, categorías y recuento total de herramientas."
-    a11y="role button, navegable por teclado; el glow de acento por juego deriva del token hue, no de color fijo."
-   >
-    <div className="max-w-[420px]">
-     <GameCard game={g} go={go} />
+   <div>
+    <div className="mb-8 pb-6 border-b border-[var(--border)]">
+     <Kicker>Boffmedia</Kicker>
+     <h2 className="text-[length:var(--t-3xl)] mt-2.5">Componentes del producto</h2>
+     <p className="text-[length:var(--t-base)] text-[color:var(--text-muted)] max-w-[64ch] mt-[0.7rem] leading-[1.65]">
+      Piezas específicas de BoffMedia, compuestas sobre el sistema. Una sola
+      fuente de datos (<code>games-data</code>) alimenta tarjetas,
+      herramientas destacadas y navegación.
+     </p>
     </div>
-   </Spec2>
 
-   <Spec2
-    title="FeaturedTool"
-    tag="boffmedia/featured-tool.tsx"
-    intro="El héroe de una página de juego: herramienta destacada con descripción, features y arte de apoyo."
-    a11y="Jerarquía clara con un solo CTA primario; el placeholder de arte indica su contenido."
-   >
-    <FeaturedTool tool={g.featured} go={go} />
-   </Spec2>
+    <Spec2
+     title="GameCard"
+     tag="boffmedia/game-card.tsx"
+     intro="La entrada de un juego en el hub de Herramientas. Muestra logo, categorías y recuento total de herramientas."
+     a11y="role button, navegable por teclado; el glow de acento por juego deriva del token hue, no de color fijo."
+    >
+     <div className="max-w-[420px]">
+       <GameCard game={g} go={goFn} />
+     </div>
+    </Spec2>
 
-   <Spec2
-    title="ToolCard"
-    tag="boffmedia/tool-card.tsx"
-    intro="Una herramienta dentro de la cuadrícula. Estados «nuevo» y «pronto»; el segundo se desactiva."
-    a11y="Las tarjetas «pronto» pierden el rol interactivo (tabIndex -1) para no confundir."
-   >
-    <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-[1.125rem]">
-     {g.tools.slice(0, 3).map((t) => (
-      <ToolCard key={t.title} tool={t} go={go} />
-     ))}
-    </div>
-   </Spec2>
+    <Spec2
+     title="FeaturedTool"
+     tag="boffmedia/featured-tool.tsx"
+     intro="El héroe de una página de juego: herramienta destacada con descripción, features y arte de apoyo."
+     a11y="Jerarquía clara con un solo CTA primario; el placeholder de arte indica su contenido."
+    >
+     <FeaturedTool tool={g.featured} go={goFn} />
+    </Spec2>
 
-   <Spec2
-    title="Cabecera de perfil"
-    tag="patrón"
-    intro="El encabezado de comunidad: avatar, identidad, etiquetas y estadísticas rápidas. Reutiliza Avatar, Badge y Stat."
-    a11y="Las cifras usan tabular-nums; los iconos sociales tienen aria-label."
-   >
-    <div className="rounded-[var(--radius-lg)] border border-[var(--border)] overflow-hidden bg-[var(--bg-grad-2)]">
-     <div className="p-7 flex gap-6 items-center flex-wrap">
-      <Avatar size={84} fallback="AX" ring tone="orange" />
-      <div className="flex-1 min-w-[200px]">
-       <div className="flex items-center gap-2.5 flex-wrap">
-        <h3 className="text-[length:var(--t-2xl)]">Alex Rivera</h3>
-        <Badge kind="accent">Pro</Badge>
-        <Badge kind="live">En línea</Badge>
-       </div>
-       <p className="text-[color:var(--text-muted)] text-[length:var(--t-sm)] mt-1 mb-3">
-        @rotomchef · se unió en marzo de 2024
-       </p>
-       <div className="flex gap-2 flex-wrap">
-        <Tag>Pokémon VGC</Tag>
-        <Tag>MH Wilds</Tag>
-        <Tag>Top 50</Tag>
-       </div>
-      </div>
-      <div className="flex gap-6">
-       {[
-        ["128", "Builds"],
-        ["32", "Torneos"],
-        ["2.4k", "Seguidores"],
-       ].map(([n, l]) => (
-        <div key={l} className="flex flex-col">
-         <span className="font-display font-extrabold text-[length:var(--t-xl)] text-[color:var(--orange-500)]">
-          {n}
-         </span>
-         <span className="text-[color:var(--text-dim)] font-mono text-[length:var(--t-xs)] uppercase tracking-[0.1em]">
-          {l}
-         </span>
+    <Spec2
+     title="ToolCard"
+     tag="boffmedia/tool-card.tsx"
+     intro="Una herramienta dentro de la cuadrícula. Estados «nuevo» y «pronto»; el segundo se desactiva."
+     a11y="Las tarjetas «pronto» pierden el rol interactivo (tabIndex -1) para no confundir."
+    >
+     <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-[1.125rem]">
+      {g.tools.slice(0, 3).map((t) => (
+        <ToolCard key={t.title} tool={t} go={goFn} />
+      ))}
+     </div>
+    </Spec2>
+
+    <Spec2
+     title="Cabecera de perfil"
+     tag="patrón"
+     intro="El encabezado de comunidad: avatar, identidad, etiquetas y estadísticas rápidas. Reutiliza Avatar, Badge y Stat."
+     a11y="Las cifras usan tabular-nums; los iconos sociales tienen aria-label."
+    >
+     <div className="rounded-[var(--radius-lg)] border border-[var(--border)] overflow-hidden bg-[var(--bg-grad-2)]">
+      <div className="p-7 flex gap-6 items-center flex-wrap">
+       <Avatar size={84} fallback="AX" ring tone="orange" />
+       <div className="flex-1 min-w-[200px]">
+        <div className="flex items-center gap-2.5 flex-wrap">
+         <h3 className="text-[length:var(--t-2xl)]">Alex Rivera</h3>
+         <Badge kind="accent">Pro</Badge>
+         <Badge kind="live">En línea</Badge>
         </div>
-       ))}
+        <p className="text-[color:var(--text-muted)] text-[length:var(--t-sm)] mt-1 mb-3">
+         @rotomchef · se unió en marzo de 2024
+        </p>
+        <div className="flex gap-2 flex-wrap">
+         <Tag>Pokémon VGC</Tag>
+         <Tag>MH Wilds</Tag>
+         <Tag>Top 50</Tag>
+        </div>
+       </div>
+       <div className="flex gap-6">
+        {[
+         ["128", "Builds"],
+         ["32", "Torneos"],
+         ["2.4k", "Seguidores"],
+        ].map(([n, l]) => (
+         <div key={l} className="flex flex-col">
+          <span className="font-display font-extrabold text-[length:var(--t-xl)] text-[color:var(--orange-500)]">
+           {n}
+          </span>
+          <span className="text-[color:var(--text-dim)] font-mono text-[length:var(--t-xs)] uppercase tracking-[0.1em]">
+           {l}
+          </span>
+         </div>
+        ))}
+       </div>
       </div>
      </div>
+    </Spec2>
+
+    {/* ---- Herramientas · componentes nuevos ---- */}
+    <div className="dsh-subdivider">
+     <span className="dsh-subdivider__kicker">Herramientas · nuevos</span>
+     <p>
+      Piezas reutilizables extraídas al construir la sección Herramientas (dirección <strong>«Rail»</strong>).
+      Todas funcionan con cualquier juego del registro <code>games-data</code> y comparten un único almacén de
+      favoritos y recientes (<code>localStorage</code>), así que el estado es consistente en toda la plataforma.
+     </p>
     </div>
-   </Spec2>
-  </div>
+
+    <Spec2
+     title="FavStar"
+     tag="boffmedia/fav-star.tsx"
+     intro="Botón de favorito reutilizable. Alterna una herramienta en el almacén global de favoritos por su href; el mismo href se refleja en cualquier lugar donde aparezca (tarjeta, lista, aside)."
+     a11y="aria-pressed comunica el estado; aria-label cambia entre añadir/quitar; detiene la propagación para no disparar la tarjeta contenedora."
+    >
+     <div className="flex gap-[0.8rem] items-center">
+      <FavStar href="#/demo/fav-a" />
+      <FavStar href="#/demo/fav-b" />
+      <span className="text-[color:var(--text-muted)] text-[length:var(--t-sm)]">
+       Pulsa una estrella — el estado persiste.
+      </span>
+     </div>
+     <PropTable rows={[
+      ["href", "string", "—", "Identificador de la herramienta (su ruta)."],
+      ["className", "string", '""', "Clases extra (p. ej. posicionado sobre una tarjeta)."],
+     ]} />
+    </Spec2>
+
+    <Spec2
+     title="ToolTile"
+     tag="boffmedia/tool-tile.tsx"
+     intro="Tarjeta compacta de herramienta: icono coloreado por juego, título, descripción a dos líneas, categoría/juego y favorito. Es la unidad densa para rejillas y listas; el acento deriva del hue del juego."
+     a11y="role button enfocable; las herramientas «pronto» pierden el rol interactivo; el estado se comunica con Badge (texto), no solo color."
+    >
+     <div className="grid grid-cols-2 gap-4 max-[620px]:grid-cols-1">
+      {pokemonTools.slice(0, 2).map((t) => (
+       <ToolTile key={t.href} tool={t} game={pokemonGame} go={goFn} showGame />
+      ))}
+     </div>
+     <PropTable rows={[
+      ["tool", "object", "—", "Herramienta normalizada (de gameToolList)."],
+      ["game", "object", "—", "Juego, para color (hue) y etiqueta."],
+      ["go", "(route) => void", "—", "Navegación; registra «reciente» al abrir."],
+      ["showGame", "boolean", "false", "Muestra el juego en vez de la categoría."],
+     ]} />
+    </Spec2>
+
+    <Spec2
+     title="ToolCardFav"
+     tag="boffmedia/tool-card-fav.tsx"
+     intro="La ToolCard estándar envuelta con una FavStar superpuesta y registro automático de «reciente» al abrir. Es la tarjeta que usa la dirección Rail en las páginas de juego — composición pura, sin CSS nuevo de tarjeta."
+     a11y="Hereda la accesibilidad de ToolCard; la estrella es un control independiente que no interfiere con la activación de la tarjeta."
+    >
+     <div className="toolgrid">
+      {pokemonTools.slice(0, 2).map((t, i) => (
+       <ToolCardFav key={t.href} tool={t} go={goFn} delay={i * 50} />
+      ))}
+     </div>
+    </Spec2>
+
+    <Spec2
+     title="GameSwitcher"
+     tag="boffmedia/game-switcher.tsx"
+     intro="Selector de juego: un Dropdown con el logo y el nombre del juego activo que lista el resto del registro para saltar entre ellos. Pensado para barras y asides; escala automáticamente al añadir juegos."
+     a11y="Es un Dropdown accesible (menú con teclado); el logo es decorativo y el nombre da el contexto."
+    >
+     <div className="max-w-[240px]">
+       <GameSwitcher game={g} go={goFn} games={allGames} />
+     </div>
+    </Spec2>
+
+    <Spec2
+     title="ToolCommand · ⌘K"
+     tag="boffmedia/tool-command.tsx"
+     intro="Buscador global de herramientas en un modal tipo paleta de comandos. Busca por herramienta, categoría o juego sobre todo el registro y navega al resultado. Reutiliza Modal y el patrón de command-palette del kit."
+     a11y="El campo recibe foco al abrir; Escape cierra; cada resultado es un botón navegable por teclado."
+    >
+     <div className="max-w-[420px]">
+       <ToolCommand tools={allRanked} go={goFn} />
+     </div>
+    </Spec2>
+
+    <Spec2
+     title="Favoritos & recientes"
+     tag="boffmedia/tools-store.ts"
+     intro="Un almacén externo minúsculo y persistido (localStorage) con dos hooks: useFavorites() → { favs, isFav, toggle } y useRecent() → { recent, push }. Cualquier componente que los use queda sincronizado al instante, sin pasar props ni elevar estado."
+     a11y="Sin UI propia; habilita estados (favorito/reciente) que los componentes comunican con texto e iconos."
+    >
+     <DemoFavCounter />
+    </Spec2>
+   </div>
+ )
+}
+
+function DemoFavCounter() {
+ const { favs } = useFavorites()
+ return (
+   <div className="flex items-center gap-4 flex-wrap">
+    <div className="flex gap-[0.6rem]">
+     <FavStar href="#/demo/fav-a" />
+     <FavStar href="#/demo/fav-b" />
+     <FavStar href="#/demo/fav-c" />
+    </div>
+    <Badge kind="accent">{favs.length} favorito{favs.length === 1 ? "" : "s"} en el almacén</Badge>
+    <span className="text-[color:var(--text-dim)] text-[length:var(--t-xs)]">
+     Compartido con toda la sección Herramientas.
+    </span>
+   </div>
  )
 }
 
 // ============================================================================
-// 8. PLAYGROUND
+// 9. PLAYGROUND
 // ============================================================================
 function PlaygroundSection() {
  const toast = useToast()
@@ -1726,7 +2160,7 @@ function PlaygroundSection() {
 }
 
 // ============================================================================
-// 9. ACCESIBILIDAD + ROADMAP
+// 10. ACCESIBILIDAD + ROADMAP
 // ============================================================================
 const A11Y = [
  ["target", "Áreas táctiles ≥ 44px", "Todo control interactivo cumple el mínimo de 44×44px en móvil. Los iconos-botón usan padding, no tamaño de icono."],
@@ -1774,7 +2208,7 @@ function AccessibilitySection() {
  )
 }
 
-const ROADMAP = [
+const ROADMAP: [string, string, string, string[]][] = [
  [
   "Fase 1",
   "Fundación",
@@ -1888,6 +2322,7 @@ const SECTIONS: Record<string, React.ComponentType<{ go?: (path: string) => void
  foundations: FoundationsSection,
  primitives: PrimitivesSection,
  composition: CompositionSection,
+ blocks: BlocksSection,
  patterns: PatternsSection,
  boff: BoffSection,
  playground: PlaygroundSection,
@@ -1915,7 +2350,7 @@ function ShowcaseInner() {
  }
 
  return (
-   <main className="w-full max-w-[var(--maxw)] mx-auto px-[var(--gutter)] pt-[6.5rem] pb-20">
+   <main className="dsh w-full max-w-[var(--maxw)] mx-auto px-[var(--gutter)] pt-[6.5rem] pb-20">
    {/* Hero */}
    <div className="grid grid-cols-[1.4fr_1fr] gap-10 items-end mb-10 max-[1000px]:grid-cols-1 max-[1000px]:gap-6">
     <div className="min-w-0">
