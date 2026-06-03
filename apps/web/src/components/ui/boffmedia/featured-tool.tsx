@@ -33,17 +33,17 @@ export function FeaturedTool({ tool, go, className }: FeaturedToolProps) {
             <IconBox icon={tool.icon} size="lg" tone="orange" />
             <div>
               <div className="flex items-center gap-3 flex-wrap">
-                <h2 className="text-t-2xl font-bold">{tool.title}</h2>
+                <h2 className="text-2xl font-bold">{tool.title}</h2>
                 {tool.isNew && <Badge kind="new">Nuevo</Badge>}
               </div>
-              <span className="flex items-center gap-1.5 text-t-xs text-[var(--accent-bright,var(--cyan-400))] mt-1">
+              <span className="flex items-center gap-1.5 text-xs text-[var(--accent-bright,var(--cyan-400))] mt-1">
                 <Icon name="sparkles" size={13} />
                 Herramienta destacada
               </span>
             </div>
           </div>
           {/* Description */}
-          <p className="text-t-sm text-[var(--text-muted,#a9abb8)]">
+          <p className="text-sm text-[var(--text-muted,#a9abb8)]">
             {tool.desc}
           </p>
           {/* Features */}
@@ -67,10 +67,10 @@ export function FeaturedTool({ tool, go, className }: FeaturedToolProps) {
         {/* Art placeholder */}
         <div className="hidden lg:flex items-center justify-center w-[280px] bg-[var(--surface-2,#181826)] border-l-[var(--hairline,1px)] border-solid border-l-[var(--border,rgba(255,255,255,0.08))] p-6">
           <div className="flex flex-col items-center gap-2 text-center">
-            <span className="text-t-sm text-[var(--text-dim,#71737f)]">
+            <span className="text-sm text-[var(--text-dim,#71737f)]">
               {tool.image}
             </span>
-            <span className="flex items-center gap-1.5 text-t-xs text-[var(--text-muted,#a9abb8)]">
+            <span className="flex items-center gap-1.5 text-xs text-[var(--text-muted,#a9abb8)]">
               <Icon name="clock" size={13} />
               Recién actualizado
             </span>
