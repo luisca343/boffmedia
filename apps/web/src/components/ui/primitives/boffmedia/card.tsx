@@ -8,7 +8,7 @@ interface BoffCardProps extends React.HTMLAttributes<HTMLDivElement> {
   ticks?: boolean
 }
 
-export function BoffCard({ className, hover, ticks, children, ...props }: BoffCardProps) {
+export function BoffCard({ className, hover, ticks, children, style, ...props }: BoffCardProps) {
   return (
     <div
       className={cn(
@@ -33,6 +33,7 @@ export function BoffCard({ className, hover, ticks, children, ...props }: BoffCa
         border: "var(--card-border)",
         borderRadius: "var(--radius-lg, 22px)",
         boxShadow: "var(--card-shadow)",
+        ...style,
       }}
       {...props}
     >
