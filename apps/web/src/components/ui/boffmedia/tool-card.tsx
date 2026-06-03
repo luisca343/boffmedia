@@ -50,11 +50,11 @@ export function ToolCard({ tool, go, delay = 0, className }: ToolCardProps) {
           <IconBox icon={tool.icon} size="md" tone="orange" />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="text-t-base font-bold">{tool.title}</h3>
+              <h3 className="text-base font-bold">{tool.title}</h3>
               {tool.isNew && <Badge kind="new">Nuevo</Badge>}
               {tool.soon && <Badge kind="soon">Pronto</Badge>}
             </div>
-            <p className="text-t-sm text-[var(--text-muted,#a9abb8)] mt-1">
+            <p className="text-sm text-[var(--text-muted,#a9abb8)] mt-1">
               {tool.desc}
             </p>
           </div>
@@ -64,7 +64,7 @@ export function ToolCard({ tool, go, delay = 0, className }: ToolCardProps) {
           {tool.features.map((f) => (
             <span
               key={f}
-              className="text-t-xs px-2 py-0.5 rounded-[var(--radius-pill,9999px)] bg-[var(--surface-3,#1f1f30)] text-[var(--text-muted,#a9abb8)]"
+              className="text-xs px-2 py-0.5 rounded-[var(--radius-pill,9999px)] bg-[var(--surface-3,#1f1f30)] text-[var(--text-muted,#a9abb8)]"
             >
               {f}
             </span>
@@ -73,14 +73,14 @@ export function ToolCard({ tool, go, delay = 0, className }: ToolCardProps) {
         {/* Footer */}
         <div className="flex items-center justify-between pt-3 border-t-[var(--hairline,1px)] border-solid border-t-[var(--border,rgba(255,255,255,0.08))]">
           {tool.popularity && (
-            <span className="flex items-center gap-1.5 text-t-xs text-[var(--text-muted,#a9abb8)]">
+            <span className="flex items-center gap-1.5 text-xs text-[var(--text-muted,#a9abb8)]">
               <Icon name="trending" size={14} />
               {tool.popularity === "high"
                 ? "Popularidad alta"
                 : "Popularidad media"}
             </span>
           )}
-          <span className="flex items-center gap-1 text-t-xs font-semibold text-[var(--accent-bright,var(--cyan-400))] ml-auto">
+          <span className="flex items-center gap-1 text-xs font-semibold text-[var(--accent-bright,var(--cyan-400))] ml-auto">
             {disabled ? "Próximamente" : "Abrir"}{" "}
             <Icon name="arrow" size={14} />
           </span>

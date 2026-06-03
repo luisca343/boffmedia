@@ -13,13 +13,6 @@ const config: Config = {
   ],
   prefix: "",
   theme: {
-    container: {
-      center: true,
-      padding: "2rem",
-      screens: {
-        "2xl": "1400px",
-      },
-    },
     extend: {
       fontFamily: {
         vinque: ["Vinque", "sans-serif"],
@@ -166,7 +159,7 @@ const config: Config = {
         },
         // Surface palette - Neutral grays for backgrounds
         surface: {
-          50: "rgb(var(--surface-50) / <alpha-value>)",
+          /*50: "rgb(var(--surface-50) / <alpha-value>)",
           100: "rgb(var(--surface-100) / <alpha-value>)",
           200: "rgb(var(--surface-200) / <alpha-value>)",
           300: "rgb(var(--surface-300) / <alpha-value>)",
@@ -176,7 +169,7 @@ const config: Config = {
           700: "rgb(var(--surface-700) / <alpha-value>)",
           800: "rgb(var(--surface-800) / <alpha-value>)",
           900: "rgb(var(--surface-900) / <alpha-value>)",
-          950: "rgb(var(--surface-950) / <alpha-value>)",
+          950: "rgb(var(--surface-950) / <alpha-value>)",*/
         },
         // Highlight palette
         highlight: {

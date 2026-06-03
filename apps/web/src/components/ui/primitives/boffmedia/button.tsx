@@ -52,7 +52,7 @@ export function BoffButton({
     "hover:-translate-y-px active:translate-y-px",
     "focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_var(--bg),0_0_0_5px_var(--accent-bright)]",
     v.cls,
-    size === "sm" && "py-2 px-4 text-t-xs",
+    size === "sm" && "py-2 px-4 text-xs",
     size === "lg" && "py-4 px-8 text-base",
     block && "w-full",
     !size && "py-3.5 px-6",

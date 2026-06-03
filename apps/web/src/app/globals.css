@@ -4,6 +4,11 @@
 @import '../styles/utilities.css';
 @import '../styles/animations.css';
 
+/* Tailwind directives — early so custom CSS below overrides preflight naturally */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* ============================================================================
    HANDOFF DESIGN TOKENS — Neon direction, token-driven
    Exact 1:1 reproduction of styles.css from handoff
@@ -124,7 +129,7 @@
 }
 
 /* ===========================================================================
-   BASE — Exact reproduction of styles.css §4
+   BASE — overrides Tailwind preflight naturally (we're after @tailwind base)
    =========================================================================== */
 * { box-sizing: border-box; }
 html.theme-switching * { transition: none !important; }
@@ -192,13 +197,34 @@ img { display: block; max-width: 100%; }
 [data-direction="neon"] .boff-card--hover:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--accent) 40%, var(--border)); }
 [data-direction="grid"] .boff-card--hover:hover { transform: translateY(-3px); border-color: var(--border-strong); }
 
+/* Showcase pseudo-elements — cannot be expressed in Tailwind alone */
+.dsh-sub::after {
+  content: "";
+  flex: 1;
+  height: var(--hairline);
+  background: var(--border);
+}
+.dodont__list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.5rem;
+  width: 6px;
+  height: 6px;
+  border-radius: 2px;
+}
+.dodont__list li {
+  font-size: var(--t-sm);
+  color: var(--text-muted);
+  line-height: 1.5;
+  padding-left: 1.1rem;
+  position: relative;
+}
+.dodont__col:first-child .dodont__list li::before { background: var(--emerald-400); }
+.dodont__col:last-child .dodont__list li::before { background: var(--rose-400); }
+
 /* Scrollbar */
 ::-webkit-scrollbar { width: 11px; height: 11px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 6px; border: 3px solid var(--bg); }
 ::-webkit-scrollbar-thumb:hover { background: var(--orange-600); }
-
-/* Tailwind directives */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
