@@ -692,6 +692,14 @@
   font-weight: 600;
 }
 
+/* Toolgrid for ToolCardFav demos */
+.toolgrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
+
+/* Subdivider between showcase sections */
+.dsh-subdivider { margin: 3rem 0 2rem; padding-top: 1.75rem; border-top: 2px solid var(--border-strong); }
+.dsh-subdivider__kicker { display: inline-block; font-family: var(--font-mono); font-size: var(--t-xs); letter-spacing: 0.14em; text-transform: uppercase; color: var(--orange-500); padding: 0.25rem 0.6rem; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--orange-500) 12%, transparent); }
+.dsh-subdivider p { font-size: var(--t-base); color: var(--text-muted); max-width: 64ch; margin: 0.9rem 0 0; line-height: 1.65; }
+
 /* Responsive */
 @media (max-width: 1000px) {
   .dsh-layout {
@@ -728,6 +736,21 @@
     grid-template-columns: 1fr;
   }
 }
+/* The hub is static documentation: neutralize scroll-reveal so every demo
+   renders visible regardless of viewport position. Real pages still animate */
+.dsh .reveal { opacity: 1; transform: none; transition: none; }
+
+/* Marquee scrolling animation for the demo strip */
+@keyframes dsh-marquee {
+  to { transform: translateX(-50%); }
+}
+.dsh-marquee-track {
+  animation: dsh-marquee 30s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .dsh-marquee-track { animation: none; }
+}
+
 @media (max-width: 620px) {
   .principle-grid,
   .dodont,
@@ -737,6 +760,9 @@
   .road__phase {
     grid-template-columns: 1fr;
     gap: 0.8rem;
+  }
+  .toolgrid {
+    grid-template-columns: 1fr;
   }
 }
 

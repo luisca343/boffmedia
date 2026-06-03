@@ -22,6 +22,7 @@ export function Callout({ icon = "sparkles", tone = "accent", title, children, c
         "border border-solid border-[var(--border)]",
         "border-l-[3px] border-l-[var(--accent-bright)]",
         "data-[direction=hud]:border-l-4 data-[direction=hud]:shadow-[4px_4px_0_0_var(--hud-shadow)]",
+        "p-4",
         tone === "orange" && "border-l-orange-500",
         className,
       )}

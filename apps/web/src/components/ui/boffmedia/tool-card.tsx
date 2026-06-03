@@ -1,5 +1,6 @@
 "use client"
 
+import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Icon } from "../primitives/boffmedia/icon"
 import { BoffBadge as Badge } from "../primitives/boffmedia/badge"
@@ -31,9 +32,8 @@ export function ToolCard({ tool, go, delay = 0, className }: ToolCardProps) {
     <Card
       hover={!disabled}
       className={cn(
-        "reveal",
-        disabled && "opacity-60",
-        !disabled && "cursor-pointer",
+        "p-6 flex flex-col gap-[1.1rem] group reveal",
+        disabled ? "opacity-70 cursor-default pointer-events-none" : "cursor-pointer",
         className
       )}
       style={{ transitionDelay: `${delay}ms` }}
@@ -44,47 +44,36 @@ export function ToolCard({ tool, go, delay = 0, className }: ToolCardProps) {
         if (e.key === "Enter" && !disabled) go(tool.href.replace(/^#/, ""))
       }}
     >
-      <div className="p-5 flex flex-col gap-3.5">
-        {/* Head */}
-        <div className="flex items-start gap-3.5">
-          <IconBox icon={tool.icon} size="md" tone="orange" />
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="text-base font-bold">{tool.title}</h3>
-              {tool.isNew && <Badge kind="new">Nuevo</Badge>}
-              {tool.soon && <Badge kind="soon">Pronto</Badge>}
-            </div>
-            <p className="text-sm text-[var(--text-muted,#a9abb8)] mt-1">
-              {tool.desc}
-            </p>
+      <div className="flex gap-4">
+        <IconBox icon={tool.icon} size="md" tone="orange" />
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2.5 flex-wrap mb-1.5">
+            <h3 className="text-t-lg">{tool.title}</h3>
+            {tool.isNew && <Badge kind="new">Nuevo</Badge>}
+            {tool.soon && <Badge kind="soon">Pronto</Badge>}
           </div>
+          <p className="text-t-sm leading-relaxed m-0 text-[var(--text-muted)]">{tool.desc}</p>
         </div>
-        {/* Features */}
-        <div className="flex flex-wrap gap-1.5">
-          {tool.features.map((f) => (
-            <span
-              key={f}
-              className="text-xs px-2 py-0.5 rounded-[var(--radius-pill,9999px)] bg-[var(--surface-3,#1f1f30)] text-[var(--text-muted,#a9abb8)]"
-            >
-              {f}
-            </span>
-          ))}
-        </div>
-        {/* Footer */}
-        <div className="flex items-center justify-between pt-3 border-t-[var(--hairline,1px)] border-solid border-t-[var(--border,rgba(255,255,255,0.08))]">
-          {tool.popularity && (
-            <span className="flex items-center gap-1.5 text-xs text-[var(--text-muted,#a9abb8)]">
-              <Icon name="trending" size={14} />
-              {tool.popularity === "high"
-                ? "Popularidad alta"
-                : "Popularidad media"}
-            </span>
-          )}
-          <span className="flex items-center gap-1 text-xs font-semibold text-[var(--accent-bright,var(--cyan-400))] ml-auto">
-            {disabled ? "Próximamente" : "Abrir"}{" "}
-            <Icon name="arrow" size={14} />
+      </div>
+      <div className="flex flex-wrap gap-1.5">
+        {tool.features.map((f) => (
+          <span key={f} className="inline-flex items-center text-t-xs font-medium text-[var(--text-muted)] px-2 py-1 rounded-full bg-[var(--surface-2)] border border-[var(--border)]">
+            {f}
           </span>
-        </div>
+        ))}
+      </div>
+      <div className="flex items-center justify-between pt-4 mt-auto border-t border-t-[var(--border)]">
+        {tool.popularity && (
+          <span className="inline-flex items-center gap-1.5 text-t-xs text-[var(--text-dim)]">
+            <Icon name="trending" size={14} />{" "}
+            {tool.popularity === "high"
+              ? "Popularidad alta"
+              : "Popularidad media"}
+          </span>
+        )}
+        <span className="inline-flex items-center gap-1.5 text-t-sm font-semibold text-orange-500 transition-all duration-300 group-hover:gap-2.5">
+          {disabled ? "Próximamente" : "Abrir"} <Icon name="arrow" size={15} />
+        </span>
       </div>
     </Card>
   )

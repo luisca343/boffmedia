@@ -1,5 +1,6 @@
 "use client"
 
+import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Icon } from "../primitives/boffmedia/icon"
 import { BoffCard as Card } from "../primitives/boffmedia/card"
@@ -42,8 +43,8 @@ export function GameCard({ game, go, delay = 0, className }: GameCardProps) {
   return (
     <Card
       hover
-      className={cn("reveal cursor-pointer", className)}
-      style={{ "--hue": `${game.hue}deg`, transitionDelay: `${delay}ms` } as React.CSSProperties}
+      className={cn("p-6 flex flex-col gap-5 cursor-pointer overflow-hidden group reveal", className)}
+      style={{ "--hue": game.hue, transitionDelay: `${delay}ms` } as React.CSSProperties}
       onClick={() => go(`/herramientas/${game.slug}`)}
       role="button"
       tabIndex={0}
@@ -51,54 +52,42 @@ export function GameCard({ game, go, delay = 0, className }: GameCardProps) {
         if (e.key === "Enter") go(`/herramientas/${game.slug}`)
       }}
     >
-      <div className="p-5">
-        {/* Accent bar */}
-        <div
-          className="h-1 w-12 rounded-full mb-4"
-          style={{ background: `hsl(${game.hue}, 70%, 55%)` }}
-        />
-        {/* Head */}
-        <div className="flex gap-4 items-center mb-4">
-          <span
-            className="grid place-items-center w-12 h-12 rounded-[var(--radius,14px)] font-display font-bold text-lg text-white"
-            style={{
-              background: `hsl(${game.hue}, 60%, 30%)`,
-              color: `hsl(${game.hue}, 80%, 75%)`,
-            }}
-          >
-            {game.logoLabel}
-          </span>
-          <div>
-            <h3 className="text-lg font-bold">{game.name}</h3>
-            <p className="text-sm text-[var(--text-muted,#a9abb8)]">
-              {game.tagline}
-            </p>
-          </div>
+      <div
+        className="absolute inset-x-0 top-0 h-0.5 pointer-events-none"
+        style={{ background: `linear-gradient(90deg, var(--orange-500), oklch(0.72 0.18 var(--hue, 200)))` }}
+        aria-hidden="true"
+      />
+      <div className="flex items-start gap-4">
+        <span
+          className="w-14 h-14 rounded-[var(--radius-lg)] shrink-0 grid place-items-center font-display font-extrabold text-xs"
+          style={{
+            color: "oklch(0.85 0.12 var(--hue, 200))",
+            background: "oklch(0.5 0.12 var(--hue, 200) / 0.16)",
+            border: "var(--hairline) solid oklch(0.6 0.14 var(--hue, 200) / 0.4)",
+          }}
+        >
+          {game.logoLabel}
+        </span>
+        <div>
+          <h3 className="text-t-xl">{game.name}</h3>
+          <p className="text-t-sm mt-1 leading-relaxed text-[var(--text-muted)]">{game.tagline}</p>
         </div>
-        {/* Categories */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          {game.categories.slice(0, 3).map((c) => (
-            <span
-              key={c.name}
-              className="inline-flex items-center gap-2 text-xs font-mono px-2.5 py-1 rounded-[var(--radius,14px)] bg-[var(--surface-3,#1f1f30)] text-[var(--text-muted,#a9abb8)]"
-            >
-              <span>{c.name}</span>
-              <span className="text-[var(--accent-bright,var(--cyan-400))]">
-                {c.tools.length}
-              </span>
-            </span>
-          ))}
-        </div>
-        {/* Footer */}
-        <div className="flex items-center justify-between pt-3 border-t-[var(--hairline,1px)] border-solid border-t-[var(--border,rgba(255,255,255,0.08))]">
-          <span className="flex items-center gap-1.5 text-xs text-[var(--text-muted,#a9abb8)]">
-            <Icon name="layers" size={14} />
-            {count} herramientas
+      </div>
+      <div className="flex flex-col gap-2 flex-1">
+        {game.categories.slice(0, 3).map((c) => (
+          <span key={c.name} className="flex items-center justify-between px-3 py-2.5 rounded-[var(--radius)] bg-[var(--surface-2)] border border-[var(--border)]">
+            <span className="text-t-sm font-semibold text-[var(--accent-bright)]">{c.name}</span>
+            <span className="font-mono text-t-xs text-[var(--text-dim)] px-2 py-0.5 rounded-full bg-[var(--surface-3)]">{c.tools.length}</span>
           </span>
-          <span className="flex items-center gap-1 text-xs font-semibold text-[var(--accent-bright,var(--cyan-400))]">
-            Explorar <Icon name="arrow" size={14} />
-          </span>
-        </div>
+        ))}
+      </div>
+      <div className="flex items-center justify-between pt-4 border-t border-t-[var(--border)]">
+        <span className="inline-flex items-center gap-1.5 text-t-xs text-[var(--text-dim)] font-mono">
+          <Icon name="layers" size={14} /> {count} herramientas
+        </span>
+        <span className="inline-flex items-center gap-1.5 text-t-sm font-semibold text-orange-500 transition-all duration-300 group-hover:gap-3">
+          Explorar <Icon name="arrow" size={16} />
+        </span>
       </div>
     </Card>
   )
