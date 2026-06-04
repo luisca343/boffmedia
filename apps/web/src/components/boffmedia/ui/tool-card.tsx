@@ -31,7 +31,7 @@ export function ToolCard({ tool, go, delay = 0, className }: ToolCardProps) {
 
   return (
     <div
-      className={cn("reveal", className)}
+      className={className}
       style={{ transitionDelay: `${delay}ms` }}
       onPointerEnter={() => setHovered(true)}
       onPointerLeave={() => setHovered(false)}
@@ -70,7 +70,7 @@ export function ToolCard({ tool, go, delay = 0, className }: ToolCardProps) {
         </div>
         <div className="flex flex-wrap gap-1.5">
           {tool.features.map((f) => (
-            <span key={f} className="inline-flex items-center text-t-xs font-medium text-[var(--text-muted)] px-2 py-1 rounded-full bg-[var(--surface-2)] border border-[var(--border)]">
+            <span key={f} className="inline-flex items-center text-t-xs font-medium text-[var(--text-muted)] px-[0.6rem] py-[0.3rem] rounded-full bg-[var(--surface-2)] border border-[var(--border)]">
               {f}
             </span>
           ))}
