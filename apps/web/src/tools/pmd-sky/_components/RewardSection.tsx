@@ -2,7 +2,7 @@ import { useTranslations } from "next-intl";
 import { GiftIcon, CubeIcon, TrophyIcon } from "@heroicons/react/24/outline";
 import { Combobox } from "@/components/ui/primitives/combobox";
 import { FormField } from "@/components/ui/form/FormField";
-import { ToolSectionHeader } from "@/components/boffmedia/tools/ToolSectionHeader";
+import { ToolSectionHeader } from "@/components/boffmedia-old/tools/ToolSectionHeader";
 import { getRewardTypes, getUseTargetItem, givesItem } from "../QuestData";
 import { getItemData } from "../ItemData";
 

@@ -2,7 +2,7 @@
 
 import { Users, Minus } from "lucide-react";
 import { Button } from "@/components/ui/primitives/button";
-import { BOFF_VARIANTS } from "@/components/boffmedia/tools/utils/boffVariants";
+import { BOFF_VARIANTS } from "@/components/boffmedia-old/tools/utils/boffVariants";
 
 const primary = BOFF_VARIANTS.primary;
 

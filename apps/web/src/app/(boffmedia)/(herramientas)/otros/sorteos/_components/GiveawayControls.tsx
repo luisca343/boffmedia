@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/primitives/button";
 import { Input } from "@/components/ui/primitives/input";
 import { Textarea } from "@/components/ui/primitives/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/primitives/tabs";
-import { BoffContainer } from "@/components/boffmedia/tools/BoffContainer";
-import { BOFF_VARIANTS } from "@/components/boffmedia/tools/utils/boffVariants";
+import { BoffContainer } from "@/components/boffmedia-old/tools/BoffContainer";
+import { BOFF_VARIANTS } from "@/components/boffmedia-old/tools/utils/boffVariants";
 
 interface GiveawayControlsProps {
   onAddParticipant: (name: string) => void;

@@ -6,7 +6,7 @@ import { spriteUrl, handleSpriteError } from "@/features/vgc-tracker/types";
 import { PokemonUsageDetail } from "@/services/api/boffmedia/vgcService";
 import { TypeBadgeSmall } from "@/components/shared/pokemon/TypeBadge";
 import { Card, CardContent } from "@/components/ui/primitives/card";
-import { ToolSectionHeader } from "@/components/boffmedia/tools/ToolSectionHeader";
+import { ToolSectionHeader } from "@/components/boffmedia-old/tools/ToolSectionHeader";
 import { BaseStatsPanel } from "./BaseStatsPanel";
 import { StatPanel } from "./StatPanel";
 import { TeammatesPanel } from "./TeammatesPanel";

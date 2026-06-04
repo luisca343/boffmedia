@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/primitives/card";
-import { ToolSectionHeader } from "@/components/boffmedia/tools/ToolSectionHeader";
+import { ToolSectionHeader } from "@/components/boffmedia-old/tools/ToolSectionHeader";
 
 interface StatPanelItem {
   name:    string;
