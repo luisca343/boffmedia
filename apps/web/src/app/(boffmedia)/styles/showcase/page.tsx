@@ -249,16 +249,17 @@ const HUB_NAV = [
   ],
  ],
  ["Fundamentos", [["foundations", "Tokens & escalas", "swatch"]]],
- [
-  "Componentes",
   [
-   ["primitives", "Primitivos", "puzzle"],
-   ["composition", "Composición", "layers"],
-   ["blocks", "Bloques", "grid"],
-   ["patterns", "Patrones", "grid"],
-   ["boff", "Boffmedia", "gamepad"],
+   "Componentes",
+   [
+    ["primitives", "Primitivos", "puzzle"],
+    ["composition", "Composición", "layers"],
+    ["blocks", "Bloques", "grid"],
+    ["patterns", "Patrones", "grid"],
+    ["boff", "Boffmedia", "gamepad"],
+    ["profile", "Perfil", "user"],
+   ],
   ],
- ],
  [
   "Calidad",
   [
@@ -1595,26 +1596,100 @@ function BlocksSection() {
      </div>
     </Spec2>
 
-    {/* NAVBAR (documented, not rendered) */}
+    {/* NAVBAR (documented, visual frame) */}
     <Spec2
      title="Navbar"
-     tag="ui.jsx"
-     intro="La barra de navegación global. Logo + enlaces con icono + acciones (IconButton) + usuario. Fija arriba, gana fondo al hacer scroll, y colapsa en un sheet en móvil. No se renderiza aquí porque es position:fixed."
+     tag="ui.jsx → boffmedia/navbar.tsx"
+     intro="La barra de navegación global. Logo + enlaces con icono + acciones (IconButton) + usuario. Fija arriba, gana fondo al hacer scroll (backdrop-filter), y colapsa en un sheet en móvil. No se renderiza inline porque es position:fixed — aquí se documenta su estructura."
      a11y="nav con aria-label; aria-current en el enlace activo; el sheet móvil atrapa el foco y cierra con Escape."
     >
-     <PropTable
-      rows={[
-       ["route", "string", "—", "Ruta activa para resaltar el enlace."],
-       ["go", "(route) => void", "—", "Navegación hash."],
-       ['theme', '"dark"|"light"', "—", "Tema actual (icono sol/luna)."],
-       ["onToggleTheme", "() => void", "—", "Alterna el tema."],
-      ]}
-     />
-     <p className="text-[length:var(--t-sm)] text-[color:var(--text-muted)] max-w-[66ch] mt-3 leading-[1.6]">
-      Compuesta por <code>Logo</code>, <code>Icon</code>,{" "}
-      <code>IconButton</code> y <code>Button</code> — cero clases sueltas
-      tras la segunda pasada.
-     </p>
+     {/* Visual frame showing navbar structure */}
+     <div className="rounded-[var(--radius-lg)] border border-[var(--border)] overflow-hidden bg-[var(--bg-grad-2)]">
+      <div className="flex items-center gap-2 py-[0.6rem] px-[0.9rem] border-b border-[var(--border)] bg-[var(--surface-2)]">
+       <span className="w-[9px] h-[9px] rounded-full bg-[var(--surface-3)]" />
+       <span className="w-[9px] h-[9px] rounded-full bg-[var(--surface-3)]" />
+       <span className="w-[9px] h-[9px] rounded-full bg-[var(--surface-3)]" />
+       <span className="ml-2 font-mono text-[length:var(--t-xs)] text-[color:var(--text-dim)]">navbar — position:fixed</span>
+      </div>
+      <div className="p-7">
+       {/* Navbar mock */}
+       <div className="flex items-center justify-between gap-6 py-[0.85rem] px-5 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface)]">
+        <div className="flex items-center gap-[0.6rem]">
+         <div className="w-[34px] h-[34px] rounded-[6px] bg-gradient-to-br from-[var(--orange-500)] to-[var(--orange-700)] grid place-items-center text-white font-bold text-sm">B</div>
+         <span className="font-display font-extrabold text-[1.1rem] text-[var(--orange-500)]">BoffMedia</span>
+        </div>
+        <div className="flex items-center gap-1 max-[920px]:hidden">
+         {[
+          ["home", "Inicio", true],
+          ["trophy", "Eventos", false],
+          ["wrench", "Herramientas", false],
+          ["users", "Comunidad", false],
+         ].map(([icon, label, active]) => (
+          <span
+           key={label as string}
+           className={
+            "inline-flex items-center gap-[0.45rem] text-[length:var(--t-sm)] font-medium py-2 px-[0.85rem] rounded-[var(--btn-radius)] transition-colors " +
+            (active
+             ? "text-[var(--orange-500)] font-semibold bg-[color-mix(in_srgb,var(--orange-500)_14%,transparent)]"
+             : "text-[var(--text-muted)]")
+           }
+          >
+           <Icon name={icon as string} size={17} />
+           <span>{label}</span>
+          </span>
+         ))}
+        </div>
+        <div className="flex items-center gap-2">
+         <IconButton icon="search" label="Buscar" />
+         <IconButton icon="bell" label="Notificaciones" dot />
+         <IconButton icon="sun" label="Cambiar tema" />
+         <span className="inline-flex items-center gap-[0.55rem] py-[0.3rem] pr-[0.75rem] pl-[0.35rem] rounded-[var(--radius-pill)] border border-[var(--border-strong)] bg-[var(--surface-2)]">
+          <span className="w-[30px] h-[30px] rounded-full grid place-items-center font-display font-extrabold text-[0.85rem] text-white bg-gradient-to-br from-[var(--orange-500)] to-[var(--orange-700)]">A</span>
+          <span className="text-[length:var(--t-sm)] font-semibold max-[920px]:hidden">Alex</span>
+         </span>
+        </div>
+       </div>
+       <p className="text-[length:var(--t-xs)] text-[color:var(--text-dim)] mt-3 text-center">
+        Vista simplificada — la navbar real es position:fixed con backdrop-filter
+       </p>
+      </div>
+     </div>
+
+     <div className="grid grid-cols-2 gap-5 mt-5 max-[1000px]:grid-cols-1">
+      <PropTable
+       rows={[
+        ["route", "string", "—", "Ruta activa para resaltar el enlace."],
+        ["go", "(route) => void", "—", "Navegación hash."],
+        ['theme', '"dark"|"light"', "—", "Tema actual (icono sol/luna)."],
+        ["onToggleTheme", "() => void", "—", "Alterna el tema."],
+       ]}
+      />
+      <div>
+       <p className="text-[length:var(--t-sm)] text-[color:var(--text-muted)] max-w-[66ch] leading-[1.6] mb-3">
+        Compuesta por <code>Logo</code>, <code>Icon</code>,{" "}
+        <code>IconButton</code> y <code>Button</code> — cero clases sueltas
+        tras la segunda pasada.
+       </p>
+       <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2 text-[length:var(--t-sm)]">
+         <Icon name="check" size={14} className="text-[var(--emerald-400)]" />
+         <span className="text-[var(--text-muted)]">Fondo translúcido con <code>backdrop-filter: blur(14px)</code></span>
+        </div>
+        <div className="flex items-center gap-2 text-[length:var(--t-sm)]">
+         <Icon name="check" size={14} className="text-[var(--emerald-400)]" />
+         <span className="text-[var(--text-muted)]">Gana borde al hacer scroll (8px+)</span>
+        </div>
+        <div className="flex items-center gap-2 text-[length:var(--t-sm)]">
+         <Icon name="check" size={14} className="text-[var(--emerald-400)]" />
+         <span className="text-[var(--text-muted)]">Sheet lateral en móvil con enlaces + tema</span>
+        </div>
+        <div className="flex items-center gap-2 text-[length:var(--t-sm)]">
+         <Icon name="check" size={14} className="text-[var(--emerald-400)]" />
+         <span className="text-[var(--text-muted)]">Punto de notificación en campana</span>
+        </div>
+       </div>
+      </div>
+     </div>
     </Spec2>
 
     {/* FOOTER */}
@@ -2035,7 +2110,340 @@ function DemoFavCounter() {
 }
 
 // ============================================================================
-// 9. PLAYGROUND
+// 9. PROFILE
+// ============================================================================
+const PROFILE_STATS = [
+  { icon: "trophy", label: "Ranking global", value: "#42", sub: "Top 1%" },
+  { icon: "bolt", label: "Puntos", value: "4 180", sub: "+210 esta semana" },
+  { icon: "chart", label: "Victorias", value: "73%", sub: "128 partidas" },
+  { icon: "star", label: "Logros", value: "37", sub: "de 60" },
+]
+const ACHIEVEMENTS = [
+  { icon: "trophy", name: "Campeón Regional", done: true },
+  { icon: "zap", name: "Racha de 10", done: true },
+  { icon: "calc", name: "Maestro del cálculo", done: true },
+  { icon: "sword", name: "Cazador veterano", done: true },
+  { icon: "cards", name: "Coleccionista TCG", done: false },
+  { icon: "flask", name: "Pionero del sim", done: false },
+]
+const ACTIVITY = [
+  { icon: "trophy", text: "Quedó 2º en VGC Regional — Series 2", time: "hace 2 días", color: "var(--orange-500)" },
+  { icon: "calc", text: "Guardó 3 sets en la Calculadora de Daño", time: "hace 4 días", color: "var(--accent-bright)" },
+  { icon: "users", text: "Se unió al equipo «Rotom Squad»", time: "hace 1 semana", color: "var(--purple-400)" },
+]
+
+function ProfileSection() {
+  const [editing, setEditing] = React.useState(false)
+  const [name, setName] = React.useState("Alex Boffmedia")
+  const [email, setEmail] = React.useState("alex@boffmedia.gg")
+
+  return (
+   <div>
+    <div className="mb-8 pb-6 border-b border-[var(--border)]">
+     <Kicker>Perfil</Kicker>
+     <h2 className="text-[length:var(--t-3xl)] mt-2.5">Página de perfil</h2>
+     <p className="text-[length:var(--t-base)] text-[color:var(--text-muted)] max-w-[64ch] mt-[0.7rem] leading-[1.65]">
+      La página de comunidad del usuario: identidad, datos, cuentas
+      vinculadas, actividad, estadísticas y logros. Compuesta al 100%
+      sobre primitivos y bloques del sistema.
+     </p>
+    </div>
+
+    {/* Page header pattern */}
+    <Spec2
+     title="Encabezado de página"
+     tag="patrón"
+     intro="Kicker + título + acción. El patrón estándar de cabecera de página interior."
+     a11y="El botón de acción es enfocable y describe su propósito con texto."
+    >
+     <div className="flex items-end justify-between gap-6 flex-wrap">
+      <div>
+       <Kicker>Cuenta</Kicker>
+       <h3 className="text-[length:var(--t-4xl)] mt-[0.7rem]">Mi perfil</h3>
+      </div>
+      <Button variant={editing ? "primary" : "ghost"} icon={editing ? "check" : "cog"} onClick={() => setEditing(!editing)}>
+       {editing ? "Guardar cambios" : "Editar perfil"}
+      </Button>
+     </div>
+    </Spec2>
+
+    {/* Profile hero / identity card */}
+    <Spec2
+     title="Tarjeta de identidad"
+     tag="patrón"
+     intro="Avatar, nombre, handle, etiquetas y estadísticas rápidas. La cubierta usa grid-dots como textura de fondo."
+     a11y="Las cifras usan tabular-nums; el avatar tiene fallback de iniciales; la cámara es un control con aria-label."
+    >
+     <Card ticks className="overflow-hidden">
+      {/* Cover */}
+      <div
+       className="h-[104px] border-b border-[var(--border)]"
+       style={{
+        background: "color-mix(in srgb, var(--orange-500) 14%, var(--surface-2))",
+        backgroundImage: "radial-gradient(var(--grid-dot) 1px, transparent 1px)",
+        backgroundSize: "22px 22px",
+       }}
+      />
+      {/* Main row */}
+      <div className="flex items-end gap-6 flex-wrap p-[1.4rem_1.75rem_1.75rem]">
+       {/* Avatar */}
+       <div className="relative w-[110px] h-[110px] shrink-0 -mt-[74px]">
+        <Avatar size={110} fallback="A" tone="orange" style={{ border: "4px solid var(--surface)", boxShadow: "0 10px 30px -10px var(--orange-500)" }} />
+        <IconButton className="absolute bottom-[2px] right-[2px] w-[30px] h-[30px] rounded-full" icon="camera" size={16} label="Cambiar foto" />
+       </div>
+       {/* Identity */}
+       <div className="flex-1 min-w-[220px] pb-[0.3rem]">
+        <div className="flex items-center gap-[0.75rem] flex-wrap">
+         <h3 className="text-[length:var(--t-2xl)] whitespace-nowrap">{name}</h3>
+         <Badge kind="live">Online</Badge>
+        </div>
+        <p className="text-[color:var(--text-muted)] text-[length:var(--t-sm)] mt-[0.35rem] mb-[0.75rem]">@alexboff · Miembro desde 2023</p>
+        <div className="flex gap-2 flex-wrap">
+         <Badge kind="accent">Moderador</Badge>
+         <Badge>VGC</Badge>
+         <Badge>Monster Hunter</Badge>
+        </div>
+       </div>
+       {/* Quick stats */}
+       <div className="flex items-center gap-5 pb-2">
+        <Metric value="#42" label="Ranking" size="sm" tone="orange" mono />
+        <div className="w-px h-[38px] bg-[var(--border-strong)]" />
+        <Metric value="4 180" label="Puntos" size="sm" tone="orange" mono />
+       </div>
+      </div>
+     </Card>
+    </Spec2>
+
+    {/* Account details + linked + activity */}
+    <Spec2
+     title="Datos de la cuenta"
+     tag="perfil"
+     intro="Formulario de nombre, correo y biografía con edición controlada. Los campos se habilitan al pulsar «Editar perfil»."
+     a11y="Labels asociadas con htmlFor; los campos disabled reducen opacidad visual."
+    >
+     <Card style={{ padding: "1.5rem" }}>
+      <CardTitle icon="user">Datos de la cuenta</CardTitle>
+      <div className="grid grid-cols-2 gap-[1.1rem] max-[620px]:grid-cols-1">
+       <Field label="Nombre" icon="user">
+        <Input value={name} disabled={!editing} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)} />
+       </Field>
+       <Field label="Correo" icon="mail">
+        <Input value={email} disabled={!editing} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)} />
+       </Field>
+       <Field label="Biografía" icon="message" className="col-span-2 max-[620px]:col-span-1">
+        <textarea
+         className="input"
+         style={{
+          resize: "vertical",
+          fontFamily: "var(--font-body)",
+          lineHeight: "1.6",
+         }}
+         rows={3}
+         disabled={!editing}
+         defaultValue="Entrenador competitivo de VGC y cazador a tiempo parcial. Construyendo herramientas para la comunidad."
+        />
+       </Field>
+      </div>
+     </Card>
+    </Spec2>
+
+    {/* Linked accounts */}
+    <Spec2
+     title="Cuentas vinculadas"
+     tag="perfil"
+     intro="Filas de cuentas externas con icono coloreado, nombre, estado y acción de vincular/desvincular."
+     a11y="Cada fila es un contenedor semántico; el botón de vincular tiene texto descriptivo."
+    >
+     <Card style={{ padding: "1.5rem" }}>
+      <CardTitle icon="link">Cuentas vinculadas</CardTitle>
+      <div className="flex flex-col gap-3">
+       <LinkedRow icon="discord" iconClass="discord" name="Discord" sub="alexboff#0420" end={<Badge kind="live">Vinculado</Badge>} />
+       <LinkedRow icon="gamepad" iconClass="mc" name="Minecraft" sub="Sin vincular" end={<Button variant="outline" size="sm" icon="link">Vincular</Button>} />
+       <LinkedRow icon="gamepad" iconClass="steam" name="Showdown" sub="RotomChef" end={<Badge kind="live">Vinculado</Badge>} />
+      </div>
+     </Card>
+    </Spec2>
+
+    {/* Activity feed */}
+    <Spec2
+     title="Actividad reciente"
+     tag="perfil"
+     intro="Línea temporal de acciones del usuario: torneos, herramientas, comunidad. Cada fila tiene icono coloreado, texto y timestamp."
+     a11y="Los iconos son decorativos; el significado vive en el texto. El color se acompaña de texto, nunca es el único portador."
+    >
+     <Card style={{ padding: "1.5rem" }}>
+      <CardTitle icon="bell">Actividad reciente</CardTitle>
+      <ul className="list-none m-0 p-0 flex flex-col">
+       {ACTIVITY.map((a, i) => <ActivityItem key={i} icon={a.icon} text={a.text} time={a.time} color={a.color} />)}
+      </ul>
+     </Card>
+    </Spec2>
+
+    {/* Stats grid */}
+    <Spec2
+     title="Estadísticas"
+     tag="perfil"
+     intro="Cuatro KPIs en cuadrícula 2×2: ranking, puntos, victorias y logros. Cada Stat reutiliza el primitivo Stat con icono, valor, delta y subtexto."
+     a11y="Los deltas usan color + icono direccional; el valor es tabular-nums."
+    >
+     <Card style={{ padding: "1.5rem" }}>
+      <CardTitle icon="chart">Estadísticas</CardTitle>
+      <div className="grid grid-cols-2 gap-[0.9rem] max-[620px]:grid-cols-1">
+       {PROFILE_STATS.map((s) => (
+        <Stat key={s.label} icon={s.icon} value={s.value} label={s.label} sub={s.sub} />
+       ))}
+      </div>
+     </Card>
+    </Spec2>
+
+    {/* Achievements */}
+    <Spec2
+     title="Logros"
+     tag="perfil"
+     intro="Cuadrícula de logros desbloqueados y bloqueados. Los bloqueados se atenúan y muestran un candado en vez del icono."
+     a11y="Los logros bloqueados usan opacidad + candado; el color nunca es el único portador de estado."
+    >
+     <Card style={{ padding: "1.5rem" }}>
+      <div className="flex items-center justify-between mb-5">
+       <h3 className="flex items-center gap-[0.6rem] text-[length:var(--t-lg)] m-0">
+        <Icon name="star" size={18} className="text-[var(--orange-500)]" />
+        Logros
+       </h3>
+       <span className="text-[color:var(--text-dim)] font-mono text-[length:var(--t-xs)]">37 / 60</span>
+      </div>
+      <div className="grid grid-cols-3 gap-3 mb-5 max-[620px]:grid-cols-2">
+       {ACHIEVEMENTS.map((a) => (
+        <AchievementTile key={a.name} icon={a.icon} name={a.name} done={a.done} />
+       ))}
+      </div>
+      <Button variant="ghost" block iconRight="arrow">Ver todos los logros</Button>
+     </Card>
+    </Spec2>
+
+    {/* Full profile page (composed) */}
+    <Spec2
+     title="Página completa"
+     tag="perfil"
+     intro="Todas las secciones juntas, como aparecen en la página de Perfil. Dos columnas: datos + actividad a la izquierda, stats + logros a la derecha."
+     a11y="La jerarquía de encabezados es correcta: h1 → h2 → h3. Los formularios son navegables por teclado."
+    >
+     <div className="rounded-[var(--radius-lg)] border border-[var(--border)] overflow-hidden bg-[var(--bg-grad-2)]">
+      <div className="flex items-center gap-2 py-[0.6rem] px-[0.9rem] border-b border-[var(--border)] bg-[var(--surface-2)]">
+       <span className="w-[9px] h-[9px] rounded-full bg-[var(--surface-3)]" />
+       <span className="w-[9px] h-[9px] rounded-full bg-[var(--surface-3)]" />
+       <span className="w-[9px] h-[9px] rounded-full bg-[var(--surface-3)]" />
+       <span className="ml-2 font-mono text-[length:var(--t-xs)] text-[color:var(--text-dim)]">/perfil</span>
+      </div>
+      <div className="p-7">
+       {/* Page header */}
+       <div className="flex items-end justify-between gap-6 mb-6 flex-wrap">
+        <div>
+         <Kicker>Cuenta</Kicker>
+         <h3 className="text-[length:var(--t-4xl)] mt-[0.7rem]">Mi perfil</h3>
+        </div>
+        <Button variant="ghost" icon="cog">Editar perfil</Button>
+       </div>
+
+       {/* Identity card */}
+       <Card ticks className="overflow-hidden mb-6">
+        <div
+         className="h-[104px] border-b border-[var(--border)]"
+         style={{
+          background: "color-mix(in srgb, var(--orange-500) 14%, var(--surface-2))",
+          backgroundImage: "radial-gradient(var(--grid-dot) 1px, transparent 1px)",
+          backgroundSize: "22px 22px",
+         }}
+        />
+        <div className="flex items-end gap-6 flex-wrap p-[1.4rem_1.75rem_1.75rem]">
+         <div className="relative w-[110px] h-[110px] shrink-0 -mt-[74px]">
+          <Avatar size={110} fallback="A" tone="orange" style={{ border: "4px solid var(--surface)", boxShadow: "0 10px 30px -10px var(--orange-500)" }} />
+          <IconButton className="absolute bottom-[2px] right-[2px] w-[30px] h-[30px] rounded-full" icon="camera" size={16} label="Cambiar foto" />
+         </div>
+         <div className="flex-1 min-w-[220px] pb-[0.3rem]">
+          <div className="flex items-center gap-[0.75rem] flex-wrap">
+           <h3 className="text-[length:var(--t-2xl)] whitespace-nowrap">{name}</h3>
+           <Badge kind="live">Online</Badge>
+          </div>
+          <p className="text-[color:var(--text-muted)] text-[length:var(--t-sm)] mt-[0.35rem] mb-[0.75rem]">@alexboff · Miembro desde 2023</p>
+          <div className="flex gap-2 flex-wrap">
+           <Badge kind="accent">Moderador</Badge>
+           <Badge>VGC</Badge>
+           <Badge>Monster Hunter</Badge>
+          </div>
+         </div>
+         <div className="flex items-center gap-5 pb-2">
+          <Metric value="#42" label="Ranking" size="sm" tone="orange" mono />
+          <div className="w-px h-[38px] bg-[var(--border-strong)]" />
+          <Metric value="4 180" label="Puntos" size="sm" tone="orange" mono />
+         </div>
+        </div>
+       </Card>
+
+       {/* Two-column grid */}
+       <div className="grid grid-cols-[1.2fr_1fr] gap-6 items-start max-[1000px]:grid-cols-1">
+        {/* Left column */}
+        <div className="flex flex-col gap-6">
+         <Card style={{ padding: "1.5rem" }}>
+          <CardTitle icon="user">Datos de la cuenta</CardTitle>
+          <div className="grid grid-cols-2 gap-[1.1rem] max-[620px]:grid-cols-1">
+           <Field label="Nombre" icon="user">
+            <Input value={name} disabled />
+           </Field>
+           <Field label="Correo" icon="mail">
+            <Input value={email} disabled />
+           </Field>
+          </div>
+         </Card>
+         <Card style={{ padding: "1.5rem" }}>
+          <CardTitle icon="link">Cuentas vinculadas</CardTitle>
+          <div className="flex flex-col gap-3">
+           <LinkedRow icon="discord" iconClass="discord" name="Discord" sub="alexboff#0420" end={<Badge kind="live">Vinculado</Badge>} />
+           <LinkedRow icon="gamepad" iconClass="mc" name="Minecraft" sub="Sin vincular" end={<Button variant="outline" size="sm" icon="link">Vincular</Button>} />
+          </div>
+         </Card>
+         <Card style={{ padding: "1.5rem" }}>
+          <CardTitle icon="bell">Actividad reciente</CardTitle>
+          <ul className="list-none m-0 p-0 flex flex-col">
+           {ACTIVITY.map((a, i) => <ActivityItem key={i} icon={a.icon} text={a.text} time={a.time} color={a.color} />)}
+          </ul>
+         </Card>
+        </div>
+        {/* Right column */}
+        <div className="flex flex-col gap-6">
+         <Card style={{ padding: "1.5rem" }}>
+          <CardTitle icon="chart">Estadísticas</CardTitle>
+          <div className="grid grid-cols-2 gap-[0.9rem]">
+           {PROFILE_STATS.map((s) => (
+            <Stat key={s.label} icon={s.icon} value={s.value} label={s.label} sub={s.sub} />
+           ))}
+          </div>
+         </Card>
+         <Card style={{ padding: "1.5rem" }}>
+          <div className="flex items-center justify-between mb-5">
+           <h3 className="flex items-center gap-[0.6rem] text-[length:var(--t-lg)] m-0">
+            <Icon name="star" size={18} className="text-[var(--orange-500)]" />
+            Logros
+           </h3>
+           <span className="text-[color:var(--text-dim)] font-mono text-[length:var(--t-xs)]">37 / 60</span>
+          </div>
+          <div className="grid grid-cols-3 gap-3 mb-5">
+           {ACHIEVEMENTS.map((a) => (
+            <AchievementTile key={a.name} icon={a.icon} name={a.name} done={a.done} />
+           ))}
+          </div>
+          <Button variant="ghost" block iconRight="arrow">Ver todos los logros</Button>
+         </Card>
+        </div>
+       </div>
+      </div>
+     </div>
+    </Spec2>
+   </div>
+  )
+}
+
+// ============================================================================
+// 10. PLAYGROUND
 // ============================================================================
 function PlaygroundSection() {
  const toast = useToast()
@@ -2325,6 +2733,7 @@ const SECTIONS: Record<string, React.ComponentType<{ go?: (path: string) => void
  blocks: BlocksSection,
  patterns: PatternsSection,
  boff: BoffSection,
+ profile: ProfileSection,
  playground: PlaygroundSection,
  a11y: AccessibilitySection,
  roadmap: RoadmapSection,

@@ -1,68 +1,84 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from "next/navigation"
-import { LogOut, LogIn, UserPlus } from "lucide-react"
-import { Button } from "@/components/ui/primitives/button"
-import { useBoffSession } from "@/services/useBoffSession"
-import { signOut } from "next-auth/react"
 import Link from 'next/link'
+import { usePathname, useRouter } from 'next/navigation'
+import { signOut } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
+import { useBoffSession } from '@/services/useBoffSession'
+import { Icon } from '@/components/ui/primitives/boffmedia/icon'
 
 export default function UserAuthSection() {
   const [mounted, setMounted] = useState(false)
+  const pathname = usePathname()
   const router = useRouter()
   const { session } = useBoffSession()
   const t = useTranslations('nav.auth')
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  useEffect(() => { setMounted(true) }, [])
 
-  if (!mounted) {
-    return null
-  }
+  if (!mounted) return null
 
-  const handleLogout = () => {
-    signOut({ callbackUrl: "/" })
-  }
+  const active = (href: string) =>
+    (pathname.startsWith(href) && href !== '/') || pathname === href
 
+  // ── Logged in: navuser pill + logout icon button ──
   if (session) {
+    const initial = (session.user.name || session.user.smartRotomUser?.username || 'U')
+      .charAt(0).toUpperCase()
+
     return (
       <>
-        <Link className="text-primary-300" href='/perfil'>
-          {session.user.name || session.user.smartRotomUser?.username}
-        </Link>
-        <Button
-          variant="ghost"
-          onClick={handleLogout}
-          className="text-primary-300 hover:text-primary-200 hover:bg-surface-800 transition-colors duration-200"
+        <Link
+          href="/perfil"
+          className={
+            'inline-flex items-center gap-[0.55rem] py-[0.3rem] pr-[0.75rem] pl-[0.35rem] border-solid bg-[var(--surface-2)] rounded-[var(--radius-pill)] transition-[border-color] duration-[var(--dur)] ' +
+            (active('/perfil')
+              ? 'border-[var(--orange-500)]'
+              : 'border-[var(--border-strong)] hover:border-[var(--orange-500)]')
+          }
+          style={{ borderWidth: 'var(--hairline)' }}
         >
-          <LogOut className="h-5 w-5 mr-2" />
-          {t("logout")}
-        </Button>
+          <span
+            className="w-[30px] h-[30px] rounded-full grid place-items-center font-display font-extrabold text-[0.85rem] text-white"
+            style={{
+              background: 'linear-gradient(135deg, var(--orange-500), var(--orange-700))',
+            }}
+          >
+            {initial}
+          </span>
+          <span className="text-[length:var(--t-sm)] font-semibold text-[var(--text)]">
+            {session.user.name || session.user.smartRotomUser?.username || 'User'}
+          </span>
+        </Link>
+        <button
+          onClick={() => signOut({ callbackUrl: '/' })}
+          aria-label={t('logout')}
+          className="inline-flex items-center justify-center w-[38px] h-[38px] rounded-[var(--btn-radius)] border border-transparent bg-transparent text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[color-mix(in_srgb,var(--text)_8%,transparent)] cursor-pointer transition-colors duration-[var(--dur)]"
+        >
+          <Icon name="arrow" size={18} style={{ transform: 'rotate(180deg)' }} />
+        </button>
       </>
     )
   }
 
+  // ── Logged out: login + register icon buttons ──
   return (
     <>
-      <Button
-        variant="ghost"
-        onClick={() => router.push("/api/auth/signin")}
-        className="text-primary-300 hover:text-primary-200 hover:bg-surface-800 transition-colors duration-200"
+      <button
+        onClick={() => router.push('/api/auth/signin')}
+        aria-label={t('login')}
+        className="inline-flex items-center justify-center w-[38px] h-[38px] rounded-[var(--btn-radius)] border border-transparent bg-transparent text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[color-mix(in_srgb,var(--text)_8%,transparent)] cursor-pointer transition-colors duration-[var(--dur)]"
       >
-        <LogIn className="h-5 w-5 mr-2" />
-        {t("login")}
-      </Button>
-      <Button
-        variant="ghost"
-        onClick={() => router.push("/auth?mode=register")}
-        className="text-primary-300 hover:text-primary-200 hover:bg-surface-800 transition-colors duration-200"
+        <Icon name="user" size={18} />
+      </button>
+      <button
+        onClick={() => router.push('/auth?mode=register')}
+        aria-label={t('register')}
+        className="inline-flex items-center justify-center w-[38px] h-[38px] rounded-[var(--btn-radius)] border border-[var(--border-strong)] bg-transparent text-[var(--text-muted)] hover:text-[var(--orange-500)] hover:border-[var(--orange-500)] cursor-pointer transition-colors duration-[var(--dur)]"
       >
-        <UserPlus className="h-5 w-5 mr-2" />
-        {t("register")}
-      </Button>
+        <Icon name="plus" size={18} />
+      </button>
     </>
   )
 }

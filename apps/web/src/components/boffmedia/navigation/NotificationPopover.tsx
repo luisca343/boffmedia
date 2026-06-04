@@ -1,14 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Bell, X, CheckCheck, Trash2, Info, CheckCircle, AlertTriangle, AlertCircle, BellOff } from "lucide-react"
+import { X, CheckCheck, Trash2, Info, CheckCircle, AlertTriangle, AlertCircle, BellOff } from "lucide-react"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/primitives/popover"
 import { ScrollArea } from "@/components/ui/primitives/scroll-area"
-import { Button } from "@/components/ui/primitives/button"
+import { Icon } from "@/components/ui/primitives/boffmedia/icon"
 import { useNotificationCenter } from "react-toastify/addons/use-notification-center"
 
 // ─── Type config ──────────────────────────────────────────────────────────────
@@ -115,30 +115,20 @@ export default function NotificationPopover() {
 
   return (
     <Popover>
-      {/* ── Trigger (same style as FicusNav ghost buttons) ───────────────── */}
+      {/* ── Trigger (matches handoff IconButton with dot) ──────────────── */}
       <PopoverTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="relative hover:bg-surface-800/40 transition-colors duration-150"
+        <button
+          className="relative inline-flex items-center justify-center w-[38px] h-[38px] rounded-[var(--btn-radius)] border border-transparent bg-transparent text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[color-mix(in_srgb,var(--text)_8%,transparent)] cursor-pointer transition-colors duration-[var(--dur)]"
+          aria-label="Notificaciones"
         >
-          <Bell
-            className="h-4 w-4"
-            style={{ color: unreadCount > 0 ? "rgb(251,146,60)" : "rgba(148,163,184,0.7)" }}
-          />
+          <Icon name="bell" size={18} />
           {unreadCount > 0 && (
             <span
-              className="absolute -top-0.5 -right-0.5 min-w-[15px] h-[15px] flex items-center justify-center px-1 rounded-full text-[9px] font-black font-mono leading-none"
-              style={{
-                background: "rgba(239,68,68,0.12)",
-                border: "1px solid rgba(239,68,68,0.4)",
-                color: "rgb(248,113,113)",
-              }}
-            >
-              {unreadCount > 9 ? "9+" : unreadCount}
-            </span>
+              className="absolute top-[8px] right-[9px] w-[6px] h-[6px] rounded-full"
+              style={{ background: 'var(--orange-500)', border: '2px solid var(--bg)' }}
+            />
           )}
-        </Button>
+        </button>
       </PopoverTrigger>
 
       {/* ── Panel (exact dropdown panel spec) ───────────────────────────── */}
