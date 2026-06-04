@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { BoffButton as Button } from "@/components/boffmedia/primitives/button";
 import { Icon } from "@/components/boffmedia/primitives/icon";
 
-export function BoffFooter() {
+export function Footer() {
   const t = useTranslations("boffmedia.footer");
 
   return (

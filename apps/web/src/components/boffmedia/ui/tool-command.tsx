@@ -1,8 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { Icon } from "../primitives/boffmedia/icon"
-import { BoffModal as Modal } from "../primitives/boffmedia/dialog"
+import { Icon } from "../primitives/icon"
+import { BoffModal as Modal } from "../primitives/dialog"
 
 interface ToolEntry {
   title: string

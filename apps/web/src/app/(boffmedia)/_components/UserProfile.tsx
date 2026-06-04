@@ -2,15 +2,20 @@
 
 import { useState, useRef, useEffect } from "react"
 import "@/styles/boffmedia-primitives.css"
-import { BoffButton as Button } from "@/components/ui/primitives/boffmedia/button"
-import { BoffInput as Input } from "@/components/ui/primitives/boffmedia/input"
+import { BoffButton as Button } from "@/components/boffmedia/primitives/button"
+import { BoffInput as Input } from "@/components/boffmedia/primitives/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/primitives/avatar"
-import { Icon } from "@/components/ui/primitives/boffmedia/icon"
-import { BoffCard as Card } from "@/components/ui/primitives/boffmedia/card"
-import { BoffBadge as Badge } from "@/components/ui/primitives/boffmedia/badge"
-import { Kicker } from "@/components/ui/primitives/boffmedia/kicker"
-import { Field } from "@/components/ui/primitives/boffmedia/field"
-import { CardTitle, Metric, LinkedRow, ActivityItem, AchievementTile, Stat } from "@/components/ui/boffmedia/blocks"
+import { Icon } from "@/components/boffmedia/primitives/icon"
+import { BoffCard as Card } from "@/components/boffmedia/primitives/card"
+import { BoffBadge as Badge } from "@/components/boffmedia/primitives/badge"
+import { Kicker } from "@/components/boffmedia/primitives/kicker"
+import { Field } from "@/components/boffmedia/primitives/field"
+import { CardTitle } from "@/components/boffmedia/ui/card-title"
+import { Metric } from "@/components/boffmedia/ui/metric"
+import { LinkedRow } from "@/components/boffmedia/ui/linked-row"
+import { ActivityItem } from "@/components/boffmedia/ui/activity-item"
+import { AchievementTile } from "@/components/boffmedia/ui/achievement-tile"
+import { StatCard } from "@/components/boffmedia/ui/stat-card"
 import useSocketStore from "@/stores/useSocketStore"
 import { useBoffSession } from "@/services/useBoffSession"
 import { UploadService } from "@/services/api/smartrotom/uploadService"
@@ -379,7 +384,7 @@ export default function UserProfile() {
                 <CardTitle icon="chart">Estadísticas</CardTitle>
                 <div className="grid grid-cols-2 gap-[0.9rem] max-[600px]:grid-cols-1">
                   {PROFILE_STATS.map((s) => (
-                    <Stat key={s.label} icon={s.icon} value={s.value} label={s.label} sub={s.sub} />
+                    <StatCard key={s.label} icon={s.icon} value={s.value} label={s.label} sub={s.sub} />
                   ))}
                 </div>
               </Card>
