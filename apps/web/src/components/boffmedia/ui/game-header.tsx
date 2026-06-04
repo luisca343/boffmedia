@@ -55,29 +55,29 @@ export function GameHeader({
           </p>
         )}
       </div>
-      <div
-        className="w-24 h-24 shrink-0 rounded-[var(--radius-lg)] grid place-items-center overflow-hidden"
-        style={{
-          border: "var(--hairline) solid oklch(0.6 0.15 var(--hue, 200) / 0.45)",
-          background: "oklch(0.5 0.13 var(--hue, 200) / 0.16)",
-          "--hue": hue,
-          color: "oklch(0.85 0.13 var(--hue, 200))",
-        } as React.CSSProperties}
-      >
-        {logoSrc ? (
-          <Image
-            src={logoSrc}
-            alt={logoAlt ?? ""}
-            width={96}
-            height={96}
-            className="object-contain"
-          />
-        ) : (
+      {logoSrc ? (
+        <Image
+          src={logoSrc}
+          alt={logoAlt ?? ""}
+          width={128}
+          height={128}
+          className="shrink-0 object-contain"
+        />
+      ) : (
+        <div
+          className="w-24 h-24 shrink-0 rounded-[var(--radius-lg)] grid place-items-center overflow-hidden"
+          style={{
+            border: "var(--hairline) solid oklch(0.6 0.15 var(--hue, 200) / 0.45)",
+            background: "oklch(0.5 0.13 var(--hue, 200) / 0.16)",
+            "--hue": hue,
+            color: "oklch(0.85 0.13 var(--hue, 200))",
+          } as React.CSSProperties}
+        >
           <span className="font-display font-extrabold text-lg">
             {logoLabel || "?"}
           </span>
-        )}
-      </div>
+        </div>
+      )}
     </header>
   )
 }

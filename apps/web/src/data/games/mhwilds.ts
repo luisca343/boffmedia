@@ -5,7 +5,7 @@ export const mhwilds: GameEntry = {
   nameKey: "games.mhwilds.name",
 
   // Sidebar
-  icon: "/img/games/mhwilds-icon.webp",
+  icon: "/img/games/mhwilds/icon.webp",
   color: "from-highlight-400 to-highlight-600",
   bg: "bg-highlight-900",
 
