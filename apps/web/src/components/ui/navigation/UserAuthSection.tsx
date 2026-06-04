@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
 import { useBoffSession } from '@/services/useBoffSession'
-import { Icon } from '@/components/ui/primitives/boffmedia/icon'
+import { Icon } from '@/components/boffmedia/primitives/icon'
 
 export default function UserAuthSection() {
   const [mounted, setMounted] = useState(false)
