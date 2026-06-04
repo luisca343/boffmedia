@@ -186,7 +186,7 @@ const achievements: Achievement[] = [
 
 export default function AchievementList() {
   return (
-    <div className="flex flex-col justify-center items-center px-4">
+    <div className="flex flex-col justify-center items-center px-4 pt-16">
       <h2 className="text-4xl font-bold mb-8 text-center text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-600">
         Lista de Logros
       </h2>

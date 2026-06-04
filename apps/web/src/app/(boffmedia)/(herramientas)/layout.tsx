@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import GameToolsLayout from "@/components/boffmedia-old/layouts/GameToolsLayout";
+import GameToolsLayout from "@/components/boffmedia/ui/game-tools-layout";
 
 export default function Layout({ 
   children 
