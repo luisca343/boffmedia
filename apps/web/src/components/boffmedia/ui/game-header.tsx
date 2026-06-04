@@ -30,7 +30,7 @@ export function GameHeader({
   return (
     <header
       className={cn(
-        "flex items-start justify-between gap-8 mb-10",
+"flex items-start justify-between gap-8 mb-10 max-[900px]:flex-col-reverse max-[900px]:items-stretch",
         compact && "flex-row-reverse",
         className,
       )}
