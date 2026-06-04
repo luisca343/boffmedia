@@ -51,7 +51,7 @@ export function GameCard({ game, go, delay = 0, className }: GameCardProps) {
 
   return (
     <div
-      className={cn("reveal", className)}
+      className={className}
       style={{ transitionDelay: `${delay}ms` }}
       onPointerEnter={() => setHovered(true)}
       onPointerLeave={() => setHovered(false)}
