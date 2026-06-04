@@ -157,7 +157,7 @@
     "tools": {
       "buildPlanner": {
         "title": "Planificador de Builds",
-        "description": "Crea builds óptimas comparando armaduras, decoraciones y habilidades",
+        "description": "Construye y optimiza sets completos: armadura, decoraciones, talismán y arma. Calcula habilidades, resistencias y afilado en tiempo real.",
         "features": {
           "optimizer": "Optimizador de builds",
           "calculator": "Calculadora de daño",

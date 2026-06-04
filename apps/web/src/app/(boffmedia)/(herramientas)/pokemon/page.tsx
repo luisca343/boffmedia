@@ -1,5 +1,5 @@
-import { GameToolsPage } from "@/components/boffmedia-old/tools/GameToolsPage";
+import { GamePage } from "@/components/boffmedia/ui/game-page";
 
 export default function PokemonPage() {
-  return <GameToolsPage slug="pokemon" />;
+  return <GamePage slug="pokemon" />;
 }
