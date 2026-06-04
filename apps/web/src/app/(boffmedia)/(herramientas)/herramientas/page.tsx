@@ -2,117 +2,178 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Zap, Terminal } from "lucide-react";
-import { GameCard, type GameCardData } from "../_components/GameCard";
+import { useRouter } from "next/navigation";
+import { Search, ChevronDown, Terminal } from "lucide-react";
+import { GameCard, type GameData } from "@/components/boffmedia/ui/game-card";
+import { Kicker } from "@/components/boffmedia/primitives/kicker";
+import { Icon } from "@/components/boffmedia/primitives/icon";
 
-const GAME_TOOLS: GameCardData[] = [
+type SortMode = "popular" | "az" | "tools";
+
+const SORT_OPTIONS: { value: SortMode; label: string }[] = [
+  { value: "popular", label: "Popularidad" },
+  { value: "az", label: "Alfabético" },
+  { value: "tools", label: "Nº herramientas" },
+];
+
+const GAMES: GameData[] = [
   {
-    id: "pokemon",
-    title: "Pokémon",
-    description: "Calculadoras, generadores y bases de datos",
-    icon: "/img/games/pokemon/icon.webp",
-    tools: [
-      { name: "TCGPocket", count: 3 },
-      { name: "Pokémon Mundo Misterioso", count: 1 },
-      { name: "Pokedex", count: 1 },
+    slug: "pokemon",
+    name: "Pokémon",
+    short: "PKMN",
+    tagline: "Calculadoras, generadores y bases de datos",
+    hue: 28,
+    logoLabel: "P",
+    categories: [
+      {
+        name: "TCGPocket",
+        tools: [
+          { name: "TCGPocket", href: "/pokemon/tcgpocket", icon: "cards" },
+        ],
+      },
+      {
+        name: "Pokémon Mundo Misterioso",
+        tools: [
+          { name: "Mundo Misterioso", href: "/pokemon/pmdsky", icon: "puzzle" },
+        ],
+      },
+      {
+        name: "Pokedex",
+        tools: [
+          { name: "Pokedex", href: "/pokemon/vgc", icon: "book" },
+        ],
+      },
     ],
-    href: "/pokemon",
-    tag: "ESTRATEGIA",
-    topBar: "from-yellow-400 via-primary-500 to-red-500",
-    border: "border-primary-500/30",
-    bgHover: "from-yellow-400/10 via-primary-500/5 to-red-500/10",
-    accent: "text-primary-400",
-    dotBg: "bg-primary-400",
-    countBorder: "border-primary-700/50",
-    countText: "text-primary-400",
-    scanLine: "rgba(251,146,60,0.7)",
-    glowColor: "rgba(249,115,22,0.25)",
+    tools: [],
+    featured: {
+      title: "Calculadoras Pokémon",
+      desc: "Herramientas de cálculo y análisis para Pokémon.",
+      features: ["Daño", "Estadísticas", "Equipos"],
+      href: "/pokemon",
+      icon: "calc",
+      image: "Pokémon herramientas",
+    },
   },
   {
-    id: "mhwilds",
-    title: "Monster Hunter Wilds",
-    description: "Planificadores y generadores de builds",
-    icon: "/img/games/mhwilds/icon.webp",
-    tools: [
-      { name: "Builds", count: 1 },
+    slug: "mhwilds",
+    name: "Monster Hunter Wilds",
+    short: "MHW",
+    tagline: "Planificadores y generadores de builds",
+    hue: 120,
+    logoLabel: "M",
+    categories: [
+      {
+        name: "Builds",
+        tools: [
+          { name: "Builds", href: "/mhwilds/builds/planner", icon: "wrench" },
+        ],
+      },
     ],
-    href: "/mhwilds",
-    tag: "ACCIÓN RPG",
-    topBar: "from-highlight-400 via-highlight-500 to-highlight-600",
-    border: "border-highlight-500/30",
-    bgHover: "from-highlight-400/10 via-highlight-500/5 to-highlight-600/10",
-    accent: "text-highlight-400",
-    dotBg: "bg-highlight-400",
-    countBorder: "border-highlight-700/50",
-    countText: "text-highlight-400",
-    scanLine: "rgba(163,230,53,0.7)",
-    glowColor: "rgba(132,204,22,0.25)",
+    tools: [],
+    featured: {
+      title: "Planificador de Builds",
+      desc: "Planifica y optimiza tus builds de Monster Hunter Wilds.",
+      features: ["Armaduras", "Habilidades", "Decoraciones"],
+      href: "/mhwilds",
+      icon: "hammer",
+      image: "MHWilds builds",
+    },
   },
   {
-    id: "otros",
-    title: "Otros",
-    description: "Herramientas generales y recursos",
-    icon: "/img/games/other/icon.webp",
-    tools: [
-      { name: "Sorteos", count: 1 },
-      { name: "Claves de Steam", count: 1 },
+    slug: "otros",
+    name: "Otros",
+    short: "MISC",
+    tagline: "Herramientas generales y recursos",
+    hue: 200,
+    logoLabel: "O",
+    categories: [
+      {
+        name: "Sorteos",
+        tools: [
+          { name: "Sorteos", href: "/otros/sorteos", icon: "trophy" },
+        ],
+      },
+      {
+        name: "Claves de Steam",
+        tools: [
+          { name: "Claves Steam", href: "/otros/keys", icon: "key" },
+        ],
+      },
     ],
-    href: "/otros",
-    tag: "UTILIDADES",
-    topBar: "from-secondary-400 via-secondary-500 to-secondary-600",
-    border: "border-secondary-500/30",
-    bgHover: "from-secondary-400/10 via-secondary-500/5 to-secondary-600/10",
-    accent: "text-secondary-400",
-    dotBg: "bg-secondary-400",
-    countBorder: "border-secondary-700/50",
-    countText: "text-secondary-400",
-    scanLine: "rgba(34,211,238,0.7)",
-    glowColor: "rgba(6,182,212,0.25)",
+    tools: [],
+    featured: {
+      title: "Utilidades",
+      desc: "Herramientas varias para la comunidad.",
+      features: ["Sorteos", "Claves", "Recursos"],
+      href: "/otros",
+      icon: "grid",
+      image: "Otras herramientas",
+    },
   },
 ];
 
 export default function ToolsLandingPage() {
+  const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchFocused, setSearchFocused] = useState(false);
+  const [sortMode, setSortMode] = useState<SortMode>("popular");
+  const [sortOpen, setSortOpen] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  const filteredTools = GAME_TOOLS.filter(
+  const go = (path: string) => router.push(path);
+
+  let filteredTools = GAMES.filter(
     (game) =>
-      game.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      game.tools.some((tool) =>
-        tool.name.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+      game.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      game.tagline.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      game.categories.some((cat) =>
+        cat.name.toLowerCase().includes(searchTerm.toLowerCase()),
+      ) ||
+      game.categories.some((cat) =>
+        cat.tools.some((t) =>
+          t.name.toLowerCase().includes(searchTerm.toLowerCase()),
+        ),
+      ),
   );
 
-  const totalTools = GAME_TOOLS.reduce(
-    (acc, game) => acc + game.tools.reduce((a, t) => a + t.count, 0),
-    0
+  if (sortMode === "az") {
+    filteredTools = [...filteredTools].sort((a, b) => a.name.localeCompare(b.name));
+  } else if (sortMode === "tools") {
+    filteredTools = [...filteredTools].sort(
+      (a, b) =>
+        (b.tools.length + b.categories.reduce((x, c) => x + c.tools.length, 0)) -
+        (a.tools.length + a.categories.reduce((x, c) => x + c.tools.length, 0)),
+    );
+  }
+
+  const totalTools = GAMES.reduce(
+    (acc, g) => acc + g.tools.length + g.categories.reduce((x, c) => x + c.tools.length, 0),
+    0,
   );
-  const totalCategories = GAME_TOOLS.reduce((acc, g) => acc + g.tools.length, 0);
+
+  const currentSortLabel = SORT_OPTIONS.find((o) => o.value === sortMode)?.label || "Ordenar";
 
   return (
-    <div className="relative min-h-screen bg-surface-950">
-      {/* ── Video + overlays ───────────────────────────────── */}
+    <main className="relative bg-surface-950 relative h-[calc(100vh-68px)]">
+      {/* ── hub-video background ─────────────────────────────── */}
       {isMounted && (
-        <div className="fixed inset-0 z-0 overflow-hidden">
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="absolute w-full h-full object-cover"
-          >
-            <source src="/uploads/looptest.mp4" type="video/mp4" />
-          </video>
-
-          {/* Dark gradient */}
+        <div className="hub-video absolute inset-0 z-0 overflow-hidden">
+          <div className="hub-video__media absolute inset-0">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="absolute w-full h-full object-cover"
+            >
+              <source src="/uploads/looptest.mp4" type="video/mp4" />
+            </video>
+          </div>
           <div className="absolute inset-0 bg-gradient-to-b from-surface-950/60 via-surface-950/75 to-surface-950/90" />
-
-          {/* Scanlines */}
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
@@ -123,165 +184,173 @@ export default function ToolsLandingPage() {
         </div>
       )}
 
-      {/* ── Content ───────────────────────────────────────── */}
-      <div className="relative z-10">
+      {/* ── hub-content ─────────────────────────────────────── */}
+      <div className="hub-content relative z-10">
         {/* Hero */}
-        <div className="container mx-auto px-4 pt-6 pb-12">
-
-          {/* Main title */}
+        <section className="hub-hero container mx-auto px-4 pt-28 pb-10 text-center">
           <motion.div
-            className="text-center mb-6"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <p
-              className="text-sm tracking-[0.6em] text-surface-400 uppercase mb-4"
-              style={{ fontFamily: "Orbitron, sans-serif" }}
-            >
-              Herramientas para
-            </p>
-            <h1
-              className="text-6xl sm:text-8xl font-black leading-none tracking-tight"
-              style={{
-                fontFamily: "Orbitron, sans-serif",
-                background: "linear-gradient(135deg, #fde68a 0%, #fb923c 40%, #f97316 70%, #ea580c 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-                filter: "drop-shadow(0 0 40px rgba(249,115,22,0.35))",
-              }}
-            >
-              VIDEOJUEGOS
-            </h1>
-          </motion.div>
-
-          {/* Accent divider */}
-          <motion.div
-            className="flex items-center justify-center gap-4 mb-8"
-            initial={{ scaleX: 0, opacity: 0 }}
-            animate={{ scaleX: 1, opacity: 1 }}
-            transition={{ duration: 0.9, delay: 0.45 }}
-          >
-            <div className="h-px flex-1 max-w-36 bg-gradient-to-r from-transparent to-primary-500/40" />
-            <Zap className="w-4 h-4 text-primary-400" style={{ filter: "drop-shadow(0 0 8px rgba(249,115,22,0.6))" }} />
-            <div className="h-px flex-1 max-w-36 bg-gradient-to-l from-transparent to-primary-500/40" />
-          </motion.div>
-
-          {/* Subtitle */}
-          <motion.p
-            className="text-center text-surface-400 max-w-xl mx-auto text-sm leading-relaxed mb-12 tracking-wide"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.55, duration: 0.6 }}
-          >
-            Recursos útiles para mejorar tu experiencia de juego.
-            Todo lo que necesitas, creado por y para la comunidad gaming.
-          </motion.p>
-
-          {/* Stats */}
-          <motion.div
-            className="flex justify-center gap-10 sm:gap-16 mb-12"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.65, duration: 0.5 }}
-          >
-            {[
-              { label: "Juegos", value: GAME_TOOLS.length },
-              { label: "Herramientas", value: totalTools },
-              { label: "Categorías", value: totalCategories },
-            ].map((stat, i) => (
-              <motion.div
-                key={stat.label}
-                className="text-center"
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7 + i * 0.08 }}
-              >
-                <div
-                  className="text-3xl font-black text-primary-400 leading-none"
-                  style={{
-                    fontFamily: "Orbitron, sans-serif",
-                    textShadow: "0 0 20px rgba(249,115,22,0.4)",
-                  }}
-                >
-                  {String(stat.value).padStart(2, "0")}
-                </div>
-                <div className="text-xs text-surface-500 tracking-widest uppercase mt-1">
-                  {stat.label}
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-
-          {/* Search */}
-          <motion.div
-            className="max-w-lg mx-auto"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.75, duration: 0.5 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="max-w-[760px] mx-auto"
           >
-            <div className="relative">
-              {/* Glow behind input */}
-              <div
-                className="absolute -inset-0.5 rounded-lg transition-opacity duration-500 pointer-events-none"
-                style={{
-                  background: "linear-gradient(90deg, rgba(249,115,22,0.3), rgba(251,146,60,0.15), rgba(249,115,22,0.3))",
-                  filter: "blur(6px)",
-                  opacity: searchFocused ? 1 : 0,
-                }}
-              />
-              <div
-                className="relative flex items-center bg-surface-900/80 border rounded-lg transition-all duration-300 backdrop-blur-sm overflow-hidden"
-                style={{
-                  borderColor: searchFocused
-                    ? "rgba(249,115,22,0.55)"
-                    : "rgba(51,65,85,0.7)",
-                }}
-              >
-                {/* Left accent bar */}
-                <div
-                  className="absolute left-0 inset-y-0 w-0.5 transition-opacity duration-300"
+            <Kicker>Herramientas · Comunidad</Kicker>
+            <h1 className="hub-title text-5xl sm:text-6xl font-black leading-tight mt-4 mb-4">
+              Herramientas para{" "}
+              <span className="text-primary-400" style={{ textShadow: "0 0 30px rgba(249,115,22,0.35)" }}>
+                videojuegos
+              </span>
+            </h1>
+            <p className="hub-lead text-surface-400 max-w-[56ch] mx-auto text-lg leading-relaxed mb-8">
+              Recursos para mejorar tu juego: calculadoras, planificadores y bases de datos.
+              Creadas por y para la comunidad gaming.
+            </p>
+
+            {/* hub-tools: search + sort */}
+            <div className="hub-tools flex gap-3 max-w-[600px] mx-auto mb-6 items-stretch justify-center">
+              <div className="hub-search flex-1">
+                <div className="relative">
+                  <div
+                    className="absolute -inset-0.5 rounded-lg transition-opacity duration-500 pointer-events-none"
+                    style={{
+                      background: "linear-gradient(90deg, rgba(249,115,22,0.3), rgba(251,146,60,0.15), rgba(249,115,22,0.3))",
+                      filter: "blur(6px)",
+                      opacity: searchFocused ? 1 : 0,
+                    }}
+                  />
+                  <div
+                    className="relative flex items-center bg-surface-900/80 border rounded-lg transition-all duration-300 backdrop-blur-sm overflow-hidden"
+                    style={{
+                      borderColor: searchFocused
+                        ? "rgba(249,115,22,0.55)"
+                        : "rgba(51,65,85,0.7)",
+                    }}
+                  >
+                    <div
+                      className="absolute left-0 inset-y-0 w-0.5 transition-opacity duration-300"
+                      style={{
+                        background: "linear-gradient(to bottom, transparent, rgba(249,115,22,0.8), transparent)",
+                        opacity: searchFocused ? 1 : 0,
+                      }}
+                    />
+                    <Search
+                      className="absolute left-4 h-4 w-4 transition-colors duration-300"
+                      style={{ color: searchFocused ? "rgb(251,146,60)" : "rgb(100,116,139)" }}
+                    />
+                    <input
+                      type="text"
+                      placeholder="Buscar herramientas, juegos…"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      onFocus={() => setSearchFocused(true)}
+                      onBlur={() => setSearchFocused(false)}
+                      className="w-full bg-transparent pl-12 pr-4 py-3.5 text-surface-200 placeholder:text-surface-500 focus:outline-none text-sm"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Sort dropdown */}
+              <div className="dd relative">
+                <div className="fixed inset-0 z-40" style={{ display: sortOpen ? "block" : "none" }} onClick={() => setSortOpen(false)} />
+                <button
+                  className="dd__trigger inline-flex items-center gap-2 px-4 py-3.5 rounded-lg border transition-all duration-300 text-sm"
                   style={{
-                    background: "linear-gradient(to bottom, transparent, rgba(249,115,22,0.8), transparent)",
-                    opacity: searchFocused ? 1 : 0,
+                    background: "rgba(15,23,42,0.8)",
+                    borderColor: "rgba(51,65,85,0.7)",
+                    color: sortOpen ? "rgb(251,146,60)" : "rgb(148,163,184)",
+                    minWidth: "160px",
+                    height: "46px",
                   }}
-                />
-                <Search
-                  className="absolute left-4 h-4 w-4 transition-colors duration-300"
-                  style={{ color: searchFocused ? "rgb(251,146,60)" : "rgb(100,116,139)" }}
-                />
-                <input
-                  type="text"
-                  placeholder="BUSCAR HERRAMIENTAS..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  onFocus={() => setSearchFocused(true)}
-                  onBlur={() => setSearchFocused(false)}
-                  className="w-full bg-transparent pl-12 pr-4 py-3.5 text-surface-200 placeholder:text-surface-600 focus:outline-none"
-                  style={{
-                    fontFamily: "Orbitron, sans-serif",
-                    fontSize: "0.65rem",
-                    letterSpacing: "0.25em",
-                  }}
-                />
+                  onClick={() => setSortOpen(!sortOpen)}
+                >
+                  <Icon name="filter" size={16} />
+                  <span className="flex-1 text-left">{currentSortLabel}</span>
+                  <ChevronDown
+                    className="w-4 h-4 transition-transform duration-300"
+                    style={{ transform: sortOpen ? "rotate(180deg)" : "rotate(0deg)" }}
+                  />
+                </button>
+                {sortOpen && (
+                  <div
+                    className="dd__menu absolute right-0 top-full mt-2 z-50 min-w-[200px] rounded-lg border py-1 backdrop-blur-md shadow-xl"
+                    style={{
+                      background: "rgba(15,23,42,0.95)",
+                      borderColor: "rgba(71,85,105,0.7)",
+                    }}
+                  >
+                    <div className="dd__header px-4 py-2 text-xs tracking-widest text-surface-500 uppercase font-mono">
+                      Ordenar por
+                    </div>
+                    {SORT_OPTIONS.map((opt) => {
+                      const active = sortMode === opt.value;
+                      return (
+                        <button
+                          key={opt.value}
+                          className="dd__item flex items-center gap-3 w-full text-left px-4 py-2.5 text-sm transition-colors"
+                          style={{
+                            color: active ? "rgb(251,146,60)" : "rgb(148,163,184)",
+                            background: active ? "rgba(249,115,22,0.08)" : "transparent",
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!active) e.currentTarget.style.background = "rgba(30,41,59,0.5)";
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!active) e.currentTarget.style.background = "transparent";
+                          }}
+                          onClick={() => {
+                            setSortMode(opt.value);
+                            setSortOpen(false);
+                          }}
+                        >
+                          <span className="flex-1">{opt.label}</span>
+                          {active && <Icon name="check" size={15} />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </div>
+
+            {/* hub-meta stats */}
+            <div className="hub-meta flex gap-6 justify-center flex-wrap">
+              <span className="inline-flex items-center gap-2 font-mono text-xs tracking-wider text-surface-500">
+                <Icon name="gamepad" size={15} className="text-primary-400" />
+                {GAMES.length} juegos
+              </span>
+              <span className="inline-flex items-center gap-2 font-mono text-xs tracking-wider text-surface-500">
+                <Icon name="wrench" size={15} className="text-primary-400" />
+                {totalTools} herramientas
+              </span>
+              <span className="inline-flex items-center gap-2 font-mono text-xs tracking-wider text-surface-500">
+                <Icon name="bolt" size={15} className="text-primary-400" />
+                Siempre actualizado
+              </span>
+            </div>
           </motion.div>
-        </div>
+        </section>
 
-        {/* Cards grid */}
-        <div className="container mx-auto px-4 pb-24">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
-            <AnimatePresence mode="popLayout">
-              {filteredTools.map((game, index) => (
-                <GameCard key={game.id} game={game} index={index} />
-              ))}
-            </AnimatePresence>
-          </div>
-
-          {/* Empty state */}
-          {filteredTools.length === 0 && (
+        {/* Grid */}
+        <section className="hub-grid-wrap container mx-auto px-4 pb-24">
+          {filteredTools.length ? (
+            <div className="hub-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+              <AnimatePresence mode="popLayout">
+                {filteredTools.map((game, index) => (
+                  <motion.div
+                    key={game.slug}
+                    layout
+                    initial={{ opacity: 0, y: 40, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.92 }}
+                    transition={{ delay: index * 0.12, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+                  >
+                    <GameCard game={game} go={go} delay={index * 80} className="in" />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          ) : (
             <motion.div
               className="text-center py-24"
               initial={{ opacity: 0 }}
@@ -290,16 +359,13 @@ export default function ToolsLandingPage() {
               <div className="w-14 h-14 rounded-lg bg-surface-900/60 border border-surface-700/40 flex items-center justify-center mx-auto mb-5">
                 <Terminal className="w-6 h-6 text-surface-600" />
               </div>
-              <p
-                className="text-surface-500 text-xs tracking-[0.4em] uppercase"
-                style={{ fontFamily: "Orbitron, sans-serif" }}
-              >
+              <p className="text-surface-500 text-xs tracking-[0.4em] uppercase font-mono">
                 // Sin resultados
               </p>
             </motion.div>
           )}
-        </div>
+        </section>
       </div>
-    </div>
+    </main>
   );
 }
