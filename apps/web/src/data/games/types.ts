@@ -35,6 +35,7 @@ export interface CategoryEntry {
 export interface ExternalLinkEntry {
   key: string;
   href: string;
+  desc?: string;
 }
 
 export interface GameEntry {
