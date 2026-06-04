@@ -1,6 +1,6 @@
 "use client";
 
-import { BoffContainer } from "@/components/boffmedia/tools/BoffContainer";
+import { BoffContainer } from "@/components/boffmedia-old/tools/BoffContainer";
 import { SkyFormData } from "../store";
 import {
   QuestConfigurationSection,

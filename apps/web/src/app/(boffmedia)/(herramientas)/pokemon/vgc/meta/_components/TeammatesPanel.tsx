@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { spriteUrl, handleSpriteError } from "@/features/vgc-tracker/types";
 import { Card, CardContent } from "@/components/ui/primitives/card";
-import { ToolSectionHeader } from "@/components/boffmedia/tools/ToolSectionHeader";
+import { ToolSectionHeader } from "@/components/boffmedia-old/tools/ToolSectionHeader";
 
 interface TeammateEntry {
   name:    string;

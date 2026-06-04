@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
-import { BoffContainer } from "@/components/boffmedia/tools/BoffContainer";
+import { BoffContainer } from "@/components/boffmedia-old/tools/BoffContainer";
 
 interface PolicyShellProps {
   title: string;

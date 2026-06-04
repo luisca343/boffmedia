@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/primitives/button"
 import { useGetLeaderboards } from "@/hooks/events/useGetLeaderboards"
-import { SectionHeader, SectionLoading } from '@/components/boffmedia/sections';
+import { SectionHeader, SectionLoading } from '@/components/boffmedia-old/sections';
 import { LeaderboardFilters } from "../_components/LeaderboardFilters"
 import { LeaderboardTabs } from "./_components/leaderboard/LeaderboardTabs"
 export default function FullLeaderboardComponent() {
