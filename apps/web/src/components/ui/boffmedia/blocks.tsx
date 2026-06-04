@@ -44,6 +44,39 @@ export function Metric({ value, label, size = "md", tone = "text", mono = false,
 }
 
 // =============================================================================
+// Stat — stats panel item (icon + value + label + sub)
+// Used in profile stats grid
+// =============================================================================
+interface StatProps {
+  icon: string
+  value: string
+  label: string
+  sub?: string
+}
+
+export function Stat({ icon, value, label, sub }: StatProps) {
+  return (
+    <div
+      className="flex flex-col gap-[0.15rem] p-[1.1rem] rounded-[var(--radius)] bg-[var(--surface-2)]"
+      style={{ border: "var(--hairline) solid var(--border)" }}
+    >
+      <span
+        className="w-9 h-9 rounded-[var(--radius)] grid place-items-center mb-2"
+        style={{
+          color: "var(--orange-500)",
+          background: "color-mix(in srgb, var(--orange-500) 12%, transparent)",
+        }}
+      >
+        <Icon name={icon} size={18} />
+      </span>
+      <span className="font-display font-extrabold text-[length:var(--t-2xl)] whitespace-nowrap leading-none">{value}</span>
+      <span className="text-sm font-semibold mt-[0.1rem]">{label}</span>
+      {sub && <span className="text-xs text-[var(--text-dim)] mt-[0.05rem]">{sub}</span>}
+    </div>
+  )
+}
+
+// =============================================================================
 // IconButton — 38px square icon control
 // dot = notification dot, bordered = border variant, active = active state
 // =============================================================================
@@ -299,7 +332,7 @@ interface LinkedRowProps {
 }
 
 export function LinkedRow({ icon, iconClass, name, sub, end }: LinkedRowProps) {
-  const iconBg = iconClass === "discord" ? "#5865f2" : iconClass === "mc" ? "linear-gradient(135deg, var(--emerald-500), #047857)" : "var(--surface-3)"
+  const iconBg = iconClass === "discord" ? "#5865f2" : iconClass === "mc" ? "linear-gradient(135deg, var(--emerald-500), #047857)" : iconClass === "steam" ? "linear-gradient(135deg, var(--cyan-500), var(--cyan-600))" : "var(--surface-3)"
 
   return (
     <div className="flex items-center gap-[0.9rem] p-[0.85rem] rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-2)]">
@@ -406,73 +439,98 @@ export function Marquee({ items, repeat = 2, icon = "bolt" }: MarqueeProps) {
 }
 
 // =============================================================================
-// Footer — page footer (for showcase documentation demo)
+// Footer — global page footer (pixel-perfect port from handoff)
 // =============================================================================
+const FOOTER_COLS = [
+  { title: "Plataforma", links: [["Juegos", "/herramientas"], ["Eventos", "/eventos"], ["Herramientas", "/herramientas"], ["Comunidad", "/comunidad"], ["Clasificación", "/eventos"]] },
+  { title: "Recursos", links: [["Blog", "#"], ["Componentes", "/componentes"], ["Servidores", "#"], ["Estado", "#"], ["API", "#"]] },
+  { title: "Compañía", links: [["Sobre nosotros", "#"], ["Contacto", "#"], ["Prensa", "#"], ["Discord", "#"]] },
+]
+
 interface FooterProps {
   go: (path: string) => void
 }
 
 export function Footer({ go }: FooterProps) {
   const year = new Date().getFullYear()
+  const handle = (href: string) => (e: React.MouseEvent) => {
+    if (href && href.startsWith("/")) { e.preventDefault(); go(href) }
+  }
 
   return (
     <footer className="border-t border-[var(--border)] bg-[var(--surface)] mt-auto">
       <div className="grid grid-cols-[1.1fr_2fr] gap-14 py-16 px-8 max-[920px]:grid-cols-1 max-[920px]:gap-10">
+        {/* Brand */}
         <div className="flex flex-col gap-[1.1rem] max-w-[30ch]">
-          <div className="inline-flex items-center gap-[0.6rem]">
-            <span className="w-[34px] h-[34px] rounded-[6px] bg-gradient-to-br from-[var(--orange-500)] to-[var(--orange-700)] grid place-items-center text-white font-bold text-sm">B</span>
-            <span className="font-display font-extrabold text-[1.3rem] tracking-[0.01em] text-[var(--orange-500)]">boffmedia</span>
-          </div>
-          <p className="text-sm leading-[1.65] text-[var(--text-muted)] m-0">Herramientas y recursos para que los jugadores lleven su experiencia al siguiente nivel.</p>
+          <a href="#" onClick={(e) => { e.preventDefault(); go("/") }} className="inline-flex items-center gap-[0.6rem]">
+            <img src="/assets/boff-logo.webp" alt="" width={34} height={34} className="rounded-[6px]" />
+            <span className="relative font-display font-extrabold text-[1.3rem] tracking-[0.01em] text-[var(--orange-500)] pr-[2.6rem]">
+              BoffMedia
+              <span className="absolute -top-[0.4rem] right-0 font-mono text-[0.5rem] font-bold tracking-[0.1em] px-[0.3rem] py-[0.12rem] text-[var(--on-accent)] bg-[var(--accent-bright)] rounded-[3px]">BETA</span>
+            </span>
+          </a>
+          <p className="text-[length:var(--t-sm)] leading-[1.65] text-[var(--text-muted)] m-0">
+            La plataforma para la comunidad de gaming, herramientas competitivas y eventos. Hecho por jugadores, para jugadores.
+          </p>
           <div className="flex gap-[0.6rem]">
-            <IconButton icon="discord" label="Discord" bordered href="#" size={16} />
-            <IconButton icon="globe" label="Web" bordered href="#" size={16} />
-            <IconButton icon="twitter" label="Twitter" bordered href="#" size={16} />
-            <IconButton icon="mail" label="Email" bordered href="#" size={16} />
+            <IconButton icon="discord" label="Discord" bordered href="#" />
+            <IconButton icon="globe" label="Web" bordered href="#" />
+            <IconButton icon="message" label="Foro" bordered href="#" />
+            <IconButton icon="star" label="Reseñas" bordered href="#" />
           </div>
         </div>
-        <div className="grid grid-cols-[1fr_1fr_1fr_1.4fr] gap-8 max-[920px]:grid-cols-2 max-[560px]:grid-cols-1">
-          {[
-            { title: "Plataforma", links: [{ label: "Herramientas", href: "#" }, { label: "Eventos", href: "#" }, { label: "Comunidad", href: "#" }, { label: "Marketplace", href: "#" }] },
-            { title: "Juegos", links: [{ label: "Pokémon", href: "#" }, { label: "MH Wilds", href: "#" }, { label: "Minecraft", href: "#" }, { label: "TCG Pocket", href: "#" }] },
-            { title: "Recursos", links: [{ label: "API", href: "#" }, { label: "Estado", href: "#" }, { label: "Cambios", href: "#" }, { label: "FAQ", href: "#" }] },
-            { title: "Newsletter", links: [] },
-          ].map((col) => (
+
+        {/* Link columns */}
+        <div className="grid grid-cols-[repeat(3,1fr)_1.4fr] gap-8 max-[920px]:grid-cols-2 max-[560px]:grid-cols-1">
+          {FOOTER_COLS.map((col) => (
             <div key={col.title}>
-              <h4 className="font-mono text-xs font-bold uppercase text-[var(--text)] tracking-wider m-0 mb-[1.1rem]">{col.title}</h4>
-              {col.links.length > 0 ? (
-                <ul className="list-none p-0 m-0 flex flex-col gap-[0.7rem]">
-                  {col.links.map((link) => (
-                    <li key={link.label}>
-                      <a
-                        href={link.href}
-                        onClick={(e) => { e.preventDefault(); go(link.href) }}
-                        className="text-sm text-[var(--text-muted)] transition-colors duration-[var(--dur)] hover:text-[var(--orange-500)]"
-                      >
-                        {link.label}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <div className="flex gap-[0.5rem] mt-[0.9rem]">
-                  <input
-                    className="flex-1 h-[46px] px-4 rounded-[var(--btn-radius,var(--radius-pill,9999px))] text-sm bg-[var(--surface-2)] border border-[var(--border-strong)] text-[var(--text)] outline-none focus:border-[var(--accent)]"
-                    placeholder="tu@correo.com"
-                  />
-                  <Button variant="primary" size="sm">OK</Button>
-                </div>
-              )}
+              <h4 className="font-mono text-[length:var(--t-xs)] font-bold uppercase tracking-[var(--label-spacing,0.1em)] text-[var(--text)] m-0 mb-[1.1rem]">{col.title}</h4>
+              <ul className="list-none p-0 m-0 flex flex-col gap-[0.7rem]">
+                {col.links.map(([label, href]) => (
+                  <li key={label}>
+                    <a
+                      href={href.startsWith("/") ? `#${href}` : href}
+                      onClick={handle(href)}
+                      className="text-[length:var(--t-sm)] text-[var(--text-muted)] transition-colors duration-[var(--dur)] hover:text-[var(--orange-500)]"
+                    >
+                      {label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
             </div>
           ))}
+          {/* Newsletter */}
+          <div>
+            <h4 className="font-mono text-[length:var(--t-xs)] font-bold uppercase tracking-[var(--label-spacing,0.1em)] text-[var(--text)] m-0 mb-[1.1rem]">Newsletter</h4>
+            <p className="text-[var(--text-muted)] text-[length:var(--t-sm)] mt-0 mb-0">Novedades, torneos y lanzamientos.</p>
+            <form className="flex gap-[0.5rem] mt-[0.9rem]" onSubmit={(e) => e.preventDefault()}>
+              <input
+                className="flex-1 h-[46px] px-4 rounded-[var(--btn-radius,var(--radius-pill,9999px))] text-[length:var(--t-sm)] bg-[var(--surface-2)] border border-[var(--border-strong)] text-[var(--text)] outline-none focus:border-[var(--accent)]"
+                type="email"
+                placeholder="tu@correo.com"
+                aria-label="Correo"
+              />
+              <Button variant="primary" iconRight="arrow" aria-label="Suscribirse" />
+            </form>
+          </div>
         </div>
       </div>
-      <div className="flex items-center justify-between gap-4 py-[1.4rem] px-8 border-t border-[var(--border)] text-sm max-[560px]:flex-col max-[560px]:items-start">
-        <span className="text-[var(--text-muted)]">© {year} BoffMedia. Todos los derechos reservados.</span>
+
+      {/* Legal bar */}
+      <div className="flex items-center justify-between gap-4 py-[1.4rem] px-8 border-t border-[var(--border)] text-[length:var(--t-sm)] max-[560px]:flex-col max-[560px]:items-start">
+        <span className="text-[var(--text-dim)]">© {year} BoffMedia. Todos los derechos reservados.</span>
         <div className="flex gap-6">
-          <a href="#" onClick={(e) => { e.preventDefault(); go("#") }} className="text-[var(--text-muted)] transition-colors hover:text-[var(--orange-500)]">Privacidad</a>
-          <a href="#" onClick={(e) => { e.preventDefault(); go("#") }} className="text-[var(--text-muted)] transition-colors hover:text-[var(--orange-500)]">Términos</a>
-          <a href="#" onClick={(e) => { e.preventDefault(); go("#") }} className="text-[var(--text-muted)] transition-colors hover:text-[var(--orange-500)]">Cookies</a>
+          {["Privacidad", "Términos", "Cookies"].map((label) => (
+            <a
+              key={label}
+              href="#"
+              onClick={(e) => { e.preventDefault(); go("/privacidad") }}
+              className="text-[var(--text-muted)] transition-colors duration-[var(--dur)] hover:text-[var(--orange-500)]"
+            >
+              {label}
+            </a>
+          ))}
         </div>
       </div>
     </footer>

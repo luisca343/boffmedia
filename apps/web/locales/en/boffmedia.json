@@ -119,33 +119,49 @@
       }
     },
     "footer": {
-      "tagline": "Your ultimate gaming platform",
+      "tagline": "The platform for the gaming community, competitive tools and events. Built by gamers, for gamers.",
       "sections": {
         "platform": {
           "title": "Platform",
           "links": {
             "games": "Games",
             "events": "Events",
-            "community": "Community"
+            "tools": "Tools",
+            "community": "Community",
+            "ranking": "Ranking"
+          }
+        },
+        "resources": {
+          "title": "Resources",
+          "links": {
+            "blog": "Blog",
+            "components": "Components",
+            "servers": "Servers",
+            "status": "Status",
+            "api": "API"
           }
         },
         "company": {
           "title": "Company",
           "links": {
-            "about": "About Us",
-            "blog": "Blog"
+            "about": "About us",
+            "contact": "Contact",
+            "press": "Press",
+            "discord": "Discord"
           }
         }
       },
       "newsletter": {
-        "title": "Subscribe to Newsletter",
-        "emailPlaceholder": "Email",
-        "joinButton": "Join"
+        "title": "Newsletter",
+        "description": "News, tournaments and launches.",
+        "emailPlaceholder": "your@email.com",
+        "joinButton": "→"
       },
       "copyright": "© {year} BoffMedia. All rights reserved.",
       "legal": {
         "privacy": "Privacy",
-        "terms": "Terms"
+        "terms": "Terms",
+        "cookies": "Cookies"
       }
     },
     "manga": {
