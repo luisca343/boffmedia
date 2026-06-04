@@ -1,66 +1,76 @@
 "use client"
 
 import * as React from "react"
-import "@/styles/boffmedia-primitives.css"
-import "./showcase.css"
 
 // Primitives — boffmedia design system
-import { Icon } from "@/components/ui/primitives/boffmedia/icon"
-import { BoffButton as Button } from "@/components/ui/primitives/boffmedia/button"
-import { BoffCard as Card } from "@/components/ui/primitives/boffmedia/card"
-import { BoffBadge as Badge } from "@/components/ui/primitives/boffmedia/badge"
-import { Kicker } from "@/components/ui/primitives/boffmedia/kicker"
-import { Tag } from "@/components/ui/primitives/boffmedia/tag"
-import { Callout } from "@/components/ui/primitives/boffmedia/callout"
-import { BoffAlert as Alert } from "@/components/ui/primitives/boffmedia/alert"
-import { ToastProvider, useToast } from "@/components/ui/primitives/boffmedia/toast-provider"
-import { BoffTooltip as Tooltip } from "@/components/ui/primitives/boffmedia/tooltip"
-import { BoffModal as Modal } from "@/components/ui/primitives/boffmedia/dialog"
-import { BoffPopover as Popover } from "@/components/ui/primitives/boffmedia/popover"
-import { Field } from "@/components/ui/primitives/boffmedia/field"
-import { BoffInput as Input } from "@/components/ui/primitives/boffmedia/input"
-import { SearchInput } from "@/components/ui/primitives/boffmedia/search-input"
-import { BoffSwitch as Switch } from "@/components/ui/primitives/boffmedia/switch"
-import { BoffCheckbox as Checkbox } from "@/components/ui/primitives/boffmedia/checkbox"
-import { BoffSlider as Slider } from "@/components/ui/primitives/boffmedia/slider"
-import { RadioGroup } from "@/components/ui/primitives/boffmedia/radio-group"
-import { BoffTabs as Tabs } from "@/components/ui/primitives/boffmedia/tabs"
-import { Segmented } from "@/components/ui/primitives/boffmedia/segmented"
-import { Breadcrumb } from "@/components/ui/primitives/boffmedia/breadcrumb"
-import { Pagination } from "@/components/ui/primitives/boffmedia/pagination"
-import { BoffAvatar as Avatar, BoffAvatarGroup as AvatarGroup } from "@/components/ui/primitives/boffmedia/avatar"
-import { IconBox } from "@/components/ui/primitives/boffmedia/icon-box"
-import { BoffSkeleton as Skeleton } from "@/components/ui/primitives/boffmedia/skeleton"
-import { BoffProgress as Progress, BoffRing as Ring } from "@/components/ui/primitives/boffmedia/progress"
-import { Stat } from "@/components/ui/primitives/boffmedia/stat"
-import { CodeBlock } from "@/components/ui/primitives/boffmedia/code-block"
-import { EmptyState } from "@/components/ui/primitives/boffmedia/empty-state"
+import { Icon } from "@/components/boffmedia/primitives/icon"
+import { BoffButton as Button } from "@/components/boffmedia/primitives/button"
+import { BoffCard as Card } from "@/components/boffmedia/primitives/card"
+import { BoffBadge as Badge } from "@/components/boffmedia/primitives/badge"
+import { Kicker } from "@/components/boffmedia/primitives/kicker"
+import { Tag } from "@/components/boffmedia/primitives/tag"
+import { Callout } from "@/components/boffmedia/primitives/callout"
+import { BoffAlert as Alert } from "@/components/boffmedia/primitives/alert"
+import { ToastProvider, useToast } from "@/components/boffmedia/primitives/toast-provider"
+import { BoffTooltip as Tooltip } from "@/components/boffmedia/primitives/tooltip"
+import { BoffModal as Modal } from "@/components/boffmedia/primitives/dialog"
+import { BoffPopover as Popover } from "@/components/boffmedia/primitives/popover"
+import { Field } from "@/components/boffmedia/primitives/field"
+import { BoffInput as Input } from "@/components/boffmedia/primitives/input"
+import { SearchInput } from "@/components/boffmedia/primitives/search-input"
+import { BoffSwitch as Switch } from "@/components/boffmedia/primitives/switch"
+import { BoffCheckbox as Checkbox } from "@/components/boffmedia/primitives/checkbox"
+import { BoffSlider as Slider } from "@/components/boffmedia/primitives/slider"
+import { RadioGroup } from "@/components/boffmedia/primitives/radio-group"
+import { BoffTabs as Tabs } from "@/components/boffmedia/primitives/tabs"
+import { Segmented } from "@/components/boffmedia/primitives/segmented"
+import { Breadcrumb } from "@/components/boffmedia/primitives/breadcrumb"
+import { Pagination } from "@/components/boffmedia/primitives/pagination"
+import { BoffAvatar as Avatar, BoffAvatarGroup as AvatarGroup } from "@/components/boffmedia/primitives/avatar"
+import { IconBox } from "@/components/boffmedia/primitives/icon-box"
+import { BoffSkeleton as Skeleton } from "@/components/boffmedia/primitives/skeleton"
+import { BoffProgress as Progress, BoffRing as Ring } from "@/components/boffmedia/primitives/progress"
+import { Stat } from "@/components/boffmedia/primitives/stat"
+import { CodeBlock } from "@/components/boffmedia/primitives/code-block"
+import { EmptyState } from "@/components/boffmedia/primitives/empty-state"
 
 // Domain
-import { GameCard } from "@/components/ui/boffmedia/game-card"
-import { ToolsTypeBadge } from "@/components/ui/boffmedia/tools-type-badge"
+import { GameCard } from "@/components/boffmedia/ui/game-card"
+import { ToolsTypeBadge } from "@/components/boffmedia/ui/tools-type-badge"
 
 // Tool-kit components
-import { ToolPanel, ToolStatBars, ToolApp, SegTabs, ToolSelect, ToolTable, CopyButton, Picker, HpBar } from "@/components/ui/primitives/boffmedia"
-import { PokeSprite } from "@/components/shared/pokemon/PokeSprite"
-import { TeamSprites } from "@/components/shared/pokemon/TeamSprites"
-import { BaseStatBars } from "@/components/shared/pokemon/BaseStatBars"
-import { FeaturedTool } from "@/components/ui/boffmedia/featured-tool"
-import { ToolCard } from "@/components/ui/boffmedia/tool-card"
+import { ToolPanel, ToolStatBars, ToolApp, SegTabs, ToolSelect, ToolTable, CopyButton, Picker, HpBar } from "@/components/boffmedia/primitives"
+import { PokeSprite } from "@/components/boffmedia/primitives/PokeSprite"
+import { TeamSprites } from "@/components/boffmedia/primitives/TeamSprites"
+import { BaseStatBars } from "@/components/boffmedia/primitives/BaseStatBars"
+import { FeaturedTool } from "@/components/boffmedia/ui/featured-tool"
+import { ToolCard } from "@/components/boffmedia/ui/tool-card"
 
 // Domain blocks
-import { Metric, IconButton, CardTitle, ToolRow, EventCard, Leaderboard, LeaderRow, LinkedRow, ActivityItem, AchievementTile, Marquee, Footer } from "@/components/ui/boffmedia/blocks"
+import { Metric } from "@/components/boffmedia/ui/metric"
+import { IconButton } from "@/components/boffmedia/ui/icon-button"
+import { CardTitle } from "@/components/boffmedia/ui/card-title"
+import { ToolRow } from "@/components/boffmedia/ui/tool-row"
+import { EventCard } from "@/components/boffmedia/ui/event-card"
+import { Leaderboard } from "@/components/boffmedia/ui/leaderboard"
+import { LeaderRow } from "@/components/boffmedia/ui/leader-row"
+import { LinkedRow } from "@/components/boffmedia/ui/linked-row"
+import { ActivityItem } from "@/components/boffmedia/ui/activity-item"
+import { AchievementTile } from "@/components/boffmedia/ui/achievement-tile"
+import { Marquee } from "@/components/boffmedia/ui/marquee"
+import { Footer } from "@/components/boffmedia/ui/footer"
 
 // New tool components
-import { FavStar } from "@/components/ui/boffmedia/fav-star"
-import { ToolTile } from "@/components/ui/boffmedia/tool-tile"
-import { ToolCardFav } from "@/components/ui/boffmedia/tool-card-fav"
-import { GameSwitcher } from "@/components/ui/boffmedia/game-switcher"
-import { ToolCommand } from "@/components/ui/boffmedia/tool-command"
-import { useFavorites, useRecent } from "@/components/ui/boffmedia/tools-store"
+import { FavStar } from "@/components/boffmedia/ui/fav-star"
+import { ToolTile } from "@/components/boffmedia/ui/tool-tile"
+import { ToolCardFav } from "@/components/boffmedia/ui/tool-card-fav"
+import { GameSwitcher } from "@/components/boffmedia/ui/game-switcher"
+import { ToolCommand } from "@/components/boffmedia/ui/tool-command"
+import { useFavorites, useRecent } from "@/components/boffmedia/ui/tools-store"
 
 // Data
 import { GAMES, GAMES_ORDER, type GameData } from "./_data/games-data"
+import Link from "next/link"
 
 // ============================================================================
 // Data helpers (unify categories.tools nav + game.tools rich entries)
@@ -1622,10 +1632,21 @@ function BlocksSection() {
       <div className="p-7">
        {/* Navbar mock */}
        <div className="flex items-center justify-between gap-6 py-[0.85rem] px-5 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface)]">
-        <div className="flex items-center gap-[0.6rem]">
-         <div className="w-[34px] h-[34px] rounded-[6px] bg-gradient-to-br from-[var(--orange-500)] to-[var(--orange-700)] grid place-items-center text-white font-bold text-sm">B</div>
-         <span className="font-display font-extrabold text-[1.1rem] text-[var(--orange-500)]">BoffMedia</span>
-        </div>
+        <Link href="/" className="inline-flex items-center gap-[0.6rem] flex-shrink-0">
+          <img
+            src="/img/boff-logo.webp"
+            alt=""
+            width={34}
+            height={34}
+            className="rounded-[6px]"
+          />
+          <span className="relative font-display font-extrabold text-[1.3rem] tracking-[0.01em] text-[var(--orange-500)] pr-[2.6rem]">
+            BoffMedia
+            <span className="absolute -top-[0.4rem] right-0 font-mono text-[0.5rem] font-bold tracking-[0.1em] px-[0.3rem] py-[0.12rem] text-[var(--on-accent)] bg-[var(--accent-bright)] rounded-[3px]">
+              BETA
+            </span>
+          </span>
+        </Link>
         <div className="flex items-center gap-1 max-[920px]:hidden">
          {[
           ["home", "Inicio", true],

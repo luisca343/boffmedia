@@ -2,11 +2,11 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "../primitives/boffmedia/icon"
-import { BoffBadge as Badge } from "../primitives/boffmedia/badge"
-import { BoffButton as Button } from "../primitives/boffmedia/button"
-import { IconBox } from "../primitives/boffmedia/icon-box"
-import { BoffCard as Card } from "../primitives/boffmedia/card"
+import { Icon } from "../primitives/icon"
+import { BoffBadge as Badge } from "../primitives/badge"
+import { BoffButton as Button } from "../primitives/button"
+import { IconBox } from "../primitives/icon-box"
+import { BoffCard as Card } from "../primitives/card"
 
 interface FeaturedToolData {
   title: string

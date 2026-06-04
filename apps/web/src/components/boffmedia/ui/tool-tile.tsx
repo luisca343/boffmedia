@@ -1,8 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { Icon } from "../primitives/boffmedia/icon"
-import { BoffBadge as Badge } from "../primitives/boffmedia/badge"
+import { Icon } from "../primitives/icon"
+import { BoffBadge as Badge } from "../primitives/badge"
 import { FavStar } from "./fav-star"
 import { useRecent } from "./tools-store"
 
