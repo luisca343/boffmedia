@@ -33,9 +33,9 @@ const kindBgs: Record<string, string> = {
 
 export function BoffBadge({ className, kind, children, ...props }: BoffBadgeProps) {
   const base = cn(
-    "inline-flex items-center gap-1",
+    "inline-flex items-center gap-[0.4rem]",
     "text-[0.68rem] font-semibold tracking-[0.08em] uppercase",
-    "py-1 px-2.5",
+    "px-[0.65rem] py-[0.3rem]",
     "border border-solid",
     kind && kindStyles[kind],
     className,

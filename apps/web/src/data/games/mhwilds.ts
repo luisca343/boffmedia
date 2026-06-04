@@ -14,10 +14,10 @@ export const mhwilds: GameEntry = {
   navHref: "/mhwilds",
 
   externalLinks: [
-    { key: "officialWebsite", href: "https://www.monsterhunter.com/" },
-    { key: "redditCommunity", href: "https://www.reddit.com/r/MonsterHunter/" },
-    { key: "wiki", href: "https://monsterhunter.fandom.com/wiki/Monster_Hunter_Wilds" },
-    { key: "videos", href: "https://www.youtube.com/results?search_query=monster+hunter+wilds" },
+    { key: "officialWebsite", href: "https://www.monsterhunter.com/", desc: "monsterhunter.com" },
+    { key: "redditCommunity", href: "https://www.reddit.com/r/MonsterHunter/", desc: "Comunidad de Reddit" },
+    { key: "wiki", href: "https://monsterhunter.fandom.com/wiki/Monster_Hunter_Wilds", desc: "Wiki de MH Wilds" },
+    { key: "videos", href: "https://www.youtube.com/results?search_query=monster+hunter+wilds", desc: "Guías y gameplay" },
   ],
 
   categories: [
