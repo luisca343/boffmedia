@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { Users, Trophy, Repeat2 } from "lucide-react";
-import { PageHeader } from "@/components/boffmedia/tools/PageHeader";
-import { BoffContainer } from "@/components/boffmedia/tools/BoffContainer";
-import { BOFF_VARIANTS } from "@/components/boffmedia/tools/utils/boffVariants";
+import { PageHeader } from "@/components/boffmedia-old/tools/PageHeader";
+import { BoffContainer } from "@/components/boffmedia-old/tools/BoffContainer";
+import { BOFF_VARIANTS } from "@/components/boffmedia-old/tools/utils/boffVariants";
 import { ParticipantsList } from "./_components/participants/ParticipantsList";
 import { GiveawayControls } from "./_components/GiveawayControls";
 import SpinnerAnimation from "./_components/spinner/SpinnerAnimation";

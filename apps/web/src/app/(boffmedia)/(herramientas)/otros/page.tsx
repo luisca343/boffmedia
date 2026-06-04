@@ -3,10 +3,10 @@
 import { motion } from "framer-motion";
 import { Gift, Key, ExternalLink, Plus, Terminal, type LucideIcon } from "lucide-react";
 import { FloatingSection } from "../../_components/layout/FloatingSection";
-import { PageHeader } from "@/components/boffmedia/tools/PageHeader";
-import { FeaturedTool } from "@/components/boffmedia/tools/FeaturedTool";
-import { ToolsGrid } from "@/components/boffmedia/tools/ToolsGrid";
-import { ExternalResources } from "@/components/boffmedia/tools/ExternalResources";
+import { PageHeader } from "@/components/boffmedia-old/tools/PageHeader";
+import { FeaturedTool } from "@/components/boffmedia-old/tools/FeaturedTool";
+import { ToolsGrid } from "@/components/boffmedia-old/tools/ToolsGrid";
+import { ExternalResources } from "@/components/boffmedia-old/tools/ExternalResources";
 import { otrosToolsConfig } from "@/data/games/otros";
 
 const ICON_MAP: Record<string, LucideIcon> = { Gift, Key };

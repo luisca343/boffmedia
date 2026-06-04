@@ -6,8 +6,8 @@ import { Trophy, ExternalLink, Medal, CheckCircle, Zap } from "lucide-react"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { useBoffSession } from "@/services/useBoffSession"
 import { InternalLink } from "@/components/ui/navigation/Link"
-import { AchievementBadge } from "@/components/boffmedia/event/AchievementBadge"
-import { getRarityTokens } from "@/components/boffmedia/event/rarityTokens"
+import { AchievementBadge } from "@/components/boffmedia-old/event/AchievementBadge"
+import { getRarityTokens } from "@/components/boffmedia-old/event/rarityTokens"
 import { EventSectionHeader } from "./EventSectionHeader"
 
 // ─── Types ────────────────────────────────────────────────────────────────────

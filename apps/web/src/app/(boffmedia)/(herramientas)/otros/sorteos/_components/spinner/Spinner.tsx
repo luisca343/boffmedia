@@ -1,7 +1,7 @@
 "use client"
 
 import SpinnerItem from "./SpinnerItem"
-import { BOFF_VARIANTS } from "@/components/boffmedia/tools/utils/boffVariants"
+import { BOFF_VARIANTS } from "@/components/boffmedia-old/tools/utils/boffVariants"
 
 interface SpinnerProps {
   spinItems: string[]

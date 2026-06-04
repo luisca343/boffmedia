@@ -2,7 +2,7 @@
 
 import { useEffect } from "react"
 import { motion } from "framer-motion"
-import { BOFF_VARIANTS } from "@/components/boffmedia/tools/utils/boffVariants"
+import { BOFF_VARIANTS } from "@/components/boffmedia-old/tools/utils/boffVariants"
 import { useGiveawayAnimation } from "../../_hooks/useGiveawayAnimation"
 import Spinner from "./Spinner"
 

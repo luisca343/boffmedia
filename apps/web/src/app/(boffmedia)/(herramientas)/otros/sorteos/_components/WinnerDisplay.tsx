@@ -3,10 +3,10 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { Trophy, Sparkles, Crown, Star } from "lucide-react";
-import { BoffContainer } from "@/components/boffmedia/tools/BoffContainer";
-import { BoffButton } from "@/components/boffmedia/tools/BoffButton";
-import { BOFF_VARIANTS } from "@/components/boffmedia/tools/utils/boffVariants";
-import { getBoffStyle } from "@/components/boffmedia/tools/utils/getBoffStyle";
+import { BoffContainer } from "@/components/boffmedia-old/tools/BoffContainer";
+import { BoffButton } from "@/components/boffmedia-old/tools/BoffButton";
+import { BOFF_VARIANTS } from "@/components/boffmedia-old/tools/utils/boffVariants";
+import { getBoffStyle } from "@/components/boffmedia-old/tools/utils/getBoffStyle";
 
 interface WinnerDisplayProps {
   winner: string;
