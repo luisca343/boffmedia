@@ -256,7 +256,8 @@ const HUB_NAV = [
     ["composition", "Composición", "layers"],
     ["blocks", "Bloques", "grid"],
     ["patterns", "Patrones", "grid"],
-    ["boff", "Boffmedia", "gamepad"],
+     ["boff", "Boffmedia", "gamepad"],
+     ["toolskit", "Herramientas", "wrench"],
     ["profile", "Perfil", "user"],
    ],
   ],
@@ -2722,6 +2723,376 @@ function RoadmapSection() {
 }
 
 // ============================================================================
+// Tool-kit demo components (extracted from the handoff tool-kit.jsx)
+// ============================================================================
+
+const TK_TYPE_COLORS: Record<string, string> = {
+  Normal: "#9fa19f", Fuego: "#e62829", Agua: "#2980ef", Eléctrico: "#fac000",
+  Planta: "#3fa129", Hielo: "#3dcef3", Lucha: "#ff8000", Veneno: "#9141cb",
+  Tierra: "#915121", Volador: "#81b9ef", Psíquico: "#ef4179", Bicho: "#91a119",
+  Roca: "#afa981", Fantasma: "#704170", Dragón: "#5060e1", Siniestro: "#624d4e",
+  Acero: "#60a1b8", Hada: "#ef70ef",
+}
+const TK_STAT_META: Record<string, [string, string]> = {
+  hp: ["PS", "#ff5959"], atk: ["Atq", "#f5ac78"], def: ["Def", "#fae078"],
+  spa: ["AtE", "#9db7f5"], spd: ["DfE", "#a7db8d"], spe: ["Vel", "#fa92b2"],
+}
+const TK_STAT_ORDER = ["hp", "atk", "def", "spa", "spd", "spe"] as const
+
+function TK_Panel({ title, meta, headRight, head, className = "", bodyClass = "", bodyStyle, noBody, style, children }: any) {
+  const showHead = head || title || meta != null || headRight
+  return (
+    <div className={"rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--card-bg)] " + className} style={style}>
+      {showHead && (head || (
+        <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-[var(--border)]">
+          <span className="font-display font-bold uppercase tracking-wider text-sm">{title}</span>
+          {headRight || (meta != null && <span className="font-mono text-xs text-[color:var(--text-dim)]">{meta}</span>)}
+        </div>
+      ))}
+      {noBody ? children : <div className={"p-4 " + bodyClass} style={bodyStyle}>{children}</div>}
+    </div>
+  )
+}
+
+function TK_StatBars({ title, items, tone, max }: any) {
+  const peak = max != null ? max : Math.max(...items.map((i: any) => i.pct), 1)
+  const color = tone || "var(--accent)"
+  return (
+    <div>
+      {title && <div className="font-mono text-xs tracking-wider uppercase text-[color:var(--text-dim)] mb-2">{title}</div>}
+      {items.map((it: any) => (
+        <div key={it.name} className="mb-1.5">
+          <div className="flex justify-between text-xs mb-0.5">
+            <span className="text-[color:var(--text-muted)]">{it.name}</span>
+            <span className="font-mono text-[color:var(--accent-bright)]">{it.pct}%</span>
+          </div>
+          <div className="h-1.5 rounded-full bg-[var(--surface-3)] overflow-hidden">
+            <div className="h-full rounded-full" style={{ width: (it.pct / peak) * 100 + "%", background: color }} />
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function TK_Sprite({ dex, name = "", size = 40, variant = "artwork", className = "" }: any) {
+  const [err, setErr] = React.useState(false)
+  const base = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon"
+  const url = variant === "front" ? `${base}/${dex}.png` : `${base}/other/official-artwork/${dex}.png`
+  if (err) return (
+    <span className={"inline-flex items-center justify-center " + className} style={{ width: size, height: size }}>
+      <span className="inline-flex items-center justify-center rounded-full text-white font-bold text-xs" style={{ width: size * 0.85, height: size * 0.85, background: `hsl(${(name.charCodeAt(0) * 47) % 360} 50% 45%)` }}>{name[0] || "?"}</span>
+    </span>
+  )
+  return <span className={"inline-flex items-center justify-center " + className} style={{ width: size, height: size }}><img src={url} alt={name} onError={() => setErr(true)} style={{ width: size, height: size }} /></span>
+}
+
+function TK_App({ toolbar, subbar, children, className = "", bare }: any) {
+  return (
+    <div className={"flex flex-col overflow-hidden " + (bare ? "" : "") + " " + className}>
+      {toolbar && <div className="shrink-0 px-4 py-2 border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--surface-2)_60%,transparent)]">{toolbar}</div>}
+      {subbar && <div className="shrink-0 px-4 py-1.5 border-b border-[var(--border)] bg-[var(--surface-2)] text-xs text-[color:var(--text-dim)]">{subbar}</div>}
+      <div className="flex-1 overflow-y-auto p-4">{children}</div>
+    </div>
+  )
+}
+
+function TK_SegTabs({ value, options, onChange, size = "md", className = "" }: any) {
+  const items = options.map((o: any) => (typeof o === "string" ? { value: o, label: o } : o))
+  const sizeCls = size === "sm" ? "text-xs px-2.5 py-1" : "text-sm px-3 py-1.5"
+  return (
+    <div className={"flex gap-px rounded-[var(--radius)] overflow-hidden border border-[var(--border)] " + className}>
+      {items.map((o: any) => (
+        <button key={o.value} type="button" role="tab" aria-selected={value === o.value}
+          className={sizeCls + " font-medium transition-colors " + (value === o.value ? "bg-[var(--accent)] text-white" : "bg-[var(--surface-2)] text-[color:var(--text-muted)] hover:text-[color:var(--text)]")}
+          onClick={() => onChange(o.value)}>
+          {o.label}{o.count != null && <span className="ml-1 font-mono text-xs opacity-70">{o.count}</span>}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+function TK_Select({ value, items, onSelect, width = "220px", align = "left", icon, placeholder = "Seleccionar", minWidth }: any) {
+  const flat = items.filter((it: any) => it && it.value != null)
+  const current = flat.find((it: any) => String(it.value) === String(value))
+  return (
+    <button type="button" className="inline-flex items-center gap-2 px-3 py-1.5 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-2)] text-sm text-[color:var(--text-muted)] hover:text-[color:var(--text)] transition-colors" style={minWidth ? { minWidth } : { width }}>
+      {icon && <Icon name={icon} size={13} className="shrink-0" />}
+      <span className="flex-1 text-left">{current ? current.label : placeholder}</span>
+      <Icon name="chevron" size={14} className="shrink-0 text-[color:var(--text-dim)]" />
+    </button>
+  )
+}
+
+function TK_SortIcon({ active, dir }: any) {
+  if (!active) return <Icon name="chevron" size={11} className="text-[color:var(--text-dim)] opacity-40" />
+  return <Icon name="chevron" size={11} style={{ transform: dir === "asc" ? "rotate(180deg)" : "none" }} />
+}
+
+function TK_Table({ columns, sortKey, sortDir, onSort, minWidth, children }: any) {
+  return (
+    <div className="rounded-[var(--radius-lg)] border border-[var(--border)] overflow-hidden">
+      <table className="w-full border-collapse text-sm" style={minWidth ? { minWidth } : undefined}>
+        <thead>
+          <tr className="[&_th]:text-left [&_th]:font-mono [&_th]:text-xs [&_th]:tracking-[0.06em] [&_th]:uppercase [&_th]:text-[color:var(--text-dim)] [&_th]:py-[0.7rem] [&_th]:px-4 [&_th]:bg-[var(--surface-2)] [&_th]:border-b [&_th]:border-[var(--border-strong)]">
+            {columns.map((c: any) => (
+              <th key={c.key} style={{ width: c.w, textAlign: c.align || "left" }}
+                className={c.sortable ? "cursor-pointer select-none hover:text-[color:var(--text)]" : ""}
+                onClick={c.sortable && onSort ? () => onSort(c.key) : undefined}>
+                <span className="inline-flex items-center gap-1" style={{ justifyContent: c.align === "right" ? "flex-end" : "flex-start" }}>
+                  {c.label}{c.sortable && <TK_SortIcon active={sortKey === c.key} dir={sortDir} />}
+                </span>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        {children}
+      </table>
+    </div>
+  )
+}
+
+function TK_TeamSprites({ slots, size = 32, max = 6, gap = 2, onSelect }: any) {
+  return (
+    <div className="flex" style={{ gap }}>
+      {slots.slice(0, max).map((s: any, i: number) => {
+        const sprite = <TK_Sprite key={i} dex={s.dex} name={s.name} size={size} />
+        return onSelect
+          ? <button key={i} type="button" className="cursor-pointer border-0 bg-transparent p-0 rounded hover:ring-2 hover:ring-[var(--accent)]" title={s.name} onClick={(e) => { e.stopPropagation(); onSelect(s) }}>{sprite}</button>
+          : <span key={i} title={s.name} className="inline-flex">{sprite}</span>
+      })}
+    </div>
+  )
+}
+
+function TK_TypeBadge({ type, pct, className = "" }: any) {
+  const bg = TK_TYPE_COLORS[type] || "var(--surface-3)"
+  return (
+    <span className={"inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold text-white " + className} style={{ background: bg }}>
+      {type}{pct != null && <b className="font-mono ml-0.5">{pct}%</b>}
+    </span>
+  )
+}
+
+function TK_CopyButton({ text, label = "Copiar", copiedLabel = "Copiado", className = "" }: any) {
+  const [done, setDone] = React.useState(false)
+  const onClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    try { navigator.clipboard.writeText(text) } catch (_) { }
+    setDone(true); setTimeout(() => setDone(false), 1600)
+  }
+  return (
+    <button type="button" className={"inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-[var(--radius)] border border-[var(--border)] text-xs font-medium text-[color:var(--text-muted)] hover:text-[color:var(--text)] hover:bg-[var(--surface-2)] transition-colors " + (done ? "text-[color:var(--emerald-400)] border-[color:var(--emerald-400)]" : "") + " " + className} onClick={onClick}>
+      <Icon name={done ? "check" : "copy"} size={13} />{done ? copiedLabel : label}
+    </button>
+  )
+}
+
+function TK_BaseStatBars({ base, title = "Estadísticas base", max = 200 }: any) {
+  const total = TK_STAT_ORDER.reduce((a, k) => a + (base[k] || 0), 0)
+  return (
+    <div>
+      {title && <div className="font-mono text-xs tracking-wider uppercase text-[color:var(--text-dim)] mb-2">{title}</div>}
+      {TK_STAT_ORDER.map((k) => (
+        <div key={k} className="flex items-center gap-2 mb-1">
+          <span className="w-7 font-mono text-xs font-bold text-right" style={{ color: TK_STAT_META[k][1] }}>{TK_STAT_META[k][0]}</span>
+          <span className="w-8 font-mono text-xs text-right text-[color:var(--text)]">{base[k]}</span>
+          <div className="flex-1 h-1.5 rounded-full bg-[var(--surface-3)] overflow-hidden">
+            <div className="h-full rounded-full" style={{ width: Math.min(100, (base[k] / max) * 100) + "%", background: TK_STAT_META[k][1] }} />
+          </div>
+        </div>
+      ))}
+      <div className="flex items-center justify-between mt-2 pt-1.5 border-t border-[var(--border)] text-xs">
+        <span className="text-[color:var(--text-dim)] font-mono">BST</span>
+        <span className="font-mono font-bold">{total}</span>
+      </div>
+    </div>
+  )
+}
+
+function TK_Picker({ value, options, onChange, className = "", ariaLabel }: any) {
+  return (
+    <select className={"w-full px-3 py-2 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-2)] text-sm text-[color:var(--text)] font-[inherit] appearance-none cursor-pointer focus:outline-none focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-soft)] " + className} value={value} aria-label={ariaLabel} onChange={(e) => onChange(e.target.value)}>
+      {options.map((o: any) => { const v = typeof o === "object" ? o.value : o; const l = typeof o === "object" ? o.label : o; return <option key={v} value={v}>{l}</option> })}
+    </select>
+  )
+}
+
+function TK_HpBar({ current, max, label = "PS", onChange, onReset, resetLabel = "full" }: any) {
+  const pct = max ? Math.max(0, Math.min(100, (current / max) * 100)) : 0
+  const tone = pct > 50 ? "#34d399" : pct > 25 ? "#f5b342" : "#f06262"
+  return (
+    <div>
+      <div className="flex items-center gap-2 text-sm mb-1">
+        <span className="font-mono text-xs text-[color:var(--text-dim)] uppercase">{label}</span>
+        {onChange
+          ? <input className="w-14 px-1.5 py-0.5 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-2)] text-sm text-center font-mono text-[color:var(--text)] focus:outline-none focus:border-[var(--accent)]" type="number" min={1} max={max} value={current} onChange={(e) => onChange(Math.min(max, Math.max(1, parseInt(e.target.value) || 1)))} />
+          : <span className="font-mono font-bold text-[color:var(--text)]">{current}</span>}
+        <span className="font-mono text-xs text-[color:var(--text-dim)]">/ {max}</span>
+        <span className="font-mono text-xs font-bold" style={{ color: tone }}>({pct.toFixed(0)}%)</span>
+        {onReset && <button className="ml-auto text-xs text-[color:var(--accent-bright)] hover:underline cursor-pointer border-0 bg-transparent font-medium" onClick={onReset}>{resetLabel}</button>}
+      </div>
+      <div className="h-2 rounded-full bg-[var(--surface-3)] overflow-hidden">
+        <div className="h-full rounded-full transition-all" style={{ width: pct + "%", background: tone }} />
+      </div>
+    </div>
+  )
+}
+
+// ============================================================================
+// toolskit — Herramientas (showcase section)
+// ============================================================================
+function ToolsKitSection() {
+  const [hpDemo, setHpDemo] = React.useState(142)
+  const [pickDemo, setPickDemo] = React.useState("Modesto")
+  const demoUsage = [{ name: "Bola Sombra", pct: 95 }, { name: "Voz Lunar", pct: 88 }, { name: "Protección", pct: 72 }, { name: "Viento Feérico", pct: 51 }]
+  return (
+    <div>
+      <div className="dsh-sectionhead">
+        <Kicker>Herramientas</Kicker>
+        <h2>Piezas compartidas de las herramientas</h2>
+        <p>Componentes extraídos al construir las páginas de Herramientas (Planificador y Árbol de MH, Meta VGC, Wonder Mail, Claves de Steam, Sorteos). Son la fuente única para cualquier herramienta nueva — token-driven y compatibles con las tres direcciones.</p>
+      </div>
+
+      <Callout icon="wrench" title="Nuevo en este pase" tone="orange" style={{ marginBottom: "1.75rem" }}>
+        El rediseño full-bleed de <strong>Meta VGC</strong> y la <strong>Calculadora de Daño</strong> extrajo diez piezas a <code>tool-kit.jsx</code>: <code>ToolApp</code> (marco de app a pantalla completa), <code>SegTabs</code>, <code>ToolSelect</code>, <code>ToolTable</code> (tabla ordenable), <code>Picker</code> (select nativo estilizado), <code>HpBar</code> (barra de recurso), <code>TeamSprites</code>, <code>CopyButton</code>, <code>TypeBadge</code> y <code>BaseStatBars</code> — junto a las ya existentes <code>ToolPanel</code>, <code>ToolStatBars</code> y <code>PokeSprite</code>. Todas token-driven y compatibles con las tres direcciones.
+      </Callout>
+
+      <Spec2 title="ToolPanel" tag="tool-kit.jsx" intro="La superficie sobre la que se construye cada página de herramienta: cabecera opcional (título + meta o cabecera propia) y cuerpo con padding. Hereda card-bg / card-border / radius del sistema." a11y="El título es texto real; el panel no aporta semántica falsa. La cabecera mantiene contraste AA en los seis modos.">
+        <div className="spec2__grid2">
+          <TK_Panel title="Equipo actual" meta="8 piezas">
+            <p className="text-[color:var(--text-muted)] m-0 text-sm">Cabecera con título + meta y cuerpo con padding.</p>
+          </TK_Panel>
+          <TK_Panel title="Sin cabecera meta">
+            <p className="text-[color:var(--text-muted)] m-0 text-sm">Solo título. El cuerpo aloja cualquier contenido de la herramienta.</p>
+          </TK_Panel>
+        </div>
+        <PropTable rows={[
+          ["title", "node", "—", "Título de la cabecera (Orbitron, mayúsculas)."],
+          ["meta", "node", "—", "Texto mono a la derecha (contador, hint)."],
+          ["headRight", "node", "—", "Sustituye a meta por contenido propio."],
+          ["head", "node", "—", "Cabecera totalmente personalizada."],
+          ["noBody", "boolean", "false", "Omite el wrapper de cuerpo con padding."],
+        ]} />
+      </Spec2>
+
+      <Spec2 title="ToolStatBars" tag="tool-kit.jsx" intro="Lista etiquetada de barras de porcentaje, normalizadas al valor mayor. Usada en Meta VGC para movimientos, objetos, habilidades y teratipos; sirve para cualquier distribución." a11y="Cada fila muestra el porcentaje como texto además de la barra: el dato no depende solo del color o la longitud.">
+        <div style={{ maxWidth: 320 }}>
+          <TK_StatBars title="Movimientos" items={demoUsage} />
+        </div>
+        <PropTable rows={[
+          ["title", "string", "—", "Encabezado mono de la sección."],
+          ["items", "{name,pct}[]", "—", "Filas a representar."],
+          ["tone", "color", "var(--accent)", "Color de la barra."],
+          ["max", "number", "auto", "Tope para normalizar (auto = mayor pct)."],
+        ]} />
+      </Spec2>
+
+      <Spec2 title="PokeSprite" tag="tool-kit.jsx" intro="Sprite de Pokémon con respaldo elegante: si la imagen falla, muestra un disco coloreado con la inicial. Variantes artwork (oficial) y front (pixel)." a11y="alt con el nombre del Pokémon; el respaldo es legible y mantiene tamaño táctil cuando es interactivo.">
+        <div style={{ display: "flex", gap: "1rem", alignItems: "center", flexWrap: "wrap" }}>
+          <TK_Sprite dex={727} name="Incineroar" size={64} />
+          <TK_Sprite dex={987} name="Flutter Mane" size={64} />
+          <TK_Sprite dex={25} name="Pikachu" size={56} variant="front" />
+          <TK_Sprite dex={99999} name="Fallback" size={56} />
+        </div>
+        <PropTable rows={[
+          ["dex", "number", "—", "Número de Pokédex nacional."],
+          ["name", "string", '""', "Nombre (alt + inicial del respaldo)."],
+          ["size", "number", "40", "Lado del sprite en px."],
+          ['variant', '"artwork"|"front"', '"artwork"', "Arte oficial o sprite pixel."],
+        ]} />
+      </Spec2>
+
+      <Spec2 title="ToolApp" tag="tool-kit.jsx" intro="Marco de aplicación a sangre completa: una columna de altura fija (viewport menos la barra de 68px) con zona de toolbar, sub-barra opcional y un cuerpo flexible que gestiona su propio scroll. Es la base de las herramientas tipo 'app' (Meta VGC, y próximamente Tracker y Calculadora)." a11y="No introduce roles falsos; las regiones internas (listas, tablas) aportan su propia semántica. El cuerpo conserva foco y scroll por teclado.">
+        <div style={{ height: 150, border: "var(--hairline) solid var(--border)", borderRadius: "var(--radius)", overflow: "hidden", display: "flex", flexDirection: "column" }}>
+          <div style={{ padding: "0.5rem 0.7rem", borderBottom: "var(--hairline) solid var(--border)", display: "flex", gap: "0.5rem", alignItems: "center", background: "color-mix(in srgb, var(--surface-2) 60%, transparent)" }}>
+            <TK_SegTabs value="a" options={[{ value: "a", label: "Toolbar" }, { value: "b", label: "región" }]} onChange={() => {}} size="sm" />
+            <div style={{ flex: 1 }} />
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--text-dim)" }}>shrink-0</span>
+          </div>
+          <div style={{ flex: 1, display: "grid", placeItems: "center", color: "var(--text-dim)", fontFamily: "var(--font-mono)", fontSize: 11 }}>cuerpo · scroll propio</div>
+        </div>
+        <PropTable rows={[
+          ["toolbar", "node", "—", "Barra superior fija (selectores, tabs)."],
+          ["subbar", "node", "—", "Sub-barra opcional (sub-vistas, avisos)."],
+          ["children", "node", "—", "Cuerpo flexible con scroll propio."],
+        ]} />
+      </Spec2>
+
+      <Spec2 title="SegTabs · ToolSelect" tag="tool-kit.jsx" intro="Los dos controles de la toolbar. SegTabs es un segmentado compacto con estado activo en acento; ToolSelect es un desplegable etiquetado (envuelve el Dropdown compartido) que muestra la opción actual. Sustituyen a los &lt;Select&gt; de Radix del código original." a11y="SegTabs usa role=tab/aria-selected; ToolSelect hereda el manejo de teclado y foco del Dropdown base.">
+        <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap", alignItems: "center" }}>
+          <TK_SegTabs value="stats" options={[{ value: "stats", label: "Stats" }, { value: "torneo", label: "Torneo" }]} onChange={() => {}} />
+          <TK_Select value="regi" icon="filter" width="200px"
+            items={[{ header: "Smogon" }, { value: "regi", label: "VGC 2026 Reg I" }, { value: "regh", label: "VGC 2026 Reg H" }]}
+            onSelect={() => {}} />
+        </div>
+        <PropTable rows={[
+          ["SegTabs · options", "string[]|{value,label,count}[]", "—", "Segmentos; count pinta un contador."],
+          ["ToolSelect · items", "{value,label}|{header}[]", "—", "Opciones, con cabeceras de grupo."],
+          ["icon", "string", "—", "Icono guía opcional en el trigger."],
+        ]} />
+      </Spec2>
+
+      <Spec2 title="ToolTable" tag="tool-kit.jsx" intro="Tabla de datos con cabecera fija y columnas opcionalmente ordenables. El padre controla el estado de orden y el render de filas; el componente aporta el cromo consistente (usada en Clasificación y Divergencia de Meta VGC)." a11y="La cabecera ordenable es un control real; el indicador de orden no depende solo del color. Las filas mantienen contraste AA.">
+        <TK_Table
+          columns={[{ key: "n", label: "#", w: 36 }, { key: "name", label: "Pokémon" }, { key: "use", label: "Uso", w: 90, align: "right", sortable: true }]}
+          sortKey="use" sortDir="desc" onSort={() => {}} minWidth="320px">
+          <tbody>
+            <tr className="[&_td]:py-[0.7rem] [&_td]:px-4 [&_td]:border-b [&_td]:border-[var(--border)] [&_td]:text-[color:var(--text-muted)] [&_tr:last-child_td]:border-b-0 [&_td]:text-sm">
+              <td className="font-mono text-[color:var(--text)]">1</td><td className="font-semibold text-[color:var(--text)]">Incineroar</td><td className="font-mono text-right text-[color:var(--text)]">43.1%</td>
+            </tr>
+            <tr className="[&_td]:py-[0.7rem] [&_td]:px-4 [&_td]:border-b [&_td]:border-[var(--border)] [&_td]:text-[color:var(--text-muted)] [&_tr:last-child_td]:border-b-0 [&_td]:text-sm">
+              <td className="font-mono text-[color:var(--text)]">2</td><td className="font-semibold text-[color:var(--text)]">Flutter Mane</td><td className="font-mono text-right text-[color:var(--text)]">37.2%</td>
+            </tr>
+          </tbody>
+        </TK_Table>
+        <PropTable rows={[
+          ["columns", "{key,label,w,align,sortable}[]", "—", "Definición de columnas."],
+          ["sortKey / sortDir", "string / 'asc'|'desc'", "—", "Estado de orden (controlado)."],
+          ["onSort", "(key) => void", "—", "Click en cabecera ordenable."],
+        ]} />
+      </Spec2>
+
+      <Spec2 title="TeamSprites · TypeBadge · CopyButton · BaseStatBars" tag="tool-kit.jsx" intro="Cuatro piezas de detalle. TeamSprites pinta una fila compacta de hasta 6 sprites (con selección opcional); TypeBadge es el chip de tipo en su color canónico; CopyButton copia al portapapeles con confirmación; BaseStatBars dibuja la distribución de estadísticas base con su BST." a11y="CopyButton confirma la acción con texto además del icono; TypeBadge mantiene texto legible sobre el color de tipo.">
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.9rem" }}>
+          <div style={{ display: "flex", gap: "0.8rem", alignItems: "center", flexWrap: "wrap" }}>
+            <TK_TeamSprites slots={[{ dex: 727, name: "Incineroar" }, { dex: 987, name: "Flutter Mane" }, { dex: 892, name: "Urshifu" }, { dex: 812, name: "Rillaboom" }]} size={34} />
+            <TK_TypeBadge type="Fuego" /><TK_TypeBadge type="Siniestro" pct={15} />
+            <TK_CopyButton text="demo" />
+          </div>
+          <div style={{ maxWidth: 240 }}><TK_BaseStatBars base={{ hp: 95, atk: 115, def: 90, spa: 80, spd: 90, spe: 60 }} /></div>
+        </div>
+        <PropTable rows={[
+          ["TeamSprites · slots", "{dex,name}[]", "—", "Hasta `max` sprites; onSelect opcional."],
+          ["TypeBadge · type / pct", "string / number", "—", "Tipo y porcentaje opcional."],
+          ["CopyButton · text", "string", "—", "Texto a copiar; confirma 1.6s."],
+          ["BaseStatBars · base", "{hp..spe}", "—", "Seis estadísticas + BST."],
+        ]} />
+      </Spec2>
+
+      <Spec2 title="Picker · HpBar" tag="tool-kit.jsx" intro="Dos piezas extraídas de la Calculadora de Daño. Picker es un &lt;select&gt; nativo estilizado — preferible a un menú propio cuando la lista es larga (naturalezas, objetos, movimientos): se escanea y teclea más rápido. HpBar es una barra de recurso con rampa verde→ámbar→rojo, editable y con reinicio opcional." a11y="Picker es un select nativo: hereda teclado y lectores de pantalla. HpBar expone el valor como texto además del color y la longitud.">
+        <div style={{ display: "flex", gap: "1.5rem", flexWrap: "wrap", alignItems: "flex-start" }}>
+          <div style={{ minWidth: 180 }}>
+            <span className="font-mono text-xs text-[color:var(--text-dim)] block mb-1.5">Naturaleza</span>
+            <TK_Picker value={pickDemo} onChange={setPickDemo} options={["Modesto", "Tímido", "Adamant", "Cauto", "Sereno", "Audaz"]} />
+          </div>
+          <div style={{ minWidth: 240 }}>
+            <TK_HpBar current={hpDemo} max={207} onChange={setHpDemo} onReset={() => setHpDemo(207)} />
+          </div>
+        </div>
+        <PropTable rows={[
+          ["Picker · options", "string[]|{value,label}[]", "—", "Opciones del select."],
+          ["Picker · value/onChange", "string / (v)=>void", "—", "Controlado."],
+          ["HpBar · current/max", "number", "—", "Valor y tope del recurso."],
+          ["HpBar · onChange/onReset", "fn", "—", "Editable + reinicio opcionales."],
+        ]} />
+      </Spec2>
+    </div>
+  )
+}
+
+// ============================================================================
 // MAIN SHOWCASE COMPONENT
 // ============================================================================
 const SECTIONS: Record<string, React.ComponentType<{ go?: (path: string) => void }>> = {
@@ -2732,8 +3103,9 @@ const SECTIONS: Record<string, React.ComponentType<{ go?: (path: string) => void
  composition: CompositionSection,
  blocks: BlocksSection,
  patterns: PatternsSection,
- boff: BoffSection,
- profile: ProfileSection,
+  boff: BoffSection,
+  toolskit: ToolsKitSection,
+  profile: ProfileSection,
  playground: PlaygroundSection,
  a11y: AccessibilitySection,
  roadmap: RoadmapSection,
