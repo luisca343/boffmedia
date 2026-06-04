@@ -8,9 +8,9 @@ import {
 import { Event } from "@boffmedia/shared";
 import { EventRegistrationButton } from "../../../_components/EventRegistrationButton";
 import { InternalLink } from "@/components/ui/navigation/Link";
-import { EventStatusChip } from "@/components/boffmedia/event/EventStatusChip";
+import { EventStatusChip } from "@/components/boffmedia-old/event/EventStatusChip";
 import { CountdownTimer } from "@/app/(boffmedia)/_components/ui/CountdownTimer";
-import { BoffCard } from "@/components/boffmedia/BoffCard";
+import { BoffCard } from "@/components/boffmedia-old/BoffCard";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 

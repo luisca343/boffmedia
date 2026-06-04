@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useGetEvents } from '@/hooks/events/useGetEvents';
-import { SectionHeader, SectionLoading, SectionFilters, SectionError, SectionEmpty } from '@/components/boffmedia/sections';
+import { SectionHeader, SectionLoading, SectionFilters, SectionError, SectionEmpty } from '@/components/boffmedia-old/sections';
 import { EventsGrid } from './_components/EventsGrid';
 import { EventsList } from './_components/EventsList';
 import { EventFilters } from './_components/EventFilters';

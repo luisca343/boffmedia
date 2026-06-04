@@ -2,7 +2,7 @@ import { useTranslations } from "next-intl";
 import { ClipboardDocumentListIcon, DocumentTextIcon, SparklesIcon } from "@heroicons/react/24/outline";
 import { Combobox } from "@/components/ui/primitives/combobox";
 import { FormField } from "@/components/ui/form/FormField";
-import { ToolSectionHeader } from "@/components/boffmedia/tools/ToolSectionHeader";
+import { ToolSectionHeader } from "@/components/boffmedia-old/tools/ToolSectionHeader";
 import { getQuestData, getSubQuestData, getForceClient } from "../QuestData";
 
 interface QuestConfigurationSectionProps {
