@@ -26,7 +26,7 @@ interface FeaturedToolProps {
 
 export function FeaturedTool({ tool, go, className }: FeaturedToolProps) {
   return (
-    <div className={cn("reveal", className)}>
+    <div className={className}>
       <Card className={cn("grid grid-cols-[1.3fr_1fr] max-[620px]:grid-cols-1 overflow-hidden mb-12")}>
         <div className="p-8 flex flex-col gap-[1.1rem]">
           <div className="flex items-center gap-4">

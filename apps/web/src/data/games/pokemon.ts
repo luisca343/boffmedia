@@ -14,9 +14,9 @@ export const pokemon: GameEntry = {
   navHref: "/pokemon",
 
   externalLinks: [
-    { key: "officialWebsite", href: "https://www.pokemon.com/es/" },
-    { key: "pokemonDatabase", href: "https://pokemondb.net/" },
-    { key: "bulbapedia", href: "https://bulbapedia.bulbagarden.net/" },
+    { key: "officialWebsite", href: "https://www.pokemon.com/es/", desc: "pokemon.com" },
+    { key: "pokemonDatabase", href: "https://pokemondb.net/", desc: "Base de datos Pokémon" },
+    { key: "bulbapedia", href: "https://bulbapedia.bulbagarden.net/", desc: "Wiki de Pokémon" },
   ],
 
   categories: [
