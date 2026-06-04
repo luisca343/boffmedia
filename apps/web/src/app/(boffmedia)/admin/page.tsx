@@ -78,7 +78,7 @@ function AdminContent() {
   };
 
   return (
-    <div className="flex min-h-screen bg-surface-950">
+    <div className="flex min-h-screen bg-surface-950 pt-16">
       {/* Sidebar */}
       <aside className="hidden md:flex md:w-56 lg:w-60 shrink-0 flex-col border-r border-surface-800/80 bg-gradient-to-b from-surface-900 to-surface-950 py-5 px-3 gap-0.5">
         {/* Sidebar header */}

@@ -54,7 +54,7 @@ export default function BoffMediaStyleGuide() {
   const form = useForm()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-surface-950 via-surface-900 to-surface-950 relative">
+    <div className="min-h-screen bg-gradient-to-br from-surface-950 via-surface-900 to-surface-950 relative pt-16">
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.018)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.018)_1px,transparent_1px)] bg-[size:48px_48px] pointer-events-none" />
       <div className="container mx-auto px-4 py-12 max-w-7xl relative">
         {/* Gaming Header */}
