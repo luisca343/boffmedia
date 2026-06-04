@@ -1,5 +1,6 @@
 "use client"
 
+import "./showcase.css"
 import * as React from "react"
 
 // Primitives — boffmedia design system
@@ -47,6 +48,7 @@ import { FeaturedTool } from "@/components/boffmedia/ui/featured-tool"
 import { ToolCard } from "@/components/boffmedia/ui/tool-card"
 
 // Domain blocks
+import { StatCard } from "@/components/boffmedia/ui/stat-card"
 import { Metric } from "@/components/boffmedia/ui/metric"
 import { IconButton } from "@/components/boffmedia/ui/icon-button"
 import { CardTitle } from "@/components/boffmedia/ui/card-title"
@@ -1447,7 +1449,7 @@ function BlocksSection() {
     {/* METRIC */}
     <Spec2
      title="Metric"
-     tag="blocks.tsx"
+     tag="metric.tsx"
      intro="Número grande + etiqueta. Unifica los tres tratamientos que existían sueltos: el héroe de Inicio, las cifras del Hub y la cabecera de Perfil. Props size · tone · mono · boxed."
      a11y="Usa tabular display para las cifras; la etiqueta describe la métrica y no depende solo de color."
     >
@@ -1471,7 +1473,7 @@ function BlocksSection() {
     {/* ICONBUTTON */}
     <Spec2
      title="IconButton"
-     tag="blocks.tsx"
+     tag="icon-button.tsx"
      intro="El control cuadrado de 38px que aparece en la navbar, el footer y los sheets. Variante bordeada y punto de notificación incluidos."
      a11y="Siempre exige aria-label; el área cumple el mínimo táctil. Renderiza &lt;a&gt; si se pasa href, &lt;button&gt; si no."
     >
@@ -1496,7 +1498,7 @@ function BlocksSection() {
     {/* CARDTITLE */}
     <Spec2
      title="CardTitle"
-     tag="blocks.tsx"
+     tag="card-title.tsx"
      intro='El encabezado "icono + título" dentro de una Card. Con la prop right añade una acción o contador alineado a la derecha.'
      a11y="Es un h3 real: mantiene la jerarquía de encabezados dentro de la tarjeta."
     >
@@ -1521,7 +1523,7 @@ function BlocksSection() {
     {/* TOOLROW */}
     <Spec2
      title="ToolRow"
-     tag="blocks.tsx"
+     tag="tool-row.tsx"
      intro="El hermano horizontal de ToolCard: mismo propósito (una herramienta), formato denso de lista. Se usa en la sección «Herramientas» de Inicio."
      a11y="Es un botón completo, enfocable y activable con teclado; el estado se comunica con Badge (texto), no solo color."
     >
@@ -1540,7 +1542,7 @@ function BlocksSection() {
     {/* EVENTCARD */}
     <Spec2
      title="EventCard"
-     tag="blocks.tsx"
+     tag="event-card.tsx"
      intro="Una entrada de torneo / evento: bloque de fecha, cuerpo y CTA. Vive en Inicio y alimentará la futura página de Eventos."
      a11y="La fecha se lee como día + mes; el estado de inscripción usa Badge con texto."
     >
@@ -1555,7 +1557,7 @@ function BlocksSection() {
     {/* LEADERBOARD */}
     <Spec2
      title="Leaderboard"
-     tag="blocks.tsx"
+     tag="leaderboard.tsx"
      intro="Tabla de clasificación con cabecera, top-3 destacado y fila «tú». Compuesta por filas LeaderRow."
      a11y="Lista semántica; el rango usa tabular-nums; los tres primeros se distinguen por estilo además de posición."
     >
@@ -1575,7 +1577,7 @@ function BlocksSection() {
     {/* LINKEDROW + ACTIVITY + ACHIEVEMENTS */}
     <Spec2
      title="LinkedRow · ActivityItem · AchievementTile"
-     tag="blocks.tsx"
+     tag="linked-row.tsx · activity-item.tsx · achievement-tile.tsx"
      intro="Los tres bloques de listado del Perfil: cuenta vinculada, fila de actividad y casilla de logro."
      a11y="Iconos decorativos; el significado vive en el texto. Los logros bloqueados muestran un candado, no solo un color apagado."
     >
@@ -1605,7 +1607,7 @@ function BlocksSection() {
     {/* MARQUEE */}
     <Spec2
      title="Marquee"
-     tag="blocks.tsx"
+     tag="marquee.tsx"
      intro="Tira de etiquetas en desplazamiento infinito. Decorativa; se detiene con el toggle de movimiento y prefers-reduced-motion."
      a11y="aria-hidden: es decoración, su contenido se anuncia en otro lugar de la página."
     >
@@ -1724,7 +1726,7 @@ function BlocksSection() {
     {/* FOOTER */}
     <Spec2
      title="Footer"
-     tag="blocks.tsx"
+     tag="footer.tsx"
      intro="El pie global: marca + tagline + IconButtons sociales, columnas de enlaces, newsletter y barra legal."
      a11y="Enlaces agrupados por encabezado; iconos sociales con aria-label; el formulario es enfocable y enviable con teclado."
     >
@@ -2318,36 +2320,36 @@ function ProfileSection() {
      <Card style={{ padding: "1.5rem" }}>
       <CardTitle icon="chart">Estadísticas</CardTitle>
       <div className="grid grid-cols-2 gap-[0.9rem] max-[620px]:grid-cols-1">
-       {PROFILE_STATS.map((s) => (
-        <Stat key={s.label} icon={s.icon} value={s.value} label={s.label} sub={s.sub} />
-       ))}
-      </div>
-     </Card>
-    </Spec2>
+        {PROFILE_STATS.map((s) => (
+         <StatCard key={s.label} icon={s.icon} value={s.value} label={s.label} sub={s.sub} />
+        ))}
+       </div>
+      </Card>
+     </Spec2>
 
-    {/* Achievements */}
-    <Spec2
-     title="Logros"
-     tag="perfil"
-     intro="Cuadrícula de logros desbloqueados y bloqueados. Los bloqueados se atenúan y muestran un candado en vez del icono."
-     a11y="Los logros bloqueados usan opacidad + candado; el color nunca es el único portador de estado."
-    >
-     <Card style={{ padding: "1.5rem" }}>
-      <div className="flex items-center justify-between mb-5">
-       <h3 className="flex items-center gap-[0.6rem] text-[length:var(--t-lg)] m-0">
-        <Icon name="star" size={18} className="text-[var(--orange-500)]" />
-        Logros
-       </h3>
-       <span className="text-[color:var(--text-dim)] font-mono text-[length:var(--t-xs)]">37 / 60</span>
-      </div>
-      <div className="grid grid-cols-3 gap-3 mb-5 max-[620px]:grid-cols-2">
-       {ACHIEVEMENTS.map((a) => (
-        <AchievementTile key={a.name} icon={a.icon} name={a.name} done={a.done} />
-       ))}
-      </div>
-      <Button variant="ghost" block iconRight="arrow">Ver todos los logros</Button>
-     </Card>
-    </Spec2>
+     {/* Achievements */}
+     <Spec2
+      title="Logros"
+      tag="perfil"
+      intro="Cuadrícula de logros desbloqueados y bloqueados. Los bloqueados se atenúan y muestran un candado en vez del icono."
+      a11y="Los logros bloqueados usan opacidad + candado; el color nunca es el único portador de estado."
+     >
+      <Card style={{ padding: "1.5rem" }}>
+       <div className="flex items-center justify-between mb-5">
+        <h3 className="flex items-center gap-[0.6rem] text-[length:var(--t-lg)] m-0">
+         <Icon name="star" size={18} className="text-[var(--orange-500)]" />
+         Logros
+        </h3>
+        <span className="text-[color:var(--text-dim)] font-mono text-[length:var(--t-xs)]">37 / 60</span>
+       </div>
+       <div className="grid grid-cols-3 gap-3 mb-5 max-[620px]:grid-cols-2">
+        {ACHIEVEMENTS.map((a) => (
+         <AchievementTile key={a.name} icon={a.icon} name={a.name} done={a.done} />
+        ))}
+       </div>
+       <Button variant="ghost" block iconRight="arrow">Ver todos los logros</Button>
+      </Card>
+     </Spec2>
 
     {/* Full profile page (composed) */}
     <Spec2
@@ -2443,7 +2445,7 @@ function ProfileSection() {
           <CardTitle icon="chart">Estadísticas</CardTitle>
           <div className="grid grid-cols-2 gap-[0.9rem]">
            {PROFILE_STATS.map((s) => (
-            <Stat key={s.label} icon={s.icon} value={s.value} label={s.label} sub={s.sub} />
+            <StatCard key={s.label} icon={s.icon} value={s.value} label={s.label} sub={s.sub} />
            ))}
           </div>
          </Card>
