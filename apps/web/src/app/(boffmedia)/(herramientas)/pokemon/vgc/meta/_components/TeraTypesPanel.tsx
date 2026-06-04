@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { TypeBadgeSmall } from "@/components/shared/pokemon/TypeBadge";
 import { Card, CardContent } from "@/components/ui/primitives/card";
-import { ToolSectionHeader } from "@/components/boffmedia/tools/ToolSectionHeader";
+import { ToolSectionHeader } from "@/components/boffmedia-old/tools/ToolSectionHeader";
 
 interface TeraEntry {
   name:    string;

@@ -1,5 +1,5 @@
 import { Event } from "@boffmedia/shared";
-import { BOFF_VARIANTS } from "@/components/boffmedia/tools/utils/boffVariants";
+import { BOFF_VARIANTS } from "@/components/boffmedia-old/tools/utils/boffVariants";
 
 // ─── Token map ────────────────────────────────────────────────────────────────
 // Maps Event.status to visual tokens derived from BOFF_VARIANTS where they

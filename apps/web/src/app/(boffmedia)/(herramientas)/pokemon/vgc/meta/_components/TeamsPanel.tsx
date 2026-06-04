@@ -7,7 +7,7 @@ import { spriteUrl, handleSpriteError } from "@/features/vgc-tracker/types";
 import { SpeciesTeamEntry, SpeciesTeamSlot } from "@/services/api/boffmedia/vgcService";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/primitives/card";
-import { ToolSectionHeader } from "@/components/boffmedia/tools/ToolSectionHeader";
+import { ToolSectionHeader } from "@/components/boffmedia-old/tools/ToolSectionHeader";
 
 // ─── Copy button ──────────────────────────────────────────────────────────────
 

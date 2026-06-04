@@ -4,8 +4,8 @@ import { useState } from "react";
 import { Users, Trophy, Search, XCircle } from "lucide-react";
 import { Input } from "@/components/ui/primitives/input";
 import { Button } from "@/components/ui/primitives/button";
-import { BoffContainer } from "@/components/boffmedia/tools/BoffContainer";
-import { BOFF_VARIANTS } from "@/components/boffmedia/tools/utils/boffVariants";
+import { BoffContainer } from "@/components/boffmedia-old/tools/BoffContainer";
+import { BOFF_VARIANTS } from "@/components/boffmedia-old/tools/utils/boffVariants";
 import { ParticipantsTab } from "./ParticipantsTab";
 import { WinnersTab } from "./WinnersTab";
 
