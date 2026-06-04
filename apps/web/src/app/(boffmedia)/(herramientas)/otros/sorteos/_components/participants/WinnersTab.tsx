@@ -1,7 +1,7 @@
 "use client";
 
 import { Trophy, Crown, Medal } from "lucide-react";
-import { BOFF_VARIANTS } from "@/components/boffmedia/tools/utils/boffVariants";
+import { BOFF_VARIANTS } from "@/components/boffmedia-old/tools/utils/boffVariants";
 
 const yellow    = BOFF_VARIANTS.yellow;
 const secondary = BOFF_VARIANTS.secondary;

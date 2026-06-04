@@ -9,8 +9,8 @@ import { cn } from "@/lib/utils";
 import { getEventStatus } from "@/lib/events";
 import { Event } from "@boffmedia/shared";
 import { InternalLink } from "@/components/ui/navigation/Link";
-import { EventStatusChip } from "@/components/boffmedia/event/EventStatusChip";
-import { BoffCard } from "@/components/boffmedia/BoffCard";
+import { EventStatusChip } from "@/components/boffmedia-old/event/EventStatusChip";
+import { BoffCard } from "@/components/boffmedia-old/BoffCard";
 
 // ─── Type icon map ────────────────────────────────────────────────────────────
 

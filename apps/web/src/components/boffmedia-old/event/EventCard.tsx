@@ -3,7 +3,7 @@ import { InternalLink } from "@/components/ui/navigation/Link";
 import { Button } from "@/components/ui/primitives/button";
 import { Event } from "@boffmedia/shared";
 import { EventStatusChip } from "./EventStatusChip";
-import { BoffCard } from "@/components/boffmedia/BoffCard";
+import { BoffCard } from "@/components/boffmedia-old/BoffCard";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
