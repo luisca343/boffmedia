@@ -1,301 +1,219 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react";
-import { Button } from "@/components/ui/primitives/button";
-import { Input } from "@/components/ui/primitives/input";
-import { Label } from "@/components/ui/primitives/label";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/primitives/avatar";
-import {
-  Camera,
-  Gamepad2,
-  LinkIcon,
-  Loader2,
-  User,
-  Mail,
-  Shield,
-  Wifi,
-} from "lucide-react";
-import useSocketStore from "@/stores/useSocketStore";
-import { useBoffSession } from "@/services/useBoffSession";
-import { UploadService } from "@/services/api/smartrotom/uploadService";
-import { UsersService } from "@/services/api/boffmedia/usersService";
-import { FloatingBackground } from "./layout/FloatingBackground";
-import { BoffContainer } from "@/components/boffmedia/tools/BoffContainer";
-import { ToolSectionHeader } from "@/components/boffmedia/tools/ToolSectionHeader";
+import { useState, useRef, useEffect } from "react"
+import "@/styles/boffmedia-primitives.css"
+import { BoffButton as Button } from "@/components/ui/primitives/boffmedia/button"
+import { BoffInput as Input } from "@/components/ui/primitives/boffmedia/input"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/primitives/avatar"
+import { Icon } from "@/components/ui/primitives/boffmedia/icon"
+import { BoffCard as Card } from "@/components/ui/primitives/boffmedia/card"
+import { BoffBadge as Badge } from "@/components/ui/primitives/boffmedia/badge"
+import { Kicker } from "@/components/ui/primitives/boffmedia/kicker"
+import { Field } from "@/components/ui/primitives/boffmedia/field"
+import { CardTitle, Metric, LinkedRow, ActivityItem, AchievementTile, Stat } from "@/components/ui/boffmedia/blocks"
+import useSocketStore from "@/stores/useSocketStore"
+import { useBoffSession } from "@/services/useBoffSession"
+import { UploadService } from "@/services/api/smartrotom/uploadService"
+import { UsersService } from "@/services/api/boffmedia/usersService"
+import { cn } from "@/lib/utils"
 
-// ─── Shared boff token shorthand ─────────────────────────────────────────────
+// ─── Mock data (handoff-pixel-perfect; user will wire real data) ──────────────
+const PROFILE_STATS = [
+  { icon: "trophy", label: "Ranking global", value: "#42", sub: "Top 1%" },
+  { icon: "bolt", label: "Puntos", value: "4 180", sub: "+210 esta semana" },
+  { icon: "chart", label: "Victorias", value: "73%", sub: "128 partidas" },
+  { icon: "star", label: "Logros", value: "37", sub: "de 60" },
+]
 
-const N = {
-  border:       "rgba(249,115,22,0.22)",
-  borderStrong: "rgba(249,115,22,0.4)",
-  bg:           "rgba(249,115,22,0.07)",
-  bgHover:      "rgba(249,115,22,0.12)",
-  text:         "rgb(251,146,60)",
-  glow:         "drop-shadow(0 0 6px rgba(249,115,22,0.45))",
-};
+const ACHIEVEMENTS = [
+  { icon: "trophy", name: "Campeón Regional", done: true },
+  { icon: "zap", name: "Racha de 10", done: true },
+  { icon: "calc", name: "Maestro del cálculo", done: true },
+  { icon: "sword", name: "Cazador veterano", done: true },
+  { icon: "cards", name: "Coleccionista TCG", done: false },
+  { icon: "flask", name: "Pionero del sim", done: false },
+]
 
-const MC = {
-  border: "rgba(132,204,22,0.22)",
-  bg:     "rgba(132,204,22,0.07)",
-  text:   "rgb(163,230,53)",
-  glow:   "drop-shadow(0 0 6px rgba(132,204,22,0.45))",
-};
-
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
-function BoffDivider() {
-  return (
-    <div
-      className="h-px"
-      style={{ background: "linear-gradient(90deg, transparent, rgba(249,115,22,0.12), transparent)" }}
-    />
-  );
-}
-
-function StatusChip({
-  icon,
-  label,
-  active,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  active?: boolean;
-}) {
-  const base = active === undefined;
-  return (
-    <div
-      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-mono"
-      style={{
-        border: `1px solid ${base ? N.border : active ? "rgba(34,197,94,0.25)" : "rgba(71,85,105,0.35)"}`,
-        background: base ? N.bg : active ? "rgba(34,197,94,0.08)" : "rgba(71,85,105,0.08)",
-        color: base ? N.text : active ? "rgba(74,222,128,0.9)" : "rgba(100,116,139,0.8)",
-      }}
-    >
-      {active !== undefined && (
-        <span
-          className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${active ? "bg-success-400 animate-pulse" : "bg-surface-600"}`}
-        />
-      )}
-      {icon}
-      {label}
-    </div>
-  );
-}
-
-function IntegrationCard({
-  icon,
-  title,
-  description,
-  linked,
-  onLink,
-  buttonLabel,
-  boff,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  linked: boolean;
-  onLink?: () => void;
-  buttonLabel: string;
-  boff: typeof N | typeof MC;}) {
-  return (
-    <div
-      className="flex items-center justify-between gap-4 p-4 rounded-lg border transition-colors duration-200"
-      style={{ borderColor: boff.border, background: boff.bg }}
-    >
-      <div className="flex items-center gap-3.5 min-w-0">
-        <div
-          className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
-          style={{
-            border: `1px solid ${boff.border}`,
-            background: "rgba(15,23,42,0.6)",
-            boxShadow: `0 0 14px rgba(0,0,0,0.3)`,
-          }}
-        >
-          <span style={{ color: boff.text, filter: boff.glow }}>{icon}</span>
-        </div>
-        <div className="min-w-0">
-          <p className="text-sm font-bold text-surface-100 leading-tight">{title}</p>
-          <p className="text-xs text-surface-500 mt-0.5 truncate">{description}</p>
-        </div>
-      </div>
-
-      {linked ? (
-        <div
-          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-mono flex-shrink-0"
-          style={{
-            border: "1px solid rgba(34,197,94,0.25)",
-            background: "rgba(34,197,94,0.08)",
-            color: "rgba(74,222,128,0.9)",
-          }}
-        >
-          <span className="w-1.5 h-1.5 rounded-full bg-success-400" />
-          Vinculado
-        </div>
-      ) : (
-        <Button
-          onClick={onLink}
-          variant="outline"
-          size="sm"
-          className="flex-shrink-0 font-mono text-xs tracking-wider h-8 px-3 transition-all duration-150"
-          style={{
-            borderColor: boff.border,
-            color: boff.text,
-            background: "transparent",
-          }}
-        >
-          <LinkIcon className="w-3 h-3 mr-1.5" />
-          {buttonLabel}
-        </Button>
-      )}
-    </div>
-  );
-}
+const ACTIVITY = [
+  { icon: "trophy", text: "Quedó 2º en VGC Regional — Series 2", time: "hace 2 días", color: "var(--orange-500)" },
+  { icon: "calc", text: "Guardó 3 sets en la Calculadora de Daño", time: "hace 4 días", color: "var(--accent-bright)" },
+  { icon: "users", text: "Se unió al equipo «Rotom Squad»", time: "hace 1 semana", color: "var(--purple-400)" },
+]
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function UserProfile() {
-  const { session, refreshSession } = useBoffSession();
-  const socket = useSocketStore((state) => state.socket);
-  const user = session?.user;
+  const { session, refreshSession } = useBoffSession()
+  const socket = useSocketStore((state) => state.socket)
+  const user = session?.user
 
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedUser, setEditedUser] = useState(user || {});
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadError, setUploadError] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isEditing, setIsEditing] = useState(false)
+  const [editedUser, setEditedUser] = useState(user || {})
+  const [isUploading, setIsUploading] = useState(false)
+  const [uploadError, setUploadError] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    if (user) setEditedUser(user);
-  }, [user]);
-
-  const linkDiscord = async () => {
-    console.log("Linking Discord account...");
-    setTimeout(() => {
-      setEditedUser((prev) => ({ ...prev, discordLinked: true }));
-    }, 2000);
-  };
+    if (user) setEditedUser(user)
+  }, [user])
 
   const handleSave = () => {
-    console.log("Saving user data:", editedUser);
-    setIsEditing(false);
-  };
+    console.log("Saving user data:", editedUser)
+    setIsEditing(false)
+  }
 
   const handleImageClick = () => {
-    if (!isUploading) fileInputRef.current?.click();
-  };
+    if (!isUploading) fileInputRef.current?.click()
+  }
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    setUploadError(null);
-    setIsUploading(true);
+    const file = event.target.files?.[0]
+    if (!file) return
+    setUploadError(null)
+    setIsUploading(true)
     try {
-      const uploadResponse = await UploadService.uploadProfileImage(file, user?.id || "default");
+      const uploadResponse = await UploadService.uploadProfileImage(file, user?.id || "default")
       if (!uploadResponse.data?.url) {
-        setUploadError("Upload failed: No response data");
-        return;
+        setUploadError("Upload failed: No response data")
+        return
       }
-      const imageUrl = uploadResponse.data.url;
-      await UsersService.updateUser(Number(user?.id), { profilePicture: imageUrl } as any);
-      setEditedUser((prev) => ({ ...prev, image: imageUrl }));
-      await refreshSession();
+      const imageUrl = uploadResponse.data.url
+      await UsersService.updateUser(Number(user?.id), { profilePicture: imageUrl } as any)
+      setEditedUser((prev) => ({ ...prev, image: imageUrl }))
+      await refreshSession()
     } catch (err) {
-      setUploadError("Upload failed: " + (err instanceof Error ? err.message : "Unknown error"));
+      setUploadError("Upload failed: " + (err instanceof Error ? err.message : "Unknown error"))
     } finally {
-      setIsUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
+      setIsUploading(false)
+      if (fileInputRef.current) fileInputRef.current.value = ""
     }
-  };
+  }
+
+  const initial = (editedUser.name || "U").charAt(0).toUpperCase()
 
   // ── Not logged in ──────────────────────────────────────────────────────────
 
   if (!user) {
     return (
-      <div className="relative min-h-screen bg-surface-950 overflow-hidden">
-        <FloatingBackground variant="cool" />
+      <div className="relative min-h-screen" style={{ background: "var(--bg)" }}>
         <div className="relative container mx-auto px-4 py-16 z-10 flex items-center justify-center">
           <div className="w-full max-w-sm">
-            <BoffContainer variant="primary" contentClassName="p-10 flex flex-col items-center text-center gap-4">
-              <div
-                className="w-16 h-16 rounded-full flex items-center justify-center"
-                style={{ background: N.bg, border: `1px solid ${N.border}` }}
+            <Card style={{ padding: "2.5rem", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: "1rem" }}>
+              <span
+                className="w-16 h-16 rounded-full grid place-items-center"
+                style={{
+                  background: "color-mix(in srgb, var(--orange-500) 12%, transparent)",
+                  border: "var(--hairline) solid color-mix(in srgb, var(--orange-500) 30%, transparent)",
+                }}
               >
-                <User className="h-8 w-8" style={{ color: N.text, filter: N.glow }} />
-              </div>
+                <Icon name="user" size={28} className="text-[var(--orange-500)]" />
+              </span>
               <div>
-                <h1
-                  className="text-xl font-black text-surface-50 mb-1"
-                  style={{ fontFamily: "Orbitron, sans-serif" }}
-                >
-                  Acceso Requerido
-                </h1>
-                <p className="text-sm text-surface-500">
+                <h2 className="text-[length:var(--t-xl)] mb-1">Acceso Requerido</h2>
+                <p className="text-[length:var(--t-sm)] text-[var(--text-muted)]">
                   Inicia sesión para ver tu perfil.
                 </p>
               </div>
-            </BoffContainer>
+            </Card>
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   // ── Logged in ──────────────────────────────────────────────────────────────
 
+  const userRoles = user.roles?.join(", ") || "Usuario"
+
   return (
-    <div className="relative min-h-screen bg-surface-950 overflow-hidden">
-      <FloatingBackground variant="warm" />
+    <div className="relative min-h-screen" style={{ background: "var(--bg)" }}>
+      <div className="relative container mx-auto px-4 z-10" style={{ paddingTop: "7.5rem", paddingBottom: "5rem" }}>
+        <div className="max-w-4xl mx-auto">
 
-      <div className="relative container mx-auto px-4 py-8 z-10">
-        <div className="max-w-3xl mx-auto">
-          <BoffContainer variant="primary" contentClassName="p-7 sm:p-9 space-y-8">
+          {/* ── Page head ─────────────────────────────────────────────────── */}
+          <div className="flex items-end justify-between gap-6 mb-8 flex-wrap">
+            <div>
+              <Kicker>Cuenta</Kicker>
+              <h1 className="text-[length:var(--t-4xl)] mt-[0.7rem] text-pretty">Mi perfil</h1>
+            </div>
+            <Button
+              variant={isEditing ? "primary" : "ghost"}
+              icon={isEditing ? "check" : "cog"}
+              onClick={() => (isEditing ? handleSave() : setIsEditing(true))}
+            >
+              {isEditing ? "Guardar cambios" : "Editar perfil"}
+            </Button>
+          </div>
 
-            {/* ── Header: avatar + identity ── */}
-            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-7">
-
+          {/* ── Identity card ─────────────────────────────────────────────── */}
+          <Card ticks className="overflow-hidden mb-6">
+            {/* Cover */}
+            <div
+              className="h-[104px]"
+              style={{
+                background: "color-mix(in srgb, var(--orange-500) 14%, var(--surface-2))",
+                borderBottom: "var(--hairline) solid var(--border)",
+                backgroundImage: "radial-gradient(var(--grid-dot) 1px, transparent 1px)",
+                backgroundSize: "22px 22px",
+              }}
+            />
+            {/* Main row */}
+            <div className="flex items-end gap-[1.5rem_1.75rem] flex-wrap p-[1.4rem_1.75rem_1.75rem]">
               {/* Avatar */}
-              <div className="flex flex-col items-center gap-3 flex-shrink-0">
+              <div className="relative w-[110px] h-[110px] shrink-0 -mt-[74px]">
                 <div
-                  className="relative group cursor-pointer"
+                  className="p-[2px] rounded-full cursor-pointer group"
                   onClick={handleImageClick}
+                  style={{
+                    background: "linear-gradient(135deg, var(--orange-500), var(--orange-700))",
+                    boxShadow: "0 10px 30px -10px var(--orange-500)",
+                  }}
                 >
-                  {/* Gradient ring */}
-                  <div
-                    className="p-[2px] rounded-full"
-                    style={{
-                      background: `linear-gradient(135deg, rgba(249,115,22,0.9), rgba(251,146,60,0.3), rgba(249,115,22,0.9))`,
-                    }}
-                  >
-                    <div className="p-0.5 rounded-full bg-surface-950">
-                      <Avatar className="w-28 h-28">
-                        <AvatarImage
-                          src={editedUser.image || user?.image || "/placeholder.svg?height=112&width=112"}
-                          alt={editedUser.name || "User"}
-                          className="object-cover"
-                        />
-                        <AvatarFallback
-                          className="text-3xl font-black"
-                          style={{ background: N.bg, color: N.text }}
-                        >
-                          {editedUser.name ? editedUser.name.charAt(0).toUpperCase() : "U"}
-                        </AvatarFallback>
+                  <div className="p-0.5 rounded-full" style={{ background: "var(--surface)" }}>
+                    <Avatar className="w-[106px] h-[106px]">
+                      <AvatarImage
+                        src={editedUser.image || user?.image || "/placeholder.svg?height=110&width=110"}
+                        alt={editedUser.name || "User"}
+                        className="object-cover"
+                      />
+                      <AvatarFallback
+                        className="text-3xl font-black"
+                        style={{ background: "color-mix(in srgb, var(--orange-500) 15%, var(--surface-2))", color: "var(--orange-500)" }}
+                      >
+                        {initial}
+                      </AvatarFallback>
 
-                        {/* Hover overlay */}
-                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-full flex items-center justify-center">
-                          <Camera className="w-7 h-7 text-white" />
+                      {/* Hover overlay */}
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-full flex items-center justify-center">
+                        <Icon name="camera" size={24} className="text-white" />
+                      </div>
+
+                      {/* Upload spinner */}
+                      {isUploading && (
+                        <div className="absolute inset-0 bg-black/70 rounded-full flex items-center justify-center">
+                          <Icon name="bolt" size={24} className="text-white animate-spin" />
                         </div>
-
-                        {/* Upload overlay */}
-                        {isUploading && (
-                          <div className="absolute inset-0 bg-black/70 rounded-full flex items-center justify-center">
-                            <Loader2 className="w-7 h-7 text-white animate-spin" />
-                          </div>
-                        )}
-                      </Avatar>
-                    </div>
+                      )}
+                    </Avatar>
                   </div>
                 </div>
+
+                {/* Camera button (handoff position) */}
+                <button
+                  onClick={handleImageClick}
+                  disabled={isUploading}
+                  aria-label="Cambiar foto"
+                  className="absolute bottom-[2px] right-[2px] w-[30px] h-[30px] rounded-full grid place-items-center cursor-pointer z-10 transition-colors duration-[var(--dur)]"
+                  style={{
+                    color: "var(--text)",
+                    background: "var(--surface)",
+                    border: "var(--hairline) solid var(--border-strong)",
+                  }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "var(--orange-500)"; (e.currentTarget as HTMLElement).style.borderColor = "var(--orange-500)" }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "var(--text)"; (e.currentTarget as HTMLElement).style.borderColor = "var(--border-strong)" }}
+                >
+                  <Icon name="camera" size={16} />
+                </button>
 
                 <input
                   ref={fileInputRef}
@@ -306,151 +224,194 @@ export default function UserProfile() {
                 />
 
                 {uploadError && (
-                  <p className="text-xs text-error-400 bg-error-950/50 px-3 py-1 rounded border border-error-800/50 max-w-[8rem] text-center">
+                  <p className="absolute -bottom-6 left-0 right-0 text-[length:var(--t-xs)] text-[var(--rose-400)] text-center">
                     {uploadError}
                   </p>
                 )}
               </div>
 
               {/* Identity */}
-              <div className="flex-1 text-center sm:text-left">
-                <h2
-                  className="text-2xl sm:text-3xl font-black text-surface-50 leading-tight mb-1"
-                  style={{
-                    fontFamily: "Orbitron, sans-serif",
-                    filter: "drop-shadow(0 0 14px rgba(249,115,22,0.25))",
-                  }}
-                >
-                  {editedUser.name || "Anonymous"}
-                </h2>
-                <p className="text-sm text-surface-400 mb-4">
-                  {editedUser.email || "No email provided"}
+              <div className="flex-1 min-w-[220px] pb-[0.3rem]">
+                <div className="flex items-center gap-[0.75rem] flex-wrap">
+                  <h2 className="text-[length:var(--t-2xl)] whitespace-nowrap">
+                    {editedUser.name || "Anonymous"}
+                  </h2>
+                  <Badge kind={socket ? "live" : undefined}>
+                    {socket ? "Online" : "Offline"}
+                  </Badge>
+                </div>
+                <p className="text-[var(--text-muted)] text-[length:var(--t-sm)] mt-[0.35rem] mb-[0.75rem]">
+                  @{editedUser.email?.split("@")[0] || "usuario"} · Miembro desde 2023
                 </p>
-
-                {/* Status chips */}
-                <div className="flex flex-wrap justify-center sm:justify-start gap-2">
-                  <StatusChip
-                    icon={<Shield className="w-3 h-3" />}
-                    label={user.roles?.join(", ") || "No roles"}
-                  />
-                  <StatusChip
-                    icon={<Wifi className="w-3 h-3" />}
-                    label={socket ? "Online" : "Offline"}
-                    active={!!socket}
-                  />
+                <div className="flex gap-2 flex-wrap">
+                  <Badge kind="accent">{userRoles}</Badge>
+                  {user.mcUuid || user.smartRotomUser?.uuid ? (
+                    <Badge kind="live">Minecraft</Badge>
+                  ) : null}
                 </div>
               </div>
+
+              {/* Quick stats (mirrors handoff hero Metric qdiv Metric) */}
+              <div className="flex items-center gap-5 pb-2 max-[600px]:w-full max-[600px]:justify-start max-[600px]:pt-2">
+                <Metric value="#42" label="Ranking" size="sm" tone="orange" mono />
+                <div className="w-px h-[38px]" style={{ background: "var(--border-strong)" }} />
+                <Metric value="4 180" label="Puntos" size="sm" tone="orange" mono />
+              </div>
             </div>
+          </Card>
 
-            <BoffDivider />
+          {/* ── Two-column grid ────────────────────────────────────────────── */}
+          <div className="grid gap-6 items-start [grid-template-columns:1.2fr_1fr] max-[1000px]:grid-cols-1">
+            {/* ── LEFT column ────────────────────────────────────────────── */}
+            <div className="flex flex-col gap-6">
 
-            {/* ── Profile settings ── */}
-            <div>
-              <ToolSectionHeader label="Datos de perfil" color="primary" />
-
-              <div className="grid sm:grid-cols-2 gap-5">
-                {[
-                  { id: "name", label: "Nombre", icon: <User className="h-3 w-3" />, field: "name", type: "text" },
-                  { id: "email", label: "Email", icon: <Mail className="h-3 w-3" />, field: "email", type: "email" },
-                ].map(({ id, label, icon, field, type }) => (
-                  <div key={id} className="space-y-1.5">
-                    <Label
-                      htmlFor={id}
-                      className="text-xs font-mono text-surface-500 flex items-center gap-1.5 tracking-widest uppercase"
-                    >
-                      {icon}
-                      {label}
-                    </Label>
+              {/* Account details */}
+              <Card style={{ padding: "1.5rem" }}>
+                <CardTitle icon="user">Datos de la cuenta</CardTitle>
+                <div className="grid grid-cols-2 gap-[1.1rem] max-[600px]:grid-cols-1">
+                  <Field label="Nombre" icon="user">
                     <Input
-                      id={id}
-                      type={type}
-                      value={(editedUser as any)[field] || ""}
-                      onChange={(e) =>
-                        setEditedUser((prev) => ({ ...prev, [field]: e.target.value }))
-                      }
+                      id="name"
+                      type="text"
+                      value={editedUser.name || ""}
+                      onChange={(e) => setEditedUser((prev) => ({ ...prev, name: e.target.value }))}
                       disabled={!isEditing}
-                      className="bg-surface-900 border-surface-700/60 text-surface-100 placeholder:text-surface-600 disabled:opacity-50 disabled:cursor-default focus:border-primary-500/50 h-9 text-sm"
                     />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <BoffDivider />
-
-            {/* ── Connections ── */}
-            <div>
-              <ToolSectionHeader label="Conexiones" color="primary" />
-
-              <div className="space-y-3">
-                <IntegrationCard
-                  icon={<Gamepad2 className="h-5 w-5" />}
-                  title="Discord Account"
-                  description="Conecta tu cuenta para funciones adicionales"
-                  linked={!!(editedUser as any).discordId}
-                  onLink={linkDiscord}
-                  buttonLabel="Vincular"
-                  boff={N}
-                />
-                <IntegrationCard
-                  icon={<User className="h-5 w-5" />}
-                  title="Minecraft Account"
-                  description="Vincula tu cuenta para acceder a los servidores"
-                  linked={!!(user.mcUuid || user.smartRotomUser?.uuid)}
-                  buttonLabel="Vincular"
-                  boff={MC}
-                />
-              </div>
-            </div>
-
-            <BoffDivider />
-
-            {/* ── Actions ── */}
-            <div>
-              {isEditing ? (
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <Button
-                    onClick={handleSave}
-                    className="flex-1 h-10 font-mono text-sm tracking-widest uppercase transition-all duration-200"
-                    style={{
-                      fontFamily: "Orbitron, sans-serif",
-                      background: "rgba(249,115,22,0.15)",
-                      borderColor: N.borderStrong,
-                      color: N.text,
-                      boxShadow: "0 0 20px rgba(249,115,22,0.12)",
-                    }}
-                    variant="outline"
-                  >
-                    Guardar cambios
-                  </Button>
-                  <Button
-                    onClick={() => setIsEditing(false)}
-                    variant="ghost"
-                    className="sm:w-36 h-10 font-mono text-sm text-surface-400 hover:text-surface-200 hover:bg-surface-800/50 transition-colors duration-150"
-                  >
-                    Cancelar
-                  </Button>
+                  </Field>
+                  <Field label="Correo" icon="mail">
+                    <Input
+                      id="email"
+                      type="email"
+                      value={editedUser.email || ""}
+                      onChange={(e) => setEditedUser((prev) => ({ ...prev, email: e.target.value }))}
+                      disabled={!isEditing}
+                    />
+                  </Field>
+                  <Field label="Biografía" icon="message" className="col-span-full">
+                    <textarea
+                      className={cn(
+                        "w-full font-body text-sm text-[var(--text)]",
+                        "bg-[var(--surface-2)] border border-solid border-[var(--border-strong)]",
+                        "rounded-[var(--btn-radius,9999px)]",
+                        "py-2.5 px-3.5",
+                        "transition-[border-color,box-shadow] duration-[var(--dur,0.32s)] ease-[var(--ease)]",
+                        "placeholder:text-[var(--text-dim)]",
+                        "focus:outline-none focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-soft)]",
+                        "disabled:opacity-55 disabled:cursor-not-allowed",
+                        "resize-y leading-[1.6]",
+                      )}
+                      rows={3}
+                      disabled={!isEditing}
+                      defaultValue="Entrenador competitivo de VGC y cazador a tiempo parcial. Construyendo herramientas para la comunidad."
+                    />
+                  </Field>
                 </div>
-              ) : (
-                <Button
-                  onClick={() => setIsEditing(true)}
-                  className="w-full h-10 font-mono text-sm tracking-widest uppercase transition-all duration-200"
-                  style={{
-                    fontFamily: "Orbitron, sans-serif",
-                    background: N.bg,
-                    borderColor: N.border,
-                    color: N.text,
-                  }}
-                  variant="outline"
-                >
-                  Editar perfil
-                </Button>
-              )}
+              </Card>
+
+              {/* Linked accounts */}
+              <Card style={{ padding: "1.5rem" }}>
+                <CardTitle icon="link">Cuentas vinculadas</CardTitle>
+                <div className="flex flex-col gap-3">
+                  <LinkedRow
+                    icon="discord"
+                    iconClass="discord"
+                    name="Discord"
+                    sub={!!(editedUser as any).discordId ? "Vinculado" : "Sin vincular"}
+                    end={
+                      !!(editedUser as any).discordId ? (
+                        <Badge kind="live">Vinculado</Badge>
+                      ) : (
+                        <Button variant="outline" size="sm" icon="link">
+                          Vincular
+                        </Button>
+                      )
+                    }
+                  />
+                  <LinkedRow
+                    icon="gamepad"
+                    iconClass="mc"
+                    name="Minecraft"
+                    sub={user.mcUuid || user.smartRotomUser?.uuid ? "Vinculado" : "Sin vincular"}
+                    end={
+                      user.mcUuid || user.smartRotomUser?.uuid ? (
+                        <Badge kind="live">Vinculado</Badge>
+                      ) : (
+                        <Button variant="outline" size="sm" icon="link">
+                          Vincular
+                        </Button>
+                      )
+                    }
+                  />
+                  <LinkedRow
+                    icon="gamepad"
+                    iconClass="steam"
+                    name="Showdown"
+                    sub={!!(editedUser as any).showdownUser ? "RotomChef" : "Sin vincular"}
+                    end={
+                      !!(editedUser as any).showdownUser ? (
+                        <Badge kind="live">Vinculado</Badge>
+                      ) : (
+                        <Button variant="outline" size="sm" icon="link">
+                          Vincular
+                        </Button>
+                      )
+                    }
+                  />
+                </div>
+              </Card>
+
+              {/* Recent activity */}
+              <Card style={{ padding: "1.5rem" }}>
+                <CardTitle icon="bell">Actividad reciente</CardTitle>
+                <ul className="list-none m-0 p-0 flex flex-col">
+                  {ACTIVITY.map((a, i) => (
+                    <ActivityItem key={i} icon={a.icon} text={a.text} time={a.time} color={a.color} />
+                  ))}
+                </ul>
+              </Card>
             </div>
 
-          </BoffContainer>
+            {/* ── RIGHT column ───────────────────────────────────────────── */}
+            <div className="flex flex-col gap-6">
+
+              {/* Statistics */}
+              <Card style={{ padding: "1.5rem" }}>
+                <CardTitle icon="chart">Estadísticas</CardTitle>
+                <div className="grid grid-cols-2 gap-[0.9rem] max-[600px]:grid-cols-1">
+                  {PROFILE_STATS.map((s) => (
+                    <Stat key={s.label} icon={s.icon} value={s.value} label={s.label} sub={s.sub} />
+                  ))}
+                </div>
+              </Card>
+
+              {/* Achievements */}
+              <Card style={{ padding: "1.5rem" }}>
+                <CardTitle
+                  icon="star"
+                  right={
+                    <span
+                      className="text-[var(--text-dim)]"
+                      style={{ fontFamily: "var(--font-mono)", fontSize: "var(--t-xs)" }}
+                    >
+                      37 / 60
+                    </span>
+                  }
+                >
+                  Logros
+                </CardTitle>
+                <div className="grid grid-cols-3 gap-[0.75rem] mb-5 max-[600px]:grid-cols-2">
+                  {ACHIEVEMENTS.map((a) => (
+                    <AchievementTile key={a.name} icon={a.icon} name={a.name} done={a.done} />
+                  ))}
+                </div>
+                <Button variant="ghost" block iconRight="arrow">
+                  Ver todos los logros
+                </Button>
+              </Card>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  );
+  )
 }

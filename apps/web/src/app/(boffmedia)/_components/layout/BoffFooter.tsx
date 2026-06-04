@@ -1,173 +1,199 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/primitives/button";
-import { Input } from "@/components/ui/primitives/input";
-import { Gamepad2 } from "lucide-react";
-import { getTranslations } from "next-intl/server";
+"use client";
 
-export async function BoffFooter() {
-  const t = await getTranslations("boffmedia.footer");
+import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { BoffButton as Button } from "@/components/ui/primitives/boffmedia/button";
+import { Icon } from "@/components/ui/primitives/boffmedia/icon";
+
+export function BoffFooter() {
+  const t = useTranslations("boffmedia.footer");
 
   return (
-    <footer className="relative bg-surface-950 overflow-hidden">
-      {/* Scanline texture */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-[0.02]"
-        aria-hidden="true"
-        style={{
-          backgroundImage:
-            "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.5) 2px, rgba(255,255,255,0.5) 4px)",
-        }}
-      />
-
-      {/* Neon top border */}
-      <div
-        className="absolute top-0 inset-x-0 h-[2px]"
-        aria-hidden="true"
-        style={{
-          background:
-            "linear-gradient(90deg, transparent 0%, rgba(249,115,22,0.4) 25%, rgba(251,146,60,0.65) 50%, rgba(249,115,22,0.4) 75%, transparent 100%)",
-          boxShadow: "0 0 12px rgba(249,115,22,0.2)",
-        }}
-      />
-
-      <div className="container mx-auto px-4 pt-14 pb-8 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
-
-          {/* ── Brand ── */}
-          <div className="space-y-4 md:col-span-1">
-            <div className="flex items-center gap-2.5">
-              <Gamepad2
-                className="h-5 w-5 text-primary-500 flex-shrink-0"
-                style={{ filter: "drop-shadow(0 0 6px rgba(249,115,22,0.45))" }}
+    <footer
+      className="mt-auto"
+      style={{
+        borderTop: "var(--hairline) solid var(--border)",
+        background: "var(--surface)",
+      }}
+    >
+      <div className="container mx-auto px-4">
+        {/* Top: brand + link columns */}
+        <div
+          className="grid gap-14 py-16 max-[920px]:grid-cols-1 max-[920px]:gap-10"
+          style={{ gridTemplateColumns: "1.1fr 2fr" }}
+        >
+          {/* Brand */}
+          <div className="flex flex-col gap-[1.1rem] max-w-[30ch]">
+            <Link href="/" className="inline-flex items-center gap-[0.6rem]">
+              <img
+                src="/assets/boff-logo.webp"
+                alt=""
+                width={34}
+                height={34}
+                className="rounded-[6px]"
               />
-              <span
-                className="text-lg font-bold bg-gradient-to-r from-primary-400 to-primary-600 text-transparent bg-clip-text"
-                style={{ filter: "drop-shadow(0 0 8px rgba(249,115,22,0.3))" }}
-              >
+              <span className="relative font-display font-extrabold text-[1.3rem] tracking-[0.01em] text-[var(--orange-500)] pr-[2.6rem]">
                 BoffMedia
+                <span className="absolute -top-[0.4rem] right-0 font-mono text-[0.5rem] font-bold tracking-[0.1em] px-[0.3rem] py-[0.12rem] text-[var(--on-accent)] bg-[var(--accent-bright)] rounded-[3px]">
+                  BETA
+                </span>
               </span>
-            </div>
-            <p className="text-sm text-surface-500 leading-relaxed">
+            </Link>
+            <p className="text-[length:var(--t-sm)] leading-[1.65] text-[var(--text-muted)] m-0">
               {t("tagline")}
             </p>
-          </div>
-
-          {/* ── Platform links ── */}
-          <div className="space-y-4">
-            <h4
-              className="text-xs font-mono text-primary-400/55 tracking-[0.35em] uppercase"
-              style={{ fontFamily: "Orbitron, sans-serif" }}
-            >
-              // {t("sections.platform.title")}
-            </h4>
-            <ul className="space-y-2.5">
+            <div className="flex gap-[0.6rem]">
               {[
-                { href: "/juegos", label: t("sections.platform.links.games") },
-                { href: "/eventos", label: t("sections.platform.links.events") },
-                { href: "/community", label: t("sections.platform.links.community") },
-              ].map(({ href, label }) => (
-                <li key={href}>
-                  <Link
-                    href={href}
-                    className="flex items-center gap-2 text-sm text-surface-500 hover:text-surface-100 transition-colors duration-150 group"
-                  >
-                    <span
-                      className="w-1 h-1 rounded-full flex-shrink-0 transition-colors duration-150"
-                      style={{ backgroundColor: "rgba(249,115,22,0.35)" }}
-                      aria-hidden="true"
-                    />
-                    {label}
-                  </Link>
-                </li>
+                { icon: "discord", label: "Discord" },
+                { icon: "globe", label: "Web" },
+                { icon: "message", label: "Foro" },
+                { icon: "star", label: "Reseñas" },
+              ].map(({ icon, label }) => (
+                <Link
+                  key={icon}
+                  href="#"
+                  aria-label={label}
+                  className="inline-flex items-center justify-center w-[38px] h-[38px] rounded-[var(--btn-radius)] border border-[var(--border-strong)] text-[var(--text-muted)] hover:text-[var(--orange-500)] hover:border-[var(--orange-500)] transition-colors duration-[var(--dur)]"
+                >
+                  <Icon name={icon} size={16} />
+                </Link>
               ))}
-            </ul>
+            </div>
           </div>
 
-          {/* ── Company links ── */}
-          <div className="space-y-4">
-            <h4
-              className="text-xs font-mono text-primary-400/55 tracking-[0.35em] uppercase"
-              style={{ fontFamily: "Orbitron, sans-serif" }}
-            >
-              // {t("sections.company.title")}
-            </h4>
-            <ul className="space-y-2.5">
-              {[
-                { href: "/about", label: t("sections.company.links.about") },
-                { href: "/blog", label: t("sections.company.links.blog") },
-              ].map(({ href, label }) => (
-                <li key={href}>
-                  <Link
-                    href={href}
-                    className="flex items-center gap-2 text-sm text-surface-500 hover:text-surface-100 transition-colors duration-150"
-                  >
-                    <span
-                      className="w-1 h-1 rounded-full flex-shrink-0"
-                      style={{ backgroundColor: "rgba(249,115,22,0.35)" }}
-                      aria-hidden="true"
-                    />
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {/* Link columns */}
+          <div
+            className="grid gap-8 max-[920px]:grid-cols-2 max-[560px]:grid-cols-1"
+            style={{ gridTemplateColumns: "repeat(3, 1fr) 1.4fr" }}
+          >
+            {/* Plataforma */}
+            <div>
+              <h4 className="font-mono text-[length:var(--t-xs)] font-bold uppercase tracking-[0.1em] text-[var(--text)] m-0 mb-[1.1rem]">
+                {t("sections.platform.title")}
+              </h4>
+              <ul className="list-none p-0 m-0 flex flex-col gap-[0.7rem]">
+                {[
+                  { href: "/herramientas", label: t("sections.platform.links.games") },
+                  { href: "/eventos", label: t("sections.platform.links.events") },
+                  { href: "/herramientas", label: t("sections.platform.links.tools") },
+                  { href: "/community", label: t("sections.platform.links.community") },
+                  { href: "/eventos", label: t("sections.platform.links.ranking") },
+                ].map(({ href, label }) => (
+                  <li key={label}>
+                    <Link
+                      href={href}
+                      className="text-[length:var(--t-sm)] text-[var(--text-muted)] transition-colors duration-[var(--dur)] hover:text-[var(--orange-500)]"
+                    >
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-          {/* ── Newsletter ── */}
-          <div className="space-y-4">
-            <h4
-              className="text-xs font-mono text-primary-400/55 tracking-[0.35em] uppercase"
-              style={{ fontFamily: "Orbitron, sans-serif" }}
-            >
-              // {t("newsletter.title")}
-            </h4>
-            <div className="flex gap-2">
-              <Input
-                placeholder={t("newsletter.emailPlaceholder")}
-                type="email"
-                className="bg-surface-900 border-surface-700/60 text-surface-200 placeholder:text-surface-600 focus:border-primary-500/50 text-sm h-9"
-              />
-              <Button
-                type="submit"
-                className="bg-primary-600 hover:bg-primary-500 text-white font-mono text-xs tracking-wider flex-shrink-0 h-9 px-3 transition-colors duration-150"
-                style={{ fontFamily: "Orbitron, sans-serif" }}
+            {/* Recursos */}
+            <div>
+              <h4 className="font-mono text-[length:var(--t-xs)] font-bold uppercase tracking-[0.1em] text-[var(--text)] m-0 mb-[1.1rem]">
+                {t("sections.resources.title")}
+              </h4>
+              <ul className="list-none p-0 m-0 flex flex-col gap-[0.7rem]">
+                {[
+                  { href: "/blog", label: t("sections.resources.links.blog") },
+                  { href: "/styles/showcase", label: t("sections.resources.links.components") },
+                  { href: "#", label: t("sections.resources.links.servers") },
+                  { href: "#", label: t("sections.resources.links.status") },
+                  { href: "#", label: t("sections.resources.links.api") },
+                ].map(({ href, label }) => (
+                  <li key={label}>
+                    <Link
+                      href={href}
+                      className="text-[length:var(--t-sm)] text-[var(--text-muted)] transition-colors duration-[var(--dur)] hover:text-[var(--orange-500)]"
+                    >
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Compañía */}
+            <div>
+              <h4 className="font-mono text-[length:var(--t-xs)] font-bold uppercase tracking-[0.1em] text-[var(--text)] m-0 mb-[1.1rem]">
+                {t("sections.company.title")}
+              </h4>
+              <ul className="list-none p-0 m-0 flex flex-col gap-[0.7rem]">
+                {[
+                  { href: "/about", label: t("sections.company.links.about") },
+                  { href: "#", label: t("sections.company.links.contact") },
+                  { href: "#", label: t("sections.company.links.press") },
+                  { href: "#", label: t("sections.company.links.discord") },
+                ].map(({ href, label }) => (
+                  <li key={label}>
+                    <Link
+                      href={href}
+                      className="text-[length:var(--t-sm)] text-[var(--text-muted)] transition-colors duration-[var(--dur)] hover:text-[var(--orange-500)]"
+                    >
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Newsletter */}
+            <div>
+              <h4 className="font-mono text-[length:var(--t-xs)] font-bold uppercase tracking-[0.1em] text-[var(--text)] m-0 mb-[1.1rem]">
+                {t("newsletter.title")}
+              </h4>
+              <p className="text-[var(--text-muted)] text-[length:var(--t-sm)] mt-0 mb-0">
+                {t("newsletter.description")}
+              </p>
+              <form
+                className="flex gap-[0.5rem] mt-[0.9rem]"
+                onSubmit={(e) => e.preventDefault()}
               >
-                {t("newsletter.joinButton")}
-              </Button>
+                <input
+                  className="flex-1 h-[46px] px-4 rounded-[var(--btn-radius,var(--radius-pill,9999px))] text-[length:var(--t-sm)] bg-[var(--surface-2)] border border-[var(--border-strong)] text-[var(--text)] outline-none focus:border-[var(--accent)]"
+                  type="email"
+                  placeholder={t("newsletter.emailPlaceholder")}
+                  aria-label="Correo"
+                />
+                <Button
+                  type="submit"
+                  aria-label="Suscribirse"
+                  className="px-3"
+                >
+                  {t("newsletter.joinButton")}
+                </Button>
+              </form>
             </div>
           </div>
         </div>
 
-        {/* Gradient divider */}
+        {/* Legal bar */}
         <div
-          className="h-px mb-8"
+          className="flex items-center justify-between gap-4 py-[1.4rem] max-[560px]:flex-col max-[560px]:items-start"
           style={{
-            background:
-              "linear-gradient(90deg, transparent, rgba(249,115,22,0.15) 30%, rgba(249,115,22,0.15) 70%, transparent)",
+            borderTop: "var(--hairline) solid var(--border)",
           }}
-        />
-
-        {/* Bottom bar */}
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p
-            className="text-xs font-mono text-surface-600 tracking-wide"
-          >
+        >
+          <span className="text-[length:var(--t-sm)] text-[var(--text-dim)]">
             {t("copyright", { year: new Date().getFullYear() })}
-          </p>
-          <div className="flex items-center gap-6">
-            <Link
-              href="/privacidad"
-              className="text-xs font-mono text-surface-500 hover:text-primary-400 transition-colors duration-150 tracking-wide"
-            >
-              {t("legal.privacy")}
-            </Link>
-            <span className="w-px h-3 bg-surface-700/60" aria-hidden="true" />
-            <Link
-              href="/terminos"
-              className="text-xs font-mono text-surface-500 hover:text-primary-400 transition-colors duration-150 tracking-wide"
-            >
-              {t("legal.terms")}
-            </Link>
+          </span>
+          <div className="flex gap-6">
+            {[
+              { href: "/privacidad", label: t("legal.privacy") },
+              { href: "/terminos", label: t("legal.terms") },
+              { href: "#", label: t("legal.cookies") },
+            ].map(({ href, label }) => (
+              <Link
+                key={label}
+                href={href}
+                className="text-[length:var(--t-sm)] text-[var(--text-muted)] transition-colors duration-[var(--dur)] hover:text-[var(--orange-500)]"
+              >
+                {label}
+              </Link>
+            ))}
           </div>
         </div>
       </div>
