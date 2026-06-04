@@ -15,7 +15,7 @@ export default function PaletteViewer() {
   ];
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="container mx-auto p-6 pt-16">
       <div className="absolute inset-0 bg-gradient-to-br from-surface-950 via-surface-900 to-surface-800 -z-10" />
       <h1 className="text-4xl font-extrabold mb-10 text-center text-white tracking-wide drop-shadow-lg">
         🎮 Color System Preview

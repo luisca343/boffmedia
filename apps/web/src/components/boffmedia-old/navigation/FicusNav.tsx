@@ -68,7 +68,7 @@ export function FicusNav() {
 
   return (
     <header
-      className="fixed w-full z-50 h-[68px] flex items-center transition-all duration-[var(--dur)] ease-[var(--ease)]"
+      className="fixed w-full z-50 h-16 flex items-center transition-all duration-[var(--dur)] ease-[var(--ease)]"
       style={{
         background: scrolled
           ? "color-mix(in srgb, var(--bg) 90%, transparent)"
