@@ -3,8 +3,8 @@
 import * as React from "react"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
-import { Icon } from "../primitives/icon"
-import { BoffCard as Card } from "../primitives/card"
+import { Icon } from "../../primitives/icon"
+import { BoffCard as Card } from "../../primitives/card"
 import { useScanAnimation } from "@/hooks/tools/useScanAnimation"
 
 export interface GameData {

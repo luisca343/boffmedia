@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import { cn } from "@/lib/utils"
-import { Kicker } from "../primitives/kicker"
+import { Kicker } from "../../primitives/kicker"
 
 interface GameHeaderProps {
   prefix: string
