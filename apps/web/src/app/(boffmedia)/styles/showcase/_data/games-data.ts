@@ -23,6 +23,7 @@ export interface FeaturedToolData {
   href: string
   icon: string
   image: string
+  hue?: number
 }
 
 export interface GameData {
@@ -105,6 +106,7 @@ export const GAMES: Record<string, GameData> = {
       href: "#/herramientas/mhwilds/builds/planner",
       icon: "sword",
       image: "Hero · Gemma / Build Planner",
+      hue: 152,
     },
     tools: [
       {
@@ -207,6 +209,7 @@ export const GAMES: Record<string, GameData> = {
       href: "#/herramientas/pokemon/calc",
       icon: "calc",
       image: "Hero · Calculadora de Daño",
+      hue: 28,
     },
     tools: [
       {
@@ -281,6 +284,7 @@ export const GAMES: Record<string, GameData> = {
       href: "#/herramientas/otros/keys",
       icon: "bookmark",
       image: "Hero · Claves de Steam",
+      hue: 200,
     },
     tools: [
       {
