@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Icon } from "../primitives/icon"
+import { Icon } from "../../primitives/icon"
 
 interface AchievementTileProps {
   icon: string
