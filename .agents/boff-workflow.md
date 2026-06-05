@@ -92,6 +92,7 @@ documentation is high.
 - ❌ Call `create_gitlab_mr` without explicit user request — MR creation is always
   user-initiated, never automatic.
 - ❌ Skip `check_guardrails` because "the path looks safe."
+- ❌ Run `pnpm lint`, `pnpm type-check`, or any other verification command outside of `run_verification`. The agent tracks run IDs, step ordering, and metrics — bypassing it breaks the chain and invalidates the run. This rule is absolute for all code-modifying tasks, no carve-out.
 - ❌ Decide a task is "too small for the agent" when it modifies 2+ files in 2+
   modules — that's the exact case `plan_goal` exists for.
 
@@ -110,6 +111,9 @@ If `boff-agent` tools are not registered in the current session:
    - `.vscode/mcp.json` (VS Code + Copilot)
    - `opencode.json` (OpenCode)
 3. If proceeding manually, at minimum run `pnpm type-check` before declaring done.
+   **Exception**: this is the ONLY scenario where running a verification command
+   directly is permitted — and only because the agent is unavailable. Once the
+   agent comes back, the run must be logged retroactively via `save_run`.
 
 ---
 
