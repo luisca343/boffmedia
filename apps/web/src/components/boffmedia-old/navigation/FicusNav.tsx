@@ -68,7 +68,7 @@ export function FicusNav() {
 
   return (
     <header
-      className="fixed w-full z-50 h-16 flex items-center transition-all duration-[var(--dur)] ease-[var(--ease)]"
+      className="fixed w-full z-50 h-[68px] flex items-center transition-all duration-[var(--dur)] ease-[var(--ease)]"
       style={{
         background: scrolled
           ? "color-mix(in srgb, var(--bg) 90%, transparent)"
@@ -99,7 +99,7 @@ export function FicusNav() {
         </Link>
 
         {/* Desktop nav links */}
-        <nav className="hidden md:flex items-center gap-1" aria-label={t("ariaLabel")}>
+        <nav className="hidden md:flex items-center gap-[0.4rem]" aria-label={t("ariaLabel")}>
           <NavMenuProvider>
             {NAV_LINKS.map(({ href, label, icon, override }) => {
               const active = inPage(href);
@@ -111,22 +111,13 @@ export function FicusNav() {
                     <InternalLink
                       app={href === "/" ? "" : null}
                       href={href}
-                      className={`inline-flex items-center gap-[0.45rem] text-[length:var(--t-sm)] font-medium py-2 px-[0.85rem] rounded-[var(--btn-radius)] transition-colors duration-[var(--dur)] ease-[var(--ease)] ${
-                        active
-                          ? "text-[var(--orange-500)] font-semibold bg-[color-mix(in_srgb,var(--orange-500)_14%,transparent)]"
-                          : "text-[var(--text-muted)] hover:text-[var(--text)]"
-                      }`}
+                      className={`navlink ${active ? "navlink--active" : ""}`}
                       onClick={handleMenuItemClick}
                     >
                       {icon && (
                         <Icon
                           name={icon}
                           size={17}
-                          className={
-                            active
-                              ? "text-[var(--orange-500)]"
-                              : "text-[var(--text-dim)] transition-colors duration-[var(--dur)]"
-                          }
                         />
                       )}
                       <span>{label}</span>

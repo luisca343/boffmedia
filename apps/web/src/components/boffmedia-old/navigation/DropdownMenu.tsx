@@ -10,7 +10,6 @@ import React, {
 } from "react";
 import Link from "next/link";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/primitives/button";
 import { motion } from "framer-motion";
 import { useBoffSession } from "@/services/useBoffSession";
 import type { UserRole } from "@boffmedia/shared/roles";
@@ -149,9 +148,8 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
       onMouseLeave={handleMouseLeave}
     >
       {/* Trigger */}
-      <Button
-        variant="ghost"
-        className="px-2 py-1 z-20 text-surface-300 hover:text-primary-300 hover:bg-surface-800/40 text-sm group transition-colors duration-150"
+      <button
+        className="navlink group"
         onClick={() => (isOpen ? dismissMenu(id) : openMenu(id))}
       >
         {mainLink ? (
@@ -171,7 +169,7 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
             />
           </>
         )}
-      </Button>
+      </button>
 
       {/* Panel — pt-2 keeps the visual spacing inside the hover zone so the
           cursor never exits the parent div while crossing to the panel. */}
