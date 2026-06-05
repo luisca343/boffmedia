@@ -27,16 +27,18 @@ export function ToolSelect({
     <button
       type="button"
       className={cn(
-        "inline-flex items-center gap-2 px-3 py-1.5",
-        "rounded-[var(--radius)] border border-[var(--border)]",
-        "bg-[var(--surface-2)] text-sm text-[color:var(--text-muted)]",
-        "hover:text-[color:var(--text)] transition-colors",
+        "inline-flex items-center gap-[0.45rem] whitespace-nowrap shrink-0",
+        "px-[0.7rem] py-[0.46rem]",
+        "rounded-[var(--radius)] [border-width:var(--hairline)] border-solid [border-color:var(--border-strong)]",
+        "bg-[var(--surface-2)] text-sm font-medium text-[var(--text)]",
+        "hover:border-[color-mix(in_srgb,var(--accent)_45%,var(--border-strong))]",
+        "transition-[border-color,background] duration-[var(--dur)] ease-[var(--ease)]",
       )}
       style={minWidth ? { minWidth } : { width }}
     >
-      {icon && <Icon name={icon} size={13} className="shrink-0" />}
-      <span className="flex-1 text-left">{current ? current.label : placeholder}</span>
-      <Icon name="chevron" size={14} className="shrink-0 text-[color:var(--text-dim)]" />
+      {icon && <Icon name={icon} size={13} className="shrink-0 text-[var(--text-dim)]" />}
+      <span className="flex-1 text-left overflow-hidden text-ellipsis">{current ? current.label : placeholder}</span>
+      <Icon name="chevron" size={14} className="shrink-0 text-[var(--text-dim)] ml-auto" />
     </button>
   )
 }

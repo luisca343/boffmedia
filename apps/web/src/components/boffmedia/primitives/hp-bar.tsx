@@ -13,12 +13,12 @@ export function HpBar({ current, max, label = "PS", onChange, onReset, resetLabe
   const pct = max ? Math.max(0, Math.min(100, (current / max) * 100)) : 0
   const tone = pct > 50 ? "#34d399" : pct > 25 ? "#f5b342" : "#f06262"
   return (
-    <div>
-      <div className="flex items-center gap-2 text-sm mb-1">
-        <span className="font-mono text-xs text-[color:var(--text-dim)] uppercase">{label}</span>
+    <div className="flex flex-col gap-[0.3rem]">
+      <div className="flex items-center gap-[0.4rem]">
+        <span className="font-mono text-[9px] tracking-[0.1em] uppercase text-[var(--text-dim)] font-bold">{label}</span>
         {onChange ? (
           <input
-            className="w-14 px-1.5 py-0.5 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-2)] text-sm text-center font-mono text-[color:var(--text)] focus:outline-none focus:border-[var(--accent)]"
+            className="w-[3.4rem] text-center font-mono text-xs text-[var(--text)] bg-[var(--surface-2)] [border-width:var(--hairline)] border-solid [border-color:var(--border-strong)] rounded-[6px] p-[0.3rem] focus:outline-none focus:[border-color:var(--accent)]"
             type="number"
             min={1}
             max={max}
@@ -26,21 +26,21 @@ export function HpBar({ current, max, label = "PS", onChange, onReset, resetLabe
             onChange={(e) => onChange(Math.min(max, Math.max(1, parseInt(e.target.value) || 1)))}
           />
         ) : (
-          <span className="font-mono font-bold text-[color:var(--text)]">{current}</span>
+          <span className="font-mono text-[11px] text-[var(--text-muted)]">{current}</span>
         )}
-        <span className="font-mono text-xs text-[color:var(--text-dim)]">/ {max}</span>
-        <span className="font-mono text-xs font-bold" style={{ color: tone }}>({pct.toFixed(0)}%)</span>
+        <span className="font-mono text-[11px] text-[var(--text-muted)]">/ {max}</span>
+        <span className="font-mono text-[11px] font-bold" style={{ color: tone }}>({pct.toFixed(0)}%)</span>
         {onReset && (
           <button
-            className="ml-auto text-xs text-[color:var(--accent-bright)] hover:underline cursor-pointer border-0 bg-transparent font-medium"
+            className="ml-auto text-[9px] text-[var(--text-dim)] hover:text-[var(--text-muted)] cursor-pointer border-0 bg-none font-mono"
             onClick={onReset}
           >
             {resetLabel}
           </button>
         )}
       </div>
-      <div className="h-2 rounded-full bg-[var(--surface-3)] overflow-hidden">
-        <div className="h-full rounded-full transition-all" style={{ width: pct + "%", background: tone }} />
+      <div className="h-[7px] rounded-[4px] bg-[var(--surface-3)] overflow-hidden [border-width:var(--hairline)] border-solid [border-color:var(--border)]">
+        <div className="h-full rounded-[4px] transition-[width] duration-[var(--dur)] ease-[var(--ease)]" style={{ width: pct + "%", background: tone }} />
       </div>
     </div>
   )
