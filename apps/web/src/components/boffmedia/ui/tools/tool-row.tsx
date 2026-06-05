@@ -1,8 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { Icon } from "../primitives/icon"
-import { BoffBadge as Badge } from "../primitives/badge"
+import { Icon } from "../../primitives/icon"
+import { BoffBadge as Badge } from "../../primitives/badge"
 
 interface ToolRowTool {
   icon: string
