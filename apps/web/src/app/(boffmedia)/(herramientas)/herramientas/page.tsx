@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Search, ChevronDown, Terminal } from "lucide-react";
-import { GameCard, type GameData } from "@/components/boffmedia/ui/game-card";
+import { GameCard, type GameData } from "@/components/boffmedia/ui/games/game-card";
 import { Kicker } from "@/components/boffmedia/primitives/kicker";
 import { Icon } from "@/components/boffmedia/primitives/icon";
 

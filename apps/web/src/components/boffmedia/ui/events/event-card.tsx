@@ -1,10 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { Icon } from "../primitives/icon"
-import { BoffButton as Button } from "../primitives/button"
-import { BoffCard as Card } from "../primitives/card"
-import { BoffBadge as Badge } from "../primitives/badge"
+import { Icon } from "../../primitives/icon"
+import { BoffButton as Button } from "../../primitives/button"
+import { BoffCard as Card } from "../../primitives/card"
+import { BoffBadge as Badge } from "../../primitives/badge"
 
 interface EventData {
   date: string

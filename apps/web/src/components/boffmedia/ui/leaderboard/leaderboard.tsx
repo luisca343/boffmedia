@@ -1,9 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { BoffButton as Button } from "../primitives/button"
-import { BoffCard as Card } from "../primitives/card"
-import { BoffBadge as Badge } from "../primitives/badge"
+import { BoffButton as Button } from "../../primitives/button"
+import { BoffCard as Card } from "../../primitives/card"
+import { BoffBadge as Badge } from "../../primitives/badge"
 import { LeaderRow } from "./leader-row"
 
 interface LeaderEntry {
