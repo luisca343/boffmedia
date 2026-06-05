@@ -75,12 +75,31 @@ export function FicusNav() {
           : "color-mix(in srgb, var(--bg) 78%, transparent)",
         backdropFilter: "blur(14px)",
         WebkitBackdropFilter: "blur(14px)",
-        borderBottom: scrolled
-          ? "var(--hairline) solid var(--border)"
-          : "var(--hairline) solid transparent",
       }}
     >
-      <div className="container mx-auto flex justify-between items-center h-full px-4">
+      {/* Scanline texture overlay */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.025] z-0"
+        aria-hidden="true"
+        style={{
+          backgroundImage:
+            "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.5) 2px, rgba(255,255,255,0.5) 4px)",
+        }}
+      />
+
+      {/* Neon bottom border */}
+      <div
+        className="absolute bottom-0 inset-x-0 h-[2px] transition-all duration-[var(--dur)] z-10"
+        aria-hidden="true"
+        style={{
+          background: scrolled
+            ? "linear-gradient(90deg, transparent 0%, rgba(249,115,22,0.55) 25%, rgba(251,146,60,0.85) 50%, rgba(249,115,22,0.55) 75%, transparent 100%)"
+            : "linear-gradient(90deg, transparent 0%, rgba(249,115,22,0.18) 25%, rgba(249,115,22,0.35) 50%, rgba(249,115,22,0.18) 75%, transparent 100%)",
+          boxShadow: scrolled ? "0 0 14px rgba(249,115,22,0.35), 0 0 4px rgba(249,115,22,0.5)" : "none",
+        }}
+      />
+
+      <div className="container mx-auto flex justify-between items-center h-full px-4 relative z-10">
         {/* Logo */}
         <Link href="/" className="inline-flex items-center gap-[0.6rem] flex-shrink-0">
           <img
