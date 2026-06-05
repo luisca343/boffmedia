@@ -47,7 +47,7 @@ describe('WingullFacadeService', () => {
       'getWorldGuardWorlds' | 'getPlayersOwnedRegions' | 'getAllPlots'
     >
   >;
-  let logger: jest.Mocked<Pick<Logger, 'log' | 'warn' | 'error'>>;
+  let _logger: jest.Mocked<Pick<Logger, 'log' | 'warn' | 'error'>>;
 
   beforeEach(async () => {
     const mockEconomyService = {
@@ -109,7 +109,7 @@ describe('WingullFacadeService', () => {
     worldService = module.get(WingullWorldService);
     transportService = module.get(WingullTransportService);
     wingullRepository = module.get(WingullRepository);
-    logger = module.get(Logger);
+    _logger = module.get(Logger);
   });
 
   it('should be defined', () => {
@@ -225,7 +225,7 @@ describe('WingullFacadeService', () => {
     it('should send message to player', async () => {
       playerService.sendMessage.mockResolvedValue({ success: true });
 
-      const result = await service.sendMessage('test-uuid', 'Hello!');
+      const _result = await service.sendMessage('test-uuid', 'Hello!');
 
       expect(playerService.sendMessage).toHaveBeenCalledWith(
         'test-uuid',
@@ -238,7 +238,7 @@ describe('WingullFacadeService', () => {
     it('should give Pokémon to player', async () => {
       playerService.givePokemon.mockResolvedValue({ success: true });
 
-      const result = await service.givePokemon('test-uuid', 'pikachu lvl:5');
+      const _result = await service.givePokemon('test-uuid', 'pikachu lvl:5');
 
       expect(playerService.givePokemon).toHaveBeenCalledWith(
         'test-uuid',
