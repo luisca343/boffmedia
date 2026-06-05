@@ -12,10 +12,9 @@ jest.mock('@/_db/schema/Events', () => ({
   validateParticipantCanReceiveAchievement: jest.fn(),
 }));
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 const {
   validateParticipantCanReceiveAchievement,
-} = require('@/_db/schema/Events');
+} = require('@/_db/schema/Events'); // eslint-disable-line @typescript-eslint/no-require-imports
 
 const mockWhere = jest.fn();
 const mockFrom = jest.fn().mockReturnValue({ where: mockWhere });

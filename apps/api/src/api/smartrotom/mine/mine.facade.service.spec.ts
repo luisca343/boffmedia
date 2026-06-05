@@ -42,7 +42,7 @@ describe('MineFacadeService', () => {
       | 'validatePlayerExists'
     >
   >;
-  let logger: jest.Mocked<Pick<Logger, 'log' | 'warn' | 'error'>>;
+  let _logger: jest.Mocked<Pick<Logger, 'log' | 'warn' | 'error'>>;
 
   beforeEach(async () => {
     const mockEnergyService = {
@@ -87,7 +87,7 @@ describe('MineFacadeService', () => {
     gameService = module.get(GameService);
     rewardService = module.get(RewardService);
     playerService = module.get(PlayerService);
-    logger = module.get(Logger);
+    _logger = module.get(Logger);
   });
 
   it('should be defined', () => {
