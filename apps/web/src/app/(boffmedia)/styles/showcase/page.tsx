@@ -40,7 +40,7 @@ import { GameCard } from "@/components/boffmedia/ui/games/game-card"
 import { ToolsTypeBadge } from "@/components/boffmedia/ui/tools/tool-type-badge"
 
 // Tool-kit components
-import { ToolPanel, ToolStatBars, ToolApp, SegTabs, ToolSelect, ToolTable, CopyButton, Picker, HpBar } from "@/components/boffmedia/primitives"
+import { ToolPanel, ToolStatBars, ToolApp, SegTabs, ToolSelect, ToolTable, CopyButton, Picker, HpBar, ResultBadge, StatTile, SplitBar, TrendChart, HeatGrid, TagPills } from "@/components/boffmedia/primitives"
 import { PokeSprite } from "@/components/shared/pokemon/PokeSprite"
 import { TeamSprites } from "@/components/shared/pokemon/TeamSprites"
 import { BaseStatBars } from "@/components/shared/pokemon/BaseStatBars"
@@ -2758,7 +2758,12 @@ function RoadmapSection() {
 function ToolsKitSection() {
   const [hpDemo, setHpDemo] = React.useState(142)
   const [pickDemo, setPickDemo] = React.useState("Modesto")
+  const [tagDemo, setTagDemo] = React.useState("skill")
   const demoUsage = [{ name: "Bola Sombra", pct: 95 }, { name: "Voz Lunar", pct: 88 }, { name: "Protección", pct: 72 }, { name: "Viento Feérico", pct: 51 }]
+  const eloDemo = [1500, 1512, 1505, 1524, 1540, 1533, 1551, 1569, 1560, 1582, 1601, 1593, 1618]
+  const eloDemoB = [1500, 1490, 1503, 1498, 1515, 1527, 1519, 1531, 1548, 1540, 1556, 1565, 1574]
+  const eloDemoRes: (string | null | undefined)[] = ["", "win", "loss", "win", "win", "loss", "win", "win", "loss", "win", "win", "loss", "win"]
+  const heatDemo = [3, 1, 0, 0, 2, 4, 5, 2, 1, 0, 3, 6, 4, 2, 0, 1, 5, 7, 3, 1, 0, 2, 4, 6, 3, 0, 1, 0]
   return (
     <div>
       <div className="dsh-sectionhead">
@@ -2769,6 +2774,10 @@ function ToolsKitSection() {
 
       <Callout icon="wrench" title="Nuevo en este pase" tone="orange" style={{ marginBottom: "1.75rem" }}>
         El rediseño full-bleed de <strong>Meta VGC</strong> y la <strong>Calculadora de Daño</strong> extrajo diez piezas a <code>tool-kit.jsx</code>: <code>ToolApp</code> (marco de app a pantalla completa), <code>SegTabs</code>, <code>ToolSelect</code>, <code>ToolTable</code> (tabla ordenable), <code>Picker</code> (select nativo estilizado), <code>HpBar</code> (barra de recurso), <code>TeamSprites</code>, <code>CopyButton</code>, <code>TypeBadge</code> y <code>BaseStatBars</code> — junto a las ya existentes <code>ToolPanel</code>, <code>ToolStatBars</code> y <code>PokeSprite</code>. Todas token-driven y compatibles con las tres direcciones.
+      </Callout>
+
+      <Callout icon="chart" title="Nuevo en este pase · Game Tracker" tone="accent" style={{ marginBottom: "1.75rem" }}>
+        El rediseño full-bleed del <strong>VGC Game Tracker</strong> (sesiones de ladder + torneo, partidas, series BO3 y panel de estadísticas) extrajo seis piezas genéricas más a <code>tool-kit.jsx</code>: <code>ResultBadge</code> (chip W/L/D), <code>StatTile</code> (KPI), <code>SplitBar</code> (barra victoria/derrota), <code>TrendChart</code> (gráfico de líneas responsive), <code>HeatGrid</code> (mapa de calor de actividad) y <code>TagPills</code> (chips con tono, seleccionables).
       </Callout>
 
       <Spec2 title="ToolPanel" tag="tool-kit.jsx" intro="La superficie sobre la que se construye cada página de herramienta: cabecera opcional (título + meta o cabecera propia) y cuerpo con padding. Hereda card-bg / card-border / radius del sistema." a11y="El título es texto real; el panel no aporta semántica falsa. La cabecera mantiene contraste AA en los seis modos.">
@@ -2898,6 +2907,72 @@ function ToolsKitSection() {
           ["Picker · value/onChange", "string / (v)=>void", "—", "Controlado."],
           ["HpBar · current/max", "number", "—", "Valor y tope del recurso."],
           ["HpBar · onChange/onReset", "fn", "—", "Editable + reinicio opcionales."],
+        ]} />
+      </Spec2>
+
+      <Spec2 title="ResultBadge · StatTile" tag="tool-kit.jsx" intro="Dos piezas base del Tracker. ResultBadge es el chip cuadrado de resultado (W / L / D / —) con tono semántico; StatTile es un KPI: número tabular grande sobre etiqueta, con tono (pos/neg/accent/neutral) y tamaño." a11y="ResultBadge usa la letra además del color. StatTile expone valor y etiqueta como texto real.">
+        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
+            <ResultBadge result="win" /><ResultBadge result="loss" /><ResultBadge result="draw" /><ResultBadge result={null} />
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "0.6rem", maxWidth: 460 }}>
+            <StatTile value="34" label="Jugadas" tone="neutral" />
+            <StatTile value="62%" label="Win rate" tone="pos" />
+            <StatTile value="1692" label="ELO" tone="accent" />
+            <StatTile value="−4.1" label="Δ media" tone="neg" small />
+          </div>
+        </div>
+        <PropTable rows={[
+          ["ResultBadge · result", '"win"|"loss"|"draw"|null', "—", "Define letra + tono."],
+          ["ResultBadge · size", "number", "32", "Lado en px."],
+          ["StatTile · value/label", "node / string", "—", "Valor grande + etiqueta."],
+          ["StatTile · tone", '"pos"|"neg"|"accent"|"neutral"', '"neutral"', "Color del valor."],
+          ["StatTile · small", "boolean", "false", "Variante compacta."],
+        ]} />
+      </Spec2>
+
+      <Spec2 title="SplitBar · TrendChart" tag="tool-kit.jsx" intro="SplitBar es la barra proporcional victoria/derrota (verde/rojo, con empate opcional) y su % de win rate. TrendChart es un gráfico de líneas responsive: mide su propio ancho para trazos nítidos, admite varias series, una línea base discontinua y puntos por resultado." a11y="SplitBar muestra el % como texto; TrendChart es decorativo-de-apoyo y el dato vive también en las tablas/KPIs.">
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.9rem", maxWidth: 520 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+            <SplitBar win={8} loss={2} /><SplitBar win={5} loss={4} draw={1} /><SplitBar win={2} loss={7} />
+          </div>
+          <div style={{ border: "var(--hairline) solid var(--border)", borderRadius: "var(--radius)", padding: "0.6rem 0.7rem" }}>
+            <TrendChart height={150}
+              lines={[{ values: eloDemo, color: "var(--accent)", width: 2 }, { values: eloDemoB, color: "var(--text-dim)", width: 1.5, dashed: true, opacity: 0.7 }]}
+              baseline={1500} dots={eloDemoRes} />
+          </div>
+        </div>
+        <PropTable rows={[
+          ["SplitBar · win/loss/draw", "number", "0", "Segmentos proporcionales."],
+          ["SplitBar · showRate", "boolean", "true", "Muestra el % de victorias."],
+          ["TrendChart · lines", "{values,color,width,dashed,opacity}[]", "—", "Series a trazar."],
+          ["TrendChart · baseline", "number", "—", "Regla discontinua de referencia."],
+          ["TrendChart · dots", '("win"|"loss"|...)[]', "—", "Puntos coloreados en la 1ª serie."],
+        ]} />
+      </Spec2>
+
+      <Spec2 title="HeatGrid · TagPills" tag="tool-kit.jsx" intro="HeatGrid es una rejilla de intensidad genérica (mapa de calor): ejes con etiquetas y una función value(fila,col) cuya magnitud tiñe la celda hacia el acento. TagPills es una fila de chips con tono, seleccionables (toggle, selección única) cuando se pasa onChange, o de solo lectura." a11y="TagPills seleccionable son botones reales; HeatGrid expone el conteo en el title de cada celda.">
+        <div style={{ display: "flex", gap: "1.5rem", flexWrap: "wrap", alignItems: "flex-start" }}>
+          <div style={{ minWidth: 240, flex: 1 }}>
+            <HeatGrid rows={["L", "M", "X", "J", "V", "S", "D"]} cols={["0", "1", "2", "3"]}
+              max={7} value={(ri, ci) => heatDemo[ri * 4 + ci] || 0} colLabel={(c) => ["mañana", "tarde", "noche", "madr."][Number(c)]} />
+          </div>
+          <div style={{ minWidth: 220 }}>
+            <span className="font-mono text-[10px] tracking-[0.1em] uppercase text-[var(--text-dim)] block mb-2">Causa del resultado</span>
+            <TagPills value={tagDemo} onChange={(v) => setTagDemo(v ?? "")} options={[
+              { value: "skill", label: "Habilidad", tone: "win" },
+              { value: "misplay", label: "Error", tone: "loss" },
+              { value: "luck", label: "Suerte", tone: "draw" },
+              { value: "disconnect", label: "Desconexión", tone: "neutral" },
+            ]} />
+          </div>
+        </div>
+        <PropTable rows={[
+          ["HeatGrid · rows/cols", "any[]", "—", "Etiquetas de los ejes."],
+          ["HeatGrid · value", "(r,c) => number|{n}", "—", "Magnitud de cada celda."],
+          ["HeatGrid · max/colLabel", "number / fn", "—", "Tope de intensidad y rótulo de columna."],
+          ["TagPills · options", "{value,label,tone}[]", "—", "Chips con tono (win/loss/draw/neutral)."],
+          ["TagPills · value/onChange", "string / fn", "—", "Con onChange = seleccionable; sin él, solo lectura."],
         ]} />
       </Spec2>
     </div>
