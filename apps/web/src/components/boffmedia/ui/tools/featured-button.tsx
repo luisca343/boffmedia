@@ -17,23 +17,20 @@ export function FeaturedButton({
   return (
     <button
       className={cn(
-        "inline-flex items-center justify-center gap-3",
-        "px-6 py-3 rounded-[var(--radius-lg)]",
-        "border border-solid cursor-pointer whitespace-nowrap",
-        "font-mono text-sm font-bold tracking-widest uppercase leading-none text-orange-500",
-        "transition-[transform,box-shadow,background,border-color] duration-[var(--dur,0.32s)] ease-[var(--ease)]",
+        "flex items-center gap-3 px-6 py-3 rounded-lg border font-display text-sm font-bold tracking-widest uppercase transition-all duration-300",
+        "cursor-pointer whitespace-nowrap leading-none text-orange-500",
         "focus-visible:outline-none",
         className,
       )}
       style={{
+        borderColor: isHovered
+          ? "color-mix(in srgb, var(--orange-500) 35%, transparent)"
+          : "color-mix(in srgb, var(--orange-500) 20%, transparent)",
         background: isHovered
           ? "color-mix(in srgb, var(--orange-500) 12%, transparent)"
           : "transparent",
-        borderColor: isHovered
-          ? "color-mix(in srgb, var(--orange-500) 50%, transparent)"
-          : "color-mix(in srgb, var(--orange-500) 20%, transparent)",
         boxShadow: isHovered
-          ? "0 0 20px color-mix(in srgb, var(--orange-500) 25%, transparent)"
+          ? "0 0 20px color-mix(in srgb, var(--orange-500) 30%, transparent)"
           : "none",
         transform: isHovered ? "translateX(3px)" : "translateX(0)",
       }}
