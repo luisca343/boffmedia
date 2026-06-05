@@ -13,7 +13,7 @@ import { Icon } from "../../primitives/icon"
 import { FeaturedTool } from "../tools/featured-tool"
 
 const HUE_MAP: Record<string, number> = {
-  mhwilds: 30,
+  mhwilds: 130,
   pokemon: 220,
   otros: 180,
 }
@@ -106,7 +106,7 @@ export function GamePage({ slug }: GamePageProps) {
   return (
     <div
       className="mx-auto px-[var(--gutter)] pb-20"
-      style={{ maxWidth: "1080px", paddingTop: "2rem" }}
+      style={{ paddingTop: "2rem" }}
     >
 
       <GameHeader

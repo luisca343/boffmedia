@@ -33,10 +33,6 @@ export function FeaturedTool({ tool, go, className }: FeaturedToolProps) {
   const [hovered, setHovered] = React.useState(false)
   const scanY = useScanAnimation(hovered, 1600)
 
-  const hue = tool.hue ?? 28
-  const glowColor = `oklch(0.6 0.16 ${hue} / 0.25)`
-  const scanlineColor = `oklch(0.7 0.16 ${hue} / 0.7)`
-
   return (
     <div
       className={cn("mb-12 cursor-pointer", className)}
@@ -47,10 +43,10 @@ export function FeaturedTool({ tool, go, className }: FeaturedToolProps) {
         className="grid grid-cols-[1.3fr_1fr] max-[620px]:grid-cols-1 overflow-hidden"
         style={{
           borderColor: hovered
-            ? `oklch(0.6 0.16 ${hue} / 0.5)`
+            ? "color-mix(in srgb, var(--orange-500) 50%, transparent)"
             : "var(--border)",
           boxShadow: hovered
-            ? `0 0 45px ${glowColor}, 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04)`
+            ? "0 0 45px color-mix(in srgb, var(--orange-500) 25%, transparent), 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04)"
             : undefined,
           transition: "transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease",
           transform: hovered ? "translateY(-4px)" : undefined,
@@ -66,9 +62,11 @@ export function FeaturedTool({ tool, go, className }: FeaturedToolProps) {
         <div
           className="absolute inset-x-0 top-0 h-[3px] pointer-events-none transition-all duration-300 z-20"
           style={{
-            background: `linear-gradient(90deg, #f97316, oklch(0.72 0.18 ${hue}))`,
+            background: "linear-gradient(90deg, var(--orange-500), color-mix(in srgb, var(--orange-500) 60%, transparent))",
             opacity: hovered ? 1 : 0.8,
-            boxShadow: hovered ? `0 0 16px ${glowColor}` : "none",
+            boxShadow: hovered
+              ? "0 0 16px color-mix(in srgb, var(--orange-500) 25%, transparent)"
+              : "none",
           }}
           aria-hidden="true"
         />
@@ -77,7 +75,7 @@ export function FeaturedTool({ tool, go, className }: FeaturedToolProps) {
         <div
           className="absolute inset-0 pointer-events-none transition-opacity duration-500"
           style={{
-            background: `radial-gradient(ellipse at 50% 0%, ${glowColor} 0%, transparent 65%)`,
+            background: "radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--orange-500) 25%, transparent) 0%, transparent 65%)",
             opacity: hovered ? 1 : 0.5,
           }}
         />
@@ -88,7 +86,7 @@ export function FeaturedTool({ tool, go, className }: FeaturedToolProps) {
             className="absolute inset-x-0 h-px pointer-events-none z-20 transition-none"
             style={{
               top: `${scanY}%`,
-              background: `linear-gradient(90deg, transparent, ${scanlineColor}, transparent)`,
+              background: "linear-gradient(90deg, transparent, color-mix(in srgb, var(--orange-500) 70%, transparent), transparent)",
             }}
           />
         )}
@@ -103,7 +101,11 @@ export function FeaturedTool({ tool, go, className }: FeaturedToolProps) {
           <div
             key={i}
             className={`absolute ${cls} transition-all duration-300 pointer-events-none z-20`}
-            style={{ borderColor: hovered ? scanlineColor : "rgba(100,116,139,0.55)" }}
+            style={{
+              borderColor: hovered
+                ? "color-mix(in srgb, var(--orange-500) 70%, transparent)"
+                : "rgba(100,116,139,0.55)",
+            }}
           />
         ))}
 
@@ -112,13 +114,7 @@ export function FeaturedTool({ tool, go, className }: FeaturedToolProps) {
           <div className="flex items-center gap-4">
             {tool.iconSrc ? (
               <div className="w-[60px] h-[60px] rounded-[var(--radius-lg,22px)] grid place-items-center overflow-hidden bg-[color-mix(in_srgb,var(--orange-500)_13%,transparent)] border border-solid border-[color-mix(in_srgb,var(--orange-500)_28%,transparent)] shadow-[0_0_30px_-8px_var(--orange-500)] shrink-0">
-                <Image
-                  src={tool.iconSrc}
-                  alt=""
-                  width={48}
-                  height={48}
-                  className="object-contain"
-                />
+                <Image src={tool.iconSrc} alt="" width={48} height={48} className="object-contain" />
               </div>
             ) : (
               <IconBox icon={tool.icon} size="lg" tone="orange" />
@@ -156,7 +152,7 @@ export function FeaturedTool({ tool, go, className }: FeaturedToolProps) {
           <div
             className="absolute inset-0 pointer-events-none z-10"
             style={{
-              background: `radial-gradient(ellipse at 50% 40%, oklch(0.6 0.16 ${hue} / 0.2) 0%, transparent 60%)`,
+              background: "radial-gradient(ellipse at 50% 40%, color-mix(in srgb, var(--orange-500) 20%, transparent) 0%, transparent 60%)",
               opacity: hovered ? 1 : 0.6,
               transition: "opacity 0.5s ease",
             }}
@@ -195,7 +191,7 @@ export function FeaturedTool({ tool, go, className }: FeaturedToolProps) {
         <div
           className="absolute inset-x-0 bottom-0 h-px pointer-events-none transition-opacity duration-500"
           style={{
-            background: `linear-gradient(90deg, #f97316, oklch(0.72 0.18 ${hue}))`,
+            background: "linear-gradient(90deg, var(--orange-500), color-mix(in srgb, var(--orange-500) 60%, transparent))",
             opacity: hovered ? 0.5 : 0.2,
           }}
           aria-hidden="true"
