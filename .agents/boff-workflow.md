@@ -110,3 +110,20 @@ If `boff-agent` tools are not registered in the current session:
    - `.vscode/mcp.json` (VS Code + Copilot)
    - `opencode.json` (OpenCode)
 3. If proceeding manually, at minimum run `pnpm type-check` before declaring done.
+
+---
+
+## Memory Management (WSL)
+
+This repo includes memory-safe scripts to prevent WSL OOM crashes:
+
+| Command | Behavior | Use when |
+|---------|----------|----------|
+| `pnpm lint` | Sequential, 2GB per package | Default for agents |
+| `pnpm type-check` | Sequential, 2GB per package | Default for agents |
+| `pnpm memory-check` | Check available memory | Before heavy operations |
+| `pnpm lint:parallel` | Concurrent, original behavior | Only with >16GB RAM |
+| `pnpm type-check:parallel` | Concurrent, original behavior | Only with >16GB RAM |
+
+**Agents MUST use `pnpm lint` and `pnpm type-check` (sequential versions) to prevent
+WSL crashes.** Only use parallel versions if the user explicitly has >16GB RAM.

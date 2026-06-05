@@ -113,10 +113,15 @@ pnpm dev:web          # Next.js dev only
 pnpm dev:api          # NestJS dev only (watch mode)
 pnpm build:web        # Next.js production build
 pnpm build:api        # NestJS production build
-pnpm lint             # Lint all packages
-pnpm type-check       # TypeScript check all packages ⚠ HIGH MEMORY — see note below
+pnpm lint             # Lint all packages (sequential, memory-safe)
+pnpm type-check       # TypeScript check all packages (sequential, memory-safe)
+pnpm memory-check     # Check available memory before heavy operations
 pnpm generate:shared  # Regenerate shared types (requires api on port 34301)
 pnpm setup            # Create public folder symlinks (first-time setup)
+
+# Parallel versions (use only with sufficient memory >16GB)
+pnpm lint:parallel    # Lint all packages concurrently
+pnpm type-check:parallel  # Type-check all packages concurrently
 
 # apps/api only
 pnpm --filter api generate   # Drizzle migration generation
@@ -128,10 +133,12 @@ pnpm --filter api test:e2e   # End-to-end tests
 pnpm --filter web test        # Playwright e2e tests
 ```
 
-> **⚠ WSL Memory Constraint:** `pnpm type-check` (and `npx tsc --noEmit`) can exhaust
-> memory in WSL environments and crash the system. **Do NOT run type-checks unless
-> the user explicitly requests it.** If needed, limit memory with:
-> `NODE_OPTIONS="--max-old-space-size=512" npx tsc --noEmit` on individual packages only.
+> **⚠ WSL Memory Management:**
+> - `pnpm lint` and `pnpm type-check` now run **sequentially** to prevent OOM crashes
+> - Each process limited to 2GB (`--max-old-space-size=2048`)
+> - Run `pnpm memory-check` before heavy operations to verify available memory
+> - If WSL crashes persists, ensure swap is enabled: `wsl --shutdown` from Windows PowerShell
+> - For parallel execution (faster), use `pnpm lint:parallel` only with >16GB RAM
 
 ---
 
