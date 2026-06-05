@@ -14,8 +14,11 @@
     "build:web": "pnpm --filter web build",
     "build:api": "pnpm --filter api build",
     "generate:shared": "pnpm --filter api generate:shared",
-    "lint": "pnpm -r lint",
-    "type-check": "pnpm -r type-check"
+    "lint": "node scripts/lint-sequential.js",
+    "lint:parallel": "pnpm -r lint",
+    "type-check": "node scripts/typecheck-sequential.js",
+    "type-check:parallel": "pnpm -r type-check",
+    "memory-check": "node scripts/memory-check.js"
   },
   "devDependencies": {
     "concurrently": "^9.0.0",
