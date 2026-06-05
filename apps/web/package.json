@@ -9,7 +9,9 @@
     "build": "next build",
     "build:nolint": "next build --no-lint",
     "start": "next start",
-    "lint": "NODE_OPTIONS='--max-old-space-size=4096' eslint src",
+    "lint": "NODE_OPTIONS='--max-old-space-size=2048' eslint src",
+    "lint:safe": "node ../../scripts/memory-check.js && NODE_OPTIONS='--max-old-space-size=2048' eslint src",
+    "type-check": "NODE_OPTIONS='--max-old-space-size=2048' tsc --noEmit --skipLibCheck",
     "test": "npx playwright test",
     "test:trace": "npx playwright test --trace on",
     "test:show": "npx playwright show-report"
