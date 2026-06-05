@@ -60,7 +60,7 @@ const GAMES: GameData[] = [
     name: "Monster Hunter Wilds",
     short: "MHW",
     tagline: "Planificadores y generadores de builds",
-    hue: 120,
+    hue: 130,
     logoLabel: "M",
     categories: [
       {
@@ -78,7 +78,7 @@ const GAMES: GameData[] = [
       href: "/mhwilds",
       icon: "hammer",
       image: "MHWilds builds",
-      hue: 120,
+      hue: 130,
     },
   },
   {

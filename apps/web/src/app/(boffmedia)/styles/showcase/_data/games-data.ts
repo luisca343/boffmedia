@@ -106,7 +106,7 @@ export const GAMES: Record<string, GameData> = {
       href: "#/herramientas/mhwilds/builds/planner",
       icon: "sword",
       image: "Hero · Gemma / Build Planner",
-      hue: 152,
+      hue: 130,
     },
     tools: [
       {
