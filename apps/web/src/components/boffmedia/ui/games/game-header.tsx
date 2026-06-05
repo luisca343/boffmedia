@@ -42,6 +42,11 @@ export function GameHeader({
           style={{
             fontSize: "var(--t-5xl)",
             margin: "0.8rem 0",
+            background: "linear-gradient(135deg, #fde68a 0%, var(--orange-400) 40%, var(--orange-500) 70%, var(--orange-600) 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+            filter: "drop-shadow(0 0 20px rgba(249,115,22,0.3))",
           }}
         >
           {highlight}
