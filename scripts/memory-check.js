@@ -9,8 +9,8 @@
 const { execSync } = require('child_process');
 const os = require('os');
 
-const MIN_AVAILABLE_MB = 3072; // 3GB minimum required
-const WARN_AVAILABLE_MB = 4096; // 4GB warning threshold
+const MIN_AVAILABLE_MB = 4096; // 4GB minimum required (eslint needs 2GB per process)
+const WARN_AVAILABLE_MB = 5120; // 5GB warning threshold
 
 function getAvailableMemoryMB() {
   try {
