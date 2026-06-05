@@ -52,6 +52,7 @@ const GAMES: GameData[] = [
       href: "/pokemon",
       icon: "calc",
       image: "Pokémon herramientas",
+      hue: 28,
     },
   },
   {
@@ -77,6 +78,7 @@ const GAMES: GameData[] = [
       href: "/mhwilds",
       icon: "hammer",
       image: "MHWilds builds",
+      hue: 120,
     },
   },
   {
@@ -108,6 +110,7 @@ const GAMES: GameData[] = [
       href: "/otros",
       icon: "grid",
       image: "Otras herramientas",
+      hue: 200,
     },
   },
 ];
@@ -158,7 +161,7 @@ export default function ToolsLandingPage() {
   const currentSortLabel = SORT_OPTIONS.find((o) => o.value === sortMode)?.label || "Ordenar";
 
   return (
-    <main className="relative bg-surface-950 relative h-[calc(100vh-68px)]">
+    <main className="relative bg-surface-950 pt-16 relative h-screen">
       {/* ── hub-video background ─────────────────────────────── */}
       {isMounted && (
         <div className="hub-video absolute inset-0 z-0 overflow-hidden">
