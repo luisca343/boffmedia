@@ -41,6 +41,9 @@ import { ToolsTypeBadge } from "@/components/boffmedia/ui/tools/tool-type-badge"
 
 // Tool-kit components
 import { ToolPanel, ToolStatBars, ToolApp, SegTabs, ToolSelect, ToolTable, CopyButton, Picker, HpBar, ResultBadge, StatTile, SplitBar, TrendChart, HeatGrid, TagPills } from "@/components/boffmedia/primitives"
+
+// Battlesim components
+import { BSType, BSTypeRow, BSCat, BSHpMeter, BSStatusChip, BSBoost, BSTera, BSPokeChip, BSMove, BSFieldCond, BSLogEvent, BSChatRow, BSTraySlot, BSMonCard, BSWinProb, BSTracker, TYPES, tyVar, effMult, effLabel, hpColor, aniF } from "@/components/boffmedia/primitives"
 import { PokeSprite } from "@/components/shared/pokemon/PokeSprite"
 import { TeamSprites } from "@/components/shared/pokemon/TeamSprites"
 import { BaseStatBars } from "@/components/shared/pokemon/BaseStatBars"
@@ -276,8 +279,9 @@ const HUB_NAV = [
     ["blocks", "Bloques", "grid"],
     ["patterns", "Patrones", "grid"],
      ["boff", "Boffmedia", "gamepad"],
-     ["toolskit", "Herramientas", "wrench"],
-     ["profile", "Perfil", "user"],
+      ["toolskit", "Herramientas", "wrench"],
+      ["battlesim", "Battlesim", "zap"],
+      ["profile", "Perfil", "user"],
    ],
   ],
  [
@@ -2980,6 +2984,182 @@ function ToolsKitSection() {
 }
 
 // ============================================================================
+// battlesim — Capa de combate (showcase section)
+// ============================================================================
+interface BSMon {
+  id: string; name: string; types: string[]; hp: number; fnt?: boolean; tera?: boolean;
+  teraType?: string; status?: string | null; boosts?: Record<string, number>;
+  stats: { hp: number; atk: number; def: number; spa: number; spd: number; spe: number };
+}
+
+const MK = {
+  garchomp: { id:"garchomp", name:"Garchomp", types:["Dragon","Ground"], teraType:"Steel", stats:{hp:108,atk:130,def:95,spa:80,spd:85,spe:102} },
+  rillaboom: { id:"rillaboom", name:"Rillaboom", types:["Grass"], teraType:"Fire", stats:{hp:100,atk:125,def:90,spa:60,spd:70,spe:85} },
+  ironhands: { id:"ironhands", name:"Iron Hands", types:["Fighting","Electric"], teraType:"Fire", stats:{hp:154,atk:140,def:108,spa:50,spd:68,spe:50} },
+  fluttermane: { id:"fluttermane", name:"Flutter Mane", types:["Ghost","Fairy"], teraType:"Fairy", stats:{hp:55,atk:55,def:55,spa:135,spd:135,spe:135} },
+  gholdengo: { id:"gholdengo", name:"Gholdengo", types:["Steel","Ghost"], teraType:"Flying", stats:{hp:87,atk:60,def:95,spa:133,spd:91,spe:84} },
+  dragonite: { id:"dragonite", name:"Dragonite", types:["Dragon","Flying"], teraType:"Normal", stats:{hp:91,atk:134,def:95,spa:100,spd:100,spe:80} },
+}
+
+const mk = (key: string, o: Partial<BSMon>): BSMon => ({ ...(MK as any)[key], hp: 100, status: null, boosts: {}, tera: false, fnt: false, stats: { hp: 100, atk: 100, def: 100, spa: 100, spd: 100, spe: 100 }, ...o } as BSMon)
+
+const MOVES = [
+  { name: "Terremoto", type: "Ground", cat: "phys", power: 100, acc: 100, pp: 9, maxpp: 16 },
+  { name: "Enfado", type: "Dragon", cat: "phys", power: 120, acc: 100, pp: 4, maxpp: 16 },
+  { name: "Roca Afilada", type: "Rock", cat: "phys", power: 100, acc: 80, pp: 8, maxpp: 8 },
+  { name: "Danza Espada", type: "Normal", cat: "status", power: 0, acc: null, pp: 12, maxpp: 32 },
+]
+
+const LOG = [
+  { turn: 6 },
+  { who: "p2", actor: "Dragonite", kind: "move", icon: "bolt", type: "Flying", txt: "usó <b>Acróbata</b> sobre Garchomp.", dmg: "−22%", crit: false },
+  { who: "p1", actor: "Garchomp", kind: "ability", icon: "shield", txt: "se aferra con <b>Multiescamas</b> rota — daño completo." },
+  { who: "p1", actor: "Garchomp", kind: "move", icon: "bolt", type: "Ground", txt: "usó <b>Terremoto</b>.", dmg: "−38%", crit: true, eff: "super" },
+  { kind: "sys", txt: "¡Un golpe crítico!" },
+  { turn: 7 },
+  { who: "p1", actor: "Alex", kind: "boost", icon: "trending", txt: "<b>Garchomp</b> aumentó su Ataque con Danza Espada.", boost: "+2 Atq" },
+]
+
+function BattlesimSection() {
+  const demoMon = mk("garchomp", { hp: 78, boosts: { atk: 2, spe: 1 }, tera: true })
+  const demoKo = mk("rillaboom", { hp: 0, fnt: true })
+  const demoPar = mk("ironhands", { hp: 44, status: "par" })
+  const target = MK.dragonite
+
+  return (
+    <div>
+      <div className="dsh-sectionhead">
+        <Kicker>Battlesim</Kicker>
+        <h2>Capa de combate</h2>
+        <p>Componentes específicos del simulador, construidos íntegramente sobre los tokens del sistema — heredan dirección (HUD/Neón/Grid), tema y acento sin reescribirse. Una sola hoja <code>battlesim.css</code> + <code>bs-kit.tsx</code> alimenta tanto el prototipo jugable como esta documentación.</p>
+      </div>
+
+      <Callout icon="sparkles" title="Prototipo jugable" style={{ marginBottom: "1.6rem" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap" }}>
+          <span>El flujo completo —inicio, cola, vista previa, combate en vivo, resultado, repetición y modo espectador— vive como prototipo clicable independiente.</span>
+          <Button variant="primary" iconRight="external">Abrir prototipo</Button>
+        </div>
+      </Callout>
+
+      <Spec2 title="Tipos y categorías" tag="battlesim.css · BSType" intro="Insignia de tipo derivada de una paleta de 18 tokens afinada para fondo oscuro. Variante sólida y fantasma; el punto refuerza el color con forma (no solo color)." a11y="El texto del tipo va siempre presente — la información nunca depende solo del color. Contraste AA sobre superficie.">
+        <div className="spec2__row">
+          {TYPES.slice(0, 9).map((t: string) => <BSType key={t} type={t} />)}
+        </div>
+        <div className="spec2__row" style={{ marginTop: ".6rem" }}>
+          {["Dragon", "Ground", "Fairy", "Steel"].map((t: string) => <BSType key={t} type={t} ghost />)}
+        </div>
+        <div className="spec2__row" style={{ marginTop: ".6rem" }}>
+          <BSCat cat="phys" /><BSCat cat="spec" /><BSCat cat="status" />
+        </div>
+      </Spec2>
+
+      <Spec2 title="Medidor de PS" tag="BSHpMeter" intro="El bloque de información de un Pokémon en combate: nombre, nivel, gema Tera, barra de PS con segmentación y color por umbral, más estado y cambios de característica como fichas." a11y="El % de PS es texto, no solo barra; los estados (PAR, QUE…) y boosts se leen como etiquetas. Color de PS reforzado por el valor numérico.">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: "1rem" }}>
+          <BSHpMeter mon={demoMon} />
+          <BSHpMeter mon={demoPar} />
+          <BSHpMeter mon={demoKo} />
+        </div>
+        <PropTable rows={[
+          ["mon", "object", "—", "Pokémon con hp (%), status, boosts, teraType, tera."],
+          ["compact", "boolean", "false", "Oculta tipos/estado/boosts (solo barra)."],
+        ]} />
+      </Spec2>
+
+      <Spec2 title="Fichas de estado, boost y Tera" tag="BSStatusChip · BSBoost · BSTera" intro="Micro-indicadores tácticos. Estados con color propio y abreviatura legible; boosts con signo y dirección; gema Tera con la forma del cristal teracristal.">
+        <div className="spec2__row">
+          {["brn", "par", "psn", "tox", "slp", "frz"].map((s) => <BSStatusChip key={s} status={s} />)}
+        </div>
+        <div className="spec2__row" style={{ marginTop: ".6rem" }}>
+          <BSBoost stat="atk" value={2} /><BSBoost stat="spe" value={1} />
+          <BSBoost stat="def" value={-1} /><BSBoost stat="spa" value={-2} />
+        </div>
+        <div className="spec2__row" style={{ marginTop: ".6rem", alignItems: "center", gap: ".7rem" }}>
+          {["Steel", "Fairy", "Dragon", "Fire", "Water"].map((t) => (
+            <span key={t} style={{ display: "inline-flex", alignItems: "center", gap: ".35rem", fontSize: "var(--t-xs)", color: "var(--text-muted)" }}>
+              <BSTera type={t} size="1.2em" />{t}
+            </span>
+          ))}
+        </div>
+      </Spec2>
+
+      <Spec2 title="Selector de ataque" tag="BSMove" intro="La ficha de un movimiento: nombre, tipo, categoría, PP y —la pieza clave— una previsualización de eficacia contra el objetivo actual, calculada con la tabla de tipos en vivo." a11y="Eficacia comunicada con texto («Súper eficaz», «Inmune»), no solo color. Botón enfocable; los movimientos sin PP se desactivan con rol no interactivo.">
+        <div className="grid grid-cols-2 gap-[.7rem]" style={{ maxWidth: 520 }}>
+          {MOVES.map((mv, i) => <BSMove key={i} move={mv} target={target} onClick={() => {}} />)}
+        </div>
+        <p className="spec2__intro" style={{ marginTop: ".7rem", fontSize: "var(--t-sm)" }}>
+          Objetivo de la demo: <b>Dragonite</b> (Dragón/Volador). Nótese cómo Terremoto marca «Inmune» y Enfado «Súper eficaz».
+        </p>
+      </Spec2>
+
+      <Spec2 title="Condiciones de campo" tag="BSFieldCond" intro="Fichas para clima, terreno, trampas y pantallas. Color por efecto, icono, contador de turnos y nivel de capas. Pensadas para un riel compacto bajo el campo.">
+        <div className="flex items-center gap-[.5rem] flex-wrap">
+          <BSFieldCond cond={{ name: "Sol", icon: "sun", c: "var(--orange-400)", turns: 3 }} />
+          <BSFieldCond cond={{ name: "Campo Eléctrico", icon: "bolt", c: "var(--ty-electric)", turns: 5 }} />
+          <BSFieldCond cond={{ name: "Trampa Rocas", icon: "shield", c: "var(--ty-rock)" }} side />
+          <BSFieldCond cond={{ name: "Púas", icon: "target", c: "var(--ty-poison)", lvl: 2 }} side />
+          <BSFieldCond cond={{ name: "Reflejo", icon: "shield", c: "var(--cyan-400)", turns: 4 }} side />
+        </div>
+      </Spec2>
+
+      <Spec2 title="Registro de combate" tag="BSLogEvent" intro="La alternativa al muro de texto: eventos como tarjetas con icono por tipo de acción, fichas de daño/curación/eficacia y separadores de turno. Mantiene la claridad competitiva con jerarquía visual." a11y="Cada evento es texto estructurado; las fichas (daño, eficacia) acompañan pero no sustituyen la descripción escrita.">
+        <div className="flex flex-col gap-[.55rem]" style={{ maxWidth: 460 }}>
+          {LOG.map((ev, i) => <BSLogEvent key={i} ev={ev} />)}
+        </div>
+      </Spec2>
+
+      <Spec2 title="Banco de equipo y tarjeta de Pokémon" tag="BSTraySlot · BSMonCard" intro="Para cambios en combate (banco compacto con PS y tipos) y para vista previa / lobby (tarjeta con arte, tipos y base stats). Los Pokémon debilitados se desactivan y se marcan.">
+        <div className="spec2__grid2" style={{ gap: "1.5rem", alignItems: "start" }}>
+          <div className="grid gap-[.6rem]" style={{ gridTemplateColumns: "1fr" }}>
+            <BSTraySlot mon={demoMon} active />
+            <BSTraySlot mon={demoPar} />
+            <BSTraySlot mon={demoKo} />
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: ".7rem" }}>
+            <BSMonCard mon={mk("fluttermane", { hp: 100 }) as BSMon} lead showStats order={1} />
+            <BSMonCard mon={mk("gholdengo", { hp: 100 }) as BSMon} showStats />
+          </div>
+        </div>
+      </Spec2>
+
+      <Spec2 title="Boff Insight y probabilidad" tag="BSWinProb · .insight" intro="Las piezas «esports»: barra de probabilidad de victoria para espectadores y el panel Boff Insight que traduce el estado del combate en lectura táctica (velocidad, rango de daño, prob. de KO)." a11y="Porcentajes y etiquetas textuales en ambos lados; la barra es refuerzo visual del dato numérico.">
+        <div className="spec2__grid2" style={{ gap: "1.5rem", alignItems: "start" }}>
+          <div style={{ paddingTop: ".4rem" }}>
+            <BSWinProb a={64} b={36} nameA="Alex" nameB="Kaito" />
+          </div>
+          <div
+            className="rounded-[var(--radius-lg)]"
+            style={{ padding: ".85rem .95rem", background: "linear-gradient(160deg, color-mix(in srgb, var(--purple-500) 14%, var(--surface)), var(--surface))", border: "1px solid color-mix(in srgb, var(--purple-500) 32%, var(--border))" }}
+          >
+            <div className="flex items-center gap-[.5rem] font-mono text-[.62rem] tracking-[.14em] uppercase text-[var(--purple-400)] font-bold mb-[.6rem]">
+              <Icon name="sparkles" size={14} /> Boff Insight
+            </div>
+            <div className="flex items-center justify-between gap-[.6rem] text-[var(--t-sm)] py-[.3rem] border-t-0 border-x-0 border-b border-solid border-[var(--border)] first:border-t-0">
+              <span className="text-[var(--text-muted)]">Velocidad</span>
+              <span className="font-mono font-bold text-[var(--emerald-400)]">Atacas primero</span>
+            </div>
+            <div className="flex items-center justify-between gap-[.6rem] text-[var(--t-sm)] py-[.3rem] border-t border-x-0 border-b-0 border-solid border-[var(--border)]">
+              <span className="text-[var(--text-muted)]">Enfado → Dragonite</span>
+              <span className="font-mono font-bold">104–122%</span>
+            </div>
+            <div className="h-[7px] rounded-[4px] overflow-hidden bg-[var(--surface-3)] border border-solid border-[var(--border)] mt-[.3rem]">
+              <span className="block h-full" style={{ width: "92%", background: "linear-gradient(90deg, var(--orange-600), var(--orange-400))" }} />
+            </div>
+            <div className="flex items-center justify-between gap-[.6rem] text-[var(--t-sm)] py-[.3rem] border-t border-x-0 border-b-0 border-solid border-[var(--border)]">
+              <span className="text-[var(--text-muted)]">Prob. de debilitar</span>
+              <span className="font-mono font-bold" style={{ color: "var(--orange-400)" }}>Garantizado</span>
+            </div>
+          </div>
+        </div>
+      </Spec2>
+
+      <Callout icon="layers" tone="orange" title="Una sola fuente, dos destinos" style={{ marginTop: "1.5rem" }}>
+        Estas piezas se exportan como componentes (<code>BSHpMeter</code>, <code>BSMove</code>, <code>BSLogEvent</code>…). El prototipo las compone en pantallas completas; el Hub las documenta. Cero CSS duplicado, cambio de dirección/tema en vivo desde Tweaks.
+      </Callout>
+    </div>
+  )
+}
+
+// ============================================================================
 // MAIN SHOWCASE COMPONENT
 // ============================================================================
 const SECTIONS: Record<string, React.ComponentType<{ go?: (path: string) => void }>> = {
@@ -2992,6 +3172,7 @@ const SECTIONS: Record<string, React.ComponentType<{ go?: (path: string) => void
  patterns: PatternsSection,
   boff: BoffSection,
   toolskit: ToolsKitSection,
+  battlesim: BattlesimSection,
   profile: ProfileSection,
  playground: PlaygroundSection,
  a11y: AccessibilitySection,
