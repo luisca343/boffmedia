@@ -8,7 +8,11 @@ import {
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { VgcService, VgcPokemon, SpeedTierEntry } from './vgc.service';
-import { Gen9DataDto, SpeedTierEntryDto, VgcPokemonDto } from './dto/vgc-response.dto';
+import {
+  Gen9DataDto,
+  SpeedTierEntryDto,
+  VgcPokemonDto,
+} from './dto/vgc-response.dto';
 
 @ApiTags('BoffMedia 🛠 | Pokémon VGC')
 @Controller('tools/vgc')
@@ -49,21 +53,28 @@ export class VgcController {
 
   @Get('champions/:regulationId/game-data')
   @ApiOperation({
-    summary: 'Get game data (moves, items, abilities) for a Champions regulation',
+    summary:
+      'Get game data (moves, items, abilities) for a Champions regulation',
     description:
       'Returns moves, items, and abilities valid for the given regulation. ' +
-      'Uses Dex.forFormat() so the regulation\'s ban list is respected. Cached per formatId.',
+      "Uses Dex.forFormat() so the regulation's ban list is respected. Cached per formatId.",
   })
   @ApiParam({
     name: 'regulationId',
     description: 'Champions regulation shorthand ID',
     example: 'vgc2026regma',
   })
-  @ApiResponse({ status: 200, description: 'Game data retrieved successfully.', type: Gen9DataDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Game data retrieved successfully.',
+    type: Gen9DataDto,
+  })
   async getChampionsGameData(@Param('regulationId') regulationId: string) {
     const regulation = await this.vgcService.getRegulationById(regulationId);
     if (!regulation) {
-      throw new NotFoundException(`Champions regulation "${regulationId}" not found.`);
+      throw new NotFoundException(
+        `Champions regulation "${regulationId}" not found.`,
+      );
     }
     return this.vgcService.getChampionsGameData(regulation.formatId);
   }

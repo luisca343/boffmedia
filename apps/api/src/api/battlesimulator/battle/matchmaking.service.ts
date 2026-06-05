@@ -53,7 +53,9 @@ export class MatchmakingService {
     // Set timeout
     const timeout = setTimeout(() => {
       this.removeFromQueue(player.playerId);
-      this.logger.log(`Queue timeout for ${player.playerId} (${player.format})`);
+      this.logger.log(
+        `Queue timeout for ${player.playerId} (${player.format})`,
+      );
     }, this.QUEUE_TIMEOUT_MS);
     this.queueTimeouts.set(player.playerId, timeout);
 
