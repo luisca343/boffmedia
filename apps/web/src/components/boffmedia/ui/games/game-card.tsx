@@ -28,6 +28,7 @@ export interface GameData {
     href: string
     icon: string
     image: string
+    hue?: number
   }
 }
 
@@ -126,11 +127,12 @@ export function GameCard({ game, go, delay = 0, className }: GameCardProps) {
           {/* Header */}
           <div className="flex items-start gap-4">
             <div
-              className="w-16 h-16 rounded-[var(--radius-lg)] overflow-hidden shrink-0 flex items-center justify-center transition-transform duration-300"
+              className="w-16 h-16 rounded-[var(--radius-lg)] overflow-hidden shrink-0 flex items-center justify-center transition-[transform,box-shadow] duration-300"
               style={{
                 border: "var(--hairline) solid oklch(0.6 0.14 var(--hue, 200) / 0.4)",
                 background: "oklch(0.5 0.12 var(--hue, 200) / 0.16)",
                 transform: hovered ? "scale(1.08)" : "scale(1)",
+                boxShadow: hovered ? `0 0 30px -10px oklch(0.6 0.16 var(--hue, 200))` : undefined,
               }}
             >
               {game.icon ? (
