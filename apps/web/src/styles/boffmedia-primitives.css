@@ -1,9 +1,9 @@
 /* ============================================================================
    BoffMedia Design System — Primitive Component Styles
-   
+
    All component styles have been migrated to Tailwind CSS utility classes
    directly in the component TSX files. This file is kept as a placeholder
    for any future styles that cannot be expressed in Tailwind.
-   
+
    Design tokens (--bg, --surface, --accent, etc.) remain in globals.css.
    ============================================================================ */
