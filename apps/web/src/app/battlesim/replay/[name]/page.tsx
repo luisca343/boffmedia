@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, use } from 'react';
+import Link from 'next/link';
 import { Game } from '../_components/Game';
 import { LigaService } from '@/services/api/smartrotom/ligaService';
 import { ReplayData } from '../../types';
@@ -53,7 +54,7 @@ export default function ReplayPage({ params }: { params: Promise<{ name: string 
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
         <p className="text-muted-foreground">{error}</p>
-        <a href="/battlesim/replay" className="text-primary underline">Paste replay manually</a>
+        <Link href="/battlesim/replay" className="text-primary underline">Paste replay manually</Link>
       </div>
     );
   }

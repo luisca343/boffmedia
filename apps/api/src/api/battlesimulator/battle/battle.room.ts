@@ -141,7 +141,6 @@ export class BattleRoom {
           this.replayLines.push(line);
           const { args, kwArgs } = Protocol.parseBattleLine(line);
 
-          const html = this.formatter.formatHTML(args, kwArgs);
           this.battle.add(args, kwArgs);
 
           this.callbacks.onProtocol(line);
@@ -155,7 +154,9 @@ export class BattleRoom {
               team1: this.getTeamData(this.battle.p1.team),
               team2: this.getTeamData(this.battle.p2.team),
               side1: this.battle.p1.name || 'Player',
-              side2: this.battle.p2.name || (this.mode === 'pvp' ? 'Player 2' : 'Bot'),
+              side2:
+                this.battle.p2.name ||
+                (this.mode === 'pvp' ? 'Player 2' : 'Bot'),
             };
             this.callbacks.onBattleEnd(result);
             return;
@@ -170,7 +171,9 @@ export class BattleRoom {
               team1: this.getTeamData(this.battle.p1.team),
               team2: this.getTeamData(this.battle.p2.team),
               side1: this.battle.p1.name || 'Player',
-              side2: this.battle.p2.name || (this.mode === 'pvp' ? 'Player 2' : 'Bot'),
+              side2:
+                this.battle.p2.name ||
+                (this.mode === 'pvp' ? 'Player 2' : 'Bot'),
             };
             this.callbacks.onBattleEnd(result);
             return;
@@ -249,7 +252,9 @@ export class BattleRoom {
               this.startTurnTimer('p2');
             } catch (e: any) {
               this.logger?.error(`[P2] Failed to parse request: ${e.message}`);
-              this.callbacks.onError(`Failed to parse P2 request: ${e.message}`);
+              this.callbacks.onError(
+                `Failed to parse P2 request: ${e.message}`,
+              );
             }
           }
         }
@@ -284,7 +289,9 @@ export class BattleRoom {
     try {
       await this.streams[side].write(choice);
     } catch (error: any) {
-      this.callbacks.onError(`Failed to write ${side} choice: ${error.message}`);
+      this.callbacks.onError(
+        `Failed to write ${side} choice: ${error.message}`,
+      );
     }
   }
 

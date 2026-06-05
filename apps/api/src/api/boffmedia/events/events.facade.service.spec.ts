@@ -13,7 +13,7 @@ const mockEvent = { id: 1, name: 'Tournament', gameId: 1, parentId: null };
 const mockGame = { id: 1, name: 'Pokémon VGC' };
 const mockAchievement = { id: 1, name: 'First Win', eventId: 1 };
 const mockTeam = { id: 1, name: 'Team Rocket', eventId: 1 };
-const mockParticipant = { id: 1, userId: 10, eventId: 1 };
+const _mockParticipant = { id: 1, userId: 10, eventId: 1 };
 const mockLeaderboardEntry = { participantId: 1, username: 'Ash', score: 100 };
 
 describe('EventsFacadeService', () => {
@@ -68,7 +68,7 @@ describe('EventsFacadeService', () => {
       | 'leaveTeam'
     >
   >;
-  let participantsService: jest.Mocked<
+  let _participantsService: jest.Mocked<
     Pick<
       ParticipantsService,
       | 'getEventParticipants'
@@ -77,7 +77,7 @@ describe('EventsFacadeService', () => {
       | 'joinEvent'
     >
   >;
-  let progressService: jest.Mocked<Pick<ProgressService, 'updateProgress'>>;
+  let _progressService: jest.Mocked<Pick<ProgressService, 'updateProgress'>>;
   let leaderboardsService: jest.Mocked<
     Pick<
       LeaderboardsService,
@@ -166,8 +166,8 @@ describe('EventsFacadeService', () => {
     gamesService = module.get(GamesService);
     achievementsService = module.get(AchievementsService);
     teamsService = module.get(TeamsService);
-    participantsService = module.get(ParticipantsService);
-    progressService = module.get(ProgressService);
+    _participantsService = module.get(ParticipantsService);
+    _progressService = module.get(ProgressService);
     leaderboardsService = module.get(LeaderboardsService);
   });
 

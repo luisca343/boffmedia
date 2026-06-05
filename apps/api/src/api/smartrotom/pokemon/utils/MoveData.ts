@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck — Pixelmon move data utility: dynamic indexing not statically typeable
 import * as fs from 'fs';
 import * as path from 'path';

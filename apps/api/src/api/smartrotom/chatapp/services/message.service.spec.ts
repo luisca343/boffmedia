@@ -110,6 +110,7 @@ describe('MessageService', () => {
     });
 
     it('handles image type by parsing and saving base64 to disk', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { promises: fsMock } = require('fs');
       mockChatRepo.findChatById.mockResolvedValue({ id: 1 });
       mockMessageRepo.createMessage.mockResolvedValue({ insertId: 10 });

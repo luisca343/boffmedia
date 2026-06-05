@@ -12,7 +12,6 @@ import {
   BattleEndResult,
   BattleRoomCallbacks,
   TimerConfig,
-  BattleRoomMode,
 } from './battle.room';
 import { Protocol } from '@pkmn/protocol';
 import { AchievementFacadeService } from '@api/smartrotom/achievement/achievement.facade.service';
@@ -48,7 +47,7 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   private readonly RECONNECT_GRACE_MS = 30_000;
 
-  handleConnection(client: Socket) {
+  handleConnection(_client: Socket) {
     // Don't register here — wait for 'register' event with clientId
   }
 
@@ -242,10 +241,7 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
   // ─── Matchmaking Events ───
 
   @SubscribeMessage('joinQueue')
-  handleJoinQueue(
-    client: Socket,
-    payload: { format?: string },
-  ): void {
+  handleJoinQueue(client: Socket, payload: { format?: string }): void {
     const state = this.getClientState(client);
     if (!state) return;
 
@@ -268,7 +264,10 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
       // Match found — create PvP room
       this.createPvPRoom(result.player1, result.player2, result.format);
     } else {
-      client.emit('queueJoined', { format, position: this.matchmaking.getQueueSize(format) });
+      client.emit('queueJoined', {
+        format,
+        position: this.matchmaking.getQueueSize(format),
+      });
     }
   }
 
@@ -478,7 +477,13 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
       },
     };
 
-    const room = new BattleRoom(roomId, callbacks, this.logger, undefined, 'pvp');
+    const room = new BattleRoom(
+      roomId,
+      callbacks,
+      this.logger,
+      undefined,
+      'pvp',
+    );
     this.rooms.set(roomId, room);
     p1Client.roomIds.set(roomId, 'p1');
     p2Client.roomIds.set(roomId, 'p2');
@@ -492,8 +497,14 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
       })
       .catch((err) => {
         this.logger.error(`Failed to create PvP battle: ${err.message}`);
-        p1Socket.emit('error', { roomId, message: `Failed to create battle: ${err.message}` });
-        p2Socket.emit('error', { roomId, message: `Failed to create battle: ${err.message}` });
+        p1Socket.emit('error', {
+          roomId,
+          message: `Failed to create battle: ${err.message}`,
+        });
+        p2Socket.emit('error', {
+          roomId,
+          message: `Failed to create battle: ${err.message}`,
+        });
         this.cleanupRoom(roomId);
       });
   }
