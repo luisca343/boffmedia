@@ -9,7 +9,9 @@ const { execSync, spawn } = require('child_process');
 const path = require('path');
 
 const PACKAGES = ['apps/web', 'apps/api'];
-const MEMORY_LIMIT = 2048; // MB per process
+const WEB_MEMORY_LIMIT = 2048; // MB for web
+const API_MEMORY_LIMIT = 3072; // MB for api (needs more due to 846 files)
+const MIN_AVAILABLE_MB = 5120; // Need 5GB free to run lint safely
 
 function getAvailableMemoryMB() {
   try {
@@ -24,10 +26,21 @@ function getAvailableMemoryMB() {
 async function runLint(pkg) {
   const pkgDir = path.resolve(__dirname, '..', pkg);
   const pkgName = pkg.split('/').pop();
+  const isApi = pkgName === 'api';
+  const memLimit = isApi ? API_MEMORY_LIMIT : WEB_MEMORY_LIMIT;
+  
+  // Check memory before each package
+  const available = getAvailableMemoryMB();
+  if (available < MIN_AVAILABLE_MB) {
+    console.error(`\n❌ Insufficient memory: ${available}MB available, ${MIN_AVAILABLE_MB}MB required`);
+    console.error('Close other applications or restart WSL with: wsl --shutdown');
+    throw new Error('Insufficient memory');
+  }
   
   console.log(`\n${'='.repeat(60)}`);
   console.log(`Linting: ${pkgName}`);
-  console.log(`Memory available: ${getAvailableMemoryMB()}MB`);
+  console.log(`Memory available: ${available}MB`);
+  console.log(`Memory limit: ${memLimit}MB`);
   console.log(`${'='.repeat(60)}\n`);
 
   return new Promise((resolve, reject) => {
@@ -36,7 +49,7 @@ async function runLint(pkg) {
       stdio: 'inherit',
       env: {
         ...process.env,
-        NODE_OPTIONS: `--max-old-space-size=${MEMORY_LIMIT}`
+        NODE_OPTIONS: `--max-old-space-size=${memLimit}`
       }
     });
 
@@ -59,7 +72,7 @@ async function runLint(pkg) {
 
 async function main() {
   console.log('Sequential Lint Runner');
-  console.log(`Memory limit per process: ${MEMORY_LIMIT}MB`);
+  console.log(`Memory limits: web=${WEB_MEMORY_LIMIT}MB, api=${API_MEMORY_LIMIT}MB`);
   console.log(`Packages to lint: ${PACKAGES.join(', ')}`);
   
   const startTime = Date.now();
