@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck — Pokemon Showdown mod file: complex this-binding patterns not statically typeable
 import type { ModdedBattleScriptsData, Move, Pokemon } from '@pkmn/sim';
 

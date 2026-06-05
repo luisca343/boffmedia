@@ -71,7 +71,7 @@ describe('SpawnDataService', () => {
 
       await service.loadSpawnData();
 
-      const allSpawns = service.getAllSpawns();
+      const _allSpawns = service.getAllSpawns();
       const calls = readJsonFiles.mock.calls;
 
       // banned folders produce calls but data is filtered during processSpawnInfos

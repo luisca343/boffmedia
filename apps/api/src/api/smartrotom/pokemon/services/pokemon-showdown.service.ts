@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck — Pixelmon data transformation: complex dynamic typing not statically typeable
 import { Injectable } from '@nestjs/common';
 import { PokemonDataService } from './data/pokemon-data.service';

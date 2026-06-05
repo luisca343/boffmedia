@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck — dynamic data access patterns not statically typeable
 import { Injectable } from '@nestjs/common';
 import {

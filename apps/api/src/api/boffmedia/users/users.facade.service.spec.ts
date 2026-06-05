@@ -13,7 +13,7 @@ const mockBoffMediaUser = {
   createdAt: new Date(),
 };
 
-const mockSmartRotomUser = {
+const _mockSmartRotomUser = {
   id: 1,
   uuid: 'test-uuid-1234',
   username: 'Ash',
@@ -38,16 +38,16 @@ describe('BoffMediaUsersFacadeService', () => {
       | 'getUserCount'
     >
   >;
-  let smartRotomUsersFacadeService: jest.Mocked<
+  let _smartRotomUsersFacadeService: jest.Mocked<
     Pick<
       SmartRotomUsersFacadeService,
       'initializeUserAndAccounts' | 'getUserWithAccounts'
     >
   >;
-  let starbankService: jest.Mocked<
+  let _starbankService: jest.Mocked<
     Pick<StarbankFacadeService, 'getAccounts' | 'createMainAccount'>
   >;
-  let logger: jest.Mocked<Pick<Logger, 'log' | 'warn' | 'error'>>;
+  let _logger: jest.Mocked<Pick<Logger, 'log' | 'warn' | 'error'>>;
 
   beforeEach(async () => {
     const mockUsersManagementService = {
@@ -97,9 +97,9 @@ describe('BoffMediaUsersFacadeService', () => {
       BoffMediaUsersFacadeService,
     );
     usersManagementService = module.get(BoffMediaUsersManagementService);
-    smartRotomUsersFacadeService = module.get(SmartRotomUsersFacadeService);
-    starbankService = module.get(StarbankFacadeService);
-    logger = module.get(Logger);
+    _smartRotomUsersFacadeService = module.get(SmartRotomUsersFacadeService);
+    _starbankService = module.get(StarbankFacadeService);
+    _logger = module.get(Logger);
   });
 
   it('should be defined', () => {
