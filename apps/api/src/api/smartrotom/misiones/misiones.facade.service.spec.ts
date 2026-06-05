@@ -153,7 +153,7 @@ describe('MisionesFacadeService', () => {
         updated: 3,
       } as any);
 
-      const result = await service.updateNPCs({ npcs: [] } as any);
+      const _result = await service.updateNPCs({ npcs: [] } as any);
 
       expect(npcService.updateNPCs).toHaveBeenCalled();
     });

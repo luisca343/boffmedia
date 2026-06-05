@@ -10,8 +10,8 @@ const path = require('path');
 
 const PACKAGES = ['apps/web', 'apps/api'];
 const WEB_MEMORY_LIMIT = 2048; // MB for web
-const API_MEMORY_LIMIT = 3072; // MB for api (needs more due to 846 files)
-const MIN_AVAILABLE_MB = 5120; // Need 5GB free to run lint safely
+const API_MEMORY_LIMIT = 2048; // MB for api (use memory-safe config)
+const MIN_AVAILABLE_MB = 2048; // Need 2GB free to run lint safely
 
 function getAvailableMemoryMB() {
   try {

@@ -189,10 +189,18 @@ export class VgcService {
    * Uses Dex.forFormat() so the regulation's ban list is respected.
    * Cached per formatId — one entry per regulation, lives for the process lifetime.
    */
-  private _gameDataCache = new Map<string, { moves: Gen9MoveEntry[]; items: string[]; abilities: string[] }>();
+  private _gameDataCache = new Map<
+    string,
+    { moves: Gen9MoveEntry[]; items: string[]; abilities: string[] }
+  >();
 
-  getChampionsGameData(formatId: string): { moves: Gen9MoveEntry[]; items: string[]; abilities: string[] } {
-    if (this._gameDataCache.has(formatId)) return this._gameDataCache.get(formatId)!;
+  getChampionsGameData(formatId: string): {
+    moves: Gen9MoveEntry[];
+    items: string[];
+    abilities: string[];
+  } {
+    if (this._gameDataCache.has(formatId))
+      return this._gameDataCache.get(formatId)!;
 
     const format = Dex.formats.get(formatId);
     if (!format.exists) {
@@ -203,7 +211,13 @@ export class VgcService {
     const moves: Gen9MoveEntry[] = [];
     for (const m of dex.moves.all()) {
       if (m.isNonstandard || m.num <= 0) continue;
-      moves.push({ name: m.name, id: m.id, basePower: m.basePower, type: m.type, category: m.category });
+      moves.push({
+        name: m.name,
+        id: m.id,
+        basePower: m.basePower,
+        type: m.type,
+        category: m.category,
+      });
     }
     moves.sort((a, b) => a.name.localeCompare(b.name));
 

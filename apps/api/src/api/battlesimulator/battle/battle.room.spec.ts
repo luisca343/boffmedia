@@ -68,7 +68,7 @@ describe('BattleRoom — diagnostic', () => {
                   }
                 } else if (request.requestType === 'switch' && request.side) {
                   const switchIndex = request.side.pokemon.findIndex(
-                    (p: any, i: number) =>
+                    (p: any, _i: number) =>
                       !p.active && !p.condition.includes('fnt'),
                   );
                   if (switchIndex >= 0) {
