@@ -228,3 +228,39 @@ img { display: block; max-width: 100%; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 6px; border: 3px solid var(--bg); }
 ::-webkit-scrollbar-thumb:hover { background: var(--orange-600); }
+
+/* ===========================================================================
+   NAVBAR — direction-aware navlink styles
+   =========================================================================== */
+.navlink {
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  font-size: var(--t-sm); font-weight: 500;
+  color: var(--text-muted);
+  padding: 0.5rem 0.85rem;
+  border-radius: var(--btn-radius);
+  position: relative;
+  transition: color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+.navlink svg { color: var(--text-dim); transition: color var(--dur) var(--ease); }
+.navlink:hover { color: var(--text); }
+.navlink:hover svg { color: var(--orange-500); }
+.navlink--active { color: var(--orange-500); font-weight: 600; }
+.navlink--active svg { color: var(--orange-500); }
+
+/* Direction: Grid — underline indicator */
+[data-direction="grid"] .navlink--active,
+[data-direction="grid"] .navlink { border-radius: 0; }
+[data-direction="grid"] .navlink::after {
+  content: ""; position: absolute; left: 0.85rem; right: 0.85rem; bottom: -2px; height: 2px;
+  background: var(--orange-500); transform: scaleX(0); transform-origin: left;
+  transition: transform var(--dur) var(--ease);
+}
+[data-direction="grid"] .navlink:hover::after,
+[data-direction="grid"] .navlink--active::after { transform: scaleX(1); }
+
+/* Direction: HUD — solid background */
+[data-direction="hud"] .navlink--active { background: var(--orange-500); color: #fff; }
+[data-direction="hud"] .navlink--active svg { color: #fff; }
+
+/* Direction: Neon — tinted background (default) */
+.navlink--active { background: color-mix(in srgb, var(--orange-500) 14%, transparent); }
