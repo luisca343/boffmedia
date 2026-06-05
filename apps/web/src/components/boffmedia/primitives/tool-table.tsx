@@ -19,21 +19,21 @@ interface ToolTableProps {
 }
 
 function SortIcon({ active, dir }: { active: boolean; dir?: "asc" | "desc" }) {
-  if (!active) return <Icon name="chevron" size={11} className="text-[color:var(--text-dim)] opacity-40" />
-  return <Icon name="chevron" size={11} style={{ transform: dir === "asc" ? "rotate(180deg)" : "none" }} />
+  if (!active) return <Icon name="chevron" size={11} className="text-[var(--text-dim)] opacity-50" />
+  return <Icon name="chevron" size={11} className="text-[var(--accent-bright)]" style={{ transform: dir === "asc" ? "rotate(180deg)" : "none" }} />
 }
 
 export function ToolTable({ columns, sortKey, sortDir, onSort, minWidth, children }: ToolTableProps) {
   return (
-    <div className="rounded-[var(--radius-lg)] border border-[var(--border)] overflow-hidden">
+    <div className="flex-1 min-h-0 overflow-auto">
       <table className="w-full border-collapse text-sm" style={minWidth ? { minWidth } : undefined}>
         <thead>
-          <tr className="[&_th]:text-left [&_th]:font-mono [&_th]:text-xs [&_th]:tracking-[0.06em] [&_th]:uppercase [&_th]:text-[color:var(--text-dim)] [&_th]:py-[0.7rem] [&_th]:px-4 [&_th]:bg-[var(--surface-2)] [&_th]:border-b [&_th]:border-[var(--border-strong)]">
+          <tr className="[&_th]:text-left [&_th]:font-mono [&_th]:text-[10px] [&_th]:tracking-[0.1em] [&_th]:uppercase [&_th]:text-[var(--text-muted)] [&_th]:font-bold [&_th]:py-[0.6rem] [&_th]:px-[0.8rem] [&_th]:sticky [&_th]:top-0 [&_th]:z-[5] [&_th]:bg-[color-mix(in_srgb,var(--surface)_96%,transparent)] [&_th]:backdrop-blur-[6px] [&_th]:border-b-[var(--hairline)] [&_th]:border-b-solid [&_th]:border-b-[var(--border)]">
             {columns.map((c) => (
               <th
                 key={c.key}
                 style={{ width: c.w, textAlign: c.align || "left" }}
-                className={cn(c.sortable && "cursor-pointer select-none hover:text-[color:var(--text)]")}
+                className={cn(c.sortable && "cursor-pointer select-none hover:text-[var(--text)]")}
                 onClick={c.sortable && onSort ? () => onSort(c.key) : undefined}
               >
                 <span
