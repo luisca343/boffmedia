@@ -23,12 +23,12 @@ export function CopyButton({ text, label = "Copiar", copiedLabel = "Copiado", cl
     <button
       type="button"
       className={cn(
-        "inline-flex items-center gap-1.5 px-2.5 py-1.5",
-        "rounded-[var(--radius)] border border-[var(--border)]",
-        "text-xs font-medium text-[color:var(--text-muted)]",
-        "hover:text-[color:var(--text)] hover:bg-[var(--surface-2)]",
-        "transition-colors",
-        done && "text-[color:var(--emerald-400)] border-[color:var(--emerald-400)]",
+        "inline-flex items-center gap-[0.35rem] px-[0.6rem] py-[0.3rem]",
+        "rounded-[var(--radius)] [border-width:var(--hairline)] border-solid [border-color:var(--border-strong)]",
+        "bg-[var(--surface-2)] text-[11px] font-semibold text-[var(--text-muted)]",
+        "hover:text-[var(--text)] hover:border-[var(--accent)]",
+        "transition-[color,border-color] duration-[var(--dur)] ease-[var(--ease)]",
+        done && "text-[var(--emerald-400)] border-[color-mix(in_srgb,var(--emerald-400)_40%,transparent)]",
         className,
       )}
       onClick={onClick}
