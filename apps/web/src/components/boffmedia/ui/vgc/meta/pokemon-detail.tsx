@@ -4,8 +4,7 @@ import { useMemo } from "react"
 import { cn } from "@/lib/utils"
 import { Icon } from "@/components/boffmedia/primitives/icon"
 import { ToolPanel } from "@/components/boffmedia/primitives/tool-panel"
-import { ToolStatBars } from "@/components/boffmedia/primitives/tool-stat-bars"
-import { PokeSprite } from "@/components/shared/pokemon/PokeSprite"
+import { spriteUrl, handleSpriteError } from "@/features/vgc-tracker/types"
 import { EvSpread } from "./spread"
 import { VgcTeamRow } from "./team-row"
 import { fmtCount, TYPE_COLORS } from "./meta-data"
@@ -95,7 +94,7 @@ function TeammateRow({ id, pct, pokeMap, onSelect }: { id: string; pct: number; 
       onClick={() => onSelect(id)}
       className="flex items-center gap-2 w-full text-left py-[0.3rem] border-b border-[color-mix(in_srgb,var(--border)_45%,transparent)] last:border-b-0 bg-transparent border-x-0 border-t-0 cursor-pointer hover:bg-[color-mix(in_srgb,var(--surface-3)_55%,transparent)]"
     >
-      <PokeSprite dex={p.dex} name={p.name} size={30} />
+      <img src={spriteUrl(p.name)} alt={p.name} width={30} height={30} className="object-contain shrink-0" onError={handleSpriteError} />
       <span className="flex-1 min-w-0 text-xs truncate text-[var(--text)]">{p.name}</span>
       <span className="font-mono text-xs text-[var(--text-muted)] shrink-0">{pct.toFixed(2)}%</span>
     </button>
@@ -181,7 +180,7 @@ export function VgcPokemonDetail({ detail, entry, pokeMap, onSelect, onBack, dri
             Lista
           </button>
         )}
-        <PokeSprite dex={detail.dex} name={detail.name} size={62} className="shrink-0" />
+        <img src={spriteUrl(detail.name)} alt={detail.name} width={62} height={62} className="object-contain shrink-0" onError={handleSpriteError} />
         <div className="min-w-0">
           <p className="font-display font-extrabold text-xl leading-tight text-[var(--text)]">{detail.name}</p>
           <div className="flex flex-wrap gap-1.5 mt-1.5 items-center">
@@ -198,10 +197,10 @@ export function VgcPokemonDetail({ detail, entry, pokeMap, onSelect, onBack, dri
 
       <div className="grid grid-cols-[repeat(auto-fit,minmax(248px,1fr))] gap-3 p-[1rem_1.1rem]">
         <BaseStatBars base={detail.base} />
-        <ToolStatBars title="Movimientos" items={detail.moves.slice(0, 10)} />
-        <ToolStatBars title="Objetos" items={detail.items.slice(0, 8)} />
+        <StatPanel title="Movimientos" items={detail.moves.slice(0, 10)} />
+        <StatPanel title="Objetos" items={detail.items.slice(0, 8)} />
         <div className="flex flex-col gap-3">
-          <ToolStatBars title="Habilidades" items={detail.abilities.slice(0, 4)} />
+          <StatPanel title="Habilidades" items={detail.abilities.slice(0, 4)} />
           {tera.length > 0 && (
             <div className="border border-[var(--border)] rounded-[var(--radius)] p-3 bg-[color-mix(in_srgb,var(--surface-2)_50%,transparent)]">
               <p className="font-mono text-[10px] tracking-[0.16em] uppercase text-[var(--text-dim)] mb-[0.55rem]">

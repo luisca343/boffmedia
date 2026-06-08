@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react"
 import { cn } from "@/lib/utils"
 import { SearchableList } from "@/components/boffmedia/primitives/searchable-list"
-import { PokeSprite } from "@/components/shared/pokemon/PokeSprite"
+import { spriteUrl, handleSpriteError } from "@/features/vgc-tracker/types"
 import { fmtCount } from "./meta-data"
 
 interface UsageEntry {
@@ -70,7 +70,14 @@ export function VgcUsageSidebar({ entries, pokeMap, selectedId, onSelect, loadin
             )}>
               #{rank}
             </span>
-            <PokeSprite dex={p.dex} name={p.name} size={34} />
+            <img
+              src={spriteUrl(p.name)}
+              alt={p.name}
+              width={34}
+              height={34}
+              className="object-contain shrink-0"
+              onError={handleSpriteError}
+            />
             <span className="min-w-0">
               <span className="block text-sm font-semibold text-[var(--text)] truncate">{p.name}</span>
               <span className="block font-mono text-[10px] text-[var(--text-dim)]">{fmtCount(entry.count)}</span>
