@@ -20,17 +20,21 @@ interface BSPokeChipProps {
 export function BSPokeChip({ mon, active, sm, onClick }: BSPokeChipProps) {
   const pct = mon.fnt ? 0 : mon.hp
   return (
-    <button
+    <div
       className={cn(
-        "relative grid place-items-center rounded-full bg-[var(--surface-3)] cursor-pointer",
+        "relative grid place-items-center rounded-full bg-[var(--surface-3)]",
         "transition-all duration-[var(--dur)] ease-[var(--ease)] border border-solid border-[var(--border)]",
         sm ? "w-[34px] h-[34px]" : "w-[46px] h-[46px]",
         active && "border-[var(--accent-bright)] shadow-[0_0_0_3px_var(--accent-soft),0_0_18px_-4px_var(--accent-bright)]",
         mon.fnt && "grayscale opacity-40",
+        onClick && "cursor-pointer",
       )}
       onClick={onClick}
       title={mon.name}
       aria-label={mon.name}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={onClick ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick(); } } : undefined}
     >
       <img
         src={aniF(mon.id)}
@@ -47,6 +51,6 @@ export function BSPokeChip({ mon, active, sm, onClick }: BSPokeChipProps) {
           <span className="block h-full rounded-[2px]" style={{ width: `${pct}%`, background: hpColor(pct) }} />
         </span>
       )}
-    </button>
+    </div>
   )
 }

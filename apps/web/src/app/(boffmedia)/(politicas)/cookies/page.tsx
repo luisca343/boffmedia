@@ -7,95 +7,82 @@ import { Icon } from "@/components/boffmedia/primitives/icon"
 import { BoffButton as Button } from "@/components/boffmedia/primitives/button"
 import { BoffCard as Card } from "@/components/boffmedia/primitives/card"
 
-const PRIVACY: {
+const SECTIONS: {
   id: string
   title: string
   body: (string | string[])[]
 }[] = [
   {
-    id: "info",
-    title: "Información que recopilamos",
+    id: "introduccion",
+    title: "Introducción",
     body: [
-      "Podemos recopilar los siguientes tipos de información cuando utilizas nuestros servicios:",
+      "Esta Política de Cookies explica qué son las cookies, cómo las utilizamos en BoffMedia y cómo puedes gestionar tus preferencias. Al utilizar nuestro sitio web y servicios, aceptas el uso de cookies según lo descrito en esta política.",
+    ],
+  },
+  {
+    id: "que-son",
+    title: "Qué son las cookies",
+    body: [
+      "Las cookies son pequeños archivos de texto que se almacenan en tu dispositivo (ordenador, tableta o móvil) cuando visitas un sitio web. Permiten que el sitio web recuerde tus preferencias y acciones durante un período de tiempo, para que no tengas que volver a introducirlas cada vez que nos visites.",
+      "Las cookies pueden ser propias (establecidas por el sitio web que estás visitando) o de terceros (establecidas por dominios externos). También pueden ser temporales (de sesión) o persistentes (permanecen en tu dispositivo hasta que se eliminan o caducan).",
+    ],
+  },
+  {
+    id: "tipos",
+    title: "Tipos de cookies que utilizamos",
+    body: [
+      "En BoffMedia utilizamos los siguientes tipos de cookies para mejorar tu experiencia:",
       [
-        "Información de registro: nombre de usuario, dirección de correo electrónico y contraseña.",
-        "Información de perfil: avatar, biografía y preferencias de juego.",
-        "Información de juego: estadísticas, logros e historial de partidas.",
-        "Información de pago: gestionada por procesadores de pago seguros.",
+        "Cookies esenciales: necesarias para el funcionamiento básico del sitio. Permiten la navegación, el inicio de sesión y el acceso a áreas seguras. Sin estas cookies, el sitio no puede funcionar correctamente.",
+        "Cookies de preferencia: permiten recordar tus preferencias, como el idioma, el tema visual y el acento de color seleccionado, para ofrecerte una experiencia personalizada.",
+        "Cookies de análisis: nos ayudan a entender cómo interactúas con el sitio, qué secciones visitas y cómo podemos mejorar. La información recopilada es agregada y anónima.",
+        "Cookies de funcionalidad: mejoran el rendimiento del sitio recordando las decisiones que tomas, como mantener tu sesión activa o conservar herramientas recientes.",
       ],
     ],
   },
   {
-    id: "uso",
-    title: "Uso de la información",
+    id: "terceros",
+    title: "Cookies de terceros",
     body: [
-      "Utilizamos tu información para:",
+      "Algunos servicios externos que utilizamos pueden establecer sus propias cookies en tu dispositivo:",
       [
-        "Proporcionar y mejorar nuestros servicios de juego.",
-        "Personalizar tu experiencia de juego.",
-        "Procesar transacciones y enviar notificaciones relacionadas.",
-        "Comunicarnos contigo sobre actualizaciones, ofertas y eventos.",
-        "Prevenir fraudes y garantizar la seguridad de nuestros servicios.",
+        "Proveedores de análisis: utilizamos herramientas de análisis anónimas para entender el uso del sitio y mejorar nuestros servicios.",
+        "Redes sociales: los botones de compartir en redes sociales pueden establecer cookies para rastrear tu interacción con ellos.",
+        "Servicios de pago: los procesadores de pago externos pueden utilizar cookies necesarias para procesar las transacciones de forma segura.",
       ],
+      "No tenemos control sobre las cookies de terceros. Te recomendamos revisar las políticas de privacidad y cookies de cada servicio externo para obtener información detallada.",
     ],
   },
   {
-    id: "compartir",
-    title: "Compartir información",
+    id: "gestion",
+    title: "Gestión de cookies",
     body: [
-      "No vendemos tu información personal. Podemos compartir información en las siguientes circunstancias:",
+      "Puedes gestionar y controlar las cookies de las siguientes maneras:",
       [
-        "Con otros jugadores, según las configuraciones de tu perfil.",
-        "Con proveedores de servicios que nos ayudan a operar la plataforma.",
-        "Si es requerido por ley o para proteger nuestros derechos legales.",
+        "Configuración del navegador: la mayoría de navegadores permiten bloquear o eliminar cookies desde su configuración. Consulta la sección de ayuda de tu navegador para más información.",
+        "Herramientas específicas: puedes utilizar herramientas de privacidad en línea para gestionar tus preferencias de cookies de forma centralizada.",
+        "Exclusión de análisis: algunos proveedores de análisis ofrecen complementos de exclusión que puedes instalar en tu navegador.",
       ],
-    ],
-  },
-  {
-    id: "seguridad",
-    title: "Seguridad de datos",
-    body: [
-      "Implementamos medidas de seguridad técnicas y organizativas para proteger tu información personal contra acceso no autorizado, pérdida o alteración.",
-    ],
-  },
-  {
-    id: "derechos",
-    title: "Tus derechos",
-    body: [
-      "Tienes derecho a:",
-      [
-        "Acceder a tu información personal.",
-        "Corregir información inexacta.",
-        "Eliminar tu información.",
-        "Oponerte al procesamiento de tu información.",
-        "Retirar tu consentimiento en cualquier momento.",
-      ],
-    ],
-  },
-  {
-    id: "cookies",
-    title: "Cookies y tecnologías similares",
-    body: [
-      "Utilizamos cookies y tecnologías similares para mejorar la funcionalidad del sitio. Puedes gestionar tus preferencias a través de la configuración de tu navegador.",
+      "Ten en cuenta que si bloqueas las cookies esenciales, algunas partes de nuestro sitio pueden no funcionar correctamente o tu experiencia puede verse afectada.",
     ],
   },
   {
     id: "cambios",
     title: "Cambios en esta política",
     body: [
-      "Podemos actualizar esta Política de Privacidad periódicamente. Te notificaremos sobre cambios significativos a través del sitio o por correo electrónico.",
+      "Podemos actualizar esta Política de Cookies periódicamente para reflejar cambios en las cookies que utilizamos o por requisitos legales. Te notificaremos sobre cambios significativos a través del sitio o por correo electrónico.",
     ],
   },
   {
     id: "contacto",
     title: "Contacto",
     body: [
-      "Si tienes preguntas sobre esta Política de Privacidad, contáctanos a través de nuestra página de contacto.",
+      "Si tienes preguntas sobre nuestra Política de Cookies, contáctanos a través de nuestra página de contacto.",
     ],
   },
 ]
 
-export default function PrivacyPage() {
+export default function CookiesPage() {
   const today = new Date().toLocaleDateString("es-ES", {
     year: "numeric",
     month: "long",
@@ -105,14 +92,14 @@ export default function PrivacyPage() {
   return (
     <div className="container pt-8 pb-20">
       <div className="max-w-[60ch] mb-10">
-        <Kicker>Legal · Privacidad</Kicker>
+        <Kicker>Legal · Cookies</Kicker>
         <h1 className="text-[length:var(--t-4xl)] mt-[0.7rem]">
-          Política de privacidad
+          Política de cookies
         </h1>
         <p className="text-[length:var(--t-lg)] leading-[1.7] text-[color:var(--text-muted)] mt-[1.1rem] mb-5">
-          En BoffMedia valoramos y respetamos tu privacidad. Esta política
-          explica cómo recopilamos, usamos y protegemos tu información personal
-          cuando utilizas nuestros servicios.
+          En BoffMedia utilizamos cookies y tecnologías similares para mejorar
+          tu experiencia, personalizar contenido y analizar el tráfico. Esta
+          política explica cómo las utilizamos y cómo puedes controlarlas.
         </p>
         <div className="flex gap-6 flex-wrap">
           <span className="inline-flex items-center gap-2 font-mono text-[length:var(--t-xs)] tracking-[0.04em] text-[color:var(--text-dim)]">
@@ -128,11 +115,11 @@ export default function PrivacyPage() {
 
       <div className="grid grid-cols-[240px_1fr] gap-14 items-start max-[1000px]:grid-cols-1 max-[1000px]:gap-8">
         <DocTOC
-          items={PRIVACY.map((s) => ({ id: s.id, title: s.title }))}
+          items={SECTIONS.map((s) => ({ id: s.id, title: s.title }))}
         />
 
         <div className="max-w-[70ch]">
-          {PRIVACY.map((s, i) => (
+          {SECTIONS.map((s, i) => (
             <section
               key={s.id}
               id={"sec-" + s.id}
@@ -200,19 +187,19 @@ export default function PrivacyPage() {
                   "var(--hairline) solid color-mix(in srgb, var(--orange-500) 30%, transparent)",
               }}
             >
-              <Icon name="shield" size={22} />
+              <Icon name="sliders" size={22} />
             </span>
             <div className="flex-1 min-w-[200px]">
               <h3 className="text-[length:var(--t-lg)] m-0">
-                ¿Quieres gestionar tus datos?
+                ¿Quieres ajustar tus preferencias?
               </h3>
               <p className="text-[color:var(--text-muted)] text-[length:var(--t-sm)] mt-[0.3rem] m-0">
-                Desde tu perfil puedes descargar o eliminar tu información en
-                cualquier momento.
+                Puedes gestionar las cookies desde la configuración de tu
+                navegador en cualquier momento.
               </p>
             </div>
             <Button variant="ghost" iconRight="arrow">
-              Ir a mi perfil
+              Más información
             </Button>
           </Card>
         </div>
