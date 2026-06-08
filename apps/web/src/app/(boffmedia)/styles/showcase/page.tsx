@@ -1,6 +1,5 @@
 "use client"
 
-import "./showcase.css"
 import * as React from "react"
 
 // Primitives — boffmedia design system
@@ -3180,9 +3179,12 @@ const SECTIONS: Record<string, React.ComponentType<{ go?: (path: string) => void
 }
 
 function ShowcaseInner() {
- const [active, setActive] = React.useState(
-  () => (typeof window !== "undefined" && localStorage.getItem("dsh-section")) || "overview"
- )
+ const [active, setActive] = React.useState("overview")
+
+ React.useEffect(() => {
+  const stored = localStorage.getItem("dsh-section")
+  if (stored && SECTIONS[stored]) setActive(stored)
+ }, [])
 
  React.useEffect(() => {
   localStorage.setItem("dsh-section", active)

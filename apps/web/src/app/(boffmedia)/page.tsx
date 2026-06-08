@@ -27,7 +27,7 @@ function EventsSectionSkeleton() {
 export default async function Home() {
   const t = await getTranslations("boffmedia");
   return (
-    <div className="flex flex-col main pt-16">
+    <>
       <HeroSection />
       <FeaturedSection />
       <Suspense fallback={<EventsSectionSkeleton />}>
@@ -35,7 +35,7 @@ export default async function Home() {
       </Suspense>
       <CommunitySection />
       {/*<CtaSection />*/}
-    </div>
+    </>
   )
 }
 

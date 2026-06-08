@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import "@/styles/boffmedia-primitives.css"
 import { BoffButton as Button } from "@/components/boffmedia/primitives/button"
 import { BoffInput as Input } from "@/components/boffmedia/primitives/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/primitives/avatar"
