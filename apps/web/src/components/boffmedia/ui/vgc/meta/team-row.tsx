@@ -1,0 +1,79 @@
+"use client"
+
+import { ExpandableCard } from "@/components/boffmedia/primitives/expandable-card"
+import { Icon } from "@/components/boffmedia/primitives/icon"
+import { CopyButton } from "@/components/boffmedia/primitives/copy-button"
+import { PokeSprite } from "@/components/shared/pokemon/PokeSprite"
+
+interface TeamSlot {
+  dex: number
+  name: string
+  tera: string
+  item: string
+  moves: string[]
+}
+
+interface TeamEntry {
+  slug: string
+  name: string
+  record: string
+  team: TeamSlot[]
+  rawText: string
+}
+
+interface TeamRowProps {
+  entry: TeamEntry
+}
+
+function SlotDetail({ slot }: { slot: TeamSlot }) {
+  return (
+    <div className="flex flex-col items-center text-center p-[0.6rem_0.4rem] border border-[var(--border)] rounded-[var(--radius)] bg-[color-mix(in_srgb,var(--surface-2)_50%,transparent)]">
+      <PokeSprite dex={slot.dex} name={slot.name} size={48} />
+      <p className="text-xs font-bold text-[var(--text)] leading-tight mt-1">{slot.name}</p>
+      <p className="text-[10px] text-[var(--text-dim)] mt-0.5">{slot.item}</p>
+      <span
+        className="text-[10px] font-semibold px-1 rounded inline-block mt-0.5"
+        style={{ color: "#f5b342", background: "color-mix(in srgb, #f5b342 14%, transparent)" }}
+      >
+        Tera {slot.tera}
+      </span>
+      <ul className="list-none m-[0.25rem_0_0] p-0 flex flex-col gap-px">
+        {slot.moves.map((m) => (
+          <li key={m} className="text-[11px] text-[var(--text-muted)] whitespace-nowrap overflow-hidden text-ellipsis">
+            {m}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+export function VgcTeamRow({ entry }: TeamRowProps) {
+  return (
+    <ExpandableCard
+      header={
+        <div className="flex items-center gap-3">
+          <div className="flex flex-col min-w-[96px] shrink-0">
+            <span className="text-xs font-bold text-[var(--text)]">{entry.name}</span>
+            <span className="font-mono text-[10px] text-[var(--text-dim)]">{entry.record}</span>
+          </div>
+          <div className="flex items-center gap-0.5 flex-1 min-w-0">
+            {entry.team.slice(0, 6).map((s) => (
+              <PokeSprite key={s.dex + s.name} dex={s.dex} name={s.name} size={30} />
+            ))}
+          </div>
+        </div>
+      }
+      bodyClassName="space-y-3"
+    >
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-3">
+        {entry.team.map((s, i) => (
+          <SlotDetail key={s.dex + s.name + i} slot={s} />
+        ))}
+      </div>
+      <div className="flex justify-end">
+        <CopyButton text={entry.rawText} />
+      </div>
+    </ExpandableCard>
+  )
+}
