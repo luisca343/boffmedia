@@ -29,6 +29,7 @@ export interface CategoryConfig {
 }
 
 export interface GameConfig {
+  slug: string;
   name: string;
   icon: string;
   color: string;
@@ -62,6 +63,7 @@ function buildGameConfig(slug: string): GameConfig {
   if (!game) throw new Error(`No game entry found for slug: "${slug}"`);
 
   return {
+    slug,
     name: game.nameKey,
     icon: game.icon,
     color: game.color,
