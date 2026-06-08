@@ -35,13 +35,18 @@ export function VgcSubbar({
 
   if (tab === "stats") {
     return (
-      <div className="flex items-center gap-2 px-3 py-1.5 text-xs text-[var(--text-muted)]">
-        <span className="inline-flex font-mono text-[10px] px-1.5 py-[0.15rem] rounded-[var(--radius-pill)] border border-[var(--border)] text-[var(--text-dim)]">
-          {formatLabel}
-        </span>
-        {formatNote && <span className="text-xs">{formatNote}</span>}
-        <span className="flex items-center gap-1 ml-auto font-mono text-[var(--text-dim)]">
-          <Icon name="info" size={12} />
+      <div className="flex items-center gap-3 px-3 py-2 border-t border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--surface-2)_30%,transparent)]">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold px-2 py-[0.2rem] rounded-[var(--radius-pill)] border border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent-bright)]">
+            <Icon name="shield" size={11} />
+            {formatLabel}
+          </span>
+          {formatNote && (
+            <span className="text-[11px] text-[var(--text-dim)] truncate">{formatNote}</span>
+          )}
+        </div>
+        <span className="flex items-center gap-1 ml-auto font-mono text-[10px] text-[var(--text-dim)] shrink-0">
+          <Icon name="info" size={11} />
           {cutoffLabel} · {month}
         </span>
       </div>
