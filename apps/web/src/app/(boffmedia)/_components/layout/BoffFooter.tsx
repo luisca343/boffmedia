@@ -184,7 +184,7 @@ export function BoffFooter() {
             {[
               { href: "/privacidad", label: t("legal.privacy") },
               { href: "/terminos", label: t("legal.terms") },
-              { href: "#", label: t("legal.cookies") },
+              { href: "/cookies", label: t("legal.cookies") },
             ].map(({ href, label }) => (
               <Link
                 key={label}

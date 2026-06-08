@@ -24,7 +24,7 @@ export default async function RootLayout({
       <ToastContainer position="bottom-right" theme="dark" />
       <FicusNav />
       <section className="border-solid no-scrollbar flex-1 bg-surface-900">
-          <section className="flex-1 [&>*]:min-h-[calc(100vh-22rem)] [&>*:not(.main)]:py-8">
+          <section className="flex-1 [&>*]:min-h-[calc(100vh-22rem)]">
             {children}
           </section>
           <BoffFooter />

@@ -57,5 +57,7 @@ export { BSTraySlot } from "./bs-tray-slot"
 export { BSMonCard } from "./bs-mon-card"
 export { BSWinProb } from "./bs-win-prob"
 export { BSTracker } from "./bs-tracker"
+export { DocTOC } from "./doc-toc"
+export type { DocTOCItem } from "./doc-toc"
 export { TYPES, tyVar, effMult, effLabel, hpColor, aniF, aniB } from "./bs-data"
 
