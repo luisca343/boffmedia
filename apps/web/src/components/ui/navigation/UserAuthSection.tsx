@@ -7,6 +7,7 @@ import { signOut } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
 import { useBoffSession } from '@/services/useBoffSession'
 import { Icon } from '@/components/boffmedia/primitives/icon'
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/primitives/avatar'
 
 export default function UserAuthSection() {
   const [mounted, setMounted] = useState(false)
@@ -39,14 +40,21 @@ export default function UserAuthSection() {
           }
           style={{ borderWidth: 'var(--hairline)' }}
         >
-          <span
-            className="w-[30px] h-[30px] rounded-full grid place-items-center font-display font-extrabold text-[0.85rem] text-white"
-            style={{
-              background: 'linear-gradient(135deg, var(--orange-500), var(--orange-700))',
-            }}
-          >
-            {initial}
-          </span>
+          <Avatar className="w-[30px] h-[30px]">
+            <AvatarImage
+              src={session.user.image || undefined}
+              alt={session.user.name || ''}
+              className="object-cover"
+            />
+            <AvatarFallback
+              className="font-display font-extrabold text-[0.85rem] text-white"
+              style={{
+                background: 'linear-gradient(135deg, var(--orange-500), var(--orange-700))',
+              }}
+            >
+              {initial}
+            </AvatarFallback>
+          </Avatar>
           <span className="text-[length:var(--t-sm)] font-semibold text-[var(--text)]">
             {session.user.name || session.user.smartRotomUser?.username || 'User'}
           </span>

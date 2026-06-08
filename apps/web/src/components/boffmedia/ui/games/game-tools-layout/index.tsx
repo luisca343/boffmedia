@@ -47,6 +47,7 @@ export default function GameToolsLayout({
 
       <FloatingSection
         variant="default"
+        showBackground
         showParticles={false}
         showBlobs={false}
         showGrid={false}
