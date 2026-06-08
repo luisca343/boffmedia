@@ -11,6 +11,7 @@ interface FloatingSectionProps {
   showGrid?: boolean;
   className?: string;
   style?: React.CSSProperties;
+  overflow?: string;
 }
 
 export function FloatingSection({ 
@@ -21,11 +22,12 @@ export function FloatingSection({
   showBackground = true,
   showGrid = false,
   className = "",
-  style = {}
+  style = {},
+  overflow = "overflow-hidden",
 }: FloatingSectionProps) {
   return (
     <section 
-      className={`relative overflow-hidden ${className}`} 
+      className={`relative ${overflow} ${className}`} 
       style={style}
     >
       {(variant !== 'neutral' && showBackground) &&  (
