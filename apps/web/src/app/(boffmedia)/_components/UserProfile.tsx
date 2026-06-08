@@ -131,7 +131,7 @@ export default function UserProfile() {
 
   return (
     <div className="relative min-h-screen" style={{ background: "var(--bg)" }}>
-      <div className="relative container mx-auto px-4 z-10" style={{ paddingTop: "7.5rem", paddingBottom: "5rem" }}>
+      <div className="relative container mx-auto px-4 z-10 py-16">
         <div className="max-w-4xl mx-auto">
 
           {/* ── Page head ─────────────────────────────────────────────────── */}
