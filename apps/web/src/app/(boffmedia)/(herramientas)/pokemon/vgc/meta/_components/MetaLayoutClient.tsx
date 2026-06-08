@@ -4,7 +4,12 @@ import { useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Info } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { ToolApp } from "@/components/boffmedia/primitives/tool-app";
+import { Icon } from "@/components/boffmedia/primitives/icon";
+import { VgcUsageSidebar } from "@/components/boffmedia/ui/vgc/meta/usage-sidebar";
+import { VgcPokemonDetail } from "@/components/boffmedia/ui/vgc/meta/pokemon-detail";
+import { VgcStandingsView } from "@/components/boffmedia/ui/vgc/meta/standings-view";
+import { VgcDivergenceView } from "@/components/boffmedia/ui/vgc/meta/divergence-view";
 import { useSmogonSnapshots } from "../_hooks/useSmogonSnapshots";
 import { useSmogonUsage } from "../_hooks/useSmogonUsage";
 import { useChampionsRegulations } from "../_hooks/useChampionsRegulations";
@@ -15,13 +20,11 @@ import { useLimitlessUsage } from "../_hooks/useLimitlessUsage";
 import { useLimitlessPlayers } from "../_hooks/useLimitlessPlayers";
 import { useDivergence } from "../_hooks/useDivergence";
 import { useMetaNavigation, DEFAULT_CUTOFF } from "../_hooks/useMetaNavigation";
-import { FormatBar } from "./FormatBar";
-import { PokemonSidebar } from "./PokemonSidebar";
-import { PokemonDetailView } from "./PokemonDetailView";
-import { StandingsView } from "./StandingsView";
-import { DivergenceView } from "./DivergenceView";
-import { MetaSplitLayout } from "./MetaSplitLayout";
+import { useSpeciesTeams } from "../_hooks/useSpeciesTeams";
+import { VgcToolbar } from "./VgcToolbar";
+import { VgcSubbar } from "./VgcSubbar";
 import { ENABLE_PREVIEW_FORMATS, FORMAT_LABELS } from "../constants";
+import { toUsageEntry, toPokeData, toPlayerEntry, toDivergenceResult, toTeamEntry } from "../_lib/vgc-adapter";
 
 export function MetaLayoutClient() {
   const t            = useTranslations("vgc.meta");
@@ -47,14 +50,9 @@ export function MetaLayoutClient() {
     [selectedRegulation],
   );
   const resolvedSmogonFormat = useMemo(
-    // If `format` points to a regulation that has no VGCPastes GID, treat it as
-    // a Smogon-backed regulation and resolve to its formatId.
     () => (selectedRegulation && !selectedRegulation.vgcPastesGid ? selectedRegulation.formatId : format),
     [selectedRegulation, format],
   );
-  // Regulation ID to use for the teams panel: prefer the tournament-tab URL param,
-  // then the regulation whose ID matches `format`, then the regulation whose formatId
-  // matches `resolvedSmogonFormat` (for raw Smogon format IDs like "gen9vgc2026regf").
   const teamsRegulationId = useMemo(
     () => regulation || selectedRegulation?.id || regulations.find((r) => r.formatId === resolvedSmogonFormat)?.id || undefined,
     [regulation, selectedRegulation, regulations, resolvedSmogonFormat],
@@ -119,26 +117,143 @@ export function MetaLayoutClient() {
     };
   }, [baseDetail, pasteDetail, isPreviewFormat]);
 
-  return (
-    <div className="flex flex-col bg-surface-900 h-[calc(100vh-4rem)] overflow-hidden">
-      <FormatBar
-        tab={tab}
-        format={format}
-        month={month}
-        cutoff={cutoff}
-        regulation={regulation}
-        tournamentId={tournamentId}
-        snapshots={snapshots}
-        regulations={regulations}
-        tournaments={tournaments}
-        formatLabels={FORMAT_LABELS}
-        onTabChange={handleTabChange}
-        onFormatChange={handleFormatChange}
-        onOptionsApply={handleOptionsApply}
-        onRegulationChange={handleRegulationChange}
-        onTournamentChange={handleTournamentChange}
-      />
+  // ── Teams for selected Pokémon ─────────────────────────────────────────────
+  const resolvedTeamsRegId = isPreviewFormat ? format : teamsRegulationId;
+  const { teams: speciesTeams } = useSpeciesTeams(
+    speciesId || undefined,
+    resolvedTeamsRegId,
+  );
 
+  // ── Adapt data for new components ──────────────────────────────────────────
+  const usageEntries = useMemo(() => entries.map(toUsageEntry), [entries]);
+  const pokeMap = useMemo(() => {
+    const map: Record<string, { id: string; name: string; dex: number; types: string[]; base: Record<string, number>; abilities: { name: string; pct: number }[]; items: { name: string; pct: number }[]; moves: { name: string; pct: number }[]; tera: { name: string; pct: number }[]; mates: { id: string; pct: number }[]; spreads: { nature: string; ev: number[]; pct: number }[] }> = {};
+    for (const e of entries) {
+      map[e.speciesId] = toPokeData(e);
+    }
+    return map;
+  }, [entries]);
+
+  const selectedEntry = useMemo(() => {
+    if (!speciesId) return usageEntries[0] ?? null;
+    return usageEntries.find((e) => e.id === speciesId) ?? null;
+  }, [usageEntries, speciesId]);
+
+  const selectedPokeData = useMemo(() => {
+    const id = selectedEntry?.id ?? speciesId;
+    return id ? pokeMap[id] ?? null : null;
+  }, [pokeMap, selectedEntry, speciesId]);
+
+  const adaptedPlayers = useMemo(
+    () => standingsPlayers.map((p) => toPlayerEntry(p, new Map())),
+    [standingsPlayers],
+  );
+
+  const adaptedDivergence = useMemo(
+    () => (divergenceResult ? toDivergenceResult(divergenceResult) : null),
+    [divergenceResult],
+  );
+
+  const adaptedTeams = useMemo(
+    () => (speciesTeams.length > 0 ? speciesTeams.map(toTeamEntry) : undefined),
+    [speciesTeams],
+  );
+
+  // ── Toolbar stats ──────────────────────────────────────────────────────────
+  const totalBattles = ladderEntries.reduce((a, e) => a + e.rawCount, 0);
+  const totalTeams   = tournamentEntries.reduce((a, e) => a + e.rawCount, 0);
+  const tours = tournaments;
+  const curTour = tournamentId && tournamentId !== "combined"
+    ? tours.find((t2) => String(t2.id) === String(tournamentId))
+    : undefined;
+
+  // ── Subbar data ────────────────────────────────────────────────────────────
+  const fmt = snapshots.find((s) => s.formatId === resolvedSmogonFormat);
+  const cutoffLabel = cutoff === 0 ? "All ELO" : `${cutoff}+ ELO`;
+
+  const toolbar = (
+    <VgcToolbar
+      tab={tab}
+      format={format}
+      month={month}
+      cutoff={cutoff}
+      regulation={regulation}
+      tournamentId={tournamentId}
+      snapshots={snapshots}
+      regulations={regulations}
+      tournaments={tournaments}
+      formatLabels={FORMAT_LABELS}
+      totalBattles={totalBattles}
+      totalTeams={totalTeams}
+      onTabChange={handleTabChange}
+      onFormatChange={handleFormatChange}
+      onOptionsApply={handleOptionsApply}
+      onRegulationChange={handleRegulationChange}
+      onTournamentChange={handleTournamentChange}
+    />
+  );
+
+  const subbar = (
+    <VgcSubbar
+      tab={tab}
+      view={view}
+      formatLabel={selectedRegulation?.name ?? fmt?.formatId ?? format}
+      formatNote={selectedRegulation?.name ? undefined : undefined}
+      cutoffLabel={cutoffLabel}
+      month={month}
+      curTourName={curTour?.name ?? undefined}
+      curTourPlayers={curTour?.playerCount ?? undefined}
+      curTourIsCombined={tournamentId === "combined" || !tournamentId}
+      combinedCount={tours.length}
+      onViewChange={handleViewChange}
+    />
+  );
+
+  // ── Body ───────────────────────────────────────────────────────────────────
+  let body: React.ReactNode;
+  if (tab === "tournament" && view === "players") {
+    body = (
+      <VgcStandingsView players={adaptedPlayers} />
+    );
+  } else if (tab === "tournament" && view === "divergence") {
+    body = (
+      <VgcDivergenceView result={adaptedDivergence} pokeMap={pokeMap} />
+    );
+  } else {
+    body = (
+      <div className="flex-1 min-h-0 flex w-full">
+        <aside className="w-[320px] shrink-0 flex flex-col min-h-0 border-r border-[var(--border)] bg-[color-mix(in_srgb,var(--surface)_40%,transparent)]">
+          <VgcUsageSidebar
+            entries={usageEntries}
+            pokeMap={pokeMap}
+            selectedId={selectedEntry?.id ?? null}
+            onSelect={handleSelect}
+            loading={loading}
+            error={error}
+          />
+        </aside>
+        <main className="flex-1 min-w-0 overflow-y-auto">
+          {selectedPokeData && selectedEntry ? (
+            <VgcPokemonDetail
+              detail={selectedPokeData}
+              entry={selectedEntry}
+              pokeMap={pokeMap}
+              onSelect={handleSelect}
+              teams={adaptedTeams}
+            />
+          ) : (
+            <div className="flex-1 flex flex-col items-center justify-center gap-3 text-[var(--text-dim)] p-8">
+              <Icon name="database" size={26} />
+              <p className="text-sm max-w-[32ch] text-center">Elige un Pokémon de la lista para ver su detalle competitivo.</p>
+            </div>
+          )}
+        </main>
+      </div>
+    );
+  }
+
+  return (
+    <ToolApp className="vgc-app" toolbar={toolbar} subbar={subbar}>
       {/* Preview notice for VGCPastes-backed formats */}
       {tab === "stats" && isPreviewFormat && (
         <div className="shrink-0 flex items-center gap-2 px-3 py-2 bg-amber-500/5 border-b border-amber-500/20 text-xs text-amber-400/80">
@@ -146,72 +261,7 @@ export function MetaLayoutClient() {
           {t("tabs.championsPreviewNotice")}
         </div>
       )}
-
-      {/* Aggregate / Players / Divergence sub-tab strip — tournament tab only */}
-      {tab === "tournament" && (
-        <div className="shrink-0 px-3 py-2 border-b border-surface-700 bg-gradient-to-r from-surface-900 via-surface-900 to-surface-800/85">
-          <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-surface-700/70 scrollbar-track-transparent">
-            <div className="inline-flex min-w-max items-center gap-1 rounded-xl border border-surface-700/80 bg-surface-800/70 p-1">
-              {(["aggregate", "players", "divergence"] as const).map((v) => (
-                <button
-                  key={v}
-                  onClick={() => handleViewChange(v)}
-                  className={cn(
-                    "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap",
-                    view === v
-                      ? "bg-primary-500/20 text-primary-300 shadow-[inset_0_0_0_1px_rgba(56,189,248,0.2)]"
-                      : "text-surface-400 hover:text-surface-100 hover:bg-surface-700/40",
-                  )}
-                >
-                  {t(`tabs.${v}`)}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Main content area */}
-      <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
-      {tab === "tournament" && view === "players" ? (
-        <StandingsView
-          players={standingsPlayers}
-          loading={standingsLoading}
-          error={standingsError}
-          tournamentId={tournamentIdNum}
-        />
-      ) : tab === "tournament" && view === "divergence" ? (
-        <DivergenceView
-          result={divergenceResult}
-          loading={divergenceLoading}
-          error={divergenceError}
-        />
-      ) : (
-        <MetaSplitLayout
-          hasSelection={!!speciesId}
-          sidebar={
-            <PokemonSidebar
-              entries={entries}
-              loading={loading}
-              error={error}
-              selectedId={speciesId}
-              onSelect={handleSelect}
-            />
-          }
-          detail={
-            <PokemonDetailView
-              detail={detail}
-              loading={false}
-              speciesId={speciesId}
-              regulationId={isPreviewFormat ? format : teamsRegulationId}
-              onBack={handleBack}
-              onSelect={handleSelect}
-            />
-          }
-        />
-      )}
-      </div>
-    </div>
+      {body}
+    </ToolApp>
   );
 }
-
