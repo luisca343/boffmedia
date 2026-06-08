@@ -1,89 +1,117 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import { env } from "@/config/env.public";
-import { Loader2, RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui/primitives/button";
-import { boffPOST } from "@/services/boffAPI";
+import { useState } from "react"
+import { Loader2, RefreshCw } from "lucide-react"
+import { BoffButton } from "@/components/boffmedia/primitives/button"
+import { ToolPanel } from "@/components/boffmedia/primitives/tool-panel"
+import { PtcgpService } from "@/services/api/boffmedia/ptcgpService"
 
-interface FetchStatusData {
-  status:    "fetching" | "success" | "error";
-  message:   string;
-  timestamp: string;
+type Step = "idle" | "series" | "sets" | "cards" | "done" | "error"
+
+interface ProgressState {
+  step: Step
+  totalSets?: number
+  doneSets?: number
+  failedSets?: number
+  message?: string
 }
 
-const STATUS_STYLES: Record<FetchStatusData["status"], { dot: string; label: string }> = {
-  success: { dot: "bg-green-400",  label: "text-green-400"  },
-  error:   { dot: "bg-red-400",    label: "text-red-400"    },
-  fetching:{ dot: "bg-amber-400 animate-pulse", label: "text-amber-400" },
-};
-
 export function TcgpScraper() {
-  const [status, setStatus] = useState<FetchStatusData | null>(null);
-  const [triggering, setTriggering] = useState(false);
-
-  useEffect(() => {
-    const eventSource = new EventSource(
-      `${env.NEXT_PUBLIC_API}/tools/ptcgp/scrape/status`
-    );
-    eventSource.onmessage = (event) => {
-      setStatus(JSON.parse(event.data) as FetchStatusData);
-    };
-    return () => eventSource.close();
-  }, []);
+  const [progress, setProgress] = useState<ProgressState>({ step: "idle" })
 
   const triggerFetch = async () => {
-    setTriggering(true);
+    setProgress({ step: "series", message: "Obteniendo series…" })
     try {
-      await boffPOST("/tools/ptcgp/scrape/refresh", { method: "POST" });
+      await PtcgpService.fetchAndStoreSeries()
+      setProgress({ step: "sets", message: "Obteniendo colecciones…" })
+      await PtcgpService.fetchAndStoreSetsForSeries("tcgp")
+      setProgress({ step: "cards", message: "Obteniendo cartas…" })
+      const results = await PtcgpService.fetchAndStoreAllCardsForSeries("tcgp")
+      const successful = results.data?.filter(r => !r.error) ?? []
+      const failed = results.data?.filter(r => r.error) ?? []
+      setProgress({
+        step: "done",
+        totalSets: results.data?.length ?? 0,
+        doneSets: successful.length,
+        failedSets: failed.length,
+        message: `${successful.length} colecciones actualizadas${failed.length > 0 ? `, ${failed.length} fallidas` : ""}`,
+      })
     } catch (error) {
-      console.error("Failed to trigger fetch:", error);
-    } finally {
-      setTriggering(false);
+      setProgress({ step: "error", message: error instanceof Error ? error.message : "Error desconocido" })
     }
-  };
+  }
 
   return (
-    <div className="space-y-4 max-w-md">
-      <p className="text-sm text-surface-400">
-        Lanza un scrape de cartas de Pokémon TCG Pocket y actualiza los datos en la base de datos.
-      </p>
-
-      <div className="rounded-xl border border-surface-700/80 bg-surface-800/50 shadow-sm p-4 space-y-4">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-surface-500">
-          Estado del scraper
+    <div className="max-w-lg space-y-6">
+      <div>
+        <h3 className="text-lg font-bold text-[var(--text)]">TCG Pocket Scraper</h3>
+        <p className="text-sm text-[var(--text-muted)] mt-1">
+          Obtiene cartas de Pokémon TCG Pocket desde la API externa y las almacena en la base de datos.
         </p>
+      </div>
 
-        {status ? (
-          <div className="space-y-2">
+      <ToolPanel title="Scraping">
+        {progress.step === "idle" ? (
+          <p className="text-sm text-[var(--text-muted)]">
+            Pulsa el botón para empezar. El proceso descarga series, colecciones y cartas secuencialmente.
+          </p>
+        ) : (
+          <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <span className={`w-2 h-2 rounded-full shrink-0 ${STATUS_STYLES[status.status].dot}`} />
-              <span className={`text-sm font-medium ${STATUS_STYLES[status.status].label}`}>
-                {status.status === "fetching" ? "Obteniendo datos…" :
-                 status.status === "success"  ? "Datos actualizados" :
-                 "Error al obtener datos"}
+              {(progress.step === "series" || progress.step === "sets" || progress.step === "cards") && (
+                <Loader2 className="w-4 h-4 animate-spin text-amber-400 shrink-0" />
+              )}
+              {progress.step === "done" && (
+                <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
+              )}
+              {progress.step === "error" && (
+                <span className="w-2 h-2 rounded-full bg-red-400 shrink-0" />
+              )}
+              <span className={`text-sm font-medium ${
+                progress.step === "done" ? "text-emerald-400" :
+                progress.step === "error" ? "text-red-400" :
+                "text-amber-400"
+              }`}>
+                {progress.step === "series" ? "Obteniendo series…" :
+                 progress.step === "sets"   ? "Obteniendo colecciones…" :
+                 progress.step === "cards"  ? "Obteniendo cartas…" :
+                 progress.step === "done"   ? "Actualización completada" :
+                 "Error"}
               </span>
             </div>
-            <p className="text-sm text-surface-300">{status.message}</p>
-            <p className="text-xs text-surface-500">
-              Última actualización: {new Date(status.timestamp).toLocaleString()}
-            </p>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2 text-surface-500 text-sm">
-            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            <span>Conectando…</span>
+            {progress.message && (
+              <p className="text-sm text-[var(--text-muted)]">{progress.message}</p>
+            )}
+            {progress.step === "done" && progress.totalSets != null && (
+              <p className="text-xs text-[var(--text-dim)]">
+                {progress.doneSets}/{progress.totalSets} colecciones procesadas
+                {progress.failedSets && progress.failedSets > 0
+                  ? ` (${progress.failedSets} con errores)`
+                  : ""}
+              </p>
+            )}
           </div>
         )}
 
-        <Button onClick={triggerFetch} disabled={triggering} className="w-full sm:w-auto">
-          {triggering ? (
-            <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Iniciando...</>
-          ) : (
-            <><RefreshCw className="w-4 h-4 mr-2" />Cargar datos de TCG</>
+        <div className="mt-4 flex gap-2">
+          <BoffButton
+            onClick={triggerFetch}
+            disabled={progress.step === "series" || progress.step === "sets" || progress.step === "cards"}
+          >
+            {(progress.step === "series" || progress.step === "sets" || progress.step === "cards") ? (
+              <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Procesando…</>
+            ) : (
+              <><RefreshCw className="w-4 h-4 mr-2" />Cargar datos</>
+            )}
+          </BoffButton>
+
+          {progress.step === "done" && (
+            <BoffButton variant="outline" onClick={() => setProgress({ step: "idle" })}>
+              Reiniciar
+            </BoffButton>
           )}
-        </Button>
-      </div>
+        </div>
+      </ToolPanel>
     </div>
-  );
+  )
 }
