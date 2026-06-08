@@ -51,6 +51,7 @@ export default function GameToolsLayout({
         showParticles={false}
         showBlobs={false}
         showGrid={false}
+        overflow={noContainer ? "overflow-visible" : "overflow-hidden"}
         className="flex-1 min-w-0 w-full"
       >
         {noContainer ? (
