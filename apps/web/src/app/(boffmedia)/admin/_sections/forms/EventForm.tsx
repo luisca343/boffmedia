@@ -2,8 +2,8 @@ import { useForm, useWatch } from "react-hook-form"
 import { useEffect } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { Button } from "@/components/ui/primitives/button"
-import { Input } from "@/components/ui/primitives/input"
+import { BoffButton } from "@/components/boffmedia/primitives/button"
+import { BoffInput } from "@/components/boffmedia/primitives/input"
 import { Textarea } from "@/components/ui/primitives/textarea"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/primitives/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/primitives/select"
@@ -52,7 +52,7 @@ export function EventForm({
       (event) =>
         event.type === "server" &&
         event.id !== defaultValues?.id && 
-        !event.parentId, // Only top-level servers can be parents
+        !event.parentId,
     ) || []
 
   const form = useForm<EventFormValues>({
@@ -71,7 +71,6 @@ export function EventForm({
     },
   })
 
-  // Watch parentId and type; if this becomes a child event, ensure type is "event"
   const parentIdValue = useWatch({ control: form.control, name: "parentId" })
   const typeValue = useWatch({ control: form.control, name: "type" })
   const isChildEvent = Boolean(parentIdValue)
@@ -82,6 +81,9 @@ export function EventForm({
     }
   }, [isChildEvent, typeValue, form])
 
+  const selectTriggerClass = "bg-[var(--surface-2)] border border-solid border-[var(--border-strong)] text-[var(--text)] py-2.5 px-3.5 focus:outline-none focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-soft)]"
+  const selectContentClass = "bg-[var(--surface)] border-[var(--border-strong)] text-[var(--text)]"
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
@@ -91,18 +93,18 @@ export function EventForm({
             name="parentId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Servidor Principal (Opcional)</FormLabel>
+                <FormLabel className="text-[var(--text-muted)]">Servidor Principal (Opcional)</FormLabel>
                 <Select
                   onValueChange={(value) => field.onChange(value ? Number(value) : undefined)}
                   defaultValue={field.value?.toString()}
                   disabled={isLoadingEvents}
                 >
                   <FormControl>
-                    <SelectTrigger className="bg-surface-700 border-surface-600 text-surface-50">
+                    <SelectTrigger className={selectTriggerClass}>
                       <SelectValue placeholder="Selecciona un servidor principal" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent className="bg-surface-800 border-surface-700">
+                  <SelectContent className={selectContentClass}>
                     <SelectItem value={"-1"}>Ninguno (Evento independiente)</SelectItem>
                     {parentEvents.map((event) => (
                       <SelectItem key={event.id} value={event.id.toString()}>
@@ -111,7 +113,7 @@ export function EventForm({
                     ))}
                   </SelectContent>
                 </Select>
-                <FormDescription>
+                <FormDescription className="text-[var(--text-dim)]">
                   {isChildEvent
                     ? "Este evento será parte de un servidor principal."
                     : "Opcionalmente, este evento puede ser parte de un servidor principal."}
@@ -127,15 +129,11 @@ export function EventForm({
           name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Título</FormLabel>
+              <FormLabel className="text-[var(--text-muted)]">Título</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="Nombre del evento"
-                  className="bg-surface-700 border-surface-600 text-surface-50"
-                  {...field}
-                />
+                <BoffInput placeholder="Nombre del evento" {...field} />
               </FormControl>
-              <FormDescription>Este será el nombre principal del evento.</FormDescription>
+              <FormDescription className="text-[var(--text-dim)]">Este será el nombre principal del evento.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -146,15 +144,15 @@ export function EventForm({
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Descripción</FormLabel>
+              <FormLabel className="text-[var(--text-muted)]">Descripción</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="Describe el evento"
-                  className="bg-surface-700 border-surface-600 text-surface-50 min-h-[100px]"
+                  className="min-h-[100px] bg-[var(--surface-2)] border border-solid border-[var(--border-strong)] text-[var(--text)] rounded-[var(--btn-radius,9999px)] py-2.5 px-3.5 focus:outline-none focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-soft)] placeholder:text-[var(--text-dim)]"
                   {...field}
                 />
               </FormControl>
-              <FormDescription>Proporciona una descripción detallada del evento.</FormDescription>
+              <FormDescription className="text-[var(--text-dim)]">Proporciona una descripción detallada del evento.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -165,18 +163,18 @@ export function EventForm({
           name="gameId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Juego</FormLabel>
+              <FormLabel className="text-[var(--text-muted)]">Juego</FormLabel>
               <Select
                 onValueChange={(value) => field.onChange(Number(value))}
                 defaultValue={field.value?.toString()}
                 disabled={isLoadingGames}
               >
                 <FormControl>
-                  <SelectTrigger className="bg-surface-700 border-surface-600 text-surface-50">
+                  <SelectTrigger className={selectTriggerClass}>
                     <SelectValue placeholder={isLoadingGames ? "Cargando juegos..." : "Selecciona un juego"} />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent className="bg-surface-800 border-surface-700">
+                <SelectContent className={selectContentClass}>
                   {games?.map((game) => (
                     <SelectItem key={game.id} value={game.id.toString()}>
                       {game.title}
@@ -184,7 +182,7 @@ export function EventForm({
                   ))}
                 </SelectContent>
               </Select>
-              <FormDescription>Selecciona el juego para este evento.</FormDescription>
+              <FormDescription className="text-[var(--text-dim)]">Selecciona el juego para este evento.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -196,13 +194,9 @@ export function EventForm({
             name="startDate"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Fecha de Inicio</FormLabel>
+                <FormLabel className="text-[var(--text-muted)]">Fecha de Inicio</FormLabel>
                 <FormControl>
-                  <Input
-                    type="datetime-local"
-                    className="bg-surface-700 border-surface-600 text-surface-50"
-                    {...field}
-                  />
+                  <BoffInput type="datetime-local" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -214,13 +208,9 @@ export function EventForm({
             name="endDate"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Fecha de Finalización</FormLabel>
+                <FormLabel className="text-[var(--text-muted)]">Fecha de Finalización</FormLabel>
                 <FormControl>
-                  <Input
-                    type="datetime-local"
-                    className="bg-surface-700 border-surface-600 text-surface-50"
-                    {...field}
-                  />
+                  <BoffInput type="datetime-local" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -234,23 +224,23 @@ export function EventForm({
             name="type"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Tipo de Evento</FormLabel>
+                <FormLabel className="text-[var(--text-muted)]">Tipo de Evento</FormLabel>
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
-                  disabled={isChildEvent} // Disable if child event
+                  disabled={isChildEvent}
                 >
                   <FormControl>
-                    <SelectTrigger className="bg-surface-700 border-surface-600 text-surface-50">
+                    <SelectTrigger className={selectTriggerClass}>
                       <SelectValue placeholder="Selecciona el tipo" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent className="bg-surface-800 border-surface-700">
+                  <SelectContent className={selectContentClass}>
                     <SelectItem value="event">Evento</SelectItem>
                     <SelectItem value="server">Servidor</SelectItem>
                   </SelectContent>
                 </Select>
-                <FormDescription>
+                <FormDescription className="text-[var(--text-dim)]">
                   {isChildEvent
                     ? "Los eventos dentro de un servidor son siempre de tipo 'evento'."
                     : "Selecciona el tipo de evento."}
@@ -265,19 +255,19 @@ export function EventForm({
             name="visibility"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Visibilidad</FormLabel>
+                <FormLabel className="text-[var(--text-muted)]">Visibilidad</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
-                    <SelectTrigger className="bg-surface-700 border-surface-600 text-surface-50">
+                    <SelectTrigger className={selectTriggerClass}>
                       <SelectValue placeholder="Selecciona la visibilidad" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent className="bg-surface-800 border-surface-700">
+                  <SelectContent className={selectContentClass}>
                     <SelectItem value="public">Público</SelectItem>
                     <SelectItem value="private">Privado</SelectItem>
                   </SelectContent>
                 </Select>
-                <FormDescription>Controla quién puede ver este evento.</FormDescription>
+                <FormDescription className="text-[var(--text-dim)]">Controla quién puede ver este evento.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -289,16 +279,15 @@ export function EventForm({
           name="icon"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Icono URL (opcional)</FormLabel>
+              <FormLabel className="text-[var(--text-muted)]">Icono URL (opcional)</FormLabel>
               <FormControl>
-                <Input
+                <BoffInput
                   placeholder="https://ejemplo.com/icono.jpg"
-                  className="bg-surface-700 border-surface-600 text-surface-50"
                   {...field}
                   value={field.value || ""}
                 />
               </FormControl>
-              <FormDescription>URL de la imagen que se usará como icono.</FormDescription>
+              <FormDescription className="text-[var(--text-dim)]">URL de la imagen que se usará como icono.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -309,34 +298,29 @@ export function EventForm({
           name="banner"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Banner URL (opcional)</FormLabel>
+              <FormLabel className="text-[var(--text-muted)]">Banner URL (opcional)</FormLabel>
               <FormControl>
-                <Input
+                <BoffInput
                   placeholder="https://ejemplo.com/banner.jpg"
-                  className="bg-surface-700 border-surface-600 text-surface-50"
                   {...field}
                   value={field.value || ""}
                 />
               </FormControl>
-              <FormDescription>URL de la imagen que se usará como banner.</FormDescription>
+              <FormDescription className="text-[var(--text-dim)]">URL de la imagen que se usará como banner.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
 
         <div className="flex justify-end gap-2 pt-4">
-          <Button type="button" variant="outline" onClick={onCancel}>
+          <BoffButton type="button" variant="ghost" onClick={onCancel}>
             Cancelar
-          </Button>
-          <Button
-            type="submit"
-            disabled={isSubmitting || isLoadingGames}
-          >
+          </BoffButton>
+          <BoffButton type="submit" disabled={isSubmitting || isLoadingGames}>
             {submitLabel}
-          </Button>
+          </BoffButton>
         </div>
       </form>
     </Form>
   )
 }
-
