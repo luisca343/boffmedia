@@ -1,10 +1,11 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { Button } from "@/components/ui/primitives/button"
-import { Input } from "@/components/ui/primitives/input"
+import { BoffButton } from "@/components/boffmedia/primitives/button"
+import { BoffInput } from "@/components/boffmedia/primitives/input"
 import { Textarea } from "@/components/ui/primitives/textarea"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/primitives/form"
+import { Field } from "@/components/boffmedia/primitives/field"
 
 const gameSchema = z.object({
   id: z.number().optional(),
@@ -41,15 +42,11 @@ export function GameForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
           name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Título</FormLabel>
+              <FormLabel className="text-[var(--text-muted)]">Título</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="Nombre del juego"
-                  className="bg-surface-700 border-surface-600 text-surface-50"
-                  {...field}
-                />
+                <BoffInput placeholder="Nombre del juego" {...field} />
               </FormControl>
-              <FormDescription>Este será el nombre principal del juego.</FormDescription>
+              <FormDescription className="text-[var(--text-dim)]">Este será el nombre principal del juego.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -60,15 +57,15 @@ export function GameForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Descripción</FormLabel>
+              <FormLabel className="text-[var(--text-muted)]">Descripción</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="Describe el juego"
-                  className="bg-surface-700 border-surface-600 text-surface-50 min-h-[100px]"
+                  className="min-h-[100px] bg-[var(--surface-2)] border border-solid border-[var(--border-strong)] text-[var(--text)] rounded-[var(--btn-radius,9999px)] py-2.5 px-3.5 focus:outline-none focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-soft)] placeholder:text-[var(--text-dim)]"
                   {...field}
                 />
               </FormControl>
-              <FormDescription>Proporciona una descripción detallada del juego.</FormDescription>
+              <FormDescription className="text-[var(--text-dim)]">Proporciona una descripción detallada del juego.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -79,31 +76,29 @@ export function GameForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
           name="icon"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Icono URL</FormLabel>
+              <FormLabel className="text-[var(--text-muted)]">Icono URL</FormLabel>
               <FormControl>
-                <Input
+                <BoffInput
                   placeholder="https://ejemplo.com/icono.jpg"
-                  className="bg-surface-700 border-surface-600 text-surface-50"
                   {...field}
                   value={field.value || ""}
                 />
               </FormControl>
-              <FormDescription>URL de la imagen que se usará como icono.</FormDescription>
+              <FormDescription className="text-[var(--text-dim)]">URL de la imagen que se usará como icono.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
 
         <div className="flex justify-end gap-2 pt-4">
-          <Button type="button" variant="outline" onClick={onCancel}>
+          <BoffButton type="button" variant="ghost" onClick={onCancel}>
             Cancelar
-          </Button>
-          <Button type="submit" disabled={isSubmitting}>
+          </BoffButton>
+          <BoffButton type="submit" disabled={isSubmitting}>
             {submitLabel}
-          </Button>
+          </BoffButton>
         </div>
       </form>
     </Form>
   )
 }
-
