@@ -68,7 +68,7 @@ export function FicusNav() {
 
   return (
     <header
-      className="fixed w-full z-50 h-[68px] flex items-center transition-all duration-[var(--dur)] ease-[var(--ease)]"
+      className="sticky top-0 w-full z-50 transition-all duration-[var(--dur)] ease-[var(--ease)]"
       style={{
         background: scrolled
           ? "color-mix(in srgb, var(--bg) 90%, transparent)"
@@ -99,7 +99,7 @@ export function FicusNav() {
         }}
       />
 
-      <div className="container mx-auto flex justify-between items-center h-full px-4 relative z-10">
+      <div className="container mx-auto flex justify-between items-center h-16 px-4 relative z-10">
         {/* Logo */}
         <Link href="/" className="inline-flex items-center gap-[0.6rem] flex-shrink-0">
           <img
