@@ -35,7 +35,7 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className="flex flex-col h-screen bg-transparent">
+      <body className="flex flex-col min-h-screen bg-transparent">
         <NextIntlClientProvider messages={messages} locale={locale}>
           {children}
         </NextIntlClientProvider>
