@@ -1,8 +1,8 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { Button } from "@/components/ui/primitives/button"
-import { Input } from "@/components/ui/primitives/input"
+import { BoffButton } from "@/components/boffmedia/primitives/button"
+import { BoffInput } from "@/components/boffmedia/primitives/input"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/primitives/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/primitives/select"
 import { useGetEvents } from "@/hooks/events/useGetEvents"
@@ -38,6 +38,9 @@ export function TeamForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
     },
   })
 
+  const selectTriggerClass = "bg-[var(--surface-2)] border border-solid border-[var(--border-strong)] text-[var(--text)] py-2.5 px-3.5 focus:outline-none focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-soft)]"
+  const selectContentClass = "bg-[var(--surface)] border-[var(--border-strong)] text-[var(--text)]"
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
@@ -46,15 +49,11 @@ export function TeamForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nombre del Equipo</FormLabel>
+              <FormLabel className="text-[var(--text-muted)]">Nombre del Equipo</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="Nombre del equipo"
-                  className="bg-surface-700 border-surface-600 text-surface-50"
-                  {...field}
-                />
+                <BoffInput placeholder="Nombre del equipo" {...field} />
               </FormControl>
-              <FormDescription>Este será el nombre principal del equipo.</FormDescription>
+              <FormDescription className="text-[var(--text-dim)]">Este será el nombre principal del equipo.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -65,16 +64,15 @@ export function TeamForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
           name="tag"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Tag del Equipo</FormLabel>
+              <FormLabel className="text-[var(--text-muted)]">Tag del Equipo</FormLabel>
               <FormControl>
-                <Input
+                <BoffInput
                   placeholder="TAG"
-                  className="bg-surface-700 border-surface-600 text-surface-50"
                   {...field}
                   value={field.value || ""}
                 />
               </FormControl>
-              <FormDescription>Un identificador corto para el equipo (máx. 5 caracteres).</FormDescription>
+              <FormDescription className="text-[var(--text-dim)]">Un identificador corto para el equipo (máx. 5 caracteres).</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -85,18 +83,18 @@ export function TeamForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
           name="eventId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Evento</FormLabel>
+              <FormLabel className="text-[var(--text-muted)]">Evento</FormLabel>
               <Select
                 onValueChange={(value) => field.onChange(Number(value))}
                 defaultValue={field.value?.toString()}
                 disabled={isLoadingEvents}
               >
                 <FormControl>
-                  <SelectTrigger className="bg-surface-700 border-surface-600 text-surface-50">
+                  <SelectTrigger className={selectTriggerClass}>
                     <SelectValue placeholder={isLoadingEvents ? "Cargando eventos..." : "Selecciona un evento"} />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent className="bg-surface-800 border-surface-700">
+                <SelectContent className={selectContentClass}>
                   {events?.map((event) => (
                     <SelectItem key={event.id} value={event.id.toString()}>
                       {event.title}
@@ -104,7 +102,7 @@ export function TeamForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
                   ))}
                 </SelectContent>
               </Select>
-              <FormDescription>Selecciona el evento al que pertenecerá este equipo.</FormDescription>
+              <FormDescription className="text-[var(--text-dim)]">Selecciona el evento al que pertenecerá este equipo.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -115,34 +113,29 @@ export function TeamForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
           name="icon"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Icono URL (opcional)</FormLabel>
+              <FormLabel className="text-[var(--text-muted)]">Icono URL (opcional)</FormLabel>
               <FormControl>
-                <Input
+                <BoffInput
                   placeholder="https://ejemplo.com/icono.jpg"
-                  className="bg-surface-700 border-surface-600 text-surface-50"
                   {...field}
                   value={field.value || ""}
                 />
               </FormControl>
-              <FormDescription>URL de la imagen que se usará como icono del equipo.</FormDescription>
+              <FormDescription className="text-[var(--text-dim)]">URL de la imagen que se usará como icono del equipo.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
 
         <div className="flex justify-end gap-2 pt-4">
-          <Button type="button" variant="outline" onClick={onCancel} className="border-surface-600 text-surface-300">
+          <BoffButton type="button" variant="ghost" onClick={onCancel}>
             Cancelar
-          </Button>
-          <Button
-            type="submit"
-            disabled={isSubmitting || isLoadingEvents}
-          >
+          </BoffButton>
+          <BoffButton type="submit" disabled={isSubmitting || isLoadingEvents}>
             {submitLabel}
-          </Button>
+          </BoffButton>
         </div>
       </form>
     </Form>
   )
 }
-
