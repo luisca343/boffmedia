@@ -3,7 +3,7 @@
 import { ExpandableCard } from "@/components/boffmedia/primitives/expandable-card"
 import { Icon } from "@/components/boffmedia/primitives/icon"
 import { CopyButton } from "@/components/boffmedia/primitives/copy-button"
-import { PokeSprite } from "@/components/shared/pokemon/PokeSprite"
+import { spriteUrl, handleSpriteError } from "@/features/vgc-tracker/types"
 
 interface TeamSlot {
   dex: number
@@ -28,7 +28,7 @@ interface TeamRowProps {
 function SlotDetail({ slot }: { slot: TeamSlot }) {
   return (
     <div className="flex flex-col items-center text-center p-[0.6rem_0.4rem] border border-[var(--border)] rounded-[var(--radius)] bg-[color-mix(in_srgb,var(--surface-2)_50%,transparent)]">
-      <PokeSprite dex={slot.dex} name={slot.name} size={48} />
+      <img src={spriteUrl(slot.name)} alt={slot.name} width={48} height={48} className="object-contain" onError={handleSpriteError} />
       <p className="text-xs font-bold text-[var(--text)] leading-tight mt-1">{slot.name}</p>
       <p className="text-[10px] text-[var(--text-dim)] mt-0.5">{slot.item}</p>
       <span
@@ -59,7 +59,7 @@ export function VgcTeamRow({ entry }: TeamRowProps) {
           </div>
           <div className="flex items-center gap-0.5 flex-1 min-w-0">
             {entry.team.slice(0, 6).map((s) => (
-              <PokeSprite key={s.dex + s.name} dex={s.dex} name={s.name} size={30} />
+              <img key={s.name} src={spriteUrl(s.name)} alt={s.name} width={30} height={30} className="object-contain" onError={handleSpriteError} />
             ))}
           </div>
         </div>

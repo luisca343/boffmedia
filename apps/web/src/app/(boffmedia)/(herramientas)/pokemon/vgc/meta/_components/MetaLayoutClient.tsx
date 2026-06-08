@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Info } from "lucide-react";
@@ -10,6 +10,7 @@ import { VgcUsageSidebar } from "@/components/boffmedia/ui/vgc/meta/usage-sideba
 import { VgcPokemonDetail } from "@/components/boffmedia/ui/vgc/meta/pokemon-detail";
 import { VgcStandingsView } from "@/components/boffmedia/ui/vgc/meta/standings-view";
 import { VgcDivergenceView } from "@/components/boffmedia/ui/vgc/meta/divergence-view";
+import { VgcMetaService } from "@/services/api/boffmedia/vgcService";
 import { useSmogonSnapshots } from "../_hooks/useSmogonSnapshots";
 import { useSmogonUsage } from "../_hooks/useSmogonUsage";
 import { useChampionsRegulations } from "../_hooks/useChampionsRegulations";
@@ -24,7 +25,7 @@ import { useSpeciesTeams } from "../_hooks/useSpeciesTeams";
 import { VgcToolbar } from "./VgcToolbar";
 import { VgcSubbar } from "./VgcSubbar";
 import { ENABLE_PREVIEW_FORMATS, FORMAT_LABELS } from "../constants";
-import { toUsageEntry, toPokeData, toPlayerEntry, toDivergenceResult, toTeamEntry } from "../_lib/vgc-adapter";
+import { toUsageEntry, toPokeData, toPlayerEntry, toDivergenceResult, toTeamEntry, toTeamSlot } from "../_lib/vgc-adapter";
 
 export function MetaLayoutClient() {
   const t            = useTranslations("vgc.meta");
@@ -81,8 +82,26 @@ export function MetaLayoutClient() {
   const { players: standingsPlayers, loading: standingsLoading, error: standingsError } =
     useLimitlessPlayers(tab === "tournament" ? tournamentIdNum : undefined);
 
-  // ── Divergence hook — only active when view=divergence in tournament tab ──
+  // ── Read view early for divergence gating ─────────────────────────────────
   const view_preread = searchParams.get("view") ?? "aggregate";
+
+  // ── On-demand team cache for tournament standings ──────────────────────────
+  const [teamCache, setTeamCache] = useState<Map<string, { team: { dex: number; name: string; tera: string; item: string; moves: string[] }[]; rawText: string }>>(new Map());
+
+  const fetchTeam = useCallback(async (slug: string) => {
+    if (!tournamentIdNum) return null;
+    try {
+      const res = await VgcMetaService.getLimitlessPlayerTeam(tournamentIdNum, slug);
+      if (res.data) {
+        const adapted = { team: res.data.slots.map((s) => toTeamSlot(s)), rawText: res.data.rawText };
+        setTeamCache((prev) => new Map(prev).set(slug, adapted));
+        return adapted;
+      }
+    } catch { /* ignore */ }
+    return null;
+  }, [tournamentIdNum]);
+
+  // ── Divergence hook — only active when view=divergence in tournament tab ──
   const divergenceRegulation = tab === "tournament" && view_preread === "divergence" ? regulation || undefined : undefined;
   const divergenceTournamentId = tab === "tournament" && view_preread === "divergence"
     ? (tournamentId === "combined" || !tournamentId ? "combined" : tournamentIdNum)
@@ -129,7 +148,9 @@ export function MetaLayoutClient() {
   const pokeMap = useMemo(() => {
     const map: Record<string, { id: string; name: string; dex: number; types: string[]; base: Record<string, number>; abilities: { name: string; pct: number }[]; items: { name: string; pct: number }[]; moves: { name: string; pct: number }[]; tera: { name: string; pct: number }[]; mates: { id: string; pct: number }[]; spreads: { nature: string; ev: number[]; pct: number }[] }> = {};
     for (const e of entries) {
-      map[e.speciesId] = toPokeData(e);
+      const pokeData = toPokeData(e);
+      map[e.speciesId] = pokeData;
+      map[e.speciesName] = pokeData;
     }
     return map;
   }, [entries]);
@@ -198,7 +219,7 @@ export function MetaLayoutClient() {
       tab={tab}
       view={view}
       formatLabel={selectedRegulation?.name ?? fmt?.formatId ?? format}
-      formatNote={selectedRegulation?.name ? undefined : undefined}
+      formatNote={selectedRegulation?.name ? `Regulación actual. Permite dos Pokémon restringidos por equipo.` : undefined}
       cutoffLabel={cutoffLabel}
       month={month}
       curTourName={curTour?.name ?? undefined}
@@ -213,7 +234,7 @@ export function MetaLayoutClient() {
   let body: React.ReactNode;
   if (tab === "tournament" && view === "players") {
     body = (
-      <VgcStandingsView players={adaptedPlayers} />
+      <VgcStandingsView players={adaptedPlayers} teamCache={teamCache} onFetchTeam={fetchTeam} />
     );
   } else if (tab === "tournament" && view === "divergence") {
     body = (

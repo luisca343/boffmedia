@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react"
 import { Icon } from "@/components/boffmedia/primitives/icon"
 import { ToolTable } from "@/components/boffmedia/primitives/tool-table"
-import { PokeSprite } from "@/components/shared/pokemon/PokeSprite"
+import { spriteUrl, handleSpriteError } from "@/features/vgc-tracker/types"
 import { EmptyState } from "@/components/boffmedia/primitives/empty-state"
 
 interface DivergenceRow {
@@ -96,7 +96,7 @@ export function VgcDivergenceView({ result, pokeMap }: DivergenceViewProps) {
                   <span className="inline-flex items-center gap-1.5 font-semibold text-[var(--text)] text-sm">
                     {p ? (
                       <>
-                        <PokeSprite dex={p.dex} name={p.name} size={30} />
+                        <img src={spriteUrl(p.name)} alt={p.name} width={30} height={30} className="object-contain shrink-0" onError={handleSpriteError} />
                         <span>{p.name}</span>
                       </>
                     ) : (
