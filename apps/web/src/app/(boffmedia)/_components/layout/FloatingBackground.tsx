@@ -75,9 +75,10 @@ export function FloatingBackground({
               </g>
             </svg>
           `)}")`,
-          backgroundSize: '100% 800px', // Full width, fixed height
-          backgroundRepeat: 'repeat-y', // Only repeat vertically
-          backgroundPosition: 'center top'
+          backgroundAttachment: 'fixed',
+          backgroundSize: '100% auto',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center center'
         }}
       />
       {showBlobs && (
