@@ -131,6 +131,7 @@ export default getRequestConfig(async () => {
     'tools/pmdsky/common.json',
     'tools/pmdsky/dungeons.json',
     'tools/tcgpocket/common.json',
+    'tools/otros.json',
     'common.json',
     'twitch.json',
     'youtube.json',
