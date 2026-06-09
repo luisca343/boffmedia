@@ -43,7 +43,7 @@ export interface GameToolsConfigType {
 
 // ─── Sidebar icon mapping (react-icons, sidebar-only concern) ─────────────────
 
-const sidebarIconMap: Record<string, IconType> = {
+export const sidebarIconMap: Record<string, IconType> = {
   Diamond:     GiDiamondHard,
   Zap:         GiLightningSpanner,
   SwordIcon:   GiSwordWound,
@@ -86,4 +86,5 @@ function buildGameConfig(slug: string): GameConfig {
 export const gameToolsConfig: GameToolsConfigType = {
   pokemon: buildGameConfig("pokemon"),
   mhwilds: buildGameConfig("mhwilds"),
+  otros: buildGameConfig("otros"),
 };

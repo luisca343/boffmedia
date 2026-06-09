@@ -26,6 +26,16 @@
                 "planner": "Planificador",
                 "weaponTree": "Árbol de Armas"
             }
+        },
+        "otros": {
+            "name": "Otras Herramientas",
+            "categories": {
+                "all": "Herramientas"
+            },
+            "tools": {
+                "sorteos": "Sorteos",
+                "keys": "Claves de Steam"
+            }
         }
     }
 }

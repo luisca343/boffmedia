@@ -26,6 +26,16 @@
         "planner": "Planner",
         "weaponTree": "Weapon Tree"
       }
+    },
+    "otros": {
+      "name": "Other Tools",
+      "categories": {
+        "all": "Tools"
+      },
+      "tools": {
+        "sorteos": "Raffles",
+        "keys": "Steam Keys"
+      }
     }
   }
 }

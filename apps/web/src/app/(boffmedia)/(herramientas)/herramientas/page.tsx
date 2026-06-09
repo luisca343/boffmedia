@@ -7,6 +7,9 @@ import { Search, ChevronDown, Terminal } from "lucide-react";
 import { GameCard, type GameData } from "@/components/boffmedia/ui/games/game-card";
 import { Kicker } from "@/components/boffmedia/primitives/kicker";
 import { Icon } from "@/components/boffmedia/primitives/icon";
+import { getGameEntry } from "@/data/games";
+import { hubConfig } from "@/data/hub";
+import { useTranslations } from "next-intl";
 
 type SortMode = "popular" | "az" | "tools";
 
@@ -16,112 +19,45 @@ const SORT_OPTIONS: { value: SortMode; label: string }[] = [
   { value: "tools", label: "Nº herramientas" },
 ];
 
-const GAMES: GameData[] = [
-  {
-    slug: "pokemon",
-    name: "Pokémon",
-    short: "PKMN",
-    tagline: "Calculadoras, generadores y bases de datos",
-    hue: 28,
-    logoLabel: "P",
-    categories: [
-      {
-        name: "TCGPocket",
-        tools: [
-          { name: "TCGPocket", href: "/pokemon/tcgpocket", icon: "cards" },
-        ],
-      },
-      {
-        name: "Pokémon Mundo Misterioso",
-        tools: [
-          { name: "Mundo Misterioso", href: "/pokemon/pmdsky", icon: "puzzle" },
-        ],
-      },
-      {
-        name: "Pokedex",
-        tools: [
-          { name: "Pokedex", href: "/pokemon/vgc", icon: "book" },
-        ],
-      },
-    ],
-    tools: [],
-    featured: {
-      title: "Calculadoras Pokémon",
-      desc: "Herramientas de cálculo y análisis para Pokémon.",
-      features: ["Daño", "Estadísticas", "Equipos"],
-      href: "/pokemon",
-      icon: "calc",
-      image: "Pokémon herramientas",
-      hue: 28,
-    },
-  },
-  {
-    slug: "mhwilds",
-    name: "Monster Hunter Wilds",
-    short: "MHW",
-    tagline: "Planificadores y generadores de builds",
-    hue: 130,
-    logoLabel: "M",
-    categories: [
-      {
-        name: "Builds",
-        tools: [
-          { name: "Builds", href: "/mhwilds/builds/planner", icon: "wrench" },
-        ],
-      },
-    ],
-    tools: [],
-    featured: {
-      title: "Planificador de Builds",
-      desc: "Planifica y optimiza tus builds de Monster Hunter Wilds.",
-      features: ["Armaduras", "Habilidades", "Decoraciones"],
-      href: "/mhwilds",
-      icon: "hammer",
-      image: "MHWilds builds",
-      hue: 130,
-    },
-  },
-  {
-    slug: "otros",
-    name: "Otros",
-    short: "MISC",
-    tagline: "Herramientas generales y recursos",
-    hue: 200,
-    logoLabel: "O",
-    categories: [
-      {
-        name: "Sorteos",
-        tools: [
-          { name: "Sorteos", href: "/otros/sorteos", icon: "trophy" },
-        ],
-      },
-      {
-        name: "Claves de Steam",
-        tools: [
-          { name: "Claves Steam", href: "/otros/keys", icon: "key" },
-        ],
-      },
-    ],
-    tools: [],
-    featured: {
-      title: "Utilidades",
-      desc: "Herramientas varias para la comunidad.",
-      features: ["Sorteos", "Claves", "Recursos"],
-      href: "/otros",
-      icon: "grid",
-      image: "Otras herramientas",
-      hue: 200,
-    },
-  },
-];
+const SLUGS = ["pokemon", "mhwilds", "otros"] as const;
 
 export default function ToolsLandingPage() {
   const router = useRouter();
+  const t = useTranslations();
   const [isMounted, setIsMounted] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchFocused, setSearchFocused] = useState(false);
   const [sortMode, setSortMode] = useState<SortMode>("popular");
   const [sortOpen, setSortOpen] = useState(false);
+
+  const GAMES: GameData[] = SLUGS.map((slug) => {
+    const entry = getGameEntry(slug);
+    const hub = hubConfig[slug];
+    if (!entry || !hub) return null;
+    return {
+      slug,
+      name: t(entry.nameKey),
+      short: hub.short,
+      tagline: hub.tagline,
+      hue: hub.hue,
+      logoLabel: hub.logoLabel,
+      icon: entry.logo || entry.icon || undefined,
+      categories: entry.categories.map((cat) => ({
+        name: t(cat.nameKey),
+        tools: cat.tools
+          .filter((tool) => tool.showInSidebar !== false)
+          .slice(0, 3)
+          .map((tool) => ({
+            name: t(tool.nameKey),
+            href: tool.href,
+            icon: tool.sidebarIcon,
+            sidebarIcon: tool.sidebarIcon,
+          })),
+      })),
+      tools: [],
+      featured: hub.featured,
+    };
+  }).filter(Boolean) as GameData[];
 
   useEffect(() => {
     setIsMounted(true);
@@ -190,7 +126,7 @@ export default function ToolsLandingPage() {
       {/* ── hub-content ─────────────────────────────────────── */}
       <div className="hub-content relative z-10">
         {/* Hero */}
-        <section className="hub-hero container mx-auto px-4 pt-28 pb-10 text-center">
+        <section className="hub-hero container mx-auto px-4 pb-10 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
