@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils"
 import { Icon } from "../../primitives/icon"
 import { BoffCard as Card } from "../../primitives/card"
 import { useScanAnimation } from "@/hooks/tools/useScanAnimation"
-
 export interface GameData {
   slug: string
   name: string
@@ -17,7 +16,7 @@ export interface GameData {
   icon?: string
   categories: {
     name: string
-    tools: { name: string; href: string; icon: string; badge?: string }[]
+    tools: { name: string; href: string; icon: string; sidebarIcon?: string; badge?: string }[]
   }[]
   tools: { title: string; desc: string; icon: string; features: string[]; href: string; popularity?: string; soon?: boolean; isNew?: boolean }[]
   featured: {
@@ -52,13 +51,13 @@ export function GameCard({ game, go, delay = 0, className }: GameCardProps) {
 
   return (
     <div
-      className={className}
+      className={cn(className, "h-full")}
       style={{ transitionDelay: `${delay}ms` }}
       onPointerEnter={() => setHovered(true)}
       onPointerLeave={() => setHovered(false)}
     >
       <Card
-        className={cn("p-6 flex flex-col gap-5 cursor-pointer overflow-hidden group")}
+        className={cn("p-4 flex flex-col gap-3 cursor-pointer overflow-hidden group h-full")}
         style={{
           "--hue": game.hue,
           borderColor: hovered
@@ -110,10 +109,10 @@ export function GameCard({ game, go, delay = 0, className }: GameCardProps) {
 
         {/* Corner brackets */}
         {([
-          "top-3 left-3 w-4 h-4 border-t border-l",
-          "top-3 right-3 w-4 h-4 border-t border-r",
-          "bottom-3 left-3 w-4 h-4 border-b border-l",
-          "bottom-3 right-3 w-4 h-4 border-b border-r",
+          "top-2 left-2 w-3 h-3 border-t border-l",
+          "top-2 right-2 w-3 h-3 border-t border-r",
+          "bottom-2 left-2 w-3 h-3 border-b border-l",
+          "bottom-2 right-2 w-3 h-3 border-b border-r",
         ] as const).map((cls, i) => (
           <div
             key={i}
@@ -123,11 +122,11 @@ export function GameCard({ game, go, delay = 0, className }: GameCardProps) {
         ))}
 
         {/* Content */}
-        <div className="relative z-10 flex flex-col h-full gap-5">
+        <div className="relative z-10 flex flex-col h-full gap-3">
           {/* Header */}
-          <div className="flex items-start gap-4">
+          <div className="flex items-start gap-3">
             <div
-              className="w-16 h-16 rounded-[var(--radius-lg)] overflow-hidden shrink-0 flex items-center justify-center transition-[transform,box-shadow] duration-300"
+              className="w-12 h-12 rounded-[var(--radius-lg)] overflow-hidden shrink-0 flex items-center justify-center transition-[transform,box-shadow] duration-300"
               style={{
                 border: "var(--hairline) solid oklch(0.6 0.14 var(--hue, 200) / 0.4)",
                 background: "oklch(0.5 0.12 var(--hue, 200) / 0.16)",
@@ -136,7 +135,7 @@ export function GameCard({ game, go, delay = 0, className }: GameCardProps) {
               }}
             >
               {game.icon ? (
-                <Image src={game.icon} alt={game.name} width={48} height={48} className="object-contain" />
+                <Image src={game.icon} alt={game.name} width={36} height={36} className="object-contain" />
               ) : (
                 <span
                   className="w-full h-full grid place-items-center font-display font-extrabold text-xs"
@@ -147,7 +146,7 @@ export function GameCard({ game, go, delay = 0, className }: GameCardProps) {
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="text-t-xl font-black mt-0.5 text-[var(--text)]">{game.name}</h3>
+              <h3 className="text-t-lg font-black mt-0.5 text-[var(--text)]">{game.name}</h3>
               <p className="text-t-sm mt-1 leading-relaxed text-[var(--text-muted)]">{game.tagline}</p>
             </div>
           </div>
@@ -155,24 +154,29 @@ export function GameCard({ game, go, delay = 0, className }: GameCardProps) {
           {/* Divider */}
           <div className="h-px bg-gradient-to-r from-transparent via-surface-700/50 to-transparent" />
 
-          {/* Categories */}
-          <div className="flex flex-col gap-2 flex-1">
+          {/* Category badges */}
+          <div className="flex flex-wrap gap-1.5 flex-1 content-start">
             {game.categories.slice(0, 3).map((c) => (
-              <span key={c.name} className="flex items-center justify-between px-3 py-2.5 rounded-[var(--radius)] bg-[var(--surface-2)] border border-[var(--border)]">
-                <span className="text-t-sm font-semibold text-[var(--accent-bright)]">{c.name}</span>
-                <span className="font-mono text-t-xs text-[var(--text-dim)] px-2 py-0.5 rounded-full bg-[var(--surface-3)]">{c.tools.length}</span>
+              <span
+                key={c.name}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[var(--surface-2)] border border-[var(--border)] text-t-xs font-medium text-[var(--accent-bright)]"
+              >
+                {c.name}
+                <span className="font-mono text-t-2xs text-[var(--text-dim)] bg-[var(--surface-3)] px-1.5 py-[1px] rounded">
+                  {c.tools.length}
+                </span>
               </span>
             ))}
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between pt-4 border-t border-t-[var(--border)]">
-            <span className="inline-flex items-center gap-[0.4rem] text-t-xs text-[var(--text-dim)] font-mono">
-              <Icon name="layers" size={14} /> {count} herramientas
+            <div className="flex items-center justify-between pt-3 border-t border-t-[var(--border)]">
+            <span className="inline-flex items-center gap-[0.3rem] text-t-xs text-[var(--text-dim)] font-mono">
+              <Icon name="layers" size={12} /> {count} herramientas
             </span>
-            <span className="inline-flex items-center gap-1 text-t-sm font-semibold transition-[gap] duration-[var(--dur)] ease-[var(--ease)] group-hover:gap-[0.7rem] uppercase text-[var(--accent-bright)]">
+            <span className="inline-flex items-center gap-1 text-t-xs font-semibold transition-[gap] duration-[var(--dur)] ease-[var(--ease)] group-hover:gap-[0.6rem] uppercase text-[var(--accent-bright)]">
               ACCEDER
-              <Icon name="arrow" size={16} />
+              <Icon name="arrow" size={14} />
             </span>
           </div>
         </div>
