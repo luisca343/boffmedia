@@ -17,6 +17,7 @@ interface DesktopSidebarProps {
 const GAMES = [
   { slug: "pokemon", name: "Pokémon", icon: "/img/games/pokemon/icon.webp" },
   { slug: "mhwilds", name: "Monster Hunter Wilds", icon: "/img/games/mhwilds/icon.webp" },
+  { slug: "otros", name: "Otras Herramientas", icon: "" },
 ]
 
 export function DesktopSidebar({ gameConfig, isActive }: DesktopSidebarProps) {
