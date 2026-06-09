@@ -1,0 +1,40 @@
+{
+  "otros": {
+    "header": {
+      "title": {
+        "prefix": "Other",
+        "highlight": "Tools"
+      },
+      "subtitle": "Useful tools for gamers and content creators"
+    },
+    "tools": {
+      "sorteos": {
+        "title": "Raffles",
+        "description": "Create and manage raffles for events and communities",
+        "features": {
+          "raffles": "Random draws",
+          "tickets": "Custom tickets",
+          "results": "Real-time results"
+        }
+      },
+      "keys": {
+        "title": "Steam Keys",
+        "description": "Manage and share Steam game keys",
+        "features": {
+          "library": "Key library",
+          "validator": "Validator",
+          "history": "Redemption history"
+        }
+      }
+    },
+    "externalLinks": {
+      "title": "Recommended resources",
+      "steamCommunity": "Steam Community",
+      "humbleBundle": "Humble Bundle",
+      "boffmediaGuides": "BoffMedia Guides"
+    },
+    "featuredTool": "Featured tool",
+    "accessButton": "Access {tool}",
+    "explore": "Explore"
+  }
+}

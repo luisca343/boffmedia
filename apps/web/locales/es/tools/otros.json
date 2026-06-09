@@ -1,0 +1,40 @@
+{
+  "otros": {
+    "header": {
+      "title": {
+        "prefix": "Otras",
+        "highlight": "Herramientas"
+      },
+      "subtitle": "Recursos útiles para gamers y creadores de contenido"
+    },
+    "tools": {
+      "sorteos": {
+        "title": "Sorteos",
+        "description": "Crea y gestiona sorteos para eventos y comunidades",
+        "features": {
+          "raffles": "Sorteos aleatorios",
+          "tickets": "Tickets personalizados",
+          "results": "Resultados en tiempo real"
+        }
+      },
+      "keys": {
+        "title": "Claves de Steam",
+        "description": "Gestiona y comparte claves de juegos de Steam",
+        "features": {
+          "library": "Biblioteca de claves",
+          "validator": "Validador",
+          "history": "Historial de canjes"
+        }
+      }
+    },
+    "externalLinks": {
+      "title": "Recursos recomendados",
+      "steamCommunity": "Comunidad de Steam",
+      "humbleBundle": "Humble Bundle",
+      "boffmediaGuides": "Guías de BoffMedia"
+    },
+    "featuredTool": "Herramienta destacada",
+    "accessButton": "Acceder a {tool}",
+    "explore": "Explorar"
+  }
+}
