@@ -11,6 +11,7 @@ export const pokemon: GameEntry = {
 
   // Landing page
   logo: "/img/games/pokemon/logo.webp",
+  bannerImage: "/img/games/pokemon/banner.webp",
   navHref: "/pokemon",
 
   externalLinks: [
@@ -25,7 +26,7 @@ export const pokemon: GameEntry = {
       nameKey: "games.pokemon.categories.vgc",
       href: "/pokemon/vgc/meta",
       landing: {
-        icon: "",
+        icon: "/img/games/pokemon/vgc-icon2.webp",
         fallbackIcon: "Podium",
         fallbackIconColor: "text-primary-400",
         color: "from-primary-500 to-violet-600",
@@ -33,6 +34,7 @@ export const pokemon: GameEntry = {
         featured: true,
         isNew: false,
         popularity: "high",
+        heroImage: "/img/games/pokemon/vgc.webp",
       },
       tools: [
         { key: "meta",            nameKey: "games.pokemon.tools.meta",            href: "/pokemon/vgc/meta",            sidebarIcon: "Podium" },

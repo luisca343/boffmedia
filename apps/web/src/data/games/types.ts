@@ -45,6 +45,8 @@ export interface GameEntry {
   icon: string;
   /** Larger logo used on the landing page. */
   logo: string;
+  /** Key art banner image used in the hero banner variant. */
+  bannerImage?: string;
   /** Tailwind gradient classes for the sidebar header (e.g. "from-yellow-400 to-red-500"). */
   color: string;
   /** Tailwind bg class for the sidebar (e.g. "bg-red-900"). */

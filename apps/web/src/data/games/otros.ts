@@ -9,6 +9,7 @@ export const otros: GameEntry = {
   bg: "bg-indigo-900",
 
   logo: "",
+  bannerImage: "/img/games/otros/banner.webp",
   navHref: "/otros",
 
   externalLinks: [
