@@ -113,9 +113,7 @@ export function FeaturedTool({ tool, go, className }: FeaturedToolProps) {
         <div className="relative z-10 p-8 flex flex-col gap-[1.1rem]">
           <div className="flex items-center gap-4">
             {tool.iconSrc ? (
-              <div className="w-[60px] h-[60px] rounded-[var(--radius-lg,22px)] grid place-items-center overflow-hidden bg-[color-mix(in_srgb,var(--orange-500)_13%,transparent)] border border-solid border-[color-mix(in_srgb,var(--orange-500)_28%,transparent)] shadow-[0_0_30px_-8px_var(--orange-500)] shrink-0">
-                <Image src={tool.iconSrc} alt="" width={48} height={48} className="object-contain" />
-              </div>
+              <Image src={tool.iconSrc} alt="" width={56} height={56} className="object-contain shrink-0" />
             ) : (
               <IconBox icon={tool.icon} size="lg" tone="orange" />
             )}

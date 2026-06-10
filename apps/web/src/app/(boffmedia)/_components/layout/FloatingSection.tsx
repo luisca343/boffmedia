@@ -1,49 +1,42 @@
-
-import { GridBackground } from "@/components/ui/display/GridBackground";
-import { FloatingBackground } from "./FloatingBackground";
+import { FloatingBackground } from "./FloatingBackground"
 
 interface FloatingSectionProps {
-  children: React.ReactNode;
-  variant?: 'default' | 'warm' | 'cool' | 'neutral';
-  showParticles?: boolean;
-  showBlobs?: boolean;
-  showBackground?: boolean;
-  showGrid?: boolean;
-  className?: string;
-  style?: React.CSSProperties;
-  overflow?: string;
+  children: React.ReactNode
+  hue?: number
+  showBlobs?: boolean
+  showGrid?: boolean
+  showBackground?: boolean
+  className?: string
+  style?: React.CSSProperties
+  overflow?: string
 }
 
-export function FloatingSection({ 
-  children, 
-  variant = 'default',
-  showParticles = true,
-  showBlobs = false,
+export function FloatingSection({
+  children,
+  hue = 200,
+  showBlobs = true,
+  showGrid = true,
   showBackground = true,
-  showGrid = false,
   className = "",
   style = {},
   overflow = "overflow-hidden",
 }: FloatingSectionProps) {
   return (
-    <section 
-      className={`relative ${overflow} ${className}`} 
+    <section
+      className={`relative ${overflow} ${className}`}
       style={style}
     >
-      {(variant !== 'neutral' && showBackground) &&  (
-        <FloatingBackground 
-          variant={variant}
-          showParticles={showParticles}
+      {showBackground && (
+        <FloatingBackground
+          hue={hue}
           showBlobs={showBlobs}
+          showGrid={showGrid}
         />
       )}
-
-      {showGrid && <GridBackground/>}
-
 
       <div className="relative z-10">
         {children}
       </div>
     </section>
-  );
+  )
 }
