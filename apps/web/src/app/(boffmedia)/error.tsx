@@ -18,7 +18,7 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
 
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-surface-900 via-surface-950 to-surface-900 overflow-hidden flex items-center justify-center">
-      <FloatingBackground variant="warm" />
+      <FloatingBackground hue={30} />
       
       <div className="relative container mx-auto px-4 z-10">
         <div className="max-w-md mx-auto text-center">
