@@ -11,6 +11,7 @@ export const mhwilds: GameEntry = {
 
   // Landing page
   logo: "/img/games/mhwilds/icon.webp",
+  bannerImage: "/img/games/mhwilds/banner.webp",
   navHref: "/mhwilds",
 
   externalLinks: [
