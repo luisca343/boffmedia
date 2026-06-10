@@ -15,9 +15,10 @@ export default function Layout({
   const isVgcMeta    = pathname.includes('/vgc/meta');
   const isDamageCalc  = pathname.includes('/vgc/damage-calculator');
   const fullscreen   = isVgcTracker || isVgcMeta || isDamageCalc;
+  const isLandingPage = pathname === `/${gameSlug}` || pathname === `/${gameSlug}/`;
 
   return (
-    <GameToolsLayout gameSlug={gameSlug} noContainer={fullscreen} noMargin={fullscreen}>
+    <GameToolsLayout gameSlug={gameSlug} noContainer={fullscreen || isLandingPage} noMargin={fullscreen}>
       {children}
     </GameToolsLayout>
   );
