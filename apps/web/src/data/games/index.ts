@@ -11,11 +11,6 @@ export function getGameEntry(slug: string): GameEntry | undefined {
   return registry[slug];
 }
 
-/**
- * Returns all items that should appear as landing page cards, in config order.
- * - If a category has a `landing` config, it contributes a card (key = category.key).
- * - If an individual tool has a `landing` config, it contributes a card (key = tool.key).
- */
 export function getLandingItems(slug: string): Array<LandingCardConfig & { key: string; href: string }> {
   const game = registry[slug];
   if (!game) return [];
