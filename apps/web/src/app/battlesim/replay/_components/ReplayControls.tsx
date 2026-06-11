@@ -1,7 +1,15 @@
+'use client';
+
+import { useEffect } from 'react';
 import { Input } from "@/components/ui/primitives/input";
-import { PlayIcon, PauseIcon, ArrowPathIcon, ChevronLeftIcon, ChevronRightIcon, ArrowsRightLeftIcon, BoltIcon, ArrowRightIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { Icon, BoffActionBar, Segmented } from '@/components/boffmedia/primitives';
 import ReplayControlsButton from './ReplayControlsButton';
-import useViewportWidth from "@/services/useViewPortWidth";
+import { REPLAY_SPEEDS } from '../../_utils/replaySpeed';
+
+export interface TimelineMarker {
+  turn: number;
+  kind: 'ko' | 'switch';
+}
 
 export type ReplayControlsProps = {
     battle: any;
@@ -20,90 +28,155 @@ export type ReplayControlsProps = {
     setLogVisible: (logVisible: boolean) => void;
     countActions: () => number;
     setCurrentAction: (action: number) => void;
+    speed: number;
+    setSpeed: (speed: number) => void;
+    markers?: TimelineMarker[];
 }
 
 export function ReplayControls({
-    battle, isPlaying, setIsPlaying, setCurrentTurn, pov, setPov, 
-    simulateAttack, simulatedAttack, setSimulatedAttack, turnInput, 
-    setTurnInput, lastTurn, logVisible, setLogVisible, setCurrentAction, countActions}: ReplayControlsProps) {
-    const [, canvasWidth] = useViewportWidth()
-
-    if(canvasWidth === 0) return null;
+    battle, isPlaying, setIsPlaying, setCurrentTurn, pov, setPov,
+    simulateAttack, simulatedAttack, setSimulatedAttack, turnInput,
+    setTurnInput, lastTurn, logVisible, setLogVisible, speed, setSpeed, markers = []}: ReplayControlsProps) {
 
     function previousTurn() {
-        const newTurn = Math.max(0, battle.turn - 1);
-        setCurrentTurn(newTurn);
+        setCurrentTurn(Math.max(0, battle.turn - 1));
     }
-    
+
     function nextTurn() {
         const newTurn = Math.min(lastTurn + 1, battle.turn + 1);
-        if(newTurn === lastTurn + 1) {
-            // When going to the last turn + 1 (end of battle)
+        if (newTurn === lastTurn + 1) {
+            // End of battle: useBattleFlow's handleTurnChange processes the win action.
             setIsPlaying(false);
-            
-            // Just set the current turn - the handleTurnChange function in useBattleFlow.tsx
-            // will now handle processing all actions including the win action
             setCurrentTurn(newTurn);
             return;
         }
         setCurrentTurn(newTurn);
     }
-    return(
-        <div className="flex justify-between p-2 bg-surface-800 space-x-2" style={{ width: `${canvasWidth}px` }}>
-            <div className="flex space-x-2">
-                <ReplayControlsButton onClick={() => setIsPlaying(!isPlaying)} label={isPlaying ? "Pause" : "Play"}>
-                    {isPlaying ? <PauseIcon className="h-5 w-5" /> : <PlayIcon className="h-5 w-5" />}
-                </ReplayControlsButton>
-                <ReplayControlsButton onClick={() => setCurrentTurn(0)} label="Restart">
-                    <ArrowPathIcon className="h-5 w-5" />
-                </ReplayControlsButton>
+
+    // Keyboard-first review: Space play/pause, arrows step turns, P swaps POV.
+    useEffect(() => {
+        function handleKeyDown(e: KeyboardEvent) {
+            const target = e.target as HTMLElement;
+            if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) return;
+            if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+            if (e.key === ' ') {
+                e.preventDefault();
+                setIsPlaying(!isPlaying);
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                previousTurn();
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                nextTurn();
+            } else if (e.key.toLowerCase() === 'p') {
+                e.preventDefault();
+                setPov(pov === 0 ? 1 : 0);
+            }
+        }
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isPlaying, pov, battle.turn, lastTurn]);
+
+    return (
+        <div className="flex flex-col gap-2 w-full min-w-0">
+            {/* Timeline scrubber */}
+            <div className="relative px-1" aria-label="Línea de tiempo del combate">
+                <input
+                    type="range"
+                    min={0}
+                    max={Math.max(1, lastTurn)}
+                    value={Math.min(battle.turn, lastTurn)}
+                    onChange={(e) => setCurrentTurn(parseInt(e.target.value, 10))}
+                    className="w-full cursor-pointer accent-[var(--accent-bright)]"
+                    aria-valuetext={`Turno ${battle.turn} de ${lastTurn}`}
+                    title={`Turno ${battle.turn} / ${lastTurn}`}
+                />
+                <div className="relative h-2 -mt-1 pointer-events-none">
+                    {markers.map((m, i) => (
+                        <span
+                            key={`${m.kind}-${m.turn}-${i}`}
+                            className="absolute w-[5px] h-[5px] rounded-full"
+                            title={`${m.kind === 'ko' ? 'KO' : 'Cambio'} — turno ${m.turn}`}
+                            style={{
+                                left: `${(m.turn / Math.max(1, lastTurn)) * 100}%`,
+                                background: m.kind === 'ko' ? 'var(--rose-500)' : 'var(--accent)',
+                                transform: 'translateX(-50%)',
+                            }}
+                        />
+                    ))}
+                </div>
             </div>
-            <div className="flex space-x-2">
-                <ReplayControlsButton onClick={previousTurn} label="Previous Turn">
-                    <ChevronLeftIcon className="h-5 w-5" />
-                </ReplayControlsButton>
-                <ReplayControlsButton onClick={nextTurn} label="Next Turn">
-                    <ChevronRightIcon className="h-5 w-5" />
-                </ReplayControlsButton>
-            </div>
-            <div className="flex space-x-2">
-                <ReplayControlsButton onClick={() => setPov(pov === 0 ? 1 : 0)} label="Switch POV">
-                    <ArrowsRightLeftIcon className="h-5 w-5" />
-                </ReplayControlsButton>
-                <ReplayControlsButton onClick={() => setLogVisible(!logVisible)} label="Toggle Log">
-                    <PlusIcon className="h-5 w-5" />
-                </ReplayControlsButton>
-                {process.env.NODE_ENV === 'development' && (
+
+            <BoffActionBar
+                aria-label="Controles de reproducción"
+                start={
                     <>
-                        <ReplayControlsButton onClick={() => simulateAttack()} label="Simulate Attack">
-                            <BoltIcon className="h-5 w-5" />
+                        <ReplayControlsButton onClick={() => setIsPlaying(!isPlaying)} label={isPlaying ? 'Pause' : 'Play'} hint="Space" active={isPlaying}>
+                            <Icon name={isPlaying ? 'pause' : 'play'} size={18} />
                         </ReplayControlsButton>
-                        <Input
-                            variant={'dark'}
-                            className="w-32 border border-surface-900"
-                            type="string"
-                            value={simulatedAttack}
-                            onChange={(e) => setSimulatedAttack(e.target.value)}
-                            min={1}
-                            max={lastTurn}
+                        <ReplayControlsButton onClick={() => setCurrentTurn(0)} label="Restart">
+                            <Icon name="refresh" size={18} />
+                        </ReplayControlsButton>
+                        <ReplayControlsButton onClick={previousTurn} label="Previous Turn" hint="←">
+                            <Icon name="chevron" size={18} style={{ transform: 'rotate(90deg)' }} />
+                        </ReplayControlsButton>
+                        <ReplayControlsButton onClick={nextTurn} label="Next Turn" hint="→">
+                            <Icon name="chevron" size={18} style={{ transform: 'rotate(-90deg)' }} />
+                        </ReplayControlsButton>
+                    </>
+                }
+                center={
+                    <>
+                        <span className="font-mono text-t-xs tabular-nums whitespace-nowrap" style={{ color: 'var(--text-muted)' }}>
+                            T{battle.turn} / {lastTurn}
+                        </span>
+                        <Segmented
+                            value={String(speed)}
+                            options={REPLAY_SPEEDS.map((s) => ({ value: String(s), label: `${s}×` }))}
+                            onChange={(v) => setSpeed(parseFloat(v))}
                         />
                     </>
-                )}
-            </div>
-            <div className="flex space-x-2">
-                <ReplayControlsButton onClick={() => setCurrentTurn()} label="Go to Turn">
-                    <ArrowRightIcon className="h-5 w-5" />
-                </ReplayControlsButton>
-                <Input
-                    variant={'dark'}
-                    className="w-20 border border-surface-900"
-                    type="number"
-                    value={turnInput}
-                    onChange={(e) => setTurnInput(parseInt(e.target.value))}
-                    min={1}
-                    max={lastTurn}
-                />
-            </div>
+                }
+                end={
+                    <>
+                        <ReplayControlsButton onClick={() => setPov(pov === 0 ? 1 : 0)} label={`POV: ${pov === 0 ? 'Jugador 1' : 'Jugador 2'}`} hint="P">
+                            <Icon name="swap" size={18} />
+                        </ReplayControlsButton>
+                        <ReplayControlsButton onClick={() => setLogVisible(!logVisible)} label="Toggle Log" active={logVisible}>
+                            <Icon name="eye" size={18} />
+                        </ReplayControlsButton>
+                        {process.env.NODE_ENV === 'development' && (
+                            <>
+                                <ReplayControlsButton onClick={() => simulateAttack()} label="Simulate Attack">
+                                    <Icon name="bolt" size={18} />
+                                </ReplayControlsButton>
+                                <Input
+                                    variant={'dark'}
+                                    className="w-32"
+                                    type="string"
+                                    value={simulatedAttack}
+                                    onChange={(e) => setSimulatedAttack(e.target.value)}
+                                />
+                            </>
+                        )}
+                        <Input
+                            variant={'dark'}
+                            className="w-20"
+                            type="number"
+                            value={turnInput}
+                            onChange={(e) => setTurnInput(parseInt(e.target.value))}
+                            min={1}
+                            max={lastTurn}
+                            aria-label="Ir al turno"
+                        />
+                        <ReplayControlsButton onClick={() => setCurrentTurn()} label="Go to Turn">
+                            <Icon name="arrow" size={18} />
+                        </ReplayControlsButton>
+                    </>
+                }
+            />
         </div>
     );
 }

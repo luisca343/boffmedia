@@ -6,6 +6,7 @@ import { PokemonIdent, Protocol } from "@pkmn/protocol";
 import { Scene } from "../_utils/Scene";
 import { BattleEventProcessor, ProcessedBattleEvent } from "../_utils/BattleEventProcessor";
 import { BattleStateBuilder } from "../_utils/BattleStateBuilder";
+import { getReplaySpeed } from "../_utils/replaySpeed";
 
 export interface UseBattleFlowOptions {
   liveMode?: boolean;
@@ -150,7 +151,7 @@ export function useBattleFlow(
 
       if (event.type === 'win' || event.type === 'tie') {
         const timeout = await processor.runAnimation(event);
-        await new Promise<void>(resolve => setTimeout(resolve, timeout));
+        await new Promise<void>(resolve => setTimeout(resolve, timeout / getReplaySpeed()));
         if (cancelled) return;
         setBattleComplete?.(true);
         liveCallbacksRef.current.onBattleEnd?.(event.args[1] as string);
@@ -159,7 +160,7 @@ export function useBattleFlow(
       }
 
       const timeout = await processor.runAnimation(event);
-      await new Promise<void>(resolve => setTimeout(resolve, timeout));
+      await new Promise<void>(resolve => setTimeout(resolve, timeout / getReplaySpeed()));
 
       if (cancelled) return;
       liveProcessingRef.current = false;
@@ -319,7 +320,7 @@ export function useBattleFlow(
       updateBattleLog(event.html, battle, event.type);
 
       const timeout = await processor.runAnimation(event);
-      await new Promise<void>(resolve => setTimeout(resolve, timeout));
+      await new Promise<void>(resolve => setTimeout(resolve, timeout / getReplaySpeed()));
 
       if (!liveMode) {
         if (event.type === 'win' || event.type === 'tie') {

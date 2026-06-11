@@ -15,26 +15,36 @@ interface BSXBenchChipProps {
 
 export function BSXBenchChip({ mon, hotkey, disabled, reserved, onClick }: BSXBenchChipProps) {
   const pct = mon.fnt ? 0 : mon.hp
+  const off = disabled || mon.fnt
+
+  const ariaLabel = [
+    `Cambiar a ${mon.name}`,
+    mon.fnt ? "debilitado" : `${pct}% PS`,
+    mon.status ? `estado ${mon.status}` : null,
+    reserved ? "ya elegido" : null,
+    off && !mon.fnt ? "no disponible" : null,
+  ].filter(Boolean).join(", ")
 
   return (
     <button
       className={[
-        "flex items-center gap-[.55rem] p-[.55rem_.6rem] text-left rounded-[var(--radius)] border font-inherit cursor-pointer transition-all duration-[var(--dur)] ease-[var(--ease)]",
+        "bsx-focus flex items-center gap-[.55rem] p-[var(--bsx-pad-md)] text-left rounded-[var(--radius)] border font-inherit cursor-pointer transition-all duration-[var(--dur)] ease-[var(--ease)]",
         "min-w-0",
-        mon.fnt ? "" : "",
-        disabled || mon.fnt ? "opacity-[.45] cursor-not-allowed" : "",
-      ].join(" ")}
+        off ? "opacity-[.45] cursor-not-allowed" : "hover:-translate-y-px hover:border-[var(--border-strong)]",
+      ].filter(Boolean).join(" ")}
       style={{
         background: "var(--surface-2)",
         border: "1px solid var(--border)",
         color: "var(--text)",
       }}
-      disabled={disabled || mon.fnt}
+      disabled={off}
+      aria-disabled={off || undefined}
+      aria-label={ariaLabel}
       onClick={onClick}
     >
       {hotkey && (
         <span
-          className="font-mono font-bold text-[.6rem] w-[19px] h-[19px] inline-grid place-items-center shrink-0 rounded-[5px]"
+          className="font-mono font-bold text-t-3xs w-[19px] h-[19px] inline-grid place-items-center shrink-0 rounded-[var(--radius-sm)]"
           style={{ background: "color-mix(in srgb, #000 30%, var(--surface-3))", color: "var(--text-muted)", border: "1px solid var(--border-strong)" }}
         >
           {hotkey}
@@ -49,14 +59,17 @@ export function BSXBenchChip({ mon, hotkey, disabled, reserved, onClick }: BSXBe
       <div className="min-w-0 flex-1">
         <div className="font-bold text-t-xs flex items-center gap-[.35rem]">
           {mon.name}
+          {mon.fnt && (
+            <span aria-hidden="true" className="font-mono font-bold text-t-3xs" style={{ color: "var(--rose-400)" }}>✕</span>
+          )}
           {mon.status && <BSStatusChip status={mon.status} />}
-          {reserved && <span className="font-mono text-[.52rem] tracking-[.08em]" style={{ color: "var(--accent-bright)" }}>ELEGIDO</span>}
+          {reserved && <span className="font-mono text-t-4xs tracking-[.08em]" style={{ color: "var(--accent-bright)" }}>ELEGIDO</span>}
         </div>
         <div
-          className="h-[4px] rounded-[2px] my-[.3rem] overflow-hidden"
+          className="h-[4px] rounded-[var(--radius-pill)] my-[.3rem] overflow-hidden"
           style={{ background: "color-mix(in srgb, #000 40%, var(--surface-3))" }}
         >
-          <i className="block h-full rounded-[2px]" style={{ width: `${pct}%`, background: hpColor(pct) }} />
+          <i className="block h-full rounded-[inherit]" style={{ width: `${pct}%`, background: hpColor(pct) }} />
         </div>
         <div className="flex gap-[.25rem]">
           <BSTypeRow types={mon.types} ghost />

@@ -12,7 +12,7 @@ interface BSTypeProps {
 export function BSType({ type, lg, ghost }: BSTypeProps) {
   const c = tyVar(type)
   const base = "inline-flex items-center gap-[.34em] font-mono font-bold tracking-[.1em] uppercase leading-none whitespace-nowrap"
-  const sz = lg ? "text-[.72rem] px-[.8em] py-[.28em]" : "text-[.62rem] px-[.6em] py-[.18em]"
+  const sz = lg ? "text-t-2xs px-[.8em] py-[.28em]" : "text-t-3xs px-[.6em] py-[.18em]"
   return (
     <span
       className={cn(base, sz, "rounded-[var(--radius-pill)] border")}
@@ -39,10 +39,10 @@ interface BSCatProps {
 export function BSCat({ cat }: BSCatProps) {
   const [label] = CAT_LABELS[cat] || CAT_LABELS.status
   return (
-    <span className="inline-flex items-center gap-[.35em] font-mono text-[.6rem] tracking-[.08em] uppercase text-[var(--text-dim)]">
+    <span className="inline-flex items-center gap-[.35em] font-mono text-t-3xs tracking-[.08em] uppercase text-[var(--text-dim)]">
       <span
         className={cn(
-          "w-[14px] h-[14px] rounded-[4px] grid place-items-center shrink-0",
+          "w-[14px] h-[14px] rounded-[var(--radius-sm)] grid place-items-center shrink-0",
           cat === "phys" && "[background:linear-gradient(135deg,#f97316,#c2410c)]",
           cat === "spec" && "[background:linear-gradient(135deg,#4aa3e8,#0891b2)]",
           cat === "status" && "[background:linear-gradient(135deg,#9aa0ab,#57545f)]",

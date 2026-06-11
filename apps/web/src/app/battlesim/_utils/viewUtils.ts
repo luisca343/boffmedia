@@ -5,7 +5,10 @@ import { Battle } from "@pkmn/client";
 
 export function getTargetWidth() {
   if (typeof window === 'undefined') return 1280;
-  return Math.round(window.screen.width * 0.65);
+  // Below the lg breakpoint the stage takes the full width (minus page padding);
+  // on desktop it keeps the classic 65%-of-screen rule.
+  if (window.innerWidth < 1024) return Math.max(280, Math.round(window.innerWidth - 32));
+  return Math.round(window.screen.width * 0.60);
 }
 export const ASPECT_RATIO = 0.5625;
 

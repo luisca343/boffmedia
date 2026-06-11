@@ -2,44 +2,83 @@
 
 import { useEffect } from 'react';
 
+interface HotkeyAction {
+  onClick: () => void;
+  disabled?: boolean;
+}
+
+interface MechanicHotkey {
+  key: string;
+  toggle: () => void;
+}
+
 interface UseBattleHotkeysOptions {
-  moves: Array<{ onClick: () => void }>;
-  switches: Array<{ onClick: () => void; disabled?: boolean }>;
+  /** Move slots, mapped to keys 1-4. */
+  moves: HotkeyAction[];
+  /** Switch slots. Keys 5-9 in move phase (offset 4), 1-9 in switch phase. */
+  switches: HotkeyAction[];
+  /** Key offset for switches: 4 when moves occupy 1-4, otherwise 0. */
+  switchKeyOffset?: number;
+  /** Mechanic toggles, e.g. { key: 't', toggle }. */
+  mechanics?: MechanicHotkey[];
+  /** Escape handler (clear armed mechanic). */
+  onEscape?: () => void;
   enabled?: boolean;
 }
 
-export function useBattleHotkeys({ moves, switches, enabled = true }: UseBattleHotkeysOptions) {
+export function useBattleHotkeys({
+  moves,
+  switches,
+  switchKeyOffset = 4,
+  mechanics = [],
+  onEscape,
+  enabled = true,
+}: UseBattleHotkeysOptions) {
   useEffect(() => {
     if (!enabled) return;
 
     function handleKeyDown(e: KeyboardEvent) {
       const target = e.target as HTMLElement;
       if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
 
-      const key = e.key;
+      const key = e.key.toLowerCase();
 
-      // Move hotkeys: 1-4
-      if (key >= '1' && key <= '4') {
-        const idx = parseInt(key) - 1;
-        if (idx < moves.length) {
-          e.preventDefault();
-          moves[idx].onClick();
-        }
+      if (key === 'escape' && onEscape) {
+        onEscape();
         return;
       }
 
-      // Switch hotkeys: 5-9
-      if (key >= '5' && key <= '9') {
-        const idx = parseInt(key) - 5;
-        if (idx < switches.length && !switches[idx].disabled) {
+      const mech = mechanics.find((m) => m.key.toLowerCase() === key);
+      if (mech) {
+        e.preventDefault();
+        mech.toggle();
+        return;
+      }
+
+      if (key >= '1' && key <= '9') {
+        const num = parseInt(key, 10);
+
+        // Move keys occupy 1..moves.length
+        if (moves.length > 0 && num <= moves.length) {
+          const move = moves[num - 1];
+          if (!move.disabled) {
+            e.preventDefault();
+            move.onClick();
+          }
+          return;
+        }
+
+        // Switch keys after the offset
+        const idx = num - 1 - switchKeyOffset;
+        if (idx >= 0 && idx < switches.length && !switches[idx].disabled) {
           e.preventDefault();
           switches[idx].onClick();
         }
-        return;
       }
     }
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [moves, switches, enabled]);
+  }, [moves, switches, switchKeyOffset, mechanics, onEscape, enabled]);
 }

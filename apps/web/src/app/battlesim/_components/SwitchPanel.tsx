@@ -6,9 +6,11 @@ interface SwitchPanelProps {
   bench: Array<{ fnt: boolean; [key: string]: any }>;
   onSwitch: (index: number) => void;
   label?: string;
+  /** Display offset for hotkey chips (move phase reserves 1-4 for moves). */
+  hotkeyOffset?: number;
 }
 
-export function SwitchPanel({ bench, onSwitch, label = 'Switch' }: SwitchPanelProps) {
+export function SwitchPanel({ bench, onSwitch, label = 'Switch', hotkeyOffset = 0 }: SwitchPanelProps) {
   if (bench.length === 0) return null;
 
   return (
@@ -19,9 +21,9 @@ export function SwitchPanel({ bench, onSwitch, label = 'Switch' }: SwitchPanelPr
       <div className="flex flex-wrap gap-2">
         {bench.map((mon, i) => (
           <BSXBenchChip
-            key={i}
+            key={mon.id ?? i}
             mon={mon}
-            hotkey={String(i + 1)}
+            hotkey={String(i + 1 + hotkeyOffset)}
             disabled={mon.fnt}
             onClick={mon.fnt ? undefined : () => onSwitch(i + 1)}
           />

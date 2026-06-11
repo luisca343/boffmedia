@@ -248,6 +248,68 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
   }
 
+  @SubscribeMessage('undoChoice')
+  handleUndoChoice(client: Socket, payload: { roomId: string }): void {
+    const state = this.getClientState(client);
+    if (!state) return;
+
+    const side = state.roomIds.get(payload?.roomId);
+    if (!side) {
+      client.emit('error', {
+        roomId: payload?.roomId,
+        message: 'Not in this battle',
+      });
+      return;
+    }
+
+    const room = this.rooms.get(payload.roomId);
+    if (!room) {
+      client.emit('error', {
+        roomId: payload.roomId,
+        message: 'Battle not found',
+      });
+      return;
+    }
+
+    room.undoChoice(side);
+  }
+
+  @SubscribeMessage('chatMessage')
+  handleChatMessage(
+    client: Socket,
+    payload: { roomId: string; message: string },
+  ): void {
+    const state = this.getClientState(client);
+    if (!state) return;
+
+    if (!payload?.roomId || !state.roomIds.has(payload.roomId)) {
+      client.emit('error', {
+        roomId: payload?.roomId,
+        message: 'Not in this battle',
+      });
+      return;
+    }
+
+    const text = String(payload.message ?? '')
+      .trim()
+      .slice(0, 300);
+    if (!text) return;
+
+    const data = {
+      roomId: payload.roomId,
+      sender: state.playerId,
+      message: text,
+      timestamp: Date.now(),
+    };
+
+    // Resolve current sockets at emit time so reconnected clients receive chat.
+    for (const other of this.clients.values()) {
+      if (other.roomIds.has(payload.roomId)) {
+        other.socket.emit('chatMessage', data);
+      }
+    }
+  }
+
   // ─── Matchmaking Events ───
 
   @SubscribeMessage('joinQueue')

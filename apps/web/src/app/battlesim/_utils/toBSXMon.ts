@@ -14,7 +14,7 @@ type BSXTickEv = {
   dmg?: string; eff?: string; boost?: string;
 };
 
-type TeamMemberHP = { hp: number; fnt?: boolean; name?: string };
+type TeamMemberHP = { hp: number; fnt?: boolean; name?: string; unknown?: boolean };
 
 export function toBSXMon(pokemon: Pokemon | null): BSXMon | null {
   if (!pokemon) return null;
@@ -99,22 +99,35 @@ export function toBSXTicks(htmlLines: string[]): BSXTickEv[] {
       continue;
     }
 
-    if (/ha sido debilitado|se debilitó|fainted/i.test(txt)) {
-      ev.kind = "sys";
-    } else if (/cambió|switch|¡adelante|Cambio/i.test(txt)) {
+    // Classification runs against the English LogFormatter output ('p1' POV);
+    // Spanish patterns are kept as fallback for localized/legacy logs.
+    if (/fainted|ha sido debilitado|se debilitó/i.test(txt)) {
+      ev.kind = "ko";
+    } else if (/\bGo!|sent out|withdrew|came back|switched in|¡adelante|cambió a/i.test(txt)) {
       ev.kind = "switch";
-    } else if (/subió|bajó|boost|redujo|increment|fell|rose|sube|baja/i.test(txt)) {
+    } else if (/(?:\brose\b|\bfell\b|sharply|drastically|won't go any (?:higher|lower)|subió|bajó)/i.test(txt)) {
       ev.kind = "boost";
-    } else if (/usó|used|atacar|utiliza/i.test(txt) && !ev.kind) {
+    } else if (
+      /started to (?:rain|hail|snow)|sandstorm|sunlight|rain continues|hail crashes|snow continu|battlefield|pointed stones|spikes were scattered|toxic spikes|sticky web|reflect raised|light screen raised|aurora veil|twisted the dimensions|electric current ran|grass grew|mist swirled|seeped into|lluvia|tormenta de arena|granizo|campo (?:eléctrico|de hierba|de niebla|psíquico)|espacio raro|rocas puntiagudas|púas|red viscosa/i.test(txt)
+    ) {
+      ev.kind = "field";
+    } else if (/ used |usó|utiliza/i.test(txt)) {
       ev.kind = "move";
     }
 
-    if (/eficaz/i.test(txt)) ev.eff = "super";
-    if (/resistido|no muy efectivo|sin efecto|immune|no efectivo/i.test(txt)) ev.eff = "weak";
-    if (/crit|golpe crítico/i.test(txt)) ev.crit = true;
+    if (/super effective|súper eficaz|eficaz/i.test(txt)) ev.eff = "super";
+    if (/not very effective|doesn't affect|had no effect|immune|resistido|no muy efectivo|poco eficaz|sin efecto|no afecta/i.test(txt)) ev.eff = "weak";
+    if (/critical hit|golpe crítico/i.test(txt)) ev.crit = true;
 
-    const dmgMatch = txt.match(/[—-]\s*(\d+[%％]?)/);
-    if (dmgMatch) ev.dmg = dmgMatch[1];
+    // Damage: "(Pikachu lost 12% of its health!)" or legacy "—12%" markers.
+    const dmgMatch =
+      txt.match(/lost ([\d.]+)% of its health/i) ||
+      txt.match(/perdió (?:un )?([\d.]+)\s*%/i) ||
+      txt.match(/[—-]\s*(\d+(?:\.\d+)?)[%％]/);
+    if (dmgMatch) ev.dmg = `−${dmgMatch[1]}%`;
+
+    // Anything without action markers and without combat data is system noise.
+    if (!ev.kind && !ev.dmg && !ev.eff && !ev.crit) ev.kind = "sys";
 
     result.push(ev);
   }
@@ -122,14 +135,21 @@ export function toBSXTicks(htmlLines: string[]): BSXTickEv[] {
 }
 
 export function toTeamHP(
-  team: Pokemon[] | Array<{ hp: number; fnt?: boolean; name?: string; maxhp?: number; condition?: string }>
+  team: Pokemon[] | Array<{ hp: number; fnt?: boolean; name?: string; maxhp?: number; condition?: string }>,
+  /** Known team size (|teamsize| protocol) — unrevealed slots are padded as unknown. */
+  totalPokemon?: number,
 ): TeamMemberHP[] {
-  return team.map((p) => {
+  const known: TeamMemberHP[] = team.map((p) => {
     if (p instanceof Pokemon) {
       return { hp: Math.floor((p.hp / p.maxhp) * 100), fnt: p.hp <= 0, name: p.name };
     }
     return { hp: p.hp, fnt: p.fnt, name: p.name };
   });
+  const size = Math.max(totalPokemon ?? 0, known.length);
+  while (known.length < size) {
+    known.push({ hp: 100, unknown: true });
+  }
+  return known;
 }
 
 export type { BSXKeyMove, BSXTickEv, TeamMemberHP };

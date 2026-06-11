@@ -1,5 +1,7 @@
 'use client';
 
+import { BoffSpinner } from '@/components/boffmedia/primitives';
+
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { usePvPMatchmaking } from '../_hooks/usePvPMatchmaking';
@@ -136,9 +138,7 @@ export default function PvPLobbyPage() {
           ) : (
             <div className="space-y-3">
               <div className="flex items-center justify-center gap-3">
-                <div className="w-5 h-5 border-2 rounded-full animate-spin"
-                  style={{ borderColor: 'var(--border)', borderTopColor: 'var(--accent-bright)' }}
-                />
+                <BoffSpinner size="sm" />
                 <span className="text-sm" style={{ color: 'var(--text-muted)' }}>Searching for opponent...</span>
               </div>
               <button

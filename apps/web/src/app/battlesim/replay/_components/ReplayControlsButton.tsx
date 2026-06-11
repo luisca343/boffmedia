@@ -1,22 +1,41 @@
-import { ButtonHTMLAttributes, FC } from "react";
+'use client';
 
-interface ReplayControlsButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  children: React.ReactNode;
+import type { ReactNode } from 'react';
+
+export default function ReplayControlsButton({
+  onClick,
+  label,
+  children,
+  active,
+  hint,
+}: {
+  onClick: () => void;
   label: string;
-}
-
-const ReplayControlsButton: FC<ReplayControlsButtonProps> = ({ children, label, ...props }) => {
+  children: ReactNode;
+  /** Toggled/engaged state. */
+  active?: boolean;
+  /** Keyboard hint shown under the icon (e.g. "Space"). */
+  hint?: string;
+}) {
   return (
     <button
-      {...props}
-      className={`p-1 px-2  bg-surface-600 text-surface-50 rounded hover:bg-surface-700 focus:outline-none focus:ring-2 focus:ring-surface-500 ${props.className}`}
+      onClick={onClick}
+      aria-label={label}
+      aria-pressed={active}
+      title={hint ? `${label} (${hint})` : label}
+      className="bsx-focus flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-[var(--radius-sm)] transition-colors duration-[var(--dur-fast)] cursor-pointer"
+      style={{
+        background: active ? 'color-mix(in srgb, var(--accent) 18%, var(--surface-2))' : 'var(--surface-2)',
+        color: active ? 'var(--accent-bright)' : 'var(--text-muted)',
+        border: `1px solid ${active ? 'color-mix(in srgb, var(--accent) 45%, var(--border))' : 'var(--border)'}`,
+      }}
     >
-      <div className="flex flex-col items-center">
-        {children}
-        <span className="text-xs mt-1">{label}</span>
-      </div>
+      {children}
+      {hint && (
+        <span className="font-mono text-t-4xs tracking-[.04em]" style={{ color: 'var(--text-dim)' }}>
+          {hint}
+        </span>
+      )}
     </button>
   );
-};
-
-export default ReplayControlsButton;
+}

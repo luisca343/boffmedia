@@ -26,7 +26,7 @@ export function BoffProgress({ value = 0, tone = "accent", label, className }: B
       )}
       <div className={cn("h-2 rounded-[999px] bg-[var(--surface-3)] overflow-hidden", "data-[direction=hud]:rounded-sm")}>
         <div
-          className={cn("h-full rounded-[inherit] transition-[width] duration-[0.6s] ease-[var(--ease)]", barTones[tone])}
+          className={cn("h-full rounded-[inherit] transition-[width] duration-[var(--dur-slow)] ease-[var(--ease)]", barTones[tone])}
           style={{ width: `${Math.max(0, Math.min(100, value))}%` }}
         />
       </div>

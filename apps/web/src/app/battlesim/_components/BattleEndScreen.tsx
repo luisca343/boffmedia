@@ -1,5 +1,6 @@
 "use client"
 import { Battle } from "@pkmn/client";
+import { useTranslations } from "next-intl";
 import { getParticipantName } from "../_utils/replayUtils";
 
 export const BattleEndScreen = ({ battle, pov, username, onRestart }: {
@@ -8,6 +9,7 @@ export const BattleEndScreen = ({ battle, pov, username, onRestart }: {
   username?: string | null,
   onRestart?: () => void
 }) => {
+  const t = useTranslations('battlesim');
   const p1 = pov === 0 ? battle.p1 : battle.p2;
   const p2 = pov === 0 ? battle.p2 : battle.p1;
 
@@ -15,7 +17,7 @@ export const BattleEndScreen = ({ battle, pov, username, onRestart }: {
   const p2Name = getParticipantName(p2.name)
 
   let winner: string;
-  let resultText: string;
+  let result: 'win' | 'loss' | 'tie';
 
   // First use the explicit winner from the battle if available
   if (battle.winner) {
@@ -28,11 +30,7 @@ export const BattleEndScreen = ({ battle, pov, username, onRestart }: {
 
     console.log('[EndScreen]', { pov, winner, myName, isWin, p1Name, p2Name, battleWinner: battle.winner, username });
 
-    if (isWin) {
-      resultText = "¡VICTORIA!";
-    } else {
-      resultText = "DERROTA";
-    }
+    result = isWin ? 'win' : 'loss';
   } else {
     // Fallback to checking remaining Pokemon if no explicit winner
     const p1HasPokemon = p1.team.some(p => !p.fainted);
@@ -40,13 +38,13 @@ export const BattleEndScreen = ({ battle, pov, username, onRestart }: {
     
     if (p1HasPokemon && !p2HasPokemon) {
       winner = p1Name;
-      resultText = pov === 0 ? "¡VICTORIA!" : "DERROTA";
+      result = pov === 0 ? 'win' : 'loss';
     } else if (!p1HasPokemon && p2HasPokemon) {
       winner = p2Name;
-      resultText = pov === 0 ? "DERROTA" : "¡VICTORIA!";
+      result = pov === 0 ? 'loss' : 'win';
     } else {
-      winner = "EMPATE";
-      resultText = "EMPATE";
+      winner = "__tie__";
+      result = 'tie';
     }
   }
   
@@ -58,12 +56,26 @@ export const BattleEndScreen = ({ battle, pov, username, onRestart }: {
     >
       {/* Semi-transparent background overlay */}
       <div className="absolute inset-0 bg-black bg-opacity-50 z-0" />
-      
+
+      {/* Result-colored glow sweep */}
+      <div
+        className="absolute inset-0 z-0 pointer-events-none bsx-end-in"
+        style={{
+          background: `radial-gradient(ellipse at center 30%, ${
+            result === 'win'
+              ? "color-mix(in srgb, var(--emerald-500) 22%, transparent)"
+              : result === 'tie'
+              ? "color-mix(in srgb, var(--amber-400) 16%, transparent)"
+              : "color-mix(in srgb, var(--rose-500) 10%, transparent)"
+          }, transparent 65%)`,
+        }}
+      />
+
       {/* Content Container */}
-      <div className="z-[200] flex flex-col items-center justify-center w-full h-full">
+      <div className="z-[200] flex flex-col items-center justify-center w-full h-full bsx-end-in">
         {/* Battle Result Banner */}
-        <div className={`mb-8 text-5xl md:text-6xl font-extrabold ${resultText === "¡VICTORIA!" ? "text-primary-500" : resultText === "EMPATE" ? "text-yellow-500" : "text-surface-300"} text-shadow-lg`}>
-          {resultText}
+        <div className={`mb-8 text-5xl md:text-6xl font-extrabold ${result === 'win' ? "text-primary-500" : result === 'tie' ? "text-yellow-500" : "text-surface-300 saturate-50"} text-shadow-lg`}>
+          {result === 'win' ? t('end.victory') : result === 'tie' ? t('end.tie') : t('end.defeat')}
         </div>
         
         {/* Main Content */}
@@ -88,9 +100,9 @@ export const BattleEndScreen = ({ battle, pov, username, onRestart }: {
             <h2 className="text-xl md:text-2xl font-bold text-white text-shadow-lg">
               {p1Name}
             </h2>
-            {winner === p1Name && winner !== "EMPATE" && (
+            {winner === p1Name && result !== 'tie' && (
               <div className="mt-2 bg-primary-500 px-3 py-1 rounded-full text-white text-sm font-bold">
-                GANADOR
+                {t('end.winner')}
               </div>
             )}
           </div>
@@ -99,14 +111,14 @@ export const BattleEndScreen = ({ battle, pov, username, onRestart }: {
           <div className="flex flex-col items-center">
             <div className="relative scale-up-down-animation">
               <div className="text-6xl md:text-7xl lg:text-8xl font-extrabold text-primary-500 text-shadow-lg transform rotate-6">
-                {winner !== "EMPATE" ? "KO" : "EMPATE"}
+                {result !== 'tie' ? 'KO' : t('end.tie')}
               </div>
               <div className="absolute inset-0 text-6xl md:text-7xl lg:text-8xl font-extrabold text-white text-opacity-30 text-shadow-lg transform rotate-6 blur-md">
-                {winner !== "EMPATE" ? "KO" : "EMPATE"}
+                {result !== 'tie' ? 'KO' : t('end.tie')}
               </div>
             </div>
             <div className="mt-4 text-lg text-white">
-              Turno {battle.turn}
+              {t('end.turn', { turn: battle.turn })}
             </div>
           </div>
           
@@ -130,9 +142,9 @@ export const BattleEndScreen = ({ battle, pov, username, onRestart }: {
             <h2 className="text-xl md:text-2xl font-bold text-white text-shadow-lg">
               {p2Name}
             </h2>
-            {winner === p2Name && winner !== "EMPATE" && (
+            {winner === p2Name && result !== 'tie' && (
               <div className="mt-2 bg-primary-500 px-3 py-1 rounded-full text-white text-sm font-bold">
-                GANADOR
+                {t('end.winner')}
               </div>
             )}
           </div>
@@ -146,7 +158,7 @@ export const BattleEndScreen = ({ battle, pov, username, onRestart }: {
             onRestart && onRestart();
           }}
         >
-          Volver al Inicio
+          {t('end.backToStart')}
         </button>
       </div>
 

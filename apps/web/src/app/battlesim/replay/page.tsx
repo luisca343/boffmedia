@@ -1,13 +1,15 @@
+'use client';
+
 import { Game } from './_components/Game';
-import { AchievementService } from '@/services/api/smartrotom/achievementsService';
 
-export const dynamic = 'force-dynamic';
-
-export default async function ReplayPage() {
-  const replayData = (await AchievementService.getReplay("67d9b543-5ac9-41e1-a8a5-20d7689e24a4", 62)).data as any
+/**
+ * Replay hub: opens the paste loader. Saved replays live at /battlesim/replay/[id].
+ * (Previously this page fetched a hardcoded replay id, which 404'd into a JSON parse error.)
+ */
+export default function ReplayPage() {
   return (
     <section className="flex flex-col" style={{ background: 'var(--bg)', color: 'var(--text)' }}>
-      <Game replayData={replayData} />
+      <Game />
     </section>
   );
 }

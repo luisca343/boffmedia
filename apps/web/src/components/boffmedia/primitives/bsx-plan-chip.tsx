@@ -23,11 +23,11 @@ export function BSXPlanChip({ tag, action, onClear, hint }: BSXPlanChipProps) {
   if (!action) {
     return (
       <div
-        className="flex items-center gap-[.45rem] p-[.45rem_.55rem] min-w-0 rounded-[var(--radius)] text-t-xs"
+        className="flex items-center gap-[.45rem] p-[var(--bsx-pad-sm)] min-w-0 rounded-[var(--radius)] text-t-xs"
         style={{ background: "var(--surface-2)", border: "1px dashed var(--border-strong)" }}
       >
         <span
-          className="font-mono font-bold text-[.56rem] w-[15px] h-[15px] inline-grid place-items-center rounded-[4px] shrink-0"
+          className="font-mono font-bold text-t-4xs w-[15px] h-[15px] inline-grid place-items-center rounded-[var(--radius-sm)] shrink-0"
           style={{
             background: "color-mix(in srgb, var(--accent) 24%, transparent)",
             color: "var(--accent-bright)",
@@ -36,7 +36,7 @@ export function BSXPlanChip({ tag, action, onClear, hint }: BSXPlanChipProps) {
         >
           {tag}
         </span>
-        <span style={{ color: "var(--text-dim)", fontSize: ".68rem" }}>{hint || "Sin orden"}</span>
+        <span style={{ color: "var(--text-dim)", fontSize: "var(--t-2xs)" }}>{hint || "Sin orden"}</span>
       </div>
     )
   }
@@ -50,7 +50,7 @@ export function BSXPlanChip({ tag, action, onClear, hint }: BSXPlanChipProps) {
 
   return (
     <div
-      className="flex items-center gap-[.45rem] p-[.45rem_.55rem] min-w-0 rounded-[var(--radius)] text-t-xs"
+      className="flex items-center gap-[.45rem] p-[var(--bsx-pad-sm)] min-w-0 rounded-[var(--radius)] text-t-xs"
       style={{
         "--_c": c,
         background: `color-mix(in srgb, ${c} 9%, var(--surface-2))`,
@@ -58,7 +58,7 @@ export function BSXPlanChip({ tag, action, onClear, hint }: BSXPlanChipProps) {
       } as React.CSSProperties}
     >
       <span
-        className="font-mono font-bold text-[.56rem] w-[15px] h-[15px] inline-grid place-items-center rounded-[4px] shrink-0"
+        className="font-mono font-bold text-t-4xs w-[15px] h-[15px] inline-grid place-items-center rounded-[var(--radius-sm)] shrink-0"
         style={{
           background: `color-mix(in srgb, var(--accent) 24%, transparent)`,
           color: "var(--accent-bright)",
@@ -72,7 +72,7 @@ export function BSXPlanChip({ tag, action, onClear, hint }: BSXPlanChipProps) {
           <>
             {action.tera && (
               <span
-                className="font-mono text-[.52rem] tracking-[.08em] px-[.35em] py-[.12em] rounded-[4px] shrink-0"
+                className="font-mono text-t-4xs tracking-[.08em] px-[.35em] py-[.12em] rounded-[var(--radius-sm)] shrink-0"
                 style={{ background: "var(--purple-500)", color: "#fff" }}
               >
                 TERA
@@ -87,7 +87,7 @@ export function BSXPlanChip({ tag, action, onClear, hint }: BSXPlanChipProps) {
       </span>
       {onClear && (
         <button
-          className="ml-auto shrink-0 w-[20px] h-[20px] grid place-items-center border-0 rounded-[5px] cursor-pointer"
+          className="ml-auto shrink-0 w-[20px] h-[20px] grid place-items-center border-0 rounded-[var(--radius-sm)] cursor-pointer"
           style={{ background: "transparent", color: "var(--text-dim)" }}
           onClick={onClear}
           aria-label="Borrar orden"

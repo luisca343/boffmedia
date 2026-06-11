@@ -35,7 +35,8 @@ export class AchievementService {
    * Get replay for a player
    */
   static getReplay(uuid: string, replayId: number): Promise<ApiResponse<Replay>> {
-    return rotomGET<Replay>(`/achievement/replays/${uuid}/${replayId}`);
+    // The API exposes this as POST /achievement/get-replay (GetReplayDto body).
+    return rotomPOST<Replay>('/achievement/get-replay', { uuid, replayId });
   }
 
   /**

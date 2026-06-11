@@ -17,7 +17,7 @@ export function BSStatusChip({ status }: BSStatusChipProps) {
   const isFnt = status === "fnt"
   return (
     <span
-      className="font-mono font-bold text-[.56rem] tracking-[.1em] uppercase px-[.45em] py-[.2em] rounded-[4px] leading-none"
+      className="font-mono font-bold text-t-4xs tracking-[.1em] uppercase px-[.45em] py-[.2em] rounded-[var(--radius-sm)] leading-none"
       style={{
         color: isFnt ? "var(--text)" : "#06070b",
         background: bg,
