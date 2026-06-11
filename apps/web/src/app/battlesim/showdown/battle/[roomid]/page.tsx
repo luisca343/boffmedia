@@ -11,6 +11,10 @@ import { ASPECT_RATIO } from '../../../_utils/viewUtils';
 import { useBSXLayout } from '../../../_hooks/useBSXLayout';
 import { BSXKey, BSXBenchChip, BSXTick, BSXRing, BSXTeraBtn } from '@/components/boffmedia/primitives';
 import type { BSXKeyMove as BSXKeyMoveT } from '../../../_utils/toBSXMon';
+import { useChoiceMechanics } from '../../../_hooks/useChoiceMechanics';
+import { MechanicToggles } from '../../../_components/MechanicToggles';
+import { MovePanel } from '../../../_components/MovePanel';
+import { SwitchPanel } from '../../../_components/SwitchPanel';
 
 const VISIBLE_TICK_LIMIT = 50;
 
@@ -41,7 +45,9 @@ export default function ShowdownBattlePage({
   const [chatInput, setChatInput] = useState('');
   const [savedReplayId, setSavedReplayId] = useState<number | null>(null);
   const [savingReplay, setSavingReplay] = useState(false);
-  const [activeMechanic, setActiveMechanic] = useState<string | null>(null);
+  const { activeMechanic, setActiveMechanic, makeChoiceWithMechanic: sendChoiceWithMechanic } = useChoiceMechanics(
+    useCallback((choice: string) => sendChoice(choice), [sendChoice])
+  );
   const [, canvasWidth] = useViewportWidth();
   const logRef = useRef<HTMLDivElement>(null);
   const chatRef = useRef<HTMLDivElement>(null);
@@ -109,15 +115,6 @@ export default function ShowdownBattlePage({
     }
   }, [state?.battleComplete, savedReplayId, savingReplay, saveShowdownReplay]);
 
-  const sendChoiceWithMechanic = useCallback((choice: string) => {
-    if (activeMechanic) {
-      sendChoice(`${choice} ${activeMechanic}`);
-      setActiveMechanic(null);
-    } else {
-      sendChoice(choice);
-    }
-  }, [activeMechanic, sendChoice]);
-
   if (!session || !state || status === 'connecting' || status === 'authenticating' || status === 'joining') {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 px-4">
@@ -166,39 +163,8 @@ export default function ShowdownBattlePage({
 
   const choicePanel = isMyTurn && bsx.requestType === 'move' ? (
     <div className="flex flex-col gap-3">
-      {bsx.bsxMoves.length > 0 && (
-        <div className="grid grid-cols-2 gap-2">
-          {bsx.bsxMoves.map((move, i) => (
-            <BSXKey key={i} move={move as BSXKeyMoveT} hotkey={String(i + 1)}
-              target={bsx.bsxFoe ? { types: bsx.bsxFoe.types, tera: bsx.bsxFoe.tera, teraType: bsx.bsxFoe.teraType } : undefined}
-              onClick={() => sendChoiceWithMechanic(`move ${i + 1}`)} />
-          ))}
-        </div>
-      )}
-      <div className="flex gap-2 flex-wrap">
-        {bsx.mechCanTera && bsx.mechTeraType && (
-          <BSXTeraBtn type={bsx.mechTeraType} armed={activeMechanic === 'terastallize'}
-            onToggle={() => setActiveMechanic(activeMechanic === 'terastallize' ? null : 'terastallize')} hotkey="T" />
-        )}
-        {bsx.mechCanMega && (
-          <button className="px-3 py-1.5 rounded-md text-sm font-medium transition-all cursor-pointer"
-            style={{ background: activeMechanic === 'mega' ? 'color-mix(in srgb, var(--accent) 20%, var(--surface-2))' : 'var(--surface-2)',
-              border: `1px solid ${activeMechanic === 'mega' ? 'var(--accent-bright)' : 'var(--border)'}`, color: 'var(--text)' }}
-            onClick={() => setActiveMechanic(activeMechanic === 'mega' ? null : 'mega')}>Mega</button>
-        )}
-        {bsx.mechCanDyna && (
-          <button className="px-3 py-1.5 rounded-md text-sm font-medium transition-all cursor-pointer"
-            style={{ background: activeMechanic === 'dynamax' ? 'color-mix(in srgb, var(--accent) 20%, var(--surface-2))' : 'var(--surface-2)',
-              border: `1px solid ${activeMechanic === 'dynamax' ? 'var(--accent-bright)' : 'var(--border)'}`, color: 'var(--text)' }}
-            onClick={() => setActiveMechanic(activeMechanic === 'dynamax' ? null : 'dynamax')}>Dynamax</button>
-        )}
-        {bsx.mechZMoves && (
-          <button className="px-3 py-1.5 rounded-md text-sm font-medium transition-all cursor-pointer"
-            style={{ background: activeMechanic === 'zmove' ? 'color-mix(in srgb, var(--accent) 20%, var(--surface-2))' : 'var(--surface-2)',
-              border: `1px solid ${activeMechanic === 'zmove' ? 'var(--accent-bright)' : 'var(--border)'}`, color: 'var(--text)' }}
-            onClick={() => setActiveMechanic(activeMechanic === 'zmove' ? null : 'zmove')}>Z-Move</button>
-        )}
-      </div>
+      <MovePanel moves={bsx.bsxMoves as BSXKeyMoveT[]} foe={bsx.bsxFoe ? { types: bsx.bsxFoe.types, tera: bsx.bsxFoe.tera, teraType: bsx.bsxFoe.teraType } : undefined} onChooseMove={(i) => sendChoiceWithMechanic(`move ${i}`)} />
+      <MechanicToggles bsx={bsx} activeMechanic={activeMechanic} setActiveMechanic={setActiveMechanic} htmlLog={state.htmlLog} />
     </div>
   ) : null;
 
@@ -299,27 +265,11 @@ export default function ShowdownBattlePage({
   );
 
   const switchBench = isMyTurn && bsx.requestType === 'move' && bsx.bsxBench.length > 0 ? (
-    <div className="flex flex-col gap-2">
-      <div className="text-xs font-medium uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Switch{trapMsg}</div>
-      <div className="flex flex-wrap gap-2">
-        {bsx.bsxBench.map((mon, i) => (
-          <BSXBenchChip key={i} mon={mon} hotkey={String(i + 1)} disabled={mon.fnt}
-            onClick={mon.fnt ? undefined : () => sendChoice(`switch ${i + 1}`)} />
-        ))}
-      </div>
-    </div>
+    <SwitchPanel bench={bsx.bsxBench} onSwitch={(i) => sendChoice(`switch ${i}`)} label={`Switch${trapMsg}`} />
   ) : null;
 
   const forcedSwitch = isMyTurn && bsx.requestType === 'switch' ? (
-    <div className="flex flex-col gap-2">
-      <div className="text-xs font-medium uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Forced Switch</div>
-      <div className="flex flex-wrap gap-2">
-        {bsx.bsxBench.map((mon, i) => (
-          <BSXBenchChip key={i} mon={mon} hotkey={String(i + 1)} disabled={mon.fnt}
-            onClick={mon.fnt ? undefined : () => sendChoice(`switch ${i + 1}`)} />
-        ))}
-      </div>
-    </div>
+    <SwitchPanel bench={bsx.bsxBench} onSwitch={(i) => sendChoice(`switch ${i}`)} label="Forced Switch" />
   ) : null;
 
   const postBattle = state.status === 'finished' ? (

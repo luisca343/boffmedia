@@ -12,16 +12,14 @@ import { sanitizeHtml } from '../../../_utils/sanitizeHtml';
 import useViewportWidth from '@/services/useViewPortWidth';
 import { ASPECT_RATIO } from '../../../_utils/viewUtils';
 import { useBSXLayout } from '../../../_hooks/useBSXLayout';
-import { BSXKey, BSXBenchChip, BSXTick, BSXRing, BSXTeraBtn } from '@/components/boffmedia/primitives';
+import { useChoiceMechanics } from '../../../_hooks/useChoiceMechanics';
+import { MechanicToggles } from '../../../_components/MechanicToggles';
+import { MovePanel } from '../../../_components/MovePanel';
+import { SwitchPanel } from '../../../_components/SwitchPanel';
+import { BSXTick, BSXRing } from '@/components/boffmedia/primitives';
 import type { BSXKeyMove as BSXKeyMoveT } from '../../../_utils/toBSXMon';
 
 const VISIBLE_TICK_LIMIT = 50;
-
-const MECHANIC_EVENT_MARKERS = ['|-mega|', '|-terastallize|', '|-zpower|', '|-burst|', '|-primal|'];
-
-function hasMechanicBeenUsed(htmlLog: string[]): boolean {
-  return htmlLog.some((line) => MECHANIC_EVENT_MARKERS.some((marker) => line.includes(marker)));
-}
 
 function getGlobalSocket(): Socket | null {
   if (typeof window === 'undefined') return null;
@@ -39,7 +37,6 @@ export default function PvPBattlePage({
   const [session, setSession] = useState<BattleSession | null>(null);
   const [side, setSide] = useState<'p1' | 'p2'>('p1');
   const [showAllLogs, setShowAllLogs] = useState(false);
-  const [activeMechanic, setActiveMechanic] = useState<string | null>(null);
   const [savedReplayId, setSavedReplayId] = useState<number | null>(null);
   const [savingReplay, setSavingReplay] = useState(false);
   const [battleStarted, setBattleStarted] = useState(false);
@@ -174,6 +171,10 @@ export default function PvPBattlePage({
     [session, decodedRoomId, triggerUpdate],
   );
 
+  const { activeMechanic, setActiveMechanic, makeChoiceWithMechanic } = useChoiceMechanics(
+    useCallback((choice: string) => handleMakeChoice(choice), [handleMakeChoice])
+  );
+
   const handleForfeit = useCallback(() => {
     if (confirm('Are you sure you want to forfeit?')) {
       const socket = getGlobalSocket();
@@ -186,15 +187,6 @@ export default function PvPBattlePage({
 
   const pov = state ? (side === 'p1' ? 0 : 1) : 0;
   const opponentName = pov === 0 ? (state?.battle.p2?.name || 'Opponent') : (state?.battle.p1?.name || 'Opponent');
-
-  const makeChoiceWithMechanic = useCallback((choice: string) => {
-    if (activeMechanic) {
-      handleMakeChoice(`${choice} ${activeMechanic}`);
-      setActiveMechanic(null);
-    } else {
-      handleMakeChoice(choice);
-    }
-  }, [activeMechanic, handleMakeChoice]);
 
   if (!session || !state) {
     return (
@@ -229,39 +221,18 @@ export default function PvPBattlePage({
   const choicePanel = state.isWaitingForChoice && bsx.requestType === 'move' ? (
     <div className="flex flex-col gap-3">
       {bsx.bsxMoves.length > 0 && (
-        <div className="grid grid-cols-2 gap-2">
-          {bsx.bsxMoves.map((move, i) => (
-            <BSXKey key={i} move={move as BSXKeyMoveT} hotkey={String(i + 1)}
-              target={bsx.bsxFoe ? { types: bsx.bsxFoe.types, tera: bsx.bsxFoe.tera, teraType: bsx.bsxFoe.teraType } : undefined}
-              onClick={() => makeChoiceWithMechanic(`move ${i + 1}`)} />
-          ))}
-        </div>
+        <MovePanel
+          moves={bsx.bsxMoves as BSXKeyMoveT[]}
+          foe={bsx.bsxFoe ? { types: bsx.bsxFoe.types, tera: bsx.bsxFoe.tera, teraType: bsx.bsxFoe.teraType } : undefined}
+          onChooseMove={(i) => makeChoiceWithMechanic(`move ${i}`)}
+        />
       )}
-      <div className="flex gap-2 flex-wrap">
-        {bsx.mechCanTera && bsx.mechTeraType && (
-          <BSXTeraBtn type={bsx.mechTeraType} armed={activeMechanic === 'terastallize'}
-            onToggle={() => setActiveMechanic(activeMechanic === 'terastallize' ? null : 'terastallize')}
-            used={hasMechanicBeenUsed(state.htmlLog)} hotkey="T" />
-        )}
-        {bsx.mechCanMega && (
-          <button className="px-3 py-1.5 rounded-md text-sm font-medium transition-all cursor-pointer"
-            style={{ background: activeMechanic === 'mega' ? 'color-mix(in srgb, var(--accent) 20%, var(--surface-2))' : 'var(--surface-2)',
-              border: `1px solid ${activeMechanic === 'mega' ? 'var(--accent-bright)' : 'var(--border)'}`, color: 'var(--text)' }}
-            onClick={() => setActiveMechanic(activeMechanic === 'mega' ? null : 'mega')}>Mega</button>
-        )}
-        {bsx.mechCanDyna && (
-          <button className="px-3 py-1.5 rounded-md text-sm font-medium transition-all cursor-pointer"
-            style={{ background: activeMechanic === 'dynamax' ? 'color-mix(in srgb, var(--accent) 20%, var(--surface-2))' : 'var(--surface-2)',
-              border: `1px solid ${activeMechanic === 'dynamax' ? 'var(--accent-bright)' : 'var(--border)'}`, color: 'var(--text)' }}
-            onClick={() => setActiveMechanic(activeMechanic === 'dynamax' ? null : 'dynamax')}>Dynamax</button>
-        )}
-        {bsx.mechZMoves && (
-          <button className="px-3 py-1.5 rounded-md text-sm font-medium transition-all cursor-pointer"
-            style={{ background: activeMechanic === 'zmove' ? 'color-mix(in srgb, var(--accent) 20%, var(--surface-2))' : 'var(--surface-2)',
-              border: `1px solid ${activeMechanic === 'zmove' ? 'var(--accent-bright)' : 'var(--border)'}`, color: 'var(--text)' }}
-            onClick={() => setActiveMechanic(activeMechanic === 'zmove' ? null : 'zmove')}>Z-Move</button>
-        )}
-      </div>
+      <MechanicToggles
+        bsx={bsx}
+        activeMechanic={activeMechanic}
+        setActiveMechanic={setActiveMechanic}
+        htmlLog={state.htmlLog}
+      />
     </div>
   ) : null;
 
@@ -324,27 +295,11 @@ export default function PvPBattlePage({
   );
 
   const switchBench = state.isWaitingForChoice && bsx.requestType === 'move' && bsx.bsxBench.length > 0 ? (
-    <div className="flex flex-col gap-2">
-      <div className="text-xs font-medium uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Switch</div>
-      <div className="flex flex-wrap gap-2">
-        {bsx.bsxBench.map((mon, i) => (
-          <BSXBenchChip key={i} mon={mon} hotkey={String(i + 1)} disabled={mon.fnt}
-            onClick={mon.fnt ? undefined : () => handleMakeChoice(`switch ${i + 1}`)} />
-        ))}
-      </div>
-    </div>
+    <SwitchPanel bench={bsx.bsxBench} onSwitch={(i) => handleMakeChoice(`switch ${i}`)} />
   ) : null;
 
   const forcedSwitch = state.isWaitingForChoice && bsx.requestType === 'switch' ? (
-    <div className="flex flex-col gap-2">
-      <div className="text-xs font-medium uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Forced Switch</div>
-      <div className="flex flex-wrap gap-2">
-        {bsx.bsxBench.map((mon, i) => (
-          <BSXBenchChip key={i} mon={mon} hotkey={String(i + 1)} disabled={mon.fnt}
-            onClick={mon.fnt ? undefined : () => handleMakeChoice(`switch ${i + 1}`)} />
-        ))}
-      </div>
-    </div>
+    <SwitchPanel bench={bsx.bsxBench} onSwitch={(i) => handleMakeChoice(`switch ${i}`)} label="Forced Switch" />
   ) : null;
 
   const postBattle = state.status === 'finished' ? (

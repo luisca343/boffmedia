@@ -130,27 +130,28 @@ export function useBattleFlow(
 
     // Process the line through the shared BattleEventProcessor
     // Canonical order: parse → format → payload → battle.add → pre-anim → log → post-anim → timeout
+    let cancelled = false;
     (async () => {
       liveProcessingRef.current = true;
       const processor = processorRef.current;
-      if (!processor) { liveProcessingRef.current = false; return; }
+      if (!processor || cancelled) { liveProcessingRef.current = false; return; }
 
       let event: ProcessedBattleEvent;
       try {
         event = await processor.processLine(line);
       } catch (e) {
-        liveProcessingRef.current = false;
-        bumpLiveIndex();
+        if (!cancelled) liveProcessingRef.current = false;
+        if (!cancelled) bumpLiveIndex();
         return;
       }
 
+      if (cancelled) return;
       updateBattleLog(event.html, battle, event.type);
 
       if (event.type === 'win' || event.type === 'tie') {
-        // Run the win/tie handler to set battle.winner correctly
         const timeout = await processor.runAnimation(event);
         await new Promise<void>(resolve => setTimeout(resolve, timeout));
-        // Mark complete AFTER winner is set — end screen will render with correct result
+        if (cancelled) return;
         setBattleComplete?.(true);
         liveCallbacksRef.current.onBattleEnd?.(event.args[1] as string);
         liveProcessingRef.current = false;
@@ -160,9 +161,12 @@ export function useBattleFlow(
       const timeout = await processor.runAnimation(event);
       await new Promise<void>(resolve => setTimeout(resolve, timeout));
 
+      if (cancelled) return;
       liveProcessingRef.current = false;
       bumpLiveIndex();
     })();
+
+    return () => { cancelled = true; };
   }, [liveTrigger, liveMode]);
 
   // addLine: push to buffer. Only trigger effect if nothing is currently processing.

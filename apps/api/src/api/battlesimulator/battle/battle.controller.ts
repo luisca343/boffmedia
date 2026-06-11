@@ -4,7 +4,6 @@ import { getRandomTeam } from '../_utils/teams';
 import {
   Dex,
   PRNG,
-  TeamValidator,
   Teams as DTeams,
   BattleStreams,
   RandomPlayerAI,
@@ -15,7 +14,6 @@ import { LogFormatter } from '@pkmn/view';
 import { Sprites } from '@pkmn/img';
 import { Protocol } from '@pkmn/protocol';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
-import { Logger } from 'nestjs-pino';
 
 function getPokemonTeam(team: Pokemon[]) {
   const pokemonTeam = [] as any[];
@@ -35,15 +33,11 @@ function getPokemonTeam(team: Pokemon[]) {
 @Controller('battlesimulator/battle')
 @UseInterceptors(ResponseInterceptor)
 export class BattleController {
-  constructor(private readonly logger: Logger) {}
-
   @Get()
   @ApiOperation({ summary: 'Simulate a Pokémon battle' })
   @ApiResponse({ status: 200, description: 'Battle simulated successfully.' })
   @ApiResponse({ status: 500, description: 'Failed to simulate battle.' })
   async getBattle() {
-    let _equipo1;
-    let _equipo2;
     const log = {} as {
       [turn: number]: {
         events: {
@@ -74,8 +68,6 @@ export class BattleController {
 
     const prng = new PRNG();
     const FORMAT = 'gen9randomdoublesbattle';
-    const _dex = Dex.forFormat(FORMAT);
-    const _validator = new TeamValidator(FORMAT);
     const GRAPHICS:
       | 'ani'
       | 'gen1rg'
@@ -120,7 +112,6 @@ export class BattleController {
       kwArgs: { [k: string]: any },
       line?: string,
     ) {
-      //this.logger.log(turn, text);
       let img1 = {} as {
         gen: number;
         w: number;
@@ -137,7 +128,6 @@ export class BattleController {
       };
 
       for (const active of battle.p1.active) {
-        //this.logger.log(active?.speciesForme);
         if (!active)
           img1 = {} as {
             gen: number;
@@ -154,7 +144,6 @@ export class BattleController {
       }
 
       for (const active of battle.p2.active) {
-        //this.logger.log(active?.speciesForme);
         if (!active)
           img2 = {} as {
             gen: number;
@@ -174,9 +163,9 @@ export class BattleController {
       log[turn].events.push({ args, kwArgs, text, line: line ?? '' });
     }
 
-    function end() {
+    function end(winner: string) {
       return {
-        winner: 'Bot A',
+        winner,
         log,
         team1: getPokemonTeam(battle.p1.team),
         team2: getPokemonTeam(battle.p2.team),
@@ -187,37 +176,33 @@ export class BattleController {
     void streams.omniscient.write(`>player p1 ${JSON.stringify(p1spec)}`);
     void streams.omniscient.write(`>player p2 ${JSON.stringify(p2spec)}`);
 
-    return new Promise((resolve, _reject) => {
+    return new Promise((resolve, reject) => {
       (async () => {
-        //this.logger.log("async");
         let turn = 0;
-        for await (const chunk of streams.omniscient) {
-          // TODO: why does Parcel not like Protocol.parse?
-          for (const line of chunk.split('\n')) {
-            //this.logger.log(line);
-            const { args, kwArgs } = Protocol.parseBattleLine(line);
-            //this.logger.log(args, kwArgs);
+        let winner: string | null = null;
+        try {
+          for await (const chunk of streams.omniscient) {
+            for (const line of chunk.split('\n')) {
+              const { args, kwArgs } = Protocol.parseBattleLine(line);
 
-            if (args[0] === 'turn') {
-              const turnNum = parseInt(args[1]);
-              turn = turnNum;
-            } else if (args[0] === 'win') {
-              /*else if (args[0] === 'teampreview') {
-                  equipo1 = battle.p1.team;
-                  equipo2 = battle.p2.team;
-                  break;
-                }*/
-              return resolve(end());
+              if (args[0] === 'turn') {
+                turn = parseInt(args[1]);
+              } else if (args[0] === 'win') {
+                winner = args[1] ?? 'Unknown';
+              }
+
+              const html = formatter.formatHTML(args, kwArgs);
+
+              battle.add(args, kwArgs);
+
+              updateLog(turn, html, args, kwArgs, line);
             }
-
-            const html = formatter.formatHTML(args, kwArgs);
-            const _key = Protocol.key(args);
-
-            battle.add(args, kwArgs);
-
-            updateLog(turn, html, args, kwArgs, line);
+            battle.update({} as Protocol.Request);
           }
-          battle.update({} as Protocol.Request);
+          // Stream ended — resolve with winner if captured, otherwise tie
+          resolve(end(winner ?? 'Tie'));
+        } catch (err) {
+          reject(err);
         }
       })();
     });
