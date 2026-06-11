@@ -3,7 +3,6 @@ import { Battle, Pokemon, Side } from "@pkmn/client";
 import { Loading } from "@/components/smartrotom/Loading";
 import { forwardRef, useCallback, useRef } from "react";
 import { positionsP1, positionsP2, ASPECT_RATIO, getScaleMultiplier } from "../_utils/viewUtils";
-import { PokemonStatus } from "./PokemonStatus";
 import { PokemonElement, PokemonRefType } from "./PokemonElement";
 import { Avatar } from "./Avatar";
 import { PokemonTeam } from "./PokemonTeam";
@@ -14,6 +13,9 @@ import BattlePreview from "./BattlePreview";
 import BattleEndScreen from "./BattleEndScreen";
 import { sanitizeHtml } from "../_utils/sanitizeHtml";
 import { getParticipantName } from "../_utils/replayUtils";
+import { BSXPlate } from "@/components/boffmedia/primitives";
+import { toBSXMon } from "../_utils/toBSXMon";
+import type { ReactNode } from "react";
 
 export type BattleCanvasRefProps = {
   bounceAll: () => void;
@@ -40,6 +42,7 @@ export const BattleCanvas = forwardRef(({
     onPlayAgain,
     battleComplete = false,
     username,
+    choicePanel,
 }: {
     battle: Battle,
     pov: 0 | 1 | any,
@@ -56,6 +59,7 @@ export const BattleCanvas = forwardRef(({
     onPlayAgain?: () => void,
     battleComplete?: boolean,
     username?: string | null,
+    choicePanel?: ReactNode,
 }, ref: React.Ref<BattleCanvasRefProps>) => {
     const pokemonRefs = useRef<{ [key: string]: PokemonRefType }>({});
     const [, canvasWidth] = useViewportWidth();
@@ -140,23 +144,26 @@ export const BattleCanvas = forwardRef(({
                         {getParticipantName(p1.name)} vs {getParticipantName(p2.name)}
                     </span>
                     </div>
-                <div className="m-1 w-2/3 flex flex-row-reverse">
+                <div className="m-1 w-2/3 flex flex-row-reverse items-start gap-1">
                     <PokemonTeam side={p2}/>
-                    {positionsP2.map((position, index) => (
-                        pokemon[position] && <PokemonStatus key={position} pokemon={pokemon[position]} className="flex-1 max-w-[33%]"/>
-                    ))}
+                    {positionsP2.map((position, index) => {
+                        const mon = toBSXMon(pokemon[position]);
+                        return mon && <div key={position} className="flex-1 max-w-[260px] shrink min-w-0"><BSXPlate mon={mon} foe slotTag="2" /></div>;
+                    })}
                 </div>
             </div>
 
                 
             <div className="h-[20%] md:h-[18%] lg:h-[15%]  w-full absolute bottom-0 flex">
-                <div className="m-1 w-2/3 flex flex-row">
+                <div className="m-1 w-2/3 flex flex-row items-start gap-1">
                     <PokemonTeam side={p1}/>
-                    {positionsP1.map((position, index) => (
-                        pokemon[position] && <PokemonStatus key={position} pokemon={pokemon[position]} className="flex-1 max-w-[33%]"/>
-                    ))}
+                    {positionsP1.map((position, index) => {
+                        const mon = toBSXMon(pokemon[position]);
+                        return mon && <div key={position} className="flex-1 max-w-[260px] shrink min-w-0"><BSXPlate mon={mon} active slotTag="1" /></div>;
+                    })}
                 </div>
                 <div className="m-1 w-1/3 flex">
+                {/* messageBar commented out — move panel now occupies bottom-right
                 {
                     messageBar && messageBar.length > 0 && <div className="w-1/3 h-fit m-1 flex-1 bg-surface-800 bg-opacity-90 py-1 px-2 rounded-md text-surface-200 z-50 absolute right-0 bottom-0">
                         {messageBar.map((message, index) => (
@@ -164,6 +171,7 @@ export const BattleCanvas = forwardRef(({
                         ))}
                     </div>
                 }
+                */}
                 </div>
             </div>
             <Avatar side={p1} pov={pov}/>
@@ -222,6 +230,23 @@ export const BattleCanvas = forwardRef(({
                 }}>
                 </div>
             </div>
+
+            {choicePanel && (
+              <div
+                className="absolute bottom-2 right-2 z-30 pointer-events-auto rounded-[var(--radius)]"
+                style={{
+                  maxWidth: 'min(540px, calc(100% - 16px))',
+                  maxHeight: 'calc(100% - 16px)',
+                  overflowY: 'auto',
+                  background: 'color-mix(in srgb, var(--bg) 82%, transparent)',
+                  backdropFilter: 'blur(6px)',
+                  border: '1px solid var(--border)',
+                  padding: '10px',
+                }}
+              >
+                {choicePanel}
+              </div>
+            )}
         </div>
     )
 })

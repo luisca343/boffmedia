@@ -1,4 +1,4 @@
-import { TARGET_WIDTH } from '@/app/battlesim/_utils/viewUtils';
+import { getTargetWidth } from '@/app/battlesim/_utils/viewUtils';
 import { useState, useEffect } from 'react';
 
 const useViewportWidth = () => {
@@ -17,7 +17,8 @@ const useViewportWidth = () => {
         };
     }, []);
 
-    const canvasWidth = viewportWidth > TARGET_WIDTH ? TARGET_WIDTH : viewportWidth;
+    const targetW = getTargetWidth();
+    const canvasWidth = viewportWidth > targetW ? targetW : viewportWidth;
 
     return [viewportWidth, canvasWidth];
 };

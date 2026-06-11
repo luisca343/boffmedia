@@ -15,21 +15,10 @@ const BATTLE_FORMATS = [
 export default function PvPLobbyPage() {
   const router = useRouter();
   const {
-    status,
-    error,
-    playerId,
-    queueFormat,
-    pendingChallenges,
-    activeSession,
-    activeRoomId,
-    activeSide,
-    connect,
-    joinQueue,
-    leaveQueue,
-    challengePlayer,
-    acceptChallenge,
-    rejectChallenge,
-    setActiveSession,
+    status, error, playerId, queueFormat, pendingChallenges,
+    activeSession, activeRoomId, activeSide,
+    connect, joinQueue, leaveQueue, challengePlayer,
+    acceptChallenge, rejectChallenge, setActiveSession,
   } = usePvPMatchmaking();
 
   const [selectedFormat, setSelectedFormat] = useState('gen9randombattle');
@@ -37,97 +26,80 @@ export default function PvPLobbyPage() {
   const [, forceUpdate] = useState(0);
   const triggerUpdate = useCallback(() => forceUpdate((n) => n + 1), []);
 
-  // Auto-connect on mount
-  useEffect(() => {
-    connect();
-  }, [connect]);
+  useEffect(() => { connect(); }, [connect]);
 
-  // When a battle is created, create a session and navigate to battle page
   useEffect(() => {
     if (status === 'inBattle' && activeRoomId && !activeSession) {
-      // Store side so the battle page can pick it up
-      if (activeSide) {
-        localStorage.setItem(`pvp_side_${activeRoomId}`, activeSide);
-      }
+      if (activeSide) localStorage.setItem(`pvp_side_${activeRoomId}`, activeSide);
       const session = new BattleSession(activeRoomId, {
-        onUpdate: triggerUpdate,
-        onRequest: () => triggerUpdate(),
-        onBattleEnd: () => triggerUpdate(),
+        onUpdate: triggerUpdate, onRequest: () => triggerUpdate(), onBattleEnd: () => triggerUpdate(),
       });
       session.status = 'active';
-
-      // Store globally so the battle page can pick it up
-      if (!(window as any).__pvp_sessions) {
-        (window as any).__pvp_sessions = {};
-      }
+      if (!(window as any).__pvp_sessions) (window as any).__pvp_sessions = {};
       (window as any).__pvp_sessions[activeRoomId] = session;
-
       setActiveSession(session, activeRoomId);
       router.push(`/battlesim/pvp/battle/${encodeURIComponent(activeRoomId)}`);
     }
   }, [status, activeRoomId, activeSession, activeSide, setActiveSession, router, triggerUpdate]);
 
-  const handleFindMatch = () => {
-    joinQueue(selectedFormat);
-  };
-
-  const handleCancelSearch = () => {
-    leaveQueue();
-  };
-
-  const handleChallenge = () => {
-    if (!challengeTarget.trim()) return;
-    challengePlayer(challengeTarget.trim(), selectedFormat);
-  };
+  const handleFindMatch = () => joinQueue(selectedFormat);
+  const handleCancelSearch = () => leaveQueue();
+  const handleChallenge = () => { if (challengeTarget.trim()) challengePlayer(challengeTarget.trim(), selectedFormat); };
 
   const isSearching = status === 'searching';
   const canSearch = status === 'connected' || status === 'idle';
 
+  const cardStyle = { background: 'var(--card-bg)', border: 'var(--card-border)', borderRadius: 'var(--radius-lg)' };
+  const inputStyle = { background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text)', borderRadius: 'var(--radius)' };
+  const btnStyle = { background: 'var(--accent)', color: 'var(--text)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' };
+
   return (
-    <div className="flex flex-col gap-4 p-4 max-w-4xl mx-auto">
+    <div className="flex flex-col gap-4 p-4 max-w-4xl mx-auto" style={{ color: 'var(--text)', background: 'var(--bg)' }}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">PvP Battle</h1>
-          <p className="text-sm text-muted-foreground">
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>PvP Battle</h1>
+          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
             Play Pokémon battles against other players on our server
           </p>
         </div>
         <StatusBadge status={status} playerId={playerId} />
       </div>
 
-      {/* Error banner */}
       {error && (
-        <div className="bg-destructive/10 border border-destructive/30 text-destructive rounded-lg p-3 text-sm">
+        <div className="p-3 text-sm rounded-lg" style={{
+          background: 'color-mix(in srgb, var(--rose-500) 10%, transparent)',
+          border: '1px solid color-mix(in srgb, var(--rose-500) 30%, transparent)',
+          color: 'var(--rose-400)'
+        }}>
           {error}
         </div>
       )}
 
-      {/* Incoming challenges */}
       {pendingChallenges.length > 0 && (
-        <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 space-y-2">
-          <h3 className="font-semibold text-blue-600">Incoming Challenges</h3>
+        <div className="p-4 space-y-2 rounded-lg" style={{
+          background: 'color-mix(in srgb, var(--accent) 10%, transparent)',
+          border: '1px solid color-mix(in srgb, var(--accent) 30%, transparent)',
+        }}>
+          <h3 className="font-semibold" style={{ color: 'var(--accent-bright)' }}>Incoming Challenges</h3>
           {pendingChallenges.map((ch) => (
-            <div
-              key={ch.from}
-              className="flex items-center justify-between bg-card border rounded-md p-3"
-            >
+            <div key={ch.from} className="flex items-center justify-between p-3 rounded-md" style={cardStyle}>
               <div>
-                <span className="font-semibold">{ch.from}</span>
-                <span className="text-muted-foreground ml-2">
-                  challenged you to {ch.format}
-                </span>
+                <span className="font-semibold" style={{ color: 'var(--text)' }}>{ch.from}</span>
+                <span className="ml-2" style={{ color: 'var(--text-muted)' }}>challenged you to {ch.format}</span>
               </div>
               <div className="flex gap-2">
                 <button
                   onClick={() => acceptChallenge(ch.from)}
-                  className="px-4 py-1.5 bg-green-600 text-white rounded-md text-sm font-medium hover:bg-green-700 transition-colors"
+                  className="px-4 py-1.5 rounded-md text-sm font-medium"
+                  style={{ background: 'color-mix(in srgb, var(--emerald-500) 80%, transparent)', color: '#fff', border: '1px solid transparent' }}
                 >
                   Accept
                 </button>
                 <button
                   onClick={() => rejectChallenge(ch.from)}
-                  className="px-4 py-1.5 bg-destructive text-destructive-foreground rounded-md text-sm font-medium hover:bg-destructive/90 transition-colors"
+                  className="px-4 py-1.5 rounded-md text-sm font-medium"
+                  style={{ background: 'var(--surface-3)', color: 'var(--rose-400)', border: '1px solid color-mix(in srgb, var(--rose-500) 40%, transparent)' }}
                 >
                   Reject
                 </button>
@@ -138,45 +110,41 @@ export default function PvPLobbyPage() {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Find Match */}
-        <div className="bg-card border rounded-lg p-6">
-          <h2 className="text-lg font-semibold mb-2">Find Match</h2>
-          <p className="text-sm text-muted-foreground mb-4">
+        <div className="p-6" style={cardStyle}>
+          <h2 className="text-lg font-semibold mb-2" style={{ color: 'var(--text)' }}>Find Match</h2>
+          <p className="text-sm mb-4" style={{ color: 'var(--text-muted)' }}>
             Join the matchmaking queue and get paired with another player.
           </p>
-
           <select
             value={selectedFormat}
             onChange={(e) => setSelectedFormat(e.target.value)}
             disabled={isSearching}
-            className="w-full px-3 py-2 bg-background border rounded-md text-sm text-foreground mb-4 disabled:opacity-50"
+            className="w-full px-3 py-2 text-sm mb-4 disabled:opacity-50" style={inputStyle}
           >
             {BATTLE_FORMATS.map((fmt) => (
-              <option key={fmt.value} value={fmt.value}>
-                {fmt.label}
-              </option>
+              <option key={fmt.value} value={fmt.value}>{fmt.label}</option>
             ))}
           </select>
-
           {!isSearching ? (
             <button
               onClick={handleFindMatch}
               disabled={!canSearch}
-              className="w-full px-4 py-3 bg-primary text-primary-foreground rounded-md text-sm font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-4 py-3 rounded-md text-sm font-semibold disabled:opacity-50" style={btnStyle}
             >
               Find Match
             </button>
           ) : (
             <div className="space-y-3">
               <div className="flex items-center justify-center gap-3">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary" />
-                <span className="text-sm text-muted-foreground">
-                  Searching for opponent...
-                </span>
+                <div className="w-5 h-5 border-2 rounded-full animate-spin"
+                  style={{ borderColor: 'var(--border)', borderTopColor: 'var(--accent-bright)' }}
+                />
+                <span className="text-sm" style={{ color: 'var(--text-muted)' }}>Searching for opponent...</span>
               </div>
               <button
                 onClick={handleCancelSearch}
-                className="w-full px-4 py-2 bg-secondary text-secondary-foreground rounded-md text-sm font-medium hover:bg-secondary/80 transition-colors"
+                className="w-full px-4 py-2 rounded-md text-sm font-medium"
+                style={{ background: 'var(--surface-3)', color: 'var(--text)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}
               >
                 Cancel
               </button>
@@ -184,38 +152,31 @@ export default function PvPLobbyPage() {
           )}
         </div>
 
-        {/* Challenge Player */}
-        <div className="bg-card border rounded-lg p-6">
-          <h2 className="text-lg font-semibold mb-2">Challenge Player</h2>
-          <p className="text-sm text-muted-foreground mb-4">
+        <div className="p-6" style={cardStyle}>
+          <h2 className="text-lg font-semibold mb-2" style={{ color: 'var(--text)' }}>Challenge Player</h2>
+          <p className="text-sm mb-4" style={{ color: 'var(--text-muted)' }}>
             Send a direct challenge to a specific player.
           </p>
-
           <select
             value={selectedFormat}
             onChange={(e) => setSelectedFormat(e.target.value)}
-            className="w-full px-3 py-2 bg-background border rounded-md text-sm text-foreground mb-4"
+            className="w-full px-3 py-2 text-sm mb-4" style={inputStyle}
           >
             {BATTLE_FORMATS.map((fmt) => (
-              <option key={fmt.value} value={fmt.value}>
-                {fmt.label}
-              </option>
+              <option key={fmt.value} value={fmt.value}>{fmt.label}</option>
             ))}
           </select>
-
           <div className="flex gap-2">
             <input
-              type="text"
-              placeholder="Player ID"
-              value={challengeTarget}
+              type="text" placeholder="Player ID" value={challengeTarget}
               onChange={(e) => setChallengeTarget(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleChallenge()}
-              className="flex-1 px-3 py-2 bg-background border rounded-md text-sm text-foreground placeholder:text-muted-foreground"
+              className="flex-1 px-3 py-2 text-sm" style={inputStyle}
             />
             <button
-              onClick={handleChallenge}
-              disabled={!challengeTarget.trim() || !canSearch}
-              className="px-4 py-2 bg-secondary text-secondary-foreground rounded-md text-sm font-medium hover:bg-secondary/80 transition-colors disabled:opacity-50"
+              onClick={handleChallenge} disabled={!challengeTarget.trim() || !canSearch}
+              className="px-4 py-2 rounded-md text-sm font-medium disabled:opacity-50"
+              style={{ background: 'var(--surface-3)', color: 'var(--text)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}
             >
               Challenge
             </button>
@@ -223,14 +184,14 @@ export default function PvPLobbyPage() {
         </div>
       </div>
 
-      {/* Your Player ID */}
       {playerId && (
-        <div className="bg-card border rounded-lg p-4">
-          <h2 className="text-sm font-semibold mb-2">Your Player ID</h2>
-          <p className="text-xs text-muted-foreground font-mono bg-muted px-2 py-1 rounded inline-block">
+        <div className="p-4" style={cardStyle}>
+          <h2 className="text-sm font-semibold mb-2" style={{ color: 'var(--text)' }}>Your Player ID</h2>
+          <p className="text-xs font-mono px-2 py-1 rounded inline-block"
+            style={{ color: 'var(--text-muted)', background: 'var(--surface-2)' }}>
             {playerId}
           </p>
-          <p className="text-xs text-muted-foreground mt-2">
+          <p className="text-xs mt-2" style={{ color: 'var(--text-muted)' }}>
             Share this ID with friends so they can challenge you directly.
           </p>
         </div>
@@ -239,40 +200,24 @@ export default function PvPLobbyPage() {
   );
 }
 
-function StatusBadge({
-  status,
-  playerId,
-}: {
-  status: string;
-  playerId: string | null;
-}) {
-  const color =
-    status === 'inBattle'
-      ? 'bg-green-500/20 text-green-600 border-green-500/30'
-      : status === 'searching'
-        ? 'bg-yellow-500/20 text-yellow-600 border-yellow-500/30'
-        : status === 'connected'
-          ? 'bg-blue-500/20 text-blue-600 border-blue-500/30'
-          : status === 'error'
-            ? 'bg-red-500/20 text-red-600 border-red-500/30'
-            : 'bg-gray-500/20 text-gray-600 border-gray-500/30';
-
-  const label =
-    status === 'inBattle'
-      ? 'In Battle'
-      : status === 'searching'
-        ? 'Searching...'
-        : status === 'connected'
-          ? 'Connected'
-          : status === 'connecting'
-            ? 'Connecting...'
-            : status === 'error'
-              ? 'Error'
-              : 'Disconnected';
+function StatusBadge({ status, playerId }: { status: string; playerId: string | null }) {
+  const palettes: Record<string, { bg: string; fg: string; bd: string }> = {
+    inBattle: { bg: 'color-mix(in srgb, var(--emerald-500) 20%, transparent)', fg: 'var(--emerald-400)', bd: 'color-mix(in srgb, var(--emerald-500) 30%, transparent)' },
+    searching: { bg: 'color-mix(in srgb, var(--amber-500) 20%, transparent)', fg: 'var(--amber-400)', bd: 'color-mix(in srgb, var(--amber-500) 30%, transparent)' },
+    connected: { bg: 'color-mix(in srgb, var(--accent) 20%, transparent)', fg: 'var(--accent-bright)', bd: 'color-mix(in srgb, var(--accent) 30%, transparent)' },
+    error: { bg: 'color-mix(in srgb, var(--rose-500) 20%, transparent)', fg: 'var(--rose-400)', bd: 'color-mix(in srgb, var(--rose-500) 30%, transparent)' },
+    default: { bg: 'color-mix(in srgb, #888 20%, transparent)', fg: '#888', bd: 'color-mix(in srgb, #888 30%, transparent)' },
+  };
+  const p = palettes[status] || palettes.default;
+  const labels: Record<string, string> = {
+    inBattle: 'In Battle', searching: 'Searching...', connected: 'Connected',
+    connecting: 'Connecting...', error: 'Error',
+  };
 
   return (
-    <span className={`px-3 py-1.5 rounded-full text-xs font-medium border ${color}`}>
-      {label}
+    <span className="px-3 py-1.5 rounded-full text-xs font-medium border"
+      style={{ background: p.bg, color: p.fg, borderColor: p.bd }}>
+      {labels[status] || 'Disconnected'}
     </span>
   );
 }
