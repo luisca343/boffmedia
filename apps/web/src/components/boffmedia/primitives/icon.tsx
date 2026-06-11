@@ -73,6 +73,8 @@ const ICON_PATHS: Record<string, string> = {
   wifioff: "M5 12.5a10 10 0 0 1 14 0 M8.5 16a5 5 0 0 1 7 0 M12 19.5h.01 M2 2l20 20",
   lock: "M8 11V7a4 4 0 0 1 8 0v4 M6 11h12a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1Z",
   inbox: "M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3 M12 2v10 M8 8l4 4 4-4",
+  fullscreen: "M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3",
+  "exit-fullscreen": "M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3",
 }
 
 export interface IconProps extends SVGProps<SVGSVGElement> {

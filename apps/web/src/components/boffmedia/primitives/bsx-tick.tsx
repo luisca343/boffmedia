@@ -22,7 +22,7 @@ export function BSXTick({ ev }: BSXTickProps) {
   if (ev.turn != null) {
     return (
       <div
-        className="flex items-center gap-[.55rem] pt-[.45rem] pb-[.15rem] font-mono font-bold text-t-3xs tracking-[.14em]"
+        className="relative z-[999] flex items-center gap-[.55rem] pt-[.45rem] pb-[.15rem] font-mono font-bold text-t-3xs tracking-[.14em]"
         style={{ color: "var(--accent-bright)", background: "none" }}
       >
         <span>T{ev.turn}</span>
@@ -34,7 +34,7 @@ export function BSXTick({ ev }: BSXTickProps) {
   if (ev.kind === "sys") {
     return (
       <div
-        className="relative pl-[.65rem] pr-[.5rem] py-[.3rem] mb-[.15rem] rounded-[var(--radius)] text-t-xs leading-[1.45] italic"
+        className="relative z-[999] pl-[.65rem] pr-[.5rem] py-[.3rem] mb-[.15rem] rounded-[var(--radius)] text-t-xs leading-[1.45] italic"
         style={{ color: "var(--text-dim)", background: "none" }}
       >
         <span className="absolute left-0 top-[4px] bottom-[4px] w-[2.5px] rounded-[var(--radius-pill)]" style={{ background: "var(--border-strong)" }} />
@@ -52,7 +52,7 @@ export function BSXTick({ ev }: BSXTickProps) {
 
   return (
     <div
-      className={`relative pl-[.65rem] pr-[.5rem] py-[.3rem] mb-[.15rem] rounded-[var(--radius)] text-t-xs leading-[1.45] ${isKO ? "font-bold" : ""}`}
+      className={`relative z-[999] pl-[.65rem] pr-[.5rem] py-[.3rem] mb-[.15rem] rounded-[var(--radius)] text-t-xs leading-[1.45] ${isKO ? "font-bold" : ""}`}
       style={{
         "--_c": c,
         color: isKO ? "var(--text)" : "var(--text-muted)",

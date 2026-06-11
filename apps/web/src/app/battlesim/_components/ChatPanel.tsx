@@ -70,7 +70,7 @@ export function ChatPanel({
           <p className="text-t-xs text-center py-4" style={{ color: 'var(--text-dim)' }}>{emptyText ?? t('chat.empty')}</p>
         )}
         {messages.map((msg, i) => (
-          <div key={i} className="text-t-xs break-words" style={{ color: 'var(--text-muted)' }}>
+          <div key={i} className="text-t-xs break-words relative z-[999]" style={{ color: 'var(--text-muted)' }}>
             {msg.timestamp != null && (
               <span className="font-mono text-t-4xs mr-1 tabular-nums" style={{ color: 'var(--text-dim)' }}>
                 {formatTime(msg.timestamp)}

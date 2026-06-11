@@ -43,6 +43,8 @@ export const BattleCanvas = memo(forwardRef(({
     username,
     choicePanel,
     aimedFoe = false,
+    canvasWidth: canvasWidthProp,
+    fullscreen = false,
 }: {
     battle: Battle,
     pov: 0 | 1 | any,
@@ -61,9 +63,12 @@ export const BattleCanvas = memo(forwardRef(({
     username?: string | null,
     choicePanel?: ReactNode,
     aimedFoe?: boolean,
+    canvasWidth?: number,
+    fullscreen?: boolean,
 }, ref: React.Ref<BattleCanvasRefProps>) => {
     const pokemonRefs = useRef<{ [key: string]: PokemonRefType }>({});
-    const [, canvasWidth] = useViewportWidth();
+    const [, defaultCanvasWidth] = useViewportWidth();
+    const canvasWidth = canvasWidthProp ?? defaultCanvasWidth;
 
     const gameRefCallback = useCallback((node: HTMLElement | null) => {
         if (node && initScene) {
@@ -156,7 +161,7 @@ export const BattleCanvas = memo(forwardRef(({
                     <FieldConditions battle={battle} pov={pov === 1 ? 1 : 0} />
                     </div>
                 <div className="m-1 w-2/3 flex flex-row-reverse items-start gap-1">
-                    <PokemonTeam side={p2}/>
+                    {!fullscreen && <PokemonTeam side={p2}/>}
                     {positionsP2.map((position, index) => {
                         const mon = toBSXMon(pokemon[position]);
                         return mon && <div key={position} className="flex-1 max-w-[260px] shrink min-w-0"><BSXPlate mon={mon} foe slotTag="2" aimed={aimedFoe && !mon.fnt} /></div>;
@@ -167,7 +172,7 @@ export const BattleCanvas = memo(forwardRef(({
                 
             <div className="h-[20%] md:h-[18%] lg:h-[15%]  w-full absolute bottom-0 flex">
                 <div className="m-1 w-2/3 flex flex-row items-start gap-1">
-                    <PokemonTeam side={p1}/>
+                    {!fullscreen && <PokemonTeam side={p1}/>}
                     {positionsP1.map((position, index) => {
                         const mon = toBSXMon(pokemon[position]);
                         return mon && <div key={position} className="flex-1 max-w-[260px] shrink min-w-0"><BSXPlate mon={mon} active slotTag="1" /></div>;

@@ -18,16 +18,20 @@ export function SwitchPanel({ bench, onSwitch, label = 'Switch', hotkeyOffset = 
       <div className="text-xs font-medium uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>
         {label}
       </div>
-      <div className="flex flex-wrap gap-2">
-        {bench.map((mon, i) => (
-          <BSXBenchChip
-            key={mon.id ?? i}
-            mon={mon}
-            hotkey={String(i + 1 + hotkeyOffset)}
-            disabled={mon.fnt}
-            onClick={mon.fnt ? undefined : () => onSwitch(i + 1)}
-          />
-        ))}
+      <div className="grid grid-cols-3 gap-2">
+        {bench.map((mon, i) => {
+          const hotkeyNum = i + 1 + hotkeyOffset;
+          const isLast = i === bench.length - 1;
+          return (
+            <BSXBenchChip
+              key={mon.id ?? i}
+              mon={mon}
+              hotkey={isLast && hotkeyNum > 9 ? '0' : String(hotkeyNum)}
+              disabled={mon.fnt}
+              onClick={mon.fnt ? undefined : () => onSwitch(i + 1)}
+            />
+          );
+        })}
       </div>
     </div>
   );

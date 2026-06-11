@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 
 import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { BoffActionBar, BSXRing } from '@/components/boffmedia/primitives';
+import { BoffActionBar, BSXRing, Icon } from '@/components/boffmedia/primitives';
 
 const MODE_META: Record<string, { label: string; color: string }> = {
   ai: { label: 'VS AI', color: 'var(--cyan-400)' },
@@ -30,6 +30,8 @@ interface BattleHeaderProps {
   onForfeit?: () => void;
   /** Extra header content (e.g. session tabs) rendered in the start slot. */
   extra?: ReactNode;
+  isFullscreen?: boolean;
+  onToggleFullscreen?: () => void;
 }
 
 export function BattleHeader({
@@ -47,6 +49,8 @@ export function BattleHeader({
   showForfeit,
   onForfeit,
   extra,
+  isFullscreen,
+  onToggleFullscreen,
 }: BattleHeaderProps) {
   const t = useTranslations('battlesim');
   const meta = MODE_META[mode];
@@ -108,6 +112,20 @@ export function BattleHeader({
           )}
           {timerP1 != null && <BSXRing sec={timerP1} max={timerMax} size={36} />}
           {timerP2 != null && <BSXRing sec={timerP2} max={timerMax} size={36} />}
+          {onToggleFullscreen && (
+            <button
+              onClick={onToggleFullscreen}
+              className="bsx-focus p-2 rounded-[var(--radius-sm)] transition-colors duration-[var(--dur-fast)]"
+              style={{
+                background: 'var(--surface-2)',
+                color: 'var(--text-muted)',
+                border: '1px solid var(--border)',
+              }}
+              title={isFullscreen ? t('header.exitFullscreen') : t('header.fullscreen')}
+            >
+              <Icon name={isFullscreen ? 'exit-fullscreen' : 'fullscreen'} size={16} />
+            </button>
+          )}
           {showForfeit && onForfeit && (
             <button
               onClick={onForfeit}
