@@ -33,7 +33,7 @@ export function BSHpMeter({ mon, compact }: BSHpMeterProps) {
       style={{ padding: ".6rem .75rem", background: "color-mix(in srgb, var(--surface) 86%, transparent)" }}
     >
       <div className="flex items-baseline justify-between gap-[.6rem]">
-        <div className="font-display font-extrabold text-[var(--t-base)] tracking-[.01em] flex items-center gap-[.5rem] min-w-0">
+        <div className="font-display font-extrabold text-t-base tracking-[.01em] flex items-center gap-[.5rem] min-w-0">
           {mon.tera && <BSTera type={mon.teraType || "Normal"} size=".85em" />}
           <span className="overflow-hidden text-ellipsis whitespace-nowrap">{mon.name}</span>
           <span className="font-mono text-[.66rem] text-[var(--text-dim)] tracking-[.06em] shrink-0">Nv50</span>
