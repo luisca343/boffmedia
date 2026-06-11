@@ -76,6 +76,15 @@ export function useBattleHotkeys({
           switches[idx].onClick();
         }
       }
+
+      // Key 0 → last switch slot (e.g. 6th pokemon when moves occupy 1-4)
+      if (key === '0' && switches.length > 0) {
+        const last = switches[switches.length - 1];
+        if (!last.disabled) {
+          e.preventDefault();
+          last.onClick();
+        }
+      }
     }
 
     window.addEventListener('keydown', handleKeyDown);

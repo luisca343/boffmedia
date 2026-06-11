@@ -221,6 +221,23 @@ img { display: block; max-width: 100%; }
   outline: 2px solid var(--accent-bright);
   outline-offset: 2px;
 }
+
+/* Fullscreen fallback (CSS-only when native API is unavailable) */
+.bsx-fullscreen-fallback {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 9999 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  overflow-y: auto !important;
+}
+
+/* Native fullscreen: ensure the layout fills the screen */
+:fullscreen .bsx-fullscreen-layout {
+  width: 100vw;
+  height: 100vh;
+  overflow-y: auto;
+}
 .reveal.in { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; transition: none; }

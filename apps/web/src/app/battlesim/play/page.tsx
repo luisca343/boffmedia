@@ -15,6 +15,7 @@ import { BattleConnectionState } from '../_components/BattleConnectionState';
 import { BattleStage } from '../_components/BattleStage';
 import { BattleActionDock } from '../_components/BattleActionDock';
 import { BattleLogPanel } from '../_components/BattleLogPanel';
+import { useFullscreen } from '../_hooks/useFullscreen';
 
 const BATTLE_FORMATS = [
   { value: 'gen9randombattle', label: 'Gen 9 Random Battle' },
@@ -41,6 +42,7 @@ export default function PlayPage() {
   const [battleStarted, setBattleStarted] = useState(false);
   const [selectedFormat, setSelectedFormat] = useState<string>('gen9randombattle');
   const [, canvasWidth] = useViewportWidth();
+  const { ref: fullscreenRef, isFullscreen, toggle: toggleFullscreen } = useFullscreen<HTMLDivElement>();
 
   const session = activeSession;
   const state = session?.getState();
@@ -149,6 +151,8 @@ export default function PlayPage() {
         timerP2={timersActive ? bsx.bsxTimerP2 : undefined}
         showForfeit={state.status === 'active'}
         onForfeit={() => forfeit(state.roomId)}
+        isFullscreen={isFullscreen}
+        onToggleFullscreen={toggleFullscreen}
       />
     </>
   );
@@ -184,8 +188,8 @@ export default function PlayPage() {
   ) : null;
 
   return (
-    <GameStageLayout header={header} rail={rail} dock={dock} footer={postBattle}>
-      <BattleStage bsx={bsx}>
+    <GameStageLayout ref={fullscreenRef} header={header} rail={rail} dock={dock} footer={postBattle} fullscreen={isFullscreen}>
+      <BattleStage bsx={bsx} fullscreen={isFullscreen}>
         <BattleCanvas
           battle={state.battle}
           pov={0}
@@ -201,6 +205,8 @@ export default function PlayPage() {
           liveStatus={state.status}
           onPlayAgain={handlePlayAgain}
           battleComplete={state.battleComplete}
+          canvasWidth={isFullscreen ? window.innerWidth : undefined}
+          fullscreen={isFullscreen}
         />
       </BattleStage>
     </GameStageLayout>
