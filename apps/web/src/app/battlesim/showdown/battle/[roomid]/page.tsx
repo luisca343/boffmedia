@@ -1,22 +1,20 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useState, useRef, useEffect, useCallback, use } from 'react';
 import Link from 'next/link';
 import { useShowdownBattle, getGlobalUsername } from '../../../_hooks/useShowdownBattle';
 import { BattleCanvas } from '../../../_components/BattleCanvas';
-import { BattleLayout } from '../../../_components/BattleLayout';
-import { sanitizeHtml } from '../../../_utils/sanitizeHtml';
+import { GameStageLayout } from '@/components/boffmedia/layouts/GameStageLayout';
 import useViewportWidth from '@/services/useViewPortWidth';
 import { ASPECT_RATIO } from '../../../_utils/viewUtils';
 import { useBSXLayout } from '../../../_hooks/useBSXLayout';
-import { BSXKey, BSXBenchChip, BSXTick, BSXRing, BSXTeraBtn } from '@/components/boffmedia/primitives';
-import type { BSXKeyMove as BSXKeyMoveT } from '../../../_utils/toBSXMon';
+import { BattleHeader } from '../../../_components/BattleHeader';
+import { BattleConnectionState } from '../../../_components/BattleConnectionState';
 import { useChoiceMechanics } from '../../../_hooks/useChoiceMechanics';
-import { MechanicToggles } from '../../../_components/MechanicToggles';
-import { MovePanel } from '../../../_components/MovePanel';
-import { SwitchPanel } from '../../../_components/SwitchPanel';
-
-const VISIBLE_TICK_LIMIT = 50;
+import { BattleStage } from '../../../_components/BattleStage';
+import { BattleActionDock } from '../../../_components/BattleActionDock';
+import { LogChatRail } from '../../../_components/LogChatRail';
 
 export default function ShowdownBattlePage({
   params,
@@ -25,6 +23,7 @@ export default function ShowdownBattlePage({
 }) {
   const { roomid } = use(params);
   const decodedRoomId = decodeURIComponent(roomid);
+  const t = useTranslations('battlesim');
 
   const {
     status,
@@ -35,26 +34,24 @@ export default function ShowdownBattlePage({
     error,
     reconnectInfo,
     sendChoice,
+    cancelChoice,
     forfeit,
     sendChat,
     initScene,
     saveShowdownReplay,
   } = useShowdownBattle(decodedRoomId, { autoCreateSession: true });
 
-  const [showAllLogs, setShowAllLogs] = useState(false);
-  const [chatInput, setChatInput] = useState('');
   const [savedReplayId, setSavedReplayId] = useState<number | null>(null);
   const [savingReplay, setSavingReplay] = useState(false);
   const { activeMechanic, setActiveMechanic, makeChoiceWithMechanic: sendChoiceWithMechanic } = useChoiceMechanics(
     useCallback((choice: string) => sendChoice(choice), [sendChoice])
   );
   const [, canvasWidth] = useViewportWidth();
-  const logRef = useRef<HTMLDivElement>(null);
-  const chatRef = useRef<HTMLDivElement>(null);
   const [battleStarted, setBattleStarted] = useState(false);
 
   const state = session?.getState();
   const bsx = useBSXLayout(state ?? null);
+  const [aimingFoe, setAimingFoe] = useState(false);
 
   const myName = username?.trim() || getGlobalUsername()?.trim();
   const p1Name = state?.battle?.p1?.name?.trim();
@@ -81,24 +78,6 @@ export default function ShowdownBattlePage({
     }
   }, [p1Name, p2Name, session, initScene, pov]);
 
-  useEffect(() => {
-    if (logRef.current) {
-      logRef.current.scrollTop = logRef.current.scrollHeight;
-    }
-  }, [state?.htmlLog]);
-
-  useEffect(() => {
-    if (chatRef.current) {
-      chatRef.current.scrollTop = chatRef.current.scrollHeight;
-    }
-  }, [chatMessages]);
-
-  const handleSendChat = () => {
-    if (!chatInput.trim()) return;
-    sendChat(chatInput);
-    setChatInput('');
-  };
-
   const handleForfeit = () => {
     if (confirm('Are you sure you want to forfeit?')) {
       forfeit();
@@ -116,216 +95,126 @@ export default function ShowdownBattlePage({
   }, [state?.battleComplete, savedReplayId, savingReplay, saveShowdownReplay]);
 
   if (!session || !state || status === 'connecting' || status === 'authenticating' || status === 'joining') {
+    const message =
+      status === 'connecting' ? t('connection.connectingShowdown')
+      : status === 'authenticating' ? t('connection.authenticating')
+      : status === 'joining' ? t('connection.joiningBattle')
+      : t('connection.waitingBattle');
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 px-4">
-        <div className="w-8 h-8 border-2 rounded-full animate-spin"
-          style={{ borderColor: 'var(--border)', borderTopColor: 'var(--accent-bright)' }}
-        />
-        <p style={{ color: 'var(--text-muted)' }}>
-          {status === 'connecting' && 'Connecting to Showdown server...'}
-          {status === 'authenticating' && 'Authenticating...'}
-          {status === 'joining' && 'Joining battle...'}
-          {(status === 'idle' || status === 'authenticated') && 'Waiting for battle to start...'}
-        </p>
-        {reconnectInfo && (
-          <p className="text-xs" style={{ color: 'var(--amber-400)' }}>
-            Reconnecting (attempt {reconnectInfo.attempt}/{reconnectInfo.maxAttempts})...
-          </p>
-        )}
-        <Link href="/battlesim/showdown" className="text-sm underline"
-          style={{ color: 'var(--text-muted)' }}>
-          Back to Lobby
-        </Link>
-      </div>
+      <BattleConnectionState
+        kind={reconnectInfo ? 'reconnecting' : 'connecting'}
+        message={message}
+        detail={reconnectInfo ? t('connection.reconnecting', { attempt: reconnectInfo.attempt, max: reconnectInfo.maxAttempts }) : undefined}
+        backHref="/battlesim/showdown"
+      />
     );
   }
 
   if (status === 'error' || state.status === 'error') {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 px-4">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold mb-2" style={{ color: 'var(--rose-500)' }}>Error</h2>
-          <p style={{ color: 'var(--text-muted)' }}>{error || state.error}</p>
-        </div>
-        <div className="flex gap-3">
-          <Link href="/battlesim/showdown"
-            className="px-6 py-2 rounded-md font-medium transition-colors"
-            style={{ background: 'var(--surface-2)', color: 'var(--text)', border: '1px solid var(--border)' }}>
-            Back to Lobby
-          </Link>
-        </div>
-      </div>
+      <BattleConnectionState
+        kind="error"
+        message={error || state.error || t('connection.unknownError')}
+        backHref="/battlesim/showdown"
+      />
     );
   }
 
   const isMyTurn = state.isWaitingForChoice;
-  const trapMsg = state.currentRequest?.active?.[0]?.trapped ? ' (trapped)' : '';
+  const trapMsg = state.currentRequest?.active?.[0]?.trapped ? t('dock.trapped') : '';
+  // Spectator: both player names known and neither matches the logged-in user.
+  const isSpectator = !!p1Name && !!p2Name && myName !== p1Name && myName !== p2Name;
 
-  const choicePanel = isMyTurn && bsx.requestType === 'move' ? (
-    <div className="flex flex-col gap-3">
-      <MovePanel moves={bsx.bsxMoves as BSXKeyMoveT[]} foe={bsx.bsxFoe ? { types: bsx.bsxFoe.types, tera: bsx.bsxFoe.tera, teraType: bsx.bsxFoe.teraType } : undefined} onChooseMove={(i) => sendChoiceWithMechanic(`move ${i}`)} />
-      <MechanicToggles bsx={bsx} activeMechanic={activeMechanic} setActiveMechanic={setActiveMechanic} htmlLog={state.htmlLog} />
-    </div>
-  ) : null;
-
+  const timersActive = !!state.timerState && state.status === 'active';
   const header = (
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-3">
-        <Link href="/battlesim/showdown" className="text-sm" style={{ color: 'var(--text-muted)' }}>
-          ← Lobby
-        </Link>
-        <h1 className="text-lg font-semibold" style={{ color: 'var(--text)' }}>Showdown Battle</h1>
-        <span className="text-xs px-2 py-1 rounded font-mono"
-          style={{ color: 'var(--text-muted)', background: 'var(--surface-2)' }}>
-          {decodedRoomId}
-        </span>
-        {username && (
-          <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-            Playing as <strong>{username}</strong>
-          </span>
-        )}
-        {spectatorCount > 0 && (
-          <span className="text-xs px-2 py-1 rounded"
-            style={{ color: 'var(--text-muted)', background: 'var(--surface-2)' }}>
-            {spectatorCount} spectator{spectatorCount !== 1 ? 's' : ''}
-          </span>
-        )}
-      </div>
-      <div className="flex items-center gap-2">
-        {state.status === 'active' && (
-          <button
-            onClick={handleForfeit}
-            className="px-4 py-1.5 rounded-md text-sm font-medium transition-colors"
-            style={{ background: 'var(--surface-3)', color: 'var(--rose-400)', border: '1px solid color-mix(in srgb, var(--rose-500) 40%, transparent)' }}
-          >
-            Forfeit
-          </button>
-        )}
-      </div>
-    </div>
+    <BattleHeader
+      mode="showdown"
+      backHref="/battlesim/showdown"
+      roomId={decodedRoomId}
+      username={username || undefined}
+      opponentName={pov === 0 ? p2Name : p1Name}
+      spectatorCount={spectatorCount}
+      timerP1={timersActive ? Math.ceil(state.timerState!.p1.turnRemaining / 1000) : undefined}
+      timerP2={timersActive ? Math.ceil(state.timerState!.p2.turnRemaining / 1000) : undefined}
+      showForfeit={state.status === 'active' && !isSpectator}
+      onForfeit={handleForfeit}
+    />
   );
 
   const rightPanel = (
-    <div className="flex flex-col gap-3">
-      <div className="flex-1 rounded-lg overflow-hidden" style={{ border: '1px solid var(--border)' }}>
-        <div
-          className="overflow-y-auto"
-          ref={logRef}
-          style={{ height: `${canvasWidth * ASPECT_RATIO}px`, background: 'var(--surface)' }}
-        >
-          {bsx.bsxTicks.length > VISIBLE_TICK_LIMIT && !showAllLogs && (
-            <button
-              onClick={() => setShowAllLogs(true)}
-              className="w-full p-1 mb-1 text-xs font-mono"
-              style={{ color: 'var(--text-muted)', background: 'var(--surface-2)', borderBottom: '1px solid var(--border)' }}
-            >
-              Show all {bsx.bsxTicks.length} events (showing last {VISIBLE_TICK_LIMIT})
-            </button>
-          )}
-          {(showAllLogs ? bsx.bsxTicks : bsx.bsxTicks.slice(-VISIBLE_TICK_LIMIT)).map((ev, i) => (
-            <BSXTick key={i} ev={ev as any} />
-          ))}
-        </div>
-      </div>
-
-      <div className="rounded-lg flex flex-col shrink-0" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-        <div ref={chatRef} className="overflow-y-auto p-2 text-sm space-y-0.5" style={{ maxHeight: '120px' }}>
-          {chatMessages.length === 0 && (
-            <p className="text-xs text-center py-4" style={{ color: 'var(--text-dim)' }}>
-              Battle chat will appear here
-            </p>
-          )}
-          {chatMessages.map((msg, i) => (
-            <div key={i} className="text-xs" style={{ color: 'var(--text-muted)' }}>
-              <span style={{ color: 'var(--accent-bright)', fontWeight: 600 }}>{msg.sender}: </span>
-              <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(msg.message) }} />
-            </div>
-          ))}
-        </div>
-        {state.status === 'active' && (
-          <div className="p-2 flex gap-2" style={{ borderTop: '1px solid var(--border)' }}>
-            <input
-              type="text" placeholder="Say something..." value={chatInput}
-              onChange={(e) => setChatInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSendChat()}
-              className="flex-1 px-2 py-1.5 rounded text-xs"
-              style={{ background: 'var(--surface-2)', border: '1px solid var(--border)', color: 'var(--text)' }}
-            />
-            <button
-              onClick={handleSendChat} disabled={!chatInput.trim()}
-              className="px-3 py-1.5 rounded text-xs font-medium disabled:opacity-50"
-              style={{ background: 'var(--surface-3)', color: 'var(--text)', border: '1px solid var(--border)' }}
-            >
-              Send
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
+    <LogChatRail
+      ticks={bsx.bsxTicks}
+      maxHeight={canvasWidth * ASPECT_RATIO * 0.82}
+      chat={{
+        messages: chatMessages,
+        onSend: (msg) => sendChat(msg),
+        disabled: state.status !== 'active',
+      }}
+    />
   );
 
-  const switchBench = isMyTurn && bsx.requestType === 'move' && bsx.bsxBench.length > 0 ? (
-    <SwitchPanel bench={bsx.bsxBench} onSwitch={(i) => sendChoice(`switch ${i}`)} label={`Switch${trapMsg}`} />
-  ) : null;
-
-  const forcedSwitch = isMyTurn && bsx.requestType === 'switch' ? (
-    <SwitchPanel bench={bsx.bsxBench} onSwitch={(i) => sendChoice(`switch ${i}`)} label="Forced Switch" />
-  ) : null;
+  const dock = isSpectator ? null : (
+    <BattleActionDock
+      bsx={bsx}
+      status={state.status}
+      isWaiting={isMyTurn}
+      htmlLog={state.htmlLog}
+      onChoice={(choice) => sendChoice(choice)}
+      onUndo={cancelChoice}
+      onAimMove={(i) => setAimingFoe(i != null)}
+      onMoveChoice={(i) => sendChoiceWithMechanic(`move ${i}`)}
+      activeMechanic={activeMechanic}
+      setActiveMechanic={setActiveMechanic}
+      switchLabel={`${t('dock.switch')}${trapMsg}`}
+    />
+  );
 
   const postBattle = state.status === 'finished' ? (
     <div className="flex flex-col items-center gap-3 py-2">
       <div className="text-center">
         <h2 className="text-xl font-semibold" style={{ color: 'var(--text)' }}>
-          {state.winner === username ? 'You won!' : state.winner === 'tie' ? "It's a tie!" : `${state.winner} won!`}
+          {state.winner === username ? t('end.youWon') : state.winner === 'tie' ? t('end.itsATie') : t('end.playerWon', { name: state.winner ?? '' })}
         </h2>
       </div>
-      {savingReplay && <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Saving replay...</p>}
+      {savingReplay && <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{t('end.savingReplay')}</p>}
       {savedReplayId && (
         <div className="flex flex-col items-center gap-2">
-          <p className="text-sm" style={{ color: 'var(--emerald-400)' }}>Replay saved!</p>
+          <p className="text-sm" style={{ color: 'var(--emerald-400)' }}>{t('end.replaySaved')}</p>
           <Link href={`/battlesim/replay/${savedReplayId}`}
             className="px-6 py-2 rounded-md font-medium transition-colors"
             style={{ background: 'var(--surface-2)', color: 'var(--text)', border: '1px solid var(--border)' }}>
-            Watch Replay
+            {t('end.watchReplay')}
           </Link>
         </div>
       )}
       <Link href="/battlesim/showdown"
         className="px-6 py-2 rounded-md font-medium transition-colors"
         style={{ background: 'var(--accent)', color: 'var(--text)', border: '1px solid var(--border)' }}>
-        Back to Lobby
+        {t('connection.backToLobby')}
       </Link>
     </div>
   ) : null;
 
   return (
-    <BattleLayout
-      header={header}
-      rightPanel={rightPanel}
-      switchBench={switchBench}
-      forcedSwitch={forcedSwitch}
-      postBattle={postBattle}
-      turnText={bsx.turnText}
-      isWaiting={isMyTurn}
-      status={state.status}
-      turn={state.battle.turn}
-    >
-      <BattleCanvas
-        battle={state.battle}
-        pov={pov}
-        messageBar={state.messageBar}
-        showPreviewOverlay={state.battle.turn === 0 && !battleStarted}
-        setBattleStarted={setBattleStarted}
-        setIsPlaying={() => {}}
-        currentAction={0}
-        battleLog={null}
-        initScene={handleInitScene}
-        liveMode={true}
-        liveStatus={state.status}
-        battleComplete={state.battleComplete}
-        username={username}
-        choicePanel={choicePanel}
-      />
-    </BattleLayout>
+    <GameStageLayout header={header} rail={rightPanel} dock={dock} footer={postBattle}>
+      <BattleStage bsx={bsx}>
+        <BattleCanvas
+          battle={state.battle}
+          pov={pov}
+          messageBar={state.messageBar}
+          showPreviewOverlay={state.battle.turn === 0 && !battleStarted}
+          setBattleStarted={setBattleStarted}
+          setIsPlaying={() => {}}
+          currentAction={0}
+          battleLog={null}
+          initScene={handleInitScene}
+          aimedFoe={aimingFoe}
+          liveMode={true}
+          liveStatus={state.status}
+          battleComplete={state.battleComplete}
+          username={username}
+        />
+      </BattleStage>
+    </GameStageLayout>
   );
 }

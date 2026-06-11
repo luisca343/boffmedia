@@ -479,6 +479,12 @@ export function useShowdownBattle(
     triggerUpdate();
   }, [triggerUpdate]);
 
+  const cancelChoice = useCallback(() => {
+    if (!sessionRef.current) return;
+    sessionRef.current.undoChoice();
+    triggerUpdate();
+  }, [triggerUpdate]);
+
   const forfeit = useCallback(() => {
     if (!sessionRef.current) return;
     sessionRef.current.forfeit(socketRef.current!);
@@ -654,6 +660,7 @@ export function useShowdownBattle(
     acceptChallenge,
     rejectChallenge,
     sendChoice,
+    cancelChoice,
     forfeit,
     sendChat,
     leaveRoom,

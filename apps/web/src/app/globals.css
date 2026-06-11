@@ -64,6 +64,10 @@
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 
   /* Modular type scale (tightened, 1.25 ratio anchored at 16) */
+  /* Micro tier — HUD/badge text used by BS/BSX battle primitives */
+  --t-4xs: 0.54rem;
+  --t-3xs: 0.6rem;
+  --t-2xs: 0.7rem;
   --t-xs: 0.75rem;
   --t-sm: 0.875rem;
   --t-base: 1rem;
@@ -82,7 +86,11 @@
 
   /* Motion */
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 0.16s;
   --dur: 0.32s;
+  --dur-slow: 0.6s;
+  --dur-pulse: 1s;   /* attention loops (low timer, aim pulse) */
+  --dur-tick: 1s;    /* must match 1s timer cadence — not aesthetic */
 }
 
 /* ===========================================================================
@@ -127,9 +135,15 @@
    DIRECTION TOKENS — Neon (default)
    =========================================================================== */
 :root {
+  --radius-sm: 5px;
   --radius: 14px;
   --radius-lg: 22px;
   --radius-pill: 9999px;
+  /* BS/BSX battle primitive padding scale */
+  --bsx-pad-sm: 0.45rem 0.55rem;
+  --bsx-pad-md: 0.55rem 0.65rem;
+  --bsx-pad-lg: 0.65rem 0.8rem;
+  --bsx-pad-chip: 0.22rem 0.55rem 0.22rem 0.35rem;
   --card-bg: color-mix(in srgb, var(--surface) 72%, transparent);
   --card-border: 1px solid var(--border);
   --card-shadow: 0 24px 60px -28px var(--shadow-color), inset 0 1px 0 rgba(255,255,255,0.05);
@@ -201,6 +215,12 @@ img { display: block; max-width: 100%; }
 
 /* Reveal-on-scroll */
 .reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.6s var(--ease), transform 0.6s var(--ease); }
+
+/* Shared keyboard-focus ring for BS/BSX battle primitives */
+.bsx-focus:focus-visible {
+  outline: 2px solid var(--accent-bright);
+  outline-offset: 2px;
+}
 .reveal.in { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; transition: none; }

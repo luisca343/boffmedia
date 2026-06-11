@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Game } from '../_components/Game';
 import { LigaService } from '@/services/api/smartrotom/ligaService';
 import { ReplayData } from '../../types';
-import { Loading } from '@/components/smartrotom/Loading';
+import { BoffSpinner } from '@/components/boffmedia/primitives';
 
 export default function ReplayPage({ params }: { params: Promise<{ name: string }> }) {
   const { name } = use(params);
@@ -45,7 +45,7 @@ export default function ReplayPage({ params }: { params: Promise<{ name: string 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]" style={{ background: 'var(--bg)' }}>
-        <Loading />
+        <BoffSpinner size="lg" />
       </div>
     );
   }

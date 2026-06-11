@@ -117,6 +117,7 @@ export default getRequestConfig(async () => {
   // Define paths to import
   const paths = [
     'boffmedia.json',
+    'battlesim.json',
     'nav.json',
     'items.json',
     'tools/games.json',

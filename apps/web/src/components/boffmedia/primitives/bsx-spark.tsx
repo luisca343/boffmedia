@@ -20,7 +20,7 @@ export function BSXSpark({ data, w = 220, h = 44 }: BSXSparkProps) {
         <path d={path} fill="none" stroke="var(--accent-bright)" strokeWidth={2} />
       </svg>
       <span
-        className="font-mono font-bold text-[.9rem] tabular-nums"
+        className="font-mono font-bold text-t-sm tabular-nums"
         style={{ color: last >= 50 ? "var(--emerald-400)" : "var(--rose-400)" }}
       >
         {last}%

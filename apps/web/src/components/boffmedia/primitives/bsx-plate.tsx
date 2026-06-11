@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useRef, useState } from "react"
 import { aniF, hpColor, tyVar } from "./bs-data"
 import { BSTera } from "./bs-tera"
 import { BSTypeRow } from "./bs-type"
@@ -20,34 +21,62 @@ interface BSXPlateProps {
   foe?: boolean
   ghost?: GhostData | null
   active?: boolean
+  /** Targeting highlight (aim pulse) without damage preview data. */
+  aimed?: boolean
 }
 
-export function BSXPlate({ mon, slotTag, foe, ghost, active }: BSXPlateProps) {
+export function BSXPlate({ mon, slotTag, foe, ghost, active, aimed }: BSXPlateProps) {
+  const pct = !mon || mon.fnt ? 0 : mon.hp
+
+  // Brief flash when HP drops (damage feedback) — CSS class only, no Scene coupling.
+  const prevHp = useRef(pct)
+  const [flashing, setFlashing] = useState(false)
+  useEffect(() => {
+    if (pct < prevHp.current) {
+      setFlashing(true)
+      const t = setTimeout(() => setFlashing(false), 600)
+      prevHp.current = pct
+      return () => clearTimeout(t)
+    }
+    prevHp.current = pct
+  }, [pct])
+
   if (!mon) return null
-  const pct = mon.fnt ? 0 : mon.hp
   const gMax = ghost ? Math.min(pct, ghost.max) : 0
   const gMin = ghost ? Math.min(pct, ghost.min) : 0
   const boosts = Object.entries(mon.boosts || {}).filter(([, v]) => v)
   const ty = mon.tera ? (mon.teraType || mon.types[0]) : (mon.types && mon.types[0])
 
   const plateCls = [
-    "w-full max-w-[290px] p-[.65rem_.8rem] rounded-[var(--radius)] border grid items-center relative overflow-hidden transition-[border-color,box-shadow] duration-[var(--dur)] ease-[var(--ease)]",
+    "w-full max-w-[290px] p-[var(--bsx-pad-lg)] rounded-[var(--radius)] border grid items-center relative overflow-hidden transition-[border-color,box-shadow] duration-[var(--dur)] ease-[var(--ease)]",
     "grid-cols-[50px_1fr] gap-[.5rem_.65rem]",
     foe ? "bsx-plate--foe" : "",
     mon.fnt ? "opacity-[.55]" : "",
     active ? "bsx-plate--active" : "",
-    ghost ? "bsx-plate--aimed" : "",
+    ghost || aimed ? "bsx-plate--aimed" : "",
+    flashing ? "bsx-dmg-flash" : "",
   ].filter(Boolean).join(" ")
+
+  const aimGlow = ghost || aimed
+
+  const ariaLabel = [
+    `${foe ? "Rival" : "Aliado"}: ${mon.name}`,
+    mon.fnt ? "debilitado" : `${pct}% PS`,
+    mon.status ? `estado ${mon.status}` : null,
+    mon.tera ? `teracristalizado a ${mon.teraType || mon.types[0]}` : null,
+  ].filter(Boolean).join(", ")
 
   return (
     <div
       className={plateCls}
+      role="group"
+      aria-label={ariaLabel}
       style={{
         "--_ty": tyVar(ty || "Normal"),
         background: "color-mix(in srgb, var(--surface) 88%, transparent)",
-        border: active ? "1px solid var(--accent-bright)" : ghost ? "color-mix(in srgb, var(--amber-400) 55%, transparent)" : "1px solid var(--border)",
-        boxShadow: active ? "0 0 0 1px var(--accent-bright) inset, 0 0 18px -8px var(--accent-bright)" : ghost ? "0 0 0 1px color-mix(in srgb, var(--amber-400) 70%, transparent) inset, 0 0 16px -6px var(--amber-400)" : undefined,
-        animation: ghost ? "bsx-aim-pulse 1.1s ease-in-out infinite" : undefined,
+        border: active ? "1px solid var(--accent-bright)" : aimGlow ? "color-mix(in srgb, var(--amber-400) 55%, transparent)" : "1px solid var(--border)",
+        boxShadow: active ? "0 0 0 1px var(--accent-bright) inset, 0 0 18px -8px var(--accent-bright)" : aimGlow ? "0 0 0 1px color-mix(in srgb, var(--amber-400) 70%, transparent) inset, 0 0 16px -6px var(--amber-400)" : undefined,
+        animation: aimGlow ? "bsx-aim-pulse var(--dur-pulse) ease-in-out infinite" : undefined,
       } as React.CSSProperties}
     >
       {/* type aura */}
@@ -65,13 +94,13 @@ export function BSXPlate({ mon, slotTag, foe, ghost, active }: BSXPlateProps) {
       >
         <img
           src={aniF(mon.id)}
-          alt=""
+          alt={mon.name}
           className="w-[46px] h-[46px] object-contain"
           style={{ imageRendering: "pixelated", filter: mon.fnt ? "grayscale(1) brightness(.7)" : undefined }}
         />
         {mon.fnt && (
           <span
-            className="absolute inset-0 grid place-items-center font-mono font-bold text-[.6rem] tracking-[.08em]"
+            className="absolute inset-0 grid place-items-center font-mono font-bold text-t-3xs tracking-[.08em]"
             style={{ color: "var(--rose-400)", background: "color-mix(in srgb, var(--bg) 55%, transparent)" }}
           >
             KO
@@ -83,7 +112,7 @@ export function BSXPlate({ mon, slotTag, foe, ghost, active }: BSXPlateProps) {
         <div className="flex items-center gap-[.4rem] min-w-0">
           {slotTag && (
             <span
-              className="font-mono font-bold text-[.56rem] w-[15px] h-[15px] inline-grid place-items-center rounded-[4px] shrink-0"
+              className="font-mono font-bold text-t-4xs w-[15px] h-[15px] inline-grid place-items-center rounded-[var(--radius-sm)] shrink-0"
               style={{
                 background: foe ? "color-mix(in srgb, var(--orange-500) 20%, transparent)" : "color-mix(in srgb, var(--accent) 24%, transparent)",
                 color: foe ? "var(--orange-400)" : "var(--accent-bright)",
@@ -94,9 +123,9 @@ export function BSXPlate({ mon, slotTag, foe, ghost, active }: BSXPlateProps) {
             </span>
           )}
           {mon.tera && <BSTera type={mon.teraType || "Normal"} size=".8em" />}
-          <span className="font-display font-extrabold text-[.82rem] min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">{mon.name}</span>
+          <span className="font-display font-extrabold text-t-xs min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">{mon.name}</span>
           <span
-            className="ml-auto font-mono font-bold text-[.66rem] tabular-nums shrink-0"
+            className="ml-auto font-mono font-bold text-t-2xs tabular-nums shrink-0"
             style={{ color: "var(--text-muted)" }}
           >
             {mon.fnt ? "KO" : `${pct}%`}
@@ -112,7 +141,7 @@ export function BSXPlate({ mon, slotTag, foe, ghost, active }: BSXPlateProps) {
               width: `${pct}%`,
               background: `linear-gradient(180deg, color-mix(in srgb, #fff 28%, ${hpColor(pct)}), ${hpColor(pct)})`,
               boxShadow: `0 0 10px -2px ${hpColor(pct)}`,
-              transition: "width .55s var(--ease), background .4s var(--ease)",
+              transition: "width var(--dur-slow) var(--ease), background var(--dur) var(--ease)",
             }}
           />
           {ghost && gMax > gMin && (
@@ -138,12 +167,12 @@ export function BSXPlate({ mon, slotTag, foe, ghost, active }: BSXPlateProps) {
         </div>
 
         {ghost ? (
-          <div className="flex items-center gap-[.35rem] font-mono font-bold text-[.6rem]" style={{ color: "var(--amber-400)" }}>
+          <div className="flex items-center gap-[.35rem] font-mono font-bold text-t-3xs" style={{ color: "var(--amber-400)" }}>
             <Icon name="target" size={11} />
             <span className="tabular-nums tracking-[.03em]">−{ghost.min}–{ghost.max}%</span>
             {ghost.ko && (
               <span
-                className={`font-mono font-bold text-[.54rem] tracking-[.05em] px-[.4em] py-[.16em] rounded-[4px] whitespace-nowrap ${
+                className={`font-mono font-bold text-t-4xs tracking-[.05em] px-[.4em] py-[.16em] rounded-[var(--radius-sm)] whitespace-nowrap ${
                   ghost.ko.cls === "sure" ? "text-white" : ""
                 }`}
                 style={
@@ -164,7 +193,7 @@ export function BSXPlate({ mon, slotTag, foe, ghost, active }: BSXPlateProps) {
         {mon.status && <BSStatusChip status={mon.status} />}
         {mon.protect && (
           <span
-            className="font-mono font-bold text-[.54rem] tracking-[.08em] px-[.4em] py-[.16em] rounded-[4px]"
+            className="font-mono font-bold text-t-4xs tracking-[.08em] px-[.4em] py-[.16em] rounded-[var(--radius-sm)]"
             style={{ color: "var(--cyan-400)", background: "color-mix(in srgb, var(--cyan-500) 16%, transparent)", border: "1px solid color-mix(in srgb, var(--cyan-500) 40%, transparent)" }}
           >
             PROT

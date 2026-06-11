@@ -79,6 +79,45 @@
   50% { box-shadow: 0 0 0 1px color-mix(in srgb, var(--amber-400) 90%, transparent) inset, 0 0 22px -6px var(--amber-400); }
 }
 
+/* BSX Ring — low-time warning pulse (was referenced but undefined) */
+@keyframes bsx-ring-low {
+  0%, 100% { transform: scale(1); filter: none; }
+  50% { transform: scale(1.06); filter: drop-shadow(0 0 6px var(--rose-500)); }
+}
+
+/* Battle action dock — phase enter (move ↔ switch ↔ team) */
+@keyframes bsx-dock-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+.bsx-dock-in { animation: bsx-dock-in var(--dur) var(--ease) both; }
+
+/* HP plate — brief damage flash when HP drops */
+@keyframes bsx-dmg-flash {
+  0% { filter: brightness(1.7) saturate(1.5); }
+  100% { filter: none; }
+}
+.bsx-dmg-flash { animation: bsx-dmg-flash var(--dur-slow) ease-out both; }
+
+/* End-of-battle banner entrance */
+@keyframes bsx-end-in {
+  from { opacity: 0; transform: scale(.92); }
+  to { opacity: 1; transform: none; }
+}
+.bsx-end-in { animation: bsx-end-in var(--dur-slow) var(--ease) both; }
+
+/* Respect user motion preferences for battle UI flourishes */
+@media (prefers-reduced-motion: reduce) {
+  .bsx-dock-in,
+  .bsx-dmg-flash,
+  .bsx-end-in {
+    animation: none !important;
+  }
+  .animate-pulse {
+    animation: none !important;
+  }
+}
+
 /* System states — floating orbs drift */
 @keyframes floatdrift {
   0%   { transform: translate(0, 0) scale(1); }

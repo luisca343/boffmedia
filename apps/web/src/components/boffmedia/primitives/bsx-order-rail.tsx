@@ -8,7 +8,7 @@ import type { BSXMon } from "./bsx-data"
 interface BSXOrderSlot {
   side: string
   idx: number
-  mon?: BSXMon
+  mon?: BSXMon & { est?: boolean }
 }
 
 interface BSXOrderRailProps {
@@ -22,10 +22,10 @@ export function BSXOrderRail({ slots }: BSXOrderRailProps) {
 
   return (
     <div
-      className="flex items-center gap-[.7rem] flex-wrap p-[.45rem_.8rem] rounded-[var(--radius)] border border-[var(--border)]"
+      className="flex items-center gap-[.7rem] flex-wrap p-[var(--bsx-pad-md)] rounded-[var(--radius)] border border-[var(--border)]"
       style={{ background: "color-mix(in srgb, var(--surface) 70%, transparent)" }}
     >
-      <span className="font-mono text-[.58rem] tracking-[.1em] uppercase inline-flex items-center gap-[.35rem] whitespace-nowrap" style={{ color: "var(--accent-bright)" }}>
+      <span className="font-mono text-t-3xs tracking-[.1em] uppercase inline-flex items-center gap-[.35rem] whitespace-nowrap" style={{ color: "var(--accent-bright)" }}>
         <Icon name="trending" size={12} /> Orden previsto
       </span>
 
@@ -33,9 +33,7 @@ export function BSXOrderRail({ slots }: BSXOrderRailProps) {
         {order.map((s, i) => (
           <span
             key={s.side + s.idx}
-            className={`inline-flex items-center gap-[.4rem] p-[.22rem_.55rem_.22rem_.35rem] rounded-[var(--radius-pill)] border text-t-xs font-semibold ${
-              s.side === "foe" ? "" : ""
-            }`}
+            className="inline-flex items-center gap-[.4rem] p-[var(--bsx-pad-chip)] rounded-[var(--radius-pill)] border text-t-xs font-semibold"
             style={{
               borderColor: s.side === "foe"
                 ? "color-mix(in srgb, var(--orange-500) 40%, var(--border))"
@@ -46,19 +44,25 @@ export function BSXOrderRail({ slots }: BSXOrderRailProps) {
             }}
           >
             <b
-              className="font-mono text-[.56rem] w-[14px] h-[14px] rounded-[4px] grid place-items-center"
+              className="font-mono text-t-4xs w-[14px] h-[14px] rounded-[var(--radius-sm)] grid place-items-center"
               style={{ background: "var(--surface-3)", color: "var(--text-muted)" }}
             >
               {i + 1}
             </b>
             <img src={aniF(s.mon!.id)} alt="" className="w-[22px] h-[22px] object-contain" />
             <span className="max-w-[9ch] overflow-hidden text-ellipsis whitespace-nowrap">{s.mon!.name}</span>
-            <span className="font-mono text-[.6rem] tabular-nums" style={{ color: "var(--text-dim)" }}>{s.spe}</span>
+            <span
+              className="font-mono text-t-3xs tabular-nums"
+              style={{ color: "var(--text-dim)" }}
+              title={(s.mon as any)?.est ? "Velocidad estimada" : undefined}
+            >
+              {(s.mon as any)?.est ? `~${s.spe}` : s.spe}
+            </span>
           </span>
         ))}
       </div>
 
-      <span className="font-mono text-[.58rem] tracking-[.1em] uppercase ml-auto inline-flex items-center gap-[.35rem] whitespace-nowrap" style={{ color: "var(--text-dim)" }}>
+      <span className="font-mono text-t-3xs tracking-[.1em] uppercase ml-auto inline-flex items-center gap-[.35rem] whitespace-nowrap" style={{ color: "var(--text-dim)" }}>
         La prioridad puede alterarlo
       </span>
     </div>

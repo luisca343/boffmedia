@@ -33,6 +33,9 @@ import { BoffProgress as Progress, BoffRing as Ring } from "@/components/boffmed
 import { Stat } from "@/components/boffmedia/primitives/stat"
 import { CodeBlock } from "@/components/boffmedia/primitives/code-block"
 import { EmptyState } from "@/components/boffmedia/primitives/empty-state"
+import { BoffSpinner } from "@/components/boffmedia/primitives/spinner"
+import { BoffActionBar } from "@/components/boffmedia/primitives/action-bar"
+import { GamePanel } from "@/components/boffmedia/primitives/game-panel"
 
 // Domain
 import { GameCard } from "@/components/boffmedia/ui/games/game-card"
@@ -42,7 +45,7 @@ import { ToolsTypeBadge } from "@/components/boffmedia/ui/tools/tool-type-badge"
 import { ToolPanel, ToolStatBars, ToolApp, SegTabs, ToolSelect, ToolTable, CopyButton, Picker, HpBar, ResultBadge, StatTile, SplitBar, TrendChart, HeatGrid, TagPills } from "@/components/boffmedia/primitives"
 
 // Battlesim components
-import { BSType, BSTypeRow, BSCat, BSHpMeter, BSStatusChip, BSBoost, BSTera, BSPokeChip, BSMove, BSFieldCond, BSLogEvent, BSChatRow, BSTraySlot, BSMonCard, BSWinProb, BSTracker, TYPES, tyVar, effMult, effLabel, hpColor, aniF, BSXRing, BSXPlate, BSXKey, BSXOrderRail, BSXPlanChip, BSXBenchChip, BSXTeraBtn, BSXTick, BSXSpark, BSXScorePlate, freshMon, calcRange, koLabel } from "@/components/boffmedia/primitives"
+import { BSType, BSTypeRow, BSCat, BSStatusChip, BSBoost, BSTera, BSPokeChip, BSMove, BSLogEvent, BSChatRow, BSMonCard, TYPES, tyVar, effMult, effLabel, hpColor, aniF, BSXRing, BSXPlate, BSXKey, BSXOrderRail, BSXPlanChip, BSXBenchChip, BSXTeraBtn, BSXTick, BSXSpark, BSXScorePlate, freshMon, calcRange, koLabel } from "@/components/boffmedia/primitives"
 import { SystemLoading, SystemError, SystemNotFound, SystemOffline, SystemMaintenance, SystemForbidden, SystemComingSoon, SystemStatesDemoEmpty, SystemStatesDemoSkeleton, SystemStatesDemoToasts } from "@/components/boffmedia/ui/system-states"
 import { PokeSprite } from "@/components/shared/pokemon/PokeSprite"
 import { TeamSprites } from "@/components/shared/pokemon/TeamSprites"
@@ -1080,6 +1083,31 @@ function PrimitivesSection() {
      <Ring value={72} tone="accent" />
      <Ring value={95} tone="emerald" />
     </Row2>
+   </Spec2>
+
+   {/* SPINNER + ACTION BAR + GAME PANEL */}
+   <Spec2
+    title="Spinner · ActionBar · GamePanel"
+    tag="primitives/spinner.tsx · action-bar.tsx · game-panel.tsx"
+    intro="Carga puntual, barra de acciones con tres zonas y panel titulado para superficies de juego."
+    a11y="Spinner con role status y texto sr-only; ActionBar con role toolbar; GamePanel usa section + header semánticos."
+   >
+    <Row2 style={{ alignItems: "center", gap: "1.5rem" }}>
+     <BoffSpinner size="sm" />
+     <BoffSpinner size="md" />
+     <BoffSpinner size="lg" label="Cargando combate…" />
+    </Row2>
+    <div className="flex flex-col gap-4" style={{ marginTop: "0.75rem" }}>
+     <BoffActionBar
+      aria-label="Demo toolbar"
+      start={<Button size="sm">Atrás</Button>}
+      center={<span className="text-t-xs" style={{ color: "var(--text-muted)" }}>Turno 12</span>}
+      end={<Button size="sm" variant="ghost">Rendirse</Button>}
+     />
+     <GamePanel title="Registro" actions={<Button size="sm" variant="ghost">Limpiar</Button>} className="max-w-[420px]">
+      <div className="p-3 text-t-sm" style={{ color: "var(--text-muted)" }}>Contenido del panel…</div>
+     </GamePanel>
+    </div>
    </Spec2>
 
    {/* TABS + SEGMENTED */}

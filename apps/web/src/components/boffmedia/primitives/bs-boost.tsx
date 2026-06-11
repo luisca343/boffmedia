@@ -12,7 +12,7 @@ export function BSBoost({ stat, value }: BSBoostProps) {
   const isUp = value > 0
   return (
     <span
-      className="font-mono font-bold text-[.58rem] tracking-[.04em] px-[.42em] py-[.2em] rounded-[4px] leading-none inline-flex gap-[.2em] border"
+      className="font-mono font-bold text-t-3xs tracking-[.04em] px-[.42em] py-[.2em] rounded-[var(--radius-sm)] leading-none inline-flex gap-[.2em] border"
       style={
         isUp
           ? { color: "var(--emerald-400)", background: "color-mix(in srgb, var(--emerald-500) 16%, transparent)", borderColor: "color-mix(in srgb, var(--emerald-500) 40%, transparent)" }
