@@ -1,7 +1,7 @@
 "use client"
 import { Battle, Pokemon, Side } from "@pkmn/client";
 import { Loading } from "@/components/smartrotom/Loading";
-import { forwardRef, useCallback, useRef } from "react";
+import { forwardRef, useCallback, useRef, memo } from "react";
 import { positionsP1, positionsP2, ASPECT_RATIO, getScaleMultiplier } from "../_utils/viewUtils";
 import { PokemonElement, PokemonRefType } from "./PokemonElement";
 import { Avatar } from "./Avatar";
@@ -26,7 +26,7 @@ export type BattleCanvasRefProps = {
   ) => void;
 };
 
-export const BattleCanvas = forwardRef(({ 
+export const BattleCanvas = memo(forwardRef(({ 
     battle, 
     pov, 
     messageBar, 
@@ -249,6 +249,6 @@ export const BattleCanvas = forwardRef(({
             )}
         </div>
     )
-})
+}))
 
 BattleCanvas.displayName = "BattleCanvas";

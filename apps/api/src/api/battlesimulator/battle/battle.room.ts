@@ -1,7 +1,6 @@
 import { BattleStreams, RandomPlayerAI, Teams } from '@pkmn/sim';
 import { Generations } from '@pkmn/data';
 import { Battle } from '@pkmn/client';
-import { LogFormatter } from '@pkmn/view';
 import { Protocol } from '@pkmn/protocol';
 import { Dex } from '@pkmn/sim';
 import { Logger } from 'nestjs-pino';
@@ -50,20 +49,18 @@ export class BattleRoom {
   readonly mode: BattleRoomMode;
   private streams!: ReturnType<typeof BattleStreams.getPlayerStreams>;
   private battle!: Battle;
-  private formatter!: LogFormatter;
   private ai!: RandomPlayerAI;
   private status: BattleRoomStatus = 'waiting';
   private replayLines: string[] = [];
   private p1Request: Protocol.Request | null = null;
   private p2Request: Protocol.Request | null = null;
   private callbacks: BattleRoomCallbacks;
-  private readPromise: Promise<void> | null = null;
   private aiPromise: Promise<void> | null = null;
   private omniscientPromise: Promise<void> | null = null;
   private gens: Generations;
   private timerConfig: TimerConfig;
   private timerState: TimerState;
-  private turnStartTime: number | null = null;
+  private turnStartTimes: Map<'p1' | 'p2', number> = new Map();
   private timerInterval: ReturnType<typeof setInterval> | null = null;
 
   constructor(
@@ -108,7 +105,6 @@ export class BattleRoom {
     );
 
     this.battle = new Battle(this.gens);
-    this.formatter = new LogFormatter('p1', this.battle);
 
     if (this.mode === 'ai') {
       this.ai = new RandomPlayerAI(this.streams.p2);
@@ -159,6 +155,7 @@ export class BattleRoom {
                 (this.mode === 'pvp' ? 'Player 2' : 'Bot'),
             };
             this.callbacks.onBattleEnd(result);
+            try { this.streams.omniscient.destroy(); } catch {}
             return;
           }
 
@@ -176,6 +173,7 @@ export class BattleRoom {
                 (this.mode === 'pvp' ? 'Player 2' : 'Bot'),
             };
             this.callbacks.onBattleEnd(result);
+            try { this.streams.omniscient.destroy(); } catch {}
             return;
           }
         }
@@ -284,7 +282,7 @@ export class BattleRoom {
     } else {
       this.p2Request = null;
     }
-    this.pauseTurnTimer();
+    this.pauseTurnTimer(side);
 
     try {
       await this.streams[side].write(choice);
@@ -342,37 +340,44 @@ export class BattleRoom {
 
   private startTurnTimer(side: 'p1' | 'p2'): void {
     if (!this.timerConfig.enabled) return;
-    this.stopTimer();
-    this.turnStartTime = Date.now();
+    this.turnStartTimes.set(side, Date.now());
     this.timerState.activeSide = side;
-    this.timerInterval = setInterval(() => {
-      if (!this.turnStartTime) return;
-      const elapsed = Date.now() - this.turnStartTime;
-      const player = this.timerState[side];
-      player.turnRemaining = Math.max(0, this.timerConfig.turnMs - elapsed);
-      player.totalRemaining = Math.max(0, player.totalRemaining - 1000);
-
-      this.callbacks.onTimerUpdate?.(this.timerState);
-
-      if (player.turnRemaining <= 0 || player.totalRemaining <= 0) {
-        this.logger?.log(`Timer expired for ${side}, auto-forfeiting`);
-        this.forfeit(side);
-      }
-    }, 1000);
+    if (!this.timerInterval) {
+      this.timerInterval = setInterval(() => {
+        const now = Date.now();
+        for (const [s, startTime] of this.turnStartTimes.entries()) {
+          const elapsed = now - startTime;
+          const player = this.timerState[s];
+          player.turnRemaining = Math.max(0, this.timerConfig.turnMs - elapsed);
+        }
+        this.callbacks.onTimerUpdate?.(this.timerState);
+        for (const [s, startTime] of this.turnStartTimes.entries()) {
+          const elapsed = now - startTime;
+          const player = this.timerState[s];
+          if (player.turnRemaining <= 0 || player.totalRemaining <= 0) {
+            this.logger?.log(`Timer expired for ${s}, auto-forfeiting`);
+            this.forfeit(s);
+            return;
+          }
+        }
+      }, 1000);
+    }
   }
 
-  private pauseTurnTimer(): void {
-    if (!this.timerConfig.enabled || !this.turnStartTime) return;
-    this.stopTimer();
-    const side = this.timerState.activeSide;
-    if (side) {
-      const elapsed = Date.now() - this.turnStartTime;
+  private pauseTurnTimer(side: 'p1' | 'p2'): void {
+    if (!this.timerConfig.enabled) return;
+    const startTime = this.turnStartTimes.get(side);
+    if (startTime) {
+      const elapsed = Date.now() - startTime;
       const player = this.timerState[side];
       player.turnRemaining = Math.max(0, this.timerConfig.turnMs - elapsed);
       player.totalRemaining = Math.max(0, player.totalRemaining - elapsed);
+      this.turnStartTimes.delete(side);
     }
-    this.turnStartTime = null;
-    this.timerState.activeSide = null;
+    if (this.turnStartTimes.size === 0) {
+      this.stopTimer();
+      this.timerState.activeSide = null;
+    }
   }
 
   private stopTimer(): void {
@@ -380,6 +385,7 @@ export class BattleRoom {
       clearInterval(this.timerInterval);
       this.timerInterval = null;
     }
+    this.turnStartTimes.clear();
   }
 
   private getTeamData(team: any[]): any[] {

@@ -5,15 +5,14 @@ import { Battle } from '@pkmn/client';
 import { Generations } from '@pkmn/data';
 import { Dex } from '@pkmn/sim';
 import { Protocol } from '@pkmn/protocol';
-import { io, Socket } from 'socket.io-client';
+import { Socket } from 'socket.io-client';
 import { create } from 'zustand';
-import { env } from '@/config/env.public';
 import { Scene } from '../_utils/Scene';
 import { useBattleFlow } from './useBattleFlow';
+import { getOrCreateSocket, getSocket, registerListenersOnce, waitForConnect } from '../_utils/battleSocket';
+import type { SocketChannel } from '../_utils/battleSocket';
 
 // Battle store — same pattern as useGameState.tsx
-// Zustand triggers re-renders even when the object reference is the same
-// (React useState bails out on same reference, skipping status bar updates)
 interface LiveBattleStore {
   battle: Battle;
   setBattle: (battle: Battle) => void;
@@ -22,25 +21,6 @@ const useLiveBattleStore = create<LiveBattleStore>((set) => ({
   battle: new Battle(new Generations(Dex as any) as any),
   setBattle: (battle: Battle) => set({ battle }),
 }));
-
-// Use window to store socket — survives React strict mode and module boundaries
-// Guard against SSR where window doesn't exist
-function getGlobalSocket(): Socket | null {
-  if (typeof window === 'undefined') return null;
-  return (window as any).__battlesim_socket ?? null;
-}
-function setGlobalSocket(socket: Socket | null) {
-  if (typeof window === 'undefined') return;
-  (window as any).__battlesim_socket = socket;
-}
-function getEventsRegistered(): boolean {
-  if (typeof window === 'undefined') return false;
-  return (window as any).__battlesim_events_registered ?? false;
-}
-function setEventsRegistered(val: boolean) {
-  if (typeof window === 'undefined') return;
-  (window as any).__battlesim_events_registered = val;
-}
 
 export type LiveBattleStatus = 'idle' | 'connecting' | 'active' | 'finished' | 'error';
 
@@ -59,7 +39,7 @@ export interface LiveBattleState {
 }
 
 export function useLiveBattle() {
-  const socketRef = useRef<Socket | null>(getGlobalSocket());
+  const socketRef = useRef<Socket | null>(getSocket('battle'));
   const roomIdRef = useRef<string | null>(null);
   const battleRef = useRef<Battle>(new Battle(new Generations(Dex as any) as any));
   const { battle, setBattle } = useLiveBattleStore();
@@ -127,95 +107,47 @@ export function useLiveBattle() {
   }, [battle, scene]);
 
   const connect = useCallback(() => {
-    const existing = getGlobalSocket();
-    if (existing?.connected) {
-      socketRef.current = existing;
-      return;
-    }
-    if (existing) {
-      existing.connect();
-      socketRef.current = existing;
-      return;
-    }
-    setStatus('connecting');
-    setError(null);
-    const API_BASE_URL = env.NEXT_PUBLIC_API;
-    // Send a stable clientId so server recognizes us across reconnects
+    const socket = getOrCreateSocket('battle');
+    socketRef.current = socket;
+
     let clientId = localStorage.getItem('battlesim_client_id');
     if (!clientId) {
       clientId = crypto.randomUUID();
       localStorage.setItem('battlesim_client_id', clientId);
     }
-    const socket = io(`${API_BASE_URL}/battle`);
-    setGlobalSocket(socket);
-    socketRef.current = socket;
 
-    if (!getEventsRegistered()) {
-      setEventsRegistered(true);
-
-      socket.on('connect', () => {
-        socket.emit('register', { clientId });
-      });
-
-      socket.on('connected', (data: { playerId: string }) => {
-      });
-
-      socket.on('battleCreated', (data: { roomId: string; format: string }) => {
-        setRoomId(data.roomId);
-        setStatus('active');
-      });
-
-      socket.on('protocol', (data: { roomId: string; line: string }) => {
-        battleFlow.addLine(data.line);
-      });
-
-      socket.on('request', (data: { roomId: string; request: Protocol.Request }) => {
-        setCurrentRequest(data.request);
-        setIsWaitingForChoice(true);
-      });
-
-      socket.on('battleEnd', (data: { roomId: string; winner: string; replay: string; replayId?: number }) => {
-        setWinner(data.winner);
-        setReplay(data.replay);
-        setReplayId(data.replayId ?? null);
-        setStatus('finished');
-      });
-
-      socket.on('timerUpdate', (data: { roomId: string; p1: { turnRemaining: number; totalRemaining: number }; p2: { turnRemaining: number; totalRemaining: number }; activeSide: 'p1' | 'p2' | null }) => {
-        setTimerState({ p1: data.p1, p2: data.p2, activeSide: data.activeSide });
-      });
-
-      socket.on('error', (data: { message: string; roomId?: string }) => {
-        console.error('[LiveBattle] Error:', data.message);
-        setError(data.message);
-      });
-
-      socket.on('disconnect', () => {
-      });
-    }
+    registerListenersOnce('battle', [
+      ['connect', () => { socket.emit('register', { clientId }); }],
+      ['connected', (_data: { playerId: string }) => {}],
+      ['battleCreated', (data: { roomId: string; format: string }) => { setRoomId(data.roomId); setStatus('active'); }],
+      ['protocol', (data: { roomId: string; line: string }) => { battleFlow.addLine(data.line); }],
+      ['request', (data: { roomId: string; request: Protocol.Request }) => { setCurrentRequest(data.request); setIsWaitingForChoice(true); }],
+      ['battleEnd', (data: { roomId: string; winner: string; replay: string; replayId?: number }) => { setWinner(data.winner); setReplay(data.replay); setReplayId(data.replayId ?? null); setStatus('finished'); }],
+      ['timerUpdate', (data: { roomId: string; p1: { turnRemaining: number; totalRemaining: number }; p2: { turnRemaining: number; totalRemaining: number }; activeSide: 'p1' | 'p2' | null }) => { setTimerState({ p1: data.p1, p2: data.p2, activeSide: data.activeSide }); }],
+      ['error', (data: { message: string; roomId?: string }) => { console.error('[LiveBattle] Error:', data.message); setError(data.message); }],
+      ['disconnect', () => {}],
+    ]);
   }, [battleFlow, status]);
 
   const createBattle = useCallback((format?: string) => {
-    // Don't create if we already have a battle
     if (roomIdRef.current) {
       setStatus('active');
       return;
     }
     setTimerState(null);
-    if (!socketRef.current?.connected) {
-      connect();
-      // Wait for connection, then create
-      const checkConnected = setInterval(() => {
-        if (socketRef.current?.connected) {
-          clearInterval(checkConnected);
-          socketRef.current.emit('createBattle', { format: format || 'gen9randombattle' });
-        }
-      }, 100);
-      // Timeout after 5s
-      setTimeout(() => clearInterval(checkConnected), 5000);
+    connect();
+    const socket = socketRef.current;
+    if (!socket) return;
+
+    const emitCreate = () => {
+      socket.emit('createBattle', { format: format || 'gen9randombattle' });
+    };
+
+    if (!socket.connected) {
+      waitForConnect(socket, 5000).then(emitCreate).catch(() => {});
       return;
     }
-    socketRef.current.emit('createBattle', { format: format || 'gen9randombattle' });
+    emitCreate();
   }, [connect]);
 
   const makeChoice = useCallback((choice: string) => {

@@ -57,6 +57,7 @@ export class BattleSession {
   private pendingBuffer: string[] = [];
   private processing = false;
   private waiting = false;
+  private destroyed = false;
   private pendingRequest: Protocol.Request | null = null;
   callbacks: SessionCallbacks;
   private hasWinEvent = false;
@@ -110,12 +111,14 @@ export class BattleSession {
 
   private async flushBuffer(): Promise<void> {
     this.processing = true;
-    while (this.lineBuffer.length > 0 && !this.waiting) {
+    while (this.lineBuffer.length > 0 && !this.waiting && !this.destroyed) {
       const line = this.lineBuffer.shift()!;
       if (!line.trim()) continue;
       await this.processLine(line);
     }
     this.processing = false;
+
+    if (this.destroyed) return;
 
     // All lines processed — safe to show end screen now
     if (this.hasWinEvent) {
@@ -213,6 +216,12 @@ export class BattleSession {
 
   forfeit(socket: any): void {
     socket.emit('forfeit', { roomId: this.roomId });
+  }
+
+  destroy(): void {
+    this.destroyed = true;
+    this.lineBuffer = [];
+    this.pendingBuffer = [];
   }
 
   getState(): BattleSessionState {

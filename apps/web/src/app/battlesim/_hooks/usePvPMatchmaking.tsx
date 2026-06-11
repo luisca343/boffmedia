@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { io, Socket } from 'socket.io-client';
-import { env } from '@/config/env.public';
+import { Socket } from 'socket.io-client';
 import { BattleSession } from '../_utils/BattleSession';
+import { getOrCreateSocket, registerListenersOnce, waitForConnect } from '../_utils/battleSocket';
 
 export type MatchmakingStatus =
   | 'idle'
@@ -19,25 +19,8 @@ export interface PendingChallenge {
   format: string;
 }
 
-function getGlobalSocket(): Socket | null {
-  if (typeof window === 'undefined') return null;
-  return (window as any).__pvp_socket ?? null;
-}
-function setGlobalSocket(socket: Socket | null) {
-  if (typeof window === 'undefined') return;
-  (window as any).__pvp_socket = socket;
-}
-function getEventsRegistered(): boolean {
-  if (typeof window === 'undefined') return false;
-  return (window as any).__pvp_events_registered ?? false;
-}
-function setEventsRegistered(val: boolean) {
-  if (typeof window === 'undefined') return;
-  (window as any).__pvp_events_registered = val;
-}
-
 export function usePvPMatchmaking() {
-  const socketRef = useRef<Socket | null>(getGlobalSocket());
+  const socketRef = useRef<Socket | null>(null);
 
   const [status, setStatus] = useState<MatchmakingStatus>('idle');
   const [error, setError] = useState<string | null>(null);
@@ -54,97 +37,40 @@ export function usePvPMatchmaking() {
   }, []);
 
   const connect = useCallback(() => {
-    const existing = getGlobalSocket();
-    if (existing?.connected) {
-      socketRef.current = existing;
-      setStatus('connected');
-      return;
-    }
-    if (existing) {
-      existing.connect();
-      socketRef.current = existing;
-      return;
-    }
+    const socket = getOrCreateSocket('pvp');
+    socketRef.current = socket;
 
-    setStatus('connecting');
-    const API_BASE_URL = env.NEXT_PUBLIC_API;
     let clientId = localStorage.getItem('battlesim_client_id');
     if (!clientId) {
       clientId = crypto.randomUUID();
       localStorage.setItem('battlesim_client_id', clientId);
     }
 
-    const socket = io(`${API_BASE_URL}/battle`);
-    setGlobalSocket(socket);
-    socketRef.current = socket;
-
-    if (!getEventsRegistered()) {
-      setEventsRegistered(true);
-
-      socket.on('connect', () => {
-        socket.emit('register', { clientId });
-      });
-
-      socket.on('connected', (data: { playerId: string; reconnected?: boolean }) => {
-        setPlayerId(data.playerId);
-        setStatus('connected');
-        setError(null);
-      });
-
-      socket.on('battleCreated', (data: { roomId: string; format: string; mode?: string; side?: 'p1' | 'p2' }) => {
-        if (data.mode === 'pvp' && data.side) {
-          setActiveSide(data.side);
-        } else {
-          setActiveSide('p1');
-        }
-        setActiveRoomId(data.roomId);
-        setStatus('inBattle');
-      });
-
-      socket.on('queueJoined', (data: { format: string; position: number }) => {
-        setQueueFormat(data.format);
-        setStatus('searching');
-        setError(null);
-      });
-
-      socket.on('queueLeft', () => {
-        setQueueFormat(null);
-        setStatus('connected');
-      });
-
-      socket.on('queueStatus', (_data: Record<string, number>) => {});
-
-      socket.on('challengeReceived', (data: { from: string; format: string }) => {
-        setPendingChallenges((prev) => [...prev, { from: data.from, format: data.format }]);
-      });
-
-      socket.on('challengeSent', (_data: { to: string; format: string }) => {});
-
-      socket.on('challengeRejected', (data: { by: string }) => {
-        setError(`Challenge rejected by ${data.by}`);
-        setTimeout(() => setError(null), 3000);
-      });
-
-      socket.on('error', (data: { message: string; roomId?: string }) => {
-        setError(data.message);
-        setTimeout(() => setError(null), 5000);
-      });
-
-      socket.on('disconnect', () => {
-        setStatus('idle');
-      });
-    }
+    registerListenersOnce('pvp', [
+      ['connect', () => { socket.emit('register', { clientId }); }],
+      ['connected', (data: { playerId: string; reconnected?: boolean }) => { setPlayerId(data.playerId); setStatus('connected'); setError(null); }],
+      ['battleCreated', (data: { roomId: string; format: string; mode?: string; side?: 'p1' | 'p2' }) => { if (data.mode === 'pvp' && data.side) { setActiveSide(data.side); } else { setActiveSide('p1'); } setActiveRoomId(data.roomId); setStatus('inBattle'); }],
+      ['queueJoined', (data: { format: string; position: number }) => { setQueueFormat(data.format); setStatus('searching'); setError(null); }],
+      ['queueLeft', () => { setQueueFormat(null); setStatus('connected'); }],
+      ['queueStatus', (_data: Record<string, number>) => {}],
+      ['challengeReceived', (data: { from: string; format: string }) => { setPendingChallenges((prev) => [...prev, { from: data.from, format: data.format }]); }],
+      ['challengeSent', (_data: { to: string; format: string }) => {}],
+      ['challengeRejected', (data: { by: string }) => { setError(`Challenge rejected by ${data.by}`); setTimeout(() => setError(null), 3000); }],
+      ['error', (data: { message: string; roomId?: string }) => { setError(data.message); setTimeout(() => setError(null), 5000); }],
+      ['disconnect', () => { setStatus('idle'); }],
+    ]);
   }, []);
 
   const joinQueue = useCallback((format: string) => {
-    if (!socketRef.current?.connected) {
-      connect();
-      setTimeout(() => {
-        socketRef.current?.emit('joinQueue', { format });
-      }, 500);
+    connect();
+    const socket = socketRef.current;
+    if (!socket) return;
+
+    if (!socket.connected) {
+      waitForConnect(socket, 5000).then(() => { socket.emit('joinQueue', { format }); }).catch(() => {});
       return;
     }
-    socketRef.current.emit('joinQueue', { format });
+    socket.emit('joinQueue', { format });
   }, [connect]);
 
   const leaveQueue = useCallback(() => {

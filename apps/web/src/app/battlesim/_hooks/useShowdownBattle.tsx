@@ -2,10 +2,10 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { Protocol } from '@pkmn/protocol';
-import { io, Socket } from 'socket.io-client';
-import { env } from '@/config/env.public';
+import { Socket } from 'socket.io-client';
 import { ShowdownBaseSession, ChatMessage } from '../_utils/ShowdownBaseSession';
 import { AchievementService } from '@/services/api/smartrotom/achievementsService';
+import { getOrCreateSocket, getSocket, registerListenersOnce } from '../_utils/battleSocket';
 
 export interface ChallengeRequest {
   from: string;
@@ -38,18 +38,6 @@ export interface ShowdownBattleState {
   chatMessages: ChatMessage[];
   error: string | null;
   reconnectInfo: { attempt: number; maxAttempts: number } | null;
-}
-
-const SHOWDOWN_SOCKET_KEY = '__showdown_socket';
-
-function getGlobalSocket(): Socket | null {
-  if (typeof window === 'undefined') return null;
-  return (window as any)[SHOWDOWN_SOCKET_KEY] ?? null;
-}
-
-function setGlobalSocket(socket: Socket | null) {
-  if (typeof window === 'undefined') return;
-  (window as any)[SHOWDOWN_SOCKET_KEY] = socket;
 }
 
 const SHOWDOWN_SESSIONS_KEY = '__showdown_sessions';
@@ -93,7 +81,7 @@ export function useShowdownBattle(
   const onBattleFoundRef = useRef(options?.onBattleFound);
   onBattleFoundRef.current = options?.onBattleFound;
 
-  const socketRef = useRef<Socket | null>(getGlobalSocket());
+  const socketRef = useRef<Socket | null>(getSocket('showdown'));
   const sessionRef = useRef<ShowdownBaseSession | null>(null);
   const challstrRef = useRef<string>('');
   const joinedRoomsRef = useRef<Set<string>>(new Set());
@@ -403,83 +391,20 @@ export function useShowdownBattle(
   }, [roomId, triggerUpdate]);
 
   const connect = useCallback(() => {
-    const existing = getGlobalSocket();
-    if (existing?.connected) {
-      socketRef.current = existing;
-      return;
-    }
-    if (existing) {
-      existing.connect();
-      socketRef.current = existing;
-      return;
-    }
-
-    setStatus('connecting');
-    setError(null);
-
-    const API_BASE_URL = env.NEXT_PUBLIC_API;
-    const socket = io(`${API_BASE_URL}/showdown`);
-    setGlobalSocket(socket);
+    const socket = getOrCreateSocket('showdown');
     socketRef.current = socket;
 
-    socket.on('connected', () => {
-      console.log('[Showdown] Socket.IO connected, emitting connectToShowdown');
-      socket.emit('connectToShowdown');
-    });
-
-    socket.on('showdownConnected', () => {
-      console.log('[Showdown] PS WebSocket connected');
-      // Only set authenticating if not already authenticated
-      if (statusRef.current !== 'authenticated' && statusRef.current !== 'active') {
-        setStatus('authenticating');
-      }
-    });
-
-    socket.on('showdownMessage', (data: string) => {
-      // Skip noisy raw messages (join, leave, chat)
-      const firstLine = data.split('\n')[0];
-      if (!firstLine.startsWith('|J|') && !firstLine.startsWith('|L|') && !firstLine.startsWith('|c:') && !firstLine.startsWith('|c|')) {
-        console.log('[Showdown] Message from PS:', data.substring(0, 100));
-      }
-      handleShowdownMessage(data);
-    });
-
-    socket.on('showdownDisconnected', (data: { code: number; reason?: string }) => {
-      console.log('[Showdown] PS WebSocket disconnected:', data);
-      if (statusRef.current !== 'reconnecting') {
-        setError('Disconnected from Showdown server');
-      }
-    });
-
-    socket.on(
-      'showdownReconnecting',
-      (data: { attempt: number; maxAttempts: number; delayMs: number }) => {
-        setStatus('reconnecting');
-        setReconnectInfo({ attempt: data.attempt, maxAttempts: data.maxAttempts });
-      },
-    );
-
-    socket.on('showdownReconnectFailed', () => {
-      setError('Failed to reconnect to Showdown server');
-      setStatus('error');
-      setReconnectInfo(null);
-    });
-
-    socket.on('loginSuccess', (_cmd: string) => {
-      setUsername(null);
-      setStatus('authenticated');
-    });
-
-    socket.on('loginError', (msg: string) => {
-      setError(msg);
-      setStatus('error');
-    });
-
-    socket.on('disconnect', () => {
-      if (statusRef.current !== 'reconnecting') {
-        setStatus('idle');
-      }
-    });
+    registerListenersOnce('showdown', [
+      ['connected', () => { console.log('[Showdown] Socket.IO connected, emitting connectToShowdown'); socket.emit('connectToShowdown'); }],
+      ['showdownConnected', () => { console.log('[Showdown] PS WebSocket connected'); if (statusRef.current !== 'authenticated' && statusRef.current !== 'active') { setStatus('authenticating'); } }],
+      ['showdownMessage', (data: string) => { const firstLine = data.split('\n')[0]; if (!firstLine.startsWith('|J|') && !firstLine.startsWith('|L|') && !firstLine.startsWith('|c:') && !firstLine.startsWith('|c|')) { console.log('[Showdown] Message from PS:', data.substring(0, 100)); } handleShowdownMessage(data); }],
+      ['showdownDisconnected', (data: { code: number; reason?: string }) => { console.log('[Showdown] PS WebSocket disconnected:', data); if (statusRef.current !== 'reconnecting') { setError('Disconnected from Showdown server'); } }],
+      ['showdownReconnecting', (data: { attempt: number; maxAttempts: number; delayMs: number }) => { setStatus('reconnecting'); setReconnectInfo({ attempt: data.attempt, maxAttempts: data.maxAttempts }); }],
+      ['showdownReconnectFailed', () => { setError('Failed to reconnect to Showdown server'); setStatus('error'); setReconnectInfo(null); }],
+      ['loginSuccess', (_cmd: string) => { setUsername(null); setStatus('authenticated'); }],
+      ['loginError', (msg: string) => { setError(msg); setStatus('error'); }],
+      ['disconnect', () => { if (statusRef.current !== 'reconnecting') { setStatus('idle'); } }],
+    ]);
   }, [handleShowdownMessage, setStatus]);
 
   const login = useCallback((user: string, password: string) => {

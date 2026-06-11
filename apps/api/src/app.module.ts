@@ -29,8 +29,6 @@ import { SocketsModule } from './api/_utils/sockets/sockets.module';
 import { MisionesModule } from '@api/smartrotom/misiones/misiones.module';
 import { SmartrotomController } from '@api/smartrotom/_main/smartrotom.controller';
 import { SmartrotomModule } from '@api/smartrotom/_main/smartrotom.module';
-import { BattleService } from './api/battlesimulator/battle/battle.service';
-import { BattleController } from './api/battlesimulator/battle/battle.controller';
 import { BattleModule } from './api/battlesimulator/battle/battle.module';
 import { SharexModule } from './api/boffmedia/util/sharex/sharex.module';
 import { ArcadeModule } from '@api/smartrotom/arcade/arcade.module';
@@ -44,7 +42,6 @@ import { ResponseModule } from './api/_utils/response/response.module';
 import { LoggerModule } from './api/_utils/logger/logger.module';
 import { ConfigService } from './api/config.service';
 import { AuthModule } from './api/auth/auth.module';
-import { ShowdownGateway } from './api/battlesimulator/showdown.gateway';
 import { DrizzleModule } from './api/_utils/drizzle/drizzle.module';
 import { PokemonDataService } from '@api/smartrotom/pokemon/services/data/pokemon-data.service';
 import { MoveDataService } from '@api/smartrotom/pokemon/services/data/move-data.service';
@@ -100,7 +97,6 @@ import { VgcModule } from '@api/boffmedia/herramientas/pokemon/vgc/vgc.module';
     ChatappModule,
     SocketsModule,
     MisionesModule,
-    SmartrotomModule,
     BattleModule,
     SharexModule,
     ArcadeModule,
@@ -121,7 +117,6 @@ import { VgcModule } from '@api/boffmedia/herramientas/pokemon/vgc/vgc.module';
     MhwildsModule,
     WingullModule,
     SmartRotomMineModule,
-    PokemonModule,
     FicusAIModule,
     AutomationModule,
     PokemonLogModule,
@@ -136,7 +131,6 @@ import { VgcModule } from '@api/boffmedia/herramientas/pokemon/vgc/vgc.module';
     StarbankController,
     ChatappController,
     SmartrotomController,
-    BattleController,
     ArcadeController,
     EventsController,
     UploadController,
@@ -146,13 +140,11 @@ import { VgcModule } from '@api/boffmedia/herramientas/pokemon/vgc/vgc.module';
     AppService,
     ResponseService,
     NetfluisService,
-    BattleService,
     PokemonDataService,
     MoveDataService,
     SpawnDataService,
     PokemonImageService,
     CommandsService,
-    ShowdownGateway,
     PlayerService,
     SmartrotomService,
     PokemonShowdownService,
