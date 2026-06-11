@@ -12,7 +12,7 @@ interface BSTypeProps {
 export function BSType({ type, lg, ghost }: BSTypeProps) {
   const c = tyVar(type)
   const base = "inline-flex items-center gap-[.34em] font-mono font-bold tracking-[.1em] uppercase leading-none whitespace-nowrap"
-  const sz = lg ? "text-[.72rem] px-[.8em] py-[.42em]" : "text-[.62rem] px-[.6em] py-[.28em]"
+  const sz = lg ? "text-[.72rem] px-[.8em] py-[.28em]" : "text-[.62rem] px-[.6em] py-[.18em]"
   return (
     <span
       className={cn(base, sz, "rounded-[var(--radius-pill)] border")}

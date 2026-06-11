@@ -38,7 +38,7 @@ export function BSTraySlot({ mon, active, onClick }: BSTraySlotProps) {
     >
       <BSPokeChip mon={mon} sm />
       <div className="min-w-0 flex-1">
-        <div className="font-bold text-[var(--t-sm)] flex items-center gap-[.4rem]">
+        <div className="font-bold text-t-sm flex items-center gap-[.4rem]">
           {mon.name}
           {mon.status && <BSStatusChip status={mon.status} />}
           {active && <span className="font-mono text-[.54rem] text-[var(--accent-bright)] tracking-[.1em]">ACTIVO</span>}

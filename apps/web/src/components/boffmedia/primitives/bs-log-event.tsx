@@ -37,7 +37,7 @@ export function BSLogEvent({ ev }: BSLogEventProps) {
   if (ev.kind === "sys") {
     return (
       <div className="flex gap-[.6rem] px-[.65rem] py-[.2rem] items-start">
-        <div className="flex-1 min-w-0 text-[var(--text-muted)] text-[var(--t-xs)] italic">{ev.txt}</div>
+        <div className="flex-1 min-w-0 text-[color:var(--text-muted)] text-t-xs italic">{ev.txt}</div>
       </div>
     )
   }
@@ -52,7 +52,7 @@ export function BSLogEvent({ ev }: BSLogEventProps) {
       >
         <LogIcon name={ev.icon || "bolt"} />
       </span>
-      <div className="flex-1 min-w-0 text-[var(--t-sm)] leading-[1.4]">
+      <div className="flex-1 min-w-0 text-t-sm leading-[1.4]">
         <span dangerouslySetInnerHTML={{ __html: ev.txt || "" }} />
         {(ev.dmg || ev.boost || ev.eff || ev.heal) && (
           <div className="flex gap-[.35rem] flex-wrap mt-[.3rem]">
@@ -96,7 +96,7 @@ interface BSChatRowProps {
 
 export function BSChatRow({ row }: BSChatRowProps) {
   return (
-    <div className="flex gap-[.55rem] py-[.35rem] items-baseline text-[var(--t-sm)]">
+    <div className="flex gap-[.55rem] py-[.35rem] items-baseline text-t-sm">
       <span
         className={cn(
           "font-bold shrink-0",
