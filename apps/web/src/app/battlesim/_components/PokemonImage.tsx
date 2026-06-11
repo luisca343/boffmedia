@@ -1,6 +1,6 @@
 import { Pokemon } from "@pkmn/client";
 import { Sprites } from "@pkmn/img";
-import { TARGET_WIDTH, getScaleMultiplier } from "../_utils/viewUtils";
+import { getTargetWidth, getScaleMultiplier } from "../_utils/viewUtils";
 
 
 type PokemonImageProps = {
@@ -17,12 +17,12 @@ type PokemonImageProps = {
 export function PokemonImage(
     {id, pokemon, side = 'p2', className, viewportWidth, battle}:  PokemonImageProps) {
     if (!pokemon) return <div></div>;
-    if(!viewportWidth) viewportWidth = TARGET_WIDTH;
+    const targetW = getTargetWidth();
+    if(!viewportWidth) viewportWidth = targetW;
     if(!battle) battle = null;
     let {url, w, h, pixelated} = Sprites.getPokemon(pokemon.speciesForme, {gen: 'ani', shiny: pokemon.shiny, side});
     
     const battleType = battle?.gameType || 'singles';
-    //const battleType = 'horde'
     const z = side === 'p1' ? 150 : 125;
 
     let multiplier;
@@ -33,8 +33,8 @@ export function PokemonImage(
     }
 
 
-    viewportWidth < TARGET_WIDTH ? w = w * viewportWidth / TARGET_WIDTH * multiplier : w = w * multiplier;
-    viewportWidth < TARGET_WIDTH ? h = h * viewportWidth / TARGET_WIDTH * multiplier : h = h * multiplier;
+    viewportWidth < targetW ? w = w * viewportWidth / targetW * multiplier : w = w * multiplier;
+    viewportWidth < targetW ? h = h * viewportWidth / targetW * multiplier : h = h * multiplier;
 
     w = w * getScaleMultiplier();
     h = h * getScaleMultiplier();

@@ -44,7 +44,7 @@ export default function ReplayPage({ params }: { params: Promise<{ name: string 
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="flex items-center justify-center min-h-[60vh]" style={{ background: 'var(--bg)' }}>
         <Loading />
       </div>
     );
@@ -52,15 +52,15 @@ export default function ReplayPage({ params }: { params: Promise<{ name: string 
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-        <p className="text-muted-foreground">{error}</p>
-        <Link href="/battlesim/replay" className="text-primary underline">Paste replay manually</Link>
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 px-4" style={{ background: 'var(--bg)' }}>
+        <p style={{ color: 'var(--text-muted)' }}>{error}</p>
+        <Link href="/battlesim/replay" className="underline" style={{ color: 'var(--accent)' }}>Paste replay manually</Link>
       </div>
     );
   }
 
   return (
-    <section className="flex flex-col">
+    <section className="flex flex-col" style={{ background: 'var(--bg)', color: 'var(--text)' }}>
       <Game battleName={name} replayData={replayData} />
     </section>
   );

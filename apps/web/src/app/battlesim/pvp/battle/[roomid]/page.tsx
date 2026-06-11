@@ -6,14 +6,15 @@ import { Protocol } from '@pkmn/protocol';
 import { io, Socket } from 'socket.io-client';
 import { env } from '@/config/env.public';
 import { BattleCanvas } from '../../../_components/BattleCanvas';
-import { ChoiceInput } from '../../../_components/ChoiceInput/ChoiceInput';
-import { TurnTimer } from '../../../_components/TurnTimer';
 import { BattleSession } from '../../../_utils/BattleSession';
 import { sanitizeHtml } from '../../../_utils/sanitizeHtml';
 import useViewportWidth from '@/services/useViewPortWidth';
 import { ASPECT_RATIO } from '../../../_utils/viewUtils';
+import { useBSXLayout } from '../../../_hooks/useBSXLayout';
+import { BSXKey, BSXBenchChip, BSXTick, BSXRing, BSXTeraBtn } from '@/components/boffmedia/primitives';
+import type { BSXKeyMove as BSXKeyMoveT } from '../../../_utils/toBSXMon';
 
-const VISIBLE_LOG_LIMIT = 50;
+const VISIBLE_TICK_LIMIT = 50;
 
 const MECHANIC_EVENT_MARKERS = ['|-mega|', '|-terastallize|', '|-zpower|', '|-burst|', '|-primal|'];
 
@@ -37,7 +38,7 @@ export default function PvPBattlePage({
   const [session, setSession] = useState<BattleSession | null>(null);
   const [side, setSide] = useState<'p1' | 'p2'>('p1');
   const [showAllLogs, setShowAllLogs] = useState(false);
-  const [showTimer, setShowTimer] = useState(false);
+  const [activeMechanic, setActiveMechanic] = useState<string | null>(null);
   const [savedReplayId, setSavedReplayId] = useState<number | null>(null);
   const [savingReplay, setSavingReplay] = useState(false);
   const [battleStarted, setBattleStarted] = useState(false);
@@ -50,18 +51,15 @@ export default function PvPBattlePage({
     forceUpdate((n) => n + 1);
   }, []);
 
-  // Initialize socket and session
   useEffect(() => {
     const socket = getGlobalSocket();
     if (!socket) return;
 
-    // Get side from battleCreated event or localStorage
     const storedSide = localStorage.getItem(`pvp_side_${decodedRoomId}`) as 'p1' | 'p2' | null;
     if (storedSide) {
       setSide(storedSide);
     }
 
-    // Create or restore session
     let sess = (window as any).__pvp_sessions?.[decodedRoomId];
     if (!sess) {
       sess = new BattleSession(decodedRoomId, {
@@ -75,7 +73,6 @@ export default function PvPBattlePage({
       }
       (window as any).__pvp_sessions[decodedRoomId] = sess;
     } else {
-      // Patch callbacks so the battle page gets updates
       sess.callbacks = {
         onUpdate: triggerUpdate,
         onRequest: () => triggerUpdate(),
@@ -84,7 +81,6 @@ export default function PvPBattlePage({
     }
     setSession(sess);
 
-    // Listen for events specific to this room
     const handleProtocol = (data: { roomId: string; line: string }) => {
       if (data.roomId === decodedRoomId) {
         sess.addLine(data.line);
@@ -125,19 +121,12 @@ export default function PvPBattlePage({
     socket.on('battleEnd', handleBattleEnd);
     socket.on('timerUpdate', handleTimerUpdate);
 
-    // Spectate to catch up on any lines that arrived before we mounted
     const handleSpectateJoined = (data: { roomId: string; replay: string; status: string; currentRequest?: Protocol.Request | null }) => {
       if (data.roomId === decodedRoomId && data.replay) {
-        // Replay buffered lines
         for (const line of data.replay.split('\n')) {
-          if (line.trim()) {
-            sess.addLine(line);
-          }
+          if (line.trim()) sess.addLine(line);
         }
-        // If there's a pending request, handle it
-        if (data.currentRequest) {
-          sess.handleRequest(data.currentRequest);
-        }
+        if (data.currentRequest) sess.handleRequest(data.currentRequest);
         triggerUpdate();
       }
     };
@@ -153,7 +142,6 @@ export default function PvPBattlePage({
     };
   }, [decodedRoomId, triggerUpdate]);
 
-  // Auto-scroll log
   useEffect(() => {
     if (logRef.current) {
       logRef.current.scrollTop = logRef.current.scrollHeight;
@@ -188,87 +176,123 @@ export default function PvPBattlePage({
   const handleForfeit = useCallback(() => {
     if (confirm('Are you sure you want to forfeit?')) {
       const socket = getGlobalSocket();
-      if (socket) {
-        socket.emit('forfeit', { roomId: decodedRoomId });
-      }
+      if (socket) socket.emit('forfeit', { roomId: decodedRoomId });
     }
   }, [decodedRoomId]);
 
   const state = session?.getState();
+  const bsx = useBSXLayout(state ?? null);
 
-  // Loading state
+  const pov = state ? (side === 'p1' ? 0 : 1) : 0;
+  const opponentName = pov === 0 ? (state?.battle.p2?.name || 'Opponent') : (state?.battle.p1?.name || 'Opponent');
+
+  const makeChoiceWithMechanic = useCallback((choice: string) => {
+    if (activeMechanic) {
+      handleMakeChoice(`${choice} ${activeMechanic}`);
+      setActiveMechanic(null);
+    } else {
+      handleMakeChoice(choice);
+    }
+  }, [activeMechanic, handleMakeChoice]);
+
   if (!session || !state) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-        <p className="text-muted-foreground">Loading battle...</p>
-        <Link
-          href="/battlesim/pvp"
-          className="text-sm text-muted-foreground hover:text-foreground underline"
-        >
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 px-4">
+        <div className="w-8 h-8 border-2 rounded-full animate-spin"
+          style={{ borderColor: 'var(--border)', borderTopColor: 'var(--accent-bright)' }}
+        />
+        <p style={{ color: 'var(--text-muted)' }}>Loading battle...</p>
+        <Link href="/battlesim/pvp" className="text-sm underline" style={{ color: 'var(--text-muted)' }}>
           Back to Lobby
         </Link>
       </div>
     );
   }
 
-  // Error state
   if (state.status === 'error') {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 px-4">
         <div className="text-center">
-          <h2 className="text-xl font-semibold text-destructive mb-2">Error</h2>
-          <p className="text-muted-foreground">{state.error}</p>
+          <h2 className="text-xl font-semibold mb-2" style={{ color: 'var(--rose-500)' }}>Error</h2>
+          <p style={{ color: 'var(--text-muted)' }}>{state.error}</p>
         </div>
-        <Link
-          href="/battlesim/pvp"
-          className="px-6 py-2 bg-secondary text-secondary-foreground rounded-md font-medium hover:bg-secondary/80 transition-colors"
-        >
+        <Link href="/battlesim/pvp"
+          className="px-6 py-2 rounded-md font-medium transition-colors"
+          style={{ background: 'var(--surface-2)', color: 'var(--text)', border: '1px solid var(--border)' }}>
           Back to Lobby
         </Link>
       </div>
     );
   }
 
-  const pov = side === 'p1' ? 0 : 1;
-  const opponentName = pov === 0 ? (state.battle.p2?.name || 'Opponent') : (state.battle.p1?.name || 'Opponent');
+  const choicePanel = state.isWaitingForChoice && bsx.requestType === 'move' ? (
+    <div className="flex flex-col gap-3">
+      {bsx.bsxMoves.length > 0 && (
+        <div className="grid grid-cols-2 gap-2">
+          {bsx.bsxMoves.map((move, i) => (
+            <BSXKey key={i} move={move as BSXKeyMoveT} hotkey={String(i + 1)}
+              target={bsx.bsxFoe ? { types: bsx.bsxFoe.types, tera: bsx.bsxFoe.tera, teraType: bsx.bsxFoe.teraType } : undefined}
+              onClick={() => makeChoiceWithMechanic(`move ${i + 1}`)} />
+          ))}
+        </div>
+      )}
+      <div className="flex gap-2 flex-wrap">
+        {bsx.mechCanTera && bsx.mechTeraType && (
+          <BSXTeraBtn type={bsx.mechTeraType} armed={activeMechanic === 'terastallize'}
+            onToggle={() => setActiveMechanic(activeMechanic === 'terastallize' ? null : 'terastallize')}
+            used={hasMechanicBeenUsed(state.htmlLog)} hotkey="T" />
+        )}
+        {bsx.mechCanMega && (
+          <button className="px-3 py-1.5 rounded-md text-sm font-medium transition-all cursor-pointer"
+            style={{ background: activeMechanic === 'mega' ? 'color-mix(in srgb, var(--accent) 20%, var(--surface-2))' : 'var(--surface-2)',
+              border: `1px solid ${activeMechanic === 'mega' ? 'var(--accent-bright)' : 'var(--border)'}`, color: 'var(--text)' }}
+            onClick={() => setActiveMechanic(activeMechanic === 'mega' ? null : 'mega')}>Mega</button>
+        )}
+        {bsx.mechCanDyna && (
+          <button className="px-3 py-1.5 rounded-md text-sm font-medium transition-all cursor-pointer"
+            style={{ background: activeMechanic === 'dynamax' ? 'color-mix(in srgb, var(--accent) 20%, var(--surface-2))' : 'var(--surface-2)',
+              border: `1px solid ${activeMechanic === 'dynamax' ? 'var(--accent-bright)' : 'var(--border)'}`, color: 'var(--text)' }}
+            onClick={() => setActiveMechanic(activeMechanic === 'dynamax' ? null : 'dynamax')}>Dynamax</button>
+        )}
+        {bsx.mechZMoves && (
+          <button className="px-3 py-1.5 rounded-md text-sm font-medium transition-all cursor-pointer"
+            style={{ background: activeMechanic === 'zmove' ? 'color-mix(in srgb, var(--accent) 20%, var(--surface-2))' : 'var(--surface-2)',
+              border: `1px solid ${activeMechanic === 'zmove' ? 'var(--accent-bright)' : 'var(--border)'}`, color: 'var(--text)' }}
+            onClick={() => setActiveMechanic(activeMechanic === 'zmove' ? null : 'zmove')}>Z-Move</button>
+        )}
+      </div>
+    </div>
+  ) : null;
 
   return (
-    <div className="flex flex-col gap-4 p-4">
+    <div className="flex flex-col gap-4 p-4" style={{ color: 'var(--text)', background: 'var(--bg)' }}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Link
-            href="/battlesim/pvp"
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
+          <Link href="/battlesim/pvp" className="text-sm" style={{ color: 'var(--text-muted)' }}>
             ← Lobby
           </Link>
-          <h1 className="text-lg font-semibold">PvP Battle</h1>
-          <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded font-mono">
+          <h1 className="text-lg font-semibold" style={{ color: 'var(--text)' }}>PvP Battle</h1>
+          <span className="text-xs px-2 py-1 rounded font-mono"
+            style={{ color: 'var(--text-muted)', background: 'var(--surface-2)' }}>
             {decodedRoomId.slice(0, 8)}...
           </span>
-          <span className="text-xs text-muted-foreground">
+          <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
             vs <strong>{opponentName}</strong>
           </span>
         </div>
         <div className="flex items-center gap-2">
           {state.timerState && state.status === 'active' && (
-            <button
-              onClick={() => setShowTimer(!showTimer)}
-              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                showTimer
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
-              }`}
-            >
-              Timer
-            </button>
+            <>
+              <BSXRing sec={Math.ceil(state.timerState.p1.turnRemaining / 1000)} max={60} size={36} />
+              <BSXRing sec={Math.ceil(state.timerState.p2.turnRemaining / 1000)} max={60} size={36} />
+            </>
           )}
           {state.status === 'active' && (
             <button
               onClick={handleForfeit}
-              className="px-4 py-1.5 bg-destructive text-destructive-foreground rounded-md text-sm font-medium hover:bg-destructive/90 transition-colors"
+              className="px-4 py-1.5 rounded-md text-sm font-medium transition-colors"
+              style={{ background: 'var(--surface-3)', color: 'var(--rose-400)', border: '1px solid color-mix(in srgb, var(--rose-500) 40%, transparent)' }}
             >
               Forfeit
             </button>
@@ -276,18 +300,9 @@ export default function PvPBattlePage({
         </div>
       </div>
 
-      {/* Timer */}
-      {showTimer && state.timerState && state.status === 'active' && (
-        <TurnTimer
-          p1={state.timerState.p1}
-          p2={state.timerState.p2}
-          activeSide={state.timerState.activeSide}
-        />
-      )}
-
       {/* Battle Canvas + Log */}
-      <div className="flex">
-        <div className="flex flex-col relative">
+      <div className="flex gap-4">
+        <div className="flex flex-col relative shrink-0">
           <BattleCanvas
             battle={state.battle}
             pov={pov}
@@ -301,62 +316,73 @@ export default function PvPBattlePage({
             liveMode={true}
             liveStatus={state.status}
             battleComplete={state.battleComplete}
+            choicePanel={choicePanel}
           />
         </div>
-        <div className="flex flex-col">
-          <div
-            className="w-[400px] bg-surface-800 p-2 overflow-y-auto text-surface-50 h-full"
-            ref={logRef}
-            style={{ height: `${canvasWidth * ASPECT_RATIO}px` }}
-          >
-            {state.htmlLog.length > VISIBLE_LOG_LIMIT && !showAllLogs && (
-              <button
-                onClick={() => setShowAllLogs(true)}
-                className="w-full p-1 mb-1 text-xs bg-surface-600 rounded hover:bg-surface-500 text-surface-200"
-              >
-                Show all {state.htmlLog.length} lines (showing last {VISIBLE_LOG_LIMIT})
-              </button>
-            )}
-            {(showAllLogs ? state.htmlLog : state.htmlLog.slice(-VISIBLE_LOG_LIMIT)).map(
-              (line, index) => (
-                <div
-                  key={
-                    showAllLogs
-                      ? index
-                      : state.htmlLog.length - VISIBLE_LOG_LIMIT + index
-                  }
-                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(line) }}
-                />
-              ),
-            )}
+
+        {/* Right: Tick Log */}
+        <div className="flex-1 min-w-0">
+          <div className="flex-1 rounded-lg overflow-hidden" style={{ border: '1px solid var(--border)' }}>
+            <div
+              className="overflow-y-auto"
+              ref={logRef}
+              style={{ height: `${canvasWidth * ASPECT_RATIO}px`, background: 'var(--surface)' }}
+            >
+              {bsx.bsxTicks.length > VISIBLE_TICK_LIMIT && !showAllLogs && (
+                <button
+                  onClick={() => setShowAllLogs(true)}
+                  className="w-full p-1 mb-1 text-xs font-mono"
+                  style={{ color: 'var(--text-muted)', background: 'var(--surface-2)', borderBottom: '1px solid var(--border)' }}
+                >
+                  Show all {bsx.bsxTicks.length} events (showing last {VISIBLE_TICK_LIMIT})
+                </button>
+              )}
+              {(showAllLogs ? bsx.bsxTicks : bsx.bsxTicks.slice(-VISIBLE_TICK_LIMIT)).map((ev, i) => (
+                <BSXTick key={i} ev={ev as any} />
+              ))}
+            </div>
           </div>
-          <div className="bg-surface-800 flex-1" />
         </div>
       </div>
 
-      {/* Choice Input */}
-      {state.isWaitingForChoice && state.currentRequest && (
-        <ChoiceInput
-          request={state.currentRequest}
-          makeChoice={handleMakeChoice}
-          isWaiting={state.isWaitingForChoice}
-          mechanicUsed={hasMechanicBeenUsed(state.htmlLog)}
-        />
+      {/* Switch/Bench below canvas */}
+      {state.isWaitingForChoice && bsx.requestType === 'move' && bsx.bsxBench.length > 0 && (
+        <div className="flex flex-col gap-2">
+          <div className="text-xs font-medium uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Switch</div>
+          <div className="flex flex-wrap gap-2">
+            {bsx.bsxBench.map((mon, i) => (
+              <BSXBenchChip key={i} mon={mon} hotkey={String(i + 1)} disabled={mon.fnt}
+                onClick={mon.fnt ? undefined : () => handleMakeChoice(`switch ${i + 1}`)} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {state.isWaitingForChoice && bsx.requestType === 'switch' && (
+        <div className="flex flex-col gap-2">
+          <div className="text-xs font-medium uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Forced Switch</div>
+          <div className="flex flex-wrap gap-2">
+            {bsx.bsxBench.map((mon, i) => (
+              <BSXBenchChip key={i} mon={mon} hotkey={String(i + 1)} disabled={mon.fnt}
+                onClick={mon.fnt ? undefined : () => handleMakeChoice(`switch ${i + 1}`)} />
+            ))}
+          </div>
+        </div>
       )}
 
       {/* Turn indicator */}
       {state.status === 'active' && state.battle.turn > 0 && (
-        <div className="text-center text-sm text-muted-foreground">
-          Turn {state.battle.turn}
+        <div className="text-center text-sm" style={{ color: 'var(--text-muted)' }}>
+          {bsx.turnText}
           {state.isWaitingForChoice && ' — Your turn!'}
         </div>
       )}
 
       {/* Post-battle */}
       {state.status === 'finished' && (
-        <div className="flex flex-col items-center gap-3">
+        <div className="flex flex-col items-center gap-3 py-2">
           <div className="text-center">
-            <h2 className="text-xl font-semibold">
+            <h2 className="text-xl font-semibold" style={{ color: 'var(--text)' }}>
               {state.winner === (pov === 0 ? state.battle.p1?.name : state.battle.p2?.name)
                 ? 'You won!'
                 : state.winner === 'tie'
@@ -364,24 +390,22 @@ export default function PvPBattlePage({
                   : `${state.winner} won!`}
             </h2>
           </div>
-          {savingReplay && (
-            <p className="text-sm text-muted-foreground">Saving replay...</p>
-          )}
+          {savingReplay && <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Saving replay...</p>}
           {savedReplayId && (
             <div className="flex flex-col items-center gap-2">
-              <p className="text-sm text-green-600">Replay saved!</p>
+              <p className="text-sm" style={{ color: 'var(--emerald-400)' }}>Replay saved!</p>
               <Link
                 href={`/battlesim/replay/${savedReplayId}`}
-                className="px-6 py-2 bg-secondary text-secondary-foreground rounded-md font-medium hover:bg-secondary/80 transition-colors"
+                className="px-6 py-2 rounded-md font-medium transition-colors"
+                style={{ background: 'var(--surface-2)', color: 'var(--text)', border: '1px solid var(--border)' }}
               >
                 Watch Replay
               </Link>
             </div>
           )}
-          <Link
-            href="/battlesim/pvp"
-            className="px-6 py-2 bg-primary text-primary-foreground rounded-md font-medium hover:bg-primary/90 transition-colors"
-          >
+          <Link href="/battlesim/pvp"
+            className="px-6 py-2 rounded-md font-medium transition-colors"
+            style={{ background: 'var(--accent)', color: 'var(--text)', border: '1px solid var(--border)' }}>
             Play Again
           </Link>
         </div>

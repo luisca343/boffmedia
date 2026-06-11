@@ -34,7 +34,7 @@ export function BSXTick({ ev }: BSXTickProps) {
   if (ev.kind === "sys") {
     return (
       <div
-        className="relative pl-[.65rem] pr-[.5rem] py-[.3rem] rounded-[var(--radius)] text-t-xs leading-[1.45] italic"
+        className="relative pl-[.65rem] pr-[.5rem] py-[.3rem] mb-[.15rem] rounded-[var(--radius)] text-t-xs leading-[1.45] italic"
         style={{ color: "var(--text-dim)", background: "none" }}
       >
         <span className="absolute left-0 top-[4px] bottom-[4px] w-[2.5px] rounded-[2px]" style={{ background: "var(--border-strong)" }} />
@@ -49,7 +49,7 @@ export function BSXTick({ ev }: BSXTickProps) {
 
   return (
     <div
-      className={`relative pl-[.65rem] pr-[.5rem] py-[.3rem] rounded-[var(--radius)] text-t-xs leading-[1.45] ${
+      className={`relative pl-[.65rem] pr-[.5rem] py-[.3rem] mb-[.15rem] rounded-[var(--radius)] text-t-xs leading-[1.45] ${
         ev.crit ? "" : ""
       }`}
       style={{

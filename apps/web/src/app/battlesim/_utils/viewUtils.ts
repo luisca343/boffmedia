@@ -3,7 +3,10 @@
 export const SCALE_WIDTH = 960;
 import { Battle } from "@pkmn/client";
 
-export const TARGET_WIDTH = 1280;
+export function getTargetWidth() {
+  if (typeof window === 'undefined') return 1280;
+  return Math.round(window.screen.width * 0.65);
+}
 export const ASPECT_RATIO = 0.5625;
 
 export const positionsP1 = ["p1a", "p1b", "p1c", "p1d", "p1e"];
@@ -74,8 +77,9 @@ export function getImageSize() {
 export function getCanvasWidth() {
     if (typeof window === 'undefined') return 0;
     const viewportWidth = window.innerWidth;
+    const target = getTargetWidth();
     
-    const canvasWidth = viewportWidth > TARGET_WIDTH ? TARGET_WIDTH : viewportWidth;
+    const canvasWidth = viewportWidth > target ? target : viewportWidth;
     return canvasWidth;
 }
 
