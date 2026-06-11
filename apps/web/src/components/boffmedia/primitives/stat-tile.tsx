@@ -10,7 +10,7 @@ interface StatTileProps {
 
 export function StatTile({ value, label, tone = "neutral", small, className }: StatTileProps) {
   return (
-    <div className={cn("bg-[var(--card-bg)] border-[var(--card-border)] rounded-[var(--radius)] px-[0.6rem] py-[0.7rem] text-center", className)}>
+    <div className={cn("bg-[var(--card-bg)] border-[var(--border)] rounded-[var(--radius)] px-[0.6rem] py-[0.7rem] text-center", className)}>
       <div
         className={cn(
           "font-display font-extrabold leading-[1.05] tabular-nums",

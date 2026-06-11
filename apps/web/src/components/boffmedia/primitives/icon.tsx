@@ -65,6 +65,11 @@ const ICON_PATHS: Record<string, string> = {
   trending: "M3 17l6-6 4 4 8-8M15 7h6v6",
   puzzle: "M10 4a2 2 0 0 1 4 0v1h3a1 1 0 0 1 1 1v3h1a2 2 0 0 1 0 4h-1v3a1 1 0 0 1-1 1h-3v-1a2 2 0 0 0-4 0v1H6a1 1 0 0 1-1-1v-3H4a2 2 0 0 1 0-4h1V6a1 1 0 0 1 1-1h3V4Z",
   swatch: "M3 17a4 4 0 0 0 8 0V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12ZM7 17h.01M11 9l4-4 3 3-9 9M11 21h9a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2h-2",
+  alert: "M21.7 16.5 13.8 3.5a2 2 0 0 0-3.6 0l-7.9 13a2 2 0 0 0 1.8 3h15.6a2 2 0 0 0 1.8-3Z M12 10v3 M12 17h.01",
+  refresh: "M21 12a9 9 0 0 0-9-9 9.9 9.9 0 0 0-6 2.3L3 8 M3 3v5h5 M3 12a9 9 0 0 0 9 9 9.9 9.9 0 0 0 6-2.3L21 16 M21 21v-5h-5",
+  wifioff: "M5 12.5a10 10 0 0 1 14 0 M8.5 16a5 5 0 0 1 7 0 M12 19.5h.01 M2 2l20 20",
+  lock: "M8 11V7a4 4 0 0 1 8 0v4 M6 11h12a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1Z",
+  inbox: "M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3 M12 2v10 M8 8l4 4 4-4",
 }
 
 export interface IconProps extends SVGProps<SVGSVGElement> {
