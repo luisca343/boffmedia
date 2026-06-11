@@ -31,8 +31,8 @@ export function BSXPlate({ mon, slotTag, foe, ghost, active }: BSXPlateProps) {
   const ty = mon.tera ? (mon.teraType || mon.types[0]) : (mon.types && mon.types[0])
 
   const plateCls = [
-    "w-full max-w-[270px] p-[.55rem_.65rem] rounded-[var(--radius)] border grid items-center relative overflow-hidden transition-[border-color,box-shadow] duration-[var(--dur)] ease-[var(--ease)]",
-    "grid-cols-[46px_1fr] gap-[.3rem_.6rem]",
+    "w-full max-w-[290px] p-[.65rem_.8rem] rounded-[var(--radius)] border grid items-center relative overflow-hidden transition-[border-color,box-shadow] duration-[var(--dur)] ease-[var(--ease)]",
+    "grid-cols-[50px_1fr] gap-[.5rem_.65rem]",
     foe ? "bsx-plate--foe" : "",
     mon.fnt ? "opacity-[.55]" : "",
     active ? "bsx-plate--active" : "",
@@ -54,19 +54,19 @@ export function BSXPlate({ mon, slotTag, foe, ghost, active }: BSXPlateProps) {
       <div
         className="absolute pointer-events-none rounded-[50%]"
         style={{
-          top: -30, left: -30, width: 110, height: 110,
+          top: -30, left: -30, width: 120, height: 120,
           background: `radial-gradient(circle, ${tyVar(ty || "Normal")}, transparent 70%)`,
           opacity: .1,
         }}
       />
       <div
-        className="relative w-[46px] h-[46px] rounded-[var(--radius)] grid place-items-center overflow-hidden"
+        className="relative w-[50px] h-[50px] rounded-[var(--radius)] grid place-items-center overflow-hidden"
         style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}
       >
         <img
           src={aniF(mon.id)}
           alt=""
-          className="w-[42px] h-[42px] object-contain"
+          className="w-[46px] h-[46px] object-contain"
           style={{ imageRendering: "pixelated", filter: mon.fnt ? "grayscale(1) brightness(.7)" : undefined }}
         />
         {mon.fnt && (
