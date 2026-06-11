@@ -49,7 +49,7 @@ export function BSMove({ move, target, onClick, disabled }: BSMoveProps) {
     >
       <span className="absolute left-0 top-0 bottom-0 w-[3px]" style={{ background: c }} />
       <div className="flex items-start justify-between gap-[.5rem]">
-        <span className="font-display font-bold text-[var(--t-base)] leading-[1.1]">{move.name}</span>
+        <span className="font-display font-bold text-t-base leading-[1.1]">{move.name}</span>
         <BSType type={move.type} />
       </div>
       <div className="flex items-center justify-between gap-[.5rem] font-mono text-[.64rem] text-[var(--text-muted)] tracking-[.04em]">
