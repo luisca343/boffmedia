@@ -1,18 +1,17 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useShowdownBattle } from '../_hooks/useShowdownBattle';
-import { sanitizeHtml } from '../_utils/sanitizeHtml';
+import { GamePanel } from '@/components/boffmedia/primitives';
+import { ChatPanel } from '../_components/ChatPanel';
 
 export default function ShowdownLobbyPage() {
   const router = useRouter();
   const [loginUser, setLoginUser] = useState('Boffmedia');
   const [loginPass, setLoginPass] = useState('boffmedia');
-  const [chatInput, setChatInput] = useState('');
   const [challengeTarget, setChallengeTarget] = useState('');
   const [selectedFormat, setSelectedFormat] = useState('gen9randombattle');
-  const chatRef = useRef<HTMLDivElement>(null);
 
   const {
     status,
@@ -45,12 +44,8 @@ export default function ShowdownLobbyPage() {
     }
   }, [status, challstr, loginUser, loginPass, login]);
 
-  useEffect(() => {
-    if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight;
-  }, [lobbyChat]);
-
   const handleLogin = () => { if (loginUser && loginPass) login(loginUser, loginPass); };
-  const handleSendChat = () => { if (chatInput.trim()) { sendRaw(`lobby|${chatInput}`); setChatInput(''); } };
+  const handleSendChat = (msg: string) => sendRaw(`lobby|${msg}`);
   const handleFindBattle = () => findBattle(selectedFormat);
   const handleChallenge = () => { if (challengeTarget.trim()) sendRaw(`|/challenge ${challengeTarget.trim()},${selectedFormat}`); };
 
@@ -165,44 +160,19 @@ export default function ShowdownLobbyPage() {
       {isLoggedIn && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Lobby Chat */}
-          <div className="lg:col-span-2 flex flex-col overflow-hidden" style={cardStyle}>
-            <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--border)' }}>
-              <h2 className="font-semibold" style={{ color: 'var(--text)' }}>Lobby Chat</h2>
-            </div>
-            <div ref={chatRef} className="flex-1 h-[400px] overflow-y-auto p-3 space-y-1 text-sm" style={{ color: 'var(--text-muted)' }}>
-              {lobbyChat.length === 0 && (
-                <p className="text-center py-8" style={{ color: 'var(--text-dim)' }}>
-                  No messages yet. Chat will appear here once connected to the lobby.
-                </p>
-              )}
-              {lobbyChat.map((msg, i) => (
-                <div key={i}>
-                  <span style={{ color: 'var(--accent-bright)', fontWeight: 600 }}>{msg.sender}: </span>
-                  <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(msg.message) }} />
-                </div>
-              ))}
-            </div>
-            <div className="p-3 flex gap-2" style={{ borderTop: '1px solid var(--border)' }}>
-              <input
-                type="text" placeholder="Type a message..." value={chatInput}
-                onChange={(e) => setChatInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSendChat()}
-                className="flex-1 px-3 py-2 text-sm" style={inputStyle}
-              />
-              <button
-                onClick={handleSendChat} disabled={!chatInput.trim()}
-                className="px-4 py-2 rounded-md text-sm font-medium disabled:opacity-50"
-                style={{ background: 'var(--surface-3)', color: 'var(--text)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}
-              >
-                Send
-              </button>
-            </div>
-          </div>
+          <GamePanel title="Lobby Chat" className="lg:col-span-2">
+            <ChatPanel
+              messages={lobbyChat}
+              onSend={handleSendChat}
+              maxHeight={400}
+              placeholder="Type a message..."
+              emptyText="No messages yet. Chat will appear here once connected to the lobby."
+            />
+          </GamePanel>
 
           {/* Actions sidebar */}
           <div className="flex flex-col gap-4">
-            <div className="p-4" style={cardStyle}>
-              <h2 className="font-semibold mb-3" style={{ color: 'var(--text)' }}>Battle</h2>
+            <GamePanel title="Battle" bodyClassName="p-4">
               <p className="text-sm mb-3" style={{ color: 'var(--text-muted)' }}>
                 Find a random opponent on the official Showdown server.
               </p>
@@ -223,14 +193,13 @@ export default function ShowdownLobbyPage() {
               </select>
               <button
                 onClick={handleFindBattle}
-                className="w-full px-4 py-3 rounded-md text-sm font-semibold" style={btnStyle}
+                className="bsx-focus w-full px-4 py-3 rounded-md text-sm font-semibold" style={btnStyle}
               >
                 Find Battle
               </button>
-            </div>
+            </GamePanel>
 
-            <div className="p-4" style={cardStyle}>
-              <h2 className="font-semibold mb-3" style={{ color: 'var(--text)' }}>Challenge Player</h2>
+            <GamePanel title="Challenge Player" bodyClassName="p-4">
               <p className="text-sm mb-3" style={{ color: 'var(--text-muted)' }}>
                 Challenge a specific player to a battle.
               </p>
@@ -249,17 +218,12 @@ export default function ShowdownLobbyPage() {
                   Challenge
                 </button>
               </div>
-            </div>
+            </GamePanel>
 
-            <div className="p-4" style={cardStyle}>
-              <h2 className="font-semibold mb-2" style={{ color: 'var(--text)' }}>
-                Online Users
-                {onlineUsers.length > 0 && (
-                  <span className="text-xs font-normal ml-2" style={{ color: 'var(--text-muted)' }}>
-                    ({onlineUsers.length})
-                  </span>
-                )}
-              </h2>
+            <GamePanel
+              title={onlineUsers.length > 0 ? `Online Users (${onlineUsers.length})` : 'Online Users'}
+              bodyClassName="p-4"
+            >
               {onlineUsers.length === 0 ? (
                 <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Loading users...</p>
               ) : (
@@ -282,7 +246,7 @@ export default function ShowdownLobbyPage() {
               <p className="text-xs mt-2 pt-2" style={{ color: 'var(--text-muted)', borderTop: '1px solid var(--border)' }}>
                 Connected as <strong>{username}</strong> — sim3.psim.us
               </p>
-            </div>
+            </GamePanel>
           </div>
         </div>
       )}

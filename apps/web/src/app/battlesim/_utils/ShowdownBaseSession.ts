@@ -33,15 +33,27 @@ export class ShowdownBaseSession extends BattleSession {
     }
   }
 
+  private lastRequest: Protocol.Request | null = null;
+
   override makeChoice(choice: string, _socket: Socket): void {
     if (this.status === 'finished') return;
 
     const psChoice = choice.startsWith('/choose ') ? choice : `/choose ${choice}`;
     this.showdownSocket.emit('sendToShowdown', `${this.roomId}|${psChoice}`);
 
+    this.lastRequest = this.currentRequest;
     this.isWaitingForChoice = false;
     this.currentRequest = null;
     this.resumeAfterChoice();
+  }
+
+  /** Cancel a submitted choice via /undo (only before the turn resolves on PS). */
+  undoChoice(): boolean {
+    if (this.status === 'finished' || !this.lastRequest) return false;
+    this.showdownSocket.emit('sendToShowdown', `${this.roomId}|/undo`);
+    this.handleRequest(this.lastRequest);
+    this.lastRequest = null;
+    return true;
   }
 
   override forfeit(_socket: Socket): void {

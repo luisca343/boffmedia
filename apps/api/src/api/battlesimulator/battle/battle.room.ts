@@ -54,6 +54,9 @@ export class BattleRoom {
   private replayLines: string[] = [];
   private p1Request: Protocol.Request | null = null;
   private p2Request: Protocol.Request | null = null;
+  /** Last requests kept so a submitted choice can be undone before the turn resolves. */
+  private lastP1Request: Protocol.Request | null = null;
+  private lastP2Request: Protocol.Request | null = null;
   private callbacks: BattleRoomCallbacks;
   private aiPromise: Promise<void> | null = null;
   private omniscientPromise: Promise<void> | null = null;
@@ -278,8 +281,10 @@ export class BattleRoom {
     }
 
     if (side === 'p1') {
+      this.lastP1Request = this.p1Request;
       this.p1Request = null;
     } else {
+      this.lastP2Request = this.p2Request;
       this.p2Request = null;
     }
     this.pauseTurnTimer(side);
@@ -291,6 +296,39 @@ export class BattleRoom {
         `Failed to write ${side} choice: ${error.message}`,
       );
     }
+  }
+
+  /**
+   * Undo a submitted choice (only possible while the turn has not resolved —
+   * the sim rejects it otherwise). Restores and re-emits the pending request.
+   */
+  async undoChoice(side: 'p1' | 'p2' = 'p1'): Promise<boolean> {
+    if (this.status !== 'active') return false;
+
+    const last = side === 'p1' ? this.lastP1Request : this.lastP2Request;
+    if (!last) {
+      this.callbacks.onError(`Nothing to undo for ${side}`);
+      return false;
+    }
+
+    try {
+      await this.streams[side].write('undo');
+    } catch (error: any) {
+      this.callbacks.onError(`Failed to undo ${side} choice: ${error.message}`);
+      return false;
+    }
+
+    if (side === 'p1') {
+      this.p1Request = last;
+      this.lastP1Request = null;
+      this.callbacks.onRequestP1(last);
+    } else {
+      this.p2Request = last;
+      this.lastP2Request = null;
+      this.callbacks.onRequestP2?.(last);
+    }
+    this.startTurnTimer(side);
+    return true;
   }
 
   async forfeit(side?: 'p1' | 'p2'): Promise<void> {

@@ -1,6 +1,6 @@
 "use client"
-import { Battle, Pokemon, Side } from "@pkmn/client";
-import { Loading } from "@/components/smartrotom/Loading";
+import { Battle, Pokemon } from "@pkmn/client";
+import { BoffSkeleton, BoffSpinner } from "@/components/boffmedia/primitives";
 import { forwardRef, useCallback, useRef, memo } from "react";
 import { positionsP1, positionsP2, ASPECT_RATIO, getScaleMultiplier } from "../_utils/viewUtils";
 import { PokemonElement, PokemonRefType } from "./PokemonElement";
@@ -11,10 +11,9 @@ import { PokemonIdent } from "@pkmn/protocol";
 import useViewportWidth from "@/services/useViewPortWidth";
 import BattlePreview from "./BattlePreview";
 import BattleEndScreen from "./BattleEndScreen";
-import { sanitizeHtml } from "../_utils/sanitizeHtml";
-import { getParticipantName } from "../_utils/replayUtils";
 import { BSXPlate } from "@/components/boffmedia/primitives";
 import { toBSXMon } from "../_utils/toBSXMon";
+import { FieldConditions } from "./FieldConditions";
 import type { ReactNode } from "react";
 
 export type BattleCanvasRefProps = {
@@ -43,6 +42,7 @@ export const BattleCanvas = memo(forwardRef(({
     battleComplete = false,
     username,
     choicePanel,
+    aimedFoe = false,
 }: {
     battle: Battle,
     pov: 0 | 1 | any,
@@ -60,6 +60,7 @@ export const BattleCanvas = memo(forwardRef(({
     battleComplete?: boolean,
     username?: string | null,
     choicePanel?: ReactNode,
+    aimedFoe?: boolean,
 }, ref: React.Ref<BattleCanvasRefProps>) => {
     const pokemonRefs = useRef<{ [key: string]: PokemonRefType }>({});
     const [, canvasWidth] = useViewportWidth();
@@ -81,12 +82,21 @@ export const BattleCanvas = memo(forwardRef(({
     if(liveMode && liveStatus === 'connecting') {
         return (
             <div className="flex flex-col items-center justify-center gap-3" style={{ width: canvasWidth, height: canvasWidth * ASPECT_RATIO, backgroundImage: 'url(/battlesim/fx/bg/hagane.png)', backgroundSize: '100% 100%' }}>
-                <Loading />
-                <span className="text-surface-200 text-sm">Waiting for battle...</span>
+                <BoffSpinner size="lg" label="Waiting for battle..." />
             </div>
         )
     }
-    if(!liveMode && !battle.pokemonControlled && !battleLog) return <Loading/>
+    if(!liveMode && !battle.pokemonControlled && !battleLog) {
+        return (
+            <div className="flex flex-col gap-3" style={{ width: canvasWidth }}>
+                <BoffSkeleton className="w-full" style={{ height: canvasWidth * ASPECT_RATIO }} />
+                <div className="flex gap-2">
+                    <BoffSkeleton className="h-10 flex-1" />
+                    <BoffSkeleton className="h-10 flex-1" />
+                </div>
+            </div>
+        )
+    }
 
     return (
         <div  id="game" ref={gameRefCallback} className="flex overflow-hidden relative select-none" style={{
@@ -136,19 +146,20 @@ export const BattleCanvas = memo(forwardRef(({
                   
                   
             <div className="h-[20%] lg:h-[15%] xl:h-[13%] w-full absolute top-0 flex justify-between z-10">
-            <div className="m-1 w-1/3 flex items-center h-fit">
-                    <div className="w-fit h-8 bg-surface-800 bg-opacity-90 py-1 px-2 rounded-md text-surface-200 z-50">
+            <div className="m-1 w-1/3 flex flex-col items-start gap-1 h-fit z-50">
+                    <div
+                        className="w-fit py-1 px-2 rounded-[var(--radius-sm)] font-mono font-bold text-t-xs"
+                        style={{ background: 'color-mix(in srgb, var(--bg) 80%, transparent)', color: 'var(--text)' }}
+                    >
                         Turno {battle.turn}
                     </div>
-                    <span className="text-surface-50 font-bold text-shadow-border1 ml-2">
-                        {getParticipantName(p1.name)} vs {getParticipantName(p2.name)}
-                    </span>
+                    <FieldConditions battle={battle} pov={pov === 1 ? 1 : 0} />
                     </div>
                 <div className="m-1 w-2/3 flex flex-row-reverse items-start gap-1">
                     <PokemonTeam side={p2}/>
                     {positionsP2.map((position, index) => {
                         const mon = toBSXMon(pokemon[position]);
-                        return mon && <div key={position} className="flex-1 max-w-[260px] shrink min-w-0"><BSXPlate mon={mon} foe slotTag="2" /></div>;
+                        return mon && <div key={position} className="flex-1 max-w-[260px] shrink min-w-0"><BSXPlate mon={mon} foe slotTag="2" aimed={aimedFoe && !mon.fnt} /></div>;
                     })}
                 </div>
             </div>
@@ -205,13 +216,6 @@ export const BattleCanvas = memo(forwardRef(({
                 />
             ))}
             <div id='overlay' className="absolute w-full h-full pointer-events-none">
-                <div className="absolute top-16 left-0 text-surface-50 text-shadow-border1 z-20 ml-2">
-                    {battle.sides.map((side) => {
-                        return Object.values(side.sideConditions).map((value) => {
-                            return <div key={`condition-${side.name}-${value.name}`}>{side.name}: {value.name} {value.minDuration} {value.maxDuration > 0 && `- ${value.maxDuration}`} turns</div>
-                        })
-                    })}
-                </div>
                 <div className={`weather w-full h-full absolute top-0 left-0 ${battle.field.terrainState.id}`}></div>
 
                 {battle.field.pseudoWeather['trickroom'] && (

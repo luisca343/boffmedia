@@ -1,0 +1,96 @@
+{
+  "battlesim": {
+    "landing": {
+      "title": "Battle Simulator",
+      "subtitle": "Watch replays, play against AI, or battle on Pokémon Showdown",
+      "play": "Play",
+      "playDesc": "Battle against an AI opponent",
+      "pvp": "PvP",
+      "pvpDesc": "Battle other players on our server",
+      "showdown": "Showdown Online",
+      "showdownDesc": "Play on the official Pokémon Showdown server",
+      "replays": "Replays",
+      "replaysDesc": "Watch saved battle replays",
+      "calc": "Calculator",
+      "calcDesc": "Damage calculator",
+      "resume": "PvP battle in progress — resume"
+    },
+    "header": {
+      "lobby": "Lobby",
+      "forfeit": "Forfeit",
+      "vs": "vs"
+    },
+    "connection": {
+      "error": "Error",
+      "unknownError": "Unknown error",
+      "tryAgain": "Try Again",
+      "backToLobby": "Back to Lobby",
+      "connectingServer": "Connecting to battle server…",
+      "loadingBattle": "Loading battle…",
+      "connectingShowdown": "Connecting to Showdown server…",
+      "authenticating": "Authenticating…",
+      "joiningBattle": "Joining battle…",
+      "waitingBattle": "Waiting for battle to start…",
+      "reconnecting": "Reconnecting (attempt {attempt}/{max})…"
+    },
+    "dock": {
+      "waitingOpponent": "Waiting for opponent…",
+      "teamPreview": "Team Preview — sending default order",
+      "confirmTeam": "Confirm Team",
+      "switch": "Switch",
+      "forcedSwitch": "Forced Switch",
+      "trapped": " (trapped)",
+      "undo": "Undo",
+      "undoHint": "Cancel the submitted choice (before the turn resolves)"
+    },
+    "log": {
+      "label": "Battle log",
+      "showAll": "Show all ({count})",
+      "empty": "No events",
+      "events": "{count} events",
+      "filterAll": "All",
+      "filterDamage": "Damage",
+      "filterSwitches": "Switches",
+      "filterField": "Field",
+      "collapsePrevious": "− Previous",
+      "hidden": "Log hidden — toggle with the eye button",
+      "tab": "Log"
+    },
+    "chat": {
+      "tab": "Chat",
+      "placeholder": "Type a message…",
+      "battlePlaceholder": "Say something…",
+      "send": "Send",
+      "empty": "No messages yet",
+      "battleEmpty": "Battle chat will appear here",
+      "unread": "{count} unread messages"
+    },
+    "end": {
+      "victory": "VICTORY!",
+      "defeat": "DEFEAT",
+      "tie": "TIE",
+      "winner": "WINNER",
+      "turn": "Turn {turn}",
+      "backToStart": "Back to Start",
+      "youWon": "You won!",
+      "itsATie": "It's a tie!",
+      "playerWon": "{name} won!",
+      "playAgain": "Play Again",
+      "watchReplay": "Watch Replay",
+      "savingReplay": "Saving replay…",
+      "replaySaved": "Replay saved!",
+      "saveReplay": "Save replay"
+    },
+    "play": {
+      "title": "Battle Simulator",
+      "subtitle": "Play a Pokémon battle against an AI opponent",
+      "start": "Start Battle",
+      "newTab": "+ New",
+      "won": "Won",
+      "lost": "Lost",
+      "tie": "Tie",
+      "turn": "Turn {turn}",
+      "yourTurn": " — Your turn!"
+    }
+  }
+}

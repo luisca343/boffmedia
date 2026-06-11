@@ -12,10 +12,12 @@ import { moveAction, } from "../../_utils/battleActions";
 import { ReplayData } from "../../types";
 import { countActions } from "../../_utils/replayUtils";
 import { ReplayErrorBoundary } from "./ReplayErrorBoundary";
-import { BSXTick } from '@/components/boffmedia/primitives';
 import { toBSXTicks } from "../../_utils/toBSXMon";
-
-const VISIBLE_TICK_LIMIT = 200;
+import { BattleLogPanel, REPLAY_TICK_LIMIT } from "../../_components/BattleLogPanel";
+import { setReplaySpeed } from "../../_utils/replaySpeed";
+import { useTranslations } from "next-intl";
+import { AchievementService } from "@/services/api/smartrotom/achievementsService";
+import type { TimelineMarker } from "./ReplayControls";
 
 function ReplayLoader({ onReplayLoad }: { onReplayLoad: (data: ReplayData) => void }) {
   const [replayText, setReplayText] = useState("");
@@ -70,9 +72,38 @@ function ReplayLoader({ onReplayLoad }: { onReplayLoad: (data: ReplayData) => vo
 }
 
 export function Game({battleName = 'medalla_doku', replayData}: {battleName?: string, replayData?: ReplayData}) {
+  const t = useTranslations('battlesim');
   const [loadedReplayData, setLoadedReplayData] = useState<ReplayData | undefined>(replayData);
   const [battleStarted, setBattleStarted] = useState<boolean>(false);
-  const [showAllLogs, setShowAllLogs] = useState<boolean>(false);
+  const [speed, setSpeed] = useState<number>(1);
+  const [savedReplayId, setSavedReplayId] = useState<number | null>(null);
+  const [savingReplay, setSavingReplay] = useState(false);
+
+  // Manual save for pasted replays (server-loaded ones are already persisted).
+  const canSaveReplay = !!loadedReplayData && !replayData && !savedReplayId;
+  const handleSaveReplay = async () => {
+    if (!loadedReplayData || savingReplay) return;
+    setSavingReplay(true);
+    try {
+      const winnerMatch = loadedReplayData.replay.match(/\|win\|(.+)/);
+      const res = await AchievementService.createReplay({
+        side1: loadedReplayData.side1 || 'Player 1',
+        side2: loadedReplayData.side2 || 'Player 2',
+        team1: typeof loadedReplayData.team1 === 'string' ? loadedReplayData.team1 : '',
+        team2: typeof loadedReplayData.team2 === 'string' ? loadedReplayData.team2 : '',
+        replay: loadedReplayData.replay,
+        winner: winnerMatch?.[1]?.trim() || 'unknown',
+      });
+      if (res.data?.replayId) setSavedReplayId(res.data.replayId);
+    } finally {
+      setSavingReplay(false);
+    }
+  };
+
+  useEffect(() => {
+    setReplaySpeed(speed);
+    return () => setReplaySpeed(1);
+  }, [speed]);
 
   const { battle, setBattle, battleLog, currentAction, scene, htmlLog, isPlaying, messageBar,
     turnInput, newTurn, settingTurn, lastTurn, simulatedAttack, logVisible, pov, setBattleLog,
@@ -85,7 +116,6 @@ export function Game({battleName = 'medalla_doku', replayData}: {battleName?: st
     settingTurn, pov, setCurrentAction, setLog, setIsPlaying, setMessageBar, setSettingTurn, setBattleComplete);
 
   const battleCanvasRef = useRef<any>(null);
-  const logRef = useRef<HTMLDivElement>(null);
 
   const [, canvasWidth] = useViewportWidth();
 
@@ -95,10 +125,6 @@ export function Game({battleName = 'medalla_doku', replayData}: {battleName?: st
     if (isPlaying && !battleStarted) setBattleStarted(true);
   }, [isPlaying, battleStarted]);
 
-  useEffect(() => {
-    if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight;
-  }, [htmlLog]);
-
   async function simulateAttack() {
     setBattleStarted(true);
     await moveAction(battle, scene, 'p1a' as PokemonIdent, simulatedAttack, 'p2a' as PokemonIdent);
@@ -106,15 +132,31 @@ export function Game({battleName = 'medalla_doku', replayData}: {battleName?: st
 
   const bsxTicks = useMemo(() => toBSXTicks(htmlLog), [htmlLog]);
 
+  // Timeline markers: one per turn for KOs and switches.
+  const markers = useMemo<TimelineMarker[]>(() => {
+    const out: TimelineMarker[] = [];
+    let turn = 0;
+    const seenSwitch = new Set<number>();
+    for (const ev of bsxTicks) {
+      if (ev.turn != null) { turn = ev.turn; continue; }
+      if (ev.kind === 'ko') out.push({ turn, kind: 'ko' });
+      else if (ev.kind === 'switch' && !seenSwitch.has(turn)) {
+        seenSwitch.add(turn);
+        out.push({ turn, kind: 'switch' });
+      }
+    }
+    return out;
+  }, [bsxTicks]);
+
   if(!loadedReplayData) {
     return <ReplayLoader onReplayLoad={setLoadedReplayData} />;
   }
 
   return (
     <ReplayErrorBoundary>
-    <div className="flex gap-4 p-4" style={{ background: 'var(--bg)', color: 'var(--text)' }}>
+    <div className="flex flex-col lg:flex-row gap-4 p-4" style={{ background: 'var(--bg)', color: 'var(--text)' }}>
       {/* Left: Canvas + Controls */}
-      <div className="flex flex-col gap-3 shrink-0">
+      <div className="flex flex-col gap-3 shrink-0 min-w-0">
         <BattleCanvas
           battle={battle}
           pov={pov}
@@ -152,38 +194,48 @@ export function Game({battleName = 'medalla_doku', replayData}: {battleName?: st
           lastTurn={lastTurn}
           logVisible={logVisible}
           setLogVisible={setLogVisible}
-          countActions={countActions}
+          countActions={() => countActions(battleLog)}
           setCurrentAction={setCurrentAction}
+          speed={speed}
+          setSpeed={setSpeed}
+          markers={markers}
         />
+
+        {(canSaveReplay || savedReplayId || savingReplay) && (
+          <div className="flex items-center gap-3">
+            {canSaveReplay && (
+              <button
+                onClick={handleSaveReplay}
+                disabled={savingReplay}
+                className="bsx-focus px-4 py-1.5 rounded-[var(--radius-sm)] text-sm font-medium disabled:opacity-50"
+                style={{ background: 'var(--surface-2)', color: 'var(--text)', border: '1px solid var(--border)' }}
+              >
+                💾 {savingReplay ? t('end.savingReplay') : t('end.saveReplay')}
+              </button>
+            )}
+            {savedReplayId && (
+              <span className="text-sm" style={{ color: 'var(--emerald-400)' }}>
+                {t('end.replaySaved')} — /battlesim/replay/{savedReplayId}
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Right: Tick Log */}
       <div className="flex-1 min-w-0">
-        <div className="rounded-lg overflow-hidden" style={{ border: '1px solid var(--border)' }}>
-          <div
-            className="overflow-y-auto"
-            ref={logRef}
-            style={{ maxHeight: `${canvasWidth * ASPECT_RATIO * 0.5}px`, background: 'var(--surface)' }}
-          >
-            {!logVisible && (
-              <p className="text-xs text-center py-4" style={{ color: 'var(--text-dim)' }}>
-                Log hidden — toggle with the eye button
-              </p>
-            )}
-            {logVisible && bsxTicks.length > VISIBLE_TICK_LIMIT && !showAllLogs && (
-              <button
-                onClick={() => setShowAllLogs(true)}
-                className="w-full p-1 mb-1 text-xs font-mono"
-                style={{ color: 'var(--text-muted)', background: 'var(--surface-2)', borderBottom: '1px solid var(--border)' }}
-              >
-                Show all {bsxTicks.length} events (showing last {VISIBLE_TICK_LIMIT})
-              </button>
-            )}
-            {logVisible && (showAllLogs ? bsxTicks : bsxTicks.slice(-VISIBLE_TICK_LIMIT)).map((ev, i) => (
-              <BSXTick key={i} ev={ev as any} />
-            ))}
-          </div>
-        </div>
+        {logVisible ? (
+          <BattleLogPanel
+            ticks={bsxTicks}
+            limit={REPLAY_TICK_LIMIT}
+            maxHeight={canvasWidth * ASPECT_RATIO * 0.7}
+            activeTurn={!isPlaying && battle.turn > 0 ? battle.turn : undefined}
+          />
+        ) : (
+          <p className="text-xs text-center py-4 rounded-[var(--radius)]" style={{ color: 'var(--text-dim)', border: '1px solid var(--border)' }}>
+            Log hidden — toggle with the eye button
+          </p>
+        )}
       </div>
     </div>
 

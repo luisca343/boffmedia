@@ -83,13 +83,13 @@ export function useBSXLayout(state: BattleState | null): BSXLayout {
       name: p1.name || "Player",
       rating: `Turn ${battle.turn}`,
       av: (p1.name || "P")[0]?.toUpperCase() || "P",
-      team: toTeamHP(p1.team),
+      team: toTeamHP(p1.team, (p1 as any).totalPokemon),
     };
     const scoreP2 = {
       name: p2.name || "Opponent",
       rating: state.winner ? `Winner: ${state.winner}` : `Turn ${battle.turn}`,
       av: (p2.name || "O")[0]?.toUpperCase() || "O",
-      team: toTeamHP(p2.team),
+      team: toTeamHP(p2.team, (p2 as any).totalPokemon),
     };
 
     return {

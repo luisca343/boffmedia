@@ -1,0 +1,96 @@
+{
+  "battlesim": {
+    "landing": {
+      "title": "Simulador de Combates",
+      "subtitle": "Mira repeticiones, juega contra la IA o combate en Pokémon Showdown",
+      "play": "Jugar",
+      "playDesc": "Combate contra un oponente IA",
+      "pvp": "PvP",
+      "pvpDesc": "Combate contra otros jugadores en nuestro servidor",
+      "showdown": "Showdown Online",
+      "showdownDesc": "Juega en el servidor oficial de Pokémon Showdown",
+      "replays": "Repeticiones",
+      "replaysDesc": "Mira repeticiones de combates guardados",
+      "calc": "Calculadora",
+      "calcDesc": "Calculadora de daño",
+      "resume": "Combate PvP en curso — reanudar"
+    },
+    "header": {
+      "lobby": "Lobby",
+      "forfeit": "Rendirse",
+      "vs": "vs"
+    },
+    "connection": {
+      "error": "Error",
+      "unknownError": "Error desconocido",
+      "tryAgain": "Reintentar",
+      "backToLobby": "Volver al lobby",
+      "connectingServer": "Conectando al servidor de combate…",
+      "loadingBattle": "Cargando combate…",
+      "connectingShowdown": "Conectando al servidor de Showdown…",
+      "authenticating": "Autenticando…",
+      "joiningBattle": "Uniéndose al combate…",
+      "waitingBattle": "Esperando a que comience el combate…",
+      "reconnecting": "Reconectando (intento {attempt}/{max})…"
+    },
+    "dock": {
+      "waitingOpponent": "Esperando al rival…",
+      "teamPreview": "Vista previa del equipo — se enviará el orden por defecto",
+      "confirmTeam": "Confirmar equipo",
+      "switch": "Cambiar",
+      "forcedSwitch": "Cambio forzado",
+      "trapped": " (atrapado)",
+      "undo": "Deshacer",
+      "undoHint": "Cancela la elección enviada (antes de que se resuelva el turno)"
+    },
+    "log": {
+      "label": "Registro de combate",
+      "showAll": "Mostrar todo ({count})",
+      "empty": "Sin eventos",
+      "events": "{count} eventos",
+      "filterAll": "Todo",
+      "filterDamage": "Daño",
+      "filterSwitches": "Cambios",
+      "filterField": "Campo",
+      "collapsePrevious": "− Anteriores",
+      "hidden": "Registro oculto — actívalo con el botón del ojo",
+      "tab": "Registro"
+    },
+    "chat": {
+      "tab": "Chat",
+      "placeholder": "Escribe un mensaje…",
+      "battlePlaceholder": "Di algo…",
+      "send": "Enviar",
+      "empty": "Aún no hay mensajes",
+      "battleEmpty": "El chat del combate aparecerá aquí",
+      "unread": "{count} mensajes sin leer"
+    },
+    "end": {
+      "victory": "¡VICTORIA!",
+      "defeat": "DERROTA",
+      "tie": "EMPATE",
+      "winner": "GANADOR",
+      "turn": "Turno {turn}",
+      "backToStart": "Volver al inicio",
+      "youWon": "¡Has ganado!",
+      "itsATie": "¡Empate!",
+      "playerWon": "¡{name} ha ganado!",
+      "playAgain": "Jugar otra vez",
+      "watchReplay": "Ver repetición",
+      "savingReplay": "Guardando repetición…",
+      "replaySaved": "¡Repetición guardada!",
+      "saveReplay": "Guardar repetición"
+    },
+    "play": {
+      "title": "Simulador de Combates",
+      "subtitle": "Juega un combate Pokémon contra un oponente IA",
+      "start": "Empezar combate",
+      "newTab": "+ Nuevo",
+      "won": "Ganado",
+      "lost": "Perdido",
+      "tie": "Empate",
+      "turn": "Turno {turn}",
+      "yourTurn": " — ¡Tu turno!"
+    }
+  }
+}
