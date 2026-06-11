@@ -9,6 +9,7 @@ import { PokemonSearch } from './PokemonSearch'
 import { StatTable } from './StatTable'
 import { MoveSlot } from './MoveSlot'
 import { HPBar } from './HPBar'
+import { BSTypeRow } from '@/components/boffmedia/primitives/bs-type'
 import { getSpriteUrl, handleSpriteError } from '../../_lib/spriteUtils'
 
 const TERA_TYPE_KEYS = [
@@ -18,6 +19,7 @@ const TERA_TYPE_KEYS = [
 ]
 
 const STATUS_KEYS = ['Healthy', 'Burned', 'Paralyzed', 'Poisoned', 'Badly Poisoned', 'Frozen', 'Asleep']
+
 
 interface Props {
   poke: CalcPokemon
@@ -96,11 +98,7 @@ export function PokemonPanel({ poke, onChange, side, useChampions = false }: Pro
             }}
           />
           {species && (
-            <div className="flex flex-wrap gap-1">
-              {species.types.map((tp) => (
-                <TypeBadgeInline key={tp} type={tp} />
-              ))}
-            </div>
+            <BSTypeRow types={species.types} ghost />
           )}
         </div>
       </div>
@@ -248,22 +246,6 @@ function FormRow({ label, children }: { label: string; children: React.ReactNode
   )
 }
 
-const TYPE_COLORS_HEX: Record<string, string> = {
-  Normal: '#a8a878', Fire: '#f08030', Water: '#6890f0', Electric: '#f8d030',
-  Grass: '#78c850', Ice: '#98d8d8', Fighting: '#c03028', Poison: '#a040a0',
-  Ground: '#e0c068', Flying: '#a890f0', Psychic: '#f85888', Bug: '#a8b820',
-  Rock: '#b8a038', Ghost: '#705898', Dragon: '#7038f8', Dark: '#705848',
-  Steel: '#b8b8d0', Fairy: '#ee99ac', Stellar: '#40b8ff',
-}
 
-function TypeBadgeInline({ type }: { type: string }) {
-  const col = TYPE_COLORS_HEX[type] ?? '#9ca3af'
-  return (
-    <span
-      className="text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wide"
-      style={{ background: `${col}22`, border: `1px solid ${col}44`, color: col }}
-    >
-      {type}
-    </span>
-  )
-}
+
+
