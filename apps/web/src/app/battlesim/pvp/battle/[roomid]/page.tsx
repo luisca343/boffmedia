@@ -6,6 +6,7 @@ import { Protocol } from '@pkmn/protocol';
 import { io, Socket } from 'socket.io-client';
 import { env } from '@/config/env.public';
 import { BattleCanvas } from '../../../_components/BattleCanvas';
+import { BattleLayout } from '../../../_components/BattleLayout';
 import { BattleSession } from '../../../_utils/BattleSession';
 import { sanitizeHtml } from '../../../_utils/sanitizeHtml';
 import useViewportWidth from '@/services/useViewPortWidth';
@@ -264,152 +265,145 @@ export default function PvPBattlePage({
     </div>
   ) : null;
 
-  return (
-    <div className="flex flex-col gap-4 p-4" style={{ color: 'var(--text)', background: 'var(--bg)' }}>
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Link href="/battlesim/pvp" className="text-sm" style={{ color: 'var(--text-muted)' }}>
-            ← Lobby
-          </Link>
-          <h1 className="text-lg font-semibold" style={{ color: 'var(--text)' }}>PvP Battle</h1>
-          <span className="text-xs px-2 py-1 rounded font-mono"
-            style={{ color: 'var(--text-muted)', background: 'var(--surface-2)' }}>
-            {decodedRoomId.slice(0, 8)}...
-          </span>
-          <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-            vs <strong>{opponentName}</strong>
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          {state.timerState && state.status === 'active' && (
-            <>
-              <BSXRing sec={Math.ceil(state.timerState.p1.turnRemaining / 1000)} max={60} size={36} />
-              <BSXRing sec={Math.ceil(state.timerState.p2.turnRemaining / 1000)} max={60} size={36} />
-            </>
-          )}
-          {state.status === 'active' && (
-            <button
-              onClick={handleForfeit}
-              className="px-4 py-1.5 rounded-md text-sm font-medium transition-colors"
-              style={{ background: 'var(--surface-3)', color: 'var(--rose-400)', border: '1px solid color-mix(in srgb, var(--rose-500) 40%, transparent)' }}
-            >
-              Forfeit
-            </button>
-          )}
-        </div>
+  const header = (
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-3">
+        <Link href="/battlesim/pvp" className="text-sm" style={{ color: 'var(--text-muted)' }}>
+          ← Lobby
+        </Link>
+        <h1 className="text-lg font-semibold" style={{ color: 'var(--text)' }}>PvP Battle</h1>
+        <span className="text-xs px-2 py-1 rounded font-mono"
+          style={{ color: 'var(--text-muted)', background: 'var(--surface-2)' }}>
+          {decodedRoomId.slice(0, 8)}...
+        </span>
+        <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
+          vs <strong>{opponentName}</strong>
+        </span>
       </div>
-
-      {/* Battle Canvas + Log */}
-      <div className="flex gap-4">
-        <div className="flex flex-col relative shrink-0">
-          <BattleCanvas
-            battle={state.battle}
-            pov={pov}
-            messageBar={state.messageBar}
-            showPreviewOverlay={state.battle.turn === 0 && !battleStarted}
-            setBattleStarted={setBattleStarted}
-            setIsPlaying={() => {}}
-            currentAction={0}
-            battleLog={null}
-            initScene={handleInitScene}
-            liveMode={true}
-            liveStatus={state.status}
-            battleComplete={state.battleComplete}
-            choicePanel={choicePanel}
-          />
-        </div>
-
-        {/* Right: Tick Log */}
-        <div className="flex-1 min-w-0">
-          <div className="flex-1 rounded-lg overflow-hidden" style={{ border: '1px solid var(--border)' }}>
-            <div
-              className="overflow-y-auto"
-              ref={logRef}
-              style={{ height: `${canvasWidth * ASPECT_RATIO}px`, background: 'var(--surface)' }}
-            >
-              {bsx.bsxTicks.length > VISIBLE_TICK_LIMIT && !showAllLogs && (
-                <button
-                  onClick={() => setShowAllLogs(true)}
-                  className="w-full p-1 mb-1 text-xs font-mono"
-                  style={{ color: 'var(--text-muted)', background: 'var(--surface-2)', borderBottom: '1px solid var(--border)' }}
-                >
-                  Show all {bsx.bsxTicks.length} events (showing last {VISIBLE_TICK_LIMIT})
-                </button>
-              )}
-              {(showAllLogs ? bsx.bsxTicks : bsx.bsxTicks.slice(-VISIBLE_TICK_LIMIT)).map((ev, i) => (
-                <BSXTick key={i} ev={ev as any} />
-              ))}
-            </div>
-          </div>
-        </div>
+      <div className="flex items-center gap-2">
+        {state.timerState && state.status === 'active' && (
+          <>
+            <BSXRing sec={Math.ceil(state.timerState.p1.turnRemaining / 1000)} max={60} size={36} />
+            <BSXRing sec={Math.ceil(state.timerState.p2.turnRemaining / 1000)} max={60} size={36} />
+          </>
+        )}
+        {state.status === 'active' && (
+          <button
+            onClick={handleForfeit}
+            className="px-4 py-1.5 rounded-md text-sm font-medium transition-colors"
+            style={{ background: 'var(--surface-3)', color: 'var(--rose-400)', border: '1px solid color-mix(in srgb, var(--rose-500) 40%, transparent)' }}
+          >
+            Forfeit
+          </button>
+        )}
       </div>
-
-      {/* Switch/Bench below canvas */}
-      {state.isWaitingForChoice && bsx.requestType === 'move' && bsx.bsxBench.length > 0 && (
-        <div className="flex flex-col gap-2">
-          <div className="text-xs font-medium uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Switch</div>
-          <div className="flex flex-wrap gap-2">
-            {bsx.bsxBench.map((mon, i) => (
-              <BSXBenchChip key={i} mon={mon} hotkey={String(i + 1)} disabled={mon.fnt}
-                onClick={mon.fnt ? undefined : () => handleMakeChoice(`switch ${i + 1}`)} />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {state.isWaitingForChoice && bsx.requestType === 'switch' && (
-        <div className="flex flex-col gap-2">
-          <div className="text-xs font-medium uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Forced Switch</div>
-          <div className="flex flex-wrap gap-2">
-            {bsx.bsxBench.map((mon, i) => (
-              <BSXBenchChip key={i} mon={mon} hotkey={String(i + 1)} disabled={mon.fnt}
-                onClick={mon.fnt ? undefined : () => handleMakeChoice(`switch ${i + 1}`)} />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Turn indicator */}
-      {state.status === 'active' && state.battle.turn > 0 && (
-        <div className="text-center text-sm" style={{ color: 'var(--text-muted)' }}>
-          {bsx.turnText}
-          {state.isWaitingForChoice && ' — Your turn!'}
-        </div>
-      )}
-
-      {/* Post-battle */}
-      {state.status === 'finished' && (
-        <div className="flex flex-col items-center gap-3 py-2">
-          <div className="text-center">
-            <h2 className="text-xl font-semibold" style={{ color: 'var(--text)' }}>
-              {state.winner === (pov === 0 ? state.battle.p1?.name : state.battle.p2?.name)
-                ? 'You won!'
-                : state.winner === 'tie'
-                  ? "It's a tie!"
-                  : `${state.winner} won!`}
-            </h2>
-          </div>
-          {savingReplay && <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Saving replay...</p>}
-          {savedReplayId && (
-            <div className="flex flex-col items-center gap-2">
-              <p className="text-sm" style={{ color: 'var(--emerald-400)' }}>Replay saved!</p>
-              <Link
-                href={`/battlesim/replay/${savedReplayId}`}
-                className="px-6 py-2 rounded-md font-medium transition-colors"
-                style={{ background: 'var(--surface-2)', color: 'var(--text)', border: '1px solid var(--border)' }}
-              >
-                Watch Replay
-              </Link>
-            </div>
-          )}
-          <Link href="/battlesim/pvp"
-            className="px-6 py-2 rounded-md font-medium transition-colors"
-            style={{ background: 'var(--accent)', color: 'var(--text)', border: '1px solid var(--border)' }}>
-            Play Again
-          </Link>
-        </div>
-      )}
     </div>
+  );
+
+  const rightPanel = (
+    <div className="rounded-lg overflow-hidden" style={{ border: '1px solid var(--border)' }}>
+      <div
+        className="overflow-y-auto"
+        ref={logRef}
+        style={{ height: `${canvasWidth * ASPECT_RATIO}px`, background: 'var(--surface)' }}
+      >
+        {bsx.bsxTicks.length > VISIBLE_TICK_LIMIT && !showAllLogs && (
+          <button
+            onClick={() => setShowAllLogs(true)}
+            className="w-full p-1 mb-1 text-xs font-mono"
+            style={{ color: 'var(--text-muted)', background: 'var(--surface-2)', borderBottom: '1px solid var(--border)' }}
+          >
+            Show all {bsx.bsxTicks.length} events (showing last {VISIBLE_TICK_LIMIT})
+          </button>
+        )}
+        {(showAllLogs ? bsx.bsxTicks : bsx.bsxTicks.slice(-VISIBLE_TICK_LIMIT)).map((ev, i) => (
+          <BSXTick key={i} ev={ev as any} />
+        ))}
+      </div>
+    </div>
+  );
+
+  const switchBench = state.isWaitingForChoice && bsx.requestType === 'move' && bsx.bsxBench.length > 0 ? (
+    <div className="flex flex-col gap-2">
+      <div className="text-xs font-medium uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Switch</div>
+      <div className="flex flex-wrap gap-2">
+        {bsx.bsxBench.map((mon, i) => (
+          <BSXBenchChip key={i} mon={mon} hotkey={String(i + 1)} disabled={mon.fnt}
+            onClick={mon.fnt ? undefined : () => handleMakeChoice(`switch ${i + 1}`)} />
+        ))}
+      </div>
+    </div>
+  ) : null;
+
+  const forcedSwitch = state.isWaitingForChoice && bsx.requestType === 'switch' ? (
+    <div className="flex flex-col gap-2">
+      <div className="text-xs font-medium uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Forced Switch</div>
+      <div className="flex flex-wrap gap-2">
+        {bsx.bsxBench.map((mon, i) => (
+          <BSXBenchChip key={i} mon={mon} hotkey={String(i + 1)} disabled={mon.fnt}
+            onClick={mon.fnt ? undefined : () => handleMakeChoice(`switch ${i + 1}`)} />
+        ))}
+      </div>
+    </div>
+  ) : null;
+
+  const postBattle = state.status === 'finished' ? (
+    <div className="flex flex-col items-center gap-3 py-2">
+      <div className="text-center">
+        <h2 className="text-xl font-semibold" style={{ color: 'var(--text)' }}>
+          {state.winner === (pov === 0 ? state.battle.p1?.name : state.battle.p2?.name)
+            ? 'You won!'
+            : state.winner === 'tie'
+              ? "It's a tie!"
+              : `${state.winner} won!`}
+        </h2>
+      </div>
+      {savingReplay && <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Saving replay...</p>}
+      {savedReplayId && (
+        <div className="flex flex-col items-center gap-2">
+          <p className="text-sm" style={{ color: 'var(--emerald-400)' }}>Replay saved!</p>
+          <Link href={`/battlesim/replay/${savedReplayId}`}
+            className="px-6 py-2 rounded-md font-medium transition-colors"
+            style={{ background: 'var(--surface-2)', color: 'var(--text)', border: '1px solid var(--border)' }}>
+            Watch Replay
+          </Link>
+        </div>
+      )}
+      <Link href="/battlesim/pvp"
+        className="px-6 py-2 rounded-md font-medium transition-colors"
+        style={{ background: 'var(--accent)', color: 'var(--text)', border: '1px solid var(--border)' }}>
+        Play Again
+      </Link>
+    </div>
+  ) : null;
+
+  return (
+    <BattleLayout
+      header={header}
+      rightPanel={rightPanel}
+      switchBench={switchBench}
+      forcedSwitch={forcedSwitch}
+      postBattle={postBattle}
+      turnText={bsx.turnText}
+      isWaiting={state.isWaitingForChoice}
+      status={state.status}
+      turn={state.battle.turn}
+    >
+      <BattleCanvas
+        battle={state.battle}
+        pov={pov}
+        messageBar={state.messageBar}
+        showPreviewOverlay={state.battle.turn === 0 && !battleStarted}
+        setBattleStarted={setBattleStarted}
+        setIsPlaying={() => {}}
+        currentAction={0}
+        battleLog={null}
+        initScene={handleInitScene}
+        liveMode={true}
+        liveStatus={state.status}
+        battleComplete={state.battleComplete}
+        choicePanel={choicePanel}
+      />
+    </BattleLayout>
   );
 }
