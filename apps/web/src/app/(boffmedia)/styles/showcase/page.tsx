@@ -42,7 +42,8 @@ import { ToolsTypeBadge } from "@/components/boffmedia/ui/tools/tool-type-badge"
 import { ToolPanel, ToolStatBars, ToolApp, SegTabs, ToolSelect, ToolTable, CopyButton, Picker, HpBar, ResultBadge, StatTile, SplitBar, TrendChart, HeatGrid, TagPills } from "@/components/boffmedia/primitives"
 
 // Battlesim components
-import { BSType, BSTypeRow, BSCat, BSHpMeter, BSStatusChip, BSBoost, BSTera, BSPokeChip, BSMove, BSFieldCond, BSLogEvent, BSChatRow, BSTraySlot, BSMonCard, BSWinProb, BSTracker, TYPES, tyVar, effMult, effLabel, hpColor, aniF } from "@/components/boffmedia/primitives"
+import { BSType, BSTypeRow, BSCat, BSHpMeter, BSStatusChip, BSBoost, BSTera, BSPokeChip, BSMove, BSFieldCond, BSLogEvent, BSChatRow, BSTraySlot, BSMonCard, BSWinProb, BSTracker, TYPES, tyVar, effMult, effLabel, hpColor, aniF, BSXRing, BSXPlate, BSXKey, BSXOrderRail, BSXPlanChip, BSXBenchChip, BSXTeraBtn, BSXTick, BSXSpark, BSXScorePlate, freshMon, calcRange, koLabel } from "@/components/boffmedia/primitives"
+import { SystemLoading, SystemError, SystemNotFound, SystemOffline, SystemMaintenance, SystemForbidden, SystemComingSoon, SystemStatesDemoEmpty, SystemStatesDemoSkeleton, SystemStatesDemoToasts } from "@/components/boffmedia/ui/system-states"
 import { PokeSprite } from "@/components/shared/pokemon/PokeSprite"
 import { TeamSprites } from "@/components/shared/pokemon/TeamSprites"
 import { BaseStatBars } from "@/components/shared/pokemon/BaseStatBars"
@@ -279,16 +280,17 @@ const HUB_NAV = [
     ["patterns", "Patrones", "grid"],
      ["boff", "Boffmedia", "gamepad"],
       ["toolskit", "Herramientas", "wrench"],
-      ["battlesim", "Battlesim", "zap"],
-      ["profile", "Perfil", "user"],
+       ["battlesim", "Battlesim", "zap"],
+        ["profile", "Perfil", "user"],
+    ],
    ],
-  ],
- [
-  "Calidad",
   [
-   ["playground", "Playground", "sliders"],
-   ["a11y", "Accesibilidad", "shield"],
-   ["roadmap", "Hoja de ruta", "trending"],
+   "Calidad",
+   [
+    ["system", "Estados del sistema", "layers"],
+    ["playground", "Playground", "sliders"],
+    ["a11y", "Accesibilidad", "shield"],
+    ["roadmap", "Hoja de ruta", "trending"],
   ],
  ],
 ] as const
@@ -2983,177 +2985,235 @@ function ToolsKitSection() {
 }
 
 // ============================================================================
-// battlesim — Capa de combate (showcase section)
+// battlesim — Capa de combate v2 «Consola de mando» (showcase section)
 // ============================================================================
-interface BSMon {
-  id: string; name: string; types: string[]; hp: number; fnt?: boolean; tera?: boolean;
-  teraType?: string; status?: string | null; boosts?: Record<string, number>;
-  stats: { hp: number; atk: number; def: number; spa: number; spd: number; spe: number };
-}
-
-const MK = {
-  garchomp: { id:"garchomp", name:"Garchomp", types:["Dragon","Ground"], teraType:"Steel", stats:{hp:108,atk:130,def:95,spa:80,spd:85,spe:102} },
-  rillaboom: { id:"rillaboom", name:"Rillaboom", types:["Grass"], teraType:"Fire", stats:{hp:100,atk:125,def:90,spa:60,spd:70,spe:85} },
-  ironhands: { id:"ironhands", name:"Iron Hands", types:["Fighting","Electric"], teraType:"Fire", stats:{hp:154,atk:140,def:108,spa:50,spd:68,spe:50} },
-  fluttermane: { id:"fluttermane", name:"Flutter Mane", types:["Ghost","Fairy"], teraType:"Fairy", stats:{hp:55,atk:55,def:55,spa:135,spd:135,spe:135} },
-  gholdengo: { id:"gholdengo", name:"Gholdengo", types:["Steel","Ghost"], teraType:"Flying", stats:{hp:87,atk:60,def:95,spa:133,spd:91,spe:84} },
-  dragonite: { id:"dragonite", name:"Dragonite", types:["Dragon","Flying"], teraType:"Normal", stats:{hp:91,atk:134,def:95,spa:100,spd:100,spe:80} },
-}
-
-const mk = (key: string, o: Partial<BSMon>): BSMon => ({ ...(MK as any)[key], hp: 100, status: null, boosts: {}, tera: false, fnt: false, stats: { hp: 100, atk: 100, def: 100, spa: 100, spd: 100, spe: 100 }, ...o } as BSMon)
-
-const MOVES = [
-  { name: "Terremoto", type: "Ground", cat: "phys", power: 100, acc: 100, pp: 9, maxpp: 16 },
-  { name: "Enfado", type: "Dragon", cat: "phys", power: 120, acc: 100, pp: 4, maxpp: 16 },
-  { name: "Roca Afilada", type: "Rock", cat: "phys", power: 100, acc: 80, pp: 8, maxpp: 8 },
-  { name: "Danza Espada", type: "Normal", cat: "status", power: 0, acc: null, pp: 12, maxpp: 32 },
-]
-
-const LOG = [
-  { turn: 6 },
-  { who: "p2", actor: "Dragonite", kind: "move", icon: "bolt", type: "Flying", txt: "usó <b>Acróbata</b> sobre Garchomp.", dmg: "−22%", crit: false },
-  { who: "p1", actor: "Garchomp", kind: "ability", icon: "shield", txt: "se aferra con <b>Multiescamas</b> rota — daño completo." },
-  { who: "p1", actor: "Garchomp", kind: "move", icon: "bolt", type: "Ground", txt: "usó <b>Terremoto</b>.", dmg: "−38%", crit: true, eff: "super" },
-  { kind: "sys", txt: "¡Un golpe crítico!" },
-  { turn: 7 },
-  { who: "p1", actor: "Alex", kind: "boost", icon: "trending", txt: "<b>Garchomp</b> aumentó su Ataque con Danza Espada.", boost: "+2 Atq" },
-]
 
 function BattlesimSection() {
-  const demoMon = mk("garchomp", { hp: 78, boosts: { atk: 2, spe: 1 }, tera: true })
-  const demoKo = mk("rillaboom", { hp: 0, fnt: true })
-  const demoPar = mk("ironhands", { hp: 44, status: "par" })
-  const target = MK.dragonite
+  const garchomp = freshMon("garchomp")
+  const dragonite = freshMon("dragonite")
+  const flutter = freshMon("fluttermane")
+  const hands = { ...freshMon("ironhands"), hp: 44, status: "par" }
+  const rilla = { ...freshMon("rillaboom"), hp: 0, fnt: true }
+  const ghostMaybe = { min: 38, max: 52, ko: koLabel({ min: 38, max: 52 }, 45) }
+  const ghostSure = { min: 35, max: 44, ko: koLabel({ min: 35, max: 44 }, 30) }
+
+  const demoLog = [
+    { turn: 7 },
+    { who: "ally", type: "Ground", txt: "<b>Garchomp</b> usó Terremoto sobre Kingambit.", dmg: "−46%", eff: "super" },
+    { who: "foe", type: "Dragon", crit: true, txt: "<b>Miraidon</b> usó Dracometeoro sobre Flutter Mane. ¡Golpe crítico!", dmg: "−88%" },
+    { kind: "sys", txt: "<b>Flutter Mane</b> se debilitó." },
+    { who: "ally", kind: "switch", txt: "¡Adelante, <b>Iron Hands</b>!" },
+  ]
 
   return (
     <div>
       <div className="dsh-sectionhead">
-        <Kicker>Battlesim</Kicker>
-        <h2>Capa de combate</h2>
-        <p>Componentes específicos del simulador, construidos íntegramente sobre los tokens del sistema — heredan dirección (HUD/Neón/Grid), tema y acento sin reescribirse. Una sola hoja <code>battlesim.css</code> + <code>bs-kit.tsx</code> alimenta tanto el prototipo jugable como esta documentación.</p>
+        <Kicker>Battlesim v2</Kicker>
+        <h2>Consola de mando</h2>
+        <p>La reimaginación del simulador para <b>dobles VGC</b>: el combate se piensa como un turno planificado — órdenes por slot, objetivo sobre la arena y el cálculo integrado en los propios controles. Una hoja <code>battlesim-x.css</code> + <code>bsx-kit.jsx</code> (motor y primitivas) alimentan la herramienta en vivo y esta documentación. Los fundamentos de la v1 (tipos, estados, Tera) se conservan en <code>bs-kit.jsx</code>.</p>
       </div>
 
-      <Callout icon="sparkles" title="Prototipo jugable" style={{ marginBottom: "1.6rem" }}>
+      <Callout icon="sword" title="Herramienta jugable" style={{ marginBottom: "1.6rem" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap" }}>
-          <span>El flujo completo —inicio, cola, vista previa, combate en vivo, resultado, repetición y modo espectador— vive como prototipo clicable independiente.</span>
-          <Button variant="primary" iconRight="external">Abrir prototipo</Button>
+          <span>El flujo completo —vista previa con escalera de velocidad, combate 2v2 con motor de daño y resultado con MVP— vive como herramienta real dentro de la app, con tweaks de disposición (Cabina / Panel).</span>
+          <div style={{ display: "flex", gap: ".6rem", flexWrap: "wrap" }}>
+            <Button variant="primary" iconRight="arrow">Abrir Battlesim</Button>
+            <Button variant="ghost" iconRight="external">Prototipo v1</Button>
+          </div>
         </div>
       </Callout>
 
-      <Spec2 title="Tipos y categorías" tag="battlesim.css · BSType" intro="Insignia de tipo derivada de una paleta de 18 tokens afinada para fondo oscuro. Variante sólida y fantasma; el punto refuerza el color con forma (no solo color)." a11y="El texto del tipo va siempre presente — la información nunca depende solo del color. Contraste AA sobre superficie.">
-        <div className="spec2__row">
-          {TYPES.slice(0, 9).map((t: string) => <BSType key={t} type={t} />)}
+      {/* FUNDAMENTOS RETENIDOS */}
+      <Spec2 title="Fundamentos retenidos (v1)" tag="bs-data.ts · bs-type.tsx · bs-status-chip.tsx · bs-boost.tsx · bs-tera.tsx" intro="La capa de juego no cambia: insignias de tipo de 18 tokens, fichas de estado y boost, gema Tera y la tabla de eficacias que alimenta todo el cálculo." a11y="La información nunca depende solo del color: tipo, estado y eficacia siempre llevan texto.">
+        <div className="flex flex-wrap gap-[0.85rem] items-center">
+          {["Dragon", "Ground", "Fairy", "Steel", "Electric", "Fire"].map((t) => <BSType key={t} type={t} />)}
         </div>
-        <div className="spec2__row" style={{ marginTop: ".6rem" }}>
-          {["Dragon", "Ground", "Fairy", "Steel"].map((t: string) => <BSType key={t} type={t} ghost />)}
-        </div>
-        <div className="spec2__row" style={{ marginTop: ".6rem" }}>
-          <BSCat cat="phys" /><BSCat cat="spec" /><BSCat cat="status" />
+        <div className="flex flex-wrap gap-[0.85rem] items-center" style={{ marginTop: ".6rem" }}>
+          {["brn", "par", "slp", "frz"].map((s) => <BSStatusChip key={s} status={s} />)}
+          <BSBoost stat="atk" value={2} />
+          <BSBoost stat="spe" value={-1} />
+          <BSCat cat="phys" />
+          <BSCat cat="spec" />
+          <BSTera type="Steel" size="1.2em" />
         </div>
       </Spec2>
 
-      <Spec2 title="Medidor de PS" tag="BSHpMeter" intro="El bloque de información de un Pokémon en combate: nombre, nivel, gema Tera, barra de PS con segmentación y color por umbral, más estado y cambios de característica como fichas." a11y="El % de PS es texto, no solo barra; los estados (PAR, QUE…) y boosts se leen como etiquetas. Color de PS reforzado por el valor numérico.">
+      {/* PLATE + GHOST */}
+      <Spec2 title="Placa de combate con daño previsto" tag="bsx-plate.tsx" intro="Rediseñada como ficha de combatiente completa: retrato con aura del tipo, barra de PS con muescas al 50% y 25%, y —al apuntar un movimiento— la lectura del cálculo integrada: franjas fantasma sobre la barra (ámbar posible, rojo garantizado), rango numérico −min–max% y probabilidad de KO. La placa apuntada respira en ámbar; los KO atenuan el retrato a escala de grises." a11y="El rango se comunica como texto numérico («−38–52%») y la probabilidad de KO como etiqueta («KO garantizado», «Posible KO»), nunca solo franjas de color. El retrato es decorativo (alt vacío); el nombre va en texto.">
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: "1rem" }}>
-          <BSHpMeter mon={demoMon} />
-          <BSHpMeter mon={demoPar} />
-          <BSHpMeter mon={demoKo} />
+          <BSXPlate mon={{ ...garchomp, hp: 78, boosts: { atk: 2 } }} slotTag="A" active />
+          <BSXPlate mon={{ ...dragonite, hp: 45 }} slotTag="A" foe ghost={ghostMaybe} />
+          <BSXPlate mon={{ ...freshMon("kingambit"), hp: 30 }} slotTag="B" foe ghost={ghostSure} />
+          <BSXPlate mon={rilla} slotTag="B" />
         </div>
         <PropTable rows={[
-          ["mon", "object", "—", "Pokémon con hp (%), status, boosts, teraType, tera."],
-          ["compact", "boolean", "false", "Oculta tipos/estado/boosts (solo barra)."],
+          ["mon", "object", "—", "Pokémon con hp (%), status, boosts, tera, protect, fnt (KO)."],
+          ["ghost", "{min,max,ko}", "null", "Daño previsto: franjas sobre la barra + lectura −min–max% + etiqueta KO. Activa el pulso ámbar."],
+          ["slotTag / foe / active", "varios", "—", "Etiqueta A/B, lado rival (tag naranja) y resaltado del slot en mando."],
         ]} />
       </Spec2>
 
-      <Spec2 title="Fichas de estado, boost y Tera" tag="BSStatusChip · BSBoost · BSTera" intro="Micro-indicadores tácticos. Estados con color propio y abreviatura legible; boosts con signo y dirección; gema Tera con la forma del cristal teracristal.">
-        <div className="spec2__row">
-          {["brn", "par", "psn", "tox", "slp", "frz"].map((s) => <BSStatusChip key={s} status={s} />)}
-        </div>
-        <div className="spec2__row" style={{ marginTop: ".6rem" }}>
-          <BSBoost stat="atk" value={2} /><BSBoost stat="spe" value={1} />
-          <BSBoost stat="def" value={-1} /><BSBoost stat="spa" value={-2} />
-        </div>
-        <div className="spec2__row" style={{ marginTop: ".6rem", alignItems: "center", gap: ".7rem" }}>
-          {["Steel", "Fairy", "Dragon", "Fire", "Water"].map((t) => (
-            <span key={t} style={{ display: "inline-flex", alignItems: "center", gap: ".35rem", fontSize: "var(--t-xs)", color: "var(--text-muted)" }}>
-              <BSTera type={t} size="1.2em" />{t}
-            </span>
+      {/* MOVE KEY */}
+      <Spec2 title="Tecla de movimiento" tag="bsx-key.tsx" intro="El selector de ataque como tecla de consola: atajo de teclado (1–4), color y borde por tipo, categoría, marca de ÁREA y prioridad, PP como barra y eficacia calculada contra el objetivo. Al pasar el cursor dispara la previsualización fantasma en la arena." a11y="Tecla enfocable con focus visible; eficacia como texto; sin PP se desactiva.">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))", gap: ".6rem", maxWidth: 660 }}>
+          {(garchomp.moves || []).map((m: any, i: number) => (
+            <BSXKey key={m.name} move={m} hotkey={String(i + 1)} target={dragonite} onClick={() => {}} />
           ))}
         </div>
-      </Spec2>
-
-      <Spec2 title="Selector de ataque" tag="BSMove" intro="La ficha de un movimiento: nombre, tipo, categoría, PP y —la pieza clave— una previsualización de eficacia contra el objetivo actual, calculada con la tabla de tipos en vivo." a11y="Eficacia comunicada con texto («Súper eficaz», «Inmune»), no solo color. Botón enfocable; los movimientos sin PP se desactivan con rol no interactivo.">
-        <div className="grid grid-cols-2 gap-[.7rem]" style={{ maxWidth: 520 }}>
-          {MOVES.map((mv, i) => <BSMove key={i} move={mv} target={target} onClick={() => {}} />)}
-        </div>
         <p className="spec2__intro" style={{ marginTop: ".7rem", fontSize: "var(--t-sm)" }}>
-          Objetivo de la demo: <b>Dragonite</b> (Dragón/Volador). Nótese cómo Terremoto marca «Inmune» y Enfado «Súper eficaz».
+          Objetivo de la demo: <b>Dragonite</b> (Dragón/Volador) — Terremoto marca «Inmune» y Garra Dragón «Súper eficaz». Nótese la marca ÁREA·TODOS de Terremoto: en dobles también golpea a tu aliado.
         </p>
       </Spec2>
 
-      <Spec2 title="Condiciones de campo" tag="BSFieldCond" intro="Fichas para clima, terreno, trampas y pantallas. Color por efecto, icono, contador de turnos y nivel de capas. Pensadas para un riel compacto bajo el campo.">
-        <div className="flex items-center gap-[.5rem] flex-wrap">
-          <BSFieldCond cond={{ name: "Sol", icon: "sun", c: "var(--orange-400)", turns: 3 }} />
-          <BSFieldCond cond={{ name: "Campo Eléctrico", icon: "bolt", c: "var(--ty-electric)", turns: 5 }} />
-          <BSFieldCond cond={{ name: "Trampa Rocas", icon: "shield", c: "var(--ty-rock)" }} side />
-          <BSFieldCond cond={{ name: "Púas", icon: "target", c: "var(--ty-poison)", lvl: 2 }} side />
-          <BSFieldCond cond={{ name: "Reflejo", icon: "shield", c: "var(--cyan-400)", turns: 4 }} side />
+      {/* ORDER RAIL */}
+      <Spec2 title="Riel de orden de velocidad" tag="bsx-order-rail.tsx" intro="Lectura competitiva clave en VGC: quién actúa antes. El riel proyecta el orden del turno con la velocidad efectiva (boosts y parálisis incluidos) y avisa de que la prioridad puede alterarlo." a11y="Orden expresado con numeración explícita además de la posición; velocidad como valor.">
+        <BSXOrderRail slots={[
+          { side: "ally", idx: 0, mon: garchomp }, { side: "ally", idx: 1, mon: flutter },
+          { side: "foe", idx: 0, mon: dragonite }, { side: "foe", idx: 1, mon: freshMon("miraidon") },
+        ]} />
+      </Spec2>
+
+      {/* PLAN CHIPS */}
+      <Spec2 title="Plan de turno" tag="bsx-plan-chip.tsx" intro="En dobles cada turno son dos órdenes. El plan las encola como fichas por slot —movimiento con objetivo, cambio o Tera armado— y se ejecutan juntas con «Ejecutar turno». Cualquier orden se puede borrar antes de confirmar." a11y="Cada ficha describe la acción completa en texto; el botón de borrar lleva aria-label.">
+        <div style={{ display: "grid", gap: ".5rem", maxWidth: 420 }}>
+          <BSXPlanChip tag="A" action={{ kind: "move", move: (garchomp.moves || [])[0], target: { spread: "all" } }} onClear={() => {}} />
+          <BSXPlanChip tag="B" action={{ kind: "move", move: (flutter.moves || [])[0], targetName: "Dragonite", tera: true }} onClear={() => {}} />
+          <BSXPlanChip tag="B" action={{ kind: "switch", toName: "Amoonguss" }} onClear={() => {}} />
+          <BSXPlanChip tag="A" hint="Esperando orden…" />
         </div>
       </Spec2>
 
-      <Spec2 title="Registro de combate" tag="BSLogEvent" intro="La alternativa al muro de texto: eventos como tarjetas con icono por tipo de acción, fichas de daño/curación/eficacia y separadores de turno. Mantiene la claridad competitiva con jerarquía visual." a11y="Cada evento es texto estructurado; las fichas (daño, eficacia) acompañan pero no sustituyen la descripción escrita.">
-        <div className="flex flex-col gap-[.55rem]" style={{ maxWidth: 460 }}>
-          {LOG.map((ev, i) => <BSLogEvent key={i} ev={ev} />)}
+      {/* BENCH + TERA */}
+      <Spec2 title="Banquillo y Teracristal" tag="bsx-bench-chip.tsx · bsx-tera-btn.tsx" intro="El cambio muestra el banquillo con PS, estado y tipos; los debilitados se marcan y desactivan. El botón Tera se «arma» para el siguiente movimiento del slot y se consume una sola vez por combate.">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: ".6rem", maxWidth: 720 }}>
+          <BSXBenchChip mon={{ ...freshMon("amoonguss"), hp: 100 }} hotkey="5" onClick={() => {}} />
+          <BSXBenchChip mon={hands} hotkey="6" onClick={() => {}} />
+          <BSXBenchChip mon={rilla} onClick={() => {}} />
+        </div>
+        <div className="flex flex-wrap gap-[0.85rem] items-center" style={{ marginTop: ".7rem" }}>
+          <BSXTeraBtn type="Steel" onToggle={() => {}} />
+          <BSXTeraBtn type="Fairy" armed onToggle={() => {}} />
+          <BSXTeraBtn type="Fire" used onToggle={() => {}} />
         </div>
       </Spec2>
 
-      <Spec2 title="Banco de equipo y tarjeta de Pokémon" tag="BSTraySlot · BSMonCard" intro="Para cambios en combate (banco compacto con PS y tipos) y para vista previa / lobby (tarjeta con arte, tipos y base stats). Los Pokémon debilitados se desactivan y se marcan.">
-        <div className="spec2__grid2" style={{ gap: "1.5rem", alignItems: "start" }}>
-          <div className="grid gap-[.6rem]" style={{ gridTemplateColumns: "1fr" }}>
-            <BSTraySlot mon={demoMon} active />
-            <BSTraySlot mon={demoPar} />
-            <BSTraySlot mon={demoKo} />
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: ".7rem" }}>
-            <BSMonCard mon={mk("fluttermane", { hp: 100 }) as BSMon} lead showStats order={1} />
-            <BSMonCard mon={mk("gholdengo", { hp: 100 }) as BSMon} showStats />
-          </div>
+      {/* LOG TICKS */}
+      <Spec2 title="Telemetría de combate" tag="bsx-tick.tsx" intro="El registro pasa de tarjetas a ticks de telemetría: línea compacta con borde de color por tipo de acción, fichas de daño/eficacia inline y separadores de turno. Más densidad para seguir un combate rápido sin perder estructura." a11y="Cada tick es una frase completa; las fichas acompañan al texto, no lo sustituyen.">
+        <div style={{ display: "flex", flexDirection: "column", gap: ".3rem", maxWidth: 460 }}>
+          {demoLog.map((ev: any, i: number) => <BSXTick key={i} ev={ev} />)}
         </div>
       </Spec2>
 
-      <Spec2 title="Boff Insight y probabilidad" tag="BSWinProb · .insight" intro="Las piezas «esports»: barra de probabilidad de victoria para espectadores y el panel Boff Insight que traduce el estado del combate en lectura táctica (velocidad, rango de daño, prob. de KO)." a11y="Porcentajes y etiquetas textuales en ambos lados; la barra es refuerzo visual del dato numérico.">
-        <div className="spec2__grid2" style={{ gap: "1.5rem", alignItems: "start" }}>
-          <div style={{ paddingTop: ".4rem" }}>
-            <BSWinProb a={64} b={36} nameA="Alex" nameB="Kaito" />
-          </div>
-          <div
-            className="rounded-[var(--radius-lg)]"
-            style={{ padding: ".85rem .95rem", background: "linear-gradient(160deg, color-mix(in srgb, var(--purple-500) 14%, var(--surface)), var(--surface))", border: "1px solid color-mix(in srgb, var(--purple-500) 32%, var(--border))" }}
-          >
-            <div className="flex items-center gap-[.5rem] font-mono text-[.62rem] tracking-[.14em] uppercase text-[var(--purple-400)] font-bold mb-[.6rem]">
-              <Icon name="sparkles" size={14} /> Boff Insight
-            </div>
-            <div className="flex items-center justify-between gap-[.6rem] text-[var(--t-sm)] py-[.3rem] border-t-0 border-x-0 border-b border-solid border-[var(--border)] first:border-t-0">
-              <span className="text-[var(--text-muted)]">Velocidad</span>
-              <span className="font-mono font-bold text-[var(--emerald-400)]">Atacas primero</span>
-            </div>
-            <div className="flex items-center justify-between gap-[.6rem] text-[var(--t-sm)] py-[.3rem] border-t border-x-0 border-b-0 border-solid border-[var(--border)]">
-              <span className="text-[var(--text-muted)]">Enfado → Dragonite</span>
-              <span className="font-mono font-bold">104–122%</span>
-            </div>
-            <div className="h-[7px] rounded-[4px] overflow-hidden bg-[var(--surface-3)] border border-solid border-[var(--border)] mt-[.3rem]">
-              <span className="block h-full" style={{ width: "92%", background: "linear-gradient(90deg, var(--orange-600), var(--orange-400))" }} />
-            </div>
-            <div className="flex items-center justify-between gap-[.6rem] text-[var(--t-sm)] py-[.3rem] border-t border-x-0 border-b-0 border-solid border-[var(--border)]">
-              <span className="text-[var(--text-muted)]">Prob. de debilitar</span>
-              <span className="font-mono font-bold" style={{ color: "var(--orange-400)" }}>Garantizado</span>
-            </div>
-          </div>
+      {/* HUD PIECES */}
+      <Spec2 title="HUD de cabecera" tag="bsx-score-plate.tsx · bsx-ring.tsx · bsx-spark.tsx" intro="Las piezas del marcador: placa de jugador con puntos de equipo por estado (vivo / tocado / KO), aro de tiempo de turno y sparkline de probabilidad de victoria que historia el combate turno a turno." a11y="Los puntos de equipo llevan title con el nombre; el tiempo y la probabilidad son siempre valores numéricos visibles.">
+        <div style={{ display: "flex", gap: "1rem", alignItems: "center", flexWrap: "wrap" }}>
+          <BSXScorePlate name="Alex" rating="1607 · tú" av="AX" team={[{ hp: 100 }, { hp: 62 }, { hp: 28 }, { hp: 0, fnt: true }]} />
+          <BSXRing sec={27} />
+          <BSXRing sec={7} />
+          <div style={{ width: 220 }}><BSXSpark data={[50, 54, 47, 58, 66, 61, 72]} /></div>
         </div>
       </Spec2>
 
-      <Callout icon="layers" tone="orange" title="Una sola fuente, dos destinos" style={{ marginTop: "1.5rem" }}>
-        Estas piezas se exportan como componentes (<code>BSHpMeter</code>, <code>BSMove</code>, <code>BSLogEvent</code>…). El prototipo las compone en pantallas completas; el Hub las documenta. Cero CSS duplicado, cambio de dirección/tema en vivo desde Tweaks.
+      <Callout icon="layers" tone="orange" title="Un motor, tres destinos" style={{ marginTop: "1.5rem" }}>
+        El cálculo (<code>calcRange</code>, <code>koLabel</code>, <code>speedOrder</code>) es la única fuente: alimenta la previsualización fantasma, la eficacia de las teclas y la resolución real del turno. Los componentes se exportan como módulos y heredan dirección × tema × acento del sistema sin reescribirse.
       </Callout>
+    </div>
+  )
+}
+
+// ============================================================================
+// 10. SYSTEM STATES
+// ============================================================================
+const STATE_PREVIEWS = [
+  { id: "cargando",      icon: "refresh",  bg: "accent" as const, name: "Cargando",          desc: "Splash con logo, anillo y barra de progreso indeterminada.", route: "/cargando",        render: () => <SystemLoading /> },
+  { id: "error",         icon: "alert",    bg: "warm" as const,   name: "Error",             desc: "Fallo inesperado con mensaje técnico plegado e ID de seguimiento.", route: "/error",   render: () => <SystemError /> },
+  { id: "404",           icon: "compass",  bg: "accent" as const, name: "404 · No encontrada", desc: "Ruta inexistente con vías de regreso al contenido.", route: "/404",                render: () => <SystemNotFound /> },
+  { id: "offline",       icon: "wifioff",  bg: "cool" as const,   name: "Sin conexión",      desc: "Pérdida de red; recarga automática al volver en línea.", route: "/sin-conexion",    render: () => <SystemOffline /> },
+  { id: "mantenimiento", icon: "cog",      bg: "warm" as const,   name: "Mantenimiento",     desc: "Ventana programada con tiempo estimado de vuelta.", route: "/mantenimiento",        render: () => <SystemMaintenance /> },
+  { id: "acceso",        icon: "lock",     bg: "warm" as const,   name: "Acceso denegado",   desc: "403 · requiere sesión o permisos superiores.", route: "/acceso-denegado",           render: () => <SystemForbidden /> },
+  { id: "proximamente",  icon: "sparkles", bg: "accent" as const, name: "Próximamente",      desc: "Lista de espera con captura de correo y confirmación.", route: "/proximamente",     render: () => <SystemComingSoon /> },
+]
+
+function SystemStatesSection() {
+  const [cur, setCur] = React.useState("404")
+  const s = STATE_PREVIEWS.find((x) => x.id === cur) || STATE_PREVIEWS[0]
+
+  return (
+    <div>
+      <div className="dsh-sectionhead">
+        <Kicker>Estados del sistema</Kicker>
+        <h2>Pantallas y estados de utilidad</h2>
+        <p>Lo que aparece fuera del flujo feliz: mientras carga, cuando algo falla, cuando no hay datos o cuando una sección aún no existe. Todo construido sobre el sistema de tokens — responde a las tres direcciones, ambos temas y el acento.</p>
+      </div>
+
+      <Spec2 title="Páginas completas" tag="system-states.jsx · StateShell" intro="Siete tomas de página completa sobre una cáscara común: fondo ambiental de orbes (warm / accent / cool), insignia, titular, acciones de regreso y vía de ayuda. Selecciona un estado para verlo en el escenario; «Abrir página» lo muestra bajo la navegación real." a11y="Cada estado declara su rol: status + aria-live para carga y desconexión, alert para errores. Las acciones de regreso son botones reales y la ayuda enlaza a la comunidad. El selector es un tablist navegable por teclado.">
+        <div className="grid grid-cols-[235px_1fr] gap-4 items-stretch max-[860px]:grid-cols-1">
+          <div className="flex flex-col gap-[0.3rem]" role="tablist" aria-label="Estado del sistema" aria-orientation="vertical">
+            {STATE_PREVIEWS.map((p) => (
+              <button
+                key={p.id}
+                role="tab"
+                aria-selected={cur === p.id}
+                className={
+                  "flex items-center gap-[0.55rem] w-full text-left font-inherit text-[length:var(--t-sm)] font-semibold px-[0.75rem] py-[0.6rem] rounded-[var(--radius)] cursor-pointer border border-solid border-transparent bg-transparent transition-[background,color,border-color] duration-[var(--dur)] " +
+                  (cur === p.id
+                    ? "text-[var(--text)] bg-[var(--surface-2)] border-[var(--border-strong)] [&_svg]:text-[var(--accent-bright)]"
+                    : "text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--surface-2)]")
+                }
+                onClick={() => setCur(p.id)}
+              >
+                <Icon name={p.icon} size={15} />
+                <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">{p.name}</span>
+                <code className="ml-auto font-mono text-[0.6rem] text-[var(--text-dim)] shrink-0 max-[860px]:hidden">{p.route}</code>
+              </button>
+            ))}
+          </div>
+          <div className="border border-solid border-[var(--border)] rounded-[var(--radius-lg)] overflow-hidden bg-[var(--card-bg)] flex flex-col min-w-0">
+            <div
+              className="relative h-[420px] overflow-hidden bg-[var(--bg)] border-b border-[var(--border)] max-[560px]:h-[320px]"
+              key={s.id}
+              aria-hidden="true"
+              style={{ "--sysstate-minh": "100%", "--sysstate-pad": "1.5rem" } as React.CSSProperties}
+            >
+              <div className="[&_.sysstate__inner]:scale-[0.9]" style={{ height: "100%" }}>
+                {s.render()}
+              </div>
+            </div>
+            <div className="flex items-center justify-between gap-4 px-[1.15rem] py-[0.85rem] border-t border-[var(--border)] bg-[color-mix(in_srgb,var(--surface-2)_55%,transparent)]">
+              <p className="text-[length:var(--t-sm)] text-[var(--text-muted)] m-0">{s.desc}</p>
+            </div>
+          </div>
+        </div>
+        <PropTable rows={[
+          ["bg", "warm|accent|cool", "accent", "Variante del fondo ambiental de orbes flotantes"],
+          ["chromed", "boolean", "false", "Renderiza a 100vh − navbar, bajo la navegación y footer reales"],
+          ["role / aria-live", "string", "—", "status · polite para esperas; alert para fallos"],
+          ["go", "function", "—", "Router de la app para las acciones de regreso"],
+        ]} />
+      </Spec2>
+
+      <Spec2 title="Estado vacío" tag="EmptyState · system-inline.jsx" intro="El bloque reutilizable para «no hay nada aquí»: icono sobre lavado de acento, titular, explicación breve y siempre una salida accionable. Cuatro presets contextuales — búsqueda, favoritos, perfil y eventos — demuestran que el componente cambia de tono sin cambiar de estructura." a11y="El CTA primario nunca falta: un estado vacío sin salida es un callejón. Título como heading real; el icono es decorativo.">
+        <SystemStatesDemoEmpty />
+        <PropTable rows={[
+          ["icon", "string", "inbox", "Icono del sistema sobre fondo de acento suave"],
+          ["title / lead", "string", "—", "Titular corto + explicación de una frase"],
+          ["ctaLabel / ctaIcon / onCta", "varios", "—", "Acción primaria (variant accent)"],
+          ["secondaryLabel / onSecondary", "varios", "—", "Salida secundaria opcional (ghost)"],
+        ]} />
+      </Spec2>
+
+      <Spec2 title="Esqueletos de carga" tag="Skeleton · kit.jsx" intro="Mientras llegan los datos, la rejilla mantiene su geometría: cada tarjeta esqueleto reserva el espacio exacto del contenido final — imagen, avatar, dos líneas — y brilla con un barrido sutil. Alterna para comparar esqueleto y contenido cargado." a11y="El contenedor en carga expone aria-busy; el barrido se detiene con reduced motion. El esqueleto replica la geometría real para evitar saltos de layout (CLS ≈ 0).">
+        <SystemStatesDemoSkeleton />
+        <PropTable rows={[
+          ["w / h", "number|string", "100% · 12", "Dimensiones del bloque"],
+          ["circle", "boolean", "false", "Avatar circular (w = h)"],
+          ["radius", "css", "var(--radius)", "Radio de esquina del bloque"],
+        ]} />
+      </Spec2>
+
+      <Spec2 title="Toasts y alertas en línea" tag="useToast · Alert" intro="Dos niveles de notificación: el toast confirma sin interrumpir (esquina inferior, autodescarte con barra de tiempo) y la alerta en línea persiste dentro del contenido hasta resolverse o cerrarse. Cuatro tonos semánticos compartidos." a11y="Los toasts viven en una región live y nunca contienen la única vía para una acción. Las alertas comunican el tono con icono y texto, no solo color; el cierre lleva aria-label.">
+        <SystemStatesDemoToasts />
+      </Spec2>
     </div>
   )
 }
@@ -3172,7 +3232,8 @@ const SECTIONS: Record<string, React.ComponentType<{ go?: (path: string) => void
   boff: BoffSection,
   toolskit: ToolsKitSection,
   battlesim: BattlesimSection,
-  profile: ProfileSection,
+  system: SystemStatesSection,
+   profile: ProfileSection,
  playground: PlaygroundSection,
  a11y: AccessibilitySection,
  roadmap: RoadmapSection,

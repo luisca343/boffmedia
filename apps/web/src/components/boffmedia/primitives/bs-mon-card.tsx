@@ -34,7 +34,7 @@ export function BSMonCard({ mon, order, lead, onClick, showStats }: BSMonCardPro
     <button
       className={cn(
         "flex flex-col gap-[.55rem] rounded-[var(--radius-lg)] relative overflow-hidden text-left font-inherit",
-        "bg-[var(--card-bg)] border-[var(--card-border)] transition-all duration-[var(--dur)] ease-[var(--ease)]",
+        "bg-[var(--card-bg)] border-[var(--border)] transition-all duration-[var(--dur)] ease-[var(--ease)]",
         "px-[.85rem] py-[.85rem] text-[var(--text)] cursor-pointer",
         '[data-direction="neon"]:backdrop-blur-[12px]',
         lead && "border-[var(--accent-bright)] shadow-[inset_0_0_0_1px_var(--accent-bright),0_16px_40px_-22px_var(--accent)]",
@@ -59,7 +59,7 @@ export function BSMonCard({ mon, order, lead, onClick, showStats }: BSMonCardPro
           className="w-[84px] h-[84px] object-contain mx-auto"
           style={{ filter: "drop-shadow(0 4px 6px rgba(0,0,0,.5))" }}
         />
-        <div className="font-display font-extrabold text-[var(--t-base)] text-center">{mon.name}</div>
+        <div className="font-display font-extrabold text-t-base text-center">{mon.name}</div>
         <div className="flex gap-[.3rem] justify-center"><BSTypeRow types={mon.types} ghost /></div>
         {showStats && (
           <div className="grid grid-cols-3 gap-[.3rem_.6rem] font-mono text-[.6rem] text-[var(--text-muted)]">
