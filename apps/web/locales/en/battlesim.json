@@ -18,7 +18,9 @@
     "header": {
       "lobby": "Lobby",
       "forfeit": "Forfeit",
-      "vs": "vs"
+      "vs": "vs",
+      "fullscreen": "Fullscreen",
+      "exitFullscreen": "Exit fullscreen"
     },
     "connection": {
       "error": "Error",

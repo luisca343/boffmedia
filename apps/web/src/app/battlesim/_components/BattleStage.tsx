@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { BSXScorePlate, BSXOrderRail } from '@/components/boffmedia/primitives';
+import { cn } from '@/lib/utils';
 import type { BSXLayout } from '../_hooks/useBSXLayout';
 
 interface BattleStageProps {
@@ -10,21 +11,23 @@ interface BattleStageProps {
   children: ReactNode;
   /** Show the projected speed-order rail (foe speeds are estimates). */
   showOrderRail?: boolean;
+  /** Hide score plates and order rail (fullscreen immersive mode). */
+  fullscreen?: boolean;
 }
 
 /**
  * Field-first stage wrapper: player score plates over the canvas,
  * the canvas itself, and the projected speed order underneath.
  */
-export function BattleStage({ bsx, children, showOrderRail = true }: BattleStageProps) {
+export function BattleStage({ bsx, children, showOrderRail = false, fullscreen = false }: BattleStageProps) {
   const orderSlots = [
     bsx.bsxAlly ? { side: 'ally', idx: 0, mon: bsx.bsxAlly } : null,
     bsx.bsxFoe ? { side: 'foe', idx: 0, mon: { ...bsx.bsxFoe, est: true } } : null,
   ].filter(Boolean) as { side: string; idx: number; mon: any }[];
 
   return (
-    <div className="flex flex-col gap-2 min-w-0 animate-appear">
-      {(bsx.bsxScoreP1 || bsx.bsxScoreP2) && (
+    <div className={cn("flex flex-col gap-2 min-w-0 animate-appear", fullscreen && "h-full")}>
+      {!fullscreen && (bsx.bsxScoreP1 || bsx.bsxScoreP2) && (
         <div className="flex flex-wrap justify-between gap-2 min-w-0">
           {bsx.bsxScoreP1 && (
             <BSXScorePlate

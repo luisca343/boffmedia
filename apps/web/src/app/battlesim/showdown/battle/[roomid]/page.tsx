@@ -15,6 +15,7 @@ import { useChoiceMechanics } from '../../../_hooks/useChoiceMechanics';
 import { BattleStage } from '../../../_components/BattleStage';
 import { BattleActionDock } from '../../../_components/BattleActionDock';
 import { LogChatRail } from '../../../_components/LogChatRail';
+import { useFullscreen } from '../../../_hooks/useFullscreen';
 
 export default function ShowdownBattlePage({
   params,
@@ -48,6 +49,7 @@ export default function ShowdownBattlePage({
   );
   const [, canvasWidth] = useViewportWidth();
   const [battleStarted, setBattleStarted] = useState(false);
+  const { ref: fullscreenRef, isFullscreen, toggle: toggleFullscreen } = useFullscreen<HTMLDivElement>();
 
   const state = session?.getState();
   const bsx = useBSXLayout(state ?? null);
@@ -138,6 +140,8 @@ export default function ShowdownBattlePage({
       timerP2={timersActive ? Math.ceil(state.timerState!.p2.turnRemaining / 1000) : undefined}
       showForfeit={state.status === 'active' && !isSpectator}
       onForfeit={handleForfeit}
+      isFullscreen={isFullscreen}
+      onToggleFullscreen={toggleFullscreen}
     />
   );
 
@@ -196,8 +200,8 @@ export default function ShowdownBattlePage({
   ) : null;
 
   return (
-    <GameStageLayout header={header} rail={rightPanel} dock={dock} footer={postBattle}>
-      <BattleStage bsx={bsx}>
+    <GameStageLayout ref={fullscreenRef} header={header} rail={rightPanel} dock={dock} footer={postBattle} fullscreen={isFullscreen}>
+      <BattleStage bsx={bsx} fullscreen={isFullscreen}>
         <BattleCanvas
           battle={state.battle}
           pov={pov}
@@ -213,6 +217,8 @@ export default function ShowdownBattlePage({
           liveStatus={state.status}
           battleComplete={state.battleComplete}
           username={username}
+          canvasWidth={isFullscreen ? window.innerWidth : undefined}
+          fullscreen={isFullscreen}
         />
       </BattleStage>
     </GameStageLayout>
