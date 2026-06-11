@@ -48,15 +48,13 @@ describe('BattleController — integration (ValidationPipe + GlobalExceptionFilt
     jest.resetAllMocks();
   });
 
-  // NOTE: getBattle() contains a bug — `getPokemonTeam` calls `this.logger.log`
-  // where `this` is undefined (plain function, not a class method). The battle
-  // simulation also runs a real @pkmn/sim battle which can take 60-120+ seconds.
-  // This test is skipped until the production bug is fixed.
+  // NOTE: getBattle() runs a real @pkmn/sim battle which can take 60-120+ seconds.
+  // This test is skipped due to long runtime only.
 
   // ── GET /battlesimulator/battle ───────────────────────────────────────────
 
   describe('GET /battlesimulator/battle', () => {
-    it.skip('returns battle result (skipped: production bug + long runtime)', async () => {
+    it.skip('returns battle result (skipped: long runtime)', async () => {
       await request(app.getHttpServer())
         .get('/battlesimulator/battle')
         .expect(200);

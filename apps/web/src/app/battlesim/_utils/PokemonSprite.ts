@@ -57,8 +57,9 @@ export class PokemonSprite {
   playNextAnim(): void {
     if (this.animationQueue.length === 0) return;
     
-    const {animType, transition, type, callback} = this.animationQueue[0];
-    this.performAnimation(transition, type, callback);
+    const animData = this.animationQueue[0];
+    const {animType, transition, type, callback} = animData;
+    this.performAnimation(transition, type, callback, animData);
   }
   
   /**
@@ -87,7 +88,7 @@ export class PokemonSprite {
   /**
    * Performs a single animation
    */
-  performAnimation(transition: ScenePos, type?: string, callback?: () => void): void {
+  performAnimation(transition: ScenePos, type?: string, callback?: () => void, animData?: AnimationData): void {
     const animationTime = transition.time === undefined ? 500 : transition.time;
     
     const prom = new Promise<void>(resolve => setTimeout(() => {
@@ -129,8 +130,10 @@ export class PokemonSprite {
         callback();
       }
       
-      this.animationQueue.shift();
-      this.scene.currentAnimations.shift();
+      const idx = animData ? this.animationQueue.indexOf(animData) : 0;
+      if (idx >= 0) this.animationQueue.splice(idx, 1);
+      const animIdx = this.scene.currentAnimations.indexOf(prom);
+      if (animIdx >= 0) this.scene.currentAnimations.splice(animIdx, 1);
       this.animCounter--;
       
       if (this.animationQueue.length > 0) {

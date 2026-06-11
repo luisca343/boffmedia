@@ -80,9 +80,10 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (!state) return;
 
     if (state.roomIds.size > 0) {
+      const playerId = state.playerId;
       const timer = setTimeout(() => {
         this.logger.log(
-          `Grace period expired for ${state.playerId}, forfeiting ${state.roomIds.size} rooms`,
+          `Grace period expired for ${playerId}, forfeiting ${state.roomIds.size} rooms`,
         );
         for (const [roomId, side] of state.roomIds.entries()) {
           const room = this.rooms.get(roomId);
@@ -91,9 +92,12 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
           }
           this.cleanupRoom(roomId);
         }
+        state.roomIds.clear();
+        this.clients.delete(playerId);
+        this.disconnectTimers.delete(playerId);
       }, this.RECONNECT_GRACE_MS);
 
-      this.disconnectTimers.set(state.playerId, timer);
+      this.disconnectTimers.set(playerId, timer);
     } else {
       this.clients.delete(state.playerId);
     }
@@ -113,12 +117,15 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     const roomId = payload?.roomId || crypto.randomUUID();
 
+    const playerId = state.playerId;
     const callbacks: BattleRoomCallbacks = {
       onProtocol: (line: string) => {
-        client.emit('protocol', { roomId, line });
+        const sock = this.clients.get(playerId)?.socket;
+        sock?.emit('protocol', { roomId, line });
       },
       onRequestP1: (request: Protocol.Request) => {
-        client.emit('request', { roomId, request });
+        const sock = this.clients.get(playerId)?.socket;
+        sock?.emit('request', { roomId, request });
       },
       onBattleEnd: async (result: BattleEndResult) => {
         let replayId: number | undefined;
@@ -136,15 +143,18 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
         } catch (err: any) {
           this.logger.error(`Failed to save replay: ${err.message}`);
         }
-        client.emit('battleEnd', { roomId, ...result, replayId });
+        const sock = this.clients.get(playerId)?.socket;
+        sock?.emit('battleEnd', { roomId, ...result, replayId });
         this.cleanupRoom(roomId);
       },
       onError: (error: string) => {
         this.logger.error(`Battle error [${roomId}]: ${error}`);
-        client.emit('error', { roomId, message: error });
+        const sock = this.clients.get(playerId)?.socket;
+        sock?.emit('error', { roomId, message: error });
       },
       onTimerUpdate: (timerState) => {
-        client.emit('timerUpdate', { roomId, ...timerState });
+        const sock = this.clients.get(playerId)?.socket;
+        sock?.emit('timerUpdate', { roomId, ...timerState });
       },
     };
 
@@ -406,11 +416,17 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     const room = this.rooms.get(payload.roomId);
     if (room) {
-      existingState.roomIds.set(payload.roomId, 'p1');
+      const existingSide = existingState.roomIds.get(payload.roomId) ?? 'p1';
+      existingState.roomIds.set(payload.roomId, existingSide);
       client.emit('reconnected', {
         roomId: payload.roomId,
         status: room.getStatus(),
+        side: existingSide,
       });
+      const pendingRequest = room.getCurrentRequest(existingSide);
+      if (pendingRequest) {
+        client.emit('request', { roomId: payload.roomId, request: pendingRequest });
+      }
     }
   }
 
@@ -429,19 +445,23 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     const roomId = crypto.randomUUID();
 
-    const p1Socket = p1Client.socket;
-    const p2Socket = p2Client.socket;
+    const p1Id = p1.playerId;
+    const p2Id = p2.playerId;
 
     const callbacks: BattleRoomCallbacks = {
       onProtocol: (line: string) => {
-        p1Socket.emit('protocol', { roomId, line });
-        p2Socket.emit('protocol', { roomId, line });
+        const s1 = this.clients.get(p1Id)?.socket;
+        const s2 = this.clients.get(p2Id)?.socket;
+        s1?.emit('protocol', { roomId, line });
+        s2?.emit('protocol', { roomId, line });
       },
       onRequestP1: (request: Protocol.Request) => {
-        p1Socket.emit('request', { roomId, request });
+        const s1 = this.clients.get(p1Id)?.socket;
+        s1?.emit('request', { roomId, request });
       },
       onRequestP2: (request: Protocol.Request) => {
-        p2Socket.emit('request', { roomId, request });
+        const s2 = this.clients.get(p2Id)?.socket;
+        s2?.emit('request', { roomId, request });
       },
       onBattleEnd: async (result: BattleEndResult) => {
         let replayId: number | undefined;
@@ -461,19 +481,25 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
 
         const endPayload = { roomId, ...result, replayId };
-        p1Socket.emit('battleEnd', endPayload);
-        p2Socket.emit('battleEnd', endPayload);
+        const s1 = this.clients.get(p1Id)?.socket;
+        const s2 = this.clients.get(p2Id)?.socket;
+        s1?.emit('battleEnd', endPayload);
+        s2?.emit('battleEnd', endPayload);
         this.cleanupRoom(roomId);
       },
       onError: (error: string) => {
         this.logger.error(`PvP Battle error [${roomId}]: ${error}`);
-        p1Socket.emit('error', { roomId, message: error });
-        p2Socket.emit('error', { roomId, message: error });
+        const s1 = this.clients.get(p1Id)?.socket;
+        const s2 = this.clients.get(p2Id)?.socket;
+        s1?.emit('error', { roomId, message: error });
+        s2?.emit('error', { roomId, message: error });
       },
       onTimerUpdate: (timerState) => {
         const payload = { roomId, ...timerState };
-        p1Socket.emit('timerUpdate', payload);
-        p2Socket.emit('timerUpdate', payload);
+        const s1 = this.clients.get(p1Id)?.socket;
+        const s2 = this.clients.get(p2Id)?.socket;
+        s1?.emit('timerUpdate', payload);
+        s2?.emit('timerUpdate', payload);
       },
     };
 
@@ -492,16 +518,20 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
       .create(format)
       .then(() => {
         const battlePayload = { roomId, format, mode: 'pvp' as const };
-        p1Socket.emit('battleCreated', { ...battlePayload, side: 'p1' });
-        p2Socket.emit('battleCreated', { ...battlePayload, side: 'p2' });
+        const s1 = this.clients.get(p1Id)?.socket;
+        const s2 = this.clients.get(p2Id)?.socket;
+        s1?.emit('battleCreated', { ...battlePayload, side: 'p1' });
+        s2?.emit('battleCreated', { ...battlePayload, side: 'p2' });
       })
       .catch((err) => {
         this.logger.error(`Failed to create PvP battle: ${err.message}`);
-        p1Socket.emit('error', {
+        const s1 = this.clients.get(p1Id)?.socket;
+        const s2 = this.clients.get(p2Id)?.socket;
+        s1?.emit('error', {
           roomId,
           message: `Failed to create battle: ${err.message}`,
         });
-        p2Socket.emit('error', {
+        s2?.emit('error', {
           roomId,
           message: `Failed to create battle: ${err.message}`,
         });
