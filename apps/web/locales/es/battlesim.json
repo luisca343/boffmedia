@@ -42,6 +42,8 @@
       "switch": "Cambiar",
       "forcedSwitch": "Cambio forzado",
       "trapped": " (atrapado)",
+      "back": "Atrás",
+      "selectTarget": "Selecciona objetivo",
       "undo": "Deshacer",
       "undoHint": "Cancela la elección enviada (antes de que se resuelva el turno)"
     },

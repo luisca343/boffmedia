@@ -42,6 +42,8 @@
       "switch": "Switch",
       "forcedSwitch": "Forced Switch",
       "trapped": " (trapped)",
+      "back": "Back",
+      "selectTarget": "Select target",
       "undo": "Undo",
       "undoHint": "Cancel the submitted choice (before the turn resolves)"
     },

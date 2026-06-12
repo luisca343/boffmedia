@@ -18,6 +18,7 @@ import { BattleLogPanel } from '../_components/BattleLogPanel';
 import { useFullscreen } from '../_hooks/useFullscreen';
 
 const BATTLE_FORMATS = [
+  { value: 'gen9randomdoublesbattle', label: 'Gen 9 Random Doubles Battle' },
   { value: 'gen9randombattle', label: 'Gen 9 Random Battle' },
   { value: 'gen8randombattle', label: 'Gen 8 Random Battle' },
   { value: 'gen7randombattle', label: 'Gen 7 Random Battle' },
