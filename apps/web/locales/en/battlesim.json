@@ -44,6 +44,7 @@
       "trapped": " (trapped)",
       "back": "Back",
       "selectTarget": "Select target",
+      "shift": "Shift to Center",
       "undo": "Undo",
       "undoHint": "Cancel the submitted choice (before the turn resolves)"
     },
@@ -86,9 +87,11 @@
       "saveReplay": "Save replay"
     },
     "play": {
+      "overline": "Play vs AI",
       "title": "Battle Simulator",
       "subtitle": "Play a Pokémon battle against an AI opponent",
       "start": "Start Battle",
+      "selected": "Selected",
       "newTab": "+ New",
       "won": "Won",
       "lost": "Lost",

@@ -5,6 +5,7 @@ import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useLiveBattleManager } from '../_hooks/useLiveBattleManager';
 import { BattleCanvas } from '../_components/BattleCanvas';
+import { BattleErrorBoundary } from '../_components/BattleErrorBoundary';
 import { GameStageLayout } from '@/components/boffmedia/layouts/GameStageLayout';
 import { ASPECT_RATIO } from '../_utils/viewUtils';
 import useViewportWidth from '@/services/useViewPortWidth';
@@ -73,29 +74,101 @@ export default function PlayPage() {
   // Idle state
   if (!session || !state) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6 px-4">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--text)' }}>{t('play.title')}</h1>
-          <p style={{ color: 'var(--text-muted)' }}>{t('play.subtitle')}</p>
-        </div>
-        <div className="flex flex-col items-center gap-3">
-          <select
-            value={selectedFormat}
-            onChange={(e) => setSelectedFormat(e.target.value)}
-            className="px-4 py-2 rounded-md text-sm font-medium cursor-pointer"
-            style={{ background: 'var(--card-bg)', border: 'var(--card-border)', color: 'var(--text)' }}
-          >
-            {BATTLE_FORMATS.map((fmt) => (
-              <option key={fmt.value} value={fmt.value}>{fmt.label}</option>
-            ))}
-          </select>
-          <button
-            onClick={handleCreateBattle}
-            className="px-8 py-3 rounded-lg text-lg font-semibold transition-colors shadow-lg"
-            style={{ background: 'var(--accent)', color: 'var(--text)', border: '1px solid var(--border)', boxShadow: '0 4px 14px -4px var(--border)' }}
-          >
-            {t('play.start')}
-          </button>
+      <div className="relative min-h-[calc(100vh-80px)] overflow-hidden px-4 py-10">
+        {/* Grid dot background */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: 'radial-gradient(var(--grid-dot) 1px, transparent 1px)',
+            backgroundSize: '28px 28px',
+            maskImage: 'radial-gradient(ellipse at center 20%, black, transparent 75%)',
+          }}
+        />
+        {/* Radial glow */}
+        <div
+          aria-hidden="true"
+          className="absolute -top-40 left-1/2 -translate-x-1/2 w-[720px] h-[420px] rounded-full pointer-events-none"
+          style={{ background: 'radial-gradient(ellipse, color-mix(in srgb, var(--cyan-400) 16%, transparent), transparent 70%)' }}
+        />
+
+        <div className="relative z-10 mx-auto max-w-4xl flex flex-col gap-8">
+          {/* Hero header */}
+          <header className="flex flex-col gap-2">
+            <span className="font-mono font-bold text-t-3xs tracking-[.3em] uppercase" style={{ color: 'var(--cyan-400)' }}>
+              ⚔️ {t('play.overline')}
+            </span>
+            <h1
+              className="font-display font-black italic uppercase text-5xl md:text-6xl tracking-[.02em]"
+              style={{ color: 'var(--text)', textShadow: '0 0 36px color-mix(in srgb, var(--cyan-400) 35%, transparent)' }}
+            >
+              {t('play.title')}
+            </h1>
+            <p className="text-lg max-w-[52ch]" style={{ color: 'var(--text-muted)' }}>
+              {t('play.subtitle')}
+            </p>
+          </header>
+
+          {/* Format cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {BATTLE_FORMATS.map((fmt, i) => {
+              const isSelected = selectedFormat === fmt.value;
+              return (
+                <button
+                  key={fmt.value}
+                  onClick={() => setSelectedFormat(fmt.value)}
+                  className="group relative flex flex-col justify-end overflow-hidden rounded-[var(--radius-lg)] p-5 text-left transition-transform duration-[var(--dur)] ease-[var(--ease)] hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cyan-400)]"
+                  style={{
+                    background: `linear-gradient(150deg, color-mix(in srgb, var(--cyan-400) ${isSelected ? 22 : 12}%, var(--surface)), var(--surface) 60%)`,
+                    border: `1px solid color-mix(in srgb, var(--cyan-400) ${isSelected ? 55 : 22}%, var(--border))`,
+                    boxShadow: isSelected ? '0 0 24px -8px color-mix(in srgb, var(--cyan-400) 40%, transparent)' : undefined,
+                  }}
+                >
+                  {/* Accent stripe */}
+                  <span
+                    aria-hidden="true"
+                    className="absolute top-0 left-0 h-0.5 transition-all duration-[var(--dur)] ease-[var(--ease)]"
+                    style={{
+                      width: isSelected ? '70%' : '35%',
+                      background: 'linear-gradient(90deg, var(--cyan-400), transparent)',
+                    }}
+                  />
+                  <span
+                    className="font-mono font-bold text-t-4xs tracking-[.22em] uppercase mb-1.5"
+                    style={{ color: 'var(--cyan-400)' }}
+                  >
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span className="font-semibold text-sm" style={{ color: 'var(--text)' }}>
+                    {fmt.label}
+                  </span>
+                  {isSelected && (
+                    <span
+                      className="mt-1 font-mono font-bold text-t-4xs tracking-[.14em] uppercase"
+                      style={{ color: 'var(--cyan-400)' }}
+                    >
+                      ▶ {t('play.selected')}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Start button */}
+          <div className="flex justify-start">
+            <button
+              onClick={handleCreateBattle}
+              className="px-10 py-3 rounded-[var(--radius)] font-bold text-base uppercase tracking-[.1em] transition-all duration-[var(--dur)] ease-[var(--ease)] hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cyan-400)]"
+              style={{
+                background: 'var(--accent)',
+                color: 'var(--text)',
+                boxShadow: '0 4px 20px -6px color-mix(in srgb, var(--cyan-400) 50%, transparent)',
+              }}
+            >
+              {t('play.start')}
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -166,7 +239,7 @@ export default function PlayPage() {
     <BattleActionDock
       bsx={bsx}
       status={state.status}
-      isWaiting={state.isWaitingForChoice}
+      isWaiting={state.isWaitingForChoice && state.battle.turn >= 1}
       htmlLog={state.htmlLog}
       onChoice={(choice) => makeChoice(state.roomId, choice)}
       onAimMove={(i) => setAimingFoe(i != null)}
@@ -191,24 +264,26 @@ export default function PlayPage() {
   return (
     <GameStageLayout ref={fullscreenRef} header={header} rail={rail} dock={dock} footer={postBattle} fullscreen={isFullscreen}>
       <BattleStage bsx={bsx} fullscreen={isFullscreen}>
-        <BattleCanvas
-          battle={state.battle}
-          pov={0}
-          messageBar={state.messageBar}
-          showPreviewOverlay={state.battle.turn === 0 && !battleStarted}
-          setBattleStarted={setBattleStarted}
-          setIsPlaying={() => {}}
-          currentAction={0}
-          battleLog={null}
-          initScene={handleInitScene}
-          aimedFoe={aimingFoe}
-          liveMode={true}
-          liveStatus={state.status}
-          onPlayAgain={handlePlayAgain}
-          battleComplete={state.battleComplete}
-          canvasWidth={isFullscreen ? window.innerWidth : undefined}
-          fullscreen={isFullscreen}
-        />
+        <BattleErrorBoundary>
+          <BattleCanvas
+            battle={state.battle}
+            pov={0}
+            messageBar={state.messageBar}
+            showPreviewOverlay={state.battle.turn === 0 && !battleStarted}
+            setBattleStarted={setBattleStarted}
+            setIsPlaying={() => {}}
+            currentAction={0}
+            battleLog={null}
+            initScene={handleInitScene}
+            aimedFoe={aimingFoe}
+            liveMode={true}
+            liveStatus={state.status}
+            onPlayAgain={handlePlayAgain}
+            battleComplete={state.battleComplete}
+            canvasWidth={isFullscreen ? (typeof window !== 'undefined' ? window.innerWidth : undefined) : undefined}
+            fullscreen={isFullscreen}
+          />
+        </BattleErrorBoundary>
       </BattleStage>
     </GameStageLayout>
   );

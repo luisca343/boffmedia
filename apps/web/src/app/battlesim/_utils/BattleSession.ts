@@ -71,6 +71,9 @@ export class BattleSession {
   initScene(gameElement: HTMLElement, pov: 0 | 1 = 0): void {
     // Always re-create scene if gameElement changed (tab switch unmounts/remounts canvas)
     if (!this.scene || this.scene.gameElement !== gameElement) {
+      if (this.scene) {
+        this.scene.destroy();
+      }
       this.scene = new Scene(this.battle, gameElement);
       this.processor = new BattleEventProcessor({
         scene: this.scene,
@@ -110,6 +113,7 @@ export class BattleSession {
   }
 
   private async flushBuffer(): Promise<void> {
+    if (!this.processor) return;
     this.processing = true;
     while (this.lineBuffer.length > 0 && !this.waiting && !this.destroyed) {
       const line = this.lineBuffer.shift()!;
@@ -163,6 +167,10 @@ export class BattleSession {
       return;
     }
 
+    if (this.status === 'connecting' && args[0] === 'turn' && this.battle.turn >= 1) {
+      this.status = 'active';
+    }
+
     // Update log
     this.htmlLog.push(event.html);
     const clearActions = ['switch', 'move', 'turn'];
@@ -189,6 +197,15 @@ export class BattleSession {
     this.callbacks.onUpdate();
   }
 
+  handleBattleEnd(data: { winner: string; replay: string; replayId?: number }): void {
+    this.winner = data.winner;
+    this.replay = data.replay;
+    this.replayId = data.replayId ?? null;
+    this.status = 'finished';
+    this.isWaitingForChoice = false;
+    this.currentRequest = null;
+  }
+
   resumeAfterChoice(): void {
     this.waiting = false;
     this.isWaitingForChoice = false;
@@ -202,7 +219,7 @@ export class BattleSession {
     }
 
     if (this.lineBuffer.length > 0) {
-      this.flushBuffer();
+      void this.flushBuffer();
     }
   }
 

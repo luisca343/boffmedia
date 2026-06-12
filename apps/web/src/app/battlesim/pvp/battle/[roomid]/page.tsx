@@ -7,6 +7,7 @@ import { Protocol } from '@pkmn/protocol';
 import { io, Socket } from 'socket.io-client';
 import { env } from '@/config/env.public';
 import { BattleCanvas } from '../../../_components/BattleCanvas';
+import { BattleErrorBoundary } from '../../../_components/BattleErrorBoundary';
 import { GameStageLayout } from '@/components/boffmedia/layouts/GameStageLayout';
 import { BattleSession } from '../../../_utils/BattleSession';
 import useViewportWidth from '@/services/useViewPortWidth';
@@ -245,7 +246,7 @@ export default function PvPBattlePage({
     <BattleActionDock
       bsx={bsx}
       status={state.status}
-      isWaiting={state.isWaitingForChoice}
+      isWaiting={state.isWaitingForChoice && state.battle.turn >= 1}
       htmlLog={state.htmlLog}
       onChoice={handleMakeChoice}
       onUndo={handleUndo}
@@ -289,23 +290,25 @@ export default function PvPBattlePage({
   return (
     <GameStageLayout ref={fullscreenRef} header={header} rail={rail} dock={dock} footer={postBattle} fullscreen={isFullscreen}>
       <BattleStage bsx={bsx} fullscreen={isFullscreen}>
-        <BattleCanvas
-          battle={state.battle}
-          pov={pov}
-          messageBar={state.messageBar}
-          showPreviewOverlay={state.battle.turn === 0 && !battleStarted}
-          setBattleStarted={setBattleStarted}
-          setIsPlaying={() => {}}
-          currentAction={0}
-          battleLog={null}
-          initScene={handleInitScene}
-          aimedFoe={aimingFoe}
-          liveMode={true}
-          liveStatus={state.status}
-          battleComplete={state.battleComplete}
-          canvasWidth={isFullscreen ? window.innerWidth : undefined}
-          fullscreen={isFullscreen}
-        />
+        <BattleErrorBoundary>
+          <BattleCanvas
+            battle={state.battle}
+            pov={pov}
+            messageBar={state.messageBar}
+            showPreviewOverlay={state.battle.turn === 0 && !battleStarted}
+            setBattleStarted={setBattleStarted}
+            setIsPlaying={() => {}}
+            currentAction={0}
+            battleLog={null}
+            initScene={handleInitScene}
+            aimedFoe={aimingFoe}
+            liveMode={true}
+            liveStatus={state.status}
+            battleComplete={state.battleComplete}
+            canvasWidth={isFullscreen ? (typeof window !== 'undefined' ? window.innerWidth : undefined) : undefined}
+            fullscreen={isFullscreen}
+          />
+        </BattleErrorBoundary>
       </BattleStage>
     </GameStageLayout>
   );

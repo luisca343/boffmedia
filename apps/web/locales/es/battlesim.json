@@ -44,6 +44,7 @@
       "trapped": " (atrapado)",
       "back": "Atrás",
       "selectTarget": "Selecciona objetivo",
+      "shift": "Cambio al Centro",
       "undo": "Deshacer",
       "undoHint": "Cancela la elección enviada (antes de que se resuelva el turno)"
     },
@@ -86,9 +87,11 @@
       "saveReplay": "Guardar repetición"
     },
     "play": {
+      "overline": "Jugar vs IA",
       "title": "Simulador de Combates",
       "subtitle": "Juega un combate Pokémon contra un oponente IA",
       "start": "Empezar combate",
+      "selected": "Seleccionado",
       "newTab": "+ Nuevo",
       "won": "Ganado",
       "lost": "Perdido",

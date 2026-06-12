@@ -44,6 +44,7 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private rooms: Map<string, BattleRoom> = new Map();
   private disconnectTimers: Map<string, NodeJS.Timeout> = new Map();
   private pendingChallenges: Map<string, PendingChallenge> = new Map();
+  private socketToPlayer: Map<string, string> = new Map();
 
   private readonly RECONNECT_GRACE_MS = 30_000;
 
@@ -63,6 +64,7 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.disconnectTimers.delete(playerId);
       }
       existing.socket = client;
+      this.socketToPlayer.set(client.id, playerId);
       client.emit('connected', { playerId, reconnected: true });
       return;
     }
@@ -72,10 +74,12 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
       roomIds: new Map(),
       playerId,
     });
+    this.socketToPlayer.set(client.id, playerId);
     client.emit('connected', { playerId });
   }
 
   handleDisconnect(client: Socket) {
+    this.socketToPlayer.delete(client.id);
     const state = this.getClientState(client);
     if (!state) return;
 
@@ -127,25 +131,8 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const sock = this.clients.get(playerId)?.socket;
         sock?.emit('request', { roomId, request });
       },
-      onBattleEnd: async (result: BattleEndResult) => {
-        let replayId: number | undefined;
-        try {
-          const replayResult = await this.achievementFacade.createReplay({
-            side1: result.side1,
-            side2: result.side2,
-            team1: JSON.stringify(result.team1),
-            team2: JSON.stringify(result.team2),
-            replay: result.replay,
-            winner: result.winner,
-          });
-          replayId = replayResult.insertId;
-          this.logger.log(`Replay saved: ${replayId}`);
-        } catch (err: any) {
-          this.logger.error(`Failed to save replay: ${err.message}`);
-        }
-        const sock = this.clients.get(playerId)?.socket;
-        sock?.emit('battleEnd', { roomId, ...result, replayId });
-        this.cleanupRoom(roomId);
+      onBattleEnd: (result: BattleEndResult) => {
+        void this.handleBattleEnd(roomId, result, [playerId]);
       },
       onError: (error: string) => {
         this.logger.error(`Battle error [${roomId}]: ${error}`);
@@ -187,6 +174,11 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ): void {
     const state = this.getClientState(client);
     if (!state) return;
+
+    if (!payload?.choice || typeof payload.choice !== 'string' || payload.choice.length > 100) {
+      client.emit('error', { roomId: payload?.roomId, message: 'Invalid choice' });
+      return;
+    }
 
     const side = state.roomIds.get(payload.roomId);
     if (!side) {
@@ -525,29 +517,8 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const s2 = this.clients.get(p2Id)?.socket;
         s2?.emit('request', { roomId, request });
       },
-      onBattleEnd: async (result: BattleEndResult) => {
-        let replayId: number | undefined;
-        try {
-          const replayResult = await this.achievementFacade.createReplay({
-            side1: result.side1,
-            side2: result.side2,
-            team1: JSON.stringify(result.team1),
-            team2: JSON.stringify(result.team2),
-            replay: result.replay,
-            winner: result.winner,
-          });
-          replayId = replayResult.insertId;
-          this.logger.log(`PvP Replay saved: ${replayId}`);
-        } catch (err: any) {
-          this.logger.error(`Failed to save PvP replay: ${err.message}`);
-        }
-
-        const endPayload = { roomId, ...result, replayId };
-        const s1 = this.clients.get(p1Id)?.socket;
-        const s2 = this.clients.get(p2Id)?.socket;
-        s1?.emit('battleEnd', endPayload);
-        s2?.emit('battleEnd', endPayload);
-        this.cleanupRoom(roomId);
+      onBattleEnd: (result: BattleEndResult) => {
+        void this.handleBattleEnd(roomId, result, [p1Id, p2Id]);
       },
       onError: (error: string) => {
         this.logger.error(`PvP Battle error [${roomId}]: ${error}`);
@@ -601,11 +572,33 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
       });
   }
 
-  private getClientState(client: Socket): ClientState | undefined {
-    for (const state of this.clients.values()) {
-      if (state.socket === client) return state;
+  private async handleBattleEnd(roomId: string, result: BattleEndResult, playerIds: string[]): Promise<void> {
+    let replayId: number | undefined;
+    try {
+      const replayResult = await this.achievementFacade.createReplay({
+        side1: result.side1,
+        side2: result.side2,
+        team1: JSON.stringify(result.team1),
+        team2: JSON.stringify(result.team2),
+        replay: result.replay,
+        winner: result.winner,
+      });
+      replayId = replayResult.insertId;
+      this.logger.log(`Replay saved: ${replayId}`);
+    } catch (err: any) {
+      this.logger.error(`Failed to save replay: ${err.message}`);
     }
-    return undefined;
+    const endPayload = { roomId, ...result, replayId };
+    for (const pid of playerIds) {
+      this.clients.get(pid)?.socket.emit('battleEnd', endPayload);
+    }
+    this.cleanupRoom(roomId);
+  }
+
+  private getClientState(client: Socket): ClientState | undefined {
+    const playerId = this.socketToPlayer.get(client.id);
+    if (!playerId) return undefined;
+    return this.clients.get(playerId);
   }
 
   private cleanupRoom(roomId: string): void {
@@ -616,6 +609,7 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
       state.roomIds.delete(roomId);
     }
 
+    room.destroy();
     this.rooms.delete(roomId);
   }
 }

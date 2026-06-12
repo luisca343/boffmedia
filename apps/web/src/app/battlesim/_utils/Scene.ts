@@ -102,6 +102,11 @@ export class Scene {
     );
   }
   
+  destroy(): void {
+    this.currentAnimations = [];
+    try { this.gameElement.innerHTML = ''; } catch {}
+  }
+
   getPokemonElement(id: string): HTMLElement | null {
     if (id === '') {
       return null;

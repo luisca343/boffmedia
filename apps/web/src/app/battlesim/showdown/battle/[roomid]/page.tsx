@@ -5,6 +5,7 @@ import { useState, useRef, useEffect, useCallback, use } from 'react';
 import Link from 'next/link';
 import { useShowdownBattle, getGlobalUsername } from '../../../_hooks/useShowdownBattle';
 import { BattleCanvas } from '../../../_components/BattleCanvas';
+import { BattleErrorBoundary } from '../../../_components/BattleErrorBoundary';
 import { GameStageLayout } from '@/components/boffmedia/layouts/GameStageLayout';
 import useViewportWidth from '@/services/useViewPortWidth';
 import { ASPECT_RATIO } from '../../../_utils/viewUtils';
@@ -122,7 +123,7 @@ export default function ShowdownBattlePage({
     );
   }
 
-  const isMyTurn = state.isWaitingForChoice;
+  const isMyTurn = state.isWaitingForChoice && state.battle.turn >= 1;
   const trapMsg = state.currentRequest?.active?.[0]?.trapped ? t('dock.trapped') : '';
   // Spectator: both player names known and neither matches the logged-in user.
   const isSpectator = !!p1Name && !!p2Name && myName !== p1Name && myName !== p2Name;
@@ -202,24 +203,26 @@ export default function ShowdownBattlePage({
   return (
     <GameStageLayout ref={fullscreenRef} header={header} rail={rightPanel} dock={dock} footer={postBattle} fullscreen={isFullscreen}>
       <BattleStage bsx={bsx} fullscreen={isFullscreen}>
-        <BattleCanvas
-          battle={state.battle}
-          pov={pov}
-          messageBar={state.messageBar}
-          showPreviewOverlay={state.battle.turn === 0 && !battleStarted}
-          setBattleStarted={setBattleStarted}
-          setIsPlaying={() => {}}
-          currentAction={0}
-          battleLog={null}
-          initScene={handleInitScene}
-          aimedFoe={aimingFoe}
-          liveMode={true}
-          liveStatus={state.status}
-          battleComplete={state.battleComplete}
-          username={username}
-          canvasWidth={isFullscreen ? window.innerWidth : undefined}
-          fullscreen={isFullscreen}
-        />
+        <BattleErrorBoundary>
+          <BattleCanvas
+            battle={state.battle}
+            pov={pov}
+            messageBar={state.messageBar}
+            showPreviewOverlay={state.battle.turn === 0 && !battleStarted}
+            setBattleStarted={setBattleStarted}
+            setIsPlaying={() => {}}
+            currentAction={0}
+            battleLog={null}
+            initScene={handleInitScene}
+            aimedFoe={aimingFoe}
+            liveMode={true}
+            liveStatus={state.status}
+            battleComplete={state.battleComplete}
+            username={username}
+            canvasWidth={isFullscreen ? (typeof window !== 'undefined' ? window.innerWidth : undefined) : undefined}
+            fullscreen={isFullscreen}
+          />
+        </BattleErrorBoundary>
       </BattleStage>
     </GameStageLayout>
   );

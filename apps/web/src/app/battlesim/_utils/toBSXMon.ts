@@ -6,6 +6,8 @@ type BSXKeyMove = {
   name: string; type: string; cat: string; power: number;
   acc: number | null; pp: number; maxpp: number;
   prio?: number; spread?: string; effect?: string;
+  target?: string;   // PS move target type (e.g. "normal", "allAdjacentFoes", "self")
+  disabled?: boolean;
 };
 
 type BSXTickEv = {
@@ -57,6 +59,8 @@ export function toBSXKeyMoves(
       acc: dexMove.accuracy === true ? null : dexMove.accuracy,
       pp: m.pp,
       maxpp: m.maxpp,
+      target: m.target ?? dexMove.target,
+      disabled: !!m.disabled,
     };
   });
 }

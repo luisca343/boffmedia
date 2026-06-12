@@ -65,6 +65,7 @@ export class BattleRoom {
   private timerState: TimerState;
   private turnStartTimes: Map<'p1' | 'p2', number> = new Map();
   private timerInterval: ReturnType<typeof setInterval> | null = null;
+  private destroyed = false;
 
   constructor(
     id: string,
@@ -112,6 +113,7 @@ export class BattleRoom {
     if (this.mode === 'ai') {
       this.ai = new RandomPlayerAI(this.streams.p2);
       this.aiPromise = this.ai.start();
+      this.aiPromise.catch(err => this.logger?.error(`[AI] ${err?.message ?? err}`));
     }
 
     const spec = { formatid: format };
@@ -119,16 +121,18 @@ export class BattleRoom {
     const p2 = { name: p2Spec?.name ?? 'Bot', team: Teams.pack(team2) };
 
     this.omniscientPromise = this.readOmniscient();
+    this.omniscientPromise.catch(err => this.logger?.error(`[Omniscient] ${err?.message ?? err}`));
+
+    this.readP1().catch(err => this.logger?.error(`[P1 reader] ${err?.message ?? err}`));
+    if (this.mode === 'pvp') {
+      this.readP2().catch(err => this.logger?.error(`[P2 reader] ${err?.message ?? err}`));
+    }
 
     await this.streams.omniscient.write(
       `>start ${JSON.stringify(spec)}\n>player p1 ${JSON.stringify(p1)}\n>player p2 ${JSON.stringify(p2)}`,
     );
 
     this.status = 'active';
-    this.readP1();
-    if (this.mode === 'pvp') {
-      this.readP2();
-    }
   }
 
   private async readOmniscient(): Promise<void> {
@@ -215,6 +219,18 @@ export class BattleRoom {
             } catch (e: any) {
               this.logger?.error(`[P1] Failed to parse request: ${e.message}`);
               this.callbacks.onError(`Failed to parse request: ${e.message}`);
+            }
+          } else if (args[0] === 'error') {
+            // [Invalid choice] = sim rejected the choice with no re-emitted request
+            // (e.g. wrong target, can't choose target for spread move).
+            // [Unavailable choice] = disabled move — sim will follow with a new |request|.
+            // Only restore for [Invalid choice] so the player can retry.
+            const msg = String(args[1] || '');
+            if (msg.startsWith('[Invalid choice]') && !this.p1Request && this.lastP1Request) {
+              this.p1Request = this.lastP1Request;
+              this.lastP1Request = null;
+              this.callbacks.onRequestP1(this.p1Request);
+              this.startTurnTimer('p1');
             }
           }
         }
@@ -358,6 +374,15 @@ export class BattleRoom {
     try {
       this.streams.omniscient.destroy();
     } catch {}
+  }
+
+  destroy(): void {
+    if (this.destroyed) return;
+    this.destroyed = true;
+    this.stopTimer();
+    try { this.streams?.omniscient?.destroy(); } catch {}
+    try { this.streams?.p1?.destroy(); } catch {}
+    try { this.streams?.p2?.destroy(); } catch {}
   }
 
   getStatus(): BattleRoomStatus {
