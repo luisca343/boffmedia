@@ -2,8 +2,13 @@
 
 ## `components/boffmedia/` — Unified Boffmedia tree
 
-### `primitives/` (39 entries, curated subset)
-Design-system primitives for Boffmedia. Generic UI atoms with no business logic. Also houses battlesim (`bs-*`, `bsx-*`) and tool-kit components (`result-badge`, `stat-tile`, etc.) that should eventually move to their own domain sections.
+### `primitives/` (78 files)
+
+Design-system primitives and domain components for Boffmedia. Organized into sub-sections by concern.
+
+#### Generic UI atoms (39 files)
+
+No business logic. Reusable across all Boffmedia sections.
 
 | File | Exports |
 |---|---|
@@ -22,7 +27,6 @@ Design-system primitives for Boffmedia. Generic UI atoms with no business logic.
 | `empty-state.tsx` | EmptyState |
 | `expandable-card.tsx` | ExpandableCard |
 | `field.tsx` | Field |
-| `heat-grid.tsx` | HeatGrid |
 | `hp-bar.tsx` | HpBar |
 | `icon-box.tsx` | IconBox |
 | `icon.tsx` | Icon |
@@ -33,29 +37,92 @@ Design-system primitives for Boffmedia. Generic UI atoms with no business logic.
 | `popover.tsx` | BoffPopover |
 | `progress.tsx` | BoffProgress, BoffRing |
 | `radio-group.tsx` | RadioGroup |
-| `result-badge.tsx` | ResultBadge |
 | `search-input.tsx` | SearchInput |
 | `searchable-list.tsx` | SearchableList |
 | `seg-tabs.tsx` | SegTabs |
 | `segmented.tsx` | Segmented |
 | `skeleton.tsx` | BoffSkeleton |
 | `slider.tsx` | BoffSlider |
-| `split-bar.tsx` | SplitBar |
+| `spinner.tsx` | BoffSpinner |
 | `stat.tsx` | Stat |
-| `stat-tile.tsx` | StatTile |
 | `switch.tsx` | BoffSwitch |
 | `tabs.tsx` | BoffTabs |
-| `tag-pills.tsx` | TagPills |
 | `tag.tsx` | Tag |
 | `toast-provider.tsx` | ToastProvider, useToast |
+| `tooltip.tsx` | BoffTooltip |
+| `action-bar.tsx` | BoffActionBar |
+
+#### `bs-*` — Battlesim v1 primitives (16 files)
+
+Battle simulation building blocks. Pokemon-type-aware, use battlesim design tokens.
+
+| File | Exports | Description |
+|---|---|---|
+| `bs-data.ts` | TYPES, tyVar, effMult, effLabel, hpColor, aniF, aniB | Type/effectiveness data helpers |
+| `bs-type.tsx` | BSType, BSTypeRow, BSCat | Pokemon type badge + row |
+| `bs-status-chip.tsx` | BSStatusChip | Status condition chip (burn, poison, etc.) |
+| `bs-boost.tsx` | BSBoost | Stat boost/minus indicator |
+| `bs-tera.tsx` | BSTera | Terastallize type indicator |
+| `bs-poke-chip.tsx` | BSPokeChip | Compact pokemon chip with sprite |
+| `bs-move.tsx` | BSMove | Move display with type/category/PP |
+| `bs-log-event.tsx` | BSLogEvent, BSChatRow | Battle log event row |
+| `bs-mon-card.tsx` | BSMonCard | Pokemon battle card |
+| `bs-field-cond.tsx` | BSFieldCond | Field condition chip (weather, terrain, rooms) |
+| `bs-hp-meter.tsx` | BSHpMeter | HP bar with type row, status, boosts |
+| `bs-tracker.tsx` | BSTracker | Team tracker (row of poke chips) |
+| `bs-tray-slot.tsx` | BSTraySlot | Selectable pokemon tray slot with HP bar |
+| `bs-win-prob.tsx` | BSWinProb | Win probability bar (spectator mode) |
+| `bs-timer.tsx` | BSTimer | Turn/game timer display |
+
+#### `bsx-*` — Battlesim v2 primitives (12 files)
+
+Next-gen battle simulation components.
+
+| File | Exports | Description |
+|---|---|---|
+| `bsx-data.ts` | MOVESETS, MON_DATA, freshMon, calcRange, koLabel, speedOrder | V2 data helpers |
+| `bsx-ring.tsx` | BSXRing | Battle ring visualization |
+| `bsx-plate.tsx` | BSXPlate | Battle plate display |
+| `bsx-key.tsx` | BSXKey | Key info display |
+| `bsx-order-rail.tsx` | BSXOrderRail | Speed/order rail |
+| `bsx-plan-chip.tsx` | BSXPlanChip | Plan chip |
+| `bsx-bench-chip.tsx` | BSXBenchChip | Bench pokemon chip |
+| `bsx-tera-btn.tsx` | BSXTeraBtn | Terastallize button |
+| `bsx-tick.tsx` | BSXTick | Tick/check indicator |
+| `bsx-spark.tsx` | BSXSpark | Spark effect |
+| `bsx-score-plate.tsx` | BSXScorePlate | Player score plate with team preview |
+
+#### Tool-kit components (11 files)
+
+Domain components for gaming tools. Should eventually move to `ui/tools/`.
+
+| File | Exports |
+|---|---|
+| `result-badge.tsx` | ResultBadge |
+| `stat-tile.tsx` | StatTile |
+| `split-bar.tsx` | SplitBar |
+| `trend-chart.tsx` | TrendChart |
+| `heat-grid.tsx` | HeatGrid |
+| `tag-pills.tsx` | TagPills |
 | `tool-app.tsx` | ToolApp |
 | `tool-panel.tsx` | ToolPanel |
 | `tool-select.tsx` | ToolSelect |
 | `tool-stat-bars.tsx` | ToolStatBars |
 | `tool-table.tsx` | ToolTable |
-| `tooltip.tsx` | BoffTooltip |
-| `trend-chart.tsx` | TrendChart |
-| `index.ts` | barrel exports |
+
+#### Other (1 file)
+
+| File | Exports | Notes |
+|---|---|---|
+| `game-panel.tsx` | GamePanel | Generic game panel with title/actions/footer |
+
+---
+
+### `layouts/` — Layout shells
+
+| File | Exports | Notes |
+|---|---|---|
+| `GameStageLayout.tsx` | GameStageLayout | Fullscreen-capable game stage with header/rail/dock/statusBar/footer slots |
 
 ---
 
@@ -129,6 +196,7 @@ Full-page utility screens for loading, errors, offline, etc. Built on `SystemSta
 
 | File | Exports | Notes |
 |---|---|---|
+| `index.ts` | barrel | Re-exports all system state components |
 | `system-float-bg.tsx` | SystemFloatBg | Ambient orb background (warm/accent/cool) |
 | `system-state-shell.tsx` | SystemStateShell | Shared page shell with grid centering |
 | `system-loading.tsx` | SystemLoading | Splash with logo, spinner, progress bar |
@@ -164,7 +232,7 @@ Full-page utility screens for loading, errors, offline, etc. Built on `SystemSta
 
 ## `components/shared/pokemon/` — Shared Pokemon UI
 
-Pokemon-specific components. Moved from `boffmedia/primitives/` (except TypeBadge, PokemonTypeIcon, PokemonItemImage which were already here).
+Pokemon-specific components. Shared across Boffmedia and SmartRotom.
 
 | File | Exports | Notes |
 |---|---|---|
@@ -183,4 +251,6 @@ Pokemon-specific components. Moved from `boffmedia/primitives/` (except TypeBadg
 - **Production consumers:** `UserProfile.tsx`, `BoffFooter.tsx`, `herramientas/page.tsx`, `pokemon/page.tsx`, `mhwilds/page.tsx`, `(herramientas)/layout.tsx`
 - **Showcase-only:** ~50 components exist only in `showcase/page.tsx` with no other production usage (includes all `ui/system-states/`, battlesim `bs-*`/`bsx-*`, and tool-kit pieces like `ResultBadge`, `StatTile`, etc.)
 - **Internal-only:** `game-header.tsx`, `DesktopSidebar.tsx`, `MobileHeader.tsx`, `MobileSidebar.tsx` (used only within their parent modules)
-- **Non-primitives in `primitives/`:** Battlesim (`bs-*`, `bsx-*`) and tool-kit components (`result-badge`, `stat-tile`, `split-bar`, `trend-chart`, `heat-grid`, `tag-pills`) live in `primitives/` but are domain-specific. They should eventually move to their own sections.
+- **Tool-kit in primitives:** `result-badge`, `stat-tile`, `split-bar`, `trend-chart`, `heat-grid`, `tag-pills`, `tool-app`, `tool-panel`, `tool-select`, `tool-stat-bars`, `tool-table` live in `primitives/` but are tool-domain. They should eventually move to `ui/tools/`.
+- **GamePanel in primitives:** `game-panel.tsx` is game-domain. Should eventually move to `ui/games/`.
+- **`boffmedia-old/`:** Contains a copy of `GameStageLayout.tsx` and `GameToolsLayout/` from a previous reorganization. Can be cleaned up.
