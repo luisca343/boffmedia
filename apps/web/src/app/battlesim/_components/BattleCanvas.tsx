@@ -123,7 +123,7 @@ export const BattleCanvas = memo(forwardRef(({
                   )}
 
                   {!liveMode && battleComplete && (
-                    <div className="absolute inset-0">
+                    <div className="absolute inset-0 z-[200]">
                       <BattleEndScreen
                         battle={battle}
                         pov={pov}
@@ -139,7 +139,7 @@ export const BattleCanvas = memo(forwardRef(({
                   )}
 
                   {liveMode && battleComplete && (
-                    <div className="absolute inset-0">
+                    <div className="absolute inset-0 z-[200]">
                       <BattleEndScreen
                         battle={battle}
                         pov={pov}
