@@ -44,6 +44,16 @@
         "mcp"
       ],
       "enabled": true
+    },
+    "janus": {
+      "type": "local",
+      "command": [
+        "/bin/bash",
+        "-c",
+        "source /home/luisca/.nvm/nvm.sh && exec janus mcp"
+      ],
+      "enabled": true,
+      "timeout": 60000
     }
   },
   "permission": {

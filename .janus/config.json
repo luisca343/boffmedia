@@ -1,0 +1,46 @@
+{
+  "$schema": "./config.schema.json",
+  "project": {
+    "name": "boffmedia",
+    "description": ""
+  },
+  "verification": {
+    "stages": [
+      {
+        "name": "lint",
+        "command": "pnpm lint"
+      },
+      {
+        "name": "type-check",
+        "command": "pnpm type-check"
+      }
+    ]
+  },
+  "guardrails": {
+    "ignoreFile": ".agentignore",
+    "patterns": []
+  },
+  "git": {
+    "branchPrefix": "janus/",
+    "mirrors": [],
+    "defaultBranch": "main"
+  },
+  "context": {
+    "groups": [],
+    "alwaysInclude": [],
+    "maxFiles": 20
+  },
+  "structural": {
+    "rules": []
+  },
+  "skills": {
+    "enabled": [
+      "*"
+    ]
+  },
+  "memory": {
+    "enabled": true,
+    "autoSave": true,
+    "reviewCycleDays": 30
+  }
+}
