@@ -1,3 +1,13 @@
 {
-  "servers": {}
+  "servers": {
+    "janus": {
+      "type": "stdio",
+      "command": "/bin/bash",
+      "args": [
+        "-c",
+        "source /home/luisca/.nvm/nvm.sh && exec janus mcp"
+      ],
+      "cwd": "/home/luisca/Programacion/Ficus Labs/boffmedia"
+    }
+  }
 }
