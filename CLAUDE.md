@@ -5,27 +5,6 @@ Domain context: `.claude/context/` — load the relevant file when switching dom
 
 ---
 
-## Boff Agent workflow — MANDATORY for code changes
-
-This repo ships a custom MCP server `boff-agent`. **You MUST use it for every
-code-modifying task.** Full rules: [.agents/boff-workflow.md](./.agents/boff-workflow.md).
-
-- **Before any Edit/Write** on a code file, call ONE of:
-  - `plan_goal` — multi-module / multi-app / >10 files / new schema+service+controller+UI / words like "feature", "migrate", "rebuild", "audit". Creates BookStack chapter with `status:draft` tasks. STOP after drafting; user approves before execution.
-  - `begin_task` — single concern, single module, <10 files. Set `taskType` to `feature`/`bugfix`/`refactor`/`ui-ux`.
-- Follow the workflow steps returned by the tool in order. Do not skip.
-- Close with `save_run` (status: passed or failed). Never abandon a `runId`.
-- Never call `create_gitlab_mr` automatically — only on explicit user request.
-
-**Carve-outs** (workflow NOT required): pure read-only questions, single-line typo fixes,
-conversational replies, edits inside `packages/agent/**` itself, edits to instruction
-files (`*.md`, `.mcp.json`, `opencode.json`). When in doubt, USE the workflow.
-
-If the `boff-agent` MCP tools are not registered in your session, STOP and tell the
-user — do not silently fall back to ad-hoc editing.
-
----
-
 ## Always-active rules
 
 - Default new components to `app/**/_components/`. Promote only with justification.

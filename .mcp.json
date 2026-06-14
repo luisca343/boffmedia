@@ -1,22 +1,21 @@
 {
   "servers": {
-    "boff-agent": {
+    "janus": {
       "type": "stdio",
       "command": "/bin/bash",
       "args": [
         "-c",
-        "source /home/luisca/.nvm/nvm.sh && exec pnpm --silent --filter @repo/agent mcp"
+        "source /home/luisca/.nvm/nvm.sh && exec janus mcp"
       ],
       "cwd": "/home/luisca/Programacion/Ficus Labs/boffmedia"
     }
   },
   "mcpServers": {
-    "boff-agent": {
-      "type": "stdio",
+    "janus": {
       "command": "/bin/bash",
       "args": [
         "-c",
-        "source /home/luisca/.nvm/nvm.sh && exec pnpm --silent --filter @repo/agent mcp"
+        "source /home/luisca/.nvm/nvm.sh && exec janus mcp"
       ],
       "cwd": "/home/luisca/Programacion/Ficus Labs/boffmedia"
     }
