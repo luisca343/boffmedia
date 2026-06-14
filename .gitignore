@@ -22,3 +22,5 @@ laboon/
 
 docs/handoffs/**
 
+.janus/memory/
+.env.janus
