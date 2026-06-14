@@ -4,51 +4,6 @@ Monorepo for Boffmedia (gaming tools platform) and SmartRotom (Pixelmon/Minecraf
 
 ---
 
-## Boff Agent workflow — MANDATORY for code changes
-
-This repo ships a custom MCP server `boff-agent` that owns context resolution,
-guardrails, verification, BookStack docs, GitLab, and metrics. **Every AI agent
-working in this repo (Claude, Copilot, OpenCode, any other) MUST use it for ALL
-code-modifying tasks.** It is not optional. Full canonical rules:
-[`.agents/boff-workflow.md`](./.agents/boff-workflow.md).
-
-### Decide first
-
-| Use `plan_goal` when... | Use `begin_task` when... |
-|---|---|
-| Spans 2+ NestJS modules | Single concern, single module |
-| Spans 2+ apps (api + web) | Estimated < 10 files changed |
-| Will change > 10 files | Already-approved task from a plan |
-| Combines schema + service + controller + UI | Single layer, single design system |
-| User says "feature", "migrate", "rebuild", "audit", "epic" | User says "fix", "tweak", "add X to Y" |
-
-`plan_goal` decomposes into a BookStack chapter of `status:draft` task pages. STOP
-after drafting. The user reviews and flips `status:draft` → `status:pending` before
-any `begin_task` runs.
-
-`begin_task` requires `taskType` (`feature` / `bugfix` / `refactor` / `ui-ux`).
-`ui-ux` triggers the Playwright step.
-
-### Rules
-
-- Call `plan_goal` or `begin_task` BEFORE any Edit/Write on a code file.
-- Follow the returned workflow in order. Do not skip steps.
-- Close every `begin_task` with `save_run` (passed or failed). Never abandon a runId.
-- Never call `create_gitlab_mr` automatically — only on explicit user request.
-- **NEVER run `pnpm lint`, `pnpm type-check`, or any other verification command directly.** Use `run_verification` from boff-agent exclusively. The agent owns verification metadata (run ID, step tracking, metrics). Running commands outside the agent breaks that chain and invalidates the run. This rule is absolute — no carve-out, no "just to check."
-
-### Carve-outs (workflow NOT required)
-
-Pure read-only questions ("explain X", "where is Y"), single-line typo fixes,
-conversational replies, edits inside `packages/agent/**` itself, edits to
-instruction / config files (`*.md`, `.mcp.json`, `opencode.json`). When in doubt,
-USE the workflow.
-
-If `boff-agent` MCP tools are not registered in your session, STOP and tell the
-user — do not silently fall back to ad-hoc editing.
-
----
-
 ## Tech Stack
 
 | Layer | Tech | Version |

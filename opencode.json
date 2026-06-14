@@ -1,34 +1,57 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "plugin": ["@warp-dot-dev/opencode-warp"],
-  "instructions": [".agents/boff-workflow.md", "AGENTS.md", "docs/test-runner-safety.md"],
+  "plugin": [
+    "@warp-dot-dev/opencode-warp"
+  ],
+  "instructions": [
+    "AGENTS.md"
+  ],
   "mcp": {
     "context7": {
       "type": "local",
-      "command": ["npx", "-y", "@upstash/context7-mcp"],
+      "command": [
+        "npx",
+        "-y",
+        "@upstash/context7-mcp"
+      ],
       "enabled": true,
       "timeout": 30000
     },
     "playwright": {
       "type": "local",
-      "command": ["npx", "-y", "@playwright/mcp@latest"],
+      "command": [
+        "npx",
+        "-y",
+        "@playwright/mcp@latest"
+      ],
       "enabled": true,
       "timeout": 30000
     },
     "chrome-devtools": {
       "type": "local",
-      "command": ["npx", "-y", "chrome-devtools-mcp@latest"],
+      "command": [
+        "npx",
+        "-y",
+        "chrome-devtools-mcp@latest"
+      ],
       "enabled": true,
       "timeout": 30000
     },
     "gitkraken": {
       "type": "local",
-      "command": ["gk", "mcp"],
+      "command": [
+        "gk",
+        "mcp"
+      ],
       "enabled": true
     },
-    "boff-agent": {
+    "janus": {
       "type": "local",
-      "command": ["pnpm", "--filter", "@repo/agent", "mcp"],
+      "command": [
+        "/bin/bash",
+        "-c",
+        "source /home/luisca/.nvm/nvm.sh && exec janus mcp"
+      ],
       "enabled": true,
       "timeout": 60000
     }

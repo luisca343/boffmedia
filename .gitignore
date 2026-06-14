@@ -25,3 +25,5 @@ laboon/
 .github/agents/agent-talkative.md
 
 docs/handoffs/**
+.janus/memory/
+.env.janus
