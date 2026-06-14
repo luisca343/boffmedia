@@ -2,7 +2,7 @@
 
 > **Status**: Active  
 > **Last updated**: 2026-05-17  
-> **Scope**: Production server — `boffmedia` and `boff_agent` databases  
+> **Scope**: Production server — `boffmedia` database  
 > **BookStack target**: Infrastructure → DevOps → Runbooks → DB Backups
 
 ---
@@ -13,7 +13,7 @@ Daily encrypted backups of both production databases, written to the Hetzner Sto
 
 | Item | Value |
 |---|---|
-| Databases | `boffmedia`, `boff_agent` |
+| Databases | `boffmedia` |
 | MariaDB container | `pterodactyl-database-1` |
 | Backup destination | `/mnt/laboon/backups/db/` (Hetzner StorageBox — `u376239.your-storagebox.de`) |
 | Encryption key location | `/opt/backups/.backup-key` (host only — also stored off-server) |
@@ -49,7 +49,7 @@ A dedicated MariaDB user with read-only permissions exists inside `pterodactyl-d
 -- Grants use '@'%' because docker exec connects via TCP, not Unix socket
 CREATE USER 'backup_user'@'%' IDENTIFIED BY '...';
 GRANT SELECT, LOCK TABLES, SHOW VIEW, EVENT, TRIGGER ON boffmedia.* TO 'backup_user'@'%';
-GRANT SELECT, LOCK TABLES, SHOW VIEW, EVENT, TRIGGER ON boff_agent.* TO 'backup_user'@'%';
+
 ```
 
 The password is stored in `/etc/environment` as `MYSQL_BACKUP_PASSWORD`. The script sources this file at startup so it works correctly from cron without a login shell.
@@ -73,7 +73,7 @@ RETENTION_DAYS=14
 MYSQL_USER="backup_user"
 MYSQL_PASSWORD="${MYSQL_BACKUP_PASSWORD}"
 CONTAINER="pterodactyl-database-1"
-DATABASES=("boffmedia" "boff_agent")
+DATABASES=("boffmedia")
 KEY_FILE="/opt/backups/.backup-key"
 
 mkdir -p "$BACKUP_DIR"

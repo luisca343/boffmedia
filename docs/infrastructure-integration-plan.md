@@ -86,10 +86,8 @@ chmod 600 /opt/backups/.backup-key
 ```sql
 CREATE USER 'backup_user'@'localhost' IDENTIFIED BY 'strong_generated_password';
 GRANT SELECT, LOCK TABLES, SHOW VIEW, EVENT, TRIGGER ON boffmedia.* TO 'backup_user'@'localhost';
-GRANT SELECT, LOCK TABLES, SHOW VIEW, EVENT, TRIGGER ON boff_agent.* TO 'backup_user'@'localhost';
 FLUSH PRIVILEGES;
 ```
-> Note: SmartRotom data lives inside `boffmedia`. `agent_memory` in the original plan = `boff_agent`. Confirmed 2026-05-17.
 
 - [x] Store `backup_user` password in `/etc/environment` as `MYSQL_BACKUP_PASSWORD`
 
@@ -107,7 +105,7 @@ RETENTION_DAYS=14
 MYSQL_USER="backup_user"
 MYSQL_PASSWORD="${MYSQL_BACKUP_PASSWORD}"
 MYSQL_HOST="localhost"
-DATABASES=("boffmedia" "boff_agent")
+DATABASES=("boffmedia")
 KEY_FILE="/opt/backups/.backup-key"
 
 mkdir -p "$BACKUP_DIR"
