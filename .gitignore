@@ -2,7 +2,6 @@ node_modules/
 .env
 .env.local
 .env*.local
-.env*.agent
 dist/
 .next/
 *.log
@@ -20,10 +19,6 @@ apps/api/*.json
 
 public/
 laboon/
-.env.agent
-.agent-runs/
-.github/agents/agent-talkative.md
 
 docs/handoffs/**
-.janus/memory/
-.env.janus
+

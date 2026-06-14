@@ -1,5 +1,4 @@
 # Paths agents must never modify (gitignore syntax).
-# Checked by `janus guard check` / the guard_check MCP tool.
 
 # ============================================
 # Lockfiles & Generated Artifacts
@@ -17,12 +16,6 @@ coverage/
 # Auto-Generated Shared Types — NEVER EDIT
 # ============================================
 packages/shared/src/
-
-# ============================================
-# Janus Internals
-# ============================================
-.janus/memory/
-.janus/config.schema.json
 
 # ============================================
 # Secrets & Credentials
@@ -56,16 +49,11 @@ apps/api/*.json
 !apps/api/drizzle.config.ts
 
 # ============================================
-# Agent Configs (managed by janus init)
+# Agent Configs
 # ============================================
-.clinerules
-.windsurfrules
-.cursor/rules
 opencode.json
 .mcp.json
-.vscode/mcp.json
 AGENTS.md
-CONVENTIONS.md
 
 # ============================================
 # Documentation & Handoffs
