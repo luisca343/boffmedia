@@ -2,17 +2,31 @@
   "$schema": "./config.schema.json",
   "project": {
     "name": "boffmedia",
-    "description": ""
+    "description": "Gaming tools platform (Boffmedia) and Pixelmon/Minecraft companion (SmartRotom) with shared NestJS API and Next.js client"
   },
   "verification": {
     "stages": [
       {
         "name": "lint",
-        "command": "pnpm lint"
+        "command": "pnpm lint",
+        "timeoutMs": 300000
       },
       {
         "name": "type-check",
-        "command": "pnpm type-check"
+        "command": "pnpm type-check",
+        "timeoutMs": 300000
+      },
+      {
+        "name": "api-test",
+        "command": "pnpm --filter api test",
+        "timeoutMs": 300000,
+        "appliesTo": ["apps/api/**/*.ts"]
+      },
+      {
+        "name": "web-test",
+        "command": "pnpm --filter web test",
+        "timeoutMs": 300000,
+        "appliesTo": ["apps/web/**/*.ts", "apps/web/**/*.tsx"]
       }
     ]
   },
@@ -23,20 +37,146 @@
   "git": {
     "branchPrefix": "janus/",
     "mirrors": [],
-    "defaultBranch": "main"
+    "defaultBranch": "master"
   },
   "context": {
-    "groups": [],
-    "alwaysInclude": [],
-    "maxFiles": 20
+    "groups": [
+      {
+        "keywords": ["nestjs", "api", "controller", "service", "module", "dto", "guard", "interceptor", "endpoint"],
+        "globs": ["apps/api/src/**/*.ts", "apps/api/package.json", "apps/api/tsconfig.json", "apps/api/nest-cli.json"]
+      },
+      {
+        "keywords": ["nextjs", "web", "page", "route", "layout", "component", "client"],
+        "globs": ["apps/web/src/**/*.ts", "apps/web/src/**/*.tsx", "apps/web/package.json", "apps/web/next.config.mjs", "apps/web/tsconfig.json"]
+      },
+      {
+        "keywords": ["smartrotom", "rotom", "pixelmon", "minecraft", "pokedex", "starbank", "chatapp", "liga", "mina", "misiones", "arcade"],
+        "globs": ["apps/web/src/app/smartrotom/**/*", "apps/web/src/components/smartrotom/**/*", "apps/web/src/services/api/smartrotom/**/*", "apps/web/src/hooks/**/*", "apps/api/src/api/smartrotom/**/*.ts"]
+      },
+      {
+        "keywords": ["boffmedia", "eventos", "herramientas", "tools", "vgc", "tcg", "mhwilds", "manga"],
+        "globs": ["apps/web/src/app/(boffmedia)/**/*", "apps/web/src/components/boffmedia/**/*", "apps/web/src/services/api/boffmedia/**/*", "apps/api/src/api/boffmedia/**/*.ts"]
+      },
+      {
+        "keywords": ["discord", "bot", "necord", "slash", "tts", "meta"],
+        "globs": ["apps/api/src/discord/**/*.ts"]
+      },
+      {
+        "keywords": ["battle", "showdown", "battlesim", "replay", "pvp"],
+        "globs": ["apps/web/src/app/battlesim/**/*", "apps/api/src/api/battlesimulator/**/*.ts"]
+      },
+      {
+        "keywords": ["database", "schema", "drizzle", "migration", "typeorm", "entity", "repository"],
+        "globs": ["apps/api/src/_db/**/*.ts", "apps/api/drizzle/**/*", "apps/api/src/api/_repositories/**/*.ts", "apps/api/src/_utils/DrizzleService.ts", "apps/api/src/_utils/MySQL2Service.ts"]
+      },
+      {
+        "keywords": ["shared", "types", "openapi", "codegen", "model"],
+        "globs": ["packages/shared/src/roles.ts", "apps/api/src/**/*.dto.ts", "apps/api/src/**/*.entity.ts"]
+      },
+      {
+        "keywords": ["mcef", "minecraft", "ingame"],
+        "globs": ["apps/web/src/services/mcef/**/*"]
+      },
+      {
+        "keywords": ["auth", "login", "jwt", "session", "google", "oauth"],
+        "globs": ["apps/api/src/api/auth/**/*.ts", "apps/web/src/features/authOptions.ts", "apps/web/src/services/middleware.ts", "apps/web/src/providers/SessionProvider.tsx"]
+      },
+      {
+        "keywords": ["socket", "realtime", "websocket", "gateway"],
+        "globs": ["apps/api/src/api/_utils/sockets/**/*", "apps/web/src/services/useSocket.ts", "apps/web/src/providers/SocketProvider.tsx"]
+      },
+      {
+        "keywords": ["ficusai", "ai", "chat", "gemini"],
+        "globs": ["apps/api/src/api/smartrotom/ficusai/**/*.ts", "apps/web/src/features/ficusai/**/*", "apps/web/src/services/api/smartrotom/ficusAiService.ts"]
+      },
+      {
+        "keywords": ["vgc-tracker", "tracker", "session", "elo"],
+        "globs": ["apps/web/src/features/vgc-tracker/**/*", "apps/api/src/api/boffmedia/herramientas/pokemon/vgc/**/*.ts"]
+      },
+      {
+        "keywords": ["i18n", "translation", "locale", "intl"],
+        "globs": ["apps/web/src/i18n/**/*", "apps/web/locales/**/*", "apps/web/src/lib/intlUtils.ts"]
+      },
+      {
+        "keywords": ["zustand", "store", "state"],
+        "globs": ["apps/web/src/stores/**/*"]
+      },
+      {
+        "keywords": ["hook", "use"],
+        "globs": ["apps/web/src/hooks/**/*"]
+      },
+      {
+        "keywords": ["ci", "cd", "deploy", "docker", "workflow"],
+        "globs": [".github/workflows/**/*", "apps/web/Dockerfile", "apps/api/Dockerfile", ".gitlab-ci.yml"]
+      },
+      {
+        "keywords": ["config", "env", "environment"],
+        "globs": ["apps/web/src/config/**/*", "apps/api/src/config/**/*", "apps/web/.env.example", "apps/api/.env.example"]
+      }
+    ],
+    "alwaysInclude": [
+      "AGENTS.md",
+      ".janus/architecture.md",
+      ".janus/constitution.md"
+    ],
+    "maxFiles": 25
   },
   "structural": {
-    "rules": []
+    "rules": [
+      {
+        "pattern": "apps/api/src/_db/schema/*.ts",
+        "kind": "database-schema",
+        "adrRecommended": true
+      },
+      {
+        "pattern": "apps/api/drizzle/migrations/*.sql",
+        "kind": "database-migration"
+      },
+      {
+        "pattern": "apps/api/src/app.module.ts",
+        "kind": "module-registration"
+      },
+      {
+        "pattern": "apps/api/src/main.ts",
+        "kind": "bootstrap-config",
+        "adrRecommended": true
+      },
+      {
+        "pattern": "apps/web/next.config.mjs",
+        "kind": "nextjs-config",
+        "adrRecommended": true
+      },
+      {
+        "pattern": "packages/shared/src/**",
+        "kind": "shared-types",
+        "adrRecommended": true
+      },
+      {
+        "pattern": "apps/api/src/api/auth/**",
+        "kind": "auth-system",
+        "adrRecommended": true
+      },
+      {
+        "pattern": ".github/workflows/*.yml",
+        "kind": "ci-cd-pipeline"
+      },
+      {
+        "pattern": "pnpm-workspace.yaml",
+        "kind": "workspace-config",
+        "adrRecommended": true
+      },
+      {
+        "pattern": "apps/web/src/components/smartrotom/ui/*",
+        "kind": "smartrotom-design-system"
+      },
+      {
+        "pattern": "apps/web/src/components/ui/primitives/*",
+        "kind": "global-design-system"
+      }
+    ]
   },
   "skills": {
-    "enabled": [
-      "*"
-    ]
+    "enabled": ["*"]
   },
   "memory": {
     "enabled": true,
