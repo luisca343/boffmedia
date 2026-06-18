@@ -24,3 +24,18 @@ docs/handoffs/**
 
 .janus/memory/
 .env.janus
+
+docs/**
+
+# VGC training data (too large for git)
+*.parquet
+docs/vgc_data/
+
+# ML training artifacts
+training/.venv/
+training/__pycache__/
+training/configs/
+models/
+*.pyc
+*.pyo
+__pycache__/
