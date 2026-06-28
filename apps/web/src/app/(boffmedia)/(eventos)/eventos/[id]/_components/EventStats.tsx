@@ -35,7 +35,7 @@ export function EventStats({ event, participants, achievements }: EventStatsProp
           <Users className="w-5 h-5" style={{ color: "rgba(249,115,22,0.8)" }} />
         </div>
         <div className="min-w-0">
-          <div className="text-[10px] font-mono uppercase tracking-widest text-surface-500 mb-0.5">
+          <div className="text-[10px] font-mono uppercase tracking-widest text-ink-muted mb-0.5">
             Participantes
           </div>
           <div className="flex items-center gap-3">
@@ -59,7 +59,7 @@ export function EventStats({ event, participants, achievements }: EventStatsProp
                 ))}
                 {overflow > 0 && (
                   <span
-                    className="text-[10px] font-mono text-surface-400 ml-2"
+                    className="text-[10px] font-mono text-ink-muted ml-2"
                   >
                     +{overflow}
                   </span>
@@ -89,7 +89,7 @@ export function EventStats({ event, participants, achievements }: EventStatsProp
           <Trophy className="w-5 h-5" style={{ color: "rgba(250,204,21,0.8)" }} />
         </div>
         <div>
-          <div className="text-[10px] font-mono uppercase tracking-widest text-surface-500 mb-0.5">
+          <div className="text-[10px] font-mono uppercase tracking-widest text-ink-muted mb-0.5">
             Logros
           </div>
           <span
@@ -123,7 +123,7 @@ export function EventStats({ event, participants, achievements }: EventStatsProp
           }
         </div>
         <div>
-          <div className="text-[10px] font-mono uppercase tracking-widest text-surface-500 mb-0.5">
+          <div className="text-[10px] font-mono uppercase tracking-widest text-ink-muted mb-0.5">
             Modalidad
           </div>
           <span

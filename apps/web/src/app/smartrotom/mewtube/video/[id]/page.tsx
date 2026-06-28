@@ -51,7 +51,7 @@ export default function Video({ params }: { params: Promise<{ id: string }> }) {
 
   if (loading) {
     return (
-      <div className="min-h-full bg-surface-900 flex justify-center items-center overflow-auto">
+      <div className="min-h-full bg-layer-1 flex justify-center items-center overflow-auto">
         <LoadingSpinner size="large" message={t("loading.video")} />
       </div>
     );
@@ -59,10 +59,10 @@ export default function Video({ params }: { params: Promise<{ id: string }> }) {
 
   if (error) {
     return (
-      <div className="min-h-full bg-surface-900 text-white p-6 flex justify-center items-center overflow-auto">
-        <div className="bg-surface-800 p-6 rounded-lg shadow-lg max-w-md w-full text-center">
+      <div className="min-h-full bg-layer-1 text-white p-6 flex justify-center items-center overflow-auto">
+        <div className="bg-layer-2 p-6 rounded-lg shadow-lg max-w-md w-full text-center">
           <p className="text-red-500 text-xl mb-4">{error}</p>
-          <InternalLink href="youtube" className="text-secondary-400 hover:underline">
+          <InternalLink href="youtube" className="text-secondary-hover hover:underline">
             {t("video.returnToSearch")}
           </InternalLink>
         </div>
@@ -71,7 +71,7 @@ export default function Video({ params }: { params: Promise<{ id: string }> }) {
   }
 
   return (
-    <div className="min-h-full bg-surface-900 text-white overflow-auto">
+    <div className="min-h-full bg-layer-1 text-white overflow-auto">
       <div className="container mx-auto px-4 py-6">
         <div className="mb-6">
           <VideoPlayer videoId={id} title={videoDetails?.snippet.title || ""} />

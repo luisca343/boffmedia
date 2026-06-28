@@ -56,7 +56,7 @@ export function BattleConnectionState({
           <button
             onClick={onRetry}
             className="bsx-focus px-6 py-2 rounded-md font-medium transition-colors"
-            style={{ background: 'var(--accent)', color: 'var(--text)', border: '1px solid var(--border)' }}
+            style={{ background: 'var(--secondary)', color: 'var(--text)', border: '1px solid var(--border)' }}
           >
             {retryLabel ?? t('connection.tryAgain')}
           </button>
@@ -65,7 +65,7 @@ export function BattleConnectionState({
           <Link
             href={backHref}
             className="bsx-focus px-6 py-2 rounded-md font-medium transition-colors"
-            style={{ background: 'var(--surface-2)', color: 'var(--text)', border: '1px solid var(--border)' }}
+            style={{ background: 'var(--layer-2)', color: 'var(--text)', border: '1px solid var(--border)' }}
           >
             {backLabel ?? t('connection.backToLobby')}
           </Link>

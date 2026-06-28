@@ -31,13 +31,13 @@ export function ExpandableCard({
   }
 
   return (
-    <div className={cn("border border-[var(--border)] rounded-[var(--radius)] overflow-hidden", className)}>
+    <div className={cn("border border-edge rounded-[var(--radius)] overflow-hidden", className)}>
       <button
         type="button"
         onClick={toggle}
         className={cn(
           "flex items-center gap-3 w-full px-3 py-2.5 bg-transparent border-none cursor-pointer text-left",
-          "hover:bg-[color-mix(in_srgb,var(--surface-3)_40%,transparent)] transition-colors",
+          "hover:bg-[color-mix(in_srgb,var(--layer-3)_40%,transparent)] transition-colors",
           headerClassName,
         )}
       >
@@ -45,12 +45,12 @@ export function ExpandableCard({
         <Icon
           name="chevron"
           size={14}
-          className="text-[var(--text-dim)] shrink-0 transition-transform duration-[var(--dur)] ease-[var(--ease)]"
+          className="text-ink-dim shrink-0 transition-transform duration-[var(--dur)] ease-[var(--ease)]"
           style={{ transform: open ? "rotate(180deg)" : "none" }}
         />
       </button>
       {open && (
-        <div className={cn("border-t border-[var(--border)] bg-[color-mix(in_srgb,var(--surface)_30%,transparent)] px-3 py-3", bodyClassName)}>
+        <div className={cn("border-t border-edge bg-[color-mix(in_srgb,var(--layer-1)_30%,transparent)] px-3 py-3", bodyClassName)}>
           {children}
         </div>
       )}

@@ -15,12 +15,12 @@ export default function UserGallery() {
   if (status === "loading") {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-6">
-        <div className="p-4 rounded-full bg-surface-700/50 border border-surface-600/50">
-          <Loader2 className="w-8 h-8 text-primary-400 animate-spin" />
+        <div className="p-4 rounded-full bg-layer-3/50 border border-edge/50">
+          <Loader2 className="w-8 h-8 text-primary-hover animate-spin" />
         </div>
         <div className="text-center max-w-md">
-          <h1 className="text-2xl font-semibold text-surface-50 mb-2">Cargando...</h1>
-          <p className="text-surface-400">
+          <h1 className="text-2xl font-semibold text-ink mb-2">Cargando...</h1>
+          <p className="text-ink-muted">
             Estamos cargando tu galería de cartas. Por favor, espera un momento.
           </p>
         </div>
@@ -35,10 +35,10 @@ export default function UserGallery() {
           <HiExclamationTriangle className="w-8 h-8 text-red-400" />
         </div>
         <div className="text-center max-w-md">
-          <h1 className="text-2xl font-semibold text-surface-50 mb-2">
+          <h1 className="text-2xl font-semibold text-ink mb-2">
             Usuario no encontrado
           </h1>
-          <p className="text-surface-400 mb-6">
+          <p className="text-ink-muted mb-6">
             Lo sentimos, no pudimos encontrar tus datos.
           </p>
           <Button

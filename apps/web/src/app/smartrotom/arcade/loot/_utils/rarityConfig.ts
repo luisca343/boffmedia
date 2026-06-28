@@ -13,34 +13,34 @@ export function getRarityConfig(rarity: ArcadeInventoryItem.rarity): RarityStyle
     case "common":
       return {
         color: "gray-800",
-        bgColor: "bg-surface-800/90",
-        borderColor: "border-surface-400",
-        textColor: "text-surface-400",
+        bgColor: "bg-layer-2/90",
+        borderColor: "border-edge",
+        textColor: "text-ink-muted",
         glow: ""
       };
     case "uncommon":
       return {
         color: "green-900",
-        bgColor: "bg-highlight-900/90",
-        borderColor: "border-highlight-400", 
-        textColor: "text-highlight-400",
-        glow: "shadow-md shadow-highlight-500/30"
+        bgColor: "bg-warning-soft/90",
+        borderColor: "border-warning-border", 
+        textColor: "text-warning-hover",
+        glow: "shadow-md shadow-warning/30"
       };
     case "rare":
       return {
         color: "blue-900", 
-        bgColor: "bg-secondary-900/90", 
-        borderColor: "border-secondary-400", 
-        textColor: "text-secondary-400",
-        glow: "shadow-lg shadow-secondary-500/40"
+        bgColor: "bg-secondary-soft/90", 
+        borderColor: "border-secondary", 
+        textColor: "text-secondary-hover",
+        glow: "shadow-lg shadow-secondary/40"
       };
     case "epic":
       return {
         color: "purple-900", 
-        bgColor: "bg-accent-900/90", 
-        borderColor: "border-accent-400", 
-        textColor: "text-accent-400",
-        glow: "shadow-xl shadow-accent-500/50"
+        bgColor: "bg-secondary-soft/90", 
+        borderColor: "border-secondary", 
+        textColor: "text-secondary-hover",
+        glow: "shadow-xl shadow-secondary/50"
       };
     case "legendary":
       return {

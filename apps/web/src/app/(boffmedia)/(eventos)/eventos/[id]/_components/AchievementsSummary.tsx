@@ -126,12 +126,12 @@ export function AchievementsSummary({ eventId }: any) {
 
   if (isLoading) {
     return (
-      <div className="bg-surface-800/50 border border-surface-700 rounded-lg p-6">
+      <div className="bg-layer-2/50 border border-edge rounded-lg p-6">
         <div className="animate-pulse space-y-4">
-          <div className="h-6 bg-surface-700 rounded w-1/3"></div>
+          <div className="h-6 bg-layer-3 rounded w-1/3"></div>
           <div className="space-y-2">
-            <div className="h-4 bg-surface-700 rounded"></div>
-            <div className="h-4 bg-surface-700 rounded w-2/3"></div>
+            <div className="h-4 bg-layer-3 rounded"></div>
+            <div className="h-4 bg-layer-3 rounded w-2/3"></div>
           </div>
         </div>
       </div>
@@ -145,11 +145,11 @@ export function AchievementsSummary({ eventId }: any) {
   const getRarityColor = (rarity?: string | null) => {
     switch (rarity?.toLowerCase()) {
       case 'diamond': return 'text-cyan-400 border-cyan-500/30 bg-cyan-500/10'
-      case 'platinum': return 'text-accent-400 border-accent-500/30 bg-accent-500/10'
+      case 'platinum': return 'text-secondary-hover border-secondary/30 bg-secondary/10'
       case 'gold': return 'text-yellow-400 border-yellow-500/30 bg-yellow-500/10'
-      case 'silver': return 'text-surface-300 border-surface-400/30 bg-surface-400/10'
+      case 'silver': return 'text-ink border-edge/30 bg-layer-3/10'
       case 'bronze': return 'text-amber-600 border-amber-600/30 bg-amber-600/10'
-      default: return 'text-surface-400 border-surface-500/30 bg-surface-500/10'
+      default: return 'text-ink-muted border-edge/30 bg-layer-3/10'
     }
   }
 
@@ -157,14 +157,14 @@ export function AchievementsSummary({ eventId }: any) {
     <div className="space-y-4">
       {/* Achievements Summary */}
       {showAchievements && (
-        <div className="bg-surface-800/50 border border-surface-700 rounded-lg p-6">
+        <div className="bg-layer-2/50 border border-edge rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xl font-semibold text-surface-50 flex items-center">
+            <h3 className="text-xl font-semibold text-ink flex items-center">
               <Trophy className="mr-2 h-5 w-5 text-amber-500" />
               Logros
             </h3>
             <InternalLink href={`/${eventId}/logros`}>
-              <Button variant="ghost" size="sm" className="text-primary-400 hover:text-primary-300">
+              <Button variant="ghost" size="sm" className="text-primary-hover hover:text-primary-hover">
                 Ver todos
                 <ChevronRight className="ml-1 h-4 w-4" />
               </Button>
@@ -174,13 +174,13 @@ export function AchievementsSummary({ eventId }: any) {
           {/* Progress Overview */}
           <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-surface-300">Progreso</span>
-              <span className="text-surface-50 font-semibold">
+              <span className="text-ink">Progreso</span>
+              <span className="text-ink font-semibold">
                 {unlockedAchievements.length} / {totalAchievements}
               </span>
             </div>
             <Progress value={completionRate} className="h-2 mb-2" />
-            <div className="text-sm text-surface-400">
+            <div className="text-sm text-ink-muted">
               {completionRate.toFixed(1)}% completado
             </div>
           </div>
@@ -188,13 +188,13 @@ export function AchievementsSummary({ eventId }: any) {
           {/* Recent Achievements */}
           {recentAchievements.length > 0 && (
             <div>
-              <h4 className="text-surface-50 font-medium mb-3 flex items-center">
-                <Award className="mr-2 h-4 w-4 text-primary-500" />
+              <h4 className="text-ink font-medium mb-3 flex items-center">
+                <Award className="mr-2 h-4 w-4 text-primary" />
                 Logros Recientes
               </h4>
               <div className="space-y-3">
                 {recentAchievements.map((achievement) => (
-                  <div key={achievement.id} className="flex items-center p-3 bg-surface-700/30 rounded-lg border border-surface-600/50">
+                  <div key={achievement.id} className="flex items-center p-3 bg-layer-3/30 rounded-lg border border-edge/50">
                     <div className="w-12 h-12 rounded-lg bg-amber-500/20 flex items-center justify-center mr-3">
                       {achievement.icon ? (
                         <img src={achievement.icon} alt="" className="w-8 h-8" />
@@ -204,7 +204,7 @@ export function AchievementsSummary({ eventId }: any) {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <h5 className="text-surface-50 font-medium">{achievement.name}</h5>
+                        <h5 className="text-ink font-medium">{achievement.name}</h5>
                         {achievement.rarity && (
                           <Badge className={getRarityColor(achievement.rarity)}>
                             {achievement.rarity}
@@ -212,9 +212,9 @@ export function AchievementsSummary({ eventId }: any) {
                         )}
                       </div>
                       {achievement.hidden ? (
-                        <p className="text-sm text-surface-500 line-clamp-1">Descripción oculta</p>
+                        <p className="text-sm text-ink-muted line-clamp-1">Descripción oculta</p>
                       ) : (
-                        <p className="text-sm text-surface-300 line-clamp-1">{achievement.description}</p>
+                        <p className="text-sm text-ink line-clamp-1">{achievement.description}</p>
                       )}
                     </div>
                     <Badge variant="secondary" className="bg-amber-500/20 text-amber-300 border-amber-500/30">
@@ -227,16 +227,16 @@ export function AchievementsSummary({ eventId }: any) {
           )}
 
           {/* Stats */}
-          <div className="mt-4 pt-4 border-t border-surface-700 grid grid-cols-2 gap-4 text-center">
+          <div className="mt-4 pt-4 border-t border-edge grid grid-cols-2 gap-4 text-center">
             <div>
-              <div className="text-2xl font-bold text-surface-50">{unlockedAchievements.length}</div>
-              <div className="text-sm text-surface-400">Desbloqueados</div>
+              <div className="text-2xl font-bold text-ink">{unlockedAchievements.length}</div>
+              <div className="text-sm text-ink-muted">Desbloqueados</div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-surface-50">
+              <div className="text-2xl font-bold text-ink">
                 {unlockedAchievements.reduce((sum, a) => sum + a.points, 0)}
               </div>
-              <div className="text-sm text-surface-400">Puntos</div>
+              <div className="text-sm text-ink-muted">Puntos</div>
             </div>
           </div>
         </div>
@@ -244,14 +244,14 @@ export function AchievementsSummary({ eventId }: any) {
 
       {/* Medals Summary */}
       {showMedals && (
-        <div className="bg-surface-800/50 border border-surface-700 rounded-lg p-6">
+        <div className="bg-layer-2/50 border border-edge rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xl font-semibold text-surface-50 flex items-center">
+            <h3 className="text-xl font-semibold text-ink flex items-center">
               <Medal className="mr-2 h-5 w-5 text-yellow-500" />
               Medallas
             </h3>
             <InternalLink href={`/${eventId}/logros`}>
-              <Button variant="ghost" size="sm" className="text-primary-400 hover:text-primary-300">
+              <Button variant="ghost" size="sm" className="text-primary-hover hover:text-primary-hover">
                 Ver todas
                 <ChevronRight className="ml-1 h-4 w-4" />
               </Button>
@@ -260,13 +260,13 @@ export function AchievementsSummary({ eventId }: any) {
 
           {/* Simple Medal List */}
           <div>
-            <h4 className="text-surface-50 font-medium mb-3 flex items-center">
+            <h4 className="text-ink font-medium mb-3 flex items-center">
               <Medal className="mr-2 h-4 w-4 text-yellow-500" />
               {playerMedals.length} Medalla{playerMedals.length !== 1 ? 's' : ''}
             </h4>
             <div className="space-y-2">
               {playerMedals.slice(0, 3).map((medal) => (
-                <div key={medal.id} className="flex items-center p-2 bg-surface-700/30 rounded-lg">
+                <div key={medal.id} className="flex items-center p-2 bg-layer-3/30 rounded-lg">
                   <div className="w-8 h-8 rounded bg-yellow-500/20 flex items-center justify-center mr-3">
                     {medal.icon ? (
                       <img src={medal.icon} alt="" className="w-5 h-5" />
@@ -275,11 +275,11 @@ export function AchievementsSummary({ eventId }: any) {
                     )}
                   </div>
                   <div className="flex-1">
-                    <h5 className="text-surface-50 font-medium text-sm">{medal.name}</h5>
+                    <h5 className="text-ink font-medium text-sm">{medal.name}</h5>
                     <div className="flex items-center gap-2 text-xs">
                       <span className="text-yellow-400">{medal.points} pts</span>
                       {medal.rarity && (
-                        <span className="text-surface-400">• {medal.rarity}</span>
+                        <span className="text-ink-muted">• {medal.rarity}</span>
                       )}
                     </div>
                   </div>
@@ -287,15 +287,15 @@ export function AchievementsSummary({ eventId }: any) {
               ))}
               {playerMedals.length > 3 && (
                 <div className="text-center">
-                  <span className="text-surface-400 text-sm">+{playerMedals.length - 3} más</span>
+                  <span className="text-ink-muted text-sm">+{playerMedals.length - 3} más</span>
                 </div>
               )}
             </div>
           </div>
 
           {/* Simple Stats */}
-          <div className="mt-4 pt-4 border-t border-surface-700 text-center">
-            <div className="text-lg font-bold text-surface-50">
+          <div className="mt-4 pt-4 border-t border-edge text-center">
+            <div className="text-lg font-bold text-ink">
               {playerMedals.reduce((sum, m) => sum + m.points, 0)} puntos totales
             </div>
           </div>

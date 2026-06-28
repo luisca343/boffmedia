@@ -56,7 +56,7 @@ interface PokemonDetailProps {
 }
 
 function TypeBadge({ type }: { type: string }) {
-  const bg = TYPE_COLORS[type] || "var(--surface-3)"
+  const bg = TYPE_COLORS[type] || "var(--layer-3)"
   return (
     <span
       className="inline-flex items-center text-[10px] font-bold uppercase tracking-[0.04em] px-2 py-[0.2rem] rounded text-white"
@@ -69,15 +69,15 @@ function TypeBadge({ type }: { type: string }) {
 
 function StatPanel({ title, items, max = 8 }: { title: string; items: { name: string; pct: number }[]; max?: number }) {
   return (
-    <div className="border border-[var(--border)] rounded-[var(--radius)] p-3 bg-[color-mix(in_srgb,var(--surface-2)_50%,transparent)]">
-      <p className="font-mono text-[10px] tracking-[0.16em] uppercase text-[var(--text-dim)] mb-[0.55rem]">
+    <div className="border border-edge rounded-[var(--radius)] p-3 bg-[color-mix(in_srgb,var(--layer-2)_50%,transparent)]">
+      <p className="font-mono text-[10px] tracking-[0.16em] uppercase text-ink-dim mb-[0.55rem]">
         {title}
       </p>
       <div className="flex flex-col">
         {items.slice(0, max).map((it, i) => (
           <div key={i} className="flex items-center gap-2 py-[0.3rem] border-b border-[color-mix(in_srgb,var(--border)_45%,transparent)] last:border-b-0">
-            <span className="flex-1 min-w-0 text-xs text-[var(--text)] truncate">{it.name}</span>
-            <span className="font-mono text-xs text-[var(--text-muted)] shrink-0">{it.pct.toFixed(2)}%</span>
+            <span className="flex-1 min-w-0 text-xs text-ink truncate">{it.name}</span>
+            <span className="font-mono text-xs text-ink-muted shrink-0">{it.pct.toFixed(2)}%</span>
           </div>
         ))}
       </div>
@@ -92,11 +92,11 @@ function TeammateRow({ id, pct, pokeMap, onSelect }: { id: string; pct: number; 
     <button
       type="button"
       onClick={() => onSelect(id)}
-      className="flex items-center gap-2 w-full text-left py-[0.3rem] border-b border-[color-mix(in_srgb,var(--border)_45%,transparent)] last:border-b-0 bg-transparent border-x-0 border-t-0 cursor-pointer hover:bg-[color-mix(in_srgb,var(--surface-3)_55%,transparent)]"
+      className="flex items-center gap-2 w-full text-left py-[0.3rem] border-b border-[color-mix(in_srgb,var(--border)_45%,transparent)] last:border-b-0 bg-transparent border-x-0 border-t-0 cursor-pointer hover:bg-[color-mix(in_srgb,var(--layer-3)_55%,transparent)]"
     >
       <img src={spriteUrl(p.name)} alt={p.name} width={30} height={30} className="object-contain shrink-0" onError={handleSpriteError} />
-      <span className="flex-1 min-w-0 text-xs truncate text-[var(--text)]">{p.name}</span>
-      <span className="font-mono text-xs text-[var(--text-muted)] shrink-0">{pct.toFixed(2)}%</span>
+      <span className="flex-1 min-w-0 text-xs truncate text-ink">{p.name}</span>
+      <span className="font-mono text-xs text-ink-muted shrink-0">{pct.toFixed(2)}%</span>
     </button>
   )
 }
@@ -115,8 +115,8 @@ function BaseStatBars({ base }: { base: Record<string, number> }) {
   const total = STAT_ORDER.reduce((a, k) => a + (base[k] || 0), 0)
 
   return (
-    <div className="border border-[var(--border)] rounded-[var(--radius)] p-3 bg-[color-mix(in_srgb,var(--surface-2)_50%,transparent)]">
-      <p className="font-mono text-[10px] tracking-[0.16em] uppercase text-[var(--text-dim)] mb-2">
+    <div className="border border-edge rounded-[var(--radius)] p-3 bg-[color-mix(in_srgb,var(--layer-2)_50%,transparent)]">
+      <p className="font-mono text-[10px] tracking-[0.16em] uppercase text-ink-dim mb-2">
         Stats base
       </p>
       {STAT_ORDER.map((k) => {
@@ -125,16 +125,16 @@ function BaseStatBars({ base }: { base: Record<string, number> }) {
         return (
           <div key={k} className="grid grid-cols-[34px_32px_1fr] gap-2 items-center mb-[0.38rem]">
             <span className="font-mono text-[10px] font-bold" style={{ color: meta.color }}>{meta.label}</span>
-            <span className="font-mono text-xs text-[var(--text-muted)] text-right">{v}</span>
-            <div className="h-[7px] rounded-full bg-[color-mix(in_srgb,var(--surface-3)_80%,transparent)] overflow-hidden">
+            <span className="font-mono text-xs text-ink-muted text-right">{v}</span>
+            <div className="h-[7px] rounded-full bg-[color-mix(in_srgb,var(--layer-3)_80%,transparent)] overflow-hidden">
               <div className="h-full rounded-full" style={{ width: `${(v / maxStat) * 100}%`, background: meta.color }} />
             </div>
           </div>
         )
       })}
-      <div className="flex justify-between text-xs mt-[0.45rem] pt-[0.45rem] border-t border-[var(--border)]">
-        <span className="font-mono text-[var(--text-dim)]">BST</span>
-        <span className="font-mono font-bold text-[var(--accent-bright)]">{total}</span>
+      <div className="flex justify-between text-xs mt-[0.45rem] pt-[0.45rem] border-t border-edge">
+        <span className="font-mono text-ink-dim">BST</span>
+        <span className="font-mono font-bold text-secondary-hover">{total}</span>
       </div>
     </div>
   )
@@ -169,12 +169,12 @@ export function VgcPokemonDetail({ detail, entry, pokeMap, onSelect, onBack, dri
 
   return (
     <div className="min-h-full">
-      <div className="sticky top-0 z-[6] flex items-center gap-3 px-[1.1rem] py-[0.85rem] border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--surface)_92%,transparent)] backdrop-blur-[10px]">
+      <div className="sticky top-0 z-[6] flex items-center gap-3 px-[1.1rem] py-[0.85rem] border-b border-edge bg-[color-mix(in_srgb,var(--layer-1)_92%,transparent)] backdrop-blur-[10px]">
         {drill && (
           <button
             type="button"
             onClick={onBack}
-            className="inline-flex items-center gap-1 px-[0.55rem] py-[0.35rem] mr-1 rounded-[var(--radius)] border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-muted)] text-xs font-semibold cursor-pointer hover:text-[var(--text)] hover:border-[var(--accent)]"
+            className="inline-flex items-center gap-1 px-[0.55rem] py-[0.35rem] mr-1 rounded-[var(--radius)] border border-edge-strong bg-layer-2 text-ink-muted text-xs font-semibold cursor-pointer hover:text-ink hover:border-secondary"
           >
             <Icon name="arrow" size={15} style={{ transform: "rotate(180deg)" }} />
             Lista
@@ -182,13 +182,13 @@ export function VgcPokemonDetail({ detail, entry, pokeMap, onSelect, onBack, dri
         )}
         <img src={spriteUrl(detail.name)} alt={detail.name} width={62} height={62} className="object-contain shrink-0" onError={handleSpriteError} />
         <div className="min-w-0">
-          <p className="font-display font-extrabold text-xl leading-tight text-[var(--text)]">{detail.name}</p>
+          <p className="font-display font-extrabold text-xl leading-tight text-ink">{detail.name}</p>
           <div className="flex flex-wrap gap-1.5 mt-1.5 items-center">
             {detail.types.map((t) => <TypeBadge key={t} type={t} />)}
-            <span className="font-mono text-[10px] px-1.5 py-[0.15rem] rounded-[var(--radius-pill)] border border-[var(--border)] text-[var(--text-dim)]">
+            <span className="font-mono text-[10px] px-1.5 py-[0.15rem] rounded-[var(--radius-pill)] border border-edge text-ink-dim">
               {entry.usage.toFixed(2)}% uso
             </span>
-            <span className="font-mono text-[10px] px-1.5 py-[0.15rem] rounded-[var(--radius-pill)] border border-[var(--border)] text-[var(--text-dim)]">
+            <span className="font-mono text-[10px] px-1.5 py-[0.15rem] rounded-[var(--radius-pill)] border border-edge text-ink-dim">
               {fmtCount(entry.count)} batallas
             </span>
           </div>
@@ -202,23 +202,23 @@ export function VgcPokemonDetail({ detail, entry, pokeMap, onSelect, onBack, dri
         <div className="flex flex-col gap-3">
           <StatPanel title="Habilidades" items={detail.abilities.slice(0, 4)} />
           {tera.length > 0 && (
-            <div className="border border-[var(--border)] rounded-[var(--radius)] p-3 bg-[color-mix(in_srgb,var(--surface-2)_50%,transparent)]">
-              <p className="font-mono text-[10px] tracking-[0.16em] uppercase text-[var(--text-dim)] mb-[0.55rem]">
+            <div className="border border-edge rounded-[var(--radius)] p-3 bg-[color-mix(in_srgb,var(--layer-2)_50%,transparent)]">
+              <p className="font-mono text-[10px] tracking-[0.16em] uppercase text-ink-dim mb-[0.55rem]">
                 Teratipos
               </p>
               <div className="flex flex-col">
                 {tera.map((t) => (
                   <div key={t.name} className="flex items-center gap-2 py-[0.3rem] border-b border-[color-mix(in_srgb,var(--border)_45%,transparent)] last:border-b-0">
                     <TypeBadge type={t.name} />
-                    <span className="font-mono text-xs text-[var(--text-muted)] shrink-0 ml-auto">{t.pct.toFixed(2)}%</span>
+                    <span className="font-mono text-xs text-ink-muted shrink-0 ml-auto">{t.pct.toFixed(2)}%</span>
                   </div>
                 ))}
               </div>
             </div>
           )}
         </div>
-        <div className="border border-[var(--border)] rounded-[var(--radius)] p-3 bg-[color-mix(in_srgb,var(--surface-2)_50%,transparent)]">
-          <p className="font-mono text-[10px] tracking-[0.16em] uppercase text-[var(--text-dim)] mb-[0.55rem]">
+        <div className="border border-edge rounded-[var(--radius)] p-3 bg-[color-mix(in_srgb,var(--layer-2)_50%,transparent)]">
+          <p className="font-mono text-[10px] tracking-[0.16em] uppercase text-ink-dim mb-[0.55rem]">
             Parejas frecuentes
           </p>
           <div className="flex flex-col">
@@ -227,8 +227,8 @@ export function VgcPokemonDetail({ detail, entry, pokeMap, onSelect, onBack, dri
             ))}
           </div>
         </div>
-        <div className="border border-[var(--border)] rounded-[var(--radius)] p-3 bg-[color-mix(in_srgb,var(--surface-2)_50%,transparent)]">
-          <p className="font-mono text-[10px] tracking-[0.16em] uppercase text-[var(--text-dim)] mb-[0.55rem]">
+        <div className="border border-edge rounded-[var(--radius)] p-3 bg-[color-mix(in_srgb,var(--layer-2)_50%,transparent)]">
+          <p className="font-mono text-[10px] tracking-[0.16em] uppercase text-ink-dim mb-[0.55rem]">
             Repartos de EVs
           </p>
           <div className="flex flex-col">
@@ -240,7 +240,7 @@ export function VgcPokemonDetail({ detail, entry, pokeMap, onSelect, onBack, dri
       </div>
 
       <div className="px-[1.1rem] pb-[1.3rem]">
-        <p className="flex items-center gap-[0.45rem] font-mono text-[10px] tracking-[0.16em] uppercase text-[var(--text-dim)] mb-[0.6rem]">
+        <p className="flex items-center gap-[0.45rem] font-mono text-[10px] tracking-[0.16em] uppercase text-ink-dim mb-[0.6rem]">
           <Icon name="users" size={14} />
           Equipos con {detail.name}
         </p>

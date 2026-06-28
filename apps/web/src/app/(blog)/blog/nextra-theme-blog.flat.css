@@ -1056,10 +1056,10 @@
       background-color: color-mix(in oklab, var(--x-color-nextra-bg) 70%, transparent);
     }
   }
-  .x\:bg-primary-100 {
+  .x\:bg-primary-soft {
     background-color: var(--x-color-primary-100);
   }
-  .x\:bg-primary-500\/10 {
+  .x\:bg-primary\/10 {
     background-color: var(--x-color-primary-500);
     @supports (color: color-mix(in lab, red, red)) {
       background-color: color-mix(in oklab, var(--x-color-primary-500) 10%, transparent);
@@ -1282,10 +1282,10 @@
   .x\:text-green-700 {
     color: var(--x-color-green-700);
   }
-  .x\:text-primary-600 {
+  .x\:text-primary-active {
     color: var(--x-color-primary-600);
   }
-  .x\:text-primary-800 {
+  .x\:text-primary-active {
     color: var(--x-color-primary-800);
   }
   .x\:text-purple-600 {
@@ -1556,7 +1556,7 @@
       }
     }
   }
-  .x\:hover\:bg-primary-50 {
+  .x\:hover\:bg-primary-soft {
     &:hover {
       @media (hover: hover) {
         background-color: var(--x-color-primary-50);
@@ -2145,7 +2145,7 @@
       background-color: var(--x-color-neutral-900);
     }
   }
-  .x\:dark\:bg-primary-100\/5 {
+  .x\:dark\:bg-primary-soft\/5 {
     &:where(.dark *) {
       background-color: var(--x-color-primary-100);
       @supports (color: color-mix(in lab, red, red)) {
@@ -2153,7 +2153,7 @@
       }
     }
   }
-  .x\:dark\:bg-primary-100\/10 {
+  .x\:dark\:bg-primary-soft\/10 {
     &:where(.dark *) {
       background-color: var(--x-color-primary-100);
       @supports (color: color-mix(in lab, red, red)) {
@@ -2161,7 +2161,7 @@
       }
     }
   }
-  .x\:dark\:bg-primary-500\/10 {
+  .x\:dark\:bg-primary\/10 {
     &:where(.dark *) {
       background-color: var(--x-color-primary-500);
       @supports (color: color-mix(in lab, red, red)) {
@@ -2243,7 +2243,7 @@
       color: var(--x-color-neutral-600);
     }
   }
-  .x\:dark\:text-primary-500 {
+  .x\:dark\:text-primary {
     &:where(.dark *) {
       color: var(--x-color-primary-500);
     }
@@ -2363,7 +2363,7 @@
       }
     }
   }
-  .x\:dark\:hover\:bg-primary-500\/10 {
+  .x\:dark\:hover\:bg-primary\/10 {
     &:where(.dark *) {
       &:hover {
         @media (hover: hover) {
@@ -2450,7 +2450,7 @@
       display: none;
     }
   }
-  .x\:\[\&_mark\]\:bg-primary-600\/80 {
+  .x\:\[\&_mark\]\:bg-primary-active\/80 {
     & mark {
       background-color: var(--x-color-primary-600);
       @supports (color: color-mix(in lab, red, red)) {

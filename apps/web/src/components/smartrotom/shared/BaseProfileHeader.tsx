@@ -36,9 +36,9 @@ export const BaseProfileHeader = ({
       <div className="w-full h-40 md:h-56 bg-cover bg-center" style={bannerStyle}></div>
       
       <div className="container mx-auto px-4 -mt-16 relative z-10">
-        <div className="bg-surface-800 rounded-xl shadow-xl p-6">
+        <div className="bg-layer-2 rounded-xl shadow-xl p-6">
           <div className="flex flex-col md:flex-row items-center md:items-start">
-            <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-surface-800 mb-4 md:mb-0 md:mr-6 bg-surface-700 flex-shrink-0">
+            <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-edge-strong mb-4 md:mb-0 md:mr-6 bg-layer-3 flex-shrink-0">
               <img
                 src={avatarUrl}
                 alt={title}
@@ -52,7 +52,7 @@ export const BaseProfileHeader = ({
               </h1>
               
               {username && (
-                <p className="text-sm text-surface-300 mb-2">
+                <p className="text-sm text-ink mb-2">
                   @{username}
                 </p>
               )}
@@ -61,7 +61,7 @@ export const BaseProfileHeader = ({
               
               {additionalInfo}
               
-              <p className="text-surface-300 line-clamp-2 md:max-w-2xl mt-4">
+              <p className="text-ink line-clamp-2 md:max-w-2xl mt-4">
                 {description}
               </p>
             </div>

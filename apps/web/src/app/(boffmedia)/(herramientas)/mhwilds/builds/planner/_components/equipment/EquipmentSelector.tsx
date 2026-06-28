@@ -116,8 +116,8 @@ export function EquipmentSelector({
           className="h-[400px] flex items-center justify-center gap-2 rounded-lg"
           style={{ background: "rgba(15,23,42,0.4)" }}
         >
-          <Loader2 className="h-6 w-6 text-primary-400 animate-spin" />
-          <span className="text-surface-400 text-sm">
+          <Loader2 className="h-6 w-6 text-primary-hover animate-spin" />
+          <span className="text-ink-muted text-sm">
             {t("build_planner.loading", { item: t("equipment").toLowerCase() })}
           </span>
         </div>
@@ -150,7 +150,7 @@ export function EquipmentSelector({
               <EquipmentItem key={item.id} item={item} slotType={slotType} index={i} onSelect={selectEquipment} />
             ))
           ) : (
-            <div className="col-span-2 text-center p-8 text-surface-400">
+            <div className="col-span-2 text-center p-8 text-ink-muted">
               <p>{t("build_planner.no_equipment_found")}</p>
             </div>
           )}
@@ -168,7 +168,7 @@ export function EquipmentSelector({
             {t("build_planner.select")} {getEquipmentDisplayName(slotType)}
           </MHWildsPanelTitle>
         </div>
-        <Button variant="ghost" size="sm" className="text-surface-400 hover:text-surface-200" onClick={onClose}>
+        <Button variant="ghost" size="sm" className="text-ink-muted hover:text-ink" onClick={onClose}>
           <X className="h-4 w-4 mr-1" /> {t("build_planner.close")}
         </Button>
       </MHWildsPanelHeader>

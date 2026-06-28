@@ -69,7 +69,7 @@ export function BSXKey({ move, hotkey, target, selected, disabled, disabledReaso
       style={{
         "--_c": tyVar(move.type),
         color: "var(--text)",
-        background: `linear-gradient(135deg, color-mix(in srgb, ${tyVar(move.type)} 13%, var(--surface)), var(--surface))`,
+        background: `linear-gradient(135deg, color-mix(in srgb, ${tyVar(move.type)} 13%, var(--layer-1)), var(--layer-1))`,
         border: `1px solid color-mix(in srgb, ${tyVar(move.type)} 36%, var(--border))`,
         boxShadow: selected ? `0 0 0 1px ${tyVar(move.type)} inset, 0 0 18px -8px ${tyVar(move.type)}` : undefined,
       } as React.CSSProperties}
@@ -88,7 +88,7 @@ export function BSXKey({ move, hotkey, target, selected, disabled, disabledReaso
       {hotkey && (
         <span
           className="font-mono font-bold text-t-3xs w-[19px] h-[19px] inline-grid place-items-center shrink-0 rounded-[var(--radius-sm)]"
-          style={{ background: "color-mix(in srgb, #000 30%, var(--surface-3))", color: "var(--text-muted)", border: "1px solid var(--border-strong)" }}
+          style={{ background: "color-mix(in srgb, #000 30%, var(--layer-3))", color: "var(--text-muted)", border: "1px solid var(--border-strong)" }}
         >
           {hotkey}
         </span>
@@ -120,7 +120,7 @@ export function BSXKey({ move, hotkey, target, selected, disabled, disabledReaso
           {move.spread && (
             <span
               className="font-mono font-bold text-t-4xs tracking-[.06em] px-[.4em] py-[.14em] rounded-[var(--radius-sm)]"
-              style={{ color: "var(--text-muted)", background: "var(--surface-3)", border: "1px solid var(--border)" }}
+              style={{ color: "var(--text-muted)", background: "var(--layer-3)", border: "1px solid var(--border)" }}
             >
               {move.spread === "all" ? "ÁREA·TODOS" : "ÁREA"}
             </span>
@@ -128,7 +128,7 @@ export function BSXKey({ move, hotkey, target, selected, disabled, disabledReaso
           {move.prio && move.prio > 0 ? (
             <span
               className="font-mono font-bold text-t-4xs tracking-[.06em] px-[.4em] py-[.14em] rounded-[var(--radius-sm)]"
-              style={{ color: "var(--cyan-400)", background: "var(--surface-3)", border: "1px solid var(--border)" }}
+              style={{ color: "var(--cyan-400)", background: "var(--layer-3)", border: "1px solid var(--border)" }}
             >
               +{move.prio}
             </span>
@@ -145,7 +145,7 @@ export function BSXKey({ move, hotkey, target, selected, disabled, disabledReaso
                 ? { color: "var(--emerald-400)", background: "color-mix(in srgb, var(--emerald-500) 16%, transparent)" }
                 : effTag.cls === "weak"
                 ? { color: "var(--rose-400)", background: "color-mix(in srgb, var(--rose-500) 14%, transparent)" }
-                : { color: "var(--text-dim)", background: "var(--surface-3)" }
+                : { color: "var(--text-dim)", background: "var(--layer-3)" }
             }
           >
             {effTag.t}
@@ -154,9 +154,9 @@ export function BSXKey({ move, hotkey, target, selected, disabled, disabledReaso
         <span className="flex items-center gap-[.35rem] font-mono text-t-4xs tabular-nums" style={{ color: "var(--text-dim)" }}>
           <i
             className="w-[34px] h-[4px] rounded-[var(--radius-pill)] overflow-hidden inline-block"
-            style={{ background: "color-mix(in srgb, #000 40%, var(--surface-3))" }}
+            style={{ background: "color-mix(in srgb, #000 40%, var(--layer-3))" }}
           >
-            <b className="block h-full rounded-[inherit]" style={{ width: `${(move.pp / move.maxpp) * 100}%`, background: "var(--accent-bright)" }} />
+            <b className="block h-full rounded-[inherit]" style={{ width: `${(move.pp / move.maxpp) * 100}%`, background: "var(--secondary-hover)" }} />
           </i>
           {move.pp}/{move.maxpp}
         </span>

@@ -16,7 +16,7 @@ export function SplitBar({ win = 0, loss = 0, draw = 0, showRate = true, height 
   return (
     <div className={cn("flex items-center gap-[0.5rem] w-full", className)}>
       <div
-        className="flex-1 min-w-[40px] flex rounded-[var(--radius-pill)] overflow-hidden bg-[var(--surface-3)]"
+        className="flex-1 min-w-[40px] flex rounded-[var(--radius-pill)] overflow-hidden bg-layer-3"
         style={{ height }}
       >
         {win > 0 && <span className="block h-full bg-[var(--trk-win)]" style={{ width: (win / total) * 100 + "%" }} />}
@@ -26,7 +26,7 @@ export function SplitBar({ win = 0, loss = 0, draw = 0, showRate = true, height 
       {showRate && (
         <span
           className={cn(
-            "font-mono text-xs font-bold min-w-[34px] text-right text-[var(--text-muted)]",
+            "font-mono text-xs font-bold min-w-[34px] text-right text-ink-muted",
             wr != null && wr >= 50 && "text-[var(--trk-win)]",
             wr != null && wr < 50 && "text-[var(--trk-loss)]",
           )}

@@ -112,7 +112,7 @@ export default function CartasPage() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center">
-          <p className="text-xl text-surface-300">{t("loading")}</p>
+          <p className="text-xl text-ink">{t("loading")}</p>
         </div>
       </div>
     );
@@ -136,7 +136,7 @@ export default function CartasPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-4 text-primary-300">
+        <h1 className="text-4xl font-bold mb-4 text-primary-hover">
           {t("cardsList.pageTitle")}
         </h1>
         <FilterComponent
@@ -146,14 +146,14 @@ export default function CartasPage() {
         />
         
         {/* Show cards count */}
-        <div className="mt-4 text-surface-400">
+        <div className="mt-4 text-ink-muted">
           Showing {Math.min(visibleCardsCount, totalCards)} of {totalCards} cards
         </div>
       </div>
 
       {visibleSets.map((set) => (
         <div key={set.setId} className="mb-12">
-          <h2 className="text-3xl font-bold mb-6 text-primary-300">
+          <h2 className="text-3xl font-bold mb-6 text-primary-hover">
             {set.setName}
           </h2>
           <CardGrid
@@ -179,7 +179,7 @@ export default function CartasPage() {
       )}
 
       {filteredSets.length === 0 && (
-        <p className="text-center text-surface-300 text-xl mt-8">
+        <p className="text-center text-ink text-xl mt-8">
           {t("cardsList.noResults")}
         </p>
       )}

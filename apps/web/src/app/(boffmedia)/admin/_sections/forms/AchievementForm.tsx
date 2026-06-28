@@ -60,8 +60,8 @@ export function AchievementForm({
     },
   })
 
-  const selectTriggerClass = "bg-[var(--surface-2)] border border-solid border-[var(--border-strong)] text-[var(--text)] py-2.5 px-3.5 focus:outline-none focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-soft)]"
-  const selectContentClass = "bg-[var(--surface)] border-[var(--border-strong)] text-[var(--text)]"
+  const selectTriggerClass = "bg-layer-2 border border-solid border-edge-strong text-ink py-2.5 px-3.5 focus:outline-none focus:border-secondary focus:shadow-[0_0_0_3px_var(--secondary-soft)]"
+  const selectContentClass = "bg-layer-1 border-edge-strong text-ink"
 
   return (
     <Form {...form}>
@@ -71,11 +71,11 @@ export function AchievementForm({
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-[var(--text-muted)]">Nombre del Logro</FormLabel>
+              <FormLabel className="text-ink-muted">Nombre del Logro</FormLabel>
               <FormControl>
                 <BoffInput placeholder="Nombre del logro" {...field} />
               </FormControl>
-              <FormDescription className="text-[var(--text-dim)]">Este será el nombre que verán los usuarios.</FormDescription>
+              <FormDescription className="text-ink-dim">Este será el nombre que verán los usuarios.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -86,15 +86,15 @@ export function AchievementForm({
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-[var(--text-muted)]">Descripción</FormLabel>
+              <FormLabel className="text-ink-muted">Descripción</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="Describe el logro"
-                  className="min-h-[100px] bg-[var(--surface-2)] border border-solid border-[var(--border-strong)] text-[var(--text)] rounded-[var(--btn-radius,9999px)] py-2.5 px-3.5 focus:outline-none focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-soft)] placeholder:text-[var(--text-dim)]"
+                  className="min-h-[100px] bg-layer-2 border border-solid border-edge-strong text-ink rounded-[var(--btn-radius,9999px)] py-2.5 px-3.5 focus:outline-none focus:border-secondary focus:shadow-[0_0_0_3px_var(--secondary-soft)] placeholder:text-ink-dim"
                   {...field}
                 />
               </FormControl>
-              <FormDescription className="text-[var(--text-dim)]">Una descripción clara de lo que representa este logro.</FormDescription>
+              <FormDescription className="text-ink-dim">Una descripción clara de lo que representa este logro.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -105,7 +105,7 @@ export function AchievementForm({
           name="eventId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-[var(--text-muted)]">Evento</FormLabel>
+              <FormLabel className="text-ink-muted">Evento</FormLabel>
               <Select
                 onValueChange={(value) => field.onChange(Number(value))}
                 defaultValue={field.value?.toString()}
@@ -124,7 +124,7 @@ export function AchievementForm({
                   ))}
                 </SelectContent>
               </Select>
-              <FormDescription className="text-[var(--text-dim)]">Selecciona el evento al que pertenecerá este logro.</FormDescription>
+              <FormDescription className="text-ink-dim">Selecciona el evento al que pertenecerá este logro.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -135,7 +135,7 @@ export function AchievementForm({
           name="points"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-[var(--text-muted)]">Puntos</FormLabel>
+              <FormLabel className="text-ink-muted">Puntos</FormLabel>
               <FormControl>
                 <BoffInput
                   type="number"
@@ -144,7 +144,7 @@ export function AchievementForm({
                   onChange={(e) => field.onChange(Number(e.target.value))}
                 />
               </FormControl>
-              <FormDescription className="text-[var(--text-dim)]">Cantidad de puntos que otorga este logro.</FormDescription>
+              <FormDescription className="text-ink-dim">Cantidad de puntos que otorga este logro.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -155,7 +155,7 @@ export function AchievementForm({
           name="icon"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-[var(--text-muted)]">Icono</FormLabel>
+              <FormLabel className="text-ink-muted">Icono</FormLabel>
               <FormControl>
                 <BoffInput
                   placeholder="/icons/achievement.png"
@@ -163,7 +163,7 @@ export function AchievementForm({
                   value={field.value || ""}
                 />
               </FormControl>
-              <FormDescription className="text-[var(--text-dim)]">Ruta del icono del logro (ej: /icons/achievement.png).</FormDescription>
+              <FormDescription className="text-ink-dim">Ruta del icono del logro (ej: /icons/achievement.png).</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -174,7 +174,7 @@ export function AchievementForm({
           name="maxProgress"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-[var(--text-muted)]">Progreso Máximo</FormLabel>
+              <FormLabel className="text-ink-muted">Progreso Máximo</FormLabel>
               <FormControl>
                 <BoffInput
                   type="number"
@@ -183,7 +183,7 @@ export function AchievementForm({
                   onChange={(e) => field.onChange(Number(e.target.value))}
                 />
               </FormControl>
-              <FormDescription className="text-[var(--text-dim)]">Cantidad máxima de progreso necesaria para completar el logro.</FormDescription>
+              <FormDescription className="text-ink-dim">Cantidad máxima de progreso necesaria para completar el logro.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -194,7 +194,7 @@ export function AchievementForm({
           name="itemType"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-[var(--text-muted)]">Tipo de Item</FormLabel>
+              <FormLabel className="text-ink-muted">Tipo de Item</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger className={selectTriggerClass}>
@@ -206,7 +206,7 @@ export function AchievementForm({
                   <SelectItem value={CreateAchievementDto.itemType.MEDAL}>Medalla</SelectItem>
                 </SelectContent>
               </Select>
-              <FormDescription className="text-[var(--text-dim)]">Tipo de recompensa que representa este item.</FormDescription>
+              <FormDescription className="text-ink-dim">Tipo de recompensa que representa este item.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -217,7 +217,7 @@ export function AchievementForm({
           name="category"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-[var(--text-muted)]">Categoría</FormLabel>
+              <FormLabel className="text-ink-muted">Categoría</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger className={selectTriggerClass}>
@@ -230,7 +230,7 @@ export function AchievementForm({
                   <SelectItem value={CreateAchievementDto.category.PARTICIPATION}>Participación</SelectItem>
                 </SelectContent>
               </Select>
-              <FormDescription className="text-[var(--text-dim)]">Categoría del logro para organización.</FormDescription>
+              <FormDescription className="text-ink-dim">Categoría del logro para organización.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -241,7 +241,7 @@ export function AchievementForm({
           name="rarity"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-[var(--text-muted)]">Rareza</FormLabel>
+              <FormLabel className="text-ink-muted">Rareza</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger className={selectTriggerClass}>
@@ -256,7 +256,7 @@ export function AchievementForm({
                   <SelectItem value={CreateAchievementDto.rarity.DIAMOND}>Diamante</SelectItem>
                 </SelectContent>
               </Select>
-              <FormDescription className="text-[var(--text-dim)]">Nivel de rareza y dificultad del logro.</FormDescription>
+              <FormDescription className="text-ink-dim">Nivel de rareza y dificultad del logro.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -268,7 +268,7 @@ export function AchievementForm({
             name="order"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-[var(--text-muted)]">Orden</FormLabel>
+                <FormLabel className="text-ink-muted">Orden</FormLabel>
                 <FormControl>
                   <BoffInput
                     type="number"
@@ -277,7 +277,7 @@ export function AchievementForm({
                     onChange={(e) => field.onChange(Number(e.target.value))}
                   />
                 </FormControl>
-                <FormDescription className="text-[var(--text-dim)]">Orden de visualización.</FormDescription>
+                <FormDescription className="text-ink-dim">Orden de visualización.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -288,7 +288,7 @@ export function AchievementForm({
             name="active"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-[var(--text-muted)]">Estado</FormLabel>
+                <FormLabel className="text-ink-muted">Estado</FormLabel>
                 <Select onValueChange={(value) => field.onChange(Number(value))} defaultValue={field.value?.toString()}>
                   <FormControl>
                     <SelectTrigger className={selectTriggerClass}>
@@ -300,7 +300,7 @@ export function AchievementForm({
                     <SelectItem value="0">Inactivo</SelectItem>
                   </SelectContent>
                 </Select>
-                <FormDescription className="text-[var(--text-dim)]">Si el logro está activo.</FormDescription>
+                <FormDescription className="text-ink-dim">Si el logro está activo.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}

@@ -60,11 +60,11 @@ export function Contact({
           <div className="h-1/2  ml-4 text-neutral-50  flex flex-col justify-between items-start ">
             <p className="text-sm font-bold">{chat.name}</p>
             {typingText ? (
-              <p className="text-sm flex items-center text-primary-400 italic">
+              <p className="text-sm flex items-center text-primary-hover italic">
                 <span className="flex gap-1 mr-2">
-                  <span className="w-1 h-1 bg-primary-400 rounded-full animate-bounce" style={{ animationDelay: "0ms", animationDuration: "1s" }} />
-                  <span className="w-1 h-1 bg-primary-400 rounded-full animate-bounce" style={{ animationDelay: "200ms", animationDuration: "1s" }} />
-                  <span className="w-1 h-1 bg-primary-400 rounded-full animate-bounce" style={{ animationDelay: "400ms", animationDuration: "1s" }} />
+                  <span className="w-1 h-1 bg-primary-hover rounded-full animate-bounce" style={{ animationDelay: "0ms", animationDuration: "1s" }} />
+                  <span className="w-1 h-1 bg-primary-hover rounded-full animate-bounce" style={{ animationDelay: "200ms", animationDuration: "1s" }} />
+                  <span className="w-1 h-1 bg-primary-hover rounded-full animate-bounce" style={{ animationDelay: "400ms", animationDuration: "1s" }} />
                 </span>
                 {typingText}
               </p>
@@ -75,7 +75,7 @@ export function Contact({
           <div className="h-1/2  ml-auto mr-4 text-neutral-50 flex flex-col justify-between items-end ">
             <p className="text-sm">{strToDate(chat.messages[0]?.createdAt)}</p>
             {chat.unread > 0 && (
-              <p className="flex items-center justify-center text-sm bg-primary-400  rounded-md w-6 h-6">
+              <p className="flex items-center justify-center text-sm bg-primary-hover  rounded-md w-6 h-6">
                 {chat.unread}
               </p>
             )}
@@ -93,7 +93,7 @@ export function Contact({
         <p className="text-sm flex items-center">
           {msg.uuid === getSmartRotomUser(session).uuid ? (
             <ArrowUpRight
-              className="mr-2 text-highlight-500"
+              className="mr-2 text-warning"
               height={20}
               width={20}
               strokeWidth={2}

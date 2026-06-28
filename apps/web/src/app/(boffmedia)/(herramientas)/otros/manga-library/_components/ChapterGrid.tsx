@@ -17,7 +17,7 @@ export default function ChapterGrid({ series, chapter, pages, discarded, onToggl
 
   return (
     <div className="space-y-3">
-      <p className="text-sm text-surface-400">{t("discardHint")}</p>
+      <p className="text-sm text-ink-muted">{t("discardHint")}</p>
       <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-1.5">
         {pages.map((page) => {
           const isDiscarded = discarded.has(page.index);
@@ -26,7 +26,7 @@ export default function ChapterGrid({ series, chapter, pages, discarded, onToggl
               key={page.index}
               type="button"
               onClick={() => onToggle(page.index)}
-              className="relative aspect-[2/3] overflow-hidden rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400"
+              className="relative aspect-[2/3] overflow-hidden rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               aria-label={`Page ${page.index + 1}${isDiscarded ? " (discarded)" : ""}`}
               aria-pressed={isDiscarded}
             >

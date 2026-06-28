@@ -21,11 +21,11 @@ export default function MinecraftWeatherWidget() {
 
   return (
     <div className="w-full min-w-[460px]  bg-white bg-opacity-80 rounded-2xl shadow-lg overflow-hidden">
-      <div className="bg-secondary-500 p-3 flex justify-between items-center">
+      <div className="bg-secondary p-3 flex justify-between items-center">
         <h2 className="text-white text-lg font-semibold">El tiempo en Teras</h2>
         <button
           onClick={refreshWeather}
-          className="text-white hover:bg-secondary-600 rounded-full p-1"
+          className="text-white hover:bg-secondary-active rounded-full p-1"
         >
           <RefreshCw className="h-5 w-5" />
         </button>
@@ -35,25 +35,25 @@ export default function MinecraftWeatherWidget() {
           <div className="flex items-center space-x-3">
             {getDayNightIcon(minecraftTime)}
             <div>
-              <p className="text-lg font-semibold text-surface-800">
+              <p className="text-lg font-semibold text-ink-dim">
                 {formatMinecraftTime(minecraftTime)}
               </p>
-              <p className="text-sm text-surface-600">
+              <p className="text-sm text-ink-dim">
                 {getDaySection(minecraftTime)}
               </p>
             </div>
           </div>
           <div className="flex items-center space-x-1">
-            <p className="text-md font-bold text-surface-800 capitalize">
+            <p className="text-md font-bold text-ink-dim capitalize">
               {getWeatherName(weatherData.weather)}
             </p>
             {getWeatherIcon(weatherData.weather)}
           </div>
           <div className="text-right">
-            <p className="text-sm text-surface-600">{
+            <p className="text-sm text-ink-dim">{
               weatherData.weather == "clear" ? "Lluvia prevista en" : "Despejado en"
               }</p>
-            <p className="text-lg font-semibold text-surface-800">
+            <p className="text-lg font-semibold text-ink-dim">
               {formatTime(weatherData.changeTime)}
             </p>
           </div>

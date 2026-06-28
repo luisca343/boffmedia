@@ -24,14 +24,14 @@ export function SystemOffline({ onRetry, onHome }: SystemOfflineProps) {
       <h1 className="text-[length:var(--t-3xl)] leading-[1.05] mb-[0.7rem]">
         Sin conexión
       </h1>
-      <p className="text-[var(--text-muted)] text-[length:var(--t-base)] max-w-[38ch] mx-auto mb-[1.6rem]">
+      <p className="text-ink-muted text-[length:var(--t-base)] max-w-[38ch] mx-auto mb-[1.6rem]">
         No detectamos conexión a internet. Comprueba tu red; volveremos a cargar la página automáticamente en cuanto vuelvas a estar en línea.
       </p>
       <div className="flex flex-wrap gap-[0.7rem] justify-center">
         <Button variant="accent" icon="refresh" onClick={onRetry}>Reintentar</Button>
         <Button variant="ghost" icon="home" onClick={onHome}>Inicio</Button>
       </div>
-      <p className="mt-[1.5rem] text-[length:var(--t-xs)] text-[var(--text-dim)]">
+      <p className="mt-[1.5rem] text-[length:var(--t-xs)] text-ink-dim">
         El contenido visto recientemente sigue disponible sin conexión.
       </p>
     </SystemStateShell>

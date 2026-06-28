@@ -29,9 +29,9 @@ export function Spinner({
   return (
     <div className="relative w-full">
       {/* Arcade cabinet frame for spinner */}
-      <div className="bg-surface-900/80 border-4 border-surface-700 rounded-xl overflow-hidden p-4 shadow-2xl">
-        <div className="bg-gradient-to-r from-surface-800 to-surface-900 py-2 px-4 mb-4 border-2 border-surface-600 rounded-t-lg">
-          <h3 className="text-md font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-secondary-400 text-center">
+      <div className="bg-layer-1/80 border-4 border-edge rounded-xl overflow-hidden p-4 shadow-2xl">
+        <div className="bg-gradient-to-r from-layer-2 to-layer-1 py-2 px-4 mb-4 border-2 border-edge rounded-t-lg">
+          <h3 className="text-md font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-secondary-hover text-center">
             {lootBox.name}
           </h3>
         </div>
@@ -42,7 +42,7 @@ export function Spinner({
         {/* Items container */}
         <div 
           ref={spinnerRef}
-          className="relative h-64 overflow-hidden bg-surface-900 border-4 border-cyan-500/50 rounded-lg"
+          className="relative h-64 overflow-hidden bg-layer-1 border-4 border-cyan-500/50 rounded-lg"
         >
           {/* Center marker */}
           <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-full z-30 flex flex-col items-center justify-between pointer-events-none">
@@ -81,16 +81,16 @@ export function Spinner({
           </div>
           
           {/* Fade effects on the sides */}
-          <div className="absolute top-0 bottom-0 left-0 w-24 bg-gradient-to-r from-surface-900 to-transparent z-20 pointer-events-none" />
-          <div className="absolute top-0 bottom-0 right-0 w-24 bg-gradient-to-l from-surface-900 to-transparent z-20 pointer-events-none" />
+          <div className="absolute top-0 bottom-0 left-0 w-24 bg-gradient-to-r from-layer-1 to-transparent z-20 pointer-events-none" />
+          <div className="absolute top-0 bottom-0 right-0 w-24 bg-gradient-to-l from-layer-1 to-transparent z-20 pointer-events-none" />
         </div>
         
         {/* Status text at bottom */}
-        <div className="mt-4 text-center text-xs text-surface-400 tracking-widest uppercase">
+        <div className="mt-4 text-center text-xs text-ink-muted tracking-widest uppercase">
           {isSpinning ? (
             <span className="animate-pulse text-cyan-300">ABRIENDO CAJA...</span>
           ) : spinComplete ? (
-            <span className="text-highlight-400">¡PREMIO OBTENIDO!</span>
+            <span className="text-warning-hover">¡PREMIO OBTENIDO!</span>
           ) : (
             <span>INSERT COIN</span>
           )}

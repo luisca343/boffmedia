@@ -21,7 +21,7 @@ const SavedTeamsPanel = lazy(() => import('./_components/saved/SavedTeamsPanel')
 function TabFallback() {
   return (
     <div className="flex-1 flex items-center justify-center">
-      <div className="w-5 h-5 rounded-full border-2 border-primary-500/30 border-t-primary-400 animate-spin" />
+      <div className="w-5 h-5 rounded-full border-2 border-primary/30 border-t-primary-400 animate-spin" />
     </div>
   )
 }
@@ -57,15 +57,15 @@ function DamageCalculatorContent() {
   const { copyShareLink, linkCopied } = useCalcUrlSync()
 
   return (
-    <div className="flex flex-col bg-surface-950" style={{ height: 'calc(100vh - 56px)' }}>
+    <div className="flex flex-col bg-base" style={{ height: 'calc(100vh - 56px)' }}>
       {/* ── Header ── */}
-      <header className="shrink-0 flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 bg-surface-900/97 border-b border-surface-700/50">
-        <div className="p-1.5 rounded-lg bg-primary-500/20 border border-primary-500/30 shrink-0">
-          <Swords className="w-4 h-4 text-primary-400" />
+      <header className="shrink-0 flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 bg-layer-1/97 border-b border-edge/50">
+        <div className="p-1.5 rounded-lg bg-primary/20 border border-primary/30 shrink-0">
+          <Swords className="w-4 h-4 text-primary-hover" />
         </div>
         <div className="min-w-0 hidden md:block mr-2">
-          <h1 className="text-sm font-bold text-surface-50 leading-tight">{t('title')}</h1>
-          <p className="text-[10px] text-surface-500 leading-tight">{t('subtitle')}</p>
+          <h1 className="text-sm font-bold text-ink leading-tight">{t('title')}</h1>
+          <p className="text-[10px] text-ink-muted leading-tight">{t('subtitle')}</p>
         </div>
 
         {/* Tab bar — horizontally scrollable on small screens */}
@@ -80,8 +80,8 @@ function DamageCalculatorContent() {
                 onClick={() => setActiveTab(id)}
                 className={`flex items-center gap-1.5 px-2.5 md:px-3 py-1.5 rounded-md text-xs font-semibold border whitespace-nowrap transition-all shrink-0 ${
                   isActive
-                    ? 'bg-primary-500/15 border-primary-500/35 text-primary-400'
-                    : 'bg-transparent border-transparent text-surface-400 hover:text-surface-200 hover:bg-surface-800/50'
+                    ? 'bg-primary/15 border-primary/35 text-primary-hover'
+                    : 'bg-transparent border-transparent text-ink-muted hover:text-ink hover:bg-layer-2/50'
                 }`}
               >
                 <Icon className="w-3 h-3 shrink-0" />
@@ -102,7 +102,7 @@ function DamageCalculatorContent() {
                   setUseChampions(true)
                 }}
               >
-                <SelectTrigger className="h-7 text-xs bg-surface-800 border-surface-600 w-44">
+                <SelectTrigger className="h-7 text-xs bg-layer-2 border-edge w-44">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -116,7 +116,7 @@ function DamageCalculatorContent() {
             </div>
           )}
           {useChampions && (
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-accent-500/15 border border-accent-500/30 text-accent-300 whitespace-nowrap">
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-secondary/15 border border-secondary/30 text-secondary-hover whitespace-nowrap">
               {t('mobile.spBadge')}
             </span>
           )}
@@ -127,7 +127,7 @@ function DamageCalculatorContent() {
             className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold border transition-all ${
               linkCopied
                 ? 'bg-green-500/15 border-green-500/35 text-green-400'
-                : 'bg-transparent border-transparent text-surface-400 hover:text-surface-200 hover:bg-surface-800/50'
+                : 'bg-transparent border-transparent text-ink-muted hover:text-ink hover:bg-layer-2/50'
             }`}
           >
             <Link2 className="w-3.5 h-3.5" />
@@ -139,8 +139,8 @@ function DamageCalculatorContent() {
             title={t('saved.title')}
             className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold border transition-all ${
               savedOpen
-                ? 'bg-primary-500/15 border-primary-500/35 text-primary-400'
-                : 'bg-transparent border-transparent text-surface-400 hover:text-surface-200 hover:bg-surface-800/50'
+                ? 'bg-primary/15 border-primary/35 text-primary-hover'
+                : 'bg-transparent border-transparent text-ink-muted hover:text-ink hover:bg-layer-2/50'
             }`}
           >
             <BookmarkPlus className="w-3.5 h-3.5" />
@@ -170,7 +170,7 @@ function DamageCalculatorContent() {
               </div>
 
               {/* Mobile panel switcher — hidden on md+ */}
-              <div className="flex md:hidden shrink-0 border-b border-surface-700/40 bg-surface-900/90">
+              <div className="flex md:hidden shrink-0 border-b border-edge/40 bg-layer-1/90">
                 {(['atk', 'field', 'def'] as const).map((p) => {
                   const label = p === 'atk' ? t('mobile.attacker') : p === 'field' ? t('mobile.field') : t('mobile.defender')
                   const active = mobilePanel === p
@@ -181,8 +181,8 @@ function DamageCalculatorContent() {
                       onClick={() => setMobilePanel(p)}
                       className={`flex-1 py-2.5 text-xs font-semibold border-b-2 transition-all ${
                         active
-                          ? 'border-primary-500 text-primary-400 bg-primary-500/5'
-                          : 'border-transparent text-surface-500 hover:text-surface-300'
+                          ? 'border-primary text-primary-hover bg-primary/5'
+                          : 'border-transparent text-ink-muted hover:text-ink'
                       }`}
                     >
                       {label}
@@ -193,13 +193,13 @@ function DamageCalculatorContent() {
 
               {/* Panels — single panel on mobile, 3-col grid on md+ */}
               <div className="flex-1 overflow-y-auto md:overflow-hidden md:grid md:grid-cols-[35vw_1fr_35vw]">
-                <div className={`${mobilePanel !== 'atk' ? 'hidden md:block' : ''} md:overflow-y-auto border-r border-surface-700/30`}>
+                <div className={`${mobilePanel !== 'atk' ? 'hidden md:block' : ''} md:overflow-y-auto border-r border-edge/30`}>
                   <PokemonPanel poke={poke1} onChange={setPoke1} side="atk" useChampions={useChampions} />
                 </div>
                 <div className={`${mobilePanel !== 'field' ? 'hidden md:block' : ''} md:overflow-y-auto`}>
                   <FieldPanel field={field} onFieldChange={setField} onAttackerSide={setAttackerSide} onDefenderSide={setDefenderSide} />
                 </div>
-                <div className={`${mobilePanel !== 'def' ? 'hidden md:block' : ''} md:overflow-y-auto border-l border-surface-700/30`}>
+                <div className={`${mobilePanel !== 'def' ? 'hidden md:block' : ''} md:overflow-y-auto border-l border-edge/30`}>
                   <PokemonPanel poke={poke2} onChange={setPoke2} side="def" useChampions={useChampions} />
                 </div>
               </div>
@@ -237,7 +237,7 @@ function DamageCalculatorContent() {
 
         {/* Saved panel — fixed full-screen drawer on mobile, inline slide on md+ */}
         <div
-          className={`fixed md:hidden right-0 z-50 w-full max-w-xs border-l border-surface-700/50 bg-surface-950 transition-transform duration-200 ${
+          className={`fixed md:hidden right-0 z-50 w-full max-w-xs border-l border-edge/50 bg-base transition-transform duration-200 ${
             savedOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
           style={{ top: '56px', bottom: 0 }}
@@ -247,7 +247,7 @@ function DamageCalculatorContent() {
           </Suspense>
         </div>
         <div
-          className="hidden md:block shrink-0 border-l border-surface-700/50 overflow-hidden transition-[width] duration-200"
+          className="hidden md:block shrink-0 border-l border-edge/50 overflow-hidden transition-[width] duration-200"
           style={{ width: savedOpen ? '320px' : '0px' }}
         >
           <div className="w-[320px] h-full">

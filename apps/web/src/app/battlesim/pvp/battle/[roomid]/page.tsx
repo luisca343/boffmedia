@@ -273,14 +273,14 @@ export default function PvPBattlePage({
           <p className="text-sm" style={{ color: 'var(--emerald-400)' }}>{t('end.replaySaved')}</p>
           <Link href={`/battlesim/replay/${savedReplayId}`}
             className="px-6 py-2 rounded-md font-medium transition-colors"
-            style={{ background: 'var(--surface-2)', color: 'var(--text)', border: '1px solid var(--border)' }}>
+            style={{ background: 'var(--layer-2)', color: 'var(--text)', border: '1px solid var(--border)' }}>
             {t('end.watchReplay')}
           </Link>
         </div>
       )}
       <Link href="/battlesim/pvp"
         className="px-6 py-2 rounded-md font-medium transition-colors"
-        style={{ background: 'var(--accent)', color: 'var(--text)', border: '1px solid var(--border)' }}>
+        style={{ background: 'var(--secondary)', color: 'var(--text)', border: '1px solid var(--border)' }}>
         {t('end.playAgain')}
       </Link>
     </div>

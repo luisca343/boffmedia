@@ -137,15 +137,15 @@ function ReferencePanel({
   return (
     <Card className="overflow-visible">
       {/* Header */}
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-surface-700 bg-surface-900/50">
-        <Target className="w-4 h-4 text-primary-400 shrink-0" />
-        <span className="text-xs font-semibold text-surface-300 uppercase tracking-wider">
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-edge bg-layer-1/50">
+        <Target className="w-4 h-4 text-primary-hover shrink-0" />
+        <span className="text-xs font-semibold text-ink uppercase tracking-wider">
           {t("reference.title")}
         </span>
         {hasRef && (
           <button
             onClick={clearRef}
-            className="ml-auto text-xs text-surface-500 hover:text-red-400 transition-colors flex items-center gap-1"
+            className="ml-auto text-xs text-ink-muted hover:text-red-400 transition-colors flex items-center gap-1"
           >
             <X className="w-3 h-3" />
             {t("reference.clearRef")}
@@ -155,13 +155,13 @@ function ReferencePanel({
 
       <div className="p-4 space-y-4">
         {/* Mode toggle */}
-        <div className="flex gap-1 rounded-lg bg-surface-900 p-1">
+        <div className="flex gap-1 rounded-lg bg-layer-1 p-1">
           <button
             onClick={() => onChange({ ...refState, useCustom: false })}
             className={`flex-1 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
               !refState.useCustom
-                ? "bg-primary-500/20 text-primary-300 shadow"
-                : "text-surface-500 hover:text-surface-300"
+                ? "bg-primary/20 text-primary-hover shadow"
+                : "text-ink-muted hover:text-ink"
             }`}
           >
             {t("reference.pokemonMode")}
@@ -170,8 +170,8 @@ function ReferencePanel({
             onClick={() => onChange({ ...refState, useCustom: true })}
             className={`flex-1 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
               refState.useCustom
-                ? "bg-primary-500/20 text-primary-300 shadow"
-                : "text-surface-500 hover:text-surface-300"
+                ? "bg-primary/20 text-primary-hover shadow"
+                : "text-ink-muted hover:text-ink"
             }`}
           >
             {t("reference.customMode")}
@@ -181,7 +181,7 @@ function ReferencePanel({
         {refState.useCustom ? (
           /* Custom speed input */
           <div className="relative">
-            <Zap className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-500 pointer-events-none" />
+            <Zap className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-muted pointer-events-none" />
             <Input
               value={refState.customSpeed}
               onChange={(e) => onChange({ ...refState, customSpeed: e.target.value })}
@@ -189,14 +189,14 @@ function ReferencePanel({
               type="number"
               min={1}
               max={999}
-              className="pl-9 bg-surface-900 border-surface-700 text-surface-100 placeholder:text-surface-500"
+              className="pl-9 bg-layer-1 border-edge text-ink placeholder:text-ink-muted"
             />
           </div>
         ) : (
           /* Pokémon search dropdown */
           <div className="relative" ref={dropdownRef}>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-500 pointer-events-none" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-muted pointer-events-none" />
               <Input
                 value={search}
                 onChange={(e) => {
@@ -208,7 +208,7 @@ function ReferencePanel({
                   if (search) setShowDropdown(true);
                 }}
                 placeholder={t("reference.searchPlaceholder")}
-                className="pl-9 pr-8 bg-surface-900 border-surface-700 text-surface-100 placeholder:text-surface-500"
+                className="pl-9 pr-8 bg-layer-1 border-edge text-ink placeholder:text-ink-muted"
               />
               {search && (
                 <button
@@ -216,16 +216,16 @@ function ReferencePanel({
                     setSearch("");
                     onChange({ ...refState, entry: null });
                   }}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-surface-500 hover:text-surface-300"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-ink-muted hover:text-ink"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>
             {showDropdown && searchResults.length > 0 && (
-              <div className="absolute z-30 w-full mt-1 rounded-lg border border-surface-700 bg-surface-900 shadow-xl overflow-hidden">
+              <div className="absolute z-30 w-full mt-1 rounded-lg border border-edge bg-layer-1 shadow-xl overflow-hidden">
                 {loading ? (
-                  <div className="px-3 py-2 text-sm text-surface-400">{t("loading")}</div>
+                  <div className="px-3 py-2 text-sm text-ink-muted">{t("loading")}</div>
                 ) : (
                   searchResults.map((p) => (
                     <button
@@ -235,7 +235,7 @@ function ReferencePanel({
                         setSearch(p.name);
                         setShowDropdown(false);
                       }}
-                      className="w-full text-left px-3 py-2 hover:bg-surface-800 transition-colors flex items-center gap-2"
+                      className="w-full text-left px-3 py-2 hover:bg-layer-2 transition-colors flex items-center gap-2"
                     >
                       { }
                       <img
@@ -246,8 +246,8 @@ function ReferencePanel({
                         height={24}
                         className="object-contain"
                       />
-                      <span className="text-sm text-surface-200">{p.name}</span>
-                      <span className="ml-auto text-xs text-surface-500 font-mono">
+                      <span className="text-sm text-ink">{p.name}</span>
+                      <span className="ml-auto text-xs text-ink-muted font-mono">
                         {p.baseSpeed}
                       </span>
                     </button>
@@ -261,7 +261,7 @@ function ReferencePanel({
         {/* EV / Nature presets (Pokémon mode only) */}
         {!refState.useCustom && refState.entry && (
           <div className="space-y-1.5">
-            <span className="text-[10px] text-surface-500 uppercase tracking-wider block">
+            <span className="text-[10px] text-ink-muted uppercase tracking-wider block">
               {t("reference.evLabel")}
             </span>
             <div className="grid grid-cols-4 gap-1">
@@ -271,8 +271,8 @@ function ReferencePanel({
                   onClick={() => onChange({ ...refState, preset: p.key })}
                   className={`py-1.5 rounded text-xs font-mono font-semibold border transition-all ${
                     refState.preset === p.key
-                      ? "bg-primary-500/20 border-primary-500/50 text-primary-300"
-                      : "bg-surface-800 border-surface-700 text-surface-400 hover:text-surface-200 hover:border-surface-600"
+                      ? "bg-primary/20 border-primary/50 text-primary-hover"
+                      : "bg-layer-2 border-edge text-ink-muted hover:text-ink hover:border-edge"
                   }`}
                 >
                   {p.label}
@@ -290,14 +290,14 @@ function ReferencePanel({
 
         {/* Effective speed display */}
         {refEffective !== null ? (
-          <div className="rounded-lg bg-surface-900/80 border border-primary-500/30 px-4 pt-3 pb-4 text-center">
-            <div className="text-[10px] text-surface-500 uppercase tracking-wider mb-1">
+          <div className="rounded-lg bg-layer-1/80 border border-primary/30 px-4 pt-3 pb-4 text-center">
+            <div className="text-[10px] text-ink-muted uppercase tracking-wider mb-1">
               {t("reference.effectiveSpeed")}
             </div>
-            <div className="text-5xl font-bold font-mono text-primary-200 tabular-nums leading-none">
+            <div className="text-5xl font-bold font-mono text-primary-hover tabular-nums leading-none">
               {refEffective}
             </div>
-            <div className="mt-2 flex flex-wrap items-center justify-center gap-1.5 text-xs text-surface-400">
+            <div className="mt-2 flex flex-wrap items-center justify-center gap-1.5 text-xs text-ink-muted">
               {refState.entry && (
                 <>
                   { }
@@ -310,14 +310,14 @@ function ReferencePanel({
                     className="object-contain"
                   />
                   <span>{refState.entry.name}</span>
-                  <span className="text-surface-600">·</span>
+                  <span className="text-ink-dim">·</span>
                   <span className="font-mono">
                     {EV_PRESETS.find((p) => p.key === refState.preset)?.label}
                   </span>
                 </>
               )}
               {hasModifiers(refState.mods) && (
-                <span className="px-1.5 py-0.5 rounded bg-primary-500/15 text-primary-400 text-[10px] font-semibold">
+                <span className="px-1.5 py-0.5 rounded bg-primary/15 text-primary-hover text-[10px] font-semibold">
                   mods
                 </span>
               )}
@@ -325,7 +325,7 @@ function ReferencePanel({
           </div>
         ) : (
           !hasRef && (
-            <div className="rounded-lg bg-surface-900/50 border border-surface-700 px-4 py-5 text-center text-xs text-surface-600 leading-relaxed">
+            <div className="rounded-lg bg-layer-1/50 border border-edge px-4 py-5 text-center text-xs text-ink-dim leading-relaxed">
               {t("reference.noRef")}
             </div>
           )
@@ -350,7 +350,7 @@ function SpeedCell({
   if (value === null) {
     return (
       <td
-        className="px-3 py-0 text-center text-surface-700 text-sm select-none"
+        className="px-3 py-0 text-center text-ink-dim text-sm select-none"
         title={t("columns.noScarf")}
       >
         —
@@ -370,7 +370,7 @@ function SpeedCell({
             : zone === "tie"
             ? "text-yellow-300 font-bold"
             : "text-green-300 font-bold"
-          : "text-surface-300"
+          : "text-ink"
       }`}
     >
       {value}
@@ -402,7 +402,7 @@ function SortTh({
         onClick={() => onSort(col)}
         title={title}
         className={`text-xs font-semibold uppercase tracking-wider transition-colors inline-flex items-center gap-0.5 ${
-          active ? "text-primary-300" : "text-surface-400 hover:text-surface-200"
+          active ? "text-primary-hover" : "text-ink-muted hover:text-ink"
         }`}
       >
         {label}
@@ -447,12 +447,12 @@ function ExpandedRowContent({
   ];
 
   return (
-    <tr className="bg-surface-900/60 border-b border-surface-700">
+    <tr className="bg-layer-1/60 border-b border-edge">
       <td colSpan={colSpan} className="px-4 py-3">
         <div className="flex flex-wrap items-center gap-4">
           {/* Speed breakdown chips */}
           <div className="space-y-1">
-            <span className="text-[10px] text-surface-500 uppercase tracking-wider block">
+            <span className="text-[10px] text-ink-muted uppercase tracking-wider block">
               {t("expanded.breakdown")}
             </span>
             <div className="flex flex-wrap gap-1.5">
@@ -472,10 +472,10 @@ function ExpandedRowContent({
                         ? "border-yellow-500/30 bg-yellow-950/30 text-yellow-300"
                         : zone === "slower"
                         ? "border-green-500/30 bg-green-950/30 text-green-300"
-                        : "border-surface-700 bg-surface-800 text-surface-300"
+                        : "border-edge bg-layer-2 text-ink"
                     }`}
                   >
-                    <span className="text-[10px] text-surface-500">{item.label}</span>
+                    <span className="text-[10px] text-ink-muted">{item.label}</span>
                     <span className="font-bold">{item.value}</span>
                     {zone === "faster" && <span className="text-[10px] text-red-400">▲</span>}
                     {zone === "tie"    && <span className="text-[10px] text-yellow-400">=</span>}
@@ -485,13 +485,13 @@ function ExpandedRowContent({
               })}
             </div>
             {refEffective !== null && (
-              <div className="text-[10px] text-surface-600 mt-1">
+              <div className="text-[10px] text-ink-dim mt-1">
                 {t("expanded.vsRef", { speed: refEffective })}
                 {" — "}▲ faster · = tie · ▼ slower than you
               </div>
             )}
             {refEffective === null && (
-              <div className="text-[10px] text-surface-600 mt-0.5">
+              <div className="text-[10px] text-ink-dim mt-0.5">
                 {t("expanded.noRef")}
               </div>
             )}
@@ -500,7 +500,7 @@ function ExpandedRowContent({
           {/* Send to Matchup */}
           <button
             onClick={() => onSelectForMatchup(pokemon)}
-            className="flex items-center gap-1.5 ml-auto px-3 py-2 rounded-lg border border-primary-500/40 bg-primary-500/10 text-primary-300 hover:bg-primary-500/20 transition-all text-xs font-semibold shrink-0"
+            className="flex items-center gap-1.5 ml-auto px-3 py-2 rounded-lg border border-primary/40 bg-primary/10 text-primary-hover hover:bg-primary/20 transition-all text-xs font-semibold shrink-0"
           >
             <Swords className="w-3.5 h-3.5" />
             {t("expanded.sendToMatchup")}
@@ -635,12 +635,12 @@ export function SpeedTiersTab({
         {/* Search + count */}
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-500 pointer-events-none" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-muted pointer-events-none" />
             <Input
               value={tableSearch}
               onChange={(e) => setTableSearch(e.target.value)}
               placeholder={t("search")}
-              className="pl-9 bg-surface-900 border-surface-700 text-surface-100 placeholder:text-surface-500"
+              className="pl-9 bg-layer-1 border-edge text-ink placeholder:text-ink-muted"
             />
           </div>
 
@@ -664,7 +664,7 @@ export function SpeedTiersTab({
             </div>
           ) : (
             !loading && (
-              <p className="text-xs text-surface-500 self-center ml-auto">
+              <p className="text-xs text-ink-muted self-center ml-auto">
                 {t("pokemonCount", { count: filteredSorted.length })}
               </p>
             )
@@ -672,7 +672,7 @@ export function SpeedTiersTab({
         </div>
 
         {/* Legend */}
-        <div className="flex flex-wrap gap-4 text-xs text-surface-500">
+        <div className="flex flex-wrap gap-4 text-xs text-ink-muted">
           <span className="flex items-center gap-1.5">
             <Star className="w-3.5 h-3.5 text-yellow-400" />
             {t("legend.restricted")}
@@ -704,29 +704,29 @@ export function SpeedTiersTab({
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.3 }}
-          className="rounded-xl border border-surface-700 overflow-hidden bg-surface-800 shadow-lg"
+          className="rounded-xl border border-edge overflow-hidden bg-layer-2 shadow-lg"
         >
           {loading ? (
-            <div className="py-24 text-center text-surface-400 animate-pulse">
+            <div className="py-24 text-center text-ink-muted animate-pulse">
               {t("loading")}
             </div>
           ) : error ? (
             <div className="py-24 text-center text-red-400">{t("error")}</div>
           ) : filteredSorted.length === 0 ? (
-            <div className="py-24 text-center text-surface-500">{t("empty")}</div>
+            <div className="py-24 text-center text-ink-muted">{t("empty")}</div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm border-collapse">
                 <thead>
-                  <tr className="bg-surface-800 border-b border-surface-700">
+                  <tr className="bg-layer-2 border-b border-edge">
                     <th className="px-3 py-3 text-left w-10">
-                      <span className="text-[10px] text-surface-600 font-semibold uppercase tracking-wider">
+                      <span className="text-[10px] text-ink-dim font-semibold uppercase tracking-wider">
                         {t("columns.number")}
                       </span>
                     </th>
                     <SortTh col="name"      sortKey={sortKey} sortDir={sortDir} onSort={handleSort} label={t("columns.pokemon")} title={t("columns.pokemon")} />
                     <th className="px-3 py-3 text-center">
-                      <span className="text-[10px] text-surface-400 font-semibold uppercase tracking-wider">Types</span>
+                      <span className="text-[10px] text-ink-muted font-semibold uppercase tracking-wider">Types</span>
                     </th>
                     <SortTh col="baseSpeed" sortKey={sortKey} sortDir={sortDir} onSort={handleSort} label={t("columns.base")}    title={t("columns.baseTitle")} />
                     <SortTh col="s0n"       sortKey={sortKey} sortDir={sortDir} onSort={handleSort} label={t("columns.minNeutral")} title={t("columns.minNeutralTitle")} />
@@ -759,20 +759,20 @@ export function SpeedTiersTab({
                     const rowBg =
                       zone === "faster" ? "hover:bg-red-950/20"
                       : zone === "tie"  ? "bg-yellow-950/10 hover:bg-yellow-950/20"
-                      : "hover:bg-surface-700/40";
+                      : "hover:bg-layer-3/40";
 
                     return [
                       /* ── Separator row ── */
                       showSeparator && refEffective !== null && (
-                        <tr key="zone-separator" className="border-y-2 border-primary-500/40">
-                          <td colSpan={totalCols} className="px-4 py-2 bg-surface-900/80">
+                        <tr key="zone-separator" className="border-y-2 border-primary/40">
+                          <td colSpan={totalCols} className="px-4 py-2 bg-layer-1/80">
                             <div className="flex items-center gap-3">
                               <div className="flex-1 h-px bg-red-500/30" />
-                              <div className="flex items-center gap-2 text-xs font-bold text-primary-300 uppercase tracking-widest whitespace-nowrap">
-                                <Zap className="w-3.5 h-3.5 text-primary-400" />
+                              <div className="flex items-center gap-2 text-xs font-bold text-primary-hover uppercase tracking-widest whitespace-nowrap">
+                                <Zap className="w-3.5 h-3.5 text-primary-hover" />
                                 {t("zones.separator")}: {refEffective}
                                 {refState.entry && !refState.useCustom && (
-                                  <span className="text-surface-500 font-normal normal-case tracking-normal">
+                                  <span className="text-ink-muted font-normal normal-case tracking-normal">
                                     ({refState.entry.name}{" "}
                                     {EV_PRESETS.find((p) => p.key === refState.preset)?.label}
                                     {hasModifiers(refState.mods) ? " + mods" : ""})
@@ -791,10 +791,10 @@ export function SpeedTiersTab({
                         onClick={() =>
                           setExpandedRow((prev) => (prev === pokemon.name ? null : pokemon.name))
                         }
-                        className={`group border-b border-surface-700/50 cursor-pointer transition-colors ${rowBorder} ${rowBg}`}
+                        className={`group border-b border-edge/50 cursor-pointer transition-colors ${rowBorder} ${rowBg}`}
                       >
                         {/* # */}
-                        <td className="px-3 py-2.5 text-surface-600 text-xs tabular-nums">
+                        <td className="px-3 py-2.5 text-ink-dim text-xs tabular-nums">
                           {idx + 1}
                         </td>
 
@@ -814,11 +814,11 @@ export function SpeedTiersTab({
                             </div>
                             <div className="flex flex-col gap-0.5 min-w-0">
                               <div className="flex items-center gap-1 flex-wrap">
-                                <span className="font-medium text-surface-100 truncate text-sm">
+                                <span className="font-medium text-ink truncate text-sm">
                                   {pokemon.name}
                                 </span>
                                 {isRef && (
-                                  <span className="text-[9px] px-1 py-0.5 rounded bg-primary-500/20 text-primary-300 border border-primary-500/30 font-bold uppercase tracking-wider shrink-0">
+                                  <span className="text-[9px] px-1 py-0.5 rounded bg-primary/20 text-primary-hover border border-primary/30 font-bold uppercase tracking-wider shrink-0">
                                     YOU
                                   </span>
                                 )}
@@ -854,8 +854,8 @@ export function SpeedTiersTab({
                         {/* Expand chevron */}
                         <td className="px-2 py-2.5 text-center">
                           <ChevronRight
-                            className={`w-4 h-4 text-surface-600 group-hover:text-surface-400 transition-all duration-200 ${
-                              isExpanded ? "rotate-90 text-primary-400" : ""
+                            className={`w-4 h-4 text-ink-dim group-hover:text-ink-muted transition-all duration-200 ${
+                              isExpanded ? "rotate-90 text-primary-hover" : ""
                             }`}
                           />
                         </td>
@@ -877,18 +877,18 @@ export function SpeedTiersTab({
 
                   {/* Separator at the very end (all rows faster than you) */}
                   {separatorBeforeIdx === filteredSorted.length && refEffective !== null && (
-                    <tr className="border-t-2 border-primary-500/40">
-                      <td colSpan={totalCols} className="px-4 py-2 bg-surface-900/80">
+                    <tr className="border-t-2 border-primary/40">
+                      <td colSpan={totalCols} className="px-4 py-2 bg-layer-1/80">
                         <div className="flex items-center gap-3">
                           <div className="flex-1 h-px bg-red-500/30" />
-                          <div className="flex items-center gap-2 text-xs font-bold text-primary-300 uppercase tracking-widest whitespace-nowrap">
-                            <Zap className="w-3.5 h-3.5 text-primary-400" />
+                          <div className="flex items-center gap-2 text-xs font-bold text-primary-hover uppercase tracking-widest whitespace-nowrap">
+                            <Zap className="w-3.5 h-3.5 text-primary-hover" />
                             {t("zones.separator")}: {refEffective}
-                            <span className="text-surface-500 font-normal normal-case tracking-normal text-[11px]">
+                            <span className="text-ink-muted font-normal normal-case tracking-normal text-[11px]">
                               (all Pokémon are faster)
                             </span>
                           </div>
-                          <div className="flex-1 h-px bg-surface-700" />
+                          <div className="flex-1 h-px bg-layer-3" />
                         </div>
                       </td>
                     </tr>
@@ -900,7 +900,7 @@ export function SpeedTiersTab({
         </motion.div>
 
         {!loading && !error && filteredSorted.length > 0 && (
-          <p className="text-xs text-surface-600 text-center">{t("footer")}</p>
+          <p className="text-xs text-ink-dim text-center">{t("footer")}</p>
         )}
       </div>
     </div>

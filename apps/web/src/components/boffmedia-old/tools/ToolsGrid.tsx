@@ -95,7 +95,7 @@ function ToolCard({ tool, index, exploreLabel }: { tool: any; index: number; exp
           {/* Header */}
           <div className="flex items-start gap-4 mb-5">
             <div
-              className="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-surface-950/60 border flex items-center justify-center transition-transform duration-300"
+              className="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-base/60 border flex items-center justify-center transition-transform duration-300"
               style={{
                 borderColor: isHovered ? boff.border : "rgba(51,65,85,0.5)",
                 transform: isHovered ? "scale(1.08)" : "scale(1)",
@@ -106,14 +106,14 @@ function ToolCard({ tool, index, exploreLabel }: { tool: any; index: number; exp
               ) : tool.iconFallback ? (
                 tool.iconFallback
               ) : (
-                <Gamepad2 className="w-7 h-7 text-surface-500" />
+                <Gamepad2 className="w-7 h-7 text-ink-muted" />
               )}
             </div>
 
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-0.5">
                 <h3
-                  className="text-lg font-black text-surface-50 leading-tight transition-colors duration-300 truncate"
+                  className="text-lg font-black text-ink leading-tight transition-colors duration-300 truncate"
                   style={{
                     fontFamily: "Orbitron, sans-serif",
                     color: isHovered ? "rgb(253,186,116)" : "rgb(248,250,252)",
@@ -123,7 +123,7 @@ function ToolCard({ tool, index, exploreLabel }: { tool: any; index: number; exp
                 </h3>
                 {tool.isNew && (
                   <span
-                    className="flex items-center gap-1 text-[10px] font-mono px-1.5 py-0.5 rounded border border-success-500/40 text-success-400 bg-success-500/10 tracking-widest flex-shrink-0"
+                    className="flex items-center gap-1 text-[10px] font-mono px-1.5 py-0.5 rounded border border-success-border/40 text-success-hover bg-success/10 tracking-widest flex-shrink-0"
                     style={{ fontFamily: "Orbitron, sans-serif" }}
                   >
                     <Sparkles className="w-2 h-2" />
@@ -131,12 +131,12 @@ function ToolCard({ tool, index, exploreLabel }: { tool: any; index: number; exp
                   </span>
                 )}
               </div>
-              <p className="text-xs text-surface-500 leading-relaxed line-clamp-2">{tool.description}</p>
+              <p className="text-xs text-ink-muted leading-relaxed line-clamp-2">{tool.description}</p>
             </div>
           </div>
 
           {/* Divider */}
-          <div className="h-px bg-gradient-to-r from-transparent via-surface-700/50 to-transparent mb-4" />
+          <div className="h-px bg-gradient-to-r from-transparent via-layer-3/50 to-transparent mb-4" />
 
           {/* Feature list */}
           <div className="space-y-1.5 flex-1 mb-5">
@@ -146,16 +146,16 @@ function ToolCard({ tool, index, exploreLabel }: { tool: any; index: number; exp
                   className="w-1 h-1 rounded-full flex-shrink-0"
                   style={{ backgroundColor: boff.scan }}
                 />
-                <span className="text-xs text-surface-400">{name}</span>
+                <span className="text-xs text-ink-muted">{name}</span>
               </div>
             ))}
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between pt-4 border-t border-surface-800/50">
+          <div className="flex items-center justify-between pt-4 border-t border-edge-strong/50">
             <div className="flex items-center gap-1.5">
-              <Cpu className="w-3 h-3 text-surface-600" />
-              <span className="text-xs font-mono text-surface-600 tracking-widest">
+              <Cpu className="w-3 h-3 text-ink-dim" />
+              <span className="text-xs font-mono text-ink-dim tracking-widest">
                 {String(totalCount).padStart(2, "0")} TOOLS
               </span>
             </div>

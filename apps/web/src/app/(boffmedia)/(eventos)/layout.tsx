@@ -6,7 +6,7 @@ export default function JuegosLayout({
   children: React.ReactNode
 }) {
   return (
-    <FloatingSection className="min-h-screen pt-16 bg-gradient-to-b from-surface-950 via-surface-900 to-surface-800">
+    <FloatingSection className="min-h-screen pt-16 bg-gradient-to-b from-base via-layer-1 to-layer-2">
       {children}
     </FloatingSection>
   )

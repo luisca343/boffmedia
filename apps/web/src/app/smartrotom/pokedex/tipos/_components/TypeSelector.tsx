@@ -14,7 +14,7 @@ export default function TypeSelector({ types, selectedType, onTypeSelect }: Type
                 <button
                     key={type}
                     onClick={() => onTypeSelect(type)}
-                    className={`transition-all transform ${selectedType === type ? 'scale-110 ring-2 ring-primary-400 rounded-lg' : 'hover:scale-105'}`}
+                    className={`transition-all transform ${selectedType === type ? 'scale-110 ring-2 ring-primary rounded-lg' : 'hover:scale-105'}`}
                 >
                     <TypeBadgeSmall type={type} />
                 </button>

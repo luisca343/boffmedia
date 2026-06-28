@@ -12,7 +12,7 @@ const alertVariants = cva(
   {
     variants: {
       variant: {
-        default: "border-surface-700 bg-surface-800 text-surface-300 [&>svg]:text-primary-400",
+        default: "border-edge bg-layer-2 text-ink [&>svg]:text-primary-hover",
         destructive:
           "border-red-500/50 text-red-500 [&>svg]:text-red-500",
       },
@@ -52,8 +52,8 @@ const AlertTitle = React.forwardRef<
   const variant = useAlertVariant()
   
   const variantStyles = {
-    default: "text-primary-300",
-    wingull: "text-secondary-300",
+    default: "text-primary-hover",
+    wingull: "text-secondary-hover",
   }
 
   return (
@@ -73,8 +73,8 @@ const AlertDescription = React.forwardRef<
   const variant = useAlertVariant()
   
   const variantStyles = {
-    default: "text-surface-400",
-    wingull: "text-secondary-200",
+    default: "text-ink-muted",
+    wingull: "text-secondary-hover",
   }
 
   return (

@@ -37,11 +37,11 @@ export function BoffSwitch({ checked, defaultChecked = false, onChange, onChecke
       <span
         className={cn(
           "w-[42px] h-6 rounded-[999px]",
-          "bg-[var(--surface-3)]",
-          "border border-solid border-[var(--border-strong)]",
+          "bg-layer-3",
+          "border border-solid border-edge-strong",
           "relative",
           "transition-background duration-[var(--dur,0.32s)]",
-          val && "bg-[var(--accent)] border-[var(--accent)]",
+          val && "bg-secondary border-secondary",
         )}
       >
         <span

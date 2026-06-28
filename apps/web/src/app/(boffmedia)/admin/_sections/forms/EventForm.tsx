@@ -81,8 +81,8 @@ export function EventForm({
     }
   }, [isChildEvent, typeValue, form])
 
-  const selectTriggerClass = "bg-[var(--surface-2)] border border-solid border-[var(--border-strong)] text-[var(--text)] py-2.5 px-3.5 focus:outline-none focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-soft)]"
-  const selectContentClass = "bg-[var(--surface)] border-[var(--border-strong)] text-[var(--text)]"
+  const selectTriggerClass = "bg-layer-2 border border-solid border-edge-strong text-ink py-2.5 px-3.5 focus:outline-none focus:border-secondary focus:shadow-[0_0_0_3px_var(--secondary-soft)]"
+  const selectContentClass = "bg-layer-1 border-edge-strong text-ink"
 
   return (
     <Form {...form}>
@@ -93,7 +93,7 @@ export function EventForm({
             name="parentId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-[var(--text-muted)]">Servidor Principal (Opcional)</FormLabel>
+                <FormLabel className="text-ink-muted">Servidor Principal (Opcional)</FormLabel>
                 <Select
                   onValueChange={(value) => field.onChange(value ? Number(value) : undefined)}
                   defaultValue={field.value?.toString()}
@@ -113,7 +113,7 @@ export function EventForm({
                     ))}
                   </SelectContent>
                 </Select>
-                <FormDescription className="text-[var(--text-dim)]">
+                <FormDescription className="text-ink-dim">
                   {isChildEvent
                     ? "Este evento será parte de un servidor principal."
                     : "Opcionalmente, este evento puede ser parte de un servidor principal."}
@@ -129,11 +129,11 @@ export function EventForm({
           name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-[var(--text-muted)]">Título</FormLabel>
+              <FormLabel className="text-ink-muted">Título</FormLabel>
               <FormControl>
                 <BoffInput placeholder="Nombre del evento" {...field} />
               </FormControl>
-              <FormDescription className="text-[var(--text-dim)]">Este será el nombre principal del evento.</FormDescription>
+              <FormDescription className="text-ink-dim">Este será el nombre principal del evento.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -144,15 +144,15 @@ export function EventForm({
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-[var(--text-muted)]">Descripción</FormLabel>
+              <FormLabel className="text-ink-muted">Descripción</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="Describe el evento"
-                  className="min-h-[100px] bg-[var(--surface-2)] border border-solid border-[var(--border-strong)] text-[var(--text)] rounded-[var(--btn-radius,9999px)] py-2.5 px-3.5 focus:outline-none focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-soft)] placeholder:text-[var(--text-dim)]"
+                  className="min-h-[100px] bg-layer-2 border border-solid border-edge-strong text-ink rounded-[var(--btn-radius,9999px)] py-2.5 px-3.5 focus:outline-none focus:border-secondary focus:shadow-[0_0_0_3px_var(--secondary-soft)] placeholder:text-ink-dim"
                   {...field}
                 />
               </FormControl>
-              <FormDescription className="text-[var(--text-dim)]">Proporciona una descripción detallada del evento.</FormDescription>
+              <FormDescription className="text-ink-dim">Proporciona una descripción detallada del evento.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -163,7 +163,7 @@ export function EventForm({
           name="gameId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-[var(--text-muted)]">Juego</FormLabel>
+              <FormLabel className="text-ink-muted">Juego</FormLabel>
               <Select
                 onValueChange={(value) => field.onChange(Number(value))}
                 defaultValue={field.value?.toString()}
@@ -182,7 +182,7 @@ export function EventForm({
                   ))}
                 </SelectContent>
               </Select>
-              <FormDescription className="text-[var(--text-dim)]">Selecciona el juego para este evento.</FormDescription>
+              <FormDescription className="text-ink-dim">Selecciona el juego para este evento.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -194,7 +194,7 @@ export function EventForm({
             name="startDate"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-[var(--text-muted)]">Fecha de Inicio</FormLabel>
+                <FormLabel className="text-ink-muted">Fecha de Inicio</FormLabel>
                 <FormControl>
                   <BoffInput type="datetime-local" {...field} />
                 </FormControl>
@@ -208,7 +208,7 @@ export function EventForm({
             name="endDate"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-[var(--text-muted)]">Fecha de Finalización</FormLabel>
+                <FormLabel className="text-ink-muted">Fecha de Finalización</FormLabel>
                 <FormControl>
                   <BoffInput type="datetime-local" {...field} />
                 </FormControl>
@@ -224,7 +224,7 @@ export function EventForm({
             name="type"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-[var(--text-muted)]">Tipo de Evento</FormLabel>
+                <FormLabel className="text-ink-muted">Tipo de Evento</FormLabel>
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
@@ -240,7 +240,7 @@ export function EventForm({
                     <SelectItem value="server">Servidor</SelectItem>
                   </SelectContent>
                 </Select>
-                <FormDescription className="text-[var(--text-dim)]">
+                <FormDescription className="text-ink-dim">
                   {isChildEvent
                     ? "Los eventos dentro de un servidor son siempre de tipo 'evento'."
                     : "Selecciona el tipo de evento."}
@@ -255,7 +255,7 @@ export function EventForm({
             name="visibility"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-[var(--text-muted)]">Visibilidad</FormLabel>
+                <FormLabel className="text-ink-muted">Visibilidad</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger className={selectTriggerClass}>
@@ -267,7 +267,7 @@ export function EventForm({
                     <SelectItem value="private">Privado</SelectItem>
                   </SelectContent>
                 </Select>
-                <FormDescription className="text-[var(--text-dim)]">Controla quién puede ver este evento.</FormDescription>
+                <FormDescription className="text-ink-dim">Controla quién puede ver este evento.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -279,7 +279,7 @@ export function EventForm({
           name="icon"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-[var(--text-muted)]">Icono URL (opcional)</FormLabel>
+              <FormLabel className="text-ink-muted">Icono URL (opcional)</FormLabel>
               <FormControl>
                 <BoffInput
                   placeholder="https://ejemplo.com/icono.jpg"
@@ -287,7 +287,7 @@ export function EventForm({
                   value={field.value || ""}
                 />
               </FormControl>
-              <FormDescription className="text-[var(--text-dim)]">URL de la imagen que se usará como icono.</FormDescription>
+              <FormDescription className="text-ink-dim">URL de la imagen que se usará como icono.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -298,7 +298,7 @@ export function EventForm({
           name="banner"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-[var(--text-muted)]">Banner URL (opcional)</FormLabel>
+              <FormLabel className="text-ink-muted">Banner URL (opcional)</FormLabel>
               <FormControl>
                 <BoffInput
                   placeholder="https://ejemplo.com/banner.jpg"
@@ -306,7 +306,7 @@ export function EventForm({
                   value={field.value || ""}
                 />
               </FormControl>
-              <FormDescription className="text-[var(--text-dim)]">URL de la imagen que se usará como banner.</FormDescription>
+              <FormDescription className="text-ink-dim">URL de la imagen que se usará como banner.</FormDescription>
               <FormMessage />
             </FormItem>
           )}

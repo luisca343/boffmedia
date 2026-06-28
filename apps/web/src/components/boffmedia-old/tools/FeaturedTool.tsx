@@ -34,14 +34,14 @@ export function FeaturedTool({ tool, t }: FeaturedToolProps) {
     >
       {/* Section label */}
       <div className="flex items-center gap-3 mb-3">
-        <div className="h-px flex-1 max-w-12 bg-gradient-to-r from-transparent to-primary-500/40" />
+        <div className="h-px flex-1 max-w-12 bg-gradient-to-r from-transparent to-primary/40" />
         <span
-          className="text-xs font-mono text-primary-400/70 tracking-[0.4em] uppercase"
+          className="text-xs font-mono text-primary-hover/70 tracking-[0.4em] uppercase"
           style={{ fontFamily: "Orbitron, sans-serif" }}
         >
           // {t("featuredTool")}
         </span>
-        <div className="h-px flex-1 max-w-12 bg-gradient-to-l from-transparent to-primary-500/40" />
+        <div className="h-px flex-1 max-w-12 bg-gradient-to-l from-transparent to-primary/40" />
       </div>
 
       <div
@@ -107,7 +107,7 @@ export function FeaturedTool({ tool, t }: FeaturedToolProps) {
             {/* Header */}
             <div className="flex items-start gap-4 mb-6">
               <div
-                className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-surface-950/60 border flex items-center justify-center transition-transform duration-300"
+                className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-base/60 border flex items-center justify-center transition-transform duration-300"
                 style={{
                   borderColor: isHovered ? boff.border : "rgba(51,65,85,0.5)",
                   transform: isHovered ? "scale(1.08)" : "scale(1)",
@@ -133,7 +133,7 @@ export function FeaturedTool({ tool, t }: FeaturedToolProps) {
                   </h2>
                   {tool.isNew && (
                     <span
-                      className="flex items-center gap-1 text-xs font-mono px-2 py-0.5 rounded border border-success-500/40 text-success-400 bg-success-500/10 tracking-widest flex-shrink-0"
+                      className="flex items-center gap-1 text-xs font-mono px-2 py-0.5 rounded border border-success-border/40 text-success-hover bg-success/10 tracking-widest flex-shrink-0"
                       style={{ fontFamily: "Orbitron, sans-serif" }}
                     >
                       <Sparkles className="w-2.5 h-2.5" />
@@ -141,23 +141,23 @@ export function FeaturedTool({ tool, t }: FeaturedToolProps) {
                     </span>
                   )}
                 </div>
-                <p className="text-xs font-mono text-primary-400/60 tracking-widest uppercase">
+                <p className="text-xs font-mono text-primary-hover/60 tracking-widest uppercase">
                   // Herramienta destacada
                 </p>
               </div>
             </div>
 
             {/* Divider */}
-            <div className="h-px bg-gradient-to-r from-transparent via-surface-700/50 to-transparent mb-6" />
+            <div className="h-px bg-gradient-to-r from-transparent via-layer-3/50 to-transparent mb-6" />
 
-            <p className="text-surface-300 text-sm leading-relaxed mb-7">{tool.description}</p>
+            <p className="text-ink text-sm leading-relaxed mb-7">{tool.description}</p>
 
             {/* Feature tags */}
             <div className="flex flex-wrap gap-2 mb-8">
               {(tool.tools ?? tool.features ?? []).map((name: string) => (
                 <span
                   key={name}
-                  className="text-xs font-mono px-3 py-1 rounded border border-surface-700/50 bg-surface-950/50 text-surface-300 tracking-wide"
+                  className="text-xs font-mono px-3 py-1 rounded border border-edge/50 bg-base/50 text-ink tracking-wide"
                 >
                   {name}
                 </span>
@@ -182,7 +182,7 @@ export function FeaturedTool({ tool, t }: FeaturedToolProps) {
                 priority
               />
               <div className="absolute inset-0 bg-black/25" />
-              <div className="absolute inset-0 bg-gradient-to-r from-surface-900/80 via-surface-900/30 to-transparent hidden lg:block" />
+              <div className="absolute inset-0 bg-gradient-to-r from-layer-1/80 via-layer-1/30 to-transparent hidden lg:block" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
               <div
                 className="absolute inset-0 pointer-events-none opacity-[0.06]"
@@ -192,9 +192,9 @@ export function FeaturedTool({ tool, t }: FeaturedToolProps) {
                 }}
               />
               {/* Updated badge */}
-              <div className="absolute bottom-4 left-4 z-10 flex items-center gap-1.5 bg-surface-950/80 border border-surface-700/50 rounded px-2.5 py-1 backdrop-blur-sm">
-                <span className="w-1.5 h-1.5 rounded-full bg-success-400 animate-pulse" />
-                <span className="text-xs font-mono text-surface-300 tracking-widest">
+              <div className="absolute bottom-4 left-4 z-10 flex items-center gap-1.5 bg-base/80 border border-edge/50 rounded px-2.5 py-1 backdrop-blur-sm">
+                <span className="w-1.5 h-1.5 rounded-full bg-success-hover animate-pulse" />
+                <span className="text-xs font-mono text-ink tracking-widest">
                   Recién actualizado
                 </span>
               </div>

@@ -22,7 +22,7 @@ export default function NewsContent({
       {selectedNewsId !== null && selectedNews ? (
         <>
           {/* Editor header with title */}
-          <div className="bg-secondary-500 text-white p-6 border-b-4 border-black relative">
+          <div className="bg-secondary text-white p-6 border-b-4 border-black relative">
             {/* Subtle halftone pattern */}
             <div className="absolute inset-0 ben-day-dots"></div>
             <div className="relative z-10 flex items-center justify-between">
@@ -30,14 +30,14 @@ export default function NewsContent({
                 <span className="text-yellow-300">✏️ Editando:</span> {selectedNews.title}
               </h2>
               {/* Comic-style badge */}
-              <div className="bg-yellow-300 text-secondary-600 px-4 py-2 rounded-2xl border-3 border-black transform rotate-3 pop-shadow text-pop-sm font-bold">
+              <div className="bg-yellow-300 text-secondary-active px-4 py-2 rounded-2xl border-3 border-black transform rotate-3 pop-shadow text-pop-sm font-bold">
                 EDITOR ACTIVO
               </div>
             </div>
           </div>
           
           {/* Editor area */}
-          <div className="flex-grow overflow-hidden p-6 border-8 border-dotted border-secondary-200 m-6 bg-white rounded-3xl relative">
+          <div className="flex-grow overflow-hidden p-6 border-8 border-dotted border-secondary m-6 bg-white rounded-3xl relative">
             {/* Comic-style corner decoration */}
             <div className="absolute -top-2 -right-2 w-8 h-8 bg-yellow-300 border-3 border-black rounded-full flex items-center justify-center transform rotate-12">
               <span className="text-black font-bold text-pop-sm">✨</span>
@@ -62,7 +62,7 @@ export default function NewsContent({
             <h1 className="text-pop-4xl font-bold mb-6 text-pink-500 pop-shadow text-center">
               ¡Editor de Noticias!
             </h1>
-            <p className="text-pop-xl text-secondary-500 text-center font-comic leading-relaxed">
+            <p className="text-pop-xl text-secondary text-center font-comic leading-relaxed">
               🎯 Selecciona una noticia del menú lateral o crea una nueva para comenzar a editar.
             </p>
             

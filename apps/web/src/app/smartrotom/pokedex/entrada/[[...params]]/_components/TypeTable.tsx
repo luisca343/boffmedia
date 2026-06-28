@@ -12,7 +12,7 @@ export function TypeTable({list, title, id, className='', badgeType}:
     // Visual styles based on whether this is offensive or defensive
     const headerStyle = badgeType === "offensive" ? 
       "bg-red-900/20 border-red-800/30" : 
-      "bg-secondary-900/20 border-secondary-800/30"
+      "bg-secondary-soft/20 border-secondary-active/30"
     
     return (
         <div className={`m-2 ${className}`} id={id}>
@@ -27,7 +27,7 @@ export function TypeTable({list, title, id, className='', badgeType}:
                 <PokedexRow key={effectivity}>
                   <PokedexCell 
                     hard 
-                    className={`font-bold text-surface-50 w-24 text-center`}
+                    className={`font-bold text-ink w-24 text-center`}
                   >
                     {effectivity > 0 ? `×${effectivity}` : "×0"}
                   </PokedexCell>
@@ -44,7 +44,7 @@ export function TypeTable({list, title, id, className='', badgeType}:
               ))}
               {visibleEffectivities.length === 0 && (
                 <PokedexRow>
-                  <PokedexCell colSpan={2} className="text-center py-4 text-surface-300">
+                  <PokedexCell colSpan={2} className="text-center py-4 text-ink">
                     No hay efectividades para mostrar
                   </PokedexCell>
                 </PokedexRow>

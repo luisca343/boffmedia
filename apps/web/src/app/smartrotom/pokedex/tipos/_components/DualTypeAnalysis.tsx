@@ -39,81 +39,81 @@ export default function DualTypeAnalysis({ type1, type2 }: DualTypeAnalysisProps
     return (
         <div className="space-y-4">
             <div>
-                <h3 className="text-lg font-medium text-surface-100 mb-2 flex items-center">
+                <h3 className="text-lg font-medium text-ink mb-2 flex items-center">
                     <span className="bg-red-600 text-white px-2 py-1 rounded-lg mr-2 font-bold">4×</span>
                     Muy débil contra:
                 </h3>
-                <div className="bg-surface-700/50 rounded-lg p-3 min-h-12 flex flex-wrap gap-2">
+                <div className="bg-layer-3/50 rounded-lg p-3 min-h-12 flex flex-wrap gap-2">
                     {x4.length > 0 ? (
                         x4.map(t => (
                             <TypeBadgeSmall key={t} type={t} />
                         ))
                     ) : (
-                        <p className="text-surface-300">Ningún tipo</p>
+                        <p className="text-ink">Ningún tipo</p>
                     )}
                 </div>
             </div>
             
             <div>
-                <h3 className="text-lg font-medium text-surface-100 mb-2 flex items-center">
+                <h3 className="text-lg font-medium text-ink mb-2 flex items-center">
                     <span className="bg-orange-500 text-white px-2 py-1 rounded-lg mr-2 font-bold">2×</span>
                     Débil contra:
                 </h3>
-                <div className="bg-surface-700/50 rounded-lg p-3 min-h-12 flex flex-wrap gap-2">
+                <div className="bg-layer-3/50 rounded-lg p-3 min-h-12 flex flex-wrap gap-2">
                     {x2.length > 0 ? (
                         x2.map(t => (
                             <TypeBadgeSmall key={t} type={t} />
                         ))
                     ) : (
-                        <p className="text-surface-300">Ningún tipo</p>
+                        <p className="text-ink">Ningún tipo</p>
                     )}
                 </div>
             </div>
             
             <div>
-                <h3 className="text-lg font-medium text-surface-100 mb-2 flex items-center">
-                    <span className="bg-highlight-500 text-white px-2 py-1 rounded-lg mr-2 font-bold">½×</span>
+                <h3 className="text-lg font-medium text-ink mb-2 flex items-center">
+                    <span className="bg-warning text-white px-2 py-1 rounded-lg mr-2 font-bold">½×</span>
                     Resistente contra:
                 </h3>
-                <div className="bg-surface-700/50 rounded-lg p-3 min-h-12 flex flex-wrap gap-2">
+                <div className="bg-layer-3/50 rounded-lg p-3 min-h-12 flex flex-wrap gap-2">
                     {x05.length > 0 ? (
                         x05.map(t => (
                             <TypeBadgeSmall key={t} type={t} />
                         ))
                     ) : (
-                        <p className="text-surface-300">Ningún tipo</p>
+                        <p className="text-ink">Ningún tipo</p>
                     )}
                 </div>
             </div>
             
             <div>
-                <h3 className="text-lg font-medium text-surface-100 mb-2 flex items-center">
-                    <span className="bg-secondary-500 text-white px-2 py-1 rounded-lg mr-2 font-bold">¼×</span>
+                <h3 className="text-lg font-medium text-ink mb-2 flex items-center">
+                    <span className="bg-secondary text-white px-2 py-1 rounded-lg mr-2 font-bold">¼×</span>
                     Muy resistente contra:
                 </h3>
-                <div className="bg-surface-700/50 rounded-lg p-3 min-h-12 flex flex-wrap gap-2">
+                <div className="bg-layer-3/50 rounded-lg p-3 min-h-12 flex flex-wrap gap-2">
                     {x025.length > 0 ? (
                         x025.map(t => (
                             <TypeBadgeSmall key={t} type={t} />
                         ))
                     ) : (
-                        <p className="text-surface-300">Ningún tipo</p>
+                        <p className="text-ink">Ningún tipo</p>
                     )}
                 </div>
             </div>
             
             <div>
-                <h3 className="text-lg font-medium text-surface-100 mb-2 flex items-center">
-                    <span className="bg-accent-600 text-white px-2 py-1 rounded-lg mr-2 font-bold">0×</span>
+                <h3 className="text-lg font-medium text-ink mb-2 flex items-center">
+                    <span className="bg-secondary-active text-white px-2 py-1 rounded-lg mr-2 font-bold">0×</span>
                     Inmune contra:
                 </h3>
-                <div className="bg-surface-700/50 rounded-lg p-3 min-h-12 flex flex-wrap gap-2">
+                <div className="bg-layer-3/50 rounded-lg p-3 min-h-12 flex flex-wrap gap-2">
                     {x0.length > 0 ? (
                         x0.map(t => (
                             <TypeBadgeSmall key={t} type={t} />
                         ))
                     ) : (
-                        <p className="text-surface-300">Ningún tipo</p>
+                        <p className="text-ink">Ningún tipo</p>
                     )}
                 </div>
             </div>

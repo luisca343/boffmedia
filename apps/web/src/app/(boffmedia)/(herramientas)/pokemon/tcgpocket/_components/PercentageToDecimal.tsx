@@ -21,12 +21,12 @@ export default function PercentageToDecimal({ value, fixed = 2 }: PercentageToDe
         <TooltipProvider>
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <span className="cursor-help text-surface-200 hover:text-surface-50 transition-colors">
+                    <span className="cursor-help text-ink hover:text-ink transition-colors">
                         {formattedNumber}%
                     </span>
                 </TooltipTrigger>
-                <TooltipContent className="bg-surface-700/95 border-surface-600/50 backdrop-blur-sm">
-                    <p className="text-surface-50">Valor completo: {originalNumber}%</p>
+                <TooltipContent className="bg-layer-3/95 border-edge/50 backdrop-blur-sm">
+                    <p className="text-ink">Valor completo: {originalNumber}%</p>
                 </TooltipContent>
             </Tooltip>
         </TooltipProvider>

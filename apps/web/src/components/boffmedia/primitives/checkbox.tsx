@@ -29,12 +29,12 @@ export function BoffCheckbox({ checked, defaultChecked = false, onChange, onChec
         id={id}
         className={cn(
           "grid place-items-center w-5 h-5 rounded-md p-0",
-          "border-[1.5px] border-solid border-[var(--border-strong)]",
-          "bg-[var(--surface-2)] text-white",
+          "border-[1.5px] border-solid border-edge-strong",
+          "bg-layer-2 text-white",
           "cursor-pointer",
           "transition-[background,border-color] duration-[var(--dur,0.32s)]",
           "data-[direction=hud]:rounded-[3px]",
-          val && "bg-[var(--accent)] border-[var(--accent)] text-[var(--on-accent)]",
+          val && "bg-secondary border-secondary text-[var(--on-secondary)]",
         )}
         disabled={disabled}
         onClick={toggle}

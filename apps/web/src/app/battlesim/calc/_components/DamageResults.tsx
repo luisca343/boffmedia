@@ -15,12 +15,12 @@ export default function DamageResults({ result }: DamageResultsProps) {
   
   
   return (
-    <div className="border border-surface-700 rounded px-2 py-1.5 bg-surface-700 text-xs">
-      <span className="font-medium text-primary-300 mb-0.5 text-base">{title}</span>
+    <div className="border border-edge rounded px-2 py-1.5 bg-layer-3 text-xs">
+      <span className="font-medium text-primary-hover mb-0.5 text-base">{title}</span>
       
-      <div className="text-surface-400 text-xs">
+      <div className="text-ink-muted text-xs">
         <span className="mr-1">Possible damage:</span>
-        <span className="font-medium text-surface-200">({damageAmounts})</span>
+        <span className="font-medium text-ink">({damageAmounts})</span>
       </div>
     </div>
   );

@@ -12,7 +12,7 @@ export function WeaponElement({ weapon }: { weapon: any }) {
   const elementType = elementInfo?.element || "none";
 
   return (
-    <div className="rounded-lg p-2.5 cursor-pointer min-w-32 overflow-hidden flex flex-col relative transition-all duration-200 bg-surface-900/80 border border-surface-700/40 hover:bg-surface-800/90 hover:border-primary-500/30">
+    <div className="rounded-lg p-2.5 cursor-pointer min-w-32 overflow-hidden flex flex-col relative transition-all duration-200 bg-layer-1/80 border border-edge/40 hover:bg-layer-2/90 hover:border-primary/30">
       {/* Rarity badge */}
       <span
         className="absolute top-0 right-0 text-[10px] px-1.5 rounded-bl font-mono"
@@ -22,12 +22,12 @@ export function WeaponElement({ weapon }: { weapon: any }) {
       </span>
       
       {/* Weapon name */}
-      <h2 className="text-xs font-bold text-surface-100 mb-1" title={weapon.name}>
+      <h2 className="text-xs font-bold text-ink mb-1" title={weapon.name}>
         {weapon.name}
       </h2>
       
       {/* Damage display with icon */}
-      <div className="flex items-center gap-1.5 text-xs text-surface-200 mt-0.5">
+      <div className="flex items-center gap-1.5 text-xs text-ink mt-0.5">
         <div className="w-3.5 h-3.5 relative flex-shrink-0">
           <img 
             src="/img/games/mhwilds/attack.webp" 
@@ -40,7 +40,7 @@ export function WeaponElement({ weapon }: { weapon: any }) {
       
       {/* Element display with icon */}
       {elementInfo && elementType !== "none" && (
-        <div className="flex items-center gap-1.5 text-xs text-surface-300 mt-1">
+        <div className="flex items-center gap-1.5 text-xs text-ink mt-1">
           <div className="w-3.5 h-3.5 relative flex-shrink-0">
             <img 
               src={`/img/games/mhwilds/${elementType}.webp`} 
@@ -50,7 +50,7 @@ export function WeaponElement({ weapon }: { weapon: any }) {
           </div>
           <span>{elementInfo.damage.display}</span>
           {elementInfo.hidden && (
-            <span className="text-[8px] text-surface-400">(hidden)</span>
+            <span className="text-[8px] text-ink-muted">(hidden)</span>
           )}
         </div>
       )}
@@ -314,7 +314,7 @@ export default function WeaponTree() {
                                     <div key={`${child.id}-same-row`} className="absolute inset-0 pointer-events-none">
                                       {/* Horizontal dashed line from parent to child */}
                                       <div 
-                                        className="absolute border-t-2 border-dashed border-primary-400"
+                                        className="absolute border-t-2 border-dashed border-primary"
                                         style={{
                                           height: '0',
                                           left: '50%',
@@ -336,7 +336,7 @@ export default function WeaponTree() {
                                     <div key={`${child.id}-diff-row`} className="absolute inset-0 pointer-events-none">
                                       {/* Vertical dashed line going down from parent */}
                                       <div 
-                                        className="absolute border-l-2 border-dashed border-primary-400"
+                                        className="absolute border-l-2 border-dashed border-primary"
                                         style={{
                                           left: '50%',
                                           top: '50%',
@@ -349,7 +349,7 @@ export default function WeaponTree() {
                                       
                                       {/* Horizontal dashed line connecting to child */}
                                       <div 
-                                        className="absolute border-t-2 border-dashed border-primary-400"
+                                        className="absolute border-t-2 border-dashed border-primary"
                                         style={{
                                           left: colDifference > 0 ? '50%' : `calc(50% + ${colDifference * 144}px)`,
                                           top: `calc(50% + ${rowDifference * 144}px)`,
@@ -397,7 +397,7 @@ export default function WeaponTree() {
           border: "1px solid rgba(249,115,22,0.18)",
         }}
       >
-        <h2 className="text-[10px] font-mono uppercase tracking-widest text-surface-500 mb-3">
+        <h2 className="text-[10px] font-mono uppercase tracking-widest text-ink-muted mb-3">
           {t('weapon_type')}
         </h2>
         <div className="flex flex-wrap gap-2">
@@ -406,7 +406,7 @@ export default function WeaponTree() {
               key={type}
               type="button"
               className={`px-3 py-1.5 rounded-lg text-xs font-mono uppercase tracking-wider transition-all duration-200 ${
-                activeWeaponType === type ? "text-primary-300" : "text-surface-400 hover:text-surface-200"
+                activeWeaponType === type ? "text-primary-hover" : "text-ink-muted hover:text-ink"
               }`}
               style={
                 activeWeaponType === type
@@ -425,7 +425,7 @@ export default function WeaponTree() {
         renderWeaponTable()
       ) : (
         <div
-          className="text-surface-300 px-4 py-6 rounded-xl my-4 text-center"
+          className="text-ink px-4 py-6 rounded-xl my-4 text-center"
           style={{ background: "rgba(15,23,42,0.5)", border: "1px solid rgba(71,85,105,0.3)" }}
         >
           <p>{t('build_planner.no_equipment_found')}</p>

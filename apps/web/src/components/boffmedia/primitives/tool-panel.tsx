@@ -19,11 +19,11 @@ export function ToolPanel({
 }: ToolPanelProps) {
   const showHead = head || title || meta != null || headRight
   return (
-    <div className={cn("rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--card-bg)]", className)} style={style}>
+    <div className={cn("rounded-[var(--radius-lg)] border border-edge bg-[var(--card-bg)]", className)} style={style}>
       {showHead && (head || (
-        <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-[var(--border)]">
+        <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-edge">
           <span className="font-display font-bold uppercase tracking-wider text-sm">{title}</span>
-          {headRight || (meta != null && <span className="font-mono text-xs text-[color:var(--text-dim)]">{meta}</span>)}
+          {headRight || (meta != null && <span className="font-mono text-xs text-ink-dim">{meta}</span>)}
         </div>
       ))}
       {noBody ? children : <div className={cn("p-4", bodyClass)} style={bodyStyle}>{children}</div>}

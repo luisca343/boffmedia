@@ -13,11 +13,11 @@ export default function StatBar({ label, value, maxValue, color }: StatBarProps)
   
   return (
     <div>
-      <div className="flex justify-between text-xs text-surface-300 mb-1">
+      <div className="flex justify-between text-xs text-ink mb-1">
         <span>{label}</span>
         <span>{value}</span>
       </div>
-      <div className="h-2 bg-surface-700 rounded overflow-hidden">
+      <div className="h-2 bg-layer-3 rounded overflow-hidden">
         <div 
           className={`h-full ${color}`}
           style={{ width: `${percentage}%` }}

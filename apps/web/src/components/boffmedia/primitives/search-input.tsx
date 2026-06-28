@@ -15,16 +15,16 @@ interface SearchInputProps {
 export function SearchInput({ value, onChange, placeholder = "Buscar…", onClear, autoFocus, className }: SearchInputProps) {
   return (
     <div className={cn("relative flex items-center", className)}>
-      <Icon name="search" size={18} className="absolute left-3.5 text-[var(--text-dim)] pointer-events-none" />
+      <Icon name="search" size={18} className="absolute left-3.5 text-ink-dim pointer-events-none" />
       <input
         className={cn(
-          "w-full font-body text-sm text-[var(--text)]",
-          "bg-[var(--surface-2)] border border-solid border-[var(--border-strong)]",
+          "w-full font-body text-sm text-ink",
+          "bg-layer-2 border border-solid border-edge-strong",
           "rounded-[var(--btn-radius,9999px)]",
           "pl-10 pr-[2.4rem] h-[46px]",
           "transition-[border-color,box-shadow] duration-[var(--dur,0.32s)] ease-[var(--ease)]",
-          "placeholder:text-[var(--text-dim)]",
-          "focus:outline-none focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-soft)]",
+          "placeholder:text-ink-dim",
+          "focus:outline-none focus:border-secondary focus:shadow-[0_0_0_3px_var(--secondary-soft)]",
           "disabled:opacity-55 disabled:cursor-not-allowed",
         )}
         type="text"
@@ -35,7 +35,7 @@ export function SearchInput({ value, onChange, placeholder = "Buscar…", onClea
       />
       {value ? (
         <button
-          className="absolute right-2 grid place-items-center w-[26px] h-[26px] border-0 rounded-full bg-[var(--surface-3)] text-[var(--text-muted)] cursor-pointer transition-[color,background] duration-[var(--dur,0.32s)] hover:text-[var(--text)] hover:bg-[var(--border-strong)]"
+          className="absolute right-2 grid place-items-center w-[26px] h-[26px] border-0 rounded-full bg-layer-3 text-ink-muted cursor-pointer transition-[color,background] duration-[var(--dur,0.32s)] hover:text-ink hover:bg-[var(--border-strong)]"
           aria-label="Limpiar"
           onClick={() => { onChange(""); onClear && onClear() }}
         >

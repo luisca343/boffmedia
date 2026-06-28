@@ -44,7 +44,7 @@ export function LoadingSpinner({
           >
             {label}
           </p>
-          <p className="mt-2 text-sm text-surface-500">Un momento, por favor</p>
+          <p className="mt-2 text-sm text-ink-muted">Un momento, por favor</p>
         </div>
       </div>
     </div>

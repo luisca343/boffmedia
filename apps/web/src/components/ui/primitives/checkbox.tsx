@@ -17,8 +17,8 @@ const Checkbox = React.forwardRef<
   CheckboxProps
 >(({ className, variant = "default", ...props }, ref) => {
   const variantStyles = {
-    default: "border-surface-500 ring-offset-surface-900 focus-visible:ring-primary-400 hover:border-primary-400/70 data-[state=checked]:bg-primary-500 data-[state=checked]:border-primary-500 data-[state=checked]:text-white data-[state=checked]:[box-shadow:0_0_8px_0px_rgb(var(--primary-500)/0.45)]",
-    wingull: "border-secondary-300 ring-offset-secondary-900 focus-visible:ring-secondary-300 data-[state=checked]:bg-secondary-400 data-[state=checked]:border-secondary-400 data-[state=checked]:text-white",
+    default: "border-edge ring-offset-layer-1 focus-visible:ring-primary hover:border-primary/70 data-[state=checked]:bg-primary data-[state=checked]:border-primary data-[state=checked]:text-white data-[state=checked]:[box-shadow:0_0_8px_0px_rgb(var(--primary-500)/0.45)]",
+    wingull: "border-secondary ring-offset-secondary-soft focus-visible:ring-secondary data-[state=checked]:bg-secondary-hover data-[state=checked]:border-secondary data-[state=checked]:text-white",
   }
 
   return (

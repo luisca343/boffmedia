@@ -76,7 +76,7 @@ export default function TwitchResults() {
     searchResults.games.length > 0;
 
   return (
-    <div className="min-h-full bg-surface-900 text-white overflow-auto">
+    <div className="min-h-full bg-layer-1 text-white overflow-auto">
       <BaseSearchHeader
         platform="twitch"
         onSearch={handleSearch}
@@ -115,7 +115,7 @@ export default function TwitchResults() {
                     return <InternalLink
                       key={user.id}
                       href={`mewtwitch/user/${user.broadcaster_login}`}
-                      className="group bg-surface-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:bg-surface-700 flex flex-col p-4"
+                      className="group bg-layer-2 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:bg-layer-3 flex flex-col p-4"
                     >
                       <div className="w-16 h-16 rounded-full overflow-hidden mx-auto mb-3">
                         <img
@@ -129,7 +129,7 @@ export default function TwitchResults() {
                         <h3 className="text-lg font-semibold mb-1 group-hover:text-purple-500 transition-colors duration-300">
                           {user.display_name}
                         </h3>
-                        <p className="text-sm text-surface-400">@{user.broadcaster_login}</p>
+                        <p className="text-sm text-ink-muted">@{user.broadcaster_login}</p>
                       </div>
                     </InternalLink>
 })}

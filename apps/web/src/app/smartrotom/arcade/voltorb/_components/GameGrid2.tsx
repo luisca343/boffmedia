@@ -24,7 +24,7 @@ export default function GameGrid({ grid, rowInfo, colInfo, onCellClick }: GameGr
       {/* Top row for column info */}
       <div className="col-span-1"></div> {/* Empty cell for top-left corner */}
       {colInfo.map((info, index) => (
-        <div key={`col-${index}`} className="flex flex-col items-center justify-center p-2 bg-surface-700 rounded-md">
+        <div key={`col-${index}`} className="flex flex-col items-center justify-center p-2 bg-layer-3 rounded-md">
           <div className="flex items-center mb-1">
             <Coins className="w-5 h-5 text-yellow-500 mr-1" />
             <span className="text-white text-lg font-bold">{info.coins}</span>
@@ -46,7 +46,7 @@ export default function GameGrid({ grid, rowInfo, colInfo, onCellClick }: GameGr
       {grid.map((row, rowIndex) => (
         <>
           {/* Row info */}
-          <div key={`row-info-${rowIndex}`} className="flex flex-col items-center justify-center p-2 bg-surface-700 rounded-md">
+          <div key={`row-info-${rowIndex}`} className="flex flex-col items-center justify-center p-2 bg-layer-3 rounded-md">
             <div className="flex items-center mb-1">
               <Coins className="w-5 h-5 text-yellow-500 mr-1" />
               <span className="text-white text-lg font-bold">{rowInfo[rowIndex].coins}</span>
@@ -67,7 +67,7 @@ export default function GameGrid({ grid, rowInfo, colInfo, onCellClick }: GameGr
           {row.map((cell, colIndex) => (
             <motion.div
               key={`cell-${rowIndex}-${colIndex}`}
-              className="aspect-square bg-secondary-500 rounded-md cursor-pointer"
+              className="aspect-square bg-secondary rounded-md cursor-pointer"
               onClick={() => handleCellClick(rowIndex, colIndex)}
               animate={{ rotateY: flippedCells[`${rowIndex}-${colIndex}`] ? 180 : 0 }}
               transition={{ duration: 0.6 }}
@@ -77,7 +77,7 @@ export default function GameGrid({ grid, rowInfo, colInfo, onCellClick }: GameGr
                 animate={{ rotateY: flippedCells[`${rowIndex}-${colIndex}`] ? 180 : 0 }}
               >
                 {flippedCells[`${rowIndex}-${colIndex}`] ? (
-                  <div className="bg-surface-200 w-full h-full rounded-md flex items-center justify-center">
+                  <div className="bg-layer-2 w-full h-full rounded-md flex items-center justify-center">
                     {cell.value === 0 ? (
                       <Image
                         src="/smartrotom/img/apps/arcade/voltorb.png"

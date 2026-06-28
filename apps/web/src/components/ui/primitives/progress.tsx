@@ -17,12 +17,12 @@ const Progress = React.forwardRef<
 >(({ className, value, variant = "default", ...props }, ref) => {
   const variantStyles = {
     default: {
-      root: "bg-primary-100 dark:bg-primary-800",
-      indicator: "bg-primary-900 dark:bg-primary-50"
+      root: "bg-primary-soft bg-primary-soft",
+      indicator: "bg-primary-soft bg-primary-soft"
     },
     wingull: {
-      root: "bg-secondary-200 dark:bg-secondary-800",
-      indicator: "bg-secondary-600"
+      root: "bg-secondary-soft bg-secondary-soft",
+      indicator: "bg-secondary-active"
     }
   }
   

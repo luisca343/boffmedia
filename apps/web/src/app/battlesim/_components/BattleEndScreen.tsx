@@ -93,7 +93,7 @@ export const BattleEndScreen = ({ battle, pov, username, onRestart }: {
         <div
           className="w-20 h-20 rounded-[var(--radius)] overflow-hidden grid place-items-center shrink-0"
           style={{
-            background: `center / cover url(/battlesim/trainers/${name.toLowerCase()}.png), var(--surface-2)`,
+            background: `center / cover url(/battlesim/trainers/${name.toLowerCase()}.png), var(--layer-2)`,
             border: `2px solid ${isWinner ? accent : 'rgba(255,255,255,.15)'}`,
           }}
         >

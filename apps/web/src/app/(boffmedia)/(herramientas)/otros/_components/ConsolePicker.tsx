@@ -35,8 +35,8 @@ export function ConsolePicker({ selected, onSelect, compact = false }: Props) {
                 : 'px-3 py-1.5 text-sm'
               }
               ${selected === key
-                ? 'bg-primary-600 border-primary-500 text-white shadow-sm shadow-primary-900/40'
-                : 'bg-surface-800/60 border-surface-600/50 text-surface-300 hover:border-surface-500 hover:text-surface-100'
+                ? 'bg-primary-active border-primary text-white shadow-sm shadow-primary-soft/40'
+                : 'bg-layer-2/60 border-edge/50 text-ink hover:border-edge hover:text-ink'
               }`}
           >
             {compact ? info.shortLabel : info.label}

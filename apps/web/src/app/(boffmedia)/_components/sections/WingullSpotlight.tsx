@@ -44,7 +44,7 @@ export function WingullSpotlight({ t }: WingullSpotlightProps) {
           {/* Logo Section - Centered and Prominent */}
           <div className="flex justify-center mb-6">
             <div className="relative">
-              <div className="absolute inset-0 bg-secondary-500/20 rounded-2xl blur-2xl"></div>
+              <div className="absolute inset-0 bg-secondary/20 rounded-2xl blur-2xl"></div>
               <Image
                 src="/img/wingull2-logo.png"
                 alt="Pixelmon Wingull 2"
@@ -55,26 +55,26 @@ export function WingullSpotlight({ t }: WingullSpotlightProps) {
             </div>
           </div>
           <div className="space-y-6">
-            <p className="text-xl text-surface-300 leading-relaxed text-center">
+            <p className="text-xl text-ink leading-relaxed text-center">
               {t("featuredGames.games.wingull.description")}
             </p>
             
             {/* Features List */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 py-4 justify-center text-center mx-auto" style={{maxWidth: 700}}>
-              <div className="flex items-center gap-3 text-surface-300 justify-center">
-                <div className="w-2 h-2 bg-secondary-400 rounded-full"></div>
+              <div className="flex items-center gap-3 text-ink justify-center">
+                <div className="w-2 h-2 bg-secondary-hover rounded-full"></div>
                 <span>Nueva generación</span>
               </div>
-              <div className="flex items-center gap-3 text-surface-300 justify-center">
-                <div className="w-2 h-2 bg-secondary-400 rounded-full"></div>
+              <div className="flex items-center gap-3 text-ink justify-center">
+                <div className="w-2 h-2 bg-secondary-hover rounded-full"></div>
                 <span>Pokémon exclusivos</span>
               </div>
-              <div className="flex items-center gap-3 text-surface-300 justify-center">
-                <div className="w-2 h-2 bg-secondary-400 rounded-full"></div>
+              <div className="flex items-center gap-3 text-ink justify-center">
+                <div className="w-2 h-2 bg-secondary-hover rounded-full"></div>
                 <span>Mecánicas mejoradas</span>
               </div>
-              <div className="flex items-center gap-3 text-surface-300 justify-center">
-                <div className="w-2 h-2 bg-secondary-400 rounded-full"></div>
+              <div className="flex items-center gap-3 text-ink justify-center">
+                <div className="w-2 h-2 bg-secondary-hover rounded-full"></div>
                 <span>Mundo renovado</span>
               </div>
             </div>

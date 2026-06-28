@@ -40,11 +40,11 @@ export default function Component() {
   const getWeatherIcon = (weather: string): React.JSX.Element => {
     switch (weather) {
       case "nublado":
-        return <Cloud className="h-12 w-12 text-surface-400" />;
+        return <Cloud className="h-12 w-12 text-ink-muted" />;
       case "lluvia":
-        return <CloudRain className="h-12 w-12 text-secondary-500" />;
+        return <CloudRain className="h-12 w-12 text-secondary" />;
       case "tormenta":
-        return <CloudLightning className="h-12 w-12 text-accent-500" />;
+        return <CloudLightning className="h-12 w-12 text-secondary" />;
       case "noche":
         return <Moon className="h-12 w-12 text-indigo-300" />;
       default:
@@ -54,11 +54,11 @@ export default function Component() {
 
   return (
     <div className="w-full max-w-[300px] bg-white rounded-2xl shadow-lg overflow-hidden">
-      <div className="bg-secondary-500 p-3 flex justify-between items-center">
+      <div className="bg-secondary p-3 flex justify-between items-center">
         <h2 className="text-white text-lg font-semibold">Clima de Minecraft</h2>
         <button
           onClick={refreshWeather}
-          className="text-white hover:bg-secondary-600 rounded-full p-1"
+          className="text-white hover:bg-secondary-active rounded-full p-1"
         >
           <RefreshCw className="h-5 w-5" />
         </button>
@@ -67,24 +67,24 @@ export default function Component() {
         <div className="flex items-center justify-between mb-4">
           {getWeatherIcon(weatherData.weather)}
           <div className="text-right">
-            <p className="text-2xl font-bold text-surface-800 capitalize">
+            <p className="text-2xl font-bold text-ink-dim capitalize">
               {weatherData.weather}
             </p>
-            <p className="text-sm text-surface-600">
+            <p className="text-sm text-ink-dim">
               Cambia en: {formatTime(weatherData.changeTime)}
             </p>
           </div>
         </div>
         <div className="flex justify-between items-center">
           <div>
-            <p className="text-sm text-surface-600">Hora del juego</p>
-            <p className="text-lg font-semibold text-surface-800">
+            <p className="text-sm text-ink-dim">Hora del juego</p>
+            <p className="text-lg font-semibold text-ink-dim">
               {formatMinecraftTime(minecraftTime)}
             </p>
           </div>
           <div className="text-right">
-            <p className="text-sm text-surface-600">Sección</p>
-            <p className="text-lg font-semibold text-surface-800">
+            <p className="text-sm text-ink-dim">Sección</p>
+            <p className="text-lg font-semibold text-ink-dim">
               {getDaySection(minecraftTime)}
             </p>
           </div>

@@ -56,7 +56,7 @@ export function VideoMessage({
           />
         )}
         {isFirstInSequence && (
-          <span className={`text-xs ${sender === "user" ? "text-surface-400 self-end" : "text-surface-500"} mb-1`}>
+          <span className={`text-xs ${sender === "user" ? "text-ink-muted self-end" : "text-ink-muted"} mb-1`}>
             {timestamp}
           </span>
         )}
@@ -84,7 +84,7 @@ export function VideoMessage({
             </div>
             <Link
               href={`/smartrotom/mewtube/video/${videoId}`}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-primary-400 hover:bg-primary-500 text-black rounded transition-colors whitespace-nowrap"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-primary-hover hover:bg-primary text-black rounded transition-colors whitespace-nowrap"
             >
               <ExternalLink className="h-3.5 w-3.5" />
               Watch in MewTube

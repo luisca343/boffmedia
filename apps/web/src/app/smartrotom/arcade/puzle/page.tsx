@@ -117,13 +117,13 @@ export default function FramerMotionSteamLogoPuzzle() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-accent-900 p-4 font-mono relative overflow-hidden">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-secondary-soft p-4 font-mono relative overflow-hidden">
       <StarsBackground />
       <RainbowText text="Puzles Arcade Temáticos y Originales" />
       {imageLoaded ? (
         <>
           <div 
-            className="relative bg-surface-800 bg-opacity-80 rounded-lg p-1 z-10"
+            className="relative bg-layer-2 bg-opacity-80 rounded-lg p-1 z-10"
             style={{
               width: '300px',
               height: '300px',
@@ -156,7 +156,7 @@ export default function FramerMotionSteamLogoPuzzle() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="mt-4 text-2xl font-bold text-highlight-400 z-10"
+              className="mt-4 text-2xl font-bold text-warning-hover z-10"
             >
               Puzzle Completed!
             </motion.div>
@@ -165,18 +165,18 @@ export default function FramerMotionSteamLogoPuzzle() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => shufflePieces(pieces)}
-            className="mt-4 bg-secondary-500 hover:bg-secondary-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-secondary-400 focus:ring-opacity-50 z-10"
+            className="mt-4 bg-secondary hover:bg-secondary-active text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-opacity-50 z-10"
           >
             Shuffle
           </motion.button>
           <div className="mt-8 flex items-center justify-center space-x-4 z-10">
-            <Puzzle className="w-8 h-8 text-secondary-500 animate-bounce" />
+            <Puzzle className="w-8 h-8 text-secondary animate-bounce" />
             <p className="text-lg text-white">Slide the pieces to solve the puzzle!</p>
-            <Puzzle className="w-8 h-8 text-secondary-500 animate-bounce" />
+            <Puzzle className="w-8 h-8 text-secondary animate-bounce" />
           </div>
         </>
       ) : (
-        <div className="w-64 h-64 rounded-full border-4 border-secondary-500 flex items-center justify-center z-10">
+        <div className="w-64 h-64 rounded-full border-4 border-secondary flex items-center justify-center z-10">
           <p className="text-white">Loading...</p>
         </div>
       )}

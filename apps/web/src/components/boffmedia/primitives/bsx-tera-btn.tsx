@@ -25,7 +25,7 @@ export function BSXTeraBtn({ type, armed, used, onToggle, hotkey }: BSXTeraBtnPr
       aria-label={used ? "Teracristal ya usado" : `Teracristalizar a tipo ${type}${armed ? ", activado" : ""}`}
       style={{
         "--_c": c,
-        background: armed ? `color-mix(in srgb, ${c} 16%, var(--surface-2))` : "var(--surface-2)",
+        background: armed ? `color-mix(in srgb, ${c} 16%, var(--layer-2))` : "var(--layer-2)",
         borderColor: `color-mix(in srgb, ${c} 40%, var(--border))`,
         color: "var(--text)",
         boxShadow: armed ? `0 0 0 1px ${c} inset, 0 0 18px -8px ${c}` : undefined,
@@ -36,7 +36,7 @@ export function BSXTeraBtn({ type, armed, used, onToggle, hotkey }: BSXTeraBtnPr
     >
       <span
         className="font-mono font-bold text-t-3xs w-[19px] h-[19px] inline-grid place-items-center shrink-0 rounded-[var(--radius-sm)]"
-        style={{ background: "color-mix(in srgb, #000 30%, var(--surface-3))", color: "var(--text-muted)", border: "1px solid var(--border-strong)" }}
+        style={{ background: "color-mix(in srgb, #000 30%, var(--layer-3))", color: "var(--text-muted)", border: "1px solid var(--border-strong)" }}
       >
         {hotkey || "T"}
       </span>

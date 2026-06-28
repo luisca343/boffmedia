@@ -12,12 +12,12 @@ export default function PokemonFilters() {
   if (!hasFilters) return null;
   
   return (
-    <div className="bg-surface-800 p-3 rounded-lg">
+    <div className="bg-layer-2 p-3 rounded-lg">
       <div className="flex items-center justify-between mb-2">
-        <h3 className="text-sm font-medium text-surface-200">Filters:</h3>
+        <h3 className="text-sm font-medium text-ink">Filters:</h3>
         <button
           onClick={clearFilters}
-          className="text-xs text-primary-400 hover:text-primary-300"
+          className="text-xs text-primary-hover hover:text-primary-hover"
         >
           (backspace = delete filter)
         </button>
@@ -47,33 +47,33 @@ export default function PokemonFilters() {
         {activeFilters.abilities.map(ability => (
           <span
             key={`ability-${ability}`}
-            className="bg-accent-900 text-accent-100 text-xs px-2 py-1 rounded flex items-center gap-1 cursor-pointer"
+            className="bg-secondary-soft text-secondary-hover text-xs px-2 py-1 rounded flex items-center gap-1 cursor-pointer"
             onClick={() => removeFilter('abilities', ability)}
           >
             {ability}
-            <span className="text-accent-300">×</span>
+            <span className="text-secondary-hover">×</span>
           </span>
         ))}
         
         {activeFilters.eggGroups.map(eggGroup => (
           <span
             key={`egg-${eggGroup}`}
-            className="bg-highlight-900 text-highlight-100 text-xs px-2 py-1 rounded flex items-center gap-1 cursor-pointer"
+            className="bg-warning-soft text-warning-hover text-xs px-2 py-1 rounded flex items-center gap-1 cursor-pointer"
             onClick={() => removeFilter('eggGroups', eggGroup)}
           >
             {eggGroup}
-            <span className="text-highlight-300">×</span>
+            <span className="text-warning-hover">×</span>
           </span>
         ))}
         
         {activeFilters.tiers.map(tier => (
           <span
             key={`tier-${tier}`}
-            className="bg-secondary-900 text-secondary-100 text-xs px-2 py-1 rounded flex items-center gap-1 cursor-pointer"
+            className="bg-secondary-soft text-secondary-hover text-xs px-2 py-1 rounded flex items-center gap-1 cursor-pointer"
             onClick={() => removeFilter('tiers', tier)}
           >
             {tier}
-            <span className="text-secondary-300">×</span>
+            <span className="text-secondary-hover">×</span>
           </span>
         ))}
       </div>

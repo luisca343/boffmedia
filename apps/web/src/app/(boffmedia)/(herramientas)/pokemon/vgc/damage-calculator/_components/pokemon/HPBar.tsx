@@ -27,14 +27,14 @@ export function HPBar({ poke, onChange, useChampions = false, baseStats: apiBase
   const pct = (cur / maxHP) * 100
 
   const barColor =
-    pct > 50 ? 'bg-success-500' : pct > 25 ? 'bg-warning-500' : 'bg-error-500'
+    pct > 50 ? 'bg-success' : pct > 25 ? 'bg-warning' : 'bg-danger'
   const textColor =
-    pct > 50 ? 'text-success-400' : pct > 25 ? 'text-warning-400' : 'text-error-400'
+    pct > 50 ? 'text-success-hover' : pct > 25 ? 'text-warning-hover' : 'text-danger-hover'
 
   return (
     <div className="space-y-1">
       <div className="flex items-center gap-2">
-        <span className="text-xs font-semibold text-surface-500 min-w-[24px]">{t('hpLabel')}</span>
+        <span className="text-xs font-semibold text-ink-muted min-w-[24px]">{t('hpLabel')}</span>
         <input
           type="number"
           min={1}
@@ -44,19 +44,19 @@ export function HPBar({ poke, onChange, useChampions = false, baseStats: apiBase
             const v = Math.min(maxHP, Math.max(1, parseInt(e.target.value) || 1))
             onChange({ currentHP: v })
           }}
-          className="w-14 bg-surface-900 border border-surface-700 rounded text-center font-mono text-xs text-surface-200 focus:outline-none focus:border-primary-500 py-0.5"
+          className="w-14 bg-layer-1 border border-edge rounded text-center font-mono text-xs text-ink focus:outline-none focus:border-primary py-0.5"
         />
-        <span className="font-mono text-xs text-surface-400">/ {maxHP}</span>
+        <span className="font-mono text-xs text-ink-muted">/ {maxHP}</span>
         <span className={`font-bold text-xs ${textColor}`}>({pct.toFixed(1)}%)</span>
         <button
           type="button"
           onClick={() => onChange({ currentHP: -1 })}
-          className="ml-auto text-[10px] text-surface-600 hover:text-surface-400 transition-colors"
+          className="ml-auto text-[10px] text-ink-dim hover:text-ink-muted transition-colors"
         >
           {t('hpReset')}
         </button>
       </div>
-      <div className="h-2 bg-surface-900 rounded-full overflow-hidden border border-surface-700/50">
+      <div className="h-2 bg-layer-1 rounded-full overflow-hidden border border-edge/50">
         <div
           className={`h-full rounded-full transition-all duration-300 ${barColor}`}
           style={{ width: `${pct}%` }}

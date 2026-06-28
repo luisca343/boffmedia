@@ -35,7 +35,7 @@ export function MainContent({ isSidebarCollapsed }: MainContentProps) {
                   value={tableName}
                   onChange={(e) => setTableName(e.target.value)}
                   placeholder="Ingresa el nombre de la tabla"
-                  className="bg-white w-full mt-1 px-3 py-2 border border-[#ccc] rounded-md shadow-sm focus:outline-none focus:ring-secondary-500 focus:border-secondary-500 text-black"
+                  className="bg-white w-full mt-1 px-3 py-2 border border-[#ccc] rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary text-black"
                 />
               </div>
             </div>
@@ -51,7 +51,7 @@ export function MainContent({ isSidebarCollapsed }: MainContentProps) {
                   onChange={(e) => setJsonInput(e.target.value)}
                   placeholder="Pega tu JSON aquí"
                   rows={10}
-                  className="bg-white w-full mt-1 px-3 py-2 border border-[#ccc] rounded-md shadow-sm focus:outline-none focus:ring-secondary-500 focus:border-secondary-500"
+                  className="bg-white w-full mt-1 px-3 py-2 border border-[#ccc] rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary"
                 />
               </div>
             </div>

@@ -185,9 +185,9 @@ export function CallStatus() {
     <nav
       className={`flex flex-col items-center justify-center fixed transition-all duration-300 ease-in-out ${
         isExpanded 
-          ? "inset-0 w-full h-full bg-surface-900/95 backdrop-blur-sm z-50" 
-          : "top-14 left-2 w-64 bg-surface-800/95 backdrop-blur-sm rounded-lg shadow-xl border border-surface-700 z-30"
-      } text-surface-50 font-medium ${activeCall.caller ? "" : "hidden"}`}
+          ? "inset-0 w-full h-full bg-layer-1/95 backdrop-blur-sm z-50" 
+          : "top-14 left-2 w-64 bg-layer-2/95 backdrop-blur-sm rounded-lg shadow-xl border border-edge z-30"
+      } text-ink font-medium ${activeCall.caller ? "" : "hidden"}`}
     >
       <audio ref={audioRef} src="/smartrotom/audio/apps/chatapp/denden.mp3" preload="auto"></audio>
       {isExpanded ? (

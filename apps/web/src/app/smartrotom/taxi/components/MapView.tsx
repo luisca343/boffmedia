@@ -112,7 +112,7 @@ export default function MapView({
         showCoordinates={showCoordinates}
       />
       
-      <div className="flex-grow relative bg-surface-50">
+      <div className="flex-grow relative bg-base">
         <div 
           className={`absolute inset-0 bg-[#041F4E] overflow-hidden ${
             dragState.isDragging ? 'cursor-grabbing' : 'cursor-grab'

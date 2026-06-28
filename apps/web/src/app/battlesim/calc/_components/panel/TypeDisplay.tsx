@@ -28,11 +28,11 @@ export default function TypeDisplay({
   return (
     <div className="grid grid-cols-2 gap-2">
       <div>
-        <label className="block text-xs font-medium mb-1 text-surface-200">Type</label>
+        <label className="block text-xs font-medium mb-1 text-ink">Type</label>
         <div className="flex space-x-1">
           {types.map((type: string) => {
             if(!type) return null;
-            return <div key={type} className="px-2 py-0.5 rounded bg-surface-700 text-xs text-surface-100">
+            return <div key={type} className="px-2 py-0.5 rounded bg-layer-3 text-xs text-ink">
               {type}
             </div>
           })}
@@ -41,10 +41,10 @@ export default function TypeDisplay({
 
       {showTeraOptions && (
         <div>
-          <label className="block text-xs font-medium mb-1 text-surface-200">Tera Type</label>
+          <label className="block text-xs font-medium mb-1 text-ink">Tera Type</label>
           <div className="flex flex-col space-y-1">
             <select
-              className="w-full p-1 border rounded bg-surface-700 border-surface-600 text-surface-100 text-xs"
+              className="w-full p-1 border rounded bg-layer-3 border-edge text-ink text-xs"
               value={teraType}
               onChange={(e) => onTeraTypeChange(e.target.value)}
             >
@@ -60,7 +60,7 @@ export default function TypeDisplay({
                 checked={isTerastallized}
                 onChange={(e) => onTerastallizedChange(e.target.checked)}
               />
-              <label htmlFor="terastallized" className="text-xs text-surface-200">Terastallized</label>
+              <label htmlFor="terastallized" className="text-xs text-ink">Terastallized</label>
             </div>
           </div>
         </div>

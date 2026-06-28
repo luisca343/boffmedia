@@ -34,7 +34,7 @@ export function GameHeroBanner({
   return (
     <div
       className={cn(
-        "relative overflow-hidden isolate border-b border-[var(--border)]",
+        "relative overflow-hidden isolate border-b border-edge",
         className,
       )}
     >
@@ -94,7 +94,7 @@ export function GameHeroBanner({
               <div
                 className="absolute inset-0"
                 style={{
-                  backgroundColor: "var(--surface-3)",
+                  backgroundColor: "var(--layer-3)",
                   backgroundImage: "repeating-linear-gradient(45deg, var(--border) 0 1px, transparent 1px 12px)",
                 }}
               />

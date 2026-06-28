@@ -54,7 +54,7 @@ export default function ShowdownLobbyPage() {
 
   const cardStyle = { background: 'var(--card-bg)', border: 'var(--card-border)', borderRadius: 'var(--radius-lg)' };
   const inputStyle = { background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text)', borderRadius: 'var(--radius)' };
-  const btnStyle = { background: 'var(--accent)', color: 'var(--text)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' };
+  const btnStyle = { background: 'var(--secondary)', color: 'var(--text)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' };
 
   return (
     <div className="flex flex-col gap-4 p-4 max-w-4xl mx-auto" style={{ color: 'var(--text)', background: 'var(--bg)' }}>
@@ -91,10 +91,10 @@ export default function ShowdownLobbyPage() {
       {/* Incoming challenges */}
       {challenges.length > 0 && (
         <div className="p-4 space-y-2 rounded-lg" style={{
-          background: 'color-mix(in srgb, var(--accent) 10%, transparent)',
-          border: '1px solid color-mix(in srgb, var(--accent) 30%, transparent)',
+          background: 'color-mix(in srgb, var(--secondary) 10%, transparent)',
+          border: '1px solid color-mix(in srgb, var(--secondary) 30%, transparent)',
         }}>
-          <h3 className="font-semibold" style={{ color: 'var(--accent-bright)' }}>Incoming Challenges</h3>
+          <h3 className="font-semibold" style={{ color: 'var(--secondary-hover)' }}>Incoming Challenges</h3>
           {challenges.map((ch) => (
             <div key={ch.from} className="flex items-center justify-between p-3 rounded-md" style={cardStyle}>
               <div>
@@ -112,7 +112,7 @@ export default function ShowdownLobbyPage() {
                 <button
                   onClick={() => rejectChallenge(ch.from)}
                   className="px-4 py-1.5 rounded-md text-sm font-medium"
-                  style={{ background: 'var(--surface-3)', color: 'var(--rose-400)', border: '1px solid color-mix(in srgb, var(--rose-500) 40%, transparent)' }}
+                  style={{ background: 'var(--layer-3)', color: 'var(--rose-400)', border: '1px solid color-mix(in srgb, var(--rose-500) 40%, transparent)' }}
                 >
                   Reject
                 </button>
@@ -213,7 +213,7 @@ export default function ShowdownLobbyPage() {
                 <button
                   onClick={handleChallenge} disabled={!challengeTarget.trim()}
                   className="px-4 py-2 rounded-md text-sm font-medium disabled:opacity-50"
-                  style={{ background: 'var(--surface-3)', color: 'var(--text)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}
+                  style={{ background: 'var(--layer-3)', color: 'var(--text)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}
                 >
                   Challenge
                 </button>
@@ -233,8 +233,8 @@ export default function ShowdownLobbyPage() {
                       key={user}
                       className="text-xs px-2 py-1 rounded"
                       style={{
-                        color: user === username ? 'var(--accent-bright)' : 'var(--text-muted)',
-                        background: user === username ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'transparent',
+                        color: user === username ? 'var(--secondary-hover)' : 'var(--text-muted)',
+                        background: user === username ? 'color-mix(in srgb, var(--secondary) 10%, transparent)' : 'transparent',
                         fontWeight: user === username ? 600 : 400,
                       }}
                     >
@@ -258,7 +258,7 @@ function StatusBadge({ status, username }: { status: string; username: string | 
   const isGuest = username?.startsWith('Guest');
   const palettes: Record<string, { bg: string; fg: string; bd: string }> = {
     active: { bg: 'color-mix(in srgb, var(--emerald-500) 20%, transparent)', fg: 'var(--emerald-400)', bd: 'color-mix(in srgb, var(--emerald-500) 30%, transparent)' },
-    authenticated: { bg: 'color-mix(in srgb, var(--accent) 20%, transparent)', fg: 'var(--accent-bright)', bd: 'color-mix(in srgb, var(--accent) 30%, transparent)' },
+    authenticated: { bg: 'color-mix(in srgb, var(--secondary) 20%, transparent)', fg: 'var(--secondary-hover)', bd: 'color-mix(in srgb, var(--secondary) 30%, transparent)' },
     error: { bg: 'color-mix(in srgb, var(--amber-500) 20%, transparent)', fg: 'var(--amber-400)', bd: 'color-mix(in srgb, var(--amber-500) 30%, transparent)' },
     default: { bg: 'color-mix(in srgb, #888 20%, transparent)', fg: '#888', bd: 'color-mix(in srgb, #888 30%, transparent)' },
   };

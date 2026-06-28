@@ -121,7 +121,7 @@ export function ImageGalleryPicker({ open, onOpenChange, onSendImage }: ImageGal
                       onClick={() => setSelectedImage(screenshot)}
                       className={`relative group aspect-square rounded-lg overflow-hidden border-2 transition-all ${
                         selectedImage?.id === screenshot.id
-                          ? "border-primary-400 ring-2 ring-primary-400"
+                          ? "border-primary ring-2 ring-primary"
                           : "border-neutral-700 hover:border-neutral-500"
                       }`}
                     >
@@ -167,7 +167,7 @@ export function ImageGalleryPicker({ open, onOpenChange, onSendImage }: ImageGal
               </div>
               <Button
                 onClick={handleSend}
-                className="w-full bg-primary-400 hover:bg-primary-500 text-black"
+                className="w-full bg-primary-hover hover:bg-primary text-black"
               >
                 <Send className="h-4 w-4 mr-2" />
                 Enviar imagen

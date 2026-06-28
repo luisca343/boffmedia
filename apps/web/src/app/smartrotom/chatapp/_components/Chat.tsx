@@ -434,9 +434,9 @@ export function Chat({
             <div className="flex items-start gap-3 px-4 py-2 mb-2 animate-fade-in">
               <div className="flex items-center gap-2 bg-neutral-800/80 backdrop-blur-sm rounded-2xl px-4 py-2 shadow-lg border border-neutral-700/50">
                 <div className="flex gap-1">
-                  <span className="w-2 h-2 bg-primary-400 rounded-full animate-bounce" style={{ animationDelay: "0ms", animationDuration: "1s" }} />
-                  <span className="w-2 h-2 bg-primary-400 rounded-full animate-bounce" style={{ animationDelay: "200ms", animationDuration: "1s" }} />
-                  <span className="w-2 h-2 bg-primary-400 rounded-full animate-bounce" style={{ animationDelay: "400ms", animationDuration: "1s" }} />
+                  <span className="w-2 h-2 bg-primary-hover rounded-full animate-bounce" style={{ animationDelay: "0ms", animationDuration: "1s" }} />
+                  <span className="w-2 h-2 bg-primary-hover rounded-full animate-bounce" style={{ animationDelay: "200ms", animationDuration: "1s" }} />
+                  <span className="w-2 h-2 bg-primary-hover rounded-full animate-bounce" style={{ animationDelay: "400ms", animationDuration: "1s" }} />
                 </div>
                 <span className="text-sm text-neutral-300 font-medium">
                   {displayText}...
@@ -474,7 +474,7 @@ export function Chat({
           placeholder="Escribe un mensaje..."
           className="flex-1"
         />
-        <Button type="submit" onClick={sendMessage} className="bg-primary-400 hover:bg-primary-500 text-black">
+        <Button type="submit" onClick={sendMessage} className="bg-primary-hover hover:bg-primary text-black">
           <Send className="h-5 w-5" />
         </Button>
       </div>

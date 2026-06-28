@@ -11,7 +11,7 @@ export const BaseStats = ({ stats, platform }: BaseStatsProps) => {
   const iconColor = platform === "youtube" ? "text-red-500" : "text-purple-500";
   
   return (
-    <div className="flex flex-wrap items-center gap-4 mb-6 text-surface-300">
+    <div className="flex flex-wrap items-center gap-4 mb-6 text-ink">
       {stats.map((stat, idx) => (
         <div key={idx} className="flex items-center">
           {stat.icon && <stat.icon className={`h-4 w-4 mr-1 ${iconColor}`} />}

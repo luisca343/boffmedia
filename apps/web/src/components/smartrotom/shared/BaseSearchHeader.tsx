@@ -56,7 +56,7 @@ export const BaseSearchHeader = ({
   const config = platformConfig[platform];
 
   return (
-    <header className="sticky top-0 z-10 bg-surface-800/95 backdrop-blur-sm shadow-md">
+    <header className="sticky top-0 z-10 bg-layer-2/95 backdrop-blur-sm shadow-md">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center gap-4">
           <div className="flex-1 flex items-center gap-4">
@@ -67,9 +67,9 @@ export const BaseSearchHeader = ({
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={handleKeyDown}
-                className="pr-10 bg-surface-700 text-white placeholder-surface-400 border-surface-600 focus:border-surface-500"
+                className="pr-10 bg-layer-3 text-white placeholder-ink-dim border-edge focus:border-edge"
               />
-              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-surface-400" />
+              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-ink-muted" />
             </div>
             
             <Button
@@ -91,7 +91,7 @@ export const BaseSearchHeader = ({
           
           <InternalLink href={config.historyPath}>
             <button 
-              className="bg-surface-700 hover:bg-surface-600 p-2 rounded-lg transition-colors"
+              className="bg-layer-3 hover:bg-layer-3 p-2 rounded-lg transition-colors"
               title={t("history.title")}
             >
               <History size={20} />

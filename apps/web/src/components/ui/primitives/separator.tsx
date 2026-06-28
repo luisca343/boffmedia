@@ -20,8 +20,8 @@ const Separator = React.forwardRef<
     ref
   ) => {
     const variantStyles = {
-      default: "bg-surface-700",
-      wingull: "bg-secondary-700",
+      default: "bg-layer-3",
+      wingull: "bg-secondary-active",
     }
     
     return (

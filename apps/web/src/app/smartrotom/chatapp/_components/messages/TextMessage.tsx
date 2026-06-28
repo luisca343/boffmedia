@@ -48,14 +48,14 @@ export function TextMessage({
           />
         )}
         {isFirstInSequence && (
-          <span className={`text-xs ${sender === "user" ? "text-surface-400 self-end" : "text-surface-500"} mb-1`}>
+          <span className={`text-xs ${sender === "user" ? "text-ink-muted self-end" : "text-ink-muted"} mb-1`}>
             {timestamp}
           </span>
         )}
         <div
           className={`px-4 py-2  border-2 border-neutral-900 ${getBubbleShape()} ${
             sender === "user"
-                ? "bg-primary-400 text-neutral-800"
+                ? "bg-primary-hover text-neutral-800"
                 : "bg-neutral-800 text-neutral-100"
           }`}
         >

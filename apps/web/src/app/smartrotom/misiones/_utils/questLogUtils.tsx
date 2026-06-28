@@ -10,13 +10,13 @@ export function getStatusStyles(status: QuestStatus) {
     case QuestStatus.ACTIVE:
       return "bg-emerald-700 text-emerald-100"
     case QuestStatus.COMPLETED:
-      return "bg-secondary-700 text-secondary-100"
+      return "bg-secondary-active text-secondary-hover"
     case QuestStatus.FAILED:
       return "bg-red-700 text-red-100"
     case QuestStatus.AVAILABLE:
       return "bg-yellow-700 text-yellow-100"
     case QuestStatus.LOCKED:
-      return "bg-surface-700 text-surface-100"
+      return "bg-layer-3 text-ink"
   }
 }
 
@@ -40,7 +40,7 @@ export function QuestDetails({ quest, dialogs, npcs }: { quest: QuestData; dialo
                 {quest.status}
                 </span>
                 {quest.repeatable && (
-                <span className="bg-accent-700 text-accent-100 px-3 py-1 rounded-full text-sm font-bold">
+                <span className="bg-secondary-active text-secondary-hover px-3 py-1 rounded-full text-sm font-bold">
                     Repetible
                 </span>
                 )}

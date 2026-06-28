@@ -11,11 +11,11 @@ export function EntryHeader({pokemon, formName, prev, next} : {pokemon: Pokemon,
     const t = useTranslations("pokedex");
     
     return (
-        <header className="flex flex-col bg-surface-950 text-surface-50 sm:h-24 z-10 p-2 shadow-md">
+        <header className="flex flex-col bg-base text-ink sm:h-24 z-10 p-2 shadow-md">
             {/* Navigation row */}
             <div className="w-full flex flex-1 justify-between items-center">
                 {/* Previous Pokemon */}
-                <InternalLink className="flex items-center hover:text-primary-400 transition-colors group" 
+                <InternalLink className="flex items-center hover:text-primary-hover transition-colors group" 
                     href={`pokedex/entrada/${prev.dex}`}>
                     <div className="flex items-center">
                         <PokemonSprite 
@@ -53,7 +53,7 @@ export function EntryHeader({pokemon, formName, prev, next} : {pokemon: Pokemon,
                 </div>
                 
                 {/* Next Pokemon */}
-                <InternalLink className="flex items-center hover:text-primary-400 transition-colors group" 
+                <InternalLink className="flex items-center hover:text-primary-hover transition-colors group" 
                     href={`pokedex/entrada/${next.dex}`}>
                     <div className="hidden md:block text-right">#{next.dex} - {getDisplayStatus(next.dex, 'base', true) ? next.name : '???'}</div>
                     <div className="flex items-center">
@@ -75,16 +75,16 @@ export function EntryHeader({pokemon, formName, prev, next} : {pokemon: Pokemon,
             
             {/* Navigation tabs */}
             <div className="w-full flex justify-evenly items-center scroll-smooth mt-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-surface-800">
-                <Link className="px-2 py-1 hover:text-primary-400 transition-colors whitespace-nowrap" href={`#info`}>Info</Link>
-                <Link className="px-2 py-1 hover:text-primary-400 transition-colors whitespace-nowrap" href={`#evotree`}>Árbol evolutivo</Link>
+                <Link className="px-2 py-1 hover:text-primary-hover transition-colors whitespace-nowrap" href={`#info`}>Info</Link>
+                <Link className="px-2 py-1 hover:text-primary-hover transition-colors whitespace-nowrap" href={`#evotree`}>Árbol evolutivo</Link>
                 {pokemon.forms.length > 1 && 
-                    <Link className="px-2 py-1 hover:text-primary-400 transition-colors whitespace-nowrap" href={`#forms`}>Formas</Link>
+                    <Link className="px-2 py-1 hover:text-primary-hover transition-colors whitespace-nowrap" href={`#forms`}>Formas</Link>
                 }
-                <Link className="px-2 py-1 hover:text-primary-400 transition-colors whitespace-nowrap" href={`#typedata`}>Tipos</Link>
-                <Link className="px-2 py-1 hover:text-primary-400 transition-colors whitespace-nowrap" href={`#stats`}>Estadísticas</Link>
-                <Link className="px-2 py-1 hover:text-primary-400 transition-colors whitespace-nowrap" href={`#spawns`}>Localizaciones</Link>
-                <Link className="px-2 py-1 hover:text-primary-400 transition-colors whitespace-nowrap" href={`#moves`}>Movimientos</Link>
-                <Link className="px-2 py-1 hover:text-primary-400 transition-colors whitespace-nowrap" href={`#palettes`}>Variantes</Link>
+                <Link className="px-2 py-1 hover:text-primary-hover transition-colors whitespace-nowrap" href={`#typedata`}>Tipos</Link>
+                <Link className="px-2 py-1 hover:text-primary-hover transition-colors whitespace-nowrap" href={`#stats`}>Estadísticas</Link>
+                <Link className="px-2 py-1 hover:text-primary-hover transition-colors whitespace-nowrap" href={`#spawns`}>Localizaciones</Link>
+                <Link className="px-2 py-1 hover:text-primary-hover transition-colors whitespace-nowrap" href={`#moves`}>Movimientos</Link>
+                <Link className="px-2 py-1 hover:text-primary-hover transition-colors whitespace-nowrap" href={`#palettes`}>Variantes</Link>
             </div>
         </header>
     );

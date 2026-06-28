@@ -30,7 +30,7 @@ export function BusinessSection({ townData, townName }: BusinessSectionProps) {
       colorClaro={colorClaro}
       colorMedio={colorMedio}
       colorOscuro={colorOscuro}
-      backgroundGradient="bg-gradient-to-br from-surface-600 to-surface-800"
+      backgroundGradient="bg-gradient-to-br from-layer-3 to-layer-2"
     >
       <div className="container mx-auto px-4">
         <SectionHeader

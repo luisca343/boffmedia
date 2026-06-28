@@ -50,40 +50,40 @@ export function Combobox({
   
   const variantStyles = {
     default: {
-      button: "bg-surface-700 text-surface-50 border-surface-600 hover:bg-surface-700 focus:ring-primary-400 transition-colors disabled:opacity-50",
-      content: "bg-surface-700 border-surface-600",
-      command: "bg-surface-700 rounded-md",
-      input: "bg-surface-700 text-surface-50 placeholder-surface-400 border-surface-600 focus:ring-primary-400",
-      item: "text-surface-50 bg-surface-700 hover:bg-surface-700",
-      itemSelected: "bg-surface-700 text-surface-50",
-      emptyText: "text-surface-300"
+      button: "bg-layer-3 text-ink border-edge hover:bg-layer-3 focus:ring-primary transition-colors disabled:opacity-50",
+      content: "bg-layer-3 border-edge",
+      command: "bg-layer-3 rounded-md",
+      input: "bg-layer-3 text-ink placeholder-ink-dim border-edge focus:ring-primary",
+      item: "text-ink bg-layer-3 hover:bg-layer-3",
+      itemSelected: "bg-layer-3 text-ink",
+      emptyText: "text-ink"
     },
     wingull: {
-      button: "bg-secondary-900 text-secondary-300 border-secondary-800 hover:bg-secondary-800 focus:ring-secondary-400",
-      content: "bg-secondary-900 border-secondary-800",
-      command: "bg-secondary-900 rounded-md",
-      input: "bg-secondary-900 text-secondary-300 placeholder-secondary-500 border-secondary-800 focus:ring-secondary-400",
-      item: "text-secondary-300 bg-secondary-900 hover:bg-secondary-950",
-      itemSelected: "bg-secondary-950 text-secondary-300",
-      emptyText: "text-secondary-300"
+      button: "bg-secondary-soft text-secondary-hover border-secondary-active hover:bg-secondary-soft focus:ring-secondary",
+      content: "bg-secondary-soft border-secondary-active",
+      command: "bg-secondary-soft rounded-md",
+      input: "bg-secondary-soft text-secondary-hover placeholder-secondary border-secondary-active focus:ring-secondary",
+      item: "text-secondary-hover bg-secondary-soft hover:bg-secondary-soft",
+      itemSelected: "bg-secondary-soft text-secondary-hover",
+      emptyText: "text-secondary-hover"
     },
     orange: {
-      button: "bg-surface-800 text-orange-100 border-orange-600 hover:bg-surface-700 focus:ring-orange-500",
-      content: "bg-surface-800 border-orange-600",
-      command: "bg-surface-800 rounded-md",
-      input: "bg-surface-700 text-orange-100 placeholder-orange-300 border-orange-600 focus:ring-orange-500",
-      item: "text-orange-100 bg-surface-800 hover:bg-surface-900",
-      itemSelected: "bg-surface-900 text-orange-100",
+      button: "bg-layer-2 text-orange-100 border-orange-600 hover:bg-layer-3 focus:ring-orange-500",
+      content: "bg-layer-2 border-orange-600",
+      command: "bg-layer-2 rounded-md",
+      input: "bg-layer-3 text-orange-100 placeholder-orange-300 border-orange-600 focus:ring-orange-500",
+      item: "text-orange-100 bg-layer-2 hover:bg-layer-1",
+      itemSelected: "bg-layer-1 text-orange-100",
       emptyText: "text-orange-300"
     },
     boff: {
-      button: "bg-surface-800 text-surface-100 border-surface-600/60 hover:bg-surface-700 hover:border-secondary-500/50 focus:ring-secondary-400/30 disabled:opacity-40 transition-all duration-200",
-      content: "bg-surface-800 border-surface-600/60",
-      command: "bg-surface-800 rounded-md",
-      input: "bg-surface-800 text-surface-100 placeholder-surface-400 border-surface-600/60 focus:ring-secondary-400/30",
-      item: "text-surface-100 bg-surface-800 hover:bg-surface-700",
-      itemSelected: "bg-surface-700 text-secondary-200",
-      emptyText: "text-surface-400"
+      button: "bg-layer-2 text-ink border-edge/60 hover:bg-layer-3 hover:border-secondary/50 focus:ring-secondary/30 disabled:opacity-40 transition-all duration-200",
+      content: "bg-layer-2 border-edge/60",
+      command: "bg-layer-2 rounded-md",
+      input: "bg-layer-2 text-ink placeholder-ink-dim border-edge/60 focus:ring-secondary/30",
+      item: "text-ink bg-layer-2 hover:bg-layer-3",
+      itemSelected: "bg-layer-3 text-secondary-hover",
+      emptyText: "text-ink-muted"
     },
   }
 
@@ -144,10 +144,10 @@ export function Combobox({
                     className={cn(
                       "mr-2 h-4 w-4",
                       value === element.value ? "opacity-100" : "opacity-0",
-                      variant === 'default' && "text-primary-400",
+                      variant === 'default' && "text-primary-hover",
                       variant === 'orange' && "text-orange-500",
-                      variant === 'wingull' && "text-secondary-400",
-                      variant === 'boff' && "text-secondary-400"
+                      variant === 'wingull' && "text-secondary-hover",
+                      variant === 'boff' && "text-secondary-hover"
                     )}
                   />
                   {element.label}

@@ -84,23 +84,23 @@ export default function MangaMetadataForm({ seriesSlug }: Props) {
     setTimeout(() => setSaved(false), 2000);
   }
 
-  const inputCls = "h-8 text-sm bg-[var(--surface-2)] border-[var(--border-strong)] text-[var(--text)] placeholder-[var(--text-dim)]";
+  const inputCls = "h-8 text-sm bg-layer-2 border-edge-strong text-ink placeholder-[var(--text-dim)]";
 
   return (
     <div className="space-y-3">
-      <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wide">{t("metadata")}</p>
+      <p className="text-xs font-medium text-ink-muted uppercase tracking-wide">{t("metadata")}</p>
 
       <div className="space-y-1">
-        <label className="text-xs text-[var(--text-muted)]">{t("metaTitle")}</label>
+        <label className="text-xs text-ink-muted">{t("metaTitle")}</label>
         <Input {...field("title")} className={inputCls} />
       </div>
 
       <div className="space-y-1">
-        <label className="text-xs text-[var(--text-muted)]">{t("metaLanguage")}</label>
+        <label className="text-xs text-ink-muted">{t("metaLanguage")}</label>
         <select
           value={form.language ?? "en"}
           onChange={(e) => setForm((f) => ({ ...f, language: e.target.value }))}
-          className="w-full h-8 rounded-md border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text)] text-sm px-2 focus:outline-none focus:ring-1 focus:ring-[var(--orange-500)]"
+          className="w-full h-8 rounded-md border border-edge-strong bg-layer-2 text-ink text-sm px-2 focus:outline-none focus:ring-1 focus:ring-[var(--orange-500)]"
         >
           {LANGUAGES.map((l) => (
             <option key={l.value} value={l.value}>{l.label}</option>
@@ -109,7 +109,7 @@ export default function MangaMetadataForm({ seriesSlug }: Props) {
       </div>
 
       <div className="space-y-1">
-        <label className="text-xs text-[var(--text-muted)]">{t("metaAuthor")}</label>
+        <label className="text-xs text-ink-muted">{t("metaAuthor")}</label>
         <Input {...field("author")} className={inputCls}
           onBlur={() => { if (form.author && !form.authorSort) setForm((f) => ({ ...f, authorSort: autoSort(f.author ?? "") })); }} />
         <div className="flex gap-1.5 items-center">
@@ -122,7 +122,7 @@ export default function MangaMetadataForm({ seriesSlug }: Props) {
       </div>
 
       <div className="space-y-1">
-        <label className="text-xs text-[var(--text-muted)]">{t("metaIllustrator")}</label>
+        <label className="text-xs text-ink-muted">{t("metaIllustrator")}</label>
         <Input {...field("illustrator")} className={inputCls}
           onBlur={() => { if (form.illustrator && !form.illustratorSort) setForm((f) => ({ ...f, illustratorSort: autoSort(f.illustrator ?? "") })); }} />
         <div className="flex gap-1.5 items-center">
@@ -136,17 +136,17 @@ export default function MangaMetadataForm({ seriesSlug }: Props) {
 
       <div className="flex gap-2">
         <div className="flex-1 space-y-1">
-          <label className="text-xs text-[var(--text-muted)]">{t("metaPublisher")}</label>
+          <label className="text-xs text-ink-muted">{t("metaPublisher")}</label>
           <Input {...field("publisher")} className={inputCls} />
         </div>
         <div className="w-20 space-y-1">
-          <label className="text-xs text-[var(--text-muted)]">{t("metaYear")}</label>
+          <label className="text-xs text-ink-muted">{t("metaYear")}</label>
           <Input {...field("date")} placeholder="YYYY" className={inputCls} maxLength={4} />
         </div>
       </div>
 
       <div className="space-y-1">
-        <label className="text-xs text-[var(--text-muted)]">{t("metaSubjects")}</label>
+        <label className="text-xs text-ink-muted">{t("metaSubjects")}</label>
         <Input value={subjectsText} onChange={(e) => setSubjectsText(e.target.value)}
           placeholder={t("metaSubjectsHint")} className={inputCls} />
       </div>

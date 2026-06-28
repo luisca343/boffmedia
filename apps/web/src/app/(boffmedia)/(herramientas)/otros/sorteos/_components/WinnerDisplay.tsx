@@ -144,7 +144,7 @@ export function WinnerDisplay({ winner, onReset, roundNumber }: WinnerDisplayPro
       </motion.div>
 
       {/* Congrats */}
-      <motion.p variants={fadeUp} className="text-surface-400 text-sm tracking-wide mb-8">
+      <motion.p variants={fadeUp} className="text-ink-muted text-sm tracking-wide mb-8">
         ¡Felicidades al ganador del sorteo!
       </motion.p>
 

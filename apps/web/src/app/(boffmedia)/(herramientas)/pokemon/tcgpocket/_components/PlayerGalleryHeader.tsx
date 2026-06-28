@@ -62,27 +62,27 @@ export function PlayerGalleryHeader({
         <div className="relative">
           {/* Background decoration */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-32 h-1 bg-gradient-to-r from-transparent via-primary-500/30 to-transparent rounded-full"></div>
+            <div className="w-32 h-1 bg-gradient-to-r from-transparent via-primary/30 to-transparent rounded-full"></div>
           </div>
           
           {/* Main title with gradient */}
-          <h1 className="relative text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-surface-50 via-primary-300 to-surface-50 bg-clip-text text-transparent">
+          <h1 className="relative text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-base via-primary-hover to-base bg-clip-text text-transparent">
             {t('gallery.header.title', { username })}
           </h1>
         </div>
         
         {/* Stats card */}
-        <div className="inline-flex items-center gap-3 bg-surface-700/30 border border-surface-600/30 rounded-full px-6 py-3 backdrop-blur-sm">
-          <HiSparkles className="w-5 h-5 text-primary-400" />
-          <span className="text-lg font-medium text-surface-50">
+        <div className="inline-flex items-center gap-3 bg-layer-3/30 border border-edge/30 rounded-full px-6 py-3 backdrop-blur-sm">
+          <HiSparkles className="w-5 h-5 text-primary-hover" />
+          <span className="text-lg font-medium text-ink">
             {t('gallery.header.cardCount', { count: cardCount })}
           </span>
-          <div className="w-2 h-2 bg-primary-500 rounded-full animate-pulse"></div>
+          <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
         </div>
       </div>
 
       {/* Compact Controls */}
-      <div className="bg-surface-700/50 border border-surface-600/50 rounded-xl p-4 space-y-4">
+      <div className="bg-layer-3/50 border border-edge/50 rounded-xl p-4 space-y-4">
         {/* Filters Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div className="relative">
@@ -91,26 +91,26 @@ export function PlayerGalleryHeader({
               placeholder={t('filter.searchPlaceholder')}
               value={nameFilter}
               onChange={(e) => setNameFilter(e.target.value)}
-              className="pl-10 bg-surface-800/50 border-surface-600/50 text-surface-50 hover:bg-surface-800 focus:border-primary-400 transition-colors"
+              className="pl-10 bg-layer-2/50 border-edge/50 text-ink hover:bg-layer-2 focus:border-primary transition-colors"
             />
-            <HiMagnifyingGlass className="absolute left-3 top-1/2 transform -translate-y-1/2 text-surface-400 w-4 h-4" />
+            <HiMagnifyingGlass className="absolute left-3 top-1/2 transform -translate-y-1/2 text-ink-muted w-4 h-4" />
           </div>
           <Select value={expansionFilter} onValueChange={setExpansionFilter}>
-            <SelectTrigger className="bg-surface-800/50 border-surface-600/50 text-surface-50 hover:bg-surface-800 focus:border-primary-400 transition-colors">
+            <SelectTrigger className="bg-layer-2/50 border-edge/50 text-ink hover:bg-layer-2 focus:border-primary transition-colors">
               <div className="flex items-center">
-                <HiFunnel className="w-4 h-4 mr-2 text-surface-400" />
+                <HiFunnel className="w-4 h-4 mr-2 text-ink-muted" />
                 <SelectValue placeholder={t('filter.expansionPlaceholder')} />
               </div>
             </SelectTrigger>
-            <SelectContent className="bg-surface-700/95 border-surface-600/50 backdrop-blur-sm">
-              <SelectItem value="all" className="text-surface-50 hover:bg-surface-600/50">
+            <SelectContent className="bg-layer-3/95 border-edge/50 backdrop-blur-sm">
+              <SelectItem value="all" className="text-ink hover:bg-layer-3/50">
                 {t('filter.allExpansions')}
               </SelectItem>
               {expansions.map((expansion) => (
                 <SelectItem 
                   key={expansion} 
                   value={expansion}
-                  className="text-surface-50 hover:bg-surface-600/50"
+                  className="text-ink hover:bg-layer-3/50"
                 >
                   {expansion}
                 </SelectItem>
@@ -131,7 +131,7 @@ export function PlayerGalleryHeader({
                     checked={hideMissingCards}
                     onCheckedChange={setHideMissingCards}
                   />
-                  <Label htmlFor="hide-missing" className="text-surface-200 text-sm cursor-pointer">
+                  <Label htmlFor="hide-missing" className="text-ink text-sm cursor-pointer">
                     {t('gallery.options.hideMissing')}
                   </Label>
                 </div>
@@ -141,7 +141,7 @@ export function PlayerGalleryHeader({
                     checked={showAmounts}
                     onCheckedChange={setShowAmounts}
                   />
-                  <Label htmlFor="show-amounts" className="text-surface-200 text-sm cursor-pointer">
+                  <Label htmlFor="show-amounts" className="text-ink text-sm cursor-pointer">
                     {t('gallery.options.showAmounts')}
                   </Label>
                 </div>
@@ -152,23 +152,23 @@ export function PlayerGalleryHeader({
             {editable && selectedEvent && setSelectedEvent && getBestPack && onRecentUpdatesClick && (
               <div className="flex flex-col sm:flex-row gap-3">
                 <Select value={selectedEvent} onValueChange={setSelectedEvent}>
-                  <SelectTrigger className="w-full sm:w-[200px] bg-surface-800/50 border-surface-600/50 text-surface-50 hover:bg-surface-800 transition-colors">
+                  <SelectTrigger className="w-full sm:w-[200px] bg-layer-2/50 border-edge/50 text-ink hover:bg-layer-2 transition-colors">
                     <SelectValue placeholder={t('gallery.options.selectEvent')} />
                   </SelectTrigger>
-                  <SelectContent className="bg-surface-700/95 border-surface-600/50 backdrop-blur-sm">
-                    <SelectItem value="general" className="text-surface-50 hover:bg-surface-600/50">
+                  <SelectContent className="bg-layer-3/95 border-edge/50 backdrop-blur-sm">
+                    <SelectItem value="general" className="text-ink hover:bg-layer-3/50">
                       {t('gallery.options.allCards')}
                     </SelectItem>
-                    <SelectItem value="expansion:geneticapex" className="text-surface-50 hover:bg-surface-600/50">
+                    <SelectItem value="expansion:geneticapex" className="text-ink hover:bg-layer-3/50">
                       {t("geneticapex")}
                     </SelectItem>
-                    <SelectItem value="expansion:mythicalisland" className="text-surface-50 hover:bg-surface-600/50">
+                    <SelectItem value="expansion:mythicalisland" className="text-ink hover:bg-layer-3/50">
                       {t("mythicalisland")}
                     </SelectItem>
-                    <SelectItem value="event:mewQuest" className="text-surface-50 hover:bg-surface-600/50">
+                    <SelectItem value="event:mewQuest" className="text-ink hover:bg-layer-3/50">
                       {t("mewQuest")}
                     </SelectItem>
-                    <SelectItem value="expansion:space-timesmackdown" className="text-surface-50 hover:bg-surface-600/50">
+                    <SelectItem value="expansion:space-timesmackdown" className="text-ink hover:bg-layer-3/50">
                       {t("space-timesmackdown")}
                     </SelectItem>
                   </SelectContent>

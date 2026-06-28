@@ -76,13 +76,13 @@ const SheetContent = React.forwardRef<
   const variant = useSheetVariant()
   
   const variantStyles = {
-    default: "bg-surface-800 border-surface-700 text-surface-100",
-    wingull: "bg-secondary-900 border-secondary-700 text-secondary-100"
+    default: "bg-layer-2 border-edge text-ink",
+    wingull: "bg-secondary-soft border-secondary-active text-secondary-hover"
   }
   
   const closeButtonStyles = {
-    default: "ring-offset-surface-900 focus:ring-primary-300 data-[state=open]:bg-surface-800",
-    wingull: "ring-offset-secondary-950 focus:ring-secondary-300 data-[state=open]:bg-secondary-900"
+    default: "ring-offset-layer-1 focus:ring-primary data-[state=open]:bg-layer-2",
+    wingull: "ring-offset-secondary-soft focus:ring-secondary data-[state=open]:bg-secondary-soft"
   }
   
   return (
@@ -142,8 +142,8 @@ const SheetTitle = React.forwardRef<
   const variant = useSheetVariant()
   
   const variantStyles = {
-    default: "text-primary-400",
-    wingull: "text-secondary-300"
+    default: "text-primary-hover",
+    wingull: "text-secondary-hover"
   }
   
   return (
@@ -163,8 +163,8 @@ const SheetDescription = React.forwardRef<
   const variant = useSheetVariant()
   
   const variantStyles = {
-    default: "text-surface-400",
-    wingull: "text-secondary-400"
+    default: "text-ink-muted",
+    wingull: "text-secondary-hover"
   }
   
   return (

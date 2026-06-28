@@ -31,7 +31,7 @@ export function PalettesSection({ palettes, pokemonIndex, formName }: PalettesSe
     <PokedexSection id='palettes' title="Variantes">
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 justify-items-center">
           {uniquePalettes.map((palette, idx) => {
-            return <div key={idx} className="flex flex-col justify-center items-center p-3 bg-surface-800/50 rounded-lg border border-surface-700/50 hover:border-surface-600 transition-colors">
+            return <div key={idx} className="flex flex-col justify-center items-center p-3 bg-layer-2/50 rounded-lg border border-edge/50 hover:border-edge transition-colors">
               <PokemonSprite
                 width={80} 
                 height={80} 

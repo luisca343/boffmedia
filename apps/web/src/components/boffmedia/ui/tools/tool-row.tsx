@@ -24,7 +24,7 @@ export function ToolRow({ tool, onClick, delay = 0 }: ToolRowProps) {
 
   return (
     <button
-      className="flex flex-col gap-4 p-6 text-left cursor-pointer bg-[var(--card-bg)] border border-[var(--border)] rounded-[var(--radius-lg)] shadow-[var(--card-shadow)] transition-all duration-[var(--dur)] ease-[var(--ease)] hover:border-[color-mix(in_srgb,var(--orange-500)_50%,var(--border))] hover:shadow-[var(--card-shadow-hover)] hover:-translate-y-[3px]"
+      className="flex flex-col gap-4 p-6 text-left cursor-pointer bg-[var(--card-bg)] border border-edge rounded-[var(--radius-lg)] shadow-[var(--card-shadow)] transition-all duration-[var(--dur)] ease-[var(--ease)] hover:border-[color-mix(in_srgb,var(--orange-500)_50%,var(--border))] hover:shadow-[var(--card-shadow-hover)] hover:-translate-y-[3px]"
       style={{ transitionDelay: `${delay}ms` }}
       onClick={onClick}
     >
@@ -33,14 +33,14 @@ export function ToolRow({ tool, onClick, delay = 0 }: ToolRowProps) {
           <Icon name={tool.icon} size={22} />
         </span>
         <div className="flex flex-col gap-[0.35rem] flex-1 min-w-0">
-          <span className="font-mono text-xs tracking-[0.1em] uppercase text-[var(--text-dim)]">{tool.cat}</span>
+          <span className="font-mono text-xs tracking-[0.1em] uppercase text-ink-dim">{tool.cat}</span>
           <span className="font-display font-bold text-lg">{tool.name}</span>
-          <span className="text-sm text-[var(--text-muted)] leading-[1.55]">{tool.desc}</span>
+          <span className="text-sm text-ink-muted leading-[1.55]">{tool.desc}</span>
         </div>
       </div>
       <div className="flex items-center justify-between">
         <Badge kind={statusKind}>{statusLabel}</Badge>
-        <Icon name="arrow" size={16} className="text-[var(--text-dim)]" />
+        <Icon name="arrow" size={16} className="text-ink-dim" />
       </div>
     </button>
   )

@@ -111,7 +111,7 @@ function StatCard({ icon: Icon, label, value, color, border, bg }: StatCardProps
         >
           {value}
         </div>
-        <div className="text-xs font-mono text-surface-500 uppercase tracking-widest">{label}</div>
+        <div className="text-xs font-mono text-ink-muted uppercase tracking-widest">{label}</div>
       </div>
     </div>
   )
@@ -221,7 +221,7 @@ function AchievementCard({ achievement }: { achievement: AchievementWithProgress
         {(achievement.maxProgress ?? 0) > 1 && (
           <div className="mb-4">
             <div className="flex items-center justify-between text-[10px] font-mono mb-1.5">
-              <span className="text-surface-500">Progreso</span>
+              <span className="text-ink-muted">Progreso</span>
               <span style={{ color: locked ? "rgba(100,116,139,0.5)" : tokens.color }}>
                 {achievement.currentProgress}/{achievement.maxProgress}
               </span>
@@ -405,7 +405,7 @@ export default function EventAchievementsPage() {
           variant="outline"
           size="sm"
           asChild
-          className="gap-2 text-surface-200 hover:text-surface-50"
+          className="gap-2 text-ink hover:text-ink"
           style={{ background: "rgba(30,41,59,0.7)", borderColor: "rgba(71,85,105,0.55)" }}
         >
           <InternalLink href={`/eventos/${eventId}`}>
@@ -431,7 +431,7 @@ export default function EventAchievementsPage() {
 
             {/* Text */}
             <div className="flex-1 text-center md:text-left">
-              <p className="text-[10px] font-mono uppercase tracking-widest text-surface-500 mb-1">
+              <p className="text-[10px] font-mono uppercase tracking-widest text-ink-muted mb-1">
                 {event?.title}
               </p>
               <h1
@@ -462,7 +462,7 @@ export default function EventAchievementsPage() {
                 >
                   {completionRate.toFixed(0)}%
                 </div>
-                <p className="text-[10px] font-mono uppercase tracking-widest text-surface-500">
+                <p className="text-[10px] font-mono uppercase tracking-widest text-ink-muted">
                   completado
                 </p>
               </div>
@@ -517,7 +517,7 @@ export default function EventAchievementsPage() {
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <Zap className="w-4 h-4" style={{ color: "rgba(249,115,22,0.7)" }} />
-              <span className="text-sm font-semibold text-surface-300">Progreso General</span>
+              <span className="text-sm font-semibold text-ink">Progreso General</span>
             </div>
             <span className="text-sm font-black font-mono" style={{ color: "rgba(251,146,60,0.9)" }}>
               {unlockedCount}/{totalCount}
@@ -588,7 +588,7 @@ export default function EventAchievementsPage() {
             >
               No se encontraron logros
             </p>
-            <p className="text-sm text-surface-500 max-w-md text-center">
+            <p className="text-sm text-ink-muted max-w-md text-center">
               {searchTerm
                 ? "Intenta con términos de búsqueda diferentes o cambia los filtros."
                 : "No hay logros disponibles para este filtro."}

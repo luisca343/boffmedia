@@ -32,9 +32,9 @@ export function LeaderboardCard({
 
   const getRankBadgeStyles = (index: number) => {
     if (index === 0) return 'bg-gradient-to-br from-yellow-400 to-yellow-600 text-black'
-    if (index === 1) return 'bg-gradient-to-br from-surface-300 to-surface-500 text-black'
+    if (index === 1) return 'bg-gradient-to-br from-layer-2 to-layer-3 text-black'
     if (index === 2) return 'bg-gradient-to-br from-amber-600 to-amber-800 text-white'
-    return 'bg-gradient-to-br from-accent-600 to-indigo-600 text-white'
+    return 'bg-gradient-to-br from-secondary-active to-indigo-600 text-white'
   }
 
   const getRankIcon = (index: number) => {
@@ -47,7 +47,7 @@ export function LeaderboardCard({
   const getCardBorderStyle = (index: number) => {
     return index < 3 
       ? 'border-yellow-500/30 shadow-lg shadow-yellow-500/10' 
-      : 'border-accent-500/20'
+      : 'border-secondary/20'
   }
 
   const getScoreDisplay = () => {
@@ -79,7 +79,7 @@ export function LeaderboardCard({
 
   return (
     <Card 
-      className={`bg-surface-800/60 backdrop-blur-sm transition-all hover:scale-105 ${getCardBorderStyle(rankIndex)} ${className}`}
+      className={`bg-layer-2/60 backdrop-blur-sm transition-all hover:scale-105 ${getCardBorderStyle(rankIndex)} ${className}`}
     >
       <CardContent className="p-4">
         <div className="flex items-center gap-4">
@@ -95,7 +95,7 @@ export function LeaderboardCard({
             <h3 className="font-semibold text-white">
               {player.nickname || `Jugador ${player.userId}`}
             </h3>
-            <p className="text-surface-400 text-sm">
+            <p className="text-ink-muted text-sm">
               {player.achievementCount || 0} logros • {player.medalCount || 0} medallas
             </p>
           </div>
@@ -105,9 +105,9 @@ export function LeaderboardCard({
             <div className={`text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r ${scoreDisplay.gradient}`}>
               {scoreDisplay.score}
             </div>
-            <div className="text-surface-400 text-sm">{scoreDisplay.label}</div>
+            <div className="text-ink-muted text-sm">{scoreDisplay.label}</div>
             {scoreDisplay.breakdown && (
-              <div className="text-xs text-surface-500 mt-1">
+              <div className="text-xs text-ink-muted mt-1">
                 {scoreDisplay.breakdown}
               </div>
             )}

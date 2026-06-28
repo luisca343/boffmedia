@@ -11,37 +11,37 @@ export const badgeVariants = cva(
     variants: {
       variant: {
         default:
-          "border-transparent bg-gradient-to-r from-primary-600 to-primary-500 text-white shadow-sm",
+          "border-transparent bg-gradient-to-r from-primary-active to-primary text-white shadow-sm",
         secondary:
-          "border border-primary-500/20 bg-primary-500/10 text-primary-300",
+          "border border-primary/20 bg-primary/10 text-primary-hover",
         destructive:
-          "border-transparent bg-gradient-to-r from-error-700 to-error-500 text-white shadow-sm",
-        outline: "text-primary-300 border border-primary-400/50 bg-primary-400/5",
+          "border-transparent bg-gradient-to-r from-danger to-danger text-white shadow-sm",
+        outline: "text-primary-hover border border-primary/50 bg-primary-hover/5",
         success:
-          "border-transparent bg-gradient-to-r from-success-700 to-success-500 text-white shadow-sm",
+          "border-transparent bg-gradient-to-r from-success to-success text-white shadow-sm",
         warning:
-          "border-transparent bg-gradient-to-r from-warning-700 to-warning-500 text-white shadow-sm",
+          "border-transparent bg-gradient-to-r from-warning to-warning text-white shadow-sm",
       },
       theme: {
-        default: "focus:ring-primary-300 focus:ring-offset-surface-900",
-        wingull: "focus:ring-secondary-300 focus:ring-offset-secondary-950",
+        default: "focus:ring-primary focus:ring-offset-layer-1",
+        wingull: "focus:ring-secondary focus:ring-offset-secondary-soft",
       }
     },
     compoundVariants: [
       {
         variant: "default",
         theme: "wingull",
-        class: "from-secondary-600 to-secondary-500 text-white",
+        class: "from-secondary-active to-secondary text-white",
       },
       {
         variant: "secondary",
         theme: "wingull",
-        class: "border-secondary-500/20 bg-secondary-500/10 text-secondary-300",
+        class: "border-secondary/20 bg-secondary/10 text-secondary-hover",
       },
       {
         variant: "outline",
         theme: "wingull",
-        class: "text-secondary-300 border-secondary-400/50 bg-secondary-400/5",
+        class: "text-secondary-hover border-secondary/50 bg-secondary-hover/5",
       },
       {
         variant: "destructive",
@@ -51,7 +51,7 @@ export const badgeVariants = cva(
       {
         variant: "success",
         theme: "wingull",
-        class: "from-highlight-700 to-highlight-500",
+        class: "from-warning to-warning",
       },
       {
         variant: "warning",

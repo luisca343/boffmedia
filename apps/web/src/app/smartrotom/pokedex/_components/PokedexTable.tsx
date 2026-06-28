@@ -24,7 +24,7 @@ interface PokedexRowProps {
 
 export function PokedexRow({ children, className }: PokedexRowProps) {
   return (
-    <TableRow className={cn("transition-all hover:bg-surface-600/50 group", className)}>
+    <TableRow className={cn("transition-all hover:bg-layer-3/50 group", className)}>
       {children}
     </TableRow>
   )
@@ -55,8 +55,8 @@ export function PokedexCell({ children = '', className = '', colSpan = 1, hard =
     <TableCell 
       className={cn(
         "py-1 px-2 transition-colors",
-        hard ? "border-surface-600/50 bg-surface-900 text-surface-50" : "border-surface-600/50 text-surface-50",
-        "group-hover:border-surface-500",
+        hard ? "border-edge/50 bg-layer-1 text-ink" : "border-edge/50 text-ink",
+        "group-hover:border-edge",
         "first:pl-3 last:pr-3",
         className
       )} 
@@ -77,7 +77,7 @@ export function PokedexHead({ children, className, colSpan = 1 }: PokedexHeadPro
   return (
     <TableHead 
       className={cn(
-        "text-surface-50 font-bold p-4 text-left",
+        "text-ink font-bold p-4 text-left",
         "first:pl-6 last:pr-6",
         className
       )} 

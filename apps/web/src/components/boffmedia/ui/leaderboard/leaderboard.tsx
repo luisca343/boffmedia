@@ -25,7 +25,7 @@ export function Leaderboard({ leaders, season = "Temporada 3", title = "Top juga
     <Card ticks className="p-6 flex flex-col gap-[1.1rem]">
       <div className="flex items-start justify-between">
         <div>
-          <span className="font-mono text-xs tracking-[0.14em] uppercase text-[var(--text-dim)] block mb-[6px]">Clasificación</span>
+          <span className="font-mono text-xs tracking-[0.14em] uppercase text-ink-dim block mb-[6px]">Clasificación</span>
           <h3 className="text-xl m-0">{title}</h3>
         </div>
         <Badge kind="accent">{season}</Badge>

@@ -23,15 +23,15 @@ export function PokeDrawer({ poke, side, useChampions, onClose, onChange }: Prop
   return (
     <>
       <div className="fixed inset-0 z-40 bg-black/50" onClick={onClose} />
-      <div className="fixed right-0 top-0 h-full w-[360px] max-w-[92vw] z-50 flex flex-col bg-surface-950 shadow-2xl border-l border-surface-700/50">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-surface-700/40 shrink-0">
-          <span className="text-sm font-bold text-surface-100">
+      <div className="fixed right-0 top-0 h-full w-[360px] max-w-[92vw] z-50 flex flex-col bg-base shadow-2xl border-l border-edge/50">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-edge/40 shrink-0">
+          <span className="text-sm font-bold text-ink">
             {side === 'atk' ? '⚔ Configure Attacker' : '🛡 Configure Defender'}
           </span>
           <button
             type="button"
             onClick={onClose}
-            className="flex items-center gap-1.5 text-[11px] text-surface-500 hover:text-surface-200 transition-colors"
+            className="flex items-center gap-1.5 text-[11px] text-ink-muted hover:text-ink transition-colors"
           >
             <X className="w-3.5 h-3.5" /> Close
           </button>

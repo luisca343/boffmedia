@@ -6,14 +6,14 @@ interface SectionHeaderProps {
 
 export function SectionHeader({ icon, title, subtitle }: SectionHeaderProps) {
   return (
-    <div className="flex items-center gap-3 mb-6 pb-3 border-b border-surface-600/50">
-      <div className="p-2 rounded-lg bg-surface-700/50 border border-surface-600/50 text-surface-200">
+    <div className="flex items-center gap-3 mb-6 pb-3 border-b border-edge/50">
+      <div className="p-2 rounded-lg bg-layer-3/50 border border-edge/50 text-ink">
         {icon}
       </div>
       <div>
-        <h3 className="text-xl font-semibold text-surface-50">{title}</h3>
+        <h3 className="text-xl font-semibold text-ink">{title}</h3>
         {subtitle && (
-          <p className="text-sm text-surface-400">{subtitle}</p>
+          <p className="text-sm text-ink-muted">{subtitle}</p>
         )}
       </div>
     </div>

@@ -74,7 +74,7 @@ export function DesktopSidebar({ gameConfig, isActive }: DesktopSidebarProps) {
                   color: gameConfig.color ? "var(--orange-400)" : "var(--text-dim)",
                   background: gameConfig.color
                     ? "color-mix(in srgb, var(--orange-500) 20%, transparent)"
-                    : "var(--surface-3)",
+                    : "var(--layer-3)",
                   borderColor: gameConfig.color
                     ? "color-mix(in srgb, var(--orange-500) 45%, transparent)"
                     : "var(--border-strong)",
@@ -97,7 +97,7 @@ export function DesktopSidebar({ gameConfig, isActive }: DesktopSidebarProps) {
 
           {switcherOpen && (
             <div
-              className="absolute top-full left-3 right-3 z-50 mt-1 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface)] shadow-[var(--card-shadow)] py-1"
+              className="absolute top-full left-3 right-3 z-50 mt-1 rounded-[var(--radius-lg)] border border-edge bg-layer-1 shadow-[var(--card-shadow)] py-1"
               onClick={() => setSwitcherOpen(false)}
             >
               {GAMES.map((g) => {
@@ -109,7 +109,7 @@ export function DesktopSidebar({ gameConfig, isActive }: DesktopSidebarProps) {
                     className={`flex items-center gap-[0.6rem] w-full text-left px-3 py-[0.55rem] border-0 bg-transparent cursor-pointer text-[length:var(--t-sm)] transition-[background,color] duration-[var(--dur)] ${
                       isCurrent
                         ? "text-[var(--orange-500)] bg-[color-mix(in_srgb,var(--orange-500)_10%,transparent)]"
-                        : "text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
+                        : "text-ink-muted hover:bg-layer-2 hover:text-ink"
                     }`}
                   >
                     {g.icon && (
@@ -129,7 +129,7 @@ export function DesktopSidebar({ gameConfig, isActive }: DesktopSidebarProps) {
               {category.href ? (
                 <Link
                   href={category.href}
-                  className="font-mono text-[0.6rem] tracking-[0.14em] uppercase px-2 mb-2.5 h-[0.9rem] whitespace-nowrap opacity-0 transition-opacity duration-[var(--dur,0.32s)] ease-[var(--ease)] group-hover:opacity-100 hover:text-[var(--text)]"
+                  className="font-mono text-[0.6rem] tracking-[0.14em] uppercase px-2 mb-2.5 h-[0.9rem] whitespace-nowrap opacity-0 transition-opacity duration-[var(--dur,0.32s)] ease-[var(--ease)] group-hover:opacity-100 hover:text-ink"
                   style={{ color: "var(--text-dim, #71737f)" }}
                 >
                   {t(category.name)}

@@ -41,13 +41,13 @@ export function ToolCommand({ tools = [], go, className = "" }: ToolCommandProps
       trigger={
         <button
           className={
-            "flex items-center gap-[0.6rem] w-full cursor-pointer px-[0.9rem] h-[48px] rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-2)] text-[color:var(--text-muted)] text-[length:var(--t-sm)] transition-all duration-[var(--dur)] hover:border-[var(--orange-500)] hover:bg-[var(--surface)]" +
+            "flex items-center gap-[0.6rem] w-full cursor-pointer px-[0.9rem] h-[48px] rounded-[var(--radius-lg)] border border-edge-strong bg-layer-2 text-ink-muted text-[length:var(--t-sm)] transition-all duration-[var(--dur)] hover:border-[var(--orange-500)] hover:bg-layer-1" +
             (className ? " " + className : "")
           }
         >
           <Icon name="search" size={16} />
           <span className="flex-1 text-left">Buscar herramienta…</span>
-          <kbd className="font-mono text-[length:var(--t-xs)] px-[0.4rem] py-[0.15rem] rounded-[5px] bg-[var(--surface-3)] border border-[var(--border)] text-[color:var(--text-dim)]">
+          <kbd className="font-mono text-[length:var(--t-xs)] px-[0.4rem] py-[0.15rem] rounded-[5px] bg-layer-3 border border-edge text-ink-dim">
             ⌘K
           </kbd>
         </button>
@@ -55,27 +55,27 @@ export function ToolCommand({ tools = [], go, className = "" }: ToolCommandProps
     >
       {(close: () => void) => (
         <div className="flex flex-col">
-          <div className="flex items-center gap-[0.6rem] py-[0.4rem] px-[0.4rem] pb-4 border-b border-[var(--border)] text-[color:var(--text-dim)]">
+          <div className="flex items-center gap-[0.6rem] py-[0.4rem] px-[0.4rem] pb-4 border-b border-edge text-ink-dim">
             <Icon name="search" size={18} />
             <input
               autoFocus
               placeholder="Busca por herramienta, categoría o juego…"
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              className="flex-1 border-0 bg-transparent text-[color:var(--text)] font-[inherit] text-[length:var(--t-base)] outline-none"
+              className="flex-1 border-0 bg-transparent text-ink font-[inherit] text-[length:var(--t-base)] outline-none"
             />
-            <kbd className="font-mono text-[length:var(--t-xs)] text-[color:var(--text-dim)]">ESC</kbd>
+            <kbd className="font-mono text-[length:var(--t-xs)] text-ink-dim">ESC</kbd>
           </div>
           <div className="flex flex-col gap-[0.2rem] pt-3 max-h-[320px] overflow-y-auto">
             {results.length === 0 ? (
-              <div className="text-center text-[color:var(--text-dim)] text-[length:var(--t-sm)] py-6">
+              <div className="text-center text-ink-dim text-[length:var(--t-sm)] py-6">
                 Sin resultados para «{q}».
               </div>
             ) : (
               results.map((t) => (
                 <button
                   key={t.href}
-                  className="flex items-center gap-[0.7rem] w-full text-left border-0 bg-transparent text-[color:var(--text-muted)] font-[inherit] text-[length:var(--t-sm)] py-[0.6rem] px-[0.7rem] rounded-[var(--radius)] cursor-pointer transition-[background,color] duration-[var(--dur)] hover:bg-[var(--surface-2)] hover:text-[color:var(--text)] [&_svg]:text-[color:var(--text-dim)]"
+                  className="flex items-center gap-[0.7rem] w-full text-left border-0 bg-transparent text-ink-muted font-[inherit] text-[length:var(--t-sm)] py-[0.6rem] px-[0.7rem] rounded-[var(--radius)] cursor-pointer transition-[background,color] duration-[var(--dur)] hover:bg-layer-2 hover:text-ink [&_svg]:text-ink-dim"
                   onClick={() => {
                     if (!t.soon) {
                       go(t.href.replace(/^#/, ""))
@@ -86,7 +86,7 @@ export function ToolCommand({ tools = [], go, className = "" }: ToolCommandProps
                   <Icon name={t.icon} size={16} />
                   {t.title}
                   {t.gameShort && (
-                    <span className="ml-auto font-mono text-[length:var(--t-xs)] text-[color:var(--text-dim)]">
+                    <span className="ml-auto font-mono text-[length:var(--t-xs)] text-ink-dim">
                       {t.gameShort}
                     </span>
                   )}

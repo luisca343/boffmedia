@@ -6,7 +6,7 @@ interface RainbowTextProps {
   className?: string;
 }
 
-const colors = ['text-pink-500', 'text-cyan-400', 'text-yellow-300', 'text-highlight-400', 'text-accent-400', 'text-red-400', 'text-secondary-400', 'text-indigo-400'];
+const colors = ['text-pink-500', 'text-cyan-400', 'text-yellow-300', 'text-warning-hover', 'text-secondary-hover', 'text-red-400', 'text-secondary-hover', 'text-indigo-400'];
 
 const RainbowText = React.memo(({ text, size = 'md', className = '' }: RainbowTextProps) => {
   const shuffledColors = colors.sort(() => Math.random() - 0.5);

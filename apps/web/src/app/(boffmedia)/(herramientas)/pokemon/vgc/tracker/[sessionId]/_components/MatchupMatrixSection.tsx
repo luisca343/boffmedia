@@ -22,51 +22,51 @@ export function MatchupMatrixSection({ pairs }: Props) {
 
   return (
     <Card className="overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-surface-700">
-        <h3 className="text-sm font-semibold text-surface-300">{t('matchupMatrix.title')}</h3>
+      <div className="flex items-center justify-between px-4 py-3 border-b border-edge">
+        <h3 className="text-sm font-semibold text-ink">{t('matchupMatrix.title')}</h3>
         <button
           onClick={() => setMinGames((n) => (n === MIN_GAMES ? 1 : MIN_GAMES))}
-          className="text-xs text-surface-500 hover:text-surface-300 transition-colors border border-surface-700 rounded px-2 py-0.5"
+          className="text-xs text-ink-muted hover:text-ink transition-colors border border-edge rounded px-2 py-0.5"
         >
           {t('matchupMatrix.minGames', { n: minGames })}
         </button>
       </div>
 
       {filtered.length === 0 ? (
-        <p className="px-4 py-4 text-xs text-surface-600">{t('matchupMatrix.noData')}</p>
+        <p className="px-4 py-4 text-xs text-ink-dim">{t('matchupMatrix.noData')}</p>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
             <thead>
-              <tr className="border-b border-surface-700">
-                <th className="text-left px-4 py-2 text-surface-500 font-medium">{t('matchupMatrix.pair')}</th>
-                <th className="text-center px-3 py-2 text-surface-500 font-medium">G</th>
-                <th className="text-center px-3 py-2 text-surface-500 font-medium">W/L</th>
-                <th className="text-center px-3 py-2 text-surface-500 font-medium">WR</th>
+              <tr className="border-b border-edge">
+                <th className="text-left px-4 py-2 text-ink-muted font-medium">{t('matchupMatrix.pair')}</th>
+                <th className="text-center px-3 py-2 text-ink-muted font-medium">G</th>
+                <th className="text-center px-3 py-2 text-ink-muted font-medium">W/L</th>
+                <th className="text-center px-3 py-2 text-ink-muted font-medium">WR</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((p) => {
                 const wr = p.winRate;
                 const wrColor =
-                  wr === null ? 'text-surface-500'
+                  wr === null ? 'text-ink-muted'
                   : wr >= 0.6 ? 'text-green-400'
-                  : wr >= 0.4 ? 'text-surface-300'
+                  : wr >= 0.4 ? 'text-ink'
                   : 'text-red-400';
                 return (
-                  <tr key={`${p.pokemon1Id}+${p.pokemon2Id}`} className="border-b border-surface-700/40 hover:bg-surface-700/30 transition-colors">
+                  <tr key={`${p.pokemon1Id}+${p.pokemon2Id}`} className="border-b border-edge/40 hover:bg-layer-3/30 transition-colors">
                     <td className="px-4 py-2">
                       <div className="flex items-center gap-1.5">
                         <img src={spriteUrl(p.pokemon1Name)} alt={p.pokemon1Name} className="w-6 h-6 object-contain" onError={handleSpriteError} />
-                        <span className="text-surface-400 text-[10px]">+</span>
+                        <span className="text-ink-muted text-[10px]">+</span>
                         <img src={spriteUrl(p.pokemon2Name)} alt={p.pokemon2Name} className="w-6 h-6 object-contain" onError={handleSpriteError} />
-                        <span className="text-surface-300 truncate max-w-[120px]">{p.pokemon1Name} + {p.pokemon2Name}</span>
+                        <span className="text-ink truncate max-w-[120px]">{p.pokemon1Name} + {p.pokemon2Name}</span>
                       </div>
                     </td>
-                    <td className="text-center px-3 py-2 text-surface-400 tabular-nums">{p.games}</td>
+                    <td className="text-center px-3 py-2 text-ink-muted tabular-nums">{p.games}</td>
                     <td className="text-center px-3 py-2 tabular-nums">
                       <span className="text-green-400">{p.wins}</span>
-                      <span className="text-surface-600">/</span>
+                      <span className="text-ink-dim">/</span>
                       <span className="text-red-400">{p.losses}</span>
                     </td>
                     <td className={`text-center px-3 py-2 font-semibold tabular-nums ${wrColor}`}>

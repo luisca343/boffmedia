@@ -61,20 +61,20 @@ export function PasteImportModal({ regulationId, maxSlots, legalPokemon, onImpor
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="bg-surface-900 border border-surface-700/60 rounded-xl shadow-2xl w-[520px] max-w-[92vw] flex flex-col gap-3 p-4">
+      <div className="bg-layer-1 border border-edge/60 rounded-xl shadow-2xl w-[520px] max-w-[92vw] flex flex-col gap-3 p-4">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-bold text-surface-100">📋 Import PokéPaste</span>
-          <button type="button" onClick={onClose} className="text-surface-500 hover:text-surface-200 transition-colors">
+          <span className="text-sm font-bold text-ink">📋 Import PokéPaste</span>
+          <button type="button" onClick={onClose} className="text-ink-muted hover:text-ink transition-colors">
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        <p className="text-[11px] text-surface-500 leading-relaxed">
-          Paste a team in <span className="text-surface-300 font-mono">Showdown / PokéPaste</span> format.
+        <p className="text-[11px] text-ink-muted leading-relaxed">
+          Paste a team in <span className="text-ink font-mono">Showdown / PokéPaste</span> format.
         </p>
 
         <textarea
-          className="w-full h-48 bg-surface-950 border border-surface-700 rounded-lg px-3 py-2 text-xs font-mono text-surface-200 placeholder:text-surface-700 focus:outline-none focus:border-primary-500 resize-none"
+          className="w-full h-48 bg-base border border-edge rounded-lg px-3 py-2 text-xs font-mono text-ink placeholder:text-ink-dim focus:outline-none focus:border-primary resize-none"
           placeholder={'Miraidon @ Choice Specs\nAbility: Hadron Engine\nLevel: 50\nEVs: 4 HP / 252 SpA / 252 Spe\nTimid Nature\n- Electro Drift\n- Draco Meteor\n- Dazzling Gleam\n- Volt Switch'}
           value={text}
           onChange={(e) => { setText(e.target.value); setError('') }}
@@ -84,7 +84,7 @@ export function PasteImportModal({ regulationId, maxSlots, legalPokemon, onImpor
         {error && <p className="text-[11px] text-red-400 font-semibold">{error}</p>}
 
         <div className="flex items-center justify-between gap-3">
-          <span className="text-[11px] text-surface-600">
+          <span className="text-[11px] text-ink-dim">
             {!moveDataLoaded
               ? 'Loading move data…'
               : preview.length > 0
@@ -93,12 +93,12 @@ export function PasteImportModal({ regulationId, maxSlots, legalPokemon, onImpor
           </span>
           <div className="flex gap-2">
             <button type="button" onClick={onClose}
-              className="px-3 py-1.5 rounded text-xs font-semibold border border-surface-700/60 text-surface-400 hover:text-surface-200 transition-colors">
+              className="px-3 py-1.5 rounded text-xs font-semibold border border-edge/60 text-ink-muted hover:text-ink transition-colors">
               Cancel
             </button>
             <button type="button" onClick={handleImport}
               disabled={!preview.length || maxSlots === 0 || !moveDataLoaded}
-              className="px-3 py-1.5 rounded text-xs font-bold bg-primary-500/20 border border-primary-500/40 text-primary-300 hover:bg-primary-500/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+              className="px-3 py-1.5 rounded text-xs font-bold bg-primary/20 border border-primary/40 text-primary-hover hover:bg-primary/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
               Import ({Math.min(preview.length, maxSlots)} Pokémon)
             </button>
           </div>

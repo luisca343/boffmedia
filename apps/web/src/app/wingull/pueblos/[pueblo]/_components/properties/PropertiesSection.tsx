@@ -29,7 +29,7 @@ export function PropertiesSection({ townData, townName }: PropertiesSectionProps
       colorClaro={colorClaro}
       colorMedio={colorMedio}
       colorOscuro={colorOscuro}
-      backgroundGradient="bg-gradient-to-bl from-surface-800 to-surface-600"
+      backgroundGradient="bg-gradient-to-bl from-layer-2 to-layer-3"
     >
       
       <div className="absolute left-0 right-0 top-0 z-20 pointer-events-none" style={{height: '80px'}}>

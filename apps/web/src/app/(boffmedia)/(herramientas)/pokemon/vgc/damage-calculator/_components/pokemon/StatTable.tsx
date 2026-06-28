@@ -71,15 +71,15 @@ export function StatTable({ poke, onChange, useChampions = false, baseStats: api
   return (
     <table className="w-full text-xs border-collapse">
       <thead>
-        <tr className="border-b border-surface-700">
-          <th className="text-left text-surface-500 font-semibold pb-1 pr-2">{t('colStat')}</th>
-          <th className="text-center text-surface-500 font-semibold pb-1 px-1">{t('colBase')}</th>
-          <th className="text-center text-surface-500 font-semibold pb-1 px-1">{t('colStage')}</th>
-          <th className="text-center text-surface-500 font-semibold pb-1 px-1">{t('colIvs')}</th>
-          <th className="text-center text-surface-500 font-semibold pb-1 px-1">
+        <tr className="border-b border-edge">
+          <th className="text-left text-ink-muted font-semibold pb-1 pr-2">{t('colStat')}</th>
+          <th className="text-center text-ink-muted font-semibold pb-1 px-1">{t('colBase')}</th>
+          <th className="text-center text-ink-muted font-semibold pb-1 px-1">{t('colStage')}</th>
+          <th className="text-center text-ink-muted font-semibold pb-1 px-1">{t('colIvs')}</th>
+          <th className="text-center text-ink-muted font-semibold pb-1 px-1">
             {useChampions ? t('colSp') : t('colEvs')}
           </th>
-          <th className="text-center text-surface-500 font-semibold pb-1 px-1">{t('colTotal')}</th>
+          <th className="text-center text-ink-muted font-semibold pb-1 px-1">{t('colTotal')}</th>
         </tr>
       </thead>
       <tbody>
@@ -88,20 +88,20 @@ export function StatTable({ poke, onChange, useChampions = false, baseStats: api
           const isDown = minusStat === key
           const computed = computeStat(key)
           const textClass = isUp
-            ? 'text-success-400'
+            ? 'text-success-hover'
             : isDown
-              ? 'text-error-400'
-              : 'text-surface-300'
+              ? 'text-danger-hover'
+              : 'text-ink'
           const boost = key !== 'hp' ? poke.boosts[key as BoostKey] : 0
-          const boostTextClass = boost > 0 ? 'text-success-400' : boost < 0 ? 'text-error-400' : 'text-surface-500'
+          const boostTextClass = boost > 0 ? 'text-success-hover' : boost < 0 ? 'text-danger-hover' : 'text-ink-muted'
 
           return (
-            <tr key={key} className="border-b border-surface-800/50 last:border-0">
+            <tr key={key} className="border-b border-edge-strong/50 last:border-0">
               <td className={`py-0.5 pr-2 font-semibold ${textClass}`}>
                 {STAT_LABELS[key]}
                 {isUp ? ' ↑' : isDown ? ' ↓' : ''}
               </td>
-              <td className="text-center font-mono text-surface-400 px-1">
+              <td className="text-center font-mono text-ink-muted px-1">
                 {bs[key]}
               </td>
               <td className="text-center px-1">
@@ -109,14 +109,14 @@ export function StatTable({ poke, onChange, useChampions = false, baseStats: api
                   <select
                     value={boost}
                     onChange={(e) => updateBoost(key as BoostKey, parseInt(e.target.value))}
-                    className={`w-12 bg-surface-900 border border-surface-700 rounded text-center font-mono focus:outline-none focus:border-primary-500 text-xs py-0.5 ${boostTextClass}`}
+                    className={`w-12 bg-layer-1 border border-edge rounded text-center font-mono focus:outline-none focus:border-primary text-xs py-0.5 ${boostTextClass}`}
                   >
                     {BOOST_VALUES.map((v) => (
                       <option key={v} value={v}>{v > 0 ? `+${v}` : v}</option>
                     ))}
                   </select>
                 ) : (
-                  <span className="text-surface-600 text-[10px]">—</span>
+                  <span className="text-ink-dim text-[10px]">—</span>
                 )}
               </td>
               <td className="text-center px-1">
@@ -126,7 +126,7 @@ export function StatTable({ poke, onChange, useChampions = false, baseStats: api
                   max={31}
                   value={poke.ivs[key]}
                   onChange={(e) => updateIv(key, e.target.value)}
-                  className="w-10 bg-surface-900 border border-surface-700 rounded text-center font-mono text-surface-200 focus:outline-none focus:border-primary-500 text-xs py-0.5"
+                  className="w-10 bg-layer-1 border border-edge rounded text-center font-mono text-ink focus:outline-none focus:border-primary text-xs py-0.5"
                 />
               </td>
               <td className="text-center px-1">
@@ -137,8 +137,8 @@ export function StatTable({ poke, onChange, useChampions = false, baseStats: api
                   step={useChampions ? 1 : 4}
                   value={poke.evs[key]}
                   onChange={(e) => updateEv(key, e.target.value)}
-                  className={`w-10 bg-surface-900 border rounded text-center font-mono text-surface-200 focus:outline-none focus:border-primary-500 text-xs py-0.5 ${
-                    totalOver ? 'border-error-500' : 'border-surface-700'
+                  className={`w-10 bg-layer-1 border rounded text-center font-mono text-ink focus:outline-none focus:border-primary text-xs py-0.5 ${
+                    totalOver ? 'border-danger-border' : 'border-edge'
                   }`}
                 />
               </td>
@@ -148,16 +148,16 @@ export function StatTable({ poke, onChange, useChampions = false, baseStats: api
             </tr>
           )
         })}
-        <tr className="border-t border-surface-700">
+        <tr className="border-t border-edge">
           <td colSpan={3} />
           <td
-            className="pt-1 text-center text-surface-500 text-xs"
+            className="pt-1 text-center text-ink-muted text-xs"
           >
             {useChampions ? t('totalSp') : t('totalEvs')}
           </td>
           <td
             className={`text-center font-mono font-bold pt-1 text-xs ${
-              totalOver ? 'text-error-400' : 'text-surface-400'
+              totalOver ? 'text-danger-hover' : 'text-ink-muted'
             }`}
           >
             {totalEvs}

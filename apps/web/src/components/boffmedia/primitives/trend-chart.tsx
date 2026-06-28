@@ -83,7 +83,7 @@ export function TrendChart({
                 key={li}
                 d={d}
                 fill="none"
-                stroke={l.color || "var(--accent)"}
+                stroke={l.color || "var(--secondary)"}
                 strokeWidth={l.width || 2}
                 strokeDasharray={l.dashed ? "5 4" : undefined}
                 strokeLinejoin="round"
@@ -105,7 +105,7 @@ export function TrendChart({
                   cy={yAt(v)}
                   r={3}
                   fill={c}
-                  stroke="var(--surface)"
+                  stroke="var(--layer-1)"
                   strokeWidth={1}
                 />
               )

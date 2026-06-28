@@ -22,7 +22,7 @@ export function SystemMaintenance({ onDiscord, onRefresh }: SystemMaintenancePro
         <Icon name="cog" size={32} />
       </div>
       <span
-        className="inline-flex items-center gap-[0.5rem] mb-[1.2rem] px-[0.85rem] py-[0.4rem] rounded-[var(--radius-pill)] border border-[var(--border-strong)] bg-[var(--surface-2)] font-[var(--label-font)] text-[length:var(--t-xs)] tracking-[var(--label-spacing)] uppercase text-[var(--text-muted)]"
+        className="inline-flex items-center gap-[0.5rem] mb-[1.2rem] px-[0.85rem] py-[0.4rem] rounded-[var(--radius-pill)] border border-edge-strong bg-layer-2 font-[var(--label-font)] text-[length:var(--t-xs)] tracking-[var(--label-spacing)] uppercase text-ink-muted"
       >
         <span className="w-[7px] h-[7px] rounded-full bg-[var(--amber-400)]" style={{ animation: "pulse-dot 1.6s var(--ease) infinite" }} />
         Vuelve en ~30 min
@@ -30,7 +30,7 @@ export function SystemMaintenance({ onDiscord, onRefresh }: SystemMaintenancePro
       <h1 className="text-[length:var(--t-3xl)] leading-[1.05] mb-[0.7rem]">
         Estamos en mantenimiento
       </h1>
-      <p className="text-[var(--text-muted)] text-[length:var(--t-base)] max-w-[38ch] mx-auto mb-[1.6rem]">
+      <p className="text-ink-muted text-[length:var(--t-base)] max-w-[38ch] mx-auto mb-[1.6rem]">
         Estamos aplicando mejoras a la plataforma. Volveremos muy pronto — gracias por tu paciencia.
       </p>
       <div className="flex flex-wrap gap-[0.7rem] justify-center">

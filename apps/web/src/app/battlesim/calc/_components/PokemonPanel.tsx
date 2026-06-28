@@ -43,8 +43,8 @@ export default function PokemonPanel({ title, side }: PokemonPanelProps) {
   } = usePokemonPanelHandlers({ pokemon, pokemonState, setPokemonState, getPokemonAbilities });
 
   return (
-    <div className="border border-surface-700 rounded-lg p-3 bg-surface-800 shadow-lg">
-      <h2 className="text-sm font-bold mb-2 text-center text-primary-400">{title}</h2>
+    <div className="border border-edge rounded-lg p-3 bg-layer-2 shadow-lg">
+      <h2 className="text-sm font-bold mb-2 text-center text-primary-hover">{title}</h2>
       
       <PokemonSelector
         title="Pokémon"

@@ -34,7 +34,7 @@ export const CurrentEquipment = ({ equipment, slotType, onRemove }: CurrentEquip
       style={{ background: "rgba(15,23,42,0.5)", border: "1px solid rgba(71,85,105,0.3)" }}
     >
       <div className="flex justify-between items-center mb-2">
-        <span className="text-[10px] font-mono uppercase tracking-widest text-surface-400">
+        <span className="text-[10px] font-mono uppercase tracking-widest text-ink-muted">
           {t("build_planner.currently_equiped")}
         </span>
         <Button
@@ -79,7 +79,7 @@ export const CurrentEquipment = ({ equipment, slotType, onRemove }: CurrentEquip
 
         <div className="flex-1 min-w-0">
           <div className="flex justify-between items-center mb-1">
-            <p className="font-medium text-surface-100 truncate pr-2">{equipment.name}</p>
+            <p className="font-medium text-ink truncate pr-2">{equipment.name}</p>
             <span className={`text-xs flex-shrink-0 ${getRarityStyle(equipment.rarity)}`}>
               ★{equipment.rarity}
             </span>
@@ -94,7 +94,7 @@ export const CurrentEquipment = ({ equipment, slotType, onRemove }: CurrentEquip
             )}
           </div>
           {equipment.slots && equipment.slots.length > 0 && (
-            <div className="mt-1 text-xs text-surface-400">
+            <div className="mt-1 text-xs text-ink-muted">
               {t("build_planner.slots")}: {equipment.slots.map(size => `○${size}`).join(' ')}
             </div>
           )}
@@ -111,14 +111,14 @@ const ArmorStats = ({ armor }: { armor: ArmorPiece }) => {
   const defenseValue = typeof armor.defense === 'number' ? armor.defense : armor.defense.base;
   return (
     <div className="flex flex-wrap gap-x-3 text-xs">
-      <span className="text-secondary-400">Def: {defenseValue}</span>
+      <span className="text-secondary-hover">Def: {defenseValue}</span>
       {armor.armorSet?.name && (
-        <span className="text-accent-400 truncate max-w-[200px]">
+        <span className="text-secondary-hover truncate max-w-[200px]">
           {t("build_planner.set")}: {armor.armorSet.name}
         </span>
       )}
       {armor.skills && armor.skills.length > 0 && (
-        <span className="text-highlight-400">
+        <span className="text-warning-hover">
           {armor.skills.map((s, i) => (
             <span key={i}>
               {s.skill?.name || s.name} +{s.level}
@@ -139,7 +139,7 @@ const WeaponStats = ({ weapon }: { weapon: Weapon }) => {
       <span className="text-red-400">
         {t('attack')}: {weapon.attack || (weapon.damage?.display || weapon.damage?.raw)}
       </span>
-      <span className={weapon.affinity >= 0 ? 'text-highlight-400' : 'text-red-400'}>
+      <span className={weapon.affinity >= 0 ? 'text-warning-hover' : 'text-red-400'}>
         {t("affinity")}: {weapon.affinity >= 0 ? '+' : ''}{weapon.affinity}%
       </span>
       {elements.map((element, idx) => (
@@ -161,7 +161,7 @@ const WeaponStats = ({ weapon }: { weapon: Weapon }) => {
 const CharmStats = ({ charm }: { charm: Charm }) => (
   <div className="flex flex-wrap gap-x-3 text-xs">
     {charm.skills && charm.skills.length > 0 && (
-      <span className="text-highlight-400">
+      <span className="text-warning-hover">
         {charm.skills.map((s, i) => (
           <span key={i}>
             {s.skill?.name} +{s.level}

@@ -135,26 +135,26 @@ export function PresetManager({ presets, onSave, onDelete, onClose }: Props) {
 
   return createPortal(
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-surface-900 border border-surface-700 rounded-xl w-full max-w-lg mx-4 shadow-2xl max-h-[90vh] flex flex-col">
+      <div className="bg-layer-1 border border-edge rounded-xl w-full max-w-lg mx-4 shadow-2xl max-h-[90vh] flex flex-col">
 
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-surface-700 shrink-0">
+        <div className="flex items-center justify-between p-4 border-b border-edge shrink-0">
           <div className="flex items-center gap-2">
             {mode !== 'list' && (
               <button
                 onClick={() => { setMode('list'); resetForm(); }}
-                className="text-surface-400 hover:text-surface-50 transition-colors mr-1"
+                className="text-ink-muted hover:text-ink transition-colors mr-1"
               >
                 <X size={16} />
               </button>
             )}
-            <h2 className="font-semibold text-surface-50">
+            <h2 className="font-semibold text-ink">
               {mode === 'edit' ? t('preset.editTitle')
                 : mode === 'history' ? t('preset.versionHistory')
                 : t('modals.teamPresets')}
             </h2>
           </div>
-          <button onClick={onClose} className="text-surface-400 hover:text-surface-50 transition-colors">
+          <button onClick={onClose} className="text-ink-muted hover:text-ink transition-colors">
             <X size={18} />
           </button>
         </div>
@@ -166,7 +166,7 @@ export function PresetManager({ presets, onSave, onDelete, onClose }: Props) {
           {mode === 'list' && (
             <>
               {presets.length === 0 && (
-                <p className="text-surface-500 text-sm text-center py-6">{t('empty.noPresets')}</p>
+                <p className="text-ink-muted text-sm text-center py-6">{t('empty.noPresets')}</p>
               )}
               {presets.map((preset) => (
                 <PresetRow
@@ -185,22 +185,22 @@ export function PresetManager({ presets, onSave, onDelete, onClose }: Props) {
           {(mode === 'create' || mode === 'edit') && (
             <div className="flex flex-col gap-3">
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-medium text-surface-400 uppercase tracking-wide">{t('labels.presetName')}</label>
+                <label className="text-xs font-medium text-ink-muted uppercase tracking-wide">{t('labels.presetName')}</label>
                 <input
                   autoFocus
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder={t('placeholders.presetName')}
-                  className="bg-surface-800 border border-surface-600 rounded-lg px-3 py-2 text-surface-50 placeholder:text-surface-500 focus:outline-none focus:border-primary-500 text-sm"
+                  className="bg-layer-2 border border-edge rounded-lg px-3 py-2 text-ink placeholder:text-ink-muted focus:outline-none focus:border-primary text-sm"
                 />
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-medium text-surface-400 uppercase tracking-wide">{t('labels.regulation')}</label>
+                <label className="text-xs font-medium text-ink-muted uppercase tracking-wide">{t('labels.regulation')}</label>
                 <select
                   value={regulationId}
                   onChange={(e) => setRegulationId(e.target.value)}
-                  className="bg-surface-800 border border-surface-600 rounded-lg px-3 py-2 text-surface-50 focus:outline-none focus:border-primary-500 text-sm"
+                  className="bg-layer-2 border border-edge rounded-lg px-3 py-2 text-ink focus:outline-none focus:border-primary text-sm"
                 >
                   {regulations.map((r) => (
                     <option key={r.id} value={r.id}>{r.name}</option>
@@ -209,13 +209,13 @@ export function PresetManager({ presets, onSave, onDelete, onClose }: Props) {
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-medium text-surface-400 uppercase tracking-wide">{t('labels.showdownPaste')}</label>
+                <label className="text-xs font-medium text-ink-muted uppercase tracking-wide">{t('labels.showdownPaste')}</label>
                 <textarea
                   value={paste}
                   onChange={(e) => { setPaste(e.target.value); setError(''); }}
                   placeholder={"Incineroar @ Assault Vest\nAbility: Intimidate\n- Fake Out\n- Knock Off\n..."}
                   rows={6}
-                  className="bg-surface-800 border border-surface-600 rounded-lg px-3 py-2 text-surface-50 placeholder:text-surface-500 focus:outline-none focus:border-primary-500 text-sm font-mono resize-none"
+                  className="bg-layer-2 border border-edge rounded-lg px-3 py-2 text-ink placeholder:text-ink-muted focus:outline-none focus:border-primary text-sm font-mono resize-none"
                 />
               </div>
 
@@ -224,14 +224,14 @@ export function PresetManager({ presets, onSave, onDelete, onClose }: Props) {
               <div className="flex gap-2">
                 <button
                   onClick={() => { setMode('list'); resetForm(); }}
-                  className="flex-1 py-2 rounded-lg border border-surface-600 text-surface-300 hover:text-surface-50 text-sm transition-colors"
+                  className="flex-1 py-2 rounded-lg border border-edge text-ink hover:text-ink text-sm transition-colors"
                 >
                   {t('buttons.cancel')}
                 </button>
                 <button
                   onClick={mode === 'create' ? handleCreate : handleEdit}
                   disabled={!paste.trim() || !isValidPaste(paste)}
-                  className="flex-1 py-2 rounded-lg bg-primary-600 hover:bg-primary-500 disabled:opacity-40 text-white text-sm font-medium transition-colors flex items-center justify-center gap-1.5"
+                  className="flex-1 py-2 rounded-lg bg-primary-active hover:bg-primary disabled:opacity-40 text-white text-sm font-medium transition-colors flex items-center justify-center gap-1.5"
                 >
                   {mode === 'create'
                     ? <><Upload size={14} /> {t('buttons.import')}</>
@@ -245,13 +245,13 @@ export function PresetManager({ presets, onSave, onDelete, onClose }: Props) {
           {mode === 'history' && historyPreset && (
             <div className="flex flex-col gap-2">
               {/* Current version */}
-              <div className="bg-surface-800 border border-primary-500/40 rounded-lg p-3">
+              <div className="bg-layer-2 border border-primary/40 rounded-lg p-3">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-mono bg-primary-500/20 text-primary-300 border border-primary-500/30 rounded px-1.5 py-px">
+                    <span className="text-[10px] font-mono bg-primary/20 text-primary-hover border border-primary/30 rounded px-1.5 py-px">
                       {t('preset.versionN', { n: historyPreset.currentVersion })}
                     </span>
-                    <span className="text-[10px] text-surface-500">{t('preset.currentTag')}</span>
+                    <span className="text-[10px] text-ink-muted">{t('preset.currentTag')}</span>
                   </div>
                   <div className="flex -space-x-2">
                     {historyPreset.slots.slice(0, 3).map((s) => (
@@ -259,31 +259,31 @@ export function PresetManager({ presets, onSave, onDelete, onClose }: Props) {
                     ))}
                   </div>
                 </div>
-                <p className="text-surface-50 text-sm font-medium">{historyPreset.name}</p>
-                <p className="text-surface-500 text-xs truncate">{historyPreset.slots.map((s) => s.speciesName).join(', ')}</p>
+                <p className="text-ink text-sm font-medium">{historyPreset.name}</p>
+                <p className="text-ink-muted text-xs truncate">{historyPreset.slots.map((s) => s.speciesName).join(', ')}</p>
               </div>
 
               {/* Past versions (newest first) */}
               {[...historyPreset.versions].reverse().map((v, i) => (
-                <div key={i} className="bg-surface-800 border border-surface-700 rounded-lg p-3">
+                <div key={i} className="bg-layer-2 border border-edge rounded-lg p-3">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-mono text-surface-500 border border-surface-700 rounded px-1.5 py-px">
+                    <span className="text-[10px] font-mono text-ink-muted border border-edge rounded px-1.5 py-px">
                       {t('preset.versionN', { n: v.version })}
                     </span>
                     <button
                       onClick={() => handleRestoreVersion(historyPreset, historyPreset.versions.length - 1 - i)}
-                      className="flex items-center gap-1 text-xs text-surface-400 hover:text-primary-300 transition-colors"
+                      className="flex items-center gap-1 text-xs text-ink-muted hover:text-primary-hover transition-colors"
                     >
                       <RotateCcw size={11} /> {t('buttons.restoreVersion')}
                     </button>
                   </div>
-                  <p className="text-surface-300 text-sm font-medium">{v.name}</p>
-                  <p className="text-surface-500 text-xs truncate">{v.slots.map((s) => s.speciesName).join(', ')}</p>
+                  <p className="text-ink text-sm font-medium">{v.name}</p>
+                  <p className="text-ink-muted text-xs truncate">{v.slots.map((s) => s.speciesName).join(', ')}</p>
                 </div>
               ))}
 
               {historyPreset.versions.length === 0 && (
-                <p className="text-surface-600 text-xs text-center py-4">No previous versions.</p>
+                <p className="text-ink-dim text-xs text-center py-4">No previous versions.</p>
               )}
             </div>
           )}
@@ -291,10 +291,10 @@ export function PresetManager({ presets, onSave, onDelete, onClose }: Props) {
 
         {/* Footer */}
         {mode === 'list' && (
-          <div className="p-4 border-t border-surface-700 shrink-0">
+          <div className="p-4 border-t border-edge shrink-0">
             <button
               onClick={openCreate}
-              className="w-full py-2 rounded-lg border border-surface-600 text-surface-300 hover:text-surface-50 hover:border-surface-500 text-sm transition-colors flex items-center justify-center gap-2"
+              className="w-full py-2 rounded-lg border border-edge text-ink hover:text-ink hover:border-edge text-sm transition-colors flex items-center justify-center gap-2"
             >
               <Plus size={16} /> {t('buttons.importNewPreset')}
             </button>
@@ -324,7 +324,7 @@ function PresetRow({
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className="bg-surface-800 border border-surface-700 rounded-lg overflow-hidden">
+    <div className="bg-layer-2 border border-edge rounded-lg overflow-hidden">
       <div className="p-3 flex items-center gap-3">
         <div className="flex -space-x-3 shrink-0">
           {preset.slots.slice(0, 3).map((s) => (
@@ -333,34 +333,34 @@ function PresetRow({
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <p className="text-surface-50 text-sm font-medium truncate">{preset.name}</p>
-            <span className="shrink-0 text-[10px] font-mono text-surface-600 border border-surface-700 rounded px-1 py-px">
+            <p className="text-ink text-sm font-medium truncate">{preset.name}</p>
+            <span className="shrink-0 text-[10px] font-mono text-ink-dim border border-edge rounded px-1 py-px">
               {t('preset.versionN', { n: preset.currentVersion })}
             </span>
           </div>
-          <p className="text-surface-500 text-xs truncate">{preset.slots.map((s) => s.speciesName).join(', ')}</p>
+          <p className="text-ink-muted text-xs truncate">{preset.slots.map((s) => s.speciesName).join(', ')}</p>
         </div>
         <div className="flex items-center gap-1 shrink-0">
-          <button onClick={onEdit} className="p-1.5 text-surface-500 hover:text-primary-300 transition-colors" title={t('buttons.editPreset')}>
+          <button onClick={onEdit} className="p-1.5 text-ink-muted hover:text-primary-hover transition-colors" title={t('buttons.editPreset')}>
             <Edit2 size={14} />
           </button>
           <button
             onClick={() => setExpanded((v) => !v)}
-            className="p-1.5 text-surface-500 hover:text-surface-300 transition-colors"
+            className="p-1.5 text-ink-muted hover:text-ink transition-colors"
             title={t('preset.versionHistory')}
           >
             {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
           </button>
-          <button onClick={onDelete} className="p-1.5 text-surface-500 hover:text-red-400 transition-colors">
+          <button onClick={onDelete} className="p-1.5 text-ink-muted hover:text-red-400 transition-colors">
             <Trash2 size={14} />
           </button>
         </div>
       </div>
       {expanded && (
-        <div className="border-t border-surface-700 px-3 pb-3 pt-2">
+        <div className="border-t border-edge px-3 pb-3 pt-2">
           <button
             onClick={onHistory}
-            className="text-xs text-surface-400 hover:text-primary-300 transition-colors flex items-center gap-1"
+            className="text-xs text-ink-muted hover:text-primary-hover transition-colors flex items-center gap-1"
           >
             <RotateCcw size={11} /> {t('preset.versionHistory')} ({preset.versions.length})
           </button>

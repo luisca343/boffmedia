@@ -127,8 +127,8 @@ export default function TransactionCharts({
                       <div className="bg-white p-3 border border-blue-200 rounded shadow">
                         <p className="font-medium">{`Fecha: ${label}`}</p>
                         <p className="text-blue-700">{`Balance: ${formatMoney(data.balance)}`}</p>
-                        <p className="text-sm text-surface-600">{`Concepto: ${data.concept}`}</p>
-                        <p className="text-sm text-surface-600">{`Tipo: ${data.type}`}</p>
+                        <p className="text-sm text-ink-dim">{`Concepto: ${data.concept}`}</p>
+                        <p className="text-sm text-ink-dim">{`Tipo: ${data.type}`}</p>
                       </div>
                     );
                   }
@@ -190,9 +190,9 @@ export default function TransactionCharts({
             <h3 className="text-lg font-semibold mb-4 text-blue-900">Resumen Financiero</h3>
             
             <div className="space-y-4">
-              <div className="bg-highlight-50 p-4 rounded-lg">
-                <div className="text-sm text-highlight-600 mb-1">Total Ingresos</div>
-                <div className="text-2xl font-bold text-highlight-700">{formatMoney(totalIncome)}</div>
+              <div className="bg-warning-soft p-4 rounded-lg">
+                <div className="text-sm text-warning mb-1">Total Ingresos</div>
+                <div className="text-2xl font-bold text-warning">{formatMoney(totalIncome)}</div>
               </div>
               
               <div className="bg-red-50 p-4 rounded-lg">
@@ -202,7 +202,7 @@ export default function TransactionCharts({
               
               <div className="bg-blue-50 p-4 rounded-lg">
                 <div className="text-sm text-blue-600 mb-1">Balance Neto</div>
-                <div className={`text-2xl font-bold ${totalIncome - totalExpense >= 0 ? 'text-highlight-700' : 'text-red-700'}`}>
+                <div className={`text-2xl font-bold ${totalIncome - totalExpense >= 0 ? 'text-warning' : 'text-red-700'}`}>
                   {formatMoney(totalIncome - totalExpense)}
                 </div>
               </div>

@@ -44,8 +44,8 @@ const DropdownMenuSubTrigger = React.forwardRef<
   const variant = useDropdownMenuVariant()
   
   const variantStyles = {
-    default: "focus:bg-surface-100 data-[state=open]:bg-surface-100 dark:focus:bg-surface-800 dark:data-[state=open]:bg-surface-800",
-    wingull: "focus:bg-secondary-800/50 data-[state=open]:bg-secondary-800 text-secondary-100"
+    default: "focus:bg-layer-1 data-[state=open]:bg-layer-1 dark:focus:bg-layer-2 dark:data-[state=open]:bg-layer-2",
+    wingull: "focus:bg-secondary-soft/50 data-[state=open]:bg-secondary-soft text-secondary-hover"
   }
   
   return (
@@ -74,8 +74,8 @@ const DropdownMenuSubContent = React.forwardRef<
   const variant = useDropdownMenuVariant()
   
   const variantStyles = {
-    default: "border-surface-200 bg-white text-surface-950 dark:border-surface-800 dark:bg-surface-950 dark:text-surface-50",
-    wingull: "border-secondary-800 bg-secondary-900 text-secondary-100"
+    default: "border-edge bg-white text-ink-dim border-edge-strong bg-base text-ink",
+    wingull: "border-secondary-active bg-secondary-soft text-secondary-hover"
   }
   
   return (
@@ -100,8 +100,8 @@ const DropdownMenuContent = React.forwardRef<
   const variant = useDropdownMenuVariant()
   
   const variantStyles = {
-    default: "border-surface-200 bg-white text-surface-950 dark:border-surface-800 dark:bg-surface-950 dark:text-surface-50",
-    wingull: "border-secondary-800 bg-secondary-900 text-secondary-100"
+    default: "border-edge bg-white text-ink-dim border-edge-strong bg-base text-ink",
+    wingull: "border-secondary-active bg-secondary-soft text-secondary-hover"
   }
   
   return (
@@ -130,8 +130,8 @@ const DropdownMenuItem = React.forwardRef<
   const variant = useDropdownMenuVariant()
   
   const variantStyles = {
-    default: "text-surface-50 focus:bg-surface-100 focus:text-surface-900 dark:focus:bg-surface-800 dark:focus:text-surface-50",
-    wingull: "focus:bg-secondary-800/50 focus:text-secondary-200"
+    default: "text-ink focus:bg-layer-1 focus:text-ink-dim dark:focus:bg-layer-2 dark:focus:text-ink",
+    wingull: "focus:bg-secondary-soft/50 focus:text-secondary-hover"
   }
   
   return (
@@ -156,8 +156,8 @@ const DropdownMenuCheckboxItem = React.forwardRef<
   const variant = useDropdownMenuVariant()
   
   const variantStyles = {
-    default: "focus:bg-surface-100 focus:text-surface-900 dark:focus:bg-surface-800 dark:focus:text-surface-50",
-    wingull: "focus:bg-secondary-800/50 focus:text-secondary-200"
+    default: "focus:bg-layer-1 focus:text-ink-dim dark:focus:bg-layer-2 dark:focus:text-ink",
+    wingull: "focus:bg-secondary-soft/50 focus:text-secondary-hover"
   }
   
   return (
@@ -190,8 +190,8 @@ const DropdownMenuRadioItem = React.forwardRef<
   const variant = useDropdownMenuVariant()
   
   const variantStyles = {
-    default: "focus:bg-surface-100 focus:text-surface-900 dark:focus:bg-surface-800 dark:focus:text-surface-50",
-    wingull: "focus:bg-secondary-800/50 focus:text-secondary-200"
+    default: "focus:bg-layer-1 focus:text-ink-dim dark:focus:bg-layer-2 dark:focus:text-ink",
+    wingull: "focus:bg-secondary-soft/50 focus:text-secondary-hover"
   }
   
   return (
@@ -224,8 +224,8 @@ const DropdownMenuLabel = React.forwardRef<
   const variant = useDropdownMenuVariant()
   
   const variantStyles = {
-    default: "text-surface-50 text-sm font-semibold",
-    wingull: "text-secondary-300 font-semibold"
+    default: "text-ink text-sm font-semibold",
+    wingull: "text-secondary-hover font-semibold"
   }
   
   return (
@@ -250,8 +250,8 @@ const DropdownMenuSeparator = React.forwardRef<
   const variant = useDropdownMenuVariant()
   
   const variantStyles = {
-    default: "bg-surface-100 dark:bg-surface-800",
-    wingull: "bg-secondary-700"
+    default: "bg-layer-1 bg-layer-2",
+    wingull: "bg-secondary-active"
   }
   
   return (
@@ -272,7 +272,7 @@ const DropdownMenuShortcut = ({
   
   const variantStyles = {
     default: "opacity-60",
-    wingull: "opacity-60 text-secondary-300"
+    wingull: "opacity-60 text-secondary-hover"
   }
   
   return (

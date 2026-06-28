@@ -17,34 +17,34 @@ export default function HpControl({
 }: HpControlProps) {
   return (
     <div className="mb-2">
-      <label className="block text-xs font-medium mb-1 text-surface-200">
-        Current HP: <span className="font-medium text-primary-300">{currentHp} / {maxHp} ({currentHpPercent}%)</span>
+      <label className="block text-xs font-medium mb-1 text-ink">
+        Current HP: <span className="font-medium text-primary-hover">{currentHp} / {maxHp} ({currentHpPercent}%)</span>
       </label>
       <div className="flex items-center space-x-1 text-xs">
         <input
           type="number"
-          className="w-full p-1 h-6 border rounded bg-surface-700 border-surface-600 text-surface-100 text-xs"
+          className="w-full p-1 h-6 border rounded bg-layer-3 border-edge text-ink text-xs"
           value={currentHp}
           min={0}
           max={maxHp}
           onChange={(e) => onHpChange(parseInt(e.target.value) || 0)}
         />
-        <span className="text-surface-400">/</span>
+        <span className="text-ink-muted">/</span>
         <input
           type="number"
-          className="w-full p-1 h-6 border rounded bg-surface-700 border-surface-600 text-surface-100 text-xs"
+          className="w-full p-1 h-6 border rounded bg-layer-3 border-edge text-ink text-xs"
           value={currentHpPercent}
           onChange={(e) => onHpPercentChange(parseInt(e.target.value) || 0)}
           min="0"
           max="100"
         />
-        <span className="text-surface-400">%</span>
+        <span className="text-ink-muted">%</span>
       </div>
       
       {/* HP Bar visualization */}
-      <div className="w-full h-1.5 bg-surface-700 mt-1 rounded overflow-hidden">
+      <div className="w-full h-1.5 bg-layer-3 mt-1 rounded overflow-hidden">
         <div 
-          className="h-full bg-highlight-500" 
+          className="h-full bg-warning" 
           style={{ 
             width: `${currentHpPercent}%`,
             backgroundColor: currentHpPercent > 50 ? '#10B981' : currentHpPercent > 20 ? '#F59E0B' : '#EF4444'

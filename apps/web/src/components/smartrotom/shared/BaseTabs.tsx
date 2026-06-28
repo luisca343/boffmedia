@@ -22,12 +22,12 @@ export const BaseTabs = ({ tabs, activeTab, onTabChange, platform }: BaseTabsPro
   
   const getInactiveStyles = () => {
     return platform === "youtube" 
-      ? "bg-surface-700 text-red-400 hover:bg-red-600" 
-      : "bg-surface-700 text-purple-400 hover:bg-purple-600";
+      ? "bg-layer-3 text-red-400 hover:bg-red-600" 
+      : "bg-layer-3 text-purple-400 hover:bg-purple-600";
   };
   
   return (
-    <div className="flex space-x-2 p-2 bg-surface-900 rounded-lg">
+    <div className="flex space-x-2 p-2 bg-layer-1 rounded-lg">
       {tabs.map((tab) => (
         <button
           key={tab.value}

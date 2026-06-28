@@ -42,11 +42,11 @@ export function GameForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
           name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-[var(--text-muted)]">Título</FormLabel>
+              <FormLabel className="text-ink-muted">Título</FormLabel>
               <FormControl>
                 <BoffInput placeholder="Nombre del juego" {...field} />
               </FormControl>
-              <FormDescription className="text-[var(--text-dim)]">Este será el nombre principal del juego.</FormDescription>
+              <FormDescription className="text-ink-dim">Este será el nombre principal del juego.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -57,15 +57,15 @@ export function GameForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-[var(--text-muted)]">Descripción</FormLabel>
+              <FormLabel className="text-ink-muted">Descripción</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="Describe el juego"
-                  className="min-h-[100px] bg-[var(--surface-2)] border border-solid border-[var(--border-strong)] text-[var(--text)] rounded-[var(--btn-radius,9999px)] py-2.5 px-3.5 focus:outline-none focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-soft)] placeholder:text-[var(--text-dim)]"
+                  className="min-h-[100px] bg-layer-2 border border-solid border-edge-strong text-ink rounded-[var(--btn-radius,9999px)] py-2.5 px-3.5 focus:outline-none focus:border-secondary focus:shadow-[0_0_0_3px_var(--secondary-soft)] placeholder:text-ink-dim"
                   {...field}
                 />
               </FormControl>
-              <FormDescription className="text-[var(--text-dim)]">Proporciona una descripción detallada del juego.</FormDescription>
+              <FormDescription className="text-ink-dim">Proporciona una descripción detallada del juego.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -76,7 +76,7 @@ export function GameForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
           name="icon"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-[var(--text-muted)]">Icono URL</FormLabel>
+              <FormLabel className="text-ink-muted">Icono URL</FormLabel>
               <FormControl>
                 <BoffInput
                   placeholder="https://ejemplo.com/icono.jpg"
@@ -84,7 +84,7 @@ export function GameForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
                   value={field.value || ""}
                 />
               </FormControl>
-              <FormDescription className="text-[var(--text-dim)]">URL de la imagen que se usará como icono.</FormDescription>
+              <FormDescription className="text-ink-dim">URL de la imagen que se usará como icono.</FormDescription>
               <FormMessage />
             </FormItem>
           )}

@@ -37,19 +37,19 @@ export function TeamsAdmin() {
       columns={[
         { key: "name", label: "Equipo", render: (t) => (
           <div className="flex items-center gap-2">
-            <span className="font-medium text-[var(--text)]">{t.name}</span>
-            {t.tag && <span className="text-xs font-mono text-[var(--text-dim)] bg-[var(--surface-2)] px-1.5 py-0.5 rounded">[{t.tag}]</span>}
+            <span className="font-medium text-ink">{t.name}</span>
+            {t.tag && <span className="text-xs font-mono text-ink-dim bg-layer-2 px-1.5 py-0.5 rounded">[{t.tag}]</span>}
           </div>
         )},
         { key: "eventId", label: "Evento ID", render: (t) => (
-          <span className="text-sm text-[var(--text-muted)]">#{t.eventId}</span>
+          <span className="text-sm text-ink-muted">#{t.eventId}</span>
         )},
         { key: "status", label: "Estado", render: (t) => {
           const colors: Record<string, string> = { active: "text-emerald-400", disqualified: "text-red-400", withdrew: "text-amber-400" }
-          return <span className={`text-sm ${colors[t.status ?? ""] ?? "text-[var(--text-muted)]"}`}>{t.status ?? "—"}</span>
+          return <span className={`text-sm ${colors[t.status ?? ""] ?? "text-ink-muted"}`}>{t.status ?? "—"}</span>
         }},
         { key: "totalScore", label: "Puntos", render: (t) => (
-          <span className="text-sm font-mono text-[var(--text-muted)]">{t.totalScore ?? 0}</span>
+          <span className="text-sm font-mono text-ink-muted">{t.totalScore ?? 0}</span>
         )},
       ]}
     />

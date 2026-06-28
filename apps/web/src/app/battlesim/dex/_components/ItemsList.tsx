@@ -40,12 +40,12 @@ export default function ItemsList({
   };
 
   return (
-    <div className="bg-surface-800 rounded-lg p-4">
-      {!compact && <h3 className="mb-3 text-surface-300">Items</h3>}
+    <div className="bg-layer-2 rounded-lg p-4">
+      {!compact && <h3 className="mb-3 text-ink">Items</h3>}
       {compact && (
-        <h3 className="mb-3 text-surface-300 font-medium flex justify-between">
+        <h3 className="mb-3 text-ink font-medium flex justify-between">
           <span>Items</span>
-          <span className="text-sm text-surface-400">
+          <span className="text-sm text-ink-muted">
             {Math.min(items.length, displayLimit)} of {items.length} shown
           </span>
         </h3>
@@ -54,19 +54,19 @@ export default function ItemsList({
         {itemsToShow.map(item => (
           <div
             key={item.id}
-            className={`${compact ? "p-2" : "p-2"} bg-surface-700 rounded cursor-pointer hover:bg-surface-600 flex items-center ${compact ? 'gap-2' : 'gap-3'}`}
+            className={`${compact ? "p-2" : "p-2"} bg-layer-3 rounded cursor-pointer hover:bg-layer-3 flex items-center ${compact ? 'gap-2' : 'gap-3'}`}
             onClick={() => onItemClick(item.name)}
           >
             <div 
-              className={`h-6 w-6 bg-surface-600 rounded-full flex items-center justify-center overflow-hidden`}
+              className={`h-6 w-6 bg-layer-3 rounded-full flex items-center justify-center overflow-hidden`}
               style={getItemIconStyle(item.name)}
             >
               {/* Empty span to maintain size if icon fails */}
               <span className="text-xs opacity-0">?</span>
             </div>
-            <div className={`font-medium text-surface-100 ${compact ? "text-sm" : ""}`}>{item.name}</div>
+            <div className={`font-medium text-ink ${compact ? "text-sm" : ""}`}>{item.name}</div>
             {!compact && (
-              <div className="text-xs text-surface-300 line-clamp-1 flex-1">{item.desc || 'No description available'}</div>
+              <div className="text-xs text-ink line-clamp-1 flex-1">{item.desc || 'No description available'}</div>
             )}
           </div>
         ))}
@@ -75,7 +75,7 @@ export default function ItemsList({
         <div className="mt-6 text-center">
           <button
             onClick={onLoadMore}
-            className="px-4 py-2 bg-surface-700 text-surface-200 rounded-md hover:bg-surface-600 transition-colors"
+            className="px-4 py-2 bg-layer-3 text-ink rounded-md hover:bg-layer-3 transition-colors"
           >
             Load More
           </button>

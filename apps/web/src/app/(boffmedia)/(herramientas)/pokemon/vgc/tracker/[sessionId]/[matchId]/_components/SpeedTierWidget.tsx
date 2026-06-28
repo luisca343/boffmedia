@@ -63,20 +63,20 @@ export function SpeedTierWidget({ slots, regulationId }: Props) {
   }
 
   return (
-    <div className="mt-3 rounded-lg border border-surface-700 bg-surface-800/60 overflow-hidden">
+    <div className="mt-3 rounded-lg border border-edge bg-layer-2/60 overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-3 py-1.5 border-b border-surface-700">
-        <span className="text-[10px] font-semibold text-surface-500 uppercase tracking-wide">
+      <div className="flex items-center justify-between px-3 py-1.5 border-b border-edge">
+        <span className="text-[10px] font-semibold text-ink-muted uppercase tracking-wide">
           {t('speedWidget.label')}
         </span>
       </div>
 
       {/* Modifiers row */}
-      <div className="flex gap-1 px-3 py-1.5 border-b border-surface-700">
+      <div className="flex gap-1 px-3 py-1.5 border-b border-edge">
         <SpeedFlagChips
           className="flex gap-1"
           buttonClassName="text-[10px] px-1.5 py-0.5 rounded font-mono transition-colors border"
-          inactiveClassName="bg-surface-800 text-surface-500 hover:text-surface-300 border-transparent"
+          inactiveClassName="bg-layer-2 text-ink-muted hover:text-ink border-transparent"
           chips={[
             {
               key: 'tailwind',
@@ -109,8 +109,8 @@ export function SpeedTierWidget({ slots, regulationId }: Props) {
       </div>
 
       {/* Opponent speed input */}
-      <div className="px-3 py-1.5 border-b border-surface-700 bg-surface-800/40">
-        <label className="text-[10px] font-semibold text-surface-500 uppercase tracking-wide block mb-1">
+      <div className="px-3 py-1.5 border-b border-edge bg-layer-2/40">
+        <label className="text-[10px] font-semibold text-ink-muted uppercase tracking-wide block mb-1">
           {t('speedWidget.opponentSpeed')}
         </label>
         <input
@@ -120,11 +120,11 @@ export function SpeedTierWidget({ slots, regulationId }: Props) {
           value={opponentBaseSpeed}
           onChange={(e) => setOpponentBaseSpeed(e.target.value === '' ? '' : parseInt(e.target.value, 10))}
           placeholder={t('speedWidget.opponentSpeedPlaceholder')}
-          className="w-full text-xs bg-surface-800 border border-surface-700 rounded px-2 py-1 text-surface-200 placeholder-surface-600 focus:outline-none focus:border-primary-500"
+          className="w-full text-xs bg-layer-2 border border-edge rounded px-2 py-1 text-ink placeholder-ink-dim focus:outline-none focus:border-primary"
         />
       </div>
 
-      <div className="px-3 py-1 text-[10px] text-surface-500 border-b border-surface-700 bg-surface-800/20">
+      <div className="px-3 py-1 text-[10px] text-ink-muted border-b border-edge bg-layer-2/20">
         {t('speedWidget.presetHint')}
       </div>
 
@@ -133,7 +133,7 @@ export function SpeedTierWidget({ slots, regulationId }: Props) {
         const isFirst = i === 0;
         const isLast = i === rows.length - 1;
         const barPct = maxEff > minEff ? ((row.effective - minEff) / (maxEff - minEff)) * 100 : 100;
-        const nameColor = isFirst ? 'text-green-400' : isLast ? 'text-orange-400' : 'text-surface-300';
+        const nameColor = isFirst ? 'text-green-400' : isLast ? 'text-orange-400' : 'text-ink';
         
         // Comparison with opponent
         const comparisonResult = opponentSpeed ? compareSpeed(row.effective, opponentSpeed) : null;
@@ -144,11 +144,11 @@ export function SpeedTierWidget({ slots, regulationId }: Props) {
             {/* Speed row */}
             <div
               onClick={() => setSelectedSlot(selectedSlot === row.slotIndex ? null : row.slotIndex)}
-              className="relative flex items-center gap-2 px-3 py-1 cursor-pointer hover:bg-surface-800/30 transition-colors group"
+              className="relative flex items-center gap-2 px-3 py-1 cursor-pointer hover:bg-layer-2/30 transition-colors group"
             >
               {/* relative speed bar */}
               <div
-                className="absolute inset-y-0 left-0 bg-surface-700/30"
+                className="absolute inset-y-0 left-0 bg-layer-3/30"
                 style={{ width: `${barPct}%` }}
               />
               <img
@@ -160,12 +160,12 @@ export function SpeedTierWidget({ slots, regulationId }: Props) {
               <div className="relative flex-1 min-w-0">
                 <div className="flex items-center gap-1.5 min-w-0">
                   <span className={`text-xs truncate ${nameColor}`}>{row.name}</span>
-                  <span className="shrink-0 text-[9px] text-surface-500 bg-surface-800/70 border border-surface-700 rounded px-1 py-px font-mono">
+                  <span className="shrink-0 text-[9px] text-ink-muted bg-layer-2/70 border border-edge rounded px-1 py-px font-mono">
                     {row.evs}/{row.nature === 1.1 ? '+' : 'N'}
                   </span>
                 </div>
               </div>
-              <span className="relative text-xs font-mono shrink-0 tabular-nums text-surface-400">
+              <span className="relative text-xs font-mono shrink-0 tabular-nums text-ink-muted">
                 {row.effective}
               </span>
               {opponentSpeed !== null && (
@@ -175,13 +175,13 @@ export function SpeedTierWidget({ slots, regulationId }: Props) {
                 </span>
               )}
               {selectedSlot === row.slotIndex && (
-                <ChevronDown size={14} className="relative text-surface-500 group-hover:text-surface-300" />
+                <ChevronDown size={14} className="relative text-ink-muted group-hover:text-ink" />
               )}
             </div>
 
             {/* EV preset picker (shown when row is clicked) */}
             {selectedSlot === row.slotIndex && (
-              <div className="px-3 py-2 bg-surface-700/30 border-t border-surface-700 flex flex-wrap gap-1">
+              <div className="px-3 py-2 bg-layer-3/30 border-t border-edge flex flex-wrap gap-1">
                 {EV_PRESETS.map((preset) => (
                   <button
                     key={preset.label}
@@ -191,8 +191,8 @@ export function SpeedTierWidget({ slots, regulationId }: Props) {
                     }}
                     className={`text-[10px] px-2 py-0.5 rounded font-mono transition-colors ${
                       row.evs === preset.evs && row.nature === preset.nature
-                        ? 'bg-primary-600/40 text-primary-300 border border-primary-600/50'
-                        : 'bg-surface-700 text-surface-400 hover:text-surface-200 border border-transparent'
+                        ? 'bg-primary-active/40 text-primary-hover border border-primary-active/50'
+                        : 'bg-layer-3 text-ink-muted hover:text-ink border border-transparent'
                     }`}
                   >
                     {preset.label}

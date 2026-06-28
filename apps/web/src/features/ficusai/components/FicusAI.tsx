@@ -17,7 +17,7 @@ export default function FicusAI() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-br from-surface-900 via-surface-800 to-surface-900 w-full mx-auto">
+    <div className="flex flex-col h-full bg-gradient-to-br from-layer-1 via-layer-2 to-layer-1 w-full mx-auto">
       <ChatMessages messages={messages} isTyping={isTyping} />
       <ChatInput
         value={inputText}

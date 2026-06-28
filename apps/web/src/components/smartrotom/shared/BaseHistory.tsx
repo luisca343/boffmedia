@@ -120,12 +120,12 @@ export function BaseHistory<T extends { id: string; type?: string }>({
       </div>
 
       {history.length === 0 ? (
-        <div className="text-center py-16 bg-surface-800 rounded-lg">
+        <div className="text-center py-16 bg-layer-2 rounded-lg">
           <div className="text-6xl mb-4">📺</div>
-          <h2 className="text-2xl font-semibold mb-2 text-surface-200">
+          <h2 className="text-2xl font-semibold mb-2 text-ink">
             {emptyMessage || t("history.empty")}
           </h2>
-          <p className="text-surface-400">
+          <p className="text-ink-muted">
             {emptySubtext || t("history.emptySubtext")}
           </p>
         </div>

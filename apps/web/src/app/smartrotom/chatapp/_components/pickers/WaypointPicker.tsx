@@ -92,8 +92,8 @@ export function WaypointPicker({ onWaypointSelect, open: externalOpen, onOpenCha
             <div className="border border-neutral-800 rounded-lg p-3 bg-neutral-850">
               <div className="flex items-center justify-between">
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-primary-400/20 flex items-center justify-center flex-shrink-0">
-                    <Navigation className="h-5 w-5 text-primary-400" />
+                  <div className="w-10 h-10 rounded-lg bg-primary-hover/20 flex items-center justify-center flex-shrink-0">
+                    <Navigation className="h-5 w-5 text-primary-hover" />
                   </div>
                   <div>
                     <h4 className="font-medium text-neutral-100 mb-1">Ubicación actual</h4>
@@ -106,7 +106,7 @@ export function WaypointPicker({ onWaypointSelect, open: externalOpen, onOpenCha
                 <Button
                   size="sm"
                   onClick={handleSelectCurrentLocation}
-                  className="bg-primary-400 hover:bg-primary-500 text-black"
+                  className="bg-primary-hover hover:bg-primary text-black"
                 >
                   Enviar
                 </Button>

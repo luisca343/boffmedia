@@ -16,8 +16,8 @@ export function BSXSpark({ data, w = 220, h = 44 }: BSXSparkProps) {
     <div className="flex items-end gap-[.5rem]">
       <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" className="flex-1 min-w-0">
         <line x1={0} y1={h / 2} x2={w} y2={h / 2} stroke="var(--border)" strokeDasharray="3 4" />
-        <path d={`${path} L${w},${h} L0,${h} Z`} fill="color-mix(in srgb, var(--accent) 14%, transparent)" stroke="none" />
-        <path d={path} fill="none" stroke="var(--accent-bright)" strokeWidth={2} />
+        <path d={`${path} L${w},${h} L0,${h} Z`} fill="color-mix(in srgb, var(--secondary) 14%, transparent)" stroke="none" />
+        <path d={path} fill="none" stroke="var(--secondary-hover)" strokeWidth={2} />
       </svg>
       <span
         className="font-mono font-bold text-t-sm tabular-nums"

@@ -12,7 +12,7 @@ export default function TabNavigation({ activeTab, setActiveTab }: TabNavigation
         className={`flex-1 py-3 font-medium transition-all duration-200 flex items-center justify-center ${
           activeTab === 'map' 
             ? 'bg-[#041F4E] text-white border-b-2 border-yellow-400' 
-            : 'bg-secondary-700/50 text-white hover:bg-secondary-600/50'
+            : 'bg-secondary-active/50 text-white hover:bg-secondary-active/50'
         }`}
         onClick={() => setActiveTab('map')}
       >
@@ -23,7 +23,7 @@ export default function TabNavigation({ activeTab, setActiveTab }: TabNavigation
         className={`flex-1 py-3 font-medium transition-all duration-200 flex items-center justify-center ${
           activeTab === 'list' 
             ? 'bg-[#041F4E] text-white border-b-2 border-yellow-400' 
-            : 'bg-secondary-700/50 text-white hover:bg-secondary-600/50'
+            : 'bg-secondary-active/50 text-white hover:bg-secondary-active/50'
         }`}
         onClick={() => setActiveTab('list')}
       >

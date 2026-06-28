@@ -84,7 +84,7 @@ export function FormField({
   return (
     <div className={className}>
       <label className={`block text-base font-medium mb-3 transition-colors ${
-        disabled ? 'text-surface-500' : 'text-surface-200'
+        disabled ? 'text-ink-muted' : 'text-ink'
       }`}>
         <div className="flex items-center gap-2">
           {icon}
@@ -95,7 +95,7 @@ export function FormField({
       </label>
       {children}
       {hint && (
-        <p className="text-xs text-surface-400 mt-1">{hint}</p>
+        <p className="text-xs text-ink-muted mt-1">{hint}</p>
       )}
     </div>
   );

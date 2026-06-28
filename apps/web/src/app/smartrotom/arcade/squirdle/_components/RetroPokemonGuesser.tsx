@@ -57,7 +57,7 @@ const TypeBadge = ({
         ${status === "possible"
           ? "bg-indigo-600 text-white border-indigo-400"
           : status === "incorrect"
-            ? "bg-surface-400 text-black border-surface-600 opacity-50"
+            ? "bg-layer-3 text-black border-edge opacity-50"
             : status === "correct"
               ? "bg-emerald-500 text-white border-emerald-300"
               : "bg-amber-500 text-black border-amber-300"
@@ -82,7 +82,7 @@ const DoubleTypeBadge = ({
     <span
       className={`inline-block px-3 py-1.5 rounded-full text-sm font-semibold mr-2 mb-1.5 border-2 shadow-md ${
         isDoubleType
-          ? "bg-accent-600 text-white border-accent-400"
+          ? "bg-secondary-active text-white border-secondary"
           : "bg-yellow-500 text-black border-yellow-400"
       }`}
     >
@@ -327,7 +327,7 @@ export default function RetroPokemonGuesser() {
   };
 
   return (
-    <div className="min-h-full w-full bg-gradient-to-b from-indigo-950 via-accent-950 to-violet-950 text-white font-mono flex flex-col relative overflow-hidden">
+    <div className="min-h-full w-full bg-gradient-to-b from-indigo-950 via-secondary-soft to-violet-950 text-white font-mono flex flex-col relative overflow-hidden">
       <StarsBackground />
 
       <ArcadeTopBar 
@@ -371,7 +371,7 @@ export default function RetroPokemonGuesser() {
             </div>
             <Button
               type="submit"
-              className="bg-gradient-to-r from-cyan-500 to-secondary-600 hover:from-cyan-600 hover:to-secondary-700 text-white text-lg px-8 py-6 rounded-lg shadow-lg border-2 border-cyan-700/70 transition-all duration-300 transform hover:scale-105"
+              className="bg-gradient-to-r from-cyan-500 to-secondary-active hover:from-cyan-600 hover:to-secondary-active text-white text-lg px-8 py-6 rounded-lg shadow-lg border-2 border-cyan-700/70 transition-all duration-300 transform hover:scale-105"
               disabled={gameOver}
             >
               Adivinar
@@ -394,7 +394,7 @@ export default function RetroPokemonGuesser() {
           {/* CRT Scan line effect */}
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/5 to-transparent opacity-20 animate-scanline pointer-events-none"></div>
           
-          <div className="bg-gradient-to-r from-indigo-800/50 to-accent-800/50 p-3 border-b border-cyan-700/30">
+          <div className="bg-gradient-to-r from-indigo-800/50 to-secondary-soft/50 p-3 border-b border-cyan-700/30">
             <h2 className="text-xl font-bold text-cyan-300">Intentos</h2>
           </div>
           
@@ -433,7 +433,7 @@ export default function RetroPokemonGuesser() {
                 )}
                 {guesses.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8 text-surface-400">
+                    <TableCell colSpan={6} className="text-center py-8 text-ink-muted">
                       Aún no hay intentos. ¡Adivina un Pokémon para comenzar!
                     </TableCell>
                   </TableRow>
@@ -444,8 +444,8 @@ export default function RetroPokemonGuesser() {
         </div>
 
           
-            <div className="bg-indigo-900/80 rounded-lg p-4 shadow-xl border-2 border-accent-600/40">
-              <h2 className="text-xl font-bold mb-3 text-accent-300">
+            <div className="bg-indigo-900/80 rounded-lg p-4 shadow-xl border-2 border-secondary-active/40">
+              <h2 className="text-xl font-bold mb-3 text-secondary-hover">
                 Información de Tipos:
               </h2>
               <div className="mb-4 flex flex-wrap">

@@ -53,7 +53,7 @@ export default function GamePage({ params }: { params: { id: string } }) {
 
   if (loading) {
     return (
-      <div className="min-h-full bg-surface-900 flex justify-center items-center overflow-auto">
+      <div className="min-h-full bg-layer-1 flex justify-center items-center overflow-auto">
         <LoadingSpinner size="large" message={t("loading.game")} />
       </div>
     );
@@ -61,8 +61,8 @@ export default function GamePage({ params }: { params: { id: string } }) {
 
   if (error || !gameData) {
     return (
-      <div className="min-h-full bg-surface-900 text-white p-6 flex justify-center items-center overflow-auto">
-        <div className="bg-surface-800 p-6 rounded-lg shadow-lg max-w-md w-full text-center">
+      <div className="min-h-full bg-layer-1 text-white p-6 flex justify-center items-center overflow-auto">
+        <div className="bg-layer-2 p-6 rounded-lg shadow-lg max-w-md w-full text-center">
           <p className="text-red-500 text-xl mb-4">{error || t("game.notFound")}</p>
           <InternalLink href="twitch" className="text-purple-400 hover:underline">
             {t("game.returnToBrowse")}
@@ -75,7 +75,7 @@ export default function GamePage({ params }: { params: { id: string } }) {
   const totalViewers = streams.reduce((total, stream) => total + stream.viewer_count, 0);
 
   return (
-    <div className="min-h-full bg-surface-900 text-white overflow-auto">
+    <div className="min-h-full bg-layer-1 text-white overflow-auto">
       {/* Game Header */}
       <div className="bg-gradient-to-r from-purple-900 to-purple-700 py-12">
         <div className="container mx-auto px-4">
@@ -108,13 +108,13 @@ export default function GamePage({ params }: { params: { id: string } }) {
 
       {/* Tab Navigation */}
       <div className="container mx-auto px-4 py-8">
-        <div className="flex border-b border-surface-700 mb-8">
+        <div className="flex border-b border-edge mb-8">
           <button
             onClick={() => setActiveTab('streams')}
             className={`px-6 py-3 font-medium transition-colors ${
               activeTab === 'streams'
                 ? 'border-b-2 border-purple-500 text-purple-500'
-                : 'text-surface-400 hover:text-white'
+                : 'text-ink-muted hover:text-white'
             }`}
           >
             {t("game.streams")} ({streams.length})
@@ -124,7 +124,7 @@ export default function GamePage({ params }: { params: { id: string } }) {
             className={`px-6 py-3 font-medium transition-colors ${
               activeTab === 'clips'
                 ? 'border-b-2 border-purple-500 text-purple-500'
-                : 'text-surface-400 hover:text-white'
+                : 'text-ink-muted hover:text-white'
             }`}
           >
             {t("game.topClips")} ({clips.length})

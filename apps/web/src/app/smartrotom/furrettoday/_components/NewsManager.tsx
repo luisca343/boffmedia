@@ -62,14 +62,14 @@ const NewsManager: React.FC<NewsManagerProps> = ({ initialNews, onClose, onSaved
         <h2 className="text-3xl font-bold text-pink-500 pop-shadow">
           {initialNews ? "¡Edita la Noticia!" : "¡Crea una Nueva Noticia!"}
         </h2>
-        <p className="mt-2 text-sm font-comic text-secondary-700">
+        <p className="mt-2 text-sm font-comic text-secondary-active">
           Completa los datos principales y guarda para actualizar la lista al instante.
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5 p-6">
         <div className="space-y-2">
-          <label htmlFor="news-title" className="block text-sm font-bold uppercase tracking-wide text-secondary-700">
+          <label htmlFor="news-title" className="block text-sm font-bold uppercase tracking-wide text-secondary-active">
             Titulo
           </label>
           <Input
@@ -83,7 +83,7 @@ const NewsManager: React.FC<NewsManagerProps> = ({ initialNews, onClose, onSaved
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="news-subtitle" className="block text-sm font-bold uppercase tracking-wide text-secondary-700">
+          <label htmlFor="news-subtitle" className="block text-sm font-bold uppercase tracking-wide text-secondary-active">
             Subtitulo
           </label>
           <Input
@@ -97,7 +97,7 @@ const NewsManager: React.FC<NewsManagerProps> = ({ initialNews, onClose, onSaved
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="news-content" className="block text-sm font-bold uppercase tracking-wide text-secondary-700">
+          <label htmlFor="news-content" className="block text-sm font-bold uppercase tracking-wide text-secondary-active">
             Contenido
           </label>
           <textarea
@@ -113,7 +113,7 @@ const NewsManager: React.FC<NewsManagerProps> = ({ initialNews, onClose, onSaved
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <label htmlFor="news-button" className="block text-sm font-bold uppercase tracking-wide text-secondary-700">
+            <label htmlFor="news-button" className="block text-sm font-bold uppercase tracking-wide text-secondary-active">
               Texto del boton
             </label>
             <Input
@@ -127,7 +127,7 @@ const NewsManager: React.FC<NewsManagerProps> = ({ initialNews, onClose, onSaved
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="news-image" className="block text-sm font-bold uppercase tracking-wide text-secondary-700">
+            <label htmlFor="news-image" className="block text-sm font-bold uppercase tracking-wide text-secondary-active">
               URL de la imagen
             </label>
             <Input

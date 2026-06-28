@@ -51,8 +51,8 @@ const AlertDialogContent = React.forwardRef<
   const variant = useAlertDialogVariant()
 
   const variantStyles = {
-    default: "border-surface-800 bg-surface-800",
-    wingull: "border-secondary-900 bg-secondary-900"
+    default: "border-edge-strong bg-layer-2",
+    wingull: "border-secondary-active bg-secondary-soft"
   }
 
   return (
@@ -107,8 +107,8 @@ const AlertDialogTitle = React.forwardRef<
   const variant = useAlertDialogVariant()
   
   const variantStyles = {
-    default: "text-primary-300",
-    wingull: "text-secondary-300"
+    default: "text-primary-hover",
+    wingull: "text-secondary-hover"
   }
   
   return (
@@ -128,8 +128,8 @@ const AlertDialogDescription = React.forwardRef<
   const variant = useAlertDialogVariant()
   
   const variantStyles = {
-    default: "text-surface-400",
-    wingull: "text-secondary-200"
+    default: "text-ink-muted",
+    wingull: "text-secondary-hover"
   }
   
   return (

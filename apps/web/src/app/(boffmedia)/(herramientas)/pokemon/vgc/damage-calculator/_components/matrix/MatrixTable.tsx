@@ -34,7 +34,7 @@ export function EmptyMatrix({ icon }: { icon: string }) {
   return (
     <div className="flex-1 flex flex-col items-center justify-center gap-2 text-center px-8">
       <div className="text-4xl opacity-10">{icon}</div>
-      <p className="text-surface-600 text-xs">{t('emptyMatrix')}</p>
+      <p className="text-ink-dim text-xs">{t('emptyMatrix')}</p>
     </div>
   )
 }
@@ -48,7 +48,7 @@ function CalcTooltip({ tooltip }: { tooltip: TooltipState }) {
   const flipped = tooltip.x + 332 > rightEdge
   return (
     <div
-      className="fixed z-[200] pointer-events-none bg-surface-800/95 border border-surface-600/50 rounded-lg px-3 py-2 text-[10px] text-surface-100 shadow-2xl leading-relaxed backdrop-blur-sm font-mono"
+      className="fixed z-[200] pointer-events-none bg-layer-2/95 border border-edge/50 rounded-lg px-3 py-2 text-[10px] text-ink shadow-2xl leading-relaxed backdrop-blur-sm font-mono"
       style={{
         left: flipped ? tooltip.x - 320 : tooltip.x + 14,
         top: tooltip.y,
@@ -83,17 +83,17 @@ export function MatrixTable({ attackers, defenders, matrix, cornerLabel, legalPo
       >
         <thead>
           <tr>
-            <th className="sticky left-0 top-0 z-30 bg-surface-900 border-b border-r border-surface-700/40 w-52 min-w-[208px] p-2">
-              <span className="text-[10px] text-surface-600 uppercase tracking-wider">{cornerLabel}</span>
+            <th className="sticky left-0 top-0 z-30 bg-layer-1 border-b border-r border-edge/40 w-52 min-w-[208px] p-2">
+              <span className="text-[10px] text-ink-dim uppercase tracking-wider">{cornerLabel}</span>
             </th>
             {defenders.map((def) => {
               const defEntry = legalPokemon.find((p) => p.name === def.name)
               return (
-                <th key={def.name} className="sticky top-0 z-20 min-w-[110px] bg-surface-900 border-b border-r border-surface-700/40 px-2 py-1.5 text-center">
+                <th key={def.name} className="sticky top-0 z-20 min-w-[110px] bg-layer-1 border-b border-r border-edge/40 px-2 py-1.5 text-center">
                   <div className="flex flex-col items-center gap-0.5">
                     <img src={getSpriteUrl(def.name)} onError={handleSpriteError}
                       className="w-10 h-10 object-contain" style={{ imageRendering: 'pixelated' }} alt={def.name} />
-                    <span className="font-bold text-xs text-surface-200 leading-tight max-w-[96px] truncate">{def.name}</span>
+                    <span className="font-bold text-xs text-ink leading-tight max-w-[96px] truncate">{def.name}</span>
                     {defEntry && (
                       <div className="flex gap-0.5">
                         {defEntry.types.map((type) => <PokemonTypeIcon key={type} type={type} size={16} />)}
@@ -109,13 +109,13 @@ export function MatrixTable({ attackers, defenders, matrix, cornerLabel, legalPo
           {attackers.map((atk, atkIdx) => {
             const atkEntry = legalPokemon.find((p) => p.name === atk.name)
             return (
-              <tr key={`${atk.name}-${atkIdx}`} className="border-b border-surface-800/40">
-                <td className="sticky left-0 z-10 bg-surface-950 border-r border-surface-700/40 w-52 min-w-[208px] align-top p-0">
-                  <div className="flex items-center gap-2 h-[56px] px-2 border-b border-surface-800/20 overflow-hidden">
+              <tr key={`${atk.name}-${atkIdx}`} className="border-b border-edge-strong/40">
+                <td className="sticky left-0 z-10 bg-base border-r border-edge/40 w-52 min-w-[208px] align-top p-0">
+                  <div className="flex items-center gap-2 h-[56px] px-2 border-b border-edge-strong/20 overflow-hidden">
                     <img src={getSpriteUrl(atk.name)} onError={handleSpriteError}
                       className="w-8 h-8 object-contain shrink-0" style={{ imageRendering: 'pixelated' }} alt={atk.name} />
                     <div className="min-w-0">
-                      <div className="font-bold text-xs text-surface-200 truncate leading-tight">{atk.name}</div>
+                      <div className="font-bold text-xs text-ink truncate leading-tight">{atk.name}</div>
                       {atkEntry && (
                         <div className="flex gap-0.5 mt-0.5">
                           {atkEntry.types.map((type) => <PokemonTypeIcon key={type} type={type} size={16} />)}
@@ -124,23 +124,23 @@ export function MatrixTable({ attackers, defenders, matrix, cornerLabel, legalPo
                     </div>
                   </div>
                   {atk.moves.map((move, mi) => (
-                    <div key={mi} className="h-[28px] flex items-center text-[11px] text-surface-400 truncate px-2 leading-tight border-b border-surface-800/10 last:border-b-0">
-                      {move.name || <span className="text-surface-700">—</span>}
+                    <div key={mi} className="h-[28px] flex items-center text-[11px] text-ink-muted truncate px-2 leading-tight border-b border-edge-strong/10 last:border-b-0">
+                      {move.name || <span className="text-ink-dim">—</span>}
                     </div>
                   ))}
                 </td>
                 {defenders.map((def, defIdx) => {
                   const results = matrix[atkIdx]?.[defIdx] ?? []
                   return (
-                    <td key={`${def.name}-${defIdx}`} className="border-r border-surface-800/30 align-top p-0">
-                      <div className="h-[56px] border-b border-surface-800/20" />
+                    <td key={`${def.name}-${defIdx}`} className="border-r border-edge-strong/30 align-top p-0">
+                      <div className="h-[56px] border-b border-edge-strong/20" />
                       {results.map((res, mi) => {
                         const { bg, color } = getMoveRowStyle(res)
                         const koLabel = res ? getKOLabel(res) : null
                         return (
                           <div
                             key={mi}
-                            className="h-[28px] flex flex-col items-center justify-center px-1.5 border-b border-surface-800/10 last:border-b-0 cursor-default"
+                            className="h-[28px] flex flex-col items-center justify-center px-1.5 border-b border-edge-strong/10 last:border-b-0 cursor-default"
                             style={{ background: bg }}
                             onMouseEnter={res ? (e) => setTooltip({ x: e.clientX, y: e.clientY, text: res.desc }) : undefined}
                             onMouseLeave={res ? () => setTooltip(null) : undefined}

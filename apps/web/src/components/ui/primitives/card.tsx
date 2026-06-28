@@ -14,13 +14,13 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ({ className, variant = "default", children, ...props }, ref) => {
     const variantStyles = {
-      default: "border-surface-700 bg-surface-800 text-surface-100",
-      wingull: "border-secondary-200 bg-gradient-to-br from-secondary-50 to-secondary-100 text-secondary-900",
+      default: "border-edge bg-layer-2 text-ink",
+      wingull: "border-secondary bg-gradient-to-br from-secondary-soft to-secondary-soft text-secondary-active",
     }
 
     const accentLineStyles = {
-      default: "bg-gradient-to-r from-transparent via-primary-500/40 to-transparent",
-      wingull: "bg-gradient-to-r from-transparent via-secondary-400/50 to-transparent",
+      default: "bg-gradient-to-r from-transparent via-primary/40 to-transparent",
+      wingull: "bg-gradient-to-r from-transparent via-secondary-hover/50 to-transparent",
     }
 
     return (
@@ -28,7 +28,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
         <div
           ref={ref}
           className={cn(
-            "rounded-xl border shadow-md relative overflow-hidden transition-all duration-200 hover:shadow-lg hover:border-surface-600/70",
+            "rounded-xl border shadow-md relative overflow-hidden transition-all duration-200 hover:shadow-lg hover:border-edge/70",
             variantStyles[variant],
             className
           )}
@@ -64,8 +64,8 @@ const CardTitle = React.forwardRef<
   const variant = useCardVariant()
 
   const variantStyles = {
-    default: "text-primary-300",
-    wingull: "text-secondary-700",
+    default: "text-primary-hover",
+    wingull: "text-secondary-active",
   }
 
   return (
@@ -89,8 +89,8 @@ const CardDescription = React.forwardRef<
   const variant = useCardVariant()
 
   const variantStyles = {
-    default: "text-surface-400",
-    wingull: "text-secondary-600",
+    default: "text-ink-muted",
+    wingull: "text-secondary-active",
   }
 
   return (

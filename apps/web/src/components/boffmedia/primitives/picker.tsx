@@ -13,10 +13,10 @@ export function Picker({ value, options, onChange, className, ariaLabel }: Picke
     <select
       className={cn(
         "w-full px-[0.45rem] py-[0.35rem] rounded-[6px] [border-width:var(--hairline)] border-solid [border-color:var(--border-strong)]",
-        "bg-[var(--surface-2)] text-xs text-[var(--text)] font-body",
+        "bg-layer-2 text-xs text-ink font-body",
         "appearance-none cursor-pointer",
         "transition-[border-color] duration-[var(--dur)] ease-[var(--ease)]",
-        "focus:outline-none focus:border-[var(--accent)] focus:shadow-[0_0_0_2px_var(--accent-soft)]",
+        "focus:outline-none focus:border-secondary focus:shadow-[0_0_0_2px_var(--secondary-soft)]",
         className,
       )}
       value={value}

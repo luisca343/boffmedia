@@ -41,12 +41,12 @@ export function SectionFilters({
     <div className={cn("flex flex-col md:flex-row gap-4 items-center justify-between", className)}>
       {/* Search */}
       <div className="relative w-full md:w-96">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-surface-400" />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-ink-muted" />
         <Input
           placeholder={searchPlaceholder}
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="pl-10 bg-surface-700/50 border-surface-600 text-surface-50 placeholder:text-surface-400 focus:border-accent-500/50 focus:ring-accent-500/20"
+          className="pl-10 bg-layer-3/50 border-edge text-ink placeholder:text-ink-muted focus:border-secondary/50 focus:ring-secondary/20"
         />
       </div>
 
@@ -57,8 +57,8 @@ export function SectionFilters({
         {/* Items Count Badge */}
         {showItemsCount && (
           <div className="flex items-center gap-2">
-            <span className="text-surface-400 text-sm font-medium capitalize">{itemsLabel}:</span>
-            <Badge className="bg-accent-500 text-white hover:bg-accent-600 font-bold">
+            <span className="text-ink-muted text-sm font-medium capitalize">{itemsLabel}:</span>
+            <Badge className="bg-secondary text-white hover:bg-secondary-active font-bold">
               {itemsCount}
             </Badge>
           </div>
@@ -66,7 +66,7 @@ export function SectionFilters({
 
         {/* View Mode Toggle */}
         {showViewMode && viewMode && onViewModeChange && (
-          <div className="flex bg-surface-700/50 rounded-lg p-1 border border-surface-600">
+          <div className="flex bg-layer-3/50 rounded-lg p-1 border border-edge">
             <Button
               variant={viewMode === 'grid' ? 'default' : 'ghost'}
               size="sm"
@@ -74,8 +74,8 @@ export function SectionFilters({
               className={cn(
                 "px-3 py-2",
                 viewMode === 'grid' 
-                  ? 'bg-accent-500 text-white hover:bg-accent-600' 
-                  : 'text-surface-400 hover:text-surface-200 hover:bg-surface-600'
+                  ? 'bg-secondary text-white hover:bg-secondary-active' 
+                  : 'text-ink-muted hover:text-ink hover:bg-layer-3'
               )}
             >
               <Grid className="h-4 w-4" />
@@ -87,8 +87,8 @@ export function SectionFilters({
               className={cn(
                 "px-3 py-2",
                 viewMode === 'list' 
-                  ? 'bg-accent-500 text-white hover:bg-accent-600' 
-                  : 'text-surface-400 hover:text-surface-200 hover:bg-surface-600'
+                  ? 'bg-secondary text-white hover:bg-secondary-active' 
+                  : 'text-ink-muted hover:text-ink hover:bg-layer-3'
               )}
             >
               <List className="h-4 w-4" />

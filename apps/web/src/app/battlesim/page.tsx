@@ -47,7 +47,7 @@ function ModeCard({ mode, t, index }: { mode: Mode; t: ReturnType<typeof useTran
         mode.hero ? 'lg:row-span-2 min-h-[260px] lg:min-h-0' : 'min-h-[150px]'
       }`}
       style={{
-        background: `linear-gradient(150deg, color-mix(in srgb, ${mode.color} 16%, var(--surface)), var(--surface) 55%)`,
+        background: `linear-gradient(150deg, color-mix(in srgb, ${mode.color} 16%, var(--layer-1)), var(--layer-1) 55%)`,
         border: `1px solid color-mix(in srgb, ${mode.color} 30%, var(--border))`,
         animationDelay: `${0.08 * index}s`,
         ['--_c' as any]: mode.color,
@@ -77,7 +77,7 @@ function ModeCard({ mode, t, index }: { mode: Mode; t: ReturnType<typeof useTran
         >
           {String(index + 1).padStart(2, '0')}
         </span>
-        <h2 className={`font-display font-extrabold uppercase tracking-[.04em] text-[var(--text)] ${mode.hero ? 'text-3xl' : 'text-xl'}`}>
+        <h2 className={`font-display font-extrabold uppercase tracking-[.04em] text-ink ${mode.hero ? 'text-3xl' : 'text-xl'}`}>
           {t(mode.titleKey)}
         </h2>
         <p className="text-sm max-w-[34ch]" style={{ color: 'var(--text-muted)' }}>
@@ -121,18 +121,18 @@ export default function Page() {
       <div
         aria-hidden="true"
         className="launcher-glow absolute -top-40 left-1/2 -translate-x-1/2 w-[720px] h-[420px] rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%)' }}
+        style={{ background: 'radial-gradient(ellipse, color-mix(in srgb, var(--secondary) 16%, transparent), transparent 70%)' }}
       />
 
       <div className="relative z-10 mx-auto max-w-5xl flex flex-col gap-8">
         {/* Hero header */}
         <header className="launcher-in flex flex-col gap-2">
-          <span className="font-mono font-bold text-t-3xs tracking-[.3em] uppercase" style={{ color: 'var(--accent-bright)' }}>
+          <span className="font-mono font-bold text-t-3xs tracking-[.3em] uppercase" style={{ color: 'var(--secondary-hover)' }}>
             ⚡ Boffmedia
           </span>
           <h1
             className="font-display font-black italic uppercase text-5xl md:text-6xl tracking-[.02em]"
-            style={{ color: 'var(--text)', textShadow: '0 0 36px color-mix(in srgb, var(--accent) 35%, transparent)' }}
+            style={{ color: 'var(--text)', textShadow: '0 0 36px color-mix(in srgb, var(--secondary) 35%, transparent)' }}
           >
             {t('landing.title')}
           </h1>
@@ -147,7 +147,7 @@ export default function Page() {
             href={activeBattle.href}
             className="launcher-in bsx-focus flex items-center gap-3 self-start px-5 py-3 rounded-[var(--radius)] font-medium"
             style={{
-              background: 'color-mix(in srgb, var(--emerald-500) 12%, var(--surface))',
+              background: 'color-mix(in srgb, var(--emerald-500) 12%, var(--layer-1))',
               border: '1px solid color-mix(in srgb, var(--emerald-500) 45%, transparent)',
               color: 'var(--emerald-400)',
               animationDelay: '.05s',

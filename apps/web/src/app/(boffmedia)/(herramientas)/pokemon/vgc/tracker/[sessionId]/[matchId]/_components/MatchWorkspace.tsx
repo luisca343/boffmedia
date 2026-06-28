@@ -156,25 +156,25 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)] text-surface-50 overflow-hidden">
+    <div className="flex flex-col h-[calc(100vh-4rem)] text-ink overflow-hidden">
       {/* ── Top bar ──────────────────────────────────────────────────────── */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-surface-700 shrink-0 bg-surface-900">
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-edge shrink-0 bg-layer-1">
         <button
           onClick={handleBack}
-          className="text-surface-400 hover:text-surface-50 transition-colors"
+          className="text-ink-muted hover:text-ink transition-colors"
         >
           <ArrowLeft size={18} />
         </button>
 
         {/* Time + format */}
         <div className="flex items-center gap-2 shrink-0">
-          <span className="text-surface-400 text-sm">
+          <span className="text-ink-muted text-sm">
             {new Date(match.createdAt).toLocaleTimeString(undefined, {
               hour: '2-digit',
               minute: '2-digit',
             })}
           </span>
-          <span className="text-surface-600 text-xs font-mono">{match.format}</span>
+          <span className="text-ink-dim text-xs font-mono">{match.format}</span>
         </div>
 
         <div className="flex-1" />
@@ -205,42 +205,42 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
         </div>
 
         {/* My ELO — standalone (ELO after this match) */}
-        <div className="flex items-center gap-1.5 bg-surface-800 border border-surface-700 rounded-lg px-2.5 py-1.5">
-          <span className="text-[10px] text-surface-500 font-mono select-none uppercase">{t('indicators.myElo')}</span>
+        <div className="flex items-center gap-1.5 bg-layer-2 border border-edge rounded-lg px-2.5 py-1.5">
+          <span className="text-[10px] text-ink-muted font-mono select-none uppercase">{t('indicators.myElo')}</span>
           <input
             value={eloAfterInput}
             onChange={(e) => setEloAfterInput(e.target.value)}
             onBlur={handleEloAfterBlur}
             placeholder="—"
-            className="w-20 bg-transparent text-surface-50 text-base font-mono text-center focus:outline-none placeholder:text-surface-700"
+            className="w-20 bg-transparent text-ink text-base font-mono text-center focus:outline-none placeholder:text-ink-dim"
           />
         </div>
 
         {/* Rival group: name + archetype + rival ELO together */}
-        <div className="flex items-center gap-2 bg-surface-800 border border-surface-700 rounded-lg px-2.5 py-1.5">
+        <div className="flex items-center gap-2 bg-layer-2 border border-edge rounded-lg px-2.5 py-1.5">
           <input
             value={opponentNameInput}
             onChange={(e) => setOpponentNameInput(e.target.value)}
             onBlur={handleOpponentNameBlur}
             placeholder={t('placeholders.rivalName')}
-            className="w-24 bg-transparent text-surface-200 text-sm placeholder:text-surface-600 focus:outline-none"
+            className="w-24 bg-transparent text-ink text-sm placeholder:text-ink-dim focus:outline-none"
           />
-          <span className="text-surface-700 text-xs shrink-0">·</span>
+          <span className="text-ink-dim text-xs shrink-0">·</span>
           <input
             value={archetypeInput}
             onChange={(e) => setArchetypeInput(e.target.value)}
             onBlur={handleArchetypeBlur}
             placeholder={t('archetype.placeholder')}
-            className="w-20 bg-transparent text-surface-400 text-xs placeholder:text-surface-700 focus:outline-none"
+            className="w-20 bg-transparent text-ink-muted text-xs placeholder:text-ink-dim focus:outline-none"
           />
-          <span className="text-surface-700 text-xs shrink-0">·</span>
-          <span className="text-[10px] text-surface-500 font-mono select-none uppercase shrink-0">{t('indicators.rival')}</span>
+          <span className="text-ink-dim text-xs shrink-0">·</span>
+          <span className="text-[10px] text-ink-muted font-mono select-none uppercase shrink-0">{t('indicators.rival')}</span>
           <input
             value={opponentEloInput}
             onChange={(e) => setOpponentEloInput(e.target.value)}
             onBlur={handleOpponentEloBlur}
             placeholder="—"
-            className="w-20 bg-transparent text-surface-50 text-base font-mono text-center focus:outline-none placeholder:text-surface-700"
+            className="w-20 bg-transparent text-ink text-base font-mono text-center focus:outline-none placeholder:text-ink-dim"
           />
         </div>
 
@@ -248,7 +248,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
         {!isCompleted ? (
           <button
             onClick={handleFinish}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-600 hover:bg-primary-500 text-white text-sm font-medium transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-active hover:bg-primary text-white text-sm font-medium transition-colors"
           >
             <Check size={14} /> {t('buttons.finish')}
           </button>
@@ -269,7 +269,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
             </button>
             <button
               onClick={() => setConfirmDelete(false)}
-              className="text-xs px-2.5 py-1.5 rounded-lg bg-surface-700 hover:bg-surface-600 text-surface-300 transition-colors"
+              className="text-xs px-2.5 py-1.5 rounded-lg bg-layer-3 hover:bg-layer-3 text-ink transition-colors"
             >
               {t('buttons.cancel')}
             </button>
@@ -277,7 +277,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
         ) : (
           <button
             onClick={() => setConfirmDelete(true)}
-            className="p-1.5 rounded-lg text-surface-600 hover:text-red-400 hover:bg-surface-800 transition-colors"
+            className="p-1.5 rounded-lg text-ink-dim hover:text-red-400 hover:bg-layer-2 transition-colors"
             title={t('tooltips.deleteMatch')}
           >
             <Trash2 size={15} />
@@ -288,7 +288,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
       {/* ── Main: My Team | Notes | Opponent ─────────────────────────── */}
       <div className="flex flex-1 min-h-0">
         {/* My Team column */}
-        <div className="w-[400px] shrink-0 overflow-y-auto border-r border-surface-700 px-5 py-4">
+        <div className="w-[400px] shrink-0 overflow-y-auto border-r border-edge px-5 py-4">
           <TeamPanel
             label={t('labels.myTeam')}
             slots={match.myTeam.slots}
@@ -307,7 +307,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
         />
 
         {/* Opponent column */}
-        <div className="w-[400px] shrink-0 overflow-y-auto border-l border-surface-700 px-5 py-4 flex flex-col gap-4">
+        <div className="w-[400px] shrink-0 overflow-y-auto border-l border-edge px-5 py-4 flex flex-col gap-4">
           <TeamPanel
             label={t('labels.opponent')}
             slots={match.opponentTeam.slots}
@@ -319,7 +319,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
 
           {/* Outcome tag */}
           <div className="flex flex-col gap-1.5">
-            <span className="text-[10px] text-surface-600 uppercase tracking-wide font-medium">
+            <span className="text-[10px] text-ink-dim uppercase tracking-wide font-medium">
               {t('outcomeTag.label')}
             </span>
             <div className="flex items-center gap-1.5 flex-wrap">
@@ -333,8 +333,8 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
                       ? tag === 'skill' ? 'bg-green-500/20 border-green-500/40 text-green-300'
                         : tag === 'misplay' ? 'bg-red-500/20 border-red-500/40 text-red-300'
                         : tag === 'luck' ? 'bg-yellow-500/20 border-yellow-500/40 text-yellow-300'
-                        : 'bg-surface-500/20 border-surface-500/40 text-surface-300'
-                      : 'border-surface-700 text-surface-500 hover:text-surface-300 hover:border-surface-600',
+                        : 'bg-layer-3/20 border-edge/40 text-ink'
+                      : 'border-edge text-ink-muted hover:text-ink hover:border-edge',
                   ].join(' ')}
                 >
                   {t(`outcomeTag.${tag}`)}
@@ -345,7 +345,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
 
           {/* Turn count */}
           <div className="flex items-center gap-3">
-            <span className="text-[10px] text-surface-600 uppercase tracking-wide font-medium shrink-0">
+            <span className="text-[10px] text-ink-dim uppercase tracking-wide font-medium shrink-0">
               {t('turnCount.label')}
             </span>
             <input
@@ -356,7 +356,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
               onChange={(e) => setTurnCountInput(e.target.value)}
               onBlur={handleTurnCountBlur}
               placeholder="—"
-              className="w-16 bg-surface-800 border border-surface-700 focus:border-primary-500 rounded-lg text-surface-200 text-sm font-mono text-center focus:outline-none px-2 py-1 transition-colors placeholder:text-surface-600"
+              className="w-16 bg-layer-2 border border-edge focus:border-primary rounded-lg text-ink text-sm font-mono text-center focus:outline-none px-2 py-1 transition-colors placeholder:text-ink-dim"
             />
           </div>
         </div>
@@ -386,13 +386,13 @@ function ResultButton({
   const styles = {
     green: active
       ? 'bg-green-500 border-green-400 text-white shadow-lg shadow-green-500/30'
-      : 'bg-surface-800 border-surface-700 text-surface-400 hover:border-green-500/50 hover:text-green-300',
+      : 'bg-layer-2 border-edge text-ink-muted hover:border-green-500/50 hover:text-green-300',
     yellow: active
       ? 'bg-yellow-500 border-yellow-400 text-white shadow-lg shadow-yellow-500/30'
-      : 'bg-surface-800 border-surface-700 text-surface-400 hover:border-yellow-500/50 hover:text-yellow-300',
+      : 'bg-layer-2 border-edge text-ink-muted hover:border-yellow-500/50 hover:text-yellow-300',
     red: active
       ? 'bg-red-500 border-red-400 text-white shadow-lg shadow-red-500/30'
-      : 'bg-surface-800 border-surface-700 text-surface-400 hover:border-red-500/50 hover:text-red-300',
+      : 'bg-layer-2 border-edge text-ink-muted hover:border-red-500/50 hover:text-red-300',
   };
 
   return (

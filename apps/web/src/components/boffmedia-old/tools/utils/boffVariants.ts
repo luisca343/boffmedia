@@ -29,7 +29,7 @@ export interface BoffVariantTokens {
 
 export const BOFF_VARIANTS: Record<BoffVariant, BoffVariantTokens> = {
   primary: {
-    bar: "from-primary-400 via-orange-400 to-primary-600",
+    bar: "from-primary-hover via-orange-400 to-primary-active",
     border: "rgba(249,115,22,0.35)",
     glow: "rgba(249,115,22,0.08)",
     glowStrong: "rgba(249,115,22,0.3)",
@@ -40,7 +40,7 @@ export const BOFF_VARIANTS: Record<BoffVariant, BoffVariantTokens> = {
     text: "rgb(251,146,60)",
   },
   secondary: {
-    bar: "from-secondary-400 via-cyan-400 to-secondary-600",
+    bar: "from-secondary-hover via-cyan-400 to-secondary-active",
     border: "rgba(6,182,212,0.35)",
     glow: "rgba(6,182,212,0.08)",
     glowStrong: "rgba(6,182,212,0.3)",
@@ -51,7 +51,7 @@ export const BOFF_VARIANTS: Record<BoffVariant, BoffVariantTokens> = {
     text: "rgb(34,211,238)",
   },
   accent: {
-    bar: "from-accent-400 via-purple-400 to-accent-600",
+    bar: "from-secondary-hover via-purple-400 to-secondary-active",
     border: "rgba(168,85,247,0.35)",
     glow: "rgba(168,85,247,0.08)",
     glowStrong: "rgba(168,85,247,0.3)",

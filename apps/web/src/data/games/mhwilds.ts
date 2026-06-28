@@ -6,8 +6,8 @@ export const mhwilds: GameEntry = {
 
   // Sidebar
   icon: "/img/games/mhwilds/icon.webp",
-  color: "from-highlight-400 to-highlight-600",
-  bg: "bg-highlight-900",
+  color: "from-warning-hover to-warning",
+  bg: "bg-warning-soft",
 
   // Landing page
   logo: "/img/games/mhwilds/icon.webp",
@@ -35,8 +35,8 @@ export const mhwilds: GameEntry = {
           landing: {
             icon: "/img/games/mhwilds/long-sword.webp",
             fallbackIcon: "Shield",
-            fallbackIconColor: "text-highlight-400",
-            color: "from-highlight-400 to-emerald-600",
+            fallbackIconColor: "text-warning-hover",
+            color: "from-warning-hover to-emerald-600",
             features: ["optimizer", "calculator", "comparison"],
             featured: true,
             isNew: true,
@@ -53,8 +53,8 @@ export const mhwilds: GameEntry = {
           landing: {
             icon: "/img/games/mhwilds/charge-blade.webp",
             fallbackIcon: "Sword",
-            fallbackIconColor: "text-secondary-400",
-            color: "from-secondary-400 to-indigo-600",
+            fallbackIconColor: "text-secondary-hover",
+            color: "from-secondary-hover to-indigo-600",
             features: ["trees", "comparison", "stats"],
             featured: false,
             isNew: false,

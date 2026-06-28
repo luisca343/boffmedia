@@ -38,8 +38,8 @@ export function TeamForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
     },
   })
 
-  const selectTriggerClass = "bg-[var(--surface-2)] border border-solid border-[var(--border-strong)] text-[var(--text)] py-2.5 px-3.5 focus:outline-none focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-soft)]"
-  const selectContentClass = "bg-[var(--surface)] border-[var(--border-strong)] text-[var(--text)]"
+  const selectTriggerClass = "bg-layer-2 border border-solid border-edge-strong text-ink py-2.5 px-3.5 focus:outline-none focus:border-secondary focus:shadow-[0_0_0_3px_var(--secondary-soft)]"
+  const selectContentClass = "bg-layer-1 border-edge-strong text-ink"
 
   return (
     <Form {...form}>
@@ -49,11 +49,11 @@ export function TeamForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-[var(--text-muted)]">Nombre del Equipo</FormLabel>
+              <FormLabel className="text-ink-muted">Nombre del Equipo</FormLabel>
               <FormControl>
                 <BoffInput placeholder="Nombre del equipo" {...field} />
               </FormControl>
-              <FormDescription className="text-[var(--text-dim)]">Este será el nombre principal del equipo.</FormDescription>
+              <FormDescription className="text-ink-dim">Este será el nombre principal del equipo.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -64,7 +64,7 @@ export function TeamForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
           name="tag"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-[var(--text-muted)]">Tag del Equipo</FormLabel>
+              <FormLabel className="text-ink-muted">Tag del Equipo</FormLabel>
               <FormControl>
                 <BoffInput
                   placeholder="TAG"
@@ -72,7 +72,7 @@ export function TeamForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
                   value={field.value || ""}
                 />
               </FormControl>
-              <FormDescription className="text-[var(--text-dim)]">Un identificador corto para el equipo (máx. 5 caracteres).</FormDescription>
+              <FormDescription className="text-ink-dim">Un identificador corto para el equipo (máx. 5 caracteres).</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -83,7 +83,7 @@ export function TeamForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
           name="eventId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-[var(--text-muted)]">Evento</FormLabel>
+              <FormLabel className="text-ink-muted">Evento</FormLabel>
               <Select
                 onValueChange={(value) => field.onChange(Number(value))}
                 defaultValue={field.value?.toString()}
@@ -102,7 +102,7 @@ export function TeamForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
                   ))}
                 </SelectContent>
               </Select>
-              <FormDescription className="text-[var(--text-dim)]">Selecciona el evento al que pertenecerá este equipo.</FormDescription>
+              <FormDescription className="text-ink-dim">Selecciona el evento al que pertenecerá este equipo.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -113,7 +113,7 @@ export function TeamForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
           name="icon"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-[var(--text-muted)]">Icono URL (opcional)</FormLabel>
+              <FormLabel className="text-ink-muted">Icono URL (opcional)</FormLabel>
               <FormControl>
                 <BoffInput
                   placeholder="https://ejemplo.com/icono.jpg"
@@ -121,7 +121,7 @@ export function TeamForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
                   value={field.value || ""}
                 />
               </FormControl>
-              <FormDescription className="text-[var(--text-dim)]">URL de la imagen que se usará como icono del equipo.</FormDescription>
+              <FormDescription className="text-ink-dim">URL de la imagen que se usará como icono del equipo.</FormDescription>
               <FormMessage />
             </FormItem>
           )}

@@ -18,12 +18,12 @@ interface DemoEmptyStateProps {
 
 function DemoEmptyState({ icon = "inbox", title, lead, ctaLabel, ctaIcon = "arrow", onCta, secondaryLabel, onSecondary }: DemoEmptyStateProps) {
   return (
-    <div className="text-center p-[clamp(2rem,5vw,3.4rem)_1.5rem] flex flex-col items-center gap-[0.5rem] border border-dashed border-[var(--border-strong)] rounded-[var(--radius-lg)] bg-[color-mix(in_srgb,var(--surface-2)_50%,transparent)]">
-      <span className="w-16 h-16 rounded-[var(--radius-lg)] grid place-items-center mb-[0.4rem] text-[var(--accent-bright)] bg-[var(--accent-soft)] border border-solid border-[color-mix(in_srgb,var(--accent)_30%,transparent)]">
+    <div className="text-center p-[clamp(2rem,5vw,3.4rem)_1.5rem] flex flex-col items-center gap-[0.5rem] border border-dashed border-edge-strong rounded-[var(--radius-lg)] bg-[color-mix(in_srgb,var(--layer-2)_50%,transparent)]">
+      <span className="w-16 h-16 rounded-[var(--radius-lg)] grid place-items-center mb-[0.4rem] text-secondary-hover bg-secondary-soft border border-solid border-[color-mix(in_srgb,var(--secondary)_30%,transparent)]">
         <Icon name={icon} size={28} />
       </span>
       <h3 className="font-display text-[length:var(--t-xl)] font-bold">{title}</h3>
-      <p className="text-[var(--text-muted)] text-[length:var(--t-sm)] max-w-[42ch] m-0 mb-[0.7rem]">{lead}</p>
+      <p className="text-ink-muted text-[length:var(--t-sm)] max-w-[42ch] m-0 mb-[0.7rem]">{lead}</p>
       <div className="flex flex-wrap gap-[0.7rem] justify-center">
         {ctaLabel && <Button variant="accent" size="sm" iconRight={ctaIcon} onClick={onCta}>{ctaLabel}</Button>}
         {secondaryLabel && <Button variant="ghost" size="sm" onClick={onSecondary}>{secondaryLabel}</Button>}
@@ -44,17 +44,17 @@ export function SystemStatesDemoEmpty() {
   const p = EMPTY_PRESETS[k]
 
   return (
-    <div className="border border-solid border-[var(--border)] rounded-[var(--radius-lg)] bg-[var(--card-bg)] p-[clamp(1.4rem,3vw,2.2rem)] mt-[1.2rem]">
+    <div className="border border-solid border-edge rounded-[var(--radius-lg)] bg-[var(--card-bg)] p-[clamp(1.4rem,3vw,2.2rem)] mt-[1.2rem]">
       <div className="flex items-center justify-between gap-4 flex-wrap mb-[1.3rem]">
         <span className="font-display text-[length:var(--t-lg)] font-bold">Estado vacío · contexto</span>
-        <div className="inline-flex flex-wrap gap-[0.3rem] p-[0.3rem] rounded-[var(--radius-pill)] bg-[var(--surface-2)] border border-[var(--border)]" role="group" aria-label="Contexto del estado vacío">
+        <div className="inline-flex flex-wrap gap-[0.3rem] p-[0.3rem] rounded-[var(--radius-pill)] bg-layer-2 border border-edge" role="group" aria-label="Contexto del estado vacío">
           {Object.entries(EMPTY_PRESETS).map(([id, v]) => (
             <button
               key={id}
               aria-pressed={k === id}
               onClick={() => setK(id)}
-              className="font-[var(--label-font)] text-[length:var(--t-xs)] tracking-[0.06em] uppercase px-[0.85rem] py-[0.45rem] rounded-[var(--radius-pill)] border-0 cursor-pointer bg-transparent text-[var(--text-muted)] hover:text-[var(--text)] data-[pressed=true]:bg-[var(--accent)] data-[pressed=true]:text-[var(--on-accent)]"
-              style={k === id ? { background: "var(--accent)", color: "var(--on-accent)" } : undefined}
+              className="font-[var(--label-font)] text-[length:var(--t-xs)] tracking-[0.06em] uppercase px-[0.85rem] py-[0.45rem] rounded-[var(--radius-pill)] border-0 cursor-pointer bg-transparent text-ink-muted hover:text-ink data-[pressed=true]:bg-secondary data-[pressed=true]:text-[var(--on-secondary)]"
+              style={k === id ? { background: "var(--secondary)", color: "var(--on-secondary)" } : undefined}
             >
               {v.label}
             </button>

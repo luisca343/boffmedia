@@ -50,7 +50,7 @@ export function BSXScorePlate({ name, rating, team, right, av }: BSXScorePlatePr
                 m.unknown
                   ? { background: "transparent", boxShadow: "none", border: "1px dashed var(--border-strong)" }
                   : isKo
-                  ? { background: "var(--surface-3)", boxShadow: "none", border: "1px solid var(--border-strong)" }
+                  ? { background: "var(--layer-3)", boxShadow: "none", border: "1px solid var(--border-strong)" }
                   : isLow
                   ? { background: "var(--amber-400)", boxShadow: "0 0 6px -1px var(--amber-400)" }
                   : { background: "var(--emerald-400)", boxShadow: "0 0 6px -1px var(--emerald-400)" }

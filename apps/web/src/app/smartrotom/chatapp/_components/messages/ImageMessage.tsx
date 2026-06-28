@@ -73,7 +73,7 @@ export function ImageMessage({
           />
         )}
         {isFirstInSequence && (
-          <span className={`text-xs ${sender === "user" ? "text-surface-400 self-end" : "text-surface-500"} mb-1`}>
+          <span className={`text-xs ${sender === "user" ? "text-ink-muted self-end" : "text-ink-muted"} mb-1`}>
             {timestamp}
           </span>
         )}

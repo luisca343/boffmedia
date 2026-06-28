@@ -15,9 +15,9 @@ export default function StreakNotifications({
     <>
       {/* Banner change notification */}
       {bannerChanged && (
-        <div className="bg-secondary-900/30 border-b border-secondary-500/30 p-2 flex items-center">
-          <AlertCircle className="h-4 w-4 text-secondary-400 mr-2" />
-          <span className="text-sm text-secondary-300">
+        <div className="bg-secondary-soft/30 border-b border-secondary/30 p-2 flex items-center">
+          <AlertCircle className="h-4 w-4 text-secondary-hover mr-2" />
+          <span className="text-sm text-secondary-hover">
             ¡Nueva temporada de recompensas disponible! Tu progreso ha sido reiniciado para la nueva serie de recompensas.
           </span>
         </div>

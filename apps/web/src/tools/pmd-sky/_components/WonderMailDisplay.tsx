@@ -52,7 +52,7 @@ export function WonderMailDisplay({
     >
       {/* Top neon bar */}
       <div
-        className="h-[3px] bg-gradient-to-r from-secondary-400 via-cyan-400 to-secondary-600 transition-all duration-300"
+        className="h-[3px] bg-gradient-to-r from-secondary-hover via-cyan-400 to-secondary-active transition-all duration-300"
         style={{ opacity: isHovered ? 1 : 0.75, boxShadow: isHovered ? "0 0 14px rgba(6,182,212,0.6)" : "none" }}
       />
 
@@ -127,7 +127,7 @@ export function WonderMailDisplay({
             boxShadow: "inset 0 2px 8px rgba(0,0,0,0.4)",
           }}
         >
-          <div className="text-center font-mono text-base sm:text-lg leading-loose text-surface-50 select-all">
+          <div className="text-center font-mono text-base sm:text-lg leading-loose text-ink select-all">
             {mail.split("\n").map((line, i) => (
               <div key={i} className="py-0.5 tracking-[0.15em]">
                 {line || "\u00A0"}

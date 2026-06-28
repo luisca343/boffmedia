@@ -60,32 +60,32 @@ export default function TrackerPage() {
       >
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-primary-500/20 border border-primary-500/30">
-              <Swords className="w-6 h-6 text-primary-400" />
+            <div className="p-2 rounded-lg bg-primary/20 border border-primary/30">
+              <Swords className="w-6 h-6 text-primary-hover" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-surface-50">{t('title')}</h1>
-              <p className="text-surface-400 text-sm">{t('subtitle')}</p>
+              <h1 className="text-2xl font-bold text-ink">{t('title')}</h1>
+              <p className="text-ink-muted text-sm">{t('subtitle')}</p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={() => setShowExportImport(true)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-surface-700 text-surface-400 hover:text-surface-50 hover:border-surface-600 text-sm transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-edge text-ink-muted hover:text-ink hover:border-edge text-sm transition-colors"
               title={t('exportImport.title')}
             >
               <Database size={14} />
             </button>
             <button
               onClick={() => setShowPresets(true)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-surface-700 text-surface-300 hover:text-surface-50 hover:border-surface-600 text-sm transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-edge text-ink hover:text-ink hover:border-edge text-sm transition-colors"
             >
               <Layers size={14} /> {t('buttons.presets', { count: presets.length })}
             </button>
             <button
               onClick={() => setShowNewSession(true)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary-600 hover:bg-primary-500 text-white text-sm font-medium transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary-active hover:bg-primary text-white text-sm font-medium transition-colors"
             >
               <Plus size={14} /> {t('buttons.newSession')}
             </button>
@@ -96,13 +96,13 @@ export default function TrackerPage() {
       {/* Active sessions */}
       {loading ? (
         <div className="flex justify-center py-16">
-          <div className="w-5 h-5 border-2 border-primary-400 border-t-transparent rounded-full animate-spin" />
+          <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
         </div>
       ) : activeSessions.length === 0 && !showingArchived ? (
         <Card className="p-12 text-center">
-          <Swords size={36} className="mx-auto text-surface-600 mb-3" />
-          <p className="text-surface-400 text-sm font-medium mb-1">{t('empty.noSessions')}</p>
-          <p className="text-surface-600 text-xs">{t('empty.noSessionsHint')}</p>
+          <Swords size={36} className="mx-auto text-ink-dim mb-3" />
+          <p className="text-ink-muted text-sm font-medium mb-1">{t('empty.noSessions')}</p>
+          <p className="text-ink-dim text-xs">{t('empty.noSessionsHint')}</p>
         </Card>
       ) : (
         <div className="flex flex-col gap-2">
@@ -124,7 +124,7 @@ export default function TrackerPage() {
         <div className="flex flex-col gap-2">
           <button
             onClick={() => setShowArchived((v) => !v)}
-            className="flex items-center gap-2 text-xs text-surface-500 hover:text-surface-300 transition-colors"
+            className="flex items-center gap-2 text-xs text-ink-muted hover:text-ink transition-colors"
           >
             <Archive size={12} />
             {showArchived
@@ -189,24 +189,24 @@ function SessionCard({
   return (
     <Link
       href={`/pokemon/vgc/tracker/${session.id}`}
-      className={`group flex items-start justify-between gap-3 rounded-xl border bg-surface-800 px-4 py-3 transition-all ${
+      className={`group flex items-start justify-between gap-3 rounded-xl border bg-layer-2 px-4 py-3 transition-all ${
         archived
-          ? 'border-surface-700 opacity-60 hover:opacity-80'
+          ? 'border-edge opacity-60 hover:opacity-80'
           : isTournament
           ? 'border-amber-500/30 hover:border-amber-400/50'
-          : 'border-surface-700 hover:border-primary-500/40'
+          : 'border-edge hover:border-primary/40'
       }`}
     >
       <div className="flex items-start gap-3 flex-1 min-w-0">
         <div className={`mt-0.5 p-1.5 rounded-lg shrink-0 ${
-          isTournament ? 'bg-amber-500/15 text-amber-400' : 'bg-surface-800 text-surface-500'
+          isTournament ? 'bg-amber-500/15 text-amber-400' : 'bg-layer-2 text-ink-muted'
         }`}>
           {isTournament ? <Trophy size={14} /> : <TrendingUp size={14} />}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
-            <span className="text-surface-50 font-medium truncate">{session.label}</span>
-            <span className="shrink-0 text-[11px] font-mono bg-surface-800 border border-surface-700 rounded px-1.5 py-px text-surface-400">
+            <span className="text-ink font-medium truncate">{session.label}</span>
+            <span className="shrink-0 text-[11px] font-mono bg-layer-2 border border-edge rounded px-1.5 py-px text-ink-muted">
               {session.format}
             </span>
             {isTournament && (
@@ -215,12 +215,12 @@ function SessionCard({
               </span>
             )}
             {archived && (
-              <span className="shrink-0 text-[11px] bg-surface-800 border border-surface-700 text-surface-500 rounded px-1.5 py-px">
+              <span className="shrink-0 text-[11px] bg-layer-2 border border-edge text-ink-muted rounded px-1.5 py-px">
                 {t('archive.badge')}
               </span>
             )}
           </div>
-          <div className="flex flex-wrap items-center gap-3 text-xs text-surface-500">
+          <div className="flex flex-wrap items-center gap-3 text-xs text-ink-muted">
             <span>{formatDate(session.startedAt)}</span>
             {isTournament && session.tournamentName && (
               <span className="flex items-center gap-1 text-amber-500/70">
@@ -241,7 +241,7 @@ function SessionCard({
       <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
         <button
           onClick={(e) => { e.preventDefault(); onDuplicate(); }}
-          className="p-1.5 rounded text-surface-500 hover:text-surface-200 hover:bg-surface-800 transition-colors"
+          className="p-1.5 rounded text-ink-muted hover:text-ink hover:bg-layer-2 transition-colors"
           title={t('buttons.duplicate')}
         >
           <Copy size={13} />
@@ -249,14 +249,14 @@ function SessionCard({
         {archived ? (
           <button
             onClick={(e) => { e.preventDefault(); onUnarchive?.(); }}
-            className="px-2 py-1 rounded text-surface-500 hover:text-surface-200 hover:bg-surface-800 text-xs transition-colors"
+            className="px-2 py-1 rounded text-ink-muted hover:text-ink hover:bg-layer-2 text-xs transition-colors"
           >
             {t('buttons.unarchive')}
           </button>
         ) : (
           <button
             onClick={(e) => { e.preventDefault(); onArchive?.(); }}
-            className="p-1.5 rounded text-surface-500 hover:text-surface-200 hover:bg-surface-800 transition-colors"
+            className="p-1.5 rounded text-ink-muted hover:text-ink hover:bg-layer-2 transition-colors"
             title={t('buttons.archive')}
           >
             <Archive size={13} />
@@ -264,7 +264,7 @@ function SessionCard({
         )}
         <button
           onClick={(e) => { e.preventDefault(); onDelete(); }}
-          className="px-2 py-1 rounded text-surface-600 hover:text-red-400 hover:bg-surface-800 text-xs transition-colors"
+          className="px-2 py-1 rounded text-ink-dim hover:text-red-400 hover:bg-layer-2 text-xs transition-colors"
         >
           {t('buttons.delete')}
         </button>

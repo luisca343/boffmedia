@@ -63,7 +63,7 @@ export default function MessageBubble({ message, isTyping }: MessageBubbleProps)
     )}>
       <Avatar className={cn(
         "w-8 h-8 flex-shrink-0",
-        isUser ? "bg-primary-600" : "bg-highlight-600"
+        isUser ? "bg-primary-active" : "bg-warning"
       )}>
         <AvatarFallback className="text-white">
           {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
@@ -73,8 +73,8 @@ export default function MessageBubble({ message, isTyping }: MessageBubbleProps)
       <div className={cn(
         "rounded-2xl px-4 py-3 shadow-lg backdrop-blur-sm",
         isUser 
-          ? "bg-primary-600 text-white rounded-tr-md" 
-          : "bg-surface-700 text-surface-100 rounded-tl-md"
+          ? "bg-primary-active text-white rounded-tr-md" 
+          : "bg-layer-3 text-ink rounded-tl-md"
       )}>
         <div className="prose prose-invert max-w-none space-y-2">
           {message.parts.map((part, index) => renderMessagePart(part, index))}
@@ -82,11 +82,11 @@ export default function MessageBubble({ message, isTyping }: MessageBubbleProps)
         {isTyping && !isUser && (
           <div className="flex items-center gap-1 mt-2 opacity-70">
             <div className="flex gap-1">
-              <div className="w-2 h-2 bg-surface-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-              <div className="w-2 h-2 bg-surface-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-              <div className="w-2 h-2 bg-surface-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+              <div className="w-2 h-2 bg-layer-3 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+              <div className="w-2 h-2 bg-layer-3 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+              <div className="w-2 h-2 bg-layer-3 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
             </div>
-            <span className="text-xs text-surface-400 ml-2">Escribiendo...</span>
+            <span className="text-xs text-ink-muted ml-2">Escribiendo...</span>
           </div>
         )}
       </div>

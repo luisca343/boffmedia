@@ -20,19 +20,19 @@ export function SpawnTable({spawns}: {spawns: SpawnInfo[]}){
 
     function getRarityColor(rarity: number){
         if(rarity < 1) return 'bg-pink-800'
-        if(rarity <= 10) return 'bg-accent-600'
+        if(rarity <= 10) return 'bg-secondary-active'
         if(rarity <= 100) return 'bg-red-800'
         if(rarity <= 200) return 'bg-yellow-800'
-        if(rarity <= 300) return 'bg-highlight-800'
+        if(rarity <= 300) return 'bg-warning-soft'
         return ''
     }
 
     if(spawns.length === 0) {
         return (
-            <div className="bg-surface-700/20 rounded-lg p-8 text-center border border-surface-600/30">
-                <MapPinIcon className="h-12 w-12 mx-auto text-surface-400 mb-3" />
-                <div className="text-xl text-surface-300">Este Pokémon no spawnea naturalmente</div>
-                <div className="text-sm text-surface-400 mt-2">Puede ser obtenido por otros medios (evolución, evento, intercambio, etc.)</div>
+            <div className="bg-layer-3/20 rounded-lg p-8 text-center border border-edge/30">
+                <MapPinIcon className="h-12 w-12 mx-auto text-ink-muted mb-3" />
+                <div className="text-xl text-ink">Este Pokémon no spawnea naturalmente</div>
+                <div className="text-sm text-ink-muted mt-2">Puede ser obtenido por otros medios (evolución, evento, intercambio, etc.)</div>
             </div>
         )
     }
@@ -86,7 +86,7 @@ export function SpawnTable({spawns}: {spawns: SpawnInfo[]}){
                         <PokedexCell className="text-center">{t(spawn.spawnType)}</PokedexCell>
                         <PokedexCell className="text-center">
                           {biomas && biomas.length > 0 ? biomas.map((biome, index) => (
-                            <span key={biome.biome} className="hover:text-primary-400 transition-colors">
+                            <span key={biome.biome} className="hover:text-primary-hover transition-colors">
                               <InternalLink href={`pokedex/localizacion/${biome.biome}`}>{biome.translated}</InternalLink>
                               {index < biomas.length - 1 ? ', ' : ''}
                             </span>
@@ -112,7 +112,7 @@ export function SpawnTable({spawns}: {spawns: SpawnInfo[]}){
         return (
             <div>
                 <span>{palette || form ? form : 'Base'}</span>
-                {palette && <span className="block text-xs text-primary-300">{palette}</span>}
+                {palette && <span className="block text-xs text-primary-hover">{palette}</span>}
             </div>
         )
     }

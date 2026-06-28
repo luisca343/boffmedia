@@ -17,7 +17,7 @@ export function EvSpread({ data }: SpreadProps) {
   return (
     <div className="flex items-start justify-between gap-3 py-[0.35rem] border-b border-[color-mix(in_srgb,var(--border)_45%,transparent)] last:border-b-0">
       <div className="min-w-0 flex-1">
-        <p className="text-xs font-semibold text-[var(--text)] leading-tight">
+        <p className="text-xs font-semibold text-ink leading-tight">
           {data.nature}
           {changes && (
             <span className="ml-1.5 text-[10px] font-normal">
@@ -30,17 +30,17 @@ export function EvSpread({ data }: SpreadProps) {
             </span>
           )}
         </p>
-        <p className="text-[11px] font-mono leading-tight mt-0.5 text-[var(--text-muted)]">
+        <p className="text-[11px] font-mono leading-tight mt-0.5 text-ink-muted">
           {parts.map((p, i) => (
             <span key={p.k}>
-              {i > 0 && <span className="text-[var(--text-dim)]"> / </span>}
+              {i > 0 && <span className="text-ink-dim"> / </span>}
               <span>{p.v} </span>
               <span style={{ color: STAT_META[p.k].color }}>{STAT_META[p.k].label}</span>
             </span>
           ))}
         </p>
       </div>
-      <span className="font-mono text-xs text-[var(--text-muted)] shrink-0">
+      <span className="font-mono text-xs text-ink-muted shrink-0">
         {data.pct.toFixed(2)}%
       </span>
     </div>

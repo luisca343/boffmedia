@@ -18,9 +18,9 @@ export default function BasicInfo({
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
       <div>
-        <label className="block text-xs font-medium mb-1 text-surface-200">Gender</label>
+        <label className="block text-xs font-medium mb-1 text-ink">Gender</label>
         <select
-          className="w-full p-1 border rounded bg-surface-700 border-surface-600 text-surface-100 text-xs"
+          className="w-full p-1 border rounded bg-layer-3 border-edge text-ink text-xs"
           value={gender}
           onChange={(e) => onGenderChange(e.target.value)}
         >
@@ -31,10 +31,10 @@ export default function BasicInfo({
       </div>
       
       <div>
-        <label className="block text-xs font-medium mb-1 text-surface-200">Level</label>
+        <label className="block text-xs font-medium mb-1 text-ink">Level</label>
         <input
           type="number"
-          className="w-full p-1 border rounded bg-surface-700 border-surface-600 text-surface-100 text-xs"
+          className="w-full p-1 border rounded bg-layer-3 border-edge text-ink text-xs"
           min="1"
           max="100"
           value={level}

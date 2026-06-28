@@ -50,7 +50,7 @@ export function SessionStatsView({ sessionId, regulationId, startElo, limitlessT
   if (loading) {
     return (
       <div className="flex justify-center py-12">
-        <div className="w-5 h-5 border-2 border-primary-400 border-t-transparent rounded-full animate-spin" />
+        <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -63,7 +63,7 @@ export function SessionStatsView({ sessionId, regulationId, startElo, limitlessT
     record.winRate !== null ? `${Math.round(record.winRate * 100)}%` : '—';
   const wrColor =
     record.winRate === null
-      ? 'text-surface-400'
+      ? 'text-ink-muted'
       : record.winRate >= 0.5
       ? 'text-green-400'
       : 'text-red-400';
@@ -76,7 +76,7 @@ export function SessionStatsView({ sessionId, regulationId, startElo, limitlessT
       : t('kpi.streakLoss', { count: record.streak.count });
   const streakColor =
     record.streak === null
-      ? 'text-surface-400'
+      ? 'text-ink-muted'
       : record.streak.type === 'win'
       ? 'text-green-400'
       : 'text-red-400';
@@ -89,14 +89,14 @@ export function SessionStatsView({ sessionId, regulationId, startElo, limitlessT
       : t('kpi.streakLoss', { count: record.bestStreak.count });
   const bestStreakColor =
     record.bestStreak === null
-      ? 'text-surface-400'
+      ? 'text-ink-muted'
       : record.bestStreak.type === 'win'
       ? 'text-green-400'
       : 'text-red-400';
 
   const eloColor =
     elo.current === null || startElo === undefined
-      ? 'text-surface-200'
+      ? 'text-ink'
       : elo.current >= startElo
       ? 'text-green-400'
       : 'text-red-400';
@@ -108,7 +108,7 @@ export function SessionStatsView({ sessionId, regulationId, startElo, limitlessT
   };
   const avgDeltaColor =
     elo.avgDeltaPerMatch === null
-      ? 'text-surface-400'
+      ? 'text-ink-muted'
       : elo.avgDeltaPerMatch >= 0
       ? 'text-green-400'
       : 'text-red-400';
@@ -126,7 +126,7 @@ export function SessionStatsView({ sessionId, regulationId, startElo, limitlessT
     <div className="space-y-4">
       {/* ── Primary KPIs ──────────────────────────────────────────────────── */}
       <div className="grid grid-cols-4 gap-3">
-        <KpiCard label={t('kpi.played')} value={record.played} color="text-surface-200" />
+        <KpiCard label={t('kpi.played')} value={record.played} color="text-ink" />
         <KpiCard label={t('kpi.winRate')} value={wrDisplay} color={wrColor} />
         <KpiCard label={t('kpi.streak')} value={streakDisplay} color={streakColor} small />
         <KpiCard label={t('kpi.eloNow')} value={elo.current ?? '—'} color={eloColor} />
@@ -143,7 +143,7 @@ export function SessionStatsView({ sessionId, regulationId, startElo, limitlessT
       {/* ── ELO Chart ─────────────────────────────────────────────────────── */}
       {eloTimeline.length > 0 && (
         <Card className="px-4 pt-4 pb-2">
-          <h3 className="text-sm font-semibold text-surface-300 mb-3">{t('chart.title')}</h3>
+          <h3 className="text-sm font-semibold text-ink mb-3">{t('chart.title')}</h3>
           <EloChart timeline={eloTimeline} startElo={startElo} />
         </Card>
       )}
@@ -151,12 +151,12 @@ export function SessionStatsView({ sessionId, regulationId, startElo, limitlessT
       {/* ── Session comparison ────────────────────────────────────────────── */}
       {comparableSessions.length > 0 && (
         <Card className="overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-surface-700">
-            <span className="text-sm font-semibold text-surface-300">{t('comparison.title')}</span>
+          <div className="flex items-center justify-between px-4 py-3 border-b border-edge">
+            <span className="text-sm font-semibold text-ink">{t('comparison.title')}</span>
             {compareIds.length > 0 && (
               <button
                 onClick={() => setCompareIds([])}
-                className="text-xs text-surface-500 hover:text-surface-300 transition-colors"
+                className="text-xs text-ink-muted hover:text-ink transition-colors"
               >
                 {t('comparison.clearAll')}
               </button>
@@ -177,10 +177,10 @@ export function SessionStatsView({ sessionId, regulationId, startElo, limitlessT
                   }
                   className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
                     active
-                      ? 'bg-primary-500/15 border-primary-500/40 text-primary-400'
+                      ? 'bg-primary/15 border-primary/40 text-primary-hover'
                       : maxReached
-                      ? 'border-surface-700 text-surface-600 cursor-not-allowed'
-                      : 'border-surface-700 text-surface-400 hover:text-surface-200 hover:border-surface-600'
+                      ? 'border-edge text-ink-dim cursor-not-allowed'
+                      : 'border-edge text-ink-muted hover:text-ink hover:border-edge'
                   }`}
                 >
                   {s.label}
@@ -191,14 +191,14 @@ export function SessionStatsView({ sessionId, regulationId, startElo, limitlessT
           </div>
           {compLoading ? (
             <div className="flex justify-center py-6">
-              <div className="w-4 h-4 border-2 border-primary-400 border-t-transparent rounded-full animate-spin" />
+              <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
             </div>
           ) : comparisonSeries.length > 0 ? (
             <div className="px-4 pb-3">
               <SessionComparisonChart currentSessionId={sessionId} series={comparisonSeries} />
             </div>
           ) : (
-            <p className="px-4 pb-4 text-xs text-surface-600">{t('comparison.hint')}</p>
+            <p className="px-4 pb-4 text-xs text-ink-dim">{t('comparison.hint')}</p>
           )}
         </Card>
       )}
@@ -257,11 +257,11 @@ function KpiCard({
   small?: boolean;
 }) {
   return (
-    <div className="rounded-xl border border-surface-700 bg-surface-800 p-3 text-center">
+    <div className="rounded-xl border border-edge bg-layer-2 p-3 text-center">
       <div className={`font-bold tabular-nums leading-tight ${small ? 'text-lg' : 'text-2xl'} ${color}`}>
         {value}
       </div>
-      <div className="text-[10px] text-surface-500 mt-0.5">{label}</div>
+      <div className="text-[10px] text-ink-muted mt-0.5">{label}</div>
     </div>
   );
 }

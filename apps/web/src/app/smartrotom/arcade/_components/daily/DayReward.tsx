@@ -35,26 +35,26 @@ export default function DayReward({
     ? getRewardVisuals(dayReward.type) 
     : {
         bgGradient: "",
-        border: "border-surface-700",
-        textColor: "text-surface-400"
+        border: "border-edge",
+        textColor: "text-ink-muted"
       };
   
   return (
     <div 
       className={`relative aspect-square rounded-lg flex flex-col items-center justify-center border-2 
         ${isCompleted 
-          ? "bg-gradient-to-br from-secondary-500/50 to-indigo-700/50 border-cyan-400" 
+          ? "bg-gradient-to-br from-secondary/50 to-indigo-700/50 border-cyan-400" 
           : isCurrent
             ? "bg-gradient-to-r from-yellow-500/30 to-amber-600/30 border-yellow-400 animate-pulse" 
             : dayReward 
               ? `bg-gradient-to-br ${visuals.bgGradient} ${visuals.border}`
-              : "bg-surface-800/50 border-surface-700"
+              : "bg-layer-2/50 border-edge"
         } ${isLoading ? "opacity-50" : ""} overflow-hidden group`}
       onMouseEnter={() => dayReward?.description && setShowTooltip(true)}
       onMouseLeave={() => setShowTooltip(false)}
     >
       {/* Day indicator (top) */}
-      <div className="absolute top-1 left-1 text-xs font-bold text-surface-400">
+      <div className="absolute top-1 left-1 text-xs font-bold text-ink-muted">
         {dayNumber}
       </div>
 
@@ -73,7 +73,7 @@ export default function DayReward({
       </div>
       
       {/* Reward type or item name - will be shown or overlaid */}
-      <div className="text-[10px] text-surface-300 truncate px-1 text-center max-w-full">
+      <div className="text-[10px] text-ink truncate px-1 text-center max-w-full">
         {isNamedReward(dayReward?.type || '') && dayReward?.description
           ? getItemName(t, dayReward.description, dayReward.type)
           : dayReward?.type === 'coins' 
@@ -83,7 +83,7 @@ export default function DayReward({
 
       {/* Completed overlay */}
       {isCompleted && (
-        <div className="absolute inset-0 bg-gradient-to-br from-secondary-500/50 to-indigo-700/50 flex items-center justify-center">
+        <div className="absolute inset-0 bg-gradient-to-br from-secondary/50 to-indigo-700/50 flex items-center justify-center">
           <Sparkles className="h-6 w-6 text-yellow-300" />
           <div className="absolute bottom-1 text-xs text-cyan-300">Reclamado</div>
         </div>
@@ -99,9 +99,9 @@ export default function DayReward({
       
       {/* Item description tooltip for longer item names */}
       {showTooltip && dayReward?.description && (
-        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 bg-secondary-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-10">
+        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 bg-secondary-soft text-white text-xs px-2 py-1 rounded whitespace-nowrap z-10">
           {getItemName(t, dayReward.description)}
-          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-secondary-900"></div>
+          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-secondary-soft"></div>
         </div>
       )}
     </div>

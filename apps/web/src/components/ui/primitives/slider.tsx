@@ -17,14 +17,14 @@ const Slider = React.forwardRef<
 >(({ className, variant = "default", ...props }, ref) => {
   const variantStyles = {
     default: {
-      track: "bg-surface-700/80",
-      range: "bg-gradient-to-r from-primary-600 to-primary-400",
-      thumb: "border-2 border-primary-400 bg-surface-900 ring-offset-surface-900 focus-visible:ring-primary-400 hover:[box-shadow:0_0_10px_2px_rgb(var(--primary-500)/0.45)] hover:scale-110 cursor-grab active:cursor-grabbing active:scale-95"
+      track: "bg-layer-3/80",
+      range: "bg-gradient-to-r from-primary-active to-primary-hover",
+      thumb: "border-2 border-primary bg-layer-1 ring-offset-layer-1 focus-visible:ring-primary hover:[box-shadow:0_0_10px_2px_rgb(var(--primary-500)/0.45)] hover:scale-110 cursor-grab active:cursor-grabbing active:scale-95"
     },
     wingull: {
-      track: "bg-secondary-900",
-      range: "bg-gradient-to-r from-secondary-500 to-secondary-300",
-      thumb: "border-2 border-secondary-400 bg-secondary-950 ring-offset-secondary-950 focus-visible:ring-secondary-300 hover:scale-110 cursor-grab active:cursor-grabbing"
+      track: "bg-secondary-soft",
+      range: "bg-gradient-to-r from-secondary to-secondary-hover",
+      thumb: "border-2 border-secondary bg-secondary-soft ring-offset-secondary-soft focus-visible:ring-secondary hover:scale-110 cursor-grab active:cursor-grabbing"
     }
   }
 

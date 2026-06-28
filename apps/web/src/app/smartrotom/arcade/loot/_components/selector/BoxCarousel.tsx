@@ -46,12 +46,12 @@ export function BoxCarousel({
   };
 
   return (
-    <div className="relative w-full max-w-xl mb-8 p-4 bg-surface-900/80 rounded-xl border-2 border-cyan-500/30 shadow-xl">
+    <div className="relative w-full max-w-xl mb-8 p-4 bg-layer-1/80 rounded-xl border-2 border-cyan-500/30 shadow-xl">
       {/* Probabilities button - Added at the top of the carousel */}
       <div className="absolute top-8 right-8 z-20">
         <button
           onClick={onShowOdds}
-          className={`px-4 py-2 rounded-lg border ${currentBoxTheme.text} ${currentBoxTheme.border} transition-colors hover:bg-surface-800/50 text-sm`}
+          className={`px-4 py-2 rounded-lg border ${currentBoxTheme.text} ${currentBoxTheme.border} transition-colors hover:bg-layer-2/50 text-sm`}
         >
           Ver Probabilidades
         </button>
@@ -69,7 +69,7 @@ export function BoxCarousel({
 
       <div className="flex justify-center items-center">
         <button 
-          className="absolute left-0 z-10 bg-surface-800/80 hover:bg-surface-700/80 text-white rounded-full p-2 shadow-md border border-surface-700"
+          className="absolute left-0 z-10 bg-layer-2/80 hover:bg-layer-3/80 text-white rounded-full p-2 shadow-md border border-edge"
           onClick={handlePrevious}
         >
           <ChevronLeft size={24} />
@@ -92,7 +92,7 @@ export function BoxCarousel({
               <h3 className={`text-xl font-bold ${currentBoxTheme.highlight} mt-4`}>
                 {lootBoxes[currentIndex].name}
               </h3>
-              <p className="text-surface-300 text-center max-w-md mt-2">
+              <p className="text-ink text-center max-w-md mt-2">
                 {lootBoxes[currentIndex].description}
               </p>
             </motion.div>
@@ -100,7 +100,7 @@ export function BoxCarousel({
         </div>
         
         <button 
-          className="absolute right-0 z-10 bg-surface-800/80 hover:bg-surface-700/80 text-white rounded-full p-2 shadow-md border border-surface-700"
+          className="absolute right-0 z-10 bg-layer-2/80 hover:bg-layer-3/80 text-white rounded-full p-2 shadow-md border border-edge"
           onClick={handleNext}
         >
           <ChevronRight size={24} />
@@ -115,7 +115,7 @@ export function BoxCarousel({
             className={`w-3 h-3 rounded-full transition-all duration-300 ${
               index === currentIndex 
                 ? 'bg-yellow-400 scale-125' 
-                : 'bg-surface-600 hover:bg-surface-500'
+                : 'bg-layer-3 hover:bg-layer-3'
             }`}
             onClick={() => {
               setCurrentIndex(index);

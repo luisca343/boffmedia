@@ -94,10 +94,10 @@ export function StatsTable({pokemon, formIndex}: {pokemon: Pokemon, formIndex: n
           </div>
           
           <HoverCard>
-            <HoverCardTrigger className="ml-2 text-surface-300 hover:text-primary-400">
+            <HoverCardTrigger className="ml-2 text-ink hover:text-primary-hover">
               <InformationCircleIcon className="h-5 w-5" />
             </HoverCardTrigger>
-            <HoverCardContent className="bg-surface-800 text-surface-100 p-3 border border-surface-600">
+            <HoverCardContent className="bg-layer-2 text-ink p-3 border border-edge">
               <div className="space-y-1 text-sm">
                 {TOTAL_STAT_COLOR_RANGES.map((range, index) => (
                   <p key={index}>
@@ -111,13 +111,13 @@ export function StatsTable({pokemon, formIndex}: {pokemon: Pokemon, formIndex: n
         
         <div className="flex items-center gap-3">
           {/* View toggle buttons */}
-          <div className="flex border border-surface-600 rounded overflow-hidden">
+          <div className="flex border border-edge rounded overflow-hidden">
             <button
               onClick={() => setViewMode("nature")}
               className={`px-3 py-1 text-sm ${
                 viewMode === "nature" 
-                  ? "bg-primary-700 text-white" 
-                  : "bg-surface-700 text-surface-300 hover:bg-surface-600"
+                  ? "bg-primary-active text-white" 
+                  : "bg-layer-3 text-ink hover:bg-layer-3"
               }`}
             >
               Naturaleza
@@ -126,8 +126,8 @@ export function StatsTable({pokemon, formIndex}: {pokemon: Pokemon, formIndex: n
               onClick={() => setViewMode("range")}
               className={`px-3 py-1 text-sm ${
                 viewMode === "range" 
-                  ? "bg-primary-700 text-white" 
-                  : "bg-surface-700 text-surface-300 hover:bg-surface-600"
+                  ? "bg-primary-active text-white" 
+                  : "bg-layer-3 text-ink hover:bg-layer-3"
               }`}
             >
               Rangos
@@ -137,13 +137,13 @@ export function StatsTable({pokemon, formIndex}: {pokemon: Pokemon, formIndex: n
           {/* Only show nature selector in nature mode */}
           {viewMode === "nature" && (
             <div className="flex items-center">
-              <label htmlFor="nature-select" className="mr-2 text-surface-200">Naturaleza:</label>
+              <label htmlFor="nature-select" className="mr-2 text-ink">Naturaleza:</label>
               <Select value={nature} onValueChange={setNature}>
-                <SelectTrigger className="bg-surface-700 text-surface-100 border border-surface-600 w-[200px]">
+                <SelectTrigger className="bg-layer-3 text-ink border border-edge w-[200px]">
                   <SelectValue placeholder={t(`nature_${nature}`)} />
                 </SelectTrigger>
                 <SelectContent 
-                    className="bg-surface-700 text-surface-100 border border-surface-600 max-h-[300px] overflow-y-auto"
+                    className="bg-layer-3 text-ink border border-edge max-h-[300px] overflow-y-auto"
                     position="popper"
                     sideOffset={5}
                   >
@@ -261,8 +261,8 @@ export function StatsTable({pokemon, formIndex}: {pokemon: Pokemon, formIndex: n
               const natureMultiplier = natures[nature as keyof typeof natures][stat.toLowerCase() as keyof typeof natures.neutral]
               const statTextClass = 
                 natureMultiplier === 1.1 ? "text-red-300 font-medium" : 
-                natureMultiplier === 0.9 ? "text-secondary-300" : 
-                "text-surface-50"
+                natureMultiplier === 0.9 ? "text-secondary-hover" : 
+                "text-ink"
               
               // Range calculations
               const range50 = calculateStatRange(stat, statValue, 50)
@@ -307,28 +307,28 @@ export function StatsTable({pokemon, formIndex}: {pokemon: Pokemon, formIndex: n
                     </>
                   ) : (
                     <>
-                      <PokedexCell className="text-center text-surface-400">
-                        <span className="text-surface-300">{range50.min}</span>
+                      <PokedexCell className="text-center text-ink-muted">
+                        <span className="text-ink">{range50.min}</span>
                       </PokedexCell>
                       <PokedexCell className="text-center">
                         <div className="text-center">
-                          <span className="font-medium text-primary-300">{range50.max}</span>
-                          <div className="text-xs text-surface-400">+{range50.max - range50.min}</div>
+                          <span className="font-medium text-primary-hover">{range50.max}</span>
+                          <div className="text-xs text-ink-muted">+{range50.max - range50.min}</div>
                         </div>
                       </PokedexCell>
-                      <PokedexCell className="text-center text-surface-400">
-                        <span className="text-surface-300">{range100.min}</span>
+                      <PokedexCell className="text-center text-ink-muted">
+                        <span className="text-ink">{range100.min}</span>
                       </PokedexCell>
                       <PokedexCell className="text-center">
                         <div className="text-center">
-                          <span className="font-medium text-primary-300">{range100.max}</span>
-                          <div className="text-xs text-surface-400">+{range100.max - range100.min}</div>
+                          <span className="font-medium text-primary-hover">{range100.max}</span>
+                          <div className="text-xs text-ink-muted">+{range100.max - range100.min}</div>
                         </div>
                       </PokedexCell>
                     </>
                   )}
                   
-                  <PokedexCell className={`text-center ${(evYields?.[stat as keyof EvYields] ?? 0) > 0 ? "text-primary-300 font-medium" : ""}`}>
+                  <PokedexCell className={`text-center ${(evYields?.[stat as keyof EvYields] ?? 0) > 0 ? "text-primary-hover font-medium" : ""}`}>
                     {evYields?.[stat as keyof EvYields] ?? 0}
                   </PokedexCell>
                 </PokedexRow>
@@ -338,7 +338,7 @@ export function StatsTable({pokemon, formIndex}: {pokemon: Pokemon, formIndex: n
         </PokedexTable>
       </div>
       
-      <div className="mt-2 flex flex-col md:flex-row gap-2 text-xs text-surface-300">
+      <div className="mt-2 flex flex-col md:flex-row gap-2 text-xs text-ink">
         {viewMode === "nature" ? (
           <>
             <div className="flex-1">

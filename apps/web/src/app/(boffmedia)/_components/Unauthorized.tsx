@@ -12,20 +12,20 @@ export default function UnauthorizedPage() {
         <div className="w-14 h-14 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-5">
           <ShieldOff className="w-7 h-7 text-red-400" />
         </div>
-        <h1 className="text-xl font-bold text-surface-50 mb-2">Acceso restringido</h1>
-        <p className="text-sm text-surface-400 mb-7 leading-relaxed">
+        <h1 className="text-xl font-bold text-ink mb-2">Acceso restringido</h1>
+        <p className="text-sm text-ink-muted mb-7 leading-relaxed">
           No tienes permiso para ver esta página. Si crees que es un error, contacta al administrador.
         </p>
         <div className="flex gap-3">
           <button
             onClick={() => router.back()}
-            className="px-4 py-2 rounded-lg border border-surface-700 text-surface-300 text-sm font-medium hover:bg-surface-800 hover:text-surface-100 transition-colors"
+            className="px-4 py-2 rounded-lg border border-edge text-ink text-sm font-medium hover:bg-layer-2 hover:text-ink transition-colors"
           >
             Volver atrás
           </button>
           <button
             onClick={() => router.push("/")}
-            className="px-4 py-2 rounded-lg bg-primary-500/15 border border-primary-500/40 text-primary-300 text-sm font-medium hover:bg-primary-500/25 transition-colors"
+            className="px-4 py-2 rounded-lg bg-primary/15 border border-primary/40 text-primary-hover text-sm font-medium hover:bg-primary/25 transition-colors"
           >
             Ir al inicio
           </button>

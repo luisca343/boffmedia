@@ -20,29 +20,29 @@ export function SmartRotomSpotlight({ t }: SmartRotomSpotlightProps) {
           iconSrc="/img/smartrotom.png"
           iconAlt="SmartRotom"
           title={t("featuredGames.games.smartrotom.title")}
-          titleGradientClass="bg-gradient-to-r from-primary-400 to-primary-300"
-          iconBgClass="from-primary-500 to-primary-700"
-          underlineClass="from-primary-400 to-primary-300"
+          titleGradientClass="bg-gradient-to-r from-primary-hover to-primary-hover"
+          iconBgClass="from-primary to-primary-active"
+          underlineClass="from-primary-hover to-primary-hover"
         >
-          <p className="text-xl text-surface-300 leading-relaxed mb-8 text-left">
+          <p className="text-xl text-ink leading-relaxed mb-8 text-left">
             {t("featuredGames.games.smartrotom.description")}
           </p>
           {/* Features List */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 py-4 mb-8 mx-auto" style={{maxWidth: 700}}>
-            <div className="flex items-center gap-3 text-surface-300">
-              <div className="w-2 h-2 bg-primary-400 rounded-full"></div>
+            <div className="flex items-center gap-3 text-ink">
+              <div className="w-2 h-2 bg-primary-hover rounded-full"></div>
               <span>Disponible en Minecraft como en la web</span>
             </div>
-            <div className="flex items-center gap-3 text-surface-300">
-              <div className="w-2 h-2 bg-primary-400 rounded-full"></div>
+            <div className="flex items-center gap-3 text-ink">
+              <div className="w-2 h-2 bg-primary-hover rounded-full"></div>
               <span>Aplicaciones útiles para tu aventura</span>
             </div>
-            <div className="flex items-center gap-3 text-surface-300">
-              <div className="w-2 h-2 bg-primary-400 rounded-full"></div>
+            <div className="flex items-center gap-3 text-ink">
+              <div className="w-2 h-2 bg-primary-hover rounded-full"></div>
               <span>Interfaz intuitiva y fácil de usar</span>
             </div>
-            <div className="flex items-center gap-3 text-surface-300">
-              <div className="w-2 h-2 bg-primary-400 rounded-full"></div>
+            <div className="flex items-center gap-3 text-ink">
+              <div className="w-2 h-2 bg-primary-hover rounded-full"></div>
               <span>Actualizaciones constantes</span>
             </div>
           </div>

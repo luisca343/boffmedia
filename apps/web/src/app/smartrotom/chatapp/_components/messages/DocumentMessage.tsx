@@ -57,7 +57,7 @@ export function DocumentMessage({
           />
         )}
         {isFirstInSequence && (
-          <span className={`text-xs ${sender === "user" ? "text-surface-400 self-end" : "text-surface-500"} mb-1`}>
+          <span className={`text-xs ${sender === "user" ? "text-ink-muted self-end" : "text-ink-muted"} mb-1`}>
             {timestamp}
           </span>
         )}
@@ -67,8 +67,8 @@ export function DocumentMessage({
           {/* Document Preview */}
           <div className="p-4">
             <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-12 h-12 bg-primary-400/20 rounded-lg flex items-center justify-center">
-                <FileText className="h-6 w-6 text-primary-400" />
+              <div className="flex-shrink-0 w-12 h-12 bg-primary-hover/20 rounded-lg flex items-center justify-center">
+                <FileText className="h-6 w-6 text-primary-hover" />
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-neutral-100 mb-1 truncate">{title}</h3>
@@ -88,7 +88,7 @@ export function DocumentMessage({
             </div>
             <Link
               href={`/smartrotom/notas?doc=${documentData.documentId}`}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-primary-400 hover:bg-primary-500 text-black rounded transition-colors whitespace-nowrap"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-primary-hover hover:bg-primary text-black rounded transition-colors whitespace-nowrap"
             >
               <ExternalLink className="h-3.5 w-3.5" />
               Abrir documento

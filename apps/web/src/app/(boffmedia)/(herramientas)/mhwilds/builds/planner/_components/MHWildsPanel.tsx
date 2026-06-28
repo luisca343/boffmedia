@@ -11,7 +11,7 @@ const BORDER = {
 } as const
 
 // ─── MHWildsPanel ─────────────────────────────────────────────────────────────
-// Replaces `<Card className="bg-surface-800 border-surface-700">` across all
+// Replaces `<Card className="bg-layer-2 border-edge">` across all
 // build-planner components.
 
 interface MHWildsPanelProps extends HTMLAttributes<HTMLDivElement> {
@@ -79,7 +79,7 @@ export function MHWildsPanelTitle({
 }
 
 // ─── StatChip ─────────────────────────────────────────────────────────────────
-// Inline stat token — replaces `bg-surface-700/40 rounded px-2 py-1.5`.
+// Inline stat token — replaces `bg-layer-3/40 rounded px-2 py-1.5`.
 // Must forward refs to work with Radix TooltipTrigger asChild.
 
 import { forwardRef } from "react"

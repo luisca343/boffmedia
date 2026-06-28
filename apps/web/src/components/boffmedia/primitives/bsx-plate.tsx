@@ -73,9 +73,9 @@ export function BSXPlate({ mon, slotTag, foe, ghost, active, aimed }: BSXPlatePr
       aria-label={ariaLabel}
       style={{
         "--_ty": tyVar(ty || "Normal"),
-        background: "color-mix(in srgb, var(--surface) 88%, transparent)",
-        border: active ? "1px solid var(--accent-bright)" : aimGlow ? "color-mix(in srgb, var(--amber-400) 55%, transparent)" : "1px solid var(--border)",
-        boxShadow: active ? "0 0 0 1px var(--accent-bright) inset, 0 0 18px -8px var(--accent-bright)" : aimGlow ? "0 0 0 1px color-mix(in srgb, var(--amber-400) 70%, transparent) inset, 0 0 16px -6px var(--amber-400)" : undefined,
+        background: "color-mix(in srgb, var(--layer-1) 88%, transparent)",
+        border: active ? "1px solid var(--secondary-hover)" : aimGlow ? "color-mix(in srgb, var(--amber-400) 55%, transparent)" : "1px solid var(--border)",
+        boxShadow: active ? "0 0 0 1px var(--secondary-hover) inset, 0 0 18px -8px var(--secondary-hover)" : aimGlow ? "0 0 0 1px color-mix(in srgb, var(--amber-400) 70%, transparent) inset, 0 0 16px -6px var(--amber-400)" : undefined,
         animation: aimGlow ? "bsx-aim-pulse var(--dur-pulse) ease-in-out infinite" : undefined,
       } as React.CSSProperties}
     >
@@ -90,7 +90,7 @@ export function BSXPlate({ mon, slotTag, foe, ghost, active, aimed }: BSXPlatePr
       />
       <div
         className="relative w-[50px] h-[50px] rounded-[var(--radius)] grid place-items-center overflow-hidden"
-        style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}
+        style={{ background: "var(--layer-2)", border: "1px solid var(--border)" }}
       >
         <img
           src={aniF(mon.id)}
@@ -114,9 +114,9 @@ export function BSXPlate({ mon, slotTag, foe, ghost, active, aimed }: BSXPlatePr
             <span
               className="font-mono font-bold text-t-4xs w-[15px] h-[15px] inline-grid place-items-center rounded-[var(--radius-sm)] shrink-0"
               style={{
-                background: foe ? "color-mix(in srgb, var(--orange-500) 20%, transparent)" : "color-mix(in srgb, var(--accent) 24%, transparent)",
-                color: foe ? "var(--orange-400)" : "var(--accent-bright)",
-                border: foe ? "1px solid color-mix(in srgb, var(--orange-500) 45%, transparent)" : "1px solid color-mix(in srgb, var(--accent) 45%, transparent)",
+                background: foe ? "color-mix(in srgb, var(--orange-500) 20%, transparent)" : "color-mix(in srgb, var(--secondary) 24%, transparent)",
+                color: foe ? "var(--orange-400)" : "var(--secondary-hover)",
+                border: foe ? "1px solid color-mix(in srgb, var(--orange-500) 45%, transparent)" : "1px solid color-mix(in srgb, var(--secondary) 45%, transparent)",
               }}
             >
               {slotTag}
@@ -132,7 +132,7 @@ export function BSXPlate({ mon, slotTag, foe, ghost, active, aimed }: BSXPlatePr
           </span>
         </div>
 
-        <div className="relative h-[10px] rounded-[var(--radius-pill)] overflow-hidden border border-[var(--border)]" style={{ background: "color-mix(in srgb, #000 45%, var(--surface-3))" }}>
+        <div className="relative h-[10px] rounded-[var(--radius-pill)] overflow-hidden border border-edge" style={{ background: "color-mix(in srgb, #000 45%, var(--layer-3))" }}>
           <i className="absolute top-0 bottom-0 w-[1px] pointer-events-none z-[1]" style={{ left: "50%", background: "color-mix(in srgb, #fff 14%, transparent)" }} />
           <i className="absolute top-0 bottom-0 w-[1px] pointer-events-none z-[1]" style={{ left: "25%", background: "color-mix(in srgb, #fff 14%, transparent)" }} />
           <i

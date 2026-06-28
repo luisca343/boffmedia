@@ -18,11 +18,11 @@ export default function PokemonHabitatCard({ data }: PokemonHabitatCardProps) {
   const filteredBiomes = habitat.filter(biome => !biome.includes('biomesoplenty') && !biome.includes('terraforged'));
 
   return (
-    <div className="bg-surface-700/50 rounded-lg p-4 mt-3 border border-surface-600">
-      <h3 className="text-lg font-bold text-surface-100 mb-2 text-center">
+    <div className="bg-layer-3/50 rounded-lg p-4 mt-3 border border-edge">
+      <h3 className="text-lg font-bold text-ink mb-2 text-center">
         {pokemonName}
       </h3>
-      <h4 className="text-sm font-semibold text-primary-400 uppercase tracking-wide mb-3 text-center">
+      <h4 className="text-sm font-semibold text-primary-hover uppercase tracking-wide mb-3 text-center">
         Hábitat
       </h4>
       <div className="flex flex-wrap gap-2 justify-center">
@@ -30,7 +30,7 @@ export default function PokemonHabitatCard({ data }: PokemonHabitatCardProps) {
           <Badge 
             key={index}
             variant="outline"
-            className="bg-highlight-600/20 border-highlight-500 text-highlight-300 hover:bg-highlight-600/30"
+            className="bg-warning/20 border-warning-border text-warning-hover hover:bg-warning/30"
           >
             {getTranslatedBiomeName(biome, t)}
           </Badge>

@@ -25,9 +25,9 @@ export default function ReplayControlsButton({
       title={hint ? `${label} (${hint})` : label}
       className="bsx-focus flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-[var(--radius-sm)] transition-colors duration-[var(--dur-fast)] cursor-pointer"
       style={{
-        background: active ? 'color-mix(in srgb, var(--accent) 18%, var(--surface-2))' : 'var(--surface-2)',
-        color: active ? 'var(--accent-bright)' : 'var(--text-muted)',
-        border: `1px solid ${active ? 'color-mix(in srgb, var(--accent) 45%, var(--border))' : 'var(--border)'}`,
+        background: active ? 'color-mix(in srgb, var(--secondary) 18%, var(--layer-2))' : 'var(--layer-2)',
+        color: active ? 'var(--secondary-hover)' : 'var(--text-muted)',
+        border: `1px solid ${active ? 'color-mix(in srgb, var(--secondary) 45%, var(--border))' : 'var(--border)'}`,
       }}
     >
       {children}

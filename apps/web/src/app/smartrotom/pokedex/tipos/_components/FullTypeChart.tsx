@@ -15,21 +15,21 @@ export default function FullTypeChart() {
     const getEffectivenessCell = (attackType: string, defenseType: string) => {
         const effectiveness = typeChart[attackType]?.[defenseType] ?? 1;
         
-        let bgColor = "bg-surface-600";  // Default color for neutral effectiveness
-        let textColor = "text-surface-100";
+        let bgColor = "bg-layer-3";  // Default color for neutral effectiveness
+        let textColor = "text-ink";
         let effectivenessText = "";
         
         if (effectiveness === 2) {
-            bgColor = "bg-highlight-700";
-            textColor = "text-highlight-100";
+            bgColor = "bg-warning";
+            textColor = "text-warning-hover";
             effectivenessText = "2×";
         } else if (effectiveness === 0.5) {
             bgColor = "bg-red-700";
             textColor = "text-red-100";
             effectivenessText = "½×";
         } else if (effectiveness === 0) {
-            bgColor = "bg-surface-900";
-            textColor = "text-surface-400";
+            bgColor = "bg-layer-1";
+            textColor = "text-ink-muted";
             effectivenessText = "0";
         }
         
@@ -64,15 +64,15 @@ export default function FullTypeChart() {
 
     return (
         <div className="overflow-x-auto">
-            <div className="text-lg font-medium text-surface-100 mb-3">Tabla de Efectividad de Tipos</div>
+            <div className="text-lg font-medium text-ink mb-3">Tabla de Efectividad de Tipos</div>
             <div className="flex flex-col lg:flex-row items-start gap-6">
                 <div className="overflow-x-auto">
-                    <div className="inline-block align-middle rounded-lg border border-surface-600 overflow-hidden bg-surface-800/50">
+                    <div className="inline-block align-middle rounded-lg border border-edge overflow-hidden bg-layer-2/50">
                         <table className="border-collapse">
                             <thead>
                                 <tr>
                                     {/* Empty top-left corner */}
-                                    <th className="bg-surface-800 text-surface-100 font-bold p-0 sticky top-0 left-0 z-20">
+                                    <th className="bg-layer-2 text-ink font-bold p-0 sticky top-0 left-0 z-20">
                                         <div className="w-9 h-9 flex items-center justify-center text-xs m-0.5">↓→</div>
                                     </th>
                                     
@@ -105,29 +105,29 @@ export default function FullTypeChart() {
                     </div>
                 </div>
                 
-                <div className="bg-surface-700/30 p-4 rounded-lg flex-shrink-0 lg:w-56">
-                    <h3 className="text-base font-medium text-surface-100 mb-3">Leyenda</h3>
+                <div className="bg-layer-3/30 p-4 rounded-lg flex-shrink-0 lg:w-56">
+                    <h3 className="text-base font-medium text-ink mb-3">Leyenda</h3>
                     <div className="flex flex-col gap-3">
                         <div className="flex items-center gap-2">
-                            <div className="bg-highlight-700 text-highlight-100 h-7 w-9 flex items-center justify-center rounded-sm text-xs font-bold">2×</div>
-                            <span className="text-sm text-surface-200">Super efectivo</span>
+                            <div className="bg-warning text-warning-hover h-7 w-9 flex items-center justify-center rounded-sm text-xs font-bold">2×</div>
+                            <span className="text-sm text-ink">Super efectivo</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="bg-surface-600 text-surface-100 h-7 w-9 flex items-center justify-center rounded-sm"></div>
-                            <span className="text-sm text-surface-200">Daño normal</span>
+                            <div className="bg-layer-3 text-ink h-7 w-9 flex items-center justify-center rounded-sm"></div>
+                            <span className="text-sm text-ink">Daño normal</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="bg-red-700 text-red-100 h-7 w-9 flex items-center justify-center rounded-sm text-xs font-bold">½×</div>
-                            <span className="text-sm text-surface-200">Poco efectivo</span>
+                            <span className="text-sm text-ink">Poco efectivo</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="bg-surface-900 text-surface-400 h-7 w-9 flex items-center justify-center rounded-sm text-xs font-bold">0</div>
-                            <span className="text-sm text-surface-200">Sin efecto</span>
+                            <div className="bg-layer-1 text-ink-muted h-7 w-9 flex items-center justify-center rounded-sm text-xs font-bold">0</div>
+                            <span className="text-sm text-ink">Sin efecto</span>
                         </div>
                     </div>
                     
-                    <div className="mt-4 pt-4 border-t border-surface-600">
-                        <p className="text-xs text-surface-300">Las filas representan los tipos atacantes, mientras que las columnas muestran los tipos defensivos.</p>
+                    <div className="mt-4 pt-4 border-t border-edge">
+                        <p className="text-xs text-ink">Las filas representan los tipos atacantes, mientras que las columnas muestran los tipos defensivos.</p>
                     </div>
                 </div>
             </div>

@@ -82,35 +82,35 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 className={cn(
                   "flex items-center gap-1.5 text-[10px] font-mono font-bold mb-2 uppercase tracking-[0.25em] px-2 transition-colors duration-200",
                   isSidebarExpanded
-                    ? "opacity-100 text-surface-500 hover:text-primary-400"
+                    ? "opacity-100 text-ink-muted hover:text-primary-hover"
                     : "opacity-100 justify-center"
                 )}
                 style={{ fontFamily: "Orbitron, sans-serif" }}
               >
                 {isAnimationComplete ? (
                   <>
-                    <span className="text-primary-600">//</span>
+                    <span className="text-primary-active">//</span>
                     <span>{t(category.name)}</span>
                   </>
                 ) : (
-                  <span className="text-primary-600 text-xs">·</span>
+                  <span className="text-primary-active text-xs">·</span>
                 )}
               </Link>
             ) : (
               <div
                 className={cn(
                   "flex items-center gap-1.5 text-[10px] font-mono font-bold mb-2 uppercase tracking-[0.25em] px-2",
-                  isSidebarExpanded ? "opacity-100 text-surface-600" : "opacity-100 justify-center"
+                  isSidebarExpanded ? "opacity-100 text-ink-dim" : "opacity-100 justify-center"
                 )}
                 style={{ fontFamily: "Orbitron, sans-serif" }}
               >
                 {isAnimationComplete ? (
                   <>
-                    <span className="text-primary-700">//</span>
+                    <span className="text-primary-active">//</span>
                     <span>{t(category.name)}</span>
                   </>
                 ) : (
-                  <span className="text-primary-700 text-xs">·</span>
+                  <span className="text-primary-active text-xs">·</span>
                 )}
               </div>
             )}
@@ -165,8 +165,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           "h-[18px] w-[18px] flex-shrink-0 relative z-10 transition-all duration-200",
                           isSidebarExpanded ? "mr-2.5" : "mx-auto",
                           isActive
-                            ? "text-primary-400"
-                            : "text-surface-500 group-hover:text-surface-300"
+                            ? "text-primary-hover"
+                            : "text-ink-muted group-hover:text-ink"
                         )}
                         style={
                           isActive
@@ -181,8 +181,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           "flex-1 whitespace-nowrap relative z-10 transition-all duration-300 ease-in-out text-sm",
                           isSidebarExpanded ? "opacity-100 max-w-full" : "opacity-0 max-w-0 overflow-hidden",
                           isActive
-                            ? "text-primary-300 font-medium"
-                            : "text-surface-400 group-hover:text-surface-100"
+                            ? "text-primary-hover font-medium"
+                            : "text-ink-muted group-hover:text-ink"
                         )}
                       >
                         {t(tool.name)}

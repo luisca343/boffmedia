@@ -48,10 +48,10 @@ export default function TCGPocket() {
       description: t("cardsList.description"),
       icon: CreditCard,
       href: "/pokemon/tcgpocket/cartas",
-      iconBg: "bg-gradient-to-br from-secondary-400 to-cyan-500",
-      textColor: "text-secondary-400",
-      hoverColor: "hover:text-secondary-300",
-      bg: "bg-gradient-to-br from-secondary-900/20 to-cyan-900/30"
+      iconBg: "bg-gradient-to-br from-secondary-hover to-cyan-500",
+      textColor: "text-secondary-hover",
+      hoverColor: "hover:text-secondary-hover",
+      bg: "bg-gradient-to-br from-secondary-soft/20 to-cyan-900/30"
     },
     {
       title: t("battles.title"),
@@ -78,7 +78,7 @@ export default function TCGPocket() {
               className="object-cover"
               priority
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-surface-900/90 to-surface-900/50"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-layer-1/90 to-layer-1/50"></div>
             <div className="absolute inset-0 flex items-center p-6">
               <div>
                 <div className="mb-2">
@@ -90,10 +90,10 @@ export default function TCGPocket() {
                     className="object-contain"
                   />
                 </div>
-                <h1 className="text-3xl sm:text-4xl font-bold text-surface-50 drop-shadow-lg">
+                <h1 className="text-3xl sm:text-4xl font-bold text-ink drop-shadow-lg">
                   {t("heading.title")} <span className="text-yellow-400">{t("heading.highlight")}</span>
                 </h1>
-                <p className="text-surface-200 mt-2 text-sm sm:text-base">
+                <p className="text-ink mt-2 text-sm sm:text-base">
                   {t("heading.subtitle")}
                 </p>
               </div>
@@ -107,7 +107,7 @@ export default function TCGPocket() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <Card className="bg-surface-800 border-surface-700 shadow-lg">
+        <Card className="bg-layer-2 border-edge shadow-lg">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-yellow-400" /> 
@@ -125,7 +125,7 @@ export default function TCGPocket() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 onKeyPress={handleKeyPress}
-                className="bg-surface-700 border-surface-600 text-surface-50 focus-visible:ring-primary-500"
+                className="bg-layer-3 border-edge text-ink focus-visible:ring-primary"
               />
               <Button 
                 onClick={handleViewGallery} 
@@ -147,7 +147,7 @@ export default function TCGPocket() {
                 className="h-full"
               >
                 <Card
-                  className={`border-surface-700 hover:border-surface-600 transition-all duration-300 cursor-pointer h-full flex flex-col overflow-hidden hover:scale-105 hover:shadow-xl ${item.bg}`}
+                  className={`border-edge hover:border-edge transition-all duration-300 cursor-pointer h-full flex flex-col overflow-hidden hover:scale-105 hover:shadow-xl ${item.bg}`}
                   onClick={() => router.push(item.href)}
                 >
                   <CardHeader className="pb-2">
@@ -160,7 +160,7 @@ export default function TCGPocket() {
                   <CardContent className="flex-grow">
                     
                   </CardContent>
-                  <CardFooter className="pt-2 border-t border-surface-700/30">
+                  <CardFooter className="pt-2 border-t border-edge/30">
                     <Button 
                       variant="ghost" 
                       className={`ml-auto p-0 ${item.textColor} ${item.hoverColor} transition-colors`}>

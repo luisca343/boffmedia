@@ -51,7 +51,7 @@ export default function YoutubeResults() {
   };
 
   return (
-    <div className="min-h-full bg-surface-900 text-white overflow-auto">
+    <div className="min-h-full bg-layer-1 text-white overflow-auto">
       <BaseSearchHeader
         platform="youtube"
         onSearch={handleSearch}

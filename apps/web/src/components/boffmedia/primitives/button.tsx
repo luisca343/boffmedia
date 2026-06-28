@@ -19,11 +19,11 @@ const variants: Record<string, { cls: string; style: React.CSSProperties }> = {
     style: { boxShadow: "0 8px 24px -8px var(--orange-500)" },
   },
   accent: {
-    cls: "bg-[var(--accent)] text-[var(--on-accent)] border-[var(--accent)] hover:brightness-110",
-    style: { boxShadow: "0 8px 24px -8px var(--accent)" },
+    cls: "bg-secondary text-[var(--on-secondary)] border-secondary hover:brightness-110",
+    style: { boxShadow: "0 8px 24px -8px var(--secondary)" },
   },
   ghost: {
-    cls: "bg-transparent text-[var(--text)] border-[var(--border-strong)] hover:bg-[color-mix(in_srgb,var(--text)_7%,transparent)]",
+    cls: "bg-transparent text-ink border-edge-strong hover:bg-[color-mix(in_srgb,var(--text)_7%,transparent)]",
     style: { boxShadow: "none" },
   },
   outline: {
@@ -50,7 +50,7 @@ export function BoffButton({
     "border border-solid cursor-pointer whitespace-nowrap",
     "transition-[transform,box-shadow,background,border-color] duration-[var(--dur,0.32s)] ease-[var(--ease)]",
     "hover:-translate-y-px active:translate-y-px",
-    "focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_var(--bg),0_0_0_5px_var(--accent-bright)]",
+    "focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_var(--bg),0_0_0_5px_var(--secondary-hover)]",
     v.cls,
     size === "sm" && "py-2 px-4 text-xs",
     size === "lg" && "py-4 px-8 text-base",

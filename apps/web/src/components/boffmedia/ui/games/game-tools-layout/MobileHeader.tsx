@@ -66,7 +66,7 @@ export function MobileHeader({ gameConfig, onMenuClick }: MobileHeaderProps) {
 
           {switcherOpen && (
             <div
-              className="absolute top-full left-0 z-50 mt-1 min-w-[200px] rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface)] shadow-[var(--card-shadow)] py-1"
+              className="absolute top-full left-0 z-50 mt-1 min-w-[200px] rounded-[var(--radius-lg)] border border-edge bg-layer-1 shadow-[var(--card-shadow)] py-1"
               onClick={() => setSwitcherOpen(false)}
             >
               {GAMES.map((g) => {
@@ -78,7 +78,7 @@ export function MobileHeader({ gameConfig, onMenuClick }: MobileHeaderProps) {
                     className={`flex items-center gap-[0.6rem] w-full text-left px-3 py-[0.55rem] border-0 bg-transparent cursor-pointer text-[length:var(--t-sm)] transition-[background,color] duration-[var(--dur)] ${
                       isCurrent
                         ? "text-[var(--orange-500)] bg-[color-mix(in_srgb,var(--orange-500)_10%,transparent)]"
-                        : "text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
+                        : "text-ink-muted hover:bg-layer-2 hover:text-ink"
                     }`}
                   >
                     {g.icon && (
@@ -94,7 +94,7 @@ export function MobileHeader({ gameConfig, onMenuClick }: MobileHeaderProps) {
 
         <button
           onClick={onMenuClick}
-          className="flex items-center justify-center w-9 h-9 rounded-[var(--btn-radius)] text-[var(--text-dim)] hover:text-[var(--text)] hover:bg-[color-mix(in_srgb,var(--text)_8%,transparent)] cursor-pointer bg-transparent border-0 transition-colors duration-[var(--dur)]"
+          className="flex items-center justify-center w-9 h-9 rounded-[var(--btn-radius)] text-ink-dim hover:text-ink hover:bg-[color-mix(in_srgb,var(--text)_8%,transparent)] cursor-pointer bg-transparent border-0 transition-colors duration-[var(--dur)]"
           aria-label="Menú"
         >
           <Menu className="h-4 w-4" />

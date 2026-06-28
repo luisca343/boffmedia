@@ -83,9 +83,9 @@ export default function TransactionTypeDistribution({
                   return (
                     <div className="bg-white p-3 border border-blue-200 rounded shadow">
                       <p className="font-medium">{`Tipo: ${label.charAt(0) + label.slice(1).toLowerCase()}`}</p>
-                      <p className="text-highlight-700">{`Ingresos: ${formatMoney(data.income)}`}</p>
+                      <p className="text-warning">{`Ingresos: ${formatMoney(data.income)}`}</p>
                       <p className="text-red-700">{`Gastos: ${formatMoney(data.expense)}`}</p>
-                      <p className="text-surface-600">{`Transacciones: ${data.count}`}</p>
+                      <p className="text-ink-dim">{`Transacciones: ${data.count}`}</p>
                     </div>
                   );
                 }
@@ -103,7 +103,7 @@ export default function TransactionTypeDistribution({
         </div>
       )}
       
-      <div className="text-sm text-center text-surface-500 mt-4">
+      <div className="text-sm text-center text-ink-muted mt-4">
         Distribución de transacciones por tipo
       </div>
     </div>

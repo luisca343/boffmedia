@@ -166,17 +166,17 @@ export default function TermsPage() {
         <h1 className="text-[length:var(--t-4xl)] mt-[0.7rem]">
           Términos de servicio
         </h1>
-        <p className="text-[length:var(--t-lg)] leading-[1.7] text-[color:var(--text-muted)] mt-[1.1rem] mb-5">
+        <p className="text-[length:var(--t-lg)] leading-[1.7] text-ink-muted mt-[1.1rem] mb-5">
           Estos Términos de Servicio rigen el uso de la plataforma BoffMedia y
           todos los servicios asociados. Al utilizar nuestros servicios,
           aceptas estos términos en su totalidad.
         </p>
         <div className="flex gap-6 flex-wrap">
-          <span className="inline-flex items-center gap-2 font-mono text-[length:var(--t-xs)] tracking-[0.04em] text-[color:var(--text-dim)]">
+          <span className="inline-flex items-center gap-2 font-mono text-[length:var(--t-xs)] tracking-[0.04em] text-ink-dim">
             <Icon name="calendar" size={15} />
             Última actualización: {today}
           </span>
-          <span className="inline-flex items-center gap-2 font-mono text-[length:var(--t-xs)] tracking-[0.04em] text-[color:var(--text-dim)]">
+          <span className="inline-flex items-center gap-2 font-mono text-[length:var(--t-xs)] tracking-[0.04em] text-ink-dim">
             <Icon name="shield" size={15} />
             Vigente
           </span>
@@ -193,7 +193,7 @@ export default function TermsPage() {
             <section
               key={s.id}
               id={"sec-" + s.id}
-              className="pb-10 mb-10 border-b border-[var(--border)] scroll-mt-[100px] last:border-b-0"
+              className="pb-10 mb-10 border-b border-edge scroll-mt-[100px] last:border-b-0"
             >
               <div className="flex items-center gap-3.5 mb-4">
                 <span
@@ -217,9 +217,9 @@ export default function TermsPage() {
                     {b.map((li, k) => (
                       <li
                         key={k}
-                        className="flex items-start gap-[0.7rem] text-[length:var(--t-base)] leading-[1.6] text-[color:var(--text-muted)]"
+                        className="flex items-start gap-[0.7rem] text-[length:var(--t-base)] leading-[1.6] text-ink-muted"
                       >
-                        <span className="shrink-0 w-[21px] h-[21px] rounded-full grid place-items-center text-[var(--on-accent)] bg-[var(--accent-bright)] mt-[0.15rem]">
+                        <span className="shrink-0 w-[21px] h-[21px] rounded-full grid place-items-center text-[var(--on-secondary)] bg-secondary-hover mt-[0.15rem]">
                           <Icon name="check" size={13} />
                         </span>
                         {li}
@@ -229,7 +229,7 @@ export default function TermsPage() {
                 ) : (
                   <p
                     key={j}
-                    className="text-[length:var(--t-base)] leading-[1.75] text-[color:var(--text-muted)] m-0 mb-4 last:mb-0"
+                    className="text-[length:var(--t-base)] leading-[1.75] text-ink-muted m-0 mb-4 last:mb-0"
                   >
                     {b}
                   </p>
@@ -263,7 +263,7 @@ export default function TermsPage() {
               <h3 className="text-[length:var(--t-lg)] m-0">
                 ¿Tienes dudas sobre los términos?
               </h3>
-              <p className="text-[color:var(--text-muted)] text-[length:var(--t-sm)] mt-[0.3rem] m-0">
+              <p className="text-ink-muted text-[length:var(--t-sm)] mt-[0.3rem] m-0">
                 Si necesitas aclaración sobre algún punto, no dudes en
                 contactarnos.
               </p>

@@ -21,7 +21,7 @@ export function BoffSpinner({ size = "md", label, className }: BoffSpinnerProps)
           width: px,
           height: px,
           border: "2px solid var(--border)",
-          borderTopColor: "var(--accent-bright)",
+          borderTopColor: "var(--secondary-hover)",
         }}
       />
       {label ? (

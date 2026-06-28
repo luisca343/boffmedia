@@ -17,7 +17,7 @@ export function Field({ label, icon, hint, error, htmlFor, children, className }
   return (
     <label className={cn("flex flex-col", className)} htmlFor={htmlFor}>
       {label && (
-        <span className="flex items-center gap-2 text-sm font-semibold text-[var(--text-muted)] mb-2">
+        <span className="flex items-center gap-2 text-sm font-semibold text-ink-muted mb-2">
           {icon && <Icon name={icon} size={15} />}
           {label}
         </span>
@@ -28,7 +28,7 @@ export function Field({ label, icon, hint, error, htmlFor, children, className }
           <Icon name="x" size={13} />{error}
         </span>
       ) : hint ? (
-        <span className="text-xs text-[var(--text-dim)] mt-1.5 inline-flex items-center gap-1.5">{hint}</span>
+        <span className="text-xs text-ink-dim mt-1.5 inline-flex items-center gap-1.5">{hint}</span>
       ) : null}
     </label>
   )

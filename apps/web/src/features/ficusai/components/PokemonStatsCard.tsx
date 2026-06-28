@@ -23,11 +23,11 @@ export default function PokemonStatsCard({ data }: PokemonStatsCardProps) {
   ];
 
   return (
-    <div className="bg-surface-700/50 rounded-lg p-4 mt-3 border border-surface-600">
-      <h3 className="text-lg font-bold text-surface-100 mb-2 text-center">
+    <div className="bg-layer-3/50 rounded-lg p-4 mt-3 border border-edge">
+      <h3 className="text-lg font-bold text-ink mb-2 text-center">
         {pokemonName}
       </h3>
-      <h4 className="text-sm font-semibold text-primary-400 uppercase tracking-wide mb-3 text-center">
+      <h4 className="text-sm font-semibold text-primary-hover uppercase tracking-wide mb-3 text-center">
         Estadísticas
       </h4>
       <div className="space-y-3">
@@ -37,14 +37,14 @@ export default function PokemonStatsCard({ data }: PokemonStatsCardProps) {
           
           return (
             <div key={index} className="flex items-center gap-3">
-              <div className="w-20 text-sm text-surface-300 font-medium">
+              <div className="w-20 text-sm text-ink font-medium">
                 {stat.label}:
               </div>
-              <div className="w-8 text-sm text-surface-200 font-mono">
+              <div className="w-8 text-sm text-ink font-mono">
                 {stat.value}
               </div>
               <div className="flex-1">
-                <div className="w-full bg-surface-600 rounded-full h-2">
+                <div className="w-full bg-layer-3 rounded-full h-2">
                   <div
                     className="h-2 rounded-full transition-all duration-300"
                     style={{

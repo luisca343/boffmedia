@@ -22,7 +22,7 @@ function CellComponent({ cell, onClick }: CellProps) {
       <div className="w-full h-full relative preserve-3d">
         <div
           className={`absolute w-full h-full flex items-center justify-center backface-hidden rounded-md border-2 ${
-            cell.revealed ? 'hidden' : 'bg-gradient-to-br from-secondary-600 to-secondary-700 border-secondary-500/70 hover:shadow-lg hover:shadow-secondary-500/20'
+            cell.revealed ? 'hidden' : 'bg-gradient-to-br from-secondary-active to-secondary-active border-secondary/70 hover:shadow-lg hover:shadow-secondary/20'
           }`}
         >
           {/* Card back with arcade style pattern */}

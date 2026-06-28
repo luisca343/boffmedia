@@ -17,7 +17,7 @@ interface PokemonDetailProps {
 }
 
 const tabBtn: React.CSSProperties = {
-    background: "var(--surface-2)",
+    background: "var(--layer-2)",
     color: "var(--text-dim)",
     border: "none",
     fontSize: "var(--text-xs)",
@@ -130,7 +130,7 @@ export default function PokemonDetail({
                         </div>
                         <div
                             className="w-full h-2 rounded-full"
-                            style={{ background: "var(--surface-3)" }}
+                            style={{ background: "var(--layer-3)" }}
                         >
                             <div
                                 className="h-2 rounded-full transition-all"
@@ -165,7 +165,7 @@ export default function PokemonDetail({
                 >
                     <TabsList
                         className="grid grid-cols-3 h-9 rounded-none"
-                        style={{ background: "var(--surface)" }}
+                        style={{ background: "var(--layer-1)" }}
                     >
                         <TabsTrigger
                             value="info"
@@ -216,10 +216,10 @@ export default function PokemonDetail({
                                                         style={{
                                                             background:
                                                                 value > 0
-                                                                    ? "color-mix(in srgb, var(--emerald-400) 15%, var(--surface-2))"
+                                                                    ? "color-mix(in srgb, var(--emerald-400) 15%, var(--layer-2))"
                                                                     : value < 0
-                                                                    ? "color-mix(in srgb, var(--red-500) 15%, var(--surface-2))"
-                                                                    : "var(--surface-2)",
+                                                                    ? "color-mix(in srgb, var(--red-500) 15%, var(--layer-2))"
+                                                                    : "var(--layer-2)",
                                                             color:
                                                                 value > 0
                                                                     ? "var(--emerald-400)"
@@ -256,7 +256,7 @@ export default function PokemonDetail({
                                             <span
                                                 className="px-2 py-0.5 text-t-3xs rounded"
                                                 style={{
-                                                    background: "var(--surface-2)",
+                                                    background: "var(--layer-2)",
                                                     color: "var(--text-muted)",
                                                 }}
                                             >
@@ -267,7 +267,7 @@ export default function PokemonDetail({
                                             <span
                                                 className="px-2 py-0.5 text-t-3xs rounded"
                                                 style={{
-                                                    background: "var(--surface-2)",
+                                                    background: "var(--layer-2)",
                                                     color: "var(--text-muted)",
                                                 }}
                                             >
@@ -278,7 +278,7 @@ export default function PokemonDetail({
                                             <span
                                                 className="px-2 py-0.5 text-t-3xs rounded"
                                                 style={{
-                                                    background: "var(--surface-2)",
+                                                    background: "var(--layer-2)",
                                                     color: "var(--text-muted)",
                                                 }}
                                             >
@@ -290,7 +290,7 @@ export default function PokemonDetail({
                                         <div
                                             className="mt-1 text-t-xs"
                                             style={{
-                                                color: "var(--accent-bright)",
+                                                color: "var(--secondary-hover)",
                                             }}
                                         >
                                             Active: {pokemon.ability}
@@ -309,7 +309,7 @@ export default function PokemonDetail({
                                         <span
                                             className="text-t-3xs px-2 py-1 rounded inline-block"
                                             style={{
-                                                background: "var(--surface-2)",
+                                                background: "var(--layer-2)",
                                                 color: "var(--text-muted)",
                                             }}
                                         >
@@ -360,7 +360,7 @@ export default function PokemonDetail({
                                                     className="w-full h-[6px] rounded-full"
                                                     style={{
                                                         background:
-                                                            "var(--surface-3)",
+                                                            "var(--layer-3)",
                                                     }}
                                                 >
                                                     <div
@@ -441,7 +441,7 @@ export default function PokemonDetail({
                                                     className="px-2 py-1 text-t-xs rounded"
                                                     style={{
                                                         background:
-                                                            "var(--surface-2)",
+                                                            "var(--layer-2)",
                                                         color: "var(--text-muted)",
                                                     }}
                                                 >
@@ -500,13 +500,13 @@ function getStatColor(value: number): string {
 
 function getStatusColor(status: string) {
     switch (status) {
-        case 'brn': return { bg: 'color-mix(in srgb, var(--orange-500, #f97316) 25%, var(--surface-2))', text: 'var(--orange-500, #f97316)' };
-        case 'frz': return { bg: 'color-mix(in srgb, var(--cyan-400, #22d3ee) 25%, var(--surface-2))', text: 'var(--cyan-400, #22d3ee)' };
-        case 'par': return { bg: 'color-mix(in srgb, var(--amber-400) 25%, var(--surface-2))', text: 'var(--amber-400)' };
-        case 'psn': return { bg: 'color-mix(in srgb, var(--purple-500, #a855f7) 25%, var(--surface-2))', text: 'var(--purple-500, #a855f7)' };
-        case 'tox': return { bg: 'color-mix(in srgb, var(--purple-700, #7e22ce) 25%, var(--surface-2))', text: 'var(--purple-500, #a855f7)' };
-        case 'slp': return { bg: 'var(--surface-3)', text: 'var(--text-dim)' };
-        default: return { bg: 'var(--surface-2)', text: 'var(--text-dim)' };
+        case 'brn': return { bg: 'color-mix(in srgb, var(--orange-500, #f97316) 25%, var(--layer-2))', text: 'var(--orange-500, #f97316)' };
+        case 'frz': return { bg: 'color-mix(in srgb, var(--cyan-400, #22d3ee) 25%, var(--layer-2))', text: 'var(--cyan-400, #22d3ee)' };
+        case 'par': return { bg: 'color-mix(in srgb, var(--amber-400) 25%, var(--layer-2))', text: 'var(--amber-400)' };
+        case 'psn': return { bg: 'color-mix(in srgb, var(--purple-500, #a855f7) 25%, var(--layer-2))', text: 'var(--purple-500, #a855f7)' };
+        case 'tox': return { bg: 'color-mix(in srgb, var(--purple-700, #7e22ce) 25%, var(--layer-2))', text: 'var(--purple-500, #a855f7)' };
+        case 'slp': return { bg: 'var(--layer-3)', text: 'var(--text-dim)' };
+        default: return { bg: 'var(--layer-2)', text: 'var(--text-dim)' };
     }
 }
 

@@ -35,11 +35,11 @@ export function EventCard({ event, go, delay = 0, action }: EventCardProps) {
         <span className="font-mono text-[0.65rem] tracking-[0.12em] text-[var(--orange-400)] mt-[2px]">{mon}</span>
       </div>
       <div className="flex-1 flex flex-col gap-[0.35rem] min-w-0">
-        <span className="font-mono text-xs tracking-[0.1em] uppercase text-[var(--text-dim)]">{event.game}</span>
+        <span className="font-mono text-xs tracking-[0.1em] uppercase text-ink-dim">{event.game}</span>
         <h3 className="text-lg m-0">{event.title}</h3>
         <div className="flex items-center gap-4 flex-wrap mt-[0.2rem]">
-          <span className="inline-flex items-center gap-[0.4rem] text-sm text-[var(--text-muted)]">
-            <Icon name="users" size={15} className="text-[var(--text-dim)]" />
+          <span className="inline-flex items-center gap-[0.4rem] text-sm text-ink-muted">
+            <Icon name="users" size={15} className="text-ink-dim" />
             {event.players} plazas
           </span>
           <Badge kind={event.status === "open" ? "live" : "new"}>

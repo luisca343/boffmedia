@@ -85,7 +85,7 @@ export function DocumentPicker({ onDocumentSelect, open: externalOpen, onOpenCha
                         <FileText className="h-5 w-5 text-blue-400" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-medium text-sm text-neutral-50 truncate group-hover:text-primary-400 transition-colors">
+                        <h3 className="font-medium text-sm text-neutral-50 truncate group-hover:text-primary-hover transition-colors">
                           {doc.title || "Documento sin título"}
                         </h3>
                         <p className="text-xs text-neutral-500 mt-1">

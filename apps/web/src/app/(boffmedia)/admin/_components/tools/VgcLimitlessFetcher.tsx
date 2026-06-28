@@ -13,11 +13,11 @@ import {
 import { useBoffSession } from "@/services/useBoffSession"
 
 function inputClass() {
-  return "w-full h-9 rounded-lg border border-[var(--border-strong)] bg-[var(--surface-2)] px-3 py-2 text-sm text-[var(--text)] placeholder:text-[var(--text-dim)] focus:outline-none focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-soft)]"
+  return "w-full h-9 rounded-lg border border-edge-strong bg-layer-2 px-3 py-2 text-sm text-ink placeholder:text-ink-dim focus:outline-none focus:border-secondary focus:shadow-[0_0_0_3px_var(--secondary-soft)]"
 }
 
 function labelClass() {
-  return "block text-xs text-[var(--text-muted)] mb-1"
+  return "block text-xs text-ink-muted mb-1"
 }
 
 function StatusDot({ status }: { status: LimitlessTournament["status"] }) {
@@ -34,13 +34,13 @@ function ProgressBar({ progress, total }: { progress: number; total: number }) {
   const pct = total > 0 ? Math.round((progress / total) * 100) : 0
   return (
     <div className="flex items-center gap-2">
-      <div className="flex-1 h-1.5 rounded-full bg-[var(--surface-3)] overflow-hidden">
+      <div className="flex-1 h-1.5 rounded-full bg-layer-3 overflow-hidden">
         <div
           className="h-full rounded-full bg-amber-400 transition-all duration-300"
           style={{ width: `${pct}%` }}
         />
       </div>
-      <span className="text-[11px] text-[var(--text-dim)] tabular-nums">{progress}/{total}</span>
+      <span className="text-[11px] text-ink-dim tabular-nums">{progress}/{total}</span>
     </div>
   )
 }
@@ -168,11 +168,11 @@ export function VgcLimitlessFetcher() {
     }
   }
 
-  const thClass = "px-4 py-2.5 text-left text-[11px] uppercase tracking-[0.08em] text-[var(--text-muted)] font-semibold"
+  const thClass = "px-4 py-2.5 text-left text-[11px] uppercase tracking-[0.08em] text-ink-muted font-semibold"
 
   return (
     <div className="space-y-4 max-w-2xl">
-      <p className="text-sm text-[var(--text-muted)]">
+      <p className="text-sm text-ink-muted">
         Importa torneos de{" "}
         <a href="https://play.limitlesstcg.com" target="_blank" rel="noopener noreferrer"
           className="text-[var(--orange-500)] hover:underline">
@@ -201,7 +201,7 @@ export function VgcLimitlessFetcher() {
             </div>
             <div>
               <label className={labelClass()}>
-                Max jugadores <span className="text-[var(--text-dim)]">(opcional)</span>
+                Max jugadores <span className="text-ink-dim">(opcional)</span>
               </label>
               <input type="number" min={1} value={maxPlayers} onChange={(e) => setMaxPlayers(e.target.value)}
                 placeholder="Todos" className={inputClass()} />
@@ -227,23 +227,23 @@ export function VgcLimitlessFetcher() {
       <ToolPanel
         title="Torneos importados"
         headRight={
-          <button onClick={() => loadTournaments()} className="text-[var(--text-dim)] hover:text-[var(--text)] transition-colors">
+          <button onClick={() => loadTournaments()} className="text-ink-dim hover:text-ink transition-colors">
             <RefreshCw className="w-3.5 h-3.5" />
           </button>
         }
       >
         {loadingList ? (
-          <div className="py-8 flex justify-center text-[var(--text-muted)]">
+          <div className="py-8 flex justify-center text-ink-muted">
             <Loader2 className="w-4 h-4 animate-spin" />
           </div>
         ) : tournaments.length === 0 ? (
-          <p className="px-4 py-6 text-center text-xs text-[var(--text-dim)]">
+          <p className="px-4 py-6 text-center text-xs text-ink-dim">
             No hay torneos importados para esta regulación.
           </p>
         ) : (
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--surface)_96%,transparent)]">
+              <tr className="border-b border-edge bg-[color-mix(in_srgb,var(--layer-1)_96%,transparent)]">
                 <th className={thClass}>Torneo</th>
                 <th className={thClass}>Estado</th>
                 <th className={thClass}>Jugadores</th>
@@ -252,10 +252,10 @@ export function VgcLimitlessFetcher() {
             </thead>
             <tbody>
               {[...tournaments].sort((a, b) => (b.date ?? "").localeCompare(a.date ?? "")).map((t) => (
-                <tr key={t.id} className="border-b border-[var(--border)] hover:bg-[color-mix(in_srgb,var(--text)_3%,transparent)] transition-colors">
+                <tr key={t.id} className="border-b border-edge hover:bg-[color-mix(in_srgb,var(--text)_3%,transparent)] transition-colors">
                   <td className="px-4 py-3">
-                    <p className="text-[var(--text)] text-xs font-medium">{t.name ?? t.limitlessId}</p>
-                    <p className="text-[var(--text-dim)] text-[11px] font-mono">{t.date ?? "—"} · {t.format ?? "—"}</p>
+                    <p className="text-ink text-xs font-medium">{t.name ?? t.limitlessId}</p>
+                    <p className="text-ink-dim text-[11px] font-mono">{t.date ?? "—"} · {t.format ?? "—"}</p>
                     {t.errorMessage && (
                       <p className="text-red-400 text-[11px] mt-0.5 truncate max-w-xs">{t.errorMessage}</p>
                     )}
@@ -263,7 +263,7 @@ export function VgcLimitlessFetcher() {
                   <td className="px-4 py-3">
                     <span className="inline-flex items-center gap-1.5 text-xs">
                       <StatusDot status={t.status} />
-                      <span className="text-[var(--text-muted)]">
+                      <span className="text-ink-muted">
                         {t.status === "running" ? "Procesando" :
                          t.status === "done"    ? "Listo" :
                          t.status === "error"   ? "Error" : "Pendiente"}
@@ -275,10 +275,10 @@ export function VgcLimitlessFetcher() {
                       </div>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-xs text-[var(--text-muted)]">
+                  <td className="px-4 py-3 text-xs text-ink-muted">
                     {t.playerCount ?? "—"}
                   </td>
-                  <td className="px-4 py-3 text-xs text-[var(--text-muted)]">
+                  <td className="px-4 py-3 text-xs text-ink-muted">
                     {t.progress ? `${t.progress}/${t.total}` : "—"}
                   </td>
                 </tr>
@@ -288,7 +288,7 @@ export function VgcLimitlessFetcher() {
         )}
       </ToolPanel>
 
-      <p className="text-xs text-[var(--text-dim)]">
+      <p className="text-xs text-ink-dim">
         Fuente: Limitless TCG API · 2 peticiones por torneo · Los decklists VGC son JSON estructurado (no texto Showdown).
       </p>
     </div>

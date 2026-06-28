@@ -50,7 +50,7 @@ export function BadgePage({ achievement, team }: BadgePageProps) {
           <span className="font-medium">Obtenida: {parseDate(achievement.completedAt)}</span>
           {achievement.replay && (
             <Dialog>
-              <DialogTrigger className="text-sm hover:text-primary-500 transition-colors">
+              <DialogTrigger className="text-sm hover:text-primary transition-colors">
                 Ver Repetición
               </DialogTrigger>
               <DialogContent className="max-w-4xl p-0 flex items-center justify-center">
