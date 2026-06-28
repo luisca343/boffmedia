@@ -37,8 +37,8 @@ export function BoffModal({ trigger, title, description, children, footer, size 
           <div
             className={cn(
               "relative w-full",
-              "bg-[var(--surface)]",
-              "border border-solid border-[var(--border-strong)]",
+              "bg-layer-1",
+              "border border-solid border-edge-strong",
               "rounded-[var(--radius-lg,22px)]",
               "shadow-[0_40px_90px_-30px_var(--shadow-color)]",
               "p-7",
@@ -52,7 +52,7 @@ export function BoffModal({ trigger, title, description, children, footer, size 
             aria-label={title || undefined}
           >
             <button
-              className="absolute top-4 right-4 grid place-items-center w-8 h-8 border-0 rounded-[var(--radius,14px)] bg-[var(--surface-2)] text-[var(--text-muted)] cursor-pointer hover:text-[var(--text)] hover:bg-[var(--surface-3)]"
+              className="absolute top-4 right-4 grid place-items-center w-8 h-8 border-0 rounded-[var(--radius,14px)] bg-layer-2 text-ink-muted cursor-pointer hover:text-ink hover:bg-layer-3"
               aria-label="Cerrar"
               onClick={close}
             >
@@ -61,7 +61,7 @@ export function BoffModal({ trigger, title, description, children, footer, size 
             {(title || description) && (
               <div className="mb-5 pr-8">
                 {title && <h3 className="text-2xl">{title}</h3>}
-                {description && <p className="text-sm text-[var(--text-muted)] mt-2 leading-relaxed">{description}</p>}
+                {description && <p className="text-sm text-ink-muted mt-2 leading-relaxed">{description}</p>}
               </div>
             )}
             <div>{typeof children === "function" ? children(close) : children}</div>

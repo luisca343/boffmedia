@@ -16,11 +16,11 @@ const HoverCardContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof HoverCardPrimitive.Content> & { variant?: HoverCardVariant }
 >(({ className, align = "center", sideOffset = 4, variant = "default", ...props }, ref) => {
   const variantClasses = {
-    default: "bg-surface-800 border-surface-600 text-primary-400",
-    info: "bg-secondary-900 border-secondary-600 text-secondary-100",
+    default: "bg-layer-2 border-edge text-primary-hover",
+    info: "bg-secondary-soft border-secondary-active text-secondary-hover",
     warning: "bg-yellow-900 border-yellow-600 text-yellow-100",
     paper: "page border-2 border-black",
-    wingull: "bg-secondary-900 border-secondary-600 text-secondary-300"
+    wingull: "bg-secondary-soft border-secondary-active text-secondary-hover"
   }
 
   return (

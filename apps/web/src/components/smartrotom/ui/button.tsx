@@ -5,18 +5,18 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 transition-all",
+  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-active focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 transition-all",
   {
     variants: {
       variant: {
-        default: 'bg-primary-500 border-2 border-black shadow-light hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none',
+        default: 'bg-primary border-2 border-black shadow-light hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none',
         furret: 'bg-pink-400 border-2 border-black shadow-light hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none',
-        noShadow: 'bg-primary-500 border-2 border-black',
+        noShadow: 'bg-primary border-2 border-black',
         link: 'underline-offset-4 text-black hover:underline',
         neutral:
           'bg-white border-2 border-black shadow-light hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none dark:hover:shadow-none',
         reverse:
-          'bg-primary-500 border-2 border-black hover:translate-x-reverseBoxShadowX hover:translate-y-reverseBoxShadowY hover:shadow-light',
+          'bg-primary border-2 border-black hover:translate-x-reverseBoxShadowX hover:translate-y-reverseBoxShadowY hover:shadow-light',
       },
       size: {
         default: "h-10 px-4 py-2",

@@ -44,15 +44,15 @@ export function TcgpScraper() {
   return (
     <div className="max-w-lg space-y-6">
       <div>
-        <h3 className="text-lg font-bold text-[var(--text)]">TCG Pocket Scraper</h3>
-        <p className="text-sm text-[var(--text-muted)] mt-1">
+        <h3 className="text-lg font-bold text-ink">TCG Pocket Scraper</h3>
+        <p className="text-sm text-ink-muted mt-1">
           Obtiene cartas de Pokémon TCG Pocket desde la API externa y las almacena en la base de datos.
         </p>
       </div>
 
       <ToolPanel title="Scraping">
         {progress.step === "idle" ? (
-          <p className="text-sm text-[var(--text-muted)]">
+          <p className="text-sm text-ink-muted">
             Pulsa el botón para empezar. El proceso descarga series, colecciones y cartas secuencialmente.
           </p>
         ) : (
@@ -80,10 +80,10 @@ export function TcgpScraper() {
               </span>
             </div>
             {progress.message && (
-              <p className="text-sm text-[var(--text-muted)]">{progress.message}</p>
+              <p className="text-sm text-ink-muted">{progress.message}</p>
             )}
             {progress.step === "done" && progress.totalSets != null && (
-              <p className="text-xs text-[var(--text-dim)]">
+              <p className="text-xs text-ink-dim">
                 {progress.doneSets}/{progress.totalSets} colecciones procesadas
                 {progress.failedSets && progress.failedSets > 0
                   ? ` (${progress.failedSets} con errores)`

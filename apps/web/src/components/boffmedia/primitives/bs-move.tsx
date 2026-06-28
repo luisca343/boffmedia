@@ -34,14 +34,14 @@ export function BSMove({ move, target, onClick, disabled }: BSMoveProps) {
     <button
       className={cn(
         "relative flex flex-col gap-[.5rem] text-left rounded-[var(--radius-lg)] cursor-pointer",
-        "border text-[var(--text)] font-inherit overflow-hidden",
+        "border text-ink font-inherit overflow-hidden",
         "transition-all duration-[var(--dur)] ease-[var(--ease)]",
         off && "opacity-40 cursor-not-allowed saturate-[.4]",
         !off && "hover:translate-y-[-3px] active:translate-y-0",
       )}
       style={{
         padding: ".85rem .95rem",
-        background: `linear-gradient(160deg, color-mix(in srgb, ${c} 16%, var(--surface)), var(--surface))`,
+        background: `linear-gradient(160deg, color-mix(in srgb, ${c} 16%, var(--layer-1)), var(--layer-1))`,
         borderColor: off ? undefined : `color-mix(in srgb, ${c} 40%, var(--border))`,
       }}
       onClick={off ? undefined : onClick}
@@ -52,7 +52,7 @@ export function BSMove({ move, target, onClick, disabled }: BSMoveProps) {
         <span className="font-display font-bold text-t-base leading-[1.1]">{move.name}</span>
         <BSType type={move.type} />
       </div>
-      <div className="flex items-center justify-between gap-[.5rem] font-mono text-[.64rem] text-[var(--text-muted)] tracking-[.04em]">
+      <div className="flex items-center justify-between gap-[.5rem] font-mono text-[.64rem] text-ink-muted tracking-[.04em]">
         <BSCat cat={move.cat as "phys" | "spec" | "status"} />
         {eff && (
           <span
@@ -60,16 +60,16 @@ export function BSMove({ move, target, onClick, disabled }: BSMoveProps) {
               "font-mono font-bold text-[.6rem] tracking-[.06em] px-[.45em] py-[.18em] rounded-[4px]",
               eff.cls === "super" && "text-[var(--emerald-400)] bg-[color-mix(in_srgb,var(--emerald-500)_16%,transparent)]",
               eff.cls === "weak" && "text-[var(--rose-400)] bg-[color-mix(in_srgb,var(--rose-500)_16%,transparent)]",
-              eff.cls === "immune" && "text-[var(--text-dim)] bg-[var(--surface-3)]",
+              eff.cls === "immune" && "text-ink-dim bg-layer-3",
             )}
           >
             {eff.t}
           </span>
         )}
       </div>
-      <div className="flex items-center justify-between gap-[.5rem] font-mono text-[.64rem] text-[var(--text-muted)] tracking-[.04em]">
+      <div className="flex items-center justify-between gap-[.5rem] font-mono text-[.64rem] text-ink-muted tracking-[.04em]">
         <span className="flex items-center gap-[.3rem]">
-          PP <b className="text-[var(--text)] tabular-nums">{move.pp}/{move.maxpp}</b>
+          PP <b className="text-ink tabular-nums">{move.pp}/{move.maxpp}</b>
         </span>
         <span>{move.cat === "status" ? "—" : `Pot ${move.power}`}{move.acc != null ? `  ·  Pre ${move.acc}` : ""}</span>
       </div>

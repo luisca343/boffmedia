@@ -61,7 +61,7 @@ export function GiveawayControls({
             // Configurar Sorteo
           </span>
         </div>
-        <p className="text-surface-400 text-sm">
+        <p className="text-ink-muted text-sm">
           Añade participantes individualmente o sube una lista completa
         </p>
       </div>
@@ -69,7 +69,7 @@ export function GiveawayControls({
       {/* Tabs */}
       <div className="mb-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2 bg-surface-800/60 border border-surface-700/50">
+          <TabsList className="grid w-full grid-cols-2 bg-layer-2/60 border border-edge/50">
             <TabsTrigger
               value="single"
               className="data-[state=active]:text-white transition-all duration-200"
@@ -92,7 +92,7 @@ export function GiveawayControls({
                 placeholder="Escribe el nombre del participante..."
                 value={newParticipant}
                 onChange={e => setNewParticipant(e.target.value)}
-                className="bg-surface-800/60 border-surface-700/50 text-surface-50 placeholder:text-surface-500 focus:border-primary-500/50 transition-all duration-200"
+                className="bg-layer-2/60 border-edge/50 text-ink placeholder:text-ink-muted focus:border-primary/50 transition-all duration-200"
               />
               <Button type="submit" variant="default">
                 Añadir
@@ -106,7 +106,7 @@ export function GiveawayControls({
               value={participantList}
               onChange={e => setParticipantList(e.target.value)}
               rows={6}
-              className="bg-surface-800/60 border-surface-700/50 text-surface-50 placeholder:text-surface-500 focus:border-primary-500/50 transition-all duration-200 resize-none"
+              className="bg-layer-2/60 border-edge/50 text-ink placeholder:text-ink-muted focus:border-primary/50 transition-all duration-200 resize-none"
             />
             <Button
               onClick={handleUploadList}
@@ -153,7 +153,7 @@ export function GiveawayControls({
               style={{ background: boff.text, boxShadow: `0 0 8px ${boff.glowStrong}` }}
             />
             <Users className="w-4 h-4" style={{ color: boff.text }} />
-            <span className="text-surface-300 text-sm font-medium">
+            <span className="text-ink text-sm font-medium">
               {participantCount} participante{participantCount !== 1 ? "s" : ""} listo{participantCount !== 1 ? "s" : ""}
             </span>
           </div>

@@ -19,7 +19,7 @@ export function DeckDisplay({ deckListing }: DeckDisplayProps) {
                 fill
                 className="object-cover rounded-sm"
               />
-              <div className="absolute bottom-1 right-1 bg-primary-400  text-black px-2  text-xs py-1 rounded-xl">
+              <div className="absolute bottom-1 right-1 bg-primary-hover  text-black px-2  text-xs py-1 rounded-xl">
                 x{card.quantity}
               </div>
             </div>

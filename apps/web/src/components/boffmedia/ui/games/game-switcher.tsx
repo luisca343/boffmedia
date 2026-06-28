@@ -35,7 +35,7 @@ export function GameSwitcher({ game, go, games = [], compact = false, className 
   return (
     <div ref={ref} className={"relative " + className}>
       <button
-        className="inline-flex items-center gap-[0.55rem] px-[0.7rem] py-[0.4rem] border border-[var(--border)] rounded-[var(--radius)] shrink-0 cursor-pointer bg-transparent transition-all duration-[var(--dur)] hover:bg-[var(--surface-2)]"
+        className="inline-flex items-center gap-[0.55rem] px-[0.7rem] py-[0.4rem] border border-edge rounded-[var(--radius)] shrink-0 cursor-pointer bg-transparent transition-all duration-[var(--dur)] hover:bg-layer-2"
         onClick={() => setOpen(!open)}
         aria-expanded={open}
         aria-haspopup="listbox"
@@ -50,19 +50,19 @@ export function GameSwitcher({ game, go, games = [], compact = false, className 
           {game.logoLabel}
         </span>
         {!compact && (
-          <span className="text-[length:var(--t-sm)] font-medium text-[color:var(--text)]">
+          <span className="text-[length:var(--t-sm)] font-medium text-ink">
             {game.short}
           </span>
         )}
-        <Icon name="chevron" size={15} className="text-[color:var(--text-dim)]" />
+        <Icon name="chevron" size={15} className="text-ink-dim" />
       </button>
 
       {open && games.length > 0 && (
         <div
-          className="absolute top-full left-0 mt-1 min-w-[200px] z-[80] rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface)] shadow-[var(--card-shadow)] py-1"
+          className="absolute top-full left-0 mt-1 min-w-[200px] z-[80] rounded-[var(--radius-lg)] border border-edge bg-layer-1 shadow-[var(--card-shadow)] py-1"
           role="listbox"
         >
-          <div className="font-mono text-[0.62rem] tracking-[0.1em] uppercase text-[color:var(--text-dim)] px-3 py-2">
+          <div className="font-mono text-[0.62rem] tracking-[0.1em] uppercase text-ink-dim px-3 py-2">
             Cambiar de juego
           </div>
           {games.map((g) => (
@@ -72,7 +72,7 @@ export function GameSwitcher({ game, go, games = [], compact = false, className 
                 "flex items-center gap-[0.6rem] w-full text-left px-3 py-[0.55rem] border-0 bg-transparent cursor-pointer text-[length:var(--t-sm)] transition-[background,color] duration-[var(--dur)]" +
                 (g.slug === game.slug
                   ? " text-[color:var(--orange-500)] bg-[color-mix(in_srgb,var(--orange-500)_10%,transparent)]"
-                  : " text-[color:var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-[color:var(--text)]")
+                  : " text-ink-muted hover:bg-layer-2 hover:text-ink")
               }
               role="option"
               aria-selected={g.slug === game.slug}

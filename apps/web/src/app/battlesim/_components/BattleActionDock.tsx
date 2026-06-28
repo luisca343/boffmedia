@@ -135,7 +135,7 @@ export function BattleActionDock({
         <button
           onClick={() => onChoice('team 1')}
           className="bsx-focus self-start px-4 py-2 rounded-md text-sm font-medium transition-colors"
-          style={{ background: 'var(--accent)', color: 'var(--text)', border: '1px solid var(--border)' }}
+          style={{ background: 'var(--secondary)', color: 'var(--text)', border: '1px solid var(--border)' }}
         >
           {t('dock.confirmTeam')}
         </button>
@@ -156,7 +156,7 @@ export function BattleActionDock({
             onClick={onUndo}
             className="bsx-focus px-4 py-1.5 rounded-[var(--radius-sm)] text-sm font-medium transition-colors duration-[var(--dur-fast)]"
             style={{
-              background: 'var(--surface-3)',
+              background: 'var(--layer-3)',
               color: 'var(--text-muted)',
               border: '1px solid var(--border-strong)',
             }}
@@ -174,7 +174,7 @@ export function BattleActionDock({
   return (
     <section
       aria-label="Acciones de combate"
-      className="rounded-[var(--radius)] border border-[var(--border)] p-3 min-h-[96px]"
+      className="rounded-[var(--radius)] border border-edge p-3 min-h-[96px]"
       style={{ background: 'var(--card-bg)' }}
     >
       <div key={phase} className="bsx-dock-in">

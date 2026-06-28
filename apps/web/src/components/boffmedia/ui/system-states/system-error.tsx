@@ -33,23 +33,23 @@ export function SystemError({ message = "Cannot read properties of undefined (re
       >
         ¡Algo salió mal!
       </h1>
-      <p className="text-[var(--text-muted)] text-[length:var(--t-base)] max-w-[38ch] mx-auto mb-[1.6rem]">
+      <p className="text-ink-muted text-[length:var(--t-base)] max-w-[38ch] mx-auto mb-[1.6rem]">
         Ha ocurrido un error inesperado. Puedes reintentar la acción o volver al inicio.
       </p>
 
       <div
-        className="w-full text-left bg-[color-mix(in_srgb,var(--surface-2)_75%,transparent)] border border-[var(--border)] rounded-[var(--radius-lg)] p-[1rem_1.1rem] mb-[1.6rem]"
+        className="w-full text-left bg-[color-mix(in_srgb,var(--layer-2)_75%,transparent)] border border-edge rounded-[var(--radius-lg)] p-[1rem_1.1rem] mb-[1.6rem]"
         style={{ backdropFilter: "blur(8px)" }}
       >
-        <span className="block font-[var(--label-font)] text-[0.66rem] tracking-[0.14em] uppercase text-[var(--text-dim)] mb-[0.35rem]">
+        <span className="block font-[var(--label-font)] text-[0.66rem] tracking-[0.14em] uppercase text-ink-dim mb-[0.35rem]">
           Mensaje de error
         </span>
-        <p className="font-mono text-[length:var(--t-sm)] text-[var(--text)] leading-[1.5] break-words m-0">
+        <p className="font-mono text-[length:var(--t-sm)] text-ink leading-[1.5] break-words m-0">
           {message || "Error desconocido"}
         </p>
         {digest && (
-          <p className="font-mono text-[length:var(--t-xs)] text-[var(--text-muted)] m-0 mt-[0.7rem] pt-[0.7rem] border-t border-[var(--border)]">
-            <span className="block font-[var(--label-font)] text-[0.66rem] tracking-[0.14em] uppercase text-[var(--text-dim)] mb-[0.35rem]">
+          <p className="font-mono text-[length:var(--t-xs)] text-ink-muted m-0 mt-[0.7rem] pt-[0.7rem] border-t border-edge">
+            <span className="block font-[var(--label-font)] text-[0.66rem] tracking-[0.14em] uppercase text-ink-dim mb-[0.35rem]">
               ID de seguimiento
             </span>
             {digest}
@@ -61,9 +61,9 @@ export function SystemError({ message = "Cannot read properties of undefined (re
         <Button variant="primary" icon="refresh" onClick={onRetry}>Reintentar</Button>
         <Button variant="ghost" icon="home" onClick={onHome}>Inicio</Button>
       </div>
-      <p className="mt-[1.5rem] text-[length:var(--t-xs)] text-[var(--text-dim)]">
+      <p className="mt-[1.5rem] text-[length:var(--t-xs)] text-ink-dim">
         ¿Necesitas ayuda?{" "}
-        <a href="https://discord.com/invite/R7MEDDSM5C" target="_blank" rel="noreferrer" className="text-[var(--accent-bright)] underline underline-offset-2 hover:text-[var(--text)]">
+        <a href="https://discord.com/invite/R7MEDDSM5C" target="_blank" rel="noreferrer" className="text-secondary-hover underline underline-offset-2 hover:text-ink">
           Comunidad Discord
         </a>
       </p>

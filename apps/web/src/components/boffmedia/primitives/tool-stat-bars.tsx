@@ -12,17 +12,17 @@ interface ToolStatBarsProps {
 
 export function ToolStatBars({ title, items, tone, max }: ToolStatBarsProps) {
   const peak = max != null ? max : Math.max(...items.map((i) => i.pct), 1)
-  const color = tone || "var(--accent)"
+  const color = tone || "var(--secondary)"
   return (
     <div>
-      {title && <div className="font-mono text-xs tracking-wider uppercase text-[color:var(--text-dim)] mb-2">{title}</div>}
+      {title && <div className="font-mono text-xs tracking-wider uppercase text-ink-dim mb-2">{title}</div>}
       {items.map((it) => (
         <div key={it.name} className="mb-1.5">
           <div className="flex justify-between text-xs mb-0.5">
-            <span className="text-[color:var(--text-muted)]">{it.name}</span>
-            <span className="font-mono text-[color:var(--accent-bright)]">{it.pct}%</span>
+            <span className="text-ink-muted">{it.name}</span>
+            <span className="font-mono text-secondary-hover">{it.pct}%</span>
           </div>
-          <div className="h-1.5 rounded-full bg-[var(--surface-3)] overflow-hidden">
+          <div className="h-1.5 rounded-full bg-layer-3 overflow-hidden">
             <div className="h-full rounded-full" style={{ width: (it.pct / peak) * 100 + "%", background: color }} />
           </div>
         </div>

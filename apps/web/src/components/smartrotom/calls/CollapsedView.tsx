@@ -65,18 +65,18 @@ export function CollapsedView({
             <div className="flex flex-col justify-center min-w-0 flex-1">
               <div className="flex items-center gap-2">
                 <span className={`text-xs font-semibold ${
-                  isUserRinging ? "text-yellow-400 animate-pulse" : "text-surface-100"
+                  isUserRinging ? "text-yellow-400 animate-pulse" : "text-ink"
                 }`}>
                   {isUserRinging ? "Incoming..." : isUserInCall ? "In Call" : "Calling..."}
                 </span>
                 {usersInCall.length > 1 && (
-                  <span className="text-xs text-surface-400">
+                  <span className="text-xs text-ink-muted">
                     ({usersInCall.length})
                   </span>
                 )}
               </div>
               {isUserInCall && (
-                <span className="text-[10px] text-surface-400 font-mono">
+                <span className="text-[10px] text-ink-muted font-mono">
                   {callDuration}
                 </span>
               )}
@@ -86,11 +86,11 @@ export function CollapsedView({
           {/* Expand Button */}
           <button
             onClick={onExpand}
-            className="flex-shrink-0 p-1.5 hover:bg-surface-700 rounded-lg transition-all duration-200 hover:scale-110 active:scale-95"
+            className="flex-shrink-0 p-1.5 hover:bg-layer-3 rounded-lg transition-all duration-200 hover:scale-110 active:scale-95"
             aria-label="Expand call view"
           >
             <ArrowsPointingOutIcon
-              className="text-surface-300 hover:text-surface-100"
+              className="text-ink hover:text-ink"
               height={20}
               width={20}
               strokeWidth={2.5}
@@ -104,7 +104,7 @@ export function CollapsedView({
           {isUserRinging && (
             <button
               onClick={onJoinCall}
-              className="group relative bg-highlight-500 hover:bg-highlight-600 active:bg-highlight-700 p-2.5 rounded-full transition-all duration-200 shadow-md hover:shadow-lg hover:scale-110 active:scale-95 animate-pulse"
+              className="group relative bg-warning hover:bg-warning active:bg-warning p-2.5 rounded-full transition-all duration-200 shadow-md hover:shadow-lg hover:scale-110 active:scale-95 animate-pulse"
               aria-label="Answer call"
             >
               <PhoneIcon

@@ -15,20 +15,20 @@ interface ToolSectionHeaderProps {
 
 const COLOR_MAP = {
   primary: {
-    text: "text-primary-400/70",
-    line: "from-primary-500/40",
+    text: "text-primary-hover/70",
+    line: "from-primary/40",
   },
   secondary: {
-    text: "text-secondary-400/70",
-    line: "from-secondary-500/40",
+    text: "text-secondary-hover/70",
+    line: "from-secondary/40",
   },
   accent: {
-    text: "text-accent-400/70",
-    line: "from-accent-500/40",
+    text: "text-secondary-hover/70",
+    line: "from-secondary/40",
   },
   neutral: {
-    text: "text-surface-500",
-    line: "from-surface-700/50",
+    text: "text-ink-muted",
+    line: "from-layer-3/50",
   },
 };
 

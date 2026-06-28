@@ -27,11 +27,11 @@ export function BSTraySlot({ mon, active, onClick }: BSTraySlotProps) {
     <button
       className={cn(
         "flex gap-[.6rem] items-center rounded-[var(--radius)] cursor-pointer text-left",
-        "border border-solid transition-all duration-[var(--dur)] ease-[var(--ease)] text-[var(--text)] font-inherit",
-        "px-[.6rem] py-[.55rem] bg-[var(--surface-2)] border-[var(--border)]",
-        "hover:not(:disabled):border-[var(--accent-bright)] hover:not(:disabled):translate-y-[-2px]",
+        "border border-solid transition-all duration-[var(--dur)] ease-[var(--ease)] text-ink font-inherit",
+        "px-[.6rem] py-[.55rem] bg-layer-2 border-edge",
+        "hover:not(:disabled):border-[var(--secondary-hover)] hover:not(:disabled):translate-y-[-2px]",
         "disabled:opacity-45 disabled:cursor-not-allowed",
-        active && "border-[var(--accent-bright)] shadow-[inset_0_0_0_1px_var(--accent-bright)]",
+        active && "border-[var(--secondary-hover)] shadow-[inset_0_0_0_1px_var(--secondary-hover)]",
       )}
       onClick={onClick}
       disabled={mon.fnt || active}
@@ -41,13 +41,13 @@ export function BSTraySlot({ mon, active, onClick }: BSTraySlotProps) {
         <div className="font-bold text-t-sm flex items-center gap-[.4rem]">
           {mon.name}
           {mon.status && <BSStatusChip status={mon.status} />}
-          {active && <span className="font-mono text-[.54rem] text-[var(--accent-bright)] tracking-[.1em]">ACTIVO</span>}
+          {active && <span className="font-mono text-[.54rem] text-secondary-hover tracking-[.1em]">ACTIVO</span>}
         </div>
         <div className="flex gap-[.25rem] mt-[.35rem]"><BSTypeRow types={mon.types} ghost /></div>
         {!mon.fnt && (
           <div
             className="h-[5px] rounded-[3px] overflow-hidden mt-[.35rem]"
-            style={{ background: "color-mix(in srgb, #000 45%, var(--surface-3))" }}
+            style={{ background: "color-mix(in srgb, #000 45%, var(--layer-3))" }}
           >
             <span className="block h-full" style={{ width: `${pct}%`, background: hpColor(pct) }} />
           </div>

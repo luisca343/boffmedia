@@ -48,10 +48,10 @@ export function ExpandedView({
     }
   
     return (
-      <div className="w-full h-full flex flex-col items-center pt-12 pb-24 bg-gradient-to-b from-surface-900 to-surface-800 animate-in fade-in duration-300">
+      <div className="w-full h-full flex flex-col items-center pt-12 pb-24 bg-gradient-to-b from-layer-1 to-layer-2 animate-in fade-in duration-300">
         <div className="absolute top-4 right-4 z-10">
           <ArrowsPointingInIcon
-            className="cursor-pointer hover:text-surface-300 hover:scale-110 transition-all duration-200 drop-shadow-lg"
+            className="cursor-pointer hover:text-ink hover:scale-110 transition-all duration-200 drop-shadow-lg"
             height={32}
             width={32}
             strokeWidth={2.5}
@@ -62,7 +62,7 @@ export function ExpandedView({
         <div className="flex-1 flex flex-col items-center justify-center max-h-[80vh] overflow-y-auto w-full px-4">
           {/* Call Duration Timer */}
           {isUserInCall && (
-            <div className="text-surface-300 text-sm font-mono mb-6 animate-in slide-in-from-top duration-500">
+            <div className="text-ink text-sm font-mono mb-6 animate-in slide-in-from-top duration-500">
               {callDuration}
             </div>
           )}
@@ -83,7 +83,7 @@ export function ExpandedView({
                     className={`rounded-full transition-all duration-300 shadow-lg
                     ${
                       user.status === UserStatus.IN_CALL
-                        ? "border-4 border-highlight-500 shadow-highlight-500/50 scale-100"
+                        ? "border-4 border-warning-border shadow-warning/50 scale-100"
                         : user.status === UserStatus.RINGING
                         ? "border-4 border-yellow-500 shadow-yellow-500/50 animate-pulse"
                         : "border-4 border-red-500 shadow-red-500/50 opacity-50"
@@ -92,10 +92,10 @@ export function ExpandedView({
                   />
                   {/* Status Indicator Dot */}
                   <div
-                    className={`absolute bottom-1 right-1 w-4 h-4 rounded-full border-2 border-surface-900
+                    className={`absolute bottom-1 right-1 w-4 h-4 rounded-full border-2 border-edge-strong
                     ${
                       user.status === UserStatus.IN_CALL
-                        ? "bg-highlight-500"
+                        ? "bg-warning"
                         : user.status === UserStatus.RINGING
                         ? "bg-yellow-500 animate-pulse"
                         : "bg-red-500"
@@ -103,7 +103,7 @@ export function ExpandedView({
                   />
                 </div>
                 {/* User UUID Label */}
-                <span className="text-xs text-surface-400 max-w-[100px] truncate">
+                <span className="text-xs text-ink-muted max-w-[100px] truncate">
                   {user.uuid === currentUserUuid ? "You" : user.username}
                 </span>
               </div>
@@ -111,13 +111,13 @@ export function ExpandedView({
           </div>
           
           {/* Status Message */}
-          <p className="text-center text-xl font-medium mb-4 text-surface-100 animate-in fade-in duration-500">
+          <p className="text-center text-xl font-medium mb-4 text-ink animate-in fade-in duration-500">
             {getStatusMessage()}
           </p>
           
           {/* Additional Status Info */}
           {usersRinging.length > 0 && (
-            <p className="text-center text-sm text-surface-400 animate-pulse">
+            <p className="text-center text-sm text-ink-muted animate-pulse">
               Waiting for {usersRinging.length} {usersRinging.length === 1 ? 'person' : 'people'} to join...
             </p>
           )}
@@ -137,7 +137,7 @@ export function ExpandedView({
               width={32}
               strokeWidth={2.5}
             />
-            <span className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-surface-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+            <span className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-layer-1 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
               End Call
             </span>
           </button>
@@ -146,7 +146,7 @@ export function ExpandedView({
           {currentUser?.status === UserStatus.RINGING && (
             <button
               onClick={onJoinCall}
-              className="group relative bg-highlight-500 hover:bg-highlight-600 active:bg-highlight-700 p-5 rounded-full transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-110 active:scale-95 animate-pulse"
+              className="group relative bg-warning hover:bg-warning active:bg-warning p-5 rounded-full transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-110 active:scale-95 animate-pulse"
               aria-label="Answer call"
             >
               <PhoneIcon
@@ -155,7 +155,7 @@ export function ExpandedView({
                 width={32}
                 strokeWidth={2.5}
               />
-              <span className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-surface-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+              <span className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-layer-1 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                 Answer
               </span>
             </button>

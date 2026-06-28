@@ -21,7 +21,7 @@ export function LastRegistries() {
 
     if (!registries?.length) {
         return (
-            <div className="flex justify-center items-center h-20 text-surface-300">
+            <div className="flex justify-center items-center h-20 text-ink">
                 No hay registros recientes
             </div>
         );

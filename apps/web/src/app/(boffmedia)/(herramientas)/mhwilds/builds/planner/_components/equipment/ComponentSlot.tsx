@@ -68,7 +68,7 @@ const WeaponDetails: FC<{ weapon: Weapon }> = ({ weapon }) => {
   return (
     <div className="flex flex-wrap gap-x-4 gap-y-1">
       <span className="text-red-400">{t("attack")}: {weapon.attack || weapon.damage?.display || 0}</span>
-      <span className={weapon.affinity && weapon.affinity >= 0 ? "text-highlight-400" : "text-red-400"}>
+      <span className={weapon.affinity && weapon.affinity >= 0 ? "text-warning-hover" : "text-red-400"}>
         {t("affinity")}: {weapon.affinity && weapon.affinity > 0 ? '+' : ''}{weapon.affinity || 0}%
       </span>
       {elements.map((element, idx) => (
@@ -103,7 +103,7 @@ const WeaponDetails: FC<{ weapon: Weapon }> = ({ weapon }) => {
         </TooltipProvider>
       ))}
       {elements.length > 1 && (
-        <span className="text-accent-300">{t("total_element")}: {totalElementalDamage}</span>
+        <span className="text-secondary-hover">{t("total_element")}: {totalElementalDamage}</span>
       )}
     </div>
   );
@@ -115,12 +115,12 @@ const ArmorDetails: FC<{ armor: ArmorPiece }> = ({ armor }) => {
   const t = useTranslations("mhwilds");
   return (
     <div className="flex gap-3">
-      <span className="text-secondary-400">{t("def")}: {armor.defense.base} - {armor.defense.max}</span>
+      <span className="text-secondary-hover">{t("def")}: {armor.defense.base} - {armor.defense.max}</span>
       {armor.rarity !== undefined && (
         <span className="text-amber-400">{t("rarity")} {armor.rarity}</span>
       )}
       {armor.armorSet && (
-        <span className="text-primary-400">
+        <span className="text-primary-hover">
           {t("build_planner.set")}: {armor.armorSet.name || (armor.name.split(" ").length > 2
             ? armor.name.split(" ").slice(-2).join(" ")
             : armor.name)}
@@ -139,7 +139,7 @@ const CharmDetails: FC<{ charm: Charm }> = ({ charm }) => {
       <span className="text-amber-400">{t("rarity")} {charm.rarity}</span>
       <div className="flex gap-2">
         {charm.skills.map((skill, idx) => (
-          <span key={idx} className="text-highlight-400">
+          <span key={idx} className="text-warning-hover">
             {skill.skill.name} +{skill.level}
           </span>
         ))}
@@ -154,13 +154,13 @@ const SkillsList: FC<{ skills: SkillRank[] | CharmSkill[] }> = ({ skills }) => {
   const t = useTranslations("mhwilds");
   return (
     <div className="mt-2 text-xs flex flex-wrap items-center gap-x-2">
-      <span className="text-surface-400 mr-1">{t("skills")}:</span>
+      <span className="text-ink-muted mr-1">{t("skills")}:</span>
       {skills.map((skillRank, idx) => {
         const skillName = skillRank.skill?.name || skillRank.name || "Unknown Skill";
         return (
-          <span key={`${skillRank.id || `skill-${idx}`}`} className="text-highlight-400">
+          <span key={`${skillRank.id || `skill-${idx}`}`} className="text-warning-hover">
             {skillName} {t("lv")}{skillRank.level}
-            {idx < skills.length - 1 && <span className="text-surface-500 ml-1">/</span>}
+            {idx < skills.length - 1 && <span className="text-ink-muted ml-1">/</span>}
           </span>
         );
       })}
@@ -210,12 +210,12 @@ export const ComponentSlot: FC<ComponentSlotProps> = ({
                   className={`object-contain ${!slot.component ? 'opacity-30' : ''}`}
                   style={{ filter: getRarityFilterStyle(rarity) }}
                 />
-                {!slot.component && <Plus className="h-4 w-4 text-surface-400 absolute bottom-0 right-0" />}
+                {!slot.component && <Plus className="h-4 w-4 text-ink-muted absolute bottom-0 right-0" />}
               </div>
             ) : slot.key === 'charm' ? (
               <div className="relative w-10 h-10 flex items-center justify-center">
-                <Medal className={`h-8 w-8 ${!slot.component ? 'text-surface-500' : 'text-amber-400'}`} />
-                {!slot.component && <Plus className="h-4 w-4 text-surface-400 absolute bottom-0 right-0" />}
+                <Medal className={`h-8 w-8 ${!slot.component ? 'text-ink-muted' : 'text-amber-400'}`} />
+                {!slot.component && <Plus className="h-4 w-4 text-ink-muted absolute bottom-0 right-0" />}
               </div>
             ) : (
               <div className="relative w-10 h-10">
@@ -227,7 +227,7 @@ export const ComponentSlot: FC<ComponentSlotProps> = ({
                   className={`object-contain ${!slot.component ? 'opacity-30' : ''}`}
                   style={{ filter: getRarityFilterStyle(rarity) }}
                 />
-                {!slot.component && <Plus className="h-4 w-4 text-surface-400 absolute bottom-0 right-0" />}
+                {!slot.component && <Plus className="h-4 w-4 text-ink-muted absolute bottom-0 right-0" />}
               </div>
             )}
           </div>
@@ -236,7 +236,7 @@ export const ComponentSlot: FC<ComponentSlotProps> = ({
         {/* Column 2: Equipment details */}
         <div className="flex-1">
           <div className="flex items-center">
-            <span className="font-medium text-surface-100">
+            <span className="font-medium text-ink">
               {slot.component
                 ? slot.component.name
                 : t("build_planner.no_equipment", { name: slot.name })}
@@ -246,7 +246,7 @@ export const ComponentSlot: FC<ComponentSlotProps> = ({
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <div className="ml-2">
-                      <Info className="h-3.5 w-3.5 text-surface-400" />
+                      <Info className="h-3.5 w-3.5 text-ink-muted" />
                     </div>
                   </TooltipTrigger>
                   <TooltipContent side="right" className="max-w-xs">
@@ -258,7 +258,7 @@ export const ComponentSlot: FC<ComponentSlotProps> = ({
           </div>
 
           {slot.component && (
-            <div className="text-xs text-surface-300 mt-1">
+            <div className="text-xs text-ink mt-1">
               {isWeapon(slot.component)
                 ? <WeaponDetails weapon={slot.component} />
                 : isArmor(slot.component)

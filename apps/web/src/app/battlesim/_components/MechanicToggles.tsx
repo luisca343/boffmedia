@@ -54,7 +54,7 @@ function MechanicButton({
     <button
       className="bsx-focus flex items-center gap-[.5rem] p-[var(--bsx-pad-md)] flex-1 rounded-[var(--radius)] border font-inherit text-t-xs font-bold cursor-pointer transition-all duration-[var(--dur)] ease-[var(--ease)] whitespace-nowrap min-w-0"
       style={{
-        background: armed ? `color-mix(in srgb, ${meta.color} 16%, var(--surface-2))` : 'var(--surface-2)',
+        background: armed ? `color-mix(in srgb, ${meta.color} 16%, var(--layer-2))` : 'var(--layer-2)',
         borderColor: `color-mix(in srgb, ${meta.color} 40%, var(--border))`,
         color: 'var(--text)',
         boxShadow: armed ? `0 0 0 1px ${meta.color} inset, 0 0 18px -8px ${meta.color}` : undefined,
@@ -66,7 +66,7 @@ function MechanicButton({
     >
       <span
         className="font-mono font-bold text-t-3xs w-[19px] h-[19px] inline-grid place-items-center shrink-0 rounded-[var(--radius-sm)]"
-        style={{ background: 'color-mix(in srgb, #000 30%, var(--surface-3))', color: 'var(--text-muted)', border: '1px solid var(--border-strong)' }}
+        style={{ background: 'color-mix(in srgb, #000 30%, var(--layer-3))', color: 'var(--text-muted)', border: '1px solid var(--border-strong)' }}
       >
         {meta.hotkey}
       </span>

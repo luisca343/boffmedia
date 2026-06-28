@@ -87,7 +87,7 @@ export default function WeeklyStreak({
   const isComponentLoading = isLoading || loadingRewards;
 
   return (
-    <div className="w-full bg-surface-900/80 rounded-xl border-2 border-cyan-500/30 shadow-xl overflow-hidden mb-8">
+    <div className="w-full bg-layer-1/80 rounded-xl border-2 border-cyan-500/30 shadow-xl overflow-hidden mb-8">
       <StreakHeader
         currentBanner={currentBanner}
         currentDay={currentDay}
@@ -102,7 +102,7 @@ export default function WeeklyStreak({
         timeUntilReset={getTimeUntilReset()}
       />
       
-      <div className="p-6 bg-surface-900">
+      <div className="p-6 bg-layer-1">
         <DaysGrid
           totalDays={totalDays}
           currentDay={currentDay}

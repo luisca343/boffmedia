@@ -21,10 +21,10 @@ export default function Habilidad({params} : {params: {id: string}}){
 
   if(!ability) {
     return (
-      <div className="bg-surface-800 min-h-full overflow-auto flex justify-center items-center p-8">
+      <div className="bg-layer-2 min-h-full overflow-auto flex justify-center items-center p-8">
         <div className="flex items-center gap-3">
-          <div className="animate-spin h-5 w-5 border-2 border-primary-300 rounded-full border-t-transparent"></div>
-          <div className="text-surface-100 text-xl">Cargando información de la habilidad...</div>
+          <div className="animate-spin h-5 w-5 border-2 border-primary rounded-full border-t-transparent"></div>
+          <div className="text-ink text-xl">Cargando información de la habilidad...</div>
         </div>
       </div>
     )
@@ -34,19 +34,19 @@ export default function Habilidad({params} : {params: {id: string}}){
   const abilityDescription = t(`ability_${ability.name.replace(/\s+/g, "")}_description`);
 
   return (
-    <div className="bg-surface-800 min-h-full overflow-auto">
+    <div className="bg-layer-2 min-h-full overflow-auto">
       <div className="mt-4 p-4 max-w-7xl mx-auto">
         {/* Header with back button */}
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center">
-            <SparklesIcon className="h-6 w-6 text-primary-400 mr-3" />
-            <h1 className="text-2xl font-bold text-surface-50">
+            <SparklesIcon className="h-6 w-6 text-primary-hover mr-3" />
+            <h1 className="text-2xl font-bold text-ink">
               {abilityName}
             </h1>
           </div>
           <InternalLink 
             href="smartrotom/pokedex/habilidades" 
-            className="text-primary-400 hover:text-primary-300 text-sm flex items-center"
+            className="text-primary-hover hover:text-primary-hover text-sm flex items-center"
           >
             <ArrowLeftIcon className="h-4 w-4 mr-1" />
             Volver a habilidades
@@ -54,26 +54,26 @@ export default function Habilidad({params} : {params: {id: string}}){
         </div>
 
         {/* Single prominent description card */}
-        <div className="mb-6 bg-surface-700/40 rounded-lg p-6 border border-surface-600/60">
+        <div className="mb-6 bg-layer-3/40 rounded-lg p-6 border border-edge/60">
           <div className="flex flex-col gap-4">
             <div className="flex items-start gap-3">
               <div className="mt-1">
-                <SparklesIcon className="h-5 w-5 text-primary-300" />
+                <SparklesIcon className="h-5 w-5 text-primary-hover" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-surface-100 mb-2">Efecto</h2>
-                <p className="text-lg leading-relaxed text-surface-200">
+                <h2 className="text-xl font-semibold text-ink mb-2">Efecto</h2>
+                <p className="text-lg leading-relaxed text-ink">
                   {abilityDescription}
                 </p>
               </div>
             </div>
             
             {ability.isHidden !== undefined && (
-              <div className="flex items-center mt-2 pt-4 border-t border-surface-600/30">
+              <div className="flex items-center mt-2 pt-4 border-t border-edge/30">
                 <span className={`px-3 py-1 rounded-full text-sm ${
                   ability.isHidden 
-                    ? "bg-primary-900/30 text-primary-300 border border-primary-700/50" 
-                    : "bg-surface-600/30 text-surface-200 border border-surface-500/50"
+                    ? "bg-primary-soft/30 text-primary-hover border border-primary-active/50" 
+                    : "bg-layer-3/30 text-ink border border-edge/50"
                 }`}>
                   {ability.isHidden ? "Habilidad oculta" : "Habilidad estándar"}
                 </span>
@@ -83,15 +83,15 @@ export default function Habilidad({params} : {params: {id: string}}){
         </div>
           
         {/* Pokémon section */}
-        <div className="bg-surface-700/30 rounded-lg p-6 border border-surface-600/50">
+        <div className="bg-layer-3/30 rounded-lg p-6 border border-edge/50">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center">
-              <BookOpenIcon className="h-5 w-5 text-primary-300 mr-2" />
-              <h2 className="text-lg font-semibold text-surface-100">
+              <BookOpenIcon className="h-5 w-5 text-primary-hover mr-2" />
+              <h2 className="text-lg font-semibold text-ink">
                 Pokémon con esta habilidad
               </h2>
             </div>
-            <span className="bg-primary-900/30 text-primary-200 px-2.5 py-0.5 rounded-full text-sm">
+            <span className="bg-primary-soft/30 text-primary-hover px-2.5 py-0.5 rounded-full text-sm">
               {pokemon?.length || 0} Pokémon
             </span>
           </div>
@@ -118,7 +118,7 @@ export default function Habilidad({params} : {params: {id: string}}){
                 <div className="mt-6 text-center">
                   <button
                     onClick={() => setShowAll(!showAll)}
-                    className="px-4 py-2 bg-surface-600/70 hover:bg-surface-500/70 text-surface-100 rounded-md text-sm transition-colors"
+                    className="px-4 py-2 bg-layer-3/70 hover:bg-layer-3/70 text-ink rounded-md text-sm transition-colors"
                   >
                     {showAll ? "Mostrar menos" : `Ver todos (${pokemon.length})`}
                   </button>
@@ -126,8 +126,8 @@ export default function Habilidad({params} : {params: {id: string}}){
               )}
             </div>
           ) : (
-            <div className="rounded-lg p-8 text-center border border-surface-600/30">
-              <p className="text-surface-300">No se encontraron Pokémon con esta habilidad</p>
+            <div className="rounded-lg p-8 text-center border border-edge/30">
+              <p className="text-ink">No se encontraron Pokémon con esta habilidad</p>
             </div>
           )}
         </div>

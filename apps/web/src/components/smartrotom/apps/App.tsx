@@ -26,7 +26,7 @@ function AppIcon({ app, size, withLink = true }: AppIconProps) {
           className="w-full h-full"
         />
       </div>
-      <p className={`text-surface-50 text-center ${textSize} mt-2 text-shadow-surface-border2`}>
+      <p className={`text-ink text-center ${textSize} mt-2 text-shadow-border2`}>
         {app.name}
       </p>
     </>

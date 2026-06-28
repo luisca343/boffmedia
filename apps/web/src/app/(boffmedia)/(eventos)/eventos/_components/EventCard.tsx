@@ -140,29 +140,29 @@ export function EventCard({ event, layout = "grid" }: EventCardProps) {
               <Calendar className="w-3.5 h-3.5" style={{ color: "rgba(249,115,22,0.6)" }} />
             )}
           </div>
-          <span className="text-[11px] font-mono text-primary-400/60 uppercase tracking-wider truncate">
+          <span className="text-[11px] font-mono text-primary-hover/60 uppercase tracking-wider truncate">
             {game?.title ?? `Juego #${event.gameId}`}
           </span>
-          <span className="text-[10px] text-surface-600 ml-auto flex-shrink-0">
+          <span className="text-[10px] text-ink-dim ml-auto flex-shrink-0">
             {event.type === Event.type.EVENT ? "Evento" : "Servidor"}
           </span>
         </div>
 
         {/* Title */}
         <h3
-          className="text-base font-black text-surface-50 leading-snug line-clamp-2 group-hover:text-primary-200 transition-colors duration-200"
+          className="text-base font-black text-ink leading-snug line-clamp-2 group-hover:text-primary-hover transition-colors duration-200"
           style={{ fontFamily: "Orbitron, sans-serif" }}
         >
           {event.title}
         </h3>
 
         {/* Description */}
-        <p className="text-xs text-surface-500 line-clamp-3 leading-relaxed flex-1">
+        <p className="text-xs text-ink-muted line-clamp-3 leading-relaxed flex-1">
           {event.description}
         </p>
 
         {/* Dates */}
-        <div className="space-y-1 text-xs font-mono text-surface-500">
+        <div className="space-y-1 text-xs font-mono text-ink-muted">
           <div className="flex items-center gap-2">
             <Clock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "rgba(249,115,22,0.5)" }} />
             <span>{formatDate(event.startDate)}</span>

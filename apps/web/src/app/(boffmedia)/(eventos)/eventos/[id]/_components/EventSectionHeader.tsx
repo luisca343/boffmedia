@@ -38,7 +38,7 @@ export function EventSectionHeader({
           {label}
         </h2>
         {sub && (
-          <p className="text-[10px] font-mono text-surface-500 mt-0.5">{sub}</p>
+          <p className="text-[10px] font-mono text-ink-muted mt-0.5">{sub}</p>
         )}
       </div>
 

@@ -22,9 +22,9 @@ export function getRewardIcon({ type, description = "", size = 24, className = "
   
   switch(lowerType) {
     case 'coins':
-      return <Coins className={`h-${size/4} w-${size/4} text-warning-300 ${className}`} />;
+      return <Coins className={`h-${size/4} w-${size/4} text-warning-hover ${className}`} />;
     case 'money':
-      return <Banknote className={`h-${size/4} w-${size/4} text-success-500 ${className}`} />;
+      return <Banknote className={`h-${size/4} w-${size/4} text-success ${className}`} />;
     case 'box':
     case 'crate':
       // For boxes/crates, use ItemImage with the description as the itemId
@@ -34,11 +34,11 @@ export function getRewardIcon({ type, description = "", size = 24, className = "
       if (description && description.length > 0) {
         return <ItemImage type="item" itemId={description} size={size} />;
       }
-      return <Award className={`h-${size/4} w-${size/4} text-secondary-300 ${className}`} />;
+      return <Award className={`h-${size/4} w-${size/4} text-secondary-hover ${className}`} />;
     case 'pokemon':
       return <PokemonImage itemId={description} size={size} />;
     default:
-      return <Gift className={`h-${size/4} w-${size/4} text-highlight-300 ${className}`} />;
+      return <Gift className={`h-${size/4} w-${size/4} text-warning-hover ${className}`} />;
   }
 }
 
@@ -51,36 +51,36 @@ export function getRewardVisuals(rewardType: string) {
   switch(lowerType) {
     case 'coins':
       return {
-        bgGradient: "from-warning-700/40 to-warning-800/40",
-        border: "border-warning-500/50",
-        textColor: "text-warning-300"
+        bgGradient: "from-warning/40 to-warning-soft/40",
+        border: "border-warning-border/50",
+        textColor: "text-warning-hover"
       };
     case 'money':
       return {
-        bgGradient: "from-success-700/40 to-success-800/40",
-        border: "border-success-500/50",
-        textColor: "text-success-300"
+        bgGradient: "from-success/40 to-success-soft/40",
+        border: "border-success-border/50",
+        textColor: "text-success-hover"
       };
     case 'box':
     case 'boxes':
     case 'crate':
     case 'crates':
       return {
-        bgGradient: "from-violet-700/40 to-accent-800/40",
+        bgGradient: "from-violet-700/40 to-secondary-soft/40",
         border: "border-violet-500/50",
         textColor: "text-violet-300"
       };
     case 'item':
       return {
-        bgGradient: "from-secondary-700/40 to-indigo-800/40",
-        border: "border-secondary-500/50",
-        textColor: "text-secondary-300"
+        bgGradient: "from-secondary-active/40 to-indigo-800/40",
+        border: "border-secondary/50",
+        textColor: "text-secondary-hover"
       };
     default:
       return {
-        bgGradient: "from-highlight-700/40 to-emerald-800/40",
-        border: "border-highlight-500/50",
-        textColor: "text-highlight-300"
+        bgGradient: "from-warning/40 to-emerald-800/40",
+        border: "border-warning-border/50",
+        textColor: "text-warning-hover"
       };
   }
 }

@@ -29,7 +29,7 @@ export const StreamDetails = ({
   const t = useTranslations("twitch");
   
   return (
-    <div className="bg-surface-800 rounded-lg p-6 shadow-lg">
+    <div className="bg-layer-2 rounded-lg p-6 shadow-lg">
       <h1 className="text-2xl font-bold mb-3">{title}</h1>
       
       <StreamStats
@@ -50,7 +50,7 @@ export const StreamDetails = ({
       </div>
       
       {tags.length > 0 && (
-        <div className="bg-surface-700 rounded p-4">
+        <div className="bg-layer-3 rounded p-4">
           <h3 className="text-lg font-medium mb-2">Tags</h3>
           <div className="flex flex-wrap gap-2">
             {tags.map((tag, index) => (

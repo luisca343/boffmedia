@@ -290,11 +290,11 @@ export function TransactionsTable({
                   </p>
                 </div>
                 
-                <div className="text-sm text-surface-600">
+                <div className="text-sm text-ink-dim">
                   {row.original.reason || "Sin concepto"}
                 </div>
                 
-                <div className="flex justify-between text-xs text-surface-500">
+                <div className="flex justify-between text-xs text-ink-muted">
                   <span>{strToDate(row.original.date)}</span>
                   <span>Balance: {formatMoney(row.original.isPayer ? row.original.fromBalance : row.original.toBalance)}</span>
                 </div>

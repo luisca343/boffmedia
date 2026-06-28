@@ -76,13 +76,13 @@ export const BaseCard = ({
       
       <InternalLink
         href={linkPath}
-        className={`block bg-surface-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:bg-surface-700 ${isChannel ? 'flex flex-col' : ''}`}
+        className={`block bg-layer-2 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:bg-layer-3 ${isChannel ? 'flex flex-col' : ''}`}
       >
         {isChannel ? (
           // Channel layout - centered avatar
           <>
             <div className="w-full flex justify-center pt-6 pb-2">
-              <div className={`w-24 h-24 rounded-full overflow-hidden ring-4 ring-surface-700 transition-all ${
+              <div className={`w-24 h-24 rounded-full overflow-hidden ring-4 ring-edge transition-all ${
               platform === "youtube" ? "group-hover:ring-red-500" : "group-hover:ring-purple-500"
             }`}>
                 <img
@@ -157,7 +157,7 @@ export const BaseCard = ({
                 {title}
               </h3>
               
-              <p className="text-sm text-surface-400 group-hover:text-surface-300 transition-colors duration-300 mb-1">
+              <p className="text-sm text-ink-muted group-hover:text-ink transition-colors duration-300 mb-1">
                 {creator}
               </p>
               

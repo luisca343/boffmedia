@@ -11,7 +11,7 @@ const kindStyles: Record<string, string> = {
   new: "text-orange-400",
   soon: "text-purple-400",
   live: "text-emerald-400",
-  accent: "text-[var(--accent-bright)]",
+  accent: "text-secondary-hover",
   neutral: "",
 }
 
@@ -19,7 +19,7 @@ const kindBorders: Record<string, string> = {
   new: "color-mix(in srgb, var(--orange-500) 45%, transparent)",
   soon: "color-mix(in srgb, var(--purple-500) 45%, transparent)",
   live: "color-mix(in srgb, var(--emerald-500) 45%, transparent)",
-  accent: "color-mix(in srgb, var(--accent) 45%, transparent)",
+  accent: "color-mix(in srgb, var(--secondary) 45%, transparent)",
   neutral: "var(--border-strong)",
 }
 
@@ -27,8 +27,8 @@ const kindBgs: Record<string, string> = {
   new: "color-mix(in srgb, var(--orange-500) 12%, transparent)",
   soon: "color-mix(in srgb, var(--purple-500) 12%, transparent)",
   live: "color-mix(in srgb, var(--emerald-500) 12%, transparent)",
-  accent: "var(--accent-soft)",
-  neutral: "var(--surface-2)",
+  accent: "var(--secondary-soft)",
+  neutral: "var(--layer-2)",
 }
 
 export function BoffBadge({ className, kind, children, ...props }: BoffBadgeProps) {
@@ -46,7 +46,7 @@ export function BoffBadge({ className, kind, children, ...props }: BoffBadgeProp
     borderRadius: "var(--radius-pill, 9999px)",
     borderColor: kind ? kindBorders[kind] : "var(--border-strong)",
     color: kind ? undefined : "var(--text-muted)",
-    background: kind ? kindBgs[kind] : "var(--surface-2)",
+    background: kind ? kindBgs[kind] : "var(--layer-2)",
   }
 
   return (

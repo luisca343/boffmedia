@@ -52,7 +52,7 @@ export function VgcDivergenceView({ result, pokeMap }: DivergenceViewProps) {
 
   if (!result || !result.rows.length) {
     return (
-      <div className="flex-1 min-h-0 flex flex-col items-center justify-center gap-3 text-[var(--text-dim)] p-8">
+      <div className="flex-1 min-h-0 flex flex-col items-center justify-center gap-3 text-ink-dim p-8">
         <EmptyState icon="chart" title="Sin datos de divergencia" sub="No hay suficiente información para comparar ladder y torneo." />
       </div>
     )
@@ -60,16 +60,16 @@ export function VgcDivergenceView({ result, pokeMap }: DivergenceViewProps) {
 
   return (
     <div className="flex-1 min-h-0 flex flex-col">
-      <div className="shrink-0 flex items-center gap-2 px-[0.85rem] py-2 border-b border-[var(--border)] text-xs text-[var(--text-muted)]">
-        <span className="font-mono px-1.5 py-[0.15rem] rounded-[var(--radius-pill)] border border-[var(--border)] text-[var(--text-dim)]">
+      <div className="shrink-0 flex items-center gap-2 px-[0.85rem] py-2 border-b border-edge text-xs text-ink-muted">
+        <span className="font-mono px-1.5 py-[0.15rem] rounded-[var(--radius-pill)] border border-edge text-ink-dim">
           Smogon
         </span>
-        <span className="font-mono text-[var(--text)]">{result.ladderFormat}</span>
-        <span className="text-[var(--text-dim)]">·</span>
+        <span className="font-mono text-ink">{result.ladderFormat}</span>
+        <span className="text-ink-dim">·</span>
         <span>{result.ladderMonth}</span>
-        <span className="text-[var(--text-dim)]">·</span>
+        <span className="text-ink-dim">·</span>
         <span>1630+ ELO</span>
-        <span className="font-mono text-[var(--text-dim)] ml-auto">{result.rowCount} Pokémon</span>
+        <span className="font-mono text-ink-dim ml-auto">{result.rowCount} Pokémon</span>
       </div>
       <ToolTable
         minWidth="620px"
@@ -90,10 +90,10 @@ export function VgcDivergenceView({ result, pokeMap }: DivergenceViewProps) {
             const p = pokeMap[row.id]
             const pos = row.delta > 0
             return (
-              <tr key={row.id} className="transition-colors hover:bg-[color-mix(in_srgb,var(--surface-3)_45%,transparent)]">
-                <td className="font-mono text-[var(--text-dim)] text-right py-3 px-4 border-b border-[var(--border)] text-sm">{i + 1}</td>
-                <td className="py-3 px-4 border-b border-[var(--border)]">
-                  <span className="inline-flex items-center gap-1.5 font-semibold text-[var(--text)] text-sm">
+              <tr key={row.id} className="transition-colors hover:bg-[color-mix(in_srgb,var(--layer-3)_45%,transparent)]">
+                <td className="font-mono text-ink-dim text-right py-3 px-4 border-b border-edge text-sm">{i + 1}</td>
+                <td className="py-3 px-4 border-b border-edge">
+                  <span className="inline-flex items-center gap-1.5 font-semibold text-ink text-sm">
                     {p ? (
                       <>
                         <img src={spriteUrl(p.name)} alt={p.name} width={30} height={30} className="object-contain shrink-0" onError={handleSpriteError} />
@@ -104,19 +104,19 @@ export function VgcDivergenceView({ result, pokeMap }: DivergenceViewProps) {
                     )}
                   </span>
                 </td>
-                <td className="font-mono text-[var(--text-muted)] text-right py-3 px-4 border-b border-[var(--border)] text-sm">
+                <td className="font-mono text-ink-muted text-right py-3 px-4 border-b border-edge text-sm">
                   {row.ladder.toFixed(1)}%
                 </td>
-                <td className="font-mono text-[var(--text-muted)] text-right py-3 px-4 border-b border-[var(--border)] text-sm">
+                <td className="font-mono text-ink-muted text-right py-3 px-4 border-b border-edge text-sm">
                   {row.tournament.toFixed(1)}%
                 </td>
                 <td
-                  className="font-mono font-bold text-right py-3 px-4 border-b border-[var(--border)] text-sm"
+                  className="font-mono font-bold text-right py-3 px-4 border-b border-edge text-sm"
                   style={{ color: pos ? "#f5b342" : "#5b9cf0" }}
                 >
                   {pos ? "+" : ""}{row.delta.toFixed(1)}%
                 </td>
-                <td className="py-3 px-4 border-b border-[var(--border)]">
+                <td className="py-3 px-4 border-b border-edge">
                   {row.badge === "ladder-trap" ? (
                     <span
                       className="inline-flex text-[10px] font-bold px-2 py-[0.16rem] rounded-[var(--radius)] border"

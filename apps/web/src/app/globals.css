@@ -37,11 +37,11 @@
   --rose-400: #fb7185;
   --rose-500: #f43f5e;
 
-  /* Accent role — swappable via tweak; defaults to cyan */
-  --accent: var(--cyan-500);
-  --accent-bright: var(--cyan-400);
-  --accent-soft: rgba(6, 182, 212, 0.14);
-  --on-accent: #04141a;
+  /* Secondary role aliases — kept for backwards compatibility during migration */
+  --accent:        var(--secondary);
+  --accent-bright: var(--secondary-hover);
+  --accent-soft:   var(--secondary-soft);
+  --on-accent:     var(--on-secondary);
 
   /* Track-record colors (win / loss / draw) */
   --trk-win: var(--emerald-400);
@@ -94,41 +94,289 @@
 }
 
 /* ===========================================================================
-   THEME TOKENS  (surfaces + text)
+   THEME TOKENS  (surfaces + text + all semantic tokens)
    =========================================================================== */
 :root,
 [data-theme="dark"] {
-  --bg: #0a0a0f;
-  --bg-grad-1: #0c0c14;
-  --bg-grad-2: #07070b;
-  --surface: #12121b;
-  --surface-2: #181826;
-  --surface-3: #1f1f30;
-  --border: rgba(255, 255, 255, 0.08);
+  /* Foundation */
+  --bg:           #0a0a0f;
+  --bg-grad-1:    #0c0c14;
+  --bg-grad-2:    #07070b;
+  --layer-1:      #12121b;
+  --layer-2:      #181826;
+  --layer-3:      #1f1f30;
+  --border:       rgba(255, 255, 255, 0.08);
   --border-strong: rgba(255, 255, 255, 0.16);
-  --text: #f4f4f7;
-  --text-muted: #a9abb8;
-  --text-dim: #71737f;
+  --text:         #f4f4f7;
+  --text-muted:   #a9abb8;
+  --text-dim:     #71737f;
   --shadow-color: rgba(0, 0, 0, 0.55);
-  --hud-shadow: #000000;
-  --grid-dot: rgba(255, 255, 255, 0.04);
+  --hud-shadow:   #000000;
+  --grid-dot:     rgba(255, 255, 255, 0.04);
+
+  /* Surface interaction */
+  --layer-hover:  rgba(255, 255, 255, 0.04);
+  --layer-active: rgba(255, 255, 255, 0.08);
+
+  /* State overlays */
+  --hover-overlay:    rgba(255, 255, 255, 0.06);
+  --pressed-overlay:  rgba(255, 255, 255, 0.12);
+  --selected-overlay: rgba(249, 115, 22, 0.10);
+
+  /* Brand — primary (orange) */
+  --primary:        #f97316;
+  --primary-hover:  #fb923c;
+  --primary-active: #ea580c;
+  --primary-soft:   rgba(249, 115, 22, 0.14);
+  --on-primary:     #ffffff;
+
+  /* Brand — secondary (cyan) */
+  --secondary:        #06b6d4;
+  --secondary-hover:  #22d3ee;
+  --secondary-active: #0891b2;
+  --secondary-soft:   rgba(6, 182, 212, 0.14);
+  --on-secondary:     #04141a;
+
+  /* Semantic — success */
+  --success:        #10b981;
+  --success-hover:  #34d399;
+  --success-soft:   rgba(16, 185, 129, 0.14);
+  --success-border: rgba(16, 185, 129, 0.30);
+  --on-success:     #ffffff;
+
+  /* Semantic — warning */
+  --warning:        #f59e0b;
+  --warning-hover:  #fbbf24;
+  --warning-soft:   rgba(245, 158, 11, 0.14);
+  --warning-border: rgba(245, 158, 11, 0.30);
+  --on-warning:     #1c1200;
+
+  /* Semantic — danger */
+  --danger:        #ef4444;
+  --danger-hover:  #f87171;
+  --danger-soft:   rgba(239, 68, 68, 0.14);
+  --danger-border: rgba(239, 68, 68, 0.30);
+  --on-danger:     #ffffff;
+
+  /* Semantic — info */
+  --info:        #3b82f6;
+  --info-hover:  #60a5fa;
+  --info-soft:   rgba(59, 130, 246, 0.14);
+  --info-border: rgba(59, 130, 246, 0.30);
+  --on-info:     #ffffff;
+
+  /* Inputs */
+  --input-bg:           var(--layer-2);
+  --input-border:       rgba(255, 255, 255, 0.12);
+  --input-border-hover: rgba(255, 255, 255, 0.22);
+  --input-border-focus: var(--secondary);
+  --input-placeholder:  var(--text-dim);
+  --input-valid:        var(--success);
+  --input-invalid:      var(--danger);
+
+  /* Interactive */
+  --focus-ring:   rgba(6, 182, 212, 0.50);
+  --selection:    rgba(249, 115, 22, 0.35);
+  --link:         var(--secondary-hover);
+  --link-hover:   var(--secondary);
+  --link-visited: #a78bfa;
+
+  /* Disabled */
+  --disabled-bg:     rgba(255, 255, 255, 0.05);
+  --disabled-border: rgba(255, 255, 255, 0.08);
+  --disabled-text:   var(--text-dim);
+
+  /* Dividers */
+  --divider:        rgba(255, 255, 255, 0.05);
+  --divider-strong: rgba(255, 255, 255, 0.10);
+
+  /* Tables & lists */
+  --row-hover:    rgba(255, 255, 255, 0.04);
+  --row-selected: rgba(249, 115, 22, 0.08);
+
+  /* Loading */
+  --skeleton:         rgba(255, 255, 255, 0.07);
+  --skeleton-shimmer: rgba(255, 255, 255, 0.13);
+
+  /* Scrollbars */
+  --scroll-track:       var(--bg);
+  --scroll-thumb:       var(--layer-3);
+  --scroll-thumb-hover: var(--primary-active);
+
+  /* Effects */
+  --glass:        rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.10);
+  --backdrop:     rgba(0, 0, 0, 0.50);
+  --scrim:        rgba(0, 0, 0, 0.60);
+
+  /* Badge state colors — backgrounds, pair with status text tokens */
+  --badge-live:       rgba(16, 185, 129, 0.18);
+  --badge-draft:      rgba(255, 255, 255, 0.08);
+  --badge-archived:   rgba(255, 255, 255, 0.05);
+  --badge-processing: rgba(59, 130, 246, 0.18);
+  --badge-paused:     rgba(245, 158, 11, 0.18);
+
+  /* Code blocks */
+  --code-bg:          #0e0e17;
+  --code-border:      rgba(255, 255, 255, 0.10);
+  --syntax-keyword:   #c084fc;
+  --syntax-string:    #34d399;
+  --syntax-number:    #fb923c;
+  --syntax-comment:   #4a4d5e;
+
+  /* Image overlays */
+  --image-overlay: rgba(0, 0, 0, 0.45);
+
+  /* Chart palette */
+  --chart-1: #f97316;
+  --chart-2: #06b6d4;
+  --chart-3: #a855f7;
+  --chart-4: #10b981;
+  --chart-5: #f59e0b;
+  --chart-6: #f43f5e;
+  --chart-7: #3b82f6;
+  --chart-8: #ec4899;
 }
 
 [data-theme="light"] {
-  --bg: #f4f3f0;
-  --bg-grad-1: #f7f6f3;
-  --bg-grad-2: #ece9e3;
-  --surface: #ffffff;
-  --surface-2: #faf9f6;
-  --surface-3: #f1efe9;
-  --border: rgba(20, 18, 14, 0.10);
+  /* Foundation */
+  --bg:            #f4f3f0;
+  --bg-grad-1:     #f7f6f3;
+  --bg-grad-2:     #ece9e3;
+  --layer-1:       #ffffff;
+  --layer-2:       #faf9f6;
+  --layer-3:       #f1efe9;
+  --border:        rgba(20, 18, 14, 0.10);
   --border-strong: rgba(20, 18, 14, 0.22);
-  --text: #18161f;
-  --text-muted: #57545f;
-  --text-dim: #8b8893;
-  --shadow-color: rgba(40, 30, 20, 0.16);
-  --hud-shadow: #18161f;
-  --grid-dot: rgba(20, 18, 14, 0.05);
+  --text:          #18161f;
+  --text-muted:    #57545f;
+  --text-dim:      #8b8893;
+  --shadow-color:  rgba(40, 30, 20, 0.16);
+  --hud-shadow:    #18161f;
+  --grid-dot:      rgba(20, 18, 14, 0.05);
+
+  /* Surface interaction */
+  --layer-hover:  rgba(0, 0, 0, 0.04);
+  --layer-active: rgba(0, 0, 0, 0.08);
+
+  /* State overlays */
+  --hover-overlay:    rgba(0, 0, 0, 0.04);
+  --pressed-overlay:  rgba(0, 0, 0, 0.10);
+  --selected-overlay: rgba(249, 115, 22, 0.08);
+
+  /* Brand — primary (orange) */
+  --primary:        #ea580c;
+  --primary-hover:  #f97316;
+  --primary-active: #c2410c;
+  --primary-soft:   rgba(234, 88, 12, 0.10);
+  --on-primary:     #ffffff;
+
+  /* Brand — secondary (cyan) */
+  --secondary:        #0891b2;
+  --secondary-hover:  #06b6d4;
+  --secondary-active: #0e7490;
+  --secondary-soft:   rgba(8, 145, 178, 0.10);
+  --on-secondary:     #ffffff;
+
+  /* Semantic — success */
+  --success:        #059669;
+  --success-hover:  #10b981;
+  --success-soft:   rgba(5, 150, 105, 0.10);
+  --success-border: rgba(5, 150, 105, 0.25);
+  --on-success:     #ffffff;
+
+  /* Semantic — warning */
+  --warning:        #d97706;
+  --warning-hover:  #f59e0b;
+  --warning-soft:   rgba(217, 119, 6, 0.10);
+  --warning-border: rgba(217, 119, 6, 0.25);
+  --on-warning:     #ffffff;
+
+  /* Semantic — danger */
+  --danger:        #dc2626;
+  --danger-hover:  #ef4444;
+  --danger-soft:   rgba(220, 38, 38, 0.10);
+  --danger-border: rgba(220, 38, 38, 0.25);
+  --on-danger:     #ffffff;
+
+  /* Semantic — info */
+  --info:        #2563eb;
+  --info-hover:  #3b82f6;
+  --info-soft:   rgba(37, 99, 235, 0.10);
+  --info-border: rgba(37, 99, 235, 0.25);
+  --on-info:     #ffffff;
+
+  /* Inputs */
+  --input-bg:           var(--layer-1);
+  --input-border:       rgba(20, 18, 14, 0.18);
+  --input-border-hover: rgba(20, 18, 14, 0.32);
+  --input-border-focus: var(--secondary);
+  --input-placeholder:  var(--text-dim);
+  --input-valid:        var(--success);
+  --input-invalid:      var(--danger);
+
+  /* Interactive */
+  --focus-ring:   rgba(8, 145, 178, 0.40);
+  --selection:    rgba(234, 88, 12, 0.25);
+  --link:         var(--secondary);
+  --link-hover:   var(--secondary-hover);
+  --link-visited: #7c3aed;
+
+  /* Disabled */
+  --disabled-bg:     rgba(20, 18, 14, 0.05);
+  --disabled-border: rgba(20, 18, 14, 0.10);
+  --disabled-text:   var(--text-dim);
+
+  /* Dividers */
+  --divider:        rgba(20, 18, 14, 0.06);
+  --divider-strong: rgba(20, 18, 14, 0.12);
+
+  /* Tables & lists */
+  --row-hover:    rgba(0, 0, 0, 0.03);
+  --row-selected: rgba(234, 88, 12, 0.06);
+
+  /* Loading */
+  --skeleton:         rgba(20, 18, 14, 0.07);
+  --skeleton-shimmer: rgba(20, 18, 14, 0.13);
+
+  /* Scrollbars */
+  --scroll-track:       var(--bg);
+  --scroll-thumb:       var(--layer-3);
+  --scroll-thumb-hover: var(--primary);
+
+  /* Effects */
+  --glass:        rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(20, 18, 14, 0.10);
+  --backdrop:     rgba(20, 18, 14, 0.40);
+  --scrim:        rgba(20, 18, 14, 0.50);
+
+  /* Badge state colors */
+  --badge-live:       rgba(5, 150, 105, 0.12);
+  --badge-draft:      rgba(20, 18, 14, 0.06);
+  --badge-archived:   rgba(20, 18, 14, 0.04);
+  --badge-processing: rgba(37, 99, 235, 0.10);
+  --badge-paused:     rgba(217, 119, 6, 0.12);
+
+  /* Code blocks */
+  --code-bg:          #f5f4f1;
+  --code-border:      rgba(20, 18, 14, 0.12);
+  --syntax-keyword:   #7c3aed;
+  --syntax-string:    #059669;
+  --syntax-number:    #c2410c;
+  --syntax-comment:   #8b8893;
+
+  /* Image overlays */
+  --image-overlay: rgba(0, 0, 0, 0.30);
+
+  /* Chart palette */
+  --chart-1: #ea580c;
+  --chart-2: #0891b2;
+  --chart-3: #9333ea;
+  --chart-4: #059669;
+  --chart-5: #d97706;
+  --chart-6: #e11d48;
+  --chart-7: #2563eb;
+  --chart-8: #db2777;
 }
 
 /* ===========================================================================
@@ -144,12 +392,12 @@
   --bsx-pad-md: 0.55rem 0.65rem;
   --bsx-pad-lg: 0.65rem 0.8rem;
   --bsx-pad-chip: 0.22rem 0.55rem 0.22rem 0.35rem;
-  --card-bg: color-mix(in srgb, var(--surface) 72%, transparent);
+  --card-bg: color-mix(in srgb, var(--layer-1) 72%, transparent);
   --card-border: 1px solid var(--border);
   --card-shadow: 0 24px 60px -28px var(--shadow-color), inset 0 1px 0 rgba(255,255,255,0.05);
   --card-shadow-hover: 0 30px 70px -26px var(--shadow-color), inset 0 1px 0 rgba(255,255,255,0.08);
   --btn-radius: 9999px;
-  --btn-shadow: 0 8px 24px -8px var(--accent);
+  --btn-shadow: 0 8px 24px -8px var(--secondary);
   --glow: 0 0 40px -8px;
   --hairline: 1px;
   --label-font: var(--font-mono);
@@ -200,7 +448,7 @@ img { display: block; max-width: 100%; }
 .eyebrow-num { font-family: var(--font-mono); color: var(--orange-500); font-weight: 700; }
 .text-muted { color: var(--text-muted); }
 .text-dim { color: var(--text-dim); }
-.accent-text { color: var(--accent-bright); }
+.accent-text { color: var(--secondary-hover); }
 .orange-text { color: var(--orange-500); }
 .divider { height: var(--hairline); background: var(--border); border: 0; margin: 0; }
 .grid-dots {
@@ -218,7 +466,7 @@ img { display: block; max-width: 100%; }
 
 /* Shared keyboard-focus ring for BS/BSX battle primitives */
 .bsx-focus:focus-visible {
-  outline: 2px solid var(--accent-bright);
+  outline: 2px solid var(--secondary-hover);
   outline-offset: 2px;
 }
 
@@ -250,7 +498,7 @@ img { display: block; max-width: 100%; }
    ============================================================================ */
 .boff-card--hover:hover { box-shadow: var(--card-shadow-hover); }
 [data-direction="hud"] .boff-card--hover:hover { transform: translate(-2px, -2px); }
-[data-direction="neon"] .boff-card--hover:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--accent) 40%, var(--border)); }
+[data-direction="neon"] .boff-card--hover:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--secondary) 40%, var(--border)); }
 [data-direction="grid"] .boff-card--hover:hover { transform: translateY(-3px); border-color: var(--border-strong); }
 
 /* Showcase pseudo-elements — cannot be expressed in Tailwind alone */
@@ -258,7 +506,7 @@ img { display: block; max-width: 100%; }
   content: "";
   flex: 1;
   height: var(--hairline);
-  background: var(--border);
+  background: var(--divider);
 }
 .dodont__list li::before {
   content: "";
@@ -281,9 +529,9 @@ img { display: block; max-width: 100%; }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 11px; height: 11px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 6px; border: 3px solid var(--bg); }
-::-webkit-scrollbar-thumb:hover { background: var(--orange-600); }
+::-webkit-scrollbar-track { background: var(--scroll-track); }
+::-webkit-scrollbar-thumb { background: var(--scroll-thumb); border-radius: 6px; border: 3px solid var(--scroll-track); }
+::-webkit-scrollbar-thumb:hover { background: var(--scroll-thumb-hover); }
 
 /* ===========================================================================
    NAVBAR — direction-aware navlink styles

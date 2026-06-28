@@ -45,7 +45,7 @@ export default function StreamPage({ params }: { params: { channel: string } }) 
 
   if (loading) {
     return (
-      <div className="min-h-full bg-surface-900 flex justify-center items-center overflow-auto">
+      <div className="min-h-full bg-layer-1 flex justify-center items-center overflow-auto">
         <LoadingSpinner size="large" message={t("loading.stream")} />
       </div>
     );
@@ -53,10 +53,10 @@ export default function StreamPage({ params }: { params: { channel: string } }) 
 
   if (error || !streamData) {
     return (
-      <div className="min-h-full bg-surface-900 text-white p-6 flex justify-center items-center overflow-auto">
-        <div className="bg-surface-800 p-6 rounded-lg shadow-lg max-w-md w-full text-center">
+      <div className="min-h-full bg-layer-1 text-white p-6 flex justify-center items-center overflow-auto">
+        <div className="bg-layer-2 p-6 rounded-lg shadow-lg max-w-md w-full text-center">
           <p className="text-red-500 text-xl mb-4">{error || t("stream.notFound")}</p>
-          <p className="text-surface-400 mb-4">
+          <p className="text-ink-muted mb-4">
             {error === t("stream.notFound") ? 
               `${params.channel} is not currently streaming or doesn't exist.` :
               "There was an error loading the stream."
@@ -71,7 +71,7 @@ export default function StreamPage({ params }: { params: { channel: string } }) 
   }
 
   return (
-    <div className="min-h-full bg-surface-900 text-white overflow-auto">
+    <div className="min-h-full bg-layer-1 text-white overflow-auto">
       <div className="container mx-auto px-4 py-6">
         <div className="mb-6">
           <TwitchPlayer 

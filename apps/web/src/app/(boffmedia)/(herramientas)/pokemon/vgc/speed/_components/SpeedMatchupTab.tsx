@@ -195,10 +195,10 @@ export function SpeedMatchupTab({
         initial={{ opacity: 0, x: -12 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.1, duration: 0.3 }}
-        className="rounded-xl border border-surface-700 bg-surface-800 shadow-lg overflow-hidden"
+        className="rounded-xl border border-edge bg-layer-2 shadow-lg overflow-hidden"
       >
-        <div className="px-4 py-3 border-b border-surface-700 bg-surface-900/50">
-          <h2 className="text-xs font-semibold text-surface-400 uppercase tracking-wider">
+        <div className="px-4 py-3 border-b border-edge bg-layer-1/50">
+          <h2 className="text-xs font-semibold text-ink-muted uppercase tracking-wider">
             {t("opponentTitle")}
           </h2>
         </div>
@@ -207,7 +207,7 @@ export function SpeedMatchupTab({
           {/* Search */}
           <div className="relative" ref={dropdownRef}>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-500 pointer-events-none" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-muted pointer-events-none" />
               <Input
                 value={searchQuery}
                 onChange={(e) => {
@@ -220,21 +220,21 @@ export function SpeedMatchupTab({
                   if (searchQuery) setShowDropdown(true);
                 }}
                 placeholder={t("opponentSearch")}
-                className="pl-9 pr-8 bg-surface-900 border-surface-700 text-surface-100 placeholder:text-surface-500"
+                className="pl-9 pr-8 bg-layer-1 border-edge text-ink placeholder:text-ink-muted"
               />
               {searchQuery && (
                 <button
                   onClick={clearOpponent}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-surface-500 hover:text-surface-300 transition-colors"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-ink-muted hover:text-ink transition-colors"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>
             {showDropdown && searchResults.length > 0 && (
-              <div className="absolute z-20 w-full mt-1 rounded-lg border border-surface-700 bg-surface-900 shadow-xl overflow-hidden">
+              <div className="absolute z-20 w-full mt-1 rounded-lg border border-edge bg-layer-1 shadow-xl overflow-hidden">
                 {loading ? (
-                  <div className="px-3 py-2 text-sm text-surface-400">
+                  <div className="px-3 py-2 text-sm text-ink-muted">
                     {t("loading")}
                   </div>
                 ) : (
@@ -242,7 +242,7 @@ export function SpeedMatchupTab({
                     <button
                       key={p.name}
                       onMouseDown={() => selectPokemon(p)}
-                      className="w-full text-left px-3 py-2 hover:bg-surface-800 transition-colors flex items-center gap-2"
+                      className="w-full text-left px-3 py-2 hover:bg-layer-2 transition-colors flex items-center gap-2"
                     >
                       { }
                       <img
@@ -253,8 +253,8 @@ export function SpeedMatchupTab({
                         height={24}
                         className="object-contain"
                       />
-                      <span className="text-sm text-surface-200">{p.name}</span>
-                      <span className="ml-auto text-xs text-surface-500 font-mono">
+                      <span className="text-sm text-ink">{p.name}</span>
+                      <span className="ml-auto text-xs text-ink-muted font-mono">
                         {p.baseSpeed}
                       </span>
                     </button>
@@ -267,7 +267,7 @@ export function SpeedMatchupTab({
           {/* Reference speed chips */}
           {refSpeeds.length > 0 && (
             <div className="space-y-1.5">
-              <span className="text-[10px] text-surface-500 uppercase tracking-wider">
+              <span className="text-[10px] text-ink-muted uppercase tracking-wider">
                 {t("referenceSpeed")}
               </span>
               <div className="flex flex-wrap gap-1.5">
@@ -282,8 +282,8 @@ export function SpeedMatchupTab({
                     }
                     className={`px-2 py-0.5 rounded text-xs font-mono border transition-all ${
                       opponent.speed === String(chip.value)
-                        ? "bg-primary-500/20 border-primary-500/50 text-primary-300"
-                        : "bg-surface-800 border-surface-700 text-surface-400 hover:text-surface-200 hover:border-surface-600"
+                        ? "bg-primary/20 border-primary/50 text-primary-hover"
+                        : "bg-layer-2 border-edge text-ink-muted hover:text-ink hover:border-edge"
                     }`}
                   >
                     {chip.label}: {chip.value}
@@ -295,7 +295,7 @@ export function SpeedMatchupTab({
 
           {/* Manual speed */}
           <div className="space-y-1.5">
-            <span className="text-[10px] text-surface-500 uppercase tracking-wider">
+            <span className="text-[10px] text-ink-muted uppercase tracking-wider">
               {t("opponentManual")}
             </span>
             <Input
@@ -307,13 +307,13 @@ export function SpeedMatchupTab({
               type="number"
               min={1}
               max={999}
-              className="bg-surface-900 border-surface-700 text-surface-100 placeholder:text-surface-500"
+              className="bg-layer-1 border-edge text-ink placeholder:text-ink-muted"
             />
           </div>
 
           {/* Opponent modifiers */}
           <div className="space-y-1.5">
-            <span className="text-[10px] text-surface-500 uppercase tracking-wider">
+            <span className="text-[10px] text-ink-muted uppercase tracking-wider">
               {t("opponentModifiers")}
             </span>
             <ModifierPanel
@@ -323,15 +323,15 @@ export function SpeedMatchupTab({
           </div>
 
           {/* Effective speed display */}
-          <div className="rounded-lg bg-surface-900/80 border border-surface-700 px-4 py-4 text-center">
-            <div className="text-[10px] text-surface-500 uppercase tracking-wider mb-1">
+          <div className="rounded-lg bg-layer-1/80 border border-edge px-4 py-4 text-center">
+            <div className="text-[10px] text-ink-muted uppercase tracking-wider mb-1">
               {t("effectiveSpeed")}
             </div>
-            <div className="text-5xl font-bold font-mono text-surface-50 tabular-nums">
+            <div className="text-5xl font-bold font-mono text-ink tabular-nums">
               {opponentEffective !== null ? opponentEffective : "—"}
             </div>
             {opponent.name && (
-              <div className="text-xs text-surface-400 mt-1.5">
+              <div className="text-xs text-ink-muted mt-1.5">
                 {opponent.name}
               </div>
             )}
@@ -344,10 +344,10 @@ export function SpeedMatchupTab({
         initial={{ opacity: 0, x: 12 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.15, duration: 0.3 }}
-        className="rounded-xl border border-surface-700 bg-surface-800 shadow-lg overflow-hidden"
+        className="rounded-xl border border-edge bg-layer-2 shadow-lg overflow-hidden"
       >
-        <div className="flex items-center justify-between px-4 py-3 border-b border-surface-700 bg-surface-900/50">
-          <h2 className="text-xs font-semibold text-surface-400 uppercase tracking-wider">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-edge bg-layer-1/50">
+          <h2 className="text-xs font-semibold text-ink-muted uppercase tracking-wider">
             {t("myTeamTitle")} ({team.length}/6)
           </h2>
           <button
@@ -361,26 +361,26 @@ export function SpeedMatchupTab({
                 }))
               )
             }
-            className="text-xs text-surface-500 hover:text-red-400 transition-colors"
+            className="text-xs text-ink-muted hover:text-red-400 transition-colors"
           >
             {t("clearTeam")}
           </button>
         </div>
 
-        <div className="divide-y divide-surface-700/60">
+        <div className="divide-y divide-edge/60">
           {team.map((member, idx) => {
             const effective = calcEffective(member.speed, member.mods);
             return (
               <div key={member.id} className="px-4 py-3 space-y-2.5">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-surface-600 w-4 shrink-0 text-center">
+                  <span className="text-xs text-ink-dim w-4 shrink-0 text-center">
                     {idx + 1}
                   </span>
                   <Input
                     value={member.name}
                     onChange={(e) => updateMember(member.id, { name: e.target.value })}
                     placeholder={t("teamMemberName")}
-                    className="flex-1 h-8 text-sm bg-surface-900 border-surface-700 text-surface-100 placeholder:text-surface-600"
+                    className="flex-1 h-8 text-sm bg-layer-1 border-edge text-ink placeholder:text-ink-dim"
                   />
                   <Input
                     value={member.speed}
@@ -391,25 +391,25 @@ export function SpeedMatchupTab({
                     type="number"
                     min={1}
                     max={999}
-                    className="w-28 h-8 text-sm font-mono bg-surface-900 border-surface-700 text-surface-100 placeholder:text-surface-600"
+                    className="w-28 h-8 text-sm font-mono bg-layer-1 border-edge text-ink placeholder:text-ink-dim"
                   />
                   <button
                     onClick={() => removeMember(member.id)}
-                    className="p-1.5 text-surface-600 hover:text-red-400 transition-colors shrink-0"
+                    className="p-1.5 text-ink-dim hover:text-red-400 transition-colors shrink-0"
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>
                 </div>
 
                 <div className="flex items-center gap-3 pl-6">
-                  <div className="text-[10px] text-surface-500 uppercase tracking-wider shrink-0">
+                  <div className="text-[10px] text-ink-muted uppercase tracking-wider shrink-0">
                     {t("effectiveSpeed")}
                   </div>
-                  <div className="text-lg font-bold font-mono text-surface-200 tabular-nums min-w-[2.5rem]">
+                  <div className="text-lg font-bold font-mono text-ink tabular-nums min-w-[2.5rem]">
                     {effective !== null ? (
                       effective
                     ) : (
-                      <span className="text-surface-700 text-base">—</span>
+                      <span className="text-ink-dim text-base">—</span>
                     )}
                   </div>
                   {opponentEffective !== null && effective !== null && (
@@ -420,7 +420,7 @@ export function SpeedMatchupTab({
                     />
                   )}
                   {opponentEffective === null && (
-                    <span className="text-xs text-surface-600 italic">
+                    <span className="text-xs text-ink-dim italic">
                       {t("noOpponent")}
                     </span>
                   )}
@@ -438,10 +438,10 @@ export function SpeedMatchupTab({
         </div>
 
         {team.length < 6 && (
-          <div className="px-4 py-3 border-t border-surface-700/60">
+          <div className="px-4 py-3 border-t border-edge/60">
             <button
               onClick={addMember}
-              className="flex items-center gap-1.5 text-xs text-surface-500 hover:text-surface-300 transition-colors"
+              className="flex items-center gap-1.5 text-xs text-ink-muted hover:text-ink transition-colors"
             >
               <Plus className="w-3.5 h-3.5" />
               {t("addMember")}

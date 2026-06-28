@@ -27,12 +27,12 @@ export function BoffTabs({ value, options, onChange, className }: BoffTabsProps)
             className={cn(
               "relative inline-flex items-center gap-2",
               "font-body text-sm font-semibold",
-              "text-[var(--text-muted)]",
+              "text-ink-muted",
               "py-3 px-3.5",
               "border-0 bg-transparent",
               "cursor-pointer",
               "transition-colors duration-[var(--dur,0.32s)]",
-              "hover:text-[var(--text)]",
+              "hover:text-ink",
               "after:content-[''] after:absolute after:left-1.5 after:right-1.5 after:-bottom-px after:h-0.5 after:bg-orange-500",
               "after:scale-x-0 after:transition-transform after:duration-[var(--dur,0.32s)] after:ease-[var(--ease)]",
               active && "text-orange-500 after:scale-x-100",
@@ -44,7 +44,7 @@ export function BoffTabs({ value, options, onChange, className }: BoffTabsProps)
               <span className={cn(
                 "font-mono text-[0.65rem] py-0.5 px-1.5",
                 "rounded-[var(--radius-pill,9999px)]",
-                "bg-[var(--surface-3)] text-[var(--text-dim)]",
+                "bg-layer-3 text-ink-dim",
                 active && "bg-[color-mix(in_srgb,var(--orange-500)_16%,transparent)] text-orange-500",
               )}>
                 {o.count}

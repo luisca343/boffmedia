@@ -23,7 +23,7 @@ export function TeamSprites({ slots, size = 32, max = 6, gap = 2, onSelect }: Te
             <button
               key={i}
               type="button"
-              className="cursor-pointer border-0 bg-transparent p-0 rounded hover:ring-2 hover:ring-[var(--accent)]"
+              className="cursor-pointer border-0 bg-transparent p-0 rounded hover:ring-2 hover:ring-secondary"
               title={s.name}
               onClick={(e) => { e.stopPropagation(); onSelect(s) }}
             >

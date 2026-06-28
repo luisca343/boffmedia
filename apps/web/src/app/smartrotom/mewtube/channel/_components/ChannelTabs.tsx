@@ -42,7 +42,7 @@ export const ChannelTabs = ({
   
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab}>
-      <TabsList className="bg-surface-800 border-b border-surface-700 w-full rounded-lg mb-6">
+      <TabsList className="bg-layer-2 border-b border-edge w-full rounded-lg mb-6">
         <TabsTrigger 
           value="videos" 
           className="data-[state=active]:bg-red-600 data-[state=active]:text-white"
@@ -108,7 +108,7 @@ export const ChannelTabs = ({
       </TabsContent>
       
       <TabsContent value="about" className="mt-0">
-        <div className="bg-surface-800 rounded-lg p-6">
+        <div className="bg-layer-2 rounded-lg p-6">
           <h2 className="text-2xl font-semibold mb-6 flex items-center">
             <span className="bg-red-600 h-6 w-1 rounded-full mr-3"></span>
             {t("content.about")}
@@ -117,7 +117,7 @@ export const ChannelTabs = ({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="md:col-span-2">
               <h3 className="text-xl font-medium mb-4">{t("content.description")}</h3>
-              <p className="text-surface-300 whitespace-pre-line">
+              <p className="text-ink whitespace-pre-line">
                 {description || t("content.noDescription")}
               </p>
             </div>

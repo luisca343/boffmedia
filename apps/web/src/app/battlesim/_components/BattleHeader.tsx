@@ -79,7 +79,7 @@ export function BattleHeader({
           {roomId && (
             <span
               className="text-t-xs px-2 py-1 rounded-[var(--radius-sm)] font-mono max-w-[16ch] overflow-hidden text-ellipsis whitespace-nowrap"
-              style={{ color: 'var(--text-muted)', background: 'var(--surface-2)' }}
+              style={{ color: 'var(--text-muted)', background: 'var(--layer-2)' }}
               title={roomId}
             >
               {roomId}
@@ -105,7 +105,7 @@ export function BattleHeader({
           {spectatorCount != null && spectatorCount > 0 && (
             <span
               className="text-t-xs px-2 py-1 rounded-[var(--radius-sm)] whitespace-nowrap"
-              style={{ color: 'var(--text-muted)', background: 'var(--surface-2)' }}
+              style={{ color: 'var(--text-muted)', background: 'var(--layer-2)' }}
             >
               👁 {spectatorCount}
             </span>
@@ -117,7 +117,7 @@ export function BattleHeader({
               onClick={onToggleFullscreen}
               className="bsx-focus p-2 rounded-[var(--radius-sm)] transition-colors duration-[var(--dur-fast)]"
               style={{
-                background: 'var(--surface-2)',
+                background: 'var(--layer-2)',
                 color: 'var(--text-muted)',
                 border: '1px solid var(--border)',
               }}
@@ -131,7 +131,7 @@ export function BattleHeader({
               onClick={onForfeit}
               className="bsx-focus px-4 py-1.5 rounded-[var(--radius-sm)] text-sm font-medium transition-colors duration-[var(--dur)]"
               style={{
-                background: 'var(--surface-3)',
+                background: 'var(--layer-3)',
                 color: 'var(--rose-400)',
                 border: '1px solid color-mix(in srgb, var(--rose-500) 40%, transparent)',
               }}

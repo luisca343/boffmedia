@@ -19,8 +19,8 @@ export default function Registro({params}: {params: any}){
         }, 500)
     }, [])
 
-    return <div className="w-full h-full bg-surface-800 flex flex-col items-center justify-center">
-        <div className="text-2xl text-surface-50">Registrando...</div>
+    return <div className="w-full h-full bg-layer-2 flex flex-col items-center justify-center">
+        <div className="text-2xl text-ink">Registrando...</div>
         <PokemonSprite id={pokemonIndex} form={formIndex} palette="none" forceBlack={forceBlack}/>
     </div>
 }

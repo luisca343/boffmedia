@@ -172,7 +172,7 @@ export default function Graficas() {
     return (
       <div className="p-8 text-center">
         <h2 className="text-xl font-semibold text-red-600 mb-2">Error</h2>
-        <p className="text-surface-700">No se pudieron cargar los datos. Por favor, intente nuevamente.</p>
+        <p className="text-ink-dim">No se pudieron cargar los datos. Por favor, intente nuevamente.</p>
       </div>
     );
   }
@@ -234,7 +234,7 @@ export default function Graficas() {
               />
             ) : (
               <div className="p-8 text-center">
-                <p className="text-surface-700">No hay transacciones para mostrar en el periodo seleccionado.</p>
+                <p className="text-ink-dim">No hay transacciones para mostrar en el periodo seleccionado.</p>
               </div>
             )}
           </BankSectionContent>
@@ -252,7 +252,7 @@ export default function Graficas() {
               />
             ) : (
               <div className="p-8 text-center">
-                <p className="text-surface-700">No hay transacciones para mostrar en el periodo seleccionado.</p>
+                <p className="text-ink-dim">No hay transacciones para mostrar en el periodo seleccionado.</p>
               </div>
             )}
           </BankSectionContent>
@@ -270,7 +270,7 @@ export default function Graficas() {
             />
           ) : (
             <div className="p-8 text-center">
-              <p className="text-surface-700">No hay transacciones para mostrar en el periodo seleccionado.</p>
+              <p className="text-ink-dim">No hay transacciones para mostrar en el periodo seleccionado.</p>
             </div>
           )}
         </BankSectionContent>

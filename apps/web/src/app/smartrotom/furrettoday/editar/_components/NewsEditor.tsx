@@ -45,7 +45,7 @@ export default function NewsEditor() {
         <div className="relative z-10 min-h-full flex items-center justify-center p-8">
           <div className="bg-yellow-300 card-pop p-8 text-center">
             <h2 className="text-pop-4xl font-bold mb-6 text-pink-500 pop-shadow">¡CARGANDO!</h2>
-            <p className="text-pop-xl font-comic text-secondary-600">Verificando permisos... 🔐</p>
+            <p className="text-pop-xl font-comic text-secondary-active">Verificando permisos... 🔐</p>
           </div>
         </div>
       </div>
@@ -61,7 +61,7 @@ export default function NewsEditor() {
         <div className="relative z-10 min-h-full flex items-center justify-center p-8">
           <div className="bg-red-100 card-pop p-8 text-center border-4 border-black max-w-2xl">
             <h2 className="text-pop-3xl font-bold mb-4 text-red-600 pop-shadow">ACCESO DENEGADO</h2>
-            <p className="text-pop-lg font-comic text-secondary-700 mb-6">
+            <p className="text-pop-lg font-comic text-secondary-active mb-6">
               Necesitas el rol ROTOM_ADMIN o ROTOM_FURRET para editar noticias.
             </p>
             <InternalLink href="/smartrotom/furrettoday" className="btn-pop-primary pop-focus animate-button-press">
@@ -109,8 +109,8 @@ export default function NewsEditor() {
             <FurretHeader />
           
           {/* Navigation breadcrumbs */}
-          <div className="bg-secondary-100 p-6 flex flex-wrap items-center font-comic border-b-4 border-black">
-            <InternalLink href="furrettoday" className="text-secondary-500 hover:underline text-pop-lg pop-focus">
+          <div className="bg-secondary-soft p-6 flex flex-wrap items-center font-comic border-b-4 border-black">
+            <InternalLink href="furrettoday" className="text-secondary hover:underline text-pop-lg pop-focus">
               🏠 Inicio
             </InternalLink>
             <span className="mx-3 text-pop-lg font-bold"> ⚡ </span>
@@ -161,7 +161,7 @@ export default function NewsEditor() {
               
               {/* Comic style title banner */}
               <div className="bg-yellow-300 py-4 border-y-4 border-black relative z-10">
-                <h2 className="text-center text-secondary-500 text-pop-xl font-bold pop-shadow">
+                <h2 className="text-center text-secondary text-pop-xl font-bold pop-shadow">
                   📰 LISTA DE NOTICIAS
                 </h2>
               </div>

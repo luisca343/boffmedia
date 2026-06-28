@@ -56,7 +56,7 @@ export const VideoCard = ({
       
       <InternalLink
         href={`youtube/video/${id}`}
-        className="block bg-surface-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:bg-surface-700"
+        className="block bg-layer-2 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:bg-layer-3"
       >
         <div className="relative">
           <img
@@ -82,7 +82,7 @@ export const VideoCard = ({
           <h3 className="text-lg font-semibold line-clamp-2 group-hover:text-red-500 transition-colors duration-300">
             {title}
           </h3>
-          <p className="text-sm text-surface-400 group-hover:text-surface-300 transition-colors duration-300 mt-1">
+          <p className="text-sm text-ink-muted group-hover:text-ink transition-colors duration-300 mt-1">
             {channelTitle}
           </p>
         </div>

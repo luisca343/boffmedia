@@ -19,10 +19,10 @@ export const ChannelCard = ({
   return (
     <InternalLink
       href={`youtube/channel/${channelId}`}
-      className="group bg-surface-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:bg-surface-700 flex flex-col"
+      className="group bg-layer-2 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:bg-layer-3 flex flex-col"
     >
       <div className="w-full flex justify-center pt-6 pb-2">
-        <div className="w-24 h-24 rounded-full overflow-hidden ring-4 ring-surface-700 group-hover:ring-red-600 transition-all">
+        <div className="w-24 h-24 rounded-full overflow-hidden ring-4 ring-edge group-hover:ring-red-600 transition-all">
           <img
             src={thumbnailUrl}
             alt={title}

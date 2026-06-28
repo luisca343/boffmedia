@@ -12,7 +12,7 @@ const SLOTS: TimeSlot[] = ['morning', 'afternoon', 'evening', 'night'];
 const DAYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const;
 
 function winRateColor(wr: number | null, games: number): string {
-  if (games === 0 || wr === null) return 'bg-surface-900 text-surface-700';
+  if (games === 0 || wr === null) return 'bg-layer-1 text-ink-dim';
   if (wr >= 0.65) return 'bg-green-500/30 text-green-300';
   if (wr >= 0.5) return 'bg-green-500/15 text-green-400';
   if (wr >= 0.35) return 'bg-red-500/15 text-red-400';
@@ -32,8 +32,8 @@ export function HeatmapSection({ heatmap }: Props) {
 
   return (
     <Card className="overflow-hidden">
-      <div className="px-4 py-3 border-b border-surface-700">
-        <h3 className="text-sm font-semibold text-surface-300">{t('heatmap.title')}</h3>
+      <div className="px-4 py-3 border-b border-edge">
+        <h3 className="text-sm font-semibold text-ink">{t('heatmap.title')}</h3>
       </div>
       <div className="p-3 overflow-x-auto">
         <table className="w-full text-xs border-separate border-spacing-0.5">
@@ -41,7 +41,7 @@ export function HeatmapSection({ heatmap }: Props) {
             <tr>
               <th className="w-10" />
               {SLOTS.map((slot) => (
-                <th key={slot} className="text-surface-500 font-medium text-center pb-1 px-1 whitespace-nowrap">
+                <th key={slot} className="text-ink-muted font-medium text-center pb-1 px-1 whitespace-nowrap">
                   {t(`timeSlots.${slot}`).split(' ')[0]}
                 </th>
               ))}
@@ -50,7 +50,7 @@ export function HeatmapSection({ heatmap }: Props) {
           <tbody>
             {DAYS.map((day, dayIndex) => (
               <tr key={day}>
-                <td className="text-surface-600 font-medium text-right pr-2 py-0.5 whitespace-nowrap">
+                <td className="text-ink-dim font-medium text-right pr-2 py-0.5 whitespace-nowrap">
                   {t(`heatmap.days.${day}`)}
                 </td>
                 {SLOTS.map((slot) => {
@@ -68,7 +68,7 @@ export function HeatmapSection({ heatmap }: Props) {
                             {wr !== null ? `${Math.round(wr * 100)}%` : '—'}
                           </span>
                         ) : (
-                          <span className="text-surface-800">·</span>
+                          <span className="text-ink-dim">·</span>
                         )}
                       </div>
                     </td>

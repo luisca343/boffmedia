@@ -53,9 +53,9 @@ function ScraperSourcesPanel() {
   };
 
   return (
-    <Card className="bg-[var(--surface)] border-[var(--border)]">
+    <Card className="bg-layer-1 border-edge">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm text-[var(--text)] flex items-center gap-2">
+        <CardTitle className="text-sm text-ink flex items-center gap-2">
           <Globe className="h-4 w-4 text-[var(--orange-500)]" />Fuentes disponibles
         </CardTitle>
       </CardHeader>
@@ -63,13 +63,13 @@ function ScraperSourcesPanel() {
         <div className="flex flex-wrap gap-2">
           {SCRAPER_SOURCES.map(source => (
             <div key={source.name} className="flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs
-              border-[var(--border)] bg-[color-mix(in_srgb,var(--text)_3%,transparent)]">
+              border-edge bg-[color-mix(in_srgb,var(--text)_3%,transparent)]">
               <span className={`h-1.5 w-1.5 rounded-full shrink-0 ${source.active ? 'bg-green-400' : 'bg-[var(--text-dim)]'}`} />
-              <span className="font-medium text-[var(--text)]">{source.name}</span>
-              <span className="text-[var(--text-dim)]">{source.description}</span>
+              <span className="font-medium text-ink">{source.name}</span>
+              <span className="text-ink-dim">{source.description}</span>
               <Badge className={`text-[10px] px-1.5 py-0 h-4 ${source.active
                 ? 'bg-green-900/30 text-green-300 border-green-800/40'
-                : 'bg-[color-mix(in_srgb,var(--text)_5%,transparent)] text-[var(--text-muted)] border-[var(--border)]'}`}>
+                : 'bg-[color-mix(in_srgb,var(--text)_5%,transparent)] text-ink-muted border-edge'}`}>
                 {source.active ? 'Activo' : 'No disponible'}
               </Badge>
             </div>
@@ -78,10 +78,10 @@ function ScraperSourcesPanel() {
 
         {/* Browser tunnel toggle */}
         {browserConfig && (
-          <div className="flex items-center justify-between pt-1 border-t border-[var(--border)]">
+          <div className="flex items-center justify-between pt-1 border-t border-edge">
             <div className="flex flex-col gap-0.5">
-              <span className="text-xs font-medium text-[var(--text)]">Túnel de navegador</span>
-              <span className="text-[11px] text-[var(--text-dim)]">Usar navegador remoto (tunnel) para scraping</span>
+              <span className="text-xs font-medium text-ink">Túnel de navegador</span>
+              <span className="text-[11px] text-ink-dim">Usar navegador remoto (tunnel) para scraping</span>
             </div>
             <button
               onClick={handleTunnelToggle}
@@ -109,20 +109,20 @@ function ScraperSourcesPanel() {
 function SearchResultCard({ result, onSelect }: { result: MangaSearchResult; onSelect: (r: MangaSearchResult) => void }) {
   return (
     <button onClick={() => onSelect(result)}
-      className="flex items-center gap-3 px-4 py-3 rounded-lg border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--surface-2)] hover:border-[color-mix(in_srgb,var(--orange-500)_20%,transparent)] transition-all text-left w-full group">
+      className="flex items-center gap-3 px-4 py-3 rounded-lg border border-edge bg-layer-1 hover:bg-layer-2 hover:border-[color-mix(in_srgb,var(--orange-500)_20%,transparent)] transition-all text-left w-full group">
       {result.cover
          
-        ? <img src={result.cover} alt={result.title} className="h-14 w-10 object-cover rounded shrink-0 border border-[var(--border)]" />
-        : <div className="h-14 w-10 rounded bg-[color-mix(in_srgb,var(--text)_5%,transparent)] border border-[var(--border)] flex items-center justify-center shrink-0">
-            <BookOpen className="h-5 w-5 text-[var(--text-dim)]" />
+        ? <img src={result.cover} alt={result.title} className="h-14 w-10 object-cover rounded shrink-0 border border-edge" />
+        : <div className="h-14 w-10 rounded bg-[color-mix(in_srgb,var(--text)_5%,transparent)] border border-edge flex items-center justify-center shrink-0">
+            <BookOpen className="h-5 w-5 text-ink-dim" />
           </div>}
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-[var(--text)] truncate group-hover:text-[var(--orange-400)] transition-colors">
+        <p className="text-sm font-medium text-ink truncate group-hover:text-[var(--orange-400)] transition-colors">
           {result.title || result.url.split('/').filter(Boolean).pop()}
         </p>
-        <p className="text-xs text-[var(--text-dim)] truncate mt-0.5">{result.url}</p>
+        <p className="text-xs text-ink-dim truncate mt-0.5">{result.url}</p>
       </div>
-      <ChevronDown className="h-4 w-4 text-[var(--text-dim)] -rotate-90 shrink-0 group-hover:text-[var(--orange-500)] transition-colors" />
+      <ChevronDown className="h-4 w-4 text-ink-dim -rotate-90 shrink-0 group-hover:text-[var(--orange-500)] transition-colors" />
     </button>
   );
 }
@@ -155,12 +155,12 @@ function ChapterSelector({ chapters, selected, downloadedSlugs, onToggle, onTogg
       {/* Filter + select-all row */}
       <div className="flex items-center gap-2">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--text-dim)]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-ink-dim" />
           <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Filtrar capítulos…"
-            className="pl-8 h-8 text-xs bg-[var(--surface-2)] border-[var(--border-strong)] text-[var(--text)] placeholder-[var(--text-dim)]" />
+            className="pl-8 h-8 text-xs bg-layer-2 border-edge-strong text-ink placeholder-[var(--text-dim)]" />
         </div>
         <button onClick={onToggleAll}
-          className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] hover:text-[var(--text)] transition-colors whitespace-nowrap">
+          className="flex items-center gap-1.5 text-xs text-ink-muted hover:text-ink transition-colors whitespace-nowrap">
           {allSelected
             ? <><Square className="h-3.5 w-3.5" />Deseleccionar</>
             : <><CheckSquare className="h-3.5 w-3.5" />Selec. todos ({chapters.length})</>}
@@ -169,26 +169,26 @@ function ChapterSelector({ chapters, selected, downloadedSlugs, onToggle, onTogg
 
       {/* Range selector row */}
       <div className="flex items-center gap-2">
-        <span className="text-xs text-[var(--text-dim)] shrink-0">Rango:</span>
+        <span className="text-xs text-ink-dim shrink-0">Rango:</span>
         <Input
           type="number" min={1} max={chapters.length} placeholder="1"
           value={rangeFrom} onChange={e => setRangeFrom(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && applyRange()}
-          className="w-20 h-7 text-xs bg-[var(--surface-2)] border-[var(--border-strong)] text-[var(--text)] placeholder-[var(--text-dim)] text-center px-2"
+          className="w-20 h-7 text-xs bg-layer-2 border-edge-strong text-ink placeholder-[var(--text-dim)] text-center px-2"
         />
-        <span className="text-xs text-[var(--text-dim)]">—</span>
+        <span className="text-xs text-ink-dim">—</span>
         <Input
           type="number" min={1} max={chapters.length} placeholder={String(chapters.length)}
           value={rangeTo} onChange={e => setRangeTo(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && applyRange()}
-          className="w-20 h-7 text-xs bg-[var(--surface-2)] border-[var(--border-strong)] text-[var(--text)] placeholder-[var(--text-dim)] text-center px-2"
+          className="w-20 h-7 text-xs bg-layer-2 border-edge-strong text-ink placeholder-[var(--text-dim)] text-center px-2"
         />
         <button onClick={applyRange}
           className="flex items-center gap-1 text-xs text-[var(--orange-500)] hover:text-[var(--orange-400)] transition-colors whitespace-nowrap border border-[color-mix(in_srgb,var(--orange-500)_30%,transparent)] hover:border-[color-mix(in_srgb,var(--orange-500)_35%,transparent)] rounded px-2 py-1 bg-[color-mix(in_srgb,var(--orange-500)_10%,transparent)]">
           <CheckSquare className="h-3 w-3" />Seleccionar
         </button>
       </div>
-      <div className="rounded-lg border border-[var(--border)] divide-y divide-[var(--border)] max-h-80 overflow-y-auto">
+      <div className="rounded-lg border border-edge divide-y divide-[var(--border)] max-h-80 overflow-y-auto">
         {filtered.map(({ ch, i }) => {
           const isSelected = selected.has(i);
           const chapterKey = ch.number != null
@@ -201,12 +201,12 @@ function ChapterSelector({ chapters, selected, downloadedSlugs, onToggle, onTogg
                 ${isSelected ? 'bg-[color-mix(in_srgb,var(--orange-500)_10%,transparent)] hover:bg-[color-mix(in_srgb,var(--orange-500)_15%,transparent)]' : isDownloaded ? 'bg-green-900/10 hover:bg-green-900/20' : 'hover:bg-[color-mix(in_srgb,var(--text)_3%,transparent)]'}`}>
               <Checkbox checked={isSelected} onCheckedChange={() => onToggle(i)} onClick={e => e.stopPropagation()}
                 className="border-[var(--text-dim)] data-[state=checked]:bg-[var(--orange-600)] data-[state=checked]:border-[var(--orange-600)] shrink-0" />
-              <span className={`flex-1 text-xs truncate ${isDownloaded ? 'text-green-300' : 'text-[var(--text)]'}`}>{ch.title}</span>
+              <span className={`flex-1 text-xs truncate ${isDownloaded ? 'text-green-300' : 'text-ink'}`}>{ch.title}</span>
               {isDownloaded && <HardDrive className="h-3 w-3 text-green-500/70 shrink-0" />}
             </div>
           );
         })}
-        {filtered.length === 0 && <p className="text-xs text-[var(--text-dim)] text-center py-4">Sin resultados.</p>}
+        {filtered.length === 0 && <p className="text-xs text-ink-dim text-center py-4">Sin resultados.</p>}
       </div>
     </div>
   );
@@ -232,10 +232,10 @@ function DownloadProgressPanel({ progress }: { progress: ProgressState }) {
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-3">
       <div className="flex flex-col gap-1.5">
         <div className="flex justify-between text-sm">
-          <span className="text-[var(--text)] font-medium">
+          <span className="text-ink font-medium">
             {progress.done ? 'Descarga completada' : `Descargando… ${progress.completed} / ${progress.total}`}
           </span>
-          <span className="text-[var(--text-muted)]">{pct}%</span>
+          <span className="text-ink-muted">{pct}%</span>
         </div>
         <div className="h-2 rounded-full bg-[color-mix(in_srgb,var(--text)_8%,transparent)] overflow-hidden">
           <motion.div className={`h-full rounded-full ${progress.done ? 'bg-green-500' : 'bg-[var(--orange-500)]'}`}
@@ -253,17 +253,17 @@ function DownloadProgressPanel({ progress }: { progress: ProgressState }) {
           </span>}
       </div>
       <button onClick={() => setShowChapters(v => !v)}
-        className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] hover:text-[var(--text)] transition-colors self-start">
+        className="flex items-center gap-1.5 text-xs text-ink-muted hover:text-ink transition-colors self-start">
         {showChapters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
         {showChapters ? 'Ocultar' : 'Ver'} capítulos ({progress.chapters.length})
       </button>
       {showChapters && (
-        <div className="rounded-lg border border-[var(--border)] divide-y divide-[var(--border)] max-h-72 overflow-y-auto">
+        <div className="rounded-lg border border-edge divide-y divide-[var(--border)] max-h-72 overflow-y-auto">
           {progress.chapters.map(ch => (
             <div key={ch.chapter} className="flex items-center gap-3 px-3 py-2">
               <CheckCircle2 className={`h-3.5 w-3.5 shrink-0 ${ch.failed > 0 ? 'text-yellow-400' : 'text-green-400'}`} />
-              <span className="flex-1 text-xs text-[var(--text)] truncate">{ch.chapter}</span>
-              <span className="text-xs text-[var(--text-dim)] shrink-0">
+              <span className="flex-1 text-xs text-ink truncate">{ch.chapter}</span>
+              <span className="text-xs text-ink-dim shrink-0">
                 {ch.downloaded} DL · {ch.skipped} skip
                 {ch.failed > 0 && <span className="text-red-400"> · {ch.failed} err</span>}
               </span>
@@ -468,16 +468,16 @@ export default function MangaDownloader() {
         initial={{ y: 80, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 80, opacity: 0 }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 9999 }}
-        className="bg-[color-mix(in_srgb,var(--surface)_96%,transparent)] backdrop-blur border-t border-[var(--border)] shadow-2xl"
+        className="bg-[color-mix(in_srgb,var(--layer-1)_96%,transparent)] backdrop-blur border-t border-edge shadow-2xl"
       >
         <div className="container mx-auto px-4 py-3 max-w-4xl flex items-center gap-4 flex-wrap">
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-[var(--text)]">
+            <p className="text-sm font-medium text-ink">
               {selectedCount} capítulo{selectedCount !== 1 ? 's' : ''} seleccionado{selectedCount !== 1 ? 's' : ''}
             </p>
-            <p className="text-xs text-[var(--text-muted)] truncate">{selectedNovel?.title}</p>
+            <p className="text-xs text-ink-muted truncate">{selectedNovel?.title}</p>
           </div>
-          <span className="text-xs text-[var(--text-dim)] flex items-center gap-1 shrink-0">
+          <span className="text-xs text-ink-dim flex items-center gap-1 shrink-0">
             <Clock className="h-3 w-3" />~{Math.ceil(selectedCount * 1.5)} min est.
           </span>
           <Button onClick={handleDownload} disabled={downloading}
@@ -497,11 +497,11 @@ export default function MangaDownloader() {
 
           {/* Header */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <h2 className="text-xl font-bold text-[var(--text)]">
+            <h2 className="text-xl font-bold text-ink">
               Descargador de{' '}
               <span className="bg-gradient-to-r from-[var(--orange-500)] to-[var(--orange-600)] bg-clip-text text-transparent">Manga</span>
             </h2>
-            <p className="text-[var(--text-muted)] mt-1 text-sm">
+            <p className="text-ink-muted mt-1 text-sm">
               Busca una serie en NovelCool, elige los capítulos y descárgalos al servidor.
             </p>
           </motion.div>
@@ -510,15 +510,15 @@ export default function MangaDownloader() {
           <ScraperSourcesPanel />
 
           {/* Search */}
-          <Card className="bg-[var(--surface)] border-[var(--border)]">
+          <Card className="bg-layer-1 border-edge">
             <CardContent className="pt-5 flex flex-col gap-4">
               <div className="flex gap-2">
                 <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-dim)]" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-dim" />
                   <Input value={query} onChange={e => setQuery(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && !searchLoading && query.trim() && handleSearch()}
                     placeholder='Buscar serie, ej. "Raeliana"…'
-                    className="pl-9 bg-[var(--surface-2)] border-[var(--border-strong)] text-[var(--text)] placeholder-[var(--text-dim)]" />
+                    className="pl-9 bg-layer-2 border-edge-strong text-ink placeholder-[var(--text-dim)]" />
                 </div>
                 <Button onClick={handleSearch} disabled={searchLoading || !query.trim()}
                   className="bg-[var(--orange-600)] hover:bg-[var(--orange-500)] text-white shrink-0">
@@ -533,9 +533,9 @@ export default function MangaDownloader() {
           </Card>
 
           {/* Direct URL */}
-          <Card className="bg-[var(--surface)] border-[var(--border)]">
+          <Card className="bg-layer-1 border-edge">
             <CardContent className="pt-5 flex flex-col gap-3">
-              <p className="text-xs text-[var(--text-muted)] flex items-center gap-1.5">
+              <p className="text-xs text-ink-muted flex items-center gap-1.5">
                 <BookOpen className="h-3.5 w-3.5" />
                 O introduce directamente la URL de la serie
               </p>
@@ -545,13 +545,13 @@ export default function MangaDownloader() {
                   onChange={e => setDirectUrl(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && !directUrlLoading && directUrl.trim() && handleDirectUrl()}
                   placeholder="https://es.novelcool.com/novel/RELIFE.html"
-                  className="bg-[var(--surface-2)] border-[var(--border-strong)] text-[var(--text)] placeholder-[var(--text-dim)] text-sm"
+                  className="bg-layer-2 border-edge-strong text-ink placeholder-[var(--text-dim)] text-sm"
                 />
                 <Button
                   onClick={handleDirectUrl}
                   disabled={directUrlLoading || !directUrl.trim()}
                   variant="outline"
-                  className="border-[var(--border-strong)] hover:bg-[color-mix(in_srgb,var(--text)_8%,transparent)] text-[var(--text)] shrink-0"
+                  className="border-edge-strong hover:bg-[color-mix(in_srgb,var(--text)_8%,transparent)] text-ink shrink-0"
                 >
                   {directUrlLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ChevronDown className="h-4 w-4 -rotate-90" />}
                   <span className="ml-2">Cargar</span>
@@ -568,10 +568,10 @@ export default function MangaDownloader() {
             {searchResults && (
               <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
                 className="flex flex-col gap-3">
-                <p className="text-sm text-[var(--text-muted)]">
+                <p className="text-sm text-ink-muted">
                   {searchResults.length === 0
                     ? 'Sin resultados.'
-                    : <><span className="text-[var(--text)] font-medium">{searchResults.length}</span> resultado{searchResults.length !== 1 ? 's' : ''} — elige una serie</>}
+                    : <><span className="text-ink font-medium">{searchResults.length}</span> resultado{searchResults.length !== 1 ? 's' : ''} — elige una serie</>}
                 </p>
                 {searchResults.map(r => <SearchResultCard key={r.url} result={r} onSelect={handleSelectNovel} />)}
               </motion.div>
@@ -582,26 +582,26 @@ export default function MangaDownloader() {
           <AnimatePresence>
             {selectedNovel && (
               <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-                <Card className="bg-[var(--surface)] border-[var(--border)]">
+                <Card className="bg-layer-1 border-edge">
                   <CardHeader className="pb-3">
                     <div className="flex items-start gap-3">
                       {selectedNovel.cover && (
                          
                         <img src={selectedNovel.cover} alt={selectedNovel.title}
-                          className="h-16 w-12 object-cover rounded border border-[var(--border)] shrink-0" />
+                          className="h-16 w-12 object-cover rounded border border-edge shrink-0" />
                       )}
                       <div className="flex-1 min-w-0">
-                        <CardTitle className="text-base text-[var(--text)] leading-snug">{selectedNovel.title}</CardTitle>
-                        <p className="text-xs text-[var(--text-dim)] mt-0.5 truncate">{selectedNovel.url}</p>
+                        <CardTitle className="text-base text-ink leading-snug">{selectedNovel.title}</CardTitle>
+                        <p className="text-xs text-ink-dim mt-0.5 truncate">{selectedNovel.url}</p>
                       </div>
-                      <button onClick={clearNovel} className="text-[var(--text-dim)] hover:text-[var(--text)] transition-colors shrink-0 mt-0.5">
+                      <button onClick={clearNovel} className="text-ink-dim hover:text-ink transition-colors shrink-0 mt-0.5">
                         <X className="h-4 w-4" />
                       </button>
                     </div>
                   </CardHeader>
                   <CardContent className="flex flex-col gap-4">
                     {chaptersLoading && (
-                      <div className="flex items-center gap-2 text-[var(--text-muted)] text-sm py-4">
+                      <div className="flex items-center gap-2 text-ink-muted text-sm py-4">
                         <Loader2 className="h-4 w-4 animate-spin" /> Cargando capítulos…
                       </div>
                     )}
@@ -610,11 +610,11 @@ export default function MangaDownloader() {
                     )}
                     {selectedNovel && (
                       <details className="group">
-                        <summary className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] hover:text-[var(--text)] cursor-pointer select-none list-none py-1">
+                        <summary className="flex items-center gap-1.5 text-xs text-ink-muted hover:text-ink cursor-pointer select-none list-none py-1">
                           <ChevronDown className="h-3.5 w-3.5 transition-transform group-open:rotate-180" />
                           Metadatos EPUB
                         </summary>
-                        <div className="mt-3 pt-3 border-t border-[var(--border)]">
+                        <div className="mt-3 pt-3 border-t border-edge">
                           <MangaMetadataForm seriesSlug={selectedNovel.title} />
                         </div>
                       </details>
@@ -622,7 +622,7 @@ export default function MangaDownloader() {
 
                     {chapters && (
                       <>
-                        <div className="flex items-center gap-2 text-xs text-[var(--text-muted)] flex-wrap">
+                        <div className="flex items-center gap-2 text-xs text-ink-muted flex-wrap">
                           <BookOpen className="h-3.5 w-3.5" />
                           <span>{chapters.length} capítulos disponibles</span>
                           {downloadedSlugs.size > 0 && (
@@ -631,7 +631,7 @@ export default function MangaDownloader() {
                             </Badge>
                           )}
                           <div className="ml-auto flex items-center gap-2">
-                            <span className="text-[var(--text-muted)]">Saltar descargados</span>
+                            <span className="text-ink-muted">Saltar descargados</span>
                             <button
                               onClick={() => setSkipDownloaded(v => !v)}
                               className={`relative inline-flex h-4 w-7 shrink-0 items-center rounded-full transition-colors focus:outline-none
@@ -659,9 +659,9 @@ export default function MangaDownloader() {
                       <p className="text-sm text-red-400 bg-red-900/20 border border-red-800/40 rounded-md px-3 py-2">{downloadError}</p>
                     )}
                     {progress && (
-                      <Card className="bg-[color-mix(in_srgb,var(--surface)_96%,transparent)] border-[var(--border)]">
+                      <Card className="bg-[color-mix(in_srgb,var(--layer-1)_96%,transparent)] border-edge">
                         <CardHeader className="pb-2 pt-4 px-4">
-                          <CardTitle className="text-sm text-[var(--text)] flex items-center gap-2">
+                          <CardTitle className="text-sm text-ink flex items-center gap-2">
                             {progress.done
                               ? <><CheckCircle2 className="h-4 w-4 text-green-400" />Descarga completada</>
                               : <><Loader2 className="h-4 w-4 animate-spin text-[var(--orange-500)]" />Progreso de descarga</>}

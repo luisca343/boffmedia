@@ -145,7 +145,7 @@ export function ShareDocumentDialog({ document }: ShareDocumentDialogProps) {
                       onClick={() => setSelectedUser(user)}
                       className={`flex items-center gap-3 p-3 rounded-md cursor-pointer transition-colors ${
                         selectedUser?.uuid === user.uuid
-                          ? "bg-primary-400/20 border border-primary-400"
+                          ? "bg-primary-hover/20 border border-primary"
                           : "hover:bg-neutral-800"
                       }`}
                     >
@@ -154,7 +154,7 @@ export function ShareDocumentDialog({ document }: ShareDocumentDialogProps) {
                         <p className="font-medium">{user.username}</p>
                       </div>
                       {selectedUser?.uuid === user.uuid && (
-                        <div className="w-2 h-2 rounded-full bg-primary-400" />
+                        <div className="w-2 h-2 rounded-full bg-primary-hover" />
                       )}
                     </div>
                   ))
@@ -179,7 +179,7 @@ export function ShareDocumentDialog({ document }: ShareDocumentDialogProps) {
             <Button
               onClick={handleShare}
               disabled={!selectedUser || sending}
-              className="bg-primary-400 hover:bg-primary-500 text-black"
+              className="bg-primary-hover hover:bg-primary text-black"
             >
               {sending ? (
                 <>

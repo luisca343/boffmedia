@@ -45,7 +45,7 @@ export default function VideoPage({ params }: { params: { id: string } }) {
 
   if (loading) {
     return (
-      <div className="min-h-full bg-surface-900 flex justify-center items-center overflow-auto">
+      <div className="min-h-full bg-layer-1 flex justify-center items-center overflow-auto">
         <LoadingSpinner size="large" message={t("loading.stream")} />
       </div>
     );
@@ -53,8 +53,8 @@ export default function VideoPage({ params }: { params: { id: string } }) {
 
   if (error || !videoData) {
     return (
-      <div className="min-h-full bg-surface-900 text-white p-6 flex justify-center items-center overflow-auto">
-        <div className="bg-surface-800 p-6 rounded-lg shadow-lg max-w-md w-full text-center">
+      <div className="min-h-full bg-layer-1 text-white p-6 flex justify-center items-center overflow-auto">
+        <div className="bg-layer-2 p-6 rounded-lg shadow-lg max-w-md w-full text-center">
           <p className="text-red-500 text-xl mb-4">{error || t("video.notFound")}</p>
           <InternalLink href="twitch" className="text-purple-400 hover:underline">
             {t("video.returnToBrowse")}
@@ -65,7 +65,7 @@ export default function VideoPage({ params }: { params: { id: string } }) {
   }
 
   return (
-    <div className="min-h-full bg-surface-900 text-white overflow-auto">
+    <div className="min-h-full bg-layer-1 text-white overflow-auto">
       <div className="container mx-auto px-4 py-6">
         <div className="mb-6">
           <TwitchVideoPlayer 

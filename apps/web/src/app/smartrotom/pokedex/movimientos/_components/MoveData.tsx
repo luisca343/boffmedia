@@ -13,7 +13,7 @@ export default function MoveDataElement({id, isFullPage = false} : {id: string, 
 
     if(!move) return (
         <div className="flex justify-center items-center p-2">
-            <div className="text-surface-100 text-base animate-pulse">Cargando...</div>
+            <div className="text-ink text-base animate-pulse">Cargando...</div>
         </div>
     );
 
@@ -21,7 +21,7 @@ export default function MoveDataElement({id, isFullPage = false} : {id: string, 
         <div className={`space-y-4 ${isFullPage ? "" : "text-center"}`}>
             {!isFullPage && (
                 <div className="text-center">
-                    <h2 className="text-xl font-bold text-surface-50">
+                    <h2 className="text-xl font-bold text-ink">
                         {getTranslatedMoveName(move.attackName, t)}
                     </h2>
                 </div>
@@ -32,37 +32,37 @@ export default function MoveDataElement({id, isFullPage = false} : {id: string, 
                 <TypeBadge type={move.attackCategory.toLowerCase()} />
             </div>
             
-            <div className={`grid grid-cols-2 gap-3 bg-surface-800/50 rounded-lg p-4 border border-surface-700/30 ${isFullPage ? "" : "max-w-[50vw] mx-auto"}`}>
+            <div className={`grid grid-cols-2 gap-3 bg-layer-2/50 rounded-lg p-4 border border-edge/30 ${isFullPage ? "" : "max-w-[50vw] mx-auto"}`}>
                 {move.basePower > 0 && (
                     <>
-                        <div className="text-surface-200 font-medium">Poder Base</div>
-                        <div className="text-surface-100 text-right">{move.basePower}</div>
+                        <div className="text-ink font-medium">Poder Base</div>
+                        <div className="text-ink text-right">{move.basePower}</div>
                     </>
                 )}
                 {move.accuracy > 0 && (
                     <>
-                        <div className="text-surface-200 font-medium">Precisión</div>
-                        <div className="text-surface-100 text-right">{move.accuracy}</div>
+                        <div className="text-ink font-medium">Precisión</div>
+                        <div className="text-ink text-right">{move.accuracy}</div>
                     </>
                 )}
-                <div className="text-surface-200 font-medium">PP</div>
-                <div className="text-surface-100 text-right">{move.ppBase} ({move.ppMax})</div>
-                <div className="text-surface-200 font-medium">Contacto</div>
-                <div className="text-surface-100 text-right">{move.makesContact ? "Sí" : "No"}</div>
+                <div className="text-ink font-medium">PP</div>
+                <div className="text-ink text-right">{move.ppBase} ({move.ppMax})</div>
+                <div className="text-ink font-medium">Contacto</div>
+                <div className="text-ink text-right">{move.makesContact ? "Sí" : "No"}</div>
                 
                 {isFullPage && (
                     <>
-                        <div className="text-surface-200 font-medium">Nombre Original</div>
-                        <div className="text-surface-100 text-right">{move.attackName}</div>
+                        <div className="text-ink font-medium">Nombre Original</div>
+                        <div className="text-ink text-right">{move.attackName}</div>
                     </>
                 )}
             </div>
             
             {move.effects.length > 0 && (
                 <div>
-                    <div className={`text-lg font-semibold text-surface-200 mb-2 ${isFullPage ? "" : "text-center"}`}>Efectos</div>
-                    <div className="bg-surface-800/50 rounded-lg p-4 border border-surface-700/30">
-                        <div className={`flex flex-col ${!isFullPage && "text-center"} space-y-2 text-surface-100`}>
+                    <div className={`text-lg font-semibold text-ink mb-2 ${isFullPage ? "" : "text-center"}`}>Efectos</div>
+                    <div className="bg-layer-2/50 rounded-lg p-4 border border-edge/30">
+                        <div className={`flex flex-col ${!isFullPage && "text-center"} space-y-2 text-ink`}>
                             {move.effects.map((effect) => (
                                 <MoveEffect key={effect.effectTypeID + effect.type} effect={effect} />
                             ))}
@@ -72,23 +72,23 @@ export default function MoveDataElement({id, isFullPage = false} : {id: string, 
             )}
             
             <div>
-                <div className={`text-lg font-semibold text-surface-200 mb-2 ${isFullPage ? "" : "text-center"}`}>Alcance</div>
+                <div className={`text-lg font-semibold text-ink mb-2 ${isFullPage ? "" : "text-center"}`}>Alcance</div>
                 <MoveTargets targetInfo={move.targetingInfo} />
             </div>
 
             {isFullPage && move.z && move.z.length > 0 && (
                 <div>
-                    <div className="text-lg font-semibold text-surface-200 mb-2">Información Z</div>
-                    <div className="bg-surface-800/50 rounded-lg p-4 border border-surface-700/30">
+                    <div className="text-lg font-semibold text-ink mb-2">Información Z</div>
+                    <div className="bg-layer-2/50 rounded-lg p-4 border border-edge/30">
                         <div className="grid grid-cols-2 gap-3">
-                            <div className="text-surface-200 font-medium">Cristal Z</div>
-                            <div className="text-surface-100 text-right">{move.z[0].crystal || "—"}</div>
+                            <div className="text-ink font-medium">Cristal Z</div>
+                            <div className="text-ink text-right">{move.z[0].crystal || "—"}</div>
                             
-                            <div className="text-surface-200 font-medium">Nombre Z</div>
-                            <div className="text-surface-100 text-right">{move.z[0].attackName || "—"}</div>
+                            <div className="text-ink font-medium">Nombre Z</div>
+                            <div className="text-ink text-right">{move.z[0].attackName || "—"}</div>
                             
-                            <div className="text-surface-200 font-medium">Poder Z</div>
-                            <div className="text-surface-100 text-right">{move.z[0].basePower || "—"}</div>
+                            <div className="text-ink font-medium">Poder Z</div>
+                            <div className="text-ink text-right">{move.z[0].basePower || "—"}</div>
                         </div>
                     </div>
                 </div>
@@ -97,9 +97,9 @@ export default function MoveDataElement({id, isFullPage = false} : {id: string, 
     );
 
     function Cell({ children, isActive, hitsAll }: { children: React.ReactNode, isActive: boolean, hitsAll?: boolean }) {
-        const bgColor = isActive && hitsAll ? "bg-red-500" : isActive ? "bg-primary-300" : "bg-surface-600";
-        const textColor = isActive ? "text-black" : "text-surface-100";
-        const borderColor = isActive && hitsAll ? "border-red-500" : isActive ? "border-primary-300" : "border-surface-600";
+        const bgColor = isActive && hitsAll ? "bg-red-500" : isActive ? "bg-primary-soft" : "bg-layer-3";
+        const textColor = isActive ? "text-black" : "text-ink";
+        const borderColor = isActive && hitsAll ? "border-red-500" : isActive ? "border-primary" : "border-edge";
     
         return (
             <div className={`border ${borderColor} ${bgColor} ${textColor} flex items-center justify-center text-center col-span-1 row-span-1 p-1 text-xs`}>
@@ -110,22 +110,22 @@ export default function MoveDataElement({id, isFullPage = false} : {id: string, 
     
     function MoveTargets({ targetInfo }: { targetInfo: { hitsAll: boolean, hitsOppositeFoe: boolean, hitsAdjacentFoe: boolean, hitsExtendedFoe: boolean, hitsSelf: boolean, hitsAdjacentAlly: boolean, hitsExtendedAlly: boolean } }) {
         return (
-            <div className="bg-surface-800/50 rounded-lg p-4 border border-surface-700/30">
+            <div className="bg-layer-2/50 rounded-lg p-4 border border-edge/30">
                 <div className="flex justify-center items-center mb-3">
                     <HoverCard>
                         <HoverCardTrigger>
                             <div className="flex items-center">
-                                <InformationCircleIcon className="w-4 h-4 mr-1 text-surface-300" />
-                                <span className="text-surface-200 text-sm">Información de alcance</span>
+                                <InformationCircleIcon className="w-4 h-4 mr-1 text-ink" />
+                                <span className="text-ink text-sm">Información de alcance</span>
                             </div>
                         </HoverCardTrigger>
-                        <HoverCardContent className="bg-surface-800 text-surface-50 w-64 border-surface-950 border z-50 p-2 text-sm">
+                        <HoverCardContent className="bg-layer-2 text-ink w-64 border-edge-strong border z-50 p-2 text-sm">
                             <div className="flex items-center mb-1">
-                                <div className="w-3 h-3 bg-surface-600 border border-surface-600 mr-2"></div>
+                                <div className="w-3 h-3 bg-layer-3 border border-edge mr-2"></div>
                                 <span>No alcanza al objetivo</span>
                             </div>
                             <div className="flex items-center mb-1">
-                                <div className="w-3 h-3 bg-primary-300 border border-primary-300 mr-2"></div>
+                                <div className="w-3 h-3 bg-primary-soft border border-primary mr-2"></div>
                                 <span>Alcanza al objetivo</span>
                             </div>
                             <div className="flex items-center">

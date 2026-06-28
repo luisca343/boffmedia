@@ -51,18 +51,18 @@ function ResourceCard({ link, index }: { link: ExternalResourcesProps["links"][n
 
       <div className="flex items-start justify-between gap-2 mb-2">
         <span
-          className="text-sm font-bold text-surface-100 leading-tight transition-colors duration-300"
+          className="text-sm font-bold text-ink leading-tight transition-colors duration-300"
           style={{ color: isHovered ? "rgb(253,186,116)" : "rgb(248,250,252)" }}
         >
           {link.title}
         </span>
         <ExternalLink
-          className="w-3.5 h-3.5 text-surface-600 flex-shrink-0 mt-0.5 transition-colors duration-300"
+          className="w-3.5 h-3.5 text-ink-dim flex-shrink-0 mt-0.5 transition-colors duration-300"
           style={{ color: isHovered ? "rgb(251,146,60)" : undefined }}
         />
       </div>
 
-      <p className="text-xs text-surface-500 leading-relaxed flex-1">{link.description}</p>
+      <p className="text-xs text-ink-muted leading-relaxed flex-1">{link.description}</p>
 
       <motion.div
         className="flex items-center gap-1 mt-3 self-end"
@@ -81,7 +81,7 @@ function ResourceCard({ link, index }: { link: ExternalResourcesProps["links"][n
 export function ExternalResources({ links, t }: ExternalResourcesProps) {
   return (
     <motion.div
-      className="mt-16 relative backdrop-blur-sm rounded-lg overflow-hidden border border-surface-600/50"
+      className="mt-16 relative backdrop-blur-sm rounded-lg overflow-hidden border border-edge/50"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.3 }}
@@ -91,7 +91,7 @@ export function ExternalResources({ links, t }: ExternalResourcesProps) {
       }}
     >
       {/* Top accent line */}
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary-500/50 to-transparent" />
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
 
       <div className="p-6 lg:p-8">
         <ToolSectionHeader label={t("externalLinks.title")} color="primary" />
@@ -104,7 +104,7 @@ export function ExternalResources({ links, t }: ExternalResourcesProps) {
       </div>
 
       {/* Bottom accent line */}
-      <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-surface-700/50 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-layer-3/50 to-transparent" />
     </motion.div>
   );
 }

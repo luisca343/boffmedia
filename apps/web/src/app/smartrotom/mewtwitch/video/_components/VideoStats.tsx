@@ -20,7 +20,7 @@ export const VideoStats = ({
   const t = useTranslations("twitch");
   
   return (
-    <div className="flex flex-wrap items-center gap-4 mb-6 text-surface-300">
+    <div className="flex flex-wrap items-center gap-4 mb-6 text-ink">
       <div className="flex items-center">
         <Eye className="h-4 w-4 mr-1" />
         <span>{formatNumber(viewCount)} {t("video.views")}</span>
@@ -37,7 +37,7 @@ export const VideoStats = ({
       </div>
       
       <div className="flex items-center">
-        <span className="text-surface-400">Language:</span>
+        <span className="text-ink-muted">Language:</span>
         <span className="ml-1">{language.toUpperCase()}</span>
       </div>
     </div>

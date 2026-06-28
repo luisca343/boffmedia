@@ -44,7 +44,7 @@ export function SkyGenerator() {
 
   return (
     <motion.div 
-      className="min-h-full text-surface-50 p-4 sm:p-6"
+      className="min-h-full text-ink p-4 sm:p-6"
       variants={containerVariants}
       initial="hidden"
       animate="visible"

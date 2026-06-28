@@ -20,10 +20,10 @@ export default function CalculatorForm() {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="relative">
-          <div className="w-12 h-12 rounded-full absolute border-4 border-solid border-surface-200 opacity-20"></div>
-          <div className="w-12 h-12 rounded-full animate-spin absolute border-4 border-solid border-primary-500 border-t-transparent"></div>
+          <div className="w-12 h-12 rounded-full absolute border-4 border-solid border-edge opacity-20"></div>
+          <div className="w-12 h-12 rounded-full animate-spin absolute border-4 border-solid border-primary border-t-transparent"></div>
         </div>
-        <p className="ml-4 text-surface-300">Loading calculator data...</p>
+        <p className="ml-4 text-ink">Loading calculator data...</p>
       </div>
     );
   }

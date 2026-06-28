@@ -106,21 +106,21 @@ export default function AdminNotificationsPage() {
                 Buscar jugador
               </TerminalLabel>
               <div className="relative">
-                <Search className="absolute left-2 top-2.5 w-4 h-4 text-highlight-600" />
+                <Search className="absolute left-2 top-2.5 w-4 h-4 text-warning" />
                 <Input
                   id="user-search"
                   placeholder="Nombre o UUID…"
                   value={userSearch}
                   onChange={(e) => setUserSearch(e.target.value)}
-                  className="pl-8 bg-black text-highlight-400 border-highlight-700 placeholder:text-highlight-800"
+                  className="pl-8 bg-black text-warning-hover border-warning-border placeholder:text-warning"
                 />
               </div>
             </div>
 
             {userSearch.length > 0 && (
-              <div className="border border-highlight-700 rounded max-h-40 overflow-y-auto">
+              <div className="border border-warning-border rounded max-h-40 overflow-y-auto">
                 {filteredUsers.length === 0 ? (
-                  <p className="text-highlight-700 text-xs p-2">// sin resultados</p>
+                  <p className="text-warning text-xs p-2">// sin resultados</p>
                 ) : (
                   filteredUsers.slice(0, 20).map((u) => (
                     <button
@@ -129,14 +129,14 @@ export default function AdminNotificationsPage() {
                         setSelectedUuid(u.uuid)
                         setUserSearch(u.username)
                       }}
-                      className={`w-full text-left px-3 py-2 text-sm hover:bg-highlight-900/30 border-b border-highlight-900 last:border-0 transition-colors ${
+                      className={`w-full text-left px-3 py-2 text-sm hover:bg-warning-soft/30 border-b border-warning-border last:border-0 transition-colors ${
                         selectedUuid === u.uuid
-                          ? "text-highlight-300 bg-highlight-900/20"
-                          : "text-highlight-600"
+                          ? "text-warning-hover bg-warning-soft/20"
+                          : "text-warning"
                       }`}
                     >
-                      <span className="text-highlight-400 font-bold">{u.username}</span>
-                      <span className="text-highlight-700 ml-2 text-xs">{u.uuid}</span>
+                      <span className="text-warning-hover font-bold">{u.username}</span>
+                      <span className="text-warning ml-2 text-xs">{u.uuid}</span>
                     </button>
                   ))
                 )}
@@ -144,9 +144,9 @@ export default function AdminNotificationsPage() {
             )}
 
             {selectedUuid && (
-              <p className="text-xs text-highlight-600 font-mono">
-                <span className="text-highlight-700">// uuid: </span>
-                <span className="text-highlight-400">{selectedUuid}</span>
+              <p className="text-xs text-warning font-mono">
+                <span className="text-warning">// uuid: </span>
+                <span className="text-warning-hover">{selectedUuid}</span>
               </p>
             )}
 
@@ -160,7 +160,7 @@ export default function AdminNotificationsPage() {
                 placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
                 value={selectedUuid}
                 onChange={(e) => setSelectedUuid(e.target.value)}
-                className="bg-black text-highlight-400 border-highlight-700 font-mono placeholder:text-highlight-800"
+                className="bg-black text-warning-hover border-warning-border font-mono placeholder:text-warning"
               />
             </div>
           </div>
@@ -180,16 +180,16 @@ export default function AdminNotificationsPage() {
               <Select value={type} onValueChange={setType}>
                 <SelectTrigger
                   id="type-select"
-                  className="bg-black text-highlight-400 border-highlight-700"
+                  className="bg-black text-warning-hover border-warning-border"
                 >
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-black text-highlight-400 border-highlight-700">
+                <SelectContent className="bg-black text-warning-hover border-warning-border">
                   {NOTIFICATION_TYPES.map((t) => (
                     <SelectItem
                       key={t.value}
                       value={t.value}
-                      className="hover:bg-highlight-900/30"
+                      className="hover:bg-warning-soft/30"
                     >
                       {t.label}
                     </SelectItem>
@@ -208,9 +208,9 @@ export default function AdminNotificationsPage() {
                 value={title}
                 maxLength={255}
                 onChange={(e) => setTitle(e.target.value)}
-                className="bg-black text-highlight-400 border-highlight-700 placeholder:text-highlight-800"
+                className="bg-black text-warning-hover border-warning-border placeholder:text-warning"
               />
-              <p className="text-highlight-800 text-xs mt-1">
+              <p className="text-warning text-xs mt-1">
                 {title.length}/255
               </p>
             </div>
@@ -224,7 +224,7 @@ export default function AdminNotificationsPage() {
                 placeholder="Escribe el contenido de la notificación…"
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
-                className="bg-black text-highlight-400 border-highlight-700 min-h-[90px] placeholder:text-highlight-800"
+                className="bg-black text-warning-hover border-warning-border min-h-[90px] placeholder:text-warning"
               />
             </div>
 
@@ -238,7 +238,7 @@ export default function AdminNotificationsPage() {
                 value={link}
                 maxLength={512}
                 onChange={(e) => setLink(e.target.value)}
-                className="bg-black text-highlight-400 border-highlight-700 placeholder:text-highlight-800"
+                className="bg-black text-warning-hover border-warning-border placeholder:text-warning"
               />
             </div>
 

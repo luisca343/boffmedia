@@ -8,8 +8,8 @@ const textareaVariants = cva(
   {
     variants: {
       variant: {
-        default: "border-surface-700 bg-surface-800 text-primary-400 ring-offset-surface-900 placeholder:text-surface-400 focus-visible:ring-primary-300",
-        wingull: "border-secondary-700 bg-secondary-900 text-secondary-300 ring-offset-secondary-950 placeholder:text-secondary-500 focus-visible:ring-secondary-300",
+        default: "border-edge bg-layer-2 text-primary-hover ring-offset-layer-1 placeholder:text-ink-muted focus-visible:ring-primary",
+        wingull: "border-secondary-active bg-secondary-soft text-secondary-hover ring-offset-secondary-soft placeholder:text-secondary focus-visible:ring-secondary",
       },
       size: {
         default: "px-3 py-2",

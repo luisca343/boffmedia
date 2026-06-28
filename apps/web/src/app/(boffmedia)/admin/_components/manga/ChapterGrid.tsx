@@ -17,7 +17,7 @@ export default function ChapterGrid({ series, chapter, pages, discarded, onToggl
 
   return (
     <div className="space-y-3">
-      <p className="text-sm text-[var(--text-muted)]">{t("discardHint")}</p>
+      <p className="text-sm text-ink-muted">{t("discardHint")}</p>
       <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-1.5">
         {pages.map((page) => {
           const isDiscarded = discarded.has(page.index);

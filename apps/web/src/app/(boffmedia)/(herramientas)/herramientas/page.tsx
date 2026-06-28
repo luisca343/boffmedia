@@ -97,7 +97,7 @@ export default function ToolsLandingPage() {
   const currentSortLabel = SORT_OPTIONS.find((o) => o.value === sortMode)?.label || "Ordenar";
 
   return (
-    <main className="relative bg-surface-950 pt-16 relative h-screen">
+    <main className="relative bg-base pt-16 relative h-screen">
       {/* ── hub-video background ─────────────────────────────── */}
       {isMounted && (
         <div className="hub-video absolute inset-0 z-0 overflow-hidden">
@@ -112,7 +112,7 @@ export default function ToolsLandingPage() {
               <source src="/uploads/looptest.mp4" type="video/mp4" />
             </video>
           </div>
-          <div className="absolute inset-0 bg-gradient-to-b from-surface-950/60 via-surface-950/75 to-surface-950/90" />
+          <div className="absolute inset-0 bg-gradient-to-b from-base/60 via-base/75 to-base/90" />
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
@@ -136,11 +136,11 @@ export default function ToolsLandingPage() {
             <Kicker>Herramientas · Comunidad</Kicker>
             <h1 className="hub-title text-5xl sm:text-6xl font-black leading-tight mt-4 mb-4">
               Herramientas para{" "}
-              <span className="text-primary-400" style={{ textShadow: "0 0 30px rgba(249,115,22,0.35)" }}>
+              <span className="text-primary-hover" style={{ textShadow: "0 0 30px rgba(249,115,22,0.35)" }}>
                 videojuegos
               </span>
             </h1>
-            <p className="hub-lead text-surface-400 max-w-[56ch] mx-auto text-lg leading-relaxed mb-8">
+            <p className="hub-lead text-ink-muted max-w-[56ch] mx-auto text-lg leading-relaxed mb-8">
               Recursos para mejorar tu juego: calculadoras, planificadores y bases de datos.
               Creadas por y para la comunidad gaming.
             </p>
@@ -158,7 +158,7 @@ export default function ToolsLandingPage() {
                     }}
                   />
                   <div
-                    className="relative flex items-center bg-surface-900/80 border rounded-lg transition-all duration-300 backdrop-blur-sm overflow-hidden"
+                    className="relative flex items-center bg-layer-1/80 border rounded-lg transition-all duration-300 backdrop-blur-sm overflow-hidden"
                     style={{
                       borderColor: searchFocused
                         ? "rgba(249,115,22,0.55)"
@@ -183,7 +183,7 @@ export default function ToolsLandingPage() {
                       onChange={(e) => setSearchTerm(e.target.value)}
                       onFocus={() => setSearchFocused(true)}
                       onBlur={() => setSearchFocused(false)}
-                      className="w-full bg-transparent pl-12 pr-4 py-3.5 text-surface-200 placeholder:text-surface-500 focus:outline-none text-sm"
+                      className="w-full bg-transparent pl-12 pr-4 py-3.5 text-ink placeholder:text-ink-muted focus:outline-none text-sm"
                     />
                   </div>
                 </div>
@@ -218,7 +218,7 @@ export default function ToolsLandingPage() {
                       borderColor: "rgba(71,85,105,0.7)",
                     }}
                   >
-                    <div className="dd__header px-4 py-2 text-xs tracking-widest text-surface-500 uppercase font-mono">
+                    <div className="dd__header px-4 py-2 text-xs tracking-widest text-ink-muted uppercase font-mono">
                       Ordenar por
                     </div>
                     {SORT_OPTIONS.map((opt) => {
@@ -254,16 +254,16 @@ export default function ToolsLandingPage() {
 
             {/* hub-meta stats */}
             <div className="hub-meta flex gap-6 justify-center flex-wrap">
-              <span className="inline-flex items-center gap-2 font-mono text-xs tracking-wider text-surface-500">
-                <Icon name="gamepad" size={15} className="text-primary-400" />
+              <span className="inline-flex items-center gap-2 font-mono text-xs tracking-wider text-ink-muted">
+                <Icon name="gamepad" size={15} className="text-primary-hover" />
                 {GAMES.length} juegos
               </span>
-              <span className="inline-flex items-center gap-2 font-mono text-xs tracking-wider text-surface-500">
-                <Icon name="wrench" size={15} className="text-primary-400" />
+              <span className="inline-flex items-center gap-2 font-mono text-xs tracking-wider text-ink-muted">
+                <Icon name="wrench" size={15} className="text-primary-hover" />
                 {totalTools} herramientas
               </span>
-              <span className="inline-flex items-center gap-2 font-mono text-xs tracking-wider text-surface-500">
-                <Icon name="bolt" size={15} className="text-primary-400" />
+              <span className="inline-flex items-center gap-2 font-mono text-xs tracking-wider text-ink-muted">
+                <Icon name="bolt" size={15} className="text-primary-hover" />
                 Siempre actualizado
               </span>
             </div>
@@ -295,10 +295,10 @@ export default function ToolsLandingPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              <div className="w-14 h-14 rounded-lg bg-surface-900/60 border border-surface-700/40 flex items-center justify-center mx-auto mb-5">
-                <Terminal className="w-6 h-6 text-surface-600" />
+              <div className="w-14 h-14 rounded-lg bg-layer-1/60 border border-edge/40 flex items-center justify-center mx-auto mb-5">
+                <Terminal className="w-6 h-6 text-ink-dim" />
               </div>
-              <p className="text-surface-500 text-xs tracking-[0.4em] uppercase font-mono">
+              <p className="text-ink-muted text-xs tracking-[0.4em] uppercase font-mono">
                 // Sin resultados
               </p>
             </motion.div>

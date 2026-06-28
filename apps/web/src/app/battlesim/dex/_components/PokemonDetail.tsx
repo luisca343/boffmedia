@@ -19,12 +19,12 @@ export default function PokemonDetail({ pokemonId }: PokemonDetailProps) {
   
   if (!pokemonData) {
     return (
-      <div className="bg-surface-800 p-4 rounded-lg">
+      <div className="bg-layer-2 p-4 rounded-lg">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-surface-100">Pokémon not found</h2>
+          <h2 className="text-xl font-bold text-ink">Pokémon not found</h2>
           <button
             onClick={() => setSelectedPokemon(null)}
-            className="text-surface-400 hover:text-surface-200 text-sm"
+            className="text-ink-muted hover:text-ink text-sm"
           >
             Back to list
           </button>
@@ -37,12 +37,12 @@ export default function PokemonDetail({ pokemonId }: PokemonDetailProps) {
   const abilities = Object.values(pokemonData.abilities || {});
   
   return (
-    <div className="bg-surface-800 p-4 rounded-lg">
+    <div className="bg-layer-2 p-4 rounded-lg">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-surface-100">{pokemonData.name}</h2>
+        <h2 className="text-xl font-bold text-ink">{pokemonData.name}</h2>
         <button
           onClick={() => setSelectedPokemon(null)}
-          className="text-surface-400 hover:text-surface-200 text-sm"
+          className="text-ink-muted hover:text-ink text-sm"
         >
           Back to list
         </button>
@@ -51,7 +51,7 @@ export default function PokemonDetail({ pokemonId }: PokemonDetailProps) {
       <div className="flex flex-col md:flex-row gap-6">
         {/* Left Column - Sprite and basic info */}
         <div className="w-full md:w-1/3">
-          <div className="bg-surface-700 p-4 rounded-lg flex items-center justify-center h-48">
+          <div className="bg-layer-3 p-4 rounded-lg flex items-center justify-center h-48">
             {spriteUrl ? (
               <img 
                 src={spriteUrl} 
@@ -59,7 +59,7 @@ export default function PokemonDetail({ pokemonId }: PokemonDetailProps) {
                 className="h-auto w-auto max-h-full max-w-full object-contain"
               />
             ) : (
-              <div className="text-surface-500">No Image Available</div>
+              <div className="text-ink-muted">No Image Available</div>
             )}
           </div>
           
@@ -77,12 +77,12 @@ export default function PokemonDetail({ pokemonId }: PokemonDetailProps) {
             </div>
             
             <div className="mb-4">
-              <h3 className="text-sm font-medium text-surface-300 mb-1">Abilities</h3>
+              <h3 className="text-sm font-medium text-ink mb-1">Abilities</h3>
               <div className="flex flex-col gap-1">
                 {abilities.map((ability, index) => (
                   <button
                     key={index}
-                    className="text-sm bg-surface-700 p-2 rounded text-left hover:bg-surface-600"
+                    className="text-sm bg-layer-3 p-2 rounded text-left hover:bg-layer-3"
                     onClick={() => addFilter('abilities', ability as string)}
                   >
                     {ability as string}
@@ -93,12 +93,12 @@ export default function PokemonDetail({ pokemonId }: PokemonDetailProps) {
             
             {pokemonData.eggGroups && (
               <div>
-                <h3 className="text-sm font-medium text-surface-300 mb-1">Egg Groups</h3>
+                <h3 className="text-sm font-medium text-ink mb-1">Egg Groups</h3>
                 <div className="flex flex-wrap gap-1">
                   {pokemonData.eggGroups.map((group: string) => (
                     <span
                       key={group}
-                      className="text-xs bg-highlight-900 text-highlight-100 px-2 py-1 rounded cursor-pointer"
+                      className="text-xs bg-warning-soft text-warning-hover px-2 py-1 rounded cursor-pointer"
                       onClick={() => addFilter('eggGroups', group)}
                     >
                       {group}
@@ -112,11 +112,11 @@ export default function PokemonDetail({ pokemonId }: PokemonDetailProps) {
         
         {/* Right Column - Tabs with data */}
         <div className="w-full md:w-2/3">
-          <div className="border-b border-surface-700 mb-4">
+          <div className="border-b border-edge mb-4">
             <div className="flex">
               <button
                 className={`py-2 px-4 text-sm font-medium ${
-                  activeTab === 'stats' ? 'border-b-2 border-primary-500 text-primary-400' : 'text-surface-400'
+                  activeTab === 'stats' ? 'border-b-2 border-primary text-primary-hover' : 'text-ink-muted'
                 }`}
                 onClick={() => setActiveTab('stats')}
               >
@@ -124,7 +124,7 @@ export default function PokemonDetail({ pokemonId }: PokemonDetailProps) {
               </button>
               <button
                 className={`py-2 px-4 text-sm font-medium ${
-                  activeTab === 'moves' ? 'border-b-2 border-primary-500 text-primary-400' : 'text-surface-400'
+                  activeTab === 'moves' ? 'border-b-2 border-primary text-primary-hover' : 'text-ink-muted'
                 }`}
                 onClick={() => setActiveTab('moves')}
               >
@@ -132,7 +132,7 @@ export default function PokemonDetail({ pokemonId }: PokemonDetailProps) {
               </button>
               <button
                 className={`py-2 px-4 text-sm font-medium ${
-                  activeTab === 'evolution' ? 'border-b-2 border-primary-500 text-primary-400' : 'text-surface-400'
+                  activeTab === 'evolution' ? 'border-b-2 border-primary text-primary-hover' : 'text-ink-muted'
                 }`}
                 onClick={() => setActiveTab('evolution')}
               >
@@ -147,13 +147,13 @@ export default function PokemonDetail({ pokemonId }: PokemonDetailProps) {
           
           {activeTab === 'moves' && (
             <div>
-              <h3 className="text-sm font-medium text-surface-300 mb-2">Learnable Moves</h3>
+              <h3 className="text-sm font-medium text-ink mb-2">Learnable Moves</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {/* Replace with actual moves data */}
                 {['Move 1', 'Move 2', 'Move 3', 'Move 4', 'Move 5'].map((move, index) => (
                   <div 
                     key={index}
-                    className="bg-surface-700 p-2 rounded cursor-pointer hover:bg-surface-600"
+                    className="bg-layer-3 p-2 rounded cursor-pointer hover:bg-layer-3"
                     onClick={() => addFilter('moves', move)}
                   >
                     {move}
@@ -165,8 +165,8 @@ export default function PokemonDetail({ pokemonId }: PokemonDetailProps) {
           
           {activeTab === 'evolution' && (
             <div>
-              <h3 className="text-sm font-medium text-surface-300 mb-2">Evolution Chain</h3>
-              <div className="bg-surface-700 p-3 rounded">
+              <h3 className="text-sm font-medium text-ink mb-2">Evolution Chain</h3>
+              <div className="bg-layer-3 p-3 rounded">
                 Evolution data not available
               </div>
             </div>

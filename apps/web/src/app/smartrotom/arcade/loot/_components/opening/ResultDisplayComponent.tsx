@@ -23,25 +23,25 @@ export function ResultDisplay({ wonItem, onComplete }: ResultDisplayProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.5 }}
-      className="z-50 absolute mb-10 w-full max-w-md bg-surface-900/90 rounded-xl p-6 border-4 border-cyan-500/50 shadow-xl"
+      className="z-50 absolute mb-10 w-full max-w-md bg-layer-1/90 rounded-xl p-6 border-4 border-cyan-500/50 shadow-xl"
     >
       {/* Cabinet top */}
-      <div className="bg-gradient-to-r from-surface-800 to-surface-900 -mt-6 -mx-6 mb-6 py-2 px-4 border-b-2 border-surface-700 flex justify-center">
-        <div className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-secondary-400 animate-text-shine px-4 text-center">
+      <div className="bg-gradient-to-r from-layer-2 to-layer-1 -mt-6 -mx-6 mb-6 py-2 px-4 border-b-2 border-edge flex justify-center">
+        <div className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-secondary-hover animate-text-shine px-4 text-center">
           ¡Objeto Obtenido!
         </div>
       </div>
       
       {/* Cabinet screws */}
-      <div className="absolute left-4 top-4 h-2 w-2 rounded-full bg-surface-600 shadow-inner"></div>
-      <div className="absolute right-4 top-4 h-2 w-2 rounded-full bg-surface-600 shadow-inner"></div>
+      <div className="absolute left-4 top-4 h-2 w-2 rounded-full bg-layer-3 shadow-inner"></div>
+      <div className="absolute right-4 top-4 h-2 w-2 rounded-full bg-layer-3 shadow-inner"></div>
       
       <div className={`flex flex-col items-center p-4 rounded-lg ${config.bgColor} border-2 ${config.borderColor} ${config.glow}`}>
         <h3 className={`text-xl font-bold ${config.textColor} mb-2 text-center`}>
           {getItemName(t, wonItem.id, wonItem.type)}
         </h3>
         {wonItem.amount && wonItem.amount > 1 && (
-          <p className="text-surface-300 text-xs mt-0.5 font-medium">
+          <p className="text-ink text-xs mt-0.5 font-medium">
             x{wonItem.amount}
           </p>
         )}
@@ -72,11 +72,11 @@ export function ResultDisplay({ wonItem, onComplete }: ResultDisplayProps) {
           )}
         </div>
         
-        <div className={`px-3 py-1 rounded-full ${config.textColor} bg-surface-950/60 mb-4 text-center font-bold uppercase tracking-wider text-sm`}>
+        <div className={`px-3 py-1 rounded-full ${config.textColor} bg-base/60 mb-4 text-center font-bold uppercase tracking-wider text-sm`}>
           {wonItem.rarity}
         </div>
         
-        <p className="text-surface-200 text-center mb-4 bg-black/40 p-3 rounded-lg border border-surface-800">
+        <p className="text-ink text-center mb-4 bg-black/40 p-3 rounded-lg border border-edge-strong">
           {wonItem.type === 'pokemon' ? wonItem.id : getItemDescription(t, wonItem.id)}
         </p>
       </div>
@@ -87,7 +87,7 @@ export function ResultDisplay({ wonItem, onComplete }: ResultDisplayProps) {
         whileTap={{ scale: 0.95 }}
         transition={{ type: "spring", stiffness: 400, damping: 10, delay: 1 }}
         onClick={onComplete}
-        className="w-full mt-6 bg-gradient-to-r from-highlight-600 to-emerald-600 hover:from-highlight-500 hover:to-emerald-500 text-white px-6 py-3 rounded-md flex items-center justify-center space-x-2 font-bold shadow-lg border-2 border-highlight-500/50"
+        className="w-full mt-6 bg-gradient-to-r from-warning to-emerald-600 hover:from-warning hover:to-emerald-500 text-white px-6 py-3 rounded-md flex items-center justify-center space-x-2 font-bold shadow-lg border-2 border-warning-border/50"
       >
         <Check className="w-5 h-5" />
         <span>¡Añadir a colección!</span>

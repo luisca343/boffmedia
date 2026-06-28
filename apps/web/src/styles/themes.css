@@ -1,266 +1,118 @@
 /* CSS Custom Properties - Color System */
+/* Private palette channels — RGB triplets consumed by semantic tokens in globals.css  */
+/* Prefix --_ signals: do not use in components.                                       */
 
 :root {
-  --background: 20 14.3% 4.1%;
-
-  /* Surface Palette */
-  --surface-50:  248 250 252;
-  --surface-100: 241 245 249; 
-  --surface-200: 226 232 240;
-  --surface-300: 203 213 225;  
-  --surface-400: 148 163 184; 
-  --surface-500: 100 116 139;  
-  --surface-600: 71 85 105; 
-  --surface-700: 51 65 85;  
-  --surface-800: 30 41 59;
-  --surface-900: 12 18 32; 
-  --surface-950: 3 5 15;
-  
   /* Primary Palette (Orange) */
-  --primary-50: 255 247 237;
-  --primary-100: 255 237 213;
-  --primary-200: 254 215 170;
-  --primary-300: 253 186 116;
-  --primary-400: 251 146 60;
-  --primary-500: 249 115 22;
-  --primary-600: 234 88 12;
-  --primary-700: 194 65 12;
-  --primary-800: 154 52 18;
-  --primary-900: 124 45 18;
-  --primary-950: 67 20 7;
+  --_primary-50:  255 247 237;
+  --_primary-100: 255 237 213;
+  --_primary-200: 254 215 170;
+  --_primary-300: 253 186 116;
+  --_primary-400: 251 146 60;
+  --_primary-500: 249 115 22;
+  --_primary-600: 234 88 12;
+  --_primary-700: 194 65 12;
+  --_primary-800: 154 52 18;
+  --_primary-900: 124 45 18;
+  --_primary-950: 67 20 7;
 
   /* Secondary Palette (Cyan) */
-  --secondary-50: 236 254 255;
-  --secondary-100: 207 250 254;
-  --secondary-200: 165 243 252;
-  --secondary-300: 103 232 249;
-  --secondary-400: 34 211 238;
-  --secondary-500: 6 182 212;
-  --secondary-600: 8 145 178;
-  --secondary-700: 14 116 144;
-  --secondary-800: 21 94 117;
-  --secondary-900: 22 78 99;
-  --secondary-950: 8 51 68;
-
-  /* Accent Palette (Purple) */
-  --accent-50: 250 245 255;
-  --accent-100: 243 232 255;
-  --accent-200: 233 213 255;
-  --accent-300: 216 180 254;
-  --accent-400: 192 132 252;
-  --accent-500: 168 85 247;
-  --accent-600: 147 51 234;
-  --accent-700: 126 34 206;
-  --accent-800: 107 33 168;
-  --accent-900: 88 28 135;
-  --accent-950: 59 7 100;
-
-  /* Highlight Palette (Lime) */
-  --highlight-50: 247 254 231;
-  --highlight-100: 236 252 203;
-  --highlight-200: 217 249 157;
-  --highlight-300: 190 242 100;
-  --highlight-400: 163 230 53;
-  --highlight-500: 132 204 22;
-  --highlight-600: 101 163 13;
-  --highlight-700: 77 124 15;
-  --highlight-800: 63 98 18;
-  --highlight-900: 54 83 20;
-  --highlight-950: 26 46 5;
+  --_secondary-50:  236 254 255;
+  --_secondary-100: 207 250 254;
+  --_secondary-200: 165 243 252;
+  --_secondary-300: 103 232 249;
+  --_secondary-400: 34 211 238;
+  --_secondary-500: 6 182 212;
+  --_secondary-600: 8 145 178;
+  --_secondary-700: 14 116 144;
+  --_secondary-800: 21 94 117;
+  --_secondary-900: 22 78 99;
+  --_secondary-950: 8 51 68;
 
   /* Success Palette (Emerald) */
-  --success-50: 236 253 245;
-  --success-100: 209 250 229;
-  --success-200: 167 243 208;
-  --success-300: 110 231 183;
-  --success-400: 52 211 153;
-  --success-500: 16 185 129;
-  --success-600: 5 150 105;
-  --success-700: 4 120 87;
-  --success-800: 6 95 70;
-  --success-900: 6 78 59;
-  --success-950: 2 44 34;
+  --_success-50:  236 253 245;
+  --_success-100: 209 250 229;
+  --_success-200: 167 243 208;
+  --_success-300: 110 231 183;
+  --_success-400: 52 211 153;
+  --_success-500: 16 185 129;
+  --_success-600: 5 150 105;
+  --_success-700: 4 120 87;
+  --_success-800: 6 95 70;
+  --_success-900: 6 78 59;
+  --_success-950: 2 44 34;
 
-  /* Warning Palette (Yellow) */
-  --warning-50: 254 252 232;
-  --warning-100: 254 249 195;
-  --warning-200: 254 240 138;
-  --warning-300: 253 224 71;
-  --warning-400: 250 204 21;
-  --warning-500: 234 179 8;
-  --warning-600: 202 138 4;
-  --warning-700: 161 98 7;
-  --warning-800: 133 77 14;
-  --warning-900: 113 63 18;
-  --warning-950: 66 32 6;
+  /* Warning Palette (Amber) */
+  --_warning-50:  254 252 232;
+  --_warning-100: 254 249 195;
+  --_warning-200: 254 240 138;
+  --_warning-300: 253 224 71;
+  --_warning-400: 250 204 21;
+  --_warning-500: 234 179 8;
+  --_warning-600: 202 138 4;
+  --_warning-700: 161 98 7;
+  --_warning-800: 133 77 14;
+  --_warning-900: 113 63 18;
+  --_warning-950: 66 32 6;
 
-  /* Error Palette (Red) */
-  --error-50: 254 242 242;
-  --error-100: 254 226 226;
-  --error-200: 254 202 202;
-  --error-300: 252 165 165;
-  --error-400: 248 113 113;
-  --error-500: 239 68 68;
-  --error-600: 220 38 38;
-  --error-700: 185 28 28;
-  --error-800: 145 23 23;
-  --error-900: 110 15 15;
-  --error-950: 60 5 5;
+  /* Danger Palette (Red) */
+  --_danger-50:  254 242 242;
+  --_danger-100: 254 226 226;
+  --_danger-200: 254 202 202;
+  --_danger-300: 252 165 165;
+  --_danger-400: 248 113 113;
+  --_danger-500: 239 68 68;
+  --_danger-600: 220 38 38;
+  --_danger-700: 185 28 28;
+  --_danger-800: 145 23 23;
+  --_danger-900: 110 15 15;
+  --_danger-950: 60 5 5;
 
   /* Info Palette (Blue) */
-  --info-50: 239 246 255;
-  --info-100: 219 234 254;
-  --info-200: 191 219 254;
-  --info-300: 147 197 253;
-  --info-400: 96 165 250;
-  --info-500: 59 130 246;
-  --info-600: 37 99 235;
-  --info-700: 29 78 216;
-  --info-800: 30 64 175;
-  --info-900: 30 58 138;
-  --info-950: 23 37 84;
+  --_info-50:  239 246 255;
+  --_info-100: 219 234 254;
+  --_info-200: 191 219 254;
+  --_info-300: 147 197 253;
+  --_info-400: 96 165 250;
+  --_info-500: 59 130 246;
+  --_info-600: 37 99 235;
+  --_info-700: 29 78 216;
+  --_info-800: 30 64 175;
+  --_info-900: 30 58 138;
+  --_info-950: 23 37 84;
 }
 
-/* Old Theme Variant */
-.old {
-  --background: 20 14.3% 4.1%;
+/* ─────────────────────────────────────────────────────────────────────────────
+   Shadcn/ui compatibility bridge — namespaced --ui-* to avoid collision
+   with the semantic token layer in globals.css
+───────────────────────────────────────────────────────────────────────────── */
 
-  --surface-50:  248 250 252;
-  --surface-100: 241 245 249; 
-  --surface-200: 226 232 240;
-  --surface-300: 203 213 225;  
-  --surface-400: 148 163 184; 
-  --surface-500: 100 116 139;  
-  --surface-600: 71 85 105; 
-  --surface-700: 51 65 85;  
-  --surface-800: 30 41 59;
-  --surface-900: 15 23 42;
-  --surface-950: 2 6 23; 
-  
-  --primary-50: 255 247 237;
-  --primary-100: 255 237 213;
-  --primary-200: 254 215 170;
-  --primary-300: 253 186 116;
-  --primary-400: 251 146 60;
-  --primary-500: 249 115 22;
-  --primary-600: 234 88 12;
-  --primary-700: 194 65 12;
-  --primary-800: 154 52 18;
-  --primary-900: 124 45 18;
-  --primary-950: 67 20 7;
+:root {
+  --ui-background: 20 14.3% 4.1%;
+  --ui-foreground: 210 40% 98%;
 
-  --secondary-50: 239 246 255;
-  --secondary-100: 219 234 254;
-  --secondary-200: 191 219 254;
-  --secondary-300: 147 197 253;
-  --secondary-400: 96 165 250;
-  --secondary-500: 59 130 246;
-  --secondary-600: 37 99 235;
-  --secondary-700: 29 78 216;
-  --secondary-800: 30 64 175;
-  --secondary-900: 30 58 138;
-  --secondary-950: 23 37 84;
+  --ui-card: 20 14.3% 4.1%;
+  --ui-card-foreground: 210 40% 98%;
 
-  --accent-50: 253 244 255;
-  --accent-100: 250 232 255;
-  --accent-200: 245 208 254;
-  --accent-300: 240 171 252;
-  --accent-400: 232 121 249;
-  --accent-500: 217 70 239;
-  --accent-600: 192 38 211;
-  --accent-700: 162 28 175;
-  --accent-800: 134 25 143;
-  --accent-900: 112 26 117;
-  --accent-950: 74 4 78;
+  --ui-popover: 20 14.3% 4.1%;
+  --ui-popover-foreground: 210 40% 98%;
 
-  --highlight-50: 255 251 235;
-  --highlight-100: 254 243 199;
-  --highlight-200: 253 230 138;
-  --highlight-300: 252 211 77;
-  --highlight-400: 251 191 36;
-  --highlight-500: 245 158 11;
-  --highlight-600: 217 119 6;
-  --highlight-700: 180 83 9;
-  --highlight-800: 146 64 14;
-  --highlight-900: 120 53 15;
-  --highlight-950: 69 26 3;
+  --ui-primary: 210 40% 98%;
+  --ui-primary-foreground: 222.2 47.4% 11.2%;
 
-  --success-50: 240 253 244;
-  --success-100: 220 252 231;
-  --success-200: 187 247 208;
-  --success-300: 134 239 172;
-  --success-400: 74 222 128;
-  --success-500: 34 197 94;
-  --success-600: 22 163 74;
-  --success-700: 21 128 61;
-  --success-800: 22 101 52;
-  --success-900: 20 83 45;
-  --success-950: 5 46 22;
+  --ui-secondary: 217.2 32.6% 17.5%;
+  --ui-secondary-foreground: 210 40% 98%;
 
-  --warning-50: 255 251 235;
-  --warning-100: 254 243 199;
-  --warning-200: 253 230 138;
-  --warning-300: 252 211 77;
-  --warning-400: 251 191 36;
-  --warning-500: 245 158 11;
-  --warning-600: 217 119 6;
-  --warning-700: 180 83 9;
-  --warning-800: 146 64 14;
-  --warning-900: 120 53 15;
-  --warning-950: 69 26 3;
+  --ui-muted: 217.2 32.6% 17.5%;
+  --ui-muted-foreground: 215 20.2% 65.1%;
 
-  --error-50: 254 242 242;
-  --error-100: 254 226 226;
-  --error-200: 254 202 202;
-  --error-300: 252 165 165;
-  --error-400: 248 113 113;
-  --error-500: 239 68 68;
-  --error-600: 220 38 38;
-  --error-700: 185 28 28;
-  --error-800: 153 27 27;
-  --error-900: 127 29 29;
-  --error-950: 69 10 10;
+  --ui-accent: 217.2 32.6% 17.5%;
+  --ui-accent-foreground: 210 40% 98%;
 
-  --info-50: 236 254 255;
-  --info-100: 207 250 254;
-  --info-200: 165 243 252;
-  --info-300: 103 232 249;
-  --info-400: 34 211 238;
-  --info-500: 6 182 212;
-  --info-600: 8 145 178;
-  --info-700: 14 116 144;
-  --info-800: 21 94 117;
-  --info-900: 22 78 99;
-  --info-950: 8 51 68;
-}
+  --ui-destructive: 0 62.8% 30.6%;
+  --ui-destructive-foreground: 210 40% 98%;
 
-/* Dark Theme */
-.dark {
-  --background: 222.2 84% 4.9%;
-  --foreground: 210 40% 98%;
-
-  --card: 222.2 84% 4.9%;
-  --card-foreground: 210 40% 98%;
-
-  --popover: 222.2 84% 4.9%;
-  --popover-foreground: 210 40% 98%;
-
-  --primary: 210 40% 98%;
-  --primary-foreground: 222.2 47.4% 11.2%;
-
-  --secondary: 217.2 32.6% 17.5%;
-  --secondary-foreground: 210 40% 98%;
-
-  --muted: 217.2 32.6% 17.5%;
-  --muted-foreground: 215 20.2% 65.1%;
-
-  --accent: 217.2 32.6% 17.5%;
-  --accent-foreground: 210 40% 98%;
-
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 210 40% 98%;
-
-  --border: 217.2 32.6% 17.5%;
-  --input: 217.2 32.6% 17.5%;
-  --ring: 212.7 26.8% 83.9%;
+  --ui-border: 217.2 32.6% 17.5%;
+  --ui-input: 217.2 32.6% 17.5%;
+  --ui-ring: 212.7 26.8% 83.9%;
 }

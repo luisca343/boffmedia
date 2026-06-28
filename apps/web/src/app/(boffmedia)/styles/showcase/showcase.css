@@ -130,7 +130,7 @@
 }
 .dsh-rail__link:hover {
   color: var(--text);
-  background: var(--surface-2);
+  background: var(--layer-2);
 }
 .dsh-rail__link--on {
   color: var(--orange-500);
@@ -200,7 +200,7 @@
   padding: 1.75rem;
   border-radius: var(--radius-lg);
   border: var(--hairline) solid var(--border);
-  background: var(--surface-2);
+  background: var(--layer-2);
   background-image: radial-gradient(var(--grid-dot) 1px, transparent 1px);
   background-size: 22px 22px;
   display: flex;
@@ -277,7 +277,7 @@
 }
 .proptable td:first-child {
   font-family: var(--font-mono);
-  color: var(--accent-bright);
+  color: var(--secondary-hover);
   white-space: nowrap;
 }
 .proptable td code {
@@ -296,7 +296,7 @@
   border-radius: var(--radius-lg);
   overflow: hidden;
   border: var(--hairline) solid var(--border);
-  background: var(--surface-2);
+  background: var(--layer-2);
 }
 .swatch__chip {
   height: 76px;
@@ -329,7 +329,7 @@
 .scale-row__token {
   font-family: var(--font-mono);
   font-size: var(--t-xs);
-  color: var(--accent-bright);
+  color: var(--secondary-hover);
   min-width: 96px;
 }
 .scale-row__val {
@@ -384,7 +384,7 @@
 .tile__box {
   width: 100%;
   height: 84px;
-  background: var(--surface-3);
+  background: var(--layer-3);
   border: var(--hairline) solid var(--border-strong);
 }
 .tile__name {
@@ -449,7 +449,7 @@
   line-height: 1.5;
 }
 .road__items svg {
-  color: var(--accent-bright);
+  color: var(--secondary-hover);
   flex-shrink: 0;
   margin-top: 2px;
 }
@@ -492,7 +492,7 @@
   padding: 1.25rem;
   border-radius: var(--radius-lg);
   border: var(--hairline) solid var(--border);
-  background: var(--surface-2);
+  background: var(--layer-2);
 }
 .dodont__head {
   display: flex;
@@ -552,13 +552,13 @@
   gap: 0.5rem;
   padding: 0.6rem 0.9rem;
   border-bottom: var(--hairline) solid var(--border);
-  background: var(--surface-2);
+  background: var(--layer-2);
 }
 .dsh-frame__dot {
   width: 9px;
   height: 9px;
   border-radius: 50%;
-  background: var(--surface-3);
+  background: var(--layer-3);
 }
 .dsh-frame__label {
   margin-left: 0.5rem;
@@ -624,7 +624,7 @@
   cursor: pointer;
 }
 .k-cmd__item:hover {
-  background: var(--surface-2);
+  background: var(--layer-2);
   color: var(--text);
 }
 .k-cmd__item svg {
@@ -665,7 +665,7 @@
   text-transform: uppercase;
   color: var(--text-dim);
   padding: 0.7rem 1rem;
-  background: var(--surface-2);
+  background: var(--layer-2);
   border-bottom: var(--hairline) solid var(--border-strong);
 }
 .k-table td {
@@ -680,7 +680,7 @@
   transition: background var(--dur);
 }
 .k-table tbody tr:hover {
-  background: var(--surface-2);
+  background: var(--layer-2);
 }
 .k-table__num {
   text-align: right;

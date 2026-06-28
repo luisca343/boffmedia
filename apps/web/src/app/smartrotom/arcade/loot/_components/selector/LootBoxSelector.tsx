@@ -37,7 +37,7 @@ export default function LootBoxSelector({
 
   return (
     <div className="flex flex-col items-center">
-      <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-accent-400 pb-2 mb-4">
+      <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-secondary-hover pb-2 mb-4">
         Selecciona una Caja
       </h2>
       

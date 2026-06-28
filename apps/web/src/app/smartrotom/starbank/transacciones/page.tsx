@@ -153,7 +153,7 @@ export default function Transacciones() {
         <SummaryCard 
           title="Ingresos Totales"
           value={formatMoney(stats.income)}
-          icon={<ArrowUpIcon className="h-6 w-6 text-success-500" />}
+          icon={<ArrowUpIcon className="h-6 w-6 text-success" />}
           //change={{ value: 5.2, isPositive: true }}
           className="md:col-span-1"
         />
@@ -161,7 +161,7 @@ export default function Transacciones() {
         <SummaryCard 
           title="Gastos Totales"
           value={formatMoney(stats.expense)}
-          icon={<ArrowDownIcon className="h-6 w-6 text-error-500" />}
+          icon={<ArrowDownIcon className="h-6 w-6 text-danger" />}
           //change={{ value: 2.8, isPositive: false }}
           className="md:col-span-1"
         />

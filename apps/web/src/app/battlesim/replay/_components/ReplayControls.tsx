@@ -89,7 +89,7 @@ export function ReplayControls({
                     max={Math.max(1, lastTurn)}
                     value={Math.min(battle.turn, lastTurn)}
                     onChange={(e) => setCurrentTurn(parseInt(e.target.value, 10))}
-                    className="w-full cursor-pointer accent-[var(--accent-bright)]"
+                    className="w-full cursor-pointer accent-[var(--secondary-hover)]"
                     aria-valuetext={`Turno ${battle.turn} de ${lastTurn}`}
                     title={`Turno ${battle.turn} / ${lastTurn}`}
                 />
@@ -101,7 +101,7 @@ export function ReplayControls({
                             title={`${m.kind === 'ko' ? 'KO' : 'Cambio'} — turno ${m.turn}`}
                             style={{
                                 left: `${(m.turn / Math.max(1, lastTurn)) * 100}%`,
-                                background: m.kind === 'ko' ? 'var(--rose-500)' : 'var(--accent)',
+                                background: m.kind === 'ko' ? 'var(--rose-500)' : 'var(--secondary)',
                                 transform: 'translateX(-50%)',
                             }}
                         />

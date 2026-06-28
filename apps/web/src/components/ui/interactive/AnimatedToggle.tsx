@@ -28,9 +28,9 @@ export function AnimatedToggle({
   };
 
   const gradients = {
-    default: "from-secondary-500 to-cyan-500",
-    feature: "from-accent-500 to-pink-500",
-    setting: "from-highlight-500 to-emerald-500"
+    default: "from-secondary to-cyan-500",
+    feature: "from-secondary to-pink-500",
+    setting: "from-warning to-emerald-500"
   };
 
   return (
@@ -40,7 +40,7 @@ export function AnimatedToggle({
       className={`group cursor-pointer ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
       onClick={() => !disabled && onChange(!checked)}
     >
-      <div className="flex items-center justify-between p-5 rounded-2xl bg-gradient-to-r from-surface-700/40 to-surface-800/40 border border-surface-600/30 hover:border-primary-500/40 transition-all duration-300">
+      <div className="flex items-center justify-between p-5 rounded-2xl bg-gradient-to-r from-layer-3/40 to-layer-2/40 border border-edge/30 hover:border-primary/40 transition-all duration-300">
         
         <div className="flex items-center gap-4">
           {icon && (
@@ -53,11 +53,11 @@ export function AnimatedToggle({
             </motion.div>
           )}
           <div>
-            <span className="text-lg font-medium text-surface-100 group-hover:text-primary-300 transition-colors">
+            <span className="text-lg font-medium text-ink group-hover:text-primary-hover transition-colors">
               {label}
             </span>
             {description && (
-              <div className="text-sm text-surface-400">
+              <div className="text-sm text-ink-muted">
                 {description}
               </div>
             )}
@@ -68,7 +68,7 @@ export function AnimatedToggle({
           className={`${sizes[size].toggle} rounded-full p-1 transition-all duration-300 ${
             checked 
               ? `bg-gradient-to-r ${gradients[variant]}` 
-              : 'bg-surface-600'
+              : 'bg-layer-3'
           }`}
           animate={{
             boxShadow: checked 

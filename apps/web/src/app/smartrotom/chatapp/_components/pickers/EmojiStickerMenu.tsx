@@ -62,7 +62,7 @@ export function EmojiStickerMenu({ onEmojiSelect, onStickerSelect }: EmojiSticke
                 onClick={() => setActiveTab("emoji")}
                 className={`flex items-center gap-2 px-6 py-3 text-sm font-medium transition-colors ${
                   activeTab === "emoji"
-                    ? "text-primary-400 border-b-2 border-primary-400"
+                    ? "text-primary-hover border-b-2 border-primary"
                     : "text-neutral-400 hover:text-neutral-200"
                 }`}
               >
@@ -73,7 +73,7 @@ export function EmojiStickerMenu({ onEmojiSelect, onStickerSelect }: EmojiSticke
                 onClick={() => setActiveTab("sticker")}
                 className={`flex items-center gap-2 px-6 py-3 text-sm font-medium transition-colors ${
                   activeTab === "sticker"
-                    ? "text-primary-400 border-b-2 border-primary-400"
+                    ? "text-primary-hover border-b-2 border-primary"
                     : "text-neutral-400 hover:text-neutral-200"
                 }`}
               >

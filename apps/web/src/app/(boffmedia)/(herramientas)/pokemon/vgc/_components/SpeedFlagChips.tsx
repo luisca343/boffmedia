@@ -17,7 +17,7 @@ interface Props {
 }
 
 const DEFAULT_INACTIVE =
-  "bg-surface-800/80 text-surface-400 border-transparent hover:text-surface-200 hover:bg-surface-700/60";
+  "bg-layer-2/80 text-ink-muted border-transparent hover:text-ink hover:bg-layer-3/60";
 
 export function SpeedFlagChips({
   chips,

@@ -41,41 +41,41 @@ function TimerBar({
         "flex flex-col gap-[.3rem] rounded-[var(--radius)] transition-all duration-[var(--dur)] ease-[var(--ease)]",
         "px-[.6rem] py-[.5rem]",
         isActive
-          ? "bg-[color-mix(in_srgb,var(--surface)_86%,transparent)]"
-          : "bg-[color-mix(in_srgb,var(--surface)_40%,transparent)] opacity-60"
+          ? "bg-[color-mix(in_srgb,var(--layer-1)_86%,transparent)]"
+          : "bg-[color-mix(in_srgb,var(--layer-1)_40%,transparent)] opacity-60"
       )}
     >
       <div className="flex items-center justify-between">
-        <span className="font-medium text-[.66rem] text-[var(--text-muted)]">{label}</span>
+        <span className="font-medium text-[.66rem] text-ink-muted">{label}</span>
         <span
           className={cn(
             "font-mono font-bold text-[.72rem] tabular-nums",
-            isLow ? "text-[var(--red-400)] animate-pulse" : "text-[var(--text)]"
+            isLow ? "text-[var(--red-400)] animate-pulse" : "text-ink"
           )}
         >
           {formatTime(turnRemaining)}
         </span>
       </div>
-      <div className="w-full h-[5px] rounded-[var(--radius-pill)] overflow-hidden bg-[color-mix(in_srgb,#000_45%,var(--surface-3))]">
+      <div className="w-full h-[5px] rounded-[var(--radius-pill)] overflow-hidden bg-[color-mix(in_srgb,#000_45%,var(--layer-3))]">
         <div
           className={cn(
             "h-full rounded-[inherit] transition-[width] duration-1000 ease-[var(--ease)]",
             isLow
               ? "bg-[var(--red-500)]"
               : isActive
-                ? "bg-[var(--accent-bright)]"
-                : "bg-[var(--surface-3)]"
+                ? "bg-secondary-hover"
+                : "bg-layer-3"
           )}
           style={{ width: `${turnPct}%` }}
         />
       </div>
-      <div className="flex items-center justify-between text-[.54rem] text-[var(--text-dim)]">
+      <div className="flex items-center justify-between text-[.54rem] text-ink-dim">
         <span>Total</span>
         <span className="tabular-nums">{formatTime(totalRemaining)}</span>
       </div>
-      <div className="w-full h-[3px] rounded-[var(--radius-pill)] overflow-hidden bg-[color-mix(in_srgb,#000_45%,var(--surface-3))]">
+      <div className="w-full h-[3px] rounded-[var(--radius-pill)] overflow-hidden bg-[color-mix(in_srgb,#000_45%,var(--layer-3))]">
         <div
-          className="h-full rounded-[inherit] bg-[var(--surface-3)] transition-[width] duration-1000 ease-[var(--ease)]"
+          className="h-full rounded-[inherit] bg-layer-3 transition-[width] duration-1000 ease-[var(--ease)]"
           style={{ width: `${totalPct}%` }}
         />
       </div>

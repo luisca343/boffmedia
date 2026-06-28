@@ -29,13 +29,13 @@ export function EventsEmpty({ searchTerm, onClearSearch }: EventsEmptyProps) {
       </div>
 
       <h3
-        className="text-xl font-black text-surface-100 mb-2"
+        className="text-xl font-black text-ink mb-2"
         style={{ fontFamily: "Orbitron, sans-serif" }}
       >
         {searchTerm ? "Sin resultados" : "No hay eventos"}
       </h3>
 
-      <p className="text-sm text-surface-500 max-w-sm mx-auto mb-8 leading-relaxed">
+      <p className="text-sm text-ink-muted max-w-sm mx-auto mb-8 leading-relaxed">
         {searchTerm
           ? `No encontramos eventos que coincidan con "${searchTerm}".`
           : "No hay eventos disponibles en este momento. ¡Vuelve pronto!"}

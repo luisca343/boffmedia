@@ -9,7 +9,7 @@ export function ProfileImage({ userId, size }: { userId: number, size?: number }
     return (
         <div
             style={{ width: dimension, height: dimension }}
-            className="rounded-full overflow-hidden aspect-square flex items-center justify-center bg-surface-700"
+            className="rounded-full overflow-hidden aspect-square flex items-center justify-center bg-layer-3"
         >
             <Image
                 src={errored ? '/profile.png' : imagePath}

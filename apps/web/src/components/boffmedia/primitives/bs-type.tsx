@@ -39,7 +39,7 @@ interface BSCatProps {
 export function BSCat({ cat }: BSCatProps) {
   const [label] = CAT_LABELS[cat] || CAT_LABELS.status
   return (
-    <span className="inline-flex items-center gap-[.35em] font-mono text-t-3xs tracking-[.08em] uppercase text-[var(--text-dim)]">
+    <span className="inline-flex items-center gap-[.35em] font-mono text-t-3xs tracking-[.08em] uppercase text-ink-dim">
       <span
         className={cn(
           "w-[14px] h-[14px] rounded-[var(--radius-sm)] grid place-items-center shrink-0",

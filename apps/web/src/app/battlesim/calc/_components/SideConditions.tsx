@@ -16,29 +16,29 @@ export default function SideConditions({ side, onSideChange }: SideConditionsPro
         <button 
           className={`px-3 py-1 text-xs rounded transition-colors ${
             side.isSR 
-              ? 'bg-primary-500 text-white shadow-md' 
-              : 'bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50'
+              ? 'bg-primary text-white shadow-md' 
+              : 'bg-layer-3 hover:bg-layer-3 active:bg-primary-soft/50'
           }`}
           onClick={() => onSideChange('isSR', !side.isSR)}
         >
           Stealth Rock
         </button>
-        <div className={`px-3 py-1 text-xs ${side.isSR ? 'text-primary-400' : 'text-surface-400'}`}>
+        <div className={`px-3 py-1 text-xs ${side.isSR ? 'text-primary-hover' : 'text-ink-muted'}`}>
           {side.isSR ? 'On' : 'Off'}
         </div>
       </div>
       
       {/* Spikes */}
       <div className="flex items-center gap-2 mb-2">
-        <div className="text-xs text-surface-300">Spikes</div>
+        <div className="text-xs text-ink">Spikes</div>
         <div className="flex gap-1">
           {[0, 1, 2, 3].map(level => (
             <button
               key={`spikes-${level}`}
               className={`w-6 h-6 text-center text-xs rounded transition-colors ${
                 side.spikes === level 
-                  ? 'bg-primary-500 text-white shadow-md' 
-                  : 'bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50'
+                  ? 'bg-primary text-white shadow-md' 
+                  : 'bg-layer-3 hover:bg-layer-3 active:bg-primary-soft/50'
               }`}
               onClick={() => onSideChange('spikes', level)}
             >
@@ -53,8 +53,8 @@ export default function SideConditions({ side, onSideChange }: SideConditionsPro
         <button 
           className={`px-2 py-1 text-xs rounded transition-colors ${
             side.isReflect 
-              ? 'bg-primary-500 text-white shadow-md' 
-              : 'bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50'
+              ? 'bg-primary text-white shadow-md' 
+              : 'bg-layer-3 hover:bg-layer-3 active:bg-primary-soft/50'
           }`}
           onClick={() => onSideChange('isReflect', !side.isReflect)}
         >
@@ -63,8 +63,8 @@ export default function SideConditions({ side, onSideChange }: SideConditionsPro
         <button 
           className={`px-2 py-1 text-xs rounded transition-colors ${
             side.isLightScreen 
-              ? 'bg-primary-500 text-white shadow-md' 
-              : 'bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50'
+              ? 'bg-primary text-white shadow-md' 
+              : 'bg-layer-3 hover:bg-layer-3 active:bg-primary-soft/50'
           }`}
           onClick={() => onSideChange('isLightScreen', !side.isLightScreen)}
         >
@@ -76,8 +76,8 @@ export default function SideConditions({ side, onSideChange }: SideConditionsPro
       <button 
         className={`px-2 py-1 text-xs rounded w-full mb-1 transition-colors ${
           side.isProtected 
-            ? 'bg-primary-500 text-white shadow-md' 
-            : 'bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50'
+            ? 'bg-primary text-white shadow-md' 
+            : 'bg-layer-3 hover:bg-layer-3 active:bg-primary-soft/50'
         }`}
         onClick={() => onSideChange('isProtected', !side.isProtected)}
       >
@@ -87,8 +87,8 @@ export default function SideConditions({ side, onSideChange }: SideConditionsPro
       <button 
         className={`px-2 py-1 text-xs rounded w-full mb-1 transition-colors ${
           side.isSeeded 
-            ? 'bg-primary-500 text-white shadow-md' 
-            : 'bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50'
+            ? 'bg-primary text-white shadow-md' 
+            : 'bg-layer-3 hover:bg-layer-3 active:bg-primary-soft/50'
         }`}
         onClick={() => onSideChange('isSeeded', !side.isSeeded)}
       >
@@ -98,8 +98,8 @@ export default function SideConditions({ side, onSideChange }: SideConditionsPro
       <button 
         className={`px-2 py-1 text-xs rounded w-full mb-1 transition-colors ${
           side.isForesight 
-            ? 'bg-primary-500 text-white shadow-md' 
-            : 'bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50'
+            ? 'bg-primary text-white shadow-md' 
+            : 'bg-layer-3 hover:bg-layer-3 active:bg-primary-soft/50'
         }`}
         onClick={() => onSideChange('isForesight', !side.isForesight)}
       >
@@ -109,8 +109,8 @@ export default function SideConditions({ side, onSideChange }: SideConditionsPro
       <button 
         className={`px-2 py-1 text-xs rounded w-full mb-1 transition-colors ${
           side.isTailwind 
-            ? 'bg-primary-500 text-white shadow-md' 
-            : 'bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50'
+            ? 'bg-primary text-white shadow-md' 
+            : 'bg-layer-3 hover:bg-layer-3 active:bg-primary-soft/50'
         }`}
         onClick={() => onSideChange('isTailwind', !side.isTailwind)}
       >
@@ -120,8 +120,8 @@ export default function SideConditions({ side, onSideChange }: SideConditionsPro
       <button 
         className={`px-2 py-1 text-xs rounded w-full mb-1 transition-colors ${
           side.isHelpingHand 
-            ? 'bg-primary-500 text-white shadow-md' 
-            : 'bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50'
+            ? 'bg-primary text-white shadow-md' 
+            : 'bg-layer-3 hover:bg-layer-3 active:bg-primary-soft/50'
         }`}
         onClick={() => onSideChange('isHelpingHand', !side.isHelpingHand)}
       >
@@ -131,8 +131,8 @@ export default function SideConditions({ side, onSideChange }: SideConditionsPro
       <button 
         className={`px-2 py-1 text-xs rounded w-full mb-1 transition-colors ${
           side.isFlowerGift 
-            ? 'bg-primary-500 text-white shadow-md' 
-            : 'bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50'
+            ? 'bg-primary text-white shadow-md' 
+            : 'bg-layer-3 hover:bg-layer-3 active:bg-primary-soft/50'
         }`}
         onClick={() => onSideChange('isFlowerGift', !side.isFlowerGift)}
       >
@@ -142,8 +142,8 @@ export default function SideConditions({ side, onSideChange }: SideConditionsPro
       <button 
         className={`px-2 py-1 text-xs rounded w-full mb-1 transition-colors ${
           side.isFriendGuard 
-            ? 'bg-primary-500 text-white shadow-md' 
-            : 'bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50'
+            ? 'bg-primary text-white shadow-md' 
+            : 'bg-layer-3 hover:bg-layer-3 active:bg-primary-soft/50'
         }`}
         onClick={() => onSideChange('isFriendGuard', !side.isFriendGuard)}
       >
@@ -153,8 +153,8 @@ export default function SideConditions({ side, onSideChange }: SideConditionsPro
       <button 
         className={`px-2 py-1 text-xs rounded w-full mb-1 transition-colors ${
           side.isAuroraVeil 
-            ? 'bg-primary-500 text-white shadow-md' 
-            : 'bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50'
+            ? 'bg-primary text-white shadow-md' 
+            : 'bg-layer-3 hover:bg-layer-3 active:bg-primary-soft/50'
         }`}
         onClick={() => onSideChange('isAuroraVeil', !side.isAuroraVeil)}
       >
@@ -164,8 +164,8 @@ export default function SideConditions({ side, onSideChange }: SideConditionsPro
       <button 
         className={`px-2 py-1 text-xs rounded w-full mb-1 transition-colors ${
           side.isBattery 
-            ? 'bg-primary-500 text-white shadow-md' 
-            : 'bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50'
+            ? 'bg-primary text-white shadow-md' 
+            : 'bg-layer-3 hover:bg-layer-3 active:bg-primary-soft/50'
         }`}
         onClick={() => onSideChange('isBattery', !side.isBattery)}
       >
@@ -175,8 +175,8 @@ export default function SideConditions({ side, onSideChange }: SideConditionsPro
       <button 
         className={`px-2 py-1 text-xs rounded w-full mb-1 transition-colors ${
           side.isPowerSpot 
-            ? 'bg-primary-500 text-white shadow-md' 
-            : 'bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50'
+            ? 'bg-primary text-white shadow-md' 
+            : 'bg-layer-3 hover:bg-layer-3 active:bg-primary-soft/50'
         }`}
         onClick={() => onSideChange('isPowerSpot', !side.isPowerSpot)}
       >
@@ -185,7 +185,7 @@ export default function SideConditions({ side, onSideChange }: SideConditionsPro
 
       {/* Switching */}
       <select
-        className="w-full bg-surface-700 border border-surface-600 rounded px-2 py-1 text-xs mb-2 hover:border-primary-500/70 focus:border-primary-500 focus:ring-1 focus:ring-primary-500/50 focus:outline-none"
+        className="w-full bg-layer-3 border border-edge rounded px-2 py-1 text-xs mb-2 hover:border-primary/70 focus:border-primary focus:ring-1 focus:ring-primary/50 focus:outline-none"
         value={side.isSwitching || ''}
         onChange={(e) => onSideChange('isSwitching', e.target.value || undefined)}
       >
@@ -195,7 +195,7 @@ export default function SideConditions({ side, onSideChange }: SideConditionsPro
       </select>
       
       {/* Export */}
-      <button className="bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50 transition-colors text-xs px-4 py-1 rounded text-surface-300">
+      <button className="bg-layer-3 hover:bg-layer-3 active:bg-primary-soft/50 transition-colors text-xs px-4 py-1 rounded text-ink">
         Export
       </button>
     </div>

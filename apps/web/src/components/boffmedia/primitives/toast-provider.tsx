@@ -45,22 +45,22 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             className={cn(
               "pointer-events-auto flex gap-3 items-start min-w-[290px] max-w-[360px] py-3.5 px-4",
               "rounded-[var(--radius-lg,22px)]",
-              "bg-[var(--surface)]",
-              "border border-solid border-[var(--border-strong)]",
+              "bg-layer-1",
+              "border border-solid border-edge-strong",
               "shadow-[0_24px_50px_-20px_var(--shadow-color)]",
               "animate-k-toast-in",
-              "data-[direction=neon]:backdrop-blur-[4px] data-[direction=neon]:bg-[color-mix(in_srgb,var(--surface)_90%,transparent)]",
+              "data-[direction=neon]:backdrop-blur-[4px] data-[direction=neon]:bg-[color-mix(in_srgb,var(--layer-1)_90%,transparent)]",
               "data-[direction=hud]:shadow-[5px_5px_0_0_var(--hud-shadow)]",
             )}
           >
-            <span className={cn("text-[var(--accent-bright)] mt-px", toneIconColor[t.tone])}>
+            <span className={cn("text-secondary-hover mt-px", toneIconColor[t.tone])}>
               <Icon name={TOAST_ICONS[t.tone] || "sparkles"} size={16} />
             </span>
             <div className="flex-1 min-w-0">
               <p className="font-semibold text-sm">{t.title}</p>
-              {t.desc && <p className="text-xs text-[var(--text-muted)] mt-0.5">{t.desc}</p>}
+              {t.desc && <p className="text-xs text-ink-muted mt-0.5">{t.desc}</p>}
             </div>
-            <button className="border-0 bg-transparent text-[var(--text-dim)] cursor-pointer p-0.5 hover:text-[var(--text)]" aria-label="Cerrar" onClick={() => dismiss(t.id)}>
+            <button className="border-0 bg-transparent text-ink-dim cursor-pointer p-0.5 hover:text-ink" aria-label="Cerrar" onClick={() => dismiss(t.id)}>
               <Icon name="x" size={14} />
             </button>
           </div>

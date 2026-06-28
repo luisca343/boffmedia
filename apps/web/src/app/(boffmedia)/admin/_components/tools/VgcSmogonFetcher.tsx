@@ -10,15 +10,15 @@ import { useBoffSession } from "@/services/useBoffSession"
 const CUTOFF_OPTIONS = [1760, 1630, 1500, 0]
 
 function inputClass() {
-  return "w-full h-9 rounded-lg border border-[var(--border-strong)] bg-[var(--surface-2)] px-2.5 text-sm text-[var(--text)] placeholder:text-[var(--text-dim)] focus:outline-none focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-soft)]"
+  return "w-full h-9 rounded-lg border border-edge-strong bg-layer-2 px-2.5 text-sm text-ink placeholder:text-ink-dim focus:outline-none focus:border-secondary focus:shadow-[0_0_0_3px_var(--secondary-soft)]"
 }
 
 function labelClass() {
-  return "text-[11px] text-[var(--text-dim)] font-medium uppercase tracking-wider"
+  return "text-[11px] text-ink-dim font-medium uppercase tracking-wider"
 }
 
 function tableHeaderClass() {
-  return "px-4 py-2.5 text-left text-[11px] uppercase tracking-[0.08em] text-[var(--text-muted)] font-semibold"
+  return "px-4 py-2.5 text-left text-[11px] uppercase tracking-[0.08em] text-ink-muted font-semibold"
 }
 
 export function VgcSmogonFetcher() {
@@ -119,7 +119,7 @@ export function VgcSmogonFetcher() {
 
   return (
     <div className="space-y-4 max-w-2xl">
-      <p className="text-sm text-[var(--text-muted)]">
+      <p className="text-sm text-ink-muted">
         Importa stats.txt + moveset.txt de Smogon y normaliza los datos en la base de datos.
       </p>
 
@@ -127,21 +127,21 @@ export function VgcSmogonFetcher() {
       <ToolPanel
         title="Snapshots almacenados"
         headRight={
-          <button onClick={loadSnapshots} className="text-[var(--text-dim)] hover:text-[var(--text)] transition-colors">
+          <button onClick={loadSnapshots} className="text-ink-dim hover:text-ink transition-colors">
             <RefreshCw className="w-3.5 h-3.5" />
           </button>
         }
       >
         {loading ? (
-          <div className="py-8 flex justify-center text-[var(--text-muted)]">
+          <div className="py-8 flex justify-center text-ink-muted">
             <Loader2 className="w-4 h-4 animate-spin" />
           </div>
         ) : snapshots.length === 0 ? (
-          <p className="py-6 text-center text-xs text-[var(--text-dim)]">Sin snapshots.</p>
+          <p className="py-6 text-center text-xs text-ink-dim">Sin snapshots.</p>
         ) : (
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--surface)_96%,transparent)]">
+              <tr className="border-b border-edge bg-[color-mix(in_srgb,var(--layer-1)_96%,transparent)]">
                 <th className={tableHeaderClass()}>Formato</th>
                 <th className={tableHeaderClass()}>Mes</th>
                 <th className={tableHeaderClass()}>Cutoff</th>
@@ -152,19 +152,19 @@ export function VgcSmogonFetcher() {
             </thead>
             <tbody>
               {snapshots.map((s) => (
-                <tr key={s.id} className="border-b border-[var(--border)] hover:bg-[color-mix(in_srgb,var(--text)_3%,transparent)] transition-colors">
-                  <td className="px-4 py-2 text-[var(--text)] font-mono text-xs">{s.formatId}</td>
-                  <td className="px-4 py-2 text-[var(--text-muted)]">{s.month}</td>
-                  <td className="px-4 py-2 text-[var(--text-muted)]">{s.cutoff === 0 ? "0 (all)" : `${s.cutoff}+`}</td>
-                  <td className="px-4 py-2 text-[var(--text-muted)]">{s.pokemonCount}</td>
-                  <td className="px-4 py-2 text-[var(--text-dim)] text-xs">
+                <tr key={s.id} className="border-b border-edge hover:bg-[color-mix(in_srgb,var(--text)_3%,transparent)] transition-colors">
+                  <td className="px-4 py-2 text-ink font-mono text-xs">{s.formatId}</td>
+                  <td className="px-4 py-2 text-ink-muted">{s.month}</td>
+                  <td className="px-4 py-2 text-ink-muted">{s.cutoff === 0 ? "0 (all)" : `${s.cutoff}+`}</td>
+                  <td className="px-4 py-2 text-ink-muted">{s.pokemonCount}</td>
+                  <td className="px-4 py-2 text-ink-dim text-xs">
                     {new Date(s.fetchedAt).toLocaleString()}
                   </td>
                   <td className="px-3 py-2 text-right">
                     <button
                       onClick={() => handleDelete(s)}
                       disabled={deletingId === s.id}
-                      className="text-[var(--text-dim)] hover:text-red-400 disabled:opacity-40 transition-colors"
+                      className="text-ink-dim hover:text-red-400 disabled:opacity-40 transition-colors"
                       title="Eliminar snapshot"
                     >
                       {deletingId === s.id

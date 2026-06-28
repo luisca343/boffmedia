@@ -80,7 +80,7 @@ function buildChips(battle: Battle, pov: 0 | 1): ConditionChip[] {
         key: `${tag}-${c.name}`,
         label: c.name,
         turns: c.minDuration ? `${c.minDuration}${c.maxDuration > 0 ? `–${c.maxDuration}` : ''}` : undefined,
-        color: tag === 'foe' ? 'var(--orange-400)' : 'var(--accent-bright)',
+        color: tag === 'foe' ? 'var(--orange-400)' : 'var(--secondary-hover)',
         side: tag,
       });
     }
@@ -105,7 +105,7 @@ export function FieldConditions({ battle, pov = 0 }: { battle: Battle; pov?: 0 |
           className="inline-flex items-center gap-1 font-mono font-bold text-t-4xs tracking-[.06em] uppercase px-[.45em] py-[.22em] rounded-[var(--radius-sm)] whitespace-nowrap"
           style={{
             color: chip.color,
-            background: `color-mix(in srgb, ${chip.color} 14%, var(--surface))`,
+            background: `color-mix(in srgb, ${chip.color} 14%, var(--layer-1))`,
             border: `1px solid color-mix(in srgb, ${chip.color} 40%, transparent)`,
           }}
         >

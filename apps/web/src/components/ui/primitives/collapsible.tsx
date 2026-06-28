@@ -36,8 +36,8 @@ const CollapsibleTrigger = React.forwardRef<
   const variant = useCollapsibleVariant()
   
   const variantStyles = {
-    default: "text-primary-400 hover:text-primary-300",
-    wingull: "text-secondary-400 hover:text-secondary-300"
+    default: "text-primary-hover hover:text-primary-hover",
+    wingull: "text-secondary-hover hover:text-secondary-hover"
   }
   
   return (
@@ -59,8 +59,8 @@ const CollapsibleContent = React.forwardRef<
   const variant = useCollapsibleVariant()
   
   const variantStyles = {
-    default: "text-surface-300",
-    wingull: "text-secondary-200"
+    default: "text-ink",
+    wingull: "text-secondary-hover"
   }
   
   return (

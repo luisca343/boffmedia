@@ -104,7 +104,7 @@ export const PokemonAutocomplete = forwardRef<PokemonAutocompleteHandle, Props>(
         onFocus={() => query.length >= 2 && setOpen(results.length > 0)}
         onBlur={() => setTimeout(() => setOpen(false), 120)}
         placeholder={placeholder}
-        className="w-full bg-surface-800 border border-surface-600 focus:border-primary-500 rounded-lg px-3 py-2 text-surface-50 placeholder:text-surface-500 text-sm focus:outline-none transition-colors"
+        className="w-full bg-layer-2 border border-edge focus:border-primary rounded-lg px-3 py-2 text-ink placeholder:text-ink-muted text-sm focus:outline-none transition-colors"
         autoComplete="off"
         spellCheck={false}
       />
@@ -113,7 +113,7 @@ export const PokemonAutocomplete = forwardRef<PokemonAutocompleteHandle, Props>(
         <ul
           ref={listRef}
           style={{ position: 'fixed', top: dropdownPos.top, left: dropdownPos.left, width: dropdownPos.width, zIndex: 9999 }}
-          className="bg-surface-900 border border-surface-700 rounded-lg shadow-xl overflow-hidden max-h-60 overflow-y-auto"
+          className="bg-layer-1 border border-edge rounded-lg shadow-xl overflow-hidden max-h-60 overflow-y-auto"
         >
           {results.map((entry, i) => (
             <li key={entry.id}>
@@ -121,8 +121,8 @@ export const PokemonAutocomplete = forwardRef<PokemonAutocompleteHandle, Props>(
                 onMouseDown={(e) => { e.preventDefault(); commit(entry); }}
                 className={`w-full flex items-center gap-2 px-3 py-2 text-left text-sm transition-colors ${
                   i === highlighted
-                    ? 'bg-primary-600/30 text-primary-300'
-                    : 'text-surface-200 hover:bg-surface-800'
+                    ? 'bg-primary-active/30 text-primary-hover'
+                    : 'text-ink hover:bg-layer-2'
                 }`}
               >
                 <img
@@ -132,7 +132,7 @@ export const PokemonAutocomplete = forwardRef<PokemonAutocompleteHandle, Props>(
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                 />
                 <span>{entry.name}</span>
-                <span className="ml-auto text-surface-600 text-xs font-mono">#{entry.num}</span>
+                <span className="ml-auto text-ink-dim text-xs font-mono">#{entry.num}</span>
               </button>
             </li>
           ))}

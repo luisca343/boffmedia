@@ -22,21 +22,21 @@ import { RegionFilter } from '../../_components/RegionFilter';
 function ConsoleGroup({ result }: { result: SearchConsoleResult }) {
   const [expanded, setExpanded] = useState(true);
   const info = CONSOLES[result.consoleKey];
-  const color = info ? MANUFACTURER_COLORS[info.manufacturer] : 'text-surface-400';
+  const color = info ? MANUFACTURER_COLORS[info.manufacturer] : 'text-ink-muted';
 
   return (
-    <div className="rounded-lg border border-surface-700/50 overflow-hidden">
+    <div className="rounded-lg border border-edge/50 overflow-hidden">
       <button
         onClick={() => setExpanded(e => !e)}
-        className="w-full flex items-center gap-3 px-4 py-3 bg-surface-800/60 hover:bg-surface-800/80 transition-colors text-left"
+        className="w-full flex items-center gap-3 px-4 py-3 bg-layer-2/60 hover:bg-layer-2/80 transition-colors text-left"
       >
         <span className={`text-sm font-semibold ${color}`}>{result.consoleLabel}</span>
-        <Badge className="bg-surface-700/40 text-surface-300 border-surface-600/40 ml-auto mr-2 shrink-0">
+        <Badge className="bg-layer-3/40 text-ink border-edge/40 ml-auto mr-2 shrink-0">
           {result.count} archivo{result.count !== 1 ? 's' : ''}
         </Badge>
         {expanded
-          ? <ChevronUp className="h-4 w-4 text-surface-500 shrink-0" />
-          : <ChevronDown className="h-4 w-4 text-surface-500 shrink-0" />
+          ? <ChevronUp className="h-4 w-4 text-ink-muted shrink-0" />
+          : <ChevronDown className="h-4 w-4 text-ink-muted shrink-0" />
         }
       </button>
 
@@ -48,21 +48,21 @@ function ConsoleGroup({ result }: { result: SearchConsoleResult }) {
             exit={{ height: 0 }}
             className="overflow-hidden"
           >
-            <div className="divide-y divide-surface-700/30">
+            <div className="divide-y divide-edge/30">
               {result.files.map(file => (
                 <div
                   key={file.filename}
-                  className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface-700/20 transition-colors duration-100"
+                  className="flex items-center gap-3 px-4 py-2.5 hover:bg-layer-3/20 transition-colors duration-100"
                 >
-                  <span className="flex-1 text-sm text-surface-200 truncate" title={file.filename}>
+                  <span className="flex-1 text-sm text-ink truncate" title={file.filename}>
                     {file.filename}
                   </span>
-                  <span className="text-xs text-surface-400 w-24 text-right shrink-0">{file.size}</span>
+                  <span className="text-xs text-ink-muted w-24 text-right shrink-0">{file.size}</span>
                   <div className="w-24 flex justify-end shrink-0">
                     <a
                       href={ScrapeService.getServeFileUrl(result.consoleKey, file.filename)}
                       download={file.filename}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-primary-600/20 border border-primary-600/40 text-primary-300 hover:bg-primary-600/30 hover:text-primary-200 transition-colors"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-primary-active/20 border border-primary-active/40 text-primary-hover hover:bg-primary-active/30 hover:text-primary-hover transition-colors"
                     >
                       <Download className="h-3 w-3" />
                       Descargar
@@ -139,35 +139,35 @@ export default function LocalLibrary() {
 
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="text-3xl font-bold text-surface-50">
+          <h1 className="text-3xl font-bold text-ink">
             Biblioteca{' '}
-            <span className="bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent">Local</span>
+            <span className="bg-gradient-to-r from-primary-hover to-primary-active bg-clip-text text-transparent">Local</span>
           </h1>
-          <p className="text-surface-400 mt-1 text-sm">
+          <p className="text-ink-muted mt-1 text-sm">
             Explora los juegos descargados en el servidor y descárgalos a tu dispositivo.
           </p>
         </motion.div>
 
         {/* Search form */}
-        <Card className="bg-surface-800/40 border-surface-700/50">
+        <Card className="bg-layer-2/40 border-edge/50">
           <CardContent className="pt-5 flex flex-col gap-5">
 
             {/* Query + button */}
             <div className="flex gap-2">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-surface-500" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted" />
                 <Input
                   value={query}
                   onChange={e => setQuery(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleSearch()}
                   placeholder='Ej: "Pokémon", "Mario"… o vacío para ver todo'
-                  className="pl-9 bg-surface-800/60 border-surface-600 text-surface-100 placeholder-surface-400"
+                  className="pl-9 bg-layer-2/60 border-edge text-ink placeholder-ink-dim"
                 />
               </div>
               <Button
                 onClick={handleSearch}
                 disabled={loading}
-                className="bg-primary-600 hover:bg-primary-500 text-white shrink-0"
+                className="bg-primary-active hover:bg-primary text-white shrink-0"
               >
                 {loading
                   ? <Loader2 className="h-4 w-4 animate-spin" />
@@ -180,21 +180,21 @@ export default function LocalLibrary() {
             {/* Console picker */}
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-surface-400 uppercase tracking-wide">Consola</span>
+                <span className="text-xs font-medium text-ink-muted uppercase tracking-wide">Consola</span>
                 {selectedConsole
-                  ? <Badge className="bg-primary-600/20 text-primary-300 border-primary-600/40 text-xs">
+                  ? <Badge className="bg-primary-active/20 text-primary-hover border-primary-active/40 text-xs">
                       {CONSOLES[selectedConsole]?.shortLabel ?? selectedConsole}
                     </Badge>
-                  : <span className="text-xs text-surface-500">ninguna seleccionada = todas las plataformas</span>
+                  : <span className="text-xs text-ink-muted">ninguna seleccionada = todas las plataformas</span>
                 }
               </div>
               <ConsolePicker selected={selectedConsole} onSelect={handleConsoleSelect} compact />
             </div>
 
             {/* Region filter */}
-            <div className="flex flex-col gap-2 pt-1 border-t border-surface-700/40">
-              <span className="text-xs font-medium text-surface-400 uppercase tracking-wide">
-                Región <span className="normal-case font-normal text-surface-500">(opcional)</span>
+            <div className="flex flex-col gap-2 pt-1 border-t border-edge/40">
+              <span className="text-xs font-medium text-ink-muted uppercase tracking-wide">
+                Región <span className="normal-case font-normal text-ink-muted">(opcional)</span>
               </span>
               <RegionFilter regions={regions} onAdd={addRegion} onRemove={removeRegion} />
             </div>
@@ -215,16 +215,16 @@ export default function LocalLibrary() {
               className="flex flex-col gap-4"
             >
               <div className="flex items-center justify-between flex-wrap gap-2">
-                <p className="text-sm text-surface-300">
+                <p className="text-sm text-ink">
                   {results.query
-                    ? <>Resultados para <span className="text-primary-300 font-medium">&ldquo;{results.query}&rdquo;</span></>
+                    ? <>Resultados para <span className="text-primary-hover font-medium">&ldquo;{results.query}&rdquo;</span></>
                     : <span>Todos los juegos</span>
                   }
                   {selectedConsole && (
-                    <> · <span className="text-surface-400">{CONSOLES[selectedConsole]?.label}</span></>
+                    <> · <span className="text-ink-muted">{CONSOLES[selectedConsole]?.label}</span></>
                   )}
                 </p>
-                <div className="flex items-center gap-3 text-sm text-surface-400">
+                <div className="flex items-center gap-3 text-sm text-ink-muted">
                   <span className="flex items-center gap-1.5">
                     <HardDrive className="h-3.5 w-3.5 text-green-400" />
                     <span className="text-green-300">
@@ -241,7 +241,7 @@ export default function LocalLibrary() {
               </div>
 
               {results.totalCount === 0 ? (
-                <p className="text-surface-500 text-sm py-8 text-center">
+                <p className="text-ink-muted text-sm py-8 text-center">
                   No se encontraron juegos
                   {results.query ? ` para "${results.query}"` : ''}
                   {regions.length > 0 ? ' con los filtros de región seleccionados' : ''}.

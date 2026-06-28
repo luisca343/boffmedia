@@ -54,13 +54,13 @@ const DialogContent = React.forwardRef<
   const variant = useDialogVariant()
   
   const variantStyles = {
-    default: "border-surface-700 bg-surface-800 text-surface-100 ring-offset-surface-900 focus:ring-primary-300",
-    wingull: "border-secondary-800 bg-secondary-900 text-secondary-100 ring-offset-secondary-950 focus:ring-secondary-300",
+    default: "border-edge bg-layer-2 text-ink ring-offset-layer-1 focus:ring-primary",
+    wingull: "border-secondary-active bg-secondary-soft text-secondary-hover ring-offset-secondary-soft focus:ring-secondary",
   }
   
   const closeButtonStyles = {
-    default: "text-surface-400 focus:ring-primary-300 ring-offset-surface-900 data-[state=open]:bg-surface-800 absolute top-4 right-4 text-purple-300 hover:text-white rounded-full p-2 border shadow-lg transition-all duration-200",
-    wingull: "text-secondary-400 focus:ring-secondary-300 ring-offset-secondary-950 data-[state=open]:bg-secondary-900",
+    default: "text-ink-muted focus:ring-primary ring-offset-layer-1 data-[state=open]:bg-layer-2 absolute top-4 right-4 text-purple-300 hover:text-white rounded-full p-2 border shadow-lg transition-all duration-200",
+    wingull: "text-secondary-hover focus:ring-secondary ring-offset-secondary-soft data-[state=open]:bg-secondary-soft",
   }
   
   return (
@@ -124,8 +124,8 @@ const DialogTitle = React.forwardRef<
   const variant = useDialogVariant()
   
   const variantStyles = {
-    default: "text-primary-300",
-    wingull: "text-secondary-300",
+    default: "text-primary-hover",
+    wingull: "text-secondary-hover",
   }
   
   return (
@@ -145,8 +145,8 @@ const DialogDescription = React.forwardRef<
   const variant = useDialogVariant()
   
   const variantStyles = {
-    default: "text-surface-400",
-    wingull: "text-secondary-400",
+    default: "text-ink-muted",
+    wingull: "text-secondary-hover",
   }
   
   return (

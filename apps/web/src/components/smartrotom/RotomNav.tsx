@@ -93,11 +93,11 @@ export function RotomNav({
 
   function Notifications() {
     return (
-      <div className="w-80 bg-surface-800 rounded-none border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
-        <header className="bg-surface-700 border-b-2 border-black p-3 flex items-center justify-between">
+      <div className="w-80 bg-layer-2 rounded-none border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+        <header className="bg-layer-3 border-b-2 border-black p-3 flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Bell className="text-surface-300" size={18} />
-            <h2 className="text-surface-100 font-bold text-sm uppercase tracking-wide">
+            <Bell className="text-ink" size={18} />
+            <h2 className="text-ink font-bold text-sm uppercase tracking-wide">
               {t("title")}
             </h2>
           </div>
@@ -107,18 +107,18 @@ export function RotomNav({
         </header>
         <div className="p-3 space-y-2 max-h-80 overflow-y-auto">
           {isLoading && (
-            <p className="text-surface-400 text-xs text-center py-4">{t("loading")}</p>
+            <p className="text-ink-muted text-xs text-center py-4">{t("loading")}</p>
           )}
           {!isLoading && notifications.length === 0 && (
-            <p className="text-surface-400 text-xs text-center py-4">{t("emptyState")}</p>
+            <p className="text-ink-muted text-xs text-center py-4">{t("emptyState")}</p>
           )}
           {notifications.map((notif) => (
             <div
               key={notif.id}
               className={`p-2 rounded-none border-2 border-black text-sm flex flex-col gap-1 ${
                 notif.isRead
-                  ? "bg-surface-700 text-surface-400"
-                  : "bg-surface-600 text-surface-200"
+                  ? "bg-layer-3 text-ink-muted"
+                  : "bg-layer-3 text-ink"
               }`}
             >
               <div className="flex justify-between items-start gap-2">
@@ -127,7 +127,7 @@ export function RotomNav({
                   <p className="text-xs mt-0.5">{notif.body}</p>
                 </div>
                 {!notif.isRead && (
-                  <span className="bg-primary-500 border-2 border-black w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1" />
+                  <span className="bg-primary border-2 border-black w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1" />
                 )}
               </div>
               {!notif.isRead && (
@@ -148,7 +148,7 @@ export function RotomNav({
           ))}
         </div>
         {notifications.length > 0 && (
-          <footer className="bg-surface-700 border-t-2 border-black p-2 flex justify-end">
+          <footer className="bg-layer-3 border-t-2 border-black p-2 flex justify-end">
             <SmartRotomButton
               variant="neutral"
               size="sm"
@@ -167,7 +167,7 @@ export function RotomNav({
   return (
     <nav
       className={`h-12 z-20 flex items-center px-2 fixed w-full ${
-        pathname.includes("pokedex") ? "bg-surface-950" : "bg-surface-800"
+        pathname.includes("pokedex") ? "bg-base" : "bg-layer-2"
       }`}
     >
       <PrevButton />
@@ -180,10 +180,10 @@ export function RotomNav({
         </SheetTrigger>
         <SheetContent
           side="top"
-          className="bg-surface-800 text-surface-50 border-none max-h-[80vh] overflow-y-auto"
+          className="bg-layer-2 text-ink border-none max-h-[80vh] overflow-y-auto"
         >
           <SheetHeader className="mb-4">
-            <SheetTitle className="text-surface-50 text-lg">Ajustes</SheetTitle>
+            <SheetTitle className="text-ink text-lg">Ajustes</SheetTitle>
           </SheetHeader>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -191,10 +191,10 @@ export function RotomNav({
             </div>
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-primary-400">🌐</span>
-                <h3 className="text-sm font-semibold text-surface-100 uppercase tracking-wider">Idioma</h3>
+                <span className="text-primary-hover">🌐</span>
+                <h3 className="text-sm font-semibold text-ink uppercase tracking-wider">Idioma</h3>
               </div>
-              <div className="bg-surface-700/50 border-2 border-surface-600 p-4 rounded-lg">
+              <div className="bg-layer-3/50 border-2 border-edge p-4 rounded-lg">
                 <LanguageSwitcher variant="mobile" />
               </div>
             </div>
@@ -207,9 +207,9 @@ export function RotomNav({
         </SheetTrigger>
         <SheetContent
           side="right"
-          className="bg-surface-800 text-surface-50 border-none flex flex-col p-0 max-w-3xl"
+          className="bg-layer-2 text-ink border-none flex flex-col p-0 max-w-3xl"
         >
-          <SheetClose className="absolute right-4 top-4 rounded-md opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2 bg-primary-500 z-10">
+          <SheetClose className="absolute right-4 top-4 rounded-md opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2 bg-primary z-10">
             <X className="h-4 w-4" />
             <span className="sr-only">Cerrar</span>
           </SheetClose>
@@ -234,7 +234,7 @@ export function RotomNav({
           <Notifications />
         </PopoverContent>
       </Popover>
-      <Hora className="text-surface-50 text-3xl mx-1" />
+      <Hora className="text-ink text-3xl mx-1 text-shadow-border2" />
       <SocketStatus socket={socket} />
       <MinecraftFunctions />
     </nav>
@@ -254,14 +254,14 @@ function NavButton({
 }) {
   return (
     <button
-      className="rounded-lg border-0 h-8 w-8 mx-2 bg-surface-50 flex items-center justify-center"
+      className="rounded-lg border-0 h-8 w-8 mx-2 bg-base flex items-center justify-center"
       onClick={onClick}
     >
       <Icono
         strokeWidth={strokeWidth}
         height={28}
         width={28}
-        className="text-primary-500"
+        className="text-primary"
       />
     </button>
   );
@@ -271,7 +271,7 @@ function SocketStatus({ socket }: { socket: Socket | null }) {
   return (
     <Tooltip>
       <TooltipTrigger>
-        <div className="cursor-pointer text-surface-50 h-10 text-xl flex items-center">
+        <div className="cursor-pointer text-ink h-10 text-xl flex items-center">
           <span>{socket && socket.connected ? "🟢" : "🔴"}</span>
         </div>
       </TooltipTrigger>

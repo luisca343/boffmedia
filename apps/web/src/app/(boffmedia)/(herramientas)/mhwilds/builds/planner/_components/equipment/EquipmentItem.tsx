@@ -70,7 +70,7 @@ export const EquipmentItem = ({ item, slotType, index, onSelect }: EquipmentItem
           {/* Details */}
           <div className="flex-1 min-w-0">
             <div className="flex justify-between items-center mb-1">
-              <p className="font-medium text-surface-100 truncate pr-2">{item.name}</p>
+              <p className="font-medium text-ink truncate pr-2">{item.name}</p>
               <span className={`text-xs flex-shrink-0 ${getRarityStyle(item.rarity)}`}>★{item.rarity}</span>
             </div>
             <div className="flex items-center text-sm">
@@ -94,14 +94,14 @@ const ArmorStats = ({ armor }: { armor: ArmorPiece }) => {
   const defenseValue = typeof armor.defense === 'number' ? armor.defense : armor.defense.base;
   return (
     <div className="flex flex-wrap gap-x-3 text-xs">
-      <span className="text-secondary-400">Def: {defenseValue}</span>
+      <span className="text-secondary-hover">Def: {defenseValue}</span>
       {armor.slots && armor.slots.length > 0 && (
-        <span className="text-surface-300">
+        <span className="text-ink">
           {t("build_planner.slots")}: {armor.slots.map(size => `○${size}`).join(' ')}
         </span>
       )}
       {armor.armorSet?.name && (
-        <span className="text-accent-400 truncate max-w-[200px]">
+        <span className="text-secondary-hover truncate max-w-[200px]">
           {t("build_planner.set")}: {armor.armorSet.name}
         </span>
       )}
@@ -115,7 +115,7 @@ const WeaponStats = ({ weapon }: { weapon: Weapon }) => {
   return (
     <div className="flex flex-wrap gap-x-3 text-xs">
       <span className="text-red-400">Atk: {weapon.attack || (weapon.damage?.display || weapon.damage?.raw)}</span>
-      <span className={weapon.affinity >= 0 ? 'text-highlight-400' : 'text-red-400'}>
+      <span className={weapon.affinity >= 0 ? 'text-warning-hover' : 'text-red-400'}>
         {t("affinity")}: {weapon.affinity >= 0 ? '+' : ''}{weapon.affinity}%
       </span>
       {elements.map((element, idx) => (
@@ -131,7 +131,7 @@ const WeaponStats = ({ weapon }: { weapon: Weapon }) => {
         </span>
       ))}
       {weapon.slots && weapon.slots.length > 0 && (
-        <span className="text-surface-300">
+        <span className="text-ink">
           {t("build_planner.slots")}: {weapon.slots.map(size => `○${size}`).join(' ')}
         </span>
       )}

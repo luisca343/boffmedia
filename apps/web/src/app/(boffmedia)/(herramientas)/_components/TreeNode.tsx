@@ -20,31 +20,31 @@ export default function TreeNode({ name, structure, path }: TreeNodeProps) {
 
   return (
     <div className="py-1">
-      <div className="flex items-center space-x-2 p-2 rounded-md hover:bg-surface-800 transition-colors duration-150">
+      <div className="flex items-center space-x-2 p-2 rounded-md hover:bg-layer-2 transition-colors duration-150">
         {isDirectory && (
           <button onClick={toggleOpen} className="focus:outline-none">
             {isOpen ? (
-              <ChevronDown className="w-4 h-4 text-primary-400" />
+              <ChevronDown className="w-4 h-4 text-primary-hover" />
             ) : (
-              <ChevronRight className="w-4 h-4 text-primary-400" />
+              <ChevronRight className="w-4 h-4 text-primary-hover" />
             )}
           </button>
         )}
         {isDirectory ? (
-          <Folder className="w-5 h-5 text-primary-500" />
+          <Folder className="w-5 h-5 text-primary" />
         ) : (
-          <File className="w-5 h-5 text-primary-400" />
+          <File className="w-5 h-5 text-primary-hover" />
         )}
         {!isDirectory ? (
-          <Link href={fullPath} className="text-primary-400 hover:text-primary-300 hover:underline font-medium transition-colors duration-150">
+          <Link href={fullPath} className="text-primary-hover hover:text-primary-hover hover:underline font-medium transition-colors duration-150">
             {structure}
           </Link>
         ) : (
-          <span className="font-medium text-primary-200">{firstToUpper(name)}</span>
+          <span className="font-medium text-primary-hover">{firstToUpper(name)}</span>
         )}
       </div>
       {isDirectory && isOpen && (
-        <div className="ml-4 pl-4 mt-1 border-l-2 border-primary-700">
+        <div className="ml-4 pl-4 mt-1 border-l-2 border-primary-active">
           {Object.entries(structure).map(([key, value]) => (
             <TreeNode key={key} name={key} structure={value} path={fullPath} />
           ))}

@@ -28,14 +28,14 @@ import { RegionFilter } from '../../_components/RegionFilter';
 // ─── Per-file status maps ─────────────────────────────────────────────────────
 
 const STATUS_ICON: Record<FileDownloadStatus, React.ReactNode> = {
-  pending:     <Clock        className="h-3.5 w-3.5 text-surface-500 shrink-0" />,
+  pending:     <Clock        className="h-3.5 w-3.5 text-ink-muted shrink-0" />,
   downloading: <Loader2      className="h-3.5 w-3.5 text-blue-400 shrink-0 animate-spin" />,
   downloaded:  <CheckCircle2 className="h-3.5 w-3.5 text-green-400 shrink-0" />,
   skipped:     <SkipForward  className="h-3.5 w-3.5 text-yellow-400 shrink-0" />,
   failed:      <XCircle      className="h-3.5 w-3.5 text-red-400 shrink-0" />,
 };
 const STATUS_COLOR: Record<FileDownloadStatus, string> = {
-  pending: 'text-surface-500', downloading: 'text-blue-300',
+  pending: 'text-ink-muted', downloading: 'text-blue-300',
   downloaded: 'text-green-300', skipped: 'text-yellow-300', failed: 'text-red-300',
 };
 const STATUS_BG: Record<FileDownloadStatus, string> = {
@@ -64,13 +64,13 @@ function DownloadProgressPanel({ progress }: { progress: ProgressState }) {
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-4">
       <div className="flex flex-col gap-1.5">
         <div className="flex justify-between text-sm">
-          <span className="text-surface-300 font-medium">
+          <span className="text-ink font-medium">
             {summary ? 'Descarga completada' : `Descargando… ${completed} / ${total}`}
           </span>
-          <span className="text-surface-400">{pct}%</span>
+          <span className="text-ink-muted">{pct}%</span>
         </div>
-        <div className="h-2 rounded-full bg-surface-700/60 overflow-hidden">
-          <motion.div className={`h-full rounded-full ${summary ? 'bg-green-500' : 'bg-primary-500'}`}
+        <div className="h-2 rounded-full bg-layer-3/60 overflow-hidden">
+          <motion.div className={`h-full rounded-full ${summary ? 'bg-green-500' : 'bg-primary'}`}
             initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ ease: 'easeOut', duration: 0.3 }} />
         </div>
       </div>
@@ -79,21 +79,21 @@ function DownloadProgressPanel({ progress }: { progress: ProgressState }) {
         {counts.skipped     > 0 && <span className="px-2 py-1 rounded-full bg-yellow-900/30 text-yellow-300 border border-yellow-800/40">{counts.skipped} omitidos</span>}
         {counts.failed      > 0 && <span className="px-2 py-1 rounded-full bg-red-900/30 text-red-300 border border-red-800/40">{counts.failed} fallidos</span>}
         {counts.downloading > 0 && <span className="px-2 py-1 rounded-full bg-blue-900/30 text-blue-300 border border-blue-800/40">{counts.downloading} en progreso</span>}
-        {summary && <span className="px-2 py-1 rounded-full bg-surface-700/40 text-surface-300 border border-surface-600/40 flex items-center gap-1"><HardDrive className="h-3 w-3" />{summary.totalDownloadedSize}</span>}
+        {summary && <span className="px-2 py-1 rounded-full bg-layer-3/40 text-ink border border-edge/40 flex items-center gap-1"><HardDrive className="h-3 w-3" />{summary.totalDownloadedSize}</span>}
       </div>
       <button onClick={() => setShowFiles(v => !v)}
-        className="flex items-center gap-1.5 text-sm text-surface-400 hover:text-surface-200 transition-colors self-start">
+        className="flex items-center gap-1.5 text-sm text-ink-muted hover:text-ink transition-colors self-start">
         {showFiles ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
         {showFiles ? 'Ocultar' : 'Ver'} archivos ({files.length})
       </button>
       {showFiles && (
-        <div className="rounded-lg border border-surface-700/50 divide-y divide-surface-700/30 max-h-80 overflow-y-auto">
+        <div className="rounded-lg border border-edge/50 divide-y divide-edge/30 max-h-80 overflow-y-auto">
           {files.map(f => (
             <motion.div key={f.filename} layout
               className={`flex items-center gap-2 px-3 py-2 transition-colors duration-300 ${STATUS_BG[f.status]}`}>
               {STATUS_ICON[f.status]}
               <span className={`flex-1 text-xs truncate ${STATUS_COLOR[f.status]}`} title={f.filename}>{f.filename}</span>
-              {f.size && <span className="text-xs text-surface-500 shrink-0">{f.size}</span>}
+              {f.size && <span className="text-xs text-ink-muted shrink-0">{f.size}</span>}
               {f.error && <span className="text-xs text-red-500 truncate max-w-[140px]" title={f.error}>{f.error}</span>}
             </motion.div>
           ))}
@@ -118,24 +118,24 @@ function CatalogConsoleGroup({ result, groupSelected, downloadedSet, onToggle, o
     decodeURIComponent(file.link.split('/').pop() ?? file.name);
   const [expanded, setExpanded] = useState(true);
   const info = CONSOLES[result.consoleKey];
-  const color = info ? MANUFACTURER_COLORS[info.manufacturer] : 'text-surface-400';
+  const color = info ? MANUFACTURER_COLORS[info.manufacturer] : 'text-ink-muted';
   const allSelected = result.files.length > 0 && result.files.every(f => groupSelected.has(f.name));
 
   return (
-    <div className="rounded-lg border border-surface-700/50 overflow-hidden">
+    <div className="rounded-lg border border-edge/50 overflow-hidden">
       {/* Header */}
       <button onClick={() => setExpanded(e => !e)}
-        className="w-full flex items-center gap-3 px-4 py-3 bg-surface-800/60 hover:bg-surface-800/80 transition-colors text-left">
+        className="w-full flex items-center gap-3 px-4 py-3 bg-layer-2/60 hover:bg-layer-2/80 transition-colors text-left">
         <span className={`text-sm font-semibold ${color} truncate flex-1`}>{result.consoleLabel}</span>
-        <Badge className="bg-surface-700/40 text-surface-300 border-surface-600/40 shrink-0">
+        <Badge className="bg-layer-3/40 text-ink border-edge/40 shrink-0">
           {result.count} juego{result.count !== 1 ? 's' : ''}
         </Badge>
         {groupSelected.size > 0 && (
-          <Badge className="bg-primary-600/20 text-primary-300 border-primary-600/40 shrink-0">
+          <Badge className="bg-primary-active/20 text-primary-hover border-primary-active/40 shrink-0">
             {groupSelected.size} sel.
           </Badge>
         )}
-        {expanded ? <ChevronUp className="h-4 w-4 text-surface-500 shrink-0" /> : <ChevronDown className="h-4 w-4 text-surface-500 shrink-0" />}
+        {expanded ? <ChevronUp className="h-4 w-4 text-ink-muted shrink-0" /> : <ChevronDown className="h-4 w-4 text-ink-muted shrink-0" />}
       </button>
 
       {/* File list */}
@@ -143,30 +143,30 @@ function CatalogConsoleGroup({ result, groupSelected, downloadedSet, onToggle, o
         {expanded && (
           <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="overflow-hidden">
             {/* Select-all row */}
-            <div className="flex items-center gap-3 px-4 py-2 bg-surface-800/40 border-b border-surface-700/40">
+            <div className="flex items-center gap-3 px-4 py-2 bg-layer-2/40 border-b border-edge/40">
               <Checkbox checked={allSelected} onCheckedChange={onToggleAll}
-                className="border-surface-500 data-[state=checked]:bg-primary-600 data-[state=checked]:border-primary-600" />
-              <button onClick={onToggleAll} className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-surface-200 transition-colors">
+                className="border-edge data-[state=checked]:bg-primary-active data-[state=checked]:border-primary-active" />
+              <button onClick={onToggleAll} className="flex items-center gap-1.5 text-xs text-ink-muted hover:text-ink transition-colors">
                 {allSelected
                   ? <><Square className="h-3 w-3" /> Deseleccionar todos</>
                   : <><CheckSquare className="h-3 w-3" /> Seleccionar todos ({result.files.length})</>
                 }
               </button>
             </div>
-            <div className="divide-y divide-surface-700/30">
+            <div className="divide-y divide-edge/30">
               {result.files.map(file => {
                 const isSelected   = groupSelected.has(file.name);
                 const isDownloaded = downloadedSet.has(localFilename(file));
                 return (
                   <div key={file.name} onClick={() => onToggle(file.name)}
                     className={`flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-colors duration-100
-                      ${isSelected ? 'bg-primary-900/20 hover:bg-primary-900/30' : isDownloaded ? 'bg-green-900/10 hover:bg-green-900/20' : 'hover:bg-surface-700/20'}`}>
+                      ${isSelected ? 'bg-primary-soft/20 hover:bg-primary-soft/30' : isDownloaded ? 'bg-green-900/10 hover:bg-green-900/20' : 'hover:bg-layer-3/20'}`}>
                     <Checkbox checked={isSelected} onCheckedChange={() => onToggle(file.name)}
                       onClick={e => e.stopPropagation()}
-                      className="border-surface-500 data-[state=checked]:bg-primary-600 data-[state=checked]:border-primary-600 shrink-0" />
-                    <span className={`flex-1 text-sm truncate ${isDownloaded ? 'text-green-300' : 'text-surface-200'}`} title={file.name}>{file.name}</span>
+                      className="border-edge data-[state=checked]:bg-primary-active data-[state=checked]:border-primary-active shrink-0" />
+                    <span className={`flex-1 text-sm truncate ${isDownloaded ? 'text-green-300' : 'text-ink'}`} title={file.name}>{file.name}</span>
                     {isDownloaded && <span title="Ya descargado"><HardDrive className="h-3.5 w-3.5 text-green-500/70 shrink-0" /></span>}
-                    <span className="text-xs text-surface-400 w-24 text-right shrink-0">{file.size}</span>
+                    <span className="text-xs text-ink-muted w-24 text-right shrink-0">{file.size}</span>
                   </div>
                 );
               })}
@@ -411,33 +411,33 @@ export default function MyrientDownloader() {
 
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="text-3xl font-bold text-surface-50">
+          <h1 className="text-3xl font-bold text-ink">
             Descargador{' '}
-            <span className="bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent">Myrient</span>
+            <span className="bg-gradient-to-r from-primary-hover to-primary-active bg-clip-text text-transparent">Myrient</span>
           </h1>
-          <p className="text-surface-400 mt-1 text-sm">
+          <p className="text-ink-muted mt-1 text-sm">
             Explora el catálogo, selecciona los juegos que quieres y descárgalos directamente al servidor.
           </p>
         </motion.div>
 
         {/* Filters card */}
-        <Card className="bg-surface-800/40 border-surface-700/50">
+        <Card className="bg-layer-2/40 border-edge/50">
           <CardContent className="pt-5 flex flex-col gap-5">
 
             {/* Query + button */}
             <div className="flex gap-2">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-surface-500" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted" />
                 <Input
                   value={query}
                   onChange={e => setQuery(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && !isSearchDisabled && handleSearch()}
                   placeholder={selectedConsole ? 'Filtrar en el catálogo…' : '"Pokémon", "Mario"… o vacío para ver todo de la consola'}
-                  className="pl-9 bg-surface-800/60 border-surface-600 text-surface-100 placeholder-surface-400"
+                  className="pl-9 bg-layer-2/60 border-edge text-ink placeholder-ink-dim"
                 />
               </div>
               <Button onClick={handleSearch} disabled={isSearchDisabled}
-                className="bg-primary-600 hover:bg-primary-500 text-white shrink-0">
+                className="bg-primary-active hover:bg-primary text-white shrink-0">
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
                 <span className="ml-2">{selectedConsole ? 'Cargar' : 'Buscar en todas'}</span>
               </Button>
@@ -446,21 +446,21 @@ export default function MyrientDownloader() {
             {/* Console picker */}
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-surface-400 uppercase tracking-wide">Consola</span>
+                <span className="text-xs font-medium text-ink-muted uppercase tracking-wide">Consola</span>
                 {selectedConsole
-                  ? <Badge className="bg-primary-600/20 text-primary-300 border-primary-600/40 text-xs">
+                  ? <Badge className="bg-primary-active/20 text-primary-hover border-primary-active/40 text-xs">
                       {CONSOLES[selectedConsole]?.shortLabel ?? selectedConsole}
                     </Badge>
-                  : <span className="text-xs text-surface-500">ninguna seleccionada = busca en todas</span>
+                  : <span className="text-xs text-ink-muted">ninguna seleccionada = busca en todas</span>
                 }
               </div>
               <ConsolePicker selected={selectedConsole} onSelect={handleConsoleSelect} compact />
             </div>
 
             {/* Region filter */}
-            <div className="flex flex-col gap-2 pt-1 border-t border-surface-700/40">
-              <span className="text-xs font-medium text-surface-400 uppercase tracking-wide">
-                Región <span className="normal-case font-normal text-surface-500">(opcional)</span>
+            <div className="flex flex-col gap-2 pt-1 border-t border-edge/40">
+              <span className="text-xs font-medium text-ink-muted uppercase tracking-wide">
+                Región <span className="normal-case font-normal text-ink-muted">(opcional)</span>
               </span>
               <RegionFilter regions={regions} onAdd={addRegion} onRemove={removeRegion} />
             </div>
@@ -475,11 +475,11 @@ export default function MyrientDownloader() {
         <AnimatePresence>
           {singleCatalog && (
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-              <Card className="bg-surface-800/40 border-surface-700/50">
+              <Card className="bg-layer-2/40 border-edge/50">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between flex-wrap gap-2">
-                    <CardTitle className="text-base text-surface-200">Catálogo</CardTitle>
-                    <div className="flex items-center gap-2 text-sm text-surface-400">
+                    <CardTitle className="text-base text-ink">Catálogo</CardTitle>
+                    <div className="flex items-center gap-2 text-sm text-ink-muted">
                       <span>{singleCatalog.count} juegos</span>
                       <span>·</span>
                       <span>{singleCatalog.totalSize}</span>
@@ -508,20 +508,20 @@ export default function MyrientDownloader() {
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
               className="flex flex-col gap-4">
               <div className="flex items-center justify-between flex-wrap gap-2">
-                <p className="text-sm text-surface-300">
+                <p className="text-sm text-ink">
                   {multiCatalog.query
-                    ? <>Resultados para <span className="text-primary-300 font-medium">&ldquo;{multiCatalog.query}&rdquo;</span></>
+                    ? <>Resultados para <span className="text-primary-hover font-medium">&ldquo;{multiCatalog.query}&rdquo;</span></>
                     : <span>Todos los catálogos</span>
                   }
                 </p>
-                <div className="flex items-center gap-3 text-sm text-surface-400">
+                <div className="flex items-center gap-3 text-sm text-ink-muted">
                   <span>{multiCatalog.totalCount} juego{multiCatalog.totalCount !== 1 ? 's' : ''}</span>
                   <span>·</span>
                   <span>{multiCatalog.consoles.length} consola{multiCatalog.consoles.length !== 1 ? 's' : ''}</span>
                 </div>
               </div>
               {multiCatalog.totalCount === 0 ? (
-                <p className="text-surface-500 text-sm py-8 text-center">
+                <p className="text-ink-muted text-sm py-8 text-center">
                   No se encontraron juegos{multiCatalog.query ? ` para "${multiCatalog.query}"` : ''}
                   {regions.length > 0 ? ' con los filtros de región seleccionados' : ''}.
                 </p>
@@ -547,9 +547,9 @@ export default function MyrientDownloader() {
         <AnimatePresence>
           {progress && (
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-              <Card className="bg-surface-800/40 border-surface-700/50">
+              <Card className="bg-layer-2/40 border-edge/50">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base text-surface-200">Progreso de descarga</CardTitle>
+                  <CardTitle className="text-base text-ink">Progreso de descarga</CardTitle>
                 </CardHeader>
                 <CardContent><DownloadProgressPanel progress={progress} /></CardContent>
               </Card>
@@ -565,26 +565,26 @@ export default function MyrientDownloader() {
           <motion.div
             initial={{ y: 80, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 80, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            className="fixed bottom-0 left-0 right-0 z-50 bg-surface-900/95 backdrop-blur border-t border-surface-700/60 shadow-2xl"
+            className="fixed bottom-0 left-0 right-0 z-50 bg-layer-1/95 backdrop-blur border-t border-edge/60 shadow-2xl"
           >
             <div className="container mx-auto px-4 py-3 max-w-4xl flex items-center gap-4 flex-wrap">
               <div className="flex-1 min-w-0">
                 {singleCatalog ? (
                   <>
-                    <p className="text-sm font-medium text-surface-100">
+                    <p className="text-sm font-medium text-ink">
                       {selected.size} juego{selected.size !== 1 ? 's' : ''} seleccionado{selected.size !== 1 ? 's' : ''}
                     </p>
-                    <p className="text-xs text-surface-400">
+                    <p className="text-xs text-ink-muted">
                       {CONSOLES[selectedConsole!]?.label}
                       {regions.length > 0 && ` · ${regions.join(', ')}`}
                     </p>
                   </>
                 ) : (
                   <>
-                    <p className="text-sm font-medium text-surface-100">
+                    <p className="text-sm font-medium text-ink">
                       {totalMultiSelected} juego{totalMultiSelected !== 1 ? 's' : ''} seleccionado{totalMultiSelected !== 1 ? 's' : ''}
                     </p>
-                    <p className="text-xs text-surface-400">
+                    <p className="text-xs text-ink-muted">
                       {multiConsoleCount} consola{multiConsoleCount !== 1 ? 's' : ''}
                       {regions.length > 0 && ` · ${regions.join(', ')}`}
                     </p>
@@ -592,11 +592,11 @@ export default function MyrientDownloader() {
                 )}
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <span className="text-xs text-surface-400">Concurrencia:</span>
+                <span className="text-xs text-ink-muted">Concurrencia:</span>
                 <Select value={concurrency} onValueChange={setConcurrency}>
-                  <SelectTrigger className="h-8 w-16 bg-surface-800 border-surface-600 text-surface-200 text-sm"><SelectValue /></SelectTrigger>
-                  <SelectContent className="bg-surface-800 border-surface-700">
-                    {['1','2','3','4','5'].map(n => <SelectItem key={n} value={n} className="text-surface-200">{n}</SelectItem>)}
+                  <SelectTrigger className="h-8 w-16 bg-layer-2 border-edge text-ink text-sm"><SelectValue /></SelectTrigger>
+                  <SelectContent className="bg-layer-2 border-edge">
+                    {['1','2','3','4','5'].map(n => <SelectItem key={n} value={n} className="text-ink">{n}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
@@ -604,7 +604,7 @@ export default function MyrientDownloader() {
               <Button
                 onClick={singleCatalog ? handleSingleDownload : triggerMultiDownload}
                 disabled={downloading}
-                className="bg-primary-600 hover:bg-primary-500 text-white shrink-0"
+                className="bg-primary-active hover:bg-primary text-white shrink-0"
               >
                 <Download className="h-4 w-4 mr-2" />
                 Descargar selección

@@ -23,7 +23,7 @@ export default async function Combates({params} : {params: {id: string}}) {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold mb-8 text-surface-200">Combates Individuales</h1>
+      <h1 className="text-4xl font-bold mb-8 text-ink">Combates Individuales</h1>
       
       {/* <Card className="mb-8">
         <CardHeader>

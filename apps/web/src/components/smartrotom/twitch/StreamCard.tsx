@@ -45,10 +45,10 @@ export const StreamCard = (props: StreamCardProps) => {
   const additionalInfo = (
     <>
       {props.gameName && (
-        <p className="text-xs text-surface-500 mb-2">{props.gameName}</p>
+        <p className="text-xs text-ink-muted mb-2">{props.gameName}</p>
       )}
       
-      <div className="flex items-center justify-between text-xs text-surface-400">
+      <div className="flex items-center justify-between text-xs text-ink-muted">
         {props.type === 'stream' && props.viewerCount !== undefined && (
           <div className="flex items-center">
             <Users className="h-3 w-3 mr-1" />

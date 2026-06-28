@@ -33,14 +33,14 @@ export default function PokemonMovesCard({ data }: PokemonMovesCardProps) {
   // Check if moves is empty or invalid
   if (!moves || Object.keys(moves).length === 0) {
     return (
-      <div className="bg-surface-700/50 rounded-lg p-4 mt-3 border border-surface-600">
-        <h3 className="text-lg font-bold text-surface-100 mb-2 text-center">
+      <div className="bg-layer-3/50 rounded-lg p-4 mt-3 border border-edge">
+        <h3 className="text-lg font-bold text-ink mb-2 text-center">
           {pokemonName}
         </h3>
-        <h4 className="text-sm font-semibold text-primary-400 uppercase tracking-wide mb-3 text-center">
+        <h4 className="text-sm font-semibold text-primary-hover uppercase tracking-wide mb-3 text-center">
           Movimientos
         </h4>
-        <p className="text-surface-300 text-sm text-center">No hay movimientos disponibles</p>
+        <p className="text-ink text-sm text-center">No hay movimientos disponibles</p>
       </div>
     );
   }
@@ -94,12 +94,12 @@ export default function PokemonMovesCard({ data }: PokemonMovesCardProps) {
   };
   
   return (
-    <div className="bg-surface-700/50 rounded-lg p-4 mt-3 border border-surface-600 relative">
+    <div className="bg-layer-3/50 rounded-lg p-4 mt-3 border border-edge relative">
       <div className="mb-4">
-        <h3 className="text-lg font-bold text-surface-100 mb-2 text-center">
+        <h3 className="text-lg font-bold text-ink mb-2 text-center">
           {pokemonName}
         </h3>
-        <h4 className="text-sm font-semibold text-primary-400 uppercase tracking-wide text-center">
+        <h4 className="text-sm font-semibold text-primary-hover uppercase tracking-wide text-center">
           Movimientos
         </h4>
       </div>
@@ -107,18 +107,18 @@ export default function PokemonMovesCard({ data }: PokemonMovesCardProps) {
       {/* Search Filter */}
       <div className="relative mb-4">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-surface-400 h-4 w-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-ink-muted h-4 w-4" />
           <Input
             type="text"
             placeholder="Buscar movimientos..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 pr-10 bg-surface-600 border-surface-500 text-surface-100 placeholder-surface-400 focus:border-primary-400 focus:ring-primary-400/20"
+            className="pl-10 pr-10 bg-layer-3 border-edge text-ink placeholder-ink-dim focus:border-primary focus:ring-primary/20"
           />
           {searchTerm && (
             <button
               onClick={clearSearch}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-surface-400 hover:text-surface-200 transition-colors"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-ink-muted hover:text-ink transition-colors"
             >
               <X className="h-4 w-4" />
             </button>
@@ -129,7 +129,7 @@ export default function PokemonMovesCard({ data }: PokemonMovesCardProps) {
       {/* Results */}
       {Object.keys(filteredMoves).length === 0 && searchTerm ? (
         <div className="text-center py-8">
-          <p className="text-surface-400 text-sm">
+          <p className="text-ink-muted text-sm">
             No se encontraron movimientos que coincidan con &quot;{searchTerm}&quot;
           </p>
         </div>
@@ -145,7 +145,7 @@ export default function PokemonMovesCard({ data }: PokemonMovesCardProps) {
             
             return (
               <div key={index} className="space-y-2">
-                <h4 className="text-sm font-semibold text-primary-400 uppercase tracking-wide">
+                <h4 className="text-sm font-semibold text-primary-hover uppercase tracking-wide">
                   {getTranslatedMoveCategory(type, t)}
                 </h4>
                 <div className="flex flex-wrap gap-2">
@@ -159,13 +159,13 @@ export default function PokemonMovesCard({ data }: PokemonMovesCardProps) {
                             <HoverCardTrigger>
                               <Badge 
                                 variant="secondary"
-                                className="bg-surface-600 text-surface-200 hover:bg-surface-500 text-xs cursor-pointer transition-colors"
+                                className="bg-layer-3 text-ink hover:bg-layer-3 text-xs cursor-pointer transition-colors"
                               >
                                 {move.level} - {getTranslatedMoveName(moveName, t)}
                               </Badge>
                             </HoverCardTrigger>
                             <HoverCardContent 
-                              className="bg-surface-700 text-surface-50 w-[400px] border-surface-950 border font-normal"
+                              className="bg-layer-3 text-ink w-[400px] border-edge-strong border font-normal"
                               style={{ zIndex: 9999 }}
                               side="top"
                               align="center"
@@ -182,13 +182,13 @@ export default function PokemonMovesCard({ data }: PokemonMovesCardProps) {
                             <HoverCardTrigger>
                               <Badge 
                                 variant="secondary"
-                                className="bg-surface-600 text-surface-200 hover:bg-surface-500 text-xs cursor-pointer transition-colors"
+                                className="bg-layer-3 text-ink hover:bg-layer-3 text-xs cursor-pointer transition-colors"
                               >
                                 {getTranslatedMoveName(moveName, t)}
                               </Badge>
                             </HoverCardTrigger>
                             <HoverCardContent 
-                              className="bg-surface-700 text-surface-50 w-[400px] border-surface-950 border font-normal"
+                              className="bg-layer-3 text-ink w-[400px] border-edge-strong border font-normal"
                               style={{ zIndex: 9999 }}
                               side="top"
                               align="center"
@@ -200,7 +200,7 @@ export default function PokemonMovesCard({ data }: PokemonMovesCardProps) {
                       }
                     })
                   ) : (
-                    <span className="text-surface-300 text-sm">{moveList?.toString() || 'No data'}</span>
+                    <span className="text-ink text-sm">{moveList?.toString() || 'No data'}</span>
                   )}
                 </div>
               </div>

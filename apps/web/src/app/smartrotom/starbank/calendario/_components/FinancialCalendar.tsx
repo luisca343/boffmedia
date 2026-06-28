@@ -143,18 +143,18 @@ export function FinancialCalendar({
                 onClick={() => setSelectedDay(day)}
                 className={cn(
                   "min-h-16 p-2 cursor-pointer border rounded-md transition-all duration-200",
-                  !isCurrentMonth && "opacity-40 bg-surface-50",
+                  !isCurrentMonth && "opacity-40 bg-base",
                   isSelected && "bg-blue-100 border-blue-400 shadow-sm scale-105",
                   isToday(day) && !isSelected && "border-blue-500 border-2",
                   dayTransactions.length > 0 && "hover:shadow-md",
-                  dayTransactions.length === 0 && "hover:bg-surface-50"
+                  dayTransactions.length === 0 && "hover:bg-base"
                 )}
               >
                 <div className="flex items-center justify-between mb-1">
                   <span className={cn(
                     "text-sm font-medium",
                     isToday(day) && "text-blue-600 font-bold",
-                    !isCurrentMonth && "text-surface-400"
+                    !isCurrentMonth && "text-ink-muted"
                   )}>
                     {format(day, "d")}
                   </span>
@@ -169,8 +169,8 @@ export function FinancialCalendar({
                   <div className="space-y-1">
                     {incomeTotal > 0 && (
                       <div className="flex items-center gap-1">
-                        <div className="flex-1 h-1.5 bg-highlight-400 rounded-full" />
-                        <span className="text-[10px] text-highlight-700 font-medium">
+                        <div className="flex-1 h-1.5 bg-warning-hover rounded-full" />
+                        <span className="text-[10px] text-warning font-medium">
                           +{formatMoney(incomeTotal).replace('¥', '').trim()}
                         </span>
                       </div>

@@ -23,7 +23,7 @@ export function BSFieldCond({ cond, side }: BSFieldCondProps) {
         side ? "text-[.58rem] px-[.5rem] py-[.28rem]" : "text-[.62rem] px-[.65rem] py-[.35rem]",
       )}
       style={{
-        background: `color-mix(in srgb, ${cond.c} 14%, var(--surface-2))`,
+        background: `color-mix(in srgb, ${cond.c} 14%, var(--layer-2))`,
         border: `1px solid color-mix(in srgb, ${cond.c} 38%, var(--border))`,
         color: `color-mix(in srgb, ${cond.c} 88%, var(--text))`,
       }}

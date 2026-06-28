@@ -33,8 +33,8 @@ export default function LanguageSwitcher({ variant = "default" }: LanguageSwitch
     return (
       <div className="pb-2 mb-2" style={{ borderBottom: "var(--hairline) solid var(--border)" }}>
         <div className="flex items-center gap-3">
-          <Icon name="globe" size={20} className={isPending ? "text-[var(--orange-500)] animate-spin" : "text-[var(--text-dim)]"} />
-          <span className="text-[var(--text-muted)]">Idioma:</span>
+          <Icon name="globe" size={20} className={isPending ? "text-[var(--orange-500)] animate-spin" : "text-ink-dim"} />
+          <span className="text-ink-muted">Idioma:</span>
           {locales.map((loc) => (
             <button
               key={loc.code}
@@ -43,8 +43,8 @@ export default function LanguageSwitcher({ variant = "default" }: LanguageSwitch
                 locale === loc.code
                   ? 'text-[var(--orange-500)] font-semibold'
                   : isPending
-                    ? 'text-[var(--text-dim)] cursor-wait'
-                    : 'text-[var(--text-muted)] hover:text-[var(--orange-500)]'
+                    ? 'text-ink-dim cursor-wait'
+                    : 'text-ink-muted hover:text-[var(--orange-500)]'
               } transition-colors duration-[var(--dur)]`}
               disabled={isPending}
             >
@@ -58,7 +58,7 @@ export default function LanguageSwitcher({ variant = "default" }: LanguageSwitch
 
   return (
     <div className="flex items-center gap-2">
-      <Icon name="globe" size={17} className={isPending ? "text-[var(--orange-500)] animate-spin" : "text-[var(--text-dim)]"} />
+      <Icon name="globe" size={17} className={isPending ? "text-[var(--orange-500)] animate-spin" : "text-ink-dim"} />
       {locales.map((loc) => (
         <button
           key={loc.code}
@@ -67,8 +67,8 @@ export default function LanguageSwitcher({ variant = "default" }: LanguageSwitch
             locale === loc.code
               ? 'text-[var(--orange-500)] font-semibold'
               : isPending
-                ? 'text-[var(--text-dim)] cursor-wait'
-                : 'text-[var(--text-muted)] hover:text-[var(--orange-500)]'
+                ? 'text-ink-dim cursor-wait'
+                : 'text-ink-muted hover:text-[var(--orange-500)]'
           }`}
           disabled={isPending}
         >

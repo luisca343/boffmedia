@@ -36,7 +36,7 @@ export default function FurretToday() {
           {/* Improved navigation with 8pt grid spacing */}
           <nav 
             id="main-navigation"
-            className="bg-gradient-to-r from-secondary-600 to-secondary-400 p-6 flex flex-wrap justify-center gap-4 relative"
+            className="bg-gradient-to-r from-secondary-active to-secondary-hover p-6 flex flex-wrap justify-center gap-4 relative"
             role="navigation"
             aria-label="Navegación principal"
           >
@@ -81,7 +81,7 @@ export default function FurretToday() {
 
           <div className="flex-grow">
             {/* Featured news section with improved contrast and spacing */}
-            <section className="bg-secondary-100 py-8 px-6">
+            <section className="bg-secondary-soft py-8 px-6">
               <div className="flex items-center mb-6">
                 <div className="h-1 bg-black flex-grow" aria-hidden="true"></div>
                 <h2 className="text-pop-3xl font-bold mx-6 text-pink-500 pop-shadow-strong px-8 py-4 bg-yellow-300 border-3 border-black transform -rotate-2 rounded-lg">
@@ -117,7 +117,7 @@ export default function FurretToday() {
               <section className="p-8 relative bg-white/90" aria-label="Más noticias">
                 <div className="flex items-center mb-8">
                   <div className="h-1 bg-black flex-grow" aria-hidden="true"></div>
-                  <h2 className="text-pop-2xl font-bold mx-6 text-secondary-500 pop-shadow">
+                  <h2 className="text-pop-2xl font-bold mx-6 text-secondary pop-shadow">
                     Más Noticias
                   </h2>
                   <div className="h-1 bg-black flex-grow" aria-hidden="true"></div>

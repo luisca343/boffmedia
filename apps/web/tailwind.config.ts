@@ -1,9 +1,8 @@
-import { be } from "date-fns/locale"
 import type { Config } from "tailwindcss"
 import plugin from "tailwindcss/plugin"
 
 const config: Config = {
-  darkMode: ["class"],
+  darkMode: ["selector", '[data-theme="dark"]'],
   content: [
     "./pages/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
@@ -51,23 +50,28 @@ const config: Config = {
         black: "900",
       },
       textShadow: {
+        // Black outline effects — pure black strokes at increasing radii.
+        // Use on white/light text over photographic or colourful backgrounds.
+        // text-shadow-border05 → text-shadow-border1 → border2 → border3 (thicker each step)
+        border05:
+          "rgb(0,0,0) 0.5px 0px 0px, rgb(0,0,0) 0.270151px 0.420735px 0px, rgb(0,0,0) -0.208073px 0.454649px 0px, rgb(0,0,0) -0.494996px 0.07056px 0px, rgb(0,0,0) -0.326822px -0.378401px 0px, rgb(0,0,0) 0.141831px -0.479462px 0px, rgb(0,0,0) 0.480085px -0.139708px 0px",
         border1:
           "rgb(0, 0, 0) 1px 0px 0px, rgb(0, 0, 0) 0.540302px 0.841471px 0px, rgb(0, 0, 0) -0.416147px 0.909297px 0px, rgb(0, 0, 0) -0.989992px 0.14112px 0px, rgb(0, 0, 0) -0.653644px -0.756802px 0px, rgb(0, 0, 0) 0.283662px -0.958924px 0px, rgb(0, 0, 0) 0.96017px -0.279415px 0px",
         border2:
           "rgb(0, 0, 0) 2px 0px 0px, rgb(0, 0, 0) 1.75517px 0.958851px 0px, rgb(0, 0, 0) 1.0806px 1.68294px 0px, rgb(0, 0, 0) 0.141474px 1.99499px 0px, rgb(0, 0, 0) -0.832294px 1.81859px 0px, rgb(0, 0, 0) -1.60229px 1.19694px 0px, rgb(0, 0, 0) -1.97998px 0.28224px 0px, rgb(0, 0, 0) -1.87291px -0.701566px 0px, rgb(0, 0, 0) -1.30729px -1.5136px 0px, rgb(0, 0, 0) -0.421592px -1.95506px 0px, rgb(0, 0, 0) 0.567324px -1.91785px 0px, rgb(0, 0, 0) 1.41734px -1.41108px 0px, rgb(0, 0, 0) 1.92034px -0.558831px 0px",
         border3:
           "rgb(0, 0, 0) 3px 0px 0px, rgb(0, 0, 0) 2.83487px 0.981584px 0px, rgb(0, 0, 0) 2.35766px 1.85511px 0px, rgb(0, 0, 0) 1.62091px 2.52441px 0px, rgb(0, 0, 0) 0.705713px 2.91581px 0px, rgb(0, 0, 0) -0.287171px 2.98622px 0px, rgb(0, 0, 0) -1.24844px 2.72789px 0px, rgb(0, 0, 0) -2.07227px 2.16926px 0px, rgb(0, 0, 0) -2.66798px 1.37182px 0px, rgb(0, 0, 0) -2.96998px 0.42336px 0px, rgb(0, 0, 0) -2.94502px -0.571704px 0px, rgb(0, 0, 0) -2.59586px -1.50383px 0px, rgb(0, 0, 0) -1.96093px -2.27041px 0px, rgb(0, 0, 0) -1.11013px -2.78704px 0px, rgb(0, 0, 0) -0.137119px -2.99686px 0px, rgb(0, 0, 0) 0.850987px -2.87677px 0px, rgb(0, 0, 0) 1.74541px -2.43999px 0px, rgb(0, 0, 0) 2.44769px -1.73459px 0px, rgb(0, 0, 0) 2.88051px -0.838247px 0px",
-        glow: "0 0 10px rgba(249, 115, 22, 0.5)",
-        "glow-lg": "0 0 20px rgba(249, 115, 22, 0.4)",
+        glow: "0 0 10px var(--primary-soft, rgba(249,115,22,0.5))",
+        "glow-lg": "0 0 20px var(--primary-soft, rgba(249,115,22,0.4))",
       },
       boxShadow: {
         left: "-5px 0px 10px 2px rgba(33, 33, 33, 0.3)",
         right: "5px 0px 10px 2px rgba(33, 33, 33, 0.3)",
         light: "4px 4px 0px 0px #000",
         dark: "4px 4px 0px 2px #000",
-        glow: "0 0 20px rgba(249, 115, 22, 0.3)",
-        "glow-lg": "0 0 40px rgba(249, 115, 22, 0.2)",
-        "inner-glow": "inset 0 0 20px rgba(249, 115, 22, 0.1)",
+        glow: "0 0 20px var(--primary-soft, rgba(249,115,22,0.3))",
+        "glow-lg": "0 0 40px var(--primary-soft, rgba(249,115,22,0.2))",
+        "inner-glow": "inset 0 0 20px var(--primary-soft, rgba(249,115,22,0.1))",
         elevated: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
         "elevated-lg": "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
         // Neon direction shadows
@@ -88,162 +92,6 @@ const config: Config = {
         reverseBoxShadowY: "-4px",
       },
       colors: {
-        // Handoff brand colors (direct hex)
-        orange: {
-          300: "#fdba74",
-          400: "#fb923c",
-          500: "#f97316",
-          600: "#ea580c",
-          700: "#c2410c",
-        },
-        cyan: {
-          300: "#67e8f9",
-          400: "#22d3ee",
-          500: "#06b6d4",
-          600: "#0891b2",
-        },
-        purple: {
-          400: "#c084fc",
-          500: "#a855f7",
-          600: "#9333ea",
-        },
-        emerald: {
-          400: "#34d399",
-          500: "#10b981",
-        },
-        amber: {
-          400: "#fbbf24",
-        },
-        rose: {
-          400: "#fb7185",
-          500: "#f43f5e",
-        },
-        // Primary palette - Orange (BoffMedia brand)
-        primary: {
-          50: "rgb(var(--primary-50) / <alpha-value>)",
-          100: "rgb(var(--primary-100) / <alpha-value>)",
-          200: "rgb(var(--primary-200) / <alpha-value>)",
-          300: "rgb(var(--primary-300) / <alpha-value>)",
-          400: "rgb(var(--primary-400) / <alpha-value>)",
-          500: "rgb(var(--primary-500) / <alpha-value>)",
-          600: "rgb(var(--primary-600) / <alpha-value>)",
-          700: "rgb(var(--primary-700) / <alpha-value>)",
-          800: "rgb(var(--primary-800) / <alpha-value>)",
-          900: "rgb(var(--primary-900) / <alpha-value>)",
-          950: "rgb(var(--primary-950) / <alpha-value>)",
-        },
-        // Secondary palette - Blue
-        secondary: {
-          50: "rgb(var(--secondary-50) / <alpha-value>)",
-          100: "rgb(var(--secondary-100) / <alpha-value>)",
-          200: "rgb(var(--secondary-200) / <alpha-value>)",
-          300: "rgb(var(--secondary-300) / <alpha-value>)",
-          400: "rgb(var(--secondary-400) / <alpha-value>)",
-          500: "rgb(var(--secondary-500) / <alpha-value>)",
-          600: "rgb(var(--secondary-600) / <alpha-value>)",
-          700: "rgb(var(--secondary-700) / <alpha-value>)",
-          800: "rgb(var(--secondary-800) / <alpha-value>)",
-          900: "rgb(var(--secondary-900) / <alpha-value>)",
-          950: "rgb(var(--secondary-950) / <alpha-value>)",
-        },
-        // Accent palette - Purple
-        accent: {
-          50: "rgb(var(--accent-50) / <alpha-value>)",
-          100: "rgb(var(--accent-100) / <alpha-value>)",
-          200: "rgb(var(--accent-200) / <alpha-value>)",
-          300: "rgb(var(--accent-300) / <alpha-value>)",
-          400: "rgb(var(--accent-400) / <alpha-value>)",
-          500: "rgb(var(--accent-500) / <alpha-value>)",
-          600: "rgb(var(--accent-600) / <alpha-value>)",
-          700: "rgb(var(--accent-700) / <alpha-value>)",
-          800: "rgb(var(--accent-800) / <alpha-value>)",
-          900: "rgb(var(--accent-900) / <alpha-value>)",
-          950: "rgb(var(--accent-950) / <alpha-value>)",
-        },
-        // Surface palette - Neutral grays for backgrounds
-        surface: {
-          /*50: "rgb(var(--surface-50) / <alpha-value>)",
-          100: "rgb(var(--surface-100) / <alpha-value>)",
-          200: "rgb(var(--surface-200) / <alpha-value>)",
-          300: "rgb(var(--surface-300) / <alpha-value>)",
-          400: "rgb(var(--surface-400) / <alpha-value>)",
-          500: "rgb(var(--surface-500) / <alpha-value>)",
-          600: "rgb(var(--surface-600) / <alpha-value>)",
-          700: "rgb(var(--surface-700) / <alpha-value>)",
-          800: "rgb(var(--surface-800) / <alpha-value>)",
-          900: "rgb(var(--surface-900) / <alpha-value>)",
-          950: "rgb(var(--surface-950) / <alpha-value>)",*/
-        },
-        // Highlight palette
-        highlight: {
-          50: "rgb(var(--highlight-50) / <alpha-value>)",
-          100: "rgb(var(--highlight-100) / <alpha-value>)",
-          200: "rgb(var(--highlight-200) / <alpha-value>)",
-          300: "rgb(var(--highlight-300) / <alpha-value>)",
-          400: "rgb(var(--highlight-400) / <alpha-value>)",
-          500: "rgb(var(--highlight-500) / <alpha-value>)",
-          600: "rgb(var(--highlight-600) / <alpha-value>)",
-          700: "rgb(var(--highlight-700) / <alpha-value>)",
-          800: "rgb(var(--highlight-800) / <alpha-value>)",
-          900: "rgb(var(--highlight-900) / <alpha-value>)",
-          950: "rgb(var(--highlight-950) / <alpha-value>)",
-        },
-        // Success palette - Green
-        success: {
-          50: "rgb(var(--success-50) / <alpha-value>)",
-          100: "rgb(var(--success-100) / <alpha-value>)",
-          200: "rgb(var(--success-200) / <alpha-value>)",
-          300: "rgb(var(--success-300) / <alpha-value>)",
-          400: "rgb(var(--success-400) / <alpha-value>)",
-          500: "rgb(var(--success-500) / <alpha-value>)",
-          600: "rgb(var(--success-600) / <alpha-value>)",
-          700: "rgb(var(--success-700) / <alpha-value>)",
-          800: "rgb(var(--success-800) / <alpha-value>)",
-          900: "rgb(var(--success-900) / <alpha-value>)",
-          950: "rgb(var(--success-950) / <alpha-value>)",
-        },
-        // Warning palette - Yellow/Amber
-        warning: {
-          50: "rgb(var(--warning-50) / <alpha-value>)",
-          100: "rgb(var(--warning-100) / <alpha-value>)",
-          200: "rgb(var(--warning-200) / <alpha-value>)",
-          300: "rgb(var(--warning-300) / <alpha-value>)",
-          400: "rgb(var(--warning-400) / <alpha-value>)",
-          500: "rgb(var(--warning-500) / <alpha-value>)",
-          600: "rgb(var(--warning-600) / <alpha-value>)",
-          700: "rgb(var(--warning-700) / <alpha-value>)",
-          800: "rgb(var(--warning-800) / <alpha-value>)",
-          900: "rgb(var(--warning-900) / <alpha-value>)",
-          950: "rgb(var(--warning-950) / <alpha-value>)",
-        },
-        // Error palette - Red
-        error: {
-          50: "rgb(var(--error-50) / <alpha-value>)",
-          100: "rgb(var(--error-100) / <alpha-value>)",
-          200: "rgb(var(--error-200) / <alpha-value>)",
-          300: "rgb(var(--error-300) / <alpha-value>)",
-          400: "rgb(var(--error-400) / <alpha-value>)",
-          500: "rgb(var(--error-500) / <alpha-value>)",
-          600: "rgb(var(--error-600) / <alpha-value>)",
-          700: "rgb(var(--error-700) / <alpha-value>)",
-          800: "rgb(var(--error-800) / <alpha-value>)",
-          900: "rgb(var(--error-900) / <alpha-value>)",
-          950: "rgb(var(--error-950) / <alpha-value>)",
-        },
-        // Info palette - Cyan/Blue
-        info: {
-          50: "rgb(var(--info-50) / <alpha-value>)",
-          100: "rgb(var(--info-100) / <alpha-value>)",
-          200: "rgb(var(--info-200) / <alpha-value>)",
-          300: "rgb(var(--info-300) / <alpha-value>)",
-          400: "rgb(var(--info-400) / <alpha-value>)",
-          500: "rgb(var(--info-500) / <alpha-value>)",
-          600: "rgb(var(--info-600) / <alpha-value>)",
-          700: "rgb(var(--info-700) / <alpha-value>)",
-          800: "rgb(var(--info-800) / <alpha-value>)",
-          900: "rgb(var(--info-900) / <alpha-value>)",
-          950: "rgb(var(--info-950) / <alpha-value>)",
-        },
         // Standard gray palette for compatibility
         gray: {
           50: "#f9fafb",
@@ -259,27 +107,150 @@ const config: Config = {
           900: "#111827",
           950: "#030712",
         },
-        // Shadcn/ui compatibility colors
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+
+        // ── Semantic surface layers ───────────────────────────────────────────
+        // bg-base, bg-layer-1, bg-layer-2, bg-layer-3
+        // from-layer-1, to-layer-2, ring-offset-layer-1, etc.
+        base:      "var(--bg)",
+        "layer-1": "var(--layer-1)",
+        "layer-2": "var(--layer-2)",
+        "layer-3": "var(--layer-3)",
+
+        // ── Brand: primary (orange) ───────────────────────────────────────────
+        // bg-primary, bg-primary-hover, bg-primary-active, bg-primary-soft, bg-primary-on
+        // text-primary, text-primary-hover, border-primary, etc.
+        primary: {
+          DEFAULT: "var(--primary)",
+          hover:   "var(--primary-hover)",
+          active:  "var(--primary-active)",
+          soft:    "var(--primary-soft)",
+          on:      "var(--on-primary)",
+        },
+
+        // ── Brand: secondary (cyan) ───────────────────────────────────────────
+        secondary: {
+          DEFAULT: "var(--secondary)",
+          hover:   "var(--secondary-hover)",
+          active:  "var(--secondary-active)",
+          soft:    "var(--secondary-soft)",
+          on:      "var(--on-secondary)",
+        },
+
+        // ── Semantic status ───────────────────────────────────────────────────
+        success: {
+          DEFAULT: "var(--success)",
+          hover:   "var(--success-hover)",
+          soft:    "var(--success-soft)",
+          border:  "var(--success-border)",
+          on:      "var(--on-success)",
+        },
+        warning: {
+          DEFAULT: "var(--warning)",
+          hover:   "var(--warning-hover)",
+          soft:    "var(--warning-soft)",
+          border:  "var(--warning-border)",
+          on:      "var(--on-warning)",
+        },
+        danger: {
+          DEFAULT: "var(--danger)",
+          hover:   "var(--danger-hover)",
+          soft:    "var(--danger-soft)",
+          border:  "var(--danger-border)",
+          on:      "var(--on-danger)",
+        },
+        info: {
+          DEFAULT: "var(--info)",
+          hover:   "var(--info-hover)",
+          soft:    "var(--info-soft)",
+          border:  "var(--info-border)",
+          on:      "var(--on-info)",
+        },
+
+        // ── Typography ────────────────────────────────────────────────────────
+        // text-ink, text-ink-muted, text-ink-dim
+        ink: {
+          DEFAULT: "var(--text)",
+          muted:   "var(--text-muted)",
+          dim:     "var(--text-dim)",
+        },
+
+        // ── Borders ───────────────────────────────────────────────────────────
+        // border-edge, border-edge-strong, border-edge-divider
+        edge: {
+          DEFAULT: "var(--border)",
+          strong:  "var(--border-strong)",
+          divider: "var(--divider)",
+        },
+
+        // ── Chart palette ─────────────────────────────────────────────────────
+        // bg-chart-1 … bg-chart-8
+        chart: {
+          1: "var(--chart-1)",
+          2: "var(--chart-2)",
+          3: "var(--chart-3)",
+          4: "var(--chart-4)",
+          5: "var(--chart-5)",
+          6: "var(--chart-6)",
+          7: "var(--chart-7)",
+          8: "var(--chart-8)",
+        },
+
+        // ── Interaction tokens ────────────────────────────────────────────────
+        "row-hover":    "var(--row-hover)",
+        "row-selected": "var(--row-selected)",
+        skeleton:       "var(--skeleton)",
+        scrim:          "var(--scrim)",
+        backdrop:       "var(--backdrop)",
+        "image-overlay": "var(--image-overlay)",
+        glass: {
+          DEFAULT: "var(--glass)",
+          border:  "var(--glass-border)",
+        },
+
+        // ── Badge state colors ────────────────────────────────────────────────
+        // bg-badge-live, bg-badge-draft, etc.
+        badge: {
+          live:       "var(--badge-live)",
+          draft:      "var(--badge-draft)",
+          archived:   "var(--badge-archived)",
+          processing: "var(--badge-processing)",
+          paused:     "var(--badge-paused)",
+        },
+
+        // ── Code blocks ───────────────────────────────────────────────────────
+        // bg-code, border-code-border, text-syntax-keyword, etc.
+        code: {
+          DEFAULT: "var(--code-bg)",
+          border:  "var(--code-border)",
+        },
+        syntax: {
+          keyword: "var(--syntax-keyword)",
+          string:  "var(--syntax-string)",
+          number:  "var(--syntax-number)",
+          comment: "var(--syntax-comment)",
+        },
+
+        // ── Shadcn/ui compatibility — namespaced to avoid collision ───────────
+        border: "hsl(var(--ui-border))",
+        input: "hsl(var(--ui-input))",
+        ring: "hsl(var(--ui-ring))",
+        background: "hsl(var(--ui-background))",
+        foreground: "hsl(var(--ui-foreground))",
         destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
+          DEFAULT: "hsl(var(--ui-destructive))",
+          foreground: "hsl(var(--ui-destructive-foreground))",
         },
         muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
+          DEFAULT: "hsl(var(--ui-muted))",
+          foreground: "hsl(var(--ui-muted-foreground))",
         },
         popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
+          DEFAULT: "hsl(var(--ui-popover))",
+          foreground: "hsl(var(--ui-popover-foreground))",
         },
         card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
+          DEFAULT: "hsl(var(--ui-card))",
+          foreground: "hsl(var(--ui-card-foreground))",
         },
       },
       keyframes: {
@@ -322,8 +293,8 @@ const config: Config = {
           "50%": { opacity: "0.5" },
         },
         "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 5px rgba(249, 115, 22, 0.3)" },
-          "50%": { boxShadow: "0 0 20px rgba(249, 115, 22, 0.6)" },
+          "0%, 100%": { boxShadow: "0 0 5px var(--primary-soft, rgba(249,115,22,0.3))" },
+          "50%": { boxShadow: "0 0 20px var(--primary-soft, rgba(249,115,22,0.6))" },
         },
         "k-shimmer": {
           from: { backgroundPosition: "200% 0" },

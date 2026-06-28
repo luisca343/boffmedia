@@ -88,7 +88,7 @@ export function TeamPanel({ label, slots, editable = false, search, onSlotChange
 
   return (
     <div className="flex flex-col gap-3 min-w-0">
-      <span className="text-xs font-semibold text-surface-400 uppercase tracking-wide">{label}</span>
+      <span className="text-xs font-semibold text-ink-muted uppercase tracking-wide">{label}</span>
 
       {/* ── Team pool (3 × 2 grid) ─────────────────────────────────────── */}
       <div className="grid grid-cols-3 gap-2">
@@ -164,14 +164,14 @@ function PoolCard({
   if (!slot.speciesId) {
     if (editable && search) {
       return (
-        <div className="h-[76px] rounded-lg border border-dashed border-surface-600 flex items-center justify-center p-2 overflow-visible">
+        <div className="h-[76px] rounded-lg border border-dashed border-edge flex items-center justify-center p-2 overflow-visible">
           <PokemonAutocomplete ref={autocompleteRef} search={search} onSelect={onFill} placeholder={t('placeholders.typeName')} onTabNext={onTabNext} />
         </div>
       );
     }
     return (
-      <div className="h-[76px] rounded-lg border border-dashed border-surface-700 flex items-center justify-center">
-        <span className="text-surface-600 text-xl select-none">?</span>
+      <div className="h-[76px] rounded-lg border border-dashed border-edge flex items-center justify-center">
+        <span className="text-ink-dim text-xl select-none">?</span>
       </div>
     );
   }
@@ -186,10 +186,10 @@ function PoolCard({
         className={[
           'w-full h-full rounded-lg flex flex-col items-center justify-center gap-0.5 transition-all',
           isAssigned
-            ? 'opacity-35 cursor-default bg-surface-800 ring-1 ring-surface-700'
+            ? 'opacity-35 cursor-default bg-layer-2 ring-1 ring-edge'
             : canAssign
-            ? 'cursor-pointer bg-surface-800 ring-1 ring-surface-700 hover:ring-2 hover:ring-primary-400/60 hover:bg-surface-750 hover:opacity-90'
-            : 'opacity-50 cursor-not-allowed bg-surface-800 ring-1 ring-surface-700',
+            ? 'cursor-pointer bg-layer-2 ring-1 ring-edge hover:ring-2 hover:ring-primary/60 hover:bg-layer-2 hover:opacity-90'
+            : 'opacity-50 cursor-not-allowed bg-layer-2 ring-1 ring-edge',
         ].join(' ')}
         title={
           isAssigned
@@ -205,7 +205,7 @@ function PoolCard({
           className="w-10 h-10 object-contain pointer-events-none"
           onError={handleSpriteError}
         />
-        <span className="text-xs text-surface-300 truncate max-w-full px-1 leading-none">
+        <span className="text-xs text-ink truncate max-w-full px-1 leading-none">
           {slot.speciesName}
         </span>
       </button>
@@ -232,7 +232,7 @@ function PoolCard({
             e.stopPropagation();
             onClear();
           }}
-          className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-surface-600 hover:bg-red-500 text-surface-200 hover:text-white flex items-center justify-center text-[10px] font-bold leading-none transition-colors"
+          className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-layer-3 hover:bg-red-500 text-ink hover:text-white flex items-center justify-center text-[10px] font-bold leading-none transition-colors"
           title={t('tooltips.removeFromTeam')}
         >
           ×
@@ -280,7 +280,7 @@ function AssignmentZone({
         <span className={`text-[10px] font-semibold uppercase tracking-wide ${cfg.badge}`}>
           {t(cfg.labelKey)}
         </span>
-        <span className={`text-[10px] font-mono ${isFull ? cfg.counter : 'text-surface-600'}`}>
+        <span className={`text-[10px] font-mono ${isFull ? cfg.counter : 'text-ink-dim'}`}>
           {filled.filter(Boolean).length}/2
         </span>
       </div>
@@ -291,7 +291,7 @@ function AssignmentZone({
           return slot ? (
             <div
               key={slot.slotIndex}
-              className={`flex-1 relative rounded-lg bg-surface-800 ring-2 ${cfg.ring} flex flex-col items-center justify-center gap-0.5 py-1 min-h-[56px]`}
+              className={`flex-1 relative rounded-lg bg-layer-2 ring-2 ${cfg.ring} flex flex-col items-center justify-center gap-0.5 py-1 min-h-[56px]`}
             >
               <img
                 src={spriteUrl(slot.speciesName!)}
@@ -299,13 +299,13 @@ function AssignmentZone({
                 className="w-8 h-8 object-contain"
                 onError={handleSpriteError}
               />
-              <span className="text-[9px] text-surface-400 truncate max-w-full px-1 leading-none">
+              <span className="text-[9px] text-ink-muted truncate max-w-full px-1 leading-none">
                 {slot.speciesName}
               </span>
               <button
                 tabIndex={-1}
                 onClick={() => onRemove(slot.slotIndex)}
-                className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-surface-700 hover:bg-red-500 text-surface-300 hover:text-white flex items-center justify-center transition-colors"
+                className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-layer-3 hover:bg-red-500 text-ink hover:text-white flex items-center justify-center transition-colors"
                 title={t('tooltips.removeFromSlot')}
               >
                 <X size={11} />
@@ -316,7 +316,7 @@ function AssignmentZone({
               key={`empty-${i}`}
               className={`flex-1 rounded-lg border border-dashed ${cfg.emptyBorder} flex items-center justify-center min-h-[56px]`}
             >
-              <span className="text-surface-700 text-[10px]">—</span>
+              <span className="text-ink-dim text-[10px]">—</span>
             </div>
           );
         })}

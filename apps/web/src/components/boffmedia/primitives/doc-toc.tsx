@@ -47,10 +47,10 @@ export function DocTOC({ items, label = "En esta página" }: DocTOCProps) {
 
   return (
     <aside className="sticky top-24 max-[1000px]:relative max-[1000px]:top-0">
-      <span className="font-mono text-[length:var(--t-xs)] tracking-[0.14em] uppercase text-[color:var(--text-dim)] block mb-4">
+      <span className="font-mono text-[length:var(--t-xs)] tracking-[0.14em] uppercase text-ink-dim block mb-4">
         {label}
       </span>
-      <nav className="flex flex-col gap-[0.15rem] border-l-2 border-[var(--border)] max-[1000px]:flex-row max-[1000px]:flex-wrap max-[1000px]:border-l-0 max-[1000px]:gap-[0.4rem]">
+      <nav className="flex flex-col gap-[0.15rem] border-l-2 border-edge max-[1000px]:flex-row max-[1000px]:flex-wrap max-[1000px]:border-l-0 max-[1000px]:gap-[0.4rem]">
         {items.map((s, i) => (
           <a
             key={s.id}
@@ -62,10 +62,10 @@ export function DocTOC({ items, label = "En esta página" }: DocTOCProps) {
               "max-[1000px]:border-l-0 max-[1000px]:ml-0 max-[1000px]:border max-[1000px]:rounded-[var(--radius-pill)]",
               active === s.id
                 ? "text-[color:var(--orange-500)] font-semibold border-l-[color:var(--orange-500)] max-[1000px]:border-[color:var(--orange-500)]"
-                : "text-[color:var(--text-muted)] hover:text-[var(--text)] max-[1000px]:border-[var(--border)]",
+                : "text-ink-muted hover:text-ink max-[1000px]:border-edge",
             )}
           >
-            <span className="font-mono text-[length:var(--t-xs)] text-[color:var(--text-dim)]">
+            <span className="font-mono text-[length:var(--t-xs)] text-ink-dim">
               {String(i + 1).padStart(2, "0")}
             </span>
             {s.title}

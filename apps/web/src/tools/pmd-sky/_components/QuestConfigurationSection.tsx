@@ -30,7 +30,7 @@ export function QuestConfigurationSection({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <FormField
           label={t("QUEST_TYPE")}
-          icon={<DocumentTextIcon className="w-4 h-4 text-secondary-400" />}
+          icon={<DocumentTextIcon className="w-4 h-4 text-secondary-hover" />}
           required
           variant="gaming"
         >
@@ -44,7 +44,7 @@ export function QuestConfigurationSection({
 
         <FormField
           label={t("QUEST_SUBTYPE")}
-          icon={<SparklesIcon className="w-4 h-4 text-accent-400" />}
+          icon={<SparklesIcon className="w-4 h-4 text-secondary-hover" />}
           disabled={!isClientForced}
           variant="gaming"
         >

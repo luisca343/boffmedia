@@ -114,10 +114,10 @@ export function BuildDisplay({
     return [
       { key: 'weapon' as EquipmentType, name: t("weapon"), icon: WeaponIconComponent, component: currentBuild.weapon, iconColor: "text-red-400", hasCustomIcon: !!currentBuild.weapon },
       { key: 'secondaryWeapon' as EquipmentType, name: t("secondary_weapon", { defaultValue: "Arma secundaria" }), icon: SecondaryWeaponIconComponent, component: currentBuild.secondaryWeapon, iconColor: "text-orange-400", hasCustomIcon: !!currentBuild.secondaryWeapon },
-      { key: 'head' as EquipmentType, name: t("head"), icon: HelmetIconComponent, component: currentBuild.head, iconColor: "text-secondary-400", hasCustomIcon: !!currentBuild.head },
-      { key: 'chest' as EquipmentType, name: t("chest"), icon: ChestIconComponent, component: currentBuild.chest, iconColor: "text-highlight-400", hasCustomIcon: !!currentBuild.chest },
+      { key: 'head' as EquipmentType, name: t("head"), icon: HelmetIconComponent, component: currentBuild.head, iconColor: "text-secondary-hover", hasCustomIcon: !!currentBuild.head },
+      { key: 'chest' as EquipmentType, name: t("chest"), icon: ChestIconComponent, component: currentBuild.chest, iconColor: "text-warning-hover", hasCustomIcon: !!currentBuild.chest },
       { key: 'arms' as EquipmentType, name: t("arms"), icon: GauntletsIconComponent, component: currentBuild.arms, iconColor: "text-yellow-400", hasCustomIcon: !!currentBuild.arms },
-      { key: 'waist' as EquipmentType, name: t("waist"), icon: WaistIconComponent, component: currentBuild.waist, iconColor: "text-accent-400", hasCustomIcon: !!currentBuild.waist },
+      { key: 'waist' as EquipmentType, name: t("waist"), icon: WaistIconComponent, component: currentBuild.waist, iconColor: "text-secondary-hover", hasCustomIcon: !!currentBuild.waist },
       { key: 'legs' as EquipmentType, name: t("legs"), icon: GreavesIconComponent, component: currentBuild.legs, iconColor: "text-cyan-400", hasCustomIcon: !!currentBuild.legs },
       { key: 'charm' as EquipmentType, name: t("charm"), icon: CharmIconComponent, component: currentBuild.charm, iconColor: "text-amber-400", hasCustomIcon: !!currentBuild.charm },
     ];
@@ -154,11 +154,11 @@ export function BuildDisplay({
                 ? `Decoration slot size ${decoration.slot}: ${decoration.name}`
                 : `Empty decoration slot size ${slotSize}`}
             >
-              <span className="flex h-full items-center justify-center px-2 text-xs font-medium text-surface-300"
+              <span className="flex h-full items-center justify-center px-2 text-xs font-medium text-ink"
                 style={{ background: "rgba(15,23,42,0.6)", borderRight: "1px solid rgba(71,85,105,0.3)" }}>
                 {decoration ? decoration.slot : slotSize}
               </span>
-              <span className="mr-2 text-xs truncate text-surface-300">
+              <span className="mr-2 text-xs truncate text-ink">
                 {decoration ? decoration.name : t("empty_slot", { defaultValue: "Vacío" })}
               </span>
             </motion.div>
@@ -176,7 +176,7 @@ export function BuildDisplay({
           <Button
             variant="ghost"
             size="sm"
-            className="text-xs flex items-center gap-1 text-surface-400 hover:text-primary-400"
+            className="text-xs flex items-center gap-1 text-ink-muted hover:text-primary-hover"
             onClick={onSwapWeapons}
             title={t("build_planner.swap_weapons", { defaultValue: "Intercambiar armas" })}
           >

@@ -40,7 +40,7 @@ const ACHIEVEMENTS = [
 
 const ACTIVITY = [
   { icon: "trophy", text: "Quedó 2º en VGC Regional — Series 2", time: "hace 2 días", color: "var(--orange-500)" },
-  { icon: "calc", text: "Guardó 3 sets en la Calculadora de Daño", time: "hace 4 días", color: "var(--accent-bright)" },
+  { icon: "calc", text: "Guardó 3 sets en la Calculadora de Daño", time: "hace 4 días", color: "var(--secondary-hover)" },
   { icon: "users", text: "Se unió al equipo «Rotom Squad»", time: "hace 1 semana", color: "var(--purple-400)" },
 ]
 
@@ -114,7 +114,7 @@ export default function UserProfile() {
               </span>
               <div>
                 <h2 className="text-[length:var(--t-xl)] mb-1">Acceso Requerido</h2>
-                <p className="text-[length:var(--t-sm)] text-[var(--text-muted)]">
+                <p className="text-[length:var(--t-sm)] text-ink-muted">
                   Inicia sesión para ver tu perfil.
                 </p>
               </div>
@@ -155,7 +155,7 @@ export default function UserProfile() {
             <div
               className="h-[104px]"
               style={{
-                background: "color-mix(in srgb, var(--orange-500) 14%, var(--surface-2))",
+                background: "color-mix(in srgb, var(--orange-500) 14%, var(--layer-2))",
                 borderBottom: "var(--hairline) solid var(--border)",
                 backgroundImage: "radial-gradient(var(--grid-dot) 1px, transparent 1px)",
                 backgroundSize: "22px 22px",
@@ -173,7 +173,7 @@ export default function UserProfile() {
                     boxShadow: "0 10px 30px -10px var(--orange-500)",
                   }}
                 >
-                  <div className="p-0.5 rounded-full" style={{ background: "var(--surface)" }}>
+                  <div className="p-0.5 rounded-full" style={{ background: "var(--layer-1)" }}>
                     <Avatar className="w-[106px] h-[106px]">
                       <AvatarImage
                         src={editedUser.image || user?.image || "/placeholder.svg?height=110&width=110"}
@@ -182,7 +182,7 @@ export default function UserProfile() {
                       />
                       <AvatarFallback
                         className="text-3xl font-black"
-                        style={{ background: "color-mix(in srgb, var(--orange-500) 15%, var(--surface-2))", color: "var(--orange-500)" }}
+                        style={{ background: "color-mix(in srgb, var(--orange-500) 15%, var(--layer-2))", color: "var(--orange-500)" }}
                       >
                         {initial}
                       </AvatarFallback>
@@ -210,7 +210,7 @@ export default function UserProfile() {
                   className="absolute bottom-[2px] right-[2px] w-[30px] h-[30px] rounded-full grid place-items-center cursor-pointer z-10 transition-colors duration-[var(--dur)]"
                   style={{
                     color: "var(--text)",
-                    background: "var(--surface)",
+                    background: "var(--layer-1)",
                     border: "var(--hairline) solid var(--border-strong)",
                   }}
                   onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "var(--orange-500)"; (e.currentTarget as HTMLElement).style.borderColor = "var(--orange-500)" }}
@@ -244,7 +244,7 @@ export default function UserProfile() {
                     {socket ? "Online" : "Offline"}
                   </Badge>
                 </div>
-                <p className="text-[var(--text-muted)] text-[length:var(--t-sm)] mt-[0.35rem] mb-[0.75rem]">
+                <p className="text-ink-muted text-[length:var(--t-sm)] mt-[0.35rem] mb-[0.75rem]">
                   @{editedUser.email?.split("@")[0] || "usuario"} · Miembro desde 2023
                 </p>
                 <div className="flex gap-2 flex-wrap">
@@ -294,13 +294,13 @@ export default function UserProfile() {
                   <Field label="Biografía" icon="message" className="col-span-full">
                     <textarea
                       className={cn(
-                        "w-full font-body text-sm text-[var(--text)]",
-                        "bg-[var(--surface-2)] border border-solid border-[var(--border-strong)]",
+                        "w-full font-body text-sm text-ink",
+                        "bg-layer-2 border border-solid border-edge-strong",
                         "rounded-[var(--btn-radius,9999px)]",
                         "py-2.5 px-3.5",
                         "transition-[border-color,box-shadow] duration-[var(--dur,0.32s)] ease-[var(--ease)]",
-                        "placeholder:text-[var(--text-dim)]",
-                        "focus:outline-none focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-soft)]",
+                        "placeholder:text-ink-dim",
+                        "focus:outline-none focus:border-secondary focus:shadow-[0_0_0_3px_var(--secondary-soft)]",
                         "disabled:opacity-55 disabled:cursor-not-allowed",
                         "resize-y leading-[1.6]",
                       )}
@@ -394,7 +394,7 @@ export default function UserProfile() {
                   icon="star"
                   right={
                     <span
-                      className="text-[var(--text-dim)]"
+                      className="text-ink-dim"
                       style={{ fontFamily: "var(--font-mono)", fontSize: "var(--t-xs)" }}
                     >
                       37 / 60

@@ -41,7 +41,7 @@ function ReplayLoader({ onReplayLoad }: { onReplayLoad: (data: ReplayData) => vo
 
   return (
     <div className="flex flex-col items-center justify-center p-6 rounded-lg max-w-3xl mx-auto mt-10"
-      style={{ background: 'var(--surface-2)' }}>
+      style={{ background: 'var(--layer-2)' }}>
       <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--text)' }}>Load Pokémon Showdown Replay</h2>
       <div className="w-full mb-4">
         <textarea
@@ -49,7 +49,7 @@ function ReplayLoader({ onReplayLoad }: { onReplayLoad: (data: ReplayData) => vo
           onChange={(e) => setReplayText(e.target.value)}
           placeholder="Paste the entire replay text here"
           className="w-full h-64 p-3 rounded font-mono text-sm"
-          style={{ background: 'var(--surface)', color: 'var(--text)', border: '1px solid var(--border)' }}
+          style={{ background: 'var(--layer-1)', color: 'var(--text)', border: '1px solid var(--border)' }}
         />
       </div>
       {error && (
@@ -60,7 +60,7 @@ function ReplayLoader({ onReplayLoad }: { onReplayLoad: (data: ReplayData) => vo
       <button
         onClick={handleLoadReplay}
         className="w-full p-2 rounded font-medium"
-        style={{ background: 'var(--accent)', color: 'var(--text)', border: '1px solid var(--border)' }}
+        style={{ background: 'var(--secondary)', color: 'var(--text)', border: '1px solid var(--border)' }}
       >
         Load Replay
       </button>
@@ -208,7 +208,7 @@ export function Game({battleName = 'medalla_doku', replayData}: {battleName?: st
                 onClick={handleSaveReplay}
                 disabled={savingReplay}
                 className="bsx-focus px-4 py-1.5 rounded-[var(--radius-sm)] text-sm font-medium disabled:opacity-50"
-                style={{ background: 'var(--surface-2)', color: 'var(--text)', border: '1px solid var(--border)' }}
+                style={{ background: 'var(--layer-2)', color: 'var(--text)', border: '1px solid var(--border)' }}
               >
                 💾 {savingReplay ? t('end.savingReplay') : t('end.saveReplay')}
               </button>
@@ -242,7 +242,7 @@ export function Game({battleName = 'medalla_doku', replayData}: {battleName?: st
     {env.NODE_ENV === 'development' && (
       <div className="mt-4 px-4 pb-4" style={{ color: 'var(--text-dim)' }}>
         <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--text)' }}>Debug Information</h3>
-        <div className="p-4 rounded space-y-1 text-sm" style={{ background: 'var(--surface-2)' }}>
+        <div className="p-4 rounded space-y-1 text-sm" style={{ background: 'var(--layer-2)' }}>
           <div>Current Action: {currentAction}</div>
           <div>Current Turn: {battle.turn}</div>
           <div>Playing: {isPlaying ? 'Yes' : 'No'}</div>

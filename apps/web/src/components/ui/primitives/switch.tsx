@@ -17,11 +17,11 @@ const Switch = React.forwardRef<
 >(({ className, variant = "default", ...props }, ref) => {
   const variantStyles = {
     default: {
-      root: "focus-visible:ring-primary-400 focus-visible:ring-offset-surface-900 data-[state=checked]:bg-primary-500 data-[state=unchecked]:bg-surface-700 data-[state=checked]:[box-shadow:0_0_12px_-2px_rgb(var(--primary-500)/0.55)]",
+      root: "focus-visible:ring-primary focus-visible:ring-offset-layer-1 data-[state=checked]:bg-primary data-[state=unchecked]:bg-layer-3 data-[state=checked]:[box-shadow:0_0_12px_-2px_rgb(var(--primary-500)/0.55)]",
       thumb: "bg-white shadow-md"
     },
     wingull: {
-      root: "focus-visible:ring-secondary-300 focus-visible:ring-offset-secondary-950 data-[state=checked]:bg-secondary-400 data-[state=unchecked]:bg-secondary-700",
+      root: "focus-visible:ring-secondary focus-visible:ring-offset-secondary-soft data-[state=checked]:bg-secondary-hover data-[state=unchecked]:bg-secondary-active",
       thumb: "bg-white shadow-md"
     }
   }

@@ -38,22 +38,22 @@ export function BestPackDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-surface-800 border border-surface-600/50 text-white max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="bg-layer-2 border border-edge/50 text-white max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader className="space-y-3">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-surface-700/50 border border-surface-600/50">
-              <TrophyIcon className="w-5 h-5 text-primary-400" />
+            <div className="p-2 rounded-lg bg-layer-3/50 border border-edge/50">
+              <TrophyIcon className="w-5 h-5 text-primary-hover" />
             </div>
-            <DialogTitle className="text-xl font-semibold text-surface-50">
+            <DialogTitle className="text-xl font-semibold text-ink">
               {t('bestPack.dialogTitle')}
             </DialogTitle>
           </div>
           
-          <div className="bg-surface-700/30 border border-surface-600/30 rounded-lg p-4">
-            <DialogDescription className="text-surface-300 space-y-2">
+          <div className="bg-layer-3/30 border border-edge/30 rounded-lg p-4">
+            <DialogDescription className="text-ink space-y-2">
               {type === "general" ? (
                 bestPackData && (
-                  <p className="text-primary-300 font-medium">
+                  <p className="text-primary-hover font-medium">
                     {t('bestPack.bestPackGeneral', {
                       packName: t(`packs.${bestPackData?.bestPack?.name?.toLowerCase()}`)
                     })}
@@ -62,13 +62,13 @@ export function BestPackDialog({
               ) : (
                 eventPackData && (
                   <div className="space-y-3">
-                    <p className="text-primary-300 font-medium">
+                    <p className="text-primary-hover font-medium">
                       {t('bestPack.bestPackEvent', {
                         eventName: t(eventName),
                         packName: t(`packs.${eventPackData?.bestPack?.name?.toLowerCase()}`)
                       })}
                     </p>
-                    <p className="text-surface-400">
+                    <p className="text-ink-muted">
                       {t('bestPack.missingCardsCount', {
                         missing: eventPackData?.missingEventCards?.length,
                         total: eventPackData?.totalEventCards
@@ -77,7 +77,7 @@ export function BestPackDialog({
                     
                     {eventPackData?.missingEventCards?.length > 0 && (
                       <div>
-                        <p className="text-sm text-surface-400 mb-2">{t('bestPack.missingCardsList')}</p>
+                        <p className="text-sm text-ink-muted mb-2">{t('bestPack.missingCardsList')}</p>
                         <div className="flex flex-wrap gap-2">
                           {eventPackData?.missingEventCards?.map((pokemon: string, index: number) => {
                             const packs = getPokemonPacks(pokemon);
@@ -89,24 +89,24 @@ export function BestPackDialog({
                                       inline-block px-2 py-1 text-xs font-medium rounded-full cursor-help transition-colors
                                       ${packs.length > 1 
                                         ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20 hover:bg-amber-500/20' 
-                                        : 'bg-primary-500/10 text-primary-400 border border-primary-500/20 hover:bg-primary-500/20'
+                                        : 'bg-primary/10 text-primary-hover border border-primary/20 hover:bg-primary/20'
                                       }
                                     `}>
                                       {pokemon}
                                     </span>
                                   </TooltipTrigger>
-                                  <TooltipContent className="bg-surface-700 border-surface-600">
+                                  <TooltipContent className="bg-layer-3 border-edge">
                                     {packs.length > 1 ? (
                                       <div>
-                                        <p className="font-bold mb-1 text-surface-50">{t('bestPack.availableIn')}</p>
+                                        <p className="font-bold mb-1 text-ink">{t('bestPack.availableIn')}</p>
                                         <ul className="list-disc pl-4 space-y-1">
                                           {packs.map((pack, i) => (
-                                            <li key={i} className="text-surface-300">{pack}</li>
+                                            <li key={i} className="text-ink">{pack}</li>
                                           ))}
                                         </ul>
                                       </div>
                                     ) : (
-                                      <p className="text-surface-300">{packs[0]}</p>
+                                      <p className="text-ink">{packs[0]}</p>
                                     )}
                                   </TooltipContent>
                                 </Tooltip>

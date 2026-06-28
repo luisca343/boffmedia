@@ -32,7 +32,7 @@ export default function EditNote({ params }: { params: { id: string } }) {
             <h2 className="text-pop-4xl font-bold mb-6 text-pink-500 pop-shadow">
               ¡CARGANDO!
             </h2>
-            <p className="text-pop-xl font-comic text-secondary-600">
+            <p className="text-pop-xl font-comic text-secondary-active">
               Verificando permisos... 🔐
             </p>
           </div>
@@ -84,9 +84,9 @@ export default function EditNote({ params }: { params: { id: string } }) {
               ¡CARGANDO!
             </h2>
             <div className="flex justify-center mb-4">
-              <Loader2 className="h-16 w-16 animate-spin text-secondary-500" />
+              <Loader2 className="h-16 w-16 animate-spin text-secondary" />
             </div>
-            <p className="text-pop-xl font-comic text-secondary-600">
+            <p className="text-pop-xl font-comic text-secondary-active">
               Furret está preparando el editor... 📝
             </p>
           </div>
@@ -166,12 +166,12 @@ export default function EditNote({ params }: { params: { id: string } }) {
           <FurretHeader />
           
           {/* Navigation breadcrumbs */}
-          <div className="bg-secondary-100 p-6 flex flex-wrap items-center font-comic border-b-4 border-black">
-            <InternalLink href="furrettoday" className="text-secondary-500 hover:underline text-pop-lg pop-focus">
+          <div className="bg-secondary-soft p-6 flex flex-wrap items-center font-comic border-b-4 border-black">
+            <InternalLink href="furrettoday" className="text-secondary hover:underline text-pop-lg pop-focus">
               🏠 Inicio
             </InternalLink>
             <span className="mx-3 text-pop-lg font-bold"> ⚡ </span>
-            <InternalLink href="furrettoday/editar" className="text-secondary-500 hover:underline text-pop-lg pop-focus">
+            <InternalLink href="furrettoday/editar" className="text-secondary hover:underline text-pop-lg pop-focus">
               📝 Editor
             </InternalLink>
             <span className="mx-3 text-pop-lg font-bold"> ⚡ </span>
@@ -180,7 +180,7 @@ export default function EditNote({ params }: { params: { id: string } }) {
           
           {/* Editor area */}
           <div className="flex-grow p-6">
-            <div className="h-[70vh] border-8 border-dotted border-secondary-200 rounded-3xl bg-white relative overflow-hidden">
+            <div className="h-[70vh] border-8 border-dotted border-secondary rounded-3xl bg-white relative overflow-hidden">
               {/* Comic-style corner decoration */}
               <div className="absolute -top-2 -right-2 w-12 h-12 bg-yellow-300 border-3 border-black rounded-full flex items-center justify-center transform rotate-12 z-10">
                 <span className="text-black font-bold text-pop-lg">✨</span>
@@ -200,7 +200,7 @@ export default function EditNote({ params }: { params: { id: string } }) {
           <div className="h-12 bg-yellow-300 border-t-4 border-black relative overflow-hidden">
             <div className="absolute inset-0 ben-day-dots"></div>
             <div className="relative z-10 flex justify-center items-center h-full">
-              <span className="text-secondary-600 font-bold text-pop-base pop-shadow">📝 EDITOR INDIVIDUAL FURRET TODAY 📝</span>
+              <span className="text-secondary-active font-bold text-pop-base pop-shadow">📝 EDITOR INDIVIDUAL FURRET TODAY 📝</span>
             </div>
           </div>
           

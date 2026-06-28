@@ -27,7 +27,7 @@ export function GameCard({ game, layout = "grid", showEvents = true }: GameCardP
 
   return (
     <Card className={cn(
-      "group bg-surface-800/60 backdrop-blur-sm border border-accent-500/20 overflow-hidden transition-all duration-300 hover:scale-105 hover:border-accent-400/40 hover:shadow-2xl hover:shadow-accent-500/20",
+      "group bg-layer-2/60 backdrop-blur-sm border border-secondary/20 overflow-hidden transition-all duration-300 hover:scale-105 hover:border-secondary/40 hover:shadow-2xl hover:shadow-secondary/20",
       isListLayout && "flex md:flex-row",
       !isActive && "opacity-60"
     )}>
@@ -36,7 +36,7 @@ export function GameCard({ game, layout = "grid", showEvents = true }: GameCardP
         isListLayout ? "w-full md:w-48 h-48 md:h-auto" : "h-48"
       )}>
         {/* Game Icon/Image */}
-        <div className="absolute inset-0 bg-gradient-to-br from-accent-600/20 to-secondary-600/20 flex items-center justify-center">
+        <div className="absolute inset-0 bg-gradient-to-br from-secondary-active/20 to-secondary-active/20 flex items-center justify-center">
           {game.icon ? (
             <img 
               src={game.icon} 
@@ -44,7 +44,7 @@ export function GameCard({ game, layout = "grid", showEvents = true }: GameCardP
               className="w-20 h-20 object-contain rounded-lg"
             />
           ) : (
-            <Gamepad2 className="w-20 h-20 text-accent-400" />
+            <Gamepad2 className="w-20 h-20 text-secondary-hover" />
           )}
         </div>
         
@@ -55,8 +55,8 @@ export function GameCard({ game, layout = "grid", showEvents = true }: GameCardP
             className={cn(
               "text-xs font-bold",
               isActive 
-                ? "bg-success-500/80 text-white border-success-400/50" 
-                : "bg-surface-600/80 text-surface-300 border-surface-500/50"
+                ? "bg-success/80 text-white border-success-border/50" 
+                : "bg-layer-3/80 text-ink border-edge/50"
             )}
           >
             {isActive ? 'Activo' : 'Inactivo'}
@@ -64,7 +64,7 @@ export function GameCard({ game, layout = "grid", showEvents = true }: GameCardP
         </div>
 
         {/* Overlay gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-surface-900/80 via-transparent to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-layer-1/80 via-transparent to-transparent"></div>
       </div>
 
       <div className={cn(
@@ -74,10 +74,10 @@ export function GameCard({ game, layout = "grid", showEvents = true }: GameCardP
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <CardTitle className="text-xl font-bold text-white mb-2 group-hover:text-accent-400 transition-colors">
+              <CardTitle className="text-xl font-bold text-white mb-2 group-hover:text-secondary-hover transition-colors">
                 {game.title}
               </CardTitle>
-              <CardDescription className="text-surface-300 line-clamp-2">
+              <CardDescription className="text-ink line-clamp-2">
                 {game.description}
               </CardDescription>
             </div>
@@ -87,7 +87,7 @@ export function GameCard({ game, layout = "grid", showEvents = true }: GameCardP
         <CardContent className="pt-0 flex-1 flex flex-col justify-between">
           <div className="space-y-3 mb-4">
             {/* Game Stats - These would come from related data */}
-            <div className="flex items-center gap-4 text-sm text-surface-400">
+            <div className="flex items-center gap-4 text-sm text-ink-muted">
               <div className="flex items-center gap-1">
                 <Calendar className="w-4 h-4" />
                 <span>Desde {formatDate(game.createdAt)}</span>

@@ -15,32 +15,32 @@ const useSelectVariant = () => React.useContext(SelectVariantContext)
 const getSelectStyles = (variant: SelectVariant = "default") => {
   return {
     trigger: {
-      default: "border-surface-700 bg-surface-800 text-primary-400 ring-offset-surface-900 focus:ring-primary-300 placeholder:text-surface-400",
-      wingull: "border-secondary-200 bg-secondary-50 text-secondary-800 hover:bg-secondary-100 focus:ring-secondary-400 ring-offset-white placeholder:text-secondary-400",
+      default: "border-edge bg-layer-2 text-primary-hover ring-offset-layer-1 focus:ring-primary placeholder:text-ink-muted",
+      wingull: "border-secondary bg-secondary-soft text-secondary-active hover:bg-secondary-soft focus:ring-secondary ring-offset-white placeholder:text-secondary-hover",
     }[variant],
     content: {
-      default: "border-surface-700 bg-surface-800 text-primary-400",
-      wingull: "border-secondary-200 bg-white text-secondary-800 shadow-lg",
+      default: "border-edge bg-layer-2 text-primary-hover",
+      wingull: "border-secondary bg-white text-secondary-active shadow-lg",
     }[variant],
     label: {
-      default: "text-surface-300",
-      wingull: "text-secondary-700 font-medium",
+      default: "text-ink",
+      wingull: "text-secondary-active font-medium",
     }[variant],
     item: {
-      default: "focus:bg-surface-700 text-primary-400 focus:text-primary-300 data-[highlighted]:bg-surface-700 data-[highlighted]:text-primary-300",
-      wingull: "focus:bg-secondary-100 hover:bg-secondary-50 text-secondary-800 focus:text-secondary-900 data-[highlighted]:bg-secondary-100 data-[highlighted]:text-secondary-900",
+      default: "focus:bg-layer-3 text-primary-hover focus:text-primary-hover data-[highlighted]:bg-layer-3 data-[highlighted]:text-primary-hover",
+      wingull: "focus:bg-secondary-soft hover:bg-secondary-soft text-secondary-active focus:text-secondary-active data-[highlighted]:bg-secondary-soft data-[highlighted]:text-secondary-active",
     }[variant],
     separator: {
-      default: "bg-surface-700",
-      wingull: "bg-secondary-100",
+      default: "bg-layer-3",
+      wingull: "bg-secondary-soft",
     }[variant],
     icon: {
-      default: "text-primary-400",
-      wingull: "text-secondary-600",
+      default: "text-primary-hover",
+      wingull: "text-secondary-active",
     }[variant],
     checkIcon: {
-      default: "text-primary-400",
-      wingull: "text-secondary-600",
+      default: "text-primary-hover",
+      wingull: "text-secondary-active",
     }[variant]
   }
 }

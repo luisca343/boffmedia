@@ -124,13 +124,13 @@ export function GameCard({ game, index }: GameCardProps) {
           {/* Header */}
           <div className="flex items-start gap-4 mb-5">
             <div
-              className={`w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 border ${game.border} bg-surface-950/60 flex items-center justify-center transition-transform duration-300`}
+              className={`w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 border ${game.border} bg-base/60 flex items-center justify-center transition-transform duration-300`}
               style={{ transform: isHovered ? "scale(1.08)" : "scale(1)" }}
             >
               {game.icon ? (
                 <Image src={game.icon} alt={game.title} width={48} height={48} className="object-contain" />
               ) : (
-                <Gamepad2 className="w-8 h-8 text-surface-500" />
+                <Gamepad2 className="w-8 h-8 text-ink-muted" />
               )}
             </div>
 
@@ -139,17 +139,17 @@ export function GameCard({ game, index }: GameCardProps) {
                 // {game.tag}
               </span>
               <h3
-                className={`text-xl font-black text-surface-50 leading-tight mt-0.5 transition-colors duration-300 ${isHovered ? game.accent : ""}`}
+                className={`text-xl font-black text-ink leading-tight mt-0.5 transition-colors duration-300 ${isHovered ? game.accent : ""}`}
                 style={{ fontFamily: "Orbitron, sans-serif" }}
               >
                 {game.title}
               </h3>
-              <p className="text-xs text-surface-500 mt-1">{game.description}</p>
+              <p className="text-xs text-ink-muted mt-1">{game.description}</p>
             </div>
           </div>
 
           {/* Divider */}
-          <div className="h-px bg-gradient-to-r from-transparent via-surface-700/50 to-transparent mb-4" />
+          <div className="h-px bg-gradient-to-r from-transparent via-layer-3/50 to-transparent mb-4" />
 
           {/* Tool list */}
           <div className="space-y-2 flex-1 mb-5">
@@ -157,10 +157,10 @@ export function GameCard({ game, index }: GameCardProps) {
               <div key={tool.name} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className={`w-1.5 h-1.5 rounded-full ${game.dotBg} opacity-70 flex-shrink-0`} />
-                  <span className="text-sm text-surface-300">{tool.name}</span>
+                  <span className="text-sm text-ink">{tool.name}</span>
                 </div>
                 <span
-                  className={`text-xs font-mono px-2 py-0.5 rounded border ${game.countBorder} bg-surface-950/50 ${game.countText}`}
+                  className={`text-xs font-mono px-2 py-0.5 rounded border ${game.countBorder} bg-base/50 ${game.countText}`}
                 >
                   {String(tool.count).padStart(2, "0")}
                 </span>
@@ -169,10 +169,10 @@ export function GameCard({ game, index }: GameCardProps) {
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between pt-4 border-t border-surface-800/50">
+          <div className="flex items-center justify-between pt-4 border-t border-edge-strong/50">
             <div className="flex items-center gap-1.5">
-              <Cpu className="w-3 h-3 text-surface-600" />
-              <span className="text-xs font-mono text-surface-600 tracking-widest">
+              <Cpu className="w-3 h-3 text-ink-dim" />
+              <span className="text-xs font-mono text-ink-dim tracking-widest">
                 {String(totalCount).padStart(2, "0")} TOOLS
               </span>
             </div>

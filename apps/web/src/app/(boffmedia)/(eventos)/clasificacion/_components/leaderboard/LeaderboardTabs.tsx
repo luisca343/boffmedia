@@ -25,22 +25,22 @@ export function LeaderboardTabs({
 }: LeaderboardTabsProps) {
   return (
     <Tabs defaultValue="general" className="space-y-6">
-      <TabsList className="bg-surface-800/60 backdrop-blur-sm border border-accent-500/20 p-1">
+      <TabsList className="bg-layer-2/60 backdrop-blur-sm border border-secondary/20 p-1">
         <TabsTrigger 
           value="general" 
-          className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-accent-600 data-[state=active]:to-indigo-600 data-[state=active]:text-white text-surface-300"
+          className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-secondary-active data-[state=active]:to-indigo-600 data-[state=active]:text-white text-ink"
         >
           Puntuación General
         </TabsTrigger>
         <TabsTrigger 
           value="medals" 
-          className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-accent-600 data-[state=active]:to-indigo-600 data-[state=active]:text-white text-surface-300"
+          className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-secondary-active data-[state=active]:to-indigo-600 data-[state=active]:text-white text-ink"
         >
           Medallas
         </TabsTrigger>
         <TabsTrigger 
           value="achievements" 
-          className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-accent-600 data-[state=active]:to-indigo-600 data-[state=active]:text-white text-surface-300"
+          className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-secondary-active data-[state=active]:to-indigo-600 data-[state=active]:text-white text-ink"
         >
           Logros
         </TabsTrigger>

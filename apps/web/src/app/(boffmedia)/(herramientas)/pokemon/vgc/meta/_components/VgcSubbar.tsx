@@ -35,17 +35,17 @@ export function VgcSubbar({
 
   if (tab === "stats") {
     return (
-      <div className="flex items-center gap-3 px-3 py-2 border-t border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--surface-2)_30%,transparent)]">
+      <div className="flex items-center gap-3 px-3 py-2 border-t border-b border-edge bg-[color-mix(in_srgb,var(--layer-2)_30%,transparent)]">
         <div className="flex items-center gap-2 min-w-0">
-          <span className="inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold px-2 py-[0.2rem] rounded-[var(--radius-pill)] border border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent-bright)]">
+          <span className="inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold px-2 py-[0.2rem] rounded-[var(--radius-pill)] border border-secondary bg-secondary-soft text-secondary-hover">
             <Icon name="shield" size={11} />
             {formatLabel}
           </span>
           {formatNote && (
-            <span className="text-[11px] text-[var(--text-dim)] truncate">{formatNote}</span>
+            <span className="text-[11px] text-ink-dim truncate">{formatNote}</span>
           )}
         </div>
-        <span className="flex items-center gap-1 ml-auto font-mono text-[10px] text-[var(--text-dim)] shrink-0">
+        <span className="flex items-center gap-1 ml-auto font-mono text-[10px] text-ink-dim shrink-0">
           <Icon name="info" size={11} />
           {cutoffLabel} · {month}
         </span>
@@ -54,7 +54,7 @@ export function VgcSubbar({
   }
 
   return (
-    <div className="flex items-center gap-2 px-3 py-1.5 text-xs text-[var(--text-muted)]">
+    <div className="flex items-center gap-2 px-3 py-1.5 text-xs text-ink-muted">
       <SegTabs
         value={view}
         size="sm"
@@ -65,7 +65,7 @@ export function VgcSubbar({
         ]}
         onChange={onViewChange}
       />
-      <span className="ml-auto font-mono text-[var(--text-dim)]">
+      <span className="ml-auto font-mono text-ink-dim">
         {curTourIsCombined
           ? `Combinado · ${combinedCount ?? 0} torneos`
           : curTourName

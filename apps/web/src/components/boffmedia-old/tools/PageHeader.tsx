@@ -19,27 +19,27 @@ interface ThemeConfig {
 
 const THEMES: Record<PageHeaderTheme, ThemeConfig> = {
   primary: {
-    breadcrumbClass: "text-primary-400",
-    dividerClass: "from-primary-500/60",
-    zapClass: "text-primary-400",
+    breadcrumbClass: "text-primary-hover",
+    dividerClass: "from-primary/60",
+    zapClass: "text-primary-hover",
     zapGlow: "rgba(249,115,22,0.5)",
     titleGradient: "linear-gradient(135deg, #fde68a 0%, #fb923c 40%, #f97316 70%, #ea580c 100%)",
     titleGlow: "rgba(249,115,22,0.3)",
     logoGlow: "rgba(249,115,22,0.2)",
   },
   accent: {
-    breadcrumbClass: "text-primary-400",
-    dividerClass: "from-accent-500/60",
-    zapClass: "text-accent-400",
+    breadcrumbClass: "text-primary-hover",
+    dividerClass: "from-secondary/60",
+    zapClass: "text-secondary-hover",
     zapGlow: "rgba(168,85,247,0.5)",
     titleGradient: "linear-gradient(135deg, #a78bfa 0%, #8b5cf6 40%, #7c3aed 100%)",
     titleGlow: "rgba(139,92,246,0.3)",
     logoGlow: "rgba(139,92,246,0.2)",
   },
   secondary: {
-    breadcrumbClass: "text-secondary-400",
-    dividerClass: "from-secondary-500/60",
-    zapClass: "text-secondary-400",
+    breadcrumbClass: "text-secondary-hover",
+    dividerClass: "from-secondary/60",
+    zapClass: "text-secondary-hover",
     zapGlow: "rgba(6,182,212,0.5)",
     titleGradient: "linear-gradient(135deg, #a5f3fc 0%, #22d3ee 40%, #06b6d4 70%, #0891b2 100%)",
     titleGlow: "rgba(6,182,212,0.3)",
@@ -86,10 +86,10 @@ export function PageHeader({
       <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-8">
         <div className="text-center lg:text-left flex-1">
           <div className="flex items-center justify-center lg:justify-start gap-1.5 mb-5">
-            <span className="text-xs font-mono text-surface-500 tracking-widest uppercase">
+            <span className="text-xs font-mono text-ink-muted tracking-widest uppercase">
               {sectionLabel}
             </span>
-            <ChevronRight className="w-3 h-3 text-surface-600" />
+            <ChevronRight className="w-3 h-3 text-ink-dim" />
             <span className={`text-xs font-mono ${cfg.breadcrumbClass} tracking-widest uppercase`}>
               {title.highlight}
             </span>
@@ -99,7 +99,7 @@ export function PageHeader({
             className="font-black tracking-tight leading-none mb-4"
             style={{ fontFamily: "Orbitron, sans-serif" }}
           >
-            <span className="block text-lg sm:text-xl text-surface-400 font-medium tracking-[0.25em] mb-2">
+            <span className="block text-lg sm:text-xl text-ink-muted font-medium tracking-[0.25em] mb-2">
               {title.prefix}
             </span>
             <span
@@ -124,7 +124,7 @@ export function PageHeader({
             />
           </div>
 
-          <p className="text-surface-400 max-w-2xl text-sm leading-relaxed tracking-wide">
+          <p className="text-ink-muted max-w-2xl text-sm leading-relaxed tracking-wide">
             {subtitle}
           </p>
         </div>

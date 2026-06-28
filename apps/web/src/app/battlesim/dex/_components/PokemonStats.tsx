@@ -22,8 +22,8 @@ export default function PokemonStats({ baseStats }: PokemonStatsProps) {
   return (
     <div>
       <div className="mb-4 flex justify-between items-center">
-        <h3 className="text-sm font-medium text-surface-300">Base Stats</h3>
-        <span className="text-xs text-surface-400">Total: {total}</span>
+        <h3 className="text-sm font-medium text-ink">Base Stats</h3>
+        <span className="text-xs text-ink-muted">Total: {total}</span>
       </div>
       
       <div className="space-y-3">
@@ -49,13 +49,13 @@ export default function PokemonStats({ baseStats }: PokemonStatsProps) {
           label="Sp. Atk" 
           value={baseStats.spa} 
           maxValue={maxStat} 
-          color="bg-secondary-500" 
+          color="bg-secondary" 
         />
         <StatBar 
           label="Sp. Def" 
           value={baseStats.spd} 
           maxValue={maxStat} 
-          color="bg-highlight-500" 
+          color="bg-warning" 
         />
         <StatBar 
           label="Speed" 

@@ -24,7 +24,7 @@ export const LoadingSpinner = ({
   return (
     <div className="flex flex-col items-center py-6">
       <Loader2 className={`${sizeClasses[size]} animate-spin ${colorClass}`} />
-      <p className="text-surface-300">{message}</p>
+      <p className="text-ink">{message}</p>
     </div>
   );
 };

@@ -35,7 +35,7 @@ function FilterPill({
       type="button"
       onClick={onClick}
       className={`px-2.5 py-1 rounded-md text-[11px] font-mono uppercase tracking-widest transition-all duration-150 ${
-        active ? "text-primary-300" : "text-surface-400 hover:text-surface-200"
+        active ? "text-primary-hover" : "text-ink-muted hover:text-ink"
       }`}
       style={
         active
@@ -53,7 +53,7 @@ function FilterPill({
 function ActiveBadge({
   label,
   onRemove,
-  colorClass = "text-surface-300",
+  colorClass = "text-ink",
 }: {
   label: string;
   onRemove: () => void;
@@ -99,12 +99,12 @@ export const EquipmentFilters = ({
   const getElementColor = (element: string) => {
     const map: Record<string, string> = {
       fire:    "text-red-400",
-      water:   "text-secondary-400",
+      water:   "text-secondary-hover",
       thunder: "text-yellow-400",
       ice:     "text-cyan-400",
-      dragon:  "text-accent-400",
+      dragon:  "text-secondary-hover",
     };
-    return map[element] || "text-surface-400";
+    return map[element] || "text-ink-muted";
   };
 
   const handleRankChange = (range: number[]) => {
@@ -132,12 +132,12 @@ export const EquipmentFilters = ({
       <div className="flex space-x-2">
         {/* Search */}
         <div className="relative flex-1">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-surface-500" />
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-ink-muted" />
           <Input
             placeholder={t("build_planner.search")}
             value={filters.search}
             onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-            className="bg-surface-900/60 border-surface-700/60 pl-8 placeholder:text-surface-500"
+            className="bg-layer-1/60 border-edge/60 pl-8 placeholder:text-ink-muted"
           />
         </div>
 
@@ -146,7 +146,7 @@ export const EquipmentFilters = ({
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
-              className={hasActiveFilters ? "text-primary-300 border-primary-500/40" : "text-surface-300"}
+              className={hasActiveFilters ? "text-primary-hover border-primary/40" : "text-ink"}
             >
               <Filter className="mr-1 h-4 w-4" />
               {t("build_planner.filters")}
@@ -171,14 +171,14 @@ export const EquipmentFilters = ({
               border: "1px solid rgba(249,115,22,0.18)",
             }}
           >
-            <DropdownMenuLabel className="text-[10px] font-mono uppercase tracking-widest text-surface-500">
+            <DropdownMenuLabel className="text-[10px] font-mono uppercase tracking-widest text-ink-muted">
               {t("build_planner.filters")}
             </DropdownMenuLabel>
             <DropdownMenuSeparator style={{ background: "rgba(71,85,105,0.3)" }} />
             <div className="p-3 space-y-3">
               {/* Rank filters */}
               <div>
-                <h4 className="text-[10px] font-mono uppercase tracking-widest text-surface-500 mb-1.5">
+                <h4 className="text-[10px] font-mono uppercase tracking-widest text-ink-muted mb-1.5">
                   Rango
                 </h4>
                 <div className="flex gap-2">
@@ -198,7 +198,7 @@ export const EquipmentFilters = ({
                 <>
                   {/* Weapon type filters */}
                   <div>
-                    <h4 className="text-[10px] font-mono uppercase tracking-widest text-surface-500 mb-1.5">
+                    <h4 className="text-[10px] font-mono uppercase tracking-widest text-ink-muted mb-1.5">
                       {t("weapon_type")}
                     </h4>
                     <div className="grid grid-cols-3 gap-1">
@@ -219,7 +219,7 @@ export const EquipmentFilters = ({
 
                   {/* Element filters */}
                   <div>
-                    <h4 className="text-[10px] font-mono uppercase tracking-widest text-surface-500 mb-1.5">
+                    <h4 className="text-[10px] font-mono uppercase tracking-widest text-ink-muted mb-1.5">
                       {t("element")}
                     </h4>
                     <div className="grid grid-cols-5 gap-1">
@@ -255,7 +255,7 @@ export const EquipmentFilters = ({
         </DropdownMenu>
 
         {/* Sort direction */}
-        <Button variant="outline" className="text-surface-300" onClick={toggleSortDirection}>
+        <Button variant="outline" className="text-ink" onClick={toggleSortDirection}>
           {sortDirection === 'asc'
             ? <ArrowUp className="mr-1 h-4 w-4" />
             : <ArrowDown className="mr-1 h-4 w-4" />}
@@ -266,7 +266,7 @@ export const EquipmentFilters = ({
       {/* Active filter badges */}
       {hasActiveFilters && (
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-mono text-surface-500">{t("build_planner.active_filters")}:</span>
+          <span className="text-[10px] font-mono text-ink-muted">{t("build_planner.active_filters")}:</span>
           {activeRankLabel && (
             <ActiveBadge label={activeRankLabel} onRemove={() => setFilters({ ...filters, rarity: [] })} />
           )}

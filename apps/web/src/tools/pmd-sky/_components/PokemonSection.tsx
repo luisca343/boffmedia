@@ -39,7 +39,7 @@ export function PokemonSection({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <FormField
           label={t("CLIENT_POKEMON")}
-          icon={<UserIcon className="w-4 h-4 text-secondary-400" />}
+          icon={<UserIcon className="w-4 h-4 text-secondary-hover" />}
           disabled={isClientForced}
           variant="gaming"
         >
@@ -51,7 +51,7 @@ export function PokemonSection({
             alt="Client Sprite"
           />
           {isClientForced && (
-            <p className="text-[10px] font-mono text-surface-500 mt-1.5 flex items-center gap-1 tracking-wide">
+            <p className="text-[10px] font-mono text-ink-muted mt-1.5 flex items-center gap-1 tracking-wide">
               <InformationCircleIcon className="w-3 h-3" />
               {t("FORCED_BY_QUEST_TYPE")}
             </p>
@@ -72,7 +72,7 @@ export function PokemonSection({
             alt="Target Sprite"
           />
           {isTargetDisabled && (
-            <p className="text-[10px] font-mono text-surface-500 mt-1.5 flex items-center gap-1 tracking-wide">
+            <p className="text-[10px] font-mono text-ink-muted mt-1.5 flex items-center gap-1 tracking-wide">
               <InformationCircleIcon className="w-3 h-3" />
               {getClientIsTarget(questType) ? t("CLIENT_IS_TARGET") : t("FORCED_BY_QUEST_TYPE")}
             </p>

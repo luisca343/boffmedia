@@ -39,22 +39,22 @@ export default function PokemonList() {
 
   if (loading) {
     return (
-      <div className="bg-surface-800 min-h-full overflow-auto flex justify-center items-center p-8">
+      <div className="bg-layer-2 min-h-full overflow-auto flex justify-center items-center p-8">
         <div className="flex items-center gap-3">
-          <div className="animate-spin h-5 w-5 border-2 border-primary-300 rounded-full border-t-transparent"></div>
-          <div className="text-surface-100 text-xl">Cargando Pokédex...</div>
+          <div className="animate-spin h-5 w-5 border-2 border-primary rounded-full border-t-transparent"></div>
+          <div className="text-ink text-xl">Cargando Pokédex...</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-surface-800 min-h-full overflow-auto">
+    <div className="bg-layer-2 min-h-full overflow-auto">
       <div className="mt-4 p-4 max-w-7xl mx-auto">
         {/* Header */}
-        <div className="bg-surface-700/30 rounded-lg p-4 border border-surface-600/50 mb-4">
-          <h1 className="text-xl font-bold text-surface-50">Explorar Pokédex</h1>
-          <p className="text-surface-200">
+        <div className="bg-layer-3/30 rounded-lg p-4 border border-edge/50 mb-4">
+          <h1 className="text-xl font-bold text-ink">Explorar Pokédex</h1>
+          <p className="text-ink">
             Explora todos los Pokémon registrados. Haz clic en un Pokémon para ver su información detallada.
           </p>
         </div>
@@ -62,12 +62,12 @@ export default function PokemonList() {
         {/* Search bar */}
         <div className="relative mb-6">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <MagnifyingGlassIcon className="h-5 w-5 text-surface-400" />
+            <MagnifyingGlassIcon className="h-5 w-5 text-ink-muted" />
           </div>
           <input
             type="text"
             placeholder="Buscar por nombre o número..."
-            className="bg-surface-700/50 border border-surface-600 text-surface-100 rounded-lg pl-10 pr-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent"
+            className="bg-layer-3/50 border border-edge text-ink rounded-lg pl-10 pr-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -83,7 +83,7 @@ export default function PokemonList() {
                 key={pokemon.dex}
                 className="block"
               >
-                <div className="bg-surface-700/50 border border-surface-600 rounded-lg p-3 hover:bg-surface-600/70 hover:border-surface-500 transition-all flex flex-col items-center">
+                <div className="bg-layer-3/50 border border-edge rounded-lg p-3 hover:bg-layer-3/70 hover:border-edge transition-all flex flex-col items-center">
                   <PokemonSprite 
                     id={pokemon.dex} 
                     form="base" 
@@ -94,8 +94,8 @@ export default function PokemonList() {
                     url={pokemon.spriteUrl}
                   />
                   <div className="text-center mt-1">
-                    <div className="text-xs text-surface-400">#{pokemon.dex.toString().padStart(3, '0')}</div>
-                    <div className="text-surface-100 font-medium truncate w-full">
+                    <div className="text-xs text-ink-muted">#{pokemon.dex.toString().padStart(3, '0')}</div>
+                    <div className="text-ink font-medium truncate w-full">
                       {isSeen ? (t(`pixelmon_${pokemon.name.toLowerCase()}`) || pokemon.name) : '???'}
                     </div>
                   </div>
@@ -106,8 +106,8 @@ export default function PokemonList() {
         </div>
         
         {filteredPokemon.length === 0 && (
-          <div className="bg-surface-700/30 rounded-lg p-8 text-center border border-surface-600/50">
-            <p className="text-surface-300 text-lg">No se encontraron Pokémon que coincidan con la búsqueda</p>
+          <div className="bg-layer-3/30 rounded-lg p-8 text-center border border-edge/50">
+            <p className="text-ink text-lg">No se encontraron Pokémon que coincidan con la búsqueda</p>
           </div>
         )}
       </div>

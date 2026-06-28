@@ -25,7 +25,7 @@ const toneStyles: Record<string, { box: string; icon: string }> = {
   },
   neutral: {
     box: "",
-    icon: "text-[var(--text-muted)] bg-[var(--surface-3)]",
+    icon: "text-ink-muted bg-layer-3",
   },
 }
 
@@ -45,8 +45,8 @@ export const BoffAlert = React.forwardRef<HTMLDivElement, BoffAlertProps>(
         className={cn(
           "flex gap-3.5 items-start p-4",
           "rounded-[var(--radius-lg,22px)]",
-          "border border-solid border-[var(--border-strong)]",
-          "bg-[var(--surface-2)]",
+          "border border-solid border-edge-strong",
+          "bg-layer-2",
           "relative",
           "data-[direction=hud]:shadow-[4px_4px_0_0_var(--hud-shadow)]",
           toneStyles[tone]?.box,
@@ -62,12 +62,12 @@ export const BoffAlert = React.forwardRef<HTMLDivElement, BoffAlertProps>(
         </span>
         <div className="flex-1 min-w-0">
           {title && <p className="font-bold text-sm mb-0.5">{title}</p>}
-          {children && <div className="text-sm text-[var(--text-muted)] leading-relaxed">{children}</div>}
+          {children && <div className="text-sm text-ink-muted leading-relaxed">{children}</div>}
           {action && <div className="mt-2.5 flex gap-2">{action}</div>}
         </div>
         {onClose && (
           <button
-            className="absolute top-2.5 right-2.5 border-0 bg-transparent text-[var(--text-dim)] cursor-pointer p-1 rounded-md hover:text-[var(--text)] hover:bg-[var(--surface-3)]"
+            className="absolute top-2.5 right-2.5 border-0 bg-transparent text-ink-dim cursor-pointer p-1 rounded-md hover:text-ink hover:bg-layer-3"
             aria-label="Cerrar"
             onClick={onClose}
           >

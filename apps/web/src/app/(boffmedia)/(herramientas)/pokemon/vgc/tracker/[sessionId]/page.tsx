@@ -145,19 +145,19 @@ export default function SessionPage({ params }: Props) {
           <div className="flex items-center gap-3">
             <Link
               href="/pokemon/vgc/tracker"
-              className="p-1.5 rounded-lg text-surface-400 hover:text-surface-50 hover:bg-surface-800 transition-colors"
+              className="p-1.5 rounded-lg text-ink-muted hover:text-ink hover:bg-layer-2 transition-colors"
             >
               <ArrowLeft size={18} />
             </Link>
             <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-lg border ${isTournament ? 'bg-amber-500/15 border-amber-500/30' : 'bg-primary-500/20 border-primary-500/30'}`}>
+              <div className={`p-2 rounded-lg border ${isTournament ? 'bg-amber-500/15 border-amber-500/30' : 'bg-primary/20 border-primary/30'}`}>
                 {isTournament
                   ? <Trophy className="w-5 h-5 text-amber-400" />
-                  : <Swords className="w-5 h-5 text-primary-400" />}
+                  : <Swords className="w-5 h-5 text-primary-hover" />}
               </div>
               <div>
-                <h1 className="text-xl font-bold text-surface-50">{session?.label ?? 'Session'}</h1>
-                <p className="text-surface-500 text-xs">
+                <h1 className="text-xl font-bold text-ink">{session?.label ?? 'Session'}</h1>
+                <p className="text-ink-muted text-xs">
                   {isTournament && session?.tournamentName
                     ? <>{session.tournamentName} · {session.regulationId}</>
                     : <>{session?.regulationId} · {session?.format}</>}
@@ -170,7 +170,7 @@ export default function SessionPage({ params }: Props) {
             {/* Export / import */}
             <button
               onClick={() => setShowExportImport(true)}
-              className="p-2 rounded-lg border border-surface-700 text-surface-400 hover:text-surface-50 hover:border-surface-600 transition-colors"
+              className="p-2 rounded-lg border border-edge text-ink-muted hover:text-ink hover:border-edge transition-colors"
               title={t('exportImport.title')}
             >
               <Database size={14} />
@@ -180,7 +180,7 @@ export default function SessionPage({ params }: Props) {
             {!isTournament && sessionPresets.length > 1 && (
               <button
                 onClick={() => setShowPresetPicker(true)}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-surface-700 text-surface-300 hover:text-surface-50 hover:border-surface-600 text-sm transition-colors"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-edge text-ink hover:text-ink hover:border-edge text-sm transition-colors"
               >
                 <Layers size={14} /> {preset?.name ?? t('buttons.changePreset')}
               </button>
@@ -192,7 +192,7 @@ export default function SessionPage({ params }: Props) {
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={importing}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-surface-800 hover:bg-surface-700 text-surface-200 text-sm font-medium transition-colors disabled:opacity-50"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-layer-2 hover:bg-layer-3 text-ink text-sm font-medium transition-colors disabled:opacity-50"
                   title={t('tooltips.importCsv')}
                 >
                   <Upload size={14} />{importing ? t('buttons.importing') : t('buttons.importCsv')}
@@ -201,7 +201,7 @@ export default function SessionPage({ params }: Props) {
             )}
             <button
               onClick={isTournament ? handleNewSeries : handleNewMatch}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-white text-sm font-medium transition-colors ${isTournament ? 'bg-amber-600 hover:bg-amber-500' : 'bg-primary-600 hover:bg-primary-500'}`}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-white text-sm font-medium transition-colors ${isTournament ? 'bg-amber-600 hover:bg-amber-500' : 'bg-primary-active hover:bg-primary'}`}
             >
               <Plus size={14} /> {isTournament ? t('buttons.newSeries') : t('buttons.newMatch')}
             </button>
@@ -220,7 +220,7 @@ export default function SessionPage({ params }: Props) {
           <div className="grid grid-cols-3 gap-3">
             <StatCard value={seriesWins} label={t('tournament.seriesWins')} color="text-green-400" />
             <StatCard value={seriesLosses} label={t('tournament.seriesLosses')} color="text-red-400" />
-            <StatCard value={`${gameWins}–${gameLosses}`} label={t('tournament.gameRecord')} color="text-surface-300" />
+            <StatCard value={`${gameWins}–${gameLosses}`} label={t('tournament.gameRecord')} color="text-ink" />
           </div>
         );
       })() : (
@@ -234,7 +234,7 @@ export default function SessionPage({ params }: Props) {
             color={
               latestElo !== undefined && session?.startElo !== undefined
                 ? latestElo >= session.startElo ? 'text-green-400' : 'text-red-400'
-                : 'text-surface-300'
+                : 'text-ink'
             }
           />
         </div>
@@ -244,13 +244,13 @@ export default function SessionPage({ params }: Props) {
       <SessionNotesEditor session={session} onSave={(notes) => session && updateSession(session.id, { sessionNotes: notes })} />
 
       {/* ── Tabs (ladder only) ───────────────────────────────────────────── */}
-      {!isTournament && <div className="flex rounded-lg border border-surface-700 bg-surface-900 p-0.5 gap-0.5">
+      {!isTournament && <div className="flex rounded-lg border border-edge bg-layer-1 p-0.5 gap-0.5">
         <button
           onClick={() => setActiveTab('matches')}
           className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-colors ${
             activeTab === 'matches'
-              ? 'bg-primary-500/20 text-primary-300'
-              : 'text-surface-500 hover:text-surface-300'
+              ? 'bg-primary/20 text-primary-hover'
+              : 'text-ink-muted hover:text-ink'
           }`}
         >
           {tStats('tabs.matches')}
@@ -259,8 +259,8 @@ export default function SessionPage({ params }: Props) {
           onClick={() => setActiveTab('stats')}
           className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-colors ${
             activeTab === 'stats'
-              ? 'bg-primary-500/20 text-primary-300'
-              : 'text-surface-500 hover:text-surface-300'
+              ? 'bg-primary/20 text-primary-hover'
+              : 'text-ink-muted hover:text-ink'
           }`}
         >
           {tStats('tabs.stats')}
@@ -275,8 +275,8 @@ export default function SessionPage({ params }: Props) {
           </div>
         ) : seriesList.length === 0 ? (
           <Card className="p-12 text-center">
-            <Trophy size={36} className="mx-auto text-surface-600 mb-3" />
-            <p className="text-surface-400 text-sm">{t('tournament.noSeries')}</p>
+            <Trophy size={36} className="mx-auto text-ink-dim mb-3" />
+            <p className="text-ink-muted text-sm">{t('tournament.noSeries')}</p>
           </Card>
         ) : (
           <TournamentSeriesList
@@ -296,12 +296,12 @@ export default function SessionPage({ params }: Props) {
         />
       ) : loading ? (
         <div className="flex justify-center py-12">
-          <div className="w-5 h-5 border-2 border-primary-400 border-t-transparent rounded-full animate-spin" />
+          <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
         </div>
       ) : matches.length === 0 ? (
         <Card className="p-12 text-center">
-          <Swords size={36} className="mx-auto text-surface-600 mb-3" />
-          <p className="text-surface-400 text-sm">{t('empty.noMatches')}</p>
+          <Swords size={36} className="mx-auto text-ink-dim mb-3" />
+          <p className="text-ink-muted text-sm">{t('empty.noMatches')}</p>
         </Card>
       ) : (
         <div className="flex flex-col gap-2">
@@ -330,10 +330,10 @@ export default function SessionPage({ params }: Props) {
       {/* Preset picker */}
       {showPresetPicker && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-surface-900 border border-surface-700 rounded-xl w-full max-w-sm mx-4 shadow-2xl">
-            <div className="flex items-center justify-between p-4 border-b border-surface-700">
-              <h2 className="font-semibold text-surface-50">{t('preset.changeTitle')}</h2>
-              <button onClick={() => setShowPresetPicker(false)} className="text-surface-400 hover:text-surface-50 transition-colors">
+          <div className="bg-layer-1 border border-edge rounded-xl w-full max-w-sm mx-4 shadow-2xl">
+            <div className="flex items-center justify-between p-4 border-b border-edge">
+              <h2 className="font-semibold text-ink">{t('preset.changeTitle')}</h2>
+              <button onClick={() => setShowPresetPicker(false)} className="text-ink-muted hover:text-ink transition-colors">
                 ×
               </button>
             </div>
@@ -349,8 +349,8 @@ export default function SessionPage({ params }: Props) {
                     }}
                     className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-lg border text-left transition-colors ${
                       isActive
-                        ? 'bg-primary-500/15 border-primary-500/40 text-surface-50'
-                        : 'bg-surface-800 border-surface-700 text-surface-300 hover:border-surface-600'
+                        ? 'bg-primary/15 border-primary/40 text-ink'
+                        : 'bg-layer-2 border-edge text-ink hover:border-edge'
                     }`}
                   >
                     <div className="flex -space-x-2 shrink-0">
@@ -359,7 +359,7 @@ export default function SessionPage({ params }: Props) {
                       ))}
                     </div>
                     <span className="flex-1 text-sm font-medium truncate">{p.name}</span>
-                    {isActive && <span className="text-[10px] text-primary-400 font-mono shrink-0">{t('preset.currentTag')}</span>}
+                    {isActive && <span className="text-[10px] text-primary-hover font-mono shrink-0">{t('preset.currentTag')}</span>}
                   </button>
                 );
               })}
@@ -381,28 +381,28 @@ export default function SessionPage({ params }: Props) {
       {/* Import config modal */}
       {importConfig && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-surface-900 border border-surface-700 rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-5">
-            <h2 className="text-surface-50 font-semibold text-base">{t('modals.importCsv')}</h2>
+          <div className="bg-layer-1 border border-edge rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-5">
+            <h2 className="text-ink font-semibold text-base">{t('modals.importCsv')}</h2>
 
             <div className="space-y-3">
               <div className="space-y-1">
-                <label className="text-xs text-surface-400 font-medium">{t('labels.startDate')}</label>
+                <label className="text-xs text-ink-muted font-medium">{t('labels.startDate')}</label>
                 <input
                   type="datetime-local"
                   value={importStartDate}
                   onChange={(e) => setImportStartDate(e.target.value)}
-                  className="w-full bg-surface-800 border border-surface-700 rounded-lg px-3 py-2 text-sm text-surface-100 focus:outline-none focus:border-primary-500 transition-colors"
+                  className="w-full bg-layer-2 border border-edge rounded-lg px-3 py-2 text-sm text-ink focus:outline-none focus:border-primary transition-colors"
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-xs text-surface-400 font-medium">{t('labels.minsPerGame')}</label>
+                <label className="text-xs text-ink-muted font-medium">{t('labels.minsPerGame')}</label>
                 <input
                   type="number"
                   min={1}
                   max={120}
                   value={importMins}
                   onChange={(e) => setImportMins(Math.max(1, parseInt(e.target.value) || 10))}
-                  className="w-full bg-surface-800 border border-surface-700 rounded-lg px-3 py-2 text-sm text-surface-100 focus:outline-none focus:border-primary-500 transition-colors"
+                  className="w-full bg-layer-2 border border-edge rounded-lg px-3 py-2 text-sm text-ink focus:outline-none focus:border-primary transition-colors"
                 />
               </div>
             </div>
@@ -410,14 +410,14 @@ export default function SessionPage({ params }: Props) {
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => setImportConfig(null)}
-                className="px-4 py-2 rounded-lg bg-surface-800 hover:bg-surface-700 text-surface-300 text-sm transition-colors"
+                className="px-4 py-2 rounded-lg bg-layer-2 hover:bg-layer-3 text-ink text-sm transition-colors"
               >
                 {t('buttons.cancel')}
               </button>
               <button
                 onClick={confirmImport}
                 disabled={importing}
-                className="px-4 py-2 rounded-lg bg-primary-600 hover:bg-primary-500 text-white text-sm font-medium transition-colors disabled:opacity-50"
+                className="px-4 py-2 rounded-lg bg-primary-active hover:bg-primary text-white text-sm font-medium transition-colors disabled:opacity-50"
               >
                 {importing ? t('buttons.importing') : t('buttons.importFile', { name: importConfig.file.name })}
               </button>
@@ -450,8 +450,8 @@ function SessionNotesEditor({
 
   return (
     <Card className="overflow-hidden">
-      <div className="px-4 py-2.5 border-b border-surface-700">
-        <span className="text-xs font-semibold text-surface-500 uppercase tracking-wide">
+      <div className="px-4 py-2.5 border-b border-edge">
+        <span className="text-xs font-semibold text-ink-muted uppercase tracking-wide">
           {t('sessionNotes.label')}
         </span>
       </div>
@@ -460,7 +460,7 @@ function SessionNotesEditor({
         onChange={(e) => handleChange(e.target.value)}
         placeholder={t('sessionNotes.placeholder')}
         rows={3}
-        className="w-full bg-transparent px-4 py-3 text-sm text-surface-200 placeholder:text-surface-700 focus:outline-none resize-none"
+        className="w-full bg-transparent px-4 py-3 text-sm text-ink placeholder:text-ink-dim focus:outline-none resize-none"
       />
     </Card>
   );
@@ -468,9 +468,9 @@ function SessionNotesEditor({
 
 function StatCard({ value, label, color }: { value: string | number; label: string; color: string }) {
   return (
-    <div className="rounded-xl border border-surface-700 bg-surface-800 p-4 text-center">
+    <div className="rounded-xl border border-edge bg-layer-2 p-4 text-center">
       <div className={`text-2xl font-bold tabular-nums ${color}`}>{value}</div>
-      <div className="text-xs text-surface-500 mt-0.5">{label}</div>
+      <div className="text-xs text-ink-muted mt-0.5">{label}</div>
     </div>
   );
 }
@@ -481,12 +481,12 @@ function MatchRow({ match, number, sessionId, eloDelta }: { match: Match; number
 
   // ELO delta: colored by result
   const deltaColor = eloDelta === undefined
-    ? 'text-surface-500'
+    ? 'text-ink-muted'
     : match.result === 'win'
     ? 'text-green-400'
     : match.result === 'loss'
     ? 'text-red-400'
-    : 'text-surface-400';
+    : 'text-ink-muted';
   const deltaSign = eloDelta !== undefined && eloDelta >= 0 ? '+' : '';
 
   // Build sprite rows for my team (no links)
@@ -537,7 +537,7 @@ function MatchRow({ match, number, sessionId, eloDelta }: { match: Match; number
       tabIndex={0}
       onClick={() => router.push(`/pokemon/vgc/tracker/${sessionId}/${match.id}`)}
       onKeyDown={(e) => e.key === 'Enter' && router.push(`/pokemon/vgc/tracker/${sessionId}/${match.id}`)}
-      className="flex items-center gap-3 rounded-xl border border-surface-700 bg-surface-800 hover:border-primary-500/40 px-3 py-2.5 transition-all cursor-pointer"
+      className="flex items-center gap-3 rounded-xl border border-edge bg-layer-2 hover:border-primary/40 px-3 py-2.5 transition-all cursor-pointer"
     >
       {/* Result badge */}
       <div
@@ -548,7 +548,7 @@ function MatchRow({ match, number, sessionId, eloDelta }: { match: Match; number
             ? 'bg-red-500/15 text-red-400 border-red-500/30'
             : match.result === 'draw'
             ? 'bg-yellow-500/15 text-yellow-400 border-yellow-500/30'
-            : 'bg-surface-800 text-surface-500 border-surface-700'
+            : 'bg-layer-2 text-ink-muted border-edge'
         }`}
       >
         {match.result === 'win' ? 'W' : match.result === 'loss' ? 'L' : match.result === 'draw' ? 'D' : '—'}
@@ -558,9 +558,9 @@ function MatchRow({ match, number, sessionId, eloDelta }: { match: Match; number
       <div className="flex-1 min-w-0">
         {/* Top line */}
         <div className="flex items-center gap-2 text-sm mb-1">
-          <span className="text-surface-200 font-medium">{t('matchRow.match', { number })}</span>
+          <span className="text-ink font-medium">{t('matchRow.match', { number })}</span>
           {match.opponentName && (
-            <span className="text-surface-400 text-xs">{t('matchRow.vs')} {match.opponentName}</span>
+            <span className="text-ink-muted text-xs">{t('matchRow.vs')} {match.opponentName}</span>
           )}
           <div className="ml-auto shrink-0 flex items-center gap-2">
             {eloDelta !== undefined && (
@@ -569,10 +569,10 @@ function MatchRow({ match, number, sessionId, eloDelta }: { match: Match; number
               </span>
             )}
             {match.eloAfter !== undefined && (
-              <span className="text-xs text-surface-400 font-mono">{match.eloAfter}</span>
+              <span className="text-xs text-ink-muted font-mono">{match.eloAfter}</span>
             )}
             {match.opponentElo !== undefined && (
-              <span className="text-xs text-surface-600 font-mono">vs {match.opponentElo}</span>
+              <span className="text-xs text-ink-dim font-mono">vs {match.opponentElo}</span>
             )}
           </div>
         </div>
@@ -582,20 +582,20 @@ function MatchRow({ match, number, sessionId, eloDelta }: { match: Match; number
           <div className="flex items-center gap-1.5">
             {mySprites && <div className="flex items-center gap-0.5">{mySprites}</div>}
             {mySprites && oppSprites && (
-              <span className="text-surface-300 text-[11px] font-semibold px-1">vs</span>
+              <span className="text-ink text-[11px] font-semibold px-1">vs</span>
             )}
             {oppSprites && <div className="flex items-center gap-0.5">{oppSprites}</div>}
-            <span className="text-surface-600 text-xs ml-1">{formatTime(match.createdAt)}</span>
+            <span className="text-ink-dim text-xs ml-1">{formatTime(match.createdAt)}</span>
             {match.notes.length > 0 && (
-              <span className="text-surface-600 text-xs">{match.notes.length === 1 ? t('matchRow.noteSingular') : t('matchRow.notesPlural', { count: match.notes.length })}</span>
+              <span className="text-ink-dim text-xs">{match.notes.length === 1 ? t('matchRow.noteSingular') : t('matchRow.notesPlural', { count: match.notes.length })}</span>
             )}
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            <span className="text-xs text-surface-600">{t('matchRow.noPicks')}</span>
-            <span className="text-surface-600 text-xs">{formatTime(match.createdAt)}</span>
+            <span className="text-xs text-ink-dim">{t('matchRow.noPicks')}</span>
+            <span className="text-ink-dim text-xs">{formatTime(match.createdAt)}</span>
             {match.notes.length > 0 && (
-              <span className="text-surface-600 text-xs">{match.notes.length === 1 ? t('matchRow.noteSingular') : t('matchRow.notesPlural', { count: match.notes.length })}</span>
+              <span className="text-ink-dim text-xs">{match.notes.length === 1 ? t('matchRow.noteSingular') : t('matchRow.notesPlural', { count: match.notes.length })}</span>
             )}
           </div>
         )}
@@ -626,7 +626,7 @@ function TournamentSeriesList({
           <button
             onClick={() => onRoundFilter(null)}
             className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
-              roundFilter === null ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40' : 'text-surface-500 hover:text-surface-300 border border-surface-700'
+              roundFilter === null ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40' : 'text-ink-muted hover:text-ink border border-edge'
             }`}
           >
             {t('tournament.allRounds')}
@@ -636,7 +636,7 @@ function TournamentSeriesList({
               key={r}
               onClick={() => onRoundFilter(r)}
               className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
-                roundFilter === r ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40' : 'text-surface-500 hover:text-surface-300 border border-surface-700'
+                roundFilter === r ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40' : 'text-ink-muted hover:text-ink border border-edge'
               }`}
             >
               {t('tournament.round', { n: r })}
@@ -666,7 +666,7 @@ function SeriesRow({ series, number, sessionId }: { series: Series; number: numb
   return (
     <Link
       href={`/pokemon/vgc/tracker/${sessionId}/series/${series.id}`}
-      className="flex items-center gap-3 rounded-xl border border-surface-700 bg-surface-800 hover:border-amber-500/30 px-3 py-2.5 transition-all"
+      className="flex items-center gap-3 rounded-xl border border-edge bg-layer-2 hover:border-amber-500/30 px-3 py-2.5 transition-all"
     >
       {/* Result badge */}
       <div className={`shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold font-mono border ${
@@ -674,7 +674,7 @@ function SeriesRow({ series, number, sessionId }: { series: Series; number: numb
           ? 'bg-green-500/15 text-green-400 border-green-500/30'
           : series.seriesResult === 'loss'
           ? 'bg-red-500/15 text-red-400 border-red-500/30'
-          : 'bg-surface-800 text-surface-500 border-surface-700'
+          : 'bg-layer-2 text-ink-muted border-edge'
       }`}>
         {series.seriesResult === 'win' ? 'W' : series.seriesResult === 'loss' ? 'L' : '—'}
       </div>
@@ -682,16 +682,16 @@ function SeriesRow({ series, number, sessionId }: { series: Series; number: numb
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 text-sm mb-1">
           {series.roundNumber && (
-            <span className="text-surface-500 text-xs font-mono">{t('tournament.round', { n: series.roundNumber })}</span>
+            <span className="text-ink-muted text-xs font-mono">{t('tournament.round', { n: series.roundNumber })}</span>
           )}
           {series.opponentName && (
-            <span className="text-surface-200 font-medium truncate">{series.opponentName}</span>
+            <span className="text-ink font-medium truncate">{series.opponentName}</span>
           )}
           {!series.opponentName && (
-            <span className="text-surface-500 font-medium">{t('tournament.seriesNumber', { n: number })}</span>
+            <span className="text-ink-muted font-medium">{t('tournament.seriesNumber', { n: number })}</span>
           )}
           <span className={`ml-auto shrink-0 font-mono text-xs font-semibold ${
-            series.seriesResult === 'win' ? 'text-green-400' : series.seriesResult === 'loss' ? 'text-red-400' : 'text-surface-400'
+            series.seriesResult === 'win' ? 'text-green-400' : series.seriesResult === 'loss' ? 'text-red-400' : 'text-ink-muted'
           }`}>{scoreLabel}</span>
         </div>
 
@@ -704,7 +704,7 @@ function SeriesRow({ series, number, sessionId }: { series: Series; number: numb
             </div>
           )}
           {allGameSlots.length > 0 && oppPreview.length > 0 && (
-            <span className="text-surface-500 text-[10px] font-semibold px-0.5">{t('matchRow.vs')}</span>
+            <span className="text-ink-muted text-[10px] font-semibold px-0.5">{t('matchRow.vs')}</span>
           )}
           {oppPreview.length > 0 && (
             <div className="flex items-center gap-0.5">
@@ -713,9 +713,9 @@ function SeriesRow({ series, number, sessionId }: { series: Series; number: numb
               ))}
             </div>
           )}
-          <span className="text-surface-600 text-xs ml-auto">{formatTime(series.createdAt)}</span>
+          <span className="text-ink-dim text-xs ml-auto">{formatTime(series.createdAt)}</span>
           {series.notes.length > 0 && (
-            <span className="text-surface-600 text-xs">{series.notes.length === 1 ? t('matchRow.noteSingular') : t('matchRow.notesPlural', { count: series.notes.length })}</span>
+            <span className="text-ink-dim text-xs">{series.notes.length === 1 ? t('matchRow.noteSingular') : t('matchRow.notesPlural', { count: series.notes.length })}</span>
           )}
         </div>
       </div>

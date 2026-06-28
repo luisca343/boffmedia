@@ -53,14 +53,14 @@ NavigationMenuList.displayName = NavigationMenuPrimitive.List.displayName
 const NavigationMenuItem = NavigationMenuPrimitive.Item
 
 const navigationMenuTriggerStyle = cva(
-  "group inline-flex h-10 w-max items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-surface-100 hover:text-surface-900 focus:bg-surface-100 focus:text-surface-900 focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-surface-100/50 data-[state=open]:bg-surface-100/50 dark:bg-surface-950 dark:hover:bg-surface-800 dark:hover:text-surface-50 dark:focus:bg-surface-800 dark:focus:text-surface-50 dark:data-[active]:bg-surface-800/50 dark:data-[state=open]:bg-surface-800/50",
+  "group inline-flex h-10 w-max items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-layer-1 hover:text-ink-dim focus:bg-layer-1 focus:text-ink-dim focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-layer-1/50 data-[state=open]:bg-layer-1/50 bg-base dark:hover:bg-layer-2 dark:hover:text-ink dark:focus:bg-layer-2 dark:focus:text-ink dark:data-[active]:bg-layer-2/50 dark:data-[state=open]:bg-layer-2/50",
   {
     variants: {
       variant: {
         default: "",
-        boffmedia: "bg-transparent hover:bg-transparent focus:bg-transparent data-[active]:bg-transparent data-[state=open]:bg-transparent text-primary-300 hover:text-primary-100 focus:text-primary-300  px-0 font-normal text-base h-auto relative",
-        boffmedia2: "bg-transparent hover:bg-transparent focus:bg-transparent focus:text-primary-300 text-primary-300 hover:text-primary-100 px-0 font-normal text-base h-auto relative",
-        wingull: "bg-secondary-900 hover:bg-secondary-800 focus:bg-secondary-800 data-[active]:bg-secondary-800/50 data-[state=open]:bg-secondary-800/50 text-secondary-100 hover:text-secondary-50 focus:text-secondary-50",
+        boffmedia: "bg-transparent hover:bg-transparent focus:bg-transparent data-[active]:bg-transparent data-[state=open]:bg-transparent text-primary-hover hover:text-primary-hover focus:text-primary-hover  px-0 font-normal text-base h-auto relative",
+        boffmedia2: "bg-transparent hover:bg-transparent focus:bg-transparent focus:text-primary-hover text-primary-hover hover:text-primary-hover px-0 font-normal text-base h-auto relative",
+        wingull: "bg-secondary-soft hover:bg-secondary-soft focus:bg-secondary-soft data-[active]:bg-secondary-soft/50 data-[state=open]:bg-secondary-soft/50 text-secondary-hover hover:text-secondary-hover focus:text-secondary-hover",
       },
     },
     defaultVariants: {
@@ -93,13 +93,13 @@ const NavigationMenuTrigger = React.forwardRef<
       )}
       {effectiveVariant === "boffmedia" && (
         <span
-          className="absolute left-0 right-0 bottom-0 h-0.5 bg-gradient-to-r from-primary-400 to-primary-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200 ease-in-out"
+          className="absolute left-0 right-0 bottom-0 h-0.5 bg-gradient-to-r from-primary-hover to-primary-active transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200 ease-in-out"
           aria-hidden="true"
         />
       )}
       {effectiveVariant === "wingull" && (
         <span
-          className="absolute left-0 right-0 bottom-0 h-0.5 bg-gradient-to-r from-secondary-400 to-secondary-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200 ease-in-out"
+          className="absolute left-0 right-0 bottom-0 h-0.5 bg-gradient-to-r from-secondary-hover to-secondary-active transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200 ease-in-out"
           aria-hidden="true"
         />
       )}
@@ -115,8 +115,8 @@ const NavigationMenuContent = React.forwardRef<
   const variant = useNavigationMenuVariant()
   
   const variantStyles = {
-    default: "bg-white dark:bg-surface-950 dark:text-surface-50 border-surface-700",
-    wingull: "bg-secondary-900 text-secondary-100 border-secondary-800"
+    default: "bg-white bg-base text-ink border-edge",
+    wingull: "bg-secondary-soft text-secondary-hover border-secondary-active"
   }
   
   return (
@@ -141,8 +141,8 @@ const NavigationMenuViewport = React.forwardRef<
   const variant = useNavigationMenuVariant()
   
   const variantStyles = {
-    default: "border-surface-700 bg-surface-800 text-primary-300",
-    wingull: "border-secondary-800 bg-secondary-900 text-secondary-100"
+    default: "border-edge bg-layer-2 text-primary-hover",
+    wingull: "border-secondary-active bg-secondary-soft text-secondary-hover"
   }
   
   return (
@@ -168,8 +168,8 @@ const NavigationMenuIndicator = React.forwardRef<
   const variant = useNavigationMenuVariant()
   
   const indicatorStyles = {
-    default: "bg-surface-800",
-    wingull: "bg-secondary-900"
+    default: "bg-layer-2",
+    wingull: "bg-secondary-soft"
   }
   
   return (

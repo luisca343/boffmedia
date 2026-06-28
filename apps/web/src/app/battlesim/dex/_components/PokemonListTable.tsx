@@ -62,14 +62,14 @@ export default function PokemonListTable({
 
   return (
     <>
-      <div className="mb-3 text-surface-400 text-sm">
+      <div className="mb-3 text-ink-muted text-sm">
         Showing {pokemonToShow.length} of {pokemon.length} Pokémon
       </div>
       
-      <div className="bg-surface-800 rounded-lg p-4">
+      <div className="bg-layer-2 rounded-lg p-4">
         <table className="w-full border-collapse">
           <thead>
-            <tr className="text-left text-surface-400 text-sm border-b border-surface-700">
+            <tr className="text-left text-ink-muted text-sm border-b border-edge">
               <th className={compact ? "p-1.5" : "p-2"}>Name</th>
               <th className={compact ? "p-1.5" : "p-2"}>Types</th>
               <th className={compact ? "p-1.5" : "p-2"}>Tier</th>
@@ -85,12 +85,12 @@ export default function PokemonListTable({
               return (
                 <tr 
                   key={pokemon.id} 
-                  className="border-b border-surface-700/50 hover:bg-surface-700/30 cursor-pointer"
+                  className="border-b border-edge/50 hover:bg-layer-3/30 cursor-pointer"
                   onClick={() => onPokemonClick(pokemon.id)}
                 >
                   <td className={compact ? "p-1.5" : "p-2"}>
                     <div className="flex items-center gap-2">
-                      <div className={`${compact ? "w-8 h-8" : "w-10 h-10"} bg-surface-700 rounded flex items-center justify-center overflow-hidden`}>
+                      <div className={`${compact ? "w-8 h-8" : "w-10 h-10"} bg-layer-3 rounded flex items-center justify-center overflow-hidden`}>
                         <img 
                           src={sprite.url}
                           alt={pokemon.name}
@@ -106,7 +106,7 @@ export default function PokemonListTable({
                           }}
                         />
                       </div>
-                      <span className={`font-medium ${compact ? "text-sm" : ""} text-surface-100`}>{pokemon.name}</span>
+                      <span className={`font-medium ${compact ? "text-sm" : ""} text-ink`}>{pokemon.name}</span>
                     </div>
                   </td>
                   <td className={compact ? "p-1.5" : "p-2"}>
@@ -120,12 +120,12 @@ export default function PokemonListTable({
                     {pokemon.tier && <TierBadge tier={pokemon.tier} />}
                   </td>
                   {!compact && (
-                    <td className="p-2 text-xs text-surface-300">
+                    <td className="p-2 text-xs text-ink">
                       <div className="flex flex-wrap gap-1">
                         {Object.values(pokemon.abilities).map((ability, idx: number) => (
                           <span 
                             key={`${pokemon.id}-ability-${idx}`}
-                            className="bg-surface-700 px-1.5 py-0.5 rounded"
+                            className="bg-layer-3 px-1.5 py-0.5 rounded"
                           >
                             {String(ability)}
                           </span>
@@ -133,7 +133,7 @@ export default function PokemonListTable({
                       </div>
                     </td>
                   )}
-                  <td className={`${compact ? "p-1.5" : "p-2"} text-right text-xs text-surface-300`}>
+                  <td className={`${compact ? "p-1.5" : "p-2"} text-right text-xs text-ink`}>
                     {bst}
                   </td>
                 </tr>
@@ -147,7 +147,7 @@ export default function PokemonListTable({
         <div className="mt-6 text-center">
           <button
             onClick={onLoadMore}
-            className="px-4 py-2 bg-surface-700 text-surface-200 rounded-md hover:bg-surface-600 transition-colors"
+            className="px-4 py-2 bg-layer-3 text-ink rounded-md hover:bg-layer-3 transition-colors"
           >
             Load More
           </button>

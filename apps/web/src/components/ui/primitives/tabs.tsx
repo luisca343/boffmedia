@@ -32,8 +32,8 @@ const TabsList = React.forwardRef<
   const variant = useTabsVariant()
 
   const variantStyles = {
-    default: "bg-surface-800/80 border border-surface-700/60 text-surface-400",
-    wingull: "bg-secondary-900 border border-secondary-700/60 text-secondary-400"
+    default: "bg-layer-2/80 border border-edge/60 text-ink-muted",
+    wingull: "bg-secondary-soft border border-secondary-active/60 text-secondary-hover"
   }
 
   return (
@@ -57,8 +57,8 @@ const TabsTrigger = React.forwardRef<
   const variant = useTabsVariant()
 
   const variantStyles = {
-    default: "ring-offset-surface-950 focus-visible:ring-primary-400 text-surface-400 hover:text-surface-200 data-[state=active]:bg-surface-700 data-[state=active]:text-primary-300 data-[state=active]:shadow-[0_0_0_1px_rgb(var(--primary-500)/0.25),0_2px_10px_-3px_rgb(var(--primary-500)/0.35)]",
-    wingull: "ring-offset-secondary-950 focus-visible:ring-secondary-400 data-[state=active]:bg-secondary-800 data-[state=active]:text-secondary-300 data-[state=active]:shadow-[0_0_0_1px_rgb(var(--secondary-500)/0.25)]"
+    default: "ring-offset-base focus-visible:ring-primary text-ink-muted hover:text-ink data-[state=active]:bg-layer-3 data-[state=active]:text-primary-hover data-[state=active]:shadow-[0_0_0_1px_rgb(var(--primary-500)/0.25),0_2px_10px_-3px_rgb(var(--primary-500)/0.35)]",
+    wingull: "ring-offset-secondary-soft focus-visible:ring-secondary data-[state=active]:bg-secondary-soft data-[state=active]:text-secondary-hover data-[state=active]:shadow-[0_0_0_1px_rgb(var(--secondary-500)/0.25)]"
   }
 
   return (
@@ -82,8 +82,8 @@ const TabsContent = React.forwardRef<
   const variant = useTabsVariant()
 
   const variantStyles = {
-    default: "ring-offset-surface-950 focus-visible:ring-primary-400 text-surface-200",
-    wingull: "ring-offset-secondary-950 focus-visible:ring-secondary-400 text-secondary-300"
+    default: "ring-offset-base focus-visible:ring-primary text-ink",
+    wingull: "ring-offset-secondary-soft focus-visible:ring-secondary text-secondary-hover"
   }
 
   return (

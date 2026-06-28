@@ -173,7 +173,7 @@ export function SendMoney() {
   return (
     <div className="w-full max-w-2xl mx-auto">
       {success && (
-        <div className="mb-6 bg-highlight-100 border border-highlight-400 text-highlight-700 px-4 py-3 rounded relative flex items-center" role="alert">
+        <div className="mb-6 bg-warning-soft border border-warning-border text-warning px-4 py-3 rounded relative flex items-center" role="alert">
           <CheckIcon className="h-5 w-5 mr-2" />
           <span>{success}</span>
         </div>

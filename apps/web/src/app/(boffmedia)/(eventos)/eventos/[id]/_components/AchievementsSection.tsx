@@ -170,7 +170,7 @@ export function AchievementsSection({ eventId, achievements, participants }: Ach
         >
           Sin logros disponibles
         </p>
-        <p className="text-xs text-surface-500">Los logros aparecerán pronto</p>
+        <p className="text-xs text-ink-muted">Los logros aparecerán pronto</p>
       </div>
     )
   }
@@ -217,7 +217,7 @@ export function AchievementsSection({ eventId, achievements, participants }: Ach
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <Zap className="w-3.5 h-3.5" style={{ color: "rgba(249,115,22,0.7)" }} />
-                    <span className="text-[10px] font-mono uppercase tracking-widest text-surface-400">
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-ink-muted">
                       Progreso XP
                     </span>
                   </div>
@@ -244,13 +244,13 @@ export function AchievementsSection({ eventId, achievements, participants }: Ach
                 >
                   <AchievementBadge achievement={displayUnlocked[0]} size="md" showTooltip={false} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-mono uppercase tracking-widest text-surface-500 mb-0.5">
+                    <p className="text-[10px] font-mono uppercase tracking-widest text-ink-muted mb-0.5">
                       Último logro desbloqueado
                     </p>
-                    <p className="text-sm font-bold text-surface-100 leading-snug truncate">
+                    <p className="text-sm font-bold text-ink leading-snug truncate">
                       {displayUnlocked[0].name}
                     </p>
-                    <p className="text-xs text-surface-500 line-clamp-1 mt-0.5">
+                    <p className="text-xs text-ink-muted line-clamp-1 mt-0.5">
                       {displayUnlocked[0].hidden ? "Descripción oculta" : displayUnlocked[0].description}
                     </p>
                     {displayUnlocked[0].userProgress?.completedAt && (
@@ -267,7 +267,7 @@ export function AchievementsSection({ eventId, achievements, participants }: Ach
                 {/* Unlocked */}
                 {session?.user && displayUnlocked.length > 1 && (
                   <div>
-                    <p className="text-[10px] font-mono uppercase tracking-widest text-surface-500 mb-2.5">
+                    <p className="text-[10px] font-mono uppercase tracking-widest text-ink-muted mb-2.5">
                       Obtenidos ({unlockedAchievements.length})
                     </p>
                     <div className="flex flex-wrap gap-2">
@@ -292,7 +292,7 @@ export function AchievementsSection({ eventId, achievements, participants }: Ach
 
                 {/* Locked */}
                 <div>
-                  <p className="text-[10px] font-mono uppercase tracking-widest text-surface-500 mb-2.5">
+                  <p className="text-[10px] font-mono uppercase tracking-widest text-ink-muted mb-2.5">
                     Bloqueados ({actualAchievements.filter((a) => !a.isUnlocked).length})
                   </p>
                   <div className="flex flex-wrap gap-2">
@@ -327,7 +327,7 @@ export function AchievementsSection({ eventId, achievements, participants }: Ach
                   variant="ghost"
                   size="sm"
                   asChild
-                  className="gap-2 text-surface-400 hover:text-surface-100"
+                  className="gap-2 text-ink-muted hover:text-ink"
                   style={{ fontSize: "11px", fontFamily: "monospace" }}
                 >
                   <InternalLink href={`${eventId}/logros`}>
@@ -362,7 +362,7 @@ export function AchievementsSection({ eventId, achievements, participants }: Ach
               return (
                 <div
                   key={`medal-${medal.id}`}
-                  className="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors hover:bg-primary-500/[0.05]"
+                  className="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors hover:bg-primary/[0.05]"
                 >
                   <div
                     className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
@@ -375,13 +375,13 @@ export function AchievementsSection({ eventId, achievements, participants }: Ach
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-surface-100 truncate">{medal.name}</p>
+                    <p className="text-sm font-semibold text-ink truncate">{medal.name}</p>
                     <div className="flex items-center gap-2 mt-0.5">
                       <span className="text-[10px] font-mono" style={{ color: "rgba(251,146,60,0.7)" }}>
                         {medal.points} pts
                       </span>
                       {medal.rarity && (
-                        <span className="text-[10px] font-mono text-surface-500">· {medal.rarity}</span>
+                        <span className="text-[10px] font-mono text-ink-muted">· {medal.rarity}</span>
                       )}
                       {medal.userProgress?.completedAt && (
                         <span className="text-[10px] font-mono" style={{ color: "rgba(132,204,22,0.7)" }}>

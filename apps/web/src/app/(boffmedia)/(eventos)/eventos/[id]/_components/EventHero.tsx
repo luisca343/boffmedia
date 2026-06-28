@@ -39,8 +39,8 @@ function MetaItem({ icon: Icon, label, value }: { icon: React.ElementType; label
         <Icon className="w-4 h-4" style={{ color: "rgba(249,115,22,0.7)" }} />
       </div>
       <div>
-        <div className="text-[10px] font-mono uppercase tracking-widest text-surface-600">{label}</div>
-        <div className="text-sm font-semibold text-surface-200">{value}</div>
+        <div className="text-[10px] font-mono uppercase tracking-widest text-ink-dim">{label}</div>
+        <div className="text-sm font-semibold text-ink">{value}</div>
       </div>
     </div>
   );
@@ -63,7 +63,7 @@ export function EventHero({ event, participants }: EventHeroProps) {
         <Button
           variant="outline"
           size="sm"
-          className="gap-2 text-surface-200 hover:text-surface-50"
+          className="gap-2 text-ink hover:text-ink"
           style={{
             background: "rgba(30,41,59,0.7)",
             borderColor: "rgba(71,85,105,0.55)",
@@ -100,7 +100,7 @@ export function EventHero({ event, participants }: EventHeroProps) {
               <div className="space-y-1.5">
                 <EventStatusChip status={event.status} />
                 {event.status === Event.status.UPCOMING && (
-                  <div className="text-xs font-mono text-secondary-400/70">
+                  <div className="text-xs font-mono text-secondary-hover/70">
                     <CountdownTimer
                       targetDate={event.startDate}
                       liveLabel="¡En vivo ahora!"
@@ -113,12 +113,12 @@ export function EventHero({ event, participants }: EventHeroProps) {
             {/* Title */}
             <div>
               <h1
-                className="text-3xl sm:text-4xl font-black text-surface-50 leading-tight mb-3"
+                className="text-3xl sm:text-4xl font-black text-ink leading-tight mb-3"
                 style={{ fontFamily: "Orbitron, sans-serif" }}
               >
                 {event.title}
               </h1>
-              <p className="text-surface-400 leading-relaxed">{event.description}</p>
+              <p className="text-ink-muted leading-relaxed">{event.description}</p>
             </div>
 
             {/* Meta grid */}
@@ -184,7 +184,7 @@ export function EventHero({ event, participants }: EventHeroProps) {
                 >
                   <TypeIcon className="w-12 h-12" style={{ color: "rgb(251,146,60)" }} />
                 </div>
-                <p className="text-xs font-mono text-surface-600 uppercase tracking-widest">
+                <p className="text-xs font-mono text-ink-dim uppercase tracking-widest">
                   ¡Evento Increíble!
                 </p>
               </div>

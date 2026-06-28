@@ -13,14 +13,14 @@ interface Props {
 type PillColor = 'orange' | 'blue' | 'cyan' | 'violet' | 'lime' | 'red'
 
 const PILL_ACTIVE: Record<PillColor, string> = {
-  orange: 'bg-primary-500/15 border-primary-500/50 text-primary-400',
+  orange: 'bg-primary/15 border-primary/50 text-primary-hover',
   blue:   'bg-blue-500/12 border-blue-500/40 text-blue-400',
   cyan:   'bg-cyan-500/12 border-cyan-400/40 text-cyan-300',
-  violet: 'bg-accent-500/12 border-accent-500/40 text-accent-300',
+  violet: 'bg-secondary/12 border-secondary/40 text-secondary-hover',
   lime:   'bg-lime-500/12 border-lime-500/40 text-lime-400',
-  red:    'bg-error-500/12 border-error-500/40 text-error-400',
+  red:    'bg-danger/12 border-danger-border/40 text-danger-hover',
 }
-const PILL_IDLE = 'bg-surface-800/70 border-surface-700/60 text-surface-500 hover:border-surface-600 hover:text-surface-300'
+const PILL_IDLE = 'bg-layer-2/70 border-edge/60 text-ink-muted hover:border-edge hover:text-ink'
 
 function Pill({
   label, active, color = 'orange', onClick,
@@ -40,9 +40,9 @@ function Pill({
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-2 text-[10px] font-bold text-surface-500 uppercase tracking-widest mt-1">
+    <div className="flex items-center gap-2 text-[10px] font-bold text-ink-muted uppercase tracking-widest mt-1">
       {children}
-      <span className="flex-1 h-px bg-surface-700/50" />
+      <span className="flex-1 h-px bg-layer-3/50" />
     </div>
   )
 }
@@ -68,9 +68,9 @@ export function FieldPanel({ field, onFieldChange, onAttackerSide, onDefenderSid
   }
 
   return (
-    <div className="bg-surface-950/98 border-x border-surface-700/30 flex flex-col gap-3 p-3">
+    <div className="bg-base/98 border-x border-edge/30 flex flex-col gap-3 p-3">
       {/* Title */}
-      <div className="text-[10px] font-black uppercase tracking-[0.15em] text-primary-500 text-center py-1 border-b border-primary-500/20">
+      <div className="text-[10px] font-black uppercase tracking-[0.15em] text-primary text-center py-1 border-b border-primary/20">
         ⚡ {t('title')}
       </div>
 
@@ -87,7 +87,7 @@ export function FieldPanel({ field, onFieldChange, onAttackerSide, onDefenderSid
       </div>
 
       {/* Weather */}
-      <div className="bg-surface-900/50 border border-surface-800/50 rounded-lg p-2.5 space-y-2">
+      <div className="bg-layer-1/50 border border-edge-strong/50 rounded-lg p-2.5 space-y-2">
         <SectionLabel>{t('weather')}</SectionLabel>
         <div className="flex flex-wrap gap-1.5">
           {WEATHERS.map((w) => (
@@ -103,7 +103,7 @@ export function FieldPanel({ field, onFieldChange, onAttackerSide, onDefenderSid
       </div>
 
       {/* Terrain */}
-      <div className="bg-surface-900/50 border border-surface-800/50 rounded-lg p-2.5 space-y-2">
+      <div className="bg-layer-1/50 border border-edge-strong/50 rounded-lg p-2.5 space-y-2">
         <SectionLabel>{t('terrain')}</SectionLabel>
         <div className="flex flex-wrap gap-1.5">
           {TERRAINS.map((tr) => (
@@ -119,7 +119,7 @@ export function FieldPanel({ field, onFieldChange, onAttackerSide, onDefenderSid
       </div>
 
       {/* Conditions */}
-      <div className="bg-surface-900/50 border border-surface-800/50 rounded-lg p-2.5 space-y-2">
+      <div className="bg-layer-1/50 border border-edge-strong/50 rounded-lg p-2.5 space-y-2">
         <SectionLabel>{t('conditions')}</SectionLabel>
         <div className="flex flex-wrap gap-1.5">
           <Pill label={t('pill.Trick Room')} active={field.trickRoom} color="violet" onClick={() => onFieldChange({ trickRoom: !field.trickRoom })} />
@@ -136,7 +136,7 @@ export function FieldPanel({ field, onFieldChange, onAttackerSide, onDefenderSid
           { key: 'defenderSide', label: t('defenderSide'), side: field.defenderSide, update: onDefenderSide },
         ] as const
       ).map(({ key, label, side, update }) => (
-        <div key={key} className="bg-surface-900/50 border border-surface-800/50 rounded-lg p-2.5 space-y-2">
+        <div key={key} className="bg-layer-1/50 border border-edge-strong/50 rounded-lg p-2.5 space-y-2">
           <SectionLabel>{label}</SectionLabel>
           <div className="flex flex-wrap gap-1.5">
             <Pill label={t('pill.Stealth Rock')} active={side.stealthRock} onClick={() => update({ stealthRock: !side.stealthRock })} />
@@ -147,7 +147,7 @@ export function FieldPanel({ field, onFieldChange, onAttackerSide, onDefenderSid
             <Pill label={t('pill.Helping Hand')} active={side.helpingHand} color="lime" onClick={() => update({ helpingHand: !side.helpingHand })} />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[10px] text-surface-500">{t('pill.Spikes')}</span>
+            <span className="text-[10px] text-ink-muted">{t('pill.Spikes')}</span>
             {([0, 1, 2, 3] as const).map((n) => (
               <button
                 key={n}
@@ -155,8 +155,8 @@ export function FieldPanel({ field, onFieldChange, onAttackerSide, onDefenderSid
                 onClick={() => update({ spikes: n })}
                 className={`w-6 h-6 rounded text-xs font-bold border transition-all ${
                   side.spikes === n
-                    ? 'bg-primary-500/20 border-primary-500/50 text-primary-400'
-                    : 'bg-surface-800 border-surface-700 text-surface-500 hover:text-surface-400'
+                    ? 'bg-primary/20 border-primary/50 text-primary-hover'
+                    : 'bg-layer-2 border-edge text-ink-muted hover:text-ink-muted'
                 }`}
               >
                 {n}

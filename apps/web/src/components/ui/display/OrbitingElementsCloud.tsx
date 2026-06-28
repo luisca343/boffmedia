@@ -100,7 +100,7 @@ export const OrbitingElementsCloud: React.FC<OrbitingElementsCloudProps> = ({
             ></div>
             {/* Tooltip */}
             <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap z-30">
-              <span className="text-sm text-cyan-400 font-medium bg-surface-900/90 px-3 py-2 rounded-lg shadow-lg border border-cyan-500/20">
+              <span className="text-sm text-cyan-400 font-medium bg-layer-1/90 px-3 py-2 rounded-lg shadow-lg border border-cyan-500/20">
                 {element.name}
               </span>
             </div>

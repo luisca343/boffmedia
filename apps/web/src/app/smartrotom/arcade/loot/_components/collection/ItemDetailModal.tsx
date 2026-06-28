@@ -32,19 +32,19 @@ export function ItemDetailModal({ item, onClose }: ItemDetailModalProps) {
           </h3>
           <button 
             onClick={onClose}
-            className="bg-surface-800 hover:bg-surface-700 text-white p-1 rounded-full border border-surface-700"
+            className="bg-layer-2 hover:bg-layer-3 text-white p-1 rounded-full border border-edge"
           >
             <X size={16} />
           </button>
         </div>
         
         <div className="flex flex-col items-center mb-6">
-          <div className="w-48 h-48 mb-4 flex items-center justify-center bg-black/30 rounded-lg border border-surface-700">
+          <div className="w-48 h-48 mb-4 flex items-center justify-center bg-black/30 rounded-lg border border-edge">
             {getRewardIcon({type: item.itemType, description: item.itemData || item.itemId, size: 128})}
           </div>
           
           {item.amount && item.amount > 1 && (
-            <div className="mb-2 px-3 py-1 bg-black/50 rounded-md border border-surface-700">
+            <div className="mb-2 px-3 py-1 bg-black/50 rounded-md border border-edge">
               <span className={`${config.textColor}`}>
                 Cantidad: <strong>{item.amount}</strong>
               </span>
@@ -55,14 +55,14 @@ export function ItemDetailModal({ item, onClose }: ItemDetailModalProps) {
             {getItemRarity(t, item.rarity)}
           </span>
           
-          <p className="text-surface-200 text-center bg-black/30 p-4 rounded-lg border border-surface-800">
+          <p className="text-ink text-center bg-black/30 p-4 rounded-lg border border-edge-strong">
             {item.itemType === "pokemon" ? item.itemId : getItemDescription(t, item.itemId) || `Un objeto ${item.rarity} de la colección.`}
           </p>
         </div>
         
         <button
           onClick={onClose}
-          className="w-full bg-surface-800 hover:bg-surface-700 text-white py-3 rounded-lg border border-surface-700 font-bold"
+          className="w-full bg-layer-2 hover:bg-layer-3 text-white py-3 rounded-lg border border-edge font-bold"
         >
           Cerrar
         </button>

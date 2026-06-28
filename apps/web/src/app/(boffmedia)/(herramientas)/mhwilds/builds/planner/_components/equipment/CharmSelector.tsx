@@ -79,18 +79,18 @@ export function CharmSelector({
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex justify-between items-center mb-1">
-              <p className="font-medium text-surface-100 truncate pr-2">{charm.name}</p>
+              <p className="font-medium text-ink truncate pr-2">{charm.name}</p>
               <span className="text-xs text-amber-400 flex-shrink-0">★{charm.rarity}</span>
             </div>
             <div className="flex flex-wrap gap-x-2 text-xs">
               {charm.skills?.map((skill, idx) => (
-                <span key={idx} className="text-highlight-400">
+                <span key={idx} className="text-warning-hover">
                   {skill.skill.name} +{skill.level}
                 </span>
               ))}
             </div>
             {charm.description && (
-              <p className="text-xs text-surface-400 mt-1 italic">{charm.description}</p>
+              <p className="text-xs text-ink-muted mt-1 italic">{charm.description}</p>
             )}
           </div>
         </div>
@@ -105,7 +105,7 @@ export function CharmSelector({
           <Medal className="h-5 w-5 text-amber-400" />
           <MHWildsPanelTitle>{t("build_planner.select_charm")}</MHWildsPanelTitle>
         </div>
-        <Button variant="ghost" size="sm" className="text-surface-400 hover:text-surface-200" onClick={onClose}>
+        <Button variant="ghost" size="sm" className="text-ink-muted hover:text-ink" onClick={onClose}>
           <X className="h-4 w-4 mr-1" /> {t("build_planner.close")}
         </Button>
       </MHWildsPanelHeader>
@@ -120,7 +120,7 @@ export function CharmSelector({
             placeholder={`${t("build_planner.search")}...`}
             value={filters.search}
             onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-            className="bg-surface-900/60 border-surface-700/60 placeholder:text-surface-500"
+            className="bg-layer-1/60 border-edge/60 placeholder:text-ink-muted"
           />
         </div>
 
@@ -129,8 +129,8 @@ export function CharmSelector({
             className="h-[400px] flex items-center justify-center gap-2 rounded-lg"
             style={{ background: "rgba(15,23,42,0.4)" }}
           >
-            <Loader2 className="h-6 w-6 text-primary-400 animate-spin" />
-            <span className="text-surface-400 text-sm">
+            <Loader2 className="h-6 w-6 text-primary-hover animate-spin" />
+            <span className="text-ink-muted text-sm">
               {t("build_planner.loading", { item: t("build_planner.charms").toLowerCase() })}
             </span>
           </div>
@@ -154,7 +154,7 @@ export function CharmSelector({
               {sortedCharms.length > 0 ? (
                 sortedCharms.map(charm => <CharmItem key={charm.id} charm={charm} />)
               ) : (
-                <div className="text-center p-8 text-surface-400">
+                <div className="text-center p-8 text-ink-muted">
                   <p>{t("build_planner.no_charms_found")}</p>
                 </div>
               )}

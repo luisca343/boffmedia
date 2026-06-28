@@ -6,7 +6,7 @@ interface SystemFloatBgProps {
 
 const orbColors = {
   warm: { a: "var(--orange-600)", b: "var(--rose-500)", c: "var(--amber-400)" },
-  accent: { a: "var(--accent)", b: "var(--accent-bright)", c: "var(--purple-500)" },
+  accent: { a: "var(--secondary)", b: "var(--secondary-hover)", c: "var(--purple-500)" },
   cool: { a: "var(--cyan-600)", b: "var(--purple-600)", c: "var(--cyan-400)" },
 }
 

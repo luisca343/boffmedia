@@ -40,7 +40,7 @@ export const BaseSearch = ({
     : "Search channels, games or streams...";
 
   return (
-    <div className="bg-surface-800 p-6 rounded-lg shadow-lg mb-8">
+    <div className="bg-layer-2 p-6 rounded-lg shadow-lg mb-8">
       <div className="flex gap-4">
         <div className="flex-1">
           <Input
@@ -49,7 +49,7 @@ export const BaseSearch = ({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="bg-surface-700 border-surface-600 text-white placeholder-surface-400 focus:border-surface-500"
+            className="bg-layer-3 border-edge text-white placeholder-ink-dim focus:border-edge"
           />
         </div>
         <Button

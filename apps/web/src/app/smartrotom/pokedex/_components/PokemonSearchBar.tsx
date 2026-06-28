@@ -31,7 +31,7 @@ export default function PokemonSearchBar() {
     return (
         <div className="w-full m-auto">
             <div className="relative mb-3">
-                <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-surface-400" />
+                <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-ink-muted" />
                 <Input 
                     variant="dark" 
                     type="text" 
@@ -49,7 +49,7 @@ export default function PokemonSearchBar() {
             )}
             
             {!isSearching && pokemon.length > 0 && (
-                <div className="bg-surface-700/30 p-3 rounded-lg max-h-64 overflow-y-auto">
+                <div className="bg-layer-3/30 p-3 rounded-lg max-h-64 overflow-y-auto">
                     <div className="overflow-auto flex flex-wrap justify-center gap-2">
                         {pokemon.map(p => (
                             <PokemonSpriteLink 
@@ -67,7 +67,7 @@ export default function PokemonSearchBar() {
             )}
             
             {!isSearching && text.length > 2 && pokemon.length === 0 && (
-                <div className="text-center py-2 text-surface-300">
+                <div className="text-center py-2 text-ink">
                     No se encontraron resultados
                 </div>
             )}

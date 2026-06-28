@@ -25,12 +25,12 @@ export async function EvoTree({params}: {params: {id: string}}) {
   const hasEvolutions = depth > 1;
 
   return (
-    <div className="text-surface-50 flex justify-center overflow-x-auto pb-4">
+    <div className="text-ink flex justify-center overflow-x-auto pb-4">
       <div className="min-w-[700px]">
         {hasEvolutions ? (
           <TreeRenderer tree={tree} t={t} />
         ) : (
-          <div className="h-full flex-col justify-center items-center text-center rounded-lg m-2 bg-surface-700/20 p-6 border border-surface-600/30">
+          <div className="h-full flex-col justify-center items-center text-center rounded-lg m-2 bg-layer-3/20 p-6 border border-edge/30">
             {baseForm && (
               <div className="flex justify-center mb-4">
                 <PokemonSpriteLink
@@ -44,7 +44,7 @@ export async function EvoTree({params}: {params: {id: string}}) {
                 />
               </div>
             )}
-            <div className="flex items-center justify-center gap-2 text-xl text-surface-300">
+            <div className="flex items-center justify-center gap-2 text-xl text-ink">
               <InformationCircleIcon className="h-6 w-6" />
               <span className="text-shadow-border1">Este Pokémon no tiene evoluciones</span>
             </div>

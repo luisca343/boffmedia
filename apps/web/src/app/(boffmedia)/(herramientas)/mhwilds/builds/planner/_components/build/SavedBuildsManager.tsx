@@ -88,7 +88,7 @@ export function SavedBuildsManager({ open, onOpenChange, onLoadBuild }: SavedBui
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="max-w-2xl border-0 text-surface-100"
+        className="max-w-2xl border-0 text-ink"
         style={{
           background: "linear-gradient(145deg, rgba(15,23,42,0.98), rgba(9,13,27,0.99))",
           border: "1px solid rgba(249,115,22,0.2)",
@@ -97,10 +97,10 @@ export function SavedBuildsManager({ open, onOpenChange, onLoadBuild }: SavedBui
         <DialogHeader>
           <DialogTitle className="text-xl flex items-center gap-2 font-black uppercase tracking-widest"
             style={{ fontFamily: "Orbitron, sans-serif" }}>
-            <FolderOpen className="h-5 w-5 text-primary-400" />
+            <FolderOpen className="h-5 w-5 text-primary-hover" />
             {t("build_planner.saved_builds")}
           </DialogTitle>
-          <DialogDescription className="text-surface-400">
+          <DialogDescription className="text-ink-muted">
             {t("build_planner.saved_builds_description")}
           </DialogDescription>
         </DialogHeader>
@@ -108,10 +108,10 @@ export function SavedBuildsManager({ open, onOpenChange, onLoadBuild }: SavedBui
         {/* Search */}
         <div className="mb-4">
           <div className="relative">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-surface-500" />
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-ink-muted" />
             <Input
               placeholder={t("build_planner.search_builds")}
-              className="pl-8 bg-surface-900/60 border-surface-700/60 placeholder:text-surface-500"
+              className="pl-8 bg-layer-1/60 border-edge/60 placeholder:text-ink-muted"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -120,8 +120,8 @@ export function SavedBuildsManager({ open, onOpenChange, onLoadBuild }: SavedBui
 
         {loading ? (
           <div className="flex items-center justify-center gap-2 py-8">
-            <Loader2 className="h-6 w-6 animate-spin text-primary-400" />
-            <span className="text-surface-400 text-sm">Cargando builds...</span>
+            <Loader2 className="h-6 w-6 animate-spin text-primary-hover" />
+            <span className="text-ink-muted text-sm">Cargando builds...</span>
           </div>
         ) : filteredBuilds.length > 0 ? (
           <ScrollArea className="h-[400px] pr-4">
@@ -133,7 +133,7 @@ export function SavedBuildsManager({ open, onOpenChange, onLoadBuild }: SavedBui
                   style={{ background: "rgba(15,23,42,0.5)", border: "1px solid rgba(71,85,105,0.3)" }}
                 >
                   <div className="flex items-center justify-between">
-                    <h3 className="font-medium text-surface-100">{build.name}</h3>
+                    <h3 className="font-medium text-ink">{build.name}</h3>
                     {deleteConfirm === build.key ? (
                       <div className="flex items-center gap-2">
                         <Button
@@ -165,7 +165,7 @@ export function SavedBuildsManager({ open, onOpenChange, onLoadBuild }: SavedBui
                         <Button
                           variant="outline"
                           size="sm"
-                          className="text-primary-400 border-primary-500/40"
+                          className="text-primary-hover border-primary/40"
                           onClick={() => handleLoadBuild(build.key)}
                         >
                           <FileDown className="h-4 w-4 mr-1" />
@@ -174,7 +174,7 @@ export function SavedBuildsManager({ open, onOpenChange, onLoadBuild }: SavedBui
                       </div>
                     )}
                   </div>
-                  <div className="mt-2 text-[10px] font-mono flex items-center text-surface-500">
+                  <div className="mt-2 text-[10px] font-mono flex items-center text-ink-muted">
                     <Clock className="h-3 w-3 mr-1" />
                     {formatDate(build.savedAt)}
                   </div>
@@ -184,7 +184,7 @@ export function SavedBuildsManager({ open, onOpenChange, onLoadBuild }: SavedBui
           </ScrollArea>
         ) : (
           <div className="py-8 text-center">
-            <p className="text-surface-400">
+            <p className="text-ink-muted">
               {searchQuery ? t("build_planner.no_builds_found") : t("build_planner.no_saved_builds")}
             </p>
             {searchQuery && (
@@ -196,7 +196,7 @@ export function SavedBuildsManager({ open, onOpenChange, onLoadBuild }: SavedBui
         )}
 
         <DialogFooter className="sm:justify-between">
-          <div className="text-[10px] font-mono text-surface-500">
+          <div className="text-[10px] font-mono text-ink-muted">
             {t("build_planner.build_count", { count: builds.length })}
           </div>
           <Button variant="outline" onClick={() => onOpenChange(false)}>

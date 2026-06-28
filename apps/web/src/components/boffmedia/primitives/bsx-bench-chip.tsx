@@ -30,10 +30,10 @@ export function BSXBenchChip({ mon, hotkey, disabled, reserved, onClick }: BSXBe
       className={[
         "bsx-focus flex items-center gap-[.55rem] p-[var(--bsx-pad-md)] text-left rounded-[var(--radius)] border font-inherit cursor-pointer transition-all duration-[var(--dur)] ease-[var(--ease)]",
         "min-w-0",
-        off ? "opacity-[.45] cursor-not-allowed" : "hover:-translate-y-px hover:border-[var(--border-strong)]",
+        off ? "opacity-[.45] cursor-not-allowed" : "hover:-translate-y-px hover:border-edge-strong",
       ].filter(Boolean).join(" ")}
       style={{
-        background: "var(--surface-2)",
+        background: "var(--layer-2)",
         border: "1px solid var(--border)",
         color: "var(--text)",
       }}
@@ -45,7 +45,7 @@ export function BSXBenchChip({ mon, hotkey, disabled, reserved, onClick }: BSXBe
       {hotkey && (
         <span
           className="font-mono font-bold text-t-3xs w-[19px] h-[19px] inline-grid place-items-center shrink-0 rounded-[var(--radius-sm)]"
-          style={{ background: "color-mix(in srgb, #000 30%, var(--surface-3))", color: "var(--text-muted)", border: "1px solid var(--border-strong)" }}
+          style={{ background: "color-mix(in srgb, #000 30%, var(--layer-3))", color: "var(--text-muted)", border: "1px solid var(--border-strong)" }}
         >
           {hotkey}
         </span>
@@ -63,11 +63,11 @@ export function BSXBenchChip({ mon, hotkey, disabled, reserved, onClick }: BSXBe
             <span aria-hidden="true" className="font-mono font-bold text-t-3xs" style={{ color: "var(--rose-400)" }}>✕</span>
           )}
           {mon.status && <BSStatusChip status={mon.status} />}
-          {reserved && <span className="font-mono text-t-4xs tracking-[.08em]" style={{ color: "var(--accent-bright)" }}>ELEGIDO</span>}
+          {reserved && <span className="font-mono text-t-4xs tracking-[.08em]" style={{ color: "var(--secondary-hover)" }}>ELEGIDO</span>}
         </div>
         <div
           className="h-[4px] rounded-[var(--radius-pill)] my-[.3rem] overflow-hidden"
-          style={{ background: "color-mix(in srgb, #000 40%, var(--surface-3))" }}
+          style={{ background: "color-mix(in srgb, #000 40%, var(--layer-3))" }}
         >
           <i className="block h-full rounded-[inherit]" style={{ width: `${pct}%`, background: hpColor(pct) }} />
         </div>

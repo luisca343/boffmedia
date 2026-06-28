@@ -260,7 +260,7 @@ function TransfersShort({
                 className={`text-right my-auto mx-2 ${
                   esPagador(transfer, activeAccount)
                     ? "text-red-800"
-                    : "text-highlight-700"
+                    : "text-warning"
                 }`}
               >
                 <div className="font-bold text-lg text-shadow-border05">
@@ -287,7 +287,7 @@ function TablaTransacciones({
 }) {
   return (
     <div className="relative overflow-x-auto shadow-sm rounded-lg">
-      <table className="min-w-full divide-y divide-surface-200">
+      <table className="min-w-full divide-y divide-edge">
         <thead className="sticky top-0 z-10 bg-blue-50">
           <tr>
             <th colSpan={2} className="px-6 py-3 text-left text-xs font-medium text-blue-800 uppercase tracking-wider">Información</th>
@@ -299,7 +299,7 @@ function TablaTransacciones({
             </th>
           </tr>
         </thead>
-        <tbody className="bg-white divide-y divide-surface-200">
+        <tbody className="bg-white divide-y divide-edge">
           {transactions.map((transaction: StarBankTransaction) => {
             const isPayer = esPagador(transaction, activeAccount);
             return (
@@ -350,7 +350,7 @@ function TablaTransacciones({
               className={`text-right my-auto ${
                 esPagador(transaction, activeAccount)
                   ? "text-red-800"
-                  : "text-highlight-700"
+                  : "text-warning"
               }`}
             >
               <div className="font-bold text-xl text-shadow-border05">

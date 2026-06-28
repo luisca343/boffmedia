@@ -65,19 +65,19 @@ export function ToolCard({ tool, go, delay = 0, className }: ToolCardProps) {
               {tool.isNew && <Badge kind="new">Nuevo</Badge>}
               {tool.soon && <Badge kind="soon">Pronto</Badge>}
             </div>
-            <p className="text-t-sm leading-relaxed m-0 text-[var(--text-muted)]">{tool.desc}</p>
+            <p className="text-t-sm leading-relaxed m-0 text-ink-muted">{tool.desc}</p>
           </div>
         </div>
         <div className="flex flex-wrap gap-1.5">
           {tool.features.map((f) => (
-            <span key={f} className="inline-flex items-center text-t-xs font-medium text-[var(--text-muted)] px-[0.6rem] py-[0.3rem] rounded-full bg-[var(--surface-2)] border border-[var(--border)]">
+            <span key={f} className="inline-flex items-center text-t-xs font-medium text-ink-muted px-[0.6rem] py-[0.3rem] rounded-full bg-layer-2 border border-edge">
               {f}
             </span>
           ))}
         </div>
         <div className="flex items-center justify-between pt-4 mt-auto border-t border-t-[var(--border)]">
           {tool.popularity && (
-            <span className="inline-flex items-center gap-[0.4rem] text-t-xs text-[var(--text-dim)]">
+            <span className="inline-flex items-center gap-[0.4rem] text-t-xs text-ink-dim">
               <Icon name="trending" size={14} />{" "}
               {tool.popularity === "high"
                 ? "Popularidad alta"

@@ -54,7 +54,7 @@ export default function ReplayPage({ params }: { params: Promise<{ name: string 
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 px-4" style={{ background: 'var(--bg)' }}>
         <p style={{ color: 'var(--text-muted)' }}>{error}</p>
-        <Link href="/battlesim/replay" className="underline" style={{ color: 'var(--accent)' }}>Paste replay manually</Link>
+        <Link href="/battlesim/replay" className="underline" style={{ color: 'var(--secondary)' }}>Paste replay manually</Link>
       </div>
     );
   }

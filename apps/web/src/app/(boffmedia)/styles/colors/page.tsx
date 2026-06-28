@@ -16,7 +16,7 @@ export default function PaletteViewer() {
 
   return (
     <div className="container mx-auto p-6 pt-16">
-      <div className="absolute inset-0 bg-gradient-to-br from-surface-950 via-surface-900 to-surface-800 -z-10" />
+      <div className="absolute inset-0 bg-gradient-to-br from-base via-layer-1 to-layer-2 -z-10" />
       <h1 className="text-4xl font-extrabold mb-10 text-center text-white tracking-wide drop-shadow-lg">
         🎮 Color System Preview
       </h1>
@@ -27,9 +27,9 @@ export default function PaletteViewer() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="rounded-xl overflow-hidden border border-surface-600 bg-surface-800/70 backdrop-blur shadow-lg"
+            className="rounded-xl overflow-hidden border border-edge bg-layer-2/70 backdrop-blur shadow-lg"
           >
-            <div className="px-5 py-3 flex items-center gap-3 bg-surface-900 border-b border-surface-700">
+            <div className="px-5 py-3 flex items-center gap-3 bg-layer-1 border-b border-edge">
               <div
                 className="w-5 h-5 rounded-full shadow"
                 style={{

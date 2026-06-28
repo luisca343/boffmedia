@@ -22,10 +22,10 @@ export function BSXOrderRail({ slots }: BSXOrderRailProps) {
 
   return (
     <div
-      className="flex items-center gap-[.7rem] flex-wrap p-[var(--bsx-pad-md)] rounded-[var(--radius)] border border-[var(--border)]"
-      style={{ background: "color-mix(in srgb, var(--surface) 70%, transparent)" }}
+      className="flex items-center gap-[.7rem] flex-wrap p-[var(--bsx-pad-md)] rounded-[var(--radius)] border border-edge"
+      style={{ background: "color-mix(in srgb, var(--layer-1) 70%, transparent)" }}
     >
-      <span className="font-mono text-t-3xs tracking-[.1em] uppercase inline-flex items-center gap-[.35rem] whitespace-nowrap" style={{ color: "var(--accent-bright)" }}>
+      <span className="font-mono text-t-3xs tracking-[.1em] uppercase inline-flex items-center gap-[.35rem] whitespace-nowrap" style={{ color: "var(--secondary-hover)" }}>
         <Icon name="trending" size={12} /> Orden previsto
       </span>
 
@@ -37,15 +37,15 @@ export function BSXOrderRail({ slots }: BSXOrderRailProps) {
             style={{
               borderColor: s.side === "foe"
                 ? "color-mix(in srgb, var(--orange-500) 40%, var(--border))"
-                : "color-mix(in srgb, var(--accent) 36%, var(--border))",
+                : "color-mix(in srgb, var(--secondary) 36%, var(--border))",
               background: s.side === "foe"
-                ? "color-mix(in srgb, var(--orange-500) 10%, var(--surface-2))"
-                : "color-mix(in srgb, var(--accent) 10%, var(--surface-2))",
+                ? "color-mix(in srgb, var(--orange-500) 10%, var(--layer-2))"
+                : "color-mix(in srgb, var(--secondary) 10%, var(--layer-2))",
             }}
           >
             <b
               className="font-mono text-t-4xs w-[14px] h-[14px] rounded-[var(--radius-sm)] grid place-items-center"
-              style={{ background: "var(--surface-3)", color: "var(--text-muted)" }}
+              style={{ background: "var(--layer-3)", color: "var(--text-muted)" }}
             >
               {i + 1}
             </b>

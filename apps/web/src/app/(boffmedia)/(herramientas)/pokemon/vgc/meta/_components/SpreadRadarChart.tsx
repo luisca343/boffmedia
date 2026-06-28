@@ -22,7 +22,7 @@ export function SpreadRadarChart({ spread, nature, maxValue = 252 }: Props) {
 
   return (
     <div className="w-full">
-      <p className="text-xs text-surface-400 text-center mb-1 font-medium">{nature}</p>
+      <p className="text-xs text-ink-muted text-center mb-1 font-medium">{nature}</p>
       <ResponsiveContainer width="100%" height={180}>
         <RadarChart data={data} margin={{ top: 4, right: 16, bottom: 4, left: 16 }}>
           <PolarGrid stroke="#475569" />

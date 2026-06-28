@@ -23,23 +23,23 @@ export default function AdminPageLayout({
   addBackgroundEffects = false
 }: AdminPageLayoutProps) {
   return (
-    <div className={`${(addBackgroundEffects || !isMinecraft()) && 'bg-black'} w-full min-h-screen text-highlight-400 font-mono p-4 flex flex-col relative overflow-auto`}>
+    <div className={`${(addBackgroundEffects || !isMinecraft()) && 'bg-black'} w-full min-h-screen text-warning-hover font-mono p-4 flex flex-col relative overflow-auto`}>
       <div className='z-10'>
       
       <div className="flex items-center mb-6">
-        <Link href={backLink} className="text-highlight-500 hover:text-highlight-400 transition-colors flex items-center">
+        <Link href={backLink} className="text-warning hover:text-warning-hover transition-colors flex items-center">
           <ArrowLeftCircle className="mr-2 w-5 h-5" />
           <span>{backText}</span>
         </Link>
       </div>
       
-      <h1 className="text-3xl font-bold mb-6 text-center text-highlight-500 uppercase tracking-widest glitch">
-        {title} {version && <span className="text-xs text-highlight-700">v{version}</span>}
+      <h1 className="text-3xl font-bold mb-6 text-center text-warning uppercase tracking-widest glitch">
+        {title} {version && <span className="text-xs text-warning">v{version}</span>}
       </h1>
       
       {children}
       
-      <div className="text-xs text-highlight-700 mt-4 text-center">
+      <div className="text-xs text-warning mt-4 text-center">
         Ficus Labs | Sistema de Administración | Acceso Restringido
       </div>
       </div>

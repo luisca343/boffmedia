@@ -29,12 +29,12 @@ export function BoffPopover({ trigger, children, align = "start", width = 280 }:
         <div
           className={cn(
             "absolute top-[calc(100%+8px)] z-[130] p-4",
-            "bg-[var(--surface)]",
-            "border border-solid border-[var(--border-strong)]",
+            "bg-layer-1",
+            "border border-solid border-edge-strong",
             "rounded-[var(--radius-lg,22px)]",
             "shadow-[0_24px_50px_-20px_var(--shadow-color)]",
             "animate-dd-in",
-            "data-[direction=neon]:backdrop-blur-[4px] data-[direction=neon]:bg-[color-mix(in_srgb,var(--surface)_90%,transparent)]",
+            "data-[direction=neon]:backdrop-blur-[4px] data-[direction=neon]:bg-[color-mix(in_srgb,var(--layer-1)_90%,transparent)]",
             "data-[direction=hud]:shadow-[5px_5px_0_0_var(--hud-shadow)]",
           )}
           style={{ width, ...alignStyles[align] }}

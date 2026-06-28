@@ -24,14 +24,14 @@ export function BSXPlanChip({ tag, action, onClear, hint }: BSXPlanChipProps) {
     return (
       <div
         className="flex items-center gap-[.45rem] p-[var(--bsx-pad-sm)] min-w-0 rounded-[var(--radius)] text-t-xs"
-        style={{ background: "var(--surface-2)", border: "1px dashed var(--border-strong)" }}
+        style={{ background: "var(--layer-2)", border: "1px dashed var(--border-strong)" }}
       >
         <span
           className="font-mono font-bold text-t-4xs w-[15px] h-[15px] inline-grid place-items-center rounded-[var(--radius-sm)] shrink-0"
           style={{
-            background: "color-mix(in srgb, var(--accent) 24%, transparent)",
-            color: "var(--accent-bright)",
-            border: "1px solid color-mix(in srgb, var(--accent) 45%, transparent)",
+            background: "color-mix(in srgb, var(--secondary) 24%, transparent)",
+            color: "var(--secondary-hover)",
+            border: "1px solid color-mix(in srgb, var(--secondary) 45%, transparent)",
           }}
         >
           {tag}
@@ -46,23 +46,23 @@ export function BSXPlanChip({ tag, action, onClear, hint }: BSXPlanChipProps) {
     : action.target && action.target.spread ? (action.target.spread === "all" ? "todos" : "ambos rivales")
     : action.targetName || ""
 
-  const c = isMove && action.move ? tyVar(action.move.type) : "var(--accent)"
+  const c = isMove && action.move ? tyVar(action.move.type) : "var(--secondary)"
 
   return (
     <div
       className="flex items-center gap-[.45rem] p-[var(--bsx-pad-sm)] min-w-0 rounded-[var(--radius)] text-t-xs"
       style={{
         "--_c": c,
-        background: `color-mix(in srgb, ${c} 9%, var(--surface-2))`,
+        background: `color-mix(in srgb, ${c} 9%, var(--layer-2))`,
         border: `1px solid color-mix(in srgb, ${c} 38%, var(--border))`,
       } as React.CSSProperties}
     >
       <span
         className="font-mono font-bold text-t-4xs w-[15px] h-[15px] inline-grid place-items-center rounded-[var(--radius-sm)] shrink-0"
         style={{
-          background: `color-mix(in srgb, var(--accent) 24%, transparent)`,
-          color: "var(--accent-bright)",
-          border: "1px solid color-mix(in srgb, var(--accent) 45%, transparent)",
+          background: `color-mix(in srgb, var(--secondary) 24%, transparent)`,
+          color: "var(--secondary-hover)",
+          border: "1px solid color-mix(in srgb, var(--secondary) 45%, transparent)",
         }}
       >
         {tag}

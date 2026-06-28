@@ -127,10 +127,10 @@ export function WinnersTab({ previousWinners }: WinnersTabProps) {
             className="w-14 h-14 rounded-lg flex items-center justify-center mb-4"
             style={{ background: "rgba(30,41,59,0.6)" }}
           >
-            <Trophy className="w-7 h-7 text-surface-500" />
+            <Trophy className="w-7 h-7 text-ink-muted" />
           </div>
-          <p className="text-surface-400 mb-1 text-sm">Sin ganadores aún</p>
-          <p className="text-xs text-surface-500">Los ganadores aparecerán aquí después de cada sorteo</p>
+          <p className="text-ink-muted mb-1 text-sm">Sin ganadores aún</p>
+          <p className="text-xs text-ink-muted">Los ganadores aparecerán aquí después de cada sorteo</p>
         </div>
       )}
     </>

@@ -36,8 +36,8 @@ const TooltipContent = React.forwardRef<
   const variant = useTooltipVariant()
   
   const variantStyles = {
-    default: "border-surface-700 bg-surface-900 text-surface-300",
-    wingull: "border-secondary-700 bg-secondary-900 text-secondary-300",
+    default: "border-edge bg-layer-1 text-ink",
+    wingull: "border-secondary-active bg-secondary-soft text-secondary-hover",
   }
   
   return (

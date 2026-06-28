@@ -43,7 +43,7 @@ const PokemonHeader: FC<{ sprite?: string; name: string; types?: string[] }> = (
         style={{ imageRendering: "pixelated" }}
       />
     )}
-    <h2 className="text-2xl font-bold text-surface-100 mb-3">{name}</h2>
+    <h2 className="text-2xl font-bold text-ink mb-3">{name}</h2>
     {types && types.length > 0 && (
       <div className="flex justify-center gap-2">
         {types.map((type, idx) => (
@@ -60,10 +60,10 @@ const StatBar: FC<{ label: string; value: number }> = ({ label, value }) => {
   const percentage = statToPercentage(value);
   return (
     <div className="flex items-center gap-3">
-      <div className="w-24 text-sm text-surface-300 font-medium">{label}:</div>
-      <div className="w-12 text-sm text-surface-200 font-mono text-right">{value}</div>
+      <div className="w-24 text-sm text-ink font-medium">{label}:</div>
+      <div className="w-12 text-sm text-ink font-mono text-right">{value}</div>
       <div className="flex-1">
-        <div className="w-full bg-surface-600 rounded-full h-2">
+        <div className="w-full bg-layer-3 rounded-full h-2">
           <div
             className="h-2 rounded-full transition-all duration-300"
             style={{ width: `${percentage}%`, backgroundColor: color }}
@@ -97,7 +97,7 @@ const OverviewSection: FC<{ stats?: PokemonStats; habitatCount: number; moveType
 
       {stats && (
         <div className="space-y-3">
-          <h4 className="text-surface-200 font-medium">Estadísticas Principales</h4>
+          <h4 className="text-ink font-medium">Estadísticas Principales</h4>
           <StatBar label="PS" value={stats.hp} />
           <StatBar label="Ataque" value={stats.attack} />
           <StatBar label="Velocidad" value={stats.speed} />
@@ -108,9 +108,9 @@ const OverviewSection: FC<{ stats?: PokemonStats; habitatCount: number; moveType
 };
 
 const InfoCard: FC<{ value: number; label: string }> = ({ value, label }) => (
-  <div className="bg-surface-600/30 rounded-lg p-4 text-center">
-    <div className="text-2xl font-bold text-surface-100">{value}</div>
-    <div className="text-sm text-surface-400">{label}</div>
+  <div className="bg-layer-3/30 rounded-lg p-4 text-center">
+    <div className="text-2xl font-bold text-ink">{value}</div>
+    <div className="text-sm text-ink-muted">{label}</div>
   </div>
 );
 
@@ -128,10 +128,10 @@ const StatsSection: FC<{ stats: PokemonStats }> = ({ stats }) => {
 
   return (
     <div className="space-y-4">
-      <div className="bg-surface-600/30 rounded-lg p-4 mb-4 flex justify-between items-center">
-        <span className="text-surface-200 font-medium">Total Base Stats</span>
+      <div className="bg-layer-3/30 rounded-lg p-4 mb-4 flex justify-between items-center">
+        <span className="text-ink font-medium">Total Base Stats</span>
         <div className="flex items-center gap-2">
-          <span className="text-2xl font-bold text-surface-100">{totalStats}</span>
+          <span className="text-2xl font-bold text-ink">{totalStats}</span>
           <div className="w-3 h-3 rounded-full" style={{ backgroundColor: getTotalStatColor(totalStats) }} />
         </div>
       </div>
@@ -182,7 +182,7 @@ const MovesSection: FC<{ moves: Record<string, any>; searchTerm: string; setSear
     <div className="space-y-4">
       <SearchInput searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       {Object.keys(filteredMoves).length === 0 && searchTerm ? (
-  <div className="text-center py-8 text-surface-400">No se encontraron movimientos con &quot;{searchTerm}&quot;</div>
+  <div className="text-center py-8 text-ink-muted">No se encontraron movimientos con &quot;{searchTerm}&quot;</div>
       ) : (
         Object.entries(filteredMoves).map(([type, moveList], idx) => (
           <MoveCategory key={idx} type={type} moveList={moveList} t={t} />
@@ -194,20 +194,20 @@ const MovesSection: FC<{ moves: Record<string, any>; searchTerm: string; setSear
 
 const SearchInput: FC<{ searchTerm: string; setSearchTerm: (v: string) => void }> = ({ searchTerm, setSearchTerm }) => (
   <div className="relative">
-    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-surface-400 h-4 w-4" />
+    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-ink-muted h-4 w-4" />
     <Input
       type="text"
       placeholder="Buscar movimiento..."
       value={searchTerm}
       onChange={(e) => setSearchTerm(e.target.value)}
-      className="pl-10 pr-10 bg-surface-600/50 border-surface-500 text-surface-100 placeholder:text-surface-400"
+      className="pl-10 pr-10 bg-layer-3/50 border-edge text-ink placeholder:text-ink-muted"
     />
     {searchTerm && (
       <Button
         variant="ghost"
         size="sm"
         onClick={() => setSearchTerm("")}
-        className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0 text-surface-400 hover:text-surface-200"
+        className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0 text-ink-muted hover:text-ink"
       >
         <X className="h-4 w-4" />
       </Button>
@@ -216,8 +216,8 @@ const SearchInput: FC<{ searchTerm: string; setSearchTerm: (v: string) => void }
 );
 
 const MoveCategory: FC<{ type: string; moveList: any; t: any }> = ({ type, moveList, t }) => (
-  <div className="bg-surface-600/30 rounded-lg p-4">
-    <h4 className="text-primary-400 font-semibold mb-3">
+  <div className="bg-layer-3/30 rounded-lg p-4">
+    <h4 className="text-primary-hover font-semibold mb-3">
       {getTranslatedMoveCategory(type, t)} (
       {type === "levelUpMoves" && Array.isArray(moveList)
         ? moveList.reduce((total: number, lvl: any) => total + (lvl.attacks?.length || 0), 0)
@@ -230,7 +230,7 @@ const MoveCategory: FC<{ type: string; moveList: any; t: any }> = ({ type, moveL
       <div className="space-y-3">
         {moveList.map((lvl: any, i: number) => (
           <div key={i} className="space-y-2">
-            <div className="text-sm font-medium text-surface-300">Nivel {lvl.level}</div>
+            <div className="text-sm font-medium text-ink">Nivel {lvl.level}</div>
             <MoveBadges moves={lvl.attacks} t={t} />
           </div>
         ))}
@@ -246,12 +246,12 @@ const MoveBadges: FC<{ moves: string[]; t: any }> = ({ moves, t }) => (
     {moves.map((move, idx) => (
       <HoverCard key={idx}>
         <HoverCardTrigger>
-          <Badge variant="secondary" className="bg-surface-600 text-surface-200 hover:bg-surface-500 text-xs cursor-pointer transition-colors">
+          <Badge variant="secondary" className="bg-layer-3 text-ink hover:bg-layer-3 text-xs cursor-pointer transition-colors">
             {getTranslatedMoveName(move, t)}
           </Badge>
         </HoverCardTrigger>
         <HoverCardContent
-          className="bg-surface-700 text-surface-50 w-[400px] border-surface-950 border font-normal"
+          className="bg-layer-3 text-ink w-[400px] border-edge-strong border font-normal"
           style={{ zIndex: 9999 }}
           side="top"
           align="center"
@@ -266,7 +266,7 @@ const MoveBadges: FC<{ moves: string[]; t: any }> = ({ moves, t }) => (
 /* ---------- Types ---------- */
 const TypesSection: FC<{ name: string; types: string[] }> = ({ name, types }) => (
   <div className="space-y-4">
-    <div className="text-surface-300 text-sm">{name} es de tipo:</div>
+    <div className="text-ink text-sm">{name} es de tipo:</div>
     <div className="flex justify-center gap-3">
       {types.map((type, idx) => (
         <TypeBadge key={idx} type={type} />
@@ -278,19 +278,19 @@ const TypesSection: FC<{ name: string; types: string[] }> = ({ name, types }) =>
 /* ---------- Habitat ---------- */
 const HabitatSection: FC<{ name: string; biomes: string[]; t: any }> = ({ name, biomes, t }) => (
   <div className="space-y-4">
-    <div className="text-surface-300 text-sm">{name} puede encontrarse en los siguientes biomas:</div>
+    <div className="text-ink text-sm">{name} puede encontrarse en los siguientes biomas:</div>
     <div className="flex flex-wrap gap-2">
       {biomes.map((biome, idx) => (
         <Badge
           key={idx}
           variant="outline"
-          className="bg-highlight-600/20 border-highlight-500 text-highlight-300 hover:bg-highlight-600/30"
+          className="bg-warning/20 border-warning-border text-warning-hover hover:bg-warning/30"
         >
           {getTranslatedBiomeName(biome, t)}
         </Badge>
       ))}
     </div>
-    {biomes.length === 0 && <div className="text-surface-400 text-sm italic">No hay biomas válidos disponibles.</div>}
+    {biomes.length === 0 && <div className="text-ink-muted text-sm italic">No hay biomas válidos disponibles.</div>}
   </div>
 );
 
@@ -322,20 +322,20 @@ export default function PokemonDataCard({ data }: PokemonDataCardProps) {
 
   if (!availableTabs.length) {
     return (
-      <div className="bg-surface-700/50 rounded-lg p-6 mt-3 border border-surface-600 text-center">
-        <div className="text-surface-400">No hay datos disponibles para mostrar.</div>
+      <div className="bg-layer-3/50 rounded-lg p-6 mt-3 border border-edge text-center">
+        <div className="text-ink-muted">No hay datos disponibles para mostrar.</div>
       </div>
     );
   }
 
   return (
-    <div className="bg-surface-700/50 rounded-lg p-6 mt-3 border border-surface-600 max-w-4xl w-full sm:w-[420px]">
+    <div className="bg-layer-3/50 rounded-lg p-6 mt-3 border border-edge max-w-4xl w-full sm:w-[420px]">
       <PokemonHeader sprite={spriteInfo?.path} name={pokemonName} types={types} />
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         {availableTabs.length > 1 && (
-          <TabsList className={`grid w-full grid-cols-${availableTabs.length} mb-6 bg-surface-600/50`}>
+          <TabsList className={`grid w-full grid-cols-${availableTabs.length} mb-6 bg-layer-3/50`}>
             {availableTabs.map((tab) => (
-              <TabsTrigger key={tab.id} value={tab.id} className="data-[state=active]:bg-primary-600">
+              <TabsTrigger key={tab.id} value={tab.id} className="data-[state=active]:bg-primary-active">
                 {tab.label}
               </TabsTrigger>
             ))}

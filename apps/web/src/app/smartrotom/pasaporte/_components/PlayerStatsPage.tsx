@@ -121,7 +121,7 @@ function StatCard({
         <h3 className="font-bold">{title}</h3>
       </div>
       <div className="text-2xl font-bold mb-1">{value}</div>
-      <div className="text-sm text-surface-600">{subtitle}</div>
+      <div className="text-sm text-ink-dim">{subtitle}</div>
     </div>
   )
 }

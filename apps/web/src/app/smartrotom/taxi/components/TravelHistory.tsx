@@ -30,7 +30,7 @@ export default function TravelHistory({ trips }: TravelHistoryProps) {
   return (
     <div className="bg-white/10 backdrop-blur-sm rounded-lg shadow-md overflow-hidden mb-4 border border-white/20">
       <div 
-        className="flex items-center justify-between p-4 cursor-pointer hover:bg-secondary-800/30 bg-gradient-to-r from-secondary-600/70 to-secondary-800/70"
+        className="flex items-center justify-between p-4 cursor-pointer hover:bg-secondary-soft/30 bg-gradient-to-r from-secondary-active/70 to-secondary-soft/70"
         onClick={toggleExpansion}
       >
         <div className="flex items-center">
@@ -39,27 +39,27 @@ export default function TravelHistory({ trips }: TravelHistoryProps) {
           </div>
           <div>
             <h3 className="font-bold text-white">Historial de viajes</h3>
-            <p className="text-sm text-secondary-200">{trips.length} viajes - {formatMoney(totalSpent)} gastados</p>
+            <p className="text-sm text-secondary-hover">{trips.length} viajes - {formatMoney(totalSpent)} gastados</p>
           </div>
         </div>
         {isExpanded ? 
-          <FaChevronUp className="text-secondary-300" /> : 
-          <FaChevronDown className="text-secondary-300" />
+          <FaChevronUp className="text-secondary-hover" /> : 
+          <FaChevronDown className="text-secondary-hover" />
         }
       </div>
       
       {isExpanded && (
         <div className="border-t border-white/10 divide-y divide-white/10">
           {trips.map((trip) => (
-            <div key={trip.id} className="p-3 hover:bg-secondary-800/20">
+            <div key={trip.id} className="p-3 hover:bg-secondary-soft/20">
               <div className="flex justify-between items-center">
                 <div className="font-medium text-white">{trip.destination}</div>
-                <div className="text-highlight-400 font-medium">{formatMoney(trip.price)}</div>
+                <div className="text-warning-hover font-medium">{formatMoney(trip.price)}</div>
               </div>
-              <div className="flex justify-between text-sm text-secondary-200 mt-1">
+              <div className="flex justify-between text-sm text-secondary-hover mt-1">
                 <div>{new Date(trip.date).toLocaleDateString()}</div>
                 <div className="flex items-center">
-                  <FaMapMarkedAlt className="mr-1 text-secondary-300" />
+                  <FaMapMarkedAlt className="mr-1 text-secondary-hover" />
                   <span>({trip.fromX}, {trip.fromZ}) → ({trip.toX}, {trip.toZ})</span>
                 </div>
               </div>

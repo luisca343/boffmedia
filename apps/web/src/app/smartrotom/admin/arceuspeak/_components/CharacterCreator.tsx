@@ -109,20 +109,20 @@ export default function CharacterCreator() {
   }
 
   return (
-    <div className="space-y-4 text-highlight-400">
-      <div className="text-xs text-highlight-600 mb-1">
-        <span className="text-highlight-600/60">{"//"} </span>
+    <div className="space-y-4 text-warning-hover">
+      <div className="text-xs text-warning mb-1">
+        <span className="text-warning/60">{"//"} </span>
         Identificador
       </div>
       <Input
         placeholder="Nombre del Personaje"
         value={name}
         onChange={(e) => setName(e.target.value)}
-        className="bg-black text-highlight-400 border-highlight-700 focus:border-highlight-500 focus:ring-0"
+        className="bg-black text-warning-hover border-warning-border focus:border-warning-border focus:ring-0"
       />
       
-      <div className="text-xs text-highlight-600 mb-1">
-        <span className="text-highlight-600/60">{"//"} </span>
+      <div className="text-xs text-warning mb-1">
+        <span className="text-warning/60">{"//"} </span>
         Formato de apariencia
       </div>
       <Input
@@ -130,12 +130,12 @@ export default function CharacterCreator() {
         placeholder="Formato (ej: §l§f[§6Nombre del Personaje§f])"
         value={characterFormat}
         onChange={(e) => setCharacterFormat(e.target.value)}
-        className="bg-black text-highlight-400 border-highlight-700 focus:border-highlight-500 focus:ring-0 font-mono"
+        className="bg-black text-warning-hover border-warning-border focus:border-warning-border focus:ring-0 font-mono"
       />
       
-      <div className="border-t border-highlight-800/30 pt-3">
-        <div className="text-xs text-highlight-600 mb-2 flex items-center">
-          <span className="w-2 h-2 bg-highlight-500 rounded-full mr-2"></span>
+      <div className="border-t border-warning-border/30 pt-3">
+        <div className="text-xs text-warning mb-2 flex items-center">
+          <span className="w-2 h-2 bg-warning rounded-full mr-2"></span>
           Selección de colores
         </div>
         <div className="grid grid-cols-4 gap-2">
@@ -156,9 +156,9 @@ export default function CharacterCreator() {
         </div>
       </div>
       
-      <div className="border-t border-highlight-800/30 pt-3">
-        <div className="text-xs text-highlight-600 mb-2 flex items-center">
-          <span className="w-2 h-2 bg-highlight-500 rounded-full mr-2"></span>
+      <div className="border-t border-warning-border/30 pt-3">
+        <div className="text-xs text-warning mb-2 flex items-center">
+          <span className="w-2 h-2 bg-warning rounded-full mr-2"></span>
           Estilos de texto
         </div>
         <div className="grid grid-cols-3 gap-2">
@@ -175,14 +175,14 @@ export default function CharacterCreator() {
         </div>
       </div>
       
-      <div className="border-t border-highlight-800/30 pt-3">
-        <div className="text-xs text-highlight-600 mb-2 flex items-center">
+      <div className="border-t border-warning-border/30 pt-3">
+        <div className="text-xs text-warning mb-2 flex items-center">
           <Eye className="w-3 h-3 mr-1" />
           Preview
         </div>
-        <div className="bg-black/60 p-3 rounded border border-highlight-700">
-          <div className="text-xs text-highlight-600/60 mb-1">&gt; Resultado:</div>
-          <p className="p-2 border border-highlight-900 bg-[#777] rounded font-minecraft" dangerouslySetInnerHTML={{ __html: previewHtml }} />
+        <div className="bg-black/60 p-3 rounded border border-warning-border">
+          <div className="text-xs text-warning/60 mb-1">&gt; Resultado:</div>
+          <p className="p-2 border border-warning-border bg-[#777] rounded font-minecraft" dangerouslySetInnerHTML={{ __html: previewHtml }} />
         </div>
       </div>
       
@@ -202,7 +202,7 @@ export default function CharacterCreator() {
         )}
       </Button>
       
-      <div className="text-xs text-highlight-700 mt-2 bg-black/40 p-2 border border-highlight-900/50 rounded">
+      <div className="text-xs text-warning mt-2 bg-black/40 p-2 border border-warning-border/50 rounded">
         <div className="flex items-start mb-1">
           <AlertTriangle className="w-3 h-3 mr-1 mt-0.5 flex-shrink-0" />
           <span>Los personajes creados serán visibles para todos los administradores.</span>

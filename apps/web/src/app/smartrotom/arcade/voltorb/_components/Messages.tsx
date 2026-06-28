@@ -29,7 +29,7 @@ export default function Messages({
           <AlertCircle className="h-6 w-6 text-red-500 mr-2" />
           <p className="text-xl font-bold text-red-400">¡Game Over!</p>
         </div>
-        <p className="text-surface-300 mb-3">Has encontrado un Voltorb y perdido {lostCoins} monedas.</p>
+        <p className="text-ink mb-3">Has encontrado un Voltorb y perdido {lostCoins} monedas.</p>
         <p className="text-cyan-400 text-sm">Inicia una nueva partida para seguir jugando.</p>
       </motion.div>
     );
@@ -46,10 +46,10 @@ export default function Messages({
           <Award className="h-6 w-6 text-yellow-500 mr-2" />
           <p className="text-xl font-bold text-yellow-300">¡Nivel Completado!</p>
         </div>
-        <p className="text-surface-300 mb-4">¡Encontraste todos los multiplicadores sin activar ningún Voltorb!</p>
+        <p className="text-ink mb-4">¡Encontraste todos los multiplicadores sin activar ningún Voltorb!</p>
         <div className="flex justify-center space-x-4 mt-4">
           <button
-            className="bg-gradient-to-r from-cyan-500 to-secondary-600 hover:from-cyan-600 hover:to-secondary-700 text-white py-2 px-4 rounded-md border border-cyan-500/50 flex items-center"
+            className="bg-gradient-to-r from-cyan-500 to-secondary-active hover:from-cyan-600 hover:to-secondary-active text-white py-2 px-4 rounded-md border border-cyan-500/50 flex items-center"
             onClick={onNextLevel}
           >
             Siguiente nivel <ChevronRight className="h-4 w-4 ml-1" />

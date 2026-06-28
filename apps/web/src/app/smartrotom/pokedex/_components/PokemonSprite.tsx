@@ -46,7 +46,7 @@ export function PokemonSpriteLink({children, id, form, palette, width = 80, heig
 
   return (
     <InternalLink
-      className="flex flex-col items-center hover:bg-surface-400 rounded-sm text-center w-24 2xl:w-20 text-surface-50"
+      className="flex flex-col items-center hover:bg-layer-3 rounded-sm text-center w-24 2xl:w-20 text-ink"
       href={`pokedex/entrada/${id}/${form}`}
     >
       <PokemonSprite

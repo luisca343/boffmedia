@@ -13,7 +13,7 @@ interface StatCardProps {
 export function StatCard({ icon, value, label, sub }: StatCardProps) {
   return (
     <div
-      className="flex flex-col gap-[0.15rem] p-[1.1rem] rounded-[var(--radius)] bg-[var(--surface-2)]"
+      className="flex flex-col gap-[0.15rem] p-[1.1rem] rounded-[var(--radius)] bg-layer-2"
       style={{ border: "var(--hairline) solid var(--border)" }}
     >
       <span
@@ -27,7 +27,7 @@ export function StatCard({ icon, value, label, sub }: StatCardProps) {
       </span>
       <span className="font-display font-extrabold text-[length:var(--t-2xl)] whitespace-nowrap leading-none">{value}</span>
       <span className="text-sm font-semibold mt-[0.1rem]">{label}</span>
-      {sub && <span className="text-xs text-[var(--text-dim)] mt-[0.05rem]">{sub}</span>}
+      {sub && <span className="text-xs text-ink-dim mt-[0.05rem]">{sub}</span>}
     </div>
   )
 }

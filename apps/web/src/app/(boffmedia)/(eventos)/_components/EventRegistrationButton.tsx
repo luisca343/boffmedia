@@ -112,8 +112,8 @@ export function EventRegistrationButton({ event }: EventRegistrationButtonProps)
   if (isLoading) {
     return (
       <Button disabled variant="accentOutline" className="w-full">
-        <Loader2 className="mr-2 h-4 w-4 animate-spin text-accent-400" />
-        <span className="text-surface-300">Verificando registro...</span>
+        <Loader2 className="mr-2 h-4 w-4 animate-spin text-secondary-hover" />
+        <span className="text-ink">Verificando registro...</span>
       </Button>
     );
   }

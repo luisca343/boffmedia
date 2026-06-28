@@ -186,7 +186,7 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
           >
             {/* Top neon bar */}
             <div
-              className="h-[2px] bg-gradient-to-r from-primary-600 via-primary-400 to-primary-600"
+              className="h-[2px] bg-gradient-to-r from-primary-active via-primary-hover to-primary-active"
               style={{ opacity: 0.7 }}
             />
 
@@ -196,23 +196,23 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
                 <>
                   <Link
                     href={mainLink.href}
-                    className="flex items-center gap-2 px-3 py-2 mx-1 rounded-md transition-all duration-150 hover:bg-primary-500/[0.08] group"
+                    className="flex items-center gap-2 px-3 py-2 mx-1 rounded-md transition-all duration-150 hover:bg-primary/[0.08] group"
                     onClick={handleNavigate}
                   >
                     {mainLink.icon && (
-                      <span className="text-primary-400/60 group-hover:text-primary-400 transition-colors flex-shrink-0">
+                      <span className="text-primary-hover/60 group-hover:text-primary-hover transition-colors flex-shrink-0">
                         {mainLink.icon}
                       </span>
                     )}
                     <div>
                       <div
-                        className="text-sm font-bold text-surface-100 group-hover:text-primary-200 transition-colors leading-tight"
+                        className="text-sm font-bold text-ink group-hover:text-primary-hover transition-colors leading-tight"
                         style={{ fontFamily: "Orbitron, sans-serif" }}
                       >
                         {mainLink.label}
                       </div>
                       {mainLink.description && (
-                        <div className="text-xs text-surface-500 mt-0.5">
+                        <div className="text-xs text-ink-muted mt-0.5">
                           {mainLink.description}
                         </div>
                       )}
@@ -277,7 +277,7 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
                       .map((item, itemIndex) => (
                         <MotionLink
                           href={item.href}
-                          className="flex items-center gap-2 mx-1 px-2 py-1.5 rounded text-xs text-surface-300 hover:text-surface-50 hover:bg-primary-500/[0.07] transition-colors duration-150 group"
+                          className="flex items-center gap-2 mx-1 px-2 py-1.5 rounded text-xs text-ink hover:text-ink hover:bg-primary/[0.07] transition-colors duration-150 group"
                           initial={{ opacity: 0, x: -4 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ duration: 0.12, delay: itemIndex * 0.025 }}
@@ -287,7 +287,7 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
                           rel={item.isExternal ? "noopener noreferrer" : undefined}
                         >
                           {item.icon && (
-                            <span className="text-primary-400/55 group-hover:text-primary-400/90 transition-colors flex-shrink-0 [&_svg]:w-3.5 [&_svg]:h-3.5">
+                            <span className="text-primary-hover/55 group-hover:text-primary-hover/90 transition-colors flex-shrink-0 [&_svg]:w-3.5 [&_svg]:h-3.5">
                               {item.icon}
                             </span>
                           )}

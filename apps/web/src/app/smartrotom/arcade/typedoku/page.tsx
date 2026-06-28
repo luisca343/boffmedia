@@ -17,14 +17,14 @@ type Cell = {
 }
 
 const typeColors: { [key: string]: string } = {
-  Normal: 'bg-surface-400',
+  Normal: 'bg-layer-3',
   Fire: 'bg-red-500',
-  Water: 'bg-secondary-500',
+  Water: 'bg-secondary',
   Electric: 'bg-yellow-400',
-  Grass: 'bg-highlight-500',
+  Grass: 'bg-warning',
   Ice: 'bg-cyan-400',
   Fairy: 'bg-pink-400',
-  Poison: 'bg-accent-500',
+  Poison: 'bg-secondary',
   Ground: 'bg-amber-600',
 }
 
@@ -298,7 +298,7 @@ export default function TypeDoku() {
   }, [handleKeyDown])
 
   return (
-    <div className="min-h-full w-full bg-gradient-to-b from-indigo-900 to-accent-900 text-white font-mono flex flex-col relative overflow-hidden">
+    <div className="min-h-full w-full bg-gradient-to-b from-indigo-900 to-secondary-soft text-white font-mono flex flex-col relative overflow-hidden">
       <StarsBackground />
       <main className="flex-grow p-6 container mx-auto max-w-4xl relative z-10">
       <RainbowText text="PokéDoku: Apasionante Sudoku Temático Arcade" />
@@ -317,12 +317,12 @@ export default function TypeDoku() {
                           <button
                             key={`${row}-${col}`}
                             className={`w-full aspect-square flex items-center justify-center text-xs sm:text-sm font-bold rounded-md border-2 transition-all duration-200 ${
-                              cell?.isGiven ? 'border-surface-500 cursor-not-allowed' : 'border-yellow-300 hover:border-yellow-500'
+                              cell?.isGiven ? 'border-edge cursor-not-allowed' : 'border-yellow-300 hover:border-yellow-500'
                             } ${
                               selectedCell && selectedCell[0] === row && selectedCell[1] === col
                                 ?'ring-2 ring-pink-500'
                                 : ''
-                            } ${cell?.value ? typeColors[cell.value] : 'bg-surface-700'}`}
+                            } ${cell?.value ? typeColors[cell.value] : 'bg-layer-3'}`}
                             onClick={() => handleCellClick(row, col)}
                             disabled={cell?.isGiven}
                           >
@@ -370,27 +370,27 @@ export default function TypeDoku() {
         <div className="flex flex-wrap justify-center space-x-4 mb-8">
           <Button
             onClick={newGame}
-            className="bg-yellow-400 text-accent-900 hover:bg-yellow-300 text-lg px-6 py-3 rounded-lg shadow-md border-2 border-yellow-500 transition-all duration-200 ease-in-out transform hover:scale-105 flex items-center"
+            className="bg-yellow-400 text-secondary-active hover:bg-yellow-300 text-lg px-6 py-3 rounded-lg shadow-md border-2 border-yellow-500 transition-all duration-200 ease-in-out transform hover:scale-105 flex items-center"
           >
             <RefreshCw className="mr-2" /> Nuevo Juego (N)
           </Button>
           <Button
             onClick={handleUndo}
             disabled={history.length <= 1}
-            className="bg-secondary-500 text-white hover:bg-secondary-400 text-lg px-6 py-3 rounded-lg shadow-md border-2 border-secondary-600 transition-all duration-200 ease-in-out transform hover:scale-105 flex items-center disabled:opacity-50"
+            className="bg-secondary text-white hover:bg-secondary-hover text-lg px-6 py-3 rounded-lg shadow-md border-2 border-secondary-active transition-all duration-200 ease-in-out transform hover:scale-105 flex items-center disabled:opacity-50"
           >
             <Undo className="mr-2" /> Deshacer (Ctrl+Z)
           </Button>
           <Button
             onClick={handleRedo}
             disabled={futureStates.length === 0}
-            className="bg-highlight-500 text-white hover:bg-highlight-400 text-lg px-6 py-3 rounded-lg shadow-md border-2 border-highlight-600 transition-all duration-200 ease-in-out transform hover:scale-105 flex items-center disabled:opacity-50"
+            className="bg-warning text-white hover:bg-warning-hover text-lg px-6 py-3 rounded-lg shadow-md border-2 border-warning-border transition-all duration-200 ease-in-out transform hover:scale-105 flex items-center disabled:opacity-50"
           >
             <Redo className="mr-2" /> Rehacer (Ctrl+Y)
           </Button>
           <Button
             onClick={handleHint}
-            className="bg-primary-500 text-white hover:bg-primary-400 text-lg px-6 py-3 rounded-lg shadow-md border-2 border-primary-600 transition-all duration-200 ease-in-out transform hover:scale-105 flex items-center"
+            className="bg-primary text-white hover:bg-primary-hover text-lg px-6 py-3 rounded-lg shadow-md border-2 border-primary-active transition-all duration-200 ease-in-out transform hover:scale-105 flex items-center"
           >
             <Lightbulb className="mr-2" /> Pista (H)
           </Button>
@@ -403,7 +403,7 @@ export default function TypeDoku() {
           <Button
             onClick={toggleNotesMode}
             className={`text-white text-lg px-6 py-3 rounded-lg shadow-md border-2 transition-all duration-200 ease-in-out transform hover:scale-105 flex items-center ${
-              isNotesMode ? 'bg-pink-500 hover:bg-pink-400 border-pink-600' : 'bg-accent-500 hover:bg-accent-400 border-accent-600'
+              isNotesMode ? 'bg-pink-500 hover:bg-pink-400 border-pink-600' : 'bg-secondary hover:bg-secondary-hover border-secondary-active'
             }`}
           >
             <PencilLine className="mr-2" /> {isNotesMode ? 'Modo Notas: ON (M)' : 'Modo Notas: OFF (M)'}
@@ -411,7 +411,7 @@ export default function TypeDoku() {
         </div>
 
         {isComplete && (
-          <div className="mt-8 p-6 bg-highlight-500 bg-opacity-90 rounded-lg shadow-xl border-2 border-yellow-500 animate-pulse">
+          <div className="mt-8 p-6 bg-warning bg-opacity-90 rounded-lg shadow-xl border-2 border-yellow-500 animate-pulse">
             <p className="text-center font-bold text-white text-2xl">
               ¡Felicidades! Has completado el TypeDoku
             </p>

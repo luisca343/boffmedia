@@ -20,7 +20,7 @@ export function BoffActionBar({ start, center, end, className, "aria-label": ari
       role="toolbar"
       aria-label={ariaLabel}
       className={cn(
-        "flex items-center gap-3 flex-wrap rounded-[var(--radius)] border border-[var(--border)] p-[var(--bsx-pad-md)]",
+        "flex items-center gap-3 flex-wrap rounded-[var(--radius)] border border-edge p-[var(--bsx-pad-md)]",
         className,
       )}
       style={{ background: "var(--card-bg)" }}

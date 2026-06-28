@@ -143,7 +143,7 @@ export default function LootBoxGame() {
 
       {/* Loading loot boxes message */}
       {loadingLootBoxes && (
-        <div className="bg-surface-900/70 text-white p-4 rounded-lg mb-6 text-center border-2 border-surface-500/40 flex justify-center items-center gap-3">
+        <div className="bg-layer-1/70 text-white p-4 rounded-lg mb-6 text-center border-2 border-edge/40 flex justify-center items-center gap-3">
           <Loader2 className="animate-spin text-cyan-400" size={24} />
           <span>Cargando cajas de botín...</span>
         </div>

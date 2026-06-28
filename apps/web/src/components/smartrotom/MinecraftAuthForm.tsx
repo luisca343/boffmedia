@@ -127,23 +127,23 @@ export function MinecraftAuthForm({ mcUserData }: MinecraftAuthFormProps) {
 
   if (mode === 'choice') {
     return (
-      <div className="flex flex-col items-center justify-center h-full bg-primary-400 text-primary-950 font-mono">
+      <div className="flex flex-col items-center justify-center h-full bg-primary-hover text-primary-active font-mono">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-primary-200 p-8 rounded-lg shadow-lg border-2 border-primary-300 max-w-md w-full"
+          className="bg-primary-soft p-8 rounded-lg shadow-lg border-2 border-primary max-w-md w-full"
         >
           <div className="flex items-center mb-6">
-            <Link className="w-8 h-8 text-primary-500 mr-2" />
+            <Link className="w-8 h-8 text-primary mr-2" />
             <h1 className="text-2xl font-bold">Vincular Cuenta</h1>
           </div>
           
-          <div className="bg-primary-300 p-4 rounded mb-6">
+          <div className="bg-primary-soft p-4 rounded mb-6">
             <p className="text-sm mb-2">
               Usuario de Minecraft: <span className="font-bold">{mcUserData?.username}</span>
             </p>
-            <p className="text-xs text-primary-700">
+            <p className="text-xs text-primary-active">
               Para continuar, necesitas vincular tu cuenta de BoffMedia
             </p>
           </div>
@@ -151,7 +151,7 @@ export function MinecraftAuthForm({ mcUserData }: MinecraftAuthFormProps) {
           <div className="space-y-4">
             <button
               onClick={() => setMode('login')}
-              className="w-full flex items-center justify-center space-x-2 bg-primary-500 hover:bg-primary-600 text-white p-3 rounded transition-colors"
+              className="w-full flex items-center justify-center space-x-2 bg-primary hover:bg-primary-active text-white p-3 rounded transition-colors"
             >
               <User className="w-5 h-5" />
               <span>Tengo una cuenta de BoffMedia</span>
@@ -159,7 +159,7 @@ export function MinecraftAuthForm({ mcUserData }: MinecraftAuthFormProps) {
             
             <button
               onClick={() => setMode('register')}
-              className="w-full flex items-center justify-center space-x-2 bg-primary-600 hover:bg-primary-700 text-white p-3 rounded transition-colors"
+              className="w-full flex items-center justify-center space-x-2 bg-primary-active hover:bg-primary-active text-white p-3 rounded transition-colors"
             >
               <UserPlus className="w-5 h-5" />
               <span>Crear nueva cuenta</span>
@@ -181,15 +181,15 @@ export function MinecraftAuthForm({ mcUserData }: MinecraftAuthFormProps) {
 
   if (mode === 'login') {
     return (
-      <div className="flex flex-col items-center justify-center h-full bg-primary-400 text-primary-950 font-mono">
+      <div className="flex flex-col items-center justify-center h-full bg-primary-hover text-primary-active font-mono">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-primary-200 p-8 rounded-lg shadow-lg border-2 border-primary-300 max-w-md w-full"
+          className="bg-primary-soft p-8 rounded-lg shadow-lg border-2 border-primary max-w-md w-full"
         >
           <div className="flex items-center mb-6">
-            <User className="w-8 h-8 text-primary-500 mr-2" />
+            <User className="w-8 h-8 text-primary mr-2" />
             <h1 className="text-2xl font-bold">Vincular Cuenta Existente</h1>
           </div>
 
@@ -201,7 +201,7 @@ export function MinecraftAuthForm({ mcUserData }: MinecraftAuthFormProps) {
                 name="username"
                 value={formData.username}
                 onChange={handleInputChange}
-                className="w-full p-2 border border-primary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full p-2 border border-primary rounded focus:outline-none focus:ring-2 focus:ring-primary"
                 required
                 disabled={isLoading}
               />
@@ -214,7 +214,7 @@ export function MinecraftAuthForm({ mcUserData }: MinecraftAuthFormProps) {
                 name="password"
                 value={formData.password}
                 onChange={handleInputChange}
-                className="w-full p-2 border border-primary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full p-2 border border-primary rounded focus:outline-none focus:ring-2 focus:ring-primary"
                 required
                 disabled={isLoading}
               />
@@ -224,14 +224,14 @@ export function MinecraftAuthForm({ mcUserData }: MinecraftAuthFormProps) {
               <button
                 type="button"
                 onClick={() => setMode('choice')}
-                className="flex-1 bg-surface-500 hover:bg-surface-600 text-white p-2 rounded transition-colors"
+                className="flex-1 bg-layer-3 hover:bg-layer-3 text-white p-2 rounded transition-colors"
                 disabled={isLoading}
               >
                 Volver
               </button>
               <button
                 type="submit"
-                className="flex-1 bg-primary-500 hover:bg-primary-600 text-white p-2 rounded transition-colors disabled:opacity-50"
+                className="flex-1 bg-primary hover:bg-primary-active text-white p-2 rounded transition-colors disabled:opacity-50"
                 disabled={isLoading}
               >
                 {isLoading ? 'Vinculando...' : 'Vincular'}
@@ -245,15 +245,15 @@ export function MinecraftAuthForm({ mcUserData }: MinecraftAuthFormProps) {
 
   if (mode === 'register') {
     return (
-      <div className="flex flex-col items-center justify-center h-full bg-primary-400 text-primary-950 font-mono">
+      <div className="flex flex-col items-center justify-center h-full bg-primary-hover text-primary-active font-mono">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-primary-200 p-8 rounded-lg shadow-lg border-2 border-primary-300 max-w-md w-full"
+          className="bg-primary-soft p-8 rounded-lg shadow-lg border-2 border-primary max-w-md w-full"
         >
           <div className="flex items-center mb-6">
-            <UserPlus className="w-8 h-8 text-primary-500 mr-2" />
+            <UserPlus className="w-8 h-8 text-primary mr-2" />
             <h1 className="text-2xl font-bold">Crear Nueva Cuenta</h1>
           </div>
 
@@ -265,7 +265,7 @@ export function MinecraftAuthForm({ mcUserData }: MinecraftAuthFormProps) {
                 name="username"
                 value={formData.username}
                 onChange={handleInputChange}
-                className="w-full p-2 border border-primary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full p-2 border border-primary rounded focus:outline-none focus:ring-2 focus:ring-primary"
                 required
                 disabled={isLoading}
               />
@@ -278,7 +278,7 @@ export function MinecraftAuthForm({ mcUserData }: MinecraftAuthFormProps) {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className="w-full p-2 border border-primary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full p-2 border border-primary rounded focus:outline-none focus:ring-2 focus:ring-primary"
                 required
                 disabled={isLoading}
               />
@@ -291,7 +291,7 @@ export function MinecraftAuthForm({ mcUserData }: MinecraftAuthFormProps) {
                 name="password"
                 value={formData.password}
                 onChange={handleInputChange}
-                className="w-full p-2 border border-primary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full p-2 border border-primary rounded focus:outline-none focus:ring-2 focus:ring-primary"
                 required
                 disabled={isLoading}
               />
@@ -304,7 +304,7 @@ export function MinecraftAuthForm({ mcUserData }: MinecraftAuthFormProps) {
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleInputChange}
-                className="w-full p-2 border border-primary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full p-2 border border-primary rounded focus:outline-none focus:ring-2 focus:ring-primary"
                 required
                 disabled={isLoading}
               />
@@ -314,14 +314,14 @@ export function MinecraftAuthForm({ mcUserData }: MinecraftAuthFormProps) {
               <button
                 type="button"
                 onClick={() => setMode('choice')}
-                className="flex-1 bg-surface-500 hover:bg-surface-600 text-white p-2 rounded transition-colors"
+                className="flex-1 bg-layer-3 hover:bg-layer-3 text-white p-2 rounded transition-colors"
                 disabled={isLoading}
               >
                 Volver
               </button>
               <button
                 type="submit"
-                className="flex-1 bg-primary-500 hover:bg-primary-600 text-white p-2 rounded transition-colors disabled:opacity-50"
+                className="flex-1 bg-primary hover:bg-primary-active text-white p-2 rounded transition-colors disabled:opacity-50"
                 disabled={isLoading}
               >
                 {isLoading ? 'Creando...' : 'Crear Cuenta'}
