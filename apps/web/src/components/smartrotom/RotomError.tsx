@@ -31,7 +31,7 @@ function isEnhancedErrorProps(props: RotomErrorProps): props is EnhancedErrorPro
 
 export function RotomErrorPage(props: RotomErrorProps) {
   return (
-    <div className="flex flex-col items-center justify-center h-full bg-primary-400 text-primary-950 font-mono">
+    <div className="flex flex-col items-center justify-center h-full bg-primary-hover text-primary-active font-mono">
       <RotomError {...props} />
     </div>
   )
@@ -74,17 +74,17 @@ export function RotomError(props: RotomErrorProps) {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="bg-primary-200 p-8 rounded-lg shadow-lg border-2 border-primary-300"
+        className="bg-primary-soft p-8 rounded-lg shadow-lg border-2 border-primary"
       >
         <div className="flex items-center mb-4">
-          <AlertTriangle className="w-8 h-8 text-primary-500 mr-2" />
+          <AlertTriangle className="w-8 h-8 text-primary mr-2" />
           <h1 className="text-2xl font-bold">Error Detectado</h1>
         </div>
-        <div className="bg-primary-300 p-4 rounded">
+        <div className="bg-primary-soft p-4 rounded">
           <p className="text-sm">{props.error || "Error desconocido"}</p>
         </div>
         <div className="mt-6 text-center">
-          <p className="text-xs text-primary-700">
+          <p className="text-xs text-primary-active">
             SmartRotom Error Code: <span className="font-bold">SR-000-000</span>
           </p>
         </div>
@@ -99,13 +99,13 @@ export function RotomError(props: RotomErrorProps) {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="bg-primary-200 p-8 rounded-lg shadow-lg border-2 border-primary-300 max-w-md"
+        className="bg-primary-soft p-8 rounded-lg shadow-lg border-2 border-primary max-w-md"
       >
         <div className="flex items-center mb-4">
-          <AlertTriangle className="w-8 h-8 text-primary-500 mr-2" />
+          <AlertTriangle className="w-8 h-8 text-primary mr-2" />
           <h1 className="text-2xl font-bold">Error desconocido</h1>
         </div>
-        <div className="bg-primary-300 p-4 rounded mb-4">
+        <div className="bg-primary-soft p-4 rounded mb-4">
           <p className="text-sm">No se encontró información para el código de error proporcionado.</p>
         </div>
       </motion.div>
@@ -118,9 +118,9 @@ export function RotomError(props: RotomErrorProps) {
     } else if (severity === ERROR_SEVERITIES.WARNING) {
       return <AlertCircle className="w-8 h-8 text-amber-500 mr-2" />;
     } else if (severity === ERROR_SEVERITIES.INFO) {
-      return <AlertCircle className="w-8 h-8 text-secondary-500 mr-2" />;
+      return <AlertCircle className="w-8 h-8 text-secondary mr-2" />;
     } else {
-      return <AlertTriangle className="w-8 h-8 text-primary-500 mr-2" />;
+      return <AlertTriangle className="w-8 h-8 text-primary mr-2" />;
     }
   };
 
@@ -129,7 +129,7 @@ export function RotomError(props: RotomErrorProps) {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="bg-primary-200 p-8 rounded-lg shadow-lg border-2 border-primary-300 max-w-md"
+      className="bg-primary-soft p-8 rounded-lg shadow-lg border-2 border-primary max-w-md"
     >
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center">
@@ -139,7 +139,7 @@ export function RotomError(props: RotomErrorProps) {
         {errorDocs && (
           <button 
             onClick={() => setShowHelp(!showHelp)}
-            className="text-primary-600 hover:text-primary-800"
+            className="text-primary-active hover:text-primary-active"
             title="Mostrar ayuda"
           >
             <HelpCircle size={20} />
@@ -147,7 +147,7 @@ export function RotomError(props: RotomErrorProps) {
         )}
       </div>
       
-      <div className="bg-primary-300 p-4 rounded mb-4">
+      <div className="bg-primary-soft p-4 rounded mb-4">
         <p className="text-sm">{errorDef.message}</p>
       </div>
       
@@ -158,7 +158,7 @@ export function RotomError(props: RotomErrorProps) {
           transition={{ duration: 0.3 }}
           className="mb-4"
         >
-          <div className="bg-primary-100 p-4 rounded border border-primary-300">
+          <div className="bg-primary-soft p-4 rounded border border-primary">
             <h3 className="font-bold mb-2">Posibles causas:</h3>
             <ul className="list-disc pl-5 text-sm mb-3">
               {errorDocs.possibleCauses.map((cause, i) => (
@@ -179,7 +179,7 @@ export function RotomError(props: RotomErrorProps) {
                   href={errorDocs.supportLink} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-secondary-600 hover:underline text-sm"
+                  className="text-secondary-active hover:underline text-sm"
                 >
                   Más información
                 </a>
@@ -193,7 +193,7 @@ export function RotomError(props: RotomErrorProps) {
         <div className="mt-4 text-center">
           <button
             onClick={onAction}
-            className="px-4 py-2 bg-primary-500 text-white rounded hover:bg-primary-600 transition-colors"
+            className="px-4 py-2 bg-primary text-white rounded hover:bg-primary-active transition-colors"
           >
             {actionText}
           </button>
@@ -201,7 +201,7 @@ export function RotomError(props: RotomErrorProps) {
       )}
       
       <div className="mt-6 text-center">
-        <p className="text-xs text-primary-700">
+        <p className="text-xs text-primary-active">
           SmartRotom Error Code: <span className="font-bold">{formattedCode}</span>
         </p>
       </div>

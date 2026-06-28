@@ -30,10 +30,10 @@ export function ContactForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-surface-800 p-6 rounded-lg shadow-lg"
+      className="bg-layer-2 p-6 rounded-lg shadow-lg"
     >
       <div className="mb-4">
-        <label htmlFor="name" className="block text-primary-300 mb-2">
+        <label htmlFor="name" className="block text-primary-hover mb-2">
           Nombre
         </label>
         <input
@@ -42,12 +42,12 @@ export function ContactForm() {
           name="name"
           value={formData.name}
           onChange={handleChange}
-          className="w-full p-2 rounded bg-surface-700 text-white border border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
+          className="w-full p-2 rounded bg-layer-3 text-white border border-primary focus:outline-none focus:ring-2 focus:ring-primary"
           required
         />
       </div>
       <div className="mb-4">
-        <label htmlFor="email" className="block text-primary-300 mb-2">
+        <label htmlFor="email" className="block text-primary-hover mb-2">
           Correo Electrónico
         </label>
         <input
@@ -56,12 +56,12 @@ export function ContactForm() {
           name="email"
           value={formData.email}
           onChange={handleChange}
-          className="w-full p-2 rounded bg-surface-700 text-white border border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
+          className="w-full p-2 rounded bg-layer-3 text-white border border-primary focus:outline-none focus:ring-2 focus:ring-primary"
           required
         />
       </div>
       <div className="mb-4">
-        <label htmlFor="message" className="block text-primary-300 mb-2">
+        <label htmlFor="message" className="block text-primary-hover mb-2">
           Mensaje
         </label>
         <textarea
@@ -69,14 +69,14 @@ export function ContactForm() {
           name="message"
           value={formData.message}
           onChange={handleChange}
-          className="w-full p-2 rounded bg-surface-700 text-white border border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
+          className="w-full p-2 rounded bg-layer-3 text-white border border-primary focus:outline-none focus:ring-2 focus:ring-primary"
           rows={4}
           required
         ></textarea>
       </div>
       <button
         type="submit"
-        className="bg-gradient-to-r from-primary-500 to-primary-700 px-6 py-2 rounded-full text-white font-bold hover:from-primary-600 hover:to-primary-800 transition duration-300 shadow-neon"
+        className="bg-gradient-to-r from-primary to-primary-active px-6 py-2 rounded-full text-white font-bold hover:from-primary-active hover:to-primary-soft transition duration-300 shadow-neon"
       >
         Enviar
       </button>

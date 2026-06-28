@@ -37,7 +37,7 @@ export function BoffCard({ className, hover, ticks, children, style, ...props }:
       }}
       {...props}
     >
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary-500/40 to-transparent" />
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
       {children}
     </div>
   )

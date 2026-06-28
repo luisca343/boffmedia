@@ -59,7 +59,7 @@ export default function GameToolsLayout({
           onMenuClick={() => setMobileSidebarOpen(true)} 
         />
         
-        <FloatingSection className={`flex-1 bg-surface-900 overflow-auto w-full ${mainContentMargin} transition-all duration-300 ease-in-out md:pt-0`}>
+        <FloatingSection className={`flex-1 bg-layer-1 overflow-auto w-full ${mainContentMargin} transition-all duration-300 ease-in-out md:pt-0`}>
           {noContainer ? children : (
             <main className="container mx-auto px-4 py-6">
               {children}

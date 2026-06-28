@@ -18,7 +18,7 @@ export function CommunitySection() {
   ];
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-secondary-900 via-secondary-500/30 to-secondary-700/40">
+    <section className="relative overflow-hidden bg-gradient-to-b from-secondary-soft via-secondary/30 to-secondary-active/40">
 
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
@@ -34,15 +34,15 @@ export function CommunitySection() {
           {/* Left Section: Community Info */}
           <div className="text-center lg:text-left order-2 lg:order-1">
             <h2 className="text-5xl sm:text-6xl font-black mb-6 leading-tight tracking-tight">
-              <span className="text-surface-50">{t("community.title.first")}</span>
+              <span className="text-ink">{t("community.title.first")}</span>
               <span
-                className="block bg-gradient-to-r from-secondary-300 via-secondary-400 to-secondary-500 bg-clip-text text-transparent"
+                className="block bg-gradient-to-r from-secondary-hover via-secondary-hover to-secondary bg-clip-text text-transparent"
                 style={{ fontFamily: "Orbitron, sans-serif" }}
               >
                 {t("community.title.second")}
               </span>
             </h2>
-            <p className="text-xl text-surface-300 mb-12 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+            <p className="text-xl text-ink mb-12 max-w-xl mx-auto lg:mx-0 leading-relaxed">
               {t("community.description")}
             </p>
 
@@ -58,7 +58,7 @@ export function CommunitySection() {
                     className="w-2 h-2 rounded-full flex-shrink-0 animate-pulse"
                     style={{ background: "rgba(99,102,241,0.85)", animationDelay: delay }}
                   />
-                  <span className="text-surface-300">{text}</span>
+                  <span className="text-ink">{text}</span>
                 </div>
               ))}
             </div>

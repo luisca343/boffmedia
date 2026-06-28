@@ -26,14 +26,14 @@ export function PolicyShell({
       <div className="flex items-center gap-1.5 mb-6 text-xs font-mono tracking-widest uppercase">
         <Link
           href="/"
-          className="text-surface-600 hover:text-surface-400 transition-colors duration-150"
+          className="text-ink-dim hover:text-ink-muted transition-colors duration-150"
         >
           Inicio
         </Link>
-        <ChevronRight className="w-3 h-3 text-surface-700 flex-shrink-0" />
-        <span className="text-primary-400/70">{label}</span>
-        <ChevronRight className="w-3 h-3 text-surface-700 flex-shrink-0" />
-        <span className="text-surface-500 truncate">{title}</span>
+        <ChevronRight className="w-3 h-3 text-ink-dim flex-shrink-0" />
+        <span className="text-primary-hover/70">{label}</span>
+        <ChevronRight className="w-3 h-3 text-ink-dim flex-shrink-0" />
+        <span className="text-ink-muted truncate">{title}</span>
       </div>
 
       <BoffContainer variant="primary" contentClassName="p-7 sm:p-10">
@@ -43,13 +43,13 @@ export function PolicyShell({
           style={{ borderBottom: "1px solid rgba(249,115,22,0.12)" }}
         >
           <span
-            className="block text-xs font-mono text-primary-400/55 tracking-[0.35em] uppercase mb-3"
+            className="block text-xs font-mono text-primary-hover/55 tracking-[0.35em] uppercase mb-3"
             style={{ fontFamily: "Orbitron, sans-serif" }}
           >
             // {label}
           </span>
           <h1
-            className="text-2xl sm:text-3xl font-black text-surface-50 leading-tight"
+            className="text-2xl sm:text-3xl font-black text-ink leading-tight"
             style={{ fontFamily: "Orbitron, sans-serif" }}
           >
             {title}
@@ -66,11 +66,11 @@ export function PolicyShell({
             style={{ borderTop: "1px solid rgba(71,85,105,0.3)" }}
           >
             <p
-              className="text-xs font-mono text-surface-600 tracking-wide"
+              className="text-xs font-mono text-ink-dim tracking-wide"
               style={{ fontFamily: "Orbitron, sans-serif" }}
             >
               // Última actualización:{" "}
-              <span className="text-surface-500">{lastUpdated}</span>
+              <span className="text-ink-muted">{lastUpdated}</span>
             </p>
           </div>
         )}
@@ -90,7 +90,7 @@ export function PolicySection({
 }) {
   return (
     <div className="mt-8 first:mt-0">
-      <h2 className="flex items-center gap-2.5 text-base font-bold text-surface-100 mb-3">
+      <h2 className="flex items-center gap-2.5 text-base font-bold text-ink mb-3">
         <span
           className="w-[3px] h-5 rounded-full flex-shrink-0"
           style={{
@@ -108,7 +108,7 @@ export function PolicySection({
 
 export function PolicyText({ children }: { children: React.ReactNode }) {
   return (
-    <p className="mb-4 text-sm text-surface-400 leading-relaxed last:mb-0">
+    <p className="mb-4 text-sm text-ink-muted leading-relaxed last:mb-0">
       {children}
     </p>
   );
@@ -125,7 +125,7 @@ export function PolicyList({
   return (
     <Tag className="mb-4 space-y-2 last:mb-0">
       {items.map((item, i) => (
-        <li key={i} className="flex items-start gap-2.5 text-sm text-surface-400 leading-relaxed">
+        <li key={i} className="flex items-start gap-2.5 text-sm text-ink-muted leading-relaxed">
           {ordered ? (
             <span
               className="flex-shrink-0 w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold font-mono mt-0.5"
@@ -161,7 +161,7 @@ export function PolicyLink({
   return (
     <Link
       href={href}
-      className="text-primary-400 hover:text-primary-300 underline underline-offset-2 decoration-primary-500/40 hover:decoration-primary-400/60 transition-colors duration-150"
+      className="text-primary-hover hover:text-primary-hover underline underline-offset-2 decoration-primary/40 hover:decoration-primary/60 transition-colors duration-150"
     >
       {children}
     </Link>

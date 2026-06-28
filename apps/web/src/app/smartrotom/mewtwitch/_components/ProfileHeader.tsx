@@ -11,7 +11,7 @@ interface ProfileHeaderProps {
 export const ProfileHeader = ({ displayName, profileImageUrl, description }: ProfileHeaderProps) => {
   const t = useTranslations("twitch");
   return (
-    <div className="flex items-center space-x-4 p-4 bg-surface-900 rounded-lg shadow">
+    <div className="flex items-center space-x-4 p-4 bg-layer-1 rounded-lg shadow">
       <img
         src={profileImageUrl}
         alt={displayName}
@@ -19,7 +19,7 @@ export const ProfileHeader = ({ displayName, profileImageUrl, description }: Pro
       />
       <div>
         <h2 className="text-2xl font-bold text-purple-400">{displayName}</h2>
-        {description && <p className="text-surface-300 mt-2">{description}</p>}
+        {description && <p className="text-ink mt-2">{description}</p>}
       </div>
     </div>
   );

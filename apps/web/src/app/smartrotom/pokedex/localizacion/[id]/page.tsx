@@ -22,9 +22,9 @@ export default function Localizacion({params} : {params: {id: string}}){
     
     if(!pokemon) {
         return (
-            <div className="bg-surface-800 min-h-full p-8 flex flex-col items-center justify-center">
-                <div className="text-surface-300 text-xl">No se encontraron datos para este bioma</div>
-                <InternalLink href="pokedex/localizacion" className="mt-4 text-primary-400 hover:text-primary-300 flex items-center">
+            <div className="bg-layer-2 min-h-full p-8 flex flex-col items-center justify-center">
+                <div className="text-ink text-xl">No se encontraron datos para este bioma</div>
+                <InternalLink href="pokedex/localizacion" className="mt-4 text-primary-hover hover:text-primary-hover flex items-center">
                     <ArrowLeftIcon className="h-4 w-4 mr-1" />
                     Volver a la lista de biomas
                 </InternalLink>
@@ -41,15 +41,15 @@ export default function Localizacion({params} : {params: {id: string}}){
     const biomeTitle = formatBiomeTitle(id);
 
     return(
-        <div className="bg-surface-800 min-h-full overflow-auto">
+        <div className="bg-layer-2 min-h-full overflow-auto">
             <div className="mt-4 p-4 max-w-7xl mx-auto">
                 <div className="flex flex-col space-y-4">
                     {/* Header with biome name and back button */}
                     <div className="flex items-center justify-between">
-                        <h1 className="text-2xl font-bold text-surface-50">{biomeTitle}</h1>
+                        <h1 className="text-2xl font-bold text-ink">{biomeTitle}</h1>
                         <InternalLink 
                             href="pokedex/localizacion" 
-                            className="text-primary-400 hover:text-primary-300 text-sm flex items-center"
+                            className="text-primary-hover hover:text-primary-hover text-sm flex items-center"
                         >
                             <ArrowLeftIcon className="h-4 w-4 mr-1" />
                             Volver a biomas
@@ -57,13 +57,13 @@ export default function Localizacion({params} : {params: {id: string}}){
                     </div>
                     
                     {/* Filter controls */}
-                    <div className="bg-surface-700/30 rounded-lg p-4 border border-surface-600/50">
+                    <div className="bg-layer-3/30 rounded-lg p-4 border border-edge/50">
                         <div className="flex items-center mb-3">
-                            <AdjustmentsHorizontalIcon className="h-5 w-5 text-primary-300 mr-2" />
-                            <h2 className="text-lg font-semibold text-surface-100">Filtros</h2>
+                            <AdjustmentsHorizontalIcon className="h-5 w-5 text-primary-hover mr-2" />
+                            <h2 className="text-lg font-semibold text-ink">Filtros</h2>
                         </div>
                         
-                        <div className="bg-surface-800/50 rounded-lg p-3">
+                        <div className="bg-layer-2/50 rounded-lg p-3">
                             <div className="flex flex-wrap gap-4">
                                 <div className="flex items-center space-x-2">
                                     <Switch 
@@ -71,7 +71,7 @@ export default function Localizacion({params} : {params: {id: string}}){
                                         checked={showSeen} 
                                         onCheckedChange={setShowSeen}
                                     />
-                                    <Label htmlFor="show-seen" className="text-surface-50 flex items-center">
+                                    <Label htmlFor="show-seen" className="text-ink flex items-center">
                                         <EyeIcon className="h-4 w-4 mr-1" />
                                         Avistados
                                     </Label>
@@ -82,7 +82,7 @@ export default function Localizacion({params} : {params: {id: string}}){
                                         checked={showCaught} 
                                         onCheckedChange={setShowCaught} 
                                     />
-                                    <Label htmlFor="show-caught" className="text-surface-50 flex items-center">
+                                    <Label htmlFor="show-caught" className="text-ink flex items-center">
                                         <img 
                                             src="/smartrotom/img/apps/pokedex/capturado.webp" 
                                             alt="Capturado" 
@@ -93,7 +93,7 @@ export default function Localizacion({params} : {params: {id: string}}){
                                 </div>
                             </div>
                             
-                            <div className="mt-2 text-xs text-surface-400 italic">
+                            <div className="mt-2 text-xs text-ink-muted italic">
                                 {(showCaught || showSeen) ? 
                                     `${showCaught || showSeen ? 'Ocultando Pokémon' : ''} ${showCaught ? "atrapados" : ""}${showCaught && showSeen ? " y " : ""}${showSeen ? "avistados" : ""}` :
                                     "Mostrando todos los Pokémon"
@@ -105,7 +105,7 @@ export default function Localizacion({params} : {params: {id: string}}){
                     {/* Pokémon sections in a single column layout */}
                     <div className="flex flex-col space-y-4">
                         {Object.entries(pokemon).map(([biome, spawn], index) => (
-                            <div key={index} className="bg-surface-700/30 rounded-lg p-4 border border-surface-600/50">
+                            <div key={index} className="bg-layer-3/30 rounded-lg p-4 border border-edge/50">
                                 <PossibleSpawnsSection 
                                     pokemonSpawns={spawn} 
                                     hideCaught={showCaught} 

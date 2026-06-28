@@ -155,11 +155,11 @@ export default function PlayerAppManagement() {
   // Loading state
   if (usersLoading || appsLoading) {
     return (
-      <div className="w-full min-h-screen bg-black text-highlight-400 font-mono p-4 flex flex-col items-center justify-center">
+      <div className="w-full min-h-screen bg-black text-warning-hover font-mono p-4 flex flex-col items-center justify-center">
         <div className="animate-pulse flex flex-col items-center">
-          <div className="text-highlight-500 text-xl mb-2">Cargando sistema...</div>
-          <div className="w-40 h-1 bg-highlight-700/30 rounded">
-            <div className="h-1 bg-highlight-500 rounded animate-[loadingBar_2s_ease-in-out_infinite]" style={{ width: "60%" }}></div>
+          <div className="text-warning text-xl mb-2">Cargando sistema...</div>
+          <div className="w-40 h-1 bg-warning/30 rounded">
+            <div className="h-1 bg-warning rounded animate-[loadingBar_2s_ease-in-out_infinite]" style={{ width: "60%" }}></div>
           </div>
         </div>
         <style jsx>{`
@@ -203,10 +203,10 @@ export default function PlayerAppManagement() {
               value={selectedPlayerUuid}
               onValueChange={setSelectedPlayerUuid}
             >
-              <SelectTrigger className="bg-black text-highlight-400 border-highlight-700 focus:border-highlight-500 w-full">
+              <SelectTrigger className="bg-black text-warning-hover border-warning-border focus:border-warning-border w-full">
                 <SelectValue placeholder="Seleccionar jugador" />
               </SelectTrigger>
-              <SelectContent className="bg-black text-highlight-400 border-highlight-700">
+              <SelectContent className="bg-black text-warning-hover border-warning-border">
                 {allUsers && allUsers.length > 0 ? (
                   allUsers
                     .filter((user) => user.id > 0)
@@ -214,10 +214,10 @@ export default function PlayerAppManagement() {
                       <SelectItem
                         key={user.uuid}
                         value={user.uuid}
-                        className="hover:bg-highlight-900/30"
+                        className="hover:bg-warning-soft/30"
                       >
                         <div className="flex items-center">
-                          <UserIcon className="w-4 h-4 mr-2 text-highlight-600" />
+                          <UserIcon className="w-4 h-4 mr-2 text-warning" />
                           <span>{user.username || `Usuario ${user.id}`}</span>
                         </div>
                       </SelectItem>
@@ -237,9 +237,9 @@ export default function PlayerAppManagement() {
         </div>
         {selectedPlayerUuid && (
           <div className="mt-3 text-sm flex items-center">
-            <span className="text-highlight-600 mr-2">Jugador activo:</span>
-            <span className="text-highlight-400 font-bold">{getSelectedPlayerName()}</span>
-            <span className="ml-2 w-2 h-2 bg-highlight-500 rounded-full animate-pulse"></span>
+            <span className="text-warning mr-2">Jugador activo:</span>
+            <span className="text-warning-hover font-bold">{getSelectedPlayerName()}</span>
+            <span className="ml-2 w-2 h-2 bg-warning rounded-full animate-pulse"></span>
           </div>
         )}
       </TerminalCard>
@@ -256,7 +256,7 @@ export default function PlayerAppManagement() {
                 {extraApps.map((app) => (
                   <div
                     key={app.id}
-                    className="flex flex-col items-center bg-black/40 p-3 border border-highlight-900/30 rounded hover:border-highlight-700 transition-all"
+                    className="flex flex-col items-center bg-black/40 p-3 border border-warning-border/30 rounded hover:border-warning-border transition-all"
                   >
                     <App app={app as SmartRotomApp} withLink={false} size="small" />
                     <Button
@@ -286,7 +286,7 @@ export default function PlayerAppManagement() {
                 {availableApps.map((app) => (
                   <div
                     key={app.id}
-                    className="flex flex-col items-center bg-black/40 p-3 border border-highlight-900/30 rounded hover:border-highlight-700 transition-all"
+                    className="flex flex-col items-center bg-black/40 p-3 border border-warning-border/30 rounded hover:border-warning-border transition-all"
                   >
                     <App app={app as SmartRotomApp} withLink={false} size="small" />
                     <Button

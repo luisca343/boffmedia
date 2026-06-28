@@ -67,11 +67,11 @@ export function SeriesNotesPanel({
   return (
     <div className="flex flex-col h-full min-h-0">
       {/* Input row */}
-      <div className="shrink-0 px-3 py-2.5 border-b border-surface-700">
+      <div className="shrink-0 px-3 py-2.5 border-b border-edge">
         <div className="flex items-center gap-2">
           <span className={`text-[10px] font-mono shrink-0 ${
             isSeriesCompleted
-              ? 'text-surface-600'
+              ? 'text-ink-dim'
               : isGameCompleted
               ? 'text-amber-500'
               : 'text-red-400'
@@ -89,7 +89,7 @@ export function SeriesNotesPanel({
             onKeyDown={handleKey}
             disabled={isSeriesCompleted}
             placeholder={t('placeholders.addNote')}
-            className="flex-1 bg-transparent border-b border-surface-700 focus:border-primary-500 text-surface-200 text-sm placeholder:text-surface-600 focus:outline-none py-1 transition-colors disabled:opacity-40"
+            className="flex-1 bg-transparent border-b border-edge focus:border-primary text-ink text-sm placeholder:text-ink-dim focus:outline-none py-1 transition-colors disabled:opacity-40"
           />
         </div>
       </div>
@@ -97,7 +97,7 @@ export function SeriesNotesPanel({
       {/* Unified feed */}
       <div className="flex-1 overflow-y-auto px-3 py-2 flex flex-col gap-1 min-h-0">
         {totalNotes === 0 && (
-          <p className="text-surface-700 text-xs text-center py-6">
+          <p className="text-ink-dim text-xs text-center py-6">
             {t('notes.noGameNotes')}
           </p>
         )}
@@ -105,13 +105,13 @@ export function SeriesNotesPanel({
           if (item.kind === 'separator') {
             return (
               <div key={`sep-${idx}`} className="flex items-center gap-2 py-1 my-0.5">
-                <div className="flex-1 h-px bg-surface-800" />
-                <span className="text-[10px] font-mono text-surface-600 shrink-0">
+                <div className="flex-1 h-px bg-layer-2" />
+                <span className="text-[10px] font-mono text-ink-dim shrink-0">
                   {item.gameNumber === 0
                     ? t('notes.phaseSeries')
                     : t('workspace.game', { n: item.gameNumber })}
                 </span>
-                <div className="flex-1 h-px bg-surface-800" />
+                <div className="flex-1 h-px bg-layer-2" />
               </div>
             );
           }
@@ -123,12 +123,12 @@ export function SeriesNotesPanel({
                   ? 'bg-red-400'
                   : isSeriesNote
                   ? 'bg-amber-400'
-                  : 'bg-surface-500'
+                  : 'bg-layer-3'
               }`} />
-              <p className={`flex-1 text-sm leading-snug ${isSeriesNote ? 'text-amber-200/80' : 'text-surface-200'}`}>
+              <p className={`flex-1 text-sm leading-snug ${isSeriesNote ? 'text-amber-200/80' : 'text-ink'}`}>
                 {item.note.text}
               </p>
-              <span className="text-surface-600 text-[10px] shrink-0 mt-0.5">
+              <span className="text-ink-dim text-[10px] shrink-0 mt-0.5">
                 {formatTime(item.note.createdAt)}
               </span>
             </div>

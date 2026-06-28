@@ -23,7 +23,7 @@ export const GameCard = ({
   return (
     <InternalLink
       href={`mewtwitch/game/${id}`}
-      className="group bg-surface-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:bg-surface-700 flex flex-col"
+      className="group bg-layer-2 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:bg-layer-3 flex flex-col"
     >
       <div className="relative">
         <img

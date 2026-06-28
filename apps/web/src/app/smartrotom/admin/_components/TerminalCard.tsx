@@ -27,15 +27,15 @@ export default function TerminalCard({
     <>
       {terminalTitle && <TerminalHeader title={terminalTitle} username={username} showDate={showDate} />}
       
-      <Card className={`bg-transparent border-highlight-500 border ${!roundedTop && "rounded-t-none"} ${className}`}>
-        <CardHeader className="border-b border-highlight-700/50 pb-3">
-          <CardTitle className="text-highlight-400 flex items-center">
-            <span className="text-highlight-600 mr-2">&gt;</span>
+      <Card className={`bg-transparent border-warning-border border ${!roundedTop && "rounded-t-none"} ${className}`}>
+        <CardHeader className="border-b border-warning-border/50 pb-3">
+          <CardTitle className="text-warning-hover flex items-center">
+            <span className="text-warning mr-2">&gt;</span>
             {title}
           </CardTitle>
           {description && (
-            <CardDescription className="text-highlight-600/80">
-              <span className="text-highlight-600/60">{"//"} </span>
+            <CardDescription className="text-warning/80">
+              <span className="text-warning/60">{"//"} </span>
               {description}
             </CardDescription>
           )}

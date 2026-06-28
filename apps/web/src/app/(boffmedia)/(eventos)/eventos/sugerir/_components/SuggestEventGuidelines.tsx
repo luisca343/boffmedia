@@ -9,13 +9,13 @@ export function SuggestEventGuidelines() {
       icon: Trophy,
       title: "Sé específico",
       description: "Incluye detalles sobre mecánicas, objetivos y qué hace único a tu evento.",
-      color: "from-accent-500 to-accent-600"
+      color: "from-secondary to-secondary-active"
     },
     {
       icon: Users,
       title: "Piensa en la comunidad",
       description: "¿Cómo puede participar la comunidad? ¿Es inclusivo para todos los niveles?",
-      color: "from-secondary-500 to-secondary-600"
+      color: "from-secondary to-secondary-active"
     },
     {
       icon: Clock,
@@ -33,10 +33,10 @@ export function SuggestEventGuidelines() {
 
   return (
     <div className="mt-12">
-      <Card className="bg-surface-800 backdrop-blur-sm border border-surface-600/30">
+      <Card className="bg-layer-2 backdrop-blur-sm border border-edge/30">
         <CardContent className="p-6">
           <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-            <Star className="w-5 h-5 text-accent-400" />
+            <Star className="w-5 h-5 text-secondary-hover" />
             Consejos para una buena sugerencia
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -49,7 +49,7 @@ export function SuggestEventGuidelines() {
                   </div>
                   <div>
                     <h4 className="text-white font-medium mb-1">{guideline.title}</h4>
-                    <p className="text-surface-300 text-sm">{guideline.description}</p>
+                    <p className="text-ink text-sm">{guideline.description}</p>
                   </div>
                 </div>
               )

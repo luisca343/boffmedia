@@ -102,7 +102,7 @@ export default function BidkeaMenu() {
                 <ModelView name={item.name} />
                 <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
                 <p className="text-lg font-bold text-[#8b4513]">{item.price}</p>
-                <p className="text-sm text-surface-600">{item.subtitle}</p>
+                <p className="text-sm text-ink-dim">{item.subtitle}</p>
                 <div className="grid gap-4 mt-4">
                   <p className="text-sm">{item.description}</p>
                   <Button className="w-full bg-[#8b4513] hover:bg-[#6d370f] text-white">

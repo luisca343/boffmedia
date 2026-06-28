@@ -12,7 +12,7 @@ interface SystemStateShellProps {
 export function SystemStateShell({ bg = "accent", role, "aria-live": live, children }: SystemStateShellProps) {
   return (
     <section
-      className="sysstate relative grid place-items-center overflow-hidden bg-[var(--bg)]"
+      className="sysstate relative grid place-items-center overflow-hidden bg-base"
       style={{
         isolation: "isolate",
         minHeight: "var(--sysstate-minh, 100vh)",

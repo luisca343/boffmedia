@@ -146,23 +146,23 @@ export function GameCard({ game, go, delay = 0, className }: GameCardProps) {
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="text-t-lg font-black mt-0.5 text-[var(--text)]">{game.name}</h3>
-              <p className="text-t-sm mt-1 leading-relaxed text-[var(--text-muted)]">{game.tagline}</p>
+              <h3 className="text-t-lg font-black mt-0.5 text-ink">{game.name}</h3>
+              <p className="text-t-sm mt-1 leading-relaxed text-ink-muted">{game.tagline}</p>
             </div>
           </div>
 
           {/* Divider */}
-          <div className="h-px bg-gradient-to-r from-transparent via-surface-700/50 to-transparent" />
+          <div className="h-px bg-gradient-to-r from-transparent via-layer-3/50 to-transparent" />
 
           {/* Category badges */}
           <div className="flex flex-wrap gap-1.5 flex-1 content-start">
             {game.categories.slice(0, 3).map((c) => (
               <span
                 key={c.name}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[var(--surface-2)] border border-[var(--border)] text-t-xs font-medium text-[var(--accent-bright)]"
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-layer-2 border border-edge text-t-xs font-medium text-secondary-hover"
               >
                 {c.name}
-                <span className="font-mono text-t-2xs text-[var(--text-dim)] bg-[var(--surface-3)] px-1.5 py-[1px] rounded">
+                <span className="font-mono text-t-2xs text-ink-dim bg-layer-3 px-1.5 py-[1px] rounded">
                   {c.tools.length}
                 </span>
               </span>
@@ -171,10 +171,10 @@ export function GameCard({ game, go, delay = 0, className }: GameCardProps) {
 
           {/* Footer */}
             <div className="flex items-center justify-between pt-3 border-t border-t-[var(--border)]">
-            <span className="inline-flex items-center gap-[0.3rem] text-t-xs text-[var(--text-dim)] font-mono">
+            <span className="inline-flex items-center gap-[0.3rem] text-t-xs text-ink-dim font-mono">
               <Icon name="layers" size={12} /> {count} herramientas
             </span>
-            <span className="inline-flex items-center gap-1 text-t-xs font-semibold transition-[gap] duration-[var(--dur)] ease-[var(--ease)] group-hover:gap-[0.6rem] uppercase text-[var(--accent-bright)]">
+            <span className="inline-flex items-center gap-1 text-t-xs font-semibold transition-[gap] duration-[var(--dur)] ease-[var(--ease)] group-hover:gap-[0.6rem] uppercase text-secondary-hover">
               ACCEDER
               <Icon name="arrow" size={14} />
             </span>

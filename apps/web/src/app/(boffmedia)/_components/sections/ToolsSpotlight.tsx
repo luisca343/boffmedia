@@ -10,11 +10,11 @@ interface ToolsSpotlightProps {
 
 export function ToolsSpotlight({ t }: ToolsSpotlightProps) {
   const toolCategories = [
-    { icon: <Calculator className="w-10 h-10 text-white" />, name: "Calculadoras", color: "from-emerald-500 to-highlight-600" },
-    { icon: <Cog className="w-10 h-10 text-white" />, name: "Generadores", color: "from-highlight-500 to-teal-600" },
+    { icon: <Calculator className="w-10 h-10 text-white" />, name: "Calculadoras", color: "from-emerald-500 to-warning" },
+    { icon: <Cog className="w-10 h-10 text-white" />, name: "Generadores", color: "from-warning to-teal-600" },
     { icon: <BarChart3 className="w-10 h-10 text-white" />, name: "Análisis", color: "from-teal-500 to-emerald-600" },
-    { icon: <Server className="w-10 h-10 text-white" />, name: "Utilidades", color: "from-emerald-600 to-highlight-700" },
-    { icon: <Filter className="w-10 h-10 text-white" />, name: "Filtros", color: "from-highlight-600 to-teal-700" },
+    { icon: <Server className="w-10 h-10 text-white" />, name: "Utilidades", color: "from-emerald-600 to-warning" },
+    { icon: <Filter className="w-10 h-10 text-white" />, name: "Filtros", color: "from-warning to-teal-700" },
     { icon: <Zap className="w-10 h-10 text-white" />, name: "Automatización", color: "from-teal-600 to-emerald-700" },
   ];
 
@@ -28,11 +28,11 @@ export function ToolsSpotlight({ t }: ToolsSpotlightProps) {
         <div className="order-2 lg:order-1 flex items-center justify-center relative h-[34rem]">
           <OrbitingElementsCloud
             centralIcon={<Wrench className="w-14 h-14 text-white animate-pulse" />}
-            centralBg="bg-gradient-to-br from-emerald-500 to-highlight-600"
+            centralBg="bg-gradient-to-br from-emerald-500 to-warning"
             orbitingElements={toolCategories}
             ringConfigs={[
               { size: "w-[22rem] h-[22rem]", border: "border border-emerald-500/20", duration: "20s" },
-              { size: "w-[28rem] h-[28rem]", border: "border border-highlight-500/10", duration: "30s", direction: "reverse" },
+              { size: "w-[28rem] h-[28rem]", border: "border border-warning-border/10", duration: "30s", direction: "reverse" },
             ]}
             particleCount={8}
             particleColorClass="bg-emerald-400/30"
@@ -48,12 +48,12 @@ export function ToolsSpotlight({ t }: ToolsSpotlightProps) {
             iconSrc="/img/tools.png"
             iconAlt="Herramientas"
             title={t("featuredGames.games.tools.title")}
-            titleGradientClass="bg-gradient-to-r from-highlight-400 to-highlight-300"
-            iconBgClass="from-highlight-500 to-highlight-700"
-            underlineClass="from-highlight-400 to-highlight-300"
+            titleGradientClass="bg-gradient-to-r from-warning-hover to-warning-soft"
+            iconBgClass="from-warning to-warning"
+            underlineClass="from-warning-hover to-warning-soft"
             headerClass="flex-row-reverse text-right"
           >
-            <p className="text-lg text-surface-300 leading-relaxed mb-8 text-left">
+            <p className="text-lg text-ink leading-relaxed mb-8 text-left">
               {t("featuredGames.games.tools.description")}
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 py-4 mb-8 mx-auto" style={{maxWidth: 700}}>
@@ -63,8 +63,8 @@ export function ToolsSpotlight({ t }: ToolsSpotlightProps) {
                 "Herramientas de análisis avanzado",
                 "Utilidades para administradores"
               ].map((feature, index) => (
-                <div key={index} className="flex items-center gap-3 text-surface-300">
-                  <div className="w-2 h-2 bg-highlight-400 rounded-full flex-shrink-0"></div>
+                <div key={index} className="flex items-center gap-3 text-ink">
+                  <div className="w-2 h-2 bg-warning-hover rounded-full flex-shrink-0"></div>
                   <span>{feature}</span>
                 </div>
               ))}

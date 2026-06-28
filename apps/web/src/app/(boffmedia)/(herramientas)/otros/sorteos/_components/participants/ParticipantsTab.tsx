@@ -46,7 +46,7 @@ export function ParticipantsTab({ participants, filteredParticipants, searchTerm
           {filteredParticipants.length}/{participants.length}
         </span>
         {searchTerm && (
-          <span className="text-[10px] text-surface-500 truncate">
+          <span className="text-[10px] text-ink-muted truncate">
             &quot;{searchTerm}&quot;
           </span>
         )}
@@ -80,7 +80,7 @@ export function ParticipantsTab({ participants, filteredParticipants, searchTerm
 
                 {/* Name + position */}
                 <div className="flex-1 min-w-0 flex items-center gap-2">
-                  <span className="text-surface-100 font-medium text-sm truncate">{name}</span>
+                  <span className="text-ink font-medium text-sm truncate">{name}</span>
                 </div>
 
                 {/* Position badge */}
@@ -96,7 +96,7 @@ export function ParticipantsTab({ participants, filteredParticipants, searchTerm
                   onClick={() => onRemove(name)}
                   variant="ghost"
                   size="zero"
-                  className="opacity-0 group-hover:opacity-100 text-surface-500 hover:text-red-400 p-1.5 rounded-lg hover:bg-red-500/10 transition-all duration-200 flex-shrink-0"
+                  className="opacity-0 group-hover:opacity-100 text-ink-muted hover:text-red-400 p-1.5 rounded-lg hover:bg-red-500/10 transition-all duration-200 flex-shrink-0"
                   title={`Eliminar a ${name}`}
                 >
                   <Minus className="w-3.5 h-3.5" />
@@ -111,17 +111,17 @@ export function ParticipantsTab({ participants, filteredParticipants, searchTerm
             className="w-14 h-14 rounded-lg flex items-center justify-center mb-4"
             style={{ background: "rgba(30,41,59,0.6)" }}
           >
-            <Users className="w-7 h-7 text-surface-500" />
+            <Users className="w-7 h-7 text-ink-muted" />
           </div>
           {searchTerm ? (
             <>
-              <p className="text-surface-400 mb-1 text-sm">No se encontraron participantes</p>
-              <p className="text-xs text-surface-500">que coincidan con &quot;{searchTerm}&quot;</p>
+              <p className="text-ink-muted mb-1 text-sm">No se encontraron participantes</p>
+              <p className="text-xs text-ink-muted">que coincidan con &quot;{searchTerm}&quot;</p>
             </>
           ) : (
             <>
-              <p className="text-surface-400 mb-1 text-sm">Sin participantes</p>
-              <p className="text-xs text-surface-500">Añade participantes para comenzar</p>
+              <p className="text-ink-muted mb-1 text-sm">Sin participantes</p>
+              <p className="text-xs text-ink-muted">Añade participantes para comenzar</p>
             </>
           )}
         </div>

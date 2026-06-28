@@ -48,7 +48,7 @@ export function ToolTile({ tool, game, go, showGame = false, className = "" }: T
   return (
     <div
       className={
-        "flex items-start gap-[0.9rem] p-[1.1rem] cursor-pointer rounded-[var(--radius-lg)] bg-[var(--card-bg)] border border-[var(--border)] transition-all duration-[var(--dur)]" +
+        "flex items-start gap-[0.9rem] p-[1.1rem] cursor-pointer rounded-[var(--radius-lg)] bg-[var(--card-bg)] border border-edge transition-all duration-[var(--dur)]" +
         (disabled
           ? " opacity-60 cursor-default"
           : " hover:border-[color-mix(in_srgb,var(--orange-500)_45%,var(--border))] hover:-translate-y-[2px] hover:shadow-[var(--card-shadow-hover)]") +
@@ -78,17 +78,17 @@ export function ToolTile({ tool, game, go, showGame = false, className = "" }: T
           {tool.isNew && <Badge kind="new">Nuevo</Badge>}
           {tool.soon && <Badge kind="soon">Pronto</Badge>}
         </div>
-        <span className="text-[length:var(--t-xs)] text-[color:var(--text-muted)] leading-[1.5] line-clamp-2 m-0">
+        <span className="text-[length:var(--t-xs)] text-ink-muted leading-[1.5] line-clamp-2 m-0">
           {tool.desc}
         </span>
         <div className="flex items-center gap-[0.6rem] mt-[0.2rem]">
           {showGame && game && (
-            <span className="font-mono text-[0.62rem] tracking-[0.08em] uppercase text-[color:var(--text-dim)] px-2 py-[0.15rem] rounded-[var(--radius-pill)] bg-[var(--surface-2)]">
+            <span className="font-mono text-[0.62rem] tracking-[0.08em] uppercase text-ink-dim px-2 py-[0.15rem] rounded-[var(--radius-pill)] bg-layer-2">
               {game.short}
             </span>
           )}
           {!showGame && tool.cat && (
-            <span className="font-mono text-[0.62rem] tracking-[0.08em] uppercase text-[color:var(--text-dim)] px-2 py-[0.15rem] rounded-[var(--radius-pill)] bg-[var(--surface-2)]">
+            <span className="font-mono text-[0.62rem] tracking-[0.08em] uppercase text-ink-dim px-2 py-[0.15rem] rounded-[var(--radius-pill)] bg-layer-2">
               {tool.cat}
             </span>
           )}

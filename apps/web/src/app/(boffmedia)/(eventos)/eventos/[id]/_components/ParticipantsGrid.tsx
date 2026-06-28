@@ -47,7 +47,7 @@ export function ParticipantsGrid({ participants }: ParticipantsGridProps) {
         >
           Sin participantes aún
         </p>
-        <p className="text-xs text-surface-500">Sé el primero en unirte a este evento</p>
+        <p className="text-xs text-ink-muted">Sé el primero en unirte a este evento</p>
       </div>
     )
   }
@@ -103,7 +103,7 @@ export function ParticipantsGrid({ participants }: ParticipantsGridProps) {
               <ProfileImage userId={participant.userId} size={36} />
 
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-surface-100 truncate">
+                <p className="text-sm font-semibold text-ink truncate">
                   {participant.nickname || "Jugador Anónimo"}
                 </p>
                 {isTop3 && rank.label && (

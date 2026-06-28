@@ -28,13 +28,13 @@ const rarityConfig: Record<
   { icon: any; color: string; bgColor: string }
 > = {
   bronce: { icon: FaAward, color: "text-orange-400", bgColor: "bg-orange-900" },
-  plata: { icon: FaAward, color: "text-surface-300", bgColor: "bg-surface-700" },
+  plata: { icon: FaAward, color: "text-ink", bgColor: "bg-layer-3" },
   oro: { icon: FaMedal, color: "text-yellow-400", bgColor: "bg-yellow-900" },
   platino: { icon: FaStar, color: "text-cyan-400", bgColor: "bg-cyan-900" },
   diamante: {
     icon: GiCutDiamond,
-    color: "text-secondary-400",
-    bgColor: "bg-secondary-900",
+    color: "text-secondary-hover",
+    bgColor: "bg-secondary-soft",
   },
 };
 
@@ -194,20 +194,20 @@ export default function AchievementList() {
         {achievements.map((achievement, index) => (
           <div
             key={index}
-            className="flex items-center space-x-4 p-4 bg-surface-800 rounded-lg border border-orange-800 shadow-lg hover:bg-surface-700 transition-colors duration-200 w-[500px] mx-auto"
+            className="flex items-center space-x-4 p-4 bg-layer-2 rounded-lg border border-orange-800 shadow-lg hover:bg-layer-3 transition-colors duration-200 w-[500px] mx-auto"
           >
             <AchievementBadge rarity={achievement.rarity} />
             <div className="flex-grow">
               <h3 className="text-lg font-semibold text-orange-400">
                 {achievement.name}
               </h3>
-              <p className="text-sm text-surface-300">{achievement.description}</p>
+              <p className="text-sm text-ink">{achievement.description}</p>
             </div>
             <div className="text-right">
               <span className="text-lg font-bold text-yellow-400">
                 {achievement.points}
               </span>
-              <span className="text-sm text-surface-300 ml-1">pts</span>
+              <span className="text-sm text-ink ml-1">pts</span>
             </div>
           </div>
         ))}

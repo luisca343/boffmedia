@@ -5,7 +5,7 @@ export const otros: GameEntry = {
   nameKey: "games.otros.name",
 
   icon: "",
-  color: "from-accent-400 to-indigo-600",
+  color: "from-secondary-hover to-indigo-600",
   bg: "bg-indigo-900",
 
   logo: "",
@@ -32,8 +32,8 @@ export const otros: GameEntry = {
           landing: {
             icon: "",
             fallbackIcon: "Gift",
-            fallbackIconColor: "text-accent-400",
-            color: "from-accent-400 to-indigo-600",
+            fallbackIconColor: "text-secondary-hover",
+            color: "from-secondary-hover to-indigo-600",
             features: ["raffles", "tickets", "results"],
             featured: true,
             popularity: "high",
@@ -47,8 +47,8 @@ export const otros: GameEntry = {
           landing: {
             icon: "",
             fallbackIcon: "Key",
-            fallbackIconColor: "text-secondary-400",
-            color: "from-secondary-400 to-cyan-600",
+            fallbackIconColor: "text-secondary-hover",
+            color: "from-secondary-hover to-cyan-600",
             features: ["library", "validator", "history"],
             featured: false,
             popularity: "medium",

@@ -28,15 +28,15 @@ export default function ReadPage({ params }: { params: Promise<{ id: string }> |
         </div>
         <div className="relative z-10 min-h-full flex items-center justify-center p-8">
           <div className="bg-yellow-300 card-pop p-8 text-center max-w-2xl">
-            <h2 className="text-pop-4xl font-bold mb-6 text-secondary-500 pop-shadow">
+            <h2 className="text-pop-4xl font-bold mb-6 text-secondary pop-shadow">
               ¡CARGANDO! 📰
             </h2>
-            <p className="text-pop-xl font-comic mb-8 text-secondary-600">
+            <p className="text-pop-xl font-comic mb-8 text-secondary-active">
               Furret está preparando tu noticia...
             </p>
             <div className="relative h-40 w-full mb-6">
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-16 h-16 border-8 border-secondary-500 border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-16 h-16 border-8 border-secondary border-t-transparent rounded-full animate-spin"></div>
               </div>
               <div className="absolute inset-0 flex items-center justify-center">
                 <span className="text-6xl animate-bounce">🔍</span>
@@ -85,7 +85,7 @@ export default function ReadPage({ params }: { params: Promise<{ id: string }> |
               <p className="text-pop-xl font-comic mb-3 text-black pop-shadow">
                 ¡Oh no! Hubo un error al cargar la noticia.
               </p>
-              <p className="text-pop-lg font-comic text-secondary-600">
+              <p className="text-pop-lg font-comic text-secondary-active">
                 ¿Quizás Furret está jugando con los cables? 🔌
               </p>
             </div>
@@ -133,8 +133,8 @@ export default function ReadPage({ params }: { params: Promise<{ id: string }> |
             <FurretHeader />
           
           {/* Navigation breadcrumbs - Enhanced */}
-          <div className="bg-secondary-100 p-6 flex flex-wrap items-center font-comic border-b-4 border-black">
-            <InternalLink href="furrettoday" className="text-secondary-500 hover:underline text-pop-lg pop-focus">
+          <div className="bg-secondary-soft p-6 flex flex-wrap items-center font-comic border-b-4 border-black">
+            <InternalLink href="furrettoday" className="text-secondary hover:underline text-pop-lg pop-focus">
               🏠 Inicio
             </InternalLink>
             <span className="mx-3 text-pop-lg font-bold"> ⚡ </span>
@@ -205,7 +205,7 @@ export default function ReadPage({ params }: { params: Promise<{ id: string }> |
                 </div>
                 
                 {/* Inner content border */}
-                <div className="border-4 border-dotted border-secondary-300 p-6 rounded-2xl bg-gray-50 relative">
+                <div className="border-4 border-dotted border-secondary p-6 rounded-2xl bg-gray-50 relative">
                   {/* Corner decorations */}
                   <div className="absolute -top-2 -right-2 w-8 h-8 bg-yellow-300 border-3 border-black rounded-full flex items-center justify-center transform rotate-12">
                     <span className="text-black font-bold text-pop-sm">✨</span>
@@ -226,12 +226,12 @@ export default function ReadPage({ params }: { params: Promise<{ id: string }> |
           </div>
           
           {/* Navigation buttons - Enhanced */}
-          <div className="bg-secondary-100 p-8 text-center border-t-4 border-black relative">
+          <div className="bg-secondary-soft p-8 text-center border-t-4 border-black relative">
             {/* Background pattern */}
             <div className="absolute inset-0 ben-day-dots opacity-30"></div>
             
             <div className="relative z-10">
-              <h3 className="text-pop-xl font-bold mb-6 text-secondary-600 pop-shadow">
+              <h3 className="text-pop-xl font-bold mb-6 text-secondary-active pop-shadow">
                 📰 ¿Te gustó esta noticia?
               </h3>
               
@@ -253,7 +253,7 @@ export default function ReadPage({ params }: { params: Promise<{ id: string }> |
               
               {/* Fun message */}
               <div className="mt-8 bg-yellow-300 inline-block px-6 py-3 border-3 border-black rounded-2xl transform rotate-1 card-pop">
-                <p className="text-pop-base font-comic text-secondary-600 pop-shadow">
+                <p className="text-pop-base font-comic text-secondary-active pop-shadow">
                   ¡Gracias por leer Furret Today! 🎉
                 </p>
               </div>

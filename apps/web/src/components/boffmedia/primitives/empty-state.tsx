@@ -16,7 +16,7 @@ export function EmptyState({ icon = "search", title, sub, action, className }: E
     <div className={cn("flex flex-col items-center text-center gap-4 py-16 px-4", className)}>
       <IconBox icon={icon} size="lg" tone="muted" />
       <h3 className="text-xl">{title}</h3>
-      {sub && <p className="text-[var(--text-muted)] max-w-[40ch]">{sub}</p>}
+      {sub && <p className="text-ink-muted max-w-[40ch]">{sub}</p>}
       {action}
     </div>
   )

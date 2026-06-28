@@ -13,7 +13,7 @@ export function Footer() {
       className="mt-auto"
       style={{
         borderTop: "var(--hairline) solid var(--border)",
-        background: "var(--surface)",
+        background: "var(--layer-1)",
       }}
     >
       <div className="container mx-auto px-4">
@@ -34,12 +34,12 @@ export function Footer() {
               />
               <span className="relative font-display font-extrabold text-[1.3rem] tracking-[0.01em] text-[var(--orange-500)] pr-[2.6rem]">
                 BoffMedia
-                <span className="absolute -top-[0.4rem] right-0 font-mono text-[0.5rem] font-bold tracking-[0.1em] px-[0.3rem] py-[0.12rem] text-[var(--on-accent)] bg-[var(--accent-bright)] rounded-[3px]">
+                <span className="absolute -top-[0.4rem] right-0 font-mono text-[0.5rem] font-bold tracking-[0.1em] px-[0.3rem] py-[0.12rem] text-[var(--on-secondary)] bg-secondary-hover rounded-[3px]">
                   BETA
                 </span>
               </span>
             </Link>
-            <p className="text-[length:var(--t-sm)] leading-[1.65] text-[var(--text-muted)] m-0">
+            <p className="text-[length:var(--t-sm)] leading-[1.65] text-ink-muted m-0">
               {t("tagline")}
             </p>
             <div className="flex gap-[0.6rem]">
@@ -53,7 +53,7 @@ export function Footer() {
                   key={icon}
                   href="#"
                   aria-label={label}
-                  className="inline-flex items-center justify-center w-[38px] h-[38px] rounded-[var(--btn-radius)] border border-[var(--border-strong)] text-[var(--text-muted)] hover:text-[var(--orange-500)] hover:border-[var(--orange-500)] transition-colors duration-[var(--dur)]"
+                  className="inline-flex items-center justify-center w-[38px] h-[38px] rounded-[var(--btn-radius)] border border-edge-strong text-ink-muted hover:text-[var(--orange-500)] hover:border-[var(--orange-500)] transition-colors duration-[var(--dur)]"
                 >
                   <Icon name={icon} size={16} />
                 </Link>
@@ -68,7 +68,7 @@ export function Footer() {
           >
             {/* Plataforma */}
             <div>
-              <h4 className="font-mono text-[length:var(--t-xs)] font-bold uppercase tracking-[0.1em] text-[var(--text)] m-0 mb-[1.1rem]">
+              <h4 className="font-mono text-[length:var(--t-xs)] font-bold uppercase tracking-[0.1em] text-ink m-0 mb-[1.1rem]">
                 {t("sections.platform.title")}
               </h4>
               <ul className="list-none p-0 m-0 flex flex-col gap-[0.7rem]">
@@ -82,7 +82,7 @@ export function Footer() {
                   <li key={label}>
                     <Link
                       href={href}
-                      className="text-[length:var(--t-sm)] text-[var(--text-muted)] transition-colors duration-[var(--dur)] hover:text-[var(--orange-500)]"
+                      className="text-[length:var(--t-sm)] text-ink-muted transition-colors duration-[var(--dur)] hover:text-[var(--orange-500)]"
                     >
                       {label}
                     </Link>
@@ -93,7 +93,7 @@ export function Footer() {
 
             {/* Recursos */}
             <div>
-              <h4 className="font-mono text-[length:var(--t-xs)] font-bold uppercase tracking-[0.1em] text-[var(--text)] m-0 mb-[1.1rem]">
+              <h4 className="font-mono text-[length:var(--t-xs)] font-bold uppercase tracking-[0.1em] text-ink m-0 mb-[1.1rem]">
                 {t("sections.resources.title")}
               </h4>
               <ul className="list-none p-0 m-0 flex flex-col gap-[0.7rem]">
@@ -107,7 +107,7 @@ export function Footer() {
                   <li key={label}>
                     <Link
                       href={href}
-                      className="text-[length:var(--t-sm)] text-[var(--text-muted)] transition-colors duration-[var(--dur)] hover:text-[var(--orange-500)]"
+                      className="text-[length:var(--t-sm)] text-ink-muted transition-colors duration-[var(--dur)] hover:text-[var(--orange-500)]"
                     >
                       {label}
                     </Link>
@@ -118,7 +118,7 @@ export function Footer() {
 
             {/* Compañía */}
             <div>
-              <h4 className="font-mono text-[length:var(--t-xs)] font-bold uppercase tracking-[0.1em] text-[var(--text)] m-0 mb-[1.1rem]">
+              <h4 className="font-mono text-[length:var(--t-xs)] font-bold uppercase tracking-[0.1em] text-ink m-0 mb-[1.1rem]">
                 {t("sections.company.title")}
               </h4>
               <ul className="list-none p-0 m-0 flex flex-col gap-[0.7rem]">
@@ -131,7 +131,7 @@ export function Footer() {
                   <li key={label}>
                     <Link
                       href={href}
-                      className="text-[length:var(--t-sm)] text-[var(--text-muted)] transition-colors duration-[var(--dur)] hover:text-[var(--orange-500)]"
+                      className="text-[length:var(--t-sm)] text-ink-muted transition-colors duration-[var(--dur)] hover:text-[var(--orange-500)]"
                     >
                       {label}
                     </Link>
@@ -142,10 +142,10 @@ export function Footer() {
 
             {/* Newsletter */}
             <div>
-              <h4 className="font-mono text-[length:var(--t-xs)] font-bold uppercase tracking-[0.1em] text-[var(--text)] m-0 mb-[1.1rem]">
+              <h4 className="font-mono text-[length:var(--t-xs)] font-bold uppercase tracking-[0.1em] text-ink m-0 mb-[1.1rem]">
                 {t("newsletter.title")}
               </h4>
-              <p className="text-[var(--text-muted)] text-[length:var(--t-sm)] mt-0 mb-0">
+              <p className="text-ink-muted text-[length:var(--t-sm)] mt-0 mb-0">
                 {t("newsletter.description")}
               </p>
               <form
@@ -153,7 +153,7 @@ export function Footer() {
                 onSubmit={(e) => e.preventDefault()}
               >
                 <input
-                  className="flex-1 h-[46px] px-4 rounded-[var(--btn-radius,var(--radius-pill,9999px))] text-[length:var(--t-sm)] bg-[var(--surface-2)] border border-[var(--border-strong)] text-[var(--text)] outline-none focus:border-[var(--accent)]"
+                  className="flex-1 h-[46px] px-4 rounded-[var(--btn-radius,var(--radius-pill,9999px))] text-[length:var(--t-sm)] bg-layer-2 border border-edge-strong text-ink outline-none focus:border-secondary"
                   type="email"
                   placeholder={t("newsletter.emailPlaceholder")}
                   aria-label="Correo"
@@ -177,7 +177,7 @@ export function Footer() {
             borderTop: "var(--hairline) solid var(--border)",
           }}
         >
-          <span className="text-[length:var(--t-sm)] text-[var(--text-dim)]">
+          <span className="text-[length:var(--t-sm)] text-ink-dim">
             {t("copyright", { year: new Date().getFullYear() })}
           </span>
           <div className="flex gap-6">
@@ -189,7 +189,7 @@ export function Footer() {
               <Link
                 key={label}
                 href={href}
-                className="text-[length:var(--t-sm)] text-[var(--text-muted)] transition-colors duration-[var(--dur)] hover:text-[var(--orange-500)]"
+                className="text-[length:var(--t-sm)] text-ink-muted transition-colors duration-[var(--dur)] hover:text-[var(--orange-500)]"
               >
                 {label}
               </Link>

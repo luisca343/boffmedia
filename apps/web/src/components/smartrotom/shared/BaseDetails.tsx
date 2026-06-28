@@ -34,7 +34,7 @@ export const BaseDetails = ({
     : `twitch/user/${creatorName}`;
 
   return (
-    <div className="bg-surface-800 rounded-lg p-6 shadow-lg">
+    <div className="bg-layer-2 rounded-lg p-6 shadow-lg">
       <h1 className="text-2xl font-bold mb-3">{title}</h1>
       
       {statsComponent}
@@ -58,7 +58,7 @@ export const BaseDetails = ({
       
       {/* Tags for Twitch */}
       {tags.length > 0 && platform === "twitch" && (
-        <div className="bg-surface-700 rounded p-4">
+        <div className="bg-layer-3 rounded p-4">
           <h3 className="text-lg font-medium mb-2">Tags</h3>
           <div className="flex flex-wrap gap-2">
             {tags.map((tag, index) => (
@@ -75,11 +75,11 @@ export const BaseDetails = ({
       
       {/* Description */}
       {description && (
-        <div className="bg-surface-700 rounded p-4 mt-4">
+        <div className="bg-layer-3 rounded p-4 mt-4">
           <h3 className="text-lg font-medium mb-2">
             {platform === "youtube" ? t("video.description") : "Description"}
           </h3>
-          <p className="text-surface-300 whitespace-pre-line">{description}</p>
+          <p className="text-ink whitespace-pre-line">{description}</p>
         </div>
       )}
     </div>

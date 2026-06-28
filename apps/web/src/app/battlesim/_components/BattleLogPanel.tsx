@@ -109,16 +109,16 @@ export function BattleLogPanel({
   return (
     <div
       className={`rounded-[var(--radius)] overflow-hidden flex flex-col ${className ?? ''}`}
-      style={{ border: '1px solid var(--border)', background: 'var(--surface)' }}
+      style={{ border: '1px solid var(--border)', background: 'var(--layer-1)' }}
     >
       {showFilters && (
-        <div className="flex items-center gap-2 p-2 border-b border-[var(--border)]" style={{ background: 'var(--surface-2)' }}>
+        <div className="flex items-center gap-2 p-2 border-b border-edge" style={{ background: 'var(--layer-2)' }}>
           <Segmented value={filter} options={filterOptions} onChange={(v) => setFilter(v as LogFilter)} className="text-t-xs" />
           {groups.length > 1 && (
             <button
               onClick={collapsePrevious}
               className="bsx-focus ml-auto text-t-3xs font-mono uppercase tracking-[.06em] px-2 py-1 rounded-[var(--radius-sm)]"
-              style={{ color: 'var(--text-dim)', background: 'var(--surface-3)' }}
+              style={{ color: 'var(--text-dim)', background: 'var(--layer-3)' }}
               title={t('log.collapsePrevious')}
             >
               {t('log.collapsePrevious')}
@@ -131,7 +131,7 @@ export function BattleLogPanel({
         <button
           onClick={() => setShowAll(true)}
           className="bsx-focus w-full text-t-xs py-1 transition-colors shrink-0"
-          style={{ background: 'var(--surface-2)', color: 'var(--text-muted)', borderBottom: '1px solid var(--border)' }}
+          style={{ background: 'var(--layer-2)', color: 'var(--text-muted)', borderBottom: '1px solid var(--border)' }}
         >
           {t('log.showAll', { count: ticks.length })}
         </button>
@@ -156,8 +156,8 @@ export function BattleLogPanel({
                   aria-expanded={!isCollapsed}
                   className="bsx-focus sticky top-0 z-[1] w-full flex items-center gap-[.55rem] pt-[.45rem] pb-[.15rem] font-mono font-bold text-t-3xs tracking-[.14em] cursor-pointer text-left"
                   style={{
-                    color: isActive ? 'var(--text)' : 'var(--accent-bright)',
-                    background: 'var(--surface)',
+                    color: isActive ? 'var(--text)' : 'var(--secondary-hover)',
+                    background: 'var(--layer-1)',
                   }}
                 >
                   <span>{isCollapsed ? '▸' : '▾'} T{group.turn}</span>

@@ -23,7 +23,7 @@ export function PokemonUsageTable({ items, showDiscards, tournamentUsageMap }: P
 
   if (items.length === 0) {
     return (
-      <p className="py-8 text-center text-surface-500 text-sm">
+      <p className="py-8 text-center text-ink-muted text-sm">
         {t('table.noData')}
       </p>
     );
@@ -54,65 +54,65 @@ export function PokemonUsageTable({ items, showDiscards, tournamentUsageMap }: P
     <div className="overflow-x-auto">
       <table className="w-full text-xs">
         <thead>
-          <tr className="border-b border-surface-700">
+          <tr className="border-b border-edge">
             {/* Pokémon name */}
-            <th className="text-left py-2.5 px-3 text-surface-500 font-medium">
+            <th className="text-left py-2.5 px-3 text-ink-muted font-medium">
               {t('table.pokemon')}
             </th>
 
             {/* Discards column (preview only) */}
             {showDiscards && (
-              <th className="py-2.5 px-2 text-right text-surface-500 font-medium whitespace-nowrap">
+              <th className="py-2.5 px-2 text-right text-ink-muted font-medium whitespace-nowrap">
                 {t('table.discards')}
               </th>
             )}
 
             {/* Uses / Brought — sortable */}
             <th
-              className="py-2.5 px-2 text-right text-surface-500 font-medium whitespace-nowrap cursor-pointer select-none hover:text-surface-300 transition-colors"
+              className="py-2.5 px-2 text-right text-ink-muted font-medium whitespace-nowrap cursor-pointer select-none hover:text-ink transition-colors"
               onClick={() => toggleSort('uses')}
             >
               <span className="flex items-center justify-end gap-0.5">
                 {showDiscards ? t('table.brought') : t('table.uses')}
                 {sortKey === 'uses' ? (
                   sortDir === 'desc' ? (
-                    <ChevronDown size={10} className="text-primary-400" />
+                    <ChevronDown size={10} className="text-primary-hover" />
                   ) : (
-                    <ChevronUp size={10} className="text-primary-400" />
+                    <ChevronUp size={10} className="text-primary-hover" />
                   )
                 ) : (
-                  <ChevronDown size={10} className="text-surface-600" />
+                  <ChevronDown size={10} className="text-ink-dim" />
                 )}
               </span>
             </th>
 
             {/* W/L/D record */}
-            <th className="py-2.5 px-2 text-right text-surface-500 font-medium whitespace-nowrap">
+            <th className="py-2.5 px-2 text-right text-ink-muted font-medium whitespace-nowrap">
               {t('table.record')}
             </th>
 
             {/* Win rate — sortable */}
             <th
-              className="py-2.5 px-3 text-right text-surface-500 font-medium cursor-pointer select-none hover:text-surface-300 transition-colors"
+              className="py-2.5 px-3 text-right text-ink-muted font-medium cursor-pointer select-none hover:text-ink transition-colors"
               onClick={() => toggleSort('winRate')}
             >
               <span className="flex items-center justify-end gap-0.5">
                 {t('table.winRate')}
                 {sortKey === 'winRate' ? (
                   sortDir === 'desc' ? (
-                    <ChevronDown size={10} className="text-primary-400" />
+                    <ChevronDown size={10} className="text-primary-hover" />
                   ) : (
-                    <ChevronUp size={10} className="text-primary-400" />
+                    <ChevronUp size={10} className="text-primary-hover" />
                   )
                 ) : (
-                  <ChevronDown size={10} className="text-surface-600" />
+                  <ChevronDown size={10} className="text-ink-dim" />
                 )}
               </span>
             </th>
 
             {/* Tournament usage % (if available) */}
             {tournamentUsageMap && (
-              <th className="py-2.5 px-3 text-right text-surface-500 font-medium whitespace-nowrap">
+              <th className="py-2.5 px-3 text-right text-ink-muted font-medium whitespace-nowrap">
                 {t('table.tournamentUsage')}
               </th>
             )}
@@ -123,7 +123,7 @@ export function PokemonUsageTable({ items, showDiscards, tournamentUsageMap }: P
             const wr = p.winRate;
             const wrColor =
               wr === null
-                ? 'text-surface-500'
+                ? 'text-ink-muted'
                 : wr >= 0.6
                 ? 'text-green-400'
                 : wr >= 0.4
@@ -135,7 +135,7 @@ export function PokemonUsageTable({ items, showDiscards, tournamentUsageMap }: P
             return (
               <tr
                 key={p.speciesId}
-                className="border-b border-surface-700/40 hover:bg-surface-700/30 transition-colors"
+                className="border-b border-edge/40 hover:bg-layer-3/30 transition-colors"
               >
                 {/* Pokémon sprite + name */}
                 <td className="py-2 px-3">
@@ -146,7 +146,7 @@ export function PokemonUsageTable({ items, showDiscards, tournamentUsageMap }: P
                       className="w-7 h-7 object-contain shrink-0"
                       onError={handleSpriteError}
                     />
-                    <span className="text-surface-200 truncate">
+                    <span className="text-ink truncate">
                       {p.speciesName}
                     </span>
                   </div>
@@ -154,22 +154,22 @@ export function PokemonUsageTable({ items, showDiscards, tournamentUsageMap }: P
 
                 {/* Discards */}
                 {showDiscards && (
-                  <td className="py-2 px-2 text-right font-mono tabular-nums text-surface-500">
+                  <td className="py-2 px-2 text-right font-mono tabular-nums text-ink-muted">
                     {p.discards}
                   </td>
                 )}
 
                 {/* Total uses / brought */}
-                <td className="py-2 px-2 text-right font-mono tabular-nums text-surface-300">
+                <td className="py-2 px-2 text-right font-mono tabular-nums text-ink">
                   {totalUses}
                 </td>
 
                 {/* W/L/D */}
                 <td className="py-2 px-2 text-right font-mono tabular-nums whitespace-nowrap">
                   <span className="text-green-400">{p.wins}</span>
-                  <span className="text-surface-600">/</span>
+                  <span className="text-ink-dim">/</span>
                   <span className="text-red-400">{p.losses}</span>
-                  <span className="text-surface-600">/</span>
+                  <span className="text-ink-dim">/</span>
                   <span className="text-yellow-400">{p.draws}</span>
                 </td>
 
@@ -182,7 +182,7 @@ export function PokemonUsageTable({ items, showDiscards, tournamentUsageMap }: P
 
                 {/* Tournament usage % (if available) */}
                 {tournamentUsageMap && (
-                  <td className="py-2 px-3 text-right font-mono tabular-nums text-surface-400 text-[11px]">
+                  <td className="py-2 px-3 text-right font-mono tabular-nums text-ink-muted text-[11px]">
                     {tournamentUsageMap.has(p.speciesId)
                       ? `${Math.round(tournamentUsageMap.get(p.speciesId)! * 100)}%`
                       : '—'}

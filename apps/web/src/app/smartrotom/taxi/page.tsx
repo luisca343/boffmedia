@@ -179,7 +179,7 @@ export default function TaxiApp() {
       {/* Decorative elements for a more dynamic look */}
       <div className="absolute top-[20%] left-[5%] w-12 h-12 bg-white/5 rounded-full blur-2xl"></div>
       <div className="absolute bottom-[15%] right-[10%] w-20 h-20 bg-yellow-400/10 rounded-full blur-3xl"></div>
-      <div className="absolute top-[60%] left-[30%] w-32 h-32 bg-secondary-300/5 rounded-full blur-2xl"></div>
+      <div className="absolute top-[60%] left-[30%] w-32 h-32 bg-secondary-soft/5 rounded-full blur-2xl"></div>
 
       <TaxiHeader 
         playerPosition={playerPosition} 

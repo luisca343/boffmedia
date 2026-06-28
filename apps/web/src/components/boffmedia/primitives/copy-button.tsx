@@ -25,8 +25,8 @@ export function CopyButton({ text, label = "Copiar", copiedLabel = "Copiado", cl
       className={cn(
         "inline-flex items-center gap-[0.35rem] px-[0.6rem] py-[0.3rem]",
         "rounded-[var(--radius)] [border-width:var(--hairline)] border-solid [border-color:var(--border-strong)]",
-        "bg-[var(--surface-2)] text-[11px] font-semibold text-[var(--text-muted)]",
-        "hover:text-[var(--text)] hover:border-[var(--accent)]",
+        "bg-layer-2 text-[11px] font-semibold text-ink-muted",
+        "hover:text-ink hover:border-secondary",
         "transition-[color,border-color] duration-[var(--dur)] ease-[var(--ease)]",
         done && "text-[var(--emerald-400)] border-[color-mix(in_srgb,var(--emerald-400)_40%,transparent)]",
         className,

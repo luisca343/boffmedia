@@ -8,11 +8,11 @@ const inputVariants = cva(
   {
     variants: {
       variant: {
-        default: "border-surface-600/80 bg-surface-800/80 text-surface-100 ring-offset-surface-950 placeholder:text-surface-500 hover:border-surface-500/80 focus-visible:ring-primary-500/50 focus-visible:border-primary-500/60",
-        dark: "border-surface-700 bg-surface-800 text-primary-400 ring-offset-surface-950 placeholder:text-surface-500 focus-visible:ring-primary-400 hover:border-surface-600",
-        neutral: "border-neutral-700 bg-neutral-800 text-neutral-100 ring-offset-neutral-950 placeholder:text-neutral-500 focus-visible:ring-primary-300 hover:border-neutral-600",
-        wingull: "border-secondary-200 bg-secondary-50 text-secondary-500 ring-offset-white focus-visible:ring-secondary-400 placeholder:text-secondary-300 hover:bg-secondary-100/30 focus:border-secondary-400",
-        boff: "border-surface-600/60 bg-surface-800 text-surface-100 ring-offset-surface-900 placeholder:text-surface-400 hover:border-secondary-500/50 hover:bg-surface-700 focus-visible:ring-secondary-400/30 focus-visible:border-secondary-500/60 transition-all duration-200",
+        default: "border-edge/80 bg-layer-2/80 text-ink ring-offset-base placeholder:text-ink-muted hover:border-edge/80 focus-visible:ring-primary/50 focus-visible:border-primary/60",
+        dark: "border-edge bg-layer-2 text-primary-hover ring-offset-base placeholder:text-ink-muted focus-visible:ring-primary hover:border-edge",
+        neutral: "border-neutral-700 bg-neutral-800 text-neutral-100 ring-offset-neutral-950 placeholder:text-neutral-500 focus-visible:ring-primary hover:border-neutral-600",
+        wingull: "border-secondary bg-secondary-soft text-secondary ring-offset-white focus-visible:ring-secondary placeholder:text-secondary-hover hover:bg-secondary-soft/30 focus:border-secondary",
+        boff: "border-edge/60 bg-layer-2 text-ink ring-offset-layer-1 placeholder:text-ink-muted hover:border-secondary/50 hover:bg-layer-3 focus-visible:ring-secondary/30 focus-visible:border-secondary/60 transition-all duration-200",
       },
     },
     defaultVariants: {

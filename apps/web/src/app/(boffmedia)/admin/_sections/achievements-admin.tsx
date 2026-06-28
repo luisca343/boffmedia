@@ -45,20 +45,20 @@ export function AchievementsAdmin() {
       columns={[
         { key: "name", label: "Logro", render: (a) => (
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] flex items-center justify-center shrink-0">
-              <Award className="w-4 h-4 text-[var(--text-dim)]" />
+            <div className="w-9 h-9 rounded-lg bg-layer-2 border border-edge flex items-center justify-center shrink-0">
+              <Award className="w-4 h-4 text-ink-dim" />
             </div>
             <div>
-              <span className="font-medium text-[var(--text)]">{a.name}</span>
-              <p className="text-xs text-[var(--text-dim)]">{a.eventName ?? `Evento #${a.eventId}`}</p>
+              <span className="font-medium text-ink">{a.name}</span>
+              <p className="text-xs text-ink-dim">{a.eventName ?? `Evento #${a.eventId}`}</p>
             </div>
           </div>
         )},
         { key: "points", label: "Pts", render: (a) => (
-          <span className="text-sm font-mono text-[var(--text-muted)]">{a.points}</span>
+          <span className="text-sm font-mono text-ink-muted">{a.points}</span>
         )},
         { key: "rarity", label: "Rareza", render: (a) => {
-          const cls = RARITY_COLORS[a.rarity ?? ""] ?? "bg-[var(--surface-2)] text-[var(--text-muted)] border-[var(--border)]"
+          const cls = RARITY_COLORS[a.rarity ?? ""] ?? "bg-layer-2 text-ink-muted border-edge"
           return (
             <span className={`text-[11px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full border ${cls}`}>
               {a.rarity ?? "—"}
@@ -66,7 +66,7 @@ export function AchievementsAdmin() {
           )
         }},
         { key: "category", label: "Categoría", render: (a) => (
-          <span className="text-sm text-[var(--text-muted)] capitalize">{a.category ?? "—"}</span>
+          <span className="text-sm text-ink-muted capitalize">{a.category ?? "—"}</span>
         )},
       ]}
     />

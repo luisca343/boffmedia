@@ -53,21 +53,21 @@ export function ToolSelect({
           "inline-flex items-center gap-[0.45rem] whitespace-nowrap shrink-0",
           "px-[0.7rem] py-[0.46rem]",
           "rounded-[var(--radius)] [border-width:var(--hairline)] border-solid [border-color:var(--border-strong)]",
-          "bg-[var(--surface-2)] text-sm font-medium text-[var(--text)]",
-          "hover:border-[color-mix(in_srgb,var(--accent)_45%,var(--border-strong))]",
+          "bg-layer-2 text-sm font-medium text-ink",
+          "hover:border-[color-mix(in_srgb,var(--secondary)_45%,var(--border-strong))]",
           "transition-[border-color,background] duration-[var(--dur)] ease-[var(--ease)]",
         )}
         style={minWidth ? { minWidth } : { width }}
       >
-        {icon && <Icon name={icon} size={13} className="shrink-0 text-[var(--text-dim)]" />}
+        {icon && <Icon name={icon} size={13} className="shrink-0 text-ink-dim" />}
         <span className="flex-1 text-left overflow-hidden text-ellipsis">{current ? current.label : placeholder}</span>
-        <Icon name="chevron" size={14} className={cn("shrink-0 text-[var(--text-dim)] ml-auto transition-transform", open && "rotate-180")} />
+        <Icon name="chevron" size={14} className={cn("shrink-0 text-ink-dim ml-auto transition-transform", open && "rotate-180")} />
       </button>
       {open && (
         <div
           className={cn(
             "absolute top-[calc(100%+6px)] z-[130] min-w-[180px] max-h-[320px] overflow-y-auto",
-            "bg-[var(--surface)] border border-[var(--border-strong)]",
+            "bg-layer-1 border border-edge-strong",
             "rounded-[var(--radius-lg)] shadow-[0_12px_32px_-8px_rgba(0,0,0,0.35)]",
             "py-1",
           )}
@@ -78,7 +78,7 @@ export function ToolSelect({
               return (
                 <div
                   key={`header-${i}`}
-                  className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--text-dim)]"
+                  className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-ink-dim"
                 >
                   {it.header}
                 </div>
@@ -94,8 +94,8 @@ export function ToolSelect({
                 className={cn(
                   "w-full text-left px-3 py-1.5 text-xs transition-colors",
                   isActive
-                    ? "bg-[var(--accent-soft)] text-[var(--accent-bright)] font-semibold"
-                    : "text-[var(--text)] hover:bg-[color-mix(in_srgb,var(--surface-3)_55%,transparent)]",
+                    ? "bg-secondary-soft text-secondary-hover font-semibold"
+                    : "text-ink hover:bg-[color-mix(in_srgb,var(--layer-3)_55%,transparent)]",
                 )}
               >
                 {it.label}

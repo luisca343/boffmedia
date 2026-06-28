@@ -28,15 +28,15 @@ export function RegulationMetaSection({ regulationId, meta, loading }: Props) {
   return (
     <Card className="overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-surface-700">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-edge">
         <div>
-          <span className="text-sm font-semibold text-surface-300">{t('regulationMeta.title')}</span>
-          <span className="ml-2 text-[11px] font-mono bg-surface-800 border border-surface-700 rounded px-1.5 py-px text-surface-400">
+          <span className="text-sm font-semibold text-ink">{t('regulationMeta.title')}</span>
+          <span className="ml-2 text-[11px] font-mono bg-layer-2 border border-edge rounded px-1.5 py-px text-ink-muted">
             {regulationId}
           </span>
         </div>
         {meta && (
-          <span className="text-[11px] text-surface-600">
+          <span className="text-[11px] text-ink-dim">
             {t('regulationMeta.matchCount', { n: meta.totalMatches })}
           </span>
         )}
@@ -52,10 +52,10 @@ export function RegulationMetaSection({ regulationId, meta, loading }: Props) {
       {/* Content */}
       {loading ? (
         <div className="flex justify-center py-8">
-          <div className="w-4 h-4 border-2 border-primary-400 border-t-transparent rounded-full animate-spin" />
+          <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
         </div>
       ) : !meta ? (
-        <p className="py-8 text-center text-surface-500 text-sm">{t('regulationMeta.noData')}</p>
+        <p className="py-8 text-center text-ink-muted text-sm">{t('regulationMeta.noData')}</p>
       ) : (
         <PokemonUsageTable
           items={tab === 'preview' ? meta.preview : tab === 'leads' ? meta.leads : meta.backs}

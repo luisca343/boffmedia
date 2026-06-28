@@ -40,7 +40,7 @@ export function EloChart({ timeline, startElo }: Props) {
 
   if (knownElos.length === 0) {
     return (
-      <div className="flex items-center justify-center h-28 text-sm text-surface-500">
+      <div className="flex items-center justify-center h-28 text-sm text-ink-muted">
         {t('chart.noData')}
       </div>
     );
@@ -112,7 +112,7 @@ export function EloChart({ timeline, startElo }: Props) {
         ? 'text-red-400'
         : point.result === 'draw'
         ? 'text-yellow-400'
-        : 'text-surface-400';
+        : 'text-ink-muted';
 
     const resultLabel =
       point.result === 'win'
@@ -129,11 +129,11 @@ export function EloChart({ timeline, startElo }: Props) {
 
     return (
       <div
-        className="rounded-lg border border-surface-700 bg-surface-900 px-3 py-2 text-xs shadow-lg"
+        className="rounded-lg border border-edge bg-layer-1 px-3 py-2 text-xs shadow-lg"
         style={{ pointerEvents: 'none' }}
       >
         <div className="flex items-center gap-2 mb-0.5">
-          <span className="text-surface-400 font-mono">
+          <span className="text-ink-muted font-mono">
             {point.matchNum === 0 ? t('chart.start') : `#${point.matchNum}`}
           </span>
           {resultLabel && (
@@ -142,7 +142,7 @@ export function EloChart({ timeline, startElo }: Props) {
             </span>
           )}
         </div>
-        <div className="text-surface-50 font-mono font-semibold text-sm">
+        <div className="text-ink font-mono font-semibold text-sm">
           {fmt(point.elo)}
         </div>
         {point.delta !== undefined && (

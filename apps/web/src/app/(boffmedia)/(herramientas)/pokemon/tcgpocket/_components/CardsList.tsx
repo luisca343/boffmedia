@@ -19,7 +19,7 @@ export function CardsList({ cards }: { cards: TcgCard[] }) {
             href={`/tcgpocket/cartas/${card.setId}/${card.id}`}
             className="group block"
           >
-            <div className="relative bg-surface-800/50 backdrop-blur-sm rounded-xl p-3 transition-all duration-300 hover:bg-surface-700/50 hover:scale-105 hover:-translate-y-1 shadow-lg hover:shadow-xl">
+            <div className="relative bg-layer-2/50 backdrop-blur-sm rounded-xl p-3 transition-all duration-300 hover:bg-layer-3/50 hover:scale-105 hover:-translate-y-1 shadow-lg hover:shadow-xl">
               <div className="relative w-full pb-[140%]">
                 <Image
                   src={`/img/games/tcgpocket/cards/${card.setId}/${card.id}.jpg`}

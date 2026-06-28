@@ -19,7 +19,7 @@ export function BoffSkeleton({ w, h, circle, radius, className, style }: BoffSke
     <span
       className={cn(
         "block",
-        "bg-[linear-gradient(90deg,var(--surface-2)_0%,var(--surface-3)_50%,var(--surface-2)_100%)]",
+        "bg-[linear-gradient(90deg,var(--layer-2)_0%,var(--layer-3)_50%,var(--layer-2)_100%)]",
         "bg-[length:200%_100%]",
         "animate-k-shimmer",
         !hasExplicitSize && "w-full h-3.5",

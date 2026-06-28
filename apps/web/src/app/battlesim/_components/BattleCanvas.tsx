@@ -181,7 +181,7 @@ export const BattleCanvas = memo(forwardRef(({
                 <div className="m-1 w-1/3 flex">
                 {/* messageBar commented out — move panel now occupies bottom-right
                 {
-                    messageBar && messageBar.length > 0 && <div className="w-1/3 h-fit m-1 flex-1 bg-surface-800 bg-opacity-90 py-1 px-2 rounded-md text-surface-200 z-50 absolute right-0 bottom-0">
+                    messageBar && messageBar.length > 0 && <div className="w-1/3 h-fit m-1 flex-1 bg-layer-2 bg-opacity-90 py-1 px-2 rounded-md text-ink z-50 absolute right-0 bottom-0">
                         {messageBar.map((message, index) => (
                             <div key={index} dangerouslySetInnerHTML={{ __html: sanitizeHtml(message) }}></div>
                         ))}

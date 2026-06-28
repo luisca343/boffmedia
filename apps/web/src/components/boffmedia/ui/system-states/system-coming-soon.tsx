@@ -17,21 +17,21 @@ export function SystemComingSoon({ onHome }: SystemComingSoonProps) {
       <div
         className="w-[78px] h-[78px] rounded-[var(--radius-lg)] grid place-items-center mb-[1.4rem] text-white"
         style={{
-          background: "linear-gradient(135deg, var(--accent), var(--purple-500))",
+          background: "linear-gradient(135deg, var(--secondary), var(--purple-500))",
         }}
       >
         <Icon name="sparkles" size={30} />
       </div>
       <span
-        className="inline-flex items-center gap-[0.5rem] mb-[1.2rem] px-[0.85rem] py-[0.4rem] rounded-[var(--radius-pill)] border border-[var(--border-strong)] bg-[var(--surface-2)] font-[var(--label-font)] text-[length:var(--t-xs)] tracking-[var(--label-spacing)] uppercase text-[var(--text-muted)]"
+        className="inline-flex items-center gap-[0.5rem] mb-[1.2rem] px-[0.85rem] py-[0.4rem] rounded-[var(--radius-pill)] border border-edge-strong bg-layer-2 font-[var(--label-font)] text-[length:var(--t-xs)] tracking-[var(--label-spacing)] uppercase text-ink-muted"
       >
-        <span className="w-[7px] h-[7px] rounded-full bg-[var(--accent-bright)]" style={{ animation: "pulse-dot 1.6s var(--ease) infinite" }} />
+        <span className="w-[7px] h-[7px] rounded-full bg-secondary-hover" style={{ animation: "pulse-dot 1.6s var(--ease) infinite" }} />
         Próxima fase
       </span>
       <h1 className="text-[length:var(--t-3xl)] leading-[1.05] mb-[0.7rem]">
         Muy pronto
       </h1>
-      <p className="text-[var(--text-muted)] text-[length:var(--t-base)] max-w-[38ch] mx-auto mb-[1.6rem]">
+      <p className="text-ink-muted text-[length:var(--t-base)] max-w-[38ch] mx-auto mb-[1.6rem]">
         Esta sección llega en la siguiente fase del rediseño. Únete a la lista de espera y te avisaremos en cuanto esté lista.
       </p>
       {done ? (
@@ -49,13 +49,13 @@ export function SystemComingSoon({ onHome }: SystemComingSoonProps) {
             required
             placeholder="tu@correo.com"
             aria-label="Correo electrónico"
-            className="flex-1 bg-[var(--surface-2)] border border-[var(--border-strong)] rounded-[var(--btn-radius)] px-3.5 py-3 text-[length:var(--t-sm)] text-[var(--text)] placeholder:text-[var(--text-dim)] focus:outline-none focus:border-[var(--accent)]"
+            className="flex-1 bg-layer-2 border border-edge-strong rounded-[var(--btn-radius)] px-3.5 py-3 text-[length:var(--t-sm)] text-ink placeholder:text-ink-dim focus:outline-none focus:border-secondary"
           />
           <Button variant="accent" type="submit" iconRight="arrow">Avísame</Button>
         </form>
       )}
-      <p className="mt-[1.2rem] text-[length:var(--t-xs)] text-[var(--text-dim)]">
-        <a href="#" onClick={(e) => { e.preventDefault(); onHome?.() }} className="text-[var(--accent-bright)] hover:text-[var(--text)]">
+      <p className="mt-[1.2rem] text-[length:var(--t-xs)] text-ink-dim">
+        <a href="#" onClick={(e) => { e.preventDefault(); onHome?.() }} className="text-secondary-hover hover:text-ink">
           ← Volver al inicio
         </a>
       </p>

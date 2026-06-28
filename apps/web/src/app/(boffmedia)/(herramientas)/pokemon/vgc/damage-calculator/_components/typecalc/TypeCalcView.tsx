@@ -105,9 +105,9 @@ function CovTable({
       <table className="border-collapse text-[13px]">
         <thead>
           <tr>
-            <th className="w-28 min-w-[112px] border-b border-surface-700/40 bg-surface-900 sticky left-0 z-10" />
+            <th className="w-28 min-w-[112px] border-b border-edge/40 bg-layer-1 sticky left-0 z-10" />
             {teamPokes.map((p) => (
-              <th key={p.name} className="min-w-[70px] border-b border-surface-700/40 bg-surface-900 px-2 py-1.5 text-center">
+              <th key={p.name} className="min-w-[70px] border-b border-edge/40 bg-layer-1 px-2 py-1.5 text-center">
                 <img
                   src={getSpriteUrl(p.name)}
                   onError={handleSpriteError}
@@ -120,7 +120,7 @@ function CovTable({
             ))}
             {/* Summary column header */}
             <th
-              className="min-w-[52px] border-b border-surface-700/40 px-2 py-1.5 text-center"
+              className="min-w-[52px] border-b border-edge/40 px-2 py-1.5 text-center"
               style={{ background: mode === 'offense' ? 'rgba(239,68,68,0.08)' : 'rgba(252,165,165,0.08)' }}
             >
               <span className="text-[11px] font-bold" style={{ color: 'rgb(252,165,165)' }}>
@@ -128,7 +128,7 @@ function CovTable({
               </span>
             </th>
             <th
-              className="min-w-[52px] border-b border-surface-700/40 px-2 py-1.5 text-center"
+              className="min-w-[52px] border-b border-edge/40 px-2 py-1.5 text-center"
               style={{ background: 'rgba(74,222,128,0.08)' }}
             >
               <span className="text-[11px] font-bold text-green-400">
@@ -150,8 +150,8 @@ function CovTable({
               : effs.filter((e) => e > 0 && e < 1).length
             const col = TYPE_COLORS[rowType] ?? '#9ca3af'
             return (
-              <tr key={rowType} className="border-b border-surface-800/30 hover:bg-surface-900/30">
-                <td className="sticky left-0 z-10 bg-surface-950 px-2 py-1.5">
+              <tr key={rowType} className="border-b border-edge-strong/30 hover:bg-layer-1/30">
+                <td className="sticky left-0 z-10 bg-base px-2 py-1.5">
                   <span
                     className="px-2 py-1 rounded text-[11px] font-bold leading-none whitespace-nowrap"
                     style={{ background: `${col}33`, border: `1px solid ${col}66`, color: col }}
@@ -194,7 +194,7 @@ function CovTable({
 function InsightRow({ poke, children }: { poke: TeamPoke; children: React.ReactNode }) {
   const col = TYPE_COLORS[poke.types[0]] ?? '#6b7280'
   return (
-    <div className="flex items-center gap-2 py-1.5 border-b border-surface-800/30 last:border-b-0">
+    <div className="flex items-center gap-2 py-1.5 border-b border-edge-strong/30 last:border-b-0">
       <div
         className="w-9 h-9 rounded flex items-center justify-center shrink-0"
         style={{ background: `${col}22`, border: `1px solid ${col}55` }}
@@ -208,7 +208,7 @@ function InsightRow({ poke, children }: { poke: TeamPoke; children: React.ReactN
           alt={poke.name}
         />
       </div>
-      <div className="flex-1 min-w-0 text-[10px] text-surface-400 leading-snug">
+      <div className="flex-1 min-w-0 text-[10px] text-ink-muted leading-snug">
         {children}
       </div>
     </div>
@@ -293,8 +293,8 @@ export function TypeCalcView() {
     return (
       <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center px-8">
         <div className="text-4xl opacity-15">🔮</div>
-        <p className="text-surface-500 text-sm font-semibold">{t('addPokemon')}</p>
-        <p className="text-surface-700 text-xs">{t('addPokemonHint')}</p>
+        <p className="text-ink-muted text-sm font-semibold">{t('addPokemon')}</p>
+        <p className="text-ink-dim text-xs">{t('addPokemonHint')}</p>
       </div>
     )
   }
@@ -306,10 +306,10 @@ export function TypeCalcView() {
         {hasRivals && <ViewToggle view={view} onChange={setView} />}
         <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center px-8">
           <div className="text-4xl opacity-15">⚔</div>
-          <p className="text-surface-500 text-sm font-semibold">
+          <p className="text-ink-muted text-sm font-semibold">
             {isRivals ? t('noThreats') : t('noTeam')}
           </p>
-          <p className="text-surface-700 text-xs">
+          <p className="text-ink-dim text-xs">
             {isRivals ? t('noThreatsHint') : t('noTeamHint')}
           </p>
         </div>
@@ -338,25 +338,25 @@ export function TypeCalcView() {
           className="rounded-lg overflow-hidden"
           style={{ background: 'rgba(8,12,24,0.97)', border: '1px solid rgba(51,65,85,0.4)' }}
         >
-          <div className="px-3 py-2 border-b border-surface-700/30">
-            <span className="text-[10px] font-black tracking-widest uppercase text-primary-400">{t('insights')}</span>
+          <div className="px-3 py-2 border-b border-edge/30">
+            <span className="text-[10px] font-black tracking-widest uppercase text-primary-hover">{t('insights')}</span>
           </div>
-          <div className="grid grid-cols-2 divide-x divide-surface-700/30">
+          <div className="grid grid-cols-2 divide-x divide-edge/30">
             {/* Offensive */}
             <div className="px-3 py-2">
               <div className="text-[9px] font-bold uppercase tracking-wider text-orange-400 mb-2">{offLabel}</div>
               {offInsights.map((p) => (
                 <InsightRow key={p.name} poke={p}>
                   {t('canHit')} <strong>{p.se}</strong> {t('typesSe')}
-                  {p.nve > 0 && <>, <span className="text-surface-600">{p.nve} {t('notVeryEffective')}</span></>}
-                  {p.imm > 0 && <>, <span className="text-surface-700">{p.imm} {t('insightImmune')}</span></>}
+                  {p.nve > 0 && <>, <span className="text-ink-dim">{p.nve} {t('notVeryEffective')}</span></>}
+                  {p.imm > 0 && <>, <span className="text-ink-dim">{p.imm} {t('insightImmune')}</span></>}
                 </InsightRow>
               ))}
               {bestOffType && (
                 <div className="mt-2 rounded px-2 py-1.5 text-[10px]" style={{ background: 'rgba(30,41,59,0.6)' }}>
-                  <span className="text-surface-500">{bestOffLbl}</span>{' '}
+                  <span className="text-ink-muted">{bestOffLbl}</span>{' '}
                   <TypeBadge type={bestOffType.type} />
-                  <span className="text-surface-500 ml-1">{t('membersHitSe', { count: bestOffType.count })}</span>
+                  <span className="text-ink-muted ml-1">{t('membersHitSe', { count: bestOffType.count })}</span>
                 </div>
               )}
             </div>
@@ -374,9 +374,9 @@ export function TypeCalcView() {
               ))}
               {bestDefType && (
                 <div className="mt-2 rounded px-2 py-1.5 text-[10px]" style={{ background: 'rgba(30,41,59,0.6)' }}>
-                  <span className="text-surface-500">{bestDefLbl}</span>{' '}
+                  <span className="text-ink-muted">{bestDefLbl}</span>{' '}
                   <TypeBadge type={bestDefType.type} />
-                  <span className="text-surface-500 ml-1">{t('membersCount', { count: bestDefType.count })}</span>
+                  <span className="text-ink-muted ml-1">{t('membersCount', { count: bestDefType.count })}</span>
                 </div>
               )}
             </div>
@@ -389,9 +389,9 @@ export function TypeCalcView() {
             className="rounded-lg overflow-hidden"
             style={{ background: 'rgba(8,12,24,0.97)', border: '1px solid rgba(51,65,85,0.4)' }}
           >
-            <div className="px-3 py-2 border-b border-surface-700/30">
+            <div className="px-3 py-2 border-b border-edge/30">
               <span className="text-[10px] font-black tracking-widest uppercase text-orange-400">{offTitle}</span>
-              <p className="text-[9px] text-surface-600 mt-0.5">{offDesc}</p>
+              <p className="text-[9px] text-ink-dim mt-0.5">{offDesc}</p>
             </div>
             <div className="p-2">
               <CovTable teamPokes={activePokes} mode="offense" />
@@ -402,9 +402,9 @@ export function TypeCalcView() {
             className="rounded-lg overflow-hidden"
             style={{ background: 'rgba(8,12,24,0.97)', border: '1px solid rgba(51,65,85,0.4)' }}
           >
-            <div className="px-3 py-2 border-b border-surface-700/30">
+            <div className="px-3 py-2 border-b border-edge/30">
               <span className="text-[10px] font-black tracking-widest uppercase text-cyan-400">{defTitle}</span>
-              <p className="text-[9px] text-surface-600 mt-0.5">{defDesc}</p>
+              <p className="text-[9px] text-ink-dim mt-0.5">{defDesc}</p>
             </div>
             <div className="p-2">
               <CovTable teamPokes={activePokes} mode="defense" />
@@ -422,14 +422,14 @@ export function TypeCalcView() {
 function ViewToggle({ view, onChange }: { view: 'team' | 'rivals'; onChange: (v: 'team' | 'rivals') => void }) {
   const t = useTranslations('vgc.calc.typeCalc')
   return (
-    <div className="flex items-center gap-1 self-start rounded-lg border border-surface-700/50 overflow-hidden">
+    <div className="flex items-center gap-1 self-start rounded-lg border border-edge/50 overflow-hidden">
       <button
         type="button"
         onClick={() => onChange('team')}
         className={`px-3 py-1.5 text-xs font-semibold transition-all ${
           view === 'team'
-            ? 'bg-primary-500/15 text-primary-400 border-r border-primary-500/30'
-            : 'text-surface-500 hover:text-surface-300 border-r border-surface-700/50'
+            ? 'bg-primary/15 text-primary-hover border-r border-primary/30'
+            : 'text-ink-muted hover:text-ink border-r border-edge/50'
         }`}
       >
         {t('myTeamToggle')}
@@ -439,8 +439,8 @@ function ViewToggle({ view, onChange }: { view: 'team' | 'rivals'; onChange: (v:
         onClick={() => onChange('rivals')}
         className={`px-3 py-1.5 text-xs font-semibold transition-all ${
           view === 'rivals'
-            ? 'bg-accent-500/15 text-accent-300'
-            : 'text-surface-500 hover:text-surface-300'
+            ? 'bg-secondary/15 text-secondary-hover'
+            : 'text-ink-muted hover:text-ink'
         }`}
       >
         {t('rivalsToggle')}

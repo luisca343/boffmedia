@@ -34,11 +34,11 @@ function MoveRow({
   isActive: boolean
   onClick: () => void
 }) {
-  const colorClass = result ? getDamageColorClass(result) : 'text-surface-600'
-  const base = `move-strip-row grid grid-cols-[1fr_auto] items-center gap-2 min-h-[24px] px-2 py-0.5 border border-surface-700/40 border-t-0 first:border-t cursor-pointer transition-colors ${
+  const colorClass = result ? getDamageColorClass(result) : 'text-ink-dim'
+  const base = `move-strip-row grid grid-cols-[1fr_auto] items-center gap-2 min-h-[24px] px-2 py-0.5 border border-edge/40 border-t-0 first:border-t cursor-pointer transition-colors ${
     isActive
-      ? 'bg-primary-500/15 border-primary-500/45'
-      : 'hover:bg-primary-500/6'
+      ? 'bg-primary/15 border-primary/45'
+      : 'hover:bg-primary/6'
   }`
 
   return (
@@ -46,8 +46,8 @@ function MoveRow({
       <div
         className={`rounded-full border px-2 py-0.5 text-[11px] font-semibold truncate ${
           isActive
-            ? 'border-primary-400/70 text-primary-200 bg-primary-500/15'
-            : 'border-surface-500/70 text-surface-200 bg-surface-900/40'
+            ? 'border-primary/70 text-primary-hover bg-primary/15'
+            : 'border-edge/70 text-ink bg-layer-1/40'
         }`}
       >
       {move.name || '—'}
@@ -57,7 +57,7 @@ function MoveRow({
           {fmtPct(result.minPct)}–{fmtPct(result.maxPct)}
         </div>
       ) : (
-        <div className="text-[11px] font-mono text-surface-700 min-w-[90px] text-right">0 - 0%</div>
+        <div className="text-[11px] font-mono text-ink-dim min-w-[90px] text-right">0 - 0%</div>
       )}
     </div>
   )
@@ -78,7 +78,7 @@ function ResultBar({
   if (!isActive || !result || !move) {
     return (
       <div className={`flex items-center px-3 min-h-[30px] ${reversed ? 'justify-end' : ''}`}>
-        <span className="text-[10px] text-surface-600">
+        <span className="text-[10px] text-ink-dim">
           {!isActive ? (reversed ? t('selectMoveRight') : t('selectMoveLeft')) : t('noDamage')}
         </span>
       </div>
@@ -92,8 +92,8 @@ function ResultBar({
       <span className={`text-[10px] font-black whitespace-nowrap ${verdict.colorClass}`}>
         {t(verdict.labelKey as any)}
       </span>
-      <span className="font-mono text-[10px] text-surface-400 truncate flex-1">{result.desc}</span>
-      <span className="font-mono text-[9px] text-surface-600 truncate flex-1 text-right">
+      <span className="font-mono text-[10px] text-ink-muted truncate flex-1">{result.desc}</span>
+      <span className="font-mono text-[9px] text-ink-dim truncate flex-1 text-right">
         ({result.rolls.join(', ')})
       </span>
     </div>
@@ -118,14 +118,14 @@ export function MoveStrip({
   )
 
   return (
-    <div className="bg-surface-900/97 border-b border-surface-700/50 flex-shrink-0">
+    <div className="bg-layer-1/97 border-b border-edge/50 flex-shrink-0">
       {/* Pokémon + moves — stacked on mobile, side-by-side on md+ */}
       <div className="flex flex-col md:grid md:grid-cols-[1fr_1px_1fr]">
 
         {/* poke1 attacks poke2 */}
         <div className="grid grid-cols-[140px_minmax(0,1fr)] sm:grid-cols-[170px_minmax(0,1fr)] gap-2 px-2.5 py-2 items-start">
           <MoveStripPokemonCard poke={poke1} apiEntry={api1} useChampions={useChampions} />
-          <div className="flex flex-col rounded overflow-hidden border border-surface-700/40 w-full md:max-w-[280px] md:justify-self-end">
+          <div className="flex flex-col rounded overflow-hidden border border-edge/40 w-full md:max-w-[280px] md:justify-self-end">
             {poke1.moves.map((mv, i) => (
               <MoveRow
                 key={i}
@@ -139,11 +139,11 @@ export function MoveStrip({
         </div>
 
         {/* Divider — horizontal on mobile, vertical on md+ */}
-        <div className="h-px w-full bg-surface-700/40 md:h-auto md:w-px md:bg-surface-700/50 md:self-stretch" />
+        <div className="h-px w-full bg-layer-3/40 md:h-auto md:w-px md:bg-layer-3/50 md:self-stretch" />
 
         {/* poke2 attacks poke1 */}
         <div className="grid grid-cols-[minmax(0,1fr)_140px] sm:grid-cols-[minmax(0,1fr)_170px] gap-2 px-2.5 py-2 items-start">
-          <div className="flex flex-col rounded overflow-hidden border border-surface-700/40 w-full md:max-w-[280px] md:justify-self-start">
+          <div className="flex flex-col rounded overflow-hidden border border-edge/40 w-full md:max-w-[280px] md:justify-self-start">
             {poke2.moves.map((mv, i) => (
               <MoveRow
                 key={i}
@@ -159,13 +159,13 @@ export function MoveStrip({
       </div>
 
       {/* Result bars — stacked on mobile, side-by-side on md+ */}
-      <div className="flex flex-col md:grid md:grid-cols-[1fr_1px_1fr] border-t border-surface-700/40">
+      <div className="flex flex-col md:grid md:grid-cols-[1fr_1px_1fr] border-t border-edge/40">
         <ResultBar
           result={activeMove1 !== null ? (results1[activeMove1] ?? null) : null}
           move={activeMove1 !== null ? poke1.moves[activeMove1] : null}
           isActive={activeMove1 !== null}
         />
-        <div className="hidden md:block md:bg-surface-700/50 md:self-stretch" />
+        <div className="hidden md:block md:bg-layer-3/50 md:self-stretch" />
         <ResultBar
           result={activeMove2 !== null ? (results2[activeMove2] ?? null) : null}
           move={activeMove2 !== null ? poke2.moves[activeMove2] : null}

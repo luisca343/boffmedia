@@ -91,7 +91,7 @@ export default function NewsList({
                   )}
                   
                   <div className="flex items-center mb-4">
-                    <div className="w-8 h-8 bg-secondary-500 rounded-full flex items-center justify-center mr-3 border-3 border-black">
+                    <div className="w-8 h-8 bg-secondary rounded-full flex items-center justify-center mr-3 border-3 border-black">
                       <FileText className="h-4 w-4 text-white" />
                     </div>
                     <h3 className="font-bold text-pop-lg text-white pr-2 truncate pop-shadow">{item.title}</h3>
@@ -106,7 +106,7 @@ export default function NewsList({
                         id={`published-${item.id}`}
                         checked={isPublished || isFeatured}
                         onCheckedChange={() => handlePublishToggle(item.id)}
-                        className="mr-2 border-3 border-black data-[state=checked]:bg-secondary-500"
+                        className="mr-2 border-3 border-black data-[state=checked]:bg-secondary"
                       />
                       <label
                         htmlFor={`published-${item.id}`}

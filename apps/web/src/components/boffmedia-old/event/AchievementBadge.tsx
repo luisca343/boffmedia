@@ -106,7 +106,7 @@ export function AchievementBadge({
             >
               {achievement.name}
             </p>
-            <p className="text-xs text-surface-500 mb-2 leading-snug">
+            <p className="text-xs text-ink-muted mb-2 leading-snug">
               {achievement.hidden ? "Descripción oculta" : achievement.description}
             </p>
             <div className="flex items-center gap-2 flex-wrap">

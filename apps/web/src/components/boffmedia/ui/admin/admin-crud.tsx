@@ -46,15 +46,15 @@ interface AdminCrudProps<T extends { id: number | string }> {
 }
 
 function dialogContentClass() {
-  return "bg-[var(--surface)] border-[var(--border-strong)] text-[var(--text)] max-h-[90vh] overflow-y-auto rounded-[var(--radius-lg,22px)]"
+  return "bg-layer-1 border-edge-strong text-ink max-h-[90vh] overflow-y-auto rounded-[var(--radius-lg,22px)]"
 }
 
 function dialogHeaderClass() {
-  return "text-[var(--text)]"
+  return "text-ink"
 }
 
 function dialogDescClass() {
-  return "text-[var(--text-muted)]"
+  return "text-ink-muted"
 }
 
 export function AdminCrud<T extends { id: number | string }>({
@@ -148,10 +148,10 @@ export function AdminCrud<T extends { id: number | string }>({
 
   if (isLoading) {
     return (
-      <div className="rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--card-bg)] flex items-center justify-center py-16">
+      <div className="rounded-[var(--radius-lg)] border border-edge bg-[var(--card-bg)] flex items-center justify-center py-16">
         <div className="flex flex-col items-center gap-3">
           <Loader2 className="w-8 h-8 animate-spin text-[var(--orange-500)]" />
-          <p className="text-sm text-[var(--text-muted)]">Cargando {entityName.plural}...</p>
+          <p className="text-sm text-ink-muted">Cargando {entityName.plural}...</p>
         </div>
       </div>
     )
@@ -159,15 +159,15 @@ export function AdminCrud<T extends { id: number | string }>({
 
   if (error) {
     return (
-      <div className="rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--card-bg)] p-8">
+      <div className="rounded-[var(--radius-lg)] border border-edge bg-[var(--card-bg)] p-8">
         <div className="text-center py-8">
           <div className="flex justify-center mb-4">
             <div className="w-12 h-12 rounded-[var(--radius,14px)] bg-[color-mix(in_srgb,var(--orange-500)_13%,transparent)] border border-[color-mix(in_srgb,var(--orange-500)_28%,transparent)] flex items-center justify-center">
               <AlertTriangle className="w-6 h-6 text-[var(--orange-500)]" />
             </div>
           </div>
-          <h3 className="text-lg font-semibold mb-2 text-[var(--text)]">Error al cargar {entityName.plural}</h3>
-          <p className="text-sm text-[var(--text-muted)] mb-6">{error}</p>
+          <h3 className="text-lg font-semibold mb-2 text-ink">Error al cargar {entityName.plural}</h3>
+          <p className="text-sm text-ink-muted mb-6">{error}</p>
           <BoffButton variant="outline" onClick={refetch}>
             <RefreshCw className="w-4 h-4 mr-2" />
             Reintentar
@@ -178,17 +178,17 @@ export function AdminCrud<T extends { id: number | string }>({
   }
 
   return (
-    <div className="rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--card-bg)] overflow-hidden">
+    <div className="rounded-[var(--radius-lg)] border border-edge bg-[var(--card-bg)] overflow-hidden">
       {/* Header */}
       <div className="px-5 pt-5 pb-3">
         <div className="flex justify-between items-start">
           <div>
-            <h3 className="text-lg font-bold text-[var(--text)] flex items-center gap-2">
+            <h3 className="text-lg font-bold text-ink flex items-center gap-2">
               {Icon && <Icon className="w-5 h-5 text-[var(--orange-500)]" />}
               {title}
             </h3>
             {description && (
-              <p className="text-sm text-[var(--text-muted)] mt-1">{description}</p>
+              <p className="text-sm text-ink-muted mt-1">{description}</p>
             )}
           </div>
           <BoffButton variant="primary" size="sm" onClick={() => setCreateOpen(true)}>
@@ -205,7 +205,7 @@ export function AdminCrud<T extends { id: number | string }>({
             />
           </div>
           <div className="flex items-center gap-2 shrink-0 ml-4">
-            <span className="text-xs text-[var(--text-dim)]">Total:</span>
+            <span className="text-xs text-ink-dim">Total:</span>
             <BoffBadge kind="accent">{filtered.length}</BoffBadge>
           </div>
         </div>
@@ -234,7 +234,7 @@ export function AdminCrud<T extends { id: number | string }>({
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-sm">
             <thead>
-              <tr className="[&_th]:text-left [&_th]:font-mono [&_th]:text-[10px] [&_th]:tracking-[0.1em] [&_th]:uppercase [&_th]:text-[var(--text-muted)] [&_th]:font-bold [&_th]:py-[0.6rem] [&_th]:px-[0.8rem] [&_th]:border-b-[var(--hairline)] [&_th]:border-b-solid [&_th]:border-b-[var(--border)] bg-[color-mix(in_srgb,var(--surface)_96%,transparent)]">
+              <tr className="[&_th]:text-left [&_th]:font-mono [&_th]:text-[10px] [&_th]:tracking-[0.1em] [&_th]:uppercase [&_th]:text-ink-muted [&_th]:font-bold [&_th]:py-[0.6rem] [&_th]:px-[0.8rem] [&_th]:border-b-[var(--hairline)] [&_th]:border-b-solid [&_th]:border-b-[var(--border)] bg-[color-mix(in_srgb,var(--layer-1)_96%,transparent)]">
                 {columns.map((col) => (
                   <th
                     key={col.key}
@@ -244,7 +244,7 @@ export function AdminCrud<T extends { id: number | string }>({
                     {col.label}
                   </th>
                 ))}
-                <th className="w-[100px] text-right font-mono text-[10px] tracking-[0.1em] uppercase text-[var(--text-muted)] font-bold py-[0.6rem] px-[0.8rem] border-b-[var(--hairline)] border-b-solid border-b-[var(--border)]">
+                <th className="w-[100px] text-right font-mono text-[10px] tracking-[0.1em] uppercase text-ink-muted font-bold py-[0.6rem] px-[0.8rem] border-b-[var(--hairline)] border-b-solid border-b-[var(--border)]">
                   Acciones
                 </th>
               </tr>
@@ -264,13 +264,13 @@ export function AdminCrud<T extends { id: number | string }>({
                     <div className="flex justify-end gap-1.5">
                       <button
                         onClick={() => openEdit(item)}
-                        className="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-[var(--border-strong)] bg-transparent text-[var(--text-muted)] hover:text-[var(--orange-500)] hover:border-[color-mix(in_srgb,var(--orange-500)_55%,transparent)] transition-colors"
+                        className="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-edge-strong bg-transparent text-ink-muted hover:text-[var(--orange-500)] hover:border-[color-mix(in_srgb,var(--orange-500)_55%,transparent)] transition-colors"
                       >
                         <Pencil className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => openDelete(item)}
-                        className="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-[var(--border-strong)] bg-transparent text-[var(--text-muted)] hover:text-red-400 hover:border-red-400/50 transition-colors"
+                        className="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-edge-strong bg-transparent text-ink-muted hover:text-red-400 hover:border-red-400/50 transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -340,9 +340,9 @@ export function AdminCrud<T extends { id: number | string }>({
 
           {selectedItem && (
             <div className="py-4">
-              <div className="p-4 rounded-lg bg-[color-mix(in_srgb,var(--surface-2)_50%,transparent)] border border-[var(--border)] mb-4">
-                <p className="font-medium text-[var(--text)]">{String(selectedItem[searchFields[0] as keyof T] ?? "")}</p>
-                <p className="text-sm text-[var(--text-muted)] mt-1">ID: {selectedItem.id}</p>
+              <div className="p-4 rounded-lg bg-[color-mix(in_srgb,var(--layer-2)_50%,transparent)] border border-edge mb-4">
+                <p className="font-medium text-ink">{String(selectedItem[searchFields[0] as keyof T] ?? "")}</p>
+                <p className="text-sm text-ink-muted mt-1">ID: {selectedItem.id}</p>
               </div>
               <p className="text-xs text-[var(--orange-500)]">
                 Nota: Esta operación podría afectar a otros elementos relacionados.
@@ -354,7 +354,7 @@ export function AdminCrud<T extends { id: number | string }>({
             <Button
               variant="outline"
               onClick={() => { setDeleteOpen(false); setSelectedItem(null) }}
-              className="border-[var(--border-strong)] text-[var(--text-muted)]"
+              className="border-edge-strong text-ink-muted"
             >
               Cancelar
             </Button>

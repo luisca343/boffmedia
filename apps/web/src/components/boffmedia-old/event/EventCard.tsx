@@ -50,18 +50,18 @@ export function EventCard({ event, href, className = "" }: EventCardProps) {
         {/* Title + description */}
         <div>
           <h4
-            className="text-base font-black text-surface-50 leading-snug mb-1.5 line-clamp-2 transition-colors duration-200 group-hover:text-primary-200"
+            className="text-base font-black text-ink leading-snug mb-1.5 line-clamp-2 transition-colors duration-200 group-hover:text-primary-hover"
             style={{ fontFamily: "Orbitron, sans-serif" }}
           >
             {event.title}
           </h4>
-          <p className="text-xs text-surface-500 line-clamp-2 leading-relaxed">
+          <p className="text-xs text-ink-muted line-clamp-2 leading-relaxed">
             {event.description}
           </p>
         </div>
 
         {/* Meta */}
-        <div className="space-y-1.5 text-xs text-surface-500 font-mono mt-auto">
+        <div className="space-y-1.5 text-xs text-ink-muted font-mono mt-auto">
           <div className="flex items-center gap-2">
             <Calendar
               className="w-3.5 h-3.5 flex-shrink-0"

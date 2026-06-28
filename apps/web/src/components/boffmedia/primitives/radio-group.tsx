@@ -30,26 +30,26 @@ export function RadioGroup({ value, defaultValue, options, onChange, name, class
             className={cn(
               "flex gap-3 items-start py-3.5 px-4",
               "rounded-[var(--radius,14px)]",
-              "border border-solid border-[var(--border)]",
-              "bg-[var(--surface-2)]",
+              "border border-solid border-edge",
+              "bg-layer-2",
               "cursor-pointer",
               "transition-[border-color,background] duration-[var(--dur,0.32s)]",
-              "hover:border-[var(--border-strong)]",
-              on && "border-[var(--accent)] bg-[var(--accent-soft)]",
+              "hover:border-edge-strong",
+              on && "border-secondary bg-secondary-soft",
               o.disabled && "opacity-50 cursor-not-allowed",
             )}
           >
             <input type="radio" name={name} checked={on} disabled={o.disabled} onChange={() => pick(o.value)} className="absolute opacity-0 pointer-events-none" />
             <span className={cn(
-              "shrink-0 w-[18px] h-[18px] rounded-full border-2 border-solid border-[var(--border-strong)] mt-px",
+              "shrink-0 w-[18px] h-[18px] rounded-full border-2 border-solid border-edge-strong mt-px",
               "grid place-items-center",
               "transition-[border-color] duration-[var(--dur,0.32s)]",
-              on && "border-[var(--accent)]",
-              on && "after:content-[''] after:w-[9px] after:h-[9px] after:rounded-full after:bg-[var(--accent)]",
+              on && "border-secondary",
+              on && "after:content-[''] after:w-[9px] after:h-[9px] after:rounded-full after:bg-secondary",
             )} />
             <span className="flex flex-col gap-[3px]">
               <span className="text-sm font-semibold">{o.label}</span>
-              {o.desc && <span className="text-xs text-[var(--text-muted)]">{o.desc}</span>}
+              {o.desc && <span className="text-xs text-ink-muted">{o.desc}</span>}
             </span>
           </label>
         )

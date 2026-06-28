@@ -26,8 +26,8 @@ export function ModifierPanel({ modifiers, onChange }: Props) {
   const active = hasModifiers(modifiers);
 
   return (
-    <div className="flex flex-wrap items-center gap-2 sm:gap-3 px-3 py-2.5 rounded-lg border border-surface-700 bg-surface-800/60">
-      <span className="text-[11px] text-surface-500 font-semibold uppercase tracking-wider shrink-0">
+    <div className="flex flex-wrap items-center gap-2 sm:gap-3 px-3 py-2.5 rounded-lg border border-edge bg-layer-2/60">
+      <span className="text-[11px] text-ink-muted font-semibold uppercase tracking-wider shrink-0">
         {t("title")}
       </span>
 
@@ -46,7 +46,7 @@ export function ModifierPanel({ modifiers, onChange }: Props) {
                   ? isPositive
                     ? "bg-green-500/20 text-green-300 border-green-500/50"
                     : "bg-red-500/20 text-red-300 border-red-500/50"
-                  : "bg-surface-800/80 text-surface-400 border-transparent hover:text-surface-200 hover:bg-surface-700/60"
+                  : "bg-layer-2/80 text-ink-muted border-transparent hover:text-ink hover:bg-layer-3/60"
               }`}
             >
               {n > 0 ? `+${n}` : n}
@@ -55,7 +55,7 @@ export function ModifierPanel({ modifiers, onChange }: Props) {
         })}
       </div>
 
-      <div className="h-4 w-px bg-surface-700/60 hidden sm:block" />
+      <div className="h-4 w-px bg-layer-3/60 hidden sm:block" />
 
       {/* Flag toggles */}
       <SpeedFlagChips
@@ -87,11 +87,11 @@ export function ModifierPanel({ modifiers, onChange }: Props) {
 
       {active && (
         <>
-          <div className="h-4 w-px bg-surface-700/60 hidden sm:block" />
+          <div className="h-4 w-px bg-layer-3/60 hidden sm:block" />
           <button
             onClick={clear}
             title={t("clear")}
-            className="p-1 rounded text-surface-500 hover:text-red-400 transition-colors"
+            className="p-1 rounded text-ink-muted hover:text-red-400 transition-colors"
           >
             <X className="w-3.5 h-3.5" />
           </button>

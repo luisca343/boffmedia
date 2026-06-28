@@ -20,12 +20,12 @@ const tones = {
     "data-[direction=neon]:shadow-[0_0_24px_-10px_var(--orange-500)]",
   ),
   accent: cn(
-    "text-[var(--accent-bright)] bg-[var(--accent-soft)]",
-    "border border-solid border-[color-mix(in_srgb,var(--accent)_30%,transparent)]",
+    "text-secondary-hover bg-secondary-soft",
+    "border border-solid border-[color-mix(in_srgb,var(--secondary)_30%,transparent)]",
   ),
   muted: cn(
-    "text-[var(--text-dim)] bg-[var(--surface-3)]",
-    "border border-solid border-[var(--border-strong)]",
+    "text-ink-dim bg-layer-3",
+    "border border-solid border-edge-strong",
   ),
 }
 

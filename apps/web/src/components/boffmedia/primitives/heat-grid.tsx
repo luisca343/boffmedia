@@ -19,13 +19,13 @@ export function HeatGrid({ rows, cols, value, max, colLabel, className }: HeatGr
       >
         <span />
         {cols.map((c, ci) => (
-          <span key={ci} className="font-mono text-[9px] text-[var(--text-dim)] text-center">
+          <span key={ci} className="font-mono text-[9px] text-ink-dim text-center">
             {colLabel ? colLabel(c, ci) : c}
           </span>
         ))}
         {rows.map((r, ri) => (
           <span key={ri} className="contents">
-            <span className="font-mono text-[10px] text-[var(--text-dim)] pr-[6px] text-right">{r}</span>
+            <span className="font-mono text-[10px] text-ink-dim pr-[6px] text-right">{r}</span>
             {cols.map((c, ci) => {
               const v = value(ri, ci)
               const n = typeof v === "number" ? v : (v ? v.n : 0)
@@ -37,8 +37,8 @@ export function HeatGrid({ rows, cols, value, max, colLabel, className }: HeatGr
                   className="aspect-square rounded-[2px] min-h-[12px]"
                   style={{
                     background: n
-                      ? `color-mix(in srgb, var(--accent) ${Math.round(18 + intensity * 82)}%, transparent)`
-                      : "var(--surface-3)",
+                      ? `color-mix(in srgb, var(--secondary) ${Math.round(18 + intensity * 82)}%, transparent)`
+                      : "var(--layer-3)",
                   }}
                 />
               )

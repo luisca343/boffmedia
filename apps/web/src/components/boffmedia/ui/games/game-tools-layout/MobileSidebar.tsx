@@ -91,12 +91,12 @@ export function MobileSidebar({ gameConfig, isOpen, onClose, isActive }: MobileS
                 <Link
                   href={category.href}
                   onClick={onClose}
-                  className="font-mono text-[0.6rem] tracking-[0.14em] uppercase px-2 mb-2.5 text-[var(--text-dim)] hover:text-[var(--text)] transition-colors duration-[var(--dur)] block"
+                  className="font-mono text-[0.6rem] tracking-[0.14em] uppercase px-2 mb-2.5 text-ink-dim hover:text-ink transition-colors duration-[var(--dur)] block"
                 >
                   {t(category.name)}
                 </Link>
               ) : (
-                <span className="font-mono text-[0.6rem] tracking-[0.14em] uppercase px-2 mb-2.5 text-[var(--text-dim)]">
+                <span className="font-mono text-[0.6rem] tracking-[0.14em] uppercase px-2 mb-2.5 text-ink-dim">
                   {t(category.name)}
                 </span>
               )}
@@ -118,7 +118,7 @@ export function MobileSidebar({ gameConfig, isOpen, onClose, isActive }: MobileS
                         }}
                         onMouseEnter={(e) => {
                           if (!active) {
-                            e.currentTarget.style.background = "var(--surface-2)"
+                            e.currentTarget.style.background = "var(--layer-2)"
                             e.currentTarget.style.color = "var(--text)"
                           }
                         }}

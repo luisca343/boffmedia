@@ -35,7 +35,7 @@ export function SpriteManifestProvider({
         <p>{error}</p>
         <button 
           onClick={() => fetchManifest()}
-          className="mt-4 px-4 py-2 bg-secondary-600 text-white rounded hover:bg-secondary-700"
+          className="mt-4 px-4 py-2 bg-secondary-active text-white rounded hover:bg-secondary-active"
         >
           Retry
         </button>

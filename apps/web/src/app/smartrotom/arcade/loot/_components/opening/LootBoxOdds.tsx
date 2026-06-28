@@ -84,10 +84,10 @@ export function LootBoxOdds({ lootBox, currentBoxTheme, onClose }: LootBoxOddsPr
   // Get color class for rarity
   const getRarityColorClass = (rarity: string): string => {
     const rarityColors: Record<string, string> = {
-      common: 'text-surface-200',
-      uncommon: 'text-highlight-400',
-      rare: 'text-secondary-400',
-      epic: 'text-accent-400',
+      common: 'text-ink',
+      uncommon: 'text-warning-hover',
+      rare: 'text-secondary-hover',
+      epic: 'text-secondary-hover',
       legendary: 'text-yellow-400',
     };
     
@@ -115,7 +115,7 @@ export function LootBoxOdds({ lootBox, currentBoxTheme, onClose }: LootBoxOddsPr
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
       <div 
         ref={modalRef}
-        className={`bg-surface-900 rounded-xl p-5 w-full max-w-4xl max-h-[85vh] overflow-y-auto ${currentBoxTheme.border}`}
+        className={`bg-layer-1 rounded-xl p-5 w-full max-w-4xl max-h-[85vh] overflow-y-auto ${currentBoxTheme.border}`}
       >
         <div className="flex justify-between items-center mb-4">
           <h3 className={`text-lg font-bold ${currentBoxTheme.highlight}`}>
@@ -123,7 +123,7 @@ export function LootBoxOdds({ lootBox, currentBoxTheme, onClose }: LootBoxOddsPr
           </h3>
           <button 
             onClick={onClose}
-            className="text-surface-400 hover:text-white"
+            className="text-ink-muted hover:text-white"
           >
             ✕
           </button>
@@ -132,8 +132,8 @@ export function LootBoxOdds({ lootBox, currentBoxTheme, onClose }: LootBoxOddsPr
         {/* Rarity Groups Section - Compact Layout */}
         <div className="space-y-4">
           {rarityOrder.map(rarity => (
-            <div key={rarity} className="bg-surface-800/50 rounded-lg p-3">
-              <div className="flex justify-between items-center border-b border-surface-700 pb-1.5 mb-2.5">
+            <div key={rarity} className="bg-layer-2/50 rounded-lg p-3">
+              <div className="flex justify-between items-center border-b border-edge pb-1.5 mb-2.5">
                 <h4 className={`font-medium ${getRarityColorClass(rarity)}`}>
                   {getRarityDisplayName(rarity)}
                 </h4>
@@ -148,8 +148,8 @@ export function LootBoxOdds({ lootBox, currentBoxTheme, onClose }: LootBoxOddsPr
                 {itemsByRarity[rarity].map((item) => (
                   <div 
                     key={item.id} 
-                    className="flex items-center justify-between bg-surface-800/60 p-1.5 px-2 rounded 
-                              border border-surface-700/50"
+                    className="flex items-center justify-between bg-layer-2/60 p-1.5 px-2 rounded 
+                              border border-edge/50"
                   >
                     <div className="flex items-center gap-1.5 min-w-0 flex-shrink">
                       {getRewardIcon({type: item.type, description: item.data || item.id, size: 24})}
@@ -160,7 +160,7 @@ export function LootBoxOdds({ lootBox, currentBoxTheme, onClose }: LootBoxOddsPr
                           <span className="text-white text-xs font-semibold ml-1">x{item.amount}</span>
                         )}
                     </div>
-                    <span className="text-xs text-surface-300 font-mono ml-1 whitespace-nowrap">
+                    <span className="text-xs text-ink font-mono ml-1 whitespace-nowrap">
                       {item.percentage.toFixed(2)}%
                     </span>
                   </div>
@@ -170,7 +170,7 @@ export function LootBoxOdds({ lootBox, currentBoxTheme, onClose }: LootBoxOddsPr
           ))}
         </div>
         
-        <div className="text-surface-400 text-xs mt-4 bg-surface-800/50 p-2 rounded-lg border border-surface-700/70">
+        <div className="text-ink-muted text-xs mt-4 bg-layer-2/50 p-2 rounded-lg border border-edge/70">
           <p>
             Las probabilidades son calculadas basadas en los pesos de cada item dentro de la caja.
           </p>

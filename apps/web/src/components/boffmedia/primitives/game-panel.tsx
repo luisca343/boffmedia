@@ -18,13 +18,13 @@ interface GamePanelProps {
 export function GamePanel({ title, actions, footer, children, className, bodyClassName }: GamePanelProps) {
   return (
     <section
-      className={cn("flex flex-col rounded-[var(--radius)] border border-[var(--border)] overflow-hidden", className)}
+      className={cn("flex flex-col rounded-[var(--radius)] border border-edge overflow-hidden", className)}
       style={{ background: "var(--card-bg)" }}
     >
       {(title || actions) && (
         <header
-          className="flex items-center gap-2 px-3 py-2 border-b border-[var(--border)]"
-          style={{ background: "var(--surface-2)" }}
+          className="flex items-center gap-2 px-3 py-2 border-b border-edge"
+          style={{ background: "var(--layer-2)" }}
         >
           {title && (
             <h2 className="font-display font-bold text-t-sm min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">
@@ -36,7 +36,7 @@ export function GamePanel({ title, actions, footer, children, className, bodyCla
       )}
       <div className={cn("flex-1 min-h-0", bodyClassName)}>{children}</div>
       {footer && (
-        <footer className="px-3 py-2 border-t border-[var(--border)]" style={{ background: "var(--surface-2)" }}>
+        <footer className="px-3 py-2 border-t border-edge" style={{ background: "var(--layer-2)" }}>
           {footer}
         </footer>
       )}

@@ -152,24 +152,24 @@ export default function Expansions({
               {/* Basic Info */}
               <div className="space-y-6">
                 <div>
-                  <p className="text-sm text-surface-400 mb-1">{t("cardDetail.number")}</p>
+                  <p className="text-sm text-ink-muted mb-1">{t("cardDetail.number")}</p>
                   <p className="text-xl text-white">{cardData.id}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-surface-400 mb-1">{t("cardDetail.expansion")}</p>
+                  <p className="text-sm text-ink-muted mb-1">{t("cardDetail.expansion")}</p>
                   <p className="text-xl text-white">
                     {cardData.setName || t("cardDetail.unknownExpansion")}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-surface-400 mb-1">{t("cardDetail.rarity")}</p>
+                  <p className="text-sm text-ink-muted mb-1">{t("cardDetail.rarity")}</p>
                   <div className="flex items-center">
                     {getRarityImages(cardData.rarity)}
                   </div>
                 </div>
                 {cardData.illustrator && (
                   <div>
-                    <p className="text-sm text-surface-400 mb-1">{t("cardDetail.illustrator")}</p>
+                    <p className="text-sm text-ink-muted mb-1">{t("cardDetail.illustrator")}</p>
                     <p className="text-xl text-white">{cardData.illustrator}</p>
                   </div>
                 )}
@@ -178,7 +178,7 @@ export default function Expansions({
               {/* Stats */}
               <div className="space-y-6">
                 <div>
-                  <p className="text-sm text-surface-400 mb-1">{t("cardDetail.type")}</p>
+                  <p className="text-sm text-ink-muted mb-1">{t("cardDetail.type")}</p>
                   <div className="flex items-center gap-2">
                     {cardData.types?.map((type, index) => (
                       <div key={index} className="flex items-center gap-2">
@@ -200,12 +200,12 @@ export default function Expansions({
                 </div>
 
                 <div>
-                  <p className="text-sm text-surface-400 mb-1">{t("cardDetail.hp")}</p>
+                  <p className="text-sm text-ink-muted mb-1">{t("cardDetail.hp")}</p>
                   <p className="text-xl text-white">{cardData.hp}</p>
                 </div>
 
                 <div>
-                  <p className="text-sm text-surface-400 mb-1">{t("cardDetail.weakness")}</p>
+                  <p className="text-sm text-ink-muted mb-1">{t("cardDetail.weakness")}</p>
                   <div className="flex flex-col gap-2">
                     {cardData.weaknesses?.map((weakness, index) => (
                       <div key={index} className="flex items-center gap-2">
@@ -227,7 +227,7 @@ export default function Expansions({
                 </div>
 
                 <div>
-                  <p className="text-sm text-surface-400 mb-1">
+                  <p className="text-sm text-ink-muted mb-1">
                     {t("cardDetail.retreatCost")}
                   </p>
                   <div className="flex items-center gap-2">
@@ -251,12 +251,12 @@ export default function Expansions({
                 {/* Boosters */}
                 {cardData.boosters && cardData.boosters.length > 0 && (
                   <div>
-                    <p className="text-sm text-surface-400 mb-1">{t("cardDetail.boosters")}</p>
+                    <p className="text-sm text-ink-muted mb-1">{t("cardDetail.boosters")}</p>
                     <div className="flex flex-wrap gap-2">
                       {cardData.boosters.map((booster, index) => (
                         <span 
                           key={index}
-                          className="px-2 py-1 text-surface-100 rounded-md text-main text-sm font-medium"
+                          className="px-2 py-1 text-ink rounded-md text-main text-sm font-medium"
                         >
                           {booster.name}
                         </span>
@@ -272,7 +272,7 @@ export default function Expansions({
           {cardData.description && (
             <div className="backdrop-blur-md bg-black/30 rounded-2xl p-8 shadow-xl border border-white/10">
               <h3 className="text-2xl font-bold mb-4 text-white">{t("cardDetail.description")}</h3>
-              <p className="text-surface-300 leading-relaxed italic">
+              <p className="text-ink leading-relaxed italic">
                 &quot;{cardData.description}&quot;
               </p>
             </div>

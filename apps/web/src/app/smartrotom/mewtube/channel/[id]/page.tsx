@@ -115,7 +115,7 @@ export default function YoutubeChannel({ params }: { params: Promise<{ id: strin
 
   if (loading) {
     return (
-      <div className="min-h-full bg-surface-900 flex justify-center items-center overflow-auto">
+      <div className="min-h-full bg-layer-1 flex justify-center items-center overflow-auto">
         <LoadingSpinner size="large" message={t("loading.channel")} />
       </div>
     );
@@ -123,10 +123,10 @@ export default function YoutubeChannel({ params }: { params: Promise<{ id: strin
 
   if (!channelInfo) {
     return (
-      <div className="min-h-full bg-surface-900 flex justify-center items-center text-white overflow-auto">
+      <div className="min-h-full bg-layer-1 flex justify-center items-center text-white overflow-auto">
         <div className="text-center">
           <p className="text-xl mb-4">{t("channel.notFound")}</p>
-          <InternalLink href="youtube" className="text-secondary-400 hover:underline">
+          <InternalLink href="youtube" className="text-secondary-hover hover:underline">
             {t("channel.returnToSearch")}
           </InternalLink>
         </div>
@@ -135,7 +135,7 @@ export default function YoutubeChannel({ params }: { params: Promise<{ id: strin
   }
 
   return (
-    <div className="min-h-full bg-surface-900 text-white overflow-auto">
+    <div className="min-h-full bg-layer-1 text-white overflow-auto">
       <ChannelHeader 
         title={channelInfo.snippet.title}
         thumbnailUrl={channelInfo.snippet.thumbnails.high?.url || channelInfo.snippet.thumbnails.medium.url}

@@ -163,8 +163,8 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
   if (Object.keys(userCards).length === 0 && !loading) {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
-        <h2 className="text-2xl font-bold mb-4 text-surface-50">{t('gallery.notFound.title')}</h2>
-        <p className="text-surface-300">{t('gallery.notFound.description')}</p>
+        <h2 className="text-2xl font-bold mb-4 text-ink">{t('gallery.notFound.title')}</h2>
+        <p className="text-ink">{t('gallery.notFound.description')}</p>
       </div>
     )
   }
@@ -193,10 +193,10 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
       <div>
         {loading ? (
           <div className="flex items-center justify-center min-h-[40vh]">
-            <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
+            <Loader2 className="w-8 h-8 text-primary animate-spin" />
           </div>
         ) : allCards.length === 0 ? (
-          <p className="text-center text-surface-300 py-8">{t('gallery.noCards')}</p>
+          <p className="text-center text-ink py-8">{t('gallery.noCards')}</p>
         ) : (
           <div className="space-y-6">
             {Object.entries(groupedCards).map(([setName, cards]) => (
@@ -247,9 +247,9 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
       />
       
       <Dialog open={isRecentUpdatesOpen} onOpenChange={setIsRecentUpdatesOpen}>
-        <DialogContent className="bg-surface-800/95 border-surface-600/50 text-white max-h-[70vh] overflow-hidden backdrop-blur-sm">
+        <DialogContent className="bg-layer-2/95 border-edge/50 text-white max-h-[70vh] overflow-hidden backdrop-blur-sm">
           <DialogHeader>
-            <DialogTitle className="text-surface-50">{t('gallery.recentCards')}</DialogTitle>
+            <DialogTitle className="text-ink">{t('gallery.recentCards')}</DialogTitle>
           </DialogHeader>
           <RecentUpdates
             recentUpdates={recentUpdates}

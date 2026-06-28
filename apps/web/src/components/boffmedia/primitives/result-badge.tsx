@@ -25,7 +25,7 @@ export function ResultBadge({ result, size = 32, className }: ResultBadgeProps) 
         kind === "win" && "text-[var(--trk-win)] bg-[color-mix(in_srgb,var(--trk-win)_15%,transparent)] [border-color:color-mix(in_srgb,var(--trk-win)_40%,transparent)]",
         kind === "loss" && "text-[var(--trk-loss)] bg-[color-mix(in_srgb,var(--trk-loss)_15%,transparent)] [border-color:color-mix(in_srgb,var(--trk-loss)_40%,transparent)]",
         kind === "draw" && "text-[var(--trk-draw)] bg-[color-mix(in_srgb,var(--trk-draw)_15%,transparent)] [border-color:color-mix(in_srgb,var(--trk-draw)_40%,transparent)]",
-        kind === "none" && "text-[var(--text-dim)] bg-[var(--surface-3)] [border-color:var(--border)]",
+        kind === "none" && "text-ink-dim bg-layer-3 [border-color:var(--border)]",
         className,
       )}
       style={{ width: size, height: size, fontSize: Math.round(size * 0.42) }}

@@ -41,15 +41,15 @@ export function TransactionList({ transactions, onSelectTransaction }: Transacti
             <div className="flex justify-between items-start">
               <div className="space-y-1 flex-1">
                 <div className="flex items-center gap-2">
-                  <div className={`w-2 h-2 rounded-full ${!transaction.isPayer ? 'bg-highlight-500' : 'bg-red-500'}`} />
+                  <div className={`w-2 h-2 rounded-full ${!transaction.isPayer ? 'bg-warning' : 'bg-red-500'}`} />
                   <p className="font-medium text-blue-900">
                     {!transaction.isPayer ? 
                       `De ${transaction.fromName || 'Desconocido'}` : 
                       `A ${transaction.toName || 'Desconocido'}`}
                   </p>
                 </div>
-                <p className="text-sm text-surface-600">{transaction.reason || "Sin concepto"}</p>
-                <div className="flex items-center gap-2 text-xs text-surface-400">
+                <p className="text-sm text-ink-dim">{transaction.reason || "Sin concepto"}</p>
+                <div className="flex items-center gap-2 text-xs text-ink-muted">
                   <span>{format(new Date(transaction.date), 'HH:mm')}</span>
                   <span>•</span>
                   <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full">
@@ -58,10 +58,10 @@ export function TransactionList({ transactions, onSelectTransaction }: Transacti
                 </div>
               </div>
               <div className="text-right ml-4">
-                <p className={`font-semibold text-lg ${!transaction.isPayer ? 'text-highlight-600' : 'text-red-600'}`}>
+                <p className={`font-semibold text-lg ${!transaction.isPayer ? 'text-warning' : 'text-red-600'}`}>
                   {!transaction.isPayer ? '+' : '-'} {formatMoney(transaction.amount)}
                 </p>
-                <p className="text-xs text-surface-500 mt-1">
+                <p className="text-xs text-ink-muted mt-1">
                   Balance: {formatMoney(transaction.isPayer ? transaction.fromBalance : transaction.toBalance)}
                 </p>
               </div>

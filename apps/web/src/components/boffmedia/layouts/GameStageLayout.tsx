@@ -44,7 +44,7 @@ export const GameStageLayout = forwardRef<HTMLDivElement, GameStageLayoutProps>(
           {rail && (
             <aside
               className={cn("flex-1 min-w-0", fullscreen ? "shrink-0 overflow-hidden lg:max-w-[340px] rounded-[var(--radius)]" : "")}
-              style={fullscreen ? { background: 'var(--surface)', border: '1px solid var(--border)', maxHeight: 'calc(100vh - 500px)', marginTop: '2rem' } : undefined}
+              style={fullscreen ? { background: 'var(--layer-1)', border: '1px solid var(--border)', maxHeight: 'calc(100vh - 500px)', marginTop: '2rem' } : undefined}
             >
               {rail}
             </aside>

@@ -209,52 +209,52 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
   const game3Unlocked = series.games.some((g) => g.gameNumber === 3);
 
   return (
-    <div className="flex flex-col h-screen text-surface-50 overflow-hidden">
+    <div className="flex flex-col h-screen text-ink overflow-hidden">
       {/* ── Top bar ──────────────────────────────────────────────────────── */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-surface-700 shrink-0 bg-surface-900">
-        <button onClick={handleBack} className="text-surface-400 hover:text-surface-50 transition-colors">
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-edge shrink-0 bg-layer-1">
+        <button onClick={handleBack} className="text-ink-muted hover:text-ink transition-colors">
           <ArrowLeft size={18} />
         </button>
 
         <div className="flex-1 flex items-center gap-2 min-w-0">
           {/* Round input */}
           <div className="flex items-center gap-1 shrink-0">
-            <span className="text-surface-500 text-xs font-mono">{t('workspace.roundPrefix')}</span>
+            <span className="text-ink-muted text-xs font-mono">{t('workspace.roundPrefix')}</span>
             <input
               value={roundInput}
               onChange={(e) => setRoundInput(e.target.value)}
               onBlur={handleRoundBlur}
               placeholder="—"
-              className="w-8 bg-transparent text-surface-300 text-sm font-mono text-center focus:outline-none border-b border-surface-700 focus:border-amber-500 transition-colors"
+              className="w-8 bg-transparent text-ink text-sm font-mono text-center focus:outline-none border-b border-edge focus:border-amber-500 transition-colors"
             />
           </div>
-          <span className="text-surface-700 text-xs">·</span>
+          <span className="text-ink-dim text-xs">·</span>
           {/* Opponent name */}
           <input
             value={opponentNameInput}
             onChange={(e) => setOpponentNameInput(e.target.value)}
             onBlur={handleOpponentNameBlur}
             placeholder={t('placeholders.rivalName')}
-            className="min-w-0 flex-1 max-w-[160px] bg-transparent border-b border-surface-700 focus:border-amber-500 text-surface-200 text-sm placeholder:text-surface-600 focus:outline-none py-0.5 transition-colors"
+            className="min-w-0 flex-1 max-w-[160px] bg-transparent border-b border-edge focus:border-amber-500 text-ink text-sm placeholder:text-ink-dim focus:outline-none py-0.5 transition-colors"
           />
-          <span className="text-surface-700 text-xs">·</span>
+          <span className="text-ink-dim text-xs">·</span>
           {/* Archetype */}
           <input
             value={archetypeInput}
             onChange={(e) => setArchetypeInput(e.target.value)}
             onBlur={handleArchetypeBlur}
             placeholder={t('archetype.placeholder')}
-            className="min-w-0 flex-1 max-w-[120px] bg-transparent border-b border-surface-700 focus:border-amber-500 text-surface-400 text-xs placeholder:text-surface-700 focus:outline-none py-0.5 transition-colors"
+            className="min-w-0 flex-1 max-w-[120px] bg-transparent border-b border-edge focus:border-amber-500 text-ink-muted text-xs placeholder:text-ink-dim focus:outline-none py-0.5 transition-colors"
           />
         </div>
 
         {/* Series score */}
         <div className="flex items-center gap-1.5 shrink-0">
-          <span className={`text-2xl font-bold font-mono tabular-nums ${wins > losses ? 'text-green-400' : wins < losses ? 'text-red-400' : 'text-surface-300'}`}>
+          <span className={`text-2xl font-bold font-mono tabular-nums ${wins > losses ? 'text-green-400' : wins < losses ? 'text-red-400' : 'text-ink'}`}>
             {wins}
           </span>
-          <span className="text-surface-600 text-sm">–</span>
-          <span className={`text-2xl font-bold font-mono tabular-nums ${losses > wins ? 'text-red-400' : losses < wins ? 'text-green-400' : 'text-surface-300'}`}>
+          <span className="text-ink-dim text-sm">–</span>
+          <span className={`text-2xl font-bold font-mono tabular-nums ${losses > wins ? 'text-red-400' : losses < wins ? 'text-green-400' : 'text-ink'}`}>
             {losses}
           </span>
         </div>
@@ -275,7 +275,7 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
       </div>
 
       {/* ── Game tabs ────────────────────────────────────────────────────── */}
-      <div className="flex items-center gap-1 px-4 py-2 border-b border-surface-700 bg-surface-900 shrink-0">
+      <div className="flex items-center gap-1 px-4 py-2 border-b border-edge bg-layer-1 shrink-0">
         {([1, 2, 3] as const).map((n) => {
           const game = series.games.find((g) => g.gameNumber === n);
           const unlocked = !!game;
@@ -293,8 +293,8 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
                 isActive
                   ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
                   : isLocked
-                  ? 'text-surface-700 cursor-not-allowed'
-                  : 'text-surface-400 hover:text-surface-200 hover:bg-surface-800',
+                  ? 'text-ink-dim cursor-not-allowed'
+                  : 'text-ink-muted hover:text-ink hover:bg-layer-2',
               ].join(' ')}
             >
               {isLocked ? <Lock size={11} /> : isDone ? <Check size={11} className="text-green-400" /> : null}
@@ -312,7 +312,7 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
         {currentGame && !currentGame.completedAt && series.seriesResult === undefined && (
           <button
             onClick={() => handleFinishGame(activeGame)}
-            className="ml-auto flex items-center gap-1 px-2.5 py-1 rounded-lg border border-surface-700 text-surface-400 hover:text-surface-50 hover:border-surface-600 text-xs transition-colors"
+            className="ml-auto flex items-center gap-1 px-2.5 py-1 rounded-lg border border-edge text-ink-muted hover:text-ink hover:border-edge text-xs transition-colors"
           >
             <Check size={11} /> {t('workspace.endGame', { n: activeGame })}
           </button>
@@ -323,7 +323,7 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
       {currentGame ? (
         <div className="flex-1 flex gap-0 min-h-0 overflow-hidden">
           {/* Left: My team */}
-          <div className="flex flex-col w-[360px] shrink-0 border-r border-surface-700 overflow-y-auto p-4 gap-4">
+          <div className="flex flex-col w-[360px] shrink-0 border-r border-edge overflow-y-auto p-4 gap-4">
             <TeamPanel
               label={t('labels.myTeam')}
               slots={currentGame.mySlots}
@@ -349,7 +349,7 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
           </div>
 
           {/* Right: Opponent */}
-          <div className="flex flex-col w-[360px] shrink-0 border-l border-surface-700 overflow-visible p-4 gap-4">
+          <div className="flex flex-col w-[360px] shrink-0 border-l border-edge overflow-visible p-4 gap-4">
             <TeamPanel
               label={t('labels.opponent')}
               slots={currentGame.opponentSlots}
@@ -373,7 +373,7 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
             <SpeedTierWidget slots={currentGame.opponentSlots} regulationId={regulationId} />
             {/* Result buttons for this game */}
             <div className="flex items-center gap-2">
-              <span className="text-xs text-surface-500 uppercase tracking-wide font-medium">{t('workspace.game', { n: activeGame })}</span>
+              <span className="text-xs text-ink-muted uppercase tracking-wide font-medium">{t('workspace.game', { n: activeGame })}</span>
               {(['win', 'loss', 'draw'] as MatchResult[]).map((r) => (
                 <button
                   key={r}
@@ -382,7 +382,7 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
                     'flex-1 py-1.5 rounded-lg text-xs font-bold font-mono border transition-all',
                     currentGame.result === r
                       ? r === 'win' ? 'bg-green-500 border-green-400 text-white' : r === 'loss' ? 'bg-red-500 border-red-400 text-white' : 'bg-yellow-500 border-yellow-400 text-white'
-                      : 'bg-surface-800 border-surface-700 text-surface-400 hover:text-surface-200',
+                      : 'bg-layer-2 border-edge text-ink-muted hover:text-ink',
                   ].join(' ')}
                 >
                   {r === 'win' ? t('result.winShort') : r === 'loss' ? t('result.lossShort') : t('result.drawShort')}
@@ -403,8 +403,8 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
                         ? tag === 'skill' ? 'bg-green-500/20 border-green-500/40 text-green-300'
                           : tag === 'misplay' ? 'bg-red-500/20 border-red-500/40 text-red-300'
                           : tag === 'luck' ? 'bg-yellow-500/20 border-yellow-500/40 text-yellow-300'
-                          : 'bg-surface-500/20 border-surface-500/40 text-surface-300'
-                        : 'border-surface-700 text-surface-600 hover:text-surface-400 hover:border-surface-600',
+                          : 'bg-layer-3/20 border-edge/40 text-ink'
+                        : 'border-edge text-ink-dim hover:text-ink-muted hover:border-edge',
                     ].join(' ')}
                   >
                     {t(`outcomeTag.${tag}`)}
@@ -412,7 +412,7 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
                 ))}
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] text-surface-600 uppercase tracking-wide font-medium shrink-0">
+                <span className="text-[10px] text-ink-dim uppercase tracking-wide font-medium shrink-0">
                   {t('turnCount.label')}
                 </span>
                 <input
@@ -422,7 +422,7 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
                   value={currentGame.turnCount ?? ''}
                   onChange={(e) => handleGameTurnCount(activeGame, e.target.value)}
                   placeholder="—"
-                  className="w-14 bg-transparent border-b border-surface-700 focus:border-amber-500 text-surface-300 text-xs font-mono text-center focus:outline-none transition-colors placeholder:text-surface-700"
+                  className="w-14 bg-transparent border-b border-edge focus:border-amber-500 text-ink text-xs font-mono text-center focus:outline-none transition-colors placeholder:text-ink-dim"
                 />
               </div>
             </div>
@@ -432,7 +432,7 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
           </div>
         </div>
       ) : (
-        <div className="flex-1 flex items-center justify-center text-surface-500 text-sm">
+        <div className="flex-1 flex items-center justify-center text-ink-muted text-sm">
           {t('workspace.noGameData')}
         </div>
       )}
@@ -459,8 +459,8 @@ function PreviousGameRecap({
   if (!prior.length) return null;
 
   return (
-    <div className="flex flex-col gap-2 pt-2 border-t border-surface-700">
-      <span className="text-[10px] text-surface-600 uppercase tracking-wide font-medium">{t('workspace.previousGames')}</span>
+    <div className="flex flex-col gap-2 pt-2 border-t border-edge">
+      <span className="text-[10px] text-ink-dim uppercase tracking-wide font-medium">{t('workspace.previousGames')}</span>
       {prior.map((g) => {
         const slots = side === 'my' ? g.mySlots : g.opponentSlots;
         const leads = slots.filter((s) => s.speciesId && isLead(s.role));
@@ -477,7 +477,7 @@ function PreviousGameRecap({
             </div>
             {backs.length > 0 && (
               <>
-                <span className="text-surface-700 text-[10px]">/</span>
+                <span className="text-ink-dim text-[10px]">/</span>
                 <div className="flex items-center gap-0.5">
                   {backs.map((s) => (
                     <img key={s.slotIndex} src={spriteUrl(s.speciesName!)} alt={s.speciesName ?? ''} className="w-6 h-6 object-contain opacity-60" onError={handleSpriteError} />

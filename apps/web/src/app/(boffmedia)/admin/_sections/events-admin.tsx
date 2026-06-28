@@ -15,7 +15,7 @@ function useEventsList() {
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   upcoming: { label: "Próximo", color: "text-amber-400" },
   active: { label: "Activo", color: "text-emerald-400" },
-  completed: { label: "Completado", color: "text-[var(--text-muted)]" },
+  completed: { label: "Completado", color: "text-ink-muted" },
 }
 
 export function EventsAdmin() {
@@ -48,30 +48,30 @@ export function EventsAdmin() {
       columns={[
         { key: "title", label: "Evento", render: (e) => (
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] flex items-center justify-center overflow-hidden shrink-0">
+            <div className="w-9 h-9 rounded-lg bg-layer-2 border border-edge flex items-center justify-center overflow-hidden shrink-0">
               {e.icon ? (
                 <img src={e.icon} alt={e.title} className="w-full h-full object-cover" />
               ) : (
-                <Calendar className="w-4 h-4 text-[var(--text-dim)]" />
+                <Calendar className="w-4 h-4 text-ink-dim" />
               )}
             </div>
             <div>
-              <span className="font-medium text-[var(--text)]">{e.title}</span>
+              <span className="font-medium text-ink">{e.title}</span>
               {e.parentEventName && (
-                <p className="text-xs text-[var(--text-dim)]">{e.parentEventName}</p>
+                <p className="text-xs text-ink-dim">{e.parentEventName}</p>
               )}
             </div>
           </div>
         )},
         { key: "gameName", label: "Juego", render: (e) => (
-          <span className="text-sm text-[var(--text-muted)]">{e.gameName ?? "—"}</span>
+          <span className="text-sm text-ink-muted">{e.gameName ?? "—"}</span>
         )},
         { key: "status", label: "Estado", render: (e) => {
-          const s = STATUS_LABELS[e.status] ?? { label: e.status, color: "text-[var(--text-muted)]" }
+          const s = STATUS_LABELS[e.status] ?? { label: e.status, color: "text-ink-muted" }
           return <span className={`text-sm font-medium ${s.color}`}>{s.label}</span>
         }},
         { key: "startDate", label: "Inicio", render: (e) => (
-          <span className="text-sm text-[var(--text-muted)]">{new Date(e.startDate).toLocaleDateString()}</span>
+          <span className="text-sm text-ink-muted">{new Date(e.startDate).toLocaleDateString()}</span>
         )},
       ]}
     />

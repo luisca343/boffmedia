@@ -9,7 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 export default function LootBoxPage() {
   return (
-    <div className="min-h-full w-full bg-gradient-to-b from-indigo-950 via-accent-950 to-violet-950 flex flex-col relative overflow-hidden font-mono">
+    <div className="min-h-full w-full bg-gradient-to-b from-indigo-950 via-secondary-soft to-violet-950 flex flex-col relative overflow-hidden font-mono">
       <StarsBackground />
       
       {/* Toast container for notifications */}
@@ -33,7 +33,7 @@ export default function LootBoxPage() {
 
       <main className="flex-grow p-6 overflow-auto container mx-auto max-w-7xl relative z-10">
         {/* Main content */}
-        <div className="w-full bg-surface-900/70 rounded-xl border-2 border-indigo-500/30 shadow-xl overflow-hidden p-6 mb-8">
+        <div className="w-full bg-layer-1/70 rounded-xl border-2 border-indigo-500/30 shadow-xl overflow-hidden p-6 mb-8">
           <LootBoxGame />
         </div>
         

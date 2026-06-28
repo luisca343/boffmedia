@@ -37,20 +37,20 @@ export function BoffSlider({ defaultValue = 50, value: controlledValue, min = 0,
     <div className={cn("flex items-center gap-4", className)}>
       <div
         className={cn(
-          "relative flex-1 h-1.5 rounded-[999px] bg-[var(--surface-3)] cursor-pointer",
+          "relative flex-1 h-1.5 rounded-[999px] bg-layer-3 cursor-pointer",
           "data-[direction=hud]:rounded-sm",
         )}
         ref={ref}
         onMouseDown={(e) => { drag.current = true; setFrom(e.clientX) }}
       >
-        <span className="absolute left-0 top-0 h-full rounded-[inherit] bg-[var(--accent)]" style={{ width: `${pct}%` }} />
+        <span className="absolute left-0 top-0 h-full rounded-[inherit] bg-secondary" style={{ width: `${pct}%` }} />
         <span
           className={cn(
-            "absolute top-1/2 w-[18px] h-[18px] rounded-full bg-white border-2 border-solid border-[var(--accent)]",
+            "absolute top-1/2 w-[18px] h-[18px] rounded-full bg-white border-2 border-solid border-secondary",
             "-translate-x-1/2 -translate-y-1/2 cursor-grab",
             "shadow-[0_2px_8px_-2px_var(--shadow-color)]",
             "data-[direction=hud]:rounded-[3px]",
-            "focus-visible:outline-none focus-visible:shadow-[0_0_0_4px_var(--accent-soft)]",
+            "focus-visible:outline-none focus-visible:shadow-[0_0_0_4px_var(--secondary-soft)]",
           )}
           tabIndex={0}
           role="slider"
@@ -62,7 +62,7 @@ export function BoffSlider({ defaultValue = 50, value: controlledValue, min = 0,
           onKeyDown={(e) => { let d = 0; if (e.key === "ArrowRight" || e.key === "ArrowUp") d = step; if (e.key === "ArrowLeft" || e.key === "ArrowDown") d = -step; if (d) { e.preventDefault(); updateVal(Math.max(min, Math.min(max, currentVal + d))) } }}
         />
       </div>
-      <span className="font-mono text-sm text-[var(--text-muted)] min-w-[44px] text-right">{currentVal}{unit}</span>
+      <span className="font-mono text-sm text-ink-muted min-w-[44px] text-right">{currentVal}{unit}</span>
     </div>
   )
 }

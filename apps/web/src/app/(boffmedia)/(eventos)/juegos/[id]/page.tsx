@@ -50,8 +50,8 @@ export default function GameDetailPage() {
       <div className="min-h-screen">
         <div className="container mx-auto p-6 max-w-7xl">
           <div className="text-center py-20">
-            <h1 className="text-3xl font-bold text-surface-300 mb-4">Juego no encontrado</h1>
-            <p className="text-surface-400">El juego que buscas no existe o ha sido eliminado.</p>
+            <h1 className="text-3xl font-bold text-ink mb-4">Juego no encontrado</h1>
+            <p className="text-ink-muted">El juego que buscas no existe o ha sido eliminado.</p>
           </div>
         </div>
       </div>
@@ -65,8 +65,8 @@ export default function GameDetailPage() {
         
         {/* Background effects */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute top-20 left-20 w-40 h-40 bg-accent-500/5 rounded-full blur-2xl"></div>
-          <div className="absolute bottom-20 right-20 w-32 h-32 bg-secondary-500/5 rounded-full blur-2xl"></div>
+          <div className="absolute top-20 left-20 w-40 h-40 bg-secondary/5 rounded-full blur-2xl"></div>
+          <div className="absolute bottom-20 right-20 w-32 h-32 bg-secondary/5 rounded-full blur-2xl"></div>
         </div>
 
         <div className="space-y-12">

@@ -65,9 +65,9 @@ export default async function EntradaPokedex({params}: any){
         })})
         
     return (
-        <section className="flex flex-col overflow-hidden text-surface-50">
+        <section className="flex flex-col overflow-hidden text-ink">
             <EntryHeader pokemon={pokemon} formName={formName} prev={prev} next={next} />
-            <section className="flex flex-col bg-surface-800 overflow-auto p-4">
+            <section className="flex flex-col bg-layer-2 overflow-auto p-4">
                 <PokedexSection id='info' title="Información">
                     <BasicInfo pokemon={pokemon} formIndex={formIndex} formName={formName} />
                 </PokedexSection>

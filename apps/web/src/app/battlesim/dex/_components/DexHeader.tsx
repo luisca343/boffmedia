@@ -19,8 +19,8 @@ export default function DexHeader() {
         <button
           className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
             currentSearchCategory === 'search' 
-              ? 'bg-primary-500 text-white' 
-              : 'bg-surface-800 hover:bg-surface-700'
+              ? 'bg-primary text-white' 
+              : 'bg-layer-2 hover:bg-layer-3'
           }`}
           onClick={() => setCurrentSearchCategory('search')}
         >
@@ -29,8 +29,8 @@ export default function DexHeader() {
         <button
           className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
             currentSearchCategory === 'pokemon' 
-              ? 'bg-primary-500 text-white' 
-              : 'bg-surface-800 hover:bg-surface-700'
+              ? 'bg-primary text-white' 
+              : 'bg-layer-2 hover:bg-layer-3'
           }`}
           onClick={() => setCurrentSearchCategory('pokemon')}
         >
@@ -39,8 +39,8 @@ export default function DexHeader() {
         <button
           className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
             currentSearchCategory === 'moves' 
-              ? 'bg-primary-500 text-white' 
-              : 'bg-surface-800 hover:bg-surface-700'
+              ? 'bg-primary text-white' 
+              : 'bg-layer-2 hover:bg-layer-3'
           }`}
           onClick={() => setCurrentSearchCategory('moves')}
         >
@@ -49,8 +49,8 @@ export default function DexHeader() {
         <button
           className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
             currentSearchCategory === 'abilities' 
-              ? 'bg-primary-500 text-white' 
-              : 'bg-surface-800 hover:bg-surface-700'
+              ? 'bg-primary text-white' 
+              : 'bg-layer-2 hover:bg-layer-3'
           }`}
           onClick={() => setCurrentSearchCategory('abilities')}
         >
@@ -59,8 +59,8 @@ export default function DexHeader() {
         <button
           className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
             currentSearchCategory === 'items' 
-              ? 'bg-primary-500 text-white' 
-              : 'bg-surface-800 hover:bg-surface-700'
+              ? 'bg-primary text-white' 
+              : 'bg-layer-2 hover:bg-layer-3'
           }`}
           onClick={() => setCurrentSearchCategory('items')}
         >
@@ -69,14 +69,14 @@ export default function DexHeader() {
       </div>
       
       {/* Generation selector */}
-      <div className="flex flex-wrap justify-center gap-1 bg-surface-800 rounded-md p-1 max-w-4xl mx-auto">
+      <div className="flex flex-wrap justify-center gap-1 bg-layer-2 rounded-md p-1 max-w-4xl mx-auto">
         {GENERATIONS.map((gen) => (
           <button
             key={gen.id}
             className={`px-3 py-1.5 text-xs rounded transition-colors ${
               currentGeneration === gen.id
-                ? 'bg-primary-500 text-white shadow-md'
-                : 'bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50'
+                ? 'bg-primary text-white shadow-md'
+                : 'bg-layer-3 hover:bg-layer-3 active:bg-primary-soft/50'
             }`}
             onClick={() => setGeneration(gen.id as GenerationId)}
           >
@@ -89,7 +89,7 @@ export default function DexHeader() {
       <div className="flex justify-center mt-3">
         <Link 
           href="/battlesim/calc"
-          className="text-primary-400 hover:text-primary-300 text-sm underline"
+          className="text-primary-hover hover:text-primary-hover text-sm underline"
         >
           Go to Damage Calculator
         </Link>

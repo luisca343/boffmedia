@@ -13,11 +13,11 @@ import {
 import { useBoffSession } from "@/services/useBoffSession"
 
 function inputClass() {
-  return "w-full h-9 rounded-lg border border-[var(--border-strong)] bg-[var(--surface-2)] px-2.5 text-sm text-[var(--text)] placeholder:text-[var(--text-dim)] focus:outline-none focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-soft)]"
+  return "w-full h-9 rounded-lg border border-edge-strong bg-layer-2 px-2.5 text-sm text-ink placeholder:text-ink-dim focus:outline-none focus:border-secondary focus:shadow-[0_0_0_3px_var(--secondary-soft)]"
 }
 
 function labelClass() {
-  return "text-[11px] text-[var(--text-dim)] font-medium uppercase tracking-wider"
+  return "text-[11px] text-ink-dim font-medium uppercase tracking-wider"
 }
 
 export function VgcChampionsFetcher() {
@@ -80,7 +80,7 @@ export function VgcChampionsFetcher() {
       case 'error':
         return { text: 'Error', className: 'text-red-400', dot: 'bg-red-400' }
       default:
-        return { text: 'Sin datos', className: 'text-[var(--text-dim)]', dot: 'bg-[var(--text-dim)]' }
+        return { text: 'Sin datos', className: 'text-ink-dim', dot: 'bg-[var(--text-dim)]' }
     }
   }
 
@@ -166,12 +166,12 @@ export function VgcChampionsFetcher() {
     }
   }
 
-  const thClass = "px-4 py-2.5 text-left text-[11px] uppercase tracking-[0.08em] text-[var(--text-muted)] font-semibold"
+  const thClass = "px-4 py-2.5 text-left text-[11px] uppercase tracking-[0.08em] text-ink-muted font-semibold"
 
   return (
     <div className="space-y-4 max-w-2xl">
-      <p className="text-sm text-[var(--text-muted)]">
-        Importa datos del CSV de VGCPastes (Google Sheets). Agrega uso por especie y co-aparición de compañeros de equipo. Los equipos individuales se guardan en <code className="text-[var(--text-dim)]">vgc_paste_teams</code>.
+      <p className="text-sm text-ink-muted">
+        Importa datos del CSV de VGCPastes (Google Sheets). Agrega uso por especie y co-aparición de compañeros de equipo. Los equipos individuales se guardan en <code className="text-ink-dim">vgc_paste_teams</code>.
       </p>
 
       <ToolPanel title="Registrar regulación">
@@ -201,19 +201,19 @@ export function VgcChampionsFetcher() {
       <ToolPanel
         title="Regulaciones configuradas"
         headRight={
-          <button onClick={() => loadAvailable()} className="text-[var(--text-dim)] hover:text-[var(--text)] transition-colors">
+          <button onClick={() => loadAvailable()} className="text-ink-dim hover:text-ink transition-colors">
             <RefreshCw className="w-3.5 h-3.5" />
           </button>
         }
       >
         {loading ? (
-          <div className="py-8 flex justify-center text-[var(--text-muted)]">
+          <div className="py-8 flex justify-center text-ink-muted">
             <Loader2 className="w-4 h-4 animate-spin" />
           </div>
         ) : (
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--surface)_96%,transparent)]">
+              <tr className="border-b border-edge bg-[color-mix(in_srgb,var(--layer-1)_96%,transparent)]">
                 <th className={thClass}>Regulación</th>
                 <th className={thClass}>Estado</th>
                 <th className={thClass} />
@@ -226,13 +226,13 @@ export function VgcChampionsFetcher() {
                 const isFetching    = fetchingPastes === regulation.id
                 const status        = getStatusLabel(regulation)
                 return (
-                  <tr key={regulation.id} className="border-b border-[var(--border)] hover:bg-[color-mix(in_srgb,var(--text)_3%,transparent)] transition-colors">
+                  <tr key={regulation.id} className="border-b border-edge hover:bg-[color-mix(in_srgb,var(--text)_3%,transparent)] transition-colors">
                     <td className="px-4 py-3">
-                      <p className="text-[var(--text)] text-xs font-medium">{regulation.name}</p>
-                      <p className="text-[var(--text-dim)] text-[11px] font-mono">{regulation.id}</p>
-                      <p className="text-[var(--text-dim)] text-[11px] font-mono">{regulation.formatId}</p>
+                      <p className="text-ink text-xs font-medium">{regulation.name}</p>
+                      <p className="text-ink-dim text-[11px] font-mono">{regulation.id}</p>
+                      <p className="text-ink-dim text-[11px] font-mono">{regulation.formatId}</p>
                       {regulation?.importTeamCount ? (
-                        <p className="text-[var(--text-dim)] text-[11px]">
+                        <p className="text-ink-dim text-[11px]">
                           {regulation.importTeamCount ?? 0} equipos importados
                         </p>
                       ) : null}
@@ -281,9 +281,9 @@ export function VgcChampionsFetcher() {
       {error   && <p className="text-xs text-red-400">{error}</p>}
       {success && <p className="text-xs text-emerald-400">{success}</p>}
 
-      <p className="text-xs text-[var(--text-dim)]">
+      <p className="text-xs text-ink-dim">
         Fuente: Google Sheets VGCPastes · GID por regulación en{" "}
-        <code className="text-[var(--text-muted)]">champions-data.ts</code> · Añadir nueva regulación: crear entrada en ese archivo y actualizar <code className="text-[var(--text-muted)]">REGULATION_OPTIONS</code> aquí.
+        <code className="text-ink-muted">champions-data.ts</code> · Añadir nueva regulación: crear entrada en ese archivo y actualizar <code className="text-ink-muted">REGULATION_OPTIONS</code> aquí.
       </p>
     </div>
   )

@@ -10,13 +10,13 @@ export const BoffInput = React.forwardRef<HTMLInputElement, BoffInputProps>(
     return (
       <input
         className={cn(
-          "w-full font-body text-sm text-[var(--text)]",
-          "bg-[var(--surface-2)] border border-solid border-[var(--border-strong)]",
+          "w-full font-body text-sm text-ink",
+          "bg-layer-2 border border-solid border-edge-strong",
           "rounded-[var(--btn-radius,9999px)]",
           "py-2.5 px-3.5",
           "transition-[border-color,box-shadow] duration-[var(--dur,0.32s)] ease-[var(--ease)]",
-          "placeholder:text-[var(--text-dim)]",
-          "focus:outline-none focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-soft)]",
+          "placeholder:text-ink-dim",
+          "focus:outline-none focus:border-secondary focus:shadow-[0_0_0_3px_var(--secondary-soft)]",
           "disabled:opacity-55 disabled:cursor-not-allowed",
           className,
         )}

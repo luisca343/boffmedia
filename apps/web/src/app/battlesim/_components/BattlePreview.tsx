@@ -42,9 +42,9 @@ export const EnhancedBattlePreview = ({
       onMouseLeave={() => setIsHovering(false)}
     >
       {/* Dynamic background with battle arena */}
-      <div className="absolute inset-0 bg-gradient-to-b from-secondary-900 via-indigo-900 to-accent-900 z-0 transition-all duration-500">
+      <div className="absolute inset-0 bg-gradient-to-b from-secondary-soft via-indigo-900 to-secondary-soft z-0 transition-all duration-500">
         {/* Battle arena floor */}
-        <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-surface-800 to-transparent"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-layer-2 to-transparent"></div>
 
         {/* Animated particles */}
         <div className={`stars ${isHovering ? 'stars-hover' : ''}`}></div>
@@ -82,7 +82,7 @@ export const EnhancedBattlePreview = ({
               ${isLoaded ? "opacity-100 transform-none" : "opacity-0 scale-50"}`}
           >
             <div className="relative scale-up-down-animation">
-              <div className="text-6xl md:text-7xl lg:text-8xl font-extrabold text-primary-500 text-shadow-lg transform -rotate-6">
+              <div className="text-6xl md:text-7xl lg:text-8xl font-extrabold text-primary text-shadow-lg transform -rotate-6">
                 VS
               </div>
               <div className="absolute inset-0 text-6xl md:text-7xl lg:text-8xl font-extrabold text-white text-opacity-30 text-shadow-lg transform -rotate-6 blur-md">
@@ -92,7 +92,7 @@ export const EnhancedBattlePreview = ({
             
             {/* Start Button */}
             <button 
-              className={`mt-6 bg-primary-500 hover:bg-primary-600 text-white font-bold py-2 px-6 rounded-full 
+              className={`mt-6 bg-primary hover:bg-primary-active text-white font-bold py-2 px-6 rounded-full 
                 transform transition-all duration-300 pulse-animation ${isHovering ? 'scale-110 shadow-lg' : ''}`}
             >
               COMENZAR

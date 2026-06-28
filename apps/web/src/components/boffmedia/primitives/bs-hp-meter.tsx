@@ -30,19 +30,19 @@ export function BSHpMeter({ mon, compact }: BSHpMeterProps) {
   return (
     <div
       className="flex flex-col gap-[.3rem] rounded-[var(--radius-lg)]"
-      style={{ padding: ".6rem .75rem", background: "color-mix(in srgb, var(--surface) 86%, transparent)" }}
+      style={{ padding: ".6rem .75rem", background: "color-mix(in srgb, var(--layer-1) 86%, transparent)" }}
     >
       <div className="flex items-baseline justify-between gap-[.6rem]">
         <div className="font-display font-extrabold text-t-base tracking-[.01em] flex items-center gap-[.5rem] min-w-0">
           {mon.tera && <BSTera type={mon.teraType || "Normal"} size=".85em" />}
           <span className="overflow-hidden text-ellipsis whitespace-nowrap">{mon.name}</span>
-          <span className="font-mono text-[.66rem] text-[var(--text-dim)] tracking-[.06em] shrink-0">Nv50</span>
+          <span className="font-mono text-[.66rem] text-ink-dim tracking-[.06em] shrink-0">Nv50</span>
         </div>
-        <span className="font-mono font-bold text-[.72rem] shrink-0 text-[var(--text-muted)] tabular-nums">
+        <span className="font-mono font-bold text-[.72rem] shrink-0 text-ink-muted tabular-nums">
           {mon.fnt ? "DEBILITADO" : `${pct}%`}
         </span>
       </div>
-      <div className={cn("relative h-[11px] rounded-[var(--radius-pill)] overflow-hidden border border-[var(--border)]", "bg-[color-mix(in_srgb,#000_45%,var(--surface-3))]")}>
+      <div className={cn("relative h-[11px] rounded-[var(--radius-pill)] overflow-hidden border border-edge", "bg-[color-mix(in_srgb,#000_45%,var(--layer-3))]")}>
         <div
           className="absolute inset-y-0 left-0 rounded-[inherit] transition-[width] duration-[.6s] ease-[var(--ease)]"
           style={{ width: `${pct}%`, background: `linear-gradient(180deg, color-mix(in srgb, #fff 30%, ${hpc}), ${hpc})`, boxShadow: `0 0 12px -2px ${hpc}` }}

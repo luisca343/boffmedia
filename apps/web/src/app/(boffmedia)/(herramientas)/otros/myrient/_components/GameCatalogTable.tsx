@@ -93,12 +93,12 @@ export default function GameCatalogTable({
       {/* Search + bulk controls */}
       <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-surface-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted" />
           <Input
             value={search}
             onChange={e => handleSearchChange(e.target.value)}
             placeholder="Buscar juego..."
-            className="pl-9 bg-surface-800/60 border-surface-600 text-surface-100 placeholder-surface-400"
+            className="pl-9 bg-layer-2/60 border-edge text-ink placeholder-ink-dim"
           />
         </div>
         <div className="flex gap-2 flex-wrap">
@@ -108,8 +108,8 @@ export default function GameCatalogTable({
               size="sm"
               variant="outline"
               onClick={toggleHideDownloaded}
-              className={`border-surface-600 hover:bg-surface-700 gap-1.5 ${
-                hideDownloaded ? 'text-primary-300 border-primary-600/50 bg-primary-900/20' : 'text-surface-300'
+              className={`border-edge hover:bg-layer-3 gap-1.5 ${
+                hideDownloaded ? 'text-primary-hover border-primary-active/50 bg-primary-soft/20' : 'text-ink'
               }`}
             >
               <EyeOff className="h-3.5 w-3.5" />
@@ -121,8 +121,8 @@ export default function GameCatalogTable({
               size="sm"
               variant="outline"
               onClick={handleSelectAllFiltered}
-              className={`border-surface-600 hover:bg-surface-700 ${
-                allFilteredSelected ? 'text-primary-300 border-primary-600/50 bg-primary-900/20' : 'text-surface-300'
+              className={`border-edge hover:bg-layer-3 ${
+                allFilteredSelected ? 'text-primary-hover border-primary-active/50 bg-primary-soft/20' : 'text-ink'
               }`}
             >
               <CheckSquare className="h-4 w-4 mr-1" />
@@ -135,7 +135,7 @@ export default function GameCatalogTable({
             <Button
               size="sm"
               variant="outline"
-              className="border-surface-600 text-surface-400 hover:bg-surface-700"
+              className="border-edge text-ink-muted hover:bg-layer-3"
               onClick={onClearAll}
             >
               <Square className="h-4 w-4 mr-1" />
@@ -146,7 +146,7 @@ export default function GameCatalogTable({
       </div>
 
       {/* Stats row */}
-      <div className="flex items-center gap-3 text-sm text-surface-400 flex-wrap">
+      <div className="flex items-center gap-3 text-sm text-ink-muted flex-wrap">
         <span>{filtered.length} juego{filtered.length !== 1 ? 's' : ''} encontrado{filtered.length !== 1 ? 's' : ''}</span>
         {downloadedCount > 0 && (
           <span className="flex items-center gap-1 text-green-400/80">
@@ -155,30 +155,30 @@ export default function GameCatalogTable({
           </span>
         )}
         {selected.size > 0 && (
-          <Badge className="bg-primary-600/20 text-primary-300 border-primary-600/40">
+          <Badge className="bg-primary-active/20 text-primary-hover border-primary-active/40">
             {selected.size} seleccionado{selected.size !== 1 ? 's' : ''}
           </Badge>
         )}
       </div>
 
       {/* Table */}
-      <div className="rounded-lg border border-surface-700/50 overflow-hidden">
+      <div className="rounded-lg border border-edge/50 overflow-hidden">
         {/* Header */}
-        <div className="flex items-center gap-3 px-4 py-2 bg-surface-800/80 border-b border-surface-700/50">
+        <div className="flex items-center gap-3 px-4 py-2 bg-layer-2/80 border-b border-edge/50">
           <Checkbox
             checked={allPageSelected}
             onCheckedChange={togglePage}
-            className="border-surface-500 data-[state=checked]:bg-primary-600 data-[state=checked]:border-primary-600"
+            className="border-edge data-[state=checked]:bg-primary-active data-[state=checked]:border-primary-active"
             aria-label="Seleccionar página"
           />
-          <span className="text-xs font-medium text-surface-400 uppercase tracking-wide flex-1">Nombre</span>
-          <span className="text-xs font-medium text-surface-400 uppercase tracking-wide w-24 text-right">Tamaño</span>
+          <span className="text-xs font-medium text-ink-muted uppercase tracking-wide flex-1">Nombre</span>
+          <span className="text-xs font-medium text-ink-muted uppercase tracking-wide w-24 text-right">Tamaño</span>
         </div>
 
         {/* Rows */}
-        <div className="divide-y divide-surface-700/30">
+        <div className="divide-y divide-edge/30">
           {paginated.length === 0 ? (
-            <div className="px-4 py-8 text-center text-surface-500">
+            <div className="px-4 py-8 text-center text-ink-muted">
               {hideDownloaded && downloadedCount === files.length
                 ? 'Todos los juegos de este catálogo ya están descargados.'
                 : 'No se encontraron juegos con ese término.'}
@@ -193,20 +193,20 @@ export default function GameCatalogTable({
                   onClick={() => onToggle(file.name)}
                   className={`flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-colors duration-100
                     ${isSelected
-                      ? 'bg-primary-900/20 hover:bg-primary-900/30'
+                      ? 'bg-primary-soft/20 hover:bg-primary-soft/30'
                       : isDownloaded
                         ? 'bg-green-900/10 hover:bg-green-900/20'
-                        : 'hover:bg-surface-700/30'
+                        : 'hover:bg-layer-3/30'
                     }`}
                 >
                   <Checkbox
                     checked={isSelected}
                     onCheckedChange={() => onToggle(file.name)}
                     onClick={e => e.stopPropagation()}
-                    className="border-surface-500 data-[state=checked]:bg-primary-600 data-[state=checked]:border-primary-600 shrink-0"
+                    className="border-edge data-[state=checked]:bg-primary-active data-[state=checked]:border-primary-active shrink-0"
                   />
                   <span
-                    className={`flex-1 text-sm truncate ${isDownloaded ? 'text-green-300' : 'text-surface-200'}`}
+                    className={`flex-1 text-sm truncate ${isDownloaded ? 'text-green-300' : 'text-ink'}`}
                     title={file.name}
                   >
                     {file.name}
@@ -216,7 +216,7 @@ export default function GameCatalogTable({
                       <HardDrive className="h-3.5 w-3.5 text-green-500/70 shrink-0" />
                     </span>
                   )}
-                  <span className="text-xs text-surface-400 w-24 text-right shrink-0">{file.size}</span>
+                  <span className="text-xs text-ink-muted w-24 text-right shrink-0">{file.size}</span>
                 </div>
               );
             })
@@ -226,15 +226,15 @@ export default function GameCatalogTable({
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between text-sm text-surface-400">
+        <div className="flex items-center justify-between text-sm text-ink-muted">
           <span>Pág. {page + 1} / {totalPages}</span>
           <div className="flex gap-1">
             <Button size="icon" variant="ghost" disabled={page === 0} onClick={() => setPage(p => p - 1)}
-              className="h-8 w-8 text-surface-400 hover:text-surface-100 hover:bg-surface-700">
+              className="h-8 w-8 text-ink-muted hover:text-ink hover:bg-layer-3">
               <ChevronLeft className="h-4 w-4" />
             </Button>
             <Button size="icon" variant="ghost" disabled={page >= totalPages - 1} onClick={() => setPage(p => p + 1)}
-              className="h-8 w-8 text-surface-400 hover:text-surface-100 hover:bg-surface-700">
+              className="h-8 w-8 text-ink-muted hover:text-ink hover:bg-layer-3">
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>

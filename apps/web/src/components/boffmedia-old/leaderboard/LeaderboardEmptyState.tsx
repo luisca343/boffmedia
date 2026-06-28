@@ -22,9 +22,9 @@ export function LeaderboardEmptyState({
 }: LeaderboardEmptyStateProps) {
   const getIcon = () => {
     switch (icon) {
-      case 'medal': return <Medal className="w-12 h-12 text-surface-400" />
-      case 'award': return <Award className="w-12 h-12 text-surface-400" />
-      default: return <Trophy className="w-12 h-12 text-surface-400" />
+      case 'medal': return <Medal className="w-12 h-12 text-ink-muted" />
+      case 'award': return <Award className="w-12 h-12 text-ink-muted" />
+      default: return <Trophy className="w-12 h-12 text-ink-muted" />
     }
   }
 
@@ -50,19 +50,19 @@ export function LeaderboardEmptyState({
 
   return (
     <div className={`text-center py-12 ${className}`}>
-      <div className="w-24 h-24 bg-surface-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
+      <div className="w-24 h-24 bg-layer-3/50 rounded-full flex items-center justify-center mx-auto mb-4">
         {getIcon()}
       </div>
-      <h3 className="text-xl font-semibold text-surface-300 mb-2">
+      <h3 className="text-xl font-semibold text-ink mb-2">
         {title || getDefaultTitle()}
       </h3>
-      <p className="text-surface-400 max-w-md mx-auto">
+      <p className="text-ink-muted max-w-md mx-auto">
         {description || getDefaultDescription()}
       </p>
       {searchTerm && onClearSearch && (
         <Button 
           variant="outline" 
-          className="mt-4 border-accent-500/30 text-accent-400 hover:bg-accent-500/20" 
+          className="mt-4 border-secondary/30 text-secondary-hover hover:bg-secondary/20" 
           onClick={onClearSearch}
         >
           Limpiar búsqueda

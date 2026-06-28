@@ -56,13 +56,13 @@ export default function ListView({
 
   return (
     <div className="relative bg-white rounded-xl shadow-xl h-full flex flex-col overflow-hidden">
-      <div className="p-4 bg-gradient-to-r from-secondary-600 to-secondary-800 rounded-t-xl">
+      <div className="p-4 bg-gradient-to-r from-secondary-active to-secondary-soft rounded-t-xl">
         <div className="flex justify-between items-center mb-3">
           <div>
             <h2 className="text-xl font-semibold text-white mb-1">Destinos Disponibles</h2>
-            <p className="text-secondary-100">Elige un destino para viajar en taxi</p>
+            <p className="text-secondary-hover">Elige un destino para viajar en taxi</p>
           </div>
-          <div className="flex items-center bg-secondary-500/50 px-3 py-1 rounded-full">
+          <div className="flex items-center bg-secondary/50 px-3 py-1 rounded-full">
             <FaCompass className="text-white mr-2" />
             <span className="text-white font-medium">
               {filteredAndSortedStops.length} destinos
@@ -73,7 +73,7 @@ export default function ListView({
         {/* Search and filter controls */}
         <div className="flex flex-col sm:flex-row gap-2">
           <div className="relative flex-grow">
-            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary-300" />
+            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary-hover" />
             <input
               type="text"
               placeholder="Buscar destino..."
@@ -84,7 +84,7 @@ export default function ListView({
           </div>
           <button
             onClick={() => setSortOrder(sortOrder === 'nearest' ? 'furthest' : 'nearest')}
-            className="px-4 py-2 bg-secondary-500 hover:bg-secondary-600 text-white rounded-lg flex items-center justify-center transition-colors"
+            className="px-4 py-2 bg-secondary hover:bg-secondary-active text-white rounded-lg flex items-center justify-center transition-colors"
           >
             {sortOrder === 'nearest' ? (
               <>
@@ -102,7 +102,7 @@ export default function ListView({
       </div>
       
       {/* List content area with clean background */}
-      <div className="flex-grow relative bg-surface-50 overflow-y-auto">
+      <div className="flex-grow relative bg-base overflow-y-auto">
         <div className="absolute inset-0 bg-[#041F4E] overflow-y-auto">
           {/* Removed grid lines - clean background */}
           
@@ -110,7 +110,7 @@ export default function ListView({
           <div className="relative p-4">
             {filteredAndSortedStops.length === 0 ? (
               <div className="text-center py-12 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
-                <div className="w-16 h-16 mx-auto bg-secondary-800/50 rounded-full flex items-center justify-center mb-4">
+                <div className="w-16 h-16 mx-auto bg-secondary-soft/50 rounded-full flex items-center justify-center mb-4">
                   <FaMapMarkerAlt className="text-white/70 text-2xl" />
                 </div>
                 <p className="text-white/90 font-medium">No se encontraron destinos que coincidan con tu búsqueda</p>
@@ -134,7 +134,7 @@ export default function ListView({
                       className={`bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden transition-all border ${
                         isSelected 
                           ? 'border-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.3)]' 
-                          : 'border-white/20 hover:border-secondary-300/50'
+                          : 'border-white/20 hover:border-secondary/50'
                       }`}
                       onClick={() => setSelectedStop(isSelected ? null : stop)}
                     >
@@ -147,11 +147,11 @@ export default function ListView({
                           </div>
                           <div>
                             <h3 className="font-bold text-white">{stop.id}</h3>
-                            <p className="text-sm text-secondary-100">Distancia: {formatDistance(stop.distance)} bloques</p>
+                            <p className="text-sm text-secondary-hover">Distancia: {formatDistance(stop.distance)} bloques</p>
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className={`text-lg font-bold ${canAfford ? 'text-highlight-400' : 'text-red-400'}`}>
+                          <div className={`text-lg font-bold ${canAfford ? 'text-warning-hover' : 'text-red-400'}`}>
                             {formatMoney(price)}
                           </div>
                         </div>
@@ -159,9 +159,9 @@ export default function ListView({
 
                       {isSelected && (
                         <div className="bg-white/5 p-4 border-t border-white/10">
-                          <p className="mb-4 text-secondary-100">{stop.description || "Sin descripción disponible"}</p>
-                          <div className="flex items-center text-sm text-secondary-200 mb-4">
-                            <FaInfoCircle className="mr-2 text-secondary-300" /> 
+                          <p className="mb-4 text-secondary-hover">{stop.description || "Sin descripción disponible"}</p>
+                          <div className="flex items-center text-sm text-secondary-hover mb-4">
+                            <FaInfoCircle className="mr-2 text-secondary-hover" /> 
                             <span>Coordenadas: X: {stop.x}, Z: {stop.z}</span>
                           </div>
                           <button
@@ -173,7 +173,7 @@ export default function ListView({
                             className={`w-full py-3 px-4 rounded-md flex items-center justify-center font-medium transition-colors ${
                               canAfford && !isLoading 
                                 ? 'bg-yellow-500 hover:bg-yellow-600 text-[#041F4E] shadow-md' // Changed from text-white to text-[#041F4E]
-                                : 'bg-surface-600/50 text-surface-400 cursor-not-allowed'
+                                : 'bg-layer-3/50 text-ink-muted cursor-not-allowed'
                             }`}
                           >
                             {isLoading ? (

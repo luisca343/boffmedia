@@ -21,7 +21,7 @@ export function VgcMetaPanel() {
     <div className="space-y-5">
       {/* Tab bar */}
       <div className="flex items-center gap-3 flex-wrap">
-        <div className="inline-flex items-center gap-1 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] p-1">
+        <div className="inline-flex items-center gap-1 rounded-xl border border-edge-strong bg-layer-2 p-1">
           {TABS.map(({ id, label }) => (
             <button
               key={id}
@@ -30,14 +30,14 @@ export function VgcMetaPanel() {
                 "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all",
                 tab === id
                   ? "bg-[color-mix(in_srgb,var(--orange-500)_20%,transparent)] text-[var(--orange-500)] border border-[color-mix(in_srgb,var(--orange-500)_20%,transparent)]"
-                  : "text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[color-mix(in_srgb,var(--text)_7%,transparent)]"
+                  : "text-ink-muted hover:text-ink hover:bg-[color-mix(in_srgb,var(--text)_7%,transparent)]"
               )}
             >
               {label}
             </button>
           ))}
         </div>
-        <span className="text-xs text-[var(--text-dim)] hidden sm:block">
+        <span className="text-xs text-ink-dim hidden sm:block">
           {TABS.find((t) => t.id === tab)?.description}
         </span>
       </div>

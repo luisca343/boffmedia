@@ -28,8 +28,8 @@ export const pokemon: GameEntry = {
       landing: {
         icon: "/img/games/pokemon/vgc-icon2.webp",
         fallbackIcon: "Podium",
-        fallbackIconColor: "text-primary-400",
-        color: "from-primary-500 to-violet-600",
+        fallbackIconColor: "text-primary-hover",
+        color: "from-primary to-violet-600",
         features: ["meta", "speed", "tracker"],
         featured: true,
         isNew: false,
@@ -77,8 +77,8 @@ export const pokemon: GameEntry = {
           landing: {
             icon: "/img/games/pmdsky-icon.webp",
             fallbackIcon: "Zap",
-            fallbackIconColor: "text-secondary-400",
-            color: "from-secondary-400 to-cyan-600",
+            fallbackIconColor: "text-secondary-hover",
+            color: "from-secondary-hover to-cyan-600",
             features: ["skyGenerator"],
             featured: false,
             isNew: false,

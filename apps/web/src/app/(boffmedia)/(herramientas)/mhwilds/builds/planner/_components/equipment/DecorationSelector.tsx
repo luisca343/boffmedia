@@ -105,7 +105,7 @@ export function DecorationSelector({
     <MHWildsPanel>
       <MHWildsPanelHeader>
         <div className="flex items-center gap-2">
-          <Gem className="h-5 w-5 text-highlight-400" />
+          <Gem className="h-5 w-5 text-warning-hover" />
           <MHWildsPanelTitle>{t("build_planner.select_decoration")}</MHWildsPanelTitle>
           <div
             className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold"
@@ -114,7 +114,7 @@ export function DecorationSelector({
             {slotSize}
           </div>
         </div>
-        <Button variant="ghost" size="icon" className="text-surface-400 hover:text-surface-200" onClick={onClose}>
+        <Button variant="ghost" size="icon" className="text-ink-muted hover:text-ink" onClick={onClose}>
           <X className="h-4 w-4" />
         </Button>
       </MHWildsPanelHeader>
@@ -125,11 +125,11 @@ export function DecorationSelector({
           <div className="relative flex-1">
             <Input
               placeholder={t("build_planner.search")}
-              className="bg-surface-900/60 border-surface-700/60 pl-8 placeholder:text-surface-500"
+              className="bg-layer-1/60 border-edge/60 pl-8 placeholder:text-ink-muted"
               value={filters.search}
               onChange={(e) => setFilters({ ...filters, search: e.target.value })}
             />
-            <div className="absolute left-2.5 top-2.5 text-surface-500">
+            <div className="absolute left-2.5 top-2.5 text-ink-muted">
               <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 6.5C10 8.433 8.433 10 6.5 10C4.567 10 3 8.433 3 6.5C3 4.567 4.567 3 6.5 3C8.433 3 10 4.567 10 6.5ZM9.30884 10.0159C8.53901 10.6318 7.56251 11 6.5 11C4.01472 11 2 8.98528 2 6.5C2 4.01472 4.01472 2 6.5 2C8.98528 2 11 4.01472 11 6.5C11 7.56251 10.6318 8.53901 10.0159 9.30884L12.8536 12.1464C13.0488 12.3417 13.0488 12.6583 12.8536 12.8536C12.6583 13.0488 12.3417 13.0488 12.1464 12.8536L9.30884 10.0159Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"/></svg>
             </div>
           </div>
@@ -140,14 +140,14 @@ export function DecorationSelector({
           className="p-3 rounded-lg mb-4"
           style={{ background: "rgba(15,23,42,0.5)", border: "1px solid rgba(71,85,105,0.2)" }}
         >
-          <div className="text-[10px] font-mono uppercase tracking-widest text-surface-500 mb-1">
+          <div className="text-[10px] font-mono uppercase tracking-widest text-ink-muted mb-1">
             {t("build_planner.assigned_to")}
           </div>
-          <div className="flex items-center text-surface-100 text-sm">
+          <div className="flex items-center text-ink text-sm">
             <span className="font-medium">{t(equipmentType)}</span>
-            <span className="mx-2 text-surface-500">•</span>
+            <span className="mx-2 text-ink-muted">•</span>
             <span>{t("slot")} {slotIndex + 1}</span>
-            <span className="mx-2 text-surface-500">•</span>
+            <span className="mx-2 text-ink-muted">•</span>
             <span className="flex items-center gap-1">
               {t("build_planner.slot_size")}
               <div
@@ -164,8 +164,8 @@ export function DecorationSelector({
         <ScrollArea className="h-[350px]">
           {!decorations ? (
             <div className="h-full flex items-center justify-center gap-2">
-              <Loader2 className="h-6 w-6 text-primary-400 animate-spin" />
-              <span className="text-surface-400 text-sm">
+              <Loader2 className="h-6 w-6 text-primary-hover animate-spin" />
+              <span className="text-ink-muted text-sm">
                 {t("build_planner.loading", { item: t("build_planner.decorations") })}
               </span>
             </div>
@@ -222,10 +222,10 @@ export function DecorationSelector({
                           </div>
                           <div className="flex-1">
                             <div className="flex justify-between w-full">
-                              <span className="font-medium text-surface-100">{decoration.name}</span>
-                              {isActive && <Check className="h-4 w-4 text-highlight-400" />}
+                              <span className="font-medium text-ink">{decoration.name}</span>
+                              {isActive && <Check className="h-4 w-4 text-warning-hover" />}
                             </div>
-                            <div className="flex flex-wrap text-xs text-highlight-400 mt-1">
+                            <div className="flex flex-wrap text-xs text-warning-hover mt-1">
                               {decoration.skills.map((skillInfo, idx) => (
                                 <span key={`${decoration.id}-skill-${idx}`} className="mr-3">
                                   {skillInfo.skill.name} +{skillInfo.level}
@@ -233,7 +233,7 @@ export function DecorationSelector({
                               ))}
                             </div>
                             {decoration.description && (
-                              <p className="text-xs text-surface-400 mt-1 italic">{decoration.description}</p>
+                              <p className="text-xs text-ink-muted mt-1 italic">{decoration.description}</p>
                             )}
                           </div>
                         </div>
@@ -242,7 +242,7 @@ export function DecorationSelector({
                   );
                 })
               ) : (
-                <div className="text-center p-8 text-surface-400">
+                <div className="text-center p-8 text-ink-muted">
                   <p>{t("build_planner.no_decorations_found")}</p>
                 </div>
               )}
@@ -256,7 +256,7 @@ export function DecorationSelector({
         className="px-4 py-2 flex justify-between"
         style={{ borderTop: "1px solid rgba(71,85,105,0.2)" }}
       >
-        <Button variant="ghost" size="sm" className="text-surface-400 hover:text-surface-200" onClick={onClose}>
+        <Button variant="ghost" size="sm" className="text-ink-muted hover:text-ink" onClick={onClose}>
           <ChevronLeft className="mr-1 h-4 w-4" /> {t("build_planner.back")}
         </Button>
       </div>

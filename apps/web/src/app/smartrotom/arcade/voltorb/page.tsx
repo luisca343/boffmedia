@@ -13,7 +13,7 @@ import { useState } from "react";
 
 export default function VoltorbFlip() {
   return (
-    <div className="min-h-full w-full bg-gradient-to-b from-indigo-950 via-accent-950 to-violet-950 text-white font-mono flex flex-col relative overflow-hidden">
+    <div className="min-h-full w-full bg-gradient-to-b from-indigo-950 via-secondary-soft to-violet-950 text-white font-mono flex flex-col relative overflow-hidden">
       <StarsBackground />
 
       <ArcadeTopBar 

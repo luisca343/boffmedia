@@ -145,7 +145,7 @@ export default function PokemonGrid() {
         )}
 
         {!hasPokemonResults && !hasMovesResults && !hasAbilityResults && !hasItemResults && (
-          <div className="text-center text-surface-400 py-10">
+          <div className="text-center text-ink-muted py-10">
             No results found. Try a different search term.
           </div>
         )}

@@ -17,7 +17,7 @@ interface SuggestEventFormProps {
 
 export function SuggestEventForm({ formData, onInputChange, onSubmit, isSubmitting }: SuggestEventFormProps) {
   return (
-    <Card className="bg-gradient-to-r from-surface-800/80 via-accent-900/20 to-surface-800/80 backdrop-blur-sm border border-accent-500/20">
+    <Card className="bg-gradient-to-r from-layer-2/80 via-secondary-soft/20 to-layer-2/80 backdrop-blur-sm border border-secondary/20">
       <CardContent className="p-8">
         <div className="space-y-8">
           <EventTypeSelector 

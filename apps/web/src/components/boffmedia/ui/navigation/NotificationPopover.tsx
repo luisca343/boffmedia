@@ -62,10 +62,10 @@ function NotificationItem({
 
       {/* Text */}
       <div className="flex-1 min-w-0 pr-8">
-        <p className="text-xs text-[var(--text-muted)] leading-snug line-clamp-2">
+        <p className="text-xs text-ink-muted leading-snug line-clamp-2">
           {notification.content}
         </p>
-        <p className="text-[10px] font-mono mt-0.5 text-[var(--text-dim)]">
+        <p className="text-[10px] font-mono mt-0.5 text-ink-dim">
           {relativeTime(notification.createdAt)}
         </p>
       </div>
@@ -91,7 +91,7 @@ function NotificationItem({
         )}
         <button
           onClick={onRemove}
-          className="w-5 h-5 flex items-center justify-center rounded transition-colors hover:bg-[color-mix(in_srgb,var(--text)_8%,transparent)] text-[var(--text-dim)]"
+          className="w-5 h-5 flex items-center justify-center rounded transition-colors hover:bg-[color-mix(in_srgb,var(--text)_8%,transparent)] text-ink-dim"
           title="Eliminar"
         >
           <X className="w-3 h-3" />
@@ -116,7 +116,7 @@ export default function NotificationPopover() {
       {/* ── Trigger (matches handoff IconButton with dot) ──────────────── */}
       <PopoverTrigger asChild>
         <button
-          className="relative inline-flex items-center justify-center w-[38px] h-[38px] rounded-[var(--btn-radius)] border border-transparent bg-transparent text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[color-mix(in_srgb,var(--text)_8%,transparent)] cursor-pointer transition-colors duration-[var(--dur)]"
+          className="relative inline-flex items-center justify-center w-[38px] h-[38px] rounded-[var(--btn-radius)] border border-transparent bg-transparent text-ink-muted hover:text-ink hover:bg-[color-mix(in_srgb,var(--text)_8%,transparent)] cursor-pointer transition-colors duration-[var(--dur)]"
           aria-label="Notificaciones"
         >
           <Icon name="bell" size={18} />
@@ -132,15 +132,15 @@ export default function NotificationPopover() {
       {/* ── Panel (exact dropdown panel spec) ───────────────────────────── */}
       <PopoverContent
         align="end"
-        className="w-72 p-0 border border-[var(--border)] rounded-lg overflow-hidden backdrop-blur-xl"
+        className="w-72 p-0 border border-edge rounded-lg overflow-hidden backdrop-blur-xl"
         style={{
-          background: "var(--surface)",
+          background: "var(--layer-1)",
           boxShadow: "var(--card-shadow)",
         }}
       >
         {/* Top neon bar — identical to dropdown */}
         <div
-          className="h-[2px] bg-gradient-to-r from-primary-600 via-primary-400 to-primary-600"
+          className="h-[2px] bg-gradient-to-r from-primary-active via-primary-hover to-primary-active"
           style={{ opacity: 0.7 }}
         />
 
@@ -148,7 +148,7 @@ export default function NotificationPopover() {
           {/* Section header — same style as dropdown section titles */}
           <div className="flex items-center justify-between px-3 pt-1.5 pb-0.5">
             <h3
-              className="text-[10px] font-mono uppercase tracking-widest text-[var(--text-dim)]"
+              className="text-[10px] font-mono uppercase tracking-widest text-ink-dim"
             >
               {unreadCount > 0 ? (
                 <>
@@ -174,7 +174,7 @@ export default function NotificationPopover() {
               {notifications.length > 0 && (
                 <button
                   onClick={() => clear()}
-                  className="w-5 h-5 flex items-center justify-center rounded transition-colors hover:bg-[color-mix(in_srgb,var(--text)_8%,transparent)] text-[var(--text-dim)]"
+                  className="w-5 h-5 flex items-center justify-center rounded transition-colors hover:bg-[color-mix(in_srgb,var(--text)_8%,transparent)] text-ink-dim"
                   title="Limpiar todo"
                 >
                   <Trash2 className="w-3 h-3" />
@@ -195,7 +195,7 @@ export default function NotificationPopover() {
           {/* Body */}
           <ScrollArea className="h-64">
             {notifications.length === 0 ? (
-              <div className="flex items-center gap-2 mx-1 px-2 py-3 text-xs text-[var(--text-dim)]">
+              <div className="flex items-center gap-2 mx-1 px-2 py-3 text-xs text-ink-dim">
                 <BellOff className="w-3.5 h-3.5 flex-shrink-0 opacity-40" />
                 <span>Sin notificaciones</span>
               </div>

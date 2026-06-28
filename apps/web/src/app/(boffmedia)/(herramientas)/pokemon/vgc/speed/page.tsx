@@ -85,12 +85,12 @@ function SpeedPageContent() {
         transition={{ duration: 0.3 }}
         className="flex items-center gap-3"
       >
-        <div className="p-2 rounded-lg bg-primary-500/20 border border-primary-500/30">
-          <Zap className="w-6 h-6 text-primary-400" />
+        <div className="p-2 rounded-lg bg-primary/20 border border-primary/30">
+          <Zap className="w-6 h-6 text-primary-hover" />
         </div>
         <div>
-          <h1 className="text-3xl font-bold text-surface-50">{t("title")}</h1>
-          <p className="text-surface-400 text-sm">{t("subtitle")}</p>
+          <h1 className="text-3xl font-bold text-ink">{t("title")}</h1>
+          <p className="text-ink-muted text-sm">{t("subtitle")}</p>
         </div>
       </motion.div>
 
@@ -107,8 +107,8 @@ function SpeedPageContent() {
             onClick={() => setSelectedReg(reg.id)}
             className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-all ${
               selectedReg === reg.id
-                ? "bg-primary-500/20 border-primary-500/60 text-primary-300"
-                : "border-surface-700 text-surface-400 hover:border-surface-500 hover:text-surface-200"
+                ? "bg-primary/20 border-primary/60 text-primary-hover"
+                : "border-edge text-ink-muted hover:border-edge hover:text-ink"
             }`}
           >
             {reg.name.replace(/\[Gen 9 Champions\]\s*/i, "")}
@@ -117,15 +117,15 @@ function SpeedPageContent() {
       </motion.div>
 
       {/* Tab bar */}
-      <div className="flex items-center gap-1 bg-surface-800/50 rounded-lg p-1 w-fit border border-surface-700">
+      <div className="flex items-center gap-1 bg-layer-2/50 rounded-lg p-1 w-fit border border-edge">
         {(["tiers", "matchup"] as Tab[]).map((tabKey) => (
           <button
             key={tabKey}
             onClick={() => setTab(tabKey)}
             className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
               tab === tabKey
-                ? "bg-primary-500/20 text-primary-300"
-                : "text-surface-400 hover:text-surface-200"
+                ? "bg-primary/20 text-primary-hover"
+                : "text-ink-muted hover:text-ink"
             }`}
           >
             {t(`tabs.${tabKey}`)}

@@ -76,15 +76,15 @@ function EntryCard({
       onDragEnd={onDragEnd}
       onDragOver={onDragOver}
       onDrop={onDrop}
-      className={`border rounded-lg overflow-hidden bg-surface-900/60 transition-all ${
+      className={`border rounded-lg overflow-hidden bg-layer-1/60 transition-all ${
         isDragging ? 'opacity-40' : ''
       } ${
-        isDropTarget ? 'border-primary-500/60 ring-1 ring-primary-500/30' : 'border-surface-700/40'
+        isDropTarget ? 'border-primary/60 ring-1 ring-primary/30' : 'border-edge/40'
       }`}
     >
       {/* Header row */}
       <div className="flex items-start gap-1.5 px-2.5 pt-2 pb-1.5">
-        <GripVertical className="w-3 h-3 shrink-0 mt-0.5 text-surface-700 cursor-grab" />
+        <GripVertical className="w-3 h-3 shrink-0 mt-0.5 text-ink-dim cursor-grab" />
         {renaming ? (
           <input
             ref={inputRef}
@@ -95,12 +95,12 @@ function EntryCard({
               if (e.key === 'Enter') commitRename()
               if (e.key === 'Escape') { setRenameVal(entry.name); setRenaming(false) }
             }}
-            className="flex-1 bg-surface-800 border border-surface-600 rounded px-2 py-0.5 text-xs text-surface-100 focus:outline-none focus:border-primary-500"
+            className="flex-1 bg-layer-2 border border-edge rounded px-2 py-0.5 text-xs text-ink focus:outline-none focus:border-primary"
           />
         ) : (
-          <span className="flex-1 text-xs font-bold text-surface-100 leading-tight">{entry.name}</span>
+          <span className="flex-1 text-xs font-bold text-ink leading-tight">{entry.name}</span>
         )}
-        <span className="text-[9px] text-surface-600 shrink-0 mt-0.5">{dateLabel}</span>
+        <span className="text-[9px] text-ink-dim shrink-0 mt-0.5">{dateLabel}</span>
       </div>
 
       {/* Sprite strip */}
@@ -117,7 +117,7 @@ function EntryCard({
             title={p.name}
           />
         ))}
-        <span className="text-[9px] text-surface-600 ml-auto">
+        <span className="text-[9px] text-ink-dim ml-auto">
           {t('pokemon', { count: entry.pokeList.length })}
         </span>
       </div>
@@ -126,14 +126,14 @@ function EntryCard({
       <div className="flex flex-wrap items-center gap-1 px-2.5 pb-2">
         <ActionBtn onClick={onLoadTeam} title={t('loadAsTeam')} color="orange" />
         <ActionBtn onClick={onLoadMany} title={t('loadAsThreats')} color="violet" />
-        <span className="w-px h-3 bg-surface-700/50" />
+        <span className="w-px h-3 bg-layer-3/50" />
         <button
           type="button"
           onClick={onCopy}
           className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold border transition-all ${
             copying
               ? 'bg-green-500/15 border-green-500/35 text-green-400'
-              : 'bg-surface-800/50 border-surface-700/50 text-surface-500 hover:text-surface-300'
+              : 'bg-layer-2/50 border-edge/50 text-ink-muted hover:text-ink'
           }`}
         >
           {copying ? <Check className="w-2.5 h-2.5" /> : <ClipboardPaste className="w-2.5 h-2.5" />}
@@ -142,7 +142,7 @@ function EntryCard({
         <button
           type="button"
           onClick={() => setExpanded((v) => !v)}
-          className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold border border-surface-700/50 bg-surface-800/50 text-surface-500 hover:text-surface-300 transition-all"
+          className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold border border-edge/50 bg-layer-2/50 text-ink-muted hover:text-ink transition-all"
         >
           {expanded ? <EyeOff className="w-2.5 h-2.5" /> : <Eye className="w-2.5 h-2.5" />}
           {t('view')}
@@ -150,7 +150,7 @@ function EntryCard({
         <button
           type="button"
           onClick={() => { setRenaming(true); setRenameVal(entry.name) }}
-          className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold border border-surface-700/50 bg-surface-800/50 text-surface-500 hover:text-surface-300 transition-all"
+          className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold border border-edge/50 bg-layer-2/50 text-ink-muted hover:text-ink transition-all"
         >
           <Pencil className="w-2.5 h-2.5" />
           {t('rename')}
@@ -158,7 +158,7 @@ function EntryCard({
         <button
           type="button"
           onClick={onDelete}
-          className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold border border-surface-700/50 bg-surface-800/50 text-surface-500 hover:text-red-400 hover:border-red-500/30 transition-all ml-auto"
+          className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold border border-edge/50 bg-layer-2/50 text-ink-muted hover:text-red-400 hover:border-red-500/30 transition-all ml-auto"
         >
           <X className="w-2.5 h-2.5" />
           {t('delete')}
@@ -168,7 +168,7 @@ function EntryCard({
       {/* Paste preview */}
       {expanded && (
         <div className="px-2.5 pb-2.5">
-          <pre className="text-[9px] font-mono text-surface-400 bg-surface-950 border border-surface-700/40 rounded p-2 whitespace-pre-wrap leading-relaxed max-h-40 overflow-y-auto">
+          <pre className="text-[9px] font-mono text-ink-muted bg-base border border-edge/40 rounded p-2 whitespace-pre-wrap leading-relaxed max-h-40 overflow-y-auto">
             {paste}
           </pre>
         </div>
@@ -181,8 +181,8 @@ function ActionBtn({
   onClick, title, color,
 }: { onClick: () => void; title: string; color: 'orange' | 'violet' }) {
   const cls = color === 'orange'
-    ? 'bg-primary-500/10 border-primary-500/30 text-primary-400 hover:bg-primary-500/20'
-    : 'bg-accent-500/10 border-accent-500/30 text-accent-400 hover:bg-accent-500/20'
+    ? 'bg-primary/10 border-primary/30 text-primary-hover hover:bg-primary/20'
+    : 'bg-secondary/10 border-secondary/30 text-secondary-hover hover:bg-secondary/20'
   return (
     <button
       type="button"
@@ -233,17 +233,17 @@ function SaveRow({
           onClick={() => !disabled && setOpen(true)}
           disabled={disabled}
           title={disabled ? disabledTitle : undefined}
-          className="w-full flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-semibold text-surface-500 hover:text-primary-400 disabled:text-surface-700 disabled:cursor-not-allowed transition-colors"
+          className="w-full flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-semibold text-ink-muted hover:text-primary-hover disabled:text-ink-dim disabled:cursor-not-allowed transition-colors"
         >
           <ChevronRight className="w-3 h-3" />
           {label}
           {count > 0 && (
-            <span className="ml-auto text-[9px] text-surface-700">{count}</span>
+            <span className="ml-auto text-[9px] text-ink-dim">{count}</span>
           )}
         </button>
       ) : (
         <div className="px-2.5 py-2 flex items-center gap-1.5">
-          <ChevronDown className="w-3 h-3 text-primary-400 shrink-0" />
+          <ChevronDown className="w-3 h-3 text-primary-hover shrink-0" />
           <input
             ref={inputRef}
             value={name}
@@ -253,20 +253,20 @@ function SaveRow({
               if (e.key === 'Escape') { setOpen(false); setName('') }
             }}
             placeholder={t('namePlaceholder')}
-            className="flex-1 min-w-0 bg-surface-800 border border-surface-600 rounded px-2 py-1 text-xs text-surface-100 placeholder:text-surface-600 focus:outline-none focus:border-primary-500"
+            className="flex-1 min-w-0 bg-layer-2 border border-edge rounded px-2 py-1 text-xs text-ink placeholder:text-ink-dim focus:outline-none focus:border-primary"
           />
           <button
             type="button"
             onClick={commit}
             disabled={!name.trim()}
-            className="px-2 py-1 rounded text-[10px] font-bold bg-primary-500/20 border border-primary-500/40 text-primary-300 hover:bg-primary-500/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all shrink-0"
+            className="px-2 py-1 rounded text-[10px] font-bold bg-primary/20 border border-primary/40 text-primary-hover hover:bg-primary/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all shrink-0"
           >
             {t('saveButton')}
           </button>
           <button
             type="button"
             onClick={() => { setOpen(false); setName('') }}
-            className="text-surface-600 hover:text-surface-300 shrink-0 transition-colors"
+            className="text-ink-dim hover:text-ink shrink-0 transition-colors"
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -329,12 +329,12 @@ function ImportSection({
   }
 
   return (
-    <div className="bg-surface-950/70 border-b border-surface-700/40 px-2.5 py-2.5 flex flex-col gap-2">
+    <div className="bg-base/70 border-b border-edge/40 px-2.5 py-2.5 flex flex-col gap-2">
       <div className="flex items-center justify-between">
-        <span className="text-[10px] font-black uppercase tracking-wider text-surface-400">
+        <span className="text-[10px] font-black uppercase tracking-wider text-ink-muted">
           {t('importTitle')}
         </span>
-        <button type="button" onClick={onClose} className="text-surface-600 hover:text-surface-300 transition-colors">
+        <button type="button" onClick={onClose} className="text-ink-dim hover:text-ink transition-colors">
           <X className="w-3.5 h-3.5" />
         </button>
       </div>
@@ -343,7 +343,7 @@ function ImportSection({
         value={text}
         onChange={(e) => { setText(e.target.value); setError('') }}
         placeholder={t('importPlaceholder')}
-        className="w-full h-28 bg-surface-900 border border-surface-700 rounded px-2 py-1.5 text-[10px] font-mono text-surface-200 placeholder:text-surface-700 focus:outline-none focus:border-primary-500 resize-none"
+        className="w-full h-28 bg-layer-1 border border-edge rounded px-2 py-1.5 text-[10px] font-mono text-ink placeholder:text-ink-dim focus:outline-none focus:border-primary resize-none"
       />
 
       <div className="flex items-center gap-1.5">
@@ -352,13 +352,13 @@ function ImportSection({
           onChange={(e) => { setName(e.target.value); setError('') }}
           onKeyDown={(e) => e.key === 'Enter' && handleSave()}
           placeholder={t('importNamePlaceholder')}
-          className="flex-1 min-w-0 bg-surface-900 border border-surface-700 rounded px-2 py-1 text-[10px] text-surface-200 placeholder:text-surface-700 focus:outline-none focus:border-primary-500"
+          className="flex-1 min-w-0 bg-layer-1 border border-edge rounded px-2 py-1 text-[10px] text-ink placeholder:text-ink-dim focus:outline-none focus:border-primary"
         />
         <button
           type="button"
           onClick={handleSave}
           disabled={!preview.length || !name.trim() || !isLoaded}
-          className="px-2 py-1 rounded text-[10px] font-bold bg-primary-500/20 border border-primary-500/40 text-primary-300 hover:bg-primary-500/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all shrink-0"
+          className="px-2 py-1 rounded text-[10px] font-bold bg-primary/20 border border-primary/40 text-primary-hover hover:bg-primary/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all shrink-0"
         >
           {t('importSave')}
         </button>
@@ -366,7 +366,7 @@ function ImportSection({
 
       {error && <p className="text-[10px] text-red-400">{error}</p>}
       {!error && preview.length > 0 && (
-        <p className="text-[10px] text-surface-600">
+        <p className="text-[10px] text-ink-dim">
           {preview.length} Pokémon {!isLoaded && '· ' + t('importLoading')}
         </p>
       )}
@@ -423,10 +423,10 @@ export function SavedTeamsPanel({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div className="flex flex-col h-full bg-surface-950">
+    <div className="flex flex-col h-full bg-base">
       {/* Header */}
-      <div className="shrink-0 flex items-center justify-between px-3 py-2.5 border-b border-surface-700/40 bg-surface-900/90">
-        <span className="text-[10px] font-black uppercase tracking-widest text-surface-300">
+      <div className="shrink-0 flex items-center justify-between px-3 py-2.5 border-b border-edge/40 bg-layer-1/90">
+        <span className="text-[10px] font-black uppercase tracking-widest text-ink">
           {t('title')}
         </span>
         <div className="flex items-center gap-1.5">
@@ -435,8 +435,8 @@ export function SavedTeamsPanel({ onClose }: { onClose: () => void }) {
             onClick={() => setImportOpen((v) => !v)}
             className={`flex items-center gap-1 px-2 py-1 rounded text-[10px] font-semibold border transition-all ${
               importOpen
-                ? 'bg-primary-500/15 border-primary-500/35 text-primary-400'
-                : 'bg-surface-800/50 border-surface-700/50 text-surface-500 hover:text-surface-200'
+                ? 'bg-primary/15 border-primary/35 text-primary-hover'
+                : 'bg-layer-2/50 border-edge/50 text-ink-muted hover:text-ink'
             }`}
           >
             <ClipboardPaste className="w-3 h-3" />
@@ -445,7 +445,7 @@ export function SavedTeamsPanel({ onClose }: { onClose: () => void }) {
           <button
             type="button"
             onClick={onClose}
-            className="text-surface-600 hover:text-surface-200 transition-colors"
+            className="text-ink-dim hover:text-ink transition-colors"
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -462,7 +462,7 @@ export function SavedTeamsPanel({ onClose }: { onClose: () => void }) {
       )}
 
       {/* Save current team/many */}
-      <div className="shrink-0 border-b border-surface-700/30">
+      <div className="shrink-0 border-b border-edge/30">
         <SaveRow
           label={t('saveTeam')}
           count={team.length}
@@ -484,8 +484,8 @@ export function SavedTeamsPanel({ onClose }: { onClose: () => void }) {
         {saved.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-2 py-12 px-4 text-center">
             <div className="text-3xl opacity-20">💾</div>
-            <p className="text-[11px] font-semibold text-surface-500">{t('empty')}</p>
-            <p className="text-[10px] text-surface-700 leading-relaxed">
+            <p className="text-[11px] font-semibold text-ink-muted">{t('empty')}</p>
+            <p className="text-[10px] text-ink-dim leading-relaxed">
               Save your team or paste a set using the buttons above.
             </p>
           </div>

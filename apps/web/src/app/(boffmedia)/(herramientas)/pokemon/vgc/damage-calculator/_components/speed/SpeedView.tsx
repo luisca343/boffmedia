@@ -227,14 +227,14 @@ function RivalsComparisonList({
 
   if (merged.length === 0) {
     return (
-      <div className="flex-1 flex items-center justify-center text-surface-600 text-sm py-12">
+      <div className="flex-1 flex items-center justify-center text-ink-dim text-sm py-12">
         {t('emptyState')}
       </div>
     )
   }
 
   return (
-    <div className="rounded-lg overflow-hidden border border-surface-700/40">
+    <div className="rounded-lg overflow-hidden border border-edge/40">
       {merged.map((entry, i) => {
         const isMine = entry.side === 'mine'
         const color = isMine ? 'rgb(249,115,22)' : 'rgb(168,85,247)'
@@ -246,7 +246,7 @@ function RivalsComparisonList({
         return (
           <div
             key={`${entry.side}-${entry.name}-${i}`}
-            className="flex items-center gap-3 px-4 py-2.5 border-b border-surface-800/30 last:border-b-0"
+            className="flex items-center gap-3 px-4 py-2.5 border-b border-edge-strong/30 last:border-b-0"
             style={{ background: isMine ? 'rgba(249,115,22,0.04)' : 'rgba(168,85,247,0.04)' }}
           >
             {/* Rank */}
@@ -268,7 +268,7 @@ function RivalsComparisonList({
             <div className="flex-1 min-w-0">
               <div className="font-semibold text-sm leading-tight" style={{ color }}>{entry.name}</div>
               <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                <span className="text-[10px] text-surface-600">{t('baseSpeed', { speed: entry.baseSpe })}</span>
+                <span className="text-[10px] text-ink-dim">{t('baseSpeed', { speed: entry.baseSpe })}</span>
                 {hasItem && (
                   <span
                     className="text-[10px] font-bold px-1.5 py-0.5 rounded"
@@ -410,9 +410,9 @@ export function SpeedView({ useChampions }: Props) {
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
       {/* Controls */}
-      <div className="shrink-0 border-b border-surface-700/40 bg-surface-900/90 px-4 py-2.5 flex flex-col gap-2">
+      <div className="shrink-0 border-b border-edge/40 bg-layer-1/90 px-4 py-2.5 flex flex-col gap-2">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-[9px] font-bold uppercase tracking-wider text-surface-500">{t('level')}</span>
+          <span className="text-[9px] font-bold uppercase tracking-wider text-ink-muted">{t('level')}</span>
           {([50, 100] as const).map((lv) => (
             <button
               key={lv}
@@ -420,8 +420,8 @@ export function SpeedView({ useChampions }: Props) {
               onClick={() => setLevel(lv)}
               className={`px-2.5 py-1 rounded text-xs font-semibold border transition-all ${
                 level === lv
-                  ? 'bg-primary-500/15 border-primary-500/35 text-primary-400'
-                  : 'bg-surface-800/50 border-surface-700/50 text-surface-400 hover:text-surface-200'
+                  ? 'bg-primary/15 border-primary/35 text-primary-hover'
+                  : 'bg-layer-2/50 border-edge/50 text-ink-muted hover:text-ink'
               }`}
             >
               Lv {lv}
@@ -430,14 +430,14 @@ export function SpeedView({ useChampions }: Props) {
 
           {/* Rivals toggle */}
           {hasRivals && (
-            <div className="flex items-center gap-1 ml-2 rounded-md border border-surface-700/50 overflow-hidden">
+            <div className="flex items-center gap-1 ml-2 rounded-md border border-edge/50 overflow-hidden">
               <button
                 type="button"
                 onClick={() => setVsRivalsOnly(true)}
                 className={`px-2.5 py-1 text-xs font-semibold transition-all ${
                   vsRivalsOnly
-                    ? 'bg-accent-500/20 text-accent-300 border-r border-accent-500/30'
-                    : 'text-surface-500 hover:text-surface-300 border-r border-surface-700/50'
+                    ? 'bg-secondary/20 text-secondary-hover border-r border-secondary/30'
+                    : 'text-ink-muted hover:text-ink border-r border-edge/50'
                 }`}
               >
                 {t('vsRivals')}
@@ -447,8 +447,8 @@ export function SpeedView({ useChampions }: Props) {
                 onClick={() => setVsRivalsOnly(false)}
                 className={`px-2.5 py-1 text-xs font-semibold transition-all ${
                   !vsRivalsOnly
-                    ? 'bg-primary-500/15 text-primary-400'
-                    : 'text-surface-500 hover:text-surface-300'
+                    ? 'bg-primary/15 text-primary-hover'
+                    : 'text-ink-muted hover:text-ink'
                 }`}
               >
                 {t('allPokemon')}
@@ -462,7 +462,7 @@ export function SpeedView({ useChampions }: Props) {
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
               placeholder={t('filterPlaceholder')}
-              className="ml-auto w-40 bg-surface-900 border border-surface-700 rounded px-2 py-1 text-xs text-surface-200 placeholder:text-surface-600 focus:outline-none focus:border-primary-500"
+              className="ml-auto w-40 bg-layer-1 border border-edge rounded px-2 py-1 text-xs text-ink placeholder:text-ink-dim focus:outline-none focus:border-primary"
             />
           )}
         </div>
@@ -553,7 +553,7 @@ export function SpeedView({ useChampions }: Props) {
                   )
                 })}
                 {refEntries.length === 0 && (
-                  <p className="text-surface-600 text-sm py-10 w-full text-center">
+                  <p className="text-ink-dim text-sm py-10 w-full text-center">
                     {t('noFilterMatch')}
                   </p>
                 )}

@@ -71,7 +71,7 @@ export default function TopBar({
           {showDropdown && (
             <div className="absolute top-full right-0 mt-2 w-64 bg-white rounded-md shadow-lg z-50 py-2">
               {/* User section */}
-              <div className="px-4 py-2 border-b border-surface-200">
+              <div className="px-4 py-2 border-b border-edge">
                 <p className="text-sm font-medium text-blue-950">{session?.user?.name || "Usuario"}</p>
                 <p className="text-xs text-blue-500">Cambiar cuenta</p>
               </div>
@@ -79,7 +79,7 @@ export default function TopBar({
               {/* Accounts section */}
               <div className="max-h-60 overflow-y-auto py-1">
                 {accounts && accounts.length > 0 ? (
-                  <div className="divide-y divide-surface-100">
+                  <div className="divide-y divide-edge">
                     {accounts.map((account: StarBankAccount) => (
                       <div
                         key={account.id}
@@ -102,19 +102,19 @@ export default function TopBar({
                         </div>
                         {activeAccount!.id === account.id && (
                           <div className="flex-shrink-0 ml-2">
-                            <span className="w-2 h-2 bg-highlight-500 rounded-full inline-block"></span>
+                            <span className="w-2 h-2 bg-warning rounded-full inline-block"></span>
                           </div>
                         )}
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="px-4 py-2 text-sm text-surface-500">No hay cuentas disponibles</p>
+                  <p className="px-4 py-2 text-sm text-ink-muted">No hay cuentas disponibles</p>
                 )}
               </div>
               
               {/* Actions section */}
-              <div className="border-t border-surface-200 pt-1">
+              <div className="border-t border-edge pt-1">
                 <InternalLink href="starbank/cuentas" className="block px-4 py-2 text-sm text-blue-600 hover:bg-blue-100">
                   Gestionar Cuentas
                 </InternalLink>

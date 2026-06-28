@@ -41,7 +41,7 @@ export function GameEvents({ gameId }: GameEventsProps) {
       <div className="space-y-6">
         <h2 className="text-2xl font-bold text-white mb-2">Eventos del Juego</h2>
         <div className="flex justify-center py-8">
-          <div className="animate-spin h-8 w-8 border-2 border-accent-500 rounded-full border-t-transparent"></div>
+          <div className="animate-spin h-8 w-8 border-2 border-secondary rounded-full border-t-transparent"></div>
         </div>
       </div>
     )
@@ -51,7 +51,7 @@ export function GameEvents({ gameId }: GameEventsProps) {
     return (
       <div className="space-y-6">
         <h2 className="text-2xl font-bold text-white mb-2">Eventos del Juego</h2>
-        <div className="text-center py-8 text-surface-300">
+        <div className="text-center py-8 text-ink">
           <p>Error al cargar eventos: {error}</p>
         </div>
       </div>
@@ -63,17 +63,17 @@ export function GameEvents({ gameId }: GameEventsProps) {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-white mb-2">Eventos del Juego</h2>
-          <p className="text-surface-400">{events.length} eventos disponibles</p>
+          <p className="text-ink-muted">{events.length} eventos disponibles</p>
         </div>
         <InternalLink href={`/eventos?game=${gameId}`}>
           <Button variant="accent">Ver todos los eventos →</Button>
         </InternalLink>
       </div>
       {events.length === 0 ? (
-        <div className="bg-surface-800/60 backdrop-blur-sm border-accent-500/20 rounded-2xl py-12 text-center">
-          <Trophy className="w-16 h-16 text-surface-400 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-surface-300 mb-2">No hay eventos disponibles</h3>
-          <p className="text-surface-400 mb-6">
+        <div className="bg-layer-2/60 backdrop-blur-sm border-secondary/20 rounded-2xl py-12 text-center">
+          <Trophy className="w-16 h-16 text-ink-muted mx-auto mb-4" />
+          <h3 className="text-xl font-semibold text-ink mb-2">No hay eventos disponibles</h3>
+          <p className="text-ink-muted mb-6">
             Aún no hay eventos creados para este juego. ¡Vuelve pronto para descubrir nuevas competiciones!
           </p>
           <InternalLink href="/eventos">

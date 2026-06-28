@@ -35,7 +35,7 @@ export function CallMessage({
     if (callData.duration === 0) {
       return <PhoneMissed className="h-5 w-5 text-red-400" />
     }
-    return <Phone className="h-5 w-5 text-highlight-400" />
+    return <Phone className="h-5 w-5 text-warning-hover" />
   }
 
   const getCallStatus = () => {

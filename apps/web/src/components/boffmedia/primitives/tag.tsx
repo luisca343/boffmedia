@@ -12,7 +12,7 @@ interface TagProps {
 
 const toneStyles: Record<string, string> = {
   neutral: "",
-  accent: "text-[var(--accent-bright)] border-[color-mix(in_srgb,var(--accent)_40%,transparent)] bg-[var(--accent-soft)]",
+  accent: "text-secondary-hover border-[color-mix(in_srgb,var(--secondary)_40%,transparent)] bg-secondary-soft",
   orange: "text-orange-400 border-[color-mix(in_srgb,var(--orange-500)_40%,transparent)] bg-[color-mix(in_srgb,var(--orange-500)_12%,transparent)]",
 }
 
@@ -24,8 +24,8 @@ export function Tag({ children, tone = "neutral", onRemove, className }: TagProp
         "text-xs font-semibold",
         "py-1 px-2",
         "rounded-[var(--radius-pill,9999px)]",
-        "border border-solid border-[var(--border-strong)]",
-        "bg-[var(--surface-2)] text-[var(--text-muted)]",
+        "border border-solid border-edge-strong",
+        "bg-layer-2 text-ink-muted",
         "data-[direction=hud]:rounded-[3px]",
         toneStyles[tone],
         className,

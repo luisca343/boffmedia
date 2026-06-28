@@ -27,10 +27,10 @@ interface TeamRowProps {
 
 function SlotDetail({ slot }: { slot: TeamSlot }) {
   return (
-    <div className="flex flex-col items-center text-center p-[0.6rem_0.4rem] border border-[var(--border)] rounded-[var(--radius)] bg-[color-mix(in_srgb,var(--surface-2)_50%,transparent)]">
+    <div className="flex flex-col items-center text-center p-[0.6rem_0.4rem] border border-edge rounded-[var(--radius)] bg-[color-mix(in_srgb,var(--layer-2)_50%,transparent)]">
       <img src={spriteUrl(slot.name)} alt={slot.name} width={48} height={48} className="object-contain" onError={handleSpriteError} />
-      <p className="text-xs font-bold text-[var(--text)] leading-tight mt-1">{slot.name}</p>
-      <p className="text-[10px] text-[var(--text-dim)] mt-0.5">{slot.item}</p>
+      <p className="text-xs font-bold text-ink leading-tight mt-1">{slot.name}</p>
+      <p className="text-[10px] text-ink-dim mt-0.5">{slot.item}</p>
       <span
         className="text-[10px] font-semibold px-1 rounded inline-block mt-0.5"
         style={{ color: "#f5b342", background: "color-mix(in srgb, #f5b342 14%, transparent)" }}
@@ -39,7 +39,7 @@ function SlotDetail({ slot }: { slot: TeamSlot }) {
       </span>
       <ul className="list-none m-[0.25rem_0_0] p-0 flex flex-col gap-px">
         {slot.moves.map((m) => (
-          <li key={m} className="text-[11px] text-[var(--text-muted)] whitespace-nowrap overflow-hidden text-ellipsis">
+          <li key={m} className="text-[11px] text-ink-muted whitespace-nowrap overflow-hidden text-ellipsis">
             {m}
           </li>
         ))}
@@ -54,8 +54,8 @@ export function VgcTeamRow({ entry }: TeamRowProps) {
       header={
         <div className="flex items-center gap-3">
           <div className="flex flex-col min-w-[96px] shrink-0">
-            <span className="text-xs font-bold text-[var(--text)]">{entry.name}</span>
-            <span className="font-mono text-[10px] text-[var(--text-dim)]">{entry.record}</span>
+            <span className="text-xs font-bold text-ink">{entry.name}</span>
+            <span className="font-mono text-[10px] text-ink-dim">{entry.record}</span>
           </div>
           <div className="flex items-center gap-0.5 flex-1 min-w-0">
             {entry.team.slice(0, 6).map((s) => (

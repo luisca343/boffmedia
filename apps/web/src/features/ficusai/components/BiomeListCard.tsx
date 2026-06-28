@@ -11,14 +11,14 @@ export default function BiomeListCard({ biomes }: BiomeListCardProps) {
   const t = useTranslations("pokedex");
   
   return (
-    <div className="bg-surface-700/50 rounded-lg p-4 mt-3 border border-surface-600">
-      <h3 className="text-lg font-bold text-surface-100 mb-4">Biomas</h3>
+    <div className="bg-layer-3/50 rounded-lg p-4 mt-3 border border-edge">
+      <h3 className="text-lg font-bold text-ink mb-4">Biomas</h3>
       <div className="flex flex-wrap gap-2">
         {biomes.map((biome, index) => (
           <Badge 
             key={index}
             variant="outline"
-            className="bg-highlight-600/20 border-highlight-500 text-highlight-300 hover:bg-highlight-600/30"
+            className="bg-warning/20 border-warning-border text-warning-hover hover:bg-warning/30"
           >
             {getTranslatedBiomeName(biome, t)}
           </Badge>

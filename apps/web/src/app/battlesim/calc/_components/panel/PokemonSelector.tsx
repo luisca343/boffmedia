@@ -15,9 +15,9 @@ export default function PokemonSelector({
 }: PokemonSelectorProps) {
   return (
     <div className="mb-4">
-      <label className="block text-xs font-medium mb-1 text-surface-200">{title}</label>
+      <label className="block text-xs font-medium mb-1 text-ink">{title}</label>
       <select 
-        className="w-full p-1 border rounded bg-surface-700 border-surface-600 text-surface-100 focus:ring-primary-500 focus:border-primary-500 text-sm"
+        className="w-full p-1 border rounded bg-layer-3 border-edge text-ink focus:ring-primary focus:border-primary text-sm"
         value={selectedPokemonId} 
         onChange={(e) => onChange(e.target.value)}
       >

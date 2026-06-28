@@ -32,36 +32,36 @@ export function TransactionDialog({ transaction, isOpen, onClose }: TransactionD
         <div className="space-y-4 mt-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-sm text-surface-500">Tipo</p>
+              <p className="text-sm text-ink-muted">Tipo</p>
               <p className="font-medium">{transaction.type}</p>
             </div>
             <div>
-              <p className="text-sm text-surface-500">Monto</p>
-              <p className={`font-medium ${transaction.isIncome ? 'text-highlight-600' : 'text-red-600'}`}>
+              <p className="text-sm text-ink-muted">Monto</p>
+              <p className={`font-medium ${transaction.isIncome ? 'text-warning' : 'text-red-600'}`}>
                 {transaction.isIncome ? '+' : '-'}{formatMoney(transaction.amount)}
               </p>
             </div>
           </div>
           
           <div>
-            <p className="text-sm text-surface-500">Concepto</p>
+            <p className="text-sm text-ink-muted">Concepto</p>
             <p className="font-medium">{transaction.reason || "Sin concepto"}</p>
           </div>
           
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-sm text-surface-500">Emisor</p>
+              <p className="text-sm text-ink-muted">Emisor</p>
               <p className="font-medium">{transaction.fromName || "Desconocido"}</p>
             </div>
             <div>
-              <p className="text-sm text-surface-500">Receptor</p>
+              <p className="text-sm text-ink-muted">Receptor</p>
               <p className="font-medium">{transaction.toName || "Desconocido"}</p>
             </div>
           </div>
           
           {transaction.fromBalance !== undefined && (
             <div>
-              <p className="text-sm text-surface-500">Nuevo saldo</p>
+              <p className="text-sm text-ink-muted">Nuevo saldo</p>
               <p className="font-medium">{formatMoney(transaction.fromBalance)}</p>
             </div>
           )}

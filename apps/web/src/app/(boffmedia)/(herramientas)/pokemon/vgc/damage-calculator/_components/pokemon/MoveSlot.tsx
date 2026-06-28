@@ -65,15 +65,15 @@ export function MoveSlot({ move, index, onChange, accentColor = 'primary' }: Pro
   }
 
   const typeColor = TYPE_COLORS[move.type] ?? '#9ca3af'
-  const borderFocus = accentColor === 'primary' ? 'focus:border-primary-500' : 'focus:border-accent-500'
-  const ctrlCls = 'bg-surface-950/80 border border-surface-700/60 rounded px-1 py-1 text-xs focus:outline-none focus:border-surface-500'
+  const borderFocus = accentColor === 'primary' ? 'focus:border-primary' : 'focus:border-secondary'
+  const ctrlCls = 'bg-base/80 border border-edge/60 rounded px-1 py-1 text-xs focus:outline-none focus:border-edge'
 
   return (
     <div className="flex items-center gap-1">
       {/* Move name search */}
       <div ref={ref} className="relative flex-1 min-w-0">
         <input
-          className={`w-full bg-surface-950/80 border border-surface-700/60 rounded px-2 py-1 text-xs font-semibold text-surface-200 placeholder:text-surface-600 focus:outline-none ${borderFocus} transition-colors`}
+          className={`w-full bg-base/80 border border-edge/60 rounded px-2 py-1 text-xs font-semibold text-ink placeholder:text-ink-dim focus:outline-none ${borderFocus} transition-colors`}
           value={query}
           placeholder={t('movePlaceholder', { n: index + 1 })}
           onFocus={() => setOpen(true)}
@@ -85,13 +85,13 @@ export function MoveSlot({ move, index, onChange, accentColor = 'primary' }: Pro
         />
 
         {open && !isLoaded && (
-          <div className="absolute top-full left-0 right-0 z-50 mt-0.5 bg-surface-900 border border-surface-700 rounded-lg shadow-2xl px-3 py-2">
-            <span className="text-[11px] text-surface-500 italic">{t('loadingMoves')}</span>
+          <div className="absolute top-full left-0 right-0 z-50 mt-0.5 bg-layer-1 border border-edge rounded-lg shadow-2xl px-3 py-2">
+            <span className="text-[11px] text-ink-muted italic">{t('loadingMoves')}</span>
           </div>
         )}
 
         {open && isLoaded && filtered.length > 0 && (
-          <div className="absolute top-full left-0 right-0 z-50 mt-0.5 bg-surface-900 border border-surface-700 rounded-lg shadow-2xl max-h-44 overflow-y-auto">
+          <div className="absolute top-full left-0 right-0 z-50 mt-0.5 bg-layer-1 border border-edge rounded-lg shadow-2xl max-h-44 overflow-y-auto">
             {filtered.map((name) => {
               const data = moveMap.get(name)
               if (!data) return null
@@ -101,7 +101,7 @@ export function MoveSlot({ move, index, onChange, accentColor = 'primary' }: Pro
                   key={name}
                   type="button"
                   onMouseDown={() => selectMove(name)}
-                  className="w-full flex items-center gap-2 px-2 py-1 text-left hover:bg-surface-800 transition-colors"
+                  className="w-full flex items-center gap-2 px-2 py-1 text-left hover:bg-layer-2 transition-colors"
                 >
                   <span
                     className="text-[9px] font-bold px-1.5 py-0.5 rounded"
@@ -109,8 +109,8 @@ export function MoveSlot({ move, index, onChange, accentColor = 'primary' }: Pro
                   >
                     {data.type}
                   </span>
-                  <span className="text-xs font-semibold text-surface-200 flex-1 truncate">{name}</span>
-                  <span className="text-[10px] text-surface-500 font-mono">
+                  <span className="text-xs font-semibold text-ink flex-1 truncate">{name}</span>
+                  <span className="text-[10px] text-ink-muted font-mono">
                     {data.basePower > 0 ? data.basePower : '—'}
                   </span>
                 </button>
@@ -127,7 +127,7 @@ export function MoveSlot({ move, index, onChange, accentColor = 'primary' }: Pro
         max={999}
         value={move.bp}
         onChange={(e) => onChange({ bp: Math.max(0, parseInt(e.target.value) || 0) })}
-        className={`w-12 font-mono text-center text-surface-200 ${ctrlCls}`}
+        className={`w-12 font-mono text-center text-ink ${ctrlCls}`}
         title={t('basePower')}
       />
 
@@ -147,7 +147,7 @@ export function MoveSlot({ move, index, onChange, accentColor = 'primary' }: Pro
       <select
         value={move.category}
         onChange={(e) => onChange({ category: e.target.value as CalcMove['category'] })}
-        className={`w-24 text-[10px] text-surface-300 ${ctrlCls}`}
+        className={`w-24 text-[10px] text-ink ${ctrlCls}`}
       >
         <option value="Physical">{t('categoryPhysical')}</option>
         <option value="Special">{t('categorySpecial')}</option>
@@ -161,8 +161,8 @@ export function MoveSlot({ move, index, onChange, accentColor = 'primary' }: Pro
         title="Critical hit"
         className={`w-5 h-[26px] flex items-center justify-center rounded border text-[9px] font-bold transition-all ${
           move.crit
-            ? 'bg-error-500/15 border-error-500/40 text-error-400'
-            : 'bg-surface-800 border-surface-700 text-surface-500 hover:text-surface-400'
+            ? 'bg-danger/15 border-danger-border/40 text-danger-hover'
+            : 'bg-layer-2 border-edge text-ink-muted hover:text-ink-muted'
         }`}
       >
         C
@@ -173,7 +173,7 @@ export function MoveSlot({ move, index, onChange, accentColor = 'primary' }: Pro
         <button
           type="button"
           onClick={clearMove}
-          className="w-3 text-surface-600 hover:text-surface-400 text-xs text-center leading-none"
+          className="w-3 text-ink-dim hover:text-ink-muted text-xs text-center leading-none"
         >
           ×
         </button>

@@ -76,7 +76,7 @@ export function ChatPanel({
                 {formatTime(msg.timestamp)}
               </span>
             )}
-            <span style={{ color: 'var(--accent-bright)', fontWeight: 600 }}>{msg.sender}: </span>
+            <span style={{ color: 'var(--secondary-hover)', fontWeight: 600 }}>{msg.sender}: </span>
             <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(msg.message) }} />
           </div>
         ))}
@@ -90,14 +90,14 @@ export function ChatPanel({
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && send()}
             className="bsx-focus flex-1 px-2 py-1.5 rounded-[var(--radius-sm)] text-t-xs"
-            style={{ background: 'var(--surface-2)', border: '1px solid var(--border)', color: 'var(--text)' }}
+            style={{ background: 'var(--layer-2)', border: '1px solid var(--border)', color: 'var(--text)' }}
             aria-label={placeholder ?? t('chat.placeholder')}
           />
           <button
             onClick={send}
             disabled={!input.trim()}
             className="bsx-focus px-3 py-1.5 rounded-[var(--radius-sm)] text-t-xs font-medium disabled:opacity-50"
-            style={{ background: 'var(--surface-3)', color: 'var(--text)', border: '1px solid var(--border)' }}
+            style={{ background: 'var(--layer-3)', color: 'var(--text)', border: '1px solid var(--border)' }}
           >
             {t('chat.send')}
           </button>

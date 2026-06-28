@@ -168,25 +168,25 @@ function Spec2({
  children: React.ReactNode
 }) {
  return (
-  <section className="py-8 pb-10 border-b border-[var(--border)] last:border-b-0 scroll-mt-[90px]">
+  <section className="py-8 pb-10 border-b border-edge last:border-b-0 scroll-mt-[90px]">
    <div className="flex items-baseline gap-[0.8rem] mb-2 flex-wrap">
     <h3 className="text-[length:var(--t-xl)]">{title}</h3>
     {tag && (
-     <span className="font-mono text-[length:var(--t-xs)] text-[color:var(--text-dim)] px-2 py-[0.15rem] border border-[var(--border)] rounded-[var(--radius-pill)]">
+     <span className="font-mono text-[length:var(--t-xs)] text-ink-dim px-2 py-[0.15rem] border border-edge rounded-[var(--radius-pill)]">
       {tag}
      </span>
     )}
    </div>
    {intro && (
-    <p className="text-[length:var(--t-sm)] text-[color:var(--text-muted)] max-w-[66ch] mb-[1.4rem] leading-[1.6]">
+    <p className="text-[length:var(--t-sm)] text-ink-muted max-w-[66ch] mb-[1.4rem] leading-[1.6]">
      {intro}
     </p>
    )}
-   <div className="p-7 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface-2)] bg-[radial-gradient(var(--grid-dot)_1px,transparent_1px)] bg-[length:22px_22px] flex flex-col gap-5">
+   <div className="p-7 rounded-[var(--radius-lg)] border border-edge bg-layer-2 bg-[radial-gradient(var(--grid-dot)_1px,transparent_1px)] bg-[length:22px_22px] flex flex-col gap-5">
     {children}
    </div>
    {a11y && (
-    <p className="flex gap-[0.55rem] items-start mt-4 text-[length:var(--t-xs)] text-[color:var(--text-dim)] leading-[1.5] [&_svg]:text-[color:var(--emerald-400)] [&_svg]:shrink-0 [&_svg]:mt-px">
+    <p className="flex gap-[0.55rem] items-start mt-4 text-[length:var(--t-xs)] text-ink-dim leading-[1.5] [&_svg]:text-[color:var(--emerald-400)] [&_svg]:shrink-0 [&_svg]:mt-px">
      <Icon name="shield" size={14} />
      <span>{a11y}</span>
     </p>
@@ -219,7 +219,7 @@ function Row3({ children }: { children: React.ReactNode }) {
 
 function Sub({ children }: { children: React.ReactNode }) {
  return (
-  <p className="dsh-sub font-mono text-[length:var(--t-xs)] tracking-[0.14em] uppercase text-[color:var(--text-dim)] mt-9 mb-4 flex items-center gap-3">
+  <p className="dsh-sub font-mono text-[length:var(--t-xs)] tracking-[0.14em] uppercase text-ink-dim mt-9 mb-4 flex items-center gap-3">
    {children}
   </p>
  )
@@ -233,7 +233,7 @@ function PropTable({ rows }: { rows: string[][] }) {
      {["Prop", "Tipo", "Defecto", "Descripción"].map((h) => (
       <th
        key={h}
-       className="text-left font-mono text-[length:var(--t-xs)] tracking-[0.08em] uppercase text-[color:var(--text-dim)] py-[0.6rem] px-[0.8rem] border-b border-[var(--border-strong)]"
+       className="text-left font-mono text-[length:var(--t-xs)] tracking-[0.08em] uppercase text-ink-dim py-[0.6rem] px-[0.8rem] border-b border-edge-strong"
       >
        {h}
       </th>
@@ -243,16 +243,16 @@ function PropTable({ rows }: { rows: string[][] }) {
    <tbody>
     {rows.map((r) => (
      <tr key={r[0]}>
-      <td className="py-[0.65rem] px-[0.8rem] border-b border-[var(--border)] align-top font-mono text-[color:var(--accent-bright)] whitespace-nowrap">
+      <td className="py-[0.65rem] px-[0.8rem] border-b border-edge align-top font-mono text-secondary-hover whitespace-nowrap">
        {r[0]}
       </td>
-      <td className="py-[0.65rem] px-[0.8rem] border-b border-[var(--border)] align-top text-[color:var(--text-muted)]">
-       <code className="font-mono text-[0.85em] text-[color:var(--text-dim)]">{r[1]}</code>
+      <td className="py-[0.65rem] px-[0.8rem] border-b border-edge align-top text-ink-muted">
+       <code className="font-mono text-[0.85em] text-ink-dim">{r[1]}</code>
       </td>
-      <td className="py-[0.65rem] px-[0.8rem] border-b border-[var(--border)] align-top text-[color:var(--text-muted)]">
-       <code className="font-mono text-[0.85em] text-[color:var(--text-dim)]">{r[2]}</code>
+      <td className="py-[0.65rem] px-[0.8rem] border-b border-edge align-top text-ink-muted">
+       <code className="font-mono text-[0.85em] text-ink-dim">{r[2]}</code>
       </td>
-      <td className="py-[0.65rem] px-[0.8rem] border-b border-[var(--border)] align-top text-[color:var(--text-muted)]">
+      <td className="py-[0.65rem] px-[0.8rem] border-b border-edge align-top text-ink-muted">
        {r[3]}
       </td>
      </tr>
@@ -304,10 +304,10 @@ const HUB_NAV = [
 function OverviewSection() {
  return (
   <div>
-   <div className="mb-8 pb-6 border-b border-[var(--border)]">
+   <div className="mb-8 pb-6 border-b border-edge">
     <Kicker>Resumen</Kicker>
     <h2 className="text-[length:var(--t-3xl)] mt-2.5">Un solo sistema para toda la plataforma</h2>
-    <p className="text-[length:var(--t-base)] text-[color:var(--text-muted)] max-w-[64ch] mt-[0.7rem] leading-[1.65]">
+    <p className="text-[length:var(--t-base)] text-ink-muted max-w-[64ch] mt-[0.7rem] leading-[1.65]">
      Este Hub es la fuente de verdad del frontend de BoffMedia. Centraliza
      tokens, primitivos, composiciones y patrones para que cada pantalla —
      Inicio, Herramientas, Perfil, Comunidad — se construya con las mismas
@@ -317,27 +317,27 @@ function OverviewSection() {
    </div>
 
    <Sub>El sistema hoy · auditoría</Sub>
-   <p className="text-[length:var(--t-sm)] text-[color:var(--text-muted)] max-w-[70ch] mb-[1.4rem] leading-relaxed">
+   <p className="text-[length:var(--t-sm)] text-ink-muted max-w-[70ch] mb-[1.4rem] leading-relaxed">
     El rediseño ya estableció una base sólida: un sistema de tokens
     completo (3 direcciones × 2 temas × acento variable) y dos capas de
     componentes. Pero la documentación vivía dispersa y faltaba inventario
     formal. Diagnóstico honesto:
    </p>
    <div className="grid grid-cols-2 gap-[1.125rem] mb-6 max-[620px]:grid-cols-1">
-    <div className="p-[1.4rem] rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--card-bg)]">
+    <div className="p-[1.4rem] rounded-[var(--radius-lg)] border border-edge bg-[var(--card-bg)]">
      <span className="font-mono text-[length:var(--t-xs)] text-[color:var(--orange-500)] font-bold">FORTALEZAS</span>
      <h4 className="text-[length:var(--t-lg)] mt-2.5 mb-2">Tokens maduros</h4>
-     <p className="text-[length:var(--t-sm)] text-[color:var(--text-muted)] leading-[1.6]">
-      <code className="font-mono text-[color:var(--accent-bright)]">styles.css</code>{" "}
+     <p className="text-[length:var(--t-sm)] text-ink-muted leading-[1.6]">
+      <code className="font-mono text-secondary-hover">styles.css</code>{" "}
       ya define marca, superficies, tipografía, espacio, radios y
       movimiento. La separación primitivo / compuesto está documentada en
       código.
      </p>
     </div>
-    <div className="p-[1.4rem] rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--card-bg)]">
+    <div className="p-[1.4rem] rounded-[var(--radius-lg)] border border-edge bg-[var(--card-bg)]">
      <span className="font-mono text-[length:var(--t-xs)] text-[color:var(--rose-400)] font-bold">DEUDA</span>
      <h4 className="text-[length:var(--t-lg)] mt-2.5 mb-2">Catálogo incompleto</h4>
-     <p className="text-[length:var(--t-sm)] text-[color:var(--text-muted)] leading-[1.6]">
+     <p className="text-[length:var(--t-sm)] text-ink-muted leading-[1.6]">
       Faltaban componentes clave (modal, toast, popover, slider,
       paginación, KPI) y no existía un inventario navegable ni guía de
       accesibilidad por componente. Esto causaba reinvención y clases
@@ -347,7 +347,7 @@ function OverviewSection() {
    </div>
 
    <Sub>Arquitectura · cuatro capas</Sub>
-   <p className="text-[length:var(--t-sm)] text-[color:var(--text-muted)] max-w-[70ch] mb-[1.4rem] leading-relaxed">
+   <p className="text-[length:var(--t-sm)] text-ink-muted max-w-[70ch] mb-[1.4rem] leading-relaxed">
     El sistema se organiza en capas. Cada una consume solo la de debajo.
     Nunca se salta hacia arriba.
    </p>
@@ -384,7 +384,7 @@ function OverviewSection() {
     ].map(([n, t, d, f, tone]) => (
      <div
       key={n}
-      className="flex gap-[1.125rem] items-center py-[1.125rem] px-5 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--card-bg)]"
+      className="flex gap-[1.125rem] items-center py-[1.125rem] px-5 rounded-[var(--radius-lg)] border border-edge bg-[var(--card-bg)]"
      >
       <span
        className="font-display font-black text-[length:var(--t-2xl)] min-w-[44px]"
@@ -394,16 +394,16 @@ function OverviewSection() {
           ? "var(--orange-500)"
           : tone === "purple"
           ? "var(--purple-400)"
-          : "var(--accent-bright)",
+          : "var(--secondary-hover)",
        }}
       >
        {n}
       </span>
       <div className="flex-1 min-w-0">
          <div className="font-display font-bold text-[length:var(--t-base)]">{t}</div>
-       <div className="text-[color:var(--text-muted)] text-[length:var(--t-sm)] mt-[0.125rem]">{d}</div>
+       <div className="text-ink-muted text-[length:var(--t-sm)] mt-[0.125rem]">{d}</div>
       </div>
-      <code className="font-mono text-[length:var(--t-xs)] text-[color:var(--text-dim)] whitespace-nowrap">
+      <code className="font-mono text-[length:var(--t-xs)] text-ink-dim whitespace-nowrap">
        {f}
       </code>
      </div>
@@ -497,27 +497,27 @@ const PRINCIPLES = [
 function PhilosophySection() {
  return (
   <div>
-   <div className="mb-8 pb-6 border-b border-[var(--border)]">
+   <div className="mb-8 pb-6 border-b border-edge">
     <Kicker>Filosofía</Kicker>
     <h2 className="text-[length:var(--t-3xl)] mt-2.5">Seis principios que mandan</h2>
-    <p className="text-[length:var(--t-base)] text-[color:var(--text-muted)] max-w-[64ch] mt-[0.7rem] leading-[1.65]">
+    <p className="text-[length:var(--t-base)] text-ink-muted max-w-[64ch] mt-[0.7rem] leading-[1.65]">
      Las decisiones de diseño no se discuten pantalla a pantalla. Se
      resuelven una vez, aquí, y se aplican en todo el producto.
     </p>
    </div>
    <div className="grid grid-cols-2 gap-[1.125rem] max-[620px]:grid-cols-1">
     {PRINCIPLES.map(([n, t, d]) => (
-     <div key={n} className="p-[1.4rem] rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--card-bg)]">
+     <div key={n} className="p-[1.4rem] rounded-[var(--radius-lg)] border border-edge bg-[var(--card-bg)]">
       <span className="font-mono text-[length:var(--t-xs)] text-[color:var(--orange-500)] font-bold">{n}</span>
       <h4 className="text-[length:var(--t-lg)] mt-2.5 mb-2">{t}</h4>
-      <p className="text-[length:var(--t-sm)] text-[color:var(--text-muted)] leading-[1.6]">{d}</p>
+      <p className="text-[length:var(--t-sm)] text-ink-muted leading-[1.6]">{d}</p>
      </div>
     ))}
    </div>
 
    <Sub>Primitivo vs. componente</Sub>
    <div className="grid grid-cols-2 gap-[1.125rem] max-[1000px]:grid-cols-1">
-    <div className="dodont__col py-5 px-5 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface-2)]">
+    <div className="dodont__col py-5 px-5 rounded-[var(--radius-lg)] border border-edge bg-layer-2">
      <div className="flex items-center gap-2 font-bold text-[length:var(--t-sm)] mb-[0.875rem] text-[color:var(--emerald-400)]">
       <Icon name="check" size={16} />
       Usa un variant
@@ -535,7 +535,7 @@ function PhilosophySection() {
       </li>
      </ul>
     </div>
-    <div className="dodont__col py-5 px-5 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface-2)]">
+    <div className="dodont__col py-5 px-5 rounded-[var(--radius-lg)] border border-edge bg-layer-2">
      <div className="flex items-center gap-2 font-bold text-[length:var(--t-sm)] mb-[0.875rem] text-[color:var(--rose-400)]">
       <Icon name="x" size={16} />
       Crea un componente
@@ -562,32 +562,62 @@ function PhilosophySection() {
 // ============================================================================
 // 3. FOUNDATIONS
 // ============================================================================
-const BRAND = [
- { name: "orange-300", value: "#fdba74" },
- { name: "orange-400", value: "#fb923c" },
- { name: "orange-500", value: "#f97316" },
- { name: "orange-600", value: "#ea580c" },
- { name: "orange-700", value: "#c2410c" },
+
+// Layer tokens — theme-aware (react to dark/light toggle)
+const LAYER_TOKENS = [
+ { token: "--bg",      label: "fondo base",         desc: "App background" },
+ { token: "--layer-1", label: "capa 1 · tarjeta",   desc: "Cards & primary surfaces" },
+ { token: "--layer-2", label: "capa 2 · elevado",   desc: "Inputs & elevated panels" },
+ { token: "--layer-3", label: "capa 3 · overlay",   desc: "Popovers & dialogs" },
 ]
-const SUPPORT = [
- { name: "cyan-400", value: "#22d3ee" },
- { name: "cyan-500", value: "#06b6d4" },
- { name: "cyan-600", value: "#0891b2" },
- { name: "purple-400", value: "#c084fc" },
- { name: "purple-500", value: "#a855f7" },
- { name: "purple-600", value: "#9333ea" },
+
+// Brand role tokens — primary (orange)
+const PRIMARY_TOKENS = [
+ { token: "--primary",        label: "primary",        desc: "Acción héroe" },
+ { token: "--primary-hover",  label: "primary-hover",  desc: "Hover" },
+ { token: "--primary-active", label: "primary-active", desc: "Active / pressed" },
+ { token: "--primary-soft",   label: "primary-soft",   desc: "Fondo tintado" },
 ]
-const SEMANTIC = [
- { name: "emerald · éxito", value: "#10b981" },
- { name: "amber · aviso", value: "#fbbf24" },
- { name: "rose · error", value: "#f43f5e" },
- { name: "cyan · info", value: "#06b6d4" },
+
+// Brand role tokens — secondary (cyan)
+const SECONDARY_TOKENS = [
+ { token: "--secondary",        label: "secondary",        desc: "Color soporte" },
+ { token: "--secondary-hover",  label: "secondary-hover",  desc: "Hover" },
+ { token: "--secondary-active", label: "secondary-active", desc: "Active / pressed" },
+ { token: "--secondary-soft",   label: "secondary-soft",   desc: "Fondo tintado" },
 ]
-const SURFACES = [
- { name: "--bg", value: "fondo base" },
- { name: "--surface", value: "tarjeta" },
- { name: "--surface-2", value: "elevado" },
- { name: "--surface-3", value: "elevado +" },
+
+// Semantic status groups
+const STATUS_GROUPS = [
+ { key: "success", label: "Éxito",   base: "--success", soft: "--success-soft", border: "--success-border" },
+ { key: "warning", label: "Aviso",   base: "--warning", soft: "--warning-soft", border: "--warning-border" },
+ { key: "danger",  label: "Peligro", base: "--danger",  soft: "--danger-soft",  border: "--danger-border"  },
+ { key: "info",    label: "Info",    base: "--info",    soft: "--info-soft",     border: "--info-border"    },
+]
+
+// Chart palette
+const CHART_TOKENS = ["--chart-1","--chart-2","--chart-3","--chart-4","--chart-5","--chart-6","--chart-7","--chart-8"]
+
+// Brand constants — fixed hex, never vary by theme
+const BRAND_CONSTANTS = [
+ { group: "Orange (primary brand)", tokens: [
+  { label: "--orange-300", value: "#fdba74" }, { label: "--orange-400", value: "#fb923c" },
+  { label: "--orange-500", value: "#f97316" }, { label: "--orange-600", value: "#ea580c" },
+  { label: "--orange-700", value: "#c2410c" },
+ ]},
+ { group: "Cyan (secondary brand)", tokens: [
+  { label: "--cyan-300", value: "#67e8f9" }, { label: "--cyan-400", value: "#22d3ee" },
+  { label: "--cyan-500", value: "#06b6d4" }, { label: "--cyan-600", value: "#0891b2" },
+ ]},
+ { group: "Purple (accent / rare)", tokens: [
+  { label: "--purple-400", value: "#c084fc" }, { label: "--purple-500", value: "#a855f7" },
+  { label: "--purple-600", value: "#9333ea" },
+ ]},
+ { group: "Misc status constants", tokens: [
+  { label: "--emerald-400", value: "#34d399" }, { label: "--emerald-500", value: "#10b981" },
+  { label: "--amber-400",   value: "#fbbf24" }, { label: "--rose-400",    value: "#fb7185" },
+  { label: "--rose-500",    value: "#f43f5e" },
+ ]},
 ]
 const TYPE_SCALE = [
  ["--t-6xl", "5rem / 80px", "Display"],
@@ -615,66 +645,202 @@ const SPACING = [
 function FoundationsSection() {
  return (
   <div>
-   <div className="mb-8 pb-6 border-b border-[var(--border)]">
+   <div className="mb-8 pb-6 border-b border-edge">
     <Kicker>Fundamentos</Kicker>
     <h2 className="text-[length:var(--t-3xl)] mt-2.5">Tokens & escalas</h2>
-    <p className="text-[length:var(--t-base)] text-[color:var(--text-muted)] max-w-[64ch] mt-[0.7rem] leading-[1.65]">
+    <p className="text-[length:var(--t-base)] text-ink-muted max-w-[64ch] mt-[0.7rem] leading-[1.65]">
      El vocabulario más bajo del sistema. Todo — color, tipo, espacio,
      forma, movimiento — sale de aquí. Cambia un token y cambia toda la
      plataforma de forma coherente.
     </p>
    </div>
 
-   <Sub>Color · marca</Sub>
-   <p className="text-[length:var(--t-sm)] text-[color:var(--text-muted)] max-w-[66ch] mb-[1.4rem] leading-[1.6]">
-    Naranja es el héroe (acción, marca). Cian acompaña; morado se reserva
-    para lo raro o especial. Constantes — no varían por tema.
+   {/* ── Foundation: layer surfaces ────────────────────────────────────── */}
+   <Sub>Color · capas de superficie</Sub>
+   <p className="text-[length:var(--t-sm)] text-ink-muted max-w-[66ch] mb-[1.4rem] leading-[1.6]">
+    Cuatro capas semánticas. Viven en <code>[data-theme]</code> — cambian con el tema de forma coherente.
    </p>
-   <div className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-[0.85rem]">
-    {BRAND.map((s) => (
-     <div key={s.name} className="rounded-[var(--radius-lg)] overflow-hidden border border-[var(--border)] bg-[var(--surface-2)]">
-      <div className="h-[76px]" style={{ background: s.value }} />
-      <div className="py-2.5 px-3">
-       <div className="text-[length:var(--t-sm)] font-semibold">{s.name}</div>
-       <div className="font-mono text-[length:var(--t-xs)] text-[color:var(--text-dim)] mt-px">{s.value}</div>
+   <div className="grid grid-cols-4 gap-[0.85rem] max-[640px]:grid-cols-2">
+    {LAYER_TOKENS.map((t) => (
+     <div key={t.token} className="rounded-[var(--radius-lg)] overflow-hidden border border-edge">
+      <div className="h-[64px] border-b border-edge" style={{ background: `var(${t.token})` }} />
+      <div className="py-2.5 px-3 bg-layer-2">
+       <div className="font-mono text-[length:var(--t-xs)] text-ink-muted">{t.token}</div>
+       <div className="font-mono text-[0.66rem] text-ink-dim mt-px leading-tight">{t.label}</div>
       </div>
      </div>
     ))}
    </div>
 
-   <Sub>Color · apoyo & semántico</Sub>
-   <div className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-[0.85rem]">
-    {[...SUPPORT, ...SEMANTIC].map((s) => (
-     <div key={s.name} className="rounded-[var(--radius-lg)] overflow-hidden border border-[var(--border)] bg-[var(--surface-2)]">
-      <div className="h-[76px]" style={{ background: s.value }} />
-      <div className="py-2.5 px-3">
-       <div className="text-[length:var(--t-sm)] font-semibold">{s.name}</div>
-       <div className="font-mono text-[length:var(--t-xs)] text-[color:var(--text-dim)] mt-px">{s.value}</div>
+   {/* ── Foundation: typography tokens ──────────────────────────────────── */}
+   <div className="mt-4 rounded-[var(--radius-lg)] border border-edge bg-layer-2 divide-y divide-[var(--divider)]">
+    {[
+     { token: "--text",       sample: "Texto principal — legible, alto contraste" },
+     { token: "--text-muted", sample: "Texto secundario · metadatos y descripciones" },
+     { token: "--text-dim",   sample: "Deshabilitado · placeholders · hints" },
+    ].map((t) => (
+     <div key={t.token} className="flex items-center gap-4 px-4 py-3">
+      <span className="font-mono text-[length:var(--t-xs)] text-ink-dim min-w-[120px]">{t.token}</span>
+      <span className="text-[length:var(--t-sm)]" style={{ color: `var(${t.token})` }}>{t.sample}</span>
+     </div>
+    ))}
+   </div>
+
+   {/* ── Foundation: border & divider tokens ───────────────────────────── */}
+   <div className="mt-4 grid grid-cols-2 gap-3 max-[640px]:grid-cols-1">
+    {[
+     { token: "--border",         label: "border",         desc: "Borde estándar" },
+     { token: "--border-strong",  label: "border-strong",  desc: "Borde énfasis" },
+     { token: "--divider",        label: "divider",        desc: "Separador suave" },
+     { token: "--divider-strong", label: "divider-strong", desc: "Separador marcado" },
+    ].map((t) => (
+     <div key={t.token} className="flex items-center gap-4 px-4 py-3 rounded-[var(--radius)] border border-edge bg-layer-2">
+      <div className="w-12 h-0" style={{ borderTop: `2px solid var(${t.token})` }} />
+      <span className="font-mono text-[length:var(--t-xs)] text-secondary-hover">{t.token}</span>
+      <span className="text-[length:var(--t-xs)] text-ink-dim ml-auto">{t.desc}</span>
+     </div>
+    ))}
+   </div>
+
+   {/* ── Brand: primary & secondary ─────────────────────────────────────── */}
+   <Sub>Color · marca</Sub>
+   <p className="text-[length:var(--t-sm)] text-ink-muted max-w-[66ch] mb-[1.4rem] leading-[1.6]">
+    Roles semánticos — nunca color raw en componentes. <code>--on-*</code> garantiza contraste sobre fondos de color.
+   </p>
+   <div className="grid grid-cols-2 gap-5 max-[640px]:grid-cols-1">
+    {[
+     { label: "Primary · naranja (héroe)", tokens: PRIMARY_TOKENS, on: "--on-primary" },
+     { label: "Secondary · cian (soporte)", tokens: SECONDARY_TOKENS, on: "--on-secondary" },
+    ].map((group) => (
+     <div key={group.label}>
+      <div className="font-mono text-[length:var(--t-xs)] text-ink-dim mb-2 uppercase tracking-wider">{group.label}</div>
+      <div className="grid grid-cols-2 gap-2">
+       {group.tokens.map((t) => (
+        <div key={t.token} className="rounded-[var(--radius)] overflow-hidden border border-edge">
+         <div className="h-[52px]" style={{ background: `var(${t.token})` }} />
+         <div className="py-2 px-2.5 bg-layer-2">
+          <div className="font-mono text-[0.66rem] text-ink-muted leading-tight">{t.token}</div>
+          <div className="font-mono text-[0.6rem] text-ink-dim mt-px">{t.desc}</div>
+         </div>
+        </div>
+       ))}
+      </div>
+      <div className="mt-2 flex items-center gap-3 px-3 py-2.5 rounded-[var(--radius)] border border-edge bg-layer-2">
+       <div className="w-5 h-5 rounded-full border border-edge" style={{ background: `var(${group.on.replace("--on-", "--")})` }} />
+       <span className="font-mono text-[length:var(--t-xs)] text-secondary-hover">{group.on}</span>
+       <span className="text-[length:var(--t-xs)] text-ink-dim">· texto sobre fondo de color</span>
       </div>
      </div>
     ))}
    </div>
 
-   <Sub>Superficies (vivas según tema)</Sub>
-   <div className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-[0.85rem]">
-    {SURFACES.map((s) => (
-     <div key={s.name} className="rounded-[var(--radius-lg)] overflow-hidden border border-[var(--border)] bg-[var(--surface-2)]">
+   {/* ── Semantic status ────────────────────────────────────────────────── */}
+   <Sub>Color · semántico</Sub>
+   <p className="text-[length:var(--t-sm)] text-ink-muted max-w-[66ch] mb-[1.4rem] leading-[1.6]">
+    Tres variantes por estado: base (icono / texto activo), soft (fondo de alerta), border (borde del contenedor).
+   </p>
+   <div className="grid grid-cols-2 gap-4 max-[640px]:grid-cols-1">
+    {STATUS_GROUPS.map((g) => (
+     <div key={g.key} className="rounded-[var(--radius-lg)] border border-edge overflow-hidden">
+      <div className="px-4 py-2.5 bg-layer-2 border-b border-edge">
+       <span className="font-mono text-[length:var(--t-xs)] text-ink-muted uppercase tracking-wider">{g.label}</span>
+      </div>
+      <div className="grid grid-cols-3">
+       {[
+        { token: g.base,   sublabel: "base" },
+        { token: g.soft,   sublabel: "soft" },
+        { token: g.border, sublabel: "border" },
+       ].map((s, i) => (
+        <div key={s.token} className={i < 2 ? "border-r border-edge" : ""}>
+         <div className="h-[48px]" style={{ background: `var(${s.token})` }} />
+         <div className="px-2.5 py-2 bg-layer-2">
+          <div className="font-mono text-[0.6rem] text-ink-dim leading-tight">{s.sublabel}</div>
+         </div>
+        </div>
+       ))}
+      </div>
+     </div>
+    ))}
+   </div>
+
+   {/* ── Interaction & state ────────────────────────────────────────────── */}
+   <Sub>Color · interacción & estado</Sub>
+   <div className="grid grid-cols-2 gap-3 max-[640px]:grid-cols-1">
+    {[
+     { token: "--hover-overlay",    desc: "Hover sobre superficie" },
+     { token: "--pressed-overlay",  desc: "Active / pressed" },
+     { token: "--selected-overlay", desc: "Fila / ítem seleccionado" },
+     { token: "--focus-ring",       desc: "Anillo de foco (teclado)" },
+     { token: "--disabled-bg",      desc: "Fondo deshabilitado" },
+     { token: "--disabled-text",    desc: "Texto deshabilitado" },
+     { token: "--row-hover",        desc: "Hover en tabla · lista" },
+     { token: "--row-selected",     desc: "Fila seleccionada" },
+     { token: "--skeleton",         desc: "Base de skeleton" },
+     { token: "--skeleton-shimmer", desc: "Shimmer de skeleton" },
+    ].map((t) => (
+     <div key={t.token} className="flex items-center gap-3 px-3 py-2.5 rounded-[var(--radius)] border border-edge bg-layer-2">
       <div
-       className="h-[76px] border border-solid border-[var(--border)]"
-       style={{ background: `var(${s.name})` }}
+       className="w-8 h-8 rounded-[6px] border border-edge flex-shrink-0"
+       style={{ background: `var(${t.token})` }}
       />
-      <div className="py-2.5 px-3">
-       <div className="font-mono text-[length:var(--t-xs)]">{s.name}</div>
-       <div className="font-mono text-[length:var(--t-xs)] text-[color:var(--text-dim)] mt-px">{s.value}</div>
+      <div className="min-w-0">
+       <div className="font-mono text-[length:var(--t-xs)] text-secondary-hover truncate">{t.token}</div>
+       <div className="font-mono text-[0.66rem] text-ink-dim mt-px">{t.desc}</div>
       </div>
      </div>
     ))}
    </div>
 
-   <Callout icon="swatch" title="El acento es variable">
-    <code>--accent</code> es un rol, no un color fijo. Por defecto cian;
-    conmutable a morado, esmeralda o naranja desde Tweaks. Los componentes
-    nunca codifican el acento a mano — leen <code>var(--accent)</code>.
+   {/* ── Chart palette ──────────────────────────────────────────────────── */}
+   <Sub>Color · visualización de datos</Sub>
+   <p className="text-[length:var(--t-sm)] text-ink-muted max-w-[66ch] mb-[1.4rem] leading-[1.6]">
+    Ocho colores secuenciales para gráficas. Varían por tema para mantener contraste y legibilidad.
+   </p>
+   <div className="flex rounded-[var(--radius-lg)] overflow-hidden border border-edge">
+    {CHART_TOKENS.map((token, i) => (
+     <div key={token} className="flex-1 flex flex-col">
+      <div className="h-[72px]" style={{ background: `var(${token})` }} />
+      <div className="py-2 px-1.5 bg-layer-2 border-t border-edge">
+       <div className="font-mono text-[0.6rem] text-ink-dim text-center">{i + 1}</div>
+      </div>
+     </div>
+    ))}
+   </div>
+   <div className="mt-2 grid grid-cols-4 gap-2 max-[640px]:grid-cols-2">
+    {CHART_TOKENS.map((token) => (
+     <div key={token} className="flex items-center gap-2 px-2.5 py-1.5 rounded-[var(--radius)] bg-layer-2 border border-edge">
+      <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: `var(${token})` }} />
+      <span className="font-mono text-[0.6rem] text-ink-dim truncate">{token}</span>
+     </div>
+    ))}
+   </div>
+
+   {/* ── Brand constants ────────────────────────────────────────────────── */}
+   <Sub>Color · constantes de marca</Sub>
+   <p className="text-[length:var(--t-sm)] text-ink-muted max-w-[66ch] mb-[1.4rem] leading-[1.6]">
+    Valores fijos de identidad visual. No varían por tema. Usado directamente solo en momentos explícitamente de marca.
+   </p>
+   {BRAND_CONSTANTS.map((group) => (
+    <div key={group.group} className="mb-4 last:mb-0">
+     <div className="font-mono text-[length:var(--t-xs)] text-ink-dim mb-2 uppercase tracking-wider">{group.group}</div>
+     <div className="flex gap-2 flex-wrap">
+      {group.tokens.map((t) => (
+       <div key={t.label} className="rounded-[var(--radius)] overflow-hidden border border-edge min-w-[80px]">
+        <div className="h-[48px]" style={{ background: t.value }} />
+        <div className="py-1.5 px-2 bg-layer-2">
+         <div className="font-mono text-[0.6rem] text-ink-muted leading-tight">{t.label}</div>
+         <div className="font-mono text-[0.56rem] text-ink-dim mt-px">{t.value}</div>
+        </div>
+       </div>
+      ))}
+     </div>
+    </div>
+   ))}
+
+   <Callout icon="swatch" title="Semántica sobre raw">
+    Los componentes nunca referencian <code>--orange-500</code> directamente.
+    Usan <code>--primary</code>, <code>--secondary</code>, <code>--danger</code>, etc.
+    Las constantes de marca alimentan los tokens semánticos en <code>globals.css</code>.
    </Callout>
 
    <Sub>Tipografía · familias</Sub>
@@ -693,7 +859,7 @@ function FoundationsSection() {
     ].map(([n, v, d]) => (
      <div
       key={n}
-      className="py-5 px-5 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--card-bg)]"
+      className="py-5 px-5 rounded-[var(--radius-lg)] border border-edge bg-[var(--card-bg)]"
      >
       <div
        className="text-[length:var(--t-3xl)] font-extrabold"
@@ -701,17 +867,17 @@ function FoundationsSection() {
       >
        {n}
       </div>
-      <div className="text-[color:var(--text-muted)] text-[length:var(--t-sm)] mt-1.5">
+      <div className="text-ink-muted text-[length:var(--t-sm)] mt-1.5">
        {d}
       </div>
      </div>
     ))}
    </div>
-   <div className="mt-4 py-5 px-5 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--card-bg)]">
+   <div className="mt-4 py-5 px-5 rounded-[var(--radius-lg)] border border-edge bg-[var(--card-bg)]">
     <div className="font-mono text-[length:var(--t-xl)] font-medium">
      JetBrains Mono
     </div>
-    <div className="text-[color:var(--text-muted)] text-[length:var(--t-sm)] mt-1.5">
+    <div className="text-ink-muted text-[length:var(--t-sm)] mt-1.5">
      Etiquetas · código · datos numéricos.
     </div>
    </div>
@@ -721,7 +887,7 @@ function FoundationsSection() {
     {TYPE_SCALE.map(([token, size, role]) => (
      <div
       key={token}
-      className="py-[1.1rem] border-b border-[var(--border)] flex flex-col gap-[0.35rem] last:border-b-0"
+      className="py-[1.1rem] border-b border-edge flex flex-col gap-[0.35rem] last:border-b-0"
      >
       <div
        className="leading-[1.1] text-balance font-bold"
@@ -738,8 +904,8 @@ function FoundationsSection() {
       >
        {role}
       </div>
-      <div className="font-mono text-[length:var(--t-xs)] text-[color:var(--text-dim)] flex gap-4 flex-wrap">
-       <span className="text-[color:var(--accent-bright)]">{token}</span>
+      <div className="font-mono text-[length:var(--t-xs)] text-ink-dim flex gap-4 flex-wrap">
+       <span className="text-secondary-hover">{token}</span>
        <span>{size}</span>
       </div>
      </div>
@@ -747,7 +913,7 @@ function FoundationsSection() {
    </div>
 
    <Sub>Espaciado · base 4px</Sub>
-   <p className="text-[length:var(--t-sm)] text-[color:var(--text-muted)] max-w-[66ch] mb-[1.4rem] leading-[1.6]">
+   <p className="text-[length:var(--t-sm)] text-ink-muted max-w-[66ch] mb-[1.4rem] leading-[1.6]">
     Ritmo en múltiplos de 4. Usa <code>gap</code> en flex/grid; evita
     márgenes sueltos. Las secciones usan <code>--space-section</code>{" "}
     (fluido).
@@ -756,12 +922,12 @@ function FoundationsSection() {
     {SPACING.map(([token, val, px]) => (
      <div
       key={token}
-      className="flex items-center gap-4 py-[0.7rem] border-b border-[var(--border)] last:border-b-0"
+      className="flex items-center gap-4 py-[0.7rem] border-b border-edge last:border-b-0"
      >
-      <span className="font-mono text-[length:var(--t-xs)] text-[color:var(--accent-bright)] min-w-[96px]">
+      <span className="font-mono text-[length:var(--t-xs)] text-secondary-hover min-w-[96px]">
        {token}
       </span>
-      <span className="font-mono text-[length:var(--t-xs)] text-[color:var(--text-dim)] min-w-[70px]">
+      <span className="font-mono text-[length:var(--t-xs)] text-ink-dim min-w-[70px]">
        {val}
       </span>
       <span
@@ -773,7 +939,7 @@ function FoundationsSection() {
    </div>
 
    <Sub>Radio (vivo según dirección)</Sub>
-   <p className="text-[length:var(--t-sm)] text-[color:var(--text-muted)] max-w-[66ch] mb-[1.4rem] leading-[1.6]">
+   <p className="text-[length:var(--t-sm)] text-ink-muted max-w-[66ch] mb-[1.4rem] leading-[1.6]">
     HUD ≈ recto (3px), Neón ≈ muy redondeado (14–22px), Grid ≈ intermedio
     (8px). Actualmente en modo Neón.
    </p>
@@ -785,25 +951,25 @@ function FoundationsSection() {
     ].map(([token, label]) => (
      <div key={token} className="flex flex-col gap-3 items-center text-center">
       <div
-       className="w-full h-[84px] bg-[var(--surface-3)] border border-[var(--border-strong)]"
+       className="w-full h-[84px] bg-layer-3 border border-edge-strong"
        style={{
         borderRadius: `var(${token})`,
         background:
-         "color-mix(in srgb, var(--orange-500) 16%, var(--surface-3))",
+         "color-mix(in srgb, var(--orange-500) 16%, var(--layer-3))",
         borderColor:
          "color-mix(in srgb, var(--orange-500) 35%, transparent)",
        }}
       />
       <div>
-       <div className="font-mono text-[length:var(--t-xs)] text-[color:var(--text-muted)]">{label}</div>
-       <div className="font-mono text-[0.66rem] text-[color:var(--text-dim)]">{token}</div>
+       <div className="font-mono text-[length:var(--t-xs)] text-ink-muted">{label}</div>
+       <div className="font-mono text-[0.66rem] text-ink-dim">{token}</div>
       </div>
      </div>
     ))}
    </div>
 
    <Sub>Elevación & sombra</Sub>
-   <p className="text-[length:var(--t-sm)] text-[color:var(--text-muted)] max-w-[66ch] mb-[1.4rem] leading-[1.6]">
+   <p className="text-[length:var(--t-sm)] text-ink-muted max-w-[66ch] mb-[1.4rem] leading-[1.6]">
     La sombra también es personalidad: Neón usa halo difuso con backdrop
     blur.
    </p>
@@ -815,15 +981,15 @@ function FoundationsSection() {
     ].map(([token, label, bg]) => (
      <div key={token} className="flex flex-col gap-3 items-center text-center">
       <div
-       className="w-full h-[84px] rounded-[var(--radius-lg)] border border-solid border-[var(--border)]"
+       className="w-full h-[84px] rounded-[var(--radius-lg)] border border-solid border-edge"
        style={{
         boxShadow: `var(${token})`,
         background: bg,
        }}
       />
       <div>
-       <div className="font-mono text-[length:var(--t-xs)] text-[color:var(--text-muted)]">{label}</div>
-       <div className="font-mono text-[0.66rem] text-[color:var(--text-dim)]">{token}</div>
+       <div className="font-mono text-[length:var(--t-xs)] text-ink-muted">{label}</div>
+       <div className="font-mono text-[0.66rem] text-ink-dim">{token}</div>
       </div>
      </div>
     ))}
@@ -878,7 +1044,7 @@ function FoundationsSection() {
 function MotionDemo() {
  const [on, setOn] = React.useState(false)
  return (
-  <div className="flex flex-col gap-4 items-center py-6 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface-2)]">
+  <div className="flex flex-col gap-4 items-center py-6 rounded-[var(--radius-lg)] border border-edge bg-layer-2">
    <div
     className="w-14 h-14 rounded-[var(--radius-lg)] bg-[var(--orange-500)]"
     style={{
@@ -918,10 +1084,10 @@ function PrimitivesSection() {
 
  return (
   <div>
-   <div className="mb-8 pb-6 border-b border-[var(--border)]">
+   <div className="mb-8 pb-6 border-b border-edge">
     <Kicker>Primitivos</Kicker>
     <h2 className="text-[length:var(--t-3xl)] mt-2.5">Catálogo de primitivos</h2>
-    <p className="text-[length:var(--t-base)] text-[color:var(--text-muted)] max-w-[64ch] mt-[0.7rem] leading-[1.65]">
+    <p className="text-[length:var(--t-base)] text-ink-muted max-w-[64ch] mt-[0.7rem] leading-[1.65]">
      Los átomos del sistema. Cada uno llega completamente estilizado y
      respeta la dirección Neón. Cambia su aspecto con <code>variant</code>,
      nunca con clases sueltas.
@@ -1005,7 +1171,7 @@ function PrimitivesSection() {
       </Tag>
      ))}
      {tags.length === 0 && (
-      <span className="text-[color:var(--text-dim)] text-[length:var(--t-sm)]">
+      <span className="text-ink-dim text-[length:var(--t-sm)]">
        Sin filtros — recarga la sección para restaurar.
       </span>
      )}
@@ -1205,10 +1371,10 @@ function CompositionSection() {
 
  return (
   <div>
-   <div className="mb-8 pb-6 border-b border-[var(--border)]">
+   <div className="mb-8 pb-6 border-b border-edge">
     <Kicker>Composición</Kicker>
     <h2 className="text-[length:var(--t-3xl)] mt-2.5">Primitivos trabajando juntos</h2>
-    <p className="text-[length:var(--t-base)] text-[color:var(--text-muted)] max-w-[64ch] mt-[0.7rem] leading-[1.65]">
+    <p className="text-[length:var(--t-base)] text-ink-muted max-w-[64ch] mt-[0.7rem] leading-[1.65]">
      Componentes con propósito ensamblado: superficies, retroalimentación
      y overlays. Construidos al 100% sobre los primitivos y los tokens.
     </p>
@@ -1227,12 +1393,12 @@ function CompositionSection() {
        <IconBox icon="calc" tone="orange" size="md" />
        <div>
         <h4 className="text-[length:var(--t-lg)]">Calculadora de daño</h4>
-        <span className="text-[color:var(--text-dim)] text-[length:var(--t-xs)] font-mono">
+        <span className="text-ink-dim text-[length:var(--t-xs)] font-mono">
          Pokémon · VGC
         </span>
        </div>
       </div>
-      <p className="text-[color:var(--text-muted)] text-[length:var(--t-sm)] m-0">
+      <p className="text-ink-muted text-[length:var(--t-sm)] m-0">
        Simula intercambios con spreads, naturalezas y campos activos.
       </p>
       <div className="flex gap-2">
@@ -1248,12 +1414,12 @@ function CompositionSection() {
        <IconBox icon="shield" tone="accent" size="md" />
        <div>
         <h4 className="text-[length:var(--t-lg)]">Card · hover</h4>
-        <span className="text-[color:var(--text-dim)] text-[length:var(--t-xs)] font-mono">
+        <span className="text-ink-dim text-[length:var(--t-xs)] font-mono">
          Elevación Neón
         </span>
        </div>
       </div>
-      <p className="text-[color:var(--text-muted)] text-[length:var(--t-sm)] m-0">
+      <p className="text-ink-muted text-[length:var(--t-sm)] m-0">
        El hover eleva con sombra difusa y borde de acento. En HUD usa offset duro, en Grid es casi plano.
       </p>
      </Card>
@@ -1382,10 +1548,10 @@ function CompositionSection() {
     intro="Datos tabulares con cabecera mono, filas con hover y columnas numéricas alineadas a la derecha."
     a11y="Estructura semántica thead/tbody. Los estados se comunican con Badge (texto), no solo color de fila."
    >
-    <div className="rounded-[var(--radius-lg)] border border-[var(--border)] overflow-hidden">
+    <div className="rounded-[var(--radius-lg)] border border-edge overflow-hidden">
      <table className="w-full border-collapse text-[length:var(--t-sm)]">
       <thead>
-        <tr className="[&_th]:text-left [&_th]:font-mono [&_th]:text-[length:var(--t-xs)] [&_th]:tracking-[0.06em] [&_th]:uppercase [&_th]:text-[color:var(--text-dim)] [&_th]:py-[0.7rem] [&_th]:px-4 [&_th]:bg-[var(--surface-2)] [&_th]:border-b [&_th]:border-[var(--border-strong)]">
+        <tr className="[&_th]:text-left [&_th]:font-mono [&_th]:text-[length:var(--t-xs)] [&_th]:tracking-[0.06em] [&_th]:uppercase [&_th]:text-ink-dim [&_th]:py-[0.7rem] [&_th]:px-4 [&_th]:bg-layer-2 [&_th]:border-b [&_th]:border-edge-strong">
         <th className="text-right font-mono">#</th>
         <th>Jugador</th>
         <th>Juego</th>
@@ -1393,33 +1559,33 @@ function CompositionSection() {
         <th className="text-right font-mono">Puntos</th>
        </tr>
       </thead>
-       <tbody className="[&_tr]:transition-[background] [&_tr]:duration-[var(--dur)] [&_tr:hover]:bg-[var(--surface-2)] [&_td]:py-[0.7rem] [&_td]:px-4 [&_td]:border-b [&_td]:border-[var(--border)] [&_td]:text-[color:var(--text-muted)] [&_tr:last-child_td]:border-b-0">
+       <tbody className="[&_tr]:transition-[background] [&_tr]:duration-[var(--dur)] [&_tr:hover]:bg-layer-2 [&_td]:py-[0.7rem] [&_td]:px-4 [&_td]:border-b [&_td]:border-edge [&_td]:text-ink-muted [&_tr:last-child_td]:border-b-0">
        <tr>
-        <td className="text-right font-mono text-[color:var(--text)]">01</td>
-        <td className="text-[color:var(--text)] font-semibold">RotomChef</td>
+        <td className="text-right font-mono text-ink">01</td>
+        <td className="text-ink font-semibold">RotomChef</td>
         <td>Pokémon VGC</td>
         <td>
          <Badge kind="live">En vivo</Badge>
         </td>
-        <td className="text-right font-mono text-[color:var(--text)]">2,480</td>
+        <td className="text-right font-mono text-ink">2,480</td>
        </tr>
        <tr>
-        <td className="text-right font-mono text-[color:var(--text)]">02</td>
-        <td className="text-[color:var(--text)] font-semibold">GemmaHunts</td>
+        <td className="text-right font-mono text-ink">02</td>
+        <td className="text-ink font-semibold">GemmaHunts</td>
         <td>MH Wilds</td>
         <td>
          <Badge kind="accent">Clasificado</Badge>
         </td>
-        <td className="text-right font-mono text-[color:var(--text)]">2,310</td>
+        <td className="text-right font-mono text-ink">2,310</td>
        </tr>
        <tr>
-        <td className="text-right font-mono text-[color:var(--text)]">03</td>
-        <td className="text-[color:var(--text)] font-semibold">BlockMaster</td>
+        <td className="text-right font-mono text-ink">03</td>
+        <td className="text-ink font-semibold">BlockMaster</td>
         <td>Minecraft</td>
         <td>
          <Badge>Inactivo</Badge>
         </td>
-        <td className="text-right font-mono text-[color:var(--text)]">2,090</td>
+        <td className="text-right font-mono text-ink">2,090</td>
        </tr>
       </tbody>
      </table>
@@ -1460,10 +1626,10 @@ function BlocksSection() {
 
   return (
    <div>
-    <div className="mb-8 pb-6 border-b border-[var(--border)]">
+    <div className="mb-8 pb-6 border-b border-edge">
      <Kicker>Bloques</Kicker>
      <h2 className="text-[length:var(--t-3xl)] mt-2.5">Compuestos extraídos de las páginas</h2>
-     <p className="text-[length:var(--t-base)] text-[color:var(--text-muted)] max-w-[64ch] mt-[0.7rem] leading-[1.65]">
+     <p className="text-[length:var(--t-base)] text-ink-muted max-w-[64ch] mt-[0.7rem] leading-[1.65]">
       Durante la segunda pasada sobre Inicio, Perfil, Navegación y Footer
       detectamos composiciones que se repetían en línea. Aquí viven ahora
       como piezas únicas — la página solo las invoca.
@@ -1538,15 +1704,15 @@ function BlocksSection() {
      <div className="grid grid-cols-2 gap-5 max-[1000px]:grid-cols-1">
       <Card style={{ padding: "1.5rem" }}>
        <CardTitle icon="user">Datos de la cuenta</CardTitle>
-       <p className="text-[color:var(--text-muted)] text-[length:var(--t-sm)] m-0">
+       <p className="text-ink-muted text-[length:var(--t-sm)] m-0">
         Encabezado simple con icono.
        </p>
       </Card>
       <Card style={{ padding: "1.5rem" }}>
-       <CardTitle icon="star" right={<span className="text-[color:var(--text-dim)] font-mono text-xs">37 / 60</span>}>
+       <CardTitle icon="star" right={<span className="text-ink-dim font-mono text-xs">37 / 60</span>}>
         Logros
        </CardTitle>
-       <p className="text-[color:var(--text-muted)] text-[length:var(--t-sm)] m-0">
+       <p className="text-ink-muted text-[length:var(--t-sm)] m-0">
         Con acción/contador a la derecha.
        </p>
       </Card>
@@ -1626,7 +1792,7 @@ function BlocksSection() {
        <CardTitle icon="bell">Actividad</CardTitle>
        <ul className="list-none m-0 p-0 flex flex-col">
         <ActivityItem icon="trophy" text="Quedó 2º en VGC Regional" time="hace 2 días" color="var(--orange-500)" />
-        <ActivityItem icon="calc" text="Guardó 3 sets en la Calculadora" time="hace 4 días" color="var(--accent-bright)" />
+        <ActivityItem icon="calc" text="Guardó 3 sets en la Calculadora" time="hace 4 días" color="var(--secondary-hover)" />
        </ul>
       </Card>
      </div>
@@ -1644,7 +1810,7 @@ function BlocksSection() {
      intro="Tira de etiquetas en desplazamiento infinito. Decorativa; se detiene con el toggle de movimiento y prefers-reduced-motion."
      a11y="aria-hidden: es decoración, su contenido se anuncia en otro lugar de la página."
     >
-     <div className="rounded-[var(--radius-lg)] overflow-hidden border border-[var(--border)]">
+     <div className="rounded-[var(--radius-lg)] overflow-hidden border border-edge">
       <Marquee items={["POKÉMON VGC", "MONSTER HUNTER", "MYSTERY DUNGEON", "TCG POCKET", "MINECRAFT", "SHOWDOWN"]} />
      </div>
     </Spec2>
@@ -1657,16 +1823,16 @@ function BlocksSection() {
      a11y="nav con aria-label; aria-current en el enlace activo; el sheet móvil atrapa el foco y cierra con Escape."
     >
      {/* Visual frame showing navbar structure */}
-     <div className="rounded-[var(--radius-lg)] border border-[var(--border)] overflow-hidden bg-[var(--bg-grad-2)]">
-      <div className="flex items-center gap-2 py-[0.6rem] px-[0.9rem] border-b border-[var(--border)] bg-[var(--surface-2)]">
-       <span className="w-[9px] h-[9px] rounded-full bg-[var(--surface-3)]" />
-       <span className="w-[9px] h-[9px] rounded-full bg-[var(--surface-3)]" />
-       <span className="w-[9px] h-[9px] rounded-full bg-[var(--surface-3)]" />
-       <span className="ml-2 font-mono text-[length:var(--t-xs)] text-[color:var(--text-dim)]">navbar — position:fixed</span>
+     <div className="rounded-[var(--radius-lg)] border border-edge overflow-hidden bg-[var(--bg-grad-2)]">
+      <div className="flex items-center gap-2 py-[0.6rem] px-[0.9rem] border-b border-edge bg-layer-2">
+       <span className="w-[9px] h-[9px] rounded-full bg-layer-3" />
+       <span className="w-[9px] h-[9px] rounded-full bg-layer-3" />
+       <span className="w-[9px] h-[9px] rounded-full bg-layer-3" />
+       <span className="ml-2 font-mono text-[length:var(--t-xs)] text-ink-dim">navbar — position:fixed</span>
       </div>
       <div className="p-7">
        {/* Navbar mock */}
-       <div className="flex items-center justify-between gap-6 py-[0.85rem] px-5 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface)]">
+       <div className="flex items-center justify-between gap-6 py-[0.85rem] px-5 rounded-[var(--radius-lg)] border border-edge bg-layer-1">
         <Link href="/" className="inline-flex items-center gap-[0.6rem] flex-shrink-0">
           <img
             src="/img/boff-logo.webp"
@@ -1677,7 +1843,7 @@ function BlocksSection() {
           />
           <span className="relative font-display font-extrabold text-[1.3rem] tracking-[0.01em] text-[var(--orange-500)] pr-[2.6rem]">
             BoffMedia
-            <span className="absolute -top-[0.4rem] right-0 font-mono text-[0.5rem] font-bold tracking-[0.1em] px-[0.3rem] py-[0.12rem] text-[var(--on-accent)] bg-[var(--accent-bright)] rounded-[3px]">
+            <span className="absolute -top-[0.4rem] right-0 font-mono text-[0.5rem] font-bold tracking-[0.1em] px-[0.3rem] py-[0.12rem] text-[var(--on-secondary)] bg-secondary-hover rounded-[3px]">
               BETA
             </span>
           </span>
@@ -1695,7 +1861,7 @@ function BlocksSection() {
             "inline-flex items-center gap-[0.45rem] text-[length:var(--t-sm)] font-medium py-2 px-[0.85rem] rounded-[var(--btn-radius)] transition-colors " +
             (active
              ? "text-[var(--orange-500)] font-semibold bg-[color-mix(in_srgb,var(--orange-500)_14%,transparent)]"
-             : "text-[var(--text-muted)]")
+             : "text-ink-muted")
            }
           >
            <Icon name={icon as string} size={17} />
@@ -1707,13 +1873,13 @@ function BlocksSection() {
          <IconButton icon="search" label="Buscar" />
          <IconButton icon="bell" label="Notificaciones" dot />
          <IconButton icon="sun" label="Cambiar tema" />
-         <span className="inline-flex items-center gap-[0.55rem] py-[0.3rem] pr-[0.75rem] pl-[0.35rem] rounded-[var(--radius-pill)] border border-[var(--border-strong)] bg-[var(--surface-2)]">
+         <span className="inline-flex items-center gap-[0.55rem] py-[0.3rem] pr-[0.75rem] pl-[0.35rem] rounded-[var(--radius-pill)] border border-edge-strong bg-layer-2">
           <span className="w-[30px] h-[30px] rounded-full grid place-items-center font-display font-extrabold text-[0.85rem] text-white bg-gradient-to-br from-[var(--orange-500)] to-[var(--orange-700)]">A</span>
           <span className="text-[length:var(--t-sm)] font-semibold max-[920px]:hidden">Alex</span>
          </span>
         </div>
        </div>
-       <p className="text-[length:var(--t-xs)] text-[color:var(--text-dim)] mt-3 text-center">
+       <p className="text-[length:var(--t-xs)] text-ink-dim mt-3 text-center">
         Vista simplificada — la navbar real es position:fixed con backdrop-filter
        </p>
       </div>
@@ -1729,7 +1895,7 @@ function BlocksSection() {
        ]}
       />
       <div>
-       <p className="text-[length:var(--t-sm)] text-[color:var(--text-muted)] max-w-[66ch] leading-[1.6] mb-3">
+       <p className="text-[length:var(--t-sm)] text-ink-muted max-w-[66ch] leading-[1.6] mb-3">
         Compuesta por <code>Logo</code>, <code>Icon</code>,{" "}
         <code>IconButton</code> y <code>Button</code> — cero clases sueltas
         tras la segunda pasada.
@@ -1737,19 +1903,19 @@ function BlocksSection() {
        <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2 text-[length:var(--t-sm)]">
          <Icon name="check" size={14} className="text-[var(--emerald-400)]" />
-         <span className="text-[var(--text-muted)]">Fondo translúcido con <code>backdrop-filter: blur(14px)</code></span>
+         <span className="text-ink-muted">Fondo translúcido con <code>backdrop-filter: blur(14px)</code></span>
         </div>
         <div className="flex items-center gap-2 text-[length:var(--t-sm)]">
          <Icon name="check" size={14} className="text-[var(--emerald-400)]" />
-         <span className="text-[var(--text-muted)]">Gana borde al hacer scroll (8px+)</span>
+         <span className="text-ink-muted">Gana borde al hacer scroll (8px+)</span>
         </div>
         <div className="flex items-center gap-2 text-[length:var(--t-sm)]">
          <Icon name="check" size={14} className="text-[var(--emerald-400)]" />
-         <span className="text-[var(--text-muted)]">Sheet lateral en móvil con enlaces + tema</span>
+         <span className="text-ink-muted">Sheet lateral en móvil con enlaces + tema</span>
         </div>
         <div className="flex items-center gap-2 text-[length:var(--t-sm)]">
          <Icon name="check" size={14} className="text-[var(--emerald-400)]" />
-         <span className="text-[var(--text-muted)]">Punto de notificación en campana</span>
+         <span className="text-ink-muted">Punto de notificación en campana</span>
         </div>
        </div>
       </div>
@@ -1763,7 +1929,7 @@ function BlocksSection() {
      intro="El pie global: marca + tagline + IconButtons sociales, columnas de enlaces, newsletter y barra legal."
      a11y="Enlaces agrupados por encabezado; iconos sociales con aria-label; el formulario es enfocable y enviable con teclado."
     >
-     <div className="rounded-[var(--radius-lg)] overflow-hidden border border-[var(--border)]">
+     <div className="rounded-[var(--radius-lg)] overflow-hidden border border-edge">
       <Footer go={NOOP as (path: string) => void} />
      </div>
     </Spec2>
@@ -1782,10 +1948,10 @@ function PatternsSection() {
 
  return (
   <div>
-   <div className="mb-8 pb-6 border-b border-[var(--border)]">
+   <div className="mb-8 pb-6 border-b border-edge">
     <Kicker>Patrones</Kicker>
     <h2 className="text-[length:var(--t-3xl)] mt-2.5">Soluciones recurrentes de UX</h2>
-    <p className="text-[length:var(--t-base)] text-[color:var(--text-muted)] max-w-[64ch] mt-[0.7rem] leading-[1.65]">
+    <p className="text-[length:var(--t-base)] text-ink-muted max-w-[64ch] mt-[0.7rem] leading-[1.65]">
      Composiciones que se repiten en todo el producto. Estandarizarlas
      elimina decisiones y mantiene la coherencia entre Herramientas,
      Eventos y Comunidad.
@@ -1813,7 +1979,7 @@ function PatternsSection() {
       />
      </div>
      <div className="flex gap-2 flex-wrap items-center">
-      <span className="text-[color:var(--text-dim)] text-[length:var(--t-xs)] font-mono uppercase tracking-[0.1em]">
+      <span className="text-ink-dim text-[length:var(--t-xs)] font-mono uppercase tracking-[0.1em]">
        Filtros
       </span>
       {tags.map((t) => (
@@ -1844,12 +2010,12 @@ function PatternsSection() {
     intro="Kicker + título + acción. La migaja de pan (Breadcrumb) sitúa al usuario en secciones anidadas como Herramientas."
     a11y="Breadcrumb en nav con aria-label; el elemento actual no es enlace."
    >
-    <div className="rounded-[var(--radius-lg)] border border-[var(--border)] overflow-hidden bg-[var(--bg-grad-2)]">
-      <div className="flex items-center gap-2 py-[0.6rem] px-[0.9rem] border-b border-[var(--border)] bg-[var(--surface-2)]">
-      <span className="w-[9px] h-[9px] rounded-full bg-[var(--surface-3)]" />
-      <span className="w-[9px] h-[9px] rounded-full bg-[var(--surface-3)]" />
-      <span className="w-[9px] h-[9px] rounded-full bg-[var(--surface-3)]" />
-      <span className="ml-2 font-mono text-[length:var(--t-xs)] text-[color:var(--text-dim)]">/herramientas/mhwilds</span>
+    <div className="rounded-[var(--radius-lg)] border border-edge overflow-hidden bg-[var(--bg-grad-2)]">
+      <div className="flex items-center gap-2 py-[0.6rem] px-[0.9rem] border-b border-edge bg-layer-2">
+      <span className="w-[9px] h-[9px] rounded-full bg-layer-3" />
+      <span className="w-[9px] h-[9px] rounded-full bg-layer-3" />
+      <span className="w-[9px] h-[9px] rounded-full bg-layer-3" />
+      <span className="ml-2 font-mono text-[length:var(--t-xs)] text-ink-dim">/herramientas/mhwilds</span>
      </div>
      <div className="p-7">
       <Breadcrumb
@@ -1920,32 +2086,32 @@ function CommandPaletteDemo() {
    size="md"
   >
    <div className="flex flex-col">
-    <div className="flex items-center gap-2.5 py-[0.4rem] px-[0.4rem] pb-4 border-b border-[var(--border)] text-[color:var(--text-dim)]">
+    <div className="flex items-center gap-2.5 py-[0.4rem] px-[0.4rem] pb-4 border-b border-edge text-ink-dim">
      <Icon name="search" size={18} />
      <input
       autoFocus
       placeholder="Escribe un comando o busca…"
       value={q}
       onChange={(e) => setQ(e.target.value)}
-      className="flex-1 border-0 bg-transparent text-[color:var(--text)] font-[inherit] text-[length:var(--t-base)] outline-none"
+      className="flex-1 border-0 bg-transparent text-ink font-[inherit] text-[length:var(--t-base)] outline-none"
      />
-     <kbd className="font-mono text-[length:var(--t-xs)] text-[color:var(--text-dim)]">ESC</kbd>
+     <kbd className="font-mono text-[length:var(--t-xs)] text-ink-dim">ESC</kbd>
     </div>
     <div className="flex flex-col gap-[0.2rem] pt-3 max-h-[320px] overflow-y-auto">
      {filtered.length === 0 ? (
-      <div className="text-center text-[color:var(--text-dim)] text-[length:var(--t-sm)] py-6">
+      <div className="text-center text-ink-dim text-[length:var(--t-sm)] py-6">
        Sin resultados para «{q}».
       </div>
      ) : (
       filtered.map((g) => (
        <div key={g.heading}>
-         <div className="font-mono text-[length:var(--t-xs)] tracking-[0.1em] uppercase text-[color:var(--text-dim)] pt-[0.5rem] pb-[0.3rem] px-[0.7rem]">
+         <div className="font-mono text-[length:var(--t-xs)] tracking-[0.1em] uppercase text-ink-dim pt-[0.5rem] pb-[0.3rem] px-[0.7rem]">
          {g.heading}
         </div>
         {g.items.map(([icon, label]) => (
          <button
           key={label}
-          className="flex items-center gap-[0.7rem] w-full text-left border-0 bg-transparent text-[color:var(--text-muted)] font-[inherit] text-[length:var(--t-sm)] py-[0.6rem] px-[0.7rem] rounded-[var(--radius)] cursor-pointer hover:bg-[var(--surface-2)] hover:text-[color:var(--text)] [&_svg]:text-[color:var(--text-dim)] [&_kbd]:ml-auto [&_kbd]:font-mono [&_kbd]:text-[length:var(--t-xs)] [&_kbd]:text-[color:var(--text-dim)] [&_kbd]:border [&_kbd]:border-[var(--border)] [&_kbd]:rounded-[5px] [&_kbd]:py-px [&_kbd]:px-1.5"
+          className="flex items-center gap-[0.7rem] w-full text-left border-0 bg-transparent text-ink-muted font-[inherit] text-[length:var(--t-sm)] py-[0.6rem] px-[0.7rem] rounded-[var(--radius)] cursor-pointer hover:bg-layer-2 hover:text-ink [&_svg]:text-ink-dim [&_kbd]:ml-auto [&_kbd]:font-mono [&_kbd]:text-[length:var(--t-xs)] [&_kbd]:text-ink-dim [&_kbd]:border [&_kbd]:border-edge [&_kbd]:rounded-[5px] [&_kbd]:py-px [&_kbd]:px-1.5"
          >
           <Icon name={icon} size={16} />
           {label}
@@ -1974,10 +2140,10 @@ function BoffSection({ go }: { go?: (path: string) => void }) {
 
  return (
    <div>
-    <div className="mb-8 pb-6 border-b border-[var(--border)]">
+    <div className="mb-8 pb-6 border-b border-edge">
      <Kicker>Boffmedia</Kicker>
      <h2 className="text-[length:var(--t-3xl)] mt-2.5">Componentes del producto</h2>
-     <p className="text-[length:var(--t-base)] text-[color:var(--text-muted)] max-w-[64ch] mt-[0.7rem] leading-[1.65]">
+     <p className="text-[length:var(--t-base)] text-ink-muted max-w-[64ch] mt-[0.7rem] leading-[1.65]">
       Piezas específicas de BoffMedia, compuestas sobre el sistema. Una sola
       fuente de datos (<code>games-data</code>) alimenta tarjetas,
       herramientas destacadas y navegación.
@@ -2023,7 +2189,7 @@ function BoffSection({ go }: { go?: (path: string) => void }) {
      intro="El encabezado de comunidad: avatar, identidad, etiquetas y estadísticas rápidas. Reutiliza Avatar, Badge y Stat."
      a11y="Las cifras usan tabular-nums; los iconos sociales tienen aria-label."
     >
-     <div className="rounded-[var(--radius-lg)] border border-[var(--border)] overflow-hidden bg-[var(--bg-grad-2)]">
+     <div className="rounded-[var(--radius-lg)] border border-edge overflow-hidden bg-[var(--bg-grad-2)]">
       <div className="p-7 flex gap-6 items-center flex-wrap">
        <Avatar size={84} fallback="AX" ring tone="orange" />
        <div className="flex-1 min-w-[200px]">
@@ -2032,7 +2198,7 @@ function BoffSection({ go }: { go?: (path: string) => void }) {
          <Badge kind="accent">Pro</Badge>
          <Badge kind="live">En línea</Badge>
         </div>
-        <p className="text-[color:var(--text-muted)] text-[length:var(--t-sm)] mt-1 mb-3">
+        <p className="text-ink-muted text-[length:var(--t-sm)] mt-1 mb-3">
          @rotomchef · se unió en marzo de 2024
         </p>
         <div className="flex gap-2 flex-wrap">
@@ -2051,7 +2217,7 @@ function BoffSection({ go }: { go?: (path: string) => void }) {
           <span className="font-display font-extrabold text-[length:var(--t-xl)] text-[color:var(--orange-500)]">
            {n}
           </span>
-          <span className="text-[color:var(--text-dim)] font-mono text-[length:var(--t-xs)] uppercase tracking-[0.1em]">
+          <span className="text-ink-dim font-mono text-[length:var(--t-xs)] uppercase tracking-[0.1em]">
            {l}
           </span>
          </div>
@@ -2080,7 +2246,7 @@ function BoffSection({ go }: { go?: (path: string) => void }) {
      <div className="flex gap-[0.8rem] items-center">
       <FavStar href="#/demo/fav-a" />
       <FavStar href="#/demo/fav-b" />
-      <span className="text-[color:var(--text-muted)] text-[length:var(--t-sm)]">
+      <span className="text-ink-muted text-[length:var(--t-sm)]">
        Pulsa una estrella — el estado persiste.
       </span>
      </div>
@@ -2166,7 +2332,7 @@ function DemoFavCounter() {
      <FavStar href="#/demo/fav-c" />
     </div>
     <Badge kind="accent">{favs.length} favorito{favs.length === 1 ? "" : "s"} en el almacén</Badge>
-    <span className="text-[color:var(--text-dim)] text-[length:var(--t-xs)]">
+    <span className="text-ink-dim text-[length:var(--t-xs)]">
      Compartido con toda la sección Herramientas.
     </span>
    </div>
@@ -2192,7 +2358,7 @@ const ACHIEVEMENTS = [
 ]
 const ACTIVITY = [
   { icon: "trophy", text: "Quedó 2º en VGC Regional — Series 2", time: "hace 2 días", color: "var(--orange-500)" },
-  { icon: "calc", text: "Guardó 3 sets en la Calculadora de Daño", time: "hace 4 días", color: "var(--accent-bright)" },
+  { icon: "calc", text: "Guardó 3 sets en la Calculadora de Daño", time: "hace 4 días", color: "var(--secondary-hover)" },
   { icon: "users", text: "Se unió al equipo «Rotom Squad»", time: "hace 1 semana", color: "var(--purple-400)" },
 ]
 
@@ -2203,10 +2369,10 @@ function ProfileSection() {
 
   return (
    <div>
-    <div className="mb-8 pb-6 border-b border-[var(--border)]">
+    <div className="mb-8 pb-6 border-b border-edge">
      <Kicker>Perfil</Kicker>
      <h2 className="text-[length:var(--t-3xl)] mt-2.5">Página de perfil</h2>
-     <p className="text-[length:var(--t-base)] text-[color:var(--text-muted)] max-w-[64ch] mt-[0.7rem] leading-[1.65]">
+     <p className="text-[length:var(--t-base)] text-ink-muted max-w-[64ch] mt-[0.7rem] leading-[1.65]">
       La página de comunidad del usuario: identidad, datos, cuentas
       vinculadas, actividad, estadísticas y logros. Compuesta al 100%
       sobre primitivos y bloques del sistema.
@@ -2241,9 +2407,9 @@ function ProfileSection() {
      <Card ticks className="overflow-hidden">
       {/* Cover */}
       <div
-       className="h-[104px] border-b border-[var(--border)]"
+       className="h-[104px] border-b border-edge"
        style={{
-        background: "color-mix(in srgb, var(--orange-500) 14%, var(--surface-2))",
+        background: "color-mix(in srgb, var(--orange-500) 14%, var(--layer-2))",
         backgroundImage: "radial-gradient(var(--grid-dot) 1px, transparent 1px)",
         backgroundSize: "22px 22px",
        }}
@@ -2252,7 +2418,7 @@ function ProfileSection() {
       <div className="flex items-end gap-6 flex-wrap p-[1.4rem_1.75rem_1.75rem]">
        {/* Avatar */}
        <div className="relative w-[110px] h-[110px] shrink-0 -mt-[74px]">
-        <Avatar size={110} fallback="A" tone="orange" style={{ border: "4px solid var(--surface)", boxShadow: "0 10px 30px -10px var(--orange-500)" }} />
+        <Avatar size={110} fallback="A" tone="orange" style={{ border: "4px solid var(--layer-1)", boxShadow: "0 10px 30px -10px var(--orange-500)" }} />
         <IconButton className="absolute bottom-[2px] right-[2px] w-[30px] h-[30px] rounded-full" icon="camera" size={16} label="Cambiar foto" />
        </div>
        {/* Identity */}
@@ -2261,7 +2427,7 @@ function ProfileSection() {
          <h3 className="text-[length:var(--t-2xl)] whitespace-nowrap">{name}</h3>
          <Badge kind="live">Online</Badge>
         </div>
-        <p className="text-[color:var(--text-muted)] text-[length:var(--t-sm)] mt-[0.35rem] mb-[0.75rem]">@alexboff · Miembro desde 2023</p>
+        <p className="text-ink-muted text-[length:var(--t-sm)] mt-[0.35rem] mb-[0.75rem]">@alexboff · Miembro desde 2023</p>
         <div className="flex gap-2 flex-wrap">
          <Badge kind="accent">Moderador</Badge>
          <Badge>VGC</Badge>
@@ -2373,7 +2539,7 @@ function ProfileSection() {
          <Icon name="star" size={18} className="text-[var(--orange-500)]" />
          Logros
         </h3>
-        <span className="text-[color:var(--text-dim)] font-mono text-[length:var(--t-xs)]">37 / 60</span>
+        <span className="text-ink-dim font-mono text-[length:var(--t-xs)]">37 / 60</span>
        </div>
        <div className="grid grid-cols-3 gap-3 mb-5 max-[620px]:grid-cols-2">
         {ACHIEVEMENTS.map((a) => (
@@ -2391,12 +2557,12 @@ function ProfileSection() {
      intro="Todas las secciones juntas, como aparecen en la página de Perfil. Dos columnas: datos + actividad a la izquierda, stats + logros a la derecha."
      a11y="La jerarquía de encabezados es correcta: h1 → h2 → h3. Los formularios son navegables por teclado."
     >
-     <div className="rounded-[var(--radius-lg)] border border-[var(--border)] overflow-hidden bg-[var(--bg-grad-2)]">
-      <div className="flex items-center gap-2 py-[0.6rem] px-[0.9rem] border-b border-[var(--border)] bg-[var(--surface-2)]">
-       <span className="w-[9px] h-[9px] rounded-full bg-[var(--surface-3)]" />
-       <span className="w-[9px] h-[9px] rounded-full bg-[var(--surface-3)]" />
-       <span className="w-[9px] h-[9px] rounded-full bg-[var(--surface-3)]" />
-       <span className="ml-2 font-mono text-[length:var(--t-xs)] text-[color:var(--text-dim)]">/perfil</span>
+     <div className="rounded-[var(--radius-lg)] border border-edge overflow-hidden bg-[var(--bg-grad-2)]">
+      <div className="flex items-center gap-2 py-[0.6rem] px-[0.9rem] border-b border-edge bg-layer-2">
+       <span className="w-[9px] h-[9px] rounded-full bg-layer-3" />
+       <span className="w-[9px] h-[9px] rounded-full bg-layer-3" />
+       <span className="w-[9px] h-[9px] rounded-full bg-layer-3" />
+       <span className="ml-2 font-mono text-[length:var(--t-xs)] text-ink-dim">/perfil</span>
       </div>
       <div className="p-7">
        {/* Page header */}
@@ -2411,16 +2577,16 @@ function ProfileSection() {
        {/* Identity card */}
        <Card ticks className="overflow-hidden mb-6">
         <div
-         className="h-[104px] border-b border-[var(--border)]"
+         className="h-[104px] border-b border-edge"
          style={{
-          background: "color-mix(in srgb, var(--orange-500) 14%, var(--surface-2))",
+          background: "color-mix(in srgb, var(--orange-500) 14%, var(--layer-2))",
           backgroundImage: "radial-gradient(var(--grid-dot) 1px, transparent 1px)",
           backgroundSize: "22px 22px",
          }}
         />
         <div className="flex items-end gap-6 flex-wrap p-[1.4rem_1.75rem_1.75rem]">
          <div className="relative w-[110px] h-[110px] shrink-0 -mt-[74px]">
-          <Avatar size={110} fallback="A" tone="orange" style={{ border: "4px solid var(--surface)", boxShadow: "0 10px 30px -10px var(--orange-500)" }} />
+          <Avatar size={110} fallback="A" tone="orange" style={{ border: "4px solid var(--layer-1)", boxShadow: "0 10px 30px -10px var(--orange-500)" }} />
           <IconButton className="absolute bottom-[2px] right-[2px] w-[30px] h-[30px] rounded-full" icon="camera" size={16} label="Cambiar foto" />
          </div>
          <div className="flex-1 min-w-[220px] pb-[0.3rem]">
@@ -2428,7 +2594,7 @@ function ProfileSection() {
            <h3 className="text-[length:var(--t-2xl)] whitespace-nowrap">{name}</h3>
            <Badge kind="live">Online</Badge>
           </div>
-          <p className="text-[color:var(--text-muted)] text-[length:var(--t-sm)] mt-[0.35rem] mb-[0.75rem]">@alexboff · Miembro desde 2023</p>
+          <p className="text-ink-muted text-[length:var(--t-sm)] mt-[0.35rem] mb-[0.75rem]">@alexboff · Miembro desde 2023</p>
           <div className="flex gap-2 flex-wrap">
            <Badge kind="accent">Moderador</Badge>
            <Badge>VGC</Badge>
@@ -2488,7 +2654,7 @@ function ProfileSection() {
             <Icon name="star" size={18} className="text-[var(--orange-500)]" />
             Logros
            </h3>
-           <span className="text-[color:var(--text-dim)] font-mono text-[length:var(--t-xs)]">37 / 60</span>
+           <span className="text-ink-dim font-mono text-[length:var(--t-xs)]">37 / 60</span>
           </div>
           <div className="grid grid-cols-3 gap-3 mb-5">
            {ACHIEVEMENTS.map((a) => (
@@ -2521,17 +2687,17 @@ function PlaygroundSection() {
 
  return (
   <div>
-   <div className="mb-8 pb-6 border-b border-[var(--border)]">
+   <div className="mb-8 pb-6 border-b border-edge">
     <Kicker>Playground</Kicker>
     <h2 className="text-[length:var(--t-3xl)] mt-2.5">Composición en vivo</h2>
-    <p className="text-[length:var(--t-base)] text-[color:var(--text-muted)] max-w-[64ch] mt-[0.7rem] leading-[1.65]">
+    <p className="text-[length:var(--t-base)] text-ink-muted max-w-[64ch] mt-[0.7rem] leading-[1.65]">
      Una mini-feature real construida solo con piezas del sistema. Edita a
      la izquierda y ve el resultado a la derecha — así se prototipan
      funciones nuevas sin escribir CSS.
     </p>
    </div>
 
-   <div className="p-7 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface-2)] bg-[radial-gradient(var(--grid-dot)_1px,transparent_1px)] bg-[length:22px_22px]">
+   <div className="p-7 rounded-[var(--radius-lg)] border border-edge bg-layer-2 bg-[radial-gradient(var(--grid-dot)_1px,transparent_1px)] bg-[length:22px_22px]">
     <div className="grid grid-cols-2 gap-8 items-start max-[1000px]:grid-cols-1">
      {/* Controls */}
      <div className="flex flex-col gap-5">
@@ -2597,8 +2763,8 @@ function PlaygroundSection() {
       <Progress label="Ataque" value={atk} tone="orange" />
       <Progress label="Defensa" value={def} tone="accent" />
       <Progress label="Velocidad" value={spe} tone="emerald" />
-      <div className="flex items-center justify-between pt-1.5 border-t border-[var(--border)]">
-       <span className="text-[color:var(--text-muted)] text-[length:var(--t-sm)] font-semibold">
+      <div className="flex items-center justify-between pt-1.5 border-t border-edge">
+       <span className="text-ink-muted text-[length:var(--t-sm)] font-semibold">
         Media de stats
        </span>
        <span className="font-display font-extrabold text-[length:var(--t-xl)] text-[color:var(--orange-500)]">
@@ -2646,10 +2812,10 @@ const A11Y = [
 function AccessibilitySection() {
  return (
   <div>
-   <div className="mb-8 pb-6 border-b border-[var(--border)]">
+   <div className="mb-8 pb-6 border-b border-edge">
     <Kicker>Accesibilidad</Kicker>
     <h2 className="text-[length:var(--t-3xl)] mt-2.5">Estándar para cada componente</h2>
-    <p className="text-[length:var(--t-base)] text-[color:var(--text-muted)] max-w-[64ch] mt-[0.7rem] leading-[1.65]">
+    <p className="text-[length:var(--t-base)] text-ink-muted max-w-[64ch] mt-[0.7rem] leading-[1.65]">
      La accesibilidad es un requisito de aceptación, no una mejora opcional.
      Estos seis criterios se verifican en cada pieza antes de entrar al
      sistema.
@@ -2659,14 +2825,14 @@ function AccessibilitySection() {
     {A11Y.map(([icon, t, d]) => (
      <div
       key={t}
-      className="p-[1.4rem] rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--card-bg)] flex gap-4"
+      className="p-[1.4rem] rounded-[var(--radius-lg)] border border-edge bg-[var(--card-bg)] flex gap-4"
      >
       <span className="grid place-items-center w-[38px] h-[38px] rounded-[var(--radius,14px)] text-[color:var(--orange-500)] bg-[color-mix(in_srgb,var(--orange-500)_12%,transparent)] shrink-0">
        <Icon name={icon} size={18} />
       </span>
       <div>
        <h4 className="text-[length:var(--t-lg)] mb-1.5">{t}</h4>
-       <p className="text-[length:var(--t-sm)] text-[color:var(--text-muted)] leading-[1.6]">{d}</p>
+       <p className="text-[length:var(--t-sm)] text-ink-muted leading-[1.6]">{d}</p>
       </div>
      </div>
     ))}
@@ -2726,10 +2892,10 @@ const ROADMAP: [string, string, string, string[]][] = [
 function RoadmapSection() {
  return (
   <div>
-   <div className="mb-8 pb-6 border-b border-[var(--border)]">
+   <div className="mb-8 pb-6 border-b border-edge">
     <Kicker>Hoja de ruta</Kicker>
     <h2 className="text-[length:var(--t-3xl)] mt-2.5">De fundación a plataforma</h2>
-    <p className="text-[length:var(--t-base)] text-[color:var(--text-muted)] max-w-[64ch] mt-[0.7rem] leading-[1.65]">
+    <p className="text-[length:var(--t-base)] text-ink-muted max-w-[64ch] mt-[0.7rem] leading-[1.65]">
      Una secuencia priorizada: primero la base, luego el catálogo, después
      la migración del producto existente y por último las capacidades que
      abren features futuras.
@@ -2739,10 +2905,10 @@ function RoadmapSection() {
     {ROADMAP.map(([phase, title, badge, items]) => (
      <div
       key={phase}
-      className="grid grid-cols-[130px_1fr] gap-6 py-6 border-b border-[var(--border)] last:border-b-0 max-[620px]:grid-cols-1 max-[620px]:gap-3"
+      className="grid grid-cols-[130px_1fr] gap-6 py-6 border-b border-edge last:border-b-0 max-[620px]:grid-cols-1 max-[620px]:gap-3"
      >
       <div className="flex flex-col gap-2">
-       <span className="font-display font-black text-[length:var(--t-2xl)] text-[color:var(--text-dim)]">
+       <span className="font-display font-black text-[length:var(--t-2xl)] text-ink-dim">
         {phase}
        </span>
        <Badge kind={badge as "live" | "new" | "soon"}>
@@ -2755,7 +2921,7 @@ function RoadmapSection() {
       </div>
       <div>
        <h4 className="text-[length:var(--t-lg)] mb-2">{title}</h4>
-       <ul className="list-none p-0 m-0 flex flex-col gap-2 [&_li]:flex [&_li]:gap-2.5 [&_li]:items-start [&_li]:text-[length:var(--t-sm)] [[&_li]:text-[color:var(--text-muted)] [&_li]:leading-relaxed_li]:text-[color:var(--text-muted)] [[&_li]:text-[color:var(--text-muted)] [&_li]:leading-relaxed_li]:leading-[1.5] [&_svg]:text-[color:var(--accent-bright)] [&_svg]:shrink-0 [&_svg]:mt-[0.125rem]">
+       <ul className="list-none p-0 m-0 flex flex-col gap-2 [&_li]:flex [&_li]:gap-2.5 [&_li]:items-start [&_li]:text-[length:var(--t-sm)] [[&_li]:text-ink-muted [&_li]:leading-relaxed_li]:text-ink-muted [[&_li]:text-ink-muted [&_li]:leading-relaxed_li]:leading-[1.5] [&_svg]:text-secondary-hover [&_svg]:shrink-0 [&_svg]:mt-[0.125rem]">
         {(items as string[]).map((it) => (
          <li key={it}>
           <Icon name="check" size={15} />
@@ -2816,10 +2982,10 @@ function ToolsKitSection() {
       <Spec2 title="ToolPanel" tag="tool-kit.jsx" intro="La superficie sobre la que se construye cada página de herramienta: cabecera opcional (título + meta o cabecera propia) y cuerpo con padding. Hereda card-bg / card-border / radius del sistema." a11y="El título es texto real; el panel no aporta semántica falsa. La cabecera mantiene contraste AA en los seis modos.">
         <div className="spec2__grid2">
           <ToolPanel title="Equipo actual" meta="8 piezas">
-            <p className="text-[color:var(--text-muted)] m-0 text-sm">Cabecera con título + meta y cuerpo con padding.</p>
+            <p className="text-ink-muted m-0 text-sm">Cabecera con título + meta y cuerpo con padding.</p>
           </ToolPanel>
           <ToolPanel title="Sin cabecera meta">
-            <p className="text-[color:var(--text-muted)] m-0 text-sm">Solo título. El cuerpo aloja cualquier contenido de la herramienta.</p>
+            <p className="text-ink-muted m-0 text-sm">Solo título. El cuerpo aloja cualquier contenido de la herramienta.</p>
           </ToolPanel>
         </div>
         <PropTable rows={[
@@ -2838,7 +3004,7 @@ function ToolsKitSection() {
         <PropTable rows={[
           ["title", "string", "—", "Encabezado mono de la sección."],
           ["items", "{name,pct}[]", "—", "Filas a representar."],
-          ["tone", "color", "var(--accent)", "Color de la barra."],
+          ["tone", "color", "var(--secondary)", "Color de la barra."],
           ["max", "number", "auto", "Tope para normalizar (auto = mayor pct)."],
         ]} />
       </Spec2>
@@ -2860,7 +3026,7 @@ function ToolsKitSection() {
 
       <Spec2 title="ToolApp" tag="tool-kit.jsx" intro="Marco de aplicación a sangre completa: una columna de altura fija (viewport menos la barra de 68px) con zona de toolbar, sub-barra opcional y un cuerpo flexible que gestiona su propio scroll. Es la base de las herramientas tipo 'app' (Meta VGC, y próximamente Tracker y Calculadora)." a11y="No introduce roles falsos; las regiones internas (listas, tablas) aportan su propia semántica. El cuerpo conserva foco y scroll por teclado.">
         <div style={{ height: 150, border: "var(--hairline) solid var(--border)", borderRadius: "var(--radius)", overflow: "hidden", display: "flex", flexDirection: "column" }}>
-          <div style={{ padding: "0.5rem 0.7rem", borderBottom: "var(--hairline) solid var(--border)", display: "flex", gap: "0.5rem", alignItems: "center", background: "color-mix(in srgb, var(--surface-2) 60%, transparent)" }}>
+          <div style={{ padding: "0.5rem 0.7rem", borderBottom: "var(--hairline) solid var(--border)", display: "flex", gap: "0.5rem", alignItems: "center", background: "color-mix(in srgb, var(--layer-2) 60%, transparent)" }}>
             <SegTabs value="a" options={[{ value: "a", label: "Toolbar" }, { value: "b", label: "región" }]} onChange={() => {}} size="sm" />
             <div style={{ flex: 1 }} />
             <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--text-dim)" }}>shrink-0</span>
@@ -2893,11 +3059,11 @@ function ToolsKitSection() {
           columns={[{ key: "n", label: "#", w: 36 }, { key: "name", label: "Pokémon" }, { key: "use", label: "Uso", w: 90, align: "right", sortable: true }]}
           sortKey="use" sortDir="desc" onSort={() => {}} minWidth="320px">
           <tbody>
-            <tr className="[&_td]:py-[0.7rem] [&_td]:px-4 [&_td]:border-b [&_td]:border-[var(--border)] [&_td]:text-[color:var(--text-muted)] [&_tr:last-child_td]:border-b-0 [&_td]:text-sm">
-              <td className="font-mono text-[color:var(--text)]">1</td><td className="font-semibold text-[color:var(--text)]">Incineroar</td><td className="font-mono text-right text-[color:var(--text)]">43.1%</td>
+            <tr className="[&_td]:py-[0.7rem] [&_td]:px-4 [&_td]:border-b [&_td]:border-edge [&_td]:text-ink-muted [&_tr:last-child_td]:border-b-0 [&_td]:text-sm">
+              <td className="font-mono text-ink">1</td><td className="font-semibold text-ink">Incineroar</td><td className="font-mono text-right text-ink">43.1%</td>
             </tr>
-            <tr className="[&_td]:py-[0.7rem] [&_td]:px-4 [&_td]:border-b [&_td]:border-[var(--border)] [&_td]:text-[color:var(--text-muted)] [&_tr:last-child_td]:border-b-0 [&_td]:text-sm">
-              <td className="font-mono text-[color:var(--text)]">2</td><td className="font-semibold text-[color:var(--text)]">Flutter Mane</td><td className="font-mono text-right text-[color:var(--text)]">37.2%</td>
+            <tr className="[&_td]:py-[0.7rem] [&_td]:px-4 [&_td]:border-b [&_td]:border-edge [&_td]:text-ink-muted [&_tr:last-child_td]:border-b-0 [&_td]:text-sm">
+              <td className="font-mono text-ink">2</td><td className="font-semibold text-ink">Flutter Mane</td><td className="font-mono text-right text-ink">37.2%</td>
             </tr>
           </tbody>
         </ToolTable>
@@ -2928,7 +3094,7 @@ function ToolsKitSection() {
       <Spec2 title="Picker · HpBar" tag="tool-kit.jsx" intro="Dos piezas extraídas de la Calculadora de Daño. Picker es un &lt;select&gt; nativo estilizado — preferible a un menú propio cuando la lista es larga (naturalezas, objetos, movimientos): se escanea y teclea más rápido. HpBar es una barra de recurso con rampa verde→ámbar→rojo, editable y con reinicio opcional." a11y="Picker es un select nativo: hereda teclado y lectores de pantalla. HpBar expone el valor como texto además del color y la longitud.">
         <div style={{ display: "flex", gap: "1.5rem", flexWrap: "wrap", alignItems: "flex-start" }}>
           <div style={{ minWidth: 180 }}>
-            <span className="font-mono text-xs text-[color:var(--text-dim)] block mb-1.5">Naturaleza</span>
+            <span className="font-mono text-xs text-ink-dim block mb-1.5">Naturaleza</span>
             <Picker value={pickDemo} onChange={setPickDemo} options={["Modesto", "Tímido", "Adamant", "Cauto", "Sereno", "Audaz"]} />
           </div>
           <div style={{ minWidth: 240 }}>
@@ -2971,7 +3137,7 @@ function ToolsKitSection() {
           </div>
           <div style={{ border: "var(--hairline) solid var(--border)", borderRadius: "var(--radius)", padding: "0.6rem 0.7rem" }}>
             <TrendChart height={150}
-              lines={[{ values: eloDemo, color: "var(--accent)", width: 2 }, { values: eloDemoB, color: "var(--text-dim)", width: 1.5, dashed: true, opacity: 0.7 }]}
+              lines={[{ values: eloDemo, color: "var(--secondary)", width: 2 }, { values: eloDemoB, color: "var(--text-dim)", width: 1.5, dashed: true, opacity: 0.7 }]}
               baseline={1500} dots={eloDemoRes} />
           </div>
         </div>
@@ -2991,7 +3157,7 @@ function ToolsKitSection() {
               max={7} value={(ri, ci) => heatDemo[ri * 4 + ci] || 0} colLabel={(c) => ["mañana", "tarde", "noche", "madr."][Number(c)]} />
           </div>
           <div style={{ minWidth: 220 }}>
-            <span className="font-mono text-[10px] tracking-[0.1em] uppercase text-[var(--text-dim)] block mb-2">Causa del resultado</span>
+            <span className="font-mono text-[10px] tracking-[0.1em] uppercase text-ink-dim block mb-2">Causa del resultado</span>
             <TagPills value={tagDemo} onChange={(v) => setTagDemo(v ?? "")} options={[
               { value: "skill", label: "Habilidad", tone: "win" },
               { value: "misplay", label: "Error", tone: "loss" },
@@ -3185,20 +3351,20 @@ function SystemStatesSection() {
                 className={
                   "flex items-center gap-[0.55rem] w-full text-left font-inherit text-[length:var(--t-sm)] font-semibold px-[0.75rem] py-[0.6rem] rounded-[var(--radius)] cursor-pointer border border-solid border-transparent bg-transparent transition-[background,color,border-color] duration-[var(--dur)] " +
                   (cur === p.id
-                    ? "text-[var(--text)] bg-[var(--surface-2)] border-[var(--border-strong)] [&_svg]:text-[var(--accent-bright)]"
-                    : "text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--surface-2)]")
+                    ? "text-ink bg-layer-2 border-edge-strong [&_svg]:text-secondary-hover"
+                    : "text-ink-muted hover:text-ink hover:bg-layer-2")
                 }
                 onClick={() => setCur(p.id)}
               >
                 <Icon name={p.icon} size={15} />
                 <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">{p.name}</span>
-                <code className="ml-auto font-mono text-[0.6rem] text-[var(--text-dim)] shrink-0 max-[860px]:hidden">{p.route}</code>
+                <code className="ml-auto font-mono text-[0.6rem] text-ink-dim shrink-0 max-[860px]:hidden">{p.route}</code>
               </button>
             ))}
           </div>
-          <div className="border border-solid border-[var(--border)] rounded-[var(--radius-lg)] overflow-hidden bg-[var(--card-bg)] flex flex-col min-w-0">
+          <div className="border border-solid border-edge rounded-[var(--radius-lg)] overflow-hidden bg-[var(--card-bg)] flex flex-col min-w-0">
             <div
-              className="relative h-[420px] overflow-hidden bg-[var(--bg)] border-b border-[var(--border)] max-[560px]:h-[320px]"
+              className="relative h-[420px] overflow-hidden bg-base border-b border-edge max-[560px]:h-[320px]"
               key={s.id}
               aria-hidden="true"
               style={{ "--sysstate-minh": "100%", "--sysstate-pad": "1.5rem" } as React.CSSProperties}
@@ -3207,8 +3373,8 @@ function SystemStatesSection() {
                 {s.render()}
               </div>
             </div>
-            <div className="flex items-center justify-between gap-4 px-[1.15rem] py-[0.85rem] border-t border-[var(--border)] bg-[color-mix(in_srgb,var(--surface-2)_55%,transparent)]">
-              <p className="text-[length:var(--t-sm)] text-[var(--text-muted)] m-0">{s.desc}</p>
+            <div className="flex items-center justify-between gap-4 px-[1.15rem] py-[0.85rem] border-t border-edge bg-[color-mix(in_srgb,var(--layer-2)_55%,transparent)]">
+              <p className="text-[length:var(--t-sm)] text-ink-muted m-0">{s.desc}</p>
             </div>
           </div>
         </div>
@@ -3296,14 +3462,14 @@ function ShowcaseInner() {
     <div className="min-w-0">
       <div className="flex items-center gap-2.5 flex-wrap mb-[1.1rem]">
       <Kicker>Sistema de diseño</Kicker>
-      <span className="font-mono text-[length:var(--t-xs)] tracking-[0.08em] text-[color:var(--text-dim)] py-1 px-2.5 border border-[var(--border)] rounded-[var(--radius-pill)]">
+      <span className="font-mono text-[length:var(--t-xs)] tracking-[0.08em] text-ink-dim py-1 px-2.5 border border-edge rounded-[var(--radius-pill)]">
        v2.0 · 4 capas
       </span>
      </div>
      <h1 className="text-[length:clamp(2.6rem,6vw,var(--t-5xl))] leading-none [&_em]:not-italic [&_em]:text-[color:var(--orange-500)]">
       Design <em>System</em> Hub
      </h1>
-     <p className="text-[length:var(--t-lg)] text-[color:var(--text-muted)] max-w-[52ch] mt-5 leading-[1.6]">
+     <p className="text-[length:var(--t-lg)] text-ink-muted max-w-[52ch] mt-5 leading-[1.6]">
       Documentación viva, catálogo de componentes y fuente de verdad del
       frontend de BoffMedia. Una sola base para competir y crear.
      </p>
@@ -3315,11 +3481,11 @@ function ShowcaseInner() {
       ["3×2", "Modos visuales"],
       ["AA", "Accesibilidad"],
      ].map(([n, l]) => (
-      <div key={l} className="py-[1.125rem] px-5 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--card-bg)]">
+      <div key={l} className="py-[1.125rem] px-5 rounded-[var(--radius-lg)] border border-edge bg-[var(--card-bg)]">
        <div className="font-display font-black text-[length:var(--t-3xl)] leading-none text-[color:var(--orange-500)]">
         {n}
        </div>
-       <div className="font-mono text-[length:var(--t-xs)] tracking-[0.1em] uppercase text-[color:var(--text-dim)] mt-1.5">
+       <div className="font-mono text-[length:var(--t-xs)] tracking-[0.1em] uppercase text-ink-dim mt-1.5">
         {l}
        </div>
       </div>
@@ -3329,10 +3495,10 @@ function ShowcaseInner() {
 
    {/* Layout */}
    <div className="grid grid-cols-[232px_1fr] gap-12 items-start max-[1000px]:grid-cols-1 max-[1000px]:gap-6">
-    <aside className="sticky top-[90px] max-h-[calc(100vh-110px)] overflow-y-auto pr-2 max-[1000px]:relative max-[1000px]:top-0 max-[1000px]:max-h-none max-[1000px]:flex max-[1000px]:flex-wrap max-[1000px]:gap-[0.4rem] max-[1000px]:pb-4 max-[1000px]:border-b max-[1000px]:border-[var(--border)]" aria-label="Secciones del sistema">
+    <aside className="sticky top-[90px] max-h-[calc(100vh-110px)] overflow-y-auto pr-2 max-[1000px]:relative max-[1000px]:top-0 max-[1000px]:max-h-none max-[1000px]:flex max-[1000px]:flex-wrap max-[1000px]:gap-[0.4rem] max-[1000px]:pb-4 max-[1000px]:border-b max-[1000px]:border-edge" aria-label="Secciones del sistema">
      {HUB_NAV.map(([group, links]) => (
       <div key={group} className="mb-[1.4rem] max-[1000px]:mb-0">
-       <span className="font-mono text-[0.66rem] tracking-[0.16em] uppercase text-[color:var(--text-dim)] block mb-[0.6rem] pl-[0.9rem] max-[1000px]:hidden">
+       <span className="font-mono text-[0.66rem] tracking-[0.16em] uppercase text-ink-dim block mb-[0.6rem] pl-[0.9rem] max-[1000px]:hidden">
         {group}
        </span>
        {links.map(([id, label, icon]) => (
@@ -3343,8 +3509,8 @@ function ShowcaseInner() {
           "flex items-center gap-[0.6rem] w-full text-left text-[length:var(--t-sm)] font-medium py-2 px-[0.9rem] border-0 rounded-[var(--radius)] cursor-pointer transition-[color,background] duration-[var(--dur)] " +
           (active === id
            ? "text-[color:var(--orange-500)] bg-[color-mix(in_srgb,var(--orange-500)_10%,transparent)] font-semibold [&_svg]:text-[color:var(--orange-500)]"
-           : "text-[color:var(--text-muted)] bg-transparent hover:text-[color:var(--text)] hover:bg-[var(--surface-2)] [&_svg]:text-[color:var(--text-dim)] [&_svg]:shrink-0 [&_svg]:transition-[color] [&_svg]:duration-[var(--dur)]") +
-           " max-[1000px]:w-auto max-[1000px]:border max-[1000px]:border-[var(--border)] max-[1000px]:rounded-[var(--radius-pill)] max-[1000px]:py-[0.4rem] max-[1000px]:px-[0.8rem]"
+           : "text-ink-muted bg-transparent hover:text-ink hover:bg-layer-2 [&_svg]:text-ink-dim [&_svg]:shrink-0 [&_svg]:transition-[color] [&_svg]:duration-[var(--dur)]") +
+           " max-[1000px]:w-auto max-[1000px]:border max-[1000px]:border-edge max-[1000px]:rounded-[var(--radius-pill)] max-[1000px]:py-[0.4rem] max-[1000px]:px-[0.8rem]"
          }
          onClick={() => pick(id)}
         >

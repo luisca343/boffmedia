@@ -15,7 +15,7 @@ interface ToolsTypeBadgeProps {
 }
 
 export function ToolsTypeBadge({ type, pct, className }: ToolsTypeBadgeProps) {
-  const bg = TYPE_COLORS[type] || "var(--surface-3)"
+  const bg = TYPE_COLORS[type] || "var(--layer-3)"
   return (
     <span
       className={cn(

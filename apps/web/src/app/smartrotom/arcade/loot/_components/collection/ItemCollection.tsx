@@ -57,9 +57,9 @@ export default function ItemCollection({ items, onClose, uuid, onInventoryUpdate
   };
 
   return (
-    <div className="bg-surface-900/90 border-2 border-cyan-500/30 shadow-xl rounded-lg p-6 w-full max-h-[80vh] overflow-hidden flex flex-col">
+    <div className="bg-layer-1/90 border-2 border-cyan-500/30 shadow-xl rounded-lg p-6 w-full max-h-[80vh] overflow-hidden flex flex-col">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-secondary-400">
+        <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-secondary-hover">
           Tu Colección
         </h2>
         <div className="flex space-x-3">
@@ -74,7 +74,7 @@ export default function ItemCollection({ items, onClose, uuid, onInventoryUpdate
           )}
           <button 
             onClick={onClose}
-            className="bg-surface-800 hover:bg-surface-700 text-white p-2 rounded-full border border-surface-700 transition-colors"
+            className="bg-layer-2 hover:bg-layer-3 text-white p-2 rounded-full border border-edge transition-colors"
           >
             <X size={20} />
           </button>
@@ -98,7 +98,7 @@ export default function ItemCollection({ items, onClose, uuid, onInventoryUpdate
       />
       
       {/* Items grid */}
-      <div className="overflow-y-auto flex-grow bg-surface-950/50 p-4 rounded-lg border border-surface-800">
+      <div className="overflow-y-auto flex-grow bg-base/50 p-4 rounded-lg border border-edge-strong">
         <CollectionGrid 
           items={paginatedItems} 
           totalItems={localItems.length}

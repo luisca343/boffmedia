@@ -13,8 +13,8 @@ function Skeleton({
   ...props
 }: SkeletonProps) {
   const variantStyles = {
-    default: "bg-surface-700/70",
-    wingull: "bg-secondary-800/50"
+    default: "bg-layer-3/70",
+    wingull: "bg-secondary-soft/50"
   }
 
   return (

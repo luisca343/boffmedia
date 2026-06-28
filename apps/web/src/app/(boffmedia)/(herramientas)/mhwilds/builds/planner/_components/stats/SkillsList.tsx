@@ -43,14 +43,14 @@ export function SkillsList({ skills, skillsData }: SkillsListProps) {
     <MHWildsPanel>
       <MHWildsPanelHeader className="py-2">
         <MHWildsPanelTitle>{t("build_planner.active_skills")}</MHWildsPanelTitle>
-        <span className="text-[10px] font-mono text-surface-500">
+        <span className="text-[10px] font-mono text-ink-muted">
           {t("build_planner.skill_count", { count: skills.length })}
         </span>
       </MHWildsPanelHeader>
 
       <div className="px-2 pt-0 pb-1">
         {!skillsData ? (
-          <div className="text-center py-6 text-surface-400">
+          <div className="text-center py-6 text-ink-muted">
             <HelpCircle className="h-6 w-6 mx-auto mb-1.5 opacity-50 animate-pulse" />
             <p className="text-xs">{t("build_planner.loading", { item: t("skills").toLowerCase() })}</p>
           </div>
@@ -101,7 +101,7 @@ export function SkillsList({ skills, skillsData }: SkillsListProps) {
             </div>
           </ScrollArea>
         ) : (
-          <div className="text-center py-6 text-surface-400">
+          <div className="text-center py-6 text-ink-muted">
             <HelpCircle className="h-6 w-6 mx-auto mb-1.5 opacity-50" />
             <p className="text-xs">{t("build_planner.no_active_skills")}</p>
             <p className="text-xs mt-0.5 opacity-70">{t("build_planner.no_active_skills_description")}</p>
@@ -146,12 +146,12 @@ function CompactSkillItem({ skill, serverSkillData, isOverallocated, isLast = fa
     if (serverSkill) {
       switch (serverSkill.kind) {
         case "attack":  return "text-red-400";
-        case "defense": return "text-secondary-400";
-        case "element": return "text-accent-400";
-        default:        return "text-highlight-400";
+        case "defense": return "text-secondary-hover";
+        case "element": return "text-secondary-hover";
+        default:        return "text-warning-hover";
       }
     }
-    return "text-highlight-400";
+    return "text-warning-hover";
   };
 
   const getSkillDescription = (skill: Skill): string => {
@@ -165,16 +165,16 @@ function CompactSkillItem({ skill, serverSkillData, isOverallocated, isLast = fa
   const skillEffectDescription = getEffectDescription(skill);
   const skillColor = getSkillColor(skill);
   const skillDescription = getSkillDescription(skill);
-  const borderClass = isLast ? "" : "border-b border-surface-700/20";
+  const borderClass = isLast ? "" : "border-b border-edge/20";
 
   return (
-    <div className={`py-1.5 px-2 ${borderClass} hover:bg-surface-800/50 transition-colors`}>
+    <div className={`py-1.5 px-2 ${borderClass} hover:bg-layer-2/50 transition-colors`}>
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild className="w-full text-left">
             <div className="flex justify-between items-center cursor-help">
               <div className="flex-1 min-w-0 pr-1">
-                <p className="text-xs text-surface-100 truncate">{skill.name}</p>
+                <p className="text-xs text-ink truncate">{skill.name}</p>
               </div>
               <div className="flex items-center gap-1 flex-shrink-0">
                 {Array.from({ length: skill.maxLevel }, (_, i) => {
@@ -255,10 +255,10 @@ function SkillTooltipContent({
 }: SkillTooltipContentProps) {
   const t = useTranslations("mhwilds");
   return (
-    <div className="bg-surface-900 space-y-3 py-2 px-4">
+    <div className="bg-layer-1 space-y-3 py-2 px-4">
       <div>
         <h3 className="font-bold text-lg">{skill.name}</h3>
-        <p className="text-sm text-surface-400">{skillDescription}</p>
+        <p className="text-sm text-ink-muted">{skillDescription}</p>
       </div>
       <div className="space-y-1.5">
         <div className="grid gap-1">
@@ -266,7 +266,7 @@ function SkillTooltipContent({
             <div
               key={rank.level}
               className={`text-xs p-1.5 rounded ${
-                rank.level === effectiveLevel ? 'text-primary-400' : 'text-surface-400'
+                rank.level === effectiveLevel ? 'text-primary-hover' : 'text-ink-muted'
               }`}
             >
               <span className="font-medium">{t("lv")} {rank.level}:</span> {rank.description}

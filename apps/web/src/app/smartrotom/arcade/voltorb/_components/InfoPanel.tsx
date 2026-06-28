@@ -49,13 +49,13 @@ function InfoPanel({
       )}
 
       {showLevelComplete && (
-        <div className="bg-highlight-500 text-white p-4 rounded-lg text-center">
+        <div className="bg-warning text-white p-4 rounded-lg text-center">
           <p className="font-bold text-xl mb-2">¡Nivel completado!</p>
           <p className="mb-4">¿Quieres pasar al siguiente nivel o quedarte con tus monedas?</p>
           <p className="mb-4">Monedas actuales: {totalCoins}</p>
           <div className="flex justify-center space-x-4">
             <button
-              className="bg-secondary-500 hover:bg-secondary-400 text-white font-bold py-2 px-4 rounded"
+              className="bg-secondary hover:bg-secondary-hover text-white font-bold py-2 px-4 rounded"
               onClick={onNextLevel}
             >
               Siguiente nivel

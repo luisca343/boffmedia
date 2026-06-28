@@ -34,10 +34,10 @@ export function BSMonCard({ mon, order, lead, onClick, showStats }: BSMonCardPro
     <button
       className={cn(
         "flex flex-col gap-[.55rem] rounded-[var(--radius-lg)] relative overflow-hidden text-left font-inherit",
-        "bg-[var(--card-bg)] border-[var(--border)] transition-all duration-[var(--dur)] ease-[var(--ease)]",
-        "px-[.85rem] py-[.85rem] text-[var(--text)] cursor-pointer",
+        "bg-[var(--card-bg)] border-edge transition-all duration-[var(--dur)] ease-[var(--ease)]",
+        "px-[.85rem] py-[.85rem] text-ink cursor-pointer",
         '[data-direction="neon"]:backdrop-blur-[12px]',
-        lead && "border-[var(--accent-bright)] shadow-[inset_0_0_0_1px_var(--accent-bright),0_16px_40px_-22px_var(--accent)]",
+        lead && "border-[var(--secondary-hover)] shadow-[inset_0_0_0_1px_var(--secondary-hover),0_16px_40px_-22px_var(--secondary)]",
       )}
       style={{ "--_c": c } as React.CSSProperties}
       onClick={onClick}
@@ -48,7 +48,7 @@ export function BSMonCard({ mon, order, lead, onClick, showStats }: BSMonCardPro
       />
       <div className="relative z-[1] flex flex-col gap-[.55rem] items-center">
         {order != null && (
-          <span className="absolute top-0 left-0 z-[2] w-[24px] h-[24px] rounded-[7px] grid place-items-center font-display font-extrabold text-[.8rem] bg-[var(--accent)] text-[var(--on-accent)]">
+          <span className="absolute top-0 left-0 z-[2] w-[24px] h-[24px] rounded-[7px] grid place-items-center font-display font-extrabold text-[.8rem] bg-secondary text-[var(--on-secondary)]">
             {order}
           </span>
         )}
@@ -62,9 +62,9 @@ export function BSMonCard({ mon, order, lead, onClick, showStats }: BSMonCardPro
         <div className="font-display font-extrabold text-t-base text-center">{mon.name}</div>
         <div className="flex gap-[.3rem] justify-center"><BSTypeRow types={mon.types} ghost /></div>
         {showStats && (
-          <div className="grid grid-cols-3 gap-[.3rem_.6rem] font-mono text-[.6rem] text-[var(--text-muted)]">
+          <div className="grid grid-cols-3 gap-[.3rem_.6rem] font-mono text-[.6rem] text-ink-muted">
             {Object.entries({ PS: mon.stats.hp, Atq: mon.stats.atk, Def: mon.stats.def, AtE: mon.stats.spa, DeE: mon.stats.spd, Vel: mon.stats.spe }).map(([k, v]) => (
-              <div key={k}>{k} <b className="text-[var(--text)] font-bold">{v}</b></div>
+              <div key={k}>{k} <b className="text-ink font-bold">{v}</b></div>
             ))}
           </div>
         )}

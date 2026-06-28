@@ -15,15 +15,15 @@ import LanguageSwitcher from "@/components/ui/navigation/LanguageSwitcher";
 
 const NotificationPopover = dynamic(() => import("./NotificationPopover"), {
   ssr: false,
-  loading: () => <div className="w-[38px] h-[38px] rounded-[var(--btn-radius)] bg-[var(--surface-3)] animate-pulse" />,
+  loading: () => <div className="w-[38px] h-[38px] rounded-[var(--btn-radius)] bg-layer-3 animate-pulse" />,
 });
 
 const UserAuthSection = dynamic(() => import("@/components/ui/navigation/UserAuthSection"), {
   ssr: false,
   loading: () => (
     <div className="flex items-center gap-2">
-      <div className="w-[38px] h-[38px] rounded-[var(--btn-radius)] bg-[var(--surface-3)] animate-pulse" />
-      <div className="w-16 h-4 bg-[var(--surface-3)] rounded animate-pulse" />
+      <div className="w-[38px] h-[38px] rounded-[var(--btn-radius)] bg-layer-3 animate-pulse" />
+      <div className="w-16 h-4 bg-layer-3 rounded animate-pulse" />
     </div>
   ),
 });
@@ -111,7 +111,7 @@ export function FicusNav() {
           />
           <span className="relative font-display font-extrabold text-[1.3rem] tracking-[0.01em] text-[var(--orange-500)] pr-[2.6rem]">
             BoffMedia
-            <span className="absolute -top-[0.4rem] right-0 font-mono text-[0.5rem] font-bold tracking-[0.1em] px-[0.3rem] py-[0.12rem] text-[var(--on-accent)] bg-[var(--accent-bright)] rounded-[3px]">
+            <span className="absolute -top-[0.4rem] right-0 font-mono text-[0.5rem] font-bold tracking-[0.1em] px-[0.3rem] py-[0.12rem] text-[var(--on-secondary)] bg-secondary-hover rounded-[3px]">
               BETA
             </span>
           </span>
@@ -159,11 +159,11 @@ export function FicusNav() {
               </>
             ) : (
               <>
-                <div className="w-[38px] h-[38px] bg-[var(--surface-3)] rounded-[var(--btn-radius)] animate-pulse" />
-                <div className="w-[38px] h-[38px] bg-[var(--surface-3)] rounded-[var(--btn-radius)] animate-pulse" />
+                <div className="w-[38px] h-[38px] bg-layer-3 rounded-[var(--btn-radius)] animate-pulse" />
+                <div className="w-[38px] h-[38px] bg-layer-3 rounded-[var(--btn-radius)] animate-pulse" />
                 <div className="flex items-center gap-2">
-                  <div className="w-[38px] h-[38px] bg-[var(--surface-3)] rounded-[var(--btn-radius)] animate-pulse" />
-                  <div className="w-16 h-4 bg-[var(--surface-3)] rounded animate-pulse" />
+                  <div className="w-[38px] h-[38px] bg-layer-3 rounded-[var(--btn-radius)] animate-pulse" />
+                  <div className="w-16 h-4 bg-layer-3 rounded animate-pulse" />
                 </div>
               </>
             )}
@@ -173,7 +173,7 @@ export function FicusNav() {
           <Sheet>
             <SheetTrigger asChild>
               <button
-                className="md:hidden inline-flex items-center justify-center w-[38px] h-[38px] rounded-[var(--btn-radius)] text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[color-mix(in_srgb,var(--text)_8%,transparent)] border-0 bg-transparent cursor-pointer transition-colors duration-[var(--dur)]"
+                className="md:hidden inline-flex items-center justify-center w-[38px] h-[38px] rounded-[var(--btn-radius)] text-ink-muted hover:text-ink hover:bg-[color-mix(in_srgb,var(--text)_8%,transparent)] border-0 bg-transparent cursor-pointer transition-colors duration-[var(--dur)]"
               >
                 <Icon name="menu" size={20} />
                 <span className="sr-only">{t("openMenu")}</span>
@@ -184,7 +184,7 @@ export function FicusNav() {
               side="right"
               className="w-72 p-0"
               style={{
-                background: "var(--surface)",
+                background: "var(--layer-1)",
                 borderLeft: "var(--hairline) solid var(--border-strong)",
               }}
             >
@@ -214,7 +214,7 @@ export function FicusNav() {
                             className={`flex items-center gap-3 px-3 py-2.5 rounded-[var(--btn-radius)] text-[length:var(--t-sm)] font-semibold transition-colors duration-[var(--dur)] ${
                               active
                                 ? "text-[var(--orange-500)] bg-[color-mix(in_srgb,var(--orange-500)_10%,transparent)]"
-                                : "text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--surface-2)]"
+                                : "text-ink-muted hover:text-ink hover:bg-layer-2"
                             }`}
                             onClick={handleMenuItemClick}
                           >
@@ -222,7 +222,7 @@ export function FicusNav() {
                               <Icon
                                 name={icon}
                                 size={20}
-                                className={active ? "text-[var(--orange-500)]" : "text-[var(--text-dim)]"}
+                                className={active ? "text-[var(--orange-500)]" : "text-ink-dim"}
                               />
                             )}
                             <span>{label}</span>

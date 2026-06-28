@@ -34,8 +34,8 @@ export function FormsSection({ pokemon, pokemonIndex, formIndex }: FormsSectionP
             >
               <div className={`flex flex-col justify-center items-center p-3 rounded-lg transition-all
                 ${isCurrentForm 
-                  ? 'bg-primary-700/30 border-2 border-primary-400' 
-                  : 'bg-surface-700/30 border border-surface-600 hover:bg-surface-600/70 hover:border-surface-500'}`}
+                  ? 'bg-primary-active/30 border-2 border-primary' 
+                  : 'bg-layer-3/30 border border-edge hover:bg-layer-3/70 hover:border-edge'}`}
               >
                 <PokemonSprite 
                   width={100} 

@@ -58,9 +58,9 @@ export default function PokemonDetails({
       {/* Only show Nature selector for Gen 3+ */}
       {showNatures && (
         <div>
-          <label className="block text-xs font-medium mb-1 text-surface-200">Nature</label>
+          <label className="block text-xs font-medium mb-1 text-ink">Nature</label>
           <select 
-            className="w-full p-1 border rounded bg-surface-700 border-surface-600 text-surface-100 text-xs"
+            className="w-full p-1 border rounded bg-layer-3 border-edge text-ink text-xs"
             value={nature} 
             onChange={(e) => onNatureChange(e.target.value)}
           >
@@ -76,9 +76,9 @@ export default function PokemonDetails({
       {/* Only show Ability selector for Gen 3+ */}
       {showAbilities && (
         <div>
-          <label className="block text-xs font-medium mb-1 text-surface-200">Ability</label>
+          <label className="block text-xs font-medium mb-1 text-ink">Ability</label>
           <select
-            className="w-full p-1 border rounded bg-surface-700 border-surface-600 text-surface-100 text-xs"
+            className="w-full p-1 border rounded bg-layer-3 border-edge text-ink text-xs"
             value={ability}
             onChange={(e) => onAbilityChange(e.target.value)}
           >
@@ -104,9 +104,9 @@ export default function PokemonDetails({
       {/* Only show Item selector for Gen 2+ */}
       {showItems && (
         <div>
-          <label className="block text-xs font-medium mb-1 text-surface-200">Item</label>
+          <label className="block text-xs font-medium mb-1 text-ink">Item</label>
           <select
-            className="w-full p-1 border rounded bg-surface-700 border-surface-600 text-surface-100 text-xs"
+            className="w-full p-1 border rounded bg-layer-3 border-edge text-ink text-xs"
             value={item}
             onChange={(e) => onItemChange(e.target.value)}
           >
@@ -131,9 +131,9 @@ export default function PokemonDetails({
       
       {/* Status is always shown */}
       <div>
-        <label className="block text-xs font-medium mb-1 text-surface-200">Status</label>
+        <label className="block text-xs font-medium mb-1 text-ink">Status</label>
         <select
-          className="w-full p-1 border rounded bg-surface-700 border-surface-600 text-surface-100 text-xs"
+          className="w-full p-1 border rounded bg-layer-3 border-edge text-ink text-xs"
           value={status}
           onChange={(e) => onStatusChange(e.target.value)}
         >

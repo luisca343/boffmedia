@@ -14,10 +14,10 @@ export function SystemStatesDemoToasts() {
   }
 
   return (
-    <div className="border border-solid border-[var(--border)] rounded-[var(--radius-lg)] bg-[var(--card-bg)] p-[clamp(1.4rem,3vw,2.2rem)] mt-[1.2rem]">
+    <div className="border border-solid border-edge rounded-[var(--radius-lg)] bg-[var(--card-bg)] p-[clamp(1.4rem,3vw,2.2rem)] mt-[1.2rem]">
       <div className="flex items-center justify-between gap-4 flex-wrap mb-[1.3rem]">
         <span className="font-display text-[length:var(--t-lg)] font-bold">Notificaciones</span>
-        <span className="text-[var(--text-dim)] text-[length:var(--t-sm)]">Los toasts aparecen abajo a la derecha</span>
+        <span className="text-ink-dim text-[length:var(--t-sm)]">Los toasts aparecen abajo a la derecha</span>
       </div>
 
       <div className="flex flex-wrap gap-[0.6rem] mb-[1.3rem]">

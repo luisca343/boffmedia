@@ -94,7 +94,7 @@ function addConditionByType(condition: any, conditionKey: string, conditions: Re
           <div className={`w-3 h-3 rounded-full inline-block ${
             condition.time.toLowerCase() === 'day' ? 'bg-yellow-400' : 
             condition.time.toLowerCase() === 'night' ? 'bg-indigo-800' : 
-            'bg-surface-400'
+            'bg-layer-3'
           }`}></div>
           <span>{t(`time_${condition.time.toLowerCase()}`)}</span>
         </div>
@@ -118,9 +118,9 @@ function addConditionByType(condition: any, conditionKey: string, conditions: Re
         <HoverCard key={conditionKey}>
           <HoverCardTrigger className='underline hover:cursor-pointer flex items-center'>
             <span>En biomas específicos</span>
-            <InformationCircleIcon className="h-4 w-4 ml-1 text-primary-300" />
+            <InformationCircleIcon className="h-4 w-4 ml-1 text-primary-hover" />
           </HoverCardTrigger>
-          <HoverCardContent className="w-96 bg-surface-800 text-surface-50 border border-surface-600/50 z-50">
+          <HoverCardContent className="w-96 bg-layer-2 text-ink border border-edge/50 z-50">
             {biomes.map(biome => t(biome)).join(', ')}
           </HoverCardContent>
         </HoverCard>

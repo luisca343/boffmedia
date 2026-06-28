@@ -12,7 +12,7 @@ interface AchievementTileProps {
 export function AchievementTile({ icon, name, done = false }: AchievementTileProps) {
   return (
     <div
-      className="flex flex-col items-center gap-[0.5rem] text-center p-4 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-2)]"
+      className="flex flex-col items-center gap-[0.5rem] text-center p-4 rounded-[var(--radius)] border border-edge bg-layer-2"
       style={{ opacity: done ? 1 : 0.5 }}
     >
       <span
@@ -20,7 +20,7 @@ export function AchievementTile({ icon, name, done = false }: AchievementTilePro
         style={
           done
             ? { color: "var(--orange-500)", background: "color-mix(in srgb, var(--orange-500) 14%, transparent)", borderColor: "color-mix(in srgb, var(--orange-500) 35%, transparent)" }
-            : { color: "var(--text-dim)", background: "var(--surface-3)", borderColor: "var(--border-strong)" }
+            : { color: "var(--text-dim)", background: "var(--layer-3)", borderColor: "var(--border-strong)" }
         }
       >
         <Icon name={done ? icon : "shield"} size={20} />

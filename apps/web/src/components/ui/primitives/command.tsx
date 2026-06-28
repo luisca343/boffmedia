@@ -21,9 +21,9 @@ const Command = React.forwardRef<
   CommandProps
 >(({ className, variant = "default", ...props }, ref) => {
   const variantStyles = {
-    default: "bg-surface-800 text-surface-100",
-    wingull: "bg-secondary-900 text-secondary-100",
-    boff: "bg-surface-800 text-surface-100",
+    default: "bg-layer-2 text-ink",
+    wingull: "bg-secondary-soft text-secondary-hover",
+    boff: "bg-layer-2 text-ink",
   }
 
   return (
@@ -52,7 +52,7 @@ const CommandDialog = ({ children, variant = "default", ...props }: CommandDialo
   return (
     <Dialog {...props}>
       <DialogContent className="overflow-hidden p-0 shadow-lg">
-        <Command variant={variant} className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-surface-500 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5 dark:[&_[cmdk-group-heading]]:text-surface-400">
+        <Command variant={variant} className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-ink-muted [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5 dark:[&_[cmdk-group-heading]]:text-ink-muted">
           {children}
         </Command>
       </DialogContent>
@@ -72,16 +72,16 @@ const CommandInput = React.forwardRef<
   const variant = useCommandVariant()
   
   const variantStyles = {
-    default: "border-surface-700 text-primary-300 placeholder:text-surface-500",
-    wingull: "border-secondary-800 text-secondary-300 placeholder:text-secondary-500",
-    boff: "border-surface-600/60 text-surface-100 placeholder:text-surface-400",
+    default: "border-edge text-primary-hover placeholder:text-ink-muted",
+    wingull: "border-secondary-active text-secondary-hover placeholder:text-secondary",
+    boff: "border-edge/60 text-ink placeholder:text-ink-muted",
   }
 
   return (
     <div className="relative flex items-center border-b" cmdk-input-wrapper="">
       <Search className={cn(
         "absolute left-3 h-4 w-4 opacity-50",
-        variant === "default" ? "text-primary-400" : variant === "boff" ? "text-secondary-400" : "text-secondary-400"
+        variant === "default" ? "text-primary-hover" : variant === "boff" ? "text-secondary-hover" : "text-secondary-hover"
       )} />
       <CommandPrimitive.Input
         ref={ref}
@@ -118,9 +118,9 @@ const CommandEmpty = React.forwardRef<
   const variant = useCommandVariant()
   
   const variantStyles = {
-    default: "text-primary-300",
-    wingull: "text-secondary-300",
-    boff: "text-surface-400",
+    default: "text-primary-hover",
+    wingull: "text-secondary-hover",
+    boff: "text-ink-muted",
   }
 
   return (
@@ -141,9 +141,9 @@ const CommandGroup = React.forwardRef<
   const variant = useCommandVariant()
   
   const variantStyles = {
-    default: "text-primary-300 [&_[cmdk-group-heading]]:text-surface-400",
-    wingull: "text-secondary-300 [&_[cmdk-group-heading]]:text-secondary-400",
-    boff: "text-surface-100 [&_[cmdk-group-heading]]:text-surface-500",
+    default: "text-primary-hover [&_[cmdk-group-heading]]:text-ink-muted",
+    wingull: "text-secondary-hover [&_[cmdk-group-heading]]:text-secondary-hover",
+    boff: "text-ink [&_[cmdk-group-heading]]:text-ink-muted",
   }
 
   return (
@@ -168,9 +168,9 @@ const CommandSeparator = React.forwardRef<
   const variant = useCommandVariant()
   
   const variantStyles = {
-    default: "bg-surface-700",
-    wingull: "bg-secondary-800",
-    boff: "bg-secondary-500/15",
+    default: "bg-layer-3",
+    wingull: "bg-secondary-soft",
+    boff: "bg-secondary/15",
   }
 
   return (
@@ -190,9 +190,9 @@ const CommandItem = React.forwardRef<
   const variant = useCommandVariant()
   
   const variantStyles = {
-    default: "text-primary-400 data-[selected=true]:bg-surface-900 data-[selected=true]:text-primary-300",
-    wingull: "text-secondary-300 data-[selected=true]:bg-secondary-950 data-[selected=true]:text-secondary-300",
-    boff: "text-surface-100 data-[selected=true]:bg-surface-700 data-[selected=true]:text-secondary-200",
+    default: "text-primary-hover data-[selected=true]:bg-layer-1 data-[selected=true]:text-primary-hover",
+    wingull: "text-secondary-hover data-[selected=true]:bg-secondary-soft data-[selected=true]:text-secondary-hover",
+    boff: "text-ink data-[selected=true]:bg-layer-3 data-[selected=true]:text-secondary-hover",
   }
 
   return (
@@ -217,9 +217,9 @@ const CommandShortcut = ({
   const variant = useCommandVariant()
   
   const variantStyles = {
-    default: "text-surface-400",
-    wingull: "text-secondary-400",
-    boff: "text-surface-500",
+    default: "text-ink-muted",
+    wingull: "text-secondary-hover",
+    boff: "text-ink-muted",
   }
 
   return (

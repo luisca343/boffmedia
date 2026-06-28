@@ -8,7 +8,7 @@ import { ChevronRightIcon, BookOpenIcon, MapIcon, BoltIcon, SparklesIcon } from 
 
 export default function PokedexMenu(){
     return (
-        <div className="bg-surface-800 min-h-full overflow-auto">
+        <div className="bg-layer-2 min-h-full overflow-auto">
             <MenuHeader />
             <div className="mt-4 p-4 max-w-7xl mx-auto">
                 <PokedexSection title="Búsqueda Rápida">
@@ -53,19 +53,19 @@ export default function PokedexMenu(){
                 </div>
                 
                 <PokedexSection title="Últimos Registros" btn={
-                    <span className="text-primary-400 hover:text-primary-300 text-sm font-normal">Ver historial completo</span>
+                    <span className="text-primary-hover hover:text-primary-hover text-sm font-normal">Ver historial completo</span>
                 }>
-                    <div className="bg-surface-700/30 p-3 rounded-lg">
+                    <div className="bg-layer-3/30 p-3 rounded-lg">
                         <LastRegistries />
                     </div>
                 </PokedexSection>
                 
                 <PokedexSection title="Posibles Spawns" btn={
-                    <InternalLink href="pokedex/spawns" className="text-primary-400 hover:text-primary-300 text-sm font-normal">
+                    <InternalLink href="pokedex/spawns" className="text-primary-hover hover:text-primary-hover text-sm font-normal">
                         Ver más
                     </InternalLink>
                 }>
-                    <div className="bg-surface-700/30 p-3 rounded-lg">
+                    <div className="bg-layer-3/30 p-3 rounded-lg">
                         <PossibleSpawns pokemonSpawns={[]} hideCaught={false} hideSeen={false}/>
                     </div>
                 </PokedexSection>
@@ -77,17 +77,17 @@ export default function PokedexMenu(){
 function QuickAccessCard({ title, description, href, icon }: { title: string, description: string, href: string, icon: React.ReactNode }) {
     return (
         <InternalLink href={href} className="block">
-            <div className="bg-surface-700/50 border border-surface-600 rounded-lg p-4 hover:bg-surface-600 transition-all shadow-md hover:shadow-lg flex items-center justify-between">
+            <div className="bg-layer-3/50 border border-edge rounded-lg p-4 hover:bg-layer-3 transition-all shadow-md hover:shadow-lg flex items-center justify-between">
                 <div className="flex items-center">
-                    <div className="bg-surface-800 p-2 rounded-full mr-4">
+                    <div className="bg-layer-2 p-2 rounded-full mr-4">
                         {icon}
                     </div>
                     <div>
-                        <h3 className="font-bold text-lg text-surface-100">{title}</h3>
-                        <p className="text-surface-300 text-sm">{description}</p>
+                        <h3 className="font-bold text-lg text-ink">{title}</h3>
+                        <p className="text-ink text-sm">{description}</p>
                     </div>
                 </div>
-                <ChevronRightIcon className="h-5 w-5 text-surface-400" />
+                <ChevronRightIcon className="h-5 w-5 text-ink-muted" />
             </div>
         </InternalLink>
     );

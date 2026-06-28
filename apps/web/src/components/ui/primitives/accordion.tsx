@@ -39,8 +39,8 @@ const AccordionItem = React.forwardRef<
   const variant = useAccordionVariant()
 
   const variantStyles = {
-    default: "border-b border-surface-700/70 transition-all duration-300",
-    wingull: "border-b border-secondary-700 transition-all duration-300",
+    default: "border-b border-edge/70 transition-all duration-300",
+    wingull: "border-b border-secondary-active transition-all duration-300",
   }
 
   return (
@@ -60,13 +60,13 @@ const AccordionTrigger = React.forwardRef<
   const variant = useAccordionVariant()
 
   const variantStyles = {
-    default: "text-surface-300 hover:text-primary-300 data-[state=open]:text-primary-300",
-    wingull: "text-secondary-300 hover:text-secondary-400 data-[state=open]:text-secondary-300",
+    default: "text-ink hover:text-primary-hover data-[state=open]:text-primary-hover",
+    wingull: "text-secondary-hover hover:text-secondary-hover data-[state=open]:text-secondary-hover",
   }
 
   const chevronStyles = {
-    default: "text-primary-500",
-    wingull: "text-secondary-500",
+    default: "text-primary",
+    wingull: "text-secondary",
   }
 
   return (
@@ -101,8 +101,8 @@ const AccordionContent = React.forwardRef<
   const variant = useAccordionVariant()
 
   const variantStyles = {
-    default: "text-surface-400",
-    wingull: "text-secondary-300",
+    default: "text-ink-muted",
+    wingull: "text-secondary-hover",
   }
 
   return (

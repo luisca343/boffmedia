@@ -16,7 +16,7 @@ export function getEventStatus(startDate: string | Date, endDate?: string | Date
   if (!hasValidEndDate) {
     return { 
       label: "En Curso", 
-      class: "bg-success-500/20 text-success-400 border-success-500/30" 
+      class: "bg-success/20 text-success-hover border-success-border/30" 
     };
   }
   
@@ -24,17 +24,17 @@ export function getEventStatus(startDate: string | Date, endDate?: string | Date
   if (now < start) {
     return { 
       label: "Próximo", 
-      class: "bg-primary-500/20 text-primary-400 border-primary-500/30" 
+      class: "bg-primary/20 text-primary-hover border-primary/30" 
     };
   } else if (now > end!) {
     return { 
       label: "Finalizado", 
-      class: "bg-surface-500/20 text-surface-400 border-surface-500/30" 
+      class: "bg-layer-3/20 text-ink-muted border-edge/30" 
     };
   } else {
     return { 
       label: "En Curso", 
-      class: "bg-success-500/20 text-success-400 border-success-500/30" 
+      class: "bg-success/20 text-success-hover border-success-border/30" 
     };
   }
 }

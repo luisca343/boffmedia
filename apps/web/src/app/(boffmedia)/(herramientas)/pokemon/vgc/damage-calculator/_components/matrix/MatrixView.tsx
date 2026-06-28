@@ -111,7 +111,7 @@ export function MatrixView({ tab, field, onFieldChange, onAttackerSide, onDefend
           className="w-full max-h-40 md:w-[240px] md:max-h-none"
         />
 
-        <div className="flex-1 overflow-auto bg-surface-950 min-h-0">
+        <div className="flex-1 overflow-auto bg-base min-h-0">
           {attackers.length > 0 && defenders.length > 0 ? (
             <MatrixTable
               attackers={attackers} defenders={defenders}

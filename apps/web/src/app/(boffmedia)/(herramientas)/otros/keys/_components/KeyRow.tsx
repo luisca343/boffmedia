@@ -20,7 +20,7 @@ export const KeyRow = ({
 
   return (
     <motion.div
-      className="group relative flex items-center gap-3 md:gap-4 px-3 md:px-4 py-3 rounded-xl bg-surface-800/50 border border-surface-700/40 hover:border-secondary-500/40 hover:bg-surface-800/80 transition-all duration-200 cursor-pointer overflow-hidden"
+      className="group relative flex items-center gap-3 md:gap-4 px-3 md:px-4 py-3 rounded-xl bg-layer-2/50 border border-edge/40 hover:border-secondary/40 hover:bg-layer-2/80 transition-all duration-200 cursor-pointer overflow-hidden"
       onMouseEnter={() => setHoveredRow(key.name)}
       onMouseLeave={() => setHoveredRow(null)}
       onClick={() => fetchGameData(key.steamID)}
@@ -30,15 +30,15 @@ export const KeyRow = ({
       transition={{ duration: 0.25, delay: Math.min(index * 0.04, 0.4) }}
     >
       {/* Hover glow sweep */}
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-secondary-500/6 via-transparent to-transparent pointer-events-none" />
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-secondary/6 via-transparent to-transparent pointer-events-none" />
 
       {/* Index */}
-      <span className="hidden sm:block text-surface-600 text-xs font-mono w-5 text-right flex-shrink-0 select-none">
+      <span className="hidden sm:block text-ink-dim text-xs font-mono w-5 text-right flex-shrink-0 select-none">
         {index + 1}
       </span>
 
       {/* Game image */}
-      <div className="w-20 h-12 md:w-24 md:h-14 rounded-lg overflow-hidden bg-surface-900 flex-shrink-0 border border-surface-700/50 group-hover:border-secondary-500/30 transition-colors duration-200">
+      <div className="w-20 h-12 md:w-24 md:h-14 rounded-lg overflow-hidden bg-layer-1 flex-shrink-0 border border-edge/50 group-hover:border-secondary/30 transition-colors duration-200">
         {key.imageUrl ? (
           <img
             src={key.imageUrl}
@@ -50,13 +50,13 @@ export const KeyRow = ({
               const parent = target.parentElement;
               if (parent) {
                 parent.innerHTML =
-                  '<div class="w-full h-full flex items-center justify-center bg-surface-800"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-surface-600"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg></div>';
+                  '<div class="w-full h-full flex items-center justify-center bg-layer-2"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-ink-dim"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg></div>';
               }
             }}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-surface-800/50">
-            <Gift className="w-5 h-5 text-surface-600" />
+          <div className="w-full h-full flex items-center justify-center bg-layer-2/50">
+            <Gift className="w-5 h-5 text-ink-dim" />
           </div>
         )}
       </div>
@@ -64,16 +64,16 @@ export const KeyRow = ({
       {/* Game info */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="font-semibold text-surface-100 truncate group-hover:text-white transition-colors duration-150 leading-tight">
+          <span className="font-semibold text-ink truncate group-hover:text-white transition-colors duration-150 leading-tight">
             {key.name}
           </span>
           {key.count && key.count > 1 && (
-            <span className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-secondary-500/15 border border-secondary-500/30 text-secondary-400 text-xs font-medium flex-shrink-0">
+            <span className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-secondary/15 border border-secondary/30 text-secondary-hover text-xs font-medium flex-shrink-0">
               ×{key.count}
             </span>
           )}
         </div>
-        <p className="text-xs text-surface-500 mt-0.5 group-hover:text-surface-400 transition-colors duration-150">
+        <p className="text-xs text-ink-muted mt-0.5 group-hover:text-ink-muted transition-colors duration-150">
           Clic para ver detalles
         </p>
       </div>
@@ -85,7 +85,7 @@ export const KeyRow = ({
           className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all duration-200 ${
             isClaimed
               ? "bg-red-500/10 text-red-400 border border-red-500/20"
-              : "bg-highlight-500/10 text-highlight-400 border border-highlight-500/20"
+              : "bg-warning/10 text-warning-hover border border-warning-border/20"
           }`}
         >
           {isClaimed ? (
@@ -101,7 +101,7 @@ export const KeyRow = ({
           className={`sm:hidden flex items-center justify-center w-7 h-7 rounded-lg ${
             isClaimed
               ? "bg-red-500/10 text-red-400 border border-red-500/20"
-              : "bg-highlight-500/10 text-highlight-400 border border-highlight-500/20"
+              : "bg-warning/10 text-warning-hover border border-warning-border/20"
           }`}
         >
           {isClaimed ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Key className="w-3.5 h-3.5" />}
@@ -111,7 +111,7 @@ export const KeyRow = ({
         <a
           href={`https://store.steampowered.com/app/${key.steamID}`}
           onClick={(e) => e.stopPropagation()}
-          className="flex items-center justify-center w-7 h-7 rounded-lg bg-surface-700/50 border border-surface-600/50 text-surface-400 hover:text-secondary-400 hover:border-secondary-500/40 hover:bg-secondary-500/10 transition-all duration-150"
+          className="flex items-center justify-center w-7 h-7 rounded-lg bg-layer-3/50 border border-edge/50 text-ink-muted hover:text-secondary-hover hover:border-secondary/40 hover:bg-secondary/10 transition-all duration-150"
           target="_blank"
           rel="noopener noreferrer"
           title="Ver en Steam"

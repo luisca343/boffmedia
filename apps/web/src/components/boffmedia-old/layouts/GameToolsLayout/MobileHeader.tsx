@@ -67,12 +67,12 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({ gameConfig, onMenuCl
               className="object-contain"
             />
           ) : (
-            <GiGamepad className="h-4 w-4 text-primary-400" />
+            <GiGamepad className="h-4 w-4 text-primary-hover" />
           )}
         </div>
 
         <span
-          className="font-black text-sm text-surface-50 tracking-wide leading-none"
+          className="font-black text-sm text-ink tracking-wide leading-none"
           style={{
             fontFamily: "Orbitron, sans-serif",
             textShadow: "0 0 12px rgba(249,115,22,0.25)",

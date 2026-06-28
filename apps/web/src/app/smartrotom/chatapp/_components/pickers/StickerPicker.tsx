@@ -63,7 +63,7 @@ export function StickerPicker({ onStickerSelect }: StickerPickerProps) {
               <button
                 key={sticker.path}
                 onClick={() => handleStickerClick(sticker.path)}
-                className="relative aspect-square rounded-lg overflow-hidden hover:ring-2 hover:ring-primary-400 transition-all bg-neutral-800 p-2"
+                className="relative aspect-square rounded-lg overflow-hidden hover:ring-2 hover:ring-primary transition-all bg-neutral-800 p-2"
                 title={sticker.name}
               >
                 <img

@@ -30,12 +30,12 @@ const MoveResult = ({
       onClick={onSelect}
       className={`block w-full text-left border-b py-0.5 px-2 text-sm transition-colors ${
         isSelected 
-          ? 'bg-primary-500/20 text-primary-300 border-primary-500' 
-          : 'border-surface-700 text-surface-100 hover:bg-surface-700'
+          ? 'bg-primary/20 text-primary-hover border-primary' 
+          : 'border-edge text-ink hover:bg-layer-3'
       }`}
     >
       <div className="flex justify-between items-center">
-        <div className="font-medium">{moveName} <span className="text-xs text-surface-400">({moveType})</span></div>
+        <div className="font-medium">{moveName} <span className="text-xs text-ink-muted">({moveType})</span></div>
         <div className="text-xs">
           {minPercent}-{maxPercent}%
         </div>
@@ -60,10 +60,10 @@ const MovesResultsList = ({
   onSelectResult
 }: MovesResultsListProps) => {
   return (
-    <div className="border border-surface-700 rounded-md bg-surface-800">
+    <div className="border border-edge rounded-md bg-layer-2">
       {/* Header */}
-      <div className="bg-surface-700 px-2 py-1 text-xs font-semibold text-primary-300">
-        {results[0]?.attacker.name || `Pokémon ${direction === 'attacker-to-defender' ? '1' : '2'}`}&apos;s Moves <span className="text-surface-400">(select one to show detailed results)</span>
+      <div className="bg-layer-3 px-2 py-1 text-xs font-semibold text-primary-hover">
+        {results[0]?.attacker.name || `Pokémon ${direction === 'attacker-to-defender' ? '1' : '2'}`}&apos;s Moves <span className="text-ink-muted">(select one to show detailed results)</span>
       </div>
       
       {/* Moves list */}
@@ -98,7 +98,7 @@ const MovesResultsList = ({
           );
         })}
         {results.length === 0 && (
-          <p className="text-xs text-surface-500 p-2">No moves selected</p>
+          <p className="text-xs text-ink-muted p-2">No moves selected</p>
         )}
       </div>
     </div>

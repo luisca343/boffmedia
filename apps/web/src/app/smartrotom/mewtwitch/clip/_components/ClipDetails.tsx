@@ -27,10 +27,10 @@ export const ClipDetails = ({
   const t = useTranslations("twitch");
   
   return (
-    <div className="bg-surface-800 rounded-lg p-6 shadow-lg">
+    <div className="bg-layer-2 rounded-lg p-6 shadow-lg">
       <h1 className="text-2xl font-bold mb-3">{title}</h1>
       
-      <div className="flex flex-wrap items-center gap-4 mb-6 text-surface-300">
+      <div className="flex flex-wrap items-center gap-4 mb-6 text-ink">
         <div className="flex items-center">
           <Eye className="h-4 w-4 mr-1" />
           <span>{formatNumber(viewCount)} {t("clip.views")}</span>
@@ -47,7 +47,7 @@ export const ClipDetails = ({
         </div>
         
         <div className="flex items-center">
-          <span className="text-surface-400">Language:</span>
+          <span className="text-ink-muted">Language:</span>
           <span className="ml-1">{language.toUpperCase()}</span>
         </div>
       </div>
@@ -63,9 +63,9 @@ export const ClipDetails = ({
           </InternalLink>
         </div>
         
-        <div className="bg-surface-700 rounded p-4">
-          <p className="text-sm text-surface-400 mb-1">{t("clip.creator")}:</p>
-          <p className="text-surface-300 font-medium">{creatorName}</p>
+        <div className="bg-layer-3 rounded p-4">
+          <p className="text-sm text-ink-muted mb-1">{t("clip.creator")}:</p>
+          <p className="text-ink font-medium">{creatorName}</p>
         </div>
       </div>
     </div>

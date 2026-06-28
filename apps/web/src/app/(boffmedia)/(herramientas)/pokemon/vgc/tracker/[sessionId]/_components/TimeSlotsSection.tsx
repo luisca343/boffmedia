@@ -24,14 +24,14 @@ export function TimeSlotsSection({ slots }: Props) {
 
   return (
     <Card className="overflow-hidden">
-      <div className="px-4 py-3 border-b border-surface-700">
-        <span className="text-sm font-semibold text-surface-300">{t('timeSlots.title')}</span>
+      <div className="px-4 py-3 border-b border-edge">
+        <span className="text-sm font-semibold text-ink">{t('timeSlots.title')}</span>
       </div>
-      <div className="divide-y divide-surface-700/50">
+      <div className="divide-y divide-edge/50">
         {slots.map((s) => {
           const wr = s.winRate;
           const wrColor =
-            wr === null ? 'text-surface-500' : wr >= 0.6 ? 'text-green-400' : wr >= 0.4 ? 'text-yellow-400' : 'text-red-400';
+            wr === null ? 'text-ink-muted' : wr >= 0.6 ? 'text-green-400' : wr >= 0.4 ? 'text-yellow-400' : 'text-red-400';
           const barWidth = wr !== null ? Math.round(wr * 100) : 0;
 
           return (
@@ -39,13 +39,13 @@ export function TimeSlotsSection({ slots }: Props) {
               <span className="shrink-0">{SLOT_ICONS[s.slot]}</span>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs text-surface-300 font-medium">{t(`timeSlots.${s.slot}`)}</span>
+                  <span className="text-xs text-ink font-medium">{t(`timeSlots.${s.slot}`)}</span>
                   <div className="flex items-center gap-3 text-xs font-mono tabular-nums">
-                    <span className="text-surface-500">
+                    <span className="text-ink-muted">
                       <span className="text-green-400">{s.wins}</span>
-                      <span className="text-surface-700">/</span>
+                      <span className="text-ink-dim">/</span>
                       <span className="text-red-400">{s.losses}</span>
-                      {s.draws > 0 && <><span className="text-surface-700">/</span><span className="text-yellow-400">{s.draws}</span></>}
+                      {s.draws > 0 && <><span className="text-ink-dim">/</span><span className="text-yellow-400">{s.draws}</span></>}
                     </span>
                     <span className={`font-semibold w-10 text-right ${wrColor}`}>
                       {wr !== null ? `${Math.round(wr * 100)}%` : '—'}
@@ -53,7 +53,7 @@ export function TimeSlotsSection({ slots }: Props) {
                   </div>
                 </div>
                 {wr !== null && (
-                  <div className="h-1 rounded-full bg-surface-700 overflow-hidden">
+                  <div className="h-1 rounded-full bg-layer-3 overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all ${wr >= 0.6 ? 'bg-green-500' : wr >= 0.4 ? 'bg-yellow-500' : 'bg-red-500'}`}
                       style={{ width: `${barWidth}%` }}
@@ -61,7 +61,7 @@ export function TimeSlotsSection({ slots }: Props) {
                   </div>
                 )}
               </div>
-              <span className="text-[10px] text-surface-600 shrink-0 tabular-nums">×{s.games}</span>
+              <span className="text-[10px] text-ink-dim shrink-0 tabular-nums">×{s.games}</span>
             </div>
           );
         })}

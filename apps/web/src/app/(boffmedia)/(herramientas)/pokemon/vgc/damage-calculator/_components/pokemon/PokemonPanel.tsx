@@ -36,13 +36,13 @@ export function PokemonPanel({ poke, onChange, side, useChampions = false }: Pro
   const apiEntry = legalPokemon.find((p) => p.name === poke.name)
   const species = apiEntry
 
-  const accentText = isAtk ? 'text-primary-400' : 'text-accent-400'
-  const accentBg = isAtk ? 'bg-primary-500/8' : 'bg-accent-500/8'
-  const accentBorder = isAtk ? 'border-primary-500/20' : 'border-accent-500/20'
+  const accentText = isAtk ? 'text-primary-hover' : 'text-secondary-hover'
+  const accentBg = isAtk ? 'bg-primary/8' : 'bg-secondary/8'
+  const accentBorder = isAtk ? 'border-primary/20' : 'border-secondary/20'
   const accentMoveColor = isAtk ? 'primary' : 'accent'
   const dotColor = isAtk
-    ? 'bg-primary-400 shadow-[0_0_6px_theme(colors.primary.400)]'
-    : 'bg-accent-400 shadow-[0_0_6px_theme(colors.accent.400)]'
+    ? 'bg-primary-hover shadow-[0_0_6px_theme(colors.primary.400)]'
+    : 'bg-secondary-hover shadow-[0_0_6px_theme(colors.accent.400)]'
 
   function updateMove(idx: number, patch: Partial<CalcPokemon['moves'][0]>) {
     const moves = poke.moves.map((m, i) =>
@@ -54,11 +54,11 @@ export function PokemonPanel({ poke, onChange, side, useChampions = false }: Pro
   const speciesAbilities = species ? Object.values(species.abilities).filter(Boolean) : []
 
   const selectCls =
-    'w-full bg-surface-900 border border-surface-700 rounded px-1.5 py-1 text-xs text-surface-200 focus:outline-none focus:border-primary-500'
+    'w-full bg-layer-1 border border-edge rounded px-1.5 py-1 text-xs text-ink focus:outline-none focus:border-primary'
 
   return (
     <div
-      className={`bg-surface-900/95 ${isAtk ? 'border-r' : 'border-l'} border-surface-700/50 flex flex-col gap-2 p-3`}
+      className={`bg-layer-1/95 ${isAtk ? 'border-r' : 'border-l'} border-edge/50 flex flex-col gap-2 p-3`}
     >
       {/* Header badge */}
       <div
@@ -71,7 +71,7 @@ export function PokemonPanel({ poke, onChange, side, useChampions = false }: Pro
       {/* Sprite + name search + types */}
       <div className="flex items-start gap-2">
         <div
-          className={`w-12 h-12 rounded-lg bg-surface-950 border ${accentBorder} flex items-center justify-center flex-shrink-0`}
+          className={`w-12 h-12 rounded-lg bg-base border ${accentBorder} flex items-center justify-center flex-shrink-0`}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -169,7 +169,7 @@ export function PokemonPanel({ poke, onChange, side, useChampions = false }: Pro
             onChange={(e) =>
               onChange({ level: Math.min(100, Math.max(1, parseInt(e.target.value) || 1)) })
             }
-            className="w-full bg-surface-900 border border-surface-700 rounded px-1 py-1 text-xs text-center text-surface-200 focus:outline-none focus:border-primary-500"
+            className="w-full bg-layer-1 border border-edge rounded px-1 py-1 text-xs text-center text-ink focus:outline-none focus:border-primary"
           />
         </FormRow>
         <FormRow label={t('nature')}>
@@ -195,7 +195,7 @@ export function PokemonPanel({ poke, onChange, side, useChampions = false }: Pro
       {/* Moves */}
       <div className="flex flex-col gap-1">
         {/* Column headers */}
-        <div className="flex items-center gap-1 px-0.5 text-[9px] font-semibold uppercase tracking-wide text-surface-600">
+        <div className="flex items-center gap-1 px-0.5 text-[9px] font-semibold uppercase tracking-wide text-ink-dim">
           <span className={`flex-1 ${accentText} font-black tracking-widest text-[10px]`}>
             {t('moves')}
           </span>
@@ -225,7 +225,7 @@ export function PokemonPanel({ poke, onChange, side, useChampions = false }: Pro
       />
 
       {/* Stat table */}
-      <div className="bg-surface-950/50 rounded-lg p-2 border border-surface-800/50">
+      <div className="bg-base/50 rounded-lg p-2 border border-edge-strong/50">
         <StatTable
           poke={poke}
           onChange={onChange}
@@ -240,7 +240,7 @@ export function PokemonPanel({ poke, onChange, side, useChampions = false }: Pro
 function FormRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <span className="text-[10px] font-semibold text-surface-500 uppercase tracking-wide">
+      <span className="text-[10px] font-semibold text-ink-muted uppercase tracking-wide">
         {label}
       </span>
       {children}

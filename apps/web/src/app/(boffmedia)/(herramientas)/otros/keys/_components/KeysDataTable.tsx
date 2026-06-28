@@ -52,14 +52,14 @@ export const KeysDataTable = ({
           className="flex flex-col items-center justify-center py-20 gap-4"
         >
           <div className="relative">
-            <div className="absolute inset-0 bg-secondary-500/10 blur-2xl rounded-full" />
-            <div className="relative w-20 h-20 rounded-2xl bg-surface-800 border border-surface-700 flex items-center justify-center">
-              <Gamepad2 className="w-9 h-9 text-surface-500" />
+            <div className="absolute inset-0 bg-secondary/10 blur-2xl rounded-full" />
+            <div className="relative w-20 h-20 rounded-2xl bg-layer-2 border border-edge flex items-center justify-center">
+              <Gamepad2 className="w-9 h-9 text-ink-muted" />
             </div>
           </div>
           <div className="text-center">
-            <p className="text-surface-300 font-medium">No se encontraron claves</p>
-            <p className="text-surface-500 text-sm mt-1">Prueba con otro término de búsqueda</p>
+            <p className="text-ink font-medium">No se encontraron claves</p>
+            <p className="text-ink-muted text-sm mt-1">Prueba con otro término de búsqueda</p>
           </div>
         </motion.div>
       )}

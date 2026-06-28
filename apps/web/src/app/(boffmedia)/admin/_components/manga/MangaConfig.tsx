@@ -99,13 +99,13 @@ export default function MangaConfig() {
       {/* Header */}
       <div className="flex items-center gap-3">
         <Settings className="w-5 h-5 text-[var(--orange-500)] shrink-0" />
-        <h2 className="text-xl font-bold text-[var(--text)]">Configuración de Manga</h2>
+        <h2 className="text-xl font-bold text-ink">Configuración de Manga</h2>
       </div>
 
       {/* Cron settings */}
-      <Card className="bg-[var(--surface)] border-[var(--border)]">
+      <Card className="bg-layer-1 border-edge">
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm text-[var(--text)] flex items-center gap-2">
+          <CardTitle className="text-sm text-ink flex items-center gap-2">
             <RefreshCw className="h-4 w-4 text-[var(--orange-500)]" />Auto-actualización
           </CardTitle>
         </CardHeader>
@@ -114,8 +114,8 @@ export default function MangaConfig() {
           {/* Enable/disable toggle */}
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-[var(--text)] font-medium">Tarea programada</p>
-              <p className="text-xs text-[var(--text-dim)] mt-0.5">
+              <p className="text-sm text-ink font-medium">Tarea programada</p>
+              <p className="text-xs text-ink-dim mt-0.5">
                 Comprueba nuevos capítulos en series marcadas como &quot;En curso&quot;
               </p>
             </div>
@@ -127,7 +127,7 @@ export default function MangaConfig() {
                 disabled={savingCron}
                 className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors focus:outline-none
                   disabled:opacity-40 disabled:cursor-not-allowed
-                  ${config?.cron.enabled ? "bg-[var(--accent)]" : "bg-[color-mix(in_srgb,var(--text)_10%,transparent)]"}`}
+                  ${config?.cron.enabled ? "bg-secondary" : "bg-[color-mix(in_srgb,var(--text)_10%,transparent)]"}`}
                 aria-checked={config?.cron.enabled}
                 role="switch"
               >
@@ -140,15 +140,15 @@ export default function MangaConfig() {
           {/* Schedule input */}
           <div className="flex gap-2 items-end">
             <div className="flex-1">
-              <label className="text-xs text-[var(--text-dim)] mb-1.5 block">Expresión cron (UTC)</label>
+              <label className="text-xs text-ink-dim mb-1.5 block">Expresión cron (UTC)</label>
               <Input
                 value={cronSchedule}
                 onChange={(e) => setCronSchedule(e.target.value)}
                 placeholder="0 3 * * *"
                 disabled={loading}
-                className="font-mono bg-[var(--surface-2)] border-[var(--border-strong)] text-[var(--text)] placeholder-[var(--text-dim)] disabled:opacity-40"
+                className="font-mono bg-layer-2 border-edge-strong text-ink placeholder-[var(--text-dim)] disabled:opacity-40"
               />
-              <p className="text-[11px] text-[var(--text-dim)] mt-1">
+              <p className="text-[11px] text-ink-dim mt-1">
                 Predeterminado: <code className="text-[var(--orange-500)]">0 3 * * *</code> = todos los días a las 3:00 UTC
               </p>
             </div>
@@ -157,46 +157,46 @@ export default function MangaConfig() {
               disabled={savingCron || loading || !cronSchedule.trim()}
               variant="outline"
               size="sm"
-              className="border-[var(--border-strong)] hover:bg-[color-mix(in_srgb,var(--text)_5%,transparent)] text-[var(--text)] shrink-0"
+              className="border-edge-strong hover:bg-[color-mix(in_srgb,var(--text)_5%,transparent)] text-ink shrink-0"
             >
               Guardar
             </Button>
           </div>
 
           {/* Run now */}
-          <div className="flex items-center gap-3 pt-2 border-t border-[var(--border)]">
+          <div className="flex items-center gap-3 pt-2 border-t border-edge">
             <Button
               onClick={handleRunNow}
               disabled={triggering || loading}
               variant="outline"
               size="sm"
-              className="border-surface-600 hover:bg-surface-700 text-[var(--text)]"
+              className="border-edge hover:bg-layer-3 text-ink"
             >
               {triggering
                 ? <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />Iniciando…</>
                 : <><Play className="w-3.5 h-3.5 mr-1.5" />Ejecutar ahora</>}
             </Button>
             {triggerMessage && (
-              <p className="text-xs text-[var(--text-muted)]">{triggerMessage}</p>
+              <p className="text-xs text-ink-muted">{triggerMessage}</p>
             )}
           </div>
         </CardContent>
       </Card>
 
       {/* Series status */}
-      <Card className="bg-[var(--surface)] border-[var(--border)]">
+      <Card className="bg-layer-1 border-edge">
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm text-[var(--text)] flex items-center gap-2">
+          <CardTitle className="text-sm text-ink flex items-center gap-2">
             <BookOpen className="h-4 w-4 text-[var(--orange-500)]" />Estado de series
           </CardTitle>
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="flex items-center gap-2 text-[var(--text-muted)] text-sm py-2">
+            <div className="flex items-center gap-2 text-ink-muted text-sm py-2">
               <Loader2 className="w-4 h-4 animate-spin" />Cargando configuración…
             </div>
           ) : seriesEntries.length === 0 ? (
-            <div className="flex items-center gap-2 text-[var(--text-dim)] text-sm py-4">
+            <div className="flex items-center gap-2 text-ink-dim text-sm py-4">
               <BookOpen className="w-4 h-4" />
               <span>No hay series registradas. Descarga una serie para verla aquí.</span>
             </div>
@@ -207,13 +207,13 @@ export default function MangaConfig() {
                 return (
                   <div
                     key={slug}
-                    className="flex items-center gap-3 px-3 py-2.5 border border-[var(--border)] rounded-lg bg-[color-mix(in_srgb,var(--surface)_96%,transparent)]"
+                    className="flex items-center gap-3 px-3 py-2.5 border border-edge rounded-lg bg-[color-mix(in_srgb,var(--layer-1)_96%,transparent)]"
                   >
-                    <BookOpen className="w-3.5 h-3.5 text-[var(--text-dim)] shrink-0" />
+                    <BookOpen className="w-3.5 h-3.5 text-ink-dim shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm text-[var(--text)] truncate font-medium">{slug}</p>
+                      <p className="text-sm text-ink truncate font-medium">{slug}</p>
                       {cfg.lastChecked && (
-                        <p className="text-[10px] text-[var(--text-dim)] flex items-center gap-1 mt-0.5">
+                        <p className="text-[10px] text-ink-dim flex items-center gap-1 mt-0.5">
                           <Clock className="w-3 h-3" />
                           Revisado: {new Date(cfg.lastChecked).toLocaleString()}
                         </p>
@@ -225,7 +225,7 @@ export default function MangaConfig() {
                           key={s}
                           onClick={() => handleStatusChange(slug, s)}
                           className={`flex items-center gap-1 px-2 py-0.5 rounded border text-[10px] font-medium transition-all
-                            ${status === s ? STATUS_STYLES[s] : "text-[var(--text-dim)] border-[var(--border)] bg-transparent hover:border-[var(--border-strong)]"}`}
+                            ${status === s ? STATUS_STYLES[s] : "text-ink-dim border-edge bg-transparent hover:border-edge-strong"}`}
                         >
                           {s === "ongoing" && <CheckCircle2 className="w-2.5 h-2.5" />}
                           {s === "completed" && <CheckCircle2 className="w-2.5 h-2.5" />}

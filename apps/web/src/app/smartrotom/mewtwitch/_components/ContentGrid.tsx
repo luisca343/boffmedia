@@ -46,7 +46,7 @@ export const ContentGrid = ({
 
   if (!hasContent) {
     return (
-      <div className="text-center py-10 text-surface-400">
+      <div className="text-center py-10 text-ink-muted">
         <p>{emptyMessage}</p>
       </div>
     );

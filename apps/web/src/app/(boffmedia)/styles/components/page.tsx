@@ -54,35 +54,35 @@ export default function BoffMediaStyleGuide() {
   const form = useForm()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-surface-950 via-surface-900 to-surface-950 relative pt-16">
+    <div className="min-h-screen bg-gradient-to-br from-base via-layer-1 to-base relative pt-16">
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.018)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.018)_1px,transparent_1px)] bg-[size:48px_48px] pointer-events-none" />
       <div className="container mx-auto px-4 py-12 max-w-7xl relative">
         {/* Gaming Header */}
-        <div className="relative rounded-2xl overflow-hidden border border-surface-600/70 shadow-2xl mb-12">
-          <div className="absolute inset-0 bg-gradient-to-br from-surface-900 via-surface-800 to-surface-900" />
-          <div className="absolute inset-0 bg-gradient-to-r from-primary-600/[0.07] via-transparent to-accent-600/[0.04]" />
-          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary-400/70 to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-surface-600/40 to-transparent" />
+        <div className="relative rounded-2xl overflow-hidden border border-edge/70 shadow-2xl mb-12">
+          <div className="absolute inset-0 bg-gradient-to-br from-layer-1 via-layer-2 to-layer-1" />
+          <div className="absolute inset-0 bg-gradient-to-r from-primary-active/[0.07] via-transparent to-secondary-active/[0.04]" />
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary-hover/70 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-layer-3/40 to-transparent" />
           <div className="relative p-8 flex items-start gap-5">
-            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center shadow-lg shadow-primary-900/60 ring-1 ring-primary-400/30">
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br from-primary to-primary-active flex items-center justify-center shadow-lg shadow-primary-soft/60 ring-1 ring-primary/30">
               <svg className="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V8zm0 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2z" clipRule="evenodd" />
               </svg>
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-3 mb-3">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary-500/10 border border-primary-500/20 text-[10px] font-mono font-bold tracking-[0.15em] uppercase text-primary-400">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary-400 animate-pulse" />
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 border border-primary/20 text-[10px] font-mono font-bold tracking-[0.15em] uppercase text-primary-hover">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary-hover animate-pulse" />
                   SISTEMA ACTIVO
                 </div>
-                <span className="text-[10px] font-mono text-surface-500 tracking-wider">v2.0.0</span>
+                <span className="text-[10px] font-mono text-ink-muted tracking-wider">v2.0.0</span>
               </div>
               <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-2 leading-tight">
-                <span className="bg-gradient-to-r from-white via-primary-100 to-primary-400 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-white via-primary-soft to-primary-hover bg-clip-text text-transparent">
                   Guía de Estilo BoffMedia
                 </span>
               </h1>
-              <p className="text-surface-400 text-sm max-w-xl">
+              <p className="text-ink-muted text-sm max-w-xl">
                 Colección de componentes UI — diseño gaming moderno con tokens de color, interacciones y tipografía coherentes
               </p>
             </div>
@@ -92,19 +92,19 @@ export default function BoffMediaStyleGuide() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-6">
           <SectionPanel title="Accordion">
             <Accordion type="single" collapsible className="w-full" variant="default">
-              <AccordionItem value="item-1" className="border-surface-600">
-                <AccordionTrigger className="text-surface-200 hover:text-primary-300">¿Es accesible?</AccordionTrigger>
-                <AccordionContent className="text-surface-300">Sí. Cumple con el patrón de diseño WAI-ARIA.</AccordionContent>
+              <AccordionItem value="item-1" className="border-edge">
+                <AccordionTrigger className="text-ink hover:text-primary-hover">¿Es accesible?</AccordionTrigger>
+                <AccordionContent className="text-ink">Sí. Cumple con el patrón de diseño WAI-ARIA.</AccordionContent>
               </AccordionItem>
-              <AccordionItem value="item-2" className="border-surface-600">
-                <AccordionTrigger className="text-surface-200 hover:text-primary-300">¿Está estilizado?</AccordionTrigger>
-                <AccordionContent className="text-surface-300">
+              <AccordionItem value="item-2" className="border-edge">
+                <AccordionTrigger className="text-ink hover:text-primary-hover">¿Está estilizado?</AccordionTrigger>
+                <AccordionContent className="text-ink">
                   Sí. Viene con estilos predeterminados que coinciden con la estética de los otros componentes.
                 </AccordionContent>
               </AccordionItem>
-              <AccordionItem value="item-3" className="border-surface-600">
-                <AccordionTrigger className="text-surface-200 hover:text-primary-300">¿Está animado?</AccordionTrigger>
-                <AccordionContent className="text-surface-300">
+              <AccordionItem value="item-3" className="border-edge">
+                <AccordionTrigger className="text-ink hover:text-primary-hover">¿Está animado?</AccordionTrigger>
+                <AccordionContent className="text-ink">
                   Sí. Está animado por defecto, pero puedes desactivarlo si lo prefieres.
                 </AccordionContent>
               </AccordionItem>
@@ -116,10 +116,10 @@ export default function BoffMediaStyleGuide() {
               <AlertDialogTrigger asChild>
                 <Button variant="outline" className="w-full">Mostrar Alerta</Button>
               </AlertDialogTrigger>
-              <AlertDialogContent className="border-surface-600">
+              <AlertDialogContent className="border-edge">
                 <AlertDialogHeader>
-                  <AlertDialogTitle className="text-surface-100">¿Estás absolutamente seguro?</AlertDialogTitle>
-                  <AlertDialogDescription className="text-surface-300">
+                  <AlertDialogTitle className="text-ink">¿Estás absolutamente seguro?</AlertDialogTitle>
+                  <AlertDialogDescription className="text-ink">
                     Esta acción no se puede deshacer. Esto eliminará permanentemente tu cuenta y removerá tus datos de
                     nuestros servidores.
                   </AlertDialogDescription>
@@ -135,19 +135,19 @@ export default function BoffMediaStyleGuide() {
           <SectionPanel title="Avatar">
             <div className="space-y-4">
               <div className="flex gap-4 items-center">
-                <Avatar className="h-12 w-12 border-2 border-primary-400">
+                <Avatar className="h-12 w-12 border-2 border-primary">
                   <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                  <AvatarFallback className="bg-primary-600 text-white">CN</AvatarFallback>
+                  <AvatarFallback className="bg-primary-active text-white">CN</AvatarFallback>
                 </Avatar>
-                <Avatar className="h-10 w-10 border border-surface-600">
+                <Avatar className="h-10 w-10 border border-edge">
                   <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                  <AvatarFallback className="bg-surface-700 text-surface-200">CN</AvatarFallback>
+                  <AvatarFallback className="bg-layer-3 text-ink">CN</AvatarFallback>
                 </Avatar>
                 <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-secondary-600 text-white text-xs">CN</AvatarFallback>
+                  <AvatarFallback className="bg-secondary-active text-white text-xs">CN</AvatarFallback>
                 </Avatar>
               </div>
-              <p className="text-surface-400 text-sm">Diferentes tamaños y estilos</p>
+              <p className="text-ink-muted text-sm">Diferentes tamaños y estilos</p>
             </div>
           </SectionPanel>
 
@@ -161,8 +161,8 @@ export default function BoffMediaStyleGuide() {
               </div>
               <div className="flex flex-wrap gap-2">
                 <Badge variant="success">Éxito</Badge>
-                <Badge className="bg-warning-500 text-white border-0">Advertencia</Badge>
-                <Badge className="bg-info-500 text-white border-0">Información</Badge>
+                <Badge className="bg-warning text-white border-0">Advertencia</Badge>
+                <Badge className="bg-info text-white border-0">Información</Badge>
               </div>
             </div>
           </SectionPanel>
@@ -171,7 +171,7 @@ export default function BoffMediaStyleGuide() {
             <div className="space-y-6">
               {/* Size Examples */}
               <div>
-                <h4 className="text-surface-200 text-sm font-medium mb-3">Ejemplos de tamaños</h4>
+                <h4 className="text-ink text-sm font-medium mb-3">Ejemplos de tamaños</h4>
                 <div className="flex flex-wrap gap-3 items-center">
                   <Button size="sm">Pequeño</Button>
                   <Button>Predeterminado</Button>
@@ -185,7 +185,7 @@ export default function BoffMediaStyleGuide() {
 
               {/* Primary Variants */}
               <div>
-                <h4 className="text-surface-200 text-sm font-medium mb-3">Primarios</h4>
+                <h4 className="text-ink text-sm font-medium mb-3">Primarios</h4>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                   <Button variant="default">Predeterminado</Button>
                   <Button variant="outline">Contorno</Button>
@@ -196,7 +196,7 @@ export default function BoffMediaStyleGuide() {
 
               {/* Secondary Variants */}
               <div>
-                <h4 className="text-surface-200 text-sm font-medium mb-3">Secundarios</h4>
+                <h4 className="text-ink text-sm font-medium mb-3">Secundarios</h4>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                   <Button variant="secondary">Secundario</Button>
                   <Button variant="secondaryOutline">Sec. Contorno</Button>
@@ -207,7 +207,7 @@ export default function BoffMediaStyleGuide() {
 
               {/* Highlight Variants */}
               <div>
-                <h4 className="text-surface-200 text-sm font-medium mb-3">Destacados</h4>
+                <h4 className="text-ink text-sm font-medium mb-3">Destacados</h4>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                   <Button variant="highlight">Destacado</Button>
                   <Button variant="highlightOutline">Dest. Contorno</Button>
@@ -218,7 +218,7 @@ export default function BoffMediaStyleGuide() {
 
               {/* Accent Variants */}
               <div>
-                <h4 className="text-surface-200 text-sm font-medium mb-3">Acentos</h4>
+                <h4 className="text-ink text-sm font-medium mb-3">Acentos</h4>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                   <Button variant="accent">Acento</Button>
                   <Button variant="accentOutline">Ac. Contorno</Button>
@@ -229,7 +229,7 @@ export default function BoffMediaStyleGuide() {
 
               {/* Success Variants */}
               <div>
-                <h4 className="text-surface-200 text-sm font-medium mb-3">Éxito</h4>
+                <h4 className="text-ink text-sm font-medium mb-3">Éxito</h4>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                   <Button variant="success">Éxito</Button>
                   <Button variant="successOutline">Éx. Contorno</Button>
@@ -240,7 +240,7 @@ export default function BoffMediaStyleGuide() {
 
               {/* Info Variants */}
               <div>
-                <h4 className="text-surface-200 text-sm font-medium mb-3">Información</h4>
+                <h4 className="text-ink text-sm font-medium mb-3">Información</h4>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                   <Button variant="info">Información</Button>
                   <Button variant="infoOutline">Info Contorno</Button>
@@ -251,7 +251,7 @@ export default function BoffMediaStyleGuide() {
 
               {/* Warning Variants */}
               <div>
-                <h4 className="text-surface-200 text-sm font-medium mb-3">Advertencia</h4>
+                <h4 className="text-ink text-sm font-medium mb-3">Advertencia</h4>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                   <Button variant="warning">Advertencia</Button>
                   <Button variant="warningOutline">Adv. Contorno</Button>
@@ -262,7 +262,7 @@ export default function BoffMediaStyleGuide() {
 
               {/* Error Variants */}
               <div>
-                <h4 className="text-surface-200 text-sm font-medium mb-3">Error</h4>
+                <h4 className="text-ink text-sm font-medium mb-3">Error</h4>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                   <Button variant="error">Error</Button>
                   <Button variant="errorOutline">Error Contorno</Button>
@@ -279,28 +279,28 @@ export default function BoffMediaStyleGuide() {
                 mode="single" 
                 selected={new Date()} 
                 onSelect={() => {}} 
-                className="w-full border border-surface-600 rounded-lg bg-surface-800" 
+                className="w-full border border-edge rounded-lg bg-layer-2" 
               />
             </div>
           </SectionPanel>
 
           <SectionPanel title="Card">
-            <Card className="hover:shadow-primary-950/40">
+            <Card className="hover:shadow-primary-soft/40">
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center">
+                  <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                     <span className="text-white text-sm font-bold">BM</span>
                   </div>
                   <div>
-                    <CardTitle className="text-surface-100">Título de la Tarjeta</CardTitle>
-                    <CardDescription className="text-surface-400">La descripción de la tarjeta va aquí</CardDescription>
+                    <CardTitle className="text-ink">Título de la Tarjeta</CardTitle>
+                    <CardDescription className="text-ink-muted">La descripción de la tarjeta va aquí</CardDescription>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="text-surface-200">
+              <CardContent className="text-ink">
                 <p>Este es el contenido principal de la tarjeta con información relevante.</p>
               </CardContent>
-              <CardFooter className="pt-4 border-t border-surface-700/60">
+              <CardFooter className="pt-4 border-t border-edge/60">
                 <Button className="w-full">Acción Principal</Button>
               </CardFooter>
             </Card>
@@ -312,14 +312,14 @@ export default function BoffMediaStyleGuide() {
                 <Checkbox id="terms" />
                 <label
                   htmlFor="terms"
-                  className="text-surface-300 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  className="text-ink text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
                   Aceptar términos y condiciones
                 </label>
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox id="newsletter" defaultChecked />
-                <label htmlFor="newsletter" className="text-surface-300 text-sm font-medium">
+                <label htmlFor="newsletter" className="text-ink text-sm font-medium">
                   Suscribirse al boletín
                 </label>
               </div>
@@ -329,14 +329,14 @@ export default function BoffMediaStyleGuide() {
           <SectionPanel title="Collapsible">
             <Collapsible className="w-full">
               <CollapsibleTrigger asChild>
-                <Button variant="outline" className="w-full justify-between border-surface-600 hover:border-surface-500">
+                <Button variant="outline" className="w-full justify-between border-edge hover:border-edge">
                   Haz clic para expandir 
                   <svg className="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </Button>
               </CollapsibleTrigger>
-              <CollapsibleContent className="p-4 mt-2 border border-surface-600 rounded-md bg-surface-800 text-surface-200">
+              <CollapsibleContent className="p-4 mt-2 border border-edge rounded-md bg-layer-2 text-ink">
                 Este es el contenido que se expande y colapsa. Puede contener cualquier tipo de información adicional.
               </CollapsibleContent>
             </Collapsible>
@@ -360,14 +360,14 @@ export default function BoffMediaStyleGuide() {
           </SectionPanel>
 
           <SectionPanel title="Command">
-            <Command className="rounded-lg border border-surface-600 shadow-md bg-surface-800">
+            <Command className="rounded-lg border border-edge shadow-md bg-layer-2">
               <CommandInput placeholder="Escribe un comando o busca..." className="border-none" />
               <CommandList>
-                <CommandEmpty className="text-surface-400">No se encontraron resultados.</CommandEmpty>
+                <CommandEmpty className="text-ink-muted">No se encontraron resultados.</CommandEmpty>
                 <CommandGroup heading="Sugerencias">
-                  <CommandItem className="hover:bg-surface-700">📅 Calendario</CommandItem>
-                  <CommandItem className="hover:bg-surface-700">😀 Buscar Emoji</CommandItem>
-                  <CommandItem className="hover:bg-surface-700">🔢 Calculadora</CommandItem>
+                  <CommandItem className="hover:bg-layer-3">📅 Calendario</CommandItem>
+                  <CommandItem className="hover:bg-layer-3">😀 Buscar Emoji</CommandItem>
+                  <CommandItem className="hover:bg-layer-3">🔢 Calculadora</CommandItem>
                 </CommandGroup>
               </CommandList>
             </Command>
@@ -378,25 +378,25 @@ export default function BoffMediaStyleGuide() {
               <DialogTrigger asChild>
                 <Button variant="outline" className="w-full">Abrir Diálogo</Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px] border-surface-600 bg-surface-800">
+              <DialogContent className="sm:max-w-[425px] border-edge bg-layer-2">
                 <DialogHeader>
-                  <DialogTitle className="text-surface-100">Editar perfil</DialogTitle>
-                  <DialogDescription className="text-surface-300">
+                  <DialogTitle className="text-ink">Editar perfil</DialogTitle>
+                  <DialogDescription className="text-ink">
                     Realiza cambios en tu perfil aquí. Haz clic en guardar cuando hayas terminado.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
                   <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="name" className="text-right text-surface-200">
+                    <Label htmlFor="name" className="text-right text-ink">
                       Nombre
                     </Label>
-                    <Input id="name" value="Pedro Duarte" className="col-span-3 bg-surface-700 border-surface-600" />
+                    <Input id="name" value="Pedro Duarte" className="col-span-3 bg-layer-3 border-edge" />
                   </div>
                   <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="username" className="text-right text-surface-200">
+                    <Label htmlFor="username" className="text-right text-ink">
                       Usuario
                     </Label>
-                    <Input id="username" value="@peduarte" className="col-span-3 bg-surface-700 border-surface-600" />
+                    <Input id="username" value="@peduarte" className="col-span-3 bg-layer-3 border-edge" />
                   </div>
                 </div>
                 <DialogFooter>
@@ -414,11 +414,11 @@ export default function BoffMediaStyleGuide() {
                   name="username"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-surface-200">Nombre de usuario</FormLabel>
+                      <FormLabel className="text-ink">Nombre de usuario</FormLabel>
                       <FormControl>
-                        <Input placeholder="shadcn" {...field} className="bg-surface-700 border-surface-600" />
+                        <Input placeholder="shadcn" {...field} className="bg-layer-3 border-edge" />
                       </FormControl>
-                      <FormDescription className="text-surface-400">
+                      <FormDescription className="text-ink-muted">
                         Este es tu nombre de usuario público.
                       </FormDescription>
                       <FormMessage />
@@ -430,11 +430,11 @@ export default function BoffMediaStyleGuide() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-surface-200">Email</FormLabel>
+                      <FormLabel className="text-ink">Email</FormLabel>
                       <FormControl>
-                        <Input type="email" placeholder="usuario@ejemplo.com" {...field} className="bg-surface-700 border-surface-600" />
+                        <Input type="email" placeholder="usuario@ejemplo.com" {...field} className="bg-layer-3 border-edge" />
                       </FormControl>
-                      <FormDescription className="text-surface-400">
+                      <FormDescription className="text-ink-muted">
                         Tu dirección de correo electrónico.
                       </FormDescription>
                       <FormMessage />
@@ -450,19 +450,19 @@ export default function BoffMediaStyleGuide() {
             <div className="flex justify-center">
               <HoverCard>
                 <HoverCardTrigger asChild>
-                  <Button variant="link" className="text-primary-400 hover:text-primary-300">@nextjs</Button>
+                  <Button variant="link" className="text-primary-hover hover:text-primary-hover">@nextjs</Button>
                 </HoverCardTrigger>
-                <HoverCardContent className="w-80 border-surface-600 bg-surface-800">
+                <HoverCardContent className="w-80 border-edge bg-layer-2">
                   <div className="flex justify-between space-x-4">
                     <Avatar>
                       <AvatarImage src="https://github.com/vercel.png" />
-                      <AvatarFallback className="bg-primary-600 text-white">VC</AvatarFallback>
+                      <AvatarFallback className="bg-primary-active text-white">VC</AvatarFallback>
                     </Avatar>
                     <div className="space-y-1">
-                      <h4 className="text-sm font-semibold text-surface-100">@nextjs</h4>
-                      <p className="text-sm text-surface-300">El framework React para la Web</p>
+                      <h4 className="text-sm font-semibold text-ink">@nextjs</h4>
+                      <p className="text-sm text-ink">El framework React para la Web</p>
                       <div className="flex items-center pt-2">
-                        <span className="text-xs text-surface-400">Creado por @vercel</span>
+                        <span className="text-xs text-ink-muted">Creado por @vercel</span>
                       </div>
                     </div>
                   </div>
@@ -476,18 +476,18 @@ export default function BoffMediaStyleGuide() {
               <Input 
                 type="email" 
                 placeholder="Email" 
-                className="bg-surface-700 border-surface-600 focus:border-primary-500" 
+                className="bg-layer-3 border-edge focus:border-primary" 
               />
               <Input 
                 type="password" 
                 placeholder="Contraseña" 
-                className="bg-surface-700 border-surface-600 focus:border-primary-500" 
+                className="bg-layer-3 border-edge focus:border-primary" 
               />
               <Input 
                 type="text" 
                 placeholder="Deshabilitado" 
                 disabled 
-                className="bg-surface-800 border-surface-700" 
+                className="bg-layer-2 border-edge" 
               />
             </div>
           </SectionPanel>
@@ -495,21 +495,21 @@ export default function BoffMediaStyleGuide() {
           <SectionPanel title="Label">
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-surface-200">Email</Label>
+                <Label htmlFor="email" className="text-ink">Email</Label>
                 <Input 
                   type="email" 
                   id="email" 
                   placeholder="m@example.com" 
-                  className="bg-surface-700 border-surface-600" 
+                  className="bg-layer-3 border-edge" 
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="required" className="text-surface-200">Campo requerido *</Label>
+                <Label htmlFor="required" className="text-ink">Campo requerido *</Label>
                 <Input 
                   type="text" 
                   id="required" 
                   placeholder="Campo obligatorio" 
-                  className="bg-surface-700 border-surface-600" 
+                  className="bg-layer-3 border-edge" 
                 />
               </div>
             </div>
@@ -521,20 +521,20 @@ export default function BoffMediaStyleGuide() {
                 <PopoverTrigger asChild>
                   <Button variant="outline">Abrir popover</Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-80 border-surface-600 bg-surface-800">
+                <PopoverContent className="w-80 border-edge bg-layer-2">
                   <div className="grid gap-4">
                     <div className="space-y-2">
-                      <h4 className="font-medium leading-none text-surface-100">Dimensiones</h4>
-                      <p className="text-sm text-surface-400">Establece las dimensiones para la capa.</p>
+                      <h4 className="font-medium leading-none text-ink">Dimensiones</h4>
+                      <p className="text-sm text-ink-muted">Establece las dimensiones para la capa.</p>
                     </div>
                     <div className="grid gap-2">
                       <div className="grid grid-cols-3 items-center gap-4">
-                        <Label htmlFor="width" className="text-surface-200">Ancho</Label>
-                        <Input id="width" defaultValue="100%" className="col-span-2 h-8 bg-surface-700 border-surface-600" />
+                        <Label htmlFor="width" className="text-ink">Ancho</Label>
+                        <Input id="width" defaultValue="100%" className="col-span-2 h-8 bg-layer-3 border-edge" />
                       </div>
                       <div className="grid grid-cols-3 items-center gap-4">
-                        <Label htmlFor="maxWidth" className="text-surface-200">Ancho máx.</Label>
-                        <Input id="maxWidth" defaultValue="300px" className="col-span-2 h-8 bg-surface-700 border-surface-600" />
+                        <Label htmlFor="maxWidth" className="text-ink">Ancho máx.</Label>
+                        <Input id="maxWidth" defaultValue="300px" className="col-span-2 h-8 bg-layer-3 border-edge" />
                       </div>
                     </div>
                   </div>
@@ -546,20 +546,20 @@ export default function BoffMediaStyleGuide() {
           <SectionPanel title="Select">
             <div className="space-y-4">
               <Select>
-                <SelectTrigger className="w-full bg-surface-700 border-surface-600">
+                <SelectTrigger className="w-full bg-layer-3 border-edge">
                   <SelectValue placeholder="Selecciona un tema" />
                 </SelectTrigger>
-                <SelectContent className="bg-surface-800 border-surface-600">
+                <SelectContent className="bg-layer-2 border-edge">
                   <SelectItem value="light">Claro</SelectItem>
                   <SelectItem value="dark">Oscuro</SelectItem>
                   <SelectItem value="system">Sistema</SelectItem>
                 </SelectContent>
               </Select>
               <Select>
-                <SelectTrigger className="w-full bg-surface-700 border-surface-600">
+                <SelectTrigger className="w-full bg-layer-3 border-edge">
                   <SelectValue placeholder="Idioma" />
                 </SelectTrigger>
-                <SelectContent className="bg-surface-800 border-surface-600">
+                <SelectContent className="bg-layer-2 border-edge">
                   <SelectItem value="es">Español</SelectItem>
                   <SelectItem value="en">English</SelectItem>
                   <SelectItem value="fr">Français</SelectItem>
@@ -571,15 +571,15 @@ export default function BoffMediaStyleGuide() {
           <SectionPanel title="Separator">
             <div className="space-y-4">
               <div className="space-y-1">
-                <h4 className="text-surface-200 text-sm font-medium leading-none">Radix Primitives</h4>
-                <p className="text-sm text-surface-400">Una biblioteca de componentes UI de código abierto.</p>
+                <h4 className="text-ink text-sm font-medium leading-none">Radix Primitives</h4>
+                <p className="text-sm text-ink-muted">Una biblioteca de componentes UI de código abierto.</p>
               </div>
-              <Separator className="my-4 bg-surface-700" />
-              <div className="flex h-5 items-center space-x-4 text-sm text-surface-300">
+              <Separator className="my-4 bg-layer-3" />
+              <div className="flex h-5 items-center space-x-4 text-sm text-ink">
                 <div>Blog</div>
-                <Separator orientation="vertical" className="bg-surface-600" />
+                <Separator orientation="vertical" className="bg-layer-3" />
                 <div>Docs</div>
-                <Separator orientation="vertical" className="bg-surface-600" />
+                <Separator orientation="vertical" className="bg-layer-3" />
                 <div>Source</div>
               </div>
             </div>
@@ -591,20 +591,20 @@ export default function BoffMediaStyleGuide() {
                 <SheetTrigger asChild>
                   <Button variant="outline">Abrir hoja</Button>
                 </SheetTrigger>
-                <SheetContent className="bg-surface-800 border-surface-600">
+                <SheetContent className="bg-layer-2 border-edge">
                   <SheetHeader>
-                    <SheetTitle className="text-surface-100">Configuración</SheetTitle>
-                    <SheetDescription className="text-surface-300">
+                    <SheetTitle className="text-ink">Configuración</SheetTitle>
+                    <SheetDescription className="text-ink">
                       Ajusta tu configuración desde este panel lateral.
                     </SheetDescription>
                   </SheetHeader>
                   <div className="mt-6 space-y-4">
                     <div className="space-y-2">
-                      <Label className="text-surface-200">Notificaciones</Label>
+                      <Label className="text-ink">Notificaciones</Label>
                       <Switch />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-surface-200">Tema oscuro</Label>
+                      <Label className="text-ink">Tema oscuro</Label>
                       <Switch defaultChecked />
                     </div>
                   </div>
@@ -616,16 +616,16 @@ export default function BoffMediaStyleGuide() {
           <SectionPanel title="Skeleton">
             <div className="space-y-4">
               <div className="flex items-center space-x-4">
-                <Skeleton className="h-12 w-12 rounded-full bg-surface-700" />
+                <Skeleton className="h-12 w-12 rounded-full bg-layer-3" />
                 <div className="space-y-2">
-                  <Skeleton className="h-4 w-[250px] bg-surface-700" />
-                  <Skeleton className="h-4 w-[200px] bg-surface-700" />
+                  <Skeleton className="h-4 w-[250px] bg-layer-3" />
+                  <Skeleton className="h-4 w-[200px] bg-layer-3" />
                 </div>
               </div>
               <div className="space-y-2">
-                <Skeleton className="h-4 w-full bg-surface-700" />
-                <Skeleton className="h-4 w-4/5 bg-surface-700" />
-                <Skeleton className="h-4 w-3/5 bg-surface-700" />
+                <Skeleton className="h-4 w-full bg-layer-3" />
+                <Skeleton className="h-4 w-4/5 bg-layer-3" />
+                <Skeleton className="h-4 w-3/5 bg-layer-3" />
               </div>
             </div>
           </SectionPanel>
@@ -633,11 +633,11 @@ export default function BoffMediaStyleGuide() {
           <SectionPanel title="Slider">
             <div className="space-y-6">
               <div className="space-y-2">
-                <Label className="text-surface-200">Volumen: 33%</Label>
+                <Label className="text-ink">Volumen: 33%</Label>
                 <Slider defaultValue={[33]} max={100} step={1} className="w-full" />
               </div>
               <div className="space-y-2">
-                <Label className="text-surface-200">Rango: 25% - 75%</Label>
+                <Label className="text-ink">Rango: 25% - 75%</Label>
                 <Slider defaultValue={[25, 75]} max={100} step={1} className="w-full" />
               </div>
             </div>
@@ -646,55 +646,55 @@ export default function BoffMediaStyleGuide() {
           <SectionPanel title="Switch">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <Label htmlFor="airplane-mode" className="text-surface-200">Modo avión</Label>
+                <Label htmlFor="airplane-mode" className="text-ink">Modo avión</Label>
                 <Switch id="airplane-mode" />
               </div>
               <div className="flex items-center justify-between">
-                <Label htmlFor="notifications" className="text-surface-200">Notificaciones</Label>
+                <Label htmlFor="notifications" className="text-ink">Notificaciones</Label>
                 <Switch id="notifications" defaultChecked />
               </div>
               <div className="flex items-center justify-between">
-                <Label htmlFor="location" className="text-surface-200">Servicios de ubicación</Label>
+                <Label htmlFor="location" className="text-ink">Servicios de ubicación</Label>
                 <Switch id="location" />
               </div>
             </div>
           </SectionPanel>
 
           <SectionPanel title="Table" fullWidth>
-            <div className="rounded-md border border-surface-600 overflow-hidden">
+            <div className="rounded-md border border-edge overflow-hidden">
               <Table>
                 <TableHeader>
-                  <TableRow className="border-surface-600 hover:bg-surface-800">
-                    <TableHead className="w-[100px] text-surface-200">ID</TableHead>
-                    <TableHead className="text-surface-200">Nombre</TableHead>
-                    <TableHead className="text-surface-200">Estado</TableHead>
-                    <TableHead className="text-right text-surface-200">Cantidad</TableHead>
+                  <TableRow className="border-edge hover:bg-layer-2">
+                    <TableHead className="w-[100px] text-ink">ID</TableHead>
+                    <TableHead className="text-ink">Nombre</TableHead>
+                    <TableHead className="text-ink">Estado</TableHead>
+                    <TableHead className="text-right text-ink">Cantidad</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  <TableRow className="border-surface-600 hover:bg-surface-800">
-                    <TableCell className="font-medium text-surface-300">001</TableCell>
-                    <TableCell className="text-surface-200">Juan Pérez</TableCell>
+                  <TableRow className="border-edge hover:bg-layer-2">
+                    <TableCell className="font-medium text-ink">001</TableCell>
+                    <TableCell className="text-ink">Juan Pérez</TableCell>
                     <TableCell>
-                      <Badge className="bg-success-600">Activo</Badge>
+                      <Badge className="bg-success">Activo</Badge>
                     </TableCell>
-                    <TableCell className="text-right text-surface-200">$250.00</TableCell>
+                    <TableCell className="text-right text-ink">$250.00</TableCell>
                   </TableRow>
-                  <TableRow className="border-surface-600 hover:bg-surface-800">
-                    <TableCell className="font-medium text-surface-300">002</TableCell>
-                    <TableCell className="text-surface-200">María García</TableCell>
+                  <TableRow className="border-edge hover:bg-layer-2">
+                    <TableCell className="font-medium text-ink">002</TableCell>
+                    <TableCell className="text-ink">María García</TableCell>
                     <TableCell>
                       <Badge variant="secondary">Inactivo</Badge>
                     </TableCell>
-                    <TableCell className="text-right text-surface-200">$150.00</TableCell>
+                    <TableCell className="text-right text-ink">$150.00</TableCell>
                   </TableRow>
-                  <TableRow className="border-surface-600 hover:bg-surface-800">
-                    <TableCell className="font-medium text-surface-300">003</TableCell>
-                    <TableCell className="text-surface-200">Carlos López</TableCell>
+                  <TableRow className="border-edge hover:bg-layer-2">
+                    <TableCell className="font-medium text-ink">003</TableCell>
+                    <TableCell className="text-ink">Carlos López</TableCell>
                     <TableCell>
-                      <Badge className="bg-warning-600">Pendiente</Badge>
+                      <Badge className="bg-warning">Pendiente</Badge>
                     </TableCell>
-                    <TableCell className="text-right text-surface-200">$320.00</TableCell>
+                    <TableCell className="text-right text-ink">$320.00</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -703,26 +703,26 @@ export default function BoffMediaStyleGuide() {
 
           <SectionPanel title="Tabs" fullWidth>
             <Tabs defaultValue="account" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 bg-surface-700">
-                <TabsTrigger value="account" className="data-[state=active]:bg-surface-600">Cuenta</TabsTrigger>
-                <TabsTrigger value="password" className="data-[state=active]:bg-surface-600">Contraseña</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 bg-layer-3">
+                <TabsTrigger value="account" className="data-[state=active]:bg-layer-3">Cuenta</TabsTrigger>
+                <TabsTrigger value="password" className="data-[state=active]:bg-layer-3">Contraseña</TabsTrigger>
               </TabsList>
               <TabsContent value="account">
-                <Card className="border-surface-600 bg-surface-800">
+                <Card className="border-edge bg-layer-2">
                   <CardHeader>
-                    <CardTitle className="text-surface-100">Cuenta</CardTitle>
-                    <CardDescription className="text-surface-400">
+                    <CardTitle className="text-ink">Cuenta</CardTitle>
+                    <CardDescription className="text-ink-muted">
                       Realiza cambios en tu cuenta aquí. Haz clic en guardar cuando hayas terminado.
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-2">
                     <div className="space-y-1">
-                      <Label htmlFor="name" className="text-surface-200">Nombre</Label>
-                      <Input id="name" defaultValue="Pedro Duarte" className="bg-surface-700 border-surface-600" />
+                      <Label htmlFor="name" className="text-ink">Nombre</Label>
+                      <Input id="name" defaultValue="Pedro Duarte" className="bg-layer-3 border-edge" />
                     </div>
                     <div className="space-y-1">
-                      <Label htmlFor="username" className="text-surface-200">Nombre de usuario</Label>
-                      <Input id="username" defaultValue="@peduarte" className="bg-surface-700 border-surface-600" />
+                      <Label htmlFor="username" className="text-ink">Nombre de usuario</Label>
+                      <Input id="username" defaultValue="@peduarte" className="bg-layer-3 border-edge" />
                     </div>
                   </CardContent>
                   <CardFooter>
@@ -731,21 +731,21 @@ export default function BoffMediaStyleGuide() {
                 </Card>
               </TabsContent>
               <TabsContent value="password">
-                <Card className="border-surface-600 bg-surface-800">
+                <Card className="border-edge bg-layer-2">
                   <CardHeader>
-                    <CardTitle className="text-surface-100">Contraseña</CardTitle>
-                    <CardDescription className="text-surface-400">
+                    <CardTitle className="text-ink">Contraseña</CardTitle>
+                    <CardDescription className="text-ink-muted">
                       Cambia tu contraseña aquí. Después de guardar, se cerrará tu sesión.
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-2">
                     <div className="space-y-1">
-                      <Label htmlFor="current" className="text-surface-200">Contraseña actual</Label>
-                      <Input id="current" type="password" className="bg-surface-700 border-surface-600" />
+                      <Label htmlFor="current" className="text-ink">Contraseña actual</Label>
+                      <Input id="current" type="password" className="bg-layer-3 border-edge" />
                     </div>
                     <div className="space-y-1">
-                      <Label htmlFor="new" className="text-surface-200">Nueva contraseña</Label>
-                      <Input id="new" type="password" className="bg-surface-700 border-surface-600" />
+                      <Label htmlFor="new" className="text-ink">Nueva contraseña</Label>
+                      <Input id="new" type="password" className="bg-layer-3 border-edge" />
                     </div>
                   </CardContent>
                   <CardFooter>
@@ -760,12 +760,12 @@ export default function BoffMediaStyleGuide() {
             <div className="space-y-4">
               <Textarea 
                 placeholder="Escribe tu mensaje aquí." 
-                className="bg-surface-700 border-surface-600 focus:border-primary-500 resize-none"
+                className="bg-layer-3 border-edge focus:border-primary resize-none"
                 rows={4}
               />
               <Textarea 
                 placeholder="Comentarios adicionales (opcional)" 
-                className="bg-surface-700 border-surface-600 focus:border-primary-500"
+                className="bg-layer-3 border-edge focus:border-primary"
                 rows={2}
               />
             </div>
@@ -778,7 +778,7 @@ export default function BoffMediaStyleGuide() {
                   <TooltipTrigger asChild>
                     <Button variant="outline">Pasa el cursor</Button>
                   </TooltipTrigger>
-                  <TooltipContent className="bg-surface-700 border-surface-600">
+                  <TooltipContent className="bg-layer-3 border-edge">
                     <p>Añade al carrito</p>
                   </TooltipContent>
                 </Tooltip>
@@ -793,7 +793,7 @@ export default function BoffMediaStyleGuide() {
                       </svg>
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent className="bg-surface-700 border-surface-600">
+                  <TooltipContent className="bg-layer-3 border-edge">
                     <p>Información adicional</p>
                   </TooltipContent>
                 </Tooltip>

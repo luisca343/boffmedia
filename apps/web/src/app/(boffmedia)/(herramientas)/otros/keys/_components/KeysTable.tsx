@@ -20,10 +20,10 @@ export default function KeysTable() {
     <div className="flex items-center justify-center min-h-[400px]">
       <div className="flex flex-col items-center gap-3">
         <div className="relative">
-          <div className="absolute inset-0 bg-secondary-500/20 blur-xl rounded-full" />
-          <div className="relative w-12 h-12 border-2 border-secondary-500/30 border-t-secondary-400 rounded-full animate-spin" />
+          <div className="absolute inset-0 bg-secondary/20 blur-xl rounded-full" />
+          <div className="relative w-12 h-12 border-2 border-secondary/30 border-t-secondary-400 rounded-full animate-spin" />
         </div>
-        <p className="text-surface-400 text-sm">Cargando claves...</p>
+        <p className="text-ink-muted text-sm">Cargando claves...</p>
       </div>
     </div>
   );
@@ -45,7 +45,7 @@ export default function KeysTable() {
   const aggregatedKeysArray = Object.values(aggregatedKeys);
 
   return (
-    <FloatingSection className={`flex-1 bg-surface-900 w-full transition-all duration-300 ease-in-out md:pt-0 pt-16`}>
+    <FloatingSection className={`flex-1 bg-layer-1 w-full transition-all duration-300 ease-in-out md:pt-0 pt-16`}>
       <div className="w-full pb-16">
         <div className="max-w-5xl mx-auto">
           <KeysHeader />
@@ -68,7 +68,7 @@ export default function KeysTable() {
           />
         </div>
 
-        <Suspense fallback={<div className="fixed inset-0 bg-surface-900/80 backdrop-blur-sm flex items-center justify-center"><div className="w-8 h-8 border-2 border-secondary-500/30 border-t-secondary-400 rounded-full animate-spin" /></div>}>
+        <Suspense fallback={<div className="fixed inset-0 bg-layer-1/80 backdrop-blur-sm flex items-center justify-center"><div className="w-8 h-8 border-2 border-secondary/30 border-t-secondary-400 rounded-full animate-spin" /></div>}>
           <SteamDialog
             isModalVisible={isModalVisible}
             setIsModalVisible={setIsModalVisible}

@@ -30,7 +30,7 @@ export default function TypeBadge({type}: {type: string}){
     const t  = useTranslations("pokedex");
     if(!type) return null
     const typeColors = colors[type.toLowerCase()];
-    return <div className={` m-1 h-8 w-32 font-bold text-xl 2xl:text-base min-w-28 flex flex-row items-center  text-surface-50 bg-${type.toLowerCase()} pl-2 pr-2 rounded text-shadow-border2 2xl:text-shadow-border1`}
+    return <div className={` m-1 h-8 w-32 font-bold text-xl 2xl:text-base min-w-28 flex flex-row items-center  text-ink bg-${type.toLowerCase()} pl-2 pr-2 rounded text-shadow-border2 2xl:text-shadow-border1`}
         style={{backgroundColor: typeColors?.backgroundColor, color: 'white'}}>
             <img src={`/smartrotom/img/types/${type.toLowerCase()}.png`} alt={t(`type_${type.toLowerCase()}`)} className="w-6 h-6 "/>
             <div className='pl-2'>{t(`type_${type.toLowerCase()}`)}</div>
@@ -42,7 +42,7 @@ export function TypeBadgeSmall({type, className}: {type: string, className?: str
     const t  = useTranslations("pokedex");
     if(!type) return null
     const typeColors = colors[type.toLowerCase().trim()];
-    return <div className={` m-1 h-6 font-bold text-xs inline-flex flex-row items-center whitespace-nowrap text-surface-50 bg-${type.toLowerCase().trim()} pl-1 pr-2 gap-1 rounded text-shadow-border1 ${className}`}
+    return <div className={` m-1 h-6 font-bold text-xs inline-flex flex-row items-center whitespace-nowrap text-ink bg-${type.toLowerCase().trim()} pl-1 pr-2 gap-1 rounded text-shadow-border1 ${className}`}
         style={{backgroundColor: typeColors?.backgroundColor, color: 'white'}}>
             <img src={`/smartrotom/img/types/${type.toLowerCase()}.png`} alt={t(`type_${type.toLowerCase().trim()}`)} className="w-4 h-4 shrink-0"/>
             <div>{t(`type_${type.toLowerCase().trim()}`)}</div>

@@ -57,7 +57,7 @@ export default function StatDisplay({
 
   return (
     <div className="mb-2 max-w-[75%] ml-1">
-      <div className={`grid ${gridColumns} gap-2 mb-1 text-xs text-surface-400`}>
+      <div className={`grid ${gridColumns} gap-2 mb-1 text-xs text-ink-muted`}>
         <div className="text-left pl-1">Stat</div>
         <div className="text-center">Base</div>
         {/* Show "DVs" for Gen 1-2, "IVs" for others */}
@@ -82,19 +82,19 @@ export default function StatDisplay({
             className={`grid ${gridColumns} gap-2 mb-1 text-xs items-center`}
           >
             <div>
-              <span className={`${hasNatureBuff ? 'text-red-500 font-medium' : ''} ${hasNatureNerf ? 'text-secondary-400 font-medium' : ''} text-surface-200`}>
+              <span className={`${hasNatureBuff ? 'text-red-500 font-medium' : ''} ${hasNatureNerf ? 'text-secondary-hover font-medium' : ''} text-ink`}>
                 {label}
               </span>
             </div>
             
-            <div className="text-center text-surface-300">
+            <div className="text-center text-ink">
               {baseStats[statKey]}
             </div>
             
             <div className="text-center">
               <input
                 type="number"
-                className="w-full py-0 px-1 h-6 border rounded text-center bg-surface-700 border-surface-600 text-surface-100 text-xs"
+                className="w-full py-0 px-1 h-6 border rounded text-center bg-layer-3 border-edge text-ink text-xs"
                 min="0"
                 max={isEarlyGen ? "15" : "31"} // DVs go from 0-15, IVs from 0-31
                 value={ivs[statKey]}
@@ -107,7 +107,7 @@ export default function StatDisplay({
               <div className="text-center">
                 <input
                   type="number"
-                  className="w-full py-0 px-1 h-6 border rounded text-center bg-surface-700 border-surface-600 text-surface-100 text-xs"
+                  className="w-full py-0 px-1 h-6 border rounded text-center bg-layer-3 border-edge text-ink text-xs"
                   min="0"
                   max="252"
                   step="4"
@@ -117,7 +117,7 @@ export default function StatDisplay({
               </div>
             )}
             
-            <div className="text-center font-medium text-primary-300">
+            <div className="text-center font-medium text-primary-hover">
               {stat !== 'hp' && boosts[stat as keyof typeof boosts] !== 0 
                 ? `${calculatedStats[statKey]} → ${boostedStats[statKey]}`
                 : calculatedStats[statKey]
@@ -127,7 +127,7 @@ export default function StatDisplay({
             <div className="text-center">
               {stat !== 'hp' ? (
                 <select
-                  className="w-full py-0 px-0 h-6 border rounded text-center bg-surface-700 border-surface-600 text-surface-100 text-xs"
+                  className="w-full py-0 px-0 h-6 border rounded text-center bg-layer-3 border-edge text-ink text-xs"
                   value={boosts[stat as keyof typeof boosts]}
                   onChange={(e) => onBoostChange(stat, parseInt(e.target.value))}
                 >

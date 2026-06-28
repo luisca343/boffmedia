@@ -13,14 +13,14 @@ export function EventTypeSelector({ selectedType, onTypeChange }: EventTypeSelec
       value: 'EVENT', 
       label: 'Evento Competitivo', 
       icon: Trophy, 
-      color: 'from-accent-500 to-accent-600',
+      color: 'from-secondary to-secondary-active',
       description: 'Competición con medallas y premios'
     },
     { 
       value: 'SERVER', 
       label: 'Servidor Especial', 
       icon: Server, 
-      color: 'from-secondary-500 to-secondary-600',
+      color: 'from-secondary to-secondary-active',
       description: 'Servidor de videojuego con eventos, mecánicas y logros'
     }
   ]
@@ -28,7 +28,7 @@ export function EventTypeSelector({ selectedType, onTypeChange }: EventTypeSelec
   return (
     <div className="space-y-4">
       <label className="text-lg font-semibold text-white flex items-center gap-2">
-        <Trophy className="w-5 h-5 text-accent-400" />
+        <Trophy className="w-5 h-5 text-secondary-hover" />
         Tipo de Evento
       </label>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -41,8 +41,8 @@ export function EventTypeSelector({ selectedType, onTypeChange }: EventTypeSelec
               onClick={() => onTypeChange(type.value)}
               className={`p-0 rounded-xl border-2 cursor-pointer transition-all duration-300 h-32 flex flex-col justify-center ${
                 isSelected 
-                  ? 'border-accent-500 bg-accent-500/10 scale-105' 
-                  : 'border-surface-600/50 hover:border-accent-500/50 hover:bg-accent-500/5'
+                  ? 'border-secondary bg-secondary/10 scale-105' 
+                  : 'border-edge/50 hover:border-secondary/50 hover:bg-secondary/5'
               }`}
             >
               <div className="flex flex-row items-center gap-4 h-full px-6">
@@ -51,7 +51,7 @@ export function EventTypeSelector({ selectedType, onTypeChange }: EventTypeSelec
                 </div>
                 <div className="flex flex-col justify-center min-h-[64px] h-full py-2">
                   <h3 className="text-white font-semibold leading-tight">{type.label}</h3>
-                  <p className="text-surface-400 text-sm min-h-[1.5em] flex items-center">{type.description}</p>
+                  <p className="text-ink-muted text-sm min-h-[1.5em] flex items-center">{type.description}</p>
                 </div>
               </div>
             </div>

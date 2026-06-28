@@ -24,12 +24,12 @@ export function Pagination({ page, total, onChange, className }: PaginationProps
         className={cn(
           "grid place-items-center min-w-[38px] h-[38px] px-2",
           "rounded-[var(--radius,14px)]",
-          "border border-solid border-[var(--border)]",
-          "bg-[var(--surface-2)] text-[var(--text-muted)]",
+          "border border-solid border-edge",
+          "bg-layer-2 text-ink-muted",
           "font-mono text-sm font-semibold",
           "cursor-pointer",
           "transition-all duration-[var(--dur,0.32s)]",
-          "hover:not-disabled:text-[var(--text)] hover:not-disabled:border-[var(--border-strong)]",
+          "hover:not-disabled:text-ink hover:not-disabled:border-edge-strong",
           "disabled:opacity-40 disabled:cursor-not-allowed",
         )}
         disabled={page === 1}
@@ -40,20 +40,20 @@ export function Pagination({ page, total, onChange, className }: PaginationProps
       </button>
       {pages.map((p, i) =>
         p === "…" ? (
-          <span key={`e${i}`} className="text-[var(--text-dim)] px-0.5">…</span>
+          <span key={`e${i}`} className="text-ink-dim px-0.5">…</span>
         ) : (
           <button
             key={p}
             className={cn(
               "grid place-items-center min-w-[38px] h-[38px] px-2",
               "rounded-[var(--radius,14px)]",
-              "border border-solid border-[var(--border)]",
-              "bg-[var(--surface-2)] text-[var(--text-muted)]",
+              "border border-solid border-edge",
+              "bg-layer-2 text-ink-muted",
               "font-mono text-sm font-semibold",
               "cursor-pointer",
               "transition-all duration-[var(--dur,0.32s)]",
-              "hover:not-disabled:text-[var(--text)] hover:not-disabled:border-[var(--border-strong)]",
-              p === page && "text-[var(--on-accent)] bg-[var(--accent)] border-[var(--accent)]",
+              "hover:not-disabled:text-ink hover:not-disabled:border-edge-strong",
+              p === page && "text-[var(--on-secondary)] bg-secondary border-secondary",
             )}
             onClick={() => go(p as number)}
             aria-current={p === page ? "page" : undefined}
@@ -66,12 +66,12 @@ export function Pagination({ page, total, onChange, className }: PaginationProps
         className={cn(
           "grid place-items-center min-w-[38px] h-[38px] px-2",
           "rounded-[var(--radius,14px)]",
-          "border border-solid border-[var(--border)]",
-          "bg-[var(--surface-2)] text-[var(--text-muted)]",
+          "border border-solid border-edge",
+          "bg-layer-2 text-ink-muted",
           "font-mono text-sm font-semibold",
           "cursor-pointer",
           "transition-all duration-[var(--dur,0.32s)]",
-          "hover:not-disabled:text-[var(--text)] hover:not-disabled:border-[var(--border-strong)]",
+          "hover:not-disabled:text-ink hover:not-disabled:border-edge-strong",
           "disabled:opacity-40 disabled:cursor-not-allowed",
         )}
         disabled={page === total}

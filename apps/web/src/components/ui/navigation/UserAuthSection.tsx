@@ -33,10 +33,10 @@ export default function UserAuthSection() {
         <Link
           href="/perfil"
           className={
-            'inline-flex items-center gap-[0.55rem] py-[0.3rem] pr-[0.75rem] pl-[0.35rem] border-solid bg-[var(--surface-2)] rounded-[var(--radius-pill)] transition-[border-color] duration-[var(--dur)] ' +
+            'inline-flex items-center gap-[0.55rem] py-[0.3rem] pr-[0.75rem] pl-[0.35rem] border-solid bg-layer-2 rounded-[var(--radius-pill)] transition-[border-color] duration-[var(--dur)] ' +
             (active('/perfil')
               ? 'border-[var(--orange-500)]'
-              : 'border-[var(--border-strong)] hover:border-[var(--orange-500)]')
+              : 'border-edge-strong hover:border-[var(--orange-500)]')
           }
           style={{ borderWidth: 'var(--hairline)' }}
         >
@@ -55,14 +55,14 @@ export default function UserAuthSection() {
               {initial}
             </AvatarFallback>
           </Avatar>
-          <span className="text-[length:var(--t-sm)] font-semibold text-[var(--text)]">
+          <span className="text-[length:var(--t-sm)] font-semibold text-ink">
             {session.user.name || session.user.smartRotomUser?.username || 'User'}
           </span>
         </Link>
         <button
           onClick={() => signOut({ callbackUrl: '/' })}
           aria-label={t('logout')}
-          className="inline-flex items-center justify-center w-[38px] h-[38px] rounded-[var(--btn-radius)] border border-transparent bg-transparent text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[color-mix(in_srgb,var(--text)_8%,transparent)] cursor-pointer transition-colors duration-[var(--dur)]"
+          className="inline-flex items-center justify-center w-[38px] h-[38px] rounded-[var(--btn-radius)] border border-transparent bg-transparent text-ink-muted hover:text-ink hover:bg-[color-mix(in_srgb,var(--text)_8%,transparent)] cursor-pointer transition-colors duration-[var(--dur)]"
         >
           <Icon name="arrow" size={18} style={{ transform: 'rotate(180deg)' }} />
         </button>
@@ -76,14 +76,14 @@ export default function UserAuthSection() {
       <button
         onClick={() => router.push('/api/auth/signin')}
         aria-label={t('login')}
-        className="inline-flex items-center justify-center w-[38px] h-[38px] rounded-[var(--btn-radius)] border border-transparent bg-transparent text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[color-mix(in_srgb,var(--text)_8%,transparent)] cursor-pointer transition-colors duration-[var(--dur)]"
+        className="inline-flex items-center justify-center w-[38px] h-[38px] rounded-[var(--btn-radius)] border border-transparent bg-transparent text-ink-muted hover:text-ink hover:bg-[color-mix(in_srgb,var(--text)_8%,transparent)] cursor-pointer transition-colors duration-[var(--dur)]"
       >
         <Icon name="user" size={18} />
       </button>
       <button
         onClick={() => router.push('/auth?mode=register')}
         aria-label={t('register')}
-        className="inline-flex items-center justify-center w-[38px] h-[38px] rounded-[var(--btn-radius)] border border-[var(--border-strong)] bg-transparent text-[var(--text-muted)] hover:text-[var(--orange-500)] hover:border-[var(--orange-500)] cursor-pointer transition-colors duration-[var(--dur)]"
+        className="inline-flex items-center justify-center w-[38px] h-[38px] rounded-[var(--btn-radius)] border border-edge-strong bg-transparent text-ink-muted hover:text-[var(--orange-500)] hover:border-[var(--orange-500)] cursor-pointer transition-colors duration-[var(--dur)]"
       >
         <Icon name="plus" size={18} />
       </button>

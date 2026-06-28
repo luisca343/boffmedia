@@ -79,13 +79,13 @@ export function StatsDisplay({ stats }: { stats: StatsData }) {
       <div className="p-3 space-y-2">
         {/* Primary stats */}
         <div className="grid grid-cols-3 gap-2">
-          {renderStatItem("defense", "defense", `${stats.defenseMin} - ${stats.defenseMax}`, "text-secondary-400")}
+          {renderStatItem("defense", "defense", `${stats.defenseMin} - ${stats.defenseMax}`, "text-secondary-hover")}
           {renderStatItem("attack", "attack", attackValue || stats.attack || 0, "text-red-400")}
           {renderStatItem(
             "affinity",
             "affinity",
             stats.affinity >= 0 ? `+${stats.affinity || 0}` : stats.affinity || 0,
-            stats.affinity >= 0 ? 'text-highlight-400' : 'text-red-400',
+            stats.affinity >= 0 ? 'text-warning-hover' : 'text-red-400',
             <span>%</span>
           )}
         </div>
@@ -105,7 +105,7 @@ export function StatsDisplay({ stats }: { stats: StatsData }) {
                         height={18}
                       />
                       <span className={`font-medium ${getElementColor(element.type)}`}>{element.damage}</span>
-                      {element.hidden && <EyeOff className="h-3 w-3 text-surface-400" />}
+                      {element.hidden && <EyeOff className="h-3 w-3 text-ink-muted" />}
                     </StatChip>
                   </TooltipTrigger>
                   <TooltipContent side="top">
@@ -127,7 +127,7 @@ export function StatsDisplay({ stats }: { stats: StatsData }) {
                         height={18}
                       />
                       <span className={`font-medium ${getStatusColor(status.type)}`}>{status.damage}</span>
-                      {status.hidden && <EyeOff className="h-3 w-3 text-surface-400" />}
+                      {status.hidden && <EyeOff className="h-3 w-3 text-ink-muted" />}
                     </StatChip>
                   </TooltipTrigger>
                   <TooltipContent side="top">
@@ -143,7 +143,7 @@ export function StatsDisplay({ stats }: { stats: StatsData }) {
                   <TooltipTrigger asChild>
                     <StatChip>
                       <Image src="/img/games/mhwilds/dragon.webp" alt="Elderseal" width={18} height={18} />
-                      <span className="font-medium text-accent-400">{t(weapon.elderseal)}</span>
+                      <span className="font-medium text-secondary-hover">{t(weapon.elderseal)}</span>
                     </StatChip>
                   </TooltipTrigger>
                   <TooltipContent side="top">
@@ -157,7 +157,7 @@ export function StatsDisplay({ stats }: { stats: StatsData }) {
 
         {/* Elemental Resistances */}
         <div>
-          <div className="text-[10px] font-mono uppercase tracking-widest text-surface-500 mb-1">
+          <div className="text-[10px] font-mono uppercase tracking-widest text-ink-muted mb-1">
             {t("build_planner.elemental_resistances")}
           </div>
           <ElementalResistances stats={stats} />
@@ -166,7 +166,7 @@ export function StatsDisplay({ stats }: { stats: StatsData }) {
         {/* Sharpness */}
         {weapon?.sharpness && (
           <div>
-            <div className="text-[10px] font-mono uppercase tracking-widest text-surface-500 mb-1">
+            <div className="text-[10px] font-mono uppercase tracking-widest text-ink-muted mb-1">
               {t("build_planner.sharpness")}
             </div>
             <SharpnessBar sharpness={weapon.sharpness} />

@@ -35,13 +35,13 @@ export function SectionHeader({
 }: SectionHeaderProps) {
   // Color variants
   let colorConfig: any = {
-    gradientFrom: "from-accent-400",
-    gradientTo: "to-secondary-400",
-    line: "from-accent-500 to-secondary-400",
-    leftIconBg: "from-accent-500 to-secondary-600",
-    rightIconBg: "from-secondary-500 to-accent-600",
+    gradientFrom: "from-secondary-hover",
+    gradientTo: "to-secondary-hover",
+    line: "from-secondary to-secondary-hover",
+    leftIconBg: "from-secondary to-secondary-active",
+    rightIconBg: "from-secondary to-secondary-active",
     titleClass: "text-4xl sm:text-5xl md:text-6xl",
-    subtitleClass: "text-lg text-surface-300",
+    subtitleClass: "text-lg text-ink",
   };
   if (variant === "orange") {
     colorConfig = {

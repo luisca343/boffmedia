@@ -45,14 +45,14 @@ export default function PokemonSearchBar() {
     <div className="relative">
       <input
         type="text"
-        className="w-full p-3 bg-surface-800 border border-surface-700 rounded-lg text-surface-100 placeholder-surface-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+        className="w-full p-3 bg-layer-2 border border-edge rounded-lg text-ink placeholder-ink-dim focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
         placeholder={getPlaceholderText()}
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
       />
       {inputValue && (
         <button
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-surface-400 hover:text-surface-200"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-muted hover:text-ink"
           onClick={() => {
             setInputValue('');
             setSearchQuery('');

@@ -53,7 +53,7 @@ export function GameHeader({
         </h1>
         {!compact && subtitle && (
           <p
-            className="text-[length:var(--t-lg)] text-[var(--text-muted)] leading-relaxed"
+            className="text-[length:var(--t-lg)] text-ink-muted leading-relaxed"
             style={{ maxWidth: "52ch" }}
           >
             {subtitle}

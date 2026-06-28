@@ -23,10 +23,10 @@ export function BSXTick({ ev }: BSXTickProps) {
     return (
       <div
         className="relative z-[999] flex items-center gap-[.55rem] pt-[.45rem] pb-[.15rem] font-mono font-bold text-t-3xs tracking-[.14em]"
-        style={{ color: "var(--accent-bright)", background: "none" }}
+        style={{ color: "var(--secondary-hover)", background: "none" }}
       >
         <span>T{ev.turn}</span>
-        <i className="flex-1 h-[1px]" style={{ background: "linear-gradient(90deg, var(--accent-soft), transparent)" }} />
+        <i className="flex-1 h-[1px]" style={{ background: "linear-gradient(90deg, var(--secondary-soft), transparent)" }} />
       </div>
     )
   }
@@ -48,7 +48,7 @@ export function BSXTick({ ev }: BSXTickProps) {
     : ev.type ? tyVar(ev.type)
     : ev.kind === "boost" ? "var(--emerald-400)"
     : ev.kind === "field" ? "var(--amber-400)"
-    : ev.kind === "switch" ? "var(--accent)" : "var(--accent)"
+    : ev.kind === "switch" ? "var(--secondary)" : "var(--secondary)"
 
   return (
     <div
@@ -69,7 +69,7 @@ export function BSXTick({ ev }: BSXTickProps) {
         style={{ background: c, opacity: ev.who === "foe" ? ".55" : undefined }}
       />
       <span
-        className="[&_b]:text-[color:var(--text)]"
+        className="[&_b]:text-ink"
         dangerouslySetInnerHTML={{ __html: ev.txt || "" }}
       />
       {(ev.dmg || ev.eff || ev.boost || ev.crit || isKO) && (
@@ -109,7 +109,7 @@ export function BSXTick({ ev }: BSXTickProps) {
           {ev.eff === "weak" && (
             <b
               className="font-mono font-bold text-t-4xs px-[.4em] py-[.14em] rounded-[var(--radius-sm)] tracking-[.04em]"
-              style={{ color: "var(--text-dim)", background: "var(--surface-3)" }}
+              style={{ color: "var(--text-dim)", background: "var(--layer-3)" }}
             >
               resistido
             </b>

@@ -96,13 +96,13 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
                   className="object-contain"
                 />
               ) : (
-                <GiGamepad className="h-5 w-5 text-primary-400" />
+                <GiGamepad className="h-5 w-5 text-primary-hover" />
               )}
             </div>
 
             <div>
               <p
-                className="font-black text-sm text-surface-50 leading-none tracking-wide"
+                className="font-black text-sm text-ink leading-none tracking-wide"
                 style={{
                   fontFamily: "Orbitron, sans-serif",
                   textShadow: "0 0 12px rgba(249,115,22,0.25)",
@@ -111,7 +111,7 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
                 {t(gameConfig.name)}
               </p>
               <p
-                className="text-[9px] font-mono text-primary-600 tracking-[0.35em] uppercase mt-0.5"
+                className="text-[9px] font-mono text-primary-active tracking-[0.35em] uppercase mt-0.5"
                 style={{ fontFamily: "Orbitron, sans-serif" }}
               >
                 // MENÚ
@@ -148,19 +148,19 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
               {category.href ? (
                 <Link
                   href={category.href}
-                  className="flex items-center gap-1.5 text-[10px] font-mono font-bold text-surface-500 hover:text-primary-400 mb-2 uppercase tracking-[0.25em] px-2 transition-colors duration-200"
+                  className="flex items-center gap-1.5 text-[10px] font-mono font-bold text-ink-muted hover:text-primary-hover mb-2 uppercase tracking-[0.25em] px-2 transition-colors duration-200"
                   style={{ fontFamily: "Orbitron, sans-serif" }}
                   onClick={() => setMobileSidebarOpen(false)}
                 >
-                  <span className="text-primary-600">//</span>
+                  <span className="text-primary-active">//</span>
                   {t(category.name)}
                 </Link>
               ) : (
                 <div
-                  className="flex items-center gap-1.5 text-[10px] font-mono font-bold text-surface-600 mb-2 uppercase tracking-[0.25em] px-2"
+                  className="flex items-center gap-1.5 text-[10px] font-mono font-bold text-ink-dim mb-2 uppercase tracking-[0.25em] px-2"
                   style={{ fontFamily: "Orbitron, sans-serif" }}
                 >
-                  <span className="text-primary-700">//</span>
+                  <span className="text-primary-active">//</span>
                   {t(category.name)}
                 </div>
               )}
@@ -202,8 +202,8 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
                           className={cn(
                             "mr-3 h-[18px] w-[18px] flex-shrink-0 relative z-10 transition-colors duration-200",
                             isActive
-                              ? "text-primary-400"
-                              : "text-surface-500 group-hover:text-surface-300"
+                              ? "text-primary-hover"
+                              : "text-ink-muted group-hover:text-ink"
                           )}
                           style={
                             isActive
@@ -217,8 +217,8 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
                           className={cn(
                             "relative z-10 flex-1 transition-colors duration-200",
                             isActive
-                              ? "text-primary-300 font-medium"
-                              : "text-surface-400 group-hover:text-surface-100"
+                              ? "text-primary-hover font-medium"
+                              : "text-ink-muted group-hover:text-ink"
                           )}
                         >
                           {t(tool.name)}

@@ -54,7 +54,7 @@ export function MovesTable({moves, sort = false, moveData, title}: {moves: Moves
     
     return (
         <div>
-            {title && <h3 className="text-lg font-medium text-primary-300 mb-3">{title}</h3>}
+            {title && <h3 className="text-lg font-medium text-primary-hover mb-3">{title}</h3>}
             
             <div className="overflow-x-auto">
                 <PokedexTable>
@@ -81,12 +81,12 @@ export function MovesTable({moves, sort = false, moveData, title}: {moves: Moves
                               <HoverCardTrigger asChild>
                                 <InternalLink
                                   href={`pokedex/movimientos/${key}`}
-                                  className="hover:text-primary-400 transition-colors inline-flex items-center"
+                                  className="hover:text-primary-hover transition-colors inline-flex items-center"
                                 >
                                   <span>{getTranslatedMoveName(key, t)}</span>
                                 </InternalLink>
                               </HoverCardTrigger>
-                              <HoverCardContent className="bg-surface-700 text-surface-50 w-[400px] border-surface-950 border font-normal z-50">
+                              <HoverCardContent className="bg-layer-3 text-ink w-[400px] border-edge-strong border font-normal z-50">
                                 <MoveDataElement id={key} />
                               </HoverCardContent>
                             </HoverCard>
@@ -111,7 +111,7 @@ export function MovesTable({moves, sort = false, moveData, title}: {moves: Moves
                       )
                     }) : (
                       <PokedexRow>
-                        <PokedexCell colSpan={8} className="text-center py-6 text-surface-300">
+                        <PokedexCell colSpan={8} className="text-center py-6 text-ink">
                           No se encontraron movimientos
                         </PokedexCell>
                       </PokedexRow>
@@ -125,17 +125,17 @@ export function MovesTable({moves, sort = false, moveData, title}: {moves: Moves
 
 export function LevelMovesTable({pokemon, formIndex, moveData}: {pokemon: Pokemon, formIndex: number, moveData: any}) {
     const moves = pokemon.forms[formIndex].moves ? pokemon.forms[formIndex].moves as Moves : pokemon.forms[0].moves as Moves
-    if(!moves) return <div className="text-surface-300 text-center py-4">Movimientos no encontrados</div>
+    if(!moves) return <div className="text-ink text-center py-4">Movimientos no encontrados</div>
     
     const levelUpMoves = moves.levelUpMoves
-    if(!levelUpMoves || levelUpMoves.length === 0) return <div className="text-surface-300 text-center py-4">No hay movimientos por nivel</div>
+    if(!levelUpMoves || levelUpMoves.length === 0) return <div className="text-ink text-center py-4">No hay movimientos por nivel</div>
     
     return <MovesTable moves={{levelUpMoves}} moveData={moveData} title="Movimientos por Nivel"/>
 }
 
 export function OtherMovesTable({pokemon, formIndex, moveData}: {pokemon: Pokemon, formIndex: number, moveData: any}) {
     const moves = pokemon.forms[formIndex].moves ? pokemon.forms[formIndex].moves as Moves : pokemon.forms[0].moves as Moves
-    if(!moves) return <div className="text-surface-300 text-center py-4">Movimientos no encontrados</div>
+    if(!moves) return <div className="text-ink text-center py-4">Movimientos no encontrados</div>
 
     let movesList: Moves = {}
     let hasOtherMoves = false
@@ -151,7 +151,7 @@ export function OtherMovesTable({pokemon, formIndex, moveData}: {pokemon: Pokemo
         }
     })
     
-    if (!hasOtherMoves) return <div className="text-surface-300 text-center py-4">No hay otros movimientos disponibles</div>
+    if (!hasOtherMoves) return <div className="text-ink text-center py-4">No hay otros movimientos disponibles</div>
     
     return <MovesTable moves={movesList} sort={true} moveData={moveData} title="Otros Movimientos"/>
 }

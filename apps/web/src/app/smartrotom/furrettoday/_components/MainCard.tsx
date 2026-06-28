@@ -75,7 +75,7 @@ const MainCard: React.FC<MainCardProps> = ({ news }) => {
           <div className="h-1 bg-black flex-grow" aria-hidden="true"></div>
         </div>
         
-        <div className="text-pop-lg mb-8 font-comic leading-relaxed text-black border-l-4 border-secondary-500 pl-6">
+        <div className="text-pop-lg mb-8 font-comic leading-relaxed text-black border-l-4 border-secondary pl-6">
           {getPreview(news, 300)}
         </div>
         

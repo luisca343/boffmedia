@@ -187,7 +187,7 @@ const PokemonSlot = memo(function PokemonSlot({
       {...listeners}
     >
       <div 
-        className={`absolute inset-0 bg-gradient-to-br from-surface-50/20 to-surface-100/30 border-2 rounded-xl cursor-pointer transition-all duration-200 backdrop-blur-sm overflow-hidden ${
+        className={`absolute inset-0 bg-gradient-to-br from-base/20 to-layer-1/30 border-2 rounded-xl cursor-pointer transition-all duration-200 backdrop-blur-sm overflow-hidden ${
           isOver
             ? 'border-green-400 bg-green-400/20'
             : isSelected 

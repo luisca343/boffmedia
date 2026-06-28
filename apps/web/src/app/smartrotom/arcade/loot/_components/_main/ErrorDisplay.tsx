@@ -12,7 +12,7 @@ export function ErrorDisplay({ error, type = "error", children }: ErrorDisplayPr
   const styles = {
     error: "bg-red-900/70 text-white border-2 border-red-500/40",
     warning: "bg-yellow-900/70 text-white border-2 border-yellow-500/40",
-    info: "bg-secondary-900/70 text-white border-2 border-secondary-500/40"
+    info: "bg-secondary-soft/70 text-white border-2 border-secondary/40"
   };
   
   return (

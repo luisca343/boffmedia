@@ -32,7 +32,7 @@ export function SearchableList<T>({
 }: SearchableListProps<T>) {
   return (
     <div className={cn("flex flex-col h-full", className)}>
-      <div className="shrink-0 p-3 border-b border-[var(--border)]">
+      <div className="shrink-0 p-3 border-b border-edge">
         <SearchInput
           value={search}
           onChange={onSearchChange}
@@ -41,7 +41,7 @@ export function SearchableList<T>({
       </div>
       <div className={cn("flex-1 overflow-y-auto", listClassName)}>
         {loading && (loadingComponent || (
-          <div className="py-12 flex justify-center text-[var(--text-dim)]">
+          <div className="py-12 flex justify-center text-ink-dim">
             <span className="font-mono text-xs">Cargando…</span>
           </div>
         ))}
@@ -49,7 +49,7 @@ export function SearchableList<T>({
           <p className="py-8 px-4 text-center text-xs text-[var(--rose-500)]">{error}</p>
         )}
         {!loading && !error && items.length === 0 && (
-          <p className="py-8 text-center text-xs text-[var(--text-dim)]">{emptyMessage}</p>
+          <p className="py-8 text-center text-xs text-ink-dim">{emptyMessage}</p>
         )}
         {!loading && !error && items.length > 0 && (
           <div className="p-2 flex flex-col gap-0.5">

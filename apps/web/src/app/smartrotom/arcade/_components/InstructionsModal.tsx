@@ -30,7 +30,7 @@ import {
               {title}
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-2 text-surface-200">
+          <div className="space-y-2 text-ink">
             {children}
           </div>
           <DialogFooter>

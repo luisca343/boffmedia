@@ -122,12 +122,12 @@ export function FeaturedTool({ tool, go, className }: FeaturedToolProps) {
                 <h2 className="text-t-3xl">{tool.title}</h2>
                 {tool.isNew && <Badge kind="new">Nuevo</Badge>}
               </div>
-              <span className="inline-flex items-center gap-1.5 font-mono text-t-xs tracking-widest uppercase text-[var(--accent-bright)] mt-1">
+              <span className="inline-flex items-center gap-1.5 font-mono text-t-xs tracking-widest uppercase text-secondary-hover mt-1">
                 <Icon name="sparkles" size={13} /> Herramienta destacada
               </span>
             </div>
           </div>
-          <p className="text-t-base leading-relaxed m-0 text-[var(--text-muted)]">{tool.desc}</p>
+          <p className="text-t-base leading-relaxed m-0 text-ink-muted">{tool.desc}</p>
           <div className="flex flex-wrap gap-2">
             {tool.features.map((f) => (
               <Badge key={f} kind="accent">{f}</Badge>
@@ -164,18 +164,18 @@ export function FeaturedTool({ tool, go, className }: FeaturedToolProps) {
               }}
             >
               <Image src={tool.heroImage} alt="" fill className="object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-r from-surface-900/80 via-surface-900/30 to-transparent hidden md:block pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-r from-layer-1/80 via-layer-1/30 to-transparent hidden md:block pointer-events-none" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
             </div>
           ) : (
             <div
-              className="w-full h-full rounded-none border-0 border-l-[var(--hairline)] border-dashed border-l-[var(--border-strong)] bg-[color:var(--surface-3)] bg-[image:repeating-linear-gradient(45deg,var(--border)_0_1px,transparent_1px_11px)] grid place-items-center overflow-hidden max-[620px]:border-l-0 max-[620px]:border-t-[var(--hairline)] max-[620px]:border-t-dashed max-[620px]:border-t-[var(--border-strong)]"
+              className="w-full h-full rounded-none border-0 border-l-[var(--hairline)] border-dashed border-l-[var(--border-strong)] bg-[color:var(--layer-3)] bg-[image:repeating-linear-gradient(45deg,var(--border)_0_1px,transparent_1px_11px)] grid place-items-center overflow-hidden max-[620px]:border-l-0 max-[620px]:border-t-[var(--hairline)] max-[620px]:border-t-dashed max-[620px]:border-t-[var(--border-strong)]"
               style={{
                 transition: "transform 0.5s ease",
                 transform: hovered ? "scale(1.03)" : "scale(1)",
               }}
             >
-              <span className="font-mono text-t-xs text-[var(--text-dim)] tracking-[0.04em]">
+              <span className="font-mono text-t-xs text-ink-dim tracking-[0.04em]">
                 {tool.image ?? ""}
               </span>
             </div>

@@ -34,8 +34,8 @@ const PopoverContent = React.forwardRef<
   const variant = usePopoverVariant()
   
   const variantStyles = {
-    default: "border-surface-700 bg-surface-800 text-primary-400",
-    wingull: "border-secondary-700 bg-secondary-800 text-secondary-300"
+    default: "border-edge bg-layer-2 text-primary-hover",
+    wingull: "border-secondary-active bg-secondary-soft text-secondary-hover"
   }
   
   return (

@@ -20,7 +20,7 @@ const COLOR_KEYS: Array<[string, BoffVariant]> = [
 ];
 
 /**
- * Maps a Tailwind color class string (e.g. "from-secondary-400 via-cyan-400")
+ * Maps a Tailwind color class string (e.g. "from-secondary-hover via-cyan-400")
  * to boff style tokens derived from the single-source BOFF_VARIANTS map.
  */
 export function getBoffStyle(colorClass: string): BoffStyle {

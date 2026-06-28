@@ -172,7 +172,7 @@ export function VgcToolbar({
         </>
       )}
       <div className="flex-1" />
-      <span className="inline-flex items-center gap-1.5 font-mono text-[10px] px-1.5 py-[0.15rem] rounded-[var(--radius-pill)] border border-[var(--border)] text-[var(--text-dim)]">
+      <span className="inline-flex items-center gap-1.5 font-mono text-[10px] px-1.5 py-[0.15rem] rounded-[var(--radius-pill)] border border-edge text-ink-dim">
         <Icon name="database" size={13} />
         {tab === "stats" ? `${totalBattles.toLocaleString("es-ES")} batallas` : `${totalTeams.toLocaleString("es-ES")} equipos`}
       </span>

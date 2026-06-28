@@ -59,14 +59,14 @@ export default function FullLeaderboardComponent() {
   }
 
   if (isLoading)
-    return <SectionLoading text="Cargando clasificación..." subtext="Preparando la tabla de posiciones" gradientFrom="from-accent-400" gradientTo="to-indigo-400" />
+    return <SectionLoading text="Cargando clasificación..." subtext="Preparando la tabla de posiciones" gradientFrom="from-secondary-hover" gradientTo="to-indigo-400" />
 
   if (error)
     return (
       <div className="min-h-screen">
         <div className="container mx-auto p-6 max-w-7xl">
           <div className="text-center py-20">
-            <div className="w-24 h-24 bg-surface-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-24 h-24 bg-layer-3/50 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="48"
@@ -77,7 +77,7 @@ export default function FullLeaderboardComponent() {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="text-surface-400"
+                className="text-ink-muted"
               >
                 <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
                 <path d="M12 9v4"></path>
@@ -85,7 +85,7 @@ export default function FullLeaderboardComponent() {
               </svg>
             </div>
             <h1 className="text-2xl font-bold text-white mb-4">Error al cargar la clasificación</h1>
-            <p className="text-surface-400 mb-6">{error}</p>
+            <p className="text-ink-muted mb-6">{error}</p>
             <Button 
               onClick={refetch} 
               variant="accent"
@@ -103,7 +103,7 @@ export default function FullLeaderboardComponent() {
         <SectionHeader 
           title="Clasificación Global"
           subtitle="Explora el ranking de todos los jugadores de la comunidad. Compite, gana medallas, logros y asciende en la clasificación."
-          gradientFrom="from-accent-400"
+          gradientFrom="from-secondary-hover"
           gradientTo="to-indigo-400"
         />
 
@@ -131,9 +131,9 @@ export default function FullLeaderboardComponent() {
 
           {/* Pagination */}
           {currentPlayers.length > 0 && (
-            <div className="bg-surface-800/60 backdrop-blur-sm border border-accent-500/20 rounded-2xl p-6">
+            <div className="bg-layer-2/60 backdrop-blur-sm border border-secondary/20 rounded-2xl p-6">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <p className="text-surface-400 text-sm">
+                <p className="text-ink-muted text-sm">
                   Mostrando {(currentPage - 1) * playersPerPage + 1} - {Math.min(currentPage * playersPerPage, filteredPlayers.length)} de {filteredPlayers.length} jugadores
                 </p>
 
@@ -174,7 +174,7 @@ export default function FullLeaderboardComponent() {
 
                     {totalPages > 5 && currentPage < totalPages - 2 && (
                       <>
-                        <span className="text-surface-500">...</span>
+                        <span className="text-ink-muted">...</span>
                         <Button
                           variant="accentOutline"
                           size="sm"

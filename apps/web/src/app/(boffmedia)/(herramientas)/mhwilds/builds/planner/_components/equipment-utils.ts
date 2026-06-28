@@ -31,15 +31,15 @@ export const getIconColor = (slotType: EquipmentType): string => {
   const colors: Record<EquipmentType, string> = {
     'weapon': "text-red-400",
     'secondaryWeapon': "text-orange-400",
-    'head': "text-secondary-400",
-    'chest': "text-highlight-400",
+    'head': "text-secondary-hover",
+    'chest': "text-warning-hover",
     'arms': "text-yellow-400",
-    'waist': "text-accent-400",
+    'waist': "text-secondary-hover",
     'legs': "text-cyan-400",
     'charm': "text-amber-400",
   };
   
-  return colors[slotType] || "text-surface-400";
+  return colors[slotType] || "text-ink-muted";
 };
 
 export const getEquipmentDisplayName = (slotType: EquipmentType): string => {
@@ -78,35 +78,35 @@ export const getRarityFilterStyle = (rarity: number): string => {
 export const getRarityStyle = (rarity: number): string => {
   switch (true) {
     case rarity === 3:
-      return "border-highlight-400 text-highlight-300";
+      return "border-warning-border text-warning-hover";
     case rarity === 4:
-      return "border-highlight-600 text-highlight-500";
+      return "border-warning-border text-warning";
     case rarity === 5:
       return "border-cyan-500 text-cyan-400";
     case rarity === 6:
-      return "border-secondary-500 text-secondary-400";
+      return "border-secondary text-secondary-hover";
     case rarity === 7:
-      return "border-accent-500 text-accent-400";
+      return "border-secondary text-secondary-hover";
     case rarity >= 8:
       return "border-orange-500 text-orange-400";
     default:
-      return "border-surface-500 text-surface-400";
+      return "border-edge text-ink-muted";
   }
 };
 
 // Get element color class
 export const getElementColor = (elementType: string): string => {
-  if (!elementType) return "text-surface-400";
+  if (!elementType) return "text-ink-muted";
   
   const colors: Record<string, string> = {
     fire: "text-red-400",
-    water: "text-secondary-400",
+    water: "text-secondary-hover",
     thunder: "text-yellow-400",
     ice: "text-cyan-400",
-    dragon: "text-accent-400"
+    dragon: "text-secondary-hover"
   };
   
-  return colors[elementType.toLowerCase()] || "text-surface-400";
+  return colors[elementType.toLowerCase()] || "text-ink-muted";
 };
 
 // Helper to get defense value regardless of format
@@ -214,21 +214,21 @@ export const getAllWeaponElements = (weapon: Weapon): {
 
 // Add a helper function to get status color
 export function getStatusColor(statusType: string | undefined): string {
-  if (!statusType) return 'text-surface-300';
+  if (!statusType) return 'text-ink';
   
   switch (statusType.toLowerCase()) {
     case 'poison':
-      return 'text-accent-400';
+      return 'text-secondary-hover';
     case 'paralysis':
       return 'text-yellow-300';
     case 'sleep':
-      return 'text-secondary-300';
+      return 'text-secondary-hover';
     case 'blast':
       return 'text-orange-400';
     case 'stun':
       return 'text-amber-400';
     default:
-      return 'text-surface-300';
+      return 'text-ink';
   }
 }
 

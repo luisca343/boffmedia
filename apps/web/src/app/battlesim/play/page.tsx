@@ -91,7 +91,7 @@ export default function PlayPage() {
           <button
             onClick={handleCreateBattle}
             className="px-8 py-3 rounded-lg text-lg font-semibold transition-colors shadow-lg"
-            style={{ background: 'var(--accent)', color: 'var(--text)', border: '1px solid var(--border)', boxShadow: '0 4px 14px -4px var(--border)' }}
+            style={{ background: 'var(--secondary)', color: 'var(--text)', border: '1px solid var(--border)', boxShadow: '0 4px 14px -4px var(--border)' }}
           >
             {t('play.start')}
           </button>
@@ -180,7 +180,7 @@ export default function PlayPage() {
       {state.replayId && (
         <Link href={`/battlesim/replay/${state.replayId}`}
           className="px-6 py-2 rounded-md font-medium transition-colors"
-          style={{ background: 'var(--surface-2)', color: 'var(--text)', border: '1px solid var(--border)' }}>
+          style={{ background: 'var(--layer-2)', color: 'var(--text)', border: '1px solid var(--border)' }}>
           {t('end.watchReplay')}
         </Link>
       )}
@@ -234,7 +234,7 @@ function BattleTabs({
   return (
     <div
       className="flex items-center gap-1 rounded-lg p-1 overflow-x-auto"
-      style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}
+      style={{ background: 'var(--layer-2)', border: '1px solid var(--border)' }}
     >
       {sessionEntries.map(([roomId, session]) => {
         const isActive = roomId === activeRoomId;
@@ -248,7 +248,7 @@ function BattleTabs({
             key={roomId}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm cursor-pointer transition-colors"
             style={{
-              background: isActive ? 'var(--surface-3)' : 'transparent',
+              background: isActive ? 'var(--layer-3)' : 'transparent',
               color: isActive ? 'var(--text)' : 'var(--text-muted)',
             }}
             onClick={() => onSwitch(roomId)}
@@ -258,7 +258,7 @@ function BattleTabs({
               className="text-xs px-1.5 py-0.5 rounded"
               style={{
                 background: st.status === 'active' ? 'color-mix(in srgb, var(--emerald-500) 20%, transparent)' :
-                  st.status === 'finished' ? 'var(--surface-3)' :
+                  st.status === 'finished' ? 'var(--layer-3)' :
                   st.status === 'connecting' ? 'color-mix(in srgb, var(--amber-500) 20%, transparent)' :
                   'color-mix(in srgb, var(--rose-500) 20%, transparent)',
                 color: st.status === 'active' ? 'var(--emerald-400)' :

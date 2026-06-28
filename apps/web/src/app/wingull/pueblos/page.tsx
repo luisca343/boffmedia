@@ -46,7 +46,7 @@ export default function PueblosPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-surface-900 flex items-center justify-center">
+      <div className="min-h-screen bg-layer-1 flex items-center justify-center">
         <BasicCard
           colorClaro={themeColors.colorClaro}
           colorMedio={themeColors.colorMedio}
@@ -63,12 +63,12 @@ export default function PueblosPage() {
   }
 
   return (
-    <div className="min-h-screen bg-surface-900">
+    <div className="min-h-screen bg-layer-1">
       <SectionTemplate
         colorClaro={themeColors.colorClaro}
         colorMedio={themeColors.colorMedio}
         colorOscuro={themeColors.colorOscuro}
-        backgroundGradient="bg-gradient-to-br from-surface-800 to-surface-900"
+        backgroundGradient="bg-gradient-to-br from-layer-2 to-layer-1"
       >
         <BackgroundDecorations includeGradient={false} />
         <div className="max-w-6xl mx-auto">
@@ -92,14 +92,14 @@ export default function PueblosPage() {
             >
               <div className="p-6">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-surface-400" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-ink-muted" />
                   <Input
                     type="text"
                     placeholder="Buscar pueblo..."
                     variant={'wingull'}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 bg-surface-50/10 border-surface-50/20 text-surface-50 placeholder-surface-100 focus:border-surface-50/40 focus:bg-surface-50/15"
+                    className="pl-10 bg-base/10 border-edge/20 text-ink placeholder-ink-dim focus:border-edge/40 focus:bg-base/15"
                   />
                 </div>
               </div>
@@ -127,9 +127,9 @@ export default function PueblosPage() {
                 className="max-w-md mx-auto"
               >
                 <div className="p-8">
-                  <Search className="w-12 h-12 mx-auto mb-4 opacity-50 text-surface-400" />
+                  <Search className="w-12 h-12 mx-auto mb-4 opacity-50 text-ink-muted" />
                     <h3 className="text-xl font-semibold mb-2 text-white">No se encontraron pueblos</h3>
-                    <p className="text-surface-400">
+                    <p className="text-ink-muted">
                       No hay pueblos que coincidan con &quot;{searchTerm}&quot;
                     </p>
                 </div>
@@ -199,16 +199,16 @@ function TownCard({ townName, themeColors, index }: TownCardProps) {
             {townName}
           </h3>
           
-          <p className="text-surface-300 text-sm mb-6">
+          <p className="text-ink text-sm mb-6">
             Descubre las parcelas disponibles y comodidades de {townName}
           </p>
 
           <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-2 text-sm text-surface-400 group-hover:text-white transition-colors">
+            <div className="flex items-center space-x-2 text-sm text-ink-muted group-hover:text-white transition-colors">
               <span>Explorar pueblo</span>
             </div>
             
-            <ChevronRight className="w-4 h-4 text-surface-400 group-hover:text-white group-hover:translate-x-1 transition-all" />
+            <ChevronRight className="w-4 h-4 text-ink-muted group-hover:text-white group-hover:translate-x-1 transition-all" />
           </div>
         </div>
       </BasicCard>

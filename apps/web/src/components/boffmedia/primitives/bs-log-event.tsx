@@ -27,24 +27,24 @@ export function BSLogEvent({ ev }: BSLogEventProps) {
   if (ev.turn != null) {
     return (
       <div className="flex items-center gap-[.7rem] my-[.4rem] mx-0">
-        <span className="font-mono font-bold text-[.62rem] tracking-[.14em] uppercase text-[var(--accent-bright)] whitespace-nowrap">
+        <span className="font-mono font-bold text-[.62rem] tracking-[.14em] uppercase text-secondary-hover whitespace-nowrap">
           Turno {ev.turn}
         </span>
-        <span className="flex-1 h-[1px]" style={{ background: "linear-gradient(90deg, var(--accent-soft), transparent)" }} />
+        <span className="flex-1 h-[1px]" style={{ background: "linear-gradient(90deg, var(--secondary-soft), transparent)" }} />
       </div>
     )
   }
   if (ev.kind === "sys") {
     return (
       <div className="flex gap-[.6rem] px-[.65rem] py-[.2rem] items-start">
-        <div className="flex-1 min-w-0 text-[color:var(--text-muted)] text-t-xs italic">{ev.txt}</div>
+        <div className="flex-1 min-w-0 text-ink-muted text-t-xs italic">{ev.txt}</div>
       </div>
     )
   }
-  const c = ev.type ? tyVar(ev.type) : ev.kind === "boost" ? "var(--emerald-400)" : "var(--accent)"
+  const c = ev.type ? tyVar(ev.type) : ev.kind === "boost" ? "var(--emerald-400)" : "var(--secondary)"
   return (
     <div
-      className={cn("flex gap-[.6rem] px-[.65rem] py-[.55rem] rounded-[var(--radius)] items-start", "bg-[var(--surface-2)] border border-solid border-[var(--border)]", ev.crit && "ev--crit")}
+      className={cn("flex gap-[.6rem] px-[.65rem] py-[.55rem] rounded-[var(--radius)] items-start", "bg-layer-2 border border-solid border-edge", ev.crit && "ev--crit")}
     >
       <span
         className="shrink-0 w-[26px] h-[26px] rounded-[7px] grid place-items-center"
@@ -101,13 +101,13 @@ export function BSChatRow({ row }: BSChatRowProps) {
         className={cn(
           "font-bold shrink-0",
           row.side === "cast" && "text-[var(--purple-400)]",
-          row.side === "p1" && "text-[var(--accent-bright)]",
+          row.side === "p1" && "text-secondary-hover",
           row.side === "p2" && "text-[var(--orange-400)]",
         )}
       >
         {row.who}
       </span>
-      <span className="text-[var(--text-muted)] min-w-0">{row.msg}</span>
+      <span className="text-ink-muted min-w-0">{row.msg}</span>
     </div>
   )
 }

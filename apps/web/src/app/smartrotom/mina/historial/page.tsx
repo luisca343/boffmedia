@@ -10,7 +10,7 @@ export default function History() {
   const { history } = useGetHistory(session?.user?.smartRotomUser?.uuid!);
 
   return (
-    <MenuWrapper className="w-full min-h-full  bg-surface-900 text-white flex flex-col items-center">
+    <MenuWrapper className="w-full min-h-full  bg-layer-1 text-white flex flex-col items-center">
       <div className="bg-black bg-opacity-70 p-6 rounded-lg w-3/4 max-w-3xl m-4">
         <h2 className="text-2xl font-bold mb-4">HISTORIAL</h2>
         <div className="space-y-4 overflow-auto">
@@ -19,7 +19,7 @@ export default function History() {
             .map((game: any, index: number) => (
               <div
                 key={index}
-                className="flex justify-between items-center border-b border-surface-600 pb-2"
+                className="flex justify-between items-center border-b border-edge pb-2"
               >
                 <span>{new Date(game[0].date).toLocaleString()}</span>
                 <div className="flex space-x-2">

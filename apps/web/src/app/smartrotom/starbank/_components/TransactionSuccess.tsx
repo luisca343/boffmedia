@@ -20,7 +20,7 @@ export function TransactionSuccess({
   
   return (
     <div className="flex flex-col items-center text-center p-6">
-      <div className="h-16 w-16 rounded-full bg-highlight-100 flex items-center justify-center text-highlight-600 mb-4">
+      <div className="h-16 w-16 rounded-full bg-warning-soft flex items-center justify-center text-warning mb-4">
         <CheckCircleIcon className="h-10 w-10" />
       </div>
       

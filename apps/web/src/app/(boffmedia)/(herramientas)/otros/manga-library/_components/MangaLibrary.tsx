@@ -226,27 +226,27 @@ function MangaLibraryInner() {
   const singleBar = showSingleBar && portalTarget
     ? createPortal(
         <div className="fixed bottom-0 left-0 right-0 z-[9999] flex justify-center pointer-events-none">
-          <div className="pointer-events-auto mb-6 flex items-center gap-3 bg-surface-800/95 backdrop-blur-sm border border-surface-700/60 rounded-xl px-5 py-3 shadow-2xl">
+          <div className="pointer-events-auto mb-6 flex items-center gap-3 bg-layer-2/95 backdrop-blur-sm border border-edge/60 rounded-xl px-5 py-3 shadow-2xl">
             {discarded.size > 0 && (
               <>
                 <span className="text-sm text-red-400">{t("discardedCount", { count: discarded.size })}</span>
                 <button
                   onClick={() => setPages(chapterSlug!, [])}
-                  className="text-surface-400 hover:text-surface-200 transition-colors"
+                  className="text-ink-muted hover:text-ink transition-colors"
                   aria-label={t("clearDiscarded")}
                 >
                   <X className="w-4 h-4" />
                 </button>
-                <div className="w-px h-4 bg-surface-600" />
+                <div className="w-px h-4 bg-layer-3" />
               </>
             )}
             {convertError && <span className="text-sm text-red-400">{convertError}</span>}
             {isConverted && !converting && <span className="text-sm text-green-400">{t("converted")}</span>}
-            <label className="flex items-center gap-1.5 text-sm text-surface-400 cursor-pointer select-none shrink-0">
+            <label className="flex items-center gap-1.5 text-sm text-ink-muted cursor-pointer select-none shrink-0">
               <Checkbox checked={includeCoverSingle} onCheckedChange={(v) => setIncludeCoverSingle(!!v)} />
               {t("coverPage")}
             </label>
-            <p className="text-xs text-surface-500">{t("keepNote")}</p>
+            <p className="text-xs text-ink-muted">{t("keepNote")}</p>
             <Button onClick={handleConvert} disabled={converting} size="sm">
               {converting
                 ? <><Loader2 className="w-4 h-4 mr-1.5 animate-spin" />{t("converting")}</>
@@ -261,29 +261,29 @@ function MangaLibraryInner() {
   const bulkBar = showBulkBar && portalTarget
     ? createPortal(
         <div className="fixed bottom-0 left-0 right-0 z-[9999] flex justify-center pointer-events-none">
-          <div className="pointer-events-auto mb-6 flex flex-wrap items-center gap-3 bg-surface-800/95 backdrop-blur-sm border border-surface-700/60 rounded-xl px-5 py-3 shadow-2xl max-w-2xl">
-            <span className="text-sm font-medium text-surface-200 shrink-0">
+          <div className="pointer-events-auto mb-6 flex flex-wrap items-center gap-3 bg-layer-2/95 backdrop-blur-sm border border-edge/60 rounded-xl px-5 py-3 shadow-2xl max-w-2xl">
+            <span className="text-sm font-medium text-ink shrink-0">
               {t("selectedChapters", { count: selectedChapters.size })}
             </span>
-            <div className="w-px h-4 bg-surface-600 shrink-0" />
-            <label className="flex items-center gap-1.5 text-sm text-surface-400 shrink-0">
+            <div className="w-px h-4 bg-layer-3 shrink-0" />
+            <label className="flex items-center gap-1.5 text-sm text-ink-muted shrink-0">
               {t("removeFirst")}
               <input
                 type="number" min={0} max={99} value={removeFirst}
                 onChange={(e) => setRemoveFirst(Math.max(0, parseInt(e.target.value) || 0))}
-                className="w-12 rounded bg-surface-700 border border-surface-600 text-surface-100 text-center text-sm px-1 py-0.5 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+                className="w-12 rounded bg-layer-3 border border-edge text-ink text-center text-sm px-1 py-0.5 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
               />
             </label>
-            <label className="flex items-center gap-1.5 text-sm text-surface-400 shrink-0">
+            <label className="flex items-center gap-1.5 text-sm text-ink-muted shrink-0">
               {t("removeLast")}
               <input
                 type="number" min={0} max={99} value={removeLast}
                 onChange={(e) => setRemoveLast(Math.max(0, parseInt(e.target.value) || 0))}
-                className="w-12 rounded bg-surface-700 border border-surface-600 text-surface-100 text-center text-sm px-1 py-0.5 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+                className="w-12 rounded bg-layer-3 border border-edge text-ink text-center text-sm px-1 py-0.5 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
               />
             </label>
             {bulk && !bulk.finished && (
-              <span className="text-sm text-surface-400 shrink-0">
+              <span className="text-sm text-ink-muted shrink-0">
                 {t("bulkConverting", { done: bulk.done, total: bulk.total })}
               </span>
             )}
@@ -293,11 +293,11 @@ function MangaLibraryInner() {
                 {bulk.errors.length > 0 && <span className="text-red-400 ml-1">({bulk.errors.length} errors)</span>}
               </span>
             )}
-            <label className="flex items-center gap-1.5 text-sm text-surface-400 cursor-pointer select-none shrink-0">
+            <label className="flex items-center gap-1.5 text-sm text-ink-muted cursor-pointer select-none shrink-0">
               <Checkbox checked={includeCoverBulk} onCheckedChange={(v) => setIncludeCoverBulk(!!v)} />
               {t("coverPage")}
             </label>
-            <p className="text-xs text-surface-500 shrink-0">{t("keepNote")}</p>
+            <p className="text-xs text-ink-muted shrink-0">{t("keepNote")}</p>
             <Button
               onClick={handleBulkConvert}
               disabled={!!bulk && !bulk.finished}
@@ -323,15 +323,15 @@ function MangaLibraryInner() {
         transition={{ duration: 0.35 }}
         className="mb-8 flex items-center gap-3"
       >
-        <BookOpen className="w-7 h-7 text-primary-400 shrink-0" />
+        <BookOpen className="w-7 h-7 text-primary-hover shrink-0" />
         <h1 className="text-3xl font-bold tracking-tight flex-1">
-          <span className="bg-gradient-to-r from-primary-400 to-primary-200 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-primary-hover to-primary-soft bg-clip-text text-transparent">
             {t("title")}
           </span>
         </h1>
         <button
           onClick={clearLibraryCache}
-          className="text-surface-500 hover:text-surface-200 transition-colors p-1.5 rounded hover:bg-surface-700/40"
+          className="text-ink-muted hover:text-ink transition-colors p-1.5 rounded hover:bg-layer-3/40"
           aria-label={t("refreshLibrary")}
           title={t("refreshLibrary")}
         >
@@ -341,21 +341,21 @@ function MangaLibraryInner() {
 
       {/* Breadcrumb */}
       {seriesSlug && (
-        <div className="flex items-center gap-1.5 text-sm text-surface-400 mb-6 flex-wrap">
-          <button onClick={goToLibrary} className="hover:text-surface-100 transition-colors">
+        <div className="flex items-center gap-1.5 text-sm text-ink-muted mb-6 flex-wrap">
+          <button onClick={goToLibrary} className="hover:text-ink transition-colors">
             {t("backToLibrary")}
           </button>
           <ChevronRight className="w-3.5 h-3.5 shrink-0" />
           <button
             onClick={chapterSlug ? goToSeries : undefined}
-            className={`hover:text-surface-100 transition-colors ${!chapterSlug ? "text-surface-100 font-medium pointer-events-none" : ""}`}
+            className={`hover:text-ink transition-colors ${!chapterSlug ? "text-ink font-medium pointer-events-none" : ""}`}
           >
             {seriesSlug}
           </button>
           {chapterSlug && (
             <>
               <ChevronRight className="w-3.5 h-3.5 shrink-0" />
-              <span className="text-surface-100 font-medium">{chapterSlug}</span>
+              <span className="text-ink font-medium">{chapterSlug}</span>
             </>
           )}
         </div>
@@ -372,23 +372,23 @@ function MangaLibraryInner() {
             transition={{ duration: 0.2 }}
           >
             {loadingLibrary ? (
-              <div className="flex items-center gap-2 text-surface-400">
+              <div className="flex items-center gap-2 text-ink-muted">
                 <Loader2 className="w-4 h-4 animate-spin" />
               </div>
             ) : !library?.series.length ? (
               <Card>
-                <CardContent className="py-12 text-center text-surface-400">{t("noSeries")}</CardContent>
+                <CardContent className="py-12 text-center text-ink-muted">{t("noSeries")}</CardContent>
               </Card>
             ) : (
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {library.series.map((series) => (
                   <button key={series.slug} onClick={() => openSeries(series.slug)} className="text-left">
-                    <Card className="hover:border-primary-500/50 transition-colors cursor-pointer h-full">
+                    <Card className="hover:border-primary/50 transition-colors cursor-pointer h-full">
                       <CardHeader className="pb-2">
                         <CardTitle className="text-base leading-snug line-clamp-2">{series.slug}</CardTitle>
                       </CardHeader>
                       <CardContent className="pt-0">
-                        <span className="text-sm text-surface-400">{series.chapters.length} {t("chapters")}</span>
+                        <span className="text-sm text-ink-muted">{series.chapters.length} {t("chapters")}</span>
                       </CardContent>
                     </Card>
                   </button>
@@ -408,7 +408,7 @@ function MangaLibraryInner() {
             transition={{ duration: 0.2 }}
           >
             {loadingLibrary || !selectedSeries ? (
-              <div className="flex items-center gap-2 text-surface-400">
+              <div className="flex items-center gap-2 text-ink-muted">
                 <Loader2 className="w-4 h-4 animate-spin" />
               </div>
             ) : (
@@ -420,7 +420,7 @@ function MangaLibraryInner() {
                     <CardContent className="p-0 flex flex-col min-h-0">
 
                       {selectedSeries.chapters.length > 0 && (
-                        <div className="flex items-center gap-3 px-4 py-2.5 border-b border-surface-700/50 shrink-0">
+                        <div className="flex items-center gap-3 px-4 py-2.5 border-b border-edge/50 shrink-0">
                           <Checkbox
                             id="select-all"
                             checked={
@@ -429,14 +429,14 @@ function MangaLibraryInner() {
                             }
                             onCheckedChange={toggleSelectAll}
                           />
-                          <label htmlFor="select-all" className="text-xs text-surface-400 cursor-pointer select-none">
+                          <label htmlFor="select-all" className="text-xs text-ink-muted cursor-pointer select-none">
                             {selectedChapters.size === selectedSeries.chapters.length &&
                             selectedSeries.chapters.length > 0
                               ? t("deselectAll")
                               : t("selectAll")}
                           </label>
                           {selectedChapters.size > 0 && (
-                            <Badge variant="outline" className="ml-auto text-[10px] border-primary-600/60 text-primary-400">
+                            <Badge variant="outline" className="ml-auto text-[10px] border-primary-active/60 text-primary-hover">
                               {t("selectedChapters", { count: selectedChapters.size })}
                             </Badge>
                           )}
@@ -445,9 +445,9 @@ function MangaLibraryInner() {
 
                       <div className="overflow-y-auto">
                         {selectedSeries.chapters.length === 0 ? (
-                          <p className="p-6 text-surface-400 text-sm">{t("noChapters")}</p>
+                          <p className="p-6 text-ink-muted text-sm">{t("noChapters")}</p>
                         ) : (
-                          <ul className="divide-y divide-surface-700/50">
+                          <ul className="divide-y divide-edge/50">
                             {selectedSeries.chapters.map((ch) => {
                               const hasEpub = ch.hasEpub || converted.get(selectedSeries.slug)?.has(ch.slug);
                               const isSelected = selectedChapters.has(ch.slug);
@@ -455,7 +455,7 @@ function MangaLibraryInner() {
                               return (
                                 <li
                                   key={ch.slug}
-                                  className={`flex items-center transition-colors ${isSelected ? "bg-primary-900/20" : ""} ${isActive ? "border-l-2 border-primary-500 bg-primary-900/30" : ""}`}
+                                  className={`flex items-center transition-colors ${isSelected ? "bg-primary-soft/20" : ""} ${isActive ? "border-l-2 border-primary bg-primary-soft/30" : ""}`}
                                 >
                                   <div className="pl-4 pr-2 py-3 flex items-center shrink-0">
                                     <Checkbox
@@ -466,20 +466,20 @@ function MangaLibraryInner() {
                                   </div>
                                   <button
                                     onClick={() => openChapter(ch.slug)}
-                                    className="flex-1 flex items-center gap-2 px-3 py-3 hover:bg-surface-700/30 transition-colors text-left min-w-0"
+                                    className="flex-1 flex items-center gap-2 px-3 py-3 hover:bg-layer-3/30 transition-colors text-left min-w-0"
                                   >
-                                    <span className={`flex-1 font-medium text-sm truncate ${isActive ? "text-primary-300" : ""}`}>
+                                    <span className={`flex-1 font-medium text-sm truncate ${isActive ? "text-primary-hover" : ""}`}>
                                       {ch.slug}
                                     </span>
                                     <div className="flex gap-1 shrink-0">
                                       {ch.hasCbz && (
-                                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-surface-600 text-surface-400">{t("cbz")}</Badge>
+                                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-edge text-ink-muted">{t("cbz")}</Badge>
                                       )}
                                       {hasEpub && (
-                                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-primary-600/60 text-primary-400">{t("epub")}</Badge>
+                                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-primary-active/60 text-primary-hover">{t("epub")}</Badge>
                                       )}
                                     </div>
-                                    <ChevronRight className={`w-3.5 h-3.5 shrink-0 ${isActive ? "text-primary-400" : "text-surface-500"}`} />
+                                    <ChevronRight className={`w-3.5 h-3.5 shrink-0 ${isActive ? "text-primary-hover" : "text-ink-muted"}`} />
                                   </button>
                                 </li>
                               );
@@ -498,11 +498,11 @@ function MangaLibraryInner() {
                     <Card>
                       <CardContent className="p-5">
                         <MangaMetadataForm seriesSlug={seriesSlug} />
-                        <p className="mt-4 text-xs text-surface-500 text-center">{t("selectChapter")}</p>
+                        <p className="mt-4 text-xs text-ink-muted text-center">{t("selectChapter")}</p>
                       </CardContent>
                     </Card>
                   ) : loadingPages ? (
-                    <div className="flex items-center gap-2 text-surface-400 py-8">
+                    <div className="flex items-center gap-2 text-ink-muted py-8">
                       <Loader2 className="w-4 h-4 animate-spin" />
                       <span className="text-sm">{t("loadingPages")}</span>
                     </div>

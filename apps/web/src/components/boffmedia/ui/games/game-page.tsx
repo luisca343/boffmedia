@@ -209,14 +209,14 @@ export function GamePage({ slug }: GamePageProps) {
                     href={link.href}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center justify-between gap-4 px-5 py-4 rounded-[var(--radius-lg)] bg-[var(--card-bg)] border border-[var(--border)] shadow-[var(--card-shadow)] backdrop-blur-[10px] transition-all duration-[var(--dur)] hover:border-[color-mix(in_srgb,var(--orange-500)_45%,var(--border))] hover:-translate-y-0.5 group"
+                    className="flex items-center justify-between gap-4 px-5 py-4 rounded-[var(--radius-lg)] bg-[var(--card-bg)] border border-edge shadow-[var(--card-shadow)] backdrop-blur-[10px] transition-all duration-[var(--dur)] hover:border-[color-mix(in_srgb,var(--orange-500)_45%,var(--border))] hover:-translate-y-0.5 group"
                   >
                     <div>
                       <span className="block font-semibold text-[length:var(--t-sm)]">
                         {link.title}
                       </span>
                       {link.desc && (
-                        <span className="text-[length:var(--t-xs)] text-[var(--text-muted)]">
+                        <span className="text-[length:var(--t-xs)] text-ink-muted">
                           {link.desc}
                         </span>
                       )}
@@ -224,7 +224,7 @@ export function GamePage({ slug }: GamePageProps) {
                     <Icon
                       name="external"
                       size={16}
-                      className="shrink-0 text-[var(--text-dim)] transition-colors duration-[var(--dur)] group-hover:text-[var(--orange-500)]"
+                      className="shrink-0 text-ink-dim transition-colors duration-[var(--dur)] group-hover:text-[var(--orange-500)]"
                     />
                   </a>
                 ))}

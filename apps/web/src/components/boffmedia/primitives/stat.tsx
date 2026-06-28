@@ -45,8 +45,8 @@ export function Stat({ icon, label, value, delta, deltaTone = "up", sub, classNa
         )}
       </div>
       <div className="font-display font-extrabold text-3xl leading-none">{value}</div>
-      <div className="text-sm font-semibold text-[var(--text-muted)] mt-1">{label}</div>
-      {sub && <div className="text-xs mt-0.5 text-[var(--text-dim)]">{sub}</div>}
+      <div className="text-sm font-semibold text-ink-muted mt-1">{label}</div>
+      {sub && <div className="text-xs mt-0.5 text-ink-dim">{sub}</div>}
     </div>
   )
 }

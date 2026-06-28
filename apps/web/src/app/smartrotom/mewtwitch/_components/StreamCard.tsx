@@ -88,7 +88,7 @@ export const StreamCard = ({
       
       <InternalLink
         href={getLink()}
-        className="block bg-surface-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:bg-surface-700"
+        className="block bg-layer-2 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:bg-layer-3"
       >
         <div className="relative">
           <img
@@ -128,15 +128,15 @@ export const StreamCard = ({
             {title}
           </h3>
           
-          <p className="text-sm text-surface-400 group-hover:text-surface-300 transition-colors duration-300 mb-1">
+          <p className="text-sm text-ink-muted group-hover:text-ink transition-colors duration-300 mb-1">
             {streamerName}
           </p>
           
           {gameName && (
-            <p className="text-xs text-surface-500 mb-2">{gameName}</p>
+            <p className="text-xs text-ink-muted mb-2">{gameName}</p>
           )}
           
-          <div className="flex items-center justify-between text-xs text-surface-400">
+          <div className="flex items-center justify-between text-xs text-ink-muted">
             {type === 'stream' && viewerCount !== undefined && (
               <div className="flex items-center">
                 <Users className="h-3 w-3 mr-1" />

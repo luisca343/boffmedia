@@ -11,7 +11,7 @@ export default function RecentDestinations({ recentStops, onSelectStop }: Recent
   
   return (
     <div className="mb-4 bg-white/10 backdrop-blur-sm rounded-lg shadow-md overflow-hidden border border-white/20">
-      <div className="bg-gradient-to-r from-secondary-600/70 to-secondary-800/70 p-3">
+      <div className="bg-gradient-to-r from-secondary-active/70 to-secondary-soft/70 p-3">
         <h3 className="flex items-center text-md font-medium text-white">
           <FaHistory className="mr-2 text-yellow-400" />
           Destinos recientes
@@ -24,7 +24,7 @@ export default function RecentDestinations({ recentStops, onSelectStop }: Recent
             <button
               key={stop.id}
               onClick={() => onSelectStop(stop)}
-              className="flex items-center px-3 py-2 bg-white/10 hover:bg-secondary-700/30 border border-white/10 hover:border-secondary-300/50 rounded-lg whitespace-nowrap transition-colors group"
+              className="flex items-center px-3 py-2 bg-white/10 hover:bg-secondary-active/30 border border-white/10 hover:border-secondary/50 rounded-lg whitespace-nowrap transition-colors group"
             >
               <div className="bg-red-500 group-hover:bg-yellow-400 p-1 rounded-full mr-2 transition-colors">
                 <FaMapMarkerAlt className="text-white text-xs" />

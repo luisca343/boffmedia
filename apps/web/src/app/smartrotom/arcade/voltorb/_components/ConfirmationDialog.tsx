@@ -43,13 +43,13 @@ export default function ConfirmationDialog({
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
-      <AlertDialogContent className={`bg-surface-900 border-4 ${variant === 'quit' ? 'border-red-500' : 'border-yellow-500'} rounded-lg p-0 max-w-md w-full ${animationClass}`}>
+      <AlertDialogContent className={`bg-layer-1 border-4 ${variant === 'quit' ? 'border-red-500' : 'border-yellow-500'} rounded-lg p-0 max-w-md w-full ${animationClass}`}>
         <div className="pixel-corners p-8">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-2xl font-bold text-center mb-6 text-white">
               {title}
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-lg text-center text-surface-300">
+            <AlertDialogDescription className="text-lg text-center text-ink">
               {description}
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -67,7 +67,7 @@ export default function ConfirmationDialog({
               </AlertDialogAction>
               <AlertDialogCancel 
                 onClick={onClose}
-                className="py-3 px-6 rounded-lg font-bold text-white bg-secondary-500 hover:bg-secondary-600 active:bg-secondary-700 transition-colors duration-200 pixel-corners"
+                className="py-3 px-6 rounded-lg font-bold text-white bg-secondary hover:bg-secondary-active active:bg-secondary-active transition-colors duration-200 pixel-corners"
               >
                 {cancelText}
               </AlertDialogCancel>

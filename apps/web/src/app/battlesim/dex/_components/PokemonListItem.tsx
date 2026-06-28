@@ -13,10 +13,10 @@ export default function PokemonListItem({ pokemon, onClick }: PokemonListItemPro
   
   return (
     <div 
-      className="bg-surface-800 rounded-lg p-3 cursor-pointer hover:bg-surface-700/80 transition-colors flex items-center gap-3"
+      className="bg-layer-2 rounded-lg p-3 cursor-pointer hover:bg-layer-3/80 transition-colors flex items-center gap-3"
       onClick={onClick}
     >
-      <div className="h-16 w-16 bg-surface-700 rounded-lg flex items-center justify-center">
+      <div className="h-16 w-16 bg-layer-3 rounded-lg flex items-center justify-center">
         {spriteUrl ? (
           <img 
             src={spriteUrl} 
@@ -24,13 +24,13 @@ export default function PokemonListItem({ pokemon, onClick }: PokemonListItemPro
             className="h-auto w-auto max-h-full max-w-full object-contain"
           />
         ) : (
-          <div className="text-surface-500 text-xs">No Image</div>
+          <div className="text-ink-muted text-xs">No Image</div>
         )}
       </div>
       
       <div className="flex-1">
         <div className="flex items-center justify-between">
-          <h3 className="font-medium text-surface-100">{pokemon.name}</h3>
+          <h3 className="font-medium text-ink">{pokemon.name}</h3>
           {pokemon.tier && <TierBadge tier={pokemon.tier} />}
         </div>
         
@@ -40,7 +40,7 @@ export default function PokemonListItem({ pokemon, onClick }: PokemonListItemPro
           ))}
         </div>
         
-        <div className="flex items-center gap-2 mt-1.5 text-xs text-surface-400">
+        <div className="flex items-center gap-2 mt-1.5 text-xs text-ink-muted">
           <span>HP: {pokemon.baseStats.hp}</span>
           <span>Atk: {pokemon.baseStats.atk}</span>
           <span>Def: {pokemon.baseStats.def}</span>
