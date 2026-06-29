@@ -36,6 +36,73 @@
         "sorteos": "Raffles",
         "keys": "Steam Keys"
       }
+    },
+    "minecraft": {
+      "name": "Minecraft",
+      "categories": {
+        "tools": "Tools"
+      },
+      "tools": {
+        "schematicCompat": "Schematic Compatibility"
+      },
+      "schematicCompat": {
+        "title": "Schematic Compatibility Tool",
+        "description": "Convert schematics between Minecraft versions and mod loaders",
+        "features": {
+          "converter": "Block Converter",
+          "preview3d": "3D Preview",
+          "modSupport": "Mod Support"
+        },
+        "setup": {
+          "sourceEnv": "Source Environment",
+          "targetEnv": "Target Environment",
+          "schematic": "Schematic File",
+          "pickDir": "Pick Directory",
+          "pickInstance": "Pick Instance Folder",
+          "scanning": "Scanning instance…",
+          "modsLabel": "mods",
+          "blocksLabel": "blocks",
+          "pickFile": "Pick File",
+          "analyze": "Analyze",
+          "rules": "Mapping Rules",
+          "import": "Import",
+          "export": "Export"
+        },
+        "diff": {
+          "header": "Compatibility",
+          "analyzing": "Analyzing…",
+          "emptyPrompt": "Scan both environments, load a schematic, then press Analyze.",
+          "noMatching": "No matching blocks",
+          "searchPlaceholder": "Search blocks…",
+          "showSafe": "Show safe",
+          "hideSafe": "Hide safe",
+          "replaceWith": "Replace with…",
+          "instances": "{count, plural, one {# instance} other {# instances}}",
+          "safe": "Safe",
+          "renamed": "Renamed",
+          "stateChanged": "State Changed",
+          "missing": "Missing",
+          "modOnly": "Mod Only",
+          "applyToAll": "Apply to All",
+          "thisInstance": "This Instance"
+        },
+        "preview": {
+          "layerSlider": "Layer",
+          "highlightAll": "Highlight All",
+          "solid": "Solid",
+          "diffOnly": "Diff Only",
+          "wireframe": "Wireframe",
+          "reset": "Reset"
+        },
+        "export": {
+          "title": "Export",
+          "progress": "Resolving block states..."
+        },
+        "worker": {
+          "connecting": "Connecting to analysis engine...",
+          "ready": "Ready"
+        }
+      }
     }
   }
 }

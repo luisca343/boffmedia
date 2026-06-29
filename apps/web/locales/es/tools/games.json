@@ -36,6 +36,73 @@
                 "sorteos": "Sorteos",
                 "keys": "Claves de Steam"
             }
+        },
+        "minecraft": {
+            "name": "Minecraft",
+            "categories": {
+                "tools": "Herramientas"
+            },
+            "tools": {
+                "schematicCompat": "Compatibilidad de Schematics"
+            },
+            "schematicCompat": {
+                "title": "Herramienta de Compatibilidad de Schematics",
+                "description": "Convierte schematics entre versiones de Minecraft y mod loaders",
+                "features": {
+                    "converter": "Convertidor de Bloques",
+                    "preview3d": "Vista Previa 3D",
+                    "modSupport": "Soporte de Mods"
+                },
+                "setup": {
+                    "sourceEnv": "Entorno Origen",
+                    "targetEnv": "Entorno Destino",
+                    "schematic": "Archivo Schematic",
+                    "pickDir": "Seleccionar Carpeta",
+                    "pickInstance": "Seleccionar Carpeta de Instancia",
+                    "scanning": "Escaneando instancia…",
+                    "modsLabel": "mods",
+                    "blocksLabel": "bloques",
+                    "pickFile": "Seleccionar Archivo",
+                    "analyze": "Analizar",
+                    "rules": "Reglas de Mapeo",
+                    "import": "Importar",
+                    "export": "Exportar"
+                },
+                "diff": {
+                    "header": "Compatibilidad",
+                    "analyzing": "Analizando…",
+                    "emptyPrompt": "Escanea ambos entornos, carga un esquema y pulsa Analizar.",
+                    "noMatching": "No hay bloques que coincidan",
+                    "searchPlaceholder": "Buscar bloques…",
+                    "showSafe": "Mostrar compatibles",
+                    "hideSafe": "Ocultar compatibles",
+                    "replaceWith": "Reemplazar con…",
+                    "instances": "{count, plural, one {# instancia} other {# instancias}}",
+                    "safe": "Compatible",
+                    "renamed": "Renombrado",
+                    "stateChanged": "Estado Cambiado",
+                    "missing": "Faltante",
+                    "modOnly": "Solo Mod",
+                    "applyToAll": "Aplicar a Todos",
+                    "thisInstance": "Esta Instancia"
+                },
+                "preview": {
+                    "layerSlider": "Capa",
+                    "highlightAll": "Resaltar Todos",
+                    "solid": "Sólido",
+                    "diffOnly": "Solo Diferencias",
+                    "wireframe": "Contorno",
+                    "reset": "Reiniciar"
+                },
+                "export": {
+                    "title": "Exportar",
+                    "progress": "Resolviendo estados de bloques..."
+                },
+                "worker": {
+                    "connecting": "Conectando al motor de análisis...",
+                    "ready": "Listo"
+                }
+            }
         }
     }
 }
