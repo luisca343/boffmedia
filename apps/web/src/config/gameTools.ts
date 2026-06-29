@@ -9,6 +9,7 @@ import {
   GiSpeedometer,
   GiScales,
   GiNotebook,
+  GiBrickWall,
 } from "react-icons/gi";
 import { FaStar } from "react-icons/fa";
 import { getGameEntry } from "@/data/games";
@@ -54,6 +55,7 @@ export const sidebarIconMap: Record<string, IconType> = {
   Speedometer: GiSpeedometer,
   Scales:      GiScales,
   Notebook:    GiNotebook,
+  Blocks:      GiBrickWall,
 };
 
 // ─── Adapter: builds GameConfig from the unified game registry ────────────────
@@ -87,4 +89,5 @@ export const gameToolsConfig: GameToolsConfigType = {
   pokemon: buildGameConfig("pokemon"),
   mhwilds: buildGameConfig("mhwilds"),
   otros: buildGameConfig("otros"),
+  minecraft: buildGameConfig("minecraft"),
 };
