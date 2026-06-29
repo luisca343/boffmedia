@@ -125,6 +125,18 @@ export type ResolutionMap = Record<
 export type ProgressCb = (pct: number, msg: string) => void;
 
 /**
+ * Per-block-type position data for the 3D preview, built worker-side and
+ * transferred to the UI thread after analysis.  `positions` is a flat
+ * Float32Array of [x, y, z] triplets — one triplet per block instance.
+ */
+export interface BlockPositionGroup {
+  paletteIndex: number;
+  block: UnifiedBlock;
+  /** Flat Float32Array: [x0,y0,z0, x1,y1,z1, …]. Length = instanceCount × 3. */
+  positions: Float32Array;
+}
+
+/**
  * Lightweight reference to a registry loaded inside the worker.
  * The full block Map stays in the worker; the UI only needs metadata.
  */
