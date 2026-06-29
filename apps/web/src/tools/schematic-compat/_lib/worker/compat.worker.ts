@@ -10,6 +10,7 @@ import type {
   RuleSet,
   RuleSetMeta,
   DiffEntry,
+  BlockPositionGroup,
   ProgressCb,
 } from "../types";
 import { loadSchematicFile } from "../pipeline/loader";
@@ -109,6 +110,53 @@ const api: CompatWorkerAPI = {
   async release(id: string): Promise<void> {
     registries.delete(id);
     schematics.delete(id);
+  },
+
+  async getSchematicBlockPositions(schematicId: string): Promise<BlockPositionGroup[]> {
+    const MAX_INSTANCES = 600_000;
+    const structure = schematics.get(schematicId);
+    if (!structure) throw new Error(`Schematic not found: ${schematicId}`);
+    const { x: sx, y: sy, z: sz } = structure.dimensions;
+
+    // Build per-palette arrays. Outer loop is yi so positions are Y-sorted
+    // within each group — enables binary-search Y-layer cutoff in the UI.
+    const posArrays: number[][] = structure.palette.map(() => []);
+    for (let yi = 0; yi < sy; yi++) {
+      for (let zi = 0; zi < sz; zi++) {
+        for (let xi = 0; xi < sx; xi++) {
+          const li = (yi * sz + zi) * sx + xi;
+          const pi = structure.blockData[li];
+          if (pi < 0 || pi >= structure.palette.length) continue;
+          const { id } = structure.palette[pi];
+          if (id.endsWith(":air") || id === "air") continue;
+          posArrays[pi].push(xi, yi, zi);
+        }
+      }
+    }
+
+    const totalInstances = posArrays.reduce((s, a) => s + a.length / 3, 0);
+    const stride = totalInstances > MAX_INSTANCES ? Math.ceil(totalInstances / MAX_INSTANCES) : 1;
+
+    return structure.palette
+      .map((block, i) => {
+        const src = posArrays[i];
+        if (src.length === 0) return null;
+
+        let positions: Float32Array;
+        if (stride > 1) {
+          const count = src.length / 3;
+          const kept: number[] = [];
+          for (let j = 0; j < count; j += stride) {
+            kept.push(src[j * 3], src[j * 3 + 1], src[j * 3 + 2]);
+          }
+          positions = new Float32Array(kept);
+        } else {
+          positions = new Float32Array(src);
+        }
+
+        return { paletteIndex: i, block, positions };
+      })
+      .filter((g): g is BlockPositionGroup => g !== null && g.positions.length > 0);
   },
 
   // ── Phase 2 ───────────────────────────────────────────────────────────────
