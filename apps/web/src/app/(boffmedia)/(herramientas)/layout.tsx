@@ -11,10 +11,11 @@ export default function Layout({
   const pathname = usePathname();
   const gameSlug = pathname.split("/")[1];
 
-  const isVgcTracker = pathname.includes('/vgc/tracker') && pathname.split("/").length >= 6;
-  const isVgcMeta    = pathname.includes('/vgc/meta');
-  const isDamageCalc  = pathname.includes('/vgc/damage-calculator');
-  const fullscreen   = isVgcTracker || isVgcMeta || isDamageCalc;
+  const isVgcTracker     = pathname.includes('/vgc/tracker') && pathname.split("/").length >= 6;
+  const isVgcMeta        = pathname.includes('/vgc/meta');
+  const isDamageCalc     = pathname.includes('/vgc/damage-calculator');
+  const isSchematicCompat = pathname.includes('/minecraft/schematic-compat');
+  const fullscreen       = isVgcTracker || isVgcMeta || isDamageCalc || isSchematicCompat;
   const isLandingPage = pathname === `/${gameSlug}` || pathname === `/${gameSlug}/`;
 
   return (
