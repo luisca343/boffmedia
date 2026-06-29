@@ -6,6 +6,7 @@ import type {
   DiffEntry,
   RegistryHandle,
   SchematicSummary,
+  BlockPositionGroup,
   ProgressCb,
 } from "../types";
 
@@ -59,6 +60,13 @@ export interface CompatWorkerAPI {
     sourceRegId: string,
     targetRegId: string
   ): Promise<CompatDiff>;
+
+  /**
+   * Build per-block-type position data for the 3D preview.  Returns one group
+   * per non-air palette entry that has at least one instance.  Air blocks
+   * (any id ending in `:air` or equal to `"air"`) are excluded.
+   */
+  getSchematicBlockPositions(schematicId: string): Promise<BlockPositionGroup[]>;
 
   /** Free a cached schematic or registry. */
   release(id: string): Promise<void>;

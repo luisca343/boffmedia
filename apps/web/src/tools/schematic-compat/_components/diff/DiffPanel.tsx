@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/primitives/input";
@@ -21,9 +21,20 @@ export function DiffPanel() {
   const t = useTranslations("games.minecraft.schematicCompat.diff");
   const diff = useToolStore((s) => s.diff);
   const isAnalyzing = useToolStore((s) => s.isAnalyzing);
+  const selectedBlockId = useToolStore((s) => s.selectedBlockId);
   const [query, setQuery] = useState("");
   const [showSafe, setShowSafe] = useState(false);
   const [filter, setFilter] = useState<StatusFilter>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to the selected entry when the 3D viewer selects a block.
+  useEffect(() => {
+    if (!selectedBlockId || !listRef.current) return;
+    const el = listRef.current.querySelector<HTMLElement>(
+      `[data-block-id="${CSS.escape(selectedBlockId)}"]`,
+    );
+    el?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, [selectedBlockId]);
 
   const groups = useMemo(() => {
     if (!diff) return [];
@@ -37,10 +48,13 @@ export function DiffPanel() {
       list.push(entry);
       byStatus.set(entry.status, list);
     }
-    return GROUP_ORDER.filter((s) => byStatus.has(s)).map((status) => ({
-      status,
-      entries: byStatus.get(status)!,
-    }));
+    return GROUP_ORDER.filter((s) => byStatus.has(s)).map((status) => {
+      let entries = byStatus.get(status)!;
+      if (status === "missing" || status === "mod-only") {
+        entries = [...entries].sort((a, b) => b.instanceCount - a.instanceCount);
+      }
+      return { status, entries };
+    });
   }, [diff, query, showSafe, filter]);
 
   if (!diff) {
@@ -85,7 +99,7 @@ export function DiffPanel() {
         </div>
       </div>
 
-      <div className="flex-1 space-y-4 overflow-y-auto p-4">
+      <div ref={listRef} className="flex-1 space-y-4 overflow-y-auto p-4">
         {groups.length === 0 ? (
           <div className="text-center text-sm text-ink-dim">{t("noMatching")}</div>
         ) : (
@@ -94,7 +108,7 @@ export function DiffPanel() {
               <h3 className="text-[11px] font-semibold uppercase tracking-wider text-ink-dim">
                 {t(statusKey(group.status))} ({group.entries.length})
               </h3>
-              <div className="space-y-1.5">
+              <div className={group.status === "missing" || group.status === "mod-only" ? "space-y-0.5" : "space-y-1.5"}>
                 {group.entries.map((entry) => (
                   <DiffEntryRow key={entry.block.id} entry={entry} />
                 ))}
