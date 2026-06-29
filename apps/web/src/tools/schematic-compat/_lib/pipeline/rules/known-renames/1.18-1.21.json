@@ -1,0 +1,7 @@
+{
+  "formatVersion": 1,
+  "description": "Block renames introduced between Minecraft 1.18 and 1.21.1",
+  "renames": {
+    "minecraft:grass": "minecraft:short_grass"
+  }
+}
