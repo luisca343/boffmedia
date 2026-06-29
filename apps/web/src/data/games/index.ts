@@ -1,11 +1,12 @@
 import { pokemon } from "./pokemon";
 import { mhwilds } from "./mhwilds";
 import { otros } from "./otros";
+import { minecraft } from "./minecraft";
 import type { GameEntry, LandingCardConfig } from "./types";
 
 export type { GameEntry, ToolEntry, CategoryEntry, LandingCardConfig, ExternalLinkEntry } from "./types";
 
-const registry: Record<string, GameEntry> = { pokemon, mhwilds, otros };
+const registry: Record<string, GameEntry> = { pokemon, mhwilds, otros, minecraft };
 
 export function getGameEntry(slug: string): GameEntry | undefined {
   return registry[slug];
