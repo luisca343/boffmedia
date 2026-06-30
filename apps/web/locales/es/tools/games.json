@@ -1,108 +1,142 @@
 {
-    "games": {
-        "pokemon": {
-            "name": "Pokémon",
-            "categories": {
-                "vgc": "VGC",
-                "tcgpocket": "TCG Pocket",
-                "others": "Otros"
-            },
-            "tools": {
-                "meta": "Análisis de Meta",
-                "speed": "Velocidad",
-                "tracker": "Tracker",
-                "gallery": "Galería",
-                "cardList": "Lista de Cartas",
-                "battles": "Combates",
-                "skyGenerator": "Generador de Correos"
-            }
+  "games": {
+    "pokemon": {
+      "name": "Pokémon",
+      "categories": {
+        "vgc": "VGC",
+        "tcgpocket": "TCG Pocket",
+        "others": "Otros"
+      },
+      "tools": {
+        "meta": "Análisis de Meta",
+        "speed": "Velocidad",
+        "tracker": "Tracker",
+        "gallery": "Galería",
+        "cardList": "Lista de Cartas",
+        "battles": "Combates",
+        "skyGenerator": "Generador de Correos"
+      }
+    },
+    "mhwilds": {
+      "name": "Monster Hunter Wilds",
+      "categories": {
+        "buildPlanner": "Planificador de Builds"
+      },
+      "tools": {
+        "planner": "Planificador",
+        "weaponTree": "Árbol de Armas"
+      }
+    },
+    "otros": {
+      "name": "Otras Herramientas",
+      "categories": {
+        "all": "Herramientas"
+      },
+      "tools": {
+        "sorteos": "Sorteos",
+        "keys": "Claves de Steam"
+      }
+    },
+    "minecraft": {
+      "name": "Minecraft",
+      "categories": {
+        "tools": "Herramientas"
+      },
+      "tools": {
+        "schematicCompat": "Compatibilidad de Schematics"
+      },
+      "schematicCompat": {
+        "title": "Herramienta de Compatibilidad de Schematics",
+        "description": "Convierte schematics entre versiones de Minecraft y mod loaders",
+        "features": {
+          "converter": "Convertidor de Bloques",
+          "preview3d": "Vista Previa 3D",
+          "modSupport": "Soporte de Mods"
         },
-        "mhwilds": {
-            "name": "Monster Hunter Wilds",
-            "categories": {
-                "buildPlanner": "Planificador de Builds"
-            },
-            "tools": {
-                "planner": "Planificador",
-                "weaponTree": "Árbol de Armas"
-            }
+        "game": {
+          "title": "Juego",
+          "minecraft": "Minecraft",
+          "hytale": "Hytale",
+          "comingSoon": "Próximamente",
+          "comingSoonNotice": "El soporte para Hytale está en la hoja de ruta."
         },
-        "otros": {
-            "name": "Otras Herramientas",
-            "categories": {
-                "all": "Herramientas"
-            },
-            "tools": {
-                "sorteos": "Sorteos",
-                "keys": "Claves de Steam"
-            }
+        "setup": {
+          "sourceEnv": "Entorno Origen",
+          "targetEnv": "Entorno Destino",
+          "schematic": "Archivo Schematic",
+          "pickDir": "Seleccionar Carpeta",
+          "pickInstance": "Seleccionar Carpeta de Instancia",
+          "pickHytale": "Seleccionar Instalación de Hytale",
+          "scanning": "Escaneando instancia…",
+          "modsLabel": "mods",
+          "blocksLabel": "bloques",
+          "pickFile": "Seleccionar Archivo",
+          "analyze": "Analizar",
+          "rules": "Reglas de Mapeo",
+          "import": "Importar",
+          "export": "Exportar"
         },
-        "minecraft": {
-            "name": "Minecraft",
-            "categories": {
-                "tools": "Herramientas"
-            },
-            "tools": {
-                "schematicCompat": "Compatibilidad de Schematics"
-            },
-            "schematicCompat": {
-                "title": "Herramienta de Compatibilidad de Schematics",
-                "description": "Convierte schematics entre versiones de Minecraft y mod loaders",
-                "features": {
-                    "converter": "Convertidor de Bloques",
-                    "preview3d": "Vista Previa 3D",
-                    "modSupport": "Soporte de Mods"
-                },
-                "setup": {
-                    "sourceEnv": "Entorno Origen",
-                    "targetEnv": "Entorno Destino",
-                    "schematic": "Archivo Schematic",
-                    "pickDir": "Seleccionar Carpeta",
-                    "pickInstance": "Seleccionar Carpeta de Instancia",
-                    "scanning": "Escaneando instancia…",
-                    "modsLabel": "mods",
-                    "blocksLabel": "bloques",
-                    "pickFile": "Seleccionar Archivo",
-                    "analyze": "Analizar",
-                    "rules": "Reglas de Mapeo",
-                    "import": "Importar",
-                    "export": "Exportar"
-                },
-                "diff": {
-                    "header": "Compatibilidad",
-                    "analyzing": "Analizando…",
-                    "emptyPrompt": "Escanea ambos entornos, carga un esquema y pulsa Analizar.",
-                    "noMatching": "No hay bloques que coincidan",
-                    "searchPlaceholder": "Buscar bloques…",
-                    "showSafe": "Mostrar compatibles",
-                    "hideSafe": "Ocultar compatibles",
-                    "replaceWith": "Reemplazar con…",
-                    "instances": "{count, plural, one {# instancia} other {# instancias}}",
-                    "safe": "Compatible",
-                    "renamed": "Renombrado",
-                    "stateChanged": "Estado Cambiado",
-                    "missing": "Faltante",
-                    "modOnly": "Solo Mod",
-                    "applyToAll": "Aplicar a Todos",
-                    "thisInstance": "Esta Instancia"
-                },
-                "preview": {
-                    "layerSlider": "Capa",
-                    "highlightAll": "Resaltar Todos",
-                    "solid": "Sólido",
-                    "diffOnly": "Solo Diferencias",
-                    "wireframe": "Contorno",
-                    "reset": "Reiniciar"
-                },
-                "export": {
-                    "title": "Exportar",
-                    "progress": "Resolviendo estados de bloques..."
-                },
-                "worker": {
-                    "connecting": "Conectando al motor de análisis...",
-                    "ready": "Listo"
-                }
-            }
+        "diff": {
+          "header": "Compatibilidad",
+          "analyzing": "Analizando…",
+          "emptyPrompt": "Escanea ambos entornos, carga un esquema y pulsa Analizar.",
+          "noMatching": "No hay bloques que coincidan",
+          "searchPlaceholder": "Buscar bloques…",
+          "showSafe": "Mostrar compatibles",
+          "hideSafe": "Ocultar compatibles",
+          "replaceWith": "Reemplazar con…",
+          "manual": "manual",
+          "resetAuto": "Restablecer a automático",
+          "instances": "{count, plural, one {# instancia} other {# instancias}}",
+          "safe": "Compatible",
+          "renamed": "Renombrado",
+          "stateChanged": "Estado Cambiado",
+          "missing": "Faltante",
+          "modOnly": "Solo Mod",
+          "applyToAll": "Aplicar a Todos",
+          "thisInstance": "Esta Instancia",
+          "bulkRules": "Reglas Masivas",
+          "bulkRulesTitle": "Reglas de Mapeo Masivo",
+          "bulkRulesDesc": "Aplica una regla a todos los bloques sin resolver de cada namespace de golpe.",
+          "bulkWouldResolve": "{count, plural, one {# resuelto} other {# resueltos}}",
+          "bulkAction": {
+            "skip": "Omitir",
+            "remap": "Reasignar",
+            "air": "→ Aire"
+          },
+          "bulkCancel": "Cancelar",
+          "bulkApply": "Aplicar"
+        },
+        "guide": {
+          "title": "Cómo usar",
+          "step1": "Selecciona la carpeta del entorno origen — la instancia de Minecraft donde se construyó el esquema.",
+          "step2": "Selecciona la carpeta del entorno destino — la instancia donde quieres cargar el esquema.",
+          "step3": "Selecciona el archivo del esquema (.schem, .litematic, .nbt o región .mca).",
+          "step4": "Pulsa Analizar para ver qué bloques son incompatibles.",
+          "step5": "Establece reemplazos en el panel de Compatibilidad y luego Exporta.",
+          "dismiss": "Entendido, no mostrar más"
+        },
+        "preview": {
+          "layerSlider": "Capa",
+          "highlightAll": "Resaltar Todos",
+          "solid": "Sólido",
+          "diffOnly": "Solo Diferencias",
+          "wireframe": "Contorno",
+          "reset": "Reiniciar"
+        },
+        "export": {
+          "title": "Exportar",
+          "progress": "Resolviendo estados de bloques...",
+          "exportButton": "Exportar",
+          "importRules": "Importar Reglas",
+          "exportRules": "Exportar Reglas",
+          "exporting": "Exportando…"
+        },
+        "worker": {
+          "connecting": "Conectando al motor de análisis...",
+          "ready": "Listo"
         }
+      }
     }
+  }
 }

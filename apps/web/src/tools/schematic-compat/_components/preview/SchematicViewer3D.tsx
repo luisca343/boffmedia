@@ -1,12 +1,37 @@
 "use client";
 
-import { useRef, useEffect, useMemo, useCallback } from "react";
+import { useRef, useEffect, useMemo, useCallback, useState } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import { useToolStore } from "../../_store/tool.store";
 import { placeholderColor } from "../../_lib/textures/blockTexture";
+import { useModTextureLoader } from "../../_hooks/modTextureContext";
+import { getBlockTexture } from "./blockTextureCache";
 import type { BlockPositionGroup, DiffEntry } from "../../_lib/types";
+
+type ModTextureLoader = (registryId: string, blockId: string) => Promise<string | null>;
+
+/** Resolves a block's THREE texture (vanilla CDN / mod JAR), or null on a miss. */
+function useBlockTexture(
+  blockId: string,
+  version: string | undefined,
+  registryId: string | undefined,
+  modLoader: ModTextureLoader | null,
+): THREE.Texture | null {
+  const [tex, setTex] = useState<THREE.Texture | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    setTex(null);
+    getBlockTexture(blockId, version, registryId, modLoader).then((t) => {
+      if (!cancelled) setTex(t);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [blockId, version, registryId, modLoader]);
+  return tex;
+}
 
 // ─── Status colour tints ──────────────────────────────────────────────────────
 
@@ -25,6 +50,9 @@ interface BlockInstancesProps {
   diffStatus: DiffEntry["status"] | undefined;
   isSelected: boolean;
   maxLayerY: number;
+  version: string | undefined;
+  registryId: string | undefined;
+  modLoader: ModTextureLoader | null;
   onSelect: (blockId: string) => void;
 }
 
@@ -33,6 +61,9 @@ function BlockInstances({
   diffStatus,
   isSelected,
   maxLayerY,
+  version,
+  registryId,
+  modLoader,
   onSelect,
 }: BlockInstancesProps) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
@@ -73,10 +104,26 @@ function BlockInstances({
     mesh.count = last + 1;
   }, [maxLayerY, group.positions, maxCount]);
 
+  const texture = useBlockTexture(group.block.id, version, registryId, modLoader);
+
   if (maxCount === 0) return null;
 
   const tint = diffStatus ? STATUS_TINT[diffStatus] : null;
-  const base = tint ?? placeholderColor(group.block.id);
+  // With a texture, keep the albedo white so the texture shows true-colour and
+  // carry the diff status in the emissive glow instead; without one, fall back
+  // to the flat tint / deterministic placeholder colour as before.
+  const base = texture ? "#ffffff" : tint ?? placeholderColor(group.block.id);
+
+  let emissive = "#000000";
+  let emissiveIntensity = 0;
+  if (isSelected) {
+    emissive = tint ?? (texture ? "#ffffff" : base);
+    emissiveIntensity = 0.5;
+  } else if (tint && texture) {
+    // Non-textured tints already live in `base`; textured ones need the glow.
+    emissive = tint;
+    emissiveIntensity = 0.3;
+  }
 
   return (
     <instancedMesh
@@ -89,9 +136,12 @@ function BlockInstances({
     >
       <boxGeometry args={[0.98, 0.98, 0.98]} />
       <meshStandardMaterial
+        // Remount the material when the texture arrives so the map compiles in.
+        key={texture ? texture.uuid : "flat"}
+        map={texture ?? undefined}
         color={base}
-        emissive={isSelected ? base : "#000000"}
-        emissiveIntensity={isSelected ? 0.45 : 0}
+        emissive={emissive}
+        emissiveIntensity={emissiveIntensity}
         roughness={0.75}
         metalness={0}
       />
@@ -121,7 +171,13 @@ function CameraRig({ dimensions }: { dimensions: { x: number; y: number; z: numb
 
 // ─── Scene — reads from the Zustand store ────────────────────────────────────
 
-function Scene() {
+interface SceneProps {
+  version: string | undefined;
+  registryId: string | undefined;
+  modLoader: ModTextureLoader | null;
+}
+
+function Scene({ version, registryId, modLoader }: SceneProps) {
   const blockPositions = useToolStore((s) => s.blockPositions);
   const diff = useToolStore((s) => s.diff);
   const selectedBlockId = useToolStore((s) => s.selectedBlockId);
@@ -169,6 +225,9 @@ function Scene() {
           diffStatus={diffStatusMap.get(group.block.id)}
           isSelected={group.block.id === selectedBlockId}
           maxLayerY={layerY}
+          version={version}
+          registryId={registryId}
+          modLoader={modLoader}
           onSelect={handleSelect}
         />
       ))}
@@ -182,6 +241,13 @@ export function SchematicViewer3D() {
   const blockPositions = useToolStore((s) => s.blockPositions);
   const isFetchingPositions = useToolStore((s) => s.isFetchingPositions);
   const schematic = useToolStore((s) => s.schematic);
+  // Schematic blocks come from the source instance — resolve their textures
+  // against the source registry's version (vanilla CDN) and id (mod JARs).
+  const sourceReg = useToolStore((s) => s.sourceReg);
+  // Grabbed here, outside the R3F <Canvas>: the Canvas runs its own reconciler,
+  // so React context from this tree does not reach components rendered inside it.
+  // We capture the loader as a value and pass it down as a prop instead.
+  const modLoader = useModTextureLoader();
 
   if (!schematic) {
     return (
@@ -213,7 +279,7 @@ export function SchematicViewer3D() {
       style={{ background: "#0f172a" }}
       className="h-full w-full"
     >
-      <Scene />
+      <Scene version={sourceReg?.version} registryId={sourceReg?.id} modLoader={modLoader} />
     </Canvas>
   );
 }

@@ -4,14 +4,16 @@ import { useTranslations } from "next-intl";
 import { Play, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/primitives/button";
 import { Separator } from "@/components/ui/primitives/separator";
+import type { GameId } from "../../_lib/adapters";
 import { useToolStore } from "../../_store/tool.store";
 import { EnvPicker } from "./EnvPicker";
 import { FilePicker } from "./FilePicker";
+import { OnboardingGuide } from "./OnboardingGuide";
 
 interface SetupPanelProps {
   engineReady: boolean;
-  onScanSource: (metaFiles: File[], jarFiles: File[]) => void;
-  onScanTarget: (metaFiles: File[], jarFiles: File[]) => void;
+  onScanSource: (gameId: GameId, files: File[]) => void;
+  onScanTarget: (gameId: GameId, files: File[]) => void;
   onPickSchematic: (file: File) => void;
   onAnalyze: () => void;
 }
@@ -25,6 +27,8 @@ export function SetupPanel({
 }: SetupPanelProps) {
   const t = useTranslations("games.minecraft.schematicCompat");
   const {
+    sourceGame,
+    targetGame,
     sourceReg,
     targetReg,
     schematic,
@@ -35,6 +39,8 @@ export function SetupPanel({
     isLoadingSchematic,
     isAnalyzing,
     error,
+    setSourceGame,
+    setTargetGame,
   } = useToolStore();
 
   const canAnalyze =
@@ -42,22 +48,28 @@ export function SetupPanel({
 
   return (
     <div className="p-4 space-y-4">
+      <OnboardingGuide />
+
       <EnvPicker
         label={t("setup.sourceEnv")}
+        game={sourceGame}
+        onGameChange={setSourceGame}
         registry={sourceReg}
         scan={sourceScan}
         loading={isLoadingSource}
         disabled={!engineReady}
-        onPick={onScanSource}
+        onPick={(files) => onScanSource(sourceGame, files)}
       />
 
       <EnvPicker
         label={t("setup.targetEnv")}
+        game={targetGame}
+        onGameChange={setTargetGame}
         registry={targetReg}
         scan={targetScan}
         loading={isLoadingTarget}
         disabled={!engineReady}
-        onPick={onScanTarget}
+        onPick={(files) => onScanTarget(targetGame, files)}
       />
 
       <Separator className="bg-edge/40" />

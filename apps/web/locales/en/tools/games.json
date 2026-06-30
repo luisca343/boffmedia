@@ -53,12 +53,20 @@
           "preview3d": "3D Preview",
           "modSupport": "Mod Support"
         },
+        "game": {
+          "title": "Game",
+          "minecraft": "Minecraft",
+          "hytale": "Hytale",
+          "comingSoon": "Coming soon",
+          "comingSoonNotice": "Hytale support is on the roadmap."
+        },
         "setup": {
           "sourceEnv": "Source Environment",
           "targetEnv": "Target Environment",
           "schematic": "Schematic File",
           "pickDir": "Pick Directory",
           "pickInstance": "Pick Instance Folder",
+          "pickHytale": "Pick Hytale Install",
           "scanning": "Scanning instance…",
           "modsLabel": "mods",
           "blocksLabel": "blocks",
@@ -77,6 +85,8 @@
           "showSafe": "Show safe",
           "hideSafe": "Hide safe",
           "replaceWith": "Replace with…",
+          "manual": "manual",
+          "resetAuto": "Reset to auto",
           "instances": "{count, plural, one {# instance} other {# instances}}",
           "safe": "Safe",
           "renamed": "Renamed",
@@ -84,7 +94,27 @@
           "missing": "Missing",
           "modOnly": "Mod Only",
           "applyToAll": "Apply to All",
-          "thisInstance": "This Instance"
+          "thisInstance": "This Instance",
+          "bulkRules": "Bulk Rules",
+          "bulkRulesTitle": "Bulk Mapping Rules",
+          "bulkRulesDesc": "Apply a rule to all unresolved blocks from each namespace at once.",
+          "bulkWouldResolve": "{count, plural, one {# resolved} other {# resolved}}",
+          "bulkAction": {
+            "skip": "Skip",
+            "remap": "Remap",
+            "air": "→ Air"
+          },
+          "bulkCancel": "Cancel",
+          "bulkApply": "Apply"
+        },
+        "guide": {
+          "title": "How to use",
+          "step1": "Pick the source environment folder — the Minecraft instance the schematic was built in.",
+          "step2": "Pick the target environment folder — the instance you want to load the schematic in.",
+          "step3": "Pick the schematic file (.schem, .litematic, .nbt, or .mca region).",
+          "step4": "Press Analyze to see which blocks are incompatible.",
+          "step5": "Set replacements in the Compatibility panel, then Export.",
+          "dismiss": "Got it, don't show again"
         },
         "preview": {
           "layerSlider": "Layer",
@@ -96,7 +126,11 @@
         },
         "export": {
           "title": "Export",
-          "progress": "Resolving block states..."
+          "progress": "Resolving block states...",
+          "exportButton": "Export",
+          "importRules": "Import Rules",
+          "exportRules": "Export Rules",
+          "exporting": "Exporting…"
         },
         "worker": {
           "connecting": "Connecting to analysis engine...",

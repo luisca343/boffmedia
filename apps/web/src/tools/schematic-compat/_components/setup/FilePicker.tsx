@@ -31,7 +31,7 @@ export function FilePicker({ label, schematic, loading, disabled, onPick }: File
       <input
         ref={inputRef}
         type="file"
-        accept=".schem,.schematic"
+        accept=".schem,.schematic,.litematic,.nbt,.mca,.prefab.json,.json"
         className="hidden"
         onChange={(e) => {
           const file = e.target.files?.[0];
