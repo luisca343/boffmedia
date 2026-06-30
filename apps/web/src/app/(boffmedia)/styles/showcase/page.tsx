@@ -44,6 +44,23 @@ import { ToolsTypeBadge } from "@/components/boffmedia/ui/tools/tool-type-badge"
 // Tool-kit components
 import { ToolPanel, ToolStatBars, ToolApp, SegTabs, ToolSelect, ToolTable, CopyButton, Picker, HpBar, ResultBadge, StatTile, SplitBar, TrendChart, HeatGrid, TagPills } from "@/components/boffmedia/primitives"
 
+// Schematic Compat pieces
+import {
+  SchIcon,
+  Stepper as SchStepper,
+  ScanCard,
+  DropZone,
+  FilterChips,
+  AssetThumb,
+  MappingRow,
+  MappingCard,
+  AxisSlider,
+  ExportBar as SchExportBar,
+  BulkRulesSheet,
+  type SchStatus,
+  type SchDiffEntry,
+} from "@/components/boffmedia/ui/schematic"
+
 // Battlesim components
 import { BSType, BSTypeRow, BSCat, BSStatusChip, BSBoost, BSTera, BSPokeChip, BSMove, BSLogEvent, BSChatRow, BSMonCard, TYPES, tyVar, effMult, effLabel, hpColor, aniF, BSXRing, BSXPlate, BSXKey, BSXOrderRail, BSXPlanChip, BSXBenchChip, BSXTeraBtn, BSXTick, BSXSpark, BSXScorePlate, freshMon, calcRange, koLabel } from "@/components/boffmedia/primitives"
 import { SystemLoading, SystemError, SystemNotFound, SystemOffline, SystemMaintenance, SystemForbidden, SystemComingSoon, SystemStatesDemoEmpty, SystemStatesDemoSkeleton, SystemStatesDemoToasts } from "@/components/boffmedia/ui/system-states"
@@ -283,6 +300,7 @@ const HUB_NAV = [
     ["patterns", "Patrones", "grid"],
      ["boff", "Boffmedia", "gamepad"],
       ["toolskit", "Herramientas", "wrench"],
+       ["schematic", "Schematic Compat", "layers"],
        ["battlesim", "Battlesim", "zap"],
         ["profile", "Perfil", "user"],
     ],
@@ -3413,6 +3431,331 @@ function SystemStatesSection() {
 }
 
 // ============================================================================
+// schematic — Schematic Compat (Minecraft · Hytale) pieces
+// ============================================================================
+const SCH_DEMO_MISSING: SchDiffEntry = {
+ block: { id: "create:cogwheel", namespace: "create", states: { axis: "x" } },
+ status: "missing",
+ instanceCount: 420,
+}
+const SCH_DEMO_RENAMED: SchDiffEntry = {
+ block: { id: "minecraft:grass_path", namespace: "minecraft", states: {} },
+ status: "renamed",
+ instanceCount: 312,
+ autoCandidate: "minecraft:dirt_path",
+}
+const SCH_DEMO_STATE: SchDiffEntry = {
+ block: { id: "minecraft:copper_bulb", namespace: "minecraft", states: { lit: "true", powered: "false" } },
+ status: "state-changed",
+ instanceCount: 64,
+ autoCandidate: "minecraft:waxed_copper_bulb",
+ incompatibleStates: ["powered"],
+}
+const SCH_DEMO_MODONLY: SchDiffEntry = {
+ block: { id: "mekanism:steel_casing", namespace: "mekanism", states: {} },
+ status: "mod-only",
+ instanceCount: 92,
+}
+const SCH_DEMO_OPTS = [
+ "minecraft:iron_bars",
+ "minecraft:cobblestone",
+ "minecraft:air",
+ "minecraft:dirt_path",
+ "minecraft:waxed_copper_bulb",
+]
+
+function SchematicSection() {
+ const [step, setStep] = React.useState(2)
+ const [game, setGame] = React.useState<"minecraft" | "hytale">("minecraft")
+ const [game2, setGame2] = React.useState<"minecraft" | "hytale">("hytale")
+ const [file, setFile] = React.useState<{ name: string; size: string; dims: string } | null>(null)
+ const [filter, setFilter] = React.useState<SchStatus | null>(null)
+ const [res, setRes] = React.useState<Record<string, string>>({})
+ const [sel, setSel] = React.useState<string | null>(null)
+ const [y, setY] = React.useState(18)
+ const [sheet, setSheet] = React.useState(false)
+
+ const resolve = (id: string, t: string) =>
+  setRes((r) => {
+   const n = { ...r }
+   if (t) n[id] = t
+   else delete n[id]
+   return n
+  })
+
+ return (
+  <div>
+   <div className="mb-8 pb-6 border-b border-edge">
+    <Kicker>Herramientas</Kicker>
+    <h2 className="text-[length:var(--t-3xl)] mt-2.5">Piezas de compatibilidad de esquemas</h2>
+    <p className="text-[length:var(--t-base)] text-ink-muted max-w-[72ch] mt-[0.7rem] leading-[1.65]">
+     Componentes extraídos de <strong>Schematic Compat</strong> (Minecraft · Hytale), en{" "}
+     <code className="font-mono text-secondary-hover">components/boffmedia/ui/schematic</code>. Todos son
+     token-driven y reutilizables fuera de la herramienta: un indicador de pasos, dos tarjetas de captura de
+     entorno, la zona de carga de archivos, los chips de filtro por estado, el tile de asset con respaldo
+     determinista, las dos densidades de fila de mapeo, el deslizador de eje, el panel de reglas en lote y la
+     barra de exportación.
+    </p>
+   </div>
+
+   <Spec2
+    title="Stepper"
+    tag="schematic/stepper"
+    intro="Indicador de progreso lineal. Marca los pasos completados con check verde, el activo con el acento, y los pendientes en gris. Las etiquetas mono se ocultan por debajo de 1100px dejando solo los números."
+    a11y="role list/listitem; el estado no depende solo del color — el paso activo y los completados cambian de forma (check vs número) y peso."
+   >
+    <Row2 style={{ justifyContent: "center" }}>
+     <SchStepper steps={["Entornos", "Esquema", "Analizar", "Exportar"]} current={step} />
+    </Row2>
+    <Row2 style={{ justifyContent: "center", gap: "0.5rem" }}>
+     {[0, 1, 2, 3].map((n) => (
+      <Button key={n} variant={step === n ? "accent" : "ghost"} size="sm" onClick={() => setStep(n)}>
+       Paso {n + 1}
+      </Button>
+     ))}
+    </Row2>
+    <PropTable
+     rows={[
+      ["steps", "string[]", "—", "Etiquetas de cada paso"],
+      ["current", "number", "0", "Índice del paso activo (los previos = completados)"],
+     ]}
+    />
+   </Spec2>
+
+   <Spec2
+    title="ScanCard"
+    tag="schematic/scan-card"
+    intro="Tarjeta de captura de entorno: conmutador de juego (Minecraft / Hytale), botón de selección de carpeta y línea de resultado con LED de estado. Cubre origen y destino — el rol tiñe el punto del encabezado (acento vs naranja). El borde se vuelve verde cuando el registro está listo."
+    a11y="El conmutador es un group de botones con aria-pressed. El resultado se comunica con texto (versión · loader · mods · bloques), no solo con el color del LED."
+   >
+    <div className="grid grid-cols-2 gap-4 max-[640px]:grid-cols-1">
+     <ScanCard
+      role="source"
+      roleLabel="Origen"
+      game={game}
+      onGame={setGame}
+      registry={{ name: "SkyFactory 5", version: "1.20.1", loader: "Fabric", mods: 142, blocks: 4310 }}
+      onPick={() => {}}
+     />
+     <ScanCard role="target" roleLabel="Destino" game={game2} onGame={setGame2} registry={null} onPick={() => {}} />
+    </div>
+    <PropTable
+     rows={[
+      ["role", "'source' | 'target'", "—", "Tiñe el punto del encabezado"],
+      ["game", "'minecraft' | 'hytale'", "—", "Juego activo del conmutador"],
+      ["onGame", "(id) => void", "—", "Cambia de juego"],
+      ["registry", "SchRegistry | null", "null", "{ name, version, loader, mods, blocks } cuando está listo"],
+      ["scanning / progress", "boolean / number", "false / 0", "Estado de escaneo + barra de progreso"],
+      ["onPick", "() => void", "—", "Abre el selector de carpeta"],
+     ]}
+    />
+   </Spec2>
+
+   <Spec2
+    title="DropZone"
+    tag="schematic/drop-zone"
+    intro="Zona de carga del esquema con estados vacío / arrastrando / cargado. Vacía muestra los formatos aceptados; cargada colapsa a una fila con nombre, tamaño, dimensiones y una insignia «Cargado»."
+    a11y="role button, operable con teclado (Enter / Espacio) y soltar archivos. El nombre del archivo va en mono para distinguir extensiones."
+   >
+    <div className="grid grid-cols-2 gap-4 max-[640px]:grid-cols-1">
+     <DropZone file={null} onPick={() => setFile({ name: "castle_gate.litematic", size: "1.2 MB", dims: "64×48×64" })} />
+     <DropZone
+      file={file || { name: "castle_gate.litematic", size: "1.2 MB", dims: "64×48×64" }}
+      onPick={() => setFile(null)}
+     />
+    </div>
+    <PropTable
+     rows={[
+      ["file", "DropZoneFile | null", "null", "{ name, size, dims } o null (vacío)"],
+      ["onPick", "() => void", "—", "Abre el selector de archivo"],
+     ]}
+    />
+   </Spec2>
+
+   <Spec2
+    title="FilterChips"
+    tag="schematic/filter-chips"
+    intro="Chips de recuento que filtran una lista por estado. Cada chip lleva un LED de color, el recuento en mono y la etiqueta. Al activar uno, el resto se atenúa; los de recuento 0 se deshabilitan."
+    a11y="El recuento y la etiqueta acompañan siempre al color: el significado nunca recae solo en el LED."
+   >
+    <Row2>
+     <FilterChips
+      active={filter}
+      onToggle={(k) => setFilter((c) => (c === k ? null : k))}
+      chips={[
+       { key: "safe", label: "Compatibles", count: 142 },
+       { key: "renamed", label: "Renombrados", count: 8 },
+       { key: "state-changed", label: "Estados", count: 5 },
+       { key: "missing", label: "Ausentes", count: 35 },
+      ]}
+     />
+    </Row2>
+    <PropTable
+     rows={[
+      ["chips", "FilterChip[]", "—", "{ key, label, count } por estado"],
+      ["active", "SchStatus | null", "null", "Estado filtrado activo"],
+      ["onToggle", "(key) => void", "—", "Activa/desactiva un filtro"],
+     ]}
+    />
+   </Spec2>
+
+   <Spec2
+    title="AssetThumb"
+    tag="schematic/asset-thumb"
+    intro="Tile cuadrado para un asset (bloque). Cuando no hay textura disponible, genera un respaldo determinista: color oklch derivado del hash del id + la inicial del nombre. Acepta un anillo de estado (seguro / aviso / ausente) y cualquier tamaño."
+    a11y="title con el id completo. El respaldo es estable: el mismo id produce siempre el mismo color, así el ojo aprende a reconocer bloques."
+   >
+    <Row2 style={{ alignItems: "flex-end", gap: "1.1rem" }}>
+     {(
+      [
+       ["minecraft:stone_bricks", "safe"],
+       ["minecraft:copper_bulb", "warn"],
+       ["create:cogwheel", "bad"],
+       ["botania:livingrock", null],
+       ["mekanism:steel_casing", null],
+      ] as const
+     ).map(([id, ring]) => (
+      <div key={id} className="flex flex-col items-center gap-1.5">
+       <AssetThumb id={id} size={44} ring={ring} />
+       <span className="font-mono text-[10px] text-ink-dim">{id.split(":")[1]}</span>
+      </div>
+     ))}
+    </Row2>
+    <PropTable
+     rows={[
+      ["id", "string", "—", "Id del bloque (namespace:name)"],
+      ["size", "number", "28", "Lado del tile en px"],
+      ["ring", "'safe'|'warn'|'bad'|null", "null", "Anillo de estado"],
+     ]}
+    />
+   </Spec2>
+
+   <Spec2
+    title="MappingRow · MappingCard"
+    tag="schematic/mapping-row · mapping-card"
+    intro="Dos densidades para una fila de mapeo origen→destino. MappingRow es la línea compacta para listas largas de bloques ausentes — los de mods comparten el rojo «Ausentes» y se distinguen con una píldora «mod». MappingCard es la tarjeta verbosa para renombrados / cambios de estado: añade el thumb de destino, la regla automática, las instancias y los chips de estado (marcando en rojo los incompatibles)."
+    a11y="Ambas son role button seleccionables; el selector detiene la propagación para no alternar la selección de la fila. El punto de estado duplica la información del anillo del thumb."
+   >
+    <div className="flex flex-col gap-2">
+     <MappingRow
+      entry={SCH_DEMO_MISSING}
+      options={SCH_DEMO_OPTS}
+      resolution={res[SCH_DEMO_MISSING.block.id]}
+      onResolve={resolve}
+      selected={sel === "a"}
+      onSelect={() => setSel((s) => (s === "a" ? null : "a"))}
+     />
+     <MappingRow
+      entry={SCH_DEMO_MODONLY}
+      options={SCH_DEMO_OPTS}
+      resolution={res[SCH_DEMO_MODONLY.block.id]}
+      onResolve={resolve}
+      selected={sel === "d"}
+      onSelect={() => setSel((s) => (s === "d" ? null : "d"))}
+     />
+     <MappingCard
+      entry={SCH_DEMO_RENAMED}
+      options={SCH_DEMO_OPTS}
+      resolution={res[SCH_DEMO_RENAMED.block.id]}
+      onResolve={resolve}
+      selected={sel === "b"}
+      onSelect={() => setSel((s) => (s === "b" ? null : "b"))}
+     />
+     <MappingCard
+      entry={SCH_DEMO_STATE}
+      options={SCH_DEMO_OPTS}
+      resolution={res[SCH_DEMO_STATE.block.id]}
+      onResolve={resolve}
+      selected={sel === "c"}
+      onSelect={() => setSel((s) => (s === "c" ? null : "c"))}
+     />
+    </div>
+    <PropTable
+     rows={[
+      ["entry", "SchDiffEntry", "—", "{ block, status, instanceCount, autoCandidate?, incompatibleStates? }"],
+      ["options", "string[]", "—", "Ids de destino para el selector de reemplazo"],
+      ["resolution", "string | undefined", "—", "Override manual del usuario"],
+      ["onResolve", "(id, target) => void", "—", "Fija ('' = limpia) el reemplazo"],
+      ["renderThumb", "ThumbRenderer?", "—", "Inyecta texturas reales (placeholder por defecto)"],
+     ]}
+    />
+   </Spec2>
+
+   <Spec2
+    title="AxisSlider"
+    tag="schematic/axis-slider"
+    intro="Deslizador de eje etiquetado para recortar la vista por capas (Y por defecto). Muestra el valor actual sobre el máximo en mono. Genérico: sirve para cualquier eje del esquema."
+    a11y="input range nativo con accent-color del tema; el valor numérico acompaña siempre al deslizador."
+   >
+    <div className="max-w-[360px]">
+     <AxisSlider axis="Y" value={y} max={47} onChange={setY} />
+    </div>
+    <PropTable
+     rows={[
+      ["axis", "string", "'Y'", "Etiqueta del eje"],
+      ["value / max", "number", "—", "Capa actual / máxima"],
+      ["onChange", "(n) => void", "—", "Nueva capa"],
+     ]}
+    />
+   </Spec2>
+
+   <Spec2
+    title="BulkRulesSheet"
+    tag="schematic/bulk-rules-sheet"
+    intro="Panel lateral para resolver bloques ausentes por espacio de nombres de una sola vez. Cada grupo ofrece Saltar / Remapear / → Aire, con una previsualización de cuántos resolvería. Cabecera, cuerpo desplazable y pie de acciones."
+    a11y="Overlay con cierre por click-fuera y botón ✕; las acciones por grupo son botones tipo radio con estado activo marcado por borde + relleno de acento."
+   >
+    <Row2>
+     <Button variant="accent" onClick={() => setSheet(true)}>
+      <SchIcon name="layers" size={15} />
+      Abrir reglas en lote
+     </Button>
+    </Row2>
+    <PropTable
+     rows={[
+      ["open", "boolean", "false", "Visibilidad del panel"],
+      ["groups", "BulkNsGroup[]", "—", "{ namespace, entries, remap } por espacio de nombres"],
+      ["onClose", "() => void", "—", "Cierra el panel"],
+      ["onApply", "(actions) => void", "—", "Aplica { ns: 'skip'|'remap'|'air' }"],
+     ]}
+    />
+   </Spec2>
+
+   <Spec2
+    title="ExportBar"
+    tag="schematic/export-bar"
+    intro="Barra de pie de exportación: importar / exportar el paquete de reglas a la izquierda, selector de formato (cambia según el juego de destino: .schem/.litematic/.nbt para Minecraft, .prefab.json para Hytale) y el botón de exportar a la derecha, con estado de carga."
+    a11y="El botón de exportar reglas se deshabilita cuando no hay reglas; el de exportar esquema, hasta que hay análisis. El estado «Exportando…» es texto + spinner."
+   >
+    <div className="border border-edge rounded-[var(--radius)] overflow-hidden">
+     <SchExportBar targetGame="minecraft" canExport ruleCount={3} exporting={false} onExport={() => {}} />
+    </div>
+    <PropTable
+     rows={[
+      ["targetGame", "'minecraft' | 'hytale'", "—", "Determina los formatos disponibles"],
+      ["canExport", "boolean", "—", "Habilita el botón de exportar esquema"],
+      ["ruleCount", "number", "0", "Reglas de reemplazo activas"],
+      ["exporting", "boolean", "false", "Muestra el estado de carga"],
+      ["onExport", "(format) => void", "—", "Exporta en el formato elegido"],
+     ]}
+    />
+   </Spec2>
+
+   <BulkRulesSheet
+    open={sheet}
+    onClose={() => setSheet(false)}
+    onApply={() => setSheet(false)}
+    groups={[
+     { namespace: "create", entries: [SCH_DEMO_MISSING, SCH_DEMO_MISSING, SCH_DEMO_MISSING], remap: 1 },
+     { namespace: "botania", entries: [SCH_DEMO_MISSING, SCH_DEMO_MISSING], remap: 0 },
+     { namespace: "mekanism", entries: [SCH_DEMO_MISSING], remap: 0 },
+    ]}
+   />
+  </div>
+ )
+}
+
+// ============================================================================
 // MAIN SHOWCASE COMPONENT
 // ============================================================================
 const SECTIONS: Record<string, React.ComponentType<{ go?: (path: string) => void }>> = {
@@ -3425,6 +3768,7 @@ const SECTIONS: Record<string, React.ComponentType<{ go?: (path: string) => void
  patterns: PatternsSection,
   boff: BoffSection,
   toolskit: ToolsKitSection,
+  schematic: SchematicSection,
   battlesim: BattlesimSection,
   system: SystemStatesSection,
    profile: ProfileSection,

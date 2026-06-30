@@ -8,6 +8,7 @@ import { useToolStore } from "../../_store/tool.store";
 import { placeholderColor } from "../../_lib/textures/blockTexture";
 import { useModTextureLoader } from "../../_hooks/modTextureContext";
 import { getBlockTexture } from "./blockTextureCache";
+import { sourcePlan, convertedPlan, type RenderKind } from "./previewPlan";
 import type { BlockPositionGroup, DiffEntry } from "../../_lib/types";
 
 type ModTextureLoader = (registryId: string, blockId: string) => Promise<string | null>;
@@ -33,21 +34,64 @@ function useBlockTexture(
   return tex;
 }
 
-// ─── Status colour tints ──────────────────────────────────────────────────────
+// ─── Per-render-kind material styling ─────────────────────────────────────────
 
-const STATUS_TINT: Record<DiffEntry["status"], string | null> = {
-  safe: null,
-  renamed: "#f59e0b",
-  "state-changed": "#a78bfa",
-  missing: "#ef4444",
-  "mod-only": "#60a5fa",
-};
+const CHANGED_GLOW = "#22c55e"; // green — this block was converted
+const PROBLEM_GLOW = "#ef4444"; // red — unresolved (missing / mod-only)
+
+interface MaterialStyle {
+  color: string;
+  emissive: string;
+  emissiveIntensity: number;
+  transparent: boolean;
+  opacity: number;
+  depthWrite: boolean;
+}
+
+/**
+ * Material props for a block given its render kind + texture + selection.
+ *  - normal  : source-mode look — texture (or placeholder), glow only when selected.
+ *  - changed : converted target block — green glow so it stands out.
+ *  - problem : unresolved block — red glow, it has no valid target yet.
+ *  - ghost   : untouched block in converted mode — muted + translucent so the
+ *              changed blocks dominate the view.
+ * A selected block is always forced solid and brightly lit so it's findable.
+ */
+function materialStyle(kind: RenderKind, isSelected: boolean, hasTexture: boolean, blockId: string): MaterialStyle {
+  const lit = hasTexture ? "#ffffff" : placeholderColor(blockId);
+
+  if (isSelected) {
+    const emissive = kind === "problem" ? PROBLEM_GLOW : kind === "changed" ? CHANGED_GLOW : "#ffffff";
+    return { color: lit, emissive, emissiveIntensity: 0.65, transparent: false, opacity: 1, depthWrite: true };
+  }
+
+  switch (kind) {
+    case "ghost":
+      // Mute the texture (multiplied by slate) and fade it back.
+      return {
+        color: hasTexture ? "#7c8896" : "#3f4754",
+        emissive: "#000000",
+        emissiveIntensity: 0,
+        transparent: true,
+        opacity: 0.3,
+        depthWrite: false,
+      };
+    case "changed":
+      return { color: lit, emissive: CHANGED_GLOW, emissiveIntensity: 0.35, transparent: false, opacity: 1, depthWrite: true };
+    case "problem":
+      return { color: lit, emissive: PROBLEM_GLOW, emissiveIntensity: 0.5, transparent: false, opacity: 1, depthWrite: true };
+    default:
+      return { color: lit, emissive: "#000000", emissiveIntensity: 0, transparent: false, opacity: 1, depthWrite: true };
+  }
+}
 
 // ─── Per-block-type instanced mesh ────────────────────────────────────────────
 
 interface BlockInstancesProps {
   group: BlockPositionGroup;
-  diffStatus: DiffEntry["status"] | undefined;
+  /** Block id whose texture to render (may differ from the group's source id). */
+  textureId: string;
+  kind: RenderKind;
   isSelected: boolean;
   maxLayerY: number;
   version: string | undefined;
@@ -58,7 +102,8 @@ interface BlockInstancesProps {
 
 function BlockInstances({
   group,
-  diffStatus,
+  textureId,
+  kind,
   isSelected,
   maxLayerY,
   version,
@@ -104,26 +149,11 @@ function BlockInstances({
     mesh.count = last + 1;
   }, [maxLayerY, group.positions, maxCount]);
 
-  const texture = useBlockTexture(group.block.id, version, registryId, modLoader);
+  const texture = useBlockTexture(textureId, version, registryId, modLoader);
 
   if (maxCount === 0) return null;
 
-  const tint = diffStatus ? STATUS_TINT[diffStatus] : null;
-  // With a texture, keep the albedo white so the texture shows true-colour and
-  // carry the diff status in the emissive glow instead; without one, fall back
-  // to the flat tint / deterministic placeholder colour as before.
-  const base = texture ? "#ffffff" : tint ?? placeholderColor(group.block.id);
-
-  let emissive = "#000000";
-  let emissiveIntensity = 0;
-  if (isSelected) {
-    emissive = tint ?? (texture ? "#ffffff" : base);
-    emissiveIntensity = 0.5;
-  } else if (tint && texture) {
-    // Non-textured tints already live in `base`; textured ones need the glow.
-    emissive = tint;
-    emissiveIntensity = 0.3;
-  }
+  const style = materialStyle(kind, isSelected, !!texture, textureId);
 
   return (
     <instancedMesh
@@ -136,12 +166,16 @@ function BlockInstances({
     >
       <boxGeometry args={[0.98, 0.98, 0.98]} />
       <meshStandardMaterial
-        // Remount the material when the texture arrives so the map compiles in.
-        key={texture ? texture.uuid : "flat"}
+        // Remount the material when the texture arrives or the render kind /
+        // selection changes, so map compile + transparency flags apply cleanly.
+        key={`${texture ? texture.uuid : "flat"}|${kind}|${isSelected ? "sel" : ""}`}
         map={texture ?? undefined}
-        color={base}
-        emissive={emissive}
-        emissiveIntensity={emissiveIntensity}
+        color={style.color}
+        emissive={style.emissive}
+        emissiveIntensity={style.emissiveIntensity}
+        transparent={style.transparent}
+        opacity={style.opacity}
+        depthWrite={style.depthWrite}
         roughness={0.75}
         metalness={0}
       />
@@ -172,33 +206,46 @@ function CameraRig({ dimensions }: { dimensions: { x: number; y: number; z: numb
 // ─── Scene — reads from the Zustand store ────────────────────────────────────
 
 interface SceneProps {
-  version: string | undefined;
-  registryId: string | undefined;
+  sourceVersion: string | undefined;
+  sourceRegistryId: string | undefined;
+  targetVersion: string | undefined;
+  targetRegistryId: string | undefined;
   modLoader: ModTextureLoader | null;
 }
 
-function Scene({ version, registryId, modLoader }: SceneProps) {
+function Scene({
+  sourceVersion,
+  sourceRegistryId,
+  targetVersion,
+  targetRegistryId,
+  modLoader,
+}: SceneProps) {
   const blockPositions = useToolStore((s) => s.blockPositions);
   const diff = useToolStore((s) => s.diff);
+  const resolutions = useToolStore((s) => s.resolutions);
   const selectedBlockId = useToolStore((s) => s.selectedBlockId);
   const layerY = useToolStore((s) => s.layerY);
   const diffOnlyMode = useToolStore((s) => s.diffOnlyMode);
+  const previewMode = useToolStore((s) => s.previewMode);
   const schematic = useToolStore((s) => s.schematic);
   const setSelectedBlock = useToolStore((s) => s.setSelectedBlock);
 
-  const diffStatusMap = useMemo(() => {
-    const m = new Map<string, DiffEntry["status"]>();
-    diff?.entries.forEach((e) => m.set(e.block.id, e.status));
+  // Converted mode only makes sense once a diff exists; otherwise show source.
+  const converted = previewMode === "converted" && !!diff;
+
+  const diffEntryMap = useMemo(() => {
+    const m = new Map<string, DiffEntry>();
+    diff?.entries.forEach((e) => m.set(e.block.id, e));
     return m;
   }, [diff]);
 
   const visibleGroups = useMemo(() => {
     if (!diffOnlyMode) return blockPositions;
     return blockPositions.filter((g) => {
-      const s = diffStatusMap.get(g.block.id);
+      const s = diffEntryMap.get(g.block.id)?.status;
       return s !== undefined && s !== "safe";
     });
-  }, [blockPositions, diffOnlyMode, diffStatusMap]);
+  }, [blockPositions, diffOnlyMode, diffEntryMap]);
 
   const handleSelect = useCallback(
     (id: string) => setSelectedBlock(id === selectedBlockId ? undefined : id),
@@ -218,19 +265,27 @@ function Scene({ version, registryId, modLoader }: SceneProps) {
       <ambientLight intensity={0.55} />
       <directionalLight position={[10, 20, 10]} intensity={0.8} />
       <directionalLight position={[-6, 8, -8]} intensity={0.25} />
-      {visibleGroups.map((group) => (
-        <BlockInstances
-          key={group.paletteIndex}
-          group={group}
-          diffStatus={diffStatusMap.get(group.block.id)}
-          isSelected={group.block.id === selectedBlockId}
-          maxLayerY={layerY}
-          version={version}
-          registryId={registryId}
-          modLoader={modLoader}
-          onSelect={handleSelect}
-        />
-      ))}
+      {visibleGroups.map((group) => {
+        const id = group.block.id;
+        const entry = diffEntryMap.get(id);
+        const plan = converted
+          ? convertedPlan(id, entry?.status, entry?.autoCandidate?.id, resolutions[id]?.targetId)
+          : sourcePlan(id);
+        return (
+          <BlockInstances
+            key={group.paletteIndex}
+            group={group}
+            textureId={plan.textureId}
+            kind={plan.kind}
+            isSelected={id === selectedBlockId}
+            maxLayerY={layerY}
+            version={plan.useTarget ? targetVersion : sourceVersion}
+            registryId={plan.useTarget ? targetRegistryId : sourceRegistryId}
+            modLoader={modLoader}
+            onSelect={handleSelect}
+          />
+        );
+      })}
     </>
   );
 }
@@ -243,7 +298,10 @@ export function SchematicViewer3D() {
   const schematic = useToolStore((s) => s.schematic);
   // Schematic blocks come from the source instance — resolve their textures
   // against the source registry's version (vanilla CDN) and id (mod JARs).
+  // In "converted" mode, changed blocks instead resolve against the target
+  // registry (the block they're being converted to).
   const sourceReg = useToolStore((s) => s.sourceReg);
+  const targetReg = useToolStore((s) => s.targetReg);
   // Grabbed here, outside the R3F <Canvas>: the Canvas runs its own reconciler,
   // so React context from this tree does not reach components rendered inside it.
   // We capture the loader as a value and pass it down as a prop instead.
@@ -279,7 +337,13 @@ export function SchematicViewer3D() {
       style={{ background: "#0f172a" }}
       className="h-full w-full"
     >
-      <Scene version={sourceReg?.version} registryId={sourceReg?.id} modLoader={modLoader} />
+      <Scene
+        sourceVersion={sourceReg?.version}
+        sourceRegistryId={sourceReg?.id}
+        targetVersion={targetReg?.version}
+        targetRegistryId={targetReg?.id}
+        modLoader={modLoader}
+      />
     </Canvas>
   );
 }

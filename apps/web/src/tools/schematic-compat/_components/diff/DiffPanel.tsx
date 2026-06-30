@@ -1,135 +1,295 @@
 "use client";
 
-import { useMemo, useState, useRef, useEffect } from "react";
-import { useTranslations } from "next-intl";
-import { Search } from "lucide-react";
-import { Input } from "@/components/ui/primitives/input";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { BoffButton } from "@/components/boffmedia/primitives/button";
+import {
+  SchIcon,
+  FilterChips,
+  MappingCard,
+  BulkRulesSheet,
+  STATUS_META,
+  type SchStatus,
+  type SchDiffEntry,
+  type SchRing,
+  type BulkAction,
+} from "@/components/boffmedia/ui/schematic";
 import { useToolStore } from "../../_store/tool.store";
 import type { DiffEntry } from "../../_lib/types";
-import { DiffSummaryBar, type StatusFilter } from "./DiffSummaryBar";
-import { DiffEntryRow } from "./DiffEntryRow";
-import { BulkRulesDrawer } from "./BulkRulesDrawer";
+import { BlockThumb, type PreviewRow } from "./BlockThumb";
 
-const GROUP_ORDER: DiffEntry["status"][] = [
-  "missing",
-  "mod-only",
-  "state-changed",
-  "renamed",
-  "safe",
-];
+// Missing and mod-only are merged into a single red "Ausentes" group (mod-only
+// rows carry a "mod" pill), so mod-only is bucketed under "missing".
+const GROUP_ORDER: SchStatus[] = ["missing", "state-changed", "renamed", "safe"];
+const GROUP_LABEL: Record<SchStatus, string> = {
+  missing: "Ausentes",
+  "mod-only": "Ausentes",
+  "state-changed": "Estados cambiados",
+  renamed: "Renombrados",
+  safe: "Compatibles",
+};
+
+/** Collapse mod-only into the missing bucket for grouping + filtering. */
+function bucketOf(status: SchStatus): SchStatus {
+  return status === "mod-only" ? "missing" : status;
+}
+
+const RING_CLASS: Record<Exclude<SchRing, null>, string> = {
+  safe: "ring-1 ring-success/60",
+  warn: "ring-1 ring-warning/60",
+  bad: "ring-1 ring-danger/60",
+};
+
+/** Suffix-preserving remap: `create:oak_log` → `minecraft:oak_log`, if it exists. */
+function remapSuffix(blockId: string, targetSet: Set<string>): string | null {
+  const colon = blockId.indexOf(":");
+  if (colon === -1) return null;
+  const candidate = `minecraft:${blockId.slice(colon + 1)}`;
+  return targetSet.has(candidate) ? candidate : null;
+}
+
+/** Rows shown in a source block's hover-preview card: status, count, then states. */
+function previewRowsFor(e: DiffEntry): PreviewRow[] {
+  const rows: PreviewRow[] = [
+    { label: "Estado", value: STATUS_META[e.status].label },
+    { label: "Instancias", value: e.instanceCount.toLocaleString() },
+  ];
+  for (const [k, v] of Object.entries(e.block.states ?? {})) {
+    rows.push({ label: k, value: String(v) });
+  }
+  return rows;
+}
+
+/** Adapt an engine DiffEntry to the presentational SchDiffEntry shape. */
+function toSchEntry(e: DiffEntry): SchDiffEntry {
+  return {
+    block: { id: e.block.id, namespace: e.block.namespace, states: e.block.states },
+    status: e.status,
+    instanceCount: e.instanceCount,
+    autoCandidate: e.autoCandidate?.id,
+    incompatibleStates: e.incompatibleStates,
+  };
+}
 
 export function DiffPanel() {
-  const t = useTranslations("games.minecraft.schematicCompat.diff");
   const diff = useToolStore((s) => s.diff);
   const isAnalyzing = useToolStore((s) => s.isAnalyzing);
+  const targetBlockIds = useToolStore((s) => s.targetBlockIds);
+  const resolutions = useToolStore((s) => s.resolutions);
+  const setResolution = useToolStore((s) => s.setResolution);
+  const clearResolution = useToolStore((s) => s.clearResolution);
   const selectedBlockId = useToolStore((s) => s.selectedBlockId);
+  const setSelectedBlock = useToolStore((s) => s.setSelectedBlock);
+  const sourceVersion = useToolStore((s) => s.sourceReg?.version);
+  const targetVersion = useToolStore((s) => s.targetReg?.version);
+  const sourceRegId = useToolStore((s) => s.sourceReg?.id);
+  const targetRegId = useToolStore((s) => s.targetReg?.id);
+
   const [query, setQuery] = useState("");
   const [showSafe, setShowSafe] = useState(false);
-  const [filter, setFilter] = useState<StatusFilter>(null);
+  const [filter, setFilter] = useState<SchStatus | null>(null);
+  const [sheet, setSheet] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
 
   // Scroll to the selected entry when the 3D viewer selects a block.
   useEffect(() => {
     if (!selectedBlockId || !listRef.current) return;
-    const el = listRef.current.querySelector<HTMLElement>(
-      `[data-block-id="${CSS.escape(selectedBlockId)}"]`,
-    );
+    const el = listRef.current.querySelector<HTMLElement>(`[data-block-id="${CSS.escape(selectedBlockId)}"]`);
     el?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [selectedBlockId]);
+
+  const targetSet = useMemo(() => new Set(targetBlockIds), [targetBlockIds]);
 
   const groups = useMemo(() => {
     if (!diff) return [];
     const q = query.trim().toLowerCase();
-    const byStatus = new Map<DiffEntry["status"], DiffEntry[]>();
+    const byStatus = new Map<SchStatus, DiffEntry[]>();
     for (const entry of diff.entries) {
-      if (filter && entry.status !== filter) continue;
+      const bucket = bucketOf(entry.status);
+      if (filter && bucket !== filter) continue;
       if (!filter && !showSafe && entry.status === "safe") continue;
       if (q && !entry.block.id.toLowerCase().includes(q)) continue;
-      const list = byStatus.get(entry.status) ?? [];
+      const list = byStatus.get(bucket) ?? [];
       list.push(entry);
-      byStatus.set(entry.status, list);
+      byStatus.set(bucket, list);
     }
     return GROUP_ORDER.filter((s) => byStatus.has(s)).map((status) => {
       let entries = byStatus.get(status)!;
-      if (status === "missing" || status === "mod-only") {
+      if (status === "missing") {
         entries = [...entries].sort((a, b) => b.instanceCount - a.instanceCount);
       }
       return { status, entries };
     });
   }, [diff, query, showSafe, filter]);
 
+  // Unresolved missing / mod-only blocks grouped by namespace, for bulk rules.
+  const bulkGroups = useMemo(() => {
+    if (!diff) return [];
+    const byNs = new Map<string, DiffEntry[]>();
+    for (const entry of diff.entries) {
+      if (entry.status !== "missing" && entry.status !== "mod-only") continue;
+      if (resolutions[entry.block.id]) continue;
+      const list = byNs.get(entry.block.namespace) ?? [];
+      list.push(entry);
+      byNs.set(entry.block.namespace, list);
+    }
+    return [...byNs.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([namespace, entries]) => ({
+        namespace,
+        entries,
+        remap: entries.filter((e) => remapSuffix(e.block.id, targetSet) !== null).length,
+      }));
+  }, [diff, resolutions, targetSet]);
+
+  const unresolved = bulkGroups.reduce((s, g) => s + g.entries.length, 0);
+
+  function applyBulk(actions: Record<string, BulkAction>) {
+    for (const g of bulkGroups) {
+      const a = actions[g.namespace] ?? "skip";
+      if (a === "skip") continue;
+      for (const e of g.entries) {
+        if (a === "air") setResolution(e.block, "minecraft:air");
+        else {
+          const target = remapSuffix(e.block.id, targetSet);
+          if (target) setResolution(e.block, target);
+        }
+      }
+    }
+    setSheet(false);
+  }
+
   if (!diff) {
     return (
-      <div className="p-4">
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-ink-muted">
-          {t("header")}
-        </h2>
-        <div className="rounded-md border border-dashed border-edge/60 p-8 text-center text-sm text-ink-dim">
-          {isAnalyzing ? t("analyzing") : t("emptyPrompt")}
-        </div>
+      <div className="m-4 p-[2.5rem_1.5rem] border-[1.5px] border-dashed border-edge rounded-[var(--radius-lg)] text-center text-ink-dim flex flex-col items-center gap-[0.7rem]">
+        <SchIcon name="layers" size={34} className="text-ink-dim opacity-70" />
+        <h3 className="font-display text-[length:var(--t-lg)] text-ink-muted">Sin análisis todavía</h3>
+        <p className="text-[length:var(--t-sm)] max-w-[34ch]">
+          {isAnalyzing ? (
+            "Analizando compatibilidad…"
+          ) : (
+            <>
+              Configura los entornos y el esquema, luego pulsa <strong>Analizar</strong> para ver el diff de bloques.
+            </>
+          )}
+        </p>
       </div>
     );
   }
 
+  const chips = [
+    { key: "safe" as SchStatus, label: "Compatibles", count: diff.summary.safe },
+    { key: "renamed" as SchStatus, label: "Renombrados", count: diff.summary.renamed },
+    { key: "state-changed" as SchStatus, label: "Estados", count: diff.summary.stateChanged },
+    // Missing + mod-only are one red "Ausentes" category.
+    { key: "missing" as SchStatus, label: "Ausentes", count: diff.summary.missing + diff.summary.modOnly },
+  ];
+
   return (
     <div className="flex h-full flex-col">
-      <div className="sticky top-0 z-10 space-y-3 border-b border-edge/40 bg-layer-1/80 p-4 backdrop-blur-sm">
-        <DiffSummaryBar
-          summary={diff.summary}
-          active={filter}
-          onToggle={(status) => setFilter((cur) => (cur === status ? null : status))}
-        />
+      {/* diff bar */}
+      <div className="shrink-0 sticky top-0 z-[8] flex flex-col gap-[0.7rem] p-[0.85rem] border-b border-edge bg-[color-mix(in_srgb,var(--layer-1)_86%,transparent)] backdrop-blur-[8px]">
+        <FilterChips chips={chips} active={filter} onToggle={(k) => setFilter((c) => (c === k ? null : k))} />
         <div className="flex items-center gap-2">
           <div className="relative flex-1">
-            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink-dim" />
-            <Input
+            <SchIcon name="search" size={16} className="absolute left-[0.6rem] top-1/2 -translate-y-1/2 text-ink-dim pointer-events-none" />
+            <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder={t("searchPlaceholder")}
-              className="h-8 pl-8 text-xs"
+              placeholder="Buscar bloque…"
+              className="w-full font-body text-[length:var(--t-sm)] text-ink bg-layer-2 border border-edge-strong rounded-[var(--btn-radius)] pl-8 pr-[0.9rem] py-2 transition-[border-color] duration-[var(--dur)] ease-[var(--ease)] placeholder:text-ink-dim hover:border-[color-mix(in_srgb,var(--text)_28%,transparent)] focus:outline-none focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-soft)]"
             />
           </div>
           <button
             type="button"
             onClick={() => setShowSafe((v) => !v)}
             disabled={filter !== null}
-            className="shrink-0 rounded-md border border-edge/50 px-2.5 py-1.5 text-xs text-ink-muted transition-colors hover:bg-layer-2/50 disabled:opacity-40"
+            className={
+              "shrink-0 py-2 px-[0.7rem] rounded-[var(--radius)] border text-[length:var(--t-xs)] cursor-pointer whitespace-nowrap transition-all duration-[var(--dur)] ease-[var(--ease)] disabled:opacity-40 disabled:cursor-default " +
+              (showSafe
+                ? "text-[color:var(--accent-bright)] border-[color-mix(in_srgb,var(--accent)_45%,transparent)] bg-[var(--accent-soft)]"
+                : "border-edge-strong bg-layer-2 text-ink-muted hover:text-ink")
+            }
           >
-            {showSafe ? t("hideSafe") : t("showSafe")}
+            {showSafe ? "Ocultar seguros" : "Ver seguros"}
           </button>
-          <BulkRulesDrawer />
+          {unresolved > 0 ? (
+            <BoffButton variant="ghost" size="sm" onClick={() => setSheet(true)} className="shrink-0">
+              <SchIcon name="layers" size={16} />
+              Reglas en lote
+              <span className="ml-0.5 py-[0.05rem] px-[0.4rem] rounded-[var(--radius-pill)] bg-layer-2 text-ink-muted font-mono text-[10px]">
+                {unresolved}
+              </span>
+            </BoffButton>
+          ) : null}
         </div>
       </div>
 
-      <div ref={listRef} className="flex-1 space-y-4 overflow-y-auto p-4">
+      {/* list */}
+      <div ref={listRef} className="flex-1 min-h-0 overflow-y-auto p-[0.85rem] flex flex-col gap-[1.1rem]">
         {groups.length === 0 ? (
-          <div className="text-center text-sm text-ink-dim">{t("noMatching")}</div>
+          <div className="my-4 text-center text-[length:var(--t-sm)] text-ink-dim">
+            Ningún bloque coincide con el filtro.
+          </div>
         ) : (
-          groups.map((group) => (
-            <section key={group.status} className="space-y-2">
-              <h3 className="text-[11px] font-semibold uppercase tracking-wider text-ink-dim">
-                {t(statusKey(group.status))} ({group.entries.length})
-              </h3>
-              <div className={group.status === "missing" || group.status === "mod-only" ? "space-y-0.5" : "space-y-1.5"}>
-                {group.entries.map((entry) => (
-                  <DiffEntryRow key={entry.block.id} entry={entry} />
-                ))}
-              </div>
-            </section>
-          ))
+          groups.map((group) => {
+            return (
+              <section key={group.status} className="flex flex-col gap-[0.5rem]">
+                <div className="flex items-center gap-2 font-mono text-[10px] tracking-[0.12em] uppercase text-ink-dim font-bold">
+                  {GROUP_LABEL[group.status]}
+                  <span className="py-[0.05rem] px-[0.4rem] rounded-[var(--radius-pill)] bg-layer-2 text-ink-muted">
+                    {group.entries.length}
+                  </span>
+                </div>
+                {/* 2–3 column grid (by available width) so block thumbnails get room. */}
+                <div className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-[0.5rem]">
+                  {group.entries.map((entry) => {
+                    const sch = toSchEntry(entry);
+                    const selected = selectedBlockId === entry.block.id;
+                    const onSelect = () => setSelectedBlock(selected ? undefined : entry.block.id);
+                    const onResolve = (blockId: string, target: string) => {
+                      if (target) setResolution(entry.block, target);
+                      else clearResolution(blockId);
+                    };
+                    const renderThumb = (id: string, size: number, ring?: SchRing): ReactNode => {
+                      const isSource = id === entry.block.id;
+                      return (
+                        <BlockThumb
+                          blockId={id}
+                          version={isSource ? sourceVersion : targetVersion}
+                          registryId={isSource ? sourceRegId : targetRegId}
+                          size={size}
+                          ringClassName={ring ? RING_CLASS[ring] : undefined}
+                          previewRows={isSource ? previewRowsFor(entry) : undefined}
+                          // Always lazy: the replacement dropdown renders the whole
+                          // target registry (thousands of blocks), so eager loading
+                          // would fire thousands of texture fetches on open. Visible
+                          // row/card thumbs still load immediately via the observer.
+                          lazy
+                        />
+                      );
+                    };
+                    return (
+                      <div key={entry.block.id} data-block-id={entry.block.id} className="min-w-0">
+                        <MappingCard
+                          entry={sch}
+                          options={targetBlockIds}
+                          resolution={resolutions[entry.block.id]?.targetId}
+                          onResolve={onResolve}
+                          selected={selected}
+                          onSelect={onSelect}
+                          renderThumb={renderThumb}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+            );
+          })
         )}
       </div>
+
+      <BulkRulesSheet open={sheet} groups={bulkGroups} onClose={() => setSheet(false)} onApply={applyBulk} />
     </div>
   );
-}
-
-function statusKey(status: DiffEntry["status"]): string {
-  switch (status) {
-    case "state-changed":
-      return "stateChanged";
-    case "mod-only":
-      return "modOnly";
-    default:
-      return status;
-  }
 }

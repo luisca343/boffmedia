@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useTranslations } from "next-intl";
-import { FolderOpen, Boxes, Gamepad2 } from "lucide-react";
-import { Button } from "@/components/ui/primitives/button";
+import { ScanCard, type SchRegistry } from "@/components/boffmedia/ui/schematic";
 import type { RegistryHandle } from "../../_lib/types";
 import type { GameId } from "../../_lib/adapters";
 
@@ -13,7 +11,8 @@ interface ScanProgress {
 }
 
 interface EnvPickerProps {
-  label: string;
+  role: "source" | "target";
+  roleLabel: string;
   game: GameId;
   onGameChange: (g: GameId) => void;
   registry?: RegistryHandle;
@@ -76,16 +75,13 @@ async function findAssetsInDir(dir: FsDirHandle): Promise<File | null> {
 
 /**
  * Locate Hytale's Assets.zip under the picked folder. Tries the known install
- * path first (`install/release/package/game/latest`), then a bounded
- * breadth-first search so an arbitrary parent folder still works without walking
- * the entire ~GB install tree.
+ * path first, then a bounded breadth-first search so an arbitrary parent folder
+ * still works without walking the entire ~GB install tree.
  */
 async function collectHytale(dir: FsDirHandle): Promise<File[]> {
-  // Maybe the user picked the folder that directly holds Assets.zip.
   const direct = await findAssetsInDir(dir);
   if (direct) return [direct];
 
-  // Fast path: descend the known Hytale layout.
   try {
     let cur = dir;
     for (const seg of HYTALE_PATH) cur = await cur.getDirectoryHandle(seg);
@@ -95,7 +91,6 @@ async function collectHytale(dir: FsDirHandle): Promise<File[]> {
     // Layout differs — fall back to a bounded search.
   }
 
-  // Bounded BFS.
   const queue: FsDirHandle[] = [dir];
   let scanned = 0;
   while (queue.length > 0 && scanned < MAX_DIRS_SCANNED) {
@@ -115,8 +110,9 @@ async function collectHytale(dir: FsDirHandle): Promise<File[]> {
 function collectFromFileList(files: FileList, game: GameId): File[] {
   const list = Array.from(files);
   if (game === "hytale") {
-    const zip = list.find((f) => f.name.toLowerCase() === "assets.zip")
-      ?? list.filter((f) => f.name.toLowerCase().endsWith(".zip")).sort((a, b) => b.size - a.size)[0];
+    const zip =
+      list.find((f) => f.name.toLowerCase() === "assets.zip") ??
+      list.filter((f) => f.name.toLowerCase().endsWith(".zip")).sort((a, b) => b.size - a.size)[0];
     return zip ? [zip] : [];
   }
   const out: File[] = [];
@@ -133,20 +129,27 @@ function collectFromFileList(files: FileList, game: GameId): File[] {
   return out;
 }
 
-const GAME_ICON: Record<GameId, typeof Boxes> = { minecraft: Boxes, hytale: Gamepad2 };
+/** Map the worker registry handle to the presentational ScanCard registry shape. */
+function toScanRegistry(h: RegistryHandle | undefined): SchRegistry | null {
+  if (!h) return null;
+  return {
+    name: h.instanceName,
+    version: h.version,
+    loader: h.modLoader,
+    mods: h.mods.length,
+    blocks: h.blockCount,
+  };
+}
 
 /**
- * Environment picker with a per-environment game toggle.
- *
- * Minecraft: pick a real instance folder; the worker detects version/loader and
- * scans `mods/*.jar`. Hytale: pick the install folder (or Assets.zip directly);
- * the worker reads the block catalog from Assets.zip's central directory.
- *
- * Prefers the File System Access API so only the relevant files are read; falls
- * back to `<input webkitdirectory>` / a `.zip` file input where it's missing.
+ * Environment picker rendered with the {@link ScanCard} design piece, preserving
+ * the File System Access API flow: Minecraft picks an instance folder (metadata +
+ * mods/*.jar); Hytale picks the install folder (or Assets.zip directly). Falls
+ * back to `<input webkitdirectory>` / a `.zip` input where the API is missing.
  */
 export function EnvPicker({
-  label,
+  role,
+  roleLabel,
   game,
   onGameChange,
   registry,
@@ -155,10 +158,8 @@ export function EnvPicker({
   disabled,
   onPick,
 }: EnvPickerProps) {
-  const t = useTranslations("games.minecraft.schematicCompat");
   const inputRef = useRef<HTMLInputElement>(null);
   const hasFsApi = typeof window !== "undefined" && !!getDirectoryPicker();
-  // Hytale fallback picks the Assets.zip file; Minecraft fallback picks a folder.
   const fallbackIsFolder = !hasFsApi && game === "minecraft";
 
   useEffect(() => {
@@ -174,6 +175,7 @@ export function EnvPicker({
   }, [fallbackIsFolder]);
 
   async function handleClick() {
+    if (disabled || loading) return;
     if (hasFsApi) {
       const picker = getDirectoryPicker();
       if (!picker) return;
@@ -189,38 +191,8 @@ export function EnvPicker({
     inputRef.current?.click();
   }
 
-  const pickLabel = game === "hytale" ? t("setup.pickHytale") : t("setup.pickInstance");
-
   return (
-    <div className="space-y-1.5">
-      <label className="text-xs font-medium text-ink-muted">{label}</label>
-
-      {/* Per-environment game toggle */}
-      <div className="grid grid-cols-2 gap-1.5">
-        {(["minecraft", "hytale"] as GameId[]).map((g) => {
-          const Icon = GAME_ICON[g];
-          const active = game === g;
-          return (
-            <button
-              key={g}
-              type="button"
-              disabled={disabled || loading}
-              onClick={() => onGameChange(g)}
-              aria-pressed={active}
-              className={[
-                "flex items-center justify-center gap-1.5 rounded-md border px-2 py-1.5 text-[11px] transition-colors",
-                active
-                  ? "border-primary/60 bg-primary/10 text-foreground"
-                  : "border-edge/40 text-muted-foreground hover:border-edge hover:text-foreground",
-              ].join(" ")}
-            >
-              <Icon className="h-3.5 w-3.5" />
-              <span className="font-medium">{t(`game.${g}`)}</span>
-            </button>
-          );
-        })}
-      </div>
-
+    <>
       <input
         ref={inputRef}
         type="file"
@@ -233,33 +205,16 @@ export function EnvPicker({
           e.target.value = "";
         }}
       />
-
-      <Button
-        variant="outline"
-        size="sm"
-        className="w-full justify-start h-9"
-        disabled={disabled || loading}
-        onClick={handleClick}
-      >
-        <FolderOpen className="w-4 h-4 mr-2" />
-        {loading ? "…" : pickLabel}
-      </Button>
-
-      <div className="text-[11px] text-ink-dim min-h-[16px]">
-        {loading ? (
-          <span className="block truncate">
-            {scan && scan.pct > 0 ? `${scan.pct}% · ${scan.msg}` : t("setup.scanning")}
-          </span>
-        ) : registry ? (
-          <span className="block text-success">
-            ✓ {registry.instanceName ? `${registry.instanceName} · ` : ""}
-            {registry.version}
-            {registry.modLoader ? ` · ${registry.modLoader}` : ""} ·{" "}
-            {registry.mods.length} {t("setup.modsLabel")} · {registry.blockCount}{" "}
-            {t("setup.blocksLabel")}
-          </span>
-        ) : null}
-      </div>
-    </div>
+      <ScanCard
+        role={role}
+        roleLabel={roleLabel}
+        game={game}
+        onGame={(g) => onGameChange(g as GameId)}
+        registry={toScanRegistry(registry)}
+        scanning={loading}
+        progress={scan?.pct ?? 0}
+        onPick={handleClick}
+      />
+    </>
   );
 }
