@@ -13,11 +13,27 @@ import type {
   BlockPositionGroup,
   ProgressCb,
 } from "../types";
-import { loadSchematicFile } from "../pipeline/loader";
-import { buildScannedRegistry } from "../pipeline/registry";
 import { computeDiff } from "../pipeline/diff";
 import { applyRules } from "../pipeline/rules/engine";
 import { transformStates } from "../pipeline/state/transformer";
+import { buildRuleSet, parseRuleSet } from "../pipeline/rules/ruleset";
+import { getAdapter, type GameId } from "../adapters";
+import type { ExportFormat } from "../pipeline/exporter";
+
+// All game-specific work (scan / parse / export) goes through a per-game adapter.
+// The engine itself stays game-agnostic — it only sees UnifiedBlock /
+// BlockRegistry / SchematicStructure.
+
+/** Pick the adapter for a schematic file by extension (Hytale prefab vs Minecraft). */
+function adapterForFile(fileName: string): GameId {
+  const lower = fileName.toLowerCase();
+  return lower.endsWith(".prefab.json") || lower.endsWith(".prefab") ? "hytale" : "minecraft";
+}
+
+/** Pick the adapter for an export by format (prefab → Hytale, else Minecraft). */
+function adapterForFormat(format: ExportFormat): GameId {
+  return format === "prefab" ? "hytale" : "minecraft";
+}
 
 // ─── In-worker caches ──────────────────────────────────────────────────────────
 
@@ -65,11 +81,11 @@ const api: CompatWorkerAPI = {
   },
 
   async scanInstance(
-    metaFiles: File[],
-    jarFiles: File[],
+    gameId: GameId,
+    files: File[],
     onProgress: ProgressCb
   ): Promise<RegistryHandle> {
-    const reg = await buildScannedRegistry(metaFiles, jarFiles, onProgress);
+    const reg = await getAdapter(gameId).buildRegistry(files, onProgress);
     const id = nextId("reg");
     registries.set(id, reg);
     return registryHandle(id, reg);
@@ -83,11 +99,14 @@ const api: CompatWorkerAPI = {
 
   async getBlockTexture(registryId: string, blockId: string): Promise<string | null> {
     const reg = registries.get(registryId);
-    return reg?.textures?.get(blockId) ?? null;
+    if (!reg) return null;
+    // Prebuilt textures (Minecraft mod JARs) first, then a lazy resolver if the
+    // game extracts on demand (Hytale pulls the icon out of Assets.zip here).
+    return reg.textures?.get(blockId) ?? (await reg.getTexture?.(blockId)) ?? null;
   },
 
   async loadSchematic(file: File): Promise<SchematicSummary> {
-    const structure = await loadSchematicFile(file);
+    const structure = await getAdapter(adapterForFile(file.name)).parseSchematic(file);
     const id = nextId("schem");
     schematics.set(id, structure);
     return schematicSummary(id, structure, file.name, file.size);
@@ -205,16 +224,19 @@ const api: CompatWorkerAPI = {
     return { schematicId: newId, remaining };
   },
 
-  async export(_schematicId: string, _format: "schem" | "litematic" | "nbt"): Promise<Blob> {
-    throw new Error("Not implemented — Phase 4");
+  async export(schematicId: string, format: ExportFormat): Promise<Blob> {
+    const structure = schematics.get(schematicId);
+    if (!structure) throw new Error(`Schematic not found: ${schematicId}`);
+    const bytes = getAdapter(adapterForFormat(format)).export(structure, format);
+    return new Blob([bytes as BlobPart], { type: "application/octet-stream" });
   },
 
-  async importRuleSet(_json: string): Promise<RuleSet> {
-    throw new Error("Not implemented — Phase 4");
+  async importRuleSet(json: string): Promise<RuleSet> {
+    return parseRuleSet(json);
   },
 
-  async exportRuleSet(_resolutions: ResolutionMap, _meta: RuleSetMeta): Promise<string> {
-    throw new Error("Not implemented — Phase 4");
+  async exportRuleSet(resolutions: ResolutionMap, meta: RuleSetMeta): Promise<string> {
+    return buildRuleSet(resolutions, meta);
   },
 };
 

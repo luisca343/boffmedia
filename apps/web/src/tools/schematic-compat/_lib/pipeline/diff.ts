@@ -9,6 +9,7 @@ import type {
 } from "../types";
 import { parseBlockState } from "./normalizer";
 import RENAMES_JSON from "./rules/known-renames/1.18-1.21.json";
+import { crossGameMap } from "./rules/cross-game";
 
 const KNOWN_RENAMES: Record<string, string> = (
   RENAMES_JSON as { renames: Record<string, string> }
@@ -44,20 +45,29 @@ function incompatibleStateKeys(
  * Try to find a rename candidate for a block absent from the target registry.
  *
  * Priority:
- *   1. Bundled known-renames table (grass → short_grass, etc.)
- *   2. Suffix match for mod blocks (create:oak_log → minecraft:oak_log)
+ *   1. Cross-game mapping table (minecraft:stone → hytale:Rock_Stone, etc.) when
+ *      source and target are different games.
+ *   2. Bundled known-renames table (grass → short_grass, etc.)
+ *   3. Suffix match for mod blocks (create:oak_log → minecraft:oak_log)
  */
 function detectRename(
   block: UnifiedBlock,
-  targetReg: BlockRegistry
+  targetReg: BlockRegistry,
+  crossGame: Record<string, string> | null
 ): UnifiedBlock | null {
-  // 1. Bundled known-renames table
+  // 1. Cross-game mapping (only set when source game ≠ target game)
+  if (crossGame) {
+    const mapped = crossGame[block.id];
+    if (mapped && targetReg.blocks.has(mapped)) return parseBlockState(mapped);
+  }
+
+  // 2. Bundled known-renames table
   const knownTarget = KNOWN_RENAMES[block.id];
   if (knownTarget && targetReg.blocks.has(knownTarget)) {
     return parseBlockState(knownTarget);
   }
 
-  // 2. Suffix match for non-vanilla blocks
+  // 3. Suffix match for non-vanilla blocks
   if (block.namespace !== "minecraft") {
     const candidate = `minecraft:${block.name}`;
     if (targetReg.blocks.has(candidate)) return parseBlockState(candidate);
@@ -85,8 +95,8 @@ export function computeDiff(
   sourceReg: BlockRegistry,
   targetReg: BlockRegistry
 ): CompatDiff {
-  // sourceReg is reserved for tag-overlap rename heuristics (Phase 3+).
-  void sourceReg;
+  // Cross-game block translation, when converting between different games.
+  const crossGame = crossGameMap(sourceReg.gameId, targetReg.gameId);
 
   const counts = countInstances(structure);
 
@@ -116,7 +126,7 @@ export function computeDiff(
     const block = structure.palette[i];
     const instanceCount = counts[i];
     if (instanceCount === 0) continue;
-    if (block.namespace === "minecraft" && block.name === "air") continue;
+    if (block.name === "air") continue;
 
     summary.total += instanceCount;
 
@@ -128,7 +138,7 @@ export function computeDiff(
         instanceCount: 0,
         targetDef,
         badKeys: new Set(),
-        renamed: targetDef ? null : detectRename(block, targetReg),
+        renamed: targetDef ? null : detectRename(block, targetReg, crossGame),
       };
       byId.set(block.id, agg);
     }
@@ -158,7 +168,7 @@ export function computeDiff(
     } else if (agg.renamed) {
       summary.renamed += instanceCount;
       entries.push({ block, status: "renamed", instanceCount, autoCandidate: agg.renamed });
-    } else if (block.namespace !== "minecraft") {
+    } else if (block.source === "mod") {
       summary.modOnly += instanceCount;
       entries.push({ block, status: "mod-only", instanceCount });
     } else {

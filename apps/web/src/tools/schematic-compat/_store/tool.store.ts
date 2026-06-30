@@ -6,6 +6,7 @@ import type {
   UnifiedBlock,
   BlockPositionGroup,
 } from "../_lib/types";
+import type { GameId } from "../_lib/adapters";
 
 interface ResolutionChoice {
   targetId: string;
@@ -18,6 +19,11 @@ interface ScanProgress {
 }
 
 interface ToolState {
+  // Per-environment game. Source ≠ target enables cross-game conversion
+  // (Minecraft ↔ Hytale); equal games do the existing version conversion.
+  sourceGame: GameId;
+  targetGame: GameId;
+
   // Worker-held artifacts (referenced by handle), each built by scanning a real
   // Minecraft instance folder.
   sourceReg?: RegistryHandle;
@@ -49,9 +55,12 @@ interface ToolState {
   isLoadingTarget: boolean;
   isLoadingSchematic: boolean;
   isAnalyzing: boolean;
+  isExporting: boolean;
   error?: string;
 
   // Actions
+  setSourceGame: (g: GameId) => void;
+  setTargetGame: (g: GameId) => void;
   setSourceReg: (h: RegistryHandle | undefined) => void;
   setTargetReg: (h: RegistryHandle | undefined) => void;
   setSourceScan: (p: ScanProgress | undefined) => void;
@@ -65,6 +74,7 @@ interface ToolState {
   setLoadingTarget: (v: boolean) => void;
   setLoadingSchematic: (v: boolean) => void;
   setAnalyzing: (v: boolean) => void;
+  setExporting: (v: boolean) => void;
   setError: (msg: string | undefined) => void;
   // Phase 3
   setBlockPositions: (groups: BlockPositionGroup[]) => void;
@@ -76,18 +86,33 @@ interface ToolState {
 }
 
 export const useToolStore = create<ToolState>((set) => ({
+  sourceGame: "minecraft",
+  targetGame: "minecraft",
   targetBlockIds: [],
   resolutions: {},
   isLoadingSource: false,
   isLoadingTarget: false,
   isLoadingSchematic: false,
   isAnalyzing: false,
+  isExporting: false,
   // Phase 3 defaults
   blockPositions: [],
   isFetchingPositions: false,
   layerY: 0,
   diffOnlyMode: false,
 
+  setSourceGame: (g) =>
+    set((state) =>
+      state.sourceGame === g
+        ? state
+        : { sourceGame: g, sourceReg: undefined, diff: undefined },
+    ),
+  setTargetGame: (g) =>
+    set((state) =>
+      state.targetGame === g
+        ? state
+        : { targetGame: g, targetReg: undefined, targetBlockIds: [], diff: undefined },
+    ),
   setSourceReg: (h) => set({ sourceReg: h }),
   setTargetReg: (h) => set({ targetReg: h }),
   setSourceScan: (p) => set({ sourceScan: p }),
@@ -116,6 +141,7 @@ export const useToolStore = create<ToolState>((set) => ({
   setLoadingTarget: (v) => set({ isLoadingTarget: v }),
   setLoadingSchematic: (v) => set({ isLoadingSchematic: v }),
   setAnalyzing: (v) => set({ isAnalyzing: v }),
+  setExporting: (v) => set({ isExporting: v }),
   setError: (msg) => set({ error: msg }),
   // Phase 3
   setBlockPositions: (groups) => set({ blockPositions: groups }),
@@ -134,6 +160,7 @@ export const useToolStore = create<ToolState>((set) => ({
       diff: undefined,
       resolutions: {},
       error: undefined,
+      isExporting: false,
       blockPositions: [],
       isFetchingPositions: false,
       selectedBlockId: undefined,

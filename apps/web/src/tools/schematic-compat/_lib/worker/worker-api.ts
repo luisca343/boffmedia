@@ -9,6 +9,8 @@ import type {
   BlockPositionGroup,
   ProgressCb,
 } from "../types";
+import type { ExportFormat } from "../pipeline/exporter";
+import type { GameId } from "../adapters";
 
 /**
  * Comlink-exposed worker API.
@@ -34,8 +36,8 @@ export interface CompatWorkerAPI {
    * the UI thread. `onProgress` is a Comlink-proxied callback.
    */
   scanInstance(
-    metaFiles: File[],
-    jarFiles: File[],
+    gameId: GameId,
+    files: File[],
     onProgress: ProgressCb
   ): Promise<RegistryHandle>;
 
@@ -79,7 +81,7 @@ export interface CompatWorkerAPI {
     targetRegId: string
   ): Promise<{ schematicId: string; remaining: DiffEntry[] }>;
 
-  export(schematicId: string, format: "schem" | "litematic" | "nbt"): Promise<Blob>;
+  export(schematicId: string, format: ExportFormat): Promise<Blob>;
 
   importRuleSet(json: string): Promise<RuleSet>;
   exportRuleSet(resolutions: ResolutionMap, meta: RuleSetMeta): Promise<string>;
