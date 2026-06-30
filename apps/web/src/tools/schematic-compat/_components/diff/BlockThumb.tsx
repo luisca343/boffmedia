@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import {
   blockTextureUrls,
   placeholderColor,
@@ -19,6 +19,13 @@ interface BlockThumbProps {
   /** Optional ring color class (e.g. status accent). */
   ringClassName?: string;
   className?: string;
+  /**
+   * Defer loading (both the `<img>` and any worker texture fetch) until the tile
+   * scrolls into view. Use in long virtualised-feeling lists (e.g. the block
+   * picker dropdown) so opening a registry with thousands of blocks doesn't fire
+   * thousands of texture loads at once.
+   */
+  lazy?: boolean;
 }
 
 function isVanillaId(blockId: string): boolean {
@@ -39,9 +46,35 @@ export function BlockThumb({
   size = 36,
   ringClassName,
   className,
+  lazy = false,
 }: BlockThumbProps) {
   const vanilla = isVanillaId(blockId);
   const loadModTexture = useModTextureLoader();
+
+  // Visibility gate. When `lazy`, stays false until the tile scrolls into view;
+  // once visible it latches true so the texture isn't dropped on scroll-away.
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(!lazy);
+  useEffect(() => {
+    if (!lazy || visible) return;
+    const el = rootRef.current;
+    if (!el) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setVisible(true);
+      return;
+    }
+    const obs = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setVisible(true);
+          obs.disconnect();
+        }
+      },
+      { rootMargin: "64px" },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [lazy, visible]);
 
   // Vanilla: ordered CDN candidates walked via <img> onError.
   const candidates = useMemo(
@@ -53,8 +86,8 @@ export function BlockThumb({
   // Modded: single data URL fetched from the worker. `undefined` = still loading.
   const [modUrl, setModUrl] = useState<string | null | undefined>(undefined);
   useEffect(() => {
-    if (vanilla || !registryId || !loadModTexture) {
-      setModUrl(null);
+    if (vanilla || !visible || !registryId || !loadModTexture) {
+      if (vanilla) setModUrl(null);
       return;
     }
     let cancelled = false;
@@ -65,23 +98,33 @@ export function BlockThumb({
     return () => {
       cancelled = true;
     };
-  }, [vanilla, registryId, blockId, loadModTexture]);
+  }, [vanilla, visible, registryId, blockId, loadModTexture]);
 
-  const src = vanilla ? candidates[attempt] : (modUrl ?? undefined);
-  const pending = !vanilla && modUrl === undefined && Boolean(registryId) && Boolean(loadModTexture);
-  const showPlaceholder = !pending && !src;
+  const src = !visible
+    ? undefined
+    : vanilla
+      ? candidates[attempt]
+      : (modUrl ?? undefined);
+  const pending =
+    !vanilla &&
+    visible &&
+    modUrl === undefined &&
+    Boolean(registryId) &&
+    Boolean(loadModTexture);
+  const showPlaceholder = visible && !pending && !src;
 
   const imgStyle: CSSProperties = { width: size, height: size, imageRendering: "pixelated" };
 
   return (
     <div
+      ref={rootRef}
       className={`relative shrink-0 overflow-hidden rounded border border-edge/50 ${
         ringClassName ?? ""
       } ${className ?? ""}`}
       style={{ width: size, height: size }}
       title={blockId}
     >
-      {pending ? (
+      {!visible || pending ? (
         <div className="h-full w-full animate-pulse bg-layer-3/60" />
       ) : showPlaceholder ? (
         <div

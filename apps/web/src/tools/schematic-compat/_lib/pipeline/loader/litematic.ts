@@ -66,8 +66,12 @@ function entryToBlock(entry: NbtCompound): UnifiedBlock {
 /**
  * Decode the Litematica split-scheme bit-packed long array.
  * Each entry uses bitsPerEntry bits; entries can straddle long boundaries.
- * Arithmetic right-shift is fine because the entry mask extracts only the
- * lower bitsPerEntry bits regardless of sign.
+ *
+ * The longs MUST be treated as unsigned: `BigInt64Array` exposes them as signed,
+ * so a long with bit 63 set reads back negative. An arithmetic right-shift of a
+ * negative bigint sign-extends with 1s, which corrupts any entry that straddles
+ * into that long. We reinterpret each long as unsigned (`asUintN`) before
+ * shifting so only the real packed bits contribute.
  */
 function decodeBlockStates(
   longs: BigInt64Array,
@@ -87,10 +91,12 @@ function decodeBlockStates(
 
     let raw: bigint;
     if (startIdx === endIdx) {
-      raw = longs[startIdx] >> startBit;
+      raw = BigInt.asUintN(64, longs[startIdx]) >> startBit;
     } else {
       // Entry straddles two longs
-      raw = (longs[startIdx] >> startBit) | (longs[endIdx] << (BigInt(64) - startBit));
+      raw =
+        (BigInt.asUintN(64, longs[startIdx]) >> startBit) |
+        (BigInt.asUintN(64, longs[endIdx]) << (BigInt(64) - startBit));
     }
     result[i] = Number(raw & maskN);
   }

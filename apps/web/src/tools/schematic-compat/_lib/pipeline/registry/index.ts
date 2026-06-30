@@ -1,6 +1,7 @@
 import type { BlockRegistry, BlockDefinition, ModInfo, ProgressCb } from "../../types";
 import { detectInstance } from "./loader-detect";
 import { scanJar } from "./jar-scanner";
+import { fingerprintFiles, cacheGet, cachePut } from "../../cache/registry-cache";
 
 /** Shape of the bundled `vanilla/<version>.json` files (see generate-vanilla.mjs). */
 interface VanillaRegistryFile {
@@ -136,6 +137,15 @@ export async function buildScannedRegistry(
   jarFiles: File[],
   onProgress: ProgressCb
 ): Promise<BlockRegistry> {
+  // ── Cache check ──────────────────────────────────────────────────────────────
+  const fp = fingerprintFiles(metaFiles, jarFiles);
+  onProgress(1, "Checking cache…");
+  const cached = await cacheGet(fp);
+  if (cached) {
+    onProgress(100, "Loaded from cache");
+    return cached;
+  }
+
   onProgress(2, "Reading instance metadata…");
   const metas = new Map<string, string>();
   for (const f of metaFiles) metas.set(f.name.toLowerCase(), await f.text());
@@ -173,8 +183,8 @@ export async function buildScannedRegistry(
 
   applyTags(registry.blocks, tags);
 
-  onProgress(100, "Done");
-  return {
+  onProgress(99, "Saving to cache…");
+  const result: BlockRegistry = {
     ...registry,
     version: info.version, // surface the real detected version, not the bundled base
     modLoader: info.modLoader,
@@ -185,4 +195,10 @@ export async function buildScannedRegistry(
     capturedAt: Date.now(),
     instanceName: info.instanceName,
   };
+
+  // Store in cache asynchronously — don't block the return.
+  cachePut(fp, result).catch(() => void 0);
+
+  onProgress(100, "Done");
+  return result;
 }

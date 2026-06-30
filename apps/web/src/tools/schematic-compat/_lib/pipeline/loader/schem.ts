@@ -51,10 +51,17 @@ function readTileEntities(root: NbtCompound, container: NbtCompound): TileEntity
       y = pos[1];
       z = pos[2];
     }
+    // v3 nests the block-entity NBT under a `Data` compound; v2 keeps it inline.
+    // Flatten v3's `Data` up so downstream (diff, writers) sees one shape.
+    const data: Record<string, unknown> = { ...(comp as Record<string, unknown>) };
+    if (data.Data && typeof data.Data === "object" && !ArrayBuffer.isView(data.Data)) {
+      Object.assign(data, data.Data as Record<string, unknown>);
+      delete data.Data;
+    }
     out.push({
       pos: { x, y, z },
       id: typeof comp.Id === "string" ? comp.Id : typeof comp.id === "string" ? comp.id : "unknown",
-      data: comp as Record<string, unknown>,
+      data,
     });
   }
   return out;

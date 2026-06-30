@@ -35,6 +35,13 @@ export interface BlockRegistry {
    * postMessage boundary wholesale; the UI fetches entries lazily by id.
    */
   textures?: Map<string, string>;
+  /**
+   * Lazy per-block texture resolver (worker-side only, never serialized). Used by
+   * games whose textures are extracted on demand rather than prebuilt into
+   * {@link textures} — e.g. Hytale pulls a block's icon PNG out of Assets.zip the
+   * first time it's requested. Returns a `data:image/png;base64,…` URL or null.
+   */
+  getTexture?: (blockId: string) => Promise<string | null>;
   snapshotHash: string;
   capturedAt: number;
   /** Name of the scanned instance (from launcher metadata), when available. */
@@ -61,7 +68,7 @@ export interface SchematicRegion {
 }
 
 export interface SchematicStructure {
-  format: "schem" | "litematic" | "nbt" | "mca";
+  format: "schem" | "litematic" | "nbt" | "mca" | "prefab";
   formatVersion: number;
   dimensions: { x: number; y: number; z: number };
   palette: UnifiedBlock[];
