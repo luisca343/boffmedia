@@ -57,6 +57,33 @@ function isVanillaId(blockId: string): boolean {
   return blockId.startsWith("minecraft:") || !blockId.includes(":");
 }
 
+// Per-source-URL texture cache, shared by the model renderer (many blocks point
+// at the same texture file, e.g. every wooden block → oak_planks.png).
+const srcCache = new Map<string, Promise<THREE.Texture | null>>();
+
+/** Load a single texture by its resolved src (CDN URL or data: URL), memoized. */
+export function getTextureBySrc(src: string): Promise<THREE.Texture | null> {
+  let pending = srcCache.get(src);
+  if (!pending) {
+    pending = loadUrl(src);
+    srcCache.set(src, pending);
+  }
+  return pending;
+}
+
+/** Load the first texture that resolves from an ordered candidate list, memoized. */
+export function getTextureByCandidates(urls: string[]): Promise<THREE.Texture | null> {
+  if (urls.length === 0) return Promise.resolve(null);
+  if (urls.length === 1) return getTextureBySrc(urls[0]);
+  const key = urls.join("|");
+  let pending = srcCache.get(key);
+  if (!pending) {
+    pending = loadFromCandidates(urls);
+    srcCache.set(key, pending);
+  }
+  return pending;
+}
+
 /**
  * Resolve a block's texture as a {@link THREE.Texture}, or `null` if none is
  * available. Results are memoized across calls.

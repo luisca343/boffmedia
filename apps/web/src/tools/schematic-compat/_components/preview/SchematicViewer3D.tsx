@@ -8,10 +8,14 @@ import { useToolStore } from "../../_store/tool.store";
 import { placeholderColor } from "../../_lib/textures/blockTexture";
 import { useModTextureLoader } from "../../_hooks/modTextureContext";
 import { getBlockTexture } from "./blockTextureCache";
+import { useBlockModel } from "./useBlockModel";
+import type { BuiltModel } from "./blockModelCache";
 import { sourcePlan, convertedPlan, type RenderKind } from "./previewPlan";
 import type { BlockPositionGroup, DiffEntry } from "../../_lib/types";
 
 type ModTextureLoader = (registryId: string, blockId: string) => Promise<string | null>;
+
+const EMPTY_STATES: Record<string, string> = {};
 
 /** Resolves a block's THREE texture (vanilla CDN / mod JAR), or null on a miss. */
 function useBlockTexture(
@@ -39,58 +43,134 @@ function useBlockTexture(
 const CHANGED_GLOW = "#22c55e"; // green — this block was converted
 const PROBLEM_GLOW = "#ef4444"; // red — unresolved (missing / mod-only)
 
-interface MaterialStyle {
-  color: string;
+interface StyleParams {
   emissive: string;
   emissiveIntensity: number;
   transparent: boolean;
   opacity: number;
   depthWrite: boolean;
+  ghost: boolean;
 }
 
 /**
- * Material props for a block given its render kind + texture + selection.
- *  - normal  : source-mode look — texture (or placeholder), glow only when selected.
+ * Render-kind → overlay material params (glow / ghosting), independent of texture.
+ *  - normal  : source-mode look — glow only when selected.
  *  - changed : converted target block — green glow so it stands out.
  *  - problem : unresolved block — red glow, it has no valid target yet.
- *  - ghost   : untouched block in converted mode — muted + translucent so the
- *              changed blocks dominate the view.
+ *  - ghost   : untouched block in converted mode — muted + translucent.
  * A selected block is always forced solid and brightly lit so it's findable.
  */
-function materialStyle(kind: RenderKind, isSelected: boolean, hasTexture: boolean, blockId: string): MaterialStyle {
-  const lit = hasTexture ? "#ffffff" : placeholderColor(blockId);
-
+function styleParams(kind: RenderKind, isSelected: boolean): StyleParams {
   if (isSelected) {
     const emissive = kind === "problem" ? PROBLEM_GLOW : kind === "changed" ? CHANGED_GLOW : "#ffffff";
-    return { color: lit, emissive, emissiveIntensity: 0.65, transparent: false, opacity: 1, depthWrite: true };
+    return { emissive, emissiveIntensity: 0.65, transparent: false, opacity: 1, depthWrite: true, ghost: false };
   }
-
   switch (kind) {
     case "ghost":
-      // Mute the texture (multiplied by slate) and fade it back.
-      return {
-        color: hasTexture ? "#7c8896" : "#3f4754",
-        emissive: "#000000",
-        emissiveIntensity: 0,
-        transparent: true,
-        opacity: 0.3,
-        depthWrite: false,
-      };
+      return { emissive: "#000000", emissiveIntensity: 0, transparent: true, opacity: 0.3, depthWrite: false, ghost: true };
     case "changed":
-      return { color: lit, emissive: CHANGED_GLOW, emissiveIntensity: 0.35, transparent: false, opacity: 1, depthWrite: true };
+      return { emissive: CHANGED_GLOW, emissiveIntensity: 0.35, transparent: false, opacity: 1, depthWrite: true, ghost: false };
     case "problem":
-      return { color: lit, emissive: PROBLEM_GLOW, emissiveIntensity: 0.5, transparent: false, opacity: 1, depthWrite: true };
+      return { emissive: PROBLEM_GLOW, emissiveIntensity: 0.5, transparent: false, opacity: 1, depthWrite: true, ghost: false };
     default:
-      return { color: lit, emissive: "#000000", emissiveIntensity: 0, transparent: false, opacity: 1, depthWrite: true };
+      return { emissive: "#000000", emissiveIntensity: 0, transparent: false, opacity: 1, depthWrite: true, ghost: false };
   }
+}
+
+/** Build one MeshStandardMaterial for a face group (or the whole cube fallback). */
+function makeMaterial(
+  texture: THREE.Texture | null,
+  tint: string | null,
+  doubleSided: boolean,
+  overlay: boolean,
+  sp: StyleParams,
+  blockId: string,
+): THREE.MeshStandardMaterial {
+  const hasTex = !!texture;
+  const color = sp.ghost
+    ? hasTex
+      ? "#7c8896"
+      : "#3f4754"
+    : hasTex
+      ? (tint ?? "#ffffff")
+      : (tint ?? placeholderColor(blockId));
+  return new THREE.MeshStandardMaterial({
+    map: texture ?? undefined,
+    color: new THREE.Color(color),
+    emissive: new THREE.Color(sp.emissive),
+    emissiveIntensity: sp.emissiveIntensity,
+    transparent: sp.transparent,
+    opacity: sp.opacity,
+    depthWrite: sp.depthWrite,
+    // Cut out transparent texels (glass, panes, plants); no-op on opaque textures.
+    alphaTest: hasTex && !sp.ghost ? 0.5 : 0,
+    side: doubleSided ? THREE.DoubleSide : THREE.FrontSide,
+    // Coplanar overlays (grass side fringe) draw just in front to avoid z-fighting.
+    polygonOffset: overlay,
+    polygonOffsetFactor: overlay ? -1 : 0,
+    polygonOffsetUnits: overlay ? -1 : 0,
+    roughness: 0.85,
+    metalness: 0,
+  });
+}
+
+// ─── Shared instance-matrix plumbing ─────────────────────────────────────────
+
+/**
+ * Write per-instance translation matrices and apply the Y-layer cutoff. Worker
+ * positions are Y-sorted, so the cutoff is a binary search rather than a scan.
+ * Re-runs (rewriting matrices) whenever the mesh is recreated — e.g. when a
+ * block swaps from the cube fallback to its compiled model.
+ */
+function useInstanceMatrices(
+  meshRef: React.RefObject<THREE.InstancedMesh | null>,
+  positions: Float32Array,
+  maxCount: number,
+  maxLayerY: number,
+  meshEpoch: unknown,
+) {
+  useEffect(() => {
+    const mesh = meshRef.current;
+    if (!mesh || maxCount === 0) return;
+    const mat = mesh.instanceMatrix.array as Float32Array;
+    for (let i = 0; i < maxCount; i++) {
+      const x = positions[i * 3];
+      const y = positions[i * 3 + 1];
+      const z = positions[i * 3 + 2];
+      const b = i * 16;
+      mat[b]    = 1; mat[b+1]  = 0; mat[b+2]  = 0; mat[b+3]  = 0;
+      mat[b+4]  = 0; mat[b+5]  = 1; mat[b+6]  = 0; mat[b+7]  = 0;
+      mat[b+8]  = 0; mat[b+9]  = 0; mat[b+10] = 1; mat[b+11] = 0;
+      mat[b+12] = x; mat[b+13] = y; mat[b+14] = z; mat[b+15] = 1;
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+    mesh.count = maxCount;
+    // meshEpoch is in deps so matrices are rewritten when the mesh is recreated.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [positions, maxCount, meshEpoch]);
+
+  useEffect(() => {
+    const mesh = meshRef.current;
+    if (!mesh || maxCount === 0) return;
+    let lo = 0, hi = maxCount - 1, last = -1;
+    while (lo <= hi) {
+      const mid = (lo + hi) >> 1;
+      if (positions[mid * 3 + 1] <= maxLayerY) { last = mid; lo = mid + 1; }
+      else hi = mid - 1;
+    }
+    mesh.count = last + 1;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [maxLayerY, positions, maxCount, meshEpoch]);
 }
 
 // ─── Per-block-type instanced mesh ────────────────────────────────────────────
 
 interface BlockInstancesProps {
   group: BlockPositionGroup;
-  /** Block id whose texture to render (may differ from the group's source id). */
+  /** Block id whose model/texture to render (may differ from the group's source id). */
   textureId: string;
+  /** Blockstate properties driving the model (empty for converted target blocks). */
+  states: Record<string, string>;
   kind: RenderKind;
   isSelected: boolean;
   maxLayerY: number;
@@ -100,7 +180,8 @@ interface BlockInstancesProps {
   onSelect: (blockId: string) => void;
 }
 
-function BlockInstances({
+/** Fallback: a single-texture cube (modded blocks, or while a model loads). */
+function CubeInstances({
   group,
   textureId,
   kind,
@@ -113,52 +194,20 @@ function BlockInstances({
 }: BlockInstancesProps) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const maxCount = group.positions.length / 3;
-
-  // Write all translation matrices once when position data changes.
-  // Positions from the worker are Y-sorted (yi was the outermost loop),
-  // so the Y-layer effect below can use binary search instead of a full scan.
-  useEffect(() => {
-    const mesh = meshRef.current;
-    if (!mesh || maxCount === 0) return;
-    const mat = mesh.instanceMatrix.array as Float32Array;
-    for (let i = 0; i < maxCount; i++) {
-      const x = group.positions[i * 3];
-      const y = group.positions[i * 3 + 1];
-      const z = group.positions[i * 3 + 2];
-      const b = i * 16;
-      // Column-major translation matrix (scale=1, no rotation)
-      mat[b]    = 1; mat[b+1]  = 0; mat[b+2]  = 0; mat[b+3]  = 0;
-      mat[b+4]  = 0; mat[b+5]  = 1; mat[b+6]  = 0; mat[b+7]  = 0;
-      mat[b+8]  = 0; mat[b+9]  = 0; mat[b+10] = 1; mat[b+11] = 0;
-      mat[b+12] = x; mat[b+13] = y; mat[b+14] = z; mat[b+15] = 1;
-    }
-    mesh.instanceMatrix.needsUpdate = true;
-    mesh.count = maxCount;
-  }, [group.positions, maxCount]);
-
-  // Apply Y-layer cutoff via binary search (positions are Y-sorted).
-  useEffect(() => {
-    const mesh = meshRef.current;
-    if (!mesh || maxCount === 0) return;
-    let lo = 0, hi = maxCount - 1, last = -1;
-    while (lo <= hi) {
-      const mid = (lo + hi) >> 1;
-      if (group.positions[mid * 3 + 1] <= maxLayerY) { last = mid; lo = mid + 1; }
-      else hi = mid - 1;
-    }
-    mesh.count = last + 1;
-  }, [maxLayerY, group.positions, maxCount]);
+  useInstanceMatrices(meshRef, group.positions, maxCount, maxLayerY, "cube");
 
   const texture = useBlockTexture(textureId, version, registryId, modLoader);
-
   if (maxCount === 0) return null;
-
-  const style = materialStyle(kind, isSelected, !!texture, textureId);
+  const sp = styleParams(kind, isSelected);
 
   return (
     <instancedMesh
       ref={meshRef}
       args={[undefined, undefined, maxCount]}
+      // Instances are spread across the schematic, but the bounding sphere is
+      // origin-centred — leave culling off so a block-type never vanishes when
+      // its (tiny, origin-based) sphere leaves the frustum.
+      frustumCulled={false}
       onClick={(e) => {
         e.stopPropagation();
         onSelect(group.block.id);
@@ -166,21 +215,75 @@ function BlockInstances({
     >
       <boxGeometry args={[0.98, 0.98, 0.98]} />
       <meshStandardMaterial
-        // Remount the material when the texture arrives or the render kind /
-        // selection changes, so map compile + transparency flags apply cleanly.
         key={`${texture ? texture.uuid : "flat"}|${kind}|${isSelected ? "sel" : ""}`}
         map={texture ?? undefined}
-        color={style.color}
-        emissive={style.emissive}
-        emissiveIntensity={style.emissiveIntensity}
-        transparent={style.transparent}
-        opacity={style.opacity}
-        depthWrite={style.depthWrite}
-        roughness={0.75}
+        color={new THREE.Color(sp.ghost ? (texture ? "#7c8896" : "#3f4754") : texture ? "#ffffff" : placeholderColor(textureId))}
+        emissive={new THREE.Color(sp.emissive)}
+        emissiveIntensity={sp.emissiveIntensity}
+        transparent={sp.transparent}
+        opacity={sp.opacity}
+        depthWrite={sp.depthWrite}
+        alphaTest={texture && !sp.ghost ? 0.5 : 0}
+        roughness={0.8}
         metalness={0}
       />
     </instancedMesh>
   );
+}
+
+/** Real Minecraft geometry: compiled model geometry + one material per face group. */
+function ModelInstances({
+  group,
+  built,
+  textureId,
+  kind,
+  isSelected,
+  maxLayerY,
+  onSelect,
+}: { built: BuiltModel } & Omit<BlockInstancesProps, "states" | "version" | "registryId" | "modLoader">) {
+  const meshRef = useRef<THREE.InstancedMesh>(null);
+  const maxCount = group.positions.length / 3;
+  // Recreate the mesh (and rewrite matrices) when geometry identity changes.
+  useInstanceMatrices(meshRef, group.positions, maxCount, maxLayerY, built.geometry);
+
+  const materials = useMemo(() => {
+    const sp = styleParams(kind, isSelected);
+    return built.groups.map((g) => makeMaterial(g.texture, g.tint, g.doubleSided, g.overlay, sp, textureId));
+  }, [built, kind, isSelected, textureId]);
+
+  useEffect(() => () => materials.forEach((m) => m.dispose()), [materials]);
+
+  if (maxCount === 0) return null;
+
+  return (
+    <instancedMesh
+      ref={meshRef}
+      args={[undefined, undefined, maxCount]}
+      geometry={built.geometry}
+      material={materials}
+      // Origin-centred bounding sphere ignores instance spread — keep culling off
+      // so a block-type never disappears as the camera moves (see CubeInstances).
+      frustumCulled={false}
+      // Geometry is cache-owned + shared across remounts; materials we dispose
+      // ourselves (effect above). Opt out of R3F's auto-dispose so unmounting one
+      // instance never disposes the shared cached geometry.
+      dispose={null}
+      onClick={(e) => {
+        e.stopPropagation();
+        onSelect(group.block.id);
+      }}
+    />
+  );
+}
+
+/** Picks the compiled-model renderer when available, else the cube fallback. */
+function BlockInstances(props: BlockInstancesProps) {
+  const built = useBlockModel(props.textureId, props.states, props.version);
+  if (built) {
+    const { states: _s, version: _v, registryId: _r, modLoader: _m, ...rest } = props;
+    return <ModelInstances {...rest} built={built} />;
+  }
+  return <CubeInstances {...props} />;
 }
 
 // ─── Camera initial placement ─────────────────────────────────────────────────
@@ -276,6 +379,9 @@ function Scene({
             key={group.paletteIndex}
             group={group}
             textureId={plan.textureId}
+            // Source blocks render with their real states; a converted target
+            // block renders with its default model (we don't track its states).
+            states={plan.useTarget ? EMPTY_STATES : group.block.states}
             kind={plan.kind}
             isSelected={id === selectedBlockId}
             maxLayerY={layerY}
