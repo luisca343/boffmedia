@@ -8,6 +8,8 @@ import type {
 } from "../_lib/types";
 import type { GameId } from "../_lib/adapters";
 
+export type PreviewMode = "source" | "converted";
+
 interface ResolutionChoice {
   targetId: string;
   applyToAll: boolean;
@@ -49,6 +51,10 @@ interface ToolState {
   selectedBlockId?: string;
   layerY: number;
   diffOnlyMode: boolean;
+  // "source"   → the schematic exactly as it looks in the source game.
+  // "converted"→ changed blocks rendered with their target texture + highlighted,
+  //              unchanged blocks ghosted so the conversion result stands out.
+  previewMode: PreviewMode;
 
   // UI state.
   isLoadingSource: boolean;
@@ -82,6 +88,7 @@ interface ToolState {
   setSelectedBlock: (id: string | undefined) => void;
   setLayerY: (y: number) => void;
   setDiffOnlyMode: (v: boolean) => void;
+  setPreviewMode: (m: PreviewMode) => void;
   reset: () => void;
 }
 
@@ -100,6 +107,7 @@ export const useToolStore = create<ToolState>((set) => ({
   isFetchingPositions: false,
   layerY: 0,
   diffOnlyMode: false,
+  previewMode: "source",
 
   setSourceGame: (g) =>
     set((state) =>
@@ -149,6 +157,7 @@ export const useToolStore = create<ToolState>((set) => ({
   setSelectedBlock: (id) => set({ selectedBlockId: id }),
   setLayerY: (y) => set({ layerY: y }),
   setDiffOnlyMode: (v) => set({ diffOnlyMode: v }),
+  setPreviewMode: (m) => set({ previewMode: m }),
   reset: () =>
     set({
       sourceReg: undefined,
@@ -166,5 +175,6 @@ export const useToolStore = create<ToolState>((set) => ({
       selectedBlockId: undefined,
       layerY: 0,
       diffOnlyMode: false,
+      previewMode: "source",
     }),
 }));
