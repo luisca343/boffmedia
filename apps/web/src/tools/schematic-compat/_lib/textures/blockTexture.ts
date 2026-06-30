@@ -23,6 +23,9 @@ const CDN_BASE = "https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-asset
 // texture drift is visually negligible.
 const SAFE_REFS = ["1.16.5", "1.18.2", "1.20.1", "1.21.1"] as const;
 
+/** Newest mirror ref — broadest block coverage; used as the fallback everywhere. */
+export const LATEST_TEXTURE_REF = SAFE_REFS[SAFE_REFS.length - 1];
+
 const WOOD_SPECIES = [
   "oak",
   "spruce",
@@ -64,10 +67,14 @@ function parseVersion(v: string): number {
 
 /** Snap any version string to the nearest mirror ref we know exists. */
 export function normalizeTextureVersion(version: string | undefined): string {
-  if (!version) return "1.21.1";
+  if (!version) return LATEST_TEXTURE_REF;
   if ((SAFE_REFS as readonly string[]).includes(version)) return version;
   const target = parseVersion(version);
-  let best = SAFE_REFS[SAFE_REFS.length - 1] as string;
+  // Unparseable / non-numeric version (e.g. "", "unknown", a loader name) → 0.
+  // Snapping by distance would land on the OLDEST ref (1.16.5) and hide every
+  // modern block; default to the newest ref instead (widest coverage).
+  if (!target) return LATEST_TEXTURE_REF;
+  let best = LATEST_TEXTURE_REF as string;
   let bestDist = Infinity;
   for (const ref of SAFE_REFS) {
     const dist = Math.abs(parseVersion(ref) - target);
@@ -143,9 +150,13 @@ export function textureNameCandidates(name: string): string[] {
 export function blockTextureUrls(blockId: string, version?: string): string[] {
   const [namespace, name] = splitId(blockId);
   if (namespace !== "minecraft") return [];
-  const ref = normalizeTextureVersion(version);
-  return textureNameCandidates(name).map(
-    (tex) => `${CDN_BASE}${ref}/assets/minecraft/textures/block/${tex}.png`,
+  const primary = normalizeTextureVersion(version);
+  // Fall back to the newest ref so blocks added/renamed after the snapped version
+  // (e.g. short_grass, mud_brick_stairs) still resolve instead of 404-ing.
+  const refs = primary === LATEST_TEXTURE_REF ? [primary] : [primary, LATEST_TEXTURE_REF];
+  const names = textureNameCandidates(name);
+  return refs.flatMap((ref) =>
+    names.map((tex) => `${CDN_BASE}${ref}/assets/minecraft/textures/block/${tex}.png`),
   );
 }
 
