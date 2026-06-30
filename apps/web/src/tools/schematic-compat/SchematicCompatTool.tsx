@@ -9,15 +9,7 @@ import { ToolLayout } from "./_components/layout/ToolLayout";
 import { SetupPanel } from "./_components/setup/SetupPanel";
 import { DiffPanel } from "./_components/diff/DiffPanel";
 import { PreviewPanel } from "./_components/preview/PreviewPanel";
-
-function ExportPlaceholder() {
-  return (
-    <div className="flex items-center gap-3 px-4 py-3 text-sm text-ink-dim">
-      <span className="font-medium text-ink-muted">Export</span>
-      <span className="text-xs">(Phase 4)</span>
-    </div>
-  );
-}
+import { ExportBar } from "./_components/export/ExportBar";
 
 export function SchematicCompatTool() {
   const { api, status } = useCompatEngine();
@@ -49,7 +41,13 @@ export function SchematicCompatTool() {
           }
           diffPanel={<DiffPanel />}
           previewPanel={<PreviewPanel />}
-          exportBar={<ExportPlaceholder />}
+          exportBar={
+            <ExportBar
+              onExport={actions.exportSchematic}
+              onExportRuleSet={actions.exportRuleSet}
+              onImportRuleSet={actions.importRuleSet}
+            />
+          }
         />
       </div>
     </ModTextureProvider>

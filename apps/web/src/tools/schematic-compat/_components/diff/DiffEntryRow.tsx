@@ -43,13 +43,32 @@ export function DiffEntryRow({ entry }: DiffEntryRowProps) {
   const isSelected = selectedBlockId === entry.block.id;
 
   const options = useMemo(
-    () => targetBlockIds.map((id) => ({ label: id, value: id })),
-    [targetBlockIds],
+    () =>
+      targetBlockIds.map((id) => ({
+        label: id,
+        value: id,
+        // Lazy: the picker can list the whole target registry (1000s of blocks),
+        // so each thumbnail only loads once it scrolls into the dropdown.
+        icon: (
+          <BlockThumb
+            blockId={id}
+            version={targetVersion}
+            registryId={targetRegId}
+            size={20}
+            lazy
+          />
+        ),
+      })),
+    [targetBlockIds, targetVersion, targetRegId],
   );
 
   const needsReplacement = entry.status === "missing" || entry.status === "mod-only";
+  const isReplaceable = entry.status === "renamed" || entry.status === "state-changed";
   const stateKeys = Object.keys(entry.block.states);
   const autoTargetId = entry.autoCandidate?.id;
+  const manualTargetId = resolution?.targetId;
+  // What the export will actually use: an explicit override, else the auto pick.
+  const effectiveTargetId = manualTargetId ?? autoTargetId;
 
   const sharedInteraction = {
     "data-block-id": entry.block.id,
@@ -149,11 +168,11 @@ export function DiffEntryRow({ entry }: DiffEntryRowProps) {
           ringClassName={`ring-1 ${STATUS_RING[entry.status]}`}
         />
 
-        {autoTargetId && (
+        {effectiveTargetId && (
           <div className="flex items-center gap-1.5 self-center text-ink-dim">
             <ArrowRight className="h-3.5 w-3.5" />
             <BlockThumb
-              blockId={autoTargetId}
+              blockId={effectiveTargetId}
               version={targetVersion}
               registryId={targetRegId}
               size={28}
@@ -166,9 +185,13 @@ export function DiffEntryRow({ entry }: DiffEntryRowProps) {
             <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS_DOT[entry.status]}`} />
             <span className="truncate font-mono text-xs text-ink">{entry.block.id}</span>
           </div>
-          {autoTargetId && (
-            <div className="truncate pl-3 font-mono text-[11px] text-success/80">
-              → {autoTargetId}
+          {effectiveTargetId && (
+            <div
+              className={`truncate pl-3 font-mono text-[11px] ${
+                manualTargetId ? "text-accent" : "text-success/80"
+              }`}
+            >
+              → {effectiveTargetId} {manualTargetId ? `· ${t("manual")}` : ""}
             </div>
           )}
           <div className="pl-3 text-[11px] text-ink-dim">
@@ -191,6 +214,43 @@ export function DiffEntryRow({ entry }: DiffEntryRowProps) {
                   </span>
                 );
               })}
+            </div>
+          )}
+
+          {/* Manual override — lets the user pick a different target block when the
+              automatic rename / state fix isn't right. stopPropagation keeps the
+              combobox from toggling row selection. */}
+          {isReplaceable && (
+            <div
+              className="mt-1.5 flex items-center gap-2 pl-3"
+              onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => e.stopPropagation()}
+            >
+              <span className="shrink-0 text-[10px] uppercase tracking-wide text-ink-muted">
+                {t("replaceWith")}
+              </span>
+              <div className="w-44">
+                <Combobox
+                  data={options}
+                  value={resolution?.targetId ?? autoTargetId ?? ""}
+                  onChange={(value) => {
+                    if (value) setResolution(entry.block, value);
+                    else clearResolution(entry.block.id);
+                  }}
+                  placeholder={autoTargetId ?? t("replaceWith")}
+                  variant="boff"
+                  className="h-7 w-full text-[11px]"
+                />
+              </div>
+              {manualTargetId && (
+                <button
+                  type="button"
+                  onClick={() => clearResolution(entry.block.id)}
+                  className="shrink-0 text-[10px] text-ink-dim underline-offset-2 hover:text-ink-muted hover:underline"
+                >
+                  {t("resetAuto")}
+                </button>
+              )}
             </div>
           )}
         </div>

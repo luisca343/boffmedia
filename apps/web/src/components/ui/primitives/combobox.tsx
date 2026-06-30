@@ -21,8 +21,15 @@ import {
 
 type ComboboxVariant = "default" | "wingull" | "orange" | "boff"
 
+interface ComboboxOption {
+  label: string;
+  value: any;
+  /** Optional leading visual (e.g. a thumbnail) rendered before the label. */
+  icon?: React.ReactNode;
+}
+
 interface ComboboxProps {
-  data: { label: string, value: any }[];
+  data: ComboboxOption[];
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
@@ -101,18 +108,26 @@ export function Combobox({
           )}
           disabled={disabled}
         >
-          {value && data.find((element) => element.value === value)?.label
-            ? data.find((element) => element.value === value)?.label
-            : "Selecciona un elemento"}
+          <span className="flex min-w-0 items-center gap-2 text-left">
+            {value && data.find((element) => element.value === value)?.icon}
+            <span className="min-w-0 truncate">
+              {value && data.find((element) => element.value === value)?.label
+                ? data.find((element) => element.value === value)?.label
+                : "Selecciona un elemento"}
+            </span>
+          </span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent 
+      <PopoverContent
         className={cn(
           "p-0",
+          // Grow to fit the option labels (at least as wide as the trigger),
+          // capped to the available viewport width so long ids stay readable.
+          "w-auto max-w-[min(28rem,var(--radix-popover-content-available-width))]",
           variantStyles[variant].content
         )}
-        style={{ width: 'var(--radix-popover-trigger-width)' }}
+        style={{ minWidth: 'var(--radix-popover-trigger-width)' }}
         align="start"
       >
         <Command
@@ -136,13 +151,14 @@ export function Combobox({
                   keywords={[element.label]}
                   onSelect={handleSelect}
                   className={cn(
+                    "whitespace-normal break-all",
                     variantStyles[variant].item,
                     value === element.value && variantStyles[variant].itemSelected
                   )}
                 >
                   <Check
                     className={cn(
-                      "mr-2 h-4 w-4",
+                      "mr-2 h-4 w-4 shrink-0 self-start mt-0.5",
                       value === element.value ? "opacity-100" : "opacity-0",
                       variant === 'default' && "text-primary-hover",
                       variant === 'orange' && "text-orange-500",
@@ -150,6 +166,9 @@ export function Combobox({
                       variant === 'boff' && "text-secondary-hover"
                     )}
                   />
+                  {element.icon && (
+                    <span className="mr-2 shrink-0 self-start">{element.icon}</span>
+                  )}
                   {element.label}
                 </CommandItem>
               ))}
@@ -161,4 +180,4 @@ export function Combobox({
   )
 }
 
-export type { ComboboxVariant }
+export type { ComboboxVariant, ComboboxOption }

@@ -1,6 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Maximize2, Minimize2 } from "lucide-react";
 import { useToolStore } from "../../_store/tool.store";
 import { LayerSlider } from "./LayerSlider";
 
@@ -69,24 +71,61 @@ export function PreviewPanel() {
   const setLayerY = useToolStore((s) => s.setLayerY);
   const setDiffOnlyMode = useToolStore((s) => s.setDiffOnlyMode);
 
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Track fullscreen so the toggle icon/label stays in sync, including when the
+  // user exits via Esc or the browser chrome rather than the button.
+  useEffect(() => {
+    const onChange = () => setIsFullscreen(document.fullscreenElement === rootRef.current);
+    document.addEventListener("fullscreenchange", onChange);
+    return () => document.removeEventListener("fullscreenchange", onChange);
+  }, []);
+
+  const toggleFullscreen = useCallback(() => {
+    if (document.fullscreenElement) {
+      void document.exitFullscreen();
+    } else {
+      void rootRef.current?.requestFullscreen?.();
+    }
+  }, []);
+
   const maxLayerY = schematic ? schematic.dimensions.y - 1 : 0;
 
   return (
-    <div className="flex h-full flex-col">
+    // bg-layer-1 so the panel has a solid backdrop when blown up to fill the
+    // screen (the normal layout sits on the page background).
+    <div ref={rootRef} className="flex h-full flex-col bg-layer-1">
       {/* Header */}
       <div className="flex shrink-0 items-center justify-between border-b border-edge/40 px-3 py-2.5">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-ink-muted">Preview</h2>
-        <button
-          type="button"
-          onClick={() => setDiffOnlyMode(!diffOnlyMode)}
-          className={`rounded px-2 py-0.5 text-[11px] transition-colors ${
-            diffOnlyMode
-              ? "bg-accent/20 font-medium text-accent"
-              : "text-ink-dim hover:text-ink-muted"
-          }`}
-        >
-          Diff only
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => setDiffOnlyMode(!diffOnlyMode)}
+            className={`rounded px-2 py-0.5 text-[11px] transition-colors ${
+              diffOnlyMode
+                ? "bg-accent/20 font-medium text-accent"
+                : "text-ink-dim hover:text-ink-muted"
+            }`}
+          >
+            Diff only
+          </button>
+          <button
+            type="button"
+            onClick={toggleFullscreen}
+            disabled={!schematic}
+            title={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
+            aria-label={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
+            className="rounded p-1 text-ink-dim transition-colors hover:text-ink-muted disabled:opacity-40"
+          >
+            {isFullscreen ? (
+              <Minimize2 className="h-3.5 w-3.5" />
+            ) : (
+              <Maximize2 className="h-3.5 w-3.5" />
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Canvas area — flex-1 so it fills all remaining space */}

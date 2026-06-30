@@ -8,6 +8,7 @@ import { useToolStore } from "../../_store/tool.store";
 import type { DiffEntry } from "../../_lib/types";
 import { DiffSummaryBar, type StatusFilter } from "./DiffSummaryBar";
 import { DiffEntryRow } from "./DiffEntryRow";
+import { BulkRulesDrawer } from "./BulkRulesDrawer";
 
 const GROUP_ORDER: DiffEntry["status"][] = [
   "missing",
@@ -96,6 +97,7 @@ export function DiffPanel() {
           >
             {showSafe ? t("hideSafe") : t("showSafe")}
           </button>
+          <BulkRulesDrawer />
         </div>
       </div>
 
