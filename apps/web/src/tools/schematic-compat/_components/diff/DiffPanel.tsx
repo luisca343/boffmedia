@@ -41,11 +41,11 @@ const RING_CLASS: Record<Exclude<SchRing, null>, string> = {
   bad: "ring-1 ring-danger/60",
 };
 
-/** Suffix-preserving remap: `create:oak_log` → `minecraft:oak_log`, if it exists. */
-function remapSuffix(blockId: string, targetSet: Set<string>): string | null {
+/** Suffix-preserving remap: `create:oak_log` → `<targetNs>:oak_log`, if it exists. */
+function remapSuffix(blockId: string, targetSet: Set<string>, targetNs: string): string | null {
   const colon = blockId.indexOf(":");
   if (colon === -1) return null;
-  const candidate = `minecraft:${blockId.slice(colon + 1)}`;
+  const candidate = `${targetNs}:${blockId.slice(colon + 1)}`;
   return targetSet.has(candidate) ? candidate : null;
 }
 
@@ -86,6 +86,12 @@ export function DiffPanel() {
   const targetVersion = useToolStore((s) => s.targetReg?.version);
   const sourceRegId = useToolStore((s) => s.sourceReg?.id);
   const targetRegId = useToolStore((s) => s.targetReg?.id);
+  const targetGame = useToolStore((s) => s.targetGame);
+
+  // Bulk-rule targets follow the target game's namespace, not a hardcoded
+  // "minecraft:" (which is wrong/absent when converting to Hytale).
+  const targetNs = targetGame === "hytale" ? "hytale" : "minecraft";
+  const airId = `${targetNs}:air`;
 
   const [query, setQuery] = useState("");
   const [showSafe, setShowSafe] = useState(false);
@@ -140,9 +146,9 @@ export function DiffPanel() {
       .map(([namespace, entries]) => ({
         namespace,
         entries,
-        remap: entries.filter((e) => remapSuffix(e.block.id, targetSet) !== null).length,
+        remap: entries.filter((e) => remapSuffix(e.block.id, targetSet, targetNs) !== null).length,
       }));
-  }, [diff, resolutions, targetSet]);
+  }, [diff, resolutions, targetSet, targetNs]);
 
   const unresolved = bulkGroups.reduce((s, g) => s + g.entries.length, 0);
 
@@ -151,9 +157,9 @@ export function DiffPanel() {
       const a = actions[g.namespace] ?? "skip";
       if (a === "skip") continue;
       for (const e of g.entries) {
-        if (a === "air") setResolution(e.block, "minecraft:air");
+        if (a === "air") setResolution(e.block, airId);
         else {
-          const target = remapSuffix(e.block.id, targetSet);
+          const target = remapSuffix(e.block.id, targetSet, targetNs);
           if (target) setResolution(e.block, target);
         }
       }
