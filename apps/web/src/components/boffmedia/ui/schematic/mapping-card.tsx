@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { SchIcon } from "./sch-icon"
 import { AssetThumb } from "./asset-thumb"
@@ -19,6 +20,7 @@ export interface MappingCardProps {
 // Verbose mapping card for renamed / state-changed rows: adds the target thumb,
 // the automatic rule, instance count and state chips (incompatible flagged red).
 export function MappingCard({ entry, options, resolution, onResolve, selected, onSelect, renderThumb }: MappingCardProps) {
+  const t = useTranslations("games.minecraft.schematicCompat")
   const meta = STATUS_META[entry.status]
   const auto = entry.autoCandidate
   const effective = resolution || auto
@@ -70,10 +72,10 @@ export function MappingCard({ entry, options, resolution, onResolve, selected, o
                 )}
               >
                 → {effective}
-                {resolution ? " · manual" : ""}
+                {resolution ? " · " + t("diff.manual") : ""}
               </div>
             ) : null}
-            <div className="pl-[0.65rem] text-[11px] text-ink-dim">{entry.instanceCount.toLocaleString()} instancias</div>
+            <div className="pl-[0.65rem] text-[11px] text-ink-dim">{t("diff.instances", { count: entry.instanceCount })}</div>
             {stateKeys.length > 0 ? (
               <div className="flex flex-wrap gap-[0.3rem] pl-[0.65rem] mt-[0.35rem]">
                 {stateKeys.map((k) => {
@@ -100,11 +102,11 @@ export function MappingCard({ entry, options, resolution, onResolve, selected, o
         {/* Full-width replace row — never squeezed by the thumbnails on the left. */}
         {replaceable ? (
           <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-            <span className="font-mono text-[9px] tracking-[0.08em] uppercase text-ink-dim shrink-0">Reemplazar</span>
+            <span className="font-mono text-[9px] tracking-[0.08em] uppercase text-ink-dim shrink-0">{t("diff.replace")}</span>
             <ReplaceSelect
               fluid
               value={resolution}
-              placeholder={auto || "Elegir…"}
+              placeholder={auto || t("diff.choose")}
               options={options}
               onChange={(v) => onResolve(entry.block.id, v)}
               renderThumb={renderThumb}
@@ -115,7 +117,7 @@ export function MappingCard({ entry, options, resolution, onResolve, selected, o
                 onClick={() => onResolve(entry.block.id, "")}
                 className="bg-transparent border-0 text-ink-dim text-[10px] cursor-pointer underline underline-offset-2 shrink-0 hover:text-ink-muted"
               >
-                {auto ? "auto" : "limpiar"}
+                {auto ? t("diff.auto") : t("diff.clear")}
               </button>
             ) : null}
           </div>
