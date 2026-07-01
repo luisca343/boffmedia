@@ -136,5 +136,14 @@ function writeSchemV3(structure: SchematicStructure): Uint8Array {
 }
 
 export function writeSchem(structure: SchematicStructure, version: 2 | 3 = 2): Uint8Array {
+  // Width/Height/Length are 16-bit (unsigned short) in the Sponge format; anything
+  // larger cannot be represented — fail loudly instead of writing a corrupt file.
+  const { x, y, z } = structure.dimensions;
+  if (x > 0xffff || y > 0xffff || z > 0xffff) {
+    throw new Error(
+      `.schem dimensions (${x}×${y}×${z}) exceed the format's 65535 per-axis limit. ` +
+        `Export a smaller region.`,
+    );
+  }
   return version === 3 ? writeSchemV3(structure) : writeSchemV2(structure);
 }

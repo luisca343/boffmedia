@@ -35,7 +35,7 @@ import {
   type NbtValue,
 } from "../../parsers/nbt";
 import { parsePaletteEntry, serializeBlockState } from "../normalizer";
-import type { SchematicStructure, UnifiedBlock } from "../../types";
+import type { SchematicStructure, UnifiedBlock, TileEntity } from "../../types";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -188,10 +188,39 @@ function parseSectionPre118(sectionNbt: NbtValue, dataVersion: number): SectionD
   return { sectionY, palette, blockIndices };
 }
 
+/** A chunk block entity with absolute world coordinates (pre-crop). */
+interface RawTileEntity {
+  x: number;
+  y: number;
+  z: number;
+  id: string;
+  data: Record<string, unknown>;
+}
+
+/**
+ * Parse a chunk's block-entity list (1.18+ `block_entities` / pre-1.18
+ * `Level.TileEntities`). Each entry carries absolute world x/y/z + id + NBT.
+ */
+function parseChunkTileEntities(list: NbtValue | undefined): RawTileEntity[] {
+  if (!Array.isArray(list)) return [];
+  const out: RawTileEntity[] = [];
+  for (const te of list) {
+    if (typeof te !== "object" || te === null || Array.isArray(te) || ArrayBuffer.isView(te)) continue;
+    const c = te as NbtCompound;
+    const id = typeof c.id === "string" ? c.id : typeof c.Id === "string" ? c.Id : null;
+    if (!id) continue;
+    const { x, y, z } = c;
+    if (typeof x !== "number" || typeof y !== "number" || typeof z !== "number") continue;
+    out.push({ x, y, z, id, data: c as Record<string, unknown> });
+  }
+  return out;
+}
+
 interface ParsedChunk {
   chunkX: number; // world block X = chunkX * 16
   chunkZ: number;
   sections: SectionData[];
+  tileEntities: RawTileEntity[];
 }
 
 function parseChunkNbt(nbt: NbtCompound): ParsedChunk | null {
@@ -215,7 +244,7 @@ function parseChunkNbt(nbt: NbtCompound): ParsedChunk | null {
         // Corrupt section — skip
       }
     }
-    return { chunkX, chunkZ, sections };
+    return { chunkX, chunkZ, sections, tileEntities: parseChunkTileEntities(nbt.block_entities) };
   } else {
     // pre-1.18: data is under Level compound
     const level = nbt.Level;
@@ -237,7 +266,7 @@ function parseChunkNbt(nbt: NbtCompound): ParsedChunk | null {
         // Corrupt section — skip
       }
     }
-    return { chunkX, chunkZ, sections };
+    return { chunkX, chunkZ, sections, tileEntities: parseChunkTileEntities(lev.TileEntities) };
   }
 }
 
@@ -423,13 +452,29 @@ export function loadMca(data: Uint8Array, fileName: string): SchematicStructure 
     }
   }
 
+  // ── Collect block entities inside the crop, offset to schematic-local coords ──
+
+  const tileEntities: TileEntity[] = [];
+  for (const chunk of chunks) {
+    for (const te of chunk.tileEntities) {
+      if (te.x < minBX || te.x > maxBX) continue;
+      if (te.y < minBY || te.y > maxBY) continue;
+      if (te.z < minBZ || te.z > maxBZ) continue;
+      tileEntities.push({
+        pos: { x: te.x - minBX, y: te.y - minBY, z: te.z - minBZ },
+        id: te.id,
+        data: te.data,
+      });
+    }
+  }
+
   return {
     format: "mca",
     formatVersion: 0,
     dimensions: { x: sx, y: sy, z: sz },
     palette,
     blockData,
-    tileEntities: [],
+    tileEntities,
     entities: [],
     metadata: {
       fileName,
