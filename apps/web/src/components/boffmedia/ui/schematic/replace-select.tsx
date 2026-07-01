@@ -43,9 +43,9 @@ export function ReplaceSelect({ value, placeholder, options, onChange, renderThu
     const el = trigRef.current
     if (!el) return
     const r = el.getBoundingClientRect()
-    // Wide enough for the 3-column thumbnail grid, but never past the viewport.
-    const w = Math.min(Math.max(r.width, 312), window.innerWidth - 16)
-    const openUp = window.innerHeight - r.bottom < 280
+    // Roomy enough for ~5 thumbnail columns, but never past the viewport.
+    const w = Math.min(Math.max(r.width, 520), window.innerWidth - 16)
+    const openUp = window.innerHeight - r.bottom < 420
     setPos({
       left: Math.min(r.left, window.innerWidth - w - 8),
       width: w,
@@ -126,7 +126,7 @@ export function ReplaceSelect({ value, placeholder, options, onChange, renderThu
       {open && pos ? (
         <div
           className={cn(
-            "mp-cmb__pop fixed z-[70] flex flex-col max-h-[280px] overflow-hidden",
+            "mp-cmb__pop fixed z-[70] flex flex-col max-h-[420px] overflow-hidden",
             "rounded-[var(--radius)] border border-edge-strong",
             "bg-[color-mix(in_srgb,var(--layer-1)_94%,transparent)] backdrop-blur-[18px]",
             "shadow-[0_20px_46px_-18px_var(--shadow-color)] animate-[dd-in_0.14s_var(--ease)]",
@@ -148,7 +148,7 @@ export function ReplaceSelect({ value, placeholder, options, onChange, renderThu
             {filtered.length === 0 ? (
               <div className="p-[0.7rem] text-center text-ink-dim text-[11px]">{t("diff.noResults")}</div>
             ) : (
-              <div className="grid grid-cols-[repeat(auto-fill,minmax(86px,1fr))] gap-1.5">
+              <div className="grid grid-cols-[repeat(auto-fill,minmax(92px,1fr))] gap-1.5">
                 {filtered.map((o) => {
                   const name = o.includes(":") ? o.slice(o.indexOf(":") + 1) : o
                   return (
@@ -169,7 +169,7 @@ export function ReplaceSelect({ value, placeholder, options, onChange, renderThu
                           : "border-transparent text-ink-muted hover:bg-layer-2 hover:text-ink",
                       )}
                     >
-                      {thumb(o, 42)}
+                      {thumb(o, 48)}
                       <span className="w-full truncate">{name}</span>
                       {o === value ? (
                         <SchIcon
