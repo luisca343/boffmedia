@@ -11,7 +11,11 @@ import { writePrefab } from "./prefab-writer";
 
 export type ExportFormat = "schem" | "schem3" | "litematic" | "nbt" | "prefab";
 
-export function exportStructure(structure: SchematicStructure, format: ExportFormat): Uint8Array {
+// Most formats return an in-memory byte buffer; `prefab` returns a streamed Blob
+// (its dense document can be multiple GB, so it's never fully resident — see
+// {@link writePrefab}). The worker wraps a Uint8Array in a Blob and passes a Blob
+// straight through.
+export function exportStructure(structure: SchematicStructure, format: ExportFormat): Uint8Array | Blob {
   switch (format) {
     case "schem":
       return writeSchem(structure, 2);

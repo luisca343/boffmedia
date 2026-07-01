@@ -93,9 +93,16 @@ function metadataCompound(structure: SchematicStructure): Tag {
   });
 }
 
+/** Rough NBT buffer size so a large export sizes its buffer once: block bytes
+ *  dominate; palette strings + entities add a bounded per-entry margin. */
+function capacityHint(structure: SchematicStructure, blockBytes: Uint8Array): number {
+  return blockBytes.length + structure.palette.length * 96 + 64 * 1024;
+}
+
 function writeSchemV2(structure: SchematicStructure): Uint8Array {
   const { x: width, y: height, z: length } = structure.dimensions;
   const off = offsetOf(structure);
+  const blockBytes = encodeVarintArray(structure.blockData);
   const root: Record<string, Tag> = {
     Version: Int(2),
     DataVersion: Int(dataVersionOf(structure)),
@@ -105,11 +112,11 @@ function writeSchemV2(structure: SchematicStructure): Uint8Array {
     Offset: IntArr(Int32Array.of(off.x, off.y, off.z)),
     PaletteMax: Int(structure.palette.length),
     Palette: paletteCompound(structure),
-    BlockData: ByteArr(encodeVarintArray(structure.blockData)),
+    BlockData: ByteArr(blockBytes),
     BlockEntities: List(NBT_TAG.Compound, blockEntitiesV2(structure)),
     Metadata: metadataCompound(structure),
   };
-  return encodeNBT(root);
+  return encodeNBT(root, { initialCapacity: capacityHint(structure, blockBytes) });
 }
 
 function writeSchemV3(structure: SchematicStructure): Uint8Array {
@@ -117,9 +124,10 @@ function writeSchemV3(structure: SchematicStructure): Uint8Array {
   const off = offsetOf(structure);
   // v3 nests block fields under `Blocks` and wraps the whole document in a
   // `Schematic` compound at the (unnamed) root.
+  const blockBytes = encodeVarintArray(structure.blockData);
   const blocks = Compound({
     Palette: paletteCompound(structure),
-    Data: ByteArr(encodeVarintArray(structure.blockData)),
+    Data: ByteArr(blockBytes),
     BlockEntities: List(NBT_TAG.Compound, blockEntitiesV3(structure)),
   });
   const schematic = Compound({
@@ -132,7 +140,7 @@ function writeSchemV3(structure: SchematicStructure): Uint8Array {
     Blocks: blocks,
     Metadata: metadataCompound(structure),
   });
-  return encodeNBT({ Schematic: schematic });
+  return encodeNBT({ Schematic: schematic }, { initialCapacity: capacityHint(structure, blockBytes) });
 }
 
 export function writeSchem(structure: SchematicStructure, version: 2 | 3 = 2): Uint8Array {

@@ -28,7 +28,7 @@ export class MinecraftAdapter implements GameAdapter {
     return loadSchematicFile(file);
   }
 
-  export(structure: SchematicStructure, format: ExportFormat): Uint8Array {
+  export(structure: SchematicStructure, format: ExportFormat): Uint8Array | Blob {
     return exportStructure(structure, format);
   }
 }

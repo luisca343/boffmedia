@@ -370,7 +370,10 @@ function CameraRig({ dimensions }: { dimensions: { x: number; y: number; z: numb
     const dist = span * 2.2;
     camera.position.set(sx / 2 + dist * 0.55, sy / 2 + dist * 0.45, sz / 2 + dist * 0.85);
     if (camera instanceof THREE.PerspectiveCamera) {
-      camera.near = 0.1;
+      // Scale near with the schematic size: a fixed 0.1 near against a far plane
+      // sized for a 500-block span crushes depth precision and z-fights the whole
+      // surface. Keep near ≥ 0.1 for small builds.
+      camera.near = Math.max(0.1, span * 0.02);
       camera.far = dist * 20;
       camera.updateProjectionMatrix();
     }

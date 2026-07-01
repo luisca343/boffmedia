@@ -196,50 +196,115 @@ const api: CompatWorkerAPI = {
   },
 
   async getSchematicBlockPositions(schematicId: string): Promise<BlockPositionGroup[]> {
-    const MAX_INSTANCES = 600_000;
+    // Past this many *renderable* (non-air) blocks we drop fully-enclosed interior
+    // cells and keep only the visible surface — a 500³ solid build is 125M blocks
+    // but only ~1.5M surface cells, so this is what makes very large schematics
+    // both fit in memory and render as a recognisable shape instead of a decimated
+    // point cloud. Below it, every block is kept so the Y-layer slider can peel
+    // through solid interiors.
+    const CULL_THRESHOLD = 1_500_000;
+    // Hard cap on instances handed to the GPU; if the surface itself is larger we
+    // stride within each block group as a last resort.
+    const MAX_INSTANCES = 2_000_000;
+
     const structure = schematics.get(schematicId);
     if (!structure) throw new Error(`Schematic not found: ${schematicId}`);
     const { x: sx, y: sy, z: sz } = structure.dimensions;
+    const data = structure.blockData;
+    const palLen = structure.palette.length;
+    const sxsz = sx * sz;
 
-    // Build per-palette arrays. Outer loop is yi so positions are Y-sorted
-    // within each group — enables binary-search Y-layer cutoff in the UI.
-    const posArrays: number[][] = structure.palette.map(() => []);
+    // air (or out-of-range) palette indices → treated as empty space.
+    const airFlags = new Uint8Array(palLen);
+    for (let i = 0; i < palLen; i++) {
+      const id = structure.palette[i].id;
+      if (id === "air" || id.endsWith(":air")) airFlags[i] = 1;
+    }
+    // A neighbour cell is "open" when it's air or an invalid index (undefined
+    // airFlags lookup → NaN-ish, so `!== 0` covers both air and out-of-range).
+    const open = (li: number): boolean => airFlags[data[li]] !== 0;
+    // A cell is on the visible surface when it touches the volume edge or any of
+    // its six neighbours is open. Interior cells (all neighbours solid) are hidden
+    // anyway, so dropping them changes nothing you could see from outside.
+    const exposed = (xi: number, yi: number, zi: number, li: number): boolean =>
+      xi === 0 || yi === 0 || zi === 0 || xi === sx - 1 || yi === sy - 1 || zi === sz - 1 ||
+      open(li - 1) || open(li + 1) ||
+      open(li - sx) || open(li + sx) ||
+      open(li - sxsz) || open(li + sxsz);
+
+    // Pass A — count renderable blocks; decides whether interior culling kicks in.
+    let nonAir = 0;
+    for (let li = 0; li < data.length; li++) {
+      if (airFlags[data[li]] === 0) nonAir++;
+    }
+    const cull = nonAir > CULL_THRESHOLD;
+
+    // Pass B — count kept instances per palette index (Y-outer so the fill pass
+    // writes Y-sorted positions, which the UI's layer cutoff binary-searches).
+    const counts = new Uint32Array(palLen);
     for (let yi = 0; yi < sy; yi++) {
       for (let zi = 0; zi < sz; zi++) {
+        const row = (yi * sz + zi) * sx;
         for (let xi = 0; xi < sx; xi++) {
-          const li = (yi * sz + zi) * sx + xi;
-          const pi = structure.blockData[li];
-          if (pi < 0 || pi >= structure.palette.length) continue;
-          const { id } = structure.palette[pi];
-          if (id.endsWith(":air") || id === "air") continue;
-          posArrays[pi].push(xi, yi, zi);
+          const li = row + xi;
+          const pi = data[li];
+          if (airFlags[pi] !== 0) continue; // air / invalid
+          if (cull && !exposed(xi, yi, zi, li)) continue;
+          counts[pi]++;
         }
       }
     }
 
-    const totalInstances = posArrays.reduce((s, a) => s + a.length / 3, 0);
-    const stride = totalInstances > MAX_INSTANCES ? Math.ceil(totalInstances / MAX_INSTANCES) : 1;
+    let total = 0;
+    for (let i = 0; i < palLen; i++) total += counts[i];
+    const stride = total > MAX_INSTANCES ? Math.ceil(total / MAX_INSTANCES) : 1;
 
-    return structure.palette
-      .map((block, i) => {
-        const src = posArrays[i];
-        if (src.length === 0) return null;
+    // Exact-size typed arrays, no boxed number[][] intermediates (the old path
+    // allocated ~3 JS numbers per block — gigabytes on a large solid schematic).
+    const buffers: (Float32Array | null)[] = new Array(palLen).fill(null);
+    for (let i = 0; i < palLen; i++) {
+      if (counts[i] > 0) buffers[i] = new Float32Array(counts[i] * 3);
+    }
+    const cursor = new Uint32Array(palLen);
 
-        let positions: Float32Array;
-        if (stride > 1) {
-          const count = src.length / 3;
-          const kept: number[] = [];
-          for (let j = 0; j < count; j += stride) {
-            kept.push(src[j * 3], src[j * 3 + 1], src[j * 3 + 2]);
-          }
-          positions = new Float32Array(kept);
-        } else {
-          positions = new Float32Array(src);
+    // Pass C — fill positions.
+    for (let yi = 0; yi < sy; yi++) {
+      for (let zi = 0; zi < sz; zi++) {
+        const row = (yi * sz + zi) * sx;
+        for (let xi = 0; xi < sx; xi++) {
+          const li = row + xi;
+          const pi = data[li];
+          if (airFlags[pi] !== 0) continue;
+          if (cull && !exposed(xi, yi, zi, li)) continue;
+          const buf = buffers[pi]!;
+          const c = cursor[pi];
+          buf[c] = xi;
+          buf[c + 1] = yi;
+          buf[c + 2] = zi;
+          cursor[pi] = c + 3;
         }
+      }
+    }
 
-        return { paletteIndex: i, block, positions };
-      })
-      .filter((g): g is BlockPositionGroup => g !== null && g.positions.length > 0);
+    const groups: BlockPositionGroup[] = [];
+    for (let i = 0; i < palLen; i++) {
+      const buf = buffers[i];
+      if (!buf || buf.length === 0) continue;
+      let positions = buf;
+      if (stride > 1) {
+        const n = buf.length / 3;
+        const kept = new Float32Array(Math.ceil(n / stride) * 3);
+        let w = 0;
+        for (let j = 0; j < n; j += stride) {
+          kept[w++] = buf[j * 3];
+          kept[w++] = buf[j * 3 + 1];
+          kept[w++] = buf[j * 3 + 2];
+        }
+        positions = kept;
+      }
+      groups.push({ paletteIndex: i, block: structure.palette[i], positions });
+    }
+    return groups;
   },
 
   // ── Phase 2 ───────────────────────────────────────────────────────────────
@@ -306,8 +371,10 @@ const api: CompatWorkerAPI = {
     // Drop any block still foreign to the target game (unmapped in a cross-game
     // conversion) so its source id never lands in the written file.
     const cleaned = stripForeignBlocks(structure, targetGame);
-    const bytes = getAdapter(targetGame).export(cleaned, format);
-    return new Blob([bytes as BlobPart], { type: "application/octet-stream" });
+    const out = getAdapter(targetGame).export(cleaned, format);
+    // A writer may stream straight to a Blob (large prefabs); pass it through
+    // rather than forcing its bytes back through a second in-memory copy.
+    return out instanceof Blob ? out : new Blob([out as BlobPart], { type: "application/octet-stream" });
   },
 
   async importRuleSet(json: string): Promise<RuleSet> {

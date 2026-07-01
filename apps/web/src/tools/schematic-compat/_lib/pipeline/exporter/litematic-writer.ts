@@ -24,37 +24,49 @@ import type { SchematicStructure, UnifiedBlock } from "../../types";
 
 const DEFAULT_DATA_VERSION = 3700; // 1.20.4
 const LITEMATIC_VERSION = 6;
-// BigInt literals (1n) require ES2020; this file is compiled for an older
-// target (matching the loader), so use the BigInt() constructor throughout.
-const MASK64 = (BigInt(1) << BigInt(64)) - BigInt(1);
 
 function dataVersionOf(structure: SchematicStructure): number {
   const dv = (structure.metadata as { dataVersion?: number }).dataVersion;
   return typeof dv === "number" && dv > 0 ? dv : DEFAULT_DATA_VERSION;
 }
 
-/** Bit-pack palette indices into a signed long array (split scheme). */
+/**
+ * Bit-pack palette indices into a signed long array (split scheme).
+ *
+ * The bitstream is packed LSB-first into 32-bit words (two per output long) using
+ * plain number ops, then folded to `BigInt64Array` once per long. The old path
+ * allocated a fresh `BigInt` for every block (mask/shift/or ≈ 5 bigints each) plus
+ * an `Array<bigint>` of every long — hundreds of MB of garbage and GC churn on a
+ * 500³ schematic (125M blocks). Here BigInt appears only `longCount` times.
+ * `bits` ≤ 32 and the intra-word offset ≤ 31, so each entry touches at most two
+ * consecutive 32-bit words — never three — which keeps the spill single-branch.
+ */
 function encodeBlockStates(blockData: Int32Array, paletteSize: number): BigInt64Array {
   const bits = paletteSize <= 1 ? 2 : Math.max(2, 32 - Math.clz32(paletteSize - 1));
-  const mask = (BigInt(1) << BigInt(bits)) - BigInt(1);
-  const longCount = Math.ceil((blockData.length * bits) / 64) || 1;
-  const work = new Array<bigint>(longCount).fill(BigInt(0));
+  const n = blockData.length;
+  const longCount = Math.ceil((n * bits) / 64) || 1;
+  const words = new Uint32Array(longCount * 2);
+  const mask = bits >= 32 ? 0xffffffff : (1 << bits) - 1;
 
-  for (let i = 0; i < blockData.length; i++) {
-    const val = BigInt(blockData[i]) & mask;
-    const startOffset = i * bits;
-    const startIdx = startOffset >> 6;
-    const endIdx = ((i + 1) * bits - 1) >> 6;
-    const startBit = BigInt(startOffset & 0x3f);
-
-    work[startIdx] = (work[startIdx] | (val << startBit)) & MASK64;
-    if (endIdx !== startIdx) {
-      work[endIdx] = (work[endIdx] | (val >> (BigInt(64) - startBit))) & MASK64;
+  for (let i = 0; i < n; i++) {
+    const v = (blockData[i] & mask) >>> 0;
+    const bit = i * bits;
+    const w = Math.floor(bit / 32);
+    const off = bit - w * 32; // 0..31
+    words[w] = (words[w] | (v << off)) >>> 0;
+    if (off + bits > 32) {
+      // off > 0 here (bits ≤ 32), so 32 - off is a valid 1..31 shift.
+      words[w + 1] = (words[w + 1] | (v >>> (32 - off))) >>> 0;
     }
   }
 
   const longs = new BigInt64Array(longCount);
-  for (let i = 0; i < longCount; i++) longs[i] = BigInt.asIntN(64, work[i]);
+  const shift32 = BigInt(32);
+  for (let i = 0; i < longCount; i++) {
+    const lo = BigInt(words[i * 2]);
+    const hi = BigInt(words[i * 2 + 1]);
+    longs[i] = BigInt.asIntN(64, (hi << shift32) | lo);
+  }
   return longs;
 }
 
@@ -70,13 +82,16 @@ function paletteEntry(block: UnifiedBlock): Tag {
 }
 
 function countNonAir(structure: SchematicStructure): number {
-  const airIndices = new Set<number>();
+  // Flag lookup by palette index — a byte array beats a Set<number> across the
+  // tens of millions of cells a large schematic iterates.
+  const airFlags = new Uint8Array(structure.palette.length);
   structure.palette.forEach((b, i) => {
-    if (b.id === "minecraft:air" || b.id.endsWith(":air") || b.id === "air") airIndices.add(i);
+    if (b.id === "minecraft:air" || b.id.endsWith(":air") || b.id === "air") airFlags[i] = 1;
   });
+  const data = structure.blockData;
   let n = 0;
-  for (let i = 0; i < structure.blockData.length; i++) {
-    if (!airIndices.has(structure.blockData[i])) n++;
+  for (let i = 0; i < data.length; i++) {
+    if (airFlags[data[i]] === 0) n++;
   }
   return n;
 }
@@ -104,11 +119,13 @@ export function writeLitematic(structure: SchematicStructure): Uint8Array {
     return Compound(fields);
   });
 
+  const blockStates = encodeBlockStates(structure.blockData, structure.palette.length);
+
   const region: Record<string, Tag> = {
     Position: Compound({ x: Int(0), y: Int(0), z: Int(0) }),
     Size: Compound({ x: Int(width), y: Int(height), z: Int(length) }),
     BlockStatePalette: List(NBT_TAG.Compound, structure.palette.map(paletteEntry)),
-    BlockStates: LongArr(encodeBlockStates(structure.blockData, structure.palette.length)),
+    BlockStates: LongArr(blockStates),
     TileEntities: List(NBT_TAG.Compound, tileEntityTags),
     Entities: List(NBT_TAG.Compound, []),
     PendingBlockTicks: List(NBT_TAG.Compound, []),
@@ -132,5 +149,8 @@ export function writeLitematic(structure: SchematicStructure): Uint8Array {
     Regions: Compound({ main: Compound(region) }),
   };
 
-  return encodeNBT(root);
+  // Bit-packed BlockStates dominate the file; size the buffer for them up front.
+  return encodeNBT(root, {
+    initialCapacity: blockStates.length * 8 + structure.palette.length * 96 + 64 * 1024,
+  });
 }
