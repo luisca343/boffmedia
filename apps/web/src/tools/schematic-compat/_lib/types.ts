@@ -1,4 +1,5 @@
 import type { CompiledModel } from "./model/types";
+import type { VariantRotation } from "./model/rotation-tuple";
 
 export interface UnifiedBlock {
   id: string;
@@ -10,11 +11,45 @@ export interface UnifiedBlock {
   modId?: string;
 }
 
+/**
+ * One resolved connection shape of a Hytale connected block: the concrete block
+ * to place plus, when that shape is a `State.Definition` of the base block, its
+ * `state` label. Iron bars, for example, model their corner as a *separate*
+ * block (`Deco_Iron_Bars_Corner`, no state) while their T/Cross are states of
+ * the base block — so both an id swap and a state label have to be expressible.
+ */
+export interface ConnectionVariant {
+  id: string;
+  state?: string;
+}
+
 export interface BlockDefinition {
   id: string;
   validStates: Record<string, string[]>;
   defaultState: Record<string, string>;
   tags: string[];
+  /**
+   * Hytale blocks only: the block's `BlockType.VariantRotation` type, which
+   * determines its legal placement `rotation` indices. Consumed by the
+   * cross-game rotation bridge to normalise a converted orientation into the set
+   * this block actually accepts (see `_lib/model/rotation-tuple.ts`).
+   */
+  variantRotation?: VariantRotation;
+  /**
+   * Hytale connected blocks only (fences / bars / walls whose `BlockType`
+   * carries a `WallConnectedBlockTemplate` `ConnectedBlockRuleSet`): the concrete
+   * block + state each connection shape resolves to. The cross-game bridge bakes
+   * the resolved variant into a converted prefab, because Hytale only recomputes
+   * connections on live placement — never on a bulk prefab paste (same reason
+   * stair corners are baked in). `corner`/`t`/`cross` are absent when the block
+   * doesn't model that shape.
+   */
+  connections?: {
+    straight: ConnectionVariant;
+    corner?: ConnectionVariant;
+    t?: ConnectionVariant;
+    cross?: ConnectionVariant;
+  };
 }
 
 export interface ModInfo {

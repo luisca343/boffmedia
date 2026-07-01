@@ -1,7 +1,8 @@
-import type { BlockRegistry, BlockDefinition, ProgressCb } from "../../types";
+import type { BlockRegistry, BlockDefinition, ConnectionVariant, ProgressCb } from "../../types";
 import { readZipEntries, extractZipEntry, type ZipEntry } from "../../parsers/zip-central";
 import { compileBlockyModel, pngDimensions, type BlockyModel } from "../../model/blockymodel";
 import type { CompiledModel } from "../../model/types";
+import { asVariantRotation, VARIANT_LEGAL_INDICES, type VariantRotation } from "../../model/rotation-tuple";
 import crossGameTable from "../rules/cross-game/minecraft-hytale.json";
 
 const ICON_PREFIX = "Common/Icons/ItemsGenerated/";
@@ -9,13 +10,21 @@ const TEX_PREFIX = "Common/BlockTextures/";
 const ITEM_DEF_PREFIX = "Server/Item/Items/";
 /** `.blockymodel` / `.png` paths in item defs are relative to the `Common/` root. */
 const COMMON_PREFIX = "Common/";
+/** Shared half-block shape. Many `*_Half` slabs are authored with `DrawType:
+ *  "None"` and no `CustomModel` (the game applies this shape by convention); we
+ *  synthesise it so they render as slabs rather than full-cube fallbacks. */
+const HALF_BLOCK_MODEL = "Blocks/Structures/Base_Shapes/HalfBlock.blockymodel";
 /** Extract eagerly in batches so the event loop stays responsive. */
 const SCAN_CONCURRENCY = 64;
-/** Every legal placement `rotation` index (see `blockRotationQuat`) — permissive
- *  on purpose, since legality actually depends on the block's VariantRotation
- *  type, which we don't model here; this just keeps `transformStates` from
- *  dropping the key outright when converting into Hytale. */
-const ROTATION_VALUES = Array.from({ length: 12 }, (_, i) => String(i));
+
+/** The legal placement `rotation` indices for a block's `VariantRotation`, as
+ *  strings for `validStates`. A block with no (or `None`) variant is not
+ *  rotatable, so it gets no `rotation` key at all — `transformStates` then drops
+ *  any incoming rotation instead of stamping an orientation onto a fixed block. */
+function rotationValues(variant: VariantRotation | undefined): string[] | undefined {
+  if (!variant || variant === "None") return undefined;
+  return VARIANT_LEGAL_INDICES[variant].map(String);
+}
 
 /** The `BlockType` block of a Hytale item definition (only the fields we use). */
 interface BlockTypeDef {
@@ -24,6 +33,51 @@ interface BlockTypeDef {
   CustomModelTexture?: Array<{ Texture?: string; Weight?: number }>;
   State?: { Definitions?: Record<string, { CustomModel?: string; CustomModelTexture?: Array<{ Texture?: string }> }> };
   Textures?: Array<Record<string, unknown>>;
+  VariantRotation?: string;
+  ConnectedBlockRuleSet?: {
+    Type?: string;
+    TemplateShapeAssetId?: string;
+    TemplateShapeBlockPatterns?: Record<string, unknown>;
+  };
+}
+
+/** Marker in a connected-block pattern name that denotes a `State.Definition`. */
+const STATE_DEF_MARKER = "_State_Definitions_";
+
+/**
+ * A `TemplateShapeBlockPatterns` value → a {@link ConnectionVariant}. A value is
+ * either a plain block name (`Deco_Iron_Bars_Corner` — a separate block) or a
+ * `*Base_State_Definitions_Label` reference (a state variant of the base block).
+ * Non-string patterns (weighted `BlockPattern` lists) are ignored — every real
+ * fence / bar / wall names a single block per shape.
+ */
+function parseConnectionVariant(pattern: unknown): ConnectionVariant | undefined {
+  if (typeof pattern !== "string" || pattern.length === 0) return undefined;
+  const name = pattern.startsWith("*") ? pattern.slice(1) : pattern;
+  const marker = name.indexOf(STATE_DEF_MARKER);
+  if (marker >= 0) {
+    return { id: `hytale:${name.slice(0, marker)}`, state: name.slice(marker + STATE_DEF_MARKER.length) };
+  }
+  return { id: `hytale:${name}` };
+}
+
+/**
+ * The connection shapes of a `WallConnectedBlockTemplate` block, or `undefined`
+ * for a non-connected block. `id` is the base block's own id (the `Straight`
+ * shape defaults to it when the pattern is missing).
+ */
+function parseConnections(bt: BlockTypeDef, id: string): BlockDefinition["connections"] {
+  const crs = bt.ConnectedBlockRuleSet;
+  if (crs?.Type !== "CustomTemplate" || crs.TemplateShapeAssetId !== "WallConnectedBlockTemplate") {
+    return undefined;
+  }
+  const p = crs.TemplateShapeBlockPatterns ?? {};
+  return {
+    straight: parseConnectionVariant(p.Straight) ?? { id },
+    corner: parseConnectionVariant(p.Corner),
+    t: parseConnectionVariant(p.T_Junction),
+    cross: parseConnectionVariant(p.Cross_Junction),
+  };
 }
 
 /** A Hytale item definition (`Server/Item/Items/**\/*.json`). */
@@ -157,6 +211,12 @@ export async function buildHytaleRegistry(
   // getTexture never has to guess.
   const ownIcon = new Map<string, string>();
   const ownTexture = new Map<string, string>();
+  // The block's actual rendered face texture, as a full `Common/`-relative path
+  // taken from `BlockType.CustomModelTexture` (structural blocks — slabs, walls,
+  // etc. — keep their texture here, not in `Textures`). Preferred over the
+  // inventory icon so a modelless block's cube fallback shows the real block
+  // texture instead of its item-icon render.
+  const ownModelTexture = new Map<string, string>();
 
   const names = [...itemDefEntries.keys()];
   let scanned = 0;
@@ -168,7 +228,16 @@ export async function buildHytaleRegistry(
         if (def?.BlockType) {
           const id = `hytale:${name}`;
           const stateLabels = def.BlockType.State?.Definitions ? Object.keys(def.BlockType.State.Definitions) : [];
-          const validStates: Record<string, string[]> = { rotation: ROTATION_VALUES };
+          const variant = asVariantRotation(def.BlockType.VariantRotation);
+          const connections = parseConnections(def.BlockType, id);
+          const validStates: Record<string, string[]> = {};
+          // A connected block's resolved shape variants (corner/T/cross) are
+          // placed at any of the four cardinal yaws regardless of the base block's
+          // VariantRotation (iron bars declare `Wall` but their T/Cross states are
+          // stored at rotation 0–3) — so widen the legal rotation set to NESW, or
+          // transformStates would drop a baked corner/T rotation of 2 or 3.
+          const rotations = connections ? VARIANT_LEGAL_INDICES.NESW.map(String) : rotationValues(variant);
+          if (rotations) validStates.rotation = rotations;
           const defaultState: Record<string, string> = {};
           if (stateLabels.length > 0) {
             validStates.state = stateLabels;
@@ -178,10 +247,12 @@ export async function buildHytaleRegistry(
             // e.g. every straight stair with a "Corner_Left" state).
             defaultState.state = "";
           }
-          blocks.set(id, { id, validStates, defaultState, tags: [] });
+          blocks.set(id, { id, validStates, defaultState, tags: [], variantRotation: variant, connections });
           if (def.Icon) ownIcon.set(name, baseName(def.Icon, "Icons/ItemsGenerated/"));
           const texVal = firstTextureValue(def.BlockType.Textures?.[0]);
           if (texVal) ownTexture.set(name, baseName(texVal, "BlockTextures/"));
+          const cmTex = def.BlockType.CustomModelTexture?.[0]?.Texture;
+          if (cmTex) ownModelTexture.set(name, cmTex);
         }
       })
     );
@@ -191,7 +262,17 @@ export async function buildHytaleRegistry(
 
   for (const target of crossGameTargets()) {
     const id = `hytale:${target}`;
-    if (!blocks.has(id)) blocks.set(id, { id, validStates: { rotation: ROTATION_VALUES }, defaultState: {}, tags: [] });
+    // Force-injected targets aren't in this install, so their real variant is
+    // unknown — keep rotation permissive (All) so a bridged orientation survives.
+    if (!blocks.has(id)) {
+      blocks.set(id, {
+        id,
+        validStates: { rotation: VARIANT_LEGAL_INDICES.All.map(String) },
+        defaultState: {},
+        tags: [],
+        variantRotation: "All",
+      });
+    }
   }
 
   onProgress(72, "Building block catalog…");
@@ -205,11 +286,18 @@ export async function buildHytaleRegistry(
     const name = blockId.startsWith("hytale:") ? blockId.slice("hytale:".length) : blockId;
     const cached = textureCache.get(name);
     if (cached !== undefined) return cached;
-    // Block face textures render better as cube faces than inventory icon renders.
+    // Prefer the block's real face texture; the inventory icon is a last resort
+    // (a modelless block otherwise renders its cube fallback with the item icon).
+    // Only a flat `BlockTextures/` face texture is used as a single tile — a
+    // model's packed atlas (e.g. `.../Stairs_Textures/*.png`) wouldn't tile
+    // sensibly, so those blocks fall through to the existing lookup / icon.
+    const modelTex = ownModelTexture.get(name);
+    const faceTex = modelTex?.startsWith("BlockTextures/") ? modelTex : undefined;
     const entry =
+      (faceTex ? entryByName.get(COMMON_PREFIX + faceTex) : undefined) ??
       texEntries.get(ownTexture.get(name) ?? name) ??
-      iconEntries.get(ownIcon.get(name) ?? name) ??
       texEntries.get(name) ??
+      iconEntries.get(ownIcon.get(name) ?? name) ??
       iconEntries.get(name);
     if (!entry) {
       textureCache.set(name, null);
@@ -244,9 +332,13 @@ export async function buildHytaleRegistry(
     const compile = async (): Promise<CompiledModel | null> => {
       const def = await loadDef(name);
       if (!def?.BlockType) return null;
-      // A state variant may override the model; fall back to the base block model.
+      // A state variant may override the model; fall back to the base block model,
+      // then to the shared half-block shape for modelless `*_Half` slabs.
       const stateDef = stateLabel ? def.BlockType.State?.Definitions?.[stateLabel] : undefined;
-      const modelPath = stateDef?.CustomModel ?? def.BlockType.CustomModel;
+      const modelPath =
+        stateDef?.CustomModel ??
+        def.BlockType.CustomModel ??
+        (name.endsWith("_Half") ? HALF_BLOCK_MODEL : undefined);
       if (!modelPath) return null;
       const texPath = stateDef?.CustomModelTexture?.[0]?.Texture ?? def.BlockType.CustomModelTexture?.[0]?.Texture;
       if (!texPath) return null;

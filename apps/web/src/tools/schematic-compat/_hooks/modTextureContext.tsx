@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useRef, type ReactNode } from "react";
 import type { CompiledModel } from "../_lib/model/types";
+import type { BlockDefinition } from "../_lib/types";
 
 /** Loads a block's mod texture (data URL) from a worker-held registry, or null. */
 type ModTextureLoader = (registryId: string, blockId: string) => Promise<string | null>;
@@ -14,8 +15,15 @@ type ModelLoader = (
   rotation?: number,
 ) => Promise<CompiledModel | null>;
 
+/** Loads a connected block's shape → variant map, or null when it isn't one. */
+type ConnectionsLoader = (
+  registryId: string,
+  blockId: string,
+) => Promise<BlockDefinition["connections"] | null>;
+
 const ModTextureContext = createContext<ModTextureLoader | null>(null);
 const ModelContext = createContext<ModelLoader | null>(null);
+const ConnectionsContext = createContext<ConnectionsLoader | null>(null);
 
 interface ProviderProps {
   /**
@@ -26,6 +34,8 @@ interface ProviderProps {
   getBlockTexture: ModTextureLoader | null;
   /** Fetches a block's compiled shaped model from the worker (same proxy caveat). */
   getBlockModel: ModelLoader | null;
+  /** Fetches a block's connection-shape map from the worker (same proxy caveat). */
+  getBlockConnections: ConnectionsLoader | null;
   children: ReactNode;
 }
 
@@ -35,9 +45,10 @@ interface ProviderProps {
  * rows / re-renders crosses the worker boundary once. Registry ids are unique per
  * scan, so the cache never goes stale within a worker's lifetime.
  */
-export function ModTextureProvider({ getBlockTexture, getBlockModel, children }: ProviderProps) {
+export function ModTextureProvider({ getBlockTexture, getBlockModel, getBlockConnections, children }: ProviderProps) {
   const texCache = useRef(new Map<string, Promise<string | null>>());
   const modelCache = useRef(new Map<string, Promise<CompiledModel | null>>());
+  const connCache = useRef(new Map<string, Promise<BlockDefinition["connections"] | null>>());
 
   const loadTexture = useCallback<ModTextureLoader>(
     (registryId, blockId) => {
@@ -67,9 +78,25 @@ export function ModTextureProvider({ getBlockTexture, getBlockModel, children }:
     [getBlockModel],
   );
 
+  const loadConnections = useCallback<ConnectionsLoader>(
+    (registryId, blockId) => {
+      if (!getBlockConnections) return Promise.resolve(null);
+      const key = `${registryId}:${blockId}`;
+      let pending = connCache.current.get(key);
+      if (!pending) {
+        pending = getBlockConnections(registryId, blockId).catch(() => null);
+        connCache.current.set(key, pending);
+      }
+      return pending;
+    },
+    [getBlockConnections],
+  );
+
   return (
     <ModTextureContext.Provider value={loadTexture}>
-      <ModelContext.Provider value={loadModel}>{children}</ModelContext.Provider>
+      <ModelContext.Provider value={loadModel}>
+        <ConnectionsContext.Provider value={loadConnections}>{children}</ConnectionsContext.Provider>
+      </ModelContext.Provider>
     </ModTextureContext.Provider>
   );
 }
@@ -80,4 +107,8 @@ export function useModTextureLoader(): ModTextureLoader | null {
 
 export function useModelLoader(): ModelLoader | null {
   return useContext(ModelContext);
+}
+
+export function useConnectionsLoader(): ConnectionsLoader | null {
+  return useContext(ConnectionsContext);
 }
