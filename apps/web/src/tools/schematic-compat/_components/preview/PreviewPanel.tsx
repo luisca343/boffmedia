@@ -159,12 +159,12 @@ function LegendDot({ color, label, faded }: { color?: string; label: string; fad
 export function PreviewPanel() {
   const schematic = useToolStore((s) => s.schematic);
   const layerY = useToolStore((s) => s.layerY);
-  const diffOnlyMode = useToolStore((s) => s.diffOnlyMode);
+  const hideUnchanged = useToolStore((s) => s.hideUnchanged);
   const selectedBlockId = useToolStore((s) => s.selectedBlockId);
   const previewMode = useToolStore((s) => s.previewMode);
   const diff = useToolStore((s) => s.diff);
   const setLayerY = useToolStore((s) => s.setLayerY);
-  const setDiffOnlyMode = useToolStore((s) => s.setDiffOnlyMode);
+  const setHideUnchanged = useToolStore((s) => s.setHideUnchanged);
   const setPreviewMode = useToolStore((s) => s.setPreviewMode);
 
   const rootRef = useRef<HTMLDivElement>(null);
@@ -192,9 +192,15 @@ export function PreviewPanel() {
         <span className="font-mono text-[10px] tracking-[0.14em] uppercase text-ink-muted font-bold">Vista previa</span>
         <ModeSwitch mode={previewMode} convertedEnabled={!!diff} onChange={setPreviewMode} />
         <div className="flex-1" />
-        <PreviewButton on={diffOnlyMode} onClick={() => setDiffOnlyMode(!diffOnlyMode)}>
-          Solo diff
-        </PreviewButton>
+        {resultView && (
+          <PreviewButton
+            on={hideUnchanged}
+            onClick={() => setHideUnchanged(!hideUnchanged)}
+            title="Oculta los bloques sin cambios para ver solo lo convertido"
+          >
+            Solo cambios
+          </PreviewButton>
+        )}
         <PreviewButton
           onClick={toggleFullscreen}
           disabled={!schematic}
