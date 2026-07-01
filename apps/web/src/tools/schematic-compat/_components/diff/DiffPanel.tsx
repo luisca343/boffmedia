@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useTranslations } from "next-intl";
 import { BoffButton } from "@/components/boffmedia/primitives/button";
 import {
   SchIcon,
   FilterChips,
   MappingCard,
   BulkRulesSheet,
-  STATUS_META,
   type SchStatus,
   type SchDiffEntry,
   type SchRing,
@@ -17,15 +17,17 @@ import { useToolStore } from "../../_store/tool.store";
 import type { DiffEntry } from "../../_lib/types";
 import { BlockThumb, type PreviewRow } from "./BlockThumb";
 
-// Missing and mod-only are merged into a single red "Ausentes" group (mod-only
+// Missing and mod-only are merged into a single red "missing" group (mod-only
 // rows carry a "mod" pill), so mod-only is bucketed under "missing".
 const GROUP_ORDER: SchStatus[] = ["missing", "state-changed", "renamed", "safe"];
-const GROUP_LABEL: Record<SchStatus, string> = {
-  missing: "Ausentes",
-  "mod-only": "Ausentes",
-  "state-changed": "Estados cambiados",
-  renamed: "Renombrados",
-  safe: "Compatibles",
+
+/** Maps an engine status to its `diff.*` translation key. */
+const STATUS_KEY: Record<SchStatus, string> = {
+  safe: "diff.safe",
+  renamed: "diff.renamed",
+  "state-changed": "diff.stateChanged",
+  missing: "diff.missing",
+  "mod-only": "diff.missing",
 };
 
 /** Collapse mod-only into the missing bucket for grouping + filtering. */
@@ -48,10 +50,10 @@ function remapSuffix(blockId: string, targetSet: Set<string>): string | null {
 }
 
 /** Rows shown in a source block's hover-preview card: status, count, then states. */
-function previewRowsFor(e: DiffEntry): PreviewRow[] {
+function previewRowsFor(e: DiffEntry, t: (key: string) => string): PreviewRow[] {
   const rows: PreviewRow[] = [
-    { label: "Estado", value: STATUS_META[e.status].label },
-    { label: "Instancias", value: e.instanceCount.toLocaleString() },
+    { label: t("diff.statusLabel"), value: t(STATUS_KEY[e.status]) },
+    { label: t("diff.instancesLabel"), value: e.instanceCount.toLocaleString() },
   ];
   for (const [k, v] of Object.entries(e.block.states ?? {})) {
     rows.push({ label: k, value: String(v) });
@@ -71,6 +73,7 @@ function toSchEntry(e: DiffEntry): SchDiffEntry {
 }
 
 export function DiffPanel() {
+  const t = useTranslations("games.minecraft.schematicCompat");
   const diff = useToolStore((s) => s.diff);
   const isAnalyzing = useToolStore((s) => s.isAnalyzing);
   const targetBlockIds = useToolStore((s) => s.targetBlockIds);
@@ -162,26 +165,20 @@ export function DiffPanel() {
     return (
       <div className="m-4 p-[2.5rem_1.5rem] border-[1.5px] border-dashed border-edge rounded-[var(--radius-lg)] text-center text-ink-dim flex flex-col items-center gap-[0.7rem]">
         <SchIcon name="layers" size={34} className="text-ink-dim opacity-70" />
-        <h3 className="font-display text-[length:var(--t-lg)] text-ink-muted">Sin análisis todavía</h3>
+        <h3 className="font-display text-[length:var(--t-lg)] text-ink-muted">{t("diff.emptyTitle")}</h3>
         <p className="text-[length:var(--t-sm)] max-w-[34ch]">
-          {isAnalyzing ? (
-            "Analizando compatibilidad…"
-          ) : (
-            <>
-              Configura los entornos y el esquema, luego pulsa <strong>Analizar</strong> para ver el diff de bloques.
-            </>
-          )}
+          {isAnalyzing ? t("diff.analyzing") : t("diff.emptyPrompt")}
         </p>
       </div>
     );
   }
 
   const chips = [
-    { key: "safe" as SchStatus, label: "Compatibles", count: diff.summary.safe },
-    { key: "renamed" as SchStatus, label: "Renombrados", count: diff.summary.renamed },
-    { key: "state-changed" as SchStatus, label: "Estados", count: diff.summary.stateChanged },
-    // Missing + mod-only are one red "Ausentes" category.
-    { key: "missing" as SchStatus, label: "Ausentes", count: diff.summary.missing + diff.summary.modOnly },
+    { key: "safe" as SchStatus, label: t("diff.safe"), count: diff.summary.safe },
+    { key: "renamed" as SchStatus, label: t("diff.renamed"), count: diff.summary.renamed },
+    { key: "state-changed" as SchStatus, label: t("diff.stateChanged"), count: diff.summary.stateChanged },
+    // Missing + mod-only are one red "missing" category.
+    { key: "missing" as SchStatus, label: t("diff.missing"), count: diff.summary.missing + diff.summary.modOnly },
   ];
 
   return (
@@ -195,7 +192,7 @@ export function DiffPanel() {
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Buscar bloque…"
+              placeholder={t("diff.searchPlaceholder")}
               className="w-full font-body text-[length:var(--t-sm)] text-ink bg-layer-2 border border-edge-strong rounded-[var(--btn-radius)] pl-8 pr-[0.9rem] py-2 transition-[border-color] duration-[var(--dur)] ease-[var(--ease)] placeholder:text-ink-dim hover:border-[color-mix(in_srgb,var(--text)_28%,transparent)] focus:outline-none focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-soft)]"
             />
           </div>
@@ -210,12 +207,12 @@ export function DiffPanel() {
                 : "border-edge-strong bg-layer-2 text-ink-muted hover:text-ink")
             }
           >
-            {showSafe ? "Ocultar seguros" : "Ver seguros"}
+            {showSafe ? t("diff.hideSafe") : t("diff.showSafe")}
           </button>
           {unresolved > 0 ? (
             <BoffButton variant="ghost" size="sm" onClick={() => setSheet(true)} className="shrink-0">
               <SchIcon name="layers" size={16} />
-              Reglas en lote
+              {t("diff.bulkRules")}
               <span className="ml-0.5 py-[0.05rem] px-[0.4rem] rounded-[var(--radius-pill)] bg-layer-2 text-ink-muted font-mono text-[10px]">
                 {unresolved}
               </span>
@@ -228,14 +225,14 @@ export function DiffPanel() {
       <div ref={listRef} className="flex-1 min-h-0 overflow-y-auto p-[0.85rem] flex flex-col gap-[1.1rem]">
         {groups.length === 0 ? (
           <div className="my-4 text-center text-[length:var(--t-sm)] text-ink-dim">
-            Ningún bloque coincide con el filtro.
+            {t("diff.noMatching")}
           </div>
         ) : (
           groups.map((group) => {
             return (
               <section key={group.status} className="flex flex-col gap-[0.5rem]">
                 <div className="flex items-center gap-2 font-mono text-[10px] tracking-[0.12em] uppercase text-ink-dim font-bold">
-                  {GROUP_LABEL[group.status]}
+                  {t(STATUS_KEY[group.status])}
                   <span className="py-[0.05rem] px-[0.4rem] rounded-[var(--radius-pill)] bg-layer-2 text-ink-muted">
                     {group.entries.length}
                   </span>
@@ -259,7 +256,7 @@ export function DiffPanel() {
                           registryId={isSource ? sourceRegId : targetRegId}
                           size={size}
                           ringClassName={ring ? RING_CLASS[ring] : undefined}
-                          previewRows={isSource ? previewRowsFor(entry) : undefined}
+                          previewRows={isSource ? previewRowsFor(entry, t) : undefined}
                           // Always lazy: the replacement dropdown renders the whole
                           // target registry (thousands of blocks), so eager loading
                           // would fire thousands of texture fetches on open. Visible

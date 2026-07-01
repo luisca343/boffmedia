@@ -74,7 +74,20 @@
           "analyze": "Analizar",
           "rules": "Reglas de Mapeo",
           "import": "Importar",
-          "export": "Exportar"
+          "export": "Exportar",
+          "environments": "Entornos",
+          "source": "Origen",
+          "target": "Destino",
+          "schematicSection": "Esquema",
+          "analyzeCompat": "Analizar compatibilidad",
+          "analyzed": "Analizado ✓",
+          "scanningShort": "Escaneando…",
+          "pickHytaleShort": "Elegir carpeta / Assets.zip",
+          "pickInstanceShort": "Elegir instancia",
+          "reading": "leyendo registro…",
+          "noEnv": "Sin entorno seleccionado",
+          "loaded": "Cargado",
+          "dropHere": "Suelta tu esquema"
         },
         "diff": {
           "header": "Compatibilidad",
@@ -105,7 +118,17 @@
             "air": "→ Aire"
           },
           "bulkCancel": "Cancelar",
-          "bulkApply": "Aplicar"
+          "bulkApply": "Aplicar",
+          "emptyTitle": "Sin análisis todavía",
+          "statusLabel": "Estado",
+          "instancesLabel": "Instancias",
+          "replace": "Reemplazar",
+          "choose": "Elegir…",
+          "auto": "auto",
+          "clear": "limpiar",
+          "noResults": "Sin resultados",
+          "clearSelection": "Limpiar selección",
+          "close": "Cerrar"
         },
         "guide": {
           "title": "Cómo usar",
@@ -122,7 +145,25 @@
           "solid": "Sólido",
           "diffOnly": "Solo Diferencias",
           "wireframe": "Contorno",
-          "reset": "Reiniciar"
+          "reset": "Reiniciar",
+          "title": "Vista previa",
+          "loading3d": "Cargando motor 3D…",
+          "inspectorEmpty": "Selecciona un bloque del diff o de la vista 3D para inspeccionarlo.",
+          "modeSource": "Origen",
+          "modeResult": "Resultado",
+          "modeDiff": "Diff",
+          "modeDisabled": "Ejecuta Analizar para comparar",
+          "onlyChanges": "Solo cambios",
+          "onlyChangesHint": "Oculta los bloques sin cambios para ver solo lo convertido",
+          "fullscreen": "Pantalla completa",
+          "exitFullscreen": "Salir de pantalla completa",
+          "legendModified": "Modificado",
+          "legendUnresolved": "Sin resolver",
+          "legendUnchanged": "Sin cambios",
+          "resultCaption": "Vista del resultado convertido",
+          "selectedHighlighted": "Bloque seleccionado resaltado",
+          "clickToInspect": "Click en un bloque para inspeccionar",
+          "emptyCaption": "Vista 3D del esquema · WebGL"
         },
         "export": {
           "title": "Exportar",
@@ -130,7 +171,8 @@
           "exportButton": "Exportar",
           "importRules": "Importar Reglas",
           "exportRules": "Exportar Reglas",
-          "exporting": "Exportando…"
+          "exporting": "Exportando…",
+          "exportSchematic": "Exportar esquema"
         },
         "worker": {
           "connecting": "Conectando al motor de análisis...",

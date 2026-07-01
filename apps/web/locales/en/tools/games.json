@@ -74,7 +74,20 @@
           "analyze": "Analyze",
           "rules": "Mapping Rules",
           "import": "Import",
-          "export": "Export"
+          "export": "Export",
+          "environments": "Environments",
+          "source": "Source",
+          "target": "Target",
+          "schematicSection": "Schematic",
+          "analyzeCompat": "Analyze compatibility",
+          "analyzed": "Analyzed ✓",
+          "scanningShort": "Scanning…",
+          "pickHytaleShort": "Choose folder / Assets.zip",
+          "pickInstanceShort": "Choose instance",
+          "reading": "reading registry…",
+          "noEnv": "No environment selected",
+          "loaded": "Loaded",
+          "dropHere": "Drop your schematic"
         },
         "diff": {
           "header": "Compatibility",
@@ -105,7 +118,17 @@
             "air": "→ Air"
           },
           "bulkCancel": "Cancel",
-          "bulkApply": "Apply"
+          "bulkApply": "Apply",
+          "emptyTitle": "No analysis yet",
+          "statusLabel": "Status",
+          "instancesLabel": "Instances",
+          "replace": "Replace",
+          "choose": "Choose…",
+          "auto": "auto",
+          "clear": "clear",
+          "noResults": "No results",
+          "clearSelection": "Clear selection",
+          "close": "Close"
         },
         "guide": {
           "title": "How to use",
@@ -122,7 +145,25 @@
           "solid": "Solid",
           "diffOnly": "Diff Only",
           "wireframe": "Wireframe",
-          "reset": "Reset"
+          "reset": "Reset",
+          "title": "Preview",
+          "loading3d": "Loading 3D engine…",
+          "inspectorEmpty": "Select a block from the diff or the 3D view to inspect it.",
+          "modeSource": "Source",
+          "modeResult": "Result",
+          "modeDiff": "Diff",
+          "modeDisabled": "Run Analyze to compare",
+          "onlyChanges": "Only changes",
+          "onlyChangesHint": "Hide unchanged blocks to see only what was converted",
+          "fullscreen": "Fullscreen",
+          "exitFullscreen": "Exit fullscreen",
+          "legendModified": "Modified",
+          "legendUnresolved": "Unresolved",
+          "legendUnchanged": "Unchanged",
+          "resultCaption": "Converted result view",
+          "selectedHighlighted": "Selected block highlighted",
+          "clickToInspect": "Click a block to inspect",
+          "emptyCaption": "3D schematic view · WebGL"
         },
         "export": {
           "title": "Export",
@@ -130,7 +171,8 @@
           "exportButton": "Export",
           "importRules": "Import Rules",
           "exportRules": "Export Rules",
-          "exporting": "Exporting…"
+          "exporting": "Exporting…",
+          "exportSchematic": "Export schematic"
         },
         "worker": {
           "connecting": "Connecting to analysis engine...",

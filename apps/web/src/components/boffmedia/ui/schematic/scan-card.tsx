@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { BoffButton } from "@/components/boffmedia/primitives/button"
 import { SchIcon } from "./sch-icon"
@@ -33,6 +34,7 @@ export function ScanCard({
   progress = 0,
   onPick,
 }: ScanCardProps) {
+  const t = useTranslations("games.minecraft.schematicCompat")
   return (
     <div
       className={cn(
@@ -53,7 +55,7 @@ export function ScanCard({
         <div
           className="ml-auto inline-flex gap-[2px] p-[2px] rounded-[var(--radius)] border border-edge bg-[color-mix(in_srgb,var(--layer-3)_60%,transparent)]"
           role="group"
-          aria-label="Juego"
+          aria-label={t("game.title")}
         >
           {GAMES_LIST.map((g) => (
             <button
@@ -87,7 +89,11 @@ export function ScanCard({
         className="w-full !justify-start gap-[0.55rem] py-[0.6rem] px-3 text-[length:var(--t-sm)] [&_svg]:text-ink-muted"
       >
         <SchIcon name="folder" size={17} />
-        {scanning ? "Escaneando…" : game === "hytale" ? "Elegir carpeta / Assets.zip" : "Elegir instancia"}
+        {scanning
+          ? t("setup.scanningShort")
+          : game === "hytale"
+            ? t("setup.pickHytaleShort")
+            : t("setup.pickInstanceShort")}
       </BoffButton>
 
       {scanning && (
@@ -119,11 +125,11 @@ export function ScanCard({
             <code className="font-mono text-[color:var(--accent-bright)]">{registry.version}</code>
             {registry.loader ? " · " + registry.loader : ""}
             <br />
-            {registry.mods} mods · {registry.blocks.toLocaleString()} bloques
+            {registry.mods} {t("setup.modsLabel")} · {registry.blocks.toLocaleString()} {t("setup.blocksLabel")}
           </span>
         ) : (
           <span className="text-ink-dim">
-            {scanning ? progress + "% · leyendo registro…" : "Sin entorno seleccionado"}
+            {scanning ? progress + "% · " + t("setup.reading") : t("setup.noEnv")}
           </span>
         )}
       </div>
