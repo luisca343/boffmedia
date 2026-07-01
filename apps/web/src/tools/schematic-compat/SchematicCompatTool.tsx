@@ -87,10 +87,13 @@ export function SchematicCompatTool() {
               onAnalyze={actions.analyze}
             />
           </aside>
-          <main className="flex-1 min-w-0 flex flex-col border-r border-edge">
+          <main className="flex-1 min-w-[360px] flex flex-col border-r border-edge">
             <DiffPanel />
           </main>
-          <aside className="w-[372px] shrink-0 flex flex-col bg-layer-1 max-[1180px]:w-[320px]">
+          {/* The 3D preview takes a large, window-proportional share (was a fixed
+              372px) so big schematics are actually legible; capped so it never
+              starves the diff list on ultrawide displays. */}
+          <aside className="w-[42%] min-w-[420px] max-w-[900px] shrink-0 flex flex-col bg-layer-1 max-[1180px]:min-w-[360px]">
             <PreviewPanel />
           </aside>
         </div>

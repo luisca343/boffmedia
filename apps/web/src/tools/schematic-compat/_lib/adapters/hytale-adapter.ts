@@ -28,7 +28,7 @@ export class HytaleAdapter implements GameAdapter {
     return loadPrefab(buffer, file.name);
   }
 
-  export(structure: SchematicStructure, format: ExportFormat): Uint8Array {
+  export(structure: SchematicStructure, format: ExportFormat): Uint8Array | Blob {
     return exportStructure(structure, format);
   }
 }

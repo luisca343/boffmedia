@@ -62,9 +62,14 @@ class ByteWriter {
   }
 
   private ensure(n: number) {
-    if (this.len + n <= this.buf.length) return;
-    let cap = this.buf.length;
-    while (cap < this.len + n) cap *= 2;
+    const need = this.len + n;
+    if (need <= this.buf.length) return;
+    // Double while the buffer is small, then grow by 1.5× once it's large so a
+    // multi-hundred-MB export (a 500³ schematic) doesn't briefly hold ~2× its
+    // final size mid-resize. Always land on at least `need`.
+    let cap = this.buf.length || 4096;
+    while (cap < need) cap = cap < 0x100000 ? cap * 2 : cap + (cap >> 1);
+    if (cap < need) cap = need;
     const next = new Uint8Array(cap);
     next.set(this.buf.subarray(0, this.len));
     this.buf = next;
@@ -90,7 +95,10 @@ class ByteWriter {
   }
 
   finish(): Uint8Array {
-    return this.buf.slice(0, this.len);
+    // A view, not a copy: on a large export the copy would transiently double the
+    // peak. The backing buffer is discarded with the writer right after, and every
+    // consumer (gzip, Blob, ByteArr payload) reads `.length` correctly.
+    return this.buf.subarray(0, this.len);
   }
 }
 
@@ -134,10 +142,12 @@ function writePayload(w: ByteWriter, tag: Tag): void {
  */
 export function encodeNBT(
   root: Record<string, Tag>,
-  opts: { rootName?: string; gzipOutput?: boolean } = {}
+  opts: { rootName?: string; gzipOutput?: boolean; initialCapacity?: number } = {}
 ): Uint8Array {
-  const { rootName = "", gzipOutput = true } = opts;
-  const w = new ByteWriter();
+  const { rootName = "", gzipOutput = true, initialCapacity } = opts;
+  // A caller that knows its dominant payload size (block data / bit-packed longs)
+  // passes it so the buffer is sized once up front instead of repeatedly resized.
+  const w = new ByteWriter(initialCapacity && initialCapacity > 4096 ? initialCapacity : 4096);
   w.i8(NBT_TAG.Compound);
   w.str(rootName);
   writePayload(w, { t: NBT_TAG.Compound, v: root });

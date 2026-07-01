@@ -1,15 +1,5 @@
 import type { SchematicStructure, UnifiedBlock } from "../../types";
-
-interface OutBlock {
-  x: number;
-  y: number;
-  z: number;
-  name: string;
-  rotation?: number;
-  support?: number;
-  filler?: number;
-  components?: Record<string, unknown>;
-}
+import { ZipWriter } from "../../parsers/zip-writer";
 
 interface Vec3 {
   x: number;
@@ -53,78 +43,218 @@ function isHytaleComponent(comp: Record<string, unknown>): boolean {
   return typeof comp.Components === "object" && comp.Components !== null;
 }
 
-/**
- * Serialise a {@link SchematicStructure} into a Hytale `.prefab.json` byte
- * buffer.
- *
- * Output is **dense**: a Hytale prefab is a complete rectangular volume, so every
- * cell in the bounding box is emitted — air cells as the `"Empty"` sentinel —
- * ordered x→z→y to match Hytale's own exported prefabs. (A sparse list that omits
- * air cells fails to load in Hytale's prefab editor.) Placement state baked into
- * the palette/tile-entities by {@link loadPrefab} (rotation, support, filler,
- * components, `_State_Definitions_` variants) is reconstructed. When the
- * structure came from a Hytale prefab, the original anchor + origin in
- * `metadata` reproduce the source coordinate space; converted Minecraft builds
- * anchor at the origin.
- */
-export function writePrefab(structure: SchematicStructure): Uint8Array {
-  const { x: sx, y: sy, z: sz } = structure.dimensions;
+// A Hytale prefab is an uncompressed per-block list, so its size scales with the
+// non-air block count. Beyond this many blocks a single file won't open in Hytale
+// (it parses the whole document into memory before placing anything — verified in
+// hytale-shared-source BsonPrefabBufferDeserializer / SelectionPrefabSerializer),
+// so the build is split into parts of at most this size, packaged as one .zip.
+// Doubles as the per-part budget. Tunable.
+const MAX_BLOCKS_PER_PREFAB = 2_000_000;
+
+// Loose runaway sanity cap on the iteration sweep (output scales with real block
+// count, not volume, and streams out); blockData can't be much larger anyway.
+const MAX_PREFAB_CELLS = 2_000_000_000;
+
+// Flush the single-file text buffer to a browser-managed Blob chunk at this many
+// UTF-16 chars — chunks move to blob storage (disk-spillable) and the string is
+// released, keeping peak heap ~one chunk.
+const PREFAB_CHUNK_CHARS = 4 * 1024 * 1024;
+
+interface PrefabHeader {
+  version: number;
+  blockIdVersion: number;
+  anchor: Vec3;
+  origin: Vec3;
+}
+
+function prefabHeader(structure: SchematicStructure): PrefabHeader {
   const meta = structure.metadata ?? {};
-  const origin = vec3(meta.origin, { x: 0, y: 0, z: 0 });
-  const anchor = vec3(meta.anchor, { x: 0, y: 0, z: 0 });
+  return {
+    // Keep the prefab version when round-tripping a prefab; otherwise emit the
+    // current Hytale version (a converted Minecraft schematic carries an unrelated
+    // format version that must not leak into the .prefab.json).
+    version: structure.format === "prefab" && structure.formatVersion ? structure.formatVersion : 8,
+    blockIdVersion: typeof meta.blockIdVersion === "number" ? meta.blockIdVersion : 11,
+    anchor: vec3(meta.anchor, { x: 0, y: 0, z: 0 }),
+    origin: vec3(meta.origin, { x: 0, y: 0, z: 0 }),
+  };
+}
 
-  // Tile entities → components, keyed by local position.
-  const components = new Map<string, Record<string, unknown>>();
-  for (const te of structure.tileEntities) {
-    components.set(`${te.pos.x},${te.pos.y},${te.pos.z}`, te.data);
-  }
+function componentsByLocalPos(structure: SchematicStructure): Map<string, Record<string, unknown>> {
+  const m = new Map<string, Record<string, unknown>>();
+  for (const te of structure.tileEntities) m.set(`${te.pos.x},${te.pos.y},${te.pos.z}`, te.data);
+  return m;
+}
 
-  // Dense volume: iterate the whole bounding box (x→z→y, matching Hytale's own
-  // prefab files) and emit every cell — air becomes the "Empty" sentinel.
-  const out: OutBlock[] = [];
+/** The document header up to (and including) the opening `"blocks":[`. */
+function docPrefix(h: PrefabHeader): string {
+  return (
+    `{"version":${h.version},"blockIdVersion":${h.blockIdVersion},` +
+    `"anchorX":${h.anchor.x},"anchorY":${h.anchor.y},"anchorZ":${h.anchor.z},"blocks":[`
+  );
+}
+
+/** One block's compact JSON object, matching Hytale's field set + defaults. */
+function blockJson(
+  block: UnifiedBlock,
+  x: number,
+  y: number,
+  z: number,
+  comp: Record<string, unknown> | undefined,
+): string {
+  let s = `{"x":${x},"y":${y},"z":${z},"name":${JSON.stringify(blockName(block))}`;
+  const rotation = intState(block, "rotation");
+  if (rotation !== undefined && rotation !== 0) s += `,"rotation":${rotation}`;
+  const support = intState(block, "support");
+  if (support !== undefined) s += `,"support":${support}`;
+  const filler = intState(block, "filler");
+  if (filler !== undefined) s += `,"filler":${filler}`;
+  if (comp && isHytaleComponent(comp)) s += `,"components":${JSON.stringify(comp)}`;
+  return s + "}";
+}
+
+/** Count renderable (non-air) blocks — decides single-file vs tiled export. */
+function countNonAir(structure: SchematicStructure): number {
+  const airFlags = new Uint8Array(structure.palette.length);
+  structure.palette.forEach((b, i) => {
+    if (b.name === "air" || b.id === "air" || b.id.endsWith(":air")) airFlags[i] = 1;
+  });
+  const data = structure.blockData;
+  let n = 0;
+  for (let i = 0; i < data.length; i++) if (airFlags[data[i]] === 0) n++;
+  return n;
+}
+
+/**
+ * Single-file **sparse** prefab — only non-air blocks, ordered x→z→y, exactly what
+ * Hytale itself writes (`BlockSelection` stores blocks in a sparse position map and
+ * `SelectionPrefabSerializer.serialize` emits only present blocks, never air; its
+ * `deserialize` re-adds each listed block and leaves the rest empty). Air carries
+ * no meaning in Hytale (absent cell = empty), and the anchor + absolute coords
+ * preserve placement. Streams to disk-backed {@link Blob} chunks; minified.
+ */
+function writeSinglePrefab(structure: SchematicStructure, h: PrefabHeader): Blob {
+  const { x: sx, y: sy, z: sz } = structure.dimensions;
+  const components = componentsByLocalPos(structure);
+  const palette = structure.palette;
+  const data = structure.blockData;
+  const encoder = new TextEncoder();
+  const parts: BlobPart[] = [];
+
+  let buf = docPrefix(h);
+  let first = true;
+  const flush = () => {
+    parts.push(new Blob([encoder.encode(buf)]));
+    buf = "";
+  };
+
   for (let xi = 0; xi < sx; xi++) {
     for (let zi = 0; zi < sz; zi++) {
       for (let yi = 0; yi < sy; yi++) {
-        const x = xi + origin.x;
-        const y = yi + origin.y;
-        const z = zi + origin.z;
-
-        const li = (yi * sz + zi) * sx + xi;
-        const pi = structure.blockData[li];
-        const block =
-          pi >= 0 && pi < structure.palette.length ? structure.palette[pi] : undefined;
-
-        if (!block || block.name === "air") {
-          out.push({ x, y, z, name: "Empty" });
-          continue;
-        }
-
-        const entry: OutBlock = { x, y, z, name: blockName(block) };
-        const rotation = intState(block, "rotation");
-        if (rotation !== undefined && rotation !== 0) entry.rotation = rotation;
-        const support = intState(block, "support");
-        if (support !== undefined) entry.support = support;
-        const filler = intState(block, "filler");
-        if (filler !== undefined) entry.filler = filler;
-        const comp = components.get(`${xi},${yi},${zi}`);
-        if (comp && isHytaleComponent(comp)) entry.components = comp;
-
-        out.push(entry);
+        const pi = data[(yi * sz + zi) * sx + xi];
+        const block = pi >= 0 && pi < palette.length ? palette[pi] : undefined;
+        if (!block || block.name === "air") continue;
+        buf +=
+          (first ? "" : ",") +
+          blockJson(block, xi + h.origin.x, yi + h.origin.y, zi + h.origin.z, components.get(`${xi},${yi},${zi}`));
+        first = false;
+        if (buf.length >= PREFAB_CHUNK_CHARS) flush();
       }
     }
   }
 
-  const doc = {
-    // Keep the prefab version when round-tripping a prefab; otherwise emit the
-    // current Hytale prefab version (a converted Minecraft schematic carries an
-    // unrelated format version that must not leak into the .prefab.json).
-    version: structure.format === "prefab" && structure.formatVersion ? structure.formatVersion : 8,
-    blockIdVersion: typeof meta.blockIdVersion === "number" ? meta.blockIdVersion : 11,
-    anchorX: anchor.x,
-    anchorY: anchor.y,
-    anchorZ: anchor.z,
-    blocks: out,
+  buf += "]}";
+  flush();
+  return new Blob(parts, { type: "application/json" });
+}
+
+function partsReadme(parts: number, h: PrefabHeader): string {
+  return [
+    `This build was too large for a single Hytale prefab, so it was split into ${parts} part prefab(s).`,
+    ``,
+    `Each part is a standalone .prefab.json holding a slice of the build's blocks. Every part`,
+    `keeps its blocks' ORIGINAL coordinates and shares the same anchor`,
+    `(${h.anchor.x}, ${h.anchor.y}, ${h.anchor.z}), so the split is only about file size — it`,
+    `carries no spatial meaning.`,
+    ``,
+    `To reassemble the whole build in Hytale, place EVERY part at the SAME position/anchor —`,
+    `the baked-in coordinates drop each block back into its correct place, and the parts overlap`,
+    `to form the complete build.`,
+    ``,
+    `Note: a multi-prefab "load folder" lays prefabs out in a row instead of overlapping them,`,
+    `so place the parts individually at one origin to reconstruct. Files are named part_NNN.prefab.json.`,
+  ].join("\n");
+}
+
+/**
+ * Split path — the build's blocks partitioned into ≤{@link MAX_BLOCKS_PER_PREFAB}-block
+ * "part" prefabs packaged into one `.zip`, used when a single prefab would be too big
+ * for Hytale to load. Partitioning is purely by count (not spatially): every part
+ * shares the anchor and keeps absolute coordinates, so placing them all at one point
+ * reconstructs the build regardless of how blocks are divided among files — which
+ * yields the fewest files. Each part is built, encoded and handed to the zip one at a
+ * time, so only a single part is ever resident.
+ */
+function writePrefabParts(structure: SchematicStructure, h: PrefabHeader): Blob {
+  const { x: sx, y: sy, z: sz } = structure.dimensions;
+  const components = componentsByLocalPos(structure);
+  const palette = structure.palette;
+  const data = structure.blockData;
+  const encoder = new TextEncoder();
+  const zip = new ZipWriter();
+  const prefix = docPrefix(h);
+
+  let buf = prefix;
+  let inPart = 0; // non-air blocks written into the current part
+  let parts = 0;
+  let first = true;
+
+  const closePart = () => {
+    buf += "]}";
+    parts++;
+    zip.add(`part_${String(parts).padStart(3, "0")}.prefab.json`, encoder.encode(buf));
+    buf = prefix;
+    inPart = 0;
+    first = true;
   };
 
-  return new TextEncoder().encode(JSON.stringify(doc, null, 2));
+  // Sweep x→z→y (Hytale's block order); fill each part to the budget, then roll over.
+  for (let xi = 0; xi < sx; xi++) {
+    for (let zi = 0; zi < sz; zi++) {
+      for (let yi = 0; yi < sy; yi++) {
+        const pi = data[(yi * sz + zi) * sx + xi];
+        const block = pi >= 0 && pi < palette.length ? palette[pi] : undefined;
+        if (!block || block.name === "air") continue;
+        buf +=
+          (first ? "" : ",") +
+          blockJson(block, xi + h.origin.x, yi + h.origin.y, zi + h.origin.z, components.get(`${xi},${yi},${zi}`));
+        first = false;
+        if (++inPart >= MAX_BLOCKS_PER_PREFAB) closePart();
+      }
+    }
+  }
+  if (inPart > 0) closePart(); // trailing partial part
+
+  zip.add("README.txt", encoder.encode(partsReadme(parts, h)));
+  return zip.finish();
+}
+
+/**
+ * Serialise a {@link SchematicStructure} into a Hytale prefab {@link Blob}: a single
+ * `.prefab.json` when the build fits ({@link MAX_BLOCKS_PER_PREFAB}), else a `.zip` of
+ * part prefabs (Blob `type` distinguishes them for the download filename).
+ */
+export function writePrefab(structure: SchematicStructure): Blob {
+  const { x: sx, y: sy, z: sz } = structure.dimensions;
+  const volume = sx * sy * sz;
+  if (volume > MAX_PREFAB_CELLS) {
+    throw new Error(
+      `.prefab volume (${sx}×${sy}×${sz} = ${volume.toLocaleString()} cells) exceeds the ` +
+        `${MAX_PREFAB_CELLS.toLocaleString()}-cell ceiling.`,
+    );
+  }
+  const h = prefabHeader(structure);
+  return countNonAir(structure) > MAX_BLOCKS_PER_PREFAB
+    ? writePrefabParts(structure, h)
+    : writeSinglePrefab(structure, h);
 }
