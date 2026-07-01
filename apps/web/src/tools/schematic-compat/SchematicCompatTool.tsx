@@ -42,8 +42,18 @@ export function SchematicCompatTool() {
     [api],
   );
 
+  const getBlockConnections = useCallback(
+    (registryId: string, blockId: string) =>
+      api ? api.getBlockConnections(registryId, blockId) : Promise.resolve(null),
+    [api],
+  );
+
   return (
-    <ModTextureProvider getBlockTexture={getBlockTexture} getBlockModel={getBlockModel}>
+    <ModTextureProvider
+      getBlockTexture={getBlockTexture}
+      getBlockModel={getBlockModel}
+      getBlockConnections={getBlockConnections}
+    >
       <div className="flex min-h-0 flex-col overflow-hidden bg-base" style={{ height: "calc(100vh - 64px)" }}>
         {/* app bar */}
         <div className="shrink-0 flex items-center gap-4 py-[0.6rem] px-4 border-b border-edge bg-[color-mix(in_srgb,var(--layer-1)_86%,transparent)] backdrop-blur-[8px]">

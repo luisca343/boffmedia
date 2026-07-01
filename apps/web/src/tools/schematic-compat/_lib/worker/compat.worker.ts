@@ -2,6 +2,7 @@ import { expose } from "comlink";
 import type { CompatWorkerAPI } from "./worker-api";
 import type {
   BlockRegistry,
+  BlockDefinition,
   SchematicStructure,
   UnifiedBlock,
   RegistryHandle,
@@ -40,6 +41,22 @@ function adapterForFormat(format: ExportFormat): GameId {
 /** Which game a block belongs to (Hytale ids are namespaced, everything else is MC). */
 function blockGameOf(block: UnifiedBlock): GameId {
   return block.namespace === "hytale" ? "hytale" : "minecraft";
+}
+
+/**
+ * The block definition `transformStates` should key off after a bridge. Normally
+ * this is the resolved `targetDef`, but a connected block (fence/bars/wall) can
+ * re-target to a shape-specific variant block — `bridgeRotationStates` signals
+ * that by changing the id — so we resolve that variant's def instead.
+ */
+function effectiveDef(
+  bridged: UnifiedBlock,
+  source: UnifiedBlock,
+  targetDef: BlockDefinition,
+  targetReg: BlockRegistry,
+): BlockDefinition {
+  if (bridged.id === source.id) return targetDef;
+  return targetReg.blocks.get(bridged.id) ?? targetDef;
 }
 
 function airBlock(game: GameId): UnifiedBlock {
@@ -144,6 +161,14 @@ const api: CompatWorkerAPI = {
     return (await reg.getModel(blockId, stateLabel, rotation)) ?? null;
   },
 
+  async getBlockConnections(registryId: string, blockId: string) {
+    // A connected block's shape map (fence/bars/wall). Plain data — the 3D
+    // preview uses it to resolve a converted block's corner/T/cross variant the
+    // same way the export path does (target block defs otherwise stay in the
+    // worker). `null` for non-connected blocks, so the preview leaves them as-is.
+    return registries.get(registryId)?.blocks.get(blockId)?.connections ?? null;
+  },
+
   async loadSchematic(file: File): Promise<SchematicSummary> {
     const structure = await getAdapter(adapterForFile(file.name)).parseSchematic(file);
     const id = nextId("schem");
@@ -239,7 +264,8 @@ const api: CompatWorkerAPI = {
       if (!res) return block;
       const targetDef = targetReg.blocks.get(res.target.id);
       if (targetDef) {
-        return transformStates(bridgeRotationStates(block, targetReg.gameId), targetDef, res.stateMap).block;
+        const bridged = bridgeRotationStates(block, targetReg.gameId, targetDef);
+        return transformStates(bridged, effectiveDef(bridged, block, targetDef, targetReg), res.stateMap).block;
       }
       return res.target;
     });
@@ -254,7 +280,10 @@ const api: CompatWorkerAPI = {
         const candidate = applyRules(block, ruleSets, targetReg);
         if (!candidate) return block;
         const targetDef = targetReg.blocks.get(candidate.id);
-        if (targetDef) return transformStates(bridgeRotationStates(block, targetReg.gameId), targetDef).block;
+        if (targetDef) {
+          const bridged = bridgeRotationStates(block, targetReg.gameId, targetDef);
+          return transformStates(bridged, effectiveDef(bridged, block, targetDef, targetReg)).block;
+        }
         return candidate;
       });
     }
