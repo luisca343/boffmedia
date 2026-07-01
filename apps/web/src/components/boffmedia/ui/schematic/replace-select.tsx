@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useRef, useState } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { SchIcon } from "./sch-icon"
 import { AssetThumb } from "./asset-thumb"
@@ -26,6 +27,7 @@ interface PopPos {
 // Searchable block combobox (thumb + id). The popover is position:fixed so it
 // escapes the diff list's overflow; coordinates are measured off the trigger.
 export function ReplaceSelect({ value, placeholder, options, onChange, renderThumb, fluid }: ReplaceSelectProps) {
+  const t = useTranslations("games.minecraft.schematicCompat")
   const thumb = (id: string, size: number) => renderThumb?.(id, size) ?? <AssetThumb id={id} size={size} />
   const [open, setOpen] = useState(false)
   const [q, setQ] = useState("")
@@ -138,13 +140,13 @@ export function ReplaceSelect({ value, placeholder, options, onChange, renderThu
               autoFocus
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Buscar bloque…"
+              placeholder={t("diff.searchPlaceholder")}
               className="flex-1 min-w-0 bg-transparent border-0 outline-none text-ink font-body text-[12px] placeholder:text-ink-dim"
             />
           </div>
           <div className="flex-1 min-h-0 overflow-y-auto p-1.5">
             {filtered.length === 0 ? (
-              <div className="p-[0.7rem] text-center text-ink-dim text-[11px]">Sin resultados</div>
+              <div className="p-[0.7rem] text-center text-ink-dim text-[11px]">{t("diff.noResults")}</div>
             ) : (
               <div className="grid grid-cols-[repeat(auto-fill,minmax(86px,1fr))] gap-1.5">
                 {filtered.map((o) => {
@@ -192,7 +194,7 @@ export function ReplaceSelect({ value, placeholder, options, onChange, renderThu
               }}
               className="shrink-0 p-[0.4rem] border-0 border-t border-edge bg-transparent text-ink-dim text-[10px] cursor-pointer transition-colors hover:text-ink-muted"
             >
-              Limpiar selección
+              {t("diff.clearSelection")}
             </button>
           ) : null}
         </div>

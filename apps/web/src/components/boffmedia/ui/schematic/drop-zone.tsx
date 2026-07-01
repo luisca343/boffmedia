@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { BoffBadge } from "@/components/boffmedia/primitives/badge"
 import { SchIcon } from "./sch-icon"
@@ -19,6 +20,7 @@ export interface DropZoneProps {
 // Schematic file picker with empty / dragging / loaded states. Empty shows the
 // accepted formats; loaded collapses to a row with name, size, dims and a badge.
 export function DropZone({ file, onPick }: DropZoneProps) {
+  const t = useTranslations("games.minecraft.schematicCompat")
   const [over, setOver] = useState(false)
 
   if (file) {
@@ -44,7 +46,7 @@ export function DropZone({ file, onPick }: DropZoneProps) {
             </div>
           </div>
           <BoffBadge kind="live" className="shrink-0">
-            Cargado
+            {t("setup.loaded")}
           </BoffBadge>
         </div>
       </div>
@@ -77,7 +79,7 @@ export function DropZone({ file, onPick }: DropZoneProps) {
       )}
     >
       <SchIcon name="upload" size={22} className="text-ink-muted" />
-      <div className="text-[length:var(--t-sm)] font-semibold text-ink">Suelta tu esquema</div>
+      <div className="text-[length:var(--t-sm)] font-semibold text-ink">{t("setup.dropHere")}</div>
       <div className="font-mono text-[length:var(--t-xs)] text-ink-dim">.schem · .litematic · .nbt · .mca · .prefab</div>
     </div>
   )

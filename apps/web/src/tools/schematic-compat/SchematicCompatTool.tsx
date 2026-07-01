@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { SchIcon, Stepper } from "@/components/boffmedia/ui/schematic";
 import { useCompatEngine } from "./_hooks/useCompatEngine";
 import { useToolActions } from "./_hooks/useToolActions";
@@ -12,9 +13,9 @@ import { DiffPanel } from "./_components/diff/DiffPanel";
 import { PreviewPanel } from "./_components/preview/PreviewPanel";
 import { ExportBar } from "./_components/export/ExportBar";
 
-const STEPS = ["Entornos", "Esquema", "Analizar", "Exportar"];
-
 export function SchematicCompatTool() {
+  const t = useTranslations("games.minecraft.schematicCompat");
+  const STEPS = [t("setup.environments"), t("setup.schematicSection"), t("setup.analyze"), t("setup.export")];
   const { api, status } = useCompatEngine();
   const actions = useToolActions(api);
   useSchematicRender(api);
@@ -80,6 +81,8 @@ export function SchematicCompatTool() {
               engineReady={engineReady}
               onScanSource={actions.scanSourceInstance}
               onScanTarget={actions.scanTargetInstance}
+              onChangeSourceGame={actions.changeSourceGame}
+              onChangeTargetGame={actions.changeTargetGame}
               onPickSchematic={actions.loadSchematic}
               onAnalyze={actions.analyze}
             />

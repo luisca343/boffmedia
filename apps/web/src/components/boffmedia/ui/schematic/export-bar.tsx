@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useTranslations } from "next-intl"
 import { BoffButton } from "@/components/boffmedia/primitives/button"
 import { SchIcon } from "./sch-icon"
 import type { SchGame } from "./lib"
@@ -36,6 +37,7 @@ export function ExportBar({
   onImportRules,
   onExportRules,
 }: ExportBarProps) {
+  const t = useTranslations("games.minecraft.schematicCompat")
   const formats = FMT[targetGame] || FMT.minecraft
   const [fmt, setFmt] = useState(formats[0][1])
 
@@ -48,11 +50,11 @@ export function ExportBar({
     <footer className="shrink-0 flex items-center gap-[0.6rem] py-[0.6rem] px-4 border-t border-edge bg-[color-mix(in_srgb,var(--layer-1)_60%,transparent)]">
       <BoffButton variant="ghost" size="sm" onClick={onImportRules}>
         <SchIcon name="upload" size={16} />
-        Importar reglas
+        {t("export.importRules")}
       </BoffButton>
       <BoffButton variant="ghost" size="sm" disabled={ruleCount === 0} onClick={onExportRules}>
         <SchIcon name="filedown" size={16} />
-        Exportar reglas {ruleCount > 0 ? `(${ruleCount})` : ""}
+        {t("export.exportRules")} {ruleCount > 0 ? `(${ruleCount})` : ""}
       </BoffButton>
 
       <div className="ml-auto" />
@@ -60,7 +62,7 @@ export function ExportBar({
       {exporting ? (
         <span className="inline-flex items-center gap-[0.4rem] text-[length:var(--t-xs)] text-ink-dim">
           <span className="w-3.5 h-3.5 rounded-full border-2 border-[color-mix(in_srgb,currentColor_30%,transparent)] border-t-current animate-spin shrink-0" />
-          Exportando…
+          {t("export.exporting")}
         </span>
       ) : null}
 
@@ -79,7 +81,7 @@ export function ExportBar({
 
       <BoffButton variant="accent" size="sm" disabled={!canExport || exporting} onClick={() => onExport(fmt)}>
         <SchIcon name="download" size={16} />
-        Exportar esquema
+        {t("export.exportSchematic")}
       </BoffButton>
     </footer>
   )

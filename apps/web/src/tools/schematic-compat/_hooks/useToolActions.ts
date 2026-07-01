@@ -87,10 +87,22 @@ function convertedFilename(original: string, format: ExportFormat): string {
 export function useToolActions(api: Remote<CompatWorkerAPI> | null) {
   const store = useToolStore;
 
+  // Free a worker-side artifact (registry / schematic) whose UI handle we're
+  // about to replace or discard. Without this every scan / schematic load leaves
+  // its worker entry (a full BlockRegistry or block array) alive for the whole
+  // session — unbounded memory growth over a long editing session.
+  const releaseHandle = useCallback(
+    async (id: string | undefined) => {
+      if (id && api) await api.release(id).catch(() => {});
+    },
+    [api],
+  );
+
   const scanSourceInstance = useCallback(
     async (gameId: GameId, files: File[]) => {
       if (!api) return;
       const s = store.getState();
+      const prevRegId = s.sourceReg?.id;
       s.setError(undefined);
       s.setLoadingSource(true);
       s.setSourceScan({ pct: 0, msg: "" });
@@ -105,17 +117,20 @@ export function useToolActions(api: Remote<CompatWorkerAPI> | null) {
         store.getState().setError(errMsg(err));
         store.getState().setSourceReg(undefined);
       } finally {
+        // The outgoing registry is now replaced (or cleared on error); free it.
+        await releaseHandle(prevRegId);
         store.getState().setLoadingSource(false);
         store.getState().setSourceScan(undefined);
       }
     },
-    [api, store]
+    [api, store, releaseHandle]
   );
 
   const scanTargetInstance = useCallback(
     async (gameId: GameId, files: File[]) => {
       if (!api) return;
       const s = store.getState();
+      const prevRegId = s.targetReg?.id;
       s.setError(undefined);
       s.setLoadingTarget(true);
       s.setTargetScan({ pct: 0, msg: "" });
@@ -133,17 +148,20 @@ export function useToolActions(api: Remote<CompatWorkerAPI> | null) {
         store.getState().setTargetReg(undefined);
         store.getState().setTargetBlockIds([]);
       } finally {
+        // The outgoing registry is now replaced (or cleared on error); free it.
+        await releaseHandle(prevRegId);
         store.getState().setLoadingTarget(false);
         store.getState().setTargetScan(undefined);
       }
     },
-    [api, store]
+    [api, store, releaseHandle]
   );
 
   const loadSchematic = useCallback(
     async (file: File) => {
       if (!api) return;
       const s = store.getState();
+      const prevSchematicId = s.schematic?.id;
       s.setError(undefined);
       s.setLoadingSchematic(true);
       try {
@@ -153,10 +171,12 @@ export function useToolActions(api: Remote<CompatWorkerAPI> | null) {
         store.getState().setError(errMsg(err));
         store.getState().setSchematic(undefined);
       } finally {
+        // The outgoing schematic is now replaced (or cleared on error); free it.
+        await releaseHandle(prevSchematicId);
         store.getState().setLoadingSchematic(false);
       }
     },
-    [api, store]
+    [api, store, releaseHandle]
   );
 
   const analyze = useCallback(async () => {
@@ -175,6 +195,31 @@ export function useToolActions(api: Remote<CompatWorkerAPI> | null) {
       store.getState().setAnalyzing(false);
     }
   }, [api, store]);
+
+  // Switching a side's game clears that registry in the store (see setSourceGame /
+  // setTargetGame). Route the change through here so the orphaned worker-side
+  // registry is released instead of leaking.
+  const changeSourceGame = useCallback(
+    (gameId: GameId) => {
+      const s = store.getState();
+      if (s.sourceGame === gameId) return;
+      const prevRegId = s.sourceReg?.id;
+      s.setSourceGame(gameId);
+      void releaseHandle(prevRegId);
+    },
+    [store, releaseHandle],
+  );
+
+  const changeTargetGame = useCallback(
+    (gameId: GameId) => {
+      const s = store.getState();
+      if (s.targetGame === gameId) return;
+      const prevRegId = s.targetReg?.id;
+      s.setTargetGame(gameId);
+      void releaseHandle(prevRegId);
+    },
+    [store, releaseHandle],
+  );
 
   // ── Phase 4 — export ────────────────────────────────────────────────────────
 
@@ -214,10 +259,15 @@ export function useToolActions(api: Remote<CompatWorkerAPI> | null) {
     if (Object.keys(map).length === 0) return;
     const fromVersion = sourceReg?.version ?? "?";
     const toVersion = targetReg?.version ?? "?";
+    // Derive the ruleset's game/labels from the actual environments so a Hytale
+    // (or cross-game) session isn't mislabelled as "Minecraft".
+    const sourceGameId = sourceReg?.gameId ?? "minecraft";
+    const targetGameId = targetReg?.gameId ?? "minecraft";
+    const gameLabel = (g: GameId) => (g === "hytale" ? "Hytale" : "Minecraft");
     const meta: RuleSetMeta = {
-      id: `mc-${fromVersion}-to-${toVersion}`,
-      name: `Minecraft ${fromVersion} → ${toVersion}`,
-      gameId: "minecraft",
+      id: `${sourceGameId}-${fromVersion}-to-${targetGameId}-${toVersion}`,
+      name: `${gameLabel(sourceGameId)} ${fromVersion} → ${gameLabel(targetGameId)} ${toVersion}`,
+      gameId: sourceGameId,
       fromVersion,
       toVersion,
     };
@@ -250,6 +300,8 @@ export function useToolActions(api: Remote<CompatWorkerAPI> | null) {
   return {
     scanSourceInstance,
     scanTargetInstance,
+    changeSourceGame,
+    changeTargetGame,
     loadSchematic,
     analyze,
     exportSchematic,

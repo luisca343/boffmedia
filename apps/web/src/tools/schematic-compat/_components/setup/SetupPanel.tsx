@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { BoffButton } from "@/components/boffmedia/primitives/button";
 import { SchIcon } from "@/components/boffmedia/ui/schematic";
 import type { GameId } from "../../_lib/adapters";
@@ -12,17 +13,11 @@ interface SetupPanelProps {
   engineReady: boolean;
   onScanSource: (gameId: GameId, files: File[]) => void;
   onScanTarget: (gameId: GameId, files: File[]) => void;
+  onChangeSourceGame: (gameId: GameId) => void;
+  onChangeTargetGame: (gameId: GameId) => void;
   onPickSchematic: (file: File) => void;
   onAnalyze: () => void;
 }
-
-const GUIDE_STEPS = [
-  "Elige el entorno de origen (instancia + mods).",
-  "Elige el entorno de destino (versión o juego).",
-  "Carga tu esquema.",
-  "Analiza para ver el diff de compatibilidad.",
-  "Resuelve y exporta al nuevo formato.",
-];
 
 function GroupHead({ title }: { title: string }) {
   return (
@@ -37,6 +32,8 @@ export function SetupPanel({
   engineReady,
   onScanSource,
   onScanTarget,
+  onChangeSourceGame,
+  onChangeTargetGame,
   onPickSchematic,
   onAnalyze,
 }: SetupPanelProps) {
@@ -53,10 +50,11 @@ export function SetupPanel({
     isAnalyzing,
     diff,
     error,
-    setSourceGame,
-    setTargetGame,
   } = useToolStore();
+  const t = useTranslations("games.minecraft.schematicCompat");
   const [guide, setGuide] = useState(false);
+
+  const guideSteps = [t("guide.step1"), t("guide.step2"), t("guide.step3"), t("guide.step4"), t("guide.step5")];
 
   const analyzed = !!diff;
   const canAnalyze =
@@ -72,13 +70,13 @@ export function SetupPanel({
           className="flex items-center gap-[0.55rem] w-full py-[0.6rem] px-[0.7rem] bg-transparent border-0 cursor-pointer text-ink-muted text-left text-[length:var(--t-xs)] transition-colors hover:text-ink"
         >
           <SchIcon name="info" size={16} className="text-[color:var(--accent-bright)] shrink-0" />
-          <span className="flex-1 font-semibold">Cómo funciona</span>
+          <span className="flex-1 font-semibold">{t("guide.title")}</span>
           <SchIcon name="chevron" size={16} style={{ transform: guide ? "rotate(180deg)" : "none", transition: "transform .2s" }} />
         </button>
         {guide ? (
           <div className="py-[0.3rem] px-[0.8rem] pb-[0.7rem] border-t border-edge">
             <ol className="mt-2 p-0 list-none flex flex-col gap-2">
-              {GUIDE_STEPS.map((tt, i) => (
+              {guideSteps.map((tt, i) => (
                 <li key={i} className="flex gap-[0.55rem] text-[length:var(--t-xs)] text-ink-dim leading-[1.45]">
                   <span className="grid place-items-center w-4 h-4 shrink-0 mt-px rounded-full bg-[var(--accent-soft)] text-[color:var(--accent-bright)] font-mono text-[9px] font-bold">
                     {i + 1}
@@ -93,12 +91,12 @@ export function SetupPanel({
 
       {/* environments */}
       <div className="flex flex-col gap-[0.6rem]">
-        <GroupHead title="Entornos" />
+        <GroupHead title={t("setup.environments")} />
         <EnvPicker
           role="source"
-          roleLabel="Origen"
+          roleLabel={t("setup.source")}
           game={sourceGame}
-          onGameChange={setSourceGame}
+          onGameChange={onChangeSourceGame}
           registry={sourceReg}
           scan={sourceScan}
           loading={isLoadingSource}
@@ -112,9 +110,9 @@ export function SetupPanel({
         </div>
         <EnvPicker
           role="target"
-          roleLabel="Destino"
+          roleLabel={t("setup.target")}
           game={targetGame}
-          onGameChange={setTargetGame}
+          onGameChange={onChangeTargetGame}
           registry={targetReg}
           scan={targetScan}
           loading={isLoadingTarget}
@@ -125,13 +123,13 @@ export function SetupPanel({
 
       {/* schematic */}
       <div className="flex flex-col gap-[0.6rem]">
-        <GroupHead title="Esquema" />
+        <GroupHead title={t("setup.schematicSection")} />
         <FilePicker schematic={schematic} disabled={!engineReady} onPick={onPickSchematic} />
       </div>
 
       <BoffButton variant="primary" block disabled={!canAnalyze} onClick={onAnalyze}>
         <SchIcon name="play" size={17} />
-        {isAnalyzing ? "Analizando…" : analyzed ? "Analizado ✓" : "Analizar compatibilidad"}
+        {isAnalyzing ? t("diff.analyzing") : analyzed ? t("setup.analyzed") : t("setup.analyzeCompat")}
       </BoffButton>
 
       {error && (
