@@ -43,13 +43,26 @@ function intState(block: UnifiedBlock, key: string): number | undefined {
 }
 
 /**
+ * A Hytale block-entity payload is wrapped in a top-level `Components` object
+ * (containers, beds, placed-by, …). Foreign tile-entity data — e.g. a Minecraft
+ * barrel's `{ id: "minecraft:barrel", Items, … }` carried through a cross-game
+ * conversion — has no such wrapper; writing it into a `.prefab.json` produces a
+ * component Hytale can't parse, so it's dropped on export.
+ */
+function isHytaleComponent(comp: Record<string, unknown>): boolean {
+  return typeof comp.Components === "object" && comp.Components !== null;
+}
+
+/**
  * Serialise a {@link SchematicStructure} into a Hytale `.prefab.json` byte
  * buffer.
  *
- * Output is sparse (Empty cells are omitted — coordinates are explicit, so the
- * file stays small for mostly-air converted Minecraft builds). Placement state
- * baked into the palette/tile-entities by {@link loadPrefab} (rotation, support,
- * filler, components, `_State_Definitions_` variants) is reconstructed. When the
+ * Output is **dense**: a Hytale prefab is a complete rectangular volume, so every
+ * cell in the bounding box is emitted — air cells as the `"Empty"` sentinel —
+ * ordered x→z→y to match Hytale's own exported prefabs. (A sparse list that omits
+ * air cells fails to load in Hytale's prefab editor.) Placement state baked into
+ * the palette/tile-entities by {@link loadPrefab} (rotation, support, filler,
+ * components, `_State_Definitions_` variants) is reconstructed. When the
  * structure came from a Hytale prefab, the original anchor + origin in
  * `metadata` reproduce the source coordinate space; converted Minecraft builds
  * anchor at the origin.
@@ -66,22 +79,27 @@ export function writePrefab(structure: SchematicStructure): Uint8Array {
     components.set(`${te.pos.x},${te.pos.y},${te.pos.z}`, te.data);
   }
 
+  // Dense volume: iterate the whole bounding box (x→z→y, matching Hytale's own
+  // prefab files) and emit every cell — air becomes the "Empty" sentinel.
   const out: OutBlock[] = [];
-  for (let yi = 0; yi < sy; yi++) {
+  for (let xi = 0; xi < sx; xi++) {
     for (let zi = 0; zi < sz; zi++) {
-      for (let xi = 0; xi < sx; xi++) {
+      for (let yi = 0; yi < sy; yi++) {
+        const x = xi + origin.x;
+        const y = yi + origin.y;
+        const z = zi + origin.z;
+
         const li = (yi * sz + zi) * sx + xi;
         const pi = structure.blockData[li];
-        if (pi < 0 || pi >= structure.palette.length) continue;
-        const block = structure.palette[pi];
-        if (block.name === "air") continue;
+        const block =
+          pi >= 0 && pi < structure.palette.length ? structure.palette[pi] : undefined;
 
-        const entry: OutBlock = {
-          x: xi + origin.x,
-          y: yi + origin.y,
-          z: zi + origin.z,
-          name: blockName(block),
-        };
+        if (!block || block.name === "air") {
+          out.push({ x, y, z, name: "Empty" });
+          continue;
+        }
+
+        const entry: OutBlock = { x, y, z, name: blockName(block) };
         const rotation = intState(block, "rotation");
         if (rotation !== undefined && rotation !== 0) entry.rotation = rotation;
         const support = intState(block, "support");
@@ -89,7 +107,7 @@ export function writePrefab(structure: SchematicStructure): Uint8Array {
         const filler = intState(block, "filler");
         if (filler !== undefined) entry.filler = filler;
         const comp = components.get(`${xi},${yi},${zi}`);
-        if (comp) entry.components = comp;
+        if (comp && isHytaleComponent(comp)) entry.components = comp;
 
         out.push(entry);
       }

@@ -8,7 +8,7 @@ import type {
 } from "../_lib/types";
 import type { GameId } from "../_lib/adapters";
 
-export type PreviewMode = "source" | "converted";
+export type PreviewMode = "source" | "result" | "converted";
 
 interface ResolutionChoice {
   targetId: string;

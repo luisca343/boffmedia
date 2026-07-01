@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { SchIcon, AxisSlider, STATUS_META } from "@/components/boffmedia/ui/schematic";
 import { useToolStore } from "../../_store/tool.store";
 import type { PreviewMode } from "../../_store/tool.store";
-import { convertedPlan } from "./previewPlan";
+import { convertedPlan, resultPlan } from "./previewPlan";
 
 // R3F uses WebGL — skip SSR entirely.
 const SchematicViewer3D = dynamic(
@@ -72,12 +72,14 @@ function Inspector() {
   const diffEntry = diff?.entries.find((e) => e.block.id === selectedBlockId);
   const stateEntries = block ? Object.entries(block.states) : [];
 
-  // In converted mode, surface the block this is being converted into.
+  // In converted/result mode, surface the block this is being converted into.
   const plan =
-    previewMode === "converted" && diff
-      ? convertedPlan(selectedBlockId, diffEntry?.status, diffEntry?.autoCandidate?.id, resolutions[selectedBlockId]?.targetId)
+    (previewMode === "converted" || previewMode === "result") && diff
+      ? (previewMode === "converted"
+          ? convertedPlan(selectedBlockId, diffEntry?.status, diffEntry?.autoCandidate?.id, resolutions[selectedBlockId]?.targetId)
+          : resultPlan(selectedBlockId, diffEntry?.status, diffEntry?.autoCandidate?.id, resolutions[selectedBlockId]?.targetId))
       : null;
-  const convertsTo = plan && plan.kind === "changed" && plan.textureId !== selectedBlockId ? plan.textureId : null;
+  const convertsTo = plan && plan.textureId !== selectedBlockId ? plan.textureId : null;
 
   return (
     <>
@@ -136,7 +138,8 @@ function ModeSwitch({
   return (
     <div className="inline-flex items-center gap-[0.15rem] p-[0.15rem] rounded-[var(--radius)] border border-edge bg-[color-mix(in_srgb,var(--text)_4%,transparent)]">
       {segment("source", "Origen")}
-      {segment("converted", "Convertido", !convertedEnabled)}
+      {segment("result", "Resultado", !convertedEnabled)}
+      {segment("converted", "Diff", !convertedEnabled)}
     </div>
   );
 }
@@ -180,6 +183,7 @@ export function PreviewPanel() {
 
   const maxLayerY = schematic ? schematic.dimensions.y - 1 : 0;
   const convertedView = previewMode === "converted" && !!diff;
+  const resultView = previewMode === "result" && !!diff;
 
   return (
     <div ref={rootRef} className="flex h-full flex-col bg-layer-1">
@@ -244,6 +248,10 @@ export function PreviewPanel() {
             <LegendDot color="#22c55e" label="Modificado" />
             <LegendDot color="#ef4444" label="Sin resolver" />
             <LegendDot label="Sin cambios" faded />
+          </div>
+        ) : resultView ? (
+          <div className="absolute left-1/2 bottom-[0.7rem] -translate-x-1/2 font-mono text-[10px] text-ink-dim whitespace-nowrap py-[0.25rem] px-[0.6rem] rounded-[var(--radius-pill)] bg-[color-mix(in_srgb,var(--layer-1)_70%,transparent)] border border-edge">
+            Vista del resultado convertido
           </div>
         ) : (
           <div className="absolute left-1/2 bottom-[0.7rem] -translate-x-1/2 font-mono text-[10px] text-ink-dim whitespace-nowrap py-[0.25rem] px-[0.6rem] rounded-[var(--radius-pill)] bg-[color-mix(in_srgb,var(--layer-1)_70%,transparent)] border border-edge">
