@@ -40,8 +40,11 @@ export interface GameAdapter {
   /** Parse a schematic/structure file into the engine's neutral representation. */
   parseSchematic(file: File): Promise<SchematicStructure>;
 
-  /** Serialise a (already version-converted) structure back to bytes. */
-  export(structure: SchematicStructure, format: ExportFormat): Uint8Array;
+  /**
+   * Serialise a (already version-converted) structure. Returns a byte buffer, or
+   * a {@link Blob} for formats streamed straight to blob storage (large prefabs).
+   */
+  export(structure: SchematicStructure, format: ExportFormat): Uint8Array | Blob;
 }
 
 /** UI-facing metadata for a game: label + whether the adapter is usable yet. */

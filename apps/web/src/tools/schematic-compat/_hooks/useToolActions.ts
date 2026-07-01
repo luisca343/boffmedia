@@ -241,7 +241,12 @@ export function useToolActions(api: Remote<CompatWorkerAPI> | null) {
           convertedId = res.schematicId;
         }
         const blob = await api.export(exportId, format);
-        triggerDownload(blob, convertedFilename(schematic.fileName, format));
+        // A prefab too large for one file comes back as a .zip of part prefabs
+        // (worker sets the Blob type); swap the extension so the download is a .zip.
+        const name = convertedFilename(schematic.fileName, format);
+        const filename =
+          blob.type === "application/zip" ? name.replace(/\.prefab\.json$/i, "-parts.zip") : name;
+        triggerDownload(blob, filename);
       } catch (err) {
         store.getState().setError(errMsg(err));
       } finally {
