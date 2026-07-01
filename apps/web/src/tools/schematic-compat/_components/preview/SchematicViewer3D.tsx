@@ -6,12 +6,12 @@ import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import { useToolStore } from "../../_store/tool.store";
 import { placeholderColor } from "../../_lib/textures/blockTexture";
-import { useModTextureLoader, useModelLoader } from "../../_hooks/modTextureContext";
+import { useModTextureLoader, useModelLoader, useConnectionsLoader } from "../../_hooks/modTextureContext";
 import { getBlockTexture } from "./blockTextureCache";
 import { useBlockModel } from "./useBlockModel";
 import type { BuiltModel } from "./blockModelCache";
 import { sourcePlan, convertedPlan, resultPlan, type RenderKind } from "./previewPlan";
-import type { BlockPositionGroup, DiffEntry } from "../../_lib/types";
+import type { BlockPositionGroup, DiffEntry, BlockDefinition, UnifiedBlock } from "../../_lib/types";
 import type { CompiledModel } from "../../_lib/model/types";
 import type { GameId } from "../../_lib/adapters/game-adapter";
 import { bridgeRotationStates } from "../../_lib/pipeline/rules/cross-game/rotation";
@@ -22,8 +22,58 @@ type ModelLoader = (
   blockId: string,
   stateLabel?: string,
 ) => Promise<CompiledModel | null>;
+type ConnectionsLoader = (
+  registryId: string,
+  blockId: string,
+) => Promise<BlockDefinition["connections"] | null>;
 
 const EMPTY_STATES: Record<string, string> = {};
+
+function statesKeyOf(states: Record<string, string>): string {
+  return Object.keys(states)
+    .sort()
+    .map((k) => `${k}=${states[k]}`)
+    .join(",");
+}
+
+/**
+ * For a cross-game converted **connected block** (fence/bars/wall), resolve its
+ * concrete shape variant so the preview renders it connected — the same
+ * resolution the export path does. Fetches the target block's `connections` map
+ * from the worker (cached) and re-runs `bridgeRotationStates` with it, which may
+ * re-target the block id (iron bars' corner is a separate block) and set the
+ * shape `state` + yaw. Returns `null` for non-connected blocks / same-game /
+ * source-mode, leaving the caller's existing (id, states) unchanged.
+ */
+function useConnectionOverride(
+  registryId: string | undefined,
+  targetBaseId: string,
+  sourceBlock: UnifiedBlock,
+  targetGameId: GameId | undefined,
+  loader: ConnectionsLoader | null,
+): { id: string; states: Record<string, string> } | null {
+  const [override, setOverride] = useState<{ id: string; states: Record<string, string> } | null>(null);
+  const statesKey = useMemo(() => statesKeyOf(sourceBlock.states), [sourceBlock.states]);
+  useEffect(() => {
+    setOverride(null);
+    if (!registryId || !targetGameId || !loader) return;
+    // Only a cross-game conversion re-targets connection shapes.
+    if ((sourceBlock.namespace === "hytale") === (targetGameId === "hytale")) return;
+    let cancelled = false;
+    loader(registryId, targetBaseId).then((conns) => {
+      if (cancelled || !conns) return;
+      const def: BlockDefinition = { id: targetBaseId, connections: conns, validStates: {}, defaultState: {}, tags: [] };
+      const bridged = bridgeRotationStates(sourceBlock, targetGameId, def);
+      setOverride({ id: bridged.id, states: bridged.states });
+    });
+    return () => {
+      cancelled = true;
+    };
+    // sourceBlock is keyed by statesKey + namespace (both stable per palette entry).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [registryId, targetBaseId, statesKey, sourceBlock.namespace, targetGameId, loader]);
+  return override;
+}
 
 /** Resolves a block's THREE texture (vanilla CDN / mod JAR), or null on a miss. */
 function useBlockTexture(
@@ -186,6 +236,10 @@ interface BlockInstancesProps {
   registryId: string | undefined;
   modLoader: ModTextureLoader | null;
   modelLoader: ModelLoader | null;
+  /** True when rendering the converted target block (vs. the source). */
+  useTarget: boolean;
+  targetGameId: GameId | undefined;
+  connectionsLoader: ConnectionsLoader | null;
   onSelect: (blockId: string) => void;
 }
 
@@ -287,12 +341,23 @@ function ModelInstances({
 
 /** Picks the compiled-model renderer when available, else the cube fallback. */
 function BlockInstances(props: BlockInstancesProps) {
-  const built = useBlockModel(props.textureId, props.states, props.version, props.registryId, props.modelLoader);
+  // A cross-game connected block re-targets to its concrete shape variant (corner
+  // may be a different block; T/Cross are states) so it renders connected.
+  const override = useConnectionOverride(
+    props.useTarget ? props.registryId : undefined,
+    props.textureId,
+    props.group.block,
+    props.targetGameId,
+    props.connectionsLoader,
+  );
+  const textureId = override?.id ?? props.textureId;
+  const states = override?.states ?? props.states;
+  const built = useBlockModel(textureId, states, props.version, props.registryId, props.modelLoader);
   if (built) {
     const { states: _s, version: _v, registryId: _r, modLoader: _m, modelLoader: _ml, ...rest } = props;
-    return <ModelInstances {...rest} built={built} />;
+    return <ModelInstances {...rest} textureId={textureId} built={built} />;
   }
-  return <CubeInstances {...props} />;
+  return <CubeInstances {...props} textureId={textureId} />;
 }
 
 // ─── Camera initial placement ─────────────────────────────────────────────────
@@ -325,6 +390,7 @@ interface SceneProps {
   targetGameId: GameId | undefined;
   modLoader: ModTextureLoader | null;
   modelLoader: ModelLoader | null;
+  connectionsLoader: ConnectionsLoader | null;
 }
 
 function Scene({
@@ -335,6 +401,7 @@ function Scene({
   targetGameId,
   modLoader,
   modelLoader,
+  connectionsLoader,
 }: SceneProps) {
   const blockPositions = useToolStore((s) => s.blockPositions);
   const diff = useToolStore((s) => s.diff);
@@ -414,6 +481,9 @@ function Scene({
             registryId={plan.useTarget ? (targetRegistryId ?? sourceRegistryId) : sourceRegistryId}
             modLoader={modLoader}
             modelLoader={modelLoader}
+            useTarget={plan.useTarget}
+            targetGameId={targetGameId}
+            connectionsLoader={connectionsLoader}
             onSelect={handleSelect}
           />
         );
@@ -439,6 +509,7 @@ export function SchematicViewer3D() {
   // We capture the loader as a value and pass it down as a prop instead.
   const modLoader = useModTextureLoader();
   const modelLoader = useModelLoader();
+  const connectionsLoader = useConnectionsLoader();
 
   if (!schematic) {
     return (
@@ -478,6 +549,7 @@ export function SchematicViewer3D() {
         targetGameId={targetReg?.gameId}
         modLoader={modLoader}
         modelLoader={modelLoader}
+        connectionsLoader={connectionsLoader}
       />
     </Canvas>
   );

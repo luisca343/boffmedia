@@ -7,6 +7,7 @@ import type {
   RegistryHandle,
   SchematicSummary,
   BlockPositionGroup,
+  BlockDefinition,
   ProgressCb,
 } from "../types";
 import type { ExportFormat } from "../pipeline/exporter";
@@ -67,6 +68,17 @@ export interface CompatWorkerAPI {
     stateLabel?: string,
     rotation?: number
   ): Promise<CompiledModel | null>;
+
+  /**
+   * A connected block's shape → variant map (`connections`), or `null` when the
+   * block isn't a connected block (fence/bars/wall). The 3D preview uses it to
+   * resolve a converted block's corner/T/cross variant without pulling every
+   * target block definition across the postMessage boundary.
+   */
+  getBlockConnections(
+    registryId: string,
+    blockId: string
+  ): Promise<BlockDefinition["connections"] | null>;
 
   /** Parse a schematic file; caches it in the worker and returns a summary. */
   loadSchematic(file: File): Promise<SchematicSummary>;

@@ -18,6 +18,7 @@
  */
 
 import type { CompiledGroup, CompiledModel } from "./types";
+import { orientationQuat } from "./rotation-tuple";
 
 // ─── Raw `.blockymodel` shapes ────────────────────────────────────────────────
 
@@ -69,31 +70,6 @@ const BLOCK_UNITS = 32;
 
 type Vec3 = [number, number, number];
 const IDENTITY: BQuat = { x: 0, y: 0, z: 0, w: 1 };
-
-/** Quaternion for a rotation of `deg` degrees about a principal axis. */
-function axisQuat(axis: "x" | "y" | "z", deg: number): BQuat {
-  const h = (deg * Math.PI) / 360;
-  const s = Math.sin(h);
-  return { x: axis === "x" ? s : 0, y: axis === "y" ? s : 0, z: axis === "z" ? s : 0, w: Math.cos(h) };
-}
-
-/**
- * Whole-block placement rotation for a Hytale `rotation` index (0–11).
- *
- * Hytale encodes 12 orientations as `group = ⌊r/4⌋`, `spin = r % 4`:
- *  - group 0 (r 0–3):  upright    — spin about Y (the NESW facing)
- *  - group 1 (r 4–7):  on its side — tilted 90° about X, then spun about Y
- *  - group 2 (r 8–11): upside down — flipped 180° about X, then spun about Y
- * Derived empirically from bundled prefabs (NESW→{0..3}, UpDown→{0,8},
- * UpDownNESW→{0..3,8..11}). The result is composed spin-after-tilt: `Ry · tilt`.
- */
-function blockRotationQuat(rotation: number): BQuat {
-  const r = ((Math.trunc(rotation) % 12) + 12) % 12;
-  const group = Math.floor(r / 4);
-  const spin = r % 4;
-  const tilt = group === 0 ? IDENTITY : axisQuat("x", group === 1 ? 90 : 180);
-  return qmul(axisQuat("y", spin * 90), tilt);
-}
 
 /** Hamilton product a·b. */
 function qmul(a: BQuat, b: BQuat): BQuat {
@@ -339,7 +315,7 @@ export function compileBlockyModel(
   if (!Array.isArray(nodes) || nodes.length === 0) return EMPTY;
   const w = texW > 0 ? texW : 1;
   const h = texH > 0 ? texH : 1;
-  const blockRot = blockRotationQuat(rotation);
+  const blockRot = orientationQuat(rotation);
 
   const solid: GroupBuf = { doubleSided: false, positions: [], normals: [], uvs: [], indices: [], vertCount: 0 };
   const doubled: GroupBuf = { doubleSided: true, positions: [], normals: [], uvs: [], indices: [], vertCount: 0 };
