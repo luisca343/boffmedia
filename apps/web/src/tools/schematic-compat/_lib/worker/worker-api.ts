@@ -11,6 +11,7 @@ import type {
 } from "../types";
 import type { ExportFormat } from "../pipeline/exporter";
 import type { GameId } from "../adapters";
+import type { CompiledModel } from "../model/types";
 
 /**
  * Comlink-exposed worker API.
@@ -52,6 +53,20 @@ export interface CompatWorkerAPI {
    * Map never crosses the boundary in bulk.
    */
   getBlockTexture(registryId: string, blockId: string): Promise<string | null>;
+
+  /**
+   * Baked geometry for a block's shaped (non-cube) model, or `null` when the
+   * block is a plain cube / has no model. Compiled on demand in the worker (e.g.
+   * Hytale reads the block's `.blockymodel` + texture from Assets.zip) and
+   * returned as plain typed arrays. `stateLabel` selects a state-variant model;
+   * `rotation` is the prefab placement index (0–11) baked into the geometry.
+   */
+  getBlockModel(
+    registryId: string,
+    blockId: string,
+    stateLabel?: string,
+    rotation?: number
+  ): Promise<CompiledModel | null>;
 
   /** Parse a schematic file; caches it in the worker and returns a summary. */
   loadSchematic(file: File): Promise<SchematicSummary>;

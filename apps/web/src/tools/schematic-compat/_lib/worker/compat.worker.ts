@@ -3,6 +3,7 @@ import type { CompatWorkerAPI } from "./worker-api";
 import type {
   BlockRegistry,
   SchematicStructure,
+  UnifiedBlock,
   RegistryHandle,
   SchematicSummary,
   CompatDiff,
@@ -17,6 +18,7 @@ import { computeDiff } from "../pipeline/diff";
 import { applyRules } from "../pipeline/rules/engine";
 import { transformStates } from "../pipeline/state/transformer";
 import { buildRuleSet, parseRuleSet } from "../pipeline/rules/ruleset";
+import { bridgeRotationStates, isRedundantDoorHalf } from "../pipeline/rules/cross-game/rotation";
 import { getAdapter, type GameId } from "../adapters";
 import type { ExportFormat } from "../pipeline/exporter";
 
@@ -33,6 +35,36 @@ function adapterForFile(fileName: string): GameId {
 /** Pick the adapter for an export by format (prefab → Hytale, else Minecraft). */
 function adapterForFormat(format: ExportFormat): GameId {
   return format === "prefab" ? "hytale" : "minecraft";
+}
+
+/** Which game a block belongs to (Hytale ids are namespaced, everything else is MC). */
+function blockGameOf(block: UnifiedBlock): GameId {
+  return block.namespace === "hytale" ? "hytale" : "minecraft";
+}
+
+function airBlock(game: GameId): UnifiedBlock {
+  return game === "hytale"
+    ? { id: "hytale:air", namespace: "hytale", name: "air", states: {}, tags: [], source: "vanilla" }
+    : { id: "minecraft:air", namespace: "minecraft", name: "air", states: {}, tags: [], source: "vanilla" };
+}
+
+/**
+ * Cross-game exports must not leak the other game's blocks. Any palette entry
+ * that isn't the target game — i.e. it was never mapped to a target-game block
+ * during conversion — is replaced with the target game's air so it's simply
+ * omitted from the written file instead of emitted with a foreign id (which is
+ * meaningless to the other game and how `minecraft:` ids ended up in a Hytale
+ * prefab). Same-game exports change nothing (every block already matches).
+ */
+function stripForeignBlocks(structure: SchematicStructure, targetGame: GameId): SchematicStructure {
+  const air = airBlock(targetGame);
+  let changed = false;
+  const palette = structure.palette.map((b) => {
+    if (b.name === "air" || blockGameOf(b) === targetGame) return b;
+    changed = true;
+    return air;
+  });
+  return changed ? { ...structure, palette } : structure;
 }
 
 // ─── In-worker caches ──────────────────────────────────────────────────────────
@@ -103,6 +135,13 @@ const api: CompatWorkerAPI = {
     // Prebuilt textures (Minecraft mod JARs) first, then a lazy resolver if the
     // game extracts on demand (Hytale pulls the icon out of Assets.zip here).
     return reg.textures?.get(blockId) ?? (await reg.getTexture?.(blockId)) ?? null;
+  },
+
+  async getBlockModel(registryId: string, blockId: string, stateLabel?: string, rotation?: number) {
+    const reg = registries.get(registryId);
+    if (!reg?.getModel) return null;
+    // Compiled geometry (plain typed arrays) → safe to clone across postMessage.
+    return (await reg.getModel(blockId, stateLabel, rotation)) ?? null;
   },
 
   async loadSchematic(file: File): Promise<SchematicSummary> {
@@ -192,11 +231,15 @@ const api: CompatWorkerAPI = {
 
     // Step 1: apply explicit per-block-id resolutions
     let newPalette = structure.palette.map((block) => {
+      // A two-block Minecraft door's upper half has nothing to become: Hytale's
+      // door model already spans both cells from the lower placement. Force it
+      // to air regardless of how (or whether) the base door id was resolved.
+      if (isRedundantDoorHalf(block, targetReg.gameId)) return airBlock(targetReg.gameId);
       const res = resolutions[block.id];
       if (!res) return block;
       const targetDef = targetReg.blocks.get(res.target.id);
       if (targetDef) {
-        return transformStates(block, targetDef, res.stateMap).block;
+        return transformStates(bridgeRotationStates(block, targetReg.gameId), targetDef, res.stateMap).block;
       }
       return res.target;
     });
@@ -204,11 +247,14 @@ const api: CompatWorkerAPI = {
     // Step 2: apply rule sets to still-unresolved blocks
     if (ruleSets.length > 0) {
       newPalette = newPalette.map((block) => {
-        if (targetReg.blocks.has(block.id)) return block;
+        // Air (including the stand-in for a collapsed door half, which isn't in
+        // the catalog) never needs a rule — and never wants one silently
+        // reassigning it via a namespace/tag/fallback rule.
+        if (block.name === "air" || targetReg.blocks.has(block.id)) return block;
         const candidate = applyRules(block, ruleSets, targetReg);
         if (!candidate) return block;
         const targetDef = targetReg.blocks.get(candidate.id);
-        if (targetDef) return transformStates(block, targetDef).block;
+        if (targetDef) return transformStates(bridgeRotationStates(block, targetReg.gameId), targetDef).block;
         return candidate;
       });
     }
@@ -227,7 +273,11 @@ const api: CompatWorkerAPI = {
   async export(schematicId: string, format: ExportFormat): Promise<Blob> {
     const structure = schematics.get(schematicId);
     if (!structure) throw new Error(`Schematic not found: ${schematicId}`);
-    const bytes = getAdapter(adapterForFormat(format)).export(structure, format);
+    const targetGame = adapterForFormat(format);
+    // Drop any block still foreign to the target game (unmapped in a cross-game
+    // conversion) so its source id never lands in the written file.
+    const cleaned = stripForeignBlocks(structure, targetGame);
+    const bytes = getAdapter(targetGame).export(cleaned, format);
     return new Blob([bytes as BlobPart], { type: "application/octet-stream" });
   },
 

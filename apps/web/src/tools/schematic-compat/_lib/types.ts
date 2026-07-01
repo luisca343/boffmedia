@@ -1,3 +1,5 @@
+import type { CompiledModel } from "./model/types";
+
 export interface UnifiedBlock {
   id: string;
   namespace: string;
@@ -42,6 +44,20 @@ export interface BlockRegistry {
    * first time it's requested. Returns a `data:image/png;base64,…` URL or null.
    */
   getTexture?: (blockId: string) => Promise<string | null>;
+  /**
+   * Lazy per-block geometry resolver (worker-side only, never serialized). Games
+   * with non-cube blocks compile a block's shaped model on demand — e.g. Hytale
+   * reads the block's `.blockymodel` + texture from Assets.zip and bakes them
+   * into a {@link CompiledModel} (plain typed arrays, safe to clone to the UI).
+   * `stateLabel` selects a state-variant model (the prefab `state` property);
+   * `rotation` is the prefab placement index (0–11) baked into the geometry.
+   * Returns `null` for cube blocks (the viewer falls back to a textured cube).
+   */
+  getModel?: (
+    blockId: string,
+    stateLabel?: string,
+    rotation?: number,
+  ) => Promise<CompiledModel | null>;
   snapshotHash: string;
   capturedAt: number;
   /** Name of the scanned instance (from launcher metadata), when available. */

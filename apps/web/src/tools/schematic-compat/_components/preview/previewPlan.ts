@@ -31,6 +31,27 @@ export function sourcePlan(sourceId: string): RenderPlan {
   return { textureId: sourceId, useTarget: false, kind: "normal" };
 }
 
+/**
+ * Result mode: resolve textures exactly like converted mode (target ids for
+ * renamed/resolved blocks) but strip all diff overlays so you see what the
+ * converted build will actually look like.
+ */
+export function resultPlan(
+  sourceId: string,
+  status: DiffEntry["status"] | undefined,
+  autoCandidateId: string | undefined,
+  resolutionTargetId: string | undefined,
+): RenderPlan {
+  if (resolutionTargetId) {
+    const useTarget = resolutionTargetId !== sourceId;
+    return { textureId: useTarget ? resolutionTargetId : sourceId, useTarget, kind: "normal" };
+  }
+  if (status === "renamed" && autoCandidateId) {
+    return { textureId: autoCandidateId, useTarget: true, kind: "normal" };
+  }
+  return { textureId: sourceId, useTarget: false, kind: "normal" };
+}
+
 /** Converted mode: see module doc for the mapping. */
 export function convertedPlan(
   sourceId: string,

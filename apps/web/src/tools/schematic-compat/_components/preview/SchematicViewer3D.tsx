@@ -6,14 +6,22 @@ import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import { useToolStore } from "../../_store/tool.store";
 import { placeholderColor } from "../../_lib/textures/blockTexture";
-import { useModTextureLoader } from "../../_hooks/modTextureContext";
+import { useModTextureLoader, useModelLoader } from "../../_hooks/modTextureContext";
 import { getBlockTexture } from "./blockTextureCache";
 import { useBlockModel } from "./useBlockModel";
 import type { BuiltModel } from "./blockModelCache";
-import { sourcePlan, convertedPlan, type RenderKind } from "./previewPlan";
+import { sourcePlan, convertedPlan, resultPlan, type RenderKind } from "./previewPlan";
 import type { BlockPositionGroup, DiffEntry } from "../../_lib/types";
+import type { CompiledModel } from "../../_lib/model/types";
+import type { GameId } from "../../_lib/adapters/game-adapter";
+import { bridgeRotationStates } from "../../_lib/pipeline/rules/cross-game/rotation";
 
 type ModTextureLoader = (registryId: string, blockId: string) => Promise<string | null>;
+type ModelLoader = (
+  registryId: string,
+  blockId: string,
+  stateLabel?: string,
+) => Promise<CompiledModel | null>;
 
 const EMPTY_STATES: Record<string, string> = {};
 
@@ -177,6 +185,7 @@ interface BlockInstancesProps {
   version: string | undefined;
   registryId: string | undefined;
   modLoader: ModTextureLoader | null;
+  modelLoader: ModelLoader | null;
   onSelect: (blockId: string) => void;
 }
 
@@ -240,7 +249,7 @@ function ModelInstances({
   isSelected,
   maxLayerY,
   onSelect,
-}: { built: BuiltModel } & Omit<BlockInstancesProps, "states" | "version" | "registryId" | "modLoader">) {
+}: { built: BuiltModel } & Omit<BlockInstancesProps, "states" | "version" | "registryId" | "modLoader" | "modelLoader">) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const maxCount = group.positions.length / 3;
   // Recreate the mesh (and rewrite matrices) when geometry identity changes.
@@ -278,9 +287,9 @@ function ModelInstances({
 
 /** Picks the compiled-model renderer when available, else the cube fallback. */
 function BlockInstances(props: BlockInstancesProps) {
-  const built = useBlockModel(props.textureId, props.states, props.version);
+  const built = useBlockModel(props.textureId, props.states, props.version, props.registryId, props.modelLoader);
   if (built) {
-    const { states: _s, version: _v, registryId: _r, modLoader: _m, ...rest } = props;
+    const { states: _s, version: _v, registryId: _r, modLoader: _m, modelLoader: _ml, ...rest } = props;
     return <ModelInstances {...rest} built={built} />;
   }
   return <CubeInstances {...props} />;
@@ -313,7 +322,9 @@ interface SceneProps {
   sourceRegistryId: string | undefined;
   targetVersion: string | undefined;
   targetRegistryId: string | undefined;
+  targetGameId: GameId | undefined;
   modLoader: ModTextureLoader | null;
+  modelLoader: ModelLoader | null;
 }
 
 function Scene({
@@ -321,7 +332,9 @@ function Scene({
   sourceRegistryId,
   targetVersion,
   targetRegistryId,
+  targetGameId,
   modLoader,
+  modelLoader,
 }: SceneProps) {
   const blockPositions = useToolStore((s) => s.blockPositions);
   const diff = useToolStore((s) => s.diff);
@@ -333,8 +346,9 @@ function Scene({
   const schematic = useToolStore((s) => s.schematic);
   const setSelectedBlock = useToolStore((s) => s.setSelectedBlock);
 
-  // Converted mode only makes sense once a diff exists; otherwise show source.
+  // Non-source modes only make sense once a diff exists; otherwise fall back to source.
   const converted = previewMode === "converted" && !!diff;
+  const result = previewMode === "result" && !!diff;
 
   const diffEntryMap = useMemo(() => {
     const m = new Map<string, DiffEntry>();
@@ -373,6 +387,8 @@ function Scene({
         const entry = diffEntryMap.get(id);
         const plan = converted
           ? convertedPlan(id, entry?.status, entry?.autoCandidate?.id, resolutions[id]?.targetId)
+          : result
+          ? resultPlan(id, entry?.status, entry?.autoCandidate?.id, resolutions[id]?.targetId)
           : sourcePlan(id);
         return (
           <BlockInstances
@@ -380,14 +396,24 @@ function Scene({
             group={group}
             textureId={plan.textureId}
             // Source blocks render with their real states; a converted target
-            // block renders with its default model (we don't track its states).
-            states={plan.useTarget ? EMPTY_STATES : group.block.states}
+            // block renders with its default model (we don't track its states) —
+            // except across a cross-game conversion, where we bridge MC
+            // facing/half <-> Hytale rotation so a converted stair/door still
+            // points the right way in the preview, matching the export.
+            states={
+              !plan.useTarget
+                ? group.block.states
+                : targetGameId && (group.block.namespace === "hytale") !== (targetGameId === "hytale")
+                ? bridgeRotationStates(group.block, targetGameId).states
+                : EMPTY_STATES
+            }
             kind={plan.kind}
             isSelected={id === selectedBlockId}
             maxLayerY={layerY}
-            version={plan.useTarget ? targetVersion : sourceVersion}
-            registryId={plan.useTarget ? targetRegistryId : sourceRegistryId}
+            version={plan.useTarget ? (targetVersion ?? sourceVersion) : sourceVersion}
+            registryId={plan.useTarget ? (targetRegistryId ?? sourceRegistryId) : sourceRegistryId}
             modLoader={modLoader}
+            modelLoader={modelLoader}
             onSelect={handleSelect}
           />
         );
@@ -412,6 +438,7 @@ export function SchematicViewer3D() {
   // so React context from this tree does not reach components rendered inside it.
   // We capture the loader as a value and pass it down as a prop instead.
   const modLoader = useModTextureLoader();
+  const modelLoader = useModelLoader();
 
   if (!schematic) {
     return (
@@ -448,7 +475,9 @@ export function SchematicViewer3D() {
         sourceRegistryId={sourceReg?.id}
         targetVersion={targetReg?.version}
         targetRegistryId={targetReg?.id}
+        targetGameId={targetReg?.gameId}
         modLoader={modLoader}
+        modelLoader={modelLoader}
       />
     </Canvas>
   );
