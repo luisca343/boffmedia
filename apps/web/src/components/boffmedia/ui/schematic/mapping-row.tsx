@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { AssetThumb } from "./asset-thumb"
 import { ReplaceSelect } from "./replace-select"
@@ -18,6 +19,7 @@ export interface MappingRowProps {
 // Compact mapping line for long lists of missing / mod-only blocks: thumb,
 // status dot, id, instance count and the replacement combobox.
 export function MappingRow({ entry, options, resolution, onResolve, selected, onSelect, renderThumb }: MappingRowProps) {
+  const t = useTranslations("games.minecraft.schematicCompat")
   const meta = STATUS_META[entry.status]
   // Missing and mod-only share the same red "Ausentes" treatment; mod-only is
   // distinguished by a "mod" pill rather than a separate colour.
@@ -60,7 +62,7 @@ export function MappingRow({ entry, options, resolution, onResolve, selected, on
       </span>
       <ReplaceSelect
         value={resolution}
-        placeholder="Reemplazar…"
+        placeholder={t("diff.replaceWith")}
         options={options}
         onChange={(v) => onResolve(entry.block.id, v)}
         renderThumb={renderThumb}

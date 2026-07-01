@@ -2,22 +2,37 @@
 
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import { SchIcon, AxisSlider, STATUS_META } from "@/components/boffmedia/ui/schematic";
+import { SchIcon, AxisSlider, type SchStatus } from "@/components/boffmedia/ui/schematic";
 import { useToolStore } from "../../_store/tool.store";
 import type { PreviewMode } from "../../_store/tool.store";
 import { convertedPlan, resultPlan } from "./previewPlan";
+
+/** Maps an engine status to its `diff.*` translation key (mirrors DiffPanel). */
+const STATUS_KEY: Record<SchStatus, string> = {
+  safe: "diff.safe",
+  renamed: "diff.renamed",
+  "state-changed": "diff.stateChanged",
+  missing: "diff.missing",
+  "mod-only": "diff.modOnly",
+};
+
+function Loading3D() {
+  const t = useTranslations("games.minecraft.schematicCompat");
+  return (
+    <div className="absolute inset-0 flex items-center justify-center text-[length:var(--t-xs)] text-ink-dim">
+      {t("preview.loading3d")}
+    </div>
+  );
+}
 
 // R3F uses WebGL — skip SSR entirely.
 const SchematicViewer3D = dynamic(
   () => import("./SchematicViewer3D").then((m) => ({ default: m.SchematicViewer3D })),
   {
     ssr: false,
-    loading: () => (
-      <div className="absolute inset-0 flex items-center justify-center text-[length:var(--t-xs)] text-ink-dim">
-        Cargando motor 3D…
-      </div>
-    ),
+    loading: () => <Loading3D />,
   },
 );
 
@@ -53,6 +68,7 @@ function PreviewButton({
 }
 
 function Inspector() {
+  const t = useTranslations("games.minecraft.schematicCompat");
   const selectedBlockId = useToolStore((s) => s.selectedBlockId);
   const blockPositions = useToolStore((s) => s.blockPositions);
   const diff = useToolStore((s) => s.diff);
@@ -62,7 +78,7 @@ function Inspector() {
   if (!selectedBlockId) {
     return (
       <p className="text-[length:var(--t-xs)] text-ink-dim">
-        Selecciona un bloque del diff o de la vista 3D para inspeccionarlo.
+        {t("preview.inspectorEmpty")}
       </p>
     );
   }
@@ -102,8 +118,8 @@ function Inspector() {
       )}
       {diffEntry && (
         <p className="text-[11px] text-ink-dim">
-          {diffEntry.instanceCount.toLocaleString()} instancias ·{" "}
-          <span className="capitalize">{STATUS_META[diffEntry.status].label}</span>
+          {t("diff.instances", { count: diffEntry.instanceCount })} ·{" "}
+          <span className="capitalize">{t(STATUS_KEY[diffEntry.status])}</span>
         </p>
       )}
     </>
@@ -119,12 +135,13 @@ function ModeSwitch({
   convertedEnabled: boolean;
   onChange: (m: PreviewMode) => void;
 }) {
+  const t = useTranslations("games.minecraft.schematicCompat");
   const segment = (value: PreviewMode, label: string, disabled?: boolean) => (
     <button
       type="button"
       disabled={disabled}
       onClick={() => onChange(value)}
-      title={disabled ? "Ejecuta Analizar para comparar" : undefined}
+      title={disabled ? t("preview.modeDisabled") : undefined}
       className={cn(
         "py-[0.25rem] px-[0.55rem] rounded-[calc(var(--radius)-2px)] text-[11px] font-medium cursor-pointer transition-all duration-[var(--dur)] ease-[var(--ease)] disabled:opacity-40 disabled:cursor-not-allowed",
         mode === value
@@ -137,9 +154,9 @@ function ModeSwitch({
   );
   return (
     <div className="inline-flex items-center gap-[0.15rem] p-[0.15rem] rounded-[var(--radius)] border border-edge bg-[color-mix(in_srgb,var(--text)_4%,transparent)]">
-      {segment("source", "Origen")}
-      {segment("result", "Resultado", !convertedEnabled)}
-      {segment("converted", "Diff", !convertedEnabled)}
+      {segment("source", t("preview.modeSource"))}
+      {segment("result", t("preview.modeResult"), !convertedEnabled)}
+      {segment("converted", t("preview.modeDiff"), !convertedEnabled)}
     </div>
   );
 }
@@ -157,6 +174,7 @@ function LegendDot({ color, label, faded }: { color?: string; label: string; fad
 }
 
 export function PreviewPanel() {
+  const t = useTranslations("games.minecraft.schematicCompat");
   const schematic = useToolStore((s) => s.schematic);
   const layerY = useToolStore((s) => s.layerY);
   const hideUnchanged = useToolStore((s) => s.hideUnchanged);
@@ -189,22 +207,22 @@ export function PreviewPanel() {
     <div ref={rootRef} className="flex h-full flex-col bg-layer-1">
       {/* header */}
       <div className="shrink-0 flex items-center gap-2 py-[0.7rem] px-[0.85rem] border-b border-edge">
-        <span className="font-mono text-[10px] tracking-[0.14em] uppercase text-ink-muted font-bold">Vista previa</span>
+        <span className="font-mono text-[10px] tracking-[0.14em] uppercase text-ink-muted font-bold">{t("preview.title")}</span>
         <ModeSwitch mode={previewMode} convertedEnabled={!!diff} onChange={setPreviewMode} />
         <div className="flex-1" />
         {resultView && (
           <PreviewButton
             on={hideUnchanged}
             onClick={() => setHideUnchanged(!hideUnchanged)}
-            title="Oculta los bloques sin cambios para ver solo lo convertido"
+            title={t("preview.onlyChangesHint")}
           >
-            Solo cambios
+            {t("preview.onlyChanges")}
           </PreviewButton>
         )}
         <PreviewButton
           onClick={toggleFullscreen}
           disabled={!schematic}
-          title={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
+          title={isFullscreen ? t("preview.exitFullscreen") : t("preview.fullscreen")}
         >
           <SchIcon name={isFullscreen ? "minimize" : "maximize"} size={16} />
         </PreviewButton>
@@ -245,23 +263,23 @@ export function PreviewPanel() {
               </svg>
             </div>
             <span className="font-mono text-[10px] tracking-[0.1em] uppercase text-ink-dim">
-              Vista 3D del esquema · WebGL
+              {t("preview.emptyCaption")}
             </span>
           </div>
         )}
         {convertedView ? (
           <div className="absolute left-1/2 bottom-[0.7rem] -translate-x-1/2 flex items-center gap-[0.7rem] font-mono text-[10px] text-ink-dim whitespace-nowrap py-[0.3rem] px-[0.7rem] rounded-[var(--radius-pill)] bg-[color-mix(in_srgb,var(--layer-1)_70%,transparent)] border border-edge">
-            <LegendDot color="#22c55e" label="Modificado" />
-            <LegendDot color="#ef4444" label="Sin resolver" />
-            <LegendDot label="Sin cambios" faded />
+            <LegendDot color="#22c55e" label={t("preview.legendModified")} />
+            <LegendDot color="#ef4444" label={t("preview.legendUnresolved")} />
+            <LegendDot label={t("preview.legendUnchanged")} faded />
           </div>
         ) : resultView ? (
           <div className="absolute left-1/2 bottom-[0.7rem] -translate-x-1/2 font-mono text-[10px] text-ink-dim whitespace-nowrap py-[0.25rem] px-[0.6rem] rounded-[var(--radius-pill)] bg-[color-mix(in_srgb,var(--layer-1)_70%,transparent)] border border-edge">
-            Vista del resultado convertido
+            {t("preview.resultCaption")}
           </div>
         ) : (
           <div className="absolute left-1/2 bottom-[0.7rem] -translate-x-1/2 font-mono text-[10px] text-ink-dim whitespace-nowrap py-[0.25rem] px-[0.6rem] rounded-[var(--radius-pill)] bg-[color-mix(in_srgb,var(--layer-1)_70%,transparent)] border border-edge">
-            {selectedBlockId ? "Bloque seleccionado resaltado" : "Click en un bloque para inspeccionar"}
+            {selectedBlockId ? t("preview.selectedHighlighted") : t("preview.clickToInspect")}
           </div>
         )}
       </div>
