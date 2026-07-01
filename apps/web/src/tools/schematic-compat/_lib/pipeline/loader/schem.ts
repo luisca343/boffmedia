@@ -15,9 +15,21 @@ import {
   asByteArray,
   decodeVarintArray,
   type NbtCompound,
+  type NbtValue,
 } from "../../parsers/nbt";
 import { parseBlockState } from "../normalizer";
 import type { SchematicStructure, UnifiedBlock, TileEntity } from "../../types";
+
+/**
+ * Width/Height/Length are NBT `short` in the Sponge spec but interpreted unsigned
+ * (WorldEdit/FAWE), so a dimension in 32768–65535 round-trips through a signed
+ * short as a negative value. Recover the unsigned 16-bit magnitude. A foreign
+ * exporter that stored them as `int` stays positive and is untouched.
+ */
+function readDimension(v: NbtValue | undefined, ctx: string): number {
+  const n = asNumber(v, ctx);
+  return n < 0 ? n + 0x10000 : n;
+}
 
 function buildPalette(paletteTag: NbtCompound): UnifiedBlock[] {
   const entries = Object.entries(paletteTag);
@@ -75,9 +87,9 @@ export function loadSchem(data: Uint8Array, fileName: string): SchematicStructur
 
   const version = schem.Version !== undefined ? asNumber(schem.Version, "Version") : 2;
 
-  const width = asNumber(schem.Width, "Width");
-  const height = asNumber(schem.Height, "Height");
-  const length = asNumber(schem.Length, "Length");
+  const width = readDimension(schem.Width, "Width");
+  const height = readDimension(schem.Height, "Height");
+  const length = readDimension(schem.Length, "Length");
 
   // v3 nests blocks under a "Blocks" compound; v2 keeps them at the root.
   const blockContainer =
