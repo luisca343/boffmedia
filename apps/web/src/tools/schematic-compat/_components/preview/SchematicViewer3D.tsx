@@ -408,7 +408,7 @@ function Scene({
   const resolutions = useToolStore((s) => s.resolutions);
   const selectedBlockId = useToolStore((s) => s.selectedBlockId);
   const layerY = useToolStore((s) => s.layerY);
-  const diffOnlyMode = useToolStore((s) => s.diffOnlyMode);
+  const hideUnchanged = useToolStore((s) => s.hideUnchanged);
   const previewMode = useToolStore((s) => s.previewMode);
   const schematic = useToolStore((s) => s.schematic);
   const setSelectedBlock = useToolStore((s) => s.setSelectedBlock);
@@ -423,13 +423,22 @@ function Scene({
     return m;
   }, [diff]);
 
+  // "Hide unchanged" only applies in Resultado mode. A block is "changed" when its
+  // converted result differs from the source: renamed to an auto candidate,
+  // resolved to a different block, or its states get rewritten (state-changed).
+  // Everything else — "safe" blocks AND still-unresolved missing/mod-only blocks,
+  // which render as their unchanged source — is hidden. Keying on the result plan
+  // (not `status === "safe"`) is what makes this work cross-game, where nothing is
+  // ever "safe" because the target registry has entirely different block ids.
   const visibleGroups = useMemo(() => {
-    if (!diffOnlyMode) return blockPositions;
+    if (!hideUnchanged || !result) return blockPositions;
     return blockPositions.filter((g) => {
-      const s = diffEntryMap.get(g.block.id)?.status;
-      return s !== undefined && s !== "safe";
+      const id = g.block.id;
+      const entry = diffEntryMap.get(id);
+      const plan = resultPlan(id, entry?.status, entry?.autoCandidate?.id, resolutions[id]?.targetId);
+      return plan.useTarget || entry?.status === "state-changed";
     });
-  }, [blockPositions, diffOnlyMode, diffEntryMap]);
+  }, [blockPositions, hideUnchanged, result, diffEntryMap, resolutions]);
 
   const handleSelect = useCallback(
     (id: string) => setSelectedBlock(id === selectedBlockId ? undefined : id),
