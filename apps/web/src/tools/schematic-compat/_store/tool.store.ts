@@ -50,7 +50,9 @@ interface ToolState {
   isFetchingPositions: boolean;
   selectedBlockId?: string;
   layerY: number;
-  diffOnlyMode: boolean;
+  // Result-mode only: hide "safe" (unchanged) blocks so the converted/resolved
+  // blocks stand out — lets you eyeball conversion progress.
+  hideUnchanged: boolean;
   // "source"   → the schematic exactly as it looks in the source game.
   // "converted"→ changed blocks rendered with their target texture + highlighted,
   //              unchanged blocks ghosted so the conversion result stands out.
@@ -87,7 +89,7 @@ interface ToolState {
   setFetchingPositions: (v: boolean) => void;
   setSelectedBlock: (id: string | undefined) => void;
   setLayerY: (y: number) => void;
-  setDiffOnlyMode: (v: boolean) => void;
+  setHideUnchanged: (v: boolean) => void;
   setPreviewMode: (m: PreviewMode) => void;
   reset: () => void;
 }
@@ -106,7 +108,7 @@ export const useToolStore = create<ToolState>((set) => ({
   blockPositions: [],
   isFetchingPositions: false,
   layerY: 0,
-  diffOnlyMode: false,
+  hideUnchanged: false,
   previewMode: "source",
 
   setSourceGame: (g) =>
@@ -156,7 +158,7 @@ export const useToolStore = create<ToolState>((set) => ({
   setFetchingPositions: (v) => set({ isFetchingPositions: v }),
   setSelectedBlock: (id) => set({ selectedBlockId: id }),
   setLayerY: (y) => set({ layerY: y }),
-  setDiffOnlyMode: (v) => set({ diffOnlyMode: v }),
+  setHideUnchanged: (v) => set({ hideUnchanged: v }),
   setPreviewMode: (m) => set({ previewMode: m }),
   reset: () =>
     set({
@@ -174,7 +176,7 @@ export const useToolStore = create<ToolState>((set) => ({
       isFetchingPositions: false,
       selectedBlockId: undefined,
       layerY: 0,
-      diffOnlyMode: false,
+      hideUnchanged: false,
       previewMode: "source",
     }),
 }));
