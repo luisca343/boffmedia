@@ -1,5 +1,6 @@
 import type { SchematicStructure, UnifiedBlock } from "../../types";
 import { ZipWriter } from "../../parsers/zip-writer";
+import { fluidPlacement, isHytaleFluidName, type FluidPlacement } from "../fluid";
 
 interface Vec3 {
   x: number;
@@ -113,6 +114,11 @@ function blockJson(
   return s + "}";
 }
 
+/** One fluid's compact JSON object for the top-level `fluids` array. */
+function fluidJson(p: FluidPlacement, x: number, y: number, z: number): string {
+  return `{"x":${x},"y":${y},"z":${z},"name":${JSON.stringify(p.name)},"level":${p.level}}`;
+}
+
 /** Count renderable (non-air) blocks — decides single-file vs tiled export. */
 function countNonAir(structure: SchematicStructure): number {
   const airFlags = new Uint8Array(structure.palette.length);
@@ -132,6 +138,11 @@ function countNonAir(structure: SchematicStructure): number {
  * `deserialize` re-adds each listed block and leaves the rest empty). Air carries
  * no meaning in Hytale (absent cell = empty), and the anchor + absolute coords
  * preserve placement. Streams to disk-backed {@link Blob} chunks; minified.
+ *
+ * Fluids are emitted separately: they are excluded from `blocks` and written into
+ * the top-level `fluids` array Hytale expects (a fluid in `blocks` becomes a solid
+ * static block — see {@link fluidPlacement}). Both passes sweep the grid in the
+ * same order and stream, so peak heap stays ~one chunk.
  */
 function writeSinglePrefab(structure: SchematicStructure, h: PrefabHeader): Blob {
   const { x: sx, y: sy, z: sz } = structure.dimensions;
@@ -142,23 +153,46 @@ function writeSinglePrefab(structure: SchematicStructure, h: PrefabHeader): Blob
   const parts: BlobPart[] = [];
 
   let buf = docPrefix(h);
-  let first = true;
   const flush = () => {
     parts.push(new Blob([encoder.encode(buf)]));
     buf = "";
   };
 
+  // Pass 1 — solid blocks (air and fluids excluded).
+  let first = true;
   for (let xi = 0; xi < sx; xi++) {
     for (let zi = 0; zi < sz; zi++) {
       for (let yi = 0; yi < sy; yi++) {
         const pi = data[(yi * sz + zi) * sx + xi];
         const block = pi >= 0 && pi < palette.length ? palette[pi] : undefined;
-        if (!block || block.name === "air") continue;
+        if (!block || block.name === "air" || isHytaleFluidName(block.name)) continue;
         buf +=
           (first ? "" : ",") +
           blockJson(block, xi + h.origin.x, yi + h.origin.y, zi + h.origin.z, components.get(`${xi},${yi},${zi}`));
         first = false;
         if (buf.length >= PREFAB_CHUNK_CHARS) flush();
+      }
+    }
+  }
+
+  // Pass 2 — fluids into their own array, keyed on the block's fluid states. Only
+  // emitted when the palette actually holds a fluid, so a fluid-free prefab keeps
+  // its exact prior shape (no empty `fluids` array).
+  if (palette.some((b) => isHytaleFluidName(b.name))) {
+    buf += `],"fluids":[`;
+    let firstFluid = true;
+    for (let xi = 0; xi < sx; xi++) {
+      for (let zi = 0; zi < sz; zi++) {
+        for (let yi = 0; yi < sy; yi++) {
+          const pi = data[(yi * sz + zi) * sx + xi];
+          const block = pi >= 0 && pi < palette.length ? palette[pi] : undefined;
+          if (!block) continue;
+          const placement = fluidPlacement(block.name, block.states);
+          if (!placement) continue;
+          buf += (firstFluid ? "" : ",") + fluidJson(placement, xi + h.origin.x, yi + h.origin.y, zi + h.origin.z);
+          firstFluid = false;
+          if (buf.length >= PREFAB_CHUNK_CHARS) flush();
+        }
       }
     }
   }
@@ -205,30 +239,43 @@ function writePrefabParts(structure: SchematicStructure, h: PrefabHeader): Blob 
   const prefix = docPrefix(h);
 
   let buf = prefix;
-  let inPart = 0; // non-air blocks written into the current part
+  let fluidBuf = ""; // fluids for the current part, held until it closes
+  let inPart = 0; // non-air entries (blocks + fluids) written into the current part
   let parts = 0;
-  let first = true;
+  let firstBlock = true;
+  let firstFluid = true;
 
   const closePart = () => {
-    buf += "]}";
+    buf += fluidBuf ? `],"fluids":[${fluidBuf}]}` : "]}";
     parts++;
     zip.add(`part_${String(parts).padStart(3, "0")}.prefab.json`, encoder.encode(buf));
     buf = prefix;
+    fluidBuf = "";
     inPart = 0;
-    first = true;
+    firstBlock = true;
+    firstFluid = true;
   };
 
-  // Sweep x→z→y (Hytale's block order); fill each part to the budget, then roll over.
+  // Sweep x→z→y (Hytale's block order); fill each part to the budget, then roll
+  // over. Fluids go to the current part's `fluids` array (same cell order, so
+  // each fluid lands in exactly one part) and count toward the budget alongside
+  // blocks, keeping the buffered-in-memory fluid slice bounded.
   for (let xi = 0; xi < sx; xi++) {
     for (let zi = 0; zi < sz; zi++) {
       for (let yi = 0; yi < sy; yi++) {
         const pi = data[(yi * sz + zi) * sx + xi];
         const block = pi >= 0 && pi < palette.length ? palette[pi] : undefined;
         if (!block || block.name === "air") continue;
-        buf +=
-          (first ? "" : ",") +
-          blockJson(block, xi + h.origin.x, yi + h.origin.y, zi + h.origin.z, components.get(`${xi},${yi},${zi}`));
-        first = false;
+        const placement = fluidPlacement(block.name, block.states);
+        if (placement) {
+          fluidBuf += (firstFluid ? "" : ",") + fluidJson(placement, xi + h.origin.x, yi + h.origin.y, zi + h.origin.z);
+          firstFluid = false;
+        } else {
+          buf +=
+            (firstBlock ? "" : ",") +
+            blockJson(block, xi + h.origin.x, yi + h.origin.y, zi + h.origin.z, components.get(`${xi},${yi},${zi}`));
+          firstBlock = false;
+        }
         if (++inPart >= MAX_BLOCKS_PER_PREFAB) closePart();
       }
     }

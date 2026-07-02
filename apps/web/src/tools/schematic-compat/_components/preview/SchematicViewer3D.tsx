@@ -6,6 +6,7 @@ import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import { useToolStore } from "../../_store/tool.store";
 import { placeholderColor } from "../../_lib/textures/blockTexture";
+import { fluidColor } from "../../_lib/pipeline/fluid";
 import { useModTextureLoader, useModelLoader, useConnectionsLoader } from "../../_hooks/modTextureContext";
 import { getBlockTexture } from "./blockTextureCache";
 import { useBlockModel } from "./useBlockModel";
@@ -263,6 +264,20 @@ function CubeInstances({
   if (maxCount === 0) return null;
   const sp = styleParams(kind, isSelected);
 
+  // Fluids (Minecraft water/lava, Hytale Fluid_*) have no usable cube texture —
+  // Minecraft water resolves no `water.png` (it's `water_still`) and would show a
+  // stray placeholder tile, Hytale's fluid tile renders white — so draw them as a
+  // flat translucent volume in the fluid's colour instead. Ghosted blocks keep
+  // the muted look.
+  const fluid = sp.ghost ? null : fluidColor(textureId);
+  const color = fluid
+    ? fluid
+    : sp.ghost
+      ? (texture ? "#7c8896" : "#3f4754")
+      : texture
+        ? "#ffffff"
+        : placeholderColor(textureId);
+
   return (
     <instancedMesh
       ref={meshRef}
@@ -278,15 +293,15 @@ function CubeInstances({
     >
       <boxGeometry args={[0.98, 0.98, 0.98]} />
       <meshStandardMaterial
-        key={`${texture ? texture.uuid : "flat"}|${kind}|${isSelected ? "sel" : ""}`}
-        map={texture ?? undefined}
-        color={new THREE.Color(sp.ghost ? (texture ? "#7c8896" : "#3f4754") : texture ? "#ffffff" : placeholderColor(textureId))}
+        key={`${fluid ? "fluid" : texture ? texture.uuid : "flat"}|${kind}|${isSelected ? "sel" : ""}`}
+        map={fluid ? undefined : (texture ?? undefined)}
+        color={new THREE.Color(color)}
         emissive={new THREE.Color(sp.emissive)}
         emissiveIntensity={sp.emissiveIntensity}
-        transparent={sp.transparent}
-        opacity={sp.opacity}
-        depthWrite={sp.depthWrite}
-        alphaTest={texture && !sp.ghost ? 0.5 : 0}
+        transparent={fluid ? true : sp.transparent}
+        opacity={fluid ? (isSelected ? 0.85 : 0.55) : sp.opacity}
+        depthWrite={fluid ? false : sp.depthWrite}
+        alphaTest={!fluid && texture && !sp.ghost ? 0.5 : 0}
         roughness={0.8}
         metalness={0}
       />

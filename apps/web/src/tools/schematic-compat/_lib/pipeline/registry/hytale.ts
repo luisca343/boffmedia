@@ -3,6 +3,7 @@ import { readZipEntries, extractZipEntry, type ZipEntry } from "../../parsers/zi
 import { compileBlockyModel, pngDimensions, type BlockyModel } from "../../model/blockymodel";
 import type { CompiledModel } from "../../model/types";
 import { asVariantRotation, VARIANT_LEGAL_INDICES, type VariantRotation } from "../../model/rotation-tuple";
+import { HYTALE_FLUID_BLOCKS } from "../fluid";
 import crossGameTable from "../rules/cross-game/minecraft-hytale.json";
 
 const ICON_PREFIX = "Common/Icons/ItemsGenerated/";
@@ -258,6 +259,19 @@ export async function buildHytaleRegistry(
     );
     scanned += batch.length;
     onProgress(25 + Math.round((scanned / names.length) * 45), `Scanning block catalog… ${scanned}/${names.length}`);
+  }
+
+  // Fluids aren't item-defs, so the catalog scan never sees them — inject the
+  // known fluid block types so a loaded/converted `Fluid_*` is a recognised block
+  // (not flagged "missing") and round-trips through the prefab `fluids` array.
+  // Empty validStates: the fluid's source/level ride as free-form states set by
+  // the loader and read by the writer, and must survive transformStates untouched
+  // (a converted Minecraft `water` carries none, and so defaults to a source).
+  for (const name of HYTALE_FLUID_BLOCKS) {
+    const id = `hytale:${name}`;
+    if (!blocks.has(id)) {
+      blocks.set(id, { id, validStates: {}, defaultState: {}, tags: [] });
+    }
   }
 
   for (const target of crossGameTargets()) {
