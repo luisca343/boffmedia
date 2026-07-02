@@ -1,5 +1,6 @@
 import type { SchematicStructure, UnifiedBlock, TileEntity } from "../../types";
 import { serializeBlockState } from "../normalizer";
+import { parsePrefabFluidName } from "../fluid";
 
 /**
  * A single block entry in a Hytale `.prefab.json` file.
@@ -21,6 +22,20 @@ interface PrefabBlock {
   components?: Record<string, unknown>;
 }
 
+/**
+ * A single entry in a Hytale prefab's top-level `fluids` array — a fluid cell,
+ * stored separately from `blocks`. `name` is the fluid *variant* (`Water_Source`
+ * for a source, `Water` for flowing) and `level` its fluid level (1 for a source,
+ * 1–8 for flowing).
+ */
+interface PrefabFluid {
+  x: number;
+  y: number;
+  z: number;
+  name: string;
+  level?: number;
+}
+
 interface PrefabFile {
   version?: number;
   blockIdVersion?: number;
@@ -28,6 +43,7 @@ interface PrefabFile {
   anchorY?: number;
   anchorZ?: number;
   blocks: PrefabBlock[];
+  fluids?: PrefabFluid[];
 }
 
 const AIR_ID = "hytale:air";
@@ -81,6 +97,27 @@ function toUnifiedBlock(b: PrefabBlock): UnifiedBlock {
 }
 
 /**
+ * Build the {@link UnifiedBlock} for a prefab fluid. A fluid rides along as an
+ * ordinary `Fluid_<Base>` palette block (so it occupies a cell and renders), with
+ * its source-ness + level preserved as states so the writer can reproduce the
+ * exact `fluids[]` entry on export.
+ */
+function fluidToUnifiedBlock(f: PrefabFluid): UnifiedBlock {
+  const { block, source } = parsePrefabFluidName(f.name);
+  return {
+    id: `hytale:${block}`,
+    namespace: "hytale",
+    name: block,
+    states: {
+      fluidSource: source ? "1" : "0",
+      fluidLevel: String(f.level ?? (source ? 1 : 8)),
+    },
+    tags: [],
+    source: "vanilla",
+  };
+}
+
+/**
  * Load a Hytale `.prefab.json` into the engine's neutral
  * {@link SchematicStructure}.
  *
@@ -95,15 +132,19 @@ export function loadPrefab(buffer: Uint8Array, fileName: string): SchematicStruc
   const text = new TextDecoder().decode(buffer);
   const json = JSON.parse(text) as PrefabFile;
   const blocks = Array.isArray(json.blocks) ? json.blocks : [];
+  // Fluids live in their own array, never in `blocks`; skip Hytale's "Empty"
+  // fluid sentinel (an explicitly-listed no-fluid cell).
+  const fluids = (Array.isArray(json.fluids) ? json.fluids : []).filter((f) => f.name && f.name !== "Empty");
 
-  if (blocks.length === 0) {
+  if (blocks.length === 0 && fluids.length === 0) {
     throw new Error("Prefab contains no blocks.");
   }
 
-  // Bounding box over all entries (including Empty — the grid must cover them).
+  // Bounding box over all entries (including Empty blocks and fluids — the grid
+  // must cover them, and a fluid may sit outside the solid-block extent).
   let minX = Infinity, minY = Infinity, minZ = Infinity;
   let maxX = -Infinity, maxY = -Infinity, maxZ = -Infinity;
-  for (const b of blocks) {
+  for (const b of [...blocks, ...fluids]) {
     if (b.x < minX) minX = b.x;
     if (b.y < minY) minY = b.y;
     if (b.z < minZ) minZ = b.z;
@@ -150,6 +191,22 @@ export function loadPrefab(buffer: Uint8Array, fileName: string): SchematicStruc
         });
       }
     }
+  }
+
+  // Fluids fill their cells after blocks; only ever land in an empty (air) cell,
+  // so a solid block already placed there is never clobbered by a fluid.
+  for (const f of fluids) {
+    const li = ((f.y - minY) * sz + (f.z - minZ)) * sx + (f.x - minX);
+    if (blockData[li] !== 0) continue;
+    const unified = fluidToUnifiedBlock(f);
+    const key = serializeBlockState(unified);
+    let pi = paletteIndex.get(key);
+    if (pi === undefined) {
+      pi = palette.length;
+      palette.push(unified);
+      paletteIndex.set(key, pi);
+    }
+    blockData[li] = pi;
   }
 
   return {
