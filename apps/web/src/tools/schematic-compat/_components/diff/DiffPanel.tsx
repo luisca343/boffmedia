@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
-import { BoffButton } from "@/components/boffmedia/primitives/button";
+import { BoffButton } from "@/components/boffmedia-v2/primitives/button";
 import {
   SchIcon,
   FilterChips,
@@ -12,7 +12,7 @@ import {
   type SchDiffEntry,
   type SchRing,
   type BulkAction,
-} from "@/components/boffmedia/ui/schematic";
+} from "@/components/boffmedia-v2/ui/schematic";
 import { useToolStore } from "../../_store/tool.store";
 import type { DiffEntry } from "../../_lib/types";
 import { BlockThumb, type PreviewRow } from "./BlockThumb";

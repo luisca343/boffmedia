@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Game } from '../_components/Game';
 import { LigaService } from '@/services/api/smartrotom/ligaService';
 import { ReplayData } from '../../types';
-import { BoffSpinner } from '@/components/boffmedia/primitives';
+import { BoffSpinner } from '@/components/boffmedia-v2/primitives';
 
 export default function ReplayPage({ params }: { params: Promise<{ name: string }> }) {
   const { name } = use(params);

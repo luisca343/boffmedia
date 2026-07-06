@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { BoffButton } from "@/components/boffmedia/primitives/button"
+import { BoffButton } from "@/components/boffmedia-v2/primitives/button"
 import { SchIcon } from "./sch-icon"
 
 export type BulkAction = "skip" | "remap" | "air"

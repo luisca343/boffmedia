@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { ScanCard, type SchRegistry } from "@/components/boffmedia/ui/schematic";
+import { ScanCard, type SchRegistry } from "@/components/boffmedia-v2/ui/schematic";
 import type { RegistryHandle } from "../../_lib/types";
 import type { GameId } from "../../_lib/adapters";
 

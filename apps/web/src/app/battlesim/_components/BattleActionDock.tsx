@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 
 import { useMemo } from 'react';
-import { BSXPlanChip } from '@/components/boffmedia/primitives';
+import { BSXPlanChip } from '@/components/boffmedia-v2/primitives';
 import { MovePanel } from './MovePanel';
 import { SwitchPanel } from './SwitchPanel';
 import { MechanicToggles } from './MechanicToggles';

@@ -8,7 +8,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/primitives/popover"
 import { ScrollArea } from "@/components/ui/primitives/scroll-area"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia-v2/primitives/icon"
 import { useNotificationCenter } from "react-toastify/addons/use-notification-center"
 
 // ─── Type config ──────────────────────────────────────────────────────────────

@@ -9,10 +9,10 @@ import {
 import { Button } from "@/components/ui/primitives/button"
 import { toast } from "react-toastify"
 import { Plus, Pencil, Trash2, RefreshCw, AlertTriangle, Loader2 } from "lucide-react"
-import { SearchInput } from "@/components/boffmedia/primitives/search-input"
-import { BoffBadge } from "@/components/boffmedia/primitives/badge"
-import { EmptyState } from "@/components/boffmedia/primitives/empty-state"
-import { BoffButton } from "@/components/boffmedia/primitives/button"
+import { SearchInput } from "@/components/boffmedia-v2/primitives/search-input"
+import { BoffBadge } from "@/components/boffmedia-v2/primitives/badge"
+import { EmptyState } from "@/components/boffmedia-v2/primitives/empty-state"
+import { BoffButton } from "@/components/boffmedia-v2/primitives/button"
 
 export interface AdminCrudColumn<T> {
   key: string

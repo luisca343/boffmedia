@@ -1,7 +1,7 @@
 "use client"
 
 import { Gamepad2 } from "lucide-react"
-import { AdminCrud } from "@/components/boffmedia/ui/admin/admin-crud"
+import { AdminCrud } from "@/components/boffmedia-v2/ui/admin/admin-crud"
 import { useGetGames } from "@/hooks/events/useGetGames"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { GameForm } from "./forms/GameForm"

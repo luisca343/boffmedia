@@ -2,8 +2,8 @@
 
 import { useMemo } from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
-import { ToolPanel } from "@/components/boffmedia/primitives/tool-panel"
+import { Icon } from "@/components/boffmedia-v2/primitives/icon"
+import { ToolPanel } from "@/components/boffmedia-v2/primitives/tool-panel"
 import { spriteUrl, handleSpriteError } from "@/features/vgc-tracker/types"
 import { EvSpread } from "./spread"
 import { VgcTeamRow } from "./team-row"

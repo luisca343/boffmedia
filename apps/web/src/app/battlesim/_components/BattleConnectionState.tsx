@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 
 import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { BoffSpinner } from '@/components/boffmedia/primitives';
+import { BoffSpinner } from '@/components/boffmedia-v2/primitives';
 
 interface BattleConnectionStateProps {
   kind: 'loading' | 'connecting' | 'reconnecting' | 'queue' | 'error';

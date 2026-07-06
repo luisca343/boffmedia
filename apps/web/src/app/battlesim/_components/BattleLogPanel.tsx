@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 
 import { useRef, useEffect, useState, useMemo } from 'react';
-import { BSXTick, Segmented } from '@/components/boffmedia/primitives';
+import { BSXTick, Segmented } from '@/components/boffmedia-v2/primitives';
 import type { BSXTickEv } from '../_utils/toBSXMon';
 
 export const VISIBLE_TICK_LIMIT = 50;

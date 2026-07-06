@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useShowdownBattle } from '../_hooks/useShowdownBattle';
-import { GamePanel } from '@/components/boffmedia/primitives';
+import { GamePanel } from '@/components/boffmedia-v2/primitives';
 import { ChatPanel } from '../_components/ChatPanel';
 
 export default function ShowdownLobbyPage() {
