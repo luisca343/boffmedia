@@ -1,8 +1,8 @@
 "use client"
 
-import { ExpandableCard } from "@/components/boffmedia/primitives/expandable-card"
-import { Icon } from "@/components/boffmedia/primitives/icon"
-import { CopyButton } from "@/components/boffmedia/primitives/copy-button"
+import { ExpandableCard } from "@/components/boffmedia-v2/primitives/expandable-card"
+import { Icon } from "@/components/boffmedia-v2/primitives/icon"
+import { CopyButton } from "@/components/boffmedia-v2/primitives/copy-button"
 import { spriteUrl, handleSpriteError } from "@/features/vgc-tracker/types"
 
 interface TeamSlot {

@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { BoffButton as Button } from "@/components/boffmedia/primitives/button";
-import { Icon } from "@/components/boffmedia/primitives/icon";
+import { BoffButton as Button } from "@/components/boffmedia-v2/primitives/button";
+import { Icon } from "@/components/boffmedia-v2/primitives/icon";
 
 export function Footer() {
   const t = useTranslations("boffmedia.footer");

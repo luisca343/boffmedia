@@ -1,11 +1,11 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { BoffButton } from "@/components/boffmedia/primitives/button"
-import { BoffInput } from "@/components/boffmedia/primitives/input"
+import { BoffButton } from "@/components/boffmedia-v2/primitives/button"
+import { BoffInput } from "@/components/boffmedia-v2/primitives/input"
 import { Textarea } from "@/components/ui/primitives/textarea"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/primitives/form"
-import { Field } from "@/components/boffmedia/primitives/field"
+import { Field } from "@/components/boffmedia-v2/primitives/field"
 
 const gameSchema = z.object({
   id: z.number().optional(),

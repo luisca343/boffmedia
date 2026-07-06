@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Battle } from "@pkmn/client";
 import { Protocol } from "@pkmn/protocol";
-import type { BSXMon } from "@/components/boffmedia/primitives";
+import type { BSXMon } from "@/components/boffmedia-v2/primitives";
 import type { BSXKeyMove, BSXTickEv, TeamMemberHP } from "../_utils/toBSXMon";
 import { toBSXMon, toBSXKeyMoves, requestPokemonToBSXMon, toBSXTicks, toTeamHP } from "../_utils/toBSXMon";
 

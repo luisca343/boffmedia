@@ -1,6 +1,6 @@
 'use client';
 
-import { BSXBenchChip } from '@/components/boffmedia/primitives';
+import { BSXBenchChip } from '@/components/boffmedia-v2/primitives';
 
 interface SwitchPanelProps {
   bench: Array<{ fnt: boolean; [key: string]: any }>;

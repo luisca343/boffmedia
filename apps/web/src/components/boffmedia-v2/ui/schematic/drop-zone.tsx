@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { BoffBadge } from "@/components/boffmedia/primitives/badge"
+import { BoffBadge } from "@/components/boffmedia-v2/primitives/badge"
 import { SchIcon } from "./sch-icon"
 
 export interface DropZoneFile {

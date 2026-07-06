@@ -2,8 +2,8 @@
 
 import { useState } from "react"
 import { Loader2, RefreshCw } from "lucide-react"
-import { BoffButton } from "@/components/boffmedia/primitives/button"
-import { ToolPanel } from "@/components/boffmedia/primitives/tool-panel"
+import { BoffButton } from "@/components/boffmedia-v2/primitives/button"
+import { ToolPanel } from "@/components/boffmedia-v2/primitives/tool-panel"
 import { PtcgpService } from "@/services/api/boffmedia/ptcgpService"
 
 type Step = "idle" | "series" | "sets" | "cards" | "done" | "error"

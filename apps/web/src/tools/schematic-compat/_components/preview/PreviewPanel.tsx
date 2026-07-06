@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import { SchIcon, AxisSlider, type SchStatus } from "@/components/boffmedia/ui/schematic";
+import { SchIcon, AxisSlider, type SchStatus } from "@/components/boffmedia-v2/ui/schematic";
 import { useToolStore } from "../../_store/tool.store";
 import type { PreviewMode } from "../../_store/tool.store";
 import { convertedPlan, resultPlan } from "./previewPlan";

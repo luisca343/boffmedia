@@ -1,9 +1,9 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { Icon } from "@/components/boffmedia/primitives/icon"
-import { SegTabs } from "@/components/boffmedia/primitives/seg-tabs"
-import { ToolSelect } from "@/components/boffmedia/primitives/tool-select"
+import { Icon } from "@/components/boffmedia-v2/primitives/icon"
+import { SegTabs } from "@/components/boffmedia-v2/primitives/seg-tabs"
+import { ToolSelect } from "@/components/boffmedia-v2/primitives/tool-select"
 import type { SmogonSnapshot, ChampionsRegulation, LimitlessTournament } from "@/services/api/boffmedia/vgcService"
 import { ENABLE_PREVIEW_FORMATS } from "../constants"
 

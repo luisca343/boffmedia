@@ -1,6 +1,6 @@
 "use client"
 import { Battle, Pokemon } from "@pkmn/client";
-import { BoffSkeleton, BoffSpinner } from "@/components/boffmedia/primitives";
+import { BoffSkeleton, BoffSpinner } from "@/components/boffmedia-v2/primitives";
 import { forwardRef, useCallback, useRef, memo } from "react";
 import { positionsP1, positionsP2, ASPECT_RATIO, getScaleMultiplier } from "../_utils/viewUtils";
 import { PokemonElement, PokemonRefType } from "./PokemonElement";
@@ -11,7 +11,7 @@ import { PokemonIdent } from "@pkmn/protocol";
 import useViewportWidth from "@/services/useViewPortWidth";
 import BattlePreview from "./BattlePreview";
 import BattleEndScreen from "./BattleEndScreen";
-import { BSXPlate } from "@/components/boffmedia/primitives";
+import { BSXPlate } from "@/components/boffmedia-v2/primitives";
 import { toBSXMon } from "../_utils/toBSXMon";
 import { FieldConditions } from "./FieldConditions";
 import type { ReactNode } from "react";

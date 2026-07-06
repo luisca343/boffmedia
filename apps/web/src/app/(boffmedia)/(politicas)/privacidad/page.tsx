@@ -1,11 +1,11 @@
 "use client"
 
 import * as React from "react"
-import { DocTOC } from "@/components/boffmedia/primitives/doc-toc"
-import { Kicker } from "@/components/boffmedia/primitives/kicker"
-import { Icon } from "@/components/boffmedia/primitives/icon"
-import { BoffButton as Button } from "@/components/boffmedia/primitives/button"
-import { BoffCard as Card } from "@/components/boffmedia/primitives/card"
+import { DocTOC } from "@/components/boffmedia-v2/primitives/doc-toc"
+import { Kicker } from "@/components/boffmedia-v2/primitives/kicker"
+import { Icon } from "@/components/boffmedia-v2/primitives/icon"
+import { BoffButton as Button } from "@/components/boffmedia-v2/primitives/button"
+import { BoffCard as Card } from "@/components/boffmedia-v2/primitives/card"
 
 const PRIVACY: {
   id: string

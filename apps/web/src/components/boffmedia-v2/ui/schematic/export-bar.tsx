@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
-import { BoffButton } from "@/components/boffmedia/primitives/button"
+import { BoffButton } from "@/components/boffmedia-v2/primitives/button"
 import { SchIcon } from "./sch-icon"
 import type { SchGame } from "./lib"
 

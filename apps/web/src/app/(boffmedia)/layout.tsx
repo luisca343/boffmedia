@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { env } from "@/config/env";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { FicusNav } from "@/components/boffmedia/ui/navigation/FicusNav";
+import { FicusNav } from "@/components/boffmedia-v2/ui/navigation/FicusNav";
 import { GlobalProviders } from "../GlobalProviders";
 import { BackToTop } from "@/components/ui/BackToTop";
 

@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react"
 import { Loader2, RefreshCw, Trash2 } from "lucide-react"
-import { BoffButton } from "@/components/boffmedia/primitives/button"
-import { ToolPanel } from "@/components/boffmedia/primitives/tool-panel"
+import { BoffButton } from "@/components/boffmedia-v2/primitives/button"
+import { ToolPanel } from "@/components/boffmedia-v2/primitives/tool-panel"
 import { ChampionsRegulation, SmogonSnapshot, VgcMetaService } from "@/services/api/boffmedia/vgcService"
 import { useBoffSession } from "@/services/useBoffSession"
 

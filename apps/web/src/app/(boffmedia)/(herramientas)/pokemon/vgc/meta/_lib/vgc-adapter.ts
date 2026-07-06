@@ -1,5 +1,5 @@
 import type { PokemonUsageDetail, LimitlessPlayerEntry, LimitlessPlayerTeam, DivergenceResult as ApiDivergenceResult, SpeciesTeamEntry } from "@/services/api/boffmedia/vgcService"
-import type { PokeData, UsageEntry, PlayerEntry, TeamSlot, DivergenceResult } from "@/components/boffmedia/ui/vgc/meta/meta-data"
+import type { PokeData, UsageEntry, PlayerEntry, TeamSlot, DivergenceResult } from "@/components/boffmedia-v2/ui/vgc/meta/meta-data"
 
 const SPECIES_DEX: Record<string, number> = {
   incineroar: 727, "flutter-mane": 987, fluttermane: 987, urshifu: 892,

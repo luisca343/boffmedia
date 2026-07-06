@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { BoffButton } from "@/components/boffmedia/primitives/button";
-import { SchIcon } from "@/components/boffmedia/ui/schematic";
+import { BoffButton } from "@/components/boffmedia-v2/primitives/button";
+import { SchIcon } from "@/components/boffmedia-v2/ui/schematic";
 import type { GameId } from "../../_lib/adapters";
 import { useToolStore } from "../../_store/tool.store";
 import { EnvPicker } from "./EnvPicker";
