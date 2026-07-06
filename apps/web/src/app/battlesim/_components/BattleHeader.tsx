@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 
 import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { BoffActionBar, BSXRing, Icon } from '@/components/boffmedia/primitives';
+import { BoffActionBar, BSXRing, Icon } from '@/components/boffmedia-v2/primitives';
 
 const MODE_META: Record<string, { label: string; color: string }> = {
   ai: { label: 'VS AI', color: 'var(--cyan-400)' },

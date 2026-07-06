@@ -1,6 +1,6 @@
 # Boffmedia Component Tree
 
-## `components/boffmedia/` — Unified Boffmedia tree
+## `components/boffmedia-v2/` — Unified Boffmedia tree
 
 ### `primitives/` (78 files)
 

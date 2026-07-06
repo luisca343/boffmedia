@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { BSXScorePlate, BSXOrderRail } from '@/components/boffmedia/primitives';
+import { BSXScorePlate, BSXOrderRail } from '@/components/boffmedia-v2/primitives';
 import { cn } from '@/lib/utils';
 import type { BSXLayout } from '../_hooks/useBSXLayout';
 

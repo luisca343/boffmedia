@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"
 import { useLocale } from "next-intl"
 import { useTransition } from "react"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia-v2/primitives/icon"
 
 interface LanguageSwitcherProps {
   variant?: "default" | "mobile"

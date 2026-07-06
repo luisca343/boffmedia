@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
 import { useBoffSession } from '@/services/useBoffSession'
-import { Icon } from '@/components/boffmedia/primitives/icon'
+import { Icon } from '@/components/boffmedia-v2/primitives/icon'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/primitives/avatar'
 
 export default function UserAuthSection() {

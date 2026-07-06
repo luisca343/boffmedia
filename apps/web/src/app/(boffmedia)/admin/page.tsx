@@ -3,7 +3,7 @@
 import { Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Gamepad2, Calendar, Users, Award, CreditCard, BarChart2, Download, Library, Settings } from "lucide-react"
-import { AdminLayout } from "@/components/boffmedia/ui/admin/admin-layout"
+import { AdminLayout } from "@/components/boffmedia-v2/ui/admin/admin-layout"
 import { useBoffSession } from "@/services/useBoffSession"
 import { USER_ROLES } from "@boffmedia/shared/roles"
 import { GamesAdmin } from "./_sections/games-admin"

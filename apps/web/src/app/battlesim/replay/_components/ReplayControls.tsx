@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { Input } from "@/components/ui/primitives/input";
-import { Icon, BoffActionBar, Segmented } from '@/components/boffmedia/primitives';
+import { Icon, BoffActionBar, Segmented } from '@/components/boffmedia-v2/primitives';
 import ReplayControlsButton from './ReplayControlsButton';
 import { REPLAY_SPEEDS } from '../../_utils/replaySpeed';
 

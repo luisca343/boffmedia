@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { DropZone, type DropZoneFile } from "@/components/boffmedia/ui/schematic";
+import { DropZone, type DropZoneFile } from "@/components/boffmedia-v2/ui/schematic";
 import type { SchematicSummary } from "../../_lib/types";
 
 interface FilePickerProps {

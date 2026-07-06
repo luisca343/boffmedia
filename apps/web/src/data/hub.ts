@@ -1,4 +1,4 @@
-import type { GameData } from "@/components/boffmedia/ui/games/game-card"
+import type { GameData } from "@/components/boffmedia-v2/ui/games/game-card"
 
 interface HubEntry {
   short: string

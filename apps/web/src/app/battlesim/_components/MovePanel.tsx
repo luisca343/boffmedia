@@ -1,6 +1,6 @@
 'use client';
 
-import { BSXKey } from '@/components/boffmedia/primitives';
+import { BSXKey } from '@/components/boffmedia-v2/primitives';
 import type { BSXKeyMove } from '../_utils/toBSXMon';
 
 interface MovePanelProps {

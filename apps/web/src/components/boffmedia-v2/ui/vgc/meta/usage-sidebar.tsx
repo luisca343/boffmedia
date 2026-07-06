@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react"
 import { cn } from "@/lib/utils"
-import { SearchableList } from "@/components/boffmedia/primitives/searchable-list"
+import { SearchableList } from "@/components/boffmedia-v2/primitives/searchable-list"
 import { spriteUrl, handleSpriteError } from "@/features/vgc-tracker/types"
 import { fmtCount } from "./meta-data"
 

@@ -1,6 +1,6 @@
 import { Pokemon } from "@pkmn/client";
 import { Dex } from "@pkmn/dex";
-import type { BSXMon } from "@/components/boffmedia/primitives";
+import type { BSXMon } from "@/components/boffmedia-v2/primitives";
 
 type BSXKeyMove = {
   name: string; type: string; cat: string; power: number;

@@ -1,6 +1,6 @@
 'use client';
 
-import { BoffSpinner } from '@/components/boffmedia/primitives';
+import { BoffSpinner } from '@/components/boffmedia-v2/primitives';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';

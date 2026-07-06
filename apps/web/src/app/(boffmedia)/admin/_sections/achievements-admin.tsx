@@ -1,7 +1,7 @@
 "use client"
 
 import { Award } from "lucide-react"
-import { AdminCrud } from "@/components/boffmedia/ui/admin/admin-crud"
+import { AdminCrud } from "@/components/boffmedia-v2/ui/admin/admin-crud"
 import { useGetAchievements } from "@/hooks/events/useGetAchievements"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { AchievementForm } from "./forms/AchievementForm"
