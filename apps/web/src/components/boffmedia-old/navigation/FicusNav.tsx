@@ -10,7 +10,7 @@ import { WingullMenu } from "./WingullMenu";
 import { NavMenuProvider } from "./DropdownMenu";
 import { InternalLink } from "@/components/ui/navigation/Link";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/primitives/sheet";
-import { Icon } from "@/components/boffmedia/primitives/icon";
+import { Icon } from "@/components/boffmedia-v2/primitives/icon";
 import LanguageSwitcher from "@/components/ui/navigation/LanguageSwitcher";
 
 const NotificationPopover = dynamic(() => import("./NotificationPopover"), {

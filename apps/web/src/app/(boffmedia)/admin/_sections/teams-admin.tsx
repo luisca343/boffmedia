@@ -1,7 +1,7 @@
 "use client"
 
 import { Users } from "lucide-react"
-import { AdminCrud } from "@/components/boffmedia/ui/admin/admin-crud"
+import { AdminCrud } from "@/components/boffmedia-v2/ui/admin/admin-crud"
 import { useGetTeams } from "@/hooks/events/useGetTeams"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { TeamForm } from "./forms/TeamForm"

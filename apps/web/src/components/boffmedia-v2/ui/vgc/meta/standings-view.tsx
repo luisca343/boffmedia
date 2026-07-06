@@ -2,11 +2,11 @@
 
 import { useState, useCallback } from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
-import { ToolTable } from "@/components/boffmedia/primitives/tool-table"
-import { CopyButton } from "@/components/boffmedia/primitives/copy-button"
+import { Icon } from "@/components/boffmedia-v2/primitives/icon"
+import { ToolTable } from "@/components/boffmedia-v2/primitives/tool-table"
+import { CopyButton } from "@/components/boffmedia-v2/primitives/copy-button"
 import { spriteUrl, handleSpriteError } from "@/features/vgc-tracker/types"
-import { EmptyState } from "@/components/boffmedia/primitives/empty-state"
+import { EmptyState } from "@/components/boffmedia-v2/primitives/empty-state"
 
 interface TeamSlot {
   dex: number

@@ -1,6 +1,6 @@
 'use client';
 
-import { BSXTeraBtn } from '@/components/boffmedia/primitives';
+import { BSXTeraBtn } from '@/components/boffmedia-v2/primitives';
 import { hasMechanicBeenUsed, ActiveMechanic } from '../_hooks/useChoiceMechanics';
 
 interface MechanicTogglesProps {

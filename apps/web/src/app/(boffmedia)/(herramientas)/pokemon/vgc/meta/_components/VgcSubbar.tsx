@@ -1,8 +1,8 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { Icon } from "@/components/boffmedia/primitives/icon"
-import { SegTabs } from "@/components/boffmedia/primitives/seg-tabs"
+import { Icon } from "@/components/boffmedia-v2/primitives/icon"
+import { SegTabs } from "@/components/boffmedia-v2/primitives/seg-tabs"
 
 interface VgcSubbarProps {
   tab: string

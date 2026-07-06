@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { ExportBar as ExportBarUI } from "@/components/boffmedia/ui/schematic";
+import { ExportBar as ExportBarUI } from "@/components/boffmedia-v2/ui/schematic";
 import { useToolStore } from "../../_store/tool.store";
 import type { ExportFormat } from "../../_lib/pipeline/exporter";
 

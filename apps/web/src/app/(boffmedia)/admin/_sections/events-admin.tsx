@@ -1,7 +1,7 @@
 "use client"
 
 import { Calendar } from "lucide-react"
-import { AdminCrud } from "@/components/boffmedia/ui/admin/admin-crud"
+import { AdminCrud } from "@/components/boffmedia-v2/ui/admin/admin-crud"
 import { useGetEvents } from "@/hooks/events/useGetEvents"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { EventForm } from "./forms/EventForm"

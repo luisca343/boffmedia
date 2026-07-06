@@ -5,7 +5,7 @@ import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useLiveBattleManager } from '../_hooks/useLiveBattleManager';
 import { BattleCanvas } from '../_components/BattleCanvas';
-import { GameStageLayout } from '@/components/boffmedia/layouts/GameStageLayout';
+import { GameStageLayout } from '@/components/boffmedia-v2/layouts/GameStageLayout';
 import { ASPECT_RATIO } from '../_utils/viewUtils';
 import useViewportWidth from '@/services/useViewPortWidth';
 import { useBSXLayout } from '../_hooks/useBSXLayout';

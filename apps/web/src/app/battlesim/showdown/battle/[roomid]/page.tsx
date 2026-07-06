@@ -5,7 +5,7 @@ import { useState, useRef, useEffect, useCallback, use } from 'react';
 import Link from 'next/link';
 import { useShowdownBattle, getGlobalUsername } from '../../../_hooks/useShowdownBattle';
 import { BattleCanvas } from '../../../_components/BattleCanvas';
-import { GameStageLayout } from '@/components/boffmedia/layouts/GameStageLayout';
+import { GameStageLayout } from '@/components/boffmedia-v2/layouts/GameStageLayout';
 import useViewportWidth from '@/services/useViewPortWidth';
 import { ASPECT_RATIO } from '../../../_utils/viewUtils';
 import { useBSXLayout } from '../../../_hooks/useBSXLayout';

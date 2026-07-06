@@ -7,7 +7,7 @@ import { Protocol } from '@pkmn/protocol';
 import { io, Socket } from 'socket.io-client';
 import { env } from '@/config/env.public';
 import { BattleCanvas } from '../../../_components/BattleCanvas';
-import { GameStageLayout } from '@/components/boffmedia/layouts/GameStageLayout';
+import { GameStageLayout } from '@/components/boffmedia-v2/layouts/GameStageLayout';
 import { BattleSession } from '../../../_utils/BattleSession';
 import useViewportWidth from '@/services/useViewPortWidth';
 import { ASPECT_RATIO } from '../../../_utils/viewUtils';

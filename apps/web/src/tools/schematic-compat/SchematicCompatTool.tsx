@@ -2,7 +2,7 @@
 
 import { useCallback } from "react";
 import { useTranslations } from "next-intl";
-import { SchIcon, Stepper } from "@/components/boffmedia/ui/schematic";
+import { SchIcon, Stepper } from "@/components/boffmedia-v2/ui/schematic";
 import { useCompatEngine } from "./_hooks/useCompatEngine";
 import { useToolActions } from "./_hooks/useToolActions";
 import { useSchematicRender } from "./_hooks/useSchematicRender";
