@@ -24,7 +24,7 @@ export function Badge({ tone = "default", children, className }: BadgeProps) {
     <span
       className={cn(
         "inline-block font-mono font-bold text-[10px] leading-none uppercase tracking-[0.12em] py-[5px] px-[9px] border border-solid",
-        "[clip-path:polygon(4px_0,100%_0,calc(100%_-_4px)_100%,0_100%)]",
+        "cut [--cut:4px]",
         TONES[tone],
         className,
       )}

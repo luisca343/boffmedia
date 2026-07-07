@@ -41,7 +41,7 @@ export function Footer() {
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 opacity-50 [background:repeating-linear-gradient(180deg,var(--stripe)_0_1px,transparent_1px_3px)]"
       />
-      <div className="relative mx-auto max-w-[1280px] px-5 min-[640px]:px-10">
+      <div className="wrap relative px-5 min-[640px]:px-10">
         <div className="grid grid-cols-1 gap-11 pb-10 pt-[52px] min-[620px]:grid-cols-2 min-[900px]:grid-cols-[1.5fr_1fr_1fr_1fr]">
           <div className="max-[899px]:col-span-full">
             <Link href="/" className="mb-[15px] inline-flex items-center gap-[11px] font-display text-[21px] font-extrabold italic uppercase leading-none text-txt no-underline">

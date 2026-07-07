@@ -82,23 +82,25 @@ export interface NavDropdownProps {
   active?: boolean
   sections: NavSection[]
   onNavigate?: () => void
+  /** Force the panel open and keep it open — for the design-system showcase. */
+  demoOpen?: boolean
 }
 
-export function NavDropdown({ label, href, active, sections }: NavDropdownProps) {
-  const [open, setOpen] = React.useState(false)
+export function NavDropdown({ label, href, active, sections, demoOpen }: NavDropdownProps) {
+  const [open, setOpen] = React.useState(!!demoOpen)
   const [hovSec, setHovSec] = React.useState(0)
   const closeTm = React.useRef<ReturnType<typeof setTimeout> | null>(null)
 
   React.useEffect(() => () => { if (closeTm.current) clearTimeout(closeTm.current) }, [])
   React.useEffect(() => {
     if (!open) return
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false) }
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape" && !demoOpen) setOpen(false) }
     document.addEventListener("keydown", onKey)
     return () => document.removeEventListener("keydown", onKey)
-  }, [open])
+  }, [open, demoOpen])
 
   const enter = () => { if (closeTm.current) clearTimeout(closeTm.current); setOpen(true) }
-  const leave = () => { closeTm.current = setTimeout(() => setOpen(false), 150) }
+  const leave = () => { if (demoOpen) return; closeTm.current = setTimeout(() => setOpen(false), 150) }
 
   const sec = sections[Math.min(hovSec, sections.length - 1)] || sections[0]
 

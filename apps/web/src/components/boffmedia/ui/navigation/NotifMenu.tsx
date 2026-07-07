@@ -58,13 +58,13 @@ export function NotifMenu() {
         onClick={() => setOpen((v) => !v)}
         className={cn(
           "relative inline-grid h-10 w-10 place-items-center border border-solid bg-panel transition-[color,border-color,background] duration-[140ms]",
-          "[clip-path:polygon(0_0,100%_0,100%_calc(100%_-_8px),calc(100%_-_8px)_100%,0_100%)]",
+          "cut-tag",
           open ? "border-accent-line text-accent-bright" : "border-line text-txt-muted hover:border-accent-line hover:text-accent-bright",
         )}
       >
         <Icon name="bell" size={18} />
         {unread > 0 && (
-          <span className="absolute -right-[5px] -top-[5px] grid h-[17px] min-w-[17px] place-items-center border-2 border-base bg-accent px-1 font-mono text-[10px] font-extrabold leading-none text-accent-ink [clip-path:polygon(3px_0,100%_0,calc(100%_-_3px)_100%,0_100%)]">
+          <span className="absolute -right-[5px] -top-[5px] grid h-[17px] min-w-[17px] place-items-center border-2 border-base bg-accent px-1 font-mono text-[10px] font-extrabold leading-none text-accent-ink cut [--cut:3px]">
             {unread}
           </span>
         )}
@@ -119,7 +119,7 @@ export function NotifMenu() {
                   )}
                 >
                   <span
-                    className="mt-px grid h-[30px] w-[30px] shrink-0 place-items-center border border-solid [clip-path:polygon(5px_0,100%_0,calc(100%_-_5px)_100%,0_100%)]"
+                    className="mt-px grid h-[30px] w-[30px] shrink-0 place-items-center border border-solid cut [--cut:5px]"
                     style={{
                       color: TONE_VAR[n.tone],
                       background: `color-mix(in srgb, ${TONE_VAR[n.tone]} 12%, transparent)`,

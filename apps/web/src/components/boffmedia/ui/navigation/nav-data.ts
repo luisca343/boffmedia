@@ -146,7 +146,7 @@ export const FOOTER_COLS: { title: string; links: FooterLink[] }[] = [
   {
     title: "Sistema",
     links: [
-      { route: "/componentes", label: "Componentes" },
+      { route: "/styles/components", label: "Componentes" },
       { route: "/perfil", label: "Mi perfil" },
       { route: "/admin", label: "Admin" },
       { route: "/privacidad", label: "Privacidad" },
