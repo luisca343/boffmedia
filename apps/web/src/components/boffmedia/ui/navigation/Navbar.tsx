@@ -1,0 +1,100 @@
+"use client"
+
+import * as React from "react"
+import Link from "next/link"
+import Image from "next/image"
+import { usePathname } from "next/navigation"
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/boffmedia/primitives/button"
+import { IconButton } from "@/components/boffmedia/primitives/icon-button"
+import { NavDropdown } from "./NavDropdown"
+import { LangSwitcher } from "./LangSwitcher"
+import { NotifMenu } from "./NotifMenu"
+import { MobileNav } from "./MobileNav"
+import { PRIMARY_NAV, TOOLS_SECTIONS, COMUNIDAD_SECTIONS } from "./nav-data"
+
+function useTheme() {
+  const [theme, setTheme] = React.useState<"dark" | "light">("dark")
+  React.useEffect(() => {
+    const current = (document.documentElement.dataset.theme as "dark" | "light") || "dark"
+    setTheme(current)
+  }, [])
+  const toggle = React.useCallback(() => {
+    setTheme((prev) => {
+      const next = prev === "dark" ? "light" : "dark"
+      const root = document.documentElement
+      root.classList.add("theme-switching")
+      root.dataset.theme = next
+      try { localStorage.setItem("theme", next) } catch { /* noop */ }
+      window.setTimeout(() => root.classList.remove("theme-switching"), 260)
+      return next
+    })
+  }, [])
+  return { theme, toggle }
+}
+
+export function Navbar() {
+  const pathname = usePathname() || "/"
+  const seg = "/" + (pathname.split("/").filter(Boolean)[0] || "")
+  const { theme, toggle } = useTheme()
+
+  return (
+    <nav className="sticky top-0 z-50 flex h-[66px] items-center gap-4 border-b border-line bg-base px-5 transition-[background,border-color] duration-[260ms] min-[640px]:px-10 min-[1120px]:gap-7">
+      <Link
+        href="/"
+        className="mr-0 flex shrink-0 items-center gap-[11px] font-display text-[22px] font-extrabold italic uppercase leading-none text-txt no-underline min-[1120px]:mr-[14px]"
+      >
+        <Image src="/img/boff-logo.webp" alt="" width={27} height={27} className="h-[27px] w-[27px] object-contain" />
+        <span>Boff<b className="text-accent">media</b></span>
+      </Link>
+
+      <div className="hidden h-full items-stretch gap-[26px] min-[1120px]:flex">
+        {PRIMARY_NAV.map((n) => {
+          const on = n.route === "/" ? pathname === "/" : seg === n.route
+          if (n.menu) {
+            return (
+              <NavDropdown
+                key={n.route}
+                label={n.label}
+                href={n.route}
+                active={on}
+                sections={n.menu === "tools" ? TOOLS_SECTIONS : COMUNIDAD_SECTIONS}
+              />
+            )
+          }
+          return (
+            <Link
+              key={n.route}
+              href={n.route}
+              className={cn(
+                "flex items-center border-y-[3px] border-transparent font-display text-[16px] font-bold uppercase leading-none tracking-[0.09em] no-underline transition-colors duration-[140ms]",
+                on ? "border-b-accent text-txt" : "text-txt-muted hover:text-txt",
+              )}
+            >
+              {n.label}
+            </Link>
+          )
+        })}
+      </div>
+
+      <div className="ml-auto flex items-center gap-2.5">
+        <div className="hidden items-center gap-2.5 min-[1120px]:flex">
+          <IconButton name="search" label="Buscar" />
+          <LangSwitcher />
+          <span aria-hidden="true" className="h-[22px] w-px shrink-0 bg-line-2" />
+          <NotifMenu />
+        </div>
+        <IconButton name={theme === "dark" ? "sun" : "moon"} label="Cambiar tema" onClick={toggle} />
+        <div className="hidden items-center gap-2 min-[1120px]:inline-flex">
+          <Button size="sm" variant="ghost" icon="user" href="/entrar">
+            Entrar
+          </Button>
+          <Button size="sm" variant="pri" icon="plus" href="/entrar?mode=register">
+            Crear cuenta
+          </Button>
+        </div>
+        <MobileNav pathname={pathname} />
+      </div>
+    </nav>
+  )
+}
