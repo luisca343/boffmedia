@@ -1,3 +1,7 @@
+import { getLandingItems } from "@/data/games"
+import { HUB_SLUGS } from "@/components/boffmedia/ui/tools/tools-data"
+import type { IconName } from "@/components/boffmedia/primitives/icon"
+
 /* Journey palette — each stop tints the sky; color interpolates continuously
    between stops so there are no hard edges between sections. */
 export const TV3_ZONES: [number, number, number][] = [
@@ -20,25 +24,40 @@ export const TV3_STOPS = [
   { id: "tv-meta", n: "06", t: "Meta" },
 ]
 
+// TODO(real-data): editorial placeholders until live stats/feed/event APIs
+// exist — tracked in BOFFMEDIA_V3_ROADMAP.md (Phase 3).
 export const TV3_HUD = [
   { k: "Partida", big: "412", suf: "+", sub: "jugadores activos", live: true },
   { k: "Temporada", big: "04", sub: "en emisión" },
 ]
 
-export const TV3_TOOLS = [
-  { ix: "01", n: "BattleSim", d: "Simulador de combates dobles VGC con daño previsto.", ic: "sword", href: "/herramientas/pokemon/battlesim" },
-  { ix: "02", n: "Calculadora de daño", d: "Rangos VGC y singles al instante, con enlaces.", ic: "calc", href: "/herramientas/pokemon/calc" },
-  { ix: "03", n: "VGC Tracker", d: "Registra partidas y analiza tu rendimiento.", ic: "chart", href: "/herramientas/pokemon/tracker" },
-  { ix: "04", n: "Visor de Torneos", d: "Emparejamientos, clasificación y Top Cut en directo.", ic: "trophy", href: "/herramientas/pokemon/vgc/torneos" },
-  { ix: "05", n: "Claves de Steam", d: "Catálogo de claves para sorteos y entregas.", ic: "key", href: "/herramientas/otros/keys" },
-  { ix: "06", n: "Calendario", d: "Toda la agenda de lanzamientos en un vistazo.", ic: "calendar", href: "/herramientas/otros/calendario" },
+/** Real tool count across every hub game (drives the landing "utilidades" stat). */
+export const TV3_TOOL_COUNT = HUB_SLUGS.reduce((n, slug) => n + getLandingItems(slug).length, 0)
+
+interface Tv3Tool {
+  ix: string
+  n: string
+  d: string
+  ic: IconName
+  href: string
+}
+
+export const TV3_TOOLS: Tv3Tool[] = [
+  { ix: "01", n: "BattleSim", d: "Simulador de combates dobles VGC con daño previsto.", ic: "sword", href: "/battlesim" },
+  { ix: "02", n: "Calculadora de daño", d: "Rangos VGC y singles al instante, con enlaces.", ic: "calc", href: "/pokemon/vgc/damage-calculator" },
+  { ix: "03", n: "VGC Tracker", d: "Registra partidas y analiza tu rendimiento.", ic: "chart", href: "/pokemon/vgc/tracker" },
+  { ix: "04", n: "Análisis de Meta", d: "Uso, tendencias y detalle por especie del meta VGC.", ic: "trending", href: "/pokemon/vgc/meta" },
+  { ix: "05", n: "Claves de Steam", d: "Catálogo de claves para sorteos y entregas.", ic: "key", href: "/otros/keys" },
+  { ix: "06", n: "TCG Pocket", d: "Colección, sobres y combates del TCG Pocket.", ic: "cards", href: "/pokemon/tcgpocket" },
 ]
 
 export const TV3_FEATS = ["Multiplataforma", "Pokédex viva", "Economía en vivo", "Mensajería"]
 
+// TODO(real-data): placeholder event until the events API feeds the landing.
 export const TV3_EVENT = { title: "Torneo Regional — Wingull 2", date: "14 JUL 2026 · 18:00" }
 export const TV3_EVENT_TS = new Date("2026-07-14T18:00:00").getTime()
 
+// TODO(real-data): placeholder cards/feed until community data feeds the landing.
 export const TV3_GAMES = [
   { n: "Pixelmon Wingull 2", d: "La aventura Pokémon definitiva dentro de Minecraft.", tag: "Insignia — Temporada 04", img: "/img/personajes.webp" },
   { n: "Minecraft Bingo", d: "Carreras de objetivos por equipos, ediciones rápidas.", tag: "Competitivo — Semanal", ph: "Minecraft Bingo" },

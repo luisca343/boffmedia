@@ -14,7 +14,8 @@
         "gallery": "Gallery",
         "cardList": "Card List",
         "battles": "Battles",
-        "skyGenerator": "Wonder Mail Generator"
+        "skyGenerator": "Wonder Mail Generator",
+        "damageCalc": "Damage Calculator"
       }
     },
     "mhwilds": {

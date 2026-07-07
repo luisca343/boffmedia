@@ -1,8 +1,8 @@
-import type { SVGProps } from "react";
+import type { IconName } from "@/components/boffmedia/primitives/icon";
 
 export interface LandingCardConfig {
   icon: string;
-  fallbackIcon: string;
+  fallbackIcon: IconName;
   fallbackIconColor: string;
   color: string;
   features: string[];
@@ -16,10 +16,15 @@ export interface ToolEntry {
   key: string;
   nameKey: string;
   href: string;
-  sidebarIcon: string;
-  sidebarIconProps?: SVGProps<SVGSVGElement>;
+  sidebarIcon: IconName;
   /** Default true. Set false for tools shown on the landing page but not in the sidebar. */
   showInSidebar?: boolean;
+  /**
+   * Render this tool without the shell's content padding (full-bleed canvas).
+   * `true` covers the tool's whole subtree; a number bleeds only routes at
+   * least that many path segments below `href` (e.g. 2 → session/match views).
+   */
+  bleed?: boolean | number;
   landing?: LandingCardConfig;
 }
 

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "./icon"
+import { Icon, type IconName } from "./icon"
 
 export type ToastTone = "ok" | "bad" | "warn" | "info"
 
@@ -11,7 +11,7 @@ export interface ToastOptions {
   msg?: React.ReactNode
   tone?: ToastTone
   duration?: number
-  icon?: string
+  icon?: IconName
   action?: { label: React.ReactNode; onClick?: () => void }
 }
 
@@ -26,7 +26,7 @@ const TONE_VAR: Record<ToastTone, string> = {
   info: "var(--info)",
 }
 
-const TONE_ICON: Record<ToastTone, string> = { ok: "check", bad: "alert", warn: "alert", info: "info" }
+const TONE_ICON: Record<ToastTone, IconName> = { ok: "check", bad: "alert", warn: "alert", info: "info" }
 
 // Imperative entry point — dispatch from anywhere; mount <ToastStack/> once
 // (done in `(boffmedia)/layout.tsx`).

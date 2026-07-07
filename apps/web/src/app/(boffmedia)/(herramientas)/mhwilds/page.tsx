@@ -1,5 +1,12 @@
-import { GamePage } from "@/components/boffmedia-v2/ui/games/game-page";
+import type { Metadata } from "next"
+import { getTranslations } from "next-intl/server"
+import { CategoryLanding } from "@/components/boffmedia/ui/tools"
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations()
+  return { title: t("toolsUi.category.metaTitle", { game: t("games.mhwilds.name") }) }
+}
 
 export default function MHWildsPage() {
-  return <GamePage slug="mhwilds" />;
+  return <CategoryLanding slug="mhwilds" />
 }

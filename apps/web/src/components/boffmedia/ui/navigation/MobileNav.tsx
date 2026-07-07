@@ -2,12 +2,13 @@
 
 import * as React from "react"
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "@/components/boffmedia/primitives/icon"
 import { IconButton } from "@/components/boffmedia/primitives/icon-button"
 import { Button } from "@/components/boffmedia/primitives/button"
 import { LangSwitcher } from "./LangSwitcher"
-import { PRIMARY_NAV, TOOLS_SECTIONS, COMUNIDAD_SECTIONS, type NavEntry, type NavSection } from "./nav-data"
+import { PRIMARY_NAV, buildToolsSections, buildComunidadSections, type NavSection } from "./nav-data"
 
 function sectionItems(sections: NavSection[]) {
   return sections.map((s) => ({
@@ -18,9 +19,9 @@ function sectionItems(sections: NavSection[]) {
   }))
 }
 
-function NavAccordion({ entry, onNavigate }: { entry: NavEntry; onNavigate: () => void }) {
+function NavAccordion({ label, sections, onNavigate }: { label: string; sections: NavSection[]; onNavigate: () => void }) {
   const [open, setOpen] = React.useState(false)
-  const groups = sectionItems(entry.menu === "tools" ? TOOLS_SECTIONS : COMUNIDAD_SECTIONS)
+  const groups = sectionItems(sections)
 
   return (
     <div className="border-b border-line">
@@ -30,7 +31,7 @@ function NavAccordion({ entry, onNavigate }: { entry: NavEntry; onNavigate: () =
         aria-expanded={open}
         className="flex w-full items-center justify-between py-3.5 font-display text-[17px] font-bold uppercase leading-none tracking-[0.06em] text-txt"
       >
-        {entry.label}
+        {label}
         <Icon
           name="chevronDown"
           size={16}
@@ -69,6 +70,10 @@ function NavAccordion({ entry, onNavigate }: { entry: NavEntry; onNavigate: () =
 }
 
 export function MobileNav({ pathname }: { pathname: string }) {
+  const t = useTranslations()
+  const tNav = useTranslations("nav.v3")
+  const toolsSections = React.useMemo(() => buildToolsSections(t), [t])
+  const comunidadSections = React.useMemo(() => buildComunidadSections(t), [t])
   const [open, setOpen] = React.useState(false)
 
   React.useEffect(() => {
@@ -95,7 +100,7 @@ export function MobileNav({ pathname }: { pathname: string }) {
     <>
       <IconButton
         name={open ? "x" : "menu"}
-        label={open ? "Cerrar menú" : "Abrir menú"}
+        label={open ? tNav("closeMenu") : tNav("openMenu")}
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         aria-haspopup="menu"
@@ -103,16 +108,21 @@ export function MobileNav({ pathname }: { pathname: string }) {
       />
 
       {open && (
-        <div className="fixed inset-x-0 bottom-0 top-[66px] z-[80] min-[1120px]:hidden">
-          <button type="button" aria-label="Cerrar menú" tabIndex={-1} onClick={close} className="absolute inset-0 bg-black/60" />
+        <div className="fixed inset-x-0 bottom-0 top-[var(--nav-h)] z-[80] min-[1120px]:hidden">
+          <button type="button" aria-label={tNav("closeMenu")} tabIndex={-1} onClick={close} className="absolute inset-0 bg-black/60" />
           <nav
-            aria-label="Navegación móvil"
+            aria-label={tNav("mobileNavAria")}
             className="absolute inset-x-0 top-0 max-h-full overflow-y-auto border-b-2 border-accent bg-base px-5 pb-6 pt-1 shadow-[0_24px_54px_-22px_rgba(0,0,0,0.75)]"
           >
             <div className="flex flex-col">
               {PRIMARY_NAV.map((n) =>
                 n.menu ? (
-                  <NavAccordion key={n.route} entry={n} onNavigate={close} />
+                  <NavAccordion
+                    key={n.route}
+                    label={tNav(n.labelKey)}
+                    sections={n.menu === "tools" ? toolsSections : comunidadSections}
+                    onNavigate={close}
+                  />
                 ) : (
                   <Link
                     key={n.route}
@@ -120,7 +130,7 @@ export function MobileNav({ pathname }: { pathname: string }) {
                     onClick={close}
                     className="border-b border-line py-3.5 font-display text-[17px] font-bold uppercase leading-none tracking-[0.06em] text-txt no-underline"
                   >
-                    {n.label}
+                    {tNav(n.labelKey)}
                   </Link>
                 ),
               )}
@@ -128,15 +138,15 @@ export function MobileNav({ pathname }: { pathname: string }) {
 
             <div className="mt-5 flex items-center gap-2.5">
               <LangSwitcher />
-              <IconButton name="search" label="Buscar" />
+              <IconButton name="search" label={tNav("search")} />
             </div>
 
             <div className="mt-4 grid gap-2.5">
               <Button variant="ghost" size="sm" icon="user" href="/entrar" onClick={close} className="w-full">
-                Entrar
+                {tNav("login")}
               </Button>
               <Button variant="pri" size="sm" icon="plus" href="/entrar?mode=register" onClick={close} className="w-full">
-                Crear cuenta
+                {tNav("register")}
               </Button>
             </div>
           </nav>

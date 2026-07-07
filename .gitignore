@@ -39,3 +39,5 @@ models/
 *.pyc
 *.pyo
 __pycache__/
+
+.agents

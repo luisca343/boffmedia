@@ -1,6 +1,6 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "./icon"
+import { Icon, type IconName } from "./icon"
 
 export type IconBoxTone = "accent" | "info" | "ok" | "warn" | "bad" | "muted"
 export type IconBoxSize = "sm" | "md" | "lg"
@@ -21,7 +21,7 @@ const SIZE: Record<IconBoxSize, string> = {
 }
 
 export interface IconBoxProps {
-  icon: string
+  icon: IconName
   tone?: IconBoxTone
   size?: IconBoxSize
   className?: string

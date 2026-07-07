@@ -4,6 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/boffmedia/primitives/button"
 import { IconButton } from "@/components/boffmedia/primitives/icon-button"
@@ -11,7 +12,7 @@ import { NavDropdown } from "./NavDropdown"
 import { LangSwitcher } from "./LangSwitcher"
 import { NotifMenu } from "./NotifMenu"
 import { MobileNav } from "./MobileNav"
-import { PRIMARY_NAV, TOOLS_SECTIONS, COMUNIDAD_SECTIONS } from "./nav-data"
+import { PRIMARY_NAV, buildToolsSections, buildComunidadSections } from "./nav-data"
 
 function useTheme() {
   const [theme, setTheme] = React.useState<"dark" | "light">("dark")
@@ -37,9 +38,13 @@ export function Navbar() {
   const pathname = usePathname() || "/"
   const seg = "/" + (pathname.split("/").filter(Boolean)[0] || "")
   const { theme, toggle } = useTheme()
+  const t = useTranslations()
+  const tNav = useTranslations("nav.v3")
+  const toolsSections = React.useMemo(() => buildToolsSections(t), [t])
+  const comunidadSections = React.useMemo(() => buildComunidadSections(t), [t])
 
   return (
-    <nav className="sticky top-0 z-50 flex h-[66px] items-center gap-4 border-b border-line bg-base px-5 transition-[background,border-color] duration-[260ms] min-[640px]:px-10 min-[1120px]:gap-7">
+    <nav className="sticky top-0 z-50 flex h-[var(--nav-h)] items-center gap-4 border-b border-line bg-base px-5 transition-[background,border-color] duration-[260ms] min-[640px]:px-10 min-[1120px]:gap-7">
       <Link
         href="/"
         className="mr-0 flex shrink-0 items-center gap-[11px] font-display text-[22px] font-extrabold italic uppercase leading-none text-txt no-underline min-[1120px]:mr-[14px]"
@@ -55,10 +60,10 @@ export function Navbar() {
             return (
               <NavDropdown
                 key={n.route}
-                label={n.label}
+                label={tNav(n.labelKey)}
                 href={n.route}
                 active={on}
-                sections={n.menu === "tools" ? TOOLS_SECTIONS : COMUNIDAD_SECTIONS}
+                sections={n.menu === "tools" ? toolsSections : comunidadSections}
               />
             )
           }
@@ -71,7 +76,7 @@ export function Navbar() {
                 on ? "border-b-accent text-txt" : "text-txt-muted hover:text-txt",
               )}
             >
-              {n.label}
+              {tNav(n.labelKey)}
             </Link>
           )
         })}
@@ -79,18 +84,18 @@ export function Navbar() {
 
       <div className="ml-auto flex items-center gap-2.5">
         <div className="hidden items-center gap-2.5 min-[1120px]:flex">
-          <IconButton name="search" label="Buscar" />
+          <IconButton name="search" label={tNav("search")} />
           <LangSwitcher />
           <span aria-hidden="true" className="h-[22px] w-px shrink-0 bg-line-2" />
           <NotifMenu />
         </div>
-        <IconButton name={theme === "dark" ? "sun" : "moon"} label="Cambiar tema" onClick={toggle} />
+        <IconButton name={theme === "dark" ? "sun" : "moon"} label={tNav("theme")} onClick={toggle} />
         <div className="hidden items-center gap-2 min-[1120px]:inline-flex">
           <Button size="sm" variant="ghost" icon="user" href="/entrar">
-            Entrar
+            {tNav("login")}
           </Button>
           <Button size="sm" variant="pri" icon="plus" href="/entrar?mode=register">
-            Crear cuenta
+            {tNav("register")}
           </Button>
         </div>
         <MobileNav pathname={pathname} />
