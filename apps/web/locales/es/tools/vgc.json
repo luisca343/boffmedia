@@ -6,11 +6,32 @@
       "share": "Compartir",
       "shareCopied": "¡Copiado!",
       "tabs": {
-        "1v1": "1 vs 1",
-        "teamvsmany": "Equipo → Amenazas",
-        "manyvsteam": "Amenazas → Equipo",
-        "speed": "⚡ Velocidad",
-        "typecalc": "🔮 Tipos"
+        "combate": "Combate",
+        "matriz": "Matriz",
+        "velocidad": "Velocidad",
+        "tipos": "Tipos",
+        "teamThreats": "Equipo → Amenazas",
+        "threatsTeam": "Amenazas → Equipo"
+      },
+      "ui": {
+        "attacker": "Atacante",
+        "defender": "Defensor",
+        "saved": "Equipos",
+        "verdictEmpty": "Elige un movimiento con daño en cualquiera de los dos lados para ver el veredicto.",
+        "emptyMove": "— vacío —",
+        "add": "Añadir",
+        "myTeam": "Mi equipo",
+        "threats": "Amenazas",
+        "matrixHint": "Toca un Pokémon para editar su set",
+        "matrixCorner": "Atacante ↓ · Defensor →",
+        "matrixEmpty": "Añade Pokémon a ambos lados para ver la matriz de daño.",
+        "saveNote": "Guarda el equipo actual para reutilizarlo en la matriz o entre sesiones.",
+        "editPrefix": "Editar",
+        "twHint": "Tiempo Raro: el más lento actúa primero",
+        "reference": "Referencia",
+        "referenceSub": "(máx / neutra, 31 IV)",
+        "speedEmpty": "Añade Pokémon a tu equipo y a rivales para comparar velocidades.",
+        "typesEmpty": "Añade Pokémon a tu equipo (pestaña Matriz) para ver su cobertura de tipos."
       },
       "panel": {
         "attacker": "Pokémon 1 — Atacante",
@@ -55,6 +76,7 @@
         "colTotal": "Total",
         "totalEvs": "Total EVs",
         "totalSp": "Total SP",
+        "overBudget": "presupuesto excedido",
         "hpLabel": "PS",
         "hpReset": "Reiniciar",
         "movePlaceholder": "Movimiento {n}...",
@@ -251,10 +273,6 @@
     "speed": {
       "title": "Velocidad",
       "subtitle": "Referencia de niveles de velocidad y calculadora de matchups",
-      "tabs": {
-        "tiers": "Niveles",
-        "matchup": "Matchup"
-      },
       "modifiers": {
         "title": "Modificadores",
         "clear": "Limpiar modificadores",
@@ -668,18 +686,6 @@
     "meta": {
       "title": "Análisis de Meta",
       "subtitle": "Uso en la escalera y composición de equipos desde Smogon Stats",
-      "tabs": {
-        "stats": "Estadísticas",
-        "tournament": "Torneo",
-        "combined": "Combinado",
-        "aggregate": "Uso",
-        "players": "Jugadores",
-        "divergence": "Divergencia",
-        "compare": "Comparar",
-        "comingSoon": "Próximamente",
-        "previewBadge": "Preview",
-        "championsPreviewNotice": "Datos obtenidos de VGCPastes (exportación CSV). Esta pestaña es una previsualización temporal: cuando el formato Champions llegue a Pokémon Showdown, los datos pasarán a ser los estadísticos oficiales de Smogon."
-      },
       "formats": {
         "gen9vgc2026regi": "VGC 2026 Reg I",
         "gen9vgc2026regh": "VGC 2026 Reg H",
