@@ -43,8 +43,9 @@ import { Ph } from "@/components/boffmedia/primitives/ph"
 import { CountUp } from "@/components/boffmedia/primitives/count-up"
 import { NavDropdown } from "@/components/boffmedia/ui/navigation/NavDropdown"
 import { LangSwitcher } from "@/components/boffmedia/ui/navigation/LangSwitcher"
-import { NotifMenu } from "@/components/boffmedia/ui/navigation/NotifMenu"
-import { TOOLS_SECTIONS, COMUNIDAD_SECTIONS } from "@/components/boffmedia/ui/navigation/nav-data"
+import { NotifMenu, type Notif } from "@/components/boffmedia/ui/navigation/NotifMenu"
+import { buildToolsSections, buildComunidadSections } from "@/components/boffmedia/ui/navigation/nav-data"
+import { useTranslations } from "next-intl"
 import { Footer } from "@/components/boffmedia/ui/layout/Footer"
 import { Marquee } from "@/components/boffmedia/ui/layout/Marquee"
 import { Decode, useSignalFX } from "@/components/boffmedia/ui/landing/travesia-fx"
@@ -167,6 +168,15 @@ function Section({ id, kicker, title, lead, children }: { id: string; kicker: st
 
 const MONO_LABEL = "font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-txt-muted"
 
+// Demo-only notifications — the real NotifMenu starts empty until a
+// notifications API exists.
+const DEMO_NOTIFS: Notif[] = [
+  { id: 1, icon: "trophy", tone: "accent", text: "Tu equipo quedó 3.º en el Torneo Wingull 2.", time: "hace 2 min", read: false },
+  { id: 2, icon: "gift", tone: "info", text: "Nuevo sorteo: clave de Steam disponible.", time: "hace 1 h", read: false },
+  { id: 3, icon: "message", tone: "muted", text: "RotomChef respondió a tu hilo del foro.", time: "hace 3 h", read: false },
+  { id: 4, icon: "star", tone: "muted", text: "Desbloqueaste el logro «Racha de 10».", time: "ayer", read: true },
+]
+
 // Display headings — «voz de la señal»: heavy italic uppercase, matching base.css
 // (h1/h2/h3). Heading `em` becomes an accent-stroked outline.
 const DISPLAY = "font-display font-extrabold italic uppercase leading-[0.92] tracking-[-0.005em]"
@@ -197,6 +207,9 @@ function FxPlayground() {
 }
 
 export default function ComponentsShowcase() {
+  const t = useTranslations()
+  const toolsSections = React.useMemo(() => buildToolsSections(t), [t])
+  const comunidadSections = React.useMemo(() => buildComunidadSections(t), [t])
   const [grpName, setGrpName] = React.useState(CHAPTERS[0].name)
   const [q, setQ] = React.useState("")
   const [active, setActive] = React.useState(CHAPTERS[0].sections[0].id)
@@ -232,7 +245,7 @@ export default function ComponentsShowcase() {
     } catch {
       /* noop */
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [])
 
   // chapter switch → reset active section, persist, scroll to top of catalog
@@ -250,7 +263,7 @@ export default function ComponentsShowcase() {
     }
     const top = document.getElementById("sc3-top")
     if (top) window.scrollTo({ top: top.getBoundingClientRect().top + window.scrollY - 76 })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [grpName])
 
   // scroll spy
@@ -267,7 +280,7 @@ export default function ComponentsShowcase() {
     spy()
     window.addEventListener("scroll", spy, { passive: true })
     return () => window.removeEventListener("scroll", spy)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [grpName])
 
   // "/" focuses search
@@ -323,7 +336,7 @@ export default function ComponentsShowcase() {
   const sideLink = "block font-mono text-[12px] font-semibold leading-none uppercase tracking-[0.1em] no-underline py-[10px] px-[14px] border-l-[3px] border-solid transition-[color,border-color,background] duration-[140ms] cursor-pointer"
 
   return (
-    <main data-ds="boffmedia" className="wrap" data-screen-label="Componentes">
+    <main data-ds="boffmedia" className="wrap">
       <div className="pt-[34px]">
         <Kicker>Sistema de diseño · v3</Kicker>
         <h1 className={cn(DISPLAY, DISPLAY_EM, "text-[clamp(40px,11vw,72px)]/[0.92] mt-[14px] mb-[10px] break-words")}>
@@ -757,16 +770,16 @@ export default function ComponentsShowcase() {
               id="navdrop"
               kicker="Primitivas"
               title="Dropdown de nav"
-              lead={<>El menú del navbar (<code>NavDropdown</code>): abre al pasar el cursor y el clic en el disparador navega al hub. Formato partido — carril de juegos a la izquierda; al pasar el cursor la hoja muestra sus herramientas agrupadas por categoría, con cabecera que navega a su hub. Se alimenta del registro de navegación (<code>TOOLS_SECTIONS</code> / <code>COMUNIDAD_SECTIONS</code>): añadir un juego o herramienta ahí lo hace aparecer aquí sin tocar el navbar.</>}
+              lead={<>El menú del navbar (<code>NavDropdown</code>): abre al pasar el cursor y el clic en el disparador navega al hub. Formato partido — carril de juegos a la izquierda; al pasar el cursor la hoja muestra sus herramientas agrupadas por categoría, con cabecera que navega a su hub. Se alimenta del registro de navegación (<code>buildToolsSections</code> deriva del registro <code>data/games</code>): añadir un juego o herramienta ahí lo hace aparecer aquí, en el hub y en la barra lateral sin tocar el navbar.</>}
             >
               <Sample title="Herramientas — juego → categorías" code="<NavDropdown demoOpen sections>" col note={<>Cada cabecera de categoría navega a su hub; la fila de juego navega a su página. Fijado abierto para la demo — arriba en la barra abre al pasar el cursor.</>}>
                 <div className="relative min-h-[360px] w-full overflow-x-auto">
-                  <NavDropdown demoOpen label="Herramientas" href="/herramientas" sections={TOOLS_SECTIONS} />
+                  <NavDropdown demoOpen label="Herramientas" href="/herramientas" sections={toolsSections} />
                 </div>
               </Sample>
-              <Sample title="Comunidad — todo agrupado" code="COMUNIDAD_SECTIONS" col note={<>Mismo formato para el menú de Comunidad.</>}>
+              <Sample title="Comunidad — todo agrupado" code="buildComunidadSections" col note={<>Mismo formato para el menú de Comunidad.</>}>
                 <div className="relative min-h-[300px] w-full overflow-x-auto">
-                  <NavDropdown demoOpen label="Comunidad" href="/comunidad" sections={COMUNIDAD_SECTIONS} />
+                  <NavDropdown demoOpen label="Comunidad" href="/comunidad" sections={comunidadSections} />
                 </div>
               </Sample>
             </Section>
@@ -783,7 +796,7 @@ export default function ComponentsShowcase() {
                 <LangSwitcher />
               </Sample>
               <Sample title="Notificaciones" code="<NotifMenu>" note={<>Campana con contador de no leídas; el popover permite marcar leídas y limpiar, con estado vacío. Ábrela.</>}>
-                <NotifMenu />
+                <NotifMenu initialItems={DEMO_NOTIFS} />
               </Sample>
               <Sample title="Cuenta — sin sesión" code='<Button href="/entrar">' note={<>Entrar / Crear cuenta cuando no hay sesión, tal como aparecen en la barra. El menú de cuenta con sesión llega con la pantalla de acceso.</>}>
                 <Button size="sm" variant="ghost" icon="user" href="/entrar">

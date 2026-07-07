@@ -429,6 +429,10 @@ const config: Config = {
     // a heading still wins.
     plugin(({ addBase, addComponents }) => {
       addBase({
+        // Shared layout tokens (navbar height drives sticky offsets in the shells).
+        ":root": {
+          "--nav-h": "66px",
+        },
         ':where([data-ds="boffmedia"]) :is(h1, h2, h3)': {
           fontFamily: "var(--font-display)",
           fontWeight: "800",

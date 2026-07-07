@@ -121,6 +121,7 @@ export default getRequestConfig(async () => {
     'nav.json',
     'items.json',
     'tools/games.json',
+    'tools/hub.json',
     'tools/mhwilds.json',
     'tools/pokemon.json',
     'tools/vgc.json',

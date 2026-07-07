@@ -1,24 +1,19 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon, type IconName } from "@/components/boffmedia/primitives/icon"
+import { useDismiss } from "@/components/boffmedia/hooks/use-dismiss"
 
-interface Notif {
+export interface Notif {
   id: number
-  icon: string
+  icon: IconName
   tone: "accent" | "info" | "muted"
   text: string
   time: string
   read: boolean
 }
-
-const SEED: Notif[] = [
-  { id: 1, icon: "trophy", tone: "accent", text: "Tu equipo quedó 3.º en el Torneo Wingull 2.", time: "hace 2 min", read: false },
-  { id: 2, icon: "gift", tone: "info", text: "Nuevo sorteo: clave de Steam disponible.", time: "hace 1 h", read: false },
-  { id: 3, icon: "message", tone: "muted", text: "RotomChef respondió a tu hilo del foro.", time: "hace 3 h", read: false },
-  { id: 4, icon: "star", tone: "muted", text: "Desbloqueaste el logro «Racha de 10».", time: "ayer", read: true },
-]
 
 const TONE_VAR: Record<Notif["tone"], string> = {
   accent: "var(--accent)",
@@ -26,33 +21,25 @@ const TONE_VAR: Record<Notif["tone"], string> = {
   muted: "var(--muted)",
 }
 
-const POP_CLIP = "polygon(0 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%)"
+export interface NotifMenuProps {
+  /** Notifications to show. No notifications API exists yet — defaults to the (real) empty state; the showcase injects demo items. */
+  initialItems?: Notif[]
+}
 
-export function NotifMenu() {
+export function NotifMenu({ initialItems }: NotifMenuProps) {
+  const tNav = useTranslations("nav.v3")
   const [open, setOpen] = React.useState(false)
-  const [items, setItems] = React.useState<Notif[]>(SEED)
+  const [items, setItems] = React.useState<Notif[]>(initialItems ?? [])
   const rootRef = React.useRef<HTMLSpanElement>(null)
   const unread = items.filter((n) => !n.read).length
 
-  React.useEffect(() => {
-    if (!open) return
-    const onDown = (e: MouseEvent) => {
-      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false)
-    }
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false) }
-    document.addEventListener("mousedown", onDown)
-    document.addEventListener("keydown", onKey)
-    return () => {
-      document.removeEventListener("mousedown", onDown)
-      document.removeEventListener("keydown", onKey)
-    }
-  }, [open])
+  useDismiss(rootRef, () => setOpen(false), open)
 
   return (
     <span className="relative inline-flex" ref={rootRef}>
       <button
         type="button"
-        aria-label="Notificaciones"
+        aria-label={tNav("notifications")}
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
@@ -73,13 +60,12 @@ export function NotifMenu() {
       {open && (
         <div
           role="menu"
-          aria-label="Notificaciones"
-          style={{ clipPath: POP_CLIP }}
-          className="absolute right-0 top-[calc(100%_+_8px)] z-[70] w-[340px] border border-solid border-line-2 border-t-accent bg-panel shadow-[0_24px_54px_-22px_rgba(0,0,0,0.75)] animate-[bm-nd-pop_0.14s_ease-out]"
+          aria-label={tNav("notifications")}
+          className="cut-tag [--cut-tag:10px] absolute right-0 top-[calc(100%_+_8px)] z-[70] w-[340px] border border-solid border-line-2 border-t-accent bg-panel shadow-[0_24px_54px_-22px_rgba(0,0,0,0.75)] animate-[bm-nd-pop_0.14s_ease-out] motion-reduce:animate-none"
         >
           <header className="flex items-center gap-2 border-b border-line px-[15px] pb-[11px] pt-[13px]">
             <b className="flex-1 font-display text-[13px] font-bold uppercase leading-none tracking-[0.04em] text-txt">
-              Notificaciones
+              {tNav("notifications")}
             </b>
             {items.length > 0 && (
               <span className="inline-flex gap-3">
@@ -89,7 +75,7 @@ export function NotifMenu() {
                     onClick={() => setItems((a) => a.map((n) => ({ ...n, read: true })))}
                     className="font-mono text-[10.5px] font-semibold uppercase leading-none tracking-[0.06em] text-txt-muted transition-colors duration-[140ms] hover:text-accent"
                   >
-                    Marcar leídas
+                    {tNav("markRead")}
                   </button>
                 )}
                 <button
@@ -97,7 +83,7 @@ export function NotifMenu() {
                   onClick={() => setItems([])}
                   className="font-mono text-[10.5px] font-semibold uppercase leading-none tracking-[0.06em] text-txt-muted transition-colors duration-[140ms] hover:text-accent"
                 >
-                  Limpiar
+                  {tNav("clear")}
                 </button>
               </span>
             )}
@@ -106,7 +92,7 @@ export function NotifMenu() {
           {items.length === 0 ? (
             <div className="flex flex-col items-center gap-2.5 px-4 py-[34px] text-txt-dim">
               <Icon name="bell" size={26} />
-              <span className="font-body text-[13px] font-medium leading-none">Sin notificaciones</span>
+              <span className="font-body text-[13px] font-medium leading-none">{tNav("noNotifications")}</span>
             </div>
           ) : (
             <div className="max-h-[280px] overflow-y-auto">
@@ -136,7 +122,7 @@ export function NotifMenu() {
                   </div>
                   <button
                     type="button"
-                    aria-label="Eliminar"
+                    aria-label={tNav("delete")}
                     onClick={() => setItems((a) => a.filter((x) => x.id !== n.id))}
                     className="-mr-1 -mt-0.5 grid h-[22px] w-[22px] shrink-0 place-items-center text-txt-dim opacity-0 transition-[color,opacity] duration-[140ms] hover:text-bad group-hover/notif:opacity-100"
                   >

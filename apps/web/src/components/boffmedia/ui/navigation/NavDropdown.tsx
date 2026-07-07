@@ -2,11 +2,10 @@
 
 import * as React from "react"
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "@/components/boffmedia/primitives/icon"
 import type { NavSection, NavItem } from "./nav-data"
-
-const PANEL_CLIP = "polygon(0 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%)"
 
 function DropItems({ items }: { items: NavItem[] }) {
   return (
@@ -87,6 +86,7 @@ export interface NavDropdownProps {
 }
 
 export function NavDropdown({ label, href, active, sections, demoOpen }: NavDropdownProps) {
+  const tNav = useTranslations("nav.v3")
   const [open, setOpen] = React.useState(!!demoOpen)
   const [hovSec, setHovSec] = React.useState(0)
   const closeTm = React.useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -129,9 +129,8 @@ export function NavDropdown({ label, href, active, sections, demoOpen }: NavDrop
       {open && (
         <div
           role="menu"
-          aria-label={`Menú de ${label}`}
-          style={{ clipPath: PANEL_CLIP }}
-          className="absolute left-[-18px] top-full z-[70] flex border border-solid border-line-2 border-t-accent bg-panel shadow-[0_24px_54px_-22px_rgba(0,0,0,0.75)] animate-[bm-nd-pop_0.14s_ease-out]"
+          aria-label={tNav("menuOf", { label })}
+          className="cut-tag [--cut-tag:10px] absolute left-[-18px] top-full z-[70] flex border border-solid border-line-2 border-t-accent bg-panel shadow-[0_24px_54px_-22px_rgba(0,0,0,0.75)] animate-[bm-nd-pop_0.14s_ease-out] motion-reduce:animate-none"
         >
           <div className="flex w-[176px] flex-col gap-0.5 border-r border-line bg-panel-2 p-2.5" role="none">
             {sections.map((s, i) => {

@@ -1,17 +1,17 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "./icon"
+import { Icon, type IconName } from "./icon"
 
 export interface OptionItem {
   value: string
-  icon?: string
+  icon?: IconName
   label: React.ReactNode
   sub?: React.ReactNode
   disabled?: boolean
 }
 
 export interface OptionCardProps {
-  icon?: string
+  icon?: IconName
   label: React.ReactNode
   sub?: React.ReactNode
   active?: boolean

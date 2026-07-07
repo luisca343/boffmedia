@@ -14,7 +14,8 @@
         "gallery": "Galería",
         "cardList": "Lista de Cartas",
         "battles": "Combates",
-        "skyGenerator": "Generador de Correos"
+        "skyGenerator": "Generador de Correos",
+        "damageCalc": "Calculadora de daño"
       }
     },
     "mhwilds": {
