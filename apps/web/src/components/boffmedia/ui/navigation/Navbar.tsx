@@ -6,12 +6,12 @@ import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/boffmedia/primitives/button"
 import { IconButton } from "@/components/boffmedia/primitives/icon-button"
 import { NavDropdown } from "./NavDropdown"
 import { LangSwitcher } from "./LangSwitcher"
 import { NotifMenu } from "./NotifMenu"
 import { MobileNav } from "./MobileNav"
+import { AccountNav } from "./AccountNav"
 import { PRIMARY_NAV, buildToolsSections, buildComunidadSections } from "./nav-data"
 
 function useTheme() {
@@ -91,12 +91,7 @@ export function Navbar() {
         </div>
         <IconButton name={theme === "dark" ? "sun" : "moon"} label={tNav("theme")} onClick={toggle} />
         <div className="hidden items-center gap-2 min-[1120px]:inline-flex">
-          <Button size="sm" variant="ghost" icon="user" href="/entrar">
-            {tNav("login")}
-          </Button>
-          <Button size="sm" variant="pri" icon="plus" href="/entrar?mode=register">
-            {tNav("register")}
-          </Button>
+          <AccountNav />
         </div>
         <MobileNav pathname={pathname} />
       </div>

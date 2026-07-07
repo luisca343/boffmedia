@@ -1,0 +1,40 @@
+{
+  "profile": {
+    "kicker": "Cuenta",
+    "title": "Mi perfil",
+    "edit": "Editar perfil",
+    "save": "Guardar cambios",
+    "saving": "Guardando…",
+    "saved": "Perfil actualizado",
+    "saveError": "No se pudo guardar el perfil",
+    "memberSince": "Miembro desde {year}",
+    "form": {
+      "name": "Nombre",
+      "email": "Correo",
+      "bio": "Biografía"
+    },
+    "section": {
+      "account": "Datos de la cuenta",
+      "linked": "Cuentas vinculadas"
+    },
+    "linked": {
+      "linked": "Vinculado",
+      "unlinked": "Sin vincular",
+      "link": "Vincular",
+      "soon": "Próximamente"
+    },
+    "status": {
+      "online": "En línea",
+      "offline": "Desconectado"
+    },
+    "avatar": {
+      "change": "Cambiar foto",
+      "error": "No se pudo subir la imagen"
+    },
+    "loggedOut": {
+      "title": "Acceso requerido",
+      "body": "Inicia sesión para ver tu perfil.",
+      "cta": "Entrar"
+    }
+  }
+}

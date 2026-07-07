@@ -1,102 +1,12 @@
-"use client"
+import type { Metadata } from "next"
+import { EventDetailView } from "./_components/EventDetailView"
 
-import { useParams } from "next/navigation"
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/primitives/button"
-import { EventsService } from "@/services/api/boffmedia/eventsService"
-import { useBoffSession } from "@/services/useBoffSession"
+export const metadata: Metadata = {
+  title: "Evento · Boffmedia",
+  description: "Detalle del evento: logros, participantes y clasificación.",
+}
 
-// Components
-import { EventHero } from "./_components/EventHero"
-import { ParticipantsGrid } from "./_components/ParticipantsGrid"
-import { AchievementsSection } from "./_components/AchievementsSection"
-import { Leaderboard } from "./_components/Leaderboard"
-import { LoadingSpinner } from "./_components/LoadingSpinner"
-import { InternalLink } from "@/components/ui/navigation/Link"
-
-export default function EventSummaryPage() {
-  const params = useParams()
-  const eventId = parseInt(params.id as string)
-  const { session } = useBoffSession()
-
-  const [event, setEvent] = useState<any>(null)
-  const [participants, setParticipants] = useState<any[]>([])
-  const [achievements, setAchievements] = useState<any[]>([])
-  const [leaderboard, setLeaderboard] = useState<any[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    async function fetchEventData() {
-      try {
-        setIsLoading(true)
-
-        const [eventResponse, participantsResponse, achievementsResponse] = await Promise.all([
-          EventsService.getEvent(eventId),
-          EventsService.getEventParticipants(eventId),
-          EventsService.getEventAchievements(eventId),
-        ])
-
-        setEvent(eventResponse.data)
-        setParticipants(participantsResponse.data || [])
-        setAchievements(achievementsResponse.data || [])
-
-        try {
-          const leaderboardResponse = await EventsService.getLeaderboard(eventId)
-          setLeaderboard(leaderboardResponse.data || [])
-        } catch (leaderboardError) {
-          console.warn("Leaderboard API not available yet, using empty array:", leaderboardError)
-          setLeaderboard([])
-        }
-      } catch (error) {
-        console.error("Error fetching event data:", error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    if (eventId && !isNaN(eventId)) {
-      fetchEventData()
-    }
-  }, [eventId])
-
-  if (isLoading) {
-    return <LoadingSpinner />
-  }
-
-  if (!event) {
-    return (
-      <div className="min-h-screen">
-        <div className="container mx-auto p-6 max-w-7xl">
-          <div className="text-center py-20">
-            <h1 className="text-2xl font-bold text-white mb-4">Evento no encontrado</h1>
-            <InternalLink href="/eventos">
-              <Button variant="accent">Volver a eventos</Button>
-            </InternalLink>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="min-h-screen">
-      <div className="relative z-10 container mx-auto p-6 max-w-7xl space-y-8">
-        {/* Hero */}
-        <EventHero event={event} participants={participants} />
-
-        {/* Content sections */}
-        <div className="space-y-10">
-          <AchievementsSection
-            eventId={eventId}
-            achievements={achievements}
-            participants={participants}
-          />
-
-          <ParticipantsGrid participants={participants} />
-
-          <Leaderboard leaderboard={leaderboard} />
-        </div>
-      </div>
-    </div>
-  )
+export default async function EventDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  return <EventDetailView id={Number(id)} />
 }
