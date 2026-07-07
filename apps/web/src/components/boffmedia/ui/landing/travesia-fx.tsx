@@ -242,7 +242,7 @@ export function FxParticles({ density = 90, className }: { density?: number; cla
 /* ---- reticle cursor -------------------------------------------------------- */
 export function FxCursor({
   scope = "main",
-  hot = "a,button,.sn-btn,[data-glare]",
+  hot = "a,button,[data-btn],[data-glare]",
 }: {
   scope?: string
   hot?: string
@@ -339,7 +339,7 @@ export function useSignalFX(rootRef: React.RefObject<HTMLElement | null>, lvl = 
     if (lvl >= 3 && !reduce) {
       let mag: HTMLElement | null = null
       const onMag = (e: PointerEvent) => {
-        const b = e.target instanceof Element ? e.target.closest<HTMLElement>(".sn-btn") : null
+        const b = e.target instanceof Element ? e.target.closest<HTMLElement>("[data-btn]") : null
         if (b !== mag && mag) mag.style.transform = ""
         mag = b && root.contains(b) ? b : null
         if (mag && !noM()) {

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/primitives/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/primitives/dialog"
 import { Loader2, Save } from 'lucide-react'
 import { useLocale, useTranslations } from "next-intl"
-import { toast } from 'react-toastify'
+import { toast } from '@/components/boffmedia/primitives/toast'
 import { boffPOST, boffGET } from "@/services/boffAPI"
 import { usePathname } from "next/navigation"
 import { useGalleryData } from "../galeria/_hooks/useGalleryData"

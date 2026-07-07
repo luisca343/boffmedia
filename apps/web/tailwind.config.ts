@@ -21,10 +21,9 @@ const config: Config = {
         // Boffmedia type system (default)
         display: ["Saira Condensed", "Arial Narrow", "sans-serif"],
         body: ["Saira", "ui-sans-serif", "system-ui", "sans-serif"],
-        mono: ["Roboto Mono", "ui-monospace", "monospace"],
-        // Legacy families retained for not-yet-migrated components
+        mono: ["IBM Plex Mono", "ui-monospace", "monospace"],
+        // Legacy family retained for not-yet-migrated components
         orbitron: ["Orbitron", "sans-serif"],
-        jetbrains: ["JetBrains Mono", "ui-monospace", "monospace"],
       },
       fontSize: {
         "4xl": ["2.25rem", { lineHeight: "normal" }],
@@ -96,6 +95,13 @@ const config: Config = {
         reverseBoxShadowY: "-4px",
       },
       colors: {
+        // ════════════════════════════════════════════════════════════════════
+        // LEGACY (Neon/v2) TOKEN VOCABULARY — @deprecated, do not use in new
+        // Boffmedia code. Kept only for not-yet-migrated `boffmedia-v2` and
+        // shadcn-compat components. The CURRENT v3 vocabulary is further down:
+        // base/panel/line/txt/accent/ok/warn/bad/signal.
+        // ════════════════════════════════════════════════════════════════════
+
         // Standard gray palette for compatibility
         gray: {
           50: "#f9fafb",
@@ -257,6 +263,12 @@ const config: Config = {
           foreground: "hsl(var(--ui-card-foreground))",
         },
 
+        // ════════════════════════════════════════════════════════════════════
+        // BOFFMEDIA V3 — CURRENT TOKEN VOCABULARY. Use these in all new code:
+        // surfaces base/base-2/base-deep/panel · hairlines line · text txt
+        // brand accent · status ok/warn/bad/signal.
+        // ════════════════════════════════════════════════════════════════════
+
         // ── Surfaces ──────────────────────────────────────────────────────────
         // bg-base (already defined → --bg), bg-base-2, bg-base-deep
         "base-2":    "var(--bg-2)",
@@ -409,6 +421,64 @@ const config: Config = {
   plugins: [
     require("tailwindcss-animate"),
     require("tailwindcss-textshadow"),
+    // ── Boffmedia v3 design system ─────────────────────────────────────────
+    // Base heading treatment + shared geometry/label patterns, so pages get
+    // the system look without repeating utility stacks. Scoped to the
+    // `[data-ds="boffmedia"]` shell (set in `(boffmedia)/layout.tsx`) via
+    // `:where()` so specificity stays at element level — any utility class on
+    // a heading still wins.
+    plugin(({ addBase, addComponents }) => {
+      addBase({
+        ':where([data-ds="boffmedia"]) :is(h1, h2, h3)': {
+          fontFamily: "var(--font-display)",
+          fontWeight: "800",
+          fontStyle: "italic",
+          textTransform: "uppercase",
+          lineHeight: "0.92",
+          letterSpacing: "-0.005em",
+        },
+        ':where([data-ds="boffmedia"]) :is(h1, h2, h3) em': {
+          fontStyle: "italic",
+          color: "transparent",
+          WebkitTextStroke: "1.6px var(--accent)",
+        },
+        ':where([data-ds="boffmedia"]) :is(h4, h5, h6)': {
+          fontFamily: "var(--font-display)",
+          fontWeight: "700",
+          textTransform: "uppercase",
+          letterSpacing: "0.02em",
+          lineHeight: "1.05",
+        },
+      })
+      addComponents({
+        // Diagonal cuts (size via --cut/--cut-lg tokens; override per-instance
+        // with e.g. `[--cut:4px]`, `[--cut-tag:9px]`).
+        ".cut": {
+          clipPath: "polygon(var(--cut) 0, 100% 0, calc(100% - var(--cut)) 100%, 0 100%)",
+        },
+        ".cut-corner": {
+          clipPath: "polygon(0 0, calc(100% - var(--cut-lg)) 0, 100% var(--cut-lg), 100% 100%, 0 100%)",
+        },
+        ".cut-tag": {
+          clipPath:
+            "polygon(0 0, 100% 0, 100% calc(100% - var(--cut-tag, 8px)), calc(100% - var(--cut-tag, 8px)) 100%, 0 100%)",
+        },
+        // Page gutter — fluid width capped at 1280px with 40px gutters.
+        ".wrap": {
+          width: "100%",
+          maxWidth: "1280px",
+          marginInline: "auto",
+          paddingInline: "2.5rem",
+        },
+        // Small uppercase mono label (dim). Color/size overridable by utilities.
+        ".mono-label": {
+          font: "600 11px/1 var(--font-mono)",
+          letterSpacing: "0.14em",
+          textTransform: "uppercase",
+          color: "var(--muted)",
+        },
+      })
+    }),
     // Enhanced text shadow plugin
     plugin(({ theme, addUtilities }) => {
       const shadowUtilities: Record<string, { textShadow: string }> = {}

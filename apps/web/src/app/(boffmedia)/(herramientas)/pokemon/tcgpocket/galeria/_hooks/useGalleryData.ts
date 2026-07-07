@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { PtcgpService } from '@/services/api/boffmedia/ptcgpService'
-import { toast } from 'react-toastify'
+import { toast } from '@/components/boffmedia/primitives/toast'
 import { BoffMediaUserEntity, TcgCard } from '@boffmedia/shared'
 import { useLocale } from 'next-intl'
 import { UsersService } from '@/services/api/boffmedia/usersService'
