@@ -151,5 +151,53 @@
       "title": "Couldn't load the calendar",
       "retry": "Retry"
     }
+  },
+  "sugerir": {
+    "kicker": "Community",
+    "title": "Suggest an event",
+    "lead": "Got an idea for an event? Tell us about it and, if it fits, we might make it happen.",
+    "type": {
+      "label": "Event type",
+      "event": { "label": "Competitive event", "desc": "A competition with medals and prizes." },
+      "server": { "label": "Special server", "desc": "A server with its own events, mechanics and achievements." }
+    },
+    "fields": {
+      "title": "Event name",
+      "titlePh": "A name for your event…",
+      "game": "Game",
+      "gamePh": "Pick a game",
+      "gameOther": "Other / to be decided",
+      "description": "Description",
+      "descriptionPh": "Describe your event. What makes it special? What activities does it include?",
+      "extra": "Additional info",
+      "extraPh": "Special rules, suggested prizes, specific formats…",
+      "start": "Proposed date",
+      "end": "End date",
+      "max": "Max participants",
+      "maxPh": "No limit"
+    },
+    "preview": {
+      "title": "Preview",
+      "untitled": "Your event",
+      "noGame": "Game TBD",
+      "noDate": "Date TBD",
+      "maxLabel": "Max {count}"
+    },
+    "submit": "Send suggestion",
+    "submitting": "Sending…",
+    "guidelines": {
+      "title": "Before you send",
+      "g1": "Explain the idea in as much detail as possible.",
+      "g2": "Propose realistic dates with room to organise it.",
+      "g3": "Mention prizes or mechanics if you already have them in mind.",
+      "g4": "The team will get back to you if your event moves forward."
+    },
+    "success": {
+      "title": "Suggestion sent!",
+      "lead": "Thanks for your idea. The team will review it and, if it fits, you'll see it among the events soon.",
+      "another": "Suggest another",
+      "back": "Back to events"
+    },
+    "toast": "Suggestion sent. Thanks for your idea!"
   }
 }
