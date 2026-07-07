@@ -19,7 +19,7 @@ export function BSType({ type, lg, ghost }: BSTypeProps) {
       style={
         (ghost
           ? { color: c, "--_c": c, background: `color-mix(in srgb, ${c} 16%, transparent)`, borderColor: `color-mix(in srgb, ${c} 45%, transparent)` }
-          : { color: "#06070b", "--_c": c, background: c, borderColor: `color-mix(in srgb, #fff 22%, ${c})` }) as React.CSSProperties
+          : { color: "#06070b", "--_c": c, background: c, borderColor: `color-mix(in srgb, #fff 22%, ${c})` }) as unknown as React.CSSProperties
       }
     >
       <span className="w-[.5em] h-[.5em] rounded-full bg-current shrink-0" />

@@ -16,6 +16,7 @@ import { BattleStage } from '../../../_components/BattleStage';
 import { BattleActionDock } from '../../../_components/BattleActionDock';
 import { LogChatRail } from '../../../_components/LogChatRail';
 import { useFullscreen } from '../../../_hooks/useFullscreen';
+import type { BattleRequest } from '../../../types';
 
 export default function ShowdownBattlePage({
   params,
@@ -123,7 +124,7 @@ export default function ShowdownBattlePage({
   }
 
   const isMyTurn = state.isWaitingForChoice;
-  const trapMsg = state.currentRequest?.active?.[0]?.trapped ? t('dock.trapped') : '';
+  const trapMsg = (state.currentRequest as BattleRequest | null)?.active?.[0]?.trapped ? t('dock.trapped') : '';
   // Spectator: both player names known and neither matches the logged-in user.
   const isSpectator = !!p1Name && !!p2Name && myName !== p1Name && myName !== p2Name;
 

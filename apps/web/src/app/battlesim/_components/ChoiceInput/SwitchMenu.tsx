@@ -1,9 +1,9 @@
 'use client';
 
-import { Protocol } from '@pkmn/protocol';
+import type { BattleRequest } from '../../types';
 
 interface SwitchMenuProps {
-  request: Protocol.Request;
+  request: BattleRequest;
   makeChoice: (choice: string) => void;
 }
 
@@ -11,7 +11,7 @@ interface PokemonSlot {
   ident: string;
   details: string;
   condition: string;
-  active: boolean;
+  active?: boolean;
   stats: { atk: number; def: number; spa: number; spd: number; spe: number };
   moves: string[];
 }
