@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Search, Key, CheckCircle2, Library } from "lucide-react";
+import { Search, Key, CheckCircle2, Library, type LucideIcon } from "lucide-react";
 import { Input } from "@/components/ui/primitives/input";
 
 interface KeysControlsProps {
@@ -18,7 +18,7 @@ const StatPill = ({
   count,
   color,
 }: {
-  icon: React.ElementType;
+  icon: LucideIcon;
   label: string;
   count: number;
   color: string;

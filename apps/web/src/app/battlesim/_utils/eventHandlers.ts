@@ -83,8 +83,8 @@ export const eventHandlers: Record<string, EventHandler> = {
     getPayload: (args, kwArgs, battle) => {
       const fromEffect = kwArgs.from && battle.get('conditions', kwArgs.from);
       const revival = fromEffect?.id === 'revivalblessing';
-      const poke = battle.getPokemon(args[1], revival)!;
-      const health = poke.healthParse(args[2]);
+      const poke = battle.getPokemon(args[1] as PokemonIdent, revival)!;
+      const health = poke.healthParse(args[2] as string);
       return { health };
     },
     afterStateChange: async (ctx) => {

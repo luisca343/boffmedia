@@ -15,7 +15,7 @@ export class Scene {
   currentAnimations: Promise<void>[] = [];
   acceleration: number;
   sceneEffects: SceneEffects;
-  $bg: { animate: () => any; delay: () => any };
+  $bg: { animate: (...args: any[]) => any; delay: (...args: any[]) => any };
   
   constructor(battle: Battle, gameElement: HTMLElement) {
     this.battle = battle;

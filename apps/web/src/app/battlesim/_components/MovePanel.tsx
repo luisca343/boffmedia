@@ -5,7 +5,7 @@ import type { BSXKeyMove } from '../_utils/toBSXMon';
 
 interface MovePanelProps {
   moves: BSXKeyMove[];
-  foe?: { types: string[]; tera: boolean; teraType: string | null };
+  foe?: { types: string[]; tera?: boolean; teraType?: string };
   onChooseMove: (index: number) => void;
   /** Targeting feedback: index of the hovered/focused damaging move, or null. */
   onAimMove?: (index: number | null) => void;

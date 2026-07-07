@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { X, CheckCheck, Trash2, Info, CheckCircle, AlertTriangle, AlertCircle, BellOff } from "lucide-react"
+import { X, CheckCheck, Trash2, Info, CheckCircle, AlertTriangle, AlertCircle, BellOff, type LucideIcon } from "lucide-react"
 import {
   Popover,
   PopoverContent,
@@ -15,7 +15,7 @@ import { useNotificationCenter } from "react-toastify/addons/use-notification-ce
 
 type ToastType = 'info' | 'success' | 'warning' | 'error' | 'default' | string
 
-const TYPE_CONFIG: Record<string, { icon: React.ElementType; color: string; border: string; bg: string }> = {
+const TYPE_CONFIG: Record<string, { icon: LucideIcon; color: string; border: string; bg: string }> = {
   success:  { icon: CheckCircle,   color: "rgb(163,230,53)",   border: "rgba(132,204,22,0.3)", bg: "rgba(132,204,22,0.07)" },
   error:    { icon: AlertCircle,   color: "rgb(248,113,113)",  border: "rgba(239,68,68,0.3)",  bg: "rgba(239,68,68,0.07)"  },
   warning:  { icon: AlertTriangle, color: "rgb(250,204,21)",   border: "rgba(250,204,21,0.3)", bg: "rgba(250,204,21,0.07)" },

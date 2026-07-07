@@ -1,9 +1,10 @@
 'use client';
 
 import { BSXBenchChip } from '@/components/boffmedia-v2/primitives';
+import type { BSXMon } from '@/components/boffmedia-v2/primitives';
 
 interface SwitchPanelProps {
-  bench: Array<{ fnt: boolean; [key: string]: any }>;
+  bench: BSXMon[];
   onSwitch: (index: number) => void;
   label?: string;
   /** Display offset for hotkey chips (move phase reserves 1-4 for moves). */

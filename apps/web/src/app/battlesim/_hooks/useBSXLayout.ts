@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Battle } from "@pkmn/client";
-import { Protocol } from "@pkmn/protocol";
+import type { BattleRequest } from "../types";
 import type { BSXMon } from "@/components/boffmedia-v2/primitives";
 import type { BSXKeyMove, BSXTickEv, TeamMemberHP } from "../_utils/toBSXMon";
 import { toBSXMon, toBSXKeyMoves, requestPokemonToBSXMon, toBSXTicks, toTeamHP } from "../_utils/toBSXMon";
@@ -14,7 +14,7 @@ type TimerState = {
 interface BattleState {
   battle: Battle;
   status: string;
-  currentRequest: Protocol.Request | null;
+  currentRequest: BattleRequest | null;
   isWaitingForChoice: boolean;
   htmlLog: string[];
   messageBar: string[];
@@ -65,7 +65,15 @@ export function useBSXLayout(state: BattleState | null): BSXLayout {
     const foe = toBSXMon(p2.active[0]);
 
     const request = state.currentRequest;
-    const requestType = request?.requestType || (request?.active ? "move" : request?.side ? "switch" : null) as "move" | "switch" | null;
+    const rt = request?.requestType;
+    const requestType: "move" | "switch" | "team" | null =
+      rt === "move" || rt === "switch" || rt === "team"
+        ? rt
+        : request?.active
+          ? "move"
+          : request?.side
+            ? "switch"
+            : null;
 
     const moves = request?.active?.[0]?.moves
       ? toBSXKeyMoves(request.active[0].moves as any)

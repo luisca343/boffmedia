@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { Protocol } from '@pkmn/protocol';
 import { MoveSelector } from './MoveSelector';
 import { SwitchMenu } from './SwitchMenu';
 import { ActionButtons, type BattleMechanic } from './ActionButtons';
+import type { BattleRequest } from '../../types';
 
 interface ChoiceInputProps {
-  request: Protocol.Request;
+  request: BattleRequest;
   makeChoice: (choice: string) => void;
   isWaiting: boolean;
   mechanicUsed: boolean;
