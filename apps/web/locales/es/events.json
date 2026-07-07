@@ -151,5 +151,53 @@
       "title": "Error al cargar el calendario",
       "retry": "Reintentar"
     }
+  },
+  "sugerir": {
+    "kicker": "Comunidad",
+    "title": "Sugerir evento",
+    "lead": "¿Tienes una idea para un evento? Cuéntanosla y, si encaja, podríamos hacerla realidad.",
+    "type": {
+      "label": "Tipo de evento",
+      "event": { "label": "Evento competitivo", "desc": "Competición con medallas y premios." },
+      "server": { "label": "Servidor especial", "desc": "Servidor con eventos, mecánicas y logros propios." }
+    },
+    "fields": {
+      "title": "Nombre del evento",
+      "titlePh": "Un nombre para tu evento…",
+      "game": "Juego",
+      "gamePh": "Selecciona un juego",
+      "gameOther": "Otro / por definir",
+      "description": "Descripción",
+      "descriptionPh": "Describe tu evento. ¿Qué lo hace especial? ¿Qué actividades incluye?",
+      "extra": "Información adicional",
+      "extraPh": "Reglas especiales, premios sugeridos, modalidades específicas…",
+      "start": "Fecha propuesta",
+      "end": "Fecha de fin",
+      "max": "Participantes máx.",
+      "maxPh": "Sin límite"
+    },
+    "preview": {
+      "title": "Vista previa",
+      "untitled": "Tu evento",
+      "noGame": "Juego por definir",
+      "noDate": "Fecha por definir",
+      "maxLabel": "Máx. {count}"
+    },
+    "submit": "Enviar sugerencia",
+    "submitting": "Enviando…",
+    "guidelines": {
+      "title": "Antes de enviar",
+      "g1": "Explica la idea con el mayor detalle posible.",
+      "g2": "Propón fechas realistas con margen para organizarlo.",
+      "g3": "Indica premios o mecánicas si ya los tienes en mente.",
+      "g4": "Recibirás respuesta del equipo si tu evento sigue adelante."
+    },
+    "success": {
+      "title": "¡Sugerencia enviada!",
+      "lead": "Gracias por tu idea. El equipo la revisará y, si encaja, la verás pronto entre los eventos.",
+      "another": "Sugerir otro",
+      "back": "Volver a eventos"
+    },
+    "toast": "Sugerencia enviada. ¡Gracias por tu idea!"
   }
 }
