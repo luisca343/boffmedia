@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import { env } from "@/config/env";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { FicusNav } from "@/components/boffmedia-v2/ui/navigation/FicusNav";
 import { GlobalProviders } from "../GlobalProviders";
 import { BackToTop } from "@/components/ui/BackToTop";
 
 import '../globals.css'
-import { BoffFooter } from "./_components/layout/BoffFooter";
+import { Navbar } from "@/components/boffmedia/ui/navigation/Navbar";
+import { Footer } from "@/components/boffmedia/ui/layout/Footer";
 
 export const metadata: Metadata = {
   title: env.NODE_ENV === 'production' ? "BoffMedia" : "FicusLab",
@@ -22,12 +22,12 @@ export default async function RootLayout({
   return (
     <GlobalProviders>
       <ToastContainer position="bottom-right" theme="dark" />
-      <FicusNav />
-      <section className="border-solid no-scrollbar flex-1 bg-layer-1">
+      <Navbar />
+      <section className="no-scrollbar flex-1 bg-base">
           <section className="flex-1 [&>*]:min-h-[calc(100vh-22rem)]">
             {children}
           </section>
-          <BoffFooter />
+          <Footer />
       </section>
       <BackToTop />
     </GlobalProviders>

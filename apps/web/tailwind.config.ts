@@ -18,9 +18,13 @@ const config: Config = {
         inter: ["Inter", "sans-serif"],
         roboto: ["Roboto", "sans-serif"],
         bebas: ["Bebas Neue", "sans-serif"],
-        display: ["Orbitron", "sans-serif"],
-        body: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
-        mono: ["JetBrains Mono", "ui-monospace", "monospace"],
+        // Boffmedia type system (default)
+        display: ["Saira Condensed", "Arial Narrow", "sans-serif"],
+        body: ["Saira", "ui-sans-serif", "system-ui", "sans-serif"],
+        mono: ["Roboto Mono", "ui-monospace", "monospace"],
+        // Legacy families retained for not-yet-migrated components
+        orbitron: ["Orbitron", "sans-serif"],
+        jetbrains: ["JetBrains Mono", "ui-monospace", "monospace"],
       },
       fontSize: {
         "4xl": ["2.25rem", { lineHeight: "normal" }],
@@ -251,6 +255,58 @@ const config: Config = {
         card: {
           DEFAULT: "hsl(var(--ui-card))",
           foreground: "hsl(var(--ui-card-foreground))",
+        },
+
+        // ── Surfaces ──────────────────────────────────────────────────────────
+        // bg-base (already defined → --bg), bg-base-2, bg-base-deep
+        "base-2":    "var(--bg-2)",
+        "base-deep": "var(--bg-deep)",
+        panel: {
+          DEFAULT: "var(--panel)",
+          2:       "var(--panel-2)",
+        },
+
+        // ── Hairlines / borders ───────────────────────────────────────────────
+        // border-line, border-line-2
+        line: {
+          DEFAULT: "var(--line)",
+          2:       "var(--line-2)",
+        },
+
+        // ── Text ──────────────────────────────────────────────────────────────
+        // text-txt, text-txt-muted, text-txt-dim
+        txt: {
+          DEFAULT: "var(--text)",
+          muted:   "var(--muted)",
+          dim:     "var(--dim)",
+        },
+
+        // ── Brand accent (orange) ─────────────────────────────────────────────
+        // bg-accent, text-accent, bg-accent-soft, border-accent-line
+        accent: {
+          DEFAULT: "var(--accent)",
+          bright:  "var(--accent-bright)",
+          soft:    "var(--accent-soft)",
+          line:    "var(--accent-line)",
+          ink:     "var(--naranja-ink)",
+        },
+
+        // ── Status ────────────────────────────────────────────────────────────
+        ok: {
+          DEFAULT: "var(--ok)",
+          soft:    "var(--ok-soft)",
+        },
+        warn: {
+          DEFAULT: "var(--warn)",
+          soft:    "var(--warn-soft)",
+        },
+        bad: {
+          DEFAULT: "var(--bad)",
+          soft:    "var(--bad-soft)",
+        },
+        signal: {
+          DEFAULT: "var(--info)",
+          soft:    "var(--info-soft)",
         },
       },
       keyframes: {

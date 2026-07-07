@@ -1,6 +1,59 @@
 # Boffmedia Component Tree
 
-## `components/boffmedia-v2/` — Unified Boffmedia tree
+## `components/boffmedia/` — Current design system (in progress)
+
+Graphite/steel/orange design. Tailwind-first, consuming the global tokens
+(`--bg`, `--panel`, `--line`, `--accent`, `--text`/`--muted`/`--dim`, `--cut`,
+display/body/mono fonts) defined in `app/globals.css`. Replaces the `boffmedia-v2`
+tree page-by-page.
+
+### `primitives/`
+
+| File | Exports |
+|---|---|
+| `icon.tsx` | Icon, ICON_NAMES |
+| `button.tsx` | Button |
+| `icon-button.tsx` | IconButton |
+| `avatar.tsx` | Avatar, AvatarGroup |
+| `badge.tsx` | Badge |
+| `chip.tsx` | Chip |
+| `kicker.tsx` | Kicker |
+| `stat.tsx` | Stats |
+| `third.tsx` | Third |
+| `rank-row.tsx` | Rank, RankRow |
+| `ticker.tsx` | Ticker |
+| `clock.tsx` | Clock |
+| `count-up.tsx` | CountUp |
+
+### `ui/`
+
+| File | Exports |
+|---|---|
+| `layout/TopBar.tsx` | TopBar |
+| `layout/Footer.tsx` | Footer |
+| `layout/Marquee.tsx` | Marquee |
+| `layout/SectionHead.tsx` | SectionHead |
+| `navigation/Navbar.tsx` | Navbar |
+| `navigation/NavDropdown.tsx` | NavDropdown |
+| `navigation/LangSwitcher.tsx` | LangSwitcher |
+| `navigation/NotifMenu.tsx` | NotifMenu |
+| `navigation/nav-data.ts` | PRIMARY_NAV, TOOLS_SECTIONS, COMUNIDAD_SECTIONS, FOOTER_COLS, FOOTER_SOCIAL |
+| `landing/LandingPage.tsx` | LandingPage — active home page (`(boffmedia)/page.tsx`), «Travesía» concept, Tailwind-only |
+| `landing/travesia-fx.tsx` | FxProgress, Scan, Decode, FxParticles, FxCursor, useSignalFX |
+| `landing/LandingHome.tsx` | LandingHome — superseded "Broadcast" concept, no longer routed |
+
+### `hooks/`
+
+| File | Exports |
+|---|---|
+| `use-reveal.ts` | useReveal |
+
+**Status:** Foundation (tokens/fonts/Tailwind) ✅ · App shell (Navbar + Footer, wired into `(boffmedia)/layout.tsx`) ✅ · Landing home page — «Travesía» (single continuous journey) ✅
+**Pending:** components showcase (`styles/components`), remaining pages/tools.
+
+---
+
+## `components/boffmedia-v2/` — Previous design system (being replaced)
 
 ### `primitives/` (78 files)
 
