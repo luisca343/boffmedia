@@ -23,7 +23,7 @@ export class BattleEventProcessor {
   private formatter: LogFormatter;
   private animationRegistry: AnimationRegistry;
 
-  constructor(private context: BattleEventProcessorContext) {
+  constructor(public readonly context: BattleEventProcessorContext) {
     this.formatter = new LogFormatter('p1', context.battle);
     this.animationRegistry = new AnimationRegistry();
   }

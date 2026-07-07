@@ -1,12 +1,12 @@
 'use client';
 
-import { Protocol } from '@pkmn/protocol';
 import { TypeBadgeSmall } from '@/components/shared/pokemon/TypeBadge';
+import type { BattleRequest } from '../../types';
 
 export type BattleMechanic = 'mega' | 'zmove' | 'dynamax' | 'terastallize';
 
 interface ActionButtonsProps {
-  request: Protocol.Request;
+  request: BattleRequest;
   activeMechanic: BattleMechanic | null;
   onToggle: (mechanic: BattleMechanic) => void;
   disabled: boolean;

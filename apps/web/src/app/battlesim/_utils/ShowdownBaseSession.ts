@@ -62,7 +62,7 @@ export class ShowdownBaseSession extends BattleSession {
 
   handleChatLine(line: string): boolean {
     const { args } = Protocol.parseBattleLine(line);
-    if (args[0] === 'c') {
+    if ((args[0] as string) === 'c') {
       // |c|USERNAME|MESSAGE
       this.chatMessages.push({
         sender: args[1] as string,

@@ -1,12 +1,12 @@
 'use client';
 
-import { Protocol } from '@pkmn/protocol';
 import { Dex } from '@pkmn/dex';
 import { TypeBadgeSmall } from '@/components/shared/pokemon/TypeBadge';
 import type { BattleMechanic } from './ActionButtons';
+import type { BattleRequest } from '../../types';
 
 interface MoveSelectorProps {
-  request: Protocol.Request;
+  request: BattleRequest;
   makeChoice: (choice: string) => void;
   activeMechanic?: BattleMechanic | null;
 }
@@ -35,14 +35,14 @@ interface MaxMoveData {
 }
 
 export function MoveSelector({ request, makeChoice, activeMechanic }: MoveSelectorProps) {
-  if (!request.active?.[0]?.moves) return null;
+  const active = request.active?.[0];
+  if (!active?.moves) return null;
 
-  const active = request.active[0];
   const trapped = active.trapped;
   const isZMove = activeMechanic === 'zmove' && active.zMoves;
   const isDynamax = activeMechanic === 'dynamax' && active.maxMoves;
 
-  const moves = active.moves;
+  const moves = active.moves as unknown as MoveData[];
   const zMoves = active.zMoves;
   const maxMoves = active.maxMoves;
 
