@@ -22,10 +22,11 @@ export const minecraft: GameEntry = {
           key: "schematicCompat",
           nameKey: "games.minecraft.tools.schematicCompat",
           href: "/minecraft/schematic-compat",
-          sidebarIcon: "Blocks",
+          sidebarIcon: "grid",
+          bleed: true,
           landing: {
             icon: "/img/games/minecraft/schematic-icon.webp",
-            fallbackIcon: "Blocks",
+            fallbackIcon: "grid",
             fallbackIconColor: "text-green-500",
             color: "from-green-700 to-emerald-500",
             features: ["converter", "preview3d", "modSupport"],

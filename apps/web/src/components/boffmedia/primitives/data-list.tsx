@@ -1,11 +1,11 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "./icon"
+import { Icon, type IconName } from "./icon"
 
 export interface DataRow {
   label: React.ReactNode
   value?: React.ReactNode
-  icon?: string
+  icon?: IconName
   mono?: boolean
   wide?: boolean
 }

@@ -1,9 +1,9 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "./icon"
+import { Icon, type IconName } from "./icon"
 
 export interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  name: string
+  name: IconName
   label: string
   size?: number
 }

@@ -1,10 +1,10 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "./icon"
+import { Icon, type IconName } from "./icon"
 
 export type BannerTone = "info" | "success" | "error" | "warn"
 
-const TONES: Record<BannerTone, { wrap: string; ico: string; def: string }> = {
+const TONES: Record<BannerTone, { wrap: string; ico: string; def: IconName }> = {
   info: {
     wrap: "border-[color-mix(in_srgb,var(--info)_45%,transparent)] bg-signal-soft",
     ico: "text-signal",
@@ -31,7 +31,7 @@ export interface BannerProps {
   tone?: BannerTone
   title?: React.ReactNode
   children?: React.ReactNode
-  icon?: string
+  icon?: IconName
   onClose?: () => void
   actions?: React.ReactNode
   className?: string

@@ -1,7 +1,7 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 
-const ICONS: Record<string, React.ReactNode> = {
+const ICONS = {
   arrow: <path d="M4 12h15m-6-6 6 6-6 6" />,
   back: <path d="M20 12H5m6 6-6-6 6-6" />,
   home: <path d="M4 11 12 4l8 7v9h-5v-6h-6v6H4z" />,
@@ -83,10 +83,13 @@ const ICONS: Record<string, React.ReactNode> = {
   dice: <g><rect x="4" y="4" width="16" height="16" rx="4" /><circle cx="9" cy="9" r="1" /><circle cx="15" cy="9" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="9" cy="15" r="1" /><circle cx="15" cy="15" r="1" /></g>,
   discord: <g><path d="M8.4 6.6c-2 .3-3.6 1-4.4 1.8-1.3 2.3-1.8 5-1.5 7.6 1.4 1.1 2.9 1.9 4.6 2.2l.9-1.5M15.6 6.6c2 .3 3.6 1 4.4 1.8 1.3 2.3 1.8 5 1.5 7.6-1.4 1.1-2.9 1.9-4.6 2.2l-.9-1.5M7 16.8c3.2 1.5 6.8 1.5 10 0M8.4 6.6C10.7 6.1 13.3 6.1 15.6 6.6" /><circle cx="9" cy="12.4" r="1.25" /><circle cx="15" cy="12.4" r="1.25" /></g>,
   google: <g><path d="M21.4 12.3c0 5-3.5 8.7-9.4 8.7a9 9 0 1 1 6.2-15.5" /><path d="M21.4 12.3H12" /></g>,
-}
+} satisfies Record<string, React.ReactNode>
+
+/** Every valid icon name — use this to type icon fields so typos fail at compile time. */
+export type IconName = keyof typeof ICONS
 
 export interface IconProps {
-  name: string
+  name: IconName
   size?: number
   className?: string
   style?: React.CSSProperties

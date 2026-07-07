@@ -1,0 +1,59 @@
+{
+  "toolsUi": {
+    "meta": {
+      "title": "Toolbox",
+      "description": "Competitive calculators, planners and databases — built by and for the community."
+    },
+    "taglines": {
+      "pokemon": "Calculators, generators and databases",
+      "mhwilds": "Build planners and generators",
+      "otros": "General tools and resources",
+      "minecraft": "Schematic compatibility and utilities"
+    },
+    "hub": {
+      "kicker": "Tools · Community",
+      "title": "The <em>toolbox</em>",
+      "lead": "Competitive calculators, planners and databases — built by and for the community. Pick your game and dive in.",
+      "searchPlaceholder": "Search tools, games…",
+      "searchAria": "Search tools",
+      "clear": "Clear",
+      "clearSearch": "Clear search",
+      "noResults": "No results",
+      "noResultsFor": "We couldn't find any tools for “{query}”.",
+      "results": "Results",
+      "matches": "{count, plural, one {# match} other {# matches}}",
+      "games": "games",
+      "tools": "tools",
+      "alwaysUpdated": "Always up to date",
+      "viewGame": "View game",
+      "toolCount": "{count, plural, one {# tool} other {# tools}}"
+    },
+    "category": {
+      "metaTitle": "{game} tools",
+      "bannerPrefix": "Tools",
+      "featured": "Featured",
+      "featuredNew": "Featured · New",
+      "featuredOf": "Featured {game} tool",
+      "openTool": "Open tool",
+      "allTools": "All tools",
+      "externalResources": "External resources",
+      "externalHint": "Leaves Boffmedia · new tab",
+      "externalTag": "External",
+      "externalFallbackDomain": "external link",
+      "externalAria": "{title}. External link to {domain}; opens in a new tab."
+    },
+    "shell": {
+      "railAria": "Game tools",
+      "switchGame": "Switch game — {game}",
+      "new": "New",
+      "collapse": "Collapse",
+      "collapseTitle": "Collapse sidebar",
+      "pin": "Pin sidebar",
+      "openToolsMenu": "Open tools menu"
+    },
+    "card": {
+      "new": "New",
+      "popular": "Popular"
+    }
+  }
+}

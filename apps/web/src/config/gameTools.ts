@@ -79,7 +79,6 @@ function buildGameConfig(slug: string): GameConfig {
           name: tool.nameKey,
           href: tool.href,
           icon: sidebarIconMap[tool.sidebarIcon] ?? GiGamepad,
-          iconProps: tool.sidebarIconProps,
         })),
     })),
   };

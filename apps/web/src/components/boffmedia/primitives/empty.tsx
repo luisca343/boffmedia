@@ -1,9 +1,9 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "./icon"
+import { Icon, type IconName } from "./icon"
 
 export interface EmptyProps {
-  icon?: string
+  icon?: IconName
   title: React.ReactNode
   lead?: React.ReactNode
   children?: React.ReactNode

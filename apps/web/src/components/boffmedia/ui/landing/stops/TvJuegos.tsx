@@ -33,7 +33,6 @@ export function TvJuegos() {
           >
             <div className={cn("relative overflow-hidden bg-base-2", i === 0 ? "aspect-[16/7] max-[520px]:aspect-[16/9]" : "aspect-[4/3]")}>
               {g.img ? (
-                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={g.img}
                   alt={g.n}

@@ -37,6 +37,7 @@ export function LandingPage() {
     <main
       ref={rootRef}
       data-ds="boffmedia"
+      data-footer-flush=""
       className="tv-landing [@media(pointer:fine)_and_(prefers-reduced-motion:no-preference)]:cursor-none [@media(pointer:fine)_and_(prefers-reduced-motion:no-preference)]:[&_:is(a,button,input)]:cursor-none [.no-motion_&]:cursor-auto [.no-motion_&_:is(a,button,input)]:cursor-auto"
       style={{ ["--zr"]: 255, ["--zg"]: 92, ["--zb"]: 10, ["--jp"]: "0%", ["--pulse"]: "0px" } as React.CSSProperties}
     >

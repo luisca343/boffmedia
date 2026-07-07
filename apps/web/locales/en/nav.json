@@ -134,6 +134,52 @@
       "markAllRead": "Mark all as read",
       "markRead": "Mark as read",
       "unread": "unread"
+    },
+    "v3": {
+      "home": "Home",
+      "tools": "Tools",
+      "community": "Community",
+      "search": "Search",
+      "theme": "Toggle theme",
+      "login": "Log in",
+      "register": "Sign up",
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu",
+      "mobileNavAria": "Mobile navigation",
+      "menuOf": "{label} menu",
+      "language": "Language",
+      "notifications": "Notifications",
+      "markRead": "Mark as read",
+      "clear": "Clear",
+      "noNotifications": "No notifications",
+      "delete": "Delete",
+      "sections": {
+        "competition": "Competition",
+        "participate": "Take part"
+      },
+      "items": {
+        "games": "Games",
+        "ranking": "Ranking",
+        "events": "Events",
+        "raffles": "Raffles"
+      },
+      "footer": {
+        "tagline": "Gaming community: tournaments, servers, competitive tools and a season that never stops.",
+        "explore": "Explore",
+        "community": "Community",
+        "system": "System",
+        "events": "Events",
+        "games": "Games",
+        "tools": "Tools",
+        "ranking": "Ranking",
+        "raffles": "Raffles",
+        "components": "Components",
+        "profile": "My profile",
+        "admin": "Admin",
+        "privacy": "Privacy",
+        "web": "Web",
+        "discord": "Discord"
+      }
     }
   }
 }

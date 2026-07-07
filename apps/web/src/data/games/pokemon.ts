@@ -27,7 +27,7 @@ export const pokemon: GameEntry = {
       href: "/pokemon/vgc/meta",
       landing: {
         icon: "/img/games/pokemon/vgc-icon2.webp",
-        fallbackIcon: "Podium",
+        fallbackIcon: "chart",
         fallbackIconColor: "text-primary-hover",
         color: "from-primary to-violet-600",
         features: ["meta", "speed", "tracker"],
@@ -37,9 +37,12 @@ export const pokemon: GameEntry = {
         heroImage: "/img/games/pokemon/vgc.webp",
       },
       tools: [
-        { key: "meta",            nameKey: "games.pokemon.tools.meta",            href: "/pokemon/vgc/meta",            sidebarIcon: "Podium" },
-        { key: "speed", nameKey: "games.pokemon.tools.speed", href: "/pokemon/vgc/speed", sidebarIcon: "Speedometer" },
-        { key: "tracker",         nameKey: "games.pokemon.tools.tracker",         href: "/pokemon/vgc/tracker",         sidebarIcon: "Notebook" },
+        { key: "meta",    nameKey: "games.pokemon.tools.meta",    href: "/pokemon/vgc/meta",    sidebarIcon: "chart", bleed: true },
+        { key: "speed",   nameKey: "games.pokemon.tools.speed",   href: "/pokemon/vgc/speed",   sidebarIcon: "bolt" },
+        { key: "tracker", nameKey: "games.pokemon.tools.tracker", href: "/pokemon/vgc/tracker", sidebarIcon: "book", bleed: 2 },
+        // Not in the sidebar or landing yet (v3 migration pending) — the entry
+        // exists so the shell knows the route renders full-bleed.
+        { key: "damageCalc", nameKey: "games.pokemon.tools.damageCalc", href: "/pokemon/vgc/damage-calculator", sidebarIcon: "calc", showInSidebar: false, bleed: true },
       ],
     },
     {
@@ -49,7 +52,7 @@ export const pokemon: GameEntry = {
       // The whole category appears as a single card on the Pokemon landing page
       landing: {
         icon: "/img/games/tcgpocket-icon.webp",
-        fallbackIcon: "Diamond",
+        fallbackIcon: "cards",
         fallbackIconColor: "text-yellow-400",
         color: "from-yellow-300 to-yellow-500",
         features: ["gallery", "cardList", "battles"],
@@ -59,9 +62,9 @@ export const pokemon: GameEntry = {
         heroImage: "/img/games/tcgpocket/hero.webp",
       },
       tools: [
-        { key: "gallery", nameKey: "games.pokemon.tools.gallery", href: "/pokemon/tcgpocket/galeria", sidebarIcon: "Diamond" },
-        { key: "cardList", nameKey: "games.pokemon.tools.cardList", href: "/pokemon/tcgpocket/cartas", sidebarIcon: "Zap" },
-        { key: "battles", nameKey: "games.pokemon.tools.battles", href: "/pokemon/tcgpocket/combates", sidebarIcon: "SwordIcon" },
+        { key: "gallery", nameKey: "games.pokemon.tools.gallery", href: "/pokemon/tcgpocket/galeria", sidebarIcon: "cards" },
+        { key: "cardList", nameKey: "games.pokemon.tools.cardList", href: "/pokemon/tcgpocket/cartas", sidebarIcon: "zap" },
+        { key: "battles", nameKey: "games.pokemon.tools.battles", href: "/pokemon/tcgpocket/combates", sidebarIcon: "sword" },
       ],
     },
     {
@@ -73,10 +76,10 @@ export const pokemon: GameEntry = {
           key: "pmdsky",
           nameKey: "games.pokemon.tools.skyGenerator",
           href: "/pokemon/pmdsky",
-          sidebarIcon: "Star",
+          sidebarIcon: "star",
           landing: {
             icon: "/img/games/pmdsky-icon.webp",
-            fallbackIcon: "Zap",
+            fallbackIcon: "zap",
             fallbackIconColor: "text-secondary-hover",
             color: "from-secondary-hover to-cyan-600",
             features: ["skyGenerator"],
@@ -88,12 +91,13 @@ export const pokemon: GameEntry = {
         {
           key: "pokedex",
           nameKey: "games.pokemon.tools.pokedex",
-          href: "/pokemon/pokedex",
-          sidebarIcon: "Gamepad",
+          // The live Pokédex is SmartRotom's — /pokemon/pokedex has no route.
+          href: "/smartrotom/pokedex",
+          sidebarIcon: "gamepad",
           showInSidebar: false,
           landing: {
             icon: "/img/games/pokedex-icon.webp",
-            fallbackIcon: "Database",
+            fallbackIcon: "database",
             fallbackIconColor: "text-red-500",
             color: "from-red-500 to-rose-600",
             features: ["pokedex"],

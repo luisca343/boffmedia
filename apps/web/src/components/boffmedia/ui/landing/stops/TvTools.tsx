@@ -6,7 +6,7 @@ import { Button } from "@/components/boffmedia/primitives/button"
 import { Decode } from "../travesia-fx"
 import { TvCP } from "../TvCP"
 import { CTA_MONO, CTA_ROW, GLARE, PRI_GLOW } from "../landing-shared"
-import { TV3_TOOLS } from "../landing-data"
+import { TV3_TOOLS, TV3_TOOL_COUNT } from "../landing-data"
 
 export function TvTools() {
   return (
@@ -27,7 +27,7 @@ export function TvTools() {
           </span>
           <b className="font-mono text-[12px] font-semibold leading-none tracking-[0.05em] text-[#9aa3b2]">toolkit.boff</b>
           <span className="ml-auto inline-flex items-center gap-[7px] font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.1em] text-[rgba(var(--zr),var(--zg),var(--zb),1)] transition-colors duration-[260ms] ease-linear">
-            <i className="h-1.5 w-1.5 rounded-full bg-current animate-[lv4-blink_1.6s_infinite]" />6 módulos activos
+            <i className="h-1.5 w-1.5 rounded-full bg-current animate-[lv4-blink_1.6s_infinite]" />{TV3_TOOLS.length} módulos activos
           </span>
         </div>
         <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-px bg-line max-[520px]:grid-cols-1">
@@ -65,7 +65,7 @@ export function TvTools() {
         <Button variant="pri" iconRight="arrow" href="/herramientas" className={PRI_GLOW}>
           Abrir la caja
         </Button>
-        <span className={CTA_MONO}>32 utilidades activas</span>
+        <span className={CTA_MONO}>{TV3_TOOL_COUNT} utilidades activas</span>
       </div>
     </TvCP>
   )
