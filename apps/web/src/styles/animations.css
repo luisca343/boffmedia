@@ -157,3 +157,32 @@
 @keyframes statetheater-in {
   from { opacity: 0; transform: translateY(8px); }
 }
+
+/* Boffmedia — spinner, pulse, ticker marquee, popover, live dot */
+@keyframes bm-spin { to { transform: rotate(360deg); } }
+@keyframes bm-pulse { 50% { opacity: 0.72; } }
+@keyframes bm-tick { to { transform: translateX(-100%); } }
+@keyframes bm-nd-pop { from { opacity: 0; transform: translateY(-5px); } }
+@keyframes bm-nd-item { from { opacity: 0; transform: translateY(-4px); } }
+@keyframes bm-livedot {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ok) 55%, transparent); }
+  50% { box-shadow: 0 0 0 5px transparent; }
+}
+@keyframes bm-topbar-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.78; } }
+@keyframes bm-marquee { to { transform: translateX(-50%); } }
+
+/* Boffmedia landing — hero art, floats, scroll cue, chapter progress, scanlines */
+@keyframes bm-drop { to { top: 110%; } }
+@keyframes bm-bob { 0%, 100% { translate: 0 0; } 50% { translate: 0 -9px; } }
+@keyframes bm-float-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+@keyframes bm-prog { from { width: 0; } to { width: 100%; } }
+@keyframes bm-scan { 0% { top: -25%; } 100% { top: 115%; } }
+
+/* Boffmedia landing «Travesía» — atmosphere blink/spin, hero bob + ignition drop,
+   spine current flow, pulse/arrival ping */
+@keyframes lv4-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+@keyframes lv4-spin { to { transform: rotate(360deg); } }
+@keyframes tv-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes tv-drop { 0% { transform: translateY(-18px); opacity: 0; } 25% { opacity: 1; } 100% { transform: translateY(118px); opacity: 0; } }
+@keyframes tv-flow { to { background-position: 0 36px; } }
+@keyframes tv-ping { 0% { transform: translate(-50%, -50%) scale(0.4); opacity: 0.9; } 100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; } }
