@@ -7,6 +7,14 @@ Graphite/steel/orange design. Tailwind-first, consuming the global tokens
 display/body/mono fonts) defined in `app/globals.css`. Replaces the `boffmedia-v2`
 tree page-by-page.
 
+**Conventions** (full detail in `docs/BOFFMEDIA_V3.md` → "System conventions"):
+import primitives from the barrel (`@/components/boffmedia/primitives`); mark v3
+page roots with `data-ds="boffmedia"` to get the base heading treatment for free;
+use the `cut`/`cut-corner`/`cut-tag`/`wrap`/`mono-label` classes instead of raw
+clip-path/container utility stacks; fire notifications with the `toast()` primitive
+(never react-toastify inside Boffmedia routes); JS hooks are `data-*` attributes,
+never marker classes.
+
 ### `primitives/`
 
 | File | Exports |
@@ -24,6 +32,41 @@ tree page-by-page.
 | `ticker.tsx` | Ticker |
 | `clock.tsx` | Clock |
 | `count-up.tsx` | CountUp |
+| `input.tsx` | Input, Textarea, INPUT_BASE |
+| `field.tsx` | Field |
+| `select.tsx` | Select |
+| `toggle.tsx` | Toggle |
+| `checkbox.tsx` | Checkbox |
+| `radio-group.tsx` | RadioGroup |
+| `slider.tsx` | Slider |
+| `kbd.tsx` | Kbd |
+| `banner.tsx` | Banner |
+| `divider.tsx` | Divider |
+| `icon-box.tsx` | IconBox |
+| `skeleton.tsx` | Skeleton |
+| `progress.tsx` | Progress |
+| `ring.tsx` | Ring |
+| `tooltip.tsx` | Tooltip |
+| `pagination.tsx` | Pagination |
+| `tabs.tsx` | Tabs |
+| `seg.tsx` | Seg |
+| `panel.tsx` | Panel |
+| `data-list.tsx` | DataList |
+| `chip-group.tsx` | ChipGroup |
+| `option-group.tsx` | OptionGroup, OptionCard |
+| `disclosure.tsx` | Disclosure |
+| `empty.tsx` | Empty |
+| `ph.tsx` | Ph |
+| `code-block.tsx` | CodeBlock |
+| `search-input.tsx` | SearchInput |
+| `crumbs.tsx` | Crumbs |
+| `table.tsx` | Table |
+| `menu.tsx` | Menu, Dropdown |
+| `toast.tsx` | ToastStack, toast (+ `toast.success/error/warn/info`) |
+| `modal.tsx` | Modal |
+| `popover.tsx` | Popover |
+| `spinner.tsx` | Spinner |
+| `index.ts` | barrel — `import { Button, Panel, … } from "@/components/boffmedia/primitives"` |
 
 ### `ui/`
 
@@ -38,9 +81,16 @@ tree page-by-page.
 | `navigation/LangSwitcher.tsx` | LangSwitcher |
 | `navigation/NotifMenu.tsx` | NotifMenu |
 | `navigation/nav-data.ts` | PRIMARY_NAV, TOOLS_SECTIONS, COMUNIDAD_SECTIONS, FOOTER_COLS, FOOTER_SOCIAL |
-| `landing/LandingPage.tsx` | LandingPage — active home page (`(boffmedia)/page.tsx`), «Travesía» concept, Tailwind-only |
+| `landing/LandingPage.tsx` | LandingPage — active home page (`(boffmedia)/page.tsx`), «Travesía» concept, orchestrator only |
+| `landing/landing-data.ts` | TV3_ZONES, TV3_STOPS, TV3_HUD, TV3_TOOLS, TV3_FEATS, TV3_EVENT(_TS), TV3_GAMES, TV3_FEED, DISCORD |
+| `landing/landing-shared.tsx` | PRI_GLOW, GLARE, HUD_FRAME, LINE_MASK, LINE_INNER, BEAMS, CTA_ROW, CTA_MONO, Grain, tvGoTo, TvCountdown |
+| `landing/landing-hooks.ts` | useTvMouseVar, useTvParallax, useJourney |
+| `landing/TvHero.tsx` | TvHero |
+| `landing/TvCP.tsx` | TvCP — journey checkpoint shell |
+| `landing/TvMinimap.tsx` | TvMinimap |
+| `landing/TvMeta.tsx` | TvMeta — final CTA |
+| `landing/stops/*.tsx` | TvTools, TvSmartRotom, TvTorneos, TvJuegos, TvComunidad — one file per checkpoint |
 | `landing/travesia-fx.tsx` | FxProgress, Scan, Decode, FxParticles, FxCursor, useSignalFX |
-| `landing/LandingHome.tsx` | LandingHome — superseded "Broadcast" concept, no longer routed |
 
 ### `hooks/`
 
@@ -48,8 +98,9 @@ tree page-by-page.
 |---|---|
 | `use-reveal.ts` | useReveal |
 
-**Status:** Foundation (tokens/fonts/Tailwind) ✅ · App shell (Navbar + Footer, wired into `(boffmedia)/layout.tsx`) ✅ · Landing home page — «Travesía» (single continuous journey) ✅
-**Pending:** components showcase (`styles/components`), remaining pages/tools.
+**Status:** Foundation (tokens/fonts/Tailwind) ✅ · System conventions (base heading styles via `data-ds`, `cut*`/`wrap`/`mono-label` classes, primitives barrel, unified `toast()`) ✅ · App shell (Navbar + Footer, wired into `(boffmedia)/layout.tsx`) ✅ · Landing home page — «Travesía», split into per-section files ✅ · Base component kit (47 primitives above incl. Modal/Popover/Spinner) + component showcase ✅ — routed at `styles/components/page.tsx` (`/styles/components`, linked from footer «Componentes»), covering the **Sistema** domain across four chapters: **Bases** (color/tipografía/geometría), **Primitivas** (botones · chips y badges · formularios · selección y rango · navegación · dropdown de nav · sesión e idioma · pie de página · menús y avisos · anillo y carga · tooltip y teclas · scrollbar), **Patrones** (paneles · datos · estados), **Movimiento** (niveles de FX · marquesina · contador y decode · cursor e imán).
+The showcase demos Modal + Popover (menús y avisos) and Spinner (anillo y carga); the nav/shell pieces via real components (`NavDropdown` with a new `demoOpen` prop, `LangSwitcher`, `NotifMenu`, `Footer`); the scrollbar via the global `--sb-*` tokens + `bm-scroll`; and the FX layer (`Marquee`, `CountUp`, `Decode`, `useSignalFX` glare/tilt/magnet). It is fully responsive: the `230px 1fr` index/main shell collapses to one column below `lg` (index becomes a bounded, non-sticky block), the chapter pager wraps, and wide specimens (spacing scale, `Stats`, `Table`, the open `NavDropdown` panel) scroll in their own `overflow-x-auto` containers. Two primitives gained shrink fixes that also benefit real pages: `Third` (added `min-w-0` so its title truncates in constrained grids) and `Table` (now wrapped in an `overflow-x-auto` container with `min-w-[420px]`). The superseded demo routes `styles/components_v2`, `styles/showcase_v2`, `styles/colors` were removed.
+**Pending:** showcase — **acceso (auth)** section deferred to Phase 3 (v3 auth kit + `steam` icon don't exist yet); «palabra cinética» (`Kinetic`) not extracted. Then: tool-kit domains (Plataforma, Herramientas, Pokémon, Monster Hunter, Otros) and their per-tool primitives; remaining pages/tools; move `data-ds="boffmedia"` from page roots up to `(boffmedia)/layout.tsx` once every route is on v3.
 
 ---
 

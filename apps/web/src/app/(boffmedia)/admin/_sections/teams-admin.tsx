@@ -5,7 +5,7 @@ import { AdminCrud } from "@/components/boffmedia-v2/ui/admin/admin-crud"
 import { useGetTeams } from "@/hooks/events/useGetTeams"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { TeamForm } from "./forms/TeamForm"
-import { toast } from "react-toastify"
+import { toast } from "@/components/boffmedia/primitives/toast"
 import type { Team } from "@boffmedia/shared"
 
 function useTeamsList() {

@@ -420,7 +420,7 @@
   /* type */
   --font-display: "Saira Condensed", "Arial Narrow", sans-serif;
   --font-body: "Saira", sans-serif;
-  --font-mono: "Roboto Mono", monospace;
+  --font-mono: "IBM Plex Mono", monospace;
 
   /* geometry */
   --cut: 10px;       /* diagonal corner cut for buttons/chips */
@@ -522,7 +522,9 @@ img { display: block; max-width: 100%; }
 ::selection { background: var(--accent); color: var(--naranja-ink); }
 
 .app-shell { min-height: 100vh; display: flex; flex-direction: column; background: var(--bg); }
-.container { width: 100%; max-width: 1280px; margin-inline: auto; padding-inline: 40px; }
+/* Page gutter lives in Tailwind as `.wrap` (tailwind.config.ts) — do not
+   redefine `.container` here: it collides with Tailwind's core utility and
+   leaks into non-Boffmedia routes. */
 
 /* Keyboard-focus ring + fullscreen fallbacks for battle primitives */
 .bsx-focus:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }

@@ -10,13 +10,11 @@ export interface SectionHeadProps {
 
 export function SectionHead({ kicker, title, lead, children }: SectionHeadProps) {
   return (
-    <div className="mb-10">
+    <div data-ds="boffmedia" className="mb-10">
       {kicker && <Kicker>{kicker}</Kicker>}
-      <h2
-        data-reveal
-        className="my-[14px] font-display text-[clamp(44px,5vw,64px)] font-extrabold italic uppercase leading-[0.92] tracking-[-0.005em] [&_em]:italic [&_em]:text-transparent [&_em]:[-webkit-text-stroke:1.6px_var(--accent)]"
-        dangerouslySetInnerHTML={{ __html: title }}
-      />
+      {/* display treatment (800 italic uppercase + em stroke) comes from the
+          data-ds base styles in tailwind.config.ts */}
+      <h2 data-reveal className="my-[14px] text-[clamp(44px,5vw,64px)]" dangerouslySetInnerHTML={{ __html: title }} />
       {lead && (
         <p data-reveal style={{ ["--i"]: 1 } as React.CSSProperties} className="max-w-[60ch] text-[17px] text-txt-muted [text-wrap:pretty]">
           {lead}

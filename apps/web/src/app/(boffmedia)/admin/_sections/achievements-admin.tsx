@@ -5,7 +5,7 @@ import { AdminCrud } from "@/components/boffmedia-v2/ui/admin/admin-crud"
 import { useGetAchievements } from "@/hooks/events/useGetAchievements"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { AchievementForm } from "./forms/AchievementForm"
-import { toast } from "react-toastify"
+import { toast } from "@/components/boffmedia/primitives/toast"
 import type { Achievement } from "@boffmedia/shared"
 
 function useAchievementsList() {

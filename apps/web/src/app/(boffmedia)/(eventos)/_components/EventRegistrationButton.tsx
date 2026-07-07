@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/primitives/button";
 import { useBoffSession } from "@/services/useBoffSession";
 import { User, UserPlus, Loader2, Lock, CheckCircle, Clock } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
+import { toast } from "@/components/boffmedia/primitives/toast";
 import type { Event } from "@boffmedia/shared";
 import { EventsService } from "@/services/api/boffmedia/eventsService";
 import { getEventStatus } from "@/lib/events";
