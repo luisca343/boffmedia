@@ -1,7 +1,11 @@
-"use client";
+import type { Metadata } from "next"
+import { CommunityView } from "./_components/CommunityView"
 
-import Construction from "@/components/shared/Construction";
+export const metadata: Metadata = {
+  title: "Comunidad · Boffmedia",
+  description: "Torneos, clasificación, logros y la comunidad de Discord de Boffmedia.",
+}
 
-export default function ConstructionPage() {
-  return <div className="pt-16"><Construction /></div>;
+export default function CommunityPage() {
+  return <CommunityView />
 }

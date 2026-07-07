@@ -13,12 +13,12 @@ export const INPUT_BASE = cn(
 
 export type InputProps = React.InputHTMLAttributes<HTMLInputElement>
 
-export function Input({ className, ...props }: InputProps) {
-  return <input className={cn(INPUT_BASE, className)} {...props} />
-}
+export const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input({ className, ...props }, ref) {
+  return <input ref={ref} className={cn(INPUT_BASE, className)} {...props} />
+})
 
 export type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement>
 
-export function Textarea({ className, ...props }: TextareaProps) {
-  return <textarea className={cn(INPUT_BASE, "min-h-[90px] resize-y", className)} {...props} />
-}
+export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(function Textarea({ className, ...props }, ref) {
+  return <textarea ref={ref} className={cn(INPUT_BASE, "min-h-[90px] resize-y", className)} {...props} />
+})

@@ -66,6 +66,8 @@ never marker classes.
 | `modal.tsx` | Modal |
 | `popover.tsx` | Popover |
 | `spinner.tsx` | Spinner |
+| `auth-provider-btn.tsx` | AuthProviderBtn — OAuth provider button (brand fill for Discord/Steam, neutral Google; `soon` = muted-but-clickable) |
+| `password-field.tsx` | PasswordField — Input with show/hide eye toggle (`aria-pressed`) |
 | `index.ts` | barrel — `import { Button, Panel, … } from "@/components/boffmedia/primitives"` |
 
 ### `ui/`
@@ -80,6 +82,7 @@ never marker classes.
 | `navigation/NavDropdown.tsx` | NavDropdown |
 | `navigation/LangSwitcher.tsx` | LangSwitcher |
 | `navigation/NotifMenu.tsx` | NotifMenu |
+| `navigation/AccountNav.tsx` | AccountNav (desktop) + MobileAccount — session-aware auth slot: account menu (avatar + `/perfil` + `signOut`) when signed in via `useBoffSession`, login/register buttons otherwise |
 | `navigation/nav-data.ts` | PRIMARY_NAV, buildToolsSections (derived from `@/data/games` — single source of truth with the hub/sidebar), buildComunidadSections, FOOTER_COLS, FOOTER_SOCIAL (labels are `nav.v3.*` i18n keys) |
 | `landing/LandingPage.tsx` | LandingPage — active home page (`(boffmedia)/page.tsx`), «Travesía» concept, orchestrator only |
 | `landing/landing-data.ts` | TV3_ZONES, TV3_STOPS, TV3_HUD, TV3_TOOLS, TV3_FEATS, TV3_EVENT(_TS), TV3_GAMES, TV3_FEED, DISCORD |
@@ -101,6 +104,24 @@ never marker classes.
 | `tools/ToolShell.tsx` | ToolShell + Bleed — v3 tool-page shell: collapsible+pinnable `SideRail` (72px→264px, hover/focus overlay, hue-active) with `GameSwitch` header, mobile off-canvas drawer. Mounted by per-game server layouts (`(herramientas)/<game>/layout.tsx`); full-bleed routes come from `ToolEntry.bleed` in `@/data/games`. Owns the `--pad-x`/`--pad-y` content padding; `Bleed` escapes it (no-op outside the shell). |
 | `tools/CategoryLanding.tsx` | CategoryLanding + internal GameBanner (real key-art), FeaturedTool (real art), ExtLinks — the `/pokemon /minecraft /mhwilds /otros` landing body, rendered inside ToolShell |
 | `tools/index.ts` | barrel for the above |
+| `auth/AuthScreen.tsx` | AuthScreen — `/entrar` login/register screen (grid-glow stage + card), wired to NextAuth (credentials `boffmedia` + Google; Discord/Steam disabled); `?mode=register` + in-card toggle |
+| `auth/CredentialsForm.tsx` | CredentialsForm — RHF+zod email/password form (keyed per mode); register → `UsersService.createUser`, login → `signIn` |
+| `auth/index.ts` | barrel for `ui/auth` |
+| `profile/ProfileHero.tsx` | ProfileHero — cover band + lower-third identity (avatar w/ upload buttons, name, handle, tags, optional quick metrics, `live` flag) |
+| `profile/AccountForm.tsx` | AccountForm — controlled name/email(/bio) grid (`useTranslations`) |
+| `profile/LinkedAccounts.tsx` | LinkedAccounts, LinkedAccountRow — linked-account rows w/ brand hue + linked/unlinked states |
+| `profile/StatTile.tsx` · `RankInsignia.tsx` · `RankStrip.tsx` | career stat tiles + rank insignia (showcase-only; no per-user stats API) |
+| `profile/TrophyCase.tsx` · `ActivityFeed.tsx` · `TourLive.tsx` · `ProfileNote.tsx` | trophy case, activity timeline, live-tournament banner, public-view note (showcase-only; no API — see `docs/BOFFMEDIA_V3_DEFERRED.md`) |
+| `profile/profile-data.tsx` | DEMO_STATS/RANK/TROPHIES/ACTIVITY/TOUR + types — showcase demo data only |
+| `profile/index.ts` | barrel for `ui/profile` |
+| `events/EventCard.tsx` | EventCard — event grid card (hue rail, status chip, game/date), links to `/eventos/[id]` |
+| `events/GameCard.tsx` | GameCard — game grid card (cover art + scrim, active badge, since-date), links to `/juegos/[id]` |
+| `events/EventStatusChip.tsx` | EventStatusChip — active/upcoming/completed status pill |
+| `events/AchievementItem.tsx` | AchievementItem — achievement/medal row w/ rarity colour (shared by event detail + `/logros`) |
+| `events/events-util.ts` | eventStatus, formatEventDate, dayMonth, EventLike/EventStatus types |
+| `events/index.ts` | barrel for `ui/events` |
+| `legal/LegalDoc.tsx` | LegalDoc — legal document: sticky scroll-spy TOC + numbered sections (paragraphs + bullet lists) |
+| `legal/index.ts` | barrel for `ui/legal` |
 
 ### `hooks/`
 
@@ -109,9 +130,11 @@ never marker classes.
 | `use-reveal.ts` | useReveal |
 | `use-dismiss.ts` | useDismiss — shared outside-click + Escape dismissal (Popover, Menu, NotifMenu, GameSwitch) |
 
-**Status:** Foundation (tokens/fonts/Tailwind) ✅ · System conventions (base heading styles via `data-ds`, `cut*`/`wrap`/`mono-label` classes, primitives barrel, unified `toast()`) ✅ · App shell (Navbar + Footer, wired into `(boffmedia)/layout.tsx`) ✅ · Landing home page — «Travesía», split into per-section files ✅ · Base component kit (47 primitives above incl. Modal/Popover/Spinner) + component showcase ✅ — routed at `styles/components/page.tsx` (`/styles/components`, linked from footer «Componentes»), covering the **Sistema** domain across four chapters: **Bases** (color/tipografía/geometría), **Primitivas** (botones · chips y badges · formularios · selección y rango · navegación · dropdown de nav · sesión e idioma · pie de página · menús y avisos · anillo y carga · tooltip y teclas · scrollbar), **Patrones** (paneles · datos · estados), **Movimiento** (niveles de FX · marquesina · contador y decode · cursor e imán).
+**Status:** Foundation (tokens/fonts/Tailwind) ✅ · System conventions (base heading styles via `data-ds`, `cut*`/`wrap`/`mono-label` classes, primitives barrel, unified `toast()`) ✅ · App shell (Navbar + Footer, wired into `(boffmedia)/layout.tsx`) ✅ · Landing home page — «Travesía», split into per-section files ✅ · Base component kit (49 primitives above incl. Modal/Popover/Spinner + auth kit) + component showcase ✅ — routed at `styles/components/page.tsx` (`/styles/components`, linked from footer «Componentes»), covering the **Sistema** domain across five chapters: **Bases** (color/tipografía/geometría), **Primitivas** (botones · chips y badges · formularios · **acceso** · selección y rango · navegación · dropdown de nav · sesión e idioma · pie de página · menús y avisos · anillo y carga · tooltip y teclas · scrollbar), **Patrones** (paneles · datos · estados), **Movimiento** (niveles de FX · marquesina · contador y decode · cursor e imán), **Perfil** (identidad · rango y stats · vitrina · actividad · cuenta y enlaces · torneo en curso).
 The showcase demos Modal + Popover (menús y avisos) and Spinner (anillo y carga); the nav/shell pieces via real components (`NavDropdown` with a new `demoOpen` prop, `LangSwitcher`, `NotifMenu`, `Footer`); the scrollbar via the global `--sb-*` tokens + `bm-scroll`; and the FX layer (`Marquee`, `CountUp`, `Decode`, `useSignalFX` glare/tilt/magnet). It is fully responsive: the `230px 1fr` index/main shell collapses to one column below `lg` (index becomes a bounded, non-sticky block), the chapter pager wraps, and wide specimens (spacing scale, `Stats`, `Table`, the open `NavDropdown` panel) scroll in their own `overflow-x-auto` containers. Two primitives gained shrink fixes that also benefit real pages: `Third` (added `min-w-0` so its title truncates in constrained grids) and `Table` (now wrapped in an `overflow-x-auto` container with `min-w-[420px]`). The superseded demo routes `styles/components_v2`, `styles/showcase_v2`, `styles/colors` were removed.
-**Pending:** showcase — **acceso (auth)** section deferred to Phase 3 (v3 auth kit + `steam` icon don't exist yet); «palabra cinética» (`Kinetic`) not extracted. Then: tool-kit domains (Plataforma, Herramientas, Pokémon, Monster Hunter, Otros) and their per-tool primitives; remaining pages/tools; move `data-ds="boffmedia"` from page roots up to `(boffmedia)/layout.tsx` once every route is on v3.
+**Phase 3 (in progress):** ✅ auth — v3 auth kit (`AuthProviderBtn`/`PasswordField`, `steam`+`camera` icons) + `/entrar` login/register wired to NextAuth, session-aware `AccountNav`. ✅ profile — `/perfil` rebuilt on v3 (real identity/avatar-upload/account-form/linked-accounts), full profile set demoed in the showcase **Perfil** chapter; deferred no-API sections in `docs/BOFFMEDIA_V3_DEFERRED.md`. ✅ ranking — `/clasificacion` global leaderboard from real `useGetLeaderboards`. ✅ events — `/eventos` + `/eventos/[id]` (real `useGetEvents`/achievements/leaderboard/join) via shared `ui/events/` kit; `/logros` global achievements catalogue; `/calendario` agenda. ✅ community — `/community` real-data hub (nav re-pointed from `/eventos`). ✅ legal — `/privacidad /terminos /cookies` via `ui/legal/LegalDoc`. ✅ landing — `TvTorneos` next-event wired to real `useGetEvents`. Remaining Phase 3: none blocking — leftover no-API items (community forum, landing HUD/FEED, notifications, tournament brackets) tracked in `docs/BOFFMEDIA_V3_DEFERRED.md`.
+
+**Pending:** showcase — «palabra cinética» (`Kinetic`) not extracted. Then: tool-kit domains (Plataforma, Herramientas, Pokémon, Monster Hunter, Otros) and their per-tool primitives; remaining pages/tools; move `data-ds="boffmedia"` from page roots up to `(boffmedia)/layout.tsx` once every route is on v3.
 
 ---
 
