@@ -26,6 +26,5 @@ export function useReveal(deps: React.DependencyList = []) {
       window.removeEventListener("scroll", check)
       window.removeEventListener("resize", check)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps)
 }

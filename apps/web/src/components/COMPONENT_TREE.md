@@ -80,7 +80,7 @@ never marker classes.
 | `navigation/NavDropdown.tsx` | NavDropdown |
 | `navigation/LangSwitcher.tsx` | LangSwitcher |
 | `navigation/NotifMenu.tsx` | NotifMenu |
-| `navigation/nav-data.ts` | PRIMARY_NAV, TOOLS_SECTIONS, COMUNIDAD_SECTIONS, FOOTER_COLS, FOOTER_SOCIAL |
+| `navigation/nav-data.ts` | PRIMARY_NAV, buildToolsSections (derived from `@/data/games` — single source of truth with the hub/sidebar), buildComunidadSections, FOOTER_COLS, FOOTER_SOCIAL (labels are `nav.v3.*` i18n keys) |
 | `landing/LandingPage.tsx` | LandingPage — active home page (`(boffmedia)/page.tsx`), «Travesía» concept, orchestrator only |
 | `landing/landing-data.ts` | TV3_ZONES, TV3_STOPS, TV3_HUD, TV3_TOOLS, TV3_FEATS, TV3_EVENT(_TS), TV3_GAMES, TV3_FEED, DISCORD |
 | `landing/landing-shared.tsx` | PRI_GLOW, GLARE, HUD_FRAME, LINE_MASK, LINE_INNER, BEAMS, CTA_ROW, CTA_MONO, Grain, tvGoTo, TvCountdown |
@@ -91,12 +91,23 @@ never marker classes.
 | `landing/TvMeta.tsx` | TvMeta — final CTA |
 | `landing/stops/*.tsx` | TvTools, TvSmartRotom, TvTorneos, TvJuegos, TvComunidad — one file per checkpoint |
 | `landing/travesia-fx.tsx` | FxProgress, Scan, Decode, FxParticles, FxCursor, useSignalFX |
+| `tools/tools-data.ts` | HUB_SLUGS, buildHubGame(s), buildCategory, hueColorOf, hueStyle, HubGame/ToolCardData/CategoryData/ExtLinkData types — adapter merging `@/data/games` + `@/data/hub` + i18n (namespaces come from `hubConfig.toolNs/extNs/headerNs`, no slug special-casing) |
+| `tools/ArtImage.tsx` | ArtImage — key-art/icon `next/image` with graceful fallback (owns the broken-image behavior) |
+| `tools/GameLogo.tsx` | GameLogo — game seal in its hue |
+| `tools/ToolCard.tsx` | ToolCard — «fila» tool card (hue rail, icon, title/desc, badges) |
+| `tools/ToolGrid.tsx` | ToolGrid — responsive card grid shared by hub + category landings |
+| `tools/TxSection.tsx` | TxSection — accent-barred section block with mono count (wraps on mobile) |
+| `tools/VideoHero.tsx` | VideoHero — hub hero with looping bg video + scanlines + scrim (`motion-reduce` falls back to poster/surface) |
+| `tools/ToolShell.tsx` | ToolShell + Bleed — v3 tool-page shell: collapsible+pinnable `SideRail` (72px→264px, hover/focus overlay, hue-active) with `GameSwitch` header, mobile off-canvas drawer. Mounted by per-game server layouts (`(herramientas)/<game>/layout.tsx`); full-bleed routes come from `ToolEntry.bleed` in `@/data/games`. Owns the `--pad-x`/`--pad-y` content padding; `Bleed` escapes it (no-op outside the shell). |
+| `tools/CategoryLanding.tsx` | CategoryLanding + internal GameBanner (real key-art), FeaturedTool (real art), ExtLinks — the `/pokemon /minecraft /mhwilds /otros` landing body, rendered inside ToolShell |
+| `tools/index.ts` | barrel for the above |
 
 ### `hooks/`
 
 | File | Exports |
 |---|---|
 | `use-reveal.ts` | useReveal |
+| `use-dismiss.ts` | useDismiss — shared outside-click + Escape dismissal (Popover, Menu, NotifMenu, GameSwitch) |
 
 **Status:** Foundation (tokens/fonts/Tailwind) ✅ · System conventions (base heading styles via `data-ds`, `cut*`/`wrap`/`mono-label` classes, primitives barrel, unified `toast()`) ✅ · App shell (Navbar + Footer, wired into `(boffmedia)/layout.tsx`) ✅ · Landing home page — «Travesía», split into per-section files ✅ · Base component kit (47 primitives above incl. Modal/Popover/Spinner) + component showcase ✅ — routed at `styles/components/page.tsx` (`/styles/components`, linked from footer «Componentes»), covering the **Sistema** domain across four chapters: **Bases** (color/tipografía/geometría), **Primitivas** (botones · chips y badges · formularios · selección y rango · navegación · dropdown de nav · sesión e idioma · pie de página · menús y avisos · anillo y carga · tooltip y teclas · scrollbar), **Patrones** (paneles · datos · estados), **Movimiento** (niveles de FX · marquesina · contador y decode · cursor e imán).
 The showcase demos Modal + Popover (menús y avisos) and Spinner (anillo y carga); the nav/shell pieces via real components (`NavDropdown` with a new `demoOpen` prop, `LangSwitcher`, `NotifMenu`, `Footer`); the scrollbar via the global `--sb-*` tokens + `bm-scroll`; and the FX layer (`Marquee`, `CountUp`, `Decode`, `useSignalFX` glare/tilt/magnet). It is fully responsive: the `230px 1fr` index/main shell collapses to one column below `lg` (index becomes a bounded, non-sticky block), the chapter pager wraps, and wide specimens (spacing scale, `Stats`, `Table`, the open `NavDropdown` panel) scroll in their own `overflow-x-auto` containers. Two primitives gained shrink fixes that also benefit real pages: `Third` (added `min-w-0` so its title truncates in constrained grids) and `Table` (now wrapped in an `overflow-x-auto` container with `min-w-[420px]`). The superseded demo routes `styles/components_v2`, `styles/showcase_v2`, `styles/colors` were removed.

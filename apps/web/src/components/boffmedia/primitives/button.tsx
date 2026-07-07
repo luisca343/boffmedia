@@ -1,14 +1,14 @@
 import * as React from "react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
-import { Icon } from "./icon"
+import { Icon, type IconName } from "./icon"
 import { Spinner } from "./spinner"
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "default" | "pri" | "ghost" | "danger"
   size?: "sm" | "lg"
-  icon?: string
-  iconRight?: string
+  icon?: IconName
+  iconRight?: IconName
   loading?: boolean
   href?: string
 }

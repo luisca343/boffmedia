@@ -1,0 +1,59 @@
+{
+  "toolsUi": {
+    "meta": {
+      "title": "Caja de herramientas",
+      "description": "Calculadoras, planificadores y bases de datos competitivas — creadas por y para la comunidad."
+    },
+    "taglines": {
+      "pokemon": "Calculadoras, generadores y bases de datos",
+      "mhwilds": "Planificadores y generadores de builds",
+      "otros": "Herramientas generales y recursos",
+      "minecraft": "Compatibilidad de esquemas y utilidades"
+    },
+    "hub": {
+      "kicker": "Herramientas · Comunidad",
+      "title": "Caja de <em>herramientas</em>",
+      "lead": "Calculadoras, planificadores y bases de datos competitivas — creadas por y para la comunidad. Elige tu juego y entra.",
+      "searchPlaceholder": "Buscar herramienta, juego…",
+      "searchAria": "Buscar herramienta",
+      "clear": "Limpiar",
+      "clearSearch": "Limpiar búsqueda",
+      "noResults": "Sin resultados",
+      "noResultsFor": "No encontramos herramientas para «{query}».",
+      "results": "Resultados",
+      "matches": "{count, plural, one {# coincidencia} other {# coincidencias}}",
+      "games": "juegos",
+      "tools": "herramientas",
+      "alwaysUpdated": "Siempre actualizado",
+      "viewGame": "Ver juego",
+      "toolCount": "{count, plural, one {# herramienta} other {# herramientas}}"
+    },
+    "category": {
+      "metaTitle": "Herramientas de {game}",
+      "bannerPrefix": "Herramientas",
+      "featured": "Destacada",
+      "featuredNew": "Destacada · Nueva",
+      "featuredOf": "Herramienta destacada de {game}",
+      "openTool": "Abrir herramienta",
+      "allTools": "Todas las herramientas",
+      "externalResources": "Recursos externos",
+      "externalHint": "Salen de Boffmedia · pestaña nueva",
+      "externalTag": "Externo",
+      "externalFallbackDomain": "enlace externo",
+      "externalAria": "{title}. Enlace externo a {domain}; se abre en una pestaña nueva."
+    },
+    "shell": {
+      "railAria": "Herramientas del juego",
+      "switchGame": "Cambiar de juego — {game}",
+      "new": "Nuevo",
+      "collapse": "Contraer",
+      "collapseTitle": "Contraer barra",
+      "pin": "Fijar barra",
+      "openToolsMenu": "Abrir menú de herramientas"
+    },
+    "card": {
+      "new": "Nuevo",
+      "popular": "Popular"
+    }
+  }
+}

@@ -102,7 +102,6 @@ export function TvHero({ lvl, density }: { lvl: number; density: number }) {
             className="absolute left-[calc(50%_-_270px)] top-[calc(50%_-_270px)] h-[540px] w-[540px] rounded-full border border-dashed border-line-2 opacity-70 animate-[lv4-spin_90s_linear_infinite] [.no-motion_&]:animate-none"
             aria-hidden="true"
           />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className="relative z-[2] w-[min(100%,500px)] max-[980px]:w-[min(80%,360px)] [filter:drop-shadow(0_26px_44px_rgba(0,0,0,0.55))_drop-shadow(0_0_56px_rgba(255,92,10,0.30))] [[data-theme=light]_&]:[filter:drop-shadow(0_22px_38px_rgba(20,23,28,0.28))_drop-shadow(0_0_46px_rgba(240,78,0,0.22))] [@media(pointer:fine)_and_(prefers-reduced-motion:no-preference)]:will-change-transform [@media(pointer:fine)_and_(prefers-reduced-motion:no-preference)]:[transform:perspective(950px)_rotateY(calc(var(--mx,0)*9deg))_rotateX(calc(var(--my,0)*-7deg))] opacity-[0.67]" src="/img/boff-logo.webp" alt="" aria-hidden="true" />
 
           <div className="absolute left-[-6%] top-[12%] z-[3] inline-flex items-center gap-2 border border-solid border-line-2 border-l-[3px] border-l-accent px-3 py-2 font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.1em] text-[#f2f4f8] [background:rgba(0,0,0,0.82)] cut-tag [--cut-tag:7px] animate-[tv-bob_5s_ease-in-out_infinite] [.no-motion_&]:animate-none [[data-theme=light]_&]:[background:rgba(16,19,24,0.9)] max-[980px]:left-0">

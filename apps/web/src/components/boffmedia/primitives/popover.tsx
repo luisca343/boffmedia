@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
+import { useDismiss } from "@/components/boffmedia/hooks/use-dismiss"
 
 export interface PopoverProps {
   trigger: React.ReactNode
@@ -16,24 +17,14 @@ export function Popover({ trigger, align = "start", side = "bottom", ariaLabel, 
   const [open, setOpen] = React.useState(false)
   const rootRef = React.useRef<HTMLSpanElement>(null)
 
-  React.useEffect(() => {
-    if (!open) return
-    const onDown = (e: MouseEvent) => {
-      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false)
-    }
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setOpen(false)
-        rootRef.current?.querySelector<HTMLElement>("[data-pop-trigger]")?.focus()
-      }
-    }
-    document.addEventListener("mousedown", onDown)
-    document.addEventListener("keydown", onKey)
-    return () => {
-      document.removeEventListener("mousedown", onDown)
-      document.removeEventListener("keydown", onKey)
-    }
-  }, [open])
+  useDismiss(
+    rootRef,
+    (reason) => {
+      setOpen(false)
+      if (reason === "escape") rootRef.current?.querySelector<HTMLElement>("[data-pop-trigger]")?.focus()
+    },
+    open,
+  )
 
   return (
     <span ref={rootRef} className="relative inline-flex">

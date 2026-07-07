@@ -134,6 +134,52 @@
       "markAllRead": "Marcar todas como leídas",
       "markRead": "Marcar como leída",
       "unread": "no leída"
+    },
+    "v3": {
+      "home": "Inicio",
+      "tools": "Herramientas",
+      "community": "Comunidad",
+      "search": "Buscar",
+      "theme": "Cambiar tema",
+      "login": "Entrar",
+      "register": "Crear cuenta",
+      "openMenu": "Abrir menú",
+      "closeMenu": "Cerrar menú",
+      "mobileNavAria": "Navegación móvil",
+      "menuOf": "Menú de {label}",
+      "language": "Idioma",
+      "notifications": "Notificaciones",
+      "markRead": "Marcar leídas",
+      "clear": "Limpiar",
+      "noNotifications": "Sin notificaciones",
+      "delete": "Eliminar",
+      "sections": {
+        "competition": "Competición",
+        "participate": "Participa"
+      },
+      "items": {
+        "games": "Juegos",
+        "ranking": "Clasificación",
+        "events": "Eventos",
+        "raffles": "Sorteos"
+      },
+      "footer": {
+        "tagline": "Comunidad gaming: torneos, servidores, herramientas competitivas y una temporada siempre en marcha.",
+        "explore": "Explorar",
+        "community": "Comunidad",
+        "system": "Sistema",
+        "events": "Eventos",
+        "games": "Juegos",
+        "tools": "Herramientas",
+        "ranking": "Clasificación",
+        "raffles": "Sorteos",
+        "components": "Componentes",
+        "profile": "Mi perfil",
+        "admin": "Admin",
+        "privacy": "Privacidad",
+        "web": "Web",
+        "discord": "Discord"
+      }
     }
   }
 }

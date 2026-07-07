@@ -1,7 +1,12 @@
+import { getGameEntry } from "@/data/games"
+import { hubConfig } from "@/data/hub"
+import { HUB_SLUGS } from "@/components/boffmedia/ui/tools/tools-data"
+import type { IconName } from "@/components/boffmedia/primitives/icon"
+
 export interface NavItem {
   label: string
   href: string
-  icon?: string
+  icon?: IconName
 }
 
 export interface NavGroup {
@@ -19,144 +24,107 @@ export interface NavSection {
 }
 
 export interface NavEntry {
-  label: string
+  labelKey: string
   route: string
   menu?: "tools" | "comunidad"
 }
 
+type T = (key: string) => string
+
 export const PRIMARY_NAV: NavEntry[] = [
-  { label: "Inicio", route: "/" },
-  { label: "Herramientas", route: "/herramientas", menu: "tools" },
-  { label: "Comunidad", route: "/comunidad", menu: "comunidad" },
+  { labelKey: "home", route: "/" },
+  { labelKey: "tools", route: "/herramientas", menu: "tools" },
+  // /comunidad ships in Phase 3 — until then the entry lands on /eventos.
+  { labelKey: "community", route: "/eventos", menu: "comunidad" },
 ]
 
-export const TOOLS_SECTIONS: NavSection[] = [
-  {
-    title: "Pokémon",
-    href: "/herramientas/pokemon",
-    hue: 22,
-    groups: [
+/**
+ * Tools menu derived from the games registry (single source of truth for
+ * routes and names) — adding a game/tool there updates this menu, the hub,
+ * the category landings and the shell sidebar together.
+ */
+export function buildToolsSections(t: T): NavSection[] {
+  return HUB_SLUGS.flatMap((slug) => {
+    const game = getGameEntry(slug)
+    const hub = hubConfig[slug]
+    if (!game || !hub) return []
+    return [
       {
-        name: "Competitivo",
-        href: "/herramientas/pokemon/competitivo",
-        items: [
-          { label: "Calculadora de daño", href: "/herramientas/pokemon/calc", icon: "calc" },
-          { label: "Meta VGC", href: "/herramientas/pokemon/vgc-meta", icon: "chart" },
-          { label: "Torneos VGC", href: "/herramientas/pokemon/torneos", icon: "trophy" },
-          { label: "Tracker de partidas", href: "/herramientas/pokemon/tracker", icon: "target" },
-        ],
+        title: t(game.nameKey),
+        href: `/${slug}`,
+        hue: hub.hue,
+        groups: game.categories
+          .map((c) => ({
+            name: t(c.nameKey),
+            href: c.href,
+            items: c.tools
+              .filter((tool) => tool.showInSidebar !== false)
+              .map((tool) => ({ label: t(tool.nameKey), href: tool.href, icon: tool.sidebarIcon })),
+          }))
+          .filter((g) => g.items.length > 0),
+        items: [],
       },
-      {
-        name: "TCG Pocket",
-        href: "/herramientas/pokemon/tcgp",
-        items: [
-          { label: "Catálogo de cartas", href: "/herramientas/pokemon/tcgp/catalogo", icon: "cards" },
-          { label: "Battlesim", href: "/herramientas/pokemon/battlesim", icon: "sword" },
-        ],
-      },
-    ],
-    items: [],
-  },
-  {
-    title: "Minecraft",
-    href: "/herramientas/minecraft",
-    hue: 130,
-    groups: [
-      {
-        name: "Mundos",
-        items: [
-          { label: "Schematic Compat", href: "/herramientas/minecraft/schematic", icon: "layers" },
-          { label: "Claves y sorteos", href: "/herramientas/minecraft/keys", icon: "key" },
-        ],
-      },
-    ],
-    items: [],
-  },
-  {
-    title: "Monster Hunter",
-    href: "/herramientas/mh",
-    hue: 280,
-    groups: [
-      {
-        name: "Cacería",
-        items: [
-          { label: "Planificador de builds", href: "/herramientas/mh/planner", icon: "sliders" },
-          { label: "Bestiario", href: "/herramientas/mh/bestiario", icon: "paw" },
-          { label: "Árbol de armas", href: "/herramientas/mh/armas", icon: "tree" },
-        ],
-      },
-    ],
-    items: [],
-  },
-]
+    ]
+  })
+}
 
-export const COMUNIDAD_SECTIONS: NavSection[] = [
-  {
-    title: "Competición",
-    href: "/clasificacion",
-    items: [
-      { label: "Juegos", href: "/juegos", icon: "gamepad" },
-      { label: "Clasificación", href: "/clasificacion", icon: "chart" },
-    ],
-  },
-  {
-    title: "Participa",
-    href: "/eventos",
-    items: [
-      { label: "Eventos", href: "/eventos", icon: "trophy" },
-      { label: "Sorteos", href: "/sorteos", icon: "gift" },
-    ],
-  },
-  {
-    title: "Contenido",
-    href: "/blog",
-    items: [
-      { label: "Blog", href: "/blog", icon: "book" },
-      { label: "Foro", href: "/foro", icon: "message" },
-    ],
-  },
-]
+export function buildComunidadSections(t: T): NavSection[] {
+  return [
+    {
+      title: t("nav.v3.sections.competition"),
+      href: "/clasificacion",
+      items: [
+        { label: t("nav.v3.items.games"), href: "/juegos", icon: "gamepad" },
+        { label: t("nav.v3.items.ranking"), href: "/clasificacion", icon: "chart" },
+      ],
+    },
+    {
+      title: t("nav.v3.sections.participate"),
+      href: "/eventos",
+      items: [
+        { label: t("nav.v3.items.events"), href: "/eventos", icon: "trophy" },
+        { label: t("nav.v3.items.raffles"), href: "/otros/sorteos", icon: "gift" },
+      ],
+    },
+  ]
+}
 
 export interface FooterLink {
   route?: string
   href?: string
-  label: string
+  labelKey: string
   external?: boolean
 }
 
-export const FOOTER_COLS: { title: string; links: FooterLink[] }[] = [
+export const FOOTER_COLS: { titleKey: string; links: FooterLink[] }[] = [
   {
-    title: "Explorar",
+    titleKey: "explore",
     links: [
-      { route: "/eventos", label: "Eventos" },
-      { route: "/juegos", label: "Juegos" },
-      { route: "/herramientas", label: "Herramientas" },
-      { route: "/clasificacion", label: "Clasificación" },
+      { route: "/eventos", labelKey: "events" },
+      { route: "/juegos", labelKey: "games" },
+      { route: "/herramientas", labelKey: "tools" },
+      { route: "/clasificacion", labelKey: "ranking" },
     ],
   },
   {
-    title: "Comunidad",
+    titleKey: "community",
     links: [
-      { route: "/comunidad", label: "Comunidad" },
-      { route: "/foro", label: "Foro" },
-      { route: "/blog", label: "Blog" },
-      { href: "https://discord.gg/TWqjNHQz7d", label: "Discord", external: true },
+      { href: "https://discord.gg/TWqjNHQz7d", labelKey: "discord", external: true },
+      { route: "/otros/sorteos", labelKey: "raffles" },
     ],
   },
   {
-    title: "Sistema",
+    titleKey: "system",
     links: [
-      { route: "/styles/components", label: "Componentes" },
-      { route: "/perfil", label: "Mi perfil" },
-      { route: "/admin", label: "Admin" },
-      { route: "/privacidad", label: "Privacidad" },
+      { route: "/styles/components", labelKey: "components" },
+      { route: "/perfil", labelKey: "profile" },
+      { route: "/admin", labelKey: "admin" },
+      { route: "/privacidad", labelKey: "privacy" },
     ],
   },
 ]
 
-export const FOOTER_SOCIAL: { icon: string; label: string; href: string }[] = [
-  { icon: "discord", label: "Discord", href: "https://discord.gg/TWqjNHQz7d" },
-  { icon: "message", label: "Foro", href: "/foro" },
-  { icon: "book", label: "Blog", href: "/blog" },
-  { icon: "globe", label: "Web", href: "/" },
+export const FOOTER_SOCIAL: { icon: IconName; labelKey: string; href: string }[] = [
+  { icon: "discord", labelKey: "discord", href: "https://discord.gg/TWqjNHQz7d" },
+  { icon: "globe", labelKey: "web", href: "/" },
 ]

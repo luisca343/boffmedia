@@ -2,13 +2,14 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "./icon"
+import { useDismiss } from "@/components/boffmedia/hooks/use-dismiss"
+import { Icon, type IconName } from "./icon"
 import { Button } from "./button"
 import { Kbd } from "./kbd"
 
 export interface MenuItem {
   label?: React.ReactNode
-  icon?: string
+  icon?: IconName
   onSelect?: () => void
   danger?: boolean
   disabled?: boolean
@@ -21,7 +22,7 @@ export interface MenuItem {
 export interface MenuProps {
   trigger?: React.ReactNode
   label?: React.ReactNode
-  icon?: string
+  icon?: IconName
   variant?: "default" | "pri" | "ghost" | "danger"
   size?: "sm" | "lg"
   items: MenuItem[]
@@ -51,24 +52,14 @@ export function Menu({
 
   const focusTrigger = () => rootRef.current?.querySelector<HTMLElement>("[data-menu-trigger]")?.focus()
 
-  React.useEffect(() => {
-    if (!open) return
-    const onDown = (e: MouseEvent) => {
-      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false)
-    }
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setOpen(false)
-        focusTrigger()
-      }
-    }
-    document.addEventListener("mousedown", onDown)
-    document.addEventListener("keydown", onKey)
-    return () => {
-      document.removeEventListener("mousedown", onDown)
-      document.removeEventListener("keydown", onKey)
-    }
-  }, [open])
+  useDismiss(
+    rootRef,
+    (reason) => {
+      setOpen(false)
+      if (reason === "escape") focusTrigger()
+    },
+    open,
+  )
 
   React.useEffect(() => {
     if (open && active >= 0) itemRefs.current[active]?.focus()

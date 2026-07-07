@@ -1,57 +1,55 @@
-import type { GameData } from "@/components/boffmedia-v2/ui/games/game-card"
-
-interface HubEntry {
+/** v3 tools-hub presentation config — one entry per game in the hub. */
+export interface HubEntry {
+  /** Short display code (brand-style, not translated). */
   short: string
-  tagline: string
+  /** i18n key for the one-line tagline shown on hub cards. */
+  taglineKey: string
+  /** Base hue (deg) for the game's accent color. */
   hue: number
+  /** Letter shown in the GameLogo seal when no icon image loads. */
   logoLabel: string
-  featured: GameData["featured"]
+  /** i18n namespace holding this game's tool strings (`<ns>.<toolKey>.title|description|features`). */
+  toolNs: string
+  /** i18n namespace for external-link titles (`<ns>.<linkKey>`). */
+  extNs: string
+  /** i18n namespace for the banner (`<ns>.title.prefix|highlight`, `<ns>.subtitle`); omit to build the banner from the game name + tagline. */
+  headerNs?: string
 }
 
 export const hubConfig: Record<string, HubEntry> = {
   pokemon: {
     short: "PKMN",
-    tagline: "Calculadoras, generadores y bases de datos",
+    taglineKey: "toolsUi.taglines.pokemon",
     hue: 28,
     logoLabel: "P",
-    featured: {
-      title: "Calculadoras Pokémon",
-      desc: "Herramientas de cálculo y análisis para Pokémon.",
-      features: ["Daño", "Estadísticas", "Equipos"],
-      href: "/pokemon",
-      icon: "calc",
-      image: "Pokémon herramientas",
-      hue: 28,
-    },
+    toolNs: "pokemon.tools",
+    extNs: "pokemon.externalLinks",
+    headerNs: "pokemon.header",
   },
   mhwilds: {
     short: "MHW",
-    tagline: "Planificadores y generadores de builds",
+    taglineKey: "toolsUi.taglines.mhwilds",
     hue: 130,
     logoLabel: "M",
-    featured: {
-      title: "Planificador de Builds",
-      desc: "Planifica y optimiza tus builds de Monster Hunter Wilds.",
-      features: ["Armaduras", "Habilidades", "Decoraciones"],
-      href: "/mhwilds",
-      icon: "hammer",
-      image: "MHWilds builds",
-      hue: 130,
-    },
+    toolNs: "mhwilds.tools",
+    extNs: "mhwilds.externalLinks",
+    headerNs: "mhwilds.header",
   },
   otros: {
     short: "MISC",
-    tagline: "Herramientas generales y recursos",
+    taglineKey: "toolsUi.taglines.otros",
     hue: 200,
     logoLabel: "O",
-    featured: {
-      title: "Utilidades",
-      desc: "Herramientas varias para la comunidad.",
-      features: ["Sorteos", "Claves", "Recursos"],
-      href: "/otros",
-      icon: "grid",
-      image: "Otras herramientas",
-      hue: 200,
-    },
+    toolNs: "otros.tools",
+    extNs: "otros.externalLinks",
+    headerNs: "otros.header",
+  },
+  minecraft: {
+    short: "MC",
+    taglineKey: "toolsUi.taglines.minecraft",
+    hue: 145,
+    logoLabel: "M",
+    toolNs: "games.minecraft",
+    extNs: "games.minecraft.externalLinks",
   },
 }

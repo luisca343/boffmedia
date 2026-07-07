@@ -2,11 +2,11 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "./icon"
+import { Icon, type IconName } from "./icon"
 
 export interface DisclosureProps {
   title: React.ReactNode
-  icon?: string
+  icon?: IconName
   sub?: React.ReactNode
   defaultOpen?: boolean
   badge?: React.ReactNode
