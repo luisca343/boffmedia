@@ -34,8 +34,7 @@ type T = (key: string) => string
 export const PRIMARY_NAV: NavEntry[] = [
   { labelKey: "home", route: "/" },
   { labelKey: "tools", route: "/herramientas", menu: "tools" },
-  // /comunidad ships in Phase 3 — until then the entry lands on /eventos.
-  { labelKey: "community", route: "/eventos", menu: "comunidad" },
+  { labelKey: "community", route: "/community", menu: "comunidad" },
 ]
 
 /**

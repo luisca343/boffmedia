@@ -50,6 +50,25 @@ import { Footer } from "@/components/boffmedia/ui/layout/Footer"
 import { Marquee } from "@/components/boffmedia/ui/layout/Marquee"
 import { Decode, useSignalFX } from "@/components/boffmedia/ui/landing/travesia-fx"
 import { GLARE } from "@/components/boffmedia/ui/landing/landing-shared"
+import { Divider } from "@/components/boffmedia/primitives/divider"
+import { AuthProviderBtn } from "@/components/boffmedia/primitives/auth-provider-btn"
+import { PasswordField } from "@/components/boffmedia/primitives/password-field"
+import {
+  ProfileHero,
+  ProfileNote,
+  RankStrip,
+  TrophyCase,
+  ActivityFeed,
+  LinkedAccounts,
+  LinkedAccountRow,
+  AccountForm,
+  TourLive,
+  DEMO_STATS,
+  DEMO_RANK,
+  DEMO_TROPHIES,
+  DEMO_ACTIVITY,
+  DEMO_TOUR,
+} from "@/components/boffmedia/ui/profile"
 
 // ── index model ─────────────────────────────────────────────────────────────
 interface SecMeta {
@@ -79,6 +98,7 @@ const CHAPTERS: Chapter[] = [
       { id: "botones", label: "Botones" },
       { id: "chips", label: "Chips y badges" },
       { id: "formularios", label: "Formularios" },
+      { id: "acceso", label: "Acceso" },
       { id: "seleccion", label: "Selección y rango" },
       { id: "navegacion", label: "Navegación" },
       { id: "navdrop", label: "Dropdown de nav" },
@@ -107,6 +127,18 @@ const CHAPTERS: Chapter[] = [
       { id: "marquesina", label: "Marquesina" },
       { id: "contador", label: "Contador y decode" },
       { id: "interaccion", label: "Cursor e imán" },
+    ],
+  },
+  {
+    name: "Perfil",
+    dom: "Sistema",
+    sections: [
+      { id: "pf-identidad", label: "Identidad" },
+      { id: "pf-rango", label: "Rango y stats" },
+      { id: "pf-vitrina", label: "Vitrina" },
+      { id: "pf-actividad", label: "Actividad" },
+      { id: "pf-vinculadas", label: "Cuenta y enlaces" },
+      { id: "pf-torneo", label: "Torneo en curso" },
     ],
   },
 ]
@@ -703,6 +735,64 @@ export default function ComponentsShowcase() {
             </Section>
           )}
 
+          {chapter.sections.some((s) => s.id === "acceso") && (
+            <Section
+              id="acceso"
+              kicker="Primitivas"
+              title="Acceso"
+              lead={<>Las piezas de la pantalla de entrada, reutilizables sueltas: botones de proveedor (<code>AuthProviderBtn</code>), el campo de contraseña con mostrar/ocultar (<code>PasswordField</code>) y el separador con etiqueta (<code>Divider</code>). La pantalla completa vive en <code>/entrar</code>.</>}
+            >
+              <Sample title="Proveedores OAuth" code="<AuthProviderBtn>" note={<>Google queda neutro con la marca en el glifo; Discord y Steam llevan relleno de marca. Los proveedores aún sin conectar van en estado <code>soon</code> (atenuados, pero siguen avisando al pulsar).</>}>
+                <div className="flex w-full max-w-[360px] flex-col gap-2.5">
+                  <AuthProviderBtn provider="google" block>
+                    Google
+                  </AuthProviderBtn>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <AuthProviderBtn provider="discord" soon>
+                      Discord
+                    </AuthProviderBtn>
+                    <AuthProviderBtn provider="steam" soon>
+                      Steam
+                    </AuthProviderBtn>
+                  </div>
+                </div>
+              </Sample>
+
+              <Sample title="Contraseña + separador" code="<PasswordField> · <Divider label>" col note={<>El ojo alterna la visibilidad (<code>aria-pressed</code>); el separador etiquetado divide proveedores del formulario.</>}>
+                <Field label="Contraseña">
+                  <PasswordField defaultValue="supersecreto" />
+                </Field>
+                <Divider label="o con tu correo" />
+              </Sample>
+
+              <Sample title="Pantalla de acceso" code="/entrar" note={<>Composición final: marca, proveedores, formulario y cambio entre iniciar sesión y crear cuenta. Conectada a NextAuth (credenciales + Google).</>}>
+                <div className="flex w-full justify-center border border-solid border-line bg-base bg-[radial-gradient(100%_70%_at_50%_0%,var(--accent-soft),transparent_60%)] p-6">
+                  <div className="flex w-full max-w-[380px] flex-col gap-[18px] border border-solid border-line-2 border-t-[3px] border-t-accent bg-panel px-7 pb-6 pt-7 [clip-path:polygon(0_0,100%_0,100%_calc(100%_-_16px),calc(100%_-_16px)_100%,0_100%)]">
+                    <span className="flex items-center gap-2.5 font-display text-[20px]/none font-extrabold italic uppercase text-txt">
+                      BOFF<b className="text-accent">MEDIA</b>
+                    </span>
+                    <AuthProviderBtn provider="google" block>
+                      Google
+                    </AuthProviderBtn>
+                    <Divider label="o con tu correo" />
+                    <Field label="Usuario">
+                      <Input placeholder="tu_usuario" />
+                    </Field>
+                    <Field label="Contraseña">
+                      <PasswordField placeholder="••••••••" />
+                    </Field>
+                    <Button variant="pri" className="w-full">
+                      Entrar
+                    </Button>
+                    <Button href="/entrar" variant="ghost" size="sm" iconRight="arrow" className="self-center">
+                      Ver pantalla completa
+                    </Button>
+                  </div>
+                </div>
+              </Sample>
+            </Section>
+          )}
+
           {chapter.sections.some((s) => s.id === "seleccion") && (
             <Section
               id="seleccion"
@@ -798,7 +888,7 @@ export default function ComponentsShowcase() {
               <Sample title="Notificaciones" code="<NotifMenu>" note={<>Campana con contador de no leídas; el popover permite marcar leídas y limpiar, con estado vacío. Ábrela.</>}>
                 <NotifMenu initialItems={DEMO_NOTIFS} />
               </Sample>
-              <Sample title="Cuenta — sin sesión" code='<Button href="/entrar">' note={<>Entrar / Crear cuenta cuando no hay sesión, tal como aparecen en la barra. El menú de cuenta con sesión llega con la pantalla de acceso.</>}>
+              <Sample title="Cuenta — sin sesión" code="<AccountNav>" note={<>Con sesión, <code>AccountNav</code> sustituye estos botones por el menú de cuenta (avatar + perfil + cerrar sesión) en la barra; sin sesión muestra Entrar / Crear cuenta, como aquí.</>}>
                 <Button size="sm" variant="ghost" icon="user" href="/entrar">
                   Entrar
                 </Button>
@@ -1244,6 +1334,112 @@ export default function ComponentsShowcase() {
             >
               <Sample title="Área de prueba" code="useSignalFX · data-glare · data-tilt-fx" col note={<>Mueve el puntero por encima: la tarjeta se inclina y brilla, y el botón se imanta hacia el cursor.</>}>
                 <FxPlayground />
+              </Sample>
+            </Section>
+          )}
+
+          {chapter.sections.some((s) => s.id === "pf-identidad") && (
+            <Section
+              id="pf-identidad"
+              kicker="Perfil"
+              title="Identidad"
+              lead={<>La cabecera de perfil (<code>ProfileHero</code>): banda de portada con textura de retransmisión, lower-third con avatar biselado, identidad y métricas rápidas. En <code>/perfil</code> se muestra sin las métricas de ejemplo y con subida de avatar real.</>}
+            >
+              <Sample title="Cabecera" code="<ProfileHero>" col note={<>Con <code>editable</code> aparecen los botones de cámara; <code>live</code> enciende la bandera «EN VIVO». El avatar cae a la inicial cuando no hay imagen.</>}>
+                <ProfileHero
+                  name="RotomChef"
+                  handle={<>@<b>rotomchef</b> · Miembro desde 2023</>}
+                  initial="R"
+                  live
+                  editable
+                  metrics={[{ v: "#42", l: "Ranking" }, { v: "4 180", l: "Puntos" }]}
+                  tags={<><Badge tone="new">Admin</Badge><Badge tone="live">Minecraft</Badge></>}
+                />
+              </Sample>
+            </Section>
+          )}
+
+          {chapter.sections.some((s) => s.id === "pf-rango") && (
+            <Section
+              id="pf-rango"
+              kicker="Perfil"
+              title="Rango y stats"
+              lead={<>Insignia de rango (<code>RankInsignia</code>) con barra de progreso y rejilla de <code>StatTile</code>, combinadas en <code>RankStrip</code>. Datos de ejemplo: aún sin API de estadísticas por usuario.</>}
+            >
+              <Sample title="Tira de rango" code="<RankStrip>" col>
+                <RankStrip rank={DEMO_RANK} stats={DEMO_STATS} />
+              </Sample>
+            </Section>
+          )}
+
+          {chapter.sections.some((s) => s.id === "pf-vitrina") && (
+            <Section
+              id="pf-vitrina"
+              kicker="Perfil"
+              title="Vitrina de logros"
+              lead={<>Rejilla de trofeos (<code>TrophyCase</code> / <code>TrophyCard</code>) con estados conseguido y bloqueado, y sello de rareza.</>}
+            >
+              <Sample title="Trofeos" code="<TrophyCase>" col>
+                <TrophyCase trophies={DEMO_TROPHIES} />
+              </Sample>
+            </Section>
+          )}
+
+          {chapter.sections.some((s) => s.id === "pf-actividad") && (
+            <Section
+              id="pf-actividad"
+              kicker="Perfil"
+              title="Actividad"
+              lead={<>Línea temporal de actividad (<code>ActivityFeed</code> / <code>ActivityRow</code>) con conector vertical entre hitos.</>}
+            >
+              <Sample title="Feed" code="<ActivityFeed>" col>
+                <Panel title="Actividad reciente">
+                  <ActivityFeed items={DEMO_ACTIVITY} />
+                </Panel>
+              </Sample>
+            </Section>
+          )}
+
+          {chapter.sections.some((s) => s.id === "pf-vinculadas") && (
+            <Section
+              id="pf-vinculadas"
+              kicker="Perfil"
+              title="Cuenta y enlaces"
+              lead={<>Formulario de cuenta (<code>AccountForm</code>) y cuentas vinculadas (<code>LinkedAccounts</code> / <code>LinkedAccountRow</code>). En <code>/perfil</code> se rellenan con la sesión real.</>}
+            >
+              <Sample title="Datos de la cuenta" code="<AccountForm>" col note={<>Controlado; deshabilitado salvo en modo edición. La biografía es solo demostración (sin API).</>}>
+                <Panel title="Datos de la cuenta">
+                  <AccountForm
+                    editing
+                    showBio
+                    values={{ name: "RotomChef", email: "rotom@boffmedia.es", bio: "Entrenador de VGC y cazador a tiempo parcial." }}
+                  />
+                </Panel>
+              </Sample>
+              <Sample title="Cuentas vinculadas" code="<LinkedAccounts>" col>
+                <Panel title="Cuentas vinculadas">
+                  <LinkedAccounts>
+                    <LinkedAccountRow icon="google" name="Google" hue="#ea4335" linked sub="rotom@gmail.com" end={<Badge tone="ok">Vinculado</Badge>} />
+                    <LinkedAccountRow icon="discord" name="Discord" hue="#5865F2" sub="Sin vincular" end={<Button size="sm" icon="link">Vincular</Button>} />
+                    <LinkedAccountRow icon="gamepad" name="Minecraft" hue="#3fbf5f" linked sub="RotomChef" end={<Badge tone="ok">Vinculado</Badge>} />
+                  </LinkedAccounts>
+                </Panel>
+              </Sample>
+            </Section>
+          )}
+
+          {chapter.sections.some((s) => s.id === "pf-torneo") && (
+            <Section
+              id="pf-torneo"
+              kicker="Perfil"
+              title="Torneo en curso"
+              lead={<>Banner de torneo en directo (<code>TourLive</code>) y la nota de vista pública (<code>ProfileNote</code>).</>}
+            >
+              <Sample title="Torneo en directo" code="<TourLive>" col>
+                <TourLive {...DEMO_TOUR} />
+              </Sample>
+              <Sample title="Nota de vista pública" code="<ProfileNote>" col>
+                <ProfileNote>Estás viendo el perfil público de un usuario.</ProfileNote>
               </Sample>
             </Section>
           )}

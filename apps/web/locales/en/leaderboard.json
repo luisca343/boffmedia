@@ -1,0 +1,30 @@
+{
+  "leaderboard": {
+    "kicker": "Community",
+    "title": "Global ranking",
+    "lead": "The whole community's ranking. Compete, earn medals and achievements, and climb the ladder.",
+    "search": "Search player…",
+    "sort": {
+      "points": "Points",
+      "medals": "Medals",
+      "achievements": "Achievements"
+    },
+    "sortDir": "Reverse order",
+    "count": "{count, plural, =0 {No players} one {# player} other {# players}}",
+    "cols": {
+      "player": "Player",
+      "points": "Points",
+      "medals": "Medals",
+      "achievements": "Achievements"
+    },
+    "showing": "Showing {from}–{to} of {total}",
+    "empty": {
+      "title": "No results",
+      "lead": "No player matches your search."
+    },
+    "error": {
+      "title": "Couldn't load the ranking",
+      "retry": "Retry"
+    }
+  }
+}

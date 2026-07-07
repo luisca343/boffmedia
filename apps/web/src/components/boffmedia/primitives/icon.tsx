@@ -83,6 +83,9 @@ const ICONS = {
   dice: <g><rect x="4" y="4" width="16" height="16" rx="4" /><circle cx="9" cy="9" r="1" /><circle cx="15" cy="9" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="9" cy="15" r="1" /><circle cx="15" cy="15" r="1" /></g>,
   discord: <g><path d="M8.4 6.6c-2 .3-3.6 1-4.4 1.8-1.3 2.3-1.8 5-1.5 7.6 1.4 1.1 2.9 1.9 4.6 2.2l.9-1.5M15.6 6.6c2 .3 3.6 1 4.4 1.8 1.3 2.3 1.8 5 1.5 7.6-1.4 1.1-2.9 1.9-4.6 2.2l-.9-1.5M7 16.8c3.2 1.5 6.8 1.5 10 0M8.4 6.6C10.7 6.1 13.3 6.1 15.6 6.6" /><circle cx="9" cy="12.4" r="1.25" /><circle cx="15" cy="12.4" r="1.25" /></g>,
   google: <g><path d="M21.4 12.3c0 5-3.5 8.7-9.4 8.7a9 9 0 1 1 6.2-15.5" /><path d="M21.4 12.3H12" /></g>,
+  steam: <g><circle cx="12" cy="12" r="9" /><circle cx="15.6" cy="8.6" r="2.4" /><circle cx="8.1" cy="14.9" r="1.7" /><path d="m9.6 13.9 4.1-2.9" /></g>,
+  camera: <g><path d="M3 8.5A1.5 1.5 0 0 1 4.5 7H8l1.4-2.2h5.2L16 7h3.5A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5z" /><circle cx="12" cy="13" r="3.4" /></g>,
+  logout: <g><path d="M15 4h3a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-3" /><path d="m10 8-4 4 4 4M6 12h9" /></g>,
 } satisfies Record<string, React.ReactNode>
 
 /** Every valid icon name — use this to type icon fields so typos fail at compile time. */

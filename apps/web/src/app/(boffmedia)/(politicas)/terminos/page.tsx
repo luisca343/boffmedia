@@ -1,17 +1,12 @@
-"use client"
+import type { Metadata } from "next"
+import { LegalDoc, type LegalSection } from "@/components/boffmedia/ui/legal"
 
-import * as React from "react"
-import { DocTOC } from "@/components/boffmedia-v2/primitives/doc-toc"
-import { Kicker } from "@/components/boffmedia-v2/primitives/kicker"
-import { Icon } from "@/components/boffmedia-v2/primitives/icon"
-import { BoffButton as Button } from "@/components/boffmedia-v2/primitives/button"
-import { BoffCard as Card } from "@/components/boffmedia-v2/primitives/card"
+export const metadata: Metadata = {
+  title: "Términos de servicio · Boffmedia",
+  description: "Las condiciones que regulan el uso de los servicios de Boffmedia.",
+}
 
-const SECTIONS: {
-  id: string
-  title: string
-  body: (string | string[])[]
-}[] = [
+const SECTIONS: LegalSection[] = [
   {
     id: "aceptacion",
     title: "Aceptación de los términos",
@@ -62,7 +57,7 @@ const SECTIONS: {
     id: "propiedad",
     title: "Propiedad intelectual",
     body: [
-      "El servicio y su contenido original, características y funcionalidad son y seguirán siendo propiedad exclusiva de BoffMedia y sus licenciantes. El servicio está protegido por derechos de autor, marcas registradas y otras leyes.",
+      "El servicio y su contenido original, características y funcionalidad son y seguirán siendo propiedad exclusiva de Boffmedia y sus licenciantes. El servicio está protegido por derechos de autor, marcas registradas y otras leyes.",
     ],
   },
   {
@@ -133,7 +128,7 @@ const SECTIONS: {
     id: "responsabilidad",
     title: "Limitación de responsabilidad",
     body: [
-      "En ningún caso BoffMedia, ni sus directores, empleados, socios, agentes, proveedores o afiliados, serán responsables por cualquier daño indirecto, incidental, especial, consecuente o punitivo derivado del uso o la imposibilidad de usar nuestros servicios.",
+      "En ningún caso Boffmedia, ni sus directores, empleados, socios, agentes, proveedores o afiliados, serán responsables por cualquier daño indirecto, incidental, especial, consecuente o punitivo derivado del uso o la imposibilidad de usar nuestros servicios.",
     ],
   },
   {
@@ -146,134 +141,19 @@ const SECTIONS: {
   {
     id: "contacto",
     title: "Contacto",
-    body: [
-      "Si tienes preguntas sobre estos Términos de Servicio, contáctanos a través de nuestra página de contacto.",
-    ],
+    body: ["Si tienes preguntas sobre estos Términos de Servicio, contáctanos a través de nuestra página de contacto."],
   },
 ]
 
 export default function TermsPage() {
-  const today = new Date().toLocaleDateString("es-ES", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  })
-
+  const updated = `Última actualización: ${new Date().toLocaleDateString("es-ES", { year: "numeric", month: "long", day: "numeric" })}`
   return (
-    <div className="container pt-8 pb-20">
-      <div className="max-w-[60ch] mb-10">
-        <Kicker>Legal · Términos</Kicker>
-        <h1 className="text-[length:var(--t-4xl)] mt-[0.7rem]">
-          Términos de servicio
-        </h1>
-        <p className="text-[length:var(--t-lg)] leading-[1.7] text-ink-muted mt-[1.1rem] mb-5">
-          Estos Términos de Servicio rigen el uso de la plataforma BoffMedia y
-          todos los servicios asociados. Al utilizar nuestros servicios,
-          aceptas estos términos en su totalidad.
-        </p>
-        <div className="flex gap-6 flex-wrap">
-          <span className="inline-flex items-center gap-2 font-mono text-[length:var(--t-xs)] tracking-[0.04em] text-ink-dim">
-            <Icon name="calendar" size={15} />
-            Última actualización: {today}
-          </span>
-          <span className="inline-flex items-center gap-2 font-mono text-[length:var(--t-xs)] tracking-[0.04em] text-ink-dim">
-            <Icon name="shield" size={15} />
-            Vigente
-          </span>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-[240px_1fr] gap-14 items-start max-[1000px]:grid-cols-1 max-[1000px]:gap-8">
-        <DocTOC
-          items={SECTIONS.map((s) => ({ id: s.id, title: s.title }))}
-        />
-
-        <div className="max-w-[70ch]">
-          {SECTIONS.map((s, i) => (
-            <section
-              key={s.id}
-              id={"sec-" + s.id}
-              className="pb-10 mb-10 border-b border-edge scroll-mt-[100px] last:border-b-0"
-            >
-              <div className="flex items-center gap-3.5 mb-4">
-                <span
-                  className="font-mono font-bold text-sm text-[color:var(--orange-500)] py-1 px-2 rounded-[var(--radius)] shrink-0"
-                  style={{
-                    border: "var(--hairline) solid color-mix(in srgb, var(--orange-500) 35%, transparent)",
-                    background:
-                      "color-mix(in srgb, var(--orange-500) 10%, transparent)",
-                  }}
-                >
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <h2 className="text-[length:var(--t-2xl)]">{s.title}</h2>
-              </div>
-              {s.body.map((b, j) =>
-                Array.isArray(b) ? (
-                  <ul
-                    key={j}
-                    className="list-none p-0 m-0 mb-4 flex flex-col gap-[0.7rem] last:mb-0"
-                  >
-                    {b.map((li, k) => (
-                      <li
-                        key={k}
-                        className="flex items-start gap-[0.7rem] text-[length:var(--t-base)] leading-[1.6] text-ink-muted"
-                      >
-                        <span className="shrink-0 w-[21px] h-[21px] rounded-full grid place-items-center text-[var(--on-secondary)] bg-secondary-hover mt-[0.15rem]">
-                          <Icon name="check" size={13} />
-                        </span>
-                        {li}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p
-                    key={j}
-                    className="text-[length:var(--t-base)] leading-[1.75] text-ink-muted m-0 mb-4 last:mb-0"
-                  >
-                    {b}
-                  </p>
-                ),
-              )}
-              {s.id === "contacto" && (
-                <Button
-                  variant="primary"
-                  icon="mail"
-                  style={{ marginTop: "1rem" }}
-                >
-                  Ir a contacto
-                </Button>
-              )}
-            </section>
-          ))}
-
-          <Card ticks className="flex items-center gap-5 p-6 flex-wrap">
-            <span
-              className="w-[50px] h-[50px] rounded-[var(--radius)] grid place-items-center text-[color:var(--orange-500)] shrink-0"
-              style={{
-                background:
-                  "color-mix(in srgb, var(--orange-500) 14%, transparent)",
-                border:
-                  "var(--hairline) solid color-mix(in srgb, var(--orange-500) 30%, transparent)",
-              }}
-            >
-              <Icon name="mail" size={22} />
-            </span>
-            <div className="flex-1 min-w-[200px]">
-              <h3 className="text-[length:var(--t-lg)] m-0">
-                ¿Tienes dudas sobre los términos?
-              </h3>
-              <p className="text-ink-muted text-[length:var(--t-sm)] mt-[0.3rem] m-0">
-                Si necesitas aclaración sobre algún punto, no dudes en
-                contactarnos.
-              </p>
-            </div>
-            <Button variant="ghost" iconRight="arrow">
-              Ir a contacto
-            </Button>
-          </Card>
-        </div>
-      </div>
-    </div>
+    <LegalDoc
+      kicker="Legal · Términos"
+      title="Términos de servicio"
+      lead="Estos términos regulan el acceso y uso de los servicios de Boffmedia. Al utilizarlos, aceptas cumplir con las condiciones descritas a continuación."
+      updated={updated}
+      sections={SECTIONS}
+    />
   )
 }

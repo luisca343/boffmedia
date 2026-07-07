@@ -3,6 +3,7 @@
 // Client-marked modules keep their boundary; server components can import
 // the barrel safely.
 
+export * from "./auth-provider-btn"
 export * from "./avatar"
 export * from "./badge"
 export * from "./banner"
@@ -30,6 +31,7 @@ export * from "./modal"
 export * from "./option-group"
 export * from "./pagination"
 export * from "./panel"
+export * from "./password-field"
 export * from "./ph"
 export * from "./popover"
 export * from "./progress"

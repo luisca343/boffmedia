@@ -6,8 +6,8 @@ import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "@/components/boffmedia/primitives/icon"
 import { IconButton } from "@/components/boffmedia/primitives/icon-button"
-import { Button } from "@/components/boffmedia/primitives/button"
 import { LangSwitcher } from "./LangSwitcher"
+import { MobileAccount } from "./AccountNav"
 import { PRIMARY_NAV, buildToolsSections, buildComunidadSections, type NavSection } from "./nav-data"
 
 function sectionItems(sections: NavSection[]) {
@@ -141,14 +141,7 @@ export function MobileNav({ pathname }: { pathname: string }) {
               <IconButton name="search" label={tNav("search")} />
             </div>
 
-            <div className="mt-4 grid gap-2.5">
-              <Button variant="ghost" size="sm" icon="user" href="/entrar" onClick={close} className="w-full">
-                {tNav("login")}
-              </Button>
-              <Button variant="pri" size="sm" icon="plus" href="/entrar?mode=register" onClick={close} className="w-full">
-                {tNav("register")}
-              </Button>
-            </div>
+            <MobileAccount onNavigate={close} />
           </nav>
         </div>
       )}
