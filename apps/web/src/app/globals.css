@@ -10,8 +10,7 @@
 @tailwind utilities;
 
 /* ============================================================================
-   HANDOFF DESIGN TOKENS — Neon direction, token-driven
-   Exact 1:1 reproduction of styles.css from handoff
+   LEGACY DESIGN TOKENS — retained for not-yet-migrated components
    ============================================================================ */
 
 /* Brand constants (fixed — do not vary by theme) */
@@ -406,71 +405,127 @@
 }
 
 /* ===========================================================================
+   BOFFMEDIA — theme tokens (default)
+   Graphite, steel, brand orange. Dark native, light variant.
+   Declared after the earlier blocks so shared token names (--bg, --text,
+   --accent, --font-*) resolve here. Legacy-only tokens (--layer-1, --secondary,
+   …) remain defined above for not-yet-migrated components during migration.
+   =========================================================================== */
+:root {
+  /* brand */
+  --naranja: #ff5c0a;
+  --naranja-bright: #ff7a33;
+  --naranja-ink: #0b0d11; /* text on orange */
+
+  /* type */
+  --font-display: "Saira Condensed", "Arial Narrow", sans-serif;
+  --font-body: "Saira", sans-serif;
+  --font-mono: "Roboto Mono", monospace;
+
+  /* geometry */
+  --cut: 10px;       /* diagonal corner cut for buttons/chips */
+  --cut-lg: 16px;    /* panels / heroes */
+  --bar: 4px;        /* accent side bar */
+
+  /* motion */
+  --t-fast: 140ms cubic-bezier(0.2, 0.7, 0.3, 1);
+  --t-med: 260ms cubic-bezier(0.2, 0.7, 0.3, 1);
+  --t-slow: 600ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root,
+[data-theme="dark"] {
+  --bg: #0b0d11;
+  --bg-2: #0d1015;         /* alternating section */
+  --bg-deep: #000000;      /* topbar / footer */
+  --panel: #13161c;
+  --panel-2: #181c24;      /* hover / nested */
+  --line: #262b35;
+  --line-2: #333a48;       /* emphasized borders */
+  --text: #f2f4f8;
+  --muted: #9aa3b2;
+  --dim: #5f6774;
+  --accent: var(--naranja);
+  --accent-bright: var(--naranja-bright);
+  --accent-soft: rgba(255, 92, 10, 0.13);
+  --accent-line: rgba(255, 92, 10, 0.45);
+  --ok: #34d377;
+  --warn: #ffb224;
+  --bad: #ff4d5e;
+  --info: #4da3ff;
+  --ok-soft: rgba(52, 211, 119, 0.13);
+  --warn-soft: rgba(255, 178, 36, 0.13);
+  --bad-soft: rgba(255, 77, 94, 0.13);
+  --info-soft: rgba(77, 163, 255, 0.13);
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+  --scrim: rgba(0, 0, 0, 0.6);
+  --stripe: rgba(255, 255, 255, 0.045);
+
+  /* scrollbar */
+  --sb-idle: rgba(154, 163, 178, 0.22);
+  --sb-hover: rgba(154, 163, 178, 0.48);
+  --sb-drag: var(--accent);
+}
+
+[data-theme="light"] {
+  --bg: #eef0f3;
+  --bg-2: #e7eaee;
+  --bg-deep: #101318;      /* topbar stays broadcast-black */
+  --panel: #ffffff;
+  --panel-2: #f5f6f8;
+  --line: #d5dae2;
+  --line-2: #b9c0cc;
+  --text: #14171c;
+  --muted: #5a6270;
+  --dim: #8b93a1;
+  --accent: #f04e00;
+  --accent-bright: #ff5c0a;
+  --accent-soft: rgba(240, 78, 0, 0.10);
+  --accent-line: rgba(240, 78, 0, 0.45);
+  --ok: #148947;
+  --warn: #a86a00;
+  --bad: #cf2438;
+  --info: #1668c7;
+  --ok-soft: rgba(20, 137, 71, 0.10);
+  --warn-soft: rgba(168, 106, 0, 0.12);
+  --bad-soft: rgba(207, 36, 56, 0.10);
+  --info-soft: rgba(22, 104, 199, 0.10);
+  --shadow: 0 18px 44px rgba(20, 23, 28, 0.14);
+  --scrim: rgba(20, 23, 28, 0.5);
+  --stripe: rgba(20, 23, 28, 0.05);
+
+  /* scrollbar */
+  --sb-idle: rgba(20, 23, 28, 0.20);
+  --sb-hover: rgba(20, 23, 28, 0.42);
+  --sb-drag: var(--accent);
+}
+
+/* ===========================================================================
    BASE — overrides Tailwind preflight naturally (we're after @tailwind base)
    =========================================================================== */
 * { box-sizing: border-box; }
 html.theme-switching * { transition: none !important; }
-html {
-  scroll-behavior: smooth;
-  /* Size clamp for 4k resolution, thinking if leaving this or remove it. */
-  font-size: clamp(16px, 8px + 0.4167vw, 24px); 
-}
+html { scroll-behavior: smooth; background: var(--bg); }
 body {
   margin: 0;
-  font-family: var(--font-body);
-  background: var(--bg) !important;
+  font: 400 16px/1.55 var(--font-body);
+  background: var(--bg);
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  font-size: var(--t-base);
-  line-height: 1.6;
+  transition: background var(--t-med), color var(--t-med);
 }
-h1, h2, h3, h4, h5 {
-  font-family: var(--font-display);
-  font-weight: 800;
-  letter-spacing: var(--display-spacing);
-  line-height: 1.08;
-  margin: 0;
-  text-wrap: balance;
-}
-p { text-wrap: pretty; }
+h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); margin: 0; }
 a { color: inherit; text-decoration: none; }
-button { font-family: var(--font-body); }
+button { font: inherit; color: inherit; }
 img { display: block; max-width: 100%; }
-::selection { background: var(--orange-500); color: #fff; }
+::selection { background: var(--accent); color: var(--naranja-ink); }
 
 .app-shell { min-height: 100vh; display: flex; flex-direction: column; background: var(--bg); }
-.container { width: 100%; max-width: var(--maxw); margin: 0 inline; margin-inline: auto; padding-inline: var(--gutter); }
+.container { width: 100%; max-width: 1280px; margin-inline: auto; padding-inline: 40px; }
 
-/* ===========================================================================
-   UTILITY — Available globally for pages and compositions
-   =========================================================================== */
-.eyebrow-num { font-family: var(--font-mono); color: var(--orange-500); font-weight: 700; }
-.text-muted { color: var(--text-muted); }
-.text-dim { color: var(--text-dim); }
-.accent-text { color: var(--secondary-hover); }
-.orange-text { color: var(--orange-500); }
-.divider { height: var(--hairline); background: var(--border); border: 0; margin: 0; }
-.grid-dots {
-  background-image: radial-gradient(var(--grid-dot) 1px, transparent 1px);
-  background-size: 22px 22px;
-}
-
-.section { padding-block: var(--space-section); }
-.section-head { display: flex; flex-direction: column; gap: 1.1rem; margin-bottom: 2.75rem; }
-.section-title { font-size: var(--t-4xl); line-height: 1.1; }
-.section-sub { color: var(--text-muted); font-size: var(--t-lg); max-width: 42ch; }
-
-/* Reveal-on-scroll */
-.reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.6s var(--ease), transform 0.6s var(--ease); }
-
-/* Shared keyboard-focus ring for BS/BSX battle primitives */
-.bsx-focus:focus-visible {
-  outline: 2px solid var(--secondary-hover);
-  outline-offset: 2px;
-}
-
-/* Fullscreen fallback (CSS-only when native API is unavailable) */
+/* Keyboard-focus ring + fullscreen fallbacks for battle primitives */
+.bsx-focus:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .bsx-fullscreen-fallback {
   position: fixed !important;
   inset: 0 !important;
@@ -479,92 +534,38 @@ img { display: block; max-width: 100%; }
   height: 100vh !important;
   overflow-y: auto !important;
 }
+:fullscreen .bsx-fullscreen-layout { width: 100vw; height: 100vh; overflow-y: auto; }
 
-/* Native fullscreen: ensure the layout fills the screen */
-:fullscreen .bsx-fullscreen-layout {
-  width: 100vw;
-  height: 100vh;
-  overflow-y: auto;
-}
-.reveal.in { opacity: 1; transform: none; }
-@media (prefers-reduced-motion: reduce) {
-  .reveal { opacity: 1; transform: none; transition: none; }
-  * { scroll-behavior: auto !important; }
-}
-
-/* ============================================================================
-   COMPONENT BASE STYLES — inline-style companions
-   These handle pseudo-class states (:hover, :focus) that inline styles can't.
-   ============================================================================ */
+/* Hover companion for the not-yet-migrated boffmedia-v2 <BoffCard hover>: pseudo-class
+   states inline styles can't express. Remove once that Card is migrated off. */
 .boff-card--hover:hover { box-shadow: var(--card-shadow-hover); }
 [data-direction="hud"] .boff-card--hover:hover { transform: translate(-2px, -2px); }
 [data-direction="neon"] .boff-card--hover:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--secondary) 40%, var(--border)); }
 [data-direction="grid"] .boff-card--hover:hover { transform: translateY(-3px); border-color: var(--border-strong); }
 
-/* Showcase pseudo-elements — cannot be expressed in Tailwind alone */
-.dsh-sub::after {
-  content: "";
-  flex: 1;
-  height: var(--hairline);
-  background: var(--divider);
+@media (prefers-reduced-motion: reduce) {
+  * { scroll-behavior: auto !important; }
 }
-.dodont__list li::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0.5rem;
-  width: 6px;
-  height: 6px;
-  border-radius: 2px;
-}
-.dodont__list li {
-  font-size: var(--t-sm);
-  color: var(--text-muted);
-  line-height: 1.5;
-  padding-left: 1.1rem;
-  position: relative;
-}
-.dodont__col:first-child .dodont__list li::before { background: var(--emerald-400); }
-.dodont__col:last-child .dodont__list li::before { background: var(--rose-400); }
-
-/* Scrollbar */
-::-webkit-scrollbar { width: 11px; height: 11px; }
-::-webkit-scrollbar-track { background: var(--scroll-track); }
-::-webkit-scrollbar-thumb { background: var(--scroll-thumb); border-radius: 6px; border: 3px solid var(--scroll-track); }
-::-webkit-scrollbar-thumb:hover { background: var(--scroll-thumb-hover); }
 
 /* ===========================================================================
-   NAVBAR — direction-aware navlink styles
+   SCROLLBAR — thin rectangular thumb, brand accent on drag
    =========================================================================== */
-.navlink {
-  display: inline-flex; align-items: center; gap: 0.45rem;
-  font-size: var(--t-sm); font-weight: 500;
-  color: var(--text-muted);
-  padding: 0.5rem 0.85rem;
-  border-radius: var(--btn-radius);
-  position: relative;
-  transition: color var(--dur) var(--ease), background var(--dur) var(--ease);
+html, .bm-scroll {
+  --sb-cur: var(--sb-idle);
+  scrollbar-width: thin;
+  scrollbar-color: var(--sb-cur) transparent;
 }
-.navlink svg { color: var(--text-dim); transition: color var(--dur) var(--ease); }
-.navlink:hover { color: var(--text); }
-.navlink:hover svg { color: var(--orange-500); }
-.navlink--active { color: var(--orange-500); font-weight: 600; }
-.navlink--active svg { color: var(--orange-500); }
-
-/* Direction: Grid — underline indicator */
-[data-direction="grid"] .navlink--active,
-[data-direction="grid"] .navlink { border-radius: 0; }
-[data-direction="grid"] .navlink::after {
-  content: ""; position: absolute; left: 0.85rem; right: 0.85rem; bottom: -2px; height: 2px;
-  background: var(--orange-500); transform: scaleX(0); transform-origin: left;
-  transition: transform var(--dur) var(--ease);
+html[data-scrolling], .bm-scroll[data-scrolling], .bm-scroll:hover { --sb-cur: var(--sb-hover); }
+::-webkit-scrollbar { width: 12px; height: 12px; background: transparent; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-corner { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background-color: var(--sb-cur, var(--sb-idle));
+  background-clip: padding-box;
+  border: 4px solid transparent;
+  border-radius: 0;
+  min-height: 44px;
+  min-width: 44px;
 }
-[data-direction="grid"] .navlink:hover::after,
-[data-direction="grid"] .navlink--active::after { transform: scaleX(1); }
-
-/* Direction: HUD — solid background */
-[data-direction="hud"] .navlink--active { background: var(--orange-500); color: #fff; }
-[data-direction="hud"] .navlink--active svg { color: #fff; }
-
-/* Direction: Neon — tinted background (default) */
-.navlink--active { background: color-mix(in srgb, var(--orange-500) 14%, transparent); }
+::-webkit-scrollbar-thumb:hover { background-color: var(--sb-hover); border-width: 3px; }
+::-webkit-scrollbar-thumb:active { background-color: var(--sb-drag); border-width: 3px; }
