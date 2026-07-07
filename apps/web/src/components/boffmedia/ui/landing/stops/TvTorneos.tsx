@@ -1,3 +1,5 @@
+"use client"
+
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/boffmedia/primitives/button"
@@ -6,8 +8,32 @@ import { Decode } from "../travesia-fx"
 import { TvCP } from "../TvCP"
 import { CTA_ROW, GLARE, HUD_FRAME, PRI_GLOW, TvCountdown } from "../landing-shared"
 import { TV3_EVENT } from "../landing-data"
+import { useGetEvents } from "@/hooks/events/useGetEvents"
+import type { EventLike } from "@/components/boffmedia/ui/events"
 
 export function TvTorneos() {
+  const { events } = useGetEvents()
+  // Real next upcoming event feeds the header + countdown; falls back to the
+  // editorial placeholder while events load or if none are scheduled.
+  const next = React.useMemo(() => {
+    const list = (Array.isArray(events) ? events : []) as EventLike[]
+    const now = Date.now()
+    return (
+      list
+        .filter((e) => {
+          const s = new Date(e.startDate).getTime()
+          return !Number.isNaN(s) && s >= now
+        })
+        .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())[0] || null
+    )
+  }, [events])
+
+  const title = next?.title ?? TV3_EVENT.title
+  const eventTs = next ? new Date(next.startDate).getTime() : undefined
+  const dateStr = next
+    ? `${new Date(next.startDate).toLocaleDateString("es-ES", { day: "numeric", month: "short" }).replace(".", "").toUpperCase()} · ${new Date(next.startDate).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}`
+    : TV3_EVENT.date
+
   return (
     <TvCP
       id="tv-cp3"
@@ -30,7 +56,7 @@ export function TvTorneos() {
             <i className="h-1.5 w-1.5 rounded-full bg-[#ff4d5e] animate-[lv4-blink_1.3s_infinite]" />
             Gran final · Bo3
           </span>
-          <span>{TV3_EVENT.title}</span>
+          <span className="min-w-0 truncate">{title}</span>
         </div>
         <div className="relative grid grid-cols-[1fr_auto_1fr] items-center gap-4 px-5 py-[30px] max-[520px]:grid-cols-1 max-[520px]:gap-5">
           <div className="grid justify-items-center gap-1.5 text-center">
@@ -59,9 +85,9 @@ export function TvTorneos() {
         </div>
         <div className="flex flex-wrap items-center justify-between gap-3.5 border-t border-solid border-line px-5 py-4">
           <span className="font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.1em] text-[#5f6774]">
-            Próxima emisión · {TV3_EVENT.date}
+            Próxima emisión · {dateStr}
           </span>
-          <TvCountdown compact />
+          <TvCountdown compact to={eventTs} />
         </div>
       </div>
       <div className={CTA_ROW}>

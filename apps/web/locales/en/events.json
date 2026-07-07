@@ -1,0 +1,155 @@
+{
+  "events": {
+    "kicker": "Community",
+    "title": "Events",
+    "lead": "Community tournaments, challenges and seasons. Take part, earn achievements and climb the ranking.",
+    "search": "Search event…",
+    "count": "{count, plural, =0 {No events} one {# event} other {# events}}",
+    "filter": {
+      "all": "All",
+      "active": "Live",
+      "upcoming": "Upcoming",
+      "completed": "Finished"
+    },
+    "status": {
+      "active": "Live",
+      "upcoming": "Upcoming",
+      "completed": "Finished"
+    },
+    "type": {
+      "event": "Event",
+      "server": "Server"
+    },
+    "card": {
+      "starts": "Starts {date}",
+      "ends": "Until {date}",
+      "game": "Game"
+    },
+    "empty": {
+      "title": "No events",
+      "lead": "No events match your search."
+    },
+    "error": {
+      "title": "Couldn't load events",
+      "retry": "Retry"
+    },
+    "detail": {
+      "back": "Events",
+      "about": "About the event",
+      "achievements": "Achievements",
+      "leaderboard": "Ranking",
+      "viewAll": "View all",
+      "points": "pts",
+      "empty": "This event has no achievements yet.",
+      "leaderEmpty": "No ranking yet.",
+      "colRank": "#",
+      "colPlayer": "Player",
+      "colPoints": "Points",
+      "colMedals": "Medals",
+      "colAchievements": "Achievements",
+      "participants": "Participants",
+      "participate": "Take part",
+      "participating": "Taking part",
+      "loginToJoin": "Sign in to take part",
+      "notFound": "Event not found",
+      "notFoundLead": "This event doesn't exist or has been removed."
+    }
+  },
+  "logros": {
+    "kicker": "Community",
+    "title": "Achievements",
+    "lead": "The full catalogue of achievements and medals you can earn across the community's events.",
+    "search": "Search achievement…",
+    "count": "{count, plural, =0 {No achievements} one {# achievement} other {# achievements}}",
+    "totalPoints": "{points} points up for grabs",
+    "filter": {
+      "all": "All",
+      "achievement": "Achievements",
+      "medal": "Medals"
+    },
+    "rarity": {
+      "bronze": "Bronze",
+      "silver": "Silver",
+      "gold": "Gold",
+      "platinum": "Platinum",
+      "diamond": "Diamond"
+    },
+    "empty": {
+      "title": "No achievements",
+      "lead": "No achievements match your search."
+    },
+    "error": {
+      "title": "Couldn't load achievements",
+      "retry": "Retry"
+    }
+  },
+  "juegos": {
+    "kicker": "Community",
+    "title": "Games",
+    "lead": "Every game on the platform: adventures, competitions and servers, each with its own season.",
+    "search": "Search game…",
+    "count": "{count, plural, =0 {No games} one {# game} other {# games}}",
+    "filter": {
+      "all": "All",
+      "active": "Active"
+    },
+    "active": "Active",
+    "inactive": "Inactive",
+    "since": "Since {date}",
+    "empty": {
+      "title": "No games",
+      "lead": "We're preparing new games. Check back soon."
+    },
+    "error": {
+      "title": "Couldn't load games",
+      "retry": "Retry"
+    },
+    "detail": {
+      "back": "Games",
+      "events": "Events",
+      "noEvents": "This game has no events yet.",
+      "viewEvents": "View events",
+      "notFound": "Game not found",
+      "notFoundLead": "This game doesn't exist or has been removed."
+    }
+  },
+  "community": {
+    "kicker": "Community",
+    "title": "Community",
+    "lead": "Live tournaments, the global ranking and an active Discord community. Your season starts here.",
+    "discord": {
+      "title": "Join the Discord",
+      "lead": "Chat, find opponents and hear about every event in real time.",
+      "cta": "Open Discord"
+    },
+    "events": {
+      "title": "Upcoming events",
+      "viewAll": "View all"
+    },
+    "players": {
+      "title": "Top players",
+      "viewAll": "View ranking"
+    },
+    "links": {
+      "events": "Events",
+      "ranking": "Ranking",
+      "achievements": "Achievements",
+      "calendar": "Calendar"
+    },
+    "empty": "Nothing yet."
+  },
+  "calendario": {
+    "kicker": "Community",
+    "title": "Calendar",
+    "lead": "Every community event, ordered by date.",
+    "today": "Today",
+    "empty": {
+      "title": "No scheduled events",
+      "lead": "New events will show up here once they're announced."
+    },
+    "error": {
+      "title": "Couldn't load the calendar",
+      "retry": "Retry"
+    }
+  }
+}

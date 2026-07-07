@@ -1,0 +1,40 @@
+{
+  "profile": {
+    "kicker": "Account",
+    "title": "My profile",
+    "edit": "Edit profile",
+    "save": "Save changes",
+    "saving": "Saving…",
+    "saved": "Profile updated",
+    "saveError": "Could not save the profile",
+    "memberSince": "Member since {year}",
+    "form": {
+      "name": "Name",
+      "email": "Email",
+      "bio": "Bio"
+    },
+    "section": {
+      "account": "Account details",
+      "linked": "Linked accounts"
+    },
+    "linked": {
+      "linked": "Linked",
+      "unlinked": "Not linked",
+      "link": "Link",
+      "soon": "Coming soon"
+    },
+    "status": {
+      "online": "Online",
+      "offline": "Offline"
+    },
+    "avatar": {
+      "change": "Change photo",
+      "error": "Could not upload the image"
+    },
+    "loggedOut": {
+      "title": "Sign in required",
+      "body": "Sign in to view your profile.",
+      "cta": "Sign in"
+    }
+  }
+}

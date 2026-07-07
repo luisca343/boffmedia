@@ -1,0 +1,155 @@
+{
+  "events": {
+    "kicker": "Comunidad",
+    "title": "Eventos",
+    "lead": "Torneos, retos y temporadas de la comunidad. Participa, gana logros y sube en la clasificación.",
+    "search": "Buscar evento…",
+    "count": "{count, plural, =0 {Sin eventos} one {# evento} other {# eventos}}",
+    "filter": {
+      "all": "Todos",
+      "active": "En curso",
+      "upcoming": "Próximos",
+      "completed": "Finalizados"
+    },
+    "status": {
+      "active": "En curso",
+      "upcoming": "Próximo",
+      "completed": "Finalizado"
+    },
+    "type": {
+      "event": "Evento",
+      "server": "Servidor"
+    },
+    "card": {
+      "starts": "Empieza {date}",
+      "ends": "Hasta {date}",
+      "game": "Juego"
+    },
+    "empty": {
+      "title": "Sin eventos",
+      "lead": "No hay eventos que coincidan con tu búsqueda."
+    },
+    "error": {
+      "title": "Error al cargar los eventos",
+      "retry": "Reintentar"
+    },
+    "detail": {
+      "back": "Eventos",
+      "about": "Sobre el evento",
+      "achievements": "Logros",
+      "leaderboard": "Clasificación",
+      "viewAll": "Ver todos",
+      "points": "pts",
+      "empty": "Este evento aún no tiene logros.",
+      "leaderEmpty": "Todavía no hay clasificación.",
+      "colRank": "#",
+      "colPlayer": "Jugador",
+      "colPoints": "Puntos",
+      "colMedals": "Medallas",
+      "colAchievements": "Logros",
+      "participants": "Participantes",
+      "participate": "Participar",
+      "participating": "Participando",
+      "loginToJoin": "Entrar para participar",
+      "notFound": "Evento no encontrado",
+      "notFoundLead": "Este evento no existe o ha sido retirado."
+    }
+  },
+  "logros": {
+    "kicker": "Comunidad",
+    "title": "Logros",
+    "lead": "El catálogo completo de logros y medallas que puedes conseguir en los eventos de la comunidad.",
+    "search": "Buscar logro…",
+    "count": "{count, plural, =0 {Sin logros} one {# logro} other {# logros}}",
+    "totalPoints": "{points} puntos en juego",
+    "filter": {
+      "all": "Todos",
+      "achievement": "Logros",
+      "medal": "Medallas"
+    },
+    "rarity": {
+      "bronze": "Bronce",
+      "silver": "Plata",
+      "gold": "Oro",
+      "platinum": "Platino",
+      "diamond": "Diamante"
+    },
+    "empty": {
+      "title": "Sin logros",
+      "lead": "No hay logros que coincidan con tu búsqueda."
+    },
+    "error": {
+      "title": "Error al cargar los logros",
+      "retry": "Reintentar"
+    }
+  },
+  "juegos": {
+    "kicker": "Comunidad",
+    "title": "Juegos",
+    "lead": "Todos los juegos de la plataforma: aventuras, competiciones y servidores con su propia temporada.",
+    "search": "Buscar juego…",
+    "count": "{count, plural, =0 {Sin juegos} one {# juego} other {# juegos}}",
+    "filter": {
+      "all": "Todos",
+      "active": "Activos"
+    },
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "since": "Desde {date}",
+    "empty": {
+      "title": "Sin juegos",
+      "lead": "Estamos preparando nuevos juegos. Vuelve pronto."
+    },
+    "error": {
+      "title": "Error al cargar los juegos",
+      "retry": "Reintentar"
+    },
+    "detail": {
+      "back": "Juegos",
+      "events": "Eventos",
+      "noEvents": "Este juego aún no tiene eventos.",
+      "viewEvents": "Ver eventos",
+      "notFound": "Juego no encontrado",
+      "notFoundLead": "Este juego no existe o ha sido retirado."
+    }
+  },
+  "community": {
+    "kicker": "Comunidad",
+    "title": "Comunidad",
+    "lead": "Torneos en marcha, la clasificación global y una comunidad activa en Discord. Aquí empieza tu temporada.",
+    "discord": {
+      "title": "Únete al Discord",
+      "lead": "Charla, encuentra rivales y entérate de cada evento en tiempo real.",
+      "cta": "Entrar al Discord"
+    },
+    "events": {
+      "title": "Próximos eventos",
+      "viewAll": "Ver todos"
+    },
+    "players": {
+      "title": "Mejores jugadores",
+      "viewAll": "Ver clasificación"
+    },
+    "links": {
+      "events": "Eventos",
+      "ranking": "Clasificación",
+      "achievements": "Logros",
+      "calendar": "Calendario"
+    },
+    "empty": "Nada por ahora."
+  },
+  "calendario": {
+    "kicker": "Comunidad",
+    "title": "Calendario",
+    "lead": "Todos los eventos de la comunidad ordenados por fecha.",
+    "today": "Hoy",
+    "empty": {
+      "title": "Sin eventos programados",
+      "lead": "Cuando se anuncien nuevos eventos aparecerán aquí."
+    },
+    "error": {
+      "title": "Error al cargar el calendario",
+      "retry": "Reintentar"
+    }
+  }
+}
