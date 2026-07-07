@@ -6,11 +6,32 @@
       "share": "Share",
       "shareCopied": "Copied!",
       "tabs": {
-        "1v1": "1 vs 1",
-        "teamvsmany": "Team → Threats",
-        "manyvsteam": "Threats → Team",
-        "speed": "⚡ Speed",
-        "typecalc": "🔮 Types"
+        "combate": "Combat",
+        "matriz": "Matrix",
+        "velocidad": "Speed",
+        "tipos": "Types",
+        "teamThreats": "Team → Threats",
+        "threatsTeam": "Threats → Team"
+      },
+      "ui": {
+        "attacker": "Attacker",
+        "defender": "Defender",
+        "saved": "Teams",
+        "verdictEmpty": "Pick a damaging move on either side to see the verdict.",
+        "emptyMove": "— empty —",
+        "add": "Add",
+        "myTeam": "My team",
+        "threats": "Threats",
+        "matrixHint": "Tap a Pokémon to edit its set",
+        "matrixCorner": "Attacker ↓ · Defender →",
+        "matrixEmpty": "Add Pokémon to both sides to see the damage matrix.",
+        "saveNote": "Save the current team to reuse it in the matrix or across sessions.",
+        "editPrefix": "Edit",
+        "twHint": "Trick Room: the slowest acts first",
+        "reference": "Reference",
+        "referenceSub": "(max / neutral, 31 IV)",
+        "speedEmpty": "Add Pokémon to your team and to threats to compare speeds.",
+        "typesEmpty": "Add Pokémon to your team (Matrix tab) to see their type coverage."
       },
       "panel": {
         "attacker": "Pokémon 1 — Attacker",
@@ -55,6 +76,7 @@
         "colTotal": "Total",
         "totalEvs": "Total EVs",
         "totalSp": "Total SP",
+        "overBudget": "budget exceeded",
         "hpLabel": "HP",
         "hpReset": "Reset",
         "movePlaceholder": "Move {n}...",
@@ -251,10 +273,6 @@
     "speed": {
       "title": "Speed",
       "subtitle": "Speed tier reference and head-to-head matchup calculator",
-      "tabs": {
-        "tiers": "Tiers",
-        "matchup": "Matchup"
-      },
       "modifiers": {
         "title": "Modifiers",
         "clear": "Clear all modifiers",
@@ -668,18 +686,6 @@
     "meta": {
       "title": "Meta Analysis",
       "subtitle": "Ladder usage & team composition data from Smogon Stats",
-      "tabs": {
-        "stats": "Stats",
-        "tournament": "Tournament",
-        "combined": "Combined",
-        "aggregate": "Usage",
-        "players": "Players",
-        "divergence": "Divergence",
-        "compare": "Compare",
-        "comingSoon": "Coming soon",
-        "previewBadge": "Preview",
-        "championsPreviewNotice": "Data sourced from VGCPastes (CSV export). This tab is a temporary preview — it will switch to official Smogon ladder stats once the Champions format is added to Pokémon Showdown."
-      },
       "formats": {
         "gen9vgc2026regi": "VGC 2026 Reg I",
         "gen9vgc2026regh": "VGC 2026 Reg H",

@@ -192,3 +192,6 @@
 @keyframes tv-drop { 0% { transform: translateY(-18px); opacity: 0; } 25% { opacity: 1; } 100% { transform: translateY(118px); opacity: 0; } }
 @keyframes tv-flow { to { background-position: 0 36px; } }
 @keyframes tv-ping { 0% { transform: translate(-50%, -50%) scale(0.4); opacity: 0.9; } 100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; } }
+
+/* VGC calc drawer slide-in */
+@keyframes bm-drawer-in { from { transform: translateX(30px); opacity: 0; } }

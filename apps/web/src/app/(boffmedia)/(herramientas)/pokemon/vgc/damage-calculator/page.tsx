@@ -1,262 +1,117 @@
-'use client'
+"use client"
 
-import { lazy, Suspense, useState } from 'react'
-import { Swords, ArrowRight, ArrowLeft, Zap, Shield, BookmarkPlus, Link2 } from 'lucide-react'
-import { useTranslations } from 'next-intl'
-import { useCalculatorStore } from './_store/calculatorStore'
-import type { CalcTab } from './_types/calculator'
-import { PokemonPanel } from './_components/pokemon/PokemonPanel'
-import { FieldPanel } from './_components/field/FieldPanel'
-import { MoveStrip } from './_components/moves/MoveStrip'
-import { useChampionsRegulations } from '../meta/_hooks/useChampionsRegulations'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/primitives/select'
-import { useCalcUrlSync } from './_hooks/useCalcUrlSync'
+import * as React from "react"
+import { lazy, Suspense, useState } from "react"
+import { useTranslations } from "next-intl"
+import { Tabs } from "@/components/boffmedia/primitives/tabs"
+import { Button } from "@/components/boffmedia/primitives/button"
+import { Spinner } from "@/components/boffmedia/primitives/spinner"
+import { useCalculatorStore } from "./_store/calculatorStore"
+import { useChampionsRegulations } from "../meta/_hooks/useChampionsRegulations"
+import { useCalcUrlSync } from "./_hooks/useCalcUrlSync"
+import { CombatView } from "./_components/CombatView"
 
-// Heavy tab views — code-split so they don't bloat the initial bundle
-const MatrixView      = lazy(() => import('./_components/matrix/MatrixView').then((m) => ({ default: m.MatrixView })))
-const SpeedView       = lazy(() => import('./_components/speed/SpeedView').then((m) => ({ default: m.SpeedView })))
-const TypeCalcView    = lazy(() => import('./_components/typecalc/TypeCalcView').then((m) => ({ default: m.TypeCalcView })))
-const SavedTeamsPanel = lazy(() => import('./_components/saved/SavedTeamsPanel').then((m) => ({ default: m.SavedTeamsPanel })))
+// Heavy tab views — code-split.
+const MatrixView = lazy(() => import("./_components/MatrixView").then((m) => ({ default: m.MatrixView })))
+const SpeedView = lazy(() => import("./_components/SpeedView").then((m) => ({ default: m.SpeedView })))
+const TypesView = lazy(() => import("./_components/TypesView").then((m) => ({ default: m.TypesView })))
+const SavedDrawer = lazy(() => import("./_components/SavedDrawer").then((m) => ({ default: m.SavedDrawer })))
+
+type TabId = "combate" | "matriz" | "velocidad" | "tipos"
+
+const REG_CARET: React.CSSProperties = {
+  backgroundImage:
+    "linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%)",
+  backgroundPosition: "calc(100% - 16px) 55%, calc(100% - 11px) 55%",
+  backgroundSize: "5px 5px",
+  backgroundRepeat: "no-repeat",
+}
 
 function TabFallback() {
   return (
-    <div className="flex-1 flex items-center justify-center">
-      <div className="w-5 h-5 rounded-full border-2 border-primary/30 border-t-primary-400 animate-spin" />
+    <div className="grid min-h-[40vh] place-items-center">
+      <Spinner />
     </div>
   )
 }
 
-type TabIcon = React.ComponentType<{ className?: string }>
-
-const TAB_ICONS: Record<CalcTab, TabIcon> = {
-  '1v1':       Swords,
-  teamvsmany:  ArrowRight,
-  manyvsteam:  ArrowLeft,
-  speed:       Zap,
-  typecalc:    Shield,
-}
-
-const TABS: CalcTab[] = ['1v1', 'teamvsmany', 'manyvsteam', 'speed', 'typecalc']
-
-type MobilePanel = 'atk' | 'field' | 'def'
-
-function DamageCalculatorContent() {
-  const t = useTranslations('vgc.calc')
-
-  const {
-    poke1, poke2, field, useChampions, regulation,
-    activeTab, activeMove1, activeMove2,
-    setPoke1, setPoke2, setField, setAttackerSide, setDefenderSide,
-    setActiveTab, setActiveMove1, setActiveMove2,
-    setRegulation, setUseChampions,
-  } = useCalculatorStore()
-
-  const regulations = useChampionsRegulations()
-  const [savedOpen, setSavedOpen] = useState(false)
-  const [mobilePanel, setMobilePanel] = useState<MobilePanel>('atk')
+function DamageCalcShell() {
+  const t = useTranslations("vgc.calc")
+  const { regulation, setRegulation, setUseChampions } = useCalculatorStore()
+  const regs = useChampionsRegulations()
   const { copyShareLink, linkCopied } = useCalcUrlSync()
 
+  const [tab, setTab] = useState<TabId>("combate")
+  const [savedOpen, setSavedOpen] = useState(false)
+
   return (
-    <div className="flex flex-col bg-base" style={{ height: 'calc(100vh - 56px)' }}>
-      {/* ── Header ── */}
-      <header className="shrink-0 flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 bg-layer-1/97 border-b border-edge/50">
-        <div className="p-1.5 rounded-lg bg-primary/20 border border-primary/30 shrink-0">
-          <Swords className="w-4 h-4 text-primary-hover" />
-        </div>
-        <div className="min-w-0 hidden md:block mr-2">
-          <h1 className="text-sm font-bold text-ink leading-tight">{t('title')}</h1>
-          <p className="text-[10px] text-ink-muted leading-tight">{t('subtitle')}</p>
-        </div>
-
-        {/* Tab bar — horizontally scrollable on small screens */}
-        <nav className="flex items-center gap-1 overflow-x-auto scrollbar-none min-w-0 flex-1">
-          {TABS.map((id) => {
-            const Icon = TAB_ICONS[id]
-            const isActive = activeTab === id
-            return (
-              <button
-                key={id}
-                type="button"
-                onClick={() => setActiveTab(id)}
-                className={`flex items-center gap-1.5 px-2.5 md:px-3 py-1.5 rounded-md text-xs font-semibold border whitespace-nowrap transition-all shrink-0 ${
-                  isActive
-                    ? 'bg-primary/15 border-primary/35 text-primary-hover'
-                    : 'bg-transparent border-transparent text-ink-muted hover:text-ink hover:bg-layer-2/50'
-                }`}
-              >
-                <Icon className="w-3 h-3 shrink-0" />
-                <span className="hidden sm:inline">{t(`tabs.${id}`)}</span>
-              </button>
-            )
-          })}
-        </nav>
-
-        <div className="flex items-center gap-1.5 shrink-0">
-          {/* Regulation picker — hidden on xs, visible on sm+ */}
-          {regulations.length > 0 && (
-            <div className="hidden sm:block">
-              <Select
-                value={regulation}
-                onValueChange={(val) => {
-                  setRegulation(val)
-                  setUseChampions(true)
-                }}
-              >
-                <SelectTrigger className="h-7 text-xs bg-layer-2 border-edge w-44">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {regulations.map((reg) => (
-                    <SelectItem key={reg.formatId} value={reg.formatId} className="text-xs">
-                      {reg.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+    <div className="flex min-w-0 flex-col" style={{ height: "calc(100vh - var(--nav-h, 66px))" }}>
+      {/* App bar */}
+      <div className="sticky top-0 z-20 flex flex-none flex-wrap items-center gap-[18px] border-b border-solid border-line bg-base px-[clamp(18px,2.4vw,40px)] py-3">
+        <Tabs
+          value={tab}
+          onChange={(v) => setTab(v as TabId)}
+          className="min-w-0 flex-1 overflow-x-auto border-b-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          tabs={[
+            { value: "combate", label: t("tabs.combate") },
+            { value: "matriz", label: t("tabs.matriz") },
+            { value: "velocidad", label: t("tabs.velocidad") },
+            { value: "tipos", label: t("tabs.tipos") },
+          ]}
+        />
+        <div className="flex flex-wrap items-center gap-2">
+          {regs.length > 0 && (
+            <select
+              value={regulation}
+              aria-label={t("title")}
+              onChange={(e) => {
+                setRegulation(e.target.value)
+                setUseChampions(true)
+              }}
+              style={REG_CARET}
+              className="cut-tag [--cut-tag:8px] cursor-pointer appearance-none border border-solid border-line-2 bg-panel py-2 pl-3 pr-[30px] font-mono text-[12px]/none font-semibold tracking-[0.06em] text-txt-muted outline-none focus-visible:outline-2 focus-visible:outline-accent-line"
+            >
+              {regs.map((r) => (
+                <option key={r.formatId} value={r.formatId}>
+                  {r.name}
+                </option>
+              ))}
+            </select>
           )}
-          {useChampions && (
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-secondary/15 border border-secondary/30 text-secondary-hover whitespace-nowrap">
-              {t('mobile.spBadge')}
-            </span>
-          )}
-          <button
-            type="button"
-            onClick={copyShareLink}
-            title={t('share')}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold border transition-all ${
-              linkCopied
-                ? 'bg-green-500/15 border-green-500/35 text-green-400'
-                : 'bg-transparent border-transparent text-ink-muted hover:text-ink hover:bg-layer-2/50'
-            }`}
-          >
-            <Link2 className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">{linkCopied ? t('shareCopied') : t('share')}</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setSavedOpen((v) => !v)}
-            title={t('saved.title')}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold border transition-all ${
-              savedOpen
-                ? 'bg-primary/15 border-primary/35 text-primary-hover'
-                : 'bg-transparent border-transparent text-ink-muted hover:text-ink hover:bg-layer-2/50'
-            }`}
-          >
-            <BookmarkPlus className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">{t('saved.title')}</span>
-          </button>
-        </div>
-      </header>
-
-      {/* ── Tab content + sliding saved panel ── */}
-      <div className="flex flex-1 overflow-hidden">
-        <div className="flex-1 min-w-0 overflow-hidden flex flex-col">
-
-          {/* ── 1v1 ── */}
-          {activeTab === '1v1' && (
-            <>
-              <div className="shrink-0">
-                <MoveStrip
-                  poke1={poke1}
-                  poke2={poke2}
-                  field={field}
-                  useChampions={useChampions}
-                  activeMove1={activeMove1}
-                  activeMove2={activeMove2}
-                  onSelectMove1={setActiveMove1}
-                  onSelectMove2={setActiveMove2}
-                />
-              </div>
-
-              {/* Mobile panel switcher — hidden on md+ */}
-              <div className="flex md:hidden shrink-0 border-b border-edge/40 bg-layer-1/90">
-                {(['atk', 'field', 'def'] as const).map((p) => {
-                  const label = p === 'atk' ? t('mobile.attacker') : p === 'field' ? t('mobile.field') : t('mobile.defender')
-                  const active = mobilePanel === p
-                  return (
-                    <button
-                      key={p}
-                      type="button"
-                      onClick={() => setMobilePanel(p)}
-                      className={`flex-1 py-2.5 text-xs font-semibold border-b-2 transition-all ${
-                        active
-                          ? 'border-primary text-primary-hover bg-primary/5'
-                          : 'border-transparent text-ink-muted hover:text-ink'
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  )
-                })}
-              </div>
-
-              {/* Panels — single panel on mobile, 3-col grid on md+ */}
-              <div className="flex-1 overflow-y-auto md:overflow-hidden md:grid md:grid-cols-[35vw_1fr_35vw]">
-                <div className={`${mobilePanel !== 'atk' ? 'hidden md:block' : ''} md:overflow-y-auto border-r border-edge/30`}>
-                  <PokemonPanel poke={poke1} onChange={setPoke1} side="atk" useChampions={useChampions} />
-                </div>
-                <div className={`${mobilePanel !== 'field' ? 'hidden md:block' : ''} md:overflow-y-auto`}>
-                  <FieldPanel field={field} onFieldChange={setField} onAttackerSide={setAttackerSide} onDefenderSide={setDefenderSide} />
-                </div>
-                <div className={`${mobilePanel !== 'def' ? 'hidden md:block' : ''} md:overflow-y-auto border-l border-edge/30`}>
-                  <PokemonPanel poke={poke2} onChange={setPoke2} side="def" useChampions={useChampions} />
-                </div>
-              </div>
-            </>
-          )}
-
-          {/* ── Matrix ── */}
-          {(activeTab === 'teamvsmany' || activeTab === 'manyvsteam') && (
-            <Suspense fallback={<TabFallback />}>
-              <MatrixView
-                tab={activeTab}
-                field={field}
-                onFieldChange={setField}
-                onAttackerSide={setAttackerSide}
-                onDefenderSide={setDefenderSide}
-                useChampions={useChampions}
-              />
-            </Suspense>
-          )}
-
-          {/* ── Speed ── */}
-          {activeTab === 'speed' && (
-            <Suspense fallback={<TabFallback />}>
-              <SpeedView useChampions={useChampions} />
-            </Suspense>
-          )}
-
-          {/* ── Type Calc ── */}
-          {activeTab === 'typecalc' && (
-            <Suspense fallback={<TabFallback />}>
-              <TypeCalcView />
-            </Suspense>
-          )}
-        </div>
-
-        {/* Saved panel — fixed full-screen drawer on mobile, inline slide on md+ */}
-        <div
-          className={`fixed md:hidden right-0 z-50 w-full max-w-xs border-l border-edge/50 bg-base transition-transform duration-200 ${
-            savedOpen ? 'translate-x-0' : 'translate-x-full'
-          }`}
-          style={{ top: '56px', bottom: 0 }}
-        >
-          <Suspense fallback={null}>
-            <SavedTeamsPanel onClose={() => setSavedOpen(false)} />
-          </Suspense>
-        </div>
-        <div
-          className="hidden md:block shrink-0 border-l border-edge/50 overflow-hidden transition-[width] duration-200"
-          style={{ width: savedOpen ? '320px' : '0px' }}
-        >
-          <div className="w-[320px] h-full">
-            <Suspense fallback={null}>
-              <SavedTeamsPanel onClose={() => setSavedOpen(false)} />
-            </Suspense>
-          </div>
+          <Button size="sm" icon={linkCopied ? "check" : "link"} onClick={copyShareLink}>
+            {linkCopied ? t("shareCopied") : t("share")}
+          </Button>
+          <Button size="sm" icon="bookmark" onClick={() => setSavedOpen((v) => !v)}>
+            {t("ui.saved")}
+          </Button>
         </div>
       </div>
+
+      {/* Body */}
+      <div className="flex-1 overflow-y-auto px-[clamp(18px,2.4vw,40px)] pb-[60px] pt-5">
+        {tab === "combate" && <CombatView />}
+        {tab === "matriz" && (
+          <Suspense fallback={<TabFallback />}>
+            <MatrixView />
+          </Suspense>
+        )}
+        {tab === "velocidad" && (
+          <Suspense fallback={<TabFallback />}>
+            <SpeedView />
+          </Suspense>
+        )}
+        {tab === "tipos" && (
+          <Suspense fallback={<TabFallback />}>
+            <TypesView />
+          </Suspense>
+        )}
+      </div>
+
+      {savedOpen && (
+        <Suspense fallback={null}>
+          <SavedDrawer onClose={() => setSavedOpen(false)} />
+        </Suspense>
+      )}
     </div>
   )
 }
@@ -264,7 +119,7 @@ function DamageCalculatorContent() {
 export default function DamageCalculatorPage() {
   return (
     <Suspense>
-      <DamageCalculatorContent />
+      <DamageCalcShell />
     </Suspense>
   )
 }
