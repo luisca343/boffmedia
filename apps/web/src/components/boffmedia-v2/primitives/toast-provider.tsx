@@ -30,7 +30,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = React.useState<ToastData[]>([])
   const push: PushToast = React.useCallback((t) => {
     const id = Math.random().toString(36).slice(2)
-    setToasts((arr) => [...arr, { id, tone: "neutral", ...t }])
+    setToasts((arr) => [...arr, { id, ...t, tone: t.tone ?? "neutral" }])
     setTimeout(() => setToasts((arr) => arr.filter((x) => x.id !== id)), t.duration || 3600)
   }, [])
   const dismiss = (id: string) => setToasts((arr) => arr.filter((x) => x.id !== id))

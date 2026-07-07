@@ -58,7 +58,7 @@ function AdminContent() {
     ? (rawSection as SectionId)
     : "games"
 
-  const navigate = (id: SectionId) => {
+  const navigate = (id: string) => {
     const params = new URLSearchParams(searchParams.toString())
     params.set("section", id)
     router.replace(`?${params.toString()}`, { scroll: false })

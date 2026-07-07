@@ -1,4 +1,19 @@
 import { Battle } from "@pkmn/client";
+import { Protocol } from "@pkmn/protocol";
+
+/**
+ * Loose view of a choice request as the battle UI consumes it. `@pkmn/protocol`
+ * types `Request` as a strict move/switch/team/wait union; these components read
+ * `active`/`side`/`forceSwitch` defensively (raw PS requests can omit `requestType`).
+ */
+export interface BattleRequest {
+  requestType?: Protocol.Request["requestType"];
+  rqid?: number;
+  active?: (Protocol.Request.ActivePokemon | null)[] | null;
+  side?: Protocol.Request.SideInfo;
+  forceSwitch?: boolean[];
+  noCancel?: boolean;
+}
 
 /**
  * Position data for scene elements

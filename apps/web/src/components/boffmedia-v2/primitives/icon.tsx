@@ -77,7 +77,7 @@ const ICON_PATHS: Record<string, string> = {
   "exit-fullscreen": "M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3",
 }
 
-export interface IconProps extends SVGProps<SVGSVGElement> {
+export interface IconProps extends Omit<SVGProps<SVGSVGElement>, "stroke"> {
   name: string
   size?: number
   stroke?: number

@@ -5,7 +5,7 @@ import { AdminCrud } from "@/components/boffmedia-v2/ui/admin/admin-crud"
 import { useGetGames } from "@/hooks/events/useGetGames"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { GameForm } from "./forms/GameForm"
-import type { Game } from "@boffmedia/shared"
+import type { Game, CreateGameDto, UpdateGameDto } from "@boffmedia/shared"
 
 function useGamesList() {
   const { games, error, isLoading, refetch } = useGetGames()
@@ -20,9 +20,9 @@ export function GamesAdmin() {
       description="Administra los juegos disponibles para eventos"
       useList={useGamesList}
       FormComponent={GameForm}
-      onCreate={(data) => EventsService.createGame(data)}
-      onUpdate={(id, data) => EventsService.updateGame(Number(id), data)}
-      onDelete={(id) => EventsService.deleteGame(Number(id))}
+      onCreate={async (data) => { await EventsService.createGame(data as CreateGameDto) }}
+      onUpdate={async (id, data) => { await EventsService.updateGame(Number(id), data as UpdateGameDto) }}
+      onDelete={async (id) => { await EventsService.deleteGame(Number(id)) }}
       searchFields={["title", "description"]}
       entityName={{ singular: "juego", plural: "juegos" }}
       columns={[
