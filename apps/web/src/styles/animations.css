@@ -171,6 +171,12 @@
 @keyframes bm-topbar-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.78; } }
 @keyframes bm-marquee { to { transform: translateX(-50%); } }
 
+/* Boffmedia v3 kit — skeleton shimmer, dropdown/menu enter, toast enter, modal enter */
+@keyframes bm-shimmer { 0% { background-position: 100% 0; } 100% { background-position: -120% 0; } }
+@keyframes bm-menu-in { from { opacity: 0; transform: translateY(-4px); } }
+@keyframes bm-toast-in { from { opacity: 0; transform: translateX(16px); } }
+@keyframes bm-modal-in { from { opacity: 0; transform: translateY(14px) scale(0.98); } }
+
 /* Boffmedia landing — hero art, floats, scroll cue, chapter progress, scanlines */
 @keyframes bm-drop { to { top: 110%; } }
 @keyframes bm-bob { 0%, 100% { translate: 0 0; } 50% { translate: 0 -9px; } }

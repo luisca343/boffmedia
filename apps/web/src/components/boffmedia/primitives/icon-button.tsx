@@ -13,7 +13,7 @@ export function IconButton({ name, label, size = 18, className, ...props }: Icon
     <button
       className={cn(
         "inline-grid place-items-center h-10 w-10 border border-solid border-line bg-panel text-txt-muted",
-        "[clip-path:polygon(0_0,100%_0,100%_calc(100%_-_8px),calc(100%_-_8px)_100%,0_100%)]",
+        "cut-tag",
         "transition-[color,border-color,background] duration-[140ms]",
         "hover:text-accent-bright hover:border-accent-line",
         className,
