@@ -24,7 +24,7 @@ export function LinkedAccountRow({ icon, name, sub, hue, linked, end, className 
     >
       <span
         className={cn(
-          "grid h-10 w-10 flex-none place-items-center border border-solid border-line-2 cut [--cut:7px]",
+          "grid h-10 w-10 flex-none place-items-center border border-solid border-line-2 [clip-path:polygon(7px_0,100%_0,100%_calc(100%_-_7px),calc(100%_-_7px)_100%,0_100%)]",
           linked ? "text-[color:var(--lhue,var(--muted))]" : "text-txt-dim",
         )}
         style={linked && hue ? ({ ["--lhue" as string]: hue } as React.CSSProperties) : undefined}

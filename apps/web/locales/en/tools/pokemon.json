@@ -67,6 +67,13 @@
         "features": {
           "pokedex": "Pokédex"
         }
+      },
+      "battlesim": {
+        "title": "Battle Simulator",
+        "description": "Real-time Pokémon battles against the AI, PvP or Showdown, with replays",
+        "features": {
+          "battlesim": "Battle"
+        }
       }
     },
     "externalLinks": {
