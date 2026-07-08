@@ -1,46 +1,4 @@
 import { ArmorPiece, EquipmentType, Weapon } from "../../../../../../../types/tools/mhwilds";
-import { LucideIcon, Medal } from "lucide-react";
-import { 
-  Sword, 
-  Shield, 
-  Shirt, 
-  ArrowBigRight, 
-  CircleDot, 
-  Footprints,
-  SwordIcon 
-} from "lucide-react";
-import { GiHelmet } from "react-icons/gi";
-
-export const getEquipmentIcon = (slotType: EquipmentType): LucideIcon | any => {
-  const icons: Record<EquipmentType, LucideIcon | any> = {
-    'weapon': SwordIcon,
-    'secondaryWeapon': SwordIcon,
-    'head': GiHelmet,
-    'chest': Shirt,
-    'arms': ArrowBigRight,
-    'waist': CircleDot,
-    'legs': Footprints,
-    'charm': Medal,
-  };
-  
-  return icons[slotType] || Shield;
-};
-
-// Get color for equipment icon
-export const getIconColor = (slotType: EquipmentType): string => {
-  const colors: Record<EquipmentType, string> = {
-    'weapon': "text-red-400",
-    'secondaryWeapon': "text-orange-400",
-    'head': "text-secondary-hover",
-    'chest': "text-warning-hover",
-    'arms': "text-yellow-400",
-    'waist': "text-secondary-hover",
-    'legs': "text-cyan-400",
-    'charm': "text-amber-400",
-  };
-  
-  return colors[slotType] || "text-ink-muted";
-};
 
 export const getEquipmentDisplayName = (slotType: EquipmentType): string => {
   const typeNames: Record<EquipmentType, string> = {
