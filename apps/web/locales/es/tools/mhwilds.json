@@ -197,9 +197,6 @@
     "charm": "Amuleto",
     "secondary_weapon": "Arma Secundaria",
     "empty_slot": "Ranura vacía",
-
-
-      
     "header": {
       "title": {
         "prefix": "Herramientas de",
@@ -257,12 +254,40 @@
     "externalLinks": {
       "title": "Enlaces Útiles",
       "officialWebsite": "Sitio Oficial",
-      "redditCommunity": "Reddit Community", 
+      "redditCommunity": "Reddit Community",
       "wiki": "Monster Hunter Wiki",
       "videos": "Guías en YouTube"
     },
     "featuredTool": "Herramienta destacada",
     "accessButton": "Acceder a {tool}",
-  "explore": "Explorar"
+    "explore": "Explorar",
+    "bestiary": {
+      "kicker": "Monster Hunter Wilds",
+      "title": "Bestiario",
+      "count": "{count} monstruos",
+      "errorTitle": "No se pudo cargar el bestiario",
+      "searchPlaceholder": "Buscar monstruo…",
+      "sortName": "Ordenar: nombre",
+      "sortHealth": "Ordenar: salud",
+      "filterKind": "Clase",
+      "all": "Todos",
+      "kindLarge": "Grande",
+      "kindSmall": "Pequeño",
+      "filterWeakness": "Debilidad elemental",
+      "results": "{count} resultados",
+      "noResults": "Sin resultados.",
+      "overview": "Resumen",
+      "baseHealth": "Salud base",
+      "baseSize": "Tamaño base",
+      "crownSilver": "Corona plata",
+      "crownGold": "Corona oro",
+      "elements": "Elementos",
+      "weaknesses": "Debilidades elementales",
+      "statusVulns": "Vulnerabilidad a estados",
+      "resistances": "Resistencias",
+      "ailments": "Estados que inflige",
+      "locations": "Ubicaciones",
+      "drops": "Recompensas"
+    }
   }
 }

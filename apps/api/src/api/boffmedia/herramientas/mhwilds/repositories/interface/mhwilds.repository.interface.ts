@@ -25,6 +25,7 @@ export interface IMhwildsRepository {
   getCharms(locale: string): Promise<ResourceFetchResult>;
   getDecorations(locale: string): Promise<ResourceFetchResult>;
   getSkills(locale: string): Promise<ResourceFetchResult>;
+  getMonsters(locale: string): Promise<ResourceFetchResult>;
 
   // Processed Data Operations
   saveProcessedData(filename: string, locale: string, data: any): Promise<void>;
