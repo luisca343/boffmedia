@@ -1,13 +1,16 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ArrowLeft, Check, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { cn } from '@/lib/utils';
+import { Icon } from '@/components/boffmedia/primitives/icon';
+import { DkApp, DkBar, DkBody, DkBack, DkTitle, DkSpacer, cssVars } from '@/components/boffmedia/ui/tools/datakit';
 import { usePokemonSearch } from '@/features/vgc-tracker/hooks/usePokemonSearch';
 import { NotesPanel, NotesPanelHandle } from './NotesPanel';
 import { TeamPanel } from './TeamPanel';
 import { SpeedTierWidget } from './SpeedTierWidget';
+import { TrSub, TR_OUTCOME_ORDER, TR_OUTCOME_TONE } from '../../../_components/ui/tr-ui';
 import type { Match, MatchNote, MatchResult, MatchSlot, OutcomeTag } from '@/features/vgc-tracker/types';
 
 interface Props {
@@ -18,6 +21,8 @@ interface Props {
   onDelete: () => Promise<void>;
 }
 
+const HDR_INPUT = 'border border-solid border-line-2 bg-base font-body text-txt outline-none transition-[border-color] placeholder:text-txt-dim focus:border-accent';
+
 export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, onSave, onDelete }: Props) {
   const t = useTranslations('vgc.tracker');
   const router = useRouter();
@@ -27,15 +32,9 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
   const [match, setMatch] = useState<Match>(initialMatch);
   const [opponentNameInput, setOpponentNameInput] = useState(initialMatch.opponentName ?? '');
   const [archetypeInput, setArchetypeInput] = useState(initialMatch.opponentArchetype ?? '');
-  const [eloAfterInput, setEloAfterInput] = useState(
-    initialMatch.eloAfter !== undefined ? String(initialMatch.eloAfter) : '',
-  );
-  const [opponentEloInput, setOpponentEloInput] = useState(
-    initialMatch.opponentElo !== undefined ? String(initialMatch.opponentElo) : '',
-  );
-  const [turnCountInput, setTurnCountInput] = useState(
-    initialMatch.turnCount !== undefined ? String(initialMatch.turnCount) : '',
-  );
+  const [eloAfterInput, setEloAfterInput] = useState(initialMatch.eloAfter !== undefined ? String(initialMatch.eloAfter) : '');
+  const [opponentEloInput, setOpponentEloInput] = useState(initialMatch.opponentElo !== undefined ? String(initialMatch.opponentElo) : '');
+  const [turnCountInput, setTurnCountInput] = useState(initialMatch.turnCount !== undefined ? String(initialMatch.turnCount) : '');
   const [isCompleted, setIsCompleted] = useState(!!initialMatch.completedAt);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout>>(null);
@@ -61,75 +60,30 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
     [scheduleAutosave],
   );
 
+  const handleResult = (result: MatchResult) => {
+    update({ result: result === match.result ? undefined : result });
+  };
+
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement).tagName;
       const inInput = tag === 'INPUT' || tag === 'TEXTAREA';
-      if (e.key === 'n' && !inInput && !e.ctrlKey && !e.metaKey) {
-        e.preventDefault();
-        notesPanelRef.current?.focusInput();
-      }
-      if (e.key === 'w' && !inInput && !e.ctrlKey && !e.metaKey) {
-        e.preventDefault();
-        handleResult('win');
-      }
-      if (e.key === 'l' && !inInput && !e.ctrlKey && !e.metaKey) {
-        e.preventDefault();
-        handleResult('loss');
-      }
+      if (inInput || e.ctrlKey || e.metaKey) return;
+      if (e.key === 'n') { e.preventDefault(); notesPanelRef.current?.focusInput(); }
+      if (e.key === 'w') { e.preventDefault(); handleResult('win'); }
+      if (e.key === 'l') { e.preventDefault(); handleResult('loss'); }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-   
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [match.result]);
 
-  const handleResult = (result: MatchResult) => {
-    const next = result === match.result ? undefined : result;
-    update({ result: next });
-  };
-
-  const handleOpponentNameBlur = () => {
-    update({ opponentName: opponentNameInput.trim() || undefined });
-  };
-
-  const handleEloAfterBlur = () => {
-    const parsed = parseFloat(eloAfterInput);
-    update({ eloAfter: isNaN(parsed) ? undefined : parsed });
-  };
-
-  const handleOpponentEloBlur = () => {
-    const parsed = parseFloat(opponentEloInput);
-    update({ opponentElo: isNaN(parsed) ? undefined : parsed });
-  };
-
-  const handleArchetypeBlur = () => {
-    update({ opponentArchetype: archetypeInput.trim() || undefined });
-  };
-
-  const handleTurnCountBlur = () => {
-    const n = parseInt(turnCountInput, 10);
-    update({ turnCount: isNaN(n) || n < 1 ? undefined : n });
-  };
-
-  const handleOutcomeTag = (tag: OutcomeTag) => {
-    update({ outcomeTag: tag === match.outcomeTag ? undefined : tag });
-  };
-
-  const handleMyTeamChange = (slots: MatchSlot[]) => {
-    update({ myTeam: { ...match.myTeam, slots } });
-  };
-
-  const handleOpponentTeamChange = (slots: MatchSlot[]) => {
-    update({ opponentTeam: { ...match.opponentTeam, slots } });
-  };
+  const handleOutcomeTag = (tag: OutcomeTag) => update({ outcomeTag: tag === match.outcomeTag ? undefined : tag });
+  const handleMyTeamChange = (slots: MatchSlot[]) => update({ myTeam: { ...match.myTeam, slots } });
+  const handleOpponentTeamChange = (slots: MatchSlot[]) => update({ opponentTeam: { ...match.opponentTeam, slots } });
 
   const handleAddNote = (text: string) => {
-    const note: MatchNote = {
-      id: crypto.randomUUID(),
-      text,
-      createdAt: Date.now(),
-      phase: isCompleted ? 'post' : 'live',
-    };
+    const note: MatchNote = { id: crypto.randomUUID(), text, createdAt: Date.now(), phase: isCompleted ? 'post' : 'live' };
     update({ notes: [...match.notes, note] });
   };
 
@@ -142,10 +96,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
   };
 
   const handleBack = () => {
-    if (saveTimer.current) {
-      clearTimeout(saveTimer.current);
-      onSave(match);
-    }
+    if (saveTimer.current) { clearTimeout(saveTimer.current); onSave(match); }
     router.push(`/pokemon/vgc/tracker/${sessionId}`);
   };
 
@@ -155,248 +106,139 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
     router.push(`/pokemon/vgc/tracker/${sessionId}`);
   };
 
+  const time = new Date(match.createdAt).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)] text-ink overflow-hidden">
-      {/* ── Top bar ──────────────────────────────────────────────────────── */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-edge shrink-0 bg-layer-1">
-        <button
-          onClick={handleBack}
-          className="text-ink-muted hover:text-ink transition-colors"
-        >
-          <ArrowLeft size={18} />
-        </button>
+    <DkApp>
+      <DkBar>
+        <DkBack onClick={handleBack} label={t('nav.backToSession')} />
+        <DkTitle icon="sword" label={t('workspace.matchTitle')} sub={`${time} · ${match.format}`} />
+        <DkSpacer />
 
-        {/* Time + format */}
-        <div className="flex items-center gap-2 shrink-0">
-          <span className="text-ink-muted text-sm">
-            {new Date(match.createdAt).toLocaleTimeString(undefined, {
-              hour: '2-digit',
-              minute: '2-digit',
-            })}
-          </span>
-          <span className="text-ink-dim text-xs font-mono">{match.format}</span>
+        {/* Result toggle */}
+        <div className="inline-flex gap-1">
+          {(['win', 'draw', 'loss'] as MatchResult[]).map((r) => (
+            <ResultButton key={r} result={r} active={match.result === r} onClick={() => handleResult(r)} label={t(`result.${r}Short`)} />
+          ))}
         </div>
 
-        <div className="flex-1" />
+        {/* My ELO */}
+        <label className="inline-flex items-center gap-[6px] border border-solid border-line-2 bg-panel px-[8px] py-[4px]">
+          <span className="select-none font-mono text-[9px] uppercase tracking-[0.08em] text-txt-muted">{t('indicators.myElo')}</span>
+          <input value={eloAfterInput} onChange={(e) => setEloAfterInput(e.target.value)} onBlur={() => update({ eloAfter: isNaN(parseFloat(eloAfterInput)) ? undefined : parseFloat(eloAfterInput) })} placeholder="—" className={cn(HDR_INPUT, 'w-16 border-0 bg-transparent text-center font-mono text-[15px]')} />
+        </label>
 
-        {/* Result buttons */}
-        <div className="flex items-center gap-1.5">
-          <ResultButton
-            label={t('result.winShort')}
-            active={match.result === 'win'}
-            color="green"
-            onClick={() => handleResult('win')}
-            hint="W"
-          />
-          <ResultButton
-            label={t('result.drawShort')}
-            active={match.result === 'draw'}
-            color="yellow"
-            onClick={() => handleResult('draw')}
-            hint="D"
-          />
-          <ResultButton
-            label={t('result.lossShort')}
-            active={match.result === 'loss'}
-            color="red"
-            onClick={() => handleResult('loss')}
-            hint="L"
-          />
+        {/* Rival group */}
+        <div className="inline-flex items-center gap-2 border border-solid border-line-2 bg-panel px-[8px] py-[4px]">
+          <input value={opponentNameInput} onChange={(e) => setOpponentNameInput(e.target.value)} onBlur={() => update({ opponentName: opponentNameInput.trim() || undefined })} placeholder={t('placeholders.rivalName')} className={cn(HDR_INPUT, 'w-24 border-0 bg-transparent text-[13px]')} />
+          <span className="text-txt-dim">·</span>
+          <input value={archetypeInput} onChange={(e) => setArchetypeInput(e.target.value)} onBlur={() => update({ opponentArchetype: archetypeInput.trim() || undefined })} placeholder={t('archetype.placeholder')} className={cn(HDR_INPUT, 'w-20 border-0 bg-transparent text-[12px] text-txt-muted')} />
+          <span className="text-txt-dim">·</span>
+          <span className="select-none font-mono text-[9px] uppercase tracking-[0.08em] text-txt-muted">{t('indicators.rival')}</span>
+          <input value={opponentEloInput} onChange={(e) => setOpponentEloInput(e.target.value)} onBlur={() => update({ opponentElo: isNaN(parseFloat(opponentEloInput)) ? undefined : parseFloat(opponentEloInput) })} placeholder="—" className={cn(HDR_INPUT, 'w-16 border-0 bg-transparent text-center font-mono text-[15px]')} />
         </div>
 
-        {/* My ELO — standalone (ELO after this match) */}
-        <div className="flex items-center gap-1.5 bg-layer-2 border border-edge rounded-lg px-2.5 py-1.5">
-          <span className="text-[10px] text-ink-muted font-mono select-none uppercase">{t('indicators.myElo')}</span>
-          <input
-            value={eloAfterInput}
-            onChange={(e) => setEloAfterInput(e.target.value)}
-            onBlur={handleEloAfterBlur}
-            placeholder="—"
-            className="w-20 bg-transparent text-ink text-base font-mono text-center focus:outline-none placeholder:text-ink-dim"
-          />
-        </div>
-
-        {/* Rival group: name + archetype + rival ELO together */}
-        <div className="flex items-center gap-2 bg-layer-2 border border-edge rounded-lg px-2.5 py-1.5">
-          <input
-            value={opponentNameInput}
-            onChange={(e) => setOpponentNameInput(e.target.value)}
-            onBlur={handleOpponentNameBlur}
-            placeholder={t('placeholders.rivalName')}
-            className="w-24 bg-transparent text-ink text-sm placeholder:text-ink-dim focus:outline-none"
-          />
-          <span className="text-ink-dim text-xs shrink-0">·</span>
-          <input
-            value={archetypeInput}
-            onChange={(e) => setArchetypeInput(e.target.value)}
-            onBlur={handleArchetypeBlur}
-            placeholder={t('archetype.placeholder')}
-            className="w-20 bg-transparent text-ink-muted text-xs placeholder:text-ink-dim focus:outline-none"
-          />
-          <span className="text-ink-dim text-xs shrink-0">·</span>
-          <span className="text-[10px] text-ink-muted font-mono select-none uppercase shrink-0">{t('indicators.rival')}</span>
-          <input
-            value={opponentEloInput}
-            onChange={(e) => setOpponentEloInput(e.target.value)}
-            onBlur={handleOpponentEloBlur}
-            placeholder="—"
-            className="w-20 bg-transparent text-ink text-base font-mono text-center focus:outline-none placeholder:text-ink-dim"
-          />
-        </div>
-
-        {/* Finish / save indicator */}
+        {/* Finish / saved */}
         {!isCompleted ? (
-          <button
-            onClick={handleFinish}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-active hover:bg-primary text-white text-sm font-medium transition-colors"
-          >
-            <Check size={14} /> {t('buttons.finish')}
+          <button type="button" onClick={handleFinish} className="cut inline-flex items-center gap-[6px] border border-solid border-accent bg-accent px-3 py-[7px] font-display text-[13px] font-bold uppercase tracking-[0.06em] text-accent-ink transition-colors hover:bg-accent-bright">
+            <Icon name="check" size={14} /> {t('buttons.finish')}
           </button>
         ) : (
-          <span className="text-xs text-green-400 flex items-center gap-1">
-            <Check size={13} /> {t('indicators.saved')}
+          <span className="inline-flex items-center gap-1 font-mono text-[11px] text-ok">
+            <Icon name="check" size={13} /> {t('indicators.saved')}
           </span>
         )}
 
         {/* Delete */}
         {confirmDelete ? (
-          <div className="flex items-center gap-1 shrink-0">
-            <button
-              onClick={handleDelete}
-              className="text-xs px-2.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white font-medium transition-colors"
-            >
+          <div className="inline-flex items-center gap-1">
+            <button type="button" onClick={handleDelete} className="border border-solid border-bad bg-bad px-[10px] py-[6px] font-mono text-[11px] font-semibold uppercase text-white">
               {t('buttons.delete')}
             </button>
-            <button
-              onClick={() => setConfirmDelete(false)}
-              className="text-xs px-2.5 py-1.5 rounded-lg bg-layer-3 hover:bg-layer-3 text-ink transition-colors"
-            >
+            <button type="button" onClick={() => setConfirmDelete(false)} className="border border-solid border-line-2 bg-base px-[10px] py-[6px] font-mono text-[11px] text-txt-muted hover:text-txt">
               {t('buttons.cancel')}
             </button>
           </div>
         ) : (
-          <button
-            onClick={() => setConfirmDelete(true)}
-            className="p-1.5 rounded-lg text-ink-dim hover:text-red-400 hover:bg-layer-2 transition-colors"
-            title={t('tooltips.deleteMatch')}
-          >
-            <Trash2 size={15} />
+          <button type="button" onClick={() => setConfirmDelete(true)} title={t('tooltips.deleteMatch')} className="grid h-8 w-8 place-items-center text-txt-dim transition-colors hover:text-bad">
+            <Icon name="trash" size={15} />
           </button>
         )}
-      </div>
+      </DkBar>
 
-      {/* ── Main: My Team | Notes | Opponent ─────────────────────────── */}
-      <div className="flex flex-1 min-h-0">
-        {/* My Team column */}
-        <div className="w-[400px] shrink-0 overflow-y-auto border-r border-edge px-5 py-4">
-          <TeamPanel
-            label={t('labels.myTeam')}
-            slots={match.myTeam.slots}
-            editable={false}
-            onSlotChange={handleMyTeamChange}
-          />
-          <SpeedTierWidget slots={match.myTeam.slots} regulationId={regulationId} />
-        </div>
+      <DkBody pad>
+        <div className="grid grid-cols-1 items-start gap-[18px] min-[760px]:grid-cols-2 min-[1100px]:grid-cols-[minmax(280px,360px)_minmax(0,1fr)_minmax(280px,360px)]">
+          <div className="grid gap-3 min-w-0">
+            <TeamPanel label={t('labels.myTeam')} slots={match.myTeam.slots} editable={false} tone="var(--accent-bright)" onSlotChange={handleMyTeamChange} />
+            <SpeedTierWidget slots={match.myTeam.slots} regulationId={regulationId} />
+          </div>
 
-        {/* Notes — centre column fills remaining space */}
-        <NotesPanel
-          ref={notesPanelRef}
-          notes={match.notes}
-          phase={isCompleted ? 'post' : 'live'}
-          onAddNote={handleAddNote}
-        />
+          <div className="min-w-0 max-[1100px]:order-3 max-[1100px]:col-span-full">
+            <NotesPanel ref={notesPanelRef} notes={match.notes} phase={isCompleted ? 'post' : 'live'} onAddNote={handleAddNote} />
+          </div>
 
-        {/* Opponent column */}
-        <div className="w-[400px] shrink-0 overflow-y-auto border-l border-edge px-5 py-4 flex flex-col gap-4">
-          <TeamPanel
-            label={t('labels.opponent')}
-            slots={match.opponentTeam.slots}
-            editable
-            search={search}
-            onSlotChange={handleOpponentTeamChange}
-          />
-          <SpeedTierWidget slots={match.opponentTeam.slots} regulationId={regulationId} />
+          <div className="grid gap-3 min-w-0">
+            <TeamPanel label={t('labels.opponent')} slots={match.opponentTeam.slots} editable tone="var(--info)" search={search} onSlotChange={handleOpponentTeamChange} />
+            <SpeedTierWidget slots={match.opponentTeam.slots} regulationId={regulationId} />
 
-          {/* Outcome tag */}
-          <div className="flex flex-col gap-1.5">
-            <span className="text-[10px] text-ink-dim uppercase tracking-wide font-medium">
-              {t('outcomeTag.label')}
-            </span>
-            <div className="flex items-center gap-1.5 flex-wrap">
-              {(['skill', 'misplay', 'luck', 'disconnect'] as OutcomeTag[]).map((tag) => (
-                <button
-                  key={tag}
-                  onClick={() => handleOutcomeTag(tag)}
-                  className={[
-                    'px-2.5 py-1 rounded-lg text-xs font-medium border transition-all',
-                    match.outcomeTag === tag
-                      ? tag === 'skill' ? 'bg-green-500/20 border-green-500/40 text-green-300'
-                        : tag === 'misplay' ? 'bg-red-500/20 border-red-500/40 text-red-300'
-                        : tag === 'luck' ? 'bg-yellow-500/20 border-yellow-500/40 text-yellow-300'
-                        : 'bg-layer-3/20 border-edge/40 text-ink'
-                      : 'border-edge text-ink-muted hover:text-ink hover:border-edge',
-                  ].join(' ')}
-                >
-                  {t(`outcomeTag.${tag}`)}
-                </button>
-              ))}
+            <div className="border border-solid border-line bg-panel px-[14px] py-[12px]">
+              <TrSub>{t('outcomeTag.label')}</TrSub>
+              <div className="flex flex-wrap gap-[5px]">
+                {TR_OUTCOME_ORDER.map((tag) => (
+                  <OutcomeButton key={tag} tag={tag} active={match.outcomeTag === tag} onClick={() => handleOutcomeTag(tag)} label={t(`outcomeTag.${tag}`)} />
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between border border-solid border-line bg-panel px-[14px] py-[12px]">
+              <TrSub className="mb-0">{t('turnCount.label')}</TrSub>
+              <input
+                type="number"
+                min={1}
+                max={99}
+                value={turnCountInput}
+                onChange={(e) => setTurnCountInput(e.target.value)}
+                onBlur={() => { const n = parseInt(turnCountInput, 10); update({ turnCount: isNaN(n) || n < 1 ? undefined : n }); }}
+                placeholder="—"
+                className={cn(HDR_INPUT, 'w-16 px-2 py-1 text-center font-mono text-[13px]')}
+              />
             </div>
           </div>
-
-          {/* Turn count */}
-          <div className="flex items-center gap-3">
-            <span className="text-[10px] text-ink-dim uppercase tracking-wide font-medium shrink-0">
-              {t('turnCount.label')}
-            </span>
-            <input
-              type="number"
-              min={1}
-              max={99}
-              value={turnCountInput}
-              onChange={(e) => setTurnCountInput(e.target.value)}
-              onBlur={handleTurnCountBlur}
-              placeholder="—"
-              className="w-16 bg-layer-2 border border-edge focus:border-primary rounded-lg text-ink text-sm font-mono text-center focus:outline-none px-2 py-1 transition-colors placeholder:text-ink-dim"
-            />
-          </div>
         </div>
-      </div>
-
-    </div>
+      </DkBody>
+    </DkApp>
   );
 }
 
-// ─── Result button ────────────────────────────────────────────────────────────
-
-function ResultButton({
-  label,
-  active,
-  color,
-  onClick,
-  hint,
-}: {
-  label: string;
-  active: boolean;
-  color: 'green' | 'red' | 'yellow';
-  onClick: () => void;
-  hint: string;
-}) {
-  const t = useTranslations('vgc.tracker');
-  const base = 'relative px-4 py-1.5 rounded-lg text-sm font-bold transition-all font-mono border';
-  const styles = {
-    green: active
-      ? 'bg-green-500 border-green-400 text-white shadow-lg shadow-green-500/30'
-      : 'bg-layer-2 border-edge text-ink-muted hover:border-green-500/50 hover:text-green-300',
-    yellow: active
-      ? 'bg-yellow-500 border-yellow-400 text-white shadow-lg shadow-yellow-500/30'
-      : 'bg-layer-2 border-edge text-ink-muted hover:border-yellow-500/50 hover:text-yellow-300',
-    red: active
-      ? 'bg-red-500 border-red-400 text-white shadow-lg shadow-red-500/30'
-      : 'bg-layer-2 border-edge text-ink-muted hover:border-red-500/50 hover:text-red-300',
-  };
-
+function ResultButton({ result, active, onClick, label }: { result: MatchResult; active: boolean; onClick: () => void; label: string }) {
+  const tone = result === 'win' ? 'var(--ok)' : result === 'loss' ? 'var(--bad)' : 'var(--warn)';
   return (
-    <button onClick={onClick} className={`${base} ${styles[color]}`} title={t('tooltips.pressKey', { hint })}>
+    <button
+      type="button"
+      onClick={onClick}
+      style={active ? cssVars({ background: tone, borderColor: tone }) : undefined}
+      className={cn(
+        'border border-solid px-[14px] py-[6px] font-mono text-[13px] font-bold uppercase leading-none transition-all',
+        active ? 'text-white' : 'border-line-2 bg-panel text-txt-muted hover:text-txt',
+      )}
+    >
+      {label}
+    </button>
+  );
+}
+
+function OutcomeButton({ tag, active, onClick, label }: { tag: OutcomeTag; active: boolean; onClick: () => void; label: string }) {
+  const tone = TR_OUTCOME_TONE[tag];
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={active ? cssVars({ color: tone, borderColor: `color-mix(in srgb, ${tone} 55%, transparent)`, background: `color-mix(in srgb, ${tone} 11%, transparent)` }) : undefined}
+      className={cn(
+        'border border-solid px-[9px] py-[6px] font-mono text-[9.5px] font-semibold uppercase leading-none tracking-[0.06em] transition-colors',
+        !active && 'border-line-2 text-txt-dim hover:text-txt',
+      )}
+    >
       {label}
     </button>
   );

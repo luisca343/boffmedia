@@ -1,47 +1,55 @@
-'use client';
+"use client"
 
-import { Cloud, CloudOff, Loader2 } from 'lucide-react';
-import { useTrackerSync } from '@/features/vgc-tracker/context/TrackerSyncContext';
+import { useTranslations } from "next-intl"
+import { Icon } from "@/components/boffmedia/primitives/icon"
+import { useTrackerSync } from "@/features/vgc-tracker/context/TrackerSyncContext"
+
+const TAG_CUT = "polygon(3px 0,100% 0,calc(100% - 3px) 100%,0 100%)"
 
 export function SyncStatusBadge() {
-  const { syncStatus, conflictMessage, refreshNow } = useTrackerSync();
+  const t = useTranslations("vgc.tracker.sync")
+  const { syncStatus, conflictMessage, refreshNow } = useTrackerSync()
 
-  if (syncStatus === 'offline') return null;
+  if (syncStatus === "offline") return null
 
-  if (syncStatus === 'conflict') {
+  if (syncStatus === "conflict") {
     return (
-      <div className="rounded-md border border-red-500/40 bg-red-500/10 px-3 py-2 text-xs text-red-400 shadow-sm">
-        <p className="font-semibold">Sync conflict</p>
-        <p className="mt-1">{conflictMessage ?? 'Another tab/device has newer tracker data.'}</p>
+      <div className="grid max-w-[280px] gap-2 border border-solid border-[color-mix(in_srgb,var(--bad)_45%,transparent)] bg-bad-soft p-3 text-bad shadow-[var(--shadow)]">
+        <p className="inline-flex items-center gap-[6px] font-mono text-[10px] font-semibold uppercase tracking-[0.12em]">
+          <Icon name="alert" size={12} />
+          {t("conflict")}
+        </p>
+        <p className="font-body text-[12px] leading-[1.5] text-txt-muted">{conflictMessage ?? t("conflictHint")}</p>
         <button
           type="button"
-          onClick={() => { void refreshNow(); }}
-          className="mt-2 rounded bg-red-600 px-2 py-1 text-xs font-medium text-white hover:bg-red-500 transition-colors"
+          onClick={() => void refreshNow()}
+          className="justify-self-start border border-solid border-bad bg-bad px-[10px] py-[6px] font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-white transition-opacity hover:opacity-90"
         >
-          Refresh from cloud
+          {t("refreshFromCloud")}
         </button>
       </div>
-    );
+    )
   }
 
-  const badgeCls =
-    syncStatus === 'idle'    ? 'bg-green-500/15 text-green-400' :
-    syncStatus === 'syncing' ? 'bg-amber-500/15 text-amber-400' :
-                               'bg-red-500/15 text-red-400';
+  const tone =
+    syncStatus === "idle"
+      ? "border-[color-mix(in_srgb,var(--ok)_45%,transparent)] bg-ok-soft text-ok"
+      : syncStatus === "syncing"
+        ? "border-[color-mix(in_srgb,var(--warn)_45%,transparent)] bg-warn-soft text-warn"
+        : "border-[color-mix(in_srgb,var(--bad)_45%,transparent)] bg-bad-soft text-bad"
 
   return (
     <div
-      className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium select-none ${badgeCls}`}
-      title={syncStatus === 'idle' ? 'Synced' : syncStatus === 'syncing' ? 'Syncing…' : 'Sync error'}
+      style={{ clipPath: TAG_CUT }}
+      className={`inline-flex select-none items-center gap-[6px] border border-solid px-[9px] py-[5px] font-mono text-[9px] font-bold uppercase tracking-[0.14em] ${tone}`}
+      title={syncStatus === "idle" ? t("synced") : syncStatus === "syncing" ? t("syncing") : t("error")}
     >
-      {syncStatus === 'idle' && <Cloud className="h-3.5 w-3.5" />}
-      {syncStatus === 'syncing' && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-      {syncStatus === 'error' && <CloudOff className="h-3.5 w-3.5" />}
-      <span>
-        {syncStatus === 'idle' && 'Synced'}
-        {syncStatus === 'syncing' && 'Syncing'}
-        {syncStatus === 'error' && 'Sync error'}
-      </span>
+      <Icon
+        name={syncStatus === "syncing" ? "refresh" : syncStatus === "idle" ? "check" : "alert"}
+        size={12}
+        className={syncStatus === "syncing" ? "animate-spin motion-reduce:animate-none" : ""}
+      />
+      <span>{syncStatus === "idle" ? t("synced") : syncStatus === "syncing" ? t("syncing") : t("error")}</span>
     </div>
-  );
+  )
 }

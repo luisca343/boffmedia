@@ -1,252 +1,156 @@
-'use client';
+"use client"
 
-import { useEffect, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { Trophy, TrendingUp, X } from 'lucide-react';
-import { useTranslations } from 'next-intl';
-import { VgcService, ChampionsRegulation, LimitlessTournament } from '@/services/api/boffmedia/vgcService';
-import type { MatchFormat, Session, SessionType, TeamPreset } from '@/features/vgc-tracker/types';
+import { useEffect, useState } from "react"
+import { useTranslations } from "next-intl"
+import { Modal } from "@/components/boffmedia/primitives/modal"
+import { Field } from "@/components/boffmedia/primitives/field"
+import { Input } from "@/components/boffmedia/primitives/input"
+import { Select } from "@/components/boffmedia/primitives/select"
+import { Button } from "@/components/boffmedia/primitives/button"
+import { DkSeg } from "@/components/boffmedia/ui/tools/datakit"
+import { Icon } from "@/components/boffmedia/primitives/icon"
+import { VgcService, ChampionsRegulation, LimitlessTournament } from "@/services/api/boffmedia/vgcService"
+import type { MatchFormat, Session, SessionType, TeamPreset } from "@/features/vgc-tracker/types"
 
 interface Props {
-  presets: TeamPreset[];
-  onConfirm: (session: Omit<Session, 'id' | 'startedAt'>) => void;
-  onClose: () => void;
+  presets: TeamPreset[]
+  onConfirm: (session: Omit<Session, "id" | "startedAt">) => void
+  onClose: () => void
 }
 
 export function NewSessionDialog({ presets, onConfirm, onClose }: Props) {
-  const t = useTranslations('vgc.tracker');
-  const [sessionType, setSessionType] = useState<SessionType>('ladder');
-  const [label, setLabel] = useState('');
-  const [tournamentName, setTournamentName] = useState('');
-  const [format, setFormat] = useState<MatchFormat>('BO1');
-  const [regulationId, setRegulationId] = useState('');
-  const [activePresetId, setActivePresetId] = useState(presets[0]?.id ?? '');
-  const [startElo, setStartElo] = useState('');
-  const [regulations, setRegulations] = useState<ChampionsRegulation[]>([]);
-  const [limitlessTournaments, setLimitlessTournaments] = useState<LimitlessTournament[]>([]);
-  const [limitlessTournamentId, setLimitlessTournamentId] = useState<number | undefined>(undefined);
+  const t = useTranslations("vgc.tracker")
+  const [sessionType, setSessionType] = useState<SessionType>("ladder")
+  const [label, setLabel] = useState("")
+  const [tournamentName, setTournamentName] = useState("")
+  const [format, setFormat] = useState<MatchFormat>("BO1")
+  const [regulationId, setRegulationId] = useState("")
+  const [activePresetId, setActivePresetId] = useState(presets[0]?.id ?? "")
+  const [startElo, setStartElo] = useState("")
+  const [regulations, setRegulations] = useState<ChampionsRegulation[]>([])
+  const [limitlessTournaments, setLimitlessTournaments] = useState<LimitlessTournament[]>([])
+  const [limitlessTournamentId, setLimitlessTournamentId] = useState<number | undefined>(undefined)
 
-  // Tournament mode defaults to BO3
   useEffect(() => {
-    if (sessionType === 'tournament') setFormat('BO3');
-    else setFormat('BO1');
-  }, [sessionType]);
+    setFormat(sessionType === "tournament" ? "BO3" : "BO1")
+  }, [sessionType])
 
   useEffect(() => {
     VgcService.getChampionsRegulations().then((res) => {
       if (res.success && res.data) {
-        setRegulations(res.data);
-        setRegulationId(res.data[0]?.id ?? '');
+        setRegulations(res.data)
+        setRegulationId(res.data[0]?.id ?? "")
       }
-    });
-  }, []);
+    })
+  }, [])
 
-  // Fetch completed Limitless tournaments for the selected regulation (tournament mode only)
   useEffect(() => {
-    if (sessionType !== 'tournament' || !regulationId) return;
-    setLimitlessTournaments([]);
-    setLimitlessTournamentId(undefined);
+    if (sessionType !== "tournament" || !regulationId) return
+    setLimitlessTournaments([])
+    setLimitlessTournamentId(undefined)
     VgcService.getLimitlessTournaments(regulationId).then((res) => {
-      if (res.success && res.data) {
-        const done = res.data.filter((t) => t.status === 'done');
-        setLimitlessTournaments(done);
-      }
-    });
-  }, [sessionType, regulationId]);
+      if (res.success && res.data) setLimitlessTournaments(res.data.filter((x) => x.status === "done"))
+    })
+  }, [sessionType, regulationId])
+
+  const canSubmit = !!label.trim() && !!regulationId
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!label.trim() || !regulationId) return;
-    const parsed = parseFloat(startElo);
+    e.preventDefault()
+    if (!canSubmit) return
+    const parsed = parseFloat(startElo)
     onConfirm({
       type: sessionType,
       label: label.trim(),
       format,
       regulationId,
       activePresetId,
-      startElo: sessionType === 'ladder' && !isNaN(parsed) ? parsed : undefined,
-      tournamentName: sessionType === 'tournament' ? (tournamentName.trim() || undefined) : undefined,
-      limitlessTournamentId: sessionType === 'tournament' ? limitlessTournamentId : undefined,
-    });
-  };
+      startElo: sessionType === "ladder" && !isNaN(parsed) ? parsed : undefined,
+      tournamentName: sessionType === "tournament" ? tournamentName.trim() || undefined : undefined,
+      limitlessTournamentId: sessionType === "tournament" ? limitlessTournamentId : undefined,
+    })
+  }
 
-  return createPortal(
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-layer-1 border border-edge rounded-xl w-full max-w-md mx-4 shadow-2xl">
-        <div className="flex items-center justify-between p-4 border-b border-edge">
-          <h2 className="font-semibold text-ink">{t('modals.newSession')}</h2>
-          <button onClick={onClose} className="text-ink-muted hover:text-ink transition-colors">
-            <X size={18} />
-          </button>
+  return (
+    <Modal open onClose={onClose} title={t("modals.newSession")}>
+      <form onSubmit={handleSubmit} className="grid gap-4">
+        <DkSeg
+          value={sessionType}
+          onChange={(v) => setSessionType(v as SessionType)}
+          ariaLabel={t("filters.sessionType")}
+          className="w-full [&>button]:flex-1 [&>button]:justify-center"
+          options={[
+            { value: "ladder", label: <><Icon name="trending" size={13} /> {t("sessionType.ladder")}</> },
+            { value: "tournament", label: <><Icon name="trophy" size={13} /> {t("sessionType.tournament")}</> },
+          ]}
+        />
+
+        {sessionType === "tournament" && (
+          <>
+            <Field label={t("labels.tournamentName")}>
+              <Input value={tournamentName} onChange={(e) => setTournamentName(e.target.value)} placeholder={t("placeholders.tournamentName")} />
+            </Field>
+            <Field
+              label={
+                <>
+                  {t("labels.limitlessTournament")} <span className="font-normal normal-case text-txt-dim">({t("labels.optional")})</span>
+                </>
+              }
+              hint={limitlessTournaments.length === 0 && regulationId ? t("labels.noImportedTournaments") : undefined}
+            >
+              <Select
+                value={limitlessTournamentId != null ? String(limitlessTournamentId) : ""}
+                onChange={(v) => setLimitlessTournamentId(v ? Number(v) : undefined)}
+                options={[
+                  { value: "", label: t("labels.noTournamentLink") },
+                  ...limitlessTournaments.map((x) => ({
+                    value: String(x.id),
+                    label: `${x.name ?? x.limitlessId}${x.date ? ` · ${x.date}` : ""}`,
+                  })),
+                ]}
+              />
+            </Field>
+          </>
+        )}
+
+        <Field label={t("labels.sessionLabel")}>
+          <Input autoFocus value={label} onChange={(e) => setLabel(e.target.value)} placeholder={t("placeholders.sessionLabel")} />
+        </Field>
+
+        <div className={`grid gap-3 ${sessionType === "ladder" ? "grid-cols-2" : "grid-cols-1"}`}>
+          <Field label={t("labels.format")}>
+            <Select value={format} onChange={(v) => setFormat(v as MatchFormat)} options={["BO1", "BO3"]} />
+          </Field>
+          {sessionType === "ladder" && (
+            <Field label={t("labels.startingElo")}>
+              <Input type="number" value={startElo} onChange={(e) => setStartElo(e.target.value)} placeholder={t("placeholders.startingElo")} />
+            </Field>
+          )}
         </div>
 
-        <form onSubmit={handleSubmit} className="p-4 flex flex-col gap-4">
-          {/* Type toggle */}
-          <div className="flex rounded-lg border border-edge bg-layer-1 p-0.5 gap-0.5">
-            <button
-              type="button"
-              onClick={() => setSessionType('ladder')}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                sessionType === 'ladder'
-                  ? 'bg-primary/20 text-primary-hover'
-                  : 'text-ink-muted hover:text-ink'
-              }`}
-            >
-              <TrendingUp size={13} /> {t('sessionType.ladder')}
-            </button>
-            <button
-              type="button"
-              onClick={() => setSessionType('tournament')}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                sessionType === 'tournament'
-                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                  : 'text-ink-muted hover:text-ink'
-              }`}
-            >
-              <Trophy size={13} /> {t('sessionType.tournament')}
-            </button>
-          </div>
+        <Field label={t("labels.regulation")}>
+          <Select value={regulationId} onChange={setRegulationId} options={regulations.map((r) => ({ value: r.id, label: r.name }))} />
+        </Field>
 
-          {/* Tournament name (tournament only) */}
-          {sessionType === 'tournament' && (
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-ink-muted uppercase tracking-wide">
-                {t('labels.tournamentName')}
-              </label>
-              <input
-                value={tournamentName}
-                onChange={(e) => setTournamentName(e.target.value)}
-                placeholder={t('placeholders.tournamentName')}
-                className="bg-layer-2 border border-edge rounded-lg px-3 py-2 text-ink placeholder:text-ink-muted focus:outline-none focus:border-amber-500 text-sm"
-              />
-            </div>
-          )}
-
-          {/* Limitless tournament link (tournament only, optional) */}
-          {sessionType === 'tournament' && (
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-ink-muted uppercase tracking-wide">
-                {t('labels.limitlessTournament')}
-                <span className="ml-1 text-ink-dim normal-case font-normal">({t('labels.optional')})</span>
-              </label>
-              <select
-                value={limitlessTournamentId ?? ''}
-                onChange={(e) => setLimitlessTournamentId(e.target.value ? Number(e.target.value) : undefined)}
-                className="bg-layer-2 border border-edge rounded-lg px-3 py-2 text-ink focus:outline-none focus:border-amber-500 text-sm"
-              >
-                <option value="">{t('labels.noTournamentLink')}</option>
-                {limitlessTournaments.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.name ?? t.limitlessId}{t.date ? ` · ${t.date}` : ''}
-                  </option>
-                ))}
-              </select>
-              {limitlessTournaments.length === 0 && regulationId && (
-                <p className="text-[11px] text-ink-dim">{t('labels.noImportedTournaments')}</p>
-              )}
-            </div>
-          )}
-
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-ink-muted uppercase tracking-wide">
-              {t('labels.sessionLabel')}
-            </label>
-            <input
-              autoFocus
-              value={label}
-              onChange={(e) => setLabel(e.target.value)}
-              placeholder={t('placeholders.sessionLabel')}
-              className="bg-layer-2 border border-edge rounded-lg px-3 py-2 text-ink placeholder:text-ink-muted focus:outline-none focus:border-primary text-sm"
+        {presets.length > 0 && (
+          <Field label={t("labels.teamPreset")}>
+            <Select
+              value={activePresetId}
+              onChange={setActivePresetId}
+              options={[{ value: "", label: t("labels.noPreset") }, ...presets.map((p) => ({ value: p.id, label: p.name }))]}
             />
-          </div>
+          </Field>
+        )}
 
-          <div className={`grid gap-3 ${sessionType === 'ladder' ? 'grid-cols-2' : 'grid-cols-1'}`}>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-ink-muted uppercase tracking-wide">
-                {t('labels.format')}
-              </label>
-              <select
-                value={format}
-                onChange={(e) => setFormat(e.target.value as MatchFormat)}
-                className="bg-layer-2 border border-edge rounded-lg px-3 py-2 text-ink focus:outline-none focus:border-primary text-sm"
-              >
-                <option value="BO1">BO1</option>
-                <option value="BO3">BO3</option>
-              </select>
-            </div>
-
-            {sessionType === 'ladder' && (
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-medium text-ink-muted uppercase tracking-wide">
-                  {t('labels.startingElo')}
-                </label>
-                <input
-                  type="number"
-                  value={startElo}
-                  onChange={(e) => setStartElo(e.target.value)}
-                  placeholder={t('placeholders.startingElo')}
-                  className="bg-layer-2 border border-edge rounded-lg px-3 py-2 text-ink placeholder:text-ink-muted focus:outline-none focus:border-primary text-sm"
-                />
-              </div>
-            )}
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-ink-muted uppercase tracking-wide">
-              {t('labels.regulation')}
-            </label>
-            <select
-              value={regulationId}
-              onChange={(e) => setRegulationId(e.target.value)}
-              className="bg-layer-2 border border-edge rounded-lg px-3 py-2 text-ink focus:outline-none focus:border-primary text-sm"
-            >
-              {regulations.map((r) => (
-                <option key={r.id} value={r.id}>{r.name}</option>
-              ))}
-            </select>
-          </div>
-
-          {presets.length > 0 && (
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-ink-muted uppercase tracking-wide">
-                {t('labels.teamPreset')}
-              </label>
-              <select
-                value={activePresetId}
-                onChange={(e) => setActivePresetId(e.target.value)}
-                className="bg-layer-2 border border-edge rounded-lg px-3 py-2 text-ink focus:outline-none focus:border-primary text-sm"
-              >
-                <option value="">{t('labels.noPreset')}</option>
-                {presets.map((p) => (
-                  <option key={p.id} value={p.id}>{p.name}</option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          <div className="flex gap-2 pt-1">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 py-2 rounded-lg border border-edge text-ink hover:text-ink text-sm transition-colors"
-            >
-              {t('buttons.cancel')}
-            </button>
-            <button
-              type="submit"
-              disabled={!label.trim() || !regulationId}
-              className={`flex-1 py-2 rounded-lg disabled:opacity-40 text-white text-sm font-medium transition-colors ${
-                sessionType === 'tournament'
-                  ? 'bg-amber-600 hover:bg-amber-500'
-                  : 'bg-primary-active hover:bg-primary'
-              }`}
-            >
-              {t('buttons.startSession')}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>,
-    document.body,
-  );
+        <div className="mt-1 flex gap-2">
+          <Button type="button" size="sm" onClick={onClose} className="flex-1">
+            {t("buttons.cancel")}
+          </Button>
+          <Button type="submit" variant="pri" size="sm" disabled={!canSubmit} className="flex-1">
+            {t("buttons.startSession")}
+          </Button>
+        </div>
+      </form>
+    </Modal>
+  )
 }

@@ -1,8 +1,9 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { Icon } from "@/components/boffmedia-v2/primitives/icon"
-import { SegTabs } from "@/components/boffmedia-v2/primitives/seg-tabs"
+import { Icon } from "@/components/boffmedia/primitives/icon"
+import { DkSub, DkSubNote, DkSeg, DkChip } from "@/components/boffmedia/ui/tools/datakit"
+import { fmtCount } from "../_lib/meta-types"
 
 interface VgcSubbarProps {
   tab: string
@@ -35,43 +36,40 @@ export function VgcSubbar({
 
   if (tab === "stats") {
     return (
-      <div className="flex items-center gap-3 px-3 py-2 border-t border-b border-edge bg-[color-mix(in_srgb,var(--layer-2)_30%,transparent)]">
-        <div className="flex items-center gap-2 min-w-0">
-          <span className="inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold px-2 py-[0.2rem] rounded-[var(--radius-pill)] border border-secondary bg-secondary-soft text-secondary-hover">
-            <Icon name="shield" size={11} />
-            {formatLabel}
-          </span>
-          {formatNote && (
-            <span className="text-[11px] text-ink-dim truncate">{formatNote}</span>
-          )}
-        </div>
-        <span className="flex items-center gap-1 ml-auto font-mono text-[10px] text-ink-dim shrink-0">
-          <Icon name="info" size={11} />
-          {cutoffLabel} · {month}
-        </span>
-      </div>
+      <DkSub>
+        <DkChip icon="shield" tone="var(--accent-bright)">{formatLabel}</DkChip>
+        {formatNote && <span className="min-w-0 truncate font-mono text-[11px] leading-[1.4] text-txt-muted">{formatNote}</span>}
+        <DkSubNote>
+          <Icon name="info" size={12} />
+          {cutoffLabel}
+          {month ? ` · ${month}` : ""}
+        </DkSubNote>
+      </DkSub>
     )
   }
 
   return (
-    <div className="flex items-center gap-2 px-3 py-1.5 text-xs text-ink-muted">
-      <SegTabs
-        value={view}
+    <DkSub>
+      <DkSeg
         size="sm"
+        value={view}
+        ariaLabel={t("aria.tournamentView")}
+        onChange={onViewChange}
         options={[
           { value: "aggregate", label: t("tabs.aggregate") },
           { value: "players", label: t("tabs.players") },
           { value: "divergence", label: t("tabs.divergence") },
         ]}
-        onChange={onViewChange}
       />
-      <span className="ml-auto font-mono text-ink-dim">
+      <DkSubNote>
         {curTourIsCombined
-          ? `Combinado · ${combinedCount ?? 0} torneos`
+          ? t("sub.combined", { count: combinedCount ?? 0 })
           : curTourName
-            ? `${curTourName}${curTourPlayers ? ` · ${curTourPlayers.toLocaleString("es-ES")} jug.` : ""}`
+            ? curTourPlayers
+              ? t("sub.tourWithPlayers", { name: curTourName, count: fmtCount(curTourPlayers) })
+              : curTourName
             : ""}
-      </span>
-    </div>
+      </DkSubNote>
+    </DkSub>
   )
 }

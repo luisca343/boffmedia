@@ -12,7 +12,7 @@ import { ENABLE_PREVIEW_FORMATS } from "../constants";
 
 const BASE_PATH      = "/pokemon/vgc/meta";
 export const DEFAULT_CUTOFF = 1760;
-const DESKTOP_MEDIA_QUERY = "(min-width: 768px)";
+const DESKTOP_MEDIA_QUERY = "(min-width: 980px)";
 
 export interface MetaUrlState {
   tab:          string;

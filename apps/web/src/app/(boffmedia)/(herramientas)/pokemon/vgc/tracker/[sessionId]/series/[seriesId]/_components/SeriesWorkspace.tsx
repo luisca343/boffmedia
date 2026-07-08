@@ -1,30 +1,25 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ArrowLeft, Check, Lock, Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { cn } from '@/lib/utils';
+import { Icon } from '@/components/boffmedia/primitives/icon';
+import { DkApp, DkBar, DkBody, DkSub, DkBack, DkSpacer, cssVars } from '@/components/boffmedia/ui/tools/datakit';
 import { usePokemonSearch } from '@/features/vgc-tracker/hooks/usePokemonSearch';
 import {
   computeSeriesResult,
   seriesScore,
   slotsForGame,
-  emptySlots,
   spriteUrl,
   handleSpriteError,
   isLead,
 } from '@/features/vgc-tracker/types';
-import type {
-  Series,
-  SeriesGame,
-  MatchNote,
-  MatchResult,
-  MatchSlot,
-  OutcomeTag,
-} from '@/features/vgc-tracker/types';
+import type { Series, SeriesGame, MatchNote, MatchResult, MatchSlot, OutcomeTag } from '@/features/vgc-tracker/types';
 import { TeamPanel } from '../../../[matchId]/_components/TeamPanel';
 import { SpeedTierWidget } from '../../../[matchId]/_components/SpeedTierWidget';
 import { SeriesNotesPanel } from './SeriesNotesPanel';
+import { TrSub, TR_OUTCOME_ORDER, TR_OUTCOME_TONE } from '../../../../_components/ui/tr-ui';
 
 interface Props {
   series: Series;
@@ -32,6 +27,8 @@ interface Props {
   regulationId: string;
   onSave: (series: Series) => Promise<void>;
 }
+
+const HDR_INPUT = 'border-0 border-b border-solid border-line-2 bg-transparent font-body text-txt outline-none transition-[border-color] placeholder:text-txt-dim focus:border-accent';
 
 export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId, onSave }: Props) {
   const t = useTranslations('vgc.tracker');
@@ -41,9 +38,7 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
   const [series, setSeries] = useState<Series>(initialSeries);
   const [activeGame, setActiveGame] = useState<1 | 2 | 3>(1);
   const [opponentNameInput, setOpponentNameInput] = useState(initialSeries.opponentName ?? '');
-  const [roundInput, setRoundInput] = useState(
-    initialSeries.roundNumber !== undefined ? String(initialSeries.roundNumber) : '',
-  );
+  const [roundInput, setRoundInput] = useState(initialSeries.roundNumber !== undefined ? String(initialSeries.roundNumber) : '');
   const [archetypeInput, setArchetypeInput] = useState(initialSeries.opponentArchetype ?? '');
   const [isCompleted, setIsCompleted] = useState(!!initialSeries.completedAt);
   const saveTimer = useRef<ReturnType<typeof setTimeout>>(null);
@@ -72,9 +67,7 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
   const updateGame = useCallback(
     (gameNumber: 1 | 2 | 3, patch: Partial<SeriesGame>) => {
       setSeries((prev) => {
-        const games = prev.games.map((g) =>
-          g.gameNumber === gameNumber ? { ...g, ...patch } : g,
-        );
+        const games = prev.games.map((g) => (g.gameNumber === gameNumber ? { ...g, ...patch } : g));
         const updatedResult = computeSeriesResult(games);
         const next: Series = {
           ...prev,
@@ -88,19 +81,6 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
     },
     [scheduleAutosave],
   );
-
-  const handleOpponentNameBlur = () => {
-    update({ opponentName: opponentNameInput.trim() || undefined });
-  };
-
-  const handleRoundBlur = () => {
-    const n = parseInt(roundInput, 10);
-    update({ roundNumber: isNaN(n) ? undefined : n });
-  };
-
-  const handleArchetypeBlur = () => {
-    update({ opponentArchetype: archetypeInput.trim() || undefined });
-  };
 
   const handleGameOutcomeTag = (gameNumber: 1 | 2 | 3, tag: OutcomeTag) => {
     const game = series.games.find((g) => g.gameNumber === gameNumber);
@@ -116,60 +96,49 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
   const handleGameResult = (gameNumber: 1 | 2 | 3, result: MatchResult) => {
     const game = series.games.find((g) => g.gameNumber === gameNumber);
     if (!game) return;
-    const next = result === game.result ? undefined : result;
-    updateGame(gameNumber, { result: next });
+    updateGame(gameNumber, { result: result === game.result ? undefined : result });
   };
 
-  const handleMySlots = (gameNumber: 1 | 2 | 3, slots: MatchSlot[]) => {
-    updateGame(gameNumber, { mySlots: slots });
-  };
+  const handleMySlots = (gameNumber: 1 | 2 | 3, slots: MatchSlot[]) => updateGame(gameNumber, { mySlots: slots });
 
   const handleOpponentSlots = (gameNumber: 1 | 2 | 3, slots: MatchSlot[]) => {
     updateGame(gameNumber, { opponentSlots: slots });
+    setSeries((prev) => {
+      const merged = prev.opponentTeam.slots.map((s) => {
+        const updated = slots.find((u) => u.slotIndex === s.slotIndex);
+        if (updated?.speciesId && !s.speciesId) return { ...updated, role: 'unknown' as const };
+        return s;
+      });
+      const next = { ...prev, opponentTeam: { ...prev.opponentTeam, slots: merged } };
+      scheduleAutosave(next);
+      return next;
+    });
   };
 
   const handleAddGameNote = (gameNumber: 1 | 2 | 3, text: string) => {
     const game = series.games.find((g) => g.gameNumber === gameNumber);
     if (!game) return;
-    const note: MatchNote = {
-      id: crypto.randomUUID(),
-      text,
-      createdAt: Date.now(),
-      phase: game.completedAt ? 'post' : 'live',
-    };
+    const note: MatchNote = { id: crypto.randomUUID(), text, createdAt: Date.now(), phase: game.completedAt ? 'post' : 'live' };
     updateGame(gameNumber, { notes: [...game.notes, note] });
   };
 
   const handleAddSeriesNote = (text: string) => {
-    const note: MatchNote = {
-      id: crypto.randomUUID(),
-      text,
-      createdAt: Date.now(),
-      phase: 'series',
-    };
+    const note: MatchNote = { id: crypto.randomUUID(), text, createdAt: Date.now(), phase: 'series' };
     update({ notes: [...series.notes, note] });
   };
 
-  // Unified note handler: adds to current game if ongoing, otherwise series-level
   const handleAddNote = (text: string) => {
     const game = series.games.find((g) => g.gameNumber === activeGame);
-    if (game && !game.completedAt && !series.completedAt) {
-      handleAddGameNote(activeGame, text);
-    } else {
-      handleAddSeriesNote(text);
-    }
+    if (game && !game.completedAt && !series.completedAt) handleAddGameNote(activeGame, text);
+    else handleAddSeriesNote(text);
   };
 
   const handleFinishGame = (gameNumber: 1 | 2 | 3) => {
     updateGame(gameNumber, { completedAt: Date.now() });
-    const { wins, losses } = seriesScore(
-      series.games.map((g) => (g.gameNumber === gameNumber ? { ...g, completedAt: Date.now() } : g)),
-    );
-    // Unlock next game if series is still live
-    const nextGame = gameNumber < 3 ? (gameNumber + 1) as 2 | 3 : null;
+    const { wins, losses } = seriesScore(series.games.map((g) => (g.gameNumber === gameNumber ? { ...g, completedAt: Date.now() } : g)));
+    const nextGame = gameNumber < 3 ? ((gameNumber + 1) as 2 | 3) : null;
     if (nextGame && wins < 2 && losses < 2) {
-      const currentGames = series.games;
-      const alreadyExists = currentGames.some((g) => g.gameNumber === nextGame);
+      const alreadyExists = series.games.some((g) => g.gameNumber === nextGame);
       if (!alreadyExists) {
         const newGame: SeriesGame = {
           id: crypto.randomUUID(),
@@ -197,290 +166,205 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
   };
 
   const handleBack = () => {
-    if (saveTimer.current) {
-      clearTimeout(saveTimer.current);
-      onSave(series);
-    }
+    if (saveTimer.current) { clearTimeout(saveTimer.current); onSave(series); }
     router.push(`/pokemon/vgc/tracker/${sessionId}`);
   };
 
   const { wins, losses } = seriesScore(series.games);
   const currentGame = series.games.find((g) => g.gameNumber === activeGame);
-  const game3Unlocked = series.games.some((g) => g.gameNumber === 3);
 
   return (
-    <div className="flex flex-col h-screen text-ink overflow-hidden">
-      {/* ── Top bar ──────────────────────────────────────────────────────── */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-edge shrink-0 bg-layer-1">
-        <button onClick={handleBack} className="text-ink-muted hover:text-ink transition-colors">
-          <ArrowLeft size={18} />
-        </button>
-
-        <div className="flex-1 flex items-center gap-2 min-w-0">
-          {/* Round input */}
-          <div className="flex items-center gap-1 shrink-0">
-            <span className="text-ink-muted text-xs font-mono">{t('workspace.roundPrefix')}</span>
-            <input
-              value={roundInput}
-              onChange={(e) => setRoundInput(e.target.value)}
-              onBlur={handleRoundBlur}
-              placeholder="—"
-              className="w-8 bg-transparent text-ink text-sm font-mono text-center focus:outline-none border-b border-edge focus:border-amber-500 transition-colors"
-            />
-          </div>
-          <span className="text-ink-dim text-xs">·</span>
-          {/* Opponent name */}
-          <input
-            value={opponentNameInput}
-            onChange={(e) => setOpponentNameInput(e.target.value)}
-            onBlur={handleOpponentNameBlur}
-            placeholder={t('placeholders.rivalName')}
-            className="min-w-0 flex-1 max-w-[160px] bg-transparent border-b border-edge focus:border-amber-500 text-ink text-sm placeholder:text-ink-dim focus:outline-none py-0.5 transition-colors"
-          />
-          <span className="text-ink-dim text-xs">·</span>
-          {/* Archetype */}
-          <input
-            value={archetypeInput}
-            onChange={(e) => setArchetypeInput(e.target.value)}
-            onBlur={handleArchetypeBlur}
-            placeholder={t('archetype.placeholder')}
-            className="min-w-0 flex-1 max-w-[120px] bg-transparent border-b border-edge focus:border-amber-500 text-ink-muted text-xs placeholder:text-ink-dim focus:outline-none py-0.5 transition-colors"
-          />
-        </div>
-
-        {/* Series score */}
-        <div className="flex items-center gap-1.5 shrink-0">
-          <span className={`text-2xl font-bold font-mono tabular-nums ${wins > losses ? 'text-green-400' : wins < losses ? 'text-red-400' : 'text-ink'}`}>
-            {wins}
+    <DkApp>
+      <DkBar>
+        <DkBack onClick={handleBack} label={t('nav.backToSession')} />
+        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+          <span className="inline-flex items-center gap-1">
+            <span className="font-mono text-[11px] text-txt-muted">{t('workspace.roundPrefix')}</span>
+            <input value={roundInput} onChange={(e) => setRoundInput(e.target.value)} onBlur={() => { const n = parseInt(roundInput, 10); update({ roundNumber: isNaN(n) ? undefined : n }); }} placeholder="—" className={cn(HDR_INPUT, 'w-8 text-center font-mono text-[13px]')} />
           </span>
-          <span className="text-ink-dim text-sm">–</span>
-          <span className={`text-2xl font-bold font-mono tabular-nums ${losses > wins ? 'text-red-400' : losses < wins ? 'text-green-400' : 'text-ink'}`}>
-            {losses}
-          </span>
+          <span className="text-txt-dim">·</span>
+          <input value={opponentNameInput} onChange={(e) => setOpponentNameInput(e.target.value)} onBlur={() => update({ opponentName: opponentNameInput.trim() || undefined })} placeholder={t('placeholders.rivalName')} className={cn(HDR_INPUT, 'min-w-0 max-w-[160px] flex-1 py-[2px] text-[13px]')} />
+          <span className="text-txt-dim">·</span>
+          <input value={archetypeInput} onChange={(e) => setArchetypeInput(e.target.value)} onBlur={() => update({ opponentArchetype: archetypeInput.trim() || undefined })} placeholder={t('archetype.placeholder')} className={cn(HDR_INPUT, 'min-w-0 max-w-[120px] flex-1 py-[2px] text-[12px] text-txt-muted')} />
         </div>
-
-        {/* Finish */}
+        <DkSpacer />
+        <span className="inline-flex items-center gap-[6px]">
+          <span className={cn('font-mono text-[24px] font-bold tabular-nums leading-none', wins > losses ? 'text-ok' : wins < losses ? 'text-bad' : 'text-txt')}>{wins}</span>
+          <span className="text-[14px] text-txt-dim">–</span>
+          <span className={cn('font-mono text-[24px] font-bold tabular-nums leading-none', losses > wins ? 'text-bad' : losses < wins ? 'text-ok' : 'text-txt')}>{losses}</span>
+        </span>
         {!isCompleted ? (
-          <button
-            onClick={handleFinishSeries}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-sm font-medium transition-colors"
-          >
-            <Check size={14} /> {t('buttons.finish')}
+          <button type="button" onClick={handleFinishSeries} className="cut inline-flex items-center gap-[6px] border border-solid border-accent bg-accent px-3 py-[7px] font-display text-[13px] font-bold uppercase tracking-[0.06em] text-accent-ink transition-colors hover:bg-accent-bright">
+            <Icon name="check" size={14} /> {t('buttons.finish')}
           </button>
         ) : (
-          <span className="text-xs text-green-400 flex items-center gap-1">
-            <Check size={13} /> {t('indicators.saved')}
+          <span className="inline-flex items-center gap-1 font-mono text-[11px] text-ok">
+            <Icon name="check" size={13} /> {t('indicators.saved')}
           </span>
         )}
-      </div>
+      </DkBar>
 
-      {/* ── Game tabs ────────────────────────────────────────────────────── */}
-      <div className="flex items-center gap-1 px-4 py-2 border-b border-edge bg-layer-1 shrink-0">
-        {([1, 2, 3] as const).map((n) => {
-          const game = series.games.find((g) => g.gameNumber === n);
-          const unlocked = !!game;
-          const isActive = activeGame === n;
-          const isDone = !!game?.completedAt;
-          const isLocked = !unlocked;
-
-          return (
-            <button
-              key={n}
-              onClick={() => unlocked && setActiveGame(n)}
-              disabled={isLocked}
-              className={[
-                'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
-                isActive
-                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                  : isLocked
-                  ? 'text-ink-dim cursor-not-allowed'
-                  : 'text-ink-muted hover:text-ink hover:bg-layer-2',
-              ].join(' ')}
-            >
-              {isLocked ? <Lock size={11} /> : isDone ? <Check size={11} className="text-green-400" /> : null}
-              {t('workspace.game', { n })}
-              {game?.result && (
-                <span className={`text-[10px] font-mono ml-0.5 ${game.result === 'win' ? 'text-green-400' : game.result === 'loss' ? 'text-red-400' : 'text-yellow-400'}`}>
-                  {game.result === 'win' ? t('result.winShort') : game.result === 'loss' ? t('result.lossShort') : t('result.drawShort')}
-                </span>
-              )}
+      {/* Game tabs */}
+      <DkSub>
+        <div className="flex flex-1 items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {([1, 2, 3] as const).map((n) => {
+            const game = series.games.find((g) => g.gameNumber === n);
+            const unlocked = !!game;
+            const active = activeGame === n;
+            const done = !!game?.completedAt;
+            return (
+              <button
+                key={n}
+                type="button"
+                onClick={() => unlocked && setActiveGame(n)}
+                disabled={!unlocked}
+                style={{ clipPath: 'polygon(0 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%)' }}
+                className={cn(
+                  'inline-flex flex-none items-center gap-[6px] border border-solid px-[10px] py-[7px] font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.08em] transition-[color,background,border-color]',
+                  active ? 'border-accent bg-accent text-accent-ink' : !unlocked ? 'cursor-not-allowed border-line bg-base text-txt-dim' : 'border-line bg-base text-txt-muted hover:text-txt',
+                )}
+              >
+                {!unlocked ? <Icon name="lock" size={11} /> : done ? <Icon name="check" size={11} className={active ? '' : 'text-ok'} /> : null}
+                {t('workspace.game', { n })}
+                {game?.result && (
+                  <span className={cn('font-mono text-[10px]', active ? '' : game.result === 'win' ? 'text-ok' : game.result === 'loss' ? 'text-bad' : 'text-warn')}>
+                    {t(`result.${game.result}Short`)}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+          {currentGame && !currentGame.completedAt && series.seriesResult === undefined && (
+            <button type="button" onClick={() => handleFinishGame(activeGame)} className="ml-auto inline-flex flex-none items-center gap-1 border border-solid border-line-2 bg-base px-[10px] py-[6px] font-mono text-[10px] uppercase tracking-[0.06em] text-txt-muted transition-colors hover:text-txt">
+              <Icon name="check" size={11} /> {t('workspace.endGame', { n: activeGame })}
             </button>
-          );
-        })}
+          )}
+        </div>
+      </DkSub>
 
-        {/* Finish game button */}
-        {currentGame && !currentGame.completedAt && series.seriesResult === undefined && (
-          <button
-            onClick={() => handleFinishGame(activeGame)}
-            className="ml-auto flex items-center gap-1 px-2.5 py-1 rounded-lg border border-edge text-ink-muted hover:text-ink hover:border-edge text-xs transition-colors"
-          >
-            <Check size={11} /> {t('workspace.endGame', { n: activeGame })}
-          </button>
+      <DkBody pad>
+        {currentGame ? (
+          <div className="grid grid-cols-1 items-start gap-[18px] min-[760px]:grid-cols-2 min-[1100px]:grid-cols-[minmax(280px,360px)_minmax(0,1fr)_minmax(280px,360px)]">
+            <div className="grid min-w-0 gap-3">
+              <TeamPanel label={t('labels.myTeam')} slots={currentGame.mySlots} editable={false} tone="var(--accent-bright)" onSlotChange={(slots) => handleMySlots(activeGame, slots)} />
+              <SpeedTierWidget slots={currentGame.mySlots} regulationId={regulationId} />
+              {activeGame > 1 && <PreviousGameRecap games={series.games} upToGame={activeGame} side="my" />}
+            </div>
+
+            <div className="min-w-0 max-[1100px]:order-3 max-[1100px]:col-span-full min-[1100px]:h-[70vh]">
+              <SeriesNotesPanel
+                games={series.games}
+                seriesNotes={series.notes}
+                currentGameNumber={activeGame}
+                isGameCompleted={!!currentGame.completedAt}
+                isSeriesCompleted={isCompleted}
+                onAddNote={handleAddNote}
+              />
+            </div>
+
+            <div className="grid min-w-0 gap-3">
+              <TeamPanel label={t('labels.opponent')} slots={currentGame.opponentSlots} editable tone="var(--info)" search={search} onSlotChange={(slots) => handleOpponentSlots(activeGame, slots)} />
+              <SpeedTierWidget slots={currentGame.opponentSlots} regulationId={regulationId} />
+
+              <div className="border border-solid border-line bg-panel px-[14px] py-[12px]">
+                <TrSub>{t('workspace.game', { n: activeGame })}</TrSub>
+                <div className="flex gap-2">
+                  {(['win', 'loss', 'draw'] as MatchResult[]).map((r) => (
+                    <GameResultButton key={r} result={r} active={currentGame.result === r} onClick={() => handleGameResult(activeGame, r)} label={t(`result.${r}Short`)} />
+                  ))}
+                </div>
+              </div>
+
+              <div className="border border-solid border-line bg-panel px-[14px] py-[12px]">
+                <TrSub>{t('outcomeTag.label')}</TrSub>
+                <div className="mb-3 flex flex-wrap gap-[5px]">
+                  {TR_OUTCOME_ORDER.map((tag) => (
+                    <OutcomeButton key={tag} tag={tag} active={currentGame.outcomeTag === tag} onClick={() => handleGameOutcomeTag(activeGame, tag)} label={t(`outcomeTag.${tag}`)} />
+                  ))}
+                </div>
+                <div className="flex items-center justify-between">
+                  <TrSub className="mb-0">{t('turnCount.label')}</TrSub>
+                  <input
+                    type="number"
+                    min={1}
+                    max={99}
+                    value={currentGame.turnCount ?? ''}
+                    onChange={(e) => handleGameTurnCount(activeGame, e.target.value)}
+                    placeholder="—"
+                    className="w-16 border border-solid border-line-2 bg-base px-2 py-1 text-center font-mono text-[13px] text-txt outline-none focus:border-accent"
+                  />
+                </div>
+              </div>
+              {activeGame > 1 && <PreviousGameRecap games={series.games} upToGame={activeGame} side="opponent" />}
+            </div>
+          </div>
+        ) : (
+          <div className="grid place-items-center py-16 font-mono text-[13px] text-txt-muted">{t('workspace.noGameData')}</div>
         )}
-      </div>
-
-      {/* ── Main content ─────────────────────────────────────────────────── */}
-      {currentGame ? (
-        <div className="flex-1 flex gap-0 min-h-0 overflow-hidden">
-          {/* Left: My team */}
-          <div className="flex flex-col w-[360px] shrink-0 border-r border-edge overflow-y-auto p-4 gap-4">
-            <TeamPanel
-              label={t('labels.myTeam')}
-              slots={currentGame.mySlots}
-              editable={false}
-              onSlotChange={(slots) => handleMySlots(activeGame, slots)}
-            />
-            <SpeedTierWidget slots={currentGame.mySlots} regulationId={regulationId} />
-            {activeGame > 1 && (
-              <PreviousGameRecap games={series.games} upToGame={activeGame} side="my" />
-            )}
-          </div>
-
-          {/* Center: Notes */}
-          <div className="flex-1 min-w-0 flex flex-col min-h-0">
-            <SeriesNotesPanel
-              games={series.games}
-              seriesNotes={series.notes}
-              currentGameNumber={activeGame}
-              isGameCompleted={!!currentGame.completedAt}
-              isSeriesCompleted={isCompleted}
-              onAddNote={handleAddNote}
-            />
-          </div>
-
-          {/* Right: Opponent */}
-          <div className="flex flex-col w-[360px] shrink-0 border-l border-edge overflow-visible p-4 gap-4">
-            <TeamPanel
-              label={t('labels.opponent')}
-              slots={currentGame.opponentSlots}
-              editable
-              search={search}
-              onSlotChange={(slots) => {
-                handleOpponentSlots(activeGame, slots);
-                // Propagate new species to series.opponentTeam for future games
-                setSeries((prev) => {
-                  const merged = prev.opponentTeam.slots.map((s) => {
-                    const updated = slots.find((u) => u.slotIndex === s.slotIndex);
-                    if (updated?.speciesId && !s.speciesId) return { ...updated, role: 'unknown' as const };
-                    return s;
-                  });
-                  const next = { ...prev, opponentTeam: { ...prev.opponentTeam, slots: merged } };
-                  scheduleAutosave(next);
-                  return next;
-                });
-              }}
-            />
-            <SpeedTierWidget slots={currentGame.opponentSlots} regulationId={regulationId} />
-            {/* Result buttons for this game */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-ink-muted uppercase tracking-wide font-medium">{t('workspace.game', { n: activeGame })}</span>
-              {(['win', 'loss', 'draw'] as MatchResult[]).map((r) => (
-                <button
-                  key={r}
-                  onClick={() => handleGameResult(activeGame, r)}
-                  className={[
-                    'flex-1 py-1.5 rounded-lg text-xs font-bold font-mono border transition-all',
-                    currentGame.result === r
-                      ? r === 'win' ? 'bg-green-500 border-green-400 text-white' : r === 'loss' ? 'bg-red-500 border-red-400 text-white' : 'bg-yellow-500 border-yellow-400 text-white'
-                      : 'bg-layer-2 border-edge text-ink-muted hover:text-ink',
-                  ].join(' ')}
-                >
-                  {r === 'win' ? t('result.winShort') : r === 'loss' ? t('result.lossShort') : t('result.drawShort')}
-                </button>
-              ))}
-            </div>
-
-            {/* Outcome tag + turn count */}
-            <div className="flex flex-col gap-1.5">
-              <div className="flex items-center gap-1 flex-wrap">
-                {(['skill', 'misplay', 'luck', 'disconnect'] as OutcomeTag[]).map((tag) => (
-                  <button
-                    key={tag}
-                    onClick={() => handleGameOutcomeTag(activeGame, tag)}
-                    className={[
-                      'px-2 py-0.5 rounded text-[10px] font-medium border transition-all',
-                      currentGame.outcomeTag === tag
-                        ? tag === 'skill' ? 'bg-green-500/20 border-green-500/40 text-green-300'
-                          : tag === 'misplay' ? 'bg-red-500/20 border-red-500/40 text-red-300'
-                          : tag === 'luck' ? 'bg-yellow-500/20 border-yellow-500/40 text-yellow-300'
-                          : 'bg-layer-3/20 border-edge/40 text-ink'
-                        : 'border-edge text-ink-dim hover:text-ink-muted hover:border-edge',
-                    ].join(' ')}
-                  >
-                    {t(`outcomeTag.${tag}`)}
-                  </button>
-                ))}
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] text-ink-dim uppercase tracking-wide font-medium shrink-0">
-                  {t('turnCount.label')}
-                </span>
-                <input
-                  type="number"
-                  min={1}
-                  max={99}
-                  value={currentGame.turnCount ?? ''}
-                  onChange={(e) => handleGameTurnCount(activeGame, e.target.value)}
-                  placeholder="—"
-                  className="w-14 bg-transparent border-b border-edge focus:border-amber-500 text-ink text-xs font-mono text-center focus:outline-none transition-colors placeholder:text-ink-dim"
-                />
-              </div>
-            </div>
-            {activeGame > 1 && (
-              <PreviousGameRecap games={series.games} upToGame={activeGame} side="opponent" />
-            )}
-          </div>
-        </div>
-      ) : (
-        <div className="flex-1 flex items-center justify-center text-ink-muted text-sm">
-          {t('workspace.noGameData')}
-        </div>
-      )}
-    </div>
+      </DkBody>
+    </DkApp>
   );
 }
 
-// ─── Previous game recap strip ────────────────────────────────────────────────
+function GameResultButton({ result, active, onClick, label }: { result: MatchResult; active: boolean; onClick: () => void; label: string }) {
+  const tone = result === 'win' ? 'var(--ok)' : result === 'loss' ? 'var(--bad)' : 'var(--warn)';
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={active ? cssVars({ background: tone, borderColor: tone }) : undefined}
+      className={cn('flex-1 border border-solid py-[6px] font-mono text-[12px] font-bold uppercase leading-none transition-all', active ? 'text-white' : 'border-line-2 bg-base text-txt-muted hover:text-txt')}
+    >
+      {label}
+    </button>
+  );
+}
 
-function PreviousGameRecap({
-  games,
-  upToGame,
-  side,
-}: {
-  games: SeriesGame[];
-  upToGame: number;
-  side: 'my' | 'opponent';
-}) {
+function OutcomeButton({ tag, active, onClick, label }: { tag: OutcomeTag; active: boolean; onClick: () => void; label: string }) {
+  const tone = TR_OUTCOME_TONE[tag];
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={active ? cssVars({ color: tone, borderColor: `color-mix(in srgb, ${tone} 55%, transparent)`, background: `color-mix(in srgb, ${tone} 11%, transparent)` }) : undefined}
+      className={cn('border border-solid px-[9px] py-[6px] font-mono text-[9.5px] font-semibold uppercase leading-none tracking-[0.06em] transition-colors', !active && 'border-line-2 text-txt-dim hover:text-txt')}
+    >
+      {label}
+    </button>
+  );
+}
+
+function PreviousGameRecap({ games, upToGame, side }: { games: SeriesGame[]; upToGame: number; side: 'my' | 'opponent' }) {
   const t = useTranslations('vgc.tracker');
-  const prior = games
-    .filter((g) => g.gameNumber < upToGame)
-    .sort((a, b) => a.gameNumber - b.gameNumber);
-
+  const prior = games.filter((g) => g.gameNumber < upToGame).sort((a, b) => a.gameNumber - b.gameNumber);
   if (!prior.length) return null;
 
   return (
-    <div className="flex flex-col gap-2 pt-2 border-t border-edge">
-      <span className="text-[10px] text-ink-dim uppercase tracking-wide font-medium">{t('workspace.previousGames')}</span>
+    <div className="grid gap-2 border-t border-solid border-line pt-2">
+      <TrSub>{t('workspace.previousGames')}</TrSub>
       {prior.map((g) => {
         const slots = side === 'my' ? g.mySlots : g.opponentSlots;
         const leads = slots.filter((s) => s.speciesId && isLead(s.role));
         const backs = slots.filter((s) => s.speciesId && (s.role === 'back1' || s.role === 'back2'));
+        const resTone = g.result === 'win' ? 'text-ok' : g.result === 'loss' ? 'text-bad' : 'text-warn';
         return (
           <div key={g.gameNumber} className="flex items-center gap-2">
-            <span className={`text-[10px] font-bold font-mono w-4 ${g.result === 'win' ? 'text-green-400' : g.result === 'loss' ? 'text-red-400' : 'text-yellow-400'}`}>
-              {g.result === 'win' ? t('result.winShort') : g.result === 'loss' ? t('result.lossShort') : t('result.drawShort')} {t('workspace.gameAbbr', { n: g.gameNumber })}
+            <span className={cn('w-9 shrink-0 font-mono text-[10px] font-bold uppercase', resTone)}>
+              {g.result ? t(`result.${g.result}Short`) : '—'} {t('workspace.gameAbbr', { n: g.gameNumber })}
             </span>
-            <div className="flex items-center gap-0.5">
+            <div className="flex items-center gap-[2px]">
               {leads.map((s) => (
-                <img key={s.slotIndex} src={spriteUrl(s.speciesName!)} alt={s.speciesName ?? ''} className="w-7 h-7 object-contain" onError={handleSpriteError} />
+                // eslint-disable-next-line @next/next/no-img-element
+                <img key={s.slotIndex} src={spriteUrl(s.speciesName!)} alt={s.speciesName ?? ''} className="h-7 w-7 object-contain" onError={handleSpriteError} />
               ))}
             </div>
             {backs.length > 0 && (
               <>
-                <span className="text-ink-dim text-[10px]">/</span>
-                <div className="flex items-center gap-0.5">
+                <span className="text-[10px] text-txt-dim">/</span>
+                <div className="flex items-center gap-[2px]">
                   {backs.map((s) => (
-                    <img key={s.slotIndex} src={spriteUrl(s.speciesName!)} alt={s.speciesName ?? ''} className="w-6 h-6 object-contain opacity-60" onError={handleSpriteError} />
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img key={s.slotIndex} src={spriteUrl(s.speciesName!)} alt={s.speciesName ?? ''} className="h-6 w-6 object-contain opacity-60" onError={handleSpriteError} />
                   ))}
                 </div>
               </>
