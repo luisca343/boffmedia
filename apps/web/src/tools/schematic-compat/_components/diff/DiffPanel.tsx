@@ -2,9 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
-import { BoffButton } from "@/components/boffmedia-v2/primitives/button";
+import { Button, Icon } from "@/components/boffmedia/primitives";
 import {
-  SchIcon,
   FilterChips,
   MappingCard,
   BulkRulesSheet,
@@ -12,7 +11,7 @@ import {
   type SchDiffEntry,
   type SchRing,
   type BulkAction,
-} from "@/components/boffmedia-v2/ui/schematic";
+} from "../ui/sch-kit";
 import { useToolStore } from "../../_store/tool.store";
 import type { DiffEntry } from "../../_lib/types";
 import { BlockThumb, type PreviewRow } from "./BlockThumb";
@@ -36,9 +35,9 @@ function bucketOf(status: SchStatus): SchStatus {
 }
 
 const RING_CLASS: Record<Exclude<SchRing, null>, string> = {
-  safe: "ring-1 ring-success/60",
-  warn: "ring-1 ring-warning/60",
-  bad: "ring-1 ring-danger/60",
+  safe: "ring-1 ring-ok/60",
+  warn: "ring-1 ring-warn/60",
+  bad: "ring-1 ring-bad/60",
 };
 
 /** Suffix-preserving remap: `create:oak_log` → `<targetNs>:oak_log`, if it exists. */
@@ -169,12 +168,14 @@ export function DiffPanel() {
 
   if (!diff) {
     return (
-      <div className="m-4 p-[2.5rem_1.5rem] border-[1.5px] border-dashed border-edge rounded-[var(--radius-lg)] text-center text-ink-dim flex flex-col items-center gap-[0.7rem]">
-        <SchIcon name="layers" size={34} className="text-ink-dim opacity-70" />
-        <h3 className="font-display text-[length:var(--t-lg)] text-ink-muted">{t("diff.emptyTitle")}</h3>
-        <p className="text-[length:var(--t-sm)] max-w-[34ch]">
-          {isAnalyzing ? t("diff.analyzing") : t("diff.emptyPrompt")}
-        </p>
+      <div className="flex-1 grid place-items-center p-6">
+        <div className="text-center text-txt-dim flex flex-col items-center gap-2.5 max-w-[36ch]">
+          <Icon name="layers" size={34} className="text-txt-dim opacity-70" />
+          <h3 className="font-display font-extrabold uppercase tracking-[0.02em] text-[22px] text-txt-muted">
+            {t("diff.emptyTitle")}
+          </h3>
+          <p className="text-[13px]">{isAnalyzing ? t("diff.analyzing") : t("diff.emptyPrompt")}</p>
+        </div>
       </div>
     );
   }
@@ -190,16 +191,17 @@ export function DiffPanel() {
   return (
     <div className="flex h-full flex-col">
       {/* diff bar */}
-      <div className="shrink-0 sticky top-0 z-[8] flex flex-col gap-[0.7rem] p-[0.85rem] border-b border-edge bg-[color-mix(in_srgb,var(--layer-1)_86%,transparent)] backdrop-blur-[8px]">
+      <div className="shrink-0 sticky top-0 z-[5] flex flex-col gap-[11px] py-[13px] px-4 border-b border-line bg-[color-mix(in_srgb,var(--bg)_88%,transparent)] backdrop-blur-[8px]">
         <FilterChips chips={chips} active={filter} onToggle={(k) => setFilter((c) => (c === k ? null : k))} />
         <div className="flex items-center gap-2">
-          <div className="relative flex-1">
-            <SchIcon name="search" size={16} className="absolute left-[0.6rem] top-1/2 -translate-y-1/2 text-ink-dim pointer-events-none" />
+          <div className="flex-1 flex items-center gap-2 px-2.5 h-8 bg-panel border border-solid border-line text-txt-dim focus-within:border-accent-line focus-within:text-txt-muted">
+            <Icon name="search" size={14} className="shrink-0" />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={t("diff.searchPlaceholder")}
-              className="w-full font-body text-[length:var(--t-sm)] text-ink bg-layer-2 border border-edge-strong rounded-[var(--btn-radius)] pl-8 pr-[0.9rem] py-2 transition-[border-color] duration-[var(--dur)] ease-[var(--ease)] placeholder:text-ink-dim hover:border-[color-mix(in_srgb,var(--text)_28%,transparent)] focus:outline-none focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-soft)]"
+              aria-label={t("diff.searchPlaceholder")}
+              className="flex-1 min-w-0 font-mono text-[12px] text-txt bg-transparent border-0 outline-none placeholder:text-txt-dim"
             />
           </div>
           <button
@@ -207,39 +209,36 @@ export function DiffPanel() {
             onClick={() => setShowSafe((v) => !v)}
             disabled={filter !== null}
             className={
-              "shrink-0 py-2 px-[0.7rem] rounded-[var(--radius)] border text-[length:var(--t-xs)] cursor-pointer whitespace-nowrap transition-all duration-[var(--dur)] ease-[var(--ease)] disabled:opacity-40 disabled:cursor-default " +
+              "shrink-0 h-8 px-[11px] border border-solid font-mono text-[11px] cursor-pointer whitespace-nowrap transition-[color,border-color,background] duration-[140ms] disabled:opacity-40 disabled:cursor-default " +
               (showSafe
-                ? "text-[color:var(--accent-bright)] border-[color-mix(in_srgb,var(--accent)_45%,transparent)] bg-[var(--accent-soft)]"
-                : "border-edge-strong bg-layer-2 text-ink-muted hover:text-ink")
+                ? "text-accent-bright border-accent-line bg-accent-soft"
+                : "border-line bg-panel text-txt-muted enabled:hover:text-txt enabled:hover:border-line-2")
             }
           >
             {showSafe ? t("diff.hideSafe") : t("diff.showSafe")}
           </button>
           {unresolved > 0 ? (
-            <BoffButton variant="ghost" size="sm" onClick={() => setSheet(true)} className="shrink-0">
-              <SchIcon name="layers" size={16} />
+            <Button variant="ghost" size="sm" icon="layers" onClick={() => setSheet(true)} className="shrink-0">
               {t("diff.bulkRules")}
-              <span className="ml-0.5 py-[0.05rem] px-[0.4rem] rounded-[var(--radius-pill)] bg-layer-2 text-ink-muted font-mono text-[10px]">
+              <span className="grid place-items-center min-w-[18px] h-4 px-1 bg-accent text-accent-ink font-mono text-[10px] font-semibold">
                 {unresolved}
               </span>
-            </BoffButton>
+            </Button>
           ) : null}
         </div>
       </div>
 
       {/* list */}
-      <div ref={listRef} className="flex-1 min-h-0 overflow-y-auto p-[0.85rem] flex flex-col gap-[1.1rem]">
+      <div ref={listRef} className="flex-1 min-h-0 overflow-y-auto py-3.5 px-4 flex flex-col gap-4">
         {groups.length === 0 ? (
-          <div className="my-4 text-center text-[length:var(--t-sm)] text-ink-dim">
-            {t("diff.noMatching")}
-          </div>
+          <div className="text-center text-[13px] text-txt-dim py-[30px]">{t("diff.noMatching")}</div>
         ) : (
           groups.map((group) => {
             return (
-              <section key={group.status} className="flex flex-col gap-[0.5rem]">
-                <div className="flex items-center gap-2 font-mono text-[10px] tracking-[0.12em] uppercase text-ink-dim font-bold">
+              <section key={group.status} className="flex flex-col gap-[7px]">
+                <div className="flex items-center gap-2 font-mono text-[10.5px] tracking-[0.12em] uppercase text-txt-muted">
                   {t(STATUS_KEY[group.status])}
-                  <span className="py-[0.05rem] px-[0.4rem] rounded-[var(--radius-pill)] bg-layer-2 text-ink-muted">
+                  <span className="grid place-items-center min-w-[18px] h-4 px-1 bg-panel-2 text-txt-dim font-semibold">
                     {group.entries.length}
                   </span>
                 </div>

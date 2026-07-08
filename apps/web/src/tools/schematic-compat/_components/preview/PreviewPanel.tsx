@@ -4,7 +4,8 @@ import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import { SchIcon, AxisSlider, type SchStatus } from "@/components/boffmedia-v2/ui/schematic";
+import { Icon } from "@/components/boffmedia/primitives";
+import { AxisSlider, type SchStatus } from "../ui/sch-kit";
 import { useToolStore } from "../../_store/tool.store";
 import type { PreviewMode } from "../../_store/tool.store";
 import { convertedPlan, resultPlan } from "./previewPlan";
@@ -21,7 +22,7 @@ const STATUS_KEY: Record<SchStatus, string> = {
 function Loading3D() {
   const t = useTranslations("games.minecraft.schematicCompat");
   return (
-    <div className="absolute inset-0 flex items-center justify-center text-[length:var(--t-xs)] text-ink-dim">
+    <div className="absolute inset-0 flex items-center justify-center font-mono text-[11px] text-txt-dim">
       {t("preview.loading3d")}
     </div>
   );
@@ -56,10 +57,8 @@ function PreviewButton({
       disabled={disabled}
       title={title}
       className={cn(
-        "inline-flex items-center gap-[0.3rem] py-[0.28rem] px-[0.5rem] rounded-[var(--radius)] border border-transparent bg-transparent text-[11px] cursor-pointer transition-all duration-[var(--dur)] ease-[var(--ease)] disabled:opacity-40",
-        on
-          ? "text-[color:var(--accent-bright)] bg-[var(--accent-soft)]"
-          : "text-ink-dim hover:text-ink hover:bg-[color-mix(in_srgb,var(--text)_6%,transparent)]",
+        "inline-flex items-center gap-1.5 py-[5px] px-[9px] border border-solid border-transparent bg-transparent font-mono text-[11px] cursor-pointer transition-colors duration-[140ms] disabled:opacity-40",
+        on ? "text-accent-bright bg-accent-soft border-accent-line" : "text-txt-dim hover:text-txt-muted",
       )}
     >
       {children}
@@ -76,11 +75,7 @@ function Inspector() {
   const previewMode = useToolStore((s) => s.previewMode);
 
   if (!selectedBlockId) {
-    return (
-      <p className="text-[length:var(--t-xs)] text-ink-dim">
-        {t("preview.inspectorEmpty")}
-      </p>
-    );
+    return <p className="text-[12px] text-txt-dim leading-[1.5] m-0">{t("preview.inspectorEmpty")}</p>;
   }
 
   const group = blockPositions.find((g) => g.block.id === selectedBlockId);
@@ -91,35 +86,35 @@ function Inspector() {
   // In converted/result mode, surface the block this is being converted into.
   const plan =
     (previewMode === "converted" || previewMode === "result") && diff
-      ? (previewMode === "converted"
-          ? convertedPlan(selectedBlockId, diffEntry?.status, diffEntry?.autoCandidate?.id, resolutions[selectedBlockId]?.targetId)
-          : resultPlan(selectedBlockId, diffEntry?.status, diffEntry?.autoCandidate?.id, resolutions[selectedBlockId]?.targetId))
+      ? previewMode === "converted"
+        ? convertedPlan(selectedBlockId, diffEntry?.status, diffEntry?.autoCandidate?.id, resolutions[selectedBlockId]?.targetId)
+        : resultPlan(selectedBlockId, diffEntry?.status, diffEntry?.autoCandidate?.id, resolutions[selectedBlockId]?.targetId)
       : null;
   const convertsTo = plan && plan.textureId !== selectedBlockId ? plan.textureId : null;
 
   return (
     <>
-      <div className="font-mono text-[length:var(--t-xs)] font-bold text-ink mb-2 break-all">{selectedBlockId}</div>
+      <div className="font-mono text-[12.5px] font-semibold text-txt mb-2 break-all">{selectedBlockId}</div>
       {convertsTo && (
-        <div className="flex items-center gap-[0.35rem] font-mono text-[11px] mb-2 break-all">
-          <SchIcon name="arrow" size={13} className="shrink-0 text-[color:var(--accent-bright)]" />
-          <span className="text-[color:var(--accent-bright)]">{convertsTo}</span>
+        <div className="flex items-center gap-1.5 font-mono text-[11px] mb-2 break-all">
+          <Icon name="arrow" size={13} className="shrink-0 text-accent-bright" />
+          <span className="text-accent-bright">{convertsTo}</span>
         </div>
       )}
       {stateEntries.length > 0 && (
-        <div className="flex flex-col gap-[0.15rem] mb-[0.4rem]">
+        <div className="grid gap-[3px] mb-1.5">
           {stateEntries.map(([k, v]) => (
-            <div key={k} className="flex justify-between text-[11px]">
-              <span className="text-ink-muted">{k}</span>
-              <span className="font-mono text-ink-dim">{v}</span>
+            <div key={k} className="flex justify-between font-mono text-[11px]">
+              <span className="text-txt-muted">{k}</span>
+              <span className="text-txt-dim">{v}</span>
             </div>
           ))}
         </div>
       )}
       {diffEntry && (
-        <p className="text-[11px] text-ink-dim">
+        <p className="text-[11.5px] text-txt-dim m-0">
           {t("diff.instances", { count: diffEntry.instanceCount })} ·{" "}
-          <span className="capitalize">{t(STATUS_KEY[diffEntry.status])}</span>
+          <span className="capitalize font-semibold text-txt-muted">{t(STATUS_KEY[diffEntry.status])}</span>
         </p>
       )}
     </>
@@ -143,17 +138,15 @@ function ModeSwitch({
       onClick={() => onChange(value)}
       title={disabled ? t("preview.modeDisabled") : undefined}
       className={cn(
-        "py-[0.25rem] px-[0.55rem] rounded-[calc(var(--radius)-2px)] text-[11px] font-medium cursor-pointer transition-all duration-[var(--dur)] ease-[var(--ease)] disabled:opacity-40 disabled:cursor-not-allowed",
-        mode === value
-          ? "bg-[var(--accent-soft)] text-[color:var(--accent-bright)]"
-          : "text-ink-dim hover:text-ink",
+        "py-1 px-2 font-mono text-[11px] cursor-pointer transition-colors duration-[140ms] disabled:opacity-40 disabled:cursor-not-allowed",
+        mode === value ? "bg-accent-soft text-accent-bright" : "text-txt-dim hover:text-txt",
       )}
     >
       {label}
     </button>
   );
   return (
-    <div className="inline-flex items-center gap-[0.15rem] p-[0.15rem] rounded-[var(--radius)] border border-edge bg-[color-mix(in_srgb,var(--text)_4%,transparent)]">
+    <div className="inline-flex items-center gap-0.5 p-0.5 border border-line bg-base">
       {segment("source", t("preview.modeSource"))}
       {segment("result", t("preview.modeResult"), !convertedEnabled)}
       {segment("converted", t("preview.modeDiff"), !convertedEnabled)}
@@ -163,10 +156,10 @@ function ModeSwitch({
 
 function LegendDot({ color, label, faded }: { color?: string; label: string; faded?: boolean }) {
   return (
-    <span className={cn("inline-flex items-center gap-[0.3rem]", faded && "opacity-60")}>
+    <span className={cn("inline-flex items-center gap-1.5", faded && "opacity-60")}>
       <span
-        className="inline-block w-[0.5rem] h-[0.5rem] rounded-full"
-        style={color ? { background: color } : { background: "var(--ink-dim)", opacity: 0.4 }}
+        className="inline-block w-2 h-2 rounded-full"
+        style={color ? { background: color } : { background: "var(--dim)", opacity: 0.4 }}
       />
       {label}
     </span>
@@ -204,18 +197,14 @@ export function PreviewPanel() {
   const resultView = previewMode === "result" && !!diff;
 
   return (
-    <div ref={rootRef} className="flex h-full flex-col bg-layer-1">
+    <div ref={rootRef} className="flex h-full flex-col bg-base-2">
       {/* header */}
-      <div className="shrink-0 flex items-center gap-2 py-[0.7rem] px-[0.85rem] border-b border-edge">
-        <span className="font-mono text-[10px] tracking-[0.14em] uppercase text-ink-muted font-bold">{t("preview.title")}</span>
+      <div className="shrink-0 flex items-center gap-1.5 px-3 h-[46px] border-b border-line">
+        <span className="font-mono text-[10.5px] tracking-[0.14em] uppercase text-txt-muted">{t("preview.title")}</span>
         <ModeSwitch mode={previewMode} convertedEnabled={!!diff} onChange={setPreviewMode} />
         <div className="flex-1" />
         {resultView && (
-          <PreviewButton
-            on={hideUnchanged}
-            onClick={() => setHideUnchanged(!hideUnchanged)}
-            title={t("preview.onlyChangesHint")}
-          >
+          <PreviewButton on={hideUnchanged} onClick={() => setHideUnchanged(!hideUnchanged)} title={t("preview.onlyChangesHint")}>
             {t("preview.onlyChanges")}
           </PreviewButton>
         )}
@@ -224,61 +213,59 @@ export function PreviewPanel() {
           disabled={!schematic}
           title={isFullscreen ? t("preview.exitFullscreen") : t("preview.fullscreen")}
         >
-          <SchIcon name={isFullscreen ? "minimize" : "maximize"} size={16} />
+          <Icon name={isFullscreen ? "exitFullscreen" : "fullscreen"} size={15} />
         </PreviewButton>
       </div>
 
       {/* stage */}
       <div
-        className="relative flex-1 min-h-0 overflow-hidden"
-        style={{
-          background:
-            "radial-gradient(120% 90% at 50% 0%, color-mix(in srgb, var(--accent) 8%, transparent), transparent 60%), var(--bg)",
-        }}
+        className="relative flex-1 min-h-[200px] overflow-hidden"
+        style={{ background: "radial-gradient(120% 120% at 50% 30%, var(--panel) 0%, var(--bg) 80%)" }}
       >
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: "radial-gradient(var(--grid-dot) 1px, transparent 1px)",
+            backgroundImage: "linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px)",
             backgroundSize: "26px 26px",
+            opacity: 0.35,
+            maskImage: "radial-gradient(120% 90% at 50% 40%, #000 30%, transparent 85%)",
+            WebkitMaskImage: "radial-gradient(120% 90% at 50% 40%, #000 30%, transparent 85%)",
           }}
         />
         {schematic ? (
           <SchematicViewer3D />
         ) : (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-[0.8rem] text-center p-6">
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-center p-6">
             <div
-              className="grid place-items-center"
-              style={{ filter: "drop-shadow(0 12px 30px color-mix(in srgb, var(--accent) 30%, transparent))" }}
+              className="grid place-items-center motion-safe:animate-[bm-bob_5s_ease-in-out_infinite]"
+              style={{ filter: "drop-shadow(0 8px 24px color-mix(in srgb, var(--accent) 30%, transparent))" }}
             >
-              <svg width="118" height="118" viewBox="0 0 120 120" fill="none">
+              <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
                 <g stroke="var(--accent-bright)" strokeWidth="1.5" strokeLinejoin="round">
-                  <path d="M60 16 L100 38 L60 60 L20 38 Z" fill="color-mix(in srgb, var(--accent) 26%, transparent)" />
-                  <path d="M20 38 L60 60 L60 104 L20 82 Z" fill="color-mix(in srgb, var(--accent) 14%, transparent)" />
-                  <path d="M100 38 L60 60 L60 104 L100 82 Z" fill="color-mix(in srgb, var(--accent) 8%, transparent)" />
+                  <path d="M60 16 L100 38 L60 60 L20 38 Z" fill="color-mix(in srgb, var(--accent) 30%, transparent)" />
+                  <path d="M20 38 L60 60 L60 104 L20 82 Z" fill="color-mix(in srgb, var(--accent) 15%, transparent)" />
+                  <path d="M100 38 L60 60 L60 104 L100 82 Z" fill="color-mix(in srgb, var(--accent) 9%, transparent)" />
                 </g>
-                <g stroke="color-mix(in srgb, var(--accent-bright) 50%, transparent)" strokeWidth="0.75">
+                <g stroke="color-mix(in srgb, var(--accent-bright) 45%, transparent)" strokeWidth="0.75">
                   <path d="M40 27 L80 49 M80 27 L40 49" />
                 </g>
               </svg>
             </div>
-            <span className="font-mono text-[10px] tracking-[0.1em] uppercase text-ink-dim">
-              {t("preview.emptyCaption")}
-            </span>
+            <span className="font-mono text-[10px] tracking-[0.1em] uppercase text-txt-dim">{t("preview.emptyCaption")}</span>
           </div>
         )}
         {convertedView ? (
-          <div className="absolute left-1/2 bottom-[0.7rem] -translate-x-1/2 flex items-center gap-[0.7rem] font-mono text-[10px] text-ink-dim whitespace-nowrap py-[0.3rem] px-[0.7rem] rounded-[var(--radius-pill)] bg-[color-mix(in_srgb,var(--layer-1)_70%,transparent)] border border-edge">
-            <LegendDot color="#22c55e" label={t("preview.legendModified")} />
-            <LegendDot color="#ef4444" label={t("preview.legendUnresolved")} />
+          <div className="absolute left-1/2 bottom-2.5 -translate-x-1/2 flex items-center gap-2.5 font-mono text-[10px] text-txt-dim whitespace-nowrap py-1 px-2.5 bg-[color-mix(in_srgb,var(--panel)_70%,transparent)] border border-line">
+            <LegendDot color="var(--ok)" label={t("preview.legendModified")} />
+            <LegendDot color="var(--bad)" label={t("preview.legendUnresolved")} />
             <LegendDot label={t("preview.legendUnchanged")} faded />
           </div>
         ) : resultView ? (
-          <div className="absolute left-1/2 bottom-[0.7rem] -translate-x-1/2 font-mono text-[10px] text-ink-dim whitespace-nowrap py-[0.25rem] px-[0.6rem] rounded-[var(--radius-pill)] bg-[color-mix(in_srgb,var(--layer-1)_70%,transparent)] border border-edge">
+          <div className="absolute left-1/2 bottom-2.5 -translate-x-1/2 font-mono text-[10px] text-txt-dim whitespace-nowrap py-1 px-2.5 bg-[color-mix(in_srgb,var(--panel)_70%,transparent)] border border-line">
             {t("preview.resultCaption")}
           </div>
         ) : (
-          <div className="absolute left-1/2 bottom-[0.7rem] -translate-x-1/2 font-mono text-[10px] text-ink-dim whitespace-nowrap py-[0.25rem] px-[0.6rem] rounded-[var(--radius-pill)] bg-[color-mix(in_srgb,var(--layer-1)_70%,transparent)] border border-edge">
+          <div className="absolute left-1/2 bottom-2.5 -translate-x-1/2 font-mono text-[10px] text-txt-dim whitespace-nowrap py-1 px-2.5 bg-[color-mix(in_srgb,var(--panel)_70%,transparent)] border border-line">
             {selectedBlockId ? t("preview.selectedHighlighted") : t("preview.clickToInspect")}
           </div>
         )}
@@ -288,7 +275,7 @@ export function PreviewPanel() {
       <AxisSlider axis="Y" value={layerY} max={maxLayerY} onChange={setLayerY} />
 
       {/* inspector */}
-      <div className="shrink-0 border-t border-edge py-[0.7rem] px-[0.85rem] min-h-[64px]">
+      <div className="shrink-0 border-t border-line py-3 px-3 min-h-[92px]">
         <Inspector />
       </div>
     </div>
