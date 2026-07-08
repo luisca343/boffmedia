@@ -38,7 +38,7 @@ export const pokemon: GameEntry = {
       },
       tools: [
         { key: "meta",    nameKey: "games.pokemon.tools.meta",    href: "/pokemon/vgc/meta",    sidebarIcon: "chart", bleed: true },
-        { key: "speed",   nameKey: "games.pokemon.tools.speed",   href: "/pokemon/vgc/speed",   sidebarIcon: "bolt" },
+        { key: "speed",   nameKey: "games.pokemon.tools.speed",   href: "/pokemon/vgc/speed",   sidebarIcon: "bolt", bleed: true },
         { key: "tracker", nameKey: "games.pokemon.tools.tracker", href: "/pokemon/vgc/tracker", sidebarIcon: "book", bleed: true },
         // Not in the sidebar or landing yet (v3 migration pending) — the entry
         // exists so the shell knows the route renders full-bleed.
@@ -55,16 +55,19 @@ export const pokemon: GameEntry = {
         fallbackIcon: "cards",
         fallbackIconColor: "text-yellow-400",
         color: "from-yellow-300 to-yellow-500",
-        features: ["gallery", "cardList", "battles"],
+        features: ["cardList", "collection", "packs"],
         featured: true,
         isNew: true,
         popularity: "high",
         heroImage: "/img/games/tcgpocket/hero.webp",
       },
+      // Full-bleed v3 tool — the whole subtree renders inside the section shell;
+      // the rail entries mirror the app's internal tabs (Panel · Cartas · Colección · Sobres).
       tools: [
-        { key: "gallery", nameKey: "games.pokemon.tools.gallery", href: "/pokemon/tcgpocket/galeria", sidebarIcon: "cards" },
-        { key: "cardList", nameKey: "games.pokemon.tools.cardList", href: "/pokemon/tcgpocket/cartas", sidebarIcon: "zap" },
-        { key: "battles", nameKey: "games.pokemon.tools.battles", href: "/pokemon/tcgpocket/combates", sidebarIcon: "sword" },
+        { key: "tcgPanel",   nameKey: "games.pokemon.tools.tcgPanel",   href: "/pokemon/tcgpocket",          sidebarIcon: "home",  bleed: true },
+        { key: "cardList",   nameKey: "games.pokemon.tools.cardList",   href: "/pokemon/tcgpocket/cartas",    sidebarIcon: "cards", bleed: true },
+        { key: "collection", nameKey: "games.pokemon.tools.collection", href: "/pokemon/tcgpocket/coleccion", sidebarIcon: "grid",  bleed: true },
+        { key: "packs",      nameKey: "games.pokemon.tools.packs",      href: "/pokemon/tcgpocket/sobres",    sidebarIcon: "inbox", bleed: true },
       ],
     },
     {

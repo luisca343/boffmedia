@@ -49,9 +49,9 @@
         "title": "TCG Pocket",
         "description": "Colección, galerías y guía para TCG Pocket",
         "features": {
-          "gallery": "Galería",
-          "cardList": "Lista de Cartas",
-          "battles": "Combates"
+          "cardList": "Cartas",
+          "collection": "Colección",
+          "packs": "Sobres"
         }
       },
       "pmdsky": {
