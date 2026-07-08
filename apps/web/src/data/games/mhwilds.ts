@@ -62,14 +62,22 @@ export const mhwilds: GameEntry = {
             popularity: "high",
           },
         },
-        // Bestiary: /mhwilds/monsters has no route yet (Phase 4). Hidden from
-        // the sidebar and the landing grid until the page exists.
         {
           key: "bestiary",
           nameKey: "games.mhwilds.tools.bestiary",
           href: "/mhwilds/monsters",
           sidebarIcon: "paw",
-          showInSidebar: false,
+          bleed: true,
+          landing: {
+            icon: "/img/games/mhwilds/icon.webp",
+            fallbackIcon: "paw",
+            fallbackIconColor: "text-warning-hover",
+            color: "from-warning-hover to-rose-600",
+            features: ["weaknesses", "drops", "locations"],
+            featured: false,
+            isNew: true,
+            popularity: "medium",
+          },
         },
       ],
     },

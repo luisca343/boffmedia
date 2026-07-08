@@ -63,6 +63,15 @@ export class MhwildsFacadeService {
     }
   }
 
+  async getMonsters(locale: string = 'es'): Promise<any[]> {
+    try {
+      const result = await this.mhwildsDataService.getMonsters(locale);
+      return result.data;
+    } catch (error: any) {
+      throw new Error(`Failed to get monsters: ${error.message}`);
+    }
+  }
+
   // ==================== PROCESSED DATA OPERATIONS ====================
 
   async getAllCharmRanks(locale: string = 'es'): Promise<CharmRankResult[]> {
