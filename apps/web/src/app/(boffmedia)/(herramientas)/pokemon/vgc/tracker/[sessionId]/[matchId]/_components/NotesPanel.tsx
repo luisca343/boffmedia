@@ -2,6 +2,7 @@
 
 import { useRef, KeyboardEvent, forwardRef, useImperativeHandle } from 'react';
 import { useTranslations } from 'next-intl';
+import { Icon } from '@/components/boffmedia/primitives/icon';
 import { MatchNote } from '@/features/vgc-tracker/types';
 
 interface Props {
@@ -40,45 +41,55 @@ export const NotesPanel = forwardRef<NotesPanelHandle, Props>(function NotesPane
   };
 
   return (
-    <div className="flex-1 min-h-0 bg-layer-1 flex flex-col">
+    <div className="flex min-h-0 flex-1 flex-col border border-solid border-line bg-panel">
       {/* Input row */}
-      <div className="flex items-center gap-2 px-4 py-2 border-b border-edge shrink-0">
-        <span className="text-xs text-ink-muted font-mono shrink-0 select-none">
+      <div className="flex shrink-0 items-center gap-2 border-b border-solid border-line px-[14px] py-[9px]">
+        <span className="shrink-0 select-none font-mono text-[10px] uppercase tracking-[0.1em] text-txt-dim">
           {phase === 'live' ? (
-            <span className="flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse inline-block" />
+            <span className="flex items-center gap-[6px] text-ok">
+              <span className="inline-block h-[6px] w-[6px] rounded-full bg-ok animate-pulse motion-reduce:animate-none" />
               {t('indicators.live')}
             </span>
           ) : (
-            <span className="text-ink-dim">{t('indicators.post')}</span>
+            <span className="text-signal">{t('indicators.post')}</span>
           )}
         </span>
         <input
           ref={inputRef}
           onKeyDown={handleKeyDown}
           placeholder={t('placeholders.addNote')}
-          className="flex-1 bg-transparent text-ink placeholder:text-ink-dim text-sm focus:outline-none"
+          className="flex-1 bg-transparent font-body text-[13px] text-txt outline-none placeholder:text-txt-dim"
           autoComplete="off"
           spellCheck={false}
         />
-        <kbd className="hidden sm:inline text-[10px] text-ink-dim border border-edge rounded px-1 py-0.5 font-mono select-none">
-          N
-        </kbd>
+        <kbd className="hidden select-none border border-solid border-line-2 px-1 py-px font-mono text-[10px] text-txt-dim sm:inline">N</kbd>
       </div>
 
       {/* Notes list */}
       {notes.length > 0 && (
-        <div className="flex-1 overflow-y-auto px-4 py-2 flex flex-col gap-1.5">
+        <div className="flex flex-1 flex-col gap-[9px] overflow-y-auto px-[14px] py-[11px]">
           {[...notes].reverse().map((note) => (
-            <div key={note.id} className="flex items-start gap-2 text-sm">
-              <span
-                className={`shrink-0 text-[10px] font-mono mt-0.5 ${
-                  note.phase === 'live' ? 'text-red-400' : 'text-ink-muted'
-                }`}
-              >
-                {note.phase === 'live' ? '●' : '○'} {formatTime(note.createdAt)}
+            <div
+              key={note.id}
+              className="grid gap-[5px] border border-solid border-line border-l-[3px] bg-base px-[11px] py-[9px]"
+              style={{ borderLeftColor: note.phase === 'live' ? 'var(--ok)' : note.phase === 'series' ? 'var(--warn)' : 'var(--info)' }}
+            >
+              <span className="inline-flex items-center gap-2">
+                <span
+                  className="justify-self-start px-[6px] py-[3px] font-mono text-[8.5px] font-semibold uppercase leading-none tracking-[0.12em]"
+                  style={
+                    note.phase === 'live'
+                      ? { color: 'var(--ok)', background: 'var(--ok-soft)' }
+                      : note.phase === 'series'
+                        ? { color: 'var(--warn)', background: 'var(--warn-soft)' }
+                        : { color: 'var(--info)', background: 'var(--info-soft)' }
+                  }
+                >
+                  {note.phase === 'live' ? t('notePhase.live') : note.phase === 'series' ? t('notePhase.series') : t('notePhase.post')}
+                </span>
+                <span className="font-mono text-[10px] text-txt-dim">{formatTime(note.createdAt)}</span>
               </span>
-              <span className="text-ink leading-snug">{note.text}</span>
+              <p className="m-0 font-body text-[12.5px] leading-[1.55] text-txt-muted">{note.text}</p>
             </div>
           ))}
         </div>

@@ -1,0 +1,17 @@
+// Shared data-tool kit (dk-*): the common chassis for VGC Meta, Torneos and the
+// VGC Tracker. Import from this barrel:
+//   import { DkApp, DkBar, DkStat, DkTrend } from "@/components/boffmedia/ui/tools/datakit"
+export * from "./utils"
+export * from "./hooks"
+export * from "./DkSprite"
+export * from "./DkShell"
+export * from "./DkControls"
+export * from "./DkSelect"
+export * from "./DkStat"
+export * from "./DkCharts"
+export * from "./DkFeedback"
+export * from "./DkTable"
+export * from "./DkBarList"
+export * from "./DkType"
+export * from "./DkTeam"
+export * from "./DkCopy"

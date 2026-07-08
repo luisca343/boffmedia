@@ -46,11 +46,25 @@
         "lv": "Nv.",
         "teraNone": "Ninguno",
         "teraTypes": {
-          "Normal": "Normal", "Fire": "Fuego", "Water": "Agua", "Electric": "Eléctrico",
-          "Grass": "Planta", "Ice": "Hielo", "Fighting": "Lucha", "Poison": "Veneno",
-          "Ground": "Tierra", "Flying": "Volador", "Psychic": "Psíquico", "Bug": "Bicho",
-          "Rock": "Roca", "Ghost": "Fantasma", "Dragon": "Dragón", "Dark": "Siniestro",
-          "Steel": "Acero", "Fairy": "Hada", "Stellar": "Astral"
+          "Normal": "Normal",
+          "Fire": "Fuego",
+          "Water": "Agua",
+          "Electric": "Eléctrico",
+          "Grass": "Planta",
+          "Ice": "Hielo",
+          "Fighting": "Lucha",
+          "Poison": "Veneno",
+          "Ground": "Tierra",
+          "Flying": "Volador",
+          "Psychic": "Psíquico",
+          "Bug": "Bicho",
+          "Rock": "Roca",
+          "Ghost": "Fantasma",
+          "Dragon": "Dragón",
+          "Dark": "Siniestro",
+          "Steel": "Acero",
+          "Fairy": "Hada",
+          "Stellar": "Astral"
         },
         "statuses": {
           "Healthy": "Saludable",
@@ -425,7 +439,8 @@
         "exportSession": "Exportar sesión",
         "exportAll": "Exportar todo",
         "importData": "Importar datos",
-        "restoreVersion": "Restaurar"
+        "restoreVersion": "Restaurar",
+        "export": "Exportar"
       },
       "labels": {
         "sessionLabel": "Etiqueta de sesión",
@@ -493,14 +508,21 @@
       "result": {
         "winShort": "V",
         "drawShort": "E",
-        "lossShort": "D"
+        "lossShort": "D",
+        "win": "Victoria",
+        "loss": "Derrota",
+        "draw": "Empate",
+        "none": "Sin resultado"
       },
       "empty": {
         "noSessions": "Sin sesiones aún",
         "noSessionsHint": "Importa un preset de equipo y luego inicia una sesión.",
         "noMatches": "Sin combates aún — ¡empieza uno!",
         "noPresets": "Sin presets aún. Importa un paste de Showdown para empezar.",
-        "noArchivedSessions": "Sin sesiones archivadas"
+        "noArchivedSessions": "Sin sesiones archivadas",
+        "noMatch": "Ninguna sesión coincide con «{q}».",
+        "noSeriesTitle": "Sin series",
+        "noMatchesTitle": "Sin combates"
       },
       "archive": {
         "showArchived": "Mostrar archivadas ({count})",
@@ -509,7 +531,8 @@
       },
       "duplicate": {
         "title": "Duplicar sesión",
-        "newLabel": "Nueva etiqueta"
+        "newLabel": "Nueva etiqueta",
+        "inherits": "Hereda"
       },
       "exportImport": {
         "title": "Datos",
@@ -526,7 +549,9 @@
         "versionN": "v{n}",
         "currentTag": "actual",
         "changeTitle": "Cambiar preset activo",
-        "activeLabel": "Preset activo"
+        "activeLabel": "Preset activo",
+        "backToList": "Volver a la lista",
+        "noPreviousVersions": "Sin versiones anteriores."
       },
       "sessionType": {
         "ladder": "Clasificatoria",
@@ -539,7 +564,9 @@
         "noSeries": "Sin series aún — ¡empieza una!",
         "round": "R{n}",
         "allRounds": "Todas las rondas",
-        "seriesNumber": "Serie #{n}"
+        "seriesNumber": "Serie #{n}",
+        "seriesUnit": "series",
+        "filterByRound": "Filtrar por ronda"
       },
       "errors": {
         "presetNameRequired": "Dale un nombre a este preset.",
@@ -569,7 +596,10 @@
         "gameAbbr": "P{n}",
         "endGame": "Terminar partida {n}",
         "noGameData": "Sin datos de partida.",
-        "previousGames": "Partidas anteriores"
+        "previousGames": "Partidas anteriores",
+        "matchTitle": "Combate",
+        "matchNotFound": "Combate no encontrado.",
+        "seriesNotFound": "Serie no encontrada."
       },
       "notes": {
         "gameTab": "Notas de partida",
@@ -598,7 +628,8 @@
       "sessionStats": {
         "tabs": {
           "matches": "Partidas",
-          "stats": "Estadísticas"
+          "stats": "Estadísticas",
+          "aria": "Vista de sesión"
         },
         "kpi": {
           "played": "Jugadas",
@@ -631,7 +662,9 @@
             "preview": "Preview rival",
             "leads": "Leads rivales",
             "backs": "Backs rivales"
-          }
+          },
+          "title": "Uso de Pokémon",
+          "empty": "Sin datos suficientes."
         },
         "leadPairs": {
           "title": "Parejas de leads",
@@ -680,7 +713,86 @@
         "archetypeBreakdown": {
           "title": "vs Arquetipo",
           "archetype": "Arquetipo"
+        },
+        "pairs": {
+          "title": "Parejas de lead",
+          "mine": "Mías",
+          "rivals": "Rivales",
+          "empty": "Sin datos."
+        },
+        "archetype": {
+          "title": "Por arquetipo rival",
+          "empty": "Sin datos de arquetipos aún."
+        },
+        "matchup": {
+          "title": "Matriz de matchups",
+          "hint": "win rate al enfrentarlos",
+          "empty": "Sin datos suficientes."
+        },
+        "activity": {
+          "title": "Actividad",
+          "hint": "partidas por hora"
+        },
+        "timeOfDay": {
+          "title": "Por momento del día",
+          "morning": "Mañana",
+          "afternoon": "Tarde",
+          "evening": "Noche",
+          "night": "Madrugada",
+          "empty": "Sin datos."
+        },
+        "days": {
+          "0": "Dom",
+          "1": "Lun",
+          "2": "Mar",
+          "3": "Mié",
+          "4": "Jue",
+          "5": "Vie",
+          "6": "Sáb"
         }
+      },
+      "filters": {
+        "sessionType": "Tipo de sesión",
+        "all": "Todas",
+        "ladder": "Ladder",
+        "tournaments": "Torneos",
+        "clear": "Limpiar filtros"
+      },
+      "search": {
+        "session": "Buscar sesión…"
+      },
+      "career": {
+        "sessions": "Sesiones",
+        "record": "Récord total",
+        "winRate": "Win rate",
+        "bestElo": "Mejor ELO"
+      },
+      "nav": {
+        "backToSessions": "Volver a sesiones",
+        "backToSession": "Volver a la sesión"
+      },
+      "sessionSub": {
+        "record": "{played} partidas · {wins}-{losses}"
+      },
+      "roles": {
+        "lead1": "Lead 1",
+        "lead2": "Lead 2",
+        "back1": "Back 1",
+        "back2": "Back 2",
+        "unknown": "Banca"
+      },
+      "notePhase": {
+        "live": "en vivo",
+        "post": "post",
+        "series": "serie"
+      },
+      "sync": {
+        "conflict": "Conflicto de sync",
+        "conflictHint": "Otra pestaña o dispositivo tiene datos más recientes.",
+        "refreshFromCloud": "Actualizar desde la nube",
+        "synced": "Sincronizado",
+        "syncing": "Sincronizando",
+        "error": "Error de sync"
       }
     },
     "meta": {
@@ -697,7 +809,9 @@
         "month": "Mes",
         "monthPlaceholder": "Último",
         "cutoff": "ELO mín.",
-        "load": "Aplicar"
+        "load": "Aplicar",
+        "regulation": "Regulación",
+        "tournament": "Torneo"
       },
       "options": "Opciones",
       "sidebar": {
@@ -730,14 +844,26 @@
         "battles": "{count} combates",
         "other": "Otros",
         "usagePercent": "{percent}% de uso",
-        "featuringTeams": "Equipos con este Pok\u00e9mon",
-        "teamsLoading": "Cargando equipos\u2026",
+        "featuringTeams": "Equipos con este Pokémon",
+        "teamsLoading": "Cargando equipos…",
         "copyPaste": "Copiar paste",
-        "copied": "\u00a1Copiado!",
-        "rentalCode": "C\u00f3digo de alquiler"
+        "copied": "¡Copiado!",
+        "rentalCode": "Código de alquiler",
+        "rank": "Puesto",
+        "usage": "Uso",
+        "appearances": "Apariciones",
+        "topN": "top {n}",
+        "noData": "—",
+        "abilitiesTeras": "Habilidades y Teratipos",
+        "clickToJump": "clic para saltar",
+        "teamsWith": "Equipos con {name}",
+        "tournamentResults": "resultados de torneo",
+        "noTeams": "Sin equipos registrados para esta especie.",
+        "emptyTitle": "Elige un Pokémon",
+        "emptyLead": "Selecciona una especie del ranking para ver su detalle competitivo: movimientos, objetos, repartos y equipos."
       },
       "standings": {
-        "loading": "Cargando resultados\u2026",
+        "loading": "Cargando resultados…",
         "empty": "No se encontraron jugadores.",
         "col": {
           "rank": "#",
@@ -745,10 +871,13 @@
           "record": "Registro",
           "team": "Equipo"
         },
-        "teamLoading": "Cargando\u2026",
-        "copyPaste": "Copiar Pok\u00e9paste",
-        "copied": "\u00a1Copiado!",
-        "tera": "Tera: {type}"
+        "teamLoading": "Cargando…",
+        "copyPaste": "Copiar Poképaste",
+        "copied": "¡Copiado!",
+        "tera": "Tera: {type}",
+        "search": "Buscar jugador…",
+        "count": "{count} jugadores",
+        "teamEmpty": "Equipo no disponible para este jugador."
       },
       "divergence": {
         "loading": "Cargando datos de divergencia…",
@@ -758,20 +887,63 @@
         "allElo": "Todos los ELO",
         "col": {
           "pokemon": "Pokémon",
-          "ladder": "Escalera %",
-          "tournament": "Torneo %",
+          "ladder": "Ladder",
+          "tournament": "Torneo",
           "delta": "|Δ|",
           "badge": "Insignia"
         },
         "badges": {
-          "ladderTrap": "Trampa de Escalera",
+          "ladderTrap": "Trampa de ladder",
           "ladderTrapTitle": "Alto uso en escalera, bajo en torneos — puede estar sobrevalorado en top-cut",
-          "tournamentStaple": "Pilar de Torneo",
+          "tournamentStaple": "Pilar de torneo",
           "tournamentStapleTitle": "Bajo uso en escalera, alto en torneos — infravalorado en la escalera"
-        }
+        },
+        "emptyTitle": "Sin datos de divergencia",
+        "note": "Compara el uso en el <b>ladder</b> ({format} · {month} · 1630+ ELO) con el uso en <b>torneos</b>. Δ positivo = más usado en torneo."
       },
       "refresh": "Actualizar",
-      "footer": "Datos de Smogon Stats · Actualización mensual · Corte por defecto: 1760"
+      "footer": "Datos de Smogon Stats · Actualización mensual · Corte por defecto: 1760",
+      "barTitle": "Meta VGC",
+      "barSub": {
+        "ladder": "Ladder · Smogon",
+        "tournament": "Circuito oficial"
+      },
+      "tabs": {
+        "stats": "Ladder",
+        "tournament": "Torneos",
+        "combined": "Todos los torneos",
+        "aggregate": "Agregado",
+        "players": "Jugadores",
+        "divergence": "Divergencia",
+        "championsPreviewNotice": "Datos de vista previa desde VGCPastes; el uso es orientativo."
+      },
+      "cutoff": {
+        "all": "Todos los ELO"
+      },
+      "chip": {
+        "battles": "{count} batallas",
+        "teams": "{count} equipos"
+      },
+      "aria": {
+        "source": "Fuente de datos",
+        "tournamentView": "Vista de torneo",
+        "usageRanking": "Ranking de uso",
+        "standings": "Clasificación del torneo",
+        "divergence": "Divergencia escalera–torneo"
+      },
+      "list": {
+        "appearances": "{count} apariciones"
+      },
+      "empty": {
+        "noMatch": "Ningún Pokémon coincide con «{q}».",
+        "noPlayer": "Ningún jugador coincide con «{q}».",
+        "clear": "Limpiar búsqueda"
+      },
+      "sub": {
+        "combined": "Combinado · {count} torneos",
+        "tourWithPlayers": "{name} · {count} jug.",
+        "formatNote": "Regulación actual. Permite dos Pokémon restringidos por equipo."
+      }
     }
   }
 }

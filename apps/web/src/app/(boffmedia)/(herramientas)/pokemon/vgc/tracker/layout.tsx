@@ -4,11 +4,9 @@ import { SyncStatusBadge } from './_components/SyncStatusBadge';
 export default function TrackerLayout({ children }: { children: React.ReactNode }) {
   return (
     <TrackerSyncProvider>
-      <div className="relative">
-        <div className="absolute top-2 right-2 z-10">
-          <SyncStatusBadge />
-        </div>
-        {children}
+      {children}
+      <div className="pointer-events-none fixed bottom-4 right-4 z-40 [&>*]:pointer-events-auto">
+        <SyncStatusBadge />
       </div>
     </TrackerSyncProvider>
   );
