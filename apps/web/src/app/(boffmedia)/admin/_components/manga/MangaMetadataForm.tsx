@@ -2,9 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Check } from "lucide-react";
-import { Button } from "@/components/ui/primitives/button";
-import { Input } from "@/components/ui/primitives/input";
+import { Button, Field, Input, Select } from "@/components/boffmedia/primitives";
 import { useMangaStore, type EpubMetadata } from "@/stores/useMangaStore";
 
 const LANGUAGES = [
@@ -30,7 +28,7 @@ interface Props {
 }
 
 export default function MangaMetadataForm({ seriesSlug }: Props) {
-  const t = useTranslations("boffmedia.mangaLibrary");
+  const t = useTranslations("admin.manga.metadata");
   const seriesMetadata = useMangaStore((s) => s.seriesMetadata);
   const setSeriesMetadata = useMangaStore((s) => s.setSeriesMetadata);
 
@@ -65,7 +63,7 @@ export default function MangaMetadataForm({ seriesSlug }: Props) {
     });
     setSubjectsText((s.subjects ?? []).join(", "));
     setSaved(false);
-   
+
   }, [seriesSlug]);
 
   function field(key: keyof EpubMetadata) {
@@ -84,75 +82,62 @@ export default function MangaMetadataForm({ seriesSlug }: Props) {
     setTimeout(() => setSaved(false), 2000);
   }
 
-  const inputCls = "h-8 text-sm bg-layer-2 border-edge-strong text-ink placeholder-[var(--text-dim)]";
-
   return (
-    <div className="space-y-3">
-      <p className="text-xs font-medium text-ink-muted uppercase tracking-wide">{t("metadata")}</p>
+    <div className="flex flex-col gap-3">
+      <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-txt-dim">{t("heading")}</p>
 
-      <div className="space-y-1">
-        <label className="text-xs text-ink-muted">{t("metaTitle")}</label>
-        <Input {...field("title")} className={inputCls} />
-      </div>
+      <Field label={t("title")}>
+        <Input {...field("title")} />
+      </Field>
 
-      <div className="space-y-1">
-        <label className="text-xs text-ink-muted">{t("metaLanguage")}</label>
-        <select
-          value={form.language ?? "en"}
-          onChange={(e) => setForm((f) => ({ ...f, language: e.target.value }))}
-          className="w-full h-8 rounded-md border border-edge-strong bg-layer-2 text-ink text-sm px-2 focus:outline-none focus:ring-1 focus:ring-[var(--orange-500)]"
-        >
-          {LANGUAGES.map((l) => (
-            <option key={l.value} value={l.value}>{l.label}</option>
-          ))}
-        </select>
-      </div>
+      <Select
+        label={t("language")}
+        value={form.language ?? "en"}
+        options={LANGUAGES}
+        onChange={(v) => setForm((f) => ({ ...f, language: v }))}
+      />
 
-      <div className="space-y-1">
-        <label className="text-xs text-ink-muted">{t("metaAuthor")}</label>
-        <Input {...field("author")} className={inputCls}
-          onBlur={() => { if (form.author && !form.authorSort) setForm((f) => ({ ...f, authorSort: autoSort(f.author ?? "") })); }} />
-        <div className="flex gap-1.5 items-center">
-          <Input {...field("authorSort")} placeholder={t("metaSortPlaceholder")} className={`${inputCls} flex-1`} />
-          <button type="button" onClick={() => setForm((f) => ({ ...f, authorSort: autoSort(f.author ?? "") }))}
-            className="text-[11px] text-[var(--orange-500)] hover:text-[var(--orange-400)] transition-colors px-1.5 py-1 rounded border border-[color-mix(in_srgb,var(--orange-500)_30%,transparent)] bg-[color-mix(in_srgb,var(--orange-500)_10%,transparent)] shrink-0">
+      <Field label={t("author")}>
+        <Input
+          {...field("author")}
+          onBlur={() => { if (form.author && !form.authorSort) setForm((f) => ({ ...f, authorSort: autoSort(f.author ?? "") })); }}
+        />
+        <div className="mt-1.5 flex items-center gap-1.5">
+          <Input {...field("authorSort")} placeholder={t("sortPlaceholder")} className="flex-1" />
+          <Button size="sm" variant="ghost" onClick={() => setForm((f) => ({ ...f, authorSort: autoSort(f.author ?? "") }))}>
             {t("autoSort")}
-          </button>
+          </Button>
         </div>
-      </div>
+      </Field>
 
-      <div className="space-y-1">
-        <label className="text-xs text-ink-muted">{t("metaIllustrator")}</label>
-        <Input {...field("illustrator")} className={inputCls}
-          onBlur={() => { if (form.illustrator && !form.illustratorSort) setForm((f) => ({ ...f, illustratorSort: autoSort(f.illustrator ?? "") })); }} />
-        <div className="flex gap-1.5 items-center">
-          <Input {...field("illustratorSort")} placeholder={t("metaSortPlaceholder")} className={`${inputCls} flex-1`} />
-          <button type="button" onClick={() => setForm((f) => ({ ...f, illustratorSort: autoSort(f.illustrator ?? "") }))}
-            className="text-[11px] text-[var(--orange-500)] hover:text-[var(--orange-400)] transition-colors px-1.5 py-1 rounded border border-[color-mix(in_srgb,var(--orange-500)_30%,transparent)] bg-[color-mix(in_srgb,var(--orange-500)_10%,transparent)] shrink-0">
+      <Field label={t("illustrator")}>
+        <Input
+          {...field("illustrator")}
+          onBlur={() => { if (form.illustrator && !form.illustratorSort) setForm((f) => ({ ...f, illustratorSort: autoSort(f.illustrator ?? "") })); }}
+        />
+        <div className="mt-1.5 flex items-center gap-1.5">
+          <Input {...field("illustratorSort")} placeholder={t("sortPlaceholder")} className="flex-1" />
+          <Button size="sm" variant="ghost" onClick={() => setForm((f) => ({ ...f, illustratorSort: autoSort(f.illustrator ?? "") }))}>
             {t("autoSort")}
-          </button>
+          </Button>
         </div>
-      </div>
+      </Field>
 
       <div className="flex gap-2">
-        <div className="flex-1 space-y-1">
-          <label className="text-xs text-ink-muted">{t("metaPublisher")}</label>
-          <Input {...field("publisher")} className={inputCls} />
-        </div>
-        <div className="w-20 space-y-1">
-          <label className="text-xs text-ink-muted">{t("metaYear")}</label>
-          <Input {...field("date")} placeholder="YYYY" className={inputCls} maxLength={4} />
-        </div>
+        <Field label={t("publisher")} className="flex-1">
+          <Input {...field("publisher")} />
+        </Field>
+        <Field label={t("year")} className="w-24">
+          <Input {...field("date")} placeholder="YYYY" maxLength={4} />
+        </Field>
       </div>
 
-      <div className="space-y-1">
-        <label className="text-xs text-ink-muted">{t("metaSubjects")}</label>
-        <Input value={subjectsText} onChange={(e) => setSubjectsText(e.target.value)}
-          placeholder={t("metaSubjectsHint")} className={inputCls} />
-      </div>
+      <Field label={t("subjects")}>
+        <Input value={subjectsText} onChange={(e) => setSubjectsText(e.target.value)} placeholder={t("subjectsHint")} />
+      </Field>
 
-      <Button size="sm" onClick={handleSave} className="w-full">
-        {saved ? <><Check className="w-3.5 h-3.5 mr-1.5" />{t("metaSaved")}</> : t("saveMetadata")}
+      <Button variant="pri" icon={saved ? "check" : undefined} onClick={handleSave} className="w-full">
+        {saved ? t("saved") : t("save")}
       </Button>
     </div>
   );
