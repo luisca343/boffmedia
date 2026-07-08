@@ -3,7 +3,6 @@ import { getFloors } from "./DungeonData";
 import { rotomGET } from "@/services/boffAPI";
 import { pmdSkyPokemon } from "./PokemonData";
 import { getForceClient, getForceTarget, givesItem } from "./QuestData";
-import { boolean } from "zod";
 
 export interface SkyFormData {
   questType: number;
@@ -61,9 +60,6 @@ export const useFormStore = create<FormState>((set, get) => ({
   },
   targetAvailable: false,
   setFormData: async (data) => {
-    // Print the data to the console
-    console.log("Data to update:", data);
-
     if(data.questType !== undefined) {
       if(data.questType === 11){
         data.specialQuestType = 1;
