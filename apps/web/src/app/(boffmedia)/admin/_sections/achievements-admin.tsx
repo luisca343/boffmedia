@@ -1,11 +1,12 @@
 "use client"
 
-import { Award } from "lucide-react"
-import { AdminCrud } from "@/components/boffmedia-v2/ui/admin/admin-crud"
+import { useTranslations } from "next-intl"
+import { Icon } from "@/components/boffmedia/primitives"
+import { AdminCrud } from "../_components/ui/av-crud"
+import { AvSectionHead } from "../_components/ui/av-kit"
 import { useGetAchievements } from "@/hooks/events/useGetAchievements"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { AchievementForm } from "./forms/AchievementForm"
-import { toast } from "@/components/boffmedia/primitives/toast"
 import type { Achievement } from "@boffmedia/shared"
 
 function useAchievementsList() {
@@ -13,62 +14,64 @@ function useAchievementsList() {
   return { data: achievements as Achievement[] | undefined, error, isLoading, refetch }
 }
 
-const RARITY_COLORS: Record<string, string> = {
-  bronze: "bg-amber-700/30 text-amber-300 border-amber-700/40",
-  silver: "bg-slate-400/20 text-slate-300 border-slate-400/30",
-  gold: "bg-yellow-500/20 text-yellow-300 border-yellow-500/30",
-  platinum: "bg-cyan-500/20 text-cyan-300 border-cyan-500/30",
-  diamond: "bg-sky-500/20 text-sky-300 border-sky-500/30",
+const RARITY: Record<string, string> = {
+  bronze: "text-amber-300 border-amber-700/50 bg-amber-700/20",
+  silver: "text-slate-300 border-slate-400/40 bg-slate-400/15",
+  gold: "text-yellow-300 border-yellow-500/40 bg-yellow-500/15",
+  platinum: "text-cyan-300 border-cyan-500/40 bg-cyan-500/15",
+  diamond: "text-sky-300 border-sky-500/40 bg-sky-500/15",
 }
 
 export function AchievementsAdmin() {
+  const t = useTranslations("admin.achievements")
   return (
-    <AdminCrud<Achievement>
-      title="Gestión de Logros"
-      icon={Award}
-      description="Administra los logros y medallas del portal"
-      useList={useAchievementsList}
-      FormComponent={AchievementForm}
-      onCreate={async (data: any) => {
-        const { id, eventId, ...createData } = data
-        await EventsService.createAchievement(eventId, createData)
-      }}
-      onUpdate={async (id, data: any) => {
-        const { id: _id, eventId, ...updateData } = data
-        await EventsService.updateAchievement(eventId, Number(id), updateData)
-      }}
-      onDelete={async (id) => {
-        toast.success(`Logro eliminado con éxito.`)
-      }}
-      searchFields={["name", "description"]}
-      entityName={{ singular: "logro", plural: "logros" }}
-      columns={[
-        { key: "name", label: "Logro", render: (a) => (
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-layer-2 border border-edge flex items-center justify-center shrink-0">
-              <Award className="w-4 h-4 text-ink-dim" />
+    <div>
+      <AvSectionHead title={t("title")} desc={t("desc")} />
+      <AdminCrud<Achievement>
+        useList={useAchievementsList}
+        FormComponent={AchievementForm}
+        onCreate={async (data: any) => {
+          const { id, eventId, ...createData } = data
+          await EventsService.createAchievement(eventId, createData)
+        }}
+        onUpdate={async (id, data: any) => {
+          const { id: _id, eventId, ...updateData } = data
+          await EventsService.updateAchievement(eventId, Number(id), updateData)
+        }}
+        onDelete={async () => {
+          /* achievement deletion endpoint not wired — see admin roadmap */
+        }}
+        searchFields={["name", "description"]}
+        entityName={{ singular: t("singular"), plural: t("plural") }}
+        columns={[
+          { key: "name", label: t("colAchievement"), render: (a) => (
+            <div className="flex items-center gap-3">
+              <div className="cut-seal [--cut:7px] w-9 h-9 bg-accent-soft border border-solid border-accent-line flex items-center justify-center shrink-0">
+                <Icon name="trophy" size={16} className="text-accent" />
+              </div>
+              <div className="min-w-0">
+                <span className="font-medium">{a.name}</span>
+                <p className="text-xs text-txt-dim font-mono">{a.eventName ?? t("eventFallback", { id: a.eventId })}</p>
+              </div>
             </div>
-            <div>
-              <span className="font-medium text-ink">{a.name}</span>
-              <p className="text-xs text-ink-dim">{a.eventName ?? `Evento #${a.eventId}`}</p>
-            </div>
-          </div>
-        )},
-        { key: "points", label: "Pts", render: (a) => (
-          <span className="text-sm font-mono text-ink-muted">{a.points}</span>
-        )},
-        { key: "rarity", label: "Rareza", render: (a) => {
-          const cls = RARITY_COLORS[a.rarity ?? ""] ?? "bg-layer-2 text-ink-muted border-edge"
-          return (
-            <span className={`text-[11px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full border ${cls}`}>
+          )},
+          { key: "points", label: t("colPoints"), render: (a) => (
+            <span className="text-sm font-mono text-txt-muted">{a.points}</span>
+          )},
+          { key: "rarity", label: t("colRarity"), render: (a) => (
+            <span
+              className={`text-[10px] font-mono font-semibold uppercase tracking-[0.08em] px-2 py-1 border border-solid ${
+                RARITY[a.rarity ?? ""] ?? "text-txt-muted border-line bg-panel-2"
+              }`}
+            >
               {a.rarity ?? "—"}
             </span>
-          )
-        }},
-        { key: "category", label: "Categoría", render: (a) => (
-          <span className="text-sm text-ink-muted capitalize">{a.category ?? "—"}</span>
-        )},
-      ]}
-    />
+          )},
+          { key: "category", label: t("colCategory"), render: (a) => (
+            <span className="text-sm text-txt-muted capitalize">{a.category ?? "—"}</span>
+          )},
+        ]}
+      />
+    </div>
   )
 }

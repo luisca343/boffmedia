@@ -1,9 +1,9 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { Loader2, RefreshCw, Upload, AlertCircle, CheckCircle2 } from "lucide-react"
-import { BoffButton } from "@/components/boffmedia-v2/primitives/button"
-import { ToolPanel } from "@/components/boffmedia-v2/primitives/tool-panel"
+import { useTranslations } from "next-intl"
+import { Button, Field, Input, Select, Icon, Spinner } from "@/components/boffmedia/primitives"
+import { AvPanel, AvAlert, AvPill } from "../ui/av-kit"
 import {
   ChampionsRegulation,
   LimitlessTournament,
@@ -12,54 +12,41 @@ import {
 } from "@/services/api/boffmedia/vgcService"
 import { useBoffSession } from "@/services/useBoffSession"
 
-function inputClass() {
-  return "w-full h-9 rounded-lg border border-edge-strong bg-layer-2 px-3 py-2 text-sm text-ink placeholder:text-ink-dim focus:outline-none focus:border-secondary focus:shadow-[0_0_0_3px_var(--secondary-soft)]"
-}
-
-function labelClass() {
-  return "block text-xs text-ink-muted mb-1"
-}
-
-function StatusDot({ status }: { status: LimitlessTournament["status"] }) {
-  if (status === "running")
-    return <Loader2 className="w-3 h-3 animate-spin text-amber-400 inline" />
-  if (status === "done")
-    return <CheckCircle2 className="w-3 h-3 text-emerald-400 inline" />
-  if (status === "error")
-    return <AlertCircle className="w-3 h-3 text-red-400 inline" />
-  return <span className="w-2 h-2 rounded-full bg-[var(--text-dim)] inline-block" />
-}
+const TH = "text-left font-mono text-[10px] uppercase tracking-[0.08em] text-txt-muted font-semibold py-2.5 px-4 border-b border-solid border-line"
 
 function ProgressBar({ progress, total }: { progress: number; total: number }) {
   const pct = total > 0 ? Math.round((progress / total) * 100) : 0
   return (
     <div className="flex items-center gap-2">
-      <div className="flex-1 h-1.5 rounded-full bg-layer-3 overflow-hidden">
-        <div
-          className="h-full rounded-full bg-amber-400 transition-all duration-300"
-          style={{ width: `${pct}%` }}
-        />
+      <div className="flex-1 h-1.5 bg-panel-2 border border-solid border-line overflow-hidden">
+        <div className="h-full bg-accent transition-all duration-300" style={{ width: `${pct}%` }} />
       </div>
-      <span className="text-[11px] text-ink-dim tabular-nums">{progress}/{total}</span>
+      <span className="text-[11px] text-txt-dim tabular-nums font-mono">{progress}/{total}</span>
     </div>
   )
 }
 
 export function VgcLimitlessFetcher() {
+  const t = useTranslations("admin.vgc")
   const { session } = useBoffSession()
-  const token = session?.user?.accessToken ?? ''
+  const token = session?.user?.accessToken ?? ""
+
+  const StatusPill = ({ status }: { status: LimitlessTournament["status"] }) => {
+    if (status === "running") return <AvPill tone="amber">{t("limitless.statusRunning")}</AvPill>
+    if (status === "done") return <AvPill tone="green" icon="check">{t("limitless.statusDone")}</AvPill>
+    if (status === "error") return <AvPill tone="rose" icon="alert">{t("limitless.statusError")}</AvPill>
+    return <AvPill tone="muted">{t("limitless.statusPending")}</AvPill>
+  }
 
   const [regulations, setRegulations] = useState<ChampionsRegulation[]>([])
-
-  const [url,          setUrl]          = useState("")
+  const [url, setUrl] = useState("")
   const [regulationId, setRegulationId] = useState("")
-  const [maxPlayers,   setMaxPlayers]   = useState("")
-  const [submitting,   setSubmitting]   = useState(false)
-  const [error,        setError]        = useState<string | null>(null)
-  const [success,      setSuccess]      = useState<string | null>(null)
-
-  const [tournaments, setTournaments]   = useState<LimitlessTournament[]>([])
-  const [loadingList, setLoadingList]   = useState(false)
+  const [maxPlayers, setMaxPlayers] = useState("")
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
+  const [tournaments, setTournaments] = useState<LimitlessTournament[]>([])
+  const [loadingList, setLoadingList] = useState(false)
 
   const pollingRef = useRef<Map<number, ReturnType<typeof setInterval>>>(new Map())
 
@@ -80,13 +67,9 @@ export function VgcLimitlessFetcher() {
       .then((res) => {
         const regs = res.data ?? []
         setRegulations(regs)
-        if (!regulationId && regs.length > 0) {
-          setRegulationId(regs[0].id)
-        }
+        if (!regulationId && regs.length > 0) setRegulationId(regs[0].id)
       })
-      .catch(() => {
-        setError("No se pudieron cargar las regulaciones.")
-      })
+      .catch(() => setError(t("limitless.loadRegErr")))
   }
 
   useEffect(() => {
@@ -99,9 +82,7 @@ export function VgcLimitlessFetcher() {
   useEffect(() => {
     const onRegulationsUpdated = () => loadRegulations()
     window.addEventListener("vgc-regulations-updated", onRegulationsUpdated)
-    return () => {
-      window.removeEventListener("vgc-regulations-updated", onRegulationsUpdated)
-    }
+    return () => window.removeEventListener("vgc-regulations-updated", onRegulationsUpdated)
   }, [])
 
   useEffect(() => {
@@ -127,24 +108,29 @@ export function VgcLimitlessFetcher() {
           clearInterval(pollingRef.current.get(tournamentId))
           pollingRef.current.delete(tournamentId)
         }
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
     }, 3000)
     pollingRef.current.set(tournamentId, interval)
   }
 
   const handleSubmit = async () => {
-    if (!url.trim()) { setError("Introduce la URL del torneo."); return }
+    if (!url.trim()) {
+      setError(t("limitless.noUrl"))
+      return
+    }
     if (!regulationId) {
-      setError("No hay regulación disponible. Regístrala primero en Champions.")
+      setError(t("limitless.noRegulation"))
       return
     }
     if (!token) {
-      setError("Sesion invalida: vuelve a iniciar sesion con una cuenta BOFF_ADMIN.")
+      setError(t("invalidSession"))
       return
     }
     const max = maxPlayers.trim() ? parseInt(maxPlayers, 10) : undefined
     if (max !== undefined && (isNaN(max) || max < 1)) {
-      setError("Max jugadores debe ser un número positivo.")
+      setError(t("limitless.invalidMax"))
       return
     }
     setSubmitting(true)
@@ -154,143 +140,111 @@ export function VgcLimitlessFetcher() {
       const res = await VgcMetaService.importLimitlessTournament(url.trim(), regulationId, token, max)
       const tournamentId = res.data?.tournamentId
       if (tournamentId) {
-        setSuccess(`Importación iniciada (ID #${tournamentId}). Procesando en segundo plano...`)
+        setSuccess(t("limitless.startedOk", { id: tournamentId }))
         setUrl("")
         setMaxPlayers("")
         loadTournaments()
         startPolling(tournamentId)
       }
     } catch (e: unknown) {
-      const msg = (e as { message?: string })?.message ?? "Error al iniciar la importación."
-      setError(msg)
+      setError((e as { message?: string })?.message ?? t("limitless.startErr"))
     } finally {
       setSubmitting(false)
     }
   }
 
-  const thClass = "px-4 py-2.5 text-left text-[11px] uppercase tracking-[0.08em] text-ink-muted font-semibold"
-
   return (
-    <div className="space-y-4 max-w-2xl">
-      <p className="text-sm text-ink-muted">
-        Importa torneos de{" "}
-        <a href="https://play.limitlesstcg.com" target="_blank" rel="noopener noreferrer"
-          className="text-[var(--orange-500)] hover:underline">
-          Limitless TCG
-        </a>{" "}
-        para agregar estadísticas de uso de los decklists VGC. Solo se necesitan 2 peticiones a la API por torneo.
+    <div className="space-y-4 max-w-3xl">
+      <p className="text-sm text-txt-muted">
+        {t.rich("limitless.intro", {
+          a: (chunks) => (
+            <a href="https://play.limitlesstcg.com" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">
+              {chunks}
+            </a>
+          ),
+        })}
       </p>
 
-      {/* Import form */}
-      <ToolPanel title="Importar torneo">
+      <AvPanel title={t("limitless.importTitle")} icon="upload">
         <div className="space-y-3">
-          <div>
-            <label className={labelClass()}>URL del torneo</label>
-            <input type="url" value={url} onChange={(e) => setUrl(e.target.value)}
-              placeholder="https://play.limitlesstcg.com/tournament/..." className={inputClass()} />
-          </div>
-
+          <Field label={t("limitless.urlLabel")}>
+            <Input type="url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://play.limitlesstcg.com/tournament/..." />
+          </Field>
           <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className={labelClass()}>Regulación</label>
-              <select value={regulationId} onChange={(e) => setRegulationId(e.target.value)} className={inputClass()}>
-                {regulations.map((r) => (
-                  <option key={r.id} value={r.id}>{r.name}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className={labelClass()}>
-                Max jugadores <span className="text-ink-dim">(opcional)</span>
-              </label>
-              <input type="number" min={1} value={maxPlayers} onChange={(e) => setMaxPlayers(e.target.value)}
-                placeholder="Todos" className={inputClass()} />
-            </div>
+            <Select
+              label={t("limitless.regulation")}
+              value={regulationId}
+              options={regulations.map((r) => ({ value: r.id, label: r.name }))}
+              onChange={setRegulationId}
+            />
+            <Field label={t("limitless.maxPlayers")}>
+              <Input type="number" min={1} value={maxPlayers} onChange={(e) => setMaxPlayers(e.target.value)} placeholder={t("limitless.maxPlayersPlaceholder")} />
+            </Field>
           </div>
         </div>
-
-        <div className="mt-3">
-          <BoffButton size="sm" onClick={handleSubmit} disabled={submitting || !url.trim() || !regulationId} block>
-            {submitting ? (
-              <><Loader2 className="w-3 h-3 mr-1.5 animate-spin" />Iniciando...</>
-            ) : (
-              <><Upload className="w-3 h-3 mr-1.5" />Importar torneo</>
-            )}
-          </BoffButton>
+        <div className="mt-4">
+          <Button variant="pri" icon="upload" loading={submitting} disabled={submitting || !url.trim() || !regulationId} onClick={handleSubmit} className="w-full">
+            {submitting ? t("limitless.importing") : t("limitless.import")}
+          </Button>
         </div>
+        {error && <AvAlert tone="error" className="mt-3">{error}</AvAlert>}
+        {success && <AvAlert tone="success" className="mt-3">{success}</AvAlert>}
+      </AvPanel>
 
-        {error   && <p className="text-xs text-red-400 mt-2">{error}</p>}
-        {success && <p className="text-xs text-emerald-400 mt-2">{success}</p>}
-      </ToolPanel>
-
-      {/* Tournament list */}
-      <ToolPanel
-        title="Torneos importados"
-        headRight={
-          <button onClick={() => loadTournaments()} className="text-ink-dim hover:text-ink transition-colors">
-            <RefreshCw className="w-3.5 h-3.5" />
+      <AvPanel
+        title={t("limitless.importedTitle")}
+        icon="database"
+        aside={
+          <button onClick={() => loadTournaments()} aria-label={t("reload")} className="text-txt-dim hover:text-txt transition-colors">
+            <Icon name="refresh" size={14} />
           </button>
         }
+        flush
       >
         {loadingList ? (
-          <div className="py-8 flex justify-center text-ink-muted">
-            <Loader2 className="w-4 h-4 animate-spin" />
+          <div className="py-8 flex justify-center">
+            <Spinner size={16} className="text-accent" />
           </div>
         ) : tournaments.length === 0 ? (
-          <p className="px-4 py-6 text-center text-xs text-ink-dim">
-            No hay torneos importados para esta regulación.
-          </p>
+          <p className="px-4 py-6 text-center text-xs text-txt-dim">{t("limitless.empty")}</p>
         ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-edge bg-[color-mix(in_srgb,var(--layer-1)_96%,transparent)]">
-                <th className={thClass}>Torneo</th>
-                <th className={thClass}>Estado</th>
-                <th className={thClass}>Jugadores</th>
-                <th className={thClass}>Cargados</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[...tournaments].sort((a, b) => (b.date ?? "").localeCompare(a.date ?? "")).map((t) => (
-                <tr key={t.id} className="border-b border-edge hover:bg-[color-mix(in_srgb,var(--text)_3%,transparent)] transition-colors">
-                  <td className="px-4 py-3">
-                    <p className="text-ink text-xs font-medium">{t.name ?? t.limitlessId}</p>
-                    <p className="text-ink-dim text-[11px] font-mono">{t.date ?? "—"} · {t.format ?? "—"}</p>
-                    {t.errorMessage && (
-                      <p className="text-red-400 text-[11px] mt-0.5 truncate max-w-xs">{t.errorMessage}</p>
-                    )}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className="inline-flex items-center gap-1.5 text-xs">
-                      <StatusDot status={t.status} />
-                      <span className="text-ink-muted">
-                        {t.status === "running" ? "Procesando" :
-                         t.status === "done"    ? "Listo" :
-                         t.status === "error"   ? "Error" : "Pendiente"}
-                      </span>
-                    </span>
-                    {t.status === "running" && t.total > 0 && (
-                      <div className="mt-1.5 w-32">
-                        <ProgressBar progress={t.progress} total={t.total} />
-                      </div>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-xs text-ink-muted">
-                    {t.playerCount ?? "—"}
-                  </td>
-                  <td className="px-4 py-3 text-xs text-ink-muted">
-                    {t.progress ? `${t.progress}/${t.total}` : "—"}
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[560px]">
+              <thead>
+                <tr className="bg-panel-2">
+                  <th className={TH}>{t("limitless.colTournament")}</th>
+                  <th className={TH}>{t("limitless.colStatus")}</th>
+                  <th className={TH}>{t("limitless.colPlayers")}</th>
+                  <th className={TH}>{t("limitless.colLoaded")}</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {[...tournaments].sort((a, b) => (b.date ?? "").localeCompare(a.date ?? "")).map((t) => (
+                  <tr key={t.id} className="border-b border-solid border-line last:border-b-0 hover:bg-panel-2 transition-colors">
+                    <td className="px-4 py-3">
+                      <p className="text-xs font-medium">{t.name ?? t.limitlessId}</p>
+                      <p className="text-txt-dim text-[11px] font-mono">{t.date ?? "—"} · {t.format ?? "—"}</p>
+                      {t.errorMessage && <p className="text-bad text-[11px] mt-0.5 truncate max-w-xs">{t.errorMessage}</p>}
+                    </td>
+                    <td className="px-4 py-3">
+                      <StatusPill status={t.status} />
+                      {t.status === "running" && t.total > 0 && (
+                        <div className="mt-1.5 w-32">
+                          <ProgressBar progress={t.progress} total={t.total} />
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-xs text-txt-muted">{t.playerCount ?? "—"}</td>
+                    <td className="px-4 py-3 text-xs text-txt-muted font-mono">{t.progress ? `${t.progress}/${t.total}` : "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
-      </ToolPanel>
+      </AvPanel>
 
-      <p className="text-xs text-ink-dim">
-        Fuente: Limitless TCG API · 2 peticiones por torneo · Los decklists VGC son JSON estructurado (no texto Showdown).
-      </p>
+      <p className="text-xs text-txt-dim">{t("limitless.source")}</p>
     </div>
   )
 }
