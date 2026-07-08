@@ -540,7 +540,7 @@ export function SchematicViewer3D() {
 
   if (!schematic) {
     return (
-      <div className="flex h-full items-center justify-center text-xs text-ink-dim">
+      <div className="flex h-full items-center justify-center text-xs text-txt-dim">
         Load a schematic to see the 3D preview
       </div>
     );
@@ -548,7 +548,7 @@ export function SchematicViewer3D() {
 
   if (isFetchingPositions) {
     return (
-      <div className="flex h-full items-center justify-center text-xs text-ink-dim">
+      <div className="flex h-full items-center justify-center text-xs text-txt-dim">
         Preparing 3D data…
       </div>
     );
@@ -556,7 +556,7 @@ export function SchematicViewer3D() {
 
   if (blockPositions.length === 0) {
     return (
-      <div className="flex h-full items-center justify-center text-xs text-ink-dim">
+      <div className="flex h-full items-center justify-center text-xs text-txt-dim">
         Run Analyze to generate the preview
       </div>
     );
