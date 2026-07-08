@@ -118,6 +118,7 @@ export default getRequestConfig(async () => {
   const paths = [
     'boffmedia.json',
     'battlesim.json',
+    'admin.json',
     'nav.json',
     'auth.json',
     'profile.json',

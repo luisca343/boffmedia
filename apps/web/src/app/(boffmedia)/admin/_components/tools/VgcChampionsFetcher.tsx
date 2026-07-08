@@ -1,9 +1,9 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Download, Loader2, RefreshCw } from "lucide-react"
-import { BoffButton } from "@/components/boffmedia-v2/primitives/button"
-import { ToolPanel } from "@/components/boffmedia-v2/primitives/tool-panel"
+import { useTranslations } from "next-intl"
+import { Button, Input, Icon, Spinner } from "@/components/boffmedia/primitives"
+import { AvPanel, AvAlert, AvPill } from "../ui/av-kit"
 import {
   BatchFetchResult,
   ChampionsRegulation,
@@ -12,24 +12,44 @@ import {
 } from "@/services/api/boffmedia/vgcService"
 import { useBoffSession } from "@/services/useBoffSession"
 
-function inputClass() {
-  return "w-full h-9 rounded-lg border border-edge-strong bg-layer-2 px-2.5 text-sm text-ink placeholder:text-ink-dim focus:outline-none focus:border-secondary focus:shadow-[0_0_0_3px_var(--secondary-soft)]"
-}
+const TH = "text-left font-mono text-[10px] uppercase tracking-[0.08em] text-txt-muted font-semibold py-2.5 px-4 border-b border-solid border-line"
 
-function labelClass() {
-  return "text-[11px] text-ink-dim font-medium uppercase tracking-wider"
-}
+type PillTone = "amber" | "accent" | "green" | "rose" | "muted"
 
 export function VgcChampionsFetcher() {
+  const t = useTranslations("admin.vgc")
   const { session } = useBoffSession()
-  const token = session?.user?.accessToken ?? ''
 
-  const [available,      setAvailable]      = useState<ChampionsRegulation[]>([])
-  const [loading,        setLoading]        = useState(false)
-  const [refreshing,     setRefreshing]     = useState<string | null>(null)
+  const statusPill = (r: ChampionsRegulation | undefined): { text: string; tone: PillTone } => {
+    switch (r?.importStatus) {
+      case "running_csv":
+        return { text: t("champions.statusRunningCsv"), tone: "amber" }
+      case "running_pastes": {
+        const total = r.importTeamCount ?? 0
+        const fetched = r.importFetchedCount ?? 0
+        return {
+          text: total > 0
+            ? t("champions.statusRunningPastesProgress", { fetched, total })
+            : t("champions.statusRunningPastes"),
+          tone: "accent",
+        }
+      }
+      case "done":
+        return { text: t("champions.statusDone"), tone: "green" }
+      case "error":
+        return { text: t("champions.statusError"), tone: "rose" }
+      default:
+        return { text: t("champions.statusNoData"), tone: "muted" }
+    }
+  }
+  const token = session?.user?.accessToken ?? ""
+
+  const [available, setAvailable] = useState<ChampionsRegulation[]>([])
+  const [loading, setLoading] = useState(false)
+  const [refreshing, setRefreshing] = useState<string | null>(null)
   const [fetchingPastes, setFetchingPastes] = useState<string | null>(null)
-  const [error,          setError]          = useState<string | null>(null)
-  const [success,        setSuccess]        = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
   const [addingRegulation, setAddingRegulation] = useState(false)
 
   const [newRegulationId, setNewRegulationId] = useState("")
@@ -41,64 +61,45 @@ export function VgcChampionsFetcher() {
     const existing = available.find((r) => r.id === newRegulationId.trim())
     if (!existing) return
     if (!newFormatId) setNewFormatId(existing.formatId ?? "")
-    if (!newName)     setNewName(existing.name ?? "")
-    if (!newGid)      setNewGid(existing.vgcPastesGid ?? "")
+    if (!newName) setNewName(existing.name ?? "")
+    if (!newGid) setNewGid(existing.vgcPastesGid ?? "")
   }, [newRegulationId, available])
 
   const loadAvailable = (silent = false) => {
     if (!silent) setLoading(true)
     VgcMetaService.getAvailableChampionsRegulations()
       .then((res) => setAvailable(res.data ?? []))
-      .catch(() => setError("No se pudo cargar el estado de Champions."))
+      .catch(() => setError(t("champions.loadErr")))
       .finally(() => {
         if (!silent) setLoading(false)
       })
   }
 
-  useEffect(() => { loadAvailable() }, [])
+  useEffect(() => {
+    loadAvailable()
+  }, [])
 
   useEffect(() => {
     if (!refreshing && !fetchingPastes) return
-    const id = setInterval(() => {
-      loadAvailable(true)
-    }, 2000)
+    const id = setInterval(() => loadAvailable(true), 2000)
     return () => clearInterval(id)
   }, [refreshing, fetchingPastes])
-
-  const getStatusLabel = (regulation: ChampionsRegulation | undefined) => {
-    switch (regulation?.importStatus) {
-      case 'running_csv':
-        return { text: 'Importando CSV', className: 'text-amber-400', dot: 'bg-amber-400' }
-      case 'running_pastes': {
-        const total   = regulation.importTeamCount ?? 0
-        const fetched = regulation.importFetchedCount ?? 0
-        const progress = total > 0 ? ` (${fetched}/${total})` : ''
-        return { text: `Descargando pastes${progress}`, className: 'text-sky-400', dot: 'bg-sky-400' }
-      }
-      case 'done':
-        return { text: 'Importado', className: 'text-emerald-400', dot: 'bg-emerald-400' }
-      case 'error':
-        return { text: 'Error', className: 'text-red-400', dot: 'bg-red-400' }
-      default:
-        return { text: 'Sin datos', className: 'text-ink-dim', dot: 'bg-[var(--text-dim)]' }
-    }
-  }
 
   const handleRefresh = async (regulationId: string) => {
     setRefreshing(regulationId)
     setError(null)
     setSuccess(null)
     if (!token) {
-      setError("Sesion invalida: vuelve a iniciar sesion con una cuenta BOFF_ADMIN.")
+      setError(t("invalidSession"))
       setRefreshing(null)
       return
     }
     try {
       const res = await VgcMetaService.refreshChampions(regulationId, token)
-      setSuccess(`Importados ${res.data?.count ?? 0} equipos para ${regulationId}.`)
+      setSuccess(t("champions.importOk", { count: res.data?.count ?? 0, id: regulationId }))
       loadAvailable()
     } catch {
-      setError("Error al importar los datos de Champions.")
+      setError(t("champions.importErr"))
     } finally {
       setRefreshing(null)
     }
@@ -109,7 +110,7 @@ export function VgcChampionsFetcher() {
     setError(null)
     setSuccess(null)
     if (!token) {
-      setError("Sesion invalida: vuelve a iniciar sesion con una cuenta BOFF_ADMIN.")
+      setError(t("invalidSession"))
       setFetchingPastes(null)
       return
     }
@@ -118,11 +119,11 @@ export function VgcChampionsFetcher() {
       const r = res.data as BatchFetchResult | undefined
       setSuccess(
         r
-          ? `Descargados ${r.fetched} pastes (${r.cached} en caché, ${r.failed} fallidos) de ${r.total} equipos.`
-          : `Pastes descargados para ${regulationId}.`,
+          ? t("champions.pastesOk", { fetched: r.fetched, cached: r.cached, failed: r.failed, total: r.total })
+          : t("champions.pastesOkSimple", { id: regulationId }),
       )
     } catch {
-      setError("Error al descargar los pastes.")
+      setError(t("champions.pastesErr"))
     } finally {
       loadAvailable(true)
       setFetchingPastes(null)
@@ -133,14 +134,13 @@ export function VgcChampionsFetcher() {
     setError(null)
     setSuccess(null)
     if (!token) {
-      setError("Sesion invalida: vuelve a iniciar sesion con una cuenta BOFF_ADMIN.")
+      setError(t("invalidSession"))
       return
     }
     if (!newRegulationId.trim() || !newFormatId.trim() || !newName.trim()) {
-      setError("Completa id, formatId y nombre para registrar la regulación.")
+      setError(t("champions.missingFields"))
       return
     }
-
     setAddingRegulation(true)
     try {
       await VgcRegulationsAdminService.upsertRegulation(
@@ -152,7 +152,7 @@ export function VgcChampionsFetcher() {
         },
         token,
       )
-      setSuccess(`Regulación ${newRegulationId.trim()} guardada.`)
+      setSuccess(t("champions.saveOk", { id: newRegulationId.trim() }))
       setNewRegulationId("")
       setNewFormatId("")
       setNewName("")
@@ -160,131 +160,115 @@ export function VgcChampionsFetcher() {
       loadAvailable(true)
       window.dispatchEvent(new CustomEvent("vgc-regulations-updated"))
     } catch {
-      setError("Error al guardar la regulación.")
+      setError(t("champions.saveErr"))
     } finally {
       setAddingRegulation(false)
     }
   }
 
-  const thClass = "px-4 py-2.5 text-left text-[11px] uppercase tracking-[0.08em] text-ink-muted font-semibold"
-
   return (
-    <div className="space-y-4 max-w-2xl">
-      <p className="text-sm text-ink-muted">
-        Importa datos del CSV de VGCPastes (Google Sheets). Agrega uso por especie y co-aparición de compañeros de equipo. Los equipos individuales se guardan en <code className="text-ink-dim">vgc_paste_teams</code>.
-      </p>
+    <div className="space-y-4 max-w-3xl">
+      <p className="text-sm text-txt-muted">{t("champions.intro")}</p>
 
-      <ToolPanel title="Registrar regulación">
+      <AvPanel title={t("champions.registerTitle")} icon="plus">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <input value={newRegulationId} onChange={(e) => setNewRegulationId(e.target.value)}
-            placeholder="id (ej. vgc2026regf)" className={inputClass()} />
-          <input value={newFormatId} onChange={(e) => setNewFormatId(e.target.value)}
-            placeholder="formatId (ej. gen9vgc2026regf)" className={inputClass()} />
-          <input value={newName} onChange={(e) => setNewName(e.target.value)}
-            placeholder="Nombre visible" className={inputClass()} />
-          <input value={newGid} onChange={(e) => setNewGid(e.target.value)}
-            placeholder="VGCPastes GID (opcional)" className={inputClass()} />
+          <Input value={newRegulationId} onChange={(e) => setNewRegulationId(e.target.value)} placeholder={t("champions.idPlaceholder")} />
+          <Input value={newFormatId} onChange={(e) => setNewFormatId(e.target.value)} placeholder={t("champions.formatPlaceholder")} />
+          <Input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder={t("champions.namePlaceholder")} />
+          <Input value={newGid} onChange={(e) => setNewGid(e.target.value)} placeholder={t("champions.gidPlaceholder")} />
         </div>
-
-        <div className="mt-3">
-          <BoffButton size="sm" variant="outline" onClick={handleUpsertRegulation} disabled={addingRegulation}>
-            {addingRegulation ? (
-              <><Loader2 className="w-3 h-3 mr-1.5 animate-spin" />Guardando...</>
-            ) : (
-              "Guardar regulación"
-            )}
-          </BoffButton>
+        <div className="mt-4">
+          <Button size="sm" loading={addingRegulation} disabled={addingRegulation} onClick={handleUpsertRegulation}>
+            {addingRegulation ? t("champions.saving") : t("champions.save")}
+          </Button>
         </div>
-      </ToolPanel>
+      </AvPanel>
 
-      {/* Regulation table */}
-      <ToolPanel
-        title="Regulaciones configuradas"
-        headRight={
-          <button onClick={() => loadAvailable()} className="text-ink-dim hover:text-ink transition-colors">
-            <RefreshCw className="w-3.5 h-3.5" />
+      <AvPanel
+        title={t("champions.configuredTitle")}
+        icon="database"
+        aside={
+          <button onClick={() => loadAvailable()} aria-label={t("reload")} className="text-txt-dim hover:text-txt transition-colors">
+            <Icon name="refresh" size={14} />
           </button>
         }
+        flush
       >
         {loading ? (
-          <div className="py-8 flex justify-center text-ink-muted">
-            <Loader2 className="w-4 h-4 animate-spin" />
+          <div className="py-8 flex justify-center">
+            <Spinner size={16} className="text-accent" />
           </div>
         ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-edge bg-[color-mix(in_srgb,var(--layer-1)_96%,transparent)]">
-                <th className={thClass}>Regulación</th>
-                <th className={thClass}>Estado</th>
-                <th className={thClass} />
-              </tr>
-            </thead>
-            <tbody>
-              {available.map((regulation) => {
-                const hasData       = (regulation?.importTeamCount ?? 0) > 0
-                const isRefreshing  = refreshing === regulation.id
-                const isFetching    = fetchingPastes === regulation.id
-                const status        = getStatusLabel(regulation)
-                return (
-                  <tr key={regulation.id} className="border-b border-edge hover:bg-[color-mix(in_srgb,var(--text)_3%,transparent)] transition-colors">
-                    <td className="px-4 py-3">
-                      <p className="text-ink text-xs font-medium">{regulation.name}</p>
-                      <p className="text-ink-dim text-[11px] font-mono">{regulation.id}</p>
-                      <p className="text-ink-dim text-[11px] font-mono">{regulation.formatId}</p>
-                      {regulation?.importTeamCount ? (
-                        <p className="text-ink-dim text-[11px]">
-                          {regulation.importTeamCount ?? 0} equipos importados
-                        </p>
-                      ) : null}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="space-y-1">
-                        <span className={`inline-flex items-center gap-1 text-xs ${status.className}`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${status.dot}`} />
-                          {status.text}
-                        </span>
-                        {regulation?.importError ? (
-                          <p className="text-[11px] text-red-400 max-w-56 truncate" title={regulation.importError}>
-                            {regulation.importError}
-                          </p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[560px]">
+              <thead>
+                <tr className="bg-panel-2">
+                  <th className={TH}>{t("champions.colRegulation")}</th>
+                  <th className={TH}>{t("champions.colStatus")}</th>
+                  <th className={TH} />
+                </tr>
+              </thead>
+              <tbody>
+                {available.map((regulation) => {
+                  const hasData = (regulation?.importTeamCount ?? 0) > 0
+                  const isRefreshing = refreshing === regulation.id
+                  const isFetching = fetchingPastes === regulation.id
+                  const status = statusPill(regulation)
+                  return (
+                    <tr key={regulation.id} className="border-b border-solid border-line last:border-b-0 hover:bg-panel-2 transition-colors">
+                      <td className="px-4 py-3">
+                        <p className="text-xs font-medium">{regulation.name}</p>
+                        <p className="text-txt-dim text-[11px] font-mono">{regulation.id}</p>
+                        <p className="text-txt-dim text-[11px] font-mono">{regulation.formatId}</p>
+                        {regulation?.importTeamCount ? (
+                          <p className="text-txt-dim text-[11px]">{t("champions.teamsImported", { count: regulation.importTeamCount ?? 0 })}</p>
                         ) : null}
-                      </div>
-                    </td>
-                    <td className="px-3 py-3 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <BoffButton size="sm" variant="outline" onClick={() => handleRefresh(regulation.id)}
-                          disabled={isRefreshing || isFetching || !regulation.vgcPastesGid}>
-                          {isRefreshing ? (
-                            <><Loader2 className="w-3 h-3 mr-1.5 animate-spin" />Importando...</>
-                          ) : (
-                            <><RefreshCw className="w-3 h-3 mr-1.5" />Importar CSV</>
-                          )}
-                        </BoffButton>
-                        <BoffButton size="sm" variant="outline" onClick={() => handleFetchPastes(regulation.id)}
-                          disabled={!hasData || isRefreshing || isFetching || !regulation.vgcPastesGid}>
-                          {isFetching ? (
-                            <><Loader2 className="w-3 h-3 mr-1.5 animate-spin" />Descargando...</>
-                          ) : (
-                            <><Download className="w-3 h-3 mr-1.5" />Fetch Pastes</>
-                          )}
-                        </BoffButton>
-                      </div>
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="space-y-1">
+                          <AvPill tone={status.tone}>{status.text}</AvPill>
+                          {regulation?.importError ? (
+                            <p className="text-[11px] text-bad max-w-56 truncate" title={regulation.importError}>
+                              {regulation.importError}
+                            </p>
+                          ) : null}
+                        </div>
+                      </td>
+                      <td className="px-3 py-3 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Button
+                            size="sm"
+                            icon="refresh"
+                            loading={isRefreshing}
+                            disabled={isRefreshing || isFetching || !regulation.vgcPastesGid}
+                            onClick={() => handleRefresh(regulation.id)}
+                          >
+                            {isRefreshing ? t("champions.importingCsv") : t("champions.importCsv")}
+                          </Button>
+                          <Button
+                            size="sm"
+                            icon="download"
+                            loading={isFetching}
+                            disabled={!hasData || isRefreshing || isFetching || !regulation.vgcPastesGid}
+                            onClick={() => handleFetchPastes(regulation.id)}
+                          >
+                            {isFetching ? t("champions.fetchingPastes") : t("champions.fetchPastes")}
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
-      </ToolPanel>
+      </AvPanel>
 
-      {error   && <p className="text-xs text-red-400">{error}</p>}
-      {success && <p className="text-xs text-emerald-400">{success}</p>}
+      {error && <AvAlert tone="error">{error}</AvAlert>}
+      {success && <AvAlert tone="success">{success}</AvAlert>}
 
-      <p className="text-xs text-ink-dim">
-        Fuente: Google Sheets VGCPastes · GID por regulación en{" "}
-        <code className="text-ink-muted">champions-data.ts</code> · Añadir nueva regulación: crear entrada en ese archivo y actualizar <code className="text-ink-muted">REGULATION_OPTIONS</code> aquí.
-      </p>
+      <p className="text-xs text-txt-dim">{t("champions.source")}</p>
     </div>
   )
 }

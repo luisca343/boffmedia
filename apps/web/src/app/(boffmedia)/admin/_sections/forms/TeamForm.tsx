@@ -1,10 +1,8 @@
-import { useForm } from "react-hook-form"
+import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { BoffButton } from "@/components/boffmedia-v2/primitives/button"
-import { BoffInput } from "@/components/boffmedia-v2/primitives/input"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/primitives/form"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/primitives/select"
+import { useTranslations } from "next-intl"
+import { Button, Field, Input, Select } from "@/components/boffmedia/primitives"
 import { useGetEvents } from "@/hooks/events/useGetEvents"
 
 const teamSchema = z.object({
@@ -26,116 +24,52 @@ interface TeamFormProps {
 }
 
 export function TeamForm({ defaultValues, isSubmitting, onSubmit, onCancel, submitLabel = "Guardar" }: TeamFormProps) {
+  const t = useTranslations("admin.form")
   const { events, isLoading: isLoadingEvents } = useGetEvents()
-
-  const form = useForm<TeamFormValues>({
+  const { register, handleSubmit, control, formState: { errors } } = useForm<TeamFormValues>({
     resolver: zodResolver(teamSchema),
-    defaultValues: defaultValues || {
-      name: "",
-      tag: "",
-      icon: "",
-      eventId: 0,
-    },
+    defaultValues: defaultValues || { name: "", tag: "", icon: "", eventId: 0 },
   })
 
-  const selectTriggerClass = "bg-layer-2 border border-solid border-edge-strong text-ink py-2.5 px-3.5 focus:outline-none focus:border-secondary focus:shadow-[0_0_0_3px_var(--secondary-soft)]"
-  const selectContentClass = "bg-layer-1 border-edge-strong text-ink"
+  const eventOptions = [
+    { value: "", label: isLoadingEvents ? t("team.eventLoading") : t("team.eventPlaceholder") },
+    ...(events?.map((e) => ({ value: String(e.id), label: e.title })) ?? []),
+  ]
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-ink-muted">Nombre del Equipo</FormLabel>
-              <FormControl>
-                <BoffInput placeholder="Nombre del equipo" {...field} />
-              </FormControl>
-              <FormDescription className="text-ink-dim">Este será el nombre principal del equipo.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+    <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
+      <Field label={t("team.nameLabel")} hint={t("team.nameHint")} error={errors.name?.message}>
+        <Input placeholder={t("team.namePlaceholder")} {...register("name")} />
+      </Field>
 
-        <FormField
-          control={form.control}
-          name="tag"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-ink-muted">Tag del Equipo</FormLabel>
-              <FormControl>
-                <BoffInput
-                  placeholder="TAG"
-                  {...field}
-                  value={field.value || ""}
-                />
-              </FormControl>
-              <FormDescription className="text-ink-dim">Un identificador corto para el equipo (máx. 5 caracteres).</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <Field label={t("team.tagLabel")} hint={t("team.tagHint")} error={errors.tag?.message}>
+        <Input placeholder="TAG" {...register("tag")} />
+      </Field>
 
-        <FormField
-          control={form.control}
-          name="eventId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-ink-muted">Evento</FormLabel>
-              <Select
-                onValueChange={(value) => field.onChange(Number(value))}
-                defaultValue={field.value?.toString()}
-                disabled={isLoadingEvents}
-              >
-                <FormControl>
-                  <SelectTrigger className={selectTriggerClass}>
-                    <SelectValue placeholder={isLoadingEvents ? "Cargando eventos..." : "Selecciona un evento"} />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent className={selectContentClass}>
-                  {events?.map((event) => (
-                    <SelectItem key={event.id} value={event.id.toString()}>
-                      {event.title}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormDescription className="text-ink-dim">Selecciona el evento al que pertenecerá este equipo.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <Controller
+        control={control}
+        name="eventId"
+        render={({ field }) => (
+          <Select
+            label={t("team.eventLabel")}
+            hint={t("team.eventHint")}
+            error={errors.eventId?.message}
+            value={field.value ? String(field.value) : ""}
+            options={eventOptions}
+            disabled={isLoadingEvents}
+            onChange={(v) => field.onChange(v ? Number(v) : 0)}
+          />
+        )}
+      />
 
-        <FormField
-          control={form.control}
-          name="icon"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-ink-muted">Icono URL (opcional)</FormLabel>
-              <FormControl>
-                <BoffInput
-                  placeholder="https://ejemplo.com/icono.jpg"
-                  {...field}
-                  value={field.value || ""}
-                />
-              </FormControl>
-              <FormDescription className="text-ink-dim">URL de la imagen que se usará como icono del equipo.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <Field label={t("team.iconLabel")} hint={t("team.iconHint")} error={errors.icon?.message}>
+        <Input placeholder="https://ejemplo.com/icono.jpg" {...register("icon")} />
+      </Field>
 
-        <div className="flex justify-end gap-2 pt-4">
-          <BoffButton type="button" variant="ghost" onClick={onCancel}>
-            Cancelar
-          </BoffButton>
-          <BoffButton type="submit" disabled={isSubmitting || isLoadingEvents}>
-            {submitLabel}
-          </BoffButton>
-        </div>
-      </form>
-    </Form>
+      <div className="flex justify-end gap-2.5 pt-2">
+        <Button type="button" variant="ghost" onClick={onCancel}>{t("cancel")}</Button>
+        <Button type="submit" variant="pri" loading={isSubmitting} disabled={isSubmitting || isLoadingEvents}>{submitLabel}</Button>
+      </div>
+    </form>
   )
 }

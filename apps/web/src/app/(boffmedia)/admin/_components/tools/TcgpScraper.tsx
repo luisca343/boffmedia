@@ -1,9 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { Loader2, RefreshCw } from "lucide-react"
-import { BoffButton } from "@/components/boffmedia-v2/primitives/button"
-import { ToolPanel } from "@/components/boffmedia-v2/primitives/tool-panel"
+import { useTranslations } from "next-intl"
+import { Button, Icon, Spinner } from "@/components/boffmedia/primitives"
+import { AvSectionHead, AvPanel, AvPill } from "../ui/av-kit"
 import { PtcgpService } from "@/services/api/boffmedia/ptcgpService"
 
 type Step = "idle" | "series" | "sets" | "cards" | "done" | "error"
@@ -17,101 +17,67 @@ interface ProgressState {
 }
 
 export function TcgpScraper() {
+  const t = useTranslations("admin.tcgp")
   const [progress, setProgress] = useState<ProgressState>({ step: "idle" })
+  const busy = progress.step === "series" || progress.step === "sets" || progress.step === "cards"
 
   const triggerFetch = async () => {
-    setProgress({ step: "series", message: "Obteniendo series…" })
+    setProgress({ step: "series" })
     try {
       await PtcgpService.fetchAndStoreSeries()
-      setProgress({ step: "sets", message: "Obteniendo colecciones…" })
+      setProgress({ step: "sets" })
       await PtcgpService.fetchAndStoreSetsForSeries("tcgp")
-      setProgress({ step: "cards", message: "Obteniendo cartas…" })
+      setProgress({ step: "cards" })
       const results = await PtcgpService.fetchAndStoreAllCardsForSeries("tcgp")
-      const successful = results.data?.filter(r => !r.error) ?? []
-      const failed = results.data?.filter(r => r.error) ?? []
+      const successful = results.data?.filter((r) => !r.error) ?? []
+      const failed = results.data?.filter((r) => r.error) ?? []
       setProgress({
         step: "done",
         totalSets: results.data?.length ?? 0,
         doneSets: successful.length,
         failedSets: failed.length,
-        message: `${successful.length} colecciones actualizadas${failed.length > 0 ? `, ${failed.length} fallidas` : ""}`,
       })
     } catch (error) {
-      setProgress({ step: "error", message: error instanceof Error ? error.message : "Error desconocido" })
+      setProgress({ step: "error", message: error instanceof Error ? error.message : undefined })
     }
   }
 
-  return (
-    <div className="max-w-lg space-y-6">
-      <div>
-        <h3 className="text-lg font-bold text-ink">TCG Pocket Scraper</h3>
-        <p className="text-sm text-ink-muted mt-1">
-          Obtiene cartas de Pokémon TCG Pocket desde la API externa y las almacena en la base de datos.
-        </p>
-      </div>
+  const runningLabel =
+    progress.step === "series" ? t("statusSeries") : progress.step === "sets" ? t("statusSets") : t("statusCards")
 
-      <ToolPanel title="Scraping">
+  return (
+    <div className="max-w-2xl">
+      <AvSectionHead title={t("title")} desc={t("desc")} />
+
+      <AvPanel title={t("panel")} icon="database">
         {progress.step === "idle" ? (
-          <p className="text-sm text-ink-muted">
-            Pulsa el botón para empezar. El proceso descarga series, colecciones y cartas secuencialmente.
-          </p>
+          <p className="text-sm text-txt-muted">{t("idle")}</p>
         ) : (
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              {(progress.step === "series" || progress.step === "sets" || progress.step === "cards") && (
-                <Loader2 className="w-4 h-4 animate-spin text-amber-400 shrink-0" />
-              )}
-              {progress.step === "done" && (
-                <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
-              )}
-              {progress.step === "error" && (
-                <span className="w-2 h-2 rounded-full bg-red-400 shrink-0" />
-              )}
-              <span className={`text-sm font-medium ${
-                progress.step === "done" ? "text-emerald-400" :
-                progress.step === "error" ? "text-red-400" :
-                "text-amber-400"
-              }`}>
-                {progress.step === "series" ? "Obteniendo series…" :
-                 progress.step === "sets"   ? "Obteniendo colecciones…" :
-                 progress.step === "cards"  ? "Obteniendo cartas…" :
-                 progress.step === "done"   ? "Actualización completada" :
-                 "Error"}
-              </span>
+              {busy && <Spinner size={14} className="text-accent shrink-0" />}
+              {progress.step === "done" && <AvPill tone="green" icon="check">{t("done")}</AvPill>}
+              {progress.step === "error" && <AvPill tone="rose" icon="alert">{t("error")}</AvPill>}
+              {busy && <span className="text-sm font-medium text-accent">{runningLabel}</span>}
             </div>
-            {progress.message && (
-              <p className="text-sm text-ink-muted">{progress.message}</p>
-            )}
+            {progress.message && <p className="text-sm text-txt-muted">{progress.message}</p>}
             {progress.step === "done" && progress.totalSets != null && (
-              <p className="text-xs text-ink-dim">
-                {progress.doneSets}/{progress.totalSets} colecciones procesadas
+              <p className="text-xs text-txt-dim font-mono">
                 {progress.failedSets && progress.failedSets > 0
-                  ? ` (${progress.failedSets} con errores)`
-                  : ""}
+                  ? t("processedFailed", { done: progress.doneSets ?? 0, total: progress.totalSets, failed: progress.failedSets })
+                  : t("processed", { done: progress.doneSets ?? 0, total: progress.totalSets })}
               </p>
             )}
           </div>
         )}
 
         <div className="mt-4 flex gap-2">
-          <BoffButton
-            onClick={triggerFetch}
-            disabled={progress.step === "series" || progress.step === "sets" || progress.step === "cards"}
-          >
-            {(progress.step === "series" || progress.step === "sets" || progress.step === "cards") ? (
-              <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Procesando…</>
-            ) : (
-              <><RefreshCw className="w-4 h-4 mr-2" />Cargar datos</>
-            )}
-          </BoffButton>
-
-          {progress.step === "done" && (
-            <BoffButton variant="outline" onClick={() => setProgress({ step: "idle" })}>
-              Reiniciar
-            </BoffButton>
-          )}
+          <Button variant="pri" icon={busy ? undefined : "refresh"} loading={busy} disabled={busy} onClick={triggerFetch}>
+            {busy ? t("processing") : t("load")}
+          </Button>
+          {progress.step === "done" && <Button onClick={() => setProgress({ step: "idle" })}>{t("reset")}</Button>}
         </div>
-      </ToolPanel>
+      </AvPanel>
     </div>
   )
 }

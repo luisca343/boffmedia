@@ -1,11 +1,11 @@
 "use client"
 
-import { Users } from "lucide-react"
-import { AdminCrud } from "@/components/boffmedia-v2/ui/admin/admin-crud"
+import { useTranslations } from "next-intl"
+import { AdminCrud } from "../_components/ui/av-crud"
+import { AvSectionHead, AvPill } from "../_components/ui/av-kit"
 import { useGetTeams } from "@/hooks/events/useGetTeams"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { TeamForm } from "./forms/TeamForm"
-import { toast } from "@/components/boffmedia/primitives/toast"
 import type { Team } from "@boffmedia/shared"
 
 function useTeamsList() {
@@ -13,45 +13,55 @@ function useTeamsList() {
   return { data: teams as Team[] | undefined, error, isLoading, refetch }
 }
 
+const STATUS: Record<string, "green" | "rose" | "amber"> = {
+  active: "green",
+  disqualified: "rose",
+  withdrew: "amber",
+}
+
 export function TeamsAdmin() {
+  const tr = useTranslations("admin.teams")
   return (
-    <AdminCrud<Team>
-      title="Gestión de Equipos"
-      icon={Users}
-      description="Administra los equipos de los eventos"
-      useList={useTeamsList}
-      FormComponent={TeamForm}
-      onCreate={async (data: any) => {
-        const { id, ...teamData } = data
-        await EventsService.createTeam(data.eventId, teamData)
-      }}
-      onUpdate={async (id, data: any) => {
-        const { id: _id, ...teamData } = data as any
-        await EventsService.updateTeam(data.eventId, Number(id), teamData)
-      }}
-      onDelete={async (id) => {
-        toast.success(`Equipo eliminado con éxito.`)
-      }}
-      searchFields={["name", "tag"]}
-      entityName={{ singular: "equipo", plural: "equipos" }}
-      columns={[
-        { key: "name", label: "Equipo", render: (t) => (
-          <div className="flex items-center gap-2">
-            <span className="font-medium text-ink">{t.name}</span>
-            {t.tag && <span className="text-xs font-mono text-ink-dim bg-layer-2 px-1.5 py-0.5 rounded">[{t.tag}]</span>}
-          </div>
-        )},
-        { key: "eventId", label: "Evento ID", render: (t) => (
-          <span className="text-sm text-ink-muted">#{t.eventId}</span>
-        )},
-        { key: "status", label: "Estado", render: (t) => {
-          const colors: Record<string, string> = { active: "text-emerald-400", disqualified: "text-red-400", withdrew: "text-amber-400" }
-          return <span className={`text-sm ${colors[t.status ?? ""] ?? "text-ink-muted"}`}>{t.status ?? "—"}</span>
-        }},
-        { key: "totalScore", label: "Puntos", render: (t) => (
-          <span className="text-sm font-mono text-ink-muted">{t.totalScore ?? 0}</span>
-        )},
-      ]}
-    />
+    <div>
+      <AvSectionHead title={tr("title")} desc={tr("desc")} />
+      <AdminCrud<Team>
+        useList={useTeamsList}
+        FormComponent={TeamForm}
+        onCreate={async (data: any) => {
+          const { id, ...teamData } = data
+          await EventsService.createTeam(data.eventId, teamData)
+        }}
+        onUpdate={async (id, data: any) => {
+          const { id: _id, ...teamData } = data as any
+          await EventsService.updateTeam(data.eventId, Number(id), teamData)
+        }}
+        onDelete={async () => {
+          /* team deletion endpoint not wired — see admin roadmap */
+        }}
+        searchFields={["name", "tag"]}
+        entityName={{ singular: tr("singular"), plural: tr("plural") }}
+        columns={[
+          { key: "name", label: tr("colTeam"), render: (t) => (
+            <div className="flex items-center gap-2">
+              <span className="font-medium">{t.name}</span>
+              {t.tag && (
+                <span className="text-xs font-mono text-txt-dim bg-panel-2 border border-solid border-line px-1.5 py-0.5">
+                  [{t.tag}]
+                </span>
+              )}
+            </div>
+          )},
+          { key: "eventId", label: tr("colEventId"), render: (t) => (
+            <span className="text-sm text-txt-muted font-mono">#{t.eventId}</span>
+          )},
+          { key: "status", label: tr("colStatus"), render: (t) => (
+            <AvPill tone={STATUS[t.status ?? ""] ?? "muted"}>{t.status ?? "—"}</AvPill>
+          )},
+          { key: "totalScore", label: tr("colPoints"), render: (t) => (
+            <span className="text-sm font-mono text-txt-muted">{t.totalScore ?? 0}</span>
+          )},
+        ]}
+      />
+    </div>
   )
 }
