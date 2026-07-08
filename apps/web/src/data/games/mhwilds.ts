@@ -32,6 +32,7 @@ export const mhwilds: GameEntry = {
           nameKey: "games.mhwilds.tools.planner",
           href: "/mhwilds/builds/planner",
           sidebarIcon: "sword",
+          bleed: true,
           landing: {
             icon: "/img/games/mhwilds/long-sword.webp",
             fallbackIcon: "shield",
@@ -49,6 +50,7 @@ export const mhwilds: GameEntry = {
           nameKey: "games.mhwilds.tools.weaponTree",
           href: "/mhwilds/tree",
           sidebarIcon: "tree",
+          bleed: true,
           landing: {
             icon: "/img/games/mhwilds/charge-blade.webp",
             fallbackIcon: "sword",

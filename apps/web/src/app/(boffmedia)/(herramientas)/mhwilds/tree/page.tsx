@@ -1,436 +1,454 @@
 "use client"
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useWeaponTreeData } from './_hooks/useWeaponTreeData';
-import { useTranslations } from 'next-intl';
-import { Button } from '@/components/ui/primitives/button';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useTranslations } from "next-intl"
+import { Button, Chip, Empty, Icon, Select, Spinner } from "@/components/boffmedia/primitives"
+import { useWeaponTreeData } from "./_hooks/useWeaponTreeData"
+import {
+  MhApp, MhBar, MhBarSide, MhBody, MhWrap, MhSeal, MhModes, MhSrc, MhSearch,
+  MhTypeChip, MhNodeCard, MhDrawer, MhRarity, MhStat3, MhElement, MhMaterial, MhLabel, MhMeter,
+} from "../_components/ui/mh-kit"
+import { WEAPON_TYPES, weaponAttack, firstSpecial, elementColor } from "../_components/mh-helpers"
 
-export function WeaponElement({ weapon }: { weapon: any }) {
-  // Extract element information
-  const elementInfo = weapon.specials?.find((special: any) => special.kind === "element");
-  const elementType = elementInfo?.element || "none";
+type Node = any
 
-  return (
-    <div className="rounded-lg p-2.5 cursor-pointer min-w-32 overflow-hidden flex flex-col relative transition-all duration-200 bg-layer-1/80 border border-edge/40 hover:bg-layer-2/90 hover:border-primary/30">
-      {/* Rarity badge */}
-      <span
-        className="absolute top-0 right-0 text-[10px] px-1.5 rounded-bl font-mono"
-        style={{ background: "rgba(15,23,42,0.8)", color: "rgba(251,146,60,0.8)", borderLeft: "1px solid rgba(71,85,105,0.3)", borderBottom: "1px solid rgba(71,85,105,0.3)" }}
-      >
-        R{weapon.rarity}
-      </span>
-      
-      {/* Weapon name */}
-      <h2 className="text-xs font-bold text-ink mb-1" title={weapon.name}>
-        {weapon.name}
-      </h2>
-      
-      {/* Damage display with icon */}
-      <div className="flex items-center gap-1.5 text-xs text-ink mt-0.5">
-        <div className="w-3.5 h-3.5 relative flex-shrink-0">
-          <img 
-            src="/img/games/mhwilds/attack.webp" 
-            alt="Attack" 
-            className="w-full h-full object-contain"
-          />
-        </div>
-        <span>{weapon.damage?.display || 0}</span>
-      </div>
-      
-      {/* Element display with icon */}
-      {elementInfo && elementType !== "none" && (
-        <div className="flex items-center gap-1.5 text-xs text-ink mt-1">
-          <div className="w-3.5 h-3.5 relative flex-shrink-0">
-            <img 
-              src={`/img/games/mhwilds/${elementType}.webp`} 
-              alt={elementType} 
-              className="w-full h-full object-contain"
-            />
-          </div>
-          <span>{elementInfo.damage.display}</span>
-          {elementInfo.hidden && (
-            <span className="text-[8px] text-ink-muted">(hidden)</span>
-          )}
-        </div>
-      )}
-    </div>
-  );
+const NODE_W = 212
+const NODE_H = 66
+const COL = NODE_W + 64
+const ROW = NODE_H + 16
+const LS_OWNED = "mh_tree_owned_v3"
+
+function tLoad(): Record<string, Record<string, boolean>> {
+  if (typeof window === "undefined") return {}
+  try { return JSON.parse(localStorage.getItem(LS_OWNED) || "{}") || {} } catch { return {} }
+}
+
+function computeLayout(roots: Node[]) {
+  const pos: Record<string, { x: number; y: number; node: Node }> = {}
+  let leaf = 0
+  function assign(node: Node, depth: number): number {
+    const x = depth * COL
+    if (!node.children || node.children.length === 0) {
+      const y = leaf * ROW; leaf++; pos[node.id] = { x, y, node }; return y
+    }
+    const ys = node.children.map((c: Node) => assign(c, depth + 1))
+    const y = (ys[0] + ys[ys.length - 1]) / 2
+    pos[node.id] = { x, y, node }; return y
+  }
+  roots.forEach((r) => assign(r, 0))
+  const edges: { from: string; to: string }[] = []
+  Object.values(pos).forEach((p) => (p.node.children || []).forEach((c: Node) => edges.push({ from: String(p.node.id), to: String(c.id) })))
+  const xs = Object.values(pos).map((p) => p.x)
+  const ys = Object.values(pos).map((p) => p.y)
+  return { pos, edges, width: (xs.length ? Math.max(...xs) : 0) + NODE_W, height: (ys.length ? Math.max(...ys) : 0) + NODE_H }
+}
+
+function flatten(roots: Node[]): { node: Node; depth: number }[] {
+  const out: { node: Node; depth: number }[] = []
+  const walk = (n: Node, d: number) => { out.push({ node: n, depth: d }); (n.children || []).forEach((c: Node) => walk(c, d + 1)) }
+  roots.forEach((r) => walk(r, 0))
+  return out
+}
+
+function pathTo(roots: Node[], id: string): string[] | null {
+  const dfs = (n: Node, acc: string[]): string[] | null => {
+    const next = [...acc, String(n.id)]
+    if (String(n.id) === id) return next
+    for (const c of n.children || []) { const r = dfs(c, next); if (r) return r }
+    return null
+  }
+  for (const r of roots) { const res = dfs(r, []); if (res) return res }
+  return null
 }
 
 export default function WeaponTree() {
-  const t = useTranslations('mhwilds');
-  
-  const {
-    weaponTypes,
-    filteredTree,
-    activeWeaponType,
-    setActiveWeaponType,
-    loading,
-    error,
-    refreshData
-  } = useWeaponTreeData();
-  
-  const [selectedWeapon, setSelectedWeapon] = useState<any>(null);
-  const router = useRouter();
-  
-  const handleWeaponClick = (weapon: any) => {
-    setSelectedWeapon(weapon);
-  };
-  
-  const closeWeaponDetails = () => {
-    setSelectedWeapon(null);
-  };
-  
+  const t = useTranslations("mhwilds")
+  const { weaponTree, loading, error, refreshData } = useWeaponTreeData()
+
+  const treeByKind: Record<string, Node[]> = weaponTree?.treeByKind || {}
+  const availableTypes = useMemo<string[]>(() => WEAPON_TYPES.filter((k) => treeByKind[k]?.length), [treeByKind])
+  const soonTypes = useMemo<string[]>(() => WEAPON_TYPES.filter((k) => !treeByKind[k]?.length), [treeByKind])
+
+  const [type, setType] = useState<string>("long-sword")
+  const [view, setView] = useState<"tree" | "outline">("tree")
+  const [selId, setSelId] = useState<string | null>(null)
+  const [owned, setOwned] = useState<Record<string, Record<string, boolean>>>({})
+  const [q, setQ] = useState("")
+  const [fRar, setFRar] = useState("all")
+  const [fEl, setFEl] = useState("all")
+  const [pathMode, setPathMode] = useState(true)
+  const [xf, setXf] = useState({ scale: 1, tx: 40, ty: 24 })
+
+  const stageRef = useRef<HTMLDivElement>(null)
+  const drag = useRef<{ x: number; y: number; tx: number; ty: number } | null>(null)
+
+  useEffect(() => { setOwned(tLoad()) }, [])
+  // once data lands, ensure the active type actually exists
+  useEffect(() => {
+    if (availableTypes.length && !availableTypes.includes(type)) {
+      setType(availableTypes.includes("long-sword") ? "long-sword" : availableTypes[0])
+    }
+  }, [availableTypes, type])
+
+  const roots = treeByKind[type] || []
+  const layout = useMemo(() => computeLayout(roots), [roots])
+  const nodesById = useMemo(() => {
+    const m: Record<string, Node> = {}
+    Object.values(layout.pos).forEach((p) => { m[String(p.node.id)] = p.node })
+    return m
+  }, [layout])
+  const allNodes = useMemo(() => Object.values(nodesById), [nodesById])
+  const total = allNodes.length
+  const ownedSet = owned[type] || {}
+  const ownedCount = allNodes.filter((n) => ownedSet[String(n.id)]).length
+  const sel = selId != null ? nodesById[selId] : null
+
+  const fit = useCallback(() => {
+    const st = stageRef.current; if (!st) return
+    const sw = st.clientWidth, sh = st.clientHeight
+    const scale = Math.min((sw - 64) / (layout.width || 1), (sh - 56) / (layout.height || 1), 1.1)
+    const s = Math.max(0.35, scale)
+    setXf({ scale: s, tx: Math.max(24, (sw - layout.width * s) / 2), ty: Math.max(20, (sh - layout.height * s) / 2) })
+  }, [layout])
+  useEffect(() => { fit(); setSelId(null) /* eslint-disable-next-line */ }, [type, view])
+
+  // native non-passive wheel zoom toward cursor
+  useEffect(() => {
+    const st = stageRef.current; if (!st || view !== "tree") return
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault()
+      const rect = st.getBoundingClientRect()
+      const mx = e.clientX - rect.left, my = e.clientY - rect.top
+      setXf((c) => {
+        const factor = e.deltaY < 0 ? 1.12 : 0.89
+        const ns = Math.min(2, Math.max(0.3, c.scale * factor))
+        const k = ns / c.scale
+        return { scale: ns, tx: mx - (mx - c.tx) * k, ty: my - (my - c.ty) * k }
+      })
+    }
+    st.addEventListener("wheel", onWheel, { passive: false })
+    return () => st.removeEventListener("wheel", onWheel)
+  }, [view])
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    if ((e.target as HTMLElement).closest("[data-node]")) return
+    drag.current = { x: e.clientX, y: e.clientY, tx: xf.tx, ty: xf.ty }
+    stageRef.current?.classList.add("cursor-grabbing")
+  }
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (!drag.current) return
+    setXf((c) => ({ ...c, tx: drag.current!.tx + (e.clientX - drag.current!.x), ty: drag.current!.ty + (e.clientY - drag.current!.y) }))
+  }
+  const endDrag = () => { drag.current = null; stageRef.current?.classList.remove("cursor-grabbing") }
+  const zoom = (dir: number) => setXf((c) => {
+    const st = stageRef.current
+    const sw = st ? st.clientWidth / 2 : 300, sh = st ? st.clientHeight / 2 : 200
+    const ns = Math.min(2, Math.max(0.3, c.scale * (dir > 0 ? 1.2 : 0.83)))
+    const k = ns / c.scale
+    return { scale: ns, tx: sw - (sw - c.tx) * k, ty: sh - (sh - c.ty) * k }
+  })
+
+  const matches = useCallback((n: Node) => {
+    if (fRar !== "all" && n.rarity !== +fRar) return false
+    if (fEl !== "all") { const sp = firstSpecial(n.specials); const e = sp ? sp.type.toLowerCase() : "none"; if (e !== fEl) return false }
+    if (q.trim() && !n.name.toLowerCase().includes(q.trim().toLowerCase())) return false
+    return true
+  }, [fRar, fEl, q])
+  const filtering = !!q.trim() || fRar !== "all" || fEl !== "all"
+
+  const pathSet = useMemo(() => {
+    if (!pathMode || !sel) return null
+    const anc = pathTo(roots, String(sel.id)) || [String(sel.id)]
+    const set: Record<string, boolean> = {}
+    anc.forEach((id) => { set[id] = true })
+    let cur: Node = nodesById[String(sel.id)]
+    while (cur && cur.children && cur.children.length) {
+      cur = [...cur.children].sort((a: Node, b: Node) => weaponAttack(b) - weaponAttack(a))[0]
+      set[String(cur.id)] = true
+    }
+    return set
+  }, [pathMode, sel, roots, nodesById])
+
+  const nodeDim = (n: Node) => (filtering && !matches(n)) || (pathSet && !pathSet[String(n.id)])
+  const edgeCls = (e: { from: string; to: string }) => {
+    if (pathSet) return pathSet[e.from] && pathSet[e.to] ? "stroke-[var(--mh)] [stroke-width:3]" : "stroke-line-2 opacity-25"
+    if (filtering) return matches(nodesById[e.from]) && matches(nodesById[e.to]) ? "stroke-line-2" : "stroke-line-2 opacity-25"
+    return "stroke-line-2"
+  }
+
+  const toggleOwned = (id: string) => setOwned((o) => {
+    const t2 = { ...(o[type] || {}) }
+    if (t2[id]) delete t2[id]; else t2[id] = true
+    const n = { ...o, [type]: t2 }
+    try { localStorage.setItem(LS_OWNED, JSON.stringify(n)) } catch { /* ignore */ }
+    return n
+  })
+
+  const rarOptions = [{ value: "all", label: t("tree.allRarity") }, ...[1, 2, 3, 4, 5, 6, 7, 8].map((r) => ({ value: String(r), label: `${t("rarity")} ${r}` }))]
+  const elOptions = [
+    { value: "all", label: t("tree.allElement") },
+    { value: "none", label: t("tree.noElement") },
+    ...["fire", "water", "thunder", "ice", "dragon", "poison", "sleep", "paralysis", "blast"].map((e) => ({ value: e, label: t(e) })),
+  ]
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px] gap-3">
-        <div className="relative w-10 h-10">
-          <div
-            className="absolute inset-0 rounded-full animate-spin"
-            style={{ border: "2px solid transparent", borderTopColor: "rgba(249,115,22,0.8)", borderRightColor: "rgba(249,115,22,0.3)" }}
-          />
-          <div
-            className="absolute inset-[3px] rounded-full animate-spin"
-            style={{ border: "2px solid transparent", borderTopColor: "rgba(34,211,238,0.6)", borderRightColor: "rgba(34,211,238,0.2)", animationDirection: "reverse" }}
-          />
+      <MhApp>
+        <div className="flex-1 grid place-items-center">
+          <div className="flex flex-col items-center gap-3">
+            <Spinner />
+            <span className="font-mono text-[12px] uppercase tracking-[0.14em] text-[var(--mh-bright)]">{t("app.loading")}…</span>
+          </div>
         </div>
-        <span
-          className="text-sm font-black uppercase tracking-widest"
-          style={{ fontFamily: "Orbitron, sans-serif", color: "rgba(251,146,60,0.9)" }}
-        >
-          {t('loading')}...
-        </span>
-      </div>
-    );
+      </MhApp>
+    )
   }
-
   if (error) {
     return (
-      <div
-        className="flex flex-col items-center gap-3 px-4 py-6 rounded-xl my-4"
-        style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.25)" }}
-      >
-        <p className="text-sm" style={{ color: "rgba(252,165,165,0.9)" }}>{error}</p>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
-          onClick={() => refreshData()}
-        >
-          {t('build_planner.retry')}
-        </Button>
-      </div>
-    );
-  }
-
-  // Helper function to extract element from a weapon
-  function getWeaponElement(weapon: any): string {
-    const elementSpecial = weapon.specials?.find((special: any) => special.kind === "element");
-    return elementSpecial?.element || "none";
-  }
-  
-  // Helper function to extract Roman numeral from weapon name
-  function getRomanNumeral(weapon: any): number {
-    const name = weapon.name || '';
-    if (name.includes(" V")) return 5;
-    if (name.includes(" IV")) return 4;
-    if (name.includes(" III")) return 3;
-    if (name.includes(" II")) return 2;
-    if (name.includes(" I")) return 1;
-    return 0;
-  }
-
-  // Helper function to find the next Roman numeral in sequence
-  function getNextRomanNumeral(parentWeapon: any): number {
-    const parentNumeral = getRomanNumeral(parentWeapon);
-    return parentNumeral + 1;
-  }
-
-  // Custom sort function for weapons by element and Roman numerals
-  function sortWeaponsByElementAndSequence(weapons: any[], parentWeapon: any = null): any[] {
-    // Group weapons by element
-    const weaponsByElement: {[key: string]: any[]} = {};
-    const parentElement = parentWeapon ? getWeaponElement(parentWeapon) : "none";
-    const nextNumeral = parentWeapon ? getNextRomanNumeral(parentWeapon) : 0;
-    
-    weapons.forEach(weapon => {
-      const element = getWeaponElement(weapon);
-      if (!weaponsByElement[element]) {
-        weaponsByElement[element] = [];
-      }
-      weaponsByElement[element].push(weapon);
-    });
-    
-    // First, check if we need to prioritize weapons with next numeral in sequence
-    if (nextNumeral > 0 && nextNumeral <= 5) {
-      const weaponsWithNextNumeral = weapons.filter(w => getRomanNumeral(w) === nextNumeral);
-      if (weaponsWithNextNumeral.length > 0) {
-        // Further sort these by element if needed
-        const remainingWeapons = weapons.filter(w => getRomanNumeral(w) !== nextNumeral);
-        return [...weaponsWithNextNumeral, ...sortWeaponsByElement(remainingWeapons, parentElement)];
-      }
-    }
-    
-    // If no next numeral is found, fall back to element-based sorting
-    return sortWeaponsByElement(weapons, parentElement);
-  }
-  
-  // Element-based sorting (kept as a separate function)
-  function sortWeaponsByElement(weapons: any[], parentElement: string = "none"): any[] {
-    // Group weapons by element
-    const weaponsByElement: {[key: string]: any[]} = {};
-    
-    weapons.forEach(weapon => {
-      const element = getWeaponElement(weapon);
-      if (!weaponsByElement[element]) {
-        weaponsByElement[element] = [];
-      }
-      weaponsByElement[element].push(weapon);
-    });
-    
-    // If parent has no element, prioritize children with no element
-    if (parentElement === "none" && weaponsByElement["none"]) {
-      // Put "none" element weapons first
-      const noneElementWeapons = weaponsByElement["none"];
-      delete weaponsByElement["none"];
-      
-      // Combine the arrays with none element first
-      return [...noneElementWeapons, ...Object.values(weaponsByElement).flat()];
-    }
-    
-    // Otherwise, try to match parent's element if possible
-    if (weaponsByElement[parentElement]) {
-      const matchingElementWeapons = weaponsByElement[parentElement];
-      delete weaponsByElement[parentElement];
-      
-      // Combine with matching element first
-      return [...matchingElementWeapons, ...Object.values(weaponsByElement).flat()];
-    }
-    
-    // Default case, just flatten all
-    return Object.values(weaponsByElement).flat();
-  }
-
-  // Function to convert the tree structure to a table format
-  function buildWeaponTable(rootWeapons: any[]) {
-    const rows: any[][] = [];
-    // Sort root weapons by element
-    const sortedRootWeapons = sortWeaponsByElement(rootWeapons);
-    
-    function processWeapon(weapon: any, rowIndex: number, hasParent: boolean = false) {
-      // Ensure the row exists
-      if (!rows[rowIndex]) {
-        rows[rowIndex] = Array(9).fill(null); // Create 9 columns (0-8)
-      }
-      
-      // Calculate column based on rarity
-      const rarity = weapon.rarity || 1;
-      const column = rarity === 1 
-      ? (hasParent ? 1 : Math.min(1, rows[rowIndex].findIndex(cell => cell === null))) 
-      : rarity;
-      
-      // Place the weapon in the appropriate column
-      rows[rowIndex][column] = weapon;
-      
-      // Process children if they exist
-      if (weapon.children && weapon.children.length > 0) {
-        // Sort children by element with parent element context and Roman numeral sequence
-        const sortedChildren = sortWeaponsByElementAndSequence(weapon.children, weapon);
-        
-        sortedChildren.forEach((child: any, index: number) => {
-          // First child continues in the same row
-          if (index === 0) {
-            processWeapon(child, rowIndex, true); // Pass true to indicate it has a parent
-          } else {
-            // Other children start new rows
-            processWeapon(child, rows.length, true); // Pass true to indicate it has a parent
-          }
-        });
-      }
-    }
-    
-    // Process each root weapon
-    sortedRootWeapons.forEach((weapon, index) => {
-      if (index === 0) {
-        processWeapon(weapon, 0, false); // Root weapons don't have parents
-      } else {
-        processWeapon(weapon, rows.length, false); // Root weapons don't have parents
-      }
-    });
-    
-    return rows;
-  }
-
-  function renderWeaponTable() {
-    const tableRows = buildWeaponTable(filteredTree);
-    
-    // Function to find a weapon's position in the table
-    const findWeaponPosition = (weaponId: string) => {
-      for (let rowIdx = 0; rowIdx < tableRows.length; rowIdx++) {
-        const colIdx = tableRows[rowIdx].findIndex(w => w && w.id === weaponId);
-        if (colIdx !== -1) {
-          return { rowIdx, colIdx };
-        }
-      }
-      return null;
-    };
-    
-    return (
-      <div className="overflow-x-auto rounded-xl p-4" style={{ background: "rgba(15,23,42,0.5)", border: "1px solid rgba(71,85,105,0.3)" }}>
-        <table className="min-w-full border-collapse">
-          <tbody>
-            {tableRows.map((row, rowIndex) => (
-              <tr key={rowIndex}>
-                {row.map((weapon, colIndex) => (
-                  <td key={colIndex} className="p-2 relative">
-                    {weapon && (
-                      <>
-                        <div 
-                          className="relative z-10"
-                          onClick={() => handleWeaponClick(weapon)}
-                        >
-                          <WeaponElement weapon={weapon} />
-                        </div>
-                        
-                        {/* Draw lines from this weapon to its direct children */}
-                        {weapon.children && weapon.children.length > 0 && (
-                          <>
-                            {weapon.children.map((child: any) => {
-                              // Find this child's position in the table
-                              const childPosition = findWeaponPosition(child.id);
-                              
-                              if (!childPosition) return null;
-                              
-                              const { rowIdx: childRowIdx, colIdx: childColIdx } = childPosition;
-                              
-                              // Only proceed if we found the child
-                              if (childRowIdx !== undefined && childColIdx !== undefined) {
-                                // Same row connection (keep existing code)
-                                if (childRowIdx === rowIndex && childColIdx > colIndex) {
-                                  const distance = childColIdx - colIndex;
-                                  
-                                  return (
-                                    <div key={`${child.id}-same-row`} className="absolute inset-0 pointer-events-none">
-                                      {/* Horizontal dashed line from parent to child */}
-                                      <div 
-                                        className="absolute border-t-2 border-dashed border-primary"
-                                        style={{
-                                          height: '0',
-                                          left: '50%',
-                                          width: `${distance * 100}%`,
-                                          top: '50%',
-                                          zIndex: 1
-                                        }}
-                                      />
-                                    </div>
-                                  );
-                                }
-                                // Different row connection - update to dashed lines
-                                else {
-                                  // Calculate positions and dimensions for the connection
-                                  const rowDifference = childRowIdx - rowIndex;
-                                  const colDifference = childColIdx - colIndex;
-                                  
-                                  return (
-                                    <div key={`${child.id}-diff-row`} className="absolute inset-0 pointer-events-none">
-                                      {/* Vertical dashed line going down from parent */}
-                                      <div 
-                                        className="absolute border-l-2 border-dashed border-primary"
-                                        style={{
-                                          left: '50%',
-                                          top: '50%',
-                                          width: '0',
-                                          height: `${rowDifference * 144}px`,
-                                          transform: 'translateX(-50%)',
-                                          zIndex: 2
-                                        }}
-                                      />
-                                      
-                                      {/* Horizontal dashed line connecting to child */}
-                                      <div 
-                                        className="absolute border-t-2 border-dashed border-primary"
-                                        style={{
-                                          left: colDifference > 0 ? '50%' : `calc(50% + ${colDifference * 144}px)`,
-                                          top: `calc(50% + ${rowDifference * 144}px)`,
-                                          width: `${Math.abs(colDifference) * 144}px`,
-                                          height: '0',
-                                          zIndex: 2
-                                        }}
-                                      />
-                                    </div>
-                                  );
-                                }
-                              }
-                              return null;
-                            })}
-                          </>
-                        )}
-                      </>
-                    )}
-                    
-                    {!weapon && <div className="w-32 h-32"></div>}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
+      <MhApp>
+        <div className="flex-1 grid place-items-center">
+          <Empty icon="alert" title={t("tree.loadError")} lead={error}>
+            <Button size="sm" variant="pri" icon="refresh" onClick={() => refreshData()}>{t("build_planner.retry")}</Button>
+          </Empty>
+        </div>
+      </MhApp>
+    )
   }
 
   return (
-    <div className="mx-auto p-4">
-      <h1
-        className="font-black uppercase tracking-widest mb-6"
-        style={{ fontFamily: "Orbitron, sans-serif", color: "rgb(226,232,240)", fontSize: "clamp(1.25rem, 3vw, 1.75rem)" }}
-      >
-        {t('weapon_type')} — {t(`weapons.${activeWeaponType.toLowerCase().replace(' ', '-')}`)}
-      </h1>
+    <MhApp>
+      <MhBar>
+        <div className="flex items-center gap-[11px] min-w-0">
+          <MhSeal name="tree" />
+          <div className="min-w-0 flex flex-col gap-px">
+            <div className="font-display text-[18px] leading-none font-extrabold uppercase tracking-[0.03em] not-italic">
+              {t("tree.titlePrefix")} <em className="text-[var(--mh-bright)] not-italic">{t("tree.titleAccent")}</em>
+            </div>
+            <div className="font-mono text-[11px] leading-tight text-txt-muted tracking-[0.02em] truncate">
+              {t(`weapons.${type}`)} · {t("tree.weaponsCount", { count: total })} · {t("tree.forgedCount", { count: ownedCount })}
+            </div>
+          </div>
+        </div>
+        <MhBarSide>
+          <MhModes
+            value={view}
+            onChange={(v) => setView(v as "tree" | "outline")}
+            options={[
+              { value: "tree", label: <><Icon name="tree" size={13} />{t("tree.tree")}</> },
+              { value: "outline", label: <><Icon name="list" size={13} />{t("tree.list")}</> },
+            ]}
+          />
+          <MhSrc label={t("app.source")} />
+        </MhBarSide>
+      </MhBar>
 
-      {/* Weapon Type Filter */}
-      <div
-        className="mb-6 rounded-xl p-4"
-        style={{
-          background: "linear-gradient(145deg, rgba(30,41,59,0.85), rgba(15,23,42,0.9))",
-          border: "1px solid rgba(249,115,22,0.18)",
-        }}
-      >
-        <h2 className="text-[10px] font-mono uppercase tracking-widest text-ink-muted mb-3">
-          {t('weapon_type')}
-        </h2>
-        <div className="flex flex-wrap gap-2">
-          {weaponTypes.map((type) => (
-            <button
-              key={type}
-              type="button"
-              className={`px-3 py-1.5 rounded-lg text-xs font-mono uppercase tracking-wider transition-all duration-200 ${
-                activeWeaponType === type ? "text-primary-hover" : "text-ink-muted hover:text-ink"
-              }`}
-              style={
-                activeWeaponType === type
-                  ? { background: "rgba(249,115,22,0.12)", border: "1px solid rgba(249,115,22,0.35)" }
-                  : { background: "transparent", border: "1px solid rgba(71,85,105,0.25)" }
-              }
-              onClick={() => setActiveWeaponType(type)}
-            >
-              {t(`weapons.${type.toLowerCase().replace(' ', '-')}`)}
-            </button>
+      {/* type rail */}
+      <div className="flex gap-3 items-center flex-wrap px-[clamp(16px,2.4vw,36px)] py-[11px] border-b border-line bg-base-2">
+        <div className="flex gap-1.5 flex-wrap flex-1">
+          {availableTypes.map((k) => (
+            <MhTypeChip key={k} icon="sword" label={t(`weapons.${k}`)} count={treeByKind[k].length} on={type === k} onClick={() => setType(k)} />
+          ))}
+          {soonTypes.slice(0, 3).map((k) => (
+            <MhTypeChip key={k} label={t(`weapons.${k}`)} count={t("tree.soon")} disabled />
           ))}
         </div>
       </div>
 
-      {filteredTree.length > 0 ? (
-        renderWeaponTable()
-      ) : (
-        <div
-          className="text-ink px-4 py-6 rounded-xl my-4 text-center"
-          style={{ background: "rgba(15,23,42,0.5)", border: "1px solid rgba(71,85,105,0.3)" }}
-        >
-          <p>{t('build_planner.no_equipment_found')}</p>
+      {/* filter strip */}
+      <div className="flex gap-2.5 items-center flex-wrap px-[clamp(16px,2.4vw,36px)] py-2.5 border-b border-line">
+        <div className="flex-1 min-w-[220px] max-w-[340px]"><MhSearch value={q} onChange={setQ} placeholder={t("tree.searchWeapon")} /></div>
+        <Select ariaLabel={t("rarity")} value={fRar} onChange={setFRar} options={rarOptions} className="min-w-[130px]" />
+        <Select ariaLabel={t("element")} value={fEl} onChange={setFEl} options={elOptions} className="min-w-[140px]" />
+        <Chip on={pathMode} onClick={() => setPathMode((v) => !v)}>
+          <Icon name="trending" size={13} className="inline align-[-2px] mr-1" />{t("tree.upgradePath")}
+        </Chip>
+        <span className="flex-1" />
+        <span className="inline-flex items-center gap-2">
+          <span className="font-mono text-[11px] leading-none text-txt-muted">{t("tree.progress")}</span>
+          <MhMeter pct={total ? (ownedCount / total) * 100 : 0} className="w-[90px]" />
+          <b className="font-mono text-[12px] leading-none">{ownedCount}/{total}</b>
+        </span>
+      </div>
+
+      {/* body */}
+      <MhBody className={view === "tree" ? "overflow-hidden flex" : ""}>
+        {view === "tree" ? (
+          <div className="flex-1 flex flex-col h-full">
+            <div
+              ref={stageRef}
+              onPointerDown={onPointerDown}
+              onPointerMove={onPointerMove}
+              onPointerUp={endDrag}
+              onPointerLeave={endDrag}
+              className="flex-1 relative overflow-hidden cursor-grab [background:radial-gradient(circle_at_1px_1px,var(--stripe)_1px,transparent_0)_0_0/26px_26px,var(--bg)]"
+            >
+              <div className="absolute top-0 left-0 origin-top-left will-change-transform" style={{ transform: `translate(${xf.tx}px,${xf.ty}px) scale(${xf.scale})`, width: layout.width, height: layout.height }}>
+                <svg className="absolute top-0 left-0 overflow-visible pointer-events-none" width={layout.width} height={layout.height}>
+                  {layout.edges.map((e, i) => {
+                    const a = layout.pos[e.from], b = layout.pos[e.to]
+                    if (!a || !b) return null
+                    const x1 = a.x + NODE_W, y1 = a.y + NODE_H / 2, x2 = b.x, y2 = b.y + NODE_H / 2
+                    const mx = (x1 + x2) / 2
+                    return <path key={i} className={`fill-none [stroke-width:2] transition-[stroke,opacity] ${edgeCls(e)}`} d={`M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`} />
+                  })}
+                </svg>
+                {allNodes.map((n) => {
+                  const p = layout.pos[String(n.id)]
+                  return (
+                    <MhNodeCard
+                      key={n.id}
+                      style={{ left: p.x, top: p.y, width: NODE_W }}
+                      name={n.name}
+                      rarity={n.rarity}
+                      attack={weaponAttack(n)}
+                      special={firstSpecial(n.specials)}
+                      selected={selId === String(n.id)}
+                      dim={!!nodeDim(n)}
+                      owned={!!ownedSet[String(n.id)]}
+                      isFinal={!n.children || n.children.length === 0}
+                      finalLabel={t("tree.final")}
+                      onSelect={() => setSelId(String(n.id))}
+                    />
+                  )
+                })}
+              </div>
+
+              <div className="absolute left-3.5 bottom-3.5 z-[6] font-mono text-[11px] leading-none text-txt-dim bg-panel border border-line py-[7px] px-2.5 flex items-center gap-[7px]">
+                <Icon name="target" size={13} />{t("tree.dragHint")}
+              </div>
+              <div className="absolute right-3.5 bottom-3.5 flex flex-col gap-[5px] z-[6]">
+                <button type="button" onClick={() => zoom(1)} aria-label={t("tree.zoomIn")} className="w-[38px] h-[38px] grid place-items-center bg-panel border border-line text-txt-muted hover:text-txt hover:border-line-2"><Icon name="plus" size={16} /></button>
+                <div className="font-mono text-[10px] leading-none text-center text-txt-dim py-[3px]">{Math.round(xf.scale * 100)}%</div>
+                <button type="button" onClick={() => zoom(-1)} aria-label={t("tree.zoomOut")} className="w-[38px] h-[38px] grid place-items-center bg-panel border border-line text-txt-muted hover:text-txt hover:border-line-2"><Icon name="minus" size={16} /></button>
+                <button type="button" onClick={fit} aria-label={t("tree.fit")} title={t("tree.fit")} className="w-[38px] h-[38px] grid place-items-center bg-panel border border-line text-txt-muted hover:text-txt hover:border-line-2"><Icon name="grid" size={15} /></button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <MhWrap>
+            <TreeOutline roots={roots} ownedSet={ownedSet} matches={filtering ? matches : null} sel={selId} onSel={setSelId} />
+          </MhWrap>
+        )}
+      </MhBody>
+
+      {sel && (
+        <TreeDetail
+          node={sel}
+          roots={roots}
+          nodesById={nodesById}
+          owned={!!ownedSet[String(sel.id)]}
+          onToggleOwned={() => toggleOwned(String(sel.id))}
+          onClose={() => setSelId(null)}
+          onGoTo={(id) => setSelId(id)}
+        />
+      )}
+    </MhApp>
+  )
+}
+
+// ── outline (list) ────────────────────────────────────────────────────────────
+function TreeOutline({ roots, ownedSet, matches, sel, onSel }: { roots: Node[]; ownedSet: Record<string, boolean>; matches: ((n: Node) => boolean) | null; sel: string | null; onSel: (id: string) => void }) {
+  const t = useTranslations("mhwilds")
+  const flat = flatten(roots)
+  const visible = matches ? flat.filter((f) => matches(f.node)) : flat
+  if (!visible.length) return <Empty icon="search" title={t("tree.noResults")} lead={t("tree.noResultsLead")} />
+  return (
+    <div className="flex flex-col gap-[3px]">
+      {visible.map(({ node, depth }) => {
+        const sp = firstSpecial(node.specials)
+        return (
+          <button
+            key={node.id}
+            type="button"
+            onClick={() => onSel(String(node.id))}
+            style={{ marginLeft: matches ? 0 : depth * 20 }}
+            className={`grid grid-cols-[1fr_auto] items-center gap-3 py-[9px] px-3 bg-panel border text-left transition-colors hover:bg-panel-2 ${sel === String(node.id) ? "border-[var(--mh)]" : "border-line hover:border-line-2"}`}
+          >
+            <span className="flex items-center gap-2 min-w-0">
+              {ownedSet[String(node.id)] && <Icon name="check" size={13} className="text-[var(--mh-bright)]" />}
+              <MhRarity rarity={node.rarity} />
+              <b className="font-body text-[13px] leading-tight truncate">{node.name}</b>
+              {(!node.children || !node.children.length) && <span className="text-txt-dim font-mono text-[12px] leading-none">· {t("tree.final").toLowerCase()}</span>}
+            </span>
+            <span className="flex gap-3 font-mono text-[11px] leading-none text-txt-muted flex-none">
+              <span><Icon name="sword" size={11} className="inline align-[-1px]" /> {weaponAttack(node)}</span>
+              {sp && <span style={{ color: elementColor(sp.type) }}>{sp.value}</span>}
+            </span>
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+// ── detail drawer ─────────────────────────────────────────────────────────────
+function TreeDetail({ node, roots, nodesById, owned, onToggleOwned, onClose, onGoTo }: {
+  node: Node; roots: Node[]; nodesById: Record<string, Node>; owned: boolean; onToggleOwned: () => void; onClose: () => void; onGoTo: (id: string) => void
+}) {
+  const t = useTranslations("mhwilds")
+  const sp = firstSpecial(node.specials)
+  const path = pathTo(roots, String(node.id)) || [String(node.id)]
+  const parentId = path.length > 1 ? path[path.length - 2] : null
+  const parent = parentId ? nodesById[parentId] : null
+  const stepMats: any[] = (parent ? node.upgradeMaterials : node.craftingMaterials) || node.craftingMaterials || []
+  const zenny = parent ? node.upgradeZennyCost : node.craftingZennyCost
+
+  return (
+    <MhDrawer
+      icon={<MhRarity rarity={node.rarity} />}
+      title={node.name}
+      sub={`${t(`weapons.${node.kind}`)} · ${t("rarity")} ${node.rarity}`}
+      onClose={onClose}
+      tools={
+        <div className="flex gap-2 flex-wrap">
+          <Button size="sm" variant={owned ? "pri" : "default"} icon={owned ? "check" : "plus"} onClick={onToggleOwned}>
+            {owned ? t("tree.forgedState") : t("tree.markForged")}
+          </Button>
+          <Button size="sm" icon="sword" href="/mhwilds/builds/planner">{t("tree.plan")}</Button>
+        </div>
+      }
+    >
+      <MhStat3 items={[
+        { value: weaponAttack(node), label: t("attack"), mod: "attack" },
+        { value: node.rarity, label: t("rarity") },
+        { value: sp ? t(sp.type) : "—", label: t("element") },
+      ]} />
+      {sp && <div className="mt-3"><MhElement type={sp.type} value={sp.value} hidden={sp.hidden} label={t(sp.type)} /></div>}
+
+      {parent && (
+        <div className="mt-[18px]">
+          <MhLabel>{t("tree.improvesFrom")}</MhLabel>
+          <button type="button" onClick={() => onGoTo(String(parent.id))} className="grid grid-cols-[1fr_auto] items-center gap-3 w-full py-[9px] px-3 bg-panel border border-line text-left hover:border-line-2">
+            <span className="flex items-center gap-2 min-w-0"><Icon name="back" size={13} className="text-txt-dim" /><MhRarity rarity={parent.rarity} /><b className="font-body text-[13px] leading-tight truncate">{parent.name}</b></span>
+            <span className="font-mono text-[11px] leading-none text-txt-muted">{weaponAttack(parent)}</span>
+          </button>
         </div>
       )}
-    </div>
-  );
+
+      {stepMats.length > 0 && (
+        <div className="mt-[18px]">
+          <MhLabel>{parent ? t("tree.upgradeMaterials") : t("tree.craftMaterials")}{zenny ? ` · ${zenny.toLocaleString()}z` : ""}</MhLabel>
+          <div className="flex flex-col gap-[5px]">
+            {stepMats.map((m: any, i: number) => (
+              <MhMaterial key={m.item?.id ?? i} name={m.item?.name ?? "?"} rarity={m.item?.rarity} quantity={m.quantity ?? 1} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {node.children && node.children.length > 0 && (
+        <div className="mt-[18px]">
+          <MhLabel>{t("tree.improvesTo")}</MhLabel>
+          <div className="flex flex-col gap-1">
+            {node.children.map((c: Node) => (
+              <button key={c.id} type="button" onClick={() => onGoTo(String(c.id))} className="grid grid-cols-[1fr_auto] items-center gap-3 w-full py-[9px] px-3 bg-panel border border-line text-left hover:border-line-2">
+                <span className="flex items-center gap-2 min-w-0"><Icon name="chevronRight" size={13} className="text-[var(--mh-bright)]" /><MhRarity rarity={c.rarity} /><b className="font-body text-[13px] leading-tight truncate">{c.name}</b></span>
+                <span className="font-mono text-[11px] leading-none text-txt-muted">{weaponAttack(c)}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </MhDrawer>
+  )
 }
