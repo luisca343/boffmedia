@@ -27,7 +27,6 @@ export const BattleShell = forwardRef<HTMLDivElement, BattleShellProps>(
     return (
       <div
         ref={ref}
-        data-ds="boffmedia"
         className={cn(
           "flex flex-col gap-3 bg-base p-3 text-txt",
           fullscreen && "fixed inset-0 z-50 gap-0 overflow-hidden p-0",

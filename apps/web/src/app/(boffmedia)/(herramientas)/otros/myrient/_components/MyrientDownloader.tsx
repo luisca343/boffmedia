@@ -305,7 +305,7 @@ export default function MyrientDownloader() {
   const showStickyBar = ((selected.size > 0 && singleCatalog) || (totalMultiSelected > 0 && multiCatalog)) && !downloading;
 
   return (
-    <main data-ds="boffmedia" className="pb-40">
+    <main className="pb-40">
       {/* header */}
       <header className="mb-[20px] mt-[4px] flex flex-wrap items-end justify-between gap-[26px]">
         <div className="max-w-[60ch]">

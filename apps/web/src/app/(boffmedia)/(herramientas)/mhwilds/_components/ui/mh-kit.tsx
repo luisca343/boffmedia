@@ -11,7 +11,6 @@ import {
 export function MhApp({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
     <div
-      data-ds="boffmedia"
       style={MH_VARS}
       className={`flex flex-col min-w-0 h-[calc(100vh-var(--nav-h,66px))] bg-base text-txt relative ${className}`}
     >

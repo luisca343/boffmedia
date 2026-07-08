@@ -1,5 +1,5 @@
 import { motion } from "framer-motion"
-import { BOFF_VARIANTS } from "@/components/boffmedia-old/tools/utils/boffVariants"
+import { BOFF_VARIANTS } from "./boffVariants"
 
 interface SpinnerItemProps {
   name: string

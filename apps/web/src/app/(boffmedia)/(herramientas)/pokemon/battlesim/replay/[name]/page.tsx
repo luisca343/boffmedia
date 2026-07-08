@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Game } from '@/app/battlesim/replay/_components/Game';
 import { LigaService } from '@/services/api/smartrotom/ligaService';
 import type { ReplayData } from '@/app/battlesim/types';
-import { BoffSpinner } from '@/components/boffmedia-v2/primitives';
+import { Spinner } from '@/components/boffmedia/primitives/spinner';
 
 export default function ReplayPage({ params }: { params: Promise<{ name: string }> }) {
   const { name } = use(params);
@@ -40,15 +40,15 @@ export default function ReplayPage({ params }: { params: Promise<{ name: string 
 
   if (loading) {
     return (
-      <div data-ds="boffmedia" className="flex min-h-[60vh] items-center justify-center bg-base">
-        <BoffSpinner size="lg" />
+      <div className="flex min-h-[60vh] items-center justify-center bg-base">
+        <Spinner size={44} />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div data-ds="boffmedia" className="flex min-h-[60vh] flex-col items-center justify-center gap-4 bg-base px-4 text-txt">
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 bg-base px-4 text-txt">
         <p className="text-txt-muted">{error}</p>
         <Link href="/pokemon/battlesim/replay" className="text-accent-bright underline">{t('replay.pasteManually')}</Link>
       </div>
@@ -56,7 +56,7 @@ export default function ReplayPage({ params }: { params: Promise<{ name: string 
   }
 
   return (
-    <section data-ds="boffmedia" className="flex flex-col bg-base text-txt">
+    <section className="flex flex-col bg-base text-txt">
       <Game battleName={name} replayData={replayData} />
     </section>
   );

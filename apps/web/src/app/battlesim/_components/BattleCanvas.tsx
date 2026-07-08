@@ -1,7 +1,8 @@
 "use client"
 import { Battle, Pokemon } from "@pkmn/client";
 import { useTranslations } from "next-intl";
-import { BoffSkeleton, BoffSpinner } from "@/components/boffmedia-v2/primitives";
+import { Spinner } from "@/components/boffmedia/primitives/spinner";
+import { Skeleton } from "@/components/boffmedia/primitives/skeleton";
 import { forwardRef, useCallback, useRef, memo } from "react";
 import { positionsP1, positionsP2, ASPECT_RATIO, getScaleMultiplier } from "../_utils/viewUtils";
 import { PokemonElement, PokemonRefType } from "./PokemonElement";
@@ -89,17 +90,18 @@ export const BattleCanvas = memo(forwardRef(({
     if(liveMode && liveStatus === 'connecting') {
         return (
             <div className="flex flex-col items-center justify-center gap-3" style={{ width: canvasWidth, height: canvasWidth * ASPECT_RATIO, backgroundImage: 'url(/battlesim/fx/bg/hagane.png)', backgroundSize: '100% 100%' }}>
-                <BoffSpinner size="lg" label={t('connection.waitingBattle')} />
+                <Spinner size={44} />
+                <span className="font-mono text-[12px] text-txt-muted">{t('connection.waitingBattle')}</span>
             </div>
         )
     }
     if(!liveMode && !battle.pokemonControlled && !battleLog) {
         return (
             <div className="flex flex-col gap-3" style={{ width: canvasWidth }}>
-                <BoffSkeleton className="w-full" style={{ height: canvasWidth * ASPECT_RATIO }} />
+                <Skeleton h={canvasWidth * ASPECT_RATIO} />
                 <div className="flex gap-2">
-                    <BoffSkeleton className="h-10 flex-1" />
-                    <BoffSkeleton className="h-10 flex-1" />
+                    <Skeleton w="auto" h={40} className="!flex-1" />
+                    <Skeleton w="auto" h={40} className="!flex-1" />
                 </div>
             </div>
         )

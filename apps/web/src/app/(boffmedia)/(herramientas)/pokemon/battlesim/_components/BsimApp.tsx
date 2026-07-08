@@ -13,7 +13,7 @@ export function BsimApp() {
   const [view, setView] = useState<BsimView>("lobby")
 
   return (
-    <div data-ds="boffmedia" className="contents">
+    <div className="contents">
     <DkApp>
       <DkBar>
         <DkBack href="/pokemon" label={t("connection.backToLobby")} />
