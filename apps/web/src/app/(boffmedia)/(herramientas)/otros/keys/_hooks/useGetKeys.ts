@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 
 type useGetKeysReturnType = {
   keys: KeyData[];
+  loading: boolean;
   refresh: () => void;
   filter: string;
   setFilter: React.Dispatch<React.SetStateAction<string>>;
@@ -21,6 +22,7 @@ interface KeyData {
 
 function useGetKeys(): useGetKeysReturnType {
   const [keys, setKeys] = useState<KeyData[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [filter, setFilter] = useState<string>("");
 
   const fetchKeys = useCallback(async () => {
@@ -29,6 +31,8 @@ function useGetKeys(): useGetKeysReturnType {
       setKeys(res);
     } catch (error) {
       console.error("Failed to fetch keys:", error);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -51,6 +55,7 @@ function useGetKeys(): useGetKeysReturnType {
 
   return {
     keys,
+    loading,
     refresh: fetchKeys,
     filter,
     setFilter,
