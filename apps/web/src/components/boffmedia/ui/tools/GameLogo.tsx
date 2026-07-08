@@ -27,7 +27,7 @@ export function GameLogo({ label, hueColor, size, className, imageSrc }: GameLog
     <span
       style={hueStyle(hueColor)}
       className={cn(
-        "cut relative grid flex-none place-items-center overflow-hidden border-solid font-display font-extrabold italic uppercase leading-none tracking-[0.02em]",
+        "cut-seal relative grid flex-none place-items-center overflow-hidden border-solid font-display font-extrabold italic uppercase leading-none tracking-[0.02em]",
         "text-[var(--ghue)] border-[color-mix(in_srgb,var(--ghue)_55%,var(--line-2))] bg-[color-mix(in_srgb,var(--ghue)_12%,var(--bg))]",
         dim.box,
         className,

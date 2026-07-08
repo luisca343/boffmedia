@@ -24,7 +24,7 @@ export function TrophyCard({ icon, name, meta, rare, done, locked, className }: 
       )}
       <span
         className={cn(
-          "mx-auto grid h-[50px] w-[50px] place-items-center cut [--cut:10px]",
+          "mx-auto grid h-[50px] w-[50px] place-items-center cut-seal [--cut:10px]",
           locked
             ? "border border-dashed border-line-2 bg-transparent text-txt-dim"
             : "border border-solid border-accent-line bg-accent-soft text-accent",
