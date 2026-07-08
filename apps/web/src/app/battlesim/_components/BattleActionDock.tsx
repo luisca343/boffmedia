@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 
 import { useMemo } from 'react';
-import { BSXPlanChip } from '@/components/boffmedia-v2/primitives';
+import { BxType } from '@/app/(boffmedia)/(herramientas)/pokemon/battlesim/_components/ui/bx-kit';
 import { MovePanel } from './MovePanel';
 import { SwitchPanel } from './SwitchPanel';
 import { MechanicToggles } from './MechanicToggles';
@@ -95,15 +95,25 @@ export function BattleActionDock({
     content = (
       <div className="flex flex-col gap-3">
         {activeMechanic && (
-          <BSXPlanChip
-            tag="★"
-            action={{ kind: 'move', move: { name: MECHANIC_LABELS[activeMechanic] ?? activeMechanic, type: 'Normal' } }}
-            onClear={() => setActiveMechanic(null)}
-          />
+          <span
+            className="inline-flex w-fit items-center gap-2 border border-accent-line bg-accent-soft px-[10px] py-[6px] font-mono text-[10.5px] font-semibold uppercase leading-none tracking-[0.06em] text-accent-bright"
+            style={{ clipPath: 'polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%)' }}
+          >
+            <span aria-hidden>★</span>
+            {MECHANIC_LABELS[activeMechanic] ?? activeMechanic}
+            <button
+              type="button"
+              onClick={() => setActiveMechanic(null)}
+              aria-label={t('dock.undo')}
+              className="ml-1 text-txt-muted transition-colors hover:text-txt focus-visible:outline-none"
+            >
+              ✕
+            </button>
+          </span>
         )}
         <MovePanel
           moves={bsx.bsxMoves as BSXKeyMove[]}
-          foe={bsx.bsxFoe ? { types: bsx.bsxFoe.types, tera: bsx.bsxFoe.tera, teraType: bsx.bsxFoe.teraType } : undefined}
+          foe={bsx.bsxFoe}
           onChooseMove={(i) => onMoveChoice(i)}
           onAimMove={onAimMove}
           teraArmed={activeMechanic === 'terastallize'}
@@ -131,11 +141,12 @@ export function BattleActionDock({
   } else if (isWaiting && bsx.requestType === 'team') {
     content = (
       <div className="flex flex-col gap-2">
-        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{t('dock.teamPreview')}</p>
+        <p className="text-sm text-txt-muted">{t('dock.teamPreview')}</p>
         <button
+          type="button"
           onClick={() => onChoice('team 1')}
-          className="bsx-focus self-start px-4 py-2 rounded-md text-sm font-medium transition-colors"
-          style={{ background: 'var(--secondary)', color: 'var(--text)', border: '1px solid var(--border)' }}
+          style={{ clipPath: 'polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%)' }}
+          className="self-start bg-accent px-4 py-2 font-display text-[13px] font-bold uppercase leading-none tracking-[0.04em] text-accent-ink transition-[filter] hover:brightness-110 focus-visible:outline-none"
         >
           {t('dock.confirmTeam')}
         </button>
@@ -143,24 +154,16 @@ export function BattleActionDock({
     );
   } else {
     content = (
-      <div className="flex items-center justify-center gap-4 h-full min-h-[64px]">
-        <span
-          className="text-sm animate-pulse"
-          role="status"
-          style={{ color: 'var(--text-dim)' }}
-        >
+      <div className="flex h-full min-h-[64px] items-center justify-center gap-4">
+        <span className="animate-[bm-pulse_1.4s_ease-in-out_infinite] font-mono text-[11px] uppercase tracking-[0.1em] text-txt-dim motion-reduce:animate-none" role="status">
           {t('dock.waitingOpponent')}
         </span>
         {onUndo && (
           <button
+            type="button"
             onClick={onUndo}
-            className="bsx-focus px-4 py-1.5 rounded-[var(--radius-sm)] text-sm font-medium transition-colors duration-[var(--dur-fast)]"
-            style={{
-              background: 'var(--layer-3)',
-              color: 'var(--text-muted)',
-              border: '1px solid var(--border-strong)',
-            }}
             title={t('dock.undoHint')}
+            className="border border-line-2 bg-panel px-4 py-1.5 font-mono text-[11px] font-semibold uppercase leading-none tracking-[0.06em] text-txt-muted transition-colors hover:border-accent-line hover:text-txt focus-visible:outline-none"
           >
             ↩ {t('dock.undo')}
           </button>
@@ -174,10 +177,10 @@ export function BattleActionDock({
   return (
     <section
       aria-label="Acciones de combate"
-      className="rounded-[var(--radius)] border border-edge p-3 min-h-[96px]"
-      style={{ background: 'var(--card-bg)' }}
+      style={{ clipPath: 'polygon(0 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%)' }}
+      className="min-h-[96px] border border-solid border-line bg-[color-mix(in_srgb,var(--panel)_88%,transparent)] p-3 backdrop-blur-[4px]"
     >
-      <div key={phase} className="bsx-dock-in">
+      <div key={phase} className="animate-[bm-menu-in_200ms_ease_both] motion-reduce:animate-none">
         {content}
       </div>
     </section>

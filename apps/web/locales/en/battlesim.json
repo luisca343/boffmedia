@@ -20,7 +20,8 @@
       "forfeit": "Forfeit",
       "vs": "vs",
       "fullscreen": "Fullscreen",
-      "exitFullscreen": "Exit fullscreen"
+      "exitFullscreen": "Exit fullscreen",
+      "opponent": "Opponent"
     },
     "connection": {
       "error": "Error",
@@ -33,7 +34,8 @@
       "authenticating": "Authenticating…",
       "joiningBattle": "Joining battle…",
       "waitingBattle": "Waiting for battle to start…",
-      "reconnecting": "Reconnecting (attempt {attempt}/{max})…"
+      "reconnecting": "Reconnecting (attempt {attempt}/{max})…",
+      "forfeitConfirm": "Are you sure you want to forfeit?"
     },
     "dock": {
       "waitingOpponent": "Waiting for opponent…",
@@ -65,7 +67,9 @@
       "send": "Send",
       "empty": "No messages yet",
       "battleEmpty": "Battle chat will appear here",
-      "unread": "{count} unread messages"
+      "unread": "{count} unread messages",
+      "lobbyPlaceholder": "Type a message…",
+      "lobbyEmpty": "No messages yet. Chat appears here once connected to the lobby."
     },
     "end": {
       "victory": "VICTORY!",
@@ -93,6 +97,181 @@
       "tie": "Tie",
       "turn": "Turn {turn}",
       "yourTurn": " — Your turn!"
+    },
+    "app": {
+      "tagline": "Battle simulator",
+      "tabs": {
+        "lobby": "Lobby",
+        "equipos": "Teams",
+        "repeticiones": "Replays"
+      },
+      "lobby": {
+        "kick": "Battle simulator · VGC",
+        "title": "To battle",
+        "modeLabel": "Game mode",
+        "formatLabel": "Format",
+        "launch": {
+          "ia": "Battle",
+          "pvp": "Find match",
+          "showdown": "Find match"
+        },
+        "modes": {
+          "ia": {
+            "label": "Training",
+            "sub": "Against the AI, no pressure",
+            "note": "Battle an AI-controlled opponent. Unranked."
+          },
+          "pvp": {
+            "label": "Ranked",
+            "sub": "PvP matchmaking",
+            "note": "Matchmaking against other players on our server."
+          },
+          "showdown": {
+            "label": "Showdown",
+            "sub": "External server",
+            "note": "Battle on the official Pokémon Showdown server."
+          }
+        },
+        "tiles": {
+          "builder": "Team Builder",
+          "builderSub": "Create and edit teams",
+          "replays": "Replays",
+          "replaysSub": "Relive your battles",
+          "ladder": "Ladder",
+          "ladderSub": "Global ranking"
+        }
+      },
+      "soon": {
+        "title": "Coming soon",
+        "equipos": "The Team Builder is coming in a future update.",
+        "repeticiones": "The replay viewer is coming in a future update."
+      },
+      "equipos": {
+        "title": "Battle teams",
+        "lead": "Your Pixelmon battle teams live in the SmartRotom PC — create, arrange and activate them there.",
+        "cta": "Open the PC in SmartRotom"
+      }
+    },
+    "canvas": {
+      "turn": "Turn {turn}"
+    },
+    "replay": {
+      "invalidId": "Invalid replay ID",
+      "notFound": "Replay not found",
+      "loadFailed": "Failed to load replay",
+      "pasteManually": "Paste replay manually"
+    },
+    "pvp": {
+      "title": "PvP Battle",
+      "subtitle": "Battle other players on our server",
+      "status": {
+        "connecting": "Connecting…",
+        "connected": "Connected",
+        "idle": "Idle",
+        "searching": "Searching…",
+        "inBattle": "In battle",
+        "error": "Error",
+        "disconnected": "Disconnected"
+      },
+      "incomingChallenges": "Incoming challenges",
+      "challengedYou": "challenged you to {format}",
+      "accept": "Accept",
+      "reject": "Reject",
+      "findMatch": {
+        "title": "Find match",
+        "desc": "Join the matchmaking queue and get paired with another player.",
+        "button": "Find match"
+      },
+      "searching": "Searching for opponent…",
+      "cancel": "Cancel",
+      "challenge": {
+        "title": "Challenge player",
+        "desc": "Send a direct challenge to a specific player.",
+        "placeholder": "Player ID",
+        "button": "Challenge"
+      },
+      "yourId": {
+        "title": "Your player ID",
+        "desc": "Share this ID so friends can challenge you directly."
+      }
+    },
+    "showdown": {
+      "title": "Showdown Lobby",
+      "subtitle": "Play on the official Showdown server",
+      "status": {
+        "disconnected": "Disconnected",
+        "inBattle": "In battle",
+        "loggedIn": "Logged in as {name}",
+        "connecting": "Connecting…",
+        "reconnecting": "Reconnecting…",
+        "error": "Error"
+      },
+      "incomingChallenges": "Incoming challenges",
+      "challengedYou": "challenged you to {format}",
+      "login": {
+        "title": "Log in to Showdown",
+        "username": "Username",
+        "password": "Password",
+        "button": "Log in",
+        "connecting": "Connecting to Showdown server…",
+        "waitingChallstr": "Waiting for challenge string…"
+      },
+      "lobbyChat": "Lobby chat",
+      "battle": {
+        "title": "Battle",
+        "desc": "Find a random opponent on the official Showdown server.",
+        "button": "Find battle"
+      },
+      "challenge": {
+        "title": "Challenge player",
+        "desc": "Challenge a specific player to a battle.",
+        "placeholder": "Player name"
+      },
+      "online": "Online users ({count})",
+      "onlineTitle": "Online users",
+      "onlineLoading": "Loading users…",
+      "you": "(you)",
+      "connectedAs": "Connected as {name} — sim3.psim.us"
+    },
+    "replays": {
+      "search": "Search by player…",
+      "scope": "Scope",
+      "recent": "Recent",
+      "mine": "Mine",
+      "winner": "Winner",
+      "errorTitle": "Could not load replays",
+      "errorLead": "The replay service is unavailable right now. Try again later.",
+      "emptyTitle": "No replays yet",
+      "emptyLead": "Battles you finish will show up here.",
+      "emptySearch": "No replays match your search.",
+      "logHidden": "Log hidden — toggle with the eye button",
+      "ctl": {
+        "timeline": "Battle timeline",
+        "turnOf": "Turn {turn} of {total}",
+        "controls": "Playback controls",
+        "play": "Play",
+        "pause": "Pause",
+        "restart": "Restart",
+        "prevTurn": "Previous turn",
+        "nextTurn": "Next turn",
+        "pov": "POV: {side}",
+        "player1": "Player 1",
+        "player2": "Player 2",
+        "toggleLog": "Toggle log",
+        "simulate": "Simulate attack",
+        "goToTurn": "Go to turn",
+        "goToTurnAria": "Go to turn",
+        "speed": "Speed"
+      },
+      "loader": {
+        "title": "Load a Pokémon Showdown replay",
+        "placeholder": "Paste the entire replay text here",
+        "load": "Load replay",
+        "hint": "Copy and paste the complete replay text from Pokémon Showdown.",
+        "errorEmpty": "Please paste a valid replay text.",
+        "errorFormat": "Invalid replay format. Expected Showdown replay text with |player| and |turn| lines.",
+        "errorUnknown": "An unknown error occurred."
+      }
     }
   }
 }

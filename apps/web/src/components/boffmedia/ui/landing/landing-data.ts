@@ -43,7 +43,7 @@ interface Tv3Tool {
 }
 
 export const TV3_TOOLS: Tv3Tool[] = [
-  { ix: "01", n: "BattleSim", d: "Simulador de combates dobles VGC con daño previsto.", ic: "sword", href: "/battlesim" },
+  { ix: "01", n: "BattleSim", d: "Simulador de combates dobles VGC con daño previsto.", ic: "sword", href: "/pokemon/battlesim" },
   { ix: "02", n: "Calculadora de daño", d: "Rangos VGC y singles al instante, con enlaces.", ic: "calc", href: "/pokemon/vgc/damage-calculator" },
   { ix: "03", n: "VGC Tracker", d: "Registra partidas y analiza tu rendimiento.", ic: "chart", href: "/pokemon/vgc/tracker" },
   { ix: "04", n: "Análisis de Meta", d: "Uso, tendencias y detalle por especie del meta VGC.", ic: "trending", href: "/pokemon/vgc/meta" },

@@ -5,7 +5,8 @@
       "categories": {
         "vgc": "VGC",
         "tcgpocket": "TCG Pocket",
-        "others": "Otros"
+        "others": "Otros",
+        "battlesim": "Battlesim"
       },
       "tools": {
         "meta": "Análisis de Meta",
@@ -16,7 +17,8 @@
         "collection": "Colección",
         "packs": "Sobres",
         "skyGenerator": "Generador de Correos",
-        "damageCalc": "Calculadora de daño"
+        "damageCalc": "Calculadora de daño",
+        "battlesim": "Battlesim"
       }
     },
     "mhwilds": {

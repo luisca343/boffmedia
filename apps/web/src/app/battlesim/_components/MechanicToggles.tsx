@@ -1,6 +1,8 @@
 'use client';
 
-import { BSXTeraBtn } from '@/components/boffmedia-v2/primitives';
+import type { CSSProperties } from 'react';
+import { BxTeraBtn, BxKbd } from '@/app/(boffmedia)/(herramientas)/pokemon/battlesim/_components/ui/bx-kit';
+import { cn } from '@/lib/utils';
 import { hasMechanicBeenUsed, ActiveMechanic } from '../_hooks/useChoiceMechanics';
 
 interface MechanicTogglesProps {
@@ -16,28 +18,10 @@ interface MechanicTogglesProps {
   htmlLog: string[];
 }
 
-const MECHANIC_META: Record<string, { label: string; icon: string; color: string; hotkey: string; tooltip: string }> = {
-  mega: {
-    label: 'Mega',
-    icon: '◈',
-    color: 'var(--rose-400)',
-    hotkey: 'M',
-    tooltip: 'Mega Evolucionar este turno',
-  },
-  dynamax: {
-    label: 'Dynamax',
-    icon: '▲',
-    color: 'var(--cyan-400)',
-    hotkey: 'D',
-    tooltip: 'Dynamax durante 3 turnos',
-  },
-  zmove: {
-    label: 'Z-Move',
-    icon: '⚡',
-    color: 'var(--purple-400)',
-    hotkey: 'Z',
-    tooltip: 'Usar Movimiento Z (una vez por combate)',
-  },
+const MECHANIC_META: Record<string, { label: string; icon: string; tone: string; hotkey: string; tooltip: string }> = {
+  mega: { label: 'Mega', icon: '◈', tone: 'var(--bad)', hotkey: 'M', tooltip: 'Mega Evolucionar este turno' },
+  dynamax: { label: 'Dynamax', icon: '▲', tone: 'var(--signal)', hotkey: 'D', tooltip: 'Dynamax durante 3 turnos' },
+  zmove: { label: 'Movimiento Z', icon: '⚡', tone: 'var(--accent)', hotkey: 'Z', tooltip: 'Usar Movimiento Z (una vez por combate)' },
 };
 
 function MechanicButton({
@@ -52,26 +36,21 @@ function MechanicButton({
   const meta = MECHANIC_META[mechanic];
   return (
     <button
-      className="bsx-focus flex items-center gap-[.5rem] p-[var(--bsx-pad-md)] flex-1 rounded-[var(--radius)] border font-inherit text-t-xs font-bold cursor-pointer transition-all duration-[var(--dur)] ease-[var(--ease)] whitespace-nowrap min-w-0"
-      style={{
-        background: armed ? `color-mix(in srgb, ${meta.color} 16%, var(--layer-2))` : 'var(--layer-2)',
-        borderColor: `color-mix(in srgb, ${meta.color} 40%, var(--border))`,
-        color: 'var(--text)',
-        boxShadow: armed ? `0 0 0 1px ${meta.color} inset, 0 0 18px -8px ${meta.color}` : undefined,
-      }}
+      type="button"
       onClick={onToggle}
       aria-pressed={armed}
       aria-label={meta.tooltip}
       title={meta.tooltip}
+      style={{ ['--tyc']: meta.tone, clipPath: 'polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%)' } as CSSProperties}
+      className={cn(
+        'inline-flex items-center gap-2 border border-solid border-line-2 bg-panel px-3 py-2 font-mono text-[10.5px] font-semibold uppercase leading-none tracking-[0.06em] text-txt-muted transition-[border-color,color,box-shadow]',
+        'hover:border-[color-mix(in_srgb,var(--tyc)_60%,transparent)] hover:text-txt',
+        armed && 'border-[var(--tyc)] text-txt [box-shadow:0_0_12px_color-mix(in_srgb,var(--tyc)_35%,transparent),inset_0_0_12px_color-mix(in_srgb,var(--tyc)_12%,transparent)]',
+      )}
     >
-      <span
-        className="font-mono font-bold text-t-3xs w-[19px] h-[19px] inline-grid place-items-center shrink-0 rounded-[var(--radius-sm)]"
-        style={{ background: 'color-mix(in srgb, #000 30%, var(--layer-3))', color: 'var(--text-muted)', border: '1px solid var(--border-strong)' }}
-      >
-        {meta.hotkey}
-      </span>
-      <span aria-hidden="true" style={{ color: meta.color }}>{meta.icon}</span>
-      <span className="overflow-hidden text-ellipsis">{armed ? `${meta.label} ✓` : meta.label}</span>
+      <BxKbd>{meta.hotkey}</BxKbd>
+      <span aria-hidden className="[color:var(--tyc)]">{meta.icon}</span>
+      <span>{armed ? `${meta.label} ✓` : meta.label}</span>
     </button>
   );
 }
@@ -85,7 +64,7 @@ export function MechanicToggles({ bsx, activeMechanic, setActiveMechanic, htmlLo
   return (
     <div className="flex gap-2 flex-wrap">
       {bsx.mechCanTera && bsx.mechTeraType && (
-        <BSXTeraBtn
+        <BxTeraBtn
           type={bsx.mechTeraType}
           armed={activeMechanic === 'terastallize'}
           onToggle={() => toggle('terastallize')}
