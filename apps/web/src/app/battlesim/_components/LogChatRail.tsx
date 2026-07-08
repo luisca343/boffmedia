@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 
 import { useState, useEffect, useRef } from 'react';
+import { cn } from '@/lib/utils';
 import { BattleLogPanel } from './BattleLogPanel';
 import { ChatPanel, type ChatPanelMessage } from './ChatPanel';
 import type { BSXTickEv } from '../_utils/toBSXMon';
@@ -42,35 +43,34 @@ export function LogChatRail({ ticks, maxHeight, chat }: LogChatRailProps) {
   }
 
   return (
-    <div
-      className="flex flex-col rounded-[var(--radius)] overflow-hidden"
-      style={{ border: '1px solid var(--border)', background: 'var(--layer-1)' }}
-    >
-      <div role="tablist" className="flex shrink-0" style={{ background: 'var(--layer-2)', borderBottom: '1px solid var(--border)' }}>
-        {(['log', 'chat'] as const).map((tabKey) => (
-          <button
-            key={tabKey}
-            role="tab"
-            aria-selected={tab === tabKey}
-            onClick={() => setTab(tabKey)}
-            className="bsx-focus flex-1 flex items-center justify-center gap-2 py-2 text-t-xs font-semibold uppercase tracking-[.08em] transition-colors duration-[var(--dur-fast)]"
-            style={{
-              color: tab === tabKey ? 'var(--text)' : 'var(--text-dim)',
-              boxShadow: tab === tabKey ? 'inset 0 -2px 0 var(--secondary-hover)' : undefined,
-            }}
-          >
-            {tabKey === 'log' ? t('log.tab') : t('chat.tab')}
-            {tabKey === 'chat' && unread > 0 && (
-              <span
-                className="font-mono text-t-4xs px-[.45em] py-[.14em] rounded-[var(--radius-pill)] text-white"
-                style={{ background: 'var(--secondary)' }}
-                aria-label={t('chat.unread', { count: unread })}
-              >
-                {unread}
-              </span>
-            )}
-          </button>
-        ))}
+    <div className="flex flex-col overflow-hidden border border-solid border-line bg-panel">
+      <div role="tablist" className="flex shrink-0 border-b border-solid border-line bg-base">
+        {(['log', 'chat'] as const).map((tabKey) => {
+          const on = tab === tabKey
+          return (
+            <button
+              key={tabKey}
+              type="button"
+              role="tab"
+              aria-selected={on}
+              onClick={() => setTab(tabKey)}
+              className={cn(
+                "flex flex-1 items-center justify-center gap-2 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.08em] transition-colors focus-visible:outline-none",
+                on ? "text-txt shadow-[inset_0_-2px_0_var(--accent)]" : "text-txt-dim hover:text-txt-muted",
+              )}
+            >
+              {tabKey === 'log' ? t('log.tab') : t('chat.tab')}
+              {tabKey === 'chat' && unread > 0 && (
+                <span
+                  className="bg-accent px-[5px] py-[2px] font-mono text-[9px] font-bold leading-none text-accent-ink"
+                  aria-label={t('chat.unread', { count: unread })}
+                >
+                  {unread}
+                </span>
+              )}
+            </button>
+          )
+        })}
       </div>
 
       {tab === 'log' ? (

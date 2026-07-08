@@ -20,7 +20,8 @@
       "forfeit": "Rendirse",
       "vs": "vs",
       "fullscreen": "Pantalla completa",
-      "exitFullscreen": "Salir de pantalla completa"
+      "exitFullscreen": "Salir de pantalla completa",
+      "opponent": "Rival"
     },
     "connection": {
       "error": "Error",
@@ -33,7 +34,8 @@
       "authenticating": "Autenticando…",
       "joiningBattle": "Uniéndose al combate…",
       "waitingBattle": "Esperando a que comience el combate…",
-      "reconnecting": "Reconectando (intento {attempt}/{max})…"
+      "reconnecting": "Reconectando (intento {attempt}/{max})…",
+      "forfeitConfirm": "¿Seguro que quieres rendirte?"
     },
     "dock": {
       "waitingOpponent": "Esperando al rival…",
@@ -65,7 +67,9 @@
       "send": "Enviar",
       "empty": "Aún no hay mensajes",
       "battleEmpty": "El chat del combate aparecerá aquí",
-      "unread": "{count} mensajes sin leer"
+      "unread": "{count} mensajes sin leer",
+      "lobbyPlaceholder": "Escribe un mensaje…",
+      "lobbyEmpty": "Aún no hay mensajes. El chat aparecerá aquí al conectar con el lobby."
     },
     "end": {
       "victory": "¡VICTORIA!",
@@ -93,6 +97,181 @@
       "tie": "Empate",
       "turn": "Turno {turn}",
       "yourTurn": " — ¡Tu turno!"
+    },
+    "app": {
+      "tagline": "Simulador de combates",
+      "tabs": {
+        "lobby": "Lobby",
+        "equipos": "Equipos",
+        "repeticiones": "Repeticiones"
+      },
+      "lobby": {
+        "kick": "Simulador de combates · VGC",
+        "title": "A la batalla",
+        "modeLabel": "Modo de juego",
+        "formatLabel": "Formato",
+        "launch": {
+          "ia": "Batallar",
+          "pvp": "Buscar combate",
+          "showdown": "Buscar combate"
+        },
+        "modes": {
+          "ia": {
+            "label": "Entrenamiento",
+            "sub": "Contra la IA, sin presión",
+            "note": "Combate contra un oponente controlado por la IA. Sin ranking."
+          },
+          "pvp": {
+            "label": "Clasificatoria",
+            "sub": "Emparejamiento PvP",
+            "note": "Emparejamiento contra otros jugadores en nuestro servidor."
+          },
+          "showdown": {
+            "label": "Showdown",
+            "sub": "Servidor externo",
+            "note": "Combate en el servidor oficial de Pokémon Showdown."
+          }
+        },
+        "tiles": {
+          "builder": "Team Builder",
+          "builderSub": "Crea y edita equipos",
+          "replays": "Repeticiones",
+          "replaysSub": "Revive tus combates",
+          "ladder": "Escalera",
+          "ladderSub": "Clasificación global"
+        }
+      },
+      "soon": {
+        "title": "Próximamente",
+        "equipos": "El Team Builder llegará en una próxima actualización.",
+        "repeticiones": "El visor de repeticiones llegará en una próxima actualización."
+      },
+      "equipos": {
+        "title": "Equipos de combate",
+        "lead": "Tus equipos de combate Pixelmon viven en el PC de SmartRotom: créalos, ordénalos y actívalos allí.",
+        "cta": "Abrir el PC en SmartRotom"
+      }
+    },
+    "canvas": {
+      "turn": "Turno {turn}"
+    },
+    "replay": {
+      "invalidId": "ID de repetición no válido",
+      "notFound": "Repetición no encontrada",
+      "loadFailed": "No se pudo cargar la repetición",
+      "pasteManually": "Pegar repetición manualmente"
+    },
+    "pvp": {
+      "title": "Combate PvP",
+      "subtitle": "Combate contra otros jugadores en nuestro servidor",
+      "status": {
+        "connecting": "Conectando…",
+        "connected": "Conectado",
+        "idle": "Inactivo",
+        "searching": "Buscando…",
+        "inBattle": "En combate",
+        "error": "Error",
+        "disconnected": "Desconectado"
+      },
+      "incomingChallenges": "Retos entrantes",
+      "challengedYou": "te ha retado a {format}",
+      "accept": "Aceptar",
+      "reject": "Rechazar",
+      "findMatch": {
+        "title": "Buscar partida",
+        "desc": "Únete a la cola de emparejamiento y te emparejaremos con otro jugador.",
+        "button": "Buscar partida"
+      },
+      "searching": "Buscando rival…",
+      "cancel": "Cancelar",
+      "challenge": {
+        "title": "Retar jugador",
+        "desc": "Envía un reto directo a un jugador concreto.",
+        "placeholder": "ID del jugador",
+        "button": "Retar"
+      },
+      "yourId": {
+        "title": "Tu ID de jugador",
+        "desc": "Comparte este ID para que tus amigos puedan retarte directamente."
+      }
+    },
+    "showdown": {
+      "title": "Lobby de Showdown",
+      "subtitle": "Juega en el servidor oficial de Showdown",
+      "status": {
+        "disconnected": "Desconectado",
+        "inBattle": "En combate",
+        "loggedIn": "Conectado como {name}",
+        "connecting": "Conectando…",
+        "reconnecting": "Reconectando…",
+        "error": "Error"
+      },
+      "incomingChallenges": "Retos entrantes",
+      "challengedYou": "te ha retado a {format}",
+      "login": {
+        "title": "Inicia sesión en Showdown",
+        "username": "Usuario",
+        "password": "Contraseña",
+        "button": "Entrar",
+        "connecting": "Conectando al servidor de Showdown…",
+        "waitingChallstr": "Esperando la cadena de reto…"
+      },
+      "lobbyChat": "Chat del lobby",
+      "battle": {
+        "title": "Combate",
+        "desc": "Encuentra un rival aleatorio en el servidor oficial de Showdown.",
+        "button": "Buscar combate"
+      },
+      "challenge": {
+        "title": "Retar jugador",
+        "desc": "Reta a un jugador concreto a un combate.",
+        "placeholder": "Nombre del jugador"
+      },
+      "online": "Usuarios en línea ({count})",
+      "onlineTitle": "Usuarios en línea",
+      "onlineLoading": "Cargando usuarios…",
+      "you": "(tú)",
+      "connectedAs": "Conectado como {name} — sim3.psim.us"
+    },
+    "replays": {
+      "search": "Buscar por jugador…",
+      "scope": "Ámbito",
+      "recent": "Recientes",
+      "mine": "Mías",
+      "winner": "Ganador",
+      "errorTitle": "No se pudieron cargar las repeticiones",
+      "errorLead": "El servicio de repeticiones no está disponible ahora mismo. Inténtalo más tarde.",
+      "emptyTitle": "Aún no hay repeticiones",
+      "emptyLead": "Los combates que termines aparecerán aquí.",
+      "emptySearch": "Ninguna repetición coincide con tu búsqueda.",
+      "logHidden": "Registro oculto — actívalo con el botón del ojo",
+      "ctl": {
+        "timeline": "Línea de tiempo del combate",
+        "turnOf": "Turno {turn} de {total}",
+        "controls": "Controles de reproducción",
+        "play": "Reproducir",
+        "pause": "Pausar",
+        "restart": "Reiniciar",
+        "prevTurn": "Turno anterior",
+        "nextTurn": "Turno siguiente",
+        "pov": "Vista: {side}",
+        "player1": "Jugador 1",
+        "player2": "Jugador 2",
+        "toggleLog": "Mostrar/ocultar registro",
+        "simulate": "Simular ataque",
+        "goToTurn": "Ir al turno",
+        "goToTurnAria": "Ir al turno",
+        "speed": "Velocidad"
+      },
+      "loader": {
+        "title": "Carga una repetición de Pokémon Showdown",
+        "placeholder": "Pega aquí el texto completo de la repetición",
+        "load": "Cargar repetición",
+        "hint": "Copia y pega el texto completo de la repetición de Pokémon Showdown.",
+        "errorEmpty": "Pega un texto de repetición válido.",
+        "errorFormat": "Formato de repetición no válido. Se espera texto de Showdown con líneas |player| y |turn|.",
+        "errorUnknown": "Ha ocurrido un error desconocido."
+      }
     }
   }
 }

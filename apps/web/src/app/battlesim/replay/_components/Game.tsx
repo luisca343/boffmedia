@@ -20,53 +20,49 @@ import { AchievementService } from "@/services/api/smartrotom/achievementsServic
 import type { TimelineMarker } from "./ReplayControls";
 
 function ReplayLoader({ onReplayLoad }: { onReplayLoad: (data: ReplayData) => void }) {
+  const t = useTranslations('battlesim');
   const [replayText, setReplayText] = useState("");
   const [error, setError] = useState("");
 
   const handleLoadReplay = () => {
     try {
-      if (!replayText.trim()) throw new Error("Please paste a valid replay text");
+      if (!replayText.trim()) throw new Error(t('replays.loader.errorEmpty'));
       const text = replayText.trim();
       const hasPlayer = text.includes('|player|');
       const hasTurn = text.includes('|turn|') || text.includes('|start|');
-      if (!hasPlayer || !hasTurn) throw new Error("Invalid replay format. Expected Pokémon Showdown replay text with |player| and |turn| lines.");
+      if (!hasPlayer || !hasTurn) throw new Error(t('replays.loader.errorFormat'));
       onReplayLoad({
         side1: "Player 1", side2: "Player 2", team1: "", team2: "",
         replay: text, winner: 0, createdAt: new Date().toISOString()
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An unknown error occurred");
+      setError(err instanceof Error ? err.message : t('replays.loader.errorUnknown'));
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center p-6 rounded-lg max-w-3xl mx-auto mt-10"
-      style={{ background: 'var(--layer-2)' }}>
-      <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--text)' }}>Load Pokémon Showdown Replay</h2>
-      <div className="w-full mb-4">
-        <textarea
-          value={replayText}
-          onChange={(e) => setReplayText(e.target.value)}
-          placeholder="Paste the entire replay text here"
-          className="w-full h-64 p-3 rounded font-mono text-sm"
-          style={{ background: 'var(--layer-1)', color: 'var(--text)', border: '1px solid var(--border)' }}
-        />
-      </div>
+    <div data-ds="boffmedia" className="mx-auto mt-10 flex max-w-3xl flex-col items-center justify-center border border-solid border-line bg-panel p-6 text-txt cut-corner">
+      <h2 className="mb-4 text-[22px]">{t('replays.loader.title')}</h2>
+      <textarea
+        value={replayText}
+        onChange={(e) => setReplayText(e.target.value)}
+        placeholder={t('replays.loader.placeholder')}
+        className="mb-4 h-64 w-full border border-solid border-line-2 bg-base p-3 font-mono text-[13px] text-txt outline-none focus:border-accent"
+      />
       {error && (
-        <div className="w-full mb-4 p-2 rounded" style={{ background: 'color-mix(in srgb, var(--rose-500) 20%, transparent)', border: '1px solid color-mix(in srgb, var(--rose-500) 50%, transparent)', color: 'var(--rose-300)' }}>
+        <div className="mb-4 w-full border border-solid border-[color-mix(in_srgb,var(--bad)_45%,transparent)] bg-bad-soft p-2 font-mono text-[12px] text-bad">
           {error}
         </div>
       )}
       <button
+        type="button"
         onClick={handleLoadReplay}
-        className="w-full p-2 rounded font-medium"
-        style={{ background: 'var(--secondary)', color: 'var(--text)', border: '1px solid var(--border)' }}
+        style={{ clipPath: 'polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)' }}
+        className="w-full bg-accent p-2.5 font-display text-[14px] font-bold uppercase leading-none tracking-[0.04em] text-accent-ink transition-[filter] hover:brightness-110 focus-visible:outline-none"
       >
-        Load Replay
+        {t('replays.loader.load')}
       </button>
-      <p className="mt-4 text-sm" style={{ color: 'var(--text-dim)' }}>
-        Copy and paste the complete replay text from Pokémon Showdown
-      </p>
+      <p className="mt-4 font-mono text-[11px] text-txt-dim">{t('replays.loader.hint')}</p>
     </div>
   );
 }
@@ -154,7 +150,7 @@ export function Game({battleName = 'medalla_doku', replayData}: {battleName?: st
 
   return (
     <ReplayErrorBoundary>
-    <div className="flex flex-col lg:flex-row gap-4 p-4" style={{ background: 'var(--bg)', color: 'var(--text)' }}>
+    <div data-ds="boffmedia" className="flex flex-col gap-4 bg-base p-4 text-txt lg:flex-row">
       {/* Left: Canvas + Controls */}
       <div className="flex flex-col gap-3 shrink-0 min-w-0">
         <BattleCanvas
@@ -205,17 +201,17 @@ export function Game({battleName = 'medalla_doku', replayData}: {battleName?: st
           <div className="flex items-center gap-3">
             {canSaveReplay && (
               <button
+                type="button"
                 onClick={handleSaveReplay}
                 disabled={savingReplay}
-                className="bsx-focus px-4 py-1.5 rounded-[var(--radius-sm)] text-sm font-medium disabled:opacity-50"
-                style={{ background: 'var(--layer-2)', color: 'var(--text)', border: '1px solid var(--border)' }}
+                className="border border-solid border-line-2 bg-panel px-4 py-1.5 font-mono text-[12px] font-semibold uppercase leading-none tracking-[0.06em] text-txt-muted transition-colors hover:border-accent-line hover:text-txt disabled:opacity-50 focus-visible:outline-none"
               >
                 💾 {savingReplay ? t('end.savingReplay') : t('end.saveReplay')}
               </button>
             )}
             {savedReplayId && (
-              <span className="text-sm" style={{ color: 'var(--emerald-400)' }}>
-                {t('end.replaySaved')} — /battlesim/replay/{savedReplayId}
+              <span className="font-mono text-[12px] text-ok">
+                {t('end.replaySaved')} — /pokemon/battlesim/replay/{savedReplayId}
               </span>
             )}
           </div>
@@ -232,8 +228,8 @@ export function Game({battleName = 'medalla_doku', replayData}: {battleName?: st
             activeTurn={!isPlaying && battle.turn > 0 ? battle.turn : undefined}
           />
         ) : (
-          <p className="text-xs text-center py-4 rounded-[var(--radius)]" style={{ color: 'var(--text-dim)', border: '1px solid var(--border)' }}>
-            Log hidden — toggle with the eye button
+          <p className="border border-solid border-line py-4 text-center font-mono text-[11px] text-txt-dim">
+            {t('replays.logHidden')}
           </p>
         )}
       </div>

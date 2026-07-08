@@ -71,6 +71,27 @@ export const pokemon: GameEntry = {
       ],
     },
     {
+      key: "battlesim",
+      nameKey: "games.pokemon.categories.battlesim",
+      href: "/pokemon/battlesim",
+      landing: {
+        icon: "/img/games/pokemon/vgc-icon2.webp",
+        fallbackIcon: "sword",
+        fallbackIconColor: "text-red-400",
+        color: "from-red-500 to-orange-600",
+        features: ["battlesim"],
+        featured: false,
+        isNew: true,
+        popularity: "high",
+        heroImage: "/img/games/pokemon/vgc.webp",
+      },
+      // Full-bleed v3 tool. One route with in-app nav (Lobby · Equipos ·
+      // Repeticiones); live battles keep dedicated room routes (Phase B).
+      tools: [
+        { key: "battlesim", nameKey: "games.pokemon.tools.battlesim", href: "/pokemon/battlesim", sidebarIcon: "sword", bleed: true },
+      ],
+    },
+    {
       key: "others",
       nameKey: "games.pokemon.categories.others",
       href: "/pokemon/pmdsky",

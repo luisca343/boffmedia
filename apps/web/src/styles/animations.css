@@ -184,6 +184,10 @@
 @keyframes bm-prog { from { width: 0; } to { width: 100%; } }
 @keyframes bm-scan { 0% { top: -25%; } 100% { top: 115%; } }
 
+/* Battlesim v3 «Bx» HUD — plate hit flash + low-timer blink */
+@keyframes bm-hitflash { 0%, 100% { background: color-mix(in srgb, var(--panel) 88%, transparent); } 40% { background: color-mix(in srgb, var(--bad) 22%, var(--panel)); } }
+@keyframes bm-blink { 50% { opacity: 0.35; } }
+
 /* Boffmedia landing «Travesía» — atmosphere blink/spin, hero bob + ignition drop,
    spine current flow, pulse/arrival ping */
 @keyframes lv4-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }

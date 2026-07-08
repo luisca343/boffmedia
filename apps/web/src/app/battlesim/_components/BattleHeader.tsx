@@ -2,15 +2,16 @@
 
 import { useTranslations } from 'next-intl';
 
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import Link from 'next/link';
-import { BoffActionBar, BSXRing, Icon } from '@/components/boffmedia-v2/primitives';
+import { Icon } from '@/components/boffmedia/primitives';
+import { BxRing } from '@/app/(boffmedia)/(herramientas)/pokemon/battlesim/_components/ui/bx-kit';
 
-const MODE_META: Record<string, { label: string; color: string }> = {
-  ai: { label: 'VS AI', color: 'var(--cyan-400)' },
-  pvp: { label: 'PVP', color: 'var(--orange-400)' },
-  showdown: { label: 'SHOWDOWN', color: 'var(--purple-400)' },
-  replay: { label: 'REPLAY', color: 'var(--emerald-400)' },
+const MODE_META: Record<string, { label: string; tone: string }> = {
+  ai: { label: 'VS IA', tone: 'var(--signal)' },
+  pvp: { label: 'PVP', tone: 'var(--warn)' },
+  showdown: { label: 'SHOWDOWN', tone: 'var(--accent)' },
+  replay: { label: 'REPETICIÓN', tone: 'var(--ok)' },
 };
 
 interface BattleHeaderProps {
@@ -57,90 +58,76 @@ export function BattleHeader({
   const back = backLabel ?? t('header.lobby');
 
   return (
-    <BoffActionBar
+    <header
       aria-label="Battle header"
-      start={
-        <>
-          {backHref && (
-            <Link href={backHref} className="bsx-focus text-sm whitespace-nowrap" style={{ color: 'var(--text-muted)' }}>
-              ← {back}
-            </Link>
-          )}
-          <span
-            className="font-mono font-bold text-t-3xs tracking-[.12em] px-2 py-1 rounded-[var(--radius-sm)] shrink-0"
-            style={{
-              color: meta.color,
-              background: `color-mix(in srgb, ${meta.color} 14%, transparent)`,
-              border: `1px solid color-mix(in srgb, ${meta.color} 40%, transparent)`,
-            }}
+      style={{ clipPath: 'polygon(0 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%)' }}
+      className="flex flex-wrap items-center gap-x-3 gap-y-2 border border-solid border-line bg-[color-mix(in_srgb,var(--panel)_88%,transparent)] px-3 py-2 backdrop-blur-[4px]"
+    >
+      <div className="flex min-w-0 flex-wrap items-center gap-2">
+        {backHref && (
+          <Link
+            href={backHref}
+            className="inline-flex items-center gap-1 whitespace-nowrap font-mono text-[11px] uppercase tracking-[0.06em] text-txt-muted transition-colors hover:text-txt focus-visible:outline-none"
           >
-            {meta.label}
+            <Icon name="back" size={13} />{back}
+          </Link>
+        )}
+        <span
+          style={{ ['--tyc']: meta.tone, clipPath: 'polygon(3px 0,100% 0,calc(100% - 3px) 100%,0 100%)' } as CSSProperties}
+          className="flex-none border border-solid border-[color-mix(in_srgb,var(--tyc)_45%,transparent)] bg-[color-mix(in_srgb,var(--tyc)_14%,transparent)] px-2 py-1 font-mono text-[10px] font-bold uppercase leading-none tracking-[0.12em] text-[var(--tyc)]"
+        >
+          {meta.label}
+        </span>
+        {roomId && (
+          <span
+            className="max-w-[16ch] overflow-hidden text-ellipsis whitespace-nowrap border border-solid border-line-2 bg-base px-2 py-1 font-mono text-[10px] leading-none text-txt-muted"
+            title={roomId}
+          >
+            {roomId}
           </span>
-          {roomId && (
-            <span
-              className="text-t-xs px-2 py-1 rounded-[var(--radius-sm)] font-mono max-w-[16ch] overflow-hidden text-ellipsis whitespace-nowrap"
-              style={{ color: 'var(--text-muted)', background: 'var(--layer-2)' }}
-              title={roomId}
-            >
-              {roomId}
-            </span>
-          )}
-          {formatLabel && (
-            <span className="text-t-xs whitespace-nowrap" style={{ color: 'var(--text-dim)' }}>{formatLabel}</span>
-          )}
-          {extra}
-        </>
-      }
-      center={
-        username || opponentName ? (
-          <span className="text-t-xs whitespace-nowrap" style={{ color: 'var(--text-muted)' }}>
-            {username && <strong style={{ color: 'var(--text)' }}>{username}</strong>}
-            {username && opponentName && <span style={{ color: 'var(--text-dim)' }}> {t('header.vs')} </span>}
-            {opponentName && <strong style={{ color: 'var(--text)' }}>{opponentName}</strong>}
+        )}
+        {formatLabel && (
+          <span className="whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.06em] text-txt-dim">{formatLabel}</span>
+        )}
+        {extra}
+      </div>
+
+      {(username || opponentName) && (
+        <span className="mx-auto whitespace-nowrap font-mono text-[11px] text-txt-muted">
+          {username && <strong className="text-txt">{username}</strong>}
+          {username && opponentName && <span className="text-txt-dim"> {t('header.vs')} </span>}
+          {opponentName && <strong className="text-txt">{opponentName}</strong>}
+        </span>
+      )}
+
+      <div className="ml-auto flex flex-none items-center gap-2">
+        {spectatorCount != null && spectatorCount > 0 && (
+          <span className="inline-flex items-center gap-1 whitespace-nowrap border border-solid border-line-2 bg-base px-2 py-1 font-mono text-[10px] leading-none text-txt-muted">
+            <Icon name="eye" size={12} />{spectatorCount}
           </span>
-        ) : undefined
-      }
-      end={
-        <>
-          {spectatorCount != null && spectatorCount > 0 && (
-            <span
-              className="text-t-xs px-2 py-1 rounded-[var(--radius-sm)] whitespace-nowrap"
-              style={{ color: 'var(--text-muted)', background: 'var(--layer-2)' }}
-            >
-              👁 {spectatorCount}
-            </span>
-          )}
-          {timerP1 != null && <BSXRing sec={timerP1} max={timerMax} size={36} />}
-          {timerP2 != null && <BSXRing sec={timerP2} max={timerMax} size={36} />}
-          {onToggleFullscreen && (
-            <button
-              onClick={onToggleFullscreen}
-              className="bsx-focus p-2 rounded-[var(--radius-sm)] transition-colors duration-[var(--dur-fast)]"
-              style={{
-                background: 'var(--layer-2)',
-                color: 'var(--text-muted)',
-                border: '1px solid var(--border)',
-              }}
-              title={isFullscreen ? t('header.exitFullscreen') : t('header.fullscreen')}
-            >
-              <Icon name={isFullscreen ? 'exit-fullscreen' : 'fullscreen'} size={16} />
-            </button>
-          )}
-          {showForfeit && onForfeit && (
-            <button
-              onClick={onForfeit}
-              className="bsx-focus px-4 py-1.5 rounded-[var(--radius-sm)] text-sm font-medium transition-colors duration-[var(--dur)]"
-              style={{
-                background: 'var(--layer-3)',
-                color: 'var(--rose-400)',
-                border: '1px solid color-mix(in srgb, var(--rose-500) 40%, transparent)',
-              }}
-            >
-              {t('header.forfeit')}
-            </button>
-          )}
-        </>
-      }
-    />
+        )}
+        {timerP1 != null && <BxRing sec={timerP1} max={timerMax} size={36} />}
+        {timerP2 != null && <BxRing sec={timerP2} max={timerMax} size={36} />}
+        {onToggleFullscreen && (
+          <button
+            type="button"
+            onClick={onToggleFullscreen}
+            title={isFullscreen ? t('header.exitFullscreen') : t('header.fullscreen')}
+            className="grid h-8 w-8 place-items-center border border-solid border-line-2 bg-base text-txt-muted transition-colors hover:border-accent-line hover:text-txt focus-visible:outline-none"
+          >
+            <Icon name={isFullscreen ? 'exitFullscreen' : 'fullscreen'} size={15} />
+          </button>
+        )}
+        {showForfeit && onForfeit && (
+          <button
+            type="button"
+            onClick={onForfeit}
+            className="border border-solid border-[color-mix(in_srgb,var(--bad)_45%,transparent)] bg-bad-soft px-4 py-1.5 font-mono text-[11px] font-semibold uppercase leading-none tracking-[0.06em] text-bad transition-colors hover:bg-[color-mix(in_srgb,var(--bad)_22%,transparent)] focus-visible:outline-none"
+          >
+            {t('header.forfeit')}
+          </button>
+        )}
+      </div>
+    </header>
   );
 }

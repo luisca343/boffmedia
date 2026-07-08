@@ -35,28 +35,29 @@ export function BattleConnectionState({
   const isError = kind === 'error';
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 px-4">
+    <div data-ds="boffmedia" className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4 text-txt">
       {isError ? (
         <div className="text-center">
-          <h2 className="text-xl font-semibold mb-2" style={{ color: 'var(--rose-500)' }}>{t('connection.error')}</h2>
-          <p style={{ color: 'var(--text-muted)' }}>{message}</p>
+          <h2 className="mb-2 text-[22px] text-bad">{t('connection.error')}</h2>
+          <p className="text-txt-muted">{message}</p>
         </div>
       ) : (
         <>
           <BoffSpinner size="md" />
-          <p role="status" style={{ color: 'var(--text-muted)' }}>{message}</p>
+          <p role="status" className="font-mono text-[13px] uppercase tracking-[0.06em] text-txt-muted">{message}</p>
         </>
       )}
       {detail && (
-        <p className="text-xs" style={{ color: 'var(--amber-400)' }}>{detail}</p>
+        <p className="font-mono text-[11px] text-warn">{detail}</p>
       )}
       {children}
       <div className="flex items-center gap-3">
         {onRetry && (
           <button
+            type="button"
             onClick={onRetry}
-            className="bsx-focus px-6 py-2 rounded-md font-medium transition-colors"
-            style={{ background: 'var(--secondary)', color: 'var(--text)', border: '1px solid var(--border)' }}
+            style={{ clipPath: 'polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%)' }}
+            className="bg-accent px-6 py-2 font-display text-[13px] font-bold uppercase leading-none tracking-[0.04em] text-accent-ink transition-[filter] hover:brightness-110 focus-visible:outline-none"
           >
             {retryLabel ?? t('connection.tryAgain')}
           </button>
@@ -64,8 +65,7 @@ export function BattleConnectionState({
         {backHref && (
           <Link
             href={backHref}
-            className="bsx-focus px-6 py-2 rounded-md font-medium transition-colors"
-            style={{ background: 'var(--layer-2)', color: 'var(--text)', border: '1px solid var(--border)' }}
+            className="border border-solid border-line-2 bg-panel px-6 py-2 font-mono text-[12px] font-semibold uppercase leading-none tracking-[0.06em] text-txt-muted transition-colors hover:border-accent-line hover:text-txt focus-visible:outline-none"
           >
             {backLabel ?? t('connection.backToLobby')}
           </Link>

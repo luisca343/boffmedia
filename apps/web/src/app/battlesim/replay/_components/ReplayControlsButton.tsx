@@ -1,6 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import { cn } from '@/lib/utils';
 
 export default function ReplayControlsButton({
   onClick,
@@ -19,23 +20,20 @@ export default function ReplayControlsButton({
 }) {
   return (
     <button
+      type="button"
       onClick={onClick}
       aria-label={label}
       aria-pressed={active}
       title={hint ? `${label} (${hint})` : label}
-      className="bsx-focus flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-[var(--radius-sm)] transition-colors duration-[var(--dur-fast)] cursor-pointer"
-      style={{
-        background: active ? 'color-mix(in srgb, var(--secondary) 18%, var(--layer-2))' : 'var(--layer-2)',
-        color: active ? 'var(--secondary-hover)' : 'var(--text-muted)',
-        border: `1px solid ${active ? 'color-mix(in srgb, var(--secondary) 45%, var(--border))' : 'var(--border)'}`,
-      }}
+      className={cn(
+        'flex cursor-pointer flex-col items-center gap-0.5 border border-solid px-2 py-1.5 transition-colors focus-visible:outline-none',
+        active
+          ? 'border-accent-line bg-accent-soft text-accent-bright'
+          : 'border-line-2 bg-base text-txt-muted hover:border-accent-line hover:text-txt',
+      )}
     >
       {children}
-      {hint && (
-        <span className="font-mono text-t-4xs tracking-[.04em]" style={{ color: 'var(--text-dim)' }}>
-          {hint}
-        </span>
-      )}
+      {hint && <span className="font-mono text-[8px] tracking-[0.04em] text-txt-dim">{hint}</span>}
     </button>
   );
 }
