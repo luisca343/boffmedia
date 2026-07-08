@@ -49,7 +49,7 @@ export default function PvPLobbyPage() {
   const statusLabel = t(`pvp.status.${KNOWN_STATUS.includes(status) ? status : 'disconnected'}`);
 
   return (
-    <div data-ds="boffmedia" className="mx-auto flex w-full max-w-4xl flex-col gap-4 p-4 text-txt">
+    <div className="mx-auto flex w-full max-w-4xl flex-col gap-4 p-4 text-txt">
       <div className="flex items-center justify-between gap-3">
         <div>
           <h1 className="text-[clamp(24px,3.5vw,34px)]">{t('pvp.title')}</h1>

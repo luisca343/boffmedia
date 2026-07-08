@@ -1,8 +1,7 @@
 // Battle-HUD helpers for the v3 `Bx*` kit: type colours/labels, HP tone, type
 // effectiveness, status/boost labels and projected speed order. Ported from the
 // handoff core; consumes the real engine's BSX shapes (English type keys).
-import type { BSXMon } from "@/components/boffmedia-v2/primitives"
-import type { BSXKeyMove, BSXTickEv, TeamMemberHP } from "@/app/battlesim/_utils/toBSXMon"
+import type { BSXMon, BSXKeyMove, BSXTickEv, TeamMemberHP } from "@/app/battlesim/_utils/toBSXMon"
 
 export type BxMon = BSXMon
 export type BxMove = BSXKeyMove

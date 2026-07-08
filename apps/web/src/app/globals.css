@@ -57,11 +57,6 @@
   --st-brn:#f97316; --st-par:#f6cf3b; --st-psn:#b46ad6; --st-tox:#a855f7;
   --st-slp:#9aa0ab; --st-frz:#67e8f9;
 
-  /* Type families */
-  --font-display: 'Orbitron', sans-serif;
-  --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
-
   /* Modular type scale (tightened, 1.25 ratio anchored at 16) */
   /* Micro tier — HUD/badge text used by BS/BSX battle primitives */
   --t-4xs: 0.54rem;

@@ -82,7 +82,7 @@ function PlayInner() {
   // Idle state — direct navigation without a format.
   if (!session || !state) {
     return (
-      <div data-ds="boffmedia" className="flex min-h-[60vh] flex-col items-center justify-center gap-6 px-4 text-txt">
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 px-4 text-txt">
         <div className="text-center">
           <h1 className="text-[clamp(28px,4vw,40px)]">{t('play.title')}</h1>
           <p className="mt-1 text-txt-muted">{t('play.subtitle')}</p>
@@ -109,7 +109,7 @@ function PlayInner() {
 
   if (state.status === 'connecting') {
     return (
-      <div data-ds="boffmedia" className="flex flex-col gap-4 p-4 text-txt">
+      <div className="flex flex-col gap-4 p-4 text-txt">
         <BattleTabs sessions={sessions} activeRoomId={activeRoomId!} onSwitch={switchTab} onClose={closeTab} onNew={handleCreateBattle} />
         <BattleConnectionState kind="connecting" message={t('connection.connectingServer')} />
       </div>
@@ -118,7 +118,7 @@ function PlayInner() {
 
   if (state.status === 'error') {
     return (
-      <div data-ds="boffmedia" className="flex flex-col gap-4 p-4 text-txt">
+      <div className="flex flex-col gap-4 p-4 text-txt">
         <BattleTabs sessions={sessions} activeRoomId={activeRoomId!} onSwitch={switchTab} onClose={closeTab} onNew={handleCreateBattle} />
         <BattleConnectionState kind="error" message={state.error ?? t('connection.unknownError')} onRetry={handleCreateBattle} backHref={LOBBY_HREF} />
       </div>

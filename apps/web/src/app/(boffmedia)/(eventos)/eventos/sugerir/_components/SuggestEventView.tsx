@@ -55,7 +55,7 @@ export function SuggestEventView() {
   }, [])
 
   return (
-    <main data-ds="boffmedia" className="wrap pb-[90px] pt-[34px]">
+    <main className="wrap pb-[90px] pt-[34px]">
       <div className="mb-6">
         <span className="mono-label">{t("kicker")}</span>
         <h1 className="mt-2 text-[clamp(44px,6vw,72px)]">{t("title")}</h1>

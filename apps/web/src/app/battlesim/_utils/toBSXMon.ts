@@ -1,6 +1,12 @@
 import { Pokemon } from "@pkmn/client";
 import { Dex } from "@pkmn/dex";
-import type { BSXMon } from "@/components/boffmedia-v2/primitives";
+
+type BSXMon = {
+  id: string; name: string; types: string[]; hp: number; fnt?: boolean; tera?: boolean;
+  teraType?: string; status?: string | null; boosts?: Record<string, number>;
+  stats: { hp: number; atk: number; def: number; spa: number; spd: number; spe: number };
+  moves?: any[]; sleepT?: number; protect?: boolean;
+};
 
 type BSXKeyMove = {
   name: string; type: string; cat: string; power: number;
@@ -152,4 +158,4 @@ export function toTeamHP(
   return known;
 }
 
-export type { BSXKeyMove, BSXTickEv, TeamMemberHP };
+export type { BSXMon, BSXKeyMove, BSXTickEv, TeamMemberHP };

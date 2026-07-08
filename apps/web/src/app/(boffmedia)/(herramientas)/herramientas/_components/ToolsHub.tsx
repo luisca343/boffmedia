@@ -31,7 +31,7 @@ export function ToolsHub() {
     : null
 
   return (
-    <main data-ds="boffmedia">
+    <main>
       <VideoHero>
         <Kicker>{tHub("kicker")}</Kicker>
         <h1 className="mb-[18px] mt-5 text-[clamp(52px,7vw,108px)]">

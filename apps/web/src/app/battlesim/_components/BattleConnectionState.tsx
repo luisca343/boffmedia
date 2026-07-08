@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 
 import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { BoffSpinner } from '@/components/boffmedia-v2/primitives';
+import { Spinner } from '@/components/boffmedia/primitives/spinner';
 
 interface BattleConnectionStateProps {
   kind: 'loading' | 'connecting' | 'reconnecting' | 'queue' | 'error';
@@ -43,7 +43,7 @@ export function BattleConnectionState({
         </div>
       ) : (
         <>
-          <BoffSpinner size="md" />
+          <Spinner size={28} />
           <p role="status" className="font-mono text-[13px] uppercase tracking-[0.06em] text-txt-muted">{message}</p>
         </>
       )}

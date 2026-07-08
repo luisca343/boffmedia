@@ -30,7 +30,7 @@ export function EventDetailView({ id }: { id: number }) {
 
   if (isLoading) {
     return (
-      <main data-ds="boffmedia" className="wrap grid min-h-[60vh] place-items-center">
+      <main className="wrap grid min-h-[60vh] place-items-center">
         <Spinner />
       </main>
     )
@@ -38,7 +38,7 @@ export function EventDetailView({ id }: { id: number }) {
 
   if (!event) {
     return (
-      <main data-ds="boffmedia" className="wrap">
+      <main className="wrap">
         <Empty icon="alert" title={t("detail.notFound")} lead={t("detail.notFoundLead")}>
           <Button variant="pri" icon="back" href="/eventos">
             {t("detail.back")}
@@ -71,7 +71,7 @@ export function EventDetailView({ id }: { id: number }) {
   }
 
   return (
-    <main data-ds="boffmedia" className="wrap pb-[90px] pt-6">
+    <main className="wrap pb-[90px] pt-6">
       <Link
         href="/eventos"
         className="mb-5 inline-flex items-center gap-2 font-mono text-[11px]/none font-semibold uppercase tracking-[0.1em] text-txt-dim no-underline transition-colors hover:text-txt"
