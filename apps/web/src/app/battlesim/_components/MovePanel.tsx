@@ -1,11 +1,13 @@
 'use client';
 
-import { BSXKey } from '@/components/boffmedia-v2/primitives';
+import { BxKey } from '@/app/(boffmedia)/(herramientas)/pokemon/battlesim/_components/ui/bx-kit';
+import type { BxMon } from '@/app/(boffmedia)/(herramientas)/pokemon/battlesim/_lib/bx-helpers';
 import type { BSXKeyMove } from '../_utils/toBSXMon';
 
 interface MovePanelProps {
   moves: BSXKeyMove[];
-  foe?: { types: string[]; tera?: boolean; teraType?: string };
+  /** Active foe — drives per-move effectiveness tags. */
+  foe?: BxMon | null;
   onChooseMove: (index: number) => void;
   /** Targeting feedback: index of the hovered/focused damaging move, or null. */
   onAimMove?: (index: number | null) => void;
@@ -19,12 +21,12 @@ export function MovePanel({ moves, foe, onChooseMove, onAimMove, teraArmed }: Mo
   return (
     <div className="grid grid-cols-2 gap-2">
       {moves.map((move, i) => (
-        <BSXKey
+        <BxKey
           key={move.name ?? i}
           move={move}
-          hotkey={String(i + 1)}
+          hotkey={i + 1}
           tera={teraArmed}
-          target={foe ? { types: foe.types, tera: foe.tera, teraType: foe.teraType } : undefined}
+          target={foe ?? null}
           onClick={() => onChooseMove(i + 1)}
           onHover={onAimMove && move.cat !== 'status' ? () => onAimMove(i) : undefined}
           onLeave={onAimMove ? () => onAimMove(null) : undefined}

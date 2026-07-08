@@ -86,6 +86,10 @@ const ICONS = {
   steam: <g><circle cx="12" cy="12" r="9" /><circle cx="15.6" cy="8.6" r="2.4" /><circle cx="8.1" cy="14.9" r="1.7" /><path d="m9.6 13.9 4.1-2.9" /></g>,
   camera: <g><path d="M3 8.5A1.5 1.5 0 0 1 4.5 7H8l1.4-2.2h5.2L16 7h3.5A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5z" /><circle cx="12" cy="13" r="3.4" /></g>,
   logout: <g><path d="M15 4h3a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-3" /><path d="m10 8-4 4 4 4M6 12h9" /></g>,
+  fullscreen: <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />,
+  exitFullscreen: <path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" />,
+  pause: <path d="M8 5v14M16 5v14" />,
+  swap: <path d="M7 4 3 8l4 4M3 8h13M17 20l4-4-4-4M21 16H8" />,
 } satisfies Record<string, React.ReactNode>
 
 /** Every valid icon name — use this to type icon fields so typos fail at compile time. */

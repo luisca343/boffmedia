@@ -1,5 +1,6 @@
 "use client"
 import { Battle, Pokemon } from "@pkmn/client";
+import { useTranslations } from "next-intl";
 import { BoffSkeleton, BoffSpinner } from "@/components/boffmedia-v2/primitives";
 import { forwardRef, useCallback, useRef, memo } from "react";
 import { positionsP1, positionsP2, ASPECT_RATIO, getScaleMultiplier } from "../_utils/viewUtils";
@@ -11,7 +12,7 @@ import { PokemonIdent } from "@pkmn/protocol";
 import useViewportWidth from "@/services/useViewPortWidth";
 import BattlePreview from "./BattlePreview";
 import BattleEndScreen from "./BattleEndScreen";
-import { BSXPlate } from "@/components/boffmedia-v2/primitives";
+import { BxPlate } from "@/app/(boffmedia)/(herramientas)/pokemon/battlesim/_components/ui/bx-kit";
 import { toBSXMon } from "../_utils/toBSXMon";
 import { FieldConditions } from "./FieldConditions";
 import type { ReactNode } from "react";
@@ -66,6 +67,7 @@ export const BattleCanvas = memo(forwardRef(({
     canvasWidth?: number,
     fullscreen?: boolean,
 }, ref: React.Ref<BattleCanvasRefProps>) => {
+    const t = useTranslations("battlesim");
     const pokemonRefs = useRef<{ [key: string]: PokemonRefType }>({});
     const [, defaultCanvasWidth] = useViewportWidth();
     const canvasWidth = canvasWidthProp ?? defaultCanvasWidth;
@@ -87,7 +89,7 @@ export const BattleCanvas = memo(forwardRef(({
     if(liveMode && liveStatus === 'connecting') {
         return (
             <div className="flex flex-col items-center justify-center gap-3" style={{ width: canvasWidth, height: canvasWidth * ASPECT_RATIO, backgroundImage: 'url(/battlesim/fx/bg/hagane.png)', backgroundSize: '100% 100%' }}>
-                <BoffSpinner size="lg" label="Waiting for battle..." />
+                <BoffSpinner size="lg" label={t('connection.waitingBattle')} />
             </div>
         )
     }
@@ -152,11 +154,8 @@ export const BattleCanvas = memo(forwardRef(({
                   
             <div className="h-[20%] lg:h-[15%] xl:h-[13%] w-full absolute top-0 flex justify-between z-10">
             <div className="m-1 w-1/3 flex flex-col items-start gap-1 h-fit z-50">
-                    <div
-                        className="w-fit py-1 px-2 rounded-[var(--radius-sm)] font-mono font-bold text-t-xs"
-                        style={{ background: 'color-mix(in srgb, var(--bg) 80%, transparent)', color: 'var(--text)' }}
-                    >
-                        Turno {battle.turn}
+                    <div className="w-fit border border-solid border-line bg-[color-mix(in_srgb,var(--base)_80%,transparent)] px-2 py-1 font-mono text-[11px] font-bold uppercase leading-none tracking-[0.08em] text-txt backdrop-blur-[3px]">
+                        {t('canvas.turn', { turn: battle.turn })}
                     </div>
                     <FieldConditions battle={battle} pov={pov === 1 ? 1 : 0} />
                     </div>
@@ -164,7 +163,7 @@ export const BattleCanvas = memo(forwardRef(({
                     {!fullscreen && <PokemonTeam side={p2}/>}
                     {positionsP2.map((position, index) => {
                         const mon = toBSXMon(pokemon[position]);
-                        return mon && <div key={position} className="flex-1 max-w-[260px] shrink min-w-0"><BSXPlate mon={mon} foe slotTag="2" aimed={aimedFoe && !mon.fnt} /></div>;
+                        return mon && <div key={position} className="flex-1 max-w-[260px] shrink min-w-0"><BxPlate mon={mon} foe slotTag="2" aimed={aimedFoe && !mon.fnt} /></div>;
                     })}
                 </div>
             </div>
@@ -175,7 +174,7 @@ export const BattleCanvas = memo(forwardRef(({
                     {!fullscreen && <PokemonTeam side={p1}/>}
                     {positionsP1.map((position, index) => {
                         const mon = toBSXMon(pokemon[position]);
-                        return mon && <div key={position} className="flex-1 max-w-[260px] shrink min-w-0"><BSXPlate mon={mon} active slotTag="1" /></div>;
+                        return mon && <div key={position} className="flex-1 max-w-[260px] shrink min-w-0"><BxPlate mon={mon} active slotTag="1" /></div>;
                     })}
                 </div>
                 <div className="m-1 w-1/3 flex">
@@ -242,15 +241,13 @@ export const BattleCanvas = memo(forwardRef(({
 
             {choicePanel && (
               <div
-                className="absolute bottom-2 right-2 z-30 pointer-events-auto rounded-[var(--radius)]"
+                className="absolute bottom-2 right-2 z-30 pointer-events-auto border border-solid border-line p-[10px]"
                 style={{
                   maxWidth: 'min(540px, calc(100% - 16px))',
                   maxHeight: 'calc(100% - 16px)',
                   overflowY: 'auto',
-                  background: 'color-mix(in srgb, var(--bg) 82%, transparent)',
+                  background: 'color-mix(in srgb, var(--base) 82%, transparent)',
                   backdropFilter: 'blur(6px)',
-                  border: '1px solid var(--border)',
-                  padding: '10px',
                 }}
               >
                 {choicePanel}

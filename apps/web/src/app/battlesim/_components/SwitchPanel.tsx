@@ -1,6 +1,6 @@
 'use client';
 
-import { BSXBenchChip } from '@/components/boffmedia-v2/primitives';
+import { BxBench } from '@/app/(boffmedia)/(herramientas)/pokemon/battlesim/_components/ui/bx-kit';
 import type { BSXMon } from '@/components/boffmedia-v2/primitives';
 
 interface SwitchPanelProps {
@@ -16,15 +16,13 @@ export function SwitchPanel({ bench, onSwitch, label = 'Switch', hotkeyOffset = 
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="text-xs font-medium uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>
-        {label}
-      </div>
+      <div className="mono-label">{label}</div>
       <div className="grid grid-cols-3 gap-2">
         {bench.map((mon, i) => {
           const hotkeyNum = i + 1 + hotkeyOffset;
           const isLast = i === bench.length - 1;
           return (
-            <BSXBenchChip
+            <BxBench
               key={mon.id ?? i}
               mon={mon}
               hotkey={isLast && hotkeyNum > 9 ? '0' : String(hotkeyNum)}

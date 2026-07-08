@@ -1,7 +1,8 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { BSXScorePlate, BSXOrderRail } from '@/components/boffmedia-v2/primitives';
+import { BxScore, BxOrder } from '@/app/(boffmedia)/(herramientas)/pokemon/battlesim/_components/ui/bx-kit';
+import type { OrderSlot } from '@/app/(boffmedia)/(herramientas)/pokemon/battlesim/_lib/bx-helpers';
 import { cn } from '@/lib/utils';
 import type { BSXLayout } from '../_hooks/useBSXLayout';
 
@@ -22,15 +23,15 @@ interface BattleStageProps {
 export function BattleStage({ bsx, children, showOrderRail = false, fullscreen = false }: BattleStageProps) {
   const orderSlots = [
     bsx.bsxAlly ? { side: 'ally', idx: 0, mon: bsx.bsxAlly } : null,
-    bsx.bsxFoe ? { side: 'foe', idx: 0, mon: { ...bsx.bsxFoe, est: true } } : null,
-  ].filter(Boolean) as { side: string; idx: number; mon: any }[];
+    bsx.bsxFoe ? { side: 'foe', idx: 0, mon: bsx.bsxFoe } : null,
+  ].filter(Boolean) as OrderSlot[];
 
   return (
-    <div className={cn("flex flex-col gap-2 min-w-0 animate-appear", fullscreen && "h-full")}>
+    <div className={cn('flex min-w-0 flex-col gap-2 animate-appear', fullscreen && 'h-full')}>
       {!fullscreen && (bsx.bsxScoreP1 || bsx.bsxScoreP2) && (
-        <div className="flex flex-wrap justify-between gap-2 min-w-0">
+        <div className="flex min-w-0 flex-wrap justify-between gap-2">
           {bsx.bsxScoreP1 && (
-            <BSXScorePlate
+            <BxScore
               name={bsx.bsxScoreP1.name}
               rating={bsx.bsxScoreP1.rating}
               av={bsx.bsxScoreP1.av}
@@ -38,7 +39,7 @@ export function BattleStage({ bsx, children, showOrderRail = false, fullscreen =
             />
           )}
           {bsx.bsxScoreP2 && (
-            <BSXScorePlate
+            <BxScore
               name={bsx.bsxScoreP2.name}
               rating={bsx.bsxScoreP2.rating}
               av={bsx.bsxScoreP2.av}
@@ -51,7 +52,7 @@ export function BattleStage({ bsx, children, showOrderRail = false, fullscreen =
 
       {children}
 
-      {showOrderRail && orderSlots.length > 1 && <BSXOrderRail slots={orderSlots} />}
+      {showOrderRail && orderSlots.length > 1 && <BxOrder slots={orderSlots} />}
     </div>
   );
 }
