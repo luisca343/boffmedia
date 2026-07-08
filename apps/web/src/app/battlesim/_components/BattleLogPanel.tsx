@@ -3,7 +3,8 @@
 import { useTranslations } from 'next-intl';
 
 import { useRef, useEffect, useState, useMemo } from 'react';
-import { BSXTick, Segmented } from '@/components/boffmedia-v2/primitives';
+import { BxTick } from '@/app/(boffmedia)/(herramientas)/pokemon/battlesim/_components/ui/bx-kit';
+import { DkSeg } from '@/components/boffmedia/ui/tools/datakit';
 import type { BSXTickEv } from '../_utils/toBSXMon';
 
 export const VISIBLE_TICK_LIMIT = 50;
@@ -108,17 +109,22 @@ export function BattleLogPanel({
 
   return (
     <div
-      className={`rounded-[var(--radius)] overflow-hidden flex flex-col ${className ?? ''}`}
-      style={{ border: '1px solid var(--border)', background: 'var(--layer-1)' }}
+      className={`flex flex-col overflow-hidden border border-solid border-line bg-panel ${className ?? ''}`}
     >
       {showFilters && (
-        <div className="flex items-center gap-2 p-2 border-b border-edge" style={{ background: 'var(--layer-2)' }}>
-          <Segmented value={filter} options={filterOptions} onChange={(v) => setFilter(v as LogFilter)} className="text-t-xs" />
+        <div className="flex items-center gap-2 border-b border-solid border-line bg-base p-2">
+          <DkSeg
+            size="sm"
+            value={filter}
+            options={filterOptions}
+            onChange={(v) => setFilter(v as LogFilter)}
+            ariaLabel={t('log.label')}
+          />
           {groups.length > 1 && (
             <button
+              type="button"
               onClick={collapsePrevious}
-              className="bsx-focus ml-auto text-t-3xs font-mono uppercase tracking-[.06em] px-2 py-1 rounded-[var(--radius-sm)]"
-              style={{ color: 'var(--text-dim)', background: 'var(--layer-3)' }}
+              className="ml-auto border border-solid border-line-2 px-2 py-1 font-mono text-[10px] uppercase leading-none tracking-[0.06em] text-txt-dim transition-colors hover:text-txt focus-visible:outline-none"
               title={t('log.collapsePrevious')}
             >
               {t('log.collapsePrevious')}
@@ -129,9 +135,9 @@ export function BattleLogPanel({
 
       {ticks.length > limit && !showAll && (
         <button
+          type="button"
           onClick={() => setShowAll(true)}
-          className="bsx-focus w-full text-t-xs py-1 transition-colors shrink-0"
-          style={{ background: 'var(--layer-2)', color: 'var(--text-muted)', borderBottom: '1px solid var(--border)' }}
+          className="w-full shrink-0 border-b border-solid border-line bg-base py-1 font-mono text-[10.5px] text-txt-muted transition-colors hover:text-txt focus-visible:outline-none"
         >
           {t('log.showAll', { count: ticks.length })}
         </button>
@@ -152,29 +158,26 @@ export function BattleLogPanel({
             <div key={group.turn} data-turn={group.turn}>
               {group.turn > 0 && (
                 <button
+                  type="button"
                   onClick={() => toggleTurn(group.turn)}
                   aria-expanded={!isCollapsed}
-                  className="bsx-focus sticky top-0 z-[1] w-full flex items-center gap-[.55rem] pt-[.45rem] pb-[.15rem] font-mono font-bold text-t-3xs tracking-[.14em] cursor-pointer text-left"
-                  style={{
-                    color: isActive ? 'var(--text)' : 'var(--secondary-hover)',
-                    background: 'var(--layer-1)',
-                  }}
+                  className={`sticky top-0 z-[1] flex w-full cursor-pointer items-center gap-[10px] bg-panel pb-[3px] pt-[7px] text-left font-mono text-[11px] font-extrabold leading-none tracking-[0.14em] focus-visible:outline-none ${isActive ? 'text-txt' : 'text-accent-bright'}`}
                 >
                   <span>{isCollapsed ? '▸' : '▾'} T{group.turn}</span>
                   {isCollapsed && (
-                    <span className="font-normal" style={{ color: 'var(--text-dim)' }}>
+                    <span className="font-normal text-txt-dim">
                       {t('log.events', { count: group.events.length })}
                     </span>
                   )}
-                  <i className="flex-1 h-[1px]" style={{ background: 'linear-gradient(90deg, var(--accent-soft, var(--border)), transparent)' }} />
+                  <i className="h-px flex-1 bg-[linear-gradient(90deg,var(--accent-line),transparent)]" />
                 </button>
               )}
-              {!isCollapsed && group.events.map((ev, i) => <BSXTick key={`${group.turn}-${i}`} ev={ev as any} />)}
+              {!isCollapsed && group.events.map((ev, i) => <BxTick key={`${group.turn}-${i}`} ev={ev} />)}
             </div>
           );
         })}
         {groups.length === 0 && (
-          <p className="text-t-xs text-center py-4" style={{ color: 'var(--text-dim)' }}>
+          <p className="py-4 text-center font-mono text-[11px] text-txt-dim">
             {t('log.empty')}
           </p>
         )}
