@@ -1,49 +1,24 @@
-'use client';
+"use client";
 
-import { useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/primitives/card';
-import { Button } from '@/components/ui/primitives/button';
-import { Badge } from '@/components/ui/primitives/badge';
-import { Input } from '@/components/ui/primitives/input';
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from '@/components/ui/primitives/select';
-import { Checkbox } from '@/components/ui/primitives/checkbox';
-import {
-  Download, Loader2, Search, CheckCircle2, XCircle, SkipForward,
-  HardDrive, ChevronDown, ChevronUp, Clock, CheckSquare, Square,
-} from 'lucide-react';
+import { useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
+import { Kicker, Button, Icon, Input, Select, Disclosure, Banner, Empty } from "@/components/boffmedia/primitives";
 import {
   ScrapeService,
   CatalogResult, CatalogSearchConsoleResult, CatalogSearchResult,
   FileDownloadEntry, FileDownloadStatus, GameFileEntry, SseDoneEvent,
-} from '@/services/api/boffmedia/scrapeService';
-import GameCatalogTable from './GameCatalogTable';
-import { FloatingSection } from '@/app/(boffmedia)/_components/layout/FloatingSection';
-import { CONSOLES, MANUFACTURER_COLORS } from '../../_components/consoles';
-import { ConsolePicker } from '../../_components/ConsolePicker';
-import { RegionFilter } from '../../_components/RegionFilter';
+} from "@/services/api/boffmedia/scrapeService";
+import GameCatalogTable from "./GameCatalogTable";
+import { CONSOLES, type Manufacturer } from "../../_components/consoles";
+import { ConsoleChip, RegionChip, Kpi, MyConsoleGroup, MyStatusIcon, MFR_DOT, MFR_ORDER } from "./ui/my-kit";
 
-// ─── Per-file status maps ─────────────────────────────────────────────────────
+const COMMON_REGIONS = ["USA", "Europe", "Japan", "World", "Spain", "France", "Germany", "Italy"];
+const CONSOLE_GROUPS = MFR_ORDER.map((mfr) => ({
+  mfr,
+  entries: Object.entries(CONSOLES).filter(([, v]) => v.manufacturer === mfr),
+}));
 
-const STATUS_ICON: Record<FileDownloadStatus, React.ReactNode> = {
-  pending:     <Clock        className="h-3.5 w-3.5 text-ink-muted shrink-0" />,
-  downloading: <Loader2      className="h-3.5 w-3.5 text-blue-400 shrink-0 animate-spin" />,
-  downloaded:  <CheckCircle2 className="h-3.5 w-3.5 text-green-400 shrink-0" />,
-  skipped:     <SkipForward  className="h-3.5 w-3.5 text-yellow-400 shrink-0" />,
-  failed:      <XCircle      className="h-3.5 w-3.5 text-red-400 shrink-0" />,
-};
-const STATUS_COLOR: Record<FileDownloadStatus, string> = {
-  pending: 'text-ink-muted', downloading: 'text-blue-300',
-  downloaded: 'text-green-300', skipped: 'text-yellow-300', failed: 'text-red-300',
-};
-const STATUS_BG: Record<FileDownloadStatus, string> = {
-  pending: '', downloading: 'bg-blue-900/10', downloaded: 'bg-green-900/10',
-  skipped: 'bg-yellow-900/10', failed: 'bg-red-900/10',
-};
-
-// ─── Progress panel ───────────────────────────────────────────────────────────
+/* ── download progress ────────────────────────────────────────────────────── */
 
 interface ProgressState {
   files: FileDownloadEntry[];
@@ -53,6 +28,7 @@ interface ProgressState {
 }
 
 function DownloadProgressPanel({ progress }: { progress: ProgressState }) {
+  const t = useTranslations("otros.myrientApp");
   const [showFiles, setShowFiles] = useState(true);
   const { files, completed, total, summary } = progress;
   const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
@@ -61,157 +37,83 @@ function DownloadProgressPanel({ progress }: { progress: ProgressState }) {
     { pending: 0, downloading: 0, downloaded: 0, skipped: 0, failed: 0 },
   );
   return (
-    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1.5">
-        <div className="flex justify-between text-sm">
-          <span className="text-ink font-medium">
-            {summary ? 'Descarga completada' : `Descargando… ${completed} / ${total}`}
+        <div className="flex justify-between text-[13px]">
+          <span className="font-medium text-txt">
+            {summary ? t("downloadComplete") : t("downloadingN", { completed, total })}
           </span>
-          <span className="text-ink-muted">{pct}%</span>
+          <span className="font-mono text-txt-muted">{pct}%</span>
         </div>
-        <div className="h-2 rounded-full bg-layer-3/60 overflow-hidden">
-          <motion.div className={`h-full rounded-full ${summary ? 'bg-green-500' : 'bg-primary'}`}
-            initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ ease: 'easeOut', duration: 0.3 }} />
+        <div className="h-2 overflow-hidden bg-base-2">
+          <div className={"h-full transition-[width] duration-300 ease-out " + (summary ? "bg-ok" : "bg-accent")} style={{ width: `${pct}%` }} />
         </div>
       </div>
-      <div className="flex flex-wrap gap-2 text-xs">
-        {counts.downloaded  > 0 && <span className="px-2 py-1 rounded-full bg-green-900/30 text-green-300 border border-green-800/40">{counts.downloaded} descargados</span>}
-        {counts.skipped     > 0 && <span className="px-2 py-1 rounded-full bg-yellow-900/30 text-yellow-300 border border-yellow-800/40">{counts.skipped} omitidos</span>}
-        {counts.failed      > 0 && <span className="px-2 py-1 rounded-full bg-red-900/30 text-red-300 border border-red-800/40">{counts.failed} fallidos</span>}
-        {counts.downloading > 0 && <span className="px-2 py-1 rounded-full bg-blue-900/30 text-blue-300 border border-blue-800/40">{counts.downloading} en progreso</span>}
-        {summary && <span className="px-2 py-1 rounded-full bg-layer-3/40 text-ink border border-edge/40 flex items-center gap-1"><HardDrive className="h-3 w-3" />{summary.totalDownloadedSize}</span>}
+      <div className="flex flex-wrap gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.06em]">
+        {counts.downloaded > 0 && <span className="border border-transparent bg-ok-soft px-2 py-1 text-ok">{t("countDownloaded", { n: counts.downloaded })}</span>}
+        {counts.skipped > 0 && <span className="border border-transparent bg-warn-soft px-2 py-1 text-warn">{t("countSkipped", { n: counts.skipped })}</span>}
+        {counts.failed > 0 && <span className="border border-transparent bg-bad-soft px-2 py-1 text-bad">{t("countFailed", { n: counts.failed })}</span>}
+        {counts.downloading > 0 && <span className="border border-transparent bg-accent-soft px-2 py-1 text-signal">{t("countDownloading", { n: counts.downloading })}</span>}
+        {summary && <span className="inline-flex items-center gap-1 border border-line-2 bg-base-2 px-2 py-1 text-txt-muted"><Icon name="database" size={11} />{summary.totalDownloadedSize}</span>}
       </div>
-      <button onClick={() => setShowFiles(v => !v)}
-        className="flex items-center gap-1.5 text-sm text-ink-muted hover:text-ink transition-colors self-start">
-        {showFiles ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-        {showFiles ? 'Ocultar' : 'Ver'} archivos ({files.length})
+      <button onClick={() => setShowFiles((v) => !v)} className="flex items-center gap-1.5 self-start font-mono text-[11px] uppercase tracking-[0.06em] text-txt-muted transition-colors hover:text-txt">
+        <Icon name={showFiles ? "chevronDown" : "chevronRight"} size={14} />
+        {showFiles ? t("hideFilesN", { n: files.length }) : t("showFilesN", { n: files.length })}
       </button>
       {showFiles && (
-        <div className="rounded-lg border border-edge/50 divide-y divide-edge/30 max-h-80 overflow-y-auto">
-          {files.map(f => (
-            <motion.div key={f.filename} layout
-              className={`flex items-center gap-2 px-3 py-2 transition-colors duration-300 ${STATUS_BG[f.status]}`}>
-              {STATUS_ICON[f.status]}
-              <span className={`flex-1 text-xs truncate ${STATUS_COLOR[f.status]}`} title={f.filename}>{f.filename}</span>
-              {f.size && <span className="text-xs text-ink-muted shrink-0">{f.size}</span>}
-              {f.error && <span className="text-xs text-red-500 truncate max-w-[140px]" title={f.error}>{f.error}</span>}
-            </motion.div>
+        <div className="max-h-80 overflow-y-auto border border-line">
+          {files.map((f) => (
+            <div key={f.filename} className="flex items-center gap-2 border-b border-[color-mix(in_srgb,var(--line)_55%,transparent)] px-3 py-2 last:border-b-0">
+              <MyStatusIcon status={f.status} />
+              <span className="min-w-0 flex-1 truncate text-[12px] text-txt" title={f.filename}>{f.filename}</span>
+              {f.size && <span className="shrink-0 font-mono text-[11px] text-txt-dim">{f.size}</span>}
+              {f.error && <span className="max-w-[140px] shrink-0 truncate text-[11px] text-bad" title={f.error}>{f.error}</span>}
+            </div>
           ))}
         </div>
       )}
-    </motion.div>
-  );
-}
-
-// ─── Multi-console console group ──────────────────────────────────────────────
-
-interface CatalogGroupProps {
-  result: CatalogSearchConsoleResult;
-  groupSelected: Set<string>;
-  downloadedSet: Set<string>;
-  onToggle: (name: string) => void;
-  onToggleAll: () => void;
-}
-
-function CatalogConsoleGroup({ result, groupSelected, downloadedSet, onToggle, onToggleAll }: CatalogGroupProps) {
-  const localFilename = (file: GameFileEntry) =>
-    decodeURIComponent(file.link.split('/').pop() ?? file.name);
-  const [expanded, setExpanded] = useState(true);
-  const info = CONSOLES[result.consoleKey];
-  const color = info ? MANUFACTURER_COLORS[info.manufacturer] : 'text-ink-muted';
-  const allSelected = result.files.length > 0 && result.files.every(f => groupSelected.has(f.name));
-
-  return (
-    <div className="rounded-lg border border-edge/50 overflow-hidden">
-      {/* Header */}
-      <button onClick={() => setExpanded(e => !e)}
-        className="w-full flex items-center gap-3 px-4 py-3 bg-layer-2/60 hover:bg-layer-2/80 transition-colors text-left">
-        <span className={`text-sm font-semibold ${color} truncate flex-1`}>{result.consoleLabel}</span>
-        <Badge className="bg-layer-3/40 text-ink border-edge/40 shrink-0">
-          {result.count} juego{result.count !== 1 ? 's' : ''}
-        </Badge>
-        {groupSelected.size > 0 && (
-          <Badge className="bg-primary-active/20 text-primary-hover border-primary-active/40 shrink-0">
-            {groupSelected.size} sel.
-          </Badge>
-        )}
-        {expanded ? <ChevronUp className="h-4 w-4 text-ink-muted shrink-0" /> : <ChevronDown className="h-4 w-4 text-ink-muted shrink-0" />}
-      </button>
-
-      {/* File list */}
-      <AnimatePresence initial={false}>
-        {expanded && (
-          <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="overflow-hidden">
-            {/* Select-all row */}
-            <div className="flex items-center gap-3 px-4 py-2 bg-layer-2/40 border-b border-edge/40">
-              <Checkbox checked={allSelected} onCheckedChange={onToggleAll}
-                className="border-edge data-[state=checked]:bg-primary-active data-[state=checked]:border-primary-active" />
-              <button onClick={onToggleAll} className="flex items-center gap-1.5 text-xs text-ink-muted hover:text-ink transition-colors">
-                {allSelected
-                  ? <><Square className="h-3 w-3" /> Deseleccionar todos</>
-                  : <><CheckSquare className="h-3 w-3" /> Seleccionar todos ({result.files.length})</>
-                }
-              </button>
-            </div>
-            <div className="divide-y divide-edge/30">
-              {result.files.map(file => {
-                const isSelected   = groupSelected.has(file.name);
-                const isDownloaded = downloadedSet.has(localFilename(file));
-                return (
-                  <div key={file.name} onClick={() => onToggle(file.name)}
-                    className={`flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-colors duration-100
-                      ${isSelected ? 'bg-primary-soft/20 hover:bg-primary-soft/30' : isDownloaded ? 'bg-green-900/10 hover:bg-green-900/20' : 'hover:bg-layer-3/20'}`}>
-                    <Checkbox checked={isSelected} onCheckedChange={() => onToggle(file.name)}
-                      onClick={e => e.stopPropagation()}
-                      className="border-edge data-[state=checked]:bg-primary-active data-[state=checked]:border-primary-active shrink-0" />
-                    <span className={`flex-1 text-sm truncate ${isDownloaded ? 'text-green-300' : 'text-ink'}`} title={file.name}>{file.name}</span>
-                    {isDownloaded && <span title="Ya descargado"><HardDrive className="h-3.5 w-3.5 text-green-500/70 shrink-0" /></span>}
-                    <span className="text-xs text-ink-muted w-24 text-right shrink-0">{file.size}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }
 
-// ─── Main component ───────────────────────────────────────────────────────────
+/* ── main ─────────────────────────────────────────────────────────────────── */
 
 export default function MyrientDownloader() {
-  const [query, setQuery] = useState('');
+  const t = useTranslations("otros.myrientApp");
+  const [query, setQuery] = useState("");
   const [selectedConsole, setSelectedConsole] = useState<string | null>(null);
   const [regions, setRegions] = useState<string[]>([]);
-  const [concurrency, setConcurrency] = useState('2');
+  const [customRegion, setCustomRegion] = useState("");
+  const [concurrency, setConcurrency] = useState("2");
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Single-console mode
   const [singleCatalog, setSingleCatalog] = useState<CatalogResult | null>(null);
   const [downloadedSet, setDownloadedSet] = useState<Set<string>>(new Set());
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
-  // Multi-console mode
   const [multiCatalog, setMultiCatalog] = useState<CatalogSearchResult | null>(null);
   const [multiSelected, setMultiSelected] = useState<Map<string, Set<string>>>(new Map());
   const [multiDownloadedSet, setMultiDownloadedSet] = useState<Map<string, Set<string>>>(new Map());
 
-  // Download state (shared)
   const [downloading, setDownloading] = useState(false);
   const [progress, setProgress] = useState<ProgressState | null>(null);
   const [downloadError, setDownloadError] = useState<string | null>(null);
 
   const totalMultiSelected = [...multiSelected.values()].reduce((s, set) => s + set.size, 0);
-  const multiConsoleCount  = [...multiSelected.values()].filter(s => s.size > 0).length;
+  const multiConsoleCount = [...multiSelected.values()].filter((s) => s.size > 0).length;
 
-  const addRegion    = (r: string) => setRegions(prev => prev.includes(r) ? prev : [...prev, r]);
-  const removeRegion = (r: string) => setRegions(prev => prev.filter(x => x !== r));
+  const toggleRegion = (r: string) => setRegions((prev) => (prev.includes(r) ? prev.filter((x) => x !== r) : [...prev, r]));
+  const addCustomRegion = () => {
+    const r = customRegion.trim();
+    if (r && !regions.includes(r)) setRegions((prev) => [...prev, r]);
+    setCustomRegion("");
+  };
+  const removeRegion = (r: string) => setRegions((prev) => prev.filter((x) => x !== r));
 
   const handleConsoleSelect = (key: string) => {
-    setSelectedConsole(prev => (prev === key ? null : key));
+    setSelectedConsole((prev) => (prev === key ? null : key));
     setSingleCatalog(null);
     setMultiCatalog(null);
     setSelected(new Set());
@@ -223,7 +125,7 @@ export default function MyrientDownloader() {
   };
 
   const toggleMultiGame = useCallback((consoleKey: string, name: string) => {
-    setMultiSelected(prev => {
+    setMultiSelected((prev) => {
       const next = new Map(prev);
       const set = new Set(next.get(consoleKey) ?? []);
       set.has(name) ? set.delete(name) : set.add(name);
@@ -233,11 +135,11 @@ export default function MyrientDownloader() {
   }, []);
 
   const toggleMultiAll = useCallback((consoleKey: string, files: GameFileEntry[]) => {
-    setMultiSelected(prev => {
+    setMultiSelected((prev) => {
       const next = new Map(prev);
       const current = next.get(consoleKey) ?? new Set<string>();
-      const allSel = files.every(f => current.has(f.name));
-      next.set(consoleKey, allSel ? new Set() : new Set(files.map(f => f.name)));
+      const allSel = files.every((f) => current.has(f.name));
+      next.set(consoleKey, allSel ? new Set() : new Set(files.map((f) => f.name)));
       return next;
     });
   }, []);
@@ -245,7 +147,7 @@ export default function MyrientDownloader() {
   const refreshLocalGames = async (consoleKey: string) => {
     try {
       const res = await ScrapeService.getLocalGames(consoleKey, regions);
-      if (res.success && res.data) setDownloadedSet(new Set(res.data.files.map(f => f.filename)));
+      if (res.success && res.data) setDownloadedSet(new Set(res.data.files.map((f) => f.filename)));
     } catch { /* non-critical */ }
   };
 
@@ -254,13 +156,12 @@ export default function MyrientDownloader() {
       consoleKeys.map(async (key) => {
         try {
           const res = await ScrapeService.getLocalGames(key, regions);
-          if (res.success && res.data)
-            return [key, new Set(res.data.files.map(f => f.filename))] as const;
+          if (res.success && res.data) return [key, new Set(res.data.files.map((f) => f.filename))] as const;
         } catch { /* non-critical */ }
         return [key, new Set<string>()] as const;
       }),
     );
-    setMultiDownloadedSet(prev => {
+    setMultiDownloadedSet((prev) => {
       const next = new Map(prev);
       for (const [key, set] of entries) next.set(key, set);
       return next;
@@ -284,32 +185,31 @@ export default function MyrientDownloader() {
           refreshLocalGames(selectedConsole),
         ]);
         if (catalogRes.success && catalogRes.data) setSingleCatalog(catalogRes.data);
-        else setError(catalogRes.error ?? catalogRes.message ?? 'Error al cargar el catálogo.');
+        else setError(catalogRes.error ?? catalogRes.message ?? t("catalogError"));
       } else {
         const res = await ScrapeService.searchCatalog(query.trim(), regions);
         if (res.success && res.data) {
-          await refreshMultiDownloaded(res.data.consoles.map(c => c.consoleKey));
+          await refreshMultiDownloaded(res.data.consoles.map((c) => c.consoleKey));
           setMultiCatalog(res.data);
         } else {
-          setError(res.error ?? res.message ?? 'Error al buscar en los catálogos.');
+          setError(res.error ?? res.message ?? t("searchError"));
         }
       }
     } catch {
-      setError('No se pudo conectar con el servidor.');
+      setError(t("connError"));
     } finally {
       setLoading(false);
     }
   };
 
-  const toggleGame  = useCallback((name: string) => setSelected(prev => { const n = new Set(prev); n.has(name) ? n.delete(name) : n.add(name); return n; }), []);
-  const selectAll   = useCallback((names: string[]) => setSelected(new Set(names)), []);
-  const clearAll    = useCallback(() => setSelected(new Set()), []);
+  const toggleGame = useCallback((name: string) => setSelected((prev) => { const n = new Set(prev); n.has(name) ? n.delete(name) : n.add(name); return n; }), []);
+  const selectAll = useCallback((names: string[]) => setSelected(new Set(names)), []);
+  const clearAll = useCallback(() => setSelected(new Set()), []);
 
-  // Unified download trigger — used by both single and multi-console modes
   const triggerDownload = async (consoleKey: string, games: GameFileEntry[]) => {
-    const initialFiles: FileDownloadEntry[] = games.map(g => ({
-      filename: decodeURIComponent(g.link.split('/').pop() ?? g.name),
-      status: 'pending',
+    const initialFiles: FileDownloadEntry[] = games.map((g) => ({
+      filename: decodeURIComponent(g.link.split("/").pop() ?? g.name),
+      status: "pending",
     }));
     setProgress({ files: initialFiles, completed: 0, total: games.length, summary: null });
     setDownloading(true);
@@ -320,21 +220,21 @@ export default function MyrientDownloader() {
       await ScrapeService.streamDownloadSelected(
         { console: consoleKey, games, concurrency: Number(concurrency) },
         (event) => {
-          if (event.type === 'progress') {
-            setProgress(prev => {
+          if (event.type === "progress") {
+            setProgress((prev) => {
               if (!prev) return prev;
               const files = [...prev.files];
-              const idx = files.findIndex(f => f.filename === event.filename);
+              const idx = files.findIndex((f) => f.filename === event.filename);
               if (idx !== -1) files[idx] = { filename: event.filename, status: event.status, size: event.size, sizeBytes: event.sizeBytes, error: event.error };
               return { ...prev, files, completed: event.index };
             });
-          } else if (event.type === 'done') {
-            setProgress(prev => prev ? { ...prev, summary: event, completed: prev.total } : prev);
+          } else if (event.type === "done") {
+            setProgress((prev) => prev ? { ...prev, summary: event, completed: prev.total } : prev);
           }
         },
       );
     } catch (err) {
-      setDownloadError(`Error de descarga: ${err instanceof Error ? err.message : String(err)}`);
+      setDownloadError(t("downloadError", { msg: err instanceof Error ? err.message : String(err) }));
     } finally {
       setDownloading(false);
       if (consoleKey === selectedConsole) await refreshLocalGames(consoleKey);
@@ -348,14 +248,12 @@ export default function MyrientDownloader() {
 
     for (const [consoleKey, names] of multiSelected) {
       if (!names.size) continue;
-      const group = multiCatalog.consoles.find(c => c.consoleKey === consoleKey);
+      const group = multiCatalog.consoles.find((c) => c.consoleKey === consoleKey);
       if (!group) continue;
-      const games = group.files.filter(f => names.has(f.name));
+      const games = group.files.filter((f) => names.has(f.name));
       if (!games.length) continue;
       plan.push({ consoleKey, games });
-      for (const g of games) {
-        allInitial.push({ filename: decodeURIComponent(g.link.split('/').pop() ?? g.name), status: 'pending' });
-      }
+      for (const g of games) allInitial.push({ filename: decodeURIComponent(g.link.split("/").pop() ?? g.name), status: "pending" });
     }
     if (!allInitial.length) return;
 
@@ -370,249 +268,233 @@ export default function MyrientDownloader() {
         await ScrapeService.streamDownloadSelected(
           { console: consoleKey, games, concurrency: Number(concurrency) },
           (event) => {
-            if (event.type === 'progress') {
-              setProgress(prev => {
+            if (event.type === "progress") {
+              setProgress((prev) => {
                 if (!prev) return prev;
                 const files = [...prev.files];
-                const idx = files.findIndex(f => f.filename === event.filename && f.status === 'pending');
+                const idx = files.findIndex((f) => f.filename === event.filename && f.status === "pending");
                 if (idx !== -1) files[idx] = { filename: event.filename, status: event.status, size: event.size, sizeBytes: event.sizeBytes, error: event.error };
                 return { ...prev, files, completed: globalCompleted + event.index };
               });
-            } else if (event.type === 'done') {
+            } else if (event.type === "done") {
               globalCompleted += games.length;
             }
           },
         );
       }
-      setProgress(prev => prev
-        ? { ...prev, completed: prev.total, summary: { type: 'done', console: '', consoleLabel: '', downloaded: 0, skipped: 0, failed: 0, totalDownloadedSize: '', totalDownloadedSizeBytes: 0 } }
+      setProgress((prev) => prev
+        ? { ...prev, completed: prev.total, summary: { type: "done", console: "", consoleLabel: "", downloaded: 0, skipped: 0, failed: 0, totalDownloadedSize: "", totalDownloadedSizeBytes: 0 } }
         : prev,
       );
     } catch (err) {
-      setDownloadError(`Error: ${err instanceof Error ? err.message : String(err)}`);
+      setDownloadError(t("downloadError", { msg: err instanceof Error ? err.message : String(err) }));
     } finally {
       setDownloading(false);
-      if (multiCatalog) refreshMultiDownloaded(plan.map(p => p.consoleKey));
+      if (multiCatalog) refreshMultiDownloaded(plan.map((p) => p.consoleKey));
     }
   };
 
   const handleSingleDownload = () => {
     if (!selectedConsole || selected.size === 0 || !singleCatalog) return;
-    const gameMap = new Map(singleCatalog.files.map(f => [f.name, f]));
-    const games = [...selected].map(n => gameMap.get(n)).filter((f): f is GameFileEntry => !!f);
+    const gameMap = new Map(singleCatalog.files.map((f) => [f.name, f]));
+    const games = [...selected].map((n) => gameMap.get(n)).filter((f): f is GameFileEntry => !!f);
     triggerDownload(selectedConsole, games);
   };
 
   const isSearchDisabled = loading || (!selectedConsole && !query.trim());
+  const showStickyBar = ((selected.size > 0 && singleCatalog) || (totalMultiSelected > 0 && multiCatalog)) && !downloading;
 
   return (
-    <FloatingSection className="min-h-screen pb-40">
-      <div className="container mx-auto px-4 py-10 max-w-4xl flex flex-col gap-8">
-
-        {/* Header */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="text-3xl font-bold text-ink">
-            Descargador{' '}
-            <span className="bg-gradient-to-r from-primary-hover to-primary-active bg-clip-text text-transparent">Myrient</span>
+    <main data-ds="boffmedia" className="pb-40">
+      {/* header */}
+      <header className="mb-[20px] mt-[4px] flex flex-wrap items-end justify-between gap-[26px]">
+        <div className="max-w-[60ch]">
+          <Kicker>{t("kicker")}</Kicker>
+          <h1 className="my-[10px] text-[clamp(34px,4.4vw,54px)] leading-[0.94]">
+            {t("titlePre")} <em>{t("titleEm")}</em>
           </h1>
-          <p className="text-ink-muted mt-1 text-sm">
-            Explora el catálogo, selecciona los juegos que quieres y descárgalos directamente al servidor.
-          </p>
-        </motion.div>
+          <p className="max-w-[58ch] text-[15px] leading-[1.5] text-txt-muted">{t("sub")}</p>
+        </div>
+        {(singleCatalog || multiCatalog) && (
+          <div className="flex flex-none gap-[10px]">
+            {singleCatalog ? (
+              <>
+                <Kpi value={singleCatalog.count} label={t("kpiGames")} />
+                <Kpi value={singleCatalog.totalSize} label={t("kpiSize")} />
+              </>
+            ) : multiCatalog ? (
+              <>
+                <Kpi value={multiCatalog.totalCount} label={t("kpiGames")} />
+                <Kpi value={multiCatalog.consoles.length} label={t("kpiConsoles")} />
+              </>
+            ) : null}
+          </div>
+        )}
+      </header>
 
-        {/* Filters card */}
-        <Card className="bg-layer-2/40 border-edge/50">
-          <CardContent className="pt-5 flex flex-col gap-5">
+      {/* search bar */}
+      <form className="mb-[14px] flex flex-wrap items-center gap-[12px]" onSubmit={(e) => { e.preventDefault(); if (!isSearchDisabled) handleSearch(); }}>
+        <div className="relative min-w-[220px] max-w-[460px] flex-1">
+          <Icon name="search" size={16} className="pointer-events-none absolute left-[13px] top-1/2 -translate-y-1/2 text-txt-dim" />
+          <Input
+            className="pl-10"
+            placeholder={selectedConsole ? t("filterPlaceholder") : t("searchPlaceholder")}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </div>
+        <Button variant="pri" type="submit" icon={loading ? "refresh" : "search"} loading={loading} disabled={isSearchDisabled}>
+          {selectedConsole ? t("loadBtn") : t("searchAllBtn")}
+        </Button>
+      </form>
 
-            {/* Query + button */}
-            <div className="flex gap-2">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted" />
-                <Input
-                  value={query}
-                  onChange={e => setQuery(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && !isSearchDisabled && handleSearch()}
-                  placeholder={selectedConsole ? 'Filtrar en el catálogo…' : '"Pokémon", "Mario"… o vacío para ver todo de la consola'}
-                  className="pl-9 bg-layer-2/60 border-edge text-ink placeholder-ink-dim"
-                />
-              </div>
-              <Button onClick={handleSearch} disabled={isSearchDisabled}
-                className="bg-primary-active hover:bg-primary text-white shrink-0">
-                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-                <span className="ml-2">{selectedConsole ? 'Cargar' : 'Buscar en todas'}</span>
-              </Button>
-            </div>
-
-            {/* Console picker */}
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-ink-muted uppercase tracking-wide">Consola</span>
-                {selectedConsole
-                  ? <Badge className="bg-primary-active/20 text-primary-hover border-primary-active/40 text-xs">
-                      {CONSOLES[selectedConsole]?.shortLabel ?? selectedConsole}
-                    </Badge>
-                  : <span className="text-xs text-ink-muted">ninguna seleccionada = busca en todas</span>
-                }
-              </div>
-              <ConsolePicker selected={selectedConsole} onSelect={handleConsoleSelect} compact />
-            </div>
-
-            {/* Region filter */}
-            <div className="flex flex-col gap-2 pt-1 border-t border-edge/40">
-              <span className="text-xs font-medium text-ink-muted uppercase tracking-wide">
-                Región <span className="normal-case font-normal text-ink-muted">(opcional)</span>
+      {/* console filter */}
+      <div className="mb-[14px] flex flex-col gap-[10px]">
+        <div className="flex items-center gap-[8px]">
+          <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-txt-dim">{t("consoleLabel")}</span>
+          {selectedConsole ? (
+            <span className="cut [--cut:4px] inline-flex items-center border border-accent-line bg-accent-soft px-[8px] py-[4px] font-mono text-[10px] font-semibold uppercase tracking-[0.06em] text-accent">
+              {CONSOLES[selectedConsole]?.shortLabel ?? selectedConsole}
+            </span>
+          ) : (
+            <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-txt-dim">{t("searchAllHint")}</span>
+          )}
+        </div>
+        <div className="flex flex-col gap-[8px]">
+          {CONSOLE_GROUPS.map(({ mfr, entries }) => (
+            <div key={mfr} className="flex items-start gap-[10px]">
+              <span className="mt-[8px] w-[64px] flex-none text-right font-mono text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: MFR_DOT[mfr as Manufacturer] }}>
+                {mfr}
               </span>
-              <RegionFilter regions={regions} onAdd={addRegion} onRemove={removeRegion} />
-            </div>
-
-            {error && (
-              <p className="text-sm text-red-400 bg-red-900/20 border border-red-800/40 rounded-md px-3 py-2">{error}</p>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Single-console catalog */}
-        <AnimatePresence>
-          {singleCatalog && (
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-              <Card className="bg-layer-2/40 border-edge/50">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between flex-wrap gap-2">
-                    <CardTitle className="text-base text-ink">Catálogo</CardTitle>
-                    <div className="flex items-center gap-2 text-sm text-ink-muted">
-                      <span>{singleCatalog.count} juegos</span>
-                      <span>·</span>
-                      <span>{singleCatalog.totalSize}</span>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <GameCatalogTable
-                    files={singleCatalog.files}
-                    selected={selected}
-                    downloadedSet={downloadedSet}
-                    onToggle={toggleGame}
-                    onSelectAll={selectAll}
-                    onClearAll={clearAll}
-                    initialSearch={query}
-                  />
-                </CardContent>
-              </Card>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Multi-console results */}
-        <AnimatePresence>
-          {multiCatalog && (
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-              className="flex flex-col gap-4">
-              <div className="flex items-center justify-between flex-wrap gap-2">
-                <p className="text-sm text-ink">
-                  {multiCatalog.query
-                    ? <>Resultados para <span className="text-primary-hover font-medium">&ldquo;{multiCatalog.query}&rdquo;</span></>
-                    : <span>Todos los catálogos</span>
-                  }
-                </p>
-                <div className="flex items-center gap-3 text-sm text-ink-muted">
-                  <span>{multiCatalog.totalCount} juego{multiCatalog.totalCount !== 1 ? 's' : ''}</span>
-                  <span>·</span>
-                  <span>{multiCatalog.consoles.length} consola{multiCatalog.consoles.length !== 1 ? 's' : ''}</span>
-                </div>
+              <div className="flex flex-wrap gap-[6px]">
+                {entries.map(([key, info]) => (
+                  <ConsoleChip key={key} label={info.shortLabel} dot={MFR_DOT[mfr as Manufacturer]} on={selectedConsole === key} onClick={() => handleConsoleSelect(key)} />
+                ))}
               </div>
-              {multiCatalog.totalCount === 0 ? (
-                <p className="text-ink-muted text-sm py-8 text-center">
-                  No se encontraron juegos{multiCatalog.query ? ` para "${multiCatalog.query}"` : ''}
-                  {regions.length > 0 ? ' con los filtros de región seleccionados' : ''}.
-                </p>
-              ) : (
-                <div className="flex flex-col gap-3">
-                  {multiCatalog.consoles.map(c => (
-                    <CatalogConsoleGroup
-                      key={c.consoleKey}
-                      result={c}
-                      groupSelected={multiSelected.get(c.consoleKey) ?? new Set()}
-                      downloadedSet={multiDownloadedSet.get(c.consoleKey) ?? new Set()}
-                      onToggle={(name) => toggleMultiGame(c.consoleKey, name)}
-                      onToggleAll={() => toggleMultiAll(c.consoleKey, c.files)}
-                    />
-                  ))}
-                </div>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Progress panel */}
-        <AnimatePresence>
-          {progress && (
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-              <Card className="bg-layer-2/40 border-edge/50">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base text-ink">Progreso de descarga</CardTitle>
-                </CardHeader>
-                <CardContent><DownloadProgressPanel progress={progress} /></CardContent>
-              </Card>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* Sticky bar — single and multi-console */}
-      <AnimatePresence>
-        {(selected.size > 0 && singleCatalog || totalMultiSelected > 0 && multiCatalog) && !downloading && (
-          <motion.div
-            initial={{ y: 80, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 80, opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            className="fixed bottom-0 left-0 right-0 z-50 bg-layer-1/95 backdrop-blur border-t border-edge/60 shadow-2xl"
-          >
-            <div className="container mx-auto px-4 py-3 max-w-4xl flex items-center gap-4 flex-wrap">
-              <div className="flex-1 min-w-0">
-                {singleCatalog ? (
-                  <>
-                    <p className="text-sm font-medium text-ink">
-                      {selected.size} juego{selected.size !== 1 ? 's' : ''} seleccionado{selected.size !== 1 ? 's' : ''}
-                    </p>
-                    <p className="text-xs text-ink-muted">
-                      {CONSOLES[selectedConsole!]?.label}
-                      {regions.length > 0 && ` · ${regions.join(', ')}`}
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <p className="text-sm font-medium text-ink">
-                      {totalMultiSelected} juego{totalMultiSelected !== 1 ? 's' : ''} seleccionado{totalMultiSelected !== 1 ? 's' : ''}
-                    </p>
-                    <p className="text-xs text-ink-muted">
-                      {multiConsoleCount} consola{multiConsoleCount !== 1 ? 's' : ''}
-                      {regions.length > 0 && ` · ${regions.join(', ')}`}
-                    </p>
-                  </>
-                )}
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <span className="text-xs text-ink-muted">Concurrencia:</span>
-                <Select value={concurrency} onValueChange={setConcurrency}>
-                  <SelectTrigger className="h-8 w-16 bg-layer-2 border-edge text-ink text-sm"><SelectValue /></SelectTrigger>
-                  <SelectContent className="bg-layer-2 border-edge">
-                    {['1','2','3','4','5'].map(n => <SelectItem key={n} value={n} className="text-ink">{n}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-              {downloadError && <p className="text-xs text-red-400 max-w-xs truncate">{downloadError}</p>}
-              <Button
-                onClick={singleCatalog ? handleSingleDownload : triggerMultiDownload}
-                disabled={downloading}
-                className="bg-primary-active hover:bg-primary text-white shrink-0"
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Descargar selección
-              </Button>
+      {/* region filter */}
+      <div className="mb-[20px]">
+        <Disclosure title={t("regionLabel")} icon="filter" sub={regions.length ? regions.join(" · ") : t("regionOptional")}>
+          <div className="flex flex-col gap-[12px]">
+            <div className="flex flex-wrap gap-[6px]">
+              {COMMON_REGIONS.map((r) => (
+                <RegionChip key={r} label={r} on={regions.includes(r)} onClick={() => toggleRegion(r)} />
+              ))}
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </FloatingSection>
+            <div className="flex gap-[8px]">
+              <Input
+                className="max-w-[260px]"
+                value={customRegion}
+                onChange={(e) => setCustomRegion(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addCustomRegion(); } }}
+                placeholder={t("regionCustomPlaceholder")}
+              />
+              <Button size="sm" icon="plus" onClick={addCustomRegion} disabled={!customRegion.trim()}>{t("addRegion")}</Button>
+            </div>
+            {regions.length > 0 && (
+              <div className="flex flex-wrap items-center gap-[6px]">
+                <span className="font-mono text-[10px] uppercase tracking-[0.08em] text-txt-dim">{t("activeRegions")}</span>
+                {regions.map((r) => (
+                  <span key={r} className="cut [--cut:4px] inline-flex items-center gap-[6px] border border-accent-line bg-accent-soft py-[4px] pl-[8px] pr-[5px] font-mono text-[10px] font-semibold uppercase tracking-[0.06em] text-accent">
+                    {r}
+                    <button type="button" aria-label={t("removeRegion", { r })} onClick={() => removeRegion(r)} className="grid h-[16px] w-[16px] place-items-center text-accent/70 transition-opacity hover:text-accent">
+                      <Icon name="x" size={11} />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        </Disclosure>
+      </div>
+
+      {error && <div className="mb-[16px]"><Banner tone="error" title={t("errorTitle")}>{error}</Banner></div>}
+
+      {/* single-console catalog */}
+      {singleCatalog && (
+        <div className="mb-[18px] border border-line bg-panel p-4">
+          <GameCatalogTable
+            files={singleCatalog.files}
+            selected={selected}
+            downloadedSet={downloadedSet}
+            onToggle={toggleGame}
+            onSelectAll={selectAll}
+            onClearAll={clearAll}
+            initialSearch={query}
+          />
+        </div>
+      )}
+
+      {/* multi-console results */}
+      {multiCatalog && (
+        <div className="mb-[18px] flex flex-col gap-3">
+          {multiCatalog.totalCount === 0 ? (
+            <Empty icon="database" title={t("emptyTitle")} lead={multiCatalog.query ? t("emptySearch", { q: multiCatalog.query }) : t("emptyLead")} />
+          ) : (
+            multiCatalog.consoles.map((c: CatalogSearchConsoleResult) => (
+              <MyConsoleGroup
+                key={c.consoleKey}
+                result={c}
+                groupSelected={multiSelected.get(c.consoleKey) ?? new Set()}
+                downloadedSet={multiDownloadedSet.get(c.consoleKey) ?? new Set()}
+                gamesLabel={(n) => t("gamesN", { n })}
+                selectedLabel={(n) => t("selN", { n })}
+                selectAllLabel={(n) => t("selectAllN", { n })}
+                deselectAllLabel={t("deselectAll")}
+                downloadedLabel={t("alreadyDownloaded")}
+                onToggle={(name) => toggleMultiGame(c.consoleKey, name)}
+                onToggleAll={() => toggleMultiAll(c.consoleKey, c.files)}
+                defaultOpen={multiCatalog.consoles.length <= 4}
+              />
+            ))
+          )}
+        </div>
+      )}
+
+      {/* progress */}
+      {progress && (
+        <div className="mb-[18px] border border-line bg-panel p-4">
+          <p className="mb-3 font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-txt-muted">{t("progressTitle")}</p>
+          <DownloadProgressPanel progress={progress} />
+        </div>
+      )}
+
+      {/* sticky bar */}
+      {showStickyBar && (
+        <div className="fixed inset-x-0 bottom-0 z-50 border-t border-solid border-line-2 bg-[color-mix(in_srgb,var(--panel)_96%,transparent)] backdrop-blur">
+          <div className="mx-auto flex max-w-[1280px] flex-wrap items-center gap-4 px-10 py-3">
+            <div className="min-w-0 flex-1">
+              {singleCatalog ? (
+                <>
+                  <p className="text-[14px] font-medium text-txt">{t("selectedN", { n: selected.size })}</p>
+                  <p className="truncate font-mono text-[11px] text-txt-muted">
+                    {CONSOLES[selectedConsole!]?.label}{regions.length > 0 && ` · ${regions.join(", ")}`}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="text-[14px] font-medium text-txt">{t("selectedN", { n: totalMultiSelected })}</p>
+                  <p className="truncate font-mono text-[11px] text-txt-muted">
+                    {t("consolesN", { n: multiConsoleCount })}{regions.length > 0 && ` · ${regions.join(", ")}`}
+                  </p>
+                </>
+              )}
+            </div>
+            <div className="flex shrink-0 items-center gap-2">
+              <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-txt-dim">{t("concurrency")}</span>
+              <Select value={concurrency} options={["1", "2", "3", "4", "5"]} onChange={setConcurrency} />
+            </div>
+            {downloadError && <p className="max-w-xs truncate text-[11px] text-bad">{downloadError}</p>}
+            <Button variant="pri" icon="download" onClick={singleCatalog ? handleSingleDownload : triggerMultiDownload} disabled={downloading}>
+              {t("downloadSelection")}
+            </Button>
+          </div>
+        </div>
+      )}
+    </main>
   );
 }

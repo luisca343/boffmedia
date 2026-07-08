@@ -4,20 +4,13 @@ import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "rea
 import { createPortal } from "react-dom";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  BookOpen, Check, ChevronDown, ChevronRight, EyeOff, FileText,
-  Library, Loader2, RefreshCw,
-} from "lucide-react";
-import { Badge } from "@/components/ui/primitives/badge";
-import { Button } from "@/components/ui/primitives/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/primitives/card";
-import { Checkbox } from "@/components/ui/primitives/checkbox";
+import { Button, Icon, Spinner, Checkbox, Empty } from "@/components/boffmedia/primitives";
 import { cn } from "@/lib/utils";
 import { ScrapeService } from "@/services/api/boffmedia/scrapeService";
 import { useMangaStore } from "@/stores/useMangaStore";
+import { AvSectionHead, AvPanel, AvPill } from "../ui/av-kit";
+import { MgCard, MgFormatTag } from "./ui/mg-kit";
 import MangaMetadataForm from "./MangaMetadataForm";
-import { FloatingSection } from "@/app/(boffmedia)/_components/layout/FloatingSection";
 
 // Session-only scroll memory for the library grid
 let _libraryScrollY = 0;
@@ -30,8 +23,6 @@ interface BulkState {
   finished: boolean;
 }
 
-// ── Inline chapter row with expandable page picker ────────────────────────────
-
 interface ChapterDef {
   slug: string;
   hasCbz: boolean;
@@ -39,17 +30,11 @@ interface ChapterDef {
   imageCount: number;
 }
 
+/* ---- chapter row with expandable page picker ------------------------------ */
+
 function ChapterRow({
-  chapter,
-  seriesSlug,
-  isSelected,
-  isExpanded,
-  isConverted,
-  isExporting,
-  isLoading,
-  hasError,
-  onToggleSelect,
-  onToggleExpand,
+  chapter, seriesSlug, isSelected, isExpanded, isConverted, isExporting, isLoading, hasError,
+  onToggleSelect, onToggleExpand,
 }: {
   chapter: ChapterDef;
   seriesSlug: string;
@@ -62,7 +47,7 @@ function ChapterRow({
   onToggleSelect: () => void;
   onToggleExpand: () => void;
 }) {
-  const t = useTranslations("boffmedia.mangaLibrary");
+  const t = useTranslations("admin.manga.library");
 
   const chapterPages = useMangaStore((s) => s.chapterPages[chapter.slug] ?? []);
   const togglePage = useMangaStore((s) => s.togglePage);
@@ -85,115 +70,48 @@ function ChapterRow({
 
   return (
     <div className={cn(
-      "border rounded-lg overflow-hidden transition-colors",
-      isSelected
-        ? "border-[color-mix(in_srgb,var(--orange-500)_30%,transparent)] bg-[color-mix(in_srgb,var(--orange-500)_5%,transparent)]"
-        : "border-edge bg-[color-mix(in_srgb,var(--layer-1)_96%,transparent)] hover:border-edge-strong",
+      "border border-solid transition-colors",
+      isSelected ? "border-accent-line bg-accent-soft" : "border-line bg-base-2 hover:border-line-2",
     )}>
-      {/* Row header */}
       <div className="flex items-center gap-2 px-3 py-2.5">
-        <Checkbox
-          checked={isSelected}
-          onCheckedChange={onToggleSelect}
-          aria-label={`Select ${chapter.slug}`}
-          disabled={isExporting}
-          className="shrink-0"
-        />
-
-        {/* Title — clicking expands */}
-        <button
-          onClick={onToggleExpand}
-          className="flex-1 flex items-center gap-2 text-left min-w-0 group"
-          aria-expanded={isExpanded}
-          aria-label={`${isExpanded ? "Contraer" : "Expandir"} páginas de ${chapter.slug}`}
-        >
-          <FileText className={cn(
-            "w-3.5 h-3.5 shrink-0 transition-colors",
-            isSelected ? "text-[var(--orange-500)]" : "text-ink-dim group-hover:text-ink",
-          )} />
-          <span className={cn(
-            "flex-1 text-sm font-medium truncate transition-colors",
-            isSelected ? "text-[var(--orange-400)]" : "text-ink group-hover:text-ink",
-          )}>
+        <Checkbox checked={isSelected} onChange={onToggleSelect} disabled={isExporting} />
+        <button onClick={onToggleExpand} className="group flex min-w-0 flex-1 items-center gap-2 text-left" aria-expanded={isExpanded}>
+          <Icon name="code" size={13} className={cn("shrink-0 transition-colors", isSelected ? "text-accent" : "text-txt-dim group-hover:text-txt")} />
+          <span className={cn("flex-1 truncate text-[14px] font-medium transition-colors", isSelected ? "text-accent" : "text-txt")}>
             {chapter.slug}
           </span>
         </button>
-
-        {/* Right-side metadata + badges + toggle */}
-        <div className="flex items-center gap-1.5 shrink-0">
-          {isExpanded && chapterPages.length > 0 ? (
-            <span className="text-[10px] tabular-nums text-ink-dim">
-              {includedCount}<span className="text-ink-dim">/{totalPages}</span>
-            </span>
-          ) : (
-            <span className="text-[10px] tabular-nums text-ink-dim">{totalPages}p</span>
-          )}
-
-          {chapter.hasCbz && (
-            <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 border-edge-strong text-ink-muted">
-              {t("cbz")}
-            </Badge>
-          )}
-          {hasEpub && (
-            <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 border-[color-mix(in_srgb,var(--orange-500)_30%,transparent)] text-[var(--orange-500)]">
-              {t("epub")}
-            </Badge>
-          )}
-
-          <button
-            onClick={onToggleExpand}
-            tabIndex={-1}
-            aria-hidden
-            className="p-0.5 rounded text-ink-dim hover:text-ink transition-colors"
-          >
-            <ChevronDown className={cn(
-              "w-3.5 h-3.5 transition-transform duration-200",
-              isExpanded && "rotate-180",
-            )} />
+        <div className="flex shrink-0 items-center gap-1.5">
+          <span className="font-mono text-[10px] tabular-nums text-txt-dim">
+            {isExpanded && chapterPages.length > 0 ? `${includedCount}/${totalPages}` : t("pagesN", { n: totalPages })}
+          </span>
+          {chapter.hasCbz && <MgFormatTag kind="cbz" />}
+          {hasEpub && <MgFormatTag kind="epub" />}
+          <button onClick={onToggleExpand} tabIndex={-1} aria-hidden className="text-txt-dim transition-colors hover:text-txt">
+            <Icon name="chevronDown" size={14} className={cn("transition-transform duration-200", isExpanded && "rotate-180")} />
           </button>
         </div>
       </div>
 
-      {/* Inline page picker (expanded) */}
       {isExpanded && (
-        <div className="border-t border-edge px-3 py-3 space-y-2.5">
+        <div className="flex flex-col gap-2.5 border-t border-solid border-line px-3 py-3">
           {isLoading ? (
-            <div className="flex items-center gap-2 text-ink-muted text-xs py-1">
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />Cargando páginas…
+            <div className="flex items-center gap-2 py-1 text-[12px] text-txt-muted">
+              <Spinner size={14} className="text-accent" />{t("loadingPages")}
             </div>
           ) : hasError ? (
-            <p className="text-xs text-red-400 py-1">{t("errorLoadingPages")}</p>
+            <p className="py-1 text-[12px] text-bad">{t("pagesError")}</p>
           ) : chapterPages.length === 0 ? (
-            <p className="text-xs text-ink-dim py-1">Sin páginas disponibles.</p>
+            <p className="py-1 text-[12px] text-txt-dim">{t("noPages")}</p>
           ) : (
             <>
-              {/* Per-chapter quick actions */}
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <button onClick={keepAll}
-                  className="text-[11px] px-2 py-0.5 rounded border border-edge text-ink-muted hover:text-ink hover:border-edge-strong transition-colors">
-                  Incluir todo
-                </button>
-                <button onClick={excludeAll}
-                  className="text-[11px] px-2 py-0.5 rounded border border-edge text-ink-muted hover:text-ink hover:border-edge-strong transition-colors">
-                  Excluir todo
-                </button>
-                <button onClick={invertSelection}
-                  className="text-[11px] px-2 py-0.5 rounded border border-edge text-ink-muted hover:text-ink hover:border-edge-strong transition-colors">
-                  Invertir
-                </button>
-                {excludedSet.size > 0 && (
-                  <span className="ml-auto text-[11px] text-red-400">
-                    {excludedSet.size} excluida{excludedSet.size !== 1 ? "s" : ""}
-                  </span>
-                )}
+              <div className="flex flex-wrap items-center gap-1.5">
+                <button onClick={keepAll} className="border border-solid border-line px-2 py-0.5 text-[11px] text-txt-muted transition-colors hover:border-line-2 hover:text-txt">{t("includeAll")}</button>
+                <button onClick={excludeAll} className="border border-solid border-line px-2 py-0.5 text-[11px] text-txt-muted transition-colors hover:border-line-2 hover:text-txt">{t("excludeAll")}</button>
+                <button onClick={invertSelection} className="border border-solid border-line px-2 py-0.5 text-[11px] text-txt-muted transition-colors hover:border-line-2 hover:text-txt">{t("invert")}</button>
+                {excludedSet.size > 0 && <span className="ml-auto text-[11px] text-bad">{t("excludedN", { n: excludedSet.size })}</span>}
               </div>
-
-              {/* Thumbnail grid */}
-              <div
-                role="group"
-                aria-label={`Páginas de ${chapter.slug}`}
-                className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-1"
-              >
+              <div role="group" className="grid grid-cols-6 gap-1 sm:grid-cols-8 md:grid-cols-10">
                 {chapterPages.map((page) => {
                   const excluded = excludedSet.has(page.index);
                   return (
@@ -201,26 +119,16 @@ function ChapterRow({
                       key={page.index}
                       type="button"
                       onClick={() => togglePage(chapter.slug, page.index)}
-                      className="relative aspect-[2/3] overflow-hidden rounded focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--orange-500)]"
-                      aria-label={`Página ${page.index + 1}${excluded ? " (excluida)" : ""}`}
+                      className="relative aspect-[2/3] overflow-hidden focus:outline-none focus-visible:ring-1 focus-visible:ring-accent"
                       aria-pressed={excluded}
                     >
-                      { }
-                      <img
-                        src={ScrapeService.getChapterImageUrl(seriesSlug, chapter.slug, page.index)}
-                        alt=""
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                      <span className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[7px] text-center py-px leading-none">
-                        {page.index + 1}
-                      </span>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={ScrapeService.getChapterImageUrl(seriesSlug, chapter.slug, page.index)} alt="" className="h-full w-full object-cover" loading="lazy" />
+                      <span className="absolute inset-x-0 bottom-0 bg-black/60 py-px text-center text-[7px] leading-none text-white">{page.index + 1}</span>
                       {excluded ? (
-                        <div className="absolute inset-0 bg-red-900/80 flex items-center justify-center">
-                          <EyeOff className="w-2.5 h-2.5 text-white" />
-                        </div>
+                        <div className="absolute inset-0 grid place-items-center bg-bad/80"><Icon name="eye" size={11} className="text-white" /></div>
                       ) : (
-                        <div className="absolute inset-0 hover:bg-white/10 transition-colors" />
+                        <div className="absolute inset-0 transition-colors hover:bg-white/10" />
                       )}
                     </button>
                   );
@@ -234,36 +142,32 @@ function ChapterRow({
   );
 }
 
-// ── Main component ────────────────────────────────────────────────────────────
+/* ---- main ------------------------------------------------------------------ */
 
 function MangaLibraryInner() {
+  const t = useTranslations("admin.manga.library");
   const [refreshingLibrary, setRefreshingLibrary] = useState(false);
   const [errorRefreshing, setErrorRefreshing] = useState(false);
-  const t = useTranslations("boffmedia.mangaLibrary");
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // Store
   const library = useMangaStore((s) => s.library);
-   const setLibrary = useMangaStore((s) => s.setLibrary);
-   const clearSelectionsForSeries = useMangaStore((s) => s.clearSelectionsForSeries);
-   const clearChapterPagesForSeries = useMangaStore((s) => s.clearChapterPagesForSeries);
+  const setLibrary = useMangaStore((s) => s.setLibrary);
+  const clearSelectionsForSeries = useMangaStore((s) => s.clearSelectionsForSeries);
+  const clearChapterPagesForSeries = useMangaStore((s) => s.clearChapterPagesForSeries);
   const chapterPagesMap = useMangaStore((s) => s.chapterPages);
   const pageSelections = useMangaStore((s) => s.pageSelections);
   const seriesMetadata = useMangaStore((s) => s.seriesMetadata);
 
-  // URL state
   const seriesSlug = searchParams.get("series");
   const selectedSeries = library?.series.find((s) => s.slug === seriesSlug) ?? null;
 
-  // UI state
   const [loadingLibrary, setLoadingLibrary] = useState(!library);
   const [expandedChapters, setExpandedChapters] = useState<Set<string>>(new Set());
   const [loadingChapters, setLoadingChapters] = useState<Set<string>>(new Set());
   const [errorChapters, setErrorChapters] = useState<Set<string>>(new Set());
   const [selectedChapters, setSelectedChapters] = useState<Set<string>>(new Set());
-  const [showMetadata, setShowMetadata] = useState(false);
   const [converted, setConverted] = useState<Map<string, Set<string>>>(new Map());
   const [bulk, setBulk] = useState<BulkState | null>(null);
   const [includeCover, setIncludeCover] = useState(false);
@@ -278,17 +182,14 @@ function MangaLibraryInner() {
 
   useEffect(() => { setPortalTarget(document.body); }, []);
 
-  // Reset chapter state when navigating to a different series
   useEffect(() => {
     if (prevSeriesRef.current !== seriesSlug) {
       setExpandedChapters(new Set());
       setSelectedChapters(new Set());
       setBulk(null);
-      setShowMetadata(false);
     }
   }, [seriesSlug]);
 
-  // Preserve library scroll position when entering/leaving a series
   useEffect(() => {
     const wasInLibrary = prevSeriesRef.current === null;
     const isInLibrary = seriesSlug === null;
@@ -298,7 +199,6 @@ function MangaLibraryInner() {
     prevSeriesRef.current = seriesSlug;
   }, [seriesSlug]);
 
-  // Load library (use persisted cache; re-fetches when cache is cleared)
   useEffect(() => {
     if (library) { setLoadingLibrary(false); return; }
     setLoadingLibrary(true);
@@ -308,7 +208,6 @@ function MangaLibraryInner() {
     });
   }, [library, setLibrary]);
 
-  // ── Navigation — always merge params to preserve ?section= ──────────────────
   function openSeries(slug: string) {
     const params = new URLSearchParams(searchParams.toString());
     params.set("series", slug);
@@ -323,7 +222,6 @@ function MangaLibraryInner() {
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   }
 
-  // ── Chapter expansion + lazy page loading ────────────────────────────────────
   async function toggleExpand(chapterSlug: string) {
     const isExpanded = expandedChapters.has(chapterSlug);
     setExpandedChapters((prev) => {
@@ -331,21 +229,16 @@ function MangaLibraryInner() {
       isExpanded ? next.delete(chapterSlug) : next.add(chapterSlug);
       return next;
     });
-    // Load pages on first expansion if not cached
     if (!isExpanded && !chapterPagesMap[chapterSlug]) {
       setLoadingChapters((prev) => new Set([...prev, chapterSlug]));
       setErrorChapters((prev) => { const next = new Set(prev); next.delete(chapterSlug); return next; });
       const res = await ScrapeService.getChapterPageList(seriesSlug!, chapterSlug);
       setLoadingChapters((prev) => { const next = new Set(prev); next.delete(chapterSlug); return next; });
-      if (res.success && res.data) {
-        useMangaStore.getState().setChapterPages(chapterSlug, res.data);
-      } else {
-        setErrorChapters((prev) => new Set([...prev, chapterSlug]));
-      }
+      if (res.success && res.data) useMangaStore.getState().setChapterPages(chapterSlug, res.data);
+      else setErrorChapters((prev) => new Set([...prev, chapterSlug]));
     }
   }
 
-  // ── Selection helpers ────────────────────────────────────────────────────────
   function toggleChapterSelect(slug: string) {
     setSelectedChapters((prev) => {
       const next = new Set(prev);
@@ -360,7 +253,6 @@ function MangaLibraryInner() {
     setSelectedChapters(selectedChapters.size === allSlugs.length ? new Set() : new Set(allSlugs));
   }
 
-  // ── Export helpers ───────────────────────────────────────────────────────────
   function markConverted(series: string, slug: string) {
     setConverted((prev) => {
       const next = new Map(prev);
@@ -385,7 +277,6 @@ function MangaLibraryInner() {
     for (const ch of chapters) {
       setBulk((prev) => prev ? { ...prev, currentSlug: ch.slug } : prev);
 
-      // Use per-chapter page selections if set, otherwise fall back to removeFirst/removeLast pattern
       const storedExcluded = pageSelections[ch.slug] ?? [];
       let excludePages = storedExcluded;
       if (storedExcluded.length === 0 && (removeFirst > 0 || removeLast > 0)) {
@@ -424,13 +315,10 @@ function MangaLibraryInner() {
     setPatching(true);
     setPatchResult(null);
     const res = await ScrapeService.patchEpubMetadata(selectedSeries.slug, targetSlugs, meta).catch(() => null);
-    if (res?.success && res.data) {
-      setPatchResult({ updated: res.data.updated, total: res.data.results.length });
-    }
+    if (res?.success && res.data) setPatchResult({ updated: res.data.updated, total: res.data.results.length });
     setPatching(false);
   }
 
-  // ── Export summary (live) ────────────────────────────────────────────────────
   const exportSummary = useMemo(() => {
     if (!selectedSeries || selectedChapters.size === 0) return null;
     const chapters = selectedSeries.chapters.filter((c) => selectedChapters.has(c.slug));
@@ -449,58 +337,60 @@ function MangaLibraryInner() {
     return { count: chapters.length, totalIncluded, totalPages };
   }, [selectedChapters, selectedSeries, chapterPagesMap, pageSelections]);
 
-  // ── Export bar (portalled to body) ───────────────────────────────────────────
   const allEpubOnly = selectedSeries !== null && selectedChapters.size > 0 &&
     [...selectedChapters].every((slug) => {
       const ch = selectedSeries.chapters.find((c) => c.slug === slug);
       return ch && ch.hasEpub && !ch.hasCbz && !converted.get(selectedSeries.slug)?.has(slug);
     });
 
+  const doRefresh = async (clearSeries?: string) => {
+    setRefreshingLibrary(true);
+    setErrorRefreshing(false);
+    try {
+      const res = await ScrapeService.getLocalMangaLibrary();
+      if (res.success && res.data) {
+        setLibrary(res.data);
+        if (clearSeries) {
+          clearSelectionsForSeries(clearSeries);
+          clearChapterPagesForSeries(clearSeries);
+        }
+      } else setErrorRefreshing(true);
+    } catch {
+      setErrorRefreshing(true);
+    } finally {
+      setRefreshingLibrary(false);
+    }
+  };
+
   const exportBar = exportSummary && portalTarget
     ? createPortal(
-        <div className="fixed bottom-0 left-0 right-0 z-[9999] flex justify-center pointer-events-none">
-          <div className="pointer-events-auto mb-5 mx-4 bg-layer-1 backdrop-blur-sm border border-edge rounded-xl shadow-2xl overflow-hidden max-w-2xl w-full">
-            {/* Main row */}
-            <div className="flex items-center gap-3 px-5 py-3">
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-ink">
-                  {exportSummary.count} capítulo{exportSummary.count !== 1 ? "s" : ""} seleccionado{exportSummary.count !== 1 ? "s" : ""}
-                </p>
-                <p className="text-xs text-ink-muted">
-                  {exportSummary.totalIncluded} pág. incluidas
-                  {exportSummary.totalIncluded < exportSummary.totalPages && (
-                    <span className="text-ink-dim"> / {exportSummary.totalPages} total</span>
-                  )}
+        <div className="fixed inset-x-0 bottom-0 z-[9999] flex justify-center px-4 pb-5">
+          <div className="w-full max-w-2xl overflow-hidden border border-solid border-line-2 bg-[color-mix(in_srgb,var(--panel)_97%,transparent)] shadow-[0_18px_48px_rgba(0,0,0,0.5)] backdrop-blur">
+            <div className="flex flex-wrap items-center gap-3 px-5 py-3">
+              <div className="min-w-0 flex-1">
+                <p className="text-[14px] font-semibold text-txt">{t("selectedN", { count: exportSummary.count })}</p>
+                <p className="font-mono text-[11px] text-txt-muted">
+                  {exportSummary.totalIncluded < exportSummary.totalPages
+                    ? t("includedOfN", { included: exportSummary.totalIncluded, total: exportSummary.totalPages })
+                    : t("includedN", { n: exportSummary.totalIncluded })}
                 </p>
               </div>
 
-              {/* Progress during export */}
               {bulk && !bulk.finished && (
-                <div className="flex flex-col items-end shrink-0">
-                  <span className="text-xs text-ink-muted">{bulk.done}/{bulk.total}</span>
-                  {bulk.currentSlug && (
-                    <span className="text-[10px] text-ink-dim max-w-[8rem] truncate">{bulk.currentSlug}</span>
-                  )}
+                <div className="flex shrink-0 flex-col items-end">
+                  <span className="font-mono text-[11px] text-txt-muted">{bulk.done}/{bulk.total}</span>
+                  {bulk.currentSlug && <span className="max-w-[8rem] truncate text-[10px] text-txt-dim">{bulk.currentSlug}</span>}
                 </div>
               )}
               {bulk?.finished && (
-                <span className="text-sm text-green-400 shrink-0 flex items-center gap-1">
-                  <Check className="w-3.5 h-3.5" />
-                  {bulk.done - bulk.errors.length} ok
-                  {bulk.errors.length > 0 && <span className="text-red-400 ml-1">· {bulk.errors.length} err</span>}
-                </span>
+                <span className="shrink-0"><AvPill tone={bulk.errors.length ? "amber" : "green"} icon="check">
+                  {t("okN", { n: bulk.done - bulk.errors.length })}{bulk.errors.length > 0 ? ` · ${t("errN", { n: bulk.errors.length })}` : ""}
+                </AvPill></span>
               )}
 
-              <label className="flex items-center gap-1.5 text-xs text-ink-muted cursor-pointer select-none shrink-0">
-                <Checkbox checked={includeCover} onCheckedChange={(v) => setIncludeCover(!!v)} />
-                Portada
-              </label>
-
-              <button
-                onClick={() => setShowAdvanced((v) => !v)}
-                className="text-xs text-ink-dim hover:text-ink transition-colors shrink-0"
-              >
-                {showAdvanced ? "Básico" : "Avanzado"}
+              <Checkbox checked={includeCover} onChange={setIncludeCover} label={t("cover")} />
+              <button onClick={() => setShowAdvanced((v) => !v)} className="shrink-0 font-mono text-[11px] uppercase tracking-[0.06em] text-txt-dim transition-colors hover:text-txt">
+                {showAdvanced ? t("basic") : t("advanced")}
               </button>
 
               {(() => {
@@ -509,53 +399,29 @@ function MangaLibraryInner() {
                   .filter((c) => selectedChapters.has(c.slug) && (c.hasEpub || convertedSet.has(c.slug)))
                   .map((c) => c.slug);
                 return epubSlugs.length > 0 ? (
-                  <Button
-                    onClick={() => handlePatchMetadata(epubSlugs)}
-                    disabled={patching || (!!bulk && !bulk.finished)}
-                    size="sm"
-                    variant="outline"
-                    className="shrink-0 border-edge-strong hover:bg-[color-mix(in_srgb,var(--text)_8%,transparent)] text-ink"
-                  >
-                    {patching
-                      ? <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />Actualizando…</>
-                      : "Actualizar metadatos"}
+                  <Button size="sm" onClick={() => handlePatchMetadata(epubSlugs)} loading={patching} disabled={patching || (!!bulk && !bulk.finished)}>
+                    {patching ? t("updatingMetadata") : t("updateMetadata")}
                   </Button>
                 ) : null;
               })()}
 
-              <Button
-                onClick={handleBulkExport}
-                disabled={!!bulk && !bulk.finished}
-                size="sm"
-                className="shrink-0"
-              >
-                {bulk && !bulk.finished
-                  ? <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />Procesando…</>
-                  : <><FileText className="w-3.5 h-3.5 mr-1.5" />{allEpubOnly ? "Actualizar EPUB" : "Exportar EPUB"}</>}
+              <Button variant="pri" size="sm" icon="code" onClick={handleBulkExport} loading={!!bulk && !bulk.finished} disabled={!!bulk && !bulk.finished}>
+                {bulk && !bulk.finished ? t("processing") : allEpubOnly ? t("updateEpub") : t("exportSelected")}
               </Button>
             </div>
 
-            {/* Advanced: pattern for chapters without manual page selection */}
             {showAdvanced && (
-              <div className="border-t border-edge px-5 py-2.5 flex items-center gap-4 flex-wrap">
-                <span className="text-[11px] text-ink-dim shrink-0">
-                  Patrón (capítulos sin selección manual):
-                </span>
-                <label className="flex items-center gap-1.5 text-[11px] text-ink-muted shrink-0">
-                  Quitar primeras
-                  <input
-                    type="number" min={0} max={99} value={removeFirst}
-                    onChange={(e) => setRemoveFirst(Math.max(0, parseInt(e.target.value) || 0))}
-                    className="w-10 rounded bg-[color-mix(in_srgb,var(--text)_8%,transparent)] border border-edge-strong text-ink text-center text-xs px-1 py-0.5 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
-                  />
+              <div className="flex flex-wrap items-center gap-4 border-t border-solid border-line px-5 py-2.5">
+                <span className="shrink-0 text-[11px] text-txt-dim">{t("patternNote")}</span>
+                <label className="flex shrink-0 items-center gap-1.5 text-[11px] text-txt-muted">
+                  {t("removeFirst")}
+                  <input type="number" min={0} max={99} value={removeFirst} onChange={(e) => setRemoveFirst(Math.max(0, parseInt(e.target.value) || 0))}
+                    className="w-10 border border-solid border-line-2 bg-base-2 px-1 py-0.5 text-center text-[12px] text-txt [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none" />
                 </label>
-                <label className="flex items-center gap-1.5 text-[11px] text-ink-muted shrink-0">
-                  Quitar últimas
-                  <input
-                    type="number" min={0} max={99} value={removeLast}
-                    onChange={(e) => setRemoveLast(Math.max(0, parseInt(e.target.value) || 0))}
-                    className="w-10 rounded bg-[color-mix(in_srgb,var(--text)_8%,transparent)] border border-edge-strong text-ink text-center text-xs px-1 py-0.5 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
-                  />
+                <label className="flex shrink-0 items-center gap-1.5 text-[11px] text-txt-muted">
+                  {t("removeLast")}
+                  <input type="number" min={0} max={99} value={removeLast} onChange={(e) => setRemoveLast(Math.max(0, parseInt(e.target.value) || 0))}
+                    className="w-10 border border-solid border-line-2 bg-base-2 px-1 py-0.5 text-center text-[12px] text-txt [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none" />
                 </label>
               </div>
             )}
@@ -565,232 +431,108 @@ function MangaLibraryInner() {
       )
     : null;
 
-  // ── Render ────────────────────────────────────────────────────────────────────
   return (
-    <FloatingSection className="pb-32">
-      <AnimatePresence mode="wait">
-
-        {/* ── LIBRARY VIEW ── */}
-        {!seriesSlug && (
-          <motion.div
-            key="library"
-            initial={{ opacity: 0, x: -16 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 16 }}
-            transition={{ duration: 0.2 }}
-          >
-            <div className="mb-6 flex items-center gap-3">
-              <Library className="w-6 h-6 text-[var(--orange-500)] shrink-0" />
-              <h2 className="text-xl font-bold flex-1">
-                <span className="bg-gradient-to-r from-[var(--orange-500)] to-[var(--orange-400)] bg-clip-text text-transparent">
-                  {t("title")}
-                </span>
-              </h2>
-<button
-  onClick={async () => {
-    setRefreshingLibrary(true);
-    setErrorRefreshing(false);
-    try {
-      const res = await ScrapeService.getLocalMangaLibrary();
-      if (res.success && res.data) setLibrary(res.data);
-      else setErrorRefreshing(true);
-    } catch {
-      setErrorRefreshing(true);
-    } finally {
-      setRefreshingLibrary(false);
-    }
-  }}
-  className={`text-ink-dim hover:text-ink transition-colors p-1.5 rounded hover:bg-[color-mix(in_srgb,var(--text)_5%,transparent)] ${refreshingLibrary ? 'opacity-50 cursor-not-allowed' : ''}`}
-  aria-label={t("refreshLibrary")} title={t("refreshLibrary")}
-  disabled={refreshingLibrary}
->
-  {refreshingLibrary ? (
-    <Loader2 className="w-4 h-4 animate-spin" />
-  ) : (
-    <RefreshCw className="w-4 h-4" />
-  )}
-</button>
-{errorRefreshing && (
-  <span className="ml-2 text-xs text-red-400">Error al recargar</span>
-)}
-
+    <div className="pb-32">
+      {/* ── LIBRARY VIEW ── */}
+      {!seriesSlug && (
+        <>
+          <AvSectionHead
+            title={t("title")}
+            actions={
+              <div className="flex items-center gap-2">
+                {errorRefreshing && <span className="text-[11px] text-bad">{t("refreshError")}</span>}
+                <Button variant="ghost" icon="refresh" onClick={() => doRefresh()} loading={refreshingLibrary} disabled={refreshingLibrary}>
+                  {t("refresh")}
+                </Button>
+              </div>
+            }
+          />
+          {loadingLibrary ? (
+            <div className="py-8"><Spinner size={18} className="text-accent" /></div>
+          ) : !library?.series.length ? (
+            <Empty icon="book" title={t("noSeries")} />
+          ) : (
+            <div className="grid gap-[14px] [grid-template-columns:repeat(auto-fill,minmax(150px,1fr))]">
+              {library.series.map((series) => (
+                <MgCard
+                  key={series.slug}
+                  title={series.slug}
+                  meta={t("chaptersN", { count: series.chapters.length })}
+                  onClick={() => openSeries(series.slug)}
+                />
+              ))}
             </div>
+          )}
+        </>
+      )}
 
-            {loadingLibrary ? (
-              <div className="flex items-center gap-2 text-ink-muted">
-                <Loader2 className="w-4 h-4 animate-spin" />
-              </div>
-            ) : !library?.series.length ? (
-              <Card className="bg-layer-1 border-edge">
-                <CardContent className="py-12 text-center text-ink-muted">{t("noSeries")}</CardContent>
-              </Card>
-            ) : (
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {library.series.map((series) => (
-                  <button key={series.slug} onClick={() => openSeries(series.slug)} className="text-left">
-                    <Card className="bg-layer-1 border-edge hover:border-[var(--orange-500)] transition-colors cursor-pointer h-full">
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-base leading-snug line-clamp-2">{series.slug}</CardTitle>
-                      </CardHeader>
-                      <CardContent className="pt-0 flex items-center gap-2">
-                        <BookOpen className="w-3.5 h-3.5 text-ink-dim shrink-0" />
-                        <span className="text-sm text-ink-muted">{series.chapters.length} {t("chapters")}</span>
-                      </CardContent>
-                    </Card>
-                  </button>
-                ))}
-              </div>
-            )}
-          </motion.div>
-        )}
+      {/* ── SERIES VIEW ── */}
+      {seriesSlug && (
+        <>
+          <div className="mb-5 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.06em] text-txt-muted">
+            <button onClick={goToLibrary} className="flex items-center gap-1.5 transition-colors hover:text-txt">
+              <Icon name="collapse" size={13} />{t("backToLibrary")}
+            </button>
+            <Icon name="chevronRight" size={12} className="text-txt-dim" />
+            <span className="min-w-0 flex-1 truncate normal-case tracking-normal text-txt">{seriesSlug}</span>
+            <button onClick={() => doRefresh(seriesSlug)} aria-label={t("refresh")} disabled={refreshingLibrary} className="text-txt-dim transition-colors hover:text-txt disabled:opacity-50">
+              {refreshingLibrary ? <Spinner size={13} /> : <Icon name="refresh" size={13} />}
+            </button>
+          </div>
 
-        {/* ── SERIES VIEW ── */}
-        {seriesSlug && (
-          <motion.div
-            key="series"
-            initial={{ opacity: 0, x: 16 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -16 }}
-            transition={{ duration: 0.2 }}
-          >
-            {/* Breadcrumb */}
-            <div className="flex items-center gap-1.5 text-sm text-ink-muted mb-5">
-              <button onClick={goToLibrary} className="hover:text-ink transition-colors flex items-center gap-1.5">
-                <Library className="w-3.5 h-3.5 shrink-0" />
-                {t("backToLibrary")}
-              </button>
-              <ChevronRight className="w-3.5 h-3.5 shrink-0" />
-              <span className="text-ink font-medium truncate flex-1 min-w-0">{seriesSlug}</span>
-              <button
-  onClick={async () => {
-    setRefreshingLibrary(true);
-    setErrorRefreshing(false);
-    try {
-      const res = await ScrapeService.getLocalMangaLibrary();
-      if (res.success && res.data) {
-        setLibrary(res.data);
-        clearSelectionsForSeries(seriesSlug!);
-        clearChapterPagesForSeries(seriesSlug!);
-      } else setErrorRefreshing(true);
-    } catch {
-      setErrorRefreshing(true);
-    } finally {
-      setRefreshingLibrary(false);
-    }
-  }}
-  className={`text-ink-dim hover:text-ink transition-colors p-1 rounded hover:bg-[color-mix(in_srgb,var(--text)_5%,transparent)] ${refreshingLibrary ? 'opacity-50 cursor-not-allowed' : ''}`}
-  aria-label={t("refreshLibrary")}
-  disabled={refreshingLibrary}
->
-  {refreshingLibrary ? (
-    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-  ) : (
-    <RefreshCw className="w-3.5 h-3.5" />
-  )}
-</button>
-{errorRefreshing && (
-  <span className="ml-2 text-xs text-red-400">Error al recargar</span>
-)}
-
-            </div>
-
-            {loadingLibrary || !selectedSeries ? (
-              <div className="flex items-center gap-2 text-ink-muted">
-                <Loader2 className="w-4 h-4 animate-spin" />
-              </div>
-            ) : (
-              <div className="space-y-4">
-
-                {/* EPUB Metadata — collapsible */}
-                <div>
-                  <button
-                    onClick={() => setShowMetadata((v) => !v)}
-                    className="flex items-center gap-1.5 text-xs text-ink-dim hover:text-ink transition-colors mb-2 group"
-                  >
-                    <FileText className="w-3.5 h-3.5 group-hover:text-[var(--orange-500)] transition-colors" />
-                    Metadatos EPUB
-                    <ChevronDown className={cn("w-3.5 h-3.5 transition-transform duration-200", showMetadata && "rotate-180")} />
-                  </button>
-                  {showMetadata && (
-                    <Card className="bg-layer-1 border-edge mb-2">
-                      <CardContent className="p-4 space-y-3">
-                        <MangaMetadataForm seriesSlug={seriesSlug} />
-                        <div className="flex items-center gap-3 pt-2 border-t border-edge">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handlePatchMetadata()}
-                            disabled={patching}
-                            className="border-edge-strong hover:bg-[color-mix(in_srgb,var(--text)_8%,transparent)] text-ink"
-                          >
-                            {patching
-                              ? <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />Aplicando…</>
-                              : "Aplicar a todos los EPUB"}
-                          </Button>
-                          {patchResult && (
-                            <p className="text-xs text-ink-muted">
-                              {patchResult.updated}/{patchResult.total} EPUB actualizados
-                            </p>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
+          {loadingLibrary || !selectedSeries ? (
+            <div className="py-8"><Spinner size={18} className="text-accent" /></div>
+          ) : (
+            <div className="flex flex-col gap-4">
+              <AvPanel title={t("metadata")} icon="edit">
+                <MangaMetadataForm seriesSlug={seriesSlug} />
+                <div className="mt-3 flex items-center gap-3 border-t border-solid border-line pt-3">
+                  <Button variant="ghost" onClick={() => handlePatchMetadata()} loading={patching} disabled={patching}>
+                    {patching ? t("applying") : t("applyAllEpub")}
+                  </Button>
+                  {patchResult && <p className="text-[12px] text-txt-muted">{t("epubUpdatedN", { updated: patchResult.updated, total: patchResult.total })}</p>}
                 </div>
+              </AvPanel>
 
-                {/* Select-all row */}
-                {selectedSeries.chapters.length > 0 && (
-                  <div className="flex items-center gap-3 px-1">
-                    <Checkbox
-                      id="select-all-chapters"
-                      checked={
-                        selectedChapters.size === selectedSeries.chapters.length &&
-                        selectedSeries.chapters.length > 0
-                      }
-                      onCheckedChange={toggleSelectAll}
+              {selectedSeries.chapters.length > 0 && (
+                <div className="flex items-center gap-3 px-1">
+                  <Checkbox
+                    checked={selectedChapters.size === selectedSeries.chapters.length && selectedSeries.chapters.length > 0}
+                    onChange={toggleSelectAll}
+                    label={selectedChapters.size === selectedSeries.chapters.length && selectedSeries.chapters.length > 0 ? t("deselectAll") : t("selectAll")}
+                  />
+                  {selectedChapters.size > 0 && <AvPill tone="accent">{t("selectedN", { count: selectedChapters.size })}</AvPill>}
+                </div>
+              )}
+
+              {selectedSeries.chapters.length === 0 ? (
+                <p className="px-1 text-[13px] text-txt-muted">{t("noChapters")}</p>
+              ) : (
+                <div className="flex flex-col gap-1.5">
+                  {selectedSeries.chapters.map((ch) => (
+                    <ChapterRow
+                      key={ch.slug}
+                      chapter={ch}
+                      seriesSlug={seriesSlug}
+                      isSelected={selectedChapters.has(ch.slug)}
+                      isExpanded={expandedChapters.has(ch.slug)}
+                      isConverted={!!converted.get(seriesSlug)?.has(ch.slug)}
+                      isExporting={!!bulk && !bulk.finished}
+                      isLoading={loadingChapters.has(ch.slug)}
+                      hasError={errorChapters.has(ch.slug)}
+                      onToggleSelect={() => toggleChapterSelect(ch.slug)}
+                      onToggleExpand={() => toggleExpand(ch.slug)}
                     />
-                    <label htmlFor="select-all-chapters" className="text-xs text-ink-muted cursor-pointer select-none">
-                      {selectedChapters.size === selectedSeries.chapters.length && selectedSeries.chapters.length > 0
-                        ? t("deselectAll") : t("selectAll")}
-                    </label>
-                    {selectedChapters.size > 0 && (
-                      <Badge variant="outline" className="text-[10px] border-[color-mix(in_srgb,var(--orange-500)_30%,transparent)] text-[var(--orange-500)]">
-                        {t("selectedChapters", { count: selectedChapters.size })}
-                      </Badge>
-                    )}
-                  </div>
-                )}
-
-                {/* Chapter list */}
-                {selectedSeries.chapters.length === 0 ? (
-                  <p className="text-ink-muted text-sm px-1">{t("noChapters")}</p>
-                ) : (
-                  <div className="space-y-1.5">
-                    {selectedSeries.chapters.map((ch) => (
-                      <ChapterRow
-                        key={ch.slug}
-                        chapter={ch}
-                        seriesSlug={seriesSlug}
-                        isSelected={selectedChapters.has(ch.slug)}
-                        isExpanded={expandedChapters.has(ch.slug)}
-                        isConverted={!!converted.get(seriesSlug)?.has(ch.slug)}
-                        isExporting={!!bulk && !bulk.finished}
-                        isLoading={loadingChapters.has(ch.slug)}
-                        hasError={errorChapters.has(ch.slug)}
-                        onToggleSelect={() => toggleChapterSelect(ch.slug)}
-                        onToggleExpand={() => toggleExpand(ch.slug)}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </>
+      )}
 
       {exportBar}
-    </FloatingSection>
+    </div>
   );
 }
 
