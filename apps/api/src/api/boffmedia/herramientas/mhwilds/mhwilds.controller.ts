@@ -28,6 +28,7 @@ import { GetArmorDto } from './dto/get-armor.dto';
 import { GetCharmsDto } from './dto/get-charms.dto';
 import { GetDecorationsDto } from './dto/get-decorations.dto';
 import { GetSkillsDto } from './dto/get-skills.dto';
+import { GetMonstersDto } from './dto/get-monsters.dto';
 import { GetWeaponTreeDto } from './dto/get-weapon-tree.dto';
 import { GetCharmRanksDto } from './dto/get-charm-ranks.dto';
 import { ClearCacheDto, WarmupCacheDto } from './dto/cache-operation.dto';
@@ -39,6 +40,7 @@ import { ArmorEntity } from './entities/armor.entity';
 import { CharmEntity, CharmRankEntity } from './entities/charm.entity';
 import { DecorationEntity } from './entities/decoration.entity';
 import { SkillEntity } from './entities/skill.entity';
+import { MonsterEntity } from './entities/monster.entity';
 import { CacheOperationResultEntity } from './entities/cache-info.entity';
 
 // Import Enums
@@ -139,6 +141,23 @@ export class MhwildsController {
   })
   async getSkills(@Query() dto: GetSkillsDto): Promise<SkillEntity[]> {
     return await this.mhwildsFacadeService.getSkills(
+      dto.locale || Locale.SPANISH,
+    );
+  }
+
+  @Get('monsters')
+  @ApiOperation({ summary: 'Get all monsters' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Monsters retrieved successfully.',
+    type: [MonsterEntity],
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Failed to retrieve monsters.',
+  })
+  async getMonsters(@Query() dto: GetMonstersDto): Promise<MonsterEntity[]> {
+    return await this.mhwildsFacadeService.getMonsters(
       dto.locale || Locale.SPANISH,
     );
   }

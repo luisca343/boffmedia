@@ -306,3 +306,65 @@ export interface Charm {
 
 // Generic EquipmentComponent interface to represent any armor piece or weapon
 export type EquipmentComponent = ArmorPiece | Weapon | Charm
+// ── Bestiary / monsters (wilds.mhdb.io/{locale}/monsters via the API proxy) ──
+export interface MhMonsterSize {
+  base: number;
+  mini: number;
+  silver: number;
+  gold: number;
+}
+export interface MhMonsterWeakness {
+  kind: 'element' | 'status' | 'effect' | string;
+  element?: string;
+  status?: string;
+  effect?: string;
+  level?: number | null;
+  condition?: string | null;
+  id: number;
+}
+export interface MhMonsterResistance {
+  kind: 'element' | 'status' | 'effect' | string;
+  element?: string;
+  status?: string;
+  effect?: string;
+  condition?: string | null;
+  id: number;
+}
+export interface MhMonsterLocation {
+  id: number;
+  name: string;
+  zoneCount?: number;
+}
+export interface MhRewardCondition {
+  kind: string;
+  rank?: string | null;
+  quantity?: number;
+  chance?: number;
+  part?: string | null;
+  id: number;
+}
+export interface MhMonsterReward {
+  id: number;
+  item: Item & { icon?: { kind?: string; color?: string; colorId?: number } };
+  conditions: MhRewardCondition[];
+}
+export interface MhMonster {
+  id: number;
+  gameId?: number;
+  kind: string; // 'large' | 'small'
+  species: string;
+  name: string;
+  description: string;
+  baseHealth?: number;
+  size: MhMonsterSize;
+  ailments: unknown[];
+  elements?: string[];
+  weaknesses: MhMonsterWeakness[];
+  resistances: MhMonsterResistance[];
+  locations: MhMonsterLocation[];
+  rewards: MhMonsterReward[];
+  features?: string;
+  tips?: string;
+  variants?: unknown[];
+  parts?: unknown[];
+}
