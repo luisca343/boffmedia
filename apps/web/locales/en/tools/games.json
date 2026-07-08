@@ -11,9 +11,10 @@
         "meta": "Meta Analysis",
         "speed": "Speed",
         "tracker": "Tracker",
-        "gallery": "Gallery",
-        "cardList": "Card List",
-        "battles": "Battles",
+        "tcgPanel": "Panel",
+        "cardList": "Cards",
+        "collection": "Collection",
+        "packs": "Packs",
         "skyGenerator": "Wonder Mail Generator",
         "damageCalc": "Damage Calculator"
       }

@@ -297,6 +297,10 @@
         "scarfShort": "Pañuelo",
         "paralysis": "Parálisis (×0.5 Velocidad)",
         "paralysisShort": "Parál."
+      },
+      "tabs": {
+        "tiers": "Niveles",
+        "matchup": "Comparador"
       }
     },
     "speedTiers": {
@@ -338,7 +342,8 @@
         "scarfTitle": "252 PEs, Pañuelo Elegido",
         "scarfPlus": "Scarf+",
         "scarfPlusTitle": "252 PEs, +Velocidad, Pañuelo Elegido",
-        "noScarf": "No puede llevar Pañuelo Elegido"
+        "noScarf": "No puede llevar Pañuelo Elegido",
+        "types": "Tipos"
       },
       "modifiers": {
         "title": "Modificadores",
