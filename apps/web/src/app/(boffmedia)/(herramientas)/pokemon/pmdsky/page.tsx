@@ -1,5 +1,5 @@
-import { SkyGenerator } from "@/tools/pmd-sky/SkyGenerator";
+import { PmdSkyView } from "./_components/PmdSkyView";
 
 export default function PmdPage() {
-  return <SkyGenerator />;
+  return <PmdSkyView />;
 }
