@@ -2,7 +2,8 @@
 
 import { useCallback } from "react";
 import { useTranslations } from "next-intl";
-import { SchIcon, Stepper } from "@/components/boffmedia-v2/ui/schematic";
+import { Icon } from "@/components/boffmedia/primitives";
+import { Stepper } from "./_components/ui/sch-kit";
 import { useCompatEngine } from "./_hooks/useCompatEngine";
 import { useToolActions } from "./_hooks/useToolActions";
 import { useSchematicRender } from "./_hooks/useSchematicRender";
@@ -55,28 +56,28 @@ export function SchematicCompatTool() {
       getBlockModel={getBlockModel}
       getBlockConnections={getBlockConnections}
     >
-      <div className="flex min-h-0 flex-col overflow-hidden bg-base" style={{ height: "calc(100vh - 64px)" }}>
+      <div data-ds="boffmedia" className="flex min-h-0 flex-col overflow-hidden bg-base text-txt" style={{ height: "calc(100vh - var(--nav-h, 66px))" }}>
         {/* app bar */}
-        <div className="shrink-0 flex items-center gap-4 py-[0.6rem] px-4 border-b border-edge bg-[color-mix(in_srgb,var(--layer-1)_86%,transparent)] backdrop-blur-[8px]">
-          <div className="flex items-center gap-[0.7rem] min-w-0">
-            <span className="grid place-items-center w-[34px] h-[34px] shrink-0 rounded-[var(--radius)] border border-edge-strong bg-[var(--accent-soft)] text-[color:var(--accent-bright)]">
-              <SchIcon name="cube" size={18} />
+        <div className="shrink-0 flex items-center gap-[18px] px-[18px] h-[58px] bg-base-deep border-b-2 border-line">
+          <div className="flex items-center gap-[11px] min-w-0">
+            <span className="cut-tag [--cut-tag:9px] grid place-items-center w-[34px] h-[34px] shrink-0 bg-accent text-accent-ink">
+              <Icon name="cube" size={18} />
             </span>
-            <span className="flex flex-col leading-[1.1] min-w-0">
-              <span className="font-display font-extrabold text-[0.95rem] tracking-[var(--display-spacing)] whitespace-nowrap">
+            <span className="flex flex-col leading-none min-w-0">
+              <span className="font-display font-extrabold italic text-[20px] tracking-[0.01em] text-white whitespace-nowrap">
                 Schematic Compat
               </span>
-              <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-ink-dim">Minecraft · Hytale</span>
+              <span className="font-mono text-[9.5px] tracking-[0.14em] uppercase text-txt-dim mt-1">Minecraft · Hytale</span>
             </span>
           </div>
-          <div className="flex-1 min-w-[0.5rem]" />
+          <div className="flex-1 min-w-2" />
           <Stepper steps={STEPS} current={step} />
-          <div className="flex-1 min-w-[0.5rem]" />
+          <div className="flex-1 min-w-2" />
         </div>
 
         {/* body: three columns */}
         <div className="flex-1 min-h-0 flex">
-          <aside className="w-[312px] shrink-0 border-r border-edge overflow-y-auto overflow-x-hidden bg-[color-mix(in_srgb,var(--layer-1)_40%,transparent)] max-[1180px]:w-[288px]">
+          <aside className="w-[336px] shrink-0 border-r border-line overflow-y-auto overflow-x-hidden bg-base-2 max-[1180px]:w-[320px]">
             <SetupPanel
               engineReady={engineReady}
               onScanSource={actions.scanSourceInstance}
@@ -87,13 +88,13 @@ export function SchematicCompatTool() {
               onAnalyze={actions.analyze}
             />
           </aside>
-          <main className="flex-1 min-w-[360px] flex flex-col border-r border-edge">
+          <main className="flex-1 min-w-[360px] flex flex-col border-r border-line bg-base">
             <DiffPanel />
           </main>
           {/* The 3D preview takes a large, window-proportional share (was a fixed
               372px) so big schematics are actually legible; capped so it never
               starves the diff list on ultrawide displays. */}
-          <aside className="w-[42%] min-w-[420px] max-w-[900px] shrink-0 flex flex-col bg-layer-1 max-[1180px]:min-w-[360px]">
+          <aside className="w-[42%] min-w-[420px] max-w-[900px] shrink-0 flex flex-col bg-base-2 max-[1180px]:min-w-[360px]">
             <PreviewPanel />
           </aside>
         </div>
