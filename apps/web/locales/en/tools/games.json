@@ -181,6 +181,11 @@
         "worker": {
           "connecting": "Connecting to analysis engine...",
           "ready": "Ready"
+        },
+        "meter": {
+          "label": "Ready to export",
+          "resolved": "resolved",
+          "blocked": "{count, plural, one {# unresolved} other {# unresolved}}"
         }
       }
     }

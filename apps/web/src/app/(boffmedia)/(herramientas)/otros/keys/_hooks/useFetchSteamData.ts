@@ -25,6 +25,8 @@ export interface Video {
   highlight: boolean;
 }
 
+export type MediaItem = Video | Image;
+
 export interface SteamGame {
   steamID: string;
   name: string;

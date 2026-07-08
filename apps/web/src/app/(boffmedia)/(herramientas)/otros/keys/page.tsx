@@ -1,5 +1,5 @@
-import KeysTable from "./_components/KeysTable";
+import { KeysView } from "./_components/KeysView";
 
 export default function KeysPage() {
-  return <KeysTable />;
+  return <KeysView />;
 }

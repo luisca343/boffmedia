@@ -1,5 +1,5 @@
-import LocalLibrary from './_components/LocalLibrary';
+import { BibliotecaView } from "./_components/BibliotecaView";
 
 export default function BibliotecaPage() {
-  return <LocalLibrary />;
+  return <BibliotecaView />;
 }
