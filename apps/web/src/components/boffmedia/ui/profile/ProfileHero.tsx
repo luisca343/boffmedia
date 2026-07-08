@@ -80,7 +80,7 @@ export function ProfileHero({
         <div className="relative h-[136px] w-[136px] flex-none">
           <div
             className={cn(
-              "absolute inset-0 overflow-hidden border-4 border-solid border-accent bg-panel-2 cut [--cut:16px] shadow-[0_16px_38px_-12px_rgba(255,92,10,0.55)]",
+              "absolute inset-0 overflow-hidden border-4 border-solid border-accent bg-panel-2 cut-seal [--cut:16px] shadow-[0_16px_38px_-12px_rgba(255,92,10,0.55)]",
               editable && "cursor-pointer",
             )}
             onClick={editable ? onAvatarClick : undefined}

@@ -7,8 +7,7 @@ import { Button } from "@/components/boffmedia/primitives/button"
 import { Empty } from "@/components/boffmedia/primitives/empty"
 import { Icon } from "@/components/boffmedia/primitives/icon"
 import { Spinner } from "@/components/boffmedia/primitives/spinner"
-import { ArtImage } from "@/components/boffmedia/ui/tools/ArtImage"
-import { EventCard, formatEventDate, type EventLike } from "@/components/boffmedia/ui/events"
+import { EventCard, GameHero, type EventLike } from "@/components/boffmedia/ui/events"
 import { useGetGame } from "@/hooks/events/useGetGame"
 import { useGetEvents } from "@/hooks/events/useGetEvents"
 
@@ -51,38 +50,7 @@ export function GameDetailView({ id }: { id: number }) {
         <Icon name="back" size={14} /> {t("detail.back")}
       </Link>
 
-      <div className="relative mb-8 flex min-h-[340px] flex-col justify-end overflow-hidden border border-solid border-line border-b-[3px] border-b-accent bg-panel-2 cut-corner">
-        <div className="absolute inset-0 z-0">
-          <ArtImage
-            src={game.icon}
-            alt=""
-            fallback={
-              <div className="absolute inset-0 grid place-items-center bg-panel-2">
-                <Icon name="gamepad" size={120} className="text-line-2" />
-              </div>
-            }
-          />
-        </div>
-        <div className="pointer-events-none absolute inset-0 z-[1] bg-[linear-gradient(to_top,var(--panel)_4%,color-mix(in_srgb,var(--panel)_55%,transparent)_46%,transparent_82%)]" />
-        <div className="relative z-[2] max-w-[900px] p-[34px] max-[720px]:p-6">
-          <h1 className="text-[clamp(40px,5.4vw,76px)]">{game.title}</h1>
-          {game.description && (
-            <p className="mt-3 max-w-[66ch] font-body text-[16px]/[1.55] text-txt-muted text-pretty">{game.description}</p>
-          )}
-          <div className="mt-5 flex flex-wrap gap-x-6 gap-y-3">
-            <span className="inline-flex items-center gap-2 font-mono text-[12px]/none uppercase tracking-[0.06em] text-txt-muted">
-              <Icon name="trophy" size={14} className="text-accent" />
-              <b className="font-semibold text-txt">{gameEvents.length}</b> {t("detail.events")}
-            </span>
-            {game.createdAt && (
-              <span className="inline-flex items-center gap-2 font-mono text-[12px]/none uppercase tracking-[0.06em] text-txt-muted">
-                <Icon name="calendar" size={14} className="text-accent" />
-                {t("since", { date: formatEventDate(game.createdAt) })}
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
+      <GameHero game={game} eventCount={gameEvents.length} className="mb-8" />
 
       <div className="mb-4 flex items-center gap-3">
         <h2 className="text-[clamp(24px,3vw,34px)] text-txt">{t("detail.events")}</h2>

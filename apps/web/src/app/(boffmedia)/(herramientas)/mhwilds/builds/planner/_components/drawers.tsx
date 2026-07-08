@@ -7,7 +7,7 @@ import { ArmorPiece, BuildDataWithIds, Charm, Decoration, EquipmentType, Weapon 
 import {
   MhDrawer, MhItem, MhRarity, MhTag, MhSlotPips, MhTypeChip, MhSearch, MhLabel,
 } from "../../../_components/ui/mh-kit"
-import { WEAPON_TYPES, weaponAttack, rarClamp } from "../../../_components/mh-helpers"
+import { WEAPON_TYPES, weaponAttack } from "../../../_components/mh-helpers"
 import { getSavedBuilds, loadBuildFromLocalStorage, deleteBuildFromLocalStorage } from "../_utils/buildUtils"
 
 type Item = Weapon | ArmorPiece | Charm

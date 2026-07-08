@@ -15,7 +15,7 @@ export function ActivityRow({ icon, text, time, className }: ActivityRowProps) {
         className,
       )}
     >
-      <span className="relative z-[1] grid h-[37px] w-[37px] flex-none place-items-center border border-solid border-line-2 bg-panel-2 text-accent cut [--cut:8px]">
+      <span className="relative z-[1] grid h-[37px] w-[37px] flex-none place-items-center border border-solid border-line-2 bg-panel-2 text-accent cut-seal [--cut:8px]">
         <Icon name={icon} size={17} />
       </span>
       <div className="min-w-0 pt-0.5">

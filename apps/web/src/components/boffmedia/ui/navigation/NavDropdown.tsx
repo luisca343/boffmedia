@@ -105,32 +105,37 @@ export function NavDropdown({ label, href, active, sections, demoOpen }: NavDrop
   const sec = sections[Math.min(hovSec, sections.length - 1)] || sections[0]
 
   return (
-    <span className="relative flex items-stretch" onMouseEnter={enter} onMouseLeave={leave}>
-      <Link
-        href={href}
-        aria-haspopup="menu"
-        aria-expanded={open}
-        onClick={() => setOpen(false)}
-        onKeyDown={(e) => { if (e.key === "ArrowDown") { e.preventDefault(); setOpen(true) } }}
-        className={cn(
-          "flex items-center gap-[7px] border-y-[3px] border-transparent font-display text-[16px] font-bold uppercase leading-none tracking-[0.09em] no-underline transition-colors duration-[140ms]",
-          active || open ? "text-txt" : "text-txt-muted hover:text-txt",
-          active && "border-b-accent",
-        )}
-      >
-        {label}
-        <Icon
-          name="chevronDown"
-          size={13}
-          className={cn("transition-all duration-[140ms]", open ? "rotate-180 text-accent opacity-100" : "opacity-50")}
-        />
-      </Link>
+    <span className={cn("flex items-stretch", demoOpen ? "w-fit" : "relative")} onMouseEnter={enter} onMouseLeave={leave}>
+      {!demoOpen && (
+        <Link
+          href={href}
+          aria-haspopup="menu"
+          aria-expanded={open}
+          onClick={() => setOpen(false)}
+          onKeyDown={(e) => { if (e.key === "ArrowDown") { e.preventDefault(); setOpen(true) } }}
+          className={cn(
+            "flex items-center gap-[7px] border-y-[3px] border-transparent font-display text-[16px] font-bold uppercase leading-none tracking-[0.09em] no-underline transition-colors duration-[140ms]",
+            active || open ? "text-txt" : "text-txt-muted hover:text-txt",
+            active && "border-b-accent",
+          )}
+        >
+          {label}
+          <Icon
+            name="chevronDown"
+            size={13}
+            className={cn("transition-all duration-[140ms]", open ? "rotate-180 text-accent opacity-100" : "opacity-50")}
+          />
+        </Link>
+      )}
 
       {open && (
         <div
           role="menu"
           aria-label={tNav("menuOf", { label })}
-          className="cut-tag [--cut-tag:10px] absolute left-[-18px] top-full z-[70] flex border border-solid border-line-2 border-t-accent bg-panel shadow-[0_24px_54px_-22px_rgba(0,0,0,0.75)] animate-[bm-nd-pop_0.14s_ease-out] motion-reduce:animate-none"
+          className={cn(
+            "cut-tag [--cut-tag:10px] z-[70] flex w-fit border border-solid border-line-2 border-t-accent bg-panel shadow-[0_24px_54px_-22px_rgba(0,0,0,0.75)] animate-[bm-nd-pop_0.14s_ease-out] motion-reduce:animate-none",
+            demoOpen ? "relative" : "absolute left-[-18px] top-full",
+          )}
         >
           <div className="flex w-[176px] flex-col gap-0.5 border-r border-line bg-panel-2 p-2.5" role="none">
             {sections.map((s, i) => {

@@ -44,6 +44,8 @@ import { CountUp } from "@/components/boffmedia/primitives/count-up"
 import { NavDropdown } from "@/components/boffmedia/ui/navigation/NavDropdown"
 import { LangSwitcher } from "@/components/boffmedia/ui/navigation/LangSwitcher"
 import { NotifMenu, type Notif } from "@/components/boffmedia/ui/navigation/NotifMenu"
+import { AccountMenu } from "@/components/boffmedia/ui/navigation/AccountNav"
+import { AuthScreen } from "@/components/boffmedia/ui/auth/AuthScreen"
 import { buildToolsSections, buildComunidadSections } from "@/components/boffmedia/ui/navigation/nav-data"
 import { useTranslations } from "next-intl"
 import { Footer } from "@/components/boffmedia/ui/layout/Footer"
@@ -69,6 +71,56 @@ import {
   DEMO_ACTIVITY,
   DEMO_TOUR,
 } from "@/components/boffmedia/ui/profile"
+import {
+  TxSection,
+  ToolCard,
+  ToolGrid,
+  GameLogo,
+  VideoHero,
+  ToolShell,
+  GameBanner,
+  FeaturedTool,
+  ExtLinks,
+  buildCategory,
+  type ToolCardData,
+} from "@/components/boffmedia/ui/tools"
+import {
+  DkApp,
+  DkBar,
+  DkBody,
+  DkTitle,
+  DkSprite,
+  DkTeam,
+  DkTable,
+  DkSeg,
+  DkSearch,
+  DkChip,
+  DkSelect,
+  DkStat,
+  DkSplit,
+  DkBarList,
+  DkType,
+  DkCopy,
+  DkTrend,
+  DkHeat,
+  DkEmpty,
+  DkSkel,
+  DkSkelList,
+} from "@/components/boffmedia/ui/tools/datakit"
+import {
+  EventCard,
+  GameCard,
+  GameHero,
+  EventBanner,
+  EventStatusChip,
+  Countdown,
+  EventOrganizer,
+  AchievementItem,
+  type EventLike,
+  type GameLike,
+  type AchievementLike,
+} from "@/components/boffmedia/ui/events"
+import { LegalDoc, type LegalSection } from "@/components/boffmedia/ui/legal/LegalDoc"
 
 // ── index model ─────────────────────────────────────────────────────────────
 interface SecMeta {
@@ -98,12 +150,12 @@ const CHAPTERS: Chapter[] = [
       { id: "botones", label: "Botones" },
       { id: "chips", label: "Chips y badges" },
       { id: "formularios", label: "Formularios" },
-      { id: "acceso", label: "Acceso" },
       { id: "seleccion", label: "Selección y rango" },
       { id: "navegacion", label: "Navegación" },
       { id: "navdrop", label: "Dropdown de nav" },
       { id: "navbar", label: "Sesión e idioma" },
       { id: "pie", label: "Pie de página" },
+      { id: "acceso", label: "Acceso" },
       { id: "menus", label: "Menús y avisos" },
       { id: "indicadores", label: "Anillo y carga" },
       { id: "ayudas", label: "Tooltip y teclas" },
@@ -130,8 +182,47 @@ const CHAPTERS: Chapter[] = [
     ],
   },
   {
+    name: "Hub de herramientas",
+    dom: "Herramientas",
+    sections: [
+      { id: "panelsec", label: "Panel de sección" },
+      { id: "tarjetas", label: "Tarjeta de herramienta" },
+      { id: "portadas", label: "Portada de juego" },
+      { id: "banner", label: "Banner de juego" },
+      { id: "destacada", label: "Destacada" },
+      { id: "herovideo", label: "Hero con vídeo" },
+      { id: "sidenav", label: "Sidebar colapsable" },
+      { id: "externos", label: "Enlaces externos" },
+    ],
+  },
+  {
+    name: "Datos en vivo",
+    dom: "Herramientas",
+    sections: [
+      { id: "dkpiezas", label: "Sprites y jugador" },
+      { id: "dktabla", label: "Tabla de datos" },
+      { id: "dkfiltros", label: "Filtros y búsqueda" },
+      { id: "dkindicadores", label: "Indicadores" },
+      { id: "dkgraficas", label: "Gráficas" },
+      { id: "dkestadosvivo", label: "Carga y avisos" },
+    ],
+  },
+  {
+    name: "Juegos y Eventos",
+    dom: "Plataforma",
+    sections: [
+      { id: "jgcover", label: "Portada de juego" },
+      { id: "gamehero", label: "Cabecera de juego" },
+      { id: "evcard", label: "Tarjeta de evento" },
+      { id: "evstatus", label: "Estado y cuenta atrás" },
+      { id: "evbanner", label: "Banner de evento" },
+      { id: "evlogro", label: "Logro y progreso" },
+      { id: "evlead", label: "Clasificación y podio" },
+    ],
+  },
+  {
     name: "Perfil",
-    dom: "Sistema",
+    dom: "Plataforma",
     sections: [
       { id: "pf-identidad", label: "Identidad" },
       { id: "pf-rango", label: "Rango y stats" },
@@ -141,9 +232,15 @@ const CHAPTERS: Chapter[] = [
       { id: "pf-torneo", label: "Torneo en curso" },
     ],
   },
+  {
+    name: "Legal",
+    dom: "Plataforma",
+    sections: [{ id: "doclegal", label: "Documento legal" }],
+  },
 ]
 
-const DOMAINS = [{ name: "Sistema", chapters: CHAPTERS }]
+const DOMAIN_ORDER = ["Sistema", "Herramientas", "Plataforma"]
+const DOMAINS = DOMAIN_ORDER.map((name) => ({ name, chapters: CHAPTERS.filter((c) => c.dom === name) }))
 const GRP_KEY = "bm-sc3-chapter"
 const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
 
@@ -209,6 +306,51 @@ const DEMO_NOTIFS: Notif[] = [
   { id: 4, icon: "star", tone: "muted", text: "Desbloqueaste el logro «Racha de 10».", time: "ayer", read: true },
 ]
 
+// Demo data for the tool/platform chapters — showcase-only, mirrors the real shapes.
+const DEMO_TOOLS: ToolCardData[] = [
+  { key: "calc", title: "Calculadora de daño", desc: "Rangos exactos, KO y velocidad para VGC.", features: ["Dobles", "Regulación H"], icon: "target", href: "#", hueColor: "hsl(18 90% 55%)", isNew: true, popularity: "high", featured: true },
+  { key: "tracker", title: "Tracker de partidas", desc: "Registra sesiones, ELO y estadísticas.", features: ["IndexedDB", "CSV"], icon: "trophy", href: "#", hueColor: "hsl(18 90% 55%)", popularity: "medium" },
+  { key: "meta", title: "Meta VGC", desc: "Uso, divergencia y detalle por especie.", features: ["Smogon", "Limitless"], icon: "gamepad", href: "#", hueColor: "hsl(18 90% 55%)" },
+]
+
+// Showcase demo game — carries the fields the games API does NOT provide yet
+// (short · events · players · hue). Real pages omit them. [deferred]
+const DEMO_GAME: GameLike = { id: 1, title: "Pokémon VGC", description: "Combates dobles oficiales de la comunidad.", icon: null, active: 1, createdAt: "2024-01-10", hue: "hsl(18 90% 55%)", short: "VGC", events: 12, players: 3400 }
+
+// Showcase demo events — carry the fields the events API does NOT provide yet
+// (participants · organizer · hue) so the full handoff card can be shown. On real
+// pages those fields are absent and the card degrades gracefully. [deferred]
+const DEMO_EVENTS: EventLike[] = [
+  { id: 1, title: "Copa Relámpago VGC", description: "Torneo dobles Regulación H, suizo + top cut.", gameName: "Pokémon VGC", startDate: "2026-07-20", status: "upcoming", type: "event", participants: 96, hue: "hsl(18 90% 55%)", organizer: { role: "coorg", name: "Liga VGC España", avatar: "L" } },
+  { id: 2, title: "Liga Wingull · Jornada 3", description: "Serie semanal de la comunidad.", gameName: "Pokémon VGC", startDate: "2026-07-01", status: "active", type: "event", participants: 48, hue: "hsl(18 90% 55%)", organizer: { role: "boffmedia", name: "Boffmedia", avatar: "B" } },
+  { id: 3, title: "Liga TCG Pocket · Temporada 2", description: "Liga mensual con puntuación acumulada y un sobre garantizado por participación.", gameName: "TCG Pocket", startDate: "2026-05-09", endDate: "2026-05-30", status: "completed", type: "server", participants: 147, hue: "hsl(265 60% 66%)", organizer: { role: "platform", name: "Smash Barcelona", avatar: "S" } },
+]
+
+// `earned` · `globalPct` · `earnedDate` are per-user progress the catalogue API
+// lacks — demo-only here, omitted on real pages. [deferred]
+const DEMO_ACHS: AchievementLike[] = [
+  { id: 1, name: "Campeón de la Copa", description: "Gana un torneo oficial.", points: 500, category: "competition", rarity: "gold", eventName: "Copa Relámpago", earned: true, earnedDate: "2026-06-16" },
+  { id: 2, name: "Racha de 10", description: "Gana 10 combates seguidos.", points: 150, category: "challenge", rarity: "silver", itemType: "medal", earned: false, globalPct: 12 },
+  { id: 3, name: "Primer combate", description: "Juega tu primera partida.", points: 10, category: "participation", rarity: "bronze", earned: false, globalPct: 68 },
+]
+
+const DEMO_LEGAL: LegalSection[] = [
+  { id: "l-intro", title: "Introducción", body: ["Demostración del componente LegalDoc: índice pegajoso con scroll-spy y secciones numeradas.", ["Texto de ejemplo, sin valor legal.", "El contenido real vive en las páginas de políticas.", "El índice resalta la sección visible."]] },
+  { id: "l-datos", title: "Datos que tratamos", body: ["Solo se recoge lo imprescindible para prestar el servicio."] },
+  { id: "l-derechos", title: "Tus derechos", body: ["Puedes solicitar acceso, rectificación o borrado de tus datos cuando quieras."] },
+]
+
+const DEMO_SPRITE =
+  "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><circle cx='20' cy='20' r='15' fill='%23e8863b'/><circle cx='20' cy='20' r='15' fill='none' stroke='%23000' stroke-opacity='.25'/></svg>"
+const DEMO_TEAM = [
+  { name: "Incineroar", src: DEMO_SPRITE },
+  { name: "Rillaboom", src: DEMO_SPRITE },
+  { name: "Flutter Mane", src: DEMO_SPRITE },
+  { name: "Amoonguss", src: DEMO_SPRITE },
+  { name: "Urshifu", src: DEMO_SPRITE },
+  { name: "Landorus", src: DEMO_SPRITE },
+]
+
 // Display headings — «voz de la señal»: heavy italic uppercase, matching base.css
 // (h1/h2/h3). Heading `em` becomes an accent-stroked outline.
 const DISPLAY = "font-display font-extrabold italic uppercase leading-[0.92] tracking-[-0.005em]"
@@ -264,6 +406,10 @@ export default function ComponentsShowcase() {
   const [pg, setPg] = React.useState(4)
   const [modalOpen, setModalOpen] = React.useState(false)
   const [fxKey, setFxKey] = React.useState(0)
+  const [dkSeg, setDkSeg] = React.useState("uso")
+  const [dkQ, setDkQ] = React.useState("")
+  const [dkReg, setDkReg] = React.useState("H")
+  const pokeCat = React.useMemo(() => buildCategory("pokemon", t), [t])
 
   const chapters = CHAPTERS
   const gi = chapters.findIndex((g) => g.name === grpName)
@@ -735,64 +881,6 @@ export default function ComponentsShowcase() {
             </Section>
           )}
 
-          {chapter.sections.some((s) => s.id === "acceso") && (
-            <Section
-              id="acceso"
-              kicker="Primitivas"
-              title="Acceso"
-              lead={<>Las piezas de la pantalla de entrada, reutilizables sueltas: botones de proveedor (<code>AuthProviderBtn</code>), el campo de contraseña con mostrar/ocultar (<code>PasswordField</code>) y el separador con etiqueta (<code>Divider</code>). La pantalla completa vive en <code>/entrar</code>.</>}
-            >
-              <Sample title="Proveedores OAuth" code="<AuthProviderBtn>" note={<>Google queda neutro con la marca en el glifo; Discord y Steam llevan relleno de marca. Los proveedores aún sin conectar van en estado <code>soon</code> (atenuados, pero siguen avisando al pulsar).</>}>
-                <div className="flex w-full max-w-[360px] flex-col gap-2.5">
-                  <AuthProviderBtn provider="google" block>
-                    Google
-                  </AuthProviderBtn>
-                  <div className="grid grid-cols-2 gap-2.5">
-                    <AuthProviderBtn provider="discord" soon>
-                      Discord
-                    </AuthProviderBtn>
-                    <AuthProviderBtn provider="steam" soon>
-                      Steam
-                    </AuthProviderBtn>
-                  </div>
-                </div>
-              </Sample>
-
-              <Sample title="Contraseña + separador" code="<PasswordField> · <Divider label>" col note={<>El ojo alterna la visibilidad (<code>aria-pressed</code>); el separador etiquetado divide proveedores del formulario.</>}>
-                <Field label="Contraseña">
-                  <PasswordField defaultValue="supersecreto" />
-                </Field>
-                <Divider label="o con tu correo" />
-              </Sample>
-
-              <Sample title="Pantalla de acceso" code="/entrar" note={<>Composición final: marca, proveedores, formulario y cambio entre iniciar sesión y crear cuenta. Conectada a NextAuth (credenciales + Google).</>}>
-                <div className="flex w-full justify-center border border-solid border-line bg-base bg-[radial-gradient(100%_70%_at_50%_0%,var(--accent-soft),transparent_60%)] p-6">
-                  <div className="flex w-full max-w-[380px] flex-col gap-[18px] border border-solid border-line-2 border-t-[3px] border-t-accent bg-panel px-7 pb-6 pt-7 [clip-path:polygon(0_0,100%_0,100%_calc(100%_-_16px),calc(100%_-_16px)_100%,0_100%)]">
-                    <span className="flex items-center gap-2.5 font-display text-[20px]/none font-extrabold italic uppercase text-txt">
-                      BOFF<b className="text-accent">MEDIA</b>
-                    </span>
-                    <AuthProviderBtn provider="google" block>
-                      Google
-                    </AuthProviderBtn>
-                    <Divider label="o con tu correo" />
-                    <Field label="Usuario">
-                      <Input placeholder="tu_usuario" />
-                    </Field>
-                    <Field label="Contraseña">
-                      <PasswordField placeholder="••••••••" />
-                    </Field>
-                    <Button variant="pri" className="w-full">
-                      Entrar
-                    </Button>
-                    <Button href="/entrar" variant="ghost" size="sm" iconRight="arrow" className="self-center">
-                      Ver pantalla completa
-                    </Button>
-                  </div>
-                </div>
-              </Sample>
-            </Section>
-          )}
-
           {chapter.sections.some((s) => s.id === "seleccion") && (
             <Section
               id="seleccion"
@@ -863,12 +951,12 @@ export default function ComponentsShowcase() {
               lead={<>El menú del navbar (<code>NavDropdown</code>): abre al pasar el cursor y el clic en el disparador navega al hub. Formato partido — carril de juegos a la izquierda; al pasar el cursor la hoja muestra sus herramientas agrupadas por categoría, con cabecera que navega a su hub. Se alimenta del registro de navegación (<code>buildToolsSections</code> deriva del registro <code>data/games</code>): añadir un juego o herramienta ahí lo hace aparecer aquí, en el hub y en la barra lateral sin tocar el navbar.</>}
             >
               <Sample title="Herramientas — juego → categorías" code="<NavDropdown demoOpen sections>" col note={<>Cada cabecera de categoría navega a su hub; la fila de juego navega a su página. Fijado abierto para la demo — arriba en la barra abre al pasar el cursor.</>}>
-                <div className="relative min-h-[360px] w-full overflow-x-auto">
+                <div className="w-full overflow-x-auto">
                   <NavDropdown demoOpen label="Herramientas" href="/herramientas" sections={toolsSections} />
                 </div>
               </Sample>
               <Sample title="Comunidad — todo agrupado" code="buildComunidadSections" col note={<>Mismo formato para el menú de Comunidad.</>}>
-                <div className="relative min-h-[300px] w-full overflow-x-auto">
+                <div className="w-full overflow-x-auto">
                   <NavDropdown demoOpen label="Comunidad" href="/comunidad" sections={comunidadSections} />
                 </div>
               </Sample>
@@ -888,7 +976,10 @@ export default function ComponentsShowcase() {
               <Sample title="Notificaciones" code="<NotifMenu>" note={<>Campana con contador de no leídas; el popover permite marcar leídas y limpiar, con estado vacío. Ábrela.</>}>
                 <NotifMenu initialItems={DEMO_NOTIFS} />
               </Sample>
-              <Sample title="Cuenta — sin sesión" code="<AccountNav>" note={<>Con sesión, <code>AccountNav</code> sustituye estos botones por el menú de cuenta (avatar + perfil + cerrar sesión) en la barra; sin sesión muestra Entrar / Crear cuenta, como aquí.</>}>
+              <Sample title="Cuenta — con sesión" code="<AccountNav> · con sesión" note={<>Avatar + nombre → menú de cuenta (perfil, cerrar sesión). Ábrelo. En la barra real aparece cuando hay sesión iniciada.</>}>
+                <AccountMenu user={{ name: "RotomChef", email: "rotomchef@boffmedia.gg", image: null }} />
+              </Sample>
+              <Sample title="Cuenta — sin sesión" code="<AccountNav> · sin sesión" note={<>Sin sesión, <code>AccountNav</code> muestra Entrar / Crear cuenta.</>}>
                 <Button size="sm" variant="ghost" icon="user" href="/entrar">
                   Entrar
                 </Button>
@@ -909,6 +1000,50 @@ export default function ComponentsShowcase() {
               <Sample title="Pie completo" code="<Footer>" col note={<>Ancho completo del shell; marca con sociales, columnas theme-aware y barra base con reloj vivo y ubicación.</>}>
                 <div className="w-full border border-solid border-line overflow-hidden [&_footer]:!mt-0">
                   <Footer />
+                </div>
+              </Sample>
+            </Section>
+          )}
+
+          {chapter.sections.some((s) => s.id === "acceso") && (
+            <Section
+              id="acceso"
+              kicker="Primitivas"
+              title="Acceso"
+              lead={<>Las piezas de la pantalla de entrada, reutilizables sueltas: botones de proveedor (<code>AuthProviderBtn</code>), el campo de contraseña con mostrar/ocultar (<code>PasswordField</code>) y el separador con etiqueta (<code>Divider</code>). La pantalla completa vive en <code>/entrar</code>.</>}
+            >
+              <Sample title="Botón de proveedor" code="<AuthProviderBtn provider>" note={<>Marcas fuertes (Discord, Steam) → relleno de marca; el resto → chasis neutro con la marca en el icono. Los no conectados van en estado <code>soon</code>. <code>block</code> ocupa el ancho.</>}>
+                <div className="grid w-full max-w-[360px] gap-2.5">
+                  <AuthProviderBtn provider="discord" soon block>
+                    Discord
+                  </AuthProviderBtn>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <AuthProviderBtn provider="google">Google</AuthProviderBtn>
+                    <AuthProviderBtn provider="steam" soon>
+                      Steam
+                    </AuthProviderBtn>
+                  </div>
+                </div>
+              </Sample>
+
+              <Sample title="Separador" code="<Divider label>" col note={<>Separador horizontal; con <code>label</code>, texto centrado en mono entre dos líneas.</>}>
+                <div className="grid w-full max-w-[360px] gap-4">
+                  <Divider />
+                  <Divider label="o con tu correo" />
+                </div>
+              </Sample>
+
+              <Sample title="Contraseña" code="<PasswordField>" col note={<>Input de contraseña con botón mostrar/ocultar (<code>aria-pressed</code>).</>}>
+                <div className="w-full max-w-[360px]">
+                  <Field label="Contraseña">
+                    <PasswordField defaultValue="supersecreto" />
+                  </Field>
+                </div>
+              </Sample>
+
+              <Sample title="Pantalla completa" code="/entrar" col note={<>La pantalla real: proveedores (Google + Discord/Steam «próximamente»), formulario de credenciales y cambio login ↔ registro. Conectada a NextAuth.</>}>
+                <div className="w-full overflow-hidden border border-solid border-line [&>div]:!min-h-[560px]">
+                  <AuthScreen />
                 </div>
               </Sample>
             </Section>
@@ -1440,6 +1575,349 @@ export default function ComponentsShowcase() {
               </Sample>
               <Sample title="Nota de vista pública" code="<ProfileNote>" col>
                 <ProfileNote>Estás viendo el perfil público de un usuario.</ProfileNote>
+              </Sample>
+            </Section>
+          )}
+
+          {/* ── Hub de herramientas ── */}
+          {chapter.sections.some((s) => s.id === "panelsec") && (
+            <Section id="panelsec" kicker="Hub de herramientas" title="Panel de sección" lead={<>Bloque de sección estandarizado (<code>TxSection</code>): titular con barra de acento, hilo discontinuo, contador en mono y ranura de acciones. Estructura cada página del hub.</>}>
+              <Sample title="Con contador y acciones" code="<TxSection count actions>" col>
+                <TxSection title="Todas las herramientas" count="10 tools" actions={<Button size="sm" variant="ghost" iconRight="arrow">Ver todo</Button>}>
+                  <ToolGrid tools={DEMO_TOOLS} />
+                </TxSection>
+              </Sample>
+              <Sample title="Con pista" code="<TxSection hint>" col>
+                <TxSection title="Recursos externos" hint={<><Icon name="external" size={12} />Salen del sitio</>}>
+                  <p className="text-txt-muted text-[14px]">Contenido de la sección…</p>
+                </TxSection>
+              </Sample>
+            </Section>
+          )}
+
+          {chapter.sections.some((s) => s.id === "tarjetas") && (
+            <Section id="tarjetas" kicker="Hub de herramientas" title="Tarjeta de herramienta" lead={<>La «fila» de herramienta (<code>ToolCard</code>): raíl de color por juego, icono, título, descripción y distintivos (nuevo · popularidad). <code>ToolGrid</code> las dispone en rejilla responsive.</>}>
+              <Sample title="Tarjeta suelta" code="<ToolCard tool>" grid>
+                <ToolCard tool={DEMO_TOOLS[0]} />
+                <ToolCard tool={DEMO_TOOLS[1]} />
+              </Sample>
+              <Sample title="Rejilla" code="<ToolGrid tools>" col>
+                <ToolGrid tools={DEMO_TOOLS} />
+              </Sample>
+            </Section>
+          )}
+
+          {chapter.sections.some((s) => s.id === "portadas") && (
+            <Section id="portadas" kicker="Hub de herramientas" title="Portada de juego" lead={<>El sello del juego en su tono (<code>GameLogo</code>): iniciales o imagen, con el color de familia y el corte diagonal. Se usa en el conmutador del shell y las cabeceras. <em>Nota:</em> el v3 no tiene una tarjeta «GameCover» aparte — la entrada completa a un juego se compone con <code>CategoryLanding</code>/<code>GameBanner</code> (ver «Banner de juego»).</>}>
+              <Sample title="Sellos por tono" code="<GameLogo hueColor>">
+                <GameLogo label="VGC" hueColor="hsl(18 90% 55%)" />
+                <GameLogo label="MH" hueColor="hsl(150 55% 52%)" />
+                <GameLogo label="MC" hueColor="hsl(140 45% 55%)" />
+                <GameLogo label="OT" hueColor="hsl(265 60% 66%)" />
+              </Sample>
+              <Sample title="Tamaños" code="size sm · md · lg">
+                <GameLogo label="VGC" hueColor="hsl(18 90% 55%)" size="sm" />
+                <GameLogo label="VGC" hueColor="hsl(18 90% 55%)" />
+                <GameLogo label="VGC" hueColor="hsl(18 90% 55%)" size="lg" />
+              </Sample>
+            </Section>
+          )}
+
+          {chapter.sections.some((s) => s.id === "banner") && (
+            <Section id="banner" kicker="Hub de herramientas" title="Banner de juego" lead={<>Cabecera de la página de categoría (<code>GameBanner</code>): prefijo + destacado en la voz de la señal, subtítulo y arte de fondo. Datos reales vía <code>buildCategory</code>.</>}>
+              <Sample title="Banner de categoría" code="<GameBanner cat>" col note="Se compone dentro de CategoryLanding en /pokemon /minecraft /mhwilds /otros.">
+                {pokeCat ? <div className="w-full">{<GameBanner cat={pokeCat} />}</div> : <Empty title="Sin datos de categoría" />}
+              </Sample>
+            </Section>
+          )}
+
+          {chapter.sections.some((s) => s.id === "destacada") && (
+            <Section id="destacada" kicker="Hub de herramientas" title="Destacada" lead={<>La herramienta destacada de una categoría (<code>FeaturedTool</code>): hero con arte, descripción y CTA. Es la primera herramienta <code>featured</code> del juego.</>}>
+              <Sample title="Herramienta destacada" code="<FeaturedTool cat>" col>
+                {pokeCat?.featuredTool ? <div className="w-full">{<FeaturedTool cat={pokeCat} />}</div> : <Empty title="Sin herramienta destacada" />}
+              </Sample>
+            </Section>
+          )}
+
+          {chapter.sections.some((s) => s.id === "herovideo") && (
+            <Section id="herovideo" kicker="Hub de herramientas" title="Hero con vídeo" lead={<>Hero del hub (<code>VideoHero</code>): vídeo de fondo en bucle, líneas de retransmisión y velo. Con <code>motion-reduce</code> cae a póster/superficie.</>}>
+              <Sample title="Hero con vídeo" code="<VideoHero>" col>
+                <div className="w-full">
+                  <VideoHero>
+                    <div className="px-8 py-16">
+                      <Kicker>Herramientas</Kicker>
+                      <h3 className={cn(DISPLAY, DISPLAY_EM, "text-[clamp(28px,5vw,48px)] mt-2")}>Elige tu <em>señal</em></h3>
+                    </div>
+                  </VideoHero>
+                </div>
+              </Sample>
+            </Section>
+          )}
+
+          {chapter.sections.some((s) => s.id === "sidenav") && (
+            <Section id="sidenav" kicker="Hub de herramientas" title="Sidebar colapsable" lead={<>El shell de herramientas (<code>ToolShell</code>): carril lateral colapsable y fijable (72px↔264px), cabecera con conmutador de juego y cajón móvil. Se monta en los layouts por juego.</>}>
+              <Sample title="Shell en vivo" code="<ToolShell slug='pokemon'>" col note="Vista previa recortada y redimensionable; en la app ocupa toda la altura bajo la barra. Pasa el ratón por el carril para expandirlo.">
+                <div className="w-full h-[520px] resize-y overflow-auto border border-solid border-line">
+                  <ToolShell slug="pokemon">
+                    <div className="p-6">
+                      <Kicker>Contenido</Kicker>
+                      <h3 className={cn(HEAD4, "text-[22px] mt-2")}>Página de herramienta</h3>
+                      <p className="text-txt-muted mt-2 text-[14px]">El contenido de cada herramienta va aquí, con el carril a la izquierda.</p>
+                    </div>
+                  </ToolShell>
+                </div>
+              </Sample>
+            </Section>
+          )}
+
+          {chapter.sections.some((s) => s.id === "externos") && (
+            <Section id="externos" kicker="Hub de herramientas" title="Enlaces externos" lead={<>Recursos que salen del sitio (<code>ExtLinks</code>): tarjetas con título, descripción e icono de enlace externo. Datos reales de la categoría.</>}>
+              <Sample title="Enlaces externos" code="<ExtLinks items>" col>
+                {pokeCat && pokeCat.ext.length > 0 ? <div className="w-full">{<ExtLinks items={pokeCat.ext} />}</div> : <Empty title="Sin enlaces externos" />}
+              </Sample>
+            </Section>
+          )}
+
+          {/* ── Datos en vivo (datakit) ── */}
+          {chapter.sections.some((s) => s.id === "dkpiezas") && (
+            <Section id="dkpiezas" kicker="Datos en vivo" title="Sprites y jugador" lead={<>Piezas de identidad de los datos: chip de sprite agnóstico (<code>DkSprite</code>, el llamador controla la URL) y la fila de equipo (<code>DkTeam</code>). El chasis vive en <code>DkApp</code>/<code>DkBar</code>/<code>DkBody</code>.</>}>
+              <Sample title="Sprite" code="<DkSprite src>">
+                <DkSprite src={DEMO_SPRITE} alt="" title="Incineroar" />
+                <DkSprite src={DEMO_SPRITE} alt="" size={40} />
+                <DkSprite src={DEMO_SPRITE} alt="" dim />
+              </Sample>
+              <Sample title="Equipo" code="<DkTeam slots>">
+                <DkTeam slots={DEMO_TEAM} />
+              </Sample>
+              <Sample title="Chasis" code="<DkApp> · <DkBar> · <DkBody>" col note={<>El armazón de altura completa: barra pegajosa (<code>DkBar</code>), título/atrás (<code>DkTitle</code>) y cuerpo con scroll propio (<code>DkBody</code>).</>}>
+                <div className="w-full h-[220px] overflow-hidden border border-solid border-line">
+                  <DkApp>
+                    <DkBar>
+                      <DkTitle icon="trophy" label="Meta VGC" sub="Regulación H" />
+                    </DkBar>
+                    <DkBody>
+                      <p className="text-txt-muted text-[13px]">Contenido del cuerpo con scroll propio.</p>
+                    </DkBody>
+                  </DkApp>
+                </div>
+              </Sample>
+            </Section>
+          )}
+
+          {chapter.sections.some((s) => s.id === "dktabla") && (
+            <Section id="dktabla" kicker="Datos en vivo" title="Tabla de datos" lead={<>Tabla ordenable (<code>DkTable</code>): cabecera pegajosa, columnas con alineación y orden, ganchos de celda <code>mono</code> e <code>is-click</code>. El llamador escribe <code>&lt;tbody&gt;/&lt;tr&gt;/&lt;td&gt;</code> planos.</>}>
+              <Sample title="Ranking de uso" code="<DkTable columns>" col>
+                <DkTable
+                  columns={[
+                    { key: "mon", label: "Pokémon" },
+                    { key: "use", label: "Uso", align: "right", sortable: true },
+                    { key: "lead", label: "Lead", align: "right" },
+                  ]}
+                  sortKey="use"
+                  sortDir="desc"
+                  onSort={() => {}}
+                >
+                  <tbody>
+                    <tr className="is-click"><td>Incineroar</td><td className="mono" style={{ textAlign: "right" }}>58.2%</td><td className="mono" style={{ textAlign: "right" }}>21.0%</td></tr>
+                    <tr className="is-click"><td>Flutter Mane</td><td className="mono" style={{ textAlign: "right" }}>54.9%</td><td className="mono" style={{ textAlign: "right" }}>33.4%</td></tr>
+                    <tr className="is-click"><td>Rillaboom</td><td className="mono" style={{ textAlign: "right" }}>41.7%</td><td className="mono" style={{ textAlign: "right" }}>18.2%</td></tr>
+                  </tbody>
+                </DkTable>
+              </Sample>
+            </Section>
+          )}
+
+          {chapter.sections.some((s) => s.id === "dkfiltros") && (
+            <Section id="dkfiltros" kicker="Datos en vivo" title="Filtros y búsqueda" lead={<>Controles de datos: segmentado con contador (<code>DkSeg</code>), búsqueda (<code>DkSearch</code>), chip mono (<code>DkChip</code>) y selector compacto (<code>DkSelect</code>). Todos con el corte inferior derecho del datakit.</>}>
+              <Sample title="Segmentado" code="<DkSeg options value onChange>">
+                <DkSeg value={dkSeg} onChange={setDkSeg} options={[{ value: "uso", label: "Uso", count: 128 }, { value: "leads", label: "Leads", count: 64 }, { value: "cores", label: "Parejas", count: 32 }]} />
+              </Sample>
+              <Sample title="Búsqueda y selector" code="<DkSearch> · <DkSelect>">
+                <DkSearch value={dkQ} onChange={setDkQ} placeholder="Buscar especie…" />
+                <DkSelect value={dkReg} onChange={setDkReg} options={[{ value: "H", label: "Regulación H" }, { value: "G", label: "Regulación G" }, { value: "F", label: "Regulación F" }]} />
+              </Sample>
+              <Sample title="Chip" code="<DkChip>">
+                <DkChip icon="trophy" tone="accent">Top cut</DkChip>
+                <DkChip>128 equipos</DkChip>
+              </Sample>
+            </Section>
+          )}
+
+          {chapter.sections.some((s) => s.id === "dkindicadores") && (
+            <Section id="dkindicadores" kicker="Datos en vivo" title="Indicadores" lead={<>KPIs y barras: tarjeta de estadística por tono (<code>DkStat</code>), barra victoria/empate/derrota (<code>DkSplit</code>), barras etiquetadas (<code>DkBarList</code>), badge de tipo (<code>DkType</code>) y copiar (<code>DkCopy</code>).</>}>
+              <Sample title="KPI por tono" code="<DkStat tone>">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full">
+                  <DkStat value="128" label="Partidas" />
+                  <DkStat value="64%" label="Victorias" tone="pos" />
+                  <DkStat value="1820" label="ELO" tone="accent" />
+                  <DkStat value="-3" label="Racha" tone="neg" />
+                </div>
+              </Sample>
+              <Sample title="Ratio y barras" code="<DkSplit> · <DkBarList>" col>
+                <div className="w-full max-w-[420px]"><DkSplit win={64} draw={4} loss={32} rate={64} /></div>
+                <div className="w-full max-w-[420px]">
+                  <DkBarList items={[
+                    { name: "Protect", pct: 100 },
+                    { name: "Fake Out", pct: 78 },
+                    { name: "Trick Room", pct: 41 },
+                  ]} />
+                </div>
+              </Sample>
+              <Sample title="Tipo y copiar" code="<DkType> · <DkCopy>">
+                <DkType type="fire" />
+                <DkType type="water" />
+                <DkType type="grass" small />
+                <DkCopy text="Incineroar @ Sitrus Berry" label="Copiar set" copiedLabel="¡Copiado!" />
+              </Sample>
+            </Section>
+          )}
+
+          {chapter.sections.some((s) => s.id === "dkgraficas") && (
+            <Section id="dkgraficas" kicker="Datos en vivo" title="Gráficas" lead={<>Gráficas en SVG en línea (cliente, medidas con <code>ResizeObserver</code>): progresión multilínea (<code>DkTrend</code>) con línea base y puntos por resultado, y mapa de calor de actividad (<code>DkHeat</code>).</>}>
+              <Sample title="Progresión" code="<DkTrend lines baseline>" col>
+                <div className="w-full">
+                  <DkTrend
+                    baseline={1500}
+                    lines={[{ values: [1500, 1540, 1520, 1580, 1620, 1600, 1660, 1700], dots: ["win", "win", "loss", "win", "win", "loss", "win", "win"] }]}
+                  />
+                </div>
+              </Sample>
+              <Sample title="Mapa de calor" code="<DkHeat rows cols value>" col>
+                <div className="w-full">
+                  <DkHeat
+                    rows={["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"]}
+                    cols={["0", "4", "8", "12", "16", "20"]}
+                    max={9}
+                    value={(r, c) => (r * 3 + c * 2) % 10}
+                  />
+                </div>
+              </Sample>
+            </Section>
+          )}
+
+          {chapter.sections.some((s) => s.id === "dkestadosvivo") && (
+            <Section id="dkestadosvivo" kicker="Datos en vivo" title="Carga y avisos" lead={<>Estados del datakit: caja vacía discontinua (<code>DkEmpty</code>) y esqueletos de carga (<code>DkSkel</code> · <code>DkSkelList</code>).</>}>
+              <Sample title="Vacío" code="<DkEmpty>" col>
+                <DkEmpty icon="inbox" title="Sin partidas todavía" lead="Registra tu primera sesión para ver estadísticas.">
+                  <Button size="sm" variant="pri">Nueva sesión</Button>
+                </DkEmpty>
+              </Sample>
+              <Sample title="Esqueletos" code="<DkSkel> · <DkSkelList>" col>
+                <DkSkel />
+                <DkSkelList rows={3} />
+              </Sample>
+            </Section>
+          )}
+
+          {/* ── Juegos y Eventos ── */}
+          {chapter.sections.some((s) => s.id === "jgcover") && (
+            <Section id="jgcover" kicker="Juegos y Eventos" title="Portada de juego" lead={<>Tarjeta de juego (<code>GameCard</code>): arte de portada con velo, distintivo activo/inactivo y fecha de alta. Enlaza a <code>/juegos/[id]</code>.</>}>
+              <Sample title="Tarjeta de juego" code="<GameCard game>" grid note={<>Los datos <code>short</code>, <code>events</code>, <code>players</code> y <code>hue</code> aún no están en la API de juegos — aquí van de ejemplo; en la página real se omiten. [aplazado]</>}>
+                <GameCard game={DEMO_GAME} />
+                <GameCard game={{ ...DEMO_GAME, id: 2, title: "Minecraft", active: 0, hue: "hsl(140 45% 55%)", short: "MC", events: 3, players: 820 }} />
+              </Sample>
+            </Section>
+          )}
+
+          {chapter.sections.some((s) => s.id === "gamehero") && (
+            <Section id="gamehero" kicker="Juegos y Eventos" title="Cabecera de juego" lead={<>Cabecera full-bleed de la página de un juego (<code>GameHero</code>): arte de fondo, título/descripción y barra de datos (eventos · antigüedad). <code>children</code> añade los botones de acción. Extraída de <code>/juegos/[id]</code> a <code>ui/events/</code>.</>}>
+              <Sample title="A todo lo ancho" code="<GameHero game eventCount liveCount>" col note={<>La barra usa <code>eventCount</code> (real) + <code>liveCount</code>/<code>players</code>/<code>short</code> (de ejemplo — aún no en la API). [aplazado]</>}>
+                <div className="w-full">
+                  <GameHero game={DEMO_GAME} eventCount={12} liveCount={2}>
+                    <Button variant="pri" icon="trophy">Ver eventos</Button>
+                    <Button icon="settings">Herramientas</Button>
+                  </GameHero>
+                </div>
+              </Sample>
+            </Section>
+          )}
+
+          {chapter.sections.some((s) => s.id === "evcard") && (
+            <Section id="evcard" kicker="Juegos y Eventos" title="Tarjeta de evento" lead={<>Un solo componente <code>EventCard</code> con dos pieles: <em>rejilla</em> y <em>lista</em> (<code>layout=&quot;list&quot;</code>). Raíl y glifo tintados con el hue del juego, cuenta atrás para próximos, recuento y organizador. Enlaza a <code>/eventos/[id]</code>.</>}>
+              <Sample title="Rejilla" code="<EventCard event>" grid note={<>Los datos <code>participants</code>, <code>organizer</code> y <code>hue</code> aún no están en la API de eventos — aquí van con datos de ejemplo; en la página real se omiten hasta que existan. [aplazado]</>}>
+                {DEMO_EVENTS.map((e) => <EventCard key={e.id} event={e} />)}
+              </Sample>
+              <Sample title="Lista" code={`<EventCard event layout="list">`} col>
+                <div className="grid w-full gap-3">
+                  <EventCard event={DEMO_EVENTS[2]} layout="list" />
+                  <EventCard event={DEMO_EVENTS[0]} layout="list" />
+                </div>
+              </Sample>
+            </Section>
+          )}
+
+          {chapter.sections.some((s) => s.id === "evstatus") && (
+            <Section id="evstatus" kicker="Juegos y Eventos" title="Estado y cuenta atrás" lead={<>Los átomos de dato del evento: píldora de estado (<code>EventStatusChip</code>), cuenta atrás (<code>Countdown</code>), organizador (<code>EventOrganizer</code>) y el sello del juego (<code>GameLogo</code>).</>}>
+              <Sample title="Estado" code="<EventStatusChip status label>">
+                <EventStatusChip status="active" label="En curso" />
+                <EventStatusChip status="upcoming" label="Próximo" />
+                <EventStatusChip status="completed" label="Finalizado" />
+                <EventStatusChip status="active" label="En directo" lg />
+              </Sample>
+              <Sample title="Cuenta atrás y sello" code="<Countdown date> · <GameLogo>">
+                <Countdown date="2026-08-01T16:00:00" />
+                <GameLogo label="VGC" hueColor="hsl(18 90% 55%)" />
+                <GameLogo label="MC" hueColor="hsl(140 45% 55%)" size="sm" />
+              </Sample>
+              <Sample title="Organizador" code="<EventOrganizer organizer>" col note={<>Tres papeles: Boffmedia organiza, co-organizado (doble sello) o un tercero en la plataforma. <code>organizer</code> aún no está en la API de eventos. [aplazado]</>}>
+                <div className="flex flex-col items-start gap-3">
+                  <EventOrganizer organizer={{ role: "boffmedia", name: "Boffmedia", avatar: "B" }} />
+                  <EventOrganizer organizer={{ role: "coorg", name: "Liga VGC España", avatar: "L" }} />
+                  <EventOrganizer organizer={{ role: "platform", name: "Smash Barcelona", avatar: "S" }} />
+                </div>
+              </Sample>
+              <Sample title="Organizador · bloque" code={`variant="block"`} col>
+                <div className="grid w-full gap-4">
+                  <EventOrganizer organizer={{ role: "boffmedia", name: "Boffmedia", avatar: "B" }} variant="block" />
+                  <EventOrganizer organizer={{ role: "coorg", name: "Gremio de Cazadores", avatar: "G" }} variant="block" />
+                </div>
+              </Sample>
+            </Section>
+          )}
+
+          {chapter.sections.some((s) => s.id === "evbanner") && (
+            <Section id="evbanner" kicker="Juegos y Eventos" title="Banner de evento" lead={<>Cabecera full-bleed de la página de un evento (<code>EventBanner</code>): arte de fondo, estado + juego, título y descripción. <code>children</code> para inscripción/compartir. Extraída de <code>/eventos/[id]</code> a <code>ui/events/</code>.</>}>
+              <Sample title="A todo lo ancho" code="<EventBanner event>" col>
+                <div className="w-full">
+                  <EventBanner event={DEMO_EVENTS[0]}>
+                    <Button variant="pri" icon="trophy">Inscribirme</Button>
+                    <Button icon="link">Compartir</Button>
+                  </EventBanner>
+                </div>
+              </Sample>
+            </Section>
+          )}
+
+          {chapter.sections.some((s) => s.id === "evlogro") && (
+            <Section id="evlogro" kicker="Juegos y Eventos" title="Logro y progreso" lead={<>Fila de logro/medalla (<code>AchievementItem</code>) con color de rareza. Compartida por el detalle de evento y <code>/logros</code>.</>}>
+              <Sample title="Logros" code="<AchievementItem achievement>" col>
+                <div className="grid gap-2 w-full">
+                  {DEMO_ACHS.map((a) => <AchievementItem key={a.id} achievement={a} showEvent />)}
+                </div>
+              </Sample>
+            </Section>
+          )}
+
+          {chapter.sections.some((s) => s.id === "evlead") && (
+            <Section id="evlead" kicker="Juegos y Eventos" title="Clasificación y podio" lead={<>Fila de clasificación (<code>RankRow</code>) con insignia de posición (<code>Rank</code>): el podio realza las tres primeras. Alimenta <code>/clasificacion</code> y las tablas por evento.</>}>
+              <Sample title="Podio" code="<RankRow> · <Rank>" col>
+                <div className="grid gap-1.5 w-full max-w-[520px]">
+                  <RankRow rank={<Rank>1</Rank>} name="RotomChef" team="Pokémon VGC" pts="2140" unit="pts" top3 />
+                  <RankRow rank={<Rank>2</Rank>} name="WingullMain" team="Pokémon VGC" pts="2088" unit="pts" top3 />
+                  <RankRow rank={<Rank>3</Rank>} name="TeraCaptain" team="Pokémon VGC" pts="1994" unit="pts" top3 />
+                  <RankRow rank={<Rank>4</Rank>} name="LadderGremlin" team="Pokémon VGC" pts="1902" unit="pts" />
+                </div>
+              </Sample>
+            </Section>
+          )}
+
+          {/* ── Legal ── */}
+          {chapter.sections.some((s) => s.id === "doclegal") && (
+            <Section id="doclegal" kicker="Legal" title="Documento legal" lead={<>Documento legal (<code>LegalDoc</code>): índice pegajoso con scroll-spy y secciones numeradas (párrafos + listas). Alimenta <code>/privacidad</code>, <code>/terminos</code> y <code>/cookies</code>.</>}>
+              <Sample title="Documento en vivo" code="<LegalDoc sections>" col note="Vista previa recortada; en la app ocupa la página completa con su propia rejilla e índice pegajoso.">
+                <div className="w-full max-h-[520px] overflow-auto border border-solid border-line [&_main]:!pt-8 [&_main]:!pb-8">
+                  <LegalDoc kicker="Legal · demo" title="Documento de ejemplo" lead="Demostración del componente con datos de ejemplo." updated="Actualizado hoy" sections={DEMO_LEGAL} />
+                </div>
               </Sample>
             </Section>
           )}

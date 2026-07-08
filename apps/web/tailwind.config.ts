@@ -460,6 +460,13 @@ const config: Config = {
         ".cut": {
           clipPath: "polygon(var(--cut) 0, 100% 0, calc(100% - var(--cut)) 100%, 0 100%)",
         },
+        // Chamfered box: top-left + bottom-right corners cut, straight edges (seals,
+        // avatars, icon glyphs, game logos). Unlike `.cut` (a slanted parallelogram
+        // for pills/buttons), this keeps all four sides square.
+        ".cut-seal": {
+          clipPath:
+            "polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut))",
+        },
         ".cut-corner": {
           clipPath: "polygon(0 0, calc(100% - var(--cut-lg)) 0, 100% var(--cut-lg), 100% 100%, 0 100%)",
         },
