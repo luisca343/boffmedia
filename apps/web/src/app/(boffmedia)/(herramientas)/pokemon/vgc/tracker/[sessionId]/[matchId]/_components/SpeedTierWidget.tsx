@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronDown } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { cn } from '@/lib/utils';
+import { Icon } from '@/components/boffmedia/primitives/icon';
 import type { MatchSlot } from '@/features/vgc-tracker/types';
 import { spriteUrl, handleSpriteError } from '@/features/vgc-tracker/types';
 import { useLegalPokemon } from '@/app/(boffmedia)/(herramientas)/pokemon/vgc/damage-calculator/_hooks/useLegalPokemon';
@@ -14,7 +15,6 @@ interface Props {
   regulationId: string;
 }
 
-// EV preset presets for quick selection
 const EV_PRESETS = [
   { label: '0N', evs: 0, nature: 1.0 },
   { label: '0+', evs: 0, nature: 1.1 },
@@ -29,12 +29,8 @@ export function SpeedTierWidget({ slots, regulationId }: Props) {
   const [tailwind, setTailwind] = useState(false);
   const [trickRoom, setTrickRoom] = useState(false);
   const [scarf, setScarf] = useState(false);
-  
-  // Per-slot EV tracking (default 0 EV, neutral nature)
   const [slotEvs, setSlotEvs] = useState<Record<number, number>>({});
   const [slotNatures, setSlotNatures] = useState<Record<number, number>>({});
-  
-  // Opponent speed input and comparison
   const [opponentBaseSpeed, setOpponentBaseSpeed] = useState<number | ''>('');
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
 
@@ -49,56 +45,34 @@ export function SpeedTierWidget({ slots, regulationId }: Props) {
       return { slotIndex: s.slotIndex, name: s.speciesName!, baseSpe, effective, evs, nature };
     })
     .filter((r) => r.baseSpe > 0)
-    .sort((a, b) => trickRoom ? a.effective - b.effective : b.effective - a.effective);
+    .sort((a, b) => (trickRoom ? a.effective - b.effective : b.effective - a.effective));
 
   if (rows.length === 0) return null;
 
   const maxEff = Math.max(...rows.map((r) => r.effective));
   const minEff = Math.min(...rows.map((r) => r.effective));
 
-  // Opponent speed calculation
   let opponentSpeed: number | null = null;
   if (typeof opponentBaseSpeed === 'number' && opponentBaseSpeed > 0) {
     opponentSpeed = applyMods(calcSpeedStat(opponentBaseSpeed, 0, 1.0), { boost: 0, tailwind, scarf, paralysis: false });
   }
 
   return (
-    <div className="mt-3 rounded-lg border border-edge bg-layer-2/60 overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center justify-between px-3 py-1.5 border-b border-edge">
-        <span className="text-[10px] font-semibold text-ink-muted uppercase tracking-wide">
-          {t('speedWidget.label')}
-        </span>
+    <div className="overflow-hidden border border-solid border-line bg-panel">
+      <div className="flex items-center justify-between border-b border-solid border-line px-3 py-[6px]">
+        <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-txt-muted">{t('speedWidget.label')}</span>
       </div>
 
-      {/* Modifiers row */}
-      <div className="flex gap-1 px-3 py-1.5 border-b border-edge">
+      {/* Modifiers */}
+      <div className="flex gap-1 border-b border-solid border-line px-3 py-[6px]">
         <SpeedFlagChips
           className="flex gap-1"
-          buttonClassName="text-[10px] px-1.5 py-0.5 rounded font-mono transition-colors border"
-          inactiveClassName="bg-layer-2 text-ink-muted hover:text-ink border-transparent"
+          buttonClassName="text-[10px] px-[6px] py-[2px] font-mono border border-solid transition-colors"
+          inactiveClassName="bg-base text-txt-muted hover:text-txt border-line-2"
           chips={[
-            {
-              key: 'tailwind',
-              label: tMods('tailwindShort'),
-              title: tMods('tailwind'),
-              active: tailwind,
-              activeClass: 'bg-blue-600/40 text-blue-300 border-blue-600/50',
-            },
-            {
-              key: 'scarf',
-              label: tMods('scarfShort'),
-              title: tMods('scarf'),
-              active: scarf,
-              activeClass: 'bg-orange-600/40 text-orange-300 border-orange-600/50',
-            },
-            {
-              key: 'trickroom',
-              label: t('speedWidget.trickroom'),
-              title: t('speedWidget.trickroom'),
-              active: trickRoom,
-              activeClass: 'bg-violet-600/40 text-violet-300 border-violet-600/50',
-            },
+            { key: 'tailwind', label: tMods('tailwindShort'), title: tMods('tailwind'), active: tailwind, activeClass: 'bg-signal-soft text-signal border-[color-mix(in_srgb,var(--info)_50%,transparent)]' },
+            { key: 'scarf', label: tMods('scarfShort'), title: tMods('scarf'), active: scarf, activeClass: 'bg-accent-soft text-accent-bright border-accent-line' },
+            { key: 'trickroom', label: t('speedWidget.trickroom'), title: t('speedWidget.trickroom'), active: trickRoom, activeClass: 'bg-warn-soft text-warn border-[color-mix(in_srgb,var(--warn)_50%,transparent)]' },
           ]}
           onToggle={(key) => {
             if (key === 'tailwind') setTailwind((v) => !v);
@@ -109,10 +83,8 @@ export function SpeedTierWidget({ slots, regulationId }: Props) {
       </div>
 
       {/* Opponent speed input */}
-      <div className="px-3 py-1.5 border-b border-edge bg-layer-2/40">
-        <label className="text-[10px] font-semibold text-ink-muted uppercase tracking-wide block mb-1">
-          {t('speedWidget.opponentSpeed')}
-        </label>
+      <div className="border-b border-solid border-line px-3 py-[6px]">
+        <label className="mb-1 block font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-txt-muted">{t('speedWidget.opponentSpeed')}</label>
         <input
           type="number"
           min="0"
@@ -120,80 +92,64 @@ export function SpeedTierWidget({ slots, regulationId }: Props) {
           value={opponentBaseSpeed}
           onChange={(e) => setOpponentBaseSpeed(e.target.value === '' ? '' : parseInt(e.target.value, 10))}
           placeholder={t('speedWidget.opponentSpeedPlaceholder')}
-          className="w-full text-xs bg-layer-2 border border-edge rounded px-2 py-1 text-ink placeholder-ink-dim focus:outline-none focus:border-primary"
+          className="w-full border border-solid border-line-2 bg-base px-2 py-1 font-mono text-[12px] text-txt outline-none transition-[border-color] placeholder:text-txt-dim focus:border-accent"
         />
       </div>
 
-      <div className="px-3 py-1 text-[10px] text-ink-muted border-b border-edge bg-layer-2/20">
-        {t('speedWidget.presetHint')}
-      </div>
+      <div className="border-b border-solid border-line px-3 py-1 font-mono text-[10px] text-txt-dim">{t('speedWidget.presetHint')}</div>
 
-      {/* Your team rows */}
+      {/* Rows */}
       {rows.map((row, i) => {
         const isFirst = i === 0;
         const isLast = i === rows.length - 1;
         const barPct = maxEff > minEff ? ((row.effective - minEff) / (maxEff - minEff)) * 100 : 100;
-        const nameColor = isFirst ? 'text-green-400' : isLast ? 'text-orange-400' : 'text-ink';
-        
-        // Comparison with opponent
+        const nameColor = isFirst ? 'text-ok' : isLast ? 'text-warn' : 'text-txt';
         const comparisonResult = opponentSpeed ? compareSpeed(row.effective, opponentSpeed) : null;
-        const comparisonColor = comparisonResult === 'faster' ? 'text-green-400' : comparisonResult === 'tie' ? 'text-yellow-400' : 'text-red-400';
+        const comparisonColor = comparisonResult === 'faster' ? 'text-ok' : comparisonResult === 'tie' ? 'text-warn' : 'text-bad';
 
         return (
           <div key={row.slotIndex}>
-            {/* Speed row */}
             <div
               onClick={() => setSelectedSlot(selectedSlot === row.slotIndex ? null : row.slotIndex)}
-              className="relative flex items-center gap-2 px-3 py-1 cursor-pointer hover:bg-layer-2/30 transition-colors group"
+              className="group relative flex cursor-pointer items-center gap-2 px-3 py-1 transition-colors hover:bg-panel-2"
             >
-              {/* relative speed bar */}
-              <div
-                className="absolute inset-y-0 left-0 bg-layer-3/30"
-                style={{ width: `${barPct}%` }}
-              />
-              <img
-                src={spriteUrl(row.name)}
-                alt=""
-                className="relative w-6 h-6 object-contain shrink-0"
-                onError={handleSpriteError}
-              />
-              <div className="relative flex-1 min-w-0">
-                <div className="flex items-center gap-1.5 min-w-0">
-                  <span className={`text-xs truncate ${nameColor}`}>{row.name}</span>
-                  <span className="shrink-0 text-[9px] text-ink-muted bg-layer-2/70 border border-edge rounded px-1 py-px font-mono">
+              <div className="absolute inset-y-0 left-0 bg-panel-2" style={{ width: `${barPct}%` }} />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={spriteUrl(row.name)} alt="" className="relative h-6 w-6 shrink-0 object-contain" onError={handleSpriteError} />
+              <div className="relative min-w-0 flex-1">
+                <div className="flex min-w-0 items-center gap-[6px]">
+                  <span className={cn('truncate text-[12px]', nameColor)}>{row.name}</span>
+                  <span className="shrink-0 border border-solid border-line-2 bg-base px-1 py-px font-mono text-[9px] text-txt-muted">
                     {row.evs}/{row.nature === 1.1 ? '+' : 'N'}
                   </span>
                 </div>
               </div>
-              <span className="relative text-xs font-mono shrink-0 tabular-nums text-ink-muted">
-                {row.effective}
-              </span>
+              <span className="relative shrink-0 font-mono text-[12px] tabular-nums text-txt-muted">{row.effective}</span>
               {opponentSpeed !== null && (
-                <span className={`relative text-[10px] font-mono shrink-0 tabular-nums ${comparisonColor}`}>
+                <span className={cn('relative shrink-0 font-mono text-[10px] tabular-nums', comparisonColor)}>
                   {comparisonResult === 'faster' ? '+' : comparisonResult === 'tie' ? '=' : ''}
                   {opponentSpeed}
                 </span>
               )}
-              {selectedSlot === row.slotIndex && (
-                <ChevronDown size={14} className="relative text-ink-muted group-hover:text-ink" />
-              )}
+              {selectedSlot === row.slotIndex && <Icon name="chevronDown" size={14} className="relative text-txt-muted" />}
             </div>
 
-            {/* EV preset picker (shown when row is clicked) */}
             {selectedSlot === row.slotIndex && (
-              <div className="px-3 py-2 bg-layer-3/30 border-t border-edge flex flex-wrap gap-1">
+              <div className="flex flex-wrap gap-1 border-t border-solid border-line bg-base px-3 py-2">
                 {EV_PRESETS.map((preset) => (
                   <button
                     key={preset.label}
+                    type="button"
                     onClick={() => {
                       setSlotEvs({ ...slotEvs, [row.slotIndex]: preset.evs });
                       setSlotNatures({ ...slotNatures, [row.slotIndex]: preset.nature });
                     }}
-                    className={`text-[10px] px-2 py-0.5 rounded font-mono transition-colors ${
+                    className={cn(
+                      'border border-solid px-2 py-[2px] font-mono text-[10px] transition-colors',
                       row.evs === preset.evs && row.nature === preset.nature
-                        ? 'bg-primary-active/40 text-primary-hover border border-primary-active/50'
-                        : 'bg-layer-3 text-ink-muted hover:text-ink border border-transparent'
-                    }`}
+                        ? 'border-accent-line bg-accent-soft text-accent-bright'
+                        : 'border-line-2 bg-panel text-txt-muted hover:text-txt',
+                    )}
                   >
                     {preset.label}
                   </button>

@@ -1,7 +1,0 @@
-export { VgcUsageSidebar } from "./usage-sidebar"
-export { VgcPokemonDetail } from "./pokemon-detail"
-export { VgcTeamRow } from "./team-row"
-export { EvSpread } from "./spread"
-export { VgcStandingsView } from "./standings-view"
-export { VgcDivergenceView } from "./divergence-view"
-export { STAT_META, STAT_ORDER, NATURE_CHANGES, TYPE_COLORS, fmtCount, type PokeData, type UsageEntry, type PlayerEntry, type TeamSlot, type Format, type TourReg, type DivergenceResult, type DivergenceRow } from "./meta-data"

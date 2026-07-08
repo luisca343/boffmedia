@@ -1,96 +1,81 @@
 'use client';
 
 import { useRef } from 'react';
-import { X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { cn } from '@/lib/utils';
+import { Icon } from '@/components/boffmedia/primitives/icon';
 import { spriteUrl, handleSpriteError, SpeciesEntry, isLead, isBack } from '@/features/vgc-tracker/types';
 import type { MatchSlot, SlotRole } from '@/features/vgc-tracker/types';
+import { cssVars } from '@/components/boffmedia/ui/tools/datakit';
 import { PokemonAutocomplete, PokemonAutocompleteHandle } from './PokemonAutocomplete';
 
 interface Props {
   label: string;
   slots: MatchSlot[];
   editable?: boolean;
+  /** Accent color (CSS value) for the panel top-border + labels. */
+  tone?: string;
   search?: (query: string) => SpeciesEntry[];
   onSlotChange: (updated: MatchSlot[]) => void;
 }
 
-// Ordered role sequence for the 4 assignment slots
 const ROLE_ORDER: Exclude<SlotRole, 'unknown'>[] = ['lead1', 'lead2', 'back1', 'back2'];
 
-export function TeamPanel({ label, slots, editable = false, search, onSlotChange }: Props) {
+export function TeamPanel({ label, slots, editable = false, tone = 'var(--accent-bright)', search, onSlotChange }: Props) {
+  const t = useTranslations('vgc.tracker');
   const leads = slots.filter((s) => isLead(s.role));
   const backs = slots.filter((s) => isBack(s.role));
+  const autocompleteRefs = useRef<(PokemonAutocompleteHandle | null)[]>(Array(6).fill(null));
 
-  // Click on an unassigned pool pokemon → fills the next available ordered position.
   const assign = (slotIndex: number) => {
     const slot = slots.find((s) => s.slotIndex === slotIndex);
     if (!slot?.speciesId || slot.role !== 'unknown') return;
-
-    const usedRoles = new Set(slots.filter(s => s.role !== 'unknown').map(s => s.role));
-    const nextRole = ROLE_ORDER.find(r => !usedRoles.has(r)) ?? null;
+    const usedRoles = new Set(slots.filter((s) => s.role !== 'unknown').map((s) => s.role));
+    const nextRole = ROLE_ORDER.find((r) => !usedRoles.has(r)) ?? null;
     if (!nextRole) return;
-
     onSlotChange(slots.map((s) => (s.slotIndex === slotIndex ? { ...s, role: nextRole } : s)));
   };
 
-  // Click × on an assignment slot → shift-down: positions after the removed one move up by 1.
-  // e.g. remove lead1 → lead2 becomes lead1, back1 becomes lead2, back2 becomes back1
   const unassign = (slotIndex: number) => {
     const removed = slots.find((s) => s.slotIndex === slotIndex);
     if (!removed || removed.role === 'unknown') return;
-
     const pos = ROLE_ORDER.indexOf(removed.role as Exclude<SlotRole, 'unknown'>);
-
-    // Build map: slotIndex → new role after shift
     const updates = new Map<number, SlotRole>();
     updates.set(slotIndex, 'unknown');
-
-    // Slots at positions after `pos` shift down by 1
     for (let i = pos + 1; i < ROLE_ORDER.length; i++) {
-      const shiftedSlot = slots.find(s => s.role === ROLE_ORDER[i]);
+      const shiftedSlot = slots.find((s) => s.role === ROLE_ORDER[i]);
       if (shiftedSlot) updates.set(shiftedSlot.slotIndex, ROLE_ORDER[i - 1]);
     }
-
-    onSlotChange(slots.map((s) => updates.has(s.slotIndex) ? { ...s, role: updates.get(s.slotIndex)! } : s));
+    onSlotChange(slots.map((s) => (updates.has(s.slotIndex) ? { ...s, role: updates.get(s.slotIndex)! } : s)));
   };
 
   const fillSpecies = (slotIndex: number, entry: SpeciesEntry) => {
-    onSlotChange(
-      slots.map((s) =>
-        s.slotIndex === slotIndex ? { ...s, speciesId: entry.id, speciesName: entry.name } : s,
-      ),
-    );
-    // Auto-advance: focus the first remaining empty slot after filling
+    onSlotChange(slots.map((s) => (s.slotIndex === slotIndex ? { ...s, speciesId: entry.id, speciesName: entry.name } : s)));
     if (editable) {
-      const next = slots
-        .filter((s) => !s.speciesId && s.slotIndex !== slotIndex)
-        .sort((a, b) => a.slotIndex - b.slotIndex)[0];
-      if (next !== undefined) {
-        setTimeout(() => autocompleteRefs.current[next.slotIndex]?.focusInput(), 0);
-      }
+      const next = slots.filter((s) => !s.speciesId && s.slotIndex !== slotIndex).sort((a, b) => a.slotIndex - b.slotIndex)[0];
+      if (next !== undefined) setTimeout(() => autocompleteRefs.current[next.slotIndex]?.focusInput(), 0);
     }
   };
 
   const clearSpecies = (slotIndex: number) => {
     onSlotChange(
-      slots.map((s) =>
-        s.slotIndex === slotIndex
-          ? { ...s, speciesId: null, speciesName: null, role: 'unknown' as const }
-          : s,
-      ),
+      slots.map((s) => (s.slotIndex === slotIndex ? { ...s, speciesId: null, speciesName: null, role: 'unknown' as const } : s)),
     );
   };
 
   const allAssigned = leads.length >= 2 && backs.length >= 2;
-  const filledRoles = new Set(slots.filter(s => s.role !== 'unknown').map(s => s.role));
-  const autocompleteRefs = useRef<(PokemonAutocompleteHandle | null)[]>(Array(6).fill(null));
+  const filledRoles = new Set(slots.filter((s) => s.role !== 'unknown').map((s) => s.role));
 
   return (
-    <div className="flex flex-col gap-3 min-w-0">
-      <span className="text-xs font-semibold text-ink-muted uppercase tracking-wide">{label}</span>
+    <div
+      style={cssVars({ '--trc': tone, borderTopColor: tone })}
+      className="grid min-w-0 gap-[11px] border border-solid border-line border-t-[3px] bg-panel px-4 py-[14px]"
+    >
+      <span className="font-mono text-[10px] font-bold uppercase leading-none tracking-[0.14em]" style={{ color: tone }}>
+        {label}
+      </span>
 
-      {/* ── Team pool (3 × 2 grid) ─────────────────────────────────────── */}
+      {/* Team pool (3 × 2 grid) */}
       <div className="grid grid-cols-3 gap-2">
         {slots.map((slot) => (
           <PoolCard
@@ -98,45 +83,45 @@ export function TeamPanel({ label, slots, editable = false, search, onSlotChange
             slot={slot}
             editable={editable}
             search={search}
-            canAssign={!allAssigned && slot.role === 'unknown' && !!slot.speciesId && ROLE_ORDER.some(r => !filledRoles.has(r))}
+            canAssign={!allAssigned && slot.role === 'unknown' && !!slot.speciesId && ROLE_ORDER.some((r) => !filledRoles.has(r))}
             onAssign={() => assign(slot.slotIndex)}
             onFill={(entry) => fillSpecies(slot.slotIndex, entry)}
             onClear={() => clearSpecies(slot.slotIndex)}
-            autocompleteRef={(el) => { autocompleteRefs.current[slot.slotIndex] = el; }}
-            onTabNext={editable ? () => {
-              const next = slots
-                .filter((s) => !s.speciesId && s.slotIndex > slot.slotIndex)
-                .sort((a, b) => a.slotIndex - b.slotIndex)[0];
-              if (next !== undefined) autocompleteRefs.current[next.slotIndex]?.focusInput();
-            } : undefined}
+            autocompleteRef={(el) => {
+              autocompleteRefs.current[slot.slotIndex] = el;
+            }}
+            onTabNext={
+              editable
+                ? () => {
+                    const next = slots
+                      .filter((s) => !s.speciesId && s.slotIndex > slot.slotIndex)
+                      .sort((a, b) => a.slotIndex - b.slotIndex)[0];
+                    if (next !== undefined) autocompleteRefs.current[next.slotIndex]?.focusInput();
+                  }
+                : undefined
+            }
           />
         ))}
       </div>
 
-      {/* ── Assignment zones ──────────────────────────────────────────── */}
+      {/* Assignment zones */}
       <div className="grid grid-cols-2 gap-2">
         <AssignmentZone
           role="lead"
-          filled={[
-            slots.find(s => s.role === 'lead1') ?? null,
-            slots.find(s => s.role === 'lead2') ?? null,
-          ]}
+          label={t('zones.leads')}
+          filled={[slots.find((s) => s.role === 'lead1') ?? null, slots.find((s) => s.role === 'lead2') ?? null]}
           onRemove={unassign}
         />
         <AssignmentZone
           role="back"
-          filled={[
-            slots.find(s => s.role === 'back1') ?? null,
-            slots.find(s => s.role === 'back2') ?? null,
-          ]}
+          label={t('zones.backs')}
+          filled={[slots.find((s) => s.role === 'back1') ?? null, slots.find((s) => s.role === 'back2') ?? null]}
           onRemove={unassign}
         />
       </div>
     </div>
   );
 }
-
-// ─── Pool card ────────────────────────────────────────────────────────────────
 
 function PoolCard({
   slot,
@@ -160,18 +145,18 @@ function PoolCard({
   onTabNext?: () => void;
 }) {
   const t = useTranslations('vgc.tracker');
-  // Empty slot
+
   if (!slot.speciesId) {
     if (editable && search) {
       return (
-        <div className="h-[76px] rounded-lg border border-dashed border-edge flex items-center justify-center p-2 overflow-visible">
+        <div className="flex h-[76px] items-center justify-center overflow-visible border border-dashed border-line-2 p-2">
           <PokemonAutocomplete ref={autocompleteRef} search={search} onSelect={onFill} placeholder={t('placeholders.typeName')} onTabNext={onTabNext} />
         </div>
       );
     }
     return (
-      <div className="h-[76px] rounded-lg border border-dashed border-edge flex items-center justify-center">
-        <span className="text-ink-dim text-xl select-none">?</span>
+      <div className="flex h-[76px] items-center justify-center border border-dashed border-line-2">
+        <span className="select-none text-xl text-txt-dim">?</span>
       </div>
     );
   }
@@ -181,58 +166,46 @@ function PoolCard({
   return (
     <div className="relative h-[76px]">
       <button
+        type="button"
         onClick={isAssigned ? undefined : canAssign ? onAssign : undefined}
         disabled={isAssigned || !canAssign}
-        className={[
-          'w-full h-full rounded-lg flex flex-col items-center justify-center gap-0.5 transition-all',
+        className={cn(
+          'flex h-full w-full flex-col items-center justify-center gap-[2px] border border-solid border-line bg-base transition-all',
           isAssigned
-            ? 'opacity-35 cursor-default bg-layer-2 ring-1 ring-edge'
+            ? 'cursor-default opacity-35'
             : canAssign
-            ? 'cursor-pointer bg-layer-2 ring-1 ring-edge hover:ring-2 hover:ring-primary/60 hover:bg-layer-2 hover:opacity-90'
-            : 'opacity-50 cursor-not-allowed bg-layer-2 ring-1 ring-edge',
-        ].join(' ')}
-        title={
-          isAssigned
-            ? t('tooltips.assignedSlot', { role: slot.role })
-            : canAssign
-            ? t('tooltips.assignSlot')
-            : t('tooltips.slotsFull')
-        }
+              ? 'cursor-pointer hover:border-accent hover:opacity-90'
+              : 'cursor-not-allowed opacity-50',
+        )}
+        title={isAssigned ? t('tooltips.assignedSlot', { role: slot.role }) : canAssign ? t('tooltips.assignSlot') : t('tooltips.slotsFull')}
       >
-        <img
-          src={spriteUrl(slot.speciesName!)}
-          alt={slot.speciesName ?? ''}
-          className="w-10 h-10 object-contain pointer-events-none"
-          onError={handleSpriteError}
-        />
-        <span className="text-xs text-ink truncate max-w-full px-1 leading-none">
-          {slot.speciesName}
-        </span>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={spriteUrl(slot.speciesName!)} alt={slot.speciesName ?? ''} className="pointer-events-none h-10 w-10 object-contain" onError={handleSpriteError} />
+        <span className="max-w-full truncate px-1 font-body text-[11px] leading-none text-txt">{slot.speciesName}</span>
       </button>
 
-      {/* Role badge on assigned cards */}
       {isAssigned && (
         <span
-          className={[
-            'absolute top-1 right-1 text-[9px] font-bold rounded px-1 py-px pointer-events-none',
+          className="pointer-events-none absolute right-1 top-1 border border-solid px-1 py-px font-mono text-[9px] font-bold leading-none"
+          style={
             isLead(slot.role)
-              ? 'bg-yellow-400/20 text-yellow-300 border border-yellow-400/30'
-              : 'bg-blue-400/20 text-blue-300 border border-blue-400/30',
-          ].join(' ')}
+              ? { color: 'var(--accent-bright)', background: 'var(--accent-soft)', borderColor: 'var(--accent-line)' }
+              : { color: 'var(--info)', background: 'var(--info-soft)', borderColor: 'color-mix(in srgb, var(--info) 40%, transparent)' }
+          }
         >
           {isLead(slot.role) ? 'L' : 'B'}
         </span>
       )}
 
-      {/* Remove-from-team button (editable, unassigned only) */}
       {editable && !isAssigned && (
         <button
+          type="button"
           tabIndex={-1}
           onClick={(e) => {
             e.stopPropagation();
             onClear();
           }}
-          className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-layer-3 hover:bg-red-500 text-ink hover:text-white flex items-center justify-center text-[10px] font-bold leading-none transition-colors"
+          className="absolute -right-1.5 -top-1.5 grid h-4 w-4 place-items-center border border-solid border-line-2 bg-panel-2 text-[10px] font-bold leading-none text-txt transition-colors hover:border-bad hover:bg-bad hover:text-white"
           title={t('tooltips.removeFromTeam')}
         >
           ×
@@ -242,81 +215,56 @@ function PoolCard({
   );
 }
 
-// ─── Assignment zone (Leads / Backs) ─────────────────────────────────────────
-
-const ZONE = {
-  lead: {
-    labelKey: 'zones.leads' as const,
-    counter: 'text-yellow-400',
-    ring: 'ring-yellow-400/50',
-    emptyBorder: 'border-yellow-400/15',
-    badge: 'bg-yellow-400/10 text-yellow-300/60',
-  },
-  back: {
-    labelKey: 'zones.backs' as const,
-    counter: 'text-blue-400',
-    ring: 'ring-blue-400/50',
-    emptyBorder: 'border-blue-400/15',
-    badge: 'bg-blue-400/10 text-blue-300/60',
-  },
-} as const;
-
 function AssignmentZone({
   role,
+  label,
   filled,
   onRemove,
 }: {
   role: 'lead' | 'back';
+  label: string;
   filled: [MatchSlot | null, MatchSlot | null];
   onRemove: (slotIndex: number) => void;
 }) {
   const t = useTranslations('vgc.tracker');
-  const cfg = ZONE[role];
-  const isFull = filled.filter(Boolean).length >= 2;
+  const tone = role === 'lead' ? 'var(--accent-bright)' : 'var(--info)';
+  const count = filled.filter(Boolean).length;
 
   return (
     <div className="flex flex-col gap-1">
-      <div className="flex items-center justify-between px-0.5">
-        <span className={`text-[10px] font-semibold uppercase tracking-wide ${cfg.badge}`}>
-          {t(cfg.labelKey)}
+      <div className="flex items-center justify-between px-[2px]">
+        <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: tone }}>
+          {label}
         </span>
-        <span className={`text-[10px] font-mono ${isFull ? cfg.counter : 'text-ink-dim'}`}>
-          {filled.filter(Boolean).length}/2
+        <span className="font-mono text-[10px]" style={{ color: count >= 2 ? tone : 'var(--dim)' }}>
+          {count}/2
         </span>
       </div>
-
       <div className="flex gap-2">
         {[0, 1].map((i) => {
           const slot = filled[i] ?? null;
           return slot ? (
             <div
               key={slot.slotIndex}
-              className={`flex-1 relative rounded-lg bg-layer-2 ring-2 ${cfg.ring} flex flex-col items-center justify-center gap-0.5 py-1 min-h-[56px]`}
+              className="relative flex min-h-[56px] flex-1 flex-col items-center justify-center gap-[2px] border border-solid bg-base py-1"
+              style={{ borderColor: tone }}
             >
-              <img
-                src={spriteUrl(slot.speciesName!)}
-                alt={slot.speciesName ?? ''}
-                className="w-8 h-8 object-contain"
-                onError={handleSpriteError}
-              />
-              <span className="text-[9px] text-ink-muted truncate max-w-full px-1 leading-none">
-                {slot.speciesName}
-              </span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={spriteUrl(slot.speciesName!)} alt={slot.speciesName ?? ''} className="h-8 w-8 object-contain" onError={handleSpriteError} />
+              <span className="max-w-full truncate px-1 font-body text-[9px] leading-none text-txt-muted">{slot.speciesName}</span>
               <button
+                type="button"
                 tabIndex={-1}
                 onClick={() => onRemove(slot.slotIndex)}
-                className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-layer-3 hover:bg-red-500 text-ink hover:text-white flex items-center justify-center transition-colors"
+                className="absolute -right-2 -top-2 grid h-5 w-5 place-items-center border border-solid border-line-2 bg-panel-2 text-txt transition-colors hover:border-bad hover:bg-bad hover:text-white"
                 title={t('tooltips.removeFromSlot')}
               >
-                <X size={11} />
+                <Icon name="x" size={11} />
               </button>
             </div>
           ) : (
-            <div
-              key={`empty-${i}`}
-              className={`flex-1 rounded-lg border border-dashed ${cfg.emptyBorder} flex items-center justify-center min-h-[56px]`}
-            >
-              <span className="text-ink-dim text-[10px]">—</span>
+            <div key={`empty-${i}`} className="flex min-h-[56px] flex-1 items-center justify-center border border-dashed border-line-2">
+              <span className="text-[10px] text-txt-dim">—</span>
             </div>
           );
         })}

@@ -1,9 +1,10 @@
-'use client';
+"use client"
 
-import { useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { Download, Upload, X } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useRef, useState } from "react"
+import { useTranslations } from "next-intl"
+import { cn } from "@/lib/utils"
+import { Modal } from "@/components/boffmedia/primitives/modal"
+import { Icon, type IconName } from "@/components/boffmedia/primitives/icon"
 import {
   downloadJson,
   exportAll,
@@ -11,127 +12,131 @@ import {
   importData,
   parseExportFile,
   type ImportResult,
-} from '@/features/vgc-tracker/utils/exportImport';
-import { useTrackerSync } from '@/features/vgc-tracker/context/TrackerSyncContext';
+} from "@/features/vgc-tracker/utils/exportImport"
+import { useTrackerSync } from "@/features/vgc-tracker/context/TrackerSyncContext"
 
 interface Props {
-  sessionId?: string;
-  sessionLabel?: string;
-  onImportDone: () => void;
-  onClose: () => void;
+  sessionId?: string
+  sessionLabel?: string
+  onImportDone: () => void
+  onClose: () => void
+}
+
+function ActionRow({
+  icon,
+  iconClass,
+  title,
+  hint,
+  disabled,
+  onClick,
+}: {
+  icon: IconName
+  iconClass: string
+  title: React.ReactNode
+  hint?: React.ReactNode
+  disabled?: boolean
+  onClick: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className="flex w-full items-center gap-[10px] border border-solid border-line bg-base px-[13px] py-[11px] text-left transition-[border-color,background] hover:border-line-2 hover:bg-panel-2 disabled:opacity-50"
+    >
+      <Icon name={icon} size={16} className={cn("flex-none", iconClass)} />
+      <span className="grid min-w-0">
+        <span className="font-body text-[13px] text-txt">{title}</span>
+        {hint && <span className="truncate font-mono text-[11px] text-txt-dim">{hint}</span>}
+      </span>
+    </button>
+  )
 }
 
 export function ExportImportDialog({ sessionId, sessionLabel, onImportDone, onClose }: Props) {
-  const t = useTranslations('vgc.tracker');
-  const { pushChange } = useTrackerSync();
-  const fileRef = useRef<HTMLInputElement>(null);
-  const [busy, setBusy] = useState(false);
-  const [result, setResult] = useState<ImportResult | null>(null);
-  const [importError, setImportError] = useState('');
+  const t = useTranslations("vgc.tracker")
+  const { pushChange } = useTrackerSync()
+  const fileRef = useRef<HTMLInputElement>(null)
+  const [busy, setBusy] = useState(false)
+  const [result, setResult] = useState<ImportResult | null>(null)
+  const [importError, setImportError] = useState("")
 
   const handleExportSession = async () => {
-    if (!sessionId) return;
-    setBusy(true);
+    if (!sessionId) return
+    setBusy(true)
     try {
-      const data = await exportSession(sessionId);
-      const label = sessionLabel?.replace(/[^a-z0-9]/gi, '_') ?? 'session';
-      downloadJson(data, `vgc_session_${label}.json`);
+      const data = await exportSession(sessionId)
+      const label = sessionLabel?.replace(/[^a-z0-9]/gi, "_") ?? "session"
+      downloadJson(data, `vgc_session_${label}.json`)
     } finally {
-      setBusy(false);
+      setBusy(false)
     }
-  };
+  }
 
   const handleExportAll = async () => {
-    setBusy(true);
+    setBusy(true)
     try {
-      const data = await exportAll();
-      downloadJson(data, `vgc_tracker_backup_${new Date().toISOString().slice(0, 10)}.json`);
+      const data = await exportAll()
+      downloadJson(data, `vgc_tracker_backup_${new Date().toISOString().slice(0, 10)}.json`)
     } finally {
-      setBusy(false);
+      setBusy(false)
     }
-  };
+  }
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    e.target.value = '';
-    setBusy(true);
-    setImportError('');
-    setResult(null);
+    const file = e.target.files?.[0]
+    if (!file) return
+    e.target.value = ""
+    setBusy(true)
+    setImportError("")
+    setResult(null)
     try {
-      const text = await file.text();
-      const data = parseExportFile(text);
-      const res = await importData(data, (table, id, entity) => {
-        pushChange(table, id, entity);
-      });
-      setResult(res);
-      onImportDone();
+      const text = await file.text()
+      const data = parseExportFile(text)
+      const res = await importData(data, (table, id, entity) => pushChange(table, id, entity))
+      setResult(res)
+      onImportDone()
     } catch {
-      setImportError(t('exportImport.importError'));
+      setImportError(t("exportImport.importError"))
     } finally {
-      setBusy(false);
+      setBusy(false)
     }
-  };
+  }
 
-  return createPortal(
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-layer-1 border border-edge rounded-xl w-full max-w-sm mx-4 shadow-2xl">
-        <div className="flex items-center justify-between p-4 border-b border-edge">
-          <h2 className="font-semibold text-ink">{t('exportImport.title')}</h2>
-          <button onClick={onClose} className="text-ink-muted hover:text-ink transition-colors">
-            <X size={18} />
-          </button>
-        </div>
-
-        <div className="p-4 flex flex-col gap-3">
-          {/* Export */}
-          <div className="flex flex-col gap-2">
-            {sessionId && (
-              <button
-                onClick={handleExportSession}
-                disabled={busy}
-                className="flex items-center gap-2 w-full px-3 py-2.5 rounded-lg bg-layer-2 border border-edge hover:border-edge text-ink text-sm transition-colors disabled:opacity-50"
-              >
-                <Download size={15} className="text-primary-hover shrink-0" />
-                <span>{t('exportImport.exportSession')}</span>
-                {sessionLabel && <span className="text-ink-muted truncate">— {sessionLabel}</span>}
-              </button>
-            )}
-            <button
-              onClick={handleExportAll}
-              disabled={busy}
-              className="flex items-center gap-2 w-full px-3 py-2.5 rounded-lg bg-layer-2 border border-edge hover:border-edge text-ink text-sm transition-colors disabled:opacity-50"
-            >
-              <Download size={15} className="text-primary-hover shrink-0" />
-              <span>{t('exportImport.exportAll')}</span>
-            </button>
-          </div>
-
-          <div className="border-t border-edge" />
-
-          {/* Import */}
-          <input ref={fileRef} type="file" accept=".json" className="hidden" onChange={handleFileChange} />
-          <button
-            onClick={() => fileRef.current?.click()}
+  return (
+    <Modal open onClose={onClose} title={t("exportImport.title")} size="sm">
+      <div className="grid gap-3">
+        {sessionId && (
+          <ActionRow
+            icon="download"
+            iconClass="text-accent-bright"
+            title={t("exportImport.exportSession")}
+            hint={sessionLabel ? `— ${sessionLabel}` : undefined}
             disabled={busy}
-            className="flex items-center gap-2 w-full px-3 py-2.5 rounded-lg bg-layer-2 border border-edge hover:border-edge text-ink text-sm transition-colors disabled:opacity-50"
-          >
-            <Upload size={15} className="text-amber-400 shrink-0" />
-            <div className="text-left">
-              <span className="block">{t('exportImport.importFile')}</span>
-              <span className="text-ink-muted text-xs">{t('exportImport.importHint')}</span>
-            </div>
-          </button>
+            onClick={handleExportSession}
+          />
+        )}
+        <ActionRow icon="download" iconClass="text-accent-bright" title={t("exportImport.exportAll")} disabled={busy} onClick={handleExportAll} />
 
-          {result && (
-            <p className="text-green-400 text-xs text-center">
-              {t('exportImport.importSuccess', { sessions: result.sessions, matches: result.matches })}
-            </p>
-          )}
-          {importError && <p className="text-red-400 text-xs text-center">{importError}</p>}
-        </div>
+        <div className="border-t border-solid border-line" />
+
+        <input ref={fileRef} type="file" accept=".json" className="hidden" onChange={handleFileChange} />
+        <ActionRow
+          icon="inbox"
+          iconClass="text-warn"
+          title={t("exportImport.importFile")}
+          hint={t("exportImport.importHint")}
+          disabled={busy}
+          onClick={() => fileRef.current?.click()}
+        />
+
+        {result && (
+          <p className="text-center font-mono text-[11px] text-ok">
+            {t("exportImport.importSuccess", { sessions: result.sessions, matches: result.matches })}
+          </p>
+        )}
+        {importError && <p className="text-center font-mono text-[11px] text-bad">{importError}</p>}
       </div>
-    </div>,
-    document.body,
-  );
+    </Modal>
+  )
 }

@@ -39,7 +39,7 @@ export const pokemon: GameEntry = {
       tools: [
         { key: "meta",    nameKey: "games.pokemon.tools.meta",    href: "/pokemon/vgc/meta",    sidebarIcon: "chart", bleed: true },
         { key: "speed",   nameKey: "games.pokemon.tools.speed",   href: "/pokemon/vgc/speed",   sidebarIcon: "bolt" },
-        { key: "tracker", nameKey: "games.pokemon.tools.tracker", href: "/pokemon/vgc/tracker", sidebarIcon: "book", bleed: 2 },
+        { key: "tracker", nameKey: "games.pokemon.tools.tracker", href: "/pokemon/vgc/tracker", sidebarIcon: "book", bleed: true },
         // Not in the sidebar or landing yet (v3 migration pending) — the entry
         // exists so the shell knows the route renders full-bleed.
         { key: "damageCalc", nameKey: "games.pokemon.tools.damageCalc", href: "/pokemon/vgc/damage-calculator", sidebarIcon: "calc", showInSidebar: false, bleed: true },

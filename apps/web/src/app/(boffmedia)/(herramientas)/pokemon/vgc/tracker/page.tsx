@@ -1,24 +1,35 @@
-'use client';
+"use client"
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { Archive, Copy, Database, Layers, Plus, Swords, TrendingUp, Trophy } from 'lucide-react';
-import { useTranslations } from 'next-intl';
-import { useSessions, usePresets } from '@/features/vgc-tracker/hooks/useVgcDb';
-import { Card } from '@/components/ui/primitives/card';
-import { NewSessionDialog } from './_components/NewSessionDialog';
-import { PresetManager } from './_components/PresetManager';
-import { DuplicateSessionDialog } from './_components/DuplicateSessionDialog';
-import { ExportImportDialog } from './_components/ExportImportDialog';
-import type { Session } from '@/features/vgc-tracker/types';
+import { useMemo, useState } from "react"
+import { useTranslations } from "next-intl"
+import {
+  DkApp,
+  DkBar,
+  DkBody,
+  DkDivider,
+  DkEmpty,
+  DkSeg,
+  DkSearch,
+  DkSkelList,
+  DkSpacer,
+  DkStat,
+  DkTitle,
+} from "@/components/boffmedia/ui/tools/datakit"
+import { Button } from "@/components/boffmedia/primitives/button"
+import { Icon } from "@/components/boffmedia/primitives/icon"
+import { useSessions, usePresets } from "@/features/vgc-tracker/hooks/useVgcDb"
+import type { Session } from "@/features/vgc-tracker/types"
+import { TrSessionRow } from "./_components/TrSessionRow"
+import { careerFromSummaries, useSessionSummaries } from "./_components/useSessionSummaries"
+import { NewSessionDialog } from "./_components/NewSessionDialog"
+import { PresetManager } from "./_components/PresetManager"
+import { DuplicateSessionDialog } from "./_components/DuplicateSessionDialog"
+import { ExportImportDialog } from "./_components/ExportImportDialog"
 
-function formatDate(ts: number) {
-  return new Date(ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
-}
+type Filter = "all" | "ladder" | "tournament"
 
-export default function TrackerPage() {
-  const t = useTranslations('vgc.tracker');
+export default function TrackerHomePage() {
+  const t = useTranslations("vgc.tracker")
   const {
     sessions,
     archivedSessions,
@@ -28,247 +39,163 @@ export default function TrackerPage() {
     archive: archiveSession,
     unarchive: unarchiveSession,
     refresh: refreshSessions,
-  } = useSessions();
-  const { presets, save: savePreset, remove: removePreset } = usePresets();
+  } = useSessions()
+  const { presets, save: savePreset, remove: removePreset } = usePresets()
 
-  const [showNewSession, setShowNewSession] = useState(false);
-  const [showPresets, setShowPresets] = useState(false);
-  const [showArchived, setShowArchived] = useState(false);
-  const [duplicating, setDuplicating] = useState<Session | null>(null);
-  const [showExportImport, setShowExportImport] = useState(false);
+  const allSessions = useMemo(() => [...sessions, ...archivedSessions], [sessions, archivedSessions])
+  const summaries = useSessionSummaries(allSessions)
+  const career = useMemo(() => careerFromSummaries(allSessions, summaries), [allSessions, summaries])
 
-  const handleCreateSession = async (data: Omit<Session, 'id' | 'startedAt'>) => {
-    await createSession({ id: crypto.randomUUID(), startedAt: Date.now(), ...data });
-    setShowNewSession(false);
-  };
+  const [filter, setFilter] = useState<Filter>("all")
+  const [q, setQ] = useState("")
+  const [showArchived, setShowArchived] = useState(false)
+  const [showNewSession, setShowNewSession] = useState(false)
+  const [showPresets, setShowPresets] = useState(false)
+  const [duplicating, setDuplicating] = useState<Session | null>(null)
+  const [showExportImport, setShowExportImport] = useState(false)
 
-  const handleDuplicate = async (data: Omit<Session, 'id' | 'startedAt'>) => {
-    await createSession({ id: crypto.randomUUID(), startedAt: Date.now(), ...data });
-    setDuplicating(null);
-  };
+  const counts = useMemo(
+    () => ({
+      all: allSessions.length,
+      ladder: allSessions.filter((s) => s.type === "ladder").length,
+      tournament: allSessions.filter((s) => s.type === "tournament").length,
+    }),
+    [allSessions],
+  )
 
-  const activeSessions = sessions;
-  const showingArchived = showArchived && archivedSessions.length > 0;
+  const match = (s: Session) => {
+    if (filter !== "all" && s.type !== filter) return false
+    if (q.trim() && !s.label.toLowerCase().includes(q.trim().toLowerCase())) return false
+    return true
+  }
+  const active = sessions.filter(match)
+  const archived = archivedSessions.filter(match)
+
+  const presetOf = (s: Session) => presets.find((p) => p.id === s.activePresetId)
+
+  const handleCreateSession = async (data: Omit<Session, "id" | "startedAt">) => {
+    await createSession({ id: crypto.randomUUID(), startedAt: Date.now(), ...data })
+    setShowNewSession(false)
+  }
+  const handleDuplicate = async (data: Omit<Session, "id" | "startedAt">) => {
+    await createSession({ id: crypto.randomUUID(), startedAt: Date.now(), ...data })
+    setDuplicating(null)
+  }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-      >
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-primary/20 border border-primary/30">
-              <Swords className="w-6 h-6 text-primary-hover" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-ink">{t('title')}</h1>
-              <p className="text-ink-muted text-sm">{t('subtitle')}</p>
-            </div>
+    <DkApp>
+      <DkBar>
+        <DkTitle icon="chart" label={t("title")} sub={t("subtitle")} />
+        <DkDivider />
+        <DkSeg
+          value={filter}
+          onChange={(v) => setFilter(v as Filter)}
+          ariaLabel={t("filters.sessionType")}
+          options={[
+            { value: "all", label: t("filters.all"), count: counts.all },
+            { value: "ladder", label: t("filters.ladder"), count: counts.ladder },
+            { value: "tournament", label: t("filters.tournaments"), count: counts.tournament },
+          ]}
+        />
+        <DkSearch value={q} onChange={setQ} placeholder={t("search.session")} className="min-w-[min(240px,100%)]" />
+        <DkSpacer />
+        <Button size="sm" icon="database" onClick={() => setShowExportImport(true)} aria-label={t("exportImport.title")} />
+        <Button size="sm" icon="layers" onClick={() => setShowPresets(true)}>
+          {t("buttons.presets", { count: presets.length })}
+        </Button>
+        <Button variant="pri" size="sm" icon="plus" onClick={() => setShowNewSession(true)}>
+          {t("buttons.newSession")}
+        </Button>
+      </DkBar>
+
+      <DkBody>
+        <div className="grid gap-4">
+          <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+            <DkStat value={career.sessions} label={t("career.sessions")} />
+            <DkStat value={`${career.wins}–${career.losses}`} label={t("career.record")} />
+            <DkStat value={`${career.winRate}%`} label={t("career.winRate")} tone={career.winRate >= 50 ? "pos" : "neg"} />
+            <DkStat value={career.bestElo} label={t("career.bestElo")} tone="accent" />
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              onClick={() => setShowExportImport(true)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-edge text-ink-muted hover:text-ink hover:border-edge text-sm transition-colors"
-              title={t('exportImport.title')}
-            >
-              <Database size={14} />
-            </button>
-            <button
-              onClick={() => setShowPresets(true)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-edge text-ink hover:text-ink hover:border-edge text-sm transition-colors"
-            >
-              <Layers size={14} /> {t('buttons.presets', { count: presets.length })}
-            </button>
-            <button
-              onClick={() => setShowNewSession(true)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary-active hover:bg-primary text-white text-sm font-medium transition-colors"
-            >
-              <Plus size={14} /> {t('buttons.newSession')}
-            </button>
-          </div>
-        </div>
-      </motion.div>
+          {loading ? (
+            <DkSkelList rows={6} h={62} gap={7} />
+          ) : (
+            <>
+              <div className="grid gap-[7px]">
+                {active.length === 0 ? (
+                  <DkEmpty
+                    icon="sword"
+                    title={t("empty.noSessions")}
+                    lead={q ? t("empty.noMatch", { q }) : t("empty.noSessionsHint")}
+                  >
+                    {(q || filter !== "all") && (
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          setQ("")
+                          setFilter("all")
+                        }}
+                      >
+                        {t("filters.clear")}
+                      </Button>
+                    )}
+                  </DkEmpty>
+                ) : (
+                  active.map((s) => (
+                    <TrSessionRow
+                      key={s.id}
+                      session={s}
+                      summary={summaries[s.id]}
+                      preset={presetOf(s)}
+                      onDuplicate={() => setDuplicating(s)}
+                      onArchive={() => archiveSession(s.id)}
+                      onDelete={() => removeSession(s.id)}
+                    />
+                  ))
+                )}
+              </div>
 
-      {/* Active sessions */}
-      {loading ? (
-        <div className="flex justify-center py-16">
-          <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-        </div>
-      ) : activeSessions.length === 0 && !showingArchived ? (
-        <Card className="p-12 text-center">
-          <Swords size={36} className="mx-auto text-ink-dim mb-3" />
-          <p className="text-ink-muted text-sm font-medium mb-1">{t('empty.noSessions')}</p>
-          <p className="text-ink-dim text-xs">{t('empty.noSessionsHint')}</p>
-        </Card>
-      ) : (
-        <div className="flex flex-col gap-2">
-          {activeSessions.map((s) => (
-            <SessionCard
-              key={s.id}
-              session={s}
-              presetName={presets.find((p) => p.id === s.activePresetId)?.name}
-              onDelete={() => removeSession(s.id)}
-              onArchive={() => archiveSession(s.id)}
-              onDuplicate={() => setDuplicating(s)}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Archive toggle */}
-      {archivedSessions.length > 0 && (
-        <div className="flex flex-col gap-2">
-          <button
-            onClick={() => setShowArchived((v) => !v)}
-            className="flex items-center gap-2 text-xs text-ink-muted hover:text-ink transition-colors"
-          >
-            <Archive size={12} />
-            {showArchived
-              ? t('archive.hideArchived')
-              : t('archive.showArchived', { count: archivedSessions.length })}
-          </button>
-          {showArchived && (
-            <div className="flex flex-col gap-2">
-              {archivedSessions.map((s) => (
-                <SessionCard
-                  key={s.id}
-                  session={s}
-                  presetName={presets.find((p) => p.id === s.activePresetId)?.name}
-                  archived
-                  onDelete={() => removeSession(s.id)}
-                  onUnarchive={() => unarchiveSession(s.id)}
-                  onDuplicate={() => setDuplicating(s)}
-                />
-              ))}
-            </div>
+              {archived.length > 0 && (
+                <div className="grid gap-[10px]">
+                  <button
+                    type="button"
+                    onClick={() => setShowArchived((v) => !v)}
+                    aria-expanded={showArchived}
+                    className="inline-flex items-center gap-[7px] justify-self-start border-0 bg-transparent py-[6px] font-mono text-[10.5px] font-semibold uppercase leading-none tracking-[0.1em] text-txt-dim transition-colors hover:text-txt"
+                  >
+                    <Icon name="chevron" size={13} style={{ transform: showArchived ? "none" : "rotate(-90deg)" }} />
+                    {showArchived ? t("archive.hideArchived") : t("archive.showArchived", { count: archived.length })}
+                  </button>
+                  {showArchived && (
+                    <div className="grid gap-[7px]">
+                      {archived.map((s) => (
+                        <TrSessionRow
+                          key={s.id}
+                          session={s}
+                          summary={summaries[s.id]}
+                          preset={presetOf(s)}
+                          onDuplicate={() => setDuplicating(s)}
+                          onUnarchive={() => unarchiveSession(s.id)}
+                          onDelete={() => removeSession(s.id)}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
           )}
         </div>
-      )}
+      </DkBody>
 
-      {/* Dialogs */}
       {showNewSession && (
         <NewSessionDialog presets={presets} onConfirm={handleCreateSession} onClose={() => setShowNewSession(false)} />
       )}
       {showPresets && (
         <PresetManager presets={presets} onSave={savePreset} onDelete={removePreset} onClose={() => setShowPresets(false)} />
       )}
-      {duplicating && (
-        <DuplicateSessionDialog source={duplicating} onConfirm={handleDuplicate} onClose={() => setDuplicating(null)} />
-      )}
-      {showExportImport && (
-        <ExportImportDialog onImportDone={refreshSessions} onClose={() => setShowExportImport(false)} />
-      )}
-    </div>
-  );
-}
-
-function SessionCard({
-  session,
-  presetName,
-  archived = false,
-  onDelete,
-  onArchive,
-  onUnarchive,
-  onDuplicate,
-}: {
-  session: Session;
-  presetName?: string;
-  archived?: boolean;
-  onDelete: () => void;
-  onArchive?: () => void;
-  onUnarchive?: () => void;
-  onDuplicate: () => void;
-}) {
-  const t = useTranslations('vgc.tracker');
-  const isTournament = session.type === 'tournament';
-
-  return (
-    <Link
-      href={`/pokemon/vgc/tracker/${session.id}`}
-      className={`group flex items-start justify-between gap-3 rounded-xl border bg-layer-2 px-4 py-3 transition-all ${
-        archived
-          ? 'border-edge opacity-60 hover:opacity-80'
-          : isTournament
-          ? 'border-amber-500/30 hover:border-amber-400/50'
-          : 'border-edge hover:border-primary/40'
-      }`}
-    >
-      <div className="flex items-start gap-3 flex-1 min-w-0">
-        <div className={`mt-0.5 p-1.5 rounded-lg shrink-0 ${
-          isTournament ? 'bg-amber-500/15 text-amber-400' : 'bg-layer-2 text-ink-muted'
-        }`}>
-          {isTournament ? <Trophy size={14} /> : <TrendingUp size={14} />}
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-0.5">
-            <span className="text-ink font-medium truncate">{session.label}</span>
-            <span className="shrink-0 text-[11px] font-mono bg-layer-2 border border-edge rounded px-1.5 py-px text-ink-muted">
-              {session.format}
-            </span>
-            {isTournament && (
-              <span className="shrink-0 text-[11px] bg-amber-500/15 border border-amber-500/30 text-amber-400 rounded px-1.5 py-px">
-                {t('sessionType.tournament')}
-              </span>
-            )}
-            {archived && (
-              <span className="shrink-0 text-[11px] bg-layer-2 border border-edge text-ink-muted rounded px-1.5 py-px">
-                {t('archive.badge')}
-              </span>
-            )}
-          </div>
-          <div className="flex flex-wrap items-center gap-3 text-xs text-ink-muted">
-            <span>{formatDate(session.startedAt)}</span>
-            {isTournament && session.tournamentName && (
-              <span className="flex items-center gap-1 text-amber-500/70">
-                <Trophy size={10} />{session.tournamentName}
-              </span>
-            )}
-            {!isTournament && presetName && (
-              <span className="flex items-center gap-1"><Layers size={11} />{presetName}</span>
-            )}
-            {!isTournament && session.startElo && (
-              <span className="flex items-center gap-1"><TrendingUp size={11} />ELO {session.startElo}</span>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Action buttons — visible on hover */}
-      <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-        <button
-          onClick={(e) => { e.preventDefault(); onDuplicate(); }}
-          className="p-1.5 rounded text-ink-muted hover:text-ink hover:bg-layer-2 transition-colors"
-          title={t('buttons.duplicate')}
-        >
-          <Copy size={13} />
-        </button>
-        {archived ? (
-          <button
-            onClick={(e) => { e.preventDefault(); onUnarchive?.(); }}
-            className="px-2 py-1 rounded text-ink-muted hover:text-ink hover:bg-layer-2 text-xs transition-colors"
-          >
-            {t('buttons.unarchive')}
-          </button>
-        ) : (
-          <button
-            onClick={(e) => { e.preventDefault(); onArchive?.(); }}
-            className="p-1.5 rounded text-ink-muted hover:text-ink hover:bg-layer-2 transition-colors"
-            title={t('buttons.archive')}
-          >
-            <Archive size={13} />
-          </button>
-        )}
-        <button
-          onClick={(e) => { e.preventDefault(); onDelete(); }}
-          className="px-2 py-1 rounded text-ink-dim hover:text-red-400 hover:bg-layer-2 text-xs transition-colors"
-        >
-          {t('buttons.delete')}
-        </button>
-      </div>
-    </Link>
-  );
+      {duplicating && <DuplicateSessionDialog source={duplicating} onConfirm={handleDuplicate} onClose={() => setDuplicating(null)} />}
+      {showExportImport && <ExportImportDialog onImportDone={refreshSessions} onClose={() => setShowExportImport(false)} />}
+    </DkApp>
+  )
 }

@@ -1,3 +1,7 @@
+// Shared view-model types + stat/type/nature lookups for the VGC meta tool.
+// Colours are canonical Pokémon values; type keys are Spanish (the API returns
+// localized type names), matching the DkType hexes.
+
 export const STAT_META: Record<string, { label: string; color: string }> = {
   hp:  { label: "PS",  color: "#ff5959" },
   atk: { label: "Atq", color: "#f5ac78" },
@@ -29,8 +33,19 @@ export const TYPE_COLORS: Record<string, string> = {
   Tierra: "#915121", Volador: "#81b9ef", Psíquico: "#ef4179", Bicho: "#91a119",
   Roca: "#afa981", Fantasma: "#704170", Dragón: "#5060e1", Siniestro: "#624d4e",
   Acero: "#60a1b8", Hada: "#ef70ef",
+  // English fallbacks (some sources return canonical names)
+  Fire: "#e62829", Water: "#2980ef", Electric: "#fac000", Grass: "#3fa129",
+  Ice: "#3dcef3", Fighting: "#ff8000", Poison: "#9141cb", Ground: "#915121",
+  Flying: "#81b9ef", Psychic: "#ef4179", Bug: "#91a119", Rock: "#afa981",
+  Ghost: "#704170", Dragon: "#5060e1", Dark: "#624d4e", Steel: "#60a1b8",
+  Fairy: "#ef70ef",
 }
 
+export function typeColor(type: string): string {
+  return TYPE_COLORS[type] ?? "var(--txt-dim)"
+}
+
+/** Thousands-separated count (Spanish dot grouping): 12345 → "12.345". */
 export function fmtCount(n: number): string {
   return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
 }
@@ -55,6 +70,22 @@ export interface UsageEntry {
   count: number
 }
 
+export interface TeamSlot {
+  dex: number
+  name: string
+  tera: string
+  item: string
+  moves: string[]
+}
+
+export interface TeamEntry {
+  slug: string
+  name: string
+  record: string
+  team: TeamSlot[]
+  rawText: string
+}
+
 export interface PlayerEntry {
   slug: string
   placing: number
@@ -64,37 +95,6 @@ export interface PlayerEntry {
   rawText: string
 }
 
-export interface TeamSlot {
-  dex: number
-  name: string
-  tera: string
-  item: string
-  moves: string[]
-}
-
-export interface Format {
-  id: string
-  code: string
-  label: string
-  short: string
-  note: string
-  months: string[]
-  base: [string, number][]
-}
-
-export interface TourReg {
-  id: string
-  name: string
-  code: string
-}
-
-export interface DivergenceResult {
-  rows: DivergenceRow[]
-  ladderFormat: string
-  ladderMonth: string
-  rowCount: number
-}
-
 export interface DivergenceRow {
   id: string
   ladder: number
@@ -102,4 +102,11 @@ export interface DivergenceRow {
   delta: number
   absDelta: number
   badge: string | null
+}
+
+export interface DivergenceResult {
+  rows: DivergenceRow[]
+  ladderFormat: string
+  ladderMonth: string
+  rowCount: number
 }
