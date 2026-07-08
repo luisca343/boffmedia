@@ -1,4 +1,4 @@
-import { ArmorPiece, Charm, Decoration, Weapon } from "@/types/tools/mhwilds";
+import { ArmorPiece, Charm, Decoration, Weapon, MhMonster } from "@/types/tools/mhwilds";
 import { apiGET, apiPOST, apiDELETE, ApiResponse } from "@/services/boffAPI";
 
 export class MhWildsService {
@@ -42,6 +42,14 @@ export class MhWildsService {
   static getSkills(locale?: string): Promise<ApiResponse<any[]>> {
     const params = locale ? `?locale=${locale}` : '';
     return apiGET<any[]>(`/tools/mhwilds/skills${params}`);
+  }
+
+  /**
+   * Get all monsters (bestiary)
+   */
+  static getMonsters(locale?: string): Promise<ApiResponse<MhMonster[]>> {
+    const params = locale ? `?locale=${locale}` : '';
+    return apiGET<MhMonster[]>(`/tools/mhwilds/monsters${params}`);
   }
 
   // ==================== PROCESSED DATA OPERATIONS ====================

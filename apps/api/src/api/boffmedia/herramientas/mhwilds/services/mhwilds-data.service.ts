@@ -97,6 +97,17 @@ export class MhwildsDataService {
     }
   }
 
+  async getMonsters(
+    locale: string,
+  ): Promise<{ data: any[]; cacheInfo: CacheInfo }> {
+    try {
+      const result = await this.mhwildsRepository.getMonsters(locale);
+      return this.formatResultWithCacheInfo(result);
+    } catch (error: any) {
+      throw new Error(`Failed to get monsters: ${error.message}`);
+    }
+  }
+
   // ==================== PROCESSED DATA OPERATIONS ====================
 
   async getAllCharmRanks(

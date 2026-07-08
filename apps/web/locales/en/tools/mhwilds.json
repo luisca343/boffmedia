@@ -197,7 +197,6 @@
     "charm": "Charm",
     "secondary_weapon": "Secondary Weapon",
     "empty_slot": "Empty slot",
-    
     "header": {
       "title": {
         "prefix": "Tools for",
@@ -255,12 +254,40 @@
     "externalLinks": {
       "title": "Useful Links",
       "officialWebsite": "Official Website",
-      "redditCommunity": "Reddit Community", 
+      "redditCommunity": "Reddit Community",
       "wiki": "Monster Hunter Wiki",
       "videos": "YouTube Guides"
     },
     "featuredTool": "Featured tool",
     "accessButton": "Access {tool}",
-    "explore": "Explore"
+    "explore": "Explore",
+    "bestiary": {
+      "kicker": "Monster Hunter Wilds",
+      "title": "Bestiary",
+      "count": "{count} monsters",
+      "errorTitle": "Failed to load the bestiary",
+      "searchPlaceholder": "Search monster…",
+      "sortName": "Sort: name",
+      "sortHealth": "Sort: health",
+      "filterKind": "Class",
+      "all": "All",
+      "kindLarge": "Large",
+      "kindSmall": "Small",
+      "filterWeakness": "Elemental weakness",
+      "results": "{count} results",
+      "noResults": "No results.",
+      "overview": "Overview",
+      "baseHealth": "Base health",
+      "baseSize": "Base size",
+      "crownSilver": "Silver crown",
+      "crownGold": "Gold crown",
+      "elements": "Elements",
+      "weaknesses": "Elemental weaknesses",
+      "statusVulns": "Status vulnerability",
+      "resistances": "Resistances",
+      "ailments": "Ailments inflicted",
+      "locations": "Locations",
+      "drops": "Rewards"
+    }
   }
 }

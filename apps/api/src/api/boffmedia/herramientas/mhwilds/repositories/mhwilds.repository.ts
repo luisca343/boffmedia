@@ -208,6 +208,10 @@ export class MhwildsRepository implements IMhwildsRepository {
     return await this.getResourceData('skills', locale);
   }
 
+  async getMonsters(locale: string): Promise<ResourceFetchResult> {
+    return await this.getResourceData('monsters', locale);
+  }
+
   // ==================== PROCESSED DATA OPERATIONS ====================
 
   async saveProcessedData(

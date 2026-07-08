@@ -28,7 +28,8 @@
       },
       "tools": {
         "planner": "Planificador",
-        "weaponTree": "Árbol de Armas"
+        "weaponTree": "Árbol de Armas",
+        "bestiary": "Bestiario"
       }
     },
     "otros": {
