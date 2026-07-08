@@ -181,6 +181,11 @@
         "worker": {
           "connecting": "Conectando al motor de análisis...",
           "ready": "Listo"
+        },
+        "meter": {
+          "label": "Listo para exportar",
+          "resolved": "resueltos",
+          "blocked": "{count, plural, one {# sin resolver} other {# sin resolver}}"
         }
       }
     }
