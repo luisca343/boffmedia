@@ -101,6 +101,7 @@ export const pokemon: GameEntry = {
           nameKey: "games.pokemon.tools.skyGenerator",
           href: "/pokemon/pmdsky",
           sidebarIcon: "star",
+          bleed: true,
           landing: {
             icon: "/img/games/pmdsky-icon.webp",
             fallbackIcon: "zap",
