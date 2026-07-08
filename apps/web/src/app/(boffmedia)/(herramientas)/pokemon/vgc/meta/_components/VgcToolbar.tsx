@@ -1,11 +1,10 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { Icon } from "@/components/boffmedia-v2/primitives/icon"
-import { SegTabs } from "@/components/boffmedia-v2/primitives/seg-tabs"
-import { ToolSelect } from "@/components/boffmedia-v2/primitives/tool-select"
+import { DkBar, DkTitle, DkDivider, DkSeg, DkSelect, DkSpacer, DkChip } from "@/components/boffmedia/ui/tools/datakit"
 import type { SmogonSnapshot, ChampionsRegulation, LimitlessTournament } from "@/services/api/boffmedia/vgcService"
 import { ENABLE_PREVIEW_FORMATS } from "../constants"
+import { fmtCount } from "../_lib/meta-types"
 
 interface VgcToolbarProps {
   tab: string
@@ -51,11 +50,8 @@ export function VgcToolbar({
   const t = useTranslations("vgc.meta")
 
   const sortedRegulations = [...regulations].sort((a, b) => b.id.localeCompare(a.id))
-  const previewRegulations = ENABLE_PREVIEW_FORMATS
-    ? sortedRegulations.filter((r) => Boolean(r.vgcPastesGid))
-    : []
+  const previewRegulations = ENABLE_PREVIEW_FORMATS ? sortedRegulations.filter((r) => Boolean(r.vgcPastesGid)) : []
   const isPreviewFormat = previewRegulations.some((r) => r.id === format)
-
   const regulationNameByFormatId = new Map(sortedRegulations.map((r) => [r.formatId, r.name]))
 
   const latestMonthByFormat = new Map<string, string>()
@@ -70,7 +66,6 @@ export function VgcToolbar({
   })
 
   const availableMonths = [...new Set(snapshots.filter((s) => s.formatId === format).map((s) => s.month))].sort().reverse()
-
   const existingCutoffs = new Set(snapshots.filter((s) => s.formatId === format).map((s) => s.cutoff))
   const availableCutoffs = VALID_CUTOFFS.filter((c) => existingCutoffs.has(c))
   const cutoffValue = availableCutoffs.includes(cutoff as (typeof VALID_CUTOFFS)[number])
@@ -88,94 +83,79 @@ export function VgcToolbar({
   const handleFormatSelect = (value: string) => {
     if (value === format) return
     const previewReg = previewRegulations.find((r) => r.id === value)
-    if (previewReg) { onFormatChange(value, "", 1760); return }
+    if (previewReg) {
+      onFormatChange(value, "", 1760)
+      return
+    }
     const snapshot = pickLatestSnapshot(value, cutoff)
-    if (snapshot) { onFormatChange(snapshot.formatId, snapshot.month, snapshot.cutoff); return }
+    if (snapshot) {
+      onFormatChange(snapshot.formatId, snapshot.month, snapshot.cutoff)
+      return
+    }
     onFormatChange(value, "", 1760)
   }
 
-  const formatItems = [
-    { header: "Smogon" },
-    ...uniqueFormats.map((fmtId) => ({ value: fmtId, label: regulationNameByFormatId.get(fmtId) ?? formatLabels[fmtId] ?? fmtId })),
-    ...(previewRegulations.length > 0
-      ? [{ header: "Champions · Preview" }, ...previewRegulations.map((r) => ({ value: r.id, label: r.name }))]
-      : []),
+  const formatOptions = [
+    ...uniqueFormats.map((id) => ({ value: id, label: regulationNameByFormatId.get(id) ?? formatLabels[id] ?? id })),
+    ...previewRegulations.map((r) => ({ value: r.id, label: r.name })),
+  ]
+
+  const tournamentOptions = [
+    { value: "combined", label: t("tabs.combined") },
+    ...[...tournaments]
+      .sort((a, b) => (b.date ?? "").localeCompare(a.date ?? ""))
+      .map((tour) => ({
+        value: String(tour.id),
+        label: tour.name ?? String(tour.limitlessId) + (tour.date ? ` — ${tour.date.slice(0, 10)}` : ""),
+      })),
   ]
 
   return (
-    <div className="flex items-center gap-2 px-3 py-2.5 flex-wrap">
-      <SegTabs
+    <DkBar>
+      <DkTitle icon="trending" label={t("barTitle")} sub={tab === "stats" ? t("barSub.ladder") : t("barSub.tournament")} />
+      <DkDivider />
+      <DkSeg
         value={tab}
+        ariaLabel={t("aria.source")}
+        onChange={onTabChange}
         options={[
           { value: "stats", label: t("tabs.stats") },
           { value: "tournament", label: t("tabs.tournament") },
         ]}
-        onChange={onTabChange}
-        size="sm"
       />
-      <span className="w-px h-5 bg-[var(--border)] mx-0.5" />
       {tab === "stats" ? (
         <>
-          <ToolSelect
-            value={format}
-            icon="filter"
-            width="220px"
-            minWidth="150px"
-            items={formatItems}
-            onSelect={handleFormatSelect}
-          />
+          <DkSelect value={format} ariaLabel={t("pickers.format")} minWidth="180px" onChange={handleFormatSelect} options={formatOptions} />
           {!isPreviewFormat && uniqueFormats.length > 0 && (
             <>
-              <ToolSelect
+              <DkSelect
                 value={month || "__all__"}
-                width="150px"
-                minWidth="120px"
-                items={[
-                  { value: "__all__", label: t("pickers.monthPlaceholder") },
-                  ...availableMonths.map((m) => ({ value: m, label: m })),
-                ]}
-                onSelect={(v) => onOptionsApply(v === "__all__" ? "" : v, cutoff)}
+                ariaLabel={t("pickers.month")}
+                onChange={(v) => onOptionsApply(v === "__all__" ? "" : v, cutoff)}
+                options={[{ value: "__all__", label: t("pickers.monthPlaceholder") }, ...availableMonths.map((m) => ({ value: m, label: m }))]}
               />
-              <ToolSelect
+              <DkSelect
                 value={cutoffValue}
-                width="140px"
-                minWidth="110px"
-                items={availableCutoffs.map((c) => ({ value: String(c), label: c === 0 ? "All ELO" : `${c}+ ELO` }))}
-                onSelect={(v) => onOptionsApply(month, Number(v))}
+                ariaLabel={t("pickers.cutoff")}
+                onChange={(v) => onOptionsApply(month, Number(v))}
+                options={availableCutoffs.map((c) => ({ value: String(c), label: c === 0 ? t("cutoff.all") : `${c}+ ELO` }))}
               />
             </>
           )}
         </>
       ) : (
         <>
-          <ToolSelect
+          <DkSelect
             value={regulation}
-            icon="filter"
-            width="160px"
-            minWidth="120px"
-            items={sortedRegulations.map((r) => ({ value: r.id, label: r.name }))}
-            onSelect={onRegulationChange}
+            ariaLabel={t("pickers.regulation")}
+            onChange={onRegulationChange}
+            options={sortedRegulations.map((r) => ({ value: r.id, label: r.name }))}
           />
-          <ToolSelect
-            value={tournamentId || "combined"}
-            width="270px"
-            minWidth="200px"
-            align="right"
-            items={[
-              { value: "combined", label: t("tabs.combined") },
-              ...[...tournaments]
-                .sort((a, b) => (b.date ?? "").localeCompare(a.date ?? ""))
-                .map((t2) => ({ value: String(t2.id), label: t2.name ?? t2.limitlessId + (t2.date ? ` — ${t2.date.slice(0, 10)}` : "") })),
-            ]}
-            onSelect={onTournamentChange}
-          />
+          <DkSelect value={tournamentId || "combined"} ariaLabel={t("pickers.tournament")} minWidth="200px" onChange={onTournamentChange} options={tournamentOptions} />
         </>
       )}
-      <div className="flex-1" />
-      <span className="inline-flex items-center gap-1.5 font-mono text-[10px] px-1.5 py-[0.15rem] rounded-[var(--radius-pill)] border border-edge text-ink-dim">
-        <Icon name="database" size={13} />
-        {tab === "stats" ? `${totalBattles.toLocaleString("es-ES")} batallas` : `${totalTeams.toLocaleString("es-ES")} equipos`}
-      </span>
-    </div>
+      <DkSpacer />
+      <DkChip icon="database">{tab === "stats" ? t("chip.battles", { count: fmtCount(totalBattles) }) : t("chip.teams", { count: fmtCount(totalTeams) })}</DkChip>
+    </DkBar>
   )
 }

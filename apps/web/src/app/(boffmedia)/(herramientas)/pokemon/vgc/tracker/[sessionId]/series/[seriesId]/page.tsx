@@ -1,7 +1,9 @@
 'use client';
 
 import { use } from 'react';
+import { useTranslations } from 'next-intl';
 import { useSingleSeries, useSessions } from '@/features/vgc-tracker/hooks/useVgcDb';
+import { Spinner } from '@/components/boffmedia/primitives/spinner';
 import { SeriesWorkspace } from './_components/SeriesWorkspace';
 
 interface Props {
@@ -9,6 +11,7 @@ interface Props {
 }
 
 export default function SeriesPage({ params }: Props) {
+  const t = useTranslations('vgc.tracker');
   const { sessionId, seriesId } = use(params);
   const { series, loading, save } = useSingleSeries(seriesId);
   const { sessions } = useSessions();
@@ -16,16 +19,16 @@ export default function SeriesPage({ params }: Props) {
 
   if (loading) {
     return (
-      <div className="h-screen bg-layer-1 flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
+      <div className="grid h-[calc(100vh-var(--nav-h,66px))] place-items-center">
+        <Spinner />
       </div>
     );
   }
 
   if (!series) {
     return (
-      <div className="h-screen bg-layer-1 flex items-center justify-center text-ink-muted">
-        Series not found.
+      <div className="grid h-[calc(100vh-var(--nav-h,66px))] place-items-center font-mono text-[13px] text-txt-muted">
+        {t('workspace.seriesNotFound')}
       </div>
     );
   }

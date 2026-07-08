@@ -1,7 +1,9 @@
 'use client';
 
 import { use } from 'react';
+import { useTranslations } from 'next-intl';
 import { useMatch, useSessions, useMatches } from '@/features/vgc-tracker/hooks/useVgcDb';
+import { Spinner } from '@/components/boffmedia/primitives/spinner';
 import { MatchWorkspace } from './_components/MatchWorkspace';
 
 interface Props {
@@ -9,6 +11,7 @@ interface Props {
 }
 
 export default function MatchPage({ params }: Props) {
+  const t = useTranslations('vgc.tracker');
   const { sessionId, matchId } = use(params);
   const { match, loading, save } = useMatch(matchId);
   const { sessions } = useSessions();
@@ -17,16 +20,16 @@ export default function MatchPage({ params }: Props) {
 
   if (loading) {
     return (
-      <div className="h-screen bg-layer-1 flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      <div className="grid h-[calc(100vh-var(--nav-h,66px))] place-items-center">
+        <Spinner />
       </div>
     );
   }
 
   if (!match) {
     return (
-      <div className="h-screen bg-layer-1 flex items-center justify-center text-ink-muted">
-        Match not found.
+      <div className="grid h-[calc(100vh-var(--nav-h,66px))] place-items-center font-mono text-[13px] text-txt-muted">
+        {t('workspace.matchNotFound')}
       </div>
     );
   }
