@@ -1,7 +1,7 @@
 'use client';
 
 import { BxBench } from '@/app/(boffmedia)/(herramientas)/pokemon/battlesim/_components/ui/bx-kit';
-import type { BSXMon } from '@/components/boffmedia-v2/primitives';
+import type { BSXMon } from '@/app/battlesim/_utils/toBSXMon';
 
 interface SwitchPanelProps {
   bench: BSXMon[];

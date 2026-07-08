@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"
 import { useLocale } from "next-intl"
 import { useTransition } from "react"
-import { Icon } from "@/components/boffmedia-v2/primitives/icon"
+import { Globe } from "lucide-react"
 
 interface LanguageSwitcherProps {
   variant?: "default" | "mobile"
@@ -33,7 +33,7 @@ export default function LanguageSwitcher({ variant = "default" }: LanguageSwitch
     return (
       <div className="pb-2 mb-2" style={{ borderBottom: "var(--hairline) solid var(--border)" }}>
         <div className="flex items-center gap-3">
-          <Icon name="globe" size={20} className={isPending ? "text-[var(--orange-500)] animate-spin" : "text-ink-dim"} />
+          <Globe size={20} className={isPending ? "text-[var(--orange-500)] animate-spin" : "text-ink-dim"} />
           <span className="text-ink-muted">Idioma:</span>
           {locales.map((loc) => (
             <button
@@ -58,7 +58,7 @@ export default function LanguageSwitcher({ variant = "default" }: LanguageSwitch
 
   return (
     <div className="flex items-center gap-2">
-      <Icon name="globe" size={17} className={isPending ? "text-[var(--orange-500)] animate-spin" : "text-ink-dim"} />
+      <Globe size={17} className={isPending ? "text-[var(--orange-500)] animate-spin" : "text-ink-dim"} />
       {locales.map((loc) => (
         <button
           key={loc.code}

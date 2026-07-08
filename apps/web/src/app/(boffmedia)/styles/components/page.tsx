@@ -136,7 +136,7 @@ export default function ComponentsShowcase() {
   const totalSections = chapters.reduce((n, g) => n + g.sections.length, 0)
 
   return (
-    <main data-ds="boffmedia" className="wrap">
+    <main className="wrap">
       <div className="pt-[34px]">
       <div className="pt-[34px]">
         <Kicker>Sistema de diseño · v3</Kicker>

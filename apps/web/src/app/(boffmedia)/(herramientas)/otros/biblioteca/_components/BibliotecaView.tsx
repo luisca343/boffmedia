@@ -33,7 +33,7 @@ export function BibliotecaView() {
   const errorMsg = error === "loadError" || error === "searchError" ? t(error) : error
 
   return (
-    <main data-ds="boffmedia" className="pb-[10px]">
+    <main className="pb-[10px]">
       {/* ── header ─────────────────────────────────────────────────────────── */}
       <header className="mb-[20px] mt-[4px] flex flex-wrap items-end justify-between gap-[26px]">
         <div className="max-w-[60ch]">

@@ -15,7 +15,6 @@ const config: Config = {
     extend: {
       fontFamily: {
         vinque: ["Vinque", "sans-serif"],
-        inter: ["Inter", "sans-serif"],
         roboto: ["Roboto", "sans-serif"],
         bebas: ["Bebas Neue", "sans-serif"],
         // Boffmedia type system (default)

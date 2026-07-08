@@ -145,11 +145,15 @@ The showcase demos Modal + Popover (menús y avisos) and Spinner (anillo y carga
 
 **Phase 6 (hardening — early items):** ✅ **Showcase split** (2026-07-08) — the ~1.9K-line `app/(boffmedia)/styles/components/page.tsx` monolith is now a 285-line orchestrator + `showcase-shared.tsx` (`Sample`/`Section` + class fragments) + `showcase-data.tsx` (`CHAPTERS`/`DOMAINS`/types + `DEMO_*`) + nine `_chapters/*.tsx` components (each owns its chapter-local demo state), per convention §10. ✅ **`/mhwilds/monsters` bestiary** (2026-07-08, `bleed: true`) — real-data master–detail on the v3 «Señal» `mh-beastiary.css` design. New backend `/tools/mhwilds/monsters` endpoint (controller `@Get('monsters')` + `GetMonstersDto` + `MonsterEntity`; facade→data-service→repo `getResourceData('monsters', …)` proxying `wilds.mhdb.io` like weapons/armor). Web (hand-written service, no `generate:shared`): `MhWildsService.getMonsters` + `MhMonster` types + `useMonsters` hook. Page reuses the shared `mh-kit` chassis (`MhApp`/`MhBar`/`MhBody`/`MhSeal`/`MhSearch`/`MhPanel`) + route-local `_components/bst-kit.tsx` (`MonsterCard`/`MonsterRow`/`WeakCell`/`VulnRow`/`Tag2`/pips) + `_hooks/useMonsters`. Roster (search · grid/list · name/health sort · class + elemental-weakness filters) ↔ detail (overview · elemental weaknesses · status vulns · resistances · ailments · locations · reward drop table). Handoff-only mock features (hitzones, breakable parts, danger moves, threat/tempered, related gear) not built — see DEFERRED. Registry `bestiary` un-hidden; strings `mhwilds.bestiary.*` + `games.mhwilds.tools.bestiary` (es+en). tsc clean (web+api).
 
-**Pending:** showcase — «palabra cinética» (`Kinetic`) not extracted. Phase 5 admin (incl. manga panels) is fully on v3; **blog is deferred**. **No v2 UI remains** — Phase 6 teardown is now unblocked: move `data-ds="boffmedia"` from page roots up to `(boffmedia)/layout.tsx`, delete `boffmedia-v2/` + `boffmedia-old/`, prune legacy tokens/fonts, drop `react-toastify`.
+**Phase 6 teardown (2026-07-08):** ✅ `data-ds="boffmedia"` hoisted to a `display:contents` wrapper in `(boffmedia)/layout.tsx` (26 per-page attrs stripped; shared `components/boffmedia/**` self-scoping components keep theirs). ✅ **`components/boffmedia-v2/` (104 files) + `boffmedia-old/` (35 files) DELETED** — after migrating the live consumers the earlier "no v2 UI remains" claim had missed: 3 legacy legal pages (`cancelaciones`/`devoluciones`/`reembolsos`) → v3 `LegalDoc`; battlesim (`BSXMon` type → `_utils/toBSXMon`, `BoffSpinner`/`BoffSkeleton` → v3 `Spinner`/`Skeleton`); sorteos `boffVariants` relocated into the tool; `LanguageSwitcher` → lucide `Globe`. Group `_components/` pruned to `Unauthorized` + `layout/FloatingBackground` (both still live); `PolicyShell`, dead `UserAuthSection`, orphan `(eventos)/index.ts` removed. ✅ Dead **Inter** font pruned. `react-toastify` **kept** (SmartRotom/wingull consumers; Boffmedia is off it). ⚠️ Legacy color tokens (`layer-*`/`ink*`/`primary`/`secondary`) stay — shared with SmartRotom/wingull/`components/ui` via the one `tailwind.config.ts`.
+
+**Pending:** showcase — «palabra cinética» (`Kinetic`) not extracted. **Blog deferred.** The `components/boffmedia-v2/` section below is **stale** — the dir is deleted, but the section still mixes in live-v3 subsections (e.g. `ui/tools/datakit` documents `components/boffmedia/ui/tools/datakit/`, which exists). Needs a dedicated tree re-audit.
 
 ---
 
-## `components/boffmedia-v2/` — Previous design system (being replaced)
+## `components/boffmedia-v2/` — ⚠️ DELETED 2026-07-08 (stale section, mixed content)
+
+> The `components/boffmedia-v2/` directory was removed in Phase 6. The tables below are retained temporarily as historical reference and **mix in live-v3 subsections** (notably `ui/tools/` and `ui/tools/datakit/`, which document `components/boffmedia/ui/tools/…`, not the deleted dir). Do not treat entries here as existing under `boffmedia-v2/`. Pending a dedicated tree re-audit.
 
 ### `primitives/` (78 files)
 
@@ -403,10 +407,4 @@ Pokemon-specific components. Shared across Boffmedia and SmartRotom.
 
 ## Usage Notes
 
-- **Most used primitive:** `Icon` (8+ external consumers across nav, layout, profile)
-- **Production consumers:** `UserProfile.tsx`, `BoffFooter.tsx`, `herramientas/page.tsx`, `pokemon/page.tsx`, `mhwilds/page.tsx`, `(herramientas)/layout.tsx`
-- **Showcase-only:** ~50 components exist only in `showcase/page.tsx` with no other production usage (includes all `ui/system-states/`, battlesim `bs-*`/`bsx-*`, and tool-kit pieces like `ResultBadge`, `StatTile`, etc.)
-- **Internal-only:** `game-header.tsx`, `DesktopSidebar.tsx`, `MobileHeader.tsx`, `MobileSidebar.tsx` (used only within their parent modules)
-- **Tool-kit in primitives:** `result-badge`, `stat-tile`, `split-bar`, `trend-chart`, `heat-grid`, `tag-pills`, `tool-app`, `tool-panel`, `tool-select`, `tool-stat-bars`, `tool-table` live in `primitives/` but are tool-domain. They should eventually move to `ui/tools/`.
-- **GamePanel in primitives:** `game-panel.tsx` is game-domain. Should eventually move to `ui/games/`.
-- **`boffmedia-old/`:** Contains a copy of `GameStageLayout.tsx` and `GameToolsLayout/` from a previous reorganization. Can be cleaned up.
+> ⚠️ **Stale (pre-Phase-6).** The bullets below described the now-deleted `components/boffmedia-v2/` and `boffmedia-old/` directories (removed 2026-07-08) — `UserProfile`/`BoffFooter`, the battlesim `bs-*`/`bsx-*` render primitives, the in-`primitives/` tool-kit, `GamePanel`, `GameStageLayout`, etc. are all gone. Retained only until the tree re-audit rewrites this file against the live `components/boffmedia/` tree.
