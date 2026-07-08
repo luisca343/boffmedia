@@ -32,7 +32,7 @@ export function AvShell({ nav, section, onNavigate, children, loading }: AvShell
   const active = allItems.find((i) => i.id === section)
 
   return (
-    <div data-ds="boffmedia" className="grid min-h-screen items-start [grid-template-columns:1fr] md:[grid-template-columns:244px_minmax(0,1fr)] bg-base">
+    <div className="grid min-h-screen items-start [grid-template-columns:1fr] md:[grid-template-columns:244px_minmax(0,1fr)] bg-base">
       {/* Desktop rail */}
       <aside className="hidden md:flex sticky top-0 self-start h-screen overflow-y-auto flex-col border-r border-solid border-line bg-base-2 pb-6 bm-scroll">
         <div className="sticky top-0 z-[2] flex items-center gap-[11px] py-[18px_20px] px-5 border-b border-solid border-line bg-base-2">

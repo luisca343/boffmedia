@@ -20,19 +20,20 @@ export default async function RootLayout({
 }>) {
   return (
     <GlobalProviders>
-      {/* v3 base heading styles (tailwind.config.ts) are scoped per-page via
-          data-ds="boffmedia" on each migrated page root — not here, so the
-          not-yet-migrated v2 pages under this layout keep their look. Move the
-          attribute up to this layout once every page is on v3. */}
-      <ToastStack />
-      <Navbar />
-      <section className="no-scrollbar flex-1 bg-base">
-          <section className="flex-1 [&>*]:min-h-[calc(100vh-22rem)]">
-            {children}
-          </section>
-          <Footer />
-      </section>
-      <BackToTop />
+      {/* v3 base heading styles (tailwind.config.ts) are scoped here for the
+          whole group now that every route is v3. `display:contents` keeps the
+          body flex layout intact while the descendant selectors still match. */}
+      <div data-ds="boffmedia" className="contents">
+        <ToastStack />
+        <Navbar />
+        <section className="no-scrollbar flex-1 bg-base">
+            <section className="flex-1 [&>*]:min-h-[calc(100vh-22rem)]">
+              {children}
+            </section>
+            <Footer />
+        </section>
+        <BackToTop />
+      </div>
     </GlobalProviders>
   );
 }

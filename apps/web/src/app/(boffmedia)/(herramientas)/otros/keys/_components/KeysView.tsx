@@ -52,7 +52,7 @@ export function KeysView() {
   }
 
   return (
-    <main data-ds="boffmedia" className="pb-[10px]">
+    <main className="pb-[10px]">
       {/* ── header ─────────────────────────────────────────────────────────── */}
       <header className="flex flex-wrap items-end justify-between gap-[24px] pb-[20px] pt-[4px]">
         <div className="min-w-0">

@@ -1,8 +1,7 @@
 import { useMemo } from "react";
 import { Battle } from "@pkmn/client";
 import type { BattleRequest } from "../types";
-import type { BSXMon } from "@/components/boffmedia-v2/primitives";
-import type { BSXKeyMove, BSXTickEv, TeamMemberHP } from "../_utils/toBSXMon";
+import type { BSXMon, BSXKeyMove, BSXTickEv, TeamMemberHP } from "../_utils/toBSXMon";
 import { toBSXMon, toBSXKeyMoves, requestPokemonToBSXMon, toBSXTicks, toTeamHP } from "../_utils/toBSXMon";
 
 type TimerState = {

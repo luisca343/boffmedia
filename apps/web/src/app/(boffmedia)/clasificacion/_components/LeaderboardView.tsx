@@ -49,7 +49,7 @@ export function LeaderboardView() {
   const labels = { points: t("sort.points"), medals: t("sort.medals"), achievements: t("sort.achievements") }
 
   return (
-    <main data-ds="boffmedia" className="wrap pb-[90px] pt-[34px]">
+    <main className="wrap pb-[90px] pt-[34px]">
       <div className="mb-6">
         <span className="mono-label">{t("kicker")}</span>
         <h1 className="mt-2 text-[clamp(40px,5vw,60px)]">{t("title")}</h1>
