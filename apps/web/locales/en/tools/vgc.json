@@ -297,6 +297,10 @@
         "scarfShort": "Scarf",
         "paralysis": "Paralysis (×0.5 Speed)",
         "paralysisShort": "Para"
+      },
+      "tabs": {
+        "tiers": "Tiers",
+        "matchup": "Matchup"
       }
     },
     "speedTiers": {
@@ -338,7 +342,8 @@
         "scarfTitle": "252 EVs, Choice Scarf",
         "scarfPlus": "Scarf+",
         "scarfPlusTitle": "252 EVs, +Speed, Choice Scarf",
-        "noScarf": "Cannot hold Choice Scarf"
+        "noScarf": "Cannot hold Choice Scarf",
+        "types": "Types"
       },
       "modifiers": {
         "title": "Modifiers",
