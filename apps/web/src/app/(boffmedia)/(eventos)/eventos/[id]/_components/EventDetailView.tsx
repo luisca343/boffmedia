@@ -11,8 +11,7 @@ import { Icon } from "@/components/boffmedia/primitives/icon"
 import { Panel } from "@/components/boffmedia/primitives/panel"
 import { Spinner } from "@/components/boffmedia/primitives/spinner"
 import { toast } from "@/components/boffmedia/primitives/toast"
-import { ArtImage } from "@/components/boffmedia/ui/tools/ArtImage"
-import { AchievementItem, EventStatusChip, eventStatus, formatEventDate } from "@/components/boffmedia/ui/events"
+import { AchievementItem, EventBanner, formatEventDate } from "@/components/boffmedia/ui/events"
 import { useGetEvent } from "@/hooks/events/useGetEvent"
 import { useGetEventAchievements } from "@/hooks/events/useGetEventAchievements"
 import { useGetLeaderboard } from "@/hooks/events/useGetLeaderboard"
@@ -49,7 +48,6 @@ export function EventDetailView({ id }: { id: number }) {
     )
   }
 
-  const status = eventStatus(event)
   const ach = Array.isArray(achievements) ? achievements : []
   const board = Array.isArray(leaderboard) ? leaderboard : []
   const count = participants?.length ?? 0
@@ -81,36 +79,7 @@ export function EventDetailView({ id }: { id: number }) {
         <Icon name="back" size={14} /> {t("detail.back")}
       </Link>
 
-      {/* hero */}
-      <div className="relative mb-6 flex min-h-[300px] flex-col justify-end overflow-hidden border border-solid border-line border-b-[3px] border-b-accent bg-panel-2 cut-corner">
-        <div className="absolute inset-0 z-0">
-          <ArtImage
-            src={event.banner || event.icon}
-            alt=""
-            fallback={
-              <div className="absolute inset-0 grid place-items-center bg-panel-2">
-                <Icon name="trophy" size={120} className="text-line-2" />
-              </div>
-            }
-          />
-        </div>
-        <div className="pointer-events-none absolute inset-0 z-[1] bg-[linear-gradient(to_top,var(--panel)_4%,color-mix(in_srgb,var(--panel)_55%,transparent)_44%,transparent_82%)]" />
-        <div className="relative z-[2] max-w-[900px] p-[34px] max-[720px]:p-6">
-          <div className="mb-4 flex flex-wrap items-center gap-3">
-            <EventStatusChip status={status} label={t(`status.${status}`)} lg />
-            {event.gameName && (
-              <span className="inline-flex items-center gap-2 font-mono text-[11px]/none font-semibold uppercase tracking-[0.08em] text-txt-muted">
-                <Icon name="gamepad" size={14} className="text-accent" />
-                {event.gameName}
-              </span>
-            )}
-          </div>
-          <h1 className="text-[clamp(38px,5vw,68px)]">{event.title}</h1>
-          {event.description && (
-            <p className="mt-3 max-w-[64ch] font-body text-[16px]/[1.55] text-txt-muted text-pretty">{event.description}</p>
-          )}
-        </div>
-      </div>
+      <EventBanner event={event} className="mb-6" />
 
       <div className="grid items-start gap-5 [grid-template-columns:1fr_340px] max-[980px]:grid-cols-1">
         {/* main */}

@@ -14,7 +14,7 @@ import { Bleed } from "./ToolShell"
 import { buildCategory, hueStyle, type CategoryData, type ExtLinkData } from "./tools-data"
 
 // ── full-bleed game banner (real key-art image) ──────────────────────────────
-function GameBanner({ cat }: { cat: CategoryData }) {
+export function GameBanner({ cat }: { cat: CategoryData }) {
   return (
     <Bleed top className="mb-10">
       <div style={hueStyle(cat.hueColor)} className="relative flex min-h-[380px] flex-col items-stretch overflow-hidden md:min-h-[460px]">
@@ -41,7 +41,7 @@ function GameBanner({ cat }: { cat: CategoryData }) {
 }
 
 // ── featured tool with real art ──────────────────────────────────────────────
-function FeaturedTool({ cat }: { cat: CategoryData }) {
+export function FeaturedTool({ cat }: { cat: CategoryData }) {
   const tCat = useTranslations("toolsUi.category")
   const f = cat.featuredTool
   if (!f) return null
@@ -96,7 +96,7 @@ function extDomain(href: string) {
   }
 }
 
-function ExtLinks({ items }: { items: ExtLinkData[] }) {
+export function ExtLinks({ items }: { items: ExtLinkData[] }) {
   const tCat = useTranslations("toolsUi.category")
   if (!items.length) return null
   return (

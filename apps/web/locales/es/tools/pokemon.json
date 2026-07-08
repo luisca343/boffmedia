@@ -67,6 +67,13 @@
         "features": {
           "pokedex": "Pokédex"
         }
+      },
+      "battlesim": {
+        "title": "Simulador de Combate",
+        "description": "Combates Pokémon en tiempo real contra la IA, PvP o Showdown, con repeticiones",
+        "features": {
+          "battlesim": "Combate"
+        }
       }
     },
     "externalLinks": {

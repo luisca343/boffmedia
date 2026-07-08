@@ -66,7 +66,7 @@ const ITEM =
 function AccountAvatar({ image, initial, size }: { image?: string | null; initial: string; size: number }) {
   return (
     <span
-      className="relative grid shrink-0 place-items-center overflow-hidden border border-solid border-accent bg-panel-2 font-display font-extrabold italic text-accent cut [--cut:5px]"
+      className="relative grid shrink-0 place-items-center overflow-hidden border border-solid border-accent bg-panel-2 font-display font-extrabold italic text-accent cut-seal [--cut:5px]"
       style={{ width: size, height: size, fontSize: Math.round(size * 0.42) }}
     >
       <ArtImage src={image} alt="" sizes={`${size}px`} fallback={<span>{initial}</span>} />
@@ -88,7 +88,7 @@ function AuthButtons() {
   )
 }
 
-function AccountMenu({ user }: { user: AccountUser }) {
+export function AccountMenu({ user }: { user: AccountUser }) {
   const tNav = useTranslations("nav.v3")
   const [open, setOpen] = React.useState(false)
   const rootRef = React.useRef<HTMLSpanElement>(null)

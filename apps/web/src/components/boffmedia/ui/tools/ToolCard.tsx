@@ -28,7 +28,7 @@ export function ToolCard({ tool }: { tool: ToolCardData }) {
       {/* left rail in the game hue */}
       <span aria-hidden="true" className="absolute left-0 top-0 h-full w-[3px] bg-[var(--ghue)]" />
 
-      <span className="cut [--cut:7px] grid h-11 w-11 flex-none place-items-center border border-solid text-[var(--ghue)] border-[color-mix(in_srgb,var(--ghue)_45%,var(--line-2))] bg-[color-mix(in_srgb,var(--ghue)_10%,transparent)] transition-[background,border-color] duration-[140ms] group-hover:bg-[color-mix(in_srgb,var(--ghue)_18%,transparent)] group-hover:border-[color-mix(in_srgb,var(--ghue)_65%,var(--line-2))]">
+      <span className="cut-seal [--cut:7px] grid h-11 w-11 flex-none place-items-center border border-solid text-[var(--ghue)] border-[color-mix(in_srgb,var(--ghue)_45%,var(--line-2))] bg-[color-mix(in_srgb,var(--ghue)_10%,transparent)] transition-[background,border-color] duration-[140ms] group-hover:bg-[color-mix(in_srgb,var(--ghue)_18%,transparent)] group-hover:border-[color-mix(in_srgb,var(--ghue)_65%,var(--line-2))]">
         <Icon name={tool.icon} size={20} />
       </span>
 

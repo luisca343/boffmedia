@@ -16,7 +16,7 @@ function LeaderAvatar({ src, initial, top3 }: { src?: string | null; initial: st
   return (
     <span
       className={cn(
-        "relative grid h-[38px] w-[38px] shrink-0 place-items-center overflow-hidden border border-solid bg-panel-2 font-display text-[15px] font-extrabold italic text-accent cut [--cut:6px]",
+        "relative grid h-[38px] w-[38px] shrink-0 place-items-center overflow-hidden border border-solid bg-panel-2 font-display text-[15px] font-extrabold italic text-accent cut-seal [--cut:6px]",
         top3 ? "border-accent" : "border-line-2",
       )}
     >
