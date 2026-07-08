@@ -11,9 +11,10 @@
         "meta": "Análisis de Meta",
         "speed": "Velocidad",
         "tracker": "Tracker",
-        "gallery": "Galería",
-        "cardList": "Lista de Cartas",
-        "battles": "Combates",
+        "tcgPanel": "Panel",
+        "cardList": "Cartas",
+        "collection": "Colección",
+        "packs": "Sobres",
         "skyGenerator": "Generador de Correos",
         "damageCalc": "Calculadora de daño"
       }

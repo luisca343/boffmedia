@@ -1,10 +1,10 @@
 import { Suspense } from "react"
 import { TcgpApp } from "../_components/TcgpApp"
 
-export default function TcgpCartasPage() {
+export default function TcgpColeccionPage() {
   return (
     <Suspense>
-      <TcgpApp view="cartas" />
+      <TcgpApp view="coleccion" />
     </Suspense>
   )
 }

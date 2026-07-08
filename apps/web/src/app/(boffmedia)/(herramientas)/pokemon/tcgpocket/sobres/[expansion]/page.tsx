@@ -1,22 +1,10 @@
-"use client";
-import { PtcgpService } from "@/services/api/boffmedia/ptcgpService";
-import { useEffect, useState } from "react";
-import { CardsList } from "../../_components/CardsList";
-import { TcgCard } from "@boffmedia/shared";
+import { Suspense } from "react"
+import { TcgpApp } from "../../_components/TcgpApp"
 
-export default function Expansions({
-  params,
-}: {
-  params: { expansion: string };
-}) {
-  const { expansion } = params;
-  const [cards, setCards] = useState<TcgCard[]>([]);
-
-  useEffect(() => {
-    PtcgpService.getCardsForSet(expansion).then((response) => {
-      setCards(response.data || []);
-    });
-  }, [expansion]);
-
-  return <CardsList cards={cards} />;
+export default function TcgpPackPage({ params }: { params: { expansion: string } }) {
+  return (
+    <Suspense>
+      <TcgpApp view="sobres" expansion={params.expansion} />
+    </Suspense>
+  )
 }

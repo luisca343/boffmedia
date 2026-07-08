@@ -3,20 +3,20 @@
 import { Suspense, useState, useEffect } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { motion } from "framer-motion";
-import { Zap } from "lucide-react";
-import {
-  VgcService,
-  ChampionsRegulation,
-  SpeedTierEntry,
-} from "@/services/api/boffmedia/vgcService";
+import { DkApp, DkBar, DkBody, DkTitle, DkDivider, DkSeg, DkSelect, DkSpacer, DkChip } from "@/components/boffmedia/ui/tools/datakit";
+import { VgcService, ChampionsRegulation, SpeedTierEntry } from "@/services/api/boffmedia/vgcService";
 import { SpeedTiersTab } from "./_components/SpeedTiersTab";
 import { SpeedMatchupTab } from "./_components/SpeedMatchupTab";
 
 type Tab = "tiers" | "matchup";
 
+function cleanRegName(name: string): string {
+  return name.replace(/\[Gen 9 Champions\]\s*/i, "");
+}
+
 function SpeedPageContent() {
   const t = useTranslations("vgc.speed");
+  const tTiers = useTranslations("vgc.speedTiers");
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -43,7 +43,7 @@ function SpeedPageContent() {
       })
       .catch(() => {});
     // selectedReg intentionally excluded — only run on mount
-     
+
   }, []);
 
   useEffect(() => {
@@ -55,7 +55,7 @@ function SpeedPageContent() {
       .finally(() => setLoading(false));
   }, [selectedReg]);
 
-  const setTab = (next: Tab) => {
+  const setTab = (next: string) => {
     const params = new URLSearchParams(searchParams.toString());
     if (next === "tiers") params.delete("tab");
     else params.set("tab", next);
@@ -71,85 +71,43 @@ function SpeedPageContent() {
   const regList: ChampionsRegulation[] =
     regulations.length > 0
       ? regulations
-      : (["vgc2026regma", "vgc2026regmabo3", "bssregma"].map((id) => ({
-          id,
-          name: id,
-        })) as ChampionsRegulation[]);
+      : (["vgc2026regma", "vgc2026regmabo3", "bssregma"].map((id) => ({ id, name: id })) as ChampionsRegulation[]);
 
   return (
-    <div className="max-w-[1400px] mx-auto px-4 py-8 space-y-6">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="flex items-center gap-3"
-      >
-        <div className="p-2 rounded-lg bg-primary/20 border border-primary/30">
-          <Zap className="w-6 h-6 text-primary-hover" />
-        </div>
-        <div>
-          <h1 className="text-3xl font-bold text-ink">{t("title")}</h1>
-          <p className="text-ink-muted text-sm">{t("subtitle")}</p>
-        </div>
-      </motion.div>
-
-      {/* Shared regulation selector */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.1, duration: 0.3 }}
-        className="flex flex-wrap gap-2"
-      >
-        {regList.map((reg) => (
-          <button
-            key={reg.id}
-            onClick={() => setSelectedReg(reg.id)}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-all ${
-              selectedReg === reg.id
-                ? "bg-primary/20 border-primary/60 text-primary-hover"
-                : "border-edge text-ink-muted hover:border-edge hover:text-ink"
-            }`}
-          >
-            {reg.name.replace(/\[Gen 9 Champions\]\s*/i, "")}
-          </button>
-        ))}
-      </motion.div>
-
-      {/* Tab bar */}
-      <div className="flex items-center gap-1 bg-layer-2/50 rounded-lg p-1 w-fit border border-edge">
-        {(["tiers", "matchup"] as Tab[]).map((tabKey) => (
-          <button
-            key={tabKey}
-            onClick={() => setTab(tabKey)}
-            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
-              tab === tabKey
-                ? "bg-primary/20 text-primary-hover"
-                : "text-ink-muted hover:text-ink"
-            }`}
-          >
-            {t(`tabs.${tabKey}`)}
-          </button>
-        ))}
-      </div>
-
-      {/* Tab content */}
-      {tab === "tiers" ? (
-        <SpeedTiersTab
-          speedTiers={speedTiers}
-          loading={loading}
-          error={error}
-          onSelectForMatchup={handleSelectForMatchup}
+    <DkApp className="min-w-0">
+      <DkBar>
+        <DkTitle icon="bolt" label={t("title")} sub={t("subtitle")} />
+        <DkDivider />
+        <DkSeg
+          value={tab}
+          ariaLabel={t("subtitle")}
+          onChange={setTab}
+          options={[
+            { value: "tiers", label: t("tabs.tiers") },
+            { value: "matchup", label: t("tabs.matchup") },
+          ]}
         />
-      ) : (
-        <SpeedMatchupTab
-          speedTiers={speedTiers}
-          loading={loading}
-          prefillEntry={prefillEntry}
-          onPrefillConsumed={() => setPrefillEntry(null)}
+        <DkSelect
+          value={selectedReg}
+          ariaLabel={t("title")}
+          minWidth="160px"
+          onChange={setSelectedReg}
+          options={regList.map((r) => ({ value: r.id, label: cleanRegName(r.name) }))}
         />
-      )}
-    </div>
+        <DkSpacer />
+        {!loading && !error && (
+          <DkChip icon="bolt">{tTiers("pokemonCount", { count: speedTiers.length })}</DkChip>
+        )}
+      </DkBar>
+
+      <DkBody>
+        {tab === "tiers" ? (
+          <SpeedTiersTab speedTiers={speedTiers} loading={loading} error={error} onSelectForMatchup={handleSelectForMatchup} />
+        ) : (
+          <SpeedMatchupTab speedTiers={speedTiers} loading={loading} prefillEntry={prefillEntry} onPrefillConsumed={() => setPrefillEntry(null)} />
+        )}
+      </DkBody>
+    </DkApp>
   );
 }
 

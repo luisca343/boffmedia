@@ -1,10 +1,6 @@
-"use client";
-import { PlayerGallery } from "../../_components/PlayerGallery";
+import { redirect } from "next/navigation"
 
-export default function UserGallery({
-  params,
-}: {
-  params: { username: string };
-}) {
-  return <PlayerGallery username={params.username} />;
+// Legacy route — read-only galleries now render under /coleccion?u=<username>.
+export default function TcgpUserGalleryRedirect({ params }: { params: { username: string } }) {
+  redirect(`/pokemon/tcgpocket/coleccion?u=${encodeURIComponent(params.username)}`)
 }

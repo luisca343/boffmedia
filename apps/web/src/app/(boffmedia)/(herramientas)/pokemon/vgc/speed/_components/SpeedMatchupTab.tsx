@@ -1,19 +1,14 @@
 "use client";
 
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
-import { motion } from "framer-motion";
-import { Search, X, Plus } from "lucide-react";
-import { Input } from "@/components/ui/primitives/input";
-import { ModifierPanel } from "../../_components/ModifierPanel";
-import {
-  applyMods,
-  compareSpeed,
-  DEFAULT_MODIFIERS,
-  Modifiers,
-} from "../../speedCalc";
-import { SpeedTierEntry } from "@/services/api/boffmedia/vgcService";
+import { cn } from "@/lib/utils";
+import { Icon } from "@/components/boffmedia/primitives/icon";
+import { DkSprite } from "@/components/boffmedia/ui/tools/datakit";
 import { spriteUrl, handleSpriteError } from "@/features/vgc-tracker/types";
+import { SpeedTierEntry } from "@/services/api/boffmedia/vgcService";
+import { applyMods, compareSpeed, DEFAULT_MODIFIERS, Modifiers } from "../../speedCalc";
+import { SpdPanel, SpdInput, SpdMonSearch, SpdModifiers } from "./SpdKit";
 
 interface TeamMember {
   id: string;
@@ -32,7 +27,6 @@ interface OpponentState {
 interface Props {
   speedTiers: SpeedTierEntry[];
   loading: boolean;
-  /** Entry sent from the Tiers tab via the ⚔ button. */
   prefillEntry: SpeedTierEntry | null;
   onPrefillConsumed: () => void;
 }
@@ -47,129 +41,46 @@ function calcEffective(speed: string, mods: Modifiers): number | null {
   return applyMods(v, mods, true);
 }
 
-function ResultBadge({
-  mySpeed,
-  opponentSpeed,
-  t,
-}: {
-  mySpeed: number | null;
-  opponentSpeed: number | null;
-  t: ReturnType<typeof useTranslations>;
-}) {
-  if (mySpeed === null || opponentSpeed === null) return null;
+function ResultBadge({ mySpeed, opponentSpeed, t }: { mySpeed: number; opponentSpeed: number; t: ReturnType<typeof useTranslations> }) {
   const result = compareSpeed(mySpeed, opponentSpeed);
   const diff = mySpeed - opponentSpeed;
-  if (result === "faster") {
-    return (
-      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-green-500/20 text-green-300 border border-green-500/40 whitespace-nowrap">
-        ▲ {t("faster")} +{diff}
-      </span>
-    );
-  }
-  if (result === "slower") {
-    return (
-      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-red-500/20 text-red-300 border border-red-500/40 whitespace-nowrap">
-        ▼ {t("slower")} {diff}
-      </span>
-    );
-  }
+  const style =
+    result === "faster"
+      ? "border-ok/40 bg-ok/15 text-ok"
+      : result === "slower"
+        ? "border-bad/40 bg-bad/15 text-bad"
+        : "border-warn/40 bg-warn/15 text-warn";
+  const label = result === "faster" ? `▲ ${t("faster")} +${diff}` : result === "slower" ? `▼ ${t("slower")} ${diff}` : `= ${t("tie")}`;
   return (
-    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-yellow-500/20 text-yellow-300 border border-yellow-500/40 whitespace-nowrap">
-      = {t("tie")}
-    </span>
+    <span className={cn("inline-flex items-center gap-1 whitespace-nowrap border border-solid px-2.5 py-1 font-mono text-[11px] font-bold", style)}>{label}</span>
   );
 }
 
-export function SpeedMatchupTab({
-  speedTiers,
-  loading,
-  prefillEntry,
-  onPrefillConsumed,
-}: Props) {
+export function SpeedMatchupTab({ speedTiers, loading, prefillEntry, onPrefillConsumed }: Props) {
   const t = useTranslations("vgc.speedComparison");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [showDropdown, setShowDropdown] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const [opponent, setOpponent] = useState<OpponentState>({
-    name: "",
-    speed: "",
-    pokemon: null,
-    mods: DEFAULT_MODIFIERS,
-  });
-  const [team, setTeam] = useState<TeamMember[]>([
-    newMember(),
-    newMember(),
-    newMember(),
-  ]);
+  const [opponent, setOpponent] = useState<OpponentState>({ name: "", speed: "", pokemon: null, mods: DEFAULT_MODIFIERS });
+  const [team, setTeam] = useState<TeamMember[]>([newMember(), newMember(), newMember()]);
 
-  // Cross-tab prefill: apply when an entry is sent from the Tiers tab
   useEffect(() => {
     if (prefillEntry) {
-      setOpponent({
-        name: prefillEntry.name,
-        speed: String(prefillEntry.speedTiers.max),
-        pokemon: prefillEntry,
-        mods: DEFAULT_MODIFIERS,
-      });
-      setSearchQuery(prefillEntry.name);
+      setOpponent({ name: prefillEntry.name, speed: String(prefillEntry.speedTiers.max), pokemon: prefillEntry, mods: DEFAULT_MODIFIERS });
       onPrefillConsumed();
     }
-    // onPrefillConsumed is stable (inline arrow on parent); prefillEntry drives the effect
-     
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prefillEntry]);
 
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(e.target as Node)
-      ) {
-        setShowDropdown(false);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
+  const opponentEffective = useMemo(() => calcEffective(opponent.speed, opponent.mods), [opponent.speed, opponent.mods]);
 
-  const searchResults = useMemo(() => {
-    if (!searchQuery.trim() || searchQuery === opponent.name) return [];
-    const q = searchQuery.toLowerCase();
-    return speedTiers.filter((p) => p.name.toLowerCase().includes(q)).slice(0, 8);
-  }, [speedTiers, searchQuery, opponent.name]);
+  const selectPokemon = (p: SpeedTierEntry) =>
+    setOpponent((prev) => ({ ...prev, name: p.name, speed: String(p.speedTiers.max), pokemon: p }));
 
-  const opponentEffective = useMemo(
-    () => calcEffective(opponent.speed, opponent.mods),
-    [opponent.speed, opponent.mods]
-  );
+  const clearOpponent = () => setOpponent({ name: "", speed: "", pokemon: null, mods: DEFAULT_MODIFIERS });
 
-  const selectPokemon = (p: SpeedTierEntry) => {
-    setOpponent((prev) => ({
-      ...prev,
-      name: p.name,
-      speed: String(p.speedTiers.max),
-      pokemon: p,
-    }));
-    setSearchQuery(p.name);
-    setShowDropdown(false);
-  };
-
-  const clearOpponent = () => {
-    setOpponent({ name: "", speed: "", pokemon: null, mods: DEFAULT_MODIFIERS });
-    setSearchQuery("");
-  };
-
-  const updateMember = (id: string, update: Partial<Omit<TeamMember, "id">>) => {
+  const updateMember = (id: string, update: Partial<Omit<TeamMember, "id">>) =>
     setTeam((prev) => prev.map((m) => (m.id === id ? { ...m, ...update } : m)));
-  };
-
-  const addMember = () => {
-    if (team.length < 6) setTeam((prev) => [...prev, newMember()]);
-  };
-
-  const removeMember = (id: string) => {
-    setTeam((prev) => prev.filter((m) => m.id !== id));
-  };
+  const addMember = () => team.length < 6 && setTeam((prev) => [...prev, newMember()]);
+  const removeMember = (id: string) => setTeam((prev) => prev.filter((m) => m.id !== id));
 
   const refSpeeds = useMemo(() => {
     const p = opponent.pokemon;
@@ -182,273 +93,113 @@ export function SpeedMatchupTab({
     ];
     if (p.speedTiers.scarf !== null) {
       chips.push({ label: "Scarf", value: p.speedTiers.scarf });
-      if (p.speedTiers.scarfPlus !== null)
-        chips.push({ label: "Scarf+", value: p.speedTiers.scarfPlus });
+      if (p.speedTiers.scarfPlus !== null) chips.push({ label: "Scarf+", value: p.speedTiers.scarfPlus });
     }
     return chips;
   }, [opponent.pokemon]);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-6 items-start">
-      {/* ── Opponent panel ── */}
-      <motion.div
-        initial={{ opacity: 0, x: -12 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 0.1, duration: 0.3 }}
-        className="rounded-xl border border-edge bg-layer-2 shadow-lg overflow-hidden"
-      >
-        <div className="px-4 py-3 border-b border-edge bg-layer-1/50">
-          <h2 className="text-xs font-semibold text-ink-muted uppercase tracking-wider">
-            {t("opponentTitle")}
-          </h2>
-        </div>
+    <div className="grid items-start gap-6 lg:grid-cols-[1fr_2fr]">
+      {/* Opponent */}
+      <SpdPanel icon="target" title={t("opponentTitle")} bodyClassName="grid gap-[14px]">
+        <SpdMonSearch
+          speedTiers={speedTiers}
+          loading={loading}
+          selectedName={opponent.name}
+          onSelect={selectPokemon}
+          onClear={clearOpponent}
+          placeholder={t("opponentSearch")}
+        />
 
-        <div className="p-4 space-y-4">
-          {/* Search */}
-          <div className="relative" ref={dropdownRef}>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-muted pointer-events-none" />
-              <Input
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setShowDropdown(true);
-                  if (!e.target.value)
-                    setOpponent((prev) => ({ ...prev, pokemon: null, name: "" }));
-                }}
-                onFocus={() => {
-                  if (searchQuery) setShowDropdown(true);
-                }}
-                placeholder={t("opponentSearch")}
-                className="pl-9 pr-8 bg-layer-1 border-edge text-ink placeholder:text-ink-muted"
-              />
-              {searchQuery && (
+        {refSpeeds.length > 0 && (
+          <div className="grid gap-[6px]">
+            <span className="font-mono text-[9px] uppercase leading-none tracking-[0.12em] text-txt-dim">{t("referenceSpeed")}</span>
+            <div className="flex flex-wrap gap-1.5">
+              {refSpeeds.map((chip) => (
                 <button
-                  onClick={clearOpponent}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-ink-muted hover:text-ink transition-colors"
+                  key={chip.label}
+                  type="button"
+                  onClick={() => setOpponent((prev) => ({ ...prev, speed: String(chip.value) }))}
+                  className={cn(
+                    "border border-solid px-2 py-[3px] font-mono text-[11px] transition-[color,background,border-color]",
+                    opponent.speed === String(chip.value) ? "border-accent-line bg-accent-soft text-accent-bright" : "border-line-2 text-txt-muted hover:text-txt",
+                  )}
                 >
-                  <X className="w-3.5 h-3.5" />
+                  {chip.label}: {chip.value}
                 </button>
-              )}
+              ))}
             </div>
-            {showDropdown && searchResults.length > 0 && (
-              <div className="absolute z-20 w-full mt-1 rounded-lg border border-edge bg-layer-1 shadow-xl overflow-hidden">
-                {loading ? (
-                  <div className="px-3 py-2 text-sm text-ink-muted">
-                    {t("loading")}
-                  </div>
-                ) : (
-                  searchResults.map((p) => (
-                    <button
-                      key={p.name}
-                      onMouseDown={() => selectPokemon(p)}
-                      className="w-full text-left px-3 py-2 hover:bg-layer-2 transition-colors flex items-center gap-2"
-                    >
-                      { }
-                      <img
-                        src={spriteUrl(p.name)}
-                        onError={handleSpriteError}
-                        alt={p.name}
-                        width={24}
-                        height={24}
-                        className="object-contain"
-                      />
-                      <span className="text-sm text-ink">{p.name}</span>
-                      <span className="ml-auto text-xs text-ink-muted font-mono">
-                        {p.baseSpeed}
-                      </span>
-                    </button>
-                  ))
-                )}
-              </div>
-            )}
           </div>
+        )}
 
-          {/* Reference speed chips */}
-          {refSpeeds.length > 0 && (
-            <div className="space-y-1.5">
-              <span className="text-[10px] text-ink-muted uppercase tracking-wider">
-                {t("referenceSpeed")}
-              </span>
-              <div className="flex flex-wrap gap-1.5">
-                {refSpeeds.map((chip) => (
-                  <button
-                    key={chip.label}
-                    onClick={() =>
-                      setOpponent((prev) => ({
-                        ...prev,
-                        speed: String(chip.value),
-                      }))
-                    }
-                    className={`px-2 py-0.5 rounded text-xs font-mono border transition-all ${
-                      opponent.speed === String(chip.value)
-                        ? "bg-primary/20 border-primary/50 text-primary-hover"
-                        : "bg-layer-2 border-edge text-ink-muted hover:text-ink hover:border-edge"
-                    }`}
-                  >
-                    {chip.label}: {chip.value}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Manual speed */}
-          <div className="space-y-1.5">
-            <span className="text-[10px] text-ink-muted uppercase tracking-wider">
-              {t("opponentManual")}
-            </span>
-            <Input
-              value={opponent.speed}
-              onChange={(e) =>
-                setOpponent((prev) => ({ ...prev, speed: e.target.value }))
-              }
-              placeholder={t("opponentSpeedPlaceholder")}
-              type="number"
-              min={1}
-              max={999}
-              className="bg-layer-1 border-edge text-ink placeholder:text-ink-muted"
-            />
-          </div>
-
-          {/* Opponent modifiers */}
-          <div className="space-y-1.5">
-            <span className="text-[10px] text-ink-muted uppercase tracking-wider">
-              {t("opponentModifiers")}
-            </span>
-            <ModifierPanel
-              modifiers={opponent.mods}
-              onChange={(m) => setOpponent((prev) => ({ ...prev, mods: m }))}
-            />
-          </div>
-
-          {/* Effective speed display */}
-          <div className="rounded-lg bg-layer-1/80 border border-edge px-4 py-4 text-center">
-            <div className="text-[10px] text-ink-muted uppercase tracking-wider mb-1">
-              {t("effectiveSpeed")}
-            </div>
-            <div className="text-5xl font-bold font-mono text-ink tabular-nums">
-              {opponentEffective !== null ? opponentEffective : "—"}
-            </div>
-            {opponent.name && (
-              <div className="text-xs text-ink-muted mt-1.5">
-                {opponent.name}
-              </div>
-            )}
-          </div>
+        <div className="grid gap-[6px]">
+          <span className="font-mono text-[9px] uppercase leading-none tracking-[0.12em] text-txt-dim">{t("opponentManual")}</span>
+          <SpdInput icon="bolt" type="number" value={opponent.speed} onChange={(v) => setOpponent((prev) => ({ ...prev, speed: v }))} placeholder={t("opponentSpeedPlaceholder")} className="w-full" />
         </div>
-      </motion.div>
 
-      {/* ── My Team panel ── */}
-      <motion.div
-        initial={{ opacity: 0, x: 12 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 0.15, duration: 0.3 }}
-        className="rounded-xl border border-edge bg-layer-2 shadow-lg overflow-hidden"
-      >
-        <div className="flex items-center justify-between px-4 py-3 border-b border-edge bg-layer-1/50">
-          <h2 className="text-xs font-semibold text-ink-muted uppercase tracking-wider">
-            {t("myTeamTitle")} ({team.length}/6)
-          </h2>
-          <button
-            onClick={() =>
-              setTeam(
-                team.map((m) => ({
-                  ...m,
-                  name: "",
-                  speed: "",
-                  mods: DEFAULT_MODIFIERS,
-                }))
-              )
-            }
-            className="text-xs text-ink-muted hover:text-red-400 transition-colors"
-          >
+        <div className="grid gap-[6px]">
+          <span className="font-mono text-[9px] uppercase leading-none tracking-[0.12em] text-txt-dim">{t("opponentModifiers")}</span>
+          <SpdModifiers modifiers={opponent.mods} onChange={(m) => setOpponent((prev) => ({ ...prev, mods: m }))} />
+        </div>
+
+        <div className="border border-solid border-line bg-base px-4 py-4 text-center">
+          <div className="mb-1 font-mono text-[9px] uppercase leading-none tracking-[0.12em] text-txt-dim">{t("effectiveSpeed")}</div>
+          <div className="font-display text-[46px] font-extrabold italic leading-none tabular-nums text-txt">{opponentEffective !== null ? opponentEffective : "—"}</div>
+          {opponent.name && <div className="mt-1.5 font-mono text-[11px] text-txt-muted">{opponent.name}</div>}
+        </div>
+      </SpdPanel>
+
+      {/* My team */}
+      <SpdPanel
+        icon="users"
+        title={`${t("myTeamTitle")} (${team.length}/6)`}
+        aside={
+          <button type="button" onClick={() => setTeam(team.map((m) => ({ ...m, name: "", speed: "", mods: DEFAULT_MODIFIERS })))} className="font-mono text-[10px] font-semibold uppercase tracking-[0.06em] text-txt-dim transition-colors hover:text-bad">
             {t("clearTeam")}
           </button>
-        </div>
-
-        <div className="divide-y divide-edge/60">
+        }
+        bodyClassName="p-0"
+      >
+        <div className="divide-y divide-[color-mix(in_srgb,var(--line)_60%,transparent)]">
           {team.map((member, idx) => {
             const effective = calcEffective(member.speed, member.mods);
             return (
-              <div key={member.id} className="px-4 py-3 space-y-2.5">
+              <div key={member.id} className="grid gap-2.5 px-[14px] py-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-ink-dim w-4 shrink-0 text-center">
-                    {idx + 1}
-                  </span>
-                  <Input
-                    value={member.name}
-                    onChange={(e) => updateMember(member.id, { name: e.target.value })}
-                    placeholder={t("teamMemberName")}
-                    className="flex-1 h-8 text-sm bg-layer-1 border-edge text-ink placeholder:text-ink-dim"
-                  />
-                  <Input
-                    value={member.speed}
-                    onChange={(e) =>
-                      updateMember(member.id, { speed: e.target.value })
-                    }
-                    placeholder={t("teamMemberSpeed")}
-                    type="number"
-                    min={1}
-                    max={999}
-                    className="w-28 h-8 text-sm font-mono bg-layer-1 border-edge text-ink placeholder:text-ink-dim"
-                  />
-                  <button
-                    onClick={() => removeMember(member.id)}
-                    className="p-1.5 text-ink-dim hover:text-red-400 transition-colors shrink-0"
-                  >
-                    <X className="w-3.5 h-3.5" />
+                  <span className="w-4 flex-none text-center font-mono text-[11px] text-txt-dim">{idx + 1}</span>
+                  <SpdInput value={member.name} onChange={(v) => updateMember(member.id, { name: v })} placeholder={t("teamMemberName")} className="flex-1" />
+                  <SpdInput type="number" value={member.speed} onChange={(v) => updateMember(member.id, { speed: v })} placeholder={t("teamMemberSpeed")} className="w-28" />
+                  <button type="button" onClick={() => removeMember(member.id)} className="grid flex-none place-items-center p-1.5 text-txt-dim transition-colors hover:text-bad">
+                    <Icon name="x" size={14} />
                   </button>
                 </div>
-
-                <div className="flex items-center gap-3 pl-6">
-                  <div className="text-[10px] text-ink-muted uppercase tracking-wider shrink-0">
-                    {t("effectiveSpeed")}
-                  </div>
-                  <div className="text-lg font-bold font-mono text-ink tabular-nums min-w-[2.5rem]">
-                    {effective !== null ? (
-                      effective
-                    ) : (
-                      <span className="text-ink-dim text-base">—</span>
-                    )}
-                  </div>
-                  {opponentEffective !== null && effective !== null && (
-                    <ResultBadge
-                      mySpeed={effective}
-                      opponentSpeed={opponentEffective}
-                      t={t}
-                    />
-                  )}
-                  {opponentEffective === null && (
-                    <span className="text-xs text-ink-dim italic">
-                      {t("noOpponent")}
-                    </span>
+                <div className="flex flex-wrap items-center gap-3 pl-6">
+                  <span className="font-mono text-[9px] uppercase leading-none tracking-[0.12em] text-txt-dim">{t("effectiveSpeed")}</span>
+                  <span className="min-w-[2.5rem] font-mono text-[17px] font-bold tabular-nums text-txt">
+                    {effective !== null ? effective : <span className="text-[15px] text-txt-dim">—</span>}
+                  </span>
+                  {opponentEffective !== null && effective !== null && <ResultBadge mySpeed={effective} opponentSpeed={opponentEffective} t={t} />}
+                  {opponentEffective === null && <span className="font-mono text-[11px] italic text-txt-dim">{t("noOpponent")}</span>}
+                  {member.name && (
+                    <DkSprite src={spriteUrl(member.name)} alt={member.name} size={22} onError={handleSpriteError} className="ml-auto" />
                   )}
                 </div>
-
                 <div className="pl-6">
-                  <ModifierPanel
-                    modifiers={member.mods}
-                    onChange={(m) => updateMember(member.id, { mods: m })}
-                  />
+                  <SpdModifiers modifiers={member.mods} onChange={(m) => updateMember(member.id, { mods: m })} />
                 </div>
               </div>
             );
           })}
         </div>
-
         {team.length < 6 && (
-          <div className="px-4 py-3 border-t border-edge/60">
-            <button
-              onClick={addMember}
-              className="flex items-center gap-1.5 text-xs text-ink-muted hover:text-ink transition-colors"
-            >
-              <Plus className="w-3.5 h-3.5" />
+          <div className="border-t border-solid border-line px-[14px] py-3">
+            <button type="button" onClick={addMember} className="inline-flex items-center gap-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.06em] text-txt-muted transition-colors hover:text-txt">
+              <Icon name="plus" size={14} />
               {t("addMember")}
             </button>
           </div>
         )}
-      </motion.div>
+      </SpdPanel>
     </div>
   );
 }

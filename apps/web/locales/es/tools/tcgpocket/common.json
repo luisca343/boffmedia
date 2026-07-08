@@ -126,6 +126,133 @@
         "card": "Carta {number}",
         "total": "Total"
       }
+    },
+    "app": {
+      "tagline": "Colección · Meta · Sobres",
+      "searchCards": "Buscar carta…",
+      "showing": "Mostrando {shown} de {total} cartas",
+      "clearFilters": "Limpiar filtros",
+      "loadMore": "Cargar más ({n} restantes)",
+      "ownedOnly": "Solo mías",
+      "errorTitle": "No se pudo cargar",
+      "errorLead": "No pudimos cargar la base de datos de cartas. Inténtalo de nuevo más tarde.",
+      "empty": {
+        "title": "Sin resultados",
+        "lead": "Prueba con otro término o quita algún filtro."
+      },
+      "tabs": {
+        "panel": "Panel",
+        "cartas": "Cartas",
+        "coleccion": "Colección",
+        "sobres": "Sobres"
+      },
+      "filters": {
+        "expansion": "Expansión",
+        "allSets": "Todas las expansiones",
+        "category": "Categoría",
+        "allCategories": "Todas las categorías"
+      },
+      "category": {
+        "pokemon": "Pokémon",
+        "trainer": "Entrenador",
+        "supporter": "Partidario",
+        "item": "Objeto",
+        "energy": "Energía"
+      },
+      "sort": {
+        "label": "Orden",
+        "num": "Número",
+        "name": "Nombre",
+        "rarity": "Rareza",
+        "hp": "PS"
+      },
+      "cartas": {
+        "title": "Lista de cartas",
+        "lead": "Base de datos completa · {cards} cartas en {sets} expansiones."
+      },
+      "panel": {
+        "kicker": "Pokémon · Cartas de bolsillo",
+        "collection": "Colección",
+        "lead": "Explora cada expansión, sigue tu colección carta a carta, calcula qué sobre te conviene abrir y consulta galerías de otros jugadores. Todo en un solo panel.",
+        "exploreCards": "Explorar cartas",
+        "myCollection": "Mi colección",
+        "openPacks": "Ver sobres",
+        "owned": "Poseídas",
+        "ofTotal": "de {total} cartas",
+        "expansions": "Expansiones",
+        "activeSets": "series activas",
+        "exCards": "Cartas ex",
+        "specialArt": "ilustraciones especiales",
+        "crowns": "Coronas",
+        "maxRarity": "máxima rareza",
+        "dupes": "Repetidas",
+        "forTrade": "para intercambio",
+        "progressBySet": "Progreso por expansión",
+        "viewCollection": "Ver colección",
+        "playerGallery": "Galería de jugador",
+        "galleryHint": "Consulta la colección pública de cualquier jugador de la comunidad.",
+        "usernamePlaceholder": "Nombre de usuario…",
+        "view": "Ver",
+        "recentActivity": "Actividad reciente",
+        "loginForActivity": "Inicia sesión para seguir tu actividad.",
+        "noActivity": "Sin movimientos todavía."
+      },
+      "coleccion": {
+        "myTitle": "Mi colección",
+        "galleryTitle": "Galería · {user}",
+        "summary": "{have} de {total} cartas · {pct}% completado · {dupes} repetidas.",
+        "viewingGallery": "Viendo la galería de {user}",
+        "readOnly": "Solo lectura.",
+        "backToMine": "Volver a la mía",
+        "searchPlaceholder": "Buscar en la colección…",
+        "hideMissing": "Ocultar faltantes",
+        "loginTitle": "Inicia sesión",
+        "loginLead": "Accede para seguir tu colección carta a carta y guardar tus cambios.",
+        "login": "Iniciar sesión",
+        "unsaved": "{count, plural, one {cambio sin guardar} other {cambios sin guardar}}",
+        "discard": "Descartar",
+        "saveChanges": "Guardar cambios",
+        "saving": "Guardando…",
+        "bestPack": "Analizador de sobres",
+        "bestPackHint": "Según tu colección, calculamos el sobre con más probabilidad de darte una carta que aún no tienes.",
+        "analyze": "Analizar",
+        "analyzing": "Analizando…",
+        "bestPackEmpty": "No hay datos suficientes para analizar los sobres.",
+        "newCardOdds": "{odds} de carta nueva por sobre.",
+        "pack": "Sobre",
+        "new": "Nueva",
+        "best": "Mejor",
+        "slot": "{n}.ª"
+      },
+      "sobres": {
+        "title": "Sobres",
+        "lead": "Cada expansión reparte sus cartas en uno o varios sobres. Ábrelos para ver qué cartas contienen.",
+        "cardCount": "{count} cartas",
+        "packCards": "Cartas del sobre",
+        "noPackCards": "Este sobre no tiene cartas registradas.",
+        "noPacks": "Sin sobres registrados para esta expansión."
+      },
+      "combates": {
+        "title": "Combates",
+        "lead": "Los combates en solitario llegarán pronto, cuando su fuente de datos esté disponible.",
+        "back": "Volver al panel"
+      },
+      "drawer": {
+        "prev": "Anterior",
+        "next": "Siguiente",
+        "close": "Cerrar",
+        "inCollection": "en tu colección",
+        "owned": "en la colección",
+        "notOwned": "No la tienes",
+        "number": "Número",
+        "expansion": "Expansión",
+        "type": "Tipo",
+        "hp": "Puntos de salud",
+        "weakness": "Debilidad",
+        "retreat": "Coste de retirada",
+        "availableIn": "Disponible en",
+        "illustrator": "Ilustrador"
+      }
     }
   }
 }
