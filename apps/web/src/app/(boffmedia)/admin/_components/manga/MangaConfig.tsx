@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BookOpen, CheckCircle2, Clock, Loader2, Pause, Play, RefreshCw, Settings } from "lucide-react";
-import { Button } from "@/components/ui/primitives/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/primitives/card";
-import { Input } from "@/components/ui/primitives/input";
+import { useTranslations } from "next-intl";
+import { Button, Field, Input, Icon, Spinner, Toggle } from "@/components/boffmedia/primitives";
 import { apiGET, apiPATCH, apiPOST } from "@/services/boffAPI";
+import { AvSectionHead, AvPanel, AvPill } from "../ui/av-kit";
 
 type SeriesStatus = "ongoing" | "completed" | "hiatus";
 
@@ -20,19 +19,15 @@ interface MangaConfigData {
   series: Record<string, SeriesConfig>;
 }
 
-const STATUS_LABELS: Record<SeriesStatus, string> = {
-  ongoing: "En curso",
-  completed: "Completado",
-  hiatus: "En pausa",
-};
-
-const STATUS_STYLES: Record<SeriesStatus, string> = {
-  ongoing: "text-green-400 border-green-800/60 bg-green-900/20",
-  completed: "text-[var(--orange-500)] border-[color-mix(in_srgb,var(--orange-500)_30%,transparent)] bg-[color-mix(in_srgb,var(--orange-500)_10%,transparent)]",
-  hiatus: "text-yellow-400 border-yellow-800/60 bg-yellow-900/20",
+const STATUSES: SeriesStatus[] = ["ongoing", "completed", "hiatus"];
+const STATUS_TONE: Record<SeriesStatus, "green" | "accent" | "amber"> = {
+  ongoing: "green",
+  completed: "accent",
+  hiatus: "amber",
 };
 
 export default function MangaConfig() {
+  const t = useTranslations("admin.manga.config");
   const [config, setConfig] = useState<MangaConfigData | null>(null);
   const [loading, setLoading] = useState(true);
   const [cronSchedule, setCronSchedule] = useState("");
@@ -74,7 +69,7 @@ export default function MangaConfig() {
     setTriggering(true);
     setTriggerMessage(null);
     const res = await apiPOST<{ message: string }>("/boffmedia/herramientas/scrape/manga/cron/run", {});
-    setTriggerMessage(res.success && res.data ? res.data.message : "Error al iniciar la tarea.");
+    setTriggerMessage(res.success && res.data ? res.data.message : t("runError"));
     setTriggering(false);
   }
 
@@ -94,153 +89,92 @@ export default function MangaConfig() {
   const seriesEntries = Object.entries(config?.series ?? {});
 
   return (
-    <div className="max-w-3xl flex flex-col gap-6">
+    <div className="max-w-3xl">
+      <AvSectionHead title={t("title")} desc={t("sub")} />
 
-      {/* Header */}
-      <div className="flex items-center gap-3">
-        <Settings className="w-5 h-5 text-[var(--orange-500)] shrink-0" />
-        <h2 className="text-xl font-bold text-ink">Configuración de Manga</h2>
-      </div>
-
-      {/* Cron settings */}
-      <Card className="bg-layer-1 border-edge">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm text-ink flex items-center gap-2">
-            <RefreshCw className="h-4 w-4 text-[var(--orange-500)]" />Auto-actualización
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-
-          {/* Enable/disable toggle */}
-          <div className="flex items-center justify-between">
+      {/* Auto-update / cron */}
+      <AvPanel title={t("autoUpdate")} icon="refresh">
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="text-sm text-ink font-medium">Tarea programada</p>
-              <p className="text-xs text-ink-dim mt-0.5">
-                Comprueba nuevos capítulos en series marcadas como &quot;En curso&quot;
-              </p>
+              <p className="text-[14px] font-medium text-txt">{t("cronTask")}</p>
+              <p className="mt-0.5 text-[12px] text-txt-dim">{t("cronDesc")}</p>
             </div>
             {loading ? (
-              <div className="w-9 h-5 rounded-full bg-[color-mix(in_srgb,var(--text)_7%,transparent)] animate-pulse" />
+              <Spinner size={16} className="text-accent" />
             ) : (
-              <button
-                onClick={handleCronToggle}
-                disabled={savingCron}
-                className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors focus:outline-none
-                  disabled:opacity-40 disabled:cursor-not-allowed
-                  ${config?.cron.enabled ? "bg-secondary" : "bg-[color-mix(in_srgb,var(--text)_10%,transparent)]"}`}
-                aria-checked={config?.cron.enabled}
-                role="switch"
-              >
-                <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform
-                  ${config?.cron.enabled ? "translate-x-4" : "translate-x-0.5"}`} />
-              </button>
+              <Toggle on={!!config?.cron.enabled} onChange={handleCronToggle} />
             )}
           </div>
 
-          {/* Schedule input */}
-          <div className="flex gap-2 items-end">
-            <div className="flex-1">
-              <label className="text-xs text-ink-dim mb-1.5 block">Expresión cron (UTC)</label>
+          <div className="flex items-end gap-2">
+            <Field label={t("cronExpr")} className="flex-1">
               <Input
                 value={cronSchedule}
                 onChange={(e) => setCronSchedule(e.target.value)}
                 placeholder="0 3 * * *"
                 disabled={loading}
-                className="font-mono bg-layer-2 border-edge-strong text-ink placeholder-[var(--text-dim)] disabled:opacity-40"
+                className="font-mono"
               />
-              <p className="text-[11px] text-ink-dim mt-1">
-                Predeterminado: <code className="text-[var(--orange-500)]">0 3 * * *</code> = todos los días a las 3:00 UTC
-              </p>
-            </div>
-            <Button
-              onClick={handleSaveSchedule}
-              disabled={savingCron || loading || !cronSchedule.trim()}
-              variant="outline"
-              size="sm"
-              className="border-edge-strong hover:bg-[color-mix(in_srgb,var(--text)_5%,transparent)] text-ink shrink-0"
-            >
-              Guardar
+            </Field>
+            <Button onClick={handleSaveSchedule} loading={savingCron} disabled={savingCron || loading || !cronSchedule.trim()}>
+              {t("save")}
             </Button>
           </div>
+          <p className="-mt-2 font-mono text-[11px] text-txt-dim">
+            {t("cronDefault")} <span className="text-accent">0 3 * * *</span>
+          </p>
 
-          {/* Run now */}
-          <div className="flex items-center gap-3 pt-2 border-t border-edge">
-            <Button
-              onClick={handleRunNow}
-              disabled={triggering || loading}
-              variant="outline"
-              size="sm"
-              className="border-edge hover:bg-layer-3 text-ink"
-            >
-              {triggering
-                ? <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />Iniciando…</>
-                : <><Play className="w-3.5 h-3.5 mr-1.5" />Ejecutar ahora</>}
+          <div className="flex items-center gap-3 border-t border-solid border-line pt-3">
+            <Button variant="ghost" icon="play" onClick={handleRunNow} loading={triggering} disabled={triggering || loading}>
+              {triggering ? t("running") : t("runNow")}
             </Button>
-            {triggerMessage && (
-              <p className="text-xs text-ink-muted">{triggerMessage}</p>
-            )}
+            {triggerMessage && <p className="text-[12px] text-txt-muted">{triggerMessage}</p>}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </AvPanel>
 
       {/* Series status */}
-      <Card className="bg-layer-1 border-edge">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm text-ink flex items-center gap-2">
-            <BookOpen className="h-4 w-4 text-[var(--orange-500)]" />Estado de series
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <div className="flex items-center gap-2 text-ink-muted text-sm py-2">
-              <Loader2 className="w-4 h-4 animate-spin" />Cargando configuración…
-            </div>
-          ) : seriesEntries.length === 0 ? (
-            <div className="flex items-center gap-2 text-ink-dim text-sm py-4">
-              <BookOpen className="w-4 h-4" />
-              <span>No hay series registradas. Descarga una serie para verla aquí.</span>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-2">
-              {seriesEntries.map(([slug, cfg]) => {
-                const status = cfg.status ?? "ongoing";
-                return (
-                  <div
-                    key={slug}
-                    className="flex items-center gap-3 px-3 py-2.5 border border-edge rounded-lg bg-[color-mix(in_srgb,var(--layer-1)_96%,transparent)]"
-                  >
-                    <BookOpen className="w-3.5 h-3.5 text-ink-dim shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-ink truncate font-medium">{slug}</p>
-                      {cfg.lastChecked && (
-                        <p className="text-[10px] text-ink-dim flex items-center gap-1 mt-0.5">
-                          <Clock className="w-3 h-3" />
-                          Revisado: {new Date(cfg.lastChecked).toLocaleString()}
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex gap-1.5 shrink-0">
-                      {(["ongoing", "completed", "hiatus"] as SeriesStatus[]).map((s) => (
-                        <button
-                          key={s}
-                          onClick={() => handleStatusChange(slug, s)}
-                          className={`flex items-center gap-1 px-2 py-0.5 rounded border text-[10px] font-medium transition-all
-                            ${status === s ? STATUS_STYLES[s] : "text-ink-dim border-edge bg-transparent hover:border-edge-strong"}`}
-                        >
-                          {s === "ongoing" && <CheckCircle2 className="w-2.5 h-2.5" />}
-                          {s === "completed" && <CheckCircle2 className="w-2.5 h-2.5" />}
-                          {s === "hiatus" && <Pause className="w-2.5 h-2.5" />}
-                          {STATUS_LABELS[s]}
-                        </button>
-                      ))}
-                    </div>
+      <AvPanel title={t("seriesStatus")} icon="book">
+        {loading ? (
+          <div className="flex items-center gap-2 py-2 text-[13px] text-txt-muted">
+            <Spinner size={16} className="text-accent" />
+            {t("loadingConfig")}
+          </div>
+        ) : seriesEntries.length === 0 ? (
+          <div className="flex items-center gap-2 py-4 text-[13px] text-txt-dim">
+            <Icon name="book" size={15} />
+            <span>{t("noSeries")}</span>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {seriesEntries.map(([slug, cfg]) => {
+              const status = cfg.status ?? "ongoing";
+              return (
+                <div key={slug} className="flex items-center gap-3 border border-solid border-line bg-base-2 px-3 py-2.5">
+                  <Icon name="book" size={14} className="shrink-0 text-txt-dim" />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[14px] font-medium text-txt">{slug}</p>
+                    {cfg.lastChecked && (
+                      <p className="mt-0.5 flex items-center gap-1 font-mono text-[10px] text-txt-dim">
+                        <Icon name="clock" size={11} />
+                        {t("checked", { date: new Date(cfg.lastChecked).toLocaleString() })}
+                      </p>
+                    )}
                   </div>
-                );
-              })}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                  <div className="flex shrink-0 gap-1.5">
+                    {STATUSES.map((s) => (
+                      <button key={s} type="button" onClick={() => handleStatusChange(slug, s)} className={status === s ? "" : "opacity-45 transition-opacity hover:opacity-80"}>
+                        <AvPill tone={status === s ? STATUS_TONE[s] : "default"}>{t(`status_${s}`)}</AvPill>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </AvPanel>
     </div>
   );
 }

@@ -1,18 +1,11 @@
-'use client';
+"use client";
 
-import { useState, useCallback, useEffect, useMemo } from 'react';
-import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/primitives/card';
-import { Button } from '@/components/ui/primitives/button';
-import { Badge } from '@/components/ui/primitives/badge';
-import { Input } from '@/components/ui/primitives/input';
-import { Checkbox } from '@/components/ui/primitives/checkbox';
+import { useState, useCallback, useEffect, useMemo } from "react";
+import { createPortal } from "react-dom";
+import { useTranslations } from "next-intl";
 import {
-  BookOpen, Search, Download, Loader2, ChevronDown, ChevronUp,
-  CheckSquare, Square, HardDrive, CheckCircle2, XCircle, Clock,
-  X, Globe,
-} from 'lucide-react';
+  Button, Field, Input, Icon, Spinner, Toggle, Disclosure, Checkbox, SearchInput,
+} from "@/components/boffmedia/primitives";
 import {
   ScrapeService,
   type BrowserConfig,
@@ -20,23 +13,26 @@ import {
   type MangaChapter,
   type MangaDownloadSseEvent,
   type LocalMangaLibrary,
-} from '@/services/api/boffmedia/scrapeService';
-import { useMangaStore } from '@/stores/useMangaStore';
-import MangaMetadataForm from './MangaMetadataForm';
-
-// ─── Scraper sources panel ─────────────────────────────────────────────────────
+} from "@/services/api/boffmedia/scrapeService";
+import { useMangaStore } from "@/stores/useMangaStore";
+import { AvSectionHead, AvPanel, AvPill, AvAlert, AvLiveDot } from "../ui/av-kit";
+import { MgResult, MgBar } from "./ui/mg-kit";
+import MangaMetadataForm from "./MangaMetadataForm";
 
 const SCRAPER_SOURCES = [
-  { name: 'NovelCool', url: 'https://es.novelcool.com', active: true, description: 'Manga y manhwa en español' },
-  { name: 'PkProject', url: 'https://pkproject.net', active: true, description: 'Pokémon Adventures' },
+  { name: "NovelCool", url: "https://es.novelcool.com", active: true, desc: "Manga y manhwa en español" },
+  { name: "PkProject", url: "https://pkproject.net", active: true, desc: "Pokémon Adventures" },
 ] as const;
 
+/* ---- scraper sources + tunnel --------------------------------------------- */
+
 function ScraperSourcesPanel() {
+  const t = useTranslations("admin.manga.downloader");
   const [browserConfig, setBrowserConfig] = useState<BrowserConfig | null>(null);
   const [tunnelToggling, setTunnelToggling] = useState(false);
 
   useEffect(() => {
-    ScrapeService.getBrowserConfig().then(res => {
+    ScrapeService.getBrowserConfig().then((res) => {
       if (res.success && res.data) setBrowserConfig(res.data);
     });
   }, []);
@@ -53,81 +49,35 @@ function ScraperSourcesPanel() {
   };
 
   return (
-    <Card className="bg-layer-1 border-edge">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-sm text-ink flex items-center gap-2">
-          <Globe className="h-4 w-4 text-[var(--orange-500)]" />Fuentes disponibles
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-3">
+    <AvPanel title={t("sources")} icon="globe">
+      <div className="flex flex-col gap-3">
         <div className="flex flex-wrap gap-2">
-          {SCRAPER_SOURCES.map(source => (
-            <div key={source.name} className="flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs
-              border-edge bg-[color-mix(in_srgb,var(--text)_3%,transparent)]">
-              <span className={`h-1.5 w-1.5 rounded-full shrink-0 ${source.active ? 'bg-green-400' : 'bg-[var(--text-dim)]'}`} />
-              <span className="font-medium text-ink">{source.name}</span>
-              <span className="text-ink-dim">{source.description}</span>
-              <Badge className={`text-[10px] px-1.5 py-0 h-4 ${source.active
-                ? 'bg-green-900/30 text-green-300 border-green-800/40'
-                : 'bg-[color-mix(in_srgb,var(--text)_5%,transparent)] text-ink-muted border-edge'}`}>
-                {source.active ? 'Activo' : 'No disponible'}
-              </Badge>
+          {SCRAPER_SOURCES.map((source) => (
+            <div key={source.name} className="flex items-center gap-2 border border-solid border-line bg-base-2 px-3 py-1.5 text-[12px]">
+              <AvLiveDot className={source.active ? "" : "bg-txt-dim"} />
+              <span className="font-medium text-txt">{source.name}</span>
+              <span className="text-txt-dim">{source.desc}</span>
+              <AvPill tone={source.active ? "green" : "default"}>
+                {source.active ? t("sourceActive") : t("sourceInactive")}
+              </AvPill>
             </div>
           ))}
         </div>
-
-        {/* Browser tunnel toggle */}
         {browserConfig && (
-          <div className="flex items-center justify-between pt-1 border-t border-edge">
+          <div className="flex items-center justify-between gap-4 border-t border-solid border-line pt-3">
             <div className="flex flex-col gap-0.5">
-              <span className="text-xs font-medium text-ink">Túnel de navegador</span>
-              <span className="text-[11px] text-ink-dim">Usar navegador remoto (tunnel) para scraping</span>
+              <span className="text-[13px] font-medium text-txt">{t("tunnel")}</span>
+              <span className="text-[11px] text-txt-dim">{t("tunnelDesc")}</span>
             </div>
-            <button
-              onClick={handleTunnelToggle}
-              disabled={tunnelToggling}
-              className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors focus:outline-none
-                disabled:opacity-40 disabled:cursor-not-allowed
-                ${browserConfig.tunnelEnabled ? 'bg-[var(--orange-600)]' : 'bg-[color-mix(in_srgb,var(--text)_10%,transparent)]'}`}
-              aria-checked={browserConfig.tunnelEnabled}
-              role="switch"
-            >
-              <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform
-                ${browserConfig.tunnelEnabled ? 'translate-x-4' : 'translate-x-0.5'}`} />
-            </button>
+            <Toggle on={browserConfig.tunnelEnabled} onChange={handleTunnelToggle} />
           </div>
         )}
-      </CardContent>
-    </Card>
-  );
-}
-
-
-
-// ─── Search results ────────────────────────────────────────────────────────────
-
-function SearchResultCard({ result, onSelect }: { result: MangaSearchResult; onSelect: (r: MangaSearchResult) => void }) {
-  return (
-    <button onClick={() => onSelect(result)}
-      className="flex items-center gap-3 px-4 py-3 rounded-lg border border-edge bg-layer-1 hover:bg-layer-2 hover:border-[color-mix(in_srgb,var(--orange-500)_20%,transparent)] transition-all text-left w-full group">
-      {result.cover
-         
-        ? <img src={result.cover} alt={result.title} className="h-14 w-10 object-cover rounded shrink-0 border border-edge" />
-        : <div className="h-14 w-10 rounded bg-[color-mix(in_srgb,var(--text)_5%,transparent)] border border-edge flex items-center justify-center shrink-0">
-            <BookOpen className="h-5 w-5 text-ink-dim" />
-          </div>}
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-ink truncate group-hover:text-[var(--orange-400)] transition-colors">
-          {result.title || result.url.split('/').filter(Boolean).pop()}
-        </p>
-        <p className="text-xs text-ink-dim truncate mt-0.5">{result.url}</p>
       </div>
-      <ChevronDown className="h-4 w-4 text-ink-dim -rotate-90 shrink-0 group-hover:text-[var(--orange-500)] transition-colors" />
-    </button>
+    </AvPanel>
   );
 }
 
-// ─── Chapter selector ──────────────────────────────────────────────────────────
+/* ---- chapter selector ----------------------------------------------------- */
 
 function ChapterSelector({ chapters, selected, downloadedSlugs, onToggle, onToggleAll, onSelectRange }: {
   chapters: MangaChapter[];
@@ -137,82 +87,76 @@ function ChapterSelector({ chapters, selected, downloadedSlugs, onToggle, onTogg
   onToggleAll: () => void;
   onSelectRange: (from: number, to: number) => void;
 }) {
+  const t = useTranslations("admin.manga.downloader");
   const allSelected = chapters.length > 0 && chapters.every((_, i) => selected.has(i));
-  const [search, setSearch] = useState('');
-  const [rangeFrom, setRangeFrom] = useState('');
-  const [rangeTo, setRangeTo] = useState('');
+  const [search, setSearch] = useState("");
+  const [rangeFrom, setRangeFrom] = useState("");
+  const [rangeTo, setRangeTo] = useState("");
   const filtered = chapters.map((ch, i) => ({ ch, i }))
     .filter(({ ch }) => !search || ch.title.toLowerCase().includes(search.toLowerCase()));
 
   const applyRange = () => {
     const from = Math.max(1, parseInt(rangeFrom) || 1);
-    const to   = Math.min(chapters.length, parseInt(rangeTo) || chapters.length);
+    const to = Math.min(chapters.length, parseInt(rangeTo) || chapters.length);
     if (from <= to) onSelectRange(from - 1, to - 1);
   };
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Filter + select-all row */}
       <div className="flex items-center gap-2">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-ink-dim" />
-          <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Filtrar capítulos…"
-            className="pl-8 h-8 text-xs bg-layer-2 border-edge-strong text-ink placeholder-[var(--text-dim)]" />
+        <div className="flex-1">
+          <SearchInput value={search} onChange={setSearch} placeholder={t("filterChapters")} size="sm" />
         </div>
-        <button onClick={onToggleAll}
-          className="flex items-center gap-1.5 text-xs text-ink-muted hover:text-ink transition-colors whitespace-nowrap">
-          {allSelected
-            ? <><Square className="h-3.5 w-3.5" />Deseleccionar</>
-            : <><CheckSquare className="h-3.5 w-3.5" />Selec. todos ({chapters.length})</>}
+        <button onClick={onToggleAll} className="whitespace-nowrap font-mono text-[11px] uppercase tracking-[0.06em] text-txt-muted transition-colors hover:text-txt">
+          {allSelected ? t("deselect") : t("selectAllN", { n: chapters.length })}
         </button>
       </div>
 
-      {/* Range selector row */}
       <div className="flex items-center gap-2">
-        <span className="text-xs text-ink-dim shrink-0">Rango:</span>
-        <Input
+        <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.08em] text-txt-dim">{t("range")}</span>
+        <input
           type="number" min={1} max={chapters.length} placeholder="1"
-          value={rangeFrom} onChange={e => setRangeFrom(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && applyRange()}
-          className="w-20 h-7 text-xs bg-layer-2 border-edge-strong text-ink placeholder-[var(--text-dim)] text-center px-2"
+          value={rangeFrom} onChange={(e) => setRangeFrom(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && applyRange()}
+          className="h-7 w-20 border border-solid border-line-2 bg-base-2 px-2 text-center text-[12px] text-txt [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
         />
-        <span className="text-xs text-ink-dim">—</span>
-        <Input
+        <span className="text-txt-dim">—</span>
+        <input
           type="number" min={1} max={chapters.length} placeholder={String(chapters.length)}
-          value={rangeTo} onChange={e => setRangeTo(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && applyRange()}
-          className="w-20 h-7 text-xs bg-layer-2 border-edge-strong text-ink placeholder-[var(--text-dim)] text-center px-2"
+          value={rangeTo} onChange={(e) => setRangeTo(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && applyRange()}
+          className="h-7 w-20 border border-solid border-line-2 bg-base-2 px-2 text-center text-[12px] text-txt [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
         />
-        <button onClick={applyRange}
-          className="flex items-center gap-1 text-xs text-[var(--orange-500)] hover:text-[var(--orange-400)] transition-colors whitespace-nowrap border border-[color-mix(in_srgb,var(--orange-500)_30%,transparent)] hover:border-[color-mix(in_srgb,var(--orange-500)_35%,transparent)] rounded px-2 py-1 bg-[color-mix(in_srgb,var(--orange-500)_10%,transparent)]">
-          <CheckSquare className="h-3 w-3" />Seleccionar
-        </button>
+        <Button size="sm" icon="check" onClick={applyRange}>{t("select")}</Button>
       </div>
-      <div className="rounded-lg border border-edge divide-y divide-[var(--border)] max-h-80 overflow-y-auto">
+
+      <div className="max-h-80 overflow-y-auto border border-solid border-line">
         {filtered.map(({ ch, i }) => {
           const isSelected = selected.has(i);
-          const chapterKey = ch.number != null
-            ? String(ch.number)
-            : ch.title.replace(/[\\/:*?"<>|]/g, '').trim();
+          const chapterKey = ch.number != null ? String(ch.number) : ch.title.replace(/[\\/:*?"<>|]/g, "").trim();
           const isDownloaded = downloadedSlugs.has(chapterKey);
           return (
-            <div key={i} onClick={() => onToggle(i)}
-              className={`flex items-center gap-3 px-3 py-2 cursor-pointer transition-colors
-                ${isSelected ? 'bg-[color-mix(in_srgb,var(--orange-500)_10%,transparent)] hover:bg-[color-mix(in_srgb,var(--orange-500)_15%,transparent)]' : isDownloaded ? 'bg-green-900/10 hover:bg-green-900/20' : 'hover:bg-[color-mix(in_srgb,var(--text)_3%,transparent)]'}`}>
-              <Checkbox checked={isSelected} onCheckedChange={() => onToggle(i)} onClick={e => e.stopPropagation()}
-                className="border-[var(--text-dim)] data-[state=checked]:bg-[var(--orange-600)] data-[state=checked]:border-[var(--orange-600)] shrink-0" />
-              <span className={`flex-1 text-xs truncate ${isDownloaded ? 'text-green-300' : 'text-ink'}`}>{ch.title}</span>
-              {isDownloaded && <HardDrive className="h-3 w-3 text-green-500/70 shrink-0" />}
+            <div
+              key={i}
+              onClick={() => onToggle(i)}
+              className={
+                "flex cursor-pointer items-center gap-3 border-b border-solid border-[color-mix(in_srgb,var(--line)_55%,transparent)] px-3 py-2 transition-colors last:border-b-0 " +
+                (isSelected ? "bg-accent-soft" : isDownloaded ? "bg-ok-soft" : "hover:bg-panel-2")
+              }
+            >
+              <Checkbox checked={isSelected} onChange={() => onToggle(i)} />
+              <span className={"flex-1 truncate text-[12px] " + (isDownloaded ? "text-ok" : "text-txt")}>{ch.title}</span>
+              {isDownloaded && <Icon name="database" size={12} className="shrink-0 text-ok" />}
             </div>
           );
         })}
-        {filtered.length === 0 && <p className="text-xs text-ink-dim text-center py-4">Sin resultados.</p>}
+        {filtered.length === 0 && <p className="py-4 text-center text-[12px] text-txt-dim">{t("noResults")}</p>}
       </div>
     </div>
   );
 }
 
-// ─── Download progress panel ───────────────────────────────────────────────────
+/* ---- download progress ---------------------------------------------------- */
 
 interface ProgressState {
   novelTitle: string;
@@ -225,65 +169,57 @@ interface ProgressState {
 }
 
 function DownloadProgressPanel({ progress }: { progress: ProgressState }) {
+  const t = useTranslations("admin.manga.downloader");
   const [showChapters, setShowChapters] = useState(true);
   const pct = progress.total > 0 ? Math.round((progress.completed / progress.total) * 100) : 0;
 
   return (
-    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3">
       <div className="flex flex-col gap-1.5">
-        <div className="flex justify-between text-sm">
-          <span className="text-ink font-medium">
-            {progress.done ? 'Descarga completada' : `Descargando… ${progress.completed} / ${progress.total}`}
+        <div className="flex justify-between text-[13px]">
+          <span className="font-medium text-txt">
+            {progress.done ? t("downloadComplete") : t("downloadingN", { completed: progress.completed, total: progress.total })}
           </span>
-          <span className="text-ink-muted">{pct}%</span>
+          <span className="font-mono text-txt-muted">{pct}%</span>
         </div>
-        <div className="h-2 rounded-full bg-[color-mix(in_srgb,var(--text)_8%,transparent)] overflow-hidden">
-          <motion.div className={`h-full rounded-full ${progress.done ? 'bg-green-500' : 'bg-[var(--orange-500)]'}`}
-            initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ ease: 'easeOut', duration: 0.3 }} />
-        </div>
+        <MgBar pct={pct} done={progress.done} />
       </div>
-      <div className="flex flex-wrap gap-2 text-xs">
-        {progress.totalDownloaded > 0 &&
-          <span className="px-2 py-1 rounded-full bg-green-900/30 text-green-300 border border-green-800/40 flex items-center gap-1">
-            <CheckCircle2 className="h-3 w-3" />{progress.totalDownloaded} imágenes DL
-          </span>}
-        {progress.totalFailed > 0 &&
-          <span className="px-2 py-1 rounded-full bg-red-900/30 text-red-300 border border-red-800/40 flex items-center gap-1">
-            <XCircle className="h-3 w-3" />{progress.totalFailed} fallidas
-          </span>}
+      <div className="flex flex-wrap gap-2">
+        {progress.totalDownloaded > 0 && <AvPill tone="green" icon="check">{t("imagesDlN", { n: progress.totalDownloaded })}</AvPill>}
+        {progress.totalFailed > 0 && <AvPill tone="rose" icon="x">{t("failedN", { n: progress.totalFailed })}</AvPill>}
       </div>
-      <button onClick={() => setShowChapters(v => !v)}
-        className="flex items-center gap-1.5 text-xs text-ink-muted hover:text-ink transition-colors self-start">
-        {showChapters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-        {showChapters ? 'Ocultar' : 'Ver'} capítulos ({progress.chapters.length})
+      <button onClick={() => setShowChapters((v) => !v)} className="flex items-center gap-1.5 self-start font-mono text-[11px] uppercase tracking-[0.06em] text-txt-muted transition-colors hover:text-txt">
+        <Icon name={showChapters ? "chevronDown" : "chevronRight"} size={14} />
+        {showChapters ? t("hideChaptersN", { n: progress.chapters.length }) : t("showChaptersN", { n: progress.chapters.length })}
       </button>
       {showChapters && (
-        <div className="rounded-lg border border-edge divide-y divide-[var(--border)] max-h-72 overflow-y-auto">
-          {progress.chapters.map(ch => (
-            <div key={ch.chapter} className="flex items-center gap-3 px-3 py-2">
-              <CheckCircle2 className={`h-3.5 w-3.5 shrink-0 ${ch.failed > 0 ? 'text-yellow-400' : 'text-green-400'}`} />
-              <span className="flex-1 text-xs text-ink truncate">{ch.chapter}</span>
-              <span className="text-xs text-ink-dim shrink-0">
-                {ch.downloaded} DL · {ch.skipped} skip
-                {ch.failed > 0 && <span className="text-red-400"> · {ch.failed} err</span>}
+        <div className="max-h-72 overflow-y-auto border border-solid border-line">
+          {progress.chapters.map((ch) => (
+            <div key={ch.chapter} className="flex items-center gap-3 border-b border-solid border-[color-mix(in_srgb,var(--line)_55%,transparent)] px-3 py-2 last:border-b-0">
+              <Icon name="check" size={13} className={"shrink-0 " + (ch.failed > 0 ? "text-warn" : "text-ok")} />
+              <span className="flex-1 truncate text-[12px] text-txt">{ch.chapter}</span>
+              <span className="shrink-0 font-mono text-[11px] text-txt-dim">
+                {t("chapterMeta", { dl: ch.downloaded, skip: ch.skipped })}
+                {ch.failed > 0 && <span className="text-bad"> · {t("chapterErr", { n: ch.failed })}</span>}
               </span>
             </div>
           ))}
         </div>
       )}
-    </motion.div>
+    </div>
   );
 }
 
-// ─── Main component ────────────────────────────────────────────────────────────
+/* ---- main ------------------------------------------------------------------ */
 
 export default function MangaDownloader() {
+  const t = useTranslations("admin.manga.downloader");
   const setSeriesMetadata = useMangaStore((s) => s.setSeriesMetadata);
   const seriesMetadata = useMangaStore((s) => s.seriesMetadata);
 
   const [library, setLibrary] = useState<LocalMangaLibrary | null>(null);
 
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchResults, setSearchResults] = useState<MangaSearchResult[] | null>(null);
   const [searchError, setSearchError] = useState<string | null>(null);
@@ -295,7 +231,7 @@ export default function MangaDownloader() {
 
   const [selectedChapters, setSelectedChapters] = useState<Set<number>>(new Set());
 
-  const [directUrl, setDirectUrl] = useState('');
+  const [directUrl, setDirectUrl] = useState("");
   const [directUrlLoading, setDirectUrlLoading] = useState(false);
   const [directUrlError, setDirectUrlError] = useState<string | null>(null);
 
@@ -309,8 +245,8 @@ export default function MangaDownloader() {
 
   const downloadedSlugs = useMemo(() => {
     if (!library || !selectedNovel) return new Set<string>();
-    const series = library.series.find(s => s.slug === selectedNovel.title);
-    return new Set(series?.chapters.map(c => c.slug) ?? []);
+    const series = library.series.find((s) => s.slug === selectedNovel.title);
+    return new Set(series?.chapters.map((c) => c.slug) ?? []);
   }, [library, selectedNovel]);
 
   const loadLibrary = useCallback(async () => {
@@ -332,9 +268,9 @@ export default function MangaDownloader() {
     try {
       const res = await ScrapeService.searchManga(query.trim());
       if (res.success && res.data) setSearchResults(res.data);
-      else setSearchError(res.error ?? 'Error al buscar.');
+      else setSearchError(res.error ?? t("searchErr"));
     } catch {
-      setSearchError('No se pudo conectar con el servidor.');
+      setSearchError(t("connErr"));
     } finally {
       setSearchLoading(false);
     }
@@ -348,13 +284,13 @@ export default function MangaDownloader() {
     try {
       const res = await ScrapeService.getNovelInfo(url);
       if (res.success && res.data) {
-        setDirectUrl('');
-        await handleSelectNovel({ title: res.data.title, url: res.data.url, cover: '' });
+        setDirectUrl("");
+        await handleSelectNovel({ title: res.data.title, url: res.data.url, cover: "" });
       } else {
-        setDirectUrlError(res.error ?? 'No se pudo obtener la información de la serie.');
+        setDirectUrlError(res.error ?? t("urlErr"));
       }
     } catch {
-      setDirectUrlError('No se pudo conectar con el servidor.');
+      setDirectUrlError(t("connErr"));
     } finally {
       setDirectUrlLoading(false);
     }
@@ -374,9 +310,9 @@ export default function MangaDownloader() {
     try {
       const res = await ScrapeService.getMangaChapters(novel.url);
       if (res.success && res.data) setChapters(res.data);
-      else setChaptersError(res.error ?? 'Error al obtener capítulos.');
+      else setChaptersError(res.error ?? t("chaptersErr"));
     } catch {
-      setChaptersError('No se pudo conectar con el servidor.');
+      setChaptersError(t("connErr"));
     } finally {
       setChaptersLoading(false);
     }
@@ -391,16 +327,16 @@ export default function MangaDownloader() {
   };
 
   const toggleChapter = useCallback((idx: number) => {
-    setSelectedChapters(prev => { const n = new Set(prev); n.has(idx) ? n.delete(idx) : n.add(idx); return n; });
+    setSelectedChapters((prev) => { const n = new Set(prev); n.has(idx) ? n.delete(idx) : n.add(idx); return n; });
   }, []);
 
   const toggleAll = useCallback(() => {
     if (!chapters) return;
-    setSelectedChapters(prev => prev.size === chapters.length ? new Set() : new Set(chapters.map((_, i) => i)));
+    setSelectedChapters((prev) => prev.size === chapters.length ? new Set() : new Set(chapters.map((_, i) => i)));
   }, [chapters]);
 
   const selectRange = useCallback((from: number, to: number) => {
-    setSelectedChapters(prev => {
+    setSelectedChapters((prev) => {
       const next = new Set(prev);
       for (let i = from; i <= to; i++) next.add(i);
       return next;
@@ -427,8 +363,8 @@ export default function MangaDownloader() {
         await ScrapeService.streamDownloadMangaNovel(
           { url: selectedNovel.url, from, to, skipDownloaded },
           (event: MangaDownloadSseEvent) => {
-            if (event.type === 'start') {
-              setProgress(prev => ({
+            if (event.type === "start") {
+              setProgress((prev) => ({
                 novelTitle: event.novelTitle,
                 total: (prev?.total ?? 0) + event.total,
                 completed: prev?.completed ?? 0,
@@ -437,16 +373,16 @@ export default function MangaDownloader() {
                 totalDownloaded: prev?.totalDownloaded ?? 0,
                 totalFailed: prev?.totalFailed ?? 0,
               }));
-            } else if (event.type === 'chapter') {
-              setProgress(prev => prev ? {
+            } else if (event.type === "chapter") {
+              setProgress((prev) => prev ? {
                 ...prev,
                 completed: prev.completed + 1,
                 chapters: [...prev.chapters, { chapter: event.chapter, downloaded: event.downloaded, skipped: event.skipped, failed: event.failed }],
                 totalDownloaded: prev.totalDownloaded + event.downloaded,
                 totalFailed: prev.totalFailed + event.failed,
               } : prev);
-            } else if (event.type === 'done') {
-              setProgress(prev => prev ? { ...prev, done: true } : prev);
+            } else if (event.type === "done") {
+              setProgress((prev) => prev ? { ...prev, done: true } : prev);
             }
           },
         );
@@ -454,7 +390,7 @@ export default function MangaDownloader() {
       setSelectedChapters(new Set());
       await loadLibrary();
     } catch (err) {
-      setDownloadError(`Error: ${err instanceof Error ? err.message : String(err)}`);
+      setDownloadError(t("downloadErr", { msg: err instanceof Error ? err.message : String(err) }));
     } finally {
       setDownloading(false);
     }
@@ -463,223 +399,121 @@ export default function MangaDownloader() {
   const selectedCount = selectedChapters.size;
 
   const stickyBar = selectedCount > 0 && !downloading && portalTarget && createPortal(
-    <AnimatePresence>
-      <motion.div
-        initial={{ y: 80, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 80, opacity: 0 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-        style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 9999 }}
-        className="bg-[color-mix(in_srgb,var(--layer-1)_96%,transparent)] backdrop-blur border-t border-edge shadow-2xl"
-      >
-        <div className="container mx-auto px-4 py-3 max-w-4xl flex items-center gap-4 flex-wrap">
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-ink">
-              {selectedCount} capítulo{selectedCount !== 1 ? 's' : ''} seleccionado{selectedCount !== 1 ? 's' : ''}
-            </p>
-            <p className="text-xs text-ink-muted truncate">{selectedNovel?.title}</p>
-          </div>
-          <span className="text-xs text-ink-dim flex items-center gap-1 shrink-0">
-            <Clock className="h-3 w-3" />~{Math.ceil(selectedCount * 1.5)} min est.
-          </span>
-          <Button onClick={handleDownload} disabled={downloading}
-            className="bg-[var(--orange-600)] hover:bg-[var(--orange-500)] text-white shrink-0">
-            <Download className="h-4 w-4 mr-2" />Descargar selección
-          </Button>
+    <div className="fixed inset-x-0 bottom-0 z-[9999] border-t border-solid border-line-2 bg-[color-mix(in_srgb,var(--panel)_96%,transparent)] backdrop-blur">
+      <div className="mx-auto flex max-w-4xl flex-wrap items-center gap-4 px-4 py-3">
+        <div className="min-w-0 flex-1">
+          <p className="text-[14px] font-medium text-txt">{t("selectedN", { count: selectedCount })}</p>
+          <p className="truncate text-[12px] text-txt-muted">{selectedNovel?.title}</p>
         </div>
-      </motion.div>
-    </AnimatePresence>,
+        <span className="flex shrink-0 items-center gap-1 font-mono text-[11px] text-txt-dim">
+          <Icon name="clock" size={12} />{t("estMin", { n: Math.ceil(selectedCount * 1.5) })}
+        </span>
+        <Button variant="pri" icon="download" onClick={handleDownload} disabled={downloading}>{t("downloadSelection")}</Button>
+      </div>
+    </div>,
     portalTarget,
   );
 
   return (
     <>
-      <section className="min-h-screen pb-40">
-        <div className="max-w-4xl flex flex-col gap-8">
+      <div className="max-w-4xl pb-40">
+        <AvSectionHead title={t("title")} desc={t("sub")} />
 
-          {/* Header */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <h2 className="text-xl font-bold text-ink">
-              Descargador de{' '}
-              <span className="bg-gradient-to-r from-[var(--orange-500)] to-[var(--orange-600)] bg-clip-text text-transparent">Manga</span>
-            </h2>
-            <p className="text-ink-muted mt-1 text-sm">
-              Busca una serie en NovelCool, elige los capítulos y descárgalos al servidor.
+        <ScraperSourcesPanel />
+
+        <AvPanel title={t("search")} icon="search">
+          <div className="flex gap-2">
+            <div className="flex-1">
+              <SearchInput value={query} onChange={setQuery} placeholder={t("searchPlaceholder")} />
+            </div>
+            <Button variant="pri" onClick={handleSearch} loading={searchLoading} disabled={searchLoading || !query.trim()}>
+              {t("searchBtn")}
+            </Button>
+          </div>
+          {searchError && <AvAlert tone="error" className="mt-3">{searchError}</AvAlert>}
+        </AvPanel>
+
+        <AvPanel title={t("orUrl")} icon="link">
+          <div className="flex gap-2">
+            <Input
+              value={directUrl}
+              onChange={(e) => setDirectUrl(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && !directUrlLoading && directUrl.trim() && handleDirectUrl()}
+              placeholder="https://es.novelcool.com/novel/RELIFE.html"
+            />
+            <Button onClick={handleDirectUrl} loading={directUrlLoading} disabled={directUrlLoading || !directUrl.trim()}>
+              {t("load")}
+            </Button>
+          </div>
+          {directUrlError && <AvAlert tone="error" className="mt-3">{directUrlError}</AvAlert>}
+        </AvPanel>
+
+        {searchResults && (
+          <div className="mb-[18px] flex flex-col gap-2">
+            <p className="text-[13px] text-txt-muted">
+              {searchResults.length === 0 ? t("noResults") : t("resultsPick", { n: searchResults.length })}
             </p>
-          </motion.div>
+            {searchResults.map((r) => <MgResult key={r.url} title={r.title || r.url} sub={r.url} cover={r.cover} onClick={() => handleSelectNovel(r)} />)}
+          </div>
+        )}
 
-          {/* Scraper sources */}
-          <ScraperSourcesPanel />
-
-          {/* Search */}
-          <Card className="bg-layer-1 border-edge">
-            <CardContent className="pt-5 flex flex-col gap-4">
-              <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-dim" />
-                  <Input value={query} onChange={e => setQuery(e.target.value)}
-                    onKeyDown={e => e.key === 'Enter' && !searchLoading && query.trim() && handleSearch()}
-                    placeholder='Buscar serie, ej. "Raeliana"…'
-                    className="pl-9 bg-layer-2 border-edge-strong text-ink placeholder-[var(--text-dim)]" />
+        {selectedNovel && (
+          <AvPanel
+            title={selectedNovel.title}
+            aside={
+              <button onClick={clearNovel} aria-label={t("clear")} className="text-txt-dim transition-colors hover:text-txt">
+                <Icon name="x" size={15} />
+              </button>
+            }
+          >
+            <div className="flex flex-col gap-4">
+              {chaptersLoading && (
+                <div className="flex items-center gap-2 py-4 text-[13px] text-txt-muted">
+                  <Spinner size={16} className="text-accent" /> {t("loadingChapters")}
                 </div>
-                <Button onClick={handleSearch} disabled={searchLoading || !query.trim()}
-                  className="bg-[var(--orange-600)] hover:bg-[var(--orange-500)] text-white shrink-0">
-                  {searchLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-                  <span className="ml-2">Buscar</span>
-                </Button>
-              </div>
-              {searchError && (
-                <p className="text-sm text-red-400 bg-red-900/20 border border-red-800/40 rounded-md px-3 py-2">{searchError}</p>
               )}
-            </CardContent>
-          </Card>
+              {chaptersError && <AvAlert tone="error">{chaptersError}</AvAlert>}
 
-          {/* Direct URL */}
-          <Card className="bg-layer-1 border-edge">
-            <CardContent className="pt-5 flex flex-col gap-3">
-              <p className="text-xs text-ink-muted flex items-center gap-1.5">
-                <BookOpen className="h-3.5 w-3.5" />
-                O introduce directamente la URL de la serie
-              </p>
-              <div className="flex gap-2">
-                <Input
-                  value={directUrl}
-                  onChange={e => setDirectUrl(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && !directUrlLoading && directUrl.trim() && handleDirectUrl()}
-                  placeholder="https://es.novelcool.com/novel/RELIFE.html"
-                  className="bg-layer-2 border-edge-strong text-ink placeholder-[var(--text-dim)] text-sm"
-                />
-                <Button
-                  onClick={handleDirectUrl}
-                  disabled={directUrlLoading || !directUrl.trim()}
-                  variant="outline"
-                  className="border-edge-strong hover:bg-[color-mix(in_srgb,var(--text)_8%,transparent)] text-ink shrink-0"
-                >
-                  {directUrlLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ChevronDown className="h-4 w-4 -rotate-90" />}
-                  <span className="ml-2">Cargar</span>
-                </Button>
-              </div>
-              {directUrlError && (
-                <p className="text-sm text-red-400 bg-red-900/20 border border-red-800/40 rounded-md px-3 py-2">{directUrlError}</p>
-              )}
-            </CardContent>
-          </Card>
+              <Disclosure title={t("metadata")} icon="edit">
+                <MangaMetadataForm seriesSlug={selectedNovel.title} />
+              </Disclosure>
 
-          {/* Search results */}
-          <AnimatePresence>
-            {searchResults && (
-              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                className="flex flex-col gap-3">
-                <p className="text-sm text-ink-muted">
-                  {searchResults.length === 0
-                    ? 'Sin resultados.'
-                    : <><span className="text-ink font-medium">{searchResults.length}</span> resultado{searchResults.length !== 1 ? 's' : ''} — elige una serie</>}
-                </p>
-                {searchResults.map(r => <SearchResultCard key={r.url} result={r} onSelect={handleSelectNovel} />)}
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Selected novel + chapter list */}
-          <AnimatePresence>
-            {selectedNovel && (
-              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-                <Card className="bg-layer-1 border-edge">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start gap-3">
-                      {selectedNovel.cover && (
-                         
-                        <img src={selectedNovel.cover} alt={selectedNovel.title}
-                          className="h-16 w-12 object-cover rounded border border-edge shrink-0" />
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <CardTitle className="text-base text-ink leading-snug">{selectedNovel.title}</CardTitle>
-                        <p className="text-xs text-ink-dim mt-0.5 truncate">{selectedNovel.url}</p>
-                      </div>
-                      <button onClick={clearNovel} className="text-ink-dim hover:text-ink transition-colors shrink-0 mt-0.5">
-                        <X className="h-4 w-4" />
-                      </button>
+              {chapters && (
+                <>
+                  <div className="flex flex-wrap items-center gap-2 text-[12px] text-txt-muted">
+                    <Icon name="book" size={14} />
+                    <span>{t("chaptersN", { n: chapters.length })}</span>
+                    {downloadedSlugs.size > 0 && <AvPill tone="green">{t("downloadedN", { n: downloadedSlugs.size })}</AvPill>}
+                    <div className="ml-auto">
+                      <Toggle on={skipDownloaded} onChange={setSkipDownloaded} label={t("skipDownloaded")} />
                     </div>
-                  </CardHeader>
-                  <CardContent className="flex flex-col gap-4">
-                    {chaptersLoading && (
-                      <div className="flex items-center gap-2 text-ink-muted text-sm py-4">
-                        <Loader2 className="h-4 w-4 animate-spin" /> Cargando capítulos…
-                      </div>
-                    )}
-                    {chaptersError && (
-                      <p className="text-sm text-red-400 bg-red-900/20 border border-red-800/40 rounded-md px-3 py-2">{chaptersError}</p>
-                    )}
-                    {selectedNovel && (
-                      <details className="group">
-                        <summary className="flex items-center gap-1.5 text-xs text-ink-muted hover:text-ink cursor-pointer select-none list-none py-1">
-                          <ChevronDown className="h-3.5 w-3.5 transition-transform group-open:rotate-180" />
-                          Metadatos EPUB
-                        </summary>
-                        <div className="mt-3 pt-3 border-t border-edge">
-                          <MangaMetadataForm seriesSlug={selectedNovel.title} />
-                        </div>
-                      </details>
-                    )}
+                  </div>
+                  <ChapterSelector
+                    chapters={chapters}
+                    selected={selectedChapters}
+                    downloadedSlugs={downloadedSlugs}
+                    onToggle={toggleChapter}
+                    onToggleAll={toggleAll}
+                    onSelectRange={selectRange}
+                  />
+                </>
+              )}
 
-                    {chapters && (
-                      <>
-                        <div className="flex items-center gap-2 text-xs text-ink-muted flex-wrap">
-                          <BookOpen className="h-3.5 w-3.5" />
-                          <span>{chapters.length} capítulos disponibles</span>
-                          {downloadedSlugs.size > 0 && (
-                            <Badge className="bg-green-900/20 text-green-300 border-green-800/40">
-                              {downloadedSlugs.size} descargados
-                            </Badge>
-                          )}
-                          <div className="ml-auto flex items-center gap-2">
-                            <span className="text-ink-muted">Saltar descargados</span>
-                            <button
-                              onClick={() => setSkipDownloaded(v => !v)}
-                              className={`relative inline-flex h-4 w-7 shrink-0 items-center rounded-full transition-colors focus:outline-none
-                                ${skipDownloaded ? 'bg-[var(--orange-600)]' : 'bg-[color-mix(in_srgb,var(--text)_10%,transparent)]'}`}
-                              aria-checked={skipDownloaded}
-                              role="switch"
-                            >
-                              <span className={`inline-block h-2.5 w-2.5 transform rounded-full bg-white shadow transition-transform
-                                ${skipDownloaded ? 'translate-x-3.5' : 'translate-x-0.5'}`} />
-                            </button>
-                          </div>
-                        </div>
-                        <ChapterSelector chapters={chapters} selected={selectedChapters}
-                          downloadedSlugs={downloadedSlugs} onToggle={toggleChapter} onToggleAll={toggleAll} onSelectRange={selectRange} />
-                      </>
-                    )}
-
-                    {downloading && (
-                      <div className="flex items-center gap-2 text-sm text-blue-300 py-2">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Descargando con Playwright… (puede tardar varios minutos por capítulo)
-                      </div>
-                    )}
-                    {downloadError && (
-                      <p className="text-sm text-red-400 bg-red-900/20 border border-red-800/40 rounded-md px-3 py-2">{downloadError}</p>
-                    )}
-                    {progress && (
-                      <Card className="bg-[color-mix(in_srgb,var(--layer-1)_96%,transparent)] border-edge">
-                        <CardHeader className="pb-2 pt-4 px-4">
-                          <CardTitle className="text-sm text-ink flex items-center gap-2">
-                            {progress.done
-                              ? <><CheckCircle2 className="h-4 w-4 text-green-400" />Descarga completada</>
-                              : <><Loader2 className="h-4 w-4 animate-spin text-[var(--orange-500)]" />Progreso de descarga</>}
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent className="px-4 pb-4">
-                          <DownloadProgressPanel progress={progress} />
-                        </CardContent>
-                      </Card>
-                    )}
-                  </CardContent>
-                </Card>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-        </div>
-      </section>
+              {downloading && (
+                <div className="flex items-center gap-2 py-2 text-[13px] text-signal">
+                  <Spinner size={16} /> {t("downloadingNote")}
+                </div>
+              )}
+              {downloadError && <AvAlert tone="error">{downloadError}</AvAlert>}
+              {progress && (
+                <AvPanel title={progress.done ? t("downloadComplete") : t("progress")} icon={progress.done ? "check" : "download"} className="mb-0">
+                  <DownloadProgressPanel progress={progress} />
+                </AvPanel>
+              )}
+            </div>
+          </AvPanel>
+        )}
+      </div>
 
       {stickyBar}
     </>
