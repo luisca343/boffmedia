@@ -1,11 +1,8 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { BoffButton } from "@/components/boffmedia-v2/primitives/button"
-import { BoffInput } from "@/components/boffmedia-v2/primitives/input"
-import { Textarea } from "@/components/ui/primitives/textarea"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/primitives/form"
-import { Field } from "@/components/boffmedia-v2/primitives/field"
+import { useTranslations } from "next-intl"
+import { Button, Field, Input, Textarea } from "@/components/boffmedia/primitives"
 
 const gameSchema = z.object({
   id: z.number().optional(),
@@ -25,80 +22,30 @@ interface GameFormProps {
 }
 
 export function GameForm({ defaultValues, isSubmitting, onSubmit, onCancel, submitLabel = "Guardar" }: GameFormProps) {
-  const form = useForm<GameFormValues>({
+  const t = useTranslations("admin.form")
+  const { register, handleSubmit, formState: { errors } } = useForm<GameFormValues>({
     resolver: zodResolver(gameSchema),
-    defaultValues: defaultValues || {
-      title: "",
-      description: "",
-      icon: "",
-    },
+    defaultValues: defaultValues || { title: "", description: "", icon: "" },
   })
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
-        <FormField
-          control={form.control}
-          name="title"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-ink-muted">Título</FormLabel>
-              <FormControl>
-                <BoffInput placeholder="Nombre del juego" {...field} />
-              </FormControl>
-              <FormDescription className="text-ink-dim">Este será el nombre principal del juego.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+    <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
+      <Field label={t("game.titleLabel")} hint={t("game.titleHint")} error={errors.title?.message}>
+        <Input placeholder={t("game.titlePlaceholder")} {...register("title")} />
+      </Field>
 
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-ink-muted">Descripción</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Describe el juego"
-                  className="min-h-[100px] bg-layer-2 border border-solid border-edge-strong text-ink rounded-[var(--btn-radius,9999px)] py-2.5 px-3.5 focus:outline-none focus:border-secondary focus:shadow-[0_0_0_3px_var(--secondary-soft)] placeholder:text-ink-dim"
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription className="text-ink-dim">Proporciona una descripción detallada del juego.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <Field label={t("game.descLabel")} hint={t("game.descHint")} error={errors.description?.message}>
+        <Textarea placeholder={t("game.descPlaceholder")} {...register("description")} />
+      </Field>
 
-        <FormField
-          control={form.control}
-          name="icon"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-ink-muted">Icono URL</FormLabel>
-              <FormControl>
-                <BoffInput
-                  placeholder="https://ejemplo.com/icono.jpg"
-                  {...field}
-                  value={field.value || ""}
-                />
-              </FormControl>
-              <FormDescription className="text-ink-dim">URL de la imagen que se usará como icono.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <Field label={t("game.iconLabel")} hint={t("game.iconHint")} error={errors.icon?.message}>
+        <Input placeholder="https://ejemplo.com/icono.jpg" {...register("icon")} />
+      </Field>
 
-        <div className="flex justify-end gap-2 pt-4">
-          <BoffButton type="button" variant="ghost" onClick={onCancel}>
-            Cancelar
-          </BoffButton>
-          <BoffButton type="submit" disabled={isSubmitting}>
-            {submitLabel}
-          </BoffButton>
-        </div>
-      </form>
-    </Form>
+      <div className="flex justify-end gap-2.5 pt-2">
+        <Button type="button" variant="ghost" onClick={onCancel}>{t("cancel")}</Button>
+        <Button type="submit" variant="pri" loading={isSubmitting} disabled={isSubmitting}>{submitLabel}</Button>
+      </div>
+    </form>
   )
 }

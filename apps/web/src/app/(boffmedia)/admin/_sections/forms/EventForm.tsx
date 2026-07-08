@@ -1,12 +1,9 @@
-import { useForm, useWatch } from "react-hook-form"
+import { useForm, useWatch, Controller } from "react-hook-form"
 import { useEffect } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { BoffButton } from "@/components/boffmedia-v2/primitives/button"
-import { BoffInput } from "@/components/boffmedia-v2/primitives/input"
-import { Textarea } from "@/components/ui/primitives/textarea"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/primitives/form"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/primitives/select"
+import { useTranslations } from "next-intl"
+import { Button, Field, Input, Select } from "@/components/boffmedia/primitives"
 import { useGetEvents } from "@/hooks/events/useGetEvents"
 import { useGetGames } from "@/hooks/events/useGetGames"
 import type { Event } from "@boffmedia/shared"
@@ -36,26 +33,15 @@ interface EventFormProps {
   parentEvent?: Event | null
 }
 
-export function EventForm({
-  defaultValues,
-  isSubmitting,
-  onSubmit,
-  onCancel,
-  submitLabel = "Guardar",
-  parentEvent,
-}: EventFormProps) {
+export function EventForm({ defaultValues, isSubmitting, onSubmit, onCancel, submitLabel = "Guardar", parentEvent }: EventFormProps) {
+  const t = useTranslations("admin.form")
   const { events, isLoading: isLoadingEvents } = useGetEvents()
   const { games, isLoading: isLoadingGames } = useGetGames()
-  
-  const parentEvents =
-    events?.filter(
-      (event) =>
-        event.type === "server" &&
-        event.id !== defaultValues?.id && 
-        !event.parentId,
-    ) || []
 
-  const form = useForm<EventFormValues>({
+  const parentEvents =
+    events?.filter((e) => e.type === "server" && e.id !== defaultValues?.id && !e.parentId) || []
+
+  const { register, handleSubmit, control, setValue, formState: { errors } } = useForm<EventFormValues>({
     resolver: zodResolver(eventSchema),
     defaultValues: {
       ...defaultValues,
@@ -71,256 +57,126 @@ export function EventForm({
     },
   })
 
-  const parentIdValue = useWatch({ control: form.control, name: "parentId" })
-  const typeValue = useWatch({ control: form.control, name: "type" })
+  const parentIdValue = useWatch({ control, name: "parentId" })
+  const typeValue = useWatch({ control, name: "type" })
   const isChildEvent = Boolean(parentIdValue)
 
   useEffect(() => {
-    if (isChildEvent && typeValue === "server") {
-      form.setValue("type", "event")
-    }
-  }, [isChildEvent, typeValue, form])
+    if (isChildEvent && typeValue === "server") setValue("type", "event")
+  }, [isChildEvent, typeValue, setValue])
 
-  const selectTriggerClass = "bg-layer-2 border border-solid border-edge-strong text-ink py-2.5 px-3.5 focus:outline-none focus:border-secondary focus:shadow-[0_0_0_3px_var(--secondary-soft)]"
-  const selectContentClass = "bg-layer-1 border-edge-strong text-ink"
+  const gameOptions = [
+    { value: "", label: isLoadingGames ? t("event.gameLoading") : t("event.gamePlaceholder") },
+    ...(games?.map((g) => ({ value: String(g.id), label: g.title })) ?? []),
+  ]
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
-        {!parentEvent && ( 
-          <FormField
-            control={form.control}
-            name="parentId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-ink-muted">Servidor Principal (Opcional)</FormLabel>
-                <Select
-                  onValueChange={(value) => field.onChange(value ? Number(value) : undefined)}
-                  defaultValue={field.value?.toString()}
-                  disabled={isLoadingEvents}
-                >
-                  <FormControl>
-                    <SelectTrigger className={selectTriggerClass}>
-                      <SelectValue placeholder="Selecciona un servidor principal" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent className={selectContentClass}>
-                    <SelectItem value={"-1"}>Ninguno (Evento independiente)</SelectItem>
-                    {parentEvents.map((event) => (
-                      <SelectItem key={event.id} value={event.id.toString()}>
-                        {event.title}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormDescription className="text-ink-dim">
-                  {isChildEvent
-                    ? "Este evento será parte de un servidor principal."
-                    : "Opcionalmente, este evento puede ser parte de un servidor principal."}
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
+    <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
+      {!parentEvent && (
+        <Controller
+          control={control}
+          name="parentId"
+          render={({ field }) => (
+            <Select
+              label={t("event.parentLabel")}
+              hint={isChildEvent ? t("event.parentHintChild") : t("event.parentHint")}
+              value={field.value != null ? String(field.value) : ""}
+              options={[
+                { value: "", label: t("event.parentNone") },
+                ...parentEvents.map((e) => ({ value: String(e.id), label: e.title })),
+              ]}
+              disabled={isLoadingEvents}
+              onChange={(v) => field.onChange(v ? Number(v) : undefined)}
+            />
+          )}
+        />
+      )}
+
+      <Field label={t("event.titleLabel")} hint={t("event.titleHint")} error={errors.title?.message}>
+        <Input placeholder={t("event.titlePlaceholder")} {...register("title")} />
+      </Field>
+
+      <Field label={t("event.descLabel")} hint={t("event.descHint")} error={errors.description?.message}>
+        <textarea
+          placeholder={t("event.descPlaceholder")}
+          className="w-full font-body text-[15px] leading-[1.4] text-txt bg-base [[data-theme=light]_&]:bg-panel border border-solid border-line-2 py-[11px] px-[14px] cut-tag min-h-[90px] resize-y outline-none focus:border-accent placeholder:text-txt-dim"
+          {...register("description")}
+        />
+      </Field>
+
+      <Controller
+        control={control}
+        name="gameId"
+        render={({ field }) => (
+          <Select
+            label={t("event.gameLabel")}
+            hint={t("event.gameHint")}
+            error={errors.gameId?.message}
+            value={field.value ? String(field.value) : ""}
+            options={gameOptions}
+            disabled={isLoadingGames}
+            onChange={(v) => field.onChange(v ? Number(v) : 0)}
           />
         )}
+      />
 
-        <FormField
-          control={form.control}
-          name="title"
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Field label={t("event.startLabel")} error={errors.startDate?.message}>
+          <Input type="datetime-local" {...register("startDate")} />
+        </Field>
+        <Field label={t("event.endLabel")} error={errors.endDate?.message}>
+          <Input type="datetime-local" {...register("endDate")} />
+        </Field>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Controller
+          control={control}
+          name="type"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-ink-muted">Título</FormLabel>
-              <FormControl>
-                <BoffInput placeholder="Nombre del evento" {...field} />
-              </FormControl>
-              <FormDescription className="text-ink-dim">Este será el nombre principal del evento.</FormDescription>
-              <FormMessage />
-            </FormItem>
+            <Select
+              label={t("event.typeLabel")}
+              hint={isChildEvent ? t("event.typeHintChild") : t("event.typeHint")}
+              value={field.value ?? ""}
+              options={[
+                { value: "event", label: t("event.typeEvent") },
+                { value: "server", label: t("event.typeServer") },
+              ]}
+              disabled={isChildEvent}
+              onChange={field.onChange}
+            />
           )}
         />
-
-        <FormField
-          control={form.control}
-          name="description"
+        <Controller
+          control={control}
+          name="visibility"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-ink-muted">Descripción</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Describe el evento"
-                  className="min-h-[100px] bg-layer-2 border border-solid border-edge-strong text-ink rounded-[var(--btn-radius,9999px)] py-2.5 px-3.5 focus:outline-none focus:border-secondary focus:shadow-[0_0_0_3px_var(--secondary-soft)] placeholder:text-ink-dim"
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription className="text-ink-dim">Proporciona una descripción detallada del evento.</FormDescription>
-              <FormMessage />
-            </FormItem>
+            <Select
+              label={t("event.visibilityLabel")}
+              hint={t("event.visibilityHint")}
+              value={field.value ?? ""}
+              options={[
+                { value: "public", label: t("event.visibilityPublic") },
+                { value: "private", label: t("event.visibilityPrivate") },
+              ]}
+              onChange={field.onChange}
+            />
           )}
         />
+      </div>
 
-        <FormField
-          control={form.control}
-          name="gameId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-ink-muted">Juego</FormLabel>
-              <Select
-                onValueChange={(value) => field.onChange(Number(value))}
-                defaultValue={field.value?.toString()}
-                disabled={isLoadingGames}
-              >
-                <FormControl>
-                  <SelectTrigger className={selectTriggerClass}>
-                    <SelectValue placeholder={isLoadingGames ? "Cargando juegos..." : "Selecciona un juego"} />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent className={selectContentClass}>
-                  {games?.map((game) => (
-                    <SelectItem key={game.id} value={game.id.toString()}>
-                      {game.title}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormDescription className="text-ink-dim">Selecciona el juego para este evento.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <Field label={t("event.iconLabel")} hint={t("event.iconHint")} error={errors.icon?.message}>
+        <Input placeholder="https://ejemplo.com/icono.jpg" {...register("icon")} />
+      </Field>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="startDate"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-ink-muted">Fecha de Inicio</FormLabel>
-                <FormControl>
-                  <BoffInput type="datetime-local" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+      <Field label={t("event.bannerLabel")} hint={t("event.bannerHint")} error={errors.banner?.message}>
+        <Input placeholder="https://ejemplo.com/banner.jpg" {...register("banner")} />
+      </Field>
 
-          <FormField
-            control={form.control}
-            name="endDate"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-ink-muted">Fecha de Finalización</FormLabel>
-                <FormControl>
-                  <BoffInput type="datetime-local" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="type"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-ink-muted">Tipo de Evento</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  disabled={isChildEvent}
-                >
-                  <FormControl>
-                    <SelectTrigger className={selectTriggerClass}>
-                      <SelectValue placeholder="Selecciona el tipo" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent className={selectContentClass}>
-                    <SelectItem value="event">Evento</SelectItem>
-                    <SelectItem value="server">Servidor</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormDescription className="text-ink-dim">
-                  {isChildEvent
-                    ? "Los eventos dentro de un servidor son siempre de tipo 'evento'."
-                    : "Selecciona el tipo de evento."}
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="visibility"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-ink-muted">Visibilidad</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger className={selectTriggerClass}>
-                      <SelectValue placeholder="Selecciona la visibilidad" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent className={selectContentClass}>
-                    <SelectItem value="public">Público</SelectItem>
-                    <SelectItem value="private">Privado</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormDescription className="text-ink-dim">Controla quién puede ver este evento.</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <FormField
-          control={form.control}
-          name="icon"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-ink-muted">Icono URL (opcional)</FormLabel>
-              <FormControl>
-                <BoffInput
-                  placeholder="https://ejemplo.com/icono.jpg"
-                  {...field}
-                  value={field.value || ""}
-                />
-              </FormControl>
-              <FormDescription className="text-ink-dim">URL de la imagen que se usará como icono.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="banner"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-ink-muted">Banner URL (opcional)</FormLabel>
-              <FormControl>
-                <BoffInput
-                  placeholder="https://ejemplo.com/banner.jpg"
-                  {...field}
-                  value={field.value || ""}
-                />
-              </FormControl>
-              <FormDescription className="text-ink-dim">URL de la imagen que se usará como banner.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="flex justify-end gap-2 pt-4">
-          <BoffButton type="button" variant="ghost" onClick={onCancel}>
-            Cancelar
-          </BoffButton>
-          <BoffButton type="submit" disabled={isSubmitting || isLoadingGames}>
-            {submitLabel}
-          </BoffButton>
-        </div>
-      </form>
-    </Form>
+      <div className="flex justify-end gap-2.5 pt-2">
+        <Button type="button" variant="ghost" onClick={onCancel}>{t("cancel")}</Button>
+        <Button type="submit" variant="pri" loading={isSubmitting} disabled={isSubmitting || isLoadingGames}>{submitLabel}</Button>
+      </div>
+    </form>
   )
 }

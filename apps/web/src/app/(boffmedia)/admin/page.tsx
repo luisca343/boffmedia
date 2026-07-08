@@ -2,10 +2,11 @@
 
 import { Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { Gamepad2, Calendar, Users, Award, CreditCard, BarChart2, Download, Library, Settings } from "lucide-react"
-import { AdminLayout } from "@/components/boffmedia-v2/ui/admin/admin-layout"
+import { useTranslations } from "next-intl"
 import { useBoffSession } from "@/services/useBoffSession"
 import { USER_ROLES } from "@boffmedia/shared/roles"
+import { AvShell, type AvNavGroup } from "./_components/ui/av-shell"
+import type { IconName } from "@/components/boffmedia/primitives"
 import { GamesAdmin } from "./_sections/games-admin"
 import { EventsAdmin } from "./_sections/events-admin"
 import { TeamsAdmin } from "./_sections/teams-admin"
@@ -17,46 +18,48 @@ import MangaLibrary from "./_components/manga/MangaLibrary"
 import MangaConfig from "./_components/manga/MangaConfig"
 import UnauthorizedPage from "../_components/Unauthorized"
 
-const NAV = [
+const NAV_META: { labelKey: string; items: { id: string; labelKey: string; icon: IconName }[] }[] = [
   {
-    label: "Portal",
+    labelKey: "portal",
     items: [
-      { id: "games",        label: "Juegos",   icon: Gamepad2  },
-      { id: "events",       label: "Eventos",  icon: Calendar  },
-      { id: "teams",        label: "Equipos",  icon: Users     },
-      { id: "achievements", label: "Logros",   icon: Award     },
+      { id: "games",        labelKey: "games",        icon: "gamepad"  },
+      { id: "events",       labelKey: "events",       icon: "calendar" },
+      { id: "teams",        labelKey: "teams",        icon: "users"    },
+      { id: "achievements", labelKey: "achievements", icon: "trophy"   },
     ],
   },
   {
-    label: "Herramientas",
+    labelKey: "tools",
     items: [
-      { id: "tcgp",    label: "TCG Pocket", icon: CreditCard },
-      { id: "vgc-meta", label: "VGC Meta",  icon: BarChart2  },
+      { id: "tcgp",     labelKey: "tcgp",     icon: "cards" },
+      { id: "vgc-meta", labelKey: "vgcMeta",  icon: "chart" },
     ],
   },
   {
-    label: "Manga",
+    labelKey: "manga",
     items: [
-      { id: "manga-downloader", label: "Descargador", icon: Download  },
-      { id: "manga-library",    label: "Biblioteca",  icon: Library   },
-      { id: "manga-config",     label: "Config",      icon: Settings  },
+      { id: "manga-downloader", labelKey: "mangaDownloader", icon: "download" },
+      { id: "manga-library",    labelKey: "mangaLibrary",    icon: "book"     },
+      { id: "manga-config",     labelKey: "mangaConfig",     icon: "settings" },
     ],
   },
-] as const
+]
 
-type SectionId = typeof NAV[number]["items"][number]["id"]
-
-const VALID_SECTIONS = NAV.flatMap((g) => g.items.map((i) => i.id)) as SectionId[]
+const VALID_SECTIONS = NAV_META.flatMap((g) => g.items.map((i) => i.id))
 
 function AdminContent() {
   const router            = useRouter()
   const searchParams      = useSearchParams()
   const { session, status } = useBoffSession()
+  const t = useTranslations("admin.nav")
 
   const rawSection = searchParams.get("section")
-  const section: SectionId = (VALID_SECTIONS as string[]).includes(rawSection ?? "")
-    ? (rawSection as SectionId)
-    : "games"
+  const section = VALID_SECTIONS.includes(rawSection ?? "") ? (rawSection as string) : "games"
+
+  const nav: AvNavGroup[] = NAV_META.map((g) => ({
+    label: t(g.labelKey),
+    items: g.items.map((i) => ({ id: i.id, label: t(i.labelKey), icon: i.icon })),
+  }))
 
   const navigate = (id: string) => {
     const params = new URLSearchParams(searchParams.toString())
@@ -69,7 +72,7 @@ function AdminContent() {
   }
 
   return (
-    <AdminLayout nav={NAV as any} section={section} onNavigate={navigate} loading={status === "loading"}>
+    <AvShell nav={nav} section={section} onNavigate={navigate} loading={status === "loading"}>
       {section === "games"             && <GamesAdmin />}
       {section === "events"            && <EventsAdmin />}
       {section === "teams"             && <TeamsAdmin />}
@@ -79,7 +82,7 @@ function AdminContent() {
       {section === "manga-downloader"  && <MangaDownloader />}
       {section === "manga-library"     && <MangaLibrary />}
       {section === "manga-config"      && <MangaConfig />}
-    </AdminLayout>
+    </AvShell>
   )
 }
 
