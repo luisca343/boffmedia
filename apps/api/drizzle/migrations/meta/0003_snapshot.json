@@ -151,7 +151,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'https://cdn.boffmedia.com/default-profile.png'"
+          "default": "'https://cdn.boffmedia.es/default-profile.png'"
         },
         "googleId": {
           "name": "googleId",

@@ -32,6 +32,13 @@ export const env = z
     DISCORD_KEY: z.string(),
     STREAMELEMENTS_KEY: z.string().optional(),
 
+    // Email (Resend). When RESEND_API_KEY is unset the MailService logs the
+    // email to the console instead of sending (dev fallback).
+    RESEND_API_KEY: z.string().optional(),
+    MAIL_FROM: z.string().default('BoffMedia <no-reply@boffmedia.com>'),
+    // Public base URL of the web app — used to build reset/verify links.
+    WEB_URL: z.string().default('http://localhost:3000'),
+
     // AI
     GEMINI_API_KEY: z.string().optional(),
 

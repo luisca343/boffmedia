@@ -71,6 +71,14 @@
       "title": "Acceso requerido",
       "body": "Inicia sesión para ver tu perfil.",
       "cta": "Entrar"
+    },
+    "public": {
+      "title": "Perfil de {name}",
+      "note": "Estás viendo el perfil público de {name}.",
+      "loading": "Cargando perfil…",
+      "notFoundTitle": "Perfil no encontrado",
+      "notFoundBody": "No existe ningún usuario con ese nombre.",
+      "viewMine": "Ver perfil público"
     }
   }
 }

@@ -8,6 +8,7 @@ import {
   Post,
   Query,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -18,7 +19,9 @@ import {
   ApiConsumes,
   ApiBody,
   ApiQuery,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 import { mkdir } from 'fs/promises';
@@ -29,6 +32,8 @@ import { SkipEnvelope } from '@/common/decorators/skip-envelope.decorator';
 
 @ApiTags('BoffMedia 🛠 | Upload')
 @Controller('upload')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth('JWT')
 @SkipEnvelope()
 export class UploadController {
   constructor(private readonly uploadFacadeService: UploadFacadeService) {}

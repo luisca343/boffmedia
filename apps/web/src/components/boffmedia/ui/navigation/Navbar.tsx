@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils"
 import { IconButton } from "@/components/boffmedia/primitives/icon-button"
 import { NavDropdown } from "./NavDropdown"
 import { LangSwitcher } from "./LangSwitcher"
-import { NotifMenu } from "./NotifMenu"
+import { NotifBell } from "./NotifBell"
 import { MobileNav } from "./MobileNav"
 import { AccountNav } from "./AccountNav"
 import { PRIMARY_NAV, buildToolsSections, buildComunidadSections } from "./nav-data"
@@ -87,7 +87,7 @@ export function Navbar() {
           <IconButton name="search" label={tNav("search")} />
           <LangSwitcher />
           <span aria-hidden="true" className="h-[22px] w-px shrink-0 bg-line-2" />
-          <NotifMenu />
+          <NotifBell />
         </div>
         <IconButton name={theme === "dark" ? "sun" : "moon"} label={tNav("theme")} onClick={toggle} />
         <div className="hidden items-center gap-2 min-[1120px]:inline-flex">
