@@ -4,9 +4,10 @@ import {
   NestModule,
   RequestMethod,
 } from '@nestjs/common';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { ResponseInterceptor } from './api/_utils/interceptors/response.interceptor';
+import { JwtAuthGuard } from './api/auth/jwt-auth.guard';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
@@ -125,6 +126,12 @@ import { VgcModule } from '@api/boffmedia/herramientas/pokemon/vgc/vgc.module';
     {
       provide: APP_INTERCEPTOR,
       useClass: ResponseInterceptor,
+    },
+    // Secure-by-default: every route requires a valid JWT unless marked
+    // `@Public()`. Runs alongside any per-route @UseGuards (RolesGuard, etc.).
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
     },
   ],
   exports: [ConfigService],

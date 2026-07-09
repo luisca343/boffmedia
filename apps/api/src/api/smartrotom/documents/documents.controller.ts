@@ -10,6 +10,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import {
   ApiTags,
   ApiOperation,
@@ -64,6 +65,7 @@ export class DocumentsController {
 
   // ==================== DOCUMENT ENDPOINTS ====================
 
+  @Public()
   @Get('document/:id')
   @ApiOperation({ summary: 'Get a document by ID' })
   @ApiResponse({
@@ -84,6 +86,7 @@ export class DocumentsController {
     return await this.documentsFacadeService.getDocumentById(documentId);
   }
 
+  @Public()
   @Post('document')
   @ApiOperation({ summary: 'Create a new document' })
   @ApiResponse({
@@ -109,6 +112,7 @@ export class DocumentsController {
     );
   }
 
+  @Public()
   @Put('document/:id')
   @ApiOperation({ summary: 'Update an existing document' })
   @ApiResponse({
@@ -143,6 +147,7 @@ export class DocumentsController {
     );
   }
 
+  @Public()
   @Delete('document/:id')
   @ApiOperation({ summary: 'Delete a document' })
   @ApiResponse({
@@ -165,6 +170,7 @@ export class DocumentsController {
 
   // ==================== NOTE ENDPOINTS ====================
 
+  @Public()
   @Post('notes') // Changed from GET to POST to use request body
   @ApiOperation({ summary: 'Get notes for a player' })
   @ApiResponse({
@@ -186,6 +192,7 @@ export class DocumentsController {
   }
 
   // Keep the existing GET endpoint for backward compatibility
+  @Public()
   @Get('all/:uuid')
   @ApiOperation({ summary: 'Get notes for a player (legacy)' })
   @ApiResponse({
@@ -202,6 +209,7 @@ export class DocumentsController {
     return await this.documentsFacadeService.getUserNotes(uuid);
   }
 
+  @Public()
   @Post('create')
   @ApiOperation({ summary: 'Create a new note and associate with user' })
   @ApiResponse({
@@ -228,6 +236,7 @@ export class DocumentsController {
     );
   }
 
+  @Public()
   @Post('save/:id')
   @ApiOperation({ summary: 'Save a note (create or update)' })
   @ApiResponse({
@@ -257,6 +266,7 @@ export class DocumentsController {
     );
   }
 
+  @Public()
   @Post('note/user') // Changed to use request body instead of path params
   @ApiOperation({ summary: 'Associate a note with a user' })
   @ApiResponse({
@@ -279,6 +289,7 @@ export class DocumentsController {
   }
 
   // Keep the existing endpoint for backward compatibility
+  @Public()
   @Post('note/:noteId/user/:uuid')
   @ApiOperation({ summary: 'Associate a note with a user (legacy)' })
   @ApiResponse({
@@ -303,6 +314,7 @@ export class DocumentsController {
     return await this.documentsFacadeService.addNoteToUser(noteIdNum, uuid);
   }
 
+  @Public()
   @Delete('note/user') // Changed to use request body
   @ApiOperation({ summary: 'Remove association between note and user' })
   @ApiResponse({
@@ -325,6 +337,7 @@ export class DocumentsController {
   }
 
   // Keep the existing endpoint for backward compatibility
+  @Public()
   @Delete('note/:noteId/user/:uuid')
   @ApiOperation({
     summary: 'Remove association between note and user (legacy)',
@@ -356,6 +369,7 @@ export class DocumentsController {
 
   // ==================== NEWS ENDPOINTS ====================
 
+  @Public()
   @Post('news/filter') // Changed to POST to use request body
   @ApiOperation({ summary: 'Get filtered news' })
   @ApiResponse({
@@ -372,6 +386,7 @@ export class DocumentsController {
   }
 
   // Keep the existing GET endpoint for backward compatibility
+  @Public()
   @Get('news')
   @ApiOperation({ summary: 'Get all news (legacy)' })
   @ApiResponse({
@@ -391,6 +406,7 @@ export class DocumentsController {
     return await this.documentsFacadeService.getAllNews();
   }
 
+  @Public()
   @Get('news/featured')
   @ApiOperation({ summary: 'Get featured news' })
   @ApiResponse({
@@ -406,6 +422,7 @@ export class DocumentsController {
     return await this.documentsFacadeService.getFeaturedNews();
   }
 
+  @Public()
   @Get('news/:newsId')
   @ApiOperation({ summary: 'Get news by ID' })
   @ApiResponse({

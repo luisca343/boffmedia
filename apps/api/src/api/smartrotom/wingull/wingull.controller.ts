@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Param,
 } from '@nestjs/common';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { WingullFacadeService } from './wingull.facade.service';
 import { UuidDto } from '../_dto/smartrotom-request-dto';
@@ -26,6 +27,7 @@ import { PokemonGiveRequestDto } from './dto/pokemon-give-request.dto';
 import { Logger } from 'nestjs-pino';
 
 @ApiTags('SmartRotom | Wingull')
+@Public()
 @Controller('wingull')
 export class WingullController {
   constructor(

@@ -1,4 +1,5 @@
 import { Controller, Post, Body } from '@nestjs/common';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AchievementFacadeService } from './achievement.facade.service';
 
@@ -26,6 +27,7 @@ import { UserAchievement } from './entities/achievement.entity';
 import { Replay } from './entities/replay.entity';
 
 @ApiTags('SmartRotom | Achievements')
+@Public()
 @Controller('smartrotom/achievement')
 export class AchievementController {
   constructor(

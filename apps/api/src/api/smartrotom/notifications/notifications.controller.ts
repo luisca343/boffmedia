@@ -10,6 +10,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import {
   ApiTags,
   ApiOperation,
@@ -27,6 +28,7 @@ import {
 } from './notifications.dto';
 
 @ApiTags('SmartRotom | Notifications')
+@Public()
 @Controller('smartrotom/notifications')
 export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}

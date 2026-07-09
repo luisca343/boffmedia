@@ -12,6 +12,7 @@ import {
   HttpStatus,
   HttpException,
 } from '@nestjs/common';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import {
   ApiTags,
   ApiOperation,
@@ -28,6 +29,7 @@ import { RolesGuard } from '@api/_utils/guards/roles.guard';
 import { OwnerOrAdminGuard } from '@api/_utils/guards/owner-or-admin.guard';
 import { Roles } from '@api/_utils/decorators/roles.decorator';
 import { USER_ROLES } from '@api/_utils/auth/roles.constants';
+import { PasswordService } from '@api/auth/password.service';
 import { BoffMediaUsersFacadeService } from './users.facade.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -61,10 +63,12 @@ export class BoffMediaUsersController {
     private readonly logger: Logger,
 
     private readonly usersFacadeService: BoffMediaUsersFacadeService,
+    private readonly passwordService: PasswordService,
   ) {}
 
   // ==================== USER CREATION ====================
 
+  @Public()
   @Post()
   @ApiOperation({ summary: 'Create a new BoffMedia user' })
   @ApiResponse({
@@ -77,6 +81,19 @@ export class BoffMediaUsersController {
   @ApiBody({ type: CreateUserDto })
   async create(@Body() createUserDto: CreateUserDto) {
     this.logger.log('Creating user with data:', createUserDto);
+    // Strong-password policy on credential sign-up only. Kept here (not on
+    // CreateUserDto) because that DTO is reused by /auth/login, and not in the
+    // shared createUser() because OAuth/Minecraft accounts get an auto-generated
+    // password with no symbol.
+    const validation = this.passwordService.validatePassword(
+      createUserDto.password,
+    );
+    if (!validation.isValid) {
+      throw new HttpException(
+        validation.errors.join('; '),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     try {
       const user = await this.usersFacadeService.createUser({
         email: createUserDto.email,
@@ -91,6 +108,7 @@ export class BoffMediaUsersController {
     }
   }
 
+  @Public()
   @Post('minecraft/register')
   @ApiOperation({ summary: 'Register a new user with Minecraft integration' })
   @ApiResponse({
@@ -117,6 +135,7 @@ export class BoffMediaUsersController {
     }
   }
 
+  @Public()
   @Post('minecraft/link')
   @ApiOperation({ summary: 'Link existing user to Minecraft account' })
   @ApiResponse({
@@ -142,6 +161,7 @@ export class BoffMediaUsersController {
     }
   }
 
+  @Public()
   @Post('google/auth')
   @ApiOperation({ summary: 'Authenticate or create user via Google OAuth' })
   @ApiResponse({
@@ -497,6 +517,7 @@ export class BoffMediaUsersController {
 
   // ==================== AUTHENTICATION ====================
 
+  @Public()
   @Post('auth/login')
   @UseGuards(AuthThrottlerGuard)
   @Throttle({ default: { ttl: 60_000, limit: 10 } })
@@ -562,6 +583,7 @@ export class BoffMediaUsersController {
 
   // ==================== VALIDATION ====================
 
+  @Public()
   @Get('validate/:type/:identifier')
   @ApiOperation({ summary: 'Validate if user exists by different identifiers' })
   @ApiParam({

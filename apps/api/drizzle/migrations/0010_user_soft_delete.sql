@@ -1,0 +1,1 @@
+ALTER TABLE `boffmedia_users` ADD `deletedAt` timestamp NULL DEFAULT NULL;

@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq, or } from 'drizzle-orm';
+import { and, eq, isNull, or } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   BoffMediaUser,
@@ -117,6 +117,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       return await this.db
         .select(this.userSelectWithoutPassword)
         .from(boffMediaUsers)
+        .where(isNull(boffMediaUsers.deletedAt))
         .execute();
     } catch (error: any) {
       this.logger.error('Failed to retrieve all users:', error);
@@ -133,7 +134,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       const rows = await this.db
         .select(this.userSelectWithoutPassword)
         .from(boffMediaUsers)
-        .where(eq(boffMediaUsers.id, id))
+        .where(and(eq(boffMediaUsers.id, id), isNull(boffMediaUsers.deletedAt)))
         .execute();
 
       return rows.length > 0 ? rows[0] : null;
@@ -154,7 +155,12 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       const rows = await this.db
         .select(this.userSelectWithoutPassword)
         .from(boffMediaUsers)
-        .where(eq(boffMediaUsers.username, username))
+        .where(
+          and(
+            eq(boffMediaUsers.username, username),
+            isNull(boffMediaUsers.deletedAt),
+          ),
+        )
         .execute();
 
       return rows.length > 0 ? rows[0] : null;
@@ -173,7 +179,9 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       const rows = await this.db
         .select(this.userSelectWithoutPassword)
         .from(boffMediaUsers)
-        .where(eq(boffMediaUsers.email, email))
+        .where(
+          and(eq(boffMediaUsers.email, email), isNull(boffMediaUsers.deletedAt)),
+        )
         .execute();
 
       return rows.length > 0 ? rows[0] : null;
@@ -192,7 +200,9 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       const rows = await this.db
         .select(this.userSelectWithoutPassword)
         .from(boffMediaUsers)
-        .where(eq(boffMediaUsers.uuid, uuid))
+        .where(
+          and(eq(boffMediaUsers.uuid, uuid), isNull(boffMediaUsers.deletedAt)),
+        )
         .execute();
 
       return rows.length > 0 ? rows[0] : null;
@@ -213,7 +223,12 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       const rows = await this.db
         .select(this.userSelectWithoutPassword)
         .from(boffMediaUsers)
-        .where(eq(boffMediaUsers.googleId, googleId))
+        .where(
+          and(
+            eq(boffMediaUsers.googleId, googleId),
+            isNull(boffMediaUsers.deletedAt),
+          ),
+        )
         .execute();
 
       return rows.length > 0 ? rows[0] : null;
@@ -240,7 +255,12 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
           smartrotomUsers,
           eq(boffMediaUsers.uuid, smartrotomUsers.uuid),
         )
-        .where(eq(boffMediaUsers.username, username))
+        .where(
+          and(
+            eq(boffMediaUsers.username, username),
+            isNull(boffMediaUsers.deletedAt),
+          ),
+        )
         .execute();
 
       if (rows.length === 0) return null;
@@ -273,7 +293,12 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
           smartrotomUsers,
           eq(boffMediaUsers.uuid, smartrotomUsers.uuid),
         )
-        .where(eq(boffMediaUsers.username, username))
+        .where(
+          and(
+            eq(boffMediaUsers.username, username),
+            isNull(boffMediaUsers.deletedAt),
+          ),
+        )
         .execute();
 
       if (rows.length === 0) return null;
@@ -304,7 +329,12 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
         })
         .from(smartrotomUsers)
         .leftJoin(boffMediaUsers, eq(boffMediaUsers.uuid, smartrotomUsers.uuid))
-        .where(eq(smartrotomUsers.uuid, uuid))
+        .where(
+          and(
+            eq(smartrotomUsers.uuid, uuid),
+            isNull(boffMediaUsers.deletedAt),
+          ),
+        )
         .execute();
 
       if (rows.length === 0) return null;
@@ -333,7 +363,9 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
           smartrotomUsers,
           eq(boffMediaUsers.uuid, smartrotomUsers.uuid),
         )
-        .where(eq(boffMediaUsers.email, email))
+        .where(
+          and(eq(boffMediaUsers.email, email), isNull(boffMediaUsers.deletedAt)),
+        )
         .execute();
 
       if (rows.length === 0) return null;
@@ -418,21 +450,47 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
     }
 
     try {
-      // Check if user exists
+      // findUserById already excludes soft-deleted rows, so a repeat delete
+      // reports "not found".
       const existingUser = await this.findUserById(id);
       if (!existingUser) {
         throw new Error(`User with ID ${id} not found`);
       }
 
-      // Delete user
+      const tombstone = `deleted_user_${id}`;
+
+      // GDPR soft-delete: keep the row so foreign keys / leaderboards / history
+      // survive, but scrub every PII field and stamp deletedAt. Reads and login
+      // exclude deletedAt rows.
       await this.db
-        .delete(boffMediaUsers)
+        .update(boffMediaUsers)
+        .set({
+          deletedAt: new Date(),
+          username: tombstone,
+          email: `deleted+${id}@deleted.invalid`,
+          password: null,
+          uuid: null,
+          googleId: null,
+          discordId: null,
+          twitchId: null,
+          steamId: null,
+          profilePicture: 'https://cdn.boffmedia.es/default-profile.png',
+          coverImage: null,
+          bio: null,
+        })
         .where(eq(boffMediaUsers.id, id))
+        .execute();
+
+      // Anonymize the public-facing participant identity (shown on leaderboards).
+      await this.db
+        .update(boffMediaParticipants)
+        .set({ nickname: tombstone, avatar: null })
+        .where(eq(boffMediaParticipants.userId, id))
         .execute();
 
       return true;
     } catch (error: any) {
-      this.logger.error(`Failed to delete user ${id}:`, error);
+      this.logger.error(`Failed to soft-delete user ${id}:`, error);
       throw new Error(`User deletion failed: ${error.message}`);
     }
   }
@@ -493,7 +551,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       return await this.db
         .select(this.userSelectWithoutPassword)
         .from(boffMediaUsers)
-        .where(or(...conditions))
+        .where(and(or(...conditions), isNull(boffMediaUsers.deletedAt)))
         .execute();
     } catch (error: any) {
       this.logger.error('Failed to check multiple fields exist:', error);

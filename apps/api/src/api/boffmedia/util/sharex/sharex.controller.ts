@@ -1,4 +1,5 @@
 import { randomString } from '@/_utils/stringUtils';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import { env } from '@/config/env';
 import {
   BadRequestException,
@@ -18,6 +19,7 @@ import { SharexUploadDto } from './dto/sharex-upload.dto';
 import { SkipEnvelope } from '@/common/decorators/skip-envelope.decorator';
 
 @ApiTags('BoffMedia 🛠 | ShareX')
+@Public()
 @Controller('sharex')
 @SkipEnvelope()
 export class SharexController {

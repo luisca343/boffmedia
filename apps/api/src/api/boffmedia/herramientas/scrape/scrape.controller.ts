@@ -10,6 +10,7 @@ import {
   Query,
   Res,
 } from '@nestjs/common';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import {
   ApiTags,
   ApiOperation,
@@ -39,6 +40,7 @@ import { UpdateMangaConfigDto } from './dto/update-manga-config.dto';
 import { UpdateSeriesStatusDto } from './dto/update-series-status.dto';
 
 @ApiTags('BoffMedia | Scrape')
+@Public()
 @Controller('boffmedia/herramientas/scrape')
 export class ScrapeController {
   constructor(private readonly scrapeFacadeService: ScrapeFacadeService) {}

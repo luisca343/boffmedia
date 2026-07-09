@@ -1,8 +1,10 @@
 import { Controller, Get, HttpStatus } from '@nestjs/common';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { NetfluisService } from './netfluis.service';
 
 @ApiTags('SmartRotom | Netfluis')
+@Public()
 @Controller('smartrotom/netfluis')
 export class NetfluisController {
   constructor(private readonly netfluisService: NetfluisService) {}

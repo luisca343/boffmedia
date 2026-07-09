@@ -7,6 +7,7 @@ import {
   Query,
   Res,
 } from '@nestjs/common';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import {
   ApiBody,
   ApiOperation,
@@ -24,6 +25,7 @@ import {
 import { DownloadChaptersDto } from './dto/download-chapters.dto';
 
 @ApiTags('BoffMedia | Manga')
+@Public()
 @Controller('boffmedia/herramientas/manga')
 export class MangaController {
   constructor(private readonly facade: MangaFacadeService) {}

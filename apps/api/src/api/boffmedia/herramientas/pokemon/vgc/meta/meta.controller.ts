@@ -10,6 +10,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { RolesGuard } from '@api/_utils/guards/roles.guard';
@@ -66,6 +67,7 @@ export class VgcMetaController {
 
   // --- Ladder (Smogon) -------------------------------------------------------
 
+  @Public()
   @Get('smogon/available')
   @ApiOperation({ summary: 'List all cached Smogon snapshots' })
   @ApiResponse({
@@ -115,6 +117,7 @@ export class VgcMetaController {
     return this.facade.deleteSmogonSnapshot(dto);
   }
 
+  @Public()
   @Get('smogon')
   @ApiOperation({
     summary: 'Get full Smogon usage + detail for all Pokémon in a snapshot',
@@ -129,6 +132,7 @@ export class VgcMetaController {
     return this.facade.getSmogonUsage(dto);
   }
 
+  @Public()
   @Get('smogon/list')
   @ApiOperation({
     summary: 'Get lean Smogon usage list (without expanded detail arrays)',
@@ -143,6 +147,7 @@ export class VgcMetaController {
     return this.facade.getSmogonUsageList(dto);
   }
 
+  @Public()
   @Get('smogon/:speciesId')
   @ApiOperation({ summary: 'Get Smogon detail for a single Pokémon' })
   @ApiParam({ name: 'speciesId', example: 'incineroar' })
@@ -160,6 +165,7 @@ export class VgcMetaController {
 
   // --- Champions (VGCPastes) -------------------------------------------------
 
+  @Public()
   @Get('champions/available')
   @ApiOperation({
     summary: 'List Champions regulations that have imported data',
@@ -174,6 +180,7 @@ export class VgcMetaController {
     return this.facade.getAvailableChampionsRegulations();
   }
 
+  @Public()
   @Get('champions')
   @ApiOperation({ summary: 'Get Champions usage data from VGCPastes' })
   @ApiResponse({
@@ -186,6 +193,7 @@ export class VgcMetaController {
     return this.facade.getChampionsUsage(dto);
   }
 
+  @Public()
   @Get('champions/list')
   @ApiOperation({
     summary: 'Get lean Champions usage list (without expanded detail arrays)',
@@ -200,6 +208,7 @@ export class VgcMetaController {
     return this.facade.getChampionsUsageList(dto);
   }
 
+  @Public()
   @Get('champions/:speciesId/detail')
   @ApiOperation({ summary: 'Get Champions paste detail for a single Pokémon' })
   @ApiParam({ name: 'speciesId', example: 'glimmoramega' })
@@ -255,6 +264,7 @@ export class VgcMetaController {
 
   // --- Limitless -------------------------------------------------------------
 
+  @Public()
   @Get('limitless/tournaments')
   @ApiOperation({ summary: 'List Limitless tournaments for a regulation' })
   @ApiResponse({
@@ -267,6 +277,7 @@ export class VgcMetaController {
     return this.facade.getLimitlessTournamentsByRegulation(regulationId);
   }
 
+  @Public()
   @Get('limitless')
   @ApiOperation({ summary: 'List all cached Limitless tournaments' })
   @ApiResponse({
@@ -279,6 +290,7 @@ export class VgcMetaController {
     return this.facade.listLimitlessTournaments();
   }
 
+  @Public()
   @Get('limitless/usage/combined')
   @ApiOperation({
     summary:
@@ -294,6 +306,7 @@ export class VgcMetaController {
     return this.facade.getLimitlessCombinedUsage(regulationId);
   }
 
+  @Public()
   @Get('limitless/usage/combined/list')
   @ApiOperation({
     summary: 'Get lean combined Limitless usage list for a regulation',
@@ -308,6 +321,7 @@ export class VgcMetaController {
     return this.facade.getLimitlessCombinedUsageList(regulationId);
   }
 
+  @Public()
   @Get('limitless/usage')
   @ApiOperation({ summary: 'Get usage data for a Limitless tournament' })
   @ApiResponse({
@@ -320,6 +334,7 @@ export class VgcMetaController {
     return this.facade.getLimitlessUsage(dto.tournamentId);
   }
 
+  @Public()
   @Get('limitless/usage/list')
   @ApiOperation({ summary: 'Get lean Limitless usage list for a tournament' })
   @ApiResponse({
@@ -332,6 +347,7 @@ export class VgcMetaController {
     return this.facade.getLimitlessUsageList(dto.tournamentId);
   }
 
+  @Public()
   @Get('limitless/tournament/:id/status')
   @ApiOperation({ summary: 'Get import job status for a tournament' })
   @ApiParam({ name: 'id', example: '1' })
@@ -362,6 +378,7 @@ export class VgcMetaController {
     return this.facade.importLimitlessTournament(dto);
   }
 
+  @Public()
   @Get('limitless/:tournamentId/players')
   @ApiOperation({ summary: 'Get player list for a Limitless tournament' })
   @ApiParam({ name: 'tournamentId', example: '1' })
@@ -375,6 +392,7 @@ export class VgcMetaController {
     return this.facade.getLimitlessPlayers(+tournamentId);
   }
 
+  @Public()
   @Get('limitless/:tournamentId/player/:slug')
   @ApiOperation({ summary: "Get a player's team for a Limitless tournament" })
   @ApiParam({ name: 'tournamentId', example: '1' })
@@ -393,6 +411,7 @@ export class VgcMetaController {
 
   // --- Regulations -----------------------------------------------------------
 
+  @Public()
   @Get('regulations')
   @ApiOperation({ summary: 'List all active Champions regulations' })
   @ApiResponse({
@@ -427,6 +446,7 @@ export class VgcMetaController {
 
   // --- Species Teams ---------------------------------------------------------
 
+  @Public()
   @Get('teams')
   @ApiOperation({
     summary:
@@ -447,6 +467,7 @@ export class VgcMetaController {
 
   // --- Unified Jobs + Personal Analytics -----------------------------------
 
+  @Public()
   @Get('jobs')
   @ApiOperation({
     summary:
@@ -478,6 +499,7 @@ export class VgcMetaController {
 
   // --- Divergence (Ladder vs Tournament) -----------------------------------
 
+  @Public()
   @Get('divergence')
   @ApiOperation({
     summary:

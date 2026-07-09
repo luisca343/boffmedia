@@ -13,6 +13,7 @@ import {
   ParseIntPipe,
   HttpStatus,
 } from '@nestjs/common';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import {
   ApiTags,
   ApiOperation,
@@ -60,6 +61,7 @@ export class EventsController {
   constructor(private readonly eventsFacadeService: EventsFacadeService) {}
 
   // ==================== EVENT MANAGEMENT ====================
+  @Public()
   @Get()
   @ApiOperation({ summary: 'Get all events' })
   @ApiResponse({
@@ -71,6 +73,7 @@ export class EventsController {
     return await this.eventsFacadeService.getEvents();
   }
 
+  @Public()
   @Get('/event/:id')
   @ApiOperation({ summary: 'Get event by id' })
   @ApiResponse({
@@ -128,6 +131,7 @@ export class EventsController {
   }
 
   // ==================== GAME MANAGEMENT ====================
+  @Public()
   @Get('/games')
   @ApiOperation({ summary: 'Get all games' })
   @ApiResponse({
@@ -139,6 +143,7 @@ export class EventsController {
     return await this.eventsFacadeService.getGames();
   }
 
+  @Public()
   @Get('/games/:id')
   @ApiOperation({ summary: 'Get game by id' })
   @ApiResponse({
@@ -196,6 +201,7 @@ export class EventsController {
   }
 
   // ==================== ACHIEVEMENT MANAGEMENT ====================
+  @Public()
   @Get('/achievements')
   @ApiOperation({ summary: 'Get all achievements' })
   @ApiResponse({
@@ -207,6 +213,7 @@ export class EventsController {
     return await this.eventsFacadeService.getAchievements();
   }
 
+  @Public()
   @Get(':eventId/achievements')
   @ApiOperation({ summary: 'Get all achievements for an event' })
   @ApiResponse({
@@ -262,6 +269,7 @@ export class EventsController {
     );
   }
 
+  @Public()
   @Get('/participants/:participantId/progress')
   @ApiOperation({ summary: 'Get all achievement progress for a participant' })
   @ApiResponse({
@@ -275,6 +283,7 @@ export class EventsController {
     return await this.eventsFacadeService.getParticipantProgress(participantId);
   }
 
+  @Public()
   @Get(':eventId/participants/:participantId/progress')
   @ApiOperation({
     summary: 'Get achievement progress for a participant in a specific event',
@@ -295,6 +304,7 @@ export class EventsController {
   }
 
   // ==================== TEAM MANAGEMENT ====================
+  @Public()
   @Get('/teams')
   @ApiOperation({ summary: 'Get all teams' })
   @ApiResponse({
@@ -306,6 +316,7 @@ export class EventsController {
     return await this.eventsFacadeService.getTeams();
   }
 
+  @Public()
   @Get(':eventId/teams')
   @ApiOperation({ summary: 'Get all teams in an event' })
   @ApiResponse({
@@ -317,6 +328,7 @@ export class EventsController {
     return await this.eventsFacadeService.getEventTeams(eventId);
   }
 
+  @Public()
   @Get('/teams/:teamId')
   @ApiOperation({ summary: 'Get team by id' })
   @ApiResponse({
@@ -328,6 +340,7 @@ export class EventsController {
     return await this.eventsFacadeService.getTeam(teamId);
   }
 
+  @Public()
   @Get('/teams/:teamId/members')
   @ApiOperation({ summary: 'Get team members' })
   @ApiResponse({
@@ -434,6 +447,7 @@ export class EventsController {
     return await this.eventsFacadeService.joinEvent(eventId, joinEventDto);
   }
 
+  @Public()
   @Get(':eventId/participants')
   @ApiOperation({ summary: 'Get all participants in an event' })
   @ApiResponse({
@@ -467,6 +481,7 @@ export class EventsController {
     );
   }
   // ==================== LEADERBOARD MANAGEMENT ====================
+  @Public()
   @Get('/leaderboards')
   @ApiOperation({ summary: 'Get all leaderboards' })
   @ApiResponse({
@@ -478,6 +493,7 @@ export class EventsController {
     return await this.eventsFacadeService.getLeaderboards();
   }
 
+  @Public()
   @Get(':eventId/leaderboard')
   @ApiOperation({ summary: 'Get event leaderboard' })
   @ApiResponse({
@@ -491,6 +507,7 @@ export class EventsController {
     return await this.eventsFacadeService.getLeaderboard(eventId);
   }
 
+  @Public()
   @Get(':eventId/teams/leaderboard')
   @ApiOperation({ summary: 'Get team leaderboard for event' })
   @ApiResponse({
@@ -506,6 +523,7 @@ export class EventsController {
 
   // ==================== USER PROFILE ====================
 
+  @Public()
   @Get('users/:userId/trophies')
   @ApiOperation({ summary: "Get a user's trophy case (earned + locked)" })
   @ApiParam({ name: 'userId', type: 'number', description: 'BoffMedia user ID' })
@@ -518,6 +536,7 @@ export class EventsController {
     return await this.eventsFacadeService.getUserTrophies(userId);
   }
 
+  @Public()
   @Get('users/:userId/activity')
   @ApiOperation({ summary: "Get a user's activity timeline" })
   @ApiParam({ name: 'userId', type: 'number', description: 'BoffMedia user ID' })

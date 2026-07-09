@@ -4,6 +4,7 @@ import {
   NotFoundException,
   Param,
 } from '@nestjs/common';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { VgcService, VgcPokemon, SpeedTierEntry } from './vgc.service';
 import {
@@ -13,6 +14,7 @@ import {
 } from './dto/vgc-response.dto';
 
 @ApiTags('BoffMedia 🛠 | Pokémon VGC')
+@Public()
 @Controller('tools/vgc')
 export class VgcController {
   constructor(private readonly vgcService: VgcService) {}
