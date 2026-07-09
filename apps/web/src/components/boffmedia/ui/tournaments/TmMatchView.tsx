@@ -1,0 +1,397 @@
+"use client"
+
+import * as React from "react"
+import { cn } from "@/lib/utils"
+import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Button } from "@/components/boffmedia/primitives/button"
+import { toast } from "@/components/boffmedia/primitives/toast"
+import { DkFlag, DkLive, DkSprite, DkType } from "@/components/boffmedia/ui/tools/datakit"
+import type { TnCompetitor } from "./tournaments-util"
+
+// Live self-report match table (LimitlessVGC model): round header, opponent card,
+// BO3 report with rival verification + auto-verify, table chat with judge request,
+// and the opponent teamsheet (Showdown export). Read-only demo data. [deferred]
+
+export interface TmMon {
+  id?: string
+  slot?: number
+  dex?: number
+  name: string
+  item: string
+  ability?: string
+  tera: string
+  moves: string[]
+}
+export interface TmPlayer extends TnCompetitor {
+  _pk?: TmMon[]
+}
+export interface TmComp {
+  title: React.ReactNode
+}
+
+const abilityOf = (m: TmMon) => m.ability || "—"
+const nowHM = () => {
+  const d = new Date()
+  return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0")
+}
+const fmtMMSS = (s: number) => {
+  const m = Math.floor(s / 60)
+  const ss = s % 60
+  return m + ":" + String(ss).padStart(2, "0")
+}
+function showdownPaste(team: TmMon[]) {
+  return team
+    .map((m) => [`${m.name} @ ${m.item}`, "Ability: " + abilityOf(m), "Level: 50", "Tera Type: " + m.tera, "- " + m.moves.join("\n- ")].join("\n"))
+    .join("\n\n")
+}
+function copyText(text: string, msg?: string) {
+  try {
+    navigator.clipboard.writeText(text)
+  } catch {
+    /* noop */
+  }
+  toast({ msg: msg || "Copiado al portapapeles", icon: "check", tone: "ok" })
+}
+
+const CARD = "border border-solid border-line bg-panel [clip-path:polygon(0_0,calc(100%_-_14px)_0,100%_14px,100%_100%,0_100%)]"
+const CARD_HEAD = "flex items-center justify-between gap-3 border-b border-solid border-line bg-panel-2 px-4 py-[13px]"
+const CARD_H3 = "m-0 font-mono text-[13px]/none font-bold uppercase tracking-[0.12em] text-txt"
+const GHUE_BORDER = "border-l-[3px] border-l-[hsl(var(--ghue,28)_60%_50%)]"
+
+function TmRoundHeader({ comp, roundNo, tableNo, status }: { comp: TmComp; roundNo: React.ReactNode; tableNo: React.ReactNode; status?: string }) {
+  const chip = "inline-flex items-center gap-1.5 border border-solid border-line-2 px-[9px] py-[5px] font-mono text-[11px]/none font-semibold text-txt-muted [&_svg]:text-txt-dim"
+  return (
+    <div className={cn("flex flex-wrap items-center justify-between gap-3.5 border border-solid border-line bg-panel px-[18px] py-[15px] [clip-path:polygon(0_0,calc(100%_-_14px)_0,100%_14px,100%_100%,0_100%)]", GHUE_BORDER)}>
+      <div>
+        <span className="mb-[9px] block font-display text-[20px]/[1.05] font-extrabold uppercase tracking-[0.02em]">{comp.title}</span>
+        <div className="flex flex-wrap gap-2">
+          <span className={chip}><Icon name="list" size={12} />Ronda {roundNo}</span>
+          <span className={chip}><Icon name="grid" size={12} />Mesa {tableNo}</span>
+          <span className="inline-flex items-center gap-1.5 border border-solid border-[hsl(var(--ghue,28)_60%_50%_/_0.4)] px-[9px] py-[5px] font-mono text-[11px]/none font-semibold text-[hsl(var(--ghue,28)_65%_62%)] [&_svg]:text-[hsl(var(--ghue,28)_65%_62%)]"><Icon name="trophy" size={12} />Al mejor de 3</span>
+        </div>
+      </div>
+      <DkLive status={status === "final" ? "final" : "live"} label={status === "final" ? "Finalizada" : "En juego"} />
+    </div>
+  )
+}
+
+function TmOpponentCard({ opp, onChat, onTeam }: { opp: TmPlayer; onChat?: () => void; onTeam?: () => void }) {
+  const rec = (opp.w || 0) + "-" + (opp.l || 0) + "-" + (opp.d || 0)
+  const pts = opp.pts != null ? opp.pts : (opp.w || 0) * 3 + (opp.d || 0)
+  const iconBtn = "grid h-7 w-7 place-items-center border border-solid border-line-2 bg-base text-txt-muted cursor-pointer transition-colors hover:border-accent-line hover:text-accent-bright"
+  return (
+    <section className={CARD}>
+      <div className={CARD_HEAD}><h3 className={CARD_H3}>Te enfrentas a</h3></div>
+      <div className="flex flex-wrap items-center justify-between gap-6 p-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <DkFlag flag={opp.flag} code={opp.country} name={opp.countryName} size={22} />
+          <div className="grid min-w-0 gap-1">
+            <div className="flex items-center gap-2">
+              <b className="font-display text-[22px]/none font-extrabold tracking-[0.01em]">{opp.name}</b>
+              <button type="button" className={iconBtn} title="Ir al chat de mesa" onClick={onChat}><Icon name="message" size={15} /></button>
+              <button type="button" className={iconBtn} title="Ver hoja de equipo" onClick={onTeam}><Icon name="list" size={15} /></button>
+            </div>
+            <span className="font-mono text-[12px]/[1.3] font-medium text-txt-muted">{pts} pts · récord {rec} · {opp.countryName}</span>
+          </div>
+        </div>
+        <div className="grid grid-cols-[auto_auto] items-center gap-x-3 gap-y-1.5">
+          <span className="col-start-1 font-mono text-[9.5px]/none font-bold uppercase tracking-[0.14em] text-txt-dim">Nombre en juego</span>
+          <button type="button" className="col-start-2 inline-flex cursor-pointer items-center gap-1.5 justify-self-start border-0 bg-transparent p-0 font-mono text-[10px]/none font-semibold text-info hover:text-accent-bright" onClick={() => copyText(opp.tag || "", "Nombre copiado: " + opp.tag)}>
+            <Icon name="copy" size={12} />Copiar
+          </button>
+          <b className="col-span-2 font-display text-[24px]/none font-extrabold tracking-[0.01em] text-txt">{opp.tag}</b>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+const AUTO_VERIFY_SECONDS = 90
+
+export function TmReportPanel({ opp, initialScenario, onSystem }: { me?: TmPlayer; opp: TmPlayer; initialScenario?: string; onSystem?: (text: string) => void }) {
+  const [games, setGames] = React.useState<(string | null)[]>([null, null, null])
+  const [phase, setPhase] = React.useState(initialScenario === "incoming" ? "incoming" : "edit")
+  const [countdown, setCountdown] = React.useState(AUTO_VERIFY_SECONDS)
+  const [autoVerified, setAutoVerified] = React.useState(false)
+  const incomingGames = React.useMemo(() => ["L", "W", "L"], [])
+
+  const wins = games.filter((g) => g === "W").length
+  const losses = games.filter((g) => g === "L").length
+  const decisive = wins >= 2 || losses >= 2
+  const resultText = wins > losses ? `Ganas esta partida ${wins}-${losses}` : losses > wins ? `Pierdes esta partida ${losses}-${wins}` : `Empate provisional ${wins}-${losses}`
+
+  const setGame = (i: number, val: string) => {
+    if (phase !== "edit") return
+    setGames((g) => {
+      const n = g.slice()
+      n[i] = n[i] === val ? null : val
+      return n
+    })
+  }
+  const submit = () => {
+    if (!decisive) return
+    setPhase("awaiting")
+    setCountdown(AUTO_VERIFY_SECONDS)
+    onSystem?.(`Has reportado el resultado ${wins}-${losses}. Esperando la confirmación de ${opp.name}.`)
+    setTimeout(() => {
+      setPhase((cur) => {
+        if (cur !== "awaiting") return cur
+        onSystem?.(opp.name + " ha confirmado el resultado. Partida verificada ✓")
+        return "verified"
+      })
+    }, 6500)
+  }
+  const verifyIncoming = (agree: boolean) => {
+    if (agree) {
+      setGames(incomingGames)
+      setPhase("verified")
+      onSystem?.(`Has verificado el resultado reportado por ${opp.name}. Partida verificada ✓`)
+    } else {
+      setPhase("dispute")
+      onSystem?.("Has rechazado el resultado. Se ha avisado a un juez para revisar la mesa.")
+    }
+  }
+  React.useEffect(() => {
+    if (phase !== "awaiting") return
+    if (countdown <= 0) {
+      setAutoVerified(true)
+      setPhase("verified")
+      onSystem?.("Sin respuesta a tiempo — se ha aplicado la auto-verificación para no bloquear el torneo.")
+      return
+    }
+    const t = setTimeout(() => setCountdown((c) => c - 1), 1000)
+    return () => clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, countdown])
+
+  const locked = phase !== "edit"
+  const shown = phase === "incoming" ? incomingGames : games
+  const pill = "inline-flex items-center gap-1.5 border border-solid px-[9px] py-[5px] font-mono text-[10px]/none font-bold uppercase tracking-[0.06em]"
+  const gbtn = "flex-1 cursor-pointer border border-solid border-line-2 bg-base px-2 py-[11px] font-body text-[13px]/none font-semibold text-txt-muted transition-colors enabled:hover:border-txt-muted enabled:hover:text-txt disabled:cursor-default"
+  const banner = "m-4 flex items-center gap-[11px] p-[14px] font-body text-[13px]/[1.45] [&>b]:font-bold"
+
+  return (
+    <section className={CARD}>
+      <div className={CARD_HEAD}>
+        <h3 className={CARD_H3}>Reportar partidas</h3>
+        {phase === "verified" && <span className={cn(pill, "border-[color:color-mix(in_srgb,var(--ok)_45%,transparent)] bg-ok-soft text-ok")}><Icon name="check" size={12} />Verificada</span>}
+        {phase === "awaiting" && <span className={cn(pill, "border-[color:color-mix(in_srgb,var(--warn)_45%,transparent)] bg-warn-soft text-warn")}><Icon name="clock" size={12} />Esperando confirmación</span>}
+        {phase === "dispute" && <span className={cn(pill, "border-[color:color-mix(in_srgb,var(--bad)_45%,transparent)] bg-bad-soft text-bad")}><Icon name="alert" size={12} />En disputa</span>}
+        {phase === "incoming" && <span className={cn(pill, "border-[color:color-mix(in_srgb,var(--warn)_45%,transparent)] bg-warn-soft text-warn")}><Icon name="clock" size={12} />Te toca verificar</span>}
+      </div>
+
+      {phase === "incoming" && (
+        <div className={cn(banner, "text-info bg-info-soft border border-solid border-[color:color-mix(in_srgb,var(--info)_40%,transparent)]")}>
+          <Icon name="info" size={15} className="flex-none" />
+          <span><b>{opp.name}</b> ha reportado el resultado. Revísalo y verifica si es correcto.</span>
+        </div>
+      )}
+
+      <div className={cn("grid gap-2.5 p-4", locked && "[&_button:not(.on)]:opacity-40")}>
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="grid grid-cols-[90px_1fr] items-center gap-4 max-[760px]:grid-cols-[70px_1fr]">
+            <span className="text-right font-mono text-[12px]/none font-bold uppercase tracking-[0.06em] text-txt-muted">Partida {i + 1}</span>
+            <div className="flex max-w-[300px] gap-2.5">
+              <button type="button" disabled={locked} onClick={() => setGame(i, "W")} className={cn(gbtn, shown[i] === "W" && "on border-ok bg-ok-soft text-ok")}>Victoria</button>
+              <button type="button" disabled={locked} onClick={() => setGame(i, "L")} className={cn(gbtn, shown[i] === "L" && "on border-bad bg-bad-soft text-bad")}>Derrota</button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {phase === "edit" && (
+        <div className="flex flex-wrap items-center justify-between gap-3.5 border-t border-solid border-line bg-base px-4 py-3.5">
+          <span className={cn("font-body text-[14px]/[1.3]", decisive ? "font-bold text-txt" : "text-txt-dim")}>{decisive ? resultText : "Marca el resultado de cada partida"}</span>
+          <Button variant="pri" size="sm" icon="check" disabled={!decisive} onClick={submit}>Enviar reporte</Button>
+        </div>
+      )}
+
+      {phase === "awaiting" && (
+        <div className="grid gap-[9px] border-t border-solid border-line bg-base px-4 py-3.5">
+          <div className="flex flex-wrap items-center justify-between gap-3.5">
+            <span className="font-body text-[14px]/[1.3] font-bold text-txt">{resultText}</span>
+            <span className="inline-flex items-center gap-1.5 font-mono text-[12px]/none text-warn"><Icon name="clock" size={12} />Auto-verificación en <b className="font-bold">{fmtMMSS(countdown)}</b></span>
+          </div>
+          <div className="h-1 overflow-hidden bg-line"><i className="block h-full bg-warn transition-[width] duration-1000 ease-linear" style={{ width: (countdown / AUTO_VERIFY_SECONDS) * 100 + "%" }} /></div>
+          <p className="m-0 max-w-[68ch] font-body text-[11.5px]/[1.5] text-txt-muted">El reporte aparece al instante en la mesa de {opp.name}. Si no responde a tiempo se validará automáticamente para no bloquear el torneo.</p>
+        </div>
+      )}
+
+      {phase === "incoming" && (
+        <div className="flex flex-wrap items-center justify-between gap-3.5 border-t border-solid border-line bg-base px-4 py-3.5">
+          <span className="font-body text-[14px]/[1.3] font-bold text-txt">Según {opp.name}: {incomingGames.filter((g) => g === "L").length}-{incomingGames.filter((g) => g === "W").length} a su favor</span>
+          <span className="inline-flex gap-2.5">
+            <Button variant="ghost" size="sm" icon="alert" onClick={() => verifyIncoming(false)}>Disputar</Button>
+            <Button variant="pri" size="sm" icon="check" onClick={() => verifyIncoming(true)}>Verificar</Button>
+          </span>
+        </div>
+      )}
+
+      {phase === "verified" && (
+        <div className={cn(banner, "text-ok bg-ok-soft border border-solid border-[color:color-mix(in_srgb,var(--ok)_40%,transparent)]")}>
+          <Icon name="check" size={16} className="flex-none" />
+          <span><b>Resultado verificado {Math.max(wins, losses)}-{Math.min(wins, losses)}.</b> {autoVerified ? "Validado automáticamente por tiempo de espera." : "Confirmado por ambos jugadores."}</span>
+        </div>
+      )}
+      {phase === "dispute" && (
+        <div className={cn(banner, "text-bad bg-bad-soft border border-solid border-[color:color-mix(in_srgb,var(--bad)_40%,transparent)]")}>
+          <Icon name="alert" size={16} className="flex-none" />
+          <span><b>Resultado en disputa.</b> Un juez revisará la mesa. Usad el chat para explicar lo ocurrido.</span>
+        </div>
+      )}
+    </section>
+  )
+}
+
+type ChatMsg = { k: "sys" | "me" | "them" | "judge"; t: string; text: string }
+
+function TmMatchChat({ me, opp, feed }: { me: TmPlayer; opp: TmPlayer; feed: string[] }) {
+  const [msgs, setMsgs] = React.useState<ChatMsg[]>(() => [
+    { k: "sys", t: "16:30", text: "La mesa está abierta. ¡Buena suerte!" },
+    { k: "them", t: "16:31", text: "¡Hola! ¿Listo cuando quieras?" },
+    { k: "me", t: "16:31", text: "¡Listo! Mi ID: " + me.tag },
+    { k: "them", t: "16:31", text: "Genial, te reto ahora." },
+  ])
+  const [judge, setJudge] = React.useState(false)
+  const [input, setInput] = React.useState("")
+  const bodyRef = React.useRef<HTMLDivElement>(null)
+
+  React.useEffect(() => {
+    if (feed && feed.length) {
+      setMsgs((m) => {
+        const have = new Set(m.filter((x) => x.k === "sys").map((x) => x.text))
+        const add = feed.filter((f) => !have.has(f)).map((text) => ({ k: "sys" as const, t: nowHM(), text }))
+        return add.length ? m.concat(add) : m
+      })
+    }
+  }, [feed])
+  React.useEffect(() => {
+    const el = bodyRef.current
+    if (el) el.scrollTop = el.scrollHeight
+  }, [msgs])
+
+  const send = () => {
+    const v = input.trim()
+    if (!v) return
+    setMsgs((m) => m.concat({ k: "me", t: nowHM(), text: v }))
+    setInput("")
+  }
+  const requestJudge = () => {
+    if (judge) return
+    setJudge(true)
+    setMsgs((m) => m.concat({ k: "sys", t: nowHM(), text: "Has solicitado un juez. Un miembro del staff se unirá en breve." }, { k: "judge", t: nowHM(), text: "Soy Álex, juez de mesa. ¿En qué puedo ayudaros?" }))
+  }
+
+  return (
+    <section className={CARD}>
+      <div className={CARD_HEAD}>
+        <h3 className={CARD_H3}>Chat de mesa</h3>
+        <Button variant="default" size="sm" icon="alert" disabled={judge} onClick={requestJudge} className={cn(!judge && "border-warn text-warn hover:border-warn hover:bg-warn hover:text-white")}>
+          {judge ? "Juez avisado" : "Solicitar juez"}
+        </Button>
+      </div>
+      <div ref={bodyRef} className="flex h-[320px] flex-col gap-2.5 overflow-y-auto bg-base p-4">
+        {msgs.map((m, i) => {
+          if (m.k === "sys")
+            return (
+              <div key={i} className="mx-auto inline-flex max-w-[82%] items-center gap-2 border border-solid border-[color:color-mix(in_srgb,var(--info)_25%,transparent)] bg-info-soft px-3 py-1.5 text-center font-body text-[11.5px]/[1.3] font-medium text-txt-muted">
+                <span className="font-mono text-[10px]/none font-semibold text-info">{m.t}</span>
+                {m.text}
+              </div>
+            )
+          const who = m.k === "me" ? me.name : m.k === "judge" ? "Álex · juez" : opp.name
+          return (
+            <div key={i} className={cn("flex max-w-[82%]", m.k === "me" ? "self-end" : "self-start")}>
+              <div className={cn("grid gap-[3px] border border-solid px-3 py-2", m.k === "me" ? "border-accent-line bg-accent-soft" : m.k === "judge" ? "border-[color:color-mix(in_srgb,var(--warn)_35%,transparent)] bg-warn-soft" : "border-line bg-panel-2")}>
+                <div className="flex items-baseline gap-2">
+                  <b className={cn("font-mono text-[11px]/none font-bold", m.k === "me" ? "text-accent-bright" : m.k === "judge" ? "text-warn" : "text-txt")}>{who}</b>
+                  <i className="font-mono text-[10px]/none not-italic text-txt-dim">{m.t}</i>
+                </div>
+                <p className="m-0 break-words font-body text-[13.5px]/[1.45] text-txt">{m.text}</p>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+      <div className="flex gap-2.5 border-t border-solid border-line bg-panel px-4 py-3">
+        <input
+          className="min-w-0 flex-1 border border-solid border-line-2 bg-base px-3 py-2.5 font-body text-[13.5px]/[1.3] text-txt focus:border-accent-line focus:outline focus:outline-2 focus:outline-accent-line"
+          value={input}
+          placeholder="Escribe un mensaje… (comparte tu ID de combate)"
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Enter") send() }}
+        />
+        <Button variant="pri" size="sm" icon="arrow" onClick={send}>Enviar</Button>
+      </div>
+    </section>
+  )
+}
+
+function TmMonCard({ mon }: { mon: TmMon }) {
+  return (
+    <div className="grid border border-solid border-line bg-base">
+      <div className="flex items-center gap-[9px] border-b border-solid border-[hsl(var(--ghue,28)_55%_46%_/_0.32)] bg-[hsl(var(--ghue,28)_55%_46%_/_0.16)] px-[11px] py-2">
+        <DkSprite alt={mon.name} size={40} />
+        <b className="min-w-0 flex-1 truncate font-display text-[14px]/[1.05] font-bold tracking-[0.01em]">{mon.name}</b>
+        <span className="inline-flex items-center gap-1.5">
+          <i className="font-mono text-[8.5px]/none font-semibold uppercase not-italic tracking-[0.08em] text-txt-dim">Tera</i>
+          <DkType type={mon.tera} small />
+        </span>
+      </div>
+      <div className="grid gap-1.5 border-b border-solid border-line px-3 py-2.5">
+        <span className="grid grid-cols-[68px_1fr] gap-2 font-body text-[12px]/[1.3] text-txt"><i className="self-center font-mono text-[8.5px]/[1.4] font-semibold uppercase not-italic tracking-[0.08em] text-txt-dim">Objeto</i>{mon.item}</span>
+        <span className="grid grid-cols-[68px_1fr] gap-2 font-body text-[12px]/[1.3] text-txt"><i className="self-center font-mono text-[8.5px]/[1.4] font-semibold uppercase not-italic tracking-[0.08em] text-txt-dim">Habilidad</i>{abilityOf(mon)}</span>
+      </div>
+      <ul className="m-0 grid list-none gap-1.5 p-3">
+        {mon.moves.map((mv) => (
+          <li key={mv} className="flex items-center gap-2 font-body text-[12.5px]/[1.2] font-medium text-txt-muted">
+            <span className="h-1 w-1 flex-none rotate-45 bg-[hsl(var(--ghue,28)_60%_55%)]" />
+            {mv}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+export function TmTeamsheet({ opp, onCalc }: { opp: TmPlayer; onCalc?: () => void }) {
+  const team = opp._pk || []
+  if (!team.length) return null
+  return (
+    <section className={CARD}>
+      <div className={CARD_HEAD}>
+        <h3 className={CARD_H3}>Hoja de equipo de {opp.name}</h3>
+        <span className="inline-flex gap-2.5">
+          <Button variant="default" size="sm" icon="calc" onClick={onCalc}>Calc. de daño</Button>
+          <Button variant="pri" size="sm" icon="copy" onClick={() => copyText(showdownPaste(team), "Equipo copiado en formato Showdown")}>Copiar equipo</Button>
+        </span>
+      </div>
+      <div className="grid grid-cols-3 gap-2.5 p-4 max-[760px]:grid-cols-2 max-[520px]:grid-cols-1">
+        {team.map((m) => <TmMonCard key={m.slot != null ? m.slot : m.id || m.name} mon={m} />)}
+      </div>
+      <p className="m-0 flex items-center gap-2 px-4 pb-4 font-body text-[11.5px]/[1.5] text-txt-muted [&_svg]:flex-none [&_svg]:text-txt-dim">
+        <Icon name="info" size={12} />Hoja registrada por el rival al inscribirse. Cópiala a Pokémon Showdown o ábrela en la calculadora para preparar tus daños.
+      </p>
+    </section>
+  )
+}
+
+export function TmMatchView({ comp, me, opp, roundNo, tableNo, status, scenario, onCalc, standalone }: { comp: TmComp; me: TmPlayer; opp: TmPlayer; roundNo: React.ReactNode; tableNo: React.ReactNode; status?: string; scenario?: string; onCalc?: () => void; standalone?: boolean }) {
+  const [feed, setFeed] = React.useState<string[]>([])
+  const pushSystem = (text: string) => setFeed((f) => f.concat(text))
+  const teamRef = React.useRef<HTMLDivElement>(null)
+  const chatRef = React.useRef<HTMLDivElement>(null)
+  const scrollTo = (ref: React.RefObject<HTMLDivElement | null>) => {
+    const el = ref.current
+    if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 80, behavior: "smooth" })
+  }
+  return (
+    <div className={cn("grid max-w-[940px] gap-3.5", standalone && "mx-auto")}>
+      <TmRoundHeader comp={comp} roundNo={roundNo} tableNo={tableNo} status={status} />
+      <TmOpponentCard opp={opp} onChat={() => scrollTo(chatRef)} onTeam={() => scrollTo(teamRef)} />
+      <TmReportPanel me={me} opp={opp} initialScenario={scenario} onSystem={pushSystem} />
+      <div ref={chatRef}><TmMatchChat me={me} opp={opp} feed={feed} /></div>
+      <div ref={teamRef}><TmTeamsheet opp={opp} onCalc={onCalc} /></div>
+    </div>
+  )
+}

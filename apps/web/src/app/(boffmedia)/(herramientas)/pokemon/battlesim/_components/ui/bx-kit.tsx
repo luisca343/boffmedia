@@ -18,22 +18,25 @@ const tyc = (v: string) => ({ ["--tyc"]: v }) as React.CSSProperties
 const CUT = "polygon(0 0,100% 0,100% calc(100% - var(--cut,10px)),calc(100% - var(--cut,10px)) 100%,0 100%)"
 const SLASH = "polygon(3px 0,100% 0,calc(100% - 3px) 100%,0 100%)"
 
-function BxSprite({ mon, size = 40 }: { mon: BxMon; size?: number }) {
+export function BxSprite({ mon, size = 40 }: { mon: BxMon; size?: number }) {
   return <DkSprite src={spriteUrl(mon.name)} alt={mon.name} size={size} onError={handleSpriteError} />
 }
 
 /* ── Type / category / status / boost / tera ─────────────────────────────── */
-export function BxType({ type, small = false }: { type: string; small?: boolean }) {
+export function BxType({ type, ghost = false, small = false }: { type: string; ghost?: boolean; small?: boolean }) {
   return (
     <span style={{ ...tyc(tyColor(type)), clipPath: SLASH }}
-      className={cn("inline-flex items-center gap-[5px] font-mono font-semibold uppercase text-accent-ink [background:var(--tyc)]",
-        small ? "gap-1 px-[5px] py-[3px] text-[8.5px] leading-none tracking-[0.06em]" : "px-[7px] py-1 text-[10px] leading-none tracking-[0.06em]")}>
-      <i aria-hidden className="rounded-full bg-current opacity-55" style={{ width: 4, height: 4 }} />{tyLabel(type)}
+      className={cn("inline-flex items-center gap-[5px] font-mono font-semibold uppercase leading-none tracking-[0.06em]",
+        small ? "gap-1 px-[5px] py-[3px] text-[8.5px]" : "px-[7px] py-1 text-[10px]",
+        ghost
+          ? "border border-solid border-[color-mix(in_srgb,var(--tyc)_40%,transparent)] text-[var(--tyc)] [background:color-mix(in_srgb,var(--tyc)_13%,transparent)]"
+          : "text-accent-ink [background:var(--tyc)]")}>
+      <i aria-hidden className={cn("rounded-full", ghost ? "bg-[var(--tyc)]" : "bg-current opacity-55")} style={{ width: 4, height: 4 }} />{tyLabel(type)}
     </span>
   )
 }
-export function BxTypeRow({ types, small = false }: { types: string[]; small?: boolean }) {
-  return <span className="inline-flex flex-wrap gap-1">{types.map((t) => <BxType key={t} type={t} small={small} />)}</span>
+export function BxTypeRow({ types, ghost = true, small = false }: { types: string[]; ghost?: boolean; small?: boolean }) {
+  return <span className="inline-flex flex-wrap gap-1">{types.map((t) => <BxType key={t} type={t} ghost={ghost} small={small} />)}</span>
 }
 
 const CAT_MARK: Record<string, string> = {
@@ -379,4 +382,78 @@ export function BxSpark({ data, w = 220, h = 40 }: { data: number[]; w?: number;
 /* ── Keyboard hint chip ──────────────────────────────────────────────────── */
 export function BxKbd({ children }: { children: React.ReactNode }) {
   return <kbd className="grid h-[18px] min-w-[18px] flex-none place-items-center border border-solid border-line-2 bg-base px-1 font-mono text-[10px] font-semibold not-italic leading-none text-txt-muted">{children}</kbd>
+}
+export function BxKbdHint({ k, label }: { k: React.ReactNode; label: React.ReactNode }) {
+  return (
+    <span className="inline-flex items-center gap-[5px] font-mono text-[9.5px] font-medium leading-none tracking-[0.04em] text-txt-dim">
+      <BxKbd>{k}</BxKbd>{label}
+    </span>
+  )
+}
+
+/* ── Plan chip (queued order) ────────────────────────────────────────────── */
+const SLOTTAG = "flex-none border border-solid border-accent-line bg-accent-soft px-[5px] py-[3px] font-mono text-[9px] font-bold not-italic leading-none tracking-[0.08em] text-accent-bright"
+type BxPlanAction =
+  | { kind: "move"; move: { name: string; type?: string }; target?: { spread?: string } | null; targetName?: string; tera?: boolean }
+  | { kind: "switch"; toName: string }
+  | null
+export function BxPlan({ tag, action, onClear, hint }: { tag: string; action: BxPlanAction; onClear?: () => void; hint?: string }) {
+  if (!action) {
+    return (
+      <div style={{ clipPath: "polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%)" }}
+        className="inline-flex min-w-0 items-center gap-[7px] border border-dashed border-line-2 bg-panel px-[9px] py-[6px]">
+        <b className={SLOTTAG}>{tag}</b>
+        <span className="font-mono text-[10px] font-medium leading-none tracking-[0.04em] text-txt-dim">{hint || "Sin orden"}</span>
+      </div>
+    )
+  }
+  const isMove = action.kind === "move"
+  const tgt = !isMove ? null : action.target && action.target.spread ? (action.target.spread === "all" ? "todos" : "ambos rivales") : action.targetName || ""
+  return (
+    <div style={{ ...tyc(isMove ? tyColor(action.move.type) : "var(--accent)"), clipPath: "polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%)" }}
+      className="inline-flex min-w-0 items-center gap-[7px] border border-solid border-[color-mix(in_srgb,var(--tyc)_45%,var(--line))] bg-panel px-[9px] py-[6px]">
+      <b className={SLOTTAG}>{tag}</b>
+      <span className="min-w-0 truncate font-body text-[11.5px] leading-[1.2] text-txt-muted [&_b]:font-semibold [&_b]:text-txt">
+        {isMove ? (
+          <>{action.tera && <i className="mr-1 border border-[color-mix(in_srgb,var(--accent)_50%,transparent)] px-[3px] py-px font-mono text-[7.5px] not-italic tracking-[0.08em] text-accent-bright">TERA</i>}<b>{action.move.name}</b>{tgt ? " → " + tgt : ""}</>
+        ) : (
+          <>Cambio → <b>{action.toName}</b></>
+        )}
+      </span>
+      {onClear && (
+        <button type="button" onClick={onClear} aria-label="Borrar orden" className="grid flex-none place-items-center border-0 bg-transparent p-[2px] text-txt-dim hover:text-bad">
+          <Icon name="x" size={12} />
+        </button>
+      )}
+    </div>
+  )
+}
+
+/* ── Team-builder slot ───────────────────────────────────────────────────── */
+export type BxSlotMon = { name: string; types: string[]; item?: string }
+export function BxSlot({ mon, order, selected = false, dim = false, onClick, aside }: {
+  mon: (BxMon & { item?: string }) | BxSlotMon | null; order?: number; selected?: boolean; dim?: boolean; onClick?: () => void; aside?: React.ReactNode
+}) {
+  if (!mon) {
+    return (
+      <button type="button" onClick={onClick} style={{ clipPath: CUT }}
+        className="flex min-h-[58px] w-full items-center justify-center gap-2 border border-dashed border-line bg-panel px-[10px] py-2 font-mono text-[10.5px] font-semibold uppercase leading-none tracking-[0.08em] text-txt-dim transition-[border-color,color] hover:border-accent-line hover:text-txt focus-visible:outline-none">
+        <Icon name="plus" size={16} /><span>Añadir</span>
+      </button>
+    )
+  }
+  return (
+    <button type="button" onClick={onClick} style={{ clipPath: CUT }}
+      className={cn("flex w-full min-w-0 items-center gap-[10px] border border-solid border-line bg-panel px-[10px] py-2 text-left transition-[border-color,background] hover:border-accent-line hover:bg-panel-2 focus-visible:outline-none",
+        selected && "border-accent shadow-[0_0_0_1px_var(--accent-line)]", dim && "opacity-55")}>
+      {order != null && <b className="flex-none font-mono text-[11px] font-extrabold leading-none text-accent-bright">{order}</b>}
+      <BxSprite mon={mon as BxMon} size={40} />
+      <span className="grid min-w-0 flex-1 gap-[3px]">
+        <b className="truncate font-display text-[13px] font-bold uppercase leading-none tracking-[0.03em]">{mon.name}</b>
+        <BxTypeRow types={mon.types} small />
+        {mon.item && <small className="font-mono text-[9.5px] leading-[1.2] text-txt-dim">{mon.item}</small>}
+      </span>
+      {aside}
+    </button>
+  )
 }
