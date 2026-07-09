@@ -54,6 +54,25 @@ export class CreateUserDto extends BaseDto {
   profilePicture?: string;
 
   @ApiProperty({
+    description: 'Cover (banner) image URL',
+    required: false,
+    example: 'https://example.com/cover.jpg',
+  })
+  @IsOptional()
+  @IsString()
+  coverImage?: string;
+
+  @ApiProperty({
+    description: 'Short user biography',
+    required: false,
+    example: 'VGC player and Minecraft builder.',
+  })
+  @IsOptional()
+  @IsString()
+  @Length(0, 500)
+  bio?: string;
+
+  @ApiProperty({
     description: 'Google ID for OAuth',
     required: false,
     example: 'google_123456789',

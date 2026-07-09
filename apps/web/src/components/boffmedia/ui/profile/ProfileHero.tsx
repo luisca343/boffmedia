@@ -13,6 +13,8 @@ export interface ProfileHeroProps {
   handle: React.ReactNode
   initial: string
   avatarUrl?: string | null
+  coverUrl?: string | null
+  bio?: React.ReactNode
   tags?: React.ReactNode
   statusBadge?: React.ReactNode
   metrics?: ProfileMetric[]
@@ -20,7 +22,9 @@ export interface ProfileHeroProps {
   liveLabel?: string
   editable?: boolean
   uploading?: boolean
+  coverUploading?: boolean
   avatarLabel?: string
+  coverLabel?: string
   onAvatarClick?: () => void
   onCoverClick?: () => void
   className?: string
@@ -36,6 +40,8 @@ export function ProfileHero({
   handle,
   initial,
   avatarUrl,
+  coverUrl,
+  bio,
   tags,
   statusBadge,
   metrics,
@@ -43,7 +49,9 @@ export function ProfileHero({
   liveLabel = "EN VIVO",
   editable,
   uploading,
+  coverUploading,
   avatarLabel = "Cambiar foto",
+  coverLabel = "Cambiar portada",
   onAvatarClick,
   onCoverClick,
   className,
@@ -52,6 +60,20 @@ export function ProfileHero({
     <div className={cn("relative mb-[22px] border border-solid border-line bg-panel cut-corner", className)}>
       {/* cover band */}
       <div className="relative h-[236px] overflow-hidden bg-panel-2">
+        {coverUrl && (
+          <ArtImage
+            src={coverUrl}
+            alt=""
+            sizes="100vw"
+            className="absolute inset-0 z-[1] h-full w-full object-cover"
+            fallback={<span className="absolute inset-0 bg-panel-2" />}
+          />
+        )}
+        {coverUploading && (
+          <span className="absolute inset-0 z-[5] grid place-items-center bg-black/60">
+            <Spinner />
+          </span>
+        )}
         <div className="pointer-events-none absolute inset-0 z-[2] bg-[repeating-linear-gradient(0deg,rgba(0,0,0,0.16)_0_1px,transparent_1px_3px)] opacity-50 mix-blend-multiply" />
         <div
           className="pointer-events-none absolute inset-0 z-[2] bg-[radial-gradient(var(--line-2)_1px,transparent_1px)] opacity-[0.22] [background-size:22px_22px]"
@@ -67,7 +89,13 @@ export function ProfileHero({
         )}
 
         {editable && (
-          <button type="button" aria-label={avatarLabel} onClick={onCoverClick} className={cn(CAM_BTN, "absolute right-4 top-4 z-[5] h-[38px] w-[38px]")}>
+          <button
+            type="button"
+            aria-label={coverLabel}
+            title={coverLabel}
+            onClick={onCoverClick}
+            className={cn(CAM_BTN, "absolute right-4 top-4 z-[6] h-[38px] w-[38px]")}
+          >
             <Icon name="camera" size={18} />
           </button>
         )}
@@ -125,6 +153,11 @@ export function ProfileHero({
             {handle}
           </div>
           {tags && <div className="mt-[15px] flex flex-wrap gap-2">{tags}</div>}
+          {bio && (
+            <p className="mt-3 max-w-[62ch] font-body text-[14px]/[1.55] text-pretty text-txt-muted">
+              {bio}
+            </p>
+          )}
         </div>
 
         {metrics && metrics.length > 0 && (

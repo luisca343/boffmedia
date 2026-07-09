@@ -7,10 +7,18 @@ import {
   Put,
   Body,
   Param,
+  Query,
+  ParseIntPipe,
   HttpStatus,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { EventsFacadeService } from './events.facade.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { CreateGameDto } from './dto/create-game.dto';
@@ -442,5 +450,36 @@ export class EventsController {
     @Param('eventId') eventId: number,
   ): Promise<TeamLeaderboardEntry[]> {
     return await this.eventsFacadeService.getTeamLeaderboard(eventId);
+  }
+
+  // ==================== USER PROFILE ====================
+
+  @Get('users/:userId/trophies')
+  @ApiOperation({ summary: "Get a user's trophy case (earned + locked)" })
+  @ApiParam({ name: 'userId', type: 'number', description: 'BoffMedia user ID' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Trophy case retrieved successfully.',
+  })
+  async getUserTrophies(@Param('userId', ParseIntPipe) userId: number) {
+    return await this.eventsFacadeService.getUserTrophies(userId);
+  }
+
+  @Get('users/:userId/activity')
+  @ApiOperation({ summary: "Get a user's activity timeline" })
+  @ApiParam({ name: 'userId', type: 'number', description: 'BoffMedia user ID' })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Activity timeline retrieved successfully.',
+  })
+  async getUserActivity(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Query('limit') limit?: number,
+  ) {
+    return await this.eventsFacadeService.getUserActivity(
+      userId,
+      limit ? Number(limit) : undefined,
+    );
   }
 }

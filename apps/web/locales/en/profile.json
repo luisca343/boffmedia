@@ -15,13 +15,41 @@
     },
     "section": {
       "account": "Account details",
-      "linked": "Linked accounts"
+      "linked": "Linked accounts",
+      "trophies": "Trophy case",
+      "activity": "Recent activity"
+    },
+    "stats": {
+      "rank": "Global rank",
+      "points": "Points",
+      "achievements": "Achievements",
+      "medals": "Medals",
+      "ofTotal": "of {total}"
+    },
+    "trophies": {
+      "emptyTitle": "No trophies yet",
+      "emptyBody": "Take part in events to unlock achievements and medals."
+    },
+    "activity": {
+      "unlocked": "Unlocked",
+      "joined": "Joined",
+      "emptyTitle": "No activity",
+      "emptyBody": "Your event activity will show up here."
     },
     "linked": {
       "linked": "Linked",
       "unlinked": "Not linked",
       "link": "Link",
+      "unlink": "Unlink",
+      "unlinkedDone": "Account unlinked",
       "soon": "Coming soon"
+    },
+    "rarity": {
+      "bronze": "Bronze",
+      "silver": "Silver",
+      "gold": "Gold",
+      "platinum": "Platinum",
+      "diamond": "Diamond"
     },
     "status": {
       "online": "Online",
@@ -29,7 +57,15 @@
     },
     "avatar": {
       "change": "Change photo",
-      "error": "Could not upload the image"
+      "error": "Could not upload the image",
+      "badType": "Invalid format. Use JPG, PNG, WEBP or GIF.",
+      "tooBig": "The image exceeds the {mb} MB maximum.",
+      "updated": "Photo updated"
+    },
+    "cover": {
+      "change": "Change cover",
+      "error": "Could not upload the cover",
+      "updated": "Cover updated"
     },
     "loggedOut": {
       "title": "Sign in required",

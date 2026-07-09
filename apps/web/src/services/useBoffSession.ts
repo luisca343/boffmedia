@@ -41,13 +41,14 @@ export const useBoffSession = () => {
     }
   }
 
-  return { 
-    session: session as Session, 
+  return {
+    session: session as Session,
     getMinecraftUUID,
-    status, 
+    status,
     hasRole,
     isBoffAdmin,
     isRotomAdmin,
-    refreshSession
+    refreshSession,
+    update, // next-auth session update — refreshes the JWT in place, no page reload
   }
 }

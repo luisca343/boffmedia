@@ -36,6 +36,8 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
     username: boffMediaUsers.username,
     uuid: boffMediaUsers.uuid,
     profilePicture: boffMediaUsers.profilePicture,
+    coverImage: boffMediaUsers.coverImage,
+    bio: boffMediaUsers.bio,
     googleId: boffMediaUsers.googleId,
     discordId: boffMediaUsers.discordId,
     twitchId: boffMediaUsers.twitchId,

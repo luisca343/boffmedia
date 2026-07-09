@@ -15,7 +15,7 @@ export interface AccountFormProps {
   values: AccountFormValues
   editing?: boolean
   onChange?: (field: keyof AccountFormValues, value: string) => void
-  /** Bio has no backing API yet — only shown in the showcase demo. */
+  /** Show the bio field (backed by the user `bio` column). */
   showBio?: boolean
   className?: string
 }

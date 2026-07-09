@@ -15,13 +15,41 @@
     },
     "section": {
       "account": "Datos de la cuenta",
-      "linked": "Cuentas vinculadas"
+      "linked": "Cuentas vinculadas",
+      "trophies": "Vitrina de logros",
+      "activity": "Actividad reciente"
+    },
+    "stats": {
+      "rank": "Ranking global",
+      "points": "Puntos",
+      "achievements": "Logros",
+      "medals": "Medallas",
+      "ofTotal": "de {total}"
+    },
+    "trophies": {
+      "emptyTitle": "Sin logros todavía",
+      "emptyBody": "Participa en eventos para desbloquear logros y medallas."
+    },
+    "activity": {
+      "unlocked": "Desbloqueó",
+      "joined": "Se unió a",
+      "emptyTitle": "Sin actividad",
+      "emptyBody": "Tu actividad en eventos aparecerá aquí."
     },
     "linked": {
       "linked": "Vinculado",
       "unlinked": "Sin vincular",
       "link": "Vincular",
+      "unlink": "Desvincular",
+      "unlinkedDone": "Cuenta desvinculada",
       "soon": "Próximamente"
+    },
+    "rarity": {
+      "bronze": "Bronce",
+      "silver": "Plata",
+      "gold": "Oro",
+      "platinum": "Platino",
+      "diamond": "Diamante"
     },
     "status": {
       "online": "En línea",
@@ -29,7 +57,15 @@
     },
     "avatar": {
       "change": "Cambiar foto",
-      "error": "No se pudo subir la imagen"
+      "error": "No se pudo subir la imagen",
+      "badType": "Formato no válido. Usa JPG, PNG, WEBP o GIF.",
+      "tooBig": "La imagen supera el máximo de {mb} MB.",
+      "updated": "Foto actualizada"
+    },
+    "cover": {
+      "change": "Cambiar portada",
+      "error": "No se pudo subir la portada",
+      "updated": "Portada actualizada"
     },
     "loggedOut": {
       "title": "Acceso requerido",
