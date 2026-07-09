@@ -1,4 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { getRandomTeam } from '../_utils/teams';
 import {
@@ -29,6 +30,7 @@ function getPokemonTeam(team: Pokemon[]) {
 }
 
 @ApiTags('BoffMedia 🛠 | Battle Simulator')
+@Public()
 @Controller('battlesimulator/battle')
 export class BattleController {
   @Get()

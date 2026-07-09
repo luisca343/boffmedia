@@ -4,12 +4,14 @@ import {
   Post,
   HttpStatus,
 } from '@nestjs/common';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { UuidDto } from '../_dto/smartrotom-request-dto';
 import { PlayerFacadeService } from './player.facade.service';
 import { PokemonW } from '../wingull/entities/pokemon-w-.entity';
 
 @ApiTags('SmartRotom | Player')
+@Public()
 @Controller('smartrotom/player')
 export class PlayerController {
   constructor(private readonly playerFacadeService: PlayerFacadeService) {}

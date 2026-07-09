@@ -9,6 +9,7 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import {
   ApiTags,
   ApiOperation,
@@ -57,6 +58,7 @@ import { BiomeSpawnCollection } from './entities/biome-spawn-collection.entity';
 import { WingullFacadeService } from '../wingull/wingull.facade.service';
 
 @ApiTags('SmartRotom | Pokémon')
+@Public()
 @Controller('smartrotom/pokemon')
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
 export class PokemonController {

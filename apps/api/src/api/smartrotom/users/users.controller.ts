@@ -9,6 +9,7 @@ import {
   HttpStatus,
   ParseIntPipe,
 } from '@nestjs/common';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { UsersFacadeService } from './users.facade.service';
 import { CreateSmartrotomUserDto } from './dto/create-user.dto';
@@ -23,6 +24,7 @@ import { UserStatistics } from './entities/user-statistics.entity';
 import { UserValidationResult } from './entities/user-validation-result.entity';
 
 @ApiTags('SmartRotom | Users')
+@Public()
 @Controller('smartrotom/users')
 export class UsersController {
   constructor(private readonly usersFacadeService: UsersFacadeService) {}

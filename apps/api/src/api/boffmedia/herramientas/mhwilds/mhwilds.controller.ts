@@ -10,6 +10,7 @@ import {
   UsePipes,
   Body,
 } from '@nestjs/common';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import {
   ApiTags,
   ApiOperation,
@@ -48,6 +49,7 @@ import { Rarity } from './enums/rarity.enum';
 import { WeaponTreeEntity } from './entities/weapon-tree.entity';
 
 @ApiTags('BoffMedia 🛠 | MHWilds')
+@Public()
 @Controller('tools/mhwilds')
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
 export class MhwildsController {

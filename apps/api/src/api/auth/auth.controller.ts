@@ -6,6 +6,7 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { AuthThrottlerGuard } from '@api/_utils/guards/auth-throttler.guard';
@@ -27,6 +28,7 @@ import {
 } from './entities/auth-response.entity';
 
 @ApiTags('BoffMedia | Authentication')
+@Public()
 @Controller('auth')
 export class AuthController {
   constructor(

@@ -7,6 +7,7 @@ import {
   Query,
   HttpStatus,
 } from '@nestjs/common';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import {
   ApiTags,
   ApiOperation,
@@ -22,6 +23,7 @@ import {
 } from './dto/tournament.dto';
 
 @ApiTags('SmartRotom | Liga')
+@Public()
 @Controller('smartrotom/liga')
 export class LigaController {
   constructor(private readonly ligaFacadeService: LigaFacadeService) {}

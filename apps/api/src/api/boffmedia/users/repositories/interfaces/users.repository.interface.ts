@@ -2,12 +2,13 @@ import { BoffMediaUser } from '@/_db/schema/BoffMedia';
 import { SmartRotomUser } from '@/_db/schema/SmartRotom';
 import { CreateUserDto } from '../../dto/create-user.dto';
 
-// Entity types for responses (without password)
-export type BoffMediaUserSafe = Omit<BoffMediaUser, 'password'>;
+// Entity types for responses (without password or the internal soft-delete marker)
+export type BoffMediaUserSafe = Omit<BoffMediaUser, 'password' | 'deletedAt'>;
 
-// Complex query result types
+// Complex query result types. Keeps `password` (for credential checks) but not
+// the internal soft-delete marker, matching the repository's select clause.
 export interface FullUserData {
-  boffmedia_users: BoffMediaUser;
+  boffmedia_users: Omit<BoffMediaUser, 'deletedAt'>;
   rotom_users: SmartRotomUser | null;
 }
 

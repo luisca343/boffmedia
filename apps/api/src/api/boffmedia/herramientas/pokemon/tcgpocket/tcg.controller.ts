@@ -9,6 +9,7 @@ import {
   Body,
   HttpStatus,
 } from '@nestjs/common';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import {
   ApiTags,
   ApiOperation,
@@ -27,6 +28,7 @@ import { UserCard, UserCardHistory } from './entities/user-card.entity';
 import { Logger } from 'nestjs-pino';
 
 @ApiTags('BoffMedia 🛠 | Pokemon TCG Pocket')
+@Public()
 @Controller('tools/ptcgp')
 export class TcgController {
   constructor(
