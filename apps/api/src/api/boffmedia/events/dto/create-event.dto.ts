@@ -55,6 +55,7 @@ export class CreateEventDto {
     required: false,
   })
   @IsOptional()
+  @IsDateString()
   endDate?: string;
 
   @ApiProperty({

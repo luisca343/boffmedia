@@ -112,10 +112,14 @@ export async function multipartPOST<T>(
 
 // Internal helper for multipart POST requests
 async function multipartPOSTRequest<T>(url: string, formData: FormData): Promise<ApiResponse<T>> {
+  // Attach the session token when present — harmless on unguarded endpoints,
+  // required for guarded ones (e.g. /upload).
+  const token = await sessionToken();
   try {
     const res = await fetch(url, {
       method: 'POST',
       body: formData,
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       next: { revalidate: 0 },
     });
     const contentType = res.headers.get('content-type');
@@ -195,6 +199,43 @@ export async function apiAuthedPUT<T>(url: string, data: any, token: string): Pr
 
 export async function apiAuthedDELETE<T>(url: string, token: string): Promise<ApiResponse<T>> {
   return authedRequest<T>("DELETE", `${getApiUrl()}${url}`, token);
+}
+
+// ─── Auto-authed requests ──────────────────────────────────────────────────────
+// Same as the apiAuthed* helpers but pull the API JWT from the NextAuth session
+// automatically, so guarded-endpoint call sites don't have to thread a token.
+// next-auth/react is imported dynamically so this module stays safe to import
+// from server-side code (authOptions imports boffPOST from here). These must
+// only be called from client contexts (admin panel, profile, join buttons).
+
+async function sessionToken(): Promise<string> {
+  try {
+    const { getSession } = await import("next-auth/react");
+    const session = await getSession();
+    return (session?.user as { accessToken?: string } | undefined)?.accessToken ?? "";
+  } catch {
+    return "";
+  }
+}
+
+export async function apiAuthedAutoPOST<T>(url: string, data: any): Promise<ApiResponse<T>> {
+  return authedRequest<T>("POST", `${getApiUrl()}${url}`, await sessionToken(), data);
+}
+
+export async function apiAuthedAutoPATCH<T>(url: string, data: any): Promise<ApiResponse<T>> {
+  return authedRequest<T>("PATCH", `${getApiUrl()}${url}`, await sessionToken(), data);
+}
+
+export async function apiAuthedAutoPUT<T>(url: string, data: any): Promise<ApiResponse<T>> {
+  return authedRequest<T>("PUT", `${getApiUrl()}${url}`, await sessionToken(), data);
+}
+
+export async function apiAuthedAutoGET<T>(url: string): Promise<ApiResponse<T>> {
+  return authedRequest<T>("GET", `${getApiUrl()}${url}`, await sessionToken());
+}
+
+export async function apiAuthedAutoDELETE<T>(url: string): Promise<ApiResponse<T>> {
+  return authedRequest<T>("DELETE", `${getApiUrl()}${url}`, await sessionToken());
 }
 
 const getApiUrl = (): string => {
@@ -289,8 +330,8 @@ interface UploadResponse {
 }
 
 async function uploadRequest<T>(
-  url: string, 
-  file: File, 
+  url: string,
+  file: File,
   options?: { path?: string; filename?: string }
 ): Promise<ApiResponse<T>> {
   const formData = new FormData();
@@ -303,10 +344,14 @@ async function uploadRequest<T>(
     formData.append('filename', options.filename);
   }
 
+  // The /upload controller is JWT-guarded; attach the session token.
+  const token = await sessionToken();
+
   try {
     const res = await fetch(url, {
       method: 'POST',
       body: formData,
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       next: {
         revalidate: 0,
       },

@@ -5,7 +5,14 @@ import {
   SessionUserEntity, SuccessResponse, UpdateUserDto, UserStatistics, UserValidationResponseEntity,
   UserRolesResponseEntity, UsersPaginatedResponseEntity, UserWithIntegrationsEntity,
 } from '@boffmedia/shared';
-import { apiGET, apiPOST, apiPUT, apiDELETE, apiPATCH } from '@/services/boffAPI';
+import {
+  apiGET,
+  apiPOST,
+  apiAuthedAutoGET,
+  apiAuthedAutoPOST,
+  apiAuthedAutoPATCH,
+  apiAuthedAutoDELETE,
+} from '@/services/boffAPI';
 
 export type { GoogleAuthDto, UserLoginDto, MinecraftLinkDto, MinecraftRegistrationDto };
 
@@ -57,57 +64,57 @@ export class UsersService {
     
     const queryString = params.toString();
     const url = queryString ? `/users?${queryString}` : '/users';
-    
-    return apiGET<UsersPaginatedResponseEntity>(url);
+
+    return apiAuthedAutoGET<UsersPaginatedResponseEntity>(url);
   }
 
   /**
    * Get user statistics with integrations
    */
   static getStatistics() {
-    return apiGET<UserStatistics>('/users/statistics');
+    return apiAuthedAutoGET<UserStatistics>('/users/statistics');
   }
 
   /**
    * Get user by ID
    */
   static getUser(id: number) {
-    return apiGET<BoffMediaUserEntity>(`/users/${id}`);
+    return apiAuthedAutoGET<BoffMediaUserEntity>(`/users/${id}`);
   }
 
   /**
    * Get user with all integrations (SmartRotom, Starbank, Roles)
    */
   static getUserWithIntegrations(id: number) {
-    return apiGET<UserWithIntegrationsEntity>(`/users/${id}/integrations`);
+    return apiAuthedAutoGET<UserWithIntegrationsEntity>(`/users/${id}/integrations`);
   }
 
   /**
-   * Get user by username
+   * Get user by username (admin-only on the API)
    */
   static getUserByUsername(username: string) {
-    return apiGET<BoffMediaUserEntity>(`/users/username/${username}`);
+    return apiAuthedAutoGET<BoffMediaUserEntity>(`/users/username/${username}`);
   }
 
   /**
-   * Get full user data by username (with SmartRotom data)
+   * Get full user data by username (with SmartRotom data) — admin-only on the API
    */
   static getFullUserByUsername(username: string) {
-    return apiGET<FullUserEntity>(`/users/username/${username}/full`);
+    return apiAuthedAutoGET<FullUserEntity>(`/users/username/${username}/full`);
   }
 
   /**
-   * Get user by email
+   * Get user by email (admin-only on the API)
    */
   static getUserByEmail(email: string) {
-    return apiGET<SessionUserEntity>(`/users/email/${email}`);
+    return apiAuthedAutoGET<SessionUserEntity>(`/users/email/${email}`);
   }
 
   /**
    * Get user roles
    */
   static getUserRoles(id: number) {
-    return apiGET<UserRolesResponseEntity>(`/users/${id}/roles`);
+    return apiAuthedAutoGET<UserRolesResponseEntity>(`/users/${id}/roles`);
   }
 
   // ==================== USER UPDATE ====================
@@ -116,14 +123,14 @@ export class UsersService {
    * Update user by ID
    */
   static updateUser(id: number, data: UpdateUserDto) {
-    return apiPATCH<BoffMediaUserEntity>(`/users/${id}`, data);
+    return apiAuthedAutoPATCH<BoffMediaUserEntity>(`/users/${id}`, data);
   }
 
   /**
    * Unlink an OAuth provider (google/discord/twitch) from a user.
    */
   static unlinkProvider(id: number, provider: 'google' | 'discord' | 'twitch') {
-    return apiDELETE<BoffMediaUserEntity>(`/users/${id}/link/${provider}`);
+    return apiAuthedAutoDELETE<BoffMediaUserEntity>(`/users/${id}/link/${provider}`);
   }
 
   // ==================== USER DELETION ====================
@@ -132,7 +139,7 @@ export class UsersService {
    * Delete user by ID
    */
   static deleteUser(id: number) {
-    return apiDELETE<SuccessResponse>(`/users/${id}`);
+    return apiAuthedAutoDELETE<SuccessResponse>(`/users/${id}`);
   }
 
   // ==================== AUTHENTICATION ====================
@@ -150,7 +157,7 @@ export class UsersService {
    * Get multiple users with integrations by IDs
    */
   static getBatchUsersWithIntegrations(data: BatchUsersDto) {
-    return apiPOST<UserWithIntegrationsEntity[]>('/users/batch', data);
+    return apiAuthedAutoPOST<UserWithIntegrationsEntity[]>('/users/batch', data);
   }
 
   // ==================== VALIDATION ====================

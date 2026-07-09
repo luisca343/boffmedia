@@ -94,6 +94,9 @@ export const boffMediaEvents = mysqlTable(
   (table) => {
     return {
       gameIdx: index('game_idx').on(table.gameId),
+      statusIdx: index('event_status_idx').on(table.status),
+      visibilityIdx: index('event_visibility_idx').on(table.visibility),
+      typeIdx: index('event_type_idx').on(table.type),
     };
   },
 );
@@ -339,6 +342,54 @@ export const boffMediaParticipantProgress = mysqlTable(
 
 export type ParticipantProgress =
   typeof boffMediaParticipantProgress.$inferSelect;
+
+export const SUGGESTION_STATUS = {
+  PENDING: 'pending',
+  APPROVED: 'approved',
+  REJECTED: 'rejected',
+} as const;
+
+// Community event proposals (the /eventos/sugerir form). A suggestion is NOT a
+// published event — an admin reviews it and can then create a real event.
+export const boffMediaEventSuggestions = mysqlTable(
+  'boffmedia_event_suggestions',
+  {
+    id: int('id').primaryKey().autoincrement(),
+    proposerUserId: int('proposer_user_id').references(
+      () => boffMediaUsers.id,
+      { onDelete: 'set null', onUpdate: 'cascade' },
+    ),
+    title: varchar('title', { length: 255 }).notNull(),
+    gameName: varchar('game_name', { length: 255 }).notNull(),
+    type: varchar('type', { length: 64 }).notNull(),
+    description: text('description').notNull(),
+    additionalInfo: text('additional_info'),
+    suggestedDate: datetime('suggested_date'),
+    endDate: datetime('end_date'),
+    maxParticipants: int('max_participants'),
+    status: mysqlEnum('status', [
+      SUGGESTION_STATUS.PENDING,
+      SUGGESTION_STATUS.APPROVED,
+      SUGGESTION_STATUS.REJECTED,
+    ])
+      .notNull()
+      .default(SUGGESTION_STATUS.PENDING),
+    reviewNote: text('review_note'),
+    createdAt: datetime('created_at')
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP()`),
+    updatedAt: datetime('updated_at')
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
+  },
+  (table) => {
+    return {
+      statusIdx: index('es_status_idx').on(table.status),
+    };
+  },
+);
+
+export type EventSuggestion = typeof boffMediaEventSuggestions.$inferSelect;
 
 /**
  * Helper function to validate participant before awarding progress

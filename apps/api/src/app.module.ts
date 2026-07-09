@@ -5,6 +5,7 @@ import {
   RequestMethod,
 } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { ResponseInterceptor } from './api/_utils/interceptors/response.interceptor';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -40,6 +41,10 @@ import { DrizzleModule } from './api/_utils/drizzle/drizzle.module';
 import { AchievementModule } from '@api/smartrotom/achievement/achievement.module';
 import { PlayerModule } from '@api/smartrotom/player/player.module';
 import { EventsModule } from '@api/boffmedia/events/events.module';
+import { NotificationsModule } from '@api/boffmedia/notifications/notifications.module';
+import { SuggestionsModule } from '@api/boffmedia/suggestions/suggestions.module';
+import { CommunityModule } from '@api/boffmedia/community/community.module';
+import { PublicProfileModule } from '@api/boffmedia/public-profile/public-profile.module';
 import { UploadModule } from './api/boffmedia/util/upload/upload.module';
 import { MhwildsModule } from './api/boffmedia/herramientas/mhwilds/mhwilds.module';
 import { WingullModule } from '@api/smartrotom/wingull/wingull.module';
@@ -59,6 +64,9 @@ import { VgcModule } from '@api/boffmedia/herramientas/pokemon/vgc/vgc.module';
       defaultMetrics: { enabled: true },
       path: '/metrics',
     }),
+    // Rate limiting is available app-wide but only enforced where ThrottlerGuard is
+    // applied (auth routes) — a global guard would throttle SSE/tool streams too.
+    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 120 }]),
     ConfigModule.forRoot(),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
@@ -91,6 +99,10 @@ import { VgcModule } from '@api/boffmedia/herramientas/pokemon/vgc/vgc.module';
     PlayerModule,
     SmartrotomModule,
     EventsModule,
+    NotificationsModule,
+    SuggestionsModule,
+    CommunityModule,
+    PublicProfileModule,
     UploadModule,
     MhwildsModule,
     WingullModule,

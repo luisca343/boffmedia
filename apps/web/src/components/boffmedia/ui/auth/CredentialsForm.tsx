@@ -9,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { signIn } from "next-auth/react"
 import { Button, Field, Input, PasswordField, toast } from "@/components/boffmedia/primitives"
 import { UsersService } from "@/services/api/boffmedia/usersService"
+import { AuthService } from "@/services/api/boffmedia/authService"
 
 interface CredentialsFormProps {
   isRegister: boolean
@@ -63,8 +64,11 @@ export function CredentialsForm({ isRegister, redirect, onRegistered }: Credenti
           username: values.username,
           password: values.password,
         })
-        if (res.success) onRegistered()
-        else toast.error(res.error || t("errors.register"))
+        if (res.success) {
+          // Fire off the verification email (best-effort — never blocks the flow).
+          AuthService.resendVerification(values.email!).catch(() => {})
+          onRegistered()
+        } else toast.error(res.error || t("errors.register"))
       } catch {
         toast.error(t("errors.generic"))
       }
@@ -116,7 +120,7 @@ export function CredentialsForm({ isRegister, redirect, onRegistered }: Credenti
         <div className="flex items-center justify-end">
           <button
             type="button"
-            onClick={() => toast(t("providers.soon"))}
+            onClick={() => router.push("/recuperar")}
             className="font-body text-[13px] font-medium text-accent hover:text-accent-bright hover:underline"
           >
             {t("forgot")}

@@ -4,6 +4,7 @@ dotenv.config();
 import { join } from 'path';
 import { env } from './config/env';
 import * as express from 'express';
+import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
@@ -17,6 +18,17 @@ import { Logger } from 'nestjs-pino';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
   app.useLogger(app.get(Logger));
+
+  // Security headers. CSP is disabled because the Swagger/Scalar reference UIs load
+  // inline assets, and cross-origin resource policy is relaxed so the web app can
+  // load the static /public/uploads assets served by this API from another origin.
+  app.use(
+    helmet({
+      contentSecurityPolicy: false,
+      crossOriginEmbedderPolicy: false,
+      crossOriginResourcePolicy: { policy: 'cross-origin' },
+    }),
+  );
 
   // Add global validation pipe for better type generation
   app.useGlobalPipes(

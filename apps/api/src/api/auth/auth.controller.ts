@@ -3,14 +3,24 @@ import {
   Post,
   Body,
   HttpStatus,
+  UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
+import { AuthThrottlerGuard } from '@api/_utils/guards/auth-throttler.guard';
 import { AuthService } from './auth.service';
+import { PasswordResetService } from './password-reset.service';
+import { EmailVerificationService } from './email-verification.service';
 import { CreateUserDto } from '@api/boffmedia/users/dto/create-user.dto';
 import { LoginMcDto } from './dto/login-mc.dto';
 import { RegisterMinecraftDto } from './dto/register-minecraft.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { GoogleCallbackDto } from './dto/google-callback.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { VerifyEmailDto } from './dto/verify-email.dto';
+import { ResendVerificationDto } from './dto/resend-verification.dto';
 import {
   AuthLoginResponseEntity,
   AuthRefreshResponseEntity,
@@ -19,9 +29,15 @@ import {
 @ApiTags('BoffMedia | Authentication')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly passwordResetService: PasswordResetService,
+    private readonly emailVerificationService: EmailVerificationService,
+  ) {}
 
   @Post('login')
+  @UseGuards(AuthThrottlerGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
   @ApiOperation({ summary: 'Login user' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -38,7 +54,7 @@ export class AuthController {
       loginDto.password,
     );
     if (!user) {
-      return { error: 'Usuario o contraseña incorrectos' };
+      throw new UnauthorizedException('Usuario o contraseña incorrectos');
     }
 
     return this.authService.login(user);
@@ -103,5 +119,60 @@ export class AuthController {
   })
   async googleAuthRedirect(@Body() body: GoogleCallbackDto) {
     return this.authService.googleLogin(body);
+  }
+
+  // ==================== PASSWORD RESET ====================
+
+  @Post('forgot')
+  @UseGuards(AuthThrottlerGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
+  @ApiOperation({ summary: 'Request a password-reset email' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description:
+      'Always succeeds (does not reveal whether the email is registered).',
+  })
+  async forgotPassword(@Body() dto: ForgotPasswordDto) {
+    await this.passwordResetService.requestReset(dto.email);
+    // Generic response — never leak whether the address exists.
+    return { success: true };
+  }
+
+  @Post('reset')
+  @ApiOperation({ summary: 'Reset a password using an emailed token' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Password updated.' })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Invalid or expired token, or weak password.',
+  })
+  async resetPassword(@Body() dto: ResetPasswordDto) {
+    return this.passwordResetService.resetPassword(dto.token, dto.newPassword);
+  }
+
+  // ==================== EMAIL VERIFICATION ====================
+
+  @Post('verify-email')
+  @ApiOperation({ summary: 'Verify an email using an emailed token' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Email verified.' })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Invalid or expired token.',
+  })
+  async verifyEmail(@Body() dto: VerifyEmailDto) {
+    return this.emailVerificationService.verify(dto.token);
+  }
+
+  @Post('resend-verification')
+  @UseGuards(AuthThrottlerGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
+  @ApiOperation({ summary: 'Send (or resend) a verification email' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description:
+      'Always succeeds (does not reveal whether the email is registered/verified).',
+  })
+  async resendVerification(@Body() dto: ResendVerificationDto) {
+    await this.emailVerificationService.sendVerification(dto.email);
+    return { success: true };
   }
 }

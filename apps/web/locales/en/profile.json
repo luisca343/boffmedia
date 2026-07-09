@@ -71,6 +71,14 @@
       "title": "Sign in required",
       "body": "Sign in to view your profile.",
       "cta": "Sign in"
+    },
+    "public": {
+      "title": "{name}’s profile",
+      "note": "You are viewing {name}’s public profile.",
+      "loading": "Loading profile…",
+      "notFoundTitle": "Profile not found",
+      "notFoundBody": "No user exists with that name.",
+      "viewMine": "View public profile"
     }
   }
 }

@@ -8,6 +8,10 @@ import { BoffMediaUsersFacadeService } from './users.facade.service';
 import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { Reflector } from '@nestjs/core';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { OwnerOrAdminGuard } from '@api/_utils/guards/owner-or-admin.guard';
+import { AuthThrottlerGuard } from '@api/_utils/guards/auth-throttler.guard';
 
 const mockLogger = {
   log: jest.fn(),
@@ -51,7 +55,19 @@ describe('BoffMediaUsersController — integration (ValidationPipe + GlobalExcep
         ResponseInterceptor,
         Reflector,
       ],
-    }).compile();
+    })
+      // These specs cover ValidationPipe + routing + facade delegation, not auth.
+      // Pass-through the controller guards so the test module needn't wire up
+      // passport/throttler infrastructure (auth is exercised in live-verify).
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(RolesGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(OwnerOrAdminGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(AuthThrottlerGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     app = moduleRef.createNestApplication();
     app.useGlobalPipes(

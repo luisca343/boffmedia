@@ -50,6 +50,27 @@
       "when": 1783605468184,
       "tag": "0006_chilly_sumo",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1783619060217,
+      "tag": "0007_api_security_hardening",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1783621231189,
+      "tag": "0008_notifications_and_suggestions",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1783625308086,
+      "tag": "0009_password_reset_and_email_verify",
+      "breakpoints": true
     }
   ]
 }

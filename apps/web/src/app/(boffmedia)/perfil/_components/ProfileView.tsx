@@ -337,14 +337,21 @@ export function ProfileView() {
           <span className="mono-label">{t("kicker")}</span>
           <h1 className="mt-2 text-[clamp(46px,5.4vw,64px)]">{t("title")}</h1>
         </div>
-        <Button
-          variant={editing ? "pri" : "default"}
-          icon={editing ? "check" : "cog"}
-          loading={saving}
-          onClick={editing ? handleSave : () => setEditing(true)}
-        >
-          {editing ? t("save") : t("edit")}
-        </Button>
+        <div className="flex flex-wrap items-center gap-2.5">
+          {user.name && !editing && (
+            <Button variant="ghost" icon="eye" href={`/u/${encodeURIComponent(user.name)}`}>
+              {t("public.viewMine")}
+            </Button>
+          )}
+          <Button
+            variant={editing ? "pri" : "default"}
+            icon={editing ? "check" : "cog"}
+            loading={saving}
+            onClick={editing ? handleSave : () => setEditing(true)}
+          >
+            {editing ? t("save") : t("edit")}
+          </Button>
+        </div>
       </div>
 
       <ProfileHero
