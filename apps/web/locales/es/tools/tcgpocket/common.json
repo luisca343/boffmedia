@@ -159,6 +159,11 @@
         "item": "Objeto",
         "energy": "Energía"
       },
+      "stage": {
+        "basic": "Básica",
+        "stage1": "Fase 1",
+        "stage2": "Fase 2"
+      },
       "sort": {
         "label": "Orden",
         "num": "Número",

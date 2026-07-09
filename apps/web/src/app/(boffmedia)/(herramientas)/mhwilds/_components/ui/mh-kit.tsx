@@ -319,6 +319,96 @@ export function MhMaterial({
   )
 }
 
+// ── equipment selector row (drawer) ──────────────────────────────────────────
+export interface MhEquipItemData {
+  name: string
+  rarity?: number
+  skills?: { name: string; level: number }[]
+  attack?: number
+  affinity?: number
+  defense?: number
+  slots?: number[]
+}
+export function MhEquipItem({
+  item, kind, active, onPick,
+}: { item: MhEquipItemData; kind: "weapon" | "armor" | "charm"; active?: boolean; onPick: () => void }) {
+  const skills = (item.skills || []).map((s) => `${s.name} ${s.level}`)
+  const stat =
+    kind === "weapon" ? (
+      <><b className="text-txt">ATQ {item.attack}</b><br />{(item.affinity ?? 0) >= 0 ? "+" : ""}{item.affinity}% afin.</>
+    ) : kind === "charm" ? (
+      <b className="text-txt">Rareza {rarClamp(item.rarity)}</b>
+    ) : (
+      <b className="text-txt">DEF {item.defense}</b>
+    )
+  return (
+    <button
+      type="button"
+      onClick={onPick}
+      className={`grid grid-cols-[auto_1fr_auto] items-center gap-[11px] w-full text-left py-[11px] px-3 bg-base-2 border cursor-pointer transition-colors hover:bg-panel-2 hover:border-line-2 ${active ? "border-[var(--mh)] shadow-[inset_0_0_0_1px_var(--mh)]" : "border-line"}`}
+    >
+      <MhRarity rarity={item.rarity} />
+      <span className="min-w-0">
+        <span className="block font-body text-[14px] leading-[1.2] font-semibold truncate">{item.name}</span>
+        {skills.length > 0 && (
+          <span className="mt-[5px] flex flex-wrap gap-1">
+            {skills.map((s) => <MhTag key={s} sk>{s}</MhTag>)}
+          </span>
+        )}
+      </span>
+      <span className="flex-none whitespace-nowrap text-right font-mono text-[12px] leading-[1.4] font-semibold text-txt-muted">
+        {stat}
+        {item.slots && item.slots.some((x) => x > 0) && <MhSlotPips slots={item.slots} />}
+      </span>
+    </button>
+  )
+}
+
+// ── set bonus row ─────────────────────────────────────────────────────────────
+export interface MhSetBonusData {
+  bonusName: string
+  pieces: number
+  activeAt?: number | null
+  nextAt?: number
+  skill?: { name: string } | null
+}
+export function MhSetBonus({ bonus }: { bonus: MhSetBonusData }) {
+  const active = bonus.activeAt != null
+  return (
+    <div className={`py-[9px] px-[11px] bg-base-2 border border-line ${active ? "" : "opacity-50"}`}>
+      <div className="flex items-center gap-2">
+        <span className="font-display text-[12px] leading-none font-bold uppercase tracking-[0.03em]">{bonus.bonusName}</span>
+        <span className="ml-auto inline-flex gap-[3px]">
+          {[1, 2, 3, 4, 5].map((n) => (
+            <i key={n} className="w-[7px] h-[7px] rounded-full" style={{ background: n <= bonus.pieces ? "var(--mh)" : "var(--line-2)" }} />
+          ))}
+        </span>
+      </div>
+      <div className={`mt-[5px] font-mono text-[11px] leading-[1.3] ${active ? "text-[var(--mh-bright)]" : "text-txt-dim"}`}>
+        {active ? (
+          <><Icon name="check" size={11} className="align-[-1px]" /> {bonus.skill ? bonus.skill.name : bonus.bonusName} · {bonus.activeAt} pzs</>
+        ) : (
+          <>Requiere {bonus.nextAt} piezas ({bonus.pieces}/{bonus.nextAt})</>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ── skeleton loadout (loading state) ─────────────────────────────────────────
+export function MhSkeletonSlots({ n = 6 }: { n?: number }) {
+  return (
+    <div className="flex flex-col gap-3">
+      {Array.from({ length: n }).map((_, i) => (
+        <div
+          key={i}
+          className="h-[66px] border border-line bg-[linear-gradient(100deg,var(--panel)_30%,var(--panel-2)_50%,var(--panel)_70%)] bg-[length:220%_100%] animate-[mh-shimmer_1.3s_linear_infinite] motion-reduce:animate-none"
+        />
+      ))}
+    </div>
+  )
+}
+
 // ── meter ─────────────────────────────────────────────────────────────────────
 export function MhMeter({ pct, className = "" }: { pct: number; className?: string }) {
   return (

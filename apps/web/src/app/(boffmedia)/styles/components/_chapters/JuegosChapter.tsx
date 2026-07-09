@@ -1,11 +1,28 @@
 "use client"
 
-import { DEMO_ACHS, DEMO_EVENTS, DEMO_GAME } from "../showcase-data"
+import { DEMO_ACHS, DEMO_EVENTS, DEMO_GAME, DEMO_TOP } from "../showcase-data"
 import { Sample, Section } from "../showcase-shared"
 import { Button } from "@/components/boffmedia/primitives/button"
-import { Rank, RankRow } from "@/components/boffmedia/primitives/rank-row"
-import { AchievementItem, Countdown, EventBanner, EventCard, EventOrganizer, EventStatusChip, GameCard, GameHero } from "@/components/boffmedia/ui/events"
+import { Ring } from "@/components/boffmedia/primitives/ring"
+import {
+  AchievementItem,
+  Countdown,
+  EventBanner,
+  EventCard,
+  EventOrganizer,
+  EventStatusChip,
+  GameCard,
+  GameHero,
+  LeaderTable,
+  MetaChip,
+  ParticipantStack,
+  PlayerLine,
+  Podium,
+  RarityTag,
+} from "@/components/boffmedia/ui/events"
 import { GameLogo } from "@/components/boffmedia/ui/tools"
+
+const VGC_HUE = "hsl(18 62% 58%)"
 
 export function JuegosChapter() {
 
@@ -64,6 +81,15 @@ export function JuegosChapter() {
                 <div className="grid w-full gap-4">
                   <EventOrganizer organizer={{ role: "boffmedia", name: "Boffmedia", avatar: "B" }} variant="block" />
                   <EventOrganizer organizer={{ role: "coorg", name: "Gremio de Cazadores", avatar: "G" }} variant="block" />
+                  <EventOrganizer organizer={{ role: "platform", name: "Circuito VGC LATAM", avatar: "C" }} variant="block" />
+                </div>
+              </Sample>
+              <Sample title="Tira de detalles" code="<MetaChip icon label value>" col note={<>El <code>hue</code> del juego tiñe el glifo; aún no está en la API de eventos. [aplazado]</>}>
+                <div className="grid w-full gap-[10px] [grid-template-columns:repeat(auto-fit,minmax(160px,1fr))]">
+                  <MetaChip icon="clock" label="Inicia" value="16 Jun · 16:00" hue={VGC_HUE} />
+                  <MetaChip icon="calendar" label="Finaliza" value="16 Jun · 23:00" hue={VGC_HUE} />
+                  <MetaChip icon="trophy" label="Tipo" value="Torneo" hue={VGC_HUE} />
+                  <MetaChip icon="gamepad" label="Juego" value="VGC" hue={VGC_HUE} />
                 </div>
               </Sample>
             </Section>
@@ -85,15 +111,33 @@ export function JuegosChapter() {
                   {DEMO_ACHS.map((a) => <AchievementItem key={a.id} achievement={a} showEvent />)}
                 </div>
               </Sample>
+              <Sample title="Anillo y rareza" code="<Ring value> · <RarityTag rarity>">
+                <Ring value={67} size={84}>67%</Ring>
+                <div className="flex flex-wrap items-center gap-2">
+                  {["bronze", "silver", "gold", "platinum", "diamond"].map((r) => <RarityTag key={r} rarity={r} />)}
+                </div>
+              </Sample>
             </Section>
 
-            <Section id="evlead" kicker="Juegos y Eventos" title="Clasificación y podio" lead={<>Fila de clasificación (<code>RankRow</code>) con insignia de posición (<code>Rank</code>): el podio realza las tres primeras. Alimenta <code>/clasificacion</code> y las tablas por evento.</>}>
-              <Sample title="Podio" code="<RankRow> · <Rank>" col>
-                <div className="grid gap-1.5 w-full max-w-[520px]">
-                  <RankRow rank={<Rank>1</Rank>} name="RotomChef" team="Pokémon VGC" pts="2140" unit="pts" top3 />
-                  <RankRow rank={<Rank>2</Rank>} name="WingullMain" team="Pokémon VGC" pts="2088" unit="pts" top3 />
-                  <RankRow rank={<Rank>3</Rank>} name="TeraCaptain" team="Pokémon VGC" pts="1994" unit="pts" top3 />
-                  <RankRow rank={<Rank>4</Rank>} name="LadderGremlin" team="Pokémon VGC" pts="1902" unit="pts" />
+            <Section id="evlead" kicker="Juegos y Eventos" title="Clasificación y podio" lead={<>Las piezas de ranking, reutilizadas en la clasificación global, en la página de juego y en el detalle de evento: <code>Podium</code> (top 3), <code>LeaderTable</code> (con destacado de «tú»), <code>PlayerLine</code> (lista compacta) y <code>ParticipantStack</code> (avatares apilados). Alimentadas con datos de ejemplo hasta que exista la API de clasificación. [aplazado]</>}>
+              <Sample title="Podio" code="<Podium players>" col>
+                <div className="w-full">
+                  <Podium players={DEMO_TOP.slice(0, 3)} />
+                </div>
+              </Sample>
+              <Sample title="Tabla" code="<LeaderTable players highlight>" col>
+                <div className="w-full">
+                  <LeaderTable players={DEMO_TOP.slice(0, 5)} highlight={DEMO_TOP[2]?.userId} />
+                </div>
+              </Sample>
+              <Sample title="Fila compacta y avatares" code="<PlayerLine> · <ParticipantStack>" col>
+                <div className="grid w-full gap-[10px]">
+                  <div className="grid gap-2.5">
+                    {DEMO_TOP.slice(0, 2).map((p, i) => <PlayerLine key={p.userId} player={p} rank={i + 1} />)}
+                  </div>
+                  <div className="mt-1.5">
+                    <ParticipantStack players={DEMO_TOP.slice(0, 9)} max={7} />
+                  </div>
                 </div>
               </Sample>
             </Section>

@@ -14,7 +14,25 @@ import { MovimientoChapter } from "./_chapters/MovimientoChapter"
 import { HubChapter } from "./_chapters/HubChapter"
 import { DatosChapter } from "./_chapters/DatosChapter"
 import { JuegosChapter } from "./_chapters/JuegosChapter"
+import { TorneosChapter } from "./_chapters/TorneosChapter"
 import { PerfilChapter } from "./_chapters/PerfilChapter"
+import { AdminChapter } from "./_chapters/AdminChapter"
+import { ComunidadChapter } from "./_chapters/ComunidadChapter"
+import { SorteosChapter } from "./_chapters/SorteosChapter"
+import { CalendarioChapter } from "./_chapters/CalendarioChapter"
+import { ArmeriaMhChapter } from "./_chapters/ArmeriaMhChapter"
+import { MhShellChapter } from "./_chapters/MhShellChapter"
+import { SchematicChapter } from "./_chapters/SchematicChapter"
+import { MewgenicsChapter } from "./_chapters/MewgenicsChapter"
+import { SorteoRapidoChapter } from "./_chapters/SorteoRapidoChapter"
+import { BattlesimChapter } from "./_chapters/BattlesimChapter"
+import { TcgPocketChapter } from "./_chapters/TcgPocketChapter"
+import { WonderMailChapter } from "./_chapters/WonderMailChapter"
+import { PlanificadorMhChapter } from "./_chapters/PlanificadorMhChapter"
+import { BestiarioChapter } from "./_chapters/BestiarioChapter"
+import { KeysChapter } from "./_chapters/KeysChapter"
+import { CatalogoChapter } from "./_chapters/CatalogoChapter"
+import { CalculadoraChapter } from "./_chapters/CalculadoraChapter"
 import { LegalChapter } from "./_chapters/LegalChapter"
 
 const CHAPTER_VIEWS: Record<string, React.ComponentType> = {
@@ -25,7 +43,25 @@ const CHAPTER_VIEWS: Record<string, React.ComponentType> = {
   "Hub de herramientas": HubChapter,
   "Datos en vivo": DatosChapter,
   "Juegos y Eventos": JuegosChapter,
+  Torneos: TorneosChapter,
   Perfil: PerfilChapter,
+  Admin: AdminChapter,
+  Comunidad: ComunidadChapter,
+  Sorteos: SorteosChapter,
+  Calendario: CalendarioChapter,
+  "Sorteo rápido": SorteoRapidoChapter,
+  Battlesim: BattlesimChapter,
+  "TCG Pocket": TcgPocketChapter,
+  "Wonder Mail": WonderMailChapter,
+  Planificador: PlanificadorMhChapter,
+  Bestiario: BestiarioChapter,
+  "Herramientas MH": MhShellChapter,
+  Armería: ArmeriaMhChapter,
+  "Schematic Compat": SchematicChapter,
+  Mewgenics: MewgenicsChapter,
+  Catálogo: CatalogoChapter,
+  "Claves de Steam": KeysChapter,
+  Calculadora: CalculadoraChapter,
   Legal: LegalChapter,
 }
 
