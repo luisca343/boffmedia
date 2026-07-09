@@ -68,6 +68,12 @@ export class BoffMediaUserEntity {
   discordId: string | null;
 
   @ApiProperty({
+    example: true,
+    description: 'Whether the user has verified their email address',
+  })
+  emailVerified: boolean;
+
+  @ApiProperty({
     example: '2024-01-01T00:00:00.000Z',
     description: 'User creation timestamp',
     type: Date,

@@ -1,4 +1,10 @@
-import { apiGET, apiPOST, apiPUT, apiDELETE, apiPATCH } from '@/services/boffAPI';
+import {
+  apiGET,
+  apiAuthedAutoPOST,
+  apiAuthedAutoPUT,
+  apiAuthedAutoDELETE,
+  apiAuthedAutoPATCH,
+} from '@/services/boffAPI';
 import type {
   CreateEventDto,
   UpdateEventDto,
@@ -43,21 +49,21 @@ export class EventsService {
    * Create a new event
    */
   static createEvent(data: any) {
-    return apiPOST<any>('/events/event', data);
+    return apiAuthedAutoPOST<any>('/events/event', data);
   }
   
   /**
    * Update an existing event
    */
   static updateEvent(id: number, data: UpdateEventDto) {
-    return apiPATCH<Event>(`/events/event/${id}`, data);
+    return apiAuthedAutoPATCH<Event>(`/events/event/${id}`, data);
   }
   
   /**
    * Delete an event
    */
   static deleteEvent(id: number) {
-    return apiDELETE<SuccessResponse>(`/events/event/${id}`);
+    return apiAuthedAutoDELETE<SuccessResponse>(`/events/event/${id}`);
   }
 
   // ==================== GAME OPERATIONS ====================
@@ -80,21 +86,21 @@ export class EventsService {
    * Create a new game
    */
   static createGame(data: CreateGameDto) {
-    return apiPOST<Game>('/events/games', data);
+    return apiAuthedAutoPOST<Game>('/events/games', data);
   }
   
   /**
    * Update an existing game
    */
   static updateGame(id: number, data: UpdateGameDto) {
-    return apiPATCH<Game>(`/events/games/${id}`, data);
+    return apiAuthedAutoPATCH<Game>(`/events/games/${id}`, data);
   }
   
   /**
    * Delete a game
    */
   static deleteGame(id: number) {
-    return apiDELETE<SuccessResponse>(`/events/games/${id}`);
+    return apiAuthedAutoDELETE<SuccessResponse>(`/events/games/${id}`);
   }
 
   // ==================== ACHIEVEMENT OPERATIONS ====================
@@ -117,14 +123,14 @@ export class EventsService {
    * Create a new achievement for an event
    */
   static createAchievement(eventId: number, data: CreateAchievementDto) {
-    return apiPOST<Achievement>(`/events/${eventId}/achievements`, data);
+    return apiAuthedAutoPOST<Achievement>(`/events/${eventId}/achievements`, data);
   }
   
   /**
    * Update an existing achievement
    */
   static updateAchievement(eventId: number, achievementId: number, data: UpdateAchievementDto) {
-    return apiPATCH<Achievement>(`/events/${eventId}/achievements/${achievementId}`, data);
+    return apiAuthedAutoPATCH<Achievement>(`/events/${eventId}/achievements/${achievementId}`, data);
   }
 
   // ==================== TEAM OPERATIONS ====================
@@ -161,28 +167,28 @@ export class EventsService {
    * Create a new team for an event
    */
   static createTeam(eventId: number, data: CreateTeamDto) {
-    return apiPOST<Team>(`/events/${eventId}/teams`, data);
+    return apiAuthedAutoPOST<Team>(`/events/${eventId}/teams`, data);
   }
   
   /**
    * Update an existing team
    */
   static updateTeam(eventId: number, teamId: number, data: UpdateTeamDto) {
-    return apiPATCH<Team>(`/events/${eventId}/teams/${teamId}`, data);
+    return apiAuthedAutoPATCH<Team>(`/events/${eventId}/teams/${teamId}`, data);
   }
   
   /**
    * Join a team
    */
   static joinTeam(eventId: number, teamId: number, data: JoinTeamDto) {
-    return apiPOST<SuccessResponse>(`/events/${eventId}/teams/${teamId}/join`, data);
+    return apiAuthedAutoPOST<SuccessResponse>(`/events/${eventId}/teams/${teamId}/join`, data);
   }
   
   /**
    * Leave a team
    */
   static leaveTeam(eventId: number, teamId: number, userId: number) {
-    return apiDELETE<SuccessResponse>(`/events/${eventId}/teams/${teamId}/members/${userId}`);
+    return apiAuthedAutoDELETE<SuccessResponse>(`/events/${eventId}/teams/${teamId}/members/${userId}`);
   }
 
   // ==================== PARTICIPANT OPERATIONS ====================
@@ -191,7 +197,7 @@ export class EventsService {
    * Join an event
    */
   static joinEvent(eventId: number, data: any) {
-    return apiPOST<SuccessResponse>(`/events/join/${eventId}`, data);
+    return apiAuthedAutoPOST<SuccessResponse>(`/events/join/${eventId}`, data);
   }
   
   /**
@@ -221,7 +227,7 @@ export class EventsService {
    * Update progress for an achievement
    */
   static updateProgress(eventId: number, data: UpdateProgressDto) {
-    return apiPUT<SuccessResponse>(`/events/${eventId}/progress`, data);
+    return apiAuthedAutoPUT<SuccessResponse>(`/events/${eventId}/progress`, data);
   }
 
   // ==================== LEADERBOARD OPERATIONS ====================

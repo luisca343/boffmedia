@@ -3,6 +3,7 @@ import { EventsController } from './events.controller';
 import { ResponseModule } from '@api/_utils/response/response.module';
 import { LoggerModule } from '@api/_utils/logger/logger.module';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
+import { NotificationsModule } from '@api/boffmedia/notifications/notifications.module';
 
 // Import all repositories
 import { EventsRepository } from './repositories/events.repository';
@@ -61,6 +62,6 @@ import { EventsFacadeService } from './events.facade.service';
     LeaderboardsService,
     ProfileService,
   ],
-  imports: [ResponseModule, LoggerModule, DrizzleModule],
+  imports: [ResponseModule, LoggerModule, DrizzleModule, NotificationsModule],
 })
 export class EventsModule {}

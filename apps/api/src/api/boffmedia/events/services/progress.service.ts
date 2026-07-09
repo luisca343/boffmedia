@@ -4,11 +4,13 @@ import { eq, and } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   boffMediaParticipantProgress,
+  boffMediaParticipants,
   ParticipantProgress,
   validateParticipantCanReceiveAchievement,
 } from '@/_db/schema/Events';
 import { AchievementsService } from './achievements.service';
 import { TeamsService } from './teams.service';
+import { NotificationsService } from '@api/boffmedia/notifications/notifications.service';
 
 @Injectable()
 export class ProgressService {
@@ -16,6 +18,7 @@ export class ProgressService {
     @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
     private readonly achievementsService: AchievementsService,
     private readonly teamsService: TeamsService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async updateProgress(
@@ -42,6 +45,18 @@ export class ProgressService {
     if (!achievement) {
       throw new Error('Achievement not found');
     }
+
+    // Was it already completed? (so we only notify on the transition)
+    const [existing] = await this.db
+      .select({ isCompleted: boffMediaParticipantProgress.isCompleted })
+      .from(boffMediaParticipantProgress)
+      .where(
+        and(
+          eq(boffMediaParticipantProgress.participantId, participantId),
+          eq(boffMediaParticipantProgress.achievementId, achievementId),
+        ),
+      );
+    const wasCompleted = existing?.isCompleted === 1;
 
     // 3. Update progress
     const isCompleted = progress >= achievement.maxProgress ? 1 : 0;
@@ -70,6 +85,11 @@ export class ProgressService {
       await this.teamsService.updateTeamScore(teamId);
     }
 
+    // 4b. Notify the participant's user on a fresh unlock (best-effort).
+    if (isCompleted && !wasCompleted) {
+      await this.notifyAchievementUnlocked(participantId, achievement);
+    }
+
     // 5. Return updated progress
     const result = await this.db
       .select()
@@ -82,6 +102,40 @@ export class ProgressService {
       );
 
     return result[0];
+  }
+
+  /**
+   * Fire a notification to the participant's linked user when they unlock an
+   * achievement/medal. Best-effort: never blocks or fails the award itself.
+   */
+  private async notifyAchievementUnlocked(
+    participantId: number,
+    achievement: { name: string; itemType: string; eventId: number | null },
+  ): Promise<void> {
+    try {
+      const [participant] = await this.db
+        .select({ userId: boffMediaParticipants.userId })
+        .from(boffMediaParticipants)
+        .where(eq(boffMediaParticipants.id, participantId));
+
+      const userId = participant?.userId;
+      if (!userId) return; // anonymous participant — nobody to notify
+
+      await this.notificationsService.create({
+        userId,
+        type: 'achievement',
+        title:
+          achievement.itemType === 'medal'
+            ? '¡Medalla conseguida!'
+            : '¡Logro desbloqueado!',
+        body: achievement.name,
+        link: achievement.eventId
+          ? `/eventos/${achievement.eventId}`
+          : '/logros',
+      });
+    } catch {
+      // swallow — a failed notification must not break awarding progress
+    }
   }
 
   async getParticipantProgress(

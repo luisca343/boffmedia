@@ -303,6 +303,18 @@ export class BoffMediaUsersFacadeService {
     }
   }
 
+  async changePassword(
+    id: number,
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<{ success: boolean }> {
+    return await this.usersManagementService.changePassword(
+      id,
+      currentPassword,
+      newPassword,
+    );
+  }
+
   async unlinkProvider(
     id: number,
     provider: 'google' | 'discord' | 'twitch',

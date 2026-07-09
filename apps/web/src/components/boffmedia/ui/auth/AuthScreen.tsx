@@ -36,7 +36,7 @@ export function AuthScreen() {
   }
 
   function onRegistered() {
-    toast.success(t("success.register"))
+    toast.success(t("success.registerVerify"))
     switchMode(false)
   }
 

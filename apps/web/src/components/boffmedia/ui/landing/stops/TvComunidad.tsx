@@ -1,3 +1,5 @@
+"use client"
+
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/boffmedia/primitives/button"
@@ -7,8 +9,20 @@ import { Decode } from "../travesia-fx"
 import { TvCP } from "../TvCP"
 import { CTA_ROW, GLARE, HUD_FRAME, PRI_GLOW } from "../landing-shared"
 import { DISCORD, TV3_FEED } from "../landing-data"
+import { useSiteActivity } from "@/hooks/community/useCommunity"
 
 export function TvComunidad() {
+  const { activity } = useSiteActivity(6)
+  // Real activity feeds the ticker; falls back to the editorial placeholders
+  // while loading or if there's no recorded activity yet.
+  const feed = activity.length
+    ? activity.slice(0, 4).map((a) =>
+        a.type === "achievement"
+          ? { k: "win", t: `${a.actor} desbloqueó ${a.name}`, ln: "border-l-ok", tp: "bg-ok" }
+          : { k: "join", t: `${a.actor} se unió a ${a.name}`, ln: "border-l-signal", tp: "bg-signal" },
+      )
+    : TV3_FEED
+
   return (
     <TvCP
       id="tv-cp5"
@@ -49,7 +63,7 @@ export function TvComunidad() {
           </i>
         </div>
         <div className="mb-[18px] grid gap-2" aria-hidden="true">
-          {TV3_FEED.map((f, i) => (
+          {feed.map((f, i) => (
             <span
               key={i}
               className={cn(

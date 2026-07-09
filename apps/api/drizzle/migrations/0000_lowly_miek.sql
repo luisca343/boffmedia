@@ -18,7 +18,7 @@ CREATE TABLE `boffmedia_users` (
 	`password` varchar(255) NOT NULL,
 	`email` varchar(255) NOT NULL,
 	`uuid` char(36),
-	`profilePicture` varchar(255) NOT NULL DEFAULT 'https://cdn.boffmedia.com/default-profile.png',
+	`profilePicture` varchar(255) NOT NULL DEFAULT 'https://cdn.boffmedia.es/default-profile.png',
 	`googleId` varchar(255),
 	`discordId` varchar(255),
 	`twitchId` varchar(255),

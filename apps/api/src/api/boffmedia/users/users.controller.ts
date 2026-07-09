@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
   ParseIntPipe,
   HttpStatus,
   HttpException,
@@ -18,10 +19,19 @@ import {
   ApiParam,
   ApiQuery,
   ApiBody,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
+import { AuthThrottlerGuard } from '@api/_utils/guards/auth-throttler.guard';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { OwnerOrAdminGuard } from '@api/_utils/guards/owner-or-admin.guard';
+import { Roles } from '@api/_utils/decorators/roles.decorator';
+import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { BoffMediaUsersFacadeService } from './users.facade.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import {
   MinecraftRegistrationDto,
   MinecraftLinkDto,
@@ -154,6 +164,9 @@ export class BoffMediaUsersController {
   // ==================== USER RETRIEVAL ====================
 
   @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Get all BoffMedia users' })
   @ApiResponse({
     status: 200,
@@ -199,6 +212,9 @@ export class BoffMediaUsersController {
   }
 
   @Get('statistics')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Get user statistics with integrations' })
   @ApiResponse({
     status: 200,
@@ -215,6 +231,8 @@ export class BoffMediaUsersController {
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard)
+  @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Get user by ID' })
   @ApiParam({ name: 'id', type: 'number', description: 'User ID' })
   @ApiResponse({
@@ -239,6 +257,8 @@ export class BoffMediaUsersController {
   }
 
   @Get(':id/integrations')
+  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard)
+  @ApiBearerAuth('JWT')
   @ApiOperation({
     summary: 'Get user with all integrations (SmartRotom, Starbank, Roles)',
   })
@@ -269,6 +289,9 @@ export class BoffMediaUsersController {
   }
 
   @Get('username/:username')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Get user by username' })
   @ApiParam({ name: 'username', type: 'string', description: 'Username' })
   @ApiResponse({
@@ -293,6 +316,9 @@ export class BoffMediaUsersController {
   }
 
   @Get('username/:username/full')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @ApiBearerAuth('JWT')
   @ApiOperation({
     summary: 'Get full user data by username (with SmartRotom data)',
   })
@@ -320,6 +346,9 @@ export class BoffMediaUsersController {
   }
 
   @Get('email/:email')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Get user by email' })
   @ApiParam({ name: 'email', type: 'string', description: 'Email address' })
   @ApiResponse({
@@ -344,6 +373,8 @@ export class BoffMediaUsersController {
   }
 
   @Get(':id/roles')
+  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard)
+  @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Get user roles' })
   @ApiParam({ name: 'id', type: 'number', description: 'User ID' })
   @ApiResponse({
@@ -364,6 +395,8 @@ export class BoffMediaUsersController {
   // ==================== USER UPDATE ====================
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard)
+  @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Update user by ID' })
   @ApiParam({ name: 'id', type: 'number', description: 'User ID' })
   @ApiResponse({
@@ -389,7 +422,27 @@ export class BoffMediaUsersController {
     }
   }
 
+  @Post(':id/password')
+  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Change a user password (verifies current password)' })
+  @ApiResponse({ status: 200, description: 'Password changed successfully' })
+  @ApiResponse({ status: 401, description: 'Current password is incorrect' })
+  @ApiBody({ type: ChangePasswordDto })
+  async changePassword(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: ChangePasswordDto,
+  ) {
+    return await this.usersFacadeService.changePassword(
+      id,
+      dto.currentPassword,
+      dto.newPassword,
+    );
+  }
+
   @Delete(':id/link/:provider')
+  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard)
+  @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Unlink an OAuth provider from a user' })
   @ApiParam({ name: 'id', type: 'number', description: 'User ID' })
   @ApiParam({
@@ -417,6 +470,8 @@ export class BoffMediaUsersController {
   // ==================== USER DELETION ====================
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard)
+  @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Delete user by ID' })
   @ApiParam({ name: 'id', type: 'number', description: 'User ID' })
   @ApiResponse({
@@ -443,6 +498,8 @@ export class BoffMediaUsersController {
   // ==================== AUTHENTICATION ====================
 
   @Post('auth/login')
+  @UseGuards(AuthThrottlerGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
   @ApiOperation({ summary: 'Authenticate user with username and password' })
   @ApiResponse({
     status: 200,
@@ -472,6 +529,9 @@ export class BoffMediaUsersController {
   // ==================== BATCH OPERATIONS ====================
 
   @Post('batch')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Get multiple users with integrations by IDs' })
   @ApiResponse({
     status: 200,

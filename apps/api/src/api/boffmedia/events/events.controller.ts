@@ -8,6 +8,8 @@ import {
   Body,
   Param,
   Query,
+  Req,
+  UseGuards,
   ParseIntPipe,
   HttpStatus,
 } from '@nestjs/common';
@@ -17,7 +19,13 @@ import {
   ApiResponse,
   ApiParam,
   ApiQuery,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { OwnerOrAdminGuard } from '@api/_utils/guards/owner-or-admin.guard';
+import { Roles } from '@api/_utils/decorators/roles.decorator';
+import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { EventsFacadeService } from './events.facade.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { CreateGameDto } from './dto/create-game.dto';
@@ -75,6 +83,9 @@ export class EventsController {
   }
 
   @Post('/event')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Create a new event' })
   @ApiResponse({
     status: HttpStatus.CREATED,
@@ -86,6 +97,9 @@ export class EventsController {
   }
 
   @Patch('/event/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Update event' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -100,6 +114,9 @@ export class EventsController {
   }
 
   @Delete('/event/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Delete event' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -134,6 +151,9 @@ export class EventsController {
   }
 
   @Post('/games')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Create a new game' })
   @ApiResponse({
     status: HttpStatus.CREATED,
@@ -145,6 +165,9 @@ export class EventsController {
   }
 
   @Patch('/games/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Update game' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -159,6 +182,9 @@ export class EventsController {
   }
 
   @Delete('/games/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Delete game' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -195,6 +221,9 @@ export class EventsController {
   }
 
   @Post(':eventId/achievements')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Create a new achievement for an event' })
   @ApiResponse({
     status: HttpStatus.CREATED,
@@ -212,6 +241,9 @@ export class EventsController {
   }
 
   @Patch(':eventId/achievements/:achievementId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Update achievement' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -308,6 +340,9 @@ export class EventsController {
   }
 
   @Post(':eventId/teams')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Create a new team for an event' })
   @ApiResponse({
     status: HttpStatus.CREATED,
@@ -322,6 +357,9 @@ export class EventsController {
   }
 
   @Patch(':eventId/teams/:teamId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Update team' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -341,6 +379,8 @@ export class EventsController {
   }
 
   @Post(':eventId/teams/:teamId/join')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Join a team' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -351,6 +391,7 @@ export class EventsController {
     @Param('teamId') teamId: number,
     @Body() joinTeamDto: JoinTeamDto,
   ): Promise<{ success: boolean }> {
+    // TODO(roadmap): verify joinTeamDto.participantId belongs to req.user.
     return await this.eventsFacadeService.joinTeam(
       eventId,
       teamId,
@@ -359,6 +400,8 @@ export class EventsController {
   }
 
   @Delete(':eventId/teams/:teamId/members/:userId')
+  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard)
+  @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Leave a team' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -374,6 +417,8 @@ export class EventsController {
 
   // ==================== PARTICIPANT MANAGEMENT ====================
   @Post('join/:eventId')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Join an event' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -382,7 +427,10 @@ export class EventsController {
   async joinEvent(
     @Param('eventId') eventId: number,
     @Body() joinEventDto: JoinEventDto,
+    @Req() req: { user: { userId: number } },
   ): Promise<{ success: boolean }> {
+    // Identity comes from the JWT, never the request body (anti-spoofing).
+    joinEventDto.userId = req.user.userId;
     return await this.eventsFacadeService.joinEvent(eventId, joinEventDto);
   }
 
@@ -401,6 +449,9 @@ export class EventsController {
 
   // ==================== PROGRESS MANAGEMENT ====================
   @Put(':eventId/progress')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Update progress for an achievement' })
   @ApiResponse({
     status: HttpStatus.OK,

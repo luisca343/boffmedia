@@ -17,7 +17,6 @@ import {
   IBoffMediaUsersRepository,
 } from './interfaces/users.repository.interface';
 import { CreateUserDto } from '../dto/create-user.dto';
-import { UpdateUserDto } from '../dto/update-user.dto';
 import { Logger } from 'nestjs-pino';
 
 @Injectable()
@@ -41,6 +40,8 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
     googleId: boffMediaUsers.googleId,
     discordId: boffMediaUsers.discordId,
     twitchId: boffMediaUsers.twitchId,
+    steamId: boffMediaUsers.steamId,
+    emailVerified: boffMediaUsers.emailVerified,
     createdAt: boffMediaUsers.createdAt,
     updatedAt: boffMediaUsers.updatedAt,
   };
@@ -376,7 +377,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
 
   async updateUser(
     id: number,
-    updateData: UpdateUserDto,
+    updateData: Partial<BoffMediaUser>,
   ): Promise<BoffMediaUserSafe> {
     if (!id || id <= 0) {
       throw new Error('Valid ID is required');

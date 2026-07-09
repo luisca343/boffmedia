@@ -2,6 +2,8 @@ import {
   Injectable,
   BadRequestException,
   ConflictException,
+  NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { BoffMediaUsersRepository } from '@api/boffmedia/users/repositories/users.repository';
 import { PasswordService } from '@api/auth/password.service';
@@ -127,7 +129,7 @@ export class BoffMediaUsersManagementService {
         password: hashedPassword,
         profilePicture:
           userData.profilePicture ||
-          'https://cdn.boffmedia.com/default-profile.png',
+          'https://cdn.boffmedia.es/default-profile.png',
       };
 
       this.logger.log('Creating new BoffMedia user:', {
@@ -342,26 +344,63 @@ export class BoffMediaUsersManagementService {
     }
 
     try {
-      // If password is being updated, validate and hash it
-      if (updateData.password) {
-        const passwordValidation = this.passwordService.validatePassword(
-          updateData.password,
-        );
-        if (!passwordValidation.isValid) {
-          throw new BadRequestException(
-            `Password validation failed: ${passwordValidation.errors.join(', ')}`,
-          );
-        }
-        updateData.password = await this.passwordService.hashPassword(
-          updateData.password,
-        );
-      }
-
+      // Password and OAuth-identity changes are intentionally NOT handled here.
+      // UpdateUserDto no longer carries `password`/`googleId`/`discordId`/`uuid`,
+      // so a generic profile update can't overwrite credentials or hijack an
+      // account. Password change belongs to its own owner-checked endpoint.
       return await this.usersRepository.updateUser(id, updateData);
     } catch (error: any) {
       this.logger.error(`Failed to update user ${id}:`, error);
       throw new Error(`User update failed: ${error.message}`);
     }
+  }
+
+  /**
+   * Change a user's password. Verifies the current password first, so this is
+   * the only path that can set a password (the generic update can't). OAuth-only
+   * accounts (no local password) can't use it.
+   */
+  async changePassword(
+    id: number,
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<{ success: boolean }> {
+    if (!id || id <= 0) {
+      throw new BadRequestException('Valid ID is required');
+    }
+
+    const user = await this.usersRepository.findUserById(id);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const full = await this.usersRepository.findFullUserByUsernameWithPassword(
+      user.username,
+    );
+    if (!full?.boffmedia_users.password) {
+      throw new BadRequestException(
+        'This account has no password (linked via an OAuth provider)',
+      );
+    }
+
+    const currentValid = await this.passwordService.verifyPassword(
+      currentPassword,
+      full.boffmedia_users.password,
+    );
+    if (!currentValid) {
+      throw new UnauthorizedException('Current password is incorrect');
+    }
+
+    const validation = this.passwordService.validatePassword(newPassword);
+    if (!validation.isValid) {
+      throw new BadRequestException(
+        `Password validation failed: ${validation.errors.join(', ')}`,
+      );
+    }
+
+    const hashed = await this.passwordService.hashPassword(newPassword);
+    await this.usersRepository.updateUser(id, { password: hashed });
+    return { success: true };
   }
 
   // ==================== PROVIDER LINKING ====================
@@ -439,6 +478,11 @@ export class BoffMediaUsersManagementService {
         return null;
       }
 
+      // OAuth-only accounts have no local password → credentials login can't apply.
+      if (!fullUser.boffmedia_users.password) {
+        return null;
+      }
+
       // Use PasswordService for verification
       const isValidPassword = await this.passwordService.verifyPassword(
         password,
@@ -468,11 +512,14 @@ export class BoffMediaUsersManagementService {
         existingUser = await this.getUserByEmail(googleUser.email);
 
         if (existingUser) {
-          // Update existing user with Google ID
-          existingUser = await this.updateUser(existingUser.id, {
+          // Link Google to the existing account. Goes straight to the repository:
+          // googleId is not a public UpdateUserDto field (account-takeover guard).
+          existingUser = await this.usersRepository.updateUser(existingUser.id, {
             googleId: googleUser.googleId,
             profilePicture:
               googleUser.profilePicture || existingUser.profilePicture,
+            // Google verifies the address — trust it.
+            emailVerified: true,
           });
         } else {
           // Create new user with secure random password
@@ -483,10 +530,15 @@ export class BoffMediaUsersManagementService {
             googleId: googleUser.googleId,
             profilePicture:
               googleUser.profilePicture ||
-              'https://cdn.boffmedia.com/default-profile.png',
+              'https://cdn.boffmedia.es/default-profile.png',
           };
 
           existingUser = await this.createUser(userData);
+          // Google verifies the address — new Google accounts start verified.
+          existingUser = await this.usersRepository.updateUser(
+            existingUser.id,
+            { emailVerified: true },
+          );
         }
       }
 
@@ -546,7 +598,8 @@ export class BoffMediaUsersManagementService {
         throw new Error('User not found');
       }
 
-      return await this.updateUser(user.id, {
+      // uuid is not a public UpdateUserDto field → link via the repository.
+      return await this.usersRepository.updateUser(user.id, {
         uuid: linkData.minecraft.uuid,
       });
     } catch (error: any) {
