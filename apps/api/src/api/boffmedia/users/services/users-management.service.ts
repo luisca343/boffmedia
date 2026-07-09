@@ -364,6 +364,40 @@ export class BoffMediaUsersManagementService {
     }
   }
 
+  // ==================== PROVIDER LINKING ====================
+
+  /**
+   * Clear a linked OAuth provider id (google/discord/twitch) on a user.
+   * Only removes the link — re-linking happens through the normal OAuth login.
+   */
+  async unlinkProvider(
+    id: number,
+    provider: 'google' | 'discord' | 'twitch',
+  ): Promise<BoffMediaUserSafe> {
+    if (!id || id <= 0) {
+      throw new BadRequestException('Valid ID is required');
+    }
+
+    const column = {
+      google: 'googleId',
+      discord: 'discordId',
+      twitch: 'twitchId',
+    }[provider] as 'googleId' | 'discordId' | 'twitchId' | undefined;
+
+    if (!column) {
+      throw new BadRequestException(`Unsupported provider: ${provider}`);
+    }
+
+    try {
+      return await this.usersRepository.updateUser(id, {
+        [column]: null,
+      } as UpdateUserDto);
+    } catch (error: any) {
+      this.logger.error(`Failed to unlink ${provider} for user ${id}:`, error);
+      throw new Error(`Provider unlink failed: ${error.message}`);
+    }
+  }
+
   // ==================== USER DELETION ====================
 
   async deleteUser(id: number): Promise<{ success: boolean; message: string }> {

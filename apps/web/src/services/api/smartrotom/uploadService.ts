@@ -35,4 +35,15 @@ export class UploadService {
       filename: `${userId}-${Date.now()}.${ext}`
     });
   }
+
+  /**
+   * Upload a cover (banner) image for a user
+   */
+  static uploadCoverImage(file: File, userId: string) {
+    const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+    return apiUpload(file, {
+      path: `profiles/covers`,
+      filename: `${userId}-cover-${Date.now()}.${ext}`
+    });
+  }
 }

@@ -24,6 +24,14 @@ export type BoffMediaUserEntity = {
      */
     profilePicture: string | null;
     /**
+     * Cover (banner) image URL
+     */
+    coverImage: string | null;
+    /**
+     * Short user biography
+     */
+    bio: string | null;
+    /**
      * Google ID for OAuth
      */
     googleId: string | null;
