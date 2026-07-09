@@ -1,4 +1,5 @@
 import { Controller, Get, Query } from '@nestjs/common';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CommunityService } from './community.service';
 import {
@@ -7,6 +8,7 @@ import {
 } from './entities/community.entity';
 
 @ApiTags('BoffMedia | Community')
+@Public()
 @Controller()
 export class CommunityController {
   constructor(private readonly service: CommunityService) {}

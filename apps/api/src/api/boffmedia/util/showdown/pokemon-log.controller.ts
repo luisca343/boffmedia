@@ -1,9 +1,11 @@
 import { Controller, Get, Logger, Param } from '@nestjs/common';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import { ApiTags } from '@nestjs/swagger';
 import { PokemonLogService } from './pokemon-log.service';
 import { SkipEnvelope } from '@/common/decorators/skip-envelope.decorator';
 
 @ApiTags('Pokemon')
+@Public()
 @Controller('pokemon-log')
 @SkipEnvelope()
 export class PokemonLogController {

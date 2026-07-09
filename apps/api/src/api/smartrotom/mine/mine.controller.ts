@@ -6,6 +6,7 @@ import {
   Post,
   HttpStatus,
 } from '@nestjs/common';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import {
   ApiTags,
   ApiOperation,
@@ -33,6 +34,7 @@ import { ClaimResponse } from './entities/claim-response.entity';
 import { PlayerStatistics } from './entities/player-statistics.entity';
 
 @ApiTags('SmartRotom | Mine')
+@Public()
 @Controller('smartrotom/mine')
 export class MineController {
   constructor(private readonly mineFacadeService: MineFacadeService) {}

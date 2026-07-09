@@ -9,6 +9,7 @@ import {
   ValidationPipe,
   UsePipes,
 } from '@nestjs/common';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import {
   ApiTags,
   ApiOperation,
@@ -44,6 +45,7 @@ import { SystemHealthResponse } from './entities/system-health-response.entity';
 import { NPC } from './entities/npc.entity';
 
 @ApiTags('SmartRotom | Misiones')
+@Public()
 @Controller('smartrotom/misiones')
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
 export class MisionesController {

@@ -10,6 +10,7 @@ import {
   ValidationPipe,
   UploadedFile,
 } from '@nestjs/common';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import {
   ApiTags,
   ApiOperation,
@@ -37,6 +38,7 @@ import { Logger } from 'nestjs-pino';
 import { env } from '@/config/env';
 
 @ApiTags('SmartRotom | Starbank')
+@Public()
 @Controller('smartrotom/starbank')
 export class StarbankController {
   constructor(

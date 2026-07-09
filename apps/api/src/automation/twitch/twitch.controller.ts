@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { TwitchMonitorService } from './services/twitch-monitor.service';
 import { TwitchApiService } from './services/twitch-api.service';
@@ -8,6 +9,7 @@ import { Logger } from 'nestjs-pino';
 import { SkipEnvelope } from '@/common/decorators/skip-envelope.decorator';
 
 @ApiTags('Automation - Twitch')
+@Public()
 @Controller('automation/twitch')
 @SkipEnvelope()
 export class TwitchController {

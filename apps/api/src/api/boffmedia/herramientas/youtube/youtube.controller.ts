@@ -4,10 +4,12 @@ import {
   Param,
   HttpStatus,
 } from '@nestjs/common';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { YoutubeFacadeService } from './youtube.facade.service';
 
 @ApiTags('BoffMedia | YouTube')
+@Public()
 @Controller('boffmedia/herramientas/youtube')
 export class YoutubeController {
   constructor(private readonly youtubeFacadeService: YoutubeFacadeService) {}

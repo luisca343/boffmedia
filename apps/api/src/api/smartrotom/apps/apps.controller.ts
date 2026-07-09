@@ -8,6 +8,7 @@ import {
   Delete,
   HttpStatus,
 } from '@nestjs/common';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AppsFacadeService } from './apps.facade.service';
 import { UpdateAppDto } from './dto/update-app.dto';
@@ -20,6 +21,7 @@ import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
 import { Logger } from 'nestjs-pino';
 
 @ApiTags('SmartRotom | Apps')
+@Public()
 @Controller('/smartrotom/apps')
 export class AppsController {
   constructor(

@@ -7,6 +7,7 @@ import {
   Query,
   HttpStatus,
 } from '@nestjs/common';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { FicusAIFacadeService } from './ficusai.facade.service';
 import { SendMessageDto } from './dto/send-message.dto';
@@ -17,6 +18,7 @@ import { FicusAiUserStatsEntity } from './entities/ficusai-user-stats.entity';
 import { FicusAiHealthEntity } from './entities/ficusai-health.entity';
 
 @ApiTags('FicusAI - Chat Assistant')
+@Public()
 @Controller('smartrotom/ficusai')
 export class FicusAIController {
   constructor(private readonly ficusAIFacadeService: FicusAIFacadeService) {}
