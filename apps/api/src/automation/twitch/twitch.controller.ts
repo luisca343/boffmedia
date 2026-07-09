@@ -5,9 +5,11 @@ import { TwitchApiService } from './services/twitch-api.service';
 import { NotificationService } from './services/notification.service';
 import { NotificationTargetDto } from './dto/notification-target.dto';
 import { Logger } from 'nestjs-pino';
+import { SkipEnvelope } from '@/common/decorators/skip-envelope.decorator';
 
 @ApiTags('Automation - Twitch')
 @Controller('automation/twitch')
+@SkipEnvelope()
 export class TwitchController {
   constructor(
     private readonly logger: Logger,

@@ -196,7 +196,12 @@ export class ArcadeService {
     const streakResponse = await rotomGET<ArcadeStreak>(`/arcade/streak/${uuid}`);
     
     if (!streakResponse.success) {
-      return streakResponse as any;
+      // Error path: `data` is absent on the wire, so the ArcadeStreak generic never
+      // actually applies here — only the error/success/message fields are forwarded.
+      return streakResponse as unknown as ApiResponse<{
+        streak: ArcadeStreak;
+        canClaim: boolean;
+      }>;
     }
 
     // Simple client-side check (server does the real validation)

@@ -2,7 +2,6 @@ import { Global, Module } from '@nestjs/common';
 import { env } from '@/config/env';
 import { DiscordController } from './discord.controller';
 import { DiscordService } from './discord.service';
-import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { ConfigModule } from '@nestjs/config';
 import { CommandsModule } from '../_commands/commands.module';
 import { NecordModule } from 'necord';
@@ -51,7 +50,6 @@ import { MetaDamageCommand } from '../commands/global/meta/meta-damage.command';
   ],
   controllers: [DiscordController],
   providers: [
-    MySQL2Service,
     DiscordService,
     PingCommand,
     FraseCommand,

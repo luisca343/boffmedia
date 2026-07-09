@@ -3,20 +3,21 @@ import {
   Post,
   Body,
   HttpStatus,
-  UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { CreateUserDto } from '@api/boffmedia/users/dto/create-user.dto';
 import { LoginMcDto } from './dto/login-mc.dto';
 import { RegisterMinecraftDto } from './dto/register-minecraft.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { GoogleCallbackDto } from './dto/google-callback.dto';
+import {
+  AuthLoginResponseEntity,
+  AuthRefreshResponseEntity,
+} from './entities/auth-response.entity';
 
 @ApiTags('BoffMedia | Authentication')
 @Controller('auth')
-@UseInterceptors(ResponseInterceptor)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
@@ -25,6 +26,7 @@ export class AuthController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'User logged in successfully.',
+    type: AuthLoginResponseEntity,
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
@@ -47,6 +49,7 @@ export class AuthController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Minecraft user logged in successfully.',
+    type: AuthLoginResponseEntity,
   })
   async loginMC(@Body() loginMC: LoginMcDto) {
     return this.authService.loginMC(loginMC);
@@ -85,6 +88,7 @@ export class AuthController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Token refreshed successfully.',
+    type: AuthRefreshResponseEntity,
   })
   async refreshToken(@Body() body: RefreshTokenDto) {
     return this.authService.refreshToken(body.refresh_token);
@@ -92,6 +96,11 @@ export class AuthController {
 
   @Post('google/callback')
   @ApiOperation({ summary: 'Handle Google authentication callback' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Google user authenticated successfully.',
+    type: AuthLoginResponseEntity,
+  })
   async googleAuthRedirect(@Body() body: GoogleCallbackDto) {
     return this.authService.googleLogin(body);
   }

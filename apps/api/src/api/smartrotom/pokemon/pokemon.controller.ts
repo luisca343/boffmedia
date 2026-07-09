@@ -6,7 +6,6 @@ import {
   Param,
   Query,
   HttpStatus,
-  UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -22,7 +21,6 @@ import {
   ApiInternalServerErrorResponse,
   ApiExtraModels,
 } from '@nestjs/swagger';
-import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { PokemonFacadeService } from './pokemon.facade.service';
 
 // Import DTOs
@@ -60,7 +58,6 @@ import { WingullFacadeService } from '../wingull/wingull.facade.service';
 
 @ApiTags('SmartRotom | Pokémon')
 @Controller('smartrotom/pokemon')
-@UseInterceptors(ResponseInterceptor)
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
 export class PokemonController {
   constructor(

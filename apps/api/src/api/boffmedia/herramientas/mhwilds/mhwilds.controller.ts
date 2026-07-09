@@ -4,7 +4,6 @@ import {
   Param,
   Query,
   HttpStatus,
-  UseInterceptors,
   Delete,
   Post,
   ValidationPipe,
@@ -19,7 +18,6 @@ import {
   ApiQuery,
   ApiBody,
 } from '@nestjs/swagger';
-import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { MhwildsFacadeService } from './mhwilds.facade.service';
 
 // Import DTOs
@@ -51,7 +49,6 @@ import { WeaponTreeEntity } from './entities/weapon-tree.entity';
 
 @ApiTags('BoffMedia 🛠 | MHWilds')
 @Controller('tools/mhwilds')
-@UseInterceptors(ResponseInterceptor)
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
 export class MhwildsController {
   constructor(private readonly mhwildsFacadeService: MhwildsFacadeService) {}

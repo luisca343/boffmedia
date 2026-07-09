@@ -1,13 +1,14 @@
 import { IsString, IsOptional, IsArray } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class EpubMetadataDto {
-  @IsString() @IsOptional() title?: string;
-  @IsString() @IsOptional() language?: string;
-  @IsString() @IsOptional() author?: string;
-  @IsString() @IsOptional() authorSort?: string;
-  @IsString() @IsOptional() illustrator?: string;
-  @IsString() @IsOptional() illustratorSort?: string;
-  @IsString() @IsOptional() publisher?: string;
-  @IsString() @IsOptional() date?: string;
-  @IsArray() @IsOptional() subjects?: string[];
+  @ApiPropertyOptional() @IsString() @IsOptional() title?: string;
+  @ApiPropertyOptional() @IsString() @IsOptional() language?: string;
+  @ApiPropertyOptional() @IsString() @IsOptional() author?: string;
+  @ApiPropertyOptional() @IsString() @IsOptional() authorSort?: string;
+  @ApiPropertyOptional() @IsString() @IsOptional() illustrator?: string;
+  @ApiPropertyOptional() @IsString() @IsOptional() illustratorSort?: string;
+  @ApiPropertyOptional() @IsString() @IsOptional() publisher?: string;
+  @ApiPropertyOptional() @IsString() @IsOptional() date?: string;
+  @ApiPropertyOptional({ type: [String] }) @IsArray() @IsOptional() subjects?: string[];
 }

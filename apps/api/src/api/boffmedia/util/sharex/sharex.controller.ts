@@ -15,9 +15,11 @@ import * as path from 'path';
 import { SharexService } from './sharex.service';
 import { ApiTags } from '@nestjs/swagger';
 import { SharexUploadDto } from './dto/sharex-upload.dto';
+import { SkipEnvelope } from '@/common/decorators/skip-envelope.decorator';
 
 @ApiTags('BoffMedia 🛠 | ShareX')
 @Controller('sharex')
+@SkipEnvelope()
 export class SharexController {
   constructor(private readonly sharexService: SharexService) {}
   @Post()

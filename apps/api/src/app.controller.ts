@@ -16,9 +16,11 @@ import { promises as fs } from 'fs';
 import axios from 'axios';
 import { join } from 'path';
 import { ApiTags } from '@nestjs/swagger';
+import { SkipEnvelope } from './common/decorators/skip-envelope.decorator';
 
 @ApiTags('Boffmedia')
 @Controller()
+@SkipEnvelope()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 

@@ -4,13 +4,11 @@ import {
   Get,
   Post,
   HttpStatus,
-  UseInterceptors,
   Param,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { WingullFacadeService } from './wingull.facade.service';
 import { UuidDto } from '../_dto/smartrotom-request-dto';
-import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { Weather } from './entities/weather.entity';
 import { Performance } from './entities/performance.entity';
 import { Region } from './entities/region.entity';
@@ -29,7 +27,6 @@ import { Logger } from 'nestjs-pino';
 
 @ApiTags('SmartRotom | Wingull')
 @Controller('wingull')
-@UseInterceptors(ResponseInterceptor)
 export class WingullController {
   constructor(
     private readonly logger: Logger,

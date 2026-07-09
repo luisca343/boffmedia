@@ -28,6 +28,14 @@ export type CreateUserDto = {
      */
     profilePicture?: string;
     /**
+     * Cover (banner) image URL
+     */
+    coverImage?: string;
+    /**
+     * Short user biography
+     */
+    bio?: string;
+    /**
      * Google ID for OAuth
      */
     googleId?: string;

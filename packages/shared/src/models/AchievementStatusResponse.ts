@@ -6,7 +6,7 @@ export type AchievementStatusResponse = {
     /**
      * Completion status (0 = not completed, 1 = completed)
      */
-    completed: number;
+    completed: number | null;
     /**
      * Error message if any
      */

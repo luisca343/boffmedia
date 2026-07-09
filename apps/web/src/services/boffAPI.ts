@@ -14,14 +14,23 @@ interface Options extends RequestInit {
   };
 }
 
-async function request<T>(method: string, url: string, data?: any): Promise<ApiResponse<T>> {
+export interface RequestOptions {
+  revalidate?: number;
+}
+
+async function request<T>(
+  method: string,
+  url: string,
+  data?: any,
+  requestOptions?: RequestOptions,
+): Promise<ApiResponse<T>> {
   const options: Options = {
     method,
     headers: {
       "Content-Type": "application/json",
     },
     next: {
-      revalidate: 0,
+      revalidate: requestOptions?.revalidate ?? 0,
     },
   };
 
@@ -29,23 +38,50 @@ async function request<T>(method: string, url: string, data?: any): Promise<ApiR
     options.body = JSON.stringify(data);
   }
 
+  let res: Response;
   try {
-    const res = await fetch(url, options);
-    const result: ApiResponse<T> = await res.json();
-    console.warn(`Request to ${url} returned:`, result);
-    return result;
+    res = await fetch(url, options);
   } catch (error) {
     console.error(`Error in request: ${(error as Error).message}`);
     throw error;
   }
+
+  if (!res.ok) {
+    return await parseErrorEnvelope<T>(res);
+  }
+
+  return (await res.json()) as ApiResponse<T>;
 }
 
-export async function GET<T>(url: string): Promise<ApiResponse<T>> {
-  return request<T>("GET", url);
+// Builds an ApiResponse error envelope from a non-ok Response: parses the
+// server's error body if possible (NestJS GlobalExceptionFilter shape),
+// otherwise synthesizes one from the status code.
+async function parseErrorEnvelope<T>(res: Response): Promise<ApiResponse<T>> {
+  const bodyText = await res.text().catch(() => "");
+
+  try {
+    const parsed = JSON.parse(bodyText);
+    if (parsed && typeof parsed === "object") {
+      return { ...parsed, success: false } as ApiResponse<T>;
+    }
+  } catch {
+    // body wasn't JSON, fall through to synthesized envelope
+  }
+
+  return {
+    statusCode: res.status,
+    message: res.statusText,
+    error: bodyText || res.statusText,
+    success: false,
+  } as ApiResponse<T>;
 }
 
-export async function POST<T>(url: string, data: any): Promise<ApiResponse<T>> {
-  return request<T>("POST", url, data);
+export async function GET<T>(url: string, options?: RequestOptions): Promise<ApiResponse<T>> {
+  return request<T>("GET", url, undefined, options);
+}
+
+export async function POST<T>(url: string, data: any, options?: RequestOptions): Promise<ApiResponse<T>> {
+  return request<T>("POST", url, data, options);
 }
 
 export async function multipartPOST<T>(
@@ -58,7 +94,6 @@ export async function multipartPOST<T>(
   // Append text fields
   Object.entries(fields).forEach(([key, value]) => {
     if (value !== undefined && value !== null) {
-      console.log(`Appending field to FormData: ${key} = ${value}`);
       formData.append(key, value);
     }
   });
@@ -66,17 +101,9 @@ export async function multipartPOST<T>(
   // Append file fields
   Object.entries(files).forEach(([key, file]) => {
     if (file) {
-      console.log(`Appending file to FormData: ${key}`);
       formData.append(key, file);
     }
   });
-
-  console.log("FormData prepared for multipart POST:", formData);
-  console.log("Sending multipart POST request to:", url);
-    // Log all FormData fields and values for debugging
-    Array.from(formData.entries()).forEach(([key, value]) => {
-      console.log(`FormData field: ${key}`, value);
-    });
 
   // Use API base URL if not absolute
   const fullUrl = url.startsWith('http') ? url : `${getApiUrl()}${url}`;
@@ -93,19 +120,7 @@ async function multipartPOSTRequest<T>(url: string, formData: FormData): Promise
     });
     const contentType = res.headers.get('content-type');
     if (!res.ok) {
-      let errorText = await res.text();
-      let errorJson;
-      try {
-        errorJson = JSON.parse(errorText);
-      } catch {
-        errorJson = { error: errorText };
-      }
-      return {
-        statusCode: res.status,
-        message: res.statusText,
-        error: errorJson.error || errorText,
-        success: false,
-      } as ApiResponse<T>;
+      return await parseErrorEnvelope<T>(res);
     }
     if (contentType && contentType.includes('application/json')) {
       const result: ApiResponse<T> = await res.json();
@@ -125,16 +140,16 @@ async function multipartPOSTRequest<T>(url: string, formData: FormData): Promise
   }
 }
 
-export async function PUT<T>(url: string, data: any): Promise<ApiResponse<T>> {
-  return request<T>("PUT", url, data);
+export async function PUT<T>(url: string, data: any, options?: RequestOptions): Promise<ApiResponse<T>> {
+  return request<T>("PUT", url, data, options);
 }
 
-export async function PATCH<T>(url: string, data: any): Promise<ApiResponse<T>> {
-  return request<T>("PATCH", url, data);
+export async function PATCH<T>(url: string, data: any, options?: RequestOptions): Promise<ApiResponse<T>> {
+  return request<T>("PATCH", url, data, options);
 }
 
-export async function DELETE<T>(url: string): Promise<ApiResponse<T>> {
-  return request<T>("DELETE", url);
+export async function DELETE<T>(url: string, options?: RequestOptions): Promise<ApiResponse<T>> {
+  return request<T>("DELETE", url, undefined, options);
 }
 
 // ─── Authenticated requests (sends Authorization: Bearer <token>) ──────────────
@@ -155,6 +170,9 @@ async function authedRequest<T>(method: string, url: string, token: string, data
 
   try {
     const res = await fetch(url, options);
+    if (!res.ok) {
+      return await parseErrorEnvelope<T>(res);
+    }
     const result: ApiResponse<T> = await res.json();
     return result;
   } catch (error) {
@@ -183,32 +201,28 @@ const getApiUrl = (): string => {
   return env.NEXT_PUBLIC_API;
 };
 
-const getTerasApiUrl = (): string => {
-  return env.NEXT_PUBLIC_TERAS_API;
-};
-
 const getServer = (): string => {
   return env.NEXT_PUBLIC_MC_WORLD;
 };
 
-export async function apiGET<T>(url: string): Promise<ApiResponse<T>> {
-  return GET<T>(`${getApiUrl()}${url}`);
+export async function apiGET<T>(url: string, options?: RequestOptions): Promise<ApiResponse<T>> {
+  return GET<T>(`${getApiUrl()}${url}`, options);
 }
 
-export async function apiPOST<T>(url: string, data: any): Promise<ApiResponse<T>> {
-  return POST<T>(`${getApiUrl()}${url}`, data);
+export async function apiPOST<T>(url: string, data: any, options?: RequestOptions): Promise<ApiResponse<T>> {
+  return POST<T>(`${getApiUrl()}${url}`, data, options);
 }
 
-export async function apiPUT<T>(url: string, data: any): Promise<ApiResponse<T>> {
-  return PUT<T>(`${getApiUrl()}${url}`, data);
+export async function apiPUT<T>(url: string, data: any, options?: RequestOptions): Promise<ApiResponse<T>> {
+  return PUT<T>(`${getApiUrl()}${url}`, data, options);
 }
 
-export async function apiPATCH<T>(url: string, data: any): Promise<ApiResponse<T>> {
-  return PATCH<T>(`${getApiUrl()}${url}`, data);
+export async function apiPATCH<T>(url: string, data: any, options?: RequestOptions): Promise<ApiResponse<T>> {
+  return PATCH<T>(`${getApiUrl()}${url}`, data, options);
 }
 
-export async function apiDELETE<T>(url: string): Promise<ApiResponse<T>> {
-  return DELETE<T>(`${getApiUrl()}${url}`);
+export async function apiDELETE<T>(url: string, options?: RequestOptions): Promise<ApiResponse<T>> {
+  return DELETE<T>(`${getApiUrl()}${url}`, options);
 }
 
 
@@ -230,7 +244,6 @@ export async function rotomMultipartPOST<T>(
   fields: Record<string, any> = {},
   files: Record<string, File | Blob> = {}
 ): Promise<ApiResponse<T>> {
-  console.log("Preparing FormData for multipart POST:", fields, files);
   fields.server = getServer();
   return multipartPOST<T>(`/smartrotom${url}`, fields, files);
 }
@@ -269,15 +282,6 @@ export async function boffPOST<T>(url: string, data: any): Promise<ApiResponse<T
   return apiPOST<T>(url, data);
 }
 
-export async function terasGET<T>(url: string): Promise<ApiResponse<T>> {
-  return GET<T>(`${getTerasApiUrl()}${url}`);
-}
-
-export async function terasPOST<T>(url: string, data: any): Promise<ApiResponse<T>> {
-  return POST<T>(`${getTerasApiUrl()}${url}`, data);
-}
-
-
 interface UploadResponse {
   filename: string;
   path: string;
@@ -308,9 +312,11 @@ async function uploadRequest<T>(
       },
     });
     
-    const result: ApiResponse<T> = await res.json();
-    console.warn(`Upload request to ${url} returned:`, result);
-    return result;
+    if (!res.ok) {
+      return await parseErrorEnvelope<T>(res);
+    }
+
+    return (await res.json()) as ApiResponse<T>;
   } catch (error) {
     console.error(`Error in upload request: ${(error as Error).message}`);
     throw error;

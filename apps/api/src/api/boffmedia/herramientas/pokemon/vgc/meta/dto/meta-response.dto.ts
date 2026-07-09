@@ -170,13 +170,13 @@ export class SpeciesTeamEntryDto {
   @ApiProperty()
   playerId!: string;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: String, nullable: true })
   playerName!: string | null;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: String, nullable: true })
   record!: string | null;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: String, nullable: true })
   rank!: string | null;
 
   @ApiProperty({ type: VgcMetaSlotDto, isArray: true })
@@ -185,7 +185,7 @@ export class SpeciesTeamEntryDto {
   @ApiProperty()
   rawText!: string;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: String, nullable: true })
   replicaCode!: string | null;
 }
 
@@ -279,7 +279,7 @@ export class ChampionsRegulationDto {
   @ApiProperty()
   gameType!: string;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: String, nullable: true })
   vgcPastesGid!: string | null;
 
   @ApiPropertyOptional({
@@ -287,7 +287,7 @@ export class ChampionsRegulationDto {
   })
   importStatus?: 'idle' | 'running_csv' | 'running_pastes' | 'done' | 'error';
 
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({ type: String, nullable: true })
   importError?: string | null;
 
   @ApiPropertyOptional()
@@ -296,10 +296,10 @@ export class ChampionsRegulationDto {
   @ApiPropertyOptional()
   importFetchedCount?: number;
 
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({ type: String, nullable: true })
   importStartedAt?: string | null;
 
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({ type: String, nullable: true })
   importCompletedAt?: string | null;
 
   @ApiProperty()
@@ -356,7 +356,7 @@ export class DivergenceResultDto {
   @ApiProperty()
   regulationId!: string;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: Number, nullable: true })
   tournamentId!: number | null;
 
   @ApiProperty()

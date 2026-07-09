@@ -76,10 +76,10 @@ export class MatchSlotDto {
   @ApiProperty()
   slotIndex!: number;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: String, nullable: true })
   speciesId!: string | null;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: String, nullable: true })
   speciesName!: string | null;
 
   @ApiProperty({ enum: ['lead1', 'lead2', 'back1', 'back2', 'unknown'] })

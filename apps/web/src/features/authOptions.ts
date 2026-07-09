@@ -1,12 +1,13 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import GoogleProvider from "next-auth/providers/google";
+import GoogleProvider, { GoogleProfile } from "next-auth/providers/google";
 import { env } from "@/config/env";
 import { boffPOST } from '@/services/boffAPI';
 import { BoffUser } from "@/types";
 import type { UserRole } from "@boffmedia/shared/roles";
 import { AuthError, AUTH_ERROR_CODES, handleAuthError } from '@/utils/auth-errors';
 import { CookiesOptions } from "next-auth";
+import type { AuthLoginResponseEntity, AuthRefreshResponseEntity } from "@boffmedia/shared";
 
 export const authOptions: NextAuthOptions = {
   pages: {
@@ -27,13 +28,22 @@ export const authOptions: NextAuthOptions = {
             return null;
           }
 
-          const response = (await boffPOST(`/auth/login`, {
+          const response = (await boffPOST<AuthLoginResponseEntity | { error: string }>(`/auth/login`, {
             username: credentials.username,
             password: credentials.password,
-          })).data as any;
+          })).data;
 
-          if (response && !response.error) {
-            return { ...response.user, accessToken: response.access_token, refreshToken: response.refresh_token } as any;
+          if (response && !('error' in response)) {
+            const { user } = response;
+            return {
+              ...user,
+              id: String(user.id),
+              roles: user.roles as UserRole[],
+              mcUuid: user.mcUuid ?? undefined,
+              smartRotomUser: user.smartRotomUser ?? undefined,
+              accessToken: response.access_token,
+              refreshToken: response.refresh_token,
+            };
           }
 
           return null;
@@ -56,8 +66,8 @@ export const authOptions: NextAuthOptions = {
           if (!credentials?.username || !credentials?.uuid || !credentials?.world) {
             throw new AuthError("Missing required Minecraft credentials", AUTH_ERROR_CODES.MISSING_CREDENTIALS);
           }
-          const response = (await boffPOST(`/auth/loginmc`, credentials)).data as any;
-          if (response && !response.error) {
+          const response = (await boffPOST<AuthLoginResponseEntity | { error: string }>(`/auth/loginmc`, credentials)).data;
+          if (response && !('error' in response)) {
             const responseData = response.user as any;
             const user: any = {
               id: responseData.id,
@@ -94,22 +104,25 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user, account, profile }) {
       if (account?.provider === 'google') {
         try {
-          const response = (await boffPOST('/auth/google/callback', {
+          // GoogleProfile is next-auth's real typed shape for this provider's profile;
+          // `image` is kept as a defensive fallback in case the shape ever drifts.
+          const googleProfile = profile as (GoogleProfile & { image?: string }) | undefined;
+          const response = await boffPOST<AuthLoginResponseEntity>('/auth/google/callback', {
             email: profile?.email,
             name: profile?.name,
-            picture: (profile as any)?.picture ?? (profile as any)?.image,
-          })) as any;
+            picture: googleProfile?.picture ?? googleProfile?.image,
+          });
 
-          if (!response.statusCode || response.statusCode !== 200) {
+          if (!response.statusCode || response.statusCode !== 200 || !response.data) {
             throw new Error('Failed to authenticate with backend');
           }
 
           const responseData = response.data;
-          user.id = responseData.user.id;
-          (user as any).roles = responseData.user.roles;
-          (user as any).smartRotomUser = responseData.user.smartRotomUser;
-          (user as any).accessToken = responseData.access_token;
-          (user as any).refreshToken = responseData.refresh_token;
+          user.id = String(responseData.user.id);
+          user.roles = responseData.user.roles as UserRole[];
+          user.smartRotomUser = responseData.user.smartRotomUser ?? undefined;
+          user.accessToken = responseData.access_token;
+          user.refreshToken = responseData.refresh_token;
 
           return true;
         } catch (error) {
@@ -123,12 +136,12 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.email = user.email;
-        token.name = (user as any).username ?? user.name;
-        token.roles = (user as any).roles;
-        token.smartRotomUser = (user as any).smartRotomUser;
-        token.image = (user as any).profilePicture ?? user.image ?? null;
-        token.accessToken = (user as any).accessToken;
-        token.refreshToken = (user as any).refreshToken;
+        token.name = user.username ?? user.name;
+        token.roles = user.roles;
+        token.smartRotomUser = user.smartRotomUser;
+        token.image = user.profilePicture ?? user.image ?? null;
+        token.accessToken = user.accessToken;
+        token.refreshToken = user.refreshToken;
         token.lastUpdated = Date.now();
       }
 
@@ -141,16 +154,16 @@ export const authOptions: NextAuthOptions = {
 
       if (shouldRefresh && token.id && token.refreshToken) {
         try {
-          const response = (await boffPOST('/auth/refresh', {
+          const response = await boffPOST<AuthRefreshResponseEntity>('/auth/refresh', {
             refresh_token: token.refreshToken,
-          })) as any;
+          });
 
-          if (response && response.statusCode === 200) {
+          if (response && response.statusCode === 200 && response.data) {
             const userData = response.data;
-            token.roles = userData.user.roles;
+            token.roles = userData.user.roles as UserRole[];
             token.name = userData.user.name;
             token.email = userData.user.email;
-            token.smartRotomUser = userData.user.smartRotomUser;
+            token.smartRotomUser = userData.user.smartRotomUser ?? undefined;
             token.image = userData.user.image ?? token.image ?? null;
             token.accessToken = userData.access_token ?? token.accessToken;
             token.refreshToken = userData.refresh_token ?? token.refreshToken;

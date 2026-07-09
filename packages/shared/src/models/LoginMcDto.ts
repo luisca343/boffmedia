@@ -3,5 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 export type LoginMcDto = {
+    username: string;
+    uuid: string;
+    world: string;
 };
 

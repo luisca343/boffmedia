@@ -19,7 +19,7 @@ export type UpsertRegulationDto = {
     /**
      * Google Sheet GID for VGCPastes data (null = no sheet)
      */
-    vgcPastesGid?: string;
+    vgcPastesGid?: string | null;
 };
 export namespace UpsertRegulationDto {
     export enum gameType {

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import type { VgcPokemon } from '@/services/api/boffmedia/vgcService'
+import { VgcService, type VgcPokemon } from '@/services/api/boffmedia/vgcService'
 
 export type { VgcPokemon }
 
@@ -14,12 +14,7 @@ async function loadLegalPokemon(regulationId: string): Promise<VgcPokemon[]> {
   if (!regulationId) return []
   if (_cache[regulationId]) return _cache[regulationId]
   if (!_fetchPromise[regulationId]) {
-    const apiBase = process.env.NEXT_PUBLIC_API ?? ''
-    _fetchPromise[regulationId] = fetch(
-      `${apiBase}/tools/vgc/champions/${regulationId}/pokemon`,
-      { next: { revalidate: 0 } },
-    )
-      .then((r) => r.json())
+    _fetchPromise[regulationId] = VgcService.getChampionsLegalPokemon(regulationId)
       .then((res) => {
         const data: VgcPokemon[] = res?.data ?? []
         _cache[regulationId] = data

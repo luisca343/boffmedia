@@ -43,6 +43,7 @@ export type UpdateEventDto = {
      * The banner of the event
      */
     banner?: string;
+    id?: number;
 };
 export namespace UpdateEventDto {
     /**

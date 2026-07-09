@@ -3,15 +3,12 @@ import {
   Get,
   Param,
   HttpStatus,
-  UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
-import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { YoutubeFacadeService } from './youtube.facade.service';
 
 @ApiTags('BoffMedia | YouTube')
 @Controller('boffmedia/herramientas/youtube')
-@UseInterceptors(ResponseInterceptor)
 export class YoutubeController {
   constructor(private readonly youtubeFacadeService: YoutubeFacadeService) {}
 

@@ -7,11 +7,9 @@ import {
   Param,
   Delete,
   HttpStatus,
-  UseInterceptors,
   ParseIntPipe,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
-import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { UsersFacadeService } from './users.facade.service';
 import { CreateSmartrotomUserDto } from './dto/create-user.dto';
 import { UpdateSmartrotomUserDto } from './dto/update-user.dto';
@@ -26,7 +24,6 @@ import { UserValidationResult } from './entities/user-validation-result.entity';
 
 @ApiTags('SmartRotom | Users')
 @Controller('smartrotom/users')
-@UseInterceptors(ResponseInterceptor)
 export class UsersController {
   constructor(private readonly usersFacadeService: UsersFacadeService) {}
 

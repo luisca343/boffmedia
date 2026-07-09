@@ -7,7 +7,6 @@ import {
   Param,
   Query,
   Body,
-  UseInterceptors,
   HttpStatus,
 } from '@nestjs/common';
 import {
@@ -17,7 +16,6 @@ import {
   ApiParam,
   ApiQuery,
 } from '@nestjs/swagger';
-import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { TcgFacadeService } from './tcg.facade.service';
 import { TcgSeries } from './entities/tcg-series.entity';
 import { TcgSet } from './entities/tcg-set.entity';
@@ -30,7 +28,6 @@ import { Logger } from 'nestjs-pino';
 
 @ApiTags('BoffMedia 🛠 | Pokemon TCG Pocket')
 @Controller('tools/ptcgp')
-@UseInterceptors(ResponseInterceptor)
 export class TcgController {
   constructor(
     private readonly logger: Logger,
