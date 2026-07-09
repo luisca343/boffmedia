@@ -229,29 +229,23 @@ describe('BoffMediaUsersManagementService', () => {
   // ─── updateUser ───────────────────────────────────────────────────────────────
 
   describe('updateUser()', () => {
-    it('hashes password when updating password field', async () => {
-      mockPasswordService.validatePassword.mockReturnValue({
-        isValid: true,
-        errors: [],
-      });
+    it('forwards whitelisted profile fields to the repository', async () => {
       mockRepo.updateUser.mockResolvedValue(mockUser);
 
-      await service.updateUser(1, { password: 'NewPass123!' });
+      await service.updateUser(1, { username: 'newname', bio: 'hi' });
 
-      expect(mockPasswordService.hashPassword).toHaveBeenCalledWith(
-        'NewPass123!',
-      );
+      expect(mockRepo.updateUser).toHaveBeenCalledWith(1, {
+        username: 'newname',
+        bio: 'hi',
+      });
     });
 
-    it('throws when password fails validation', async () => {
-      mockPasswordService.validatePassword.mockReturnValue({
-        isValid: false,
-        errors: ['too short'],
-      });
+    it('never hashes/sets a password through the generic update path', async () => {
+      mockRepo.updateUser.mockResolvedValue(mockUser);
 
-      await expect(service.updateUser(1, { password: '123' })).rejects.toThrow(
-        'Password validation failed',
-      );
+      await service.updateUser(1, { username: 'newname' });
+
+      expect(mockPasswordService.hashPassword).not.toHaveBeenCalled();
     });
 
     it('throws BadRequestException when id is 0', async () => {

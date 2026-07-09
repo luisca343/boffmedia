@@ -22,16 +22,25 @@ const TONE_VAR: Record<Notif["tone"], string> = {
 }
 
 export interface NotifMenuProps {
-  /** Notifications to show. No notifications API exists yet — defaults to the (real) empty state; the showcase injects demo items. */
+  /** Notifications to show. Defaults to the empty state; `NotifBell` passes real data, the showcase injects demo items. */
   initialItems?: Notif[]
+  /** Optional persistence hooks — when provided, the local action is also sent to the API. */
+  onMarkAllRead?: () => void
+  onDismiss?: (id: number) => void
+  onClear?: () => void
 }
 
-export function NotifMenu({ initialItems }: NotifMenuProps) {
+export function NotifMenu({ initialItems, onMarkAllRead, onDismiss, onClear }: NotifMenuProps) {
   const tNav = useTranslations("nav.v3")
   const [open, setOpen] = React.useState(false)
   const [items, setItems] = React.useState<Notif[]>(initialItems ?? [])
   const rootRef = React.useRef<HTMLSpanElement>(null)
   const unread = items.filter((n) => !n.read).length
+
+  // Sync when the source list changes (e.g. NotifBell finishes fetching).
+  React.useEffect(() => {
+    setItems(initialItems ?? [])
+  }, [initialItems])
 
   useDismiss(rootRef, () => setOpen(false), open)
 
@@ -72,7 +81,10 @@ export function NotifMenu({ initialItems }: NotifMenuProps) {
                 {unread > 0 && (
                   <button
                     type="button"
-                    onClick={() => setItems((a) => a.map((n) => ({ ...n, read: true })))}
+                    onClick={() => {
+                      setItems((a) => a.map((n) => ({ ...n, read: true })))
+                      onMarkAllRead?.()
+                    }}
                     className="font-mono text-[10.5px] font-semibold uppercase leading-none tracking-[0.06em] text-txt-muted transition-colors duration-[140ms] hover:text-accent"
                   >
                     {tNav("markRead")}
@@ -80,7 +92,10 @@ export function NotifMenu({ initialItems }: NotifMenuProps) {
                 )}
                 <button
                   type="button"
-                  onClick={() => setItems([])}
+                  onClick={() => {
+                    setItems([])
+                    onClear?.()
+                  }}
                   className="font-mono text-[10.5px] font-semibold uppercase leading-none tracking-[0.06em] text-txt-muted transition-colors duration-[140ms] hover:text-accent"
                 >
                   {tNav("clear")}
@@ -123,7 +138,10 @@ export function NotifMenu({ initialItems }: NotifMenuProps) {
                   <button
                     type="button"
                     aria-label={tNav("delete")}
-                    onClick={() => setItems((a) => a.filter((x) => x.id !== n.id))}
+                    onClick={() => {
+                      setItems((a) => a.filter((x) => x.id !== n.id))
+                      onDismiss?.(n.id)
+                    }}
                     className="-mr-1 -mt-0.5 grid h-[22px] w-[22px] shrink-0 place-items-center text-txt-dim opacity-0 transition-[color,opacity] duration-[140ms] hover:text-bad group-hover/notif:opacity-100"
                   >
                     <Icon name="x" size={12} />

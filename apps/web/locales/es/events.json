@@ -158,8 +158,14 @@
     "lead": "¿Tienes una idea para un evento? Cuéntanosla y, si encaja, podríamos hacerla realidad.",
     "type": {
       "label": "Tipo de evento",
-      "event": { "label": "Evento competitivo", "desc": "Competición con medallas y premios." },
-      "server": { "label": "Servidor especial", "desc": "Servidor con eventos, mecánicas y logros propios." }
+      "event": {
+        "label": "Evento competitivo",
+        "desc": "Competición con medallas y premios."
+      },
+      "server": {
+        "label": "Servidor especial",
+        "desc": "Servidor con eventos, mecánicas y logros propios."
+      }
     },
     "fields": {
       "title": "Nombre del evento",
@@ -198,6 +204,8 @@
       "another": "Sugerir otro",
       "back": "Volver a eventos"
     },
-    "toast": "Sugerencia enviada. ¡Gracias por tu idea!"
+    "toast": "Sugerencia enviada. ¡Gracias por tu idea!",
+    "errorToast": "No se pudo enviar la sugerencia. Inténtalo de nuevo.",
+    "loginRequired": "Inicia sesión para enviar una sugerencia."
   }
 }

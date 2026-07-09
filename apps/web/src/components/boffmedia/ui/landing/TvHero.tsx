@@ -9,10 +9,25 @@ import { Decode, FxParticles } from "./travesia-fx"
 import { BEAMS, Grain, LINE_INNER, LINE_MASK, PRI_GLOW, tvGoTo } from "./landing-shared"
 import { TV3_HUD } from "./landing-data"
 import { useTvMouseVar } from "./landing-hooks"
+import { useSiteStats } from "@/hooks/community/useCommunity"
 
 export function TvHero({ lvl, density }: { lvl: number; density: number }) {
   const artRef = React.useRef<HTMLDivElement>(null)
   useTvMouseVar(artRef)
+  const { stats } = useSiteStats()
+  // Real site stats feed the HUD; falls back to the editorial placeholders
+  // while loading or if the API is unavailable (keeps the hero visually stable).
+  const hud = stats
+    ? [
+        { k: "Comunidad", big: String(stats.users), suf: "+", sub: "usuarios registrados", live: false },
+        {
+          k: "Eventos",
+          big: String(stats.activeEvents > 0 ? stats.activeEvents : stats.events),
+          sub: stats.activeEvents > 0 ? "en directo" : "en total",
+          live: stats.activeEvents > 0,
+        },
+      ]
+    : TV3_HUD
   return (
     <section className="relative z-[1] grid min-h-screen items-center overflow-hidden pb-24 pt-[118px]" id="tv-hero">
       {lvl >= 2 && <FxParticles density={density} />}
@@ -69,7 +84,7 @@ export function TvHero({ lvl, density }: { lvl: number; density: number }) {
             </Button>
           </div>
           <div data-reveal style={{ ["--i"]: 3 } as React.CSSProperties} className="mt-10 flex gap-3.5 max-[820px]:flex-wrap">
-            {TV3_HUD.map((h) => (
+            {hud.map((h) => (
               <div
                 key={h.k}
                 className="relative min-w-[150px] border border-solid border-line px-4 pb-[13px] pt-3.5 backdrop-blur-[6px] [background:rgba(10,12,16,0.6)] cut-tag [--cut-tag:9px] before:absolute before:bottom-0 before:left-0 before:top-0 before:w-[3px] before:bg-accent before:content-[''] [[data-theme=light]_&]:[background:rgba(255,255,255,0.6)]"

@@ -1,7 +1,6 @@
 import { BoffMediaUser } from '@/_db/schema/BoffMedia';
 import { SmartRotomUser } from '@/_db/schema/SmartRotom';
 import { CreateUserDto } from '../../dto/create-user.dto';
-import { UpdateUserDto } from '../../dto/update-user.dto';
 
 // Entity types for responses (without password)
 export type BoffMediaUserSafe = Omit<BoffMediaUser, 'password'>;
@@ -40,7 +39,13 @@ export interface IBoffMediaUsersRepository {
   getUserRoles(userId: number): Promise<string[]>;
 
   // ==================== UPDATE OPERATIONS ====================
-  updateUser(id: number, updateData: UpdateUserDto): Promise<BoffMediaUserSafe>;
+  // Broad partial: the public HTTP path is narrowed by UpdateUserDto in the
+  // controller/service, but internal callers (OAuth linking, minecraft uuid,
+  // provider unlink) legitimately set googleId/discordId/uuid/steamId here.
+  updateUser(
+    id: number,
+    updateData: Partial<BoffMediaUser>,
+  ): Promise<BoffMediaUserSafe>;
 
   // ==================== DELETE OPERATIONS ====================
   deleteUser(id: number): Promise<boolean>;

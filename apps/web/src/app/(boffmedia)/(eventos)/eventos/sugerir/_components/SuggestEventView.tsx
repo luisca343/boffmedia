@@ -3,6 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { toast } from "@/components/boffmedia/primitives/toast"
+import { SuggestionsService, type CreateSuggestionPayload } from "@/services/api/boffmedia/suggestionsService"
 import { SuggestForm } from "./SuggestForm"
 import { SuggestSuccess } from "./SuggestSuccess"
 import { Guidelines } from "./Guidelines"
@@ -41,13 +42,32 @@ export function SuggestEventView() {
 
   const submit = React.useCallback(async () => {
     setSubmitting(true)
-    // No suggest-event endpoint exists yet (tracked in BOFFMEDIA_V3_DEFERRED.md);
-    // the suggestion is captured client-side until the backend lands.
-    await new Promise((r) => setTimeout(r, 700))
-    setSubmitting(false)
-    setSubmitted(true)
-    toast.success(t("toast"))
-  }, [t])
+    try {
+      const payload: CreateSuggestionPayload = {
+        title: data.title,
+        gameName: data.gameName,
+        type: data.type,
+        description: data.description,
+      }
+      if (data.additionalInfo) payload.additionalInfo = data.additionalInfo
+      if (data.suggestedDate) payload.suggestedDate = data.suggestedDate
+      if (data.endDate) payload.endDate = data.endDate
+      if (data.maxParticipants) payload.maxParticipants = Number(data.maxParticipants)
+
+      const res = await SuggestionsService.create(payload)
+      if (res.error || res.success === false) {
+        // 401 → not authenticated; anything else → generic failure.
+        toast.error(res.statusCode === 401 ? t("loginRequired") : t("errorToast"))
+        return
+      }
+      setSubmitted(true)
+      toast.success(t("toast"))
+    } catch {
+      toast.error(t("errorToast"))
+    } finally {
+      setSubmitting(false)
+    }
+  }, [data, t])
 
   const reset = React.useCallback(() => {
     setData(EMPTY)

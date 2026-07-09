@@ -158,8 +158,14 @@
     "lead": "Got an idea for an event? Tell us about it and, if it fits, we might make it happen.",
     "type": {
       "label": "Event type",
-      "event": { "label": "Competitive event", "desc": "A competition with medals and prizes." },
-      "server": { "label": "Special server", "desc": "A server with its own events, mechanics and achievements." }
+      "event": {
+        "label": "Competitive event",
+        "desc": "A competition with medals and prizes."
+      },
+      "server": {
+        "label": "Special server",
+        "desc": "A server with its own events, mechanics and achievements."
+      }
     },
     "fields": {
       "title": "Event name",
@@ -198,6 +204,8 @@
       "another": "Suggest another",
       "back": "Back to events"
     },
-    "toast": "Suggestion sent. Thanks for your idea!"
+    "toast": "Suggestion sent. Thanks for your idea!",
+    "errorToast": "Could not send your suggestion. Please try again.",
+    "loginRequired": "Sign in to send a suggestion."
   }
 }

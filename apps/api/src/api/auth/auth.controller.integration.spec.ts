@@ -5,6 +5,9 @@ import { Logger } from 'nestjs-pino';
 const request = require('supertest') as typeof import('supertest');
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { PasswordResetService } from './password-reset.service';
+import { EmailVerificationService } from './email-verification.service';
+import { AuthThrottlerGuard } from '@api/_utils/guards/auth-throttler.guard';
 import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { Reflector } from '@nestjs/core';
@@ -26,6 +29,16 @@ const mockAuthService = {
   googleLogin: jest.fn(),
 };
 
+const mockPasswordResetService = {
+  requestReset: jest.fn(),
+  resetPassword: jest.fn(),
+};
+
+const mockEmailVerificationService = {
+  sendVerification: jest.fn(),
+  verify: jest.fn(),
+};
+
 describe('AuthController — integration (ValidationPipe + GlobalExceptionFilter)', () => {
   let app: INestApplication;
 
@@ -34,11 +47,24 @@ describe('AuthController — integration (ValidationPipe + GlobalExceptionFilter
       controllers: [AuthController],
       providers: [
         { provide: AuthService, useValue: mockAuthService },
+        {
+          provide: PasswordResetService,
+          useValue: mockPasswordResetService,
+        },
+        {
+          provide: EmailVerificationService,
+          useValue: mockEmailVerificationService,
+        },
         { provide: Logger, useValue: mockLogger },
         ResponseInterceptor,
         Reflector,
       ],
-    }).compile();
+    })
+      // Pass-through the throttler guard — the test module doesn't wire up the
+      // throttler infrastructure and these specs cover validation, not limits.
+      .overrideGuard(AuthThrottlerGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     app = moduleRef.createNestApplication();
     app.useGlobalPipes(
@@ -106,8 +132,23 @@ describe('AuthController — integration (ValidationPipe + GlobalExceptionFilter
       expect(res.body.statusCode).toBe(400);
     });
 
-    it('calls AuthService when body is valid', async () => {
+    it('returns 401 when credentials are invalid', async () => {
       mockAuthService.validateUser.mockResolvedValue(null);
+
+      const res = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({ username: 'validuser', password: 'validpass' });
+
+      expect(res.status).toBe(401);
+      expect(mockAuthService.validateUser).toHaveBeenCalledWith(
+        'validuser',
+        'validpass',
+      );
+    });
+
+    it('calls AuthService and returns a token when credentials are valid', async () => {
+      mockAuthService.validateUser.mockResolvedValue({ id: 1, name: 'ash' });
+      mockAuthService.login.mockResolvedValue({ access_token: 'tok' });
 
       const res = await request(app.getHttpServer())
         .post('/auth/login')
@@ -118,6 +159,7 @@ describe('AuthController — integration (ValidationPipe + GlobalExceptionFilter
         'validuser',
         'validpass',
       );
+      expect(mockAuthService.login).toHaveBeenCalled();
     });
   });
 
@@ -418,6 +460,113 @@ describe('AuthController — integration (ValidationPipe + GlobalExceptionFilter
       expect(mockAuthService.googleLogin).toHaveBeenCalledWith(
         expect.objectContaining({ picture: 'https://example.com/pic.jpg' }),
       );
+    });
+  });
+
+  // ── POST /auth/forgot — ForgotPasswordDto validation ───────────────────
+  describe('POST /auth/forgot — ForgotPasswordDto validation', () => {
+    it('returns 400 when email is invalid', async () => {
+      const res = await request(app.getHttpServer())
+        .post('/auth/forgot')
+        .send({ email: 'not-an-email' });
+
+      expect(res.status).toBe(400);
+    });
+
+    it('returns a generic success and delegates when email is valid', async () => {
+      mockPasswordResetService.requestReset.mockResolvedValue(undefined);
+
+      const res = await request(app.getHttpServer())
+        .post('/auth/forgot')
+        .send({ email: 'ash@pokemon.com' });
+
+      expect(res.status).toBeLessThan(300);
+      expect(mockPasswordResetService.requestReset).toHaveBeenCalledWith(
+        'ash@pokemon.com',
+      );
+    });
+  });
+
+  // ── POST /auth/reset — ResetPasswordDto validation ─────────────────────
+  describe('POST /auth/reset — ResetPasswordDto validation', () => {
+    it('returns 400 when token is missing', async () => {
+      const res = await request(app.getHttpServer())
+        .post('/auth/reset')
+        .send({ newPassword: 'securepw1' });
+
+      expect(res.status).toBe(400);
+    });
+
+    it('returns 400 when newPassword is shorter than 8 characters', async () => {
+      const res = await request(app.getHttpServer())
+        .post('/auth/reset')
+        .send({ token: 'abc', newPassword: 'short' });
+
+      expect(res.status).toBe(400);
+    });
+
+    it('delegates to PasswordResetService when body is valid', async () => {
+      mockPasswordResetService.resetPassword.mockResolvedValue({
+        success: true,
+      });
+
+      const res = await request(app.getHttpServer())
+        .post('/auth/reset')
+        .send({ token: 'reset-token', newPassword: 'securepw1' });
+
+      expect(res.status).toBeLessThan(300);
+      expect(mockPasswordResetService.resetPassword).toHaveBeenCalledWith(
+        'reset-token',
+        'securepw1',
+      );
+    });
+  });
+
+  // ── POST /auth/verify-email — VerifyEmailDto validation ────────────────
+  describe('POST /auth/verify-email — VerifyEmailDto validation', () => {
+    it('returns 400 when token is missing', async () => {
+      const res = await request(app.getHttpServer())
+        .post('/auth/verify-email')
+        .send({});
+
+      expect(res.status).toBe(400);
+    });
+
+    it('delegates to EmailVerificationService when token is present', async () => {
+      mockEmailVerificationService.verify.mockResolvedValue({ success: true });
+
+      const res = await request(app.getHttpServer())
+        .post('/auth/verify-email')
+        .send({ token: 'verify-token' });
+
+      expect(res.status).toBeLessThan(300);
+      expect(mockEmailVerificationService.verify).toHaveBeenCalledWith(
+        'verify-token',
+      );
+    });
+  });
+
+  // ── POST /auth/resend-verification — ResendVerificationDto validation ──
+  describe('POST /auth/resend-verification — ResendVerificationDto validation', () => {
+    it('returns 400 when email is invalid', async () => {
+      const res = await request(app.getHttpServer())
+        .post('/auth/resend-verification')
+        .send({ email: 'not-an-email' });
+
+      expect(res.status).toBe(400);
+    });
+
+    it('returns a generic success and delegates when email is valid', async () => {
+      mockEmailVerificationService.sendVerification.mockResolvedValue(undefined);
+
+      const res = await request(app.getHttpServer())
+        .post('/auth/resend-verification')
+        .send({ email: 'ash@pokemon.com' });
+
+      expect(res.status).toBeLessThan(300);
+      expect(
+        mockEmailVerificationService.sendVerification,
+      ).toHaveBeenCalledWith('ash@pokemon.com');
     });
   });
 
