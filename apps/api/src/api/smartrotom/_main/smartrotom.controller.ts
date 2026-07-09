@@ -1,4 +1,5 @@
 import { SmartrotomService } from './smartrotom.service';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import {
   Body,
@@ -26,6 +27,7 @@ export class ResultadoCarreraDto {
 }
 
 @ApiTags('Smartrotom')
+@Public()
 @Controller('smartrotom')
 export class SmartrotomController {
   constructor(

@@ -1,9 +1,11 @@
 import { Controller, Get, Param } from '@nestjs/common';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PublicProfileService } from './public-profile.service';
 import { PublicProfileEntity } from './entities/public-profile.entity';
 
 @ApiTags('BoffMedia | Public Profile')
+@Public()
 @Controller('profile')
 export class PublicProfileController {
   constructor(private readonly service: PublicProfileService) {}

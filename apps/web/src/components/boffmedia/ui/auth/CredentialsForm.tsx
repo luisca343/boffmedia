@@ -10,6 +10,8 @@ import { signIn } from "next-auth/react"
 import { Button, Field, Input, PasswordField, toast } from "@/components/boffmedia/primitives"
 import { UsersService } from "@/services/api/boffmedia/usersService"
 import { AuthService } from "@/services/api/boffmedia/authService"
+import { PasswordRequirements } from "./PasswordRequirements"
+import { isPasswordValid } from "./passwordPolicy"
 
 interface CredentialsFormProps {
   isRegister: boolean
@@ -36,9 +38,12 @@ export function CredentialsForm({ isRegister, redirect, onRegistered }: Credenti
       password: z.string().min(8, t("errors.passwordMin")),
     })
     if (!isRegister) return base
+    // Sign-up requires the full strong-password policy (same rules the reset
+    // flow + the API enforce); login just checks a non-empty password.
     return base
       .extend({
         email: z.string().min(1, t("errors.emailRequired")).email(t("errors.emailInvalid")),
+        password: z.string().refine(isPasswordValid, { message: t("errors.pwRequirements") }),
         confirmPassword: z.string().min(8, t("errors.passwordMin")),
       })
       .refine((d) => d.password === d.confirmPassword, {
@@ -50,6 +55,7 @@ export function CredentialsForm({ isRegister, redirect, onRegistered }: Credenti
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<Values>({
     resolver: zodResolver(schema) as never,
@@ -104,6 +110,8 @@ export function CredentialsForm({ isRegister, redirect, onRegistered }: Credenti
           {...register("password")}
         />
       </Field>
+
+      {isRegister && <PasswordRequirements value={watch("password") ?? ""} />}
 
       {isRegister && (
         <Field label={t("fields.confirm")} error={errors.confirmPassword?.message}>

@@ -5,6 +5,7 @@ import { Logger } from 'nestjs-pino';
 const request = require('supertest') as typeof import('supertest');
 import { BoffMediaUsersController } from './users.controller';
 import { BoffMediaUsersFacadeService } from './users.facade.service';
+import { PasswordService } from '@api/auth/password.service';
 import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { Reflector } from '@nestjs/core';
@@ -41,6 +42,12 @@ const mockFacade = {
   validateUserExists: jest.fn(),
 };
 
+// Plain (non-jest.fn) so jest.resetAllMocks() can't wipe the return value —
+// these specs cover routing/validation, not the password policy itself.
+const mockPasswordService = {
+  validatePassword: () => ({ isValid: true, errors: [], strength: 'strong' }),
+};
+
 const mockUser = { id: 1, username: 'TrainerAsh', email: 'ash@pokemon.com' };
 
 describe('BoffMediaUsersController — integration (ValidationPipe + GlobalExceptionFilter)', () => {
@@ -51,6 +58,7 @@ describe('BoffMediaUsersController — integration (ValidationPipe + GlobalExcep
       controllers: [BoffMediaUsersController],
       providers: [
         { provide: BoffMediaUsersFacadeService, useValue: mockFacade },
+        { provide: PasswordService, useValue: mockPasswordService },
         { provide: Logger, useValue: mockLogger },
         ResponseInterceptor,
         Reflector,

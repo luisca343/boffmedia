@@ -4,25 +4,13 @@
 /* eslint-disable */
 export type UpdateUserDto = {
     /**
-     * Server UUID (automatically added by middleware)
-     */
-    server?: string;
-    /**
-     * User email address
-     */
-    email?: string;
-    /**
      * Username for the user
      */
     username?: string;
     /**
-     * User password
+     * User email address
      */
-    password?: string;
-    /**
-     * User UUID
-     */
-    uuid?: string;
+    email?: string;
     /**
      * Profile picture URL
      */
@@ -35,13 +23,5 @@ export type UpdateUserDto = {
      * Short user biography
      */
     bio?: string;
-    /**
-     * Google ID for OAuth
-     */
-    googleId?: string;
-    /**
-     * Discord ID for OAuth
-     */
-    discordId?: string;
 };
 

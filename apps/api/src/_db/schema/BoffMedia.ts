@@ -35,6 +35,9 @@ export const boffMediaUsers = mysqlTable('boffmedia_users', {
   updatedAt: timestamp('updatedAt', { mode: 'date' })
     .defaultNow()
     .onUpdateNow(),
+  // GDPR soft-delete: set (with PII scrubbed) instead of hard-deleting. All
+  // reads/login exclude rows where this is non-null.
+  deletedAt: timestamp('deletedAt', { mode: 'date' }),
 });
 
 export type BoffMediaUser = typeof boffMediaUsers.$inferSelect;

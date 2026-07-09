@@ -40,6 +40,10 @@ export type BoffMediaUserEntity = {
      */
     discordId: string | null;
     /**
+     * Whether the user has verified their email address
+     */
+    emailVerified: boolean;
+    /**
      * User creation timestamp
      */
     createdAt: string | null;

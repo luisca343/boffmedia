@@ -7,6 +7,7 @@ import {
   Delete,
   HttpStatus,
 } from '@nestjs/common';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import {
   ApiTags,
   ApiOperation,
@@ -19,6 +20,7 @@ import { RegistrationData } from './services/registration.service';
 import { CreateInviteBodyDto } from './dto/create-invite-body.dto';
 
 @ApiTags('Wingull | Invites')
+@Public()
 @Controller('wingull/invites')
 export class InvitesController {
   constructor(private readonly invitesFacadeService: InvitesFacadeService) {}

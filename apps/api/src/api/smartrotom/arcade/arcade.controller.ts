@@ -7,6 +7,7 @@ import {
   Body,
   Query,
 } from '@nestjs/common';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import {
   ApiTags,
   ApiOperation,
@@ -40,6 +41,7 @@ import {
 import { DailyRewardsConfig } from './entities/daily-rewards.entity';
 
 @ApiTags('SmartRotom | Arcade')
+@Public()
 @Controller('smartrotom/arcade')
 export class ArcadeController {
   constructor(private readonly arcadeFacadeService: ArcadeFacadeService) {}

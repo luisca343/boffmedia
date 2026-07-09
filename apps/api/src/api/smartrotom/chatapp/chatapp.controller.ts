@@ -9,6 +9,7 @@ import {
   HttpStatus,
   Query,
 } from '@nestjs/common';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import {
   ApiTags,
   ApiOperation,
@@ -44,6 +45,7 @@ import {
 import { CallSession, CallResponse } from './entities/call.entity';
 
 @ApiTags('SmartRotom | ChatApp')
+@Public()
 @Controller('smartrotom/chatapp')
 export class ChatappController {
   constructor(private readonly chatappFacadeService: ChatappFacadeService) {}

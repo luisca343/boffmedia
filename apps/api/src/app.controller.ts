@@ -7,6 +7,7 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import { AppService } from './app.service';
 import { UrlBodyDto } from './common/dto/url-body.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -19,6 +20,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { SkipEnvelope } from './common/decorators/skip-envelope.decorator';
 
 @ApiTags('Boffmedia')
+@Public()
 @Controller()
 @SkipEnvelope()
 export class AppController {
