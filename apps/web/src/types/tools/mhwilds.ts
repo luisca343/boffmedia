@@ -354,6 +354,9 @@ export interface MhMonster {
   kind: string; // 'large' | 'small'
   species: string;
   name: string;
+  title?: string; // [deferred] editorial subtitle (e.g. "Rey de los Cielos") — not in the MH DB API
+  threat?: number; // [deferred] 1–5 threat tier — not in the MH DB API
+  flagship?: boolean; // [deferred] flagship/insignia monster — not in the MH DB API
   description: string;
   baseHealth?: number;
   size: MhMonsterSize;

@@ -7,10 +7,15 @@ import { MONO_LABEL, Sample, Section } from "../showcase-shared"
 import { AuthProviderBtn } from "@/components/boffmedia/primitives/auth-provider-btn"
 import { Avatar, AvatarGroup } from "@/components/boffmedia/primitives/avatar"
 import { Badge } from "@/components/boffmedia/primitives/badge"
+import { Banner } from "@/components/boffmedia/primitives/banner"
 import { Button } from "@/components/boffmedia/primitives/button"
 import { Checkbox } from "@/components/boffmedia/primitives/checkbox"
 import { Chip } from "@/components/boffmedia/primitives/chip"
+import { ChipGroup } from "@/components/boffmedia/primitives/chip-group"
+import { Clock } from "@/components/boffmedia/primitives/clock"
+import { CodeBlock } from "@/components/boffmedia/primitives/code-block"
 import { Crumbs } from "@/components/boffmedia/primitives/crumbs"
+import { Disclosure } from "@/components/boffmedia/primitives/disclosure"
 import { Divider } from "@/components/boffmedia/primitives/divider"
 import { Field } from "@/components/boffmedia/primitives/field"
 import { Icon } from "@/components/boffmedia/primitives/icon"
@@ -20,6 +25,7 @@ import { Input, Textarea } from "@/components/boffmedia/primitives/input"
 import { Kbd } from "@/components/boffmedia/primitives/kbd"
 import { Menu } from "@/components/boffmedia/primitives/menu"
 import { Modal } from "@/components/boffmedia/primitives/modal"
+import { OptionGroup } from "@/components/boffmedia/primitives/option-group"
 import { Pagination } from "@/components/boffmedia/primitives/pagination"
 import { PasswordField } from "@/components/boffmedia/primitives/password-field"
 import { Popover } from "@/components/boffmedia/primitives/popover"
@@ -62,6 +68,11 @@ export function PrimitivasChapter() {
   const [seg, setSeg] = React.useState("dia")
   const [pg, setPg] = React.useState(4)
   const [modalOpen, setModalOpen] = React.useState(false)
+  const [chipG, setChipG] = React.useState("todos")
+  const [chipM, setChipM] = React.useState<string[]>(["vgc", "clima"])
+  const [opt, setOpt] = React.useState("dobles")
+  const [optM, setOptM] = React.useState<string[]>(["protect"])
+  const [bannerOpen, setBannerOpen] = React.useState(true)
   return (
     <>
             <Section id="botones" kicker="Primitivas" title="Botones">
@@ -161,6 +172,38 @@ export function PrimitivasChapter() {
                 <IconBox icon="alert" tone="warn" size="sm" />
                 <IconBox icon="tree" tone="muted" />
               </Sample>
+              <Sample
+                title="Grupo de chips"
+                code="<ChipGroup label value onChange options multi>"
+                col
+                note={<>Filtro compacto en mono: exclusivo o <code>multi</code>. Cada opción admite <code>count</code> y un punto de <code>color</code>.</>}
+              >
+                <div className="grid gap-4 w-full max-w-[440px]">
+                  <ChipGroup
+                    label="Formato"
+                    value={chipG}
+                    onChange={(v) => setChipG(v as string)}
+                    options={[
+                      { value: "todos", label: "Todos", count: 224 },
+                      { value: "vgc", label: "VGC", count: 128 },
+                      { value: "singles", label: "Singles", count: 64 },
+                      { value: "draft", label: "Draft", count: 32 },
+                    ]}
+                  />
+                  <ChipGroup
+                    label="Etiquetas (multi)"
+                    multi
+                    value={chipM}
+                    onChange={(v) => setChipM(v as string[])}
+                    options={[
+                      { value: "vgc", label: "VGC", color: "hsl(18 90% 55%)" },
+                      { value: "clima", label: "Clima", color: "hsl(200 80% 55%)" },
+                      { value: "tr", label: "Trick Room", color: "hsl(265 60% 66%)" },
+                      { value: "hyper", label: "Hyper Offense", color: "hsl(0 75% 60%)" },
+                    ]}
+                  />
+                </div>
+              </Sample>
             </Section>
 
             <Section id="formularios" kicker="Primitivas" title="Formularios">
@@ -205,13 +248,43 @@ export function PrimitivasChapter() {
                   <SearchInput value={sq} onChange={setSq} size="sm" placeholder="Variante sm" />
                 </div>
               </Sample>
+              <Sample
+                title="Desplegable"
+                code="<Disclosure title icon sub badge>"
+                col
+                note={<>Contenedor plegable para ajustes avanzados y ayuda contextual; oculta el detalle hasta que se necesita. Admite <code>icon</code>, subtítulo y <code>badge</code>.</>}
+              >
+                <div className="grid gap-3 w-full max-w-[440px]">
+                  <Disclosure title="Ajustes avanzados" icon="sliders" sub="EVs, IVs y naturaleza" badge="Opcional">
+                    <div className="grid gap-3 pt-3">
+                      <Field label="Naturaleza">
+                        <Select
+                          value="adamant"
+                          onChange={() => {}}
+                          options={[
+                            { value: "adamant", label: "Firme (+Atq / −AtqEsp)" },
+                            { value: "jolly", label: "Alegre (+Vel / −AtqEsp)" },
+                            { value: "modest", label: "Modesta (+AtqEsp / −Atq)" },
+                          ]}
+                        />
+                      </Field>
+                      <Checkbox defaultChecked label="Sincronizar IVs perfectos" />
+                    </div>
+                  </Disclosure>
+                  <Disclosure title="Cómo se calcula" icon="info">
+                    <p className="pt-3 text-txt-muted text-[13px] leading-[1.6]">
+                      El rango sale de aplicar la fórmula de daño con los modificadores activos: naturaleza, objeto, campo y clima.
+                    </p>
+                  </Disclosure>
+                </div>
+              </Sample>
             </Section>
 
             <Section
               id="seleccion"
               kicker="Primitivas"
               title="Selección y rango"
-              lead={<>Checkbox para selección múltiple, Radio para elección exclusiva con descripción y Slider para rango. Marcadores del sistema: cuadro con corte y diamante.</>}
+              lead={<>Checkbox para selección múltiple, Radio para elección exclusiva con descripción y Slider para rango. Los completan <code>Toggle</code> (encendido inmediato) y <code>OptionGroup</code> (tarjetas con icono). Marcadores del sistema: cuadro con corte y diamante.</>}
             >
               <Sample title="Checkbox" code="<Checkbox checked onChange label>" col>
                 <div className="grid gap-3">
@@ -238,6 +311,37 @@ export function PrimitivasChapter() {
                 <div className="grid gap-[18px] w-full max-w-[440px]">
                   <Slider label="Volumen de la señal" value={rng} onChange={setRng} unit="%" />
                   <Progress value={rng} />
+                </div>
+              </Sample>
+              <Sample
+                title="Tarjetas de opción"
+                code="<OptionGroup options value onChange columns multi>"
+                col
+                note={<>Tarjetas con icono para elección exclusiva o <code>multi</code>; alternativa expresiva al <code>RadioGroup</code>. <code>columns</code> fija la rejilla.</>}
+              >
+                <div className="grid gap-4 w-full max-w-[520px]">
+                  <OptionGroup
+                    value={opt}
+                    onChange={(v) => setOpt(v as string)}
+                    columns={3}
+                    ariaLabel="Formato de combate"
+                    options={[
+                      { value: "singles", icon: "sword", label: "Singles", sub: "1v1" },
+                      { value: "dobles", icon: "users", label: "Dobles", sub: "VGC" },
+                      { value: "draft", icon: "list", label: "Draft", sub: "Por turnos" },
+                    ]}
+                  />
+                  <OptionGroup
+                    multi
+                    value={optM}
+                    onChange={(v) => setOptM(v as string[])}
+                    columns={2}
+                    ariaLabel="Coberturas del equipo"
+                    options={[
+                      { value: "protect", icon: "shield", label: "Protect", sub: "Prioridad +4" },
+                      { value: "fake", icon: "zap", label: "Fake Out", sub: "Amedrenta" },
+                    ]}
+                  />
                 </div>
               </Sample>
             </Section>
@@ -318,6 +422,12 @@ export function PrimitivasChapter() {
                 <div className="w-full border border-solid border-line overflow-hidden [&_footer]:!mt-0">
                   <Footer />
                 </div>
+              </Sample>
+              <Sample title="Reloj en vivo" code="<Clock>" note={<>El reloj de la barra base del pie: se actualiza cada segundo y usa cifras tabulares para no descuadrar. Suelto, sirve para cualquier marca de tiempo en directo.</>}>
+                <span className="inline-flex items-center gap-[10px] font-mono text-[13px] tracking-[0.08em] text-txt-muted">
+                  <Badge tone="live">En vivo</Badge>
+                  <Clock className="text-accent" />
+                </span>
               </Sample>
             </Section>
 
@@ -499,6 +609,42 @@ export function PrimitivasChapter() {
                 <Button size="sm" onClick={() => toast({ tone: "info", msg: "Nueva regulación disponible.", action: { label: "Ver", onClick: () => {} } })}>
                   Con acción
                 </Button>
+              </Sample>
+              <Sample
+                title="Banner de aviso"
+                code="<Banner tone title actions onClose>"
+                col
+                note={<>El aviso persistente en línea — frente al <code>Toast</code> efímero. Cuatro tonos, icono automático por tono, y ranuras opcionales de <code>actions</code> y cierre.</>}
+              >
+                <div className="grid gap-3 w-full max-w-[520px]">
+                  {bannerOpen && (
+                    <Banner tone="info" title="Regulación H activa" onClose={() => setBannerOpen(false)}>
+                      Los equipos deben cumplir la lista de la temporada actual.
+                    </Banner>
+                  )}
+                  {!bannerOpen && (
+                    <Button size="sm" variant="ghost" icon="refresh" onClick={() => setBannerOpen(true)}>
+                      Restaurar banner
+                    </Button>
+                  )}
+                  <Banner tone="success" title="Equipo validado">
+                    Los seis Pokémon cumplen la regulación.
+                  </Banner>
+                  <Banner
+                    tone="warn"
+                    title="Faltan datos"
+                    actions={
+                      <Button size="sm" variant="ghost">
+                        Completar
+                      </Button>
+                    }
+                  >
+                    Añade los EVs para calcular rangos exactos.
+                  </Banner>
+                  <Banner tone="error" title="Set no permitido">
+                    Incineroar con Intimidación está restringido en este formato.
+                  </Banner>
+                </div>
               </Sample>
             </Section>
 

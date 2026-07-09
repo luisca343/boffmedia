@@ -7,6 +7,7 @@ import { Button } from "@/components/boffmedia/primitives/button"
 import { Chip } from "@/components/boffmedia/primitives/chip"
 import { CountUp } from "@/components/boffmedia/primitives/count-up"
 import { Kicker } from "@/components/boffmedia/primitives/kicker"
+import { Ticker } from "@/components/boffmedia/primitives/ticker"
 import { GLARE } from "@/components/boffmedia/ui/landing/landing-shared"
 import { Decode, useSignalFX } from "@/components/boffmedia/ui/landing/travesia-fx"
 import { Marquee } from "@/components/boffmedia/ui/layout/Marquee"
@@ -58,6 +59,11 @@ export function MovimientoChapter() {
               <Sample title="Marquesina" code="<Marquee items speed>" col>
                 <div className="w-full">
                   <Marquee items={["BoffMedia", "Wingull 2", "SmartRotom", "Torneos"]} speed={16} />
+                </div>
+              </Sample>
+              <Sample title="Ticker" code="<Ticker items>" col note={<>La tira de titulares de la barra del shell: desplazamiento continuo con separadores en diamante de acento. Cada <code>◆</code> sale del <code>&lt;em&gt;</code> incrustado.</>}>
+                <div className="flex w-full items-center border border-solid border-line bg-panel px-4 py-[10px] font-mono text-[12px] tracking-[0.04em] text-txt-muted">
+                  <Ticker items={["Copa Relámpago · inscripción abierta", "Nueva regulación H disponible", "Sorteo: clave de Steam", "Wingull 2 este sábado"]} />
                 </div>
               </Sample>
             </Section>

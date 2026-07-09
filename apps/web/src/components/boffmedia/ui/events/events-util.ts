@@ -35,6 +35,43 @@ export interface EventLike {
 
 export const EV_BOFF = { name: "Boffmedia", avatar: "B", handle: "@boffmedia" } as const
 
+/** Rarity palette shared by achievements + the RarityTag atom (label · color · soft bg). */
+export const RARITY: Record<string, { label: string; color: string; soft: string }> = {
+  bronze: { label: "Bronce", color: "#cd7f47", soft: "rgba(205,127,71,0.14)" },
+  silver: { label: "Plata", color: "#c0c7d1", soft: "rgba(192,199,209,0.16)" },
+  gold: { label: "Oro", color: "#f4b04e", soft: "rgba(244,176,78,0.16)" },
+  platinum: { label: "Platino", color: "#5fd6c4", soft: "rgba(95,214,196,0.16)" },
+  diamond: { label: "Diamante", color: "#7cc4ff", soft: "rgba(124,196,255,0.18)" },
+}
+
+/** Per-game hue in the events' `hsl(H 62% 58%)` formula. [deferred] until games API carries hue. */
+export function evHue(hue?: number | string | null): string {
+  if (hue == null) return "var(--accent)"
+  return typeof hue === "number" ? `hsl(${hue} 62% 58%)` : hue
+}
+
+/** es-ES thousands formatting for point/participant counts. */
+export function evNum(n?: number | null): string {
+  return (n || 0).toLocaleString("es-ES")
+}
+
+/**
+ * A player row on a leaderboard. Sourced from the (future) ranking API.
+ * [deferred] — no ranking endpoint yet; the showcase feeds demo rows.
+ */
+export interface PlayerLike {
+  userId: number
+  nickname: string
+  avatar: string
+  totalPoints: number
+  medalCount: number
+  achievementCount: number
+  /** [deferred] short game code shown in the leaderboard's game column. */
+  gameShort?: string | null
+  /** [deferred] per-game hue (CSS colour or HSL hue number). */
+  hue?: number | string | null
+}
+
 /** Label · tag · icon per organizer role (used by the block variant). */
 export function evOrgMeta(role: EventOrganizerRole) {
   const map = {

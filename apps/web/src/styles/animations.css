@@ -204,3 +204,17 @@
 
 /* VGC calc drawer slide-in */
 @keyframes bm-drawer-in { from { transform: translateX(30px); opacity: 0; } }
+
+/* Schematic Compat — iso stage float + bulk-rules sheet in */
+@keyframes schfloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+@keyframes schfade { from { opacity: 0; } }
+@keyframes schslide { from { transform: translateX(30px); opacity: 0; } }
+
+/* Datakit — round stepper live pulse + toast slide-up */
+@keyframes dk-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+@keyframes dk-toastin { from { transform: translate(-50%, 10px); opacity: 0; } }
+
+@keyframes mh-shimmer {
+  from { background-position: 180% 0; }
+  to { background-position: -40% 0; }
+}

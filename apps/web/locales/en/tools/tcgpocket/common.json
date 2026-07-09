@@ -159,6 +159,11 @@
         "item": "Item",
         "energy": "Energy"
       },
+      "stage": {
+        "basic": "Basic",
+        "stage1": "Stage 1",
+        "stage2": "Stage 2"
+      },
       "sort": {
         "label": "Sort",
         "num": "Number",
