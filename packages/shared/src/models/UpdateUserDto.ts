@@ -3,5 +3,45 @@
 /* tslint:disable */
 /* eslint-disable */
 export type UpdateUserDto = {
+    /**
+     * Server UUID (automatically added by middleware)
+     */
+    server?: string;
+    /**
+     * User email address
+     */
+    email?: string;
+    /**
+     * Username for the user
+     */
+    username?: string;
+    /**
+     * User password
+     */
+    password?: string;
+    /**
+     * User UUID
+     */
+    uuid?: string;
+    /**
+     * Profile picture URL
+     */
+    profilePicture?: string;
+    /**
+     * Cover (banner) image URL
+     */
+    coverImage?: string;
+    /**
+     * Short user biography
+     */
+    bio?: string;
+    /**
+     * Google ID for OAuth
+     */
+    googleId?: string;
+    /**
+     * Discord ID for OAuth
+     */
+    discordId?: string;
 };
 

@@ -9,7 +9,6 @@ import {
   HttpStatus,
   Query,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -19,7 +18,6 @@ import {
   ApiQuery,
   ApiBody,
 } from '@nestjs/swagger';
-import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { Roles } from '@api/_utils/decorators/roles.decorator';
 import { RolesGuard } from '@api/_utils/guards/roles.guard';
@@ -59,7 +57,6 @@ import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
 
 @ApiTags('SmartRotom | Documents')
 @Controller('smartrotom/documents')
-@UseInterceptors(ResponseInterceptor)
 export class DocumentsController {
   constructor(
     private readonly documentsFacadeService: DocumentsFacadeService,

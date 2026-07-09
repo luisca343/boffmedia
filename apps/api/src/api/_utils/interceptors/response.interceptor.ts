@@ -5,10 +5,12 @@ import {
   CallHandler,
   HttpStatus,
   Logger,
+  StreamableFile,
 } from '@nestjs/common';
 import { Observable, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { Reflector } from '@nestjs/core';
+import { SKIP_ENVELOPE_METADATA_KEY } from '@/common/decorators/skip-envelope.decorator';
 
 @Injectable()
 export class ResponseInterceptor implements NestInterceptor {
@@ -17,8 +19,17 @@ export class ResponseInterceptor implements NestInterceptor {
   constructor(private reflector: Reflector) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    const skipEnvelope = this.reflector.getAllAndOverride<boolean>(
+      SKIP_ENVELOPE_METADATA_KEY,
+      [context.getHandler(), context.getClass()],
+    );
+
+    if (skipEnvelope) {
+      return next.handle();
+    }
+
     const request = context.switchToHttp().getRequest();
-    const _response = context.switchToHttp().getResponse();
+    const response = context.switchToHttp().getResponse();
     const handler = context.getHandler();
 
     // Get action name and success message from ApiOperation
@@ -29,6 +40,11 @@ export class ResponseInterceptor implements NestInterceptor {
 
     return next.handle().pipe(
       map((data) => {
+        // Pass streamed / manually-sent (@Res()) responses through untouched
+        if (data instanceof StreamableFile || response?.headersSent) {
+          return data;
+        }
+
         this.logSuccess(action, data);
         return this.createSuccessResponse(successMessage, data);
       }),

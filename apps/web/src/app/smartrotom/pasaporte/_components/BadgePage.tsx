@@ -6,6 +6,7 @@ import ActiveTeam from "./ActiveTeam"
 import { AchievementService, UserAchievement, Replay } from "@/services/api/smartrotom/achievementsService"
 import { useEffect, useState } from "react"
 import { PokemonW } from "@boffmedia/shared"
+import { env } from "@/config/env.public"
 
 interface BadgePageProps {
   achievement: UserAchievement
@@ -37,7 +38,7 @@ export function BadgePage({ achievement, team }: BadgePageProps) {
           <div className="relative">
             <div className="w-12 h-12 2xl:w-16 2xl:h-16 ml-4 mt-2 relative">
               <img
-                src={`https://api.boffmedia.es/smartrotom/img/logros/${achievement.icon}.webp`}
+                src={`${env.NEXT_PUBLIC_API}/smartrotom/img/logros/${achievement.icon}.webp`}
                 alt={achievement.name}
                 className="relative z-10 w-full h-full object-contain"
               />

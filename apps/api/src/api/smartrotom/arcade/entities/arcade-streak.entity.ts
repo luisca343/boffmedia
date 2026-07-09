@@ -1,9 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { DailyRewardItem } from './daily-rewards.entity';
 
 export class ArcadeStreak {
   @ApiProperty({
     example: '2023-11-01T10:00:00Z',
     description: 'Last time the user claimed a reward',
+    type: Date,
     nullable: true,
   })
   lastClaimed: Date | null;
@@ -23,6 +25,7 @@ export class ArcadeStreak {
   @ApiProperty({
     example: 'winter_2023',
     description: 'Last banner the user interacted with',
+    type: String,
     nullable: true,
   })
   lastBanner: string | null;
@@ -41,21 +44,9 @@ export class ArcadeStreak {
 
   @ApiProperty({
     description: 'Next reward information',
-    type: 'object',
-    additionalProperties: { type: 'object' },
-    example: {
-      day: 3,
-      type: 'CURRENCY',
-      amount: 150,
-      description: 'Day 3 reward',
-    },
+    type: DailyRewardItem,
   })
-  nextReward: {
-    day: number;
-    type: string;
-    amount: number;
-    description: string;
-  };
+  nextReward: DailyRewardItem;
 
   @ApiProperty({
     example: 'winter_2023',

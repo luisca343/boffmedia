@@ -55,7 +55,7 @@ export class VgcPokemonDto {
   @ApiProperty()
   isMythical!: boolean;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: String, nullable: true })
   requiredItem!: string | null;
 }
 
@@ -72,10 +72,10 @@ export class SpeedTierValuesDto {
   @ApiProperty()
   maxPlus!: number;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: Number, nullable: true })
   scarf!: number | null;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: Number, nullable: true })
   scarfPlus!: number | null;
 }
 
@@ -101,7 +101,7 @@ export class SpeedTierEntryDto {
   @ApiProperty()
   isMythical!: boolean;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: String, nullable: true })
   requiredItem!: string | null;
 
   @ApiProperty({ type: SpeedTierValuesDto })

@@ -14,11 +14,11 @@ export type SmartRotomApp = {
     /**
      * URL or path to the app
      */
-    url: string;
+    url: string | null;
     /**
      * Whether the app is active
      */
-    active: SmartRotomApp.active;
+    active: SmartRotomApp.active | null;
 };
 export namespace SmartRotomApp {
     /**

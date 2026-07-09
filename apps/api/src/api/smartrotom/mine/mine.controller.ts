@@ -5,7 +5,6 @@ import {
   Param,
   Post,
   HttpStatus,
-  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -17,7 +16,6 @@ import {
   getSchemaPath,
   ApiExtraModels,
 } from '@nestjs/swagger';
-import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { MineFacadeService } from './mine.facade.service';
 import { PlayGameDto } from './dto/play-game.dto';
 import { ClaimRewardsDto } from './dto/claim-rewards.dto';
@@ -36,7 +34,6 @@ import { PlayerStatistics } from './entities/player-statistics.entity';
 
 @ApiTags('SmartRotom | Mine')
 @Controller('smartrotom/mine')
-@UseInterceptors(ResponseInterceptor)
 export class MineController {
   constructor(private readonly mineFacadeService: MineFacadeService) {}
 

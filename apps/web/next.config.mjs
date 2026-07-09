@@ -15,6 +15,17 @@ const nextConfig = {
     typescript: {
         ignoreBuildErrors: true,
     },
+
+    // Uploaded files (profile/cover images, blog assets) are stored relative
+    // (/uploads/...) but live on the API server, not this app.
+    async rewrites() {
+        return [
+            {
+                source: '/uploads/:path*',
+                destination: `${process.env.NEXT_PUBLIC_API}/uploads/:path*`,
+            },
+        ];
+    },
     
     // Production optimizations
     compress: true,
@@ -56,6 +67,11 @@ const nextConfig = {
             {
                 protocol: 'https',
                 hostname: 'www.serebii.net',
+                port: ''
+            },
+            {
+                protocol: 'https',
+                hostname: 'example.com',
                 port: ''
             }
         ]

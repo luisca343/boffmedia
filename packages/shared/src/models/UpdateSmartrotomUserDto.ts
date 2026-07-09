@@ -3,5 +3,21 @@
 /* tslint:disable */
 /* eslint-disable */
 export type UpdateSmartrotomUserDto = {
+    /**
+     * Server UUID (automatically added by middleware)
+     */
+    server?: string;
+    /**
+     * UUID of the user
+     */
+    uuid?: string;
+    /**
+     * Username of the user
+     */
+    username?: string;
+    /**
+     * World of the user
+     */
+    world?: string;
 };
 

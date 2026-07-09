@@ -6,7 +6,6 @@ import {
   Query,
   Param,
   HttpStatus,
-  UseInterceptors,
   ValidationPipe,
   UsePipes,
 } from '@nestjs/common';
@@ -21,7 +20,6 @@ import {
   ApiNotFoundResponse,
   ApiInternalServerErrorResponse,
 } from '@nestjs/swagger';
-import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { MisionesFacadeService } from './misiones.facade.service';
 
 // Import DTOs
@@ -47,7 +45,6 @@ import { NPC } from './entities/npc.entity';
 
 @ApiTags('SmartRotom | Misiones')
 @Controller('smartrotom/misiones')
-@UseInterceptors(ResponseInterceptor)
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
 export class MisionesController {
   constructor(private readonly misionesFacadeService: MisionesFacadeService) {}

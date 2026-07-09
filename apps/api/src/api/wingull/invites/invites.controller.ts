@@ -6,7 +6,6 @@ import {
   Param,
   Delete,
   HttpStatus,
-  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -15,14 +14,12 @@ import {
   ApiParam,
   ApiBody,
 } from '@nestjs/swagger';
-import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { InvitesFacadeService } from './invites.facade.service';
 import { RegistrationData } from './services/registration.service';
 import { CreateInviteBodyDto } from './dto/create-invite-body.dto';
 
 @ApiTags('Wingull | Invites')
 @Controller('wingull/invites')
-@UseInterceptors(ResponseInterceptor)
 export class InvitesController {
   constructor(private readonly invitesFacadeService: InvitesFacadeService) {}
 

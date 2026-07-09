@@ -1,6 +1,5 @@
-import { Controller, Post, Body, UseInterceptors } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { AchievementFacadeService } from './achievement.facade.service';
 
 // DTOs
@@ -28,7 +27,6 @@ import { Replay } from './entities/replay.entity';
 
 @ApiTags('SmartRotom | Achievements')
 @Controller('smartrotom/achievement')
-@UseInterceptors(ResponseInterceptor)
 export class AchievementController {
   constructor(
     private readonly achievementFacadeService: AchievementFacadeService,

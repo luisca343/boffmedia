@@ -3,5 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export type UrlBodyDto = {
+    url: string;
 };
 

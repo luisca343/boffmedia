@@ -54,6 +54,8 @@ export class EvolutionNode {
   @ApiProperty({
     description: 'Form index',
     example: 1,
+    type: Number,
+    nullable: true,
     required: false,
   })
   index?: number | null;

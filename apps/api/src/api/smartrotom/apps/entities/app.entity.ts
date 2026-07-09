@@ -17,6 +17,7 @@ export class SmartRotomApp {
   @ApiProperty({
     example: 'mina',
     description: 'URL or path to the app',
+    type: String,
     nullable: true,
   })
   url: string | null;

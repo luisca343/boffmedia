@@ -36,6 +36,7 @@ export class PlayerStatistics {
   @ApiProperty({
     description: 'Date of last game played',
     example: '2025-06-28T10:00:00Z',
+    type: Date,
     nullable: true,
   })
   lastPlayed: Date | null;

@@ -168,4 +168,3 @@ export const getTimeSince = (dateString: string): string => {
 
 // Twitch API configuration (would ideally be in environment variables)
 export const TWITCH_CLIENT_ID = env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
-export const TWITCH_CLIENT_SECRET = env.NEXT_PUBLIC_TWITCH_CLIENT_SECRET;

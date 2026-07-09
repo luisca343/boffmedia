@@ -3,5 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 export type GoogleCallbackDto = {
+    email?: string;
+    name?: string;
+    picture?: string;
 };
 

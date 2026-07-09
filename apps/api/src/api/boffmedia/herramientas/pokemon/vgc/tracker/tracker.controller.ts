@@ -8,10 +8,8 @@ import {
   Put,
   Req,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { TrackerService } from './tracker.service';
 import {
@@ -30,7 +28,6 @@ import {
 
 @ApiTags('BoffMedia 🛠 | Pokémon VGC Tracker')
 @Controller('tools/vgc/tracker')
-@UseInterceptors(ResponseInterceptor)
 @UseGuards(JwtAuthGuard)
 export class TrackerController {
   constructor(private readonly service: TrackerService) {}

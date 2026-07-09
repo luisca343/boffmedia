@@ -6,7 +6,6 @@ import {
   Post,
   Body,
   Query,
-  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -17,7 +16,6 @@ import {
   ApiQuery,
   ApiExtraModels,
 } from '@nestjs/swagger';
-import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { ArcadeFacadeService } from './arcade.facade.service';
 
 // Import the correct DTOs
@@ -43,7 +41,6 @@ import { DailyRewardsConfig } from './entities/daily-rewards.entity';
 
 @ApiTags('SmartRotom | Arcade')
 @Controller('smartrotom/arcade')
-@UseInterceptors(ResponseInterceptor)
 export class ArcadeController {
   constructor(private readonly arcadeFacadeService: ArcadeFacadeService) {}
 

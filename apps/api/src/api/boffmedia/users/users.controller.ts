@@ -10,7 +10,6 @@ import {
   ParseIntPipe,
   HttpStatus,
   HttpException,
-  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -29,7 +28,6 @@ import {
 } from './dto/minecraft-registration.dto';
 import { GoogleAuthDto } from './dto/google-auth.dto';
 import { UserLoginDto } from './dto/user-login.dto';
-import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
 
 // Import entities
@@ -48,7 +46,6 @@ import { Logger } from 'nestjs-pino';
 
 @ApiTags('BoffMedia | Users')
 @Controller('users')
-@UseInterceptors(ResponseInterceptor)
 export class BoffMediaUsersController {
   constructor(
     private readonly logger: Logger,

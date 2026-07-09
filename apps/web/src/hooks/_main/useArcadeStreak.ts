@@ -74,7 +74,7 @@ export function useArcadeStreak(): UseArcadeStreakReturn {
         setStreakData({
           streak: response.streak,
           claimed: response.claimedToday || false,
-          rewardAmount: (response.nextReward as any)?.amount || 50,
+          rewardAmount: response.nextReward?.amount || 50,
           nextReward: response.nextReward,
           currentDay: response.currentDay || 1,
           totalDays: response.totalDays || 7,
@@ -142,7 +142,7 @@ export function useArcadeStreak(): UseArcadeStreakReturn {
         setStreakData({
           streak: streak.streak,
           claimed: true,
-          rewardAmount: (streak.nextReward as any)?.amount || 50,
+          rewardAmount: streak.nextReward?.amount || 50,
           nextReward: streak.nextReward,
           currentDay: streak.currentDay || 1,
           totalDays: streak.totalDays || 7,
