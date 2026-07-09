@@ -74,7 +74,7 @@ const nextConfig = {
                 hostname: 'example.com',
                 port: ''
             }
-        ]cdn.boffmedia.com
+        ]
     },
     webpack: (config, { isServer, dev }) => {
         if (!isServer && !dev) {
