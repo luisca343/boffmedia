@@ -119,6 +119,13 @@ export class UsersService {
     return apiPATCH<BoffMediaUserEntity>(`/users/${id}`, data);
   }
 
+  /**
+   * Unlink an OAuth provider (google/discord/twitch) from a user.
+   */
+  static unlinkProvider(id: number, provider: 'google' | 'discord' | 'twitch') {
+    return apiDELETE<BoffMediaUserEntity>(`/users/${id}/link/${provider}`);
+  }
+
   // ==================== USER DELETION ====================
 
   /**

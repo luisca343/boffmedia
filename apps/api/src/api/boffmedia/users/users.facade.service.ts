@@ -303,6 +303,21 @@ export class BoffMediaUsersFacadeService {
     }
   }
 
+  async unlinkProvider(
+    id: number,
+    provider: 'google' | 'discord' | 'twitch',
+  ): Promise<BoffMediaUserSafe> {
+    try {
+      return await this.usersManagementService.unlinkProvider(id, provider);
+    } catch (error: any) {
+      this.logger.error(
+        `Failed to unlink ${provider} for BoffMedia user ${id}:`,
+        error,
+      );
+      throw new Error(`Provider unlink failed: ${error.message}`);
+    }
+  }
+
   // ==================== USER DELETION ====================
 
   async deleteUser(id: number): Promise<{ success: boolean; message: string }> {

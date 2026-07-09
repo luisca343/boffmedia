@@ -19,6 +19,7 @@ import { ParticipantsService } from './services/participants.service';
 import { TeamsService } from './services/teams.service';
 import { ProgressService } from './services/progress.service';
 import { LeaderboardsService } from './services/leaderboards.service';
+import { ProfileService } from './services/profile.service';
 
 // Import facade service
 import { EventsFacadeService } from './events.facade.service';
@@ -40,6 +41,7 @@ import { EventsFacadeService } from './events.facade.service';
     TeamsService,
     ProgressService,
     LeaderboardsService,
+    ProfileService,
 
     // Facade service
     EventsFacadeService,
@@ -57,6 +59,7 @@ import { EventsFacadeService } from './events.facade.service';
     TeamsService,
     ProgressService,
     LeaderboardsService,
+    ProfileService,
   ],
   imports: [ResponseModule, LoggerModule, DrizzleModule],
 })

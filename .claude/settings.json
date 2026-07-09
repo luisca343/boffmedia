@@ -6,5 +6,37 @@
       "Bash(pnpm --filter web type-check)",
       "Bash(pnpm --filter web type-check *)"
     ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "printf '%s' '{\"hookSpecificOutput\":{\"hookEventName\":\"SessionStart\",\"additionalContext\":\"EXPLORATION & MEMORY POLICY (enforced): (1) Use horus for ALL code navigation (horus explore/search/callers/callees/impact) BEFORE any grep/find/glob. Targeted grep is a fallback ONLY after horus, never broad exploration. (2) Run mimir context at session start to recall prior decisions; use mimir save proactively for decisions, bugfixes, and patterns.\"}}'"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat); if printf '%s' \"$payload\" | grep -qE '\\b(grep|rg|find|fd)\\b'; then printf '%s' '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"additionalContext\":\"REMINDER: use horus (explore/search/callers/callees/impact) before grep/find/rg. Targeted grep is allowed only as a post-horus fallback, not for broad exploration.\"}}'; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "Grep|Glob",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "printf '%s' '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"additionalContext\":\"REMINDER: prefer horus (explore/search/callers/callees/impact) over the Grep/Glob tools for code navigation; use them only as a fallback after horus.\"}}'"
+          }
+        ]
+      }
+    ]
   }
 }

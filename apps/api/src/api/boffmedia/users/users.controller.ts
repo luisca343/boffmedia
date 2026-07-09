@@ -392,6 +392,31 @@ export class BoffMediaUsersController {
     }
   }
 
+  @Delete(':id/link/:provider')
+  @ApiOperation({ summary: 'Unlink an OAuth provider from a user' })
+  @ApiParam({ name: 'id', type: 'number', description: 'User ID' })
+  @ApiParam({
+    name: 'provider',
+    enum: ['google', 'discord', 'twitch'],
+    description: 'Provider to unlink',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Provider unlinked successfully',
+    type: BoffMediaUserEntity,
+  })
+  @ApiResponse({ status: 400, description: 'Invalid provider' })
+  async unlinkProvider(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('provider') provider: 'google' | 'discord' | 'twitch',
+  ) {
+    try {
+      return await this.usersFacadeService.unlinkProvider(id, provider);
+    } catch (error: any) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
   // ==================== USER DELETION ====================
 
   @Delete(':id')

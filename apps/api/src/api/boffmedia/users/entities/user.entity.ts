@@ -34,6 +34,20 @@ export class BoffMediaUserEntity {
   profilePicture: string | null;
 
   @ApiProperty({
+    example: 'https://example.com/cover.jpg',
+    description: 'Cover (banner) image URL',
+    nullable: true,
+  })
+  coverImage: string | null;
+
+  @ApiProperty({
+    example: 'VGC player and Minecraft builder.',
+    description: 'Short user biography',
+    nullable: true,
+  })
+  bio: string | null;
+
+  @ApiProperty({
     example: 'google_123456789',
     description: 'Google ID for OAuth',
     nullable: true,

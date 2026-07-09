@@ -2,6 +2,7 @@ import {
   char,
   int,
   mysqlTable,
+  text,
   timestamp,
   varchar,
 } from 'drizzle-orm/mysql-core';
@@ -19,6 +20,8 @@ export const boffMediaUsers = mysqlTable('boffmedia_users', {
   profilePicture: varchar('profilePicture', { length: 255 })
     .notNull()
     .default('https://cdn.boffmedia.com/default-profile.png'),
+  coverImage: varchar('coverImage', { length: 255 }),
+  bio: text('bio'),
   googleId: varchar('googleId', { length: 255 }).unique(),
   discordId: varchar('discordId', { length: 255 }).unique(),
   twitchId: varchar('twitchId', { length: 255 }).unique(),

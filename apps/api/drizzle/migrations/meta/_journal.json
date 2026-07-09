@@ -43,6 +43,13 @@
       "when": 1779289705958,
       "tag": "0005_dazzling_scourge",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1783605468184,
+      "tag": "0006_chilly_sumo",
+      "breakpoints": true
     }
   ]
 }
