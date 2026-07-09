@@ -7,7 +7,6 @@ import {
   Param,
   Delete,
   HttpStatus,
-  UseInterceptors,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AppsFacadeService } from './apps.facade.service';
@@ -16,14 +15,12 @@ import { CreateAppDto } from './dto/create-app.dto';
 import { OrderAppDto } from './dto/order-apps.dto';
 import { PlayerAppDto } from './dto/player-app.dto';
 import { GetPlayerAppsDto } from './dto/get-player-apps.dto';
-import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { SmartRotomApp } from './entities/app.entity';
 import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
 import { Logger } from 'nestjs-pino';
 
 @ApiTags('SmartRotom | Apps')
 @Controller('/smartrotom/apps')
-@UseInterceptors(ResponseInterceptor)
 export class AppsController {
   constructor(
     private readonly logger: Logger,

@@ -3,5 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 export type ArceusspeakDto = {
+    name: string;
+    value: string;
+    format: string;
 };
 

@@ -6,21 +6,18 @@ import {
   Body,
   Query,
   HttpStatus,
-  UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { FicusAIFacadeService } from './ficusai.facade.service';
 import { SendMessageDto } from './dto/send-message.dto';
 import { GetMessagesDto } from './dto/get-messages.dto';
 import { FicusMessageContentDto } from './dto/ficus-message-content.dto';
-import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
 import { FicusAiUserStatsEntity } from './entities/ficusai-user-stats.entity';
 import { FicusAiHealthEntity } from './entities/ficusai-health.entity';
 
 @ApiTags('FicusAI - Chat Assistant')
 @Controller('smartrotom/ficusai')
-@UseInterceptors(ResponseInterceptor)
 export class FicusAIController {
   constructor(private readonly ficusAIFacadeService: FicusAIFacadeService) {}
 

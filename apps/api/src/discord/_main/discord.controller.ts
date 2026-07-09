@@ -1,6 +1,8 @@
 import { Controller } from '@nestjs/common';
+import { SkipEnvelope } from '@/common/decorators/skip-envelope.decorator';
 
 @Controller('discord')
+@SkipEnvelope()
 export class DiscordController {
   /*
     constructor(

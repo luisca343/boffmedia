@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { env } from '@/config/env.public';
+import { VgcService } from '@/services/api/boffmedia/vgcService';
 import type { SpeciesEntry } from '../types';
 
 // Module-level cache keyed by regulationId — fetched once per key per page load.
@@ -12,14 +12,9 @@ async function loadSpecies(regulationId: string): Promise<SpeciesEntry[]> {
   if (!regulationId) return [];
   if (_cache[regulationId]) return _cache[regulationId];
   if (!_fetchPromise[regulationId]) {
-    const apiBase = env.NEXT_PUBLIC_API;
-    _fetchPromise[regulationId] = fetch(
-      `${apiBase}/tools/vgc/champions/${regulationId}/pokemon`,
-      { next: { revalidate: 0 } },
-    )
-      .then((r) => r.json())
+    _fetchPromise[regulationId] = VgcService.getChampionsLegalPokemon(regulationId)
       .then((res) => {
-        const data: Array<{ name: string; num: number }> = res?.data ?? [];
+        const data = res?.data ?? [];
         _cache[regulationId] = data.map((p) => ({
           id: p.name.toLowerCase().replace(/[^a-z0-9]/g, ''),
           name: p.name,

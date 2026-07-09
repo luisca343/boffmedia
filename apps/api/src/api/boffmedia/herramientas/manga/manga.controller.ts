@@ -6,7 +6,6 @@ import {
   Post,
   Query,
   Res,
-  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -16,7 +15,6 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Response } from 'express';
-import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { MangaFacadeService } from './manga.facade.service';
 import { MangaSearchResult } from './entities/manga-result.entity';
 import {
@@ -27,7 +25,6 @@ import { DownloadChaptersDto } from './dto/download-chapters.dto';
 
 @ApiTags('BoffMedia | Manga')
 @Controller('boffmedia/herramientas/manga')
-@UseInterceptors(ResponseInterceptor)
 export class MangaController {
   constructor(private readonly facade: MangaFacadeService) {}
 

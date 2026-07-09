@@ -9,7 +9,6 @@ import {
   Query,
   HttpCode,
   HttpStatus,
-  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -18,7 +17,6 @@ import {
   ApiParam,
   ApiQuery,
 } from '@nestjs/swagger';
-import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { NotificationsService } from './notifications.service';
 import {
   GetInboxQueryDto,
@@ -30,7 +28,6 @@ import {
 
 @ApiTags('SmartRotom | Notifications')
 @Controller('smartrotom/notifications')
-@UseInterceptors(ResponseInterceptor)
 export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 

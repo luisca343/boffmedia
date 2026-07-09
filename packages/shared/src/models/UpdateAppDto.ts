@@ -3,5 +3,30 @@
 /* tslint:disable */
 /* eslint-disable */
 export type UpdateAppDto = {
+    /**
+     * Server UUID (automatically added by middleware)
+     */
+    server?: string;
+    /**
+     * The name of the app
+     */
+    name?: string;
+    /**
+     * The URL of the app
+     */
+    url?: string;
+    /**
+     * The active status of the app
+     */
+    active?: UpdateAppDto.active;
 };
+export namespace UpdateAppDto {
+    /**
+     * The active status of the app
+     */
+    export enum active {
+        '_0' = 0,
+        '_1' = 1,
+    }
+}
 

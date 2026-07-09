@@ -18,11 +18,11 @@ export type PokedexRegistry = {
     /**
      * Date when first seen
      */
-    seenAt?: string;
+    seenAt?: string | null;
     /**
      * Date when caught
      */
-    caughtAt?: string;
+    caughtAt?: string | null;
     /**
      * Pokémon name
      */

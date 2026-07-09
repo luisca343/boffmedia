@@ -19,7 +19,6 @@ import {
   ApiBody,
   ApiConsumes,
 } from '@nestjs/swagger';
-import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { StarbankFacadeService } from './starbank.facade.service';
 
 // Import DTOs
@@ -39,7 +38,6 @@ import { env } from '@/config/env';
 
 @ApiTags('SmartRotom | Starbank')
 @Controller('smartrotom/starbank')
-@UseInterceptors(ResponseInterceptor)
 export class StarbankController {
   constructor(
     private readonly logger: Logger,

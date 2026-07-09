@@ -32,7 +32,7 @@ function AppIcon({ app, size, withLink = true }: AppIconProps) {
     </>
   )
 
-  return withLink ? (
+  return withLink && app.url ? (
     <InternalLink href={app.url} className="flex flex-col items-center">
       {icon}
     </InternalLink>

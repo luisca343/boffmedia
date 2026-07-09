@@ -11,6 +11,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { apiReference } from '@scalar/nestjs-api-reference';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
+import { ApiResponseEntity } from './common/entities/api-response.entity';
 import { Logger } from 'nestjs-pino';
 
 async function bootstrap() {
@@ -44,7 +45,7 @@ async function bootstrap() {
 
   app.use('/', express.static(join(__dirname, '..', 'public')));
 
-  console.log('EL PUERTO ES: ' + configService.get('PORT'));
+  const port = configService.get<number>('PORT') ?? 34301;
 
   if (env.NODE_ENV !== 'production') {
     const config = new DocumentBuilder()
@@ -72,15 +73,11 @@ async function bootstrap() {
       operationIdFactory: (controllerKey: string, methodKey: string) => {
         return `${controllerKey.replace('Controller', '')}${methodKey.charAt(0).toUpperCase() + methodKey.slice(1)}`;
       },
+      extraModels: [ApiResponseEntity],
     });
 
-    // YOUR ORIGINAL TAG SORTING LOGIC - KEPT EXACTLY AS IT WAS
     if (document.tags && document.tags.length > 0) {
       document.tags.sort((a, b) => a.name.localeCompare(b.name));
-      console.log(
-        'Tags sorted alphabetically:',
-        document.tags.map((tag) => tag.name),
-      );
     } else {
       // Extract tags from paths if they're not in the document.tags array
       const tagsSet = new Set<string>();
@@ -97,18 +94,8 @@ async function bootstrap() {
       document.tags = Array.from(tagsSet)
         .sort((a, b) => a.localeCompare(b))
         .map((tag) => ({ name: tag }));
-
-      console.log(
-        'Tags extracted and sorted:',
-        document.tags.map((tag) => tag.name),
-      );
     }
 
-    console.log('Final document structure check:');
-    console.log('Tags count:', document.tags?.length || 0);
-    console.log('Paths count:', Object.keys(document.paths).length);
-
-    // Set up the standard Swagger endpoints
     SwaggerModule.setup('api', app, document, {
       swaggerOptions: {
         persistAuthorization: true,
@@ -131,16 +118,10 @@ async function bootstrap() {
         },
       }),
     );
-
-    // Log useful URLs for development
-    console.log('\n🚀 API Documentation URLs:');
-    console.log(`📖 Swagger UI: http://localhost:34301/api`);
-    console.log(`📋 Scalar Reference: http://localhost:34301/reference`);
-    console.log(`🔗 OpenAPI JSON: http://localhost:34301/api-json\n`);
   }
 
-  await app.listen(34301);
-  console.log('Server open');
+  await app.listen(port);
+  console.log(`Server listening on port ${port}`);
 }
 
 bootstrap();

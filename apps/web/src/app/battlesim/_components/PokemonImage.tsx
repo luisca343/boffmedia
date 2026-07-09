@@ -1,6 +1,7 @@
 import { Pokemon } from "@pkmn/client";
 import { Sprites } from "@pkmn/img";
 import { getTargetWidth, getScaleMultiplier } from "../_utils/viewUtils";
+import { env } from "@/config/env.public";
 
 
 type PokemonImageProps = {
@@ -41,7 +42,8 @@ export function PokemonImage(
 
 
     if (url === "https://play.pokemonshowdown.com/sprites/gen5/0.png") {
-        url = `http://boffmedia.es/smartrotom/img/sprites/Front/${pokemon?.speciesForme?.toUpperCase()}.png`;
+        // Same /smartrotom/img/ path pattern the API host serves elsewhere (see BadgePage, Badges.tsx).
+        url = `${env.NEXT_PUBLIC_API}/smartrotom/img/sprites/Front/${pokemon?.speciesForme?.toUpperCase()}.png`;
         pixelated = true;
     }
     return (

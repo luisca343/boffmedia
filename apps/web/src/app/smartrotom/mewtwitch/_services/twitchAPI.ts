@@ -1,12 +1,11 @@
-import { 
-  TwitchStream, 
-  TwitchUser, 
+import {
+  TwitchStream,
+  TwitchUser,
   TwitchSearchChannel,
-  TwitchGame, 
-  TwitchVideo, 
-  TwitchClip, 
-  TWITCH_CLIENT_ID, 
-  TWITCH_CLIENT_SECRET 
+  TwitchGame,
+  TwitchVideo,
+  TwitchClip,
+  TWITCH_CLIENT_ID
 } from "../types";
 
 interface TwitchAPIResponse<T> {
@@ -34,17 +33,8 @@ class TwitchAPIService {
     }
 
     try {
-      const response = await fetch('https://id.twitch.tv/oauth2/token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          client_id: TWITCH_CLIENT_ID,
-          client_secret: TWITCH_CLIENT_SECRET,
-          grant_type: 'client_credentials',
-        }),
-      });
+      // Token exchange happens server-side (client_secret never reaches the browser).
+      const response = await fetch('/api/twitch/token', { method: 'POST' });
 
       if (!response.ok) {
         throw new Error(`Failed to get access token: ${response.statusText}`);

@@ -7,7 +7,6 @@ import {
   Put,
   Delete,
   HttpStatus,
-  UseInterceptors,
   Query,
 } from '@nestjs/common';
 import {
@@ -18,7 +17,6 @@ import {
   ApiQuery,
   ApiBody,
 } from '@nestjs/swagger';
-import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import {
   ChatappFacadeService,
   CreateChatMessageRequest,
@@ -47,7 +45,6 @@ import { CallSession, CallResponse } from './entities/call.entity';
 
 @ApiTags('SmartRotom | ChatApp')
 @Controller('smartrotom/chatapp')
-@UseInterceptors(ResponseInterceptor)
 export class ChatappController {
   constructor(private readonly chatappFacadeService: ChatappFacadeService) {}
 

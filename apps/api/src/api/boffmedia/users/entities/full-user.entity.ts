@@ -23,6 +23,7 @@ export class SmartRotomUserEntity {
   @ApiProperty({
     example: 'overworld',
     description: 'Current Minecraft world',
+    type: String,
     nullable: true,
   })
   world: string | null;
@@ -30,6 +31,7 @@ export class SmartRotomUserEntity {
   @ApiProperty({
     example: 10,
     description: 'User energy level',
+    type: Number,
     nullable: true,
   })
   energy: number | null;
@@ -37,6 +39,7 @@ export class SmartRotomUserEntity {
   @ApiProperty({
     example: '2024-01-01T00:00:00.000Z',
     description: 'Last energy charge timestamp',
+    type: Date,
     nullable: true,
   })
   lastCharge: Date | null;

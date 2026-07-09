@@ -1,9 +1,11 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { TwitchApiService } from './services/twitch-api.service';
+import { SkipEnvelope } from '@/common/decorators/skip-envelope.decorator';
 
 @ApiTags('Automation - Twitch Debug')
 @Controller('automation/twitch/debug')
+@SkipEnvelope()
 export class TwitchDebugController {
   constructor(private readonly twitchApiService: TwitchApiService) {}
 

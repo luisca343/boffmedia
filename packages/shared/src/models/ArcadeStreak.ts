@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { DailyRewardItem } from './DailyRewardItem';
 export type ArcadeStreak = {
     /**
      * Last time the user claimed a reward
@@ -30,7 +31,7 @@ export type ArcadeStreak = {
     /**
      * Next reward information
      */
-    nextReward: Record<string, Record<string, any>>;
+    nextReward: DailyRewardItem;
     /**
      * Current active banner
      */

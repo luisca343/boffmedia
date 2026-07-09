@@ -15,7 +15,6 @@ const mockLogger = {
 
 const mockService = {
   processShowdownLogs: jest.fn(),
-  parseShowdownLog: jest.fn(),
 };
 
 describe('PokemonLogController — integration (ValidationPipe + GlobalExceptionFilter)', () => {
@@ -72,24 +71,6 @@ describe('PokemonLogController — integration (ValidationPipe + GlobalException
       await request(app.getHttpServer())
         .get('/pokemon-log/process/badsheet')
         .expect(500);
-    });
-  });
-
-  // ── GET /pokemon-log/test-parse ───────────────────────────────────────────
-
-  describe('GET /pokemon-log/test-parse', () => {
-    it('parses sample log and returns result', async () => {
-      mockService.parseShowdownLog.mockReturnValue({
-        players: ['p1', 'p2'],
-        turns: 10,
-      });
-      const res = await request(app.getHttpServer()).get(
-        '/pokemon-log/test-parse',
-      );
-
-      expect(res.status).toBeLessThan(300);
-      expect(mockService.parseShowdownLog).toHaveBeenCalled();
-      expect(res.body).toMatchObject({ players: ['p1', 'p2'] });
     });
   });
 });

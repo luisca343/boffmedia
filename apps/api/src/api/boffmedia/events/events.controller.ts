@@ -10,7 +10,6 @@ import {
   Query,
   ParseIntPipe,
   HttpStatus,
-  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -27,7 +26,6 @@ import { CreateTeamDto } from './dto/create-team.dto';
 import { JoinEventDto } from './dto/join-event.dto';
 import { UpdateProgressDto } from './dto/update-progress.dto'; // Import from DTO folder
 import { JoinTeamDto } from './dto/join-team.dto'; // Import from DTO folder
-import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
 import { Event } from './entities/event.entity';
@@ -43,10 +41,13 @@ import {
   TeamLeaderboardEntry,
 } from './entities/leaderboard.entity';
 import { UpdateTeamDto } from './dto/update-team.dto';
+import {
+  UserTrophiesEntity,
+  UserActivityItemEntity,
+} from './entities/profile.entity';
 
 @ApiTags('BoffMedia | Events')
 @Controller('events')
-@UseInterceptors(ResponseInterceptor)
 export class EventsController {
   constructor(private readonly eventsFacadeService: EventsFacadeService) {}
 
@@ -460,6 +461,7 @@ export class EventsController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Trophy case retrieved successfully.',
+    type: UserTrophiesEntity,
   })
   async getUserTrophies(@Param('userId', ParseIntPipe) userId: number) {
     return await this.eventsFacadeService.getUserTrophies(userId);
@@ -472,6 +474,7 @@ export class EventsController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Activity timeline retrieved successfully.',
+    type: [UserActivityItemEntity],
   })
   async getUserActivity(
     @Param('userId', ParseIntPipe) userId: number,

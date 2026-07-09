@@ -9,7 +9,6 @@ import {
   Post,
   Query,
   Res,
-  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -19,7 +18,6 @@ import {
   ApiBody,
 } from '@nestjs/swagger';
 import { Response } from 'express';
-import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { ScrapeFacadeService } from './scrape.facade.service';
 import { EuropeAggregateResult } from './entities/europe-aggregate.entity';
 import {
@@ -42,7 +40,6 @@ import { UpdateSeriesStatusDto } from './dto/update-series-status.dto';
 
 @ApiTags('BoffMedia | Scrape')
 @Controller('boffmedia/herramientas/scrape')
-@UseInterceptors(ResponseInterceptor)
 export class ScrapeController {
   constructor(private readonly scrapeFacadeService: ScrapeFacadeService) {}
 
