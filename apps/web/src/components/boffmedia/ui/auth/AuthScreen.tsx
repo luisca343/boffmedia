@@ -5,7 +5,7 @@ import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useTranslations } from "next-intl"
 import { signIn } from "next-auth/react"
-import { AuthProviderBtn, Divider, Icon, toast } from "@/components/boffmedia/primitives"
+import { AuthProviderBtn, Divider, Icon, Kicker, toast } from "@/components/boffmedia/primitives"
 import { CredentialsForm } from "./CredentialsForm"
 
 const GRID_BG: React.CSSProperties = {
@@ -57,10 +57,13 @@ export function AuthScreen() {
           href="/"
           className="flex items-center gap-2.5 font-display text-[20px]/none font-extrabold italic uppercase text-txt no-underline"
         >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/img/boff-logo.webp" alt="" className="h-[26px] w-[26px] flex-none object-contain" />
           BOFF<b className="text-accent">MEDIA</b>
         </Link>
 
         <div className="flex flex-col gap-1.5">
+          <Kicker>{isRegister ? t("register.kicker") : t("login.kicker")}</Kicker>
           <h1 className="text-[30px]/[1.02] tracking-[0.01em] max-[480px]:text-[25px]">
             {isRegister ? t("register.title") : t("login.title")}
           </h1>

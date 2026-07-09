@@ -3,6 +3,8 @@
 import { Sample, Section } from "../showcase-shared"
 import { Badge } from "@/components/boffmedia/primitives/badge"
 import { Button } from "@/components/boffmedia/primitives/button"
+import { CodeBlock } from "@/components/boffmedia/primitives/code-block"
+import { DataList } from "@/components/boffmedia/primitives/data-list"
 import { Empty } from "@/components/boffmedia/primitives/empty"
 import { Panel } from "@/components/boffmedia/primitives/panel"
 import { Ph } from "@/components/boffmedia/primitives/ph"
@@ -69,6 +71,30 @@ export function PatronesChapter() {
                 <div className="grid gap-[14px]">
                   <Progress value={62} />
                   <Progress value={28} />
+                </div>
+              </Sample>
+              <Sample title="Lista de datos" code="<DataList rows>" col note={<>Pares etiqueta/valor para fichas y detalles; el valor va a la derecha, con opción <code>mono</code>, <code>icon</code> y filas <code>wide</code> a línea completa.</>}>
+                <div className="w-full max-w-[440px]">
+                  <DataList
+                    rows={[
+                      { label: "Formato", value: "Dobles VGC", icon: "gamepad" },
+                      { label: "Regulación", value: "H" },
+                      { label: "Plazas", value: "96 / 128", mono: true },
+                      { label: "Objeto", value: "Sitrus Berry", icon: "star", mono: true },
+                      { label: "Notas", value: "Lead de Incineroar + Flutter Mane para presionar Trick Room.", wide: true },
+                    ]}
+                  />
+                </div>
+              </Sample>
+              <Sample title="Bloque de código" code="<CodeBlock lines label copyText scan>" col note={<>Bloque monoespaciado con cabecera y botón de copiar; <code>scan</code> añade el barrido de sintonización y <code>tone=&quot;accent&quot;</code> tiñe el texto.</>}>
+                <div className="w-full max-w-[440px]">
+                  <CodeBlock
+                    label="Código · US / JP"
+                    tone="accent"
+                    scan
+                    copyText="9F3K-2XQW-7T"
+                    lines={["9F3K-2XQW-7T"]}
+                  />
                 </div>
               </Sample>
             </Section>

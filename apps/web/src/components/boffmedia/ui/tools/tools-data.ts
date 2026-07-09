@@ -21,6 +21,10 @@ export interface ToolCardData {
   featured?: boolean
   heroImage?: string
   iconSrc?: string
+  /** Category / game label shown in the «señal» skin head. */
+  cat?: string
+  /** Not wired yet — renders muted with a «Pronto» badge. */
+  soon?: boolean
 }
 
 export interface HubGame {

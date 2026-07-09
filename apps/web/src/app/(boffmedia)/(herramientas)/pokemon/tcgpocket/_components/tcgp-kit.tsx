@@ -1,11 +1,12 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon, type IconName } from "@/components/boffmedia/primitives"
 import type { TcgCard } from "@boffmedia/shared"
 import {
-  cssVars, typeColor, normType, rarityMeta, isPokemon, pct, padNum, localCardArt,
+  cssVars, typeColor, typeGlyph, normType, normStage, rarityMeta, isPokemon, pct, padNum, localCardArt,
 } from "../_lib/tcgp-maps"
 
 // ── Type pip ─────────────────────────────────────────────────────────────────
@@ -14,14 +15,14 @@ export function TcgTypePip({ type, size = 20, title }: { type: string; size?: nu
   return (
     <span
       title={title}
-      className="inline-grid place-items-center flex-none rounded-full font-bold leading-none uppercase"
+      className="inline-grid place-items-center flex-none rounded-full font-bold leading-none"
       style={cssVars({
-        width: size, height: size, fontSize: Math.round(size * 0.5),
+        width: size, height: size, fontSize: Math.round(size * 0.62),
         background: `color-mix(in srgb, ${c} 22%, var(--panel))`,
         color: c, border: `1px solid color-mix(in srgb, ${c} 55%, transparent)`,
       })}
     >
-      {normType(type).charAt(0).toUpperCase()}
+      {typeGlyph(type)}
     </span>
   )
 }
@@ -49,8 +50,11 @@ export function TcgRarityMarks({ rarity, size = 12 }: { rarity: string; size?: n
   )
 }
 
-// ── Card art (real image, graceful fallback to a CSS placeholder) ────────────
-function TcgCardArt({ card }: { card: TcgCard }) {
+// ── Card art window ──────────────────────────────────────────────────────────
+// The handoff draws a CSS «señal» window (type glyph + label). Where real card
+// art is available we render it inside that same window, falling back to the
+// glyph if every source fails — so the frame matches the handoff either way.
+function TcgCardArt({ card, glyphLabel }: { card: TcgCard; glyphLabel: string }) {
   const sources = useMemo(() => {
     const list: string[] = []
     if (card.image) list.push(card.image.startsWith("http") && !/\.(png|jpg|jpeg|webp)$/i.test(card.image) ? `${card.image}/high.webp` : card.image)
@@ -60,26 +64,31 @@ function TcgCardArt({ card }: { card: TcgCard }) {
   const [idx, setIdx] = useState(0)
   useEffect(() => setIdx(0), [card.id])
 
-  if (idx >= sources.length) {
-    const c = typeColor(card.types?.[0])
+  if (idx < sources.length) {
     return (
-      <div
-        className="absolute inset-0 grid place-items-center"
-        style={{ background: `linear-gradient(180deg, color-mix(in srgb, ${c} 24%, var(--panel)), var(--panel))` }}
-      >
-        <span className="px-2 text-center font-display text-[12px] font-bold uppercase leading-tight text-txt">{card.name}</span>
-      </div>
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={sources[idx]}
+        alt={card.name}
+        loading="lazy"
+        className="absolute inset-0 h-full w-full object-cover"
+        onError={() => setIdx((i) => i + 1)}
+      />
     )
   }
+  // CSS signal fallback — glyph + type label, coloured by --tc.
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={sources[idx]}
-      alt={card.name}
-      loading="lazy"
-      className="absolute inset-0 h-full w-full object-cover"
-      onError={() => setIdx((i) => i + 1)}
-    />
+    <>
+      <span className="leading-none [font-size:clamp(30px,8vw,56px)]" style={{ color: "color-mix(in srgb, var(--tc) 62%, transparent)" }}>
+        {typeGlyph(card.types?.[0])}
+      </span>
+      <span
+        className="absolute inset-x-0 bottom-[5px] text-center font-mono text-[7px] font-semibold uppercase leading-none tracking-[0.16em]"
+        style={{ color: "color-mix(in srgb, var(--tc) 78%, var(--text))" }}
+      >
+        {glyphLabel}
+      </span>
+    </>
   )
 }
 
@@ -107,11 +116,22 @@ export interface CardFaceProps {
   onOpen?: (c: TcgCard) => void
 }
 export function TcgCardFace({ card, count = 0, editable, showAmounts = true, dim, onAdd, onRemove, onOpen }: CardFaceProps) {
+  const t = useTranslations("tcgpocket")
+  const tl = (key: string, fallback: string) => (t.has(key as never) ? t(key as never) : fallback)
   const r = rarityMeta(card.rarity)
   const missing = dim != null ? dim : count === 0
+  const pk = isPokemon(card)
+  const primary = card.types?.[0]
+  const c = typeColor(primary)
+  const isEx = /\bex$/i.test(card.name.trim())
+
   const rarityBorder =
     r.kind === "crown" ? "border-accent-line" :
-    r.kind === "star" ? "border-warn/50" : "border-line-2"
+    r.kind === "star" ? "border-warn/[0.45]" : "border-line-2"
+
+  const catLabel = tl(`app.category.${(card.category || "").toLowerCase()}`, card.category || "")
+  const stageLabel = tl(`app.stage.${normStage(card.stage)}`, tl("app.stage.basic", "Básica"))
+  const typeLabel = primary ? tl(`types.${normType(primary)}`, catLabel).toUpperCase() : catLabel.toUpperCase()
 
   return (
     <div
@@ -119,43 +139,74 @@ export function TcgCardFace({ card, count = 0, editable, showAmounts = true, dim
       tabIndex={onOpen ? 0 : undefined}
       onClick={onOpen ? () => onOpen(card) : undefined}
       onKeyDown={onOpen ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpen(card) } } : undefined}
-      aria-label={card.name}
+      aria-label={`${card.name} — ${catLabel}`}
       className={cn(
-        "group relative flex aspect-[2.5/3.5] flex-col overflow-hidden rounded-[9px] border border-solid bg-panel shadow-[0_6px_16px_rgba(0,0,0,0.28)] transition-[transform,border-color,box-shadow]",
+        "group relative flex aspect-[2.5/3.5] flex-col overflow-hidden rounded-[9px] border border-solid shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_6px_16px_rgba(0,0,0,0.28)] transition-[transform,border-color,box-shadow]",
         rarityBorder,
+        r.kind === "crown" && "bg-[linear-gradient(180deg,var(--accent-soft),var(--panel)_44%)]",
         onOpen && "cursor-pointer hover:-translate-y-1 hover:shadow-[0_10px_26px_rgba(0,0,0,0.42)] focus-visible:-translate-y-1 focus-visible:outline-none",
-        missing && "opacity-50 grayscale hover:opacity-80",
+        missing && "opacity-[0.42] grayscale hover:opacity-[0.72]",
       )}
+      style={cssVars({
+        "--tc": c,
+        "--tc-deep": `color-mix(in srgb, ${c} 50%, var(--bg-deep))`,
+        ...(r.kind === "crown" ? {} : { background: `linear-gradient(180deg, color-mix(in srgb, ${c} 16%, var(--panel)), var(--panel) 46%)` }),
+        ...(isEx ? { boxShadow: `0 0 0 1px color-mix(in srgb, ${c} 40%, transparent) inset, 0 6px 16px rgba(0,0,0,0.28)` } : {}),
+      })}
     >
-      <TcgCardArt card={card} />
+      {/* top row — stage/category · name · PS */}
+      <div className="flex items-baseline gap-[6px] px-2 pb-1 pt-[7px]">
+        <span className="flex-none font-mono text-[8px] font-semibold uppercase leading-none tracking-[0.08em] text-txt-dim">
+          {pk ? stageLabel : catLabel}
+        </span>
+        <span className="flex-1 truncate font-display text-[12px] font-bold leading-none tracking-[0.01em] text-txt">{card.name}</span>
+        {pk && card.hp != null && (
+          <span className="inline-flex flex-none items-baseline gap-[2px] font-mono text-[12px] font-bold leading-none text-txt">
+            <small className="text-[7px] text-txt-muted">PS</small>{card.hp}
+          </span>
+        )}
+      </div>
 
-      {/* rarity corner */}
-      <span className="absolute left-[6px] top-[6px] z-[2] rounded bg-base-deep/70 px-[5px] py-[3px] backdrop-blur-sm">
-        <TcgRarityMarks rarity={card.rarity} size={8} />
-      </span>
+      {/* art window — real art when present, glyph «señal» otherwise */}
+      <div
+        className="relative mx-[7px] grid flex-1 place-items-center overflow-hidden rounded-[5px] border border-solid"
+        aria-hidden="true"
+        style={{
+          borderColor: `color-mix(in srgb, ${c} 30%, transparent)`,
+          background: `repeating-linear-gradient(135deg, color-mix(in srgb, ${c} 14%, transparent) 0 6px, transparent 6px 12px), color-mix(in srgb, var(--tc-deep) 34%, var(--bg-deep))`,
+        }}
+      >
+        <TcgCardArt card={card} glyphLabel={typeLabel} />
+        {isEx && (
+          <span className="absolute left-[6px] top-[5px] font-display text-[12px] font-extrabold italic leading-none text-accent [text-shadow:0_0_8px_var(--accent-soft)]">ex</span>
+        )}
+      </div>
+
+      {/* foot — type pips · rarity · set·id */}
+      <div className="flex items-center gap-[5px] px-2 pb-[7px] pt-[5px]">
+        <span className="inline-flex gap-[3px]">
+          {(card.types || []).map((ty) => <TcgTypePip key={ty} type={ty} size={16} />)}
+        </span>
+        <TcgRarityMarks rarity={card.rarity} size={9} />
+        <span className="ml-auto font-mono text-[8px] font-semibold leading-none tracking-[0.04em] text-txt-dim">{card.setId}·{padNum(card.localId || card.id)}</span>
+      </div>
 
       {/* count badge / add-lock */}
       {!editable && count > 0 && showAmounts && (
-        <span className="absolute right-[8px] top-[6px] z-[3] rounded-full border border-solid border-line-2 bg-base-deep/80 px-[6px] py-[2px] font-mono text-[11px] font-bold leading-none text-txt backdrop-blur-sm">
+        <span className="absolute right-[11px] top-[32px] z-[3] rounded-full border border-solid border-line-2 bg-base-deep/80 px-[6px] py-[3px] font-mono text-[11px] font-bold leading-none text-txt backdrop-blur-sm">
           ×{count}
         </span>
       )}
       {missing && !editable && (
-        <span className="absolute right-[8px] top-[6px] z-[3] grid h-6 w-6 place-items-center rounded-full border border-dashed border-line-2 bg-base-deep/70 text-txt-dim">
-          <Icon name="plus" size={14} />
+        <span className="absolute right-[11px] top-[30px] z-[3] grid h-6 w-6 place-items-center rounded-full border border-dashed border-line-2 bg-base-deep/70 text-txt-dim">
+          <Icon name="plus" size={16} />
         </span>
       )}
-
-      {/* name reveal on hover */}
-      <span className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] flex items-end bg-gradient-to-t from-black/85 to-transparent p-2 pt-6 opacity-0 transition-opacity group-hover:opacity-100">
-        <span className="truncate font-display text-[12px] font-bold text-white">{card.name}</span>
-        <span className="ml-auto pl-1 font-mono text-[8px] text-white/70">#{padNum(card.localId || card.id)}</span>
-      </span>
 
       {/* editor */}
       {editable && (
         <div
-          className="absolute inset-x-0 bottom-0 z-[4] flex items-center justify-between gap-2 bg-gradient-to-t from-base-deep to-base-deep/10 px-2 py-[7px]"
+          className="absolute inset-x-0 bottom-0 z-[4] flex items-center justify-between gap-[6px] bg-[linear-gradient(0deg,var(--bg-deep),color-mix(in_srgb,var(--bg-deep)_10%,transparent))] px-[9px] py-[7px]"
           onClick={(e) => e.stopPropagation()}
         >
           <StepBtn dir="minus" label="−1" disabled={count === 0} onClick={() => onRemove?.(card)} />
@@ -247,26 +298,29 @@ export function TcgPackTile({ setId, name, meta, hue, onOpen }: { setId: string;
   const [failed, setFailed] = useState(false)
   return (
     <button
-      type="button" onClick={onOpen} aria-label={name}
-      className="group relative flex aspect-[3/4.2] flex-col overflow-hidden rounded-[10px] border border-solid shadow-[0_8px_22px_rgba(0,0,0,0.35)] transition-transform hover:-translate-y-1"
+      type="button" onClick={onOpen} aria-label={`Sobre ${name} · ${setId}`}
+      className="group relative flex aspect-[3/4.2] flex-col overflow-hidden rounded-[10px] border border-solid shadow-[0_8px_22px_rgba(0,0,0,0.35)] transition-transform hover:-translate-y-[5px] hover:-rotate-[0.6deg] hover:shadow-[0_14px_32px_rgba(0,0,0,0.5)]"
       style={{
         borderColor: `color-mix(in srgb, ${c} 45%, var(--line-2))`,
         background: `linear-gradient(160deg, color-mix(in srgb, ${c} 30%, var(--panel)), var(--bg-deep))`,
       }}
     >
       <span className="pointer-events-none absolute inset-0 z-[1]" style={{ background: "linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.14) 46%, transparent 60%)" }} />
-      <span className="absolute left-2 top-2 z-[2] cut [--cut:3px] bg-white/90 px-[6px] py-[3px] font-display text-[11px] font-bold uppercase leading-none text-black">{setId}</span>
+      <span className="cut [--cut:3px] absolute left-[9px] top-[9px] z-[2] bg-white/90 px-[6px] py-[3px] font-display text-[12px] font-extrabold uppercase leading-none tracking-[0.04em] text-accent-ink">{setId}</span>
       <span className="relative z-0 grid flex-1 place-items-center">
         {failed ? (
-          <span className="font-mono text-[46px] text-white/85" style={{ textShadow: "0 0 16px rgba(255,255,255,0.4)" }}>◆</span>
+          <>
+            <span className="pointer-events-none absolute inset-x-0 top-[14%] h-[6px] opacity-50 [background:repeating-linear-gradient(90deg,rgba(255,255,255,0.5)_0_3px,transparent_3px_7px)]" aria-hidden="true" />
+            <span className="text-[46px] text-white/85" style={{ textShadow: "0 0 16px rgba(255,255,255,0.4)" }}>◆</span>
+          </>
         ) : (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={packArt(setId, name)} alt={name} loading="lazy" className="h-full w-full object-contain p-2" onError={() => setFailed(true)} />
         )}
       </span>
       <span className="relative z-[2] bg-gradient-to-t from-base-deep to-transparent px-[11px] pb-3 pt-[10px]">
-        <b className="block truncate font-display text-[15px] font-bold uppercase leading-none text-white">{name}</b>
-        {meta && <small className="font-mono text-[10px] leading-tight text-white/65">{meta}</small>}
+        <b className="block truncate font-display text-[15px] font-bold uppercase leading-none tracking-[0.02em] text-white">{name}</b>
+        {meta && <small className="font-mono text-[10px] font-medium leading-tight tracking-[0.05em] text-white/65">{meta}</small>}
       </span>
     </button>
   )

@@ -31,6 +31,26 @@ export function typeColor(type: string | undefined | null): string {
   return TYPE_COLORS[normType(type)] ?? "var(--dim)"
 }
 
+// Signal glyph per type — mirrors the handoff «cara señal» art window.
+const TYPE_GLYPH: Record<string, string> = {
+  grass: "✦", fire: "✸", water: "❍", lightning: "⚡", psychic: "◈",
+  fighting: "✜", darkness: "☾", metal: "⬡", dragon: "❈", colorless: "○", fairy: "✿",
+}
+
+export function typeGlyph(type: string | undefined | null): string {
+  return TYPE_GLYPH[normType(type)] ?? "○"
+}
+
+// ── Stage ──────────────────────────────────────────────────────────────────
+// tcgdex returns "Basic" / "Stage1" / "Stage2"; normalise for the i18n key
+// (`app.stage.<key>`) shown on the card frame. Unknown → "basic" (Básica).
+export function normStage(stage: string | undefined | null): string {
+  const k = (stage || "").toLowerCase().replace(/\s+/g, "")
+  if (k.includes("2")) return "stage2"
+  if (k.includes("1")) return "stage1"
+  return "basic"
+}
+
 // The canonical order used for the filter chip row.
 export const TYPE_ORDER = [
   "grass", "fire", "water", "lightning", "psychic",

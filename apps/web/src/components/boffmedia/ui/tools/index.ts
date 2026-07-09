@@ -1,5 +1,6 @@
 export { ArtImage } from "./ArtImage"
 export { GameLogo } from "./GameLogo"
+export { GameCover, type GameCoverData } from "./GameCover"
 export { ToolCard } from "./ToolCard"
 export { ToolGrid } from "./ToolGrid"
 export { TxSection } from "./TxSection"

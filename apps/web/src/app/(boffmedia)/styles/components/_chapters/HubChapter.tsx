@@ -9,11 +9,13 @@ import { Empty } from "@/components/boffmedia/primitives/empty"
 import { Icon } from "@/components/boffmedia/primitives/icon"
 import { Kicker } from "@/components/boffmedia/primitives/kicker"
 import { Panel } from "@/components/boffmedia/primitives/panel"
-import { ExtLinks, FeaturedTool, GameBanner, GameLogo, ToolCard, ToolGrid, ToolShell, TxSection, VideoHero, buildCategory } from "@/components/boffmedia/ui/tools"
+import { Seg } from "@/components/boffmedia/primitives/seg"
+import { ExtLinks, FeaturedTool, GameBanner, GameCover, GameLogo, ToolCard, ToolGrid, ToolShell, TxSection, VideoHero, buildCategory } from "@/components/boffmedia/ui/tools"
 import { useTranslations } from "next-intl"
 
 export function HubChapter() {
   const t = useTranslations()
+  const [cardVariant, setCardVariant] = React.useState("senal")
   const pokeCat = React.useMemo(() => buildCategory("pokemon", t), [t])
   return (
     <>
@@ -30,27 +32,44 @@ export function HubChapter() {
               </Sample>
             </Section>
 
-            <Section id="tarjetas" kicker="Hub de herramientas" title="Tarjeta de herramienta" lead={<>La «fila» de herramienta (<code>ToolCard</code>): raíl de color por juego, icono, título, descripción y distintivos (nuevo · popularidad). <code>ToolGrid</code> las dispone en rejilla responsive.</>}>
-              <Sample title="Tarjeta suelta" code="<ToolCard tool>" grid>
-                <ToolCard tool={DEMO_TOOLS[0]} />
-                <ToolCard tool={DEMO_TOOLS[1]} />
+            <Section id="tarjetas" kicker="Hub de herramientas" title="Tarjeta de herramienta" lead={<>La pieza que puebla el hub y las páginas de juego. Un solo componente (<code>ToolCard</code>) con dos pieles seleccionables por <code>variant</code>: <strong>señal</strong> (rica, vertical, con categoría y flecha) y <strong>fila</strong> (compacta horizontal). El raíl superior y el icono se tiñen con el hue del juego. Estados: normal, popular y «pronto» (deshabilitada).</>}>
+              <Sample title="Variante en vivo" code="<ToolCard variant> · <ToolGrid variant>" col note="La misma tarjeta, dos disposiciones. En el hub se elige por juego; la próxima herramienta (Bestiario) usará la piel «señal».">
+                <div className="mb-[18px]">
+                  <Seg
+                    value={cardVariant}
+                    onChange={setCardVariant}
+                    options={[
+                      { value: "senal", label: "Señal" },
+                      { value: "fila", label: "Fila" },
+                    ]}
+                  />
+                </div>
+                <ToolGrid tools={DEMO_TOOLS} variant={cardVariant as "senal" | "fila"} />
               </Sample>
-              <Sample title="Rejilla" code="<ToolGrid tools>" col>
-                <ToolGrid tools={DEMO_TOOLS} />
+              <Sample title="Piel señal y piel fila" code={`variant="senal" · "fila"`} col>
+                <div className="grid w-full gap-4 sm:grid-cols-2">
+                  <ToolCard tool={DEMO_TOOLS[0]} variant="senal" />
+                  <ToolCard tool={DEMO_TOOLS[3]} variant="senal" />
+                </div>
+                <div className="grid w-full gap-2">
+                  <ToolCard tool={DEMO_TOOLS[1]} variant="fila" />
+                  <ToolCard tool={DEMO_TOOLS[2]} variant="fila" />
+                </div>
               </Sample>
             </Section>
 
-            <Section id="portadas" kicker="Hub de herramientas" title="Portada de juego" lead={<>El sello del juego en su tono (<code>GameLogo</code>): iniciales o imagen, con el color de familia y el corte diagonal. Se usa en el conmutador del shell y las cabeceras. <em>Nota:</em> el v3 no tiene una tarjeta «GameCover» aparte — la entrada completa a un juego se compone con <code>CategoryLanding</code>/<code>GameBanner</code> (ver «Banner de juego»).</>}>
-              <Sample title="Sellos por tono" code="<GameLogo hueColor>">
-                <GameLogo label="VGC" hueColor="hsl(18 90% 55%)" />
-                <GameLogo label="MH" hueColor="hsl(150 55% 52%)" />
-                <GameLogo label="MC" hueColor="hsl(140 45% 55%)" />
-                <GameLogo label="OT" hueColor="hsl(265 60% 66%)" />
+            <Section id="portadas" kicker="Hub de herramientas" title="Portada de juego" lead={<>La entrada a cada juego en el hub (<code>GameCover</code>): arte de fondo (un <code>image-slot</code>, aquí con placeholder tinteado), sello del juego, contador de herramientas, título, lema y CTA. Variante <code>mini</code> para el layout mixto. El sello del juego (<code>GameLogo</code>) es el átomo reutilizable en su tono.</>}>
+              <Sample title="Portadas" code="<GameCover game mini>" col note="Comparten el hue del juego; la variante mini es la tira ancha sin lema.">
+                <div className="grid w-full max-w-[560px] gap-[18px]">
+                  <GameCover game={{ name: "Pokémon", tagline: "Herramientas competitivas de VGC: cálculo, meta, tracker y más.", slug: "pokemon", hueColor: "hsl(18 90% 55%)", logoLabel: "VGC", toolCount: 6 }} />
+                  <GameCover game={{ name: "Monster Hunter", tagline: "Bestiario, armería y planificador para MH Wilds.", slug: "mhwilds", hueColor: "hsl(150 55% 52%)", logoLabel: "MH", toolCount: 5 }} mini />
+                </div>
               </Sample>
-              <Sample title="Tamaños" code="size sm · md · lg">
+              <Sample title="Sello del juego" code="<GameLogo hueColor size>">
                 <GameLogo label="VGC" hueColor="hsl(18 90% 55%)" size="sm" />
-                <GameLogo label="VGC" hueColor="hsl(18 90% 55%)" />
-                <GameLogo label="VGC" hueColor="hsl(18 90% 55%)" size="lg" />
+                <GameLogo label="MH" hueColor="hsl(150 55% 52%)" />
+                <GameLogo label="MC" hueColor="hsl(140 45% 55%)" size="lg" />
+                <GameLogo label="OT" hueColor="hsl(265 60% 66%)" size="lg" />
               </Sample>
             </Section>
 

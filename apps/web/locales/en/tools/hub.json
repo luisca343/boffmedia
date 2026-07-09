@@ -53,7 +53,8 @@
     },
     "card": {
       "new": "New",
-      "popular": "Popular"
+      "popular": "Popular",
+      "soon": "Soon"
     }
   }
 }
