@@ -8,6 +8,11 @@ import { TeamsService } from './services/teams.service';
 import { ParticipantsService } from './services/participants.service';
 import { ProgressService } from './services/progress.service';
 import { LeaderboardsService } from './services/leaderboards.service';
+import {
+  ProfileService,
+  UserActivityItem,
+  UserTrophies,
+} from './services/profile.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { CreateGameDto } from './dto/create-game.dto';
@@ -42,6 +47,7 @@ export class EventsFacadeService {
     private readonly teamsService: TeamsService,
     private readonly progressService: ProgressService,
     private readonly leaderboardsService: LeaderboardsService,
+    private readonly profileService: ProfileService,
   ) {}
 
   // ==================== EVENT MANAGEMENT ====================
@@ -578,5 +584,18 @@ export class EventsFacadeService {
     }
 
     return this.leaderboardsService.getRecentAchievements(limit, eventId);
+  }
+
+  // ==================== USER PROFILE ====================
+
+  async getUserTrophies(userId: number): Promise<UserTrophies> {
+    return this.profileService.getUserTrophies(userId);
+  }
+
+  async getUserActivity(
+    userId: number,
+    limit?: number,
+  ): Promise<UserActivityItem[]> {
+    return this.profileService.getUserActivity(userId, limit);
   }
 }

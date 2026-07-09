@@ -41,3 +41,6 @@ models/
 __pycache__/
 
 .agents
+.horus/
+.mimir/
+.claude
