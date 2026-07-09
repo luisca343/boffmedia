@@ -44,6 +44,8 @@ export class UpsertRegulationDto {
   @ApiPropertyOptional({
     example: '791705272',
     description: 'Google Sheet GID for VGCPastes data (null = no sheet)',
+    type: String,
+    nullable: true,
   })
   @IsOptional()
   @IsString()

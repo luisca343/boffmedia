@@ -3,17 +3,14 @@ import {
   Controller,
   Post,
   HttpStatus,
-  UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
-import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { UuidDto } from '../_dto/smartrotom-request-dto';
 import { PlayerFacadeService } from './player.facade.service';
 import { PokemonW } from '../wingull/entities/pokemon-w-.entity';
 
 @ApiTags('SmartRotom | Player')
 @Controller('smartrotom/player')
-@UseInterceptors(ResponseInterceptor)
 export class PlayerController {
   constructor(private readonly playerFacadeService: PlayerFacadeService) {}
 

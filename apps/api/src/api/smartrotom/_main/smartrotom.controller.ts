@@ -6,10 +6,8 @@ import {
   Get,
   Post,
   HttpStatus,
-  UseInterceptors,
 } from '@nestjs/common';
 import { TeleportPlayerDto } from '../_dto/teleport-player.dto';
-import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { WingullFacadeService } from '../wingull/wingull.facade.service';
 import { ArceuSpeakEntity } from './entities/arceuspeak.entity';
 import { ArceusspeakDto } from '../_dto/arceuspeak.dto';
@@ -29,7 +27,6 @@ export class ResultadoCarreraDto {
 
 @ApiTags('Smartrotom')
 @Controller('smartrotom')
-@UseInterceptors(ResponseInterceptor)
 export class SmartrotomController {
   constructor(
     private smartrotomService: SmartrotomService,

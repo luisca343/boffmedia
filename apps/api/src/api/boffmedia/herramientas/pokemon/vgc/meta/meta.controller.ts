@@ -9,10 +9,8 @@ import {
   Query,
   Req,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { RolesGuard } from '@api/_utils/guards/roles.guard';
 import { Roles } from '@api/_utils/decorators/roles.decorator';
@@ -51,7 +49,6 @@ import {
 
 @ApiTags('BoffMedia 🛠 | VGC Meta')
 @Controller('tools/vgc/meta')
-@UseInterceptors(ResponseInterceptor)
 export class VgcMetaController {
   private readonly logger = new Logger(VgcMetaController.name);
 

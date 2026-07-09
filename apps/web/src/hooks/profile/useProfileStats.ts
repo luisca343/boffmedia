@@ -1,13 +1,10 @@
 import { useCallback, useEffect, useState } from "react"
-import {
-  ProfileService,
-  type UserActivityItem,
-  type UserTrophies,
-} from "@/services/api/boffmedia/profileService"
+import { ProfileService } from "@/services/api/boffmedia/profileService"
+import type { UserActivityItemEntity, UserTrophiesEntity } from "@boffmedia/shared"
 
 /** Fetches a user's trophy case; no-ops until a valid userId is available. */
 export function useUserTrophies(userId?: number | null) {
-  const [data, setData] = useState<UserTrophies | null>(null)
+  const [data, setData] = useState<UserTrophiesEntity | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(!!userId)
   const [error, setError] = useState<string | null>(null)
 
@@ -34,7 +31,7 @@ export function useUserTrophies(userId?: number | null) {
 
 /** Fetches a user's activity timeline; no-ops until a valid userId is available. */
 export function useUserActivity(userId?: number | null, limit?: number) {
-  const [data, setData] = useState<UserActivityItem[]>([])
+  const [data, setData] = useState<UserActivityItemEntity[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(!!userId)
   const [error, setError] = useState<string | null>(null)
 

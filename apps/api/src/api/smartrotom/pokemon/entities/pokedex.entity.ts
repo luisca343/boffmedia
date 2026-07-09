@@ -137,6 +137,8 @@ export class PokedexRegistry {
   @ApiProperty({
     description: 'Date when first seen',
     example: '2025-06-29T10:00:00Z',
+    type: Date,
+    nullable: true,
     required: false,
   })
   seenAt: Date | null;
@@ -144,6 +146,8 @@ export class PokedexRegistry {
   @ApiProperty({
     description: 'Date when caught',
     example: '2025-06-29T12:00:00Z',
+    type: Date,
+    nullable: true,
     required: false,
   })
   caughtAt: Date | null;

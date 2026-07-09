@@ -1,4 +1,4 @@
-import { Controller, Get, UseInterceptors } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { getRandomTeam } from '../_utils/teams';
 import {
@@ -13,7 +13,6 @@ import { Battle, Pokemon } from '@pkmn/client';
 import { LogFormatter } from '@pkmn/view';
 import { Sprites } from '@pkmn/img';
 import { Protocol } from '@pkmn/protocol';
-import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 
 function getPokemonTeam(team: Pokemon[]) {
   const pokemonTeam = [] as any[];
@@ -31,7 +30,6 @@ function getPokemonTeam(team: Pokemon[]) {
 
 @ApiTags('BoffMedia 🛠 | Battle Simulator')
 @Controller('battlesimulator/battle')
-@UseInterceptors(ResponseInterceptor)
 export class BattleController {
   @Get()
   @ApiOperation({ summary: 'Simulate a Pokémon battle' })

@@ -3,10 +3,8 @@ import {
   Get,
   NotFoundException,
   Param,
-  UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
-import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { VgcService, VgcPokemon, SpeedTierEntry } from './vgc.service';
 import {
   Gen9DataDto,
@@ -16,7 +14,6 @@ import {
 
 @ApiTags('BoffMedia 🛠 | Pokémon VGC')
 @Controller('tools/vgc')
-@UseInterceptors(ResponseInterceptor)
 export class VgcController {
   constructor(private readonly vgcService: VgcService) {}
 

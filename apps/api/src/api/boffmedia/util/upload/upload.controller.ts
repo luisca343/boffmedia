@@ -25,9 +25,11 @@ import { mkdir } from 'fs/promises';
 
 import { UploadFacadeService } from './upload.facade.service';
 import { UploadImageDto, UploadFileDto, DeleteFileDto } from './dto/upload.dto';
+import { SkipEnvelope } from '@/common/decorators/skip-envelope.decorator';
 
 @ApiTags('BoffMedia 🛠 | Upload')
 @Controller('upload')
+@SkipEnvelope()
 export class UploadController {
   constructor(private readonly uploadFacadeService: UploadFacadeService) {}
 

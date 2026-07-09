@@ -6,7 +6,6 @@ import {
   Body,
   Query,
   HttpStatus,
-  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -16,7 +15,6 @@ import {
   ApiQuery,
   ApiBody,
 } from '@nestjs/swagger';
-import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { LigaFacadeService } from './liga.facade.service';
 import {
   CreateTournamentDto,
@@ -25,7 +23,6 @@ import {
 
 @ApiTags('SmartRotom | Liga')
 @Controller('smartrotom/liga')
-@UseInterceptors(ResponseInterceptor)
 export class LigaController {
   constructor(private readonly ligaFacadeService: LigaFacadeService) {}
 

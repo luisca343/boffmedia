@@ -25,6 +25,7 @@ export class NotificationResponseDto {
 
   @ApiProperty({
     description: 'Optional deep-link URL',
+    type: String,
     nullable: true,
     required: false,
   })

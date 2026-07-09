@@ -51,7 +51,6 @@ pending `pnpm generate:shared` runs, active design system (Boffmedia or SmartRot
 | SmartRotom UI | `.claude/context/smartrotom.md` |
 | Full reference | `AGENTS.md` |
 
-
 <!-- janus:sdd BEGIN (managed by `janus install`; do not edit inside) -->
 # Workspace rules — Janus SDD orchestrator
 

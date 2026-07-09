@@ -3,5 +3,13 @@
 /* tslint:disable */
 /* eslint-disable */
 export type UpdateSeriesStatusDto = {
+    status: UpdateSeriesStatusDto.status;
 };
+export namespace UpdateSeriesStatusDto {
+    export enum status {
+        ONGOING = 'ongoing',
+        COMPLETED = 'completed',
+        HIATUS = 'hiatus',
+    }
+}
 

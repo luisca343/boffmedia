@@ -55,6 +55,8 @@ export class AchievementStatusResponse {
   @ApiProperty({
     description: 'Completion status (0 = not completed, 1 = completed)',
     example: 1,
+    type: Number,
+    nullable: true,
   })
   completed: number | null;
 

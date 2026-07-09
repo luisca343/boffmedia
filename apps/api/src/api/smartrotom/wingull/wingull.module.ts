@@ -24,10 +24,10 @@ import { WingullTransportRepository } from './repositories/wingull-transport.rep
 import { WingullPlayerRepository } from './repositories/wingull-player.repository';
 import { WingullWorldRepository } from './repositories/wingull-world.repository';
 import { WingullRepository } from './repositories/wingull.repository';
-import { WingullSQL2Service } from '@/_utils/WingullSQL2Service';
+import { WingullSQL2Module } from '@/_utils/WingullSQL2.module';
 
 @Module({
-  imports: [LoggerModule, ResponseModule],
+  imports: [LoggerModule, ResponseModule, WingullSQL2Module],
   controllers: [WingullController],
   providers: [
     WingullEconomyService,
@@ -36,7 +36,6 @@ import { WingullSQL2Service } from '@/_utils/WingullSQL2Service';
     WingullTransportService,
 
     WingullFacadeService,
-    WingullSQL2Service,
 
     {
       provide: WINGULL_ECONOMY_REPOSITORY_TOKEN,
