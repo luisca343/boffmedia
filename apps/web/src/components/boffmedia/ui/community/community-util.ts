@@ -19,7 +19,10 @@ export interface CmAuthor {
   id: number
   name: string
   handle: string
+  /** Text glyph (initial/emoji) — the fallback when avatarUrl is absent. */
   avatar: string
+  /** Real profile-picture URL; rendered as an image, falling back to avatar. */
+  avatarUrl?: string | null
   tone: CmTone
   role: string
   bio?: string
