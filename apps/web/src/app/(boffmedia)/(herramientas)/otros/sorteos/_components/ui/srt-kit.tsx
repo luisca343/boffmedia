@@ -67,7 +67,7 @@ export function SrtRow({
   }
   return (
     <div className={"grid grid-cols-[30px_1fr_auto_auto] items-center gap-[10px] border-b border-line px-[14px] py-[8px] transition-colors last:border-b-0 hover:bg-panel-2 " + (won ? "opacity-55" : "")}>
-      <span className="text-right font-mono text-[11px] tabular-nums text-txt-dim">
+      <span className="text-right font-mono text-[11px] font-semibold tabular-nums text-txt-dim">
         {won ? <Icon name="trophy" size={13} className="inline text-accent" /> : index}
       </span>
       {editing ? (
@@ -83,7 +83,7 @@ export function SrtRow({
               setEditing(false)
             }
           }}
-          className="min-w-0 border border-accent-line bg-base-2 px-[9px] py-[7px] text-[14px] text-txt outline-none"
+          className="min-w-0 border border-accent-line bg-base-2 px-[9px] py-[7px] text-[14px] font-medium text-txt outline-none"
         />
       ) : (
         <span
@@ -117,7 +117,7 @@ export function SrtWinnerList({ winners, pool, weighted }: { winners: Entrant[];
           <span className="min-w-[30px] font-display text-[20px] font-extrabold italic tabular-nums text-accent">{i + 1}</span>
           <Avatar accent className="h-[36px] w-[36px] flex-none text-[14px]">{initials(w.name)}</Avatar>
           <span className="min-w-0 flex-1 truncate font-display text-[18px] font-bold text-txt">{w.name}</span>
-          <span className="flex-none font-mono text-[11px] tracking-[0.04em] text-txt-dim">{oddsOf(pool, w, weighted).toFixed(1)}%</span>
+          <span className="flex-none font-mono text-[11px] font-medium tracking-[0.04em] text-txt-dim">{oddsOf(pool, w, weighted).toFixed(1)}%</span>
         </div>
       ))}
     </div>
@@ -137,7 +137,7 @@ export function SrtSeedTag({ seed, copyLabel, copiedLabel, seedLabel }: { seed: 
     setTimeout(() => setOk(false), 1400)
   }
   return (
-    <span className="inline-flex items-center gap-[9px] border border-line-2 bg-panel-2 px-[11px] py-[7px] font-mono text-[11px] tracking-[0.04em] text-txt-muted">
+    <span className="inline-flex items-center gap-[9px] border border-line-2 bg-panel-2 px-[11px] py-[7px] font-mono text-[11px] font-medium tracking-[0.04em] text-txt-muted">
       <Icon name="lock" size={13} className="flex-none text-signal" />
       {seedLabel} <code className="font-semibold text-accent">#{seed}</code>
       <button type="button" onClick={copy} aria-label={copyLabel} className="ml-1 inline-flex items-center gap-[5px] border-0 bg-transparent p-0 text-txt-dim transition-colors hover:text-accent">

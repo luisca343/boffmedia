@@ -137,7 +137,7 @@ export function NavDropdown({ label, href, active, sections, demoOpen }: NavDrop
             demoOpen ? "relative" : "absolute left-[-18px] top-full",
           )}
         >
-          <div className="flex w-[176px] flex-col gap-0.5 border-r border-line bg-panel-2 p-2.5" role="none">
+          <div className="flex w-[176px] flex-col gap-0.5 border-r border-line bg-panel-2 py-2.5 px-2" role="none">
             {sections.map((s, i) => {
               const hueStyle = s.hue != null ? ({ ["--ghue" as string]: String(s.hue) } as React.CSSProperties) : undefined
               return (

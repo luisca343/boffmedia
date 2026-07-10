@@ -107,17 +107,19 @@ export function AccountMenu({ user }: { user: AccountUser }) {
         aria-label={tNav("account")}
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          "inline-flex items-center gap-2 border border-solid bg-panel py-1 pl-1 pr-2.5 cut-tag transition-[color,border-color,background] duration-[140ms]",
-          open ? "border-accent-line text-txt" : "border-line text-txt-muted hover:border-accent-line hover:text-txt",
+          "inline-flex items-center gap-[9px] border border-solid py-1 pl-1 pr-2 cut-tag transition-[color,border-color,background] duration-[140ms]",
+          open
+            ? "border-line-2 bg-panel-2 text-txt"
+            : "border-transparent bg-transparent text-txt-muted hover:border-line-2 hover:bg-panel-2 hover:text-txt",
         )}
       >
         <AccountAvatar image={image} initial={initial} size={28} />
-        <span className="max-w-[130px] truncate font-display text-[14px] font-bold uppercase leading-none tracking-[0.04em]">
+        <span className="max-w-[130px] truncate font-display text-[13px] font-bold leading-none tracking-[0.05em] text-txt">
           {name}
         </span>
         <Icon
           name="chevronDown"
-          size={14}
+          size={13}
           className={cn("shrink-0 text-txt-dim transition-transform duration-[140ms]", open && "rotate-180 text-accent")}
         />
       </button>
