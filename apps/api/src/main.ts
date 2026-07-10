@@ -50,7 +50,11 @@ async function bootstrap() {
     'https://blog.ficuslab.es',
   ];
   app.enableCors({ origin });
-  app.use(express.json({ limit: '50mb' }));
+  // JSON body cap. File uploads go through multer/FileInterceptor (multipart),
+  // not express.json, so this only bounds JSON payloads — 5mb is very generous
+  // for those while cutting the DoS surface from the previous 50mb. Bump a
+  // specific route with its own body-parser middleware if it ever needs more.
+  app.use(express.json({ limit: '5mb' }));
 
   const configService = app.get(ConfigService);
   app.useGlobalFilters(new GlobalExceptionFilter(app.get(Logger)));

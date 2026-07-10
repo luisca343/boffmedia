@@ -200,7 +200,8 @@ describe('EventsFacadeService', () => {
 
       const result = await service.getEvent(1);
 
-      expect(eventsService.getEventById).toHaveBeenCalledWith(1);
+      // Defaults to public-only (includePrivate=false) when no role is passed.
+      expect(eventsService.getEventById).toHaveBeenCalledWith(1, false);
       expect(result).toEqual(mockEvent);
     });
   });
