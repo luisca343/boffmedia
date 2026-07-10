@@ -77,7 +77,7 @@ export class PostsService {
       if (!ref || ref.authorId === replierId) return;
       await this.notifications.create({
         userId: ref.authorId,
-        type: 'system',
+        type: 'forum',
         title: 'Nueva respuesta en tu hilo',
         body: ref.title,
         link: `/foro/${ref.catSlug}/${threadId}`,

@@ -1,6 +1,8 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider, { GoogleProfile } from "next-auth/providers/google";
+import DiscordProvider, { DiscordProfile } from "next-auth/providers/discord";
+import TwitchProvider, { TwitchProfile } from "next-auth/providers/twitch";
 import { env } from "@/config/env";
 import { boffPOST } from '@/services/boffAPI';
 import { BoffUser } from "@/types";
@@ -8,6 +10,18 @@ import type { UserRole } from "@boffmedia/shared/roles";
 import { AuthError, AUTH_ERROR_CODES, handleAuthError } from '@/utils/auth-errors';
 import { CookiesOptions } from "next-auth";
 import type { AuthLoginResponseEntity, AuthRefreshResponseEntity } from "@boffmedia/shared";
+
+// Discord OAuth only activates when both credentials are configured — keeps the
+// provider (and the /entrar button) inert until the app secrets are set.
+export const discordEnabled = Boolean(
+  env.DISCORD_ID && env.DISCORD_SECRET,
+);
+
+// Twitch OAuth only activates when both credentials are configured — keeps the
+// provider (and the /entrar button) inert until the app secrets are set.
+export const twitchEnabled = Boolean(
+  env.TWITCH_CLIENT_ID && env.TWITCH_CLIENT_SECRET,
+);
 
 export const authOptions: NextAuthOptions = {
   pages: {
@@ -98,7 +112,24 @@ export const authOptions: NextAuthOptions = {
           prompt: "select_account"
         }
       }
-    })
+    }),
+    ...(discordEnabled
+      ? [
+          DiscordProvider({
+            clientId: env.DISCORD_ID,
+            clientSecret: env.DISCORD_SECRET,
+            authorization: { params: { scope: "identify email" } },
+          }),
+        ]
+      : []),
+    ...(twitchEnabled
+      ? [
+          TwitchProvider({
+            clientId: env.TWITCH_CLIENT_ID,
+            clientSecret: env.TWITCH_CLIENT_SECRET,
+          }),
+        ]
+      : []),
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
@@ -111,6 +142,7 @@ export const authOptions: NextAuthOptions = {
             email: profile?.email,
             name: profile?.name,
             picture: googleProfile?.picture ?? googleProfile?.image,
+            googleId: googleProfile?.sub,
           });
 
           if (!response.statusCode || response.statusCode !== 200 || !response.data) {
@@ -127,6 +159,69 @@ export const authOptions: NextAuthOptions = {
           return true;
         } catch (error) {
           console.error('Error in Google sign in:', error);
+          return false;
+        }
+      }
+
+      if (account?.provider === 'discord') {
+        try {
+          const p = profile as DiscordProfile | undefined;
+          const avatar =
+            p?.avatar && p?.id
+              ? `https://cdn.discordapp.com/avatars/${p.id}/${p.avatar}.${
+                  p.avatar.startsWith('a_') ? 'gif' : 'png'
+                }?size=256`
+              : undefined;
+
+          const response = await boffPOST<AuthLoginResponseEntity>('/auth/discord/callback', {
+            discordId: p?.id,
+            email: p?.email,
+            name: p?.global_name ?? p?.username,
+            picture: avatar,
+          });
+
+          if (!response.statusCode || response.statusCode !== 200 || !response.data) {
+            throw new Error('Failed to authenticate with backend');
+          }
+
+          const responseData = response.data;
+          user.id = String(responseData.user.id);
+          user.roles = responseData.user.roles as UserRole[];
+          user.smartRotomUser = responseData.user.smartRotomUser ?? undefined;
+          user.accessToken = responseData.access_token;
+          user.refreshToken = responseData.refresh_token;
+
+          return true;
+        } catch (error) {
+          console.error('Error in Discord sign in:', error);
+          return false;
+        }
+      }
+
+      if (account?.provider === 'twitch') {
+        try {
+          const p = profile as TwitchProfile | undefined;
+          const response = await boffPOST<AuthLoginResponseEntity>('/auth/twitch/callback', {
+            twitchId: p?.sub,
+            email: p?.email,
+            name: p?.preferred_username,
+            picture: p?.picture,
+          });
+
+          if (!response.statusCode || response.statusCode !== 200 || !response.data) {
+            throw new Error('Failed to authenticate with backend');
+          }
+
+          const responseData = response.data;
+          user.id = String(responseData.user.id);
+          user.roles = responseData.user.roles as UserRole[];
+          user.smartRotomUser = responseData.user.smartRotomUser ?? undefined;
+          user.accessToken = responseData.access_token;
+          user.refreshToken = responseData.refresh_token;
+
+          return true;
+        } catch (error) {
+          console.error('Error in Twitch sign in:', error);
           return false;
         }
       }

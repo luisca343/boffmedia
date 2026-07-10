@@ -19,7 +19,13 @@ const GRID_BG: React.CSSProperties = {
   maskImage: "radial-gradient(90% 70% at 50% 30%, #000 30%, transparent 78%)",
 }
 
-export function AuthScreen() {
+export function AuthScreen({
+  discordEnabled = false,
+  twitchEnabled = false,
+}: {
+  discordEnabled?: boolean
+  twitchEnabled?: boolean
+}) {
   const t = useTranslations("auth")
   const router = useRouter()
   const params = useSearchParams()
@@ -42,6 +48,8 @@ export function AuthScreen() {
 
   const soonHint = (provider: "discord" | "steam") => () =>
     toast(t("providers.soonHint", { provider: t(`providers.${provider}`) }))
+
+  // Steam is link-only (from the profile) — it has no standalone login here.
 
   return (
     <div
@@ -76,14 +84,20 @@ export function AuthScreen() {
           <AuthProviderBtn provider="google" block onClick={() => signIn("google", { callbackUrl: redirect })}>
             {t("providers.google")}
           </AuthProviderBtn>
-          <div className="grid grid-cols-2 gap-2.5 max-[480px]:grid-cols-1">
-            <AuthProviderBtn provider="discord" soon title={t("providers.soon")} onClick={soonHint("discord")}>
+          {discordEnabled ? (
+            <AuthProviderBtn provider="discord" block onClick={() => signIn("discord", { callbackUrl: redirect })}>
               {t("providers.discord")}
             </AuthProviderBtn>
-            <AuthProviderBtn provider="steam" soon title={t("providers.soon")} onClick={soonHint("steam")}>
-              {t("providers.steam")}
+          ) : (
+            <AuthProviderBtn provider="discord" block soon title={t("providers.soon")} onClick={soonHint("discord")}>
+              {t("providers.discord")}
             </AuthProviderBtn>
-          </div>
+          )}
+          {twitchEnabled && (
+            <AuthProviderBtn provider="twitch" block onClick={() => signIn("twitch", { callbackUrl: redirect })}>
+              {t("providers.twitch")}
+            </AuthProviderBtn>
+          )}
         </div>
 
         <Divider label={t("divider")} />

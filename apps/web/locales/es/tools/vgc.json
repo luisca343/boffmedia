@@ -690,7 +690,8 @@
         "regulationMeta": {
           "title": "Meta de la regulación",
           "matchCount": "{n} partidas",
-          "noData": "Sin datos de rivales en esta regulación aún."
+          "noData": "Sin datos de rivales en esta regulación aún.",
+          "tournamentUsage": "Uso en torneo"
         },
         "comparison": {
           "title": "Comparar sesiones",

@@ -18,6 +18,8 @@ import { LoginMcDto } from './dto/login-mc.dto';
 import { RegisterMinecraftDto } from './dto/register-minecraft.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { GoogleCallbackDto } from './dto/google-callback.dto';
+import { DiscordCallbackDto } from './dto/discord-callback.dto';
+import { TwitchCallbackDto } from './dto/twitch-callback.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
@@ -121,6 +123,28 @@ export class AuthController {
   })
   async googleAuthRedirect(@Body() body: GoogleCallbackDto) {
     return this.authService.googleLogin(body);
+  }
+
+  @Post('discord/callback')
+  @ApiOperation({ summary: 'Handle Discord authentication callback' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Discord user authenticated successfully.',
+    type: AuthLoginResponseEntity,
+  })
+  async discordAuthRedirect(@Body() body: DiscordCallbackDto) {
+    return this.authService.discordLogin(body);
+  }
+
+  @Post('twitch/callback')
+  @ApiOperation({ summary: 'Handle Twitch authentication callback' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Twitch user authenticated successfully.',
+    type: AuthLoginResponseEntity,
+  })
+  async twitchAuthRedirect(@Body() body: TwitchCallbackDto) {
+    return this.authService.twitchLogin(body);
   }
 
   // ==================== PASSWORD RESET ====================

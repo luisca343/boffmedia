@@ -44,7 +44,13 @@ const CAT_ICON: Record<string, IconName> = {
 const OK_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"]
 const MAX_IMAGE_MB = 5
 
-export function ProfileView() {
+export function ProfileView({
+  discordEnabled = false,
+  twitchEnabled = false,
+}: {
+  discordEnabled?: boolean
+  twitchEnabled?: boolean
+}) {
   const t = useTranslations("profile")
   const locale = useLocale()
   const { session, status, update } = useBoffSession()
@@ -78,6 +84,49 @@ export function ProfileView() {
   React.useEffect(() => {
     loadFull()
   }, [loadFull])
+
+  // Toast the result of a provider link round-trip. The Steam/Discord callbacks
+  // redirect back to /perfil?linked=<p> or ?linked_error=<p>[_taken]; strip the
+  // query afterwards so a refresh doesn't re-fire it.
+  const linkQueryHandled = React.useRef(false)
+  React.useEffect(() => {
+    if (linkQueryHandled.current) return
+    const sp = new URLSearchParams(window.location.search)
+    const linked = sp.get("linked")
+    const err = sp.get("linked_error")
+    if (!linked && !err) return
+    linkQueryHandled.current = true
+    if (linked === "steam") {
+      toast.success(t("linked.steamLinked"))
+      loadFull()
+    } else if (linked === "discord") {
+      toast.success(t("linked.discordLinked"))
+      loadFull()
+    } else if (linked === "google") {
+      toast.success(t("linked.googleLinked"))
+      loadFull()
+    } else if (linked === "twitch") {
+      toast.success(t("linked.twitchLinked"))
+      loadFull()
+    } else if (err === "steam_taken") {
+      toast.error(t("linked.steamTaken"))
+    } else if (err === "discord_taken") {
+      toast.error(t("linked.discordTaken"))
+    } else if (err === "google_taken") {
+      toast.error(t("linked.googleTaken"))
+    } else if (err === "twitch_taken") {
+      toast.error(t("linked.twitchTaken"))
+    } else if (err === "discord") {
+      toast.error(t("linked.discordError"))
+    } else if (err === "google") {
+      toast.error(t("linked.googleError"))
+    } else if (err === "twitch") {
+      toast.error(t("linked.twitchError"))
+    } else if (err) {
+      toast.error(t("linked.steamError"))
+    }
+    window.history.replaceState(null, "", window.location.pathname)
+  }, [t, loadFull])
 
   React.useEffect(() => {
     if (user) {
@@ -210,7 +259,7 @@ export function ProfileView() {
     }
   }
 
-  async function handleUnlink(provider: "google" | "discord") {
+  async function handleUnlink(provider: "google" | "discord" | "steam" | "twitch") {
     if (!userId) return
     try {
       const res = await UsersService.unlinkProvider(userId, provider)
@@ -251,6 +300,11 @@ export function ProfileView() {
   const initial = (user.name || "U").charAt(0).toUpperCase()
   const year = full?.createdAt ? new Date(full.createdAt).getFullYear() : null
   const mcLinked = !!user.smartRotomUser?.uuid
+  // steamId/twitchId are on the API response at runtime (repo selects them); the
+  // `as` keeps type-check green until `pnpm generate:shared` adds them to the model.
+  const providerIds = full as (FullUser & { steamId?: string | null; twitchId?: string | null }) | null
+  const steamLinked = Boolean(providerIds?.steamId)
+  const twitchLinked = Boolean(providerIds?.twitchId)
 
   // ── B — career stats + hero metrics from the real global leaderboard ─────
   const me = (leaderboards ?? []).find((e) => Number(e.userId) === Number(user.id))
@@ -312,7 +366,7 @@ export function ProfileView() {
     </>
   )
 
-  const linkEnd = (linked: boolean, provider?: "google" | "discord") => {
+  const linkEnd = (linked: boolean, provider?: "google" | "discord" | "steam" | "twitch") => {
     if (linked) {
       if (editing && provider) {
         return (
@@ -322,6 +376,32 @@ export function ProfileView() {
         )
       }
       return <Badge tone="ok">{t("linked.linked")}</Badge>
+    }
+    // Steam/Google always link via their flow; Discord only when the app is
+    // configured. A full navigation (not client-nav) is required so the route's
+    // redirect to the provider is followed by the browser.
+    const linkHref =
+      provider === "steam"
+        ? "/api/steam/link"
+        : provider === "google"
+          ? "/api/google/link"
+          : provider === "discord" && discordEnabled
+            ? "/api/discord/link"
+            : provider === "twitch" && twitchEnabled
+              ? "/api/twitch/link"
+              : null
+    if (linkHref) {
+      return (
+        <Button
+          size="sm"
+          icon="link"
+          onClick={() => {
+            window.location.href = linkHref
+          }}
+        >
+          {t("linked.link")}
+        </Button>
+      )
     }
     return (
       <Button size="sm" disabled title={t("linked.soon")} icon="link">
@@ -409,6 +489,22 @@ export function ProfileView() {
               linked={!!full?.discordId}
               sub={full?.discordId ? t("linked.linked") : t("linked.unlinked")}
               end={linkEnd(!!full?.discordId, "discord")}
+            />
+            <LinkedAccountRow
+              icon="steam"
+              name="Steam"
+              hue="#66c0f4"
+              linked={steamLinked}
+              sub={steamLinked ? t("linked.linked") : t("linked.unlinked")}
+              end={linkEnd(steamLinked, "steam")}
+            />
+            <LinkedAccountRow
+              icon="twitch"
+              name="Twitch"
+              hue="#9146FF"
+              linked={twitchLinked}
+              sub={twitchLinked ? t("linked.linked") : t("linked.unlinked")}
+              end={linkEnd(twitchLinked, "twitch")}
             />
             <LinkedAccountRow
               icon="gamepad"

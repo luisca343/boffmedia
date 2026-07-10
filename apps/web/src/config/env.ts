@@ -18,5 +18,13 @@ export const env = z
     NEXTAUTH_SECRET: z.string(),
     TWITCH_CLIENT_ID: z.string().default(''),
     TWITCH_CLIENT_SECRET: z.string().default(''),
+    // Discord OAuth (login + profile linking) — optional; features only activate
+    // when both are set, so the Discord UI stays inert until they're configured.
+    // (DISCORD_KEY is the bot token and lives API-side; these are the OAuth app.)
+    DISCORD_ID: z.string().default(''),
+    DISCORD_SECRET: z.string().default(''),
+    // Steam Web API key — optional; only used to resolve the persona name/avatar
+    // when linking. The OpenID link itself works without it.
+    STEAM_API_KEY: z.string().default(''),
   })
   .parse(process.env);
