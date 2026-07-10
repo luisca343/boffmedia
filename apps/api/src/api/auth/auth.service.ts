@@ -230,11 +230,45 @@ export class AuthService {
   }
 
   async googleLogin(googleUser: any) {
-    let user = await this.usersService.findByEmail(googleUser.email);
+    // Route through createFromGoogle so the google id is captured/synced onto
+    // the account (find by google id → by email(attach) → create) — the old
+    // findByEmail shortcut never stored googleId and broke new sign-ups.
+    const user = await this.usersService.createFromGoogle(googleUser);
+    return this.login(user);
+  }
 
-    if (!user) {
-      user = await this.usersService.createFromGoogle(googleUser);
-    }
+  async discordLogin(discordUser: {
+    discordId: string;
+    email?: string;
+    name?: string;
+    picture?: string;
+  }) {
+    // createFromDiscord resolves the account internally (by discordId, then by
+    // email, else create) and returns the session user — mirrors the Google path.
+    const user = await this.usersService.createFromDiscord({
+      discordId: discordUser.discordId,
+      email: discordUser.email,
+      name: discordUser.name,
+      profilePicture: discordUser.picture,
+    });
+
+    return this.login(user);
+  }
+
+  async twitchLogin(twitchUser: {
+    twitchId: string;
+    email?: string;
+    name?: string;
+    picture?: string;
+  }) {
+    // createFromTwitch resolves the account internally (by twitchId, then by
+    // email, else create) and returns the session user — mirrors Discord.
+    const user = await this.usersService.createFromTwitch({
+      twitchId: twitchUser.twitchId,
+      email: twitchUser.email,
+      name: twitchUser.name,
+      profilePicture: twitchUser.picture,
+    });
 
     return this.login(user);
   }

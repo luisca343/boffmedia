@@ -68,6 +68,22 @@ export class BoffMediaUserEntity {
   discordId: string | null;
 
   @ApiProperty({
+    example: '76561197960287930',
+    description: 'SteamID64 (link-only, no standalone Steam login)',
+    type: String,
+    nullable: true,
+  })
+  steamId: string | null;
+
+  @ApiProperty({
+    example: '141981764',
+    description: 'Twitch user id for OAuth',
+    type: String,
+    nullable: true,
+  })
+  twitchId: string | null;
+
+  @ApiProperty({
     example: true,
     description: 'Whether the user has verified their email address',
   })

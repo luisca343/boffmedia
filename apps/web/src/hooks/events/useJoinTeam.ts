@@ -1,23 +1,35 @@
-import { useRotomRequest } from "@/hooks/useRotomRequest"
+import { useState } from "react"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 
+// Imperative mutation — never auto-fires on mount (call joinTeam to run it).
 export function useJoinTeam(eventId: number, teamId: number) {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(
-    (userId) => EventsService.joinTeam(eventId, teamId, userId),
-    [eventId, teamId],
-  )
+  const [joinResult, setJoinResult] =
+    useState<Awaited<ReturnType<typeof EventsService.joinTeam>>["data"]>()
+  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
-  const joinTeam = (userId: number) => {
-    return EventsService.joinTeam(eventId, teamId, {participantId: userId})
+  const joinTeam = async (userId: number) => {
+    setIsLoading(true)
+    setError(null)
+    try {
+      const res = await EventsService.joinTeam(eventId, teamId, { participantId: userId })
+      if (res.error) setError(res.error)
+      else setJoinResult(res.data)
+      return res
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e))
+      throw e
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return {
-    joinResult: data,
+    joinResult,
     error,
     isLoading,
-    refetch,
+    refetch: joinTeam,
     joinTeam,
-    setJoinResult: setData,
+    setJoinResult,
   }
 }
-

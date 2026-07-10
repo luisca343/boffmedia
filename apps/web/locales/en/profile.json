@@ -42,7 +42,19 @@
       "link": "Link",
       "unlink": "Unlink",
       "unlinkedDone": "Account unlinked",
-      "soon": "Coming soon"
+      "soon": "Coming soon",
+      "steamLinked": "Steam account linked",
+      "steamTaken": "That Steam account is already linked to another user",
+      "steamError": "Couldn't link Steam. Please try again.",
+      "discordLinked": "Discord account linked",
+      "discordTaken": "That Discord account is already linked to another user",
+      "discordError": "Couldn't link Discord. Please try again.",
+      "googleLinked": "Google account linked",
+      "googleTaken": "That Google account is already linked to another user",
+      "googleError": "Couldn't link Google. Please try again.",
+      "twitchLinked": "Twitch account linked",
+      "twitchTaken": "That Twitch account is already linked to another user",
+      "twitchError": "Couldn't link Twitch. Please try again."
     },
     "rarity": {
       "bronze": "Bronze",

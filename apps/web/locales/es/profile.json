@@ -42,7 +42,19 @@
       "link": "Vincular",
       "unlink": "Desvincular",
       "unlinkedDone": "Cuenta desvinculada",
-      "soon": "Próximamente"
+      "soon": "Próximamente",
+      "steamLinked": "Cuenta de Steam vinculada",
+      "steamTaken": "Esa cuenta de Steam ya está vinculada a otro usuario",
+      "steamError": "No se pudo vincular Steam. Inténtalo de nuevo.",
+      "discordLinked": "Cuenta de Discord vinculada",
+      "discordTaken": "Esa cuenta de Discord ya está vinculada a otro usuario",
+      "discordError": "No se pudo vincular Discord. Inténtalo de nuevo.",
+      "googleLinked": "Cuenta de Google vinculada",
+      "googleTaken": "Esa cuenta de Google ya está vinculada a otro usuario",
+      "googleError": "No se pudo vincular Google. Inténtalo de nuevo.",
+      "twitchLinked": "Cuenta de Twitch vinculada",
+      "twitchTaken": "Esa cuenta de Twitch ya está vinculada a otro usuario",
+      "twitchError": "No se pudo vincular Twitch. Inténtalo de nuevo."
     },
     "rarity": {
       "bronze": "Bronce",

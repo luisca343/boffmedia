@@ -4,6 +4,8 @@ import {
   UserCreationResult,
   SessionUser,
   GoogleUserData,
+  DiscordUserData,
+  TwitchUserData,
   MinecraftRegistrationData,
   MinecraftLinkData,
 } from './services/users-management.service';
@@ -317,7 +319,7 @@ export class BoffMediaUsersFacadeService {
 
   async unlinkProvider(
     id: number,
-    provider: 'google' | 'discord' | 'twitch',
+    provider: 'google' | 'discord' | 'twitch' | 'steam',
   ): Promise<BoffMediaUserSafe> {
     try {
       return await this.usersManagementService.unlinkProvider(id, provider);
@@ -327,6 +329,51 @@ export class BoffMediaUsersFacadeService {
         error,
       );
       throw new Error(`Provider unlink failed: ${error.message}`);
+    }
+  }
+
+  async linkSteam(id: number, steamId: string): Promise<BoffMediaUserSafe> {
+    try {
+      return await this.usersManagementService.linkSteam(id, steamId);
+    } catch (error: any) {
+      this.logger.error(`Failed to link Steam for BoffMedia user ${id}:`, error);
+      throw error;
+    }
+  }
+
+  async linkDiscord(id: number, discordId: string): Promise<BoffMediaUserSafe> {
+    try {
+      return await this.usersManagementService.linkDiscord(id, discordId);
+    } catch (error: any) {
+      this.logger.error(
+        `Failed to link Discord for BoffMedia user ${id}:`,
+        error,
+      );
+      throw error;
+    }
+  }
+
+  async linkGoogle(id: number, googleId: string): Promise<BoffMediaUserSafe> {
+    try {
+      return await this.usersManagementService.linkGoogle(id, googleId);
+    } catch (error: any) {
+      this.logger.error(
+        `Failed to link Google for BoffMedia user ${id}:`,
+        error,
+      );
+      throw error;
+    }
+  }
+
+  async linkTwitch(id: number, twitchId: string): Promise<BoffMediaUserSafe> {
+    try {
+      return await this.usersManagementService.linkTwitch(id, twitchId);
+    } catch (error: any) {
+      this.logger.error(
+        `Failed to link Twitch for BoffMedia user ${id}:`,
+        error,
+      );
+      throw error;
     }
   }
 
@@ -416,6 +463,24 @@ export class BoffMediaUsersFacadeService {
     } catch (error: any) {
       this.logger.error('Failed to create user from Google:', error);
       throw new Error(`Google authentication failed: ${error.message}`);
+    }
+  }
+
+  async createFromDiscord(discordUser: DiscordUserData): Promise<SessionUser> {
+    try {
+      return await this.usersManagementService.createFromDiscord(discordUser);
+    } catch (error: any) {
+      this.logger.error('Failed to create user from Discord:', error);
+      throw new Error(`Discord authentication failed: ${error.message}`);
+    }
+  }
+
+  async createFromTwitch(twitchUser: TwitchUserData): Promise<SessionUser> {
+    try {
+      return await this.usersManagementService.createFromTwitch(twitchUser);
+    } catch (error: any) {
+      this.logger.error('Failed to create user from Twitch:', error);
+      throw new Error(`Twitch authentication failed: ${error.message}`);
     }
   }
 
