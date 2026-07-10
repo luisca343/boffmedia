@@ -15,11 +15,17 @@ export class EventsService {
     return this.eventsRepository.findAll(filters);
   }
 
-  async getEventById(id: number): Promise<Event & { childEvents?: Event[] }> {
-    const event = await this.eventsRepository.findById(id);
+  async getEventById(
+    id: number,
+    includePrivate = false,
+  ): Promise<Event & { childEvents?: Event[] }> {
+    const event = await this.eventsRepository.findById(id, includePrivate);
     if (!event) return null as unknown as Event & { childEvents?: Event[] };
 
-    const childEvents = await this.eventsRepository.findChildEvents(id);
+    const childEvents = await this.eventsRepository.findChildEvents(
+      id,
+      includePrivate,
+    );
 
     return {
       ...event,
@@ -42,7 +48,11 @@ export class EventsService {
     };
 
     const result = await this.eventsRepository.create(eventData);
-    return this.getEventById(result.insertId) as unknown as Promise<Event>;
+    // Admin op: return the full saved event even when it's private.
+    return this.getEventById(
+      result.insertId,
+      true,
+    ) as unknown as Promise<Event>;
   }
 
   async updateEvent(
@@ -63,7 +73,8 @@ export class EventsService {
     };
 
     await this.eventsRepository.update(id, eventData);
-    return this.getEventById(id);
+    // Admin op: return the full updated event even when it's private.
+    return this.getEventById(id, true);
   }
 
   async deleteEvent(id: number): Promise<void> {

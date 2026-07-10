@@ -169,13 +169,15 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
   // ── GET /events/event/:id ────────────────────────────────────────────────
 
   describe('GET /events/event/:id', () => {
-    it('returns 200 and passes id to facade.getEvent', async () => {
+    it('returns 200 and passes id + public-only (no auth) to facade.getEvent', async () => {
       mockFacade.getEvent.mockResolvedValue({ ...mockEvent, childEvents: [] });
 
       const res = await request(app.getHttpServer()).get('/events/event/1');
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getEvent).toHaveBeenCalledWith(1);
+      // No global guard in this controller-only module → req.user undefined →
+      // includePrivate false (admin path covered in events.controller.spec.ts).
+      expect(mockFacade.getEvent).toHaveBeenCalledWith(1, false);
     });
   });
 
