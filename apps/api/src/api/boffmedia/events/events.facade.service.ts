@@ -56,8 +56,11 @@ export class EventsFacadeService {
     return this.eventsService.getAllEvents(filters) as unknown as Event[];
   }
 
-  async getEvent(id: number): Promise<Event & { childEvents?: Event[] }> {
-    return this.eventsService.getEventById(id) as unknown as Event & {
+  async getEvent(
+    id: number,
+    includePrivate = false,
+  ): Promise<Event & { childEvents?: Event[] }> {
+    return this.eventsService.getEventById(id, includePrivate) as unknown as Event & {
       childEvents?: Event[];
     };
   }

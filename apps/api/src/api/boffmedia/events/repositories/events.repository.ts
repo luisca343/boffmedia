@@ -90,8 +90,22 @@ export class EventsRepository {
     return (await query) as unknown as EventWithGameNameAndParent[];
   }
 
-  async findById(id: number): Promise<EventWithGameNameAndParent | null> {
+  async findById(
+    id: number,
+    includePrivate = false,
+  ): Promise<EventWithGameNameAndParent | null> {
     const parentEvent = alias(boffMediaEvents, 'parentEvent');
+
+    const conditions = [
+      eq(boffMediaEvents.id, id),
+      isNull(boffMediaEvents.deletedAt),
+      or(isNull(boffMediaEvents.gameId), isNull(boffMediaGames.deletedAt)),
+    ];
+    // Non-admins can't fetch a private event by id (returned as not-found so it
+    // leaks nothing — same shape as a missing/soft-deleted event).
+    if (!includePrivate) {
+      conditions.push(eq(boffMediaEvents.visibility, 'public'));
+    }
 
     const result = await this.db
       .select({
@@ -102,13 +116,7 @@ export class EventsRepository {
       .from(boffMediaEvents)
       .leftJoin(boffMediaGames, eq(boffMediaGames.id, boffMediaEvents.gameId))
       .leftJoin(parentEvent, eq(parentEvent.id, boffMediaEvents.parentId))
-      .where(
-        and(
-          eq(boffMediaEvents.id, id),
-          isNull(boffMediaEvents.deletedAt),
-          or(isNull(boffMediaEvents.gameId), isNull(boffMediaGames.deletedAt)),
-        ),
-      );
+      .where(and(...conditions));
 
     return (result.length
       ? result[0]
@@ -117,8 +125,18 @@ export class EventsRepository {
 
   async findChildEvents(
     parentId: number,
+    includePrivate = false,
   ): Promise<EventWithGameNameAndParent[]> {
     const parentEvent = alias(boffMediaEvents, 'parentEvent');
+
+    const conditions = [
+      eq(boffMediaEvents.parentId, parentId),
+      isNull(boffMediaEvents.deletedAt),
+      or(isNull(boffMediaEvents.gameId), isNull(boffMediaGames.deletedAt)),
+    ];
+    if (!includePrivate) {
+      conditions.push(eq(boffMediaEvents.visibility, 'public'));
+    }
 
     return this.db
       .select({
@@ -129,13 +147,7 @@ export class EventsRepository {
       .from(boffMediaEvents)
       .leftJoin(boffMediaGames, eq(boffMediaGames.id, boffMediaEvents.gameId))
       .leftJoin(parentEvent, eq(parentEvent.id, boffMediaEvents.parentId))
-      .where(
-        and(
-          eq(boffMediaEvents.parentId, parentId),
-          isNull(boffMediaEvents.deletedAt),
-          or(isNull(boffMediaEvents.gameId), isNull(boffMediaGames.deletedAt)),
-        ),
-      ) as unknown as EventWithGameNameAndParent[];
+      .where(and(...conditions)) as unknown as EventWithGameNameAndParent[];
   }
 
   async create(eventData: Partial<Event>): Promise<{ insertId: number }> {

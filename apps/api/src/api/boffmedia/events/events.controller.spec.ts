@@ -40,3 +40,28 @@ describe('EventsController — getEvents visibility', () => {
     );
   });
 });
+
+describe('EventsController — getEvent (by id) visibility', () => {
+  let controller: EventsController;
+  let facade: { getEvent: jest.Mock };
+
+  beforeEach(() => {
+    facade = { getEvent: jest.fn().mockResolvedValue({ id: 1 }) };
+    controller = new EventsController(facade as unknown as EventsFacadeService);
+  });
+
+  it('passes includePrivate=true for an admin caller', async () => {
+    await controller.getEvent(1, { user: { roles: [USER_ROLES.BOFF_ADMIN] } });
+    expect(facade.getEvent).toHaveBeenCalledWith(1, true);
+  });
+
+  it('passes includePrivate=false for a non-admin authenticated caller', async () => {
+    await controller.getEvent(1, { user: { roles: ['SOME_USER'] } });
+    expect(facade.getEvent).toHaveBeenCalledWith(1, false);
+  });
+
+  it('passes includePrivate=false for an anonymous caller (no user)', async () => {
+    await controller.getEvent(1, {});
+    expect(facade.getEvent).toHaveBeenCalledWith(1, false);
+  });
+});

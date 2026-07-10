@@ -56,10 +56,11 @@ export class EventsService {
   }
   
   /**
-   * Get a specific event by ID
+   * Get a specific event by ID. Auto-authed so an admin can view a private
+   * event; anonymous/non-admin callers get not-found for private events.
    */
   static getEvent(id: number) {
-    return apiGET<Event>(`/events/event/${id}`);
+    return apiAuthedAutoGET<Event>(`/events/event/${id}`);
   }
   
   /**
