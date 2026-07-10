@@ -2,11 +2,14 @@ import * as React from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useTranslations } from "next-intl"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon, type IconName } from "@/components/boffmedia/primitives/icon"
 import { Clock } from "@/components/boffmedia/primitives/clock"
-import { FOOTER_COLS, FOOTER_SOCIAL, type FooterLink } from "@/components/boffmedia/ui/navigation/nav-data"
+import { FOOTER_COLS, FOOTER_SOCIAL } from "@/components/boffmedia/ui/navigation/nav-data"
 
-function FooterAnchor({ link, label }: { link: FooterLink; label: string }) {
+/** A single footer link target (already resolved — label passed separately). */
+type FooterAnchorTarget = { route?: string; href?: string; external?: boolean }
+
+function FooterAnchor({ link, label }: { link: FooterAnchorTarget; label: string }) {
   const inner = (
     <>
       <span>{label}</span>
@@ -33,6 +36,55 @@ function FooterAnchor({ link, label }: { link: FooterLink; label: string }) {
   )
 }
 
+export interface FooterColLink extends FooterAnchorTarget {
+  label: string
+}
+
+/** Reusable footer link column: display header + list with reveal-on-hover chevron. */
+export function FooterCol({ title, links }: { title: string; links: FooterColLink[] }) {
+  return (
+    <nav aria-label={title}>
+      <h6 className="mb-4 border-b border-line pb-[11px] font-display text-[12px] font-bold uppercase leading-none tracking-[0.16em] text-txt">
+        {title}
+      </h6>
+      <ul className="grid list-none gap-[3px] p-0">
+        {links.map((l) => (
+          <li key={l.label}>
+            <FooterAnchor link={l} label={l.label} />
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
+
+export interface FooterSocialItem {
+  icon: IconName
+  label: string
+  href: string
+}
+
+/** Reusable social row: diagonal-cut boxes that fill with accent and lift on hover. */
+export function FooterSocial({ items }: { items: FooterSocialItem[] }) {
+  return (
+    <div className="flex gap-[9px]">
+      {items.map((s) => (
+        <a
+          key={s.label}
+          href={s.href}
+          aria-label={s.label}
+          title={s.label}
+          target={s.href.startsWith("http") ? "_blank" : undefined}
+          rel={s.href.startsWith("http") ? "noopener noreferrer" : undefined}
+          className="cut [--cut:7px] grid h-[38px] w-[38px] place-items-center border border-solid border-line bg-panel text-txt-muted transition-[color,background,border-color,transform] duration-[140ms] hover:-translate-y-0.5 hover:border-accent hover:bg-accent hover:text-accent-ink"
+        >
+          <Icon name={s.icon} size={17} />
+        </a>
+      ))}
+    </div>
+  )
+}
+
 export function Footer() {
   const t = useTranslations("nav.v3.footer")
   return (
@@ -51,36 +103,15 @@ export function Footer() {
               <span>Boff<b className="text-accent">media</b></span>
             </Link>
             <p className="mb-5 max-w-[36ch] font-body text-[14px] leading-[1.65] text-txt-muted">{t("tagline")}</p>
-            <div className="flex gap-[9px]">
-              {FOOTER_SOCIAL.map((s) => (
-                <a
-                  key={s.labelKey}
-                  href={s.href}
-                  aria-label={t(s.labelKey)}
-                  title={t(s.labelKey)}
-                  target={s.href.startsWith("http") ? "_blank" : undefined}
-                  rel={s.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                  className="cut [--cut:7px] grid h-[38px] w-[38px] place-items-center border border-solid border-line bg-panel text-txt-muted transition-[color,background,border-color,transform] duration-[140ms] hover:-translate-y-0.5 hover:border-accent hover:bg-accent hover:text-accent-ink"
-                >
-                  <Icon name={s.icon} size={17} />
-                </a>
-              ))}
-            </div>
+            <FooterSocial items={FOOTER_SOCIAL.map((s) => ({ icon: s.icon, label: t(s.labelKey), href: s.href }))} />
           </div>
 
           {FOOTER_COLS.map((c) => (
-            <nav key={c.titleKey} aria-label={t(c.titleKey)}>
-              <h6 className="mb-4 border-b border-line pb-[11px] font-display text-[12px] font-bold uppercase leading-none tracking-[0.16em] text-txt">
-                {t(c.titleKey)}
-              </h6>
-              <ul className="grid list-none gap-[3px] p-0">
-                {c.links.map((l) => (
-                  <li key={l.labelKey}>
-                    <FooterAnchor link={l} label={t(l.labelKey)} />
-                  </li>
-                ))}
-              </ul>
-            </nav>
+            <FooterCol
+              key={c.titleKey}
+              title={t(c.titleKey)}
+              links={c.links.map((l) => ({ label: t(l.labelKey), route: l.route, href: l.href, external: l.external }))}
+            />
           ))}
         </div>
 

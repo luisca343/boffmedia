@@ -21,7 +21,7 @@ export function SrtStatusChip({ status, size }: { status: SrtStatus; size?: "lg"
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-[7px] border border-solid px-2.5 py-1.5 font-mono text-[10px]/none font-bold uppercase tracking-[0.12em] [clip-path:polygon(4px_0,100%_0,calc(100%_-_4px)_100%,0_100%)]",
+        "cut [--cut:4px] inline-flex items-center gap-[7px] border border-solid px-2.5 py-1.5 font-mono text-[10px]/none font-bold uppercase tracking-[0.12em]",
         STATUS_CLS[key] || "border-line-2 bg-panel-2 text-txt-muted",
         size === "lg" && "px-[13px] py-2 text-[11px]",
       )}
@@ -69,7 +69,7 @@ export function SrtSourceTag({ source }: { source: SrtSourceKey }) {
 export function SrtPrizeTag({ type, winners }: { type: SrtPrizeType; winners?: number }) {
   const m = srtPrizeMeta(type)
   return (
-    <span className="inline-flex items-center gap-1.5 border border-solid border-accent-line bg-accent-soft px-2 py-[5px] font-mono text-[9.5px]/none font-semibold uppercase tracking-[0.1em] text-accent [clip-path:polygon(4px_0,100%_0,calc(100%_-_4px)_100%,0_100%)]">
+    <span className="cut [--cut:4px] inline-flex items-center gap-1.5 border border-solid border-accent-line bg-accent-soft px-2 py-[5px] font-mono text-[9.5px]/none font-semibold uppercase tracking-[0.1em] text-accent">
       <Icon name={m.icon} size={12} />
       {m.label}
       {winners && winners > 1 ? ` · ${winners} ganadores` : ""}

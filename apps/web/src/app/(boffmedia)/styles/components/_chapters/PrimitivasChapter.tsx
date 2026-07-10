@@ -43,7 +43,7 @@ import { toast } from "@/components/boffmedia/primitives/toast"
 import { Toggle } from "@/components/boffmedia/primitives/toggle"
 import { Tooltip } from "@/components/boffmedia/primitives/tooltip"
 import { AuthScreen } from "@/components/boffmedia/ui/auth/AuthScreen"
-import { Footer } from "@/components/boffmedia/ui/layout/Footer"
+import { Footer, FooterCol, FooterSocial } from "@/components/boffmedia/ui/layout/Footer"
 import { AccountMenu } from "@/components/boffmedia/ui/navigation/AccountNav"
 import { LangSwitcher } from "@/components/boffmedia/ui/navigation/LangSwitcher"
 import { NavDropdown } from "@/components/boffmedia/ui/navigation/NavDropdown"
@@ -416,12 +416,33 @@ export function PrimitivasChapter() {
               id="pie"
               kicker="Primitivas"
               title="Pie de página"
-              lead={<>El <code>Footer</code> del shell: cierre de emisión con rejilla de columnas, enlaces sociales de corte diagonal y barra base con reloj en vivo. Todo con tokens, así que se adapta al tema claro/oscuro sin grises fijos.</>}
+              lead={<>El <code>Footer</code> del shell: cierre de emisión con rejilla de columnas y barra base con reloj en vivo. Se adapta al tema claro/oscuro con tokens — nada de grises fijos. Se descompone en dos piezas reutilizables: <code>FooterCol</code> (columna de enlaces con chevron revelado) y <code>FooterSocial</code> (cuadros sociales de corte diagonal).</>}
             >
               <Sample title="Pie completo" code="<Footer>" col note={<>Ancho completo del shell; marca con sociales, columnas theme-aware y barra base con reloj vivo y ubicación.</>}>
                 <div className="w-full border border-solid border-line overflow-hidden [&_footer]:!mt-0">
                   <Footer />
                 </div>
+              </Sample>
+              <Sample title="Columna de enlaces" code="<FooterCol title links>" note={<>Cabecera en display + lista con chevron que aparece y desplaza al pasar el cursor.</>}>
+                <div className="min-w-[200px]">
+                  <FooterCol
+                    title="Explorar"
+                    links={[
+                      { route: "/eventos", label: "Eventos" },
+                      { route: "/juegos", label: "Juegos" },
+                      { route: "/herramientas", label: "Herramientas" },
+                      { href: "https://discord.gg/TWqjNHQz7d", label: "Discord", external: true },
+                    ]}
+                  />
+                </div>
+              </Sample>
+              <Sample title="Enlaces sociales" code="<FooterSocial items>" note={<>Fila de cuadros con corte diagonal; al pasar el cursor se rellenan en acento y se elevan.</>}>
+                <FooterSocial
+                  items={[
+                    { icon: "discord", label: "Discord", href: "https://discord.gg/TWqjNHQz7d" },
+                    { icon: "globe", label: "Web", href: "/" },
+                  ]}
+                />
               </Sample>
               <Sample title="Reloj en vivo" code="<Clock>" note={<>El reloj de la barra base del pie: se actualiza cada segundo y usa cifras tabulares para no descuadrar. Suelto, sirve para cualquier marca de tiempo en directo.</>}>
                 <span className="inline-flex items-center gap-[10px] font-mono text-[13px] tracking-[0.08em] text-txt-muted">

@@ -14,7 +14,7 @@ export function RarityTag({ rarity, className }: { rarity: string; className?: s
         "inline-flex items-center px-2 py-[5px] font-mono text-[9.5px]/none font-bold uppercase tracking-[0.12em]",
         "border border-solid text-[color:var(--rc,var(--muted))] bg-[color:var(--rs,var(--panel-2))]",
         "border-[color:color-mix(in_srgb,var(--rc,var(--line-2))_40%,transparent)]",
-        "[clip-path:polygon(4px_0,100%_0,calc(100%_-_4px)_100%,0_100%)]",
+        "cut [--cut:4px]",
         className,
       )}
     >
