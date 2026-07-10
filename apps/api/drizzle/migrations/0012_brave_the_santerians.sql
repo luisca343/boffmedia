@@ -1,0 +1,2 @@
+ALTER TABLE `boffmedia_participant_progress` MODIFY COLUMN `is_completed` boolean NOT NULL;--> statement-breakpoint
+ALTER TABLE `boffmedia_participant_progress` MODIFY COLUMN `is_completed` boolean NOT NULL DEFAULT false;

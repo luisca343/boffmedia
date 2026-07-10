@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { EventsRepository } from '../repositories/events.repository';
+import {
+  EventsRepository,
+  FindEventsFilters,
+} from '../repositories/events.repository';
 import { Event } from '@/_db/schema/Events';
 import { CreateEventDto } from '../dto/create-event.dto';
 import { UpdateEventDto } from '../dto/update-event.dto';
@@ -8,8 +11,8 @@ import { UpdateEventDto } from '../dto/update-event.dto';
 export class EventsService {
   constructor(private readonly eventsRepository: EventsRepository) {}
 
-  async getAllEvents(): Promise<Event[]> {
-    return this.eventsRepository.findAll();
+  async getAllEvents(filters?: FindEventsFilters): Promise<Event[]> {
+    return this.eventsRepository.findAll(filters);
   }
 
   async getEventById(id: number): Promise<Event & { childEvents?: Event[] }> {

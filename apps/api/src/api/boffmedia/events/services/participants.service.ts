@@ -73,7 +73,7 @@ export class ParticipantsService {
 
       // Progress properties
       currentProgress: achievement.progress || 0,
-      isCompleted: 0,
+      isCompleted: false,
       completedAt: null,
       lastUpdated: new Date(),
     }));

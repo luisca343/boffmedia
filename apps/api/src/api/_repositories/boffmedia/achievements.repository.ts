@@ -17,7 +17,7 @@ export interface ParticipantProgressWithAchievement {
   participantId: number;
   achievementId: number;
   currentProgress: number;
-  isCompleted: number;
+  isCompleted: boolean;
   completedAt: Date | null;
   lastUpdated: Date;
   achievement: {
