@@ -9,7 +9,7 @@ import { CountUp } from "@/components/boffmedia/primitives/count-up"
 import { Kicker } from "@/components/boffmedia/primitives/kicker"
 import { Ticker } from "@/components/boffmedia/primitives/ticker"
 import { GLARE } from "@/components/boffmedia/ui/landing/landing-shared"
-import { Decode, useSignalFX } from "@/components/boffmedia/ui/landing/travesia-fx"
+import { Decode, Kinetic, useSignalFX } from "@/components/boffmedia/ui/landing/travesia-fx"
 import { Marquee } from "@/components/boffmedia/ui/layout/Marquee"
 
 
@@ -64,6 +64,19 @@ export function MovimientoChapter() {
               <Sample title="Ticker" code="<Ticker items>" col note={<>La tira de titulares de la barra del shell: desplazamiento continuo con separadores en diamante de acento. Cada <code>◆</code> sale del <code>&lt;em&gt;</code> incrustado.</>}>
                 <div className="flex w-full items-center border border-solid border-line bg-panel px-4 py-[10px] font-mono text-[12px] tracking-[0.04em] text-txt-muted">
                   <Ticker items={["Copa Relámpago · inscripción abierta", "Nueva regulación H disponible", "Sorteo: clave de Steam", "Wingull 2 este sábado"]} />
+                </div>
+              </Sample>
+            </Section>
+
+            <Section
+              id="cinetica"
+              kicker="Movimiento"
+              title="Palabra cinética"
+              lead={<>Rótulo gigante en contorno que se desplaza horizontalmente ligado al scroll — marca de sección en Wingull 2 y Comunidad. <code>dir</code> controla el sentido, <code>pos</code> lo ancla arriba o abajo.</>}
+            >
+              <Sample title="Palabra cinética" code="<Kinetic word dir pos>" col note={<>Haz scroll para verla moverse. El padre necesita <code>position: relative; overflow: hidden</code>.</>}>
+                <div className="relative h-[190px] w-full overflow-hidden border border-dashed border-line-2">
+                  <Kinetic word="Señal" dir={1} pos="top" />
                 </div>
               </Sample>
             </Section>

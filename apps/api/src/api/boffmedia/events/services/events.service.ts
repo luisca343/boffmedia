@@ -89,4 +89,17 @@ export class EventsService {
     const event = await this.eventsRepository.findById(eventId);
     return !!event;
   }
+
+  /**
+   * Like validateEventExists, but a private event counts as "not visible" for
+   * non-admins (includePrivate=false) — so its sub-resources return not-found
+   * to the public instead of leaking the event's existence/data.
+   */
+  async validateEventVisible(
+    eventId: number,
+    includePrivate = false,
+  ): Promise<boolean> {
+    const event = await this.eventsRepository.findById(eventId, includePrivate);
+    return !!event;
+  }
 }

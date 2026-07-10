@@ -60,6 +60,7 @@ export const CHAPTERS: Chapter[] = [
     sections: [
       { id: "fxniveles", label: "Niveles de FX" },
       { id: "marquesina", label: "Marquesina" },
+      { id: "cinetica", label: "Palabra cinética" },
       { id: "contador", label: "Contador y decode" },
       { id: "interaccion", label: "Cursor e imán" },
     ],

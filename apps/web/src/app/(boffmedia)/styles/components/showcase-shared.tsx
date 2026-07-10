@@ -36,7 +36,7 @@ export function Sample({
     <div className="border border-solid border-line bg-panel mb-[22px]">
       <div className="flex items-center gap-3 py-[10px] px-4 border-b border-solid border-line bg-panel-2">
         <h4 className={cn(HEAD4, "text-[14px]/[1.05] tracking-[0.08em]")}>{title}</h4>
-        {code && <code className="ml-auto font-mono text-[11px] leading-none text-txt-dim">{code}</code>}
+        {code && <code className="ml-auto font-mono text-[11px] font-medium leading-none text-txt-dim">{code}</code>}
       </div>
       <div
         className={cn(
@@ -48,7 +48,7 @@ export function Sample({
         {children}
       </div>
       {note && (
-        <div className="font-body text-[13px] leading-[1.6] text-txt-muted py-3 px-4 border-t border-dashed border-line [&_code]:font-mono [&_code]:text-[12px] [&_code]:text-accent">
+        <div className="font-body text-[13px] leading-[1.6] text-txt-muted py-3 px-4 border-t border-dashed border-line [&_code]:font-mono [&_code]:text-[12px] [&_code]:font-medium [&_code]:text-accent">
           {note}
         </div>
       )}

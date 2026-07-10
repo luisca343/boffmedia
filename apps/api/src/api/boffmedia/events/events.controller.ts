@@ -233,7 +233,7 @@ export class EventsController {
     return await this.eventsFacadeService.getAchievements();
   }
 
-  @Public()
+  @OptionalAuth()
   @Get(':eventId/achievements')
   @ApiOperation({ summary: 'Get all achievements for an event' })
   @ApiResponse({
@@ -243,8 +243,14 @@ export class EventsController {
   })
   async getEventAchievements(
     @Param('eventId') eventId: number,
+    @Req() req: { user?: { roles?: string[] } },
   ): Promise<Achievement[]> {
-    return await this.eventsFacadeService.getEventAchievements(eventId);
+    const includePrivate =
+      req.user?.roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false;
+    return await this.eventsFacadeService.getEventAchievements(
+      eventId,
+      includePrivate,
+    );
   }
 
   @Post(':eventId/achievements')
@@ -303,7 +309,7 @@ export class EventsController {
     return await this.eventsFacadeService.getParticipantProgress(participantId);
   }
 
-  @Public()
+  @OptionalAuth()
   @Get(':eventId/participants/:participantId/progress')
   @ApiOperation({
     summary: 'Get achievement progress for a participant in a specific event',
@@ -316,10 +322,14 @@ export class EventsController {
   async getParticipantProgressByEvent(
     @Param('eventId') eventId: number,
     @Param('participantId') participantId: number,
+    @Req() req: { user?: { roles?: string[] } },
   ): Promise<AchievementWithProgress[]> {
+    const includePrivate =
+      req.user?.roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false;
     return await this.eventsFacadeService.getParticipantProgressByEvent(
       participantId,
       eventId,
+      includePrivate,
     );
   }
 
@@ -336,7 +346,7 @@ export class EventsController {
     return await this.eventsFacadeService.getTeams();
   }
 
-  @Public()
+  @OptionalAuth()
   @Get(':eventId/teams')
   @ApiOperation({ summary: 'Get all teams in an event' })
   @ApiResponse({
@@ -344,8 +354,13 @@ export class EventsController {
     description: 'Teams retrieved successfully.',
     type: [Team],
   })
-  async getEventTeams(@Param('eventId') eventId: number): Promise<Team[]> {
-    return await this.eventsFacadeService.getEventTeams(eventId);
+  async getEventTeams(
+    @Param('eventId') eventId: number,
+    @Req() req: { user?: { roles?: string[] } },
+  ): Promise<Team[]> {
+    const includePrivate =
+      req.user?.roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false;
+    return await this.eventsFacadeService.getEventTeams(eventId, includePrivate);
   }
 
   @Public()
@@ -467,7 +482,7 @@ export class EventsController {
     return await this.eventsFacadeService.joinEvent(eventId, joinEventDto);
   }
 
-  @Public()
+  @OptionalAuth()
   @Get(':eventId/participants')
   @ApiOperation({ summary: 'Get all participants in an event' })
   @ApiResponse({
@@ -477,8 +492,14 @@ export class EventsController {
   })
   async getEventParticipants(
     @Param('eventId') eventId: number,
+    @Req() req: { user?: { roles?: string[] } },
   ): Promise<Participant[]> {
-    return await this.eventsFacadeService.getEventParticipants(eventId);
+    const includePrivate =
+      req.user?.roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false;
+    return await this.eventsFacadeService.getEventParticipants(
+      eventId,
+      includePrivate,
+    );
   }
 
   // ==================== PROGRESS MANAGEMENT ====================
@@ -513,7 +534,7 @@ export class EventsController {
     return await this.eventsFacadeService.getLeaderboards();
   }
 
-  @Public()
+  @OptionalAuth()
   @Get(':eventId/leaderboard')
   @ApiOperation({ summary: 'Get event leaderboard' })
   @ApiResponse({
@@ -523,11 +544,17 @@ export class EventsController {
   })
   async getLeaderboard(
     @Param('eventId') eventId: number,
+    @Req() req: { user?: { roles?: string[] } },
   ): Promise<LeaderboardEntry[]> {
-    return await this.eventsFacadeService.getLeaderboard(eventId);
+    const includePrivate =
+      req.user?.roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false;
+    return await this.eventsFacadeService.getLeaderboard(
+      eventId,
+      includePrivate,
+    );
   }
 
-  @Public()
+  @OptionalAuth()
   @Get(':eventId/teams/leaderboard')
   @ApiOperation({ summary: 'Get team leaderboard for event' })
   @ApiResponse({
@@ -537,8 +564,14 @@ export class EventsController {
   })
   async getTeamLeaderboard(
     @Param('eventId') eventId: number,
+    @Req() req: { user?: { roles?: string[] } },
   ): Promise<TeamLeaderboardEntry[]> {
-    return await this.eventsFacadeService.getTeamLeaderboard(eventId);
+    const includePrivate =
+      req.user?.roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false;
+    return await this.eventsFacadeService.getTeamLeaderboard(
+      eventId,
+      includePrivate,
+    );
   }
 
   // ==================== USER PROFILE ====================
