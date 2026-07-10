@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ProgressService } from './progress.service';
 import { AchievementsService } from './achievements.service';
 import { TeamsService } from './teams.service';
+import { NotificationsService } from '@api/boffmedia/notifications/notifications.service';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 
 jest.mock('@/_db/schema/Events', () => ({
@@ -40,7 +41,7 @@ const mockProgress = {
   participantId: 1,
   achievementId: 2,
   currentProgress: 3,
-  isCompleted: 0,
+  isCompleted: false,
   completedAt: null,
   lastUpdated: new Date(),
   createdAt: new Date(),
@@ -75,6 +76,7 @@ describe('ProgressService', () => {
         { provide: DRIZZLE, useValue: mockDb },
         { provide: AchievementsService, useValue: mockAchievementsService },
         { provide: TeamsService, useValue: mockTeamsService },
+        { provide: NotificationsService, useValue: { create: jest.fn() } },
       ],
     }).compile();
 
@@ -111,27 +113,27 @@ describe('ProgressService', () => {
       expect(result).toEqual(mockProgress);
     });
 
-    it('marks isCompleted=1 when progress meets maxProgress', async () => {
-      const completedProgress = { ...mockProgress, isCompleted: 1 };
+    it('marks isCompleted=true when progress meets maxProgress', async () => {
+      const completedProgress = { ...mockProgress, isCompleted: true };
       mockWhere.mockResolvedValue([completedProgress]);
 
       await service.updateProgress(1, 2, 5);
 
       expect(mockValues).toHaveBeenCalledWith(
-        expect.objectContaining({ isCompleted: 1 }),
+        expect.objectContaining({ isCompleted: true }),
       );
     });
 
-    it('marks isCompleted=0 when progress is below maxProgress', async () => {
+    it('marks isCompleted=false when progress is below maxProgress', async () => {
       await service.updateProgress(1, 2, 2);
 
       expect(mockValues).toHaveBeenCalledWith(
-        expect.objectContaining({ isCompleted: 0, completedAt: null }),
+        expect.objectContaining({ isCompleted: false, completedAt: null }),
       );
     });
 
     it('updates team score when achievement is completed and teamId is provided', async () => {
-      mockWhere.mockResolvedValue([{ ...mockProgress, isCompleted: 1 }]);
+      mockWhere.mockResolvedValue([{ ...mockProgress, isCompleted: true }]);
 
       await service.updateProgress(1, 2, 5, 99);
 

@@ -27,7 +27,7 @@ export interface UserProgress {
   participantId: number
   achievementId: number
   currentProgress: number
-  isCompleted: number // 0 or 1 since it&#39;s an int in MySQL
+  isCompleted: boolean
   completedAt: Date | null
   lastUpdated: Date
   createdAt: Date

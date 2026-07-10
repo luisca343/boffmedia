@@ -1,0 +1,1 @@
+CREATE INDEX `pp_completed_idx` ON `boffmedia_participant_progress` (`is_completed`,`participant_id`,`achievement_id`);

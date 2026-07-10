@@ -7,6 +7,7 @@ import { TeamsService } from './services/teams.service';
 import { ParticipantsService } from './services/participants.service';
 import { ProgressService } from './services/progress.service';
 import { LeaderboardsService } from './services/leaderboards.service';
+import { ProfileService } from './services/profile.service';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 
 const mockEvent = { id: 1, name: 'Tournament', gameId: 1, parentId: null };
@@ -137,6 +138,10 @@ describe('EventsFacadeService', () => {
       joinEvent: jest.fn(),
     };
     const mockProgressService = { updateProgress: jest.fn() };
+    const mockProfileService = {
+      getUserTrophies: jest.fn(),
+      getUserActivity: jest.fn(),
+    };
     const mockLeaderboardsService = {
       getGlobalLeaderboard: jest.fn(),
       getEventLeaderboard: jest.fn(),
@@ -157,6 +162,7 @@ describe('EventsFacadeService', () => {
         { provide: ParticipantsService, useValue: mockParticipantsService },
         { provide: ProgressService, useValue: mockProgressService },
         { provide: LeaderboardsService, useValue: mockLeaderboardsService },
+        { provide: ProfileService, useValue: mockProfileService },
         { provide: DRIZZLE, useValue: {} },
       ],
     }).compile();

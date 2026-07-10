@@ -56,10 +56,10 @@ export class ProgressService {
           eq(boffMediaParticipantProgress.achievementId, achievementId),
         ),
       );
-    const wasCompleted = existing?.isCompleted === 1;
+    const wasCompleted = existing?.isCompleted === true;
 
     // 3. Update progress
-    const isCompleted = progress >= achievement.maxProgress ? 1 : 0;
+    const isCompleted = progress >= achievement.maxProgress;
     const completedAt = isCompleted ? new Date() : null;
 
     await this.db

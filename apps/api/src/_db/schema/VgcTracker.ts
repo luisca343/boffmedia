@@ -1,11 +1,11 @@
 import {
   bigint,
-  datetime,
   double,
   int,
   mysqlEnum,
   mysqlTable,
   text,
+  timestamp,
   varchar,
 } from 'drizzle-orm/mysql-core';
 import { sql } from 'drizzle-orm';
@@ -56,10 +56,10 @@ export const vgcTeamPresets = mysqlTable('vgc_team_presets', {
   slots: text('slots').notNull(),
   currentVersion: int('current_version').notNull().default(1),
   versions: text('versions').notNull().default('[]'),
-  createdAt: datetime('created_at')
+  createdAt: timestamp('created_at')
     .notNull()
     .default(sql`CURRENT_TIMESTAMP()`),
-  updatedAt: datetime('updated_at')
+  updatedAt: timestamp('updated_at')
     .notNull()
     .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
 });
@@ -77,17 +77,17 @@ export const vgcSessions = mysqlTable('vgc_sessions', {
   type: varchar('type', { length: 16 }).notNull().default('ladder'),
   activePresetId: varchar('active_preset_id', { length: 36 }),
   startElo: double('start_elo'),
-  startedAt: datetime('started_at')
+  startedAt: timestamp('started_at')
     .notNull()
     .default(sql`CURRENT_TIMESTAMP()`),
   archivedAt: bigint('archived_at', { mode: 'number' }),
   tournamentName: varchar('tournament_name', { length: 255 }),
   limitlessTournamentId: int('limitless_tournament_id'),
   sessionNotes: text('session_notes'),
-  createdAt: datetime('created_at')
+  createdAt: timestamp('created_at')
     .notNull()
     .default(sql`CURRENT_TIMESTAMP()`),
-  updatedAt: datetime('updated_at')
+  updatedAt: timestamp('updated_at')
     .notNull()
     .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
 });
@@ -114,11 +114,11 @@ export const vgcMatches = mysqlTable('vgc_matches', {
   eloAfter: double('elo_after'),
   opponentElo: double('opponent_elo'),
   notes: text('notes').notNull().default('[]'),
-  createdAt: datetime('created_at')
+  createdAt: timestamp('created_at')
     .notNull()
     .default(sql`CURRENT_TIMESTAMP()`),
-  completedAt: datetime('completed_at'),
-  updatedAt: datetime('updated_at')
+  completedAt: timestamp('completed_at'),
+  updatedAt: timestamp('updated_at')
     .notNull()
     .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
 });
@@ -144,7 +144,7 @@ export const vgcSeries = mysqlTable('vgc_series', {
   games: text('games').notNull().default('[]'),
   seriesResult: varchar('series_result', { length: 8 }),
   notes: text('notes').notNull().default('[]'),
-  updatedAt: datetime('updated_at')
+  updatedAt: timestamp('updated_at')
     .notNull()
     .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
 });

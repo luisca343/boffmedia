@@ -88,7 +88,7 @@ export class CommunityService {
           boffMediaParticipantProgress.participantId,
         ),
       )
-      .where(eq(boffMediaParticipantProgress.isCompleted, 1))
+      .where(eq(boffMediaParticipantProgress.isCompleted, true))
       .orderBy(desc(boffMediaParticipantProgress.completedAt))
       .limit(limit);
 

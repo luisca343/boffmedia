@@ -1,7 +1,6 @@
 import { sql } from 'drizzle-orm';
 import {
   char,
-  datetime,
   int,
   mysqlTable,
   primaryKey,
@@ -169,7 +168,7 @@ export const smartRotomInventory = mysqlTable('rotom_inventory', {
   rarity: varchar('rarity', { length: 20 })
     .$type<'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'>()
     .default('common'),
-  createdAt: datetime('created_at').default(sql`CURRENT_TIMESTAMP()`),
+  createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP()`),
 });
 
 export type SmartRotomInventoryItem = typeof smartRotomInventory.$inferSelect;
@@ -187,7 +186,7 @@ export const srNotifications = mysqlTable('rotom_notifications', {
   body: text('body').notNull(),
   link: varchar('link', { length: 512 }),
   isRead: int('is_read').default(0),
-  createdAt: datetime('created_at').default(sql`CURRENT_TIMESTAMP()`),
+  createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP()`),
 });
 
 export type SrNotification = typeof srNotifications.$inferSelect;

@@ -1,8 +1,8 @@
 import {
-  datetime,
   index,
   int,
   mysqlTable,
+  timestamp,
   varchar,
 } from 'drizzle-orm/mysql-core';
 import { sql } from 'drizzle-orm';
@@ -24,9 +24,9 @@ export const boffMediaPasswordResetTokens = mysqlTable(
         onUpdate: 'cascade',
       }),
     tokenHash: varchar('token_hash', { length: 64 }).notNull(),
-    expiresAt: datetime('expires_at').notNull(),
-    usedAt: datetime('used_at'),
-    createdAt: datetime('created_at')
+    expiresAt: timestamp('expires_at').notNull(),
+    usedAt: timestamp('used_at'),
+    createdAt: timestamp('created_at')
       .notNull()
       .default(sql`CURRENT_TIMESTAMP()`),
   },
@@ -55,9 +55,9 @@ export const boffMediaEmailVerifications = mysqlTable(
       }),
     email: varchar('email', { length: 255 }).notNull(),
     tokenHash: varchar('token_hash', { length: 64 }).notNull(),
-    expiresAt: datetime('expires_at').notNull(),
-    usedAt: datetime('used_at'),
-    createdAt: datetime('created_at')
+    expiresAt: timestamp('expires_at').notNull(),
+    usedAt: timestamp('used_at'),
+    createdAt: timestamp('created_at')
       .notNull()
       .default(sql`CURRENT_TIMESTAMP()`),
   },

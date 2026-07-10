@@ -8,6 +8,10 @@ import { EventsFacadeService } from './events.facade.service';
 import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { Reflector } from '@nestjs/core';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { OwnerOrAdminGuard } from '@api/_utils/guards/owner-or-admin.guard';
+import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 
 const mockLogger = {
   log: jest.fn(),
@@ -83,7 +87,25 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
         ResponseInterceptor,
         Reflector,
       ],
-    }).compile();
+    })
+      // These specs cover ValidationPipe + routing + facade delegation, not auth.
+      // Pass-through the controller guards so protected routes reach the handler;
+      // the JWT guard populates req.user like the real one (join reads it).
+      .overrideGuard(JwtAuthGuard)
+      .useValue({
+        canActivate: (ctx: import('@nestjs/common').ExecutionContext) => {
+          ctx.switchToHttp().getRequest().user = {
+            userId: 1,
+            roles: [USER_ROLES.BOFF_ADMIN],
+          };
+          return true;
+        },
+      })
+      .overrideGuard(RolesGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(OwnerOrAdminGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     app = moduleRef.createNestApplication();
     app.useGlobalPipes(
@@ -115,6 +137,24 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
 
       expect(res.status).toBe(200);
       expect(mockFacade.getEvents).toHaveBeenCalledTimes(1);
+    });
+
+    it('forwards validated filters and defaults to public-only (no auth)', async () => {
+      // getEvents relies on the global APP_GUARD, which isn't wired in this
+      // controller-only module, so req.user is undefined here → includePrivate
+      // false (an unauthenticated caller never receives private events). The
+      // admin path is covered in events.controller.spec.ts.
+      mockFacade.getEvents.mockResolvedValue([mockEvent]);
+
+      await request(app.getHttpServer()).get('/events?status=active&limit=5');
+
+      expect(mockFacade.getEvents).toHaveBeenCalledWith(
+        expect.objectContaining({
+          includePrivate: false,
+          status: 'active',
+          limit: 5,
+        }),
+      );
     });
 
     it('returns empty array when no events exist', async () => {
@@ -770,7 +810,7 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
   // ── POST /events/join/:eventId — JoinEventDto validation ─────────────────
 
   describe('POST /events/join/:eventId — JoinEventDto validation', () => {
-    it('returns 201 and calls facade.joinEvent when body is valid', async () => {
+    it('returns 201 and uses the JWT identity, not the body userId', async () => {
       mockFacade.joinEvent.mockResolvedValue({ success: true });
 
       const res = await request(app.getHttpServer())
@@ -778,9 +818,11 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
         .send({ userId: 42 });
 
       expect(res.status).toBe(201);
+      // The handler overrides body.userId with req.user.userId (anti-impersonation),
+      // so the spoofed 42 is ignored in favour of the authenticated user (1).
       expect(mockFacade.joinEvent).toHaveBeenCalledWith(
         5,
-        expect.objectContaining({ userId: 42 }),
+        expect.objectContaining({ userId: 1 }),
       );
     });
 
