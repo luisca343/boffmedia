@@ -299,7 +299,7 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
       );
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getLeaderboard).toHaveBeenCalledWith(1);
+      expect(mockFacade.getLeaderboard).toHaveBeenCalledWith(1, false);
     });
 
     it('returns entries in the order the facade provides them', async () => {
@@ -314,7 +314,7 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
       );
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getLeaderboard).toHaveBeenCalledWith(5);
+      expect(mockFacade.getLeaderboard).toHaveBeenCalledWith(5, false);
     });
 
     it('returns empty array when event has no participants', async () => {
@@ -522,7 +522,7 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
       );
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getEventAchievements).toHaveBeenCalledWith(5);
+      expect(mockFacade.getEventAchievements).toHaveBeenCalledWith(5, false);
     });
   });
 
@@ -627,6 +627,7 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
       expect(mockFacade.getParticipantProgressByEvent).toHaveBeenCalledWith(
         7,
         5,
+        false,
       );
     });
   });
@@ -653,7 +654,7 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
       const res = await request(app.getHttpServer()).get('/events/5/teams');
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getEventTeams).toHaveBeenCalledWith(5);
+      expect(mockFacade.getEventTeams).toHaveBeenCalledWith(5, false);
     });
   });
 
@@ -857,7 +858,7 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
       );
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getEventParticipants).toHaveBeenCalledWith(5);
+      expect(mockFacade.getEventParticipants).toHaveBeenCalledWith(5, false);
     });
   });
 
@@ -943,7 +944,7 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
       );
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getTeamLeaderboard).toHaveBeenCalledWith(5);
+      expect(mockFacade.getTeamLeaderboard).toHaveBeenCalledWith(5, false);
     });
 
     it('returns empty array when no teams exist', async () => {

@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { EventsService } from './services/events.service';
@@ -190,10 +190,17 @@ export class EventsFacadeService {
     ) as unknown as Achievement;
   }
 
-  async getEventAchievements(eventId: number): Promise<Achievement[]> {
-    const eventExists = await this.eventsService.validateEventExists(eventId);
-    if (!eventExists) {
-      throw new Error('Event not found');
+  async getEventAchievements(
+    eventId: number,
+    includePrivate = false,
+  ): Promise<Achievement[]> {
+    const eventVisible = await this.eventsService.validateEventVisible(
+      eventId,
+      includePrivate,
+    );
+    if (!eventVisible) {
+      // 404 (not 500) — also hides a private event's existence from non-admins.
+      throw new NotFoundException('Event not found');
     }
 
     return this.achievementsService.getAchievementsByEventId(
@@ -248,7 +255,17 @@ export class EventsFacadeService {
   async getParticipantProgressByEvent(
     participantId: number,
     eventId: number,
+    includePrivate = false,
   ): Promise<AchievementWithProgress[]> {
+    const eventVisible = await this.eventsService.validateEventVisible(
+      eventId,
+      includePrivate,
+    );
+    if (!eventVisible) {
+      // 404 (not 500) — also hides a private event's existence from non-admins.
+      throw new NotFoundException('Event not found');
+    }
+
     return this.achievementsService.getParticipantProgressByEvent(
       participantId,
       eventId,
@@ -260,10 +277,17 @@ export class EventsFacadeService {
     return this.teamsService.getAllTeams() as unknown as Team[];
   }
 
-  async getEventTeams(eventId: number): Promise<Team[]> {
-    const eventExists = await this.eventsService.validateEventExists(eventId);
-    if (!eventExists) {
-      throw new Error('Event not found');
+  async getEventTeams(
+    eventId: number,
+    includePrivate = false,
+  ): Promise<Team[]> {
+    const eventVisible = await this.eventsService.validateEventVisible(
+      eventId,
+      includePrivate,
+    );
+    if (!eventVisible) {
+      // 404 (not 500) — also hides a private event's existence from non-admins.
+      throw new NotFoundException('Event not found');
     }
 
     return this.teamsService.getTeamsByEventId(eventId) as unknown as Team[];
@@ -427,10 +451,17 @@ export class EventsFacadeService {
     return { success: true };
   }
 
-  async getEventParticipants(eventId: number): Promise<Participant[]> {
-    const eventExists = await this.eventsService.validateEventExists(eventId);
-    if (!eventExists) {
-      throw new Error('Event not found');
+  async getEventParticipants(
+    eventId: number,
+    includePrivate = false,
+  ): Promise<Participant[]> {
+    const eventVisible = await this.eventsService.validateEventVisible(
+      eventId,
+      includePrivate,
+    );
+    if (!eventVisible) {
+      // 404 (not 500) — also hides a private event's existence from non-admins.
+      throw new NotFoundException('Event not found');
     }
 
     // Get raw participants data
@@ -504,19 +535,33 @@ export class EventsFacadeService {
     return this.leaderboardsService.getGlobalLeaderboard();
   }
 
-  async getLeaderboard(eventId: number): Promise<LeaderboardEntry[]> {
-    const eventExists = await this.eventsService.validateEventExists(eventId);
-    if (!eventExists) {
-      throw new Error('Event not found');
+  async getLeaderboard(
+    eventId: number,
+    includePrivate = false,
+  ): Promise<LeaderboardEntry[]> {
+    const eventVisible = await this.eventsService.validateEventVisible(
+      eventId,
+      includePrivate,
+    );
+    if (!eventVisible) {
+      // 404 (not 500) — also hides a private event's existence from non-admins.
+      throw new NotFoundException('Event not found');
     }
 
     return this.leaderboardsService.getEventLeaderboard(eventId);
   }
 
-  async getTeamLeaderboard(eventId: number): Promise<TeamLeaderboardEntry[]> {
-    const eventExists = await this.eventsService.validateEventExists(eventId);
-    if (!eventExists) {
-      throw new Error('Event not found');
+  async getTeamLeaderboard(
+    eventId: number,
+    includePrivate = false,
+  ): Promise<TeamLeaderboardEntry[]> {
+    const eventVisible = await this.eventsService.validateEventVisible(
+      eventId,
+      includePrivate,
+    );
+    if (!eventVisible) {
+      // 404 (not 500) — also hides a private event's existence from non-admins.
+      throw new NotFoundException('Event not found');
     }
 
     // Get raw leaderboard data

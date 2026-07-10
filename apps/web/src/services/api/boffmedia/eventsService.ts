@@ -134,7 +134,7 @@ export class EventsService {
    * Get all achievements for a specific event
    */
   static getEventAchievements(eventId: number) {
-    return apiGET<Achievement[]>(`/events/${eventId}/achievements`);
+    return apiAuthedAutoGET<Achievement[]>(`/events/${eventId}/achievements`);
   }
   
   /**
@@ -164,7 +164,7 @@ export class EventsService {
    * Get all teams for a specific event
    */
   static getEventTeams(eventId: number) {
-    return apiGET<Team[]>(`/events/${eventId}/teams`);
+    return apiAuthedAutoGET<Team[]>(`/events/${eventId}/teams`);
   }
   
   /**
@@ -222,7 +222,7 @@ export class EventsService {
    * Get all participants for an event
    */
   static getEventParticipants(eventId: number) {
-    return apiGET<Participant[]>(`/events/${eventId}/participants`);
+    return apiAuthedAutoGET<Participant[]>(`/events/${eventId}/participants`);
   }
 
   // ==================== PROGRESS OPERATIONS ====================
@@ -238,7 +238,7 @@ export class EventsService {
    * Get achievement progress for a participant in a specific event
    */
   static getParticipantProgressByEvent(eventId: number, participantId: number) {
-    return apiGET<AchievementWithProgress[]>(`/events/${eventId}/participants/${participantId}/progress`);
+    return apiAuthedAutoGET<AchievementWithProgress[]>(`/events/${eventId}/participants/${participantId}/progress`);
   }
   
   /**
@@ -261,14 +261,14 @@ export class EventsService {
    * Get event leaderboard
    */
   static getLeaderboard(eventId: number) {
-    return apiGET<LeaderboardEntry[]>(`/events/${eventId}/leaderboard`);
+    return apiAuthedAutoGET<LeaderboardEntry[]>(`/events/${eventId}/leaderboard`);
   }
   
   /**
    * Get team leaderboard for an event
    */
   static getTeamLeaderboard(eventId: number) {
-    return apiGET<TeamLeaderboardEntry[]>(`/events/${eventId}/teams/leaderboard`);
+    return apiAuthedAutoGET<TeamLeaderboardEntry[]>(`/events/${eventId}/teams/leaderboard`);
   }
 
   // ==================== CONVENIENCE METHODS ====================

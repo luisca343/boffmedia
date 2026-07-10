@@ -30,7 +30,7 @@ export function KvStatus({ given }: { given?: boolean }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-[7px] border border-solid px-[9px] py-1.5 font-mono text-[9.5px]/none font-bold uppercase tracking-[0.1em] [clip-path:polygon(4px_0,100%_0,calc(100%_-_4px)_100%,0_100%)]",
+        "cut [--cut:4px] inline-flex items-center gap-[7px] border border-solid px-[9px] py-1.5 font-mono text-[9.5px]/none font-bold uppercase tracking-[0.1em]",
         given ? "border-[color-mix(in_srgb,var(--warn)_28%,transparent)] bg-[color-mix(in_srgb,var(--warn)_8%,transparent)] text-txt-dim" : "border-[color-mix(in_srgb,var(--ok)_40%,transparent)] bg-ok-soft text-ok",
       )}
     >

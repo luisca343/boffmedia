@@ -20,7 +20,7 @@ export function EventStatusChip({ status, label, lg, className }: EventStatusChi
     <span
       className={cn(
         "inline-flex items-center gap-[7px] border border-solid font-mono font-bold uppercase tracking-[0.12em]",
-        "[clip-path:polygon(4px_0,100%_0,calc(100%_-_4px)_100%,0_100%)]",
+        "cut [--cut:4px]",
         lg ? "px-[13px] py-2 text-[11px]/none" : "px-2.5 py-1.5 text-[10px]/none",
         TONE[status],
         className,
