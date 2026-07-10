@@ -16,12 +16,14 @@ import { ListPostsQueryDto } from '../dto/list-posts-query.dto';
 import { ForumPost } from '../entities/forum-post.entity';
 import { ForumPostList } from '../entities/forum-post-list.entity';
 import { toForumAuthor } from '../forum.mapper';
+import { NotificationsService } from '@api/boffmedia/notifications/notifications.service';
 
 @Injectable()
 export class PostsService {
   constructor(
     private readonly repo: ForumPostsRepository,
     private readonly threadsRepo: ForumThreadsRepository,
+    private readonly notifications: NotificationsService,
   ) {}
 
   async getPostsByThread(
@@ -59,11 +61,30 @@ export class PostsService {
     const now = new Date();
     const postId = await this.repo.insertReply(threadId, userId, body, now);
     await this.threadsRepo.registerReply(threadId, userId, now);
+    await this.notifyReply(threadId, userId);
 
     const row = await this.repo.findRowById(postId);
     if (!row) throw new NotFoundException('Post not found');
     // A brand-new reply is never the OP.
     return this.mapPost(row, null);
+  }
+
+  // Tells the thread author someone replied. Best-effort: a failed notification
+  // must never fail the reply itself (and authors don't notify themselves).
+  private async notifyReply(threadId: number, replierId: number): Promise<void> {
+    try {
+      const ref = await this.threadsRepo.findNotifyRef(threadId);
+      if (!ref || ref.authorId === replierId) return;
+      await this.notifications.create({
+        userId: ref.authorId,
+        type: 'system',
+        title: 'Nueva respuesta en tu hilo',
+        body: ref.title,
+        link: `/foro/${ref.catSlug}/${threadId}`,
+      });
+    } catch {
+      // swallow — notifications are best-effort
+    }
   }
 
   async editPost(

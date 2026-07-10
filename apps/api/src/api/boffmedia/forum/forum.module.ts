@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ResponseModule } from '@api/_utils/response/response.module';
 import { LoggerModule } from '@api/_utils/logger/logger.module';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
+import { NotificationsModule } from '@api/boffmedia/notifications/notifications.module';
 import { ForumController } from './forum.controller';
 
 // Repositories
@@ -40,6 +41,6 @@ import { ForumFacadeService } from './forum.facade.service';
   ],
   controllers: [ForumController],
   exports: [ForumFacadeService],
-  imports: [ResponseModule, LoggerModule, DrizzleModule],
+  imports: [ResponseModule, LoggerModule, DrizzleModule, NotificationsModule],
 })
 export class ForumModule {}

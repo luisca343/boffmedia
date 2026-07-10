@@ -16,6 +16,7 @@ import { ForumThread } from '../entities/forum-thread.entity';
 import { ForumThreadList } from '../entities/forum-thread-list.entity';
 import { ForumVoteResult } from '../entities/forum-vote-result.entity';
 import { toForumAuthor } from '../forum.mapper';
+import { NotificationsService } from '@api/boffmedia/notifications/notifications.service';
 
 @Injectable()
 export class ThreadsService {
@@ -23,6 +24,7 @@ export class ThreadsService {
     private readonly repo: ForumThreadsRepository,
     private readonly postsRepo: ForumPostsRepository,
     private readonly votesRepo: ForumVotesRepository,
+    private readonly notifications: NotificationsService,
   ) {}
 
   async getThreadsByCategory(
@@ -121,6 +123,7 @@ export class ThreadsService {
       await this.postsRepo.clearSolutionForThread(threadId);
       await this.postsRepo.setSolution(postId, true);
       await this.repo.setSolved(threadId, true);
+      await this.notifySolution(threadId, postId, userId);
     } else {
       await this.postsRepo.clearSolutionForThread(threadId);
       await this.repo.setSolved(threadId, false);
@@ -141,6 +144,30 @@ export class ThreadsService {
     if (!exists) throw new NotFoundException('Thread not found');
     await this.repo.setLocked(threadId, locked);
     return this.getThreadNoView(threadId);
+  }
+
+  // Tells the answer's author their post was accepted as the solution.
+  // Best-effort: a failed notification must never fail the solve action.
+  private async notifySolution(
+    threadId: number,
+    postId: number,
+    solverId: number,
+  ): Promise<void> {
+    try {
+      const post = await this.postsRepo.findState(postId);
+      if (!post || post.userId === solverId) return;
+      const ref = await this.repo.findNotifyRef(threadId);
+      if (!ref) return;
+      await this.notifications.create({
+        userId: post.userId,
+        type: 'system',
+        title: 'Tu respuesta fue marcada como solución',
+        body: ref.title,
+        link: `/foro/${ref.catSlug}/${threadId}`,
+      });
+    } catch {
+      // swallow — notifications are best-effort
+    }
   }
 
   private mapThread(row: ThreadRow): ForumThread {
