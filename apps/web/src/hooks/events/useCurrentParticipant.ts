@@ -9,11 +9,7 @@ export function useCurrentParticipant(eventId: number) {
   
   const shouldFetch = eventId && userId
   
-  const { data, error, isLoading, refetch } = useRotomRequest(
-    () => EventsService.getEventParticipants(eventId),
-    [eventId],
-    !shouldFetch
-  )
+  const { data, error, isLoading, refetch } = useRotomRequest(EventsService.getEventParticipants, eventId)
 
   const participantId = useMemo(() => {
     if (!userId || !data) return null
