@@ -2,10 +2,7 @@ import { useRotomRequest } from "@/hooks/useRotomRequest"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 
 export function useGetLeaderboard(eventId: number) {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(
-    () => EventsService.getLeaderboard(eventId),
-    [eventId],
-  )
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(EventsService.getLeaderboard, eventId)
 
   return {
     leaderboard: data || [],

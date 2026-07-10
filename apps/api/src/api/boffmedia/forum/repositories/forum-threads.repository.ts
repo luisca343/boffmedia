@@ -43,6 +43,13 @@ export interface ThreadState {
   solved: boolean;
 }
 
+// Recipient + link context for producing a forum notification about a thread.
+export interface ThreadNotifyRef {
+  authorId: number;
+  title: string;
+  catSlug: string;
+}
+
 export interface CreateThreadInput {
   categoryId: number;
   userId: number;
@@ -201,6 +208,28 @@ export class ForumThreadsRepository {
       )
       .limit(1);
     return rows.length ? (rows[0] as ThreadState) : null;
+  }
+
+  async findNotifyRef(id: number): Promise<ThreadNotifyRef | null> {
+    const rows = await this.db
+      .select({
+        authorId: boffMediaForumThreads.userId,
+        title: boffMediaForumThreads.title,
+        catSlug: boffMediaForumCategories.slug,
+      })
+      .from(boffMediaForumThreads)
+      .innerJoin(
+        boffMediaForumCategories,
+        eq(boffMediaForumCategories.id, boffMediaForumThreads.categoryId),
+      )
+      .where(
+        and(
+          eq(boffMediaForumThreads.id, id),
+          isNull(boffMediaForumThreads.deletedAt),
+        ),
+      )
+      .limit(1);
+    return rows.length ? rows[0] : null;
   }
 
   // Creates the thread and its OP post atomically. The OP's createdAt doubles as
