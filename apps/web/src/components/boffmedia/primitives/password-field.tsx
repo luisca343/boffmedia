@@ -29,7 +29,7 @@ export const PasswordField = React.forwardRef<HTMLInputElement, PasswordFieldPro
           "text-txt-dim hover:text-accent aria-pressed:text-accent transition-colors",
         )}
       >
-        <Icon name="eye" size={18} />
+        <Icon name="eye" size={16} />
       </button>
     </div>
   )

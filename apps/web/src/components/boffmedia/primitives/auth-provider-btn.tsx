@@ -52,7 +52,7 @@ export function AuthProviderBtn({
         "transition-[border-color,background,color,transform,filter] duration-[140ms] active:translate-y-px",
         brand
           ? "text-[color:var(--pvink)] border-[color:var(--pv)] bg-[color:var(--pv)] hover:brightness-110"
-          : "text-txt border-line-2 bg-panel hover:border-accent-line hover:bg-panel-2",
+          : "text-txt border-line-2 bg-panel hover:border-[color-mix(in_srgb,var(--panel-2)_60%,var(--line-2))] hover:bg-[color-mix(in_srgb,var(--panel-2)_12%,var(--panel))]",
         block && "w-full",
         muted && "opacity-50",
         soon && "cursor-not-allowed active:translate-y-0",

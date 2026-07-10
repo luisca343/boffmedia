@@ -34,7 +34,7 @@ export function AvatarGroup({ items, max = 5, lg }: AvatarGroupProps) {
   const shown = items.slice(0, max)
   const extra = items.length - shown.length
   return (
-    <span className="inline-flex [&>*]:-ml-2 [&>*:first-child]:ml-0">
+    <span className="inline-flex [&>*]:-ml-[9px] [&>*:first-child]:ml-0">
       {shown.map((it, i) => {
         const o = typeof it === "string" ? { label: it } : it
         return (
@@ -44,7 +44,7 @@ export function AvatarGroup({ items, max = 5, lg }: AvatarGroupProps) {
         )
       })}
       {extra > 0 && (
-        <Avatar lg={lg} className="text-txt-muted">
+        <Avatar lg={lg} className="bg-panel font-mono font-semibold text-[11px] text-txt-muted">
           +{extra}
         </Avatar>
       )}

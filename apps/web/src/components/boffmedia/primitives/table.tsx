@@ -40,7 +40,7 @@ export function Table({ columns, rows, className }: TableProps) {
                 key={c.key}
                 className={cn(
                   "py-3 px-4 border-b border-solid border-line [tr:last-child_&]:border-b-0 text-[15px]",
-                  c.numeric && "font-mono text-[13px] leading-none text-right",
+                  c.numeric && "font-mono text-[13px] font-medium leading-none text-right",
                 )}
               >
                 {r[c.key]}

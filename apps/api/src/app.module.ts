@@ -42,6 +42,7 @@ import { DrizzleModule } from './api/_utils/drizzle/drizzle.module';
 import { AchievementModule } from '@api/smartrotom/achievement/achievement.module';
 import { PlayerModule } from '@api/smartrotom/player/player.module';
 import { EventsModule } from '@api/boffmedia/events/events.module';
+import { ForumModule } from '@api/boffmedia/forum/forum.module';
 import { NotificationsModule } from '@api/boffmedia/notifications/notifications.module';
 import { SuggestionsModule } from '@api/boffmedia/suggestions/suggestions.module';
 import { CommunityModule } from '@api/boffmedia/community/community.module';
@@ -100,6 +101,7 @@ import { VgcModule } from '@api/boffmedia/herramientas/pokemon/vgc/vgc.module';
     PlayerModule,
     SmartrotomModule,
     EventsModule,
+    ForumModule,
     NotificationsModule,
     SuggestionsModule,
     CommunityModule,

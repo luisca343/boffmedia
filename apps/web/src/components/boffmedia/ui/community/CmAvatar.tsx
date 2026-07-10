@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
+import { ArtImage } from "@/components/boffmedia/ui/tools/ArtImage"
 import { authorHue, timeAgo, type CmAuthor, type CmTone } from "./community-util"
 
 // The shared authorship atoms of Blog + Foro: the tinted broadcast initial
@@ -14,19 +15,24 @@ export function CmAvatar({
   letter,
   size,
 }: {
-  author?: { avatar?: string; tone?: CmTone } | null
+  author?: { avatar?: string; avatarUrl?: string | null; tone?: CmTone; name?: string } | null
   hue?: number
   letter?: string
   size?: number
 }) {
   const h = hue != null ? hue : authorHue(author)
   const ch = letter || (author ? author.avatar : "?")
+  const px = size ?? 34
   return (
     <span
       style={{ "--h": h, width: size, height: size, fontSize: size ? size * 0.44 : undefined } as React.CSSProperties}
-      className="inline-grid h-[34px] w-[34px] flex-none place-items-center border border-solid border-[color-mix(in_srgb,hsl(var(--h)_70%_50%)_40%,var(--line-2))] bg-[color-mix(in_srgb,hsl(var(--h)_70%_50%)_16%,var(--panel-2))] font-display text-[15px]/none font-extrabold italic text-[hsl(var(--h)_78%_62%)] cut-seal [--cut:8px]"
+      className="relative inline-grid h-[34px] w-[34px] flex-none place-items-center overflow-hidden border border-solid border-[color-mix(in_srgb,hsl(var(--h)_70%_50%)_40%,var(--line-2))] bg-[color-mix(in_srgb,hsl(var(--h)_70%_50%)_16%,var(--panel-2))] font-display text-[15px]/none font-extrabold italic text-[hsl(var(--h)_78%_62%)] cut-seal [--cut:8px]"
     >
-      {ch}
+      {author?.avatarUrl ? (
+        <ArtImage src={author.avatarUrl} alt={author.name ?? ""} width={px} height={px} className="h-full w-full" fallback={<span>{ch}</span>} />
+      ) : (
+        ch
+      )}
     </span>
   )
 }
@@ -38,6 +44,7 @@ export function Byline({
   onOpen,
   link = true,
   size,
+  now,
 }: {
   author?: CmAuthor | null
   when?: string
@@ -45,6 +52,9 @@ export function Byline({
   onOpen?: (href: string) => void
   link?: boolean
   size?: number
+  // Reference «now» for the relative timestamp. Undefined keeps the frozen
+  // showcase CM_NOW default (see timeAgo); real pages pass a live Date.
+  now?: Date
 }) {
   if (!author) return null
   const clickName = (e: React.MouseEvent) => {
@@ -68,7 +78,7 @@ export function Byline({
           )}
         </span>
         <span className="mt-[3px] font-mono text-[10px]/[1.2] font-medium uppercase tracking-[0.08em] text-txt-muted">
-          {sub || (when ? timeAgo(when) : author.role)}
+          {sub || (when ? timeAgo(when, now) : author.role)}
         </span>
       </span>
     </span>
