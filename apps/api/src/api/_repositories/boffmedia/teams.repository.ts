@@ -143,7 +143,7 @@ export class TeamsRepository {
       .where(
         and(
           eq(boffMediaEventTeamMembers.teamId, teamId),
-          eq(boffMediaParticipantProgress.isCompleted, 1),
+          eq(boffMediaParticipantProgress.isCompleted, true),
         ),
       );
 

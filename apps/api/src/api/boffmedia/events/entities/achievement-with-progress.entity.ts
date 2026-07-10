@@ -9,11 +9,10 @@ export class AchievementWithProgress extends Achievement {
   currentProgress: number;
 
   @ApiProperty({
-    example: 1,
-    description:
-      'Whether the achievement is completed (1 = completed, 0 = not completed)',
+    example: true,
+    description: 'Whether the achievement is completed',
   })
-  isCompleted: number;
+  isCompleted: boolean;
 
   @ApiProperty({
     example: '2024-06-01T12:30:00.000Z',

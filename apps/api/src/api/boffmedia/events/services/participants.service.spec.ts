@@ -120,7 +120,7 @@ describe('ParticipantsService', () => {
         eventId: 10,
         name: 'First Catch',
         currentProgress: 3,
-        isCompleted: 0,
+        isCompleted: false,
         active: 1,
       });
     });

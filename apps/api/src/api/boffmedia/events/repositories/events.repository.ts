@@ -10,6 +10,16 @@ export interface EventWithGameNameAndParent extends Event {
   parentEventName?: string;
 }
 
+export interface FindEventsFilters {
+  status?: 'upcoming' | 'active' | 'completed';
+  gameId?: number;
+  type?: 'event' | 'server';
+  limit?: number;
+  offset?: number;
+  /** When false/undefined, only `public`-visibility events are returned. */
+  includePrivate?: boolean;
+}
+
 @Injectable()
 export class EventsRepository {
   constructor(
@@ -34,10 +44,29 @@ export class EventsRepository {
     deletedAt: boffMediaEvents.deletedAt,
   };
 
-  async findAll(): Promise<EventWithGameNameAndParent[]> {
+  async findAll(
+    filters: FindEventsFilters = {},
+  ): Promise<EventWithGameNameAndParent[]> {
     const parentEvent = alias(boffMediaEvents, 'parentEvent');
 
-    return this.db
+    const conditions = [
+      isNull(boffMediaEvents.deletedAt),
+      or(isNull(boffMediaEvents.gameId), isNull(boffMediaGames.deletedAt)),
+    ];
+    if (filters.status) {
+      conditions.push(eq(boffMediaEvents.status, filters.status));
+    }
+    if (filters.gameId !== undefined) {
+      conditions.push(eq(boffMediaEvents.gameId, filters.gameId));
+    }
+    if (filters.type) {
+      conditions.push(eq(boffMediaEvents.type, filters.type));
+    }
+    if (!filters.includePrivate) {
+      conditions.push(eq(boffMediaEvents.visibility, 'public'));
+    }
+
+    const query = this.db
       .select({
         ...this.eventSelect,
         gameName: boffMediaGames.title,
@@ -46,12 +75,19 @@ export class EventsRepository {
       .from(boffMediaEvents)
       .leftJoin(boffMediaGames, eq(boffMediaGames.id, boffMediaEvents.gameId))
       .leftJoin(parentEvent, eq(parentEvent.id, boffMediaEvents.parentId))
-      .where(
-        and(
-          isNull(boffMediaEvents.deletedAt),
-          or(isNull(boffMediaEvents.gameId), isNull(boffMediaGames.deletedAt)),
-        ),
-      ) as unknown as EventWithGameNameAndParent[];
+      .where(and(...conditions))
+      // Deterministic order so pagination is stable (matches prior PK order).
+      .orderBy(boffMediaEvents.id)
+      .$dynamic();
+
+    // MySQL needs a LIMIT to accept an OFFSET; use a large sentinel when only
+    // offset is given.
+    if (filters.limit !== undefined || filters.offset !== undefined) {
+      query.limit(filters.limit ?? Number.MAX_SAFE_INTEGER);
+      if (filters.offset !== undefined) query.offset(filters.offset);
+    }
+
+    return (await query) as unknown as EventWithGameNameAndParent[];
   }
 
   async findById(id: number): Promise<EventWithGameNameAndParent | null> {

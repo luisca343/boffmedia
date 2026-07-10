@@ -2,6 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { EventsService } from './services/events.service';
+import { FindEventsFilters } from './repositories/events.repository';
 import { GamesService } from './services/games.service';
 import { AchievementsService } from './services/achievements.service';
 import { TeamsService } from './services/teams.service';
@@ -51,8 +52,8 @@ export class EventsFacadeService {
   ) {}
 
   // ==================== EVENT MANAGEMENT ====================
-  async getEvents(): Promise<Event[]> {
-    return this.eventsService.getAllEvents() as unknown as Event[];
+  async getEvents(filters?: FindEventsFilters): Promise<Event[]> {
+    return this.eventsService.getAllEvents(filters) as unknown as Event[];
   }
 
   async getEvent(id: number): Promise<Event & { childEvents?: Event[] }> {

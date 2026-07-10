@@ -85,7 +85,7 @@ export class ProfileService {
               boffMediaParticipantProgress.participantId,
               participantIds,
             ),
-            eq(boffMediaParticipantProgress.isCompleted, 1),
+            eq(boffMediaParticipantProgress.isCompleted, true),
           ),
         );
       for (const p of progress) completed.set(p.achievementId, p.completedAt);
@@ -147,7 +147,7 @@ export class ProfileService {
       .where(
         and(
           inArray(boffMediaParticipantProgress.participantId, participantIds),
-          eq(boffMediaParticipantProgress.isCompleted, 1),
+          eq(boffMediaParticipantProgress.isCompleted, true),
         ),
       )
       .orderBy(desc(boffMediaParticipantProgress.completedAt))

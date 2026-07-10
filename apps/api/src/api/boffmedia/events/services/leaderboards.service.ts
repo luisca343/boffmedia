@@ -37,7 +37,13 @@ export class LeaderboardsService {
   ) {}
 
   /**
-   * Get global leaderboard across all events
+   * Get global leaderboard across all events.
+   *
+   * Driven from completed progress with inner joins so only participants who
+   * have earned at least one (non-deleted) achievement/medal are aggregated —
+   * this avoids scanning the whole participants table and padding the board
+   * with zero-score rows. Point semantics are unchanged: only completed items
+   * with a non-deleted achievement contribute.
    */
   async getGlobalLeaderboard(): Promise<LeaderboardEntry[]> {
     const results = await this.db
@@ -47,39 +53,32 @@ export class LeaderboardsService {
         avatar: boffMediaParticipants.avatar,
         userId: boffMediaParticipants.userId,
         achievementPoints:
-          sql<number>`COALESCE(SUM(CASE WHEN ${boffMediaAchievements.itemType} = 'achievement' AND ${boffMediaParticipantProgress.isCompleted} = 1 THEN ${boffMediaAchievements.points} ELSE 0 END), 0)`.as(
+          sql<number>`COALESCE(SUM(CASE WHEN ${boffMediaAchievements.itemType} = 'achievement' THEN ${boffMediaAchievements.points} ELSE 0 END), 0)`.as(
             'achievement_points',
           ),
         medalPoints:
-          sql<number>`COALESCE(SUM(CASE WHEN ${boffMediaAchievements.itemType} = 'medal' AND ${boffMediaParticipantProgress.isCompleted} = 1 THEN ${boffMediaAchievements.points} ELSE 0 END), 0)`.as(
+          sql<number>`COALESCE(SUM(CASE WHEN ${boffMediaAchievements.itemType} = 'medal' THEN ${boffMediaAchievements.points} ELSE 0 END), 0)`.as(
             'medal_points',
           ),
         totalPoints:
-          sql<number>`COALESCE(SUM(CASE WHEN ${boffMediaParticipantProgress.isCompleted} = 1 THEN ${boffMediaAchievements.points} ELSE 0 END), 0)`.as(
+          sql<number>`COALESCE(SUM(${boffMediaAchievements.points}), 0)`.as(
             'total_points',
           ),
         achievementCount:
-          sql<number>`COALESCE(COUNT(DISTINCT CASE WHEN ${boffMediaAchievements.itemType} = 'achievement' AND ${boffMediaParticipantProgress.isCompleted} = 1 THEN ${boffMediaParticipantProgress.achievementId} END), 0)`.as(
+          sql<number>`COUNT(DISTINCT CASE WHEN ${boffMediaAchievements.itemType} = 'achievement' THEN ${boffMediaParticipantProgress.achievementId} END)`.as(
             'achievement_count',
           ),
         medalCount:
-          sql<number>`COALESCE(COUNT(DISTINCT CASE WHEN ${boffMediaAchievements.itemType} = 'medal' AND ${boffMediaParticipantProgress.isCompleted} = 1 THEN ${boffMediaParticipantProgress.achievementId} END), 0)`.as(
+          sql<number>`COUNT(DISTINCT CASE WHEN ${boffMediaAchievements.itemType} = 'medal' THEN ${boffMediaParticipantProgress.achievementId} END)`.as(
             'medal_count',
           ),
         lastUpdated:
-          sql<Date>`COALESCE(MAX(${boffMediaParticipantProgress.lastUpdated}), NULL)`.as(
+          sql<Date>`MAX(${boffMediaParticipantProgress.lastUpdated})`.as(
             'last_updated',
           ),
       })
-      .from(boffMediaParticipants)
-      .leftJoin(
-        boffMediaParticipantProgress,
-        eq(
-          boffMediaParticipantProgress.participantId,
-          boffMediaParticipants.id,
-        ),
-      )
-      .leftJoin(
+      .from(boffMediaParticipantProgress)
+      .innerJoin(
         boffMediaAchievements,
         and(
           eq(
@@ -89,13 +88,14 @@ export class LeaderboardsService {
           isNull(boffMediaAchievements.deletedAt),
         ),
       )
-      .leftJoin(
-        boffMediaEvents,
-        and(
-          eq(boffMediaEvents.id, boffMediaAchievements.eventId),
-          isNull(boffMediaEvents.deletedAt),
+      .innerJoin(
+        boffMediaParticipants,
+        eq(
+          boffMediaParticipants.id,
+          boffMediaParticipantProgress.participantId,
         ),
       )
+      .where(eq(boffMediaParticipantProgress.isCompleted, true))
       .groupBy(
         boffMediaParticipants.id,
         boffMediaParticipants.nickname,
@@ -160,7 +160,7 @@ export class LeaderboardsService {
       .where(
         and(
           eq(boffMediaAchievements.eventId, eventId),
-          eq(boffMediaParticipantProgress.isCompleted, 1),
+          eq(boffMediaParticipantProgress.isCompleted, true),
         ),
       )
       .groupBy(
@@ -217,20 +217,107 @@ export class LeaderboardsService {
   }
 
   /**
-   * Get participant's ranking across global and specific event
+   * Get participant's ranking across global and (optionally) a specific event.
+   *
+   * Instead of materializing the whole board to `.find()` one row, this reads
+   * the participant's own aggregate directly, then derives their global rank
+   * with a single grouped COUNT of participants ranked strictly above them —
+   * matching the board's `(total_points DESC, last_updated DESC)` ordering.
    */
   async getParticipantRanking(
     participantId: number,
     eventId?: number,
   ): Promise<ParticipantRanking> {
-    // Get global ranking
-    const globalLeaderboard = await this.getGlobalLeaderboard();
-    const globalEntry = globalLeaderboard.find(
-      (entry) => entry.participantId === participantId,
-    );
+    // The participant's own aggregate (bounded to their rows by the PK).
+    const [own] = await this.db
+      .select({
+        totalPoints:
+          sql<number>`COALESCE(SUM(${boffMediaAchievements.points}), 0)`.as(
+            'total_points',
+          ),
+        achievementCount:
+          sql<number>`COUNT(DISTINCT CASE WHEN ${boffMediaAchievements.itemType} = 'achievement' THEN ${boffMediaParticipantProgress.achievementId} END)`.as(
+            'achievement_count',
+          ),
+        medalCount:
+          sql<number>`COUNT(DISTINCT CASE WHEN ${boffMediaAchievements.itemType} = 'medal' THEN ${boffMediaParticipantProgress.achievementId} END)`.as(
+            'medal_count',
+          ),
+        lastUpdated:
+          sql<Date | null>`MAX(${boffMediaParticipantProgress.lastUpdated})`.as(
+            'last_updated',
+          ),
+      })
+      .from(boffMediaParticipantProgress)
+      .innerJoin(
+        boffMediaAchievements,
+        and(
+          eq(
+            boffMediaAchievements.id,
+            boffMediaParticipantProgress.achievementId,
+          ),
+          isNull(boffMediaAchievements.deletedAt),
+        ),
+      )
+      .where(
+        and(
+          eq(boffMediaParticipantProgress.participantId, participantId),
+          eq(boffMediaParticipantProgress.isCompleted, true),
+        ),
+      );
+
+    const totalPoints = Number(own?.totalPoints ?? 0);
+    const achievementCount = Number(own?.achievementCount ?? 0);
+    const medalCount = Number(own?.medalCount ?? 0);
+    // A participant with no completed items is not on the board → rank 0,
+    // mirroring the previous `globalEntry?.rank || 0`.
+    const isRanked = achievementCount + medalCount > 0;
+
+    let globalRank = 0;
+    if (isRanked) {
+      const lastUpdated = own?.lastUpdated ?? null;
+
+      // Per-participant totals; count those ranked strictly above this one.
+      const boardTotals = this.db
+        .select({
+          participantId: boffMediaParticipantProgress.participantId,
+          totalPoints:
+            sql<number>`COALESCE(SUM(${boffMediaAchievements.points}), 0)`.as(
+              'total_points',
+            ),
+          lastUpdated:
+            sql<Date>`MAX(${boffMediaParticipantProgress.lastUpdated})`.as(
+              'last_updated',
+            ),
+        })
+        .from(boffMediaParticipantProgress)
+        .innerJoin(
+          boffMediaAchievements,
+          and(
+            eq(
+              boffMediaAchievements.id,
+              boffMediaParticipantProgress.achievementId,
+            ),
+            isNull(boffMediaAchievements.deletedAt),
+          ),
+        )
+        .where(eq(boffMediaParticipantProgress.isCompleted, true))
+        .groupBy(boffMediaParticipantProgress.participantId)
+        .as('board_totals');
+
+      const [above] = await this.db
+        .select({ count: sql<number>`COUNT(*)`.as('count') })
+        .from(boardTotals)
+        .where(
+          sql`${boardTotals.totalPoints} > ${totalPoints} OR (${boardTotals.totalPoints} = ${totalPoints} AND ${boardTotals.lastUpdated} > ${lastUpdated})`,
+        );
+
+      globalRank = Number(above?.count ?? 0) + 1;
+    }
 
     let eventRank: number | undefined;
     if (eventId) {
+      // Event boards are bounded to a single event, so materializing is cheap.
       const eventLeaderboard = await this.getEventLeaderboard(eventId);
       const eventEntry = eventLeaderboard.find(
         (entry) => entry.participantId === participantId,
@@ -240,11 +327,11 @@ export class LeaderboardsService {
 
     return {
       participantId,
-      globalRank: globalEntry?.rank || 0,
+      globalRank,
       eventRank,
-      totalPoints: globalEntry?.totalPoints || 0,
-      achievementCount: globalEntry?.achievementCount || 0,
-      medalCount: globalEntry?.medalCount || 0,
+      totalPoints,
+      achievementCount,
+      medalCount,
     };
   }
 
@@ -256,7 +343,7 @@ export class LeaderboardsService {
     eventId?: number,
   ): Promise<LeaderboardEntry[]> {
     const whereConditions = [
-      eq(boffMediaParticipantProgress.isCompleted, 1),
+      eq(boffMediaParticipantProgress.isCompleted, true),
       eq(boffMediaAchievements.itemType, 'achievement'),
     ];
 
@@ -378,7 +465,7 @@ export class LeaderboardsService {
       completedAt: Date;
     }[]
   > {
-    const whereConditions = [eq(boffMediaParticipantProgress.isCompleted, 1)];
+    const whereConditions = [eq(boffMediaParticipantProgress.isCompleted, true)];
 
     if (eventId) {
       whereConditions.push(eq(boffMediaAchievements.eventId, eventId));
@@ -438,6 +525,8 @@ export class LeaderboardsService {
   }
 
   private getGlobalLeaderboardCountQuery() {
+    // Kept consistent with getGlobalLeaderboard: distinct participants with at
+    // least one completed, non-deleted achievement/medal.
     return this.db
       .select({
         count:
@@ -448,21 +537,15 @@ export class LeaderboardsService {
       .from(boffMediaParticipantProgress)
       .innerJoin(
         boffMediaAchievements,
-        eq(
-          boffMediaAchievements.id,
-          boffMediaParticipantProgress.achievementId,
-        ),
-      )
-      .leftJoin(
-        boffMediaEvents,
-        eq(boffMediaEvents.id, boffMediaAchievements.eventId),
-      )
-      .where(
         and(
-          eq(boffMediaParticipantProgress.isCompleted, 1),
-          isNull(boffMediaEvents.deletedAt),
+          eq(
+            boffMediaAchievements.id,
+            boffMediaParticipantProgress.achievementId,
+          ),
+          isNull(boffMediaAchievements.deletedAt),
         ),
-      );
+      )
+      .where(eq(boffMediaParticipantProgress.isCompleted, true));
   }
 
   private getEventLeaderboardCountQuery(eventId: number) {
@@ -484,7 +567,7 @@ export class LeaderboardsService {
       .where(
         and(
           eq(boffMediaAchievements.eventId, eventId),
-          eq(boffMediaParticipantProgress.isCompleted, 1),
+          eq(boffMediaParticipantProgress.isCompleted, true),
         ),
       );
   }

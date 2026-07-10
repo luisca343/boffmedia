@@ -1,9 +1,9 @@
 import { sql } from 'drizzle-orm';
 import {
-  datetime,
   int,
   mysqlTable,
   text,
+  timestamp,
   varchar,
 } from 'drizzle-orm/mysql-core';
 
@@ -18,10 +18,10 @@ export const ficusFrases = mysqlTable('ficus_quotes', {
   serverID: varchar('server_id', { length: 32 }).notNull(),
   quote: text('quote').notNull(),
   comment: text('comment'),
-  createdAt: datetime('created_at')
+  createdAt: timestamp('created_at')
     .notNull()
     .default(sql`CURRENT_TIMESTAMP()`),
-  updatedAt: datetime('updated_at'),
+  updatedAt: timestamp('updated_at'),
 });
 
 export type FicusFrase = typeof ficusFrases.$inferSelect;
@@ -32,10 +32,10 @@ export const discordUsers = mysqlTable('discord_users', {
   avatar: varchar('avatar', { length: 255 }),
   color: varchar('color', { length: 6 }),
   ttsVoice: varchar('tts_voice', { length: 32 }).default('Enrique'),
-  createdAt: datetime('created_at')
+  createdAt: timestamp('created_at')
     .notNull()
     .default(sql`CURRENT_TIMESTAMP()`),
-  updatedAt: datetime('updated_at'),
+  updatedAt: timestamp('updated_at'),
 });
 
 export type DiscordUser = typeof discordUsers.$inferSelect;

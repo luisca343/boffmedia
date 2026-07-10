@@ -72,9 +72,9 @@ export type AchievementWithProgress = {
      */
     currentProgress: number;
     /**
-     * Whether the achievement is completed (1 = completed, 0 = not completed)
+     * Whether the achievement is completed
      */
-    isCompleted: number;
+    isCompleted: boolean;
     /**
      * When the achievement was completed
      */
