@@ -26,7 +26,11 @@ export class CommunityService {
   async getSiteStats(): Promise<SiteStatsEntity> {
     const [[users], [events], [activeEvents], [participants], [achievements]] =
       await Promise.all([
-        this.db.select({ c: sql<number>`COUNT(*)` }).from(boffMediaUsers),
+        this.db
+          .select({ c: sql<number>`COUNT(*)` })
+          .from(boffMediaUsers)
+          // Exclude GDPR soft-deleted tombstones from the public count.
+          .where(isNull(boffMediaUsers.deletedAt)),
         this.db
           .select({ c: sql<number>`COUNT(*)` })
           .from(boffMediaEvents)

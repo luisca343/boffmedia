@@ -87,7 +87,7 @@ export class EventsController {
     });
   }
 
-  @Public()
+  @OptionalAuth()
   @Get('/event/:id')
   @ApiOperation({ summary: 'Get event by id' })
   @ApiResponse({
@@ -95,8 +95,14 @@ export class EventsController {
     description: 'Event retrieved successfully.',
     type: Event,
   })
-  async getEvent(@Param('id') id: number): Promise<Event> {
-    return await this.eventsFacadeService.getEvent(id);
+  async getEvent(
+    @Param('id') id: number,
+    @Req() req: { user?: { roles?: string[] } },
+  ): Promise<Event> {
+    // A private event is only returned to admins; non-admins get not-found.
+    const includePrivate =
+      req.user?.roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false;
+    return await this.eventsFacadeService.getEvent(id, includePrivate);
   }
 
   @Post('/event')
