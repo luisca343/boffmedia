@@ -54,7 +54,7 @@ export function Checkbox({ checked, defaultChecked, onChange, label, disabled, c
           )}
         />
       </span>
-      {label && <span className="font-body text-[14px] leading-[1.3] text-txt">{label}</span>}
+      {label && <span className="font-body text-[14px] font-medium leading-[1.3] text-txt">{label}</span>}
     </button>
   )
 }

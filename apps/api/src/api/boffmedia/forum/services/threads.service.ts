@@ -1,0 +1,178 @@
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import {
+  ForumThreadsRepository,
+  ThreadRow,
+} from '../repositories/forum-threads.repository';
+import { ForumPostsRepository } from '../repositories/forum-posts.repository';
+import { ForumVotesRepository } from '../repositories/forum-votes.repository';
+import { USER_ROLES } from '@api/_utils/auth/roles.constants';
+import { ListThreadsQueryDto } from '../dto/list-threads-query.dto';
+import { CreateThreadDto } from '../dto/create-thread.dto';
+import { ForumThread } from '../entities/forum-thread.entity';
+import { ForumThreadList } from '../entities/forum-thread-list.entity';
+import { ForumVoteResult } from '../entities/forum-vote-result.entity';
+import { toForumAuthor } from '../forum.mapper';
+
+@Injectable()
+export class ThreadsService {
+  constructor(
+    private readonly repo: ForumThreadsRepository,
+    private readonly postsRepo: ForumPostsRepository,
+    private readonly votesRepo: ForumVotesRepository,
+  ) {}
+
+  async getThreadsByCategory(
+    categoryId: number,
+    query: ListThreadsQueryDto,
+  ): Promise<ForumThreadList> {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 20;
+    const sort = query.sort ?? 'recent';
+
+    const [rows, total] = await Promise.all([
+      this.repo.findByCategoryId(categoryId, page, limit, sort),
+      this.repo.countByCategoryId(categoryId),
+    ]);
+
+    return {
+      items: rows.map((r) => this.mapThread(r)),
+      total,
+      page,
+      pageSize: limit,
+    };
+  }
+
+  async getThreadById(id: number): Promise<ForumThread | null> {
+    const row = await this.repo.findById(id);
+    if (!row) return null;
+
+    await this.repo.incrementViewCount(id);
+    // Reflect the increment in the response without a re-read.
+    return this.mapThread({ ...row, viewCount: row.viewCount + 1 });
+  }
+
+  async threadExists(id: number): Promise<boolean> {
+    return this.repo.existsById(id);
+  }
+
+  // Read + map without the view-count side effect (for post-write responses).
+  private async getThreadNoView(id: number): Promise<ForumThread> {
+    const row = await this.repo.findById(id);
+    if (!row) throw new NotFoundException('Thread not found');
+    return this.mapThread(row);
+  }
+
+  async createThread(
+    userId: number,
+    dto: CreateThreadDto,
+  ): Promise<ForumThread> {
+    const threadId = await this.repo.createThreadWithOp({
+      categoryId: dto.categoryId,
+      userId,
+      title: dto.title,
+      body: dto.body,
+    });
+    return this.getThreadNoView(threadId);
+  }
+
+  // Toggle: one vote per (user, thread). Returns the caller's new vote state and
+  // the resulting (clamped) thread total.
+  async toggleVote(threadId: number, userId: number): Promise<ForumVoteResult> {
+    const existing = await this.votesRepo.find(userId, threadId);
+    let voted: boolean;
+    if (existing) {
+      await this.votesRepo.remove(userId, threadId);
+      await this.repo.adjustVoteCount(threadId, -1);
+      voted = false;
+    } else {
+      await this.votesRepo.add(userId, threadId);
+      await this.repo.adjustVoteCount(threadId, 1);
+      voted = true;
+    }
+    const votes = await this.repo.getVoteCount(threadId);
+    return { voted, votes };
+  }
+
+  // Author-or-admin only (checked here, not in the controller). postId marks a
+  // post as the solution (replacing any prior one); omit it to unsolve.
+  async solve(
+    threadId: number,
+    userId: number,
+    roles: string[] | undefined,
+    postId?: number | null,
+  ): Promise<ForumThread> {
+    const thread = await this.repo.findState(threadId);
+    if (!thread) throw new NotFoundException('Thread not found');
+
+    const isAdmin = roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false;
+    if (thread.userId !== userId && !isAdmin) {
+      throw new ForbiddenException('Not allowed to solve this thread');
+    }
+
+    if (postId != null) {
+      const belongs = await this.postsRepo.existsInThread(postId, threadId);
+      if (!belongs) {
+        throw new NotFoundException('Post not found in this thread');
+      }
+      await this.postsRepo.clearSolutionForThread(threadId);
+      await this.postsRepo.setSolution(postId, true);
+      await this.repo.setSolved(threadId, true);
+    } else {
+      await this.postsRepo.clearSolutionForThread(threadId);
+      await this.repo.setSolved(threadId, false);
+    }
+
+    return this.getThreadNoView(threadId);
+  }
+
+  async setPinned(threadId: number, pinned: boolean): Promise<ForumThread> {
+    const exists = await this.repo.existsById(threadId);
+    if (!exists) throw new NotFoundException('Thread not found');
+    await this.repo.setPinned(threadId, pinned);
+    return this.getThreadNoView(threadId);
+  }
+
+  async setLocked(threadId: number, locked: boolean): Promise<ForumThread> {
+    const exists = await this.repo.existsById(threadId);
+    if (!exists) throw new NotFoundException('Thread not found');
+    await this.repo.setLocked(threadId, locked);
+    return this.getThreadNoView(threadId);
+  }
+
+  private mapThread(row: ThreadRow): ForumThread {
+    const lastAuthor =
+      row.lastUserId != null && row.lastUsername != null
+        ? toForumAuthor({
+            id: row.lastUserId,
+            username: row.lastUsername,
+            profilePicture: row.lastPicture,
+          })
+        : null;
+
+    return {
+      id: row.id,
+      catSlug: row.catSlug,
+      catName: row.catName,
+      catHue: row.catHue,
+      title: row.title,
+      author: toForumAuthor({
+        id: row.authorId,
+        username: row.authorUsername,
+        profilePicture: row.authorPicture,
+      }),
+      lastAuthor,
+      lastAt: row.lastPostAt,
+      createdAt: row.createdAt,
+      pinned: row.pinned,
+      locked: row.locked,
+      solved: row.solved,
+      replies: row.replyCount,
+      views: row.viewCount,
+      votes: row.voteCount,
+    };
+  }
+}

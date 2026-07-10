@@ -35,6 +35,7 @@ export const boffMediaUsers = mysqlTable('boffmedia_users', {
   updatedAt: timestamp('updated_at', { mode: 'date' })
     .defaultNow()
     .onUpdateNow(),
+  lastSeenAt: timestamp('last_seen_at'),
   // GDPR soft-delete: set (with PII scrubbed) instead of hard-deleting. All
   // reads/login exclude rows where this is non-null.
   deletedAt: timestamp('deleted_at', { mode: 'date' }),

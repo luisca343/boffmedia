@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils"
 import { Badge } from "@/components/boffmedia/primitives/badge"
 import { Icon } from "@/components/boffmedia/primitives/icon"
 import { Panel } from "@/components/boffmedia/primitives/panel"
+import { ArtImage } from "@/components/boffmedia/ui/tools/ArtImage"
 import { Byline, CmAvatar } from "./CmAvatar"
 import { fmtNum, timeAgo, type ForumCategoryLike, type ForumMember, type ForumStatsData, type ForumThreadLike } from "./community-util"
 
@@ -16,11 +17,15 @@ export function ThreadRow({
   onOpen,
   compact,
   showCat,
+  now,
 }: {
   thread: ForumThreadLike
   onOpen?: (href: string) => void
   compact?: boolean
   showCat?: boolean
+  // Reference «now» for relative timestamps. Undefined keeps the frozen
+  // showcase CM_NOW default; real pages pass a live Date.
+  now?: Date
 }) {
   const open = () => onOpen && onOpen("/foro/" + thread.catSlug + "/" + thread.id)
   const hot = thread.replies >= 3 || (thread.votes || 0) >= 40
@@ -40,11 +45,24 @@ export function ThreadRow({
     >
       <span
         className={cn(
-          "grid h-11 w-11 flex-none place-items-center border border-solid border-[color-mix(in_srgb,hsl(var(--chue)_70%_50%)_40%,var(--line-2))] bg-[color-mix(in_srgb,hsl(var(--chue)_70%_50%)_14%,var(--panel-2))] font-display text-[18px]/none font-extrabold italic text-[hsl(var(--chue)_78%_64%)] cut-seal [--cut:8px]",
+          "relative grid h-11 w-11 flex-none place-items-center overflow-hidden border border-solid border-[color-mix(in_srgb,hsl(var(--chue)_70%_50%)_40%,var(--line-2))] bg-[color-mix(in_srgb,hsl(var(--chue)_70%_50%)_14%,var(--panel-2))] font-display text-[18px]/none font-extrabold italic text-[hsl(var(--chue)_78%_64%)] cut-seal [--cut:8px]",
           compact && "h-[38px] w-[38px] text-[15px]",
         )}
       >
-        {thread.author ? thread.author.avatar : "?"}
+        {thread.author?.avatarUrl ? (
+          <ArtImage
+            src={thread.author.avatarUrl}
+            alt={thread.author.name ?? ""}
+            width={compact ? 38 : 44}
+            height={compact ? 38 : 44}
+            className="h-full w-full"
+            fallback={<span>{thread.author.avatar}</span>}
+          />
+        ) : thread.author ? (
+          thread.author.avatar
+        ) : (
+          "?"
+        )}
       </span>
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-[9px]">
@@ -62,13 +80,13 @@ export function ThreadRow({
             </>
           )}
           <span className="text-line-2">·</span>
-          <span>{timeAgo(thread.createdAt)}</span>
+          <span>{timeAgo(thread.createdAt, now)}</span>
           {thread.replies > 0 && thread.lastAuthor && (
             <>
               <span className="text-line-2">·</span>
               <span>
                 último: {thread.lastAuthor.name}
-                {thread.lastAt && <> · {timeAgo(thread.lastAt)}</>}
+                {thread.lastAt && <> · {timeAgo(thread.lastAt, now)}</>}
               </span>
             </>
           )}
@@ -88,7 +106,7 @@ export function ThreadRow({
   )
 }
 
-export function CategoryTile({ cat, onOpen }: { cat: ForumCategoryLike; onOpen?: (href: string) => void }) {
+export function CategoryTile({ cat, onOpen, now }: { cat: ForumCategoryLike; onOpen?: (href: string) => void; now?: Date }) {
   const open = () => onOpen && onOpen("/foro/" + cat.slug)
   return (
     <div
@@ -123,7 +141,7 @@ export function CategoryTile({ cat, onOpen }: { cat: ForumCategoryLike; onOpen?:
         {cat.lastAuthor && cat.lastAt && (
           <div className="min-w-[150px] border-l border-solid border-line pl-[22px]">
             <span className="mb-2 block font-mono text-[9px]/none font-medium uppercase tracking-[0.1em] text-txt-dim">Última actividad</span>
-            <Byline author={cat.lastAuthor} when={cat.lastAt} size={24} link={false} />
+            <Byline author={cat.lastAuthor} when={cat.lastAt} size={24} link={false} now={now} />
           </div>
         )}
       </div>
@@ -143,6 +161,9 @@ export function CmMemberRow({
   rank?: number
   count?: number
   onOpen?: (href: string) => void
+  // Accepted for API parity with the other forum rows (OnlineList forwards it);
+  // this row renders no relative timestamp so it is currently unused.
+  now?: Date
 }) {
   const open = () => onOpen && onOpen("/blog/autor/" + member.handle)
   return (
@@ -183,13 +204,13 @@ function WidgetHead({ icon, title, right }: { icon: "users" | "chart"; title: st
   )
 }
 
-export function OnlineList({ members, onOpen }: { members: ForumMember[]; onOpen?: (href: string) => void }) {
+export function OnlineList({ members, onOpen, now }: { members: ForumMember[]; onOpen?: (href: string) => void; now?: Date }) {
   return (
     <Panel>
       <WidgetHead icon="users" title="En línea ahora" right={<span className="font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-ok">{members.length}</span>} />
       <div className="grid">
         {members.map((m) => (
-          <CmMemberRow key={m.handle} member={m} onOpen={onOpen} />
+          <CmMemberRow key={m.handle} member={m} onOpen={onOpen} now={now} />
         ))}
       </div>
     </Panel>
