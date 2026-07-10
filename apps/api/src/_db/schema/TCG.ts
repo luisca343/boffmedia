@@ -1,10 +1,10 @@
 import {
-  mysqlTable,
-  varchar,
   int,
-  text,
+  mysqlTable,
   primaryKey,
-  datetime,
+  text,
+  timestamp,
+  varchar,
 } from 'drizzle-orm/mysql-core';
 
 export const tcgSets = mysqlTable('tcg_sets', {
@@ -47,7 +47,7 @@ export const tcgCards = mysqlTable('tcg_cards', {
   stage: varchar('stage', { length: 32 }),
   description_en: varchar('description_en', { length: 1024 }),
   description_es: varchar('description_es', { length: 1024 }),
-  updated: datetime('updated'),
+  updated: timestamp('updated'),
 
   // TODO: Pensar en cómo manejar estos campos complejos de forma más eficiente
   types: varchar('types', { length: 255 }), // JSON: ["Grass", "Water"]
@@ -68,9 +68,9 @@ export const userCards = mysqlTable(
     user_id: int('user_id').notNull(),
     card_id: varchar('card_id', { length: 32 }).notNull(),
     quantity: int('quantity').default(1).notNull(),
-    acquired_date: datetime('acquired_date').notNull(),
-    created_at: datetime('created_at').notNull(),
-    updated_at: datetime('updated_at').notNull(),
+    acquired_date: timestamp('acquired_date').notNull(),
+    created_at: timestamp('created_at').notNull(),
+    updated_at: timestamp('updated_at').notNull(),
   },
   (table) => ({
     userCardUnique: primaryKey({
@@ -87,7 +87,7 @@ export const userCardHistory = mysqlTable('tcg_user_card_history', {
   user_id: int('user_id').notNull(),
   card_id: varchar('card_id', { length: 32 }).notNull(),
   quantity_change: int('quantity_change').notNull(), // +/- amount
-  date: datetime('date').notNull(),
+  date: timestamp('date').notNull(),
 });
 
 export type UserCardHistory = typeof userCardHistory.$inferSelect;

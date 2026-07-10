@@ -1,11 +1,11 @@
 import {
-  datetime,
   double,
   foreignKey,
   index,
   int,
   mysqlTable,
   text,
+  timestamp,
   uniqueIndex,
   varchar,
 } from 'drizzle-orm/mysql-core';
@@ -49,7 +49,7 @@ export const vgcSmogonSnapshots = mysqlTable(
     month: varchar('month', { length: 7 }).notNull(),
     cutoff: int('cutoff').notNull(),
     pokemonCount: int('pokemon_count').notNull().default(0),
-    fetchedAt: datetime('fetched_at').notNull(),
+    fetchedAt: timestamp('fetched_at').notNull(),
   },
   (t) => [
     uniqueIndex('vgc_smogon_format_month_cutoff_idx').on(
@@ -84,7 +84,7 @@ export const vgcSmogonPokemon = mysqlTable(
     teraTypes: text('tera_types').notNull(),
     teammates: text('teammates').notNull(),
     spreads: text('spreads').notNull(),
-    fetchedAt: datetime('fetched_at').notNull(),
+    fetchedAt: timestamp('fetched_at').notNull(),
   },
   (t) => [
     uniqueIndex('vgc_smogon_pokemon_idx').on(
@@ -121,7 +121,7 @@ export const vgcPokepastes = mysqlTable(
     title: varchar('title', { length: 255 }),
     formatId: varchar('format_id', { length: 64 }),
     replicaCode: varchar('replica_code', { length: 20 }),
-    fetchedAt: datetime('fetched_at').notNull(),
+    fetchedAt: timestamp('fetched_at').notNull(),
   },
   (t) => [index('vgc_pokepastes_format_idx').on(t.formatId)],
 );
@@ -157,7 +157,7 @@ export const vgcPastesRepository = mysqlTable(
     hasEvs: varchar('has_evs', { length: 4 }), // 'Yes' / 'No'
     sourceUrl: varchar('source_url', { length: 512 }),
     owner: varchar('owner', { length: 128 }),
-    fetchedAt: datetime('fetched_at').notNull(),
+    fetchedAt: timestamp('fetched_at').notNull(),
   },
   (t) => [
     index('vgc_pastes_repository_regulation_idx').on(t.regulationId),
@@ -185,7 +185,7 @@ export const vgcLimitlessTournaments = mysqlTable(
     progress: int('progress').notNull().default(0),
     total: int('total').notNull().default(0),
     errorMessage: text('error_message'),
-    fetchedAt: datetime('fetched_at').notNull(),
+    fetchedAt: timestamp('fetched_at').notNull(),
   },
   (t) => [
     index('vgc_limitless_tournaments_regulation_idx').on(t.regulationId),
@@ -213,7 +213,7 @@ export const vgcLimitlessTeams = mysqlTable(
     placing: int('placing'),
     record: varchar('record', { length: 16 }), // e.g. '7-2-0'
     pasteId: int('paste_id').references(() => vgcPokepastes.id), // null until paste scraped
-    fetchedAt: datetime('fetched_at').notNull(),
+    fetchedAt: timestamp('fetched_at').notNull(),
   },
   (t) => [
     index('vgc_limitless_teams_tournament_idx').on(t.tournamentId),
@@ -254,10 +254,10 @@ export const vgcRegulations = mysqlTable(
     importError: text('import_error'),
     importTeamCount: int('import_team_count').notNull().default(0),
     importFetchedCount: int('import_fetched_count').notNull().default(0),
-    importStartedAt: datetime('import_started_at'),
-    importCompletedAt: datetime('import_completed_at'),
+    importStartedAt: timestamp('import_started_at'),
+    importCompletedAt: timestamp('import_completed_at'),
     active: int('active').notNull().default(1), // 0 = soft-disabled
-    createdAt: datetime('created_at').notNull(),
+    createdAt: timestamp('created_at').notNull(),
   },
   (t) => [
     index('vgc_regulations_active_idx').on(t.active),

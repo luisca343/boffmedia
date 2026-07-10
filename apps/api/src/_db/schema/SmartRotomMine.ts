@@ -1,9 +1,9 @@
 import { sql } from 'drizzle-orm';
 import {
   char,
-  datetime,
   int,
   mysqlTable,
+  timestamp,
   varchar,
 } from 'drizzle-orm/mysql-core';
 import { smartrotomUsers } from './SmartRotom';
@@ -16,7 +16,7 @@ export const mineGames = mysqlTable('rotom_mine_games', {
       onDelete: 'cascade',
       onUpdate: 'cascade',
     }),
-  createdAt: datetime('created_at').default(sql`CURRENT_TIMESTAMP()`),
+  createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP()`),
 });
 
 export type PartidaMina = typeof mineGames.$inferSelect;

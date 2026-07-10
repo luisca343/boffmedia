@@ -1,10 +1,10 @@
 import {
-  datetime,
   index,
   int,
   mysqlEnum,
   mysqlTable,
   text,
+  timestamp,
   varchar,
 } from 'drizzle-orm/mysql-core';
 import { sql } from 'drizzle-orm';
@@ -38,8 +38,8 @@ export const boffMediaNotifications = mysqlTable(
     title: varchar('title', { length: 255 }).notNull(),
     body: text('body'),
     link: varchar('link', { length: 512 }),
-    readAt: datetime('read_at'),
-    createdAt: datetime('created_at')
+    readAt: timestamp('read_at'),
+    createdAt: timestamp('created_at')
       .notNull()
       .default(sql`CURRENT_TIMESTAMP()`),
   },

@@ -14,6 +14,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { Public } from '@api/_utils/decorators/public.decorator';
+import { OptionalAuth } from '@api/_utils/decorators/optional-auth.decorator';
 import {
   ApiTags,
   ApiOperation,
@@ -29,6 +30,7 @@ import { Roles } from '@api/_utils/decorators/roles.decorator';
 import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { EventsFacadeService } from './events.facade.service';
 import { CreateEventDto } from './dto/create-event.dto';
+import { ListEventsQueryDto } from './dto/list-events-query.dto';
 import { CreateGameDto } from './dto/create-game.dto';
 import { CreateAchievementDto } from './dto/create-achievement.dto';
 import { CreateTeamDto } from './dto/create-team.dto';
@@ -61,16 +63,28 @@ export class EventsController {
   constructor(private readonly eventsFacadeService: EventsFacadeService) {}
 
   // ==================== EVENT MANAGEMENT ====================
-  @Public()
+  @OptionalAuth()
   @Get()
-  @ApiOperation({ summary: 'Get all events' })
+  @ApiOperation({
+    summary: 'Get all events (optional status/gameId/type filters + pagination)',
+  })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Events retrieved successfully.',
     type: [Event],
   })
-  async getEvents(): Promise<Event[]> {
-    return await this.eventsFacadeService.getEvents();
+  async getEvents(
+    @Query() query: ListEventsQueryDto,
+    @Req() req: { user?: { roles?: string[] } },
+  ): Promise<Event[]> {
+    // Private events are only exposed to admins; anonymous/non-admin callers
+    // (public pages) get public events only.
+    const includePrivate =
+      req.user?.roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false;
+    return await this.eventsFacadeService.getEvents({
+      ...query,
+      includePrivate,
+    });
   }
 
   @Public()

@@ -78,6 +78,41 @@
       "when": 1783632611791,
       "tag": "0010_user_soft_delete",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "5",
+      "when": 1783633741378,
+      "tag": "0011_tranquil_justice",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "5",
+      "when": 1783666564540,
+      "tag": "0012_brave_the_santerians",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "5",
+      "when": 1783669899830,
+      "tag": "0013_events_datetime_to_timestamp",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "5",
+      "when": 1783673470416,
+      "tag": "0014_sweep_datetime_to_timestamp_all",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "5",
+      "when": 1783674379191,
+      "tag": "0015_rename_boffmedia_snake_case",
+      "breakpoints": true
     }
   ]
 }

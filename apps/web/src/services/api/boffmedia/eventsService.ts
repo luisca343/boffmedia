@@ -1,5 +1,6 @@
 import {
   apiGET,
+  apiAuthedAutoGET,
   apiAuthedAutoPOST,
   apiAuthedAutoPUT,
   apiAuthedAutoDELETE,
@@ -28,14 +29,30 @@ import type {
   SuccessResponse,
 } from '@boffmedia/shared';
 
+export interface EventFilters {
+  status?: 'upcoming' | 'active' | 'completed';
+  gameId?: number;
+  type?: 'event' | 'server';
+  limit?: number;
+  offset?: number;
+}
+
 export class EventsService {
   // ==================== EVENT OPERATIONS ====================
-  
+
   /**
-   * Get all events
+   * Get all events. With no filters this returns the full public list; pass
+   * filters to narrow/paginate server-side. Sent auto-authed so an admin's
+   * token reaches the API (admins additionally receive private events);
+   * anonymous callers send no token and get public events only.
    */
-  static getEvents() {
-    return apiGET<Event[]>('/events');
+  static getEvents(filters?: EventFilters) {
+    const params = new URLSearchParams(
+      Object.entries(filters ?? {})
+        .filter(([, v]) => v !== undefined && v !== null)
+        .map(([k, v]) => [k, String(v)]),
+    ).toString();
+    return apiAuthedAutoGET<Event[]>(params ? `/events?${params}` : '/events');
   }
   
   /**

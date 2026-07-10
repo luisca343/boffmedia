@@ -2,12 +2,16 @@ import { ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 import { IS_PUBLIC_KEY } from '@api/_utils/decorators/public.decorator';
+import { IS_OPTIONAL_AUTH_KEY } from '@api/_utils/decorators/optional-auth.decorator';
 
 /**
  * JWT auth guard. Registered as the global `APP_GUARD` (secure-by-default), so
  * it also honours the `@Public()` decorator: a route/controller marked public
  * skips authentication. Still usable per-route via `@UseGuards(JwtAuthGuard)` —
  * an explicitly-guarded route is never public.
+ *
+ * `@OptionalAuth()` routes run passport but never reject: a valid token
+ * populates `req.user`, a missing/invalid one leaves it `undefined`.
  */
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
@@ -31,5 +35,26 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     }
 
     return super.canActivate(context);
+  }
+
+  /**
+   * For `@OptionalAuth()` routes, don't throw on a missing/invalid token —
+   * return the resolved user or `undefined` so the request proceeds anonymously.
+   */
+  handleRequest<TUser = unknown>(
+    err: unknown,
+    user: TUser,
+    info: unknown,
+    context: ExecutionContext,
+    status?: unknown,
+  ): TUser {
+    const isOptional = this.reflector.getAllAndOverride<boolean>(
+      IS_OPTIONAL_AUTH_KEY,
+      [context.getHandler(), context.getClass()],
+    );
+    if (isOptional) {
+      return (user ?? undefined) as TUser;
+    }
+    return super.handleRequest(err, user, info, context, status);
   }
 }
