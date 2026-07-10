@@ -5,7 +5,7 @@ import {
   apiAuthedAutoDELETE,
 } from '@/services/boffAPI'
 
-export type NotificationType = 'event' | 'achievement' | 'tournament' | 'system'
+export type NotificationType = 'event' | 'achievement' | 'tournament' | 'forum' | 'system'
 
 export interface ApiNotification {
   id: number

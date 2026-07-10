@@ -13,7 +13,13 @@ const TONE_BY_TYPE: Record<NotificationType, Notif["tone"]> = {
   event: "info",
   achievement: "accent",
   tournament: "accent",
+  forum: "accent",
   system: "muted",
+}
+
+// Forum notifications get a distinct message glyph; other types keep the bell.
+const ICON_BY_TYPE: Partial<Record<NotificationType, Notif["icon"]>> = {
+  forum: "message",
 }
 
 function relTime(iso: string): string {
@@ -29,7 +35,7 @@ function relTime(iso: string): string {
 function toNotif(n: ApiNotification): Notif {
   return {
     id: n.id,
-    icon: "bell",
+    icon: ICON_BY_TYPE[n.type] ?? "bell",
     tone: TONE_BY_TYPE[n.type] ?? "muted",
     text: n.body ? `${n.title} — ${n.body}` : n.title,
     time: relTime(n.createdAt),

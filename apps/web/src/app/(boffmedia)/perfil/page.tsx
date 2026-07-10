@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { ProfileView } from "./_components/ProfileView"
+import { discordEnabled, twitchEnabled } from "@/features/authOptions"
 
 export const metadata: Metadata = {
   title: "Mi perfil · Boffmedia",
@@ -7,5 +8,5 @@ export const metadata: Metadata = {
 }
 
 export default function ProfilePage() {
-  return <ProfileView />
+  return <ProfileView discordEnabled={discordEnabled} twitchEnabled={twitchEnabled} />
 }

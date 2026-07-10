@@ -45,6 +45,24 @@ export interface GoogleUserData {
   profilePicture?: string;
 }
 
+export interface DiscordUserData {
+  discordId: string;
+  // Discord only returns an email when the `email` scope is granted; account
+  // creation requires it, but linking by discordId does not.
+  email?: string;
+  name?: string;
+  profilePicture?: string;
+}
+
+export interface TwitchUserData {
+  twitchId: string;
+  // Twitch only returns an email with the `user:read:email` scope and a verified
+  // address; account creation requires it, linking by twitchId does not.
+  email?: string;
+  name?: string;
+  profilePicture?: string;
+}
+
 export interface MinecraftRegistrationData {
   username: string;
   email: string;
@@ -259,6 +277,37 @@ export class BoffMediaUsersManagementService {
     }
   }
 
+  async getUserByDiscordId(
+    discordId: string,
+  ): Promise<BoffMediaUserSafe | null> {
+    if (!discordId || discordId.trim() === '') {
+      throw new BadRequestException('Discord ID is required');
+    }
+
+    try {
+      return await this.usersRepository.findUserByDiscordId(discordId);
+    } catch (error: any) {
+      this.logger.error(
+        `Failed to get user by Discord ID ${discordId}:`,
+        error,
+      );
+      throw new Error(`Failed to retrieve user: ${error.message}`);
+    }
+  }
+
+  async getUserByTwitchId(twitchId: string): Promise<BoffMediaUserSafe | null> {
+    if (!twitchId || twitchId.trim() === '') {
+      throw new BadRequestException('Twitch ID is required');
+    }
+
+    try {
+      return await this.usersRepository.findUserByTwitchId(twitchId);
+    } catch (error: any) {
+      this.logger.error(`Failed to get user by Twitch ID ${twitchId}:`, error);
+      throw new Error(`Failed to retrieve user: ${error.message}`);
+    }
+  }
+
   // ==================== FULL USER RETRIEVAL ====================
   async getFullUserByUsernameWithPassword(
     username: string,
@@ -406,12 +455,136 @@ export class BoffMediaUsersManagementService {
   // ==================== PROVIDER LINKING ====================
 
   /**
-   * Clear a linked OAuth provider id (google/discord/twitch) on a user.
-   * Only removes the link — re-linking happens through the normal OAuth login.
+   * Link a verified SteamID64 to a user. Steam has no OAuth login of its own
+   * (OpenID, no email) — it is link-only, attached to an already-authenticated
+   * account. The web verifies the Steam OpenID assertion before calling this.
+   */
+  async linkSteam(id: number, steamId: string): Promise<BoffMediaUserSafe> {
+    if (!id || id <= 0) {
+      throw new BadRequestException('Valid ID is required');
+    }
+    if (!steamId || !/^\d{17}$/.test(steamId)) {
+      throw new BadRequestException('A valid SteamID64 is required');
+    }
+
+    // Refuse to steal a SteamID already linked to a different account.
+    const owner = await this.usersRepository.findUserBySteamId(steamId);
+    if (owner && owner.id !== id) {
+      throw new ConflictException(
+        'This Steam account is already linked to another user',
+      );
+    }
+
+    try {
+      return await this.usersRepository.updateUser(id, {
+        steamId,
+      } as UpdateUserDto);
+    } catch (error: any) {
+      this.logger.error(`Failed to link Steam for user ${id}:`, error);
+      throw new Error(`Steam link failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Attach a Discord id to a user, by user id — session-preserving linking from
+   * the profile (as opposed to Discord *login*, which merges by email). The web
+   * verifies the Discord OAuth handshake before calling this.
+   */
+  async linkDiscord(id: number, discordId: string): Promise<BoffMediaUserSafe> {
+    if (!id || id <= 0) {
+      throw new BadRequestException('Valid ID is required');
+    }
+    if (!discordId || !/^\d{5,32}$/.test(discordId)) {
+      throw new BadRequestException('A valid Discord ID is required');
+    }
+
+    // Refuse to steal a Discord account already linked to someone else.
+    const owner = await this.usersRepository.findUserByDiscordId(discordId);
+    if (owner && owner.id !== id) {
+      throw new ConflictException(
+        'This Discord account is already linked to another user',
+      );
+    }
+
+    try {
+      return await this.usersRepository.updateUser(id, {
+        discordId,
+      } as UpdateUserDto);
+    } catch (error: any) {
+      this.logger.error(`Failed to link Discord for user ${id}:`, error);
+      throw new Error(`Discord link failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Attach a Google id (`sub`) to a user, by user id — session-preserving
+   * linking from the profile (as opposed to Google *login*, which merges by
+   * email). The web verifies the Google OAuth handshake before calling this.
+   */
+  async linkGoogle(id: number, googleId: string): Promise<BoffMediaUserSafe> {
+    if (!id || id <= 0) {
+      throw new BadRequestException('Valid ID is required');
+    }
+    if (!googleId || googleId.trim() === '' || googleId.length > 255) {
+      throw new BadRequestException('A valid Google ID is required');
+    }
+
+    // Refuse to steal a Google account already linked to someone else.
+    const owner = await this.usersRepository.findUserByGoogleId(googleId);
+    if (owner && owner.id !== id) {
+      throw new ConflictException(
+        'This Google account is already linked to another user',
+      );
+    }
+
+    try {
+      return await this.usersRepository.updateUser(id, {
+        googleId,
+      } as UpdateUserDto);
+    } catch (error: any) {
+      this.logger.error(`Failed to link Google for user ${id}:`, error);
+      throw new Error(`Google link failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Attach a Twitch id to a user, by user id — session-preserving linking from
+   * the profile (as opposed to Twitch *login*, which merges by email). The web
+   * verifies the Twitch OAuth handshake before calling this.
+   */
+  async linkTwitch(id: number, twitchId: string): Promise<BoffMediaUserSafe> {
+    if (!id || id <= 0) {
+      throw new BadRequestException('Valid ID is required');
+    }
+    if (!twitchId || !/^\d{1,20}$/.test(twitchId)) {
+      throw new BadRequestException('A valid Twitch ID is required');
+    }
+
+    // Refuse to steal a Twitch account already linked to someone else.
+    const owner = await this.usersRepository.findUserByTwitchId(twitchId);
+    if (owner && owner.id !== id) {
+      throw new ConflictException(
+        'This Twitch account is already linked to another user',
+      );
+    }
+
+    try {
+      return await this.usersRepository.updateUser(id, {
+        twitchId,
+      } as UpdateUserDto);
+    } catch (error: any) {
+      this.logger.error(`Failed to link Twitch for user ${id}:`, error);
+      throw new Error(`Twitch link failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Clear a linked provider id (google/discord/twitch/steam) on a user.
+   * Only removes the link — re-linking happens through the normal flow.
    */
   async unlinkProvider(
     id: number,
-    provider: 'google' | 'discord' | 'twitch',
+    provider: 'google' | 'discord' | 'twitch' | 'steam',
   ): Promise<BoffMediaUserSafe> {
     if (!id || id <= 0) {
       throw new BadRequestException('Valid ID is required');
@@ -421,7 +594,13 @@ export class BoffMediaUsersManagementService {
       google: 'googleId',
       discord: 'discordId',
       twitch: 'twitchId',
-    }[provider] as 'googleId' | 'discordId' | 'twitchId' | undefined;
+      steam: 'steamId',
+    }[provider] as
+      | 'googleId'
+      | 'discordId'
+      | 'twitchId'
+      | 'steamId'
+      | undefined;
 
     if (!column) {
       throw new BadRequestException(`Unsupported provider: ${provider}`);
@@ -504,8 +683,11 @@ export class BoffMediaUsersManagementService {
 
   async createFromGoogle(googleUser: GoogleUserData): Promise<SessionUser> {
     try {
-      // Check if user already exists
-      let existingUser = await this.getUserByGoogleId(googleUser.googleId);
+      // Resolve by google id first (when the caller sent one — older login
+      // requests didn't, and getUserByGoogleId throws on an empty id).
+      let existingUser = googleUser.googleId
+        ? await this.getUserByGoogleId(googleUser.googleId)
+        : null;
 
       if (!existingUser) {
         // Check by email
@@ -556,6 +738,134 @@ export class BoffMediaUsersManagementService {
     } catch (error: any) {
       this.logger.error('Failed to create user from Google:', error);
       throw new Error(`Google authentication failed: ${error.message}`);
+    }
+  }
+
+  // ==================== DISCORD AUTHENTICATION ====================
+
+  async createFromDiscord(discordUser: DiscordUserData): Promise<SessionUser> {
+    try {
+      // Resolve by discordId first (returning Discord user).
+      let existingUser = await this.getUserByDiscordId(discordUser.discordId);
+
+      if (!existingUser) {
+        // Then by email — links Discord to an existing account.
+        if (discordUser.email) {
+          existingUser = await this.getUserByEmail(discordUser.email);
+        }
+
+        if (existingUser) {
+          // Attach discordId to the matched account. Straight to the repository:
+          // discordId is not a public UpdateUserDto field (account-takeover guard).
+          existingUser = await this.usersRepository.updateUser(existingUser.id, {
+            discordId: discordUser.discordId,
+            profilePicture:
+              discordUser.profilePicture || existingUser.profilePicture,
+            // Discord returns the email only for verified accounts — trust it.
+            emailVerified: true,
+          });
+        } else {
+          // A brand-new Discord account needs an email to onboard (email is
+          // NOT NULL). The web requests the `email` scope, so this is expected.
+          if (!discordUser.email) {
+            throw new Error('Discord did not provide an email address');
+          }
+
+          const userData: CreateUserDto = {
+            email: discordUser.email,
+            username: this.generateUsernameFromEmail(discordUser.email),
+            password: this.passwordService.generateOAuthPassword(),
+            discordId: discordUser.discordId,
+            profilePicture:
+              discordUser.profilePicture ||
+              'https://cdn.boffmedia.es/default-profile.png',
+          };
+
+          existingUser = await this.createUser(userData);
+          existingUser = await this.usersRepository.updateUser(existingUser.id, {
+            emailVerified: true,
+          });
+        }
+      }
+
+      const fullUser = await this.getFullUserByUsernameWithPassword(
+        existingUser.username,
+      );
+      if (!fullUser) {
+        throw new Error(
+          'Failed to retrieve full user data after Discord authentication',
+        );
+      }
+
+      const roles = await this.getUserRoles(fullUser.boffmedia_users.id);
+      return this.createSessionUser(fullUser, roles);
+    } catch (error: any) {
+      this.logger.error('Failed to create user from Discord:', error);
+      throw new Error(`Discord authentication failed: ${error.message}`);
+    }
+  }
+
+  // ==================== TWITCH AUTHENTICATION ====================
+
+  async createFromTwitch(twitchUser: TwitchUserData): Promise<SessionUser> {
+    try {
+      // Resolve by twitchId first (returning Twitch user).
+      let existingUser = await this.getUserByTwitchId(twitchUser.twitchId);
+
+      if (!existingUser) {
+        // Then by email — links Twitch to an existing account.
+        if (twitchUser.email) {
+          existingUser = await this.getUserByEmail(twitchUser.email);
+        }
+
+        if (existingUser) {
+          // Attach twitchId to the matched account. Straight to the repository:
+          // twitchId is not a public UpdateUserDto field (account-takeover guard).
+          existingUser = await this.usersRepository.updateUser(existingUser.id, {
+            twitchId: twitchUser.twitchId,
+            profilePicture:
+              twitchUser.profilePicture || existingUser.profilePicture,
+            // Twitch returns the email only for verified accounts — trust it.
+            emailVerified: true,
+          });
+        } else {
+          // A brand-new Twitch account needs an email to onboard (email is
+          // NOT NULL). The web requests the `user:read:email` scope.
+          if (!twitchUser.email) {
+            throw new Error('Twitch did not provide an email address');
+          }
+
+          const userData: CreateUserDto = {
+            email: twitchUser.email,
+            username: this.generateUsernameFromEmail(twitchUser.email),
+            password: this.passwordService.generateOAuthPassword(),
+            twitchId: twitchUser.twitchId,
+            profilePicture:
+              twitchUser.profilePicture ||
+              'https://cdn.boffmedia.es/default-profile.png',
+          };
+
+          existingUser = await this.createUser(userData);
+          existingUser = await this.usersRepository.updateUser(existingUser.id, {
+            emailVerified: true,
+          });
+        }
+      }
+
+      const fullUser = await this.getFullUserByUsernameWithPassword(
+        existingUser.username,
+      );
+      if (!fullUser) {
+        throw new Error(
+          'Failed to retrieve full user data after Twitch authentication',
+        );
+      }
+
+      const roles = await this.getUserRoles(fullUser.boffmedia_users.id);
+      return this.createSessionUser(fullUser, roles);
+    } catch (error: any) {
+      this.logger.error('Failed to create user from Twitch:', error);
+      throw new Error(`Twitch authentication failed: ${error.message}`);
     }
   }
 

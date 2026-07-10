@@ -35,6 +35,9 @@ export interface IBoffMediaUsersRepository {
   findUserByEmail(email: string): Promise<BoffMediaUserSafe | null>;
   findUserByUuid(uuid: string): Promise<BoffMediaUserSafe | null>;
   findUserByGoogleId(googleId: string): Promise<BoffMediaUserSafe | null>;
+  findUserByDiscordId(discordId: string): Promise<BoffMediaUserSafe | null>;
+  findUserBySteamId(steamId: string): Promise<BoffMediaUserSafe | null>;
+  findUserByTwitchId(twitchId: string): Promise<BoffMediaUserSafe | null>;
 
   // ==================== COMPLEX QUERIES ====================
   findFullUserByUsernameWithPassword(

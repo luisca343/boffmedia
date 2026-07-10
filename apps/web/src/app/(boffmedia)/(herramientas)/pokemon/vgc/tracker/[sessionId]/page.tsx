@@ -267,7 +267,7 @@ export default function SessionPage({ params }: Props) {
               </div>
             )
           ) : tab === "stats" ? (
-            <TrStats sessionId={sessionId} startElo={session?.startElo} />
+            <TrStats sessionId={sessionId} session={session} sessions={sessions} />
           ) : loading ? (
             <Loading />
           ) : matches.length === 0 ? (

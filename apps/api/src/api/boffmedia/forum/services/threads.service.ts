@@ -160,7 +160,7 @@ export class ThreadsService {
       if (!ref) return;
       await this.notifications.create({
         userId: post.userId,
-        type: 'system',
+        type: 'forum',
         title: 'Tu respuesta fue marcada como solución',
         body: ref.title,
         link: `/foro/${ref.catSlug}/${threadId}`,

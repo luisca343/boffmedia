@@ -5,14 +5,22 @@ import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { DkStat, DkSeg, DkSplit, DkTrend, DkHeat } from "@/components/boffmedia/ui/tools/datakit"
 import { useSessionStats } from "@/features/vgc-tracker/hooks/useSessionStats"
+import { useComparisonElo } from "@/features/vgc-tracker/hooks/useComparisonElo"
+import { useRegulationMeta } from "@/features/vgc-tracker/hooks/useRegulationMeta"
 import type { PokemonUsage, LeadPairStats } from "@/features/vgc-tracker/utils/sessionStats"
+import type { Session } from "@/features/vgc-tracker/types"
 import { Spinner } from "@/components/boffmedia/primitives/spinner"
 import { TrPanel, TrSprite, TrSub, TrNone } from "../../_components/ui/tr-ui"
 
 type TableTab = "myTeam" | "preview" | "leads" | "backs"
+type UsageTab = "preview" | "leads" | "backs"
 
-export function TrStats({ sessionId, startElo }: { sessionId: string; startElo?: number }) {
+// Overlay palette for the compare-sessions chart (current session is always accent).
+const SERIES_COLORS = ["var(--info)", "var(--ok)", "var(--warn)", "var(--bad)"]
+
+export function TrStats({ sessionId, session, sessions }: { sessionId: string; session?: Session; sessions: Session[] }) {
   const t = useTranslations("vgc.tracker.sessionStats")
+  const startElo = session?.startElo
   const { stats, loading } = useSessionStats(sessionId, startElo)
   const [tab, setTab] = useState<TableTab>("myTeam")
 
@@ -75,6 +83,8 @@ export function TrStats({ sessionId, startElo }: { sessionId: string; startElo?:
         </TrPanel>
       )}
 
+      {session && <ComparisonPanel sessionId={sessionId} session={session} sessions={sessions} />}
+
       <TrPanel
         title={t("table.title")}
         icon="chart"
@@ -95,6 +105,8 @@ export function TrStats({ sessionId, startElo }: { sessionId: string; startElo?:
       >
         <UsageTable items={tabItems[tab]} played={played} preview={tab === "preview"} />
       </TrPanel>
+
+      {session && <RegulationMetaPanel session={session} />}
 
       <div className="grid grid-cols-[repeat(auto-fit,minmax(min(420px,100%),1fr))] items-start gap-3">
         <TrPanel title={t("pairs.title")} icon="users">
@@ -250,5 +262,185 @@ function ActivityHeat({ stats }: { stats: ReturnType<typeof useSessionStats>["st
       max={grid.max}
       value={(ri, ci) => grid.map.get(`${HEAT_DAYS[ri].dow}:${HEAT_SLOTS[ci]}`) ?? 0}
     />
+  )
+}
+
+// ─── session comparison (overlay ELO curves) ─────────────────────────────────
+function ComparisonPanel({ sessionId, session, sessions }: { sessionId: string; session: Session; sessions: Session[] }) {
+  const t = useTranslations("vgc.tracker.sessionStats")
+  // Other ladder sessions in the same regulation (ELO scales differ per reg),
+  // newest first.
+  const others = useMemo(
+    () =>
+      sessions
+        .filter((s) => s.id !== sessionId && s.type === "ladder" && s.regulationId === session.regulationId)
+        .sort((a, b) => b.startedAt - a.startedAt),
+    [sessions, sessionId, session.regulationId],
+  )
+  const [selected, setSelected] = useState<string[]>([])
+  const activeIds = useMemo(() => [sessionId, ...selected], [sessionId, selected])
+  const { series } = useComparisonElo(activeIds, sessions)
+
+  // Nothing to compare against → hide the whole panel.
+  if (others.length === 0) return null
+
+  const colorFor = (id: string) =>
+    id === sessionId ? "var(--accent)" : SERIES_COLORS[Math.max(0, others.findIndex((o) => o.id === id)) % SERIES_COLORS.length]
+
+  const toggle = (id: string) =>
+    setSelected((cur) => (cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id]))
+
+  const lines = series.map((s) => ({
+    values: s.points.map((p) => p.elo),
+    color: colorFor(s.id),
+    width: s.id === sessionId ? 2.4 : 1.6,
+  }))
+
+  return (
+    <TrPanel
+      title={t("comparison.title")}
+      icon="trending"
+      right={
+        selected.length > 0 ? (
+          <button
+            type="button"
+            onClick={() => setSelected([])}
+            className="font-mono text-[10px] font-semibold uppercase tracking-[0.06em] text-txt-muted transition-colors hover:text-accent"
+          >
+            {t("comparison.clearAll")}
+          </button>
+        ) : undefined
+      }
+    >
+      <div className="mb-3 flex flex-wrap gap-[6px]">
+        <LegendChip label={session.label} color="var(--accent)" active locked />
+        {others.map((o) => (
+          <LegendChip key={o.id} label={o.label} color={colorFor(o.id)} active={selected.includes(o.id)} onClick={() => toggle(o.id)} />
+        ))}
+      </div>
+      {selected.length === 0 ? <TrNone>{t("comparison.hint")}</TrNone> : <DkTrend height={180} lines={lines} />}
+    </TrPanel>
+  )
+}
+
+function LegendChip({
+  label,
+  color,
+  active,
+  locked,
+  onClick,
+}: {
+  label: string
+  color: string
+  active: boolean
+  locked?: boolean
+  onClick?: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={locked}
+      aria-pressed={active}
+      className={cn(
+        "inline-flex items-center gap-[6px] border border-solid px-[9px] py-[5px] font-body text-[11.5px] leading-none transition-[color,border-color,background]",
+        active ? "border-line-2 bg-panel-2 text-txt" : "border-line bg-base text-txt-muted hover:border-line-2 hover:text-txt",
+        locked ? "cursor-default" : "cursor-pointer",
+      )}
+    >
+      <span className="h-[9px] w-[9px] flex-none" style={{ background: active ? color : "transparent", border: `1.5px solid ${color}` }} />
+      <span className="max-w-[120px] truncate">{label}</span>
+    </button>
+  )
+}
+
+// ─── regulation meta (opponent usage across the whole regulation) ─────────────
+function RegulationMetaPanel({ session }: { session: Session }) {
+  const t = useTranslations("vgc.tracker.sessionStats")
+  const { meta, loading } = useRegulationMeta(session.regulationId, session.limitlessTournamentId)
+  const [tab, setTab] = useState<UsageTab>("preview")
+
+  const items = meta ? (tab === "preview" ? meta.preview : tab === "leads" ? meta.leads : meta.backs) : []
+
+  return (
+    <TrPanel
+      title={t("regulationMeta.title")}
+      icon="chart"
+      right={
+        <>
+          {meta && <span className="font-mono text-[10.5px] text-txt-dim">{t("regulationMeta.matchCount", { n: meta.totalMatches })}</span>}
+          <DkSeg
+            size="sm"
+            value={tab}
+            onChange={(v) => setTab(v as UsageTab)}
+            ariaLabel={t("regulationMeta.title")}
+            options={[
+              { value: "preview", label: t("table.tabs.preview") },
+              { value: "leads", label: t("table.tabs.leads") },
+              { value: "backs", label: t("table.tabs.backs") },
+            ]}
+          />
+        </>
+      }
+    >
+      {loading ? (
+        <div className="grid place-items-center py-6">
+          <Spinner />
+        </div>
+      ) : !meta ? (
+        <TrNone>{t("regulationMeta.noData")}</TrNone>
+      ) : (
+        <RegUsageBars items={items} total={meta.totalMatches} preview={tab === "preview"} tournamentUsage={meta.tournamentUsageMap} />
+      )}
+    </TrPanel>
+  )
+}
+
+function RegUsageBars({
+  items,
+  total,
+  preview,
+  tournamentUsage,
+}: {
+  items: PokemonUsage[]
+  total: number
+  preview: boolean
+  tournamentUsage?: Map<string, number>
+}) {
+  const t = useTranslations("vgc.tracker.sessionStats")
+  if (!items.length) return <TrNone>{t("regulationMeta.noData")}</TrNone>
+  const counted = items.map((it) => ({ ...it, n: preview ? it.uses + it.discards : it.uses }))
+  const peak = Math.max(...counted.map((i) => i.n), 1)
+  return (
+    <div className="grid">
+      {counted.map((it) => {
+        const pct = total > 0 ? Math.round((it.n / total) * 100) : 0
+        const tour = tournamentUsage?.get(it.speciesId)
+        return (
+          <div
+            key={it.speciesId}
+            className="flex items-center gap-[9px] border-b border-dashed border-[color-mix(in_srgb,var(--line)_65%,transparent)] py-1 last:border-b-0"
+          >
+            <TrSprite name={it.speciesName} size={26} />
+            <span className="min-w-0 flex-1 truncate font-body text-[12px]">{it.speciesName}</span>
+            <span className="h-[5px] w-[90px] flex-none overflow-hidden border border-solid border-line bg-base" aria-hidden="true">
+              <i className="block h-full bg-accent opacity-75" style={{ width: `${(it.n / peak) * 100}%` }} />
+            </span>
+            <span className="w-[42px] flex-none text-right font-mono text-[11px] text-txt-muted">{pct}%</span>
+            {tournamentUsage && (
+              <span
+                title={t("regulationMeta.tournamentUsage")}
+                className={cn(
+                  "w-[46px] flex-none text-right font-mono text-[11px] font-semibold",
+                  tour != null ? "text-accent-bright" : "text-txt-dim",
+                )}
+              >
+                {tour != null ? `${Math.round(tour)}%` : "—"}
+              </span>
+            )}
+          </div>
+        )
+      })}
+    </div>
   )
 }
