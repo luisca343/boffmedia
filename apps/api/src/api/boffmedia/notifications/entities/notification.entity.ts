@@ -8,10 +8,10 @@ export class NotificationEntity {
   userId: number;
 
   @ApiProperty({
-    enum: ['event', 'achievement', 'tournament', 'system'],
+    enum: ['event', 'achievement', 'tournament', 'forum', 'system'],
     example: 'system',
   })
-  type: 'event' | 'achievement' | 'tournament' | 'system';
+  type: 'event' | 'achievement' | 'tournament' | 'forum' | 'system';
 
   @ApiProperty({ example: 'Nuevo evento disponible' })
   title: string;

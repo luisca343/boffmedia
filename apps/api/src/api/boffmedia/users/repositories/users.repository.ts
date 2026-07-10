@@ -238,6 +238,87 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
     }
   }
 
+  async findUserByDiscordId(
+    discordId: string,
+  ): Promise<BoffMediaUserSafe | null> {
+    if (!discordId || discordId.trim() === '') {
+      throw new Error('Discord ID is required');
+    }
+
+    try {
+      const rows = await this.db
+        .select(this.userSelectWithoutPassword)
+        .from(boffMediaUsers)
+        .where(
+          and(
+            eq(boffMediaUsers.discordId, discordId),
+            isNull(boffMediaUsers.deletedAt),
+          ),
+        )
+        .execute();
+
+      return rows.length > 0 ? rows[0] : null;
+    } catch (error: any) {
+      this.logger.error(
+        `Failed to find user by Discord ID ${discordId}:`,
+        error,
+      );
+      throw new Error(`Failed to find user: ${error.message}`);
+    }
+  }
+
+  async findUserBySteamId(
+    steamId: string,
+  ): Promise<BoffMediaUserSafe | null> {
+    if (!steamId || steamId.trim() === '') {
+      throw new Error('Steam ID is required');
+    }
+
+    try {
+      const rows = await this.db
+        .select(this.userSelectWithoutPassword)
+        .from(boffMediaUsers)
+        .where(
+          and(
+            eq(boffMediaUsers.steamId, steamId),
+            isNull(boffMediaUsers.deletedAt),
+          ),
+        )
+        .execute();
+
+      return rows.length > 0 ? rows[0] : null;
+    } catch (error: any) {
+      this.logger.error(`Failed to find user by Steam ID ${steamId}:`, error);
+      throw new Error(`Failed to find user: ${error.message}`);
+    }
+  }
+
+  async findUserByTwitchId(
+    twitchId: string,
+  ): Promise<BoffMediaUserSafe | null> {
+    if (!twitchId || twitchId.trim() === '') {
+      throw new Error('Twitch ID is required');
+    }
+
+    try {
+      const rows = await this.db
+        .select(this.userSelectWithoutPassword)
+        .from(boffMediaUsers)
+        .where(
+          and(
+            eq(boffMediaUsers.twitchId, twitchId),
+            isNull(boffMediaUsers.deletedAt),
+          ),
+        )
+        .execute();
+
+      return rows.length > 0 ? rows[0] : null;
+    } catch (error: any) {
+      this.logger.error(`Failed to find user by Twitch ID ${twitchId}:`, error);
+      throw new Error(`Failed to find user: ${error.message}`);
+    }
+  }
+
   // ==================== COMPLEX QUERIES ====================
 
   async findFullUserByUsernameWithPassword(

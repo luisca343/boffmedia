@@ -16,4 +16,11 @@ export class GoogleCallbackDto {
   @IsString()
   @IsOptional()
   picture?: string;
+
+  // Google's stable user id (`sub`). Sent so login captures/syncs googleId onto
+  // the account and new Google sign-ups work.
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  googleId?: string;
 }

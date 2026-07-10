@@ -1,23 +1,36 @@
+import { useState } from "react"
 import { CreateAchievementDto } from "@boffmedia/shared"
-import { useRotomRequest } from "@/hooks/useRotomRequest"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 
+// Imperative mutation — never auto-fires on mount (call createAchievement to run it).
 export function useCreateAchievement(eventId: number) {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(
-    (createAchievementDto) => EventsService.createAchievement(eventId, createAchievementDto),
-    [eventId],
-  )
+  const [createdAchievement, setCreatedAchievement] =
+    useState<Awaited<ReturnType<typeof EventsService.createAchievement>>["data"]>()
+  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
-  const createAchievement = (createAchievementDto: CreateAchievementDto) => {
-    return EventsService.createAchievement(eventId, createAchievementDto)
+  const createAchievement = async (createAchievementDto: CreateAchievementDto) => {
+    setIsLoading(true)
+    setError(null)
+    try {
+      const res = await EventsService.createAchievement(eventId, createAchievementDto)
+      if (res.error) setError(res.error)
+      else setCreatedAchievement(res.data)
+      return res
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e))
+      throw e
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return {
-    createdAchievement: data,
+    createdAchievement,
     error,
     isLoading,
-    refetch,
+    refetch: createAchievement,
     createAchievement,
-    setCreatedAchievement: setData,
+    setCreatedAchievement,
   }
 }

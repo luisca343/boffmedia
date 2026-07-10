@@ -8,6 +8,7 @@ import {
 import {
   apiGET,
   apiPOST,
+  apiAuthedPOST,
   apiAuthedAutoGET,
   apiAuthedAutoPOST,
   apiAuthedAutoPATCH,
@@ -127,10 +128,42 @@ export class UsersService {
   }
 
   /**
-   * Unlink an OAuth provider (google/discord/twitch) from a user.
+   * Unlink a provider (google/discord/twitch/steam) from a user.
    */
-  static unlinkProvider(id: number, provider: 'google' | 'discord' | 'twitch') {
+  static unlinkProvider(id: number, provider: 'google' | 'discord' | 'twitch' | 'steam') {
     return apiAuthedAutoDELETE<BoffMediaUserEntity>(`/users/${id}/link/${provider}`);
+  }
+
+  /**
+   * Link a verified SteamID64 to a user. Called server-side from the Steam
+   * OpenID callback, so the caller passes the session's API token explicitly.
+   */
+  static linkSteam(id: number, steamId: string, token: string) {
+    return apiAuthedPOST<BoffMediaUserEntity>(`/users/${id}/link/steam`, { steamId }, token);
+  }
+
+  /**
+   * Link a verified Discord id to a user. Called server-side from the Discord
+   * OAuth link callback, so the caller passes the session's API token explicitly.
+   */
+  static linkDiscord(id: number, discordId: string, token: string) {
+    return apiAuthedPOST<BoffMediaUserEntity>(`/users/${id}/link/discord`, { discordId }, token);
+  }
+
+  /**
+   * Link a verified Google id (`sub`) to a user. Called server-side from the
+   * Google OAuth link callback, so the caller passes the session token explicitly.
+   */
+  static linkGoogle(id: number, googleId: string, token: string) {
+    return apiAuthedPOST<BoffMediaUserEntity>(`/users/${id}/link/google`, { googleId }, token);
+  }
+
+  /**
+   * Link a verified Twitch id to a user. Called server-side from the Twitch
+   * OAuth link callback, so the caller passes the session token explicitly.
+   */
+  static linkTwitch(id: number, twitchId: string, token: string) {
+    return apiAuthedPOST<BoffMediaUserEntity>(`/users/${id}/link/twitch`, { twitchId }, token);
   }
 
   // ==================== USER DELETION ====================

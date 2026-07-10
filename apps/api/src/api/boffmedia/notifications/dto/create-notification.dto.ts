@@ -21,11 +21,11 @@ export class CreateNotificationDto {
   userId?: number;
 
   @ApiProperty({
-    enum: ['event', 'achievement', 'tournament', 'system'],
+    enum: ['event', 'achievement', 'tournament', 'forum', 'system'],
     example: 'system',
   })
-  @IsEnum(['event', 'achievement', 'tournament', 'system'])
-  type: 'event' | 'achievement' | 'tournament' | 'system';
+  @IsEnum(['event', 'achievement', 'tournament', 'forum', 'system'])
+  type: 'event' | 'achievement' | 'tournament' | 'forum' | 'system';
 
   @ApiProperty({ example: 'Mantenimiento programado' })
   @IsString()

@@ -4,7 +4,7 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Icon, type IconName } from "./icon"
 
-export type AuthProvider = "google" | "discord" | "steam"
+export type AuthProvider = "google" | "discord" | "steam" | "twitch"
 
 // Brand fills for providers that carry a strong identity colour. Google stays
 // neutral (panel surface, brand lives only in the glyph). Values are one-off
@@ -13,6 +13,7 @@ const BRAND: Record<AuthProvider, { bg?: string; ink?: string } | null> = {
   google: null,
   discord: { bg: "#5865F2", ink: "#ffffff" },
   steam: { bg: "#1b2838", ink: "#c7d5e0" },
+  twitch: { bg: "#9146FF", ink: "#ffffff" },
 }
 
 export interface AuthProviderBtnProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {

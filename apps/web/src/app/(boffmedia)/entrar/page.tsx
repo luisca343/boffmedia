@@ -1,6 +1,7 @@
 import { Suspense } from "react"
 import type { Metadata } from "next"
 import { AuthScreen } from "@/components/boffmedia/ui/auth"
+import { discordEnabled, twitchEnabled } from "@/features/authOptions"
 
 export const metadata: Metadata = {
   title: "Entrar · Boffmedia",
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
 export default function EntrarPage() {
   return (
     <Suspense>
-      <AuthScreen />
+      <AuthScreen discordEnabled={discordEnabled} twitchEnabled={twitchEnabled} />
     </Suspense>
   )
 }

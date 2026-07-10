@@ -39,6 +39,10 @@ import {
   MinecraftLinkDto,
 } from './dto/minecraft-registration.dto';
 import { GoogleAuthDto } from './dto/google-auth.dto';
+import { LinkSteamDto } from './dto/link-steam.dto';
+import { LinkDiscordDto } from './dto/link-discord.dto';
+import { LinkGoogleDto } from './dto/link-google.dto';
+import { LinkTwitchDto } from './dto/link-twitch.dto';
 import { UserLoginDto } from './dto/user-login.dto';
 import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
 
@@ -460,6 +464,98 @@ export class BoffMediaUsersController {
     );
   }
 
+  @Post(':id/link/steam')
+  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Link a verified SteamID64 to a user (Steam is link-only)',
+  })
+  @ApiParam({ name: 'id', type: 'number', description: 'User ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Steam account linked successfully',
+    type: BoffMediaUserEntity,
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Steam account already linked to another user',
+  })
+  async linkSteam(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: LinkSteamDto,
+  ) {
+    return this.usersFacadeService.linkSteam(id, dto.steamId);
+  }
+
+  @Post(':id/link/discord')
+  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Link a verified Discord id to a user (session-preserving linking)',
+  })
+  @ApiParam({ name: 'id', type: 'number', description: 'User ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Discord account linked successfully',
+    type: BoffMediaUserEntity,
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Discord account already linked to another user',
+  })
+  async linkDiscord(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: LinkDiscordDto,
+  ) {
+    return this.usersFacadeService.linkDiscord(id, dto.discordId);
+  }
+
+  @Post(':id/link/google')
+  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Link a verified Google id to a user (session-preserving linking)',
+  })
+  @ApiParam({ name: 'id', type: 'number', description: 'User ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Google account linked successfully',
+    type: BoffMediaUserEntity,
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Google account already linked to another user',
+  })
+  async linkGoogle(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: LinkGoogleDto,
+  ) {
+    return this.usersFacadeService.linkGoogle(id, dto.googleId);
+  }
+
+  @Post(':id/link/twitch')
+  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Link a verified Twitch id to a user (session-preserving linking)',
+  })
+  @ApiParam({ name: 'id', type: 'number', description: 'User ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Twitch account linked successfully',
+    type: BoffMediaUserEntity,
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Twitch account already linked to another user',
+  })
+  async linkTwitch(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: LinkTwitchDto,
+  ) {
+    return this.usersFacadeService.linkTwitch(id, dto.twitchId);
+  }
+
   @Delete(':id/link/:provider')
   @UseGuards(JwtAuthGuard, OwnerOrAdminGuard)
   @ApiBearerAuth('JWT')
@@ -467,7 +563,7 @@ export class BoffMediaUsersController {
   @ApiParam({ name: 'id', type: 'number', description: 'User ID' })
   @ApiParam({
     name: 'provider',
-    enum: ['google', 'discord', 'twitch'],
+    enum: ['google', 'discord', 'twitch', 'steam'],
     description: 'Provider to unlink',
   })
   @ApiResponse({
@@ -478,7 +574,7 @@ export class BoffMediaUsersController {
   @ApiResponse({ status: 400, description: 'Invalid provider' })
   async unlinkProvider(
     @Param('id', ParseIntPipe) id: number,
-    @Param('provider') provider: 'google' | 'discord' | 'twitch',
+    @Param('provider') provider: 'google' | 'discord' | 'twitch' | 'steam',
   ) {
     try {
       return await this.usersFacadeService.unlinkProvider(id, provider);

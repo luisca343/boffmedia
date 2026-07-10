@@ -15,6 +15,9 @@ export const NOTIFICATION_TYPE = {
   ACHIEVEMENT: 'achievement',
   TOURNAMENT: 'tournament',
   SYSTEM: 'system',
+  // Appended last on purpose: MySQL stores ENUM by ordinal position, so a new
+  // value must go at the end to avoid remapping existing rows (migration 0017).
+  FORUM: 'forum',
 } as const;
 
 export const boffMediaNotifications = mysqlTable(
@@ -32,6 +35,7 @@ export const boffMediaNotifications = mysqlTable(
       NOTIFICATION_TYPE.ACHIEVEMENT,
       NOTIFICATION_TYPE.TOURNAMENT,
       NOTIFICATION_TYPE.SYSTEM,
+      NOTIFICATION_TYPE.FORUM,
     ])
       .notNull()
       .default(NOTIFICATION_TYPE.SYSTEM),

@@ -89,4 +89,13 @@ export class CreateUserDto extends BaseDto {
   @IsOptional()
   @IsString()
   discordId?: string;
+
+  @ApiProperty({
+    description: 'Twitch ID for OAuth',
+    required: false,
+    example: 'twitch_141981764',
+  })
+  @IsOptional()
+  @IsString()
+  twitchId?: string;
 }
