@@ -12,7 +12,7 @@ export function BasesChapter() {
   return (
     <>
             <Section id="color" kicker="Bases" title="Color" lead="Grafito profundo con paneles de acero y un único acento: el naranja Boffmedia. Los tonos semánticos se reservan para estado, nunca para decorar.">
-              <Sample title="Paleta" code="tokens">
+              <Sample title="Paleta" code="tokens.css">
                 <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 w-full">
                   {(
                     [
@@ -30,7 +30,7 @@ export function BasesChapter() {
                   ).map(([v, n]) => (
                     <div key={v} className="border border-solid border-line">
                       <i className="block h-16" style={{ background: `var(${v})` }} />
-                      <div className="py-[9px] px-[11px] font-mono text-[10px] leading-[1.5] text-txt-muted">
+                      <div className="py-[9px] px-[11px] font-mono text-[10px] font-medium leading-[1.5] text-txt-muted">
                         <b className="block text-txt font-semibold">{n}</b>
                         {v}
                       </div>
@@ -56,7 +56,7 @@ export function BasesChapter() {
                     ["Dato / Mono 500–600 / 10–15px", <span key="e" className={MONO_LABEL}>Torneo · Servidor Wingull · 96 plazas</span>],
                   ].map(([meta, node], i) => (
                     <div key={i} className="grid grid-cols-1 sm:grid-cols-[210px_1fr] gap-2 sm:gap-[22px] items-baseline border-b border-dashed border-line pb-4 last:border-b-0 last:pb-0">
-                      <span className="font-mono text-[11px] leading-[1.6] text-txt-dim">{meta as React.ReactNode}</span>
+                      <span className="font-mono text-[11px] font-medium leading-[1.6] text-txt-dim">{meta as React.ReactNode}</span>
                       {node as React.ReactNode}
                     </div>
                   ))}
@@ -69,18 +69,18 @@ export function BasesChapter() {
             </Section>
 
             <Section id="geometria" kicker="Bases" title="Geometría" lead="Nada de radios: la firma es el corte diagonal. Tres cortes fijos y una barra de acento de 4px. El corte siempre cae hacia la derecha, como un banner de retransmisión.">
-              <Sample title="Cortes" code="cut · tag · corner">
+              <Sample title="Cortes" code=".cut · .cut-tag · .cut-corner">
                 <div className="flex gap-[22px] flex-wrap">
                   {[
                     ["CUT 10px", "cut"],
                     ["TAG 8px", "cut-tag"],
                     ["CORNER 16px", "cut-corner"],
                   ].map(([l, clip]) => (
-                    <div key={l} className={cn("w-[130px] h-[72px] bg-panel-2 border border-solid border-line-2 grid place-items-center font-mono text-[10px] leading-none text-txt-muted tracking-[0.08em]", clip)}>
+                    <div key={l} className={cn("w-[130px] h-[72px] bg-panel-2 border border-solid border-line-2 grid place-items-center font-mono text-[10px] font-medium leading-none text-txt-muted tracking-[0.08em]", clip)}>
                       {l}
                     </div>
                   ))}
-                  <div className="w-[130px] h-[72px] bg-panel-2 border border-solid border-line-2 border-l-4 border-l-accent grid place-items-center font-mono text-[10px] leading-none text-txt-muted tracking-[0.08em]">
+                  <div className="w-[130px] h-[72px] bg-panel-2 border border-solid border-line-2 border-l-4 border-l-accent grid place-items-center font-mono text-[10px] font-medium leading-none text-txt-muted tracking-[0.08em]">
                     BARRA 4px
                   </div>
                 </div>
@@ -98,7 +98,7 @@ export function BasesChapter() {
                       [84, "sección"],
                     ] as const
                   ).map(([n, l]) => (
-                    <div key={n} className="flex items-center gap-4 whitespace-nowrap font-mono text-[11px] leading-none text-txt-muted">
+                    <div key={n} className="flex items-center gap-4 whitespace-nowrap font-mono text-[11px] font-medium leading-none text-txt-muted">
                       <i className="h-[18px] bg-accent-soft border border-solid border-accent-line" style={{ width: n * 3 }} />
                       {n}px · {l}
                     </div>

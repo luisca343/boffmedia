@@ -28,6 +28,7 @@ describe('EventsFacadeService', () => {
       | 'updateEvent'
       | 'deleteEvent'
       | 'validateEventExists'
+      | 'validateEventVisible'
     >
   >;
   let gamesService: jest.Mocked<
@@ -100,6 +101,7 @@ describe('EventsFacadeService', () => {
       updateEvent: jest.fn(),
       deleteEvent: jest.fn(),
       validateEventExists: jest.fn(),
+      validateEventVisible: jest.fn(),
     };
     const mockGamesService = {
       getAllGames: jest.fn(),
@@ -361,7 +363,7 @@ describe('EventsFacadeService', () => {
 
   describe('getEventAchievements', () => {
     it('should return event achievements when event exists', async () => {
-      eventsService.validateEventExists.mockResolvedValue(true);
+      eventsService.validateEventVisible.mockResolvedValue(true);
       achievementsService.getAchievementsByEventId.mockResolvedValue([
         mockAchievement,
       ] as any);
@@ -372,7 +374,7 @@ describe('EventsFacadeService', () => {
     });
 
     it('should throw if event not found', async () => {
-      eventsService.validateEventExists.mockResolvedValue(false);
+      eventsService.validateEventVisible.mockResolvedValue(false);
 
       await expect(service.getEventAchievements(99)).rejects.toThrow(
         'Event not found',
@@ -449,7 +451,7 @@ describe('EventsFacadeService', () => {
 
   describe('getEventTeams', () => {
     it('should return teams for event when event exists', async () => {
-      eventsService.validateEventExists.mockResolvedValue(true);
+      eventsService.validateEventVisible.mockResolvedValue(true);
       teamsService.getTeamsByEventId.mockResolvedValue([mockTeam] as any);
 
       const result = await service.getEventTeams(1);
@@ -458,7 +460,7 @@ describe('EventsFacadeService', () => {
     });
 
     it('should throw if event not found', async () => {
-      eventsService.validateEventExists.mockResolvedValue(false);
+      eventsService.validateEventVisible.mockResolvedValue(false);
 
       await expect(service.getEventTeams(99)).rejects.toThrow(
         'Event not found',
@@ -556,7 +558,7 @@ describe('EventsFacadeService', () => {
 
   describe('getLeaderboard', () => {
     it('should return event leaderboard when event exists', async () => {
-      eventsService.validateEventExists.mockResolvedValue(true);
+      eventsService.validateEventVisible.mockResolvedValue(true);
       leaderboardsService.getEventLeaderboard.mockResolvedValue([
         mockLeaderboardEntry,
       ] as any);
@@ -567,7 +569,7 @@ describe('EventsFacadeService', () => {
     });
 
     it('should throw if event not found', async () => {
-      eventsService.validateEventExists.mockResolvedValue(false);
+      eventsService.validateEventVisible.mockResolvedValue(false);
 
       await expect(service.getLeaderboard(99)).rejects.toThrow(
         'Event not found',

@@ -65,3 +65,28 @@ describe('EventsController — getEvent (by id) visibility', () => {
     expect(facade.getEvent).toHaveBeenCalledWith(1, false);
   });
 });
+
+describe('EventsController — event sub-resource visibility', () => {
+  // The :eventId sub-resources (leaderboard/participants/teams/achievements/
+  // progress) all use the same role→includePrivate expression; getLeaderboard
+  // is representative.
+  let controller: EventsController;
+  let facade: { getLeaderboard: jest.Mock };
+
+  beforeEach(() => {
+    facade = { getLeaderboard: jest.fn().mockResolvedValue([]) };
+    controller = new EventsController(facade as unknown as EventsFacadeService);
+  });
+
+  it('admin caller → includePrivate=true (private event visible)', async () => {
+    await controller.getLeaderboard(5, {
+      user: { roles: [USER_ROLES.BOFF_ADMIN] },
+    });
+    expect(facade.getLeaderboard).toHaveBeenCalledWith(5, true);
+  });
+
+  it('anonymous caller → includePrivate=false (private event hidden)', async () => {
+    await controller.getLeaderboard(5, {});
+    expect(facade.getLeaderboard).toHaveBeenCalledWith(5, false);
+  });
+});

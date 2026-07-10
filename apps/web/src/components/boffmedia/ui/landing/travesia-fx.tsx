@@ -126,6 +126,54 @@ export function Decode({ text, dur = 900, className }: { text: string; dur?: num
   )
 }
 
+/* ---- kinetic section word (giant outline, scroll-linked horizontal drift) -- */
+export function Kinetic({ word, dir = 1, pos = "top" }: { word: string; dir?: number; pos?: "top" | "bottom" }) {
+  const ref = React.useRef<HTMLSpanElement>(null)
+  React.useEffect(() => {
+    const el = ref.current
+    const parent = el?.parentElement
+    if (!el || !parent) return
+    let raf = 0
+    let pend = false
+    const on = () => {
+      if (pend) return
+      pend = true
+      raf = requestAnimationFrame(() => {
+        pend = false
+        if (fxReduced()) {
+          el.style.transform = ""
+          return
+        }
+        const vh = window.innerHeight || 800
+        const r = parent.getBoundingClientRect()
+        const c = (r.top + r.height / 2 - vh / 2) / vh
+        el.style.transform = `translate3d(${(c * 340 * dir).toFixed(1)}px,0,0)`
+      })
+    }
+    window.addEventListener("scroll", on, { passive: true })
+    window.addEventListener("resize", on, { passive: true })
+    on()
+    return () => {
+      window.removeEventListener("scroll", on)
+      window.removeEventListener("resize", on)
+      if (raf) cancelAnimationFrame(raf)
+    }
+  }, [dir])
+  return (
+    <div
+      aria-hidden="true"
+      className={cn("pointer-events-none absolute left-0 right-0 z-0 select-none", pos === "top" ? "top-[-34px]" : "bottom-[-26px]")}
+    >
+      <span
+        ref={ref}
+        className="inline-block whitespace-nowrap font-display text-[210px] font-extrabold italic uppercase leading-none text-transparent opacity-60 [-webkit-text-stroke:1px_var(--line)] [will-change:transform] max-[1100px]:text-[130px]"
+      >
+        {word}
+      </span>
+    </div>
+  )
+}
+
 /* ---- pixel particle field (canvas fills its parent) ------------------------ */
 export function FxParticles({ density = 90, className }: { density?: number; className?: string }) {
   const ref = React.useRef<HTMLCanvasElement>(null)
