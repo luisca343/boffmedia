@@ -43,6 +43,7 @@ import { AchievementModule } from '@api/smartrotom/achievement/achievement.modul
 import { PlayerModule } from '@api/smartrotom/player/player.module';
 import { EventsModule } from '@api/boffmedia/events/events.module';
 import { ForumModule } from '@api/boffmedia/forum/forum.module';
+import { TournamentsModule } from '@api/boffmedia/tournaments/tournaments.module';
 import { NotificationsModule } from '@api/boffmedia/notifications/notifications.module';
 import { SuggestionsModule } from '@api/boffmedia/suggestions/suggestions.module';
 import { CommunityModule } from '@api/boffmedia/community/community.module';
@@ -102,6 +103,7 @@ import { VgcModule } from '@api/boffmedia/herramientas/pokemon/vgc/vgc.module';
     SmartrotomModule,
     EventsModule,
     ForumModule,
+    TournamentsModule,
     NotificationsModule,
     SuggestionsModule,
     CommunityModule,

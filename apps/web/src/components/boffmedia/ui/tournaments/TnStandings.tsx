@@ -166,7 +166,7 @@ export function TnLeagueTable({ league, onOpen, pinned, onPin, promo = 4 }: { le
                   {s.c.kind === "team" ? <TnAvatar c={s.c} size={22} /> : <DkFlag flag={s.c.flag} code={s.c.country} name={s.c.countryName} size={15} />}
                   <span className="grid min-w-0">
                     <b className="truncate font-body text-[13px]/[1.2] font-semibold">{s.c.name}</b>
-                    <i className="truncate font-mono text-[9.5px]/[1.2] not-italic text-txt-dim">{s.c.kind === "team" ? s.c.tag : "@" + s.c.tag}</i>
+                    {s.c.tag && <i className="truncate font-mono text-[9.5px]/[1.2] not-italic text-txt-dim">{s.c.kind === "team" ? s.c.tag : "@" + s.c.tag}</i>}
                   </span>
                   {onPin && <DkPin on={pinned === s.c.id} onClick={() => onPin(s.c.id)} size={13} />}
                 </span>

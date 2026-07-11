@@ -72,7 +72,18 @@ export function TnEntrant({
         disabled={!onOpen}
       >
         <span className={nameCls}>{c.name}</span>
-        {!compact && <span className="max-w-full truncate font-mono text-[9.5px]/[1.2] font-medium text-txt-dim">{sub || (c.kind === "team" ? `${c.tag} · ${c.roster ? c.roster.length + " jugadores" : "equipo"}` : "@" + c.tag)}</span>}
+        {!compact && (() => {
+          const subText =
+            sub ??
+            (c.kind === "team"
+              ? `${c.tag ? c.tag + " · " : ""}${c.roster ? c.roster.length + " jugadores" : "equipo"}`
+              : c.tag
+                ? "@" + c.tag
+                : null)
+          return subText ? (
+            <span className="max-w-full truncate font-mono text-[9.5px]/[1.2] font-medium text-txt-dim">{subText}</span>
+          ) : null
+        })()}
       </button>
       {onPin && <DkPin on={pinned} onClick={() => onPin(c.id)} />}
     </span>

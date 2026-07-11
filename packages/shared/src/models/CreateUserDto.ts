@@ -43,5 +43,9 @@ export type CreateUserDto = {
      * Discord ID for OAuth
      */
     discordId?: string;
+    /**
+     * Twitch ID for OAuth
+     */
+    twitchId?: string;
 };
 

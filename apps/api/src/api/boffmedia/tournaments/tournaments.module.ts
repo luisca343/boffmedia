@@ -1,0 +1,31 @@
+import { Module } from '@nestjs/common';
+import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
+import { NotificationsModule } from '@api/boffmedia/notifications/notifications.module';
+import { TournamentsController } from './tournaments.controller';
+import { TournamentsFacadeService } from './tournaments.facade.service';
+import { TournamentsRepository } from './repositories/tournaments.repository';
+import { TournamentsService } from './services/tournaments.service';
+import { RegistrationService } from './services/registration.service';
+import { BracketService } from './services/bracket.service';
+import { MatchesService } from './services/matches.service';
+import { StandingsService } from './services/standings.service';
+import { PhasesService } from './services/phases.service';
+import { AdvancementService } from './services/advancement.service';
+
+@Module({
+  imports: [DrizzleModule, NotificationsModule],
+  controllers: [TournamentsController],
+  providers: [
+    TournamentsRepository,
+    TournamentsService,
+    RegistrationService,
+    BracketService,
+    MatchesService,
+    StandingsService,
+    PhasesService,
+    AdvancementService,
+    TournamentsFacadeService,
+  ],
+  exports: [TournamentsFacadeService],
+})
+export class TournamentsModule {}
