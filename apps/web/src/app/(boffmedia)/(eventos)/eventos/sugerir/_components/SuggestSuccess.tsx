@@ -1,8 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { Empty } from "@/components/boffmedia/primitives/empty"
-import { Button } from "@/components/boffmedia/primitives/button"
+import { Empty, Button } from "@/components/boffmedia/primitives"
 
 export function SuggestSuccess({ onReset }: { onReset: () => void }) {
   const t = useTranslations("events.sugerir.success")

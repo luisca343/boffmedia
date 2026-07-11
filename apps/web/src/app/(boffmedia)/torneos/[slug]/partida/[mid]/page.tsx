@@ -4,9 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { use } from "react"
 import { cn } from "@/lib/utils"
-import { Button, Modal, toast } from "@/components/boffmedia/primitives"
-import { Icon } from "@/components/boffmedia/primitives/icon"
-import { Spinner } from "@/components/boffmedia/primitives/spinner"
+import { Button, Modal, toast, Icon, Spinner } from "@/components/boffmedia/primitives"
 import { useBoffSession } from "@/services/useBoffSession"
 import {
   TmRoundHeader,

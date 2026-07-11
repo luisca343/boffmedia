@@ -1,6 +1,6 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 
 // contextual note (info | warn).
 export function Callout({ tone = "info", children }: { tone?: "info" | "warn"; children: React.ReactNode }) {

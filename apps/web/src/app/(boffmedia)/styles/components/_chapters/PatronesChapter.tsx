@@ -1,19 +1,7 @@
 "use client"
 
 import { Sample, Section } from "../showcase-shared"
-import { Badge } from "@/components/boffmedia/primitives/badge"
-import { Button } from "@/components/boffmedia/primitives/button"
-import { CodeBlock } from "@/components/boffmedia/primitives/code-block"
-import { DataList } from "@/components/boffmedia/primitives/data-list"
-import { Empty } from "@/components/boffmedia/primitives/empty"
-import { Panel } from "@/components/boffmedia/primitives/panel"
-import { Ph } from "@/components/boffmedia/primitives/ph"
-import { Progress } from "@/components/boffmedia/primitives/progress"
-import { Rank, RankRow } from "@/components/boffmedia/primitives/rank-row"
-import { Skeleton } from "@/components/boffmedia/primitives/skeleton"
-import { Stats } from "@/components/boffmedia/primitives/stat"
-import { Table } from "@/components/boffmedia/primitives/table"
-import { Third } from "@/components/boffmedia/primitives/third"
+import { Badge, Button, CodeBlock, DataList, Empty, Panel, Ph, Progress, Rank, RankRow, Skeleton, Stats, Table, Third } from "@/components/boffmedia/primitives"
 
 export function PatronesChapter() {
 

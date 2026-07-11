@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import { Icon } from "@/components/boffmedia/primitives/icon";
+import { Icon } from "@/components/boffmedia/primitives"
 import { DkSprite } from "@/components/boffmedia/ui/tools/datakit";
 import { spriteUrl, handleSpriteError } from "@/features/vgc-tracker/types";
 import { SpeedTierEntry } from "@/services/api/boffmedia/vgcService";

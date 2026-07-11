@@ -3,9 +3,7 @@
 import Link from "next/link"
 import { use, useState } from "react"
 import { cn } from "@/lib/utils"
-import { Button, Field, Input, Modal, toast } from "@/components/boffmedia/primitives"
-import { Icon } from "@/components/boffmedia/primitives/icon"
-import { Spinner } from "@/components/boffmedia/primitives/spinner"
+import { Button, Field, Input, Modal, toast, Icon, Spinner } from "@/components/boffmedia/primitives"
 import { TnFormatBadge, TnEntrant, TnPodium } from "@/components/boffmedia/ui/tournaments"
 import { useTournament } from "@/hooks/tournaments/useTournament"
 import {

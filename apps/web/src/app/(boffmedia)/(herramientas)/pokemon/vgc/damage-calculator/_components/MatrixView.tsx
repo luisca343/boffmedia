@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { Seg } from "@/components/boffmedia/primitives/seg"
+import { Seg } from "@/components/boffmedia/primitives"
 import { useCalculatorStore, defaultPokemon } from "../_store/calculatorStore"
 import type { CalcPokemon } from "../_types/calculator"
 import { FieldBar } from "./FieldBar"

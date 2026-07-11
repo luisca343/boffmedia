@@ -4,7 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 import type { NavSection, NavItem } from "./nav-data"
 
 function DropItems({ items }: { items: NavItem[] }) {
@@ -16,7 +16,7 @@ function DropItems({ items }: { items: NavItem[] }) {
           href={it.href}
           role="menuitem"
           style={{ animationDelay: `${i * 22}ms` }}
-          className="group/item flex items-center gap-[11px] px-4 py-2 font-body text-[14px] font-medium leading-[1.2] text-txt-muted no-underline transition-colors duration-[140ms] animate-[bm-nd-item_0.16s_both] hover:bg-accent-soft hover:text-txt focus-visible:bg-accent-soft focus-visible:text-txt focus-visible:outline-none"
+          className="group/item flex items-center gap-[11px] px-4 py-2 font-body text-[14px] font-medium leading-[1.2] text-txt-muted no-underline transition-colors duration-[140ms] animate-[bm-nd-item_0.16s_both] motion-reduce:animate-none hover:bg-accent-soft hover:text-txt focus-visible:bg-accent-soft focus-visible:text-txt focus-visible:outline-none"
         >
           <Icon
             name={it.icon || "wrench"}

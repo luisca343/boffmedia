@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react"
 import { useTranslations } from "next-intl"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 
 export function SessionNotesEditor({ notes, onSave }: { notes?: string; onSave: (notes: string) => void }) {
   const t = useTranslations("vgc.tracker")

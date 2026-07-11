@@ -2,9 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
-import { Kicker } from "@/components/boffmedia/primitives/kicker"
-import { ToastStack } from "@/components/boffmedia/primitives/toast"
+import { Icon, Kicker, ToastStack } from "@/components/boffmedia/primitives"
 import { CHAPTERS, DOMAINS } from "./showcase-data"
 import { DISPLAY, DISPLAY_EM, MONO_LABEL, GRP_KEY, norm, sideLink } from "./showcase-shared"
 import { BasesChapter } from "./_chapters/BasesChapter"

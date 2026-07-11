@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 import { srtSourceMeta, srtPrizeMeta, type SrtPrizeType, type SrtSourceKey, type SrtStatus, type SrtOrganizerData } from "./giveaways-util"
 
 // The giveaway atoms: status chip (4 lifecycle states), organizer seal, source
@@ -31,7 +31,7 @@ export function SrtStatusChip({ status, size }: { status: SrtStatus; size?: "lg"
           aria-hidden
           className={cn(
             "flex-none rounded-full",
-            key === "active" ? "h-[7px] w-[7px] bg-accent-ink animate-[bm-blink_1.3s_steps(2)_infinite]" : "h-1.5 w-1.5 bg-warn animate-[bm-pulse_1s_ease-in-out_infinite]",
+            key === "active" ? "h-[7px] w-[7px] bg-accent-ink animate-[bm-blink_1.3s_steps(2)_infinite] motion-reduce:animate-none" : "h-1.5 w-1.5 bg-warn animate-[bm-pulse_1s_ease-in-out_infinite] motion-reduce:animate-none",
           )}
         />
       )}

@@ -2,11 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { Button } from "@/components/boffmedia/primitives/button"
-import { Empty } from "@/components/boffmedia/primitives/empty"
-import { SearchInput } from "@/components/boffmedia/primitives/search-input"
-import { Seg } from "@/components/boffmedia/primitives/seg"
-import { Spinner } from "@/components/boffmedia/primitives/spinner"
+import { Button, Empty, SearchInput, Seg, Spinner } from "@/components/boffmedia/primitives"
 import { useGetEvents } from "@/hooks/events/useGetEvents"
 import { EventCard, eventStatus, type EventLike, type EventStatus } from "@/components/boffmedia/ui/events"
 

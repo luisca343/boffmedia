@@ -2,10 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon, type IconName } from "@/components/boffmedia/primitives/icon"
-import { Badge } from "@/components/boffmedia/primitives/badge"
-import { Button } from "@/components/boffmedia/primitives/button"
-import { Toggle } from "@/components/boffmedia/primitives/toggle"
+import { Icon, Badge, Button, Toggle, type IconName } from "@/components/boffmedia/primitives"
 
 // The operative strip that accompanies a legal document: export data, blocked
 // essential cookies, analytics/marketing switches and danger-toned deletion.

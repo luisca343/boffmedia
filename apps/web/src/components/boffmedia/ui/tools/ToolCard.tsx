@@ -2,12 +2,11 @@ import * as React from "react"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
-import { Badge } from "@/components/boffmedia/primitives/badge"
+import { Icon, Badge } from "@/components/boffmedia/primitives"
 import { hueStyle, type ToolCardData } from "./tools-data"
 
 // bottom-right diagonal cut (señal) / bottom-left (fila) — one-off clips.
-const SENAL_CLIP = "[clip-path:polygon(0_0,100%_0,100%_calc(100%_-_14px),calc(100%_-_14px)_100%,0_100%)]"
+const SENAL_CLIP = "cut-tag [--cut-tag:14px]"
 const FILA_CLIP = "[clip-path:polygon(0_0,100%_0,100%_100%,10px_100%,0_calc(100%_-_10px))]"
 
 const ICON_BOX =

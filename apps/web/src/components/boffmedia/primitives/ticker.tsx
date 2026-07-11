@@ -8,7 +8,7 @@ export function Ticker({ items }: TickerProps) {
   const doubled = items.concat(items)
   return (
     <div className="relative flex-1 min-w-0 overflow-hidden whitespace-nowrap">
-      <div className="inline-block pl-[100%] animate-[bm-tick_38s_linear_infinite] [&_em]:not-italic [&_em]:text-accent">
+      <div className="inline-block pl-[100%] animate-[bm-tick_38s_linear_infinite] motion-reduce:animate-none [&_em]:not-italic [&_em]:text-accent">
         {doubled.map((t, i) => (
           <span
             key={i}

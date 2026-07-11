@@ -1,7 +1,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 import { GameLogo } from "./GameLogo"
 import { hueStyle } from "./tools-data"
 
@@ -29,7 +29,7 @@ export function GameCover({ game, mini = false }: { game: GameCoverData; mini?: 
       style={hueStyle(game.hueColor)}
       className={cn(
         "group relative flex flex-col justify-end overflow-hidden border border-solid border-line bg-panel text-left no-underline",
-        "[clip-path:polygon(0_0,calc(100%_-_18px)_0,100%_18px,100%_100%,0_100%)] transition-[transform,border-color] duration-[140ms]",
+        "cut-corner [--cut-lg:18px] transition-[transform,border-color] duration-[140ms]",
         "hover:-translate-y-1 hover:border-[color-mix(in_srgb,var(--ghue)_55%,var(--line))]",
         mini ? "aspect-[21/9]" : "aspect-[15/11]",
       )}

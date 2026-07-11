@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 import { CtCover } from "./CtCard"
 import { CtStars } from "./CtAtoms"
 import { CT_STATUS, ctRatingDist, type CtActivity, type CtGame } from "./catalog-util"

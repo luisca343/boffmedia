@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon, type IconName } from "@/components/boffmedia/primitives/icon"
+import { Icon, type IconName } from "@/components/boffmedia/primitives"
 import { MEW, MEW_KIND_LABEL, MEW_TOKEN_ICON, mewHueFor, mewHuman, mewIsRawKey, mewMonogram, mewParseText, mewTokenLabel, type MewRec } from "./mew-util"
 
 // Mewgenics «Papel y tinta» atoms: tokened text, art tile, rarity/faction/kind

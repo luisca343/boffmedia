@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl"
 import { calcStat, Generations } from "@smogon/calc"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 import type { CalcPokemon, StatKey, BoostKey } from "../../_types/calculator"
 import { NATURES } from "../../_hooks/usePokemonData"
 

@@ -1,6 +1,6 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/boffmedia/primitives/button"
+import { Button } from "@/components/boffmedia/primitives"
 import { FxParticles } from "./travesia-fx"
 import { BEAMS, Grain, PRI_GLOW } from "./landing-shared"
 import { DISCORD } from "./landing-data"
@@ -50,7 +50,7 @@ export function TvMeta({ lvl, density }: { lvl: number; density: number }) {
           Crea tu cuenta, entra al Discord y empieza tu propio recorrido junto a la comunidad Pixelmon.
         </p>
         <div data-reveal style={{ ["--i"]: 3 } as React.CSSProperties} className="mt-[34px] flex flex-wrap justify-center gap-3.5">
-          <Button variant="pri" size="lg" iconRight="arrow" href="/comunidad" className={PRI_GLOW}>
+          <Button variant="pri" size="lg" iconRight="arrow" href="/entrar?mode=register" className={PRI_GLOW}>
             Crear cuenta gratis
           </Button>
           <Button size="lg" href={DISCORD}>

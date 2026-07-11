@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 import { DkFlag } from "./DkFlag"
 
 // Datakit extras: round stepper, country multi-filter and the toast hook.
@@ -27,11 +27,11 @@ export function DkStepper({ steps, value, onChange }: { steps: DkStep[]; value: 
             aria-selected={on}
             onClick={() => onChange(s.value)}
             className={cn(
-              "inline-flex flex-none items-center gap-1.5 border border-solid bg-base px-2.5 py-[7px] font-mono text-[10px]/none font-semibold uppercase tracking-[0.08em] transition-[color,border-color,background] duration-[140ms] [clip-path:polygon(0_0,100%_0,100%_calc(100%_-_6px),calc(100%_-_6px)_100%,0_100%)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-line",
+              "inline-flex flex-none items-center gap-1.5 border border-solid bg-base px-2.5 py-[7px] font-mono text-[10px]/none font-semibold uppercase tracking-[0.08em] transition-[color,border-color,background] duration-[140ms] cut-tag [--cut-tag:6px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-line",
               on ? "border-accent bg-accent text-accent-ink" : st === "live" ? "border-[color-mix(in_srgb,var(--ok)_40%,transparent)] text-ok hover:border-line-2 hover:text-txt" : st === "done" ? "border-line text-txt-muted hover:border-line-2 hover:text-txt" : "border-line text-txt-dim hover:border-line-2 hover:text-txt",
             )}
           >
-            {st === "live" && <span aria-hidden className={cn("h-1.5 w-1.5 rounded-full bg-current animate-[dk-pulse_1.4s_ease-in-out_infinite]", on && "text-accent-ink")} />}
+            {st === "live" && <span aria-hidden className={cn("h-1.5 w-1.5 rounded-full bg-current animate-[dk-pulse_1.4s_ease-in-out_infinite] motion-reduce:animate-none", on && "text-accent-ink")} />}
             {s.label}
           </button>
         )
@@ -79,7 +79,7 @@ export function DkCountryFilter({ options, value, onChange, resultCount, noun = 
   return (
     <div ref={ref} className="flex flex-wrap items-center gap-2.5">
       <div className="relative">
-        <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-haspopup="dialog" className={cn("inline-flex items-center gap-2 border border-solid border-line-2 bg-base px-[11px] py-2 font-mono text-[11px]/none font-semibold tracking-[0.05em] transition-[color,border-color] duration-[140ms] [clip-path:polygon(0_0,100%_0,100%_calc(100%_-_7px),calc(100%_-_7px)_100%,0_100%)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-line", sel.length ? "border-accent-line text-accent-bright" : "text-txt-muted")}>
+        <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-haspopup="dialog" className={cn("inline-flex items-center gap-2 border border-solid border-line-2 bg-base px-[11px] py-2 font-mono text-[11px]/none font-semibold tracking-[0.05em] transition-[color,border-color] duration-[140ms] cut-tag [--cut-tag:7px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-line", sel.length ? "border-accent-line text-accent-bright" : "text-txt-muted")}>
           <Icon name="globe" size={14} />
           <span>{label}</span>
           {sel.length > 1 && <span className="bg-accent-soft px-[5px] py-0.5 text-[9px] text-accent-bright">{sel.length}</span>}
@@ -122,7 +122,7 @@ export function DkCountryFilter({ options, value, onChange, resultCount, noun = 
           {sel.map((code) => {
             const c = byCode.get(code)
             return (
-              <button key={code} type="button" onClick={() => toggle(code)} title={"Quitar " + (c ? c.name : code)} className="inline-flex items-center gap-[5px] border border-solid border-accent-line bg-accent-soft px-2 py-[5px] font-mono text-[10px]/none font-semibold text-accent-bright [clip-path:polygon(2px_0,100%_0,calc(100%_-_2px)_100%,0_100%)]">
+              <button key={code} type="button" onClick={() => toggle(code)} title={"Quitar " + (c ? c.name : code)} className="inline-flex items-center gap-[5px] border border-solid border-accent-line bg-accent-soft px-2 py-[5px] font-mono text-[10px]/none font-semibold text-accent-bright cut [--cut:2px]">
                 <DkFlag flag={c?.flag} code={code} name={c?.name || code} size={12} />
                 <span>{code}</span>
                 <Icon name="x" size={10} />
@@ -154,7 +154,7 @@ export function useDkToast(): [React.ReactNode, (msg: React.ReactNode) => void] 
     tm.current = setTimeout(() => setMsg(null), 2400)
   }
   const node = msg ? (
-    <div role="status" className="fixed bottom-7 left-1/2 z-[200] inline-flex -translate-x-1/2 items-center gap-[9px] whitespace-nowrap border border-solid border-line-2 bg-base-deep px-4 py-[11px] font-mono text-[12px]/[1.3] font-medium text-txt [box-shadow:0_18px_50px_rgba(0,0,0,0.5)] [clip-path:polygon(0_0,100%_0,100%_calc(100%_-_9px),calc(100%_-_9px)_100%,0_100%)] animate-[dk-toastin_0.2s_cubic-bezier(0.2,0.7,0.3,1)]">
+    <div role="status" className="fixed bottom-7 left-1/2 z-[200] inline-flex -translate-x-1/2 items-center gap-[9px] whitespace-nowrap border border-solid border-line-2 bg-base-deep px-4 py-[11px] font-mono text-[12px]/[1.3] font-medium text-txt [box-shadow:0_18px_50px_rgba(0,0,0,0.5)] cut-tag [--cut-tag:9px] animate-[dk-toastin_0.2s_cubic-bezier(0.2,0.7,0.3,1)] motion-reduce:animate-none">
       <Icon name="info" size={14} className="text-accent-bright" />
       {msg}
     </div>

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 import { LzPlatformPills } from "@/components/boffmedia/ui/calendar"
 import { CtStars, CtLogButton, CtStatusPill } from "./CtAtoms"
 import { CT_GENRE_ICON, CT_STATUS, useCtRating, useCtStatus, type CtGame } from "./catalog-util"

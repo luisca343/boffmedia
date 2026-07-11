@@ -2,11 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon, type IconName } from "@/components/boffmedia/primitives"
-import { Avatar } from "@/components/boffmedia/primitives/avatar"
-import { Badge } from "@/components/boffmedia/primitives/badge"
-import { IconButton } from "@/components/boffmedia/primitives/icon-button"
-import { Spinner } from "@/components/boffmedia/primitives/spinner"
+import { Icon, Avatar, Badge, IconButton, Spinner, type IconName } from "@/components/boffmedia/primitives"
 import { AvPill, AvLiveDot } from "./av-kit"
 
 /**

@@ -1,7 +1,7 @@
-import { getGameEntry } from "@/data/games"
+import { getGameEntry, getToolHref } from "@/data/games"
 import { hubConfig } from "@/data/hub"
 import { HUB_SLUGS } from "@/components/boffmedia/ui/tools/tools-data"
-import type { IconName } from "@/components/boffmedia/primitives/icon"
+import type { IconName } from "@/components/boffmedia/primitives"
 
 export interface NavItem {
   label: string
@@ -83,7 +83,7 @@ export function buildComunidadSections(t: T): NavSection[] {
       href: "/eventos",
       items: [
         { label: t("nav.v3.items.events"), href: "/eventos", icon: "trophy" },
-        { label: t("nav.v3.items.raffles"), href: "/otros/sorteos", icon: "gift" },
+        { label: t("nav.v3.items.raffles"), href: getToolHref("otros", "sorteos"), icon: "gift" },
       ],
     },
   ]
@@ -110,7 +110,7 @@ export const FOOTER_COLS: { titleKey: string; links: FooterLink[] }[] = [
     titleKey: "community",
     links: [
       { href: "https://discord.gg/TWqjNHQz7d", labelKey: "discord", external: true },
-      { route: "/otros/sorteos", labelKey: "raffles" },
+      { route: getToolHref("otros", "sorteos"), labelKey: "raffles" },
     ],
   },
   {

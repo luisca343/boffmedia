@@ -2,9 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Badge } from "@/components/boffmedia/primitives/badge"
-import { Icon } from "@/components/boffmedia/primitives/icon"
-import { Panel } from "@/components/boffmedia/primitives/panel"
+import { Badge, Icon, Panel } from "@/components/boffmedia/primitives"
 import { ArtImage } from "@/components/boffmedia/ui/tools/ArtImage"
 import { Byline, CmAvatar } from "./CmAvatar"
 import { fmtNum, timeAgo, type ForumCategoryLike, type ForumMember, type ForumStatsData, type ForumThreadLike } from "./community-util"

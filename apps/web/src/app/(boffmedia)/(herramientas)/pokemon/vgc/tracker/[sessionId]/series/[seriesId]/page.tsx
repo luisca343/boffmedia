@@ -3,7 +3,7 @@
 import { use } from 'react';
 import { useTranslations } from 'next-intl';
 import { useSingleSeries, useSessions } from '@/features/vgc-tracker/hooks/useVgcDb';
-import { Spinner } from '@/components/boffmedia/primitives/spinner';
+import { Spinner } from "@/components/boffmedia/primitives"
 import { SeriesWorkspace } from './_components/SeriesWorkspace';
 
 interface Props {
@@ -19,7 +19,7 @@ export default function SeriesPage({ params }: Props) {
 
   if (loading) {
     return (
-      <div className="grid h-[calc(100vh-var(--nav-h,66px))] place-items-center">
+      <div className="grid h-[calc(100vh_-_var(--nav-h,66px))] place-items-center">
         <Spinner />
       </div>
     );
@@ -27,7 +27,7 @@ export default function SeriesPage({ params }: Props) {
 
   if (!series) {
     return (
-      <div className="grid h-[calc(100vh-var(--nav-h,66px))] place-items-center font-mono text-[13px] text-txt-muted">
+      <div className="grid h-[calc(100vh_-_var(--nav-h,66px))] place-items-center font-mono text-[13px] text-txt-muted">
         {t('workspace.seriesNotFound')}
       </div>
     );

@@ -3,7 +3,7 @@
 import { useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
-import { Icon } from '@/components/boffmedia/primitives/icon';
+import { Icon } from "@/components/boffmedia/primitives"
 import { spriteUrl, handleSpriteError, SpeciesEntry, isLead, isBack } from '@/features/vgc-tracker/types';
 import type { MatchSlot, SlotRole } from '@/features/vgc-tracker/types';
 import { cssVars } from '@/components/boffmedia/ui/tools/datakit';

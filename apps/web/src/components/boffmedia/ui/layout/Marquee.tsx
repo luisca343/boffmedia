@@ -25,7 +25,7 @@ export function Marquee({ items, speed = 30 }: MarqueeProps) {
   return (
     <div className="overflow-hidden border-y border-line bg-base-2 py-[22px]">
       <div
-        className="flex w-max animate-[bm-marquee_var(--mq-dur)_linear_infinite]"
+        className="flex w-max animate-[bm-marquee_var(--mq-dur)_linear_infinite] motion-reduce:animate-none"
         style={{ ["--mq-dur"]: `${speed}s` } as React.CSSProperties}
       >
         <Half items={items} />

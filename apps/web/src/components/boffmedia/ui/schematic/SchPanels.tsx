@@ -2,9 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Badge } from "@/components/boffmedia/primitives/badge"
-import { Button } from "@/components/boffmedia/primitives/button"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Badge, Button, Icon } from "@/components/boffmedia/primitives"
 import { BlockThumb, SchGlyph } from "./SchAtoms"
 import { SCH_STATUS, schToneVars, type SchBulkGroup, type SchEntry, type SchRegistry } from "./schematic-util"
 
@@ -296,7 +294,7 @@ export function ExportBar({ targetGame, canExport, ruleCount, exporting, onExpor
       <div className="flex-1" />
       {exporting ? (
         <span className="flex items-center gap-2 font-mono text-[11px] text-accent-bright">
-          <span className="h-[13px] w-[13px] rounded-full border-2 border-line-2 border-t-accent animate-[bm-spin_0.7s_linear_infinite]" />
+          <span className="h-[13px] w-[13px] rounded-full border-2 border-line-2 border-t-accent animate-[bm-spin_0.7s_linear_infinite] motion-reduce:animate-none" />
           Exportando…
         </span>
       ) : null}
@@ -325,8 +323,8 @@ export function BulkRules({ open, groups, onClose, onApply }: { open: boolean; g
   const set = (ns: string, a: string) => setActions((p) => ({ ...p, [ns]: a }))
   const none = groups.every((g) => (actions[g.namespace] || "skip") === "skip")
   return (
-    <div className="fixed inset-0 z-[950] flex justify-end bg-black/60 animate-[schfade_0.18s_ease]" onClick={onClose}>
-      <aside className="flex h-full w-[min(440px,100%)] flex-col border-l-2 border-solid border-accent bg-panel [box-shadow:0_0_60px_rgba(0,0,0,0.5)] animate-[schslide_0.24s_cubic-bezier(0.16,1,0.3,1)]" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Reglas en lote">
+    <div className="fixed inset-0 z-[950] flex justify-end bg-black/60 animate-[schfade_0.18s_ease] motion-reduce:animate-none" onClick={onClose}>
+      <aside className="flex h-full w-[min(440px,100%)] flex-col border-l-2 border-solid border-accent bg-panel [box-shadow:0_0_60px_rgba(0,0,0,0.5)] animate-[schslide_0.24s_cubic-bezier(0.16,1,0.3,1)] motion-reduce:animate-none" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Reglas en lote">
         <header className="relative border-b border-solid border-line px-[18px] pb-[15px] pt-[18px]">
           <button type="button" onClick={onClose} aria-label="Cerrar" className="absolute right-[14px] top-[14px] border-0 bg-transparent p-1 text-txt-dim hover:text-txt">
             <Icon name="x" size={16} />

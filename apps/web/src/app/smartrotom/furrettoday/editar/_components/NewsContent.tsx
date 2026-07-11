@@ -58,7 +58,7 @@ export default function NewsContent({
           
           {/* Comic speech bubble */}
           <div className="relative bg-white border-4 border-black p-6 mb-8 max-w-2xl transform -rotate-2 card-pop shadow-[8px_8px_0px_0px_rgba(0,0,0,0.3)]">
-            <div className="absolute h-12 w-12 bg-white border-r-4 border-b-4 border-black transform rotate-45 -bottom-7 left-[calc(50%-16px)]"></div>
+            <div className="absolute h-12 w-12 bg-white border-r-4 border-b-4 border-black transform rotate-45 -bottom-7 left-[calc(50%_-_16px)]"></div>
             <h1 className="text-pop-4xl font-bold mb-6 text-pink-500 pop-shadow text-center">
               ¡Editor de Noticias!
             </h1>
