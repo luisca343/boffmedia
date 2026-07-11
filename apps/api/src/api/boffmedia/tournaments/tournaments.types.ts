@@ -11,6 +11,8 @@ import {
   PHASE_STATUS,
   ADVANCE_TYPE,
   TIEBREAK_PROFILE,
+  PROPOSAL_STATE,
+  MATCH_MESSAGE_KIND,
 } from '@/_db/schema/Tournaments';
 
 export type TournamentFormat =
@@ -31,3 +33,7 @@ export type PhaseStatus = (typeof PHASE_STATUS)[keyof typeof PHASE_STATUS];
 export type AdvanceType = (typeof ADVANCE_TYPE)[keyof typeof ADVANCE_TYPE];
 export type TiebreakProfile =
   (typeof TIEBREAK_PROFILE)[keyof typeof TIEBREAK_PROFILE];
+export type ProposalState =
+  (typeof PROPOSAL_STATE)[keyof typeof PROPOSAL_STATE];
+export type MatchMessageKind =
+  (typeof MATCH_MESSAGE_KIND)[keyof typeof MATCH_MESSAGE_KIND];

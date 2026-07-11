@@ -15,6 +15,7 @@ import {
   matchesForPhaseChain,
   standingsForEntrants,
 } from '../standings.util';
+import { effectiveBestOf } from '../match-report.util';
 import { toCompetitor } from '../tournaments.mapper';
 import { Competitor } from '../entities/competitor.entity';
 import { MatchView } from '../entities/match.entity';
@@ -29,11 +30,41 @@ import { TournamentDetail } from '../entities/tournament-detail.entity';
 import { PhaseView } from '../entities/phase.entity';
 import type { PhaseStatus, TournamentFormat } from '../tournaments.types';
 
+/** Per-tournament context needed to compute each match's effective best-of. */
+interface MatchCtx {
+  tBestOf: number;
+  phaseById: Map<number, TournamentPhase>;
+  maxWinnersRound: Map<number, number>; // phaseId → highest winners round
+}
+
 @Injectable()
 export class StandingsService {
   constructor(private readonly repo: TournamentsRepository) {}
 
-  async buildDetail(t: TournamentListRow): Promise<TournamentDetail> {
+  private buildMatchCtx(
+    tBestOf: number,
+    phases: TournamentPhase[],
+    matches: TournamentMatch[],
+  ): MatchCtx {
+    const maxWinnersRound = new Map<number, number>();
+    for (const m of matches) {
+      if (m.bracket !== 'winners' || m.phaseId == null) continue;
+      maxWinnersRound.set(
+        m.phaseId,
+        Math.max(maxWinnersRound.get(m.phaseId) ?? 0, m.roundNumber),
+      );
+    }
+    return {
+      tBestOf,
+      phaseById: new Map(phases.map((p) => [p.id, p])),
+      maxWinnersRound,
+    };
+  }
+
+  async buildDetail(
+    t: TournamentListRow,
+    viewerUserId?: number,
+  ): Promise<TournamentDetail> {
     const participants = await this.repo.listParticipants(t.id);
     const teamIds = participants.filter((p) => p.kind === 'team').map((p) => p.id);
     const rosterRows = await this.repo.listRoster(teamIds);
@@ -53,6 +84,7 @@ export class StandingsService {
     const groups = await this.repo.listGroups(t.id);
     const phases = await this.repo.listPhases(t.id);
     const entrants = await this.repo.listPhaseEntrantsForTournament(t.id);
+    const ctx = this.buildMatchCtx(t.bestOf, phases, matches);
 
     const phaseViews = this.buildPhases(
       t,
@@ -62,13 +94,28 @@ export class StandingsService {
       cmap,
       groups,
       entrants,
+      ctx,
     );
     const activePhaseId = this.pickActivePhaseId(phases);
     // Legacy `view`: the active phase's render model (kept one release).
     const view =
       phaseViews.find((pv) => pv.id === activePhaseId)?.view ??
       phaseViews[0]?.view ??
-      this.buildView(t, participants, matches, cmap, groups);
+      this.buildView(t, participants, matches, cmap, groups, ctx);
+
+    const viewerParticipant =
+      viewerUserId != null
+        ? participants.find((p) => p.userId === viewerUserId) ?? null
+        : null;
+    const myMatch =
+      viewerParticipant && t.status === 'live'
+        ? matches.find(
+            (m) =>
+              (m.status === 'ready' || m.status === 'live') &&
+              (m.topParticipantId === viewerParticipant.id ||
+                m.botParticipantId === viewerParticipant.id),
+          ) ?? null
+        : null;
 
     return {
       id: t.id,
@@ -84,10 +131,13 @@ export class StandingsService {
       eventId: t.eventId,
       description: t.description,
       rules: t.rules,
+      prizes: t.prizes,
+      checkInOpen: t.checkInOpen,
       banner: t.banner,
       icon: t.icon,
       hue: t.hue,
       bestOf: t.bestOf,
+      autoVerifyMinutes: t.autoVerifyMinutes,
       maxParticipants: t.maxParticipants,
       registrationOpen: t.registrationOpen,
       startDate: t.startDate ? t.startDate.toISOString() : null,
@@ -97,10 +147,92 @@ export class StandingsService {
           ? cmap.get(t.championParticipantId) ?? null
           : null,
       participants: participants.map((p) => cmap.get(p.id)!),
+      viewerParticipantId: viewerParticipant
+        ? String(viewerParticipant.id)
+        : null,
+      myMatchId: myMatch?.id ?? null,
+      podium: this.buildPodium(t, phases, participants, matches, cmap),
       activePhaseId,
       phases: phaseViews,
       view,
     };
+  }
+
+  /**
+   * Top-3 once the tournament completes. Elimination: champion · final loser ·
+   * third-place winner (when that match exists). Table formats: top-3 of the
+   * final phase's standings; leaderboard: metric order.
+   */
+  private buildPodium(
+    t: TournamentListRow,
+    phases: TournamentPhase[],
+    participants: TournamentParticipant[],
+    matches: TournamentMatch[],
+    cmap: Map<number, Competitor>,
+  ): Competitor[] {
+    if (t.status !== 'completed' || t.championParticipantId == null) return [];
+    const ids: number[] = [t.championParticipantId];
+    const push = (id: number | null | undefined) => {
+      if (id != null && !ids.includes(id) && ids.length < 3) ids.push(id);
+    };
+
+    const final = phases.length
+      ? phases.reduce((a, b) => (a.phaseOrder > b.phaseOrder ? a : b))
+      : null;
+    const phMatches = final
+      ? matches.filter((m) => m.phaseId === final.id)
+      : matches;
+    const fmt = final?.format ?? t.format;
+    const hasKnockout = phMatches.some((m) => m.bracket === 'winners');
+
+    if (fmt === 'single' || fmt === 'double' || (t.format === 'groups' && hasKnockout)) {
+      const grand = phMatches.find(
+        (m) => m.bracket === 'grand' && m.status === 'completed',
+      );
+      let decisive = grand ?? null;
+      if (!decisive) {
+        const winners = phMatches.filter((m) => m.bracket === 'winners');
+        const maxR = Math.max(0, ...winners.map((m) => m.roundNumber));
+        decisive =
+          winners.find(
+            (m) => m.roundNumber === maxR && m.status === 'completed',
+          ) ?? null;
+      }
+      if (decisive?.winnerParticipantId != null) {
+        push(
+          decisive.winnerParticipantId === decisive.topParticipantId
+            ? decisive.botParticipantId
+            : decisive.topParticipantId,
+        );
+      }
+      const third = phMatches.find(
+        (m) => m.bracket === 'third' && m.status === 'completed',
+      );
+      push(third?.winnerParticipantId);
+    } else if (fmt === 'leaderboard') {
+      const metric = t.metric ?? 'score';
+      const sorted = [...participants].sort((a, b) => {
+        const av = a.score ?? (metric === 'time' ? Number.MAX_SAFE_INTEGER : 0);
+        const bv = b.score ?? (metric === 'time' ? Number.MAX_SAFE_INTEGER : 0);
+        return metric === 'time' ? av - bv : bv - av;
+      });
+      for (const p of sorted) push(p.id);
+    } else {
+      const chain = final
+        ? matchesForPhaseChain(final.id, phases, matches)
+        : matches;
+      const rows = computeStandings(
+        participants.map((p) => p.id),
+        chain,
+        final?.tiebreakProfile ?? 'points',
+      );
+      for (const r of rows) push(r.participantId);
+    }
+
+    return ids
+      .slice(0, 3)
+      .map((id) => cmap.get(id))
+      .filter((c): c is Competitor => c != null);
   }
 
   // ── phases ──────────────────────────────────────────────────────────────────
@@ -112,6 +244,7 @@ export class StandingsService {
     cmap: Map<number, Competitor>,
     groups: TournamentGroup[],
     entrants: TournamentPhaseEntrant[],
+    ctx: MatchCtx,
   ): PhaseView[] {
     // Pre-migration safety net: synthesise a single phase from the tournament.
     if (phases.length === 0) {
@@ -120,15 +253,18 @@ export class StandingsService {
           id: 0,
           order: 1,
           name: 'Fase única',
-          format: t.format === 'groups' ? 'roundrobin' : t.format,
+          format: t.format,
           status: this.mapTournamentStatus(t.status),
           rounds: null,
           bestOf: t.bestOf,
+          finalsBestOf: null,
+          groupCount: null,
+          thirdPlace: false,
           carryStandings: false,
           advance: null,
           entrantCount: participants.length,
           qualifiedCount: null,
-          view: this.buildView(t, participants, matches, cmap, groups),
+          view: this.buildView(t, participants, matches, cmap, groups, ctx),
         },
       ];
     }
@@ -152,14 +288,30 @@ export class StandingsService {
         .map((e) => partById.get(e.participantId))
         .filter((p): p is TournamentParticipant => p != null);
       const view = single
-        ? this.buildView(t, participants, matches, cmap, groups)
+        ? this.buildView(t, participants, matches, cmap, groups, ctx)
         : ph.format === 'swiss'
-          ? this.swissPhaseView(ph, phParticipants, phMatches, cmap, {
-              phases,
-              allMatches: matches,
-              allParticipantIds: participants.map((p) => p.id),
-            })
-          : this.buildFormatView(ph.format, phParticipants, phMatches, cmap, t);
+          ? this.swissPhaseView(
+              ph,
+              phParticipants,
+              phMatches,
+              cmap,
+              {
+                phases,
+                allMatches: matches,
+                allParticipantIds: participants.map((p) => p.id),
+              },
+              ctx,
+            )
+          : ph.format === 'groups'
+            ? this.phaseGroupsView(ph, phMatches, cmap, groups)
+            : this.buildFormatView(
+                ph.format,
+                phParticipants,
+                phMatches,
+                cmap,
+                t,
+                ctx,
+              );
       const next = phases[i + 1];
       const qualifiedCount = next
         ? (entrantsByPhase.get(next.id) ?? []).length
@@ -172,6 +324,9 @@ export class StandingsService {
         status: ph.status,
         rounds: ph.rounds,
         bestOf: ph.bestOf ?? t.bestOf,
+        finalsBestOf: ph.finalsBestOf,
+        groupCount: ph.groupCount,
+        thirdPlace: ph.thirdPlace,
         carryStandings: ph.carryStandings,
         advance: ph.advanceType
           ? {
@@ -185,6 +340,42 @@ export class StandingsService {
         view,
       };
     });
+  }
+
+  /**
+   * Groups-PHASE view. Membership derives from the phase's match rows —
+   * `participants.groupId` is transient and may belong to a later phase.
+   */
+  private phaseGroupsView(
+    ph: TournamentPhase,
+    phMatches: TournamentMatch[],
+    cmap: Map<number, Competitor>,
+    allGroups: TournamentGroup[],
+  ): object {
+    const phGroups = allGroups
+      .filter((g) => g.phaseId === ph.id)
+      .sort((a, b) => a.order - b.order);
+    return {
+      groups: phGroups.map((g) => {
+        const gMatches = phMatches.filter((m) => m.groupId === g.id);
+        const memberIds = [
+          ...new Set(
+            gMatches
+              .flatMap((m) => [m.topParticipantId, m.botParticipantId])
+              .filter((id): id is number => id != null),
+          ),
+        ];
+        return {
+          id: g.id,
+          name: g.name,
+          done: gMatches.filter((m) => m.status === 'completed').length,
+          total: gMatches.length,
+          advance: g.advanceCount,
+          standings: this.tableOf(memberIds, gMatches, cmap, ph.tiebreakProfile),
+        };
+      }),
+      knockout: null,
+    };
   }
 
   /** Default phase tab: the live one, else the last completed, else the first. */
@@ -211,7 +402,10 @@ export class StandingsService {
     const cmap = new Map<number, Competitor>();
     for (const p of participants) cmap.set(p.id, toCompetitor(p));
     const matches = await this.repo.listMatches(tournamentId);
-    return matches.map((m) => this.toMatchView(m, cmap));
+    const phases = await this.repo.listPhases(tournamentId);
+    const t = await this.repo.findById(tournamentId);
+    const ctx = this.buildMatchCtx(t?.bestOf ?? 1, phases, matches);
+    return matches.map((m) => this.toMatchView(m, cmap, ctx));
   }
 
   private buildView(
@@ -220,16 +414,17 @@ export class StandingsService {
     matches: TournamentMatch[],
     cmap: Map<number, Competitor>,
     groups: TournamentGroup[] = [],
+    ctx: MatchCtx,
   ): object {
     if (t.format === 'groups') {
       return {
         groups: this.groupsView(participants, matches, cmap, groups),
         knockout: matches.some((m) => m.bracket === 'winners')
-          ? { rounds: this.roundsOf(matches, 'winners', cmap) }
+          ? { rounds: this.roundsOf(matches, 'winners', cmap, ctx) }
           : null,
       };
     }
-    return this.buildFormatView(t.format, participants, matches, cmap, t);
+    return this.buildFormatView(t.format, participants, matches, cmap, t, ctx);
   }
 
   /**
@@ -242,18 +437,25 @@ export class StandingsService {
     matches: TournamentMatch[],
     cmap: Map<number, Competitor>,
     t: TournamentListRow,
+    ctx: MatchCtx,
   ): object {
     switch (format) {
       case 'single':
-        return { rounds: this.roundsOf(matches, 'winners', cmap) };
+        return {
+          rounds: this.roundsOf(matches, 'winners', cmap, ctx),
+          thirdPlace:
+            matches
+              .filter((m) => m.bracket === 'third')
+              .map((m) => this.toMatchView(m, cmap, ctx))[0] ?? null,
+        };
       case 'double':
         return {
-          winners: this.roundsOf(matches, 'winners', cmap),
-          losers: this.roundsOf(matches, 'losers', cmap),
+          winners: this.roundsOf(matches, 'winners', cmap, ctx),
+          losers: this.roundsOf(matches, 'losers', cmap, ctx),
           grandFinal:
             matches
               .filter((m) => m.bracket === 'grand')
-              .map((m) => this.toMatchView(m, cmap))[0] ?? null,
+              .map((m) => this.toMatchView(m, cmap, ctx))[0] ?? null,
         };
       case 'roundrobin':
         return this.leagueView(
@@ -268,7 +470,7 @@ export class StandingsService {
             matches.filter((m) => m.bracket === 'swiss'),
             cmap,
           ),
-          rounds: this.roundsOf(matches, 'swiss', cmap),
+          rounds: this.roundsOf(matches, 'swiss', cmap, ctx),
         };
       case 'leaderboard':
         return this.leaderboardView(t, participants, cmap);
@@ -287,17 +489,22 @@ export class StandingsService {
     phParticipants: TournamentParticipant[],
     phMatches: TournamentMatch[],
     cmap: Map<number, Competitor>,
-    ctx: {
+    chainCtx: {
       phases: TournamentPhase[];
       allMatches: TournamentMatch[];
       allParticipantIds: number[];
     },
+    ctx: MatchCtx,
   ): object {
     const entrantIds = phParticipants.map((p) => p.id);
-    const chain = matchesForPhaseChain(phase.id, ctx.phases, ctx.allMatches);
+    const chain = matchesForPhaseChain(
+      phase.id,
+      chainCtx.phases,
+      chainCtx.allMatches,
+    );
     const standings = standingsForEntrants(
       entrantIds,
-      ctx.allParticipantIds,
+      chainCtx.allParticipantIds,
       chain,
       phase.tiebreakProfile,
     ).map((s) => ({
@@ -311,14 +518,16 @@ export class StandingsService {
       ga: s.ga,
       pts: s.pts,
     }));
-    return { standings, rounds: this.roundsOf(phMatches, 'swiss', cmap) };
+    return { standings, rounds: this.roundsOf(phMatches, 'swiss', cmap, ctx) };
   }
 
   // ── helpers ──────────────────────────────────────────────────────────────────
   private toMatchView(
     m: TournamentMatch,
     cmap: Map<number, Competitor>,
+    ctx: MatchCtx,
   ): MatchView {
+    const phase = m.phaseId != null ? ctx.phaseById.get(m.phaseId) ?? null : null;
     return {
       id: m.id,
       bracket: m.bracket,
@@ -333,6 +542,14 @@ export class StandingsService {
         m.winnerParticipantId != null
           ? cmap.get(m.winnerParticipantId) ?? null
           : null,
+      bestOf: effectiveBestOf(
+        m,
+        phase,
+        ctx.tBestOf,
+        m.phaseId != null ? ctx.maxWinnersRound.get(m.phaseId) ?? 0 : 0,
+      ),
+      scheduledAt: m.scheduledAt ? m.scheduledAt.toISOString() : null,
+      proposalState: m.proposalState,
     };
   }
 
@@ -340,6 +557,7 @@ export class StandingsService {
     matches: TournamentMatch[],
     bracket: string,
     cmap: Map<number, Competitor>,
+    ctx: MatchCtx,
   ): MatchView[][] {
     const inBracket = matches.filter((m) => m.bracket === bracket);
     const rounds = [...new Set(inBracket.map((m) => m.roundNumber))].sort(
@@ -349,7 +567,7 @@ export class StandingsService {
       inBracket
         .filter((m) => m.roundNumber === r)
         .sort((a, b) => a.position - b.position)
-        .map((m) => this.toMatchView(m, cmap)),
+        .map((m) => this.toMatchView(m, cmap, ctx)),
     );
   }
 
@@ -357,8 +575,9 @@ export class StandingsService {
     participantIds: number[],
     matches: TournamentMatch[],
     cmap: Map<number, Competitor>,
+    profile: TournamentPhase['tiebreakProfile'] = 'points',
   ): Standing[] {
-    return computeStandings(participantIds, matches).map((s) => ({
+    return computeStandings(participantIds, matches, profile).map((s) => ({
       rank: s.rank,
       c: cmap.get(s.participantId)!,
       played: s.played,

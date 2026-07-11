@@ -6,9 +6,10 @@ import { MatchesService } from './services/matches.service';
 import { StandingsService } from './services/standings.service';
 import { PhasesService } from './services/phases.service';
 import { AdvancementService } from './services/advancement.service';
+import { MatchReportService } from './services/match-report.service';
+import { TournamentNotificationsService } from './services/tournament-notifications.service';
+import { TournamentAnnouncerService } from './services/tournament-announcer.service';
 import { TournamentsRepository } from './repositories/tournaments.repository';
-import { NotificationsService } from '@api/boffmedia/notifications/notifications.service';
-import { Tournament } from '@/_db/schema/Tournaments';
 import { CreateTournamentDto } from './dto/create-tournament.dto';
 import { CreatePhaseDto, UpdatePhaseDto } from './dto/create-phase.dto';
 import { UpdateTournamentDto } from './dto/update-tournament.dto';
@@ -19,9 +20,16 @@ import { UpdateParticipantDto } from './dto/update-participant.dto';
 import { GenerateBracketDto } from './dto/generate-bracket.dto';
 import { ReportMatchDto } from './dto/report-match.dto';
 import { SetStatusDto } from './dto/set-status.dto';
+import { ProposeReportDto } from './dto/propose-report.dto';
+import { ConfirmReportDto } from './dto/confirm-report.dto';
+import { TeamsheetDto } from './dto/teamsheet.dto';
+import { SubmitScoreDto } from './dto/submit-score.dto';
+import { ScheduleMatchesDto } from './dto/schedule-matches.dto';
 import { TournamentSummary } from './entities/tournament.entity';
 import { TournamentDetail } from './entities/tournament-detail.entity';
 import { Competitor } from './entities/competitor.entity';
+import { MatchDetail } from './entities/match-detail.entity';
+import { MatchMessageView } from './entities/match-message.entity';
 
 @Injectable()
 export class TournamentsFacadeService {
@@ -33,17 +41,23 @@ export class TournamentsFacadeService {
     private readonly standings: StandingsService,
     private readonly phases: PhasesService,
     private readonly advancement: AdvancementService,
+    private readonly matchReport: MatchReportService,
+    private readonly notify: TournamentNotificationsService,
+    private readonly announcer: TournamentAnnouncerService,
     private readonly repo: TournamentsRepository,
-    private readonly notifications: NotificationsService,
   ) {}
 
   list(query: ListTournamentsQueryDto): Promise<TournamentSummary[]> {
     return this.tournaments.list(query);
   }
 
-  async getBySlug(slug: string): Promise<TournamentDetail> {
+  mine(userId: number) {
+    return this.tournaments.mine(userId);
+  }
+
+  async getBySlug(slug: string, userId?: number): Promise<TournamentDetail> {
     const row = await this.tournaments.getMetaBySlug(slug);
-    return this.standings.buildDetail(row);
+    return this.standings.buildDetail(row, userId);
   }
 
   async getParticipants(slug: string): Promise<Competitor[]> {
@@ -83,10 +97,19 @@ export class TournamentsFacadeService {
   }
 
   async advance(id: number): Promise<TournamentDetail> {
+    await this.matchReport.settleExpiredProposals(id);
     const res = await this.advancement.advance(id);
+    const t = await this.tournaments.getById(id);
     if (res.completed && res.championParticipantId != null) {
-      const t = await this.tournaments.getById(id);
-      await this.notifyChampion(t, res.championParticipantId);
+      await this.notify.notifyChampion(t, res.championParticipantId);
+      await this.announcer.announceChampion(t, res.championParticipantId);
+    } else if (!res.completed) {
+      await this.notify.notifyPhaseOutcome(
+        t,
+        res.qualifiedParticipantIds,
+        res.eliminatedParticipantIds,
+      );
+      await this.notifyCurrentRoundReady(id);
     }
     return this.detail(id);
   }
@@ -116,6 +139,18 @@ export class TournamentsFacadeService {
     return this.registration.withdraw(id, userId);
   }
 
+  setCheckIn(id: number, userId: number, checkedIn: boolean) {
+    return this.registration.setCheckIn(id, userId, checkedIn);
+  }
+
+  submitScore(
+    id: number,
+    userId: number,
+    dto: SubmitScoreDto,
+  ): Promise<Competitor> {
+    return this.registration.submitScore(id, userId, dto.score, dto.meta);
+  }
+
   updateParticipant(
     pid: number,
     dto: UpdateParticipantDto,
@@ -131,12 +166,17 @@ export class TournamentsFacadeService {
     id: number,
     dto: GenerateBracketDto,
   ): Promise<TournamentDetail> {
+    await this.matchReport.settleExpiredProposals(id);
     const t = await this.tournaments.getById(id);
     const wasLive = t.status === 'live';
     await this.bracket.generate(t, dto);
-    // Only announce the start on the first generate (the draft/registration →
-    // live transition) — swiss calls generate once per round.
-    if (!wasLive) await this.notifyStart(t);
+    // Only announce the start on the first NON-PREVIEW generate (the
+    // draft/registration → live transition) — swiss calls generate per round.
+    if (!wasLive && !dto.preview) {
+      await this.notify.notifyStart(t);
+      await this.announcer.announceStart(t);
+    }
+    if (!dto.preview) await this.notifyCurrentRoundReady(id);
     return this.detail(id);
   }
 
@@ -145,16 +185,107 @@ export class TournamentsFacadeService {
     matchId: number,
     dto: ReportMatchDto,
   ): Promise<TournamentDetail> {
+    const before = await this.tournaments.getById(id);
     await this.matches.report(id, matchId, dto);
     const t = await this.tournaments.getById(id);
-    if (t.status === 'completed' && t.championParticipantId != null) {
-      await this.notifyChampion(t, t.championParticipantId);
+    if (
+      t.status === 'completed' &&
+      before.status !== 'completed' &&
+      t.championParticipantId != null
+    ) {
+      await this.notify.notifyChampion(t, t.championParticipantId);
+      await this.announcer.announceChampion(t, t.championParticipantId);
     }
     return this.detail(id);
   }
 
   async setStatus(id: number, dto: SetStatusDto): Promise<TournamentDetail> {
+    const before = await this.tournaments.getById(id);
     await this.tournaments.setStatus(id, dto.status);
+    if (dto.status === 'registration' && before.status !== 'registration') {
+      await this.announcer.announceRegistrationOpen(before);
+    }
+    return this.detail(id);
+  }
+
+  // ── self-report + match page ──────────────────────────────────────────────────
+  getMatchDetail(
+    slug: string,
+    matchId: number,
+    userId?: number,
+    isAdmin = false,
+  ): Promise<MatchDetail> {
+    return this.matchReport.getMatchDetail(slug, matchId, userId, isAdmin);
+  }
+
+  async proposeReport(
+    id: number,
+    matchId: number,
+    userId: number,
+    dto: ProposeReportDto,
+  ): Promise<{ success: boolean }> {
+    return this.matchReport.propose(id, matchId, userId, dto);
+  }
+
+  async confirmReport(
+    id: number,
+    matchId: number,
+    userId: number,
+    dto: ConfirmReportDto,
+  ): Promise<{ success: boolean }> {
+    return this.matchReport.confirm(id, matchId, userId, dto);
+  }
+
+  listMatchMessages(
+    id: number,
+    matchId: number,
+    userId: number,
+    isAdmin: boolean,
+    afterId: number,
+  ): Promise<MatchMessageView[]> {
+    return this.matchReport.listMessages(id, matchId, userId, isAdmin, afterId);
+  }
+
+  postMatchMessage(
+    id: number,
+    matchId: number,
+    userId: number,
+    isAdmin: boolean,
+    body: string,
+  ): Promise<MatchMessageView> {
+    return this.matchReport.postMessage(id, matchId, userId, isAdmin, body);
+  }
+
+  requestJudge(
+    id: number,
+    matchId: number,
+    userId: number,
+    isAdmin: boolean,
+  ): Promise<{ success: boolean }> {
+    return this.matchReport.requestJudge(id, matchId, userId, isAdmin);
+  }
+
+  setTeamsheet(
+    id: number,
+    userId: number,
+    dto: TeamsheetDto,
+  ): Promise<{ success: boolean }> {
+    return this.matchReport.setTeamsheet(id, userId, dto);
+  }
+
+  // ── scheduling (admin) ────────────────────────────────────────────────────────
+  async scheduleMatches(
+    id: number,
+    dto: ScheduleMatchesDto,
+  ): Promise<TournamentDetail> {
+    const all = await this.repo.listMatches(id);
+    const own = new Set(all.map((m) => m.id));
+    for (const mid of dto.matchIds) {
+      if (!own.has(mid)) continue;
+      await this.repo.updateMatch(mid, {
+        scheduledAt: dto.scheduledAt ?? null,
+      });
+    }
     return this.detail(id);
   }
 
@@ -163,43 +294,28 @@ export class TournamentsFacadeService {
     return this.standings.buildDetail(row);
   }
 
-  // ── notification producers (best-effort — never fail the action) ─────────────
-  private async notifyStart(t: Tournament): Promise<void> {
+  /**
+   * Notify players of the round that just became playable: ready matches of the
+   * lowest open round per bracket. Later-round matches that turn ready via
+   * result propagation are notified by MatchesService instead.
+   */
+  private async notifyCurrentRoundReady(tournamentId: number): Promise<void> {
     try {
-      const parts = await this.repo.listParticipants(t.id);
-      const link = `/torneos/${t.slug}`;
-      for (const p of parts) {
-        if (p.userId == null) continue;
-        await this.notifications.create({
-          userId: p.userId,
-          type: 'tournament',
-          title: 'El torneo ha comenzado',
-          body: t.name,
-          link,
-        });
+      const matches = await this.repo.listMatches(tournamentId);
+      const ready = matches.filter((m) => m.status === 'ready');
+      const minRound = new Map<string, number>();
+      for (const m of ready) {
+        minRound.set(
+          m.bracket,
+          Math.min(minRound.get(m.bracket) ?? Infinity, m.roundNumber),
+        );
+      }
+      for (const m of ready) {
+        if (m.roundNumber !== minRound.get(m.bracket)) continue;
+        await this.notify.notifyMatchReady(m);
       }
     } catch {
-      // swallow — notifications are best-effort
-    }
-  }
-
-  private async notifyChampion(
-    t: Tournament,
-    championParticipantId: number,
-  ): Promise<void> {
-    try {
-      const champ = await this.repo.findParticipant(championParticipantId);
-      if (champ?.userId != null) {
-        await this.notifications.create({
-          userId: champ.userId,
-          type: 'tournament',
-          title: '¡Has ganado el torneo!',
-          body: t.name,
-          link: `/torneos/${t.slug}`,
-        });
-      }
-    } catch {
-      // swallow — notifications are best-effort
+      // best-effort
     }
   }
 }

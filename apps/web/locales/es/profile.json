@@ -17,7 +17,19 @@
       "account": "Datos de la cuenta",
       "linked": "Cuentas vinculadas",
       "trophies": "Vitrina de logros",
-      "activity": "Actividad reciente"
+      "activity": "Actividad reciente",
+      "tournaments": "Mis torneos"
+    },
+    "tournaments": {
+      "emptyTitle": "Sin torneos todavía",
+      "emptyBody": "Apúntate a un torneo de la comunidad y aparecerá aquí.",
+      "champion": "Campeón",
+      "status": {
+        "active": "Activo",
+        "eliminated": "Eliminado",
+        "withdrew": "Retirado",
+        "disqualified": "Descalificado"
+      }
     },
     "stats": {
       "rank": "Ranking global",

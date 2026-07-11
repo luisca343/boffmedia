@@ -1,0 +1,1 @@
+ALTER TABLE `boffmedia_tournament_phases` MODIFY COLUMN `advance_type` enum('all','top_n','record','top_or_record');

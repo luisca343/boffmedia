@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { and, desc, eq, inArray, isNull, like, sql } from 'drizzle-orm';
+import { and, desc, eq, inArray, isNull, like, lt, sql } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/mysql-core';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
@@ -11,6 +11,7 @@ import {
   boffMediaTournamentMatches,
   boffMediaTournamentPhases,
   boffMediaTournamentPhaseEntrants,
+  boffMediaTournamentMatchMessages,
   Tournament,
   TournamentParticipant,
   TournamentGroup,
@@ -18,6 +19,7 @@ import {
   TournamentRosterMember,
   TournamentPhase,
   TournamentPhaseEntrant,
+  TournamentMatchMessage,
 } from '@/_db/schema/Tournaments';
 import { boffMediaGames } from '@/_db/schema/Events';
 import { boffMediaUsers } from '@/_db/schema/BoffMedia';
@@ -320,6 +322,12 @@ export class TournamentsRepository {
       .where(eq(boffMediaTournamentGroups.tournamentId, tournamentId));
   }
 
+  async deleteGroupsByPhase(phaseId: number): Promise<void> {
+    await this.db
+      .delete(boffMediaTournamentGroups)
+      .where(eq(boffMediaTournamentGroups.phaseId, phaseId));
+  }
+
   // ── matches ──────────────────────────────────────────────────────────────────
   async insertMatch(
     values: typeof boffMediaTournamentMatches.$inferInsert,
@@ -422,6 +430,143 @@ export class TournamentsRepository {
       .where(eq(boffMediaTournamentMatches.id, id));
   }
 
+  // ── self-report proposals ─────────────────────────────────────────────────────
+  /**
+   * Atomically claim an open match for a new proposal (no active proposal,
+   * match still playable). True when this call won the slot — a concurrent
+   * rival proposal loses instead of silently overwriting.
+   */
+  async claimProposal(
+    matchId: number,
+    values: {
+      proposedByParticipantId: number;
+      proposedTopScore: number;
+      proposedBotScore: number;
+      proposedGames: string;
+      proposedAt: Date;
+      proposalExpiresAt: Date;
+    },
+  ): Promise<boolean> {
+    const [res] = await this.db
+      .update(boffMediaTournamentMatches)
+      .set({ ...values, proposalState: 'pending' })
+      .where(
+        and(
+          eq(boffMediaTournamentMatches.id, matchId),
+          isNull(boffMediaTournamentMatches.proposedByParticipantId),
+          inArray(boffMediaTournamentMatches.status, ['ready', 'live']),
+        ),
+      );
+    return res.affectedRows > 0;
+  }
+
+  /**
+   * Atomically claim an expired pending proposal for auto-verification (state
+   * flips pending→null so concurrent settlers can't double-finalize).
+   */
+  async claimExpiredProposal(matchId: number, now: Date): Promise<boolean> {
+    const [res] = await this.db
+      .update(boffMediaTournamentMatches)
+      .set({ proposalState: null })
+      .where(
+        and(
+          eq(boffMediaTournamentMatches.id, matchId),
+          eq(boffMediaTournamentMatches.proposalState, 'pending'),
+          lt(boffMediaTournamentMatches.proposalExpiresAt, now),
+          inArray(boffMediaTournamentMatches.status, ['ready', 'live']),
+        ),
+      );
+    return res.affectedRows > 0;
+  }
+
+  async listExpiredProposalMatches(
+    tournamentId: number,
+    now: Date,
+  ): Promise<TournamentMatch[]> {
+    return this.db
+      .select()
+      .from(boffMediaTournamentMatches)
+      .where(
+        and(
+          eq(boffMediaTournamentMatches.tournamentId, tournamentId),
+          eq(boffMediaTournamentMatches.proposalState, 'pending'),
+          lt(boffMediaTournamentMatches.proposalExpiresAt, now),
+          inArray(boffMediaTournamentMatches.status, ['ready', 'live']),
+        ),
+      );
+  }
+
+  // ── match chat ────────────────────────────────────────────────────────────────
+  async addMatchMessage(
+    values: typeof boffMediaTournamentMatchMessages.$inferInsert,
+  ): Promise<number> {
+    const [res] = await this.db
+      .insert(boffMediaTournamentMatchMessages)
+      .values(values);
+    return res.insertId;
+  }
+
+  async listMatchMessages(
+    matchId: number,
+    afterId = 0,
+  ): Promise<TournamentMatchMessage[]> {
+    return this.db
+      .select()
+      .from(boffMediaTournamentMatchMessages)
+      .where(
+        and(
+          eq(boffMediaTournamentMatchMessages.matchId, matchId),
+          sql`${boffMediaTournamentMatchMessages.id} > ${afterId}`,
+        ),
+      )
+      .orderBy(boffMediaTournamentMatchMessages.id);
+  }
+
+  /** Tournaments the user has entered, newest first (for the profile panel). */
+  async listByParticipantUser(userId: number): Promise<
+    (TournamentListRow & {
+      myParticipantId: number;
+      myStatus: string;
+    })[]
+  > {
+    const champ = alias(boffMediaTournamentParticipants, 'champ');
+    const rows = await this.db
+      .select({
+        t: boffMediaTournaments,
+        gameTitle: boffMediaGames.title,
+        championName: champ.name,
+        myParticipantId: boffMediaTournamentParticipants.id,
+        myStatus: boffMediaTournamentParticipants.status,
+      })
+      .from(boffMediaTournamentParticipants)
+      .innerJoin(
+        boffMediaTournaments,
+        eq(
+          boffMediaTournamentParticipants.tournamentId,
+          boffMediaTournaments.id,
+        ),
+      )
+      .leftJoin(
+        boffMediaGames,
+        eq(boffMediaTournaments.gameId, boffMediaGames.id),
+      )
+      .leftJoin(champ, eq(boffMediaTournaments.championParticipantId, champ.id))
+      .where(
+        and(
+          eq(boffMediaTournamentParticipants.userId, userId),
+          isNull(boffMediaTournaments.deletedAt),
+        ),
+      )
+      .orderBy(desc(boffMediaTournaments.createdAt));
+    return rows.map((r) => ({
+      ...r.t,
+      gameTitle: r.gameTitle,
+      championName: r.championName,
+      myParticipantId: r.myParticipantId,
+      myStatus: r.myStatus,
+    }));
+  }
+
   // ── phases ──────────────────────────────────────────────────────────────────
   async createPhase(
     values: typeof boffMediaTournamentPhases.$inferInsert,
@@ -486,6 +631,12 @@ export class TournamentsRepository {
   ): Promise<void> {
     if (rows.length === 0) return;
     await this.db.insert(boffMediaTournamentPhaseEntrants).values(rows);
+  }
+
+  async clearPhaseEntrants(phaseId: number): Promise<void> {
+    await this.db
+      .delete(boffMediaTournamentPhaseEntrants)
+      .where(eq(boffMediaTournamentPhaseEntrants.phaseId, phaseId));
   }
 
   async listPhaseEntrants(

@@ -1,0 +1,75 @@
+"use client"
+
+import * as React from "react"
+import { cn } from "@/lib/utils"
+import type { TnCompetitor } from "./tournaments-util"
+
+const CUT_POD = "[clip-path:polygon(0_0,calc(100%_-_14px)_0,100%_14px,100%_100%,0_100%)]"
+const CUT_PLACE = "[clip-path:polygon(0_0,calc(100%_-_6px)_0,100%_6px,100%_100%,0_100%)]"
+
+function PodiumAvatar({ c, size }: { c: TnCompetitor; size: number }) {
+  const ini = (c.name || "?").trim()[0]?.toUpperCase() || "?"
+  return (
+    <span
+      className="grid flex-none place-items-center overflow-hidden border border-solid border-line-2 bg-panel-2 font-display font-extrabold uppercase text-white"
+      style={{
+        width: size,
+        height: size,
+        fontSize: Math.round(size * 0.38),
+        background: c.avatar ? undefined : `hsl(${c.hue ?? 210} 42% 34%)`,
+      }}
+    >
+      {c.avatar ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={c.avatar} alt="" className="h-full w-full object-cover" />
+      ) : (
+        ini
+      )}
+    </span>
+  )
+}
+
+/** Top-3 podium (2 · 1 · 3 visual order) for a completed tournament. */
+export function TnPodium({ podium }: { podium: TnCompetitor[] }) {
+  const top = podium.slice(0, 3)
+  if (top.length === 0) return null
+  const order = [top[1], top[0], top[2]].filter(Boolean) as TnCompetitor[]
+  return (
+    <div className="mx-auto grid w-full max-w-[760px] grid-cols-3 items-end gap-4 max-[720px]:max-w-[380px] max-[720px]:grid-cols-1">
+      {order.map((c) => {
+        const place = top.indexOf(c) + 1
+        const first = place === 1
+        return (
+          <div
+            key={c.id}
+            className={cn(
+              "relative flex flex-col items-center px-4 pb-[18px] pt-[46px] text-center",
+              "border border-solid bg-panel",
+              first
+                ? "border-accent-line bg-[linear-gradient(to_bottom,var(--accent-soft),var(--panel)_60%)] pt-[54px]"
+                : "border-line",
+              CUT_POD,
+              "max-[720px]:flex-row max-[720px]:items-center max-[720px]:gap-[14px] max-[720px]:p-4 max-[720px]:text-left",
+            )}
+          >
+            <span
+              className={cn(
+                "absolute left-1/2 top-3 grid h-[34px] w-[34px] -translate-x-1/2 place-items-center font-display text-[18px]/none font-extrabold italic",
+                first ? "bg-accent text-accent-ink" : "border border-solid border-line-2 bg-panel-2 text-txt",
+                CUT_PLACE,
+                "max-[720px]:static max-[720px]:translate-x-0",
+              )}
+            >
+              {place}
+            </span>
+            <span className={cn("mb-3 max-[720px]:mb-0", first ? "" : "")}>
+              <PodiumAvatar c={c} size={first ? 74 : 60} />
+            </span>
+            <span className="font-display text-[19px]/[1.05] font-bold uppercase">{c.name}</span>
+            {c.flag && <span className="mt-1 text-[15px]">{c.flag}</span>}
+          </div>
+        )
+      })}
+    </div>
+  )
+}

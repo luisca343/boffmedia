@@ -2,6 +2,7 @@ import {
   apiAuthedAutoGET,
   apiAuthedAutoPOST,
   apiAuthedAutoPATCH,
+  apiAuthedAutoPUT,
   apiAuthedAutoDELETE,
 } from '@/services/boffAPI'
 
@@ -11,6 +12,7 @@ export type TnFormat = 'single' | 'double' | 'groups' | 'roundrobin' | 'swiss' |
 export type TnKind = 'solo' | 'team' | 'entry'
 export type TnStatus = 'draft' | 'registration' | 'live' | 'completed' | 'cancelled'
 export type TnMetric = 'score' | 'time'
+export type TnParticipantStatus = 'active' | 'eliminated' | 'withdrew' | 'disqualified'
 
 export interface TnRosterMember { id: number; userId: number | null; name: string; role: string | null }
 
@@ -22,8 +24,12 @@ export interface TnCompetitorApi {
   country: string | null
   flag: string | null
   seed: number | null
+  status: TnParticipantStatus
+  checkedIn: boolean
   hue: number | null
   avatar: string | null
+  score: number | null
+  verified: boolean
   roster?: TnRosterMember[]
 }
 
@@ -38,6 +44,54 @@ export interface TnMatchApi {
   g2: number | null
   status: string
   winner: TnCompetitorApi | null
+  bestOf: number
+  scheduledAt: string | null
+  proposalState: 'pending' | 'disputed' | null
+}
+
+export interface TnMatchProposalApi {
+  byParticipantId: string
+  mine: boolean
+  games: string
+  topScore: number
+  botScore: number
+  state: 'pending' | 'disputed'
+  expiresAt: string
+}
+
+export interface TnMonApi {
+  slot?: number
+  dex?: number
+  name: string
+  item?: string
+  ability?: string
+  tera?: string
+  moves: string[]
+}
+
+export interface TnMatchSideRecordApi { w: number; d: number; l: number; pts: number }
+
+export interface TnMatchDetailApi extends TnMatchApi {
+  tournamentId: number
+  slug: string
+  tournamentName: string
+  phaseName: string | null
+  viewerRole: 'top' | 'bot' | 'spectator' | 'admin'
+  topRecord: TnMatchSideRecordApi | null
+  botRecord: TnMatchSideRecordApi | null
+  proposal: TnMatchProposalApi | null
+  judgeRequestedAt: string | null
+  opponentTeamsheet: TnMonApi[] | null
+  champion: TnCompetitorApi | null
+}
+
+export interface TnMatchMessageApi {
+  id: number
+  kind: 'sys' | 'player' | 'judge'
+  authorUserId: number | null
+  authorName: string | null
+  body: string
+  createdAt: string
 }
 
 export interface TnStandingApi {
@@ -80,6 +134,7 @@ export interface TnViewApi {
   winners?: TnMatchApi[][]
   losers?: TnMatchApi[][]
   grandFinal?: TnMatchApi | null
+  thirdPlace?: TnMatchApi | null
   table?: TnStandingApi[]
   crosstable?: TnCrosstableApi
   standings?: TnStandingApi[]
@@ -112,9 +167,9 @@ export interface TournamentSummaryApi {
   endDate: string | null
 }
 
-export type TnPhaseFormat = 'single' | 'double' | 'roundrobin' | 'swiss' | 'leaderboard'
+export type TnPhaseFormat = 'single' | 'double' | 'roundrobin' | 'swiss' | 'leaderboard' | 'groups'
 export type TnPhaseStatus = 'pending' | 'live' | 'completed'
-export type TnAdvanceType = 'all' | 'top_n' | 'record'
+export type TnAdvanceType = 'all' | 'top_n' | 'record' | 'top_or_record'
 export type TnTiebreakProfile = 'points' | 'resistance'
 
 export interface TnAdvanceRuleApi {
@@ -131,6 +186,9 @@ export interface TnPhaseApi {
   status: TnPhaseStatus
   rounds: number | null
   bestOf: number
+  finalsBestOf: number | null
+  groupCount: number | null
+  thirdPlace: boolean
   carryStandings: boolean
   advance: TnAdvanceRuleApi | null
   entrantCount: number
@@ -143,7 +201,10 @@ export interface TnPhaseInput {
   name: string
   format: TnPhaseFormat
   bestOf?: number
+  finalsBestOf?: number
   rounds?: number
+  groupCount?: number
+  thirdPlace?: boolean
   carryStandings?: boolean
   advanceType?: TnAdvanceType
   advanceCount?: number
@@ -165,19 +226,30 @@ export interface TournamentDetailApi {
   eventId: number | null
   description: string | null
   rules: string | null
+  prizes: string | null
+  checkInOpen: boolean
   banner: string | null
   icon: string | null
   hue: number | null
   bestOf: number
+  autoVerifyMinutes: number | null
   maxParticipants: number | null
   registrationOpen: boolean
   startDate: string | null
   endDate: string | null
   champion: TnCompetitorApi | null
   participants: TnCompetitorApi[]
+  viewerParticipantId: string | null
+  myMatchId: number | null
+  podium: TnCompetitorApi[]
   activePhaseId: number | null
   phases: TnPhaseApi[]
   view: TnViewApi
+}
+
+export interface MyTournamentApi extends TournamentSummaryApi {
+  myStatus: TnParticipantStatus
+  isChampion: boolean
 }
 
 export interface TournamentFilters {
@@ -209,8 +281,60 @@ export class TournamentsService {
     return apiAuthedAutoGET<TnMatchApi[]>(`/tournaments/${slug}/matches`)
   }
 
+  static getMatchDetail(slug: string, matchId: number) {
+    return apiAuthedAutoGET<TnMatchDetailApi>(`/tournaments/${slug}/matches/${matchId}`)
+  }
+
+  static mine() {
+    return apiAuthedAutoGET<MyTournamentApi[]>('/tournaments/mine')
+  }
+
+  // Player self-report + match page
+  static propose(id: number, matchId: number, games: string) {
+    return apiAuthedAutoPOST<{ success: boolean }>(`/tournaments/${id}/matches/${matchId}/propose`, { games })
+  }
+  static confirm(id: number, matchId: number, accept: boolean) {
+    return apiAuthedAutoPOST<{ success: boolean }>(`/tournaments/${id}/matches/${matchId}/confirm`, { accept })
+  }
+  static getMessages(id: number, matchId: number, after = 0) {
+    return apiAuthedAutoGET<TnMatchMessageApi[]>(`/tournaments/${id}/matches/${matchId}/messages${after ? `?after=${after}` : ''}`)
+  }
+  static postMessage(id: number, matchId: number, body: string) {
+    return apiAuthedAutoPOST<TnMatchMessageApi>(`/tournaments/${id}/matches/${matchId}/messages`, { body })
+  }
+  static requestJudge(id: number, matchId: number) {
+    return apiAuthedAutoPOST<{ success: boolean }>(`/tournaments/${id}/matches/${matchId}/judge`, {})
+  }
+  static setTeamsheet(id: number, mons: TnMonApi[]) {
+    return apiAuthedAutoPUT<{ success: boolean }>(`/tournaments/${id}/teamsheet`, { mons })
+  }
+
+  // Check-in + leaderboard submissions
+  static checkIn(id: number) {
+    return apiAuthedAutoPOST<{ success: boolean; checkedInAt: string | null }>(`/tournaments/${id}/checkin`, {})
+  }
+  static checkOut(id: number) {
+    return apiAuthedAutoDELETE<{ success: boolean; checkedInAt: string | null }>(`/tournaments/${id}/checkin`)
+  }
+  static submitScore(id: number, body: { score: number; meta?: string }) {
+    return apiAuthedAutoPOST<TnCompetitorApi>(`/tournaments/${id}/submit-score`, body)
+  }
+
+  // Admin scheduling
+  static schedule(id: number, matchIds: number[], scheduledAt: string | null) {
+    return apiAuthedAutoPOST<TournamentDetailApi>(`/tournaments/${id}/matches/schedule`, { matchIds, scheduledAt })
+  }
+
   // Self-registration
-  static register(id: number, body: { name?: string; tag?: string; country?: string }) {
+  static register(
+    id: number,
+    body: {
+      name?: string
+      tag?: string
+      country?: string
+      roster?: { name: string; userId?: number; role?: string }[]
+    },
+  ) {
     return apiAuthedAutoPOST<TnCompetitorApi>(`/tournaments/${id}/register`, body)
   }
   static withdraw(id: number) {
@@ -251,7 +375,17 @@ export class TournamentsService {
   static removePhase(id: number, pid: number) {
     return apiAuthedAutoDELETE<TournamentDetailApi>(`/tournaments/${id}/phases/${pid}`)
   }
-  static report(id: number, matchId: number, body: { topScore: number; botScore: number; winnerParticipantId?: number }) {
+  static report(
+    id: number,
+    matchId: number,
+    body: {
+      topScore: number
+      botScore: number
+      winnerParticipantId?: number
+      amend?: boolean
+      forfeit?: boolean
+    },
+  ) {
     return apiAuthedAutoPOST<TournamentDetailApi>(`/tournaments/${id}/matches/${matchId}/report`, body)
   }
   static setStatus(id: number, status: TnStatus) {

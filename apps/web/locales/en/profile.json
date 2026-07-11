@@ -17,7 +17,19 @@
       "account": "Account details",
       "linked": "Linked accounts",
       "trophies": "Trophy case",
-      "activity": "Recent activity"
+      "activity": "Recent activity",
+      "tournaments": "My tournaments"
+    },
+    "tournaments": {
+      "emptyTitle": "No tournaments yet",
+      "emptyBody": "Join a community tournament and it will show up here.",
+      "champion": "Champion",
+      "status": {
+        "active": "Active",
+        "eliminated": "Eliminated",
+        "withdrew": "Withdrew",
+        "disqualified": "Disqualified"
+      }
     },
     "stats": {
       "rank": "Global rank",

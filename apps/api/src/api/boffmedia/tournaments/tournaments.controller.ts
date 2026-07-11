@@ -8,6 +8,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Put,
   Query,
   Req,
   UseGuards,
@@ -19,6 +20,7 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { Public } from '@api/_utils/decorators/public.decorator';
+import { OptionalAuth } from '@api/_utils/decorators/optional-auth.decorator';
 import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { RolesGuard } from '@api/_utils/guards/roles.guard';
 import { Roles } from '@api/_utils/decorators/roles.decorator';
@@ -34,17 +36,30 @@ import { GenerateBracketDto } from './dto/generate-bracket.dto';
 import { ReportMatchDto } from './dto/report-match.dto';
 import { SetStatusDto } from './dto/set-status.dto';
 import { CreatePhaseDto, UpdatePhaseDto } from './dto/create-phase.dto';
+import { ProposeReportDto } from './dto/propose-report.dto';
+import { ConfirmReportDto } from './dto/confirm-report.dto';
+import { MatchMessageDto } from './dto/match-message.dto';
+import { TeamsheetDto } from './dto/teamsheet.dto';
+import { SubmitScoreDto } from './dto/submit-score.dto';
+import { ScheduleMatchesDto } from './dto/schedule-matches.dto';
 import { TournamentSummary } from './entities/tournament.entity';
 import { TournamentDetail } from './entities/tournament-detail.entity';
 import { Competitor } from './entities/competitor.entity';
 import { MatchView } from './entities/match.entity';
+import { MatchDetail } from './entities/match-detail.entity';
+import { MatchMessageView } from './entities/match-message.entity';
 
 type AuthedRequest = { user: { userId: number; roles?: string[] } };
+type MaybeAuthedRequest = { user?: { userId: number; roles?: string[] } };
 
 @ApiTags('BoffMedia | Tournaments')
 @Controller('tournaments')
 export class TournamentsController {
   constructor(private readonly facade: TournamentsFacadeService) {}
+
+  private isAdmin(req: MaybeAuthedRequest): boolean {
+    return req.user?.roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false;
+  }
 
   // ── public reads ─────────────────────────────────────────────────────────────
   @Public()
@@ -55,12 +70,28 @@ export class TournamentsController {
     return this.facade.list(query);
   }
 
-  @Public()
+  // NOTE: declared before `:slug` so the literal path wins the route match.
+  @Get('mine')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: "Tournaments the caller has entered (profile)." })
+  mine(@Req() req: AuthedRequest) {
+    return this.facade.mine(req.user.userId);
+  }
+
+  @OptionalAuth()
   @Get(':slug')
-  @ApiOperation({ summary: 'Tournament detail (meta + participants + view).' })
+  @ApiOperation({
+    summary:
+      'Tournament detail (meta + participants + view). Signed-in callers also ' +
+      'get their own `viewerParticipantId`.',
+  })
   @ApiResponse({ status: HttpStatus.OK, type: TournamentDetail })
-  getBySlug(@Param('slug') slug: string): Promise<TournamentDetail> {
-    return this.facade.getBySlug(slug);
+  getBySlug(
+    @Param('slug') slug: string,
+    @Req() req: MaybeAuthedRequest,
+  ): Promise<TournamentDetail> {
+    return this.facade.getBySlug(slug, req.user?.userId);
   }
 
   @Public()
@@ -77,6 +108,152 @@ export class TournamentsController {
   @ApiResponse({ status: HttpStatus.OK, type: [MatchView] })
   getMatches(@Param('slug') slug: string): Promise<MatchView[]> {
     return this.facade.getMatches(slug);
+  }
+
+  @OptionalAuth()
+  @Get(':slug/matches/:mid')
+  @ApiOperation({
+    summary:
+      'Match page payload (viewer-aware: proposal perspective, opponent teamsheet).',
+  })
+  @ApiResponse({ status: HttpStatus.OK, type: MatchDetail })
+  getMatchDetail(
+    @Param('slug') slug: string,
+    @Param('mid', ParseIntPipe) mid: number,
+    @Req() req: MaybeAuthedRequest,
+  ): Promise<MatchDetail> {
+    return this.facade.getMatchDetail(
+      slug,
+      mid,
+      req.user?.userId,
+      this.isAdmin(req),
+    );
+  }
+
+  // ── player self-report + match page interactions ─────────────────────────────
+  @Post(':id/matches/:mid/propose')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Self-report a result (rival must verify).' })
+  propose(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('mid', ParseIntPipe) mid: number,
+    @Body() dto: ProposeReportDto,
+    @Req() req: AuthedRequest,
+  ): Promise<{ success: boolean }> {
+    return this.facade.proposeReport(id, mid, req.user.userId, dto);
+  }
+
+  @Post(':id/matches/:mid/confirm')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: "Verify or dispute the rival's reported result." })
+  confirm(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('mid', ParseIntPipe) mid: number,
+    @Body() dto: ConfirmReportDto,
+    @Req() req: AuthedRequest,
+  ): Promise<{ success: boolean }> {
+    return this.facade.confirmReport(id, mid, req.user.userId, dto);
+  }
+
+  @Get(':id/matches/:mid/messages')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Table chat (players of the match + admins).' })
+  @ApiResponse({ status: HttpStatus.OK, type: [MatchMessageView] })
+  listMessages(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('mid', ParseIntPipe) mid: number,
+    @Query('after') after: string | undefined,
+    @Req() req: AuthedRequest,
+  ): Promise<MatchMessageView[]> {
+    return this.facade.listMatchMessages(
+      id,
+      mid,
+      req.user.userId,
+      this.isAdmin(req),
+      Number(after) || 0,
+    );
+  }
+
+  @Post(':id/matches/:mid/messages')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Post a table-chat message.' })
+  postMessage(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('mid', ParseIntPipe) mid: number,
+    @Body() dto: MatchMessageDto,
+    @Req() req: AuthedRequest,
+  ): Promise<MatchMessageView> {
+    return this.facade.postMatchMessage(
+      id,
+      mid,
+      req.user.userId,
+      this.isAdmin(req),
+      dto.body,
+    );
+  }
+
+  @Post(':id/matches/:mid/judge')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Request a judge for this table.' })
+  requestJudge(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('mid', ParseIntPipe) mid: number,
+    @Req() req: AuthedRequest,
+  ): Promise<{ success: boolean }> {
+    return this.facade.requestJudge(id, mid, req.user.userId, this.isAdmin(req));
+  }
+
+  @Put(':id/teamsheet')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: "Set the caller's open teamsheet (≤6 mons)." })
+  setTeamsheet(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: TeamsheetDto,
+    @Req() req: AuthedRequest,
+  ): Promise<{ success: boolean }> {
+    return this.facade.setTeamsheet(id, req.user.userId, dto);
+  }
+
+  @Post(':id/checkin')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Check in for the current check-in window.' })
+  checkIn(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: AuthedRequest,
+  ): Promise<{ success: boolean; checkedInAt: string | null }> {
+    return this.facade.setCheckIn(id, req.user.userId, true);
+  }
+
+  @Delete(':id/checkin')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Undo the check-in.' })
+  checkOut(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: AuthedRequest,
+  ): Promise<{ success: boolean; checkedInAt: string | null }> {
+    return this.facade.setCheckIn(id, req.user.userId, false);
+  }
+
+  @Post(':id/submit-score')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Leaderboard: submit/replace my score (drops to unverified).',
+  })
+  submitScore(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: SubmitScoreDto,
+    @Req() req: AuthedRequest,
+  ): Promise<Competitor> {
+    return this.facade.submitScore(id, req.user.userId, dto);
   }
 
   // ── self-registration ────────────────────────────────────────────────────────
@@ -212,6 +389,18 @@ export class TournamentsController {
     @Body() dto: SetStatusDto,
   ): Promise<TournamentDetail> {
     return this.facade.setStatus(id, dto);
+  }
+
+  @Post(':id/matches/schedule')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Set/clear the scheduled time of matches (bulk).' })
+  schedule(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: ScheduleMatchesDto,
+  ): Promise<TournamentDetail> {
+    return this.facade.scheduleMatches(id, dto);
   }
 
   // ── phases (admin) ─────────────────────────────────────────────────────────

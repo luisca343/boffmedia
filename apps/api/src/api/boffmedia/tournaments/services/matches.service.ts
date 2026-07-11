@@ -6,12 +6,15 @@ import {
 import { TournamentsRepository } from '../repositories/tournaments.repository';
 import { TournamentMatch } from '@/_db/schema/Tournaments';
 import { ReportMatchDto } from '../dto/report-match.dto';
+import { effectiveBestOf } from '../match-report.util';
+import { TournamentNotificationsService } from './tournament-notifications.service';
 import type { MatchStatus } from '../tournaments.types';
 
 const ELIMINATION: ReadonlySet<string> = new Set([
   'winners',
   'losers',
   'grand',
+  'third',
 ]);
 
 export interface Settlement {
@@ -24,7 +27,10 @@ export interface Settlement {
 
 @Injectable()
 export class MatchesService {
-  constructor(private readonly repo: TournamentsRepository) {}
+  constructor(
+    private readonly repo: TournamentsRepository,
+    private readonly notify: TournamentNotificationsService,
+  ) {}
 
   /** Admin reports a result; returns the winner id (or null for a draw). */
   async report(
@@ -48,11 +54,33 @@ export class MatchesService {
     }
     if (alreadyResolved) await this.assertAmendable(match);
 
-    // Games bound uses the match's phase best-of when set, else the tournament's.
-    const tournament = await this.repo.findById(tournamentId);
-    const phase =
-      match.phaseId != null ? await this.repo.findPhase(match.phaseId) : null;
-    const bestOf = phase?.bestOf ?? tournament?.bestOf ?? 1;
+    // Forfeit / walkover: the named winner takes the match by the opponent's
+    // absence. No score is entered and best-of bounds don't apply; the bracket
+    // still advances the winner exactly as a played result would.
+    if (dto.forfeit) {
+      if (dto.winnerParticipantId == null) {
+        throw new BadRequestException('A forfeit needs an explicit winner');
+      }
+      if (
+        dto.winnerParticipantId !== match.topParticipantId &&
+        dto.winnerParticipantId !== match.botParticipantId
+      ) {
+        throw new BadRequestException(
+          'Winner must be one of the two competitors',
+        );
+      }
+      const winnerIsTop = dto.winnerParticipantId === match.topParticipantId;
+      await this.settle(match, {
+        winnerId: dto.winnerParticipantId,
+        loserId: winnerIsTop ? match.botParticipantId : match.topParticipantId,
+        topScore: winnerIsTop ? 1 : 0,
+        botScore: winnerIsTop ? 0 : 1,
+        status: 'completed',
+      });
+      return { success: true, winnerParticipantId: dto.winnerParticipantId };
+    }
+
+    const bestOf = await this.matchBestOf(match);
     this.validateBestOf(bestOf, dto.topScore, dto.botScore);
 
     let winnerId = dto.winnerParticipantId ?? null;
@@ -99,6 +127,15 @@ export class MatchesService {
       winnerParticipantId: s.winnerId,
       status: s.status,
       reportedAt: new Date(),
+      // Any settlement (rival confirm, admin report/amend, forfeit, bye)
+      // supersedes whatever self-report proposal was open on the match.
+      proposedByParticipantId: null,
+      proposedTopScore: null,
+      proposedBotScore: null,
+      proposedGames: null,
+      proposedAt: null,
+      proposalExpiresAt: null,
+      proposalState: null,
     });
 
     if (s.winnerId == null) return; // draw (league/group/swiss) — nothing to advance
@@ -121,25 +158,73 @@ export class MatchesService {
       await this.markReadyIfComplete(match.loserNextMatchId);
     }
 
-    // A bracket final (no onward match) resolves its phase. Crown the champion +
-    // close the tournament only when this is the LAST phase; a mid-sequence elim
-    // final just closes its phase and waits for `advance`. Table-format phases
-    // (swiss/roundrobin/leaderboard) have no bracket final — they finalize via
-    // the advancement service instead.
-    if (
+    // A decisive bracket final (no onward match) crowns the champion the moment
+    // it resolves — on the LAST phase only; a mid-sequence elim final waits for
+    // `advance`. The phase itself completes once nothing in it is unresolved,
+    // so a pending third-place playoff keeps both phase and tournament open.
+    // Table-format phases (swiss/roundrobin/leaderboard) have no bracket final —
+    // they finalize via the advancement service instead.
+    const isDecisiveFinal =
       !match.nextMatchId &&
-      (match.bracket === 'winners' || match.bracket === 'grand')
-    ) {
-      if (match.phaseId != null) {
-        await this.repo.updatePhase(match.phaseId, { status: 'completed' });
-      }
-      if (await this.isFinalPhase(match.tournamentId, match.phaseId)) {
+      (match.bracket === 'winners' || match.bracket === 'grand');
+
+    if (match.phaseId == null) {
+      // Legacy phase-less match: original single-shot behavior.
+      if (isDecisiveFinal) {
         await this.repo.update(match.tournamentId, {
           championParticipantId: s.winnerId,
           status: 'completed',
         });
       }
+      return;
     }
+
+    if (
+      isDecisiveFinal &&
+      (await this.isFinalPhase(match.tournamentId, match.phaseId))
+    ) {
+      await this.repo.update(match.tournamentId, {
+        championParticipantId: s.winnerId,
+      });
+    }
+    if (isDecisiveFinal || match.bracket === 'third') {
+      await this.maybeCompletePhase(match.tournamentId, match.phaseId);
+    }
+  }
+
+  /** Complete the phase (and tournament, on the last one) once fully resolved. */
+  private async maybeCompletePhase(
+    tournamentId: number,
+    phaseId: number,
+  ): Promise<void> {
+    const phaseMatches = await this.repo.listMatchesByPhase(phaseId);
+    if (
+      phaseMatches.some((m) => m.status !== 'completed' && m.status !== 'bye')
+    ) {
+      return;
+    }
+    await this.repo.updatePhase(phaseId, { status: 'completed' });
+    if (await this.isFinalPhase(tournamentId, phaseId)) {
+      await this.repo.update(tournamentId, { status: 'completed' });
+    }
+  }
+
+  /** Effective best-of for one match (phase finals may escalate, e.g. BO5). */
+  async matchBestOf(match: TournamentMatch): Promise<number> {
+    const tournament = await this.repo.findById(match.tournamentId);
+    const phase =
+      match.phaseId != null ? await this.repo.findPhase(match.phaseId) : null;
+    if (phase?.finalsBestOf == null) {
+      return phase?.bestOf ?? tournament?.bestOf ?? 1;
+    }
+    const phaseMatches = await this.repo.listMatchesByPhase(phase.id);
+    const maxWinnersRound = Math.max(
+      0,
+      ...phaseMatches
+        .filter((m) => m.bracket === 'winners')
+        .map((m) => m.roundNumber),
+    );
+    return effectiveBestOf(match, phase, tournament?.bestOf ?? 1, maxWinnersRound);
   }
 
   /** True for a legacy phase-less match or a match in the highest-order phase. */
@@ -174,10 +259,35 @@ export class MatchesService {
         'Cannot amend: a later match has already been played',
       );
     }
+    // Once a later phase has been seeded from this phase's standings, the result
+    // is frozen — amending it would contradict who advanced. This covers table
+    // formats (league/swiss) whose final standings drove `advance`, where there
+    // is no downstream match to catch it.
+    if (match.phaseId != null) {
+      const phases = await this.repo.listPhases(match.tournamentId);
+      const phase = phases.find((p) => p.id === match.phaseId);
+      if (phase) {
+        for (const later of phases.filter(
+          (p) => p.phaseOrder > phase.phaseOrder,
+        )) {
+          const entrants = await this.repo.listPhaseEntrants(later.id);
+          if (entrants.length > 0) {
+            throw new BadRequestException(
+              'Cannot amend: a later phase has already been seeded from these results',
+            );
+          }
+        }
+      }
+    }
+    // Swiss pairs each round from the standings so far, so a played later round
+    // in the SAME phase locks this one (Day 1 and Day 2 are separate phases).
     if (match.bracket === 'swiss') {
       const all = await this.repo.listMatches(match.tournamentId);
       const hasLaterRound = all.some(
-        (m) => m.bracket === 'swiss' && m.roundNumber > match.roundNumber,
+        (m) =>
+          m.bracket === 'swiss' &&
+          m.phaseId === match.phaseId &&
+          m.roundNumber > match.roundNumber,
       );
       if (hasLaterRound) {
         throw new BadRequestException(
@@ -211,6 +321,7 @@ export class MatchesService {
       m.botParticipantId != null
     ) {
       await this.repo.setMatchStatus(matchId, 'ready');
+      await this.notify.notifyMatchReady(m);
     }
   }
 }

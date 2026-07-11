@@ -7,6 +7,7 @@ import { Spinner } from "@/components/boffmedia/primitives/spinner"
 import { TnFormatBadge } from "@/components/boffmedia/ui/tournaments"
 import { useTournaments } from "@/hooks/tournaments/useTournaments"
 import { useTournament } from "@/hooks/tournaments/useTournament"
+import { TorneoView } from "../../torneos/_components/TorneoView"
 import { UsersService } from "@/services/api/boffmedia/usersService"
 import {
   TournamentsService,
@@ -18,18 +19,32 @@ import {
   type TnPhaseInput,
   type TnPhaseFormat,
   type TnAdvanceType,
+  type TnParticipantStatus,
+  type TnCompetitorApi,
 } from "@/services/api/boffmedia/tournamentsService"
 
 const FORMATS: TnFormat[] = ["single", "double", "groups", "roundrobin", "swiss", "leaderboard"]
 const KINDS: TnKind[] = ["solo", "team", "entry"]
-const PHASE_FORMATS: TnPhaseFormat[] = ["swiss", "single", "double", "roundrobin", "leaderboard"]
-const ADVANCE_TYPES: TnAdvanceType[] = ["record", "top_n", "all"]
+const PHASE_FORMATS: TnPhaseFormat[] = ["swiss", "single", "double", "roundrobin", "groups", "leaderboard"]
+const ADVANCE_TYPE_OPTIONS: { value: TnAdvanceType; label: string }[] = [
+  { value: "record", label: "Récord (≤ derrotas)" },
+  { value: "top_n", label: "Top N" },
+  { value: "top_or_record", label: "Top N + récord (unión)" },
+  { value: "all", label: "Todos avanzan" },
+]
+const PARTICIPANT_STATUS: { value: TnParticipantStatus; label: string }[] = [
+  { value: "active", label: "Activo" },
+  { value: "eliminated", label: "Eliminado" },
+  { value: "withdrew", label: "Retirado" },
+  { value: "disqualified", label: "Descalificado" },
+]
 
-// Official Pokémon VGC regional shape: Day 1 swiss → Day 2 swiss (carry) → Top Cut.
+// Official Pokémon VGC regional shape: Day 1 swiss (X-2 or better make Day 2) →
+// Day 2 swiss (carry) → Top Cut = top 8 PLUS everyone still at X-2 (asymmetric).
 const VGC_PRESET: TnPhaseInput[] = [
   { name: "Día 1 — Suizo", format: "swiss", rounds: 9, advanceType: "record", advanceMaxLosses: 2, tiebreakProfile: "resistance" },
-  { name: "Día 2 — Suizo", format: "swiss", rounds: 5, carryStandings: true, advanceType: "record", advanceMaxLosses: 2, tiebreakProfile: "resistance" },
-  { name: "Top Cut", format: "single", tiebreakProfile: "resistance" },
+  { name: "Día 2 — Suizo", format: "swiss", rounds: 5, carryStandings: true, advanceType: "top_or_record", advanceCount: 8, advanceMaxLosses: 2, tiebreakProfile: "resistance" },
+  { name: "Top Cut", format: "single", thirdPlace: true, tiebreakProfile: "resistance" },
 ]
 
 const PHASE_STATUS_TONE: Record<string, string> = {
@@ -171,6 +186,7 @@ function Manage({ slug, onBack }: { slug: string; onBack: () => void }) {
   const { tournament: t, isLoading, refetch } = useTournament(slug)
   const [matches, setMatches] = useState<TnMatchApi[]>([])
   const [seeding, setSeeding] = useState("as-seeded")
+  const [onlyCheckedIn, setOnlyCheckedIn] = useState(false)
 
   const loadMatches = useCallback(async () => {
     const r = await TournamentsService.getMatches(slug)
@@ -187,15 +203,29 @@ function Manage({ slug, onBack }: { slug: string; onBack: () => void }) {
     const r = await TournamentsService.setStatus(t.id, status)
     if (r.error) toast.error(r.error); else { toast.success(`Estado: ${status}`); refetch() }
   }
-  const generate = async () => {
-    const r = await TournamentsService.generate(t.id, { seeding })
-    if (r.error) toast.error(r.error); else { toast.success("Generado"); refreshAll() }
+  const finalize = async () => {
+    if (!confirm(`¿Finalizar «${t.name}»? No podrá reabrirse.`)) return
+    setStatus("completed")
+  }
+  const generate = async (preview = false) => {
+    const body: Record<string, unknown> = { seeding }
+    if (preview) body.preview = true
+    if (onlyCheckedIn) body.onlyCheckedIn = true
+    const r = await TournamentsService.generate(t.id, body)
+    if (r.error) toast.error(r.error)
+    else { toast.success(preview ? "Generado (borrador — no público)" : "Generado"); refreshAll() }
+  }
+  const toggleCheckInWindow = async () => {
+    const r = await TournamentsService.update(t.id, { checkInOpen: !t.checkInOpen })
+    if (r.error) toast.error(r.error)
+    else { toast.success(t.checkInOpen ? "Check-in cerrado" : "Check-in abierto"); refetch() }
   }
   const advance = async () => {
     const r = await TournamentsService.advance(t.id)
     if (r.error) toast.error(r.error); else { toast.success("Fase avanzada"); refreshAll() }
   }
   const remove = async () => {
+    if (!confirm(`¿Eliminar «${t.name}»? Esta acción no se puede deshacer.`)) return
     const r = await TournamentsService.remove(t.id)
     if (r.error) toast.error(r.error); else { toast("Torneo eliminado"); onBack() }
   }
@@ -211,17 +241,48 @@ function Manage({ slug, onBack }: { slug: string; onBack: () => void }) {
     return "Generar"
   })()
 
+  const doneMatches = matches.filter((m) => m.status === "completed" || m.status === "bye").length
+  const checkedIn = t.participants.filter((p) => p.checkedIn).length
+
   return (
     <div className="grid gap-5">
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <Button size="sm" icon="back" onClick={onBack}>Torneos</Button>
         <SectionHead title={t.name} sub={`${t.format} · ${t.status}`} />
+        <a
+          href={`/torneos/${t.slug}`}
+          target="_blank"
+          rel="noreferrer"
+          className="ml-auto inline-flex items-center gap-1.5 border border-solid border-line px-2.5 py-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.06em] text-txt-muted transition-colors hover:border-accent-line hover:text-accent-bright"
+        >
+          Ver página ↗
+        </a>
+      </div>
+
+      <div className="grid gap-2 [grid-template-columns:repeat(auto-fit,minmax(116px,1fr))]">
+        <Stat label="Participantes" value={t.participants.length} />
+        {t.checkInOpen && <Stat label="Check-in" value={`${checkedIn}/${t.participants.length}`} tone="text-ok" />}
+        {matches.length > 0 && <Stat label="Partidas" value={`${doneMatches}/${matches.length}`} />}
+        {multiPhase && livePhase && <Stat label="Fase" value={`${livePhase.order}/${(t.phases ?? []).length}`} tone="text-accent-bright" />}
+        {livePhase?.format === "swiss" && (
+          <Stat label="Ronda" value={`${livePhase.view.rounds?.length ?? 0}/${livePhase.rounds ?? "?"}`} />
+        )}
+        {t.champion && <Stat label="Campeón" value={`🏆 ${t.champion.name}`} tone="text-accent-bright" />}
       </div>
 
       <Panel title="Ciclo de vida" aside={<TnFormatBadge format={t.format} size="sm" />}>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button size="sm" onClick={() => setStatus("registration")}>Abrir inscripción</Button>
-          <Button size="sm" variant="pri" icon="bolt" onClick={generate}>{genLabel}</Button>
+          <Button size="sm" onClick={toggleCheckInWindow}>
+            {t.checkInOpen ? "Cerrar check-in" : "Abrir check-in"}
+          </Button>
+          <Button size="sm" variant="pri" icon="bolt" onClick={() => generate(false)}>{genLabel}</Button>
+          {t.status !== "live" && t.status !== "completed" && (
+            <Button size="sm" icon="eye" onClick={() => generate(true)}>Generar (borrador)</Button>
+          )}
+          {t.status !== "live" && t.status !== "completed" && (t.phases ?? []).some((p) => p.status === "live") && (
+            <Button size="sm" variant="pri" onClick={() => setStatus("live")}>Publicar</Button>
+          )}
           {multiPhase && (
             <Button size="sm" icon="bolt" disabled={!livePhase} onClick={advance}>Avanzar fase</Button>
           )}
@@ -235,17 +296,173 @@ function Manage({ slug, onBack }: { slug: string; onBack: () => void }) {
               { value: "as-added", label: "Orden de alta" },
             ]}
           />
-          <Button size="sm" onClick={() => setStatus("completed")}>Finalizar</Button>
+          <label className="inline-flex cursor-pointer items-center gap-1.5 font-mono text-[11px] text-txt-muted">
+            <input type="checkbox" checked={onlyCheckedIn} onChange={(e) => setOnlyCheckedIn(e.target.checked)} />
+            Solo con check-in
+          </label>
+          <Button size="sm" onClick={finalize}>Finalizar</Button>
           <Button size="sm" onClick={remove}>Eliminar</Button>
         </div>
-        {t.champion && <p className="mt-2 font-mono text-[12px] text-accent-bright">🏆 Campeón: {t.champion.name}</p>}
       </Panel>
 
-      {multiPhase && <PhasesPanel phases={t.phases} />}
+      <EditPanel detail={t} onChange={refetch} />
+
+      <PhasesManager detail={t} onChange={refreshAll} />
 
       <EntrantsPanel detail={t} onChange={refreshAll} />
+
+      {(t.status === "live" || t.status === "completed") && (
+        <Panel title="Estado actual" aside={<span className="font-mono text-[10px] text-txt-dim">cuadro y clasificación</span>}>
+          <TorneoView detail={t} />
+        </Panel>
+      )}
+
       <ReportPanel tid={t.id} bestOf={livePhase?.bestOf ?? t.bestOf} matches={matches} onReported={refreshAll} />
     </div>
+  )
+}
+
+function Stat({
+  label,
+  value,
+  tone,
+}: {
+  label: string
+  value: string | number
+  tone?: string
+}) {
+  return (
+    <div className="cut border border-solid border-line bg-base px-3 py-2 [--cut:5px]">
+      <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.1em] text-txt-dim">{label}</div>
+      <div className={cn("truncate font-display text-[19px] font-bold not-italic leading-tight", tone ?? "text-txt")}>
+        {value}
+      </div>
+    </div>
+  )
+}
+
+// ── edit tournament meta ─────────────────────────────────────────────────────
+function EditPanel({
+  detail,
+  onChange,
+}: {
+  detail: NonNullable<ReturnType<typeof useTournament>["tournament"]>
+  onChange: () => void
+}) {
+  const toLocal = (iso: string | null) =>
+    iso ? new Date(iso).toISOString().slice(0, 16) : ""
+  const [name, setName] = useState(detail.name)
+  const [description, setDescription] = useState(detail.description ?? "")
+  const [rules, setRules] = useState(detail.rules ?? "")
+  const [prizes, setPrizes] = useState(detail.prizes ?? "")
+  const [banner, setBanner] = useState(detail.banner ?? "")
+  const [bestOf, setBestOf] = useState(detail.bestOf)
+  const [autoVerify, setAutoVerify] = useState<number | "">(detail.autoVerifyMinutes ?? "")
+  const [maxParticipants, setMaxParticipants] = useState<number | "">(detail.maxParticipants ?? "")
+  const [regOpen, setRegOpen] = useState(detail.registrationOpen)
+  const [startDate, setStartDate] = useState(toLocal(detail.startDate))
+  const [endDate, setEndDate] = useState(toLocal(detail.endDate))
+  const [busy, setBusy] = useState(false)
+  const [open, setOpen] = useState(false)
+
+  const save = async () => {
+    if (!name.trim()) return toast.error("El nombre es obligatorio")
+    setBusy(true)
+    const body: Record<string, unknown> = {
+      name: name.trim(),
+      description: description.trim() || null,
+      rules: rules.trim() || null,
+      prizes: prizes.trim() || null,
+      banner: banner.trim() || null,
+      bestOf,
+      autoVerifyMinutes: autoVerify === "" ? null : autoVerify,
+      maxParticipants: maxParticipants === "" ? null : maxParticipants,
+      registrationOpen: regOpen,
+      startDate: startDate ? new Date(startDate).toISOString() : null,
+      endDate: endDate ? new Date(endDate).toISOString() : null,
+    }
+    const r = await TournamentsService.update(detail.id, body)
+    setBusy(false)
+    if (r.error) toast.error(r.error)
+    else { toast.success("Torneo actualizado"); onChange() }
+  }
+
+  return (
+    <Panel
+      title="Editar torneo"
+      aside={
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          className="font-mono text-[11px] text-accent transition-opacity hover:opacity-70"
+        >
+          {open ? "Ocultar" : "Editar"}
+        </button>
+      }
+    >
+      {open && (
+        <div className="grid gap-3">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Field label="Nombre">
+              <Input value={name} onChange={(e) => setName(e.target.value)} />
+            </Field>
+            <Field label="Banner (URL)">
+              <Input value={banner} onChange={(e) => setBanner(e.target.value)} placeholder="https://…" />
+            </Field>
+            <Field label="Al mejor de (BO)">
+              <Input type="number" min={1} value={bestOf} onChange={(e) => setBestOf(Math.max(1, +e.target.value || 1))} />
+            </Field>
+            <Field label="Máx. participantes">
+              <Input type="number" min={2} value={maxParticipants} onChange={(e) => setMaxParticipants(e.target.value === "" ? "" : Math.max(2, +e.target.value))} />
+            </Field>
+            <Field label="Auto-verificación (min · vacío = 10)">
+              <Input type="number" min={1} value={autoVerify} onChange={(e) => setAutoVerify(e.target.value === "" ? "" : Math.max(1, +e.target.value))} placeholder="10" />
+            </Field>
+            <Field label="Inscripción">
+              <Select
+                value={regOpen ? "yes" : "no"}
+                options={[{ value: "yes", label: "Abierta" }, { value: "no", label: "Cerrada" }]}
+                onChange={(v) => setRegOpen(v === "yes")}
+              />
+            </Field>
+            <Field label="Inicio">
+              <Input type="datetime-local" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+            </Field>
+            <Field label="Fin">
+              <Input type="datetime-local" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+            </Field>
+          </div>
+          <Field label="Descripción">
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={2}
+              className="w-full resize-y border border-solid border-line bg-base px-2 py-1.5 font-body text-[13px]"
+            />
+          </Field>
+          <Field label="Reglas">
+            <textarea
+              value={rules}
+              onChange={(e) => setRules(e.target.value)}
+              rows={3}
+              className="w-full resize-y border border-solid border-line bg-base px-2 py-1.5 font-body text-[13px]"
+            />
+          </Field>
+          <Field label="Premios">
+            <textarea
+              value={prizes}
+              onChange={(e) => setPrizes(e.target.value)}
+              rows={2}
+              placeholder={"1º — 50€\n2º — 25€"}
+              className="w-full resize-y border border-solid border-line bg-base px-2 py-1.5 font-body text-[13px]"
+            />
+          </Field>
+          <div className="flex justify-end">
+            <Button variant="pri" size="sm" disabled={busy} onClick={save}>Guardar cambios</Button>
+          </div>
+        </div>
+      )}
+    </Panel>
   )
 }
 
@@ -312,12 +529,18 @@ function EntrantsPanel({
     const r = await TournamentsService.removeParticipant(detail.id, Number(pid))
     if (r.error) toast.error(r.error); else onChange()
   }
+  const updateP = async (pid: string, body: Record<string, unknown>) => {
+    const r = await TournamentsService.updateParticipant(detail.id, Number(pid), body)
+    if (r.error) toast.error(r.error); else onChange()
+  }
 
   return (
     <Panel title={`Participantes (${detail.participants.length})`}>
-      {/* Add a real registered user (real name + avatar). */}
+      {/* Add a real registered user (real name + avatar). Results render inline
+          (not an absolute overlay) so the Panel's cut-corner clip-path can't clip
+          them when the panel is short — e.g. before any players are added. */}
       {!isLb && (
-        <div className="relative mb-3">
+        <div className="mb-3">
           <Field label="Añadir usuario registrado">
             <Input
               value={userQuery}
@@ -327,7 +550,7 @@ function EntrantsPanel({
             />
           </Field>
           {matches.length > 0 && (
-            <div className="absolute z-10 mt-1 w-full max-w-md border border-solid border-line-2 bg-panel shadow-lg">
+            <div className="mt-1 max-h-64 w-full max-w-md overflow-y-auto border border-solid border-line-2 bg-panel shadow-lg">
               {matches.map((u) => (
                 <button
                   key={u.id}
@@ -363,14 +586,95 @@ function EntrantsPanel({
 
       <div className="grid gap-1">
         {detail.participants.map((p) => (
-          <div key={p.id} className="flex items-center gap-2 border-b border-dashed border-line py-1 last:border-b-0">
-            {p.seed != null && <span className="w-6 font-mono text-[10px] text-txt-dim">#{p.seed}</span>}
-            <span className="flex-1 truncate font-body text-[12.5px]">{p.name}{p.flag ? ` ${p.flag}` : ""}</span>
-            <button type="button" onClick={() => remove(p.id)} className="text-txt-dim transition-colors hover:text-bad">✕</button>
-          </div>
+          <EntrantRow
+            key={p.id}
+            p={p}
+            isLb={isLb}
+            onUpdate={(body) => updateP(p.id, body)}
+            onRemove={() => remove(p.id)}
+          />
         ))}
       </div>
     </Panel>
+  )
+}
+
+/** One entrant row with inline seed/status editing (score/verified for leaderboards). */
+function EntrantRow({
+  p,
+  isLb,
+  onUpdate,
+  onRemove,
+}: {
+  p: TnCompetitorApi
+  isLb: boolean
+  onUpdate: (body: Record<string, unknown>) => void
+  onRemove: () => void
+}) {
+  const [seed, setSeed] = useState<number | "">(p.seed ?? "")
+  const [score, setScore] = useState<number | "">(p.score ?? "")
+
+  const commitSeed = () => {
+    const next = seed === "" ? null : seed
+    if (next !== (p.seed ?? null)) onUpdate({ seed: next })
+  }
+  const commitScore = () => {
+    const next = score === "" ? null : score
+    if (next !== (p.score ?? null)) onUpdate({ score: next })
+  }
+
+  const dim = p.status !== "active"
+  return (
+    <div className="flex flex-wrap items-center gap-2 border-b border-dashed border-line py-1 last:border-b-0">
+      {!isLb && (
+        <input
+          type="number"
+          value={seed}
+          onChange={(e) => setSeed(e.target.value === "" ? "" : +e.target.value)}
+          onBlur={commitSeed}
+          onKeyDown={(e) => e.key === "Enter" && commitSeed()}
+          className="w-12 border border-line bg-panel px-1 py-0.5 text-center font-mono text-[11px]"
+          title="Seed"
+        />
+      )}
+      <span className={cn("flex-1 truncate font-body text-[12.5px]", dim && "text-txt-dim line-through")}>
+        {p.name}{p.flag ? ` ${p.flag}` : ""}
+        {p.checkedIn && <span className="ml-1.5 font-mono text-[10px] text-ok" title="Check-in hecho">✓</span>}
+      </span>
+      {isLb ? (
+        <>
+          <input
+            type="number"
+            value={score}
+            onChange={(e) => setScore(e.target.value === "" ? "" : +e.target.value)}
+            onBlur={commitScore}
+            onKeyDown={(e) => e.key === "Enter" && commitScore()}
+            className="w-20 border border-line bg-panel px-1 py-0.5 text-center font-mono text-[11px]"
+            title="Score"
+          />
+          <button
+            type="button"
+            onClick={() => onUpdate({ verified: !p.verified })}
+            className={cn(
+              "border border-solid px-1.5 py-0.5 font-mono text-[10px] transition-colors",
+              p.verified ? "border-ok text-ok" : "border-line text-txt-dim hover:text-txt",
+            )}
+            title="Verificado"
+          >
+            {p.verified ? "✓ verif." : "sin verif."}
+          </button>
+        </>
+      ) : (
+        <Select
+          value={p.status}
+          options={PARTICIPANT_STATUS}
+          onChange={(v) => onUpdate({ status: v })}
+          className="w-auto"
+          ariaLabel="Estado"
+        />
+      )}
+      <button type="button" onClick={onRemove} className="text-txt-dim transition-colors hover:text-bad">✕</button>
+    </div>
   )
 }
 
@@ -385,17 +689,38 @@ function ReportPanel({
   matches: TnMatchApi[]
   onReported: () => void
 }) {
-  const [scores, setScores] = useState<Record<number, { a: number; b: number }>>({})
-  // A valid decisive best-of-N result: winner takes the majority, loser one less
-  // (1-0 for BO1, 2-1 for BO3, 3-2 for BO5) — matches the API's best-of guard.
-  const majority = Math.max(1, Math.ceil(bestOf / 2))
-  const def = { a: majority, b: Math.max(0, majority - 1) }
+  // Scores start blank so a stray click can never record a phantom result — the
+  // admin must enter a real score (or use a walkover) before OK enables.
+  const [scores, setScores] = useState<Record<number, { a: string; b: string }>>({})
+  const [amendId, setAmendId] = useState<number | null>(null)
 
-  const report = async (m: TnMatchApi) => {
-    const s = scores[m.id] ?? def
-    const winnerParticipantId = s.a === s.b ? undefined : s.a > s.b ? Number(m.top!.id) : Number(m.bot!.id)
-    const r = await TournamentsService.report(tid, m.id, { topScore: s.a, botScore: s.b, winnerParticipantId })
-    if (r.error) toast.error(r.error); else onReported()
+  const send = async (
+    m: TnMatchApi,
+    body: {
+      topScore: number
+      botScore: number
+      winnerParticipantId?: number
+      amend?: boolean
+      forfeit?: boolean
+    },
+  ) => {
+    const r = await TournamentsService.report(tid, m.id, body)
+    if (r.error) toast.error(r.error)
+    else { setAmendId(null); onReported() }
+  }
+
+  const report = async (m: TnMatchApi, amend = false) => {
+    const s = scores[m.id] ?? { a: "", b: "" }
+    if (s.a === "" || s.b === "") return toast.error("Introduce el resultado")
+    const a = +s.a
+    const b = +s.b
+    const winnerParticipantId = a === b ? undefined : a > b ? Number(m.top!.id) : Number(m.bot!.id)
+    await send(m, { topScore: a, botScore: b, winnerParticipantId, amend })
+  }
+
+  const forfeit = async (m: TnMatchApi, winnerSide: "top" | "bot") => {
+    const winnerParticipantId = Number((winnerSide === "top" ? m.top : m.bot)!.id)
+    await send(m, { topScore: 0, botScore: 0, winnerParticipantId, forfeit: true })
   }
 
   // Elimination brackets are reported round by round: a semifinal can't be
@@ -418,6 +743,9 @@ function ReportPanel({
   const ready = matches.filter((m) => m.status === "ready" && m.top && m.bot)
   const reportable = ready.filter((m) => !isLocked(m))
   const waiting = ready.filter((m) => isLocked(m))
+  // Resolved matches with two named sides can be corrected (the API guards
+  // whether it is still safe to amend).
+  const resolved = matches.filter((m) => m.status === "completed" && m.top && m.bot)
 
   const roundLabel = (m: TnMatchApi): string => {
     if (m.bracket === "grand") return "Gran final"
@@ -445,6 +773,12 @@ function ReportPanel({
     return bracketRank(ba) - bracketRank(bb) || Number(ra) - Number(rb)
   })
 
+  const setScore = (id: number, patch: Partial<{ a: string; b: string }>) =>
+    setScores((cur) => {
+      const base = cur[id] ?? { a: "", b: "" }
+      return { ...cur, [id]: { ...base, ...patch } }
+    })
+
   if (matches.length === 0) return null
   return (
     <Panel title={`Reportar resultados (${reportable.length} listos)`}>
@@ -458,21 +792,25 @@ function ReportPanel({
         <div className="grid gap-3">
           {orderedGroups.map(([key, g]) => (
             <div key={key} className="grid gap-1.5">
-              <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-txt-dim">
-                {g.label} · {g.items.length}
-              </span>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-txt-dim">
+                  {g.label} · {g.items.length}
+                </span>
+                <RoundScheduler tid={tid} items={g.items} onScheduled={onReported} />
+              </div>
               {g.items.map((m) => {
-                const s = scores[m.id] ?? def
-                const set = (patch: Partial<{ a: number; b: number }>) =>
-                  setScores((cur) => ({ ...cur, [m.id]: { ...s, ...patch } }))
+                const s = scores[m.id] ?? { a: "", b: "" }
+                const filled = s.a !== "" && s.b !== ""
                 return (
-                  <div key={m.id} className="flex items-center gap-2 border border-solid border-line bg-base px-2 py-1.5">
-                    <span className="flex-1 truncate text-right font-body text-[12px]">{m.top?.name}</span>
-                    <input type="number" min={0} value={s.a} onChange={(e) => set({ a: +e.target.value })} className="w-12 border border-line bg-panel px-1 py-0.5 text-center font-mono text-[12px]" />
+                  <div key={m.id} className="flex flex-wrap items-center gap-2 border border-solid border-line bg-base px-2 py-1.5">
+                    <span className="min-w-[80px] flex-1 truncate text-right font-body text-[12px]">{m.top?.name}</span>
+                    <input type="number" min={0} value={s.a} onChange={(e) => setScore(m.id, { a: e.target.value })} className="w-12 border border-line bg-panel px-1 py-0.5 text-center font-mono text-[12px]" placeholder="–" />
                     <span className="font-mono text-[11px] text-txt-dim">–</span>
-                    <input type="number" min={0} value={s.b} onChange={(e) => set({ b: +e.target.value })} className="w-12 border border-line bg-panel px-1 py-0.5 text-center font-mono text-[12px]" />
-                    <span className="flex-1 truncate font-body text-[12px]">{m.bot?.name}</span>
-                    <Button size="sm" onClick={() => report(m)}>OK</Button>
+                    <input type="number" min={0} value={s.b} onChange={(e) => setScore(m.id, { b: e.target.value })} className="w-12 border border-line bg-panel px-1 py-0.5 text-center font-mono text-[12px]" placeholder="–" />
+                    <span className="min-w-[80px] flex-1 truncate font-body text-[12px]">{m.bot?.name}</span>
+                    <Button size="sm" disabled={!filled} onClick={() => report(m)}>OK</Button>
+                    <button type="button" onClick={() => forfeit(m, "top")} className="border border-solid border-line px-1.5 py-0.5 font-mono text-[9px] uppercase text-txt-dim transition-colors hover:border-line-2 hover:text-txt" title={`Walkover a favor de ${m.top?.name}`}>W.O. ↑</button>
+                    <button type="button" onClick={() => forfeit(m, "bot")} className="border border-solid border-line px-1.5 py-0.5 font-mono text-[9px] uppercase text-txt-dim transition-colors hover:border-line-2 hover:text-txt" title={`Walkover a favor de ${m.bot?.name}`}>W.O. ↓</button>
                   </div>
                 )
               })}
@@ -484,6 +822,54 @@ function ReportPanel({
         <p className="mt-3 border-t border-dashed border-line pt-2 font-mono text-[10px] text-txt-dim">
           🔒 {waiting.length} partida{waiting.length === 1 ? "" : "s"} en rondas posteriores — se desbloquean al cerrar la ronda actual.
         </p>
+      )}
+
+      {(() => {
+        const disputed = matches.filter((m) => m.proposalState === "disputed")
+        if (!disputed.length) return null
+        return (
+          <div className="mt-3 border border-solid border-bad bg-bad-soft px-3 py-2 font-mono text-[11px] text-bad">
+            ⚠ {disputed.length} partida{disputed.length === 1 ? "" : "s"} en disputa — revisa el chat de mesa y resuelve con el reporte manual.
+          </div>
+        )
+      })()}
+
+      {resolved.length > 0 && (
+        <details className="mt-3 border-t border-dashed border-line pt-2">
+          <summary className="cursor-pointer font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-txt-dim">
+            Corregir resultados ({resolved.length})
+          </summary>
+          <div className="mt-2 grid gap-1.5">
+            {resolved.map((m) => {
+              const editing = amendId === m.id
+              const s = scores[m.id] ?? { a: "", b: "" }
+              const filled = s.a !== "" && s.b !== ""
+              return (
+                <div key={m.id} className="flex flex-wrap items-center gap-2 border border-solid border-line bg-base px-2 py-1.5">
+                  <span className="min-w-[80px] flex-1 truncate text-right font-body text-[12px]">{m.top?.name}</span>
+                  {editing ? (
+                    <>
+                      <input type="number" min={0} value={s.a} onChange={(e) => setScore(m.id, { a: e.target.value })} className="w-12 border border-line bg-panel px-1 py-0.5 text-center font-mono text-[12px]" />
+                      <span className="font-mono text-[11px] text-txt-dim">–</span>
+                      <input type="number" min={0} value={s.b} onChange={(e) => setScore(m.id, { b: e.target.value })} className="w-12 border border-line bg-panel px-1 py-0.5 text-center font-mono text-[12px]" />
+                    </>
+                  ) : (
+                    <span className="font-mono text-[12px] text-txt-muted">{m.g1 ?? 0}–{m.g2 ?? 0}</span>
+                  )}
+                  <span className="min-w-[80px] flex-1 truncate font-body text-[12px]">{m.bot?.name}</span>
+                  {editing ? (
+                    <>
+                      <Button size="sm" disabled={!filled} onClick={() => report(m, true)}>Guardar</Button>
+                      <button type="button" onClick={() => setAmendId(null)} className="font-mono text-[10px] text-txt-dim hover:text-txt">cancelar</button>
+                    </>
+                  ) : (
+                    <button type="button" onClick={() => { setAmendId(m.id); setScore(m.id, { a: String(m.g1 ?? 0), b: String(m.g2 ?? 0) }) }} className="font-mono text-[10px] text-accent transition-opacity hover:opacity-70">corregir</button>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </details>
       )}
     </Panel>
   )
@@ -531,7 +917,6 @@ function PhasesEditor({
         <div className="grid gap-2">
           {phases.map((p, i) => {
             const isLast = i === phases.length - 1
-            const advType = p.advanceType ?? "record"
             return (
               <div key={i} className="border border-solid border-line bg-base p-2">
                 <div className="mb-2 flex items-center gap-2">
@@ -541,49 +926,7 @@ function PhasesEditor({
                   <button type="button" onClick={() => move(i, 1)} disabled={isLast} className="px-1 text-txt-dim transition-colors hover:text-txt disabled:opacity-30">↓</button>
                   <button type="button" onClick={() => remove(i)} className="px-1 text-txt-dim transition-colors hover:text-bad">✕</button>
                 </div>
-                <div className="grid gap-2 sm:grid-cols-3">
-                  <Field label="Formato">
-                    <Select value={p.format} options={[...PHASE_FORMATS]} onChange={(v) => update(i, { format: v as TnPhaseFormat })} />
-                  </Field>
-                  {p.format === "swiss" && (
-                    <Field label="Rondas">
-                      <Input type="number" min={1} value={p.rounds ?? ""} onChange={(e) => update(i, { rounds: e.target.value === "" ? undefined : Math.max(1, +e.target.value) })} />
-                    </Field>
-                  )}
-                  {i > 0 && (
-                    <Field label="Registro previo">
-                      <Select
-                        value={p.carryStandings ? "yes" : "no"}
-                        options={[{ value: "no", label: "Reiniciar" }, { value: "yes", label: "Arrastrar (carry)" }]}
-                        onChange={(v) => update(i, { carryStandings: v === "yes" })}
-                      />
-                    </Field>
-                  )}
-                  <Field label="Desempate">
-                    <Select
-                      value={p.tiebreakProfile ?? "points"}
-                      options={[{ value: "points", label: "Puntos" }, { value: "resistance", label: "Resistencia" }]}
-                      onChange={(v) => update(i, { tiebreakProfile: v as "points" | "resistance" })}
-                    />
-                  </Field>
-                  {!isLast && (
-                    <>
-                      <Field label="Avance">
-                        <Select value={advType} options={[...ADVANCE_TYPES]} onChange={(v) => update(i, { advanceType: v as TnAdvanceType })} />
-                      </Field>
-                      {advType === "record" && (
-                        <Field label="Máx. derrotas">
-                          <Input type="number" min={0} value={p.advanceMaxLosses ?? 2} onChange={(e) => update(i, { advanceMaxLosses: Math.max(0, +e.target.value) })} />
-                        </Field>
-                      )}
-                      {advType === "top_n" && (
-                        <Field label="Top N">
-                          <Input type="number" min={1} value={p.advanceCount ?? 8} onChange={(e) => update(i, { advanceCount: Math.max(1, +e.target.value) })} />
-                        </Field>
-                      )}
-                    </>
-                  )}
-                </div>
+                <PhaseFields p={p} isFirst={i === 0} isLast={isLast} upd={(patch) => update(i, patch)} />
               </div>
             )
           })}
@@ -596,37 +939,290 @@ function PhasesEditor({
   )
 }
 
-// ── phase stepper (manage view) ──────────────────────────────────────────────
-function PhasesPanel({ phases }: { phases: TnPhaseApi[] }) {
+// ── phase manager (manage view: view all, edit/remove pending, append) ─────────
+function PhasesManager({
+  detail,
+  onChange,
+}: {
+  detail: NonNullable<ReturnType<typeof useTournament>["tournament"]>
+  onChange: () => void
+}) {
+  const phases = (detail.phases ?? []).filter((p) => p.id > 0)
+  const [editingId, setEditingId] = useState<number | null>(null)
+  const canAppend = detail.status !== "completed" && detail.status !== "cancelled"
+
+  if (phases.length === 0) return null
+  const maxOrder = Math.max(...phases.map((p) => p.order))
+
+  const append = async () => {
+    const r = await TournamentsService.addPhase(detail.id, {
+      name: `Fase ${phases.length + 1}`,
+      format: "swiss",
+    })
+    if (r.error) toast.error(r.error); else { toast.success("Fase añadida"); onChange() }
+  }
+  const removePhase = async (p: TnPhaseApi) => {
+    if (!confirm(`¿Eliminar la fase «${p.name}»?`)) return
+    const r = await TournamentsService.removePhase(detail.id, p.id)
+    if (r.error) toast.error(r.error); else { toast("Fase eliminada"); onChange() }
+  }
+
   return (
-    <Panel title="Fases">
-      <div className="flex flex-wrap items-center gap-2">
-        {phases.map((p, i) => (
-          <div key={p.id} className="flex items-center gap-2">
-            <div className={cn("min-w-[148px] border border-solid bg-base px-3 py-2", PHASE_STATUS_TONE[p.status] ?? "border-line")}>
+    <Panel
+      title="Fases"
+      aside={
+        canAppend ? (
+          <button type="button" onClick={append} className="font-mono text-[11px] text-accent transition-opacity hover:opacity-70">
+            + Añadir fase
+          </button>
+        ) : undefined
+      }
+    >
+      <div className="grid gap-2">
+        {phases.map((p) => {
+          const isLast = p.order === maxOrder
+          if (editingId === p.id && p.status === "pending") {
+            return (
+              <PhaseRowEditor
+                key={p.id}
+                detail={detail}
+                phase={p}
+                isLast={isLast}
+                onClose={() => setEditingId(null)}
+                onChange={() => { setEditingId(null); onChange() }}
+              />
+            )
+          }
+          return (
+            <div key={p.id} className={cn("border border-solid bg-base px-3 py-2", PHASE_STATUS_TONE[p.status] ?? "border-line")}>
               <div className="flex items-center justify-between gap-2">
-                <span className="truncate font-body text-[12.5px] font-semibold">{p.name}</span>
-                <span className="font-mono text-[9px] uppercase tracking-[0.08em]">{p.status}</span>
+                <span className="truncate font-body text-[12.5px] font-semibold">
+                  {p.order}. {p.name}
+                </span>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-[9px] uppercase tracking-[0.08em]">{p.status}</span>
+                  {p.status === "pending" && (
+                    <>
+                      <button type="button" onClick={() => setEditingId(p.id)} className="font-mono text-[10px] text-accent transition-opacity hover:opacity-70">editar</button>
+                      <button type="button" onClick={() => removePhase(p)} className="text-txt-dim transition-colors hover:text-bad">✕</button>
+                    </>
+                  )}
+                </div>
               </div>
               <div className="mt-1 font-mono text-[10px] text-txt-dim">
                 {p.format}{p.rounds ? ` · ${p.rounds}r` : ""} · {p.entrantCount}👤
                 {p.qualifiedCount != null ? ` · clasifican ${p.qualifiedCount}` : ""}
+                {p.advance
+                  ? ` · ${p.advance.type === "record" ? `≤${p.advance.maxLosses ?? 0} derrotas` : p.advance.type === "top_n" ? `top ${p.advance.count ?? ""}` : p.advance.type === "top_or_record" ? `top ${p.advance.count ?? ""} + ≤${p.advance.maxLosses ?? 0} derrotas` : "todos avanzan"}`
+                  : isLast ? " · final" : ""}
               </div>
-              {p.advance && (
-                <div className="mt-0.5 font-mono text-[9px] text-txt-dim">
-                  {p.advance.type === "record"
-                    ? `≤${p.advance.maxLosses ?? 0} derrotas`
-                    : p.advance.type === "top_n"
-                      ? `top ${p.advance.count ?? ""}`
-                      : "todos avanzan"}
-                </div>
-              )}
             </div>
-            {i < phases.length - 1 && <span className="font-mono text-txt-dim">→</span>}
-          </div>
-        ))}
+          )
+        })}
       </div>
     </Panel>
+  )
+}
+
+function PhaseRowEditor({
+  detail,
+  phase,
+  isLast,
+  onClose,
+  onChange,
+}: {
+  detail: NonNullable<ReturnType<typeof useTournament>["tournament"]>
+  phase: TnPhaseApi
+  isLast: boolean
+  onClose: () => void
+  onChange: () => void
+}) {
+  const [draft, setDraft] = useState<TnPhaseInput>({
+    name: phase.name,
+    format: phase.format,
+    rounds: phase.rounds ?? undefined,
+    finalsBestOf: phase.finalsBestOf ?? undefined,
+    groupCount: phase.groupCount ?? undefined,
+    thirdPlace: phase.thirdPlace,
+    carryStandings: phase.carryStandings,
+    advanceType: phase.advance?.type,
+    advanceCount: phase.advance?.count ?? undefined,
+    advanceMaxLosses: phase.advance?.maxLosses ?? undefined,
+  })
+  const [busy, setBusy] = useState(false)
+  const upd = (patch: Partial<TnPhaseInput>) => setDraft((d) => ({ ...d, ...patch }))
+
+  const save = async () => {
+    setBusy(true)
+    const r = await TournamentsService.updatePhase(detail.id, phase.id, draft)
+    setBusy(false)
+    if (r.error) toast.error(r.error); else { toast.success("Fase actualizada"); onChange() }
+  }
+
+  return (
+    <div className="border border-solid border-accent-line bg-base p-2">
+      <div className="mb-2 flex items-center gap-2">
+        <span className="w-12 font-mono text-[10px] text-txt-dim">Fase {phase.order}</span>
+        <Input value={draft.name} onChange={(e) => upd({ name: e.target.value })} className="flex-1" />
+      </div>
+      <PhaseFields p={draft} isFirst={phase.order === 1} isLast={isLast} upd={upd} />
+      <div className="mt-2 flex justify-end gap-2">
+        <Button size="sm" onClick={onClose}>Cancelar</Button>
+        <Button variant="pri" size="sm" disabled={busy} onClick={save}>Guardar</Button>
+      </div>
+    </div>
+  )
+}
+
+/** Shared per-phase config fields (create editor + manage editor). */
+function PhaseFields({
+  p,
+  isFirst,
+  isLast,
+  upd,
+}: {
+  p: TnPhaseInput
+  isFirst: boolean
+  isLast: boolean
+  upd: (patch: Partial<TnPhaseInput>) => void
+}) {
+  const advType = p.advanceType ?? "record"
+  const isGroups = p.format === "groups"
+  return (
+    <div className="grid gap-2 sm:grid-cols-3">
+      <Field label="Formato">
+        <Select
+          value={p.format}
+          options={[...PHASE_FORMATS]}
+          onChange={(v) => {
+            const format = v as TnPhaseFormat
+            // Groups can't carry standings; their advancement is per-group top N.
+            upd(
+              format === "groups"
+                ? { format, carryStandings: false, advanceType: "top_n", advanceCount: p.advanceCount ?? 2 }
+                : { format },
+            )
+          }}
+        />
+      </Field>
+      {p.format === "swiss" && (
+        <Field label="Rondas">
+          <Input type="number" min={1} value={p.rounds ?? ""} onChange={(e) => upd({ rounds: e.target.value === "" ? undefined : Math.max(1, +e.target.value) })} />
+        </Field>
+      )}
+      {isGroups && (
+        <Field label="Nº de grupos">
+          <Input type="number" min={1} value={p.groupCount ?? 2} onChange={(e) => upd({ groupCount: Math.max(1, +e.target.value || 1) })} />
+        </Field>
+      )}
+      {(p.format === "single" || p.format === "double") && (
+        <Field label="BO de la final (opcional)">
+          <Input type="number" min={1} value={p.finalsBestOf ?? ""} onChange={(e) => upd({ finalsBestOf: e.target.value === "" ? undefined : Math.max(1, +e.target.value) })} />
+        </Field>
+      )}
+      {p.format === "single" && (
+        <Field label="Tercer puesto">
+          <Select
+            value={p.thirdPlace ? "yes" : "no"}
+            options={[{ value: "no", label: "No" }, { value: "yes", label: "Sí" }]}
+            onChange={(v) => upd({ thirdPlace: v === "yes" })}
+          />
+        </Field>
+      )}
+      {!isFirst && !isGroups && (
+        <Field label="Registro previo">
+          <Select
+            value={p.carryStandings ? "yes" : "no"}
+            options={[{ value: "no", label: "Reiniciar" }, { value: "yes", label: "Arrastrar (carry)" }]}
+            onChange={(v) => upd({ carryStandings: v === "yes" })}
+          />
+        </Field>
+      )}
+      <Field label="Desempate">
+        <Select
+          value={p.tiebreakProfile ?? "points"}
+          options={[{ value: "points", label: "Puntos" }, { value: "resistance", label: "Resistencia" }]}
+          onChange={(v) => upd({ tiebreakProfile: v as "points" | "resistance" })}
+        />
+      </Field>
+      {!isLast &&
+        (isGroups ? (
+          <Field label="Clasifican por grupo">
+            <Input type="number" min={1} value={p.advanceCount ?? 2} onChange={(e) => upd({ advanceCount: Math.max(1, +e.target.value || 1), advanceType: "top_n" })} />
+          </Field>
+        ) : (
+          <>
+            <Field label="Avance">
+              <Select value={advType} options={ADVANCE_TYPE_OPTIONS} onChange={(v) => upd({ advanceType: v as TnAdvanceType })} />
+            </Field>
+            {(advType === "top_n" || advType === "top_or_record") && (
+              <Field label="Top N">
+                <Input type="number" min={1} value={p.advanceCount ?? 8} onChange={(e) => upd({ advanceCount: Math.max(1, +e.target.value) })} />
+              </Field>
+            )}
+            {(advType === "record" || advType === "top_or_record") && (
+              <Field label="Máx. derrotas">
+                <Input type="number" min={0} value={p.advanceMaxLosses ?? 2} onChange={(e) => upd({ advanceMaxLosses: Math.max(0, +e.target.value) })} />
+              </Field>
+            )}
+            {advType === "top_or_record" && (
+              <p className="font-mono text-[10px] leading-[1.4] text-txt-dim sm:col-span-3">
+                Avanzan los <b>top N</b> y además <b>todos</b> los que tengan ≤ derrotas — corte asimétrico (byes para los cabezas de serie sobrantes).
+              </p>
+            )}
+          </>
+        ))}
+    </div>
+  )
+}
+
+/** Bulk-set the scheduled time for every match of one round. */
+function RoundScheduler({
+  tid,
+  items,
+  onScheduled,
+}: {
+  tid: number
+  items: TnMatchApi[]
+  onScheduled: () => void
+}) {
+  const existing = items.find((m) => m.scheduledAt)?.scheduledAt ?? null
+  const toLocal = (iso: string | null) => {
+    if (!iso) return ""
+    const d = new Date(iso)
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset())
+    return d.toISOString().slice(0, 16)
+  }
+  const [value, setValue] = useState(toLocal(existing))
+  const [busy, setBusy] = useState(false)
+
+  const apply = async () => {
+    setBusy(true)
+    const iso = value ? new Date(value).toISOString() : null
+    const r = await TournamentsService.schedule(tid, items.map((m) => m.id), iso)
+    setBusy(false)
+    if (r.error) toast.error(r.error)
+    else { toast.success(iso ? "Ronda programada" : "Horario borrado"); onScheduled() }
+  }
+
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      <input
+        type="datetime-local"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        className="border border-solid border-line bg-panel px-1.5 py-0.5 font-mono text-[10.5px] text-txt-muted"
+        title="Horario de la ronda"
+      />
+      <button
+        type="button"
+        disabled={busy}
+        onClick={apply}
+        className="font-mono text-[10px] text-accent transition-opacity hover:opacity-70 disabled:opacity-40"
+      >
+        {value ? "Programar" : existing ? "Borrar horario" : "Programar"}
+      </button>
+    </span>
   )
 }
 
