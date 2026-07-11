@@ -74,6 +74,7 @@ export function buildComunidadSections(t: T): NavSection[] {
       href: "/clasificacion",
       items: [
         { label: t("nav.v3.items.games"), href: "/juegos", icon: "gamepad" },
+        { label: t("nav.v3.items.tournaments"), href: "/torneos", icon: "trophy" },
         { label: t("nav.v3.items.ranking"), href: "/clasificacion", icon: "chart" },
       ],
     },
