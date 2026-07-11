@@ -137,7 +137,7 @@ never marker classes.
 | `catalog/*` | Biblioteca/Myrient `ct-*` catalog kit: CtCard, CtViews, CtAtoms, catalog-util; index barrel |
 | `calendar/*` | Calendar/agenda `lz-*` kit: LzCards, LzViews, LzAtoms, calendar-util; index barrel |
 | `schematic/*` | Schematic Compat `sch-*` kit: SchPanels, SchAtoms, schematic-util; index barrel |
-| `mewgenics/*` | Mewgenics kit: MewPop, MewAtoms, mew-util; index barrel |
+| `mewgenics/*` | Mewgenics kit: MewAtoms, MewPop, mew-util (meta/palettes/helpers), mew-art (sprite/icon singleton), mew-store (real data load + normalize + resolvers), `codex/` (MewCodex app · MewViews 8 fiches · MewRefs linking refs); index + codex barrels |
 
 ### `hooks/`
 
