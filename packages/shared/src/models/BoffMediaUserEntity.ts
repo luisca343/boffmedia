@@ -40,6 +40,14 @@ export type BoffMediaUserEntity = {
      */
     discordId: string | null;
     /**
+     * SteamID64 (link-only, no standalone Steam login)
+     */
+    steamId: string | null;
+    /**
+     * Twitch user id for OAuth
+     */
+    twitchId: string | null;
+    /**
      * Whether the user has verified their email address
      */
     emailVerified: boolean;

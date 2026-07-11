@@ -127,6 +127,20 @@
       "when": 1783708145096,
       "tag": "0017_forum_notification_type",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "5",
+      "when": 1783728770923,
+      "tag": "0018_tournaments",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "5",
+      "when": 1783762882420,
+      "tag": "0019_tournament_phases",
+      "breakpoints": true
     }
   ]
 }
