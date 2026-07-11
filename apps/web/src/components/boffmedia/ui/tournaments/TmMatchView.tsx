@@ -53,12 +53,15 @@ function copyText(text: string, msg?: string) {
   toast({ msg: msg || "Copiado al portapapeles", icon: "check", tone: "ok" })
 }
 
-const CARD = "border border-solid border-line bg-panel [clip-path:polygon(0_0,calc(100%_-_14px)_0,100%_14px,100%_100%,0_100%)]"
-const CARD_HEAD = "flex items-center justify-between gap-3 border-b border-solid border-line bg-panel-2 px-4 py-[13px]"
-const CARD_H3 = "m-0 font-mono text-[13px]/none font-bold uppercase tracking-[0.12em] text-txt"
+export const TM_CARD = "border border-solid border-line bg-panel [clip-path:polygon(0_0,calc(100%_-_14px)_0,100%_14px,100%_100%,0_100%)]"
+export const TM_CARD_HEAD = "flex items-center justify-between gap-3 border-b border-solid border-line bg-panel-2 px-4 py-[13px]"
+export const TM_CARD_H3 = "m-0 font-mono text-[13px]/none font-bold uppercase tracking-[0.12em] text-txt"
+const CARD = TM_CARD
+const CARD_HEAD = TM_CARD_HEAD
+const CARD_H3 = TM_CARD_H3
 const GHUE_BORDER = "border-l-[3px] border-l-[hsl(var(--ghue,28)_60%_50%)]"
 
-function TmRoundHeader({ comp, roundNo, tableNo, status }: { comp: TmComp; roundNo: React.ReactNode; tableNo: React.ReactNode; status?: string }) {
+export function TmRoundHeader({ comp, roundNo, tableNo, status, bestOf = 3, scheduledAt }: { comp: TmComp; roundNo: React.ReactNode; tableNo: React.ReactNode; status?: string; bestOf?: number; scheduledAt?: string | null }) {
   const chip = "inline-flex items-center gap-1.5 border border-solid border-line-2 px-[9px] py-[5px] font-mono text-[11px]/none font-semibold text-txt-muted [&_svg]:text-txt-dim"
   return (
     <div className={cn("flex flex-wrap items-center justify-between gap-3.5 border border-solid border-line bg-panel px-[18px] py-[15px] [clip-path:polygon(0_0,calc(100%_-_14px)_0,100%_14px,100%_100%,0_100%)]", GHUE_BORDER)}>
@@ -67,7 +70,13 @@ function TmRoundHeader({ comp, roundNo, tableNo, status }: { comp: TmComp; round
         <div className="flex flex-wrap gap-2">
           <span className={chip}><Icon name="list" size={12} />Ronda {roundNo}</span>
           <span className={chip}><Icon name="grid" size={12} />Mesa {tableNo}</span>
-          <span className="inline-flex items-center gap-1.5 border border-solid border-[hsl(var(--ghue,28)_60%_50%_/_0.4)] px-[9px] py-[5px] font-mono text-[11px]/none font-semibold text-[hsl(var(--ghue,28)_65%_62%)] [&_svg]:text-[hsl(var(--ghue,28)_65%_62%)]"><Icon name="trophy" size={12} />Al mejor de 3</span>
+          <span className="inline-flex items-center gap-1.5 border border-solid border-[hsl(var(--ghue,28)_60%_50%_/_0.4)] px-[9px] py-[5px] font-mono text-[11px]/none font-semibold text-[hsl(var(--ghue,28)_65%_62%)] [&_svg]:text-[hsl(var(--ghue,28)_65%_62%)]"><Icon name="trophy" size={12} />Al mejor de {bestOf}</span>
+          {scheduledAt && (
+            <span className={chip}>
+              <Icon name="clock" size={12} />
+              {new Date(scheduledAt).toLocaleString("es-ES", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+            </span>
+          )}
         </div>
       </div>
       <DkLive status={status === "final" ? "final" : "live"} label={status === "final" ? "Finalizada" : "En juego"} />
@@ -75,7 +84,7 @@ function TmRoundHeader({ comp, roundNo, tableNo, status }: { comp: TmComp; round
   )
 }
 
-function TmOpponentCard({ opp, onChat, onTeam }: { opp: TmPlayer; onChat?: () => void; onTeam?: () => void }) {
+export function TmOpponentCard({ opp, onChat, onTeam }: { opp: TmPlayer; onChat?: () => void; onTeam?: () => void }) {
   const rec = (opp.w || 0) + "-" + (opp.l || 0) + "-" + (opp.d || 0)
   const pts = opp.pts != null ? opp.pts : (opp.w || 0) * 3 + (opp.d || 0)
   const iconBtn = "grid h-7 w-7 place-items-center border border-solid border-line-2 bg-base text-txt-muted cursor-pointer transition-colors hover:border-accent-line hover:text-accent-bright"

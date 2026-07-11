@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import type { CompetitorKind } from '../tournaments.types';
+import type { CompetitorKind, ParticipantStatus } from '../tournaments.types';
 
 export class RosterMember {
   @ApiProperty()
@@ -38,11 +38,23 @@ export class Competitor {
   @ApiProperty({ nullable: true })
   seed: number | null;
 
+  @ApiProperty({ enum: ['active', 'eliminated', 'withdrew', 'disqualified'] })
+  status: ParticipantStatus;
+
+  @ApiProperty({ description: 'Checked in for the current check-in window.' })
+  checkedIn: boolean;
+
   @ApiProperty({ nullable: true })
   hue: number | null;
 
   @ApiProperty({ nullable: true })
   avatar: string | null;
+
+  @ApiProperty({ nullable: true, description: 'Leaderboard-format score.' })
+  score: number | null;
+
+  @ApiProperty({ description: 'Leaderboard-format: entry verified by an admin.' })
+  verified: boolean;
 
   @ApiProperty({ type: [RosterMember], required: false })
   roster?: RosterMember[];

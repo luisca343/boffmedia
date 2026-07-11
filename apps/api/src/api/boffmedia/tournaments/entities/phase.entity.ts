@@ -7,7 +7,7 @@ import type {
 
 /** The advancement rule out of a phase (null on the final phase). */
 export class PhaseAdvanceRule {
-  @ApiProperty({ enum: ['all', 'top_n', 'record'] })
+  @ApiProperty({ enum: ['all', 'top_n', 'record', 'top_or_record'] })
   type: AdvanceType;
 
   @ApiProperty({
@@ -38,7 +38,9 @@ export class PhaseView {
   @ApiProperty()
   name: string;
 
-  @ApiProperty({ enum: ['single', 'double', 'roundrobin', 'swiss', 'leaderboard'] })
+  @ApiProperty({
+    enum: ['single', 'double', 'roundrobin', 'swiss', 'leaderboard', 'groups'],
+  })
   format: PhaseFormat;
 
   @ApiProperty({ enum: ['pending', 'live', 'completed'] })
@@ -49,6 +51,18 @@ export class PhaseView {
 
   @ApiProperty()
   bestOf: number;
+
+  @ApiProperty({
+    nullable: true,
+    description: 'Best-of override for the decisive match (final/grand final).',
+  })
+  finalsBestOf: number | null;
+
+  @ApiProperty({ nullable: true, description: 'Groups: number of groups.' })
+  groupCount: number | null;
+
+  @ApiProperty({ description: 'Single: third-place match is played.' })
+  thirdPlace: boolean;
 
   @ApiProperty()
   carryStandings: boolean;

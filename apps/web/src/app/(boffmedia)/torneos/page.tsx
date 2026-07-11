@@ -22,14 +22,20 @@ const DOT_TONE: Record<string, string> = {
 export default function TorneosPage() {
   const { tournaments, isLoading } = useTournaments()
   const [filter, setFilter] = useState<Filter>("all")
+  const [query, setQuery] = useState("")
 
-  const shown = useMemo(
-    () =>
-      tournaments
-        .filter((t) => t.status !== "draft" && t.status !== "cancelled")
-        .filter((t) => (filter === "all" ? true : t.status === filter)),
-    [tournaments, filter],
-  )
+  const shown = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    return tournaments
+      .filter((t) => t.status !== "draft" && t.status !== "cancelled")
+      .filter((t) => (filter === "all" ? true : t.status === filter))
+      .filter(
+        (t) =>
+          q === "" ||
+          t.name.toLowerCase().includes(q) ||
+          (t.gameTitle?.toLowerCase().includes(q) ?? false),
+      )
+  }, [tournaments, filter, query])
 
   return (
     <main className="wrap py-10">
@@ -43,7 +49,7 @@ export default function TorneosPage() {
         </p>
       </header>
 
-      <div className="mb-5">
+      <div className="mb-5 flex flex-wrap items-center gap-3">
         <DkSeg
           size="sm"
           value={filter}
@@ -55,6 +61,13 @@ export default function TorneosPage() {
             { value: "registration", label: "Inscripción" },
             { value: "completed", label: "Finalizados" },
           ]}
+        />
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Buscar torneo o juego…"
+          aria-label="Buscar torneos"
+          className="min-w-[180px] flex-1 border border-solid border-line bg-panel px-3 py-1.5 font-body text-[13px] placeholder:text-txt-dim sm:max-w-xs"
         />
       </div>
 

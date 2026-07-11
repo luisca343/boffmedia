@@ -6,10 +6,11 @@ import {
 import { TournamentsRepository } from '../repositories/tournaments.repository';
 import { BracketService } from './bracket.service';
 import {
+  computeStandings,
   matchesForPhaseChain,
   standingsForEntrants,
 } from '../standings.util';
-import { TournamentPhase } from '@/_db/schema/Tournaments';
+import { TournamentMatch, TournamentPhase } from '@/_db/schema/Tournaments';
 
 interface Ranked {
   participantId: number;
@@ -23,6 +24,9 @@ export interface AdvanceResult {
   championParticipantId: number | null;
   nextPhaseId: number | null;
   qualifiedCount: number;
+  // Entrants of the phase just closed, split by outcome (for notifications).
+  qualifiedParticipantIds: number[];
+  eliminatedParticipantIds: number[];
 }
 
 /**
@@ -43,7 +47,22 @@ export class AdvancementService {
     if (!t) throw new NotFoundException('Tournament not found');
 
     const phases = await this.repo.listPhases(tournamentId);
-    const live = phases.find((p) => p.status === 'live');
+    // Elimination phases settle themselves to 'completed' when their final
+    // lands, so "the phase to advance" is the live one — or, failing that, the
+    // highest completed phase whose successor hasn't been seeded yet.
+    let live = phases.find((p) => p.status === 'live');
+    if (!live) {
+      for (const p of [...phases]
+        .filter((x) => x.status === 'completed')
+        .sort((a, b) => b.phaseOrder - a.phaseOrder)) {
+        const nextP = phases.find((x) => x.phaseOrder === p.phaseOrder + 1);
+        if (!nextP) continue;
+        if ((await this.repo.listPhaseEntrants(nextP.id)).length === 0) {
+          live = p;
+          break;
+        }
+      }
+    }
     if (!live) throw new BadRequestException('No live phase to advance');
 
     const allMatches = await this.repo.listMatches(tournamentId);
@@ -74,15 +93,21 @@ export class AdvancementService {
     //    computed against the whole field so records/resistance stay complete.
     const entrants = await this.repo.listPhaseEntrants(live.id);
     const entrantIds = entrants.map((e) => e.participantId);
-    const allParticipantIds = (
-      await this.repo.listParticipants(tournamentId)
-    ).map((p) => p.id);
-    const standings = await this.finalStandings(
-      live,
-      entrantIds,
-      allParticipantIds,
-      matchesForPhaseChain(live.id, phases, allMatches),
+    const participants = await this.repo.listParticipants(tournamentId);
+    const allParticipantIds = participants.map((p) => p.id);
+    // Withdrawn / disqualified entrants keep their records for everyone else's
+    // resistance math but can neither advance nor be crowned.
+    const activeSet = new Set(
+      participants.filter((p) => p.status === 'active').map((p) => p.id),
     );
+    const standings = (
+      await this.finalStandings(
+        live,
+        entrantIds,
+        allParticipantIds,
+        matchesForPhaseChain(live.id, phases, allMatches),
+      )
+    ).filter((s) => activeSet.has(s.participantId));
 
     const next = phases.find((p) => p.phaseOrder === live.phaseOrder + 1);
 
@@ -102,17 +127,28 @@ export class AdvancementService {
         championParticipantId: champion ?? null,
         nextPhaseId: null,
         qualifiedCount: 0,
+        qualifiedParticipantIds: champion != null ? [champion] : [],
+        eliminatedParticipantIds: [],
       };
     }
 
-    // 4-5. Apply the rule and require a viable next field.
-    const qualifiers = this.selectQualifiers(live, standings);
+    // 4-5. Apply the rule and require a viable next field. Groups phases pick
+    // per group (top N of each, cross-seeded); other formats use the flat rule.
+    const qualifiers =
+      live.format === 'groups'
+        ? await this.groupPhaseQualifiers(live, phaseMatches, activeSet)
+        : this.selectQualifiers(live, standings);
     if (qualifiers.length < 2) {
       throw new BadRequestException(
         'Advancement rule yields fewer than 2 qualifiers — adjust results or the rule',
       );
     }
     const qualifierIds = new Set(qualifiers.map((q) => q.participantId));
+    // Notify only entrants who were still active but missed the cut (not those
+    // who had already withdrawn).
+    const eliminatedParticipantIds = entrants
+      .map((e) => e.participantId)
+      .filter((id) => activeSet.has(id) && !qualifierIds.has(id));
 
     // 6-7. Freeze qualifiers as next-phase entrants, eliminate the rest, flip phases.
     await this.repo.transaction(async (tx) => {
@@ -148,6 +184,8 @@ export class AdvancementService {
       championParticipantId: null,
       nextPhaseId: next.id,
       qualifiedCount: qualifiers.length,
+      qualifiedParticipantIds: qualifiers.map((q) => q.participantId),
+      eliminatedParticipantIds,
     };
   }
 
@@ -183,6 +221,53 @@ export class AdvancementService {
     }));
   }
 
+  /**
+   * Groups-phase qualifiers: top `group.advanceCount` of each group by the
+   * phase's tiebreak, cross-seeded (all group winners first, then runners-up…).
+   * Group membership derives from the phase's match rows — `participants.groupId`
+   * is transient and may have been rewritten by a later phase.
+   */
+  private async groupPhaseQualifiers(
+    phase: TournamentPhase,
+    phaseMatches: TournamentMatch[],
+    activeSet: Set<number>,
+  ): Promise<Ranked[]> {
+    const groups = (await this.repo.listGroups(phase.tournamentId))
+      .filter((g) => g.phaseId === phase.id)
+      .sort((a, b) => a.order - b.order);
+    const perGroup = groups.map((g) => {
+      const gMatches = phaseMatches.filter((m) => m.groupId === g.id);
+      const memberIds = [
+        ...new Set(
+          gMatches
+            .flatMap((m) => [m.topParticipantId, m.botParticipantId])
+            .filter((id): id is number => id != null),
+        ),
+      ];
+      return computeStandings(memberIds, gMatches, phase.tiebreakProfile)
+        .filter((r) => activeSet.has(r.participantId))
+        .slice(0, g.advanceCount)
+        .map((r) => ({
+          participantId: r.participantId,
+          rank: r.rank,
+          w: r.w,
+          l: r.l,
+        }));
+    });
+    const out: Ranked[] = [];
+    for (let rank = 0; ; rank++) {
+      let any = false;
+      for (const g of perGroup) {
+        if (g[rank]) {
+          out.push(g[rank]);
+          any = true;
+        }
+      }
+      if (!any) break;
+    }
+    return out;
+  }
+
   private selectQualifiers(phase: TournamentPhase, standings: Ranked[]): Ranked[] {
     switch (phase.advanceType) {
       case 'top_n':
@@ -193,6 +278,14 @@ export class AdvancementService {
         return phase.advanceCount != null
           ? eligible.slice(0, phase.advanceCount)
           : eligible;
+      }
+      case 'top_or_record': {
+        // Union: the top N by standings OR anyone at ≤ maxLosses losses.
+        // Standings are sorted, so both sets are contiguous from the top — the
+        // qualifier count is max(N, #{≤maxLosses}), i.e. an asymmetric cut.
+        const n = phase.advanceCount ?? 0;
+        const cap = phase.advanceMaxLosses ?? Number.MAX_SAFE_INTEGER;
+        return standings.filter((s, i) => i < n || s.l <= cap);
       }
       case 'all':
       default:

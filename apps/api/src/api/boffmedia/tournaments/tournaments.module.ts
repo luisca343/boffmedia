@@ -11,6 +11,9 @@ import { MatchesService } from './services/matches.service';
 import { StandingsService } from './services/standings.service';
 import { PhasesService } from './services/phases.service';
 import { AdvancementService } from './services/advancement.service';
+import { MatchReportService } from './services/match-report.service';
+import { TournamentNotificationsService } from './services/tournament-notifications.service';
+import { TournamentAnnouncerService } from './services/tournament-announcer.service';
 
 @Module({
   imports: [DrizzleModule, NotificationsModule],
@@ -24,6 +27,9 @@ import { AdvancementService } from './services/advancement.service';
     StandingsService,
     PhasesService,
     AdvancementService,
+    MatchReportService,
+    TournamentNotificationsService,
+    TournamentAnnouncerService,
     TournamentsFacadeService,
   ],
   exports: [TournamentsFacadeService],

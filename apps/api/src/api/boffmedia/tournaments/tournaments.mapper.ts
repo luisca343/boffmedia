@@ -32,8 +32,12 @@ export function toCompetitor(
     country: p.country,
     flag: flagEmoji(p.country),
     seed: p.seed,
+    status: p.status,
+    checkedIn: p.checkedInAt != null,
     hue: p.hue,
     avatar: p.avatar,
+    score: p.score,
+    verified: p.verified,
     roster: roster && roster.length ? roster.map(toRosterMember) : undefined,
   };
 }
