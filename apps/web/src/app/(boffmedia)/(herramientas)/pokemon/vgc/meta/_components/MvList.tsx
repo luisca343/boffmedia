@@ -3,7 +3,7 @@
 import { useMemo, useRef, useState } from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/boffmedia/primitives/button"
+import { Button } from "@/components/boffmedia/primitives"
 import { DkSearch, DkSprite, DkEmpty, DkSkelList } from "@/components/boffmedia/ui/tools/datakit"
 import { spriteUrl, handleSpriteError } from "@/features/vgc-tracker/types"
 import { fmtCount, type PokeData, type UsageEntry } from "../_lib/meta-types"

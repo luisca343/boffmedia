@@ -31,7 +31,7 @@ export function CodeBlock({ lines, label, copyText, scan = false, tone, actions,
     <div
       className={cn(
         "border border-solid border-line-2 bg-base-deep overflow-hidden",
-        "[clip-path:polygon(0_0,calc(100%_-_var(--cut))_0,100%_var(--cut),100%_100%,0_100%)]",
+        "cut-corner [--cut-lg:10px]",
         className,
       )}
     >

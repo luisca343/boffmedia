@@ -533,13 +533,6 @@ img { display: block; max-width: 100%; }
 }
 :fullscreen .bsx-fullscreen-layout { width: 100vw; height: 100vh; overflow-y: auto; }
 
-/* Hover companion for the not-yet-migrated boffmedia-v2 <BoffCard hover>: pseudo-class
-   states inline styles can't express. Remove once that Card is migrated off. */
-.boff-card--hover:hover { box-shadow: var(--card-shadow-hover); }
-[data-direction="hud"] .boff-card--hover:hover { transform: translate(-2px, -2px); }
-[data-direction="neon"] .boff-card--hover:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--secondary) 40%, var(--border)); }
-[data-direction="grid"] .boff-card--hover:hover { transform: translateY(-3px); border-color: var(--border-strong); }
-
 @media (prefers-reduced-motion: reduce) {
   * { scroll-behavior: auto !important; }
 }

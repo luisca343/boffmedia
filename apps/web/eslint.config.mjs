@@ -4,6 +4,12 @@ export default [
   ...nextConfig,
   {
     rules: {
+      'no-restricted-imports': ['error', {
+        patterns: [{
+          group: ['@/components/boffmedia/primitives/*'],
+          message: 'Import boffmedia v3 primitives from the barrel `@/components/boffmedia/primitives` (BOFFMEDIA_V3.md §1), not by deep path.',
+        }],
+      }],
       '@next/next/no-img-element': 'off',
       'react-hooks/exhaustive-deps': 'off',
       'react-hooks/set-state-in-effect': 'off',

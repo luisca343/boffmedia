@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 
 // Country flag emoji with an accessible name. Mirrors `.dk-flag`.
 export function DkFlag({ flag, code, name, size = 15 }: { flag?: string; code?: string; name?: string; size?: number }) {

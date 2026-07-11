@@ -2,9 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/boffmedia/primitives/button"
-import { Modal } from "@/components/boffmedia/primitives/modal"
-import { toast } from "@/components/boffmedia/primitives/toast"
+import { Button, Modal, toast } from "@/components/boffmedia/primitives"
 import { MONO_LABEL, Sample, Section } from "../showcase-shared"
 import { AV_CHART_C, DEMO_MEMBERS, DEMO_PIPELINE, aiCurve } from "../showcase-data"
 import {

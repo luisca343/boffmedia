@@ -2,8 +2,7 @@
 
 import { DEMO_ACHS, DEMO_EVENTS, DEMO_GAME, DEMO_TOP } from "../showcase-data"
 import { Sample, Section } from "../showcase-shared"
-import { Button } from "@/components/boffmedia/primitives/button"
-import { Ring } from "@/components/boffmedia/primitives/ring"
+import { Button, Ring } from "@/components/boffmedia/primitives"
 import {
   AchievementItem,
   Countdown,

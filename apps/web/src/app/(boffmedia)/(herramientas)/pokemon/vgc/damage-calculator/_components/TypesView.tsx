@@ -2,8 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { Icon } from "@/components/boffmedia/primitives/icon"
-import { Seg } from "@/components/boffmedia/primitives/seg"
+import { Icon, Seg } from "@/components/boffmedia/primitives"
 import { PokemonSprite } from "./ui/PokemonSprite"
 import { TypeBadge } from "./ui/TypeBadge"
 import { useCalculatorStore } from "../_store/calculatorStore"

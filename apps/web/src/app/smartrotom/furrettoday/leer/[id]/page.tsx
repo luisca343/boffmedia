@@ -81,7 +81,7 @@ export default function ReadPage({ params }: { params: Promise<{ id: string }> |
             
             {/* Comic style speech bubble */}
             <div className="relative bg-yellow-300 border-4 border-black p-6 mb-8 mx-auto max-w-lg transform rotate-1 card-pop">
-              <div className="absolute h-6 w-6 bg-yellow-300 border-r-4 border-b-4 border-black transform rotate-45 -bottom-3 left-[calc(50%-12px)]"></div>
+              <div className="absolute h-6 w-6 bg-yellow-300 border-r-4 border-b-4 border-black transform rotate-45 -bottom-3 left-[calc(50%_-_12px)]"></div>
               <p className="text-pop-xl font-comic mb-3 text-black pop-shadow">
                 ¡Oh no! Hubo un error al cargar la noticia.
               </p>

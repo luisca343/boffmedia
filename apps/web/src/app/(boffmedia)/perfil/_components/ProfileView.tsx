@@ -82,7 +82,7 @@ export function ProfileView({
       .then((res) => {
         if (res.data) setFull(res.data)
       })
-      .catch(() => {})
+      .catch((err) => console.error("[perfil] failed to load full profile", err))
   }, [userId])
 
   React.useEffect(() => {
@@ -179,7 +179,9 @@ export function ProfileView({
         setFull((prev) => (prev ? { ...prev, bio: values.bio ?? prev.bio } : prev))
         try {
           await update()
-        } catch {}
+        } catch (err) {
+          console.error("[perfil] session refresh after save failed", err)
+        }
         toast.success(t("saved"))
         setEditing(false)
       } else {
@@ -219,7 +221,9 @@ export function ProfileView({
       setFull((prev) => (prev ? { ...prev, profilePicture: url } : prev))
       try {
         await update() // refresh session (navbar avatar) in place, no reload
-      } catch {}
+      } catch (err) {
+        console.error("[perfil] session refresh after avatar update failed", err)
+      }
       toast.success(t("avatar.updated"))
     } catch {
       toast.error(t("avatar.error"))
@@ -271,7 +275,9 @@ export function ProfileView({
         loadFull()
         try {
           await update()
-        } catch {}
+        } catch (err) {
+          console.error("[perfil] session refresh after unlink failed", err)
+        }
         toast.success(t("linked.unlinkedDone"))
       } else {
         toast.error(res.error || t("saveError"))
@@ -304,11 +310,8 @@ export function ProfileView({
   const initial = (user.name || "U").charAt(0).toUpperCase()
   const year = full?.createdAt ? new Date(full.createdAt).getFullYear() : null
   const mcLinked = !!user.smartRotomUser?.uuid
-  // steamId/twitchId are on the API response at runtime (repo selects them); the
-  // `as` keeps type-check green until `pnpm generate:shared` adds them to the model.
-  const providerIds = full as (FullUser & { steamId?: string | null; twitchId?: string | null }) | null
-  const steamLinked = Boolean(providerIds?.steamId)
-  const twitchLinked = Boolean(providerIds?.twitchId)
+  const steamLinked = Boolean(full?.steamId)
+  const twitchLinked = Boolean(full?.twitchId)
 
   // ── B — career stats + hero metrics from the real global leaderboard ─────
   const me = (leaderboards ?? []).find((e) => Number(e.userId) === Number(user.id))

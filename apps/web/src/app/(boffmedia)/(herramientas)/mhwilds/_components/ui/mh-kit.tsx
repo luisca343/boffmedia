@@ -12,7 +12,7 @@ export function MhApp({ children, className = "" }: { children: React.ReactNode;
   return (
     <div
       style={MH_VARS}
-      className={`flex flex-col min-w-0 h-[calc(100vh-var(--nav-h,66px))] bg-base text-txt relative ${className}`}
+      className={`flex flex-col min-w-0 h-[calc(100vh_-_var(--nav-h,66px))] bg-base text-txt relative ${className}`}
     >
       {children}
     </div>

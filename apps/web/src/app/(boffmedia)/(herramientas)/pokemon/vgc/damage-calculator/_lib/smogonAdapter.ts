@@ -161,15 +161,15 @@ export function calcAllMoves(
 export function getKOVerdict(res: DamageResult): { labelKey: string; colorClass: string } {
   const { minPct, maxPct } = res
   if (minPct >= 100) return { labelKey: 'guaranteedOHKO', colorClass: 'text-red-400' }
-  if (minPct * 2 >= 100) return { labelKey: 'guaranteed2HKO', colorClass: 'text-primary-hover' }
+  if (minPct * 2 >= 100) return { labelKey: 'guaranteed2HKO', colorClass: 'text-accent-bright' }
   if (maxPct * 2 >= 100) return { labelKey: 'possible2HKO', colorClass: 'text-warning-hover' }
   if (maxPct >= 100) return { labelKey: 'possibleOHKO', colorClass: 'text-red-400' }
-  return { labelKey: 'noKO', colorClass: 'text-ink-muted' }
+  return { labelKey: 'noKO', colorClass: 'text-txt-muted' }
 }
 
 export function getDamageColorClass(res: DamageResult): string {
   if (res.maxPct >= 100) return 'text-red-400'
-  if (res.maxPct >= 75) return 'text-primary-hover'
+  if (res.maxPct >= 75) return 'text-accent-bright'
   if (res.maxPct >= 50) return 'text-warning-hover'
-  return 'text-ink-muted'
+  return 'text-txt-muted'
 }

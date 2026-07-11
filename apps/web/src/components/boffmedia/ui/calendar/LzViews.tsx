@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 import { LzBannerCard, LzPosterCard } from "./LzCards"
 import { LZ_MONTHS, LZ_ONE_DAY, LZ_PLATFORMS, LZ_WD, LZ_WD_LONG, lzKeyOf, lzParse, lzSameDay, lzWdShort, lzRelativeDays, type LzRelease } from "./calendar-util"
 

@@ -324,6 +324,10 @@ export function FxCursor({
         raf = requestAnimationFrame(tick)
       }
     }
+    // §7 exemption: this reticle owns `.on`/`.hot`/`.d`/`.r` end-to-end — toggled
+    // here and styled by the self-scoped [&.on]/[&.hot] variants on the wrapper below.
+    // It's a self-contained cursor overlay, not shared state; don't copy this over the
+    // codebase's `data-*` hook convention for anything with an external consumer.
     const onMove = (e: PointerEvent) => {
       const target = e.target instanceof Element ? e.target : null
       const inside = target && target.closest(scope)

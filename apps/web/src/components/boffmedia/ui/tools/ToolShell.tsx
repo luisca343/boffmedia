@@ -5,7 +5,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon, type IconName } from "@/components/boffmedia/primitives/icon"
+import { Icon, type IconName } from "@/components/boffmedia/primitives"
 import { useDismiss } from "@/components/boffmedia/hooks/use-dismiss"
 import { getGameEntry, type GameEntry } from "@/data/games"
 import { hubConfig } from "@/data/hub"
@@ -52,7 +52,7 @@ function GameSwitch({ slug }: { slug: string }) {
         <Icon name="chevronDown" size={16} className={cn("flex-none text-txt-muted transition-transform duration-[140ms]", open && "rotate-180")} />
       </button>
       {open && (
-        <div className="absolute left-3 top-[calc(100%-6px)] z-[130] min-w-[228px] border border-solid border-line-2 bg-panel shadow-[0_24px_54px_-22px_rgba(0,0,0,0.6)] animate-[bm-menu-in_0.16s_ease-out] motion-reduce:animate-none">
+        <div className="absolute left-3 top-[calc(100%_-_6px)] z-[130] min-w-[228px] border border-solid border-line-2 bg-panel shadow-[0_24px_54px_-22px_rgba(0,0,0,0.6)] animate-[bm-menu-in_0.16s_ease-out] motion-reduce:animate-none">
           {HUB_SLUGS.map((s) => {
             const g = getGameEntry(s)
             if (!g) return null
@@ -279,12 +279,12 @@ export function ToolShell({ slug, children }: ToolShellProps) {
   if (!game || !hub) return <>{children}</>
 
   return (
-    <div data-footer-flush="" className="flex min-h-[calc(100dvh-var(--nav-h))] items-stretch">
+    <div data-footer-flush="" className="flex min-h-[calc(100dvh_-_var(--nav-h))] items-stretch">
       <aside
         className={cn(
           "z-30 flex-none self-start max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-[80] max-lg:h-screen max-lg:w-[288px] max-lg:shadow-[var(--shadow)]",
           "max-lg:transition-[transform,visibility] max-lg:duration-300",
-          "lg:sticky lg:top-[var(--nav-h)] lg:h-[calc(100dvh-var(--nav-h))]",
+          "lg:sticky lg:top-[var(--nav-h)] lg:h-[calc(100dvh_-_var(--nav-h))]",
           mobileOpen ? "max-lg:translate-x-0 max-lg:visible" : "max-lg:-translate-x-full max-lg:invisible",
         )}
       >

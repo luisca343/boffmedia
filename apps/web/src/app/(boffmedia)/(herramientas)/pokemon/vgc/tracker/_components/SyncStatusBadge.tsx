@@ -1,7 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 import { useTrackerSync } from "@/features/vgc-tracker/context/TrackerSyncContext"
 
 const TAG_CUT = "polygon(3px 0,100% 0,calc(100% - 3px) 100%,0 100%)"

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 import { LZ_GENRE_ICON, LZ_PLATFORMS, type LzPlatformKey } from "./calendar-util"
 
 // The per-release atoms: wish star, platform pills, hype meter, versions list and

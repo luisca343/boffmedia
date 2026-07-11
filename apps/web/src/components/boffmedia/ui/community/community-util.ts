@@ -1,4 +1,4 @@
-import type { IconName } from "@/components/boffmedia/primitives/icon"
+import type { IconName } from "@/components/boffmedia/primitives"
 
 // v3 «Señal» — Comunidad (Blog + Foro) shared types + helpers. Mirrors the
 // window globals/helpers from comunidad-data.js + comunidad-kit.jsx, but the

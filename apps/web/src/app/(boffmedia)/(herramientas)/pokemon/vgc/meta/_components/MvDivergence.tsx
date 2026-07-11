@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react"
 import { useTranslations } from "next-intl"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 import { DkTable, DkSprite, DkEmpty, DkSkelList } from "@/components/boffmedia/ui/tools/datakit"
 import { spriteUrl, handleSpriteError } from "@/features/vgc-tracker/types"
 import type { DivergenceResult, PokeData } from "../_lib/meta-types"
@@ -126,7 +126,7 @@ function Badge({ tone, children }: { tone: "signal" | "warn"; children: React.Re
       : { color: "var(--warn)", background: "color-mix(in srgb, var(--warn) 12%, transparent)", borderColor: "color-mix(in srgb, var(--warn) 35%, transparent)" }
   return (
     <span
-      className="inline-flex whitespace-nowrap border border-solid px-[7px] py-1 font-mono text-[9px] font-semibold uppercase leading-none tracking-[0.1em] [clip-path:polygon(2px_0,100%_0,calc(100%_-_2px)_100%,0_100%)]"
+      className="inline-flex whitespace-nowrap border border-solid px-[7px] py-1 font-mono text-[9px] font-semibold uppercase leading-none tracking-[0.1em] cut [--cut:2px]"
       style={style}
     >
       {children}

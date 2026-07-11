@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Sample, Section } from "../showcase-shared"
-import { Button } from "@/components/boffmedia/primitives/button"
+import { Button } from "@/components/boffmedia/primitives"
 import {
   SrtCard,
   SrtDrawReel,
@@ -141,7 +141,7 @@ export function SorteosChapter() {
         }
       >
         <Sample title="Premio" code="<SrtPrizeShowcase sorteo>" col>
-          <div className="w-full border border-solid border-line bg-panel [clip-path:polygon(0_0,calc(100%_-_14px)_0,100%_14px,100%_100%,0_100%)]">
+          <div className="w-full border border-solid border-line bg-panel cut-corner [--cut-lg:14px]">
             <div className="p-5">
               <SrtPrizeShowcase sorteo={featured} />
             </div>

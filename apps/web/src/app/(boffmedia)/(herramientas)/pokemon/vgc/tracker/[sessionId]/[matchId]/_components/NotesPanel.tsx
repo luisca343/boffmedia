@@ -2,7 +2,7 @@
 
 import { useRef, KeyboardEvent, forwardRef, useImperativeHandle } from 'react';
 import { useTranslations } from 'next-intl';
-import { Icon } from '@/components/boffmedia/primitives/icon';
+import { Icon } from "@/components/boffmedia/primitives"
 import { MatchNote } from '@/features/vgc-tracker/types';
 
 interface Props {

@@ -20,7 +20,7 @@ export function Disclosure({ title, icon, sub, defaultOpen = false, badge, child
     <div
       className={cn(
         "border border-solid border-line bg-panel",
-        "[clip-path:polygon(0_0,calc(100%_-_var(--cut))_0,100%_var(--cut),100%_100%,0_100%)]",
+        "cut-corner [--cut-lg:10px]",
         className,
       )}
     >

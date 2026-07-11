@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 import { LzCover, LzVersList, LzWishStar } from "./LzAtoms"
 import { LZ_GENRE_ICON, LZ_MONTHS, lzFollowers, lzParse, lzWdShort, type LzRelease } from "./calendar-util"
 
@@ -102,7 +102,7 @@ export function LzBannerCard({ game, popular, wished, onWish, onOpen }: { game: 
                 e.stopPropagation()
                 open()
               }}
-              className="grid h-[30px] w-9 flex-none place-items-center border border-solid border-accent bg-accent text-accent-ink transition-[background,border-color] duration-[140ms] [clip-path:polygon(6px_0,100%_0,calc(100%_-_6px)_100%,0_100%)] hover:border-accent-bright hover:bg-accent-bright"
+              className="grid h-[30px] w-9 flex-none place-items-center border border-solid border-accent bg-accent text-accent-ink transition-[background,border-color] duration-[140ms] cut [--cut:6px] hover:border-accent-bright hover:bg-accent-bright"
             >
               <Icon name="play" size={14} />
             </button>

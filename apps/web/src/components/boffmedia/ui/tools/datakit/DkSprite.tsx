@@ -38,7 +38,7 @@ export function DkSprite({ src, alt, size = 26, dim, title, onError, className }
       ) : (
         <span
           style={{ fontSize: Math.round(size * 0.4) }}
-          className="grid h-full w-full place-items-center bg-panel-2 font-display font-bold uppercase text-txt-dim [clip-path:polygon(3px_0,100%_0,calc(100%_-_3px)_100%,0_100%)]"
+          className="grid h-full w-full place-items-center bg-panel-2 font-display font-bold uppercase text-txt-dim cut [--cut:3px]"
         >
           {alt.slice(0, 2)}
         </span>

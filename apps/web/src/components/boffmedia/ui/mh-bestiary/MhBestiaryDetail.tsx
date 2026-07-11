@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon, type IconName } from "@/components/boffmedia/primitives/icon"
+import { Icon, type IconName } from "@/components/boffmedia/primitives"
 import { MhStars } from "@/app/(boffmedia)/(herramientas)/mhwilds/monsters/_components/bst-kit"
 import { MhRarity } from "@/app/(boffmedia)/(herramientas)/mhwilds/_components/ui/mh-kit"
 

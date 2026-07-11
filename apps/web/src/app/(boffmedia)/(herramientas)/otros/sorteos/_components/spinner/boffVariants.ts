@@ -17,7 +17,7 @@ export interface BoffVariantTokens {
 
 export const BOFF_VARIANTS: Record<BoffVariant, BoffVariantTokens> = {
   primary: {
-    bar: "from-primary-hover via-orange-400 to-primary-active",
+    bar: "from-accent-bright via-orange-400 to-accent",
     border: "rgba(249,115,22,0.35)",
     glow: "rgba(249,115,22,0.08)",
     glowStrong: "rgba(249,115,22,0.3)",

@@ -287,7 +287,9 @@
       "resistances": "Resistances",
       "ailments": "Ailments inflicted",
       "locations": "Locations",
-      "drops": "Rewards"
+      "noLocations": "No known locations",
+      "drops": "Rewards",
+      "noDrops": "No rewards recorded"
     }
   }
 }

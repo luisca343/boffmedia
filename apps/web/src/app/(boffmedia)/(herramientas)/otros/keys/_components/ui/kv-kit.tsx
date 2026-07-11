@@ -359,7 +359,7 @@ export function KeyModal({
       <button type="button" aria-label="Cerrar" onClick={onClose} className="absolute inset-0 cursor-default border-0 bg-[rgba(0,0,0,0.62)] p-0 backdrop-blur-[3px]" />
       <div
         style={{ clipPath: "polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%)" }}
-        className="relative max-h-[92vh] w-[min(600px,100%)] overflow-y-auto border border-line-2 border-t-[3px] border-t-accent bg-panel animate-[bm-modal-in_var(--t-med,180ms)] bm-scroll"
+        className="relative max-h-[92vh] w-[min(600px,100%)] overflow-y-auto border border-line-2 border-t-[3px] border-t-accent bg-panel animate-[bm-modal-in_var(--t-med,180ms)] motion-reduce:animate-none bm-scroll"
       >
         <IconButton name="x" label="Cerrar" onClick={onClose} className="absolute right-[14px] top-[14px] z-[3]" />
         <div className="relative aspect-[460/172] border-b border-line">
