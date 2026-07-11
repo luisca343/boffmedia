@@ -2,11 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { Panel } from "@/components/boffmedia/primitives/panel"
-import { Field } from "@/components/boffmedia/primitives/field"
-import { Input, Textarea } from "@/components/boffmedia/primitives/input"
-import { Select } from "@/components/boffmedia/primitives/select"
-import { Button } from "@/components/boffmedia/primitives/button"
+import { Panel, Field, Input, Textarea, Select, Button } from "@/components/boffmedia/primitives"
 import { useGetGames } from "@/hooks/events/useGetGames"
 import type { Game } from "@boffmedia/shared"
 import { TypeCards } from "./TypeCards"

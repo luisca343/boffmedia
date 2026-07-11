@@ -66,7 +66,7 @@ export function PmdSkyView() {
   const floorError = issues.find((i) => i.field === "floor")?.msg
 
   return (
-    <div className="flex min-w-0 flex-col bg-base min-[961px]:h-[calc(100vh-var(--nav-h,66px))]">
+    <div className="flex min-w-0 flex-col bg-base min-[961px]:h-[calc(100vh_-_var(--nav-h,66px))]">
       {/* ── top bar ─────────────────────────────────────────────────────────── */}
       <div className="sticky top-0 z-20 flex flex-none flex-wrap items-end gap-5 border-b border-solid border-line bg-base px-[clamp(18px,2.4vw,40px)] py-4 max-[960px]:items-start">
         <div className="min-w-0 flex-1">

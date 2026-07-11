@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon, type IconName } from "@/components/boffmedia/primitives/icon"
+import { Icon, type IconName } from "@/components/boffmedia/primitives"
 
 // Mono data chip with a tinted glyph — the «detail strip» of an event
 // (starts · type · game…). Mirrors `.ev-meta` from eventos.css.

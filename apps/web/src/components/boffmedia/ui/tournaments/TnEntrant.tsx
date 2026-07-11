@@ -2,11 +2,11 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 import { DkFlag, DkPin, DkLive } from "@/components/boffmedia/ui/tools/datakit"
 import { TN_FORMAT_ICON, TN_FORMAT_LABEL, type TnCompetitor } from "./tournaments-util"
 
-const TN_AV = "inline-grid flex-none place-items-center font-display font-extrabold uppercase [clip-path:polygon(0_0,calc(100%_-_4px)_0,100%_4px,100%_100%,0_100%)]"
+const TN_AV = "inline-grid flex-none place-items-center font-display font-extrabold uppercase cut-corner [--cut-lg:4px]"
 
 // Generic avatar: initial-in-hue, or a team glyph; falls to a «bye» slot. `.tn-av`
 export function TnAvatar({ c, size = 26 }: { c?: TnCompetitor | null; size?: number }) {

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 import { KvPlatforms, KvReview, KvTags } from "./KvAtoms"
 import { kvMetaColor, kvMetaLabel, kvReviewLabel, type KvInfoData, type KvKey, type KvPriceData } from "./keys-util"
 

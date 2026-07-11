@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 import { SrtPrizeTag } from "./SrtAtoms"
 import { srtNum, srtPrizeMeta, type Sorteo, type SrtRequirement, type SrtStep } from "./giveaways-util"
 
@@ -15,7 +15,7 @@ export function SrtPrizeShowcase({ sorteo }: { sorteo: Sorteo }) {
   return (
     <div className="flex flex-col items-start gap-5 sm:flex-row">
       {/* [deferred] <image-slot> prize art — shows the tinted glyph until upload exists */}
-      <div className="relative aspect-square w-full flex-none overflow-hidden border border-solid border-line-2 bg-base-2 [clip-path:polygon(0_0,calc(100%_-_14px)_0,100%_14px,100%_100%,0_100%)] sm:aspect-square sm:w-[168px] max-sm:aspect-[16/9]">
+      <div className="relative aspect-square w-full flex-none overflow-hidden border border-solid border-line-2 bg-base-2 cut-corner [--cut-lg:14px] sm:aspect-square sm:w-[168px] max-sm:aspect-[16/9]">
         <span aria-hidden className="absolute inset-0 z-0 grid place-items-center text-accent opacity-[0.28]">
           <Icon name={m.icon} size={70} />
         </span>

@@ -166,7 +166,7 @@ export function SrtConfetti({ n = 54 }: { n?: number }) {
       {pieces.map((p, i) => (
         <span
           key={i}
-          className="absolute -top-3 animate-[bm-srt-conf_linear_forwards]"
+          className="absolute -top-3 animate-[bm-srt-conf_linear_forwards] motion-reduce:animate-none"
           style={{ left: p.left + "%", width: p.w, height: p.w * 1.5, background: p.color, animationDuration: p.dur + "s", animationDelay: p.delay + "s" }}
         />
       ))}

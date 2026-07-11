@@ -4,8 +4,8 @@
 
 Graphite/steel/orange design. Tailwind-first, consuming the global tokens
 (`--bg`, `--panel`, `--line`, `--accent`, `--text`/`--muted`/`--dim`, `--cut`,
-display/body/mono fonts) defined in `app/globals.css`. Replaces the `boffmedia-v2`
-tree page-by-page.
+display/body/mono fonts) defined in `app/globals.css`. Replaced the `boffmedia-v2`
+tree, which was fully deleted in Phase 6 (2026-07-08).
 
 **Conventions** (full detail in `docs/BOFFMEDIA_V3.md` → "System conventions"):
 import primitives from the barrel (`@/components/boffmedia/primitives`); mark v3
@@ -126,6 +126,18 @@ never marker classes.
 | `events/index.ts` | barrel for `ui/events` |
 | `legal/LegalDoc.tsx` | LegalDoc — legal document: sticky scroll-spy TOC + numbered sections (paragraphs + bullet lists) |
 | `legal/index.ts` | barrel for `ui/legal` |
+| `tournaments/*` | `/torneos` viewer + admin-standings kit: TnBracket + TnRadialBracket (single/double-elim), TnStandings/TnLeaderboard/TnPairings, TnPodium, TnEntrant, TmMatchView (match report), tournaments-util; index barrel |
+| `community/*` | `/foro` forum kit: Forum, ForumComposer, ForumMarkdown, PostCard, PostBody, VoteRail, CmAvatar, community-util; index barrel |
+| `tools/datakit/*` | **shared v3 data-tool kit (`dk-*`)** — the live chassis for VGC tracker/meta/speed, battlesim, torneos: DkShell, DkBarList, DkBracket, DkCharts, DkControls, DkCopy, DkExtras, DkFeedback, DkFlag, DkLive, DkSelect, DkSprite (game-agnostic sprite chip; caller owns `spriteUrl`/`handleSpriteError`), DkStat, DkTable, DkTeam, DkType + hooks/utils; import from the datakit barrel |
+| `mh-shell/*` | MhShell — shared MH Wilds app chassis (emerald hue); index barrel |
+| `mh-db/*` | MH Wilds armor/weapon DB cards: MhArmor, MhWeapon, mh-db-util; index barrel |
+| `mh-bestiary/*` | MhBestiaryDetail — bestiary monster detail panel; index barrel |
+| `keys/*` | Steam Keys `kv-*` kit: KvCard, KvAtoms, KvSections, keys-util; index barrel |
+| `giveaways/*` | Sorteos `srt-*` kit: SrtCard, SrtDetail, SrtDraw, SrtAtoms, giveaways-util; index barrel |
+| `catalog/*` | Biblioteca/Myrient `ct-*` catalog kit: CtCard, CtViews, CtAtoms, catalog-util; index barrel |
+| `calendar/*` | Calendar/agenda `lz-*` kit: LzCards, LzViews, LzAtoms, calendar-util; index barrel |
+| `schematic/*` | Schematic Compat `sch-*` kit: SchPanels, SchAtoms, schematic-util; index barrel |
+| `mewgenics/*` | Mewgenics kit: MewPop, MewAtoms, mew-util; index barrel |
 
 ### `hooks/`
 
@@ -147,246 +159,7 @@ The showcase demos Modal + Popover (menús y avisos) and Spinner (anillo y carga
 
 **Phase 6 teardown (2026-07-08):** ✅ `data-ds="boffmedia"` hoisted to a `display:contents` wrapper in `(boffmedia)/layout.tsx` (26 per-page attrs stripped; shared `components/boffmedia/**` self-scoping components keep theirs). ✅ **`components/boffmedia-v2/` (104 files) + `boffmedia-old/` (35 files) DELETED** — after migrating the live consumers the earlier "no v2 UI remains" claim had missed: 3 legacy legal pages (`cancelaciones`/`devoluciones`/`reembolsos`) → v3 `LegalDoc`; battlesim (`BSXMon` type → `_utils/toBSXMon`, `BoffSpinner`/`BoffSkeleton` → v3 `Spinner`/`Skeleton`); sorteos `boffVariants` relocated into the tool; `LanguageSwitcher` → lucide `Globe`. Group `_components/` pruned to `Unauthorized` + `layout/FloatingBackground` (both still live); `PolicyShell`, dead `UserAuthSection`, orphan `(eventos)/index.ts` removed. ✅ Dead **Inter** font pruned. `react-toastify` **kept** (SmartRotom/wingull consumers; Boffmedia is off it). ⚠️ Legacy color tokens (`layer-*`/`ink*`/`primary`/`secondary`) stay — shared with SmartRotom/wingull/`components/ui` via the one `tailwind.config.ts`.
 
-**Pending:** — (showcase «palabra cinética» `Kinetic` now built → `landing/travesia-fx`, and `FooterCol`/`FooterSocial` extracted from `Footer`, all showcased 2026-07-10). **Blog deferred.** The `components/boffmedia-v2/` section below is **stale** — the dir is deleted, but the section still mixes in live-v3 subsections (e.g. `ui/tools/datakit` documents `components/boffmedia/ui/tools/datakit/`, which exists). Needs a dedicated tree re-audit.
-
----
-
-## `components/boffmedia-v2/` — ⚠️ DELETED 2026-07-08 (stale section, mixed content)
-
-> The `components/boffmedia-v2/` directory was removed in Phase 6. The tables below are retained temporarily as historical reference and **mix in live-v3 subsections** (notably `ui/tools/` and `ui/tools/datakit/`, which document `components/boffmedia/ui/tools/…`, not the deleted dir). Do not treat entries here as existing under `boffmedia-v2/`. Pending a dedicated tree re-audit.
-
-### `primitives/` (78 files)
-
-Design-system primitives and domain components for Boffmedia. Organized into sub-sections by concern.
-
-#### Generic UI atoms (39 files)
-
-No business logic. Reusable across all Boffmedia sections.
-
-| File | Exports |
-|---|---|
-| `alert.tsx` | BoffAlert |
-| `avatar.tsx` | BoffAvatar, BoffAvatarGroup |
-| `badge.tsx` | BoffBadge |
-| `breadcrumb.tsx` | Breadcrumb |
-| `button.tsx` | BoffButton |
-| `callout.tsx` | Callout |
-| `card.tsx` | BoffCard |
-| `checkbox.tsx` | BoffCheckbox |
-| `code-block.tsx` | CodeBlock |
-| `copy-button.tsx` | CopyButton |
-| `dialog.tsx` | BoffModal |
-| `doc-toc.tsx` | DocTOC |
-| `empty-state.tsx` | EmptyState |
-| `expandable-card.tsx` | ExpandableCard |
-| `field.tsx` | Field |
-| `hp-bar.tsx` | HpBar |
-| `icon-box.tsx` | IconBox |
-| `icon.tsx` | Icon |
-| `input.tsx` | BoffInput |
-| `kicker.tsx` | Kicker |
-| `pagination.tsx` | Pagination |
-| `picker.tsx` | Picker |
-| `popover.tsx` | BoffPopover |
-| `progress.tsx` | BoffProgress, BoffRing |
-| `radio-group.tsx` | RadioGroup |
-| `search-input.tsx` | SearchInput |
-| `searchable-list.tsx` | SearchableList |
-| `seg-tabs.tsx` | SegTabs |
-| `segmented.tsx` | Segmented |
-| `skeleton.tsx` | BoffSkeleton |
-| `slider.tsx` | BoffSlider |
-| `spinner.tsx` | BoffSpinner |
-| `stat.tsx` | Stat |
-| `switch.tsx` | BoffSwitch |
-| `tabs.tsx` | BoffTabs |
-| `tag.tsx` | Tag |
-| `toast-provider.tsx` | ToastProvider, useToast |
-| `tooltip.tsx` | BoffTooltip |
-| `action-bar.tsx` | BoffActionBar |
-
-#### `bs-*` — Battlesim v1 primitives (16 files)
-
-Battle simulation building blocks. Pokemon-type-aware, use battlesim design tokens.
-
-| File | Exports | Description |
-|---|---|---|
-| `bs-data.ts` | TYPES, tyVar, effMult, effLabel, hpColor, aniF, aniB | Type/effectiveness data helpers |
-| `bs-type.tsx` | BSType, BSTypeRow, BSCat | Pokemon type badge + row |
-| `bs-status-chip.tsx` | BSStatusChip | Status condition chip (burn, poison, etc.) |
-| `bs-boost.tsx` | BSBoost | Stat boost/minus indicator |
-| `bs-tera.tsx` | BSTera | Terastallize type indicator |
-| `bs-poke-chip.tsx` | BSPokeChip | Compact pokemon chip with sprite |
-| `bs-move.tsx` | BSMove | Move display with type/category/PP |
-| `bs-log-event.tsx` | BSLogEvent, BSChatRow | Battle log event row |
-| `bs-mon-card.tsx` | BSMonCard | Pokemon battle card |
-| `bs-field-cond.tsx` | BSFieldCond | Field condition chip (weather, terrain, rooms) |
-| `bs-hp-meter.tsx` | BSHpMeter | HP bar with type row, status, boosts |
-| `bs-tracker.tsx` | BSTracker | Team tracker (row of poke chips) |
-| `bs-tray-slot.tsx` | BSTraySlot | Selectable pokemon tray slot with HP bar |
-| `bs-win-prob.tsx` | BSWinProb | Win probability bar (spectator mode) |
-| `bs-timer.tsx` | BSTimer | Turn/game timer display |
-
-#### `bsx-*` — Battlesim v2 primitives (12 files)
-
-Next-gen battle simulation components.
-
-| File | Exports | Description |
-|---|---|---|
-| `bsx-data.ts` | MOVESETS, MON_DATA, freshMon, calcRange, koLabel, speedOrder | V2 data helpers |
-| `bsx-ring.tsx` | BSXRing | Battle ring visualization |
-| `bsx-plate.tsx` | BSXPlate | Battle plate display |
-| `bsx-key.tsx` | BSXKey | Key info display |
-| `bsx-order-rail.tsx` | BSXOrderRail | Speed/order rail |
-| `bsx-plan-chip.tsx` | BSXPlanChip | Plan chip |
-| `bsx-bench-chip.tsx` | BSXBenchChip | Bench pokemon chip |
-| `bsx-tera-btn.tsx` | BSXTeraBtn | Terastallize button |
-| `bsx-tick.tsx` | BSXTick | Tick/check indicator |
-| `bsx-spark.tsx` | BSXSpark | Spark effect |
-| `bsx-score-plate.tsx` | BSXScorePlate | Player score plate with team preview |
-
-#### Tool-kit components (11 files)
-
-Domain components for gaming tools. Should eventually move to `ui/tools/`.
-
-| File | Exports |
-|---|---|
-| `result-badge.tsx` | ResultBadge |
-| `stat-tile.tsx` | StatTile |
-| `split-bar.tsx` | SplitBar |
-| `trend-chart.tsx` | TrendChart |
-| `heat-grid.tsx` | HeatGrid |
-| `tag-pills.tsx` | TagPills |
-| `tool-app.tsx` | ToolApp |
-| `tool-panel.tsx` | ToolPanel |
-| `tool-select.tsx` | ToolSelect |
-| `tool-stat-bars.tsx` | ToolStatBars |
-| `tool-table.tsx` | ToolTable |
-
-#### Other (1 file)
-
-| File | Exports | Notes |
-|---|---|---|
-| `game-panel.tsx` | GamePanel | Generic game panel with title/actions/footer |
-
----
-
-### `layouts/` — Layout shells
-
-| File | Exports | Notes |
-|---|---|---|
-| `GameStageLayout.tsx` | GameStageLayout | Fullscreen-capable game stage with header/rail/dock/statusBar/footer slots |
-
----
-
-### `ui/games/` — Game-related components
-| File | Exports | Notes |
-|---|---|---|
-| `game-card.tsx` | GameCard, GameData | Game selection card with neon glow |
-| `game-header.tsx` | GameHeader | Game page hero header (internal) |
-| `game-hero-banner.tsx` | GameHeroBanner | Full-width hero banner for game pages |
-| `game-page.tsx` | GamePage | Full game landing page template |
-| `game-switcher.tsx` | GameSwitcher | Game context switcher dropdown |
-| `game-tools-layout/` | GameToolsLayout (default) | Layout shell for game tool pages |
-| `├─ index.tsx` | | Main layout with responsive sidebar |
-| `├─ DesktopSidebar.tsx` | DesktopSidebar | Desktop sidebar (internal) |
-| `├─ MobileHeader.tsx` | MobileHeader | Sticky mobile header (internal) |
-| `└─ MobileSidebar.tsx` | MobileSidebar | Slide-in mobile sheet (internal) |
-
-### `ui/tools/` — Tool-related components
-| File | Exports | Notes |
-|---|---|---|
-| `tool-card.tsx` | ToolCard | Tool listing card with icon and features |
-| `tool-card-fav.tsx` | ToolCardFav | ToolCard with favorite overlay |
-| `tool-command.tsx` | ToolCommand | Command palette (Cmd+K) tool search |
-| `tool-row.tsx` | ToolRow | Tool listing as card-style row |
-| `tool-tile.tsx` | ToolTile | Compact tool tile with hue-aware icon |
-| `tool-type-badge.tsx` | ToolsTypeBadge | Pokemon type badge (Spanish) |
-| `featured-tool.tsx` | FeaturedTool | Featured tool hero section |
-| `tools-store.ts` | useFavorites, useRecent | Zustand store for favorites/recents |
-| `fav-star.tsx` | FavStar | Favorite toggle star button |
-| `featured-button.tsx` | FeaturedButton | CTA button variant for featured tools |
-
-#### `ui/tools/datakit/` — shared v3 data-tool kit (`dk-*`)
-The v3 chassis for data tools (VGC Tracker + Meta today; Speed / Torneos next) — the intended v3 home for the legacy `boffmedia-v2` tool-kit primitives (`trend-chart`/`heat-grid`/`split-bar`/`stat-tile`/…). Import from the `datakit` barrel. Built with Tailwind + tokens only (no CSS port); `DkTrend`/`DkHeat` are inline-SVG (client, `ResizeObserver`-measured).
-| File | Exports | Notes |
-|---|---|---|
-| `DkShell.tsx` | DkApp, DkBar, DkSub, DkSubNote, DkBody, DkDivider, DkSpacer, DkTitle, DkBack | Full-height tool chassis (sticky bar + sub-bar + own-scroll body), tool title/back, `--dk-pad` gutter |
-| `DkControls.tsx` | DkSeg, DkSearch, DkChip | Segmented control (+count/size), search field, mono chip — all with the datakit bottom-right cut |
-| `DkStat.tsx` | DkStat, DkSplit | KPI card (tone pos/neg/accent) + win/draw/loss ratio bar |
-| `DkCharts.tsx` | DkTrend, DkHeat | Multi-line progression sparkline (dashed baseline + result dots) + activity heatmap |
-| `DkFeedback.tsx` | DkEmpty, DkSkel, DkSkelList | Dashed empty box + single / list shimmer skeletons |
-| `DkSelect.tsx` | DkSelect | Compact mono `dk-sel` native select (CSS caret, cut) |
-| `DkTable.tsx` | DkTable, DkColumn | Sortable data table (sticky head, `is-click`/`mono` cell hooks) — child-selector styled so callers write plain `<tr>/<td>` |
-| `DkBarList.tsx` | DkBarList, DkBarItem | Ranked labelled bars (moves/items/partners…), peak-relative, optional lead sprite + onClick |
-| `DkType.tsx` | DkType, TYPE_COLORS, typeColor | Pokémon type badge in canonical colour |
-| `DkTeam.tsx` | DkTeam, DkTeamSlot | Compact row of team sprites |
-| `DkCopy.tsx` | DkCopy | Copy-to-clipboard button with confirm |
-| `DkSprite.tsx` | DkSprite | Game-agnostic sprite chip (caller owns URL + onError) |
-| `hooks.ts` | useDkNarrow, useDkLoad | Narrow-viewport (drill-in) + context-switch loading pulse |
-| `utils.ts` | cssVars, DkTone, DK_CUT | CSS-var cast helper + shared 8px cut clip-path |
-
-### `ui/profile/` — User profile components
-| File | Exports | Notes |
-|---|---|---|
-| `achievement-tile.tsx` | AchievementTile | Single achievement badge tile |
-| `activity-item.tsx` | ActivityItem | Activity feed row |
-| `card-title.tsx` | CardTitle | Card section heading with icon |
-| `linked-row.tsx` | LinkedRow | Linked account row (Discord/MC/Steam) |
-| `metric.tsx` | Metric | Key metric display (value + label) |
-| `stat-card.tsx` | StatCard | Stat card with icon, large value, label |
-
-### `ui/leaderboard/` — Leaderboard components
-| File | Exports | Notes |
-|---|---|---|
-| `leaderboard.tsx` | Leaderboard | Full leaderboard card with ranked rows |
-| `leader-row.tsx` | LeaderRow | Single leaderboard row |
-
-### `ui/events/` — Event components
-| File | Exports | Notes |
-|---|---|---|
-| `event-card.tsx` | EventCard | Event listing card with date block |
-
-### `ui/layout/` — Shared layout / chrome
-| File | Exports | Notes |
-|---|---|---|
-| `footer.tsx` | Footer | Site footer with brand, links, newsletter |
-| `marquee.tsx` | Marquee | Auto-scrolling marquee text banner |
-| `icon-button.tsx` | IconButton | Small square icon-only button |
-
-### `ui/navigation/` — Navigation and menus
-| File | Exports | Notes |
-|---|---|---|
-| `FicusNav.tsx` | FicusNav | Main site navigation bar |
-| `DropdownMenu.tsx` | DropdownMenu | Generic dropdown menu |
-| `NotificationPopover.tsx` | NotificationPopover | Notification bell with popover |
-| `ToolsMenu.tsx` | ToolsMenu | Tools section dropdown menu |
-| `WingullMenu.tsx` | WingullMenu | User menu (profile, settings, logout) |
-
-### `ui/system-states/` — System state screens
-Full-page utility screens for loading, errors, offline, etc. Built on `SystemStateShell` + `SystemFloatBg`. Demo-only (showcased in Design System Hub).
-
-| File | Exports | Notes |
-|---|---|---|
-| `index.ts` | barrel | Re-exports all system state components |
-| `system-float-bg.tsx` | SystemFloatBg | Ambient orb background (warm/accent/cool) |
-| `system-state-shell.tsx` | SystemStateShell | Shared page shell with grid centering |
-| `system-loading.tsx` | SystemLoading | Splash with logo, spinner, progress bar |
-| `system-error.tsx` | SystemError | Crash page with collapsible trace + tracking ID |
-| `system-not-found.tsx` | SystemNotFound | 404 with navigation fallbacks |
-| `system-offline.tsx` | SystemOffline | Network loss with auto-reconnect |
-| `system-maintenance.tsx` | SystemMaintenance | Scheduled downtime with ETA |
-| `system-forbidden.tsx` | SystemForbidden | 403 with login prompt |
-| `system-coming-soon.tsx` | SystemComingSoon | Waitlist with email capture |
-| `system-states-demo-empty.tsx` | SystemStatesDemoEmpty | Empty state presets demo |
-| `system-states-demo-skeleton.tsx` | SystemStatesDemoSkeleton | Skeleton loading demo |
-| `system-states-demo-toasts.tsx` | SystemStatesDemoToasts | Toast notification demo |
-
-### `ui/admin/` — Admin panel components (removed)
-The v2 admin shell + CRUD (`admin-layout` + `admin-crud`) were **deleted (Phase 5,
-2026-07-08)** and replaced by the v3 «Señal» admin under
-`app/(boffmedia)/admin/_components/ui/` (`av-kit`/`av-shell`/`av-crud`). See the
-Phase 5 note in the boffmedia-v3 progress section above.
+**Pending:** — (showcase «palabra cinética» `Kinetic` now built → `landing/travesia-fx`, and `FooterCol`/`FooterSocial` extracted from `Footer`, all showcased 2026-07-10). **Blog deferred.** The stale `components/boffmedia-v2/` reference tables were **removed 2026-07-11** (the dir was deleted in Phase 6); the `ui/` table above now covers all 19 live `ui/` subdirs, including the shared `datakit` kit.
 
 ---
 
@@ -403,8 +176,3 @@ Pokemon-specific components. Shared across Boffmedia and SmartRotom.
 | `PokemonTypeIcon.tsx` | PokemonTypeIcon | Pokemon type icon |
 | `PokemonItemImage.tsx` | PokemonItemImage | Pokemon item image |
 
----
-
-## Usage Notes
-
-> ⚠️ **Stale (pre-Phase-6).** The bullets below described the now-deleted `components/boffmedia-v2/` and `boffmedia-old/` directories (removed 2026-07-08) — `UserProfile`/`BoffFooter`, the battlesim `bs-*`/`bsx-*` render primitives, the in-`primitives/` tool-kit, `GamePanel`, `GameStageLayout`, etc. are all gone. Retained only until the tree re-audit rewrites this file against the live `components/boffmedia/` tree.

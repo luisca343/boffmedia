@@ -1,9 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Avatar } from "@/components/boffmedia/primitives/avatar"
-import { Button } from "@/components/boffmedia/primitives/button"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Avatar, Button, Icon } from "@/components/boffmedia/primitives"
 import { SRT_REEL_COLORS, srtTotalTickets, type Sorteo, type SrtParticipant } from "./giveaways-util"
 
 interface ReelCell {
@@ -105,7 +103,7 @@ export function SrtWinnerCard({ sorteo, onReplay }: { sorteo: Sorteo; onReplay?:
   const total = srtTotalTickets(sorteo)
   const odds = total ? (w.tickets / total) * 100 : 0
   return (
-    <div className="relative overflow-hidden border border-solid border-accent-line border-t-[3px] border-t-accent bg-panel px-[26px] pb-[30px] pt-[34px] text-center [clip-path:polygon(0_0,calc(100%_-_16px)_0,100%_16px,100%_100%,0_100%)]">
+    <div className="relative overflow-hidden border border-solid border-accent-line border-t-[3px] border-t-accent bg-panel px-[26px] pb-[30px] pt-[34px] text-center cut-corner [--cut-lg:16px]">
       <span aria-hidden className="pointer-events-none absolute inset-0 z-0 [background:radial-gradient(80%_70%_at_50%_0,var(--accent-soft),transparent_60%)]" />
       <span className="relative z-[1] inline-flex items-center gap-[7px] border border-solid border-accent-line px-[11px] py-1.5 font-mono text-[10px]/none font-bold uppercase tracking-[0.14em] text-accent">
         <Icon name="sparkles" size={12} />

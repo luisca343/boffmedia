@@ -1,6 +1,6 @@
 "use client"
 
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 import { PokemonSprite } from "./ui/PokemonSprite"
 import { cssVars } from "./ui/theme"
 import type { CalcPokemon } from "../_types/calculator"

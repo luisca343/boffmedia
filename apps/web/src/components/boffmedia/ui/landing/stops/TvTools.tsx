@@ -1,8 +1,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
-import { Button } from "@/components/boffmedia/primitives/button"
+import { Icon, Button } from "@/components/boffmedia/primitives"
 import { Decode } from "../travesia-fx"
 import { TvCP } from "../TvCP"
 import { CTA_MONO, CTA_ROW, GLARE, PRI_GLOW } from "../landing-shared"
@@ -27,7 +26,7 @@ export function TvTools() {
           </span>
           <b className="font-mono text-[12px] font-semibold leading-none tracking-[0.05em] text-[#9aa3b2]">toolkit.boff</b>
           <span className="ml-auto inline-flex items-center gap-[7px] font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.1em] text-[rgba(var(--zr),var(--zg),var(--zb),1)] transition-colors duration-[260ms] ease-linear">
-            <i className="h-1.5 w-1.5 rounded-full bg-current animate-[lv4-blink_1.6s_infinite]" />{TV3_TOOLS.length} módulos activos
+            <i className="h-1.5 w-1.5 rounded-full bg-current animate-[lv4-blink_1.6s_infinite] motion-reduce:animate-none" />{TV3_TOOLS.length} módulos activos
           </span>
         </div>
         <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-px bg-line max-[520px]:grid-cols-1">

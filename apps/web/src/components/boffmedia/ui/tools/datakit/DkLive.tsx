@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 
 // live / playing / pending / final / soon status pill. Mirrors `.dk-live`.
 const DK_LIVE: Record<string, [string, string, boolean]> = {
@@ -27,7 +27,7 @@ export function DkLive({ status = "live", label, size = "md" }: { status?: strin
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 whitespace-nowrap border border-solid font-mono font-bold uppercase tracking-[0.14em] [clip-path:polygon(3px_0,100%_0,calc(100%_-_3px)_100%,0_100%)]",
+        "inline-flex items-center gap-1.5 whitespace-nowrap border border-solid font-mono font-bold uppercase tracking-[0.14em] cut [--cut:3px]",
         size === "sm" ? "px-1.5 py-1 text-[8px]/none" : "px-2 py-[5px] text-[9px]/none",
         DK_LIVE_TONE[kind],
       )}

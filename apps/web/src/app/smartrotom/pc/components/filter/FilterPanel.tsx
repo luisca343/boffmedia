@@ -140,7 +140,7 @@ export function FilterPanel({
           </div>
 
           {/* Content */}
-          <div className="p-6 overflow-y-auto max-h-[calc(90vh-100px)]">
+          <div className="p-6 overflow-y-auto max-h-[calc(90vh_-_100px)]">
             <div className="space-y-6">
               
               {/* Search and Sort Section */}

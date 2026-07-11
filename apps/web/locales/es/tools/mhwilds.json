@@ -287,7 +287,9 @@
       "resistances": "Resistencias",
       "ailments": "Estados que inflige",
       "locations": "Ubicaciones",
-      "drops": "Recompensas"
+      "noLocations": "Sin ubicaciones conocidas",
+      "drops": "Recompensas",
+      "noDrops": "Sin recompensas registradas"
     }
   }
 }

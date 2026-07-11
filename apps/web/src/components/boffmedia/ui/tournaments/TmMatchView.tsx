@@ -2,9 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
-import { Button } from "@/components/boffmedia/primitives/button"
-import { toast } from "@/components/boffmedia/primitives/toast"
+import { Icon, Button, toast } from "@/components/boffmedia/primitives"
 import { DkFlag, DkLive, DkSprite, DkType } from "@/components/boffmedia/ui/tools/datakit"
 import type { TnCompetitor } from "./tournaments-util"
 
@@ -53,7 +51,7 @@ function copyText(text: string, msg?: string) {
   toast({ msg: msg || "Copiado al portapapeles", icon: "check", tone: "ok" })
 }
 
-export const TM_CARD = "border border-solid border-line bg-panel [clip-path:polygon(0_0,calc(100%_-_14px)_0,100%_14px,100%_100%,0_100%)]"
+export const TM_CARD = "border border-solid border-line bg-panel cut-corner [--cut-lg:14px]"
 export const TM_CARD_HEAD = "flex items-center justify-between gap-3 border-b border-solid border-line bg-panel-2 px-4 py-[13px]"
 export const TM_CARD_H3 = "m-0 font-mono text-[13px]/none font-bold uppercase tracking-[0.12em] text-txt"
 const CARD = TM_CARD
@@ -64,7 +62,7 @@ const GHUE_BORDER = "border-l-[3px] border-l-[hsl(var(--ghue,28)_60%_50%)]"
 export function TmRoundHeader({ comp, roundNo, tableNo, status, bestOf = 3, scheduledAt }: { comp: TmComp; roundNo: React.ReactNode; tableNo: React.ReactNode; status?: string; bestOf?: number; scheduledAt?: string | null }) {
   const chip = "inline-flex items-center gap-1.5 border border-solid border-line-2 px-[9px] py-[5px] font-mono text-[11px]/none font-semibold text-txt-muted [&_svg]:text-txt-dim"
   return (
-    <div className={cn("flex flex-wrap items-center justify-between gap-3.5 border border-solid border-line bg-panel px-[18px] py-[15px] [clip-path:polygon(0_0,calc(100%_-_14px)_0,100%_14px,100%_100%,0_100%)]", GHUE_BORDER)}>
+    <div className={cn("flex flex-wrap items-center justify-between gap-3.5 border border-solid border-line bg-panel px-[18px] py-[15px] cut-corner [--cut-lg:14px]", GHUE_BORDER)}>
       <div>
         <span className="mb-[9px] block font-display text-[20px]/[1.05] font-extrabold uppercase tracking-[0.02em]">{comp.title}</span>
         <div className="flex flex-wrap gap-2">

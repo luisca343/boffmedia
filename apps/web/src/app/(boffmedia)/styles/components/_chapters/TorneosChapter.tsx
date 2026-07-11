@@ -21,7 +21,7 @@ import {
 import { TN_GROUP, TN_LB, TN_LEAGUE, TN_MATCH, TN_RADIAL_STEPS, TN_SINGLE, TN_SOLO, TN_TEAM, tnRadialRounds } from "./torneos-demo"
 
 const SLIDER =
-  "h-1.5 flex-1 cursor-pointer appearance-none border border-solid border-line-2 bg-base outline-none [&::-webkit-slider-thumb]:h-[18px] [&::-webkit-slider-thumb]:w-[18px] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-panel [&::-webkit-slider-thumb]:bg-accent [&::-webkit-slider-thumb]:[clip-path:polygon(0_0,calc(100%_-_4px)_0,100%_4px,100%_100%,0_100%)] [&::-moz-range-thumb]:h-[18px] [&::-moz-range-thumb]:w-[18px] [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:rounded-none [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-panel [&::-moz-range-thumb]:bg-accent"
+  "h-1.5 flex-1 cursor-pointer appearance-none border border-solid border-line-2 bg-base outline-none [&::-webkit-slider-thumb]:h-[18px] [&::-webkit-slider-thumb]:w-[18px] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-panel [&::-webkit-slider-thumb]:bg-accent [&::-webkit-slider-thumb]:cut-corner [--cut-lg:4px] [&::-moz-range-thumb]:h-[18px] [&::-moz-range-thumb]:w-[18px] [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:rounded-none [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-panel [&::-moz-range-thumb]:bg-accent"
 const CTL_LBL = "flex-none font-mono text-[10px]/none font-bold uppercase tracking-[0.14em] text-txt-dim"
 const CTL_VAL = "min-w-[52px] flex-none text-right font-display text-[22px]/none font-extrabold tabular-nums text-accent-bright"
 

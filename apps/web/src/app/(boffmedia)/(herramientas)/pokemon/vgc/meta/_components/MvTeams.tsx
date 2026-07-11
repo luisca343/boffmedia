@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 import { DkSprite, DkTeam, DkCopy } from "@/components/boffmedia/ui/tools/datakit"
 import { spriteUrl, handleSpriteError } from "@/features/vgc-tracker/types"
 import type { TeamSlot, TeamEntry } from "../_lib/meta-types"

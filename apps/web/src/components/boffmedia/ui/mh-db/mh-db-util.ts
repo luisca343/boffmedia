@@ -1,4 +1,4 @@
-import type { IconName } from "@/components/boffmedia/primitives/icon"
+import type { IconName } from "@/components/boffmedia/primitives"
 
 // v3 «Señal» — MH Wilds Armería / armor-DB shared types + static maps + helpers.
 // Mirrors the presentational bits of v3-mh-db-kit.jsx. The real MHDB data layer

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 import { kvCapsuleArt, kvHeaderArt, kvPlatformMeta, kvReviewColor, kvViaMeta, type KvPlatform, type KvViaKey } from "./keys-util"
 
 const ART_FB = "grid h-full w-full place-items-center text-line-2 [background:repeating-linear-gradient(-45deg,var(--bg-2)_0_10px,var(--panel-2)_10px_20px)]"

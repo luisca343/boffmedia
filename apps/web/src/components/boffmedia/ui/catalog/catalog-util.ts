@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import type { IconName } from "@/components/boffmedia/primitives/icon"
+import type { IconName } from "@/components/boffmedia/primitives"
 import type { LzPlatformKey } from "@/components/boffmedia/ui/calendar"
 
 // v3 «Señal» — Catálogo (game backlog · Backloggd-style) shared types + helpers +

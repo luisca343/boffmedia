@@ -2,8 +2,7 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import { Empty } from "@/components/boffmedia/primitives/empty"
-import { Spinner } from "@/components/boffmedia/primitives/spinner"
+import { Empty, Spinner } from "@/components/boffmedia/primitives"
 import { CategoryTile, ForumStats, OnlineList } from "@/components/boffmedia/ui/community"
 import { useForumCategories } from "@/hooks/forum/useForumCategories"
 import { useForumOnline } from "@/hooks/forum/useForumOnline"

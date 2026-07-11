@@ -3,7 +3,7 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Sample, Section } from "../showcase-shared"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 import { MhFavStar, MhToolTabs } from "@/components/boffmedia/ui/mh-shell"
 import { MHDB } from "./mh-db-demo"
 
@@ -45,7 +45,7 @@ export function MhShellChapter() {
       <Section id="mhshelldmg" kicker="Monster Hunter" title="Laboratorio de daño" lead={<>El Laboratorio cruza un arma con la tabla de hitzones de un monstruo. Cada parte muestra el índice de daño físico + elemental con la mejor resaltada.</>}>
         <Sample title="Selector arma × monstruo" code=".mh-dmgsel" col>
           <div className="flex w-full flex-wrap items-stretch gap-3">
-            <div style={{ "--sh": 15 } as React.CSSProperties} className="flex flex-1 basis-[300px] cursor-pointer items-center gap-3 border border-solid border-line bg-panel px-[14px] py-3 text-left transition-[border-color,background] duration-[140ms] [clip-path:polygon(0_0,calc(100%_-_10px)_0,100%_10px,100%_100%,0_100%)] hover:border-line-2 hover:bg-panel-2">
+            <div style={{ "--sh": 15 } as React.CSSProperties} className="flex flex-1 basis-[300px] cursor-pointer items-center gap-3 border border-solid border-line bg-panel px-[14px] py-3 text-left transition-[border-color,background] duration-[140ms] cut-corner [--cut-lg:10px] hover:border-line-2 hover:bg-panel-2">
               <span className="grid h-11 w-11 flex-none place-items-center border border-solid border-[hsl(var(--sh)_52%_46%/0.4)] bg-[hsl(var(--sh)_52%_46%/0.13)] text-[hsl(var(--sh)_58%_60%)]">
                 <Icon name="sword" size={22} />
               </span>
@@ -59,7 +59,7 @@ export function MhShellChapter() {
               <Icon name="edit" size={16} className="flex-none text-txt-dim" />
             </div>
             <span className="flex-none self-center font-mono text-[11px]/none font-bold uppercase tracking-[0.1em] text-txt-dim">contra</span>
-            <div className="flex flex-1 basis-[300px] cursor-pointer items-center gap-3 border border-solid border-line bg-panel px-[14px] py-3 text-left transition-[border-color,background] duration-[140ms] [clip-path:polygon(0_0,calc(100%_-_10px)_0,100%_10px,100%_100%,0_100%)] hover:border-line-2 hover:bg-panel-2">
+            <div className="flex flex-1 basis-[300px] cursor-pointer items-center gap-3 border border-solid border-line bg-panel px-[14px] py-3 text-left transition-[border-color,background] duration-[140ms] cut-corner [--cut-lg:10px] hover:border-line-2 hover:bg-panel-2">
               <span className="grid h-11 w-11 flex-none place-items-center border border-solid border-[hsl(8_52%_46%/0.4)] bg-[hsl(8_52%_46%/0.13)] text-[hsl(8_58%_60%)]">
                 <Icon name="skull" size={22} />
               </span>

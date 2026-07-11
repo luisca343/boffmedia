@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 import { TrResult, TrBrought, trFmtTime } from "../../_components/ui/tr-ui"
 import { seriesScore } from "@/features/vgc-tracker/types"
 import type { Match, Series } from "@/features/vgc-tracker/types"
@@ -52,7 +52,7 @@ export function TrMatchRow({ match, number, sessionId, eloDelta }: { match: Matc
   )
 }
 
-const DOT = "inline-block h-2 w-2 [clip-path:polygon(2px_0,100%_0,calc(100%_-_2px)_100%,0_100%)]"
+const DOT = "inline-block h-2 w-2 cut [--cut:2px]"
 
 export function TrSeriesRow({ series, number, sessionId }: { series: Series; number: number; sessionId: string }) {
   const t = useTranslations("vgc.tracker")

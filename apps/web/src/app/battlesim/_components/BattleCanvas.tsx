@@ -1,8 +1,7 @@
 "use client"
 import { Battle, Pokemon } from "@pkmn/client";
 import { useTranslations } from "next-intl";
-import { Spinner } from "@/components/boffmedia/primitives/spinner";
-import { Skeleton } from "@/components/boffmedia/primitives/skeleton";
+import { Spinner, Skeleton } from "@/components/boffmedia/primitives"
 import { forwardRef, useCallback, useRef, memo } from "react";
 import { positionsP1, positionsP2, ASPECT_RATIO, getScaleMultiplier } from "../_utils/viewUtils";
 import { PokemonElement, PokemonRefType } from "./PokemonElement";
@@ -152,8 +151,7 @@ export const BattleCanvas = memo(forwardRef(({
                       />
                     </div>
                   )}
-                  
-                  
+
             <div className="h-[20%] lg:h-[15%] xl:h-[13%] w-full absolute top-0 flex justify-between z-10">
             <div className="m-1 w-1/3 flex flex-col items-start gap-1 h-fit z-50">
                     <div className="w-fit border border-solid border-line bg-[color-mix(in_srgb,var(--base)_80%,transparent)] px-2 py-1 font-mono text-[11px] font-bold uppercase leading-none tracking-[0.08em] text-txt backdrop-blur-[3px]">
@@ -170,7 +168,6 @@ export const BattleCanvas = memo(forwardRef(({
                 </div>
             </div>
 
-                
             <div className="h-[20%] md:h-[18%] lg:h-[15%]  w-full absolute bottom-0 flex">
                 <div className="m-1 w-2/3 flex flex-row items-start gap-1">
                     {!fullscreen && <PokemonTeam side={p1}/>}

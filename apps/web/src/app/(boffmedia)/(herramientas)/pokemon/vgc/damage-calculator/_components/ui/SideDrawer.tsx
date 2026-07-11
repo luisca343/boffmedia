@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Icon, type IconName } from "@/components/boffmedia/primitives/icon"
+import { Icon, type IconName } from "@/components/boffmedia/primitives"
 
 // right-side drawer (saved teams, edit slot). Esc closes.
 export function SideDrawer({

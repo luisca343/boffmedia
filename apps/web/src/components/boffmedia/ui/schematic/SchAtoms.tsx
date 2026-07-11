@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 import { SCH_GLYPHS, SCH_STATUS, schColor, schColor2, schGlyphFor, schToneVars, type SchTone } from "./schematic-util"
 
 // Schematic Compat atoms: custom glyph, block thumb, stepper, readiness meter,
@@ -49,7 +49,7 @@ export function SchSteps({ steps, current }: { steps: string[]; current: number 
             <li className="flex items-center gap-[7px]">
               <span
                 className={cn(
-                  "grid h-[22px] w-[22px] flex-none place-items-center border border-solid font-mono text-[11px] font-semibold [clip-path:polygon(0_0,100%_0,100%_calc(100%_-_5px),calc(100%_-_5px)_100%,0_100%)]",
+                  "grid h-[22px] w-[22px] flex-none place-items-center border border-solid font-mono text-[11px] font-semibold cut-tag [--cut-tag:5px]",
                   state === "active" ? "border-accent bg-accent text-accent-ink" : state === "done" ? "border-ok bg-ok-soft text-ok" : "border-line-2 bg-panel text-txt-muted",
                 )}
               >
@@ -137,7 +137,7 @@ export function IsoStage({ selected, caption = "Vista 3D del esquema · WebGL" }
     <div className="relative min-h-[200px] flex-1 overflow-hidden [background:radial-gradient(120%_120%_at_50%_30%,var(--panel)_0%,var(--bg)_80%)]">
       <div aria-hidden className="absolute inset-0 opacity-[0.35] [background-image:linear-gradient(var(--line)_1px,transparent_1px),linear-gradient(90deg,var(--line)_1px,transparent_1px)] [background-size:26px_26px] [mask-image:radial-gradient(120%_90%_at_50%_40%,#000_30%,transparent_85%)]" />
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-        <svg width="120" height="120" viewBox="0 0 120 120" fill="none" className="[filter:drop-shadow(0_8px_24px_color-mix(in_srgb,var(--accent)_30%,transparent))] animate-[schfloat_5s_ease-in-out_infinite]">
+        <svg width="120" height="120" viewBox="0 0 120 120" fill="none" className="[filter:drop-shadow(0_8px_24px_color-mix(in_srgb,var(--accent)_30%,transparent))] animate-[schfloat_5s_ease-in-out_infinite] motion-reduce:animate-none">
           <g stroke="var(--accent-bright)" strokeWidth="1.5" strokeLinejoin="round">
             <path d="M60 16 L100 38 L60 60 L20 38 Z" fill="color-mix(in srgb, var(--accent) 30%, transparent)" />
             <path d="M20 38 L60 60 L60 104 L20 82 Z" fill="color-mix(in srgb, var(--accent) 15%, transparent)" />

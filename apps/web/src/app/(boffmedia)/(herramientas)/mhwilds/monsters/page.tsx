@@ -291,17 +291,19 @@ function MonsterDetail({ m }: { m: MhMonster }) {
       )}
 
       {/* locations */}
-      {m.locations.length > 0 && (
-        <MhPanel title={t("locations")} icon="map">
+      <MhPanel title={t("locations")} icon="map">
+        {m.locations.length > 0 ? (
           <div className="flex flex-wrap gap-1.5">
             {m.locations.map((l) => <Tag2 key={l.id} good>{l.name}</Tag2>)}
           </div>
-        </MhPanel>
-      )}
+        ) : (
+          <BstNone>{t("noLocations")}</BstNone>
+        )}
+      </MhPanel>
 
       {/* drops */}
-      {drops.length > 0 && (
-        <MhPanel title={t("drops")} icon="gift" count={drops.length}>
+      <MhPanel title={t("drops")} icon="gift" count={drops.length || undefined}>
+        {drops.length > 0 ? (
           <div className="flex flex-col gap-[5px]">
             {drops.map((d) => {
               const tone = chanceTone(d.chance)
@@ -323,10 +325,16 @@ function MonsterDetail({ m }: { m: MhMonster }) {
               )
             })}
           </div>
-        </MhPanel>
-      )}
+        ) : (
+          <BstNone>{t("noDrops")}</BstNone>
+        )}
+      </MhPanel>
     </div>
   )
+}
+
+function BstNone({ children }: { children: React.ReactNode }) {
+  return <p className="m-0 py-1 font-mono text-[11.5px] leading-[1.5] text-txt-dim">{children}</p>
 }
 
 function StatRow({ k, v }: { k: React.ReactNode; v: React.ReactNode }) {

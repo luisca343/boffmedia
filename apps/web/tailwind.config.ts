@@ -95,9 +95,12 @@ const config: Config = {
       },
       colors: {
         // ════════════════════════════════════════════════════════════════════
-        // LEGACY (Neon/v2) TOKEN VOCABULARY — @deprecated, do not use in new
-        // Boffmedia code. Kept only for not-yet-migrated `boffmedia-v2` and
-        // shadcn-compat components. The CURRENT v3 vocabulary is further down:
+        // LEGACY (Neon/v2) TOKEN VOCABULARY — @deprecated for Boffmedia v3, do
+        // NOT use in new Boffmedia code. `boffmedia-v2` is deleted, but these
+        // tokens are still live infrastructure for the OTHER design systems that
+        // share this one config: SmartRotom, wingull, and the shadcn-compat
+        // `components/ui` layer (hundreds of consumers). Not prunable until those
+        // migrate. The CURRENT Boffmedia v3 vocabulary is further down:
         // base/panel/line/txt/accent/ok/warn/bad/signal.
         // ════════════════════════════════════════════════════════════════════
 

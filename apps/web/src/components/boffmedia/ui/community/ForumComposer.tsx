@@ -1,9 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Button } from "@/components/boffmedia/primitives/button"
-import { Input, Textarea } from "@/components/boffmedia/primitives/input"
-import { Seg } from "@/components/boffmedia/primitives/seg"
+import { Button, Input, Textarea, Seg } from "@/components/boffmedia/primitives"
 import { ForumMarkdown } from "./ForumMarkdown"
 
 // Matches the forum write DTOs (create-thread / create-post / edit-post).

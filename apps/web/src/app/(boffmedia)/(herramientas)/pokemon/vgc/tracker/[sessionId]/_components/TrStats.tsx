@@ -9,7 +9,7 @@ import { useComparisonElo } from "@/features/vgc-tracker/hooks/useComparisonElo"
 import { useRegulationMeta } from "@/features/vgc-tracker/hooks/useRegulationMeta"
 import type { PokemonUsage, LeadPairStats } from "@/features/vgc-tracker/utils/sessionStats"
 import type { Session } from "@/features/vgc-tracker/types"
-import { Spinner } from "@/components/boffmedia/primitives/spinner"
+import { Spinner } from "@/components/boffmedia/primitives"
 import { TrPanel, TrSprite, TrSub, TrNone } from "../../_components/ui/tr-ui"
 
 type TableTab = "myTeam" | "preview" | "leads" | "backs"

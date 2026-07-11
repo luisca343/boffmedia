@@ -1,7 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 import type { SuggestFormData } from "./SuggestEventView"
 
 function fmtDate(value: string): string | null {

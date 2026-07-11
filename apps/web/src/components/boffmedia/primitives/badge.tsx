@@ -5,7 +5,7 @@ export type BadgeTone = "default" | "live" | "new" | "ok" | "warn" | "bad" | "in
 
 const TONES: Record<BadgeTone, string> = {
   default: "bg-panel-2 border-line-2 text-txt-muted",
-  live: "bg-accent border-accent text-accent-ink animate-[bm-pulse_2s_ease-in-out_infinite]",
+  live: "bg-accent border-accent text-accent-ink animate-[bm-pulse_2s_ease-in-out_infinite] motion-reduce:animate-none",
   new: "bg-accent-soft border-accent-line text-accent",
   ok: "bg-ok-soft border-transparent text-ok",
   warn: "bg-warn-soft border-transparent text-warn",

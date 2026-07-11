@@ -1,4 +1,4 @@
-import type { IconName } from "@/components/boffmedia/primitives/icon"
+import type { IconName } from "@/components/boffmedia/primitives"
 
 // v3 «Señal» — Sorteos (giveaways) shared types + helpers. Mirrors the window
 // helpers from v3-sorteos-data.jsx (srtStatus/srtHue/srtNum/srtOdds…). The

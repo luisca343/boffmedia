@@ -1,6 +1,6 @@
-import { getLandingItems } from "@/data/games"
+import { getLandingItems, getToolHref } from "@/data/games"
 import { HUB_SLUGS } from "@/components/boffmedia/ui/tools/tools-data"
-import type { IconName } from "@/components/boffmedia/primitives/icon"
+import type { IconName } from "@/components/boffmedia/primitives"
 
 /* Journey palette — each stop tints the sky; color interpolates continuously
    between stops so there are no hard edges between sections. */
@@ -24,8 +24,9 @@ export const TV3_STOPS = [
   { id: "tv-meta", n: "06", t: "Meta" },
 ]
 
-// TODO(real-data): editorial placeholders until live stats/feed/event APIs
-// exist — tracked in BOFFMEDIA_V3_ROADMAP.md (Phase 3).
+// Fallback for the landing HUD only — `TvHero` renders real site stats from
+// `useSiteStats` (GET /stats/site) and drops to these while the API loads or is
+// unavailable, so the hero stays visually stable.
 export const TV3_HUD = [
   { k: "Partida", big: "412", suf: "+", sub: "jugadores activos", live: true },
   { k: "Temporada", big: "04", sub: "en emisión" },
@@ -42,22 +43,28 @@ interface Tv3Tool {
   href: string
 }
 
+// Curated landing feature list — display copy (name/description/icon) is
+// landing-specific, but hrefs derive from the `@/data/games` registry (§10) so a
+// route change follows automatically instead of drifting here.
 export const TV3_TOOLS: Tv3Tool[] = [
-  { ix: "01", n: "BattleSim", d: "Simulador de combates dobles VGC con daño previsto.", ic: "sword", href: "/pokemon/battlesim" },
-  { ix: "02", n: "Calculadora de daño", d: "Rangos VGC y singles al instante, con enlaces.", ic: "calc", href: "/pokemon/vgc/damage-calculator" },
-  { ix: "03", n: "VGC Tracker", d: "Registra partidas y analiza tu rendimiento.", ic: "chart", href: "/pokemon/vgc/tracker" },
-  { ix: "04", n: "Análisis de Meta", d: "Uso, tendencias y detalle por especie del meta VGC.", ic: "trending", href: "/pokemon/vgc/meta" },
-  { ix: "05", n: "Claves de Steam", d: "Catálogo de claves para sorteos y entregas.", ic: "key", href: "/otros/keys" },
-  { ix: "06", n: "TCG Pocket", d: "Colección, sobres y combates del TCG Pocket.", ic: "cards", href: "/pokemon/tcgpocket" },
+  { ix: "01", n: "BattleSim", d: "Simulador de combates dobles VGC con daño previsto.", ic: "sword", href: getToolHref("pokemon", "battlesim") },
+  { ix: "02", n: "Calculadora de daño", d: "Rangos VGC y singles al instante, con enlaces.", ic: "calc", href: getToolHref("pokemon", "damageCalc") },
+  { ix: "03", n: "VGC Tracker", d: "Registra partidas y analiza tu rendimiento.", ic: "chart", href: getToolHref("pokemon", "tracker") },
+  { ix: "04", n: "Análisis de Meta", d: "Uso, tendencias y detalle por especie del meta VGC.", ic: "trending", href: getToolHref("pokemon", "meta") },
+  { ix: "05", n: "Claves de Steam", d: "Catálogo de claves para sorteos y entregas.", ic: "key", href: getToolHref("otros", "keys") },
+  { ix: "06", n: "TCG Pocket", d: "Colección, sobres y combates del TCG Pocket.", ic: "cards", href: getToolHref("pokemon", "tcgPanel") },
 ]
 
 export const TV3_FEATS = ["Multiplataforma", "Pokédex viva", "Economía en vivo", "Mensajería"]
 
-// TODO(real-data): placeholder event until the events API feeds the landing.
+// Fallback next-event only — `TvTorneos` shows the real next upcoming event
+// (useGetEvents) and drops to this while events load or if none are scheduled.
 export const TV3_EVENT = { title: "Torneo Regional — Wingull 2", date: "14 JUL 2026 · 18:00" }
 export const TV3_EVENT_TS = new Date("2026-07-14T18:00:00").getTime()
 
-// TODO(real-data): placeholder cards/feed until community data feeds the landing.
+// TV3_GAMES stays editorial (no games-showcase API). TV3_FEED below is only the
+// fallback for `TvComunidad`'s activity ticker, which renders real activity from
+// `useSiteActivity` (GET /activity) when available.
 export const TV3_GAMES = [
   { n: "Pixelmon Wingull 2", d: "La aventura Pokémon definitiva dentro de Minecraft.", tag: "Insignia — Temporada 04", img: "/img/personajes.webp" },
   { n: "Minecraft Bingo", d: "Carreras de objetivos por equipos, ediciones rápidas.", tag: "Competitivo — Semanal", ph: "Minecraft Bingo" },

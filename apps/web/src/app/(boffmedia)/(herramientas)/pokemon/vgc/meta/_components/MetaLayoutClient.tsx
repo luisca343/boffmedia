@@ -4,7 +4,7 @@ import { useMemo, useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { DkApp, DkBody, useDkNarrow } from "@/components/boffmedia/ui/tools/datakit";
-import { Icon } from "@/components/boffmedia/primitives/icon";
+import { Icon } from "@/components/boffmedia/primitives"
 import { VgcMetaService } from "@/services/api/boffmedia/vgcService";
 import { useSmogonSnapshots } from "../_hooks/useSmogonSnapshots";
 import { useSmogonUsage } from "../_hooks/useSmogonUsage";

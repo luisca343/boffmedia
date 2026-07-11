@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon, type IconName } from "@/components/boffmedia/primitives/icon"
+import { Icon, type IconName } from "@/components/boffmedia/primitives"
 import { MewFaction, MewKind, MewRarity, MewStats, MewText, MewTile } from "./MewAtoms"
 import { MEW, MEW_KIND_LABEL, mewClip, mewHueFor, mewHuman, type MewRec } from "./mew-util"
 

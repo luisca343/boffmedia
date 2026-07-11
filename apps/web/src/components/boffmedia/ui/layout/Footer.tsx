@@ -2,8 +2,7 @@ import * as React from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useTranslations } from "next-intl"
-import { Icon, type IconName } from "@/components/boffmedia/primitives/icon"
-import { Clock } from "@/components/boffmedia/primitives/clock"
+import { Icon, Clock, type IconName } from "@/components/boffmedia/primitives"
 import { FOOTER_COLS, FOOTER_SOCIAL } from "@/components/boffmedia/ui/navigation/nav-data"
 
 /** A single footer link target (already resolved — label passed separately). */
@@ -123,7 +122,7 @@ export function Footer() {
           </span>
           <div className="ml-auto flex items-center gap-[18px] uppercase max-[619px]:ml-0 max-[619px]:w-full">
             <span className="inline-flex items-center gap-[7px] tabular-nums text-txt-muted">
-              <i aria-hidden="true" className="h-[7px] w-[7px] rounded-full bg-ok animate-[bm-livedot_2s_ease-in-out_infinite]" />
+              <i aria-hidden="true" className="h-[7px] w-[7px] rounded-full bg-ok animate-[bm-livedot_2s_ease-in-out_infinite] motion-reduce:animate-none" />
               <Clock />
             </span>
             <span>Madrid · UTC+2</span>

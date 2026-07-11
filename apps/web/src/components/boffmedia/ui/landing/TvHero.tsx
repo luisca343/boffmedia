@@ -2,9 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Kicker } from "@/components/boffmedia/primitives/kicker"
-import { Button } from "@/components/boffmedia/primitives/button"
-import { CountUp } from "@/components/boffmedia/primitives/count-up"
+import { Kicker, Button, CountUp } from "@/components/boffmedia/primitives"
 import { Decode, FxParticles } from "./travesia-fx"
 import { BEAMS, Grain, LINE_INNER, LINE_MASK, PRI_GLOW, tvGoTo } from "./landing-shared"
 import { TV3_HUD } from "./landing-data"
@@ -90,7 +88,7 @@ export function TvHero({ lvl, density }: { lvl: number; density: number }) {
                 className="relative min-w-[150px] border border-solid border-line px-4 pb-[13px] pt-3.5 backdrop-blur-[6px] [background:rgba(10,12,16,0.6)] cut-tag [--cut-tag:9px] before:absolute before:bottom-0 before:left-0 before:top-0 before:w-[3px] before:bg-accent before:content-[''] [[data-theme=light]_&]:[background:rgba(255,255,255,0.6)]"
               >
                 <span className="inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.12em] text-txt-dim">
-                  {h.live && <i className="h-1.5 w-1.5 rounded-full bg-ok animate-[lv4-blink_1.6s_infinite]" aria-hidden="true" />}
+                  {h.live && <i className="h-1.5 w-1.5 rounded-full bg-ok animate-[lv4-blink_1.6s_infinite] motion-reduce:animate-none" aria-hidden="true" />}
                   {h.k}
                 </span>
                 <span className="mb-[3px] mt-2 block font-display text-[30px] font-extrabold leading-none text-txt tabular-nums">
@@ -120,7 +118,7 @@ export function TvHero({ lvl, density }: { lvl: number; density: number }) {
           <img className="relative z-[2] w-[min(100%,500px)] max-[980px]:w-[min(80%,360px)] [filter:drop-shadow(0_26px_44px_rgba(0,0,0,0.55))_drop-shadow(0_0_56px_rgba(255,92,10,0.30))] [[data-theme=light]_&]:[filter:drop-shadow(0_22px_38px_rgba(20,23,28,0.28))_drop-shadow(0_0_46px_rgba(240,78,0,0.22))] [@media(pointer:fine)_and_(prefers-reduced-motion:no-preference)]:will-change-transform [@media(pointer:fine)_and_(prefers-reduced-motion:no-preference)]:[transform:perspective(950px)_rotateY(calc(var(--mx,0)*9deg))_rotateX(calc(var(--my,0)*-7deg))] opacity-[0.67]" src="/img/boff-logo.webp" alt="" aria-hidden="true" />
 
           <div className="absolute left-[-6%] top-[12%] z-[3] inline-flex items-center gap-2 border border-solid border-line-2 border-l-[3px] border-l-accent px-3 py-2 font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.1em] text-[#f2f4f8] [background:rgba(0,0,0,0.82)] cut-tag [--cut-tag:7px] animate-[tv-bob_5s_ease-in-out_infinite] [.no-motion_&]:animate-none [[data-theme=light]_&]:[background:rgba(16,19,24,0.9)] max-[980px]:left-0">
-            <i className="h-1.5 w-1.5 rounded-full bg-ok animate-[lv4-blink_1.6s_infinite]" />
+            <i className="h-1.5 w-1.5 rounded-full bg-ok animate-[lv4-blink_1.6s_infinite] motion-reduce:animate-none" />
             Recorrido activo
           </div>
           <div className="absolute bottom-[16%] right-[-4%] z-[3] inline-flex items-center gap-2 border border-solid border-line-2 border-l-[3px] border-l-accent px-3 py-2 font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.1em] text-[#f2f4f8] [animation-delay:-2.5s] [background:rgba(0,0,0,0.82)] cut-tag [--cut-tag:7px] animate-[tv-bob_5s_ease-in-out_infinite] [.no-motion_&]:animate-none [[data-theme=light]_&]:[background:rgba(16,19,24,0.9)] max-[980px]:right-0">
