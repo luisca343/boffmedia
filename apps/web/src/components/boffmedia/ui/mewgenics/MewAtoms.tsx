@@ -4,6 +4,7 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Icon, type IconName } from "@/components/boffmedia/primitives"
 import { MEW, MEW_KIND_LABEL, MEW_TOKEN_ICON, mewHueFor, mewHuman, mewIsRawKey, mewMonogram, mewParseText, mewTokenLabel, type MewRec } from "./mew-util"
+import { mewArtSrc } from "./mew-art"
 
 // Mewgenics «Papel y tinta» atoms: tokened text, art tile, rarity/faction/kind
 // stickers, crayon stat bars, entity refs, the generic effect renderer and the
@@ -23,7 +24,7 @@ export function MewText({ children, muted, className }: { children?: React.React
   const raw = children == null ? "" : String(children)
   if (!raw || mewIsRawKey(raw)) return null
   return (
-    <div className={cn("flex flex-col gap-[3px] text-[14px]/[1.52] font-medium [font-family:var(--mwf-hand)]", muted && "text-[13px] text-[color:var(--mwp-ink-soft)]", className)}>
+    <div className={cn("flex flex-col gap-[3px] text-[14px]/[1.52] font-medium [font-family:var(--mwf-hand)] min-[1600px]:text-[15.5px]", muted && "text-[13px] text-[color:var(--mwp-ink-soft)] min-[1600px]:text-[14px]", className)}>
       {raw.split(/\n/).map((ln, li) => (
         <span className="block" key={li}>
           {mewParseText(ln).map((seg, i) => {
@@ -40,14 +41,22 @@ export function MewText({ children, muted, className }: { children?: React.React
 export function MewTile({ cat, rec, size = 44, glyph }: { cat: string; rec: MewRec; size?: number; glyph?: IconName }) {
   const hue = mewHueFor(cat, rec)
   const ico = glyph || (MEW.catBy[cat] ? (MEW.catBy[cat].icon as IconName) : "info")
+  const [err, setErr] = React.useState(false)
+  const art = err ? null : mewArtSrc(cat, rec)
   return (
     <span aria-hidden style={{ "--h": hue, width: size, height: size } as React.CSSProperties} className="relative grid flex-none place-items-center overflow-hidden border-2 border-solid border-[hsl(var(--h)_45%_27%)] text-[hsl(var(--h)_50%_28%)] [background:radial-gradient(120%_120%_at_30%_18%,hsl(var(--h)_58%_88%),hsl(var(--h)_46%_74%))] [border-radius:48%_52%_45%_55%/55%_45%_52%_48%]">
-      <span className="mt-[8%] text-[hsl(var(--h)_55%_22%)] [font-family:var(--mwf-disp)]" style={{ fontSize: Math.max(12, Math.min(24, Math.round(size * 0.44))) }}>
-        {mewMonogram(rec.name, rec.id)}
-      </span>
-      <span className="absolute bottom-[5%] right-[8%] text-[hsl(var(--h)_45%_28%/0.55)]">
-        <Icon name={ico} size={Math.round(size * 0.34)} />
-      </span>
+      {art ? (
+        <img src={art} alt="" loading="lazy" onError={() => setErr(true)} className="block h-full w-full object-contain p-[9%] [filter:drop-shadow(0_2px_3px_rgba(51,37,61,0.35))]" />
+      ) : (
+        <>
+          <span className="mt-[8%] text-[hsl(var(--h)_55%_22%)] [font-family:var(--mwf-disp)]" style={{ fontSize: Math.max(12, Math.min(24, Math.round(size * 0.44))) }}>
+            {mewMonogram(rec.name, rec.id)}
+          </span>
+          <span className="absolute bottom-[5%] right-[8%] text-[hsl(var(--h)_45%_28%/0.55)]">
+            <Icon name={ico} size={Math.round(size * 0.34)} />
+          </span>
+        </>
+      )}
     </span>
   )
 }
@@ -166,7 +175,7 @@ export function MewPanel({ title, icon, count, aside, children, className }: { t
               <Icon name={icon} size={14} />
             </span>
           )}
-          {title && <h3 className="m-0 text-[14.5px]/none tracking-[0.05em] text-[color:var(--mwp-ink)] [font-family:var(--mwf-disp)]">{title}</h3>}
+          {title && <h3 className="m-0 text-[14.5px]/none tracking-[0.05em] text-[color:var(--mwp-ink)] [font-family:var(--mwf-disp)] min-[1600px]:text-[16.5px]">{title}</h3>}
           {count != null && <span className="bg-[color:var(--mwp-red)] px-[7px] py-[3px] font-mono text-[10.5px]/none font-bold text-[color:var(--mwp-paper)] [border-radius:10px_8px_11px_9px] [transform:rotate(2deg)]">{count}</span>}
           <span className="flex-1" />
           {aside}
