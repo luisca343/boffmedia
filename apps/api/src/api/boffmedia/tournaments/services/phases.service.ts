@@ -34,7 +34,7 @@ export class PhasesService {
       tournamentId: t.id,
       phaseOrder: 1,
       name: 'Fase única',
-      format: t.format === 'groups' ? 'roundrobin' : t.format,
+      format: t.format,
       tiebreakProfile: 'points',
     });
   }
@@ -77,7 +77,10 @@ export class PhasesService {
         'name',
         'format',
         'bestOf',
+        'finalsBestOf',
         'rounds',
+        'groupCount',
+        'thirdPlace',
         'carryStandings',
         'advanceType',
         'advanceCount',
@@ -87,6 +90,11 @@ export class PhasesService {
         'endDate',
       ] as (keyof UpdatePhaseDto)[]
     ).forEach(set);
+    if ((patch.format ?? ph.format) === 'groups' && (patch.carryStandings ?? ph.carryStandings)) {
+      throw new BadRequestException(
+        'A groups phase cannot carry standings — records are per group',
+      );
+    }
     await this.repo.updatePhase(phaseId, patch);
     return this.mustFindPhase(phaseId);
   }
@@ -114,13 +122,21 @@ export class PhasesService {
     order: number,
     dto: CreatePhaseDto,
   ): typeof boffMediaTournamentPhases.$inferInsert {
+    if (dto.format === 'groups' && dto.carryStandings) {
+      throw new BadRequestException(
+        'A groups phase cannot carry standings — records are per group',
+      );
+    }
     return {
       tournamentId,
       phaseOrder: order,
       name: dto.name,
       format: dto.format,
       bestOf: dto.bestOf ?? null,
+      finalsBestOf: dto.finalsBestOf ?? null,
       rounds: dto.rounds ?? null,
+      groupCount: dto.groupCount ?? null,
+      thirdPlace: dto.thirdPlace ?? false,
       carryStandings: dto.carryStandings ?? false,
       advanceType: dto.advanceType ?? null,
       advanceCount: dto.advanceCount ?? null,

@@ -33,10 +33,13 @@ export class TournamentsService {
       maxParticipants: dto.maxParticipants ?? null,
       registrationOpen: dto.registrationOpen ?? false,
       bestOf: dto.bestOf ?? 1,
+      autoVerifyMinutes: dto.autoVerifyMinutes ?? null,
       groupCount: dto.groupCount ?? null,
       advanceCount: dto.advanceCount ?? null,
       description: dto.description ?? null,
       rules: dto.rules ?? null,
+      prizes: dto.prizes ?? null,
+      checkInOpen: dto.checkInOpen ?? false,
       banner: dto.banner ?? null,
       icon: dto.icon ?? null,
       hue: dto.hue ?? null,
@@ -78,6 +81,21 @@ export class TournamentsService {
     return rows.map((r) => this.toSummary(r, counts.get(r.id) ?? 0));
   }
 
+  /** Tournaments the caller has entered (profile panel), newest first. */
+  async mine(
+    userId: number,
+  ): Promise<(TournamentSummary & { myStatus: string; isChampion: boolean })[]> {
+    const rows = await this.repo.listByParticipantUser(userId);
+    const counts = await this.repo.participantCounts(rows.map((r) => r.id));
+    return rows.map((r) => ({
+      ...this.toSummary(r, counts.get(r.id) ?? 0),
+      myStatus: r.myStatus,
+      isChampion:
+        r.championParticipantId != null &&
+        r.championParticipantId === r.myParticipantId,
+    }));
+  }
+
   async update(id: number, dto: UpdateTournamentDto): Promise<Tournament> {
     await this.getById(id);
     const patch: Partial<typeof boffMediaTournaments.$inferInsert> = {};
@@ -97,10 +115,13 @@ export class TournamentsService {
         'maxParticipants',
         'registrationOpen',
         'bestOf',
+        'autoVerifyMinutes',
         'groupCount',
         'advanceCount',
         'description',
         'rules',
+        'prizes',
+        'checkInOpen',
         'banner',
         'icon',
         'hue',

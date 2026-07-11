@@ -11,6 +11,7 @@ import {
   TnCrosstable,
   TnLeaderboard,
   TnEntrant,
+  TnPairings,
   type TnStanding,
 } from "@/components/boffmedia/ui/tournaments"
 import type {
@@ -84,12 +85,24 @@ function PhaseBody({
   switch (format) {
     case "single":
       return (
-        <Scroll>
-          <DkBracket
-            rounds={A.bracketRounds(view.rounds)}
-            renderMatch={(m) => <TnBracketMatch m={m} champion={champion} />}
-          />
-        </Scroll>
+        <div className="grid gap-4">
+          <Scroll>
+            <DkBracket
+              rounds={A.bracketRounds(view.rounds)}
+              renderMatch={(m) => <TnBracketMatch m={m} champion={champion} />}
+            />
+          </Scroll>
+          {view.thirdPlace && (
+            <div className="grid gap-1.5">
+              <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-txt-dim">
+                Tercer puesto
+              </span>
+              <div className="max-w-[280px]">
+                <TnBracketMatch m={A.match(view.thirdPlace)} champion={null} />
+              </div>
+            </div>
+          )}
+        </div>
       )
     case "double":
       return (
@@ -186,8 +199,15 @@ function qualifiedIds(
     return new Set(
       standings.slice(0, advance.count ?? standings.length).map((s) => s.c.id),
     )
-  // record: everyone at ≤ maxLosses, optionally capped by standings order.
   const cap = advance.maxLosses ?? Number.MAX_SAFE_INTEGER
+  if (advance.type === "top_or_record") {
+    // Union: top N by standings OR anyone at ≤ maxLosses losses.
+    const n = advance.count ?? 0
+    return new Set(
+      standings.filter((s, i) => i < n || s.l <= cap).map((s) => s.c.id),
+    )
+  }
+  // record: everyone at ≤ maxLosses, optionally capped by standings order.
   let elig = standings.filter((s) => s.l <= cap)
   if (advance.count != null) elig = elig.slice(0, advance.count)
   return new Set(elig.map((s) => s.c.id))
@@ -210,23 +230,38 @@ function SwissBlock({
     if (qualified.has(s.c.id)) lastCut = i
   })
 
+  const pairingRounds = (view.rounds ?? []).map((r) => ({
+    round: r[0]?.roundNumber ?? 0,
+    matches: r.map(A.match),
+  }))
+  const [seg, setSeg] = useState<"standings" | "pairings">("standings")
+
+  const standings = (
+    <SwissStandings
+      rows={rows}
+      qualified={qualified}
+      lastCutIndex={advance ? lastCut : -1}
+      dimEliminated={completed}
+      advance={advance}
+    />
+  )
+
+  // No pairings yet → just the standings (no tabs to separate).
+  if (pairingRounds.length === 0) return standings
+
   return (
-    <div className="grid gap-4">
-      <SwissStandings
-        rows={rows}
-        qualified={qualified}
-        lastCutIndex={advance ? lastCut : -1}
-        dimEliminated={completed}
-        advance={advance}
+    <div className="grid gap-3">
+      <DkSeg
+        size="sm"
+        value={seg}
+        onChange={(v) => setSeg(v as "standings" | "pairings")}
+        ariaLabel="Vista del suizo"
+        options={[
+          { value: "standings", label: "Clasificación" },
+          { value: "pairings", label: "Emparejamientos" },
+        ]}
       />
-      {(view.rounds ?? []).length > 0 && (
-        <Scroll>
-          <DkBracket
-            rounds={A.bracketRounds(view.rounds)}
-            renderMatch={(m) => <TnBracketMatch m={m} champion={null} />}
-          />
-        </Scroll>
-      )}
+      {seg === "standings" ? standings : <TnPairings rounds={pairingRounds} />}
     </div>
   )
 }
@@ -252,7 +287,9 @@ function SwissStandings({
       ? `Corte · ${advance.maxLosses ?? 0} derrotas`
       : advance?.type === "top_n"
         ? `Corte · top ${advance.count ?? ""}`
-        : "Corte"
+        : advance?.type === "top_or_record"
+          ? `Corte · top ${advance.count ?? ""} + ${advance.maxLosses ?? 0} derrotas`
+          : "Corte"
 
   return (
     <div className="overflow-x-auto border border-solid border-line bg-panel">

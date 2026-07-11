@@ -39,12 +39,36 @@ export class CreatePhaseDto {
   @Min(1)
   bestOf?: number;
 
+  @ApiPropertyOptional({
+    description:
+      'Best-of override for the decisive match (single: final · double: grand final).',
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  finalsBestOf?: number;
+
   @ApiPropertyOptional({ description: 'Swiss: fixed number of rounds.' })
   @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(1)
   rounds?: number;
+
+  @ApiPropertyOptional({ description: 'Groups: number of groups.' })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  groupCount?: number;
+
+  @ApiPropertyOptional({
+    description: 'Single: also play a third-place match between semifinal losers.',
+  })
+  @IsOptional()
+  @IsBoolean()
+  thirdPlace?: boolean;
 
   @ApiPropertyOptional({ description: 'Fold the previous phase records into this phase.' })
   @IsOptional()

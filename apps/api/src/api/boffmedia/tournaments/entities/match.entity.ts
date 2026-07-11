@@ -1,13 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Competitor } from './competitor.entity';
-import type { MatchBracket, MatchStatus } from '../tournaments.types';
+import type {
+  MatchBracket,
+  MatchStatus,
+  ProposalState,
+} from '../tournaments.types';
 
 /** Maps the web `TnMatch` VM (a bracket seat pairing). */
 export class MatchView {
   @ApiProperty()
   id: number;
 
-  @ApiProperty({ enum: ['winners', 'losers', 'grand', 'group', 'league', 'swiss'] })
+  @ApiProperty({
+    enum: ['winners', 'losers', 'grand', 'group', 'league', 'swiss', 'third'],
+  })
   bracket: MatchBracket;
 
   @ApiProperty()
@@ -33,4 +39,19 @@ export class MatchView {
 
   @ApiProperty({ type: Competitor, nullable: true })
   winner: Competitor | null;
+
+  @ApiProperty({
+    description: 'Effective games-per-match (phase finals may escalate).',
+  })
+  bestOf: number;
+
+  @ApiProperty({ nullable: true, type: String, format: 'date-time' })
+  scheduledAt: string | null;
+
+  @ApiProperty({
+    nullable: true,
+    enum: ['pending', 'disputed'],
+    description: 'Active self-report proposal state, if any.',
+  })
+  proposalState: ProposalState | null;
 }

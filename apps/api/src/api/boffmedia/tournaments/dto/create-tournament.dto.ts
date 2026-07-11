@@ -89,6 +89,17 @@ export class CreateTournamentDto {
   @Min(1)
   bestOf?: number;
 
+  @ApiPropertyOptional({
+    description:
+      'Minutes a self-reported result waits for rival confirmation before ' +
+      'auto-verifying. Null → the platform default (10).',
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  autoVerifyMinutes?: number;
+
   @ApiPropertyOptional({ description: 'Groups format: number of groups.' })
   @IsOptional()
   @Type(() => Number)
@@ -112,6 +123,16 @@ export class CreateTournamentDto {
   @IsOptional()
   @IsString()
   rules?: string;
+
+  @ApiPropertyOptional({ description: 'Prize breakdown (free text).' })
+  @IsOptional()
+  @IsString()
+  prizes?: string;
+
+  @ApiPropertyOptional({ description: 'Player check-in window open.' })
+  @IsOptional()
+  @IsBoolean()
+  checkInOpen?: boolean;
 
   @ApiPropertyOptional()
   @IsOptional()

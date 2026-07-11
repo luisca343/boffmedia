@@ -36,23 +36,21 @@ export class BracketService {
     if (!live) {
       const first = phases[0];
       if (!first) throw new BadRequestException('Tournament has no phases');
-      const active = (await this.repo.listParticipants(t.id)).filter(
-        (p) => p.status === 'active',
-      );
-      if (t.format !== 'leaderboard' && active.length < 2) {
-        throw new BadRequestException('Need at least 2 active participants');
-      }
-      const orderedIds = await this.seed(active, dto);
-      await this.repo.addPhaseEntrants(
-        orderedIds.map((pid, i) => ({
-          phaseId: first.id,
-          participantId: pid,
-          seed: i + 1,
-        })),
-      );
-      await this.buildPhase(t, first, orderedIds, dto);
-      await this.repo.updatePhase(first.id, { status: 'live' });
-      await this.repo.update(t.id, { status: 'live' });
+      await this.activatePhase1(t, first, dto);
+      return;
+    }
+
+    // Phase 1 still previewing (tournament not publicly live) → a re-generate
+    // is a reshuffle: re-seed and re-freeze the entrants. Swiss and the legacy
+    // groups format are excluded — their second call appends structure instead.
+    const minOrder = Math.min(...phases.map((p) => p.phaseOrder));
+    if (
+      t.status !== 'live' &&
+      live.phaseOrder === minOrder &&
+      live.format !== 'swiss' &&
+      t.format !== 'groups'
+    ) {
+      await this.activatePhase1(t, live, dto);
       return;
     }
 
@@ -61,14 +59,43 @@ export class BracketService {
       (e) => e.participantId,
     );
     await this.buildPhase(t, live, orderedIds, dto);
-    await this.repo.update(t.id, { status: 'live' });
+    if (!dto.preview) await this.repo.update(t.id, { status: 'live' });
+  }
+
+  /** Seed + freeze phase-1 entrants and build its structure (also reshuffles). */
+  private async activatePhase1(
+    t: Tournament,
+    phase: TournamentPhase,
+    dto: GenerateBracketDto,
+  ): Promise<void> {
+    await this.repo.clearPhaseEntrants(phase.id);
+    const active = (await this.repo.listParticipants(t.id)).filter(
+      (p) =>
+        p.status === 'active' && (!dto.onlyCheckedIn || p.checkedInAt != null),
+    );
+    if (t.format !== 'leaderboard' && active.length < 2) {
+      throw new BadRequestException('Need at least 2 active participants');
+    }
+    const orderedIds = await this.seed(active, dto);
+    await this.repo.addPhaseEntrants(
+      orderedIds.map((pid, i) => ({
+        phaseId: phase.id,
+        participantId: pid,
+        seed: i + 1,
+      })),
+    );
+    await this.buildPhase(t, phase, orderedIds, dto);
+    await this.repo.updatePhase(phase.id, { status: 'live' });
+    // Preview builds keep the tournament out of the public "live" state.
+    if (!dto.preview) await this.repo.update(t.id, { status: 'live' });
   }
 
   /**
    * Build the structure for one phase from its ordered entrant ids, tagging the
    * new matches with the phase. Reused by phase-1 activation (generate) and by
    * the advancement service when it opens the next phase. Legacy `groups`
-   * tournaments (always single-phase) keep their whole-tournament code path.
+   * tournaments (always single-phase) keep their whole-tournament code path;
+   * `groups` as a PHASE format is the multi-phase group stage.
    */
   async buildPhase(
     t: Tournament,
@@ -76,14 +103,24 @@ export class BracketService {
     orderedIds: number[],
     dto: GenerateBracketDto,
   ): Promise<void> {
-    const format = t.format === 'groups' ? 'groups' : phase.format;
-    switch (format) {
+    if (t.format === 'groups') {
+      const active = (await this.repo.listParticipants(t.id)).filter(
+        (p) => p.status === 'active',
+      );
+      await this.buildGroupsOrKnockout(t, active, dto);
+      await this.repo.assignOrphanMatchesToPhase(t.id, phase.id);
+      return;
+    }
+    switch (phase.format) {
       case 'leaderboard':
         break; // ranking metric only — no structural matches
       case 'single':
         await this.assertPhaseRegenerable(phase.id, dto.force);
         await this.wipePhase(phase.id);
-        await this.buildSingleElim(t.id, orderedIds, 'winners');
+        {
+          const wb = await this.buildSingleElim(t.id, orderedIds, 'winners');
+          if (phase.thirdPlace) await this.addThirdPlaceMatch(t.id, wb);
+        }
         break;
       case 'roundrobin':
         await this.assertPhaseRegenerable(phase.id, dto.force);
@@ -95,18 +132,107 @@ export class BracketService {
         await this.wipePhase(phase.id);
         await this.buildDouble(t.id, orderedIds);
         break;
-      case 'groups': {
-        const active = (await this.repo.listParticipants(t.id)).filter(
-          (p) => p.status === 'active',
-        );
-        await this.buildGroupsOrKnockout(t, active, dto);
+      case 'groups':
+        await this.buildGroupsPhase(t, phase, orderedIds, dto);
         break;
-      }
       case 'swiss':
         await this.buildSwiss(t, phase, orderedIds, dto);
         break;
     }
     await this.repo.assignOrphanMatchesToPhase(t.id, phase.id);
+  }
+
+  /**
+   * Third-place playoff for a single-elim phase: one `third` match fed by both
+   * semifinal losers. Skipped when a semifinal is a bye — its "loser" never
+   * materialises and the playoff could never fill.
+   */
+  private async addThirdPlaceMatch(
+    tournamentId: number,
+    wb: number[][],
+  ): Promise<void> {
+    if (wb.length < 2) return;
+    const semis = wb[wb.length - 2];
+    if (semis.length !== 2) return;
+    for (const id of semis) {
+      const m = await this.repo.findMatch(id);
+      if (!m || m.status === 'bye') return;
+    }
+    const thirdId = await this.repo.insertMatch({
+      tournamentId,
+      bracket: 'third',
+      roundNumber: 1,
+      position: 0,
+      status: 'pending',
+    });
+    await this.repo.updateMatch(semis[0], {
+      loserNextMatchId: thirdId,
+      loserNextMatchSlot: 'top',
+    });
+    await this.repo.updateMatch(semis[1], {
+      loserNextMatchId: thirdId,
+      loserNextMatchSlot: 'bot',
+    });
+  }
+
+  /**
+   * Group-stage PHASE: snake-seed the phase's entrants into `phase.groupCount`
+   * round-robin groups. Regeneration also drops the phase's previous groups
+   * (participants.groupId nulls via FK) so reruns don't duplicate them.
+   */
+  private async buildGroupsPhase(
+    t: Tournament,
+    phase: TournamentPhase,
+    orderedIds: number[],
+    dto: GenerateBracketDto,
+  ): Promise<void> {
+    await this.assertPhaseRegenerable(phase.id, dto.force);
+    await this.wipePhase(phase.id);
+    await this.repo.deleteGroupsByPhase(phase.id);
+
+    const groupCount = Math.max(
+      1,
+      phase.groupCount ??
+        dto.groupCount ??
+        Math.max(1, Math.round(orderedIds.length / 4)),
+    );
+    // For groups phases the phase's advanceCount is PER GROUP (top N of each).
+    const advance = phase.advanceCount ?? dto.advanceCount ?? 2;
+
+    const groupIds: number[] = [];
+    for (let g = 0; g < groupCount; g++) {
+      groupIds.push(
+        await this.repo.createGroup({
+          tournamentId: t.id,
+          phaseId: phase.id,
+          name: `Grupo ${String.fromCharCode(65 + g)}`,
+          advanceCount: advance,
+          order: g,
+        }),
+      );
+    }
+
+    const members: number[][] = groupIds.map(() => []);
+    let gi = 0;
+    let dir = 1;
+    for (const pid of orderedIds) {
+      members[gi].push(pid);
+      await this.repo.updateParticipant(pid, { groupId: groupIds[gi] });
+      gi += dir;
+      if (gi >= groupCount) {
+        gi = groupCount - 1;
+        dir = -1;
+      } else if (gi < 0) {
+        gi = 0;
+        dir = 1;
+      }
+    }
+
+    for (let g = 0; g < groupCount; g++) {
+      if (members[g].length >= 2) {
+        await this.buildLeague(t.id, members[g], 'group', groupIds[g]);
+      }
+    }
   }
 
   // ── seeding ───────────────────────────────────────────────────────────────
@@ -601,15 +727,25 @@ export class BracketService {
       dto.rounds ??
       Math.ceil(Math.log2(Math.max(2, orderedIds.length)));
 
+    // Withdrawn / disqualified entrants are excluded from pairing (they still
+    // appear in standings, dimmed) — otherwise a live player would be paired
+    // against a competitor who has dropped out.
+    const activeIds = new Set(
+      (await this.repo.listParticipants(t.id))
+        .filter((p) => p.status === 'active')
+        .map((p) => p.id),
+    );
+    const activeOrdered = orderedIds.filter((id) => activeIds.has(id));
+
     // Round 1 pairs the frozen entrant order (top half vs bottom half).
     if (swiss.length === 0) {
-      const half = Math.ceil(orderedIds.length / 2);
+      const half = Math.ceil(activeOrdered.length / 2);
       await this.pairSwissRound(
         t.id,
         1,
-        orderedIds
+        activeOrdered
           .slice(0, half)
-          .map((a, i) => [a, orderedIds[i + half] ?? null] as const),
+          .map((a, i) => [a, activeOrdered[i + half] ?? null] as const),
       );
       return;
     }
@@ -650,7 +786,7 @@ export class BracketService {
       }
     }
     const pairing = this.swissPairing(
-      ranked.map((r) => r.participantId),
+      ranked.map((r) => r.participantId).filter((id) => activeIds.has(id)),
       played,
       priorByes,
     );

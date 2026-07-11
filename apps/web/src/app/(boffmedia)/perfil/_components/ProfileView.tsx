@@ -25,11 +25,15 @@ import {
   type StatTileData,
   type TrophyData,
 } from "@/components/boffmedia/ui/profile"
+import Link from "next/link"
+import { cn } from "@/lib/utils"
+import { TnFormatBadge } from "@/components/boffmedia/ui/tournaments"
 import { useBoffSession } from "@/services/useBoffSession"
 import { UsersService } from "@/services/api/boffmedia/usersService"
 import { UploadService } from "@/services/api/smartrotom/uploadService"
 import { useGetLeaderboards } from "@/hooks/events/useGetLeaderboards"
 import { useUserActivity, useUserTrophies } from "@/hooks/profile/useProfileStats"
+import { useMyTournaments } from "@/hooks/tournaments/useMyTournaments"
 
 type FullUser = NonNullable<Awaited<ReturnType<typeof UsersService.getUser>>["data"]>
 
@@ -535,6 +539,60 @@ export function ProfileView({
           )}
         </Panel>
       </div>
+
+      <div className="mt-4">
+        <Panel title={t("section.tournaments")}>
+          <MyTournamentsList />
+        </Panel>
+      </div>
     </main>
+  )
+}
+
+function MyTournamentsList() {
+  const t = useTranslations("profile")
+  const { tournaments, isLoading } = useMyTournaments()
+
+  if (isLoading) {
+    return (
+      <div className="grid place-items-center py-6">
+        <Spinner />
+      </div>
+    )
+  }
+  if (tournaments.length === 0) {
+    return <Empty icon="trophy" title={t("tournaments.emptyTitle")} lead={t("tournaments.emptyBody")} />
+  }
+
+  const STATUS_TONE: Record<string, string> = {
+    active: "text-ok",
+    eliminated: "text-txt-dim",
+    withdrew: "text-txt-dim",
+    disqualified: "text-bad",
+  }
+
+  return (
+    <div className="grid gap-1.5">
+      {tournaments.map((tn) => (
+        <Link
+          key={tn.id}
+          href={`/torneos/${tn.slug}`}
+          className="flex items-center gap-3 border border-solid border-line bg-base px-3 py-2 transition-colors hover:border-line-2"
+        >
+          <TnFormatBadge format={tn.format} size="sm" />
+          <span className="flex-1 truncate font-body text-[13px] font-semibold">{tn.name}</span>
+          {tn.isChampion ? (
+            <span className="font-mono text-[10.5px] font-semibold text-accent-bright">
+              🏆 {t("tournaments.champion")}
+            </span>
+          ) : (
+            <span className={cn("font-mono text-[10.5px] uppercase tracking-[0.06em]", STATUS_TONE[tn.myStatus] ?? "text-txt-dim")}>
+              {t(`tournaments.status.${tn.myStatus}`)}
+            </span>
+          )}
+          <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-txt-dim">{tn.status}</span>
+        </Link>
+      ))}
+    </div>
   )
 }

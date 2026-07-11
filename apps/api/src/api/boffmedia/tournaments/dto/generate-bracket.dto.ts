@@ -44,4 +44,20 @@ export class GenerateBracketDto {
   @IsOptional()
   @IsBoolean()
   force?: boolean;
+
+  @ApiPropertyOptional({
+    description:
+      'Draft preview: build the structure but keep the tournament out of the ' +
+      'public "live" state and skip start announcements.',
+  })
+  @IsOptional()
+  @IsBoolean()
+  preview?: boolean;
+
+  @ApiPropertyOptional({
+    description: 'Keep only checked-in entrants when activating phase 1.',
+  })
+  @IsOptional()
+  @IsBoolean()
+  onlyCheckedIn?: boolean;
 }

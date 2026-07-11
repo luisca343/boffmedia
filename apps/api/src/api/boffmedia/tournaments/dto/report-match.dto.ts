@@ -28,6 +28,16 @@ export class ReportMatchDto {
 
   @ApiPropertyOptional({
     description:
+      'Walkover: the named winner advances by the opponent\'s absence ' +
+      '(no-show / disqualification). Requires winnerParticipantId; scores and ' +
+      'best-of bounds are ignored.',
+  })
+  @IsOptional()
+  @IsBoolean()
+  forfeit?: boolean;
+
+  @ApiPropertyOptional({
+    description:
       'Correct an already-resolved match. Allowed only while its successors ' +
       '(next/loser-next targets, later swiss rounds) are still unplayed.',
   })
