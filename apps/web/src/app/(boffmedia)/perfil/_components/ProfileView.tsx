@@ -8,34 +8,25 @@ import {
   Empty,
   Panel,
   Spinner,
-  toast,
   type IconName,
 } from "@/components/boffmedia/primitives"
 import {
   AccountForm,
   ActivityFeed,
-  LinkedAccounts,
-  LinkedAccountRow,
   ProfileHero,
   StatTile,
   TrophyCase,
-  type AccountFormValues,
   type ActivityData,
   type ProfileMetric,
   type StatTileData,
   type TrophyData,
 } from "@/components/boffmedia/ui/profile"
-import Link from "next/link"
-import { cn } from "@/lib/utils"
-import { TnFormatBadge } from "@/components/boffmedia/ui/tournaments"
 import { useBoffSession } from "@/services/useBoffSession"
-import { UsersService } from "@/services/api/boffmedia/usersService"
-import { UploadService } from "@/services/api/smartrotom/uploadService"
 import { useGetLeaderboards } from "@/hooks/events/useGetLeaderboards"
 import { useUserActivity, useUserTrophies } from "@/hooks/profile/useProfileStats"
-import { useMyTournaments } from "@/hooks/tournaments/useMyTournaments"
-
-type FullUser = NonNullable<Awaited<ReturnType<typeof UsersService.getUser>>["data"]>
+import { useProfileEditor } from "./useProfileEditor"
+import { LinkedAccountsPanel } from "./LinkedAccountsPanel"
+import { MyTournamentsList } from "./MyTournamentsList"
 
 // achievement category → a safe local IconName (mirrors ui/events/AchievementItem)
 const CAT_ICON: Record<string, IconName> = {
@@ -44,9 +35,6 @@ const CAT_ICON: Record<string, IconName> = {
   participation: "users",
   achievement: "star",
 }
-
-const OK_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"]
-const MAX_IMAGE_MB = 5
 
 export function ProfileView({
   discordEnabled = false,
@@ -60,83 +48,29 @@ export function ProfileView({
   const { session, status, update } = useBoffSession()
   const user = session?.user
 
-  const [full, setFull] = React.useState<FullUser | null>(null)
-  const [editing, setEditing] = React.useState(false)
-  const [saving, setSaving] = React.useState(false)
-  const [uploading, setUploading] = React.useState(false)
-  const [coverUploading, setCoverUploading] = React.useState(false)
-  const [avatarOverride, setAvatarOverride] = React.useState<string | null>(null)
-  const [coverOverride, setCoverOverride] = React.useState<string | null>(null)
-  const [values, setValues] = React.useState<AccountFormValues>({ name: "", email: "", bio: "" })
-  const fileRef = React.useRef<HTMLInputElement>(null)
-  const coverRef = React.useRef<HTMLInputElement>(null)
-
   const userId = user?.id ? Number(user.id) : null
   const { leaderboards } = useGetLeaderboards()
   const { trophies } = useUserTrophies(userId)
   const { activity } = useUserActivity(userId, 12)
 
-  const loadFull = React.useCallback(() => {
-    if (!userId) return
-    UsersService.getUser(userId)
-      .then((res) => {
-        if (res.data) setFull(res.data)
-      })
-      .catch((err) => console.error("[perfil] failed to load full profile", err))
-  }, [userId])
-
-  React.useEffect(() => {
-    loadFull()
-  }, [loadFull])
-
-  // Toast the result of a provider link round-trip. The Steam/Discord callbacks
-  // redirect back to /perfil?linked=<p> or ?linked_error=<p>[_taken]; strip the
-  // query afterwards so a refresh doesn't re-fire it.
-  const linkQueryHandled = React.useRef(false)
-  React.useEffect(() => {
-    if (linkQueryHandled.current) return
-    const sp = new URLSearchParams(window.location.search)
-    const linked = sp.get("linked")
-    const err = sp.get("linked_error")
-    if (!linked && !err) return
-    linkQueryHandled.current = true
-    if (linked === "steam") {
-      toast.success(t("linked.steamLinked"))
-      loadFull()
-    } else if (linked === "discord") {
-      toast.success(t("linked.discordLinked"))
-      loadFull()
-    } else if (linked === "google") {
-      toast.success(t("linked.googleLinked"))
-      loadFull()
-    } else if (linked === "twitch") {
-      toast.success(t("linked.twitchLinked"))
-      loadFull()
-    } else if (err === "steam_taken") {
-      toast.error(t("linked.steamTaken"))
-    } else if (err === "discord_taken") {
-      toast.error(t("linked.discordTaken"))
-    } else if (err === "google_taken") {
-      toast.error(t("linked.googleTaken"))
-    } else if (err === "twitch_taken") {
-      toast.error(t("linked.twitchTaken"))
-    } else if (err === "discord") {
-      toast.error(t("linked.discordError"))
-    } else if (err === "google") {
-      toast.error(t("linked.googleError"))
-    } else if (err === "twitch") {
-      toast.error(t("linked.twitchError"))
-    } else if (err) {
-      toast.error(t("linked.steamError"))
-    }
-    window.history.replaceState(null, "", window.location.pathname)
-  }, [t, loadFull])
-
-  React.useEffect(() => {
-    if (user) {
-      setValues({ name: user.name ?? "", email: user.email ?? "", bio: full?.bio ?? "" })
-    }
-  }, [user?.name, user?.email, full?.bio])
+  const {
+    full,
+    editing,
+    setEditing,
+    saving,
+    uploading,
+    coverUploading,
+    avatarOverride,
+    coverOverride,
+    values,
+    setValues,
+    fileRef,
+    coverRef,
+    handleSave,
+    handleFile,
+    handleCoverFile,
+    handleUnlink,
+  } = useProfileEditor({ userId, user, update })
 
   // ── Relative-time formatter (localized) ──────────────────────────────────
   const relTime = React.useCallback(
@@ -159,133 +93,6 @@ export function ProfileView({
     },
     [locale],
   )
-
-  function validateImage(file: File): string | null {
-    if (!OK_IMAGE_TYPES.includes(file.type)) return t("avatar.badType")
-    if (file.size > MAX_IMAGE_MB * 1024 * 1024) return t("avatar.tooBig", { mb: MAX_IMAGE_MB })
-    return null
-  }
-
-  async function handleSave() {
-    if (!userId) return
-    setSaving(true)
-    try {
-      const res = await UsersService.updateUser(userId, {
-        username: values.name,
-        email: values.email,
-        bio: values.bio ?? "",
-      } as never)
-      if (res.success) {
-        setFull((prev) => (prev ? { ...prev, bio: values.bio ?? prev.bio } : prev))
-        try {
-          await update()
-        } catch (err) {
-          console.error("[perfil] session refresh after save failed", err)
-        }
-        toast.success(t("saved"))
-        setEditing(false)
-      } else {
-        toast.error(res.error || t("saveError"))
-      }
-    } catch {
-      toast.error(t("saveError"))
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file || !userId) return
-    const invalid = validateImage(file)
-    if (invalid) {
-      toast.error(invalid)
-      if (fileRef.current) fileRef.current.value = ""
-      return
-    }
-    setUploading(true)
-    try {
-      const up = await UploadService.uploadProfileImage(file, String(userId))
-      if (!up.data?.url) {
-        toast.error(t("avatar.error"))
-        return
-      }
-      const url = up.data.url
-      setAvatarOverride(url) // optimistic — no page reload
-      const res = await UsersService.updateUser(userId, { profilePicture: url } as never)
-      if (!res.success) {
-        setAvatarOverride(null)
-        toast.error(res.error || t("avatar.error"))
-        return
-      }
-      setFull((prev) => (prev ? { ...prev, profilePicture: url } : prev))
-      try {
-        await update() // refresh session (navbar avatar) in place, no reload
-      } catch (err) {
-        console.error("[perfil] session refresh after avatar update failed", err)
-      }
-      toast.success(t("avatar.updated"))
-    } catch {
-      toast.error(t("avatar.error"))
-    } finally {
-      setUploading(false)
-      if (fileRef.current) fileRef.current.value = ""
-    }
-  }
-
-  async function handleCoverFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file || !userId) return
-    const invalid = validateImage(file)
-    if (invalid) {
-      toast.error(invalid)
-      if (coverRef.current) coverRef.current.value = ""
-      return
-    }
-    setCoverUploading(true)
-    try {
-      const up = await UploadService.uploadCoverImage(file, String(userId))
-      if (!up.data?.url) {
-        toast.error(t("cover.error"))
-        return
-      }
-      const url = up.data.url
-      setCoverOverride(url) // optimistic — no page reload
-      const res = await UsersService.updateUser(userId, { coverImage: url } as never)
-      if (!res.success) {
-        setCoverOverride(null)
-        toast.error(res.error || t("cover.error"))
-        return
-      }
-      setFull((prev) => (prev ? { ...prev, coverImage: url } : prev))
-      toast.success(t("cover.updated"))
-    } catch {
-      toast.error(t("cover.error"))
-    } finally {
-      setCoverUploading(false)
-      if (coverRef.current) coverRef.current.value = ""
-    }
-  }
-
-  async function handleUnlink(provider: "google" | "discord" | "steam" | "twitch") {
-    if (!userId) return
-    try {
-      const res = await UsersService.unlinkProvider(userId, provider)
-      if (res.success) {
-        loadFull()
-        try {
-          await update()
-        } catch (err) {
-          console.error("[perfil] session refresh after unlink failed", err)
-        }
-        toast.success(t("linked.unlinkedDone"))
-      } else {
-        toast.error(res.error || t("saveError"))
-      }
-    } catch {
-      toast.error(t("saveError"))
-    }
-  }
 
   if (status === "loading") {
     return (
@@ -373,50 +180,6 @@ export function ProfileView({
     </>
   )
 
-  const linkEnd = (linked: boolean, provider?: "google" | "discord" | "steam" | "twitch") => {
-    if (linked) {
-      if (editing && provider) {
-        return (
-          <Button size="sm" variant="ghost" icon="x" onClick={() => handleUnlink(provider)}>
-            {t("linked.unlink")}
-          </Button>
-        )
-      }
-      return <Badge tone="ok">{t("linked.linked")}</Badge>
-    }
-    // Steam/Google always link via their flow; Discord only when the app is
-    // configured. A full navigation (not client-nav) is required so the route's
-    // redirect to the provider is followed by the browser.
-    const linkHref =
-      provider === "steam"
-        ? "/api/steam/link"
-        : provider === "google"
-          ? "/api/google/link"
-          : provider === "discord" && discordEnabled
-            ? "/api/discord/link"
-            : provider === "twitch" && twitchEnabled
-              ? "/api/twitch/link"
-              : null
-    if (linkHref) {
-      return (
-        <Button
-          size="sm"
-          icon="link"
-          onClick={() => {
-            window.location.href = linkHref
-          }}
-        >
-          {t("linked.link")}
-        </Button>
-      )
-    }
-    return (
-      <Button size="sm" disabled title={t("linked.soon")} icon="link">
-        {t("linked.link")}
-      </Button>
-    )
-  }
-
   return (
     <main className="wrap pb-[90px] pt-[34px]">
       <div className="mb-[22px] flex flex-wrap items-end justify-between gap-[22px]">
@@ -479,50 +242,18 @@ export function ProfileView({
           />
         </Panel>
 
-        <Panel title={t("section.linked")}>
-          <LinkedAccounts>
-            <LinkedAccountRow
-              icon="google"
-              name="Google"
-              hue="#ea4335"
-              linked={!!full?.googleId}
-              sub={full?.googleId ? t("linked.linked") : t("linked.unlinked")}
-              end={linkEnd(!!full?.googleId, "google")}
-            />
-            <LinkedAccountRow
-              icon="discord"
-              name="Discord"
-              hue="#5865F2"
-              linked={!!full?.discordId}
-              sub={full?.discordId ? t("linked.linked") : t("linked.unlinked")}
-              end={linkEnd(!!full?.discordId, "discord")}
-            />
-            <LinkedAccountRow
-              icon="steam"
-              name="Steam"
-              hue="#66c0f4"
-              linked={steamLinked}
-              sub={steamLinked ? t("linked.linked") : t("linked.unlinked")}
-              end={linkEnd(steamLinked, "steam")}
-            />
-            <LinkedAccountRow
-              icon="twitch"
-              name="Twitch"
-              hue="#9146FF"
-              linked={twitchLinked}
-              sub={twitchLinked ? t("linked.linked") : t("linked.unlinked")}
-              end={linkEnd(twitchLinked, "twitch")}
-            />
-            <LinkedAccountRow
-              icon="gamepad"
-              name="Minecraft"
-              hue="#3fbf5f"
-              linked={mcLinked}
-              sub={mcLinked ? (user.smartRotomUser?.username ?? t("linked.linked")) : t("linked.unlinked")}
-              end={mcLinked ? <Badge tone="ok">{t("linked.linked")}</Badge> : linkEnd(false)}
-            />
-          </LinkedAccounts>
-        </Panel>
+        <LinkedAccountsPanel
+          googleId={full?.googleId}
+          discordId={full?.discordId}
+          steamLinked={steamLinked}
+          twitchLinked={twitchLinked}
+          mcLinked={mcLinked}
+          mcUsername={user.smartRotomUser?.username}
+          editing={editing}
+          discordEnabled={discordEnabled}
+          twitchEnabled={twitchEnabled}
+          onUnlink={handleUnlink}
+        />
       </div>
 
       <div className="mt-4 grid items-start gap-4 [grid-template-columns:1.05fr_0.95fr] max-[1080px]:grid-cols-1">
@@ -549,53 +280,5 @@ export function ProfileView({
         </Panel>
       </div>
     </main>
-  )
-}
-
-function MyTournamentsList() {
-  const t = useTranslations("profile")
-  const { tournaments, isLoading } = useMyTournaments()
-
-  if (isLoading) {
-    return (
-      <div className="grid place-items-center py-6">
-        <Spinner />
-      </div>
-    )
-  }
-  if (tournaments.length === 0) {
-    return <Empty icon="trophy" title={t("tournaments.emptyTitle")} lead={t("tournaments.emptyBody")} />
-  }
-
-  const STATUS_TONE: Record<string, string> = {
-    active: "text-ok",
-    eliminated: "text-txt-dim",
-    withdrew: "text-txt-dim",
-    disqualified: "text-bad",
-  }
-
-  return (
-    <div className="grid gap-1.5">
-      {tournaments.map((tn) => (
-        <Link
-          key={tn.id}
-          href={`/torneos/${tn.slug}`}
-          className="flex items-center gap-3 border border-solid border-line bg-base px-3 py-2 transition-colors hover:border-line-2"
-        >
-          <TnFormatBadge format={tn.format} size="sm" />
-          <span className="flex-1 truncate font-body text-[13px] font-semibold">{tn.name}</span>
-          {tn.isChampion ? (
-            <span className="font-mono text-[10.5px] font-semibold text-accent-bright">
-              🏆 {t("tournaments.champion")}
-            </span>
-          ) : (
-            <span className={cn("font-mono text-[10.5px] uppercase tracking-[0.06em]", STATUS_TONE[tn.myStatus] ?? "text-txt-dim")}>
-              {t(`tournaments.status.${tn.myStatus}`)}
-            </span>
-          )}
-          <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-txt-dim">{tn.status}</span>
-        </Link>
-      ))}
-    </div>
   )
 }
