@@ -26,6 +26,15 @@
           "validator": "Validador",
           "history": "Historial de canjes"
         }
+      },
+      "mewgenics": {
+        "title": "Codex Mewgenics",
+        "description": "Base de datos completa de Mewgenics: objetos, bestiario, habilidades, pasivas, estados, eventos, clases y mapas",
+        "features": {
+          "database": "8 categorías del wiki",
+          "search": "Búsqueda y filtros",
+          "crosslinks": "Fichas enlazadas"
+        }
       }
     },
     "externalLinks": {

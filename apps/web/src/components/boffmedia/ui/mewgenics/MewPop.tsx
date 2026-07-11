@@ -31,6 +31,7 @@ export function CxCard({ cat, rec, active, onOpen, view }: { cat: string; rec: M
     <button
       type="button"
       onClick={onOpen}
+      data-cxid={rec.id}
       style={{ "--h": mewHueFor(cat, rec) } as React.CSSProperties}
       className={cn(
         base,
@@ -40,7 +41,7 @@ export function CxCard({ cat, rec, active, onOpen, view }: { cat: string; rec: M
     >
       <MewTile cat={cat} rec={rec} size={view === "list" ? 40 : 48} />
       <span className="flex min-w-0 flex-col gap-[5px]">
-        <span className={cn("overflow-hidden text-[13.5px]/[1.15] font-bold [font-family:var(--mwf-hand)]", view === "list" ? "whitespace-nowrap text-ellipsis" : "[-webkit-box-orient:vertical] [-webkit-line-clamp:2] [display:-webkit-box]")}>{rec.name}</span>
+        <span className={cn("overflow-hidden text-[13.5px]/[1.15] font-bold [font-family:var(--mwf-hand)] min-[1600px]:text-[15px]", view === "list" ? "whitespace-nowrap text-ellipsis" : "[-webkit-box-orient:vertical] [-webkit-line-clamp:2] [display:-webkit-box]")}>{rec.name}</span>
         {meta && <span className="flex max-w-full flex-wrap items-center gap-1">{meta}</span>}
       </span>
       {view === "list" && <Icon name="chevronRight" size={15} className="flex-none text-[color:var(--mwp-ink-soft)]" />}
@@ -276,11 +277,12 @@ export function MewHoverCard({ cat, rec, children }: { cat: string; rec: MewRec;
 }
 
 // The paper pill link used as a hover trigger (mew-ref--link).
-export function MewRefLink({ icon, children }: { icon?: IconName; children: React.ReactNode }) {
+export function MewRefLink({ icon, count, onClick, children }: { icon?: IconName; count?: number; onClick?: () => void; children: React.ReactNode }) {
   return (
-    <button type="button" className="group inline-flex cursor-pointer items-center gap-[5px] border-[1.5px] border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] px-[9px] pb-1 pt-[5px] text-[12px]/[1.15] font-semibold text-[color:var(--mwp-ink)] transition-[color,border-color,transform] duration-[130ms] [box-shadow:0_2px_0_rgba(0,0,0,0.22)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)] hover:border-[color:var(--mwp-red-deep)] hover:text-[color:var(--mwp-red-deep)] hover:[transform:rotate(-1.2deg)_translateY(-1px)]">
+    <button type="button" onClick={onClick} className="group inline-flex cursor-pointer items-center gap-[5px] border-[1.5px] border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] px-[9px] pb-1 pt-[5px] text-[12px]/[1.15] font-semibold text-[color:var(--mwp-ink)] transition-[color,border-color,transform] duration-[130ms] [box-shadow:0_2px_0_rgba(0,0,0,0.22)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)] hover:border-[color:var(--mwp-red-deep)] hover:text-[color:var(--mwp-red-deep)] hover:[transform:rotate(-1.2deg)_translateY(-1px)]">
       {icon && <Icon name={icon} size={12} className="flex-none text-[color:var(--mwp-ink-soft)] group-hover:text-[color:var(--mwp-red)]" />}
       <span className="min-w-0">{children}</span>
+      {count != null && <span className="pl-[3px] font-mono text-[9px]/none font-bold text-[color:var(--mwp-ink-soft)]">{count}</span>}
     </button>
   )
 }
