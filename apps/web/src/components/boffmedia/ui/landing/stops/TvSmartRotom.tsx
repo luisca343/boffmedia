@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Button } from "@/components/boffmedia/primitives/button"
+import { Button } from "@/components/boffmedia/primitives"
 import { Decode } from "../travesia-fx"
 import { TvCP } from "../TvCP"
 import { CTA_ROW, PRI_GLOW } from "../landing-shared"

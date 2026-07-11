@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 import { MhRarity } from "@/app/(boffmedia)/(herramientas)/mhwilds/_components/ui/mh-kit"
 import { MH_COATINGS, MH_ELDERSEAL, MH_NOTE_COLORS, MH_PHIALS, MH_SHARPNESS, sharpnessAt, topSharpColor, type MhWeapon } from "./mh-db-util"
 

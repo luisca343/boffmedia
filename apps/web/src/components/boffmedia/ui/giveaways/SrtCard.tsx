@@ -2,9 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Avatar } from "@/components/boffmedia/primitives/avatar"
-import { Button } from "@/components/boffmedia/primitives/button"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Avatar, Button, Icon } from "@/components/boffmedia/primitives"
 import { Countdown } from "@/components/boffmedia/ui/events/Countdown"
 import { SrtPrizeTag, SrtSourceTag, SrtStatusChip } from "./SrtAtoms"
 import { srtHue, srtNum, srtPrizeMeta, srtStatus, type Sorteo } from "./giveaways-util"
@@ -28,7 +26,7 @@ export function SrtCard({ sorteo, layout, entered, onOpen }: { sorteo: Sorteo; l
       aria-label={sorteo.title}
       style={{ "--ghue": hue } as React.CSSProperties}
       className={cn(
-        "group relative flex cursor-pointer flex-col overflow-hidden border border-solid border-line border-l-4 border-l-[color:var(--ghue)] bg-panel text-left transition-[border-color,background,transform] duration-[140ms] [clip-path:polygon(0_0,100%_0,100%_calc(100%_-_14px),calc(100%_-_14px)_100%,0_100%)]",
+        "group relative flex cursor-pointer flex-col overflow-hidden border border-solid border-line border-l-4 border-l-[color:var(--ghue)] bg-panel text-left transition-[border-color,background,transform] duration-[140ms] cut-tag [--cut-tag:14px]",
         "hover:-translate-y-[3px] hover:border-[color-mix(in_srgb,var(--ghue)_45%,var(--line))] hover:bg-panel-2 hover:border-l-[color:var(--ghue)]",
         row && "sm:flex-row sm:items-stretch",
         status.key === "ended" && "opacity-[0.82]",
@@ -120,7 +118,7 @@ export function SrtFeatured({ sorteo, entered, onOpen }: { sorteo: Sorteo; enter
   const open = () => onOpen && onOpen("/sorteos?g=" + sorteo.slug)
   const cta = status.key === "active" ? (entered ? "Ya participas · ver" : "Participar ahora") : status.key === "announced" ? "Ver ganador" : status.key === "upcoming" ? "Ver detalles" : "Ver sorteo"
   return (
-    <div className="relative mb-[30px] grid min-h-[340px] grid-cols-1 overflow-hidden border border-solid border-line border-t-[3px] border-t-accent bg-base-2 [clip-path:polygon(0_0,calc(100%_-_20px)_0,100%_20px,100%_100%,0_100%)] md:grid-cols-[1.15fr_0.85fr]">
+    <div className="relative mb-[30px] grid min-h-[340px] grid-cols-1 overflow-hidden border border-solid border-line border-t-[3px] border-t-accent bg-base-2 cut-corner [--cut-lg:20px] md:grid-cols-[1.15fr_0.85fr]">
       <div className="relative min-h-[220px] overflow-hidden border-b border-solid border-line md:border-b-0 md:border-r">
         <div aria-hidden className="absolute inset-0 z-0 bg-base" />
         <div aria-hidden className="pointer-events-none absolute inset-0 z-[1] [background:linear-gradient(105deg,transparent_40%,color-mix(in_srgb,var(--panel)_70%,transparent)_82%,var(--panel)_100%),radial-gradient(120%_120%_at_20%_20%,color-mix(in_srgb,var(--accent)_22%,transparent),transparent_55%)]" />

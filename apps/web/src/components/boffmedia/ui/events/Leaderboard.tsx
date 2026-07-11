@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Avatar } from "@/components/boffmedia/primitives/avatar"
+import { Avatar } from "@/components/boffmedia/primitives"
 import { evHue, evNum, type PlayerLike } from "./events-util"
 
 // Ranking pieces reused across the global leaderboard, the game page and the
@@ -10,10 +10,10 @@ import { evHue, evNum, type PlayerLike } from "./events-util"
 // (compact list) and ParticipantStack (stacked avatars). Mirror eventos.css.
 // [deferred] — fed by demo rows until the ranking API exists.
 
-const CUT_RANK = "[clip-path:polygon(6px_0,100%_0,100%_calc(100%_-_6px),calc(100%_-_6px)_100%,0_100%,0_6px)]"
-const CUT_PLACE = "[clip-path:polygon(7px_0,100%_0,100%_calc(100%_-_7px),calc(100%_-_7px)_100%,0_100%,0_7px)]"
-const CUT_POD = "[clip-path:polygon(0_0,calc(100%_-_14px)_0,100%_14px,100%_100%,0_100%)]"
-const CUT_MORE = "[clip-path:polygon(8px_0,100%_0,100%_calc(100%_-_8px),calc(100%_-_8px)_100%,0_100%,0_8px)]"
+const CUT_RANK = "cut-seal [--cut:6px]"
+const CUT_PLACE = "cut-seal [--cut:7px]"
+const CUT_POD = "cut-corner [--cut-lg:14px]"
+const CUT_MORE = "cut-seal [--cut:8px]"
 
 // ── ParticipantStack — grupo de avatares apilados ────────────────────────────
 export function ParticipantStack({ players, max = 8, size = 38 }: { players: PlayerLike[]; max?: number; size?: number }) {

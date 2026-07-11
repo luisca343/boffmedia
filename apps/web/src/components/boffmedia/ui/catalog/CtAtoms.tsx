@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 import { CT_STATUS, CT_STATUS_ORDER, CtStore, useCtStatus, type CtStatusKey } from "./catalog-util"
 
 // Catálogo atoms: half-star rating, status pill, status menu + log button.
@@ -144,7 +144,7 @@ export function CtLogButton({ gameId, block = false, size = "md" }: { gameId: st
           setOpen((v) => !v)
         }}
         className={cn(
-          "inline-flex items-center border border-solid font-mono font-semibold uppercase [clip-path:polygon(var(--cut)_0,100%_0,calc(100%_-_var(--cut))_100%,0_100%)] [--cut:7px] transition-[border-color,background,color] duration-[140ms]",
+          "inline-flex items-center border border-solid font-mono font-semibold uppercase cut [--cut:7px] transition-[border-color,background,color] duration-[140ms]",
           size === "sm" ? "gap-[5px] px-2.5 py-[7px] text-[10px]" : "gap-[7px] px-3 py-[9px] text-[11px] tracking-[0.05em]",
           block && "w-full justify-center",
           s ? "border-[color-mix(in_oklch,var(--sc)_55%,var(--line))] bg-[color-mix(in_oklch,var(--sc)_16%,var(--panel-2))] text-[color:var(--sc)]" : "border-line-2 bg-panel-2 text-txt hover:border-accent-line",

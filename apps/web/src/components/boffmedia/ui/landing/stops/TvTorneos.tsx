@@ -2,8 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/boffmedia/primitives/button"
-import { CountUp } from "@/components/boffmedia/primitives/count-up"
+import { Button, CountUp } from "@/components/boffmedia/primitives"
 import { Decode } from "../travesia-fx"
 import { TvCP } from "../TvCP"
 import { CTA_ROW, GLARE, HUD_FRAME, PRI_GLOW, TvCountdown } from "../landing-shared"
@@ -53,7 +52,7 @@ export function TvTorneos() {
       >
         <div className="flex items-center justify-between gap-3.5 border-b border-solid border-line px-[18px] py-3.5 font-mono text-[11px] font-semibold uppercase leading-none tracking-[0.08em] text-[#9aa3b2]">
           <span className="inline-flex items-center gap-[7px] text-[#ff4d5e]">
-            <i className="h-1.5 w-1.5 rounded-full bg-[#ff4d5e] animate-[lv4-blink_1.3s_infinite]" />
+            <i className="h-1.5 w-1.5 rounded-full bg-[#ff4d5e] animate-[lv4-blink_1.3s_infinite] motion-reduce:animate-none" />
             Gran final · Bo3
           </span>
           <span className="min-w-0 truncate">{title}</span>

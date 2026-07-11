@@ -1,6 +1,6 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon, type IconName } from "@/components/boffmedia/primitives/icon"
+import { Icon, type IconName } from "@/components/boffmedia/primitives"
 import { cssVars, DK_CUT } from "./utils"
 
 /**
@@ -13,8 +13,8 @@ export function DkApp({ children, className }: { children: React.ReactNode; clas
     <div
       style={cssVars({ "--dk-pad": "clamp(14px,2vw,32px)" })}
       className={cn(
-        "flex min-w-0 flex-col h-[calc(100vh-var(--nav-h,66px))]",
-        "max-[720px]:h-auto max-[720px]:min-h-[calc(100vh-var(--nav-h,66px))]",
+        "flex min-w-0 flex-col h-[calc(100vh_-_var(--nav-h,66px))]",
+        "max-[720px]:h-auto max-[720px]:min-h-[calc(100vh_-_var(--nav-h,66px))]",
         className,
       )}
     >

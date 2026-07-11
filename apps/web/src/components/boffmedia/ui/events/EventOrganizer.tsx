@@ -1,6 +1,6 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 import { evOrgMeta, EV_BOFF, type EventOrganizerData } from "./events-util"
 
 const SEAL = "grid place-items-center flex-none font-display font-bold leading-none cut-seal [--cut:5px]"

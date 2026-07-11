@@ -1,5 +1,5 @@
 import type * as React from "react"
-import type { IconName } from "@/components/boffmedia/primitives/icon"
+import type { IconName } from "@/components/boffmedia/primitives"
 
 // v3 «Señal» — Mewgenics «Papel y tinta» Codex shared helpers + mock data layer.
 // Mirrors the window.MEW globals from v3-mew-data.jsx, reduced to what the

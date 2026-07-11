@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 import { DkBracket, DkFlag, DkLive, type DkBracketRound } from "@/components/boffmedia/ui/tools/datakit"
 import { TnAvatar } from "./TnEntrant"
 import type { TnCompetitor, TnMatch } from "./tournaments-util"

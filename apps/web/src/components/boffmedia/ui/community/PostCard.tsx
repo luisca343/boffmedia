@@ -2,8 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Badge } from "@/components/boffmedia/primitives/badge"
-import { Icon, type IconName } from "@/components/boffmedia/primitives/icon"
+import { Badge, Icon, type IconName } from "@/components/boffmedia/primitives"
 import { Byline } from "./CmAvatar"
 import { timeAgo, type BlogCategoryLike, type BlogPostLike } from "./community-util"
 

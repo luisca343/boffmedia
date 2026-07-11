@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 import { MhRarity, MhSlotPips } from "@/app/(boffmedia)/(herramientas)/mhwilds/_components/ui/mh-kit"
 import { MH_ELEMENTS, MH_RES_ORDER, MH_SKILL_CAT, type MhArmorPiece, type MhArmorProfile, type MhArmorSet, type MhSetBonusData, type MhSkill } from "./mh-db-util"
 
@@ -68,7 +68,7 @@ export function MhSetCard({ set, active, onOpen, view }: { set: MhArmorSet; acti
     )
   }
   return (
-    <button type="button" onClick={onOpen} style={style} className={cn("flex flex-col overflow-hidden border border-solid border-line bg-panel text-left transition-[border-color,transform,box-shadow] duration-[140ms] [clip-path:polygon(0_0,calc(100%_-_10px)_0,100%_10px,100%_100%,0_100%)] hover:-translate-y-[2px] hover:border-line-2 hover:[box-shadow:0_12px_26px_-16px_#000]", active && "border-[color:var(--mh)] [box-shadow:0_0_0_1px_var(--mh)]")}>
+    <button type="button" onClick={onOpen} style={style} className={cn("flex flex-col overflow-hidden border border-solid border-line bg-panel text-left transition-[border-color,transform,box-shadow] duration-[140ms] cut-corner [--cut-lg:10px] hover:-translate-y-[2px] hover:border-line-2 hover:[box-shadow:0_12px_26px_-16px_#000]", active && "border-[color:var(--mh)] [box-shadow:0_0_0_1px_var(--mh)]")}>
       <span className="relative grid h-[76px] place-items-center overflow-hidden [background:radial-gradient(120%_90%_at_70%_15%,hsl(var(--sh)_48%_32%_/_0.5),transparent_60%),repeating-linear-gradient(135deg,var(--bg-2)_0_8px,var(--panel-2)_8px_16px)]">
         <Icon name="shield" size={40} className={cn("[filter:drop-shadow(0_3px_6px_rgba(0,0,0,0.4))]", active ? "text-[hsl(var(--sh)_56%_74%)]" : "text-[hsl(var(--sh)_42%_70%_/_0.6)]")} />
         <span className="absolute left-[7px] top-[7px]">

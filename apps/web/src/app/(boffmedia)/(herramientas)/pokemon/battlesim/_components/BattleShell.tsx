@@ -41,7 +41,7 @@ export const BattleShell = forwardRef<HTMLDivElement, BattleShellProps>(
             <aside
               className={cn(
                 "min-w-0 flex-1",
-                fullscreen && "mt-8 max-h-[calc(100vh-500px)] shrink-0 overflow-hidden border border-solid border-line bg-panel lg:max-w-[340px]",
+                fullscreen && "mt-8 max-h-[calc(100vh_-_500px)] shrink-0 overflow-hidden border border-solid border-line bg-panel lg:max-w-[340px]",
               )}
             >
               {rail}

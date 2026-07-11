@@ -66,7 +66,7 @@ export function TcgpApp({ view, expansion, cardId }: Props) {
   const drawerEditable = view === "coleccion" && !galleryUser && collection.editable
 
   return (
-    <div className="flex min-w-0 flex-col max-[720px]:h-auto max-[720px]:min-h-[calc(100vh-var(--nav-h,66px))] min-[721px]:h-[calc(100vh-var(--nav-h,66px))]">
+    <div className="flex min-w-0 flex-col max-[720px]:h-auto max-[720px]:min-h-[calc(100vh_-_var(--nav-h,66px))] min-[721px]:h-[calc(100vh_-_var(--nav-h,66px))]">
       {/* section header */}
       <header className="flex-none border-b border-solid border-line bg-base/90 backdrop-blur-[10px] max-[720px]:sticky max-[720px]:top-0 max-[720px]:z-20">
         <div className="flex items-center gap-4 px-[clamp(16px,3vw,34px)] py-[14px]">

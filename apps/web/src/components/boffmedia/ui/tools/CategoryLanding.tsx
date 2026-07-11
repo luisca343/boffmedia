@@ -2,10 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { Kicker } from "@/components/boffmedia/primitives/kicker"
-import { Icon } from "@/components/boffmedia/primitives/icon"
-import { Button } from "@/components/boffmedia/primitives/button"
-import { Chip } from "@/components/boffmedia/primitives/chip"
+import { Kicker, Icon, Button, Chip } from "@/components/boffmedia/primitives"
 import { GameLogo } from "./GameLogo"
 import { ToolGrid } from "./ToolGrid"
 import { TxSection } from "./TxSection"
@@ -60,7 +57,7 @@ export function FeaturedTool({ cat }: { cat: CategoryData }) {
       <div className="relative min-h-[220px] border-b border-solid bg-base-2 md:min-h-[300px] md:border-b-0 md:border-r border-[color-mix(in_srgb,var(--ghue)_28%,var(--line))]">
         <ArtImage src={art} sizes="(min-width: 768px) 40vw, 100vw" />
         <span aria-hidden="true" className="pointer-events-none absolute inset-0 z-[2] hidden md:block [background:linear-gradient(to_right,transparent_52%,color-mix(in_srgb,var(--panel)_55%,transparent)_88%,var(--panel))]" />
-        <span className="absolute bottom-8 right-[26px] z-[3] grid h-16 w-16 place-items-center border-2 border-solid text-[var(--ghue)] bg-[color-mix(in_srgb,var(--ghue)_16%,var(--bg))] border-[color-mix(in_srgb,var(--ghue)_55%,var(--line-2))] shadow-[0_10px_34px_rgba(0,0,0,0.45)] [clip-path:polygon(13px_0,100%_0,100%_calc(100%_-_13px),calc(100%_-_13px)_100%,0_100%,0_13px)] transition-transform duration-300 group-hover:-translate-y-1 max-md:right-6 max-md:-bottom-[30px]">
+        <span className="absolute bottom-8 right-[26px] z-[3] grid h-16 w-16 place-items-center border-2 border-solid text-[var(--ghue)] bg-[color-mix(in_srgb,var(--ghue)_16%,var(--bg))] border-[color-mix(in_srgb,var(--ghue)_55%,var(--line-2))] shadow-[0_10px_34px_rgba(0,0,0,0.45)] cut-seal [--cut:13px] transition-transform duration-300 group-hover:-translate-y-1 max-md:right-6 max-md:-bottom-[30px]">
           <Icon name={f.icon} size={26} />
         </span>
       </div>
@@ -110,7 +107,7 @@ export function ExtLinks({ items }: { items: ExtLinkData[] }) {
             target="_blank"
             rel="noopener noreferrer"
             aria-label={tCat("externalAria", { title: item.title, domain })}
-            className="group/ext relative flex flex-col gap-[11px] border border-dashed border-line-2 bg-panel px-4 pb-[13px] pt-[14px] no-underline transition-[border-color,background,transform] duration-[140ms] hover:-translate-y-[2px] hover:border-[color-mix(in_srgb,var(--info)_55%,var(--line-2))] hover:bg-panel-2 [clip-path:polygon(0_0,calc(100%_-_16px)_0,100%_16px,100%_100%,0_100%)]"
+            className="group/ext relative flex flex-col gap-[11px] border border-dashed border-line-2 bg-panel px-4 pb-[13px] pt-[14px] no-underline transition-[border-color,background,transform] duration-[140ms] hover:-translate-y-[2px] hover:border-[color-mix(in_srgb,var(--info)_55%,var(--line-2))] hover:bg-panel-2 cut-corner [--cut-lg:16px]"
           >
             <span aria-hidden="true" className="absolute right-0 top-0 h-4 w-4 [background:color-mix(in_srgb,var(--info)_30%,var(--panel))] [clip-path:polygon(0_0,100%_100%,0_100%)] transition-colors group-hover/ext:[background:color-mix(in_srgb,var(--info)_60%,var(--panel))]" />
             <span className="flex items-center gap-2">

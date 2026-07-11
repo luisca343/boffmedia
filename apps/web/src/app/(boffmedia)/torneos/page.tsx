@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useMemo, useState } from "react"
 import { cn } from "@/lib/utils"
-import { Spinner } from "@/components/boffmedia/primitives/spinner"
+import { Spinner } from "@/components/boffmedia/primitives"
 import { DkSeg } from "@/components/boffmedia/ui/tools/datakit"
 import { TnFormatBadge } from "@/components/boffmedia/ui/tournaments"
 import { useTournaments } from "@/hooks/tournaments/useTournaments"

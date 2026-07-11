@@ -3,7 +3,7 @@
 import { use } from 'react';
 import { useTranslations } from 'next-intl';
 import { useMatch, useSessions, useMatches } from '@/features/vgc-tracker/hooks/useVgcDb';
-import { Spinner } from '@/components/boffmedia/primitives/spinner';
+import { Spinner } from "@/components/boffmedia/primitives"
 import { MatchWorkspace } from './_components/MatchWorkspace';
 
 interface Props {
@@ -20,7 +20,7 @@ export default function MatchPage({ params }: Props) {
 
   if (loading) {
     return (
-      <div className="grid h-[calc(100vh-var(--nav-h,66px))] place-items-center">
+      <div className="grid h-[calc(100vh_-_var(--nav-h,66px))] place-items-center">
         <Spinner />
       </div>
     );
@@ -28,7 +28,7 @@ export default function MatchPage({ params }: Props) {
 
   if (!match) {
     return (
-      <div className="grid h-[calc(100vh-var(--nav-h,66px))] place-items-center font-mono text-[13px] text-txt-muted">
+      <div className="grid h-[calc(100vh_-_var(--nav-h,66px))] place-items-center font-mono text-[13px] text-txt-muted">
         {t('workspace.matchNotFound')}
       </div>
     );

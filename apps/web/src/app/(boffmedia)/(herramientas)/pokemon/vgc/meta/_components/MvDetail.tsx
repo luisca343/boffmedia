@@ -57,7 +57,7 @@ export function MvDetail({ detail, entry, rank, pokeMap, onSelect, onBack, loadi
       <div className="px-[var(--dk-pad)] pb-[60px] pt-[18px]">
         <header className="mb-4 flex flex-wrap items-center gap-[14px]">
           {onBack && <DkBack onClick={onBack} label={t("detail.backToList")} />}
-          <span className="grid h-[74px] w-[74px] flex-none place-items-center border border-solid border-line-2 bg-panel [clip-path:polygon(0_0,100%_0,100%_calc(100%_-_12px),calc(100%_-_12px)_100%,0_100%)]">
+          <span className="grid h-[74px] w-[74px] flex-none place-items-center border border-solid border-line-2 bg-panel cut-tag [--cut-tag:12px]">
             <DkSprite src={spriteUrl(detail.name)} alt={detail.name} size={62} onError={handleSpriteError} />
           </span>
           <div className="min-w-0">

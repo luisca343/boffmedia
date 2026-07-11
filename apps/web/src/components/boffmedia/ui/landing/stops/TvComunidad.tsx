@@ -2,17 +2,16 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/boffmedia/primitives/button"
-import { Chip } from "@/components/boffmedia/primitives/chip"
-import { CountUp } from "@/components/boffmedia/primitives/count-up"
+import { Button, Chip } from "@/components/boffmedia/primitives"
 import { Decode } from "../travesia-fx"
 import { TvCP } from "../TvCP"
 import { CTA_ROW, GLARE, HUD_FRAME, PRI_GLOW } from "../landing-shared"
 import { DISCORD, TV3_FEED } from "../landing-data"
-import { useSiteActivity } from "@/hooks/community/useCommunity"
+import { useSiteActivity, useSiteStats } from "@/hooks/community/useCommunity"
 
 export function TvComunidad() {
   const { activity } = useSiteActivity(6)
+  const { stats } = useSiteStats()
   // Real activity feeds the ticker; falls back to the editorial placeholders
   // while loading or if there's no recorded activity yet.
   const feed = activity.length
@@ -23,6 +22,13 @@ export function TvComunidad() {
       )
     : TV3_FEED
 
+  // Real competitor count feeds the lead; drops the clause while stats load so
+  // no number is fabricated.
+  const lead =
+    stats && stats.participants > 0
+      ? `Equipos, clanes, sorteos y eventos especiales. ${stats.participants.toLocaleString("es-ES")} jugadores ya compiten; solo falta tu nombre en el ranking.`
+      : "Equipos, clanes, sorteos y eventos especiales; solo falta tu nombre en el ranking."
+
   return (
     <TvCP
       id="tv-cp5"
@@ -30,7 +36,7 @@ export function TvComunidad() {
       side="l"
       kick={<Decode text="Parada 05 · Más que un servidor" />}
       title="Una comunidad <em>viva</em>"
-      lead="Equipos, clanes, sorteos y eventos especiales. 412 jugadores ya compiten esta temporada; solo falta tu nombre en el ranking."
+      lead={lead}
     >
       <div
         data-glare
@@ -40,28 +46,6 @@ export function TvComunidad() {
           HUD_FRAME,
         )}
       >
-        <div className="flex items-baseline justify-between gap-3 border-b border-solid border-line pb-4">
-          <span className="inline-flex items-center gap-2 font-mono text-[11px] font-semibold uppercase leading-none tracking-[0.1em] text-ok">
-            <i className="h-[7px] w-[7px] rounded-full bg-ok shadow-[0_0_8px_var(--ok)] animate-[lv4-blink_1.6s_infinite]" aria-hidden="true" />
-            En línea ahora
-          </span>
-          <b className="font-display text-[30px] font-extrabold italic leading-none text-txt tabular-nums">
-            <CountUp value="128" />
-          </b>
-        </div>
-        <div className="my-[18px] flex" aria-hidden="true">
-          {["AX", "NV", "K7", "ZN", "ML"].map((a) => (
-            <i
-              key={a}
-              className="-ml-2.5 grid h-[42px] w-[42px] place-items-center rounded-full border-2 border-solid border-panel bg-panel-2 font-mono text-[12px] font-bold not-italic leading-none text-txt-muted first:ml-0"
-            >
-              {a}
-            </i>
-          ))}
-          <i className="-ml-2.5 grid h-[42px] w-[42px] place-items-center rounded-full border-2 border-solid border-panel bg-accent font-mono text-[12px] font-bold not-italic leading-none text-accent-ink">
-            +123
-          </i>
-        </div>
         <div className="mb-[18px] grid gap-2" aria-hidden="true">
           {feed.map((f, i) => (
             <span
@@ -72,7 +56,7 @@ export function TvComunidad() {
               )}
               style={{ ["--i"]: i } as React.CSSProperties}
             >
-              <i className={cn("h-[7px] w-[7px] flex-none rounded-full animate-[lv4-blink_2s_infinite]", f.tp)} />
+              <i className={cn("h-[7px] w-[7px] flex-none rounded-full animate-[lv4-blink_2s_infinite] motion-reduce:animate-none", f.tp)} />
               {f.t}
             </span>
           ))}
@@ -83,7 +67,7 @@ export function TvComunidad() {
           <Chip>Equipos y clanes</Chip>
         </div>
         <div className={CTA_ROW}>
-          <Button variant="pri" iconRight="arrow" href="/comunidad" className={PRI_GLOW}>
+          <Button variant="pri" iconRight="arrow" href="/community" className={PRI_GLOW}>
             Unirme
           </Button>
           <Button href={DISCORD}>Discord</Button>

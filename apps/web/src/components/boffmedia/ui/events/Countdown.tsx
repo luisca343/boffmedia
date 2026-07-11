@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 
 /** Live countdown to an event start. Renders nothing once the date has passed. */
 export function Countdown({ date, compact, className }: { date: string; compact?: boolean; className?: string }) {

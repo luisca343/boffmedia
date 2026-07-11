@@ -2,8 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon, CodeBlock, type IconName } from "@/components/boffmedia/primitives"
-import { INPUT_BASE } from "@/components/boffmedia/primitives/input"
+import { Icon, CodeBlock, INPUT_BASE, type IconName } from "@/components/boffmedia/primitives"
 
 // ── Searchable combo (port of the handoff CxCombo: input + filtered dropdown,
 //    ↑/↓/Enter/Esc, right-aligned `.tail` slot in options) ─────────────────────

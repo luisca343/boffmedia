@@ -1,7 +1,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 import { Decode } from "../travesia-fx"
 import { TvCP } from "../TvCP"
 import { GLARE } from "../landing-shared"

@@ -4,8 +4,8 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import type { TnCompetitor } from "./tournaments-util"
 
-const CUT_POD = "[clip-path:polygon(0_0,calc(100%_-_14px)_0,100%_14px,100%_100%,0_100%)]"
-const CUT_PLACE = "[clip-path:polygon(0_0,calc(100%_-_6px)_0,100%_6px,100%_100%,0_100%)]"
+const CUT_POD = "cut-corner [--cut-lg:14px]"
+const CUT_PLACE = "cut-corner [--cut-lg:6px]"
 
 function PodiumAvatar({ c, size }: { c: TnCompetitor; size: number }) {
   const ini = (c.name || "?").trim()[0]?.toUpperCase() || "?"

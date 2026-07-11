@@ -1,7 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 import { DkSub, DkSubNote, DkSeg, DkChip } from "@/components/boffmedia/ui/tools/datakit"
 import { fmtCount } from "../_lib/meta-types"
 

@@ -1,4 +1,4 @@
-import type { IconName } from "@/components/boffmedia/primitives/icon"
+import type { IconName } from "@/components/boffmedia/primitives"
 
 // Generic tournament competitor: a solo player, a team/squad or a scoring entry.
 // Sourced from the (future) tournaments API. [deferred]

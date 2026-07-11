@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives/icon"
+import { Icon } from "@/components/boffmedia/primitives"
 import { KvArt, KvStatus, KvTags, KvVia } from "./KvAtoms"
 import { kvReviewColor, type KvKey } from "./keys-util"
 
@@ -16,7 +16,7 @@ export function KvCard({ item, onOpen }: { item: KvKey; onOpen?: (item: KvKey) =
       aria-label={item.name}
       onClick={() => onOpen?.(item)}
       className={cn(
-        "group relative flex cursor-pointer flex-col overflow-hidden border border-solid border-line bg-panel p-0 text-left transition-[border-color,transform,background] duration-[140ms] [clip-path:polygon(0_0,100%_0,100%_calc(100%_-_14px),calc(100%_-_14px)_100%,0_100%)]",
+        "group relative flex cursor-pointer flex-col overflow-hidden border border-solid border-line bg-panel p-0 text-left transition-[border-color,transform,background] duration-[140ms] cut-tag [--cut-tag:14px]",
         "hover:-translate-y-[3px] hover:border-[color-mix(in_srgb,var(--accent)_45%,var(--line))] hover:bg-panel-2",
         item.given && "opacity-[0.72]",
       )}

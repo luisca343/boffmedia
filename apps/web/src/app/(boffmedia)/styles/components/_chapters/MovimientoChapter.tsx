@@ -3,15 +3,10 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { DISPLAY, HEAD4, Sample, Section } from "../showcase-shared"
-import { Button } from "@/components/boffmedia/primitives/button"
-import { Chip } from "@/components/boffmedia/primitives/chip"
-import { CountUp } from "@/components/boffmedia/primitives/count-up"
-import { Kicker } from "@/components/boffmedia/primitives/kicker"
-import { Ticker } from "@/components/boffmedia/primitives/ticker"
+import { Button, Chip, CountUp, Kicker, Ticker } from "@/components/boffmedia/primitives"
 import { GLARE } from "@/components/boffmedia/ui/landing/landing-shared"
 import { Decode, Kinetic, useSignalFX } from "@/components/boffmedia/ui/landing/travesia-fx"
 import { Marquee } from "@/components/boffmedia/ui/layout/Marquee"
-
 
 function FxPlayground() {
   const ref = React.useRef<HTMLDivElement>(null)
