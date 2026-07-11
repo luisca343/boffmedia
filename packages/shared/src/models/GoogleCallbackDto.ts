@@ -6,5 +6,6 @@ export type GoogleCallbackDto = {
     email?: string;
     name?: string;
     picture?: string;
+    googleId?: string;
 };
 

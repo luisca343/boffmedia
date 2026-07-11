@@ -164,7 +164,8 @@
         "games": "Games",
         "ranking": "Ranking",
         "events": "Events",
-        "raffles": "Raffles"
+        "raffles": "Raffles",
+        "tournaments": "Tournaments"
       },
       "footer": {
         "tagline": "Gaming community: tournaments, servers, competitive tools and a season that never stops.",
