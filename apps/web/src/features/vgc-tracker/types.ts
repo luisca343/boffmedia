@@ -14,6 +14,7 @@ export interface PresetSlot {
   ability?: string;
   moves: string[];
   nature?: string;
+  teraType?: string;
 }
 
 export interface PresetVersion {

@@ -30,6 +30,7 @@ export function comp(a: TnCompetitorApi | null | undefined): TnCompetitor | null
     country: a.country ?? undefined,
     seed: a.seed ?? undefined,
     hue: a.hue ?? undefined,
+    avatar: a.avatar ?? undefined,
     roster: a.roster,
   }
 }

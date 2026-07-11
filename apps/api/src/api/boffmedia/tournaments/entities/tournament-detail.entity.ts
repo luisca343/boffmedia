@@ -54,6 +54,12 @@ export class TournamentDetail {
   @ApiProperty({ nullable: true })
   rules: string | null;
 
+  @ApiProperty({ nullable: true, description: 'Prize breakdown (free text).' })
+  prizes: string | null;
+
+  @ApiProperty({ description: 'Player check-in window open.' })
+  checkInOpen: boolean;
+
   @ApiProperty({ nullable: true })
   banner: string | null;
 
@@ -65,6 +71,12 @@ export class TournamentDetail {
 
   @ApiProperty()
   bestOf: number;
+
+  @ApiProperty({
+    nullable: true,
+    description: 'Self-report auto-verify window (minutes); null → default 10.',
+  })
+  autoVerifyMinutes: number | null;
 
   @ApiProperty({ nullable: true })
   maxParticipants: number | null;
@@ -83,6 +95,27 @@ export class TournamentDetail {
 
   @ApiProperty({ type: [Competitor] })
   participants: Competitor[];
+
+  @ApiProperty({
+    nullable: true,
+    description:
+      "The signed-in caller's own participant id (stringified), or null when " +
+      'anonymous / not registered. Drives the register/withdraw control.',
+  })
+  viewerParticipantId: string | null;
+
+  @ApiProperty({
+    nullable: true,
+    description:
+      "The caller's currently playable (ready/live) match id — the 'Tu partida' banner.",
+  })
+  myMatchId: number | null;
+
+  @ApiProperty({
+    type: [Competitor],
+    description: 'Top-3 podium, only populated once the tournament completes.',
+  })
+  podium: Competitor[];
 
   @ApiProperty({
     nullable: true,

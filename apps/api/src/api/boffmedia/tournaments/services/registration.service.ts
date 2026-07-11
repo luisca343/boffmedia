@@ -65,6 +65,11 @@ export class RegistrationService {
     if (t.status !== 'registration' || !t.registrationOpen) {
       throw new ForbiddenException('Registration is closed');
     }
+    // Lazy auto-close: the start date is the registration deadline.
+    if (t.startDate && new Date() >= t.startDate) {
+      await this.repo.update(t.id, { registrationOpen: false });
+      throw new ForbiddenException('Registration is closed');
+    }
 
     const existing = await this.repo.findParticipantByUser(tournamentId, userId);
     if (existing) throw new ConflictException('Already registered');
@@ -142,6 +147,69 @@ export class RegistrationService {
     if (!p) throw new NotFoundException('Participant not found');
     await this.repo.removeParticipant(id);
     return { success: true };
+  }
+
+  /** Player check-in while the admin has the window open. */
+  async setCheckIn(
+    tournamentId: number,
+    userId: number,
+    checkedIn: boolean,
+  ): Promise<{ success: boolean; checkedInAt: string | null }> {
+    const t = await this.repo.findById(tournamentId);
+    if (!t) throw new NotFoundException('Tournament not found');
+    if (!t.checkInOpen) {
+      throw new BadRequestException('El check-in no está abierto');
+    }
+    const me = await this.repo.findParticipantByUser(tournamentId, userId);
+    if (!me) throw new NotFoundException('Not registered');
+    const at = checkedIn ? new Date() : null;
+    await this.repo.updateParticipant(me.id, { checkedInAt: at });
+    return { success: true, checkedInAt: at ? at.toISOString() : null };
+  }
+
+  /**
+   * Leaderboard self-submission: upsert the caller's own entry with a new
+   * score + evidence line. Every submission drops back to unverified so an
+   * admin re-validates it. Auto-registers while registration is open.
+   */
+  async submitScore(
+    tournamentId: number,
+    userId: number,
+    score: number,
+    meta?: string,
+  ): Promise<Competitor> {
+    const t = await this.repo.findById(tournamentId);
+    if (!t) throw new NotFoundException('Tournament not found');
+    if (t.format !== 'leaderboard') {
+      throw new BadRequestException('Not a leaderboard tournament');
+    }
+    if (t.status !== 'registration' && t.status !== 'live') {
+      throw new BadRequestException('Submissions are closed');
+    }
+
+    let me = await this.repo.findParticipantByUser(tournamentId, userId);
+    if (!me) {
+      if (t.status !== 'registration' || !t.registrationOpen) {
+        throw new ForbiddenException('Registration is closed');
+      }
+      const user = await this.repo.findUserBasic(userId);
+      const id = await this.repo.addParticipant({
+        tournamentId,
+        kind: t.competitorKind,
+        userId,
+        name: user?.username || 'Jugador',
+        avatar: user?.profilePicture ?? null,
+      });
+      me = await this.repo.findParticipant(id);
+      if (!me) throw new NotFoundException('Participant not found');
+    }
+
+    await this.repo.updateParticipant(me.id, {
+      score,
+      meta: meta ?? null,
+      verified: false,
+    });
+    return this.loadCompetitor(me.id);
   }
 
   private async insertRoster(

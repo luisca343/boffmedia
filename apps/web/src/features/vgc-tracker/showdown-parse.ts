@@ -33,11 +33,14 @@ export function parseShowdownPaste(paste: string): PresetSlot[] {
 
     let ability: string | undefined;
     let nature: string | undefined;
+    let teraType: string | undefined;
     const moves: string[] = [];
 
     for (const line of lines.slice(1)) {
       if (line.startsWith('Ability:')) {
         ability = line.slice(8).trim();
+      } else if (line.startsWith('Tera Type:')) {
+        teraType = line.slice(10).trim();
       } else if (line.endsWith(' Nature')) {
         nature = line.slice(0, -7).trim();
       } else if (line.startsWith('- ')) {
@@ -54,6 +57,7 @@ export function parseShowdownPaste(paste: string): PresetSlot[] {
       ability,
       moves,
       nature,
+      teraType,
     });
   });
 

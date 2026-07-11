@@ -56,6 +56,8 @@ export const MATCH_BRACKET = {
   GROUP: 'group',
   LEAGUE: 'league',
   SWISS: 'swiss',
+  // Third-place playoff of a single-elim phase (fed by both semifinal losers).
+  THIRD: 'third',
 } as const;
 
 export const MATCH_STATUS = {
@@ -79,6 +81,9 @@ export const PHASE_FORMAT = {
   ROUNDROBIN: 'roundrobin',
   SWISS: 'swiss',
   LEADERBOARD: 'leaderboard',
+  // Group stage phase: entrants snake-seeded into round-robin groups; the
+  // advancement rule takes the top N of each group, cross-seeded.
+  GROUPS: 'groups',
 } as const;
 
 export const PHASE_STATUS = {
@@ -91,11 +96,28 @@ export const ADVANCE_TYPE = {
   ALL: 'all',
   TOP_N: 'top_n',
   RECORD: 'record',
+  // Union: the top N by standings PLUS everyone at ≤ advance_max_losses losses.
+  // Yields an asymmetric cut (VGC "top 8 + all X-2") — the bracket byes the
+  // extra top seeds automatically.
+  TOP_OR_RECORD: 'top_or_record',
 } as const;
 
 export const TIEBREAK_PROFILE = {
   POINTS: 'points',
   RESISTANCE: 'resistance',
+} as const;
+
+// Self-report proposal lifecycle: a participant proposes a result, the rival
+// confirms (→ match settles, columns cleared) or disputes (→ admin resolves).
+export const PROPOSAL_STATE = {
+  PENDING: 'pending',
+  DISPUTED: 'disputed',
+} as const;
+
+export const MATCH_MESSAGE_KIND = {
+  SYS: 'sys',
+  PLAYER: 'player',
+  JUDGE: 'judge',
 } as const;
 
 // NOTE: FK constraints use explicit short names (foreignKey({ name })) because
@@ -144,11 +166,18 @@ export const boffMediaTournaments = mysqlTable(
     registrationOpen: boolean('registration_open').notNull().default(false),
     // Games per match (BO1/BO3/BO5) — top_score/bot_score are games won.
     bestOf: int('best_of').notNull().default(1),
+    // Minutes a player self-report waits for the rival before auto-verifying.
+    // Null → the module default (DEFAULT_AUTO_VERIFY_MINUTES).
+    autoVerifyMinutes: int('auto_verify_minutes'),
     // Groups format: number of groups + advancers per group.
     groupCount: int('group_count'),
     advanceCount: int('advance_count'),
     description: text('description'),
     rules: text('rules'),
+    prizes: text('prizes'),
+    // Manual check-in window: admin opens it; only checked-in entrants can be
+    // kept at generate time (GenerateBracketDto.onlyCheckedIn).
+    checkInOpen: boolean('check_in_open').notNull().default(false),
     banner: varchar('banner', { length: 255 }),
     icon: varchar('icon', { length: 255 }),
     hue: int('hue'),
@@ -194,6 +223,9 @@ export const boffMediaTournamentGroups = mysqlTable(
   {
     id: int('id').primaryKey().autoincrement(),
     tournamentId: int('tournament_id').notNull(),
+    // Set for phase-scoped groups (groups PHASE format); null on legacy
+    // whole-tournament `groups` format groups.
+    phaseId: int('phase_id'),
     name: varchar('name', { length: 64 }).notNull(),
     label: varchar('label', { length: 64 }),
     advanceCount: int('advance_count').notNull().default(2),
@@ -204,6 +236,7 @@ export const boffMediaTournamentGroups = mysqlTable(
   },
   (t) => ({
     tournamentIdx: index('tg_tournament_idx').on(t.tournamentId),
+    phaseIdx: index('tg_phase_idx').on(t.phaseId),
     tournamentFk: foreignKey({
       columns: [t.tournamentId],
       foreignColumns: [boffMediaTournaments.id],
@@ -240,6 +273,10 @@ export const boffMediaTournamentParticipants = mysqlTable(
     score: int('score'),
     meta: varchar('meta', { length: 255 }),
     verified: boolean('verified').notNull().default(false),
+    // JSON array of up to 6 mons {slot,dex,name,item,ability,tera,moves[4]} —
+    // shown to the current-round opponent on the match page (open teamsheet).
+    teamsheet: text('teamsheet'),
+    checkedInAt: timestamp('checked_in_at'),
     status: mysqlEnum('status', [
       TOURNAMENT_PARTICIPANT_STATUS.ACTIVE,
       TOURNAMENT_PARTICIPANT_STATUS.ELIMINATED,
@@ -341,6 +378,7 @@ export const boffMediaTournamentPhases = mysqlTable(
       PHASE_FORMAT.ROUNDROBIN,
       PHASE_FORMAT.SWISS,
       PHASE_FORMAT.LEADERBOARD,
+      PHASE_FORMAT.GROUPS, // appended last — in-place MySQL enum extension
     ]).notNull(),
     status: mysqlEnum('status', [
       PHASE_STATUS.PENDING,
@@ -350,7 +388,13 @@ export const boffMediaTournamentPhases = mysqlTable(
       .notNull()
       .default(PHASE_STATUS.PENDING),
     bestOf: int('best_of'), // null → tournament.bestOf
+    // Best-of override for the decisive match (single: winners final ·
+    // double: grand final). Null → phase/tournament bestOf.
+    finalsBestOf: int('finals_best_of'),
     rounds: int('rounds'), // swiss: fixed round count
+    groupCount: int('group_count'), // groups: number of groups
+    // single: also play a third-place match between the semifinal losers.
+    thirdPlace: boolean('third_place').notNull().default(false),
     // Chain this phase's standings onto the previous phase's records (VGC Day 2).
     carryStandings: boolean('carry_standings').notNull().default(false),
     // Advancement rule OUT of this phase (null on the final phase).
@@ -358,6 +402,7 @@ export const boffMediaTournamentPhases = mysqlTable(
       ADVANCE_TYPE.ALL,
       ADVANCE_TYPE.TOP_N,
       ADVANCE_TYPE.RECORD,
+      ADVANCE_TYPE.TOP_OR_RECORD, // appended last — in-place MySQL enum extension
     ]),
     advanceCount: int('advance_count'), // top_n: N · record: optional cap
     advanceMaxLosses: int('advance_max_losses'), // record: 2 → "X-2 or better"
@@ -441,6 +486,7 @@ export const boffMediaTournamentMatches = mysqlTable(
       MATCH_BRACKET.GROUP,
       MATCH_BRACKET.LEAGUE,
       MATCH_BRACKET.SWISS,
+      MATCH_BRACKET.THIRD, // appended last — in-place MySQL enum extension
     ])
       .notNull()
       .default(MATCH_BRACKET.WINNERS),
@@ -476,6 +522,20 @@ export const boffMediaTournamentMatches = mysqlTable(
     ]),
     scheduledAt: timestamp('scheduled_at'),
     reportedAt: timestamp('reported_at'),
+    // Player self-report proposal (cleared unconditionally when the match
+    // settles). `proposed_games` is a per-game 'W'/'L' string normalized to the
+    // TOP participant's perspective.
+    proposedByParticipantId: int('proposed_by_participant_id'),
+    proposedTopScore: int('proposed_top_score'),
+    proposedBotScore: int('proposed_bot_score'),
+    proposedGames: varchar('proposed_games', { length: 16 }),
+    proposedAt: timestamp('proposed_at'),
+    proposalExpiresAt: timestamp('proposal_expires_at'),
+    proposalState: mysqlEnum('proposal_state', [
+      PROPOSAL_STATE.PENDING,
+      PROPOSAL_STATE.DISPUTED,
+    ]),
+    judgeRequestedAt: timestamp('judge_requested_at'),
     createdAt: timestamp('created_at')
       .notNull()
       .default(sql`CURRENT_TIMESTAMP()`),
@@ -535,6 +595,13 @@ export const boffMediaTournamentMatches = mysqlTable(
     })
       .onDelete('set null')
       .onUpdate('cascade'),
+    proposerFk: foreignKey({
+      columns: [t.proposedByParticipantId],
+      foreignColumns: [boffMediaTournamentParticipants.id],
+      name: 'tm_prop_fk',
+    })
+      .onDelete('set null')
+      .onUpdate('cascade'),
     nextFk: foreignKey({
       columns: [t.nextMatchId],
       foreignColumns: [t.id],
@@ -553,3 +620,47 @@ export const boffMediaTournamentMatches = mysqlTable(
 );
 
 export type TournamentMatch = typeof boffMediaTournamentMatches.$inferSelect;
+
+// Table chat of one match (players + judges + system lines). `author_name` is a
+// display snapshot so rendering never needs a users join; kind 'sys' rows have
+// no author. Visible only to the two match participants and admins.
+export const boffMediaTournamentMatchMessages = mysqlTable(
+  'boffmedia_tournament_match_messages',
+  {
+    id: int('id').primaryKey().autoincrement(),
+    matchId: int('match_id').notNull(),
+    authorUserId: int('author_user_id'),
+    authorName: varchar('author_name', { length: 64 }),
+    kind: mysqlEnum('kind', [
+      MATCH_MESSAGE_KIND.SYS,
+      MATCH_MESSAGE_KIND.PLAYER,
+      MATCH_MESSAGE_KIND.JUDGE,
+    ])
+      .notNull()
+      .default(MATCH_MESSAGE_KIND.PLAYER),
+    body: varchar('body', { length: 1000 }).notNull(),
+    createdAt: timestamp('created_at')
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP()`),
+  },
+  (t) => ({
+    matchIdx: index('tmm_match_idx').on(t.matchId),
+    matchFk: foreignKey({
+      columns: [t.matchId],
+      foreignColumns: [boffMediaTournamentMatches.id],
+      name: 'tmm_m_fk',
+    })
+      .onDelete('cascade')
+      .onUpdate('cascade'),
+    authorFk: foreignKey({
+      columns: [t.authorUserId],
+      foreignColumns: [boffMediaUsers.id],
+      name: 'tmm_u_fk',
+    })
+      .onDelete('set null')
+      .onUpdate('cascade'),
+  }),
+);
+
+export type TournamentMatchMessage =
+  typeof boffMediaTournamentMatchMessages.$inferSelect;

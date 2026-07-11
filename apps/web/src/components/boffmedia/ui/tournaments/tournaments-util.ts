@@ -14,6 +14,7 @@ export interface TnCompetitor {
   countryName?: string
   seed?: number
   hue?: number
+  avatar?: string
   roster?: unknown[]
   // records / extra fields tolerated by the standings + live views
   w?: number

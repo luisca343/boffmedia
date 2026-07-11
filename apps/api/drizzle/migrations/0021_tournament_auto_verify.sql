@@ -1,0 +1,1 @@
+ALTER TABLE `boffmedia_tournaments` ADD `auto_verify_minutes` int;
