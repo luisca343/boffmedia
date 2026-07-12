@@ -6,7 +6,7 @@ import { Check, Sparkles } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { ItemImage } from "@/lib/ItemImage";
 import { ArcadeInventoryItem, LootboxItemConfig } from "@boffmedia/shared";
-import { getRewardIcon } from "../../../_util/rewardIcons";
+import { getRewardIcon } from "../../../_utils/rewardIcons";
 import { Item } from "@radix-ui/react-select";
 
 interface ResultDisplayProps {

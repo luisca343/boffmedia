@@ -1,7 +1,7 @@
 import { PokemonW } from "@boffmedia/shared"
 import { ExtendedPokemonW } from "@/types/dto/pc-pokemon.dto"
 import { PokemonImage } from '@/lib/PokemonImage'
-import { createPokemonSpecFromTeam } from "../../utils/pokemonUtils"
+import { createPokemonSpecFromTeam } from "../../_utils/pokemonUtils"
 import { PiStarFill, PiSkullFill, PiPlus } from "react-icons/pi"
 import { PokemonItemImage } from "@/components/shared/pokemon/PokemonItemImage"
 import { useState, useMemo } from "react"

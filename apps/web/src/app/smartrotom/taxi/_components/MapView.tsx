@@ -6,10 +6,10 @@ import { useMemo } from 'react';
 import { Position, MapBounds, CoordinateTransformer, PositionCalculator, MapImage } from '@/components/shared/map/StandardizedMap';
 
 // Hooks
-import { useMapState } from '../hooks/useMapState';
-import { useMapInteractions } from '../hooks/useMapInteractions';
-import { useStopPositions } from '../hooks/useStopPositions';
-import { useViewportDimensions } from '../hooks/useViewportDimensions';
+import { useMapState } from '../_hooks/useMapState';
+import { useMapInteractions } from '../_hooks/useMapInteractions';
+import { useStopPositions } from '../_hooks/useStopPositions';
+import { useViewportDimensions } from '../_hooks/useViewportDimensions';
 
 // Components
 import { MapHeader } from './map/MapHeader';

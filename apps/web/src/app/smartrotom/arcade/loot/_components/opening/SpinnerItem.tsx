@@ -6,7 +6,7 @@ import { getRarityConfig } from "../../_utils/rarityConfig";
 import { useTranslations } from "next-intl";
 import { ItemImage } from "@/lib/ItemImage";
 import { ArcadeInventoryItem, LootboxItemConfig } from "@boffmedia/shared";
-import { getRewardIcon } from "../../../_util/rewardIcons";
+import { getRewardIcon } from "../../../_utils/rewardIcons";
 
 interface SpinnerItemProps {
   item: LootboxItemConfig;

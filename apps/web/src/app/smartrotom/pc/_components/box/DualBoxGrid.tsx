@@ -1,5 +1,5 @@
 import { PCBoxData, PCPokemon } from '@/types/dto/pc-pokemon.dto'
-import { FilterBoxData } from '../../types/filter.types'
+import { FilterBoxData } from '../../_types/filter.types'
 import { BattleTeam } from '@/types/dto/battle-team.dto'
 import PokemonSlot from './PokemonSlot'
 import BoxHeader from './BoxHeader'

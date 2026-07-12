@@ -1,8 +1,8 @@
 import { useCallback } from 'react'
 import { PCPokemon } from '@/types/dto/pc-pokemon.dto'
 import { PokemonW } from '@boffmedia/shared'
-import { FilterBoxData } from '../../types/filter.types'
-import { usePCWithFilters } from '../../hooks/usePCWithFilters'
+import { FilterBoxData } from '../../_types/filter.types'
+import { usePCWithFilters } from '../../_hooks/usePCWithFilters'
 
 interface FilterBoxProps {
   uuid: string

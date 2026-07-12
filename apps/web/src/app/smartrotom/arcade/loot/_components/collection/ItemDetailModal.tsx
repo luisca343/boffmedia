@@ -4,7 +4,7 @@ import { ItemDisplay } from "../ItemDisplay";
 import { useTranslations } from "next-intl";
 import { getItemDescription, getItemName, getItemRarity } from "@/lib/intlUtils";
 import { ArcadeInventoryItem } from "@boffmedia/shared";
-import { getRewardIcon } from "../../../_util/rewardIcons";
+import { getRewardIcon } from "../../../_utils/rewardIcons";
 
 interface ItemDetailModalProps {
   item: ArcadeInventoryItem | null;

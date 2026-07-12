@@ -12,7 +12,7 @@ import {
   filterAmount,
   filterDate,
   filterReason,
-} from "../../_util/TransactionFilter";
+} from "../../_utils/TransactionFilter";
 import { CellDefProps } from "../page";
 import { Input } from "@/components/ui/primitives/input";
 import { strToDate, cn } from "@/lib/utils";

@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { ItemImage } from "@/lib/ItemImage";
 import { Check } from "lucide-react";
-import { getRewardIcon } from "../../_util/rewardIcons";
+import { getRewardIcon } from "../../_utils/rewardIcons";
 
 interface ItemDisplayProps {
   type: string;
