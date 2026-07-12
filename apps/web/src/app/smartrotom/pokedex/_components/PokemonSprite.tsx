@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { StatusIconv2 } from "./StatusIcon"
-import { InternalLink } from "@/components/ui/navigation/Link"
+import Link from "next/link"
 import { usePokemonStore } from "@/stores/pokemonStore"
 import { Loading } from "@/components/smartrotom/Loading"
 import { getItemSprite, getPokemonNameFromIdAndForm, getVisibility, PokedexStatus } from "../dexUtils"
@@ -45,9 +45,9 @@ export function PokemonSpriteLink({children, id, form, palette, width = 80, heig
   if (!isVisible) return null
 
   return (
-    <InternalLink
-      className="flex flex-col items-center hover:bg-layer-3 rounded-sm text-center w-24 2xl:w-20 text-ink"
-      href={`pokedex/entrada/${id}/${form}`}
+    <Link
+      className="flex w-24 flex-col items-center rounded-sm text-center text-pk-surface-100 hover:bg-pk-surface-800 2xl:w-20"
+      href={`/smartrotom/pokedex/entrada/${id}/${form}`}
     >
       <PokemonSprite
         id={id}
@@ -63,7 +63,7 @@ export function PokemonSpriteLink({children, id, form, palette, width = 80, heig
         hideCaught={hideCaught}
         hideSeen={hideSeen}
       />
-    </InternalLink>
+    </Link>
   )
 }
 

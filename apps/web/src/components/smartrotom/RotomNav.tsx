@@ -22,11 +22,7 @@ import { NotificationsService } from "@/services/api/smartrotom/notificationsSer
 import type { NotificationResponseDto } from "@boffmedia/shared";
 import { useTranslations } from "next-intl";
 
-export function RotomNav({
-  setTema,
-}: {
-  setTema: (tema: string) => void;
-}) {
+export function RotomNav() {
   const { socket, connect } = useSocketStore();
   const { session } = useBoffSession();
   const t = useTranslations("nav.notifications");
@@ -194,7 +190,7 @@ export function RotomNav({
           </SheetHeader>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <SettingsPage setTema={setTema} />
+              <SettingsPage />
             </div>
             <div>
               <div className="flex items-center gap-2 mb-3">
