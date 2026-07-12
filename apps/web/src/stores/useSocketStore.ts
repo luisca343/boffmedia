@@ -2,6 +2,7 @@ import type { SmartRotomUser } from "@/types"
 import io, { type Socket } from "socket.io-client"
 import { create } from "zustand"
 import { env } from "@/config/env.public"
+import { isMinecraft } from "@/services/mcef/mcefHelper"
 
 interface SocketStore {
   socket: Socket | null
@@ -38,8 +39,9 @@ const useSocketStore = create<SocketStore>((set, get) => ({
     socket.on("connect", () => {
       //console.log("Socket connected")
       set({ user, socket, isConnecting: false })
-      // Emit smartrotom:connection event as expected by the gateway
-      socket.emit("smartrotom:connection", user)
+      // Emit smartrotom:connection event as expected by the gateway.
+      // `inGame` tags the connection source so presence can be online vs ingame.
+      socket.emit("smartrotom:connection", { ...user, inGame: isMinecraft() })
     })
 
     socket.on("disconnect", (reason) => {

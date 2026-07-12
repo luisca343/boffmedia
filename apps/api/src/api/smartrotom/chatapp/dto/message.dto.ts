@@ -113,6 +113,21 @@ export class DeleteMessageDto extends BaseDto {
   uuid: string;
 }
 
+export class ReactMessageDto extends BaseDto {
+  @ApiProperty({
+    description: 'UUID of the user reacting',
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
+  })
+  @IsNotEmpty()
+  @IsString()
+  uuid: string;
+
+  @ApiProperty({ description: 'Reaction emoji', example: '🔥' })
+  @IsNotEmpty()
+  @IsString()
+  emoji: string;
+}
+
 export class MarkMessageReadDto extends BaseDto {
   @ApiProperty({
     description: 'Message ID',

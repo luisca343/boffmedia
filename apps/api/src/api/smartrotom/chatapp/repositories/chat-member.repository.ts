@@ -44,9 +44,7 @@ export class ChatMemberRepository implements IMemberRepository {
     const result = await this.db.insert(rotomChatUsers).values({
       chatId,
       uuid,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    } as RotomChatUser);
+    });
     return { insertId: result[0].insertId };
   }
 
@@ -70,5 +68,41 @@ export class ChatMemberRepository implements IMemberRepository {
       )
       .limit(1);
     return result[0] || null;
+  }
+
+  async findMemberFlags(
+    chatId: number,
+    uuid: string,
+  ): Promise<{ pinned: boolean; muted: boolean }> {
+    const result = await this.db
+      .select({ pinned: rotomChatUsers.pinned, muted: rotomChatUsers.muted })
+      .from(rotomChatUsers)
+      .where(
+        and(eq(rotomChatUsers.chatId, chatId), eq(rotomChatUsers.uuid, uuid)),
+      )
+      .limit(1);
+    return result[0] || { pinned: false, muted: false };
+  }
+
+  async setPinned(
+    chatId: number,
+    uuid: string,
+    pinned: boolean,
+  ): Promise<void> {
+    await this.db
+      .update(rotomChatUsers)
+      .set({ pinned })
+      .where(
+        and(eq(rotomChatUsers.chatId, chatId), eq(rotomChatUsers.uuid, uuid)),
+      );
+  }
+
+  async setMuted(chatId: number, uuid: string, muted: boolean): Promise<void> {
+    await this.db
+      .update(rotomChatUsers)
+      .set({ muted })
+      .where(
+        and(eq(rotomChatUsers.chatId, chatId), eq(rotomChatUsers.uuid, uuid)),
+      );
   }
 }

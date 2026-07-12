@@ -158,9 +158,7 @@ export class ChatappRepository {
     const result = await this.db.insert(rotomChatUsers).values({
       chatId,
       uuid,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    } as RotomChatUser);
+    });
 
     return { insertId: result[0].insertId };
   }
