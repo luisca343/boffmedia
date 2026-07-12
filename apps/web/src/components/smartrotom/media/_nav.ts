@@ -20,7 +20,7 @@ export interface NavConfig {
 /**
  * Sidebar nav per app. Only Inicio + Historial have real routes today; the rest
  * of the designed nav is rendered but gated (`deferred`) rather than faked —
- * see the deferred register in docs/MEWTUBE_MEWTWITCH_V3.md §13.
+ * see the deferred register in docs/smartrotom/deferred/mewtube-mewtwitch.md.
  */
 export function navFor(app: MediaAppId, basePath: string): NavConfig {
   const isTube = app === "mewtube"

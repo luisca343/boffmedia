@@ -2,8 +2,8 @@
 import * as React from "react";
 import { formatMoney } from "../../_utils/format";
 
-const FG_SUBTLE = "#8d99b3";
-const BORDER = "#e3ebf5";
+// Axis/grid/ink follow the theme, so they are Tailwind token classes rather than
+// baked hex — a light-tuned grid line is invisible on the dark navy canvas.
 
 interface Point { balance: number; day: number }
 
@@ -66,13 +66,13 @@ export function AreaChart({ data, height = 240, color = "#2463eb", showAxis = tr
         </defs>
         {showAxis && (
           <g>
-            {ticks.map((t, i) => <line key={i} x1={padX} x2={w - 8} y1={t.y} y2={t.y} stroke={BORDER} strokeDasharray="2 4" />)}
+            {ticks.map((t, i) => <line key={i} x1={padX} x2={w - 8} y1={t.y} y2={t.y} className="stroke-sb-border" strokeDasharray="2 4" />)}
           </g>
         )}
         {showAxis && (
           <g>
             {ticks.map((t, i) => (
-              <text key={i} x={padX - 8} y={t.y + 3} textAnchor="end" fontSize="10" fill={FG_SUBTLE} className="tabular-nums">
+              <text key={i} x={padX - 8} y={t.y + 3} textAnchor="end" fontSize="10" className="fill-sb-fg-subtle tabular-nums">
                 {Math.round(t.v / 1000)}k
               </text>
             ))}
@@ -83,7 +83,7 @@ export function AreaChart({ data, height = 240, color = "#2463eb", showAxis = tr
         {hover && (
           <g>
             <line x1={hover.x} x2={hover.x} y1={padY} y2={padY + innerH} stroke={color} strokeOpacity=".25" strokeDasharray="2 3" />
-            <circle cx={hover.x} cy={hover.y} r="4" fill={color} stroke="#fff" strokeWidth="2" />
+            <circle cx={hover.x} cy={hover.y} r="4" fill={color} className="stroke-sb-surface" strokeWidth="2" />
           </g>
         )}
       </svg>

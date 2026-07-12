@@ -14,6 +14,7 @@ import { isMinecraft } from "@/services/mcef/mcefHelper"
 import { MinecraftAuthForm } from "./MinecraftAuthForm"
 import { RotomError, RotomErrorPage } from "./RotomError"
 import { RotomErrorCodeKey } from "./RotomErrorSystem"
+import { useRotomThemeClass } from "./theme/useRotomTheme"
 
 export default function AppWrapper({
   children,
@@ -27,7 +28,9 @@ export default function AppWrapper({
   const [datosUsuario, setDatosUsuario] = useState<Object | null>(null)
   const [isMC, setIsMC] = useState(false)
 
-  const [tema, setTema] = useState("")
+  // The theme lives in a persisted store, not local state — it used to reset on every
+  // reload. `RotomNav`/`Settings` write to the same store, so no setter is threaded down.
+  const tema = useRotomThemeClass()
 
   /*
     if ('speechSynthesis' in window) {
@@ -135,7 +138,7 @@ export default function AppWrapper({
       id="smartrotom"
       className={`roboto flex flex-col min-h-screen ${tema} text-black bg-transparent`}
     >
-      <RotomNav setTema={setTema} />
+      <RotomNav />
       <ToastContainer position="bottom-right" theme="dark" />
       <main className="relative flex-1 pt-12 flex overflow-hidden">
         <CallStatus />

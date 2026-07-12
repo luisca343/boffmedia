@@ -1,8 +1,6 @@
 import * as React from "react";
 import { formatMoney } from "../../_utils/format";
 
-const FG_MUTED = "#5b6b85";
-const FG = "#0c1830";
 
 interface Slice { value: number; hex: string }
 
@@ -25,8 +23,8 @@ export function Donut({ data, size = 200, thickness = 22 }: { data: Slice[]; siz
         const path = `M ${x0} ${y0} A ${r} ${r} 0 ${large} 1 ${x1} ${y1}`;
         return <path key={i} d={path} stroke={d.hex} strokeWidth={thickness} fill="none" strokeLinecap="butt" />;
       })}
-      <text x={c} y={c - 4} textAnchor="middle" fontSize="11" fill={FG_MUTED}>Total</text>
-      <text x={c} y={c + 14} textAnchor="middle" fontSize="16" fontWeight="700" fill={FG} className="tabular-nums">
+      <text x={c} y={c - 4} textAnchor="middle" fontSize="11" className="fill-sb-fg-muted">Total</text>
+      <text x={c} y={c + 14} textAnchor="middle" fontSize="16" fontWeight="700" className="fill-sb-fg tabular-nums">
         {formatMoney(total)}
       </text>
     </svg>

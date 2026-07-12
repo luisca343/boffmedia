@@ -2,7 +2,7 @@
 import { Badge } from "@/components/ui/primitives/badge";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/primitives/hover-card";
 import { Input } from "@/components/ui/primitives/input";
-import MoveDataElement from "@/app/smartrotom/pokedex/movimientos/_components/MoveData";
+import MoveDataElement from "./MoveData";
 import { useTranslations } from "next-intl";
 import { getTranslatedMoveName, getTranslatedMoveCategory } from "@/utils/pokemonTranslations";
 import { useState, useMemo } from "react";

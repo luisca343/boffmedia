@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/primitives/input";
 import { Button } from "@/components/ui/primitives/button";
 
 import TypeBadge from "@/components/shared/pokemon/TypeBadge";
-import MoveDataElement from "@/app/smartrotom/pokedex/movimientos/_components/MoveData";
+import MoveDataElement from "./MoveData";
 
 import { getStatColor, statToPercentage, getTotalStatColor } from "@/lib/pokemonColors";
 import { getTranslatedMoveName, getTranslatedMoveCategory, getTranslatedBiomeName } from "@/utils/pokemonTranslations";

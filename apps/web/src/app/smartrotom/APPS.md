@@ -533,3 +533,20 @@ The tour is a special featured article in Guías (`/guias/bienvenida`) and can b
 ### App store (Admin-managed)
 
 Admins can enable/disable individual apps per player group (VIP, staff, all players) without a redeploy. The existing `rotom_apps` + `rotom_user_apps` system already supports this. The Admin app's "Apps" section should expose a full matrix: app × player group = enabled/disabled, with bulk assign.
+
+---
+
+## Developer routes
+
+Not player-facing apps — internal surfaces, not registered in `rotom_apps`.
+
+### Componentes (design-system showcase)
+**Route:** `/smartrotom/styles/components`
+
+Live catalogue of every SmartRotom primitive, across all six design systems (the `sr-*` chrome plus
+`sb`/`ca`/`nt`/`pk`/`mw`). Each specimen mounts its app's real scope root, so a primitive renders here
+exactly as it does in the app — including ChatApp/Notas light-vs-dark and the Mewtube-red vs
+Mewtwitch-purple accent switch, shown side by side.
+
+The SmartRotom sibling of Boffmedia's `/styles/components`. **Add a specimen whenever you add a
+primitive.** See [docs/smartrotom/SMARTROTOM_V3.md](../../../../../docs/smartrotom/SMARTROTOM_V3.md).
