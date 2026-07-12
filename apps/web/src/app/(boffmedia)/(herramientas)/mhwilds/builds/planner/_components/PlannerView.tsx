@@ -2,8 +2,8 @@
 
 import React, { useEffect, useMemo, useState } from "react"
 import { useTranslations } from "next-intl"
-import { toast } from "@/components/boffmedia/primitives"
-import { EquipmentType, Weapon, ArmorPiece, Charm, Decoration } from "@/types/tools/mhwilds"
+import { Icon, toast } from "@/components/boffmedia/primitives"
+import { EquipmentType, Weapon, ArmorPiece, Charm, Decoration, MhMonster } from "@/types/tools/mhwilds"
 import { MhApp, MhBody, MhWrap } from "../../../_components/ui/mh-kit"
 import { weaponAttack } from "../../../_components/mh-helpers"
 import { useGameData } from "../_hooks/useGameData"
@@ -13,6 +13,10 @@ import { importBuildFromUrl, generateShareableLink, exportBuildAsJson, saveBuild
 import { PlannerBar } from "./PlannerBar"
 import { Loadout } from "./Loadout"
 import { Summary } from "./Summary"
+import { PlannerCompare } from "./PlannerCompare"
+import { TargetPanel } from "./TargetPanel"
+import { TargetDrawer } from "./TargetDrawer"
+import { SkillSearchDrawer, type SkillSource } from "./SkillSearchDrawer"
 import { EquipDrawer, DecoDrawer, SavedDrawer, IoDrawer } from "./drawers"
 
 export type SlotDef = { key: EquipmentType; icon: "sword" | "shield" | "sparkles"; kind: EquipmentType | "weapon" | "charm"; labelKey: string }
@@ -33,6 +37,8 @@ type Drawer =
   | { type: "deco"; slot: EquipmentType; idx: number; size: number }
   | { type: "saved" }
   | { type: "io" }
+  | { type: "target" }
+  | { type: "skillsearch" }
   | null
 
 export function PlannerView() {
@@ -49,6 +55,8 @@ export function PlannerView() {
   } = useBuildState({ getWeaponById, getArmorById, getDecorationById, getCharmById })
 
   const [drawer, setDrawer] = useState<Drawer>(null)
+  const [mode, setMode] = useState<"build" | "compare">("build")
+  const [targetMon, setTargetMon] = useState<MhMonster | null>(null)
   const isLoading = loadingWeapons || loadingArmor || loadingDecorations || loadingCharms
 
   useEffect(() => {
@@ -81,6 +89,22 @@ export function PlannerView() {
     setDrawer(null)
   }
 
+  // equip a skill source from the reverse-search: armor/charm into its slot, a
+  // decoration into the first equipped piece with a free slot big enough.
+  const equipSource = (src: SkillSource) => {
+    if (src.kind === "armor") return equip(src.slot, src.item)
+    if (src.kind === "charm") return equip("charm", src.item)
+    for (const s of SLOTS) {
+      const item = buildWithFullObjects[s.key] as { slots?: number[] } | null
+      const slots = item?.slots || []
+      for (let idx = 0; idx < slots.length; idx++) {
+        const free = !currentBuild.decorations.some((d) => d.equipmentType === s.key && d.slotIndex === idx)
+        if (slots[idx] >= src.decoSlot && free) return setDeco(s.key, idx, src.item)
+      }
+    }
+    toast.error(t("build_planner.skillsearch.no_slot"))
+  }
+
   const onSave = () => {
     try { saveBuildToLocalStorage(currentBuild); toast.success(t("build_planner.saved_local", { key: "" })) }
     catch { toast.error(t("build_planner.error_saving")) }
@@ -102,6 +126,8 @@ export function PlannerView() {
         filled={filled}
         total={SLOTS.length}
         skillCount={skills.length}
+        mode={mode}
+        onMode={(m) => setMode(m === "compare" ? "compare" : "build")}
         onOpenSaved={() => setDrawer({ type: "saved" })}
         onIo={() => setDrawer({ type: "io" })}
         onShare={onShare}
@@ -111,22 +137,55 @@ export function PlannerView() {
 
       <MhBody>
         <MhWrap>
-          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(330px,380px)] gap-4 items-start">
-            <Loadout
-              slots={SLOTS}
-              build={buildWithFullObjects}
-              filled={filled}
-              total={SLOTS.length}
-              skills={skills.length}
-              attack={weaponAttack(wp)}
-              defense={stats.defenseMin}
-              onSwap={handleSwapWeapons}
-              onOpenEquip={(slot) => setDrawer({ type: "equip", slot })}
-              onOpenDeco={(slot, idx, size) => setDrawer({ type: "deco", slot, idx, size })}
-              onClearDeco={(slot, idx) => setDeco(slot, idx, null)}
+          {mode === "compare" ? (
+            <PlannerCompare
+              currentBuild={currentBuild}
+              resolvers={{ getWeaponById, getArmorById, getDecorationById, getCharmById }}
+              skillsData={skillsData}
+              onBack={() => setMode("build")}
             />
-            <Summary stats={stats} skills={skills} skillsData={skillsData} weapon={wp} />
-          </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(330px,380px)] gap-4 items-start">
+              <div className="flex flex-col gap-4">
+                <Loadout
+                  slots={SLOTS}
+                  build={buildWithFullObjects}
+                  filled={filled}
+                  total={SLOTS.length}
+                  skills={skills.length}
+                  attack={weaponAttack(wp)}
+                  defense={stats.defenseMin}
+                  onSwap={handleSwapWeapons}
+                  onOpenEquip={(slot) => setDrawer({ type: "equip", slot })}
+                  onOpenDeco={(slot, idx, size) => setDrawer({ type: "deco", slot, idx, size })}
+                  onClearDeco={(slot, idx) => setDeco(slot, idx, null)}
+                />
+                <button
+                  type="button"
+                  onClick={() => setDrawer({ type: "skillsearch" })}
+                  className="flex w-full items-center gap-3 border border-line bg-panel px-3.5 py-3 text-left transition-colors cut-corner hover:border-[var(--mh)]"
+                >
+                  <Icon name="search" size={16} className="shrink-0 text-[var(--mh-bright)]" />
+                  <span className="grid min-w-0 gap-0.5">
+                    <b className="font-display text-[14px] leading-tight font-bold uppercase">{t("build_planner.skillsearch.cta_title")}</b>
+                    <span className="font-mono text-[11px] leading-none text-txt-muted">{t("build_planner.skillsearch.cta_lead")}</span>
+                  </span>
+                  <Icon name="chevronRight" size={15} className="ml-auto shrink-0 text-txt-dim" />
+                </button>
+              </div>
+              <div className="flex flex-col gap-3.5 lg:sticky lg:top-[74px]">
+                <TargetPanel
+                  target={targetMon}
+                  weapons={weapons}
+                  currentWeaponId={currentBuild.weaponId}
+                  onPick={() => setDrawer({ type: "target" })}
+                  onClear={() => setTargetMon(null)}
+                  onEquipWeapon={(id) => equip("weapon", getWeaponById(id))}
+                />
+                <Summary stats={stats} skills={skills} skillsData={skillsData} weapon={wp} />
+              </div>
+            </div>
+          )}
         </MhWrap>
       </MhBody>
 
@@ -165,6 +224,21 @@ export function PlannerView() {
           onImport={(b) => { setCurrentBuild(b); setDrawer(null); toast.success(t("build_planner.build_loaded", { name: b.name })) }}
           onShare={onShare}
           onExport={onExport}
+          onClose={() => setDrawer(null)}
+        />
+      )}
+      {drawer?.type === "target" && (
+        <TargetDrawer
+          onPick={(m) => { setTargetMon(m); setDrawer(null) }}
+          onClose={() => setDrawer(null)}
+        />
+      )}
+      {drawer?.type === "skillsearch" && (
+        <SkillSearchDrawer
+          armor={armor}
+          charms={charms}
+          decorations={decorations}
+          onEquip={equipSource}
           onClose={() => setDrawer(null)}
         />
       )}

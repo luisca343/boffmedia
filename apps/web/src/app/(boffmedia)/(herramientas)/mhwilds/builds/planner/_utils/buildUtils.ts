@@ -1,4 +1,37 @@
-import { BuildDataWithIds, EquipmentType } from "@/types/tools/mhwilds";
+import { BuildData, BuildDataWithIds, DecorationAssignment, EquipmentType } from "@/types/tools/mhwilds";
+
+export interface BuildResolvers {
+  getWeaponById: (id: string | null) => any;
+  getArmorById: (id: string | null) => any;
+  getDecorationById: (id: string) => any;
+  getCharmById: (id: string | null) => any;
+}
+
+/**
+ * Resolve an id-based build into full equipment objects, using the getters from
+ * `useGameData`. Shared by the live build state and the compare view so any saved
+ * build can be run through the real calc engine.
+ */
+export function resolveBuild(build: BuildDataWithIds, g: BuildResolvers): BuildData {
+  return {
+    name: build.name,
+    weapon: g.getWeaponById(build.weaponId),
+    secondaryWeapon: g.getWeaponById(build.secondaryWeaponId),
+    head: g.getArmorById(build.headId),
+    chest: g.getArmorById(build.chestId),
+    arms: g.getArmorById(build.armsId),
+    waist: g.getArmorById(build.waistId),
+    legs: g.getArmorById(build.legsId),
+    charm: g.getCharmById(build.charmId),
+    decorations: build.decorations
+      .map((d: { equipmentType: EquipmentType; slotIndex: number; decorationId: string }) => ({
+        equipmentType: d.equipmentType,
+        slotIndex: d.slotIndex,
+        decoration: g.getDecorationById(d.decorationId),
+      }))
+      .filter((d: { decoration: any }) => d.decoration !== null) as DecorationAssignment[],
+  };
+}
 
 /**
  * Convert single letter equipment type to full type

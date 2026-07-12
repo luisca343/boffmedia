@@ -52,6 +52,54 @@
       "loadError": "Error loading the weapon tree"
     },
     "build_planner": {
+      "compare": {
+        "mode_edit": "Edit",
+        "mode_compare": "Compare",
+        "title": "Compare builds",
+        "lead": "Your current build against up to 2 saved ones. The best in each row is highlighted.",
+        "back": "Back to editing",
+        "current": "current",
+        "pick": "Pick saved builds ({count}/2)",
+        "res_total": "Total res.",
+        "wasted": "Wasted",
+        "top_skills": "Top skills",
+        "empty_title": "Nothing to compare",
+        "empty_lead": "Save at least one build to pit it against the current one."
+      },
+      "target": {
+        "cta_title": "Choose target monster",
+        "cta_lead": "Weapon suggestions based on its weaknesses",
+        "title": "Target monster",
+        "change": "Change",
+        "clear": "Clear target",
+        "weak_to": "Weak to",
+        "recommended": "Recommended weapons",
+        "no_elem_weak": "No elemental weakness",
+        "no_suggestions": "No elemental weapon exploits its weaknesses — prioritise raw damage and high sharpness.",
+        "equip": "Equip",
+        "bestiary": "View in bestiary",
+        "drawer_title": "Choose target monster",
+        "drawer_empty": "No monster matches your search."
+      },
+      "skillsearch": {
+        "cta_title": "Search by skill",
+        "cta_lead": "Find which piece, jewel or charm grants it",
+        "title": "Search by skill",
+        "sub": "What equipment grants each skill",
+        "placeholder": "Search skill…",
+        "all": "All skills",
+        "empty": "No skill matches your search.",
+        "source_count": "{count, plural, one {# source} other {# sources}}",
+        "kind_armor": "Armor",
+        "kind_charm": "Charm",
+        "kind_decoration": "Jewel",
+        "no_slot": "No free slot for this jewel — equip armor with slots."
+      },
+      "forge": {
+        "owned": "{owned}/{total} owned",
+        "full_path": "Full path · {steps} steps",
+        "loading_path": "Computing upgrade path…"
+      },
       "piecesCount": "{filled}/{total} pieces",
       "swap": "Swap",
       "import_export": "Import / export",
