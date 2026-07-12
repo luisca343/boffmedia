@@ -535,6 +535,10 @@ img { display: block; max-width: 100%; }
 
 @media (prefers-reduced-motion: reduce) {
   * { scroll-behavior: auto !important; }
+  /* Collapse state/hover transitions. Animations are left intact so loading
+     spinners keep indicating; decorative animation reduction rides with the
+     per-app animation pass. */
+  *, *::before, *::after { transition-duration: 0.01ms !important; }
 }
 
 /* ===========================================================================

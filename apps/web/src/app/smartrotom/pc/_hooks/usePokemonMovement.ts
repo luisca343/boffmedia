@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { toast } from 'react-toastify'
-import { DragSource, DragDestination } from '../types/common'
+import { DragSource, DragDestination } from '../_types/common'
 import { PCPokemon } from '@/types/dto/pc-pokemon.dto'
 import { PokemonW } from '@boffmedia/shared'
 import { WingullService } from '@/services/api/smartrotom/wingullService'
@@ -8,7 +8,7 @@ import {
   convertPCToTeam, 
   convertTeamToPC, 
   updatePokemonPosition 
-} from '../lib/pokemonConversion'
+} from '../_lib/pokemonConversion'
 
 interface UsePokemonMovementProps {
   uuid: string

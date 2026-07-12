@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/primitives/button";
 import { Loader2 } from "lucide-react";
 import { getItemName } from "@/lib/intlUtils";
 import { useTranslations } from "next-intl";
-import { getRewardIcon, isNamedReward } from "../../_util/rewardIcons";
+import { getRewardIcon, isNamedReward } from "../../_utils/rewardIcons";
 import { DailyRewardItem, DailyRewardsConfig } from "@boffmedia/shared";
 
 interface ClaimSectionProps {

@@ -24,16 +24,19 @@ export const BaseProfileHeader = ({
   statsComponent,
   additionalInfo
 }: BaseProfileHeaderProps) => {
-  const theme = themes[platform];
-  
-  // Get banner image or fallback to platform gradient
-  const bannerStyle = bannerUrl 
-    ? { backgroundImage: `url(${bannerUrl})` } 
-    : { background: `linear-gradient(90deg, ${theme.primary} 0%, ${theme.secondary} 100%)` };
+  // Banner image, or a platform-colored gradient fallback. Fallback uses full
+  // literal classes so the Tailwind JIT emits them (a `${theme.primary}` value
+  // like "red-500" is invalid CSS inside an inline-style gradient).
+  const bannerStyle = bannerUrl ? { backgroundImage: `url(${bannerUrl})` } : undefined;
+  const bannerFallback = bannerUrl
+    ? ""
+    : platform === "youtube"
+    ? "bg-gradient-to-r from-red-500 to-red-600"
+    : "bg-gradient-to-r from-purple-500 to-purple-600";
 
   return (
     <>
-      <div className="w-full h-40 md:h-56 bg-cover bg-center" style={bannerStyle}></div>
+      <div className={`w-full h-40 md:h-56 bg-cover bg-center ${bannerFallback}`} style={bannerStyle}></div>
       
       <div className="container mx-auto px-4 -mt-16 relative z-10">
         <div className="bg-layer-2 rounded-xl shadow-xl p-6">

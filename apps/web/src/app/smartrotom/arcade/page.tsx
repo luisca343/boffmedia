@@ -12,7 +12,7 @@ import { useArcadeStreak } from "@/hooks/_main/useArcadeStreak";
 import { ToastContainer } from "react-toastify";
 import { useTranslations } from "next-intl";
 import { getItemName } from "@/lib/intlUtils";
-import { isNamedReward } from "./_util/rewardIcons";
+import { isNamedReward } from "./_utils/rewardIcons";
 import { ItemImage } from "@/lib/ItemImage";
 
 export default function CentroArcade() {

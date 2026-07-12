@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback } from 'react';
-import { Position, DragState, MapBounds } from '../types/map.types';
+import { Position, DragState, MapBounds } from '../_types/map.types';
 import { CoordinateTransformer } from '@/components/shared/map/StandardizedMap';
-import { calculateWorldMovementDelta } from '../utils/coordinate-utils';
+import { calculateWorldMovementDelta } from '../_utils/coordinate-utils';
 interface UseMapInteractionsProps {
   mapBounds: MapBounds;
   zoomLevel: number;

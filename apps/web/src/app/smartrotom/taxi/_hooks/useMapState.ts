@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Position, MapBounds } from '@/components/shared/map/StandardizedMap';
-import { MAP_CONSTANTS, ZOOM_CONSTANTS } from '../utils/constants';
+import { MAP_CONSTANTS, ZOOM_CONSTANTS } from '../_utils/constants';
 
 interface UseMapStateProps {
   playerPosition: Position;

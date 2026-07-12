@@ -1,5 +1,5 @@
 import { PCPokemon } from '@/types/dto/pc-pokemon.dto'
-import { PokemonFilter, FilterSort, LEGENDARY_POKEMON_IDS } from '../types/filter.types'
+import { PokemonFilter, FilterSort, LEGENDARY_POKEMON_IDS } from '../_types/filter.types'
 
 /**
  * Check if a Pokémon matches the given filters
