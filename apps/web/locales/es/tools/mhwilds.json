@@ -52,6 +52,54 @@
       "loadError": "Error al cargar el árbol de armas"
     },
     "build_planner": {
+      "compare": {
+        "mode_edit": "Editar",
+        "mode_compare": "Comparar",
+        "title": "Comparar builds",
+        "lead": "Tu build actual frente a hasta 2 guardadas. Se resalta la mejor de cada fila.",
+        "back": "Volver a editar",
+        "current": "actual",
+        "pick": "Elige builds guardadas ({count}/2)",
+        "res_total": "Res. total",
+        "wasted": "Desperdiciado",
+        "top_skills": "Top habilidades",
+        "empty_title": "Nada que comparar",
+        "empty_lead": "Guarda al menos una build para enfrentarla con la actual."
+      },
+      "target": {
+        "cta_title": "Elegir monstruo objetivo",
+        "cta_lead": "Sugerencias de armas según sus debilidades",
+        "title": "Monstruo objetivo",
+        "change": "Cambiar",
+        "clear": "Quitar objetivo",
+        "weak_to": "Débil a",
+        "recommended": "Armas recomendadas",
+        "no_elem_weak": "Sin debilidad elemental",
+        "no_suggestions": "Ningún arma elemental aprovecha sus debilidades — prioriza daño físico y afilado alto.",
+        "equip": "Equipar",
+        "bestiary": "Ver en el bestiario",
+        "drawer_title": "Elegir monstruo objetivo",
+        "drawer_empty": "Ningún monstruo coincide con la búsqueda."
+      },
+      "skillsearch": {
+        "cta_title": "Buscar por habilidad",
+        "cta_lead": "Encuentra qué pieza, joya o talismán la otorga",
+        "title": "Buscar por habilidad",
+        "sub": "Qué equipo otorga cada habilidad",
+        "placeholder": "Buscar habilidad…",
+        "all": "Todas las habilidades",
+        "empty": "Ninguna habilidad coincide con la búsqueda.",
+        "source_count": "{count, plural, one {# fuente} other {# fuentes}}",
+        "kind_armor": "Armadura",
+        "kind_charm": "Talismán",
+        "kind_decoration": "Joya",
+        "no_slot": "Sin ranura libre para esta joya — equipa armadura con ranuras."
+      },
+      "forge": {
+        "owned": "{owned}/{total} obtenidos",
+        "full_path": "Ruta completa · {steps} pasos",
+        "loading_path": "Calculando ruta de mejora…"
+      },
       "piecesCount": "{filled}/{total} piezas",
       "swap": "Cambiar",
       "import_export": "Importar / exportar",
