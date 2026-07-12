@@ -31,6 +31,41 @@
         "disqualified": "Descalificado"
       }
     },
+    "tabs": {
+      "private": "Privada",
+      "public": "Pública",
+      "tournaments": "Torneos"
+    },
+    "tours": {
+      "kicker": "Cuenta · Competición",
+      "title": "Mis torneos",
+      "viewAll": "Ver todos los torneos",
+      "registered": "Inscrito",
+      "emptyTitle": "Sin torneos todavía",
+      "emptyBody": "Apúntate a un torneo de la comunidad y aparecerá aquí.",
+      "groups": {
+        "live": "En curso",
+        "soon": "Próximos",
+        "done": "Historial"
+      }
+    },
+    "live": {
+      "badge": "En vivo",
+      "round": "Ronda {n} · en curso",
+      "vs": "vs.",
+      "enter": "Entrar a mi partida",
+      "record": "Récord",
+      "points": "Puntos",
+      "progress": "Ronda",
+      "format": {
+        "single": "Eliminación directa",
+        "double": "Doble eliminación",
+        "groups": "Grupos",
+        "roundrobin": "Todos contra todos",
+        "swiss": "Suizo",
+        "leaderboard": "Clasificación"
+      }
+    },
     "stats": {
       "rank": "Ranking global",
       "points": "Puntos",

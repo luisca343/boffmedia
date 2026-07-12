@@ -19,10 +19,12 @@ function MiniFlag({ icon, children }: { icon?: IconName; children: React.ReactNo
   )
 }
 
+// Flat layout (no box of its own) — the parent MewPanel is the single wrapper.
+// A dashed top-divider only appears when several stack in one panel.
 function InlineShell({ cat, id, rec, badges, facts, desc, onNav }: { cat: string; id: string; rec: { id: string; name: string }; badges?: React.ReactNode; facts?: React.ReactNode; desc?: string; onNav: NavFn }) {
   const clipped = mewClip(desc, 120)
   return (
-    <div className="border-[1.5px] border-solid border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] p-2.5 [border-radius:var(--wob-c)]">
+    <div className="border-t border-dashed border-[color:var(--mwp-ink-line)] pt-3 first:border-t-0 first:pt-0">
       <button type="button" onClick={() => onNav(cat, id)} className="group flex w-full items-center gap-2.5 text-left">
         <MewTile cat={cat} rec={rec as never} size={42} />
         <span className="flex min-w-0 flex-1 flex-col gap-1">
@@ -34,7 +36,7 @@ function InlineShell({ cat, id, rec, badges, facts, desc, onNav }: { cat: string
         </span>
         <Icon name="arrow" size={13} className="flex-none text-[color:var(--mwp-ink-soft)] group-hover:text-[color:var(--mwp-red)]" />
       </button>
-      {facts ? <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 border-t border-dashed border-[color:var(--mwp-ink-line)] pt-2 font-mono text-[11.5px]/[1.3] text-[color:var(--mwp-ink-soft)]">{facts}</div> : null}
+      {facts ? <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 font-mono text-[11.5px]/[1.3] text-[color:var(--mwp-ink-soft)]">{facts}</div> : null}
     </div>
   )
 }
