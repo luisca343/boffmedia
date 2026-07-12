@@ -1,13 +1,10 @@
-"use client";
-import YoutubeResults from "./_components/YoutubeResults";
-import { useBoffSession } from "@/services/useBoffSession";
+import { Suspense } from "react"
+import { Home } from "./_components/Home"
 
-export default function Youtube() {
-  const { session } = useBoffSession();
-  
+export default function MewtubePage() {
   return (
-    <div className="min-h-full bg-layer-1 overflow-auto">
-      <YoutubeResults />
-    </div>
-  );
+    <Suspense fallback={null}>
+      <Home />
+    </Suspense>
+  )
 }
