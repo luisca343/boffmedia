@@ -131,6 +131,29 @@
   --secondary-soft:   rgba(6, 182, 212, 0.14);
   --on-secondary:     #04141a;
 
+  /* SmartRotom v3 chrome vocabulary. Aliases onto the themeable brand/surface
+     vars above so the 5-theme picker + light/dark drive it for free — defined
+     once here, resolved per active theme at use-site. The accent tracks the
+     orange --primary (Rotom's brand colour); the theme picker recolours it
+     per variant (pink/cyan/amber). Shares Boffmedia v3's geometry/type
+     language but stays a separate, SmartRotom-owned namespace. */
+  --sr-bg:            var(--bg);
+  --sr-panel:         var(--layer-2);
+  --sr-panel-2:       var(--layer-3);
+  --sr-line:          var(--border);
+  --sr-line-2:        var(--border-strong);
+  --sr-txt:           var(--text);
+  --sr-txt-muted:     var(--text-muted);
+  --sr-txt-dim:       var(--text-dim);
+  --sr-accent:        var(--primary);
+  --sr-accent-bright: var(--primary-hover);
+  --sr-accent-soft:   var(--primary-soft);
+  --sr-accent-line:   color-mix(in srgb, var(--primary) 45%, transparent);
+  --sr-accent-ink:    #0b0b10;
+  --sr-ok:            var(--success);
+  --sr-warn:          #f59e0b;
+  --sr-bad:           #ef4444;
+
   /* Semantic — success */
   --success:        #10b981;
   --success-hover:  #34d399;

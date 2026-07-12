@@ -4,17 +4,22 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const badgeVariants = cva(
-  'inline-flex items-center rounded-full border-2 text-black border-black  px-2.5 font-base py-0.5 text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2',
+  cn(
+    "cut [--cut:5px] inline-flex items-center justify-center gap-1",
+    "font-display font-bold not-italic uppercase tracking-[0.08em] leading-none",
+    "text-[11px] px-2 py-1 border border-solid transition-colors",
+  ),
   {
     variants: {
       variant: {
-        default: 'bg-primary',
-        neutral: 'bg-white dark:bg-darkBg dark:text-darkText',
-        button: 'bg-primary hover:bg-primary-hover cursor-pointer',
+        default: "bg-sr-accent border-sr-accent text-sr-accent-ink",
+        neutral: "bg-sr-panel-2 border-sr-line text-sr-txt",
+        button:
+          "bg-sr-accent-soft border-sr-accent-line text-sr-accent-bright cursor-pointer hover:bg-sr-accent hover:text-sr-accent-ink hover:border-sr-accent",
       },
     },
     defaultVariants: {
-      variant: 'default',
+      variant: "default",
     },
   },
 )
@@ -24,9 +29,7 @@ export interface BadgeProps
     VariantProps<typeof badgeVariants> {}
 
 function SmartRotomBadge({ className, variant, ...props }: BadgeProps) {
-  return (
-    <div className={cn(badgeVariants({ variant }), className)} {...props} />
-  )
+  return <div className={cn(badgeVariants({ variant }), className)} {...props} />
 }
 
 export { SmartRotomBadge, badgeVariants }

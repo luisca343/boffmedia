@@ -4,7 +4,8 @@ import { env } from "@/config/env.public";
 import { useBoffSession } from "@/services/useBoffSession";
 import { signIn, signOut } from "next-auth/react";
 import { useState } from "react";
-import { SmartRotomButton } from "@/components/smartrotom/ui/button";
+import { cn } from "@/lib/utils";
+import { SmartRotomButton } from "@/components/smartrotom/ui";
 import { Copy, Check, LogIn, LogOut, Palette, Bug, Monitor, Smartphone, Sun, Moon } from "lucide-react";
 import { useChatSettings } from "@/app/smartrotom/chatapp/_stores/useChatSettings";
 import type { ThemePref } from "@/app/smartrotom/chatapp/_utils/theme";
@@ -18,6 +19,22 @@ const themes = [
   { id: 'theme-mizu', label: 'Mizu', colors: ['bg-cyan-50', 'bg-cyan-100', 'bg-cyan-500'] },
   { id: 'theme-oasis', label: 'Oasis', colors: ['bg-amber-50', 'bg-amber-100', 'bg-amber-500'] },
 ];
+
+function SectionLabel({ icon: Icon, children }: { icon: typeof Sun; children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-2 mb-3">
+      <Icon size={16} className="text-sr-accent" />
+      <h3 className="font-display text-sm font-bold not-italic uppercase tracking-[0.06em] text-sr-txt">
+        {children}
+      </h3>
+    </div>
+  );
+}
+
+const tileBase =
+  "group flex flex-col items-center gap-1.5 p-2 cut [--cut:6px] border transition-[background,border-color] duration-150";
+const tileActive = "border-sr-accent bg-sr-accent-soft";
+const tileIdle = "border-sr-line bg-sr-panel hover:bg-sr-panel-2 hover:border-sr-line-2";
 
 export function SettingsPage({ setTema }: { setTema: (tema: string) => void }) {
   const { session } = useBoffSession();
@@ -41,35 +58,24 @@ export function SettingsPage({ setTema }: { setTema: (tema: string) => void }) {
   return (
     <div className="space-y-5">
       {/* Device Status */}
-      <div className="flex items-center gap-2 text-xs text-ink-muted">
+      <div className="flex items-center gap-2 mono-label !text-sr-txt-muted">
         {isMinecraft() ? (
-          <Smartphone size={14} className="text-primary-hover" />
+          <Smartphone size={14} className="text-sr-accent" />
         ) : (
-          <Monitor size={14} className="text-primary-hover" />
+          <Monitor size={14} className="text-sr-accent" />
         )}
-        <span className="font-medium uppercase tracking-wider">
-          {isMinecraft() ? 'SmartRotom' : 'Browser'}
-        </span>
+        <span>{isMinecraft() ? 'SmartRotom' : 'Browser'}</span>
       </div>
 
       {/* Themes Section */}
       <div>
-        <div className="flex items-center gap-2 mb-3">
-          <Palette size={16} className="text-primary-hover" />
-          <h3 className="text-sm font-semibold text-ink uppercase tracking-wider">Temas</h3>
-        </div>
+        <SectionLabel icon={Palette}>Temas</SectionLabel>
         <div className="grid grid-cols-5 gap-2">
           {themes.map((theme) => (
             <button
               key={theme.id}
               onClick={() => handleThemeChange(theme.id)}
-              className={`
-                group relative flex flex-col items-center gap-1.5 p-2 rounded-lg border-2 transition-all duration-150
-                ${activeTheme === theme.id
-                  ? 'border-primary bg-primary/10 shadow-light'
-                  : 'border-edge hover:border-edge bg-layer-3/50 hover:bg-layer-3'
-                }
-              `}
+              className={cn(tileBase, activeTheme === theme.id ? tileActive : tileIdle)}
             >
               {/* Color preview dots */}
               <div className="flex gap-0.5">
@@ -80,16 +86,12 @@ export function SettingsPage({ setTema }: { setTema: (tema: string) => void }) {
                   />
                 ))}
               </div>
-              <span className={`
-                text-[10px] font-medium leading-none
-                ${activeTheme === theme.id ? 'text-primary-hover' : 'text-ink-muted group-hover:text-ink'}
-              `}>
+              <span className={cn(
+                "text-[10px] font-medium leading-none",
+                activeTheme === theme.id ? "text-sr-accent-bright" : "text-sr-txt-muted group-hover:text-sr-txt"
+              )}>
                 {theme.label}
               </span>
-              {/* Active indicator */}
-              {activeTheme === theme.id && (
-                <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-primary-hover rounded-full border-2 border-edge-strong" />
-              )}
             </button>
           ))}
         </div>
@@ -97,10 +99,7 @@ export function SettingsPage({ setTema }: { setTema: (tema: string) => void }) {
 
       {/* Chat light/dark mode */}
       <div>
-        <div className="flex items-center gap-2 mb-3">
-          <Sun size={16} className="text-primary-hover" />
-          <h3 className="text-sm font-semibold text-ink uppercase tracking-wider">Modo del chat</h3>
-        </div>
+        <SectionLabel icon={Sun}>Modo del chat</SectionLabel>
         <div className="grid grid-cols-3 gap-2">
           {([
             { id: "light", label: "Claro", icon: Sun },
@@ -108,20 +107,15 @@ export function SettingsPage({ setTema }: { setTema: (tema: string) => void }) {
             { id: "auto", label: "Auto", icon: Monitor },
           ] as { id: ThemePref; label: string; icon: typeof Sun }[]).map((m) => {
             const MIcon = m.icon;
+            const active = chatMode === m.id;
             return (
               <button
                 key={m.id}
                 onClick={() => setChatMode(m.id)}
-                className={`
-                  group flex flex-col items-center gap-1.5 p-2 rounded-lg border-2 transition-all duration-150
-                  ${chatMode === m.id
-                    ? "border-primary bg-primary/10 shadow-light"
-                    : "border-edge hover:border-edge bg-layer-3/50 hover:bg-layer-3"
-                  }
-                `}
+                className={cn(tileBase, active ? tileActive : tileIdle)}
               >
-                <MIcon size={16} className={chatMode === m.id ? "text-primary-hover" : "text-ink-muted group-hover:text-ink"} />
-                <span className={`text-[10px] font-medium leading-none ${chatMode === m.id ? "text-primary-hover" : "text-ink-muted group-hover:text-ink"}`}>
+                <MIcon size={16} className={active ? "text-sr-accent-bright" : "text-sr-txt-muted group-hover:text-sr-txt"} />
+                <span className={cn("text-[10px] font-medium leading-none", active ? "text-sr-accent-bright" : "text-sr-txt-muted group-hover:text-sr-txt")}>
                   {m.label}
                 </span>
               </button>
@@ -132,10 +126,7 @@ export function SettingsPage({ setTema }: { setTema: (tema: string) => void }) {
 
       {/* Auth Section */}
       <div>
-        <div className="flex items-center gap-2 mb-3">
-          <LogIn size={16} className="text-primary-hover" />
-          <h3 className="text-sm font-semibold text-ink uppercase tracking-wider">Sesión</h3>
-        </div>
+        <SectionLabel icon={LogIn}>Sesión</SectionLabel>
         <div className="flex gap-2">
           <SmartRotomButton
             onClick={() => signIn('boffmedia')}
@@ -161,27 +152,24 @@ export function SettingsPage({ setTema }: { setTema: (tema: string) => void }) {
       {/* Debug Section (Dev Only) */}
       {isDev && session && (
         <div>
-          <div className="flex items-center gap-2 mb-3">
-            <Bug size={16} className="text-amber-400" />
-            <h3 className="text-sm font-semibold text-ink uppercase tracking-wider">Debug</h3>
-          </div>
-          <div className="bg-layer-1/80 border-2 border-edge rounded-lg overflow-hidden">
+          <SectionLabel icon={Bug}>Debug</SectionLabel>
+          <div className="bg-sr-bg border border-sr-line cut-corner [--cut-lg:10px] overflow-hidden">
             {/* Session info header */}
-            <div className="flex items-center justify-between px-3 py-2 bg-layer-3/50 border-b border-edge">
+            <div className="flex items-center justify-between px-3 py-2 bg-sr-panel-2 border-b border-sr-line">
               <div className="flex items-center gap-2">
                 <div className="flex gap-1">
-                  <div className="w-2 h-2 rounded-full bg-red-400" />
-                  <div className="w-2 h-2 rounded-full bg-yellow-400" />
-                  <div className="w-2 h-2 rounded-full bg-green-400" />
+                  <div className="w-2 h-2 rounded-full bg-sr-bad" />
+                  <div className="w-2 h-2 rounded-full bg-sr-warn" />
+                  <div className="w-2 h-2 rounded-full bg-sr-ok" />
                 </div>
-                <span className="text-[10px] text-ink-muted font-mono">session.json</span>
+                <span className="text-[10px] text-sr-txt-muted font-mono">session.json</span>
               </div>
               {session?.user?.accessToken && (
                 <SmartRotomButton
                   onClick={copyToken}
                   variant={copied ? "default" : "neutral"}
                   size="sm"
-                  className="gap-1.5 h-7 px-2"
+                  className="gap-1.5 !py-1 !px-2"
                 >
                   {copied ? (
                     <>
@@ -199,7 +187,7 @@ export function SettingsPage({ setTema }: { setTema: (tema: string) => void }) {
             </div>
             {/* JSON content */}
             <div className="p-3 max-h-40 overflow-auto scrollbar-thin">
-              <pre className="text-[11px] leading-relaxed text-ink font-mono whitespace-pre-wrap break-all">
+              <pre className="text-[11px] leading-relaxed text-sr-txt font-mono whitespace-pre-wrap break-all">
                 {JSON.stringify(session, null, 2)}
               </pre>
             </div>

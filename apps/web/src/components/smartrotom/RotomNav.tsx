@@ -5,8 +5,8 @@ import { Socket } from "socket.io-client";
 import BreadcrumbNav from "@/components/smartrotom/BreadcrumbNav";
 import FicusAI from "@/features/ficusai/components/FicusAI";
 import { usePathname } from "next/navigation";
-import { getSmartRotomUser } from "@/lib/utils";
-import { Bell, Check, X } from "lucide-react";
+import { getSmartRotomUser, cn } from "@/lib/utils";
+import { Bell, Check, X, Globe } from "lucide-react";
 import { SettingsPage } from "@/components/smartrotom/Settings";
 import { Popover, PopoverTrigger } from "@/components/ui/primitives/popover";
 import { PopoverContent } from "@radix-ui/react-popover";
@@ -17,8 +17,7 @@ import { SettingsButton, AIButton, NextButton, NotificationButton, PrevButton, R
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/primitives/sheet";
 import useSocketStore from "@/stores/useSocketStore";
 import LanguageSwitcher from "@/components/ui/navigation/LanguageSwitcher";
-import { SmartRotomBadge } from "@/components/smartrotom/ui/badge";
-import { SmartRotomButton } from "@/components/smartrotom/ui/button";
+import { SmartRotomBadge, SmartRotomButton, SmartRotomPanel } from "@/components/smartrotom/ui";
 import { NotificationsService } from "@/services/api/smartrotom/notificationsService";
 import type { NotificationResponseDto } from "@boffmedia/shared";
 import { useTranslations } from "next-intl";
@@ -93,41 +92,47 @@ export function RotomNav({
 
   function Notifications() {
     return (
-      <div className="w-80 bg-layer-2 rounded-none border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
-        <header className="bg-layer-3 border-b-2 border-black p-3 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Bell className="text-ink" size={18} />
-            <h2 className="text-ink font-bold text-sm uppercase tracking-wide">
-              {t("title")}
-            </h2>
-          </div>
-          {unreadCount > 0 && (
+      <SmartRotomPanel
+        bodyClassName="p-0"
+        className="w-80 shadow-[0_16px_40px_-12px_rgba(0,0,0,0.7)]"
+        title={
+          <span className="flex items-center gap-2">
+            <Bell className="text-sr-accent" size={15} />
+            {t("title")}
+          </span>
+        }
+        aside={
+          unreadCount > 0 ? (
             <SmartRotomBadge variant="default">{unreadCount}</SmartRotomBadge>
-          )}
-        </header>
+          ) : undefined
+        }
+      >
         <div className="p-3 space-y-2 max-h-80 overflow-y-auto">
           {isLoading && (
-            <p className="text-ink-muted text-xs text-center py-4">{t("loading")}</p>
+            <p className="text-sr-txt-muted text-xs text-center py-4">{t("loading")}</p>
           )}
           {!isLoading && notifications.length === 0 && (
-            <p className="text-ink-muted text-xs text-center py-4">{t("emptyState")}</p>
+            <p className="text-sr-txt-muted text-xs text-center py-4">{t("emptyState")}</p>
           )}
           {notifications.map((notif) => (
             <div
               key={notif.id}
-              className={`p-2 rounded-none border-2 border-black text-sm flex flex-col gap-1 ${
+              className={cn(
+                "cut-tag [--cut-tag:9px] p-2.5 border text-sm flex flex-col gap-1 transition-colors",
                 notif.isRead
-                  ? "bg-layer-3 text-ink-muted"
-                  : "bg-layer-3 text-ink"
-              }`}
+                  ? "bg-sr-panel border-sr-line text-sr-txt-muted"
+                  : "bg-sr-panel-2 border-sr-accent-line text-sr-txt"
+              )}
             >
               <div className="flex justify-between items-start gap-2">
                 <div className="flex-grow">
-                  <p className="font-bold text-xs">{notif.title}</p>
-                  <p className="text-xs mt-0.5">{notif.body}</p>
+                  <p className="font-display font-bold not-italic uppercase tracking-[0.04em] text-[11px] leading-tight">
+                    {notif.title}
+                  </p>
+                  <p className="text-xs mt-1 text-sr-txt-muted normal-case">{notif.body}</p>
                 </div>
                 {!notif.isRead && (
-                  <span className="bg-primary border-2 border-black w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1" />
+                  <span className="bg-sr-accent w-2 h-2 rounded-full flex-shrink-0 mt-1" />
                 )}
               </div>
               {!notif.isRead && (
@@ -135,7 +140,7 @@ export function RotomNav({
                   <SmartRotomButton
                     variant="noShadow"
                     size="sm"
-                    className="h-6 px-2 text-xs"
+                    className="!py-1 !px-2 text-[11px]"
                     onClick={() => handleMarkRead(notif.id)}
                     aria-label={t("markRead")}
                   >
@@ -148,11 +153,11 @@ export function RotomNav({
           ))}
         </div>
         {notifications.length > 0 && (
-          <footer className="bg-layer-3 border-t-2 border-black p-2 flex justify-end">
+          <footer className="border-t border-sr-line p-2 flex justify-end">
             <SmartRotomButton
-              variant="neutral"
+              variant="ghost"
               size="sm"
-              className="h-7 px-3 text-xs"
+              className="!py-1 !px-2 text-[11px]"
               onClick={handleMarkAllRead}
             >
               <Check size={12} className="mr-1" />
@@ -160,14 +165,14 @@ export function RotomNav({
             </SmartRotomButton>
           </footer>
         )}
-      </div>
+      </SmartRotomPanel>
     );
   }
 
   return (
     <nav
-      className={`h-12 z-20 flex items-center px-2 fixed w-full ${
-        pathname.includes("pokedex") ? "bg-base" : "bg-layer-2"
+      className={`h-12 z-20 flex items-center gap-0.5 px-2 fixed w-full border-b border-sr-line backdrop-blur-sm ${
+        pathname.includes("pokedex") ? "bg-sr-bg" : "bg-sr-panel"
       }`}
     >
       <PrevButton />
@@ -180,10 +185,12 @@ export function RotomNav({
         </SheetTrigger>
         <SheetContent
           side="top"
-          className="bg-layer-2 text-ink border-none max-h-[80vh] overflow-y-auto"
+          className="bg-sr-panel text-sr-txt border-b border-sr-line max-h-[80vh] overflow-y-auto"
         >
           <SheetHeader className="mb-4">
-            <SheetTitle className="text-ink text-lg">Ajustes</SheetTitle>
+            <SheetTitle className="text-sr-txt font-display not-italic uppercase tracking-[0.05em] text-lg">
+              Ajustes
+            </SheetTitle>
           </SheetHeader>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -191,10 +198,12 @@ export function RotomNav({
             </div>
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-primary-hover">🌐</span>
-                <h3 className="text-sm font-semibold text-ink uppercase tracking-wider">Idioma</h3>
+                <Globe size={16} className="text-sr-accent" />
+                <h3 className="font-display text-sm font-bold not-italic uppercase tracking-[0.06em] text-sr-txt">
+                  Idioma
+                </h3>
               </div>
-              <div className="bg-layer-3/50 border-2 border-edge p-4 rounded-lg">
+              <div className="bg-sr-panel-2 border border-sr-line p-4 cut-corner [--cut-lg:12px]">
                 <LanguageSwitcher variant="mobile" />
               </div>
             </div>
@@ -207,9 +216,9 @@ export function RotomNav({
         </SheetTrigger>
         <SheetContent
           side="right"
-          className="bg-layer-2 text-ink border-none flex flex-col p-0 max-w-3xl"
+          className="bg-sr-panel text-sr-txt border-l border-sr-line flex flex-col p-0 max-w-3xl"
         >
-          <SheetClose className="absolute right-4 top-4 rounded-md opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2 bg-primary z-10">
+          <SheetClose className="absolute right-4 top-4 cut [--cut:6px] p-1.5 opacity-90 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sr-accent bg-sr-accent text-sr-accent-ink z-10">
             <X className="h-4 w-4" />
             <span className="sr-only">Cerrar</span>
           </SheetClose>
@@ -234,51 +243,31 @@ export function RotomNav({
           <Notifications />
         </PopoverContent>
       </Popover>
-      <Hora className="text-ink text-3xl mx-1 text-shadow-border2" />
+      <Hora className="text-sr-txt font-display text-2xl mx-1 tabular-nums tracking-tight" />
       <SocketStatus socket={socket} />
       <MinecraftFunctions />
     </nav>
   );
 }
 
-function NavButton({
-  Icono,
-  strokeWidth = 5,
-  onClick = null,
-}: {
-  onClick?: any;
-  strokeWidth?: number;
-  Icono: React.ForwardRefExoticComponent<
-    React.PropsWithoutRef<React.SVGProps<SVGSVGElement>>
-  >;
-}) {
-  return (
-    <button
-      className="rounded-lg border-0 h-8 w-8 mx-2 bg-base flex items-center justify-center"
-      onClick={onClick}
-    >
-      <Icono
-        strokeWidth={strokeWidth}
-        height={28}
-        width={28}
-        className="text-primary"
-      />
-    </button>
-  );
-}
-
 function SocketStatus({ socket }: { socket: Socket | null }) {
+  const connected = Boolean(socket && socket.connected);
   return (
     <Tooltip>
       <TooltipTrigger>
-        <div className="cursor-pointer text-ink h-10 text-xl flex items-center">
-          <span>{socket && socket.connected ? "🟢" : "🔴"}</span>
+        <div className="cursor-pointer h-10 flex items-center px-1.5">
+          <span
+            className={cn(
+              "h-2.5 w-2.5 rounded-full",
+              connected
+                ? "bg-sr-ok shadow-[0_0_8px_var(--sr-ok)]"
+                : "bg-sr-bad"
+            )}
+          />
         </div>
       </TooltipTrigger>
       <TooltipContent>
-        {socket && socket.connected
-          ? `Conectado con id ${socket.id}`
-          : "No conectado"}
+        {connected ? `Conectado con id ${socket?.id}` : "No conectado"}
       </TooltipContent>
     </Tooltip>
   );

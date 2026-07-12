@@ -3,7 +3,7 @@
 import MenuWrapper from "../_components/MenuWrapper";
 import Image from "next/image";
 import { toast } from "react-toastify";
-import { SmartRotomButton } from "@/components/smartrotom/ui/button";
+import { SmartRotomButton } from "@/components/smartrotom/ui";
 import { isMinecraft, mcefQuery } from "@/services/mcef/mcefHelper";
 import { useBoffSession } from "@/services/useBoffSession";
 import { useGetUnclaimed } from "@/hooks/mina/useGetUnclaimed";
@@ -82,7 +82,8 @@ export default function Reclamar() {
         <div className="mt-6 flex justify-center">
           <SmartRotomButton
             onClick={claimReward}
-            className=" text-white text-xl  text-shadow-border1"
+            size="lg"
+            className="text-base"
           >
             RECLAMAR TODO ({boxes} CAJAS)
           </SmartRotomButton>
