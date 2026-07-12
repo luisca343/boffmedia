@@ -1,94 +1,34 @@
-import MenuHeader from "./_components/MenuHeader";
-import { InternalLink } from "@/components/ui/navigation/Link";
-import { LastRegistries } from "./_components/LastRegistries";
-import { PokedexSection } from "./_components/PokedexSection";
-import PokemonSearchBar from "./_components/PokemonSearchBar";
-import { PossibleSpawns } from "./_components/PossibleSpawns";
-import { ChevronRightIcon, BookOpenIcon, MapIcon, BoltIcon, SparklesIcon } from "@heroicons/react/24/outline";
+import { HubSidebar } from "./_components/HubSidebar"
+import { HubTopbar } from "./_components/HubTopbar"
+import { ProgressStrip } from "./_components/ProgressStrip"
+import { SpawnsCard } from "./_components/SpawnsCard"
+import { RecentCard } from "./_components/RecentCard"
+import { StreakCard } from "./_components/StreakCard"
+import { GoalsCard } from "./_components/GoalsCard"
 
-export default function PokedexMenu(){
-    return (
-        <div className="bg-layer-2 min-h-full overflow-auto">
-            <MenuHeader />
-            <div className="mt-4 p-4 max-w-7xl mx-auto">
-                <PokedexSection title="Búsqueda Rápida">
-                    <PokemonSearchBar />
-                </PokedexSection>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 my-6">
-                    <QuickAccessCard 
-                        title="Explorar Pokédex" 
-                        description="Visualiza todos los Pokémon registrados"
-                        href="pokedex/entrada"
-                        icon={<BookOpenIcon className="h-6 w-6" />}
-                    />
-                    <QuickAccessCard 
-                        title="Localización" 
-                        description="Encuentra Pokémon por bioma"
-                        href="pokedex/localizacion"
-                        icon={<MapIcon className="h-6 w-6" />}
-                    />
-                    <QuickAccessCard 
-                        title="Movimientos" 
-                        description="Consulta los movimientos Pokémon"
-                        href="pokedex/movimientos"
-                        icon={<BoltIcon className="h-6 w-6" />}
-                    />
-                    <QuickAccessCard 
-                        title="Habilidades" 
-                        description="Explora las habilidades Pokémon"
-                        href="pokedex/habilidades"
-                        icon={<SparklesIcon className="h-6 w-6" />}
-                    />
-                    <QuickAccessCard 
-                        title="Tipos" 
-                        description="Explora las ventajas y desventajas de tipos"
-                        href="pokedex/tipos"
-                        icon={<div className="h-6 w-6 flex items-center justify-center">
-                            <img src="/smartrotom/img/types/dragon.png" alt="Tipos" className="h-5 w-5" />
-                        </div>}
-                    />
-                    {/* Empty div for proper grid alignment on large screens when there's an odd number of cards */}
-                    <div className="hidden xl:block"></div>
-                </div>
-                
-                <PokedexSection title="Últimos Registros" btn={
-                    <span className="text-primary-hover hover:text-primary-hover text-sm font-normal">Ver historial completo</span>
-                }>
-                    <div className="bg-layer-3/30 p-3 rounded-lg">
-                        <LastRegistries />
-                    </div>
-                </PokedexSection>
-                
-                <PokedexSection title="Posibles Spawns" btn={
-                    <InternalLink href="pokedex/spawns" className="text-primary-hover hover:text-primary-hover text-sm font-normal">
-                        Ver más
-                    </InternalLink>
-                }>
-                    <div className="bg-layer-3/30 p-3 rounded-lg">
-                        <PossibleSpawns pokemonSpawns={[]} hideCaught={false} hideSeen={false}/>
-                    </div>
-                </PokedexSection>
-            </div>
+export default function PokedexHub() {
+  return (
+    <div className="flex h-full">
+      <HubSidebar />
+
+      <main className="flex-1 min-w-0 flex flex-col gap-[22px] p-6 overflow-y-auto">
+        <HubTopbar />
+        <ProgressStrip />
+
+        <div className="grid grid-cols-1 lg:grid-cols-[1.7fr_1fr] gap-[22px]">
+          <SpawnsCard />
+          <div className="flex flex-col gap-[22px]">
+            <RecentCard />
+            <StreakCard />
+            <GoalsCard />
+          </div>
         </div>
-    )
-}
 
-function QuickAccessCard({ title, description, href, icon }: { title: string, description: string, href: string, icon: React.ReactNode }) {
-    return (
-        <InternalLink href={href} className="block">
-            <div className="bg-layer-3/50 border border-edge rounded-lg p-4 hover:bg-layer-3 transition-all shadow-md hover:shadow-lg flex items-center justify-between">
-                <div className="flex items-center">
-                    <div className="bg-layer-2 p-2 rounded-full mr-4">
-                        {icon}
-                    </div>
-                    <div>
-                        <h3 className="font-bold text-lg text-ink">{title}</h3>
-                        <p className="text-ink text-sm">{description}</p>
-                    </div>
-                </div>
-                <ChevronRightIcon className="h-5 w-5 text-ink-muted" />
-            </div>
-        </InternalLink>
-    );
+        <div className="flex items-center justify-between px-3.5 py-2 text-[11px] text-pk-surface-500 font-pk-mono">
+          <span>v2.4.0 · a9c12f3</span>
+          <span>905 indexados · 21 generables</span>
+        </div>
+      </main>
+    </div>
+  )
 }

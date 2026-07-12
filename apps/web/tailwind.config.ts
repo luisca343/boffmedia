@@ -1066,15 +1066,15 @@ const config: Config = {
         "--mw-800": "30 41 59", // surface-800
         "--mw-700": "51 65 85", // surface-700
       }
-      // Mewtube — warm ramp + red (neutralizes the blue tint).
+      // Mewtube — pink (Mew) + a warm pink-tinted ramp that harmonizes it.
       const mewtube = {
-        "--mw-accent": "239 68 68",
-        "--mw-bg": "14 8 10",
-        "--mw-900": "24 16 18",
-        "--mw-800": "38 26 28",
-        "--mw-700": "58 42 44",
-        "--mw-hairline": "rgba(255, 220, 220, 0.07)",
-        "--mw-hairline-strong": "rgba(255, 220, 220, 0.12)",
+        "--mw-accent": "236 72 153", // #ec4899 pink-500
+        "--mw-bg": "15 8 13",
+        "--mw-900": "26 15 22",
+        "--mw-800": "42 26 36",
+        "--mw-700": "62 42 54",
+        "--mw-hairline": "rgba(255, 220, 240, 0.07)",
+        "--mw-hairline-strong": "rgba(255, 220, 240, 0.12)",
       }
       addBase({
         // Default to the cool ramp so the shell has a canvas even before the

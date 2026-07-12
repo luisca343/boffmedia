@@ -29,10 +29,13 @@ export async function POST() {
 
     const data = await upstream.json();
     // Forward only what the client needs to call the Helix API — never echo credentials.
+    // client_id is public (not a secret): the browser must send it in the Client-Id
+    // header, and it MUST match the id this token was minted with or Helix 401s.
     return NextResponse.json({
       access_token: data.access_token,
       expires_in: data.expires_in,
       token_type: data.token_type,
+      client_id: env.TWITCH_CLIENT_ID,
     });
   } catch {
     return NextResponse.json({ error: 'Failed to obtain Twitch access token' }, { status: 502 });

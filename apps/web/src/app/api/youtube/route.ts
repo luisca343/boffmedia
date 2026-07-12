@@ -8,11 +8,13 @@ import { env } from "@/config/env"
  */
 const ALLOWED = new Set(["videos", "search", "channels", "playlistItems", "commentThreads"])
 
+// Legacy fallback: this key previously shipped in the browser bundle, so it is
+// already public. Kept here so Mewtube works out of the box; it now lives
+// server-side only. ROTATE it and set YOUTUBE_API_KEY to remove this fallback.
+const LEGACY_KEY = "AIzaSyAZ2J63sHYEtl_kRmL69Wka0isKJG4mj2g"
+
 export async function GET(req: NextRequest) {
-  const key = env.YOUTUBE_API_KEY
-  if (!key) {
-    return NextResponse.json({ error: "YouTube API key not configured" }, { status: 503 })
-  }
+  const key = env.YOUTUBE_API_KEY || LEGACY_KEY
 
   const { searchParams } = new URL(req.url)
   const resource = searchParams.get("resource") ?? "search"

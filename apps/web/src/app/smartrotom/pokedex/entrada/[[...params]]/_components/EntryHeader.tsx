@@ -1,91 +1,156 @@
 "use client"
-import Link from "next/link";
-import { PokemonSprite } from "../../../_components/PokemonSprite";
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
-import { getDisplayStatus, getPokemonNameAndForm } from "../../../dexUtils";
-import { Pokemon } from "@/types/Pokemon";
-import { InternalLink } from "@/components/ui/navigation/Link";
-import { useTranslations } from "next-intl";
 
-export function EntryHeader({pokemon, formName, prev, next} : {pokemon: Pokemon, formName: string, prev: {dex: number, name: string, spriteUrl: string}, next: {dex: number, name: string, spriteUrl: string}}) {
-    const t = useTranslations("pokedex");
-    
-    return (
-        <header className="flex flex-col bg-base text-ink sm:h-24 z-10 p-2 shadow-md">
-            {/* Navigation row */}
-            <div className="w-full flex flex-1 justify-between items-center">
-                {/* Previous Pokemon */}
-                <InternalLink className="flex items-center hover:text-primary-hover transition-colors group" 
-                    href={`pokedex/entrada/${prev.dex}`}>
-                    <div className="flex items-center">
-                        <PokemonSprite 
-                            id={prev.dex} 
-                            form="base" 
-                            palette='none' 
-                            width={50} 
-                            height={50} 
-                            hide={true} 
-                            inverted={true}
-                            className="transform group-hover:scale-110 transition-transform"
-                            url={prev.spriteUrl}
-                        />
-                        <ChevronLeftIcon className="w-6 h-6"/>
-                    </div>
-                    <div className="hidden md:block">#{prev.dex} - {getDisplayStatus(prev.dex, 'base', true) ? prev.name : '???'}</div>
-                </InternalLink>
-                
-                {/* Current Pokemon */}
-                <div className="flex items-center justify-center text-2xl sm:text-3xl md:text-4xl font-bold">
-                    <span className="hidden xs:block">#{pokemon.dex} - </span>
-                    <span className="truncate max-w-[200px] sm:max-w-none">
-                        {getDisplayStatus(pokemon.dex, formName, true) ? getPokemonNameAndForm(pokemon.name, formName, t) : '???'}
-                    </span>
-                    <PokemonSprite 
-                        id={pokemon.dex} 
-                        form={formName} 
-                        palette='none' 
-                        width={50} 
-                        height={50} 
-                        hide={true} 
-                        inverted={true}
-                        url={pokemon.forms[0].spriteUrl}
-                    />
-                </div>
-                
-                {/* Next Pokemon */}
-                <InternalLink className="flex items-center hover:text-primary-hover transition-colors group" 
-                    href={`pokedex/entrada/${next.dex}`}>
-                    <div className="hidden md:block text-right">#{next.dex} - {getDisplayStatus(next.dex, 'base', true) ? next.name : '???'}</div>
-                    <div className="flex items-center">
-                        <ChevronRightIcon className="w-6 h-6"/>
-                        <PokemonSprite 
-                            id={next.dex} 
-                            form="base" 
-                            palette='none' 
-                            width={50} 
-                            height={50} 
-                            hide={true} 
-                            inverted={true}
-                            className="transform group-hover:scale-110 transition-transform"
-                            url={next.spriteUrl}
-                        />
-                    </div>
-                </InternalLink>
+import Link from "next/link"
+import { useEffect, useRef, useState } from "react"
+import { PokemonSprite } from "../../../_components/PokemonSprite"
+import { ChevronLeftIcon, ChevronRightIcon, ArrowUpRightIcon, BookmarkIcon } from "@heroicons/react/24/outline"
+import { getDisplayStatus, getPokemonNameAndForm } from "../../../dexUtils"
+import type { Pokemon } from "@/types/Pokemon"
+import { useTranslations } from "next-intl"
+import { TypeChip, StatusPill } from "../../../_components/ui"
+import { HubSidebar } from "../../../_components/HubSidebar"
+import { TYPE_COLORS } from "../../../_utils/typeColors"
+
+// Section ids match the scroll-spy targets rendered by page.tsx.
+const TABS = [
+  { id: "info", label: "Info" },
+  { id: "evo", label: "Evolución" },
+  { id: "stats", label: "Estadísticas" },
+  { id: "effect", label: "Efectividades" },
+  { id: "spawns", label: "Spawns" },
+  { id: "moves", label: "Movimientos" },
+  { id: "variants", label: "Variantes" },
+]
+
+export function EntryHeader({
+  pokemon,
+  formName,
+  prev,
+  next,
+  children,
+}: {
+  pokemon: Pokemon
+  formName: string
+  prev: { dex: number; name: string; spriteUrl: string }
+  next: { dex: number; name: string; spriteUrl: string }
+  children?: React.ReactNode
+}) {
+  const t = useTranslations("pokedex")
+  const types = pokemon.forms[0]?.types as string[] | undefined
+  const isVisible = getDisplayStatus(pokemon.dex, formName, true)
+  const [activeTab, setActiveTab] = useState<string>("info")
+  const observerRef = useRef<IntersectionObserver | null>(null)
+
+  useEffect(() => {
+    if (observerRef.current) observerRef.current.disconnect()
+    const callback: IntersectionObserverCallback = (entries) => {
+      const visible = entries
+        .filter((e) => e.isIntersecting)
+        .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
+      if (visible.length > 0) setActiveTab(visible[0].target.id)
+    }
+    observerRef.current = new IntersectionObserver(callback, { rootMargin: "-10% 0px -80% 0px", threshold: 0 })
+    TABS.forEach(({ id }) => {
+      const el = document.getElementById(id)
+      if (el) observerRef.current!.observe(el)
+    })
+    return () => observerRef.current?.disconnect()
+  }, [])
+
+  const type1 = types?.[0]
+  const portraitBg = `radial-gradient(40px 30px at 50% 30%, rgba(255,255,255,.06), transparent 70%), ${
+    type1 && TYPE_COLORS[type1] ? TYPE_COLORS[type1] : "#18212f"
+  }`
+
+  return (
+    <div className="flex h-full">
+      <HubSidebar />
+      <div className="flex-1 flex flex-col min-w-0">
+        <header className="sticky top-0 z-10 bg-[rgba(10,15,26,0.85)] backdrop-blur-xl backdrop-saturate-150 border-b border-white/[0.05] px-6 pt-3.5">
+          <div className="flex items-center gap-5 pb-3">
+            <div className="w-16 h-16 rounded-[14px] grid place-items-center shrink-0 relative overflow-hidden" style={{ background: portraitBg }}>
+              <PokemonSprite
+                id={pokemon.dex}
+                form={formName}
+                palette="none"
+                width={56}
+                height={56}
+                hide={true}
+                inverted={true}
+                url={pokemon.forms[0]?.spriteUrl}
+                className="relative z-10 drop-shadow-[0_3px_4px_rgba(0,0,0,0.4)]"
+              />
             </div>
-            
-            {/* Navigation tabs */}
-            <div className="w-full flex justify-evenly items-center scroll-smooth mt-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-surface-800">
-                <Link className="px-2 py-1 hover:text-primary-hover transition-colors whitespace-nowrap" href={`#info`}>Info</Link>
-                <Link className="px-2 py-1 hover:text-primary-hover transition-colors whitespace-nowrap" href={`#evotree`}>Árbol evolutivo</Link>
-                {pokemon.forms.length > 1 && 
-                    <Link className="px-2 py-1 hover:text-primary-hover transition-colors whitespace-nowrap" href={`#forms`}>Formas</Link>
-                }
-                <Link className="px-2 py-1 hover:text-primary-hover transition-colors whitespace-nowrap" href={`#typedata`}>Tipos</Link>
-                <Link className="px-2 py-1 hover:text-primary-hover transition-colors whitespace-nowrap" href={`#stats`}>Estadísticas</Link>
-                <Link className="px-2 py-1 hover:text-primary-hover transition-colors whitespace-nowrap" href={`#spawns`}>Localizaciones</Link>
-                <Link className="px-2 py-1 hover:text-primary-hover transition-colors whitespace-nowrap" href={`#moves`}>Movimientos</Link>
-                <Link className="px-2 py-1 hover:text-primary-hover transition-colors whitespace-nowrap" href={`#palettes`}>Variantes</Link>
+            <div className="min-w-0">
+              <div className="font-pk-mono text-xs text-pk-surface-500 tracking-[0.04em]">N.º {String(pokemon.dex).padStart(4, "0")}</div>
+              <h1 className="font-pk-display font-bold text-[28px] leading-[1.05] tracking-tight text-pk-surface-50 my-0.5 mb-2">
+                {isVisible ? getPokemonNameAndForm(pokemon.name, formName, t) : "???"}
+              </h1>
+              <div className="flex items-center gap-2.5 flex-wrap">
+                {types?.map((type) => (
+                  <TypeChip key={type} type={type} size="md" />
+                ))}
+                <StatusPill status={isVisible ? "caught" : "unknown"} size="md" />
+              </div>
             </div>
+
+            <div className="ml-auto flex items-center gap-1.5">
+              <span className="w-9 h-9 bg-white/[0.04] border border-white/[0.08] rounded-[9px] grid place-items-center text-pk-surface-300">
+                <ArrowUpRightIcon className="w-4 h-4" />
+              </span>
+              <span className="w-9 h-9 bg-white/[0.04] border border-white/[0.08] rounded-[9px] grid place-items-center text-pk-surface-300">
+                <BookmarkIcon className="w-4 h-4" />
+              </span>
+              <div className="flex items-center gap-px bg-white/[0.04] border border-white/[0.06] rounded-[10px] p-[3px]">
+                <Link
+                  href={`/smartrotom/pokedex/entrada/${prev.dex}`}
+                  title={`#${prev.dex} ${prev.name}`}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-[7px] text-pk-surface-300 hover:text-pk-surface-50 hover:bg-white/[0.05] transition-colors text-xs"
+                >
+                  <ChevronLeftIcon className="w-3.5 h-3.5" />
+                  <span className="font-pk-mono text-[11px] text-pk-surface-500">#{String(prev.dex).padStart(3, "0")}</span>
+                </Link>
+                <span className="w-px h-[18px] bg-white/[0.08]" />
+                <Link
+                  href={`/smartrotom/pokedex/entrada/${next.dex}`}
+                  title={`#${next.dex} ${next.name}`}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-[7px] text-pk-surface-300 hover:text-pk-surface-50 hover:bg-white/[0.05] transition-colors text-xs"
+                >
+                  <span className="font-pk-mono text-[11px] text-pk-surface-500">#{String(next.dex).padStart(3, "0")}</span>
+                  <ChevronRightIcon className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          <nav className="flex gap-0.5 overflow-x-auto scrollbar-none" role="tablist">
+            {TABS.map((tab) => {
+              const isActive = activeTab === tab.id
+              return (
+                <Link
+                  key={tab.id}
+                  href={`#${tab.id}`}
+                  aria-current={isActive ? "location" : undefined}
+                  className={`relative px-3.5 py-2.5 text-[13px] font-medium transition-colors whitespace-nowrap inline-flex items-center gap-[7px] ${
+                    isActive ? "text-pk-primary-300" : "text-pk-surface-400 hover:text-pk-surface-100"
+                  }`}
+                >
+                  <span
+                    className="w-1.5 h-1.5 rounded-full"
+                    style={{ background: isActive ? "#fb923c" : "#4a576e", boxShadow: isActive ? "0 0 6px #fb923c" : "none" }}
+                  />
+                  {tab.label}
+                  {isActive && (
+                    <span className="absolute left-3.5 right-3.5 -bottom-px h-[2px] rounded-full" style={{ background: "#fb923c", boxShadow: "0 0 8px #fb923c" }} />
+                  )}
+                </Link>
+              )
+            })}
+          </nav>
         </header>
-    );
+
+        {children && <div className="flex-1 overflow-auto">{children}</div>}
+      </div>
+    </div>
+  )
 }

@@ -1,70 +1,70 @@
-import { InternalLink } from "@/components/ui/navigation/Link"
-import { PokemonService } from "@/services/api/smartrotom/pokemonService";
-import { getTranslations } from "next-intl/server";
-import { MapPinIcon, ArchiveBoxIcon } from "@heroicons/react/24/outline";
-import { getTranslatedBiomeName } from "@/utils/pokemonTranslations";
+import { PokemonService } from "@/services/api/smartrotom/pokemonService"
+import { getTranslations } from "next-intl/server"
+import Link from "next/link"
+import { ScreenShell } from "../_components/ScreenShell"
+import { PageHead, MetaStat } from "../_components/PageHead"
+import { TypeChip } from "../_components/ui"
+import { resolveBiome } from "../_data/biomes"
+import { getTranslatedBiomeName } from "@/utils/pokemonTranslations"
+import { MapIcon } from "@heroicons/react/24/outline"
 
-export default async function Biomas(){
-    const t = await getTranslations("pokedex");
-    const biomesResponse = await PokemonService.getBiomes();
-    const biomes = biomesResponse.data as { name: string; count: number }[];
-    
-    return(
-        <div className="bg-layer-2 min-h-full overflow-auto">
-            <div className="mt-4 p-4 max-w-7xl mx-auto">
-                <div className="bg-layer-3/30 rounded-lg p-4 border border-edge/50 mb-4">
-                    <div className="flex items-center mb-3">
-                        <MapPinIcon className="h-6 w-6 text-primary-hover mr-2" />
-                        <h1 className="text-xl font-bold text-ink">Localización de Pokémon</h1>
-                    </div>
-                    
-                    <p className="text-ink mb-4">
-                        Explora diferentes biomas y descubre qué Pokémon puedes encontrar en cada uno. 
-                        Selecciona un bioma para ver los Pokémon disponibles.
-                    </p>
-                </div>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {biomes
-                        .filter((biome) => !biome.name.includes("biomesoplenty") && !biome.name.includes("terraforged"))
-                        .sort((a, b) => {
-                            // Sort by number of Pokémon in descending order
-                            return b.count - a.count;
-                        })
-                        .map((biome, index) => {
-                            const biomeName = getTranslatedBiomeName(biome.name, t);
-                            
-                            return (
-                                <InternalLink href={`pokedex/localizacion/${biome.name}`} key={index}>
-                                    <div className="flex flex-col items-center justify-center text-center p-4 h-36 
-                                                rounded-lg border border-edge bg-layer-3/50
-                                                hover:bg-layer-3/80 hover:border-edge hover:text-ink transition-all
-                                                shadow-md hover:shadow-lg group">
-                                        <div className="mb-2 opacity-70 group-hover:opacity-100 transition-opacity">
-                                            <MapPinIcon className="h-6 w-6 text-primary-hover mx-auto" />
-                                        </div>
-                                        <span className="text-lg font-bold text-ink mb-2 group-hover:text-ink transition-colors line-clamp-2">
-                                            {biomeName}
-                                        </span>
-                                        <div className="flex items-center justify-center space-x-2">
-                                            <ArchiveBoxIcon className="h-4 w-4 text-amber-400" />
-                                            <span className="text-xl text-amber-400 font-medium">
-                                                {biome.count}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </InternalLink>
-                            );
-                        })}
-                </div>
-                
-                {/* If there are no valid biomes to display */}
-                {biomes.filter((biome) => !biome.name.includes("biomesoplenty") && !biome.name.includes("terraforged")).length === 0 && (
-                    <div className="bg-layer-3/30 rounded-lg p-8 text-center border border-edge/50">
-                        <p className="text-ink text-lg">No se encontraron biomas disponibles</p>
-                    </div>
-                )}
-            </div>
-        </div>
-    );
+export default async function LocalizacionPage() {
+  const t = await getTranslations("pokedex")
+  const res = await PokemonService.getBiomes()
+  const raw = (res.data as { name: string; count: number }[]) ?? []
+  const biomes = raw
+    .filter((b) => !b.name.includes("biomesoplenty") && !b.name.includes("terraforged"))
+    .sort((a, b) => b.count - a.count)
+  const total = biomes.reduce((a, b) => a + b.count, 0)
+  const max = Math.max(1, ...biomes.map((b) => b.count))
+
+  return (
+    <ScreenShell>
+      <PageHead
+        icon={MapIcon}
+        eyebrow="Mundo"
+        title="Localización por bioma"
+        desc="Cada tarjeta muestra el bioma con su paleta característica, el número de especies registrables y su proporción frente al bioma más poblado."
+        meta={
+          <>
+            <MetaStat label="Biomas" value={biomes.length} />
+            <MetaStat label="Especies localizables" value={total} />
+          </>
+        }
+      />
+
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-2.5">
+        {biomes.map((b) => {
+          const m = resolveBiome(b.name)
+          return (
+            <Link
+              key={b.name}
+              href={`/smartrotom/pokedex/localizacion/${b.name}`}
+              className="relative rounded-xl p-[14px_16px] min-h-[116px] flex flex-col gap-2 overflow-hidden border border-transparent transition-transform hover:-translate-y-0.5"
+              style={{ background: `linear-gradient(135deg, ${m.color}, color-mix(in oklab, ${m.color} 60%, #000))`, color: m.textLight ? "#fff" : "rgba(0,0,0,.85)" }}
+            >
+              <span className="absolute top-0 right-0 w-[100px] h-[100px] bg-[radial-gradient(circle_at_70%_30%,rgba(255,255,255,.12),transparent_60%)] pointer-events-none" />
+              <span className="self-start w-[26px] h-[26px] bg-black/[0.18] rounded-[7px] grid place-items-center text-base relative" aria-hidden="true">
+                {m.glyph}
+              </span>
+              <span className="font-pk-display font-bold text-base leading-tight mt-auto relative">{getTranslatedBiomeName(b.name, t)}</span>
+              <div className="flex items-center justify-between gap-2.5 relative">
+                <span className="flex items-baseline gap-1.5 text-xs opacity-90">
+                  <b className="font-pk-display font-bold text-lg tabular-nums">{b.count}</b> Pokémon
+                </span>
+                <TypeChip type={m.type} size="sm" />
+              </div>
+              <div className="h-1 rounded-sm bg-black/25 overflow-hidden relative">
+                <div className="h-full bg-white/70" style={{ width: `${(b.count / max) * 100}%` }} />
+              </div>
+            </Link>
+          )
+        })}
+      </div>
+
+      {biomes.length === 0 && (
+        <div className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-8 text-center text-pk-surface-400 text-sm">No se encontraron biomas disponibles.</div>
+      )}
+    </ScreenShell>
+  )
 }
