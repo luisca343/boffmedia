@@ -28,6 +28,7 @@ import { ChatappFacadeService } from './chatapp.facade.service';
 // Import controller
 import { ChatappController } from './chatapp.controller';
 import { SocketsModule } from '@api/_utils/sockets/sockets.module';
+import { PresenceModule } from '@api/_utils/sockets/presence.module';
 import { WingullModule } from '../wingull/wingull.module';
 
 @Module({
@@ -37,6 +38,7 @@ import { WingullModule } from '../wingull/wingull.module';
     LoggerModule,
     DrizzleModule,
     WingullModule,
+    PresenceModule,
   ],
   controllers: [ChatappController],
   providers: [

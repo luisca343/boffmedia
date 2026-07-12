@@ -183,11 +183,16 @@ export function CallStatus() {
 
   return (
     <nav
-      className={`flex flex-col items-center justify-center fixed transition-all duration-300 ease-in-out ${
-        isExpanded 
-          ? "inset-0 w-full h-full bg-layer-1/95 backdrop-blur-sm z-50" 
-          : "top-14 left-2 w-64 bg-layer-2/95 backdrop-blur-sm rounded-lg shadow-xl border border-edge z-30"
-      } text-ink font-medium ${activeCall.caller ? "" : "hidden"}`}
+      style={
+        isExpanded
+          ? { background: "radial-gradient(900px 600px at 50% -8%, rgba(0,168,132,.26), transparent 60%), linear-gradient(180deg,#0d171d,#060d11)" }
+          : undefined
+      }
+      className={`fixed transition-all duration-300 ease-in-out ${
+        isExpanded
+          ? "inset-0 z-50 flex flex-col"
+          : "left-3 top-16 z-30 w-[320px] max-w-[calc(100vw-24px)] overflow-hidden rounded-[16px] border border-[#2a3942] bg-[#111b21] shadow-[0_24px_60px_-18px_rgba(0,0,0,.55)]"
+      } text-[#e9edef] ${activeCall.caller ? "" : "hidden"}`}
     >
       <audio ref={audioRef} src="/smartrotom/audio/apps/chatapp/denden.mp3" preload="auto"></audio>
       {isExpanded ? (
