@@ -20,6 +20,22 @@ export type Document = {
      */
     type: number;
     /**
+     * Public flag (0 = private, 1 = public)
+     */
+    public: number;
+    /**
+     * Pinned flag (0 = no, 1 = pinned)
+     */
+    pinned: number;
+    /**
+     * Folder ID the document belongs to, or null
+     */
+    folderId: number | null;
+    /**
+     * Soft-delete timestamp; null means live
+     */
+    deletedAt: string | null;
+    /**
      * Document creation date
      */
     createdAt: string;

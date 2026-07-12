@@ -78,4 +78,14 @@ export class NoteService {
       );
     return !!association;
   }
+
+  async getShares(documentId: number): Promise<string[]> {
+    const shares =
+      await this.documentsRepository.findDocumentShares(documentId);
+    return shares.map((s) => s.uuid);
+  }
+
+  getSharesForDocuments(ids: number[]) {
+    return this.documentsRepository.findSharesByDocumentIds(ids);
+  }
 }
