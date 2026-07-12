@@ -1,233 +1,177 @@
 "use client";
-
-import { useState, useEffect, useMemo } from "react";
-import { format, addMonths, subMonths, isSameDay, isToday } from "date-fns";
-import { es } from "date-fns/locale";
-import { useGetTransactions } from "@/hooks/starbank/useGetTransactions";
+import * as React from "react";
 import useStarBank from "../_hooks/useStarBank";
-import { ChartsSkeleton } from "../graficas/_components/ChartsSkeleton";
-import { BankSection, BankSectionContent, BankSectionHeader } from "../_components/BankSection";
-import { formatMoney, changeActiveAccount } from "../bankUtils";
-import { Badge } from "@/components/ui/primitives/badge";
-import { CalendarIcon, Filter } from "lucide-react";
-import { FinancialCalendar } from "./_components/FinancialCalendar";
-import { TransactionList } from "./_components/TransactionList";
-import { FilterPopover } from "./_components/FilterPopover";
-import { TransactionDialog } from "./_components/TransactionDialog";
-import { AccountSelect } from "../_components/AccountSelect";
-import { StarBankTransaction } from "@boffmedia/shared";
+import { useGetTransactions } from "@/hooks/starbank/useGetTransactions";
+import { PageHeader, Card, SectionHead, CardBody, Button, Ico, Skeleton } from "../_components/ui";
+import { resolveCategory } from "../_utils/categories";
+import { isOutgoing } from "../_utils/account";
+import { formatMoney } from "../_utils/format";
+import { cn } from "@/lib/utils";
+import type { SBTransaction } from "../_types";
 
-// Group transactions by date
-interface TransactionsByDate {
-  [date: string]: StarBankTransaction[];
+interface DayEvent { reason: string; amount: number; category: ReturnType<typeof resolveCategory>; type: "in" | "out" }
+
+function keyOf(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
 export default function Calendario() {
-  const { accounts, activeAccount, setActiveAccount } = useStarBank();
-  const [isSwitchingAccount, setIsSwitchingAccount] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<any>(null);
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([
-    'TRANSFERENCIA', 'COMPRA', 'VENTA', 'BONUS'
-  ]);
-  const [monthView, setMonthView] = useState(new Date());
-  const [selectedDay, setSelectedDay] = useState<Date | undefined>(new Date());
-  
-  // Use the account ID for the transactions query
-  const { 
-    transactions, 
-    isLoading: transactionsLoading, 
-    refetch: refetchTransactions,
-    error: transactionsError
-  } = useGetTransactions(activeAccount?.id ?? -1, 500);
+  const { activeAccount } = useStarBank();
+  const accId = activeAccount?.id ?? -1;
+  const { transactions, isLoading } = useGetTransactions(accId, 100);
 
-  // Refetch transactions when the account changes
-  useEffect(() => {
-    if (activeAccount?.id) {
-      setIsSwitchingAccount(true);
-      refetchTransactions()
-        .then(() => {
-          setIsSwitchingAccount(false);
-        });
+  const today = React.useMemo(() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; }, []);
+  const [viewMonth, setViewMonth] = React.useState(today.getMonth());
+  const [viewYear, setViewYear] = React.useState(today.getFullYear());
+  const [selected, setSelected] = React.useState<string | null>(null);
+
+  const all = (transactions ?? []) as SBTransaction[];
+
+  const events = React.useMemo(() => {
+    const m = new Map<string, DayEvent[]>();
+    for (const t of all) {
+      const d = new Date(t.date);
+      if (isNaN(d.getTime())) continue;
+      const k = keyOf(d);
+      const arr = m.get(k) ?? [];
+      arr.push({ reason: t.reason, amount: t.amount, category: resolveCategory(t), type: isOutgoing(t, accId) ? "out" : "in" });
+      m.set(k, arr);
     }
-  }, [activeAccount, refetchTransactions]);
+    return m;
+  }, [all, accId]);
 
-  // Handle account selection with localStorage update
-  const handleAccountSelect = (account: any) => {
-    if (account) {
-      changeActiveAccount(account);
-      setActiveAccount(account);
-    }
-  };
+  const first = new Date(viewYear, viewMonth, 1);
+  const startOffset = (first.getDay() + 6) % 7;
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+  const daysInPrev = new Date(viewYear, viewMonth, 0).getDate();
 
-  // Group transactions by date for calendar display
-  const transactionsByDate = useMemo(() => {
-    if (!transactions || !Array.isArray(transactions)) return {};
-    
-    // Filter by selected transaction types
-    const filteredTransactions = transactions.filter(tx => selectedTypes.includes(tx.type));
-    
-    // Group by date
-    return filteredTransactions.reduce((acc: TransactionsByDate, tx) => {
-      try {
-        const txDate = new Date(tx.date);
-        
-        // Check if date is valid
-        if (isNaN(txDate.getTime())) {
-          console.warn("Invalid transaction date:", tx.date);
-          return acc;
-        }
-        
-        const dateKey = format(txDate, 'yyyy-MM-dd');
-        
-        if (!acc[dateKey]) {
-          acc[dateKey] = [];
-        }
-        
-        acc[dateKey].push({
-          ...tx,
-          isPayer: tx.isPayer
-        });
-        
-      } catch (error) {
-        console.error("Error processing transaction:", error, tx);
-      }
-      
-      return acc;
-    }, {});
-  }, [transactions, activeAccount, selectedTypes]);
+  const cells: { day: number; out?: boolean }[] = [];
+  for (let i = 0; i < startOffset; i++) cells.push({ out: true, day: daysInPrev - startOffset + 1 + i });
+  for (let i = 1; i <= daysInMonth; i++) cells.push({ day: i });
+  while (cells.length % 7 !== 0) cells.push({ out: true, day: cells.length - daysInMonth - startOffset + 1 });
 
-  // Get the transactions for the selected day
-  const selectedDayTransactions = useMemo(() => {
-    if (!selectedDay || !transactionsByDate || isNaN(selectedDay.getTime())) {
-      return [];
-    }
-    
-    try {
-      const dateKey = format(selectedDay, 'yyyy-MM-dd');
-      return transactionsByDate[dateKey] || [];
-    } catch (error) {
-      console.error("Error formatting selected day:", error);
-      return [];
-    }
-  }, [selectedDay, transactionsByDate]);
+  const monthName = first.toLocaleDateString("es-ES", { month: "long", year: "numeric" });
+  const selectedEvents = selected ? events.get(selected) ?? [] : [];
 
-  // Get the list of unique transaction types for the filter
-  const transactionTypes = useMemo(() => {
-    if (!transactions) return [];
-    
-    const types = new Set<string>();
-    transactions.forEach(tx => {
-      if (tx.type) types.add(tx.type);
-    });
-    
-    return Array.from(types);
-  }, [transactions]);
-
-  // Handle filter change
-  const handleFilterChange = (type: string) => {
-    if (selectedTypes.includes(type)) {
-      setSelectedTypes(selectedTypes.filter(t => t !== type));
-    } else {
-      setSelectedTypes([...selectedTypes, type]);
-    }
-  };
-
-  // Navigate to today
-  const handleTodayClick = () => {
-    setMonthView(new Date());
-    setSelectedDay(new Date());
-  };
-  
-  // Determine if we should show the loading state
-  const isLoading = useMemo(() => {
-    return !accounts || accounts.length === 0 || (transactionsLoading && !isSwitchingAccount);
-  }, [accounts, transactionsLoading, isSwitchingAccount]);
-  
-  if (isLoading) {
-    return <ChartsSkeleton />;
+  function nav(delta: number) {
+    let m = viewMonth + delta, y = viewYear;
+    while (m < 0) { m += 12; y--; }
+    while (m > 11) { m -= 12; y++; }
+    setViewMonth(m); setViewYear(y); setSelected(null);
+  }
+  function isToday(day: number) {
+    return day === today.getDate() && viewMonth === today.getMonth() && viewYear === today.getFullYear();
   }
 
-  // Count total transactions in the current view
-  const totalTransactions = Object.values(transactionsByDate).reduce(
-    (sum, txs) => sum + txs.length, 
-    0
-  );
+  if (isLoading || !activeAccount) {
+    return (
+      <>
+        <Skeleton className="h-8 w-56" />
+        <div className="grid gap-4 md:grid-cols-12">
+          <Skeleton className="h-[520px] rounded-sb-lg md:col-span-8" />
+          <Skeleton className="h-[520px] rounded-sb-lg md:col-span-4" />
+        </div>
+      </>
+    );
+  }
 
   return (
-    <div className="max-w-[95%] mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6">
-      <div className="flex flex-col md:flex-row gap-6">
-        {/* Calendar Section */}
-        <BankSection className="w-full md:w-3/5">
-          <BankSectionHeader>
-            <div className="flex items-center justify-between w-full">
-              <div className="flex items-center gap-4">
-                <h1 className="text-xl font-semibold">Calendario Financiero</h1>
-                <Badge variant="outline" className="ml-2">
-                  {totalTransactions} transacciones
-                </Badge>
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <AccountSelect 
-                  accounts={accounts}
-                  activeAccount={activeAccount}
-                  setActiveAccount={handleAccountSelect}
-                  className="w-48"
-                />
-                
-                <FilterPopover 
-                  transactionTypes={transactionTypes}
-                  selectedTypes={selectedTypes}
-                  onFilterChange={handleFilterChange}
-                />
-              </div>
-            </div>
-          </BankSectionHeader>
-          
-          <BankSectionContent>
-            <FinancialCalendar 
-              monthView={monthView}
-              setMonthView={setMonthView}
-              selectedDay={selectedDay}
-              setSelectedDay={setSelectedDay}
-              transactionsByDate={transactionsByDate}
-              onTodayClick={handleTodayClick}
-            />
-          </BankSectionContent>
-        </BankSection>
+    <>
+      <PageHeader
+        title="Calendario de pagos"
+        sub="Tus movimientos por día e ingresos previstos"
+        actions={<Button variant="primary"><Ico name="plus" size={14} /> Nuevo pago</Button>}
+      />
 
-        {/* Transactions for Selected Day Section */}
-        <BankSection className="w-full md:w-2/5">
-          <BankSectionHeader>
-            <div className="flex items-center justify-between w-full">
-              <h2 className="text-lg font-medium">
-                {selectedDay ? format(selectedDay, "d 'de' MMMM, yyyy", { locale: es }) : "Seleccione una fecha"}
-              </h2>
-              {selectedDayTransactions.length > 0 && (
-                <Badge>
-                  {selectedDayTransactions.length} {selectedDayTransactions.length === 1 ? "transacción" : "transacciones"}
-                </Badge>
+      <div className="grid gap-4 md:grid-cols-12">
+        <Card className="md:col-span-8">
+          <div className="flex items-center justify-between px-5 pb-1 pt-[18px]">
+            <div>
+              <div className="mb-0.5 text-[11px] uppercase tracking-[0.1em] text-sb-fg-subtle">Vista mensual</div>
+              <h3 className="m-0 font-sb-display text-[18px] font-semibold capitalize">{monthName}</h3>
+            </div>
+            <div className="flex gap-1.5">
+              <Button variant="secondary" size="icon" onClick={() => nav(-1)} aria-label="Mes anterior"><Ico name="arrL" size={14} /></Button>
+              <Button variant="secondary" size="sm" onClick={() => { setViewMonth(today.getMonth()); setViewYear(today.getFullYear()); }}>Hoy</Button>
+              <Button variant="secondary" size="icon" onClick={() => nav(1)} aria-label="Mes siguiente"><Ico name="arrR" size={14} /></Button>
+            </div>
+          </div>
+
+          <CardBody>
+            <div className="grid grid-cols-7 gap-1">
+              {["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].map((d) => (
+                <div key={d} className="py-2 text-center text-[11px] font-semibold uppercase tracking-[0.08em] text-sb-fg-muted">{d}</div>
+              ))}
+              {cells.map((c, i) => {
+                if (c.out) return <div key={i} className="flex aspect-square flex-col rounded-sb-sm p-1.5 text-[12px] text-sb-fg-subtle">{c.day}</div>;
+                const k = keyOf(new Date(viewYear, viewMonth, c.day));
+                const ev = events.get(k) ?? [];
+                const sel = selected === k;
+                return (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setSelected(sel ? null : k)}
+                    className={cn(
+                      "flex aspect-square cursor-pointer flex-col rounded-sb-sm border border-transparent p-1.5 text-[12px] transition-colors",
+                      sel ? "bg-sb-600 text-white hover:bg-sb-700" : "bg-sb-surface-2 text-sb-fg-2 hover:bg-sb-surface-3",
+                      !sel && isToday(c.day) && "border-sb-500 font-bold text-sb-700",
+                    )}
+                  >
+                    <span className="font-semibold">{c.day}</span>
+                    {ev.length > 0 && (
+                      <span className="mt-auto flex gap-[3px]">
+                        {ev.slice(0, 3).map((e, j) => (
+                          <span key={j} className="size-[5px] rounded-full" style={{ background: sel ? "#fff" : e.type === "in" ? "#059669" : "#dc2626" }} />
+                        ))}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="mt-4 rounded-sb-md bg-sb-surface-2 p-3.5">
+              {selected ? (
+                <div>
+                  <div className="mb-2.5 flex items-center justify-between">
+                    <strong className="capitalize">{new Date(selected).toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" })}</strong>
+                    <Button variant="ghost" size="sm" onClick={() => setSelected(null)}><Ico name="x" size={14} /></Button>
+                  </div>
+                  {selectedEvents.length === 0 && <div className="text-sb-fg-muted">Sin movimientos ese día</div>}
+                  {selectedEvents.map((e, i) => (
+                    <div key={i} className={cn("flex items-center gap-3 py-2", i > 0 && "border-t border-sb-border")}>
+                      <span className="size-2 rounded-full" style={{ background: e.category.hex }} />
+                      <div className="flex-1">
+                        <div className="text-[13px] font-semibold">{e.reason}</div>
+                        <div className="text-[11.5px] text-sb-fg-muted">{e.category.label}</div>
+                      </div>
+                      <div className={cn("font-semibold tabular-nums", e.type === "in" ? "text-sb-pos" : "text-sb-neg")}>{e.type === "in" ? "+ " : "− "}{formatMoney(e.amount)}</div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-wrap items-center gap-4 text-[12px] text-sb-fg-muted">
+                  <span className="flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-sb-pos-2" /> Ingreso</span>
+                  <span className="flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-sb-neg-2" /> Gasto</span>
+                  <span>Selecciona un día para ver el detalle</span>
+                </div>
               )}
             </div>
-          </BankSectionHeader>
-          
-          <BankSectionContent>
-            <TransactionList 
-              transactions={selectedDayTransactions}
-              onSelectTransaction={setSelectedEvent}
-            />
-          </BankSectionContent>
-        </BankSection>
-      </div>
+          </CardBody>
+        </Card>
 
-      {/* Transaction Detail Dialog */}
-      {selectedEvent && (
-        <TransactionDialog
-          transaction={selectedEvent}
-          isOpen={!!selectedEvent}
-          onClose={() => setSelectedEvent(null)}
-        />
-      )}
-    </div>
+        <Card className="md:col-span-4">
+          <SectionHead eyebrow="Programados" title="Próximos pagos" />
+          <CardBody className="items-center justify-center py-12 text-center">
+            <div className="grid size-12 place-items-center rounded-full bg-sb-surface-3 text-sb-fg-subtle">
+              <Ico name="cal" size={22} />
+            </div>
+            <div className="text-[13px] text-sb-fg-muted">No hay pagos programados</div>
+            <div className="max-w-[220px] text-[12px] text-sb-fg-subtle">Los pagos recurrentes aparecerán aquí cuando estén disponibles.</div>
+          </CardBody>
+        </Card>
+      </div>
+    </>
   );
 }

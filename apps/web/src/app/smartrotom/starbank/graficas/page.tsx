@@ -1,280 +1,141 @@
 "use client";
-
-import { useState, useEffect, useMemo, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import TransactionCharts from "./_components/TransactionCharts";
-import TransactionMetrics from "./_components/TransactionMetrics";
-import DateRangeSelector from "./_components/DateRangeSelector";
-import TransactionTypeDistribution from "./_components/TransactionTypeDistribution";
-import { AccountSelect } from "../_components/AccountSelect";
-import { useBoffSession } from "@/services/useBoffSession";
+import * as React from "react";
 import useStarBank from "../_hooks/useStarBank";
 import { useGetTransactions } from "@/hooks/starbank/useGetTransactions";
-import { ChartsSkeleton } from "./_components/ChartsSkeleton";
-import { BankSection, BankSectionContent, BankSectionHeader } from "../_components/BankSection";
-import { Calendar } from "@/components/ui/primitives/calendar";
-import { Button } from "@/components/ui/primitives/button";
-import { formatMoney, changeActiveAccount } from "../bankUtils";
-import { StarBankAccount, StarBankTransaction } from "@boffmedia/shared";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/primitives/popover";
-import { cn } from "@/lib/utils";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
-import { ArrowRight, ChevronDown } from "lucide-react";
+import { PageHeader, Card, SectionHead, CardBody, Kpi, Button, Ico, Seg, AreaChart, BarChart, Donut, Skeleton } from "../_components/ui";
+import { income, expense, withinDays, balanceSeries, expenseByCategory, weeklyIncomeExpense, largestExpense } from "../_utils/analytics";
+import { displayName } from "../_utils/account";
+import { formatMoney } from "../_utils/format";
+import type { SBTransaction } from "../_types";
+
+const RANGES = [
+  { id: "7d", label: "7 días", days: 7 },
+  { id: "30d", label: "30 días", days: 30 },
+  { id: "90d", label: "90 días", days: 90 },
+  { id: "1y", label: "1 año", days: 365 },
+];
+const DAY = 86_400_000;
 
 export default function Graficas() {
-  // Date range state
-  const [selectedDateRange, setSelectedDateRange] = useState<[Date, Date]>([
-    new Date(new Date().setMonth(new Date().getMonth() - 1)), // Last month
-    new Date() // Today
-  ]);
-  
-  // Get account data from the hook
-  const { accounts, activeAccount, setActiveAccount } = useStarBank();
+  const { activeAccount } = useStarBank();
+  const accId = activeAccount?.id ?? -1;
+  const { transactions, isLoading } = useGetTransactions(accId, 100);
+  const [range, setRange] = React.useState("30d");
 
-  // Store the active account ID in local state to ensure consistency
-  const [currentAccountId, setCurrentAccountId] = useState<number | null>(null);
-  
-  // Track whether we're switching accounts to prevent unnecessary skeleton shows
-  const [isSwitchingAccount, setIsSwitchingAccount] = useState(false);
-  
-  // Initialize metrics state
-  const [metrics, setMetrics] = useState({
-    totalIncome: 0,
-    totalExpenses: 0,
-    averageTransaction: 0,
-    largestExpense: 0,
-    largestIncome: 0,
-    transactionCount: 0
+  const days = RANGES.find((r) => r.id === range)?.days ?? 30;
+  const all = (transactions ?? []) as SBTransaction[];
+  const filtered = React.useMemo(() => withinDays(all, days), [all, days]);
+
+  if (isLoading || !activeAccount) {
+    return (
+      <>
+        <Skeleton className="h-8 w-56" />
+        <div className="grid gap-4 md:grid-cols-3">{[0, 1, 2].map((i) => <Skeleton key={i} className="h-[104px] rounded-sb-lg" />)}</div>
+        <Skeleton className="h-[320px] rounded-sb-lg" />
+      </>
+    );
+  }
+
+  const inc = income(filtered, accId);
+  const exp = expense(filtered, accId);
+  const avg = filtered.length ? (inc + exp) / filtered.length : 0;
+  const series = balanceSeries(filtered, accId).map((p) => ({ balance: p.balance, day: p.day }));
+  const byCat = expenseByCategory(filtered, accId);
+  const weekly = weeklyIncomeExpense(all, accId, 4);
+  const largest = largestExpense(filtered, accId);
+  const catTotal = byCat.reduce((s, c) => s + c.value, 0) || 1;
+
+  // real 14-day activity (transaction count per day)
+  const now = Date.now();
+  const activity = Array.from({ length: 14 }).map((_, i) => {
+    const dayStart = now - (13 - i) * DAY;
+    return all.filter((t) => { const ts = +new Date(t.date); return ts >= dayStart - DAY && ts < dayStart; }).length;
   });
-
-  // Update the current account ID when activeAccount changes
-  useEffect(() => {
-    if (activeAccount && activeAccount.id !== undefined) {
-      setCurrentAccountId(activeAccount.id);
-    }
-  }, [activeAccount]);
-
-  // Use the account ID for the transactions query with null fallback
-  const { 
-    transactions, 
-    isLoading: transactionsLoading, 
-    refetch: refetchTransactions,
-    error: transactionsError
-  } = useGetTransactions(currentAccountId ?? -1);
-
-  // Refetch transactions when the account changes
-  useEffect(() => {
-    if (currentAccountId && currentAccountId !== -1) {
-      setIsSwitchingAccount(true);
-      refetchTransactions()
-        .then(() => {
-          setIsSwitchingAccount(false);
-        });
-    }
-  }, [currentAccountId, refetchTransactions]);
-
-  // Handle account change - optimize to prevent unnecessary re-renders
-  const handleAccountChange = useCallback((accountId: number) => {
-    // Only proceed if we're actually changing accounts
-    if (accountId !== currentAccountId) {
-      setIsSwitchingAccount(true);
-      
-      // Find the account object with the matching ID
-      const selectedAccount = accounts?.find((acc: StarBankAccount) => acc.id === accountId);
-      
-      if (selectedAccount) {
-        // Use changeActiveAccount utility to save to localStorage
-        changeActiveAccount(accountId);
-        setActiveAccount(selectedAccount.id);
-      }
-    }
-  }, [accounts, setActiveAccount, currentAccountId]);
-
-  // Custom handler for AccountSelect component
-  const handleAccountSelect = (account: StarBankAccount) => {
-    if (account && account.id) {
-      // Use changeActiveAccount utility to save to localStorage
-      changeActiveAccount(account.id);
-    }
-  };
-
-  // Filter transactions by the selected date range - using useMemo for performance
-  const filteredTransactions = useMemo(() => {
-    if (!transactions) return [];
-    
-    return transactions.filter((tx: StarBankTransaction) => {
-      try {
-        const txDate = new Date(tx.date);
-        return txDate >= selectedDateRange[0] && txDate <= selectedDateRange[1];
-      } catch (e) {
-        console.error("Error parsing date:", e);
-        return false;
-      }
-    });
-  }, [transactions, selectedDateRange]);
-
-  // Process transaction data for metrics
-  useEffect(() => {
-    // Make sure we have all the data we need before calculating
-    if (!filteredTransactions.length || !currentAccountId) return;
-    
-    // Calculate metrics
-    let incomeTotal = 0;
-    let expensesTotal = 0;
-    let largestExpense = 0;
-    let largestIncome = 0;
-    let sum = 0;
-    
-    filteredTransactions.forEach((transaction: StarBankTransaction) => {
-      const amount = transaction.amount;
-      sum += amount;
-      
-      if (transaction.from === currentAccountId) {
-        expensesTotal += amount;
-        largestExpense = Math.max(largestExpense, amount);
-      } else {
-        incomeTotal += amount;
-        largestIncome = Math.max(largestIncome, amount);
-      }
-    });
-    
-    // Only update metrics state if values have changed
-    const newMetrics = {
-      totalIncome: incomeTotal,
-      totalExpenses: expensesTotal,
-      averageTransaction: filteredTransactions.length > 0 ? sum / filteredTransactions.length : 0,
-      largestExpense,
-      largestIncome,
-      transactionCount: filteredTransactions.length
-    };
-    
-    setMetrics(newMetrics);
-  }, [filteredTransactions, currentAccountId]);
-  
-  // Determine if we should show the loading state
-  const shouldShowSkeleton = useMemo(() => {
-    return (
-      !accounts || 
-      accounts.length === 0 || 
-      (transactionsLoading && !isSwitchingAccount) || 
-      !activeAccount
-    );
-  }, [accounts, transactionsLoading, activeAccount, isSwitchingAccount]);
-  
-  // Show loading state until all necessary data is available
-  if (shouldShowSkeleton) {
-    return <ChartsSkeleton />;
-  }
-
-  // Error state
-  if (transactionsError) {
-    return (
-      <div className="p-8 text-center">
-        <h2 className="text-xl font-semibold text-red-600 mb-2">Error</h2>
-        <p className="text-ink-dim">No se pudieron cargar los datos. Por favor, intente nuevamente.</p>
-      </div>
-    );
-  }
+  const maxAct = Math.max(1, ...activity);
 
   return (
-    <div className="max-w-[90%] mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6">
-      {/* Header section with account selector and date range picker */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <BankSection className="w-full">
-          <BankSectionHeader>Seleccionar Cuenta</BankSectionHeader>
-          <BankSectionContent>
-            <div className="w-full">
-              {accounts && accounts.length > 0 && (
-                <AccountSelect 
-                  accounts={accounts}
-                  activeAccount={activeAccount}
-                  setActiveAccount={(account: any) => {
-                    if (account) {
-                      changeActiveAccount(account);
-                    }
-                    setActiveAccount(account);
-                  }}
-                  id="account-select"
-                  className="w-full"
-                />
-              )}
-            </div>
-          </BankSectionContent>
-        </BankSection>
-
-        <BankSection className="w-full">
-          <BankSectionHeader>Periodo de Análisis</BankSectionHeader>
-          <BankSectionContent>
-            <DateRangeSelector 
-              dateRange={selectedDateRange} 
-              onDateChange={setSelectedDateRange}
-            />
-          </BankSectionContent>
-        </BankSection>
-      </div>
-      
-      {/* Metrics cards */}
-      <TransactionMetrics 
-        metrics={metrics} 
-        accountName={activeAccount?.name || ""}
+    <>
+      <PageHeader
+        title="Gráficas y análisis"
+        sub={`Visualización de ${displayName(activeAccount.name)} · ${filtered.length} transacciones`}
+        actions={
+          <>
+            <Seg options={RANGES} value={range} onChange={setRange} />
+            <Button variant="secondary"><Ico name="download" size={14} /> Exportar</Button>
+          </>
+        }
       />
-      
-      {/* Main charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Balance evolution chart */}
-        <BankSection className="w-full">
-          <BankSectionHeader>Evolución de Balance</BankSectionHeader>
-          <BankSectionContent>
-            {filteredTransactions && filteredTransactions.length > 0 ? (
-              <TransactionCharts 
-                transactions={filteredTransactions} 
-                activeAccount={activeAccount}
-                chartType="balance" 
-              />
-            ) : (
-              <div className="p-8 text-center">
-                <p className="text-ink-dim">No hay transacciones para mostrar en el periodo seleccionado.</p>
-              </div>
-            )}
-          </BankSectionContent>
-        </BankSection>
-        
-        {/* Income/Expenses chart */}
-        <BankSection className="w-full">
-          <BankSectionHeader>Ingresos y Gastos</BankSectionHeader>
-          <BankSectionContent>
-            {filteredTransactions && filteredTransactions.length > 0 ? (
-              <TransactionCharts 
-                transactions={filteredTransactions} 
-                activeAccount={activeAccount}
-                chartType="inout" 
-              />
-            ) : (
-              <div className="p-8 text-center">
-                <p className="text-ink-dim">No hay transacciones para mostrar en el periodo seleccionado.</p>
-              </div>
-            )}
-          </BankSectionContent>
-        </BankSection>
+
+      <div className="grid gap-4 md:grid-cols-3">
+        <Kpi label="Ingresos" value={formatMoney(inc)} icon="arrUR" tone="pos" />
+        <Kpi label="Gastos" value={formatMoney(exp)} icon="arrDR" tone="neg" />
+        <Kpi label="Transacción media" value={formatMoney(Math.round(avg))} icon="chart" tone="brand" sub={`${filtered.length} operaciones`} />
       </div>
-      
-      {/* Transaction type distribution */}
-      <BankSection className="w-full">
-        <BankSectionHeader>Distribución por Tipo de Transacción</BankSectionHeader>
-        <BankSectionContent>
-          {filteredTransactions && filteredTransactions.length > 0 ? (
-            <TransactionTypeDistribution 
-              transactions={filteredTransactions} 
-              activeAccount={activeAccount!}
-            />
-          ) : (
-            <div className="p-8 text-center">
-              <p className="text-ink-dim">No hay transacciones para mostrar en el periodo seleccionado.</p>
+
+      <div className="grid gap-4 md:grid-cols-12">
+        <Card className="md:col-span-8">
+          <SectionHead eyebrow={`Últimos ${days} días`} title="Evolución de balance" />
+          <CardBody>
+            <AreaChart data={series} height={260} color="#2463eb" />
+          </CardBody>
+        </Card>
+        <Card className="md:col-span-4">
+          <SectionHead eyebrow="Período" title="Mayor gasto" />
+          <CardBody>
+            <div className="font-sb-display text-[32px] font-semibold tabular-nums tracking-[-0.01em]">{formatMoney(largest)}</div>
+            <div className="text-[13px] text-sb-fg-muted">Operación más alta de salida en el período seleccionado.</div>
+            <div className="h-px bg-sb-border" />
+            <div className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.02em] text-sb-fg-muted">Actividad (14 días)</div>
+            <div className="flex h-20 w-full items-end gap-1">
+              {activity.map((a, i) => (
+                <div key={i} className="flex-1 rounded" style={{ height: `${20 + (a / maxAct) * 60}%`, background: a === maxAct && a > 0 ? "#2463eb" : "#bfdbfe" }} />
+              ))}
             </div>
-          )}
-        </BankSectionContent>
-      </BankSection>
-    </div>
+          </CardBody>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-12">
+        <Card className="md:col-span-6">
+          <SectionHead eyebrow="Por semana" title="Ingresos vs. gastos" />
+          <CardBody>
+            <BarChart data={weekly} height={220} />
+            <div className="flex justify-center gap-4 pt-2">
+              <span className="flex items-center gap-1.5 text-[12px]"><span className="size-2.5 rounded bg-sb-pos-2" /> Ingresos</span>
+              <span className="flex items-center gap-1.5 text-[12px]"><span className="size-2.5 rounded bg-sb-neg-2" /> Gastos</span>
+            </div>
+          </CardBody>
+        </Card>
+
+        <Card className="md:col-span-6">
+          <SectionHead eyebrow="Gastos" title="Distribución por categoría" />
+          <CardBody className="flex-row items-center justify-between gap-7">
+            {byCat.length === 0 ? (
+              <div className="w-full py-8 text-center text-[13px] text-sb-fg-muted">Sin gastos en el período</div>
+            ) : (
+              <>
+                <Donut data={byCat} size={200} thickness={26} />
+                <div className="flex flex-1 flex-col gap-2">
+                  {byCat.map((c) => {
+                    const pct = (c.value / catTotal) * 100;
+                    return (
+                      <div key={c.id} className="flex flex-col gap-1">
+                        <div className="flex items-center justify-between text-[13px]">
+                          <span className="flex items-center gap-2"><span className="size-2.5 rounded" style={{ background: c.hex }} />{c.label}</span>
+                          <span className="font-semibold tabular-nums">{formatMoney(c.value)}</span>
+                        </div>
+                        <div className="h-1 overflow-hidden rounded-full bg-sb-surface-3">
+                          <div className="h-full" style={{ width: `${pct}%`, background: c.hex }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+          </CardBody>
+        </Card>
+      </div>
+    </>
   );
 }

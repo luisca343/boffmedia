@@ -23,6 +23,9 @@ const config: Config = {
         mono: ["IBM Plex Mono", "ui-monospace", "monospace"],
         // Legacy family retained for not-yet-migrated components
         orbitron: ["Orbitron", "sans-serif"],
+        // Starbank (SmartRotom) — fintech dual type system (self-hosted)
+        sb: ["Inter", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "sans-serif"],
+        "sb-display": ["Space Grotesk", "Inter", "ui-sans-serif", "system-ui", "sans-serif"],
       },
       fontSize: {
         "4xl": ["2.25rem", { lineHeight: "normal" }],
@@ -83,6 +86,12 @@ const config: Config = {
         "neon-toast": "0 24px 50px -20px var(--shadow-color, rgba(0,0,0,0.55))",
         "neon-modal": "0 40px 90px -30px var(--shadow-color, rgba(0,0,0,0.55))",
         "neon-popover": "0 24px 50px -20px var(--shadow-color, rgba(0,0,0,0.55))",
+        // ── Starbank (SmartRotom) — fintech elevation ───────────────────────
+        "sb-1": "0 1px 0 rgba(15,30,60,.04), 0 1px 2px rgba(15,30,60,.04)",
+        "sb-2": "0 1px 0 rgba(15,30,60,.03), 0 6px 18px -8px rgba(15,30,60,.15)",
+        "sb-3": "0 10px 30px -12px rgba(15,30,60,.25)",
+        "sb-brand": "0 14px 40px -16px rgba(36,99,235,.55)",
+        "sb-focus": "0 0 0 3px rgba(36,99,235,.22)",
       },
       backdropBlur: {
         xs: "2px",
@@ -94,6 +103,35 @@ const config: Config = {
         reverseBoxShadowY: "-4px",
       },
       colors: {
+        // ════════════════════════════════════════════════════════════════════
+        // STARBANK (SmartRotom) — blue-anchored fintech tokens. Light theme
+        // baked as hex (dark/density are deferred; convert to CSS-var-backed
+        // when those are wired). Namespaced `sb-*` so nothing collides with the
+        // other design systems sharing this config. Categoricals are colours so
+        // `bg-sb-league/10 text-sb-league` gives the 10%-tint chip pattern.
+        // ════════════════════════════════════════════════════════════════════
+        sb: {
+          50: "#eff6ff", 100: "#dbeafe", 200: "#bfdbfe", 300: "#93c5fd",
+          400: "#60a5fa", 500: "#3b82f6", 600: "#2463eb", 700: "#1d4ed8",
+          800: "#1e3a8a", 900: "#172554", 950: "#0b1638",
+          // surfaces
+          bg: "#f3f6fc", "bg-grid": "#eaf0fa", surface: "#ffffff",
+          "surface-2": "#f7faff", "surface-3": "#eef3fb",
+          border: "#e3ebf5", "border-strong": "#c9d6ec", ring: "#2463eb",
+          // text
+          fg: "#0c1830", "fg-2": "#2c3a55", "fg-muted": "#5b6b85",
+          "fg-subtle": "#8d99b3", onbrand: "#ffffff",
+          // semantic
+          pos: "#047857", "pos-2": "#059669", "pos-soft": "#e7f7ef",
+          neg: "#b91c1c", "neg-2": "#dc2626", "neg-soft": "#fdecec",
+          warn: "#b45309", "warn-soft": "#fff5e0",
+          info: "#1d4ed8", "info-soft": "#e8f0ff",
+          // categorical
+          league: "#2463eb", shop: "#06b6d4", heal: "#ec4899",
+          transfer: "#8b5cf6", reward: "#10b981", fee: "#94a3b8",
+          subscription: "#f59e0b", other: "#64748b",
+        },
+
         // ════════════════════════════════════════════════════════════════════
         // LEGACY (Neon/v2) TOKEN VOCABULARY — @deprecated for Boffmedia v3, do
         // NOT use in new Boffmedia code. `boffmedia-v2` is deleted, but these
@@ -417,6 +455,13 @@ const config: Config = {
         "neon": "14px",
         "neon-lg": "22px",
         "neon-pill": "9999px",
+        // ── Starbank (SmartRotom) radii ─────────────────────────────────────
+        "sb-xs": "6px",
+        "sb-sm": "10px",
+        "sb-md": "14px",
+        "sb-lg": "18px",
+        "sb-xl": "24px",
+        "sb-pill": "999px",
       },
     },
   },
