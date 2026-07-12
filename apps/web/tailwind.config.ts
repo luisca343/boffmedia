@@ -29,6 +29,24 @@ const config: Config = {
         // ChatApp (SmartRotom) — native system UI stack, no external fonts.
         ca: ["-apple-system", "BlinkMacSystemFont", "Segoe UI", "Helvetica Neue", "Helvetica", "Arial", "sans-serif"],
         "ca-mono": ["ui-monospace", "SF Mono", "Roboto Mono", "Menlo", "Consolas", "monospace"],
+        // Pokédex (SmartRotom) — dark/gaming dual type system (self-hosted).
+        // IBM Plex Mono stands in for the handoff's JetBrains Mono (already hosted).
+        pk: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        "pk-display": ["Orbitron", "ui-sans-serif", "system-ui", "sans-serif"],
+        "pk-mono": ["IBM Plex Mono", "ui-monospace", "monospace"],
+        // Mewtube + Mewtwitch (SmartRotom) — media dual type system (self-hosted).
+        // Orbitron for screen/section titles, Inter for UI/body, Lexend Mega for
+        // the wordmark only.
+        mw: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        "mw-display": ["Orbitron", "ui-sans-serif", "system-ui", "sans-serif"],
+        "mw-wide": ["Lexend Mega", "ui-sans-serif", "system-ui", "sans-serif"],
+        // Notes (SmartRotom) — linked-notes quad type system (self-hosted).
+        // IBM Plex Mono stands in for the handoff's Roboto Mono; the optional
+        // serif reading mode uses a system serif stack (no new font added).
+        nt: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        "nt-display": ["Orbitron", "ui-sans-serif", "system-ui", "sans-serif"],
+        "nt-mono": ["IBM Plex Mono", "ui-monospace", "monospace"],
+        "nt-read": ["Georgia", "Cambria", "Times New Roman", "serif"],
       },
       fontSize: {
         "4xl": ["2.25rem", { lineHeight: "normal" }],
@@ -99,6 +117,18 @@ const config: Config = {
         "ca-bubble": "var(--ca-bubble-shadow)",
         "ca-pop": "0 16px 44px -10px rgb(0 0 0 / .4)",
         "ca-modal": "0 30px 70px -20px rgb(0 0 0 / .6)",
+        // ── Pokédex (SmartRotom) — dark/gaming elevation ────────────────────
+        "pk-glow": "0 0 24px rgba(249,115,22,.25)",
+        "pk-elevated": "0 8px 32px rgba(0,0,0,.4), 0 2px 8px rgba(0,0,0,.3)",
+        "pk-inner": "inset 0 1px 0 rgba(255,255,255,.06), inset 0 -1px 0 rgba(0,0,0,.4)",
+        // The reused inset "3D" highlight on chips / stat-bar fills / progress segs.
+        "pk-chip": "inset 0 1px 0 rgba(255,255,255,.18), inset 0 -1px 0 rgba(0,0,0,.18)",
+        // ── Mewtube + Mewtwitch (SmartRotom) — accent glow + media elevation ──
+        // Glow tracks the per-app accent (`--mw-accent` triplet, red / purple).
+        "mw-glow": "0 0 20px rgb(var(--mw-accent) / .35)",
+        "mw-glow-lg": "0 0 40px rgb(var(--mw-accent) / .2)",
+        "mw-card": "0 8px 30px -12px rgba(0,0,0,.6)",
+        "mw-elevated": "0 20px 50px -20px rgba(0,0,0,.7)",
       },
       backdropBlur: {
         xs: "2px",
@@ -182,6 +212,59 @@ const config: Config = {
           info: "rgb(var(--ca-info) / <alpha-value>)",
           error: "rgb(var(--ca-error) / <alpha-value>)",
           warning: "rgb(var(--ca-warning) / <alpha-value>)",
+        },
+
+        // Notes (SmartRotom) — linked-notes surfaces + text + runtime accent,
+        // all CSS-var-backed for real dark(default)/light theming. Values live in
+        // the `.nt-app` base-layer plugin below. `--nt-accent`/`--nt-accent-fg`
+        // are runtime-settable triplets (the tweaks accent picker sets them
+        // inline on the root). Category hues (nt-c-*) are theme-independent and
+        // drive folder/tag colours.
+        nt: {
+          // orange brand ramp (constant)
+          50: "rgb(var(--nt-50) / <alpha-value>)",
+          100: "rgb(var(--nt-100) / <alpha-value>)",
+          200: "rgb(var(--nt-200) / <alpha-value>)",
+          300: "rgb(var(--nt-300) / <alpha-value>)",
+          400: "rgb(var(--nt-400) / <alpha-value>)",
+          500: "rgb(var(--nt-500) / <alpha-value>)",
+          600: "rgb(var(--nt-600) / <alpha-value>)",
+          700: "rgb(var(--nt-700) / <alpha-value>)",
+          800: "rgb(var(--nt-800) / <alpha-value>)",
+          900: "rgb(var(--nt-900) / <alpha-value>)",
+          950: "rgb(var(--nt-950) / <alpha-value>)",
+          // category hues (constant) — folders + tags
+          "c-primary": "rgb(var(--nt-c-primary) / <alpha-value>)",
+          "c-secondary": "rgb(var(--nt-c-secondary) / <alpha-value>)",
+          "c-accent": "rgb(var(--nt-c-accent) / <alpha-value>)",
+          "c-success": "rgb(var(--nt-c-success) / <alpha-value>)",
+          "c-warning": "rgb(var(--nt-c-warning) / <alpha-value>)",
+          "c-error": "rgb(var(--nt-c-error) / <alpha-value>)",
+          "c-info": "rgb(var(--nt-c-info) / <alpha-value>)",
+          // surfaces (theme-dependent)
+          bg: "rgb(var(--nt-bg) / <alpha-value>)",
+          "bg-1": "rgb(var(--nt-bg-1) / <alpha-value>)",
+          "bg-2": "rgb(var(--nt-bg-2) / <alpha-value>)",
+          panel: "rgb(var(--nt-panel) / <alpha-value>)",
+          "panel-2": "rgb(var(--nt-panel-2) / <alpha-value>)",
+          elevated: "rgb(var(--nt-elevated) / <alpha-value>)",
+          doc: "rgb(var(--nt-doc) / <alpha-value>)",
+          // alpha-based surfaces (full colours)
+          hover: "var(--nt-hover)",
+          "hover-strong": "var(--nt-hover-strong)",
+          border: "var(--nt-border)",
+          "border-2": "var(--nt-border-2)",
+          // text
+          fg: "rgb(var(--nt-fg) / <alpha-value>)",
+          "fg-muted": "rgb(var(--nt-fg-muted) / <alpha-value>)",
+          "fg-subtle": "rgb(var(--nt-fg-subtle) / <alpha-value>)",
+          // brand accent (runtime-settable) + status
+          accent: "rgb(var(--nt-accent) / <alpha-value>)",
+          "accent-fg": "rgb(var(--nt-accent-fg) / <alpha-value>)",
+          "on-accent": "rgb(var(--nt-on-accent) / <alpha-value>)",
+          success: "rgb(var(--nt-c-success) / <alpha-value>)",
+          warning: "rgb(var(--nt-c-warning) / <alpha-value>)",
+          error: "rgb(var(--nt-c-error) / <alpha-value>)",
         },
 
         // ════════════════════════════════════════════════════════════════════
@@ -412,6 +495,102 @@ const config: Config = {
           DEFAULT: "var(--info)",
           soft:    "var(--info-soft)",
         },
+
+        // ════════════════════════════════════════════════════════════════════
+        // SMARTROTOM v3 CHROME — SmartRotom-owned vocabulary, structurally a
+        // sibling of the Boffmedia v3 block above but a separate namespace so
+        // the two design systems stay isolated (CLAUDE.md). Var-backed aliases
+        // (see globals.css --sr-*) so the theme picker drives them for free.
+        // Use with the shared geometry (cut/cut-corner/cut-tag) + font-display.
+        // ════════════════════════════════════════════════════════════════════
+        sr: {
+          bg:        "var(--sr-bg)",
+          panel:     "var(--sr-panel)",
+          "panel-2": "var(--sr-panel-2)",
+          line:      "var(--sr-line)",
+          "line-2":  "var(--sr-line-2)",
+          txt: {
+            DEFAULT: "var(--sr-txt)",
+            muted:   "var(--sr-txt-muted)",
+            dim:     "var(--sr-txt-dim)",
+          },
+          accent: {
+            DEFAULT: "var(--sr-accent)",
+            bright:  "var(--sr-accent-bright)",
+            soft:    "var(--sr-accent-soft)",
+            line:    "var(--sr-accent-line)",
+            ink:     "var(--sr-accent-ink)",
+          },
+          ok:   "var(--sr-ok)",
+          warn: "var(--sr-warn)",
+          bad:  "var(--sr-bad)",
+        },
+        // ════════════════════════════════════════════════════════════════════
+        // POKÉDEX (SmartRotom) — dark/gaming palette. Values ported 1:1 from the
+        // handoff styles.css (dark theme baked as hex). Namespaced `pk-*` so it
+        // stays isolated from the other design systems sharing this config.
+        // Per-type / status / rarity colours are DATA-DRIVEN and live as JS maps
+        // in pokedex/_utils (applied via inline style), NOT here — a dynamic
+        // `bg-pk-type-${t}` class can't be JIT-compiled (the f12 bug we're fixing).
+        // ════════════════════════════════════════════════════════════════════
+        pk: {
+          primary: {
+            50: "#fff7ed", 100: "#ffedd5", 200: "#fed7aa", 300: "#fdba74",
+            400: "#fb923c", 500: "#f97316", 600: "#ea580c", 700: "#c2410c",
+            800: "#9a3412", 900: "#7c2d12",
+          },
+          secondary: {
+            300: "#67e8f9", 400: "#22d3ee", 500: "#06b6d4",
+            600: "#0891b2", 700: "#0e7490", 900: "#164e63",
+          },
+          accent: {
+            300: "#d8b4fe", 400: "#c084fc", 500: "#a855f7",
+            600: "#9333ea", 900: "#4c1d95",
+          },
+          highlight: { 400: "#a3e635", 500: "#84cc16" },
+          surface: {
+            50: "#f9fbfd", 100: "#f2f6fa", 200: "#e4eaf2", 300: "#cdd7e3",
+            400: "#97a6bb", 500: "#677790", 600: "#4a576e", 700: "#36415a",
+            800: "#18212f", 900: "#0c1321", 950: "#030609",
+          },
+          success: "#10b981", warning: "#f59e0b", error: "#ef4444",
+        },
+
+        // ════════════════════════════════════════════════════════════════════
+        // MEWTUBE + MEWTWITCH (SmartRotom) — media dual-accent tokens. Dark
+        // canvas, ONE system, TWO accents: Mewtube red / Mewtwitch purple, plus
+        // a warm-vs-cool surface ramp so each accent harmonizes. CSS-var backed
+        // and swapped by `data-app` on the `.mw-app` root (see the mw base-layer
+        // plugin below) — never a dynamic `bg-${x}` class (the G2 bug). Alpha
+        // works: `bg-mw-accent/12`, `text-mw-fg-mute`, `bg-mw-800`.
+        // ════════════════════════════════════════════════════════════════════
+        mw: {
+          bg:  "rgb(var(--mw-bg) / <alpha-value>)",
+          900: "rgb(var(--mw-900) / <alpha-value>)",
+          800: "rgb(var(--mw-800) / <alpha-value>)",
+          700: "rgb(var(--mw-700) / <alpha-value>)",
+          panel:    "var(--mw-panel)",
+          "panel-2": "var(--mw-panel-2)",
+          line:        "var(--mw-hairline)",
+          "line-strong": "var(--mw-hairline-strong)",
+          fg: {
+            DEFAULT: "rgb(var(--mw-fg) / <alpha-value>)",
+            mute:    "rgb(var(--mw-fg-mute) / <alpha-value>)",
+            subtle:  "rgb(var(--mw-fg-subtle) / <alpha-value>)",
+            faint:   "rgb(var(--mw-fg-faint) / <alpha-value>)",
+          },
+          accent: {
+            DEFAULT: "rgb(var(--mw-accent) / <alpha-value>)",
+            dark:    "var(--mw-accent-dark)",
+            on:      "rgb(var(--mw-on-accent) / <alpha-value>)",
+          },
+          highlight: "rgb(var(--mw-highlight) / <alpha-value>)",
+          secondary: "rgb(var(--mw-secondary) / <alpha-value>)",
+          success:   "rgb(var(--mw-success) / <alpha-value>)",
+          warning:   "rgb(var(--mw-warning) / <alpha-value>)",
+          error:     "rgb(var(--mw-error) / <alpha-value>)",
+          info:      "rgb(var(--mw-info) / <alpha-value>)",
+        },
       },
       keyframes: {
         // Existing animations
@@ -489,6 +668,31 @@ const config: Config = {
         "ca-fade": { from: { opacity: "0" } },
         "ca-modal-in": { from: { opacity: "0", transform: "translateY(14px) scale(.98)" } },
         "ca-slide-in": { from: { opacity: "0", transform: "translateX(20px)" } },
+        // ── Pokédex (SmartRotom) ──────────────────────────────────────────
+        "pk-drop-in": { from: { opacity: "0", transform: "translateY(-6px)" } },
+        "pk-fade-up": { from: { opacity: "0", transform: "translateY(6px)" } },
+        // ── Mewtube + Mewtwitch (SmartRotom) ──────────────────────────────
+        "mw-fade-in": {
+          from: { opacity: "0", transform: "translateY(4px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        // Live-pill white dot: expanding ring.
+        "mw-ping-white": {
+          "0%": { boxShadow: "0 0 0 0 rgba(255,255,255,.7)" },
+          "70%": { boxShadow: "0 0 0 6px rgba(255,255,255,0)" },
+          "100%": { boxShadow: "0 0 0 0 rgba(255,255,255,0)" },
+        },
+        // Viewer / live dot: expanding ring in the per-app accent.
+        "mw-ping": {
+          "0%": { boxShadow: "0 0 0 0 rgb(var(--mw-accent) / .6)" },
+          "70%": { boxShadow: "0 0 0 8px rgb(var(--mw-accent) / 0)" },
+          "100%": { boxShadow: "0 0 0 0 rgb(var(--mw-accent) / 0)" },
+        },
+        // Sidebar live dot: opacity + scale breathe.
+        "mw-blink": {
+          "0%, 100%": { opacity: "1", transform: "scale(1)" },
+          "50%": { opacity: ".6", transform: "scale(.85)" },
+        },
       },
       animation: {
         // Existing animations
@@ -516,6 +720,18 @@ const config: Config = {
         "ca-fade": "ca-fade 0.18s ease",
         "ca-modal-in": "ca-modal-in 0.2s cubic-bezier(.2,.8,.3,1)",
         "ca-slide-in": "ca-slide-in 0.24s ease",
+        // ── Pokédex (SmartRotom) ──────────────────────────────────────────
+        "pk-drop-in": "pk-drop-in 0.18s cubic-bezier(.16,1,.3,1)",
+        "pk-fade-up": "pk-fade-up 0.25s cubic-bezier(.16,1,.3,1)",
+        // ── Mewtube + Mewtwitch (SmartRotom) ──────────────────────────────
+        "mw-fade-in": "mw-fade-in 0.3s cubic-bezier(.2,.7,.2,1)",
+        "mw-ping-white": "mw-ping-white 1.5s ease-in-out infinite",
+        "mw-ping": "mw-ping 1.5s ease-in-out infinite",
+        "mw-blink": "mw-blink 1.6s ease-in-out infinite",
+      },
+      transitionTimingFunction: {
+        "pk-out": "cubic-bezier(.16, 1, .3, 1)",
+        "pk-spring": "cubic-bezier(.34, 1.56, .64, 1)",
       },
       spacing: {
         18: "4.5rem",
@@ -540,6 +756,27 @@ const config: Config = {
         "ca-lg": "12px",
         "ca-xl": "16px",
         "ca-2xl": "22px",
+        // ── Pokédex (SmartRotom) radii ──────────────────────────────────────
+        "pk-sm": "6px",
+        "pk-md": "10px",
+        "pk-lg": "14px",
+        "pk-xl": "20px",
+        "pk-2xl": "28px",
+        "pk-pill": "999px",
+        // ── Mewtube + Mewtwitch (SmartRotom) radii — handoff scale ──────────
+        "mw-sm": "4px",   // radius-sm
+        "mw-md": "6px",   // radius-md — buttons, inputs
+        "mw-lg": "8px",   // radius-lg
+        "mw-xl": "12px",  // radius-xl — small cards
+        "mw-2xl": "16px", // radius-2xl — medium cards
+        "mw-3xl": "24px", // radius-3xl — featured / hero cards
+        "mw-pill": "999px",
+        // ── Notes (SmartRotom) radii — handoff scale ───────────────────────
+        "nt-sm": "6px",
+        "nt-md": "9px",
+        "nt-lg": "12px",
+        "nt-xl": "16px",
+        "nt-2xl": "22px",
       },
     },
   },
@@ -686,6 +923,183 @@ const config: Config = {
           border: "1.5px solid transparent", backgroundClip: "padding-box",
         },
         ".ca-scroll::-webkit-scrollbar-thumb:hover": { background: "rgb(var(--ca-500) / .8)" },
+      })
+    }),
+    // ── Notes (SmartRotom) theme layer ─────────────────────────────────────
+    // Real dark(default)/light + runtime accent, scoped to `.nt-app` so nothing
+    // leaks into the rest of SmartRotom. `--nt-accent`/`--nt-accent-fg` are
+    // runtime-settable RGB triplets (the tweaks accent picker sets them inline).
+    // The editor prose (`.nt-doc`) and thin scrollbar live here as components so
+    // no per-app CSS file is needed — descendant-styled contentEditable output
+    // is the "absolutely necessary" case.
+    plugin(({ addBase, addComponents }) => {
+      const constant = {
+        // orange brand ramp
+        "--nt-50": "255 247 237", "--nt-100": "255 237 213", "--nt-200": "254 215 170",
+        "--nt-300": "253 186 116", "--nt-400": "251 146 60", "--nt-500": "249 115 22",
+        "--nt-600": "234 88 12", "--nt-700": "194 65 12", "--nt-800": "154 52 18",
+        "--nt-900": "124 45 18", "--nt-950": "67 20 7",
+        // category hues (folders + tags)
+        "--nt-c-primary": "249 115 22", "--nt-c-secondary": "59 130 246",
+        "--nt-c-accent": "217 70 239", "--nt-c-success": "16 185 129",
+        "--nt-c-warning": "245 158 11", "--nt-c-error": "239 68 68",
+        "--nt-c-info": "139 92 246",
+      }
+      const dark = {
+        "--nt-bg": "3 6 9", "--nt-bg-1": "8 13 24", "--nt-bg-2": "12 19 33",
+        "--nt-panel": "15 22 38", "--nt-panel-2": "20 29 47", "--nt-elevated": "26 36 56",
+        "--nt-doc": "11 16 28",
+        "--nt-hover": "rgb(255 255 255 / .04)", "--nt-hover-strong": "rgb(255 255 255 / .07)",
+        "--nt-border": "rgb(255 255 255 / .08)", "--nt-border-2": "rgb(255 255 255 / .13)",
+        "--nt-fg": "236 241 248", "--nt-fg-muted": "154 168 191", "--nt-fg-subtle": "108 122 146",
+        "--nt-accent": "249 115 22", "--nt-accent-fg": "251 146 60", "--nt-on-accent": "10 12 18",
+      }
+      const light = {
+        "--nt-bg": "244 247 251", "--nt-bg-1": "248 250 253", "--nt-bg-2": "255 255 255",
+        "--nt-panel": "255 255 255", "--nt-panel-2": "248 250 253", "--nt-elevated": "255 255 255",
+        "--nt-doc": "255 255 255",
+        "--nt-hover": "rgb(15 23 42 / .04)", "--nt-hover-strong": "rgb(15 23 42 / .07)",
+        "--nt-border": "rgb(15 23 42 / .09)", "--nt-border-2": "rgb(15 23 42 / .14)",
+        "--nt-fg": "17 25 41", "--nt-fg-muted": "82 95 117", "--nt-fg-subtle": "133 146 168",
+        "--nt-accent": "234 88 12", "--nt-accent-fg": "194 65 12", "--nt-on-accent": "255 255 255",
+      }
+      addBase({
+        ".nt-app": { ...constant, ...dark, colorScheme: "dark" },
+        '.nt-app[data-theme="light"]': { ...light, colorScheme: "light" },
+        ".nt-app ::selection": { background: "rgb(var(--nt-accent) / .30)" },
+      })
+      const fg = "rgb(var(--nt-fg))"
+      const border = "var(--nt-border)"
+      addComponents({
+        // Document prose — the note editor's rendered/edited HTML.
+        ".nt-doc": {
+          maxWidth: "740px", margin: "0 auto",
+          padding: "52px clamp(22px, 7%, 64px) 200px",
+          background: "rgb(var(--nt-doc))", minHeight: "100%",
+          borderLeft: `1px solid ${border}`, borderRight: `1px solid ${border}`,
+          color: fg,
+        },
+        ".nt-doc.wide": { maxWidth: "980px" },
+        '.nt-doc[contenteditable="true"]': { caretColor: "rgb(var(--nt-accent))" },
+        ".nt-doc:focus": { outline: "none" },
+        ".nt-doc h1": { fontSize: "32px", lineHeight: "1.18", fontWeight: "700", letterSpacing: "-.02em", margin: "0 0 .5em", color: fg },
+        ".nt-doc h2": { fontSize: "21px", lineHeight: "1.3", fontWeight: "650", letterSpacing: "-.01em", margin: "1.7em 0 .5em", color: fg },
+        ".nt-doc h3": { fontSize: "17px", fontWeight: "650", margin: "1.4em 0 .4em", color: fg },
+        ".nt-doc p": { fontSize: "16px", lineHeight: "1.72", margin: "0 0 1em", color: fg },
+        ".nt-doc p.lead": { fontSize: "18px", lineHeight: "1.65", color: "rgb(var(--nt-fg-muted))", marginBottom: "1.4em" },
+        ".nt-doc strong": { fontWeight: "650", color: fg },
+        ".nt-doc ul, .nt-doc ol": { paddingLeft: "1.4em", margin: "0 0 1.1em" },
+        ".nt-doc li": { fontSize: "16px", lineHeight: "1.7", marginBottom: ".35em" },
+        ".nt-doc ul.todo": { listStyle: "none", paddingLeft: ".2em" },
+        ".nt-doc ul.todo li": { position: "relative", paddingLeft: "30px", cursor: "pointer" },
+        ".nt-doc ul.todo li::before": {
+          content: '""', position: "absolute", left: "0", top: "4px",
+          width: "18px", height: "18px", borderRadius: "5px",
+          border: "1.5px solid var(--nt-border-2)", background: "rgb(var(--nt-panel))",
+          transition: "all .15s cubic-bezier(.4,0,.2,1)",
+        },
+        '.nt-doc ul.todo li[data-done="true"]::before': { background: "rgb(var(--nt-accent))", borderColor: "rgb(var(--nt-accent))" },
+        '.nt-doc ul.todo li[data-done="true"]::after': {
+          content: '""', position: "absolute", left: "6px", top: "7px",
+          width: "5px", height: "9px", border: "solid rgb(var(--nt-on-accent))",
+          borderWidth: "0 2px 2px 0", transform: "rotate(45deg)",
+        },
+        '.nt-doc ul.todo li[data-done="true"]': { color: "rgb(var(--nt-fg-subtle))", textDecoration: "line-through" },
+        ".nt-doc blockquote": { margin: "1.3em 0", padding: "4px 0 4px 18px", borderLeft: "3px solid rgb(var(--nt-accent))", color: "rgb(var(--nt-fg-muted))", fontStyle: "italic", fontSize: "16px", lineHeight: "1.65" },
+        ".nt-doc code": { fontFamily: "'IBM Plex Mono', ui-monospace, monospace", fontSize: ".86em", background: "var(--nt-hover-strong)", padding: "2px 6px", borderRadius: "5px", color: "rgb(var(--nt-accent-fg))", border: `1px solid ${border}` },
+        ".nt-doc pre": { background: "rgb(var(--nt-bg))", border: `1px solid ${border}`, borderRadius: "9px", padding: "16px 18px", overflow: "auto", margin: "1.2em 0" },
+        ".nt-doc pre code": { background: "none", border: "none", padding: "0", color: fg },
+        ".nt-doc table": { width: "100%", borderCollapse: "collapse", margin: "1.3em 0", fontSize: "14.5px", border: `1px solid ${border}`, borderRadius: "9px", overflow: "hidden" },
+        ".nt-doc th, .nt-doc td": { textAlign: "left", padding: "9px 14px", borderBottom: `1px solid ${border}` },
+        ".nt-doc th": { background: "rgb(var(--nt-panel))", fontWeight: "600", color: "rgb(var(--nt-fg-muted))", fontSize: "12.5px", letterSpacing: ".02em", textTransform: "uppercase" },
+        ".nt-doc td": { borderRight: `1px solid ${border}` },
+        ".nt-doc tr:last-child td": { borderBottom: "none" },
+        ".nt-doc td:last-child, .nt-doc th:last-child": { borderRight: "none" },
+        ".nt-doc tbody tr:hover": { background: "var(--nt-hover)" },
+        ".nt-doc .wikilink": { color: "rgb(var(--nt-accent-fg))", textDecoration: "none", cursor: "pointer", borderBottom: "1px solid rgb(var(--nt-accent) / .35)", paddingBottom: "1px", borderRadius: "2px", transition: "background .12s" },
+        '.nt-doc .wikilink::before': { content: '"[["', opacity: ".4", fontSize: ".85em" },
+        '.nt-doc .wikilink::after': { content: '"]]"', opacity: ".4", fontSize: ".85em" },
+        ".nt-doc .wikilink:hover": { background: "rgb(var(--nt-accent) / .15)" },
+        ".nt-doc.serif p, .nt-doc.serif li, .nt-doc.serif blockquote": { fontFamily: "Georgia, Cambria, 'Times New Roman', serif", fontSize: "18px" },
+        ".nt-doc.serif h1, .nt-doc.serif h2, .nt-doc.serif h3": { fontFamily: "Georgia, Cambria, 'Times New Roman', serif" },
+        // Thin, theme-aware scrollbar (opt-in on scroll containers).
+        ".nt-scroll": { scrollbarWidth: "thin", scrollbarColor: "var(--nt-border-2) transparent" },
+        ".nt-scroll::-webkit-scrollbar": { width: "10px", height: "10px" },
+        ".nt-scroll::-webkit-scrollbar-thumb": { background: "var(--nt-border-2)", borderRadius: "99px", border: "3px solid transparent", backgroundClip: "padding-box" },
+        ".nt-scroll::-webkit-scrollbar-thumb:hover": { background: "rgb(var(--nt-fg-subtle))", backgroundClip: "padding-box" },
+      })
+    }),
+    // ── Mewtube + Mewtwitch (SmartRotom) theme layer ───────────────────────
+    // One system, two accents, scoped to the `.mw-app` root so nothing leaks
+    // into the rest of SmartRotom. `--mw-accent` is a per-app RGB triplet
+    // (`data-app="mewtube"` → red, `="mewtwitch"` → purple); soft/glow tints
+    // derive off it via Tailwind alpha + the mw-glow shadow. The surface ramp
+    // warms for Mewtube (so red harmonizes) and stays cool for Mewtwitch — the
+    // handoff's `.theme-*` behaviour, ported 1:1 from styles.css.
+    plugin(({ addBase, addComponents }) => {
+      // Theme-independent: text ramp, status, highlight/secondary, panels,
+      // hairlines, accent-derived dark, easing.
+      const constant = {
+        "--mw-fg": "248 250 252",        // surface-50
+        "--mw-fg-mute": "203 213 225",   // surface-300
+        "--mw-fg-subtle": "148 163 184", // surface-400
+        "--mw-fg-faint": "100 116 139",  // surface-500
+        "--mw-on-accent": "255 255 255",
+        "--mw-highlight": "132 204 22",  // lime-500 — subs / system events only
+        "--mw-secondary": "6 182 212",   // cyan-500
+        "--mw-success": "16 185 129",
+        "--mw-warning": "234 179 8",
+        "--mw-error": "239 68 68",
+        "--mw-info": "59 130 246",
+        "--mw-panel": "rgba(15, 21, 36, 0.85)",
+        "--mw-panel-2": "rgba(22, 30, 48, 0.92)",
+        "--mw-hairline": "rgba(255, 255, 255, 0.06)",
+        "--mw-hairline-strong": "rgba(255, 255, 255, 0.1)",
+        "--mw-accent-dark": "color-mix(in srgb, rgb(var(--mw-accent)) 70%, black)",
+        "--mw-ease": "cubic-bezier(.2,.7,.2,1)",
+      }
+      // Mewtwitch — cool default ramp + purple.
+      const mewtwitch = {
+        "--mw-accent": "168 85 247",
+        "--mw-bg": "3 5 15",    // surface-950
+        "--mw-900": "12 18 32", // surface-900
+        "--mw-800": "30 41 59", // surface-800
+        "--mw-700": "51 65 85", // surface-700
+      }
+      // Mewtube — warm ramp + red (neutralizes the blue tint).
+      const mewtube = {
+        "--mw-accent": "239 68 68",
+        "--mw-bg": "14 8 10",
+        "--mw-900": "24 16 18",
+        "--mw-800": "38 26 28",
+        "--mw-700": "58 42 44",
+        "--mw-hairline": "rgba(255, 220, 220, 0.07)",
+        "--mw-hairline-strong": "rgba(255, 220, 220, 0.12)",
+      }
+      addBase({
+        // Default to the cool ramp so the shell has a canvas even before the
+        // per-app attribute resolves; the body-tint is accent 8% over canvas.
+        ".mw-app": {
+          ...constant,
+          ...mewtwitch,
+          colorScheme: "dark",
+          color: "rgb(var(--mw-fg))",
+          background: "color-mix(in srgb, rgb(var(--mw-accent)) 8%, rgb(var(--mw-bg)))",
+        },
+        '.mw-app[data-app="mewtube"]': mewtube,
+        '.mw-app[data-app="mewtwitch"]': mewtwitch,
+      })
+      addComponents({
+        // Thin, accent-aware scrollbar (opt-in on scroll containers).
+        ".mw-scroll": {
+          scrollbarWidth: "thin",
+          scrollbarColor: "rgb(var(--mw-700) / .9) transparent",
+        },
+        ".mw-scroll::-webkit-scrollbar": { width: "6px", height: "6px" },
+        ".mw-scroll::-webkit-scrollbar-thumb": {
+          background: "rgb(var(--mw-700))",
+          borderRadius: "99px",
+        },
       })
     }),
     // Enhanced text shadow plugin

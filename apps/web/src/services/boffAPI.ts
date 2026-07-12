@@ -308,7 +308,13 @@ export async function rotomPATCH<T>(url: string, data: any): Promise<ApiResponse
 }
 
 export async function rotomDELETE<T>(url: string, data?: any): Promise<ApiResponse<T>> {
-  return apiDELETE<T>(`/smartrotom${url}`);
+  // SmartRotom mutations are gated by MinecraftMiddleware, which requires the
+  // `server` field in the body for any non-GET request — send it (like
+  // rotomPOST/PUT) so DELETEs aren't rejected with 403.
+  return request<T>("DELETE", `${getApiUrl()}/smartrotom${url}`, {
+    ...(data ?? {}),
+    server: getServer(),
+  });
 }
 
 export async function wingullPOST<T>(url: string, data: any): Promise<ApiResponse<T>> {
