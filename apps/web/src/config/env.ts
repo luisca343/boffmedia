@@ -26,5 +26,8 @@ export const env = z
     // Steam Web API key — optional; only used to resolve the persona name/avatar
     // when linking. The OpenID link itself works without it.
     STEAM_API_KEY: z.string().default(''),
+    // YouTube Data API key — server-side only; proxied via /api/youtube so the
+    // key never reaches the browser bundle (previously leaked client-side).
+    YOUTUBE_API_KEY: z.string().default(''),
   })
   .parse(process.env);

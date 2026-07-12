@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 import React from "react";
-import { SmartRotomBadge } from "./ui/badge";
+import { SmartRotomBadge } from "./ui";
 import { breadcrumbRewrite } from "@/utils/breadcrumb-rewrite";
 
 export default function BreadcrumbNav({className} : {className?: string}){
@@ -13,13 +13,13 @@ export default function BreadcrumbNav({className} : {className?: string}){
     const parts = path.split('/').filter(Boolean)
 
     return (
-        <div className={`${className} flex bg-white rounded-sm h-8 items-center ps-4 text-black`}>
+        <div className={`${className} flex cut [--cut:6px] bg-sr-panel-2 border border-sr-line h-8 items-center px-3 text-sr-txt`}>
             {parts.map((part, index) => {
 
                 const href = '/' + parts.slice(0, index + 1).join('/')
                 return (
                     <React.Fragment key={`breadcrumb-${index}`}>
-                        {index > 0 && <span className="text-3xl font-bold m-1 text-primary">/</span>}
+                        {index > 0 && <span className="text-lg font-display m-1 text-sr-accent">/</span>}
                         <Breadcrumb index={index} key={index} parts={parts} />
                     </React.Fragment>
                 )
