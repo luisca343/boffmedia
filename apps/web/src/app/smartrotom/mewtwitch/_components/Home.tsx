@@ -53,6 +53,11 @@ export function Home() {
       )}
       <div className="mx-auto max-w-[1640px] px-4 pb-20 pt-5 md:px-10">
         <StreamSection eyebrow="En directo" title="Directos populares ahora" streams={rest} loading={top.isLoading} />
+        {top.isError && (
+          <p className="py-4 text-center text-sm text-mw-fg-faint">
+            No se pudo conectar con Twitch. Revisa las credenciales de la API.
+          </p>
+        )}
         <CategoryRail eyebrow="Explora" title="Categorías principales" categories={cats} loading={games.isLoading} />
       </div>
     </>

@@ -1,136 +1,98 @@
 "use client"
-import { typeChart } from '../../dexUtils';
-import { useTranslations } from "next-intl";
-import { colors } from '@/components/shared/pokemon/TypeBadge';
+import React, { useState } from "react"
+import { typeChart } from "../../dexUtils"
+import { TypeGlyph } from "../../_components/ui"
+import { TYPE_COLORS, TYPE_LABELS, ALL_TYPES } from "../../_utils/typeColors"
+import { getContrastingTextColor } from "../../_utils/dexMeta"
+
+// Attacker's perspective: 2× = green (good), ½ = red (bad), 0 = purple (immune).
+function multSymbol(m: number) {
+  if (m === 4) return "4×"
+  if (m === 2) return "2×"
+  if (m === 0.5) return "½"
+  if (m === 0.25) return "¼"
+  if (m === 0) return "0"
+  return "·"
+}
+function multStyle(m: number): { background: string; color: string } {
+  if (m === 2 || m === 4) return { background: "rgba(163,230,53,.16)", color: "#a3e635" }
+  if (m === 0.5 || m === 0.25) return { background: "rgba(239,68,68,.16)", color: "#f87171" }
+  if (m === 0) return { background: "rgba(192,132,252,.18)", color: "#c084fc" }
+  return { background: "rgba(255,255,255,.025)", color: "#677790" }
+}
+
+const LEGEND = [
+  { s: "2×", style: { background: "rgba(163,230,53,.16)", color: "#a3e635" }, label: "Súper eficaz" },
+  { s: "·", style: { background: "rgba(255,255,255,.03)", color: "#677790" }, label: "Daño normal" },
+  { s: "½", style: { background: "rgba(239,68,68,.16)", color: "#f87171" }, label: "Poco eficaz" },
+  { s: "0", style: { background: "rgba(192,132,252,.18)", color: "#c084fc" }, label: "Sin efecto" },
+]
 
 export default function FullTypeChart() {
-    const t = useTranslations("pokedex");
-    const pokemonTypes = [
-        "normal", "fire", "water", "electric", "grass", "ice", "fighting",
-        "poison", "ground", "flying", "psychic", "bug", "rock", "ghost",
-        "dragon", "dark", "steel", "fairy"
-    ];
+  const [hover, setHover] = useState<{ axis: "atk" | "def"; type: string } | null>(null)
 
-    // Function to get effectiveness and corresponding styling
-    const getEffectivenessCell = (attackType: string, defenseType: string) => {
-        const effectiveness = typeChart[attackType]?.[defenseType] ?? 1;
-        
-        let bgColor = "bg-layer-3";  // Default color for neutral effectiveness
-        let textColor = "text-ink";
-        let effectivenessText = "";
-        
-        if (effectiveness === 2) {
-            bgColor = "bg-warning";
-            textColor = "text-warning-hover";
-            effectivenessText = "2×";
-        } else if (effectiveness === 0.5) {
-            bgColor = "bg-red-700";
-            textColor = "text-red-100";
-            effectivenessText = "½×";
-        } else if (effectiveness === 0) {
-            bgColor = "bg-layer-1";
-            textColor = "text-ink-muted";
-            effectivenessText = "0";
-        }
-        
-        return (
-            <div 
-                className={`${bgColor} ${textColor} flex items-center justify-center w-9 h-9 text-xs font-bold rounded-sm m-0.5`}
-                title={`${t(`type_${attackType}`)} → ${t(`type_${defenseType}`)}: ${effectiveness}x`}
+  return (
+    <div className="grid grid-cols-1 xl:grid-cols-[1fr_220px] gap-[22px] items-start">
+      <div className="overflow-x-auto">
+        <div className="grid gap-0.5 bg-white/[0.02] border border-white/[0.05] rounded-[10px] p-2 min-w-[560px]" style={{ gridTemplateColumns: "36px repeat(18, minmax(0, 1fr))" }}>
+          <div className="grid place-items-center text-pk-surface-500 font-pk-mono text-[9px] bg-white/[0.02] rounded aspect-square">A↓D→</div>
+          {ALL_TYPES.map((tp) => (
+            <div
+              key={"h-" + tp}
+              className="grid place-items-center aspect-square rounded"
+              style={{ background: TYPE_COLORS[tp], color: getContrastingTextColor(TYPE_COLORS[tp]) }}
+              title={TYPE_LABELS[tp]}
+              onMouseEnter={() => setHover({ axis: "def", type: tp })}
+              onMouseLeave={() => setHover(null)}
             >
-                {effectivenessText}
+              <TypeGlyph type={tp} size={14} />
             </div>
-        );
-    };
+          ))}
 
-    // Function to get the type cell with the icon and the correct background color
-    const getTypeCell = (type: string, isHeader: boolean = false) => {
-        const typeColor = colors[type]?.backgroundColor || "#666666";
-        
-        return (
-            <div 
-                className={`w-9 h-9 flex items-center justify-center font-medium rounded-sm m-0.5 ${isHeader ? 'sticky top-0 z-10' : ''}`}
-                style={{ backgroundColor: typeColor }}
-            >
-                <img 
-                    src={`/smartrotom/img/types/${type.toLowerCase()}.png`} 
-                    className="w-6 h-6" 
-                    alt={t(`type_${type}`)}
-                    title={t(`type_${type}`)}
-                />
-            </div>
-        );
-    };
-
-    return (
-        <div className="overflow-x-auto">
-            <div className="text-lg font-medium text-ink mb-3">Tabla de Efectividad de Tipos</div>
-            <div className="flex flex-col lg:flex-row items-start gap-6">
-                <div className="overflow-x-auto">
-                    <div className="inline-block align-middle rounded-lg border border-edge overflow-hidden bg-layer-2/50">
-                        <table className="border-collapse">
-                            <thead>
-                                <tr>
-                                    {/* Empty top-left corner */}
-                                    <th className="bg-layer-2 text-ink font-bold p-0 sticky top-0 left-0 z-20">
-                                        <div className="w-9 h-9 flex items-center justify-center text-xs m-0.5">↓→</div>
-                                    </th>
-                                    
-                                    {/* Top row - Defending types */}
-                                    {pokemonTypes.map((defenseType) => (
-                                        <th key={`def-${defenseType}`} className="sticky top-0 z-10 p-0">
-                                            {getTypeCell(defenseType, true)}
-                                        </th>
-                                    ))}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {/* Side column - Attacking types */}
-                                {pokemonTypes.map((attackType) => (
-                                    <tr key={`row-${attackType}`}>
-                                        <td className="sticky left-0 z-10 p-0">
-                                            {getTypeCell(attackType)}
-                                        </td>
-                                        
-                                        {/* Effectiveness cells */}
-                                        {pokemonTypes.map((defenseType) => (
-                                            <td key={`${attackType}-${defenseType}`} className="p-0">
-                                                {getEffectivenessCell(attackType, defenseType)}
-                                            </td>
-                                        ))}
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <div className="bg-layer-3/30 p-4 rounded-lg flex-shrink-0 lg:w-56">
-                    <h3 className="text-base font-medium text-ink mb-3">Leyenda</h3>
-                    <div className="flex flex-col gap-3">
-                        <div className="flex items-center gap-2">
-                            <div className="bg-warning text-warning-hover h-7 w-9 flex items-center justify-center rounded-sm text-xs font-bold">2×</div>
-                            <span className="text-sm text-ink">Super efectivo</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <div className="bg-layer-3 text-ink h-7 w-9 flex items-center justify-center rounded-sm"></div>
-                            <span className="text-sm text-ink">Daño normal</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <div className="bg-red-700 text-red-100 h-7 w-9 flex items-center justify-center rounded-sm text-xs font-bold">½×</div>
-                            <span className="text-sm text-ink">Poco efectivo</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <div className="bg-layer-1 text-ink-muted h-7 w-9 flex items-center justify-center rounded-sm text-xs font-bold">0</div>
-                            <span className="text-sm text-ink">Sin efecto</span>
-                        </div>
-                    </div>
-                    
-                    <div className="mt-4 pt-4 border-t border-edge">
-                        <p className="text-xs text-ink">Las filas representan los tipos atacantes, mientras que las columnas muestran los tipos defensivos.</p>
-                    </div>
-                </div>
-            </div>
+          {ALL_TYPES.map((atk) => (
+            <React.Fragment key={"row-" + atk}>
+              <div
+                className="grid place-items-center aspect-square rounded"
+                style={{ background: TYPE_COLORS[atk], color: getContrastingTextColor(TYPE_COLORS[atk]) }}
+                title={TYPE_LABELS[atk]}
+                onMouseEnter={() => setHover({ axis: "atk", type: atk })}
+                onMouseLeave={() => setHover(null)}
+              >
+                <TypeGlyph type={atk} size={14} />
+              </div>
+              {ALL_TYPES.map((def) => {
+                const m = typeChart[atk]?.[def] ?? 1
+                const hl = (hover?.axis === "def" && hover.type === def) || (hover?.axis === "atk" && hover.type === atk)
+                return (
+                  <div
+                    key={atk + def}
+                    className="grid place-items-center aspect-square rounded font-pk-mono text-[11px] font-semibold tabular-nums cursor-default"
+                    style={{ ...multStyle(m), ...(hl ? { boxShadow: "inset 0 0 0 1px rgba(249,115,22,.5)" } : {}) }}
+                    title={`${TYPE_LABELS[atk]} → ${TYPE_LABELS[def]}: ×${m}`}
+                  >
+                    {multSymbol(m)}
+                  </div>
+                )
+              })}
+            </React.Fragment>
+          ))}
         </div>
-    );
+      </div>
+
+      <div className="bg-white/[0.02] border border-white/[0.05] rounded-[10px] p-[16px_18px] flex flex-col gap-2.5">
+        <h4 className="font-pk-mono text-[10px] tracking-[0.1em] uppercase text-pk-surface-500 mb-1">Leyenda</h4>
+        {LEGEND.map((r) => (
+          <div key={r.label} className="flex items-center gap-2.5 text-[12.5px] text-pk-surface-200">
+            <span className="w-6 h-6 rounded grid place-items-center font-pk-mono text-[10px] font-semibold" style={r.style}>
+              {r.s}
+            </span>
+            {r.label}
+          </div>
+        ))}
+        <div className="text-[11.5px] text-pk-surface-500 leading-[1.5] pt-3 border-t border-white/[0.05] mt-1">
+          Filas = atacante · Columnas = defensor. Pasa el cursor sobre una cabecera para destacar su fila/columna.
+        </div>
+      </div>
+    </div>
+  )
 }

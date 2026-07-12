@@ -1,5 +1,4 @@
 "use client"
-import { PokedexSection } from "../../../_components/PokedexSection"
 import { PokemonSprite } from "../../../_components/PokemonSprite"
 import { useTranslations } from "next-intl"
 
@@ -16,37 +15,41 @@ interface PalettesSectionProps {
 
 export function PalettesSection({ palettes, pokemonIndex, formName }: PalettesSectionProps) {
   const t = useTranslations("pokedex")
-  
-  if (!palettes || palettes.length === 0 || palettes.every(p => p.length === 0)) {
-    return null
-  }
-  
-  // Flatten all palettes into a single array, removing duplicates
+
+  if (!palettes || palettes.length === 0 || palettes.every((p) => p.length === 0)) return null
+
   const allPalettes = palettes.flat()
-  const uniquePalettes = allPalettes.filter((palette, index, self) => 
-    index === self.findIndex((p) => p.name === palette.name)
-  )
-  
+  const uniquePalettes = allPalettes.filter((palette, index, self) => index === self.findIndex((p) => p.name === palette.name))
+
   return (
-    <PokedexSection id='palettes' title="Variantes">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 justify-items-center">
-          {uniquePalettes.map((palette, idx) => {
-            return <div key={idx} className="flex flex-col justify-center items-center p-3 bg-layer-2/50 rounded-lg border border-edge/50 hover:border-edge transition-colors">
-              <PokemonSprite
-                width={80} 
-                height={80} 
-                id={pokemonIndex} 
-                form={formName} 
-                palette={palette.name} 
-                hide={true} 
-                showStatus={false}
-              />
-              <span className="mt-2 text-sm text-center">
-                {t(`palette_${palette.name}`)}
-              </span>
-            </div>
-})}
-        </div>
-    </PokedexSection>
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-2.5">
+      {uniquePalettes.map((palette, idx) => {
+        const isShiny = palette.name === "shiny"
+        return (
+          <div
+            key={idx}
+            className={`relative bg-white/[0.02] border rounded-xl p-[14px_8px] flex flex-col items-center gap-2 cursor-pointer transition-all ${
+              isShiny
+                ? "border-pk-accent-300/30 hover:border-pk-accent-300/60 hover:bg-pk-accent-300/[0.05]"
+                : "border-white/[0.05] hover:border-pk-primary-400/30 hover:bg-pk-primary-400/[0.03]"
+            }`}
+          >
+            <span className="absolute top-2 right-2 font-pk-mono text-[9px] tracking-[0.08em] text-pk-surface-500">{palette.name}</span>
+            <PokemonSprite
+              width={64}
+              height={64}
+              id={pokemonIndex}
+              form={formName}
+              palette={palette.name}
+              hide={true}
+              showStatus={false}
+              pixelated={true}
+              className="drop-shadow-[0_4px_6px_rgba(0,0,0,0.3)]"
+            />
+            <span className="text-xs text-pk-surface-200 font-medium">{t(`palette_${palette.name}`)}</span>
+          </div>
+        )
+      })}
+    </div>
   )
 }

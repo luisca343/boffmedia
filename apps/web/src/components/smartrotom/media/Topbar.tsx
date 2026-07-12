@@ -8,12 +8,12 @@ import { MEDIA_THEMES, useMediaTheme, type MediaAppId } from "./_theme"
 import { I } from "./ui/icons"
 
 const BRAND_GRADIENT: Record<MediaAppId, string> = {
-  mewtube: "linear-gradient(135deg,#ef4444,#b91c1c 70%,#7f1d1d)",
+  mewtube: "linear-gradient(135deg,#ec4899,#be185d 70%,#831843)",
   mewtwitch: "linear-gradient(135deg,#a855f7,#6b21a8 70%,#4c1d95)",
 }
-const SWITCH_DOT: Record<MediaAppId, string> = { mewtube: "#ef4444", mewtwitch: "#a855f7" }
+const SWITCH_DOT: Record<MediaAppId, string> = { mewtube: "#ec4899", mewtwitch: "#a855f7" }
 const SWITCH_ON: Record<MediaAppId, string> = {
-  mewtube: "linear-gradient(135deg,#ef4444,#b91c1c)",
+  mewtube: "linear-gradient(135deg,#ec4899,#be185d)",
   mewtwitch: "linear-gradient(135deg,#a855f7,#6b21a8)",
 }
 
