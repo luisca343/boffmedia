@@ -1,0 +1,214 @@
+import * as React from "react"
+import { cn } from "@/lib/utils"
+
+// Shared class fragments + specimen wrappers for the SmartRotom showcase.
+// Mirrors the Boffmedia showcase's `showcase-shared.tsx` (BOFFMEDIA_V3.md §12).
+//
+// The one structural difference: SmartRotom is six design systems, not one
+// (SMARTROTOM_V3.md §0). A primitive only resolves its tokens inside its own scope
+// root, so every specimen renders inside `<Scope>` — see below.
+
+export const MONO_LABEL = "font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-sr-txt-muted"
+
+// The showcase's own chrome speaks the `sr-*` chrome vocabulary — the frame around
+// the apps, never an app's palette. Specimens inside `<Scope>` speak their own.
+export const DISPLAY = "font-display font-extrabold italic uppercase leading-[0.92] tracking-[-0.005em]"
+export const DISPLAY_EM = "[&_em]:italic [&_em]:text-transparent [&_em]:[-webkit-text-stroke:1.6px_var(--sr-accent)]"
+export const HEAD4 = "font-display font-bold uppercase tracking-[0.02em] leading-[1.05]"
+
+export const GRP_KEY = "sr-sc-chapter"
+export const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+export const sideLink =
+  "block font-mono text-[12px] font-semibold leading-none uppercase tracking-[0.1em] no-underline py-[10px] px-[14px] border-l-[3px] border-solid transition-[color,border-color,background] duration-[140ms] cursor-pointer"
+
+// ── scope roots ─────────────────────────────────────────────────────────────
+// Each app's tokens only resolve inside its scope root, so a specimen rendered
+// bare would show unresolved CSS vars. `Scope` reproduces the real root from each
+// app's layout — the same classes, so a primitive looks here exactly as it does in
+// the app. `sr` is deliberately a no-op: the chrome has no scope root, it's global.
+export type AppKey = "sr" | "sb" | "ca" | "nt" | "pk" | "mw"
+
+// The scope CLASS is what makes an app's tokens resolve: `ca`/`nt`/`mw` are CSS-var
+// backed and their vars are declared on `.ca-app`/`.nt-app`/`.mw-app` base layers, so
+// without the class every `bg-ca-*` reads an undefined var. (`sb`/`pk` are baked hex
+// and would resolve anywhere, but they carry the class for consistency.)
+const SCOPE_VARS: Record<AppKey, string> = {
+  sr: "",
+  sb: "sb-app",
+  ca: "ca-app",
+  nt: "nt-app",
+  pk: "pk-app",
+  mw: "mw-app",
+}
+
+// The SKIN is the app's canvas + fonts + ink, lifted from its real layout root. Kept
+// separate from the vars so a specimen can resolve an app's tokens *without* painting
+// its canvas — see `canvas={false}` on Sample.
+const SCOPE_SKIN: Record<AppKey, string> = {
+  sr: "",
+  sb: "bg-sb-bg font-sb text-sb-fg [font-feature-settings:'cv11','ss01','ss03']",
+  ca: "bg-ca-panel font-ca text-ca-50 antialiased",
+  nt: "bg-nt-bg font-nt text-nt-fg",
+  pk: "bg-pk-surface-950 font-pk text-pk-surface-100 antialiased [font-feature-settings:'ss01','cv11']",
+  mw: "bg-mw-bg font-mw text-mw-fg",
+}
+
+export function Scope({
+  app,
+  theme,
+  media,
+  skin = true,
+  className,
+  children,
+}: {
+  app: AppKey
+  /** ca / nt only — drives the real light/dark token swap. */
+  theme?: "light" | "dark"
+  /** mw only — picks the accent (Mewtube pink / Mewtwitch purple). */
+  media?: "mewtube" | "mewtwitch"
+  /** Paint the app's canvas/fonts/ink. Off = tokens resolve, chrome surface shows through. */
+  skin?: boolean
+  className?: string
+  children: React.ReactNode
+}) {
+  return (
+    <div
+      className={cn(SCOPE_VARS[app], skin && SCOPE_SKIN[app], className)}
+      data-theme={theme}
+      data-app={app === "mw" ? (media ?? "mewtube") : undefined}
+    >
+      {children}
+    </div>
+  )
+}
+
+// ── specimen wrapper ────────────────────────────────────────────────────────
+export function Sample({
+  title,
+  code,
+  note,
+  app = "sr",
+  theme,
+  media,
+  col,
+  grid,
+  padded = true,
+  canvas = true,
+  children,
+}: {
+  title: React.ReactNode
+  code?: React.ReactNode
+  note?: React.ReactNode
+  /** Which design system the specimen belongs to — sets its scope root. */
+  app?: AppKey
+  theme?: "light" | "dark"
+  media?: "mewtube" | "mewtwitch"
+  col?: boolean
+  grid?: boolean
+  /** Off for specimens that supply their own padding (full-bleed chrome, shells). */
+  padded?: boolean
+  /**
+   * Paint the app's canvas behind the specimen. On (default) for components, so a
+   * Starbank button sits on Starbank white exactly as it does in the app — its ink
+   * (`sb-fg`) is near-black and would be unreadable on the chrome. Off for
+   * palettes/tokens, which need no canvas. Tokens resolve either way: the scope
+   * class stays, only the skin drops.
+   */
+  canvas?: boolean
+  children: React.ReactNode
+}) {
+  const stage = (
+    <Scope
+      app={app}
+      theme={theme}
+      media={media}
+      skin={canvas}
+      className={cn(
+        padded && "p-[26px]",
+        canvas && app !== "sr" && "border border-solid border-sr-line",
+        "flex flex-wrap gap-4 items-center",
+        col && "flex-col items-stretch flex-nowrap",
+        grid && "grid grid-cols-1 sm:grid-cols-2",
+      )}
+    >
+      {children}
+    </Scope>
+  )
+
+  return (
+    <div className="border border-solid border-sr-line bg-sr-panel mb-[22px]">
+      <div className="flex items-center gap-3 py-[10px] px-4 border-b border-solid border-sr-line bg-sr-panel-2">
+        <h4 className={cn(HEAD4, "text-[14px]/[1.05] tracking-[0.08em] text-sr-txt")}>{title}</h4>
+        {code && <code className="ml-auto font-mono text-[11px] font-medium leading-none text-sr-txt-dim">{code}</code>}
+      </div>
+      {/*
+        An app's canvas is INSET as a framed stage rather than painted across the whole
+        body. Starbank and light-theme ChatApp are genuinely light systems, so their
+        specimens must sit on a light surface to be legible — but full-bleed that reads
+        as a broken white wrapper. The chrome gutter keeps the frame dark and makes the
+        canvas look deliberate. `sr` chrome needs no stage: it IS the surface.
+      */}
+      {canvas && app !== "sr" ? <div className="p-3 bg-sr-panel">{stage}</div> : stage}
+      {note && (
+        <div className="font-body text-[13px] leading-[1.6] text-sr-txt-muted py-3 px-4 border-t border-dashed border-sr-line [&_code]:font-mono [&_code]:text-[12px] [&_code]:font-medium [&_code]:text-sr-accent">
+          {note}
+        </div>
+      )}
+    </div>
+  )
+}
+
+export function Section({
+  id,
+  kicker,
+  title,
+  lead,
+  children,
+}: {
+  id: string
+  kicker: string
+  title: string
+  lead?: React.ReactNode
+  children: React.ReactNode
+}) {
+  return (
+    <section id={id} className="mb-[74px] scroll-mt-[120px]">
+      <Kicker>{kicker}</Kicker>
+      <h2 className={cn(DISPLAY, "text-sr-txt text-[clamp(30px,8vw,42px)]/[0.92] mt-[10px] mb-2")}>{title}</h2>
+      {lead && (
+        <p className="text-sr-txt-muted max-w-[66ch] mb-7 text-[15px] [&_code]:font-mono [&_code]:text-[13px] [&_code]:text-sr-accent">
+          {lead}
+        </p>
+      )}
+      {children}
+    </section>
+  )
+}
+
+// The chrome has no `Kicker` primitive of its own (only Button/Badge/Panel), so the
+// showcase owns this one rather than reaching across to Boffmedia's (SMARTROTOM_V3.md §3).
+export function Kicker({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="inline-flex items-center gap-2 font-mono text-[11px] font-semibold uppercase leading-none tracking-[0.16em] text-sr-accent">
+      <i className="h-[7px] w-[7px] rotate-45 bg-sr-accent" />
+      {children}
+    </span>
+  )
+}
+
+/** A swatch grid — used by every Bases chapter to show a namespace's palette. */
+export function Swatches({ tokens }: { tokens: readonly (readonly [string, string])[] }) {
+  return (
+    <div className="grid w-full grid-cols-3 gap-3 sm:grid-cols-5">
+      {tokens.map(([cls, name]) => (
+        <div key={cls + name} className="border border-solid border-sr-line">
+          <i className={cn("block h-16", cls)} />
+          <div className="bg-sr-panel-2 px-[11px] py-[9px] font-mono text-[10px] font-medium leading-[1.5] text-sr-txt-muted">
+            <b className="block font-semibold text-sr-txt">{name}</b>
+            {cls}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}

@@ -1,4 +1,8 @@
-export type ThemePref = "light" | "dark" | "auto";
+/**
+ * What the `.ca-app` root renders. The *choice* between the two is no longer ChatApp's:
+ * it is derived from the platform theme (`useRotomMode`), so the pref/auto resolution
+ * that used to live here now lives once, in `components/smartrotom/theme`.
+ */
 export type ResolvedTheme = "light" | "dark";
 
 /** Accent choices offered by the appearance picker (hex; `--ca-accent` is derived). */
@@ -18,7 +22,3 @@ export function hexToTriplet(hex: string): string {
   return `${(n >> 16) & 255} ${(n >> 8) & 255} ${n & 255}`;
 }
 
-export function resolveTheme(pref: ThemePref, systemDark: boolean): ResolvedTheme {
-  if (pref === "auto") return systemDark ? "dark" : "light";
-  return pref;
-}

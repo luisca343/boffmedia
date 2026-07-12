@@ -108,11 +108,14 @@ const config: Config = {
         "neon-modal": "0 40px 90px -30px var(--shadow-color, rgba(0,0,0,0.55))",
         "neon-popover": "0 24px 50px -20px var(--shadow-color, rgba(0,0,0,0.55))",
         // ── Starbank (SmartRotom) — fintech elevation ───────────────────────
-        "sb-1": "0 1px 0 rgba(15,30,60,.04), 0 1px 2px rgba(15,30,60,.04)",
-        "sb-2": "0 1px 0 rgba(15,30,60,.03), 0 6px 18px -8px rgba(15,30,60,.15)",
-        "sb-3": "0 10px 30px -12px rgba(15,30,60,.25)",
-        "sb-brand": "0 14px 40px -16px rgba(36,99,235,.55)",
-        "sb-focus": "0 0 0 3px rgba(36,99,235,.22)",
+        // Var-backed: dark needs its own shadows (a hairline tuned for white cards
+        // is invisible on navy), so `--sb-sh-1..3` are swapped by the `.sb-app`
+        // base layer below. Brand + focus are constant across themes.
+        "sb-1": "var(--sb-sh-1)",
+        "sb-2": "var(--sb-sh-2)",
+        "sb-3": "var(--sb-sh-3)",
+        "sb-brand": "var(--sb-sh-brand)",
+        "sb-focus": "var(--sb-sh-focus)",
         // ChatApp (SmartRotom) — bubble/menu elevation (theme-var backed).
         "ca-bubble": "var(--ca-bubble-shadow)",
         "ca-pop": "0 16px 44px -10px rgb(0 0 0 / .4)",
@@ -148,25 +151,57 @@ const config: Config = {
         // `bg-sb-league/10 text-sb-league` gives the 10%-tint chip pattern.
         // ════════════════════════════════════════════════════════════════════
         sb: {
-          50: "#eff6ff", 100: "#dbeafe", 200: "#bfdbfe", 300: "#93c5fd",
-          400: "#60a5fa", 500: "#3b82f6", 600: "#2463eb", 700: "#1d4ed8",
-          800: "#1e3a8a", 900: "#172554", 950: "#0b1638",
+          // CSS-var backed (values in the `.sb-app` base layer below) so the handoff's
+          // `[data-theme="dark"]` really swaps. Solid colours are RGB triplets, which is
+          // what keeps the alpha modifier working — `bg-sb-league/10 text-sb-league` is
+          // the categorical chip pattern and would break under a plain `var()`.
+          50: "rgb(var(--sb-50) / <alpha-value>)",
+          100: "rgb(var(--sb-100) / <alpha-value>)",
+          200: "rgb(var(--sb-200) / <alpha-value>)",
+          300: "rgb(var(--sb-300) / <alpha-value>)",
+          400: "rgb(var(--sb-400) / <alpha-value>)",
+          500: "rgb(var(--sb-500) / <alpha-value>)",
+          600: "rgb(var(--sb-600) / <alpha-value>)",
+          700: "rgb(var(--sb-700) / <alpha-value>)",
+          800: "rgb(var(--sb-800) / <alpha-value>)",
+          900: "rgb(var(--sb-900) / <alpha-value>)",
+          950: "rgb(var(--sb-950) / <alpha-value>)",
           // surfaces
-          bg: "#f3f6fc", "bg-grid": "#eaf0fa", surface: "#ffffff",
-          "surface-2": "#f7faff", "surface-3": "#eef3fb",
-          border: "#e3ebf5", "border-strong": "#c9d6ec", ring: "#2463eb",
+          bg: "rgb(var(--sb-bg) / <alpha-value>)",
+          "bg-grid": "rgb(var(--sb-bg-grid) / <alpha-value>)",
+          surface: "rgb(var(--sb-surface) / <alpha-value>)",
+          "surface-2": "rgb(var(--sb-surface-2) / <alpha-value>)",
+          "surface-3": "rgb(var(--sb-surface-3) / <alpha-value>)",
+          border: "rgb(var(--sb-border) / <alpha-value>)",
+          "border-strong": "rgb(var(--sb-border-strong) / <alpha-value>)",
+          ring: "rgb(var(--sb-ring) / <alpha-value>)",
           // text
-          fg: "#0c1830", "fg-2": "#2c3a55", "fg-muted": "#5b6b85",
-          "fg-subtle": "#8d99b3", onbrand: "#ffffff",
-          // semantic
-          pos: "#047857", "pos-2": "#059669", "pos-soft": "#e7f7ef",
-          neg: "#b91c1c", "neg-2": "#dc2626", "neg-soft": "#fdecec",
-          warn: "#b45309", "warn-soft": "#fff5e0",
-          info: "#1d4ed8", "info-soft": "#e8f0ff",
-          // categorical
-          league: "#2463eb", shop: "#06b6d4", heal: "#ec4899",
-          transfer: "#8b5cf6", reward: "#10b981", fee: "#94a3b8",
-          subscription: "#f59e0b", other: "#64748b",
+          fg: "rgb(var(--sb-fg) / <alpha-value>)",
+          "fg-2": "rgb(var(--sb-fg-2) / <alpha-value>)",
+          "fg-muted": "rgb(var(--sb-fg-muted) / <alpha-value>)",
+          "fg-subtle": "rgb(var(--sb-fg-subtle) / <alpha-value>)",
+          onbrand: "rgb(var(--sb-onbrand) / <alpha-value>)",
+          // semantic — the `-soft` tints are solid in light but ALPHA in dark
+          // (rgba over navy), so they stay plain vars: no alpha modifier on them.
+          pos: "rgb(var(--sb-pos) / <alpha-value>)",
+          "pos-2": "rgb(var(--sb-pos-2) / <alpha-value>)",
+          "pos-soft": "var(--sb-pos-soft)",
+          neg: "rgb(var(--sb-neg) / <alpha-value>)",
+          "neg-2": "rgb(var(--sb-neg-2) / <alpha-value>)",
+          "neg-soft": "var(--sb-neg-soft)",
+          warn: "rgb(var(--sb-warn) / <alpha-value>)",
+          "warn-soft": "var(--sb-warn-soft)",
+          info: "rgb(var(--sb-info) / <alpha-value>)",
+          "info-soft": "var(--sb-info-soft)",
+          // categorical — constant across themes
+          league: "rgb(var(--sb-league) / <alpha-value>)",
+          shop: "rgb(var(--sb-shop) / <alpha-value>)",
+          heal: "rgb(var(--sb-heal) / <alpha-value>)",
+          transfer: "rgb(var(--sb-transfer) / <alpha-value>)",
+          reward: "rgb(var(--sb-reward) / <alpha-value>)",
+          fee: "rgb(var(--sb-fee) / <alpha-value>)",
+          subscription: "rgb(var(--sb-subscription) / <alpha-value>)",
+          other: "rgb(var(--sb-other) / <alpha-value>)",
         },
 
         // ════════════════════════════════════════════════════════════════════
@@ -852,6 +887,62 @@ const config: Config = {
         },
       })
     }),
+    // ── Starbank (SmartRotom) theme layer ──────────────────────────────────
+    // Real light/dark, ported 1:1 from the handoff's `:root` + `[data-theme="dark"]`.
+    // Scoped to `.sb-app`; `data-theme` on that root swaps it (driven by the one
+    // SmartRotom theme picker via `useRotomMode()`). The brand ramp, the categorical
+    // accents and the focus/brand shadows are CONSTANT — the handoff overrides only
+    // surfaces, text, the `-soft` tints and elevation.
+    plugin(({ addBase }) => {
+      const constant = {
+        "--sb-50": "239 246 255", "--sb-100": "219 234 254", "--sb-200": "191 219 254",
+        "--sb-300": "147 197 253", "--sb-400": "96 165 250", "--sb-500": "59 130 246",
+        "--sb-600": "36 99 235", "--sb-700": "29 78 216", "--sb-800": "30 58 138",
+        "--sb-900": "23 37 84", "--sb-950": "11 22 56",
+        "--sb-ring": "36 99 235",
+        "--sb-onbrand": "255 255 255",
+        "--sb-pos": "4 120 87", "--sb-pos-2": "5 150 105",
+        "--sb-neg": "185 28 28", "--sb-neg-2": "220 38 38",
+        "--sb-warn": "180 83 9",
+        "--sb-info": "29 78 216",
+        "--sb-league": "36 99 235", "--sb-shop": "6 182 212", "--sb-heal": "236 72 153",
+        "--sb-transfer": "139 92 246", "--sb-reward": "16 185 129", "--sb-fee": "148 163 184",
+        "--sb-subscription": "245 158 11", "--sb-other": "100 116 139",
+        "--sb-sh-brand": "0 14px 40px -16px rgba(36, 99, 235, .55)",
+        "--sb-sh-focus": "0 0 0 3px rgba(36, 99, 235, .22)",
+      }
+      const light = {
+        "--sb-bg": "243 246 252", "--sb-bg-grid": "234 240 250",
+        "--sb-surface": "255 255 255", "--sb-surface-2": "247 250 255",
+        "--sb-surface-3": "238 243 251",
+        "--sb-border": "227 235 245", "--sb-border-strong": "201 214 236",
+        "--sb-fg": "12 24 48", "--sb-fg-2": "44 58 85",
+        "--sb-fg-muted": "91 107 133", "--sb-fg-subtle": "141 153 179",
+        "--sb-pos-soft": "#e7f7ef", "--sb-neg-soft": "#fdecec",
+        "--sb-warn-soft": "#fff5e0", "--sb-info-soft": "#e8f0ff",
+        "--sb-sh-1": "0 1px 0 rgba(15, 30, 60, .04), 0 1px 2px rgba(15, 30, 60, .04)",
+        "--sb-sh-2": "0 1px 0 rgba(15, 30, 60, .03), 0 6px 18px -8px rgba(15, 30, 60, .15)",
+        "--sb-sh-3": "0 10px 30px -12px rgba(15, 30, 60, .25)",
+      }
+      const dark = {
+        "--sb-bg": "7 17 42", "--sb-bg-grid": "10 23 52",
+        "--sb-surface": "14 28 63", "--sb-surface-2": "17 35 73",
+        "--sb-surface-3": "21 41 90",
+        "--sb-border": "29 50 104", "--sb-border-strong": "39 64 126",
+        "--sb-fg": "232 238 252", "--sb-fg-2": "194 204 228",
+        "--sb-fg-muted": "148 163 196", "--sb-fg-subtle": "107 123 160",
+        "--sb-pos-soft": "rgba(5, 150, 105, .15)", "--sb-neg-soft": "rgba(220, 38, 38, .18)",
+        "--sb-warn-soft": "rgba(180, 83, 9, .2)", "--sb-info-soft": "rgba(29, 78, 216, .2)",
+        "--sb-sh-1": "0 1px 0 rgba(0,0,0,.4), 0 1px 2px rgba(0,0,0,.4)",
+        "--sb-sh-2": "0 1px 0 rgba(0,0,0,.4), 0 8px 24px -8px rgba(0,0,0,.55)",
+        "--sb-sh-3": "0 14px 40px -14px rgba(0,0,0,.6)",
+      }
+      addBase({
+        ".sb-app": { ...constant, ...light, colorScheme: "light" },
+        '.sb-app[data-theme="dark"]': { ...dark, colorScheme: "dark" },
+      })
+    }),
+
     // ── ChatApp (SmartRotom) theme layer ───────────────────────────────────
     // Real light/dark + accent, scoped to the `.ca-app` root so it never leaks
     // into the rest of SmartRotom. `--ca-accent` is a runtime-settable RGB

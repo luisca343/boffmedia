@@ -64,7 +64,7 @@ export function TopBar({ currentPage, account, accounts, onSelectAccount, onOpen
           className="relative grid size-[38px] place-items-center rounded-sb-md border border-sb-border bg-sb-surface text-sb-fg-2 transition-colors hover:border-sb-border-strong hover:bg-sb-surface-2 hover:text-sb-fg"
         >
           <Ico name="bell" size={16} />
-          <span className="absolute right-[9px] top-2 size-2 rounded-full bg-sb-neg-2 shadow-[0_0_0_2px_#fff]" aria-hidden />
+          <span className="absolute right-[9px] top-2 size-2 rounded-full bg-sb-neg-2 shadow-[0_0_0_2px_rgb(var(--sb-surface))]" aria-hidden />
         </button>
 
         <div className="relative" ref={ref}>

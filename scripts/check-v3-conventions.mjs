@@ -1,20 +1,50 @@
 #!/usr/bin/env node
-// Boffmedia v3 convention guard (BOFFMEDIA_V3.md §3). Fails CI on two mechanical
-// footguns that type-check can't catch:
+// Design-system convention guard. Fails CI on mechanical footguns that type-check
+// can't catch.
+//
+// Boffmedia v3 (BOFFMEDIA_V3.md §3) — checked on the Boffmedia roots:
 //   1. Unspaced `+`/`-` inside a Tailwind arbitrary `calc(...)` — invalid CSS,
 //      silently dropped by the browser (the ToolShell dropdown-offset bug class).
 //   2. Raw `[clip-path:polygon(...)]` in className whose shape IS one of the named
 //      utilities — should be `cut` / `cut-seal` / `cut-corner` / `cut-tag`.
 // Genuine one-off polygons (diamonds, single-corner cuts, asymmetric shapes) are
 // left alone: only the four utility-shaped patterns are flagged.
+//
+// SmartRotom v3 (SMARTROTOM_V3.md §3/§4) — checked on the *migrated* roots only
+// (legacy apps are grandfathered until they migrate; see the migration table):
+//   3. Cross-design-system imports — a SmartRotom file pulling a Boffmedia-owned
+//      primitive (`@/components/ui/*`, `@/components/boffmedia/*`). CLAUDE.md
+//      forbids crossing the two systems; the migrated apps are clean and must stay so.
+//   4. Dynamic Tailwind class fragments (`bg-${x}`, `text-${x}`…) — the JIT cannot
+//      see them, so the class silently never compiles (audit gap G2).
+//
+// The unspaced-calc() rule (1) is deliberately NOT applied to the SmartRotom roots:
+// Tailwind v3 normalizes math operators inside `calc()` for both arbitrary values and
+// arbitrary properties (verified — `calc(100dvh-3rem)` and `calc(100dvh_-_3rem)` emit
+// identical CSS), so it is a spacing convention, not a correctness bug.
 import { readFileSync } from "node:fs";
 import { execSync } from "node:child_process";
 
-const ROOTS = ["apps/web/src/components/boffmedia", "apps/web/src/app/(boffmedia)"];
+const BM_ROOTS = ["apps/web/src/components/boffmedia", "apps/web/src/app/(boffmedia)"];
 
-function listFiles() {
+// Only the surfaces that have actually been migrated to the SmartRotom v3 system.
+// Add a root here as each remaining app is migrated — that is what makes the guard
+// ratchet forward instead of being disabled by the legacy tree's 85 violations.
+const SR_ROOTS = [
+  "apps/web/src/app/smartrotom/starbank",
+  "apps/web/src/app/smartrotom/chatapp",
+  "apps/web/src/app/smartrotom/notas",
+  "apps/web/src/app/smartrotom/pokedex",
+  "apps/web/src/app/smartrotom/mewtube",
+  "apps/web/src/app/smartrotom/mewtwitch",
+  "apps/web/src/app/smartrotom/styles",
+  "apps/web/src/components/smartrotom/ui",
+  "apps/web/src/components/smartrotom/media",
+];
+
+function listFiles(roots) {
   const out = [];
-  for (const root of ROOTS) {
+  for (const root of roots) {
     let res = "";
     try {
       res = execSync(`git ls-files -- '${root}/*.tsx' '${root}/*.ts'`, { encoding: "utf8" });
@@ -23,6 +53,18 @@ function listFiles() {
   }
   return out;
 }
+
+// A SmartRotom file must not import a Boffmedia-owned primitive.
+const CROSS_DS = /from\s+["']@\/components\/(ui|boffmedia)\//;
+
+// `bg-${tone}`, `text-${c}-300`, `border-${x}` … inside a template literal. The JIT
+// only sees literal class strings, so these silently never compile. Full-class maps
+// (`{ red: "bg-red-500" }`) are the fix.
+const DYNAMIC_CLASS = /\b(?:bg|text|border|from|to|via|ring|fill|stroke|shadow)-(?:\w+-)*\$\{/;
+
+// Comment lines are prose, not code — the convention docs quote the very patterns we
+// ban (`bg-${t}`), so matching them would flag the warning against the bug as the bug.
+const IS_COMMENT = /^\s*(?:\/\/|\/\*|\*)/;
 
 // Unspaced binary +/- inside a calc value. High precision: the operator must sit
 // immediately after a value terminator — `%`, `)`, or `<digit><length-unit>` — and
@@ -46,12 +88,17 @@ const SHAPED = [
 ];
 
 const violations = [];
-for (const file of listFiles()) {
+
+function checkCalc(file, line, i) {
+  if (line.includes("calc(") && UNSPACED_CALC.test(line)) {
+    violations.push(`${file}:${i + 1}  unspaced calc() — add spaces (\`_-_\`/\`_+_\`); unspaced +/- is invalid CSS and silently dropped`);
+  }
+}
+
+for (const file of listFiles(BM_ROOTS)) {
   const lines = readFileSync(file, "utf8").split("\n");
   lines.forEach((line, i) => {
-    if (line.includes("calc(") && UNSPACED_CALC.test(line)) {
-      violations.push(`${file}:${i + 1}  unspaced calc() — add spaces (\`_-_\`/\`_+_\`); unspaced +/- is invalid CSS and silently dropped`);
-    }
+    checkCalc(file, line, i);
     for (const [re, util] of SHAPED) {
       if (re.test(line)) {
         violations.push(`${file}:${i + 1}  utility-shaped clip-path — use \`${util}\` (BOFFMEDIA_V3.md §3)`);
@@ -61,10 +108,23 @@ for (const file of listFiles()) {
   });
 }
 
+for (const file of listFiles(SR_ROOTS)) {
+  const lines = readFileSync(file, "utf8").split("\n");
+  lines.forEach((line, i) => {
+    if (IS_COMMENT.test(line)) return;
+    if (CROSS_DS.test(line)) {
+      violations.push(`${file}:${i + 1}  cross-design-system import — SmartRotom must not import Boffmedia primitives (SMARTROTOM_V3.md §3)`);
+    }
+    if (DYNAMIC_CLASS.test(line)) {
+      violations.push(`${file}:${i + 1}  dynamic Tailwind class — the JIT can't see \`bg-\${…}\`; use a full-class map (SMARTROTOM_V3.md §4)`);
+    }
+  });
+}
+
 if (violations.length) {
-  console.error(`\n✗ Boffmedia v3 convention check failed (${violations.length}):\n`);
+  console.error(`\n✗ v3 convention check failed (${violations.length}):\n`);
   for (const v of violations) console.error("  " + v);
   console.error("");
   process.exit(1);
 }
-console.log("✓ Boffmedia v3 conventions: no unspaced calc / utility-shaped clip-paths");
+console.log("✓ v3 conventions: Boffmedia (calc / clip-path) + SmartRotom (cross-DS / dynamic classes)");

@@ -9,6 +9,7 @@ import {
   type CSSProperties,
   type ReactNode,
 } from "react";
+import { useRotomMode, useRotomThemeStore } from "@/components/smartrotom/theme/useRotomTheme";
 
 export type Theme = "dark" | "light";
 export type Reading = "sans" | "serif";
@@ -43,24 +44,35 @@ function hexToTriplet(hex: string): string | null {
   return `${(n >> 16) & 255} ${(n >> 8) & 255} ${n & 255}`;
 }
 
+/** Everything Notas still owns. Light/dark left — it is now a platform choice. */
+type LocalTweaks = Omit<Tweaks, "theme">;
+
 export function NotesThemeProvider({ children }: { children: ReactNode }) {
-  const [tweaks, setTweaks] = useState<Tweaks>({
-    theme: "dark",
+  const [tweaks, setTweaks] = useState<LocalTweaks>({
     accent: DEFAULT_ACCENT,
     reading: "sans",
     width: "normal",
   });
 
+  // Light/dark comes from the one SmartRotom theme picker (Ajustes → Temas), so a theme
+  // Notas has no skin for still resolves to a sensible mode. The toggle below writes
+  // back to that same picker rather than keeping a second, divergent preference.
+  const theme = useRotomMode();
+  const setRotomTheme = useRotomThemeStore((s) => s.setTheme);
+
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setTweaks((t) => ({ ...t, ...JSON.parse(raw) }));
+      if (raw) {
+        const { theme: _drop, ...rest } = JSON.parse(raw) as Partial<Tweaks>;
+        setTweaks((t) => ({ ...t, ...rest }));
+      }
     } catch {
       /* ignore */
     }
   }, []);
 
-  const patch = (p: Partial<Tweaks>) =>
+  const patch = (p: Partial<LocalTweaks>) =>
     setTweaks((t) => {
       const next = { ...t, ...p };
       try {
@@ -80,8 +92,9 @@ export function NotesThemeProvider({ children }: { children: ReactNode }) {
 
   const value: ThemeCtx = {
     ...tweaks,
-    setTheme: (theme) => patch({ theme }),
-    toggleTheme: () => patch({ theme: tweaks.theme === "dark" ? "light" : "dark" }),
+    theme,
+    setTheme: (t) => setRotomTheme(t),
+    toggleTheme: () => setRotomTheme(theme === "dark" ? "light" : "dark"),
     setAccent: (accent) => patch({ accent }),
     setReading: (reading) => patch({ reading }),
     setWidth: (width) => patch({ width }),

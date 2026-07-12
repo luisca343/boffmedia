@@ -7,7 +7,7 @@ export function RotomNotFoundFull(){
         <main className={`roboto flex flex-col h-screen overflow-hidden  bg-primary-hover bg-center bg-no-repeat bg-cover bg-fixed`}>
             <GlobalProviders>
                 <TooltipProvider>
-                <RotomNav setTema={() => null}/>
+                <RotomNav />
                    <RotomNotFound/>
                 </TooltipProvider>
             </GlobalProviders>
