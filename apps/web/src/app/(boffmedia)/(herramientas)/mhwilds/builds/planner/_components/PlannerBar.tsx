@@ -2,12 +2,13 @@
 
 import { useTranslations } from "next-intl"
 import { Button, Icon, IconButton } from "@/components/boffmedia/primitives"
-import { MhBar, MhBarSide, MhSeal } from "../../../_components/ui/mh-kit"
+import { MhBar, MhBarSide, MhModes, MhSeal } from "../../../_components/ui/mh-kit"
 
 export function PlannerBar({
-  name, onName, filled, total, skillCount, onOpenSaved, onIo, onShare, onReset, onSave,
+  name, onName, filled, total, skillCount, mode, onMode, onOpenSaved, onIo, onShare, onReset, onSave,
 }: {
   name: string; onName: (v: string) => void; filled: number; total: number; skillCount: number
+  mode: "build" | "compare"; onMode: (m: string) => void
   onOpenSaved: () => void; onIo: () => void; onShare: () => void; onReset: () => void; onSave: () => void
 }) {
   const t = useTranslations("mhwilds")
@@ -29,6 +30,14 @@ export function PlannerBar({
         </div>
       </div>
       <MhBarSide>
+        <MhModes
+          value={mode}
+          onChange={onMode}
+          options={[
+            { value: "build", label: <><Icon name="wrench" size={13} />{t("build_planner.compare.mode_edit")}</> },
+            { value: "compare", label: <><Icon name="layers" size={13} />{t("build_planner.compare.mode_compare")}</> },
+          ]}
+        />
         <Button size="sm" icon="bookmark" onClick={onOpenSaved}>{t("build_planner.saved_builds")}</Button>
         <Button size="sm" icon="download" onClick={onIo}>{t("build_planner.import_export")}</Button>
         <Button size="sm" icon="link" onClick={onShare}>{t("build_planner.share")}</Button>

@@ -1,10 +1,10 @@
 import { useState, useCallback, useMemo } from "react";
-import { 
-  BuildData, 
-  BuildDataWithIds, 
+import {
+  BuildData,
+  BuildDataWithIds,
   EquipmentType,
-  DecorationAssignment 
 } from "@/types/tools/mhwilds";
+import { resolveBuild } from "../_utils/buildUtils";
 
 export interface BuildStateProps {
   getWeaponById: (id: string | null) => any;
@@ -42,35 +42,11 @@ export function useBuildState({
     slotSize: number;
   } | null>(null);
 
-  // Convert ID-based build to full object build
-  const buildWithFullObjects = useMemo<BuildData>(() => {
-    const result: BuildData = {
-      name: currentBuild.name,
-      weapon: getWeaponById(currentBuild.weaponId),
-      secondaryWeapon: getWeaponById(currentBuild.secondaryWeaponId),
-      head: getArmorById(currentBuild.headId),
-      chest: getArmorById(currentBuild.chestId),
-      arms: getArmorById(currentBuild.armsId),
-      waist: getArmorById(currentBuild.waistId),
-      legs: getArmorById(currentBuild.legsId),
-      charm: getCharmById(currentBuild.charmId),
-      decorations: currentBuild.decorations
-        .map((decoAssign: { equipmentType: EquipmentType; slotIndex: number; decorationId: string }) => ({
-          equipmentType: decoAssign.equipmentType,
-          slotIndex: decoAssign.slotIndex,
-          decoration: getDecorationById(decoAssign.decorationId)
-        }))
-        .filter((d: { decoration: any }) => d.decoration !== null) as DecorationAssignment[]
-    };
-    
-    return result;
-  }, [
-    currentBuild, 
-    getWeaponById, 
-    getArmorById, 
-    getDecorationById,
-    getCharmById
-  ]);
+  // Convert ID-based build to full object build (shared resolver)
+  const buildWithFullObjects = useMemo<BuildData>(
+    () => resolveBuild(currentBuild, { getWeaponById, getArmorById, getDecorationById, getCharmById }),
+    [currentBuild, getWeaponById, getArmorById, getDecorationById, getCharmById],
+  );
 
   // Handle equipment slot selection
   const handleSlotClick = useCallback((slot: EquipmentType) => {

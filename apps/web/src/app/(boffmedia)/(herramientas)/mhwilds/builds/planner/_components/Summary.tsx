@@ -5,9 +5,10 @@ import { Banner, Empty } from "@/components/boffmedia/primitives"
 import { StatsData, Skill, Weapon } from "@/types/tools/mhwilds"
 import { getAllWeaponElements } from "./equipment-utils"
 import {
-  MhPanel, MhStat3, MhElement, MhResistances, MhSharpness, MhSkillRow, MhCatLegend, MhLabel, MhMaterial,
+  MhPanel, MhStat3, MhElement, MhResistances, MhSharpness, MhSkillRow, MhCatLegend, MhLabel,
 } from "../../../_components/ui/mh-kit"
 import { weaponAttack } from "../../../_components/mh-helpers"
+import { ForgePanel } from "./ForgePanel"
 
 export function Summary({
   stats, skills, skillsData, weapon,
@@ -18,13 +19,11 @@ export function Summary({
   const catLabels = { attack: t("build_planner.cat_attack"), element: t("element"), defense: t("defense"), utility: t("build_planner.cat_utility") }
   const wasted = skills.filter((s) => s.level > s.maxLevel).reduce((n, s) => n + (s.level - s.maxLevel), 0)
   const sortedSkills = [...skills].sort((a, b) => b.level - a.level || a.name.localeCompare(b.name))
-  const forgeMats: any[] = (weapon as any)?.crafting?.materials || []
-
   const { elements, statuses } = weapon ? getAllWeaponElements(weapon) : { elements: [], statuses: [] }
   const primary = elements[0] || statuses[0] || null
 
   return (
-    <div className="flex flex-col gap-3.5 lg:sticky lg:top-[74px]">
+    <div className="flex flex-col gap-3.5">
       {/* weapon */}
       <MhPanel title={t("weapon")} icon="sword" aside={weapon ? undefined : undefined}>
         {!weapon ? (
@@ -92,16 +91,8 @@ export function Summary({
         )}
       </MhPanel>
 
-      {/* forge materials (equipped weapon) */}
-      {weapon && forgeMats.length > 0 && (
-        <MhPanel title={t("build_planner.forge_materials")} icon="hammer" count={forgeMats.length}>
-          <div className="flex flex-col gap-[5px]">
-            {forgeMats.map((m: any, i: number) => (
-              <MhMaterial key={m.item?.id ?? i} name={m.item?.name ?? "?"} rarity={m.item?.rarity} quantity={m.quantity ?? 1} />
-            ))}
-          </div>
-        </MhPanel>
-      )}
+      {/* forge materials — cumulative full upgrade path (equipped weapon) */}
+      {weapon && <ForgePanel weapon={weapon} />}
     </div>
   )
 }
