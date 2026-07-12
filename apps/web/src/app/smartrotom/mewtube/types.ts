@@ -111,6 +111,6 @@ export interface Video {
       day: 'numeric'
     });
   };
-  
-  // API key (ideally would be in an environment variable)
-  export const API_KEY = "AIzaSyAZ2J63sHYEtl_kRmL69Wka0isKJG4mj2g";
+
+  // YouTube calls now go through the server proxy (/api/youtube), which injects
+  // YOUTUBE_API_KEY server-side — the key is never shipped to the browser.
