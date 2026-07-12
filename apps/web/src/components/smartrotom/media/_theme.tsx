@@ -32,7 +32,7 @@ export const MEDIA_THEMES: Record<MediaAppId, MediaTheme> = {
     label: "Mewtube",
     basePath: "/smartrotom/mewtube",
     sibling: "mewtwitch",
-    accentHex: "#ef4444",
+    accentHex: "#ec4899",
     searchPlaceholder: "Buscar vídeos, creadores…",
     primaryCta: "Suscribirse",
   },

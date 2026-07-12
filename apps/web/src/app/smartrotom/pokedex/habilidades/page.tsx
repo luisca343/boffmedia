@@ -1,112 +1,95 @@
 "use client"
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/primitives/hover-card";
-import { useTranslations } from "next-intl";
-import { useGetAllAbilities } from "@/hooks/pokemon/useGetAllAbilities";
-import { AbilityCount } from "@/services/api/smartrotom/pokemonService";
-import { InternalLink } from "@/components/ui/navigation/Link";
-import { BookOpenIcon, SparklesIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
-import AbilityDataElement from "./_components/AbilityData";
+import { useState, useMemo } from "react"
+import { useTranslations } from "next-intl"
+import { useGetAllAbilities } from "@/hooks/pokemon/useGetAllAbilities"
+import { ScreenShell } from "../_components/ScreenShell"
+import { PageHead, MetaStat } from "../_components/PageHead"
+import { AbilityDetailPane } from "./_components/AbilityDetailPane"
+import { SparklesIcon, MagnifyingGlassIcon, StarIcon } from "@heroicons/react/24/outline"
 
-export default function Habilidades() {
-    const { abilities } = useGetAllAbilities();
-    const t = useTranslations("pokedex");
-    const [searchQuery, setSearchQuery] = useState("");
+export default function HabilidadesPage() {
+  const t = useTranslations("pokedex")
+  const { abilities, isLoading } = useGetAllAbilities()
+  const [q, setQ] = useState("")
+  const [selected, setSelected] = useState<string | null>(null)
 
-    if (!abilities) return (
-        <div className="bg-layer-2 min-h-full overflow-auto flex justify-center items-center">
-            <div className="flex items-center gap-3">
-                <div className="animate-spin h-5 w-5 border-2 border-primary rounded-full border-t-transparent"></div>
-                <div className="text-ink text-xl">Cargando habilidades...</div>
-            </div>
+  const nameOf = (a: { name: string }) => t(`ability_${a.name.replace(/\s+/g, "")}`)
+  const descOf = (a: { name: string }) => t(`ability_${a.name.replace(/\s+/g, "")}_description`)
+
+  const list = useMemo(() => {
+    const all = abilities ?? []
+    const term = q.trim().toLowerCase()
+    const filtered = term
+      ? all.filter((a) => nameOf(a).toLowerCase().includes(term) || descOf(a).toLowerCase().includes(term) || a.name.toLowerCase().includes(term))
+      : all
+    return [...filtered].sort((a, b) => b.count - a.count)
+  }, [abilities, q, t])
+
+  const maxCount = useMemo(() => Math.max(1, ...(abilities ?? []).map((a) => a.count)), [abilities])
+  const activeKey = selected ?? list[0]?.name ?? null
+
+  return (
+    <ScreenShell>
+      <PageHead
+        icon={SparklesIcon}
+        eyebrow="Referencia"
+        title="Habilidades"
+        desc="Ordenadas por popularidad. Busca por nombre o efecto y abre cualquier habilidad para ver su descripción y los Pokémon que la portan."
+        meta={
+          <>
+            <MetaStat label="Total" value={abilities?.length ?? 0} />
+            <MetaStat label="Resultados" value={list.length} />
+          </>
+        }
+      />
+
+      <div className="relative">
+        <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-pk-surface-400" />
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Buscar por nombre o efecto…"
+          className="w-full bg-white/[0.03] border border-white/[0.07] rounded-[10px] py-2.5 pr-3.5 pl-10 text-[13.5px] text-pk-surface-50 outline-none placeholder:text-pk-surface-500 focus:border-pk-primary-400/50 focus:bg-white/[0.05] focus:shadow-[0_0_0_3px_rgba(249,115,22,0.12)] transition-colors"
+        />
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-[1fr_380px] gap-[18px] items-start">
+        <div className="flex flex-col border border-white/[0.05] rounded-xl overflow-hidden bg-white/[0.012]">
+          {isLoading ? (
+            <div className="p-8 text-center text-pk-surface-500 text-sm">Cargando habilidades…</div>
+          ) : list.length ? (
+            list.map((a) => {
+              const active = activeKey === a.name
+              return (
+                <button
+                  key={a.name}
+                  onClick={() => setSelected(a.name)}
+                  className="grid gap-3.5 items-center px-4 py-3 border-b border-white/[0.04] last:border-0 text-left w-full transition-colors hover:bg-white/[0.03]"
+                  style={{ gridTemplateColumns: "36px 1fr 120px", ...(active ? { background: "rgba(249,115,22,.08)", boxShadow: "inset 0 0 0 1px rgba(249,115,22,.25)" } : {}) }}
+                >
+                  <span className="w-8 h-8 grid place-items-center rounded-lg bg-white/[0.04] text-pk-surface-300">
+                    <StarIcon className="w-3.5 h-3.5" />
+                  </span>
+                  <span className="flex flex-col gap-[3px] min-w-0">
+                    <span className="text-sm font-semibold text-pk-surface-50 truncate">{nameOf(a)}</span>
+                    <span className="text-xs text-pk-surface-400 truncate">{descOf(a)}</span>
+                  </span>
+                  <span className="flex items-center gap-2 justify-end">
+                    <span className="w-[60px] h-1 bg-white/[0.04] rounded-full overflow-hidden">
+                      <span className="block h-full bg-pk-primary-400 rounded-full" style={{ width: `${(a.count / maxCount) * 100}%` }} />
+                    </span>
+                    <span className="font-pk-mono text-xs text-pk-surface-100 tabular-nums font-semibold min-w-[36px] text-right">{a.count}</span>
+                  </span>
+                </button>
+              )
+            })
+          ) : (
+            <div className="p-[30px] text-center text-pk-surface-500 text-[13px]">No hay habilidades que coincidan con la búsqueda.</div>
+          )}
         </div>
-    );
 
-    const filteredAbilities = abilities.filter(ability => 
-        t(`ability_${ability.name.replace(/\s+/g, "")}`)
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase()) ||
-        t(`ability_${ability.name.replace(/\s+/g, "")}_description`)
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase())
-    );
-
-    return (
-        <div className="bg-layer-2 min-h-full overflow-auto">
-            <div className="mt-4 p-4 max-w-7xl mx-auto">
-                {/* Header section */}
-                <div className="bg-layer-3/30 rounded-lg p-4 border border-edge/50 mb-4">
-                    <div className="flex items-center mb-3">
-                        <BookOpenIcon className="h-6 w-6 text-primary-hover mr-2" />
-                        <h1 className="text-xl font-bold text-ink">Habilidades Pokémon</h1>
-                    </div>
-                    
-                    <p className="text-ink">
-                        Explora las diferentes habilidades que pueden tener los Pokémon. 
-                        Pasa el cursor sobre una habilidad para ver su descripción o haz clic para ver qué Pokémon pueden tenerla.
-                    </p>
-                </div>
-
-                {/* Search bar */}
-                <div className="relative mb-6">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <MagnifyingGlassIcon className="h-5 w-5 text-ink-muted" />
-                    </div>
-                    <input
-                        type="text"
-                        placeholder="Buscar habilidad..."
-                        className="bg-layer-3/50 border border-edge text-ink rounded-lg pl-10 pr-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                </div>
-
-                {/* Abilities grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {filteredAbilities.length > 0 ? (
-                        filteredAbilities.map((ability: AbilityCount) => (
-                            <HoverCard key={ability.name}>
-                                <HoverCardTrigger>
-                                    <InternalLink href={`pokedex/habilidades/${ability.name}`}>
-                                        <div className="flex flex-col items-center justify-center text-center p-4 h-32 
-                                                    rounded-lg border border-edge bg-layer-3/50
-                                                    hover:bg-layer-3/80 hover:border-edge hover:text-ink transition-all
-                                                    shadow-md hover:shadow-lg group">
-                                            <div className="mb-2 opacity-70 group-hover:opacity-100 transition-opacity">
-                                                <SparklesIcon className="h-5 w-5 text-primary-hover mx-auto" />
-                                            </div>
-                                            <span className="text-lg font-bold text-ink mb-2 group-hover:text-ink transition-colors">
-                                                {t(`ability_${ability.name.replace(/\s+/g, "")}`)}
-                                            </span>
-                                            <div className="flex items-center justify-center space-x-2">
-                                                <span className="text-xl text-amber-400 font-medium">
-                                                    {ability.count}
-                                                </span>
-                                                <span className="text-xs text-ink group-hover:text-ink">
-                                                    Pokémon
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </InternalLink>
-                                </HoverCardTrigger>
-                                <HoverCardContent className="bg-layer-3 text-ink w-[400px] border-edge border font-normal p-4 rounded-lg z-50 shadow-xl">
-                                    <AbilityDataElement id={ability.name} />
-                                </HoverCardContent>
-                            </HoverCard>
-                        ))
-                    ) : (
-                        <div className="col-span-full bg-layer-3/30 rounded-lg p-8 text-center border border-edge/50">
-                            <p className="text-ink text-lg">No se encontraron habilidades que coincidan con la búsqueda</p>
-                        </div>
-                    )}
-                </div>
-
-                {/* Statistics footer */}
-                <div className="mt-6 pt-4 border-t border-edge/50 text-ink-muted text-sm flex justify-between items-center">
-                    <div>Total de habilidades: {abilities.length}</div>
-                    <div>Habilidades encontradas: {filteredAbilities.length}</div>
-                </div>
-            </div>
-        </div>
-    );
+        <aside className="xl:sticky xl:top-4 flex flex-col gap-3.5">{activeKey && <AbilityDetailPane abilityKey={activeKey} />}</aside>
+      </div>
+    </ScreenShell>
+  )
 }

@@ -19,11 +19,18 @@ interface TwitchAuthResponse {
   access_token: string;
   expires_in: number;
   token_type: string;
+  // The client id the token was minted with (server-side). Helix requires the
+  // Client-Id header to match this exactly; NEXT_PUBLIC_TWITCH_CLIENT_ID is only
+  // a fallback in case the route doesn't supply it.
+  client_id?: string;
 }
 
 class TwitchAPIService {
   private accessToken: string | null = null;
   private tokenExpiry: number = 0;
+  // Client id that actually minted the current token — kept in lockstep so the
+  // Client-Id header can never drift from the bearer token (that mismatch 401s).
+  private clientId: string = TWITCH_CLIENT_ID;
   private baseURL = 'https://api.twitch.tv/helix';
 
   private async getAccessToken(): Promise<string> {
@@ -42,9 +49,12 @@ class TwitchAPIService {
 
       const data: TwitchAuthResponse = await response.json();
       this.accessToken = data.access_token;
+      // Header must match the id this token was minted with, not a separate
+      // NEXT_PUBLIC_* var that can be unset or point at a different app.
+      this.clientId = data.client_id || TWITCH_CLIENT_ID;
       // Set expiry with some buffer (5 minutes before actual expiry)
       this.tokenExpiry = Date.now() + (data.expires_in - 300) * 1000;
-      
+
       return this.accessToken;
     } catch (error) {
       console.error('Error getting Twitch access token:', error);
@@ -65,7 +75,7 @@ class TwitchAPIService {
     const response = await fetch(url.toString(), {
       headers: {
         'Authorization': `Bearer ${token}`,
-        'Client-Id': TWITCH_CLIENT_ID,
+        'Client-Id': this.clientId,
       },
     });
 
