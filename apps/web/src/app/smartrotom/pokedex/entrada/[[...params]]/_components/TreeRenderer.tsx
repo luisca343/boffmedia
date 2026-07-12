@@ -1,63 +1,79 @@
 import React from "react"
-import { SubTree } from "@/types/pokedex"
+import { SubTree, PokemonEvo } from "@/types/pokedex"
 import { Evolution } from "@/types/Pokemon"
+import { ChevronRightIcon } from "@heroicons/react/24/outline"
 import { PokemonSpriteLink } from "../../../_components/PokemonSprite"
 import { getEvolutionMethod } from "./EvolutionConditions"
 
-interface TreeRendererProps {
-  tree: SubTree
-  t: any
+// Horizontal evolution chain (entry-evo). Branches (e.g. Eevee) stack vertically
+// after the shared node; a linear chain renders as a single horizontal row.
+export function TreeRenderer({ tree, t, currentDex }: { tree: SubTree; t: any; currentDex: number }) {
+  return (
+    <div className="flex flex-col gap-6 w-max">
+      {Object.keys(tree).map((key) => (
+        <EvoNodeRow key={key} node={tree[key]} formKey={key} t={t} currentDex={currentDex} />
+      ))}
+    </div>
+  )
 }
 
-export function TreeRenderer({ tree, t }: TreeRendererProps) {
+function EvoNode({ node, form, current }: { node: PokemonEvo; form: string; current: boolean }) {
   return (
-    <div className="h-full flex-col justify-center items-center rounded-lg m-2">
-      {Object.keys(tree).map((key: string) => {
-        const [pkmName, form] = key.split('_')
-        const subTree = tree[key]
-        const evos = subTree.evos
-        
-        if(Object.keys(subTree).length === 0 || !subTree.pkm) return null
-        
-        return (
-          <div key={key} className='w-full flex flex-row items-center' style={{height: `${100/Object.keys(tree).length}%`}}>
-            <PokemonSpriteLink 
-              id={subTree.dex} 
-              form={form} 
-              palette='none' 
-              width={100} 
-              height={100} 
-              hide={true} 
-              displayName={true}
-              className="transition-transform hover:scale-105"
-                url={subTree.spriteUrl}
-            />
-            
-            <div className="flex flex-col">
-              {Object.keys(evos)?.length > 0 && Object.keys(evos).map((evo: any, index: number) => {
-                const thisEvos = evos[evo]
-                
-                return (
-                  <div key={`${evo}`} className="flex items-center justify-center p-2">
-                    <div className="flex flex-col items-center">
-                      {thisEvos.methods?.map(
-                        (method: Evolution, methodIndex: number) => {
-                          return (
-                            <React.Fragment key={`method-${methodIndex}`}>
-                              {getEvolutionMethod(method, t)}
-                            </React.Fragment>
-                          )
-                        }
-                      )}
-                    </div>
-                    <TreeRenderer tree={{[evo]: thisEvos}} t={t} />
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        )
-      })}
+    <div
+      className={`flex flex-col items-center gap-2 p-[14px_12px] rounded-xl min-w-[130px] shrink-0 transition-all ${
+        current
+          ? "border border-pk-primary-400/50 bg-pk-primary-400/[0.08] shadow-[0_0_18px_rgba(249,115,22,0.15)]"
+          : "border border-white/[0.06] bg-white/[0.02] hover:border-pk-primary-400/30 hover:bg-pk-primary-400/[0.04]"
+      }`}
+    >
+      <PokemonSpriteLink id={node.dex} form={form} palette="none" width={64} height={64} hide={true} displayName={true} url={node.spriteUrl} />
+      <span className="font-pk-mono text-[10px] text-pk-surface-500">#{String(node.dex).padStart(3, "0")}</span>
+    </div>
+  )
+}
+
+function EvoArrow({ methods, t }: { methods: Evolution[]; t: any }) {
+  return (
+    <div className="flex flex-col items-center gap-1 text-pk-surface-500 text-[10.5px] font-pk-mono uppercase tracking-[0.08em] shrink-0">
+      <div className="text-center max-w-[160px]">
+        {methods.length ? (
+          methods.map((m, i) => (
+            <React.Fragment key={i}>
+              {i > 0 && <div className="text-[8px] text-pk-surface-600 my-0.5">o</div>}
+              {getEvolutionMethod(m, t)}
+            </React.Fragment>
+          ))
+        ) : (
+          <span>Evoluciona</span>
+        )}
+      </div>
+      <ChevronRightIcon className="w-3.5 h-3.5" />
+      <div className="w-9 h-px bg-pk-surface-600" />
+    </div>
+  )
+}
+
+function EvoNodeRow({ node, formKey, t, currentDex }: { node: PokemonEvo; formKey: string; t: any; currentDex: number }) {
+  const form = formKey.split("_")[1] || "base"
+  const evoKeys = Object.keys(node.evos || {})
+  if (!node.pkm) return null
+
+  return (
+    <div className="flex items-center gap-3.5">
+      <EvoNode node={node} form={form} current={node.dex === currentDex} />
+      {evoKeys.length > 0 && (
+        <div className="flex flex-col gap-4">
+          {evoKeys.map((ek) => {
+            const evoNode = node.evos[ek]
+            return (
+              <div key={ek} className="flex items-center gap-3.5">
+                <EvoArrow methods={evoNode.methods ?? []} t={t} />
+                <EvoNodeRow node={evoNode} formKey={ek} t={t} currentDex={currentDex} />
+              </div>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }

@@ -15,7 +15,7 @@ export function MediaShell({ app, children }: { app: MediaAppId; children: React
   const [mobileOpen, setMobileOpen] = useState(false)
 
   return (
-    <MediaAppProvider app={app} className="flex h-full min-h-0 flex-col overflow-hidden">
+    <MediaAppProvider app={app} className="flex h-[calc(100dvh_-_3rem)] min-h-0 flex-col overflow-hidden">
       <Topbar
         onToggleSidebar={() => {
           setCollapsed((c) => !c)

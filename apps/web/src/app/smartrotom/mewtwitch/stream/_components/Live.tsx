@@ -115,7 +115,7 @@ export function Live({ channel }: { channel: string }) {
         )}
       </div>
 
-      <aside className="lg:sticky lg:top-0 lg:h-[calc(100dvh-7rem)] lg:self-start">
+      <aside className="lg:sticky lg:top-0 lg:h-[calc(100dvh_-_7rem)] lg:self-start">
         <ChatPanel channel={channel} viewers={s?.viewer_count} />
       </aside>
     </div>
