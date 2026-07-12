@@ -1,10 +1,5 @@
-"use client";
-import { HistoryView } from "./_components/History";
+import { HistoryView } from "./_components/HistoryView"
 
-export default function HistoryPage() {
-  return (
-    <div className="min-h-full bg-layer-1 overflow-auto text-white">
-      <HistoryView />
-    </div>
-  );
+export default function MewtwitchHistoryPage() {
+  return <HistoryView />
 }
