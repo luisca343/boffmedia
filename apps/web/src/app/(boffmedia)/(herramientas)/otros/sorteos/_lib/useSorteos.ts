@@ -114,22 +114,20 @@ function load(): Persisted {
 }
 
 export function useSorteos() {
-  const boot = React.useMemo(load, [])
-  const [entrants, setEntrants] = React.useState<Entrant[]>(boot.entrants)
-  const [history, setHistory] = React.useState<HistoryRound[]>(boot.history)
-  const [weighted, setWeighted] = React.useState(!!boot.cfg.weighted)
-  const [exclude, setExclude] = React.useState(boot.cfg.exclude !== false)
-  const [winnerCount, setWinnerCount] = React.useState(boot.cfg.winnerCount || 1)
-  const [drawMode, setDrawMode] = React.useState<DrawMode>(boot.cfg.drawMode || "reel")
+  // Start from the empty defaults on both server and the first client render, so
+  // the two match (no hydration mismatch). localStorage is applied after mount.
+  const [entrants, setEntrants] = React.useState<Entrant[]>([])
+  const [history, setHistory] = React.useState<HistoryRound[]>([])
+  const [weighted, setWeighted] = React.useState(false)
+  const [exclude, setExclude] = React.useState(true)
+  const [winnerCount, setWinnerCount] = React.useState(1)
+  const [drawMode, setDrawMode] = React.useState<DrawMode>("reel")
 
   const [phase, setPhase] = React.useState<Phase>("setup")
   const [draw, setDraw] = React.useState<Draw | null>(null)
 
-  // hydrate from localStorage after mount (SSR renders the empty boot)
-  const hydrated = React.useRef(false)
+  const [ready, setReady] = React.useState(false)
   React.useEffect(() => {
-    if (hydrated.current) return
-    hydrated.current = true
     const s = load()
     if (s.entrants.length) setEntrants(s.entrants)
     if (s.history.length) setHistory(s.history)
@@ -137,15 +135,17 @@ export function useSorteos() {
     setExclude(s.cfg.exclude !== false)
     setWinnerCount(s.cfg.winnerCount || 1)
     setDrawMode(s.cfg.drawMode || "reel")
+    setReady(true)
   }, [])
 
   React.useEffect(() => {
+    if (!ready) return // don't clobber storage before the load effect has run
     try {
       localStorage.setItem(LS_KEY, JSON.stringify({ entrants, history, cfg: { weighted, exclude, winnerCount, drawMode } }))
     } catch {
       /* noop */
     }
-  }, [entrants, history, weighted, exclude, winnerCount, drawMode])
+  }, [ready, entrants, history, weighted, exclude, winnerCount, drawMode])
 
   const wonNames = React.useMemo(() => new Set(history.flatMap((r) => r.winners.map((w) => w.name))), [history])
   const pool = React.useMemo(() => (exclude ? entrants.filter((e) => !wonNames.has(e.name)) : entrants), [entrants, exclude, wonNames])

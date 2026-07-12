@@ -190,8 +190,8 @@
 @keyframes bm-hitflash { 0%, 100% { background: color-mix(in srgb, var(--panel) 88%, transparent); } 40% { background: color-mix(in srgb, var(--bad) 22%, var(--panel)); } }
 @keyframes bm-blink { 50% { opacity: 0.35; } }
 
-/* Sorteos v3 «Señal» — winner confetti fall */
-@keyframes bm-srt-conf { 0% { opacity: 0; transform: translateY(-10px) rotate(0deg); } 10% { opacity: 1; } 100% { opacity: 0.9; transform: translateY(420px) rotate(540deg); } }
+/* Sorteos v3 «Señal» — winner confetti fall (fades out so pieces don't freeze over the winners) */
+@keyframes bm-srt-conf { 0% { opacity: 0; transform: translateY(-10px) rotate(0deg); } 10% { opacity: 1; } 80% { opacity: 0.85; } 100% { opacity: 0; transform: translateY(560px) rotate(540deg); } }
 
 /* Boffmedia landing «Travesía» — atmosphere blink/spin, hero bob + ignition drop,
    spine current flow, pulse/arrival ping */
