@@ -11,6 +11,10 @@ import { IMessageRepository } from '../repositories/interfaces/chat-message.repo
 import { IUserRepository } from '../repositories/interfaces/chat-user.repository.interface';
 import { Group } from '../entities/group.entity';
 import { RotomChat } from '@/_db/schema/SmartRotomChat';
+import {
+  PresenceService,
+  PresenceStatus,
+} from '@api/_utils/sockets/presence.service';
 
 @Injectable()
 export class GroupService {
@@ -23,6 +27,7 @@ export class GroupService {
     private readonly chatMessageRepository: IMessageRepository,
     @Inject(CHAT_USER_REPOSITORY_TOKEN)
     private readonly chatUserRepository: IUserRepository,
+    private readonly presence: PresenceService,
   ) {}
 
   async getUserGroups(uuid: string): Promise<Group[]> {
@@ -137,6 +142,18 @@ export class GroupService {
     await this.chatMemberRepository.removeChatMember(groupId, uuid);
   }
 
+  async setPinned(
+    chatId: number,
+    uuid: string,
+    pinned: boolean,
+  ): Promise<void> {
+    await this.chatMemberRepository.setPinned(chatId, uuid, pinned);
+  }
+
+  async setMuted(chatId: number, uuid: string, muted: boolean): Promise<void> {
+    await this.chatMemberRepository.setMuted(chatId, uuid, muted);
+  }
+
   private async buildGroupFromChat(
     chat: RotomChat,
     requestingUserUuid: string,
@@ -178,6 +195,60 @@ export class GroupService {
       }
     }
 
+    // ── Enrichment: reactions, read receipts / status, unread, presence, flags ──
+    const messageIds = messages.map((m) => m.id);
+    const [reactionRows, readRows, flags] = await Promise.all([
+      this.chatMessageRepository.findReactionsForMessages(messageIds),
+      this.chatMessageRepository.findReadsForMessages(messageIds),
+      this.chatMemberRepository.findMemberFlags(chat.id, requestingUserUuid),
+    ]);
+
+    const reactionsByMsg = new Map<number, Map<string, string[]>>();
+    for (const r of reactionRows) {
+      if (!reactionsByMsg.has(r.messageId))
+        reactionsByMsg.set(r.messageId, new Map());
+      const em = reactionsByMsg.get(r.messageId)!;
+      em.set(r.emoji, [...(em.get(r.emoji) ?? []), r.uuid]);
+    }
+    const readsByMsg = new Map<number, Set<string>>();
+    for (const rd of readRows) {
+      if (!readsByMsg.has(rd.messageId))
+        readsByMsg.set(rd.messageId, new Set());
+      readsByMsg.get(rd.messageId)!.add(rd.uuid);
+    }
+    const memberUuids = members.map((m) => m.uuid);
+
+    const enrichedMessages = messages.map((m) => {
+      const emojiMap = reactionsByMsg.get(m.id);
+      const reactions = emojiMap
+        ? Array.from(emojiMap.entries()).map(([emoji, by]) => ({ emoji, by }))
+        : [];
+      const others = memberUuids.filter((u) => u !== m.uuid);
+      const readSet = readsByMsg.get(m.id);
+      const readByAll =
+        others.length > 0 && others.every((u) => readSet?.has(u));
+      const deliveredToAny = others.some((u) => this.presence.isOnline(u));
+      const status: 'sent' | 'delivered' | 'read' = readByAll
+        ? 'read'
+        : deliveredToAny
+          ? 'delivered'
+          : 'sent';
+      return { ...m, reactions, status };
+    });
+
+    const unread = messages.filter(
+      (m) =>
+        m.uuid &&
+        m.uuid !== requestingUserUuid &&
+        !readsByMsg.get(m.id)?.has(requestingUserUuid),
+    ).length;
+
+    let presence: PresenceStatus | undefined;
+    if (chat.type === 2) {
+      const other = memberUuids.find((u) => u !== requestingUserUuid);
+      if (other) presence = this.presence.get(other);
+    }
+
     return {
       id: chat.id,
       name: chatName,
@@ -186,9 +257,12 @@ export class GroupService {
       image: chatImage,
       createdAt: chat.createdAt,
       updatedAt: chat.updatedAt!,
-      messages,
-      unread: 0, // TODO: Implement unread count logic
+      messages: enrichedMessages,
+      unread,
       members: members,
+      presence,
+      pinned: flags.pinned,
+      muted: flags.muted,
     };
   }
 }

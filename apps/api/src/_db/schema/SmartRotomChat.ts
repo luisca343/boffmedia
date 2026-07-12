@@ -1,7 +1,9 @@
 import { sql } from 'drizzle-orm';
 import {
+  boolean,
   int,
   mysqlTable,
+  primaryKey,
   text,
   timestamp,
   varchar,
@@ -35,6 +37,8 @@ export const rotomChatUsers = mysqlTable('rotom_chat_users', {
       onDelete: 'cascade',
       onUpdate: 'cascade',
     }),
+  pinned: boolean('pinned').notNull().default(false),
+  muted: boolean('muted').notNull().default(false),
 });
 
 export type RotomChatUser = typeof rotomChatUsers.$inferSelect;
@@ -78,3 +82,28 @@ export const rotomChatMessageReads = mysqlTable('rotom_chat_message_reads', {
 });
 
 export type RotomChatMessageRead = typeof rotomChatMessageReads.$inferSelect;
+
+export const rotomChatMessageReactions = mysqlTable(
+  'rotom_chat_message_reactions',
+  {
+    messageId: int('message_id')
+      .notNull()
+      .references(() => rotomChatMessages.id, {
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+      }),
+    uuid: varchar('uuid', { length: 36 })
+      .notNull()
+      .references(() => smartrotomUsers.uuid, {
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+      }),
+    emoji: varchar('emoji', { length: 32 }).notNull(),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.messageId, table.uuid, table.emoji] }),
+  }),
+);
+
+export type RotomChatMessageReaction =
+  typeof rotomChatMessageReactions.$inferSelect;

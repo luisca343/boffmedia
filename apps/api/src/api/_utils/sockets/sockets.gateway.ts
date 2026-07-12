@@ -10,6 +10,7 @@ import {
 import type { Server, Socket } from 'socket.io';
 import { Inject, forwardRef } from '@nestjs/common';
 import { ChatappFacadeService } from '@api/smartrotom/chatapp/chatapp.facade.service';
+import { PresenceService } from './presence.service';
 import { Logger } from 'nestjs-pino';
 
 @WebSocketGateway(34304, {
@@ -29,7 +30,13 @@ export class SocketsGateway
 
     @Inject(forwardRef(() => ChatappFacadeService))
     private chatAppService: ChatappFacadeService,
+
+    private readonly presence: PresenceService,
   ) {}
+
+  private broadcastPresence(uuid: string): void {
+    this.server.emit('presence:update', { uuid, status: this.presence.get(uuid) });
+  }
 
   handleConnection(client: Socket) {
     this.logger.log(`Client with ID ${client.id} connected`);
@@ -59,6 +66,8 @@ export class SocketsGateway
       uuid: smartRotomUser.uuid,
       socketId: client.id,
     });
+    this.presence.setOnline(smartRotomUser.uuid, !!smartRotomUser.inGame);
+    this.broadcastPresence(smartRotomUser.uuid);
     this.logger.log(`Updated connection for user ${smartRotomUser.uuid}`);
     this.logger.log('Current users:', this.users.size);
 
@@ -72,6 +81,8 @@ export class SocketsGateway
     for (const [uuid, user] of this.users.entries()) {
       if (user.socketId === client.id) {
         this.users.delete(uuid);
+        this.presence.setOffline(uuid);
+        this.broadcastPresence(uuid);
         this.logger.log(`Removed user ${uuid} from connections`);
         break;
       }

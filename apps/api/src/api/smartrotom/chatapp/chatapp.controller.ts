@@ -25,12 +25,17 @@ import {
 import { CreateChatRequest } from './services/chat.service';
 
 // Import DTOs
-import { CreateChatDto } from './dto/chat.dto';
+import {
+  CreateChatDto,
+  SetChatPinnedDto,
+  SetChatMutedDto,
+} from './dto/chat.dto';
 import {
   CreateMessageDto,
   UpdateMessageDto,
   DeleteMessageDto,
   MarkMessageReadDto,
+  ReactMessageDto,
 } from './dto/message.dto';
 import { AddMemberDto, RemoveMemberDto } from './dto/group.dto';
 import { InitiateCallDto, EndCallDto } from './dto/call.dto';
@@ -275,6 +280,60 @@ export class ChatappController {
     return await this.chatappFacadeService.markMessageAsRead(
       messageIdNum,
       markReadDto.uuid,
+    );
+  }
+
+  @Post('message/:messageId/react')
+  @ApiOperation({ summary: 'Toggle a reaction on a message' })
+  @ApiResponse({ status: HttpStatus.OK, type: MessageResponse })
+  @ApiParam({ name: 'messageId', description: 'Message ID' })
+  @ApiBody({ type: ReactMessageDto })
+  async reactToMessage(
+    @Param('messageId') messageId: string,
+    @Body() dto: ReactMessageDto,
+  ): Promise<MessageResponse> {
+    const id = parseInt(messageId, 10);
+    if (isNaN(id)) throw new Error('Invalid message ID');
+    return await this.chatappFacadeService.toggleReaction(
+      id,
+      dto.uuid,
+      dto.emoji,
+    );
+  }
+
+  @Post('chat/:chatId/pin')
+  @ApiOperation({ summary: 'Pin or unpin a chat for a user' })
+  @ApiResponse({ status: HttpStatus.OK, type: MessageResponse })
+  @ApiParam({ name: 'chatId', description: 'Chat ID' })
+  @ApiBody({ type: SetChatPinnedDto })
+  async setChatPinned(
+    @Param('chatId') chatId: string,
+    @Body() dto: SetChatPinnedDto,
+  ): Promise<MessageResponse> {
+    const id = parseInt(chatId, 10);
+    if (isNaN(id)) throw new Error('Invalid chat ID');
+    return await this.chatappFacadeService.setChatPinned(
+      id,
+      dto.uuid,
+      dto.pinned,
+    );
+  }
+
+  @Post('chat/:chatId/mute')
+  @ApiOperation({ summary: 'Mute or unmute a chat for a user' })
+  @ApiResponse({ status: HttpStatus.OK, type: MessageResponse })
+  @ApiParam({ name: 'chatId', description: 'Chat ID' })
+  @ApiBody({ type: SetChatMutedDto })
+  async setChatMuted(
+    @Param('chatId') chatId: string,
+    @Body() dto: SetChatMutedDto,
+  ): Promise<MessageResponse> {
+    const id = parseInt(chatId, 10);
+    if (isNaN(id)) throw new Error('Invalid chat ID');
+    return await this.chatappFacadeService.setChatMuted(
+      id,
+      dto.uuid,
+      dto.muted,
     );
   }
 

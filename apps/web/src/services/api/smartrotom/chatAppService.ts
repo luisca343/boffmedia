@@ -9,6 +9,9 @@ import type {
   RemoveMemberDto,
   InitiateCallDto,
   EndCallDto,
+  ReactMessageDto,
+  SetChatPinnedDto,
+  SetChatMutedDto,
   Chat,
   RotomMessage,
   CreateChatResponse,
@@ -73,6 +76,27 @@ export class ChatAppService {
    */
   static markMessageAsRead(messageId: number, data: MarkMessageReadDto) {
     return rotomPOST<MessageResponse>(`/chatapp/message/${messageId}/read`, data);
+  }
+
+  /**
+   * Toggle an emoji reaction on a message
+   */
+  static reactToMessage(messageId: number, data: ReactMessageDto) {
+    return rotomPOST<MessageResponse>(`/chatapp/message/${messageId}/react`, data);
+  }
+
+  /**
+   * Pin or unpin a chat for a user
+   */
+  static setChatPinned(chatId: number, data: SetChatPinnedDto) {
+    return rotomPOST<MessageResponse>(`/chatapp/chat/${chatId}/pin`, data);
+  }
+
+  /**
+   * Mute or unmute a chat for a user
+   */
+  static setChatMuted(chatId: number, data: SetChatMutedDto) {
+    return rotomPOST<MessageResponse>(`/chatapp/chat/${chatId}/mute`, data);
   }
 
   /**

@@ -6,6 +6,7 @@ import {
   IsArray,
   IsOptional,
   IsInt,
+  IsBoolean,
 } from 'class-validator';
 
 export enum ChatType {
@@ -70,6 +71,34 @@ export class GetChatsDto {
   @IsNotEmpty()
   @IsString()
   uuid: string;
+}
+
+export class SetChatPinnedDto extends BaseDto {
+  @ApiProperty({
+    description: 'UUID of the user',
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
+  })
+  @IsNotEmpty()
+  @IsString()
+  uuid: string;
+
+  @ApiProperty({ description: 'Pinned state', example: true })
+  @IsBoolean()
+  pinned: boolean;
+}
+
+export class SetChatMutedDto extends BaseDto {
+  @ApiProperty({
+    description: 'UUID of the user',
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
+  })
+  @IsNotEmpty()
+  @IsString()
+  uuid: string;
+
+  @ApiProperty({ description: 'Muted state', example: true })
+  @IsBoolean()
+  muted: boolean;
 }
 
 export class GetChatByIdDto {

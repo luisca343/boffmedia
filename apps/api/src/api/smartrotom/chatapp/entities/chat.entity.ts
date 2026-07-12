@@ -15,6 +15,18 @@ export class ChatMember {
   username?: string;
 }
 
+export class MessageReaction {
+  @ApiProperty({ example: '🔥', description: 'Reaction emoji' })
+  emoji: string;
+
+  @ApiProperty({
+    type: [String],
+    description: 'UUIDs of users who reacted with this emoji',
+    example: ['67d9b543-5ac9-41e1-a8a5-20d7689e24a4'],
+  })
+  by: string[];
+}
+
 export class ChatMessage {
   @ApiProperty({
     example: 123,
@@ -33,6 +45,32 @@ export class ChatMessage {
     description: 'Message creation date',
   })
   createdAt: Date;
+
+  @ApiProperty({
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
+    description: 'Sender UUID',
+    required: false,
+  })
+  uuid?: string;
+
+  @ApiProperty({ example: 'text', description: 'Message type', required: false })
+  type?: string | null;
+
+  @ApiProperty({
+    type: [MessageReaction],
+    description: 'Reactions on this message',
+    required: false,
+    example: [],
+  })
+  reactions?: MessageReaction[];
+
+  @ApiProperty({
+    example: 'read',
+    description: 'Delivery status of the message (for the sender)',
+    enum: ['sent', 'delivered', 'read'],
+    required: false,
+  })
+  status?: 'sent' | 'delivered' | 'read';
 }
 
 export class Chat {

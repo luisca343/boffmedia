@@ -26,6 +26,9 @@ const config: Config = {
         // Starbank (SmartRotom) — fintech dual type system (self-hosted)
         sb: ["Inter", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "sans-serif"],
         "sb-display": ["Space Grotesk", "Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        // ChatApp (SmartRotom) — native system UI stack, no external fonts.
+        ca: ["-apple-system", "BlinkMacSystemFont", "Segoe UI", "Helvetica Neue", "Helvetica", "Arial", "sans-serif"],
+        "ca-mono": ["ui-monospace", "SF Mono", "Roboto Mono", "Menlo", "Consolas", "monospace"],
       },
       fontSize: {
         "4xl": ["2.25rem", { lineHeight: "normal" }],
@@ -92,6 +95,10 @@ const config: Config = {
         "sb-3": "0 10px 30px -12px rgba(15,30,60,.25)",
         "sb-brand": "0 14px 40px -16px rgba(36,99,235,.55)",
         "sb-focus": "0 0 0 3px rgba(36,99,235,.22)",
+        // ChatApp (SmartRotom) — bubble/menu elevation (theme-var backed).
+        "ca-bubble": "var(--ca-bubble-shadow)",
+        "ca-pop": "0 16px 44px -10px rgb(0 0 0 / .4)",
+        "ca-modal": "0 30px 70px -20px rgb(0 0 0 / .6)",
       },
       backdropBlur: {
         xs: "2px",
@@ -130,6 +137,51 @@ const config: Config = {
           league: "#2463eb", shop: "#06b6d4", heal: "#ec4899",
           transfer: "#8b5cf6", reward: "#10b981", fee: "#94a3b8",
           subscription: "#f59e0b", other: "#64748b",
+        },
+
+        // ════════════════════════════════════════════════════════════════════
+        // CHATAPP (SmartRotom) — WhatsApp-style messaging tokens. REAL light/dark
+        // + accent (CSS-var backed, swapped by `data-theme` / a runtime
+        // `--ca-accent` triplet on the `.ca-app` root; see the ChatApp base-layer
+        // plugin below). Wallpaper/bubble/density/font are baked. Namespaced
+        // `ca-*` so nothing collides with the other systems sharing this config.
+        // Alpha works: `bg-ca-accent/14`, `text-ca-500`, `bg-ca-panel`.
+        // ════════════════════════════════════════════════════════════════════
+        ca: {
+          // neutral surface ramp (inverts light↔dark)
+          50: "rgb(var(--ca-50) / <alpha-value>)",
+          100: "rgb(var(--ca-100) / <alpha-value>)",
+          200: "rgb(var(--ca-200) / <alpha-value>)",
+          300: "rgb(var(--ca-300) / <alpha-value>)",
+          400: "rgb(var(--ca-400) / <alpha-value>)",
+          500: "rgb(var(--ca-500) / <alpha-value>)",
+          600: "rgb(var(--ca-600) / <alpha-value>)",
+          700: "rgb(var(--ca-700) / <alpha-value>)",
+          800: "rgb(var(--ca-800) / <alpha-value>)",
+          900: "rgb(var(--ca-900) / <alpha-value>)",
+          950: "rgb(var(--ca-950) / <alpha-value>)",
+          // semantic surfaces
+          panel: "rgb(var(--ca-panel) / <alpha-value>)",
+          header: "rgb(var(--ca-header) / <alpha-value>)",
+          "search-bg": "rgb(var(--ca-search-bg) / <alpha-value>)",
+          "input-bg": "rgb(var(--ca-input-bg) / <alpha-value>)",
+          "bubble-in": "rgb(var(--ca-bubble-in) / <alpha-value>)",
+          "bubble-in-text": "rgb(var(--ca-bubble-in-text) / <alpha-value>)",
+          "bubble-out-text": "rgb(var(--ca-bubble-out-text) / <alpha-value>)",
+          "bubble-out": "var(--ca-bubble-out)", // accent-derived (color-mix)
+          wallpaper: "var(--ca-wallpaper-bg)",
+          doodle: "var(--ca-doodle-color)",
+          // brand accent (runtime-settable triplet) + derived soft
+          accent: "rgb(var(--ca-accent) / <alpha-value>)",
+          "on-accent": "rgb(var(--ca-on-accent) / <alpha-value>)",
+          "accent-soft": "var(--ca-accent-soft)",
+          // status
+          online: "rgb(var(--ca-online) / <alpha-value>)",
+          "tick-read": "rgb(var(--ca-tick-read) / <alpha-value>)",
+          highlight: "rgb(var(--ca-highlight) / <alpha-value>)",
+          info: "rgb(var(--ca-info) / <alpha-value>)",
+          error: "rgb(var(--ca-error) / <alpha-value>)",
+          warning: "rgb(var(--ca-warning) / <alpha-value>)",
         },
 
         // ════════════════════════════════════════════════════════════════════
@@ -424,6 +476,19 @@ const config: Config = {
           "0%, 100%": { opacity: "1" },
           "50%": { opacity: "0.3" },
         },
+        // ── ChatApp (SmartRotom) ──────────────────────────────────────────
+        "ca-bounce": {
+          "0%, 60%, 100%": { transform: "translateY(0)", opacity: ".5" },
+          "30%": { transform: "translateY(-4px)", opacity: "1" },
+        },
+        "ca-shimmer": {
+          "0%": { backgroundPosition: "100% 0" },
+          "100%": { backgroundPosition: "-100% 0" },
+        },
+        "ca-pop": { from: { opacity: "0", transform: "translateY(8px) scale(.98)" } },
+        "ca-fade": { from: { opacity: "0" } },
+        "ca-modal-in": { from: { opacity: "0", transform: "translateY(14px) scale(.98)" } },
+        "ca-slide-in": { from: { opacity: "0", transform: "translateX(20px)" } },
       },
       animation: {
         // Existing animations
@@ -444,6 +509,13 @@ const config: Config = {
         "k-modal-in": "k-modal-in 0.26s var(--ease)",
         "dd-in": "dd-in 0.16s var(--ease)",
         "pulse-dot": "pulse-dot 1.6s var(--ease) infinite",
+        // ── ChatApp (SmartRotom) ──────────────────────────────────────────
+        "ca-bounce": "ca-bounce 1s infinite",
+        "ca-shimmer": "ca-shimmer 1.4s infinite",
+        "ca-pop": "ca-pop 0.14s cubic-bezier(.2,.8,.3,1)",
+        "ca-fade": "ca-fade 0.18s ease",
+        "ca-modal-in": "ca-modal-in 0.2s cubic-bezier(.2,.8,.3,1)",
+        "ca-slide-in": "ca-slide-in 0.24s ease",
       },
       spacing: {
         18: "4.5rem",
@@ -462,6 +534,12 @@ const config: Config = {
         "sb-lg": "18px",
         "sb-xl": "24px",
         "sb-pill": "999px",
+        // ── ChatApp (SmartRotom) radii ──────────────────────────────────────
+        "ca-sm": "6px",
+        "ca-md": "8px",
+        "ca-lg": "12px",
+        "ca-xl": "16px",
+        "ca-2xl": "22px",
       },
     },
   },
@@ -535,6 +613,79 @@ const config: Config = {
           textTransform: "uppercase",
           color: "var(--muted)",
         },
+      })
+    }),
+    // ── ChatApp (SmartRotom) theme layer ───────────────────────────────────
+    // Real light/dark + accent, scoped to the `.ca-app` root so it never leaks
+    // into the rest of SmartRotom. `--ca-accent` is a runtime-settable RGB
+    // triplet (an inline style on the root drives the accent picker); the soft
+    // accent + outgoing-bubble tints are color-mixed off it per theme. Baked:
+    // warm doodle wallpaper, tail bubbles, regular density, system font.
+    plugin(({ addBase, addComponents }) => {
+      const light = {
+        "--ca-50": "17 27 33", "--ca-100": "31 44 52", "--ca-200": "59 74 84",
+        "--ca-300": "84 101 111", "--ca-400": "102 119 129", "--ca-500": "134 150 160",
+        "--ca-600": "174 186 193", "--ca-700": "209 215 219", "--ca-800": "240 242 245",
+        "--ca-900": "255 255 255", "--ca-950": "255 255 255",
+        "--ca-panel": "255 255 255", "--ca-header": "240 242 245",
+        "--ca-search-bg": "255 255 255", "--ca-input-bg": "255 255 255",
+        "--ca-bubble-in": "255 255 255", "--ca-bubble-in-text": "17 27 33",
+        "--ca-bubble-out-text": "17 27 33",
+        "--ca-bubble-out": "color-mix(in srgb, rgb(var(--ca-accent)) 20%, #ffffff)",
+        "--ca-accent-soft": "color-mix(in srgb, rgb(var(--ca-accent)) 90%, black)",
+        "--ca-wallpaper-bg": "#efeae2",
+        "--ca-doodle-color": "rgba(86, 72, 53, .07)",
+        "--ca-bubble-shadow": "0 1px .5px rgba(11,20,26,.13)",
+      }
+      const dark = {
+        "--ca-50": "233 237 239", "--ca-100": "217 222 224", "--ca-200": "207 217 222",
+        "--ca-300": "174 186 193", "--ca-400": "134 150 160", "--ca-500": "102 119 129",
+        "--ca-600": "55 72 81", "--ca-700": "42 57 66", "--ca-800": "32 44 51",
+        "--ca-900": "17 27 33", "--ca-950": "11 20 26",
+        "--ca-panel": "17 27 33", "--ca-header": "32 44 51",
+        "--ca-search-bg": "42 57 66", "--ca-input-bg": "42 57 66",
+        "--ca-bubble-in": "31 44 51", "--ca-bubble-in-text": "233 237 239",
+        "--ca-bubble-out-text": "233 237 239",
+        "--ca-bubble-out": "color-mix(in srgb, rgb(var(--ca-accent)) 42%, #0b141a)",
+        "--ca-accent-soft": "color-mix(in srgb, rgb(var(--ca-accent)) 68%, white)",
+        "--ca-wallpaper-bg": "#0b141a",
+        "--ca-doodle-color": "rgba(233, 237, 239, .045)",
+        "--ca-bubble-shadow": "0 1px .5px rgba(0,0,0,.28)",
+      }
+      // Accent + status are theme-independent (default = WhatsApp green).
+      const constant = {
+        "--ca-accent": "0 168 132", "--ca-on-accent": "255 255 255",
+        "--ca-online": "37 211 102", "--ca-tick-read": "83 189 235",
+        "--ca-highlight": "37 211 102", "--ca-info": "53 145 235",
+        "--ca-error": "240 84 84", "--ca-warning": "234 179 8",
+        "--ca-t-fast": "120ms cubic-bezier(.4,0,.2,1)",
+        "--ca-t-base": "200ms cubic-bezier(.4,0,.2,1)",
+      }
+      addBase({
+        ".ca-app": { ...constant, ...light, colorScheme: "light" },
+        '.ca-app[data-theme="dark"]': { ...dark, colorScheme: "dark" },
+      })
+      const doodle =
+        "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'%3E%3Cg fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='40' cy='52' r='14'/%3E%3Ccircle cx='110' cy='30' r='3.4' fill='%23000' stroke='none'/%3E%3Cpath d='M174 56h16M182 48v16'/%3E%3Crect x='206' y='104' width='44' height='32' rx='11'/%3E%3Cpath d='M214 136l-4 9 11-5'/%3E%3Ccircle cx='70' cy='150' r='9'/%3E%3Cpath d='M126 128l22 22'/%3E%3Cpath d='M244 196l18 0-9 16z'/%3E%3Ccircle cx='40' cy='232' r='3.4' fill='%23000' stroke='none'/%3E%3Ccircle cx='150' cy='236' r='16'/%3E%3Cpath d='M250 36h16M258 28v16'/%3E%3Crect x='18' y='118' width='22' height='22' rx='7'/%3E%3Ccircle cx='212' cy='262' r='3.4' fill='%23000' stroke='none'/%3E%3Cpath d='M88 92l22-18'/%3E%3Ccircle cx='272' cy='150' r='8'/%3E%3Cpath d='M104 244h22M115 233v22'/%3E%3Ccircle cx='178' cy='160' r='3.4' fill='%23000' stroke='none'/%3E%3C/g%3E%3C/svg%3E\")"
+      addComponents({
+        // Repeating WhatsApp-style doodle wallpaper overlay (tinted by theme).
+        ".ca-doodle": {
+          backgroundColor: "var(--ca-doodle-color)",
+          WebkitMaskImage: doodle, maskImage: doodle,
+          WebkitMaskSize: "300px 300px", maskSize: "300px 300px",
+          WebkitMaskRepeat: "repeat", maskRepeat: "repeat",
+        },
+        // Thin, theme-aware scrollbar (opt-in on scroll containers).
+        ".ca-scroll": {
+          scrollbarWidth: "thin",
+          scrollbarColor: "rgb(var(--ca-500) / .55) transparent",
+        },
+        ".ca-scroll::-webkit-scrollbar": { width: "7px", height: "7px" },
+        ".ca-scroll::-webkit-scrollbar-thumb": {
+          background: "rgb(var(--ca-500) / .5)", borderRadius: "99px",
+          border: "1.5px solid transparent", backgroundClip: "padding-box",
+        },
+        ".ca-scroll::-webkit-scrollbar-thumb:hover": { background: "rgb(var(--ca-500) / .8)" },
       })
     }),
     // Enhanced text shadow plugin
