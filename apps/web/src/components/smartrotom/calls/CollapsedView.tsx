@@ -1,5 +1,4 @@
-import { PhoneIcon, ArrowsPointingOutIcon } from "@heroicons/react/24/outline"
-import { CabezaJugador } from "../minecraft/CabezaMC"
+import { PhoneIcon, ArrowsPointingOutIcon, MicrophoneIcon } from "@heroicons/react/24/outline"
 import { type CallData, UserStatus } from "../types/call"
 import { useState, useEffect } from "react"
 
@@ -12,126 +11,73 @@ interface CollapsedViewProps {
   callStartTime: number
 }
 
-export function CollapsedView({ 
-  activeCall, 
-  currentUserUuid, 
-  onJoinCall, 
-  onExitCall, 
+export function CollapsedView({
+  activeCall,
+  currentUserUuid,
+  onJoinCall,
+  onExitCall,
   onExpand,
-  callStartTime 
+  callStartTime,
 }: CollapsedViewProps) {
-    const [callDuration, setCallDuration] = useState("00:00")
-    const currentUser = activeCall.users.find((user) => user.uuid === currentUserUuid)
-    const isUserInCall = currentUser?.status === UserStatus.IN_CALL
-    const isUserRinging = currentUser?.status === UserStatus.RINGING
-    const usersInCall = activeCall.users.filter((user) => user.status === UserStatus.IN_CALL)
-  
-    useEffect(() => {
-      if (!isUserInCall || !callStartTime) return
-      
-      const updateDuration = () => {
-        const elapsed = Math.floor((Date.now() - callStartTime) / 1000)
-        const minutes = Math.floor(elapsed / 60)
-        const seconds = elapsed % 60
-        setCallDuration(`${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`)
-      }
-      
-      updateDuration()
-      const interval = setInterval(updateDuration, 1000)
-      return () => clearInterval(interval)
-    }, [callStartTime, isUserInCall])
-  
-    return (
-      <div className="flex flex-col gap-2 w-full p-2 animate-in slide-in-from-left duration-300">
-        {/* Top row with caller info and expand button */}
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 flex-1 min-w-0">
-            {/* Caller Avatar */}
-            {activeCall.caller !== currentUserUuid && (
-              <div className="flex-shrink-0">
-                <CabezaJugador
-                  width={36}
-                  height={36}
-                  uuid={activeCall.caller}
-                  nombreNPC={activeCall.caller}
-                  autoRotate={false}
-                  tag={false}
-                  zoom={1}
-                />
-              </div>
-            )}
-            
-            {/* Call Info */}
-            <div className="flex flex-col justify-center min-w-0 flex-1">
-              <div className="flex items-center gap-2">
-                <span className={`text-xs font-semibold ${
-                  isUserRinging ? "text-yellow-400 animate-pulse" : "text-ink"
-                }`}>
-                  {isUserRinging ? "Incoming..." : isUserInCall ? "In Call" : "Calling..."}
-                </span>
-                {usersInCall.length > 1 && (
-                  <span className="text-xs text-ink-muted">
-                    ({usersInCall.length})
-                  </span>
-                )}
-              </div>
-              {isUserInCall && (
-                <span className="text-[10px] text-ink-muted font-mono">
-                  {callDuration}
-                </span>
-              )}
-            </div>
-          </div>
-          
-          {/* Expand Button */}
-          <button
-            onClick={onExpand}
-            className="flex-shrink-0 p-1.5 hover:bg-layer-3 rounded-lg transition-all duration-200 hover:scale-110 active:scale-95"
-            aria-label="Expand call view"
-          >
-            <ArrowsPointingOutIcon
-              className="text-ink hover:text-ink"
-              height={20}
-              width={20}
-              strokeWidth={2.5}
-            />
-          </button>
-        </div>
-        
-        {/* Bottom row with action buttons */}
-        <div className="flex items-center justify-center gap-4">
-          {/* Answer Button - only show when ringing */}
-          {isUserRinging && (
-            <button
-              onClick={onJoinCall}
-              className="group relative bg-warning hover:bg-warning active:bg-warning p-2.5 rounded-full transition-all duration-200 shadow-md hover:shadow-lg hover:scale-110 active:scale-95 animate-pulse"
-              aria-label="Answer call"
-            >
-              <PhoneIcon
-                className="text-white"
-                height={20}
-                width={20}
-                strokeWidth={2.5}
-              />
-            </button>
-          )}
-          
-          {/* End Call Button */}
-          <button
-            onClick={onExitCall}
-            className="group relative bg-red-500 hover:bg-red-600 active:bg-red-700 p-2.5 rounded-full transition-all duration-200 shadow-md hover:shadow-lg hover:scale-110 active:scale-95"
-            aria-label="End call"
-          >
-            <PhoneIcon
-              className="text-white transform rotate-[135deg]"
-              height={20}
-              width={20}
-              strokeWidth={2.5}
-            />
-          </button>
+  const [callDuration, setCallDuration] = useState("0:00")
+  const [muted, setMuted] = useState(false)
+  const currentUser = activeCall.users.find((user) => user.uuid === currentUserUuid)
+  const isUserInCall = currentUser?.status === UserStatus.IN_CALL
+  const isUserRinging = currentUser?.status === UserStatus.RINGING
+  const usersInCall = activeCall.users.filter((user) => user.status === UserStatus.IN_CALL)
+  const caller = activeCall.users.find((u) => u.uuid === activeCall.caller)
+  const name = activeCall.caller === currentUserUuid ? "Tu llamada" : caller?.username || "Llamada"
+
+  useEffect(() => {
+    if (!isUserInCall || !callStartTime) return
+    const update = () => {
+      const s = Math.floor((Date.now() - callStartTime) / 1000)
+      setCallDuration(`${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`)
+    }
+    update()
+    const interval = setInterval(update, 1000)
+    return () => clearInterval(interval)
+  }, [callStartTime, isUserInCall])
+
+  const status = isUserRinging ? "Llamada entrante" : isUserInCall ? callDuration : "Llamando…"
+
+  return (
+    <div className="flex w-full items-center gap-3 px-3 py-2.5">
+      <div className="relative h-11 w-11 flex-none overflow-hidden rounded-full bg-[#2a3942]">
+        <img src={`https://mc-heads.net/avatar/${activeCall.caller}`} alt="" className="h-full w-full object-cover [image-rendering:pixelated]" />
+        {isUserInCall && <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-[#111b21] bg-[#25d366]" />}
+      </div>
+
+      <div className="min-w-0 flex-1">
+        <div className="truncate text-sm font-semibold text-[#e9edef]">{name}</div>
+        <div className="flex items-center gap-1.5 text-[11.5px] text-[#8696a0]">
+          <PhoneIcon className="h-3 w-3 flex-none" strokeWidth={2} />
+          <span className="font-mono tabular-nums" style={{ color: "#53d3a0" }}>{status}</span>
+          {usersInCall.length > 1 && <span>· {usersInCall.length}</span>}
         </div>
       </div>
-    )
-  }
-  
-  
+
+      <button
+        onClick={() => setMuted((v) => !v)}
+        title="Silenciar"
+        className={`grid h-9 w-9 flex-none place-items-center rounded-full transition-colors ${muted ? "bg-[#00a884] text-white" : "bg-white/[0.14] text-[#e9edef] hover:bg-white/[0.24]"}`}
+      >
+        <MicrophoneIcon className="h-[18px] w-[18px]" strokeWidth={2} />
+      </button>
+
+      {isUserRinging && (
+        <button onClick={onJoinCall} title="Aceptar" className="grid h-9 w-9 flex-none place-items-center rounded-full bg-[#25d366] text-white transition-transform hover:brightness-110 active:scale-90">
+          <PhoneIcon className="h-[18px] w-[18px]" strokeWidth={2} />
+        </button>
+      )}
+
+      <button onClick={onExitCall} title="Colgar" className="grid h-9 w-9 flex-none place-items-center rounded-full bg-[#f05454] text-white transition-transform hover:brightness-110 active:scale-90">
+        <PhoneIcon className="h-[18px] w-[18px] rotate-[135deg]" strokeWidth={2} />
+      </button>
+
+      <button onClick={onExpand} title="Ampliar" className="grid h-9 w-9 flex-none place-items-center rounded-full bg-white/[0.14] text-[#e9edef] transition-colors hover:bg-white/[0.24]">
+        <ArrowsPointingOutIcon className="h-[18px] w-[18px]" strokeWidth={2} />
+      </button>
+    </div>
+  )
+}

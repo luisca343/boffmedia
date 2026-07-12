@@ -172,6 +172,7 @@ export class ChatappFacadeService {
   ): Promise<{ success: boolean; message: string }> {
     try {
       await this.messageService.markMessageAsRead(messageId, uuid);
+      this.socketGateway.server.emit('chat:read', { messageId, uuid });
       return {
         success: true,
         message: 'Message marked as read',
@@ -180,6 +181,47 @@ export class ChatappFacadeService {
       this.logger.error(`Error marking message ${messageId} as read:`, error);
       throw new Error(`Failed to mark message as read: ${error.message}`);
     }
+  }
+
+  async toggleReaction(
+    messageId: number,
+    uuid: string,
+    emoji: string,
+  ): Promise<{ success: boolean; message: string }> {
+    try {
+      const { chatId, reactions } = await this.messageService.toggleReaction(
+        messageId,
+        uuid,
+        emoji,
+      );
+      this.socketGateway.server.emit('chat:reaction', {
+        chatId,
+        messageId,
+        reactions,
+      });
+      return { success: true, message: 'Reaction updated' };
+    } catch (error: any) {
+      this.logger.error(`Error toggling reaction on ${messageId}:`, error);
+      throw new Error(`Failed to toggle reaction: ${error.message}`);
+    }
+  }
+
+  async setChatPinned(
+    chatId: number,
+    uuid: string,
+    pinned: boolean,
+  ): Promise<{ success: boolean; message: string }> {
+    await this.groupService.setPinned(chatId, uuid, pinned);
+    return { success: true, message: pinned ? 'Chat pinned' : 'Chat unpinned' };
+  }
+
+  async setChatMuted(
+    chatId: number,
+    uuid: string,
+    muted: boolean,
+  ): Promise<{ success: boolean; message: string }> {
+    await this.groupService.setMuted(chatId, uuid, muted);
+    return { success: true, message: muted ? 'Chat muted' : 'Chat unmuted' };
   }
 
   // ==================== GROUP MANAGEMENT ====================

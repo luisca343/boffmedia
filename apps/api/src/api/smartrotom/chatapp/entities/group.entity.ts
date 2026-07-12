@@ -31,4 +31,26 @@ export class Group {
 
   @ApiProperty({ type: [ChatMember], example: [] })
   members: ChatMember[];
+
+  @ApiProperty({
+    example: 'online',
+    description: 'Presence of the counterpart (direct chats only)',
+    enum: ['online', 'ingame', 'offline'],
+    required: false,
+  })
+  presence?: 'online' | 'ingame' | 'offline';
+
+  @ApiProperty({
+    example: false,
+    description: 'Whether the requesting user pinned this chat',
+    required: false,
+  })
+  pinned?: boolean;
+
+  @ApiProperty({
+    example: false,
+    description: 'Whether the requesting user muted this chat',
+    required: false,
+  })
+  muted?: boolean;
 }

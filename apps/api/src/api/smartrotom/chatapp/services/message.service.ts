@@ -186,7 +186,38 @@ export class MessageService {
     if (!message) {
       throw new Error('Message not found');
     }
-
+    if (await this.chatMessageRepository.hasRead(messageId, uuid)) return;
     await this.chatMessageRepository.markMessageAsRead(messageId, uuid);
+  }
+
+  /** Toggle a reaction on/off, returning the message's chat + the fresh set. */
+  async toggleReaction(
+    messageId: number,
+    uuid: string,
+    emoji: string,
+  ): Promise<{ chatId: number | null; reactions: { emoji: string; by: string[] }[]; added: boolean }> {
+    const has = await this.chatMessageRepository.hasReaction(
+      messageId,
+      uuid,
+      emoji,
+    );
+    if (has) {
+      await this.chatMessageRepository.removeReaction(messageId, uuid, emoji);
+    } else {
+      await this.chatMessageRepository.addReaction(messageId, uuid, emoji);
+    }
+
+    const rows = await this.chatMessageRepository.findReactionsForMessages([
+      messageId,
+    ]);
+    const map = new Map<string, string[]>();
+    for (const r of rows) map.set(r.emoji, [...(map.get(r.emoji) ?? []), r.uuid]);
+    const reactions = Array.from(map.entries()).map(([e, by]) => ({
+      emoji: e,
+      by,
+    }));
+    const chatId =
+      await this.chatMessageRepository.findMessageChatId(messageId);
+    return { chatId, reactions, added: !has };
   }
 }

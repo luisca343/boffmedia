@@ -5,7 +5,9 @@ import { useBoffSession } from "@/services/useBoffSession";
 import { signIn, signOut } from "next-auth/react";
 import { useState } from "react";
 import { SmartRotomButton } from "@/components/smartrotom/ui/button";
-import { Copy, Check, LogIn, LogOut, Palette, Bug, Monitor, Smartphone } from "lucide-react";
+import { Copy, Check, LogIn, LogOut, Palette, Bug, Monitor, Smartphone, Sun, Moon } from "lucide-react";
+import { useChatSettings } from "@/app/smartrotom/chatapp/_stores/useChatSettings";
+import type { ThemePref } from "@/app/smartrotom/chatapp/_utils/theme";
 
 const isDev = env.NODE_ENV === "development";
 
@@ -21,6 +23,7 @@ export function SettingsPage({ setTema }: { setTema: (tema: string) => void }) {
   const { session } = useBoffSession();
   const [copied, setCopied] = useState(false);
   const [activeTheme, setActiveTheme] = useState('');
+  const { theme: chatMode, setTheme: setChatMode } = useChatSettings();
 
   const copyToken = () => {
     if (session?.user?.accessToken) {
@@ -89,6 +92,41 @@ export function SettingsPage({ setTema }: { setTema: (tema: string) => void }) {
               )}
             </button>
           ))}
+        </div>
+      </div>
+
+      {/* Chat light/dark mode */}
+      <div>
+        <div className="flex items-center gap-2 mb-3">
+          <Sun size={16} className="text-primary-hover" />
+          <h3 className="text-sm font-semibold text-ink uppercase tracking-wider">Modo del chat</h3>
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          {([
+            { id: "light", label: "Claro", icon: Sun },
+            { id: "dark", label: "Oscuro", icon: Moon },
+            { id: "auto", label: "Auto", icon: Monitor },
+          ] as { id: ThemePref; label: string; icon: typeof Sun }[]).map((m) => {
+            const MIcon = m.icon;
+            return (
+              <button
+                key={m.id}
+                onClick={() => setChatMode(m.id)}
+                className={`
+                  group flex flex-col items-center gap-1.5 p-2 rounded-lg border-2 transition-all duration-150
+                  ${chatMode === m.id
+                    ? "border-primary bg-primary/10 shadow-light"
+                    : "border-edge hover:border-edge bg-layer-3/50 hover:bg-layer-3"
+                  }
+                `}
+              >
+                <MIcon size={16} className={chatMode === m.id ? "text-primary-hover" : "text-ink-muted group-hover:text-ink"} />
+                <span className={`text-[10px] font-medium leading-none ${chatMode === m.id ? "text-primary-hover" : "text-ink-muted group-hover:text-ink"}`}>
+                  {m.label}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
