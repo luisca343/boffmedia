@@ -4,7 +4,7 @@ import { ItemDisplay } from "../ItemDisplay";
 import { useTranslations } from "next-intl";
 import { getItemName, getItemRarity } from "@/lib/intlUtils";
 import { ArcadeInventoryItem } from "@boffmedia/shared";
-import { getRewardIcon } from "../../../_util/rewardIcons";
+import { getRewardIcon } from "../../../_utils/rewardIcons";
 
 interface CollectionGridProps {
   items: ArcadeInventoryItem[];

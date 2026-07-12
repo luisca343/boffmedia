@@ -57,7 +57,7 @@ export default function ArcadeGameCard({ title, description, href, icon, color, 
         </div>
         
         {/* Game display screen */}
-        <div className={`relative h-36 overflow-hidden bg-${color}-900/40 border-b-4 border-edge-strong`}>
+        <div className={`relative h-36 overflow-hidden ${getScreenBg(color)} border-b-4 border-edge-strong`}>
           {/* CRT screen effect */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60"></div>
           <div className="absolute inset-0 bg-[url('/images/scan-lines.png')] opacity-10"></div>
@@ -93,7 +93,7 @@ export default function ArcadeGameCard({ title, description, href, icon, color, 
           </div>
           
           {/* Game title with neon effect */}
-          <h3 className={`text-xl font-bold text-${color}-300 mb-2 ${isHovered ? 'neon-text-' + color : ''}`}>
+          <h3 className={`text-xl font-bold ${getTitleColor(color)} mb-2 ${isHovered ? 'drop-shadow-[0_0_10px_currentColor]' : ''}`}>
             {title}
           </h3>
           
@@ -143,7 +143,7 @@ function getRandomColor(index: number, mainColor: string): string {
 function getButtonColor(type: string, mainColor: string): string {
   if (type === 'red') return 'bg-red-500';
   if (type === 'green') return 'bg-warning';
-  
+
   // Make the blue button match the main color
   switch (mainColor) {
     case 'yellow': return 'bg-yellow-500';
@@ -153,5 +153,31 @@ function getButtonColor(type: string, mainColor: string): string {
     case 'purple': return 'bg-secondary';
     case 'green': return 'bg-emerald-500';
     default: return 'bg-secondary';
+  }
+}
+
+// Full literal classes so the Tailwind JIT emits them (interpolated
+// `bg-${color}-900/40` fragments are never seen by the compiler).
+function getScreenBg(color: string): string {
+  switch (color) {
+    case 'yellow': return 'bg-yellow-900/40';
+    case 'orange': return 'bg-orange-900/40';
+    case 'pink': return 'bg-pink-900/40';
+    case 'blue': return 'bg-blue-900/40';
+    case 'purple': return 'bg-purple-900/40';
+    case 'green': return 'bg-green-900/40';
+    default: return 'bg-blue-900/40';
+  }
+}
+
+function getTitleColor(color: string): string {
+  switch (color) {
+    case 'yellow': return 'text-yellow-300';
+    case 'orange': return 'text-orange-300';
+    case 'pink': return 'text-pink-300';
+    case 'blue': return 'text-blue-300';
+    case 'purple': return 'text-purple-300';
+    case 'green': return 'text-green-300';
+    default: return 'text-blue-300';
   }
 }

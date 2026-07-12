@@ -4,7 +4,7 @@ import { getItemName } from "@/lib/intlUtils";
 import { ItemImage } from "@/lib/ItemImage";
 import { calculateLootBoxOdds } from "../../_utils/calculateLootBoxOdds";
 import { LootboxBoxConfig } from "@boffmedia/shared";
-import { getRewardIcon } from "../../../_util/rewardIcons";
+import { getRewardIcon } from "../../../_utils/rewardIcons";
 
 interface LootBoxOddsProps {
   lootBox: LootboxBoxConfig;

@@ -1,7 +1,7 @@
 import { FaArchive, FaChevronLeft, FaChevronRight, FaTimes, FaDatabase } from 'react-icons/fa'
 import { PiMagnifyingGlass, PiSliders, PiX, PiTarget } from 'react-icons/pi'
 import { PCBoxData } from '@/types/dto/pc-pokemon.dto'
-import { FilterBoxData, isFilterBox } from '../../types/filter.types'
+import { FilterBoxData, isFilterBox } from '../../_types/filter.types'
 
 interface BoxHeaderProps {
   boxData: PCBoxData | FilterBoxData
