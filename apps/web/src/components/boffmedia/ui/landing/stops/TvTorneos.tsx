@@ -90,8 +90,8 @@ export function TvTorneos() {
         </div>
       </div>
       <div className={CTA_ROW}>
-        <Button variant="pri" iconRight="arrow" href="/eventos" className={PRI_GLOW}>
-          Inscribirme
+        <Button variant="pri" iconRight="arrow" href="/torneos" className={PRI_GLOW}>
+          Ver torneos
         </Button>
         <Button href="/clasificacion">Ver ranking</Button>
       </div>
