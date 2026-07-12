@@ -1,7 +1,6 @@
 "use client"
 
 import SpinnerItem from "./SpinnerItem"
-import { BOFF_VARIANTS } from "./boffVariants"
 
 interface SpinnerProps {
   spinItems: string[]
@@ -14,8 +13,7 @@ interface SpinnerProps {
   ITEM_WIDTH: number
 }
 
-const boff   = BOFF_VARIANTS.primary;
-const yellow = BOFF_VARIANTS.yellow;
+const PANEL = "polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,0 100%)"
 
 export default function Spinner({
   spinItems,
@@ -26,65 +24,60 @@ export default function Spinner({
   spinnerRef,
   itemsContainerRef,
 }: SpinnerProps) {
+  const live = isSpinning && !spinComplete
   return (
     <div className="relative w-full">
       <div
-        className="rounded-lg overflow-hidden border transition-all duration-500"
+        className="border border-line bg-panel transition-all duration-500"
         style={{
-          background: "linear-gradient(145deg, rgba(12,18,32,0.99), rgba(6,10,20,0.99))",
-          borderColor: spinComplete ? yellow.border : boff.border,
+          clipPath: PANEL,
           boxShadow: spinComplete
-            ? `0 8px 40px rgba(0,0,0,0.7), 0 0 60px ${yellow.glow}`
-            : `0 8px 40px rgba(0,0,0,0.7), 0 0 60px ${boff.glow}`,
+            ? "0 8px 40px rgba(0,0,0,0.5), 0 0 60px color-mix(in srgb, var(--accent) 16%, transparent)"
+            : "0 8px 40px rgba(0,0,0,0.5)",
         }}
       >
-        {/* Top neon bar */}
-        <div
-          className={`h-[3px] bg-gradient-to-r transition-all duration-500 ${spinComplete ? yellow.bar : boff.bar}`}
-        />
+        {/* accent signal bar */}
+        <div className="h-[3px] bg-gradient-to-r from-accent-bright to-accent" />
 
         <div className="p-4">
-          {/* Header row */}
-          <div className="flex items-center justify-between mb-4 px-1">
-            <div className="flex items-center gap-2">
-              <div
-                className="w-2 h-2 rounded-full flex-shrink-0"
-                style={{
-                  background: isSpinning && !spinComplete ? "#ef4444" : spinComplete ? yellow.text : boff.text,
-                  boxShadow: isSpinning && !spinComplete
-                    ? "0 0 8px rgba(239,68,68,0.8)"
-                    : `0 0 8px ${spinComplete ? yellow.glowStrong : boff.glowStrong}`,
-                  animation: isSpinning && !spinComplete ? "pulse 0.8s infinite" : "none",
-                }}
-              />
-              <h3
-                className="text-sm font-bold transition-all duration-300"
-                style={{
-                  color: spinComplete ? yellow.text : boff.text,
-                  fontFamily: "Orbitron, sans-serif",
-                }}
-              >
-                {spinComplete ? "¡Ganador Seleccionado!" : isSpinning ? "Sorteando..." : "Ruleta del Sorteo"}
-              </h3>
-            </div>
+          {/* header row — REC/LIVE indicator + status title */}
+          <div className="mb-4 flex items-center gap-2 px-1">
+            <span
+              className={
+                "h-2 w-2 flex-none rounded-full " +
+                (live ? "animate-[bm-pulse_0.8s_ease-in-out_infinite] bg-bad motion-reduce:animate-none" : "bg-accent")
+              }
+              style={{
+                boxShadow: live
+                  ? "0 0 8px color-mix(in srgb, var(--bad) 80%, transparent)"
+                  : "0 0 8px color-mix(in srgb, var(--accent) 60%, transparent)",
+              }}
+            />
+            <h3
+              className={
+                "font-display text-sm font-bold not-italic uppercase tracking-[0.06em] transition-colors " +
+                (spinComplete ? "text-accent" : "text-txt")
+              }
+            >
+              {spinComplete ? "¡Ganador seleccionado!" : live ? "Sorteando…" : "Ruleta del sorteo"}
+            </h3>
           </div>
 
-          {/* Viewport */}
+          {/* viewport */}
           <div
             ref={spinnerRef}
-            className="relative h-72 overflow-hidden rounded-lg border transition-all duration-500"
+            className="relative h-72 overflow-hidden border border-line-2 bg-base-deep transition-all duration-500"
             style={{
-              background: "rgba(3,5,12,0.95)",
-              borderColor: spinComplete ? yellow.border : "rgba(249,115,22,0.2)",
               boxShadow: spinComplete
-                ? `inset 0 0 50px ${yellow.glow}`
-                : `inset 0 0 30px rgba(0,0,0,0.6)`,
+                ? "inset 0 0 50px color-mix(in srgb, var(--accent) 12%, transparent)"
+                : "inset 0 0 30px rgba(0,0,0,0.55)",
+              borderColor: spinComplete ? "var(--accent-line)" : undefined,
             }}
           >
-            {/* Items */}
+            {/* items strip */}
             <div
               ref={itemsContainerRef}
-              className="absolute inset-y-0 left-0 flex items-center h-full"
+              className="absolute inset-y-0 left-0 flex h-full items-center"
               style={{
                 transform: `translateX(${-scrollPosition}px)`,
                 transition: spinComplete ? "transform 0.5s ease-out" : "none",
@@ -101,88 +94,61 @@ export default function Spinner({
               ))}
             </div>
 
-            {/* Scanlines */}
+            {/* broadcast scanlines */}
             <div
-              className="absolute inset-0 z-20 pointer-events-none"
+              className="pointer-events-none absolute inset-0 z-20 opacity-60"
               style={{
                 backgroundImage:
                   "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.18) 3px, rgba(0,0,0,0.18) 4px)",
-                opacity: 0.6,
               }}
             />
 
-            {/* Fade masks */}
-            <div
-              className="absolute inset-y-0 left-0 w-36 z-30 pointer-events-none"
-              style={{ background: "linear-gradient(to right, rgba(3,5,12,1) 40%, transparent)" }}
-            />
-            <div
-              className="absolute inset-y-0 right-0 w-36 z-30 pointer-events-none"
-              style={{ background: "linear-gradient(to left, rgba(3,5,12,1) 40%, transparent)" }}
-            />
+            {/* edge fade masks */}
+            <div className="pointer-events-none absolute inset-y-0 left-0 z-30 w-36" style={{ background: "linear-gradient(to right, var(--bg-deep) 40%, transparent)" }} />
+            <div className="pointer-events-none absolute inset-y-0 right-0 z-30 w-36" style={{ background: "linear-gradient(to left, var(--bg-deep) 40%, transparent)" }} />
 
-            {/* Center selection indicator */}
-            <div className="absolute inset-y-0 left-1/2 -translate-x-[1px] z-40 pointer-events-none flex flex-col items-center">
-              {/* Top arrow */}
-              <div
+            {/* center selection reticle */}
+            <div className="pointer-events-none absolute inset-y-0 left-1/2 z-40 flex -translate-x-[1px] flex-col items-center">
+              <span
                 style={{
                   width: 0,
                   height: 0,
                   borderLeft: "10px solid transparent",
                   borderRight: "10px solid transparent",
-                  borderTop: `14px solid ${spinComplete ? yellow.text : boff.text}`,
-                  filter: `drop-shadow(0 0 6px ${spinComplete ? yellow.glowStrong : boff.glowStrong})`,
-                  transition: "border-color 0.5s ease",
+                  borderTop: "14px solid var(--accent)",
+                  filter: "drop-shadow(0 0 6px color-mix(in srgb, var(--accent) 60%, transparent))",
                 }}
               />
-              {/* Vertical line */}
-              <div
-                className="flex-1 w-[2px]"
-                style={{
-                  background: spinComplete
-                    ? `linear-gradient(to bottom, ${yellow.text}, rgba(250,204,21,0.08))`
-                    : `linear-gradient(to bottom, ${boff.text}, rgba(249,115,22,0.08))`,
-                  transition: "background 0.5s ease",
-                }}
-              />
-              {/* Bottom arrow */}
-              <div
+              <span className="w-[2px] flex-1" style={{ background: "linear-gradient(to bottom, var(--accent), color-mix(in srgb, var(--accent) 8%, transparent))" }} />
+              <span
                 style={{
                   width: 0,
                   height: 0,
                   borderLeft: "10px solid transparent",
                   borderRight: "10px solid transparent",
-                  borderBottom: `14px solid ${spinComplete ? yellow.text : boff.text}`,
-                  filter: `drop-shadow(0 0 6px ${spinComplete ? yellow.glowStrong : boff.glowStrong})`,
-                  transition: "border-color 0.5s ease",
+                  borderBottom: "14px solid var(--accent)",
+                  filter: "drop-shadow(0 0 6px color-mix(in srgb, var(--accent) 60%, transparent))",
                 }}
               />
             </div>
           </div>
 
-          {/* Status row */}
-          <div className="mt-3 flex items-center justify-center gap-2 min-h-[20px]">
+          {/* status row */}
+          <div className="mt-3 flex min-h-[20px] items-center justify-center gap-2">
             {!spinComplete ? (
               <div className="flex gap-1.5">
-                {[0, 0.25, 0.5].map((delay, i) => (
-                  <div
-                    key={i}
-                    className="w-1.5 h-1.5 rounded-full animate-bounce"
-                    style={{ background: boff.text, animationDelay: `${delay}s`, opacity: 0.7 }}
-                  />
+                {[0, 0.16, 0.32].map((delay, i) => (
+                  <span key={i} className="h-1.5 w-1.5 animate-bounce rounded-full bg-accent opacity-70 motion-reduce:animate-none" style={{ animationDelay: `${delay}s` }} />
                 ))}
               </div>
             ) : (
-              <span
-                className="text-xs font-bold tracking-[0.2em] uppercase"
-                style={{ color: yellow.text, fontFamily: "Orbitron, sans-serif" }}
-              >
-                ✓ Ganador confirmado
+              <span className="inline-flex items-center gap-[6px] font-mono text-xs font-bold uppercase tracking-[0.18em] text-accent">
+                <span aria-hidden="true">✓</span> Ganador confirmado
               </span>
             )}
           </div>
         </div>
       </div>
     </div>
-  );
+  )
 }

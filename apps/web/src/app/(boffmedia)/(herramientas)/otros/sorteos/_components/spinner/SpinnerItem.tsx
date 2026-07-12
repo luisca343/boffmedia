@@ -1,5 +1,4 @@
-import { motion } from "framer-motion"
-import { BOFF_VARIANTS } from "./boffVariants"
+"use client"
 
 interface SpinnerItemProps {
   name: string
@@ -8,100 +7,77 @@ interface SpinnerItemProps {
   spinComplete: boolean
 }
 
-const yellowBoff = BOFF_VARIANTS.yellow;
-
-function nameToHue(name: string): number {
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = (hash * 31 + name.charCodeAt(i)) & 0xffff;
-  }
-  const hues = [210, 265, 145, 185, 320, 45, 25, 290];
-  return hues[hash % hues.length];
-}
+// cut-seal chamfer (top-left + bottom-right) — the v3 idiom for identity glyphs.
+const SEAL = "polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)"
+// cut-corner (beveled top-right) — the v3 idiom for cards/panels.
+const CARD = "polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%)"
 
 function getInitials(name: string): string {
-  const parts = name.trim().split(/\s+/);
-  if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
-  return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+  const parts = name.trim().split(/\s+/).filter(Boolean)
+  if (!parts.length) return "?"
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
 }
 
-export default function SpinnerItem({ name, index, isWinningItem, spinComplete }: SpinnerItemProps) {
-  const showWin = isWinningItem && spinComplete;
-  const hue     = nameToHue(name);
-  const initials = getInitials(name);
+export default function SpinnerItem({ name, isWinningItem, spinComplete }: SpinnerItemProps) {
+  const showWin = isWinningItem && spinComplete
+  const initials = getInitials(name)
 
   return (
     <div
-      key={`${name}-${index}`}
-      className="relative flex-shrink-0 h-64 mx-[10px] p-4 rounded-lg flex flex-col items-center justify-center transition-all duration-500"
+      // width 180 + mx 10*2 = 200px, matching the hook's ITEM_WIDTH (do not change)
+      className={
+        "relative mx-[10px] flex h-64 w-[180px] flex-none flex-col items-center justify-center p-4 transition-all duration-500 " +
+        (showWin
+          ? "scale-[1.06] border border-accent bg-accent-soft"
+          : "border border-line-2 bg-panel-2")
+      }
       style={{
-        width: "180px",
-        border: showWin
-          ? `1.5px solid ${yellowBoff.border}`
-          : `1px solid hsla(${hue}, 45%, 28%, 0.65)`,
-        background: showWin
-          ? "linear-gradient(160deg, rgba(42,33,5,0.98), rgba(22,17,2,0.99))"
-          : `linear-gradient(160deg, hsl(${hue}, 22%, 10%), hsl(${hue}, 16%, 7%))`,
+        clipPath: CARD,
         boxShadow: showWin
-          ? `0 0 30px ${yellowBoff.glowStrong}, 0 0 80px ${yellowBoff.glow}, inset 0 0 20px rgba(250,204,21,0.04)`
-          : `0 4px 20px hsla(${hue}, 50%, 18%, 0.2)`,
-        transform: showWin ? "scale(1.07)" : "scale(1)",
+          ? "0 0 30px color-mix(in srgb, var(--accent) 34%, transparent), 0 0 80px color-mix(in srgb, var(--accent) 14%, transparent)"
+          : "none",
       }}
     >
-      {/* Initials avatar */}
+      {/* winner backdrop glow */}
+      {showWin && (
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 animate-[bm-pulse_1.5s_ease-in-out_infinite] motion-reduce:animate-none"
+          style={{ background: "radial-gradient(ellipse at center, color-mix(in srgb, var(--accent) 10%, transparent), transparent 70%)" }}
+        />
+      )}
+
+      {/* initials seal */}
       <div
-        className="w-20 h-20 rounded-full flex items-center justify-center mb-3 font-black text-2xl select-none shadow-lg"
+        className={
+          "mb-3 grid h-20 w-20 select-none place-items-center border font-display text-2xl font-extrabold not-italic " +
+          (showWin ? "border-accent-line bg-accent text-accent-ink" : "border-line-2 bg-base-deep text-txt-muted")
+        }
         style={{
-          background: showWin
-            ? "linear-gradient(135deg, rgba(250,204,21,0.9), rgba(234,179,8,0.75))"
-            : `linear-gradient(135deg, hsl(${hue}, 55%, 32%), hsl(${hue}, 45%, 20%))`,
-          color: showWin
-            ? "rgba(15,12,2,0.95)"
-            : `hsl(${hue}, 80%, 92%)`,
-          fontFamily: "Orbitron, sans-serif",
-          boxShadow: showWin
-            ? `0 0 20px ${yellowBoff.glow}, 0 4px 16px rgba(0,0,0,0.5)`
-            : `0 4px 14px hsla(${hue}, 50%, 18%, 0.35)`,
-          letterSpacing: initials.length > 1 ? "-0.05em" : "0",
+          clipPath: SEAL,
+          letterSpacing: initials.length > 1 ? "-0.03em" : "0",
         }}
       >
         {initials}
       </div>
 
-      {/* Name */}
+      {/* name */}
       <p
-        className="font-semibold text-center text-xs truncate max-w-full px-2 tracking-wide"
-        style={{
-          color: showWin ? yellowBoff.text : `hsl(${hue}, 60%, 78%)`,
-        }}
+        className={
+          "max-w-full truncate px-2 text-center font-mono text-xs font-medium tracking-[0.02em] " +
+          (showWin ? "text-accent" : "text-txt-muted")
+        }
       >
         {name}
       </p>
 
-      {/* Winning badge + glow */}
+      {/* winner tag */}
       {showWin && (
-        <>
-          <motion.div
-            animate={{ scale: [1, 1.2, 1], opacity: [0.12, 0.38, 0.12] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-            className="absolute inset-0 rounded-lg pointer-events-none"
-            style={{ background: `radial-gradient(ellipse at center, ${yellowBoff.tint}, transparent 70%)` }}
-          />
-          <motion.span
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-            className="mt-2 text-[10px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded"
-            style={{
-              color: "rgba(12,9,2,0.95)",
-              background: yellowBoff.text,
-              fontFamily: "Orbitron, sans-serif",
-            }}
-          >
-            GANADOR
-          </motion.span>
-        </>
+        <span className="mt-2 animate-[bm-fade_0.3s_ease-out] bg-accent px-[10px] py-[2px] font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-accent-ink motion-reduce:animate-none">
+          Ganador
+        </span>
       )}
     </div>
-  );
+  )
 }
