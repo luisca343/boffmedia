@@ -1,427 +1,169 @@
 "use client";
-import { strToDate } from "@/lib/utils";
-import { useEffect, useState } from "react";
-import {
-  BankSection,
-  BankSectionButton,
-  BankSectionContent,
-  BankSectionFooter,
-  BankSectionHeader,
-} from "./_components/BankSection";
-import { AccountImage } from "./_components/AccountImage";
-import { formatMoney, getActiveAccountBalance, changeActiveAccount } from "./bankUtils";
+import * as React from "react";
 import { useRouter } from "next/navigation";
-import { AccountSelect } from "./_components/AccountSelect";
-import {
-  AreaChart,
-  Area,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
-
-import { ArrowRight, DollarSign, CreditCard, Send } from 'lucide-react';
-import { useBoffSession } from "@/services/useBoffSession";
-import { useGetTransactions } from "@/hooks/starbank/useGetTransactions";
-import { useGetTransfers } from "@/hooks/starbank/useGetTransfers";
-import { InternalLink } from "@/components/ui/navigation/Link";
-import { DashboardSkeleton } from "./_components/DashBoardSkeleton";
-import { StarBankTransaction } from "@boffmedia/shared";
 import useStarBank from "./_hooks/useStarBank";
+import { useGetTransactions } from "@/hooks/starbank/useGetTransactions";
+import { PageHeader, Card, SectionHead, CardBody, Kpi, Button, Ico, AccountAvatar, Skeleton, type IconName } from "./_components/ui";
+import { TxRow } from "./_components/TxRow";
+import { TxDetail } from "./_components/TxDetail";
+import { HeroBalance } from "./_components/dashboard/HeroBalance";
+import { income, expense, savingsRate, balanceSeries, periodDelta } from "./_utils/analytics";
+import { formatMoney } from "./_utils/format";
+import { displayName } from "./_utils/account";
+import type { SBTransaction } from "./_types";
 
-export default function StarBank() {
+const BASE = "/smartrotom/starbank";
+const DAY = 86_400_000;
+
+export default function Dashboard() {
   const router = useRouter();
-  const { session } = useBoffSession();
-  const { accounts, activeAccount, setActiveAccount } = useStarBank();
+  const { accounts, activeAccount } = useStarBank();
+  const accId = activeAccount?.id ?? -1;
+  const { transactions, isLoading } = useGetTransactions(accId, 100);
+  const [openTx, setOpenTx] = React.useState<SBTransaction | null>(null);
 
-  const { transactions, error: transactionsError, isLoading: transactionsLoading } = useGetTransactions(activeAccount?.id ?? -1, 100);
-  const { transfers, error: transfersError, isLoading: transfersLoading } = useGetTransfers(activeAccount?.id ?? -1);
+  if (!activeAccount || isLoading) return <DashboardSkeleton />;
 
-  function changeAccount(account: number) {
-    changeActiveAccount(account);
-    setActiveAccount(account);
-  }
+  const txs = (transactions ?? []) as SBTransaction[];
+  const inc = income(txs, accId);
+  const exp = expense(txs, accId);
+  const sav = savingsRate(txs, accId);
+  const points = balanceSeries(txs, accId);
+  const series = points.map((p) => p.balance);
+  const recent = txs.slice(0, 6);
 
-  function getData() {
-    return transactions
-      ?.slice()
-      .reverse()
-      .reduce((acc: any, transaction: any) => {
-        const transactionType =
-          transaction.from === activeAccount?.id ? "out" : "in";
-        const currentBalance =
-          transactionType === "out"
-            ? transaction.fromBalance
-            : transaction.toBalance;
+  const now = Date.now();
+  const weekAgo = [...points].reverse().find((p) => now - +new Date(p.date) >= 7 * DAY);
+  const weekAgoBal = weekAgo?.balance ?? points[0]?.balance;
+  const weekDelta = weekAgoBal
+    ? { amount: activeAccount.balance - weekAgoBal, pct: ((activeAccount.balance - weekAgoBal) / weekAgoBal) * 100 }
+    : undefined;
 
-        acc.push({
-          name: strToDate(transaction.date),
-          balance: currentBalance,
-        });
-        return acc;
-      }, []) || [];
-  }
-
-  function TestChart({
-    data,
-    className,
-  }: {
-    data?: { name: string; balance: number }[];
-    className?: string;
-  }) {
-    return (
-      <ResponsiveContainer width="100%" height="100%">
-        <AreaChart
-          width={100}
-          height={100}
-          data={data}
-          margin={{
-            top: 5,
-            right: 5,
-            left: -25,
-            bottom: 5,
-          }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <YAxis />
-          <Tooltip />
-          <Area
-            type="monotone"
-            dataKey="balance"
-            stroke="#1e3a8a"
-            fill="#3b82f6"
-            activeDot={{ r: 8 }}
-          />
-        </AreaChart>
-      </ResponsiveContainer>
-    );
-  }
-
-  function GraficaYTal() {
-    return <TestChart data={getData()} className="h-full " />;
-  }
-
-  if (!accounts || transactionsLoading || transfersLoading) {
-    return <DashboardSkeleton />;
-  }
-
-  if (transactionsError || transfersError) {
-    return <div>Error: {transactionsError || transfersError}</div>;
-  }
+  const today = new Date().toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" });
 
   return (
-    <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8 py-8 h-full flex flex-col">
-      <section className="w-full grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Balance Card */}
-        <BankSection className="h-64 md:col-span-1">
-          <BankSectionHeader>Balance de cuenta</BankSectionHeader>
-          <BankSectionContent>
-            <div className="flex flex-col h-full justify-center">
-              <div className="text-4xl 2xl:text-5xl font-bold text-blue-700">
-                {formatMoney(activeAccount?.balance ?? 0)}
-              </div>
-              <div className="text-sm text-blue-500 mt-2">
-                Cuenta {activeAccount?.name || "Principal"}
-              </div>
-            </div>
-          </BankSectionContent>
-          <BankSectionFooter>
-            <div className="flex flex-col w-full justify-center">
-              <span className="text-xs xl:text-lg text-blue-800">
-                Cambiar de Cuenta
-              </span>
-              <AccountSelect
-                accounts={accounts}
-                activeAccount={activeAccount?.id ?? -1}
-                setActiveAccount={changeAccount}
-              />
-            </div>
-          </BankSectionFooter>
-        </BankSection>
-  
-        {/* Chart Card */}
-        <BankSection className="h-64 md:col-span-2">
-          <BankSectionHeader>Movimientos Recientes</BankSectionHeader>
-          <BankSectionContent>
-            <GraficaYTal />
-          </BankSectionContent>
-        </BankSection>
-  
-        {/* Quick Actions */}
-        <BankSection className="md:col-span-3">
-          <BankSectionHeader>Acciones Rápidas</BankSectionHeader>
-          <BankSectionContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <InternalLink 
-                href="starbank/enviar" 
-                className="group relative overflow-hidden flex flex-1 items-center justify-center p-6 border-2 border-blue-200 rounded-xl bg-gradient-to-br from-blue-50 to-white hover:from-blue-100 hover:to-blue-50 transition-all duration-300 hover:shadow-lg hover:scale-105"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-3 bg-blue-100 rounded-full group-hover:bg-blue-200 transition-colors">
-                    <DollarSign className="text-blue-700 h-6 w-6" />
-                  </div>
-                  <div>
-                    <span className="text-blue-900 font-semibold block">Transferir Dinero</span>
-                    <span className="text-blue-600 text-sm">Envía dinero rápidamente</span>
-                  </div>
-                </div>
-                <div className="absolute top-0 right-0 w-20 h-20 bg-blue-200 rounded-full -mr-10 -mt-10 opacity-20"></div>
-              </InternalLink>
-              
-              <InternalLink 
-                href="starbank/cuentas" 
-                className="group relative overflow-hidden flex flex-1 items-center justify-center p-6 border-2 border-blue-200 rounded-xl bg-gradient-to-br from-blue-50 to-white hover:from-blue-100 hover:to-blue-50 transition-all duration-300 hover:shadow-lg hover:scale-105"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-3 bg-blue-100 rounded-full group-hover:bg-blue-200 transition-colors">
-                    <CreditCard className="text-blue-700 h-6 w-6" />
-                  </div>
-                  <div>
-                    <span className="text-blue-900 font-semibold block">Administrar Cuentas</span>
-                    <span className="text-blue-600 text-sm">Gestiona tus cuentas</span>
-                  </div>
-                </div>
-                <div className="absolute top-0 right-0 w-20 h-20 bg-blue-200 rounded-full -mr-10 -mt-10 opacity-20"></div>
-              </InternalLink>
-              
-              <InternalLink 
-                href="starbank/facturas" 
-                className="group relative overflow-hidden flex flex-1 items-center justify-center p-6 border-2 border-blue-200 rounded-xl bg-gradient-to-br from-blue-50 to-white hover:from-blue-100 hover:to-blue-50 transition-all duration-300 hover:shadow-lg hover:scale-105"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-3 bg-blue-100 rounded-full group-hover:bg-blue-200 transition-colors">
-                    <Send className="text-blue-700 h-6 w-6" />
-                  </div>
-                  <div>
-                    <span className="text-blue-900 font-semibold block">Pagar Facturas</span>
-                    <span className="text-blue-600 text-sm">Gestiona tus pagos</span>
-                  </div>
-                </div>
-                <div className="absolute top-0 right-0 w-20 h-20 bg-blue-200 rounded-full -mr-10 -mt-10 opacity-20"></div>
-              </InternalLink>
-            </div>
-          </BankSectionContent>
-        </BankSection>
-  
-        {/* Recent Transactions */}
-        <BankSection className="h-96 overflow-auto md:col-span-3">
-          <BankSectionHeader>Transacciones Recientes</BankSectionHeader>
-          <BankSectionContent>
-            <Transactions
-              trans={transactions}
-              activeAccount={activeAccount?.id ?? -1}
-              fecth={false}
-            />
-          </BankSectionContent>
-          <BankSectionFooter>
-            <InternalLink
-              href="starbank/transacciones"
-              className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center py-2 rounded-lg transition-colors"
-            >
-              Ver todas las transacciones <ArrowRight className="ml-2 -mr-1 h-4 w-4" />
-            </InternalLink>
-          </BankSectionFooter>
-        </BankSection>
-      </section>
-    </div>
-  );
-}
+    <>
+      <PageHeader
+        title={`Hola, ${displayName((accounts?.find((a) => a.type === "MAIN") ?? activeAccount).name)}`}
+        sub={`Aquí tienes el resumen de tu cuenta · ${today}`}
+        actions={
+          <Button variant="primary" href={`${BASE}/enviar`}>
+            <Ico name="send" size={16} /> Enviar
+          </Button>
+        }
+      />
 
-function TransfersShort({
-  transfers,
-  activeAccount,
-}: {
-  transfers: any;
-  activeAccount: any;
-}) {
-  return (
-    <div className="flex justify-evenly flex-wrap ">
-      {transfers.map((transfer: any) => {
-        const transactionType =
-          transfer.from === activeAccount.id ? "out" : "in";
-        const amount =
-          transactionType === "out" ? -transfer.amount : transfer.amount;
-        const currentBalance =
-          transactionType === "out" ? transfer.fromBalance : transfer.toBalance;
-        const name =
-          transactionType === "out" ? transfer.toName : transfer.fromName;
-        const type =
-          transactionType === "out" ? transfer.toType : transfer.fromType;
+      <HeroBalance account={activeAccount} series={series} weekDelta={weekDelta} />
 
-        return (
-          <div
-            className="flex flex-col justify-center items-center"
-            key={transfer.date}
-          >
-            <div className="flex hover:bg-opacity-50 items-center my-1">
-              <AccountImage width={32} type={type} name={name} image={(transfer as any).image} />
-              <div
-                className={`text-right my-auto mx-2 ${
-                  esPagador(transfer, activeAccount)
-                    ? "text-red-800"
-                    : "text-warning"
-                }`}
-              >
-                <div className="font-bold text-lg text-shadow-border05">
-                  {formatMoney(amount)}
-                </div>
-              </div>
-            </div>
-            <div className="flex text-xs text-center">
-              {strToDate(transfer.date)} - {name}
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function TablaTransacciones({
-  transactions,
-  activeAccount,
-}: {
-  transactions: any;
-  activeAccount: any;
-}) {
-  return (
-    <div className="relative overflow-x-auto shadow-sm rounded-lg">
-      <table className="min-w-full divide-y divide-edge">
-        <thead className="sticky top-0 z-10 bg-blue-50">
-          <tr>
-            <th colSpan={2} className="px-6 py-3 text-left text-xs font-medium text-blue-800 uppercase tracking-wider">Información</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-blue-800 uppercase tracking-wider">
-              Cantidad
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-blue-800 uppercase tracking-wider">
-              Fecha
-            </th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-edge">
-          {transactions.map((transaction: StarBankTransaction) => {
-            const isPayer = esPagador(transaction, activeAccount);
-            return (
-              <tr key={transaction.date} className="hover:bg-blue-50 transition-colors">
-                <td className="py-4 pl-6 whitespace-nowrap">
-                  <AccountImage type={transaction.displayAccountType} name={transaction.displayName} image={(transaction as any).displayImage}/>
-                </td>
-                <td className="pr-6 py-4">
-                  <div className="text-sm font-medium text-blue-900">{transaction.reason}</div>
-                  <div className="text-xs text-blue-500">{transaction.displayName}</div>
-                </td>
-                <td className={`px-6 py-4 whitespace-nowrap font-medium ${
-                  isPayer ? "text-red-600" : "text-emerald-600"
-                }`}>
-                  <div className="flex items-center">
-                    {isPayer ? "- " : "+ "}
-                    {formatMoney(transaction.amount)}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-900">
-                  {strToDate(transaction.date)}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-/*
-        return (
-          <div
-            key={transaction.date}
-            className="flex  hover:bg-opacity-50 items-center my-1"
-          >
-            <AccountImage type={type} name={name} />
-            <div className="min-h-9 my-auto mx-4 flex flex-col flex-1">
-              <div className="text-lg font-bold break-all">
-                {transaction.reason}
-              </div>
-              <div className="text-sm ">
-                {strToDate(transaction.date)} - {name}
-              </div>
-            </div>
-            <div
-              className={`text-right my-auto ${
-                esPagador(transaction, activeAccount)
-                  ? "text-red-800"
-                  : "text-warning"
-              }`}
-            >
-              <div className="font-bold text-xl text-shadow-border05">
-                {formatMoney(amount)}
-              </div>
-              <div className="text-md">{formatMoney(currentBalance)}</div>
-            </div>
-          </div>
-        );*/
-
-function Transactions({
-  trans,
-  activeAccount,
-  className,
-  fecth = true,
-}: {
-  trans: any;
-  activeAccount: number;
-  className?: string;
-  fecth?: boolean;
-}) {
-  const [transactions, setTransactions] = useState<StarBankTransaction[]>([]);
-  const { transactions: fetchedTransactions, isLoading, error } = useGetTransactions(activeAccount, 100);
-
-
-  useEffect(() => {
-    if (!fetch) {
-      setTransactions(trans);
-    } else if (fetchedTransactions) {
-      setTransactions(fetchedTransactions);
-    }
-  }, [fetch, trans, fetchedTransactions]);
-
-  if (isLoading) {
-    return (
-      <div className="h-full p-2 overflow-auto">
-        <div className="text-center 2xl:text-2xl font-bold">
-          Cargando transacciones...
-        </div>
+      <div className="grid gap-4 md:grid-cols-3">
+        <Kpi label="Ingresos del periodo" value={formatMoney(inc)} icon="arrUR" tone="pos" delta={periodDelta(txs, accId, 30, income)} sub="vs. periodo anterior" />
+        <Kpi label="Gastos del periodo" value={formatMoney(exp)} icon="arrDR" tone="neg" delta={periodDelta(txs, accId, 30, expense)} sub="vs. periodo anterior" />
+        <Kpi label="Tasa de ahorro" value={`${sav.toFixed(0)} %`} icon="shield" tone="brand" sub={`Has guardado ${formatMoney(Math.max(0, inc - exp))}`} />
       </div>
-    );
-  }
 
-  if (error) {
-    return (
-      <div className="h-full p-2 overflow-auto">
-        <div className="text-center 2xl:text-2xl font-bold text-red-600">
-          Error al cargar las transacciones
-        </div>
-      </div>
-    );
-  }
+      <div className="grid gap-4 md:grid-cols-12">
+        <Card className="md:col-span-8">
+          <SectionHead eyebrow="Atajos" title="Acciones rápidas" />
+          <CardBody>
+            <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-4">
+              <QuickAction icon="send" t1="Enviar dinero" t2="A un entrenador o tienda" onClick={() => router.push(`${BASE}/enviar`)} />
+              <QuickAction icon="card" t1="Mover entre cuentas" t2="Reorganiza tu dinero" onClick={() => router.push(`${BASE}/cuentas`)} />
+              <QuickAction icon="qrcode" t1="Solicitar pago" t2="Comparte tu código" />
+              <QuickAction icon="cal" t1="Programar pago" t2="Pagos recurrentes" onClick={() => router.push(`${BASE}/calendario`)} />
+            </div>
+          </CardBody>
+        </Card>
 
-  if (transactions.length === 0) {
-    return (
-      <div className="h-full p-2 overflow-auto">
-        <div className="text-center 2xl:text-2xl font-bold">
-          No hay transacciones
-        </div>
+        <Card className="md:col-span-4">
+          <SectionHead eyebrow="7 días" title="Próximos pagos" action={<Button variant="ghost" size="sm" href={`${BASE}/calendario`}>Ver todo</Button>} />
+          <CardBody className="items-center justify-center py-10 text-center">
+            <div className="grid size-12 place-items-center rounded-full bg-sb-surface-3 text-sb-fg-subtle">
+              <Ico name="cal" size={22} />
+            </div>
+            <div className="text-[13px] text-sb-fg-muted">Sin pagos programados</div>
+          </CardBody>
+        </Card>
       </div>
-    );
-  }
-  
-  return (
-    <TablaTransacciones
-      transactions={transactions}
-      activeAccount={activeAccount}
-    />
+
+      <div className="grid gap-4 md:grid-cols-12">
+        <Card className="md:col-span-8">
+          <SectionHead eyebrow="Últimos movimientos" title="Transacciones recientes" action={<Button variant="ghost" size="sm" href={`${BASE}/transacciones`}>Ver todas <Ico name="arrR" size={14} /></Button>} />
+          <CardBody noPad>
+            {recent.length === 0 ? (
+              <div className="px-5 py-10 text-center text-[13px] text-sb-fg-muted">No hay transacciones todavía</div>
+            ) : (
+              <div className="flex flex-col">
+                {recent.map((tx, i) => (
+                  <TxRow key={`${tx.date}-${i}`} tx={tx} activeAccountId={accId} onClick={setOpenTx} />
+                ))}
+              </div>
+            )}
+          </CardBody>
+        </Card>
+
+        <Card className="md:col-span-4">
+          <SectionHead eyebrow={`${accounts?.length ?? 0} cuentas`} title="Tus cuentas" action={<Button variant="ghost" size="sm" href={`${BASE}/cuentas`}>Gestionar</Button>} />
+          <CardBody noPad className="pb-3.5">
+            {(accounts ?? []).map((acc) => (
+              <button
+                key={acc.id}
+                type="button"
+                onClick={() => router.push(`${BASE}/cuentas`)}
+                className="flex items-center gap-3 border-t border-sb-border px-5 py-2.5 text-left transition-colors first:border-t-0 hover:bg-sb-surface-2"
+              >
+                <AccountAvatar account={acc} size={36} square />
+                <div className="min-w-0 flex-1">
+                  <div className="text-[13.5px] font-semibold">{displayName(acc.name)}</div>
+                  <div className="text-[11.5px] text-sb-fg-muted">{acc.type === "MAIN" ? "Cuenta principal" : "Cuenta secundaria"}</div>
+                </div>
+                <div className="text-[13.5px] font-semibold tabular-nums">{formatMoney(acc.balance)}</div>
+              </button>
+            ))}
+          </CardBody>
+        </Card>
+      </div>
+
+      {openTx && <TxDetail tx={openTx} activeAccountId={accId} onClose={() => setOpenTx(null)} />}
+    </>
   );
 }
 
-function esPagador(transaction: any, activeAccount: any) {
-  return transaction.from == activeAccount?.id;
+function QuickAction({ icon, t1, t2, onClick }: { icon: IconName; t1: string; t2: string; onClick?: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="group flex items-center gap-3 rounded-sb-md border border-sb-border bg-sb-surface p-3.5 text-left transition-all hover:border-sb-300 hover:bg-sb-50 hover:shadow-sb-2"
+    >
+      <span className="grid size-[38px] shrink-0 place-items-center rounded-[10px] bg-sb-surface-3 text-sb-700 transition-colors group-hover:bg-sb-100">
+        <Ico name={icon} size={18} />
+      </span>
+      <div>
+        <div className="text-[13.5px] font-semibold text-sb-fg">{t1}</div>
+        <div className="text-[11.5px] text-sb-fg-muted">{t2}</div>
+      </div>
+    </button>
+  );
+}
+
+function DashboardSkeleton() {
+  return (
+    <>
+      <div className="flex items-end justify-between gap-4">
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-4 w-64" />
+        </div>
+        <Skeleton className="h-9 w-24 rounded-sb-md" />
+      </div>
+      <Skeleton className="h-[240px] w-full rounded-sb-xl" />
+      <div className="grid gap-4 md:grid-cols-3">
+        {[0, 1, 2].map((i) => <Skeleton key={i} className="h-[104px] rounded-sb-lg" />)}
+      </div>
+      <div className="grid gap-4 md:grid-cols-12">
+        <Skeleton className="h-48 rounded-sb-lg md:col-span-8" />
+        <Skeleton className="h-48 rounded-sb-lg md:col-span-4" />
+      </div>
+    </>
+  );
 }

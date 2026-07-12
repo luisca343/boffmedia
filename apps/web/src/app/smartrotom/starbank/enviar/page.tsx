@@ -1,111 +1,240 @@
-"use client"
-import { BankSection, BankSectionContent, BankSectionHeader } from "../_components/BankSection";
-import { SendMoney } from "../_components/SendMoney";
-import { BanknotesIcon, ArrowPathIcon, ChartBarIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
+"use client";
+import * as React from "react";
+import { useBoffSession } from "@/services/useBoffSession";
+import { useGetAccounts } from "@/hooks/starbank/useGetAccounts";
+import { useGetAllAccounts } from "@/hooks/starbank/useGetAllAccounts";
+import { useTransfer } from "@/hooks/starbank/useTransfer";
+import { PageHeader, Card, Button, Ico, Stepper, Label, Input, Select, ContactAvatar, AccountAvatar } from "../_components/ui";
+import { formatMoney } from "../_utils/format";
+import { displayName } from "../_utils/account";
+import { cn } from "@/lib/utils";
+import type { SBAccount } from "../_types";
 
-export default function EnviarDinero() {
-  const [showRecent, setShowRecent] = useState(false);
-  
+const BASE = "/smartrotom/starbank";
+const PRESETS = [1000, 5000, 10000, 25000, 50000];
+const STEPS = ["Destinatario", "Importe", "Revisar"];
+
+export default function Enviar() {
+  const { session } = useBoffSession();
+  const { accounts: myAccounts } = useGetAccounts(session?.user?.smartRotomUser?.uuid!);
+  const { accounts: allAccounts } = useGetAllAccounts();
+  const { transfer, isLoading } = useTransfer();
+
+  const [step, setStep] = React.useState(0);
+  const [recipient, setRecipient] = React.useState<SBAccount | null>(null);
+  const [from, setFrom] = React.useState<number>(-1);
+  const [amountStr, setAmountStr] = React.useState("");
+  const [concept, setConcept] = React.useState("");
+  const [q, setQ] = React.useState("");
+  const [done, setDone] = React.useState(false);
+  const [error, setError] = React.useState("");
+
+  const mine = (myAccounts ?? []) as SBAccount[];
+  const everyone = (allAccounts ?? []) as SBAccount[];
+
+  React.useEffect(() => {
+    if (from === -1 && mine.length > 0) setFrom(mine[0].id);
+  }, [mine, from]);
+
+  const fromAcc = mine.find((a) => a.id === from);
+  const q2 = q.trim().toLowerCase();
+  const myTargets = React.useMemo(
+    () => mine.filter((a) => !q2 || a.name.toLowerCase().includes(q2)),
+    [mine, q2],
+  );
+  const otherTargets = React.useMemo(
+    () => everyone.filter((a) => !mine.some((m) => m.id === a.id) && (!q2 || a.name.toLowerCase().includes(q2))),
+    [everyone, mine, q2],
+  );
+
+  const amount = Math.round(Number(amountStr.replace(/\./g, "").replace(",", ".")) || 0);
+  const canNext1 = !!recipient;
+  const canNext2 = amount > 0 && !!fromAcc && amount <= fromAcc.balance && recipient?.id !== from;
+
+  async function finish() {
+    if (!recipient || !fromAcc) return;
+    setError("");
+    try {
+      await transfer({ from: fromAcc.id, to: recipient.id, amount, concept: concept || "Transferencia" } as any);
+      setDone(true);
+    } catch {
+      setError("No se pudo completar la transferencia");
+    }
+  }
+
+  if (done && recipient && fromAcc) {
+    return (
+      <div className="mx-auto mt-14 w-full max-w-[460px] animate-in fade-in duration-300">
+        <Card className="p-10 text-center">
+          <div className="mx-auto mb-5 grid size-20 place-items-center rounded-full bg-sb-pos-soft text-sb-pos">
+            <Ico name="check" size={36} />
+          </div>
+          <h2 className="m-0 mb-1.5 font-sb-display text-[24px] font-semibold">¡Transferencia enviada!</h2>
+          <div className="mb-4 text-sb-fg-muted">
+            Has enviado <strong className="tabular-nums text-sb-fg">{formatMoney(amount)}</strong> a <strong>{displayName(recipient.name)}</strong>
+          </div>
+          <div className="mb-4 font-sb-display text-[48px] font-semibold tabular-nums text-sb-fg">{formatMoney(amount)}</div>
+          <div className="rounded-sb-md bg-sb-surface-2 p-3.5 text-left text-[13px]">
+            <div className="flex justify-between"><span className="text-sb-fg-muted">De</span><span>{displayName(fromAcc.name)}</span></div>
+            <div className="mt-1.5 flex justify-between"><span className="text-sb-fg-muted">Concepto</span><span>{concept || "—"}</span></div>
+            <div className="mt-1.5 flex justify-between"><span className="text-sb-fg-muted">Referencia</span><span className="font-mono">SR-{Date.now().toString().slice(-8)}</span></div>
+          </div>
+          <div className="mt-5 flex justify-center gap-2">
+            <Button variant="secondary" onClick={() => { setDone(false); setStep(0); setRecipient(null); setAmountStr(""); setConcept(""); }}>Nueva transferencia</Button>
+            <Button variant="primary" href={`${BASE}/transacciones`}>Ver movimientos</Button>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-[90%] mx-auto py-6 px-4 sm:px-6 lg:px-8">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Main transfer section */}
-        <div className="md:col-span-2">
-          <BankSection className="h-full">
-            <BankSectionHeader>Enviar Dinero</BankSectionHeader>
-            <div className="flex items-center mb-4">
-              <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-                <BanknotesIcon className="h-6 w-6" />
-              </div>
-              <div className="ml-3">
-                <p className="text-sm text-blue-600">
-                  Transfiere dinero de forma segura a cualquier cuenta
-                </p>
+    <>
+      <PageHeader title="Enviar dinero" sub="Transfiere a otro entrenador, tienda o cuenta tuya" />
+
+      <Card className="p-6">
+        <Stepper steps={STEPS} current={step} />
+
+        {step === 0 && (
+          <div className="mx-auto flex w-full max-w-[720px] flex-col gap-[18px]">
+            <div>
+              <Label htmlFor="recip">Buscar destinatario</Label>
+              <div className="relative">
+                <Ico name="search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-sb-fg-subtle" />
+                <Input id="recip" className="pl-9" placeholder="Nombre de la cuenta…" value={q} onChange={(e) => setQ(e.target.value)} />
               </div>
             </div>
-            <BankSectionContent>
-              <SendMoney />
-            </BankSectionContent>
-          </BankSection>
-        </div>
-        
-        {/* Right sidebar with helpful information */}
-        <div className="md:col-span-1">
-          <div className="space-y-6">
-            {/* Tips section */}
-            <BankSection className="bg-blue-50">
-              <BankSectionHeader>Tips de Transferencia</BankSectionHeader>
-              <ul className="space-y-3 text-sm text-blue-700">
-                <li className="flex items-start">
-                  <span className="mr-2 text-blue-500">•</span>
-                  <span>Verifica siempre el nombre del receptor</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-2 text-blue-500">•</span>
-                  <span>Confirma el monto antes de enviar</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-2 text-blue-500">•</span>
-                  <span>Las transferencias son instantáneas</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-2 text-blue-500">•</span>
-                  <span>Mantén un historial de tus transferencias</span>
-                </li>
-              </ul>
-            </BankSection>
-            
-            {/* Recent transfers toggle */}
-            <BankSection>
-              <div 
-                className="flex justify-between items-center cursor-pointer"
-                onClick={() => setShowRecent(!showRecent)}
-              >
-                <BankSectionHeader>Transferencias Recientes</BankSectionHeader>
-                <ArrowPathIcon className="h-5 w-5 text-blue-600" />
+            <div>
+              <Label>Mis cuentas</Label>
+              <p className="-mt-1 mb-2 text-[12px] text-sb-fg-muted">Mueve dinero entre tus propias cuentas.</p>
+              <div className="grid gap-2.5 [grid-template-columns:repeat(auto-fill,minmax(140px,1fr))]">
+                {myTargets.map((c) => <RecipientCard key={c.id} account={c} selected={recipient?.id === c.id} onSelect={setRecipient} />)}
+                {myTargets.length === 0 && <div className="col-span-full py-4 text-center text-[13px] text-sb-fg-muted">Sin coincidencias</div>}
               </div>
-              
-              {showRecent && (
-                <div className="space-y-3 mt-2">
-                  <RecentTransferItem 
-                    name="Usuario Example"
-                    amount="¥2,500"
-                    date="23/04/2025"
-                  />
-                  <RecentTransferItem 
-                    name="Shop Minecra"
-                    amount="¥590"
-                    date="15/04/2025"
-                  />
-                  <RecentTransferItem 
-                    name="Coffee Shop"
-                    amount="¥120"
-                    date="10/04/2025"
-                  />
-                </div>
-              )}
-            </BankSection>
+            </div>
+
+            <div>
+              <Label>Otras cuentas</Label>
+              <div className="grid gap-2.5 [grid-template-columns:repeat(auto-fill,minmax(140px,1fr))]">
+                {otherTargets.slice(0, 12).map((c) => <RecipientCard key={c.id} account={c} selected={recipient?.id === c.id} onSelect={setRecipient} />)}
+                {otherTargets.length === 0 && <div className="col-span-full py-4 text-center text-[13px] text-sb-fg-muted">{q2 ? "Sin coincidencias" : "No hay otras cuentas"}</div>}
+              </div>
+            </div>
+            <div className="mt-2 flex items-center justify-between">
+              <Button variant="ghost" href={BASE}>Cancelar</Button>
+              <Button variant="primary" disabled={!canNext1} onClick={() => setStep(1)}>Continuar <Ico name="arrR" size={14} /></Button>
+            </div>
           </div>
-        </div>
-      </div>
-    </div>
+        )}
+
+        {step === 1 && recipient && (
+          <div className="mx-auto flex w-full max-w-[520px] flex-col gap-5">
+            <div className="flex items-center justify-center gap-2.5 rounded-sb-md bg-sb-surface-2 p-3.5">
+              <span className="text-[13px] text-sb-fg-muted">Enviando a</span>
+              <ContactAvatar name={recipient.name} type={recipient.type} image={recipient.image} id={recipient.id} size={28} />
+              <strong>{displayName(recipient.name)}</strong>
+              <Button variant="ghost" size="sm" onClick={() => setStep(0)}>Cambiar</Button>
+            </div>
+
+            <div className="py-5 text-center">
+              <Label className="text-center">Importe</Label>
+              <input
+                autoFocus
+                inputMode="decimal"
+                value={amountStr}
+                onChange={(e) => setAmountStr(e.target.value.replace(/[^\d.,]/g, ""))}
+                placeholder="0"
+                className="w-full border-0 bg-transparent text-center font-sb-display text-[56px] font-semibold tabular-nums tracking-[-0.03em] text-sb-fg caret-sb-600 outline-none"
+              />
+              <div className={cn("text-[13px]", fromAcc && amount > fromAcc.balance ? "text-sb-neg" : "text-sb-fg-muted")}>
+                {fromAcc && amount > fromAcc.balance
+                  ? `Excede el saldo disponible (${formatMoney(fromAcc.balance)})`
+                  : `Disponible en ${fromAcc ? displayName(fromAcc.name) : "—"}: ${formatMoney(fromAcc?.balance ?? 0)}`}
+              </div>
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-2">
+              {PRESETS.map((v) => (
+                <button key={v} type="button" onClick={() => setAmountStr(v.toLocaleString("es-ES"))} className="rounded-sb-pill border border-sb-border bg-sb-surface px-3.5 py-2 text-[13px] font-medium transition-colors hover:border-sb-300 hover:bg-sb-50 hover:text-sb-700">
+                  {formatMoney(v)}
+                </button>
+              ))}
+            </div>
+
+            <div>
+              <Label htmlFor="from-acc">Pagar desde</Label>
+              <Select id="from-acc" value={from} onChange={(e) => setFrom(Number(e.target.value))}>
+                {mine.map((a) => <option key={a.id} value={a.id}>{displayName(a.name)} — {formatMoney(a.balance)}</option>)}
+              </Select>
+              {recipient?.id === from && <p className="mt-1.5 text-[12px] font-medium text-sb-neg">Elige una cuenta de origen distinta al destinatario.</p>}
+            </div>
+
+            <div>
+              <Label htmlFor="concept">Concepto (opcional)</Label>
+              <Input id="concept" value={concept} onChange={(e) => setConcept(e.target.value)} placeholder="Ej: Reembolso pokébolas" maxLength={50} />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <Button variant="ghost" onClick={() => setStep(0)}><Ico name="arrL" size={14} /> Atrás</Button>
+              <Button variant="primary" disabled={!canNext2} onClick={() => setStep(2)}>Revisar <Ico name="arrR" size={14} /></Button>
+            </div>
+          </div>
+        )}
+
+        {step === 2 && recipient && fromAcc && (
+          <div className="mx-auto flex w-full max-w-[520px] flex-col gap-[18px]">
+            <div className="text-center">
+              <Label className="text-center">Vas a enviar</Label>
+              <div className="font-sb-display text-[56px] font-bold tabular-nums tracking-[-0.02em]">{formatMoney(amount)}</div>
+            </div>
+
+            <div className="flex flex-col gap-3 rounded-sb-md bg-sb-surface-2 p-[18px]">
+              <div className="flex items-center justify-between">
+                <span className="text-sb-fg-muted">De</span>
+                <span className="flex items-center gap-2"><AccountAvatar account={fromAcc} size={24} /><strong>{displayName(fromAcc.name)}</strong></span>
+              </div>
+              <div className="h-px bg-sb-border" />
+              <div className="flex items-center justify-between">
+                <span className="text-sb-fg-muted">A</span>
+                <span className="flex items-center gap-2"><ContactAvatar name={recipient.name} type={recipient.type} image={recipient.image} id={recipient.id} size={24} /><strong>{displayName(recipient.name)}</strong></span>
+              </div>
+              <div className="h-px bg-sb-border" />
+              <div className="flex items-center justify-between"><span className="text-sb-fg-muted">Concepto</span><span>{concept || "—"}</span></div>
+              <div className="h-px bg-sb-border" />
+              <div className="flex items-center justify-between"><span className="font-semibold">Total a debitar</span><span className="text-[16px] font-bold tabular-nums">{formatMoney(amount)}</span></div>
+            </div>
+
+            <div className="flex items-center gap-2.5 rounded-sb-md bg-sb-info-soft p-3 text-sb-info">
+              <Ico name="shieldOk" size={16} />
+              <span className="text-[12.5px]">Transferencia instantánea y protegida. Saldo proyectado tras la operación: <strong className="tabular-nums">{formatMoney(fromAcc.balance - amount)}</strong></span>
+            </div>
+
+            {error && <div className="text-[13px] font-medium text-sb-neg">{error}</div>}
+
+            <div className="flex items-center justify-between">
+              <Button variant="ghost" onClick={() => setStep(1)}><Ico name="arrL" size={14} /> Atrás</Button>
+              <Button variant="primary" size="lg" onClick={finish} disabled={isLoading}><Ico name="send" size={16} /> {isLoading ? "Enviando…" : "Confirmar y enviar"}</Button>
+            </div>
+          </div>
+        )}
+      </Card>
+    </>
   );
 }
 
-function RecentTransferItem({ name, amount, date }: { name: string; amount: string; date: string }) {
+function RecipientCard({ account: c, selected, onSelect }: { account: SBAccount; selected: boolean; onSelect: (a: SBAccount) => void }) {
   return (
-    <div className="flex items-center justify-between p-2 rounded-lg hover:bg-blue-50">
-      <div className="flex items-center">
-        <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-          {name[0]}
-        </div>
-        <div className="ml-3">
-          <p className="text-sm font-medium text-blue-900">{name}</p>
-          <p className="text-xs text-blue-500">{date}</p>
-        </div>
-      </div>
-      <div className="text-sm font-medium text-red-600">{amount}</div>
-    </div>
+    <button
+      type="button"
+      onClick={() => onSelect(c)}
+      className={cn(
+        "flex flex-col items-center gap-2 rounded-sb-md border bg-sb-surface p-3.5 transition-all",
+        selected ? "border-sb-600 bg-sb-50 shadow-sb-1" : "border-sb-border hover:border-sb-300 hover:bg-sb-50",
+      )}
+    >
+      <ContactAvatar name={c.name} type={c.type} image={c.image} id={c.id} size={44} />
+      <span className="text-center text-[13px] font-semibold">{displayName(c.name)}</span>
+      <span className="text-[11px] text-sb-fg-muted">{c.type === "MAIN" ? "Principal" : "Secundaria"}</span>
+    </button>
   );
 }

@@ -1,238 +1,203 @@
 "use client";
-import { useEffect, useState } from "react";
-import { getValidAccountId } from "../bankUtils";
-import {
-  useReactTable,
-  getCoreRowModel,
-  flexRender,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  ColumnFiltersState,
-  Table,
-  Row,
-  Column,
-  Cell,
-  getSortedRowModel,
-  SortingState,
-} from "@tanstack/react-table";
-import { BankSection, BankSectionButton } from "../_components/BankSection";
-import { TransactionsTable, columns } from "./_components/TransactionsTable";
-import { useBoffSession } from "@/services/useBoffSession";
-import { useGetAccounts } from "@/hooks/starbank/useGetAccounts";
-import { useGetTransactions } from "@/hooks/starbank/useGetTransactions";
-import { AccountSelect } from "../_components/AccountSelect";
-import { Input } from "@/components/ui/primitives/input";
-import { formatMoney, getActiveAccountBalance, changeActiveAccount } from "../bankUtils";
-import { Search } from "lucide-react";
-import { TransactionSkeleton } from "./_components/TransactionSkeleton";
-import { SummaryCard } from "../_components/SummaryCard";
-import { ArrowDownIcon, ArrowUpIcon, ChevronUpDownIcon, ListBulletIcon } from "@heroicons/react/24/outline";
-import { StarBankTransaction } from "@boffmedia/shared";
+import * as React from "react";
 import useStarBank from "../_hooks/useStarBank";
+import { useGetTransactions } from "@/hooks/starbank/useGetTransactions";
+import { PageHeader, Card, Kpi, Button, Ico, Seg, Input, Skeleton } from "../_components/ui";
+import { TxDetail } from "../_components/TxDetail";
+import { CATEGORIES, resolveCategory, type CategoryId } from "../_utils/categories";
+import { income, expense, withinDays } from "../_utils/analytics";
+import { formatMoney, fmtDate, fmtTime } from "../_utils/format";
+import { isOutgoing, displayName, balanceAfter } from "../_utils/account";
+import { cn } from "@/lib/utils";
+import type { SBTransaction } from "../_types";
 
-export interface CellDefProps<TData> {
-  table: Table<TData>;
-  row: Row<TData>;
-  column: Column<TData>;
-  cell: Cell<TData, unknown>;
-  getValue: () => any;
-  renderValue: () => any;
-}
-
-function calculateTransactionStats(transactions: StarBankTransaction[], activeAccount: number) {
-  let income = 0;
-  let expense = 0;
-
-  transactions.forEach(transaction => {
-    if (!transaction.isPayer) {
-      income += transaction.amount;
-    } else {
-      expense += transaction.amount;
-    }
-  });
-
-  return { income, expense, net: income - expense };
-}
+const PERIODS = [
+  { id: "7d", label: "7 días", days: 7 },
+  { id: "30d", label: "30 días", days: 30 },
+  { id: "90d", label: "90 días", days: 90 },
+  { id: "all", label: "Todas", days: 9999 },
+];
+const TYPES = [
+  { id: "all", label: "Todas" },
+  { id: "in", label: "Entradas" },
+  { id: "out", label: "Salidas" },
+];
+type SortId = "amount" | "balance" | "date";
 
 export default function Transacciones() {
-  const { session } = useBoffSession();
-  const { accounts, activeAccount, setActiveAccount } = useStarBank();
-  const [transactions, setTransactions] = useState<StarBankTransaction[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [sorting, setSorting] = useState<SortingState>([{ id: "date", desc: true }]);
-  const [stats, setStats] = useState({ income: 0, expense: 0, net: 0 });
+  const { activeAccount } = useStarBank();
+  const accId = activeAccount?.id ?? -1;
+  const { transactions, isLoading } = useGetTransactions(accId, 100);
 
-  const { transactions: fetchedTransactions, error: transactionsError, isLoading: transactionsLoading } = useGetTransactions(activeAccount?.id ?? -1);
+  const [period, setPeriod] = React.useState("30d");
+  const [type, setType] = React.useState("all");
+  const [cat, setCat] = React.useState<"all" | CategoryId>("all");
+  const [q, setQ] = React.useState("");
+  const [sort, setSort] = React.useState<{ id: SortId; dir: "asc" | "desc" }>({ id: "date", dir: "desc" });
+  const [openTx, setOpenTx] = React.useState<SBTransaction | null>(null);
 
-  // eslint-disable-next-line react-hooks/incompatible-library
-  const table = useReactTable({
-    data: transactions,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    state: {
-      globalFilter: searchTerm,
-      columnFilters,
-      sorting,
-    },
-    initialState: {
-      pagination: {
-        pageIndex: 0,
-        pageSize: 10,
-      },
-    },
-    onSortingChange: setSorting,
-    getPaginationRowModel: getPaginationRowModel(),
-    meta: {
-      activeAccount,
-    },
-  });
+  const all = (transactions ?? []) as SBTransaction[];
 
-  useEffect(() => {
-    if (fetchedTransactions && activeAccount) {
-      setTransactions(fetchedTransactions);
-      setStats(calculateTransactionStats(fetchedTransactions, activeAccount.id));
-    }
-  }, [fetchedTransactions, activeAccount]);
+  const filtered = React.useMemo(() => {
+    const days = PERIODS.find((p) => p.id === period)?.days ?? 30;
+    return withinDays(all, days)
+      .filter((t) => type === "all" || (type === "in" ? !isOutgoing(t, accId) : isOutgoing(t, accId)))
+      .filter((t) => cat === "all" || resolveCategory(t).id === cat)
+      .filter((t) => !q || t.reason?.toLowerCase().includes(q.toLowerCase()) || (t.displayName ?? "").toLowerCase().includes(q.toLowerCase()))
+      .sort((a, b) => {
+        const dir = sort.dir === "desc" ? -1 : 1;
+        if (sort.id === "amount") return ((isOutgoing(a, accId) ? -a.amount : a.amount) - (isOutgoing(b, accId) ? -b.amount : b.amount)) * dir;
+        if (sort.id === "balance") return (balanceAfter(a, accId) - balanceAfter(b, accId)) * dir;
+        return (+new Date(a.date) - +new Date(b.date)) * dir;
+      });
+  }, [all, accId, period, type, cat, q, sort]);
 
-  function updateFilters(columnId: string, value: string) {
-    const newFilters = columnFilters.filter((f) => f.id !== columnId);
-    if (value) {
-      newFilters.push({ id: columnId, value });
-    }
-    setColumnFilters(newFilters);
+  const inc = income(filtered, accId);
+  const exp = expense(filtered, accId);
+
+  function toggleSort(id: SortId) {
+    setSort((s) => ({ id, dir: s.id === id && s.dir === "desc" ? "asc" : "desc" }));
   }
 
-  function handleAccountChange(accountId: any) {
-    changeActiveAccount(Number(accountId));
-    setActiveAccount(Number(accountId));
+  function SortHead({ id, label }: { id: SortId; label: string }) {
+    const on = sort.id === id;
+    return (
+      <button type="button" onClick={() => toggleSort(id)} className="inline-flex items-center gap-1.5 hover:text-sb-fg">
+        {label}
+        <Ico name="sort" size={12} className={on ? "opacity-100" : "opacity-40"} />
+      </button>
+    );
   }
 
-  function handleSearchChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setSearchTerm(e.target.value);
+  if (isLoading || !activeAccount) {
+    return (
+      <>
+        <Skeleton className="h-8 w-48" />
+        <div className="grid gap-4 md:grid-cols-3">{[0, 1, 2].map((i) => <Skeleton key={i} className="h-[104px] rounded-sb-lg" />)}</div>
+        <Skeleton className="h-96 rounded-sb-lg" />
+      </>
+    );
   }
-
-  if (!accounts || transactionsLoading) return <TransactionSkeleton />;
-  if (transactionsError) return <div>Error: {transactionsError}</div>;
-
-  const currentAccount = activeAccount;
 
   return (
-    <main className="max-w-[90%] mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6">
-      {/* Header with stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <BankSection className="md:col-span-4 mb-4">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 flex-wrap">
-            <div>
-              <h1 className="text-2xl font-bold text-blue-900">Historial de Transacciones</h1>
-              <p className="text-blue-600">
-                Mostrando transacciones para la cuenta <span className="font-medium">{currentAccount?.name || 'Cargando...'}</span>
-              </p>
-            </div>
-            
-            <div className="w-full md:w-auto">
-              <AccountSelect
-                accounts={accounts}
-                activeAccount={activeAccount}
-                setActiveAccount={handleAccountChange}
-                className="w-full md:w-64"
-              />
-            </div>
-          </div>
-        </BankSection>
-        
-        <SummaryCard 
-          title="Balance Actual"
-          value={formatMoney(getActiveAccountBalance(accounts!, activeAccount?.id ?? 0))}
-          icon={<ChevronUpDownIcon className="h-6 w-6" />}
-          className="md:col-span-1"
-        />
-        
-        <SummaryCard 
-          title="Ingresos Totales"
-          value={formatMoney(stats.income)}
-          icon={<ArrowUpIcon className="h-6 w-6 text-success" />}
-          //change={{ value: 5.2, isPositive: true }}
-          className="md:col-span-1"
-        />
-        
-        <SummaryCard 
-          title="Gastos Totales"
-          value={formatMoney(stats.expense)}
-          icon={<ArrowDownIcon className="h-6 w-6 text-danger" />}
-          //change={{ value: 2.8, isPositive: false }}
-          className="md:col-span-1"
-        />
-  {/* Removed 'Total Neto' card as net is always equal to current balance */}
+    <>
+      <PageHeader
+        title="Transacciones"
+        sub={`Movimientos de la cuenta ${displayName(activeAccount.name)}`}
+        actions={<Button variant="secondary"><Ico name="download" size={14} /> Exportar</Button>}
+      />
+
+      <div className="grid gap-4 md:grid-cols-3">
+        <Kpi label="Saldo actual" value={formatMoney(activeAccount.balance)} icon="card" tone="brand" />
+        <Kpi label="Ingresos · periodo" value={formatMoney(inc)} icon="arrUR" tone="pos" sub={`${filtered.filter((t) => !isOutgoing(t, accId)).length} entradas`} />
+        <Kpi label="Gastos · periodo" value={formatMoney(exp)} icon="arrDR" tone="neg" sub={`${filtered.filter((t) => isOutgoing(t, accId)).length} salidas`} />
       </div>
 
-      {/* Search and Filter */}
-      <BankSection className="bg-white rounded-lg border border-blue-200 py-4">
-        <div className="flex flex-wrap gap-4 items-center">
-          <div className="relative flex-1 min-w-[240px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-blue-500" />
-            <Input 
-              placeholder="Buscar transacciones..."
-              value={searchTerm}
-              onChange={handleSearchChange}
-              className="pl-10 bg-blue-50"
-            />
-          </div>
-          
-          <div className="flex items-center gap-2 text-sm text-blue-700">
-            <span>Mostrando {table.getFilteredRowModel().rows.length} de {transactions.length} transacciones</span>
+      <Card>
+        <div className="flex flex-wrap items-center gap-2 border-b border-sb-border bg-sb-surface px-4 py-3">
+          <Seg options={PERIODS} value={period} onChange={setPeriod} />
+          <Seg options={TYPES} value={type} onChange={setType} />
+          <FChip active={cat === "all"} onClick={() => setCat("all")}><Ico name="filter" size={12} /> Todas las categorías</FChip>
+          {Object.values(CATEGORIES).map((c) => (
+            <FChip key={c.id} active={cat === c.id} color={c.hex} onClick={() => setCat(cat === c.id ? "all" : c.id)}>
+              <span className="size-1.5 rounded-full" style={{ background: cat === c.id ? "#fff" : c.hex }} />
+              {c.label}
+            </FChip>
+          ))}
+          <div className="relative ml-auto min-w-[200px]">
+            <Ico name="search" size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-sb-fg-subtle" />
+            <Input className="h-8 pl-8 text-[13px]" placeholder="Buscar…" value={q} onChange={(e) => setQ(e.target.value)} />
           </div>
         </div>
-      </BankSection>
 
-      {/* Transactions Table */}
-      <BankSection variant="noPadding" className="bg-white rounded-lg overflow-hidden border border-blue-200">
-        <TransactionsTable
-          table={table}
-          columnFilters={columnFilters}
-          updateFilters={updateFilters}
-        />
-      </BankSection>
-      
-      {/* Pagination */}
-      <div className="flex justify-between items-center bg-white p-4 shadow-sm rounded-md border border-blue-200">
-        <div className="flex items-center gap-2">
-          <BankSectionButton 
-            onClick={() => table.previousPage()} 
-            disabled={!table.getCanPreviousPage()}
-          >
-            Anterior
-          </BankSectionButton>
-          
-          <BankSectionButton 
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Siguiente
-          </BankSectionButton>
+        <div className="overflow-auto">
+          <table className="w-full border-separate border-spacing-0">
+            <thead>
+              <tr>
+                <Th className="w-[280px]">Contraparte</Th>
+                <Th>Concepto</Th>
+                <Th>Categoría</Th>
+                <Th align="right"><SortHead id="amount" label="Cantidad" /></Th>
+                <Th align="right"><SortHead id="balance" label="Saldo" /></Th>
+                <Th align="right"><SortHead id="date" label="Fecha" /></Th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.length === 0 ? (
+                <tr><td colSpan={6} className="px-4 py-10 text-center text-sb-fg-muted">No se encontraron transacciones con estos filtros</td></tr>
+              ) : (
+                filtered.map((tx, i) => {
+                  const c = resolveCategory(tx);
+                  const out = isOutgoing(tx, accId);
+                  return (
+                    <tr key={`${tx.date}-${i}`} onClick={() => setOpenTx(tx)} className="cursor-pointer transition-colors hover:bg-sb-surface-2">
+                      <Td>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[13px] font-semibold">{displayName(tx.displayName)}</span>
+                        </div>
+                        <div className="text-[11px] text-sb-fg-muted">{out ? "Salida" : "Entrada"}</div>
+                      </Td>
+                      <Td className="text-sb-fg-2">{tx.reason}</Td>
+                      <Td>
+                        <span className={cn("inline-flex h-6 items-center gap-1.5 rounded-sb-pill px-2.5 text-[11.5px] font-semibold", c.soft, c.text)}>
+                          <span className={cn("size-1.5 rounded-full", c.dotBg)} />
+                          {c.label}
+                        </span>
+                      </Td>
+                      <Td align="right">
+                        <span className={cn("font-semibold tabular-nums", out ? "text-sb-neg" : "text-sb-pos")}>{out ? "− " : "+ "}{formatMoney(tx.amount)}</span>
+                      </Td>
+                      <Td align="right" className="tabular-nums">{formatMoney(balanceAfter(tx, accId))}</Td>
+                      <Td align="right" className="text-sb-fg-muted tabular-nums">
+                        <div>{fmtDate(tx.date)}</div>
+                        <div className="text-[11px]">{fmtTime(tx.date)}</div>
+                      </Td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
         </div>
-        
-        <div className="flex items-center gap-2 text-sm">
-          <span className="text-blue-700">
-            Página {table.getState().pagination.pageIndex + 1} de{" "}
-            {table.getPageCount() || 1}
-          </span>
-          
-          <select
-            value={table.getState().pagination.pageSize}
-            onChange={e => table.setPageSize(Number(e.target.value))}
-            className="px-2 py-1 border border-blue-200 rounded text-sm bg-blue-50"
-          >
-            {[10, 25, 50].map(pageSize => (
-              <option key={pageSize} value={pageSize}>
-                Mostrar {pageSize}
-              </option>
-            ))}
-          </select>
+
+        <div className="flex items-center justify-between border-t border-sb-border p-4">
+          <div className="text-[13px] text-sb-fg-muted">
+            Mostrando <strong className="text-sb-fg">{filtered.length}</strong> transacciones
+          </div>
+          <div className="flex gap-2">
+            <Button variant="secondary" size="sm" disabled><Ico name="arrL" size={14} /> Anterior</Button>
+            <Button variant="secondary" size="sm">Siguiente <Ico name="arrR" size={14} /></Button>
+          </div>
         </div>
-      </div>
-    </main>
+      </Card>
+
+      {openTx && <TxDetail tx={openTx} activeAccountId={accId} onClose={() => setOpenTx(null)} />}
+    </>
+  );
+}
+
+function Th({ children, align = "left", className }: { children: React.ReactNode; align?: "left" | "right"; className?: string }) {
+  return (
+    <th className={cn("sticky top-0 border-b border-sb-border bg-sb-surface-2 px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.06em] text-sb-fg-muted", align === "right" ? "text-right" : "text-left", className)}>
+      {children}
+    </th>
+  );
+}
+function Td({ children, align = "left", className }: { children: React.ReactNode; align?: "left" | "right"; className?: string }) {
+  return <td className={cn("border-b border-sb-border px-4 py-3 text-[13px]", align === "right" ? "text-right" : "text-left", className)}>{children}</td>;
+}
+function FChip({ children, active, color, onClick }: { children: React.ReactNode; active?: boolean; color?: string; onClick?: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={active && color ? { background: color, borderColor: color, color: "#fff" } : undefined}
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-sb-pill border px-2.5 py-1.5 text-[12px] font-medium transition-colors",
+        active && !color ? "border-sb-600 bg-sb-600 text-white" : "border-sb-border bg-sb-surface-2 hover:border-sb-border-strong",
+      )}
+    >
+      {children}
+    </button>
   );
 }
