@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq, and, desc } from 'drizzle-orm';
+import { eq, and, desc, isNull, isNotNull, inArray } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   rotomDocuments,
@@ -15,6 +15,10 @@ export interface DocumentDetails {
   title: string;
   content: string;
   type: number;
+  public: number;
+  pinned: number;
+  folderId: number | null;
+  deletedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -38,9 +42,39 @@ export interface NotePreview {
   id: number;
   title: string;
   type: number;
+  public: number;
+  pinned: number;
+  folderId: number | null;
+  deletedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface DocumentShare {
+  documentId: number;
+  uuid: string;
+}
+
+interface DocumentMutation {
+  title?: string;
+  content?: string;
+  type?: number;
+  public?: number;
+  pinned?: number;
+  folderId?: number | null;
+}
+
+const NOTE_PREVIEW_COLUMNS = {
+  id: rotomDocuments.id,
+  title: rotomDocuments.title,
+  type: rotomDocuments.type,
+  public: rotomDocuments.public,
+  pinned: rotomDocuments.pinned,
+  folderId: rotomDocuments.folderId,
+  deletedAt: rotomDocuments.deletedAt,
+  createdAt: rotomDocuments.createdAt,
+  updatedAt: rotomDocuments.updatedAt,
+};
 
 @Injectable()
 export class DocumentsRepository implements IDocumentsRepository {
@@ -51,14 +85,7 @@ export class DocumentsRepository implements IDocumentsRepository {
   // ==================== DOCUMENT OPERATIONS ====================
   async findDocumentById(id: number): Promise<RotomDocument | null> {
     const result = await this.db
-      .select({
-        id: rotomDocuments.id,
-        title: rotomDocuments.title,
-        content: rotomDocuments.content,
-        type: rotomDocuments.type,
-        createdAt: rotomDocuments.createdAt,
-        updatedAt: rotomDocuments.updatedAt,
-      })
+      .select()
       .from(rotomDocuments)
       .where(eq(rotomDocuments.id, id))
       .limit(1);
@@ -67,19 +94,35 @@ export class DocumentsRepository implements IDocumentsRepository {
 
   async findUserDocuments(uuid: string): Promise<NotePreview[]> {
     return this.db
-      .select({
-        id: rotomDocuments.id,
-        title: rotomDocuments.title,
-        type: rotomDocuments.type,
-        createdAt: rotomDocuments.createdAt,
-        updatedAt: rotomDocuments.updatedAt,
-      })
+      .select(NOTE_PREVIEW_COLUMNS)
       .from(rotomDocuments)
       .innerJoin(
         rotomDocumentsUsers,
         eq(rotomDocuments.id, rotomDocumentsUsers.documentId),
       )
-      .where(eq(rotomDocumentsUsers.uuid, uuid))
+      .where(
+        and(
+          eq(rotomDocumentsUsers.uuid, uuid),
+          isNull(rotomDocuments.deletedAt),
+        ),
+      )
+      .orderBy(desc(rotomDocuments.updatedAt));
+  }
+
+  async findTrashedDocuments(uuid: string): Promise<NotePreview[]> {
+    return this.db
+      .select(NOTE_PREVIEW_COLUMNS)
+      .from(rotomDocuments)
+      .innerJoin(
+        rotomDocumentsUsers,
+        eq(rotomDocuments.id, rotomDocumentsUsers.documentId),
+      )
+      .where(
+        and(
+          eq(rotomDocumentsUsers.uuid, uuid),
+          isNotNull(rotomDocuments.deletedAt),
+        ),
+      )
       .orderBy(desc(rotomDocuments.updatedAt));
   }
 
@@ -100,19 +143,28 @@ export class DocumentsRepository implements IDocumentsRepository {
 
   async updateDocument(
     id: number,
-    documentData: {
-      title?: string;
-      content?: string;
-      type?: number;
-      public?: number;
-    },
+    documentData: DocumentMutation,
   ): Promise<void> {
     await this.db
       .update(rotomDocuments)
       .set({
         ...documentData,
         updatedAt: new Date(),
-      } as RotomDocument)
+      } as Partial<RotomDocument>)
+      .where(eq(rotomDocuments.id, id));
+  }
+
+  async softDeleteDocument(id: number): Promise<void> {
+    await this.db
+      .update(rotomDocuments)
+      .set({ deletedAt: new Date() } as Partial<RotomDocument>)
+      .where(eq(rotomDocuments.id, id));
+  }
+
+  async restoreDocument(id: number): Promise<void> {
+    await this.db
+      .update(rotomDocuments)
+      .set({ deletedAt: null } as Partial<RotomDocument>)
       .where(eq(rotomDocuments.id, id));
   }
 
@@ -138,6 +190,27 @@ export class DocumentsRepository implements IDocumentsRepository {
     return result[0] || null;
   }
 
+  async findDocumentShares(documentId: number): Promise<DocumentShare[]> {
+    return this.db
+      .select({
+        documentId: rotomDocumentsUsers.documentId,
+        uuid: rotomDocumentsUsers.uuid,
+      })
+      .from(rotomDocumentsUsers)
+      .where(eq(rotomDocumentsUsers.documentId, documentId));
+  }
+
+  async findSharesByDocumentIds(ids: number[]): Promise<DocumentShare[]> {
+    if (ids.length === 0) return [];
+    return this.db
+      .select({
+        documentId: rotomDocumentsUsers.documentId,
+        uuid: rotomDocumentsUsers.uuid,
+      })
+      .from(rotomDocumentsUsers)
+      .where(inArray(rotomDocumentsUsers.documentId, ids));
+  }
+
   async addDocumentToUser(
     documentId: number,
     uuid: string,
@@ -145,8 +218,6 @@ export class DocumentsRepository implements IDocumentsRepository {
     const result = await this.db.insert(rotomDocumentsUsers).values({
       documentId,
       uuid,
-      createdAt: new Date(),
-      updatedAt: new Date(),
     } as RotomDocumentUser);
     return { insertId: result[0].insertId };
   }

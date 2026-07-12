@@ -6,6 +6,11 @@ import {
 } from './services/document.service';
 import { NoteService } from './services/note.service';
 import {
+  NoteOrganizationService,
+  CreateFolderRequest,
+  CreateTagRequest,
+} from './services/note-organization.service';
+import {
   NewsService,
   CreateNewsRequest,
   UpdateNewsRequest,
@@ -14,9 +19,15 @@ import {
 import { Logger } from 'nestjs-pino';
 import {
   DocumentDetails,
-  NotePreview,
+  NotePreview as NotePreviewRow,
   NewsDetails,
 } from '@api/smartrotom/documents/repositories/documents.repository';
+import {
+  FolderRow,
+  TagRow,
+  VersionRow,
+} from './repositories/interfaces/note-organization.repository.interface';
+import { NotePreview } from './entities/document.entity';
 
 export interface CreateNoteWithUserRequest {
   title: string;
@@ -32,8 +43,40 @@ export class DocumentsFacadeService {
 
     private readonly documentService: DocumentService,
     private readonly noteService: NoteService,
+    private readonly noteOrganizationService: NoteOrganizationService,
     private readonly newsService: NewsService,
   ) {}
+
+  // Merge folder/pin metadata from rotom_documents with tag links and shares
+  // into the enriched NotePreview the client renders (sidebar + list) with no
+  // per-note round-trips.
+  private async enrichNotes(rows: NotePreviewRow[]): Promise<NotePreview[]> {
+    const ids = rows.map((r) => r.id);
+    const [tagLinks, shares] = await Promise.all([
+      this.noteOrganizationService.getTagLinksForDocuments(ids),
+      this.noteService.getSharesForDocuments(ids),
+    ]);
+
+    const tagsByDoc = new Map<number, number[]>();
+    for (const link of tagLinks) {
+      const list = tagsByDoc.get(link.documentId) ?? [];
+      list.push(link.tagId);
+      tagsByDoc.set(link.documentId, list);
+    }
+
+    const sharesByDoc = new Map<number, string[]>();
+    for (const share of shares) {
+      const list = sharesByDoc.get(share.documentId) ?? [];
+      list.push(share.uuid);
+      sharesByDoc.set(share.documentId, list);
+    }
+
+    return rows.map((row) => ({
+      ...row,
+      tags: tagsByDoc.get(row.id) ?? [],
+      sharedWith: sharesByDoc.get(row.id) ?? [],
+    }));
+  }
 
   // ==================== DOCUMENT MANAGEMENT ====================
 
@@ -105,10 +148,196 @@ export class DocumentsFacadeService {
 
   async getUserNotes(uuid: string): Promise<NotePreview[]> {
     try {
-      return await this.documentService.getUserDocuments(uuid);
+      const rows = await this.documentService.getUserDocuments(uuid);
+      return await this.enrichNotes(rows);
     } catch (error: any) {
       this.logger.error(`Error getting notes for user ${uuid}:`, error);
       throw new Error(`Failed to retrieve notes: ${error.message}`);
+    }
+  }
+
+  async getTrashedNotes(uuid: string): Promise<NotePreview[]> {
+    try {
+      const rows = await this.documentService.getTrashedDocuments(uuid);
+      return await this.enrichNotes(rows);
+    } catch (error: any) {
+      this.logger.error(`Error getting trash for user ${uuid}:`, error);
+      throw new Error(`Failed to retrieve trash: ${error.message}`);
+    }
+  }
+
+  async restoreDocument(id: number): Promise<DocumentDetails> {
+    try {
+      return await this.documentService.restoreDocument(id);
+    } catch (error: any) {
+      this.logger.error(`Error restoring document ${id}:`, error);
+      throw new Error(`Failed to restore document: ${error.message}`);
+    }
+  }
+
+  async purgeDocument(
+    id: number,
+  ): Promise<{ success: boolean; message: string }> {
+    try {
+      await this.documentService.purgeDocument(id);
+      return { success: true, message: 'Document permanently deleted' };
+    } catch (error: any) {
+      this.logger.error(`Error purging document ${id}:`, error);
+      throw new Error(`Failed to delete document: ${error.message}`);
+    }
+  }
+
+  async getDocumentShares(documentId: number): Promise<string[]> {
+    try {
+      return await this.noteService.getShares(documentId);
+    } catch (error: any) {
+      this.logger.error(`Error getting shares for ${documentId}:`, error);
+      throw new Error(`Failed to retrieve shares: ${error.message}`);
+    }
+  }
+
+  // ==================== FOLDERS ====================
+
+  async getFolders(uuid: string): Promise<FolderRow[]> {
+    try {
+      return await this.noteOrganizationService.getFolders(uuid);
+    } catch (error: any) {
+      this.logger.error(`Error getting folders for ${uuid}:`, error);
+      throw new Error(`Failed to retrieve folders: ${error.message}`);
+    }
+  }
+
+  async createFolder(req: CreateFolderRequest): Promise<FolderRow> {
+    try {
+      return await this.noteOrganizationService.createFolder(req);
+    } catch (error: any) {
+      this.logger.error('Error creating folder:', error);
+      throw new Error(`Failed to create folder: ${error.message}`);
+    }
+  }
+
+  async updateFolder(
+    id: number,
+    data: { name?: string; color?: string; parentId?: number | null },
+  ): Promise<FolderRow> {
+    try {
+      return await this.noteOrganizationService.updateFolder(id, data);
+    } catch (error: any) {
+      this.logger.error(`Error updating folder ${id}:`, error);
+      throw new Error(`Failed to update folder: ${error.message}`);
+    }
+  }
+
+  async deleteFolder(id: number): Promise<{ success: boolean }> {
+    try {
+      return await this.noteOrganizationService.deleteFolder(id);
+    } catch (error: any) {
+      this.logger.error(`Error deleting folder ${id}:`, error);
+      throw new Error(`Failed to delete folder: ${error.message}`);
+    }
+  }
+
+  // ==================== TAGS ====================
+
+  async getTags(uuid: string): Promise<TagRow[]> {
+    try {
+      return await this.noteOrganizationService.getTags(uuid);
+    } catch (error: any) {
+      this.logger.error(`Error getting tags for ${uuid}:`, error);
+      throw new Error(`Failed to retrieve tags: ${error.message}`);
+    }
+  }
+
+  async createTag(req: CreateTagRequest): Promise<TagRow> {
+    try {
+      return await this.noteOrganizationService.createTag(req);
+    } catch (error: any) {
+      this.logger.error('Error creating tag:', error);
+      throw new Error(`Failed to create tag: ${error.message}`);
+    }
+  }
+
+  async updateTag(
+    id: number,
+    data: { label?: string; color?: string },
+  ): Promise<{ success: boolean }> {
+    try {
+      return await this.noteOrganizationService.updateTag(id, data);
+    } catch (error: any) {
+      this.logger.error(`Error updating tag ${id}:`, error);
+      throw new Error(`Failed to update tag: ${error.message}`);
+    }
+  }
+
+  async deleteTag(id: number): Promise<{ success: boolean }> {
+    try {
+      return await this.noteOrganizationService.deleteTag(id);
+    } catch (error: any) {
+      this.logger.error(`Error deleting tag ${id}:`, error);
+      throw new Error(`Failed to delete tag: ${error.message}`);
+    }
+  }
+
+  async toggleNoteTag(
+    documentId: number,
+    tagId: number,
+  ): Promise<{ success: boolean; applied: boolean }> {
+    try {
+      return await this.noteOrganizationService.toggleTag(documentId, tagId);
+    } catch (error: any) {
+      this.logger.error(
+        `Error toggling tag ${tagId} on ${documentId}:`,
+        error,
+      );
+      throw new Error(`Failed to toggle tag: ${error.message}`);
+    }
+  }
+
+  // ==================== VERSIONS ====================
+
+  async getVersions(documentId: number): Promise<VersionRow[]> {
+    try {
+      return await this.noteOrganizationService.getVersions(documentId);
+    } catch (error: any) {
+      this.logger.error(`Error getting versions for ${documentId}:`, error);
+      throw new Error(`Failed to retrieve versions: ${error.message}`);
+    }
+  }
+
+  async snapshotVersion(
+    documentId: number,
+    label?: string,
+    authorUuid?: string,
+  ): Promise<VersionRow> {
+    try {
+      const document = await this.documentService.getDocumentById(documentId);
+      return await this.noteOrganizationService.createVersion({
+        documentId,
+        content: document.content,
+        label,
+        authorUuid,
+      });
+    } catch (error: any) {
+      this.logger.error(`Error snapshotting ${documentId}:`, error);
+      throw new Error(`Failed to snapshot note: ${error.message}`);
+    }
+  }
+
+  // Snapshots the current content first (so nothing is lost), then restores the
+  // chosen version's content onto the live document.
+  async restoreVersion(versionId: number): Promise<DocumentDetails> {
+    try {
+      const version = await this.noteOrganizationService.getVersion(versionId);
+      if (!version) {
+        throw new Error('Version not found');
+      }
+      await this.snapshotVersion(version.documentId, 'Antes de restaurar');
+      return await this.documentService.updateDocument(version.documentId, {
+        content: version.content,
+      });
+    } catch (error: any) {
+      this.logger.error(`Error restoring version ${versionId}:`, error);
+      throw new Error(`Failed to restore version: ${error.message}`);
     }
   }
 

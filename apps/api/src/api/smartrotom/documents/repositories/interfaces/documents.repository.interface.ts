@@ -1,21 +1,39 @@
-import { CreateDocumentDto } from '../../dto/create-document.dto';
-import { UpdateDocumentDto } from '../../dto/document.dto';
-import { NotePreview, Document } from '../../entities/document.entity';
-import { RotomDocumentUser } from '@/_db/schema/SmartRotomDocuments';
+import { RotomDocument, RotomDocumentUser } from '@/_db/schema/SmartRotomDocuments';
+import {
+  DocumentShare,
+  NotePreview,
+} from '../documents.repository';
+
+export interface DocumentMutation {
+  title?: string;
+  content?: string;
+  type?: number;
+  public?: number;
+  pinned?: number;
+  folderId?: number | null;
+}
 
 export interface IDocumentsRepository {
-  findDocumentById(id: number): Promise<Document | null>;
+  findDocumentById(id: number): Promise<RotomDocument | null>;
   findUserDocuments(uuid: string): Promise<NotePreview[]>;
-  createDocument(
-    documentData: CreateDocumentDto,
-  ): Promise<{ insertId: number }>;
-  updateDocument(id: number, documentData: UpdateDocumentDto): Promise<void>;
+  findTrashedDocuments(uuid: string): Promise<NotePreview[]>;
+  createDocument(documentData: {
+    title: string;
+    content: string;
+    type: number;
+    public?: number;
+  }): Promise<{ insertId: number }>;
+  updateDocument(id: number, documentData: DocumentMutation): Promise<void>;
+  softDeleteDocument(id: number): Promise<void>;
+  restoreDocument(id: number): Promise<void>;
   deleteDocument(id: number): Promise<void>;
 
   findDocumentUserAssociation(
     documentId: number,
     uuid: string,
   ): Promise<RotomDocumentUser | null>;
+  findDocumentShares(documentId: number): Promise<DocumentShare[]>;
+  findSharesByDocumentIds(ids: number[]): Promise<DocumentShare[]>;
   addDocumentToUser(
     documentId: number,
     uuid: string,

@@ -39,6 +39,11 @@ import {
   UpdateDocumentDto,
   GetUserDocumentsDto,
   AddNoteToUserDto,
+  CreateFolderDto,
+  UpdateFolderDto,
+  CreateTagDto,
+  UpdateTagDto,
+  CreateVersionDto,
 } from './dto/document.dto';
 import {
   CreateNewsDto,
@@ -50,6 +55,9 @@ import {
 import {
   Document,
   NotePreview,
+  NoteFolder,
+  NoteTag,
+  NoteVersion,
   CreateNoteResponse,
   SaveDocumentResponse,
 } from './entities/document.entity';
@@ -140,11 +148,251 @@ export class DocumentsController {
       content: updateDocumentDto.content,
       type: updateDocumentDto.type,
       public: updateDocumentDto.public,
+      pinned: updateDocumentDto.pinned,
+      folderId: updateDocumentDto.folderId,
     };
     return await this.documentsFacadeService.updateDocument(
       documentId,
       updateDocumentRequest,
     );
+  }
+
+  @Public()
+  @Post('document/:id/restore')
+  @ApiOperation({ summary: 'Restore a soft-deleted document from the trash' })
+  @ApiResponse({ status: HttpStatus.OK, type: Document })
+  @ApiParam({ name: 'id', description: 'Document ID' })
+  async restoreDocument(@Param('id') id: string): Promise<Document> {
+    const documentId = parseInt(id, 10);
+    if (isNaN(documentId)) {
+      throw new Error('Invalid document ID');
+    }
+    return await this.documentsFacadeService.restoreDocument(documentId);
+  }
+
+  @Public()
+  @Delete('document/:id/purge')
+  @ApiOperation({ summary: 'Permanently delete a document' })
+  @ApiResponse({ status: HttpStatus.OK, type: SuccessResponse })
+  @ApiParam({ name: 'id', description: 'Document ID' })
+  async purgeDocument(@Param('id') id: string): Promise<SuccessResponse> {
+    const documentId = parseInt(id, 10);
+    if (isNaN(documentId)) {
+      throw new Error('Invalid document ID');
+    }
+    return await this.documentsFacadeService.purgeDocument(documentId);
+  }
+
+  @Public()
+  @Get('document/:id/shares')
+  @ApiOperation({ summary: 'List UUIDs a document is shared with' })
+  @ApiResponse({ status: HttpStatus.OK, type: [String] })
+  @ApiParam({ name: 'id', description: 'Document ID' })
+  async getDocumentShares(@Param('id') id: string): Promise<string[]> {
+    const documentId = parseInt(id, 10);
+    if (isNaN(documentId)) {
+      throw new Error('Invalid document ID');
+    }
+    return await this.documentsFacadeService.getDocumentShares(documentId);
+  }
+
+  // ==================== TRASH ENDPOINTS ====================
+
+  @Public()
+  @Get('trash/:uuid')
+  @ApiOperation({ summary: 'Get soft-deleted notes for a user' })
+  @ApiResponse({ status: HttpStatus.OK, type: [NotePreview] })
+  @ApiParam({ name: 'uuid', description: 'User UUID' })
+  async getTrash(@Param('uuid') uuid: string): Promise<NotePreview[]> {
+    return await this.documentsFacadeService.getTrashedNotes(uuid);
+  }
+
+  // ==================== FOLDER ENDPOINTS ====================
+
+  @Public()
+  @Get('folders/:uuid')
+  @ApiOperation({ summary: 'List folders for a user' })
+  @ApiResponse({ status: HttpStatus.OK, type: [NoteFolder] })
+  @ApiParam({ name: 'uuid', description: 'User UUID' })
+  async getFolders(@Param('uuid') uuid: string): Promise<NoteFolder[]> {
+    return await this.documentsFacadeService.getFolders(uuid);
+  }
+
+  @Public()
+  @Post('folders')
+  @ApiOperation({ summary: 'Create a folder' })
+  @ApiResponse({ status: HttpStatus.CREATED, type: NoteFolder })
+  @ApiBody({ type: CreateFolderDto })
+  async createFolder(@Body() dto: CreateFolderDto): Promise<NoteFolder> {
+    return await this.documentsFacadeService.createFolder({
+      uuid: dto.uuid,
+      name: dto.name,
+      color: dto.color,
+      parentId: dto.parentId ?? null,
+    });
+  }
+
+  @Public()
+  @Put('folders/:id')
+  @ApiOperation({ summary: 'Update a folder' })
+  @ApiResponse({ status: HttpStatus.OK, type: NoteFolder })
+  @ApiParam({ name: 'id', description: 'Folder ID' })
+  @ApiBody({ type: UpdateFolderDto })
+  async updateFolder(
+    @Param('id') id: string,
+    @Body() dto: UpdateFolderDto,
+  ): Promise<NoteFolder> {
+    const folderId = parseInt(id, 10);
+    if (isNaN(folderId)) {
+      throw new Error('Invalid folder ID');
+    }
+    return await this.documentsFacadeService.updateFolder(folderId, {
+      name: dto.name,
+      color: dto.color,
+      parentId: dto.parentId,
+    });
+  }
+
+  @Public()
+  @Delete('folders/:id')
+  @ApiOperation({ summary: 'Delete a folder' })
+  @ApiResponse({ status: HttpStatus.OK, type: SuccessResponse })
+  @ApiParam({ name: 'id', description: 'Folder ID' })
+  async deleteFolder(@Param('id') id: string): Promise<SuccessResponse> {
+    const folderId = parseInt(id, 10);
+    if (isNaN(folderId)) {
+      throw new Error('Invalid folder ID');
+    }
+    return await this.documentsFacadeService.deleteFolder(folderId);
+  }
+
+  // ==================== TAG ENDPOINTS ====================
+
+  @Public()
+  @Get('tags/:uuid')
+  @ApiOperation({ summary: 'List tags for a user' })
+  @ApiResponse({ status: HttpStatus.OK, type: [NoteTag] })
+  @ApiParam({ name: 'uuid', description: 'User UUID' })
+  async getTags(@Param('uuid') uuid: string): Promise<NoteTag[]> {
+    return await this.documentsFacadeService.getTags(uuid);
+  }
+
+  @Public()
+  @Post('tags')
+  @ApiOperation({ summary: 'Create a tag' })
+  @ApiResponse({ status: HttpStatus.CREATED, type: NoteTag })
+  @ApiBody({ type: CreateTagDto })
+  async createTag(@Body() dto: CreateTagDto): Promise<NoteTag> {
+    return await this.documentsFacadeService.createTag({
+      uuid: dto.uuid,
+      label: dto.label,
+      color: dto.color,
+    });
+  }
+
+  @Public()
+  @Put('tags/:id')
+  @ApiOperation({ summary: 'Update a tag' })
+  @ApiResponse({ status: HttpStatus.OK, type: SuccessResponse })
+  @ApiParam({ name: 'id', description: 'Tag ID' })
+  @ApiBody({ type: UpdateTagDto })
+  async updateTag(
+    @Param('id') id: string,
+    @Body() dto: UpdateTagDto,
+  ): Promise<SuccessResponse> {
+    const tagId = parseInt(id, 10);
+    if (isNaN(tagId)) {
+      throw new Error('Invalid tag ID');
+    }
+    return await this.documentsFacadeService.updateTag(tagId, {
+      label: dto.label,
+      color: dto.color,
+    });
+  }
+
+  @Public()
+  @Delete('tags/:id')
+  @ApiOperation({ summary: 'Delete a tag' })
+  @ApiResponse({ status: HttpStatus.OK, type: SuccessResponse })
+  @ApiParam({ name: 'id', description: 'Tag ID' })
+  async deleteTag(@Param('id') id: string): Promise<SuccessResponse> {
+    const tagId = parseInt(id, 10);
+    if (isNaN(tagId)) {
+      throw new Error('Invalid tag ID');
+    }
+    return await this.documentsFacadeService.deleteTag(tagId);
+  }
+
+  @Public()
+  @Post('document/:id/tag/:tagId')
+  @ApiOperation({ summary: 'Toggle a tag on a note (adds if absent, removes if present)' })
+  @ApiResponse({ status: HttpStatus.OK, type: SuccessResponse })
+  @ApiParam({ name: 'id', description: 'Document ID' })
+  @ApiParam({ name: 'tagId', description: 'Tag ID' })
+  async toggleNoteTag(
+    @Param('id') id: string,
+    @Param('tagId') tagId: string,
+  ): Promise<{ success: boolean; applied: boolean }> {
+    const documentId = parseInt(id, 10);
+    const parsedTagId = parseInt(tagId, 10);
+    if (isNaN(documentId) || isNaN(parsedTagId)) {
+      throw new Error('Invalid document or tag ID');
+    }
+    return await this.documentsFacadeService.toggleNoteTag(
+      documentId,
+      parsedTagId,
+    );
+  }
+
+  // ==================== VERSION ENDPOINTS ====================
+
+  @Public()
+  @Get('document/:id/versions')
+  @ApiOperation({ summary: 'List version history for a note' })
+  @ApiResponse({ status: HttpStatus.OK, type: [NoteVersion] })
+  @ApiParam({ name: 'id', description: 'Document ID' })
+  async getVersions(@Param('id') id: string): Promise<NoteVersion[]> {
+    const documentId = parseInt(id, 10);
+    if (isNaN(documentId)) {
+      throw new Error('Invalid document ID');
+    }
+    return await this.documentsFacadeService.getVersions(documentId);
+  }
+
+  @Public()
+  @Post('document/:id/versions')
+  @ApiOperation({ summary: 'Snapshot the current note content as a version' })
+  @ApiResponse({ status: HttpStatus.CREATED, type: NoteVersion })
+  @ApiParam({ name: 'id', description: 'Document ID' })
+  @ApiBody({ type: CreateVersionDto })
+  async snapshotVersion(
+    @Param('id') id: string,
+    @Body() dto: CreateVersionDto,
+  ): Promise<NoteVersion> {
+    const documentId = parseInt(id, 10);
+    if (isNaN(documentId)) {
+      throw new Error('Invalid document ID');
+    }
+    return await this.documentsFacadeService.snapshotVersion(
+      documentId,
+      dto.label,
+      dto.authorUuid,
+    );
+  }
+
+  @Public()
+  @Post('versions/:versionId/restore')
+  @ApiOperation({ summary: 'Restore a note to a previous version' })
+  @ApiResponse({ status: HttpStatus.OK, type: Document })
+  @ApiParam({ name: 'versionId', description: 'Version ID' })
+  async restoreVersion(
+    @Param('versionId') versionId: string,
+  ): Promise<Document> {
+    const parsedVersionId = parseInt(versionId, 10);
+    if (isNaN(parsedVersionId)) {
+      throw new Error('Invalid version ID');
+    }
+    return await this.documentsFacadeService.restoreVersion(parsedVersionId);
   }
 
   @Public()

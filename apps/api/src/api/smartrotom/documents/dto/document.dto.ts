@@ -39,7 +39,7 @@ export class CreateDocumentDtoWithUuid extends CreateDocumentDto {
   uuid: string;
 }
 
-export class UpdateDocumentDto {
+export class UpdateDocumentDto extends BaseDto {
   @ApiProperty({
     description: 'Document title',
     example: 'Updated Document Title',
@@ -76,6 +76,132 @@ export class UpdateDocumentDto {
   @IsOptional()
   @IsInt()
   public?: number;
+
+  @ApiProperty({
+    description: 'Whether the document is pinned (0 = no, 1 = pinned)',
+    example: 1,
+    required: false,
+  })
+  @IsOptional()
+  @IsInt()
+  pinned?: number;
+
+  @ApiProperty({
+    type: Number,
+    description: 'Folder the document belongs to; null moves it to the root',
+    example: 12,
+    required: false,
+    nullable: true,
+  })
+  @IsOptional()
+  @IsInt()
+  folderId?: number | null;
+}
+
+export class CreateFolderDto extends BaseDto {
+  @ApiProperty({ description: 'Owner UUID', example: '67d9b543-...' })
+  @IsNotEmpty()
+  @IsString()
+  uuid: string;
+
+  @ApiProperty({ description: 'Folder name', example: 'VGC 2026' })
+  @IsNotEmpty()
+  @IsString()
+  name: string;
+
+  @ApiProperty({
+    description: 'Semantic palette key',
+    example: 'primary',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  color?: string;
+
+  @ApiProperty({
+    type: Number,
+    description: 'Parent folder ID for nesting',
+    example: 5,
+    required: false,
+    nullable: true,
+  })
+  @IsOptional()
+  @IsInt()
+  parentId?: number | null;
+}
+
+export class UpdateFolderDto extends BaseDto {
+  @ApiProperty({ description: 'Folder name', required: false })
+  @IsOptional()
+  @IsString()
+  name?: string;
+
+  @ApiProperty({ description: 'Semantic palette key', required: false })
+  @IsOptional()
+  @IsString()
+  color?: string;
+
+  @ApiProperty({
+    type: Number,
+    description: 'Parent folder ID for nesting',
+    required: false,
+    nullable: true,
+  })
+  @IsOptional()
+  @IsInt()
+  parentId?: number | null;
+}
+
+export class CreateTagDto extends BaseDto {
+  @ApiProperty({ description: 'Owner UUID', example: '67d9b543-...' })
+  @IsNotEmpty()
+  @IsString()
+  uuid: string;
+
+  @ApiProperty({ description: 'Tag label', example: 'meta' })
+  @IsNotEmpty()
+  @IsString()
+  label: string;
+
+  @ApiProperty({
+    description: 'Semantic palette key',
+    example: 'primary',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  color?: string;
+}
+
+export class UpdateTagDto extends BaseDto {
+  @ApiProperty({ description: 'Tag label', required: false })
+  @IsOptional()
+  @IsString()
+  label?: string;
+
+  @ApiProperty({ description: 'Semantic palette key', required: false })
+  @IsOptional()
+  @IsString()
+  color?: string;
+}
+
+export class CreateVersionDto extends BaseDto {
+  @ApiProperty({
+    description: 'Optional label for the snapshot',
+    required: false,
+    example: 'Ajuste de velocidad',
+  })
+  @IsOptional()
+  @IsString()
+  label?: string;
+
+  @ApiProperty({
+    description: 'Author UUID producing the snapshot',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  authorUuid?: string;
 }
 
 export class GetUserDocumentsDto {
