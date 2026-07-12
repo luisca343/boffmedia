@@ -40,7 +40,7 @@ export function ItemView({ rec, onNav }: ViewProps) {
           )}
           {(rec.ability || rec.attack) && (
             <MewPanel title="Uso" icon="bolt">
-              <div className="flex flex-col gap-2.5">
+              <div className="flex flex-col">
                 {rec.ability && <MewAbilityInline id={rec.ability} onNav={onNav} label={mewSubItemName(select.name(rec.ability), rec.name)} />}
                 {rec.attack && <MewAbilityInline id={rec.attack} onNav={onNav} />}
               </div>

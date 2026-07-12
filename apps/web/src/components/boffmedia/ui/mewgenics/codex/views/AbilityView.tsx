@@ -72,7 +72,7 @@ export function AbilityView({ rec, onNav }: ViewProps) {
           )}
           {chained.length > 0 && (
             <MewPanel title="Encadena con" icon="link">
-              <div className="flex flex-col gap-2.5">
+              <div className="flex flex-col">
                 {chained.map((id) => <MewAbilityInline key={id} id={id} onNav={onNav} />)}
               </div>
             </MewPanel>
