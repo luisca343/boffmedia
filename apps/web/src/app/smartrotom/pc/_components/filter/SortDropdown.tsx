@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { PiCaretDown, PiSortAscending, PiSortDescending } from 'react-icons/pi'
-import { FilterSort } from '../../types/filter.types'
+import { FilterSort } from '../../_types/filter.types'
 
 interface SortDropdownProps {
   sort: FilterSort

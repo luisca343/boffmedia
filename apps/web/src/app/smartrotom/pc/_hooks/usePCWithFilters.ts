@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, useEffect } from 'react'
 import { PCPokemon } from '@/types/dto/pc-pokemon.dto'
-import { FilterBoxData, PokemonFilter, FilterSort, isFilterBox, getFilterPageFromBoxNumber } from '../types/filter.types'
+import { FilterBoxData, PokemonFilter, FilterSort, isFilterBox, getFilterPageFromBoxNumber } from '../_types/filter.types'
 import { useFilterManagement } from './useFilterManagement'
 
 interface UsePCWithFiltersProps {

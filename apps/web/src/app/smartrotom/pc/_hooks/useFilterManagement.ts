@@ -11,14 +11,14 @@ import {
   FilterState, 
   FilterBoxData,
   getFilterBoxNumber 
-} from '../types/filter.types'
+} from '../_types/filter.types'
 import { 
   filterAndSortPokemon, 
   paginateResults, 
   getFilterOptions, 
   hasActiveFilters,
   clearAllFilters
-} from '../utils/filterUtils'
+} from '../_utils/filterUtils'
 
 interface UseFilterManagementProps {
   allPokemon: PCPokemon[]

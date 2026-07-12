@@ -12,6 +12,8 @@ export const env = z
     NEXT_PUBLIC_URL: z.string().default(''),
     NEXT_PUBLIC_ROTOM_API_URL: z.string().default(''),
     NEXT_PUBLIC_TWITCH_CLIENT_ID: z.string().default(''),
+    // Pokémon Showdown iframe target. Override per-environment; prefer an HTTPS host.
+    NEXT_PUBLIC_SHOWDOWN_URL: z.string().default('http://148.251.3.244:8002/'),
   })
   .parse({
     NODE_ENV: process.env.NODE_ENV,
@@ -21,4 +23,5 @@ export const env = z
     NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
     NEXT_PUBLIC_ROTOM_API_URL: process.env.NEXT_PUBLIC_ROTOM_API_URL,
     NEXT_PUBLIC_TWITCH_CLIENT_ID: process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID,
+    NEXT_PUBLIC_SHOWDOWN_URL: process.env.NEXT_PUBLIC_SHOWDOWN_URL,
   });

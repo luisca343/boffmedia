@@ -5,7 +5,7 @@ import {
   PiStar, PiGenderMale, PiGenderFemale, PiGenderNeuter,
   PiMagnifyingGlass, PiSortAscending, PiSortDescending
 } from 'react-icons/pi'
-import { PokemonFilter, FilterSort, POKEMON_TYPES } from '../../types/filter.types'
+import { PokemonFilter, FilterSort, POKEMON_TYPES } from '../../_types/filter.types'
 import { PokemonTypeIcon } from '@/components/shared/pokemon/PokemonTypeIcon'
 import { SearchBar } from './SearchBar'
 import { SortDropdown } from './SortDropdown'

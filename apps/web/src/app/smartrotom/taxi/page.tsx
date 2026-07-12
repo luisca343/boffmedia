@@ -9,14 +9,14 @@ import { StarbankService } from "@/services/api/smartrotom/starbankService"
 import { TaxiStop } from "@boffmedia/shared"
 import { TaxiStopExtended } from "@/types"
 import { getMcUserData } from '@/services/mcef/mcefApi'
-import TaxiHeader from './components/TaxiHeader'
-import TabNavigation from './components/TabNavigation'
-import MapView from './components/MapView'
-import ListView from './components/ListView'
-import LoadingOverlay from './components/LoadingOverlay'
-import SelectedStopDetails from './components/SelectedStopDetails'
+import TaxiHeader from './_components/TaxiHeader'
+import TabNavigation from './_components/TabNavigation'
+import MapView from './_components/MapView'
+import ListView from './_components/ListView'
+import LoadingOverlay from './_components/LoadingOverlay'
+import SelectedStopDetails from './_components/SelectedStopDetails'
 import { WingullService } from '@/services/api/smartrotom/wingullService'
-import { MINIMUM_FARE, POSITION_REFRESH_INTERVAL, PRICE_PER_BLOCK, TAXI_SERVICE_ACCOUNT } from './utils/constants'
+import { MINIMUM_FARE, POSITION_REFRESH_INTERVAL, PRICE_PER_BLOCK, TAXI_SERVICE_ACCOUNT } from './_utils/constants'
 
 interface Position {
   x: number

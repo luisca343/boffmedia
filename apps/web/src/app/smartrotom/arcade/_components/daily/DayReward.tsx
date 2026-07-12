@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Sparkles, Gift } from "lucide-react";
 import { getItemName } from "@/lib/intlUtils";
 import { useTranslations } from "next-intl";
-import { getRewardIcon, getRewardVisuals, isNamedReward } from "../../_util/rewardIcons";
+import { getRewardIcon, getRewardVisuals, isNamedReward } from "../../_utils/rewardIcons";
 import { DailyRewardItem } from "@boffmedia/shared";
 
 interface DayRewardProps {
