@@ -6,19 +6,11 @@ import { signIn, signOut } from "next-auth/react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { SmartRotomButton } from "@/components/smartrotom/ui";
-import { Copy, Check, LogIn, LogOut, Palette, Bug, Monitor, Smartphone, Sun, Moon } from "lucide-react";
-import { useChatSettings } from "@/app/smartrotom/chatapp/_stores/useChatSettings";
-import type { ThemePref } from "@/app/smartrotom/chatapp/_utils/theme";
+import { Copy, Check, LogIn, LogOut, Palette, Bug, Monitor, Smartphone, Sun } from "lucide-react";
+import { ROTOM_THEMES } from "@/components/smartrotom/theme/rotomTheme";
+import { useRotomMode, useRotomThemeStore } from "@/components/smartrotom/theme/useRotomTheme";
 
 const isDev = env.NODE_ENV === "development";
-
-const themes = [
-  { id: '', label: 'Clásico', colors: ['bg-layer-2', 'bg-layer-3', 'bg-primary'] },
-  { id: 'theme-light', label: 'Claro', colors: ['bg-white', 'bg-layer-2', 'bg-primary'] },
-  { id: 'theme-tulipan', label: 'Tulipán', colors: ['bg-pink-50', 'bg-pink-100', 'bg-pink-500'] },
-  { id: 'theme-mizu', label: 'Mizu', colors: ['bg-cyan-50', 'bg-cyan-100', 'bg-cyan-500'] },
-  { id: 'theme-oasis', label: 'Oasis', colors: ['bg-amber-50', 'bg-amber-100', 'bg-amber-500'] },
-];
 
 function SectionLabel({ icon: Icon, children }: { icon: typeof Sun; children: React.ReactNode }) {
   return (
@@ -36,11 +28,13 @@ const tileBase =
 const tileActive = "border-sr-accent bg-sr-accent-soft";
 const tileIdle = "border-sr-line bg-sr-panel hover:bg-sr-panel-2 hover:border-sr-line-2";
 
-export function SettingsPage({ setTema }: { setTema: (tema: string) => void }) {
+export function SettingsPage() {
   const { session } = useBoffSession();
   const [copied, setCopied] = useState(false);
-  const [activeTheme, setActiveTheme] = useState('');
-  const { theme: chatMode, setTheme: setChatMode } = useChatSettings();
+  const theme = useRotomThemeStore((s) => s.theme);
+  const setTheme = useRotomThemeStore((s) => s.setTheme);
+  // What the themeable apps (ChatApp, Notas) will actually render under this choice.
+  const mode = useRotomMode();
 
   const copyToken = () => {
     if (session?.user?.accessToken) {
@@ -48,11 +42,6 @@ export function SettingsPage({ setTema }: { setTema: (tema: string) => void }) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
-  };
-
-  const handleThemeChange = (themeId: string) => {
-    setActiveTheme(themeId);
-    setTema(themeId);
   };
 
   return (
@@ -67,61 +56,46 @@ export function SettingsPage({ setTema }: { setTema: (tema: string) => void }) {
         <span>{isMinecraft() ? 'SmartRotom' : 'Browser'}</span>
       </div>
 
-      {/* Themes Section */}
+      {/*
+        One theme control for the whole of SmartRotom. It used to be two — this grid
+        (which set a class nothing styled) plus a separate "Modo del chat" that only
+        ChatApp read. Now the themeable apps derive their light/dark from this choice,
+        so a theme with no app-specific skin still lands somewhere sensible.
+      */}
       <div>
         <SectionLabel icon={Palette}>Temas</SectionLabel>
-        <div className="grid grid-cols-5 gap-2">
-          {themes.map((theme) => (
-            <button
-              key={theme.id}
-              onClick={() => handleThemeChange(theme.id)}
-              className={cn(tileBase, activeTheme === theme.id ? tileActive : tileIdle)}
-            >
-              {/* Color preview dots */}
-              <div className="flex gap-0.5">
-                {theme.colors.map((color, i) => (
-                  <div
-                    key={i}
-                    className={`w-3 h-3 rounded-full border border-black/20 ${color}`}
-                  />
-                ))}
-              </div>
-              <span className={cn(
-                "text-[10px] font-medium leading-none",
-                activeTheme === theme.id ? "text-sr-accent-bright" : "text-sr-txt-muted group-hover:text-sr-txt"
-              )}>
-                {theme.label}
-              </span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Chat light/dark mode */}
-      <div>
-        <SectionLabel icon={Sun}>Modo del chat</SectionLabel>
         <div className="grid grid-cols-3 gap-2">
-          {([
-            { id: "light", label: "Claro", icon: Sun },
-            { id: "dark", label: "Oscuro", icon: Moon },
-            { id: "auto", label: "Auto", icon: Monitor },
-          ] as { id: ThemePref; label: string; icon: typeof Sun }[]).map((m) => {
-            const MIcon = m.icon;
-            const active = chatMode === m.id;
+          {ROTOM_THEMES.map((t) => {
+            const active = theme === t.id;
             return (
               <button
-                key={m.id}
-                onClick={() => setChatMode(m.id)}
+                key={t.id}
+                onClick={() => setTheme(t.id)}
+                aria-pressed={active}
                 className={cn(tileBase, active ? tileActive : tileIdle)}
               >
-                <MIcon size={16} className={active ? "text-sr-accent-bright" : "text-sr-txt-muted group-hover:text-sr-txt"} />
-                <span className={cn("text-[10px] font-medium leading-none", active ? "text-sr-accent-bright" : "text-sr-txt-muted group-hover:text-sr-txt")}>
-                  {m.label}
+                <div className="flex gap-0.5">
+                  {t.swatches.map((swatch, i) => (
+                    <div key={i} className={cn("w-3 h-3 rounded-full border border-black/20", swatch)} />
+                  ))}
+                </div>
+                <span
+                  className={cn(
+                    "text-[10px] font-medium leading-none",
+                    active ? "text-sr-accent-bright" : "text-sr-txt-muted group-hover:text-sr-txt",
+                  )}
+                >
+                  {t.label}
                 </span>
               </button>
             );
           })}
         </div>
+        <p className="mt-2 flex items-center gap-1.5 text-[10px] leading-none text-sr-txt-dim">
+          <Sun size={11} className="text-sr-txt-dim" />
+          Las apps con tema propio (Chat, Notas) se muestran en{" "}
+          <strong className="font-medium text-sr-txt-muted">{mode === "dark" ? "oscuro" : "claro"}</strong>.
+        </p>
       </div>
 
       {/* Auth Section */}

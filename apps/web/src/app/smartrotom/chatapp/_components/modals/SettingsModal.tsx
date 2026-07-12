@@ -4,13 +4,7 @@ import { cn } from "@/lib/utils";
 import { getSmartRotomUser } from "@/lib/utils";
 import { Avatar, Icon, Modal, Toggle, type IconName } from "../ui";
 import { useChatSettings } from "../../_stores/useChatSettings";
-import { ACCENTS, type ThemePref } from "../../_utils/theme";
-
-const THEMES: { value: ThemePref; label: string }[] = [
-  { value: "light", label: "Claro" },
-  { value: "dark", label: "Oscuro" },
-  { value: "auto", label: "Auto" },
-];
+import { ACCENTS } from "../../_utils/theme";
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -35,7 +29,7 @@ function ToggleRow({ icon, label, desc, on, onClick }: { icon: IconName; label: 
 }
 
 export function SettingsModal({ session, onClose }: { session: unknown; onClose: () => void }) {
-  const { theme, accent, setTheme, setAccent } = useChatSettings();
+  const { accent, setAccent } = useChatSettings();
   const me = getSmartRotomUser(session);
   // [deferred] privacy/notification prefs have no settings API — presentational only
   const [prefs, setPrefs] = useState({ receipts: true, lastseen: true, preview: true, sounds: true, enter: true, quiet: false });
@@ -52,20 +46,12 @@ export function SettingsModal({ session, onClose }: { session: unknown; onClose:
       </div>
 
       <Section title="Apariencia">
-        <div className="mb-3 flex gap-2">
-          {THEMES.map((t) => (
-            <button
-              key={t.value}
-              onClick={() => setTheme(t.value)}
-              className={cn(
-                "flex-1 rounded-ca-md border px-3 py-2 text-[13.5px] font-semibold transition-colors",
-                theme === t.value ? "border-ca-accent bg-ca-accent/[.14] text-ca-accent-soft" : "border-ca-800 bg-ca-800 text-ca-300 hover:bg-ca-700/70",
-              )}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
+        {/* Light/dark moved to the platform picker (Ajustes → Temas) so one choice
+            drives every SmartRotom app. The accent stays here — it is ChatApp's own. */}
+        <p className="mb-3 flex items-center gap-2 rounded-ca-md border border-ca-800 bg-ca-800 px-3 py-2 text-[12.5px] text-ca-400">
+          <Icon name="settings" size={15} className="flex-none text-ca-500" />
+          El modo claro/oscuro se elige en los ajustes de SmartRotom, en «Temas».
+        </p>
         <div className="flex flex-wrap gap-2.5">
           {ACCENTS.map((c) => (
             <button
