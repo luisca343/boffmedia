@@ -1,126 +1,124 @@
-"use client"
-import useStarBank from "../_hooks/useStarBank";
-import { AccountImage } from "./AccountImage";
-import { useBoffSession } from "@/services/useBoffSession";
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
-import { useState, useRef, useEffect } from "react";
-import { changeActiveAccount, formatMoney } from "../bankUtils";
-import { StarBankAccount } from "@boffmedia/shared";
-import { InternalLink } from "@/components/ui/navigation/Link";
+"use client";
+import * as React from "react";
+import { cn } from "@/lib/utils";
+import { AccountAvatar, Ico } from "./ui";
+import { formatMoney } from "../_utils/format";
+import { displayName } from "../_utils/account";
+import type { SBAccount } from "../_types";
 
-export default function TopBar({
-  currentPage,
-}: Readonly<{ currentPage: string }>) {
-  const { accounts, activeAccount, setActiveAccount } = useStarBank();
-  const { session } = useBoffSession();
-  const [showDropdown, setShowDropdown] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  
-  // Handle clicks outside the dropdown to close it
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowDropdown(false);
-      }
+const TITLES: Record<string, { t: string; c: string[] }> = {
+  starbank: { t: "General", c: ["Inicio"] },
+  cuentas: { t: "Cuentas", c: ["Personal", "Cuentas"] },
+  transacciones: { t: "Transacciones", c: ["Personal", "Movimientos"] },
+  enviar: { t: "Enviar dinero", c: ["Personal", "Transferencia"] },
+  graficas: { t: "Gráficas", c: ["Análisis", "Gráficas"] },
+  calendario: { t: "Calendario de pagos", c: ["Análisis", "Calendario"] },
+};
+
+export function TopBar({ currentPage, account, accounts, onSelectAccount, onOpenAccounts }: {
+  currentPage: string;
+  account?: SBAccount | null;
+  accounts?: SBAccount[];
+  onSelectAccount: (id: number) => void;
+  onOpenAccounts: () => void;
+}) {
+  const info = TITLES[currentPage] ?? TITLES.starbank;
+  const [open, setOpen] = React.useState(false);
+  const ref = React.useRef<HTMLDivElement>(null);
+  const list = accounts ?? [];
+
+  React.useEffect(() => {
+    if (!open) return;
+    function onDown(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     }
-    
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-  
-  const capitalizeFirstLetter = (string: string) => {
-    if (string === "starbank") return "Dashboard";
-    if (string === "enviar") return "Enviar Dinero";
-    if (string === "graficas") return "Gráficas";
-    return string.charAt(0).toUpperCase() + string.slice(1);
-  };
-  
-  // Handle account change
-  const handleAccountChange = (account: StarBankAccount) => {
-    if (account && account.id) {
-      // Save to localStorage and update state
-      changeActiveAccount(account.id);
-      setActiveAccount(account.id);
-      setShowDropdown(false);
-    }
-  };
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, [open]);
 
   return (
-    <header className="bg-blue-200 shadow-sm border-b border-blue-300">
-      <div className="h-20 mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-        <h1 className="text-2xl font-semibold">
-          {capitalizeFirstLetter(currentPage)}
-        </h1>
-        <div className="flex items-center relative" ref={dropdownRef}>
-          {activeAccount && (
-            <div 
-              className="flex items-center gap-3 cursor-pointer bg-blue-100 hover:bg-blue-300 transition-colors duration-200 px-4 py-2 rounded-full"
-              onClick={() => setShowDropdown(!showDropdown)}
-            >
-              <div className="text-right hidden sm:block">
-                <p className="text-sm font-medium text-blue-950">{session?.user?.name || "Usuario"}</p>
-                <p className="text-xs text-blue-800">{activeAccount.name}</p>
-              </div>
-              <AccountImage width={40} height={40} type={activeAccount.type} name={activeAccount.name} image={(activeAccount as any).image}/>
-              <ChevronDownIcon className="h-4 w-4 text-blue-800" />
+    <header className="sticky top-0 z-30 flex items-center gap-4 border-b border-sb-border bg-white/85 px-4 py-3 backdrop-blur-[10px] backdrop-saturate-[1.4] md:px-7 md:py-3.5">
+      <div>
+        <div className="text-[12px] text-sb-fg-muted">
+          {info.c.map((c, i) => (
+            <span key={i}>{i > 0 ? " / " : ""}<strong className="font-semibold text-sb-fg-2">{c}</strong></span>
+          ))}
+        </div>
+        <div className="font-sb-display text-[18px] font-semibold tracking-[-0.01em]">{info.t}</div>
+      </div>
+
+      <div className="relative hidden max-w-[420px] flex-1 md:block">
+        <Ico name="search" size={16} className="absolute left-[11px] top-1/2 -translate-y-1/2 text-sb-fg-subtle" />
+        <input
+          placeholder="Buscar transacciones, cuentas, contactos…"
+          aria-label="Buscar"
+          className="h-[38px] w-full rounded-sb-md border border-sb-border bg-sb-surface-2 pl-9 pr-3 text-sb-fg outline-none transition-colors focus:border-sb-400 focus:bg-sb-surface"
+        />
+        <span className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md border border-sb-border bg-sb-surface px-1.5 py-0.5 text-[10px] text-sb-fg-subtle">⌘K</span>
+      </div>
+
+      <div className="ml-auto flex items-center gap-2">
+        <button
+          type="button"
+          aria-label="Notificaciones"
+          className="relative grid size-[38px] place-items-center rounded-sb-md border border-sb-border bg-sb-surface text-sb-fg-2 transition-colors hover:border-sb-border-strong hover:bg-sb-surface-2 hover:text-sb-fg"
+        >
+          <Ico name="bell" size={16} />
+          <span className="absolute right-[9px] top-2 size-2 rounded-full bg-sb-neg-2 shadow-[0_0_0_2px_#fff]" aria-hidden />
+        </button>
+
+        <div className="relative" ref={ref}>
+          <button
+            type="button"
+            onClick={() => setOpen((o) => !o)}
+            aria-haspopup="menu"
+            aria-expanded={open}
+            aria-label="Cambiar cuenta"
+            className="flex items-center gap-2.5 rounded-sb-pill border border-sb-border bg-sb-surface py-1 pl-1 pr-2.5 transition-colors hover:bg-sb-surface-2"
+          >
+            <span className="size-[30px] overflow-hidden rounded-full">
+              <AccountAvatar account={account ?? undefined} size={30} />
+            </span>
+            <div className="hidden leading-[1.15] sm:block">
+              <div className="text-[12.5px] font-semibold">{account ? displayName(account.name) : "—"}</div>
+              <div className="text-[11px] tabular-nums text-sb-fg-muted">{formatMoney(account?.balance ?? 0)}</div>
             </div>
-          )}
-          
-          {showDropdown && (
-            <div className="absolute top-full right-0 mt-2 w-64 bg-white rounded-md shadow-lg z-50 py-2">
-              {/* User section */}
-              <div className="px-4 py-2 border-b border-edge">
-                <p className="text-sm font-medium text-blue-950">{session?.user?.name || "Usuario"}</p>
-                <p className="text-xs text-blue-500">Cambiar cuenta</p>
+            <Ico name="arrD" size={14} className={cn("transition-transform", open && "rotate-180")} />
+          </button>
+
+          {open && (
+            <div className="absolute right-0 top-full z-50 mt-2 w-72 overflow-hidden rounded-sb-md border border-sb-border bg-sb-surface shadow-sb-3">
+              <div className="border-b border-sb-border px-4 py-2.5">
+                <div className="text-[11px] uppercase tracking-[0.1em] text-sb-fg-subtle">Cambiar cuenta</div>
               </div>
-              
-              {/* Accounts section */}
-              <div className="max-h-60 overflow-y-auto py-1">
-                {accounts && accounts.length > 0 ? (
-                  <div className="divide-y divide-edge">
-                    {accounts.map((account: StarBankAccount) => (
-                      <div
-                        key={account.id}
-                        className={`flex items-center px-4 py-2 hover:bg-blue-50 cursor-pointer ${
-                          activeAccount!.id === account.id ? 'bg-blue-50' : ''
-                        }`}
-                        onClick={() => handleAccountChange(account)}
-                      >
-                        <div className="flex-shrink-0 mr-3">
-                          <AccountImage 
-                            width={32} 
-                            height={32} 
-                            type={account.type} 
-                            name={account.name}
-                          />
-                        </div>
-                        <div className="flex-grow">
-                          <p className="text-sm font-medium text-blue-900">{account.name}</p>
-                          <p className="text-xs text-blue-600">{formatMoney(account.balance)}</p>
-                        </div>
-                        {activeAccount!.id === account.id && (
-                          <div className="flex-shrink-0 ml-2">
-                            <span className="w-2 h-2 bg-warning rounded-full inline-block"></span>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
+              <div className="max-h-72 overflow-y-auto py-1">
+                {list.length === 0 ? (
+                  <div className="px-4 py-3 text-[13px] text-sb-fg-muted">No hay cuentas disponibles</div>
                 ) : (
-                  <p className="px-4 py-2 text-sm text-ink-muted">No hay cuentas disponibles</p>
+                  list.map((acc) => {
+                    const active = account?.id === acc.id;
+                    return (
+                      <button
+                        key={acc.id}
+                        type="button"
+                        onClick={() => { onSelectAccount(acc.id); setOpen(false); }}
+                        className={cn("flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-sb-surface-2", active && "bg-sb-50")}
+                      >
+                        <AccountAvatar account={acc} size={32} square />
+                        <div className="min-w-0 flex-1">
+                          <div className="truncate text-[13px] font-semibold">{displayName(acc.name)}</div>
+                          <div className="text-[11.5px] tabular-nums text-sb-fg-muted">{formatMoney(acc.balance)}</div>
+                        </div>
+                        {active && <span className="size-2 shrink-0 rounded-full bg-sb-pos-2" />}
+                      </button>
+                    );
+                  })
                 )}
               </div>
-              
-              {/* Actions section */}
-              <div className="border-t border-edge pt-1">
-                <InternalLink href="starbank/cuentas" className="block px-4 py-2 text-sm text-blue-600 hover:bg-blue-100">
-                  Gestionar Cuentas
-                </InternalLink>
-                <InternalLink href="" className="block px-4 py-2 text-sm text-red-600 hover:bg-blue-100">
-                  Cerrar sesión
-                </InternalLink>
+              <div className="border-t border-sb-border">
+                <button type="button" onClick={() => { setOpen(false); onOpenAccounts(); }} className="w-full px-4 py-2.5 text-left text-[13px] font-medium text-sb-700 transition-colors hover:bg-sb-50">
+                  Gestionar cuentas
+                </button>
               </div>
             </div>
           )}
