@@ -13,6 +13,14 @@ import type {
   News,
   NewsResponse,
   SuccessResponse,
+  NoteFolder,
+  NoteTag,
+  NoteVersion,
+  CreateFolderDto,
+  UpdateFolderDto,
+  CreateTagDto,
+  UpdateTagDto,
+  CreateVersionDto,
 } from '@boffmedia/shared';
 
 export class DocumentsService {
@@ -75,12 +83,97 @@ export class DocumentsService {
   static addNoteToUser(noteId: number, uuid: string) {
     return rotomPOST<SuccessResponse>(`/documents/note/${noteId}/user/${uuid}`, {});
   }
-  
+
   /**
    * Remove a note from a user
    */
   static removeNoteFromUser(noteId: number, uuid: string) {
     return rotomDELETE<SuccessResponse>(`/documents/note/${noteId}/user/${uuid}`);
+  }
+
+  /** List the UUIDs a note is shared with */
+  static getDocumentShares(id: number) {
+    return rotomGET<string[]>(`/documents/document/${id}/shares`);
+  }
+
+  // ==================== TRASH OPERATIONS ====================
+
+  /** Soft-deleted notes for a user */
+  static getTrash(uuid: string) {
+    return rotomGET<NotePreview[]>(`/documents/trash/${uuid}`);
+  }
+
+  /** Restore a soft-deleted note */
+  static restoreDocument(id: number) {
+    return rotomPOST<Document>(`/documents/document/${id}/restore`, {});
+  }
+
+  /** Permanently delete a note */
+  static purgeDocument(id: number) {
+    return rotomDELETE<SuccessResponse>(`/documents/document/${id}/purge`);
+  }
+
+  // ==================== FOLDER OPERATIONS ====================
+
+  static getFolders(uuid: string) {
+    return rotomGET<NoteFolder[]>(`/documents/folders/${uuid}`);
+  }
+
+  static createFolder(data: CreateFolderDto) {
+    return rotomPOST<NoteFolder>('/documents/folders', data);
+  }
+
+  static updateFolder(id: number, data: UpdateFolderDto) {
+    return rotomPUT<NoteFolder>(`/documents/folders/${id}`, data);
+  }
+
+  static deleteFolder(id: number) {
+    return rotomDELETE<SuccessResponse>(`/documents/folders/${id}`);
+  }
+
+  // ==================== TAG OPERATIONS ====================
+
+  static getTags(uuid: string) {
+    return rotomGET<NoteTag[]>(`/documents/tags/${uuid}`);
+  }
+
+  static createTag(data: CreateTagDto) {
+    return rotomPOST<NoteTag>('/documents/tags', data);
+  }
+
+  static updateTag(id: number, data: UpdateTagDto) {
+    return rotomPUT<SuccessResponse>(`/documents/tags/${id}`, data);
+  }
+
+  static deleteTag(id: number) {
+    return rotomDELETE<SuccessResponse>(`/documents/tags/${id}`);
+  }
+
+  /** Toggle a tag on a note (adds if absent, removes if present) */
+  static toggleNoteTag(documentId: number, tagId: number) {
+    return rotomPOST<{ success: boolean; applied: boolean }>(
+      `/documents/document/${documentId}/tag/${tagId}`,
+      {},
+    );
+  }
+
+  // ==================== VERSION OPERATIONS ====================
+
+  static getVersions(documentId: number) {
+    return rotomGET<NoteVersion[]>(`/documents/document/${documentId}/versions`);
+  }
+
+  /** Snapshot the current note content as a version */
+  static snapshotVersion(documentId: number, data: CreateVersionDto) {
+    return rotomPOST<NoteVersion>(
+      `/documents/document/${documentId}/versions`,
+      data,
+    );
+  }
+
+  /** Restore a note to a previous version */
+  static restoreVersion(versionId: number) {
+    return rotomPOST<Document>(`/documents/versions/${versionId}/restore`, {});
   }
 
   // ==================== NEWS OPERATIONS ====================
