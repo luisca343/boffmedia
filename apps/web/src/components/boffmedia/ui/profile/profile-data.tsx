@@ -40,11 +40,11 @@ export interface RankData {
 
 export interface TourData {
   name: string
-  where: string
   format: string
-  stats: { k: string; v: ReactNode }[]
-  roundLabel: string
-  vs: ReactNode
+  where?: string // [deferred — no venue/series field on the tournament model; real page fills from gameTitle when present]
+  stats?: { k: string; v: ReactNode }[] // gated — populated from the viewer's standings when the format exposes them
+  roundLabel?: string // gated — only when the viewer has an active (unreported) match
+  vs?: ReactNode // gated — opponent from the viewer's active match
 }
 
 export const DEMO_STATS: StatTileData[] = [

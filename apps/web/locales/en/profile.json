@@ -31,6 +31,41 @@
         "disqualified": "Disqualified"
       }
     },
+    "tabs": {
+      "private": "Private",
+      "public": "Public",
+      "tournaments": "Tournaments"
+    },
+    "tours": {
+      "kicker": "Account · Competition",
+      "title": "My tournaments",
+      "viewAll": "View all tournaments",
+      "registered": "Registered",
+      "emptyTitle": "No tournaments yet",
+      "emptyBody": "Join a community tournament and it will show up here.",
+      "groups": {
+        "live": "Ongoing",
+        "soon": "Upcoming",
+        "done": "History"
+      }
+    },
+    "live": {
+      "badge": "Live",
+      "round": "Round {n} · in progress",
+      "vs": "vs.",
+      "enter": "Enter my match",
+      "record": "Record",
+      "points": "Points",
+      "progress": "Round",
+      "format": {
+        "single": "Single elim",
+        "double": "Double elim",
+        "groups": "Groups",
+        "roundrobin": "Round robin",
+        "swiss": "Swiss",
+        "leaderboard": "Leaderboard"
+      }
+    },
     "stats": {
       "rank": "Global rank",
       "points": "Points",

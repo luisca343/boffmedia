@@ -111,7 +111,7 @@ never marker classes.
 | `profile/AccountForm.tsx` | AccountForm — controlled name/email(/bio) grid (`useTranslations`) |
 | `profile/LinkedAccounts.tsx` | LinkedAccounts, LinkedAccountRow — linked-account rows w/ brand hue + linked/unlinked states |
 | `profile/StatTile.tsx` · `RankInsignia.tsx` · `RankStrip.tsx` | career stat tiles + rank insignia (showcase-only; no per-user stats API) |
-| `profile/TrophyCase.tsx` · `ActivityFeed.tsx` · `TourLive.tsx` · `ProfileNote.tsx` | trophy case, activity timeline, live-tournament banner, public-view note (showcase-only; no API — see `docs/BOFFMEDIA_V3_DEFERRED.md`) |
+| `profile/TrophyCase.tsx` · `ActivityFeed.tsx` · `TourLive.tsx` · `ProfileNote.tsx` | trophy case, activity timeline, live-tournament banner, public-view note — **all live on real data** (`/perfil`: trophy case + activity in the default view; `TourLive` is the featured card of the **Torneos** tab via `perfil/_components/ProfileTournamentsTab` + `useProfileTournaments`; `/u/[handle]`: `ProfileNote`) |
 | `profile/profile-data.tsx` | DEMO_STATS/RANK/TROPHIES/ACTIVITY/TOUR + types — showcase demo data only |
 | `profile/index.ts` | barrel for `ui/profile` |
 | `events/EventCard.tsx` | EventCard — event card, **rebuilt to handoff** (grid + `layout="list"`; hue rail + type watermark, status chip, kind, countdown, seal, participant count, organizer row); links to `/eventos/[id]`. Deferred: `participants`/`organizer`/`hue` |
@@ -137,7 +137,7 @@ never marker classes.
 | `catalog/*` | Biblioteca/Myrient `ct-*` catalog kit: CtCard, CtViews, CtAtoms, catalog-util; index barrel |
 | `calendar/*` | Calendar/agenda `lz-*` kit: LzCards, LzViews, LzAtoms, calendar-util; index barrel |
 | `schematic/*` | Schematic Compat `sch-*` kit: SchPanels, SchAtoms, schematic-util; index barrel |
-| `mewgenics/*` | Mewgenics kit: MewAtoms, MewPop, mew-util (meta/palettes/helpers), mew-art (sprite/icon singleton), mew-store (real data load + normalize + resolvers), `codex/` (MewCodex app · MewViews 8 fiches · MewRefs linking refs); index + codex barrels |
+| `mewgenics/*` | **Mewgenics Codex** (`/otros/mewgenics`) — data browser over 8 wiki categories, v3 «Señal» skin. **Data layer** (SRP split): `mew-store-state` (store singleton + `T` localize + rev/subscribe bus) · `mew-normalize` (raw wiki_data → view records) · `mew-resolvers` (`buildIndex` + `select` cross-ref) · `mew-store` (loader + `useMewData` + `MewData`, re-exports `select`) · `mew-art` (sprite/icon singleton, `mewArtSrc`). **Presentational**: `MewAtoms` (tokened text/tile/badges/stats/panel) · `MewPop` (`CxCard` roster card + hover cards). **`codex/`**: `MewCodex` (orchestrator) · `useMewCodex` (state hook) · `codex-config` (filters/sort/search/hash) · `MewChrome` (topbar/tabs/trail) · `MewRoster` · `MewRefs` (linking refs/effects) · **`codex/views/`** (`scaffold` shared layout · `ability-format` · `inline` embedded cards · one file per category `ItemView`…`MapView` · `index` = `MEW_DETAIL` dispatch). Barrels: `index` (showcase) + `codex/index` (`MewCodex`) |
 
 ### `hooks/`
 

@@ -62,6 +62,9 @@ function useAvatarUrl(user?: AccountUser): string | null {
 const ITEM =
   "flex items-center gap-2.5 px-[15px] py-2.5 font-body text-[14px] font-medium leading-none text-txt-muted no-underline transition-colors duration-[140ms] hover:bg-panel-2 hover:text-txt"
 
+const MOBILE_ITEM =
+  "flex items-center gap-2.5 px-1 py-2.5 font-body text-[14px] font-medium leading-none text-txt-muted no-underline transition-colors duration-[140ms] hover:text-txt"
+
 function AccountAvatar({ image, initial, size }: { image?: string | null; initial: string; size: number }) {
   return (
     <span
@@ -87,7 +90,7 @@ function AuthButtons() {
   )
 }
 
-export function AccountMenu({ user }: { user: AccountUser }) {
+export function AccountMenu({ user, isAdmin }: { user: AccountUser; isAdmin?: boolean }) {
   const tNav = useTranslations("nav.v3")
   const [open, setOpen] = React.useState(false)
   const rootRef = React.useRef<HTMLSpanElement>(null)
@@ -144,13 +147,36 @@ export function AccountMenu({ user }: { user: AccountUser }) {
             <Icon name="user" size={16} className="text-txt-dim" />
             {tNav("profile")}
           </Link>
+          <Link href="/perfil?tab=torneos" role="menuitem" onClick={() => setOpen(false)} className={ITEM}>
+            <Icon name="trophy" size={16} className="text-txt-dim" />
+            {tNav("tournaments")}
+          </Link>
+          <Link href="/perfil" role="menuitem" onClick={() => setOpen(false)} className={ITEM}>
+            <Icon name="chart" size={16} className="text-txt-dim" />
+            {tNav("activity")}
+          </Link>
+          <Link href="/perfil" role="menuitem" onClick={() => setOpen(false)} className={ITEM}>
+            <Icon name="settings" size={16} className="text-txt-dim" />
+            {tNav("settings")}
+          </Link>
+          {isAdmin && (
+            <Link
+              href="/admin"
+              role="menuitem"
+              onClick={() => setOpen(false)}
+              className={cn(ITEM, "border-t border-line")}
+            >
+              <Icon name="shield" size={16} className="text-txt-dim" />
+              {tNav("admin")}
+            </Link>
+          )}
           <button
             type="button"
             role="menuitem"
             onClick={() => signOut({ callbackUrl: "/" })}
-            className={cn(ITEM, "w-full border-t border-line text-left hover:text-bad")}
+            className="flex w-full items-center gap-2.5 border-t border-line px-[15px] py-2.5 text-left font-body text-[14px] font-medium leading-none text-bad no-underline transition-colors duration-[140ms] hover:bg-panel-2"
           >
-            <Icon name="logout" size={16} className="text-txt-dim" />
+            <Icon name="logout" size={16} className="text-bad" />
             {tNav("logout")}
           </button>
         </div>
@@ -161,19 +187,19 @@ export function AccountMenu({ user }: { user: AccountUser }) {
 
 /** Desktop navbar auth slot: account menu when signed in, login/register buttons otherwise. */
 export function AccountNav() {
-  const { session } = useBoffSession()
+  const { session, isBoffAdmin } = useBoffSession()
   const [mounted, setMounted] = React.useState(false)
   React.useEffect(() => setMounted(true), [])
   // Until mounted (and on SSR) the client session is unknown — render the
   // logged-out buttons so hydration matches, then swap in the menu.
   if (!mounted || !session?.user) return <AuthButtons />
-  return <AccountMenu user={session.user} />
+  return <AccountMenu user={session.user} isAdmin={isBoffAdmin()} />
 }
 
 /** Mobile drawer auth slot: identity + logout when signed in, buttons otherwise. */
 export function MobileAccount({ onNavigate }: { onNavigate: () => void }) {
   const tNav = useTranslations("nav.v3")
-  const { session } = useBoffSession()
+  const { session, isBoffAdmin } = useBoffSession()
   const [mounted, setMounted] = React.useState(false)
   React.useEffect(() => setMounted(true), [])
   const image = useAvatarUrl(session?.user)
@@ -212,6 +238,26 @@ export function MobileAccount({ onNavigate }: { onNavigate: () => void }) {
           )}
         </div>
       </Link>
+      <div className="grid">
+        <Link href="/perfil?tab=torneos" onClick={onNavigate} className={MOBILE_ITEM}>
+          <Icon name="trophy" size={16} className="shrink-0 text-txt-dim" />
+          {tNav("tournaments")}
+        </Link>
+        <Link href="/perfil" onClick={onNavigate} className={MOBILE_ITEM}>
+          <Icon name="chart" size={16} className="shrink-0 text-txt-dim" />
+          {tNav("activity")}
+        </Link>
+        <Link href="/perfil" onClick={onNavigate} className={MOBILE_ITEM}>
+          <Icon name="settings" size={16} className="shrink-0 text-txt-dim" />
+          {tNav("settings")}
+        </Link>
+        {isBoffAdmin() && (
+          <Link href="/admin" onClick={onNavigate} className={MOBILE_ITEM}>
+            <Icon name="shield" size={16} className="shrink-0 text-txt-dim" />
+            {tNav("admin")}
+          </Link>
+        )}
+      </div>
       <Button
         variant="ghost"
         size="sm"
