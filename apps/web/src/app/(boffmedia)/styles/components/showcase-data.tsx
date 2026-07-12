@@ -165,6 +165,7 @@ export const CHAPTERS: Chapter[] = [
     name: "Sorteo rápido",
     dom: "Herramientas",
     sections: [
+      { id: "srqspin", label: "Ruleta del sorteo" },
       { id: "srqrow", label: "Fila de participante" },
       { id: "srqreveal", label: "Ganadores y semilla" },
     ],

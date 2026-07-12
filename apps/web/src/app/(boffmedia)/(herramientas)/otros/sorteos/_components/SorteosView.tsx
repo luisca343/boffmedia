@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl"
 import { Kicker, Button, Icon, Input, Textarea, Seg, Toggle, Avatar } from "@/components/boffmedia/primitives"
 import { useSorteos, oddsOf } from "../_lib/useSorteos"
 import { SrtWeight, SrtRow, SrtWinnerList, SrtSeedTag, SrtConfetti, SrtPanel, SrtPanelHead } from "./ui/srt-kit"
-// The spin animation is the original v2 component, used as-is (to be restyled later).
+// v3 «Señal» draw animation (horizontal reel), keeps the original tick/win sound.
 import SpinnerAnimation from "./spinner/SpinnerAnimation"
 
 function initialsOf(name: string) {
@@ -208,7 +208,7 @@ export function SorteosView() {
                 <p className="max-w-[34ch] font-mono text-[12px] leading-[1.5]">{t("blankText")}</p>
               </div>
             ) : phase === "setup" ? (
-              <div className="flex flex-1 flex-col gap-[18px]">
+              <div className="flex flex-1 flex-col justify-center gap-[20px]">
                 <div className="flex flex-wrap items-center gap-[14px] border border-line bg-panel-2 px-[18px] py-[16px]">
                   <span style={{ clipPath: "polygon(9px 0,100% 0,100% calc(100% - 9px),calc(100% - 9px) 100%,0 100%,0 9px)" }} className="grid h-[46px] w-[46px] flex-none place-items-center border border-accent-line bg-accent-soft text-accent">
                     <Icon name="users" size={22} />
@@ -227,12 +227,28 @@ export function SorteosView() {
                     </span>
                   </div>
                 </div>
+                {/* roster preview — fills the stage so the CTA isn't marooned at the bottom */}
+                {pool.length > 0 && (
+                  <div className="flex flex-wrap content-start justify-center gap-[8px]">
+                    {pool.slice(0, 28).map((e) => (
+                      <span key={e.id} className="inline-flex max-w-[190px] items-center gap-[8px] border border-line-2 bg-panel-2 px-[10px] py-[7px]">
+                        <Avatar className="h-[24px] w-[24px] flex-none text-[10px]">{initialsOf(e.name)}</Avatar>
+                        <span className="truncate font-mono text-[12px] text-txt-muted">{e.name}</span>
+                      </span>
+                    ))}
+                    {pool.length > 28 && (
+                      <span className="inline-flex items-center border border-line-2 bg-panel-2 px-[12px] py-[7px] font-mono text-[12px] font-semibold text-txt-dim">
+                        +{pool.length - 28}
+                      </span>
+                    )}
+                  </div>
+                )}
                 <button
                   type="button"
                   disabled={pool.length === 0}
                   onClick={runDraw}
                   style={{ clipPath: "polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%)" }}
-                  className="relative mt-auto inline-flex w-full items-center justify-center gap-[12px] overflow-hidden border-0 p-[20px] font-display text-[22px] font-extrabold italic uppercase tracking-[0.03em] text-accent-ink transition-[filter,transform] [background:repeating-linear-gradient(-55deg,var(--accent)_0_14px,var(--accent-bright)_14px_28px)] enabled:hover:-translate-y-[2px] enabled:hover:brightness-[1.08] disabled:cursor-default disabled:bg-panel-2 disabled:bg-none disabled:text-txt-muted disabled:opacity-50 disabled:grayscale"
+                  className="relative inline-flex w-full items-center justify-center gap-[12px] overflow-hidden border-0 p-[20px] font-display text-[22px] font-extrabold italic uppercase tracking-[0.03em] text-accent-ink transition-[filter,transform] [background:repeating-linear-gradient(-55deg,var(--accent)_0_14px,var(--accent-bright)_14px_28px)] enabled:hover:-translate-y-[2px] enabled:hover:brightness-[1.08] disabled:cursor-default disabled:bg-panel-2 disabled:bg-none disabled:text-txt-muted disabled:opacity-50 disabled:grayscale"
                 >
                   <Icon name="bolt" size={20} className="flex-none" />
                   {effCount > 1 ? t("drawN", { n: effCount }) : t("drawOne")}
@@ -241,7 +257,7 @@ export function SorteosView() {
               </div>
             ) : phase === "spin" && draw ? (
               <div className="flex flex-1 flex-col justify-center">
-                {/* Original v2 spinner, used as-is (with its own tick/win sound). */}
+                {/* v3 «Señal» spinner (reel physics + tick/win sound from useBaseSpinnerAnimation). */}
                 <SpinnerAnimation
                   participants={draw.pool.map((e) => e.name)}
                   winner={draw.winners[0]?.name ?? null}

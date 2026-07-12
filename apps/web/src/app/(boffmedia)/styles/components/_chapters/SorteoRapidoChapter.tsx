@@ -2,15 +2,47 @@
 
 import * as React from "react"
 import { Sample, Section } from "../showcase-shared"
+import { Button } from "@/components/boffmedia/primitives"
 import { SrtPanel, SrtPanelHead, SrtRow, SrtSeedTag, SrtWeight, SrtWinnerList } from "@/app/(boffmedia)/(herramientas)/otros/sorteos/_components/ui/srt-kit"
 import type { Entrant } from "@/app/(boffmedia)/(herramientas)/otros/sorteos/_lib/useSorteos"
+import SpinnerAnimation from "@/app/(boffmedia)/(herramientas)/otros/sorteos/_components/spinner/SpinnerAnimation"
 
 const DEMO_POOL: Entrant[] = [
   { id: "a", name: "AxelCraft", weight: 3 },
   { id: "b", name: "NovaPixel", weight: 1 },
   { id: "c", name: "RotomChef", weight: 2 },
   { id: "d", name: "WingullMain", weight: 1 },
+  { id: "e", name: "PixelDrake", weight: 1 },
+  { id: "f", name: "Lumaflux", weight: 2 },
 ]
+
+// Self-contained spinner preview: «Girar» picks a random winner and remounts
+// the reel (fresh key) so useBaseSpinnerAnimation replays with its tick/win sound.
+function SpinnerDemo() {
+  const names = DEMO_POOL.map((e) => e.name)
+  const [spin, setSpin] = React.useState<{ id: number; winner: string } | null>(null)
+  const [running, setRunning] = React.useState(false)
+  const start = () => {
+    const winner = names[Math.floor(Math.random() * names.length)]
+    setSpin((s) => ({ id: (s?.id ?? 0) + 1, winner }))
+    setRunning(true)
+  }
+  return (
+    <div className="grid w-full max-w-[560px] gap-4">
+      <SpinnerAnimation
+        key={spin?.id ?? "idle"}
+        participants={names}
+        winner={spin?.winner ?? null}
+        onComplete={() => setRunning(false)}
+      />
+      <div className="flex justify-center">
+        <Button variant="pri" icon="bolt" onClick={start} disabled={running}>
+          {spin ? "Girar de nuevo" : "Girar"}
+        </Button>
+      </div>
+    </div>
+  )
+}
 
 export function SorteoRapidoChapter() {
   const [pool, setPool] = React.useState(DEMO_POOL)
@@ -19,6 +51,17 @@ export function SorteoRapidoChapter() {
   const winners = pool.slice(0, 2)
   return (
     <>
+      <Section
+        id="srqspin"
+        kicker="Sorteo rápido"
+        title="Ruleta del sorteo"
+        lead={<>La animación del sorteo (<code>SpinnerAnimation</code>): una tira horizontal que decelera hasta el ganador, con su sonido de tic/victoria. Restilizada a v3 «Señal» — grafito + naranja de marca, cortes diagonales, indicador REC en directo — conservando la física del carrete (<code>useBaseSpinnerAnimation</code>). Pulsa <em>Girar</em> para reproducirla.</>}
+      >
+        <Sample title="Carrete en directo" code="<SpinnerAnimation participants winner onComplete>" col>
+          <SpinnerDemo />
+        </Sample>
+      </Section>
+
       <Section
         id="srqrow"
         kicker="Sorteo rápido"
@@ -69,7 +112,7 @@ export function SorteoRapidoChapter() {
         id="srqreveal"
         kicker="Sorteo rápido"
         title="Ganadores y semilla"
-        lead={<>El resultado del sorteo: la lista de ganadores con su probabilidad (<code>SrtWinnerList</code>) y la etiqueta de semilla verificable (<code>SrtSeedTag</code>) que permite reproducir el sorteo. La tira ponderada girando (el spinner) vive en la herramienta en vivo.</>}
+        lead={<>El resultado del sorteo: la lista de ganadores con su probabilidad (<code>SrtWinnerList</code>) y la etiqueta de semilla verificable (<code>SrtSeedTag</code>) que permite reproducir el sorteo. La tira girando es la <code>Ruleta del sorteo</code> de arriba.</>}
       >
         <Sample title="Ganadores" code="<SrtWinnerList winners pool weighted>" col>
           <div className="w-full max-w-[520px]">
