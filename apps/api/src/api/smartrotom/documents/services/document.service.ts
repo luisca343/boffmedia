@@ -18,6 +18,8 @@ export interface UpdateDocumentRequest {
   content?: string;
   type?: number;
   public?: number;
+  pinned?: number;
+  folderId?: number | null;
 }
 
 @Injectable()
@@ -46,6 +48,14 @@ export class DocumentService {
     }
 
     return this.documentsRepository.findUserDocuments(uuid);
+  }
+
+  async getTrashedDocuments(uuid: string): Promise<NotePreview[]> {
+    if (!uuid) {
+      throw new Error('UUID is required');
+    }
+
+    return this.documentsRepository.findTrashedDocuments(uuid);
   }
 
   async createDocument(
@@ -99,11 +109,42 @@ export class DocumentService {
       updateData.public = updateDocumentRequest.public;
     }
 
+    if (updateDocumentRequest.pinned !== undefined) {
+      updateData.pinned = updateDocumentRequest.pinned;
+    }
+
+    if (updateDocumentRequest.folderId !== undefined) {
+      updateData.folderId = updateDocumentRequest.folderId;
+    }
+
     await this.documentsRepository.updateDocument(id, updateData);
     return this.getDocumentById(id);
   }
 
+  // Soft delete: moves the document to the trash (recoverable).
   async deleteDocument(id: number): Promise<void> {
+    const existingDocument =
+      await this.documentsRepository.findDocumentById(id);
+    if (!existingDocument) {
+      throw new Error('Document not found');
+    }
+
+    await this.documentsRepository.softDeleteDocument(id);
+  }
+
+  async restoreDocument(id: number): Promise<DocumentDetails> {
+    const existingDocument =
+      await this.documentsRepository.findDocumentById(id);
+    if (!existingDocument) {
+      throw new Error('Document not found');
+    }
+
+    await this.documentsRepository.restoreDocument(id);
+    return this.getDocumentById(id);
+  }
+
+  // Permanent removal (cascades to tags/versions/shares via FKs).
+  async purgeDocument(id: number): Promise<void> {
     const existingDocument =
       await this.documentsRepository.findDocumentById(id);
     if (!existingDocument) {
