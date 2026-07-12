@@ -2,11 +2,13 @@
 
 import * as React from "react"
 import { useLocale, useTranslations } from "next-intl"
+import { useRouter } from "next/navigation"
 import {
   Badge,
   Button,
   Empty,
   Panel,
+  Seg,
   Spinner,
   type IconName,
 } from "@/components/boffmedia/primitives"
@@ -26,7 +28,7 @@ import { useGetLeaderboards } from "@/hooks/events/useGetLeaderboards"
 import { useUserActivity, useUserTrophies } from "@/hooks/profile/useProfileStats"
 import { useProfileEditor } from "./useProfileEditor"
 import { LinkedAccountsPanel } from "./LinkedAccountsPanel"
-import { MyTournamentsList } from "./MyTournamentsList"
+import { ProfileTournamentsTab } from "./ProfileTournamentsTab"
 
 // achievement category → a safe local IconName (mirrors ui/events/AchievementItem)
 const CAT_ICON: Record<string, IconName> = {
@@ -52,6 +54,22 @@ export function ProfileView({
   const { leaderboards } = useGetLeaderboards()
   const { trophies } = useUserTrophies(userId)
   const { activity } = useUserActivity(userId, 12)
+
+  const router = useRouter()
+  const [view, setView] = React.useState<"privada" | "torneos">("privada")
+  // Deep-link `/perfil?tab=torneos` → open the tab on mount (client-only, no Suspense caveat).
+  React.useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("tab") === "torneos") setView("torneos")
+  }, [])
+  const isTours = view === "torneos"
+  // «Pública» is a dedicated route (`/u/[handle]`), so that segment navigates there.
+  const onTab = (v: string) => {
+    if (v === "publica") {
+      if (user?.name) router.push(`/u/${encodeURIComponent(user.name)}`)
+      return
+    }
+    setView(v === "torneos" ? "torneos" : "privada")
+  }
 
   const {
     full,
@@ -184,101 +202,111 @@ export function ProfileView({
     <main className="wrap pb-[90px] pt-[34px]">
       <div className="mb-[22px] flex flex-wrap items-end justify-between gap-[22px]">
         <div>
-          <span className="mono-label">{t("kicker")}</span>
-          <h1 className="mt-2 text-[clamp(46px,5.4vw,64px)]">{t("title")}</h1>
+          <span className="mono-label">{isTours ? t("tours.kicker") : t("kicker")}</span>
+          <h1 className="mt-2 text-[clamp(46px,5.4vw,64px)]">{isTours ? t("tours.title") : t("title")}</h1>
         </div>
         <div className="flex flex-wrap items-center gap-2.5">
-          {user.name && !editing && (
-            <Button variant="ghost" icon="eye" href={`/u/${encodeURIComponent(user.name)}`}>
-              {t("public.viewMine")}
+          <Seg
+            value={view}
+            onChange={onTab}
+            options={[
+              { value: "privada", label: t("tabs.private") },
+              { value: "publica", label: t("tabs.public") },
+              { value: "torneos", label: t("tabs.tournaments") },
+            ]}
+          />
+          {!isTours && (
+            <Button
+              variant={editing ? "pri" : "default"}
+              icon={editing ? "check" : "cog"}
+              loading={saving}
+              onClick={editing ? handleSave : () => setEditing(true)}
+            >
+              {editing ? t("save") : t("edit")}
             </Button>
           )}
-          <Button
-            variant={editing ? "pri" : "default"}
-            icon={editing ? "check" : "cog"}
-            loading={saving}
-            onClick={editing ? handleSave : () => setEditing(true)}
-          >
-            {editing ? t("save") : t("edit")}
-          </Button>
         </div>
       </div>
 
-      <ProfileHero
-        name={user.name || "—"}
-        handle={handle}
-        initial={initial}
-        avatarUrl={avatarOverride ?? user.image ?? full?.profilePicture}
-        coverUrl={coverOverride ?? full?.coverImage}
-        bio={full?.bio || undefined}
-        tags={tags}
-        metrics={metrics}
-        editable
-        uploading={uploading}
-        coverUploading={coverUploading}
-        avatarLabel={t("avatar.change")}
-        coverLabel={t("cover.change")}
-        onAvatarClick={() => !uploading && fileRef.current?.click()}
-        onCoverClick={() => !coverUploading && coverRef.current?.click()}
-      />
-      <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
-      <input ref={coverRef} type="file" accept="image/*" className="hidden" onChange={handleCoverFile} />
-
-      {stats.length > 0 && (
-        <div className="mb-4 grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(148px,1fr))]">
-          {stats.map((s) => (
-            <StatTile key={s.label} {...s} />
-          ))}
-        </div>
-      )}
-
-      <div className="grid items-start gap-4 [grid-template-columns:1.05fr_0.95fr] max-[1080px]:grid-cols-1">
-        <Panel title={t("section.account")}>
-          <AccountForm
-            values={values}
-            editing={editing}
-            showBio
-            onChange={(f, v) => setValues((prev) => ({ ...prev, [f]: v }))}
+      {isTours ? (
+        <ProfileTournamentsTab />
+      ) : (
+        <>
+          <ProfileHero
+            name={user.name || "—"}
+            handle={handle}
+            initial={initial}
+            avatarUrl={avatarOverride ?? user.image ?? full?.profilePicture}
+            coverUrl={coverOverride ?? full?.coverImage}
+            bio={full?.bio || undefined}
+            tags={tags}
+            metrics={metrics}
+            editable
+            uploading={uploading}
+            coverUploading={coverUploading}
+            avatarLabel={t("avatar.change")}
+            coverLabel={t("cover.change")}
+            onAvatarClick={() => !uploading && fileRef.current?.click()}
+            onCoverClick={() => !coverUploading && coverRef.current?.click()}
           />
-        </Panel>
+          <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
+          <input ref={coverRef} type="file" accept="image/*" className="hidden" onChange={handleCoverFile} />
 
-        <LinkedAccountsPanel
-          googleId={full?.googleId}
-          discordId={full?.discordId}
-          steamLinked={steamLinked}
-          twitchLinked={twitchLinked}
-          mcLinked={mcLinked}
-          mcUsername={user.smartRotomUser?.username}
-          editing={editing}
-          discordEnabled={discordEnabled}
-          twitchEnabled={twitchEnabled}
-          onUnlink={handleUnlink}
-        />
-      </div>
-
-      <div className="mt-4 grid items-start gap-4 [grid-template-columns:1.05fr_0.95fr] max-[1080px]:grid-cols-1">
-        <Panel title={t("section.trophies")}>
-          {trophyItems.length > 0 ? (
-            <TrophyCase trophies={trophyItems} />
-          ) : (
-            <Empty icon="trophy" title={t("trophies.emptyTitle")} lead={t("trophies.emptyBody")} />
+          {stats.length > 0 && (
+            <div className="mb-4 grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(148px,1fr))]">
+              {stats.map((s) => (
+                <StatTile key={s.label} {...s} />
+              ))}
+            </div>
           )}
-        </Panel>
 
-        <Panel title={t("section.activity")}>
-          {activityItems.length > 0 ? (
-            <ActivityFeed items={activityItems} />
-          ) : (
-            <Empty icon="clock" title={t("activity.emptyTitle")} lead={t("activity.emptyBody")} />
-          )}
-        </Panel>
-      </div>
+          {/* Two independent column stacks (handoff pf-grid → pf-col) so a tall
+              panel never opens a gap under a shorter one in the same row. */}
+          <div className="grid items-start gap-4 [grid-template-columns:1.05fr_0.95fr] max-[1080px]:grid-cols-1">
+            <div className="grid min-w-0 gap-4">
+              <Panel title={t("section.account")}>
+                <AccountForm
+                  values={values}
+                  editing={editing}
+                  showBio
+                  onChange={(f, v) => setValues((prev) => ({ ...prev, [f]: v }))}
+                />
+              </Panel>
 
-      <div className="mt-4">
-        <Panel title={t("section.tournaments")}>
-          <MyTournamentsList />
-        </Panel>
-      </div>
+              <Panel title={t("section.trophies")}>
+                {trophyItems.length > 0 ? (
+                  <TrophyCase trophies={trophyItems} />
+                ) : (
+                  <Empty icon="trophy" title={t("trophies.emptyTitle")} lead={t("trophies.emptyBody")} />
+                )}
+              </Panel>
+            </div>
+
+            <div className="grid min-w-0 gap-4">
+              <LinkedAccountsPanel
+                googleId={full?.googleId}
+                discordId={full?.discordId}
+                steamLinked={steamLinked}
+                twitchLinked={twitchLinked}
+                mcLinked={mcLinked}
+                mcUsername={user.smartRotomUser?.username}
+                editing={editing}
+                discordEnabled={discordEnabled}
+                twitchEnabled={twitchEnabled}
+                onUnlink={handleUnlink}
+              />
+
+              <Panel title={t("section.activity")}>
+                {activityItems.length > 0 ? (
+                  <ActivityFeed items={activityItems} />
+                ) : (
+                  <Empty icon="clock" title={t("activity.emptyTitle")} lead={t("activity.emptyBody")} />
+                )}
+              </Panel>
+            </div>
+          </div>
+        </>
+      )}
     </main>
   )
 }
