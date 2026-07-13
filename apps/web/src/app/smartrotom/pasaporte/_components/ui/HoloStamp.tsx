@@ -1,0 +1,43 @@
+// PAPER. The overprint that surfaces on a page while it is under the lamp.
+
+import type { ReactNode } from "react"
+import { cn } from "@/lib/utils"
+
+/**
+ * A holographic ring, multiplied into the stock so it tints the paper instead of covering
+ * it. It appears only during inspection — a security feature that were always visible
+ * would just be decoration.
+ */
+export function HoloStamp({
+  show,
+  children = (
+    <>
+      SELLO
+      <br />
+      TERAS
+      <br />
+      VÁLIDO
+    </>
+  ),
+  className,
+}: {
+  show: boolean
+  children?: ReactNode
+  className?: string
+}) {
+  return (
+    <div
+      aria-hidden="true"
+      className={cn(
+        "pointer-events-none absolute right-[34px] top-[40%] z-[7] h-[120px] w-[120px] rotate-[-12deg]",
+        "transition-all duration-300 motion-reduce:transition-none",
+        show ? "scale-100 opacity-75" : "scale-[.7] opacity-0",
+        className,
+      )}
+    >
+      <div className="ps-holo-ring grid h-full w-full place-items-center rounded-full text-center font-ps-mono text-[11px] tracking-[.12em] text-ps-teal-deep">
+        {children}
+      </div>
+    </div>
+  )
+}
