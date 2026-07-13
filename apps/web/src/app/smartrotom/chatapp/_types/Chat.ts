@@ -80,6 +80,13 @@ export type Message = {
     type: string;
 }
 
+// TODO(P9): shadows shared `Chat`/`ChatMessage` (this file predates Phase 5's `_types/view.ts`
+// `ChatVM`/`ChatMessageVM`, which is the type actually wired to the UI); `members: string[]`
+// has already drifted from the entity's `ChatMember[]`, but nothing reads `.members` off this
+// type today (only `.id`/`.messages`/`.unread` are touched, via `useGetChats.ts`'s `any`-typed
+// state) — aligning it would mean re-deriving `Message` (a socket payload with `chatId`, which
+// has no generated counterpart) against `ChatMessage` too. Left unlinked rather than mechanically
+// forced.
 export type ChatData = {
     id: number;
     name: string;

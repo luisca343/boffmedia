@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useBoffSession } from "@/services/useBoffSession";
+import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid";
 import { useRotomRequest } from "@/hooks/useRotomRequest";
 import { DocumentsService } from "@/services/api/smartrotom/documentsService";
 import type { ApiResponse } from "@/services/boffAPI";
@@ -16,8 +16,7 @@ function toVM(n: NotePreview): NoteVM {
 }
 
 export function useNotesData() {
-  const { session } = useBoffSession();
-  const uuid = session?.user.smartRotomUser?.uuid ?? "";
+  const uuid = useRotomUuid() ?? "";
   const [mutationError, setError] = useState<string | null>(null);
 
   /**

@@ -1,44 +1,32 @@
 import type { PresenceStatus } from "../_components/ui";
+import type { Chat, ChatMember, ChatMessage, MessageReaction } from "@boffmedia/shared";
 
 /** Chat type discriminator as stored by the API. */
 export const CHAT_TYPE = { PUBLIC: 0, SAVED: 1, DIRECT: 2, GROUP: 3 } as const;
 
-export interface Reaction {
-  emoji: string;
-  /** UUIDs of users who reacted. */
-  by: string[];
-}
+export type Reaction = MessageReaction;
 
 export type MessageStatus = "sent" | "delivered" | "read";
 
-export interface ChatMemberVM {
-  uuid: string;
-  username?: string;
-}
+export type ChatMemberVM = ChatMember;
 
-export interface ChatMessageVM {
-  id: number;
-  content: string;
-  createdAt: string;
+export interface ChatMessageVM extends Omit<ChatMessage, "type" | "status" | "uuid"> {
   uuid: string;
   chatId: number;
+  // The entity declares `type?: string | null`, but NestJS/swagger can't reflect a
+  // union design:type and falls back to `object`, so the generated model widens it
+  // to `Record<string, any>`. Narrowed back to what the wire actually sends.
   type: string;
   // Phase 5 (optional until the API returns them)
-  reactions?: Reaction[];
   status?: MessageStatus;
   replyTo?: number | null; // [deferred] no reply API yet
 }
 
-export interface ChatVM {
-  id: number;
-  name: string;
-  type: number;
+export interface ChatVM extends Omit<Chat, "description" | "createdAt" | "updatedAt" | "messages" | "members"> {
   description?: string;
-  image: string;
   createdAt?: string;
   updatedAt?: string;
   messages: ChatMessageVM[];
-  unread: number;
   members: ChatMemberVM[];
   // Phase 5 wiring (optional until backed by the API)
   presence?: PresenceStatus;
