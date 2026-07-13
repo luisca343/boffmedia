@@ -94,6 +94,26 @@ const config: Config = {
         gt: ["Public Sans", "ui-sans-serif", "system-ui", "sans-serif"],
         "gt-display": ["Libre Baskerville", "Georgia", "Times New Roman", "serif"],
         "gt-mono": ["Space Mono", "Roboto Mono", "ui-monospace", "monospace"],
+        // Wigglypop (SmartRotom) — the bubbly marketplace. Only two families, and
+        // the split is unusual: Fredoka is the ROUNDED face (wordmark, card and
+        // panel titles, every heading) and tops out at 600 — asking it for 700+
+        // silently falls back, so the design's "bold" IS 600. Nunito carries body
+        // copy AND every figure: `font-wp-mono` is not a real monospace, it is
+        // Nunito 800 with tabular-nums (see the `.wp-num` component class), which
+        // is what keeps prices column-aligned without importing a third family.
+        wp: ["Nunito", "ui-sans-serif", "system-ui", "sans-serif"],
+        "wp-display": ["Fredoka", "Nunito", "ui-rounded", "sans-serif"],
+        "wp-mono": ["Nunito", "ui-sans-serif", "system-ui", "sans-serif"],
+        // Rooker (SmartRotom) — the social nest. Alone among the twelve, its
+        // body face is the reader's OWN system UI font: a timeline should read
+        // like the device it is on. `font-rk-chirp` (Hanken Grotesk, self-hosted
+        // variable 400–900) is the opt-in alternative offered in Pantalla — it
+        // is applied by swapping `--rk-font` on the scope root, so `font-rk`
+        // resolves to whichever face the reader chose. There is no display face:
+        // Rooker sets hierarchy with weight, never with a second family.
+        rk: ["var(--rk-font)", "ui-sans-serif", "system-ui", "sans-serif"],
+        "rk-chirp": ["Hanken Grotesk", "ui-sans-serif", "system-ui", "sans-serif"],
+        "rk-mono": ["IBM Plex Mono", "Roboto Mono", "ui-monospace", "monospace"],
       },
       fontSize: {
         "4xl": ["2.25rem", { lineHeight: "normal" }],
@@ -198,6 +218,29 @@ const config: Config = {
         "gt-sm": "0 1px 2px rgba(74,64,40,.08), inset 0 1px 0 rgba(255,255,255,.6)",
         gt: "0 2px 10px -4px rgba(74,64,40,.22), inset 0 1px 0 rgba(255,255,255,.7)",
         "gt-lg": "0 16px 40px -20px rgba(50,42,22,.45), inset 0 1px 0 rgba(255,255,255,.7)",
+        // ── Wigglypop (SmartRotom) — candy elevation ────────────────────────
+        // Every shadow is tinted with the accent's plum (223,63,137), never a
+        // neutral black: on a pink-cream page a grey drop shadow reads as soot.
+        // The ramp is deliberately long-and-soft (large blur, large negative
+        // spread) — that softness is what makes the surfaces read as inflated.
+        "wp-soft": "0 8px 22px -12px rgba(223,63,137,.22)",
+        wp: "0 16px 36px -18px rgba(223,63,137,.30)",
+        "wp-btn": "0 3px 8px -5px rgba(223,63,137,.3)",
+        // The primary button and the active tab sit on a much heavier drop —
+        // that is what lifts the pink gradient off the pink page.
+        "wp-primary": "0 10px 20px -8px rgba(223,63,137,.7)",
+        "wp-tab": "0 8px 16px -8px rgba(223,63,137,.6)",
+        "wp-card-hover": "0 22px 40px -20px rgba(223,63,137,.5)",
+        "wp-modal": "0 30px 70px -24px rgba(223,63,137,.5)",
+        // Ring + glow in one, for the hovered/selected slot and card.
+        "wp-glow":
+          "0 0 0 1px rgba(242,99,160,.5), 0 8px 24px -8px rgba(242,99,160,.45)",
+        // The three rarity hovers. Literal classes, applied from the map in
+        // `_utils/rarity.ts` — never `shadow-wp-${rarity}` (§4).
+        "wp-raro": "0 22px 40px -20px rgba(18,192,176,.45)",
+        "wp-epico": "0 22px 40px -20px rgba(157,92,224,.5)",
+        "wp-legendario": "0 22px 42px -18px rgba(243,165,31,.55)",
+        "wp-slot": "inset 0 1px 0 #fff, 0 4px 10px -7px rgba(223,63,137,.18)",
       },
       backdropBlur: {
         xs: "2px",
@@ -980,6 +1023,120 @@ const config: Config = {
           danger: { DEFAULT: "rgb(var(--gt-danger) / <alpha-value>)", tint: "rgb(var(--gt-danger-tint) / <alpha-value>)" },
           info:   { DEFAULT: "rgb(var(--gt-info) / <alpha-value>)",   tint: "rgb(var(--gt-info-tint) / <alpha-value>)" },
         },
+        // ════════════════════════════════════════════════════════════════════
+        // Rooker (SmartRotom) — "el nido social". Backed by `.rk-app[data-theme]`
+        // with THREE canvases, not two: Claro, Tenue and Oscuro. Light/dark still
+        // comes from the platform picker (SMARTROTOM_V3 §2b) — what the app owns
+        // is *which* dark, which is a contrast preference, not a theme.
+        //
+        // The accent is a runtime triplet (`--rk-accent`, six choices) and every
+        // brand surface derives off it through Tailwind's alpha channel, so one
+        // var swap repaints the whole timeline. What must NOT follow the accent
+        // are the action colours: a Retrino is always green and a heart is always
+        // pink, exactly as on Twitter — recolouring them would destroy the
+        // learned meaning. Those five reaction hues are therefore constants.
+        // ════════════════════════════════════════════════════════════════════
+        // ════════════════════════════════════════════════════════════════════
+        // WIGGLYPOP (SmartRotom) — `wp-*`. The bubbly marketplace: Wallapop's
+        // friendly second-hand shop crossed with Wigglytuff's balloon pink.
+        // Light-only, like Furret Today and Gobierno — the pink-cream paper IS
+        // the product, so the app ignores the theme picker's mode
+        // (SMARTROTOM_V3.md §2b). There is no `data-theme` axis on `.wp-app`.
+        //
+        // TWO accents, and the split is the whole system:
+        //   · `wp-accent` (balloon pink) = IDENTITY and ACTION — the brand, the
+        //     primary button, the active tab, every focus ring.
+        //   · `wp-teal` (Wallapop's teal) = MONEY and TRUST — every price, the
+        //     valuation box, the escrow/verified badges. It is never decorative.
+        // Keeping money teal is what stops a page of pink prices from turning
+        // into visual noise, and it is why a price is legible at a glance.
+        //
+        // The four rarity hues are DATA-DRIVEN (a Pokémon's IVs pick one), so
+        // they are applied through the literal class maps in `_utils/rarity.ts`
+        // — never `text-wp-rarity-${r}` (§4: dynamic classes never compile).
+        // ════════════════════════════════════════════════════════════════════
+        wp: {
+          // Surfaces: a pink-cream page, white cards. `bg` is the page, `panel`
+          // is the frosted chrome (used at /90), `panel-2` the sunken tint.
+          bg: "rgb(var(--wp-bg) / <alpha-value>)",
+          "bg-soft": "rgb(var(--wp-bg-soft) / <alpha-value>)",
+          panel: "rgb(var(--wp-panel) / <alpha-value>)",
+          "panel-2": "rgb(var(--wp-panel-2) / <alpha-value>)",
+          // Wigglytuff's belly — the wallet pill and nothing else. It is the one
+          // warm note in a cool-pink page, which is what makes money feel held.
+          cream: {
+            DEFAULT: "rgb(var(--wp-cream) / <alpha-value>)",
+            deep: "rgb(var(--wp-cream-deep) / <alpha-value>)",
+          },
+          // Hairlines are a dusty plum, not grey. One triplet, two strengths via
+          // alpha: `border-wp-line/24` is the default rule, `/46` the strong one.
+          line: "rgb(var(--wp-line) / <alpha-value>)",
+          // Text is deep plum, never black — #000 on this page reads as a hole.
+          fg: {
+            DEFAULT: "rgb(var(--wp-fg) / <alpha-value>)",
+            muted: "rgb(var(--wp-fg-muted) / <alpha-value>)",
+            subtle: "rgb(var(--wp-fg-subtle) / <alpha-value>)",
+          },
+          accent: {
+            DEFAULT: "rgb(var(--wp-accent) / <alpha-value>)",
+            strong: "rgb(var(--wp-accent-strong) / <alpha-value>)",
+            // The two stops of the primary gradient (`.wp-grad-primary`).
+            light: "rgb(var(--wp-accent-light) / <alpha-value>)",
+          },
+          // Money + trust. `teal` is the price colour; `teal-deep` is text ON a
+          // teal-tinted surface (the trust chip), where plain teal would fail AA.
+          teal: {
+            DEFAULT: "rgb(var(--wp-teal) / <alpha-value>)",
+            deep: "rgb(var(--wp-teal-deep) / <alpha-value>)",
+          },
+          green: "rgb(var(--wp-green) / <alpha-value>)",
+          violet: "rgb(var(--wp-violet) / <alpha-value>)",
+          amber: "rgb(var(--wp-amber) / <alpha-value>)",
+          gold: "rgb(var(--wp-gold) / <alpha-value>)",
+          rose: "rgb(var(--wp-rose) / <alpha-value>)",
+          // Rarity. Note `raro` IS teal and `legendario` IS gold — deliberately
+          // the same triplets, so the rarity ramp and the money/reward ramp stay
+          // one palette rather than two competing ones.
+          rarity: {
+            comun: "rgb(var(--wp-rarity-comun) / <alpha-value>)",
+            raro: "rgb(var(--wp-rarity-raro) / <alpha-value>)",
+            epico: "rgb(var(--wp-rarity-epico) / <alpha-value>)",
+            legendario: "rgb(var(--wp-rarity-legendario) / <alpha-value>)",
+          },
+        },
+        rk: {
+          bg:       "rgb(var(--rk-bg) / <alpha-value>)",
+          card:     "rgb(var(--rk-card) / <alpha-value>)",
+          elevated: "rgb(var(--rk-elevated) / <alpha-value>)",
+          // The nav/header scrim sits over scrolling content and is blurred, so
+          // it is a full colour (pre-composited alpha), not a triplet.
+          nav:      "var(--rk-nav)",
+          hover:    "var(--rk-hover)",
+          fg: {
+            DEFAULT: "rgb(var(--rk-fg) / <alpha-value>)",
+            muted:   "rgb(var(--rk-fg-muted) / <alpha-value>)",
+            subtle:  "rgb(var(--rk-fg-subtle) / <alpha-value>)",
+          },
+          line: {
+            DEFAULT: "rgb(var(--rk-line) / <alpha-value>)",
+            strong:  "rgb(var(--rk-line-strong) / <alpha-value>)",
+          },
+          accent: {
+            DEFAULT: "rgb(var(--rk-accent) / <alpha-value>)",
+            // The ink that sits ON the accent — flips to near-black for the
+            // light accents (yellow, green) so the CTA label stays legible.
+            fg:      "rgb(var(--rk-accent-fg) / <alpha-value>)",
+          },
+          // Fixed action + status colours. Constant across all three canvases.
+          heart:    "rgb(var(--rk-heart) / <alpha-value>)",
+          ball:     "rgb(var(--rk-ball) / <alpha-value>)",
+          choque:   "rgb(var(--rk-choque) / <alpha-value>)",
+          shiny:    "rgb(var(--rk-shiny) / <alpha-value>)",
+          fuego:    "rgb(var(--rk-fuego) / <alpha-value>)",
+          rt:       "rgb(var(--rk-rt) / <alpha-value>)",
+          live:     "rgb(var(--rk-live) / <alpha-value>)",
+          verified: "rgb(var(--rk-verified) / <alpha-value>)",
+        },
       },
       keyframes: {
         // Existing animations
@@ -1255,6 +1412,51 @@ const config: Config = {
           from: { opacity: "0", transform: "translateY(10px) scale(.98)" },
           to:   { opacity: "1", transform: "translateY(0) scale(1)" },
         },
+        // ── Wigglypop (SmartRotom) ──────────────────────────────────────────
+        // The system's motion signature is OVERSHOOT. `wp-pop` deliberately
+        // scales past 1 before settling — that 8% overshoot on the bouncy ease
+        // is what makes a card feel inflated rather than merely animated, and it
+        // is the one thing to preserve if any of these are ever retuned.
+        "wp-pop": {
+          "0%":   { opacity: "0", transform: "scale(.6)" },
+          "60%":  { transform: "scale(1.08)" },
+          "100%": { opacity: "1", transform: "scale(1)" },
+        },
+        "wp-fade": { from: { opacity: "0" }, to: { opacity: "1" } },
+        "wp-slide-up": {
+          from: { opacity: "0", transform: "translateY(14px)" },
+          to:   { opacity: "1", transform: "translateY(0)" },
+        },
+        // The detail hero bobs. Slow and small — it reads as a balloon holding
+        // station, not as a thing demanding attention.
+        "wp-floaty": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%":      { transform: "translateY(-7px)" },
+        },
+        // ── Rooker (SmartRotom) ─────────────────────────────────────────────
+        "rk-pop": {
+          "0%":   { transform: "scale(.4)", opacity: "0" },
+          "60%":  { transform: "scale(1.15)" },
+          "100%": { transform: "scale(1)", opacity: "1" },
+        },
+        // The reaction that flies off the button when you tap it.
+        "rk-fly": {
+          "0%":   { transform: "translateY(0) rotate(0)" },
+          "100%": { transform: "translateY(-46px) rotate(8deg)", opacity: "0" },
+        },
+        "rk-fadeup": {
+          from: { opacity: "0", transform: "translateY(8px)" },
+          to:   { opacity: "1", transform: "translateY(0)" },
+        },
+        // The sheen that crawls across a shiny capture. Drives background-position,
+        // so the gradient it animates must be sized 200% wide.
+        "rk-shimmer": { to: { backgroundPosition: "200% 0" } },
+        // The halo on anything live. Hard-coded to the live red because that is
+        // what "live" means here — it does not follow the accent.
+        "rk-live": {
+          "0%, 100%": { boxShadow: "0 0 0 0 rgb(var(--rk-live) / .5)" },
+          "50%":      { boxShadow: "0 0 0 5px rgb(var(--rk-live) / 0)" },
+        },
       },
       animation: {
         // Existing animations
@@ -1339,6 +1541,20 @@ const config: Config = {
         "gt-pulse": "gt-pulse 1.8s ease-in-out infinite",
         "gt-stamp": "gt-stamp .4s cubic-bezier(.2,.8,.3,1) both",
         "gt-toast": "gt-toast .22s ease-out both",
+        // ── Wigglypop (SmartRotom) ──────────────────────────────────────────
+        // `wp-pop` rides the bouncy ease (it is the one that overshoots); the
+        // other two ride the soft ease, because content sliding in should not
+        // wobble. Pair each with `motion-reduce:animate-none` at the usage site.
+        "wp-pop": "wp-pop .3s cubic-bezier(.34,1.4,.5,1) both",
+        "wp-fade": "wp-fade .3s cubic-bezier(.22,.61,.36,1) both",
+        "wp-slide-up": "wp-slide-up .3s cubic-bezier(.22,.61,.36,1) both",
+        "wp-floaty": "wp-floaty 5s cubic-bezier(.22,.61,.36,1) infinite",
+        // ── Rooker (SmartRotom) ─────────────────────────────────────────────
+        "rk-pop": "rk-pop .18s ease-out both",
+        "rk-fly": "rk-fly .65s ease-out forwards",
+        "rk-fadeup": "rk-fadeup .28s ease-out both",
+        "rk-shimmer": "rk-shimmer 3.4s linear infinite",
+        "rk-live": "rk-live 2s ease-in-out infinite",
       },
       transitionTimingFunction: {
         "pk-out": "cubic-bezier(.16, 1, .3, 1)",
@@ -1347,6 +1563,13 @@ const config: Config = {
         tx: "cubic-bezier(.22, 1, .36, 1)",
         // Furret Today — the "snap" the pop cards lift on.
         ft: "cubic-bezier(.2, .7, .2, 1)",
+        // Wigglypop's two curves. `ease-wp` OVERSHOOTS (the 1.4 control point is
+        // past 1) — it is the bouncy one, and it belongs on anything that scales
+        // or lifts: buttons, cards, slots, the toggle knob. `ease-wp-soft` does
+        // not overshoot and belongs on anything that fades or slides, where a
+        // bounce would look like a bug. Do not swap them.
+        wp: "cubic-bezier(.34, 1.4, .5, 1)",
+        "wp-soft": "cubic-bezier(.22, .61, .36, 1)",
       },
       spacing: {
         18: "4.5rem",
@@ -1360,18 +1583,40 @@ const config: Config = {
         ft: "2.5px",
         "ft-thick": "4px",
         "ft-hair": "1.5px",
+        // ── Wigglypop (SmartRotom) — the soft 1.5px rule ────────────────────
+        // Every card, button, input and slot in Wigglypop is bordered at 1.5px,
+        // not 1px. It is the single most load-bearing number in the system: at
+        // 1px the white cards dissolve into the pink page, and at 2px they turn
+        // into stickers. The hairline (`border-wp-line/24`) stays 1px.
+        wp: "1.5px",
       },
       borderRadius: {
         "4xl": "2rem",
         "neon": "14px",
         "neon-lg": "22px",
         "neon-pill": "9999px",
+        // ── Rooker (SmartRotom) radii ───────────────────────────────────────
+        // A two-value system on purpose: every container is a 16px card and
+        // every control is a full pill. `rk-sm` exists only for the tiny
+        // square-ish things (the clear-search chip, an inline swatch).
+        "rk-sm": "4px",
+        "rk-md": "12px",
+        rk: "16px",
+        "rk-pill": "9999px",
         // ── Furret Today (SmartRotom) radii ─────────────────────────────────
         "ft-sm": "6px",
         "ft-md": "10px",
         ft: "14px",
         "ft-lg": "24px",
         "ft-pill": "999px",
+        // ── Wigglypop (SmartRotom) radii ────────────────────────────────────
+        // Generous and rounded — this is a balloon system. `wp` (18px) is the
+        // card/panel, `wp-sm` (13px) every control and input, `wp-lg` (26px) the
+        // modal. Anything interactive that is not a rectangle is a full pill.
+        "wp-sm": "13px",
+        wp: "18px",
+        "wp-lg": "26px",
+        "wp-pill": "999px",
         // ── Starbank (SmartRotom) radii ─────────────────────────────────────
         "sb-xs": "6px",
         "sb-sm": "10px",
@@ -2935,6 +3180,275 @@ const config: Config = {
         ".gt-scroll::-webkit-scrollbar-thumb:hover": {
           background: "rgb(var(--gt-ink-300))",
         },
+      })
+    }),
+    // ── Rooker (SmartRotom) theme layer ────────────────────────────────────
+    // "El nido social": a Twitter-faithful timeline. Scoped to `.rk-app`, with
+    // THREE canvases where every other app has two — Claro, Tenue and Oscuro.
+    // That is not an extra theme: the platform picker still decides light vs
+    // dark (§2b), and when it says dark the reader picks *which* dark. Tenue is
+    // the default (a desaturated navy — Twitter's "dim"); Oscuro is true black
+    // for OLED. So `data-theme` carries the resolved canvas, never a preference
+    // the app invented.
+    //
+    // `--rk-accent` is a runtime triplet the reader chooses from six. It is set
+    // on the scope root by the Pantalla panel, and everything brand-coloured
+    // derives from it through Tailwind's alpha channel — there is no second
+    // place a brand colour is written down.
+    plugin(({ addBase, addComponents }) => {
+      // Constant across all three canvases. The five reaction hues and the two
+      // action colours encode MEANING (a Retrino is green, a like is pink, live
+      // is red), so they must not drift when the canvas or the accent changes.
+      const constant = {
+        "--rk-heart":    "249 24 128",
+        "--rk-ball":     "244 33 46",
+        "--rk-choque":   "255 212 0",
+        "--rk-shiny":    "29 155 240",
+        "--rk-fuego":    "255 122 0",
+        "--rk-rt":       "0 186 124",
+        "--rk-live":     "244 33 46",
+        "--rk-verified": "29 155 240",
+        // Defaults; the Pantalla panel overwrites both on the scope root.
+        "--rk-accent":    "29 155 240",
+        "--rk-accent-fg": "255 255 255",
+        // The body face. Swapped to Hanken Grotesk when the reader picks Chirp.
+        "--rk-font":
+          "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif",
+      }
+      const dim = {
+        "--rk-bg":          "21 32 43",
+        "--rk-card":        "30 39 50",
+        "--rk-elevated":    "40 51 64",
+        "--rk-nav":         "rgb(21 32 43 / .85)",
+        "--rk-hover":       "rgb(239 243 244 / .03)",
+        "--rk-fg":          "247 249 249",
+        "--rk-fg-muted":    "139 152 165",
+        "--rk-fg-subtle":   "139 152 165",
+        "--rk-line":        "56 68 77",
+        "--rk-line-strong": "84 99 110",
+      }
+      const light = {
+        "--rk-bg":          "255 255 255",
+        "--rk-card":        "247 249 249",
+        "--rk-elevated":    "239 243 244",
+        "--rk-nav":         "rgb(255 255 255 / .85)",
+        "--rk-hover":       "rgb(15 20 25 / .03)",
+        "--rk-fg":          "15 20 25",
+        "--rk-fg-muted":    "83 100 113",
+        "--rk-fg-subtle":   "83 100 113",
+        "--rk-line":        "239 243 244",
+        "--rk-line-strong": "207 217 222",
+      }
+      const lightsout = {
+        "--rk-bg":          "0 0 0",
+        "--rk-card":        "22 24 28",
+        "--rk-elevated":    "29 31 35",
+        "--rk-nav":         "rgb(0 0 0 / .8)",
+        "--rk-hover":       "rgb(231 233 234 / .03)",
+        "--rk-fg":          "231 233 234",
+        "--rk-fg-muted":    "113 118 123",
+        "--rk-fg-subtle":   "113 118 123",
+        "--rk-line":        "47 51 54",
+        "--rk-line-strong": "62 65 68",
+      }
+      addBase({
+        ".rk-app": { ...constant, ...dim, colorScheme: "dark" },
+        '.rk-app[data-theme="light"]':     { ...light, colorScheme: "light" },
+        '.rk-app[data-theme="lightsout"]': { ...lightsout, colorScheme: "dark" },
+        ".rk-app ::selection": { background: "rgb(var(--rk-accent) / .3)" },
+      })
+      addComponents({
+        ".rk-scroll": {
+          scrollbarWidth: "thin",
+          scrollbarColor: "rgb(var(--rk-line-strong)) transparent",
+        },
+        ".rk-scroll::-webkit-scrollbar": { width: "8px", height: "8px" },
+        ".rk-scroll::-webkit-scrollbar-track": { background: "transparent" },
+        ".rk-scroll::-webkit-scrollbar-thumb": {
+          background: "rgb(var(--rk-line-strong))",
+          borderRadius: "999px",
+          border: "2px solid transparent",
+          backgroundClip: "content-box",
+        },
+        ".rk-scroll::-webkit-scrollbar-thumb:hover": {
+          background: "rgb(var(--rk-fg-subtle))",
+        },
+        // The horizontal event rail scrolls but must not show a bar.
+        ".rk-rail": { scrollbarWidth: "none" },
+        ".rk-rail::-webkit-scrollbar": { display: "none" },
+      })
+    }),
+
+    // ══════════════════════════════════════════════════════════════════════
+    // WIGGLYPOP (SmartRotom) — `.wp-app`
+    // The bubbly marketplace. Light-only by design: the pink-cream page IS the
+    // product, so there is no `data-theme` axis here (SMARTROTOM_V3.md §2b —
+    // the app ignores the picker's mode, like Furret Today and Gobierno).
+    //
+    // The palette is declared as raw `R G B` triplets so Tailwind's
+    // `<alpha-value>` works on every token (`border-wp-line/24`) AND so the
+    // component classes below can read it from inside plugin CSS.
+    // ══════════════════════════════════════════════════════════════════════
+    plugin(({ addBase, addComponents }) => {
+      addBase({
+        ".wp-app": {
+          "--wp-bg": "252 230 240",
+          "--wp-bg-soft": "254 244 249",
+          "--wp-panel": "255 255 255",
+          "--wp-panel-2": "253 234 243",
+          "--wp-cream": "255 242 230",
+          "--wp-cream-deep": "255 226 204",
+          "--wp-line": "214 142 178",
+          "--wp-fg": "60 34 54",
+          "--wp-fg-muted": "140 108 128",
+          "--wp-fg-subtle": "187 159 174",
+          "--wp-accent": "242 99 160",
+          "--wp-accent-strong": "223 63 137",
+          "--wp-accent-light": "248 124 176",
+          "--wp-teal": "18 192 176",
+          "--wp-teal-deep": "10 156 142",
+          "--wp-green": "17 179 154",
+          "--wp-violet": "157 92 224",
+          "--wp-amber": "245 166 35",
+          "--wp-gold": "243 165 31",
+          "--wp-rose": "241 91 122",
+          "--wp-rarity-comun": "181 138 163",
+          "--wp-rarity-raro": "18 192 176",
+          "--wp-rarity-epico": "157 92 224",
+          "--wp-rarity-legendario": "243 165 31",
+          // Two corner glows over a vertical cream→pink wash. The glows are what
+          // stop the page from reading as flat pink: warm pink top-right, the
+          // money-teal bottom-left, so the page itself states the two accents.
+          background:
+            "radial-gradient(1100px 620px at 86% -10%, rgba(242,99,160,.12), transparent 60%), radial-gradient(900px 600px at -5% 108%, rgba(18,192,176,.10), transparent 55%), linear-gradient(180deg, rgb(var(--wp-bg-soft)), rgb(var(--wp-bg)) 82%)",
+          backgroundAttachment: "fixed",
+          color: "rgb(var(--wp-fg))",
+          // 600 is the app's *resting* weight — not a heading trick. Nunito at
+          // 400 looks anaemic on this page; the whole system is set semibold up.
+          fontWeight: "600",
+          "-webkit-font-smoothing": "antialiased",
+        },
+        ".wp-app :focus-visible": {
+          outline: "3px solid rgb(var(--wp-accent))",
+          outlineOffset: "2px",
+          borderRadius: "6px",
+        },
+      })
+
+      addComponents({
+        // ── The frosted panel ───────────────────────────────────────────────
+        // White at 90% over the pink page + a saturation bump, so what shows
+        // through stays candy-coloured instead of going grey.
+        ".wp-glass": {
+          background: "rgb(var(--wp-panel) / .9)",
+          backdropFilter: "blur(8px) saturate(120%)",
+          WebkitBackdropFilter: "blur(8px) saturate(120%)",
+          border: "1px solid rgb(var(--wp-line) / .24)",
+          boxShadow: "0 8px 22px -12px rgba(223,63,137,.22)",
+        },
+        // The top nav sits over scrolling cards and blurs harder than a panel.
+        ".wp-chrome": {
+          background: "rgb(var(--wp-panel) / .86)",
+          backdropFilter: "blur(18px) saturate(140%)",
+          WebkitBackdropFilter: "blur(18px) saturate(140%)",
+        },
+        // ── The primary gradient ────────────────────────────────────────────
+        // One class, used by the primary button, the active nav/format tab and
+        // the brand mark — they must always be the same pink or the chrome
+        // stops reading as one object. Top-lit (light stop above), which is
+        // what gives the pill its inflated look.
+        ".wp-grad-primary": {
+          backgroundImage:
+            "linear-gradient(180deg, rgb(var(--wp-accent-light)), rgb(var(--wp-accent-strong)))",
+        },
+        ".wp-grad-mark": {
+          backgroundImage:
+            "linear-gradient(150deg, #fb8cc0, #ef4f97 62%, #e0418a)",
+        },
+        // ── Figures ─────────────────────────────────────────────────────────
+        // Every price, balance, IV, level and count. Tabular numerals are what
+        // keep a column of prices aligned; 800 is what makes them read as money
+        // rather than as body copy. Non-negotiable on anything numeric.
+        ".wp-num": {
+          fontVariantNumeric: "tabular-nums",
+          fontWeight: "800",
+        },
+        // ── Sprite backdrops ────────────────────────────────────────────────
+        // The pastel wash behind every Pokémon sprite. Data-driven (the mon's
+        // primary type picks one), so these are LITERAL classes selected through
+        // the map in `_utils/spriteTheme.ts` — never `wp-bg-${type}` (§4).
+        ".wp-wall": { position: "relative", overflow: "hidden" },
+        // The white bloom every wash carries at the top, so the sprite always
+        // has light behind its head regardless of which wash it landed on.
+        ".wp-wall::after": {
+          content: '""',
+          position: "absolute",
+          inset: "0",
+          background:
+            "radial-gradient(120% 80% at 50% 8%, rgba(255,255,255,.55), transparent 60%)",
+        },
+        ".wp-wall-classic": { backgroundImage: "linear-gradient(160deg,#fce7f1,#f8d9e8)" },
+        ".wp-wall-forest":  { backgroundImage: "linear-gradient(160deg,#e5f3d9,#d7ecc9)" },
+        ".wp-wall-ocean":   { backgroundImage: "linear-gradient(160deg,#dcf3f3,#cbeeee)" },
+        ".wp-wall-volcano": { backgroundImage: "linear-gradient(160deg,#ffe6dc,#ffd5c5)" },
+        ".wp-wall-space":   { backgroundImage: "linear-gradient(160deg,#e8e6fb,#dcd9f6)" },
+        ".wp-wall-meadow":  { backgroundImage: "linear-gradient(160deg,#eaf4d8,#dcedc6)" },
+        ".wp-wall-dusk":    { backgroundImage: "linear-gradient(160deg,#f0e2fb,#e7d3f6)" },
+        ".wp-wall-cave":    { backgroundImage: "linear-gradient(160deg,#edecf2,#e1e0ea)" },
+        ".wp-wall-rainbow": { backgroundImage: "linear-gradient(125deg,#fce0ee,#e7ecfb 50%,#dcf3ee)" },
+        ".wp-wall-sakura":  { backgroundImage: "linear-gradient(160deg,#fde3ed,#fbd4e5)" },
+        // The dot screen laid over a wash. Plum at 5% — any darker and it fights
+        // the sprite it is supposed to sit behind.
+        ".wp-dots": {
+          backgroundImage:
+            "radial-gradient(rgba(60,34,54,.05) 1px, transparent 1.6px)",
+          backgroundSize: "18px 18px",
+        },
+        // The shiny / legendary bloom behind a sprite. Teal for shiny (it is the
+        // same teal as money — a shiny IS value), gold for legendary.
+        ".wp-burst-shiny": {
+          background:
+            "radial-gradient(60% 60% at 50% 42%, rgba(18,192,176,.26), transparent 70%)",
+        },
+        ".wp-burst-legend": {
+          background:
+            "radial-gradient(60% 60% at 50% 42%, rgba(243,165,31,.26), transparent 72%)",
+        },
+        // ── Sprites ─────────────────────────────────────────────────────────
+        // Pixelated, with a warm-plum contact shadow so the sprite sits ON the
+        // wash rather than floating over it.
+        ".wp-sprite": {
+          imageRendering: "pixelated",
+          objectFit: "contain",
+          filter: "drop-shadow(0 5px 6px rgba(180,110,150,.35))",
+          pointerEvents: "none",
+        },
+        // The detail hero. The handoff drew smooth official artwork here, but the
+        // only sprite source we actually have is the self-hosted Pixelmon manifest
+        // (`utils/spriteUtils`) — there is no artwork endpoint. So the hero is the
+        // same pixel sprite, upscaled and given a much deeper drop. Staying
+        // pixelated is the honest call and reads as deliberate; smoothing it would
+        // just be a blurry sprite pretending to be art.
+        ".wp-sprite-hero": {
+          imageRendering: "pixelated",
+          objectFit: "contain",
+          filter: "drop-shadow(0 24px 26px rgba(120,70,100,.35))",
+        },
+        // ── Scrollbars ──────────────────────────────────────────────────────
+        ".wp-scroll::-webkit-scrollbar": { width: "11px", height: "11px" },
+        ".wp-scroll::-webkit-scrollbar-track": { background: "transparent" },
+        ".wp-scroll::-webkit-scrollbar-thumb": {
+          background: "rgb(var(--wp-line) / .4)",
+          borderRadius: "999px",
+          border: "3px solid transparent",
+          backgroundClip: "content-box",
+        },
+        ".wp-scroll::-webkit-scrollbar-thumb:hover": {
+          background: "rgb(var(--wp-line) / .62)",
+          backgroundClip: "content-box",
+        },
+        ".wp-noscroll": { scrollbarWidth: "none" },
+        ".wp-noscroll::-webkit-scrollbar": { display: "none" },
       })
     }),
   ],

@@ -197,6 +197,20 @@
       "when": 1783926970784,
       "tag": "0027_noisy_pride",
       "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "5",
+      "when": 1783943445936,
+      "tag": "0028_tired_anthem",
+      "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "5",
+      "when": 1783943738591,
+      "tag": "0029_wigglypop_market",
+      "breakpoints": true
     }
   ]
 }
