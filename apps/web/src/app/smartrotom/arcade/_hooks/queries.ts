@@ -11,12 +11,11 @@ import type {
   OpenLootBoxResponseDto,
 } from "@boffmedia/shared"
 import { rotomGETOrThrow, rotomPOSTOrThrow } from "@/services/boffAPI"
-import { useBoffSession } from "@/services/useBoffSession"
+import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
 
 /** The SmartRotom uuid every arcade endpoint is keyed by. `null` until signed in. */
 export function useArcadeUuid(): string | null {
-  const { session } = useBoffSession()
-  return session?.user?.smartRotomUser?.uuid ?? null
+  return useRotomUuid()
 }
 
 export const arcadeKeys = {

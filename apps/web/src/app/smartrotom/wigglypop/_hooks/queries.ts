@@ -2,7 +2,7 @@
 
 import { useMemo } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { useBoffSession } from "@/services/useBoffSession"
+import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
 import { usePokemonStore } from "@/stores/pokemonStore"
 import { WigglypopService, type ListingQuery } from "@/services/api/smartrotom/wigglypopService"
 import { rotomGETOrThrow, userMessageFrom } from "@/services/boffAPI"
@@ -21,8 +21,7 @@ import { toast } from "../_components/ui"
 
 /** The SmartRotom uuid every Wigglypop endpoint is keyed by. `null` until signed in. */
 export function useWpUuid(): string | null {
-  const { session } = useBoffSession()
-  return session?.user?.smartRotomUser?.uuid ?? null
+  return useRotomUuid()
 }
 
 export const wpKeys = {

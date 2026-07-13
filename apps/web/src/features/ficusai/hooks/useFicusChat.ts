@@ -15,14 +15,13 @@ function mapDtoToMensaje(dto: any): Mensaje {
       : [],
   };
 }
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { FicusAIService } from "@/services/api/smartrotom/ficusAiService";
-import { useBoffSession } from "@/services/useBoffSession";
+import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid";
 import { Mensaje } from "../types";
 
 export function useFicusChat() {
-  const { session } = useBoffSession();
-  const uuid = useMemo(() => session?.user.smartRotomUser!.uuid, [session]);
+  const uuid = useRotomUuid();
   
   const [messages, setMessages] = useState<Mensaje[]>([
     {
@@ -64,7 +63,7 @@ export function useFicusChat() {
   }, [uuid]);
 
   const sendMessage = async (text: string) => {
-    if (!text.trim() || isTyping || !session?.user.smartRotomUser?.uuid) return;
+    if (!text.trim() || isTyping || !uuid) return;
 
     const userMessage: Mensaje = {
       sender: "user",
@@ -76,7 +75,7 @@ export function useFicusChat() {
     setIsTyping(true);
 
     try {
-      const response = await FicusAIService.sendTextMessage(session.user.smartRotomUser.uuid, text);
+      const response = await FicusAIService.sendTextMessage(uuid, text);
       const botMessage = response.data ? mapDtoToMensaje(response.data) : undefined;
       
       // Create animated message

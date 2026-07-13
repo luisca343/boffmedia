@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import type { PokemonW } from "@boffmedia/shared"
 import { PcMarksService } from "@/services/api/smartrotom/pcMarksService"
 import { wingullPOSTOrThrow } from "@/services/boffAPI"
-import { useBoffSession } from "@/services/useBoffSession"
+import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
 import type { BattleTeamData } from "@/types/dto/battle-team.dto"
 import type { ExtendedPokemonW, PCPokemon } from "@/types/dto/pc-pokemon.dto"
 import type { Mon, SlotLoc } from "../_types/pc.types"
@@ -18,8 +18,7 @@ const PARTY_BOX = -1
 
 /** The SmartRotom uuid every PC endpoint is keyed by. `null` until signed in. */
 export function usePcUuid(): string | null {
-  const { session } = useBoffSession()
-  return session?.user?.smartRotomUser?.uuid ?? null
+  return useRotomUuid()
 }
 
 export const pcKeys = {

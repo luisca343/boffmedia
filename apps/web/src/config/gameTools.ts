@@ -1,17 +1,17 @@
-import type { IconType } from "react-icons";
+import type { LucideIcon } from "lucide-react";
 import {
-  GiDiamondHard,
-  GiLightningSpanner,
-  GiSwordWound,
-  GiGamepad,
-  GiFamilyTree,
-  GiPodiumWinner,
-  GiSpeedometer,
-  GiScales,
-  GiNotebook,
-  GiBrickWall,
-} from "react-icons/gi";
-import { FaStar } from "react-icons/fa";
+  Gem,
+  Wrench,
+  Sword,
+  Gamepad2,
+  Network,
+  Trophy,
+  Gauge,
+  Scale,
+  NotebookPen,
+  BrickWall,
+  Star,
+} from "lucide-react";
 import { getGameEntry } from "@/data/games";
 
 // ─── Public types (used by sidebar components) ────────────────────────────────
@@ -19,7 +19,7 @@ import { getGameEntry } from "@/data/games";
 export interface ToolConfig {
   name: string;
   href: string;
-  icon: IconType;
+  icon: LucideIcon;
   iconProps?: React.SVGProps<SVGSVGElement>;
 }
 
@@ -42,20 +42,20 @@ export interface GameToolsConfigType {
   [key: string]: GameConfig;
 }
 
-// ─── Sidebar icon mapping (react-icons, sidebar-only concern) ─────────────────
+// ─── Sidebar icon mapping (lucide-react, sidebar-only concern) ────────────────
 
-export const sidebarIconMap: Record<string, IconType> = {
-  Diamond:     GiDiamondHard,
-  Zap:         GiLightningSpanner,
-  SwordIcon:   GiSwordWound,
-  Gamepad:     GiGamepad,
-  Star:        FaStar,
-  FamilyTree:  GiFamilyTree,
-  Podium:      GiPodiumWinner,
-  Speedometer: GiSpeedometer,
-  Scales:      GiScales,
-  Notebook:    GiNotebook,
-  Blocks:      GiBrickWall,
+export const sidebarIconMap: Record<string, LucideIcon> = {
+  Diamond:     Gem,
+  Zap:         Wrench,
+  SwordIcon:   Sword,
+  Gamepad:     Gamepad2,
+  Star:        Star,
+  FamilyTree:  Network,
+  Podium:      Trophy,
+  Speedometer: Gauge,
+  Scales:      Scale,
+  Notebook:    NotebookPen,
+  Blocks:      BrickWall,
 };
 
 // ─── Adapter: builds GameConfig from the unified game registry ────────────────
@@ -78,7 +78,7 @@ function buildGameConfig(slug: string): GameConfig {
         .map((tool) => ({
           name: tool.nameKey,
           href: tool.href,
-          icon: sidebarIconMap[tool.sidebarIcon] ?? GiGamepad,
+          icon: sidebarIconMap[tool.sidebarIcon] ?? Gamepad2,
         })),
     })),
   };

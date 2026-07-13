@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { useMemo } from "react"
 import { MisionesService } from "@/services/api/smartrotom/misionesService"
-import { useBoffSession } from "@/services/useBoffSession"
+import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
 import type { IDialogue, NPC, QuestData } from "../_types"
 import { buildRegions } from "../_utils/regions"
 
@@ -13,8 +13,7 @@ import { buildRegions } from "../_utils/regions"
  * (SMARTROTOM_V3.md §8: TanStack Query, not `useEffect` + `setState`).
  */
 export function useQuestSystem() {
-  const { session } = useBoffSession()
-  const uuid = session?.user?.smartRotomUser?.uuid
+  const uuid = useRotomUuid()
 
   const query = useQuery({
     queryKey: ["misiones", "user", uuid],

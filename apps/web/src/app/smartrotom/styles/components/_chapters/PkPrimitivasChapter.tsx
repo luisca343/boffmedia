@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { BookOpenIcon, MapIcon } from "@heroicons/react/24/outline"
+import { BookOpenIcon, MapIcon } from "lucide-react"
 import { Sample, Section } from "../showcase-shared"
 import { PokeballIcon, StatusPill, TypeChip, TypeGlyph } from "../../../pokedex/_components/ui"
 import { MetaStat, PageHead } from "../../../pokedex/_components/PageHead"

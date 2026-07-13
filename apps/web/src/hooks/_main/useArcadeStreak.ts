@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useBoffSession } from '@/services/useBoffSession';
+import { useRotomUuid } from '@/components/smartrotom/behavior/useRotomUuid';
 import { toast } from 'react-toastify';
 import { ArcadeInventoryItem, ArcadeService } from '@/services/api/smartrotom/arcadeService';
 import { ArcadeStreak, ArcadeStreakClaim } from '@boffmedia/shared';
@@ -29,6 +30,7 @@ interface UseArcadeStreakReturn {
 
 export function useArcadeStreak(): UseArcadeStreakReturn {
   const { session } = useBoffSession();
+  const uuid = useRotomUuid();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [streakData, setStreakData] = useState<{
@@ -68,7 +70,7 @@ export function useArcadeStreak(): UseArcadeStreakReturn {
 
       try {
         setLoading(true);
-        const response = (await ArcadeService.getStreak(session.user.smartRotomUser?.uuid!)).data as ArcadeStreak;
+        const response = (await ArcadeService.getStreak(uuid!)).data as ArcadeStreak;
 
         // Use the claimedToday property directly from the server response
         setStreakData({
@@ -132,8 +134,8 @@ export function useArcadeStreak(): UseArcadeStreakReturn {
     }
 
     try {
-      const result = await ArcadeService.claimDailyReward({uuid: session.user.smartRotomUser?.uuid!});
-      const daily = await (await ArcadeService.getStreakStatus(session.user.smartRotomUser?.uuid!)).data!;
+      const result = await ArcadeService.claimDailyReward({uuid: uuid!});
+      const daily = await (await ArcadeService.getStreakStatus(uuid!)).data!;
       const { streak } = daily;
 
       console.log("daily", daily);

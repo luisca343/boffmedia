@@ -45,13 +45,9 @@ const SR_ROOTS = [
 // count may only go DOWN. Adding an import to a listed file fails the build, and so does
 // the first one in any file not listed. When a file is cleaned, drop its entry.
 //
-// Everything here is legacy (camara/liga/mina/bidkea) or the not-actually-migrated chrome
-// (RotomNav still pulls 6 Boffmedia primitives — the `sr-*` migration painted tokens onto
-// the surface without replacing what is underneath). See docs/smartrotom/AUDIT_2026-07-13.md.
+// Everything left here is legacy (camara/liga/mina/bidkea). The chrome (RotomNav, layout,
+// providers) was rebuilt on sr-* primitives in components/smartrotom/chrome/ and is clean.
 const CROSS_DS_BASELINE = {
-  "apps/web/src/app/smartrotom/layout.tsx": 1,
-  "apps/web/src/app/smartrotom/SmartRotomProviders.tsx": 1,
-  "apps/web/src/components/smartrotom/RotomNav.tsx": 6,
   "apps/web/src/components/smartrotom/apps/App.tsx": 1,
   "apps/web/src/app/smartrotom/bidkea/page.tsx": 2,
   "apps/web/src/app/smartrotom/camara/_components/CameraBottomControls.tsx": 1,
@@ -64,6 +60,31 @@ const CROSS_DS_BASELINE = {
   "apps/web/src/app/smartrotom/mina/_components/LinkMina.tsx": 1,
   "apps/web/src/app/smartrotom/mina/drops/page.tsx": 1,
   "apps/web/src/app/smartrotom/mina/jugar/page.tsx": 2,
+};
+
+// The wingull / auth / battlesim zones belong to no design system and used to be watched
+// by nothing — their legacy shadcn (`components/ui`) usage could grow freely. Same ratchet
+// contract as CROSS_DS_BASELINE: counts may only go DOWN; when a file is cleaned, drop its
+// entry. Imports of `components/boffmedia` are deliberately NOT counted here — adopting
+// the live design system is the direction these zones should move in.
+const ORPHAN_ROOTS = [
+  "apps/web/src/app/wingull",
+  "apps/web/src/app/auth",
+  "apps/web/src/app/battlesim",
+];
+
+const LEGACY_UI = ["apps/web/src/components/ui/"];
+
+const ORPHAN_LEGACY_BASELINE = {
+  "apps/web/src/app/wingull/page.tsx": 2,
+  "apps/web/src/app/wingull/_components/MovingSection.tsx": 1,
+  "apps/web/src/app/wingull/pueblos/page.tsx": 1,
+  "apps/web/src/app/wingull/invitacion/[id]/_components/InvitacionUsada.tsx": 2,
+  "apps/web/src/app/wingull/invitacion/[id]/_components/InvitacionNoEncontrada.tsx": 2,
+  "apps/web/src/app/wingull/invitacion/[id]/_components/InvitacionForm.tsx": 5,
+  "apps/web/src/app/auth/AuthForm.tsx": 3,
+  "apps/web/src/app/battlesim/_components/PokemonElement.tsx": 1,
+  "apps/web/src/app/battlesim/_components/PokemonDetail.tsx": 3,
 };
 
 function listFiles(roots) {
@@ -94,7 +115,7 @@ function listFiles(roots) {
 const BM_OWNED = ["apps/web/src/components/ui/", "apps/web/src/components/boffmedia/"];
 const IMPORT_FROM = /(?:from|import)\s+["']([^"']+)["']/;
 
-function isCrossDs(file, line) {
+function importLandsIn(file, line, roots) {
   const m = line.match(IMPORT_FROM);
   if (!m) return false;
   const spec = m[1];
@@ -105,8 +126,10 @@ function isCrossDs(file, line) {
       ? posix.normalize(posix.join(posix.dirname(file), spec))
       : null; // a bare package name is never a local primitive
 
-  return target !== null && BM_OWNED.some((root) => (target + "/").startsWith(root));
+  return target !== null && roots.some((root) => (target + "/").startsWith(root));
 }
+
+const isCrossDs = (file, line) => importLandsIn(file, line, BM_OWNED);
 
 // `bg-${tone}`, `text-${c}-300`, `border-${x}` … inside a template literal. The JIT
 // only sees literal class strings, so these silently never compile. Full-class maps
@@ -211,10 +234,44 @@ for (const [file, allowed] of Object.entries(CROSS_DS_BASELINE)) {
   }
 }
 
+// Same ratchet, orphan zones: legacy `components/ui` imports may only go down.
+const orphanSeen = {};
+
+for (const file of listFiles(ORPHAN_ROOTS)) {
+  const lines = readFileSync(file, "utf8").split("\n");
+  lines.forEach((line, i) => {
+    if (IS_COMMENT.test(line)) return;
+    if (importLandsIn(file, line, LEGACY_UI)) {
+      (orphanSeen[file] ??= []).push(i + 1);
+    }
+  });
+}
+
+for (const [file, lines] of Object.entries(orphanSeen)) {
+  const allowed = ORPHAN_LEGACY_BASELINE[file] ?? 0;
+  if (lines.length > allowed) {
+    const where = lines.join(", ");
+    violations.push(
+      allowed === 0
+        ? `${file}:${lines[0]}  legacy shadcn import in an unguarded zone — don't add components/ui usage here`
+        : `${file}  legacy shadcn imports grew ${allowed} → ${lines.length} (lines ${where})`,
+    );
+  }
+}
+
+for (const [file, allowed] of Object.entries(ORPHAN_LEGACY_BASELINE)) {
+  const actual = orphanSeen[file]?.length ?? 0;
+  if (actual < allowed && existsSync(file)) {
+    violations.push(
+      `${file}  legacy shadcn imports are down to ${actual} (baseline says ${allowed}) — lower it to ${actual} in ORPHAN_LEGACY_BASELINE so the guard ratchets forward`,
+    );
+  }
+}
+
 if (violations.length) {
   console.error(`\n✗ v3 convention check failed (${violations.length}):\n`);
   for (const v of violations) console.error("  " + v);
   console.error("");
   process.exit(1);
 }
-console.log("✓ v3 conventions: Boffmedia (calc / clip-path) + SmartRotom (cross-DS / dynamic classes)");
+console.log("✓ v3 conventions: Boffmedia (calc / clip-path) + SmartRotom (cross-DS / dynamic classes) + orphan zones (legacy shadcn ratchet)");
