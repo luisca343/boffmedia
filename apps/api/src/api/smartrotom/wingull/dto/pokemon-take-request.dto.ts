@@ -13,6 +13,9 @@ import { IsInt, IsNotEmpty, IsString, IsUUID, Min } from 'class-validator';
 // The plugin MUST refuse the take if the slot no longer matches it — that is the whole
 // safety property: it makes "sell the mon you listed" impossible to race by moving the PC
 // around between listing and settlement.
+//
+// Deliberately not a BaseDto: /wingull routes are the game-server bridge and sit
+// outside MinecraftMiddleware's /smartrotom scope, so no `server` field arrives.
 export class PokemonTakeRequestDto {
   @ApiProperty({ example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4' })
   @IsUUID()

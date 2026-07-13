@@ -6,6 +6,7 @@ import { LoadingScreen } from "./Loading"
 import { CallStatus } from "./calls/CallStatus"
 import { useEffect, useState } from "react"
 import { useSession } from "next-auth/react"
+import { useRotomUuid } from "./behavior/useRotomUuid"
 import { AuthForm } from "@/app/auth/AuthForm"
 import "react-toastify/dist/ReactToastify.css"
 import { ToastContainer } from "react-toastify"
@@ -25,6 +26,7 @@ export default function AppWrapper({
     data: Session
     status: string
   }
+  const rotomUuid = useRotomUuid()
   const [datosUsuario, setDatosUsuario] = useState<Object | null>(null)
   const [isMC, setIsMC] = useState(false)
 
@@ -96,7 +98,7 @@ export default function AppWrapper({
   }
 
   function smartRotomLinked(): boolean {
-    return session?.user.smartRotomUser?.uuid ? true : false
+    return rotomUuid ? true : false
   }
 
   if (status === "authenticated" && !smartRotomLinked()) {

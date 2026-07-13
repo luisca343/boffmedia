@@ -50,25 +50,6 @@ export class CreateMessageDto extends BaseDto {
   type?: MessageType;
 }
 
-export class GetMessagesDto {
-  @ApiProperty({
-    description: 'Chat ID',
-    example: 1,
-  })
-  @IsNotEmpty()
-  @IsInt()
-  chatId: number;
-
-  @ApiProperty({
-    description: 'Maximum number of messages to retrieve',
-    example: 50,
-    required: false,
-  })
-  @IsOptional()
-  @IsInt()
-  limit?: number;
-}
-
 export class UpdateMessageDto extends BaseDto {
   @ApiProperty({
     description: 'Message ID',
