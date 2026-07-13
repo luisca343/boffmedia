@@ -1,249 +1,257 @@
-'use client'
+"use client"
 
-import { useState, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useBoffSession } from "@/services/useBoffSession"
-import { ToastContainer, toast } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
-import { SmartrotomService } from "@/services/api/smartrotom/smartrotomService"
-import { StarbankService } from "@/services/api/smartrotom/starbankService"
-import { TaxiStop } from "@boffmedia/shared"
-import { TaxiStopExtended } from "@/types"
-import { getMcUserData } from '@/services/mcef/mcefApi'
-import TaxiHeader from './_components/TaxiHeader'
-import TabNavigation from './_components/TabNavigation'
-import MapView from './_components/MapView'
-import ListView from './_components/ListView'
-import LoadingOverlay from './_components/LoadingOverlay'
-import SelectedStopDetails from './_components/SelectedStopDetails'
-import { WingullService } from '@/services/api/smartrotom/wingullService'
-import { MINIMUM_FARE, POSITION_REFRESH_INTERVAL, PRICE_PER_BLOCK, TAXI_SERVICE_ACCOUNT } from './_utils/constants'
+import { MapCanvas } from "./_components/map/MapCanvas"
+import { DestinationsPanel } from "./_components/DestinationsPanel"
+import { PassportPanel } from "./_components/PassportPanel"
+import { SelectedCard } from "./_components/SelectedCard"
+import { NavTabs, TopBar, type TaxiTab } from "./_components/TopBar"
+import { ConfirmModal, InsufficientModal } from "./_components/flows/ConfirmModal"
+import { TravelingOverlay } from "./_components/flows/TravelingOverlay"
+import { WalletModal } from "./_components/flows/WalletModal"
+import { ToastHost, toast } from "./_components/ui"
+import { useBalance, useLedger, usePlayerPosition, useRegions, useStops, useTeleport } from "./_hooks/queries"
+import { useEnrichedStops } from "./_hooks/useEnrichedStops"
+import { useFavorites } from "./_hooks/useFavorites"
+import { useReducedMotion, useViewportHeight, useWide } from "./_hooks/useMediaQuery"
+import { travelStats, tripsFromTransactions } from "./_utils/trips"
+import type { EnrichedStop } from "./_types"
 
-interface Position {
-  x: number
-  z: number
-}
+type Flow = "idle" | "confirm" | "insufficient" | "traveling"
 
-interface TripRecord {
-  id: string;
-  destination: string;
-  date: Date;
-  price: number;
-  fromX: number;
-  fromZ: number;
-  toX: number;
-  toZ: number;
-}
+/** How much of the map the mobile sheet covers — the map centres above it. */
+const SHEET_RATIO = 0.46
 
-export default function TaxiApp() {
-  // State and function declarations
+export default function TaxiPage() {
   const { session } = useBoffSession()
-  const [playerPosition, setPlayerPosition] = useState<Position>({ x: 0, z: 0 })
-  const [playerMoney, setPlayerMoney] = useState(0)
-  const [selectedStop, setSelectedStop] = useState<TaxiStopExtended | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [activeTab, setActiveTab] = useState<'map' | 'list'>('map')
-  const [taxiStops, setTaxiStops] = useState<TaxiStopExtended[]>([])
-  const [showRecentDrawer, setShowRecentDrawer] = useState(false)
-  const isInitialLoad = useRef(true)
-  
-  const updatePlayerPosition = async () => {
-    try {
-      const userData = await getMcUserData()
-      if (userData.status === 200 && userData.data) {
-        setPlayerPosition({ 
-          x: Math.floor(userData.data.x), 
-          z: Math.floor(userData.data.z) 
-        })
-      }
-    } catch (error) {
-      console.error('Error updating player position:', error)
-    }
-  }
-  
+  const uuid = session?.user?.smartRotomUser?.uuid
+  const playerName = session?.user?.name ?? "Entrenador"
+
+  const stopsQuery = useStops()
+  const regionsQuery = useRegions()
+  const positionQuery = usePlayerPosition()
+  const balanceQuery = useBalance(uuid)
+  const ledgerQuery = useLedger(uuid)
+  const teleport = useTeleport(uuid)
+
+  const wide = useWide()
+  const reduceMotion = useReducedMotion()
+  const viewportHeight = useViewportHeight()
+  const { favorites, toggle: toggleFavorite } = useFavorites()
+
+  const [tab, setTab] = useState<TaxiTab>("go")
+  const [selected, setSelected] = useState<EnrichedStop | null>(null)
+  const [flow, setFlow] = useState<Flow>("idle")
+  const [walletOpen, setWalletOpen] = useState(false)
+  const [sheetFull, setSheetFull] = useState(false)
+  const [recenterSignal, setRecenterSignal] = useState(0)
+
+  const player = positionQuery.data ?? { x: 0, z: 0 }
+  const balance = balanceQuery.data
+  const transactions = useMemo(() => ledgerQuery.data?.transactions ?? [], [ledgerQuery.data])
+
+  const stops = useEnrichedStops(stopsQuery.data ?? [], player, regionsQuery.data ?? [])
+
+  // The passport and the "recientes" rail are the same ledger read, seen two ways.
+  const trips = useMemo(() => tripsFromTransactions(transactions), [transactions])
+  const stats = useMemo(() => travelStats(trips), [trips])
+
+  // The map is stale about the selected stop's fare the moment the player moves, so the
+  // selection is held by id and re-read from the live list.
+  const selectedLive = useMemo(
+    () => (selected ? (stops.find((s) => s.id === selected.id) ?? selected) : null),
+    [selected, stops],
+  )
+
   useEffect(() => {
-    const fetchData = async () => {
-      if (!isInitialLoad.current) return;
-      
-      setIsLoading(true)
-      try {
-        const stopsResponse = await WingullService.getTaxiStops()
-        
-        if (stopsResponse.data) {
-          const stopsArray = Object.values(stopsResponse.data)
-          setTaxiStops(stopsArray)
-        } else {
-          toast.error('Error al cargar las paradas de taxi')
-        }
+    if (stopsQuery.isError) toast.error("No se pudieron cargar las paradas de taxi")
+  }, [stopsQuery.isError])
 
-        await updatePlayerPosition()
+  const onSelect = useCallback(
+    (stop: EnrichedStop) => {
+      setSelected(stop)
+      setTab("go")
+      if (!wide) setSheetFull(false)
+    },
+    [wide],
+  )
 
-        if (session?.user?.smartRotomUser?.uuid) {
-          const balanceResponse = await StarbankService.getUserBalance(session.user.smartRotomUser.uuid)
-          if (balanceResponse.data) {
-            setPlayerMoney(balanceResponse.data.balance)
-          }
-        } 
-        
-        isInitialLoad.current = false;
-      } catch (error) {
-        console.error('Error fetching data:', error)
-        toast.error('No se pudieron cargar los datos')
-      } finally {
-        setIsLoading(false)
-      }
-    }
-    
-    fetchData()
-  }, [session])
-  
-  useEffect(() => {
-    updatePlayerPosition();
-    
-    const intervalId = setInterval(() => {
-      updatePlayerPosition();
-    }, POSITION_REFRESH_INTERVAL);
-    
-    return () => clearInterval(intervalId);
-  }, []);
+  const onTravel = useCallback(
+    (stop: EnrichedStop) => {
+      if (balance === undefined) return
+      setSelected(stop)
+      setFlow(balance < stop.price ? "insufficient" : "confirm")
+    },
+    [balance],
+  )
 
-  const calculateDistance = (x1: number, z1: number, x2: number, z2: number) => {
-    return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(z2 - z1, 2))
-  }
+  const onConfirm = useCallback(() => {
+    if (!selectedLive) return
+    const stop = selectedLive
+    setFlow("traveling")
+    teleport.mutate(
+      { stop, price: stop.price },
+      {
+        onSuccess: () => {
+          setFlow("idle")
+          setSelected(null)
+          setRecenterSignal((n) => n + 1)
+          toast.success(
+            <>
+              ¡Has llegado a <strong>{stop.id}</strong>!
+            </>,
+          )
+        },
+        onError: (error) => {
+          setFlow("idle")
+          toast.error(error instanceof Error ? error.message : "No se pudo completar el viaje")
+        },
+      },
+    )
+  }, [selectedLive, teleport])
 
-  const calculatePrice = (distance: number) => {
-    return Math.ceil(MINIMUM_FARE + (distance * PRICE_PER_BLOCK))
-  }
+  const openWallet = useCallback(() => {
+    setFlow("idle")
+    setWalletOpen(true)
+  }, [])
 
-  const teleportPlayer = async (stop: TaxiStopExtended) => {
-    const distance = calculateDistance(playerPosition.x, playerPosition.z, stop.x, stop.z)
-    const price = calculatePrice(distance)
-    
-    if (playerMoney < price) {
-      toast.error('No tienes suficiente dinero para este viaje')
-      return
-    }
+  const panel = (
+    <div className="flex h-full min-h-0 flex-col">
+      <NavTabs tab={tab} onChange={setTab} />
+      {tab === "go" ? (
+        <DestinationsPanel
+          stops={stops}
+          balance={balance}
+          selected={selectedLive}
+          favorites={favorites}
+          recents={stats.recents}
+          onSelect={onSelect}
+          onToggleFavorite={toggleFavorite}
+        />
+      ) : (
+        <PassportPanel
+          stops={stops}
+          trips={trips}
+          stats={stats}
+          loading={ledgerQuery.isLoading || stopsQuery.isLoading}
+        />
+      )}
+    </div>
+  )
 
-    setIsLoading(true)
-    try {
-      if (session?.user?.smartRotomUser?.uuid) {
-        const res = await StarbankService.transferFromMain({
-          uuid: session.user.smartRotomUser.uuid,
-          to: TAXI_SERVICE_ACCOUNT,
-          amount: price,
-          concept: `Taxi a ${stop.id}`,
-        })
+  const card = selectedLive && (
+    <SelectedCard
+      stop={selectedLive}
+      balance={balance}
+      favorite={favorites.includes(selectedLive.id)}
+      onToggleFavorite={toggleFavorite}
+      onTravel={onTravel}
+      onTopUp={openWallet}
+      onClose={() => setSelected(null)}
+      onRecenter={() => setRecenterSignal((n) => n + 1)}
+      bare={!wide}
+    />
+  )
 
-        if (!res.success) {
-          toast.error('Error al procesar el pago del taxi')
-          return
-        }
-
-        await WingullService.teleportPlayer({
-          id: stop.id,
-          uuid: session.user.smartRotomUser.uuid
-        })
-        
-      }
-      
-      setPlayerPosition({ x: stop.x, z: stop.z })
-      setPlayerMoney(playerMoney - price)
-      
-      toast.success(`¡Has llegado a ${stop.id}!`)
-      setSelectedStop(null)
-    } catch (error) {
-      console.error('Teleport error:', error)
-      toast.error('No se pudo completar el viaje. Por favor, inténtalo de nuevo.')
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const formatDistance = (distance: number) => {
-    return Math.round(distance).toLocaleString()
-  }
-
-  const handleSelectRecentStop = (stop: TaxiStop) => {
-    setSelectedStop(stop)
-    setShowRecentDrawer(false)
-    if (activeTab !== 'list') {
-      setActiveTab('list')
-    }
-  }
+  // On a phone the sheet sits over the map, so the camera's centre has to rise above it.
+  const bottomInset = wide ? 0 : Math.round(viewportHeight * SHEET_RATIO)
 
   return (
-    <div className="relative h-full w-full bg-gradient-to-b from-[#0A2463] via-[#1E3A8A] to-[#2563EB] overflow-hidden">
-      <div className="absolute inset-0 opacity-10" style={{
-        backgroundImage: "url('data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')"
-      }}></div>
-
-      {/* Decorative elements for a more dynamic look */}
-      <div className="absolute top-[20%] left-[5%] w-12 h-12 bg-white/5 rounded-full blur-2xl"></div>
-      <div className="absolute bottom-[15%] right-[10%] w-20 h-20 bg-yellow-400/10 rounded-full blur-3xl"></div>
-      <div className="absolute top-[60%] left-[30%] w-32 h-32 bg-secondary-soft/5 rounded-full blur-2xl"></div>
-
-      <TaxiHeader 
-        playerPosition={playerPosition} 
-        playerMoney={playerMoney} 
-        onHistoryClick={() => setShowRecentDrawer(!showRecentDrawer)} 
+    <>
+      <TopBar
+        balance={balance}
+        loadingBalance={balanceQuery.isLoading}
+        playerName={playerName}
+        onWallet={openWallet}
+        onProfile={() => {
+          setSelected(null)
+          setTab("pass")
+          if (!wide) setSheetFull(true)
+        }}
       />
-      
-      <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      {/* Content Area */}
-      <div className="absolute top-28 bottom-0 left-0 right-0 p-4 overflow-y-auto">
-        {activeTab === 'map' && (
-          <MapView 
-            taxiStops={taxiStops} 
-            playerPosition={playerPosition} 
-            selectedStop={selectedStop} 
-            setSelectedStop={setSelectedStop} 
-          />
-        )}
-        {activeTab === 'list' && (
-          <ListView
-            taxiStops={taxiStops}
-            playerPosition={playerPosition}
-            playerMoney={playerMoney}
-            selectedStop={selectedStop}
-            setSelectedStop={setSelectedStop}
-            calculateDistance={calculateDistance}
-            calculatePrice={calculatePrice}
-            formatDistance={formatDistance}
-            teleportPlayer={teleportPlayer}
-            isLoading={isLoading}
-          />
+      <div className={`relative flex min-h-0 flex-1 overflow-hidden ${wide ? "flex-row" : "flex-col"}`}>
+        <div className="relative min-h-0 min-w-0 flex-1">
+          <MapCanvas
+            stops={stops}
+            regions={regionsQuery.data ?? []}
+            player={player}
+            selected={selectedLive}
+            onSelect={onSelect}
+            reduceMotion={reduceMotion}
+            bottomInset={bottomInset}
+            recenterSignal={recenterSignal}
+          >
+            {wide && card && <div className="absolute bottom-[18px] left-[18px] z-[25] w-[380px] max-w-[calc(100%-90px)]">{card}</div>}
+          </MapCanvas>
+        </div>
+
+        {wide ? (
+          <aside className="z-[12] flex w-[404px] shrink-0 flex-col border-l border-solid border-tx-line bg-tx-bg-1/80 backdrop-blur-[20px]">
+            {panel}
+          </aside>
+        ) : (
+          <div
+            className="absolute inset-x-0 bottom-0 z-[26] flex flex-col rounded-t-[24px] border-t border-solid border-tx-line-2 bg-tx-bg-1/95 shadow-[0_-16px_50px_rgb(0_0_0/0.4)] backdrop-blur-[24px] transition-[height] duration-[400ms] ease-tx"
+            style={{ height: selectedLive ? "auto" : sheetFull ? "86vh" : "46vh", maxHeight: "88vh" }}
+          >
+            <button
+              type="button"
+              onClick={() => setSheetFull((f) => !f)}
+              aria-label={sheetFull ? "Contraer panel" : "Expandir panel"}
+              className="grid shrink-0 place-items-center px-0 pb-1.5 pt-2.5"
+            >
+              <span className="h-[5px] w-[42px] rounded-[3px] bg-tx-line-2" />
+            </button>
+            {selectedLive ? (
+              <div className="tx-scroll max-h-[86vh] overflow-y-auto px-3.5 pb-4">{card}</div>
+            ) : (
+              <div className="flex min-h-0 flex-1">
+                <div className="w-full">{panel}</div>
+              </div>
+            )}
+          </div>
         )}
       </div>
 
-      {/* Selected Stop Details (Map View) */}
-      {activeTab === 'map' && selectedStop && (
-        <SelectedStopDetails
-          selectedStop={selectedStop}
-          playerPosition={playerPosition}
-          playerMoney={playerMoney}
-          calculateDistance={calculateDistance}
-          calculatePrice={calculatePrice}
-          formatDistance={formatDistance}
-          teleportPlayer={teleportPlayer}
-          isLoading={isLoading}
-          onClose={() => setSelectedStop(null)}
+      {walletOpen && (
+        <WalletModal
+          balance={balance}
+          transactions={transactions}
+          accountIds={ledgerQuery.data?.accountIds ?? []}
+          loading={ledgerQuery.isLoading || balanceQuery.isLoading}
+          playerName={playerName}
+          onClose={() => setWalletOpen(false)}
         />
       )}
 
-      {isLoading && <LoadingOverlay />}
-      
-      <ToastContainer 
-        position="top-center"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="dark"
-      />
-    </div>
+      {flow === "confirm" && selectedLive && balance !== undefined && (
+        <ConfirmModal
+          stop={selectedLive}
+          player={player}
+          balance={balance}
+          pending={teleport.isPending}
+          onConfirm={onConfirm}
+          onCancel={() => setFlow("idle")}
+        />
+      )}
+
+      {flow === "insufficient" && selectedLive && balance !== undefined && (
+        <InsufficientModal
+          stop={selectedLive}
+          price={selectedLive.price}
+          balance={balance}
+          onClose={() => setFlow("idle")}
+          onTopUp={openWallet}
+        />
+      )}
+
+      {flow === "traveling" && selectedLive && (
+        <TravelingOverlay stopId={selectedLive.id} reduceMotion={reduceMotion} />
+      )}
+
+      <ToastHost />
+    </>
   )
 }
