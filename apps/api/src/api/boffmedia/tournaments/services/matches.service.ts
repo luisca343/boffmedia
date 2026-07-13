@@ -88,10 +88,14 @@ export class MatchesService {
       if (dto.topScore > dto.botScore) winnerId = match.topParticipantId;
       else if (dto.botScore > dto.topScore) winnerId = match.botParticipantId;
     }
-    if (winnerId != null &&
+    if (
+      winnerId != null &&
       winnerId !== match.topParticipantId &&
-      winnerId !== match.botParticipantId) {
-      throw new BadRequestException('Winner must be one of the two competitors');
+      winnerId !== match.botParticipantId
+    ) {
+      throw new BadRequestException(
+        'Winner must be one of the two competitors',
+      );
     }
     if (winnerId == null && ELIMINATION.has(match.bracket)) {
       throw new BadRequestException('This match cannot end in a draw');
@@ -149,7 +153,11 @@ export class MatchesService {
       await this.markReadyIfComplete(match.nextMatchId);
     }
 
-    if (match.loserNextMatchId && match.loserNextMatchSlot && s.loserId != null) {
+    if (
+      match.loserNextMatchId &&
+      match.loserNextMatchSlot &&
+      s.loserId != null
+    ) {
       await this.repo.setMatchSlot(
         match.loserNextMatchId,
         match.loserNextMatchSlot,
@@ -224,7 +232,12 @@ export class MatchesService {
         .filter((m) => m.bracket === 'winners')
         .map((m) => m.roundNumber),
     );
-    return effectiveBestOf(match, phase, tournament?.bestOf ?? 1, maxWinnersRound);
+    return effectiveBestOf(
+      match,
+      phase,
+      tournament?.bestOf ?? 1,
+      maxWinnersRound,
+    );
   }
 
   /** True for a legacy phase-less match or a match in the highest-order phase. */

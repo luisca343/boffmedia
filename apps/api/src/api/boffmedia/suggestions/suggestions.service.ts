@@ -67,7 +67,10 @@ export class SuggestionsService {
   }
 
   /** Admin: approve / reject a suggestion. */
-  async review(id: number, dto: ReviewSuggestionDto): Promise<SuggestionEntity> {
+  async review(
+    id: number,
+    dto: ReviewSuggestionDto,
+  ): Promise<SuggestionEntity> {
     await this.db
       .update(boffMediaEventSuggestions)
       .set({ status: dto.status, reviewNote: dto.reviewNote ?? null })

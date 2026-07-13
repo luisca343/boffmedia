@@ -32,7 +32,9 @@ export class CreatePhaseDto {
   @IsEnum(PHASE_FORMAT)
   format: PhaseFormat;
 
-  @ApiPropertyOptional({ description: 'Games per match; falls back to tournament.bestOf.' })
+  @ApiPropertyOptional({
+    description: 'Games per match; falls back to tournament.bestOf.',
+  })
   @IsOptional()
   @Type(() => Number)
   @IsInt()
@@ -64,30 +66,40 @@ export class CreatePhaseDto {
   groupCount?: number;
 
   @ApiPropertyOptional({
-    description: 'Single: also play a third-place match between semifinal losers.',
+    description:
+      'Single: also play a third-place match between semifinal losers.',
   })
   @IsOptional()
   @IsBoolean()
   thirdPlace?: boolean;
 
-  @ApiPropertyOptional({ description: 'Fold the previous phase records into this phase.' })
+  @ApiPropertyOptional({
+    description: 'Fold the previous phase records into this phase.',
+  })
   @IsOptional()
   @IsBoolean()
   carryStandings?: boolean;
 
-  @ApiPropertyOptional({ enum: Object.values(ADVANCE_TYPE), description: 'Null on the final phase.' })
+  @ApiPropertyOptional({
+    enum: Object.values(ADVANCE_TYPE),
+    description: 'Null on the final phase.',
+  })
   @IsOptional()
   @IsEnum(ADVANCE_TYPE)
   advanceType?: AdvanceType;
 
-  @ApiPropertyOptional({ description: 'top_n: N · record: optional cap by standings order.' })
+  @ApiPropertyOptional({
+    description: 'top_n: N · record: optional cap by standings order.',
+  })
   @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(1)
   advanceCount?: number;
 
-  @ApiPropertyOptional({ description: 'record: max losses to advance (2 → "X-2 or better").' })
+  @ApiPropertyOptional({
+    description: 'record: max losses to advance (2 → "X-2 or better").',
+  })
   @IsOptional()
   @Type(() => Number)
   @IsInt()

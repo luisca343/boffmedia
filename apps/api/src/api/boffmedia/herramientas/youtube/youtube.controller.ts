@@ -1,9 +1,4 @@
-import {
-  Controller,
-  Get,
-  Param,
-  HttpStatus,
-} from '@nestjs/common';
+import { Controller, Get, Param, HttpStatus } from '@nestjs/common';
 import { Public } from '@api/_utils/decorators/public.decorator';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { YoutubeFacadeService } from './youtube.facade.service';

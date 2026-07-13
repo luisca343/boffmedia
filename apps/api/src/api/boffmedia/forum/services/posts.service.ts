@@ -71,7 +71,10 @@ export class PostsService {
 
   // Tells the thread author someone replied. Best-effort: a failed notification
   // must never fail the reply itself (and authors don't notify themselves).
-  private async notifyReply(threadId: number, replierId: number): Promise<void> {
+  private async notifyReply(
+    threadId: number,
+    replierId: number,
+  ): Promise<void> {
     try {
       const ref = await this.threadsRepo.findNotifyRef(threadId);
       if (!ref || ref.authorId === replierId) return;

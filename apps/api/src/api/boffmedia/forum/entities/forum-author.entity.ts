@@ -21,7 +21,8 @@ export class ForumAuthor {
   @ApiProperty({
     type: String,
     example: '/uploads/u/12.jpg',
-    description: "The author's profile picture URL, or null to fall back to the initial",
+    description:
+      "The author's profile picture URL, or null to fall back to the initial",
     required: false,
     nullable: true,
   })

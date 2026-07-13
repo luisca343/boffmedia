@@ -696,13 +696,16 @@ export class BoffMediaUsersManagementService {
         if (existingUser) {
           // Link Google to the existing account. Goes straight to the repository:
           // googleId is not a public UpdateUserDto field (account-takeover guard).
-          existingUser = await this.usersRepository.updateUser(existingUser.id, {
-            googleId: googleUser.googleId,
-            profilePicture:
-              googleUser.profilePicture || existingUser.profilePicture,
-            // Google verifies the address — trust it.
-            emailVerified: true,
-          });
+          existingUser = await this.usersRepository.updateUser(
+            existingUser.id,
+            {
+              googleId: googleUser.googleId,
+              profilePicture:
+                googleUser.profilePicture || existingUser.profilePicture,
+              // Google verifies the address — trust it.
+              emailVerified: true,
+            },
+          );
         } else {
           // Create new user with secure random password
           const userData: CreateUserDto = {
@@ -757,13 +760,16 @@ export class BoffMediaUsersManagementService {
         if (existingUser) {
           // Attach discordId to the matched account. Straight to the repository:
           // discordId is not a public UpdateUserDto field (account-takeover guard).
-          existingUser = await this.usersRepository.updateUser(existingUser.id, {
-            discordId: discordUser.discordId,
-            profilePicture:
-              discordUser.profilePicture || existingUser.profilePicture,
-            // Discord returns the email only for verified accounts — trust it.
-            emailVerified: true,
-          });
+          existingUser = await this.usersRepository.updateUser(
+            existingUser.id,
+            {
+              discordId: discordUser.discordId,
+              profilePicture:
+                discordUser.profilePicture || existingUser.profilePicture,
+              // Discord returns the email only for verified accounts — trust it.
+              emailVerified: true,
+            },
+          );
         } else {
           // A brand-new Discord account needs an email to onboard (email is
           // NOT NULL). The web requests the `email` scope, so this is expected.
@@ -782,9 +788,12 @@ export class BoffMediaUsersManagementService {
           };
 
           existingUser = await this.createUser(userData);
-          existingUser = await this.usersRepository.updateUser(existingUser.id, {
-            emailVerified: true,
-          });
+          existingUser = await this.usersRepository.updateUser(
+            existingUser.id,
+            {
+              emailVerified: true,
+            },
+          );
         }
       }
 
@@ -821,13 +830,16 @@ export class BoffMediaUsersManagementService {
         if (existingUser) {
           // Attach twitchId to the matched account. Straight to the repository:
           // twitchId is not a public UpdateUserDto field (account-takeover guard).
-          existingUser = await this.usersRepository.updateUser(existingUser.id, {
-            twitchId: twitchUser.twitchId,
-            profilePicture:
-              twitchUser.profilePicture || existingUser.profilePicture,
-            // Twitch returns the email only for verified accounts — trust it.
-            emailVerified: true,
-          });
+          existingUser = await this.usersRepository.updateUser(
+            existingUser.id,
+            {
+              twitchId: twitchUser.twitchId,
+              profilePicture:
+                twitchUser.profilePicture || existingUser.profilePicture,
+              // Twitch returns the email only for verified accounts — trust it.
+              emailVerified: true,
+            },
+          );
         } else {
           // A brand-new Twitch account needs an email to onboard (email is
           // NOT NULL). The web requests the `user:read:email` scope.
@@ -846,9 +858,12 @@ export class BoffMediaUsersManagementService {
           };
 
           existingUser = await this.createUser(userData);
-          existingUser = await this.usersRepository.updateUser(existingUser.id, {
-            emailVerified: true,
-          });
+          existingUser = await this.usersRepository.updateUser(
+            existingUser.id,
+            {
+              emailVerified: true,
+            },
+          );
         }
       }
 

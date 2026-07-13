@@ -1,6 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { ArrayMinSize, IsArray, IsDate, IsInt, IsOptional } from 'class-validator';
+import {
+  ArrayMinSize,
+  IsArray,
+  IsDate,
+  IsInt,
+  IsOptional,
+} from 'class-validator';
 
 /** Set (or clear) the scheduled time of one or more matches at once. */
 export class ScheduleMatchesDto {

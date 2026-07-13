@@ -180,7 +180,10 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
         .select(this.userSelectWithoutPassword)
         .from(boffMediaUsers)
         .where(
-          and(eq(boffMediaUsers.email, email), isNull(boffMediaUsers.deletedAt)),
+          and(
+            eq(boffMediaUsers.email, email),
+            isNull(boffMediaUsers.deletedAt),
+          ),
         )
         .execute();
 
@@ -267,9 +270,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
     }
   }
 
-  async findUserBySteamId(
-    steamId: string,
-  ): Promise<BoffMediaUserSafe | null> {
+  async findUserBySteamId(steamId: string): Promise<BoffMediaUserSafe | null> {
     if (!steamId || steamId.trim() === '') {
       throw new Error('Steam ID is required');
     }
@@ -411,10 +412,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
         .from(smartrotomUsers)
         .leftJoin(boffMediaUsers, eq(boffMediaUsers.uuid, smartrotomUsers.uuid))
         .where(
-          and(
-            eq(smartrotomUsers.uuid, uuid),
-            isNull(boffMediaUsers.deletedAt),
-          ),
+          and(eq(smartrotomUsers.uuid, uuid), isNull(boffMediaUsers.deletedAt)),
         )
         .execute();
 
@@ -445,7 +443,10 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
           eq(boffMediaUsers.uuid, smartrotomUsers.uuid),
         )
         .where(
-          and(eq(boffMediaUsers.email, email), isNull(boffMediaUsers.deletedAt)),
+          and(
+            eq(boffMediaUsers.email, email),
+            isNull(boffMediaUsers.deletedAt),
+          ),
         )
         .execute();
 

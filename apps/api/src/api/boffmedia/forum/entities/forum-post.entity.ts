@@ -25,7 +25,8 @@ export class ForumPost {
 
   @ApiProperty({
     example: true,
-    description: 'Whether this post is the original post (earliest in the thread)',
+    description:
+      'Whether this post is the original post (earliest in the thread)',
   })
   isOp: boolean;
 

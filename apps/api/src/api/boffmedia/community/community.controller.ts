@@ -14,7 +14,9 @@ export class CommunityController {
   constructor(private readonly service: CommunityService) {}
 
   @Get('stats/site')
-  @ApiOperation({ summary: 'Aggregate site-wide stats (public, for the landing HUD)' })
+  @ApiOperation({
+    summary: 'Aggregate site-wide stats (public, for the landing HUD)',
+  })
   @ApiResponse({ status: 200, type: SiteStatsEntity })
   getSiteStats() {
     return this.service.getSiteStats();

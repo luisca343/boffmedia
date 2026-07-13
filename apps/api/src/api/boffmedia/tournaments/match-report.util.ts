@@ -41,7 +41,9 @@ export function gamesToScores(games: string): { wins: number; losses: number } {
 
 /** Flip a games string to the other player's perspective (W↔L). */
 export function flipGames(games: string): string {
-  return [...games].map((c) => (c === 'W' ? 'L' : c === 'L' ? 'W' : c)).join('');
+  return [...games]
+    .map((c) => (c === 'W' ? 'L' : c === 'L' ? 'W' : c))
+    .join('');
 }
 
 /**

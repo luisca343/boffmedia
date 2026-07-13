@@ -108,10 +108,7 @@ export class ForumFacadeService {
     return this.postsService.createReply(threadId, userId, dto.body);
   }
 
-  async voteThread(
-    threadId: number,
-    userId: number,
-  ): Promise<ForumVoteResult> {
+  async voteThread(threadId: number, userId: number): Promise<ForumVoteResult> {
     const exists = await this.threadsService.threadExists(threadId);
     if (!exists) {
       throw new NotFoundException('Thread not found');

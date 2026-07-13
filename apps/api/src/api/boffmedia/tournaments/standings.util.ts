@@ -161,10 +161,7 @@ export function computeStandings(
     }
     const oomw = new Map<number, number>();
     for (const id of participantIds) {
-      oomw.set(
-        id,
-        mean((opponents.get(id) ?? []).map((o) => omw.get(o) ?? 0)),
-      );
+      oomw.set(id, mean((opponents.get(id) ?? []).map((o) => omw.get(o) ?? 0)));
     }
     rows.sort(
       (x, y) =>

@@ -84,7 +84,9 @@ export class TournamentsService {
   /** Tournaments the caller has entered (profile panel), newest first. */
   async mine(
     userId: number,
-  ): Promise<(TournamentSummary & { myStatus: string; isChampion: boolean })[]> {
+  ): Promise<
+    (TournamentSummary & { myStatus: string; isChampion: boolean })[]
+  > {
     const rows = await this.repo.listByParticipantUser(userId);
     const counts = await this.repo.participantCounts(rows.map((r) => r.id));
     return rows.map((r) => ({
@@ -143,10 +145,7 @@ export class TournamentsService {
     return { success: true };
   }
 
-  async setStatus(
-    id: number,
-    status: TournamentStatus,
-  ): Promise<Tournament> {
+  async setStatus(id: number, status: TournamentStatus): Promise<Tournament> {
     const t = await this.getById(id);
     if (t.status === 'completed' && status !== 'completed') {
       throw new BadRequestException('A completed tournament cannot reopen');
@@ -155,7 +154,10 @@ export class TournamentsService {
     return this.getById(id);
   }
 
-  toSummary(row: TournamentListRow, participantCount: number): TournamentSummary {
+  toSummary(
+    row: TournamentListRow,
+    participantCount: number,
+  ): TournamentSummary {
     return {
       id: row.id,
       slug: row.slug,

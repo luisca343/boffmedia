@@ -10,5 +10,8 @@ export class EpubMetadataDto {
   @ApiPropertyOptional() @IsString() @IsOptional() illustratorSort?: string;
   @ApiPropertyOptional() @IsString() @IsOptional() publisher?: string;
   @ApiPropertyOptional() @IsString() @IsOptional() date?: string;
-  @ApiPropertyOptional({ type: [String] }) @IsArray() @IsOptional() subjects?: string[];
+  @ApiPropertyOptional({ type: [String] })
+  @IsArray()
+  @IsOptional()
+  subjects?: string[];
 }

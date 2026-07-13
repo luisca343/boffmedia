@@ -73,7 +73,10 @@ export class UserActivityItemEntity {
   })
   type: 'achievement' | 'event_join';
 
-  @ApiProperty({ example: 'First Steps', description: 'Achievement or event name' })
+  @ApiProperty({
+    example: 'First Steps',
+    description: 'Achievement or event name',
+  })
   name: string;
 
   @ApiProperty({ example: 'trophy.png', description: 'Icon for this activity' })

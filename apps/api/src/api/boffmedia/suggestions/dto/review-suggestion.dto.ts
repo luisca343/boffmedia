@@ -6,7 +6,9 @@ export class ReviewSuggestionDto {
   @IsEnum(['pending', 'approved', 'rejected'])
   status: 'pending' | 'approved' | 'rejected';
 
-  @ApiPropertyOptional({ example: 'Aprobado — lo publicamos la semana que viene.' })
+  @ApiPropertyOptional({
+    example: 'Aprobado — lo publicamos la semana que viene.',
+  })
   @IsOptional()
   @IsString()
   reviewNote?: string;
