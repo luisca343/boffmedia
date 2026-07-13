@@ -1,7 +1,7 @@
 "use client";
 import * as React from "react";
 import useStarBank from "../_hooks/useStarBank";
-import { useGetTransactions } from "@/hooks/starbank/useGetTransactions";
+import { useTransactions } from "../_hooks/queries";
 import { PageHeader, Card, SectionHead, CardBody, Kpi, Button, Ico, Seg, AreaChart, BarChart, Donut, Skeleton } from "../_components/ui";
 import { income, expense, withinDays, balanceSeries, expenseByCategory, weeklyIncomeExpense, largestExpense } from "../_utils/analytics";
 import { displayName } from "../_utils/account";
@@ -19,7 +19,7 @@ const DAY = 86_400_000;
 export default function Graficas() {
   const { activeAccount } = useStarBank();
   const accId = activeAccount?.id ?? -1;
-  const { transactions, isLoading } = useGetTransactions(accId, 100);
+  const { data: transactions, isLoading } = useTransactions(accId, 100);
   const [range, setRange] = React.useState("30d");
 
   const days = RANGES.find((r) => r.id === range)?.days ?? 30;

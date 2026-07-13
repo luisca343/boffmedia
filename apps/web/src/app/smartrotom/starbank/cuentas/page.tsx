@@ -1,8 +1,9 @@
 "use client";
 import * as React from "react";
 import useStarBank from "../_hooks/useStarBank";
-import { useBoffSession } from "@/services/useBoffSession";
-import { useCreateAccount } from "@/hooks/starbank/useCreateAccount";
+import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid";
+import { useCreateAccountMutation } from "../_hooks/queries";
+import { userMessageFrom } from "@/services/boffAPI";
 import { PageHeader, Card, SectionHead, CardBody, Kpi, Button, Ico, AccountAvatar, Sheet, Label, Input, toast } from "../_components/ui";
 import { formatMoney } from "../_utils/format";
 import { displayName, accountColor } from "../_utils/account";
@@ -15,8 +16,8 @@ const MAIN_BG =
   "linear-gradient(135deg, #1e3a8a, #2463eb)";
 
 export default function Cuentas() {
-  const { session } = useBoffSession();
-  const { accounts, activeAccount, setActiveAccount, fetchAccounts } = useStarBank();
+  const uuid = useRotomUuid();
+  const { accounts, activeAccount, setActiveAccount } = useStarBank();
   const [creating, setCreating] = React.useState(false);
 
   const list = (accounts ?? []) as SBAccount[];
@@ -132,10 +133,9 @@ export default function Cuentas() {
 
       {creating && (
         <CreateAccountDialog
-          uuid={session?.user?.smartRotomUser?.uuid}
+          uuid={uuid ?? undefined}
           onClose={() => setCreating(false)}
           onCreated={() => {
-            if (session) fetchAccounts(session);
             setCreating(false);
             toast("Cuenta creada");
           }}
@@ -147,25 +147,22 @@ export default function Cuentas() {
 
 function CreateAccountDialog({ uuid, onClose, onCreated }: { uuid?: string; onClose: () => void; onCreated: () => void }) {
   const [name, setName] = React.useState("");
-  const [busy, setBusy] = React.useState(false);
   const [error, setError] = React.useState("");
-  const { createAccount } = useCreateAccount();
+  const createAccount = useCreateAccountMutation(uuid);
 
-  async function submit() {
+  function submit() {
     if (!name.trim() || !uuid) {
       setError("Introduce un nombre para la cuenta");
       return;
     }
-    setBusy(true);
     setError("");
-    try {
-      await createAccount({ name: name.trim(), uuid });
-      onCreated();
-    } catch {
-      setError("No se pudo crear la cuenta");
-    } finally {
-      setBusy(false);
-    }
+    createAccount.mutate(
+      { data: { name: name.trim(), uuid } },
+      {
+        onSuccess: onCreated,
+        onError: (err) => setError(userMessageFrom(err, "No se pudo crear la cuenta")),
+      },
+    );
   }
 
   return (
@@ -181,7 +178,7 @@ function CreateAccountDialog({ uuid, onClose, onCreated }: { uuid?: string; onCl
       {error && <div className="text-[13px] font-medium text-sb-neg">{error}</div>}
       <div className="mt-auto flex justify-end gap-2">
         <Button variant="ghost" onClick={onClose}>Cancelar</Button>
-        <Button variant="primary" onClick={submit} disabled={busy || !name.trim()}>{busy ? "Creando…" : "Crear cuenta"}</Button>
+        <Button variant="primary" onClick={submit} disabled={createAccount.isPending || !name.trim()}>{createAccount.isPending ? "Creando…" : "Crear cuenta"}</Button>
       </div>
     </Sheet>
   );

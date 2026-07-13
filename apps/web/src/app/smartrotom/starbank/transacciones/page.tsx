@@ -1,7 +1,7 @@
 "use client";
 import * as React from "react";
 import useStarBank from "../_hooks/useStarBank";
-import { useGetTransactions } from "@/hooks/starbank/useGetTransactions";
+import { useTransactions } from "../_hooks/queries";
 import { PageHeader, Card, Kpi, Button, Ico, Seg, Input, Skeleton } from "../_components/ui";
 import { TxDetail } from "../_components/TxDetail";
 import { CATEGORIES, resolveCategory, type CategoryId } from "../_utils/categories";
@@ -27,7 +27,7 @@ type SortId = "amount" | "balance" | "date";
 export default function Transacciones() {
   const { activeAccount } = useStarBank();
   const accId = activeAccount?.id ?? -1;
-  const { transactions, isLoading } = useGetTransactions(accId, 100);
+  const { data: transactions, isLoading } = useTransactions(accId, 100);
 
   const [period, setPeriod] = React.useState("30d");
   const [type, setType] = React.useState("all");

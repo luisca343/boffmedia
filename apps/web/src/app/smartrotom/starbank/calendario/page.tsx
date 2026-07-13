@@ -1,7 +1,7 @@
 "use client";
 import * as React from "react";
 import useStarBank from "../_hooks/useStarBank";
-import { useGetTransactions } from "@/hooks/starbank/useGetTransactions";
+import { useTransactions } from "../_hooks/queries";
 import { PageHeader, Card, SectionHead, CardBody, Button, Ico, Skeleton } from "../_components/ui";
 import { resolveCategory } from "../_utils/categories";
 import { isOutgoing } from "../_utils/account";
@@ -18,7 +18,7 @@ function keyOf(d: Date): string {
 export default function Calendario() {
   const { activeAccount } = useStarBank();
   const accId = activeAccount?.id ?? -1;
-  const { transactions, isLoading } = useGetTransactions(accId, 100);
+  const { data: transactions, isLoading } = useTransactions(accId, 100);
 
   const today = React.useMemo(() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; }, []);
   const [viewMonth, setViewMonth] = React.useState(today.getMonth());
