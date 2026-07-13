@@ -76,6 +76,10 @@ export namespace StarBankTransaction {
         DERROTA_ENTRENADOR = 'DERROTA_ENTRENADOR',
         DEPOSITO = 'DEPOSITO',
         RETIRO = 'RETIRO',
+        MULTA = 'MULTA',
+        TASA = 'TASA',
+        SUBASTA = 'SUBASTA',
+        RECOMPENSA = 'RECOMPENSA',
     }
 }
 

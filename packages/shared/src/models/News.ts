@@ -51,5 +51,21 @@ export type News = {
      * News last update date
      */
     updatedAt: string;
+    /**
+     * Byline author name
+     */
+    author: string | null;
+    /**
+     * Author masthead role
+     */
+    authorRole: string | null;
+    /**
+     * Magazine issue number
+     */
+    issue: number | null;
+    /**
+     * Number of claps (reader appreciation) received
+     */
+    claps: number;
 };
 
