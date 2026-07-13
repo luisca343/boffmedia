@@ -12,7 +12,7 @@ export interface CreateTransactionData {
 export interface IStarbankTransactionRepository {
   create(
     transactionData: CreateTransactionData,
-  ): Promise<{ success: boolean; message?: string }>;
+  ): Promise<{ success: boolean; message?: string; transactionId?: number }>;
   findByAccountId(
     accountId: number,
     limit?: number,

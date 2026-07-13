@@ -131,8 +131,48 @@ export const rotomNews = mysqlTable('rotom_news', {
   content: text('content').notNull(),
   buttonText: varchar('button_text', { length: 255 }),
   imageUrl: varchar('image_url', { length: 255 }),
+  // Editorial byline. `authorRole` is the masthead role ("Editora de comunidad");
+  // the editorial board is derived by grouping news on this pair, not stored.
+  author: varchar('author', { length: 255 }),
+  authorRole: varchar('author_role', { length: 255 }),
+  // Magazine issue number. The back-issue archive is derived by grouping on it.
+  issue: int('issue'),
+  claps: int('claps').notNull().default(0),
   createdAt: timestamp('created_at').notNull(),
   updatedAt: timestamp('updated_at').notNull(),
 });
 
 export type RotomNews = typeof rotomNews.$inferSelect;
+
+// Reader comments ("viñetas de lectores") on a news article.
+export const rotomNewsComments = mysqlTable('rotom_news_comments', {
+  id: int('id').primaryKey().autoincrement(),
+  newsId: int('news_id')
+    .notNull()
+    .references(() => rotomNews.id, {
+      onDelete: 'cascade',
+      onUpdate: 'cascade',
+    }),
+  uuid: varchar('uuid', { length: 36 })
+    .notNull()
+    .references(() => smartrotomUsers.uuid, {
+      onDelete: 'cascade',
+      onUpdate: 'cascade',
+    }),
+  body: varchar('body', { length: 500 }).notNull(),
+  createdAt: timestamp('created_at').notNull(),
+});
+
+export type RotomNewsComment = typeof rotomNewsComments.$inferSelect;
+
+export const rotomNewsletterSubscribers = mysqlTable(
+  'rotom_newsletter_subscribers',
+  {
+    id: int('id').primaryKey().autoincrement(),
+    email: varchar('email', { length: 255 }).notNull().unique(),
+    createdAt: timestamp('created_at').notNull(),
+  },
+);
+
+export type RotomNewsletterSubscriber =
+  typeof rotomNewsletterSubscribers.$inferSelect;

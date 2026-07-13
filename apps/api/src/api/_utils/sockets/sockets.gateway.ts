@@ -35,7 +35,10 @@ export class SocketsGateway
   ) {}
 
   private broadcastPresence(uuid: string): void {
-    this.server.emit('presence:update', { uuid, status: this.presence.get(uuid) });
+    this.server.emit('presence:update', {
+      uuid,
+      status: this.presence.get(uuid),
+    });
   }
 
   handleConnection(client: Socket) {

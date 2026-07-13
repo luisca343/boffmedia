@@ -31,6 +31,7 @@ import { SmartrotomModule } from '@api/smartrotom/_main/smartrotom.module';
 import { BattleModule } from './api/battlesimulator/battle/battle.module';
 import { SharexModule } from './api/boffmedia/util/sharex/sharex.module';
 import { ArcadeModule } from '@api/smartrotom/arcade/arcade.module';
+import { PcModule } from '@api/smartrotom/pc/pc.module';
 import { DiscordModule } from './discord/_main/discord.module';
 import { CommandsModule } from './discord/_commands/commands.module';
 import { LigaModule } from '@api/smartrotom/liga/liga.module';
@@ -60,6 +61,7 @@ import { YoutubeModule } from '@api/boffmedia/herramientas/youtube/youtube.modul
 import { ScrapeModule } from '@api/boffmedia/herramientas/scrape/scrape.module';
 import { MangaModule } from '@api/boffmedia/herramientas/manga/manga.module';
 import { VgcModule } from '@api/boffmedia/herramientas/pokemon/vgc/vgc.module';
+import { GobiernoModule } from '@api/smartrotom/gobierno/gobierno.module';
 
 @Module({
   imports: [
@@ -90,6 +92,7 @@ import { VgcModule } from '@api/boffmedia/herramientas/pokemon/vgc/vgc.module';
     BattleModule,
     SharexModule,
     ArcadeModule,
+    PcModule,
     DiscordModule,
     CommandsModule,
     LigaModule,
@@ -119,6 +122,7 @@ import { VgcModule } from '@api/boffmedia/herramientas/pokemon/vgc/vgc.module';
     ScrapeModule,
     MangaModule,
     VgcModule,
+    GobiernoModule,
   ],
   controllers: [AppController],
   providers: [

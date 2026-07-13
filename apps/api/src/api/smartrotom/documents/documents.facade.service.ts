@@ -16,6 +16,11 @@ import {
   UpdateNewsRequest,
   NewsResponse,
 } from './services/news.service';
+import {
+  NewsCommentRow,
+  EditorialBoardRow,
+  NewsIssueRow,
+} from './repositories/interfaces/news.repository.interface';
 import { Logger } from 'nestjs-pino';
 import {
   DocumentDetails,
@@ -285,10 +290,7 @@ export class DocumentsFacadeService {
     try {
       return await this.noteOrganizationService.toggleTag(documentId, tagId);
     } catch (error: any) {
-      this.logger.error(
-        `Error toggling tag ${tagId} on ${documentId}:`,
-        error,
-      );
+      this.logger.error(`Error toggling tag ${tagId} on ${documentId}:`, error);
       throw new Error(`Failed to toggle tag: ${error.message}`);
     }
   }
@@ -485,6 +487,84 @@ export class DocumentsFacadeService {
     } catch (error: any) {
       this.logger.error('Error saving news:', error);
       throw new Error(`Failed to save news: ${error.message}`);
+    }
+  }
+
+  // ==================== NEWS COMMENTS ====================
+
+  async getNewsComments(newsId: number): Promise<NewsCommentRow[]> {
+    try {
+      return await this.newsService.getComments(newsId);
+    } catch (error: any) {
+      this.logger.error(`Error getting comments for news ${newsId}:`, error);
+      throw new Error(`Failed to retrieve comments: ${error.message}`);
+    }
+  }
+
+  async addNewsComment(
+    newsId: number,
+    uuid: string,
+    body: string,
+  ): Promise<NewsCommentRow> {
+    try {
+      return await this.newsService.addComment(newsId, uuid, body);
+    } catch (error: any) {
+      this.logger.error(`Error adding comment to news ${newsId}:`, error);
+      throw new Error(`Failed to add comment: ${error.message}`);
+    }
+  }
+
+  async deleteNewsComment(
+    commentId: number,
+  ): Promise<{ success: boolean; message: string }> {
+    try {
+      await this.newsService.removeComment(commentId);
+      return { success: true, message: 'Comment deleted successfully' };
+    } catch (error: any) {
+      this.logger.error(`Error deleting comment ${commentId}:`, error);
+      throw new Error(`Failed to delete comment: ${error.message}`);
+    }
+  }
+
+  // ==================== NEWS CLAPS ====================
+
+  async clapNews(newsId: number): Promise<{ id: number; claps: number }> {
+    try {
+      return await this.newsService.clapNews(newsId);
+    } catch (error: any) {
+      this.logger.error(`Error clapping news ${newsId}:`, error);
+      throw new Error(`Failed to clap news: ${error.message}`);
+    }
+  }
+
+  // ==================== EDITORIAL BOARD & ISSUES ====================
+
+  async getEditorialBoard(): Promise<EditorialBoardRow[]> {
+    try {
+      return await this.newsService.getEditorialBoard();
+    } catch (error: any) {
+      this.logger.error('Error getting editorial board:', error);
+      throw new Error(`Failed to retrieve editorial board: ${error.message}`);
+    }
+  }
+
+  async getNewsIssues(): Promise<NewsIssueRow[]> {
+    try {
+      return await this.newsService.getIssues();
+    } catch (error: any) {
+      this.logger.error('Error getting news issues:', error);
+      throw new Error(`Failed to retrieve news issues: ${error.message}`);
+    }
+  }
+
+  // ==================== NEWSLETTER ====================
+
+  async subscribeNewsletter(email: string): Promise<{ success: boolean }> {
+    try {
+      return await this.newsService.subscribeNewsletter(email);
+    } catch (error: any) {
+      this.logger.error('Error subscribing to newsletter:', error);
+      throw new Error(`Failed to subscribe to newsletter: ${error.message}`);
     }
   }
 

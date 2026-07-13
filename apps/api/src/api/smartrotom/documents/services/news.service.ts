@@ -1,6 +1,11 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { NEWS_REPOSITORY_TOKEN } from '../repositories/interfaces/documents.repository.token';
-import { INewsRepository } from '../repositories/interfaces/news.repository.interface';
+import {
+  INewsRepository,
+  NewsCommentRow,
+  EditorialBoardRow,
+  NewsIssueRow,
+} from '../repositories/interfaces/news.repository.interface';
 import { NewsDetails } from '../repositories/documents.repository';
 
 export interface CreateNewsRequest {
@@ -13,6 +18,9 @@ export interface CreateNewsRequest {
   content?: string;
   buttonText?: string;
   imageUrl?: string;
+  author?: string;
+  authorRole?: string;
+  issue?: number;
 }
 
 export interface UpdateNewsRequest {
@@ -25,6 +33,9 @@ export interface UpdateNewsRequest {
   content?: string;
   buttonText?: string;
   imageUrl?: string;
+  author?: string;
+  authorRole?: string;
+  issue?: number;
 }
 
 export interface NewsResponse {
@@ -204,5 +215,75 @@ export class NewsService {
     } catch {
       return false;
     }
+  }
+
+  // ==================== COMMENTS ====================
+
+  async getComments(newsId: number): Promise<NewsCommentRow[]> {
+    if (!newsId || newsId <= 0) {
+      throw new Error('Valid news ID is required');
+    }
+    return this.newsRepository.findCommentsByNewsId(newsId);
+  }
+
+  async addComment(
+    newsId: number,
+    uuid: string,
+    body: string,
+  ): Promise<NewsCommentRow> {
+    if (!newsId || newsId <= 0) {
+      throw new Error('Valid news ID is required');
+    }
+    if (!uuid) {
+      throw new Error('User UUID is required');
+    }
+    if (!body || !body.trim()) {
+      throw new Error('Comment body is required');
+    }
+
+    const news = await this.newsRepository.findNewsById(newsId);
+    if (!news) {
+      throw new Error('News not found');
+    }
+
+    return this.newsRepository.createComment(newsId, uuid, body.trim());
+  }
+
+  async removeComment(commentId: number): Promise<void> {
+    if (!commentId || commentId <= 0) {
+      throw new Error('Valid comment ID is required');
+    }
+    await this.newsRepository.deleteComment(commentId);
+  }
+
+  // ==================== CLAPS ====================
+
+  async clapNews(newsId: number): Promise<{ id: number; claps: number }> {
+    const news = await this.newsRepository.findNewsById(newsId);
+    if (!news) {
+      throw new Error('News not found');
+    }
+
+    const claps = await this.newsRepository.incrementClaps(newsId);
+    return { id: newsId, claps };
+  }
+
+  // ==================== EDITORIAL BOARD & ISSUES ====================
+
+  async getEditorialBoard(): Promise<EditorialBoardRow[]> {
+    return this.newsRepository.findEditorialBoard();
+  }
+
+  async getIssues(): Promise<NewsIssueRow[]> {
+    return this.newsRepository.findIssues();
+  }
+
+  // ==================== NEWSLETTER ====================
+
+  async subscribeNewsletter(email: string): Promise<{ success: boolean }> {
+    if (!email || !email.trim()) {
+      throw new Error('Email is required');
+    }
+    return this.newsRepository.subscribeNewsletter(email.trim().toLowerCase());
   }
 }

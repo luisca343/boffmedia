@@ -94,7 +94,11 @@ export class NoteOrganizationService {
       label: req.label.trim(),
       color: req.color || DEFAULT_COLOR,
     });
-    return { id: insertId, label: req.label.trim(), color: req.color || DEFAULT_COLOR };
+    return {
+      id: insertId,
+      label: req.label.trim(),
+      color: req.color || DEFAULT_COLOR,
+    };
   }
 
   async updateTag(

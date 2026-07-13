@@ -557,7 +557,9 @@ describe('AuthController — integration (ValidationPipe + GlobalExceptionFilter
     });
 
     it('returns a generic success and delegates when email is valid', async () => {
-      mockEmailVerificationService.sendVerification.mockResolvedValue(undefined);
+      mockEmailVerificationService.sendVerification.mockResolvedValue(
+        undefined,
+      );
 
       const res = await request(app.getHttpServer())
         .post('/auth/resend-verification')

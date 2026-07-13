@@ -25,11 +25,7 @@ export interface IMessageRepository {
   findReactionsForMessages(
     messageIds: number[],
   ): Promise<{ messageId: number; uuid: string; emoji: string }[]>;
-  hasReaction(
-    messageId: number,
-    uuid: string,
-    emoji: string,
-  ): Promise<boolean>;
+  hasReaction(messageId: number, uuid: string, emoji: string): Promise<boolean>;
   addReaction(messageId: number, uuid: string, emoji: string): Promise<void>;
   removeReaction(messageId: number, uuid: string, emoji: string): Promise<void>;
 }

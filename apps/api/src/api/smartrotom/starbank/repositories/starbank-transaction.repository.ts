@@ -33,7 +33,7 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
 
   async create(
     transactionData: CreateTransactionData,
-  ): Promise<{ success: boolean; message?: string }> {
+  ): Promise<{ success: boolean; message?: string; transactionId?: number }> {
     try {
       // Get current balances
       const fromAccount =
@@ -81,7 +81,7 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
       }
 
       // Record transaction
-      await this.db
+      const inserted = await this.db
         .insert(starBankTransactions)
         .values({
           from: transactionData.from,
@@ -95,7 +95,7 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
         })
         .execute();
 
-      return { success: true };
+      return { success: true, transactionId: inserted[0].insertId };
     } catch (error: any) {
       this.logger.error('Failed to create transaction:', error);
       return {

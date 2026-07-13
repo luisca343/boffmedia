@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -50,7 +51,10 @@ import {
   UpdateNewsDto,
   NewsStatusDto,
   GetNewsDto,
+  CreateNewsCommentDto,
+  NewsletterSubscribeDto,
 } from './dto/news.dto';
+import { BaseDto } from '@api/_utils/dto/base.dto';
 
 import {
   Document,
@@ -61,7 +65,14 @@ import {
   CreateNoteResponse,
   SaveDocumentResponse,
 } from './entities/document.entity';
-import { News, NewsResponse } from './entities/news.entity';
+import {
+  News,
+  NewsResponse,
+  NewsComment,
+  EditorialBoardMember,
+  NewsIssue,
+  ClapResponse,
+} from './entities/news.entity';
 import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
 
 @ApiTags('SmartRotom | Documents')
@@ -325,7 +336,9 @@ export class DocumentsController {
 
   @Public()
   @Post('document/:id/tag/:tagId')
-  @ApiOperation({ summary: 'Toggle a tag on a note (adds if absent, removes if present)' })
+  @ApiOperation({
+    summary: 'Toggle a tag on a note (adds if absent, removes if present)',
+  })
   @ApiResponse({ status: HttpStatus.OK, type: SuccessResponse })
   @ApiParam({ name: 'id', description: 'Document ID' })
   @ApiParam({ name: 'tagId', description: 'Tag ID' })
@@ -670,6 +683,33 @@ export class DocumentsController {
     return await this.documentsFacadeService.getFeaturedNews();
   }
 
+  // NOTE: 'board' and 'issues' are static segments and must stay registered
+  // before the 'news/:newsId' param route below, or Nest matches them as
+  // newsId="board"/"issues" (parseInt → NaN).
+  @Public()
+  @Get('news/board')
+  @ApiOperation({ summary: 'Get the editorial board (derived from bylines)' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Editorial board retrieved successfully.',
+    type: [EditorialBoardMember],
+  })
+  async getEditorialBoard(): Promise<EditorialBoardMember[]> {
+    return await this.documentsFacadeService.getEditorialBoard();
+  }
+
+  @Public()
+  @Get('news/issues')
+  @ApiOperation({ summary: 'Get the back-issue archive (derived by issue)' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'News issues retrieved successfully.',
+    type: [NewsIssue],
+  })
+  async getNewsIssues(): Promise<NewsIssue[]> {
+    return await this.documentsFacadeService.getNewsIssues();
+  }
+
   @Public()
   @Get('news/:newsId')
   @ApiOperation({ summary: 'Get news by ID' })
@@ -683,9 +723,75 @@ export class DocumentsController {
   async getNewsById(@Param('newsId') newsId: string): Promise<News> {
     const newsIdNum = parseInt(newsId, 10);
     if (isNaN(newsIdNum)) {
-      throw new Error('Invalid news ID');
+      throw new BadRequestException('Invalid news ID');
     }
     return await this.documentsFacadeService.getNewsById(newsIdNum);
+  }
+
+  @Public()
+  @Get('news/:newsId/comments')
+  @ApiOperation({ summary: 'Get comments for a news article' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Comments retrieved successfully.',
+    type: [NewsComment],
+  })
+  @ApiParam({ name: 'newsId', description: 'News ID' })
+  async getNewsComments(
+    @Param('newsId') newsId: string,
+  ): Promise<NewsComment[]> {
+    const newsIdNum = parseInt(newsId, 10);
+    if (isNaN(newsIdNum)) {
+      throw new BadRequestException('Invalid news ID');
+    }
+    return await this.documentsFacadeService.getNewsComments(newsIdNum);
+  }
+
+  @Public()
+  @Post('news/:newsId/comments')
+  @ApiOperation({ summary: 'Add a comment to a news article' })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Comment created successfully.',
+    type: NewsComment,
+  })
+  @ApiParam({ name: 'newsId', description: 'News ID' })
+  @ApiBody({ type: CreateNewsCommentDto })
+  async addNewsComment(
+    @Param('newsId') newsId: string,
+    @Body() createNewsCommentDto: CreateNewsCommentDto,
+  ): Promise<NewsComment> {
+    const newsIdNum = parseInt(newsId, 10);
+    if (isNaN(newsIdNum)) {
+      throw new BadRequestException('Invalid news ID');
+    }
+    return await this.documentsFacadeService.addNewsComment(
+      newsIdNum,
+      createNewsCommentDto.uuid,
+      createNewsCommentDto.body,
+    );
+  }
+
+  @Public()
+  @Post('news/:newsId/clap')
+  @ApiOperation({ summary: 'Clap a news article (reader appreciation)' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Clap registered successfully.',
+    type: ClapResponse,
+  })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'News not found.' })
+  @ApiParam({ name: 'newsId', description: 'News ID' })
+  @ApiBody({ type: BaseDto })
+  async clapNews(
+    @Param('newsId') newsId: string,
+    @Body() _body: BaseDto,
+  ): Promise<ClapResponse> {
+    const newsIdNum = parseInt(newsId, 10);
+    if (isNaN(newsIdNum)) {
+      throw new BadRequestException('Invalid news ID');
+    }
+    return await this.documentsFacadeService.clapNews(newsIdNum);
   }
 
   @Post('news')
@@ -713,6 +819,9 @@ export class DocumentsController {
       content: createNewsDto.content,
       buttonText: createNewsDto.buttonText,
       imageUrl: createNewsDto.imageUrl,
+      author: createNewsDto.author,
+      authorRole: createNewsDto.authorRole,
+      issue: createNewsDto.issue,
     };
     return await this.documentsFacadeService.createNews(createNewsRequest);
   }
@@ -735,7 +844,7 @@ export class DocumentsController {
   ): Promise<News> {
     const newsIdNum = parseInt(newsId, 10);
     if (isNaN(newsIdNum)) {
-      throw new Error('Invalid news ID');
+      throw new BadRequestException('Invalid news ID');
     }
 
     const updateNewsRequest: UpdateNewsRequest = {
@@ -748,6 +857,9 @@ export class DocumentsController {
       content: updateNewsDto.content,
       buttonText: updateNewsDto.buttonText,
       imageUrl: updateNewsDto.imageUrl,
+      author: updateNewsDto.author,
+      authorRole: updateNewsDto.authorRole,
+      issue: updateNewsDto.issue,
     };
 
     return await this.documentsFacadeService.updateNews(
@@ -770,9 +882,29 @@ export class DocumentsController {
   async deleteNews(@Param('newsId') newsId: string): Promise<SuccessResponse> {
     const newsIdNum = parseInt(newsId, 10);
     if (isNaN(newsIdNum)) {
-      throw new Error('Invalid news ID');
+      throw new BadRequestException('Invalid news ID');
     }
     return await this.documentsFacadeService.deleteNews(newsIdNum);
+  }
+
+  @Delete('news/comments/:commentId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.ROTOM_ADMIN, USER_ROLES.ROTOM_FURRET)
+  @ApiOperation({ summary: 'Delete a news comment' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Comment deleted successfully.',
+    type: SuccessResponse,
+  })
+  @ApiParam({ name: 'commentId', description: 'Comment ID' })
+  async deleteNewsComment(
+    @Param('commentId') commentId: string,
+  ): Promise<SuccessResponse> {
+    const commentIdNum = parseInt(commentId, 10);
+    if (isNaN(commentIdNum)) {
+      throw new BadRequestException('Invalid comment ID');
+    }
+    return await this.documentsFacadeService.deleteNewsComment(commentIdNum);
   }
 
   @Post('newsstatus')
@@ -795,6 +927,25 @@ export class DocumentsController {
     return await this.documentsFacadeService.updateNewsStatus(
       newsStatusDto.published,
       newsStatusDto.featured,
+    );
+  }
+
+  // ==================== NEWSLETTER ====================
+
+  @Public()
+  @Post('newsletter')
+  @ApiOperation({ summary: 'Subscribe an email to the newsletter' })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Subscribed successfully.',
+    type: SuccessResponse,
+  })
+  @ApiBody({ type: NewsletterSubscribeDto })
+  async subscribeNewsletter(
+    @Body() newsletterSubscribeDto: NewsletterSubscribeDto,
+  ): Promise<SuccessResponse> {
+    return await this.documentsFacadeService.subscribeNewsletter(
+      newsletterSubscribeDto.email,
     );
   }
 }

@@ -1,11 +1,5 @@
 import { sql } from 'drizzle-orm';
-import {
-  char,
-  int,
-  json,
-  mysqlTable,
-  timestamp,
-} from 'drizzle-orm/mysql-core';
+import { char, int, json, mysqlTable, timestamp } from 'drizzle-orm/mysql-core';
 
 export const ficusMessages = mysqlTable('ficus_messages', {
   uuid: char('uuid', { length: 36 }),
