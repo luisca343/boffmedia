@@ -66,7 +66,7 @@ export function MsBasesChapter() {
           app="ms"
           title="Cera — el estado de un encargo"
           code="SEAL_FILL / SEAL_TEXT"
-          note="El color del sello es dato, no clase: se aplica como fill de SVG o desde un mapa de clases literales. Un bg-ms-seal-${status} no compilaría nunca (§4)."
+          note="El color del sello es dato, no clase: se aplica como fill de SVG o desde un mapa de clases literales. Una clase interpolada (`bg-ms-seal-` + el estado) no compilaría nunca (§4)."
           canvas={false}
         >
           <Swatches tokens={SEALS} />

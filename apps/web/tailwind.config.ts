@@ -54,6 +54,14 @@ const config: Config = {
         ar: ["Space Grotesk", "ui-sans-serif", "system-ui", "sans-serif"],
         "ar-display": ["Press Start 2P", "ui-monospace", "monospace"],
         "ar-mono": ["JetBrains Mono", "ui-monospace", "monospace"],
+        // PC (SmartRotom) — the storage console, triple type system (self-hosted).
+        // Chakra Petch is the squared-off HUD face: it carries the wordmark, box
+        // names and panel titles and nothing else. Every figure — dex numbers,
+        // levels, box counts, IV/EV, stat totals — is JetBrains Mono, because the
+        // whole app is a grid of numbers that must align down a column.
+        pc: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        "pc-display": ["Chakra Petch", "Inter", "ui-sans-serif", "sans-serif"],
+        "pc-mono": ["JetBrains Mono", "ui-monospace", "monospace"],
         // Taxi (SmartRotom) — mobility triple type system (self-hosted).
         // Orbitron carries the wordmark and the rider tier only; every figure
         // (fares, coords, distances) is JetBrains Mono with tabular numerals.
@@ -69,6 +77,23 @@ const config: Config = {
         "ms-uppercase": ["IM Fell English SC", "Cinzel", "Georgia", "serif"],
         "ms-mono": ["IM Fell DW Pica", "ui-monospace", "monospace"],
         "ms-hand": ["Patrick Hand", "Segoe Print", "cursive"],
+        // Furret Today (SmartRotom) — the pop-art magazine. Four faces: Bangers
+        // shouts every headline (single 400 weight — never ask for another),
+        // Fraunces is the italic serif deck/byline, Space Grotesk is the body
+        // copy, and Inter carries every uppercase UI label (eyebrows, pills,
+        // buttons) where the display face would be unreadable at 11px.
+        ft: ["Space Grotesk", "Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        "ft-display": ["Bangers", "Anton", "Archivo Black", "ui-sans-serif", "sans-serif"],
+        "ft-deck": ["Fraunces", "Georgia", "Times New Roman", "serif"],
+        "ft-ui": ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        // Gobierno de Teras (SmartRotom) — the civic paper system. Libre
+        // Baskerville is the engraved face: every heading, every figure on a
+        // stat tile, the seal's circular legend. Public Sans is the UI. Space
+        // Mono is the institutional label face — it carries every uppercase
+        // kicker, table header, badge and case number, and nothing else.
+        gt: ["Public Sans", "ui-sans-serif", "system-ui", "sans-serif"],
+        "gt-display": ["Libre Baskerville", "Georgia", "Times New Roman", "serif"],
+        "gt-mono": ["Space Mono", "Roboto Mono", "ui-monospace", "monospace"],
       },
       fontSize: {
         "4xl": ["2.25rem", { lineHeight: "normal" }],
@@ -113,6 +138,15 @@ const config: Config = {
         "glow-lg": "0 0 20px var(--primary-soft, rgba(249,115,22,0.4))",
       },
       boxShadow: {
+        // ── Furret Today (SmartRotom) — the hard offset "print" drop ────────
+        // No blur, no spread: a solid ink slab offset down-right, the way a
+        // misregistered second pass looks on cheap newsprint. This IS the
+        // app's elevation system; there is no soft shadow anywhere in it.
+        "ft-pop": "6px 6px 0 0 rgb(var(--ft-ink))",
+        "ft-pop-sm": "3px 3px 0 0 rgb(var(--ft-ink))",
+        "ft-pop-md": "5px 5px 0 0 rgb(var(--ft-ink))",
+        "ft-pop-lg": "10px 10px 0 0 rgb(var(--ft-ink))",
+        "ft-pop-xs": "2px 2px 0 0 rgb(var(--ft-ink))",
         // ── Taxi (SmartRotom) elevation — theme-dependent, see `.tx-app` ────
         "tx-1": "var(--tx-shadow-1)",
         "tx-2": "var(--tx-shadow-2)",
@@ -158,6 +192,12 @@ const config: Config = {
         "mw-glow-lg": "0 0 40px rgb(var(--mw-accent) / .2)",
         "mw-card": "0 8px 30px -12px rgba(0,0,0,.6)",
         "mw-elevated": "0 20px 50px -20px rgba(0,0,0,.7)",
+        // ── Gobierno de Teras (SmartRotom) — paper elevation ───────────────
+        // Every shadow carries a warm-white inset top edge: on cream paper a
+        // neutral drop shadow alone reads as dirt, not as lift.
+        "gt-sm": "0 1px 2px rgba(74,64,40,.08), inset 0 1px 0 rgba(255,255,255,.6)",
+        gt: "0 2px 10px -4px rgba(74,64,40,.22), inset 0 1px 0 rgba(255,255,255,.7)",
+        "gt-lg": "0 16px 40px -20px rgba(50,42,22,.45), inset 0 1px 0 rgba(255,255,255,.7)",
       },
       backdropBlur: {
         xs: "2px",
@@ -740,6 +780,43 @@ const config: Config = {
           "panel-2":     "var(--ar-panel-2)",
         },
         // ════════════════════════════════════════════════════════════════════
+        // PC (SmartRotom) — `pc-*`. The storage console: a slate void behind
+        // frosted glass panels. Dark-only — the app ignores the theme picker's
+        // mode (SMARTROTOM_V3.md §2b), like Pokédex, Arcade and Misiones.
+        // CSS-var backed (declared on `.pc-app`) rather than baked hex, because
+        // the glass/slot/wallpaper component classes below have to read the
+        // palette from inside plugin CSS. Alpha works: `bg-pc-accent/16`.
+        // Blue is the ONE structural accent; the other six are strictly
+        // semantic roles and never decorate: cyan = multi-select, violet =
+        // compare/filters, green = valid drop, amber = held item, rose =
+        // destructive/fainted, gold = shiny.
+        // ════════════════════════════════════════════════════════════════════
+        pc: {
+          bg:    "rgb(var(--pc-bg) / <alpha-value>)",
+          "bg-1": "rgb(var(--pc-bg-1) / <alpha-value>)",
+          "bg-2": "rgb(var(--pc-bg-2) / <alpha-value>)",
+          fg: {
+            DEFAULT: "rgb(var(--pc-fg) / <alpha-value>)",
+            muted:   "rgb(var(--pc-fg-muted) / <alpha-value>)",
+            subtle:  "rgb(var(--pc-fg-subtle) / <alpha-value>)",
+          },
+          accent: {
+            DEFAULT: "rgb(var(--pc-accent) / <alpha-value>)",
+            strong:  "rgb(var(--pc-accent-strong) / <alpha-value>)",
+          },
+          cyan:   "rgb(var(--pc-cyan) / <alpha-value>)",
+          violet: "rgb(var(--pc-violet) / <alpha-value>)",
+          green:  "rgb(var(--pc-green) / <alpha-value>)",
+          amber:  "rgb(var(--pc-amber) / <alpha-value>)",
+          rose:   "rgb(var(--pc-rose) / <alpha-value>)",
+          gold:   "rgb(var(--pc-gold) / <alpha-value>)",
+          line:          "var(--pc-line)",
+          "line-strong": "var(--pc-line-strong)",
+          panel:         "var(--pc-panel)",
+          "panel-2":     "var(--pc-panel-2)",
+          "panel-solid": "rgb(var(--pc-panel-solid) / <alpha-value>)",
+        },
+        // ════════════════════════════════════════════════════════════════════
         // MISIONES (SmartRotom) — `ms-*`. The tavern quest board: a cork+wood
         // tablón holding parchment papers pinned with wax seals. Dark-only, one
         // palette (Pergamino) — the app ignores the theme picker's mode, like
@@ -789,6 +866,119 @@ const config: Config = {
             red:  "rgb(var(--ms-stamp-red) / <alpha-value>)",
             gold: "rgb(var(--ms-stamp-gold) / <alpha-value>)",
           },
+        },
+        // ════════════════════════════════════════════════════════════════════
+        // FURRET TODAY (SmartRotom) — `ft-*`. A pop-art printed magazine: warm
+        // newsprint paper, comic ink, and six saturated accents that behave like
+        // spot colours on a press. Light-only — the paper IS the design, so the
+        // app ignores the theme picker's mode (like Pokédex, Arcade, Misiones —
+        // SMARTROTOM_V3.md §2b). The dark "ink" cover is a SECTION, not a theme.
+        // CSS-var backed (declared on `.ft-app`) so the halftone/newsprint/stripe
+        // component classes below can read the palette from inside plugin CSS.
+        // Alpha works: `bg-ft-pink/12`, `border-ft-ink/30`.
+        // The six accents are DATA-DRIVEN (an article's category picks one), so
+        // they are applied through the literal class maps in `_utils/accents.ts`
+        // — never `bg-ft-${accent}` (§4: dynamic classes silently never compile).
+        // ════════════════════════════════════════════════════════════════════
+        ft: {
+          ink:   "rgb(var(--ft-ink) / <alpha-value>)",
+          paper: {
+            DEFAULT: "rgb(var(--ft-paper) / <alpha-value>)",
+            2:       "rgb(var(--ft-paper-2) / <alpha-value>)",
+            dark:    "rgb(var(--ft-paper-dark) / <alpha-value>)",
+          },
+          // Body copy sits a touch warmer/lighter than pure ink so long-form
+          // reading does not vibrate against the cream paper.
+          body:  "rgb(var(--ft-body) / <alpha-value>)",
+          deck:  "rgb(var(--ft-deck) / <alpha-value>)",
+          pink: {
+            DEFAULT: "rgb(var(--ft-pink) / <alpha-value>)",
+            soft:    "rgb(var(--ft-pink-soft) / <alpha-value>)",
+          },
+          yellow: {
+            DEFAULT: "rgb(var(--ft-yellow) / <alpha-value>)",
+            soft:    "rgb(var(--ft-yellow-soft) / <alpha-value>)",
+          },
+          cyan: {
+            DEFAULT: "rgb(var(--ft-cyan) / <alpha-value>)",
+            soft:    "rgb(var(--ft-cyan-soft) / <alpha-value>)",
+          },
+          orange: {
+            DEFAULT: "rgb(var(--ft-orange) / <alpha-value>)",
+            soft:    "rgb(var(--ft-orange-soft) / <alpha-value>)",
+          },
+          purple: {
+            DEFAULT: "rgb(var(--ft-purple) / <alpha-value>)",
+            soft:    "rgb(var(--ft-purple-soft) / <alpha-value>)",
+          },
+          lime:  "rgb(var(--ft-lime) / <alpha-value>)",
+          red:   "rgb(var(--ft-red) / <alpha-value>)",
+        },
+        // ════════════════════════════════════════════════════════════════════
+        // GOBIERNO DE TERAS (SmartRotom) — `gt-*`. A civic institution printed
+        // on warm paper: cream surfaces, warm-black ink, municipal green and
+        // heraldic gold. Light-only — the paper IS the design, so the app
+        // ignores the theme picker's mode (like Furret Today, Pokédex, Arcade,
+        // Misiones — SMARTROTOM_V3.md §2b).
+        //
+        // `accent` is the one themeable axis: four institutional colours
+        // (civic / navy / burgundy / gold) swapped by `data-accent` on the
+        // scope root. The six `dep-*` hues are NOT themeable — a department's
+        // colour is its identity, and it stays put whatever the accent is.
+        // ════════════════════════════════════════════════════════════════════
+        gt: {
+          paper: {
+            bg: "rgb(var(--gt-paper-bg) / <alpha-value>)",
+            0:  "rgb(var(--gt-paper-0) / <alpha-value>)",
+            1:  "rgb(var(--gt-paper-1) / <alpha-value>)",
+            2:  "rgb(var(--gt-paper-2) / <alpha-value>)",
+            3:  "rgb(var(--gt-paper-3) / <alpha-value>)",
+          },
+          line: {
+            DEFAULT: "rgb(var(--gt-line) / <alpha-value>)",
+            strong:  "rgb(var(--gt-line-strong) / <alpha-value>)",
+            soft:    "rgb(var(--gt-line-soft) / <alpha-value>)",
+          },
+          ink: {
+            900: "rgb(var(--gt-ink-900) / <alpha-value>)",
+            800: "rgb(var(--gt-ink-800) / <alpha-value>)",
+            700: "rgb(var(--gt-ink-700) / <alpha-value>)",
+            600: "rgb(var(--gt-ink-600) / <alpha-value>)",
+            500: "rgb(var(--gt-ink-500) / <alpha-value>)",
+            400: "rgb(var(--gt-ink-400) / <alpha-value>)",
+            300: "rgb(var(--gt-ink-300) / <alpha-value>)",
+          },
+          civic: {
+            DEFAULT: "rgb(var(--gt-civic) / <alpha-value>)",
+            700:     "rgb(var(--gt-civic-700) / <alpha-value>)",
+            600:     "rgb(var(--gt-civic-600) / <alpha-value>)",
+            300:     "rgb(var(--gt-civic-300) / <alpha-value>)",
+            tint:    "rgb(var(--gt-civic-tint) / <alpha-value>)",
+          },
+          gold: {
+            DEFAULT: "rgb(var(--gt-gold) / <alpha-value>)",
+            600:     "rgb(var(--gt-gold-600) / <alpha-value>)",
+            300:     "rgb(var(--gt-gold-300) / <alpha-value>)",
+            tint:    "rgb(var(--gt-gold-tint) / <alpha-value>)",
+          },
+          // The accent follows `data-accent`; everything else here does not.
+          accent: {
+            DEFAULT: "rgb(var(--gt-accent) / <alpha-value>)",
+            strong:  "rgb(var(--gt-accent-strong) / <alpha-value>)",
+            tint:    "rgb(var(--gt-accent-tint) / <alpha-value>)",
+          },
+          dep: {
+            urbanismo: "rgb(var(--gt-dep-urbanismo) / <alpha-value>)",
+            seguridad: "rgb(var(--gt-dep-seguridad) / <alpha-value>)",
+            hacienda:  "rgb(var(--gt-dep-hacienda) / <alpha-value>)",
+            justicia:  "rgb(var(--gt-dep-justicia) / <alpha-value>)",
+            poblacion: "rgb(var(--gt-dep-poblacion) / <alpha-value>)",
+            gobierno:  "rgb(var(--gt-dep-gobierno) / <alpha-value>)",
+          },
+          ok:     { DEFAULT: "rgb(var(--gt-ok) / <alpha-value>)",     tint: "rgb(var(--gt-ok-tint) / <alpha-value>)" },
+          warn:   { DEFAULT: "rgb(var(--gt-warn) / <alpha-value>)",   tint: "rgb(var(--gt-warn-tint) / <alpha-value>)" },
+          danger: { DEFAULT: "rgb(var(--gt-danger) / <alpha-value>)", tint: "rgb(var(--gt-danger-tint) / <alpha-value>)" },
+          info:   { DEFAULT: "rgb(var(--gt-info) / <alpha-value>)",   tint: "rgb(var(--gt-info-tint) / <alpha-value>)" },
         },
       },
       keyframes: {
@@ -955,6 +1145,41 @@ const config: Config = {
           from: { opacity: "0", transform: "translateY(14px) scale(.98)" },
           to: { opacity: "1", transform: "none" },
         },
+        // ── PC (SmartRotom) ─────────────────────────────────────────────────
+        "pc-fade": { from: { opacity: "0" }, to: { opacity: "1" } },
+        "pc-pop": {
+          from: { opacity: "0", transform: "scale(.92)" },
+          to: { opacity: "1", transform: "scale(1)" },
+        },
+        "pc-slide-up": {
+          from: { opacity: "0", transform: "translateY(14px)" },
+          to: { opacity: "1", transform: "none" },
+        },
+        "pc-slide-in-right": {
+          from: { opacity: "0", transform: "translateX(40px)" },
+          to: { opacity: "1", transform: "none" },
+        },
+        "pc-float": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-5px)" },
+        },
+        "pc-shimmer": {
+          from: { backgroundPosition: "-200% 0" },
+          to: { backgroundPosition: "200% 0" },
+        },
+        // Referenced by name from the `.pc-boot-scan::after` component class.
+        pcBootSweep: { from: { transform: "translateY(0)" }, to: { transform: "translateY(420%)" } },
+        "pc-boot-cell": {
+          "0%": { opacity: "0", transform: "scale(.5)" },
+          "70%": { transform: "scale(1.08)" },
+          "100%": { opacity: "1", transform: "scale(1)" },
+        },
+        "pc-boot-spin": { to: { transform: "rotate(360deg)" } },
+        "pc-boot-blink": { "50%": { opacity: ".2" } },
+        "pc-pulse-glow": {
+          "0%, 100%": { boxShadow: "0 0 0 1px rgb(var(--pc-accent) / .3)" },
+          "50%": { boxShadow: "0 0 18px -2px rgb(var(--pc-accent) / .5)" },
+        },
         "tx-sheet-up": {
           from: { opacity: "0", transform: "translateY(60px)" },
           to: { opacity: "1", transform: "none" },
@@ -991,6 +1216,44 @@ const config: Config = {
           "0%, 42%": { transform: "rotate(0deg)" },
           "50%, 92%": { transform: "rotate(180deg)" },
           "100%": { transform: "rotate(360deg)" },
+        },
+        // ── Furret Today (SmartRotom) ───────────────────────────────────────
+        "ft-pulse": { "0%, 100%": { opacity: "1" }, "50%": { opacity: ".4" } },
+        "ft-bob": {
+          "0%, 100%": { transform: "translateY(0) rotate(-2deg)" },
+          "50%": { transform: "translateY(-4px) rotate(-1deg)" },
+        },
+        "ft-marquee": {
+          from: { transform: "translateX(0)" },
+          to: { transform: "translateX(-50%)" },
+        },
+        "ft-burst": {
+          "0%": { transform: "scale(.8)", opacity: "0" },
+          "60%": { transform: "scale(1.05)", opacity: "1" },
+          "100%": { transform: "scale(1)", opacity: "1" },
+        },
+        "ft-shimmer": {
+          from: { backgroundPosition: "200% 0" },
+          to: { backgroundPosition: "-200% 0" },
+        },
+        // ── Gobierno de Teras (SmartRotom) ────────────────────────────────
+        // The seal's circular legend turns once every 90s — slow enough to read
+        // as engraving that happens to move, not as a spinner.
+        "gt-seal": { to: { transform: "rotate(360deg)" } },
+        // Transform-only, so a throttled or backgrounded tab can never leave
+        // the content stuck invisible at opacity 0.
+        "gt-pop": { from: { transform: "translateY(8px)" }, to: { transform: "translateY(0)" } },
+        "gt-pop-scale": { from: { transform: "scale(.97)" }, to: { transform: "scale(1)" } },
+        "gt-blink": { "0%, 55%": { opacity: "1" }, "56%, 100%": { opacity: ".25" } },
+        "gt-pulse": { "0%, 100%": { opacity: "1" }, "50%": { opacity: ".5" } },
+        "gt-stamp": {
+          "0%":   { opacity: "0", transform: "scale(1.5) rotate(-14deg)" },
+          "60%":  { opacity: "1", transform: "scale(.94) rotate(-9deg)" },
+          "100%": { transform: "scale(1) rotate(-9deg)" },
+        },
+        "gt-toast": {
+          from: { opacity: "0", transform: "translateY(10px) scale(.98)" },
+          to:   { opacity: "1", transform: "translateY(0) scale(1)" },
         },
       },
       animation: {
@@ -1041,6 +1304,17 @@ const config: Config = {
         "tx-beam": "tx-beam 0.7s linear infinite",
         "tx-ping": "tx-ping 1.9s cubic-bezier(.22,1,.36,1) infinite",
         "tx-card-in": "tx-card-in 0.32s cubic-bezier(.22,1,.36,1)",
+        // ── PC (SmartRotom) ─────────────────────────────────────────────────
+        "pc-fade": "pc-fade .3s cubic-bezier(.22,.61,.36,1) both",
+        "pc-pop": "pc-pop .22s cubic-bezier(.22,.61,.36,1) both",
+        "pc-slide-up": "pc-slide-up .28s cubic-bezier(.22,.61,.36,1) both",
+        "pc-slide-in-right": "pc-slide-in-right .28s cubic-bezier(.22,.61,.36,1) both",
+        "pc-float": "pc-float 5s ease-in-out infinite",
+        "pc-shimmer": "pc-shimmer 1.4s linear infinite",
+        "pc-boot-cell": "pc-boot-cell .3s cubic-bezier(.22,.61,.36,1) both",
+        "pc-boot-spin": "pc-boot-spin 1.5s linear infinite",
+        "pc-boot-blink": "pc-boot-blink 1s steps(2) infinite",
+        "pc-pulse-glow": "pc-pulse-glow 1.5s infinite",
         "tx-sheet-up": "tx-sheet-up 0.34s cubic-bezier(.22,1,.36,1)",
         "tx-toast-in": "tx-toast-in 0.4s cubic-bezier(.22,1,.36,1)",
         "tx-fade": "tx-fade 0.22s ease",
@@ -1051,23 +1325,53 @@ const config: Config = {
         "ms-spark": "ms-spark 3s ease-in-out infinite",
         "ms-slide-in": "ms-slide-in 0.32s cubic-bezier(.16,1,.3,1)",
         "ms-hourglass": "ms-hourglass 4s ease-in-out infinite",
+        // ── Furret Today (SmartRotom) ─────────────────────────────────────
+        "ft-pulse": "ft-pulse 1.4s ease-in-out infinite",
+        "ft-bob": "ft-bob 4.5s ease-in-out infinite",
+        "ft-marquee": "ft-marquee 40s linear infinite",
+        "ft-burst": "ft-burst .36s cubic-bezier(.2,.8,.2,1) both",
+        "ft-shimmer": "ft-shimmer 1.4s linear infinite",
+        // ── Gobierno de Teras (SmartRotom) ────────────────────────────────
+        "gt-seal": "gt-seal 90s linear infinite",
+        "gt-pop": "gt-pop .28s ease-out both",
+        "gt-pop-scale": "gt-pop-scale .22s ease-out both",
+        "gt-blink": "gt-blink 1.3s step-end infinite",
+        "gt-pulse": "gt-pulse 1.8s ease-in-out infinite",
+        "gt-stamp": "gt-stamp .4s cubic-bezier(.2,.8,.3,1) both",
+        "gt-toast": "gt-toast .22s ease-out both",
       },
       transitionTimingFunction: {
         "pk-out": "cubic-bezier(.16, 1, .3, 1)",
         "pk-spring": "cubic-bezier(.34, 1.56, .64, 1)",
         // The Taxi handoff's single easing curve (`--ease`).
         tx: "cubic-bezier(.22, 1, .36, 1)",
+        // Furret Today — the "snap" the pop cards lift on.
+        ft: "cubic-bezier(.2, .7, .2, 1)",
       },
       spacing: {
         18: "4.5rem",
         88: "22rem",
         128: "32rem",
       },
+      borderWidth: {
+        // ── Furret Today (SmartRotom) — the comic ink outline ───────────────
+        // The half-pixel is deliberate: 2.5px is the handoff's stroke and it
+        // renders crisper than 2px against the halftone dots at 1x.
+        ft: "2.5px",
+        "ft-thick": "4px",
+        "ft-hair": "1.5px",
+      },
       borderRadius: {
         "4xl": "2rem",
         "neon": "14px",
         "neon-lg": "22px",
         "neon-pill": "9999px",
+        // ── Furret Today (SmartRotom) radii ─────────────────────────────────
+        "ft-sm": "6px",
+        "ft-md": "10px",
+        ft: "14px",
+        "ft-lg": "24px",
+        "ft-pill": "999px",
         // ── Starbank (SmartRotom) radii ─────────────────────────────────────
         "sb-xs": "6px",
         "sb-sm": "10px",
@@ -1081,6 +1385,11 @@ const config: Config = {
         "ca-lg": "12px",
         "ca-xl": "16px",
         "ca-2xl": "22px",
+        // ── PC (SmartRotom) radii ───────────────────────────────────────────
+        "pc-sm": "10px",
+        pc: "14px",
+        "pc-lg": "20px",
+        "pc-pill": "999px",
         // ── Pokédex (SmartRotom) radii ──────────────────────────────────────
         "pk-sm": "6px",
         "pk-md": "10px",
@@ -1109,6 +1418,11 @@ const config: Config = {
         "tx-lg": "18px",
         "tx-xl": "24px",
         "tx-pill": "999px",
+        // ── Gobierno de Teras (SmartRotom) radii ───────────────────────────
+        // Deliberately tight: this is a printed document, not an app surface.
+        "gt-sm": "5px",
+        gt: "8px",
+        "gt-pill": "999px",
       },
     },
   },
@@ -1579,6 +1893,171 @@ const config: Config = {
       })
     }),
     // ── Arcade (SmartRotom) theme layer ──────────────────────────────────────
+    // ── PC (SmartRotom) ───────────────────────────────────────────────────────
+    // Dark-only slate console, scoped to `.pc-app`. Four things live here that
+    // genuinely cannot be utilities: the palette (the component classes below
+    // read it back out of the vars), the frosted-glass panel, the storage slot
+    // (a four-layer inset shadow plus six mutually-composable states), and the
+    // ten box wallpapers — which MUST be literal classes, because the box theme
+    // is data-driven and `theme-${t}` would never compile (SMARTROTOM_V3.md §4).
+    plugin(({ addBase, addComponents }) => {
+      addBase({
+        ".pc-app": {
+          "--pc-bg": "7 11 22",
+          "--pc-bg-1": "11 17 32",
+          "--pc-bg-2": "15 23 42",
+          "--pc-fg": "238 242 251",
+          "--pc-fg-muted": "174 187 212",
+          "--pc-fg-subtle": "107 122 153",
+          "--pc-accent": "79 155 255",
+          "--pc-accent-strong": "47 123 240",
+          "--pc-cyan": "56 211 224",
+          "--pc-violet": "167 139 250",
+          "--pc-green": "56 211 159",
+          "--pc-amber": "245 183 64",
+          "--pc-rose": "251 113 133",
+          "--pc-gold": "252 211 77",
+          "--pc-line": "rgb(120 140 175 / .16)",
+          "--pc-line-strong": "rgb(130 155 195 / .30)",
+          "--pc-panel": "rgb(20 29 48 / .72)",
+          "--pc-panel-2": "rgb(30 41 59 / .55)",
+          "--pc-panel-solid": "17 26 46",
+          colorScheme: "dark",
+        },
+        ".pc-app ::selection": { background: "rgb(var(--pc-accent) / .35)" },
+        ".pc-app :focus-visible": {
+          outline: "2px solid rgb(var(--pc-accent))",
+          outlineOffset: "2px",
+          borderRadius: "4px",
+        },
+        ".pc-app ::-webkit-scrollbar": { width: "10px", height: "10px" },
+        ".pc-app ::-webkit-scrollbar-track": { background: "transparent" },
+        ".pc-app ::-webkit-scrollbar-thumb": {
+          background: "rgb(120 140 175 / .22)",
+          borderRadius: "99px",
+          border: "2px solid transparent",
+          backgroundClip: "content-box",
+        },
+        ".pc-app ::-webkit-scrollbar-thumb:hover": { background: "rgb(120 140 175 / .4)", backgroundClip: "content-box" },
+      })
+      addComponents({
+        // The console void: an accent bloom top-right, a violet one bottom-left.
+        ".pc-canvas": {
+          background:
+            "radial-gradient(1200px 700px at 78% -10%, rgb(var(--pc-accent) / .13), transparent 60%)," +
+            "radial-gradient(900px 600px at 5% 110%, rgb(var(--pc-violet) / .12), transparent 55%)," +
+            "linear-gradient(160deg, rgb(var(--pc-bg-1)), rgb(var(--pc-bg)) 70%)",
+        },
+        // Every panel in the app. Backdrop-filter is the whole point — the box
+        // wallpaper has to bleed through the chrome sitting on top of it.
+        ".pc-glass": {
+          background: "var(--pc-panel)",
+          backdropFilter: "blur(16px) saturate(120%)",
+          WebkitBackdropFilter: "blur(16px) saturate(120%)",
+          border: "1px solid var(--pc-line)",
+        },
+        // A storage slot. The states compose (a favourite can also be selected
+        // and a drop target), so they are additive classes, not an enum.
+        ".pc-slot": {
+          position: "relative",
+          width: "100%",
+          aspectRatio: "1",
+          borderRadius: "10px",
+          border: "1px solid var(--pc-line)",
+          background: "linear-gradient(180deg, rgb(13 20 36 / .5), rgb(9 14 26 / .65))",
+          boxShadow: "inset 0 1px 0 rgb(255 255 255 / .04), inset 0 -8px 16px -10px rgb(0 0 0 / .6)",
+          transition: "transform .12s cubic-bezier(.22,.61,.36,1), border-color .14s, box-shadow .14s, background .14s",
+          cursor: "pointer",
+          userSelect: "none",
+        },
+        ".pc-slot-empty": {
+          background: "linear-gradient(180deg, rgb(255 255 255 / .015), rgb(0 0 0 / .12))",
+          borderStyle: "dashed",
+          borderColor: "rgb(120 140 175 / .18)",
+          cursor: "default",
+        },
+        ".pc-slot:not(.pc-slot-empty):hover": {
+          transform: "translateY(-3px)",
+          borderColor: "var(--pc-line-strong)",
+          boxShadow: "0 12px 22px -12px rgb(0 0 0 / .8), inset 0 1px 0 rgb(255 255 255 / .06)",
+          zIndex: "2",
+        },
+        ".pc-slot-selected": {
+          borderColor: "rgb(var(--pc-accent))",
+          boxShadow: "0 0 0 1px rgb(var(--pc-accent) / .4), 0 0 24px -2px rgb(var(--pc-accent) / .35)",
+        },
+        ".pc-slot-multi": {
+          borderColor: "rgb(var(--pc-cyan))",
+          boxShadow: "0 0 0 1px rgb(var(--pc-cyan)), 0 0 18px -4px rgb(var(--pc-cyan) / .5)",
+        },
+        ".pc-slot-compare": {
+          borderColor: "rgb(var(--pc-violet))",
+          boxShadow: "0 0 0 1px rgb(var(--pc-violet))",
+        },
+        ".pc-slot-drop": {
+          borderColor: "rgb(var(--pc-green))",
+          borderStyle: "solid",
+          boxShadow: "0 0 0 2px rgb(var(--pc-green)), 0 0 22px -2px rgb(var(--pc-green) / .6)",
+          background: "rgb(var(--pc-green) / .12)",
+        },
+        ".pc-slot-dragging": { opacity: ".35" },
+        // The favourite ring is a pseudo-element so it layers under the sprite
+        // without a wrapper and without eating pointer events.
+        ".pc-slot-fav::before": {
+          content: '""',
+          position: "absolute",
+          inset: "-1px",
+          borderRadius: "inherit",
+          boxShadow: "inset 0 0 14px -2px rgb(var(--pc-gold) / .55)",
+          pointerEvents: "none",
+        },
+        // ── Box wallpapers ────────────────────────────────────────────────────
+        // Ten named gradients + a shared dot screen and vignette. Literal classes
+        // on purpose: the theme is a data value, so it is mapped to a full class
+        // name in `_utils/boxThemes.ts` — never interpolated (§4, audit gap G2).
+        ".pc-wp": { position: "absolute", inset: "0", opacity: ".9" },
+        ".pc-wp::after": {
+          content: '""',
+          position: "absolute",
+          inset: "0",
+          background:
+            "radial-gradient(120% 80% at 50% 0%, rgb(255 255 255 / .05), transparent 60%)," +
+            "linear-gradient(180deg, transparent, rgb(var(--pc-bg) / .55))",
+        },
+        ".pc-wp-dots": {
+          backgroundImage: "radial-gradient(rgb(255 255 255 / .06) 1px, transparent 1.4px)",
+          backgroundSize: "18px 18px",
+        },
+        ".pc-wp-classic": { background: "linear-gradient(160deg,#1b2742,#0e1626)" },
+        ".pc-wp-forest": { background: "linear-gradient(160deg,#143226,#0c1b16)" },
+        ".pc-wp-ocean": { background: "linear-gradient(160deg,#10314a,#0a1a2c)" },
+        ".pc-wp-volcano": { background: "linear-gradient(160deg,#3a1b1b,#1c0f12)" },
+        ".pc-wp-space": { background: "linear-gradient(160deg,#241845,#0d0a1e)" },
+        ".pc-wp-meadow": { background: "linear-gradient(160deg,#2a3318,#12180c)" },
+        ".pc-wp-dusk": { background: "linear-gradient(160deg,#3a234a,#171026)" },
+        ".pc-wp-cave": { background: "linear-gradient(160deg,#222733,#0e1118)" },
+        ".pc-wp-rainbow": { background: "linear-gradient(125deg,#3a1d3f,#1c2748 45%,#123333)" },
+        ".pc-wp-sakura": { background: "linear-gradient(160deg,#3d2336,#1d1320)" },
+        // The boot screen's CRT sweep — a pseudo-element, so not a utility.
+        ".pc-boot-scan": {
+          position: "absolute",
+          inset: "0",
+          pointerEvents: "none",
+          background: "repeating-linear-gradient(0deg, rgb(255 255 255 / .022) 0 1px, transparent 1px 3px)",
+          opacity: ".55",
+        },
+        ".pc-boot-scan::after": {
+          content: '""',
+          position: "absolute",
+          left: "0",
+          right: "0",
+          top: "-45%",
+          height: "45%",
+          background: "linear-gradient(180deg, transparent, rgb(var(--pc-accent) / .10), transparent)",
+          animation: "pcBootSweep 2.6s cubic-bezier(.22,.61,.36,1) infinite",
+        },
+      })
+    }),
     // Dark-only synthwave, scoped to `.ar-app`. Two things live here that cannot
     // be utilities: the palette (the effect classes below read it back out of the
     // vars) and the CRT layer — scanlines, vignette and the horizon grid are all
@@ -2064,6 +2543,397 @@ const config: Config = {
         },
         ".gradient-border": {
           borderImage: "linear-gradient(45deg, #f97316, #ea580c) 1",
+        },
+      })
+    }),
+
+    // ══════════════════════════════════════════════════════════════════════
+    // FURRET TODAY (SmartRotom) — `.ft-app`
+    // A pop-art printed magazine. Light-only by design: the warm newsprint
+    // paper IS the product, so unlike Starbank/ChatApp/Notas there is no
+    // `data-theme` axis here (SMARTROTOM_V3.md §2b — the app ignores the
+    // picker's mode, like Pokédex, Arcade and Misiones). The dark cover is a
+    // SECTION (`.ft-cover-ink`), not a theme.
+    //
+    // The palette is declared as raw `R G B` triplets so Tailwind's
+    // `<alpha-value>` works on every token AND so the component classes below
+    // can read it from inside plugin CSS.
+    // ══════════════════════════════════════════════════════════════════════
+    plugin(({ addBase, addComponents }) => {
+      addBase({
+        ".ft-app": {
+          "--ft-ink": "11 11 15",
+          "--ft-paper": "253 246 227",
+          "--ft-paper-2": "245 236 208",
+          "--ft-paper-dark": "26 25 37",
+          "--ft-body": "35 32 39",
+          "--ft-deck": "58 54 69",
+          "--ft-pink": "255 45 135",
+          "--ft-pink-soft": "255 209 227",
+          "--ft-yellow": "255 214 10",
+          "--ft-yellow-soft": "255 243 168",
+          "--ft-cyan": "0 196 212",
+          "--ft-cyan-soft": "201 243 247",
+          "--ft-orange": "255 122 26",
+          "--ft-orange-soft": "255 216 184",
+          "--ft-purple": "139 92 246",
+          "--ft-purple-soft": "230 220 255",
+          "--ft-lime": "179 230 59",
+          "--ft-red": "237 28 36",
+          // The paper gradient: the press laid ink heavier at the foot.
+          background:
+            "linear-gradient(180deg, rgb(var(--ft-paper)) 0%, rgb(var(--ft-paper-2)) 100%)",
+          color: "rgb(var(--ft-ink))",
+          "-webkit-font-smoothing": "antialiased",
+          textRendering: "optimizeLegibility",
+        },
+        // Focus is a hot-pink ring everywhere in the app, never a browser blue.
+        ".ft-app :focus-visible": {
+          outline: "3px solid rgb(var(--ft-pink))",
+          outlineOffset: "3px",
+          borderRadius: "4px",
+        },
+      })
+
+      addComponents({
+        // ── Ben-Day dots ───────────────────────────────────────────────────
+        // The load-bearing texture of the whole system. `-color` tints the dots
+        // with the current accent; `-mask` fades them out at the foot so a
+        // section can dissolve into the paper instead of ending on a hard edge.
+        ".ft-halftone": {
+          backgroundImage:
+            "radial-gradient(rgb(var(--ft-ink)) 1.2px, transparent 1.4px)",
+          backgroundSize: "10px 10px",
+        },
+        ".ft-halftone-dense": {
+          backgroundImage:
+            "radial-gradient(rgb(var(--ft-ink)) 1.6px, transparent 1.8px)",
+          backgroundSize: "8px 8px",
+        },
+        ".ft-halftone-light": {
+          backgroundImage: "radial-gradient(#fff 1.6px, transparent 1.8px)",
+          backgroundSize: "14px 14px",
+        },
+        ".ft-halftone-mask": {
+          maskImage:
+            "linear-gradient(180deg, #000 0%, #000 70%, transparent 100%)",
+          WebkitMaskImage:
+            "linear-gradient(180deg, #000 0%, #000 70%, transparent 100%)",
+        },
+        // Faint ruled lines — the ghost of a newspaper's baseline grid.
+        ".ft-newsprint": {
+          backgroundImage:
+            "repeating-linear-gradient(to bottom, transparent 0, transparent 27px, rgba(0,0,0,.04) 27px, rgba(0,0,0,.04) 28px)",
+        },
+        // Hazard stripes for the ticker rails.
+        ".ft-stripes": {
+          backgroundImage:
+            "repeating-linear-gradient(45deg, rgb(var(--ft-yellow)) 0 16px, rgb(var(--ft-ink)) 16px 19px)",
+        },
+
+        // ── The dark cover ─────────────────────────────────────────────────
+        ".ft-cover-ink": {
+          background: "rgb(var(--ft-paper-dark))",
+          color: "#fff",
+        },
+
+        // ── Long-form article body ─────────────────────────────────────────
+        // The reader renders CKEditor-authored HTML, so every element has to be
+        // styled by tag here — the editor emits no classes we control.
+        ".ft-article": {
+          fontFamily: "'Space Grotesk', Inter, ui-sans-serif, system-ui, sans-serif",
+          fontSize: "18px",
+          lineHeight: "1.75",
+          color: "rgb(var(--ft-body))",
+        },
+        ".ft-article p": { margin: "0 0 22px" },
+        ".ft-article h1": {
+          fontFamily: "Bangers, Anton, ui-sans-serif, sans-serif",
+          fontSize: "40px",
+          lineHeight: "1.05",
+          letterSpacing: ".02em",
+          margin: "40px 0 16px",
+        },
+        ".ft-article h2": {
+          fontFamily: "Bangers, Anton, ui-sans-serif, sans-serif",
+          fontSize: "34px",
+          lineHeight: "1.1",
+          letterSpacing: ".02em",
+          margin: "40px 0 16px",
+        },
+        ".ft-article h3": {
+          fontFamily: "Bangers, Anton, ui-sans-serif, sans-serif",
+          fontSize: "26px",
+          margin: "32px 0 12px",
+          letterSpacing: ".02em",
+        },
+        // A highlighter drawn straight onto the word.
+        ".ft-article strong": {
+          background: "rgb(var(--ft-yellow))",
+          padding: "0 4px",
+          fontWeight: "700",
+        },
+        ".ft-article a": {
+          color: "rgb(var(--ft-pink))",
+          textDecoration: "underline",
+          textDecorationThickness: "2px",
+          textUnderlineOffset: "3px",
+        },
+        ".ft-article ul, .ft-article ol": {
+          margin: "0 0 22px",
+          paddingLeft: "24px",
+        },
+        ".ft-article li": { margin: "0 0 8px" },
+        ".ft-article img": {
+          border: "2.5px solid rgb(var(--ft-ink))",
+          borderRadius: "14px",
+          boxShadow: "6px 6px 0 0 rgb(var(--ft-ink))",
+          margin: "28px 0",
+        },
+        ".ft-article figcaption": {
+          fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif",
+          fontSize: "13px",
+          textTransform: "uppercase",
+          letterSpacing: ".04em",
+          opacity: ".7",
+          marginTop: "-16px",
+          marginBottom: "28px",
+        },
+        ".ft-article blockquote": {
+          fontFamily: "Fraunces, Georgia, serif",
+          fontWeight: "700",
+          fontStyle: "italic",
+          fontSize: "30px",
+          lineHeight: "1.2",
+          color: "rgb(var(--ft-ink))",
+          padding: "28px 0 28px 28px",
+          borderLeft: "6px solid rgb(var(--ft-pink))",
+          margin: "32px 0",
+        },
+        // The oversized comic initial that opens a story.
+        ".ft-dropcap::first-letter": {
+          fontFamily: "Bangers, Anton, ui-sans-serif, sans-serif",
+          fontSize: "88px",
+          lineHeight: ".85",
+          float: "left",
+          padding: "8px 12px 4px 0",
+          color: "rgb(var(--ft-pink))",
+          WebkitTextStroke: "2px rgb(var(--ft-ink))",
+          paintOrder: "stroke fill",
+        },
+
+        // ── Ink-stroked display type ───────────────────────────────────────
+        ".ft-ink-stroke": {
+          WebkitTextStroke: "2.5px rgb(var(--ft-ink))",
+          paintOrder: "stroke fill",
+        },
+        // The big pink section numeral.
+        ".ft-stamp": {
+          fontFamily: "Bangers, Anton, ui-sans-serif, sans-serif",
+          fontSize: "64px",
+          lineHeight: "1",
+          color: "rgb(var(--ft-pink))",
+          WebkitTextStroke: "2.5px rgb(var(--ft-ink))",
+          paintOrder: "stroke fill",
+        },
+
+        // ── Pop-art scrollbar ──────────────────────────────────────────────
+        ".ft-scroll::-webkit-scrollbar": { height: "10px", width: "10px" },
+        ".ft-scroll::-webkit-scrollbar-track": {
+          background: "rgb(var(--ft-paper-2))",
+          borderRadius: "999px",
+        },
+        ".ft-scroll::-webkit-scrollbar-thumb": {
+          background: "rgb(var(--ft-pink))",
+          borderRadius: "999px",
+          border: "2px solid rgb(var(--ft-ink))",
+        },
+
+        // ── Skeleton ───────────────────────────────────────────────────────
+        ".ft-skel": {
+          background:
+            "linear-gradient(90deg, rgba(0,0,0,.06) 0%, rgba(0,0,0,.12) 50%, rgba(0,0,0,.06) 100%)",
+          backgroundSize: "200% 100%",
+          border: "2px solid rgb(var(--ft-ink))",
+          borderRadius: "14px",
+        },
+      })
+    }),
+
+    // ════════════════════════════════════════════════════════════════════════
+    // GOBIERNO DE TERAS (SmartRotom) — `.gt-app` scope root.
+    //
+    // Light-only: `colorScheme: light` is declared here and there is no
+    // `[data-theme]` variant, because the warm paper IS the design. The app
+    // therefore ignores the theme picker's mode (SMARTROTOM_V3.md §2b).
+    //
+    // Two data-attributes on the root ARE honoured:
+    //   data-accent="civic|navy|burgundy|gold"  — the institutional colour
+    //   data-density="comfortable|compact"      — table/grid rhythm
+    // ════════════════════════════════════════════════════════════════════════
+    plugin(({ addBase, addComponents }) => {
+      addBase({
+        ".gt-app": {
+          // paper surfaces (warm cream)
+          "--gt-paper-bg": "236 229 214",
+          "--gt-paper-0": "252 250 244",
+          "--gt-paper-1": "246 241 230",
+          "--gt-paper-2": "239 232 216",
+          "--gt-paper-3": "230 221 201",
+          "--gt-line": "220 211 189",
+          "--gt-line-strong": "199 187 158",
+          "--gt-line-soft": "231 223 205",
+          // ink (warm near-black → faint)
+          "--gt-ink-900": "42 37 23",
+          "--gt-ink-800": "58 51 34",
+          "--gt-ink-700": "76 68 48",
+          "--gt-ink-600": "99 90 65",
+          "--gt-ink-500": "131 121 84",
+          "--gt-ink-400": "156 146 114",
+          "--gt-ink-300": "184 174 142",
+          // civic core
+          "--gt-civic": "31 111 74",
+          "--gt-civic-700": "24 90 60",
+          "--gt-civic-600": "27 101 67",
+          "--gt-civic-300": "111 174 143",
+          "--gt-civic-tint": "228 238 231",
+          "--gt-gold": "169 132 47",
+          "--gt-gold-600": "146 112 38",
+          "--gt-gold-300": "216 185 110",
+          "--gt-gold-tint": "241 233 211",
+          // department hues — fixed identities, never themed
+          "--gt-dep-urbanismo": "176 97 58",
+          "--gt-dep-seguridad": "47 90 158",
+          "--gt-dep-hacienda": "31 111 74",
+          "--gt-dep-justicia": "138 58 85",
+          "--gt-dep-poblacion": "77 107 130",
+          "--gt-dep-gobierno": "169 132 47",
+          // status — muted, so they sit on paper instead of shouting off it
+          "--gt-ok": "46 125 82",
+          "--gt-ok-tint": "227 239 230",
+          "--gt-warn": "183 134 29",
+          "--gt-warn-tint": "244 236 212",
+          "--gt-danger": "178 58 58",
+          "--gt-danger-tint": "244 226 223",
+          "--gt-info": "63 111 163",
+          "--gt-info-tint": "227 234 242",
+          // accent — defaults to civic green; data-accent swaps it below
+          "--gt-accent": "31 111 74",
+          "--gt-accent-strong": "24 90 60",
+          "--gt-accent-tint": "228 238 231",
+          // rhythm — data-density swaps these
+          "--gt-gap": "16px",
+          "--gt-row-py": "11px",
+          colorScheme: "light",
+        },
+        '.gt-app[data-accent="navy"]': {
+          "--gt-accent": "47 90 158",
+          "--gt-accent-strong": "36 74 133",
+          "--gt-accent-tint": "227 234 244",
+        },
+        '.gt-app[data-accent="burgundy"]': {
+          "--gt-accent": "138 58 85",
+          "--gt-accent-strong": "115 47 71",
+          "--gt-accent-tint": "241 227 232",
+        },
+        '.gt-app[data-accent="gold"]': {
+          "--gt-accent": "169 132 47",
+          "--gt-accent-strong": "141 109 36",
+          "--gt-accent-tint": "243 236 214",
+        },
+        '.gt-app[data-density="compact"]': {
+          "--gt-gap": "11px",
+          "--gt-row-py": "7px",
+        },
+        ".gt-app ::selection": {
+          background: "rgb(var(--gt-accent))",
+          color: "#fff",
+        },
+        ".gt-app :focus-visible": {
+          outline: "2px solid rgb(var(--gt-accent))",
+          outlineOffset: "2px",
+          borderRadius: "4px",
+        },
+      })
+
+      addComponents({
+        // The paper itself: a warm bloom from the top, a green wash at the
+        // bottom, and a faint cross-hatched guilloché — the engraved security
+        // pattern that makes the surface read as an official document rather
+        // than a beige div. Fixed behind everything, never interactive.
+        ".gt-paper": {
+          position: "relative",
+          isolation: "isolate",
+          "&::before, &::after": {
+            content: '""',
+            position: "absolute",
+            inset: "0",
+            zIndex: "-1",
+            pointerEvents: "none",
+          },
+          "&::before": {
+            background:
+              "radial-gradient(130% 80% at 50% -10%, rgba(169,132,47,.07), transparent 55%), radial-gradient(100% 70% at 100% 110%, rgba(31,111,74,.05), transparent 55%)",
+          },
+          "&::after": {
+            opacity: ".5",
+            backgroundImage:
+              "repeating-linear-gradient(45deg, rgba(120,100,60,.025) 0 1px, transparent 1px 7px), repeating-linear-gradient(-45deg, rgba(120,100,60,.02) 0 1px, transparent 1px 9px)",
+          },
+        },
+
+        // The engraved gold rule across the top of an official card.
+        ".gt-edge-gold": {
+          position: "relative",
+          overflow: "hidden",
+          "&::before": {
+            content: '""',
+            position: "absolute",
+            left: "0",
+            right: "0",
+            top: "0",
+            height: "3px",
+            background:
+              "linear-gradient(90deg, transparent, rgb(var(--gt-gold)), transparent)",
+          },
+        },
+
+        // The department-coloured spine down a card's left edge. The colour
+        // comes from `--gt-dep`, set inline by whatever knows the department.
+        ".gt-spine": {
+          position: "relative",
+          "&::before": {
+            content: '""',
+            position: "absolute",
+            left: "0",
+            top: "0",
+            bottom: "0",
+            width: "3px",
+            background: "var(--gt-dep, rgb(var(--gt-accent)))",
+            borderTopLeftRadius: "inherit",
+            borderBottomLeftRadius: "inherit",
+          },
+        },
+
+        // The fine double rule that divides sections of a printed document.
+        ".gt-rule": {
+          border: "none",
+          borderTop: "1px solid rgb(var(--gt-line-strong))",
+          borderBottom: "1px solid rgb(var(--gt-line))",
+          height: "3px",
+          background: "transparent",
+        },
+
+        ".gt-scroll::-webkit-scrollbar": { width: "11px", height: "11px" },
+        ".gt-scroll::-webkit-scrollbar-track": { background: "transparent" },
+        ".gt-scroll::-webkit-scrollbar-thumb": {
+          background: "rgb(var(--gt-line-strong))",
+          borderRadius: "8px",
+          border: "3px solid transparent",
+          backgroundClip: "padding-box",
+        },
+        ".gt-scroll::-webkit-scrollbar-thumb:hover": {
+          background: "rgb(var(--gt-ink-300))",
         },
       })
     }),

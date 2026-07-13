@@ -39,7 +39,7 @@ export function ArCabinaChapter() {
         id="ar-rarezas"
         kicker="Arcade"
         title="Rarezas"
-        lead="La escalera de rareza es un conjunto de color guiado por datos, así que vive como un mapa JS (`_utils/rarity.ts`) y se aplica en línea — nunca como `bg-${rareza}`, que la JIT de Tailwind no vería nunca."
+        lead="La escalera de rareza es un conjunto de color guiado por datos, así que vive como un mapa JS (`_utils/rarity.ts`) y se aplica en línea — nunca como una clase interpolada (`bg-` + la rareza), que la JIT de Tailwind no vería nunca."
       >
         <Sample
           title="Escalera"
