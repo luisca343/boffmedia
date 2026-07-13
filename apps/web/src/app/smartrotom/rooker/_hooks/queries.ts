@@ -2,14 +2,13 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { RookerService, type CreatePostBody, type UpdateProfileBody } from "@/services/api/smartrotom/rookerService"
-import { useBoffSession } from "@/services/useBoffSession"
+import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
 import type { FeedTab, ProfileTab, RookerPost, RookerPostDetail } from "../_types"
 import { applyReaction, type ReactionType } from "../_utils/reactions"
 
 /** The SmartRotom uuid every Rooker endpoint is keyed by. `null` until signed in. */
 export function useRookerUuid(): string | null {
-  const { session } = useBoffSession()
-  return session?.user?.smartRotomUser?.uuid ?? null
+  return useRotomUuid()
 }
 
 export const rookerKeys = {

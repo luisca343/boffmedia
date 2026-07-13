@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react"
 import { usePokemonStore } from "@/stores/pokemonStore"
 import type { PokedexData } from "@/types/pokedex"
-import { useBoffSession } from "@/services/useBoffSession"
+import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
 import { PokedexStatus } from "@/app/smartrotom/pokedex/dexUtils"
 
 export function usePokedexData() {
-  const {session} = useBoffSession()
+  const uuid = useRotomUuid()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const getPokedexData = usePokemonStore((state) => state.getPokedexData)
@@ -20,7 +20,7 @@ export function usePokedexData() {
       setIsLoading(true)
       setError(null)
       try {
-        await getPokedexData(session.user.smartRotomUser?.uuid!)
+        await getPokedexData(uuid!)
       } catch (err) {
         setError("Failed to fetch Pokedex data")
       } finally {
@@ -28,18 +28,18 @@ export function usePokedexData() {
       }
     }
 
-    if (!pokedexData && session.user.smartRotomUser?.uuid) {
+    if (!pokedexData && uuid) {
       fetchData()
     }
-  }, [session.user.smartRotomUser?.uuid, pokedexData, fetchingPokedex])
+  }, [uuid, pokedexData, fetchingPokedex])
 
   const refetch = async () => {
-    if (!session.user.smartRotomUser?.uuid) return
-    
+    if (!uuid) return
+
     setIsLoading(true)
     setError(null)
     try {
-      await getPokedexData(session.user.smartRotomUser.uuid)
+      await getPokedexData(uuid)
     } catch (err) {
       setError("Failed to fetch Pokedex data")
     } finally {

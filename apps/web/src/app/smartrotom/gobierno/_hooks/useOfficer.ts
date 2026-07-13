@@ -1,6 +1,7 @@
 "use client"
 
 import { useBoffSession } from "@/services/useBoffSession"
+import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
 import { USER_ROLES, GOBIERNO_RANKS } from "@boffmedia/shared/roles"
 import { badgeOf } from "../_utils/format"
 
@@ -11,6 +12,7 @@ import { badgeOf } from "../_utils/format"
  */
 export function useOfficer() {
   const { session, status, hasRole, isRotomAdmin, isBoffAdmin } = useBoffSession()
+  const uuid = useRotomUuid()
 
   const rank = GOBIERNO_RANKS.find((r) => hasRole(r.role))
   const isAdmin = isRotomAdmin() || isBoffAdmin()
@@ -27,7 +29,7 @@ export function useOfficer() {
     canOpen,
     isAdmin,
     username: session?.user?.smartRotomUser?.username ?? session?.user?.username ?? "",
-    uuid: session?.user?.smartRotomUser?.uuid ?? "",
+    uuid: uuid ?? "",
     rankLabel: rank?.label ?? (isAdmin ? "Administración" : "Funcionario"),
     badge: badgeOf(userId, rank?.prefix ?? (isAdmin ? "A" : "G")),
   }

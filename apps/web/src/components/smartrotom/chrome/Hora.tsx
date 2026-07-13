@@ -1,6 +1,5 @@
 "use client"
 import { useEffect, useState } from "react";
-import { set } from "react-hook-form";
 
 export function Hora({className= ''}: {className?: string}) {
     const getTime = (separator = ':') => {

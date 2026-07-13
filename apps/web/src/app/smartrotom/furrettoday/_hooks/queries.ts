@@ -22,6 +22,7 @@ import {
   rotomPOSTOrThrow,
 } from "@/services/boffAPI";
 import { useBoffSession } from "@/services/useBoffSession";
+import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid";
 
 import { toArticle, type FtArticle } from "../_utils/article";
 
@@ -110,8 +111,7 @@ export function useIssues() {
 
 export function usePostComment(newsId: number) {
   const client = useQueryClient();
-  const { session } = useBoffSession();
-  const uuid = session?.user?.smartRotomUser?.uuid ?? null;
+  const uuid = useRotomUuid();
 
   const mutation = useMutation({
     mutationFn: (body: string) =>

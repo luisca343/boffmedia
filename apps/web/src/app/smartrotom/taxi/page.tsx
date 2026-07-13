@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useBoffSession } from "@/services/useBoffSession"
+import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
 import { MapCanvas } from "./_components/map/MapCanvas"
 import { DestinationsPanel } from "./_components/DestinationsPanel"
 import { PassportPanel } from "./_components/PassportPanel"
@@ -25,7 +26,7 @@ const SHEET_RATIO = 0.46
 
 export default function TaxiPage() {
   const { session } = useBoffSession()
-  const uuid = session?.user?.smartRotomUser?.uuid
+  const uuid = useRotomUuid() ?? undefined
   const playerName = session?.user?.name ?? "Entrenador"
 
   const stopsQuery = useStops()

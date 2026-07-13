@@ -1,18 +1,19 @@
 import React from 'react';
-import { 
-  PiHeartFill, 
-  PiGenderMaleBold, 
-  PiGenderFemaleBold, 
-  PiGenderNeuterBold, 
-  PiStarFill, 
-  PiSkull, 
-  PiFire, 
-  PiLightning, 
-  PiSnowflake, 
-  PiBed, 
-  PiSkullFill 
-} from "react-icons/pi";
-import { FaMars, FaVenus, FaNeuter } from "react-icons/fa";
+import {
+  Heart,
+  Skull,
+  Flame,
+  Zap,
+  Snowflake,
+  Bed,
+} from "lucide-react";
+import { Mars, Venus, Neuter } from "./genderIcons";
+
+// Shared hand-drawn gender glyphs (lucide ships none). Sized "1em" so the
+// existing text-sm/text-[8px] em-based sizing keeps working.
+const MarsIcon = ({ className }: { className?: string }) => <Mars size="1em" className={className} />;
+const VenusIcon = ({ className }: { className?: string }) => <Venus size="1em" className={className} />;
+const NeuterIcon = ({ className }: { className?: string }) => <Neuter size="1em" className={className} />;
 
 /**
  * Status icon utilities for Pokemon display components
@@ -28,20 +29,20 @@ export function getStatusIcon(status: string, className: string = "text-xs"): Re
   switch (status.toLowerCase()) {
     case 'poison':
     case 'poisoned':
-      return <PiSkullFill className={`${className} text-purple-400`} />;
+      return <Skull fill="currentColor" className={`${className} text-purple-400`} />;
     case 'burned':
-      return <PiFire className={`${className} text-red-400`} />;
+      return <Flame className={`${className} text-red-400`} />;
     case 'paralyzed':
-      return <PiLightning className={`${className} text-yellow-400`} />;
+      return <Zap className={`${className} text-yellow-400`} />;
     case 'frozen':
-      return <PiSnowflake className={`${className} text-blue-400`} />;
+      return <Snowflake className={`${className} text-blue-400`} />;
     case 'sleeping':
-      return <PiBed className={`${className} text-indigo-400`} />;
+      return <Bed className={`${className} text-indigo-400`} />;
     case 'fainted':
-      return <PiSkull className={`${className} text-red-500`} />;
+      return <Skull className={`${className} text-red-500`} />;
     case 'healthy':
     default:
-      return <PiHeartFill className={`${className} text-green-400`} />;
+      return <Heart fill="currentColor" className={`${className} text-green-400`} />;
   }
 }
 
@@ -67,29 +68,29 @@ export function getGenderIcon(
   switch (gender.toLowerCase()) {
     case 'male':
       if (variant === 'card') {
-        return <FaMars className="text-blue-500 text-sm" />;
+        return <MarsIcon className="text-blue-500 text-sm" />;
       }
       return (
         <div className={baseIconClass}>
-          <PiGenderMaleBold className="text-blue-400 text-[8px]" />
+          <MarsIcon className="text-blue-400 text-[8px]" />
         </div>
       );
     case 'female':
       if (variant === 'card') {
-        return <FaVenus className="text-pink-500 text-sm" />;
+        return <VenusIcon className="text-pink-500 text-sm" />;
       }
       return (
         <div className={baseIconClass}>
-          <PiGenderFemaleBold className="text-pink-400 text-[8px]" />
+          <VenusIcon className="text-pink-400 text-[8px]" />
         </div>
       );
     case 'genderless':
       if (variant === 'card') {
-        return <FaNeuter className="text-gray-500 text-sm" />;
+        return <NeuterIcon className="text-gray-500 text-sm" />;
       }
       return (
         <div className={baseIconClass}>
-          <PiGenderNeuterBold className="text-gray-400 text-[8px]" />
+          <NeuterIcon className="text-gray-400 text-[8px]" />
         </div>
       );
     default:

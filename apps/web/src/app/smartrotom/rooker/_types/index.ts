@@ -1,3 +1,17 @@
+import type {
+  RookerFeedEntity,
+  RookerFollowResultEntity,
+  RookerNotificationEntity,
+  RookerPostAuthorEntity,
+  RookerPostBattleEntity,
+  RookerPostCaptureEntity,
+  RookerPostCountsEntity,
+  RookerPostEntity,
+  RookerProfileEntity,
+  RookerSearchEntity,
+  RookerSuggestionEntity,
+  RookerTrendEntity,
+} from "@boffmedia/shared"
 import type { ReactionCounts, ReactionType } from "../_utils/reactions"
 
 export type PostType = "text" | "media" | "capture" | "battle"
@@ -11,9 +25,8 @@ export type PostType = "text" | "media" | "capture" | "battle"
  * tints their profile banner and rides beside their name. It is validated against
  * their own Pokédex, so it is a real capture, not a costume.
  */
-export interface RookerAuthor {
-  uuid: string
-  username: string
+export interface RookerAuthor
+  extends Omit<RookerPostAuthorEntity, "handle" | "displayName" | "partnerPokemonId"> {
   /**
    * Null until the trainer has a Rooker profile. Every existing `rotom_user` is
    * seeded with one, but a player who joins the server tomorrow appears in the graph
@@ -23,34 +36,23 @@ export interface RookerAuthor {
   handle: string | null
   displayName: string | null
   partnerPokemonId: number | null
-  /**
-   * [deferred] Staff/gym-leader verification. `rotom_users` has no role column and the
-   * boffmedia role join is not wired, so the API pins this to `false` and the check
-   * never renders. See docs/smartrotom/deferred/README.md.
-   */
-  isVerified?: boolean
 }
 
-export interface RookerCapture {
-  pokemonId: number
-  formId: string
-  paletteId: string
-  /** Derived server-side: a palette other than `none` IS the shiny flag. */
-  shiny: boolean
+export interface RookerCapture extends Omit<RookerPostCaptureEntity, "caughtAt"> {
   caughtAt: string | null
 }
 
-export interface RookerBattle {
-  replayId: number
-  side1: string
-  side2: string
+export interface RookerBattle extends Omit<RookerPostBattleEntity, "winner" | "createdAt"> {
   winner: string | null
-  createdAt: string
+  /**
+   * TODO(P9): real drift, fixed here — the wire's `createdAt` is `Date | null` (a battle whose
+   * replay predates the join, or import gaps). This type used to claim it was always a string;
+   * `BattleCard.tsx`'s `relTime()` call was already null-safe, so no consumer needed a change.
+   */
+  createdAt: string | null
 }
 
-export interface RookerPostCounts {
-  replies: number
-  retrinos: number
+export interface RookerPostCounts extends Omit<RookerPostCountsEntity, "reactions"> {
   reactions: ReactionCounts
 }
 
@@ -64,13 +66,21 @@ export interface RookerPostMe {
   bookmark: boolean
 }
 
-export interface RookerPost {
-  id: number
+export interface RookerPost
+  extends Omit<
+    RookerPostEntity,
+    "author" | "text" | "type" | "createdAt" | "parentId" | "counts" | "me" | "capture" | "battle" | "mediaUrl" | "retrinoBy"
+  > {
   author: RookerAuthor
   text: string | null
+  /** Same values as the generated `RookerPostEntity.type` enum, restated as a plain union. */
   type: PostType
-  createdAt: string
-  pinned: boolean
+  /**
+   * TODO(P9): real drift, fixed here — the wire's `createdAt` is `Date | null`, not always a
+   * string. `AuthorLine.tsx` (the one place a post's `createdAt` reaches a typed prop) is
+   * updated to accept `string | null`; its `relTime()`/`dateTime` use were already null-safe.
+   */
+  createdAt: string | null
   parentId: number | null
   counts: RookerPostCounts
   me: RookerPostMe
@@ -81,26 +91,33 @@ export interface RookerPost {
   retrinoBy: string | null
 }
 
+// Same shape as generated `RookerThreadEntity` — spelled out rather than aliased so its two
+// fields stay the app's own (already-aligned) `RookerPost`, not the raw entity.
 export interface RookerPostDetail {
   post: RookerPost
   replies: RookerPost[]
 }
 
 /** The API pages every post list. `hasMore` drives "load more"; it is not a count. */
-export interface RookerFeed {
+export interface RookerFeed extends Omit<RookerFeedEntity, "items"> {
   items: RookerPost[]
-  hasMore: boolean
 }
 
-export interface RookerProfile {
-  uuid: string
-  username: string
-  handle: string
+export interface RookerProfile
+  extends Omit<RookerProfileEntity, "displayName" | "bio" | "link" | "partnerPokemonId" | "createdAt" | "counts" | "stats"> {
   displayName: string | null
   bio: string | null
   link: string | null
   partnerPokemonId: number | null
-  createdAt: string
+  /** TODO(P9): real drift, fixed here — the wire's `createdAt` is `Date | null`; `joinedAt()`
+   * (the only reader, in `[handle]/page.tsx`) was already null-safe. */
+  createdAt: string | null
+  /**
+   * [deferred] Same staff/gym-leader verification as `RookerAuthor.isVerified` — not on the
+   * profile entity itself, only on the post-author embed, but the check is inert everywhere
+   * (always pinned `false` server-side), so the shape is restated here rather than plumbed
+   * through a real join. See `_components/ui/Verified.tsx`.
+   */
   isVerified?: boolean
   counts: {
     posts: number
@@ -114,45 +131,31 @@ export interface RookerProfile {
     battles: number
     dexPct: number
   }
-  isFollowedByMe: boolean
 }
 
-export interface RookerTrend {
-  tag: string
-  posts: number
-}
+export type RookerTrend = RookerTrendEntity
 
 /** The state AFTER the toggle, so the caller never has to guess which way it flipped. */
-export interface RookerFollowResult {
-  following: boolean
-  followers: number
-}
+export type RookerFollowResult = RookerFollowResultEntity
 
-export interface RookerSuggestion {
-  uuid: string
-  username: string
-  handle: string
+export interface RookerSuggestion
+  extends Omit<RookerSuggestionEntity, "displayName" | "partnerPokemonId"> {
   displayName: string | null
   partnerPokemonId: number | null
-  followers: number
+  /** [deferred] see `RookerProfile.isVerified` — not on the wire suggestion either. */
   isVerified?: boolean
 }
 
-export interface RookerSearchResults {
+export interface RookerSearchResults extends Omit<RookerSearchEntity, "users" | "posts" | "tags"> {
   users: RookerSuggestion[]
   posts: RookerPost[]
   tags: RookerTrend[]
 }
 
-export interface RookerNotification {
-  id: number
-  userUuid: string
-  type: string
-  title: string
-  body: string | null
+export interface RookerNotification extends Omit<RookerNotificationEntity, "link" | "createdAt"> {
   link: string | null
-  isRead: number
-  createdAt: string
+  /** The wire's `createdAt` is nullable (`Date | null`); `relTime()` already guards it. */
+  createdAt: string | null
 }
 
 export type ProfileTab = "trinos" | "capturas" | "combates" | "media"

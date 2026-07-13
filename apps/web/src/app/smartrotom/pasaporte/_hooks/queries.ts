@@ -14,12 +14,11 @@ import type {
 import { PasaporteService } from "@/services/api/smartrotom/pasaporteService"
 import { type MinecraftStats } from "@/services/api/smartrotom/playerService"
 import { rotomGETOrThrow, rotomPOSTOrThrow, wingullPOSTOrThrow } from "@/services/boffAPI"
-import { useBoffSession } from "@/services/useBoffSession"
+import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
 
 /** The SmartRotom uuid every passport route is keyed by. `null` until signed in. */
 export function usePasaporteUuid(): string | null {
-  const { session } = useBoffSession()
-  return session?.user?.smartRotomUser?.uuid ?? null
+  return useRotomUuid()
 }
 
 export const pasaporteKeys = {

@@ -1,5 +1,5 @@
 "use client";
-import { Hora } from "@/components/ui/Hora";
+import { Hora } from "@/components/smartrotom/chrome/Hora";
 import { useEffect, useState, useCallback } from "react";
 import { Socket } from "socket.io-client";
 import BreadcrumbNav from "@/components/smartrotom/BreadcrumbNav";
@@ -8,15 +8,14 @@ import { usePathname } from "next/navigation";
 import { getSmartRotomUser, cn } from "@/lib/utils";
 import { Bell, Check, X, Globe } from "lucide-react";
 import { SettingsPage } from "@/components/smartrotom/Settings";
-import { Popover, PopoverTrigger } from "@/components/ui/primitives/popover";
-import { PopoverContent } from "@radix-ui/react-popover";
+import { SrPopover, SrPopoverTrigger, SrPopoverContent } from "@/components/smartrotom/chrome/SrPopover";
 import { useBoffSession } from "@/services/useBoffSession";
 import { MinecraftFunctions } from "@/components/smartrotom/MinecraftFunctions";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/primitives/tooltip";
-import { SettingsButton, AIButton, NextButton, NotificationButton, PrevButton, ReloadButton } from "@/components/ui/navigation/NavButton";
-import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/primitives/sheet";
+import { SrTooltip } from "@/components/smartrotom/chrome/SrTooltip";
+import { SettingsButton, AIButton, NextButton, NotificationButton, PrevButton, ReloadButton } from "@/components/smartrotom/chrome/NavButton";
+import { SrSheet, SrSheetClose, SrSheetContent, SrSheetHeader, SrSheetTitle, SrSheetTrigger } from "@/components/smartrotom/chrome/SrSheet";
 import useSocketStore from "@/stores/useSocketStore";
-import LanguageSwitcher from "@/components/ui/navigation/LanguageSwitcher";
+import LanguageSwitcher from "@/components/smartrotom/chrome/LanguageSwitcher";
 import { SmartRotomBadge, SmartRotomButton, SmartRotomPanel } from "@/components/smartrotom/ui";
 import { NotificationsService } from "@/services/api/smartrotom/notificationsService";
 import type { NotificationResponseDto } from "@boffmedia/shared";
@@ -175,19 +174,24 @@ export function RotomNav() {
       <NextButton />
       <ReloadButton />
       <BreadcrumbNav className="flex-1 mx-1 invisible w-0 sm:w-auto sm:visible " />
-      <Sheet>
-        <SheetTrigger>
+      <SrSheet>
+        <SrSheetTrigger>
           <SettingsButton />
-        </SheetTrigger>
-        <SheetContent
+        </SrSheetTrigger>
+        <SrSheetContent
           side="top"
+          label="Ajustes"
           className="bg-sr-panel text-sr-txt border-b border-sr-line max-h-[80vh] overflow-y-auto"
         >
-          <SheetHeader className="mb-4">
-            <SheetTitle className="text-sr-txt font-display not-italic uppercase tracking-[0.05em] text-lg">
+          <SrSheetClose className="absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2 ring-offset-sr-panel focus:ring-sr-accent">
+            <X className="h-4 w-4" />
+            <span className="sr-only">Cerrar</span>
+          </SrSheetClose>
+          <SrSheetHeader className="mb-4">
+            <SrSheetTitle className="text-sr-txt font-display not-italic uppercase tracking-[0.05em] text-lg">
               Ajustes
-            </SheetTitle>
-          </SheetHeader>
+            </SrSheetTitle>
+          </SrSheetHeader>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <SettingsPage />
@@ -204,27 +208,28 @@ export function RotomNav() {
               </div>
             </div>
           </div>
-        </SheetContent>
-      </Sheet>
-      <Sheet>
-        <SheetTrigger>
+        </SrSheetContent>
+      </SrSheet>
+      <SrSheet>
+        <SrSheetTrigger>
           <AIButton />
-        </SheetTrigger>
-        <SheetContent
+        </SrSheetTrigger>
+        <SrSheetContent
           side="right"
+          label="Asistente IA"
           className="bg-sr-panel text-sr-txt border-l border-sr-line flex flex-col p-0 max-w-3xl"
         >
-          <SheetClose className="absolute right-4 top-4 cut [--cut:6px] p-1.5 opacity-90 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sr-accent bg-sr-accent text-sr-accent-ink z-10">
+          <SrSheetClose className="absolute right-4 top-4 cut [--cut:6px] p-1.5 opacity-90 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sr-accent bg-sr-accent text-sr-accent-ink z-10">
             <X className="h-4 w-4" />
             <span className="sr-only">Cerrar</span>
-          </SheetClose>
-          <SheetDescription className="h-full overflow-hidden">
+          </SrSheetClose>
+          <div className="h-full overflow-hidden">
             <FicusAI />
-          </SheetDescription>
-        </SheetContent>
-      </Sheet>
-      <Popover>
-        <PopoverTrigger className="relative">
+          </div>
+        </SrSheetContent>
+      </SrSheet>
+      <SrPopover>
+        <SrPopoverTrigger>
           <NotificationButton />
           {unreadCount > 0 && (
             <SmartRotomBadge
@@ -234,11 +239,11 @@ export function RotomNav() {
               {unreadCount}
             </SmartRotomBadge>
           )}
-        </PopoverTrigger>
-        <PopoverContent className="z-50">
+        </SrPopoverTrigger>
+        <SrPopoverContent>
           <Notifications />
-        </PopoverContent>
-      </Popover>
+        </SrPopoverContent>
+      </SrPopover>
       <Hora className="text-sr-txt font-display text-2xl mx-1 tabular-nums tracking-tight" />
       <SocketStatus socket={socket} />
       <MinecraftFunctions />
@@ -249,22 +254,17 @@ export function RotomNav() {
 function SocketStatus({ socket }: { socket: Socket | null }) {
   const connected = Boolean(socket && socket.connected);
   return (
-    <Tooltip>
-      <TooltipTrigger>
-        <div className="cursor-pointer h-10 flex items-center px-1.5">
-          <span
-            className={cn(
-              "h-2.5 w-2.5 rounded-full",
-              connected
-                ? "bg-sr-ok shadow-[0_0_8px_var(--sr-ok)]"
-                : "bg-sr-bad"
-            )}
-          />
-        </div>
-      </TooltipTrigger>
-      <TooltipContent>
-        {connected ? `Conectado con id ${socket?.id}` : "No conectado"}
-      </TooltipContent>
-    </Tooltip>
+    <SrTooltip content={connected ? `Conectado con id ${socket?.id}` : "No conectado"}>
+      <div className="cursor-pointer h-10 flex items-center px-1.5">
+        <span
+          className={cn(
+            "h-2.5 w-2.5 rounded-full",
+            connected
+              ? "bg-sr-ok shadow-[0_0_8px_var(--sr-ok)]"
+              : "bg-sr-bad"
+          )}
+        />
+      </div>
+    </SrTooltip>
   );
 }
