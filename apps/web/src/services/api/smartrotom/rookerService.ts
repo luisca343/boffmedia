@@ -1,4 +1,4 @@
-import { rotomGET, rotomPOST, rotomPATCH, rotomDELETE, type ApiResponse } from "@/services/boffAPI"
+import { rotomGETOrThrow, rotomPOSTOrThrow, rotomPATCHOrThrow, rotomDELETEOrThrow } from "@/services/boffAPI"
 
 /**
  * Rooker — the social nest.
@@ -65,38 +65,38 @@ export class RookerService {
     tab?: FeedTab
     limit?: number
     offset?: number
-  }): Promise<ApiResponse<RookerFeed>> {
-    return rotomGET<RookerFeed>(`/rooker/feed${qs(params)}`)
+  }): Promise<RookerFeed> {
+    return rotomGETOrThrow<RookerFeed>(`/rooker/feed${qs(params)}`)
   }
 
-  static getPost(id: number, uuid?: string): Promise<ApiResponse<RookerPostDetail>> {
-    return rotomGET<RookerPostDetail>(`/rooker/posts/${id}${qs({ uuid })}`)
+  static getPost(id: number, uuid?: string): Promise<RookerPostDetail> {
+    return rotomGETOrThrow<RookerPostDetail>(`/rooker/posts/${id}${qs({ uuid })}`)
   }
 
-  static createPost(body: CreatePostBody): Promise<ApiResponse<RookerPost>> {
-    return rotomPOST<RookerPost>("/rooker/posts", body)
+  static createPost(body: CreatePostBody): Promise<RookerPost> {
+    return rotomPOSTOrThrow<RookerPost>("/rooker/posts", body)
   }
 
-  static deletePost(id: number, uuid: string): Promise<ApiResponse<{ ok: boolean; id: number }>> {
-    return rotomDELETE<{ ok: boolean; id: number }>(`/rooker/posts/${id}`, { uuid })
+  static deletePost(id: number, uuid: string): Promise<{ ok: boolean; id: number }> {
+    return rotomDELETEOrThrow<{ ok: boolean; id: number }>(`/rooker/posts/${id}`, { uuid })
   }
 
   // ── Engagement. All three toggle, and all three answer with the whole post,
   //    so the caller never has to reconstruct the new counts itself. ──────────
-  static react(id: number, uuid: string, type: ReactionType): Promise<ApiResponse<RookerPost>> {
-    return rotomPOST<RookerPost>(`/rooker/posts/${id}/react`, { uuid, type })
+  static react(id: number, uuid: string, type: ReactionType): Promise<RookerPost> {
+    return rotomPOSTOrThrow<RookerPost>(`/rooker/posts/${id}/react`, { uuid, type })
   }
 
-  static retrino(id: number, uuid: string): Promise<ApiResponse<RookerPost>> {
-    return rotomPOST<RookerPost>(`/rooker/posts/${id}/retrino`, { uuid })
+  static retrino(id: number, uuid: string): Promise<RookerPost> {
+    return rotomPOSTOrThrow<RookerPost>(`/rooker/posts/${id}/retrino`, { uuid })
   }
 
-  static bookmark(id: number, uuid: string): Promise<ApiResponse<RookerPost>> {
-    return rotomPOST<RookerPost>(`/rooker/posts/${id}/bookmark`, { uuid })
+  static bookmark(id: number, uuid: string): Promise<RookerPost> {
+    return rotomPOSTOrThrow<RookerPost>(`/rooker/posts/${id}/bookmark`, { uuid })
   }
 
-  static getBookmarks(uuid: string): Promise<ApiResponse<RookerFeed>> {
-    return rotomGET<RookerFeed>(`/rooker/bookmarks${qs({ uuid })}`)
+  static getBookmarks(uuid: string): Promise<RookerFeed> {
+    return rotomGETOrThrow<RookerFeed>(`/rooker/bookmarks${qs({ uuid })}`)
   }
 
   // ── The social graph ───────────────────────────────────────────────────────
@@ -106,46 +106,46 @@ export class RookerService {
    * suffixes colliding handles), so it has to be asked for, not derived.
    * Resolves to `null` for a trainer with no Rooker profile yet.
    */
-  static getMe(uuid: string): Promise<ApiResponse<RookerProfile | null>> {
-    return rotomGET<RookerProfile | null>(`/rooker/me${qs({ uuid })}`)
+  static getMe(uuid: string): Promise<RookerProfile | null> {
+    return rotomGETOrThrow<RookerProfile | null>(`/rooker/me${qs({ uuid })}`)
   }
 
-  static follow(uuid: string, targetUuid: string): Promise<ApiResponse<RookerFollowResult>> {
-    return rotomPOST<RookerFollowResult>("/rooker/follow", { uuid, targetUuid })
+  static follow(uuid: string, targetUuid: string): Promise<RookerFollowResult> {
+    return rotomPOSTOrThrow<RookerFollowResult>("/rooker/follow", { uuid, targetUuid })
   }
 
-  static getProfile(handle: string, viewer?: string): Promise<ApiResponse<RookerProfile>> {
-    return rotomGET<RookerProfile>(`/rooker/profile/${handle}${qs({ viewer })}`)
+  static getProfile(handle: string, viewer?: string): Promise<RookerProfile> {
+    return rotomGETOrThrow<RookerProfile>(`/rooker/profile/${handle}${qs({ viewer })}`)
   }
 
   static getProfilePosts(
     handle: string,
     params: { tab?: ProfileTab; uuid?: string } = {},
-  ): Promise<ApiResponse<RookerFeed>> {
-    return rotomGET<RookerFeed>(`/rooker/profile/${handle}/posts${qs(params)}`)
+  ): Promise<RookerFeed> {
+    return rotomGETOrThrow<RookerFeed>(`/rooker/profile/${handle}/posts${qs(params)}`)
   }
 
-  static updateProfile(body: UpdateProfileBody): Promise<ApiResponse<RookerProfile>> {
-    return rotomPATCH<RookerProfile>("/rooker/profile", body)
+  static updateProfile(body: UpdateProfileBody): Promise<RookerProfile> {
+    return rotomPATCHOrThrow<RookerProfile>("/rooker/profile", body)
   }
 
   // ── Discovery ──────────────────────────────────────────────────────────────
-  static getTrends(limit = 6): Promise<ApiResponse<{ items: RookerTrend[] }>> {
-    return rotomGET<{ items: RookerTrend[] }>(`/rooker/trends${qs({ limit })}`)
+  static getTrends(limit = 6): Promise<{ items: RookerTrend[] }> {
+    return rotomGETOrThrow<{ items: RookerTrend[] }>(`/rooker/trends${qs({ limit })}`)
   }
 
-  static getSuggestions(uuid?: string, limit = 3): Promise<ApiResponse<{ items: RookerSuggestion[] }>> {
-    return rotomGET<{ items: RookerSuggestion[] }>(`/rooker/suggestions${qs({ uuid, limit })}`)
+  static getSuggestions(uuid?: string, limit = 3): Promise<{ items: RookerSuggestion[] }> {
+    return rotomGETOrThrow<{ items: RookerSuggestion[] }>(`/rooker/suggestions${qs({ uuid, limit })}`)
   }
 
-  static search(q: string, uuid?: string): Promise<ApiResponse<RookerSearchResults>> {
-    return rotomGET<RookerSearchResults>(`/rooker/search${qs({ q, uuid })}`)
+  static search(q: string, uuid?: string): Promise<RookerSearchResults> {
+    return rotomGETOrThrow<RookerSearchResults>(`/rooker/search${qs({ q, uuid })}`)
   }
 
   /** Rides on the generic `rotom_notifications` table, filtered to `type = 'rooker'`. */
   static getNotifications(
     uuid: string,
-  ): Promise<ApiResponse<{ items: RookerNotification[]; total: number }>> {
-    return rotomGET<{ items: RookerNotification[]; total: number }>(`/rooker/notifications${qs({ uuid })}`)
+  ): Promise<{ items: RookerNotification[]; total: number }> {
+    return rotomGETOrThrow<{ items: RookerNotification[]; total: number }>(`/rooker/notifications${qs({ uuid })}`)
   }
 }

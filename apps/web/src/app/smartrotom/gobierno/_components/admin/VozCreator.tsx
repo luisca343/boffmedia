@@ -56,7 +56,7 @@ export function VozCreator({ onCreated, onClose }: { onCreated: (value: string) 
     try {
       const res = await SmartrotomService.postArceuSpeak({ name: name.trim(), value, format: fmt.trim() })
       if (res.success === false || (res.statusCode && res.statusCode >= 400)) {
-        throw new Error(res.message || "No se pudo crear la voz.")
+        throw new Error(res.userMessage ?? "No se pudo crear la voz.")
       }
       toast(`Voz «${name.trim()}» creada`, "ok", "check")
       onCreated(value)

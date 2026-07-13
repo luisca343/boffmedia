@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
+import { userMessageFrom } from "@/services/boffAPI"
 import PlayOnMountAudio from "@/components/shared/PlayOnMountAudio"
 import { BootScreen } from "./_components/BootScreen"
 import { BoxOverview } from "./_components/BoxOverview"
@@ -137,7 +138,12 @@ export default function PCPage() {
   }, [detail, multiMode, overlay, setDetail, setMultiMode, toggleDual])
 
   if (error) {
-    return <ErrorOverlay message={error.message} onRetry={() => window.location.reload()} />
+    return (
+      <ErrorOverlay
+        message={userMessageFrom(error, "Inténtalo de nuevo en unos segundos.")}
+        onRetry={() => window.location.reload()}
+      />
+    )
   }
 
   return (

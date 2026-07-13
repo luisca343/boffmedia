@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation"
 import { useMemo } from "react"
 import { cn } from "@/lib/utils"
+import { userMessageFrom } from "@/services/boffAPI"
 import { fmt } from "../_utils/format"
 import { PRICE_CAP, useFeedFilters, type WpSort } from "../_stores/filterStore"
 import { useListings, useToggleWatch, useWatchlist } from "../_hooks/queries"
@@ -127,7 +128,7 @@ export function Feed() {
           <EmptyState
             icon="alert"
             title="El mercado no responde"
-            body={(error as Error).message}
+            body={userMessageFrom(error, "Inténtalo de nuevo en unos segundos.")}
           />
         ) : isLoading ? (
           <div className="grid grid-cols-[repeat(auto-fill,minmax(236px,1fr))] gap-[18px] px-[26px] pb-11 pt-5">

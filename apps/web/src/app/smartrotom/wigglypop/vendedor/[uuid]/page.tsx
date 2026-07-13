@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { use } from "react"
+import { userMessageFrom } from "@/services/boffAPI"
 import { fmt, timeAgo } from "../../_utils/format"
 import { useListings, useSeller, useToggleWatch, useWatchlist } from "../../_hooks/queries"
 import { ListingCard } from "../../_components/ListingCard"
@@ -40,7 +41,14 @@ export default function SellerPage({ params }: { params: Promise<{ uuid: string 
   )
   const watchedIds = new Set((watched ?? []).map((l) => l.id))
 
-  if (error) return <EmptyState icon="alert" title="Vendedor no encontrado" body={error.message} />
+  if (error)
+    return (
+      <EmptyState
+        icon="alert"
+        title="Vendedor no encontrado"
+        body={userMessageFrom(error, "Inténtalo de nuevo en unos segundos.")}
+      />
+    )
 
   return (
     <div className="flex min-w-0 flex-1 flex-col">

@@ -3,6 +3,7 @@
 // The public bounty wall: a view over active Buscados, not its own register. Same query
 // params as BuscadosSection so TanStack Query serves both pages from one cached fetch.
 import { useMemo } from "react"
+import { userMessageFrom } from "@/services/boffAPI"
 import { Avatar, Badge, Empty, Icon, Seal, Skeleton } from "../ui"
 import { useBuscados } from "../../_hooks/queries"
 import { useGobiernoUi } from "../../_stores/useGobiernoUi"
@@ -56,7 +57,11 @@ export function RecompensasSection() {
           ))}
         </div>
       ) : isError ? (
-        <Empty icon="alert" title="No se ha podido cargar el tablón" sub={error instanceof Error ? error.message : undefined} />
+        <Empty
+          icon="alert"
+          title="No se ha podido cargar el tablón"
+          sub={error ? userMessageFrom(error, "Inténtalo de nuevo en unos segundos.") : undefined}
+        />
       ) : active.length === 0 ? (
         <Empty
           icon="scroll"

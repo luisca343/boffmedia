@@ -2,7 +2,7 @@
 
 import { useMemo } from "react"
 import { useQuery } from "@tanstack/react-query"
-import { WingullService } from "@/services/api/smartrotom/wingullService"
+import { wingullPOSTOrThrow } from "@/services/boffAPI"
 import { usePokemonStore } from "@/stores/pokemonStore"
 import type { PCPokemon, ExtendedPokemonW } from "@/types/dto/pc-pokemon.dto"
 import type { Pokemon } from "@/types/Pokemon"
@@ -28,16 +28,6 @@ import { useWpUuid } from "./queries"
  * be byte-identical to the one the PC and the server compute, or a listing could
  * never be matched back to its Pokémon.
  */
-
-async function unwrap<T>(
-  call: Promise<{ success: boolean; data?: T; message?: string }>,
-): Promise<T> {
-  const res = await call
-  if (!res.success || res.data === undefined) {
-    throw new Error(res.message || "No se pudo leer tu PC")
-  }
-  return res.data
-}
 
 /** A box Pokémon, in the shape a listing needs, with its slot address attached. */
 export interface PcSlotMon extends WpMon {
@@ -86,7 +76,7 @@ export function usePcMons() {
 
   const pc = useQuery({
     queryKey: ["wigglypop", "pc", uuid ?? ""],
-    queryFn: () => unwrap<PCPokemon[]>(WingullService.getPC(uuid!)),
+    queryFn: () => wingullPOSTOrThrow<PCPokemon[]>("/pc", { uuid: uuid! }),
     enabled: Boolean(uuid),
     // The PC is the seller's inventory. It changes in-game while they browse, so a
     // stale read here means listing a Pokémon that has already moved.

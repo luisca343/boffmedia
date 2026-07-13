@@ -7,29 +7,14 @@ import type {
   PasaporteSeasonEntity,
   PokemonW,
   Replay,
+  StarBankAccount,
+  StarBankTransaction,
   UserAchievement,
 } from "@boffmedia/shared"
-import { AchievementService } from "@/services/api/smartrotom/achievementsService"
 import { PasaporteService } from "@/services/api/smartrotom/pasaporteService"
-import { PlayerService, type MinecraftStats } from "@/services/api/smartrotom/playerService"
-import { StarbankService } from "@/services/api/smartrotom/starbankService"
-import { WingullService } from "@/services/api/smartrotom/wingullService"
+import { type MinecraftStats } from "@/services/api/smartrotom/playerService"
+import { rotomGETOrThrow, rotomPOSTOrThrow, wingullPOSTOrThrow } from "@/services/boffAPI"
 import { useBoffSession } from "@/services/useBoffSession"
-
-/**
- * `boffAPI` has two failure modes: network errors throw, HTTP errors resolve to
- * `{ success: false }` (SMARTROTOM_V3 §8). Reading `.data` off an unchecked response is
- * the silent-failure pattern the audit flagged, so every read funnels through here and
- * turns a failed envelope into a thrown error react-query can see, retry and surface.
- */
-async function unwrap<T>(
-  promise: Promise<{ success: boolean; data?: T; message?: string }>,
-  what: string,
-): Promise<T> {
-  const res = await promise
-  if (!res.success || res.data === undefined) throw new Error(res.message || `No se pudo cargar ${what}`)
-  return res.data
-}
 
 /** The SmartRotom uuid every passport route is keyed by. `null` until signed in. */
 export function usePasaporteUuid(): string | null {
@@ -51,7 +36,7 @@ export const pasaporteKeys = {
 export function usePassportProfile(uuid?: string | null) {
   return useQuery({
     queryKey: pasaporteKeys.profile(uuid ?? ""),
-    queryFn: () => unwrap<PasaporteProfileEntity>(PasaporteService.getProfile(uuid!), "el pasaporte"),
+    queryFn: () => PasaporteService.getProfile(uuid!),
     enabled: !!uuid,
   })
 }
@@ -60,7 +45,7 @@ export function usePassportProfile(uuid?: string | null) {
 export function usePlayerStats(uuid?: string | null) {
   return useQuery({
     queryKey: pasaporteKeys.stats(uuid ?? ""),
-    queryFn: () => unwrap<MinecraftStats>(PlayerService.getStats(uuid!), "tus estadísticas"),
+    queryFn: () => rotomPOSTOrThrow<MinecraftStats>("/player/stats", { uuid: uuid! }),
     enabled: !!uuid,
   })
 }
@@ -68,7 +53,7 @@ export function usePlayerStats(uuid?: string | null) {
 export function usePlayerTeam(uuid?: string | null) {
   return useQuery({
     queryKey: pasaporteKeys.team(uuid ?? ""),
-    queryFn: () => unwrap<PokemonW[]>(WingullService.getTeam(uuid!), "tu equipo"),
+    queryFn: () => wingullPOSTOrThrow<PokemonW[]>("/team", { uuid: uuid! }),
     enabled: !!uuid,
   })
 }
@@ -81,7 +66,7 @@ export function usePlayerTeam(uuid?: string | null) {
 export function useAchievements(uuid?: string | null) {
   return useQuery({
     queryKey: pasaporteKeys.achievements(uuid ?? ""),
-    queryFn: () => unwrap<UserAchievement[]>(AchievementService.getAchievements({ uuid: uuid! }), "tus medallas"),
+    queryFn: () => rotomPOSTOrThrow<UserAchievement[]>("/achievement/get-achievements", { uuid: uuid! }),
     enabled: !!uuid,
   })
 }
@@ -89,7 +74,7 @@ export function useAchievements(uuid?: string | null) {
 export function useLogros(uuid?: string | null) {
   return useQuery({
     queryKey: pasaporteKeys.logros(uuid ?? ""),
-    queryFn: () => unwrap<PasaporteLogroEntity[]>(PasaporteService.getLogros(uuid!), "tus logros"),
+    queryFn: () => PasaporteService.getLogros(uuid!),
     enabled: !!uuid,
   })
 }
@@ -97,7 +82,7 @@ export function useLogros(uuid?: string | null) {
 export function useSeason(uuid?: string | null) {
   return useQuery({
     queryKey: pasaporteKeys.season(uuid ?? ""),
-    queryFn: () => unwrap<PasaporteSeasonEntity>(PasaporteService.getSeason(uuid!), "la temporada"),
+    queryFn: () => PasaporteService.getSeason(uuid!),
     enabled: !!uuid,
   })
 }
@@ -115,11 +100,13 @@ export function useLedger(uuid?: string | null) {
   return useQuery({
     queryKey: pasaporteKeys.ledger(uuid ?? ""),
     queryFn: async () => {
-      const accounts = await unwrap(StarbankService.getUserAccounts(uuid!), "tus cuentas")
+      const accounts = await rotomGETOrThrow<StarBankAccount[]>(`/starbank/accounts/${uuid}`)
       const accountIds = accounts.map((a) => a.id)
 
       const perAccount = await Promise.all(
-        accountIds.map((id) => unwrap(StarbankService.getAccountTransactions(id, 100), "tus movimientos")),
+        accountIds.map((id) =>
+          rotomGETOrThrow<StarBankTransaction[]>(`/starbank/transactions/${id}?limit=100`),
+        ),
       )
 
       // A transfer between two of the trainer's own accounts comes back from both, so the
@@ -149,7 +136,7 @@ export function useLedger(uuid?: string | null) {
 export function useReplay(uuid?: string | null, replayId?: number | null) {
   return useQuery({
     queryKey: pasaporteKeys.replay(uuid ?? "", replayId ?? 0),
-    queryFn: () => unwrap<Replay>(AchievementService.getReplay(uuid!, replayId!), "el combate"),
+    queryFn: () => rotomPOSTOrThrow<Replay>("/achievement/get-replay", { uuid: uuid!, replayId: replayId! }),
     enabled: !!uuid && !!replayId,
     staleTime: Infinity,
   })

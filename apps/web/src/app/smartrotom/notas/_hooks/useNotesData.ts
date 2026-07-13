@@ -29,7 +29,7 @@ export function useNotesData() {
     async <T,>(call: Promise<ApiResponse<T>>, fallback: string): Promise<ApiResponse<T> | null> => {
       try {
         const res = await call;
-        if (!res?.success) throw new Error(res?.message || fallback);
+        if (!res?.success) throw new Error(res?.userMessage ?? fallback);
         setError(null);
         return res;
       } catch (e) {

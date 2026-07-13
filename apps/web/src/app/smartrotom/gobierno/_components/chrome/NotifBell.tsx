@@ -4,9 +4,8 @@ import { useEffect, useRef, useState } from "react"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import Link from "next/link"
 import type { NotificationsInboxDto } from "@boffmedia/shared"
-import { NotificationsService } from "@/services/api/smartrotom/notificationsService"
+import { rotomGETOrThrow, rotomPATCHOrThrow, userMessageFrom } from "@/services/boffAPI"
 import { Icon, Empty, toast } from "../ui"
-import { unwrap } from "../../_hooks/queries"
 import { useOfficer } from "../../_hooks/useOfficer"
 import { timeAgo } from "../../_utils/format"
 import { TONES, type Tone } from "../../_utils/tones"
@@ -32,7 +31,8 @@ export function NotifBell() {
 
   const { data } = useQuery({
     queryKey: ["gob", "notifs", uuid],
-    queryFn: () => unwrap<NotificationsInboxDto>(NotificationsService.getNotifications(uuid, 12)),
+    queryFn: () =>
+      rotomGETOrThrow<NotificationsInboxDto>(`/notifications?uuid=${encodeURIComponent(uuid)}&limit=12&offset=0`),
     enabled: !!uuid,
     staleTime: 30_000,
   })
@@ -55,10 +55,10 @@ export function NotifBell() {
     try {
       // Invalidating unconditionally would clear the badge on a write the server rejected,
       // so the refetch only follows a confirmed success.
-      await unwrap(NotificationsService.markAllNotificationsRead(uuid))
+      await rotomPATCHOrThrow("/notifications/read-all", { uuid })
       qc.invalidateQueries({ queryKey: ["gob", "notifs", uuid] })
     } catch (e) {
-      toast(e instanceof Error ? e.message : "No se pudieron marcar como leídas", "danger", "alert")
+      toast(userMessageFrom(e, "No se pudieron marcar como leídas"), "danger", "alert")
     }
   }
 

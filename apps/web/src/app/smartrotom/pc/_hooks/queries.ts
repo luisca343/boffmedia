@@ -3,8 +3,8 @@
 import { useCallback, useMemo } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import type { PokemonW } from "@boffmedia/shared"
-import { WingullService } from "@/services/api/smartrotom/wingullService"
 import { PcMarksService } from "@/services/api/smartrotom/pcMarksService"
+import { wingullPOSTOrThrow } from "@/services/boffAPI"
 import { useBoffSession } from "@/services/useBoffSession"
 import type { BattleTeamData } from "@/types/dto/battle-team.dto"
 import type { ExtendedPokemonW, PCPokemon } from "@/types/dto/pc-pokemon.dto"
@@ -22,22 +22,6 @@ export function usePcUuid(): string | null {
   return session?.user?.smartRotomUser?.uuid ?? null
 }
 
-/**
- * `boffAPI` has two failure modes: network errors throw, HTTP errors resolve to
- * `{ success: false }`. Reading `.data` off an unchecked response is the silent-
- * failure pattern the audit flagged, so every call funnels through here and turns a
- * failed envelope into a thrown error React Query can see (SMARTROTOM_V3.md §8).
- */
-async function unwrap<T>(
-  call: Promise<{ success: boolean; data?: T; message?: string }>,
-): Promise<T> {
-  const res = await call
-  if (!res.success || res.data === undefined) {
-    throw new Error(res.message || "No se pudo contactar con el almacén del PC")
-  }
-  return res.data
-}
-
 export const pcKeys = {
   pc: (uuid: string) => ["pc", "boxes", uuid] as const,
   party: (uuid: string) => ["pc", "party", uuid] as const,
@@ -52,7 +36,7 @@ export function usePcBoxes() {
   const uuid = usePcUuid()
   return useQuery({
     queryKey: pcKeys.pc(uuid ?? ""),
-    queryFn: () => unwrap<PCPokemon[]>(WingullService.getPC(uuid!)),
+    queryFn: () => wingullPOSTOrThrow<PCPokemon[]>("/pc", { uuid: uuid! }),
     enabled: Boolean(uuid),
   })
 }
@@ -63,7 +47,7 @@ export function useParty() {
   return useQuery({
     queryKey: pcKeys.party(uuid ?? ""),
     queryFn: async () => {
-      const team = await unwrap<PokemonW[]>(WingullService.getTeam(uuid!))
+      const team = await wingullPOSTOrThrow<PokemonW[]>("/team", { uuid: uuid! })
       return padParty(team as ExtendedPokemonW[])
     },
     enabled: Boolean(uuid),
@@ -74,7 +58,7 @@ export function useBattleTeams() {
   const uuid = usePcUuid()
   return useQuery({
     queryKey: pcKeys.battleTeams(uuid ?? ""),
-    queryFn: () => unwrap<BattleTeamData>(WingullService.getBattleTeams(uuid!)),
+    queryFn: () => wingullPOSTOrThrow<BattleTeamData>("/battleteams", { uuid: uuid! }),
     enabled: Boolean(uuid),
   })
 }
@@ -85,9 +69,7 @@ export function useMarks() {
   return useQuery({
     queryKey: pcKeys.marks(uuid ?? ""),
     queryFn: async () => {
-      const rows = await unwrap<Array<{ pokemonKey: string; favorite: boolean; tags: string[] }>>(
-        PcMarksService.getMarks(uuid!),
-      )
+      const rows = await PcMarksService.getMarks(uuid!)
       const map: PcMarkMap = {}
       for (const r of rows) {
         map[r.pokemonKey] = { favorite: !!r.favorite, tags: Array.isArray(r.tags) ? r.tags : [] }
@@ -223,14 +205,13 @@ export function useMovePokemon() {
   return useMutation({
     mutationFn: async ({ from, to }: { from: SlotLoc; to: SlotLoc }) => {
       if (!uuid) throw new Error("Sesión no iniciada")
-      return unwrap(
-        WingullService.movePokemonInPC(uuid, {
-          sourceBox: boxOf(from),
-          sourceIndex: from.index,
-          destinationBox: boxOf(to),
-          destinationIndex: to.index,
-        }),
-      )
+      return wingullPOSTOrThrow("/pc/move", {
+        uuid,
+        sourceBox: boxOf(from),
+        sourceIndex: from.index,
+        destinationBox: boxOf(to),
+        destinationIndex: to.index,
+      })
     },
     onMutate: async ({ from, to }) => {
       if (!uuid) return
@@ -317,7 +298,7 @@ export function useSetMark() {
   return useMutation({
     mutationFn: ({ key, patch }: { key: string; patch: Partial<PcMarkState> }) => {
       if (!uuid) throw new Error("Sesión no iniciada")
-      return unwrap(PcMarksService.upsertMark(uuid, key, patch))
+      return PcMarksService.upsertMark(uuid, key, patch)
     },
     onMutate: ({ key, patch }) => ({ prev: patchLocal((m) => withMark(m, key, patch)) }),
     onError: (_e, _v, ctx) => {
@@ -343,13 +324,11 @@ export function useBulkMark() {
       removeTags?: string[]
     }) => {
       if (!uuid) throw new Error("Sesión no iniciada")
-      return unwrap(
-        PcMarksService.bulkUpsert(uuid, vars.keys, {
-          favorite: vars.favorite,
-          addTags: vars.addTags,
-          removeTags: vars.removeTags,
-        }),
-      )
+      return PcMarksService.bulkUpsert(uuid, vars.keys, {
+        favorite: vars.favorite,
+        addTags: vars.addTags,
+        removeTags: vars.removeTags,
+      })
     },
     onMutate: ({ keys, favorite, addTags, removeTags }) => ({
       prev: patchLocal((prev) => {

@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { useState } from "react"
 import type { OpenLootBoxResponseDto } from "@boffmedia/shared"
+import { userMessageFrom } from "@/services/boffAPI"
 import {
   useArcadeInventory,
   useArcadeUuid,
@@ -164,9 +165,7 @@ export default function LootPage() {
       {openBox.isError && (
         <Panel tone="deep" tight className="mb-4">
           <p role="alert" className="font-ar-mono text-[12px] text-ar-danger">
-            {openBox.error instanceof Error
-              ? openBox.error.message
-              : "No se pudo abrir la caja. Inténtalo de nuevo."}
+            {userMessageFrom(openBox.error, "No se pudo abrir la caja. Inténtalo de nuevo.")}
           </p>
         </Panel>
       )}

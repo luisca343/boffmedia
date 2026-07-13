@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import { userMessageFrom } from "@/services/boffAPI"
 import {
   Avatar,
   Badge,
@@ -68,7 +69,11 @@ export function BuscadosSection() {
           ))}
         </div>
       ) : isError ? (
-        <Empty icon="alert" title="No se ha podido cargar el registro" sub={error instanceof Error ? error.message : undefined} />
+        <Empty
+          icon="alert"
+          title="No se ha podido cargar el registro"
+          sub={error ? userMessageFrom(error, "Inténtalo de nuevo en unos segundos.") : undefined}
+        />
       ) : active.length === 0 && resolved.length === 0 ? (
         <Empty
           icon="shieldAlert"

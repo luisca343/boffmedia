@@ -1,4 +1,4 @@
-import { rotomGET, rotomPUT, ApiResponse } from '@/services/boffAPI';
+import { rotomGETOrThrow, rotomPUTOrThrow } from '@/services/boffAPI';
 import type { PcMark } from '@boffmedia/shared';
 
 /**
@@ -13,8 +13,8 @@ export class PcMarksService {
   /**
    * Get every mark of a user
    */
-  static getMarks(uuid: string): Promise<ApiResponse<PcMark[]>> {
-    return rotomGET<PcMark[]>(`/pc-marks/${uuid}`);
+  static getMarks(uuid: string): Promise<PcMark[]> {
+    return rotomGETOrThrow<PcMark[]>(`/pc-marks/${uuid}`);
   }
 
   /**
@@ -24,8 +24,8 @@ export class PcMarksService {
     uuid: string,
     pokemonKey: string,
     patch: { favorite?: boolean; tags?: string[] }
-  ): Promise<ApiResponse<PcMark>> {
-    return rotomPUT<PcMark>('/pc-marks', { uuid, pokemonKey, ...patch });
+  ): Promise<PcMark> {
+    return rotomPUTOrThrow<PcMark>('/pc-marks', { uuid, pokemonKey, ...patch });
   }
 
   /**
@@ -36,7 +36,7 @@ export class PcMarksService {
     uuid: string,
     pokemonKeys: string[],
     patch: { favorite?: boolean; addTags?: string[]; removeTags?: string[] }
-  ): Promise<ApiResponse<PcMark[]>> {
-    return rotomPUT<PcMark[]>('/pc-marks/bulk', { uuid, pokemonKeys, ...patch });
+  ): Promise<PcMark[]> {
+    return rotomPUTOrThrow<PcMark[]>('/pc-marks/bulk', { uuid, pokemonKeys, ...patch });
   }
 }

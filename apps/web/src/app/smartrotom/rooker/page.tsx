@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { cn } from "@/lib/utils"
+import { userMessageFrom } from "@/services/boffAPI"
 import { EmptyState, FeedSkeleton, Icon, SegTabs } from "./_components/ui"
 import { PostCard } from "./_components/PostCard"
 import { ComposeInline } from "./_components/ComposeInline"
@@ -46,7 +47,7 @@ export default function RookerFeedPage() {
         <EmptyState
           icon="close"
           title="El nido no responde"
-          body={error instanceof Error ? error.message : undefined}
+          body={error ? userMessageFrom(error, "Inténtalo de nuevo en unos segundos.") : undefined}
           action={
             <Button intent="ghost" onClick={() => refetch()}>
               Reintentar

@@ -1,5 +1,6 @@
 "use client"
 
+import { userMessageFrom } from "@/services/boffAPI"
 import { Empty, Skeleton } from "../ui"
 import { useEvento } from "../../_hooks/queries"
 import { BackToEventos } from "./shared"
@@ -37,7 +38,11 @@ export function EventoDetail({ id }: { id: string }) {
     return (
       <>
         <BackToEventos />
-        <Empty icon="alert" title="No se ha podido cargar el evento" sub={error instanceof Error ? error.message : undefined} />
+        <Empty
+          icon="alert"
+          title="No se ha podido cargar el evento"
+          sub={error ? userMessageFrom(error, "Inténtalo de nuevo en unos segundos.") : undefined}
+        />
       </>
     )
   }

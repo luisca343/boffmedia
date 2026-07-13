@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import { userMessageFrom } from "@/services/boffAPI"
 import { Badge, Button, Card, Empty, Icon, PageHead, Skeleton } from "../ui"
 import { Segmented } from "./Segmented"
 import { PlayerLink } from "./PlayerLink"
@@ -60,7 +61,11 @@ export function DenunciasSection() {
           ))}
         </div>
       ) : isError ? (
-        <Empty icon="alert" title="No se ha podido cargar el registro" sub={error instanceof Error ? error.message : undefined} />
+        <Empty
+          icon="alert"
+          title="No se ha podido cargar el registro"
+          sub={error ? userMessageFrom(error, "Inténtalo de nuevo en unos segundos.") : undefined}
+        />
       ) : filtered.length === 0 ? (
         <Empty
           icon="fileText"

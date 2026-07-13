@@ -12,19 +12,6 @@ export function useRookerUuid(): string | null {
   return session?.user?.smartRotomUser?.uuid ?? null
 }
 
-/**
- * `boffAPI` has two failure modes: network errors throw, HTTP errors resolve to
- * `{ success: false }`. Reading `.data` off an unchecked response is the silent-failure
- * pattern the audit flagged (§8), so every call funnels through here.
- */
-async function unwrap<T>(call: Promise<{ success: boolean; data?: T; message?: string }>): Promise<T> {
-  const res = await call
-  if (!res.success || res.data === undefined) {
-    throw new Error(res.message || "El nido no responde")
-  }
-  return res.data
-}
-
 export const rookerKeys = {
   all: ["rooker"] as const,
   me: (uuid?: string | null) => ["rooker", "me", uuid] as const,
@@ -51,7 +38,7 @@ export function useMe() {
   const uuid = useRookerUuid()
   return useQuery({
     queryKey: rookerKeys.me(uuid),
-    queryFn: () => unwrap(RookerService.getMe(uuid!)),
+    queryFn: () => RookerService.getMe(uuid!),
     enabled: Boolean(uuid),
     staleTime: 5 * 60_000,
   })
@@ -61,7 +48,7 @@ export function useFeed(tab: FeedTab) {
   const uuid = useRookerUuid()
   return useQuery({
     queryKey: rookerKeys.feed(tab, uuid),
-    queryFn: async () => (await unwrap(RookerService.getFeed({ uuid: uuid ?? undefined, tab }))).items,
+    queryFn: async () => (await RookerService.getFeed({ uuid: uuid ?? undefined, tab })).items,
     // "Siguiendo" is empty and meaningless for a signed-out reader — there is no
     // graph to follow — so it is only fetched once we know who is asking.
     enabled: tab === "parati" || Boolean(uuid),
@@ -72,7 +59,7 @@ export function usePost(id: number) {
   const uuid = useRookerUuid()
   return useQuery({
     queryKey: rookerKeys.post(id, uuid),
-    queryFn: () => unwrap(RookerService.getPost(id, uuid ?? undefined)),
+    queryFn: () => RookerService.getPost(id, uuid ?? undefined),
     enabled: Number.isFinite(id) && id > 0,
   })
 }
@@ -81,7 +68,7 @@ export function useProfile(handle: string) {
   const uuid = useRookerUuid()
   return useQuery({
     queryKey: rookerKeys.profile(handle, uuid),
-    queryFn: () => unwrap(RookerService.getProfile(handle, uuid ?? undefined)),
+    queryFn: () => RookerService.getProfile(handle, uuid ?? undefined),
     enabled: Boolean(handle),
   })
 }
@@ -91,7 +78,7 @@ export function useProfilePosts(handle: string, tab: ProfileTab) {
   return useQuery({
     queryKey: rookerKeys.profilePosts(handle, tab, uuid),
     queryFn: async () =>
-      (await unwrap(RookerService.getProfilePosts(handle, { tab, uuid: uuid ?? undefined }))).items,
+      (await RookerService.getProfilePosts(handle, { tab, uuid: uuid ?? undefined })).items,
     enabled: Boolean(handle),
   })
 }
@@ -99,7 +86,7 @@ export function useProfilePosts(handle: string, tab: ProfileTab) {
 export function useTrends(limit = 6) {
   return useQuery({
     queryKey: rookerKeys.trends(),
-    queryFn: async () => (await unwrap(RookerService.getTrends(limit))).items,
+    queryFn: async () => (await RookerService.getTrends(limit)).items,
   })
 }
 
@@ -107,7 +94,7 @@ export function useSuggestions(limit = 3) {
   const uuid = useRookerUuid()
   return useQuery({
     queryKey: rookerKeys.suggestions(uuid),
-    queryFn: async () => (await unwrap(RookerService.getSuggestions(uuid ?? undefined, limit))).items,
+    queryFn: async () => (await RookerService.getSuggestions(uuid ?? undefined, limit)).items,
   })
 }
 
@@ -116,7 +103,7 @@ export function useSearch(q: string) {
   const term = q.trim()
   return useQuery({
     queryKey: rookerKeys.search(term, uuid),
-    queryFn: () => unwrap(RookerService.search(term, uuid ?? undefined)),
+    queryFn: () => RookerService.search(term, uuid ?? undefined),
     enabled: term.length >= 2,
   })
 }
@@ -125,7 +112,7 @@ export function useNotifications() {
   const uuid = useRookerUuid()
   return useQuery({
     queryKey: rookerKeys.notifications(uuid ?? ""),
-    queryFn: async () => (await unwrap(RookerService.getNotifications(uuid!))).items,
+    queryFn: async () => (await RookerService.getNotifications(uuid!)).items,
     enabled: Boolean(uuid),
   })
 }
@@ -134,7 +121,7 @@ export function useBookmarks() {
   const uuid = useRookerUuid()
   return useQuery({
     queryKey: rookerKeys.bookmarks(uuid ?? ""),
-    queryFn: async () => (await unwrap(RookerService.getBookmarks(uuid!))).items,
+    queryFn: async () => (await RookerService.getBookmarks(uuid!)).items,
     enabled: Boolean(uuid),
   })
 }
@@ -178,8 +165,7 @@ export function useReact() {
   const uuid = useRookerUuid()
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, type }: { id: number; type: ReactionType }) =>
-      unwrap(RookerService.react(id, uuid!, type)),
+    mutationFn: ({ id, type }: { id: number; type: ReactionType }) => RookerService.react(id, uuid!, type),
     onMutate: async ({ id, type }) => {
       await qc.cancelQueries({ queryKey: rookerKeys.all })
       const snapshot = qc.getQueriesData({ queryKey: rookerKeys.all })
@@ -204,7 +190,7 @@ export function useRetrino() {
   const uuid = useRookerUuid()
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (id: number) => unwrap(RookerService.retrino(id, uuid!)),
+    mutationFn: (id: number) => RookerService.retrino(id, uuid!),
     onMutate: async (id) => {
       await qc.cancelQueries({ queryKey: rookerKeys.all })
       const snapshot = qc.getQueriesData({ queryKey: rookerKeys.all })
@@ -229,7 +215,7 @@ export function useBookmark() {
   const uuid = useRookerUuid()
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (id: number) => unwrap(RookerService.bookmark(id, uuid!)),
+    mutationFn: (id: number) => RookerService.bookmark(id, uuid!),
     onMutate: async (id) => {
       await qc.cancelQueries({ queryKey: rookerKeys.all })
       const snapshot = qc.getQueriesData({ queryKey: rookerKeys.all })
@@ -263,7 +249,7 @@ export function useCreatePost() {
   const uuid = useRookerUuid()
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (body: Omit<CreatePostBody, "uuid">) => unwrap(RookerService.createPost({ ...body, uuid: uuid! })),
+    mutationFn: (body: Omit<CreatePostBody, "uuid">) => RookerService.createPost({ ...body, uuid: uuid! }),
     onSuccess: () => qc.invalidateQueries({ queryKey: rookerKeys.all }),
   })
 }
@@ -272,7 +258,7 @@ export function useDeletePost() {
   const uuid = useRookerUuid()
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (id: number) => unwrap(RookerService.deletePost(id, uuid!)),
+    mutationFn: (id: number) => RookerService.deletePost(id, uuid!),
     onSuccess: () => qc.invalidateQueries({ queryKey: rookerKeys.all }),
   })
 }
@@ -283,7 +269,7 @@ export function useFollow() {
   const uuid = useRookerUuid()
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (targetUuid: string) => unwrap(RookerService.follow(uuid!, targetUuid)),
+    mutationFn: (targetUuid: string) => RookerService.follow(uuid!, targetUuid),
     onSuccess: () => qc.invalidateQueries({ queryKey: rookerKeys.all }),
   })
 }
@@ -293,7 +279,7 @@ export function useUpdateProfile() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (body: Omit<UpdateProfileBody, "uuid">) =>
-      unwrap(RookerService.updateProfile({ ...body, uuid: uuid! })),
+      RookerService.updateProfile({ ...body, uuid: uuid! }),
     onSuccess: () => qc.invalidateQueries({ queryKey: rookerKeys.all }),
   })
 }

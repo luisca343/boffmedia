@@ -1,6 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
+import { userMessageFrom } from "@/services/boffAPI"
 import { FORMAT_ICON, FORMAT_LABEL, fmt } from "../_utils/format"
 import { useToggleWatch, useWatchlist } from "../_hooks/queries"
 import {
@@ -46,7 +47,7 @@ export default function WatchlistPage() {
 
       <div className="wp-scroll min-h-0 flex-1 overflow-y-auto px-[30px] pb-10 pt-[18px]">
         {error ? (
-          <EmptyState icon="alert" title="No se pudo cargar tu seguimiento" body={error.message} />
+          <EmptyState icon="alert" title="No se pudo cargar tu seguimiento" body={userMessageFrom(error, "Inténtalo de nuevo en unos segundos.")} />
         ) : isLoading ? (
           <div className="grid gap-2">
             {Array.from({ length: 5 }).map((_, i) => (

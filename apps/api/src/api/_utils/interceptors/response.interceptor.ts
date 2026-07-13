@@ -32,8 +32,8 @@ export class ResponseInterceptor implements NestInterceptor {
     const response = context.switchToHttp().getResponse();
     const handler = context.getHandler();
 
-    // Get action name and success message from ApiOperation
-    const { action, successMessage } = this.extractSwaggerMetadata(handler);
+    // Get action name from ApiOperation
+    const { action } = this.extractSwaggerMetadata(handler);
 
     // Log request
     this.logRequest(action, request.body, request.params, request.query);
@@ -46,7 +46,7 @@ export class ResponseInterceptor implements NestInterceptor {
         }
 
         this.logSuccess(action, data);
-        return this.createSuccessResponse(successMessage, data);
+        return this.createSuccessResponse(data, response?.statusCode);
       }),
       catchError((error) => {
         this.handleError(action, error, {
@@ -63,28 +63,12 @@ export class ResponseInterceptor implements NestInterceptor {
     // Get ApiOperation metadata
     const apiOperation = this.reflector.get('swagger/apiOperation', handler);
 
-    // Use summary as action and generate success message from it
+    // Use summary as action (for logging only — the envelope carries no
+    // machine-generated message; user-facing text is the client's job)
     const action =
       apiOperation?.summary || this.generateActionName(handler.name);
-    const successMessage = this.generateSuccessMessage(action);
 
-    return { action, successMessage };
-  }
-
-  private generateSuccessMessage(action: string): string {
-    const actionLower = action.toLowerCase();
-
-    if (actionLower.startsWith('get ')) {
-      return action.replace(/^get /i, '') + ' retrieved successfully';
-    } else if (actionLower.startsWith('create ')) {
-      return action.replace(/^create /i, '') + ' created successfully';
-    } else if (actionLower.startsWith('update ')) {
-      return action.replace(/^update /i, '') + ' updated successfully';
-    } else if (actionLower.startsWith('delete ')) {
-      return action.replace(/^delete /i, '') + ' deleted successfully';
-    }
-
-    return action + ' completed successfully';
+    return { action };
   }
 
   private logRequest(action: string, body: any, params: any, query: any) {
@@ -143,11 +127,10 @@ export class ResponseInterceptor implements NestInterceptor {
     }
   }
 
-  private createSuccessResponse(message: string, data: any) {
+  private createSuccessResponse(data: any, statusCode?: number) {
     return {
       success: true,
-      statusCode: HttpStatus.OK,
-      message,
+      statusCode: statusCode ?? HttpStatus.OK,
       data,
     };
   }
@@ -164,20 +147,34 @@ export class ResponseInterceptor implements NestInterceptor {
       .trim();
   }
 
-  // Helper methods for better logging
-  private hasSensitiveData(body: any): boolean {
-    if (!body || typeof body !== 'object') return false;
+  // Field-name match (not substring-of-the-whole-body, which hid any payload
+  // containing "queryKey", "monkey", etc. from the request logs)
+  private static readonly SENSITIVE_KEYS = new Set([
+    'password',
+    'token',
+    'accesstoken',
+    'refreshtoken',
+    'secret',
+    'key',
+    'apikey',
+    'privatekey',
+    'credentials',
+    'authorization',
+  ]);
 
-    const sensitiveFields = [
-      'password',
-      'token',
-      'secret',
-      'key',
-      'credentials',
-    ];
-    const bodyStr = JSON.stringify(body).toLowerCase();
+  private hasSensitiveData(body: any, depth = 0): boolean {
+    if (depth > 4 || !body || typeof body !== 'object') return false;
 
-    return sensitiveFields.some((field) => bodyStr.includes(field));
+    if (Array.isArray(body)) {
+      return body.some((item) => this.hasSensitiveData(item, depth + 1));
+    }
+
+    return Object.entries(body).some(
+      ([key, value]) =>
+        ResponseInterceptor.SENSITIVE_KEYS.has(
+          key.toLowerCase().replace(/[_-]/g, ''),
+        ) || this.hasSensitiveData(value, depth + 1),
+    );
   }
 
   private getDataInfo(data: any): string {

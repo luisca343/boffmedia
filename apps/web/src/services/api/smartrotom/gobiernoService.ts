@@ -1,4 +1,9 @@
-import { rotomGET, rotomPOST, rotomPATCH, rotomDELETE } from "@/services/boffAPI"
+import {
+  rotomGETOrThrow as rotomGET,
+  rotomPOSTOrThrow as rotomPOST,
+  rotomPATCHOrThrow as rotomPATCH,
+  rotomDELETEOrThrow as rotomDELETE,
+} from "@/services/boffAPI"
 
 // Transport for /smartrotom/gobierno. `rotomPOST/PATCH/DELETE` inject `body.server`, which
 // MinecraftMiddleware requires on every non-GET under /smartrotom/* (SMARTROTOM_V3 §8).

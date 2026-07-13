@@ -151,7 +151,7 @@ export default function NotesPage() {
               // Falling back to an empty template here would duplicate the note with its
               // body silently dropped, so a failed read must abort the copy outright.
               if (!res.success || !res.data) {
-                toast(res.message || "No se pudo leer la nota para duplicarla", "error");
+                toast(res.userMessage ?? "No se pudo leer la nota para duplicarla", "error");
                 return;
               }
               await actions.newNote({
