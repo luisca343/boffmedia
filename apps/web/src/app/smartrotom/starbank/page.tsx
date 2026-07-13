@@ -2,7 +2,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import useStarBank from "./_hooks/useStarBank";
-import { useGetTransactions } from "@/hooks/starbank/useGetTransactions";
+import { useTransactions } from "./_hooks/queries";
 import { PageHeader, Card, SectionHead, CardBody, Kpi, Button, Ico, AccountAvatar, Skeleton, type IconName } from "./_components/ui";
 import { TxRow } from "./_components/TxRow";
 import { TxDetail } from "./_components/TxDetail";
@@ -19,7 +19,7 @@ export default function Dashboard() {
   const router = useRouter();
   const { accounts, activeAccount } = useStarBank();
   const accId = activeAccount?.id ?? -1;
-  const { transactions, isLoading } = useGetTransactions(accId, 100);
+  const { data: transactions, isLoading } = useTransactions(accId, 100);
   const [openTx, setOpenTx] = React.useState<SBTransaction | null>(null);
 
   if (!activeAccount || isLoading) return <DashboardSkeleton />;

@@ -23,11 +23,6 @@ export function changeActiveAccount(activeAccount: number): number {
     return activeAccount;
 }
 
-export function formatMoney(amount: number): string {
-    if (isNaN(amount)) return "ERROR ¥";
-    return `${Number(amount.toFixed(0)).toLocaleString('es-ES')} ¥`;
-}
-
 export function getTransactionImageName(transaction: StarBankTransaction): string {
     return transaction.isPayer ? transaction.toName! : transaction.fromName!;
 }

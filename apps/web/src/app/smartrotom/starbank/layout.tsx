@@ -1,6 +1,7 @@
 "use client";
 import { usePathname, useRouter } from "next/navigation";
 import { useRotomMode } from "@/components/smartrotom/theme/useRotomTheme";
+import { AppQueryProvider as StarBankQueryProvider } from "@/components/smartrotom/behavior/QueryProvider";
 import { Sidebar } from "./_components/Sidebar";
 import { TopBar } from "./_components/TopBar";
 import { ToastHost } from "./_components/ui";
@@ -18,7 +19,18 @@ const MESH: Record<"light" | "dark", string> = {
     "radial-gradient(700px 500px at -10% 110%, rgba(139,92,246,.10), transparent 60%)",
 };
 
+// Every page under `/starbank` calls `useStarBank`/the query hooks, and so does this
+// layout (it needs the active account for the sidebar and top bar) — so the provider
+// has to wrap this component from the outside, not sit inside its own returned tree.
 export default function StarbankLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  return (
+    <StarBankQueryProvider>
+      <StarbankLayoutBody>{children}</StarbankLayoutBody>
+    </StarBankQueryProvider>
+  );
+}
+
+function StarbankLayoutBody({ children }: Readonly<{ children: React.ReactNode }>) {
   const pathname = usePathname();
   const router = useRouter();
   const { accounts, activeAccount, setActiveAccount } = useStarBank();
