@@ -1,6 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { MessageRequestDto } from '../dto/message-request.dto';
 import { PokemonGiveRequestDto } from '../dto/pokemon-give-request.dto';
+import { PokemonTakeResponse } from '../dto/pokemon-take-request.dto';
+import { ItemsTakeResponse, TakeItemDto } from '../dto/items-take-request.dto';
 import { UpdateBattleTeamDto } from '../dto/battle-team.dto';
 import { WINGULL_USER_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 import { IWingullPlayerRepository } from '../repositories/interfaces/wingull-player.repository.interface';
@@ -124,6 +126,43 @@ export class WingullPlayerService {
     } catch (error: any) {
       this.logger.error(`Failed to give items to ${uuid}:`, error);
       throw new Error(`Items giving failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Removes a Pokémon from a player's PC and hands back its pokespec. `expectedKey` is the
+   * content hash the slot must still match — the plugin refuses the take otherwise, which is
+   * what makes "sell the mon you listed" unraceable. Throws until the plugin ships the route.
+   */
+  async takePokemon(
+    uuid: string,
+    box: number,
+    index: number,
+    expectedKey: string,
+  ): Promise<PokemonTakeResponse> {
+    try {
+      return await this.wingullPlayerRepository.takePokemonInAPI({
+        uuid,
+        box,
+        index,
+        expectedKey,
+      });
+    } catch (error: any) {
+      this.logger.error(`Failed to take Pokémon from ${uuid}:`, error);
+      throw new Error(`Pokémon taking failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Removes items from a player. Returns what was ACTUALLY removed, which may be less than
+   * asked for — settle against `taken`, never against the request.
+   */
+  async takeItems(uuid: string, items: TakeItemDto[]): Promise<ItemsTakeResponse> {
+    try {
+      return await this.wingullPlayerRepository.takeItemsInAPI({ uuid, items });
+    } catch (error: any) {
+      this.logger.error(`Failed to take items from ${uuid}:`, error);
+      throw new Error(`Items taking failed: ${error.message}`);
     }
   }
 
