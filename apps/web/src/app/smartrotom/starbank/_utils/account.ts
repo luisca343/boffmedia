@@ -1,12 +1,14 @@
 import type { SBAccount, SBTransaction } from "../_types";
 
-export const AVATAR_FALLBACK = "/smartrotom/img/apps/starbank/cuentas/teras.png";
+export const AVATAR_FALLBACK = "/smartrotom/img/apps/starbank/cuentas/Teras.png";
 
 /** Resolve an avatar URL the same way the legacy AccountImage did:
  *  MAIN → Minecraft head; SECONDARY → uploaded image or name-based path. */
 export function accountImageUrl(type?: string, name?: string, image?: string): string {
   if (type === "SECONDARY") {
-    return image || `/smartrotom/img/apps/starbank/cuentas/${(name ?? "").toLowerCase()}.png`;
+    // Exact account name: the files in public/…/cuentas/ keep their original
+    // casing, and this runs on a case-sensitive filesystem in prod.
+    return image || `/smartrotom/img/apps/starbank/cuentas/${name ?? ""}.png`;
   }
   return `https://minotar.net/avatar/${name ?? ""}/80.png`;
 }

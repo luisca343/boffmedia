@@ -1,14 +1,13 @@
 "use client"
 
 import Link from "next/link"
-import { useBoffSession } from "@/services/useBoffSession"
+import { useRotomUsername } from "@/components/smartrotom/behavior/useRotomUuid"
 import { Icon, Panel, Tag } from "../_components/ui"
 import { CabinaSection } from "./_components/CabinaSection"
 import { CuentaSection } from "./_components/CuentaSection"
 
 export default function AjustesPage() {
-  const { session } = useBoffSession()
-  const username = session?.user?.smartRotomUser?.username
+  const username = useRotomUsername() ?? undefined
 
   return (
     <>

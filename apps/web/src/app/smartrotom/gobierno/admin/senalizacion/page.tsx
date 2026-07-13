@@ -4,10 +4,10 @@ import { useMemo, useState } from "react"
 import { env } from "@/config/env.public"
 import { Bar, Button, Card, Empty, Field, Icon, PageHead, Select, Skeleton, toast } from "../../_components/ui"
 import { ConsolaHero } from "../../_components/admin/ConsolaHero"
-import { DIR_OPTIONS, HighwaySign, ROAD_TYPES, type CartelDestinationInput, type CartelRoadType } from "../../_components/admin/HighwaySign"
+import { DIR_OPTIONS, HighwaySign, ROAD_TYPES, type CartelDestinationDisplay, type CartelDestinationInput, type CartelRoadType } from "../../_components/admin/HighwaySign"
 import { useCarteles, useCreateCartel, useDeleteCartel } from "../../_hooks/queries"
 
-function buildUrl(tipo: string, highway: string, destinations: CartelDestinationInput[]) {
+function buildUrl(tipo: string, highway: string, destinations: CartelDestinationDisplay[]) {
   let u = `${env.NEXT_PUBLIC_URL}/smartrotom/cartel?tipo=${tipo}&via=${encodeURIComponent(highway)}`
   destinations.forEach((d, i) => {
     if (d.dest || d.dist) {
@@ -44,7 +44,10 @@ export default function SenalizacionPage() {
       {
         name: name.trim(),
         highway: highway.trim(),
-        destinations: dests.filter((d) => d.dest.trim() || d.dist.trim()),
+        // dist travels as a number on the wire (CartelDestinationDto)
+        destinations: dests
+          .filter((d) => d.dest.trim() || d.dist.trim())
+          .map((d) => ({ ...d, dist: Number(d.dist) || 0 })),
       },
       { onSuccess: () => setName("") },
     )

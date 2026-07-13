@@ -407,12 +407,12 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
       expect(mockFacade.getNewsById).toHaveBeenCalledWith(1);
     });
 
-    it('returns 500 when newsId is non-numeric', async () => {
+    it('returns 400 when newsId is non-numeric', async () => {
       const res = await request(app.getHttpServer()).get(
         '/smartrotom/documents/news/abc',
       );
 
-      expect(res.status).toBe(500);
+      expect(res.status).toBe(400);
     });
   });
 

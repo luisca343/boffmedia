@@ -1,4 +1,5 @@
 import type { Screenshot } from "@/stores/cameraGalleryStore";
+import type { ChatMember } from "@boffmedia/shared";
 
 export interface Position {
     x: number;
@@ -80,13 +81,10 @@ export type Message = {
     type: string;
 }
 
-// TODO(P9): shadows shared `Chat`/`ChatMessage` (this file predates Phase 5's `_types/view.ts`
-// `ChatVM`/`ChatMessageVM`, which is the type actually wired to the UI); `members: string[]`
-// has already drifted from the entity's `ChatMember[]`, but nothing reads `.members` off this
-// type today (only `.id`/`.messages`/`.unread` are touched, via `useGetChats.ts`'s `any`-typed
-// state) — aligning it would mean re-deriving `Message` (a socket payload with `chatId`, which
-// has no generated counterpart) against `ChatMessage` too. Left unlinked rather than mechanically
-// forced.
+// Pre-Phase-5 shape kept for `useGetChats.ts`'s socket-cache updates; the UI itself is wired
+// to `_types/view.ts`'s `ChatVM`/`ChatMessageVM`. `members` matches the wire's `ChatMember[]`
+// (only `.id`/`.messages`/`.unread` are actually read off this type). `Message` stays local —
+// it is the socket payload (carries `chatId`) and has no generated counterpart.
 export type ChatData = {
     id: number;
     name: string;
@@ -96,5 +94,5 @@ export type ChatData = {
     updatedAt: string;
     messages: Message[];
     unread: number;
-    members: string[];
+    members: ChatMember[];
 }

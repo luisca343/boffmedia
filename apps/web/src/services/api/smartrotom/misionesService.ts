@@ -1,4 +1,3 @@
-import { INPC } from '@/app/smartrotom/misiones/_types/Quest';
 import { rotomGET, rotomPOST, ApiResponse } from '@/services/boffAPI';
 import { SuccessResponse, UploadNpcImageDto } from '@boffmedia/shared';
 import { QuestSystemData } from '@/types/misiones';
@@ -16,13 +15,6 @@ export class MisionesService {
    */
   static getQuestsForUser(uuid: string) {
     return rotomPOST<QuestSystemData>('/misiones/user', { uuid });
-  }
-
-  /**
-   * Update NPCs
-   */
-  static updateNPCs(npcs: INPC[]) {
-    return rotomPOST<SuccessResponse>('/misiones/npcs', { npcs });
   }
 
   /**
@@ -58,27 +50,6 @@ export class MisionesService {
    */
   static getCacheStatus() {
     return rotomGET<SuccessResponse>('/misiones/cache/status');
-  }
-
-  /**
-   * Get all NPCs
-   */
-  static getAllNPCs() {
-    return rotomGET<INPC[]>('/misiones/npcs');
-  }
-
-  /**
-   * Get specific NPC by ID
-   */
-  static getNPCById(id: number) {
-    return rotomGET<INPC>(`/misiones/npcs/${id}`);
-  }
-
-  /**
-   * Get NPCs by quest ID
-   */
-  static getNPCsByQuestId(questId: number) {
-    return rotomGET<INPC[]>(`/misiones/npcs/quest/${questId}`);
   }
 
   /**

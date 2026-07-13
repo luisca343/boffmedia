@@ -78,6 +78,9 @@ export function SrPopoverTrigger({
   )
 }
 
+// Must match the data-[state=closed] duration below.
+const EXIT_MS = 150
+
 export function SrPopoverContent({
   className,
   children,
@@ -86,12 +89,26 @@ export function SrPopoverContent({
   children: ReactNode
 }) {
   const { open } = usePopoverCtx()
-  if (!open) return null
+
+  // Deferred unmount so the closed-state animation can play.
+  const [present, setPresent] = useState(open)
+  useEffect(() => {
+    if (open) {
+      setPresent(true)
+      return
+    }
+    const t = setTimeout(() => setPresent(false), EXIT_MS)
+    return () => clearTimeout(t)
+  }, [open])
+
+  if (!present) return null
   return (
     <div
       role="dialog"
+      data-state={open ? "open" : "closed"}
       className={cn(
         "absolute left-1/2 top-full z-50 mt-2 -translate-x-1/2 outline-none",
+        "animate-in fade-in-0 zoom-in-95 duration-150 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:duration-150 data-[state=closed]:pointer-events-none",
         className,
       )}
     >

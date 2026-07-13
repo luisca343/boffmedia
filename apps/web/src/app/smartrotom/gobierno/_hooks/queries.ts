@@ -28,6 +28,23 @@ import type {
   Tesoreria,
   Zona,
 } from "../_types"
+import {
+  mapPaged,
+  normalizeAnuncio,
+  normalizeApelacion,
+  normalizeAuditEntry,
+  normalizeBitacoraEntry,
+  normalizeBuscado,
+  normalizeDenuncia,
+  normalizeEvento,
+  normalizeExpediente,
+  normalizeMegafoniaEntry,
+  normalizeMulta,
+  normalizeParcela,
+  normalizeParcelaHistorial,
+  normalizePatrulla,
+  normalizeSubasta,
+} from "../_utils/personRef"
 
 type Query = Record<string, string | number | boolean | undefined | null>
 
@@ -74,44 +91,59 @@ export const useZonas = (q?: Query) =>
 export const useParcelas = (q?: Query) =>
   useQuery({
     queryKey: gobKeys.parcelas(q),
-    queryFn: () => GobiernoService.parcelas(q) as Promise<Paged<Parcela>>,
+    queryFn: () => GobiernoService.parcelas(q).then((d) => mapPaged(d, normalizeParcela)) as Promise<Paged<Parcela>>,
   })
 
 export const useHistorial = (q?: Query) =>
   useQuery({
     queryKey: gobKeys.historial(q),
-    queryFn: () => GobiernoService.historial(q) as Promise<Paged<ParcelaHistorial>>,
+    queryFn: () =>
+      GobiernoService.historial(q).then((d) => mapPaged(d, normalizeParcelaHistorial)) as Promise<
+        Paged<ParcelaHistorial>
+      >,
   })
 
 export const useSubastas = (q?: Query) =>
   useQuery({
     queryKey: gobKeys.subastas(q),
-    queryFn: () => GobiernoService.subastas(q) as Promise<Paged<Subasta>>,
+    queryFn: () => GobiernoService.subastas(q).then((d) => mapPaged(d, normalizeSubasta)) as Promise<Paged<Subasta>>,
   })
 
 export const useDenuncias = (q?: Query) =>
   useQuery({
     queryKey: gobKeys.denuncias(q),
-    queryFn: () => GobiernoService.denuncias(q) as Promise<Paged<Denuncia>>,
+    queryFn: () => GobiernoService.denuncias(q).then((d) => mapPaged(d, normalizeDenuncia)) as Promise<Paged<Denuncia>>,
   })
 
 export const useBuscados = (q?: Query) =>
   useQuery({
     queryKey: gobKeys.buscados(q),
-    queryFn: () => GobiernoService.buscados(q) as Promise<Paged<Buscado>>,
+    queryFn: () => GobiernoService.buscados(q).then((d) => mapPaged(d, normalizeBuscado)) as Promise<Paged<Buscado>>,
   })
 
 export const usePatrullas = () =>
-  useQuery({ queryKey: gobKeys.patrullas, queryFn: () => GobiernoService.patrullas() as Promise<Patrulla[]> })
+  useQuery({
+    queryKey: gobKeys.patrullas,
+    queryFn: () =>
+      GobiernoService.patrullas().then(
+        (d) => (Array.isArray(d) ? d.map(normalizePatrulla) : d),
+      ) as Promise<Patrulla[]>,
+  })
 
 export const useBitacora = (q?: Query) =>
   useQuery({
     queryKey: gobKeys.bitacora(q),
-    queryFn: () => GobiernoService.bitacora(q) as Promise<BitacoraEntry[]>,
+    queryFn: () =>
+      GobiernoService.bitacora(q).then(
+        (d) => (Array.isArray(d) ? d.map(normalizeBitacoraEntry) : d),
+      ) as Promise<BitacoraEntry[]>,
   })
 
 export const useMultas = (q?: Query) =>
-  useQuery({ queryKey: gobKeys.multas(q), queryFn: () => GobiernoService.multas(q) as Promise<Paged<Multa>> })
+  useQuery({
+    queryKey: gobKeys.multas(q),
+    queryFn: () => GobiernoService.multas(q).then((d) => mapPaged(d, normalizeMulta)) as Promise<Paged<Multa>>,
+  })
 
 export const useTesoreria = () =>
   useQuery({ queryKey: gobKeys.tesoreria, queryFn: () => GobiernoService.tesoreria() as Promise<Tesoreria> })
@@ -119,20 +151,22 @@ export const useTesoreria = () =>
 export const useExpedientes = (q?: Query) =>
   useQuery({
     queryKey: gobKeys.expedientes(q),
-    queryFn: () => GobiernoService.expedientes(q) as Promise<Paged<Expediente>>,
+    queryFn: () =>
+      GobiernoService.expedientes(q).then((d) => mapPaged(d, normalizeExpediente)) as Promise<Paged<Expediente>>,
   })
 
 export const useExpediente = (id: number | null) =>
   useQuery({
     queryKey: gobKeys.expediente(id ?? 0),
-    queryFn: () => GobiernoService.expediente(id as number) as Promise<Expediente>,
+    queryFn: () => GobiernoService.expediente(id as number).then(normalizeExpediente) as Promise<Expediente>,
     enabled: id != null,
   })
 
 export const useApelaciones = (q?: Query) =>
   useQuery({
     queryKey: gobKeys.apelaciones(q),
-    queryFn: () => GobiernoService.apelaciones(q) as Promise<Paged<Apelacion>>,
+    queryFn: () =>
+      GobiernoService.apelaciones(q).then((d) => mapPaged(d, normalizeApelacion)) as Promise<Paged<Apelacion>>,
   })
 
 export const useCenso = (q?: Query) =>
@@ -151,22 +185,27 @@ export const useOficiales = () =>
 export const useAnuncios = (q?: Query) =>
   useQuery({
     queryKey: gobKeys.anuncios(q),
-    queryFn: () => GobiernoService.anuncios(q) as Promise<Paged<Anuncio>>,
+    queryFn: () => GobiernoService.anuncios(q).then((d) => mapPaged(d, normalizeAnuncio)) as Promise<Paged<Anuncio>>,
   })
 
 export const useAuditoria = (q?: Query) =>
   useQuery({
     queryKey: gobKeys.auditoria(q),
-    queryFn: () => GobiernoService.auditoria(q) as Promise<Paged<AuditEntry>>,
+    queryFn: () =>
+      GobiernoService.auditoria(q).then((d) => mapPaged(d, normalizeAuditEntry)) as Promise<Paged<AuditEntry>>,
   })
 
 export const useEventos = (q?: Query) =>
-  useQuery({ queryKey: gobKeys.eventos(q), queryFn: () => GobiernoService.eventos(q) as Promise<Evento[]> })
+  useQuery({
+    queryKey: gobKeys.eventos(q),
+    queryFn: () =>
+      GobiernoService.eventos(q).then((d) => (Array.isArray(d) ? d.map(normalizeEvento) : d)) as Promise<Evento[]>,
+  })
 
 export const useEvento = (id: number | null) =>
   useQuery({
     queryKey: gobKeys.evento(id ?? 0),
-    queryFn: () => GobiernoService.evento(id as number) as Promise<Evento>,
+    queryFn: () => GobiernoService.evento(id as number).then(normalizeEvento) as Promise<Evento>,
     enabled: id != null,
   })
 
@@ -176,7 +215,10 @@ export const useNpcSkins = () =>
 export const useMegafonia = (q?: Query) =>
   useQuery({
     queryKey: gobKeys.megafonia(q),
-    queryFn: () => GobiernoService.megafonia(q) as Promise<MegafoniaEntry[]>,
+    queryFn: () =>
+      GobiernoService.megafonia(q).then(
+        (d) => (Array.isArray(d) ? d.map(normalizeMegafoniaEntry) : d),
+      ) as Promise<MegafoniaEntry[]>,
   })
 
 export const useCarteles = () =>
@@ -209,45 +251,45 @@ function useGobMutation<TArgs, TData>(
 }
 
 export const useCreateDenuncia = () =>
-  useGobMutation<unknown, Denuncia>((b) => GobiernoService.createDenuncia(b), {
+  useGobMutation<unknown, Denuncia>((b) => GobiernoService.createDenuncia(b).then(normalizeDenuncia), {
     keys: [["gob", "denuncias"]],
     success: (d) => `Denuncia ${d.code} registrada`,
   })
 
 export const useResolveDenuncia = () =>
   useGobMutation<{ id: number; resolution: string; status: string }, Denuncia>(
-    ({ id, ...b }) => GobiernoService.resolveDenuncia(id, b),
+    ({ id, ...b }) => GobiernoService.resolveDenuncia(id, b).then(normalizeDenuncia),
     { keys: [["gob", "denuncias"]], success: (d) => `Denuncia ${d.code} resuelta` },
   )
 
 export const useCreateMulta = () =>
-  useGobMutation<unknown, Multa>((b) => GobiernoService.createMulta(b), {
+  useGobMutation<unknown, Multa>((b) => GobiernoService.createMulta(b).then(normalizeMulta), {
     keys: [["gob", "multas"]],
     success: (m) => `Multa ${m.code} emitida`,
   })
 
 export const usePayMulta = () =>
-  useGobMutation<number, Multa>((id) => GobiernoService.payMulta(id), {
+  useGobMutation<number, Multa>((id) => GobiernoService.payMulta(id).then(normalizeMulta), {
     keys: [["gob", "multas"], ["gob", "apelaciones"]],
     money: true,
     success: (m) => `Multa ${m.code} pagada a la Tesorería`,
   })
 
 export const useCancelMulta = () =>
-  useGobMutation<number, Multa>((id) => GobiernoService.cancelMulta(id), {
+  useGobMutation<number, Multa>((id) => GobiernoService.cancelMulta(id).then(normalizeMulta), {
     keys: [["gob", "multas"]],
     success: (m) => `Multa ${m.code} anulada`,
   })
 
 export const useCreateBuscado = () =>
-  useGobMutation<unknown, Buscado>((b) => GobiernoService.createBuscado(b), {
+  useGobMutation<unknown, Buscado>((b) => GobiernoService.createBuscado(b).then(normalizeBuscado), {
     keys: [["gob", "buscados"]],
     success: (b) => `${b.player.username} añadido a busca y captura`,
   })
 
 export const useCaptureBuscado = () =>
   useGobMutation<{ id: number; capturedBy: string }, Buscado>(
-    ({ id, ...b }) => GobiernoService.captureBuscado(id, b),
+    ({ id, ...b }) => GobiernoService.captureBuscado(id, b).then(normalizeBuscado),
     {
       keys: [["gob", "buscados"]],
       money: true,
@@ -256,19 +298,19 @@ export const useCaptureBuscado = () =>
   )
 
 export const useCreateSubasta = () =>
-  useGobMutation<unknown, Subasta>((b) => GobiernoService.createSubasta(b), {
+  useGobMutation<unknown, Subasta>((b) => GobiernoService.createSubasta(b).then(normalizeSubasta), {
     keys: [["gob", "subastas"], ["gob", "parcelas"]],
     success: (s) => `Subasta ${s.code} abierta`,
   })
 
 export const usePuja = () =>
   useGobMutation<{ id: number; uuid: string; amount: number }, Subasta>(
-    ({ id, ...b }) => GobiernoService.puja(id, b),
+    ({ id, ...b }) => GobiernoService.puja(id, b).then(normalizeSubasta),
     { keys: [["gob", "subastas"]], success: (s) => `Puja registrada · ${s.code}` },
   )
 
 export const useCloseSubasta = () =>
-  useGobMutation<number, Subasta>((id) => GobiernoService.closeSubasta(id), {
+  useGobMutation<number, Subasta>((id) => GobiernoService.closeSubasta(id).then(normalizeSubasta), {
     keys: [["gob", "subastas"], ["gob", "parcelas"]],
     money: true,
     success: (s) => `Subasta ${s.code} adjudicada`,
@@ -276,7 +318,7 @@ export const useCloseSubasta = () =>
 
 export const useResolveApelacion = () =>
   useGobMutation<{ id: number; outcome: "upheld" | "overturned"; decision: string }, Apelacion>(
-    ({ id, ...b }) => GobiernoService.resolveApelacion(id, b),
+    ({ id, ...b }) => GobiernoService.resolveApelacion(id, b).then(normalizeApelacion),
     {
       keys: [["gob", "apelaciones"], ["gob", "multas"]],
       money: true,
@@ -285,7 +327,7 @@ export const useResolveApelacion = () =>
   )
 
 export const useCreateExpediente = () =>
-  useGobMutation<unknown, Expediente>((b) => GobiernoService.createExpediente(b), {
+  useGobMutation<unknown, Expediente>((b) => GobiernoService.createExpediente(b).then(normalizeExpediente), {
     keys: [["gob", "expedientes"]],
     success: (e) => `Expediente ${e.code} abierto`,
   })
@@ -310,37 +352,37 @@ export const useUpdateZona = () =>
 
 export const useUpdateParcela = () =>
   useGobMutation<{ regionId: string; [k: string]: unknown }, Parcela>(
-    ({ regionId, ...b }) => GobiernoService.updateParcela(regionId, b),
+    ({ regionId, ...b }) => GobiernoService.updateParcela(regionId, b).then(normalizeParcela),
     { keys: [["gob", "parcelas"], ["gob", "zonas"]], success: () => "Parcela actualizada" },
   )
 
 export const useAddBitacora = () =>
-  useGobMutation<unknown, BitacoraEntry>((b) => GobiernoService.addBitacora(b), {
+  useGobMutation<unknown, BitacoraEntry>((b) => GobiernoService.addBitacora(b).then(normalizeBitacoraEntry), {
     keys: [["gob", "bitacora"], ["gob", "patrullas"]],
     success: () => "Anotación registrada en la bitácora",
   })
 
 export const useCreatePatrulla = () =>
-  useGobMutation<unknown, Patrulla>((b) => GobiernoService.createPatrulla(b), {
+  useGobMutation<unknown, Patrulla>((b) => GobiernoService.createPatrulla(b).then(normalizePatrulla), {
     keys: [["gob", "patrullas"]],
     success: (p) => `Turno «${p.label}» creado`,
   })
 
 export const useUpdatePatrulla = () =>
   useGobMutation<{ id: number; [k: string]: unknown }, Patrulla>(
-    ({ id, ...b }) => GobiernoService.updatePatrulla(id, b),
+    ({ id, ...b }) => GobiernoService.updatePatrulla(id, b).then(normalizePatrulla),
     { keys: [["gob", "patrullas"]], success: (p) => `Turno «${p.label}» actualizado` },
   )
 
 export const useCreateAnuncio = () =>
-  useGobMutation<unknown, Anuncio>((b) => GobiernoService.createAnuncio(b), {
+  useGobMutation<unknown, Anuncio>((b) => GobiernoService.createAnuncio(b).then(normalizeAnuncio), {
     keys: [["gob", "anuncios"]],
     success: (a) => `«${a.title}» publicado`,
   })
 
 export const useUpdateAnuncio = () =>
   useGobMutation<{ id: number; [k: string]: unknown }, Anuncio>(
-    ({ id, ...b }) => GobiernoService.updateAnuncio(id, b),
+    ({ id, ...b }) => GobiernoService.updateAnuncio(id, b).then(normalizeAnuncio),
     { keys: [["gob", "anuncios"]], success: () => "Anuncio actualizado" },
   )
 
@@ -351,16 +393,16 @@ export const useDeleteAnuncio = () =>
   })
 
 export const useCreateEvento = () =>
-  useGobMutation<unknown, Evento>((b) => GobiernoService.createEvento(b), {
+  useGobMutation<unknown, Evento>((b) => GobiernoService.createEvento(b).then(normalizeEvento), {
     keys: [["gob", "eventos"]],
     success: (e) => `Evento ${e.code} creado`,
   })
 
 export const useUpdateEvento = () =>
-  useGobMutation<{ id: number; [k: string]: unknown }, Evento>(({ id, ...b }) => GobiernoService.updateEvento(id, b), {
-    keys: [["gob", "eventos"], ["gob", "evento"]],
-    success: () => "Evento actualizado",
-  })
+  useGobMutation<{ id: number; [k: string]: unknown }, Evento>(
+    ({ id, ...b }) => GobiernoService.updateEvento(id, b).then(normalizeEvento),
+    { keys: [["gob", "eventos"], ["gob", "evento"]], success: () => "Evento actualizado" },
+  )
 
 export const useCreateObra = () =>
   useGobMutation<{ eventoId: number; [k: string]: unknown }, unknown>(

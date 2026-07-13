@@ -84,7 +84,11 @@ const DIR_ICON: Record<string, IconName> = {
   right: "arrowRight",
 }
 
+/** Edit-time form state: `dist` is the raw <Field> string, converted to number on save. */
 export type CartelDestinationInput = { dest: string; dist: string; dir: string }
+
+/** What the sign can render: form input (string dist) or a saved wire row (number dist). */
+export type CartelDestinationDisplay = { dest: string; dist: string | number; dir: string }
 
 export function HighwaySign({
   type = "autopista",
@@ -95,7 +99,7 @@ export function HighwaySign({
 }: {
   type?: string
   highway?: string
-  destinations?: CartelDestinationInput[]
+  destinations?: CartelDestinationDisplay[]
   unit?: string
   width?: number
 }) {

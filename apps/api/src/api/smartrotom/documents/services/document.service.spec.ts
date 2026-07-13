@@ -7,7 +7,7 @@ const mockRepo = {
   findUserDocuments: jest.fn(),
   createDocument: jest.fn(),
   updateDocument: jest.fn(),
-  deleteDocument: jest.fn(),
+  softDeleteDocument: jest.fn(),
 };
 
 const mockDocument = {
@@ -172,12 +172,12 @@ describe('DocumentService', () => {
   // ─── deleteDocument ───────────────────────────────────────────────────────────
 
   describe('deleteDocument()', () => {
-    it('deletes existing document', async () => {
+    it('soft-deletes existing document', async () => {
       mockRepo.findDocumentById.mockResolvedValue(mockDocument);
-      mockRepo.deleteDocument.mockResolvedValue(undefined);
+      mockRepo.softDeleteDocument.mockResolvedValue(undefined);
 
       await expect(service.deleteDocument(1)).resolves.toBeUndefined();
-      expect(mockRepo.deleteDocument).toHaveBeenCalledWith(1);
+      expect(mockRepo.softDeleteDocument).toHaveBeenCalledWith(1);
     });
 
     it('throws when document not found', async () => {
@@ -186,7 +186,7 @@ describe('DocumentService', () => {
       await expect(service.deleteDocument(99)).rejects.toThrow(
         'Document not found',
       );
-      expect(mockRepo.deleteDocument).not.toHaveBeenCalled();
+      expect(mockRepo.softDeleteDocument).not.toHaveBeenCalled();
     });
   });
 

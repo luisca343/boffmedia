@@ -26,6 +26,15 @@ export interface ModalShellProps {
   className?: string
   closeOnScrim?: boolean
   closeOnEscape?: boolean
+  /**
+   * Exit-animation support: pass `open` (instead of conditionally rendering the
+   * shell) together with `exitDurationMs`, and the shell defers unmount that long
+   * after `open` flips false. Scrim and panel carry `data-state="open"|"closed"`,
+   * so skins declare exits as `data-[state=closed]:animate-out …` classes.
+   * Omitted (default), the shell unmounts immediately — the legacy behavior.
+   */
+  open?: boolean
+  exitDurationMs?: number
   children: ReactNode
 }
 
@@ -42,20 +51,39 @@ export function ModalShell({
   className,
   closeOnScrim = true,
   closeOnEscape = true,
+  open = true,
+  exitDurationMs = 0,
   children,
 }: ModalShellProps) {
   const panel = useRef<HTMLDivElement>(null)
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
 
+  // Deferred unmount: stay present for exitDurationMs after `open` flips false
+  // so the closed-state animation can play.
+  const [present, setPresent] = useState(open)
   useEffect(() => {
-    if (!closeOnEscape) return
+    if (open) {
+      setPresent(true)
+      return
+    }
+    if (!exitDurationMs) {
+      setPresent(false)
+      return
+    }
+    const t = setTimeout(() => setPresent(false), exitDurationMs)
+    return () => clearTimeout(t)
+  }, [open, exitDurationMs])
+  const closing = !open && present
+
+  useEffect(() => {
+    if (!closeOnEscape || !open) return
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose()
     }
     document.addEventListener("keydown", onKey)
     return () => document.removeEventListener("keydown", onKey)
-  }, [closeOnEscape, onClose])
+  }, [closeOnEscape, onClose, open])
 
   useEffect(() => {
     const prev = document.body.style.overflow
@@ -94,7 +122,7 @@ export function ModalShell({
     }
   }, [])
 
-  if (!mounted) return null
+  if (!mounted || !present) return null
 
   return createPortal(
     <ThemedLayer scope={scope}>
@@ -102,9 +130,10 @@ export function ModalShell({
         // mousedown, not click: a drag that starts inside the panel and ends
         // on the scrim would otherwise close the modal.
         onMouseDown={(e) => {
-          if (closeOnScrim && e.target === e.currentTarget) onClose()
+          if (closeOnScrim && open && e.target === e.currentTarget) onClose()
         }}
-        className={`fixed inset-0 ${scrimClassName ?? ""}`}
+        data-state={closing ? "closed" : "open"}
+        className={`fixed inset-0 ${closing ? "pointer-events-none" : ""} ${scrimClassName ?? ""}`}
       >
         <div
           ref={panel}
@@ -113,6 +142,7 @@ export function ModalShell({
           aria-label={label}
           tabIndex={-1}
           onKeyDown={onKeyDown}
+          data-state={closing ? "closed" : "open"}
           className={className}
         >
           {children}
