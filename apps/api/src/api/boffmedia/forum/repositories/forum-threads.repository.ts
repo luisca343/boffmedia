@@ -294,11 +294,7 @@ export class ForumThreadsRepository {
       .where(eq(boffMediaForumThreads.id, threadId));
   }
 
-  async setLastPost(
-    threadId: number,
-    at: Date,
-    userId: number,
-  ): Promise<void> {
+  async setLastPost(threadId: number, at: Date, userId: number): Promise<void> {
     await this.db
       .update(boffMediaForumThreads)
       .set({ lastPostAt: at, lastPostUserId: userId })

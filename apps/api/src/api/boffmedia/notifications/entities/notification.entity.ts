@@ -16,7 +16,10 @@ export class NotificationEntity {
   @ApiProperty({ example: 'Nuevo evento disponible' })
   title: string;
 
-  @ApiProperty({ nullable: true, example: 'El torneo de verano ya está abierto.' })
+  @ApiProperty({
+    nullable: true,
+    example: 'El torneo de verano ya está abierto.',
+  })
   body: string | null;
 
   @ApiProperty({ nullable: true, example: '/eventos/12' })

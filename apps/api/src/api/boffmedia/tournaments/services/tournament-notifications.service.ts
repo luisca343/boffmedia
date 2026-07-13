@@ -102,7 +102,12 @@ export class TournamentNotificationsService {
         if (pid == null) continue;
         const p = await this.repo.findParticipant(pid);
         if (p?.userId != null) {
-          await this.notifyUser(p.userId, 'Tu partida está lista', t.name, link);
+          await this.notifyUser(
+            p.userId,
+            'Tu partida está lista',
+            t.name,
+            link,
+          );
         }
       }
     } catch {

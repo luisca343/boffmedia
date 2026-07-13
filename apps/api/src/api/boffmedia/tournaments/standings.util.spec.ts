@@ -34,13 +34,25 @@ function match(part: Partial<TournamentMatch>): TournamentMatch {
 }
 /** a beats b, 1-0. */
 const win = (a: number, b: number, extra: Partial<TournamentMatch> = {}) =>
-  match({ topParticipantId: a, botParticipantId: b, winnerParticipantId: a, topScore: 1, botScore: 0, ...extra });
+  match({
+    topParticipantId: a,
+    botParticipantId: b,
+    winnerParticipantId: a,
+    topScore: 1,
+    botScore: 0,
+    ...extra,
+  });
 const rankOf = (rows: { participantId: number; rank: number }[], id: number) =>
   rows.find((r) => r.participantId === id)!.rank;
 
 describe('computeStandings', () => {
   it('counts a bye as a 3-point win that also counts as played', () => {
-    const bye = match({ status: 'bye', topParticipantId: 1, botParticipantId: null, winnerParticipantId: 1 });
+    const bye = match({
+      status: 'bye',
+      topParticipantId: 1,
+      botParticipantId: null,
+      winnerParticipantId: 1,
+    });
     const rows = computeStandings([1, 2], [bye]);
     const p1 = rows.find((r) => r.participantId === 1)!;
     expect(p1.pts).toBe(3);
@@ -52,7 +64,16 @@ describe('computeStandings', () => {
   it('awards 3 for a win, 1 each for a draw, 0 for a loss', () => {
     const rows = computeStandings(
       [1, 2, 3, 4],
-      [win(1, 2), match({ topParticipantId: 3, botParticipantId: 4, winnerParticipantId: null, topScore: 1, botScore: 1 })],
+      [
+        win(1, 2),
+        match({
+          topParticipantId: 3,
+          botParticipantId: 4,
+          winnerParticipantId: null,
+          topScore: 1,
+          botScore: 1,
+        }),
+      ],
     );
     expect(rows.find((r) => r.participantId === 1)!.pts).toBe(3);
     expect(rows.find((r) => r.participantId === 2)!.pts).toBe(0);

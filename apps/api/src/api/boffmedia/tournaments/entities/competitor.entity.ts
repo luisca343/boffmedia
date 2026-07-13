@@ -32,7 +32,10 @@ export class Competitor {
   @ApiProperty({ nullable: true, description: 'ISO alpha-2 country code.' })
   country: string | null;
 
-  @ApiProperty({ nullable: true, description: 'Emoji flag derived from country.' })
+  @ApiProperty({
+    nullable: true,
+    description: 'Emoji flag derived from country.',
+  })
   flag: string | null;
 
   @ApiProperty({ nullable: true })
@@ -53,7 +56,9 @@ export class Competitor {
   @ApiProperty({ nullable: true, description: 'Leaderboard-format score.' })
   score: number | null;
 
-  @ApiProperty({ description: 'Leaderboard-format: entry verified by an admin.' })
+  @ApiProperty({
+    description: 'Leaderboard-format: entry verified by an admin.',
+  })
   verified: boolean;
 
   @ApiProperty({ type: [RosterMember], required: false })

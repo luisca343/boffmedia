@@ -66,7 +66,9 @@ export class StandingsService {
     viewerUserId?: number,
   ): Promise<TournamentDetail> {
     const participants = await this.repo.listParticipants(t.id);
-    const teamIds = participants.filter((p) => p.kind === 'team').map((p) => p.id);
+    const teamIds = participants
+      .filter((p) => p.kind === 'team')
+      .map((p) => p.id);
     const rosterRows = await this.repo.listRoster(teamIds);
     const rosterByParticipant = new Map<number, typeof rosterRows>();
     for (const r of rosterRows) {
@@ -105,16 +107,16 @@ export class StandingsService {
 
     const viewerParticipant =
       viewerUserId != null
-        ? participants.find((p) => p.userId === viewerUserId) ?? null
+        ? (participants.find((p) => p.userId === viewerUserId) ?? null)
         : null;
     const myMatch =
       viewerParticipant && t.status === 'live'
-        ? matches.find(
+        ? (matches.find(
             (m) =>
               (m.status === 'ready' || m.status === 'live') &&
               (m.topParticipantId === viewerParticipant.id ||
                 m.botParticipantId === viewerParticipant.id),
-          ) ?? null
+          ) ?? null)
         : null;
 
     return {
@@ -144,7 +146,7 @@ export class StandingsService {
       endDate: t.endDate ? t.endDate.toISOString() : null,
       champion:
         t.championParticipantId != null
-          ? cmap.get(t.championParticipantId) ?? null
+          ? (cmap.get(t.championParticipantId) ?? null)
           : null,
       participants: participants.map((p) => cmap.get(p.id)!),
       viewerParticipantId: viewerParticipant
@@ -185,7 +187,11 @@ export class StandingsService {
     const fmt = final?.format ?? t.format;
     const hasKnockout = phMatches.some((m) => m.bracket === 'winners');
 
-    if (fmt === 'single' || fmt === 'double' || (t.format === 'groups' && hasKnockout)) {
+    if (
+      fmt === 'single' ||
+      fmt === 'double' ||
+      (t.format === 'groups' && hasKnockout)
+    ) {
       const grand = phMatches.find(
         (m) => m.bracket === 'grand' && m.status === 'completed',
       );
@@ -371,7 +377,12 @@ export class StandingsService {
           done: gMatches.filter((m) => m.status === 'completed').length,
           total: gMatches.length,
           advance: g.advanceCount,
-          standings: this.tableOf(memberIds, gMatches, cmap, ph.tiebreakProfile),
+          standings: this.tableOf(
+            memberIds,
+            gMatches,
+            cmap,
+            ph.tiebreakProfile,
+          ),
         };
       }),
       knockout: null,
@@ -527,26 +538,33 @@ export class StandingsService {
     cmap: Map<number, Competitor>,
     ctx: MatchCtx,
   ): MatchView {
-    const phase = m.phaseId != null ? ctx.phaseById.get(m.phaseId) ?? null : null;
+    const phase =
+      m.phaseId != null ? (ctx.phaseById.get(m.phaseId) ?? null) : null;
     return {
       id: m.id,
       bracket: m.bracket,
       roundNumber: m.roundNumber,
       position: m.position,
-      top: m.topParticipantId != null ? cmap.get(m.topParticipantId) ?? null : null,
-      bot: m.botParticipantId != null ? cmap.get(m.botParticipantId) ?? null : null,
+      top:
+        m.topParticipantId != null
+          ? (cmap.get(m.topParticipantId) ?? null)
+          : null,
+      bot:
+        m.botParticipantId != null
+          ? (cmap.get(m.botParticipantId) ?? null)
+          : null,
       g1: m.topScore,
       g2: m.botScore,
       status: m.status,
       winner:
         m.winnerParticipantId != null
-          ? cmap.get(m.winnerParticipantId) ?? null
+          ? (cmap.get(m.winnerParticipantId) ?? null)
           : null,
       bestOf: effectiveBestOf(
         m,
         phase,
         ctx.tBestOf,
-        m.phaseId != null ? ctx.maxWinnersRound.get(m.phaseId) ?? 0 : 0,
+        m.phaseId != null ? (ctx.maxWinnersRound.get(m.phaseId) ?? 0) : 0,
       ),
       scheduledAt: m.scheduledAt ? m.scheduledAt.toISOString() : null,
       proposalState: m.proposalState,
@@ -596,7 +614,7 @@ export class StandingsService {
     cmap: Map<number, Competitor>,
   ): CrosstableData {
     const idx = new Map(orderedIds.map((id, i) => [id, i]));
-    const grid: (CrosstableData['grid'][number][number])[][] = orderedIds.map(
+    const grid: CrosstableData['grid'][number][number][][] = orderedIds.map(
       () => orderedIds.map(() => null),
     );
     for (const m of matches) {

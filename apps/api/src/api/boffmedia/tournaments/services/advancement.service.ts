@@ -70,9 +70,7 @@ export class AdvancementService {
 
     // 1. Every match of this phase must be resolved (and all swiss rounds run).
     if (
-      phaseMatches.some(
-        (m) => m.status !== 'completed' && m.status !== 'bye',
-      )
+      phaseMatches.some((m) => m.status !== 'completed' && m.status !== 'bye')
     ) {
       throw new BadRequestException(
         'Finish every match in the current phase first',
@@ -268,7 +266,10 @@ export class AdvancementService {
     return out;
   }
 
-  private selectQualifiers(phase: TournamentPhase, standings: Ranked[]): Ranked[] {
+  private selectQualifiers(
+    phase: TournamentPhase,
+    standings: Ranked[],
+  ): Ranked[] {
     switch (phase.advanceType) {
       case 'top_n':
         return standings.slice(0, phase.advanceCount ?? standings.length);

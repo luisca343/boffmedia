@@ -222,7 +222,10 @@ export class ForumPostsRepository {
           isNull(boffMediaForumPosts.deletedAt),
         ),
       )
-      .orderBy(desc(boffMediaForumPosts.createdAt), desc(boffMediaForumPosts.id))
+      .orderBy(
+        desc(boffMediaForumPosts.createdAt),
+        desc(boffMediaForumPosts.id),
+      )
       .limit(1);
     return rows.length ? (rows[0] as PostState) : null;
   }

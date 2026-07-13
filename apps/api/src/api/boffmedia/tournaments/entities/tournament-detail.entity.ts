@@ -24,13 +24,17 @@ export class TournamentDetail {
   @ApiProperty()
   name: string;
 
-  @ApiProperty({ enum: ['single', 'double', 'groups', 'roundrobin', 'swiss', 'leaderboard'] })
+  @ApiProperty({
+    enum: ['single', 'double', 'groups', 'roundrobin', 'swiss', 'leaderboard'],
+  })
   format: TournamentFormat;
 
   @ApiProperty({ enum: ['solo', 'team', 'entry'] })
   competitorKind: CompetitorKind;
 
-  @ApiProperty({ enum: ['draft', 'registration', 'live', 'completed', 'cancelled'] })
+  @ApiProperty({
+    enum: ['draft', 'registration', 'live', 'completed', 'cancelled'],
+  })
   status: TournamentStatus;
 
   @ApiProperty({ enum: ['score', 'time'], nullable: true })
@@ -119,7 +123,8 @@ export class TournamentDetail {
 
   @ApiProperty({
     nullable: true,
-    description: 'Id of the phase the UI should default to (live / last played).',
+    description:
+      'Id of the phase the UI should default to (live / last played).',
   })
   activePhaseId: number | null;
 

@@ -1,7 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class MonsterEntity {
-  @ApiProperty({ example: 12, description: 'Unique identifier for the monster' })
+  @ApiProperty({
+    example: 12,
+    description: 'Unique identifier for the monster',
+  })
   id: number;
 
   @ApiProperty({ example: 'Rathalos', description: 'Name of the monster' })
@@ -25,7 +28,9 @@ export class MonsterEntity {
   @ApiProperty({ required: false, description: 'Base health at low rank' })
   baseHealth?: number;
 
-  @ApiProperty({ description: 'Size thresholds (base/mini/silver/gold crowns)' })
+  @ApiProperty({
+    description: 'Size thresholds (base/mini/silver/gold crowns)',
+  })
   size: Record<string, number>;
 
   @ApiProperty({
@@ -37,13 +42,19 @@ export class MonsterEntity {
   @ApiProperty({ description: 'Elemental / effect resistances', isArray: true })
   resistances: unknown[];
 
-  @ApiProperty({ description: 'Ailments the monster can inflict', isArray: true })
+  @ApiProperty({
+    description: 'Ailments the monster can inflict',
+    isArray: true,
+  })
   ailments: unknown[];
 
   @ApiProperty({ description: 'Elements the monster uses', isArray: true })
   elements: string[];
 
-  @ApiProperty({ description: 'Locations where the monster appears', isArray: true })
+  @ApiProperty({
+    description: 'Locations where the monster appears',
+    isArray: true,
+  })
   locations: unknown[];
 
   @ApiProperty({ description: 'Carve / capture / reward drops', isArray: true })

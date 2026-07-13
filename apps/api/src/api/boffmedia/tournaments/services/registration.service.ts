@@ -71,7 +71,10 @@ export class RegistrationService {
       throw new ForbiddenException('Registration is closed');
     }
 
-    const existing = await this.repo.findParticipantByUser(tournamentId, userId);
+    const existing = await this.repo.findParticipantByUser(
+      tournamentId,
+      userId,
+    );
     if (existing) throw new ConflictException('Already registered');
 
     if (t.maxParticipants != null) {
@@ -102,7 +105,10 @@ export class RegistrationService {
   ): Promise<{ success: boolean }> {
     const t = await this.repo.findById(tournamentId);
     if (!t) throw new NotFoundException('Tournament not found');
-    const existing = await this.repo.findParticipantByUser(tournamentId, userId);
+    const existing = await this.repo.findParticipantByUser(
+      tournamentId,
+      userId,
+    );
     if (!existing) throw new NotFoundException('Not registered');
     if (t.status !== 'registration' && t.status !== 'draft') {
       throw new BadRequestException(
