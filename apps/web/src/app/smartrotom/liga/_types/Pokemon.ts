@@ -1,16 +1,8 @@
+import type { PokemonW } from "@boffmedia/shared"
 
-export interface PokemonData {
-    dex: number;
-    nature: string;
-    species: string;
-    form: string;
-    palette: string;
-    name: string;
-    level: number;
-    item: string;
-    ability: string;
-    moves: string[];
-    ivs: number[];
-    evs: number[];
-    stats: number[];
+// `form`/`palette` narrow the wire's optional fields to required — every capture this app
+// reads off already carries both (even if empty), never absent.
+export interface PokemonData extends Omit<PokemonW, "form" | "palette"> {
+  form: string
+  palette: string
 }

@@ -1,33 +1,16 @@
-export interface HeldItem {
-  itemID: string;
-  percentChance: number;
-}
+import type { HeldItem, SpawnCondition, SpawnInfo as SharedSpawnInfo } from "@boffmedia/shared"
 
-export interface Condition {
-  times: string[];
-  stringBiomes: string[];
-  maxY?: number;
-  minY?: number;
-}
+export type { HeldItem }
 
-export interface SpawnInfo {
-  spec: string;
-  stringLocationTypes: string[];
-  minLevel: number;
-  maxLevel: number;
-  typeID: string;
-  heldItems: HeldItem[];
-  condition: Condition;
-  rarity: number;
+// Real drift, fixed here: the wire's `SpawnCondition` has no `maxY`/`minY` at all (only
+// `times?`/`weathers?`/`stringBiomes`) — this type invented them, so `SpawnTable.tsx`'s height
+// badge (`spawn.condition?.minY`) was always `undefined` and never rendered. The dead branch was
+// removed there rather than kept pointed at data the API doesn't send.
+export type Condition = SpawnCondition
 
-  spawnType: string;
-  pokemonName: string;
-  pokemonForm: string;
-  pokemonPalette: string;
-  pokemonDex: number;
-  gender: string;
-
-  spriteUrl: string;
+export interface SpawnInfo extends SharedSpawnInfo {
+  /** Computed client-side (`getSpriteUrl`), never sent by the API. */
+  spriteUrl?: string
 }
 
 export interface Pokemon {
