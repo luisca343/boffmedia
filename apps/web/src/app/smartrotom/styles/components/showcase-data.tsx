@@ -183,9 +183,123 @@ export const CHAPTERS: Chapter[] = [
       { id: "mw-chat", label: "Chat" },
     ],
   },
+
+  // ── Taxi · tx-* ────────────────────────────────────────────────────────────
+  {
+    name: "Bases",
+    dom: "Taxi",
+    app: "tx",
+    sections: [
+      { id: "tx-color", label: "Color" },
+      { id: "tx-tipografia", label: "Tipografía" },
+      { id: "tx-geometria", label: "Geometría" },
+    ],
+  },
+  {
+    name: "Primitivas",
+    dom: "Taxi",
+    app: "tx",
+    sections: [
+      { id: "tx-botones", label: "Botones" },
+      { id: "tx-chips", label: "Chips y píldoras" },
+      { id: "tx-formularios", label: "Búsqueda y controles" },
+      { id: "tx-datos", label: "Cifras" },
+      { id: "tx-estados", label: "Vacíos y carga" },
+    ],
+  },
+  {
+    name: "Viaje",
+    dom: "Taxi",
+    app: "tx",
+    sections: [
+      { id: "tx-mapa", label: "Mapa" },
+      { id: "tx-destinos", label: "Destinos" },
+      { id: "tx-pago", label: "Pago y llegada" },
+      { id: "tx-diferido", label: "Diferido" },
+    ],
+  },
+
+  // ── Arcade · ar-* ──────────────────────────────────────────────────────────
+  {
+    name: "Bases",
+    dom: "Arcade",
+    app: "ar",
+    sections: [
+      { id: "ar-color", label: "Color" },
+      { id: "ar-tipografia", label: "Tipografía" },
+      { id: "ar-crt", label: "Capa CRT" },
+    ],
+  },
+  {
+    name: "Primitivas",
+    dom: "Arcade",
+    app: "ar",
+    sections: [
+      { id: "ar-botones", label: "Botones" },
+      { id: "ar-etiquetas", label: "Etiquetas" },
+      { id: "ar-paneles", label: "Paneles" },
+      { id: "ar-controles", label: "Controles" },
+      { id: "ar-progreso", label: "Progreso y cifras" },
+      { id: "ar-estados", label: "Carga" },
+    ],
+  },
+  {
+    name: "Cabina",
+    dom: "Arcade",
+    app: "ar",
+    sections: [
+      { id: "ar-rarezas", label: "Rarezas" },
+      { id: "ar-cabinas", label: "Cabinas" },
+      { id: "ar-recompensa", label: "Recompensa" },
+      { id: "ar-diferido", label: "Diferido" },
+    ],
+  },
+
+  // ── Misiones · ms-* ────────────────────────────────────────────────────────
+  {
+    name: "Bases",
+    dom: "Misiones",
+    app: "ms",
+    sections: [
+      { id: "ms-color", label: "Color" },
+      { id: "ms-tipografia", label: "Tipografía" },
+      { id: "ms-materiales", label: "Materiales" },
+    ],
+  },
+  {
+    name: "Primitivas",
+    dom: "Misiones",
+    app: "ms",
+    sections: [
+      { id: "ms-sellos", label: "Sellos y chinchetas" },
+      { id: "ms-ornamento", label: "Ornamento" },
+      { id: "ms-controles", label: "Controles" },
+      { id: "ms-recortes", label: "Recortes del corcho" },
+    ],
+  },
+  {
+    name: "Tablón",
+    dom: "Misiones",
+    app: "ms",
+    sections: [
+      { id: "ms-papeles", label: "Papeles" },
+      { id: "ms-botin", label: "Botín" },
+      { id: "ms-cadena", label: "Cadena" },
+    ],
+  },
 ]
 
-export const DOMAIN_ORDER = ["Sistema", "Starbank", "ChatApp", "Notas", "Pokédex", "Media"]
+export const DOMAIN_ORDER = [
+  "Sistema",
+  "Starbank",
+  "ChatApp",
+  "Notas",
+  "Pokédex",
+  "Media",
+  "Taxi",
+  "Arcade",
+  "Misiones",
+]
 
 // Chapter names repeat across domains ("Bases" exists six times), so a chapter's
 // identity is domain + name — not name alone.
@@ -204,4 +318,7 @@ export const DOMAIN_META: Record<string, { ns: string; note: string }> = {
   Notas: { ns: "nt-*", note: "Notas enlazadas · oscuro por defecto" },
   Pokédex: { ns: "pk-*", note: "Gaming · oscuro" },
   Media: { ns: "mw-*", note: "Un sistema, dos acentos" },
+  Taxi: { ns: "tx-*", note: "Movilidad · azul estructura, ámbar dinero" },
+  Arcade: { ns: "ar-*", note: "Synthwave CRT · oscuro, cinco neones" },
+  Misiones: { ns: "ms-*", note: "Taberna · pergamino y cera, oscuro" },
 }

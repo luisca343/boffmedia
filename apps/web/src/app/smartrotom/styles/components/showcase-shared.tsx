@@ -26,7 +26,7 @@ export const sideLink =
 // bare would show unresolved CSS vars. `Scope` reproduces the real root from each
 // app's layout — the same classes, so a primitive looks here exactly as it does in
 // the app. `sr` is deliberately a no-op: the chrome has no scope root, it's global.
-export type AppKey = "sr" | "sb" | "ca" | "nt" | "pk" | "mw"
+export type AppKey = "sr" | "sb" | "ca" | "nt" | "pk" | "mw" | "tx" | "ms" | "ar"
 
 // The scope CLASS is what makes an app's tokens resolve: `ca`/`nt`/`mw` are CSS-var
 // backed and their vars are declared on `.ca-app`/`.nt-app`/`.mw-app` base layers, so
@@ -39,6 +39,9 @@ const SCOPE_VARS: Record<AppKey, string> = {
   nt: "nt-app",
   pk: "pk-app",
   mw: "mw-app",
+  tx: "tx-app",
+  ms: "ms-app",
+  ar: "ar-app",
 }
 
 // The SKIN is the app's canvas + fonts + ink, lifted from its real layout root. Kept
@@ -51,6 +54,11 @@ const SCOPE_SKIN: Record<AppKey, string> = {
   nt: "bg-nt-bg font-nt text-nt-fg",
   pk: "bg-pk-surface-950 font-pk text-pk-surface-100 antialiased [font-feature-settings:'ss01','cv11']",
   mw: "bg-mw-bg font-mw text-mw-fg",
+  tx: "bg-tx-bg bg-[image:var(--tx-app-bg)] font-tx text-tx-txt antialiased",
+  // Misiones' canvas is the tavern board itself — cork, wood and lamplight.
+  ms: "ms-tavern font-ms text-ms-ink-1 antialiased",
+  // The Arcade's canvas is the synthwave void: two neon blooms over a violet gradient.
+  ar: "ar-canvas font-ar text-ar-ink antialiased",
 }
 
 export function Scope({
@@ -62,7 +70,7 @@ export function Scope({
   children,
 }: {
   app: AppKey
-  /** ca / nt only — drives the real light/dark token swap. */
+  /** ca / nt / tx only — drives the real light/dark token swap. */
   theme?: "light" | "dark"
   /** mw only — picks the accent (Mewtube pink / Mewtwitch purple). */
   media?: "mewtube" | "mewtwitch"
