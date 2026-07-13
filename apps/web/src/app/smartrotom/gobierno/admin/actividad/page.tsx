@@ -47,7 +47,7 @@ export default function ActividadPage() {
       return (
         e.action.toLowerCase().includes(q) ||
         e.target.toLowerCase().includes(q) ||
-        e.actor.username.toLowerCase().includes(q)
+        (e.actor?.username ?? "").toLowerCase().includes(q)
       )
     }
     return true
@@ -55,7 +55,7 @@ export default function ActividadPage() {
 
   const exportTxt = () => {
     const text = filtered
-      .map((e) => `${fmtDateTime(e.createdAt)} [${e.source}] [${e.dep}] ${e.actor.username} · ${e.action} · ${e.target}`)
+      .map((e) => `${fmtDateTime(e.createdAt)} [${e.source}] [${e.dep}] ${e.actor?.username ?? "Sistema"} · ${e.action} · ${e.target}`)
       .join("\n")
     const blob = new Blob([text], { type: "text/plain" })
     const url = URL.createObjectURL(blob)
@@ -125,8 +125,8 @@ export default function ActividadPage() {
                     </TD>
                     <TD>
                       <div className="flex items-center gap-2">
-                        <Avatar user={e.actor.username} size={22} />
-                        <span className="text-[12.5px] font-bold text-gt-ink-900">{e.actor.username}</span>
+                        <Avatar user={e.actor?.username} size={22} />
+                        <span className="text-[12.5px] font-bold text-gt-ink-900">{e.actor?.username ?? "Sistema"}</span>
                       </div>
                     </TD>
                     <TD className="text-[12.5px]">{e.action}</TD>

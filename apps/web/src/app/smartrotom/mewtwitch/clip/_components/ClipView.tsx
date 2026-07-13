@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useClip } from "../../_hooks/useTwitch"
 import { compactCount } from "../../_utils/twitch"
-import { getTimeSince } from "../../types"
+import { getTimeSince } from "../../_utils/format"
 
 export function ClipView({ id }: { id: string }) {
   const clip = useClip(id)

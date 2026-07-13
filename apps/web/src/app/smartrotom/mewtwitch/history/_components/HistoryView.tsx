@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { Button, SectionHeader } from "@/components/smartrotom/media/ui"
 import { clearHistory, getHistory, type HistoryItem } from "../../_services/historyService"
 import { MEWTWITCH_BASE, compactCount, twitchThumb } from "../../_utils/twitch"
-import { getTimeSince } from "../../types"
+import { getTimeSince } from "../../_utils/format"
 import { VodCard, type VodCardData } from "../../_components/VodCard"
 
 function hrefFor(item: HistoryItem): string {

@@ -1,8 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { ClockIcon, ArrowRightIcon } from "@heroicons/react/24/outline"
-import { useBoffSession } from "@/services/useBoffSession"
+import { ClockIcon, ArrowRightIcon } from "lucide-react"
+import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
 import { useGetRegistries } from "@/hooks/pokemon/useGetRegistries"
 import { usePokemonStore } from "@/stores/pokemonStore"
 import { StatusPill, TypeChip } from "./ui"
@@ -23,8 +23,8 @@ type EnrichedRegistry = {
 }
 
 export function RecentCard() {
-  const { session } = useBoffSession()
-  const { registries, isLoading } = useGetRegistries(session.user.smartRotomUser?.uuid!)
+  const uuid = useRotomUuid()
+  const { registries, isLoading } = useGetRegistries(uuid!)
   const { getPokemonByDex } = usePokemonStore()
   const [enriched, setEnriched] = useState<EnrichedRegistry[]>([])
 

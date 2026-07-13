@@ -3,7 +3,7 @@ import { MAP_CONSTANTS } from '@/components/shared/map/StandardizedMap';
 import type { CoordinateTransformer, Position } from '@/components/shared/map/StandardizedMap';
 import { CompleteMarker } from './CompleteMarker';
 import { BoundaryOverlay } from './BoundaryOverlay';
-import { PiHouse, PiBuilding, PiSparkle } from "react-icons/pi";
+import { House, Building, Sparkles } from "lucide-react";
 import { BaseMarker } from '@/components/shared/map/BaseMarker';
 
 interface MarkerProps {
@@ -57,7 +57,7 @@ export function PropertyMarker({
     >
       <CompleteMarker
         isSelected={isSelected}
-        icon={PiHouse}
+        icon={House}
         label={`#${property.id} - ${property.name}`}
         variant="property"
         colorClaro={colorClaro}
@@ -97,7 +97,7 @@ export function BusinessMarker({
       className="group z-20"
     >
       <CompleteMarker
-        icon={PiBuilding}
+        icon={Building}
         isSelected={isSelected}
         label={`Local #${business.id} - ${business.name}`}
         variant="business"
@@ -131,7 +131,7 @@ export function AmenityMarker({ worldPosition, transformer, amenity, isSelected,
         isSelected={isSelected}
         colorOscuro={colorOscuro}
         label={amenity.name}
-        icon={PiSparkle}
+        icon={Sparkles}
       />
     </MapMarker>
   );

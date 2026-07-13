@@ -11,7 +11,7 @@ import { getSpriteUrl } from "@/utils/spriteUtils"
 import { ScreenShell } from "../../_components/ScreenShell"
 import { StatusPill } from "../../_components/ui"
 import { RARITY_META } from "../../_utils/dexMeta"
-import { ArrowLeftIcon } from "@heroicons/react/24/outline"
+import { ArrowLeftIcon } from "lucide-react"
 import { getTranslatedBiomeName } from "@/utils/pokemonTranslations"
 import { resolveBiome } from "../../_data/biomes"
 

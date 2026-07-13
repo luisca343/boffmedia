@@ -2,14 +2,14 @@
 
 import { PokemonSprite, PokemonSpriteLink } from "./PokemonSprite"
 import { StatusIcon } from "./StatusIcon"
-import { useBoffSession } from "@/services/useBoffSession"
+import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
 import { useGetRegistries } from "@/hooks/pokemon/useGetRegistries"
 import { Loading } from "@/components/smartrotom/Loading"
 
 export function LastRegistries() {
-    const { session } = useBoffSession();
-    const { registries, isLoading } = useGetRegistries(session.user.smartRotomUser?.uuid!);
-    
+    const uuid = useRotomUuid();
+    const { registries, isLoading } = useGetRegistries(uuid!);
+
 
     if (isLoading) {
         return (

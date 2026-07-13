@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from "react"
 import { useRouter } from "next/navigation"
-import { MagnifyingGlassIcon, BoltIcon, FunnelIcon, Cog6ToothIcon } from "@heroicons/react/24/outline"
+import { SearchIcon, ZapIcon, FilterIcon, SettingsIcon } from "lucide-react"
 import { TypeChip, StatusPill } from "./ui"
 import { usePokemonStore } from "@/stores/pokemonStore"
 import { usePokedexData } from "@/hooks/usePokedexData"
@@ -66,7 +66,7 @@ export function HubTopbar() {
   return (
     <div className="flex items-center gap-4 justify-between">
       <div className="relative flex-1 max-w-[540px]">
-        <MagnifyingGlassIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[17px] h-[17px] text-pk-surface-400 pointer-events-none" />
+        <SearchIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[17px] h-[17px] text-pk-surface-400 pointer-events-none" />
         <input
           ref={inputRef}
           type="search"
@@ -145,7 +145,7 @@ export function HubTopbar() {
         )}
       </div>
       <div className="flex gap-2">
-        {[BoltIcon, FunnelIcon, Cog6ToothIcon].map((Icon, i) => (
+        {[ZapIcon, FilterIcon, SettingsIcon].map((Icon, i) => (
           <button
             key={i}
             className="w-9 h-9 bg-white/[0.04] border border-white/[0.08] rounded-[9px] grid place-items-center text-pk-surface-300 hover:text-pk-surface-50 hover:bg-white/[0.07] transition-colors"

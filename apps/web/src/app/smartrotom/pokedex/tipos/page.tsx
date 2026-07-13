@@ -4,7 +4,7 @@ import FullTypeChart from "./_components/FullTypeChart"
 import TypeAnalysis from "./_components/TypeAnalysis"
 import { ScreenShell } from "../_components/ScreenShell"
 import { PageHead } from "../_components/PageHead"
-import { RectangleStackIcon, TableCellsIcon, ScaleIcon } from "@heroicons/react/24/outline"
+import { LayersIcon, TableIcon, ScaleIcon } from "lucide-react"
 
 export default function TiposPage() {
   const [view, setView] = useState<"chart" | "analysis">("chart")
@@ -19,14 +19,14 @@ export default function TiposPage() {
   return (
     <ScreenShell>
       <PageHead
-        icon={RectangleStackIcon}
+        icon={LayersIcon}
         eyebrow="Combate"
         title="Tabla y análisis de tipos"
         desc="Matriz interactiva 18 × 18 (atacante × defensor) y calculadora de tipos duales con desglose por multiplicador."
         meta={
           <div className="flex gap-1 bg-white/[0.02] border border-white/[0.05] rounded-[10px] p-1">
             <button onClick={() => setView("chart")} aria-current={view === "chart" ? "page" : undefined} className={toggle(view === "chart")}>
-              <TableCellsIcon className="w-3.5 h-3.5" />
+              <TableIcon className="w-3.5 h-3.5" />
               Tabla completa
             </button>
             <button onClick={() => setView("analysis")} aria-current={view === "analysis" ? "page" : undefined} className={toggle(view === "analysis")}>
