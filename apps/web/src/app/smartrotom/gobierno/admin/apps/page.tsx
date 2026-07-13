@@ -1,0 +1,159 @@
+"use client"
+
+import { Suspense, useEffect, useState, type ReactNode } from "react"
+import { useSearchParams } from "next/navigation"
+import { Bar, Button, Card, Empty, PageHead, Select, Skeleton } from "../../_components/ui"
+import { ConsolaHero } from "../../_components/admin/ConsolaHero"
+import {
+  useAdminAddApp,
+  useAdminApps,
+  useAdminPlayerApps,
+  useAdminRemoveApp,
+  useAdminUsers,
+  type SmartRotomApp,
+} from "../../_components/admin/adminApi"
+import { useGobiernoUi } from "../../_stores/useGobiernoUi"
+import { useOfficer } from "../../_hooks/useOfficer"
+
+function AppTile({ app, action }: { app: SmartRotomApp; action: ReactNode }) {
+  return (
+    <div className="flex flex-col items-center gap-2 rounded-gt-sm border border-gt-line bg-gt-paper-0 p-3 text-center">
+      <div className="h-[46px] w-[46px] overflow-hidden rounded-[11px] border border-gt-line-strong bg-gt-paper-2">
+        { }
+        <img src={`/smartrotom/img/apps/${app.url}.webp`} alt={app.name} className="h-full w-full object-cover" />
+      </div>
+      <div className="text-[12px] font-bold text-gt-ink-900">{app.name}</div>
+      {action}
+    </div>
+  )
+}
+
+// `useSearchParams` opts its subtree into Suspense at build time — without this boundary
+// `next build` fails even though the route is fully client-rendered.
+export default function AppsPage() {
+  return (
+    <Suspense fallback={<Skeleton className="h-14 w-2/3" />}>
+      <AppsScreen />
+    </Suspense>
+  )
+}
+
+function AppsScreen() {
+  const searchParams = useSearchParams()
+  const presetUuid = searchParams.get("uuid")
+  const openDossier = useGobiernoUi((s) => s.openDossier)
+  const { uuid: ownUuid } = useOfficer()
+
+  const { data: users, isLoading: usersLoading } = useAdminUsers()
+  const { data: allApps, isLoading: appsLoading } = useAdminApps()
+  const [uuid, setUuid] = useState("")
+
+  useEffect(() => {
+    if (uuid || !users?.length) return
+    if (presetUuid && users.some((u) => u.uuid === presetUuid)) setUuid(presetUuid)
+    else if (ownUuid && users.some((u) => u.uuid === ownUuid)) setUuid(ownUuid)
+    else setUuid(users[0].uuid)
+  }, [uuid, users, presetUuid, ownUuid])
+
+  const { data: playerApps, isLoading: playerAppsLoading } = useAdminPlayerApps(uuid || null)
+  const addApp = useAdminAddApp()
+  const removeApp = useAdminRemoveApp()
+
+  const activeApps = (allApps ?? []).filter((a) => a.active === 1)
+  const assignedIds = new Set((playerApps ?? []).map((a) => a.id))
+  const assigned = activeApps.filter((a) => assignedIds.has(a.id))
+  const available = activeApps.filter((a) => !assignedIds.has(a.id))
+  const selectedUser = users?.find((u) => u.uuid === uuid)
+
+  return (
+    <>
+      <PageHead
+        kicker="Administración · Dispositivos"
+        dep="poblacion"
+        title="Apps de jugador"
+        sub="Gestiona las aplicaciones del SmartRotom de cada ciudadano. Antes Gestión de Apps."
+      />
+      <ConsolaHero title="Gestor de apps" code="apps" icon="smartphone" dep="poblacion" />
+
+      <Card className="mb-4">
+        <div className="flex flex-wrap items-center gap-3 p-3.5">
+          <span className="font-gt-mono text-[9.5px] font-bold uppercase tracking-[.12em] text-gt-ink-400">
+            Jugador
+          </span>
+          <div className="w-[260px]">
+            {usersLoading ? (
+              <Skeleton className="h-9" />
+            ) : (
+              <Select value={uuid} onChange={setUuid} options={(users ?? []).map((u) => ({ value: u.uuid, label: u.username }))} />
+            )}
+          </div>
+          {selectedUser && (
+            <Button tone="ghost" size="sm" icon="fileText" className="ml-auto" onClick={() => openDossier(selectedUser.uuid)}>
+              Ver expediente
+            </Button>
+          )}
+        </div>
+      </Card>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card className="overflow-hidden">
+          <Bar icon="star" dep="gold">
+            Apps asignadas {assigned.length > 0 && <span className="font-gt-mono text-[11px] text-gt-ink-400"> · {assigned.length}</span>}
+          </Bar>
+          {appsLoading || playerAppsLoading ? (
+            <div className="grid grid-cols-4 gap-2.5 p-3.5">
+              {Array.from({ length: 4 }, (_, i) => (
+                <Skeleton key={i} className="h-[92px]" />
+              ))}
+            </div>
+          ) : assigned.length ? (
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(96px,1fr))] gap-2.5 p-3.5">
+              {assigned.map((a) => (
+                <AppTile
+                  key={a.id}
+                  app={a}
+                  action={
+                    <Button size="sm" tone="ghost" icon="minus" disabled={removeApp.isPending} onClick={() => removeApp.mutate({ uuid, id: a.id })}>
+                      Quitar
+                    </Button>
+                  }
+                />
+              ))}
+            </div>
+          ) : (
+            <Empty icon="badge" title="Sin apps asignadas" sub="Este jugador no tiene apps adicionales asignadas." />
+          )}
+        </Card>
+
+        <Card className="overflow-hidden">
+          <Bar icon="plus" dep="poblacion">
+            Disponibles para asignar
+          </Bar>
+          {appsLoading || playerAppsLoading ? (
+            <div className="grid grid-cols-4 gap-2.5 p-3.5">
+              {Array.from({ length: 4 }, (_, i) => (
+                <Skeleton key={i} className="h-[92px]" />
+              ))}
+            </div>
+          ) : available.length ? (
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(96px,1fr))] gap-2.5 p-3.5">
+              {available.map((a) => (
+                <AppTile
+                  key={a.id}
+                  app={a}
+                  action={
+                    <Button size="sm" tone="soft" icon="plus" disabled={addApp.isPending} onClick={() => addApp.mutate({ uuid, id: a.id })}>
+                      Añadir
+                    </Button>
+                  }
+                />
+              ))}
+            </div>
+          ) : (
+            <Empty icon="checkCircle" title="Todo asignado" sub="Este jugador tiene todas las apps disponibles." />
+          )}
+        </Card>
+      </div>
+    </>
+  )
+}

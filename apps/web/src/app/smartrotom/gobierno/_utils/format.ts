@@ -1,0 +1,49 @@
+export const money = (n: number | null | undefined): string => Number(n ?? 0).toLocaleString("es-ES")
+
+export const timeAgo = (iso: string | Date | null | undefined): string => {
+  if (!iso) return "—"
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return "—"
+  const diff = (Date.now() - d.getTime()) / 1000
+  if (diff < 60) return "hace un momento"
+  if (diff < 3600) return `hace ${Math.floor(diff / 60)} min`
+  if (diff < 86400) return `hace ${Math.floor(diff / 3600)} h`
+  return `hace ${Math.floor(diff / 86400)} d`
+}
+
+export const fmtDate = (iso: string | Date | null | undefined): string => {
+  if (!iso) return "—"
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return "—"
+  return d.toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" })
+}
+
+export const fmtDateTime = (iso: string | Date | null | undefined): string => {
+  if (!iso) return "—"
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return "—"
+  return d.toLocaleString("es-ES", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })
+}
+
+// "Termina en 4 h 25 min" — an auction or a hunt is only legible as time remaining.
+export const timeLeft = (iso: string | Date | null | undefined): string => {
+  if (!iso) return "—"
+  const ms = new Date(iso).getTime() - Date.now()
+  if (Number.isNaN(ms)) return "—"
+  if (ms <= 0) return "finalizado"
+  const h = Math.floor(ms / 3_600_000)
+  const m = Math.floor((ms % 3_600_000) / 60_000)
+  if (h >= 24) return `${Math.floor(h / 24)} d ${h % 24} h`
+  if (h > 0) return `${h} h ${m} min`
+  return `${m} min`
+}
+
+// Towns arrive from WorldGuard as snake_case region prefixes (`ciudad_carmin`).
+export const townName = (raw: string | null | undefined): string => {
+  if (!raw) return "—"
+  return raw.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+}
+
+// The badge number is derived from the user id, not stored — there is no officers table.
+export const badgeOf = (userId: number | null | undefined, prefix = "G"): string =>
+  `${prefix}-${String(userId ?? 0).padStart(3, "0")}`

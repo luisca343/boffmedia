@@ -1,0 +1,403 @@
+"use client"
+
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { GobiernoService } from "@/services/api/smartrotom/gobiernoService"
+import { toast } from "../_components/ui"
+import type {
+  Anuncio,
+  Apelacion,
+  AuditEntry,
+  BitacoraEntry,
+  Buscado,
+  Cartel,
+  Ciudadano,
+  Counters,
+  Denuncia,
+  Evento,
+  Expediente,
+  MegafoniaEntry,
+  Multa,
+  NpcSkin,
+  Oficial,
+  Paged,
+  Parcela,
+  ParcelaHistorial,
+  Patrulla,
+  Subasta,
+  Tesoreria,
+  Zona,
+} from "../_types"
+
+/**
+ * `boffAPI` has two failure modes: network errors THROW, but HTTP errors RESOLVE to
+ * `{ success: false }`. Reading `.data` off a failed response is the silent-failure the
+ * audit flagged, so every call in this app funnels through here and a failed envelope
+ * becomes a thrown error that TanStack Query can actually see (SMARTROTOM_V3 §8).
+ */
+async function unwrap<T>(p: Promise<unknown>): Promise<T> {
+  const res = (await p) as { success?: boolean; statusCode?: number; data?: unknown; message?: string }
+  if (res?.success === false || (res?.statusCode && res.statusCode >= 400)) {
+    throw new Error(res?.message || "La solicitud al Gobierno de Teras ha fallado.")
+  }
+  return res?.data as T
+}
+
+type Query = Record<string, string | number | boolean | undefined | null>
+
+export const gobKeys = {
+  counters: ["gob", "counters"] as const,
+  zonas: (q?: Query) => ["gob", "zonas", q ?? {}] as const,
+  parcelas: (q?: Query) => ["gob", "parcelas", q ?? {}] as const,
+  historial: (q?: Query) => ["gob", "historial", q ?? {}] as const,
+  parcelaHistorial: (regionId: string) => ["gob", "parcela-historial", regionId] as const,
+  subastas: (q?: Query) => ["gob", "subastas", q ?? {}] as const,
+  denuncias: (q?: Query) => ["gob", "denuncias", q ?? {}] as const,
+  buscados: (q?: Query) => ["gob", "buscados", q ?? {}] as const,
+  patrullas: ["gob", "patrullas"] as const,
+  bitacora: (q?: Query) => ["gob", "bitacora", q ?? {}] as const,
+  multas: (q?: Query) => ["gob", "multas", q ?? {}] as const,
+  tesoreria: ["gob", "tesoreria"] as const,
+  expedientes: (q?: Query) => ["gob", "expedientes", q ?? {}] as const,
+  expediente: (id: number) => ["gob", "expediente", id] as const,
+  apelaciones: (q?: Query) => ["gob", "apelaciones", q ?? {}] as const,
+  censo: (q?: Query) => ["gob", "censo", q ?? {}] as const,
+  ciudadano: (uuid: string) => ["gob", "ciudadano", uuid] as const,
+  oficiales: ["gob", "oficiales"] as const,
+  anuncios: (q?: Query) => ["gob", "anuncios", q ?? {}] as const,
+  auditoria: (q?: Query) => ["gob", "auditoria", q ?? {}] as const,
+  eventos: (q?: Query) => ["gob", "eventos", q ?? {}] as const,
+  evento: (id: number) => ["gob", "evento", id] as const,
+  npcSkins: ["gob", "npc-skins"] as const,
+  megafonia: (q?: Query) => ["gob", "megafonia", q ?? {}] as const,
+  carteles: ["gob", "carteles"] as const,
+}
+
+// ─── Reads ────────────────────────────────────────────────────────────────────
+
+export const useCounters = () =>
+  useQuery({
+    queryKey: gobKeys.counters,
+    queryFn: () => unwrap<Counters>(GobiernoService.counters()),
+    staleTime: 30_000,
+  })
+
+export const useZonas = (q?: Query) =>
+  useQuery({ queryKey: gobKeys.zonas(q), queryFn: () => unwrap<Zona[]>(GobiernoService.zonas(q)) })
+
+export const useParcelas = (q?: Query) =>
+  useQuery({ queryKey: gobKeys.parcelas(q), queryFn: () => unwrap<Paged<Parcela>>(GobiernoService.parcelas(q)) })
+
+export const useHistorial = (q?: Query) =>
+  useQuery({
+    queryKey: gobKeys.historial(q),
+    queryFn: () => unwrap<Paged<ParcelaHistorial>>(GobiernoService.historial(q)),
+  })
+
+export const useSubastas = (q?: Query) =>
+  useQuery({ queryKey: gobKeys.subastas(q), queryFn: () => unwrap<Paged<Subasta>>(GobiernoService.subastas(q)) })
+
+export const useDenuncias = (q?: Query) =>
+  useQuery({ queryKey: gobKeys.denuncias(q), queryFn: () => unwrap<Paged<Denuncia>>(GobiernoService.denuncias(q)) })
+
+export const useBuscados = (q?: Query) =>
+  useQuery({ queryKey: gobKeys.buscados(q), queryFn: () => unwrap<Paged<Buscado>>(GobiernoService.buscados(q)) })
+
+export const usePatrullas = () =>
+  useQuery({ queryKey: gobKeys.patrullas, queryFn: () => unwrap<Patrulla[]>(GobiernoService.patrullas()) })
+
+export const useBitacora = (q?: Query) =>
+  useQuery({ queryKey: gobKeys.bitacora(q), queryFn: () => unwrap<BitacoraEntry[]>(GobiernoService.bitacora(q)) })
+
+export const useMultas = (q?: Query) =>
+  useQuery({ queryKey: gobKeys.multas(q), queryFn: () => unwrap<Paged<Multa>>(GobiernoService.multas(q)) })
+
+export const useTesoreria = () =>
+  useQuery({ queryKey: gobKeys.tesoreria, queryFn: () => unwrap<Tesoreria>(GobiernoService.tesoreria()) })
+
+export const useExpedientes = (q?: Query) =>
+  useQuery({
+    queryKey: gobKeys.expedientes(q),
+    queryFn: () => unwrap<Paged<Expediente>>(GobiernoService.expedientes(q)),
+  })
+
+export const useExpediente = (id: number | null) =>
+  useQuery({
+    queryKey: gobKeys.expediente(id ?? 0),
+    queryFn: () => unwrap<Expediente>(GobiernoService.expediente(id as number)),
+    enabled: id != null,
+  })
+
+export const useApelaciones = (q?: Query) =>
+  useQuery({
+    queryKey: gobKeys.apelaciones(q),
+    queryFn: () => unwrap<Paged<Apelacion>>(GobiernoService.apelaciones(q)),
+  })
+
+export const useCenso = (q?: Query) =>
+  useQuery({ queryKey: gobKeys.censo(q), queryFn: () => unwrap<Paged<Ciudadano>>(GobiernoService.censo(q)) })
+
+export const useCiudadano = (uuid: string | null) =>
+  useQuery({
+    queryKey: gobKeys.ciudadano(uuid ?? ""),
+    queryFn: () => unwrap<Ciudadano>(GobiernoService.ciudadano(uuid as string)),
+    enabled: !!uuid,
+  })
+
+export const useOficiales = () =>
+  useQuery({ queryKey: gobKeys.oficiales, queryFn: () => unwrap<Oficial[]>(GobiernoService.oficiales()) })
+
+export const useAnuncios = (q?: Query) =>
+  useQuery({ queryKey: gobKeys.anuncios(q), queryFn: () => unwrap<Paged<Anuncio>>(GobiernoService.anuncios(q)) })
+
+export const useAuditoria = (q?: Query) =>
+  useQuery({ queryKey: gobKeys.auditoria(q), queryFn: () => unwrap<Paged<AuditEntry>>(GobiernoService.auditoria(q)) })
+
+export const useEventos = (q?: Query) =>
+  useQuery({ queryKey: gobKeys.eventos(q), queryFn: () => unwrap<Evento[]>(GobiernoService.eventos(q)) })
+
+export const useEvento = (id: number | null) =>
+  useQuery({
+    queryKey: gobKeys.evento(id ?? 0),
+    queryFn: () => unwrap<Evento>(GobiernoService.evento(id as number)),
+    enabled: id != null,
+  })
+
+export const useNpcSkins = () =>
+  useQuery({ queryKey: gobKeys.npcSkins, queryFn: () => unwrap<NpcSkin[]>(GobiernoService.npcSkins()) })
+
+export const useMegafonia = (q?: Query) =>
+  useQuery({
+    queryKey: gobKeys.megafonia(q),
+    queryFn: () => unwrap<MegafoniaEntry[]>(GobiernoService.megafonia(q)),
+  })
+
+export const useCarteles = () =>
+  useQuery({ queryKey: gobKeys.carteles, queryFn: () => unwrap<Cartel[]>(GobiernoService.carteles()) })
+
+// ─── Mutations ────────────────────────────────────────────────────────────────
+
+/**
+ * Every mutation lands in the audit log, and the money ones move the treasury too — so a
+ * successful write always invalidates `auditoria` and `counters`, and the money ones also
+ * invalidate `tesoreria`. Invalidating together is what keeps a paid fine from showing as
+ * paid on one screen and pending on the next.
+ */
+function useGobMutation<TArgs, TData>(
+  fn: (args: TArgs) => Promise<unknown>,
+  opts: { keys: readonly unknown[][]; money?: boolean; success?: (data: TData, args: TArgs) => string },
+) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (args: TArgs) => unwrap<TData>(fn(args)),
+    onSuccess: (data, args) => {
+      const keys = [...opts.keys, ["gob", "auditoria"], ["gob", "counters"]]
+      if (opts.money) keys.push(["gob", "tesoreria"])
+      keys.forEach((key) => qc.invalidateQueries({ queryKey: key }))
+      const msg = opts.success?.(data, args)
+      if (msg) toast(msg, "ok", "check")
+    },
+    onError: (e: Error) => toast(e.message, "danger", "alert"),
+  })
+}
+
+export const useCreateDenuncia = () =>
+  useGobMutation<unknown, Denuncia>((b) => GobiernoService.createDenuncia(b), {
+    keys: [["gob", "denuncias"]],
+    success: (d) => `Denuncia ${d.code} registrada`,
+  })
+
+export const useResolveDenuncia = () =>
+  useGobMutation<{ id: number; resolution: string; status: string }, Denuncia>(
+    ({ id, ...b }) => GobiernoService.resolveDenuncia(id, b),
+    { keys: [["gob", "denuncias"]], success: (d) => `Denuncia ${d.code} resuelta` },
+  )
+
+export const useCreateMulta = () =>
+  useGobMutation<unknown, Multa>((b) => GobiernoService.createMulta(b), {
+    keys: [["gob", "multas"]],
+    success: (m) => `Multa ${m.code} emitida`,
+  })
+
+export const usePayMulta = () =>
+  useGobMutation<number, Multa>((id) => GobiernoService.payMulta(id), {
+    keys: [["gob", "multas"], ["gob", "apelaciones"]],
+    money: true,
+    success: (m) => `Multa ${m.code} pagada a la Tesorería`,
+  })
+
+export const useCancelMulta = () =>
+  useGobMutation<number, Multa>((id) => GobiernoService.cancelMulta(id), {
+    keys: [["gob", "multas"]],
+    success: (m) => `Multa ${m.code} anulada`,
+  })
+
+export const useCreateBuscado = () =>
+  useGobMutation<unknown, Buscado>((b) => GobiernoService.createBuscado(b), {
+    keys: [["gob", "buscados"]],
+    success: (b) => `${b.player.username} añadido a busca y captura`,
+  })
+
+export const useCaptureBuscado = () =>
+  useGobMutation<{ id: number; capturedBy: string }, Buscado>(
+    ({ id, ...b }) => GobiernoService.captureBuscado(id, b),
+    {
+      keys: [["gob", "buscados"]],
+      money: true,
+      success: (b) => `Captura confirmada · recompensa pagada`,
+    },
+  )
+
+export const useCreateSubasta = () =>
+  useGobMutation<unknown, Subasta>((b) => GobiernoService.createSubasta(b), {
+    keys: [["gob", "subastas"], ["gob", "parcelas"]],
+    success: (s) => `Subasta ${s.code} abierta`,
+  })
+
+export const usePuja = () =>
+  useGobMutation<{ id: number; uuid: string; amount: number }, Subasta>(
+    ({ id, ...b }) => GobiernoService.puja(id, b),
+    { keys: [["gob", "subastas"]], success: (s) => `Puja registrada · ${s.code}` },
+  )
+
+export const useCloseSubasta = () =>
+  useGobMutation<number, Subasta>((id) => GobiernoService.closeSubasta(id), {
+    keys: [["gob", "subastas"], ["gob", "parcelas"]],
+    money: true,
+    success: (s) => `Subasta ${s.code} adjudicada`,
+  })
+
+export const useResolveApelacion = () =>
+  useGobMutation<{ id: number; outcome: "upheld" | "overturned"; decision: string }, Apelacion>(
+    ({ id, ...b }) => GobiernoService.resolveApelacion(id, b),
+    {
+      keys: [["gob", "apelaciones"], ["gob", "multas"]],
+      money: true,
+      success: (a) => `Apelación ${a.code} ${a.status === "overturned" ? "estimada" : "desestimada"}`,
+    },
+  )
+
+export const useCreateExpediente = () =>
+  useGobMutation<unknown, Expediente>((b) => GobiernoService.createExpediente(b), {
+    keys: [["gob", "expedientes"]],
+    success: (e) => `Expediente ${e.code} abierto`,
+  })
+
+export const useAddExpedienteEvento = () =>
+  useGobMutation<{ id: number; kind: string; text: string; ref?: string }, unknown>(
+    ({ id, ...b }) => GobiernoService.addExpedienteEvento(id, b),
+    { keys: [["gob", "expedientes"], ["gob", "expediente"]], success: () => "Anotación añadida al expediente" },
+  )
+
+export const useCreateZona = () =>
+  useGobMutation<unknown, Zona>((b) => GobiernoService.createZona(b), {
+    keys: [["gob", "zonas"], ["gob", "parcelas"]],
+    success: (z) => `Zona «${z.name}» creada`,
+  })
+
+export const useUpdateZona = () =>
+  useGobMutation<{ id: number; [k: string]: unknown }, Zona>(({ id, ...b }) => GobiernoService.updateZona(id, b), {
+    keys: [["gob", "zonas"], ["gob", "parcelas"]],
+    success: (z) => `Zona «${z.name}» actualizada`,
+  })
+
+export const useUpdateParcela = () =>
+  useGobMutation<{ regionId: string; [k: string]: unknown }, Parcela>(
+    ({ regionId, ...b }) => GobiernoService.updateParcela(regionId, b),
+    { keys: [["gob", "parcelas"], ["gob", "zonas"]], success: () => "Parcela actualizada" },
+  )
+
+export const useAddBitacora = () =>
+  useGobMutation<unknown, BitacoraEntry>((b) => GobiernoService.addBitacora(b), {
+    keys: [["gob", "bitacora"], ["gob", "patrullas"]],
+    success: () => "Anotación registrada en la bitácora",
+  })
+
+export const useCreatePatrulla = () =>
+  useGobMutation<unknown, Patrulla>((b) => GobiernoService.createPatrulla(b), {
+    keys: [["gob", "patrullas"]],
+    success: (p) => `Turno «${p.label}» creado`,
+  })
+
+export const useUpdatePatrulla = () =>
+  useGobMutation<{ id: number; [k: string]: unknown }, Patrulla>(
+    ({ id, ...b }) => GobiernoService.updatePatrulla(id, b),
+    { keys: [["gob", "patrullas"]], success: (p) => `Turno «${p.label}» actualizado` },
+  )
+
+export const useCreateAnuncio = () =>
+  useGobMutation<unknown, Anuncio>((b) => GobiernoService.createAnuncio(b), {
+    keys: [["gob", "anuncios"]],
+    success: (a) => `«${a.title}» publicado`,
+  })
+
+export const useUpdateAnuncio = () =>
+  useGobMutation<{ id: number; [k: string]: unknown }, Anuncio>(
+    ({ id, ...b }) => GobiernoService.updateAnuncio(id, b),
+    { keys: [["gob", "anuncios"]], success: () => "Anuncio actualizado" },
+  )
+
+export const useDeleteAnuncio = () =>
+  useGobMutation<number, unknown>((id) => GobiernoService.deleteAnuncio(id), {
+    keys: [["gob", "anuncios"]],
+    success: () => "Anuncio retirado",
+  })
+
+export const useCreateEvento = () =>
+  useGobMutation<unknown, Evento>((b) => GobiernoService.createEvento(b), {
+    keys: [["gob", "eventos"]],
+    success: (e) => `Evento ${e.code} creado`,
+  })
+
+export const useUpdateEvento = () =>
+  useGobMutation<{ id: number; [k: string]: unknown }, Evento>(({ id, ...b }) => GobiernoService.updateEvento(id, b), {
+    keys: [["gob", "eventos"], ["gob", "evento"]],
+    success: () => "Evento actualizado",
+  })
+
+export const useCreateObra = () =>
+  useGobMutation<{ eventoId: number; [k: string]: unknown }, unknown>(
+    ({ eventoId, ...b }) => GobiernoService.createObra(eventoId, b),
+    { keys: [["gob", "eventos"], ["gob", "evento"]], success: () => "Obra registrada" },
+  )
+
+export const useSetEspecies = () =>
+  useGobMutation<{ eventoId: number; especies: unknown[] }, unknown>(
+    ({ eventoId, especies }) => GobiernoService.setEspecies(eventoId, { especies }),
+    { keys: [["gob", "eventos"], ["gob", "evento"]], success: () => "Tabla de aparición guardada" },
+  )
+
+export const useGrantRole = () =>
+  useGobMutation<{ uuid: string; role: string }, unknown>(({ uuid, role }) => GobiernoService.grantRole(uuid, { role }), {
+    keys: [["gob", "oficiales"]],
+    success: () => "Nombramiento registrado",
+  })
+
+export const useRevokeRole = () =>
+  useGobMutation<{ uuid: string; role: string }, unknown>(
+    ({ uuid, role }) => GobiernoService.revokeRole(uuid, role),
+    { keys: [["gob", "oficiales"]], success: () => "Cese registrado" },
+  )
+
+export const useUpsertNpcSkin = () =>
+  useGobMutation<unknown, NpcSkin>((b) => GobiernoService.upsertNpcSkin(b), {
+    keys: [["gob", "npc-skins"]],
+    success: (s) => `Skin «${s.skin}» guardada`,
+  })
+
+export const useSendMegafonia = () =>
+  useGobMutation<{ speaker: string; text: string }, unknown>((b) => GobiernoService.sendMegafonia(b), {
+    keys: [["gob", "megafonia"]],
+    success: () => "Mensaje emitido al servidor",
+  })
+
+export const useCreateCartel = () =>
+  useGobMutation<unknown, Cartel>((b) => GobiernoService.createCartel(b), {
+    keys: [["gob", "carteles"]],
+    success: (c) => `Cartel «${c.name}» guardado`,
+  })
+
+export const useDeleteCartel = () =>
+  useGobMutation<number, unknown>((id) => GobiernoService.deleteCartel(id), {
+    keys: [["gob", "carteles"]],
+    success: () => "Cartel eliminado",
+  })
