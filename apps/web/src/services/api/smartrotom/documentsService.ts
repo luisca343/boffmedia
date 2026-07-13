@@ -6,6 +6,12 @@ import type {
   CreateNewsDto,
   UpdateNewsDto,
   NewsStatusDto,
+  NewsComment,
+  CreateNewsCommentDto,
+  NewsletterSubscribeDto,
+  EditorialBoardMember,
+  NewsIssue,
+  ClapResponse,
   Document,
   NotePreview,
   CreateNoteResponse,
@@ -232,6 +238,48 @@ export class DocumentsService {
    */
   static updateNewsStatus(data: NewsStatusDto) {
     return rotomPOST<SuccessResponse>('/documents/newsstatus', data);
+  }
+
+  // ==================== FURRET TODAY EDITORIAL ====================
+  // Reader comments, claps, the derived masthead and the derived back-issue
+  // archive. Added in migration 0025 for the Furret Today magazine redesign.
+
+  /** Reader comments ("viñetas") on an article, newest first */
+  static getNewsComments(newsId: number) {
+    return rotomGET<NewsComment[]>(`/documents/news/${newsId}/comments`);
+  }
+
+  /** Post a reader comment */
+  static createNewsComment(newsId: number, data: CreateNewsCommentDto) {
+    return rotomPOST<NewsComment>(`/documents/news/${newsId}/comments`, data);
+  }
+
+  /** Delete a reader comment */
+  static deleteNewsComment(commentId: number) {
+    return rotomDELETE<SuccessResponse>(`/documents/news/comments/${commentId}`);
+  }
+
+  /** Applaud an article — increments its clap counter */
+  static clapNews(newsId: number) {
+    return rotomPOST<ClapResponse>(`/documents/news/${newsId}/clap`, {});
+  }
+
+  /**
+   * The editorial board — DERIVED by grouping published news on
+   * (author, authorRole), not a table.
+   */
+  static getEditorialBoard() {
+    return rotomGET<EditorialBoardMember[]>('/documents/news/board');
+  }
+
+  /** The back-issue archive — DERIVED by grouping published news on `issue`. */
+  static getNewsIssues() {
+    return rotomGET<NewsIssue[]>('/documents/news/issues');
+  }
+
+  /** Subscribe an email to the weekly newsletter */
+  static subscribeNewsletter(data: NewsletterSubscribeDto) {
+    return rotomPOST<SuccessResponse>('/documents/newsletter', data);
   }
 
   // ==================== CONVENIENCE METHODS ====================

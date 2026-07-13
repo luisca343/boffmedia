@@ -287,6 +287,97 @@ export const CHAPTERS: Chapter[] = [
       { id: "ms-cadena", label: "Cadena" },
     ],
   },
+
+  // ── Furret Today · ft-* ────────────────────────────────────────────────────
+  {
+    name: "Bases",
+    dom: "Furret Today",
+    app: "ft",
+    sections: [
+      { id: "ft-color", label: "Color" },
+      { id: "ft-tipografia", label: "Tipografía" },
+      { id: "ft-texturas", label: "Texturas y tramas" },
+    ],
+  },
+  {
+    name: "Primitivas",
+    dom: "Furret Today",
+    app: "ft",
+    sections: [
+      { id: "ft-botones", label: "Botones" },
+      { id: "ft-etiquetas", label: "Etiquetas" },
+      { id: "ft-tarjetas", label: "Tarjetas" },
+      { id: "ft-controles", label: "Controles" },
+      { id: "ft-estados", label: "Carga y vacíos" },
+    ],
+  },
+  {
+    name: "Quiosco",
+    dom: "Furret Today",
+    app: "ft",
+    sections: [
+      { id: "ft-viñeta", label: "Viñeta" },
+      { id: "ft-portada", label: "Portada" },
+      { id: "ft-articulo", label: "Artículo" },
+    ],
+  },
+  // ── PC · the pc-* storage console ─────────────────────────────────────────
+  {
+    name: "Bases",
+    dom: "PC",
+    app: "pc",
+    sections: [
+      { id: "pc-color", label: "Color" },
+      { id: "pc-tipografia", label: "Tipografía" },
+      { id: "pc-fondos", label: "Fondos de caja" },
+    ],
+  },
+  {
+    name: "Primitivas",
+    dom: "PC",
+    app: "pc",
+    sections: [
+      { id: "pc-botones", label: "Botones" },
+      { id: "pc-etiquetas", label: "Etiquetas" },
+      { id: "pc-campos", label: "Campos" },
+      { id: "pc-medidores", label: "Medidores" },
+      { id: "pc-estados", label: "Carga" },
+    ],
+  },
+  {
+    name: "Almacén",
+    dom: "PC",
+    app: "pc",
+    sections: [
+      { id: "pc-huecos", label: "Huecos" },
+      { id: "pc-caja", label: "La caja" },
+      { id: "pc-tipos", label: "Tipos" },
+    ],
+  },
+  // ── Gobierno de Teras · gt-* ───────────────────────────────────────────────
+  {
+    name: "Bases",
+    dom: "Gobierno",
+    app: "gt",
+    sections: [
+      { id: "gt-color", label: "Color" },
+      { id: "gt-tipografia", label: "Tipografía" },
+      { id: "gt-geometria", label: "Geometría" },
+    ],
+  },
+  {
+    name: "Primitivas",
+    dom: "Gobierno",
+    app: "gt",
+    sections: [
+      { id: "gt-botones", label: "Botones y distintivos" },
+      { id: "gt-superficies", label: "Superficies" },
+      { id: "gt-datos", label: "Datos" },
+      { id: "gt-formularios", label: "Formularios" },
+      { id: "gt-estados", label: "Vacíos y carga" },
+    ],
+  },
+
 ]
 
 export const DOMAIN_ORDER = [
@@ -299,6 +390,9 @@ export const DOMAIN_ORDER = [
   "Taxi",
   "Arcade",
   "Misiones",
+  "Furret Today",
+  "PC",
+  "Gobierno",
 ]
 
 // Chapter names repeat across domains ("Bases" exists six times), so a chapter's
@@ -321,4 +415,7 @@ export const DOMAIN_META: Record<string, { ns: string; note: string }> = {
   Taxi: { ns: "tx-*", note: "Movilidad · azul estructura, ámbar dinero" },
   Arcade: { ns: "ar-*", note: "Synthwave CRT · oscuro, cinco neones" },
   Misiones: { ns: "ms-*", note: "Taberna · pergamino y cera, oscuro" },
+  "Furret Today": { ns: "ft-*", note: "Revista pop · papel de periódico, claro" },
+  PC: { ns: "pc-*", note: "Consola de almacenamiento · pizarra y cristal, oscuro" },
+  Gobierno: { ns: "gt-*", note: "Institución cívica · papel y sello grabado, claro" },
 }

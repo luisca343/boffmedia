@@ -26,7 +26,7 @@ export const sideLink =
 // bare would show unresolved CSS vars. `Scope` reproduces the real root from each
 // app's layout — the same classes, so a primitive looks here exactly as it does in
 // the app. `sr` is deliberately a no-op: the chrome has no scope root, it's global.
-export type AppKey = "sr" | "sb" | "ca" | "nt" | "pk" | "mw" | "tx" | "ms" | "ar"
+export type AppKey = "sr" | "sb" | "ca" | "nt" | "pk" | "mw" | "tx" | "ms" | "ar" | "ft" | "pc" | "gt"
 
 // The scope CLASS is what makes an app's tokens resolve: `ca`/`nt`/`mw` are CSS-var
 // backed and their vars are declared on `.ca-app`/`.nt-app`/`.mw-app` base layers, so
@@ -42,6 +42,9 @@ const SCOPE_VARS: Record<AppKey, string> = {
   tx: "tx-app",
   ms: "ms-app",
   ar: "ar-app",
+  ft: "ft-app",
+  pc: "pc-app",
+  gt: "gt-app",
 }
 
 // The SKIN is the app's canvas + fonts + ink, lifted from its real layout root. Kept
@@ -59,6 +62,14 @@ const SCOPE_SKIN: Record<AppKey, string> = {
   ms: "ms-tavern font-ms text-ms-ink-1 antialiased",
   // The Arcade's canvas is the synthwave void: two neon blooms over a violet gradient.
   ar: "ar-canvas font-ar text-ar-ink antialiased",
+  // Furret Today's canvas is the paper itself — the `.ft-app` base layer already
+  // paints the cream newsprint gradient, so the skin only adds the type and ink.
+  ft: "font-ft text-ft-ink antialiased",
+  // The PC's canvas is the slate void the glass panels float on.
+  pc: "pc-canvas font-pc text-pc-fg antialiased",
+  // The Gobierno's canvas is warm paper: `gt-paper` lays the grain and the engraved
+  // guilloché over it, the way an official document is printed on stock, not on white.
+  gt: "gt-paper bg-gt-paper-bg font-gt text-gt-ink-800 antialiased",
 }
 
 export function Scope({
