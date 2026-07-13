@@ -33,14 +33,16 @@ export function GraphView({
     Promise.all(
       missing.map((n) =>
         DocumentsService.getDocument(n.id)
-          .then((r) => [n.id, r.data?.content ?? ""] as const)
-          .catch(() => [n.id, ""] as const),
+          // A failed read resolves to `{ success: false }`; caching "" for it would draw the
+          // note as an isolated node, so leave it unresolved and let the next open retry.
+          .then((r) => [n.id, r.success ? r.data?.content ?? "" : null] as const)
+          .catch(() => [n.id, null] as const),
       ),
     ).then((pairs) => {
       if (cancelled) return;
       setContent((prev) => {
         const next = { ...prev };
-        for (const [id, c] of pairs) next[id] = c;
+        for (const [id, c] of pairs) if (c != null) next[id] = c;
         return next;
       });
     });

@@ -169,8 +169,9 @@ export function getPokedexStatus(
 }
 
 export async function getItemSprite(name: string) {
-  const img = (await PokemonService.getItemSprite(name)).data
-  return await img
+  const res = await PokemonService.getItemSprite(name)
+  if (!res.success || !res.data) return null
+  return res.data
 }
 
 export function getPokemonName(name: string, t: any) {

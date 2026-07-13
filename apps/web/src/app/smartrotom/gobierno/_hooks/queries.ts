@@ -34,7 +34,7 @@ import type {
  * audit flagged, so every call in this app funnels through here and a failed envelope
  * becomes a thrown error that TanStack Query can actually see (SMARTROTOM_V3 §8).
  */
-async function unwrap<T>(p: Promise<unknown>): Promise<T> {
+export async function unwrap<T>(p: Promise<unknown>): Promise<T> {
   const res = (await p) as { success?: boolean; statusCode?: number; data?: unknown; message?: string }
   if (res?.success === false || (res?.statusCode && res.statusCode >= 400)) {
     throw new Error(res?.message || "La solicitud al Gobierno de Teras ha fallado.")

@@ -12,7 +12,14 @@ export function useTransfer() {
     setError(null);
     
     try {
+      // boffAPI resolves `{ success: false }` on an HTTP error and only throws on a
+      // network error, so a business failure (insufficient funds, bad account, 5xx)
+      // reaches here as a normal return value. Rejecting is what makes it reach the
+      // caller's catch instead of the success screen.
       const result = await StarbankService.transfer(transferData);
+      if (!result.success) {
+        throw new Error(result.message || result.error || "No se pudo completar la transferencia");
+      }
       setData(result.data ?? null);
       return result;
     } catch (err: any) {
